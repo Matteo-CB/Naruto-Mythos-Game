@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-05-05",
+      "title_fr": "Sakura Secret (135) plus de boucle infinie + Kakashi ne peut plus copier Kakashi",
+      "title_en": "Sakura Secret (135) no longer loops + Kakashi can't copy Kakashi anymore",
+      "changes_fr": [
+        "Sakura Secret (135) : la boucle où l'écran redemandait sans fin de défausser deux cartes après le choix est corrigée. L'effet termine proprement et joue la carte choisie.",
+        "Kakashi (016 Sharingan, 148 Mythos) ne peut plus copier un autre Kakashi en jeu. Tous les Kakashi sont retirés des cibles copiables, ce qui empêche les boucles infinies de copie."
+      ],
+      "changes_en": [
+        "Sakura Secret (135): the infinite loop where the screen kept asking to discard two cards after picking is fixed. The effect now resolves properly and plays the chosen card.",
+        "Kakashi (016 Sharingan, 148 Mythos) can no longer copy another Kakashi in play. All Kakashi are removed from the copyable target pool, which prevents the infinite copy loops."
+      ]
+    },
+    {
+      "date": "2026-05-05",
       "title_fr": "Performances, replays compressés et fix MSS 05",
       "title_en": "Performance, compressed replays and MSS 05 fix",
       "changes_fr": [

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
@@ -87,9 +87,15 @@ export function TargetOrderPopup({
     }
   }, [allSelected, orderedIds, onConfirm]);
 
-  
+  const autoConfirmedRef = useRef(false);
+  useEffect(() => {
+    if (targets.length === 1 && !autoConfirmedRef.current) {
+      autoConfirmedRef.current = true;
+      onConfirm([targets[0].instanceId]);
+    }
+  }, [targets, onConfirm]);
+
   if (targets.length === 1) {
-    onConfirm([targets[0].instanceId]);
     return null;
   }
 

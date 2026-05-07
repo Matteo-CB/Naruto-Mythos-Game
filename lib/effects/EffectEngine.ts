@@ -18349,10 +18349,9 @@ export class EffectEngine {
     let drawnCards: any[] = storedCards;
     if (drawnCards.length === 0) {
       drawnCards = (newState as any)._sakura135DrawnCards ?? [];
-      delete (newState as any)._sakura135DrawnCards;
     }
     if (drawnCards.length === 0) {
-      
+
       let topCardsInfo: any[] = [];
       try { topCardsInfo = JSON.parse(pending.effectDescription).topCards ?? []; } catch { /* ignore */ }
       const numDrawn = topCardsInfo.length;
@@ -18360,6 +18359,7 @@ export class EffectEngine {
         drawnCards = ps.discardPile.splice(ps.discardPile.length - numDrawn, numDrawn);
       }
     }
+    delete (newState as any)._sakura135DrawnCards;
 
     if (cardIndex < 0 || cardIndex >= drawnCards.length) return state;
 
