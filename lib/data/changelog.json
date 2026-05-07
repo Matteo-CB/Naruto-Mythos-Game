@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-05",
+      "title_fr": "Prise de contrôle : un personnage volé déjà upgrade revient bien à son propriétaire si le contrôleur quitte",
+      "title_en": "Take control: a stolen character that was already upgraded now returns to its owner when the controller leaves",
+      "changes_fr": [
+        "Quand Ino (ou un effet similaire) prenait le contrôle d'un personnage déjà upgrade (stack > 1) et que le contrôleur quittait le jeu (défaite, caché, retour en main), le personnage volé restait sur le côté du contrôleur. Conforme à la règle, il revient désormais à son propriétaire d'origine avec sa pile complète et son état (caché ou face visible)."
+      ],
+      "changes_en": [
+        "When Ino (or a similar effect) took control of an already-upgraded character (stack > 1) and the controller left play (defeated, hidden, returned to hand), the stolen character stayed on the controller's side. Per the rules, it now returns to its original owner with the full stack and its state (hidden or face-up)."
+      ]
+    },
+    {
+      "date": "2026-05-05",
       "title_fr": "Timers raccourcis : mulligan, mission et déconnexion à 1 minute",
       "title_en": "Shorter timers: mulligan, mission and disconnect at 1 minute",
       "changes_fr": [

@@ -15864,14 +15864,6 @@ export class EffectEngine {
 
       if (!currentMission || !char || !fromSide || idx === -1) continue;
 
-            
-            
-            if (char.stack && char.stack.length > 1) {
-              
-              char.controllerInstanceId = undefined;
-              continue;
-            }
-
             const toSide = char.originalOwner === 'player1' ? 'player1Characters' : 'player2Characters';
 
             

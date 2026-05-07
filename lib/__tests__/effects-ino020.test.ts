@@ -146,6 +146,44 @@ describe('Ino 020 (UC) - Take Control', () => {
       expect(itachiReturned?.controllerInstanceId).toBeUndefined();
     });
 
+    it('defeating the controller returns a stolen UPGRADED stack to its owner', () => {
+      const baseNaruto = mockCard({ id: 'KS-100-C', number: 100, name_fr: 'NARUTO UZUMAKI', chakra: 2, power: 2 });
+      const upgradedNaruto = mockCard({ id: 'KS-133-S', number: 133, name_fr: 'NARUTO UZUMAKI', chakra: 6, power: 6 });
+      const stolenNarutoStack = mockChar({
+        instanceId: 'naruto-stack',
+        card: upgradedNaruto,
+        stack: [baseNaruto, upgradedNaruto],
+        controlledBy: 'player2',
+        originalOwner: 'player1',
+        controllerInstanceId: 'ino-1',
+        isHidden: true,
+      });
+      const ino = mockChar({
+        instanceId: 'ino-1',
+        card: ino020,
+        controlledBy: 'player2',
+        originalOwner: 'player2',
+      });
+      const state = makeState({
+        activeMissions: [
+          mockMission({ player1Characters: [], player2Characters: [ino, stolenNarutoStack] }),
+          mockMission({ rank: 'C', rankBonus: 2 }),
+        ],
+      });
+
+      const after = EffectEngine.defeatCharacterDirect(state, 'ino-1');
+
+      const stillOnP2 = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'naruto-stack');
+      expect(stillOnP2).toBeUndefined();
+
+      const returned = after.activeMissions[0].player1Characters.find((c: { instanceId: string }) => c.instanceId === 'naruto-stack');
+      expect(returned).toBeDefined();
+      expect(returned?.controlledBy).toBe('player1');
+      expect(returned?.controllerInstanceId).toBeUndefined();
+      expect(returned?.stack.length).toBe(2);
+      expect(returned?.isHidden).toBe(true);
+    });
+
     it('Choji 018 post-move hide on the controller returns the stolen card', () => {
       const itachi = mockChar({
         instanceId: 'itachi-1',
