@@ -319,6 +319,27 @@ export async function rehydrateAbsenceTimers(io: Server): Promise<void> {
   }
 }
 
+async function handleSwissDoubleAbsence(io: Server, tournamentId: string, matchId: string) {
+  const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
+  if (!match || match.status === 'completed' || match.status === 'forfeit') return;
+
+  await prisma.tournamentMatch.update({
+    where: { id: matchId },
+    data: { status: 'forfeit', winnerId: null, winnerUsername: null, completedAt: new Date() },
+  });
+
+  io.to(`tournament:${tournamentId}`).emit('tournament:player-forfeited', {
+    matchId, forfeitedPlayerId: match.player1Id, winnerId: null, winnerUsername: null, doubleForfeit: true,
+  });
+  if (match.player2Id) {
+    io.to(`tournament:${tournamentId}`).emit('tournament:player-forfeited', {
+      matchId, forfeitedPlayerId: match.player2Id, winnerId: null, winnerUsername: null, doubleForfeit: true,
+    });
+  }
+
+  await handleSwissMatchEnd(io, tournamentId, match);
+}
+
 async function handleMatchForfeit(io: Server, tournamentId: string, matchId: string, forfeitPlayerId: string) {
   const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
   if (!match || match.status === 'completed' || match.status === 'forfeit') return;
@@ -496,12 +517,16 @@ export async function handleSwissMatchEnd(
       });
       for (const nm of newMatches) {
         const deadline = startAbsenceTimer(nm.id, async () => {
-          
-          const absent1 = !matchReadyPlayers.get(nm.id)?.has(nm.player1Id ?? '');
-          const absent2 = !matchReadyPlayers.get(nm.id)?.has(nm.player2Id ?? '');
-          const forfeitId = absent1 ? nm.player1Id : nm.player2Id;
-          if (forfeitId) {
-            await handleMatchForfeit(io, tournamentId, nm.id, forfeitId);
+          const ready = matchReadyPlayers.get(nm.id);
+          const absent1 = !ready?.has(nm.player1Id ?? '');
+          const absent2 = !ready?.has(nm.player2Id ?? '');
+          if (absent1 && absent2) {
+            await handleSwissDoubleAbsence(io, tournamentId, nm.id);
+          } else {
+            const forfeitId = absent1 ? nm.player1Id : nm.player2Id;
+            if (forfeitId) {
+              await handleMatchForfeit(io, tournamentId, nm.id, forfeitId);
+            }
           }
           matchReadyPlayers.delete(nm.id);
         });
@@ -599,9 +624,10 @@ function buildSwissData(
     .map(m => ({
       round: m.round,
       player1Id: m.player1Id!,
-      player2Id: m.player2Id ?? m.player1Id!, // bye case
+      player2Id: m.player2Id ?? m.player1Id!,
       winnerId: m.winnerId,
       isBye: m.isBye,
+      isDoubleForfeit: m.status === 'forfeit' && m.winnerId === null && m.player2Id !== null && !m.isBye,
     }));
 
   return { swissPlayers, swissResults };

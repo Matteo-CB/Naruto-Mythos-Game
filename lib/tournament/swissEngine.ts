@@ -14,8 +14,9 @@ export interface SwissMatchResult {
   round: number;
   player1Id: string;
   player2Id: string;
-  winnerId: string | null; // null = draw
+  winnerId: string | null;
   isBye: boolean;
+  isDoubleForfeit?: boolean;
 }
 
 export interface SwissStanding {
@@ -101,8 +102,10 @@ export function computeStandings(
     if (s1) s1.opponents.push(r.player2Id);
     if (s2) s2.opponents.push(r.player1Id);
 
-    if (r.winnerId === null) {
-      
+    if (r.isDoubleForfeit) {
+      if (s1) { s1.losses++; }
+      if (s2) { s2.losses++; }
+    } else if (r.winnerId === null) {
       if (s1) { s1.draws++; s1.matchPoints += 1; }
       if (s2) { s2.draws++; s2.matchPoints += 1; }
     } else if (r.winnerId === r.player1Id) {

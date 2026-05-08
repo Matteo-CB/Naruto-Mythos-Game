@@ -195,6 +195,53 @@ describe('Tournament logic — Double elimination', () => {
   });
 });
 
+describe('Tournament logic — Swiss double absence (no-show)', () => {
+  it('isDoubleForfeit gives both players a loss and 0 match points (not a draw)', () => {
+    const ps: SwissPlayer[] = players(2).map((p, i) => ({ ...p, seed: i + 1 }));
+    const results: SwissMatchResult[] = [
+      { round: 1, player1Id: 'u1', player2Id: 'u2', winnerId: null, isBye: false, isDoubleForfeit: true },
+    ];
+    const standings = computeStandings(ps, results);
+    const u1 = standings.find(s => s.userId === 'u1')!;
+    const u2 = standings.find(s => s.userId === 'u2')!;
+    expect(u1.matchPoints).toBe(0);
+    expect(u2.matchPoints).toBe(0);
+    expect(u1.losses).toBe(1);
+    expect(u2.losses).toBe(1);
+    expect(u1.draws).toBe(0);
+    expect(u2.draws).toBe(0);
+    expect(u1.wins).toBe(0);
+    expect(u2.wins).toBe(0);
+  });
+
+  it('plain draw (winnerId=null without doubleForfeit) still gives 1 point each', () => {
+    const ps: SwissPlayer[] = players(2).map((p, i) => ({ ...p, seed: i + 1 }));
+    const results: SwissMatchResult[] = [
+      { round: 1, player1Id: 'u1', player2Id: 'u2', winnerId: null, isBye: false },
+    ];
+    const standings = computeStandings(ps, results);
+    expect(standings[0].matchPoints).toBe(1);
+    expect(standings[1].matchPoints).toBe(1);
+    expect(standings[0].draws).toBe(1);
+    expect(standings[1].draws).toBe(1);
+  });
+
+  it('double forfeit does not give Buchholz-rewarding points to opponents', () => {
+    const ps: SwissPlayer[] = players(4).map((p, i) => ({ ...p, seed: i + 1 }));
+    const results: SwissMatchResult[] = [
+      { round: 1, player1Id: 'u1', player2Id: 'u2', winnerId: 'u1', isBye: false },
+      { round: 1, player1Id: 'u3', player2Id: 'u4', winnerId: null, isBye: false, isDoubleForfeit: true },
+      { round: 2, player1Id: 'u1', player2Id: 'u3', winnerId: 'u1', isBye: false },
+    ];
+    const standings = computeStandings(ps, results);
+    const u1 = standings.find(s => s.userId === 'u1')!;
+    const u3 = standings.find(s => s.userId === 'u3')!;
+    expect(u3.matchPoints).toBe(0);
+    expect(u1.matchPoints).toBe(6);
+    expect(u1.buchholz).toBe(0);
+  });
+});
+
 describe('Tournament logic — full mental run for 8 players double-elim', () => {
   it('produces the right number of total matches and a single GF', () => {
     const r = generateDoubleElimBracket(players(8));

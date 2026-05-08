@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois Suisse : double absence comptée comme double défaite",
+      "title_en": "Swiss tournaments: double absence counted as double loss",
+      "changes_fr": [
+        "En Suisse, quand les deux joueurs étaient absents au démarrage d'un round (ex: les deux ferment leur navigateur entre rounds), le code choisissait arbitrairement player1 comme forfait et donnait la victoire (3 points + Buchholz) à player2, qui était également AFK. Désormais, si les deux sont absents au timeout, le match est marqué en double forfait : aucun gagnant, aucun point pour personne, une défaite pour chacun. Le classement reflète correctement que personne n'a joué."
+      ],
+      "changes_en": [
+        "In Swiss, when both players were absent at the start of a round (e.g. both close the browser between rounds), the code arbitrarily picked player1 as the forfeiter and awarded the win (3 points + Buchholz) to player2, who was also AFK. Now, if both are absent at the timeout, the match is marked as a double forfeit: no winner, no points to anyone, one loss for each. Standings correctly reflect that nobody played."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : audit complet des routes (join, start, admin, créa)",
       "title_en": "Tournaments: full route audit (join, start, admin, create)",
       "changes_fr": [
