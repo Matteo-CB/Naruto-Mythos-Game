@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : participants disqualifiés pendant la registration filtrés au démarrage",
+      "title_en": "Tournaments: participants disqualified during registration filtered at start",
+      "changes_fr": [
+        "Quand un admin disqualifiait un participant pendant la phase de registration (eliminated=true posé sur le participant), le démarrage du tournoi gardait quand même ce participant dans le bracket. Conséquences : en single-élim et double-élim, le compte de joueurs (qui doit être 4/8/16/32) incluait des participants déjà DQ, et le bracket démarrait avec autoForfeitIfEliminated qui devait gicler le DQ dès que son R1 devenait ready (gaspillage). En Suisse, le filtre des DQ s'appliquait seulement aux pairings des rounds 2+ (pass précédente), donc le R1 incluait le DQ qui se faisait apparier puis forfaiter par absence-timer (2 minutes perdues par phantom match). Désormais startLogic filtre tous les participants eliminated=true avant la génération du bracket et la génération des pools sealed."
+      ],
+      "changes_en": [
+        "When an admin disqualified a participant during the registration phase (eliminated=true set on the participant), the tournament start would still include that participant in the bracket. Consequences: in single-elim and double-elim, the player count (which must be 4/8/16/32) included already-DQ'd participants, and the bracket would start with autoForfeitIfEliminated kicking out the DQ as soon as their R1 became ready (wasteful). In Swiss, the DQ filter only applied to round-2+ pairings (previous pass), so R1 included the DQ who would get paired and then forfeited via the absence timer (2 wasted minutes per phantom match). startLogic now filters all eliminated=true participants before bracket generation and sealed pool generation."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Admin resetMatch : refus si le match aval est déjà en cours ou conclu",
       "title_en": "Admin resetMatch: refuses when downstream match is already in flight or concluded",
       "changes_fr": [

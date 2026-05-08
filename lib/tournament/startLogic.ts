@@ -32,6 +32,8 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
     tournament.useBanList = false;
   }
 
+  tournament.participants = tournament.participants.filter(p => !p.eliminated);
+
   if (tournament.gameMode === 'sealed') {
     const { generateSealedPool } = await import('@/lib/sealed/boosterGenerator');
     const count = tournament.sealedBoosterCount ?? 5;
