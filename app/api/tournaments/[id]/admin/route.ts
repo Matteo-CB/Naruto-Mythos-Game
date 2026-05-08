@@ -111,6 +111,11 @@ export async function POST(
     const actorId = session.user.id;
     const actorUsername = session.user.name ?? 'unknown';
 
+    const matchMutatingActions = new Set(['disqualify', 'setMatchWinner', 'resetMatch']);
+    if (matchMutatingActions.has(action) && tournament.status === 'cancelled') {
+      return NextResponse.json({ error: 'Tournament is cancelled, no match changes allowed' }, { status: 400 });
+    }
+
     switch (action) {
       
       case 'disqualify': {
@@ -456,6 +461,9 @@ export async function POST(
       case 'cancelTournament': {
         if (tournament.status === 'completed') {
           return NextResponse.json({ error: 'Cannot cancel completed tournament' }, { status: 400 });
+        }
+        if (tournament.status === 'cancelled') {
+          return NextResponse.json({ error: 'Tournament already cancelled' }, { status: 400 });
         }
 
         const inProgressMatches = tournament.matches.filter((m) => m.status === 'in_progress' && m.roomCode);

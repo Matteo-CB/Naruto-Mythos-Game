@@ -108,11 +108,13 @@ export default function TournamentDetailPage() {
     const onAT = (d: { matchId: string; playerId: string; deadline: string }) => { handleMatchUpdate({ matchId: d.matchId, absenceDeadline: d.deadline, absentPlayerId: d.playerId } as any); };
     const onSU = (d: Parameters<typeof handleStandingsUpdate>[0]) => handleStandingsUpdate(d);
     const onSRG = (d: Parameters<typeof handleSwissRoundGenerated>[0]) => handleSwissRoundGenerated(d);
+    const onRefresh = () => { fetchTournament(tournamentId); };
     socket.on('tournament:update', onU); socket.on('tournament:match-updated', onM); socket.on('tournament:completed', onC); socket.on('tournament:round-complete', onR);
     socket.on('tournament:player-forfeited', onF); socket.on('tournament:match-ready', onMR); socket.on('tournament:absence-timer', onAT);
     socket.on('tournament:standings-updated', onSU); socket.on('tournament:swiss-round-generated', onSRG);
-    return () => { socket.emit('tournament:unsubscribe', { tournamentId }); socket.off('tournament:update', onU); socket.off('tournament:match-updated', onM); socket.off('tournament:completed', onC); socket.off('tournament:round-complete', onR); socket.off('tournament:player-forfeited', onF); socket.off('tournament:match-ready', onMR); socket.off('tournament:absence-timer', onAT); socket.off('tournament:standings-updated', onSU); socket.off('tournament:swiss-round-generated', onSRG); };
-  }, [socket, tournamentId, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, handleStandingsUpdate, handleSwissRoundGenerated]);
+    socket.on('tournament:refresh', onRefresh);
+    return () => { socket.emit('tournament:unsubscribe', { tournamentId }); socket.off('tournament:update', onU); socket.off('tournament:match-updated', onM); socket.off('tournament:completed', onC); socket.off('tournament:round-complete', onR); socket.off('tournament:player-forfeited', onF); socket.off('tournament:match-ready', onMR); socket.off('tournament:absence-timer', onAT); socket.off('tournament:standings-updated', onSU); socket.off('tournament:swiss-round-generated', onSRG); socket.off('tournament:refresh', onRefresh); };
+  }, [socket, tournamentId, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, handleStandingsUpdate, handleSwissRoundGenerated, fetchTournament]);
 
   
   useEffect(() => {

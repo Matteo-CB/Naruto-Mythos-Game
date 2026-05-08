@@ -2,6 +2,23 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : 3 events socket reliés au client + double-cancel guard",
+      "title_en": "Tournaments: 3 socket events wired up on client + double-cancel guard",
+      "changes_fr": [
+        "Trois events émis par le serveur (tournament:refresh, tournament:disqualified, tournament:match-reset) n'avaient aucun handler côté client : ils sont maintenant câblés. La page tournoi se rafraîchit auto sur tournament:refresh ; un joueur disqualifié ou dont le match est reset par admin pendant qu'il joue voit son écran de fin de partie s'afficher.",
+        "Garde anti double-cancel : annuler un tournoi déjà annulé renvoie maintenant 400 au lieu de relancer toute la logique de cleanup.",
+        "Garde sur les actions admin (DQ, set winner, reset match) : refusées si le tournoi est déjà cancelled.",
+        "6 nouveaux tests d'idempotence : générer le bracket double-élim deux fois donne le même résultat, computeStandings/generateSwissPairings/loserDropTarget/winnerAdvanceTarget sont tous déterministes."
+      ],
+      "changes_en": [
+        "Three server-emitted events (tournament:refresh, tournament:disqualified, tournament:match-reset) had no client handler — now wired. The tournament page auto-refreshes on tournament:refresh; a player who is disqualified or whose match is reset by admin mid-game sees the end-of-game screen.",
+        "Anti-double-cancel guard: cancelling an already-cancelled tournament now returns 400 instead of re-running the whole cleanup.",
+        "Guard on admin actions (DQ, set winner, reset match): rejected if the tournament is already cancelled.",
+        "6 new idempotency tests: generating the double-elim bracket twice gives the same result; computeStandings, generateSwissPairings, loserDropTarget, winnerAdvanceTarget are all deterministic."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : 12 tests E2E supplémentaires (cycle complet de tournoi)",
       "title_en": "Tournaments: 12 more E2E tests (full tournament lifecycle)",
       "changes_fr": [

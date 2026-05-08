@@ -428,6 +428,57 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         }
       });
 
+      socket.on('tournament:disqualified', (data: { matchId: string; userId: string }) => {
+        console.log('[Socket] Player disqualified from tournament match:', data);
+        const resyncT = get()._resyncTimer;
+        if (resyncT) clearInterval(resyncT);
+        set({
+          gameEnded: true,
+          gameResult: {
+            winner: 'disqualified',
+            player1Score: 0, player2Score: 0,
+            winReason: 'forfeit' as const,
+            tournamentId: null,
+          } as never,
+          actionDeadline: null,
+          _resyncTimer: null,
+        });
+      });
+
+      socket.on('tournament:match-reset', (data: { matchId: string }) => {
+        console.log('[Socket] Tournament match reset by admin:', data);
+        const resyncT = get()._resyncTimer;
+        if (resyncT) clearInterval(resyncT);
+        set({
+          gameEnded: true,
+          gameResult: {
+            winner: 'reset',
+            player1Score: 0, player2Score: 0,
+            winReason: 'forfeit' as const,
+            tournamentId: null,
+          } as never,
+          actionDeadline: null,
+          _resyncTimer: null,
+        });
+      });
+
+      socket.on('tournament:cancelled', (data: { reason: string }) => {
+        console.log('[Socket] Tournament cancelled:', data.reason);
+        const resyncT = get()._resyncTimer;
+        if (resyncT) clearInterval(resyncT);
+        set({
+          gameEnded: true,
+          gameResult: {
+            winner: 'cancelled',
+            player1Score: 0, player2Score: 0,
+            winReason: 'forfeit' as const,
+            tournamentId: null,
+          } as never,
+          actionDeadline: null,
+          _resyncTimer: null,
+        });
+      });
+
       
 
       socket.on('game:action-deadline', (data: { deadline: number; durationMs?: number }) => {
