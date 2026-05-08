@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois Suisse : génération de round suivant idempotente",
+      "title_en": "Swiss tournaments: next-round generation now idempotent",
+      "changes_fr": [
+        "Si pour une raison quelconque la séquence créer-matchs-du-round-suivant + update-currentRound était interrompue (DB hiccup, restart serveur entre les deux étapes, etc.), le tournoi Suisse pouvait rester coincé : les nouveaux matchs existaient déjà, mais currentRound pointait sur le round précédent. Le prochain handleSwissMatchEnd ré-essayait createMany sur les mêmes (round, matchIndex) et échouait sur la contrainte unique. Désormais, juste avant createMany, on vérifie si des matchs du round suivant existent déjà ; si oui on skip la création (recovery silencieuse) et on enchaîne sur l'update de currentRound + l'émission des events. Le tournoi se débloque tout seul au prochain match end."
+      ],
+      "changes_en": [
+        "If for any reason the sequence create-next-round-matches + update-currentRound was interrupted (DB hiccup, server restart between the two steps, etc.), the Swiss tournament could stay stuck: the new matches existed but currentRound still pointed to the previous round. The next handleSwissMatchEnd would re-attempt createMany on the same (round, matchIndex) and fail on the unique constraint. Now, right before createMany, we check whether next-round matches already exist; if so we skip the creation (silent recovery) and continue with the currentRound update and event emission. The tournament unblocks itself on the next match end."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Sélection de deck : même fenêtre de course avec auto-start fermée",
       "title_en": "Deck selection: same race window with auto-start closed",
       "changes_fr": [

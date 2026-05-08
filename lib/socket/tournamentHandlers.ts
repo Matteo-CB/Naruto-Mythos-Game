@@ -555,25 +555,32 @@ export async function handleSwissMatchEnd(
       const eliminatedIds = new Set(tournament.participants.filter(p => p.eliminated).map(p => p.userId));
       const pairings = generateSwissPairings(swissPlayers, swissResults, nextRound, eliminatedIds);
 
-      
-      await prisma.tournamentMatch.createMany({
-        data: pairings.map((pairing) => {
-          const isBye = pairing.player2 === null;
-          return {
-            tournamentId,
-            round: pairing.round,
-            matchIndex: pairing.matchIndex,
-            player1Id: pairing.player1.userId,
-            player1Username: pairing.player1.username,
-            player2Id: pairing.player2?.userId ?? null,
-            player2Username: pairing.player2?.username ?? null,
-            winnerId: isBye ? pairing.player1.userId : null,
-            winnerUsername: isBye ? pairing.player1.username : null,
-            isBye,
-            status: isBye ? 'completed' : 'ready',
-          };
-        }),
+      const existingNext = await prisma.tournamentMatch.findFirst({
+        where: { tournamentId, round: nextRound },
+        select: { id: true },
       });
+      if (!existingNext) {
+        await prisma.tournamentMatch.createMany({
+          data: pairings.map((pairing) => {
+            const isBye = pairing.player2 === null;
+            return {
+              tournamentId,
+              round: pairing.round,
+              matchIndex: pairing.matchIndex,
+              player1Id: pairing.player1.userId,
+              player1Username: pairing.player1.username,
+              player2Id: pairing.player2?.userId ?? null,
+              player2Username: pairing.player2?.username ?? null,
+              winnerId: isBye ? pairing.player1.userId : null,
+              winnerUsername: isBye ? pairing.player1.username : null,
+              isBye,
+              status: isBye ? 'completed' : 'ready',
+            };
+          }),
+        });
+      } else {
+        console.log(`[Tournament] Swiss round ${nextRound} matches already exist for ${tournamentId}, skipping createMany (recovering from prior partial state)`);
+      }
       
       const byePlayers = pairings.filter(p => p.player2 === null);
       if (byePlayers.length > 0) {
