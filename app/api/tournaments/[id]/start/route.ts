@@ -58,6 +58,20 @@ export async function POST(
     }
 
 
+    if (tournament.gameMode === 'sealed') {
+      const { generateSealedPool } = await import('@/lib/sealed/boosterGenerator');
+      const count = tournament.sealedBoosterCount ?? 5;
+      for (const p of tournament.participants) {
+        if (p.sealedPool) continue;
+        const pool = generateSealedPool(count);
+        await prisma.tournamentParticipant.update({
+          where: { id: p.id },
+          data: { sealedPool: pool as never },
+        });
+      }
+    }
+
+
     if (tournament.gameMode !== 'sealed') {
       const invalidPlayers = tournament.participants.filter(p => !p.deckValid || !p.deckId);
       for (const p of invalidPlayers) {
@@ -73,6 +87,23 @@ export async function POST(
 
     if (tournament.participants.length < 2) {
       return NextResponse.json({ error: 'Need at least 2 players with valid decks' }, { status: 400 });
+    }
+
+    if (tournament.format === 'double_elimination') {
+      const valid = [4, 8, 16, 32];
+      if (!valid.includes(tournament.participants.length)) {
+        return NextResponse.json({
+          error: `Double elimination requires exactly 4, 8, 16, or 32 valid participants (currently ${tournament.participants.length})`,
+        }, { status: 400 });
+      }
+    }
+    if (tournament.format === 'elimination') {
+      const valid = [4, 8, 16, 32];
+      if (!valid.includes(tournament.participants.length)) {
+        return NextResponse.json({
+          error: `Single elimination requires exactly 4, 8, 16, or 32 valid participants (currently ${tournament.participants.length})`,
+        }, { status: 400 });
+      }
     }
 
     

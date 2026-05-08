@@ -2,6 +2,25 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : sealed entièrement fonctionnel + plusieurs sécurités",
+      "title_en": "Tournaments: sealed mode fully working + several safeguards",
+      "changes_fr": [
+        "Mode sealed en tournoi maintenant fonctionnel : les pools sont générés au démarrage du tournoi et persistés par participant. La salle de match envoie automatiquement le pool aux deux joueurs. Plus de tournoi sealed bloqué.",
+        "Validation au start : la double élimination et l'élimination simple exigent désormais exactement 4, 8, 16 ou 32 participants valides (sinon erreur claire au lieu d'un bracket cassé).",
+        "Le timeout de phase de mission (1 minute par décision) s'applique aussi aux parties de tournoi, pas seulement aux parties classées.",
+        "handleTournamentMatchEnd refuse maintenant un double appel pour le même match (déjà completed/forfeit) → plus de risque de double finalisation.",
+        "Les advances de match en double élimination loggent maintenant une erreur si le match cible est introuvable, au lieu d'échouer silencieusement."
+      ],
+      "changes_en": [
+        "Sealed tournament mode now fully functional: pools are generated at tournament start and persisted per participant. The match room emits the pool to each player automatically. No more stuck sealed tournaments.",
+        "Start validation: double elimination and single elimination now require exactly 4, 8, 16 or 32 valid participants (clear error instead of a broken bracket).",
+        "The mission-phase timeout (1 minute per decision) now applies to tournament games too, not just ranked games.",
+        "handleTournamentMatchEnd now refuses a double call for the same match (already completed/forfeit) — no more double-finalize risk.",
+        "Match advancement in double elimination now logs an error if the target match is missing, instead of silently failing."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : double élimination disponible",
       "title_en": "Tournaments: double elimination is now available",
       "changes_fr": [

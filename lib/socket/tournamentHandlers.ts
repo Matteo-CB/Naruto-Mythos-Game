@@ -95,7 +95,12 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
         matchReadyPlayers.delete(matchId);
         const roomCode = match.roomCode || `T-${matchId.slice(-6)}`;
 
-        
+        const tournamentMeta = await prisma.tournament.findUnique({
+          where: { id: tournamentId },
+          select: { gameMode: true, sealedBoosterCount: true },
+        });
+        const isSealedTournament = tournamentMeta?.gameMode === 'sealed';
+
         const [p1Participant, p2Participant] = await Promise.all([
           prisma.tournamentParticipant.findFirst({ where: { tournamentId, userId: match.player1Id } }),
           prisma.tournamentParticipant.findFirst({ where: { tournamentId, userId: match.player2Id } }),
@@ -104,22 +109,24 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
         let hostDeck: { characters: CharacterCard[]; missions: MissionCard[] } | null = null;
         let guestDeck: { characters: CharacterCard[]; missions: MissionCard[] } | null = null;
 
-        if (p1Participant?.deckId) {
-          const deck = await prisma.deck.findUnique({ where: { id: p1Participant.deckId } });
-          if (deck) {
-            hostDeck = {
-              characters: (deck.cardIds ?? []).map((id: string) => getCharacterById(id)).filter(Boolean) as CharacterCard[],
-              missions: (deck.missionIds ?? []).map((id: string) => getMissionById(id)).filter(Boolean) as MissionCard[],
-            };
+        if (!isSealedTournament) {
+          if (p1Participant?.deckId) {
+            const deck = await prisma.deck.findUnique({ where: { id: p1Participant.deckId } });
+            if (deck) {
+              hostDeck = {
+                characters: (deck.cardIds ?? []).map((id: string) => getCharacterById(id)).filter(Boolean) as CharacterCard[],
+                missions: (deck.missionIds ?? []).map((id: string) => getMissionById(id)).filter(Boolean) as MissionCard[],
+              };
+            }
           }
-        }
-        if (p2Participant?.deckId) {
-          const deck = await prisma.deck.findUnique({ where: { id: p2Participant.deckId } });
-          if (deck) {
-            guestDeck = {
-              characters: (deck.cardIds ?? []).map((id: string) => getCharacterById(id)).filter(Boolean) as CharacterCard[],
-              missions: (deck.missionIds ?? []).map((id: string) => getMissionById(id)).filter(Boolean) as MissionCard[],
-            };
+          if (p2Participant?.deckId) {
+            const deck = await prisma.deck.findUnique({ where: { id: p2Participant.deckId } });
+            if (deck) {
+              guestDeck = {
+                characters: (deck.cardIds ?? []).map((id: string) => getCharacterById(id)).filter(Boolean) as CharacterCard[],
+                missions: (deck.missionIds ?? []).map((id: string) => getMissionById(id)).filter(Boolean) as MissionCard[],
+              };
+            }
           }
         }
 
@@ -137,7 +144,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             isPrivate: true,
             isRanked: false,
             isAnonymous: false,
-            gameMode: 'casual',
+            gameMode: isSealedTournament ? 'sealed' : 'casual',
             createdAt: Date.now(),
             actionTimer: null,
             timerDeadline: null,
@@ -150,8 +157,8 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             replayStateSnapshots: null,
             replaySnapshotLogLengths: null,
             finalized: false,
-            isSealed: false,
-            sealedBoosterCount: 5,
+            isSealed: isSealedTournament,
+            sealedBoosterCount: (tournamentMeta?.sealedBoosterCount ?? 5) as 4 | 5 | 6,
             sealedTimer: null,
             sealedDeadline: null,
             timerEnabled: true,
@@ -176,6 +183,22 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
         io.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
           matchId, status: 'in_progress', roomCode,
         });
+
+        if (isSealedTournament) {
+          const hostPool = (p1Participant?.sealedPool as { boosters: unknown; allCards: unknown } | null) ?? null;
+          const guestPool = (p2Participant?.sealedPool as { boosters: unknown; allCards: unknown } | null) ?? null;
+          const userSockets = new Map<string, string>();
+          for (const [, sock] of io.sockets.sockets) {
+            const data = (sock as unknown as { data?: { userId?: string } }).data;
+            if (data?.userId) userSockets.set(data.userId, sock.id);
+          }
+          if (hostPool && userSockets.has(match.player1Id)) {
+            io.to(userSockets.get(match.player1Id)!).emit('sealed:boosters', hostPool);
+          }
+          if (guestPool && userSockets.has(match.player2Id)) {
+            io.to(userSockets.get(match.player2Id)!).emit('sealed:boosters', guestPool);
+          }
+        }
 
         const createdRoom = rooms.get(roomCode);
         if (createdRoom && !createdRoom.tournamentJoinTimer) {
@@ -318,6 +341,10 @@ export async function handleTournamentMatchEnd(io: Server, tournamentId: string,
   try {
     const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
     if (!match) return;
+    if (match.status === 'completed' || match.status === 'forfeit') {
+      console.log(`[Tournament] handleTournamentMatchEnd skipped for ${matchId}: already ${match.status}`);
+      return;
+    }
     clearAbsenceTimer(matchId);
     matchReadyPlayers.delete(matchId);
 
@@ -788,7 +815,10 @@ async function applySlot(
       },
     },
   });
-  if (!target) return;
+  if (!target) {
+    console.error(`[Tournament] applySlot: target not found ${plan.bracket} R${plan.round} M${plan.matchIndex} (tournament ${tournamentId})`);
+    return;
+  }
   const update: Record<string, unknown> = {};
   if (plan.slot === 'player1') {
     update.player1Id = userId;

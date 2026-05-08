@@ -1038,7 +1038,7 @@ function startMissionPhaseTimer(
 
   if (!room.gameState) return;
   if (!room.timerEnabled) return;
-  if (!room.isRanked) return; // Only in ranked
+  if (!room.isRanked && !room.tournamentId) return; // Active in ranked AND tournament rooms
 
   const pendingAction = room.gameState.pendingActions[0];
   if (!pendingAction) return;
