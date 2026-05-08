@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois programmés : auto-start corrige le banlist gelé, le sealed et la revalidation",
+      "title_en": "Scheduled tournaments: auto-start now freezes banlist, generates sealed pools, re-validates decks",
+      "changes_fr": [
+        "Le démarrage automatique des tournois programmés (à l'heure prévue) ne passait par AUCUN des contrôles de la route de start manuelle. En conséquence : un tournoi sealed programmé démarrait sans pools générés (les matchs auraient crashé), un tournoi élim programmé pouvait démarrer avec 5 ou 7 joueurs, le banlist global n'était jamais figé au start, et les decks n'étaient pas re-validés (décalage avec le ban-list ou deck supprimé entre l'inscription et le start). La logique de start a été factorisée dans un helper partagé et l'auto-start passe désormais par exactement le même chemin que le start manuel."
+      ],
+      "changes_en": [
+        "Automatic tournament start (at the scheduled time) was bypassing ALL the validation logic from the manual start route. Consequence: a scheduled sealed tournament would start with no pools generated (matches would crash), a scheduled elim tournament could start with 5 or 7 players, the global banlist was never frozen at start, and decks were not re-validated (stale against banlist changes or deck deletion between registration and start). The start logic has been factored into a shared helper and auto-start now goes through exactly the same path as the manual start."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois Suisse : double absence comptée comme double défaite",
       "title_en": "Swiss tournaments: double absence counted as double loss",
       "changes_fr": [
