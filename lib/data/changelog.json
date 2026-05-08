@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Matchmaking et rematch bloqués pendant un match de tournoi",
+      "title_en": "Matchmaking and rematch blocked during a tournament match",
+      "changes_fr": [
+        "Suite des fixes 'pas de double partie' : la file matchmaking:join et l'acceptation de rematch (game:rematch-accept) ne vérifiaient pas non plus la présence d'un match de tournoi en cours. Un joueur en plein round Suisse pouvait rejoindre la file et se faire apparier en partie casual classée, ou accepter un rematch d'une partie qu'il venait juste de terminer alors que son tournoi venait de l'apparier pour le round suivant. Les deux events refusent maintenant l'opération avec le code du match de tournoi à finir d'abord."
+      ],
+      "changes_en": [
+        "Continuation of the 'no double game' fixes: the matchmaking:join queue and the rematch accept (game:rematch-accept) were also not checking for an active tournament match. A player mid-Swiss-round could join matchmaking and end up paired in a ranked casual game, or accept a rematch from a game they just finished while their tournament had paired them for the next round. Both events now refuse with the tournament match room code to finish first."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Création/jointure de room casual bloquée pendant un match de tournoi",
       "title_en": "Casual room create/join blocked during a tournament match",
       "changes_fr": [

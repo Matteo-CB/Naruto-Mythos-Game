@@ -2167,6 +2167,15 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(code);
       if (!room || !room.rematchOffer) return;
 
+      const accepterUserId = room.hostSocket === socket.id ? room.hostId : room.guestId;
+      if (accepterUserId) {
+        const tournamentBusy = await getActiveTournamentMatchForUser(accepterUserId);
+        if (tournamentBusy && tournamentBusy.roomCode !== code) {
+          socket.emit('game:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.` });
+          return;
+        }
+      }
+
       console.log(`[Socket] Rematch accepted in room ${code}, redirecting to deck select (sealed: ${room.isSealed})`);
       room.rematchOffer = undefined;
 
@@ -2249,16 +2258,22 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     
-    socket.on('matchmaking:join', (data: { userId: string; isRanked?: boolean; hostName?: string }) => {
+    socket.on('matchmaking:join', async (data: { userId: string; isRanked?: boolean; hostName?: string }) => {
       if (isMaintenanceActive()) {
         socket.emit('game:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
+        return;
+      }
+
+      const tournamentBusy = await getActiveTournamentMatchForUser(data.userId);
+      if (tournamentBusy) {
+        socket.emit('game:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.` });
         return;
       }
 
       console.log(`[Socket] User ${data.userId} joining matchmaking (ranked: ${data.isRanked ?? true})`);
       const wantRanked = data.isRanked ?? true;
 
-      
+
       cleanupPlayerRoom(socket);
 
       
