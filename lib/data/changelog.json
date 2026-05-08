@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : Discord requis enfin vérifié à la jointure",
+      "title_en": "Tournaments: Discord requirement finally enforced on join",
+      "changes_fr": [
+        "Le flag tournament.requiresDiscord était hardcodé à true à la création de chaque tournoi et présent dans le schéma BDD avec un message d'erreur i18n associé ('Liez d'abord votre compte Discord'), mais aucune route serveur ne le vérifiait. N'importe qui sans Discord lié pouvait rejoindre n'importe quel tournoi via /api/tournaments/[id]/join ou /api/tournaments/join-by-code, contournant complètement l'exigence prévue. Désormais les deux routes refusent la jointure avec un 403 si le tournoi requiert Discord et que l'utilisateur n'a pas de discordId lié sur son compte. Le message renvoyé peut être affiché tel quel par le client."
+      ],
+      "changes_en": [
+        "The tournament.requiresDiscord flag was hardcoded to true on every tournament creation and present in the DB schema with a matching i18n error string ('Link your Discord account first'), but no server route was checking it. Anyone without Discord linked could join any tournament via /api/tournaments/[id]/join or /api/tournaments/join-by-code, completely bypassing the intended requirement. Both routes now refuse the join with a 403 if the tournament requires Discord and the user has no discordId on their account. The returned message can be displayed verbatim by the client."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois Suisse : double déconnexion en plein match aussi traitée comme double défaite",
       "title_en": "Swiss tournaments: in-game double disconnect also handled as double forfeit",
       "changes_fr": [

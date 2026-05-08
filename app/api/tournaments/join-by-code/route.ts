@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { username: true, elo: true },
+      select: { username: true, elo: true, discordId: true },
     });
 
     if (
@@ -47,6 +47,10 @@ export async function POST(req: NextRequest) {
       if (!tournament.allowedLeagues.includes(playerLeague)) {
         return NextResponse.json({ error: 'Your current rank does not meet the requirements for this tournament' }, { status: 403 });
       }
+    }
+
+    if (tournament.requiresDiscord && !user?.discordId) {
+      return NextResponse.json({ error: 'Link your Discord account first' }, { status: 403 });
     }
 
     const activeBan = await prisma.userBan.findFirst({

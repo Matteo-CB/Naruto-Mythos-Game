@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
-import { isDiscordMember } from '@/lib/discord/tournamentRoles';
 
 
 export async function POST(
@@ -60,7 +59,11 @@ export async function POST(
       }
     }
 
-    
+    if (tournament.requiresDiscord && !user?.discordId) {
+      return NextResponse.json({ error: 'Link your Discord account first' }, { status: 403 });
+    }
+
+
     const activeBan = await prisma.userBan.findFirst({
       where: {
         userId: session.user.id,
