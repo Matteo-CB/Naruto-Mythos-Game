@@ -98,7 +98,12 @@ export async function POST(req: NextRequest) {
     if (typeof restrictionNote === 'string' && restrictionNote.length > 500) {
       return NextResponse.json({ error: 'Restriction note must be at most 500 characters' }, { status: 400 });
     }
-    if (gameMode === 'sealed') {
+    const VALID_GAME_MODES = ['classic', 'sealed', 'restricted'] as const;
+    const resolvedGameMode = gameMode || 'classic';
+    if (!VALID_GAME_MODES.includes(resolvedGameMode as typeof VALID_GAME_MODES[number])) {
+      return NextResponse.json({ error: `gameMode must be one of: ${VALID_GAME_MODES.join(', ')}` }, { status: 400 });
+    }
+    if (resolvedGameMode === 'sealed') {
       const count = sealedBoosterCount ?? 5;
       if (typeof count !== 'number' || !Number.isInteger(count) || count < 1 || count > 12) {
         return NextResponse.json({ error: 'Sealed booster count must be an integer between 1 and 12' }, { status: 400 });
@@ -125,7 +130,7 @@ export async function POST(req: NextRequest) {
         type,
         format,
         status: 'registration',
-        gameMode: gameMode || 'classic',
+        gameMode: resolvedGameMode,
         maxPlayers,
         isPublic: isPublic !== false,
         joinCode: generateJoinCode(),
@@ -133,7 +138,7 @@ export async function POST(req: NextRequest) {
         creatorUsername: user?.username || 'Unknown',
         requiresDiscord: true,
         useBanList: useBanList !== false,
-        sealedBoosterCount: gameMode === 'sealed' ? (sealedBoosterCount || 5) : null,
+        sealedBoosterCount: resolvedGameMode === 'sealed' ? (sealedBoosterCount || 5) : null,
         bannedCardIds: Array.isArray(bannedCardIds) ? bannedCardIds : [],
         allowedLeagues: leagueRestrictions,
         

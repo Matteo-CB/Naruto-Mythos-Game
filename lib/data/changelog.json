@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : validation du gameMode à la création (classic/sealed/restricted uniquement)",
+      "title_en": "Tournaments: gameMode validation at creation (classic/sealed/restricted only)",
+      "changes_fr": [
+        "L'API de création de tournoi acceptait n'importe quelle string dans gameMode et la stockait telle quelle. Si un client envoyait gameMode='foobar', le tournoi se créait avec cette valeur, l'UI ne savait pas l'afficher (les règles classic/sealed/restricted ne matchaient pas), et seul le check === 'sealed' du backend agissait spécifiquement (donc 'foobar' se comportait comme 'classic' avec un libellé cassé). Désormais la création rejette avec un 400 si gameMode n'est pas dans la liste autorisée. Les valeurs falsy (undefined, '') tombent toujours sur 'classic' par défaut."
+      ],
+      "changes_en": [
+        "The tournament creation API accepted any string in gameMode and stored it as-is. If a client sent gameMode='foobar', the tournament would be created with that value, the UI would not know how to display it (the classic/sealed/restricted rules would not match), and only the backend's === 'sealed' check would act specifically (so 'foobar' behaved like 'classic' with a broken label). Now creation rejects with 400 if gameMode is not in the allowed list. Falsy values (undefined, '') still default to 'classic'."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : participants disqualifiés pendant la registration filtrés au démarrage",
       "title_en": "Tournaments: participants disqualified during registration filtered at start",
       "changes_fr": [
