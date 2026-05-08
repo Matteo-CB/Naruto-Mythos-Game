@@ -72,6 +72,18 @@ async function cleanupTournamentMaps(tournamentId: string): Promise<void> {
   }
 }
 
+export const cleanupTournamentMapsExternal = cleanupTournamentMaps;
+
+export function cleanupTournamentMapsByIds(tournamentId: string, matchIds: string[]): void {
+  for (const matchId of matchIds) {
+    matchReadyPlayers.delete(matchId);
+    matchReadyLocks.delete(matchId);
+  }
+  for (const [key] of swissRoundLocks) {
+    if (key.startsWith(tournamentId)) swissRoundLocks.delete(key);
+  }
+}
+
 export function registerTournamentHandlers(io: Server, socket: Socket) {
   socket.on('tournament:subscribe', async ({ tournamentId }: { tournamentId: string }) => {
     const tournament = await prisma.tournament.findUnique({

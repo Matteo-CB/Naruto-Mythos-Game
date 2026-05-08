@@ -597,6 +597,14 @@ export async function POST(
           data: { status: 'cancelled' },
         });
         if (io) io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'admin', tournamentId });
+
+        try {
+          const { cleanupTournamentMapsExternal } = await import('@/lib/socket/tournamentHandlers');
+          await cleanupTournamentMapsExternal(tournamentId);
+        } catch (err) {
+          console.error('[Tournament] cleanupTournamentMapsExternal failed:', err);
+        }
+
         await logAdminAction({
           tournamentId, actorId, actorUsername,
           action: 'cancelTournament',

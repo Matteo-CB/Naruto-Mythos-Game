@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Memory leak persistant après cancel/delete admin corrigé",
+      "title_en": "Persistent memory leak after admin cancel/delete fixed",
+      "changes_fr": [
+        "Suite du fix de la passe 49 sur cleanupTournamentMaps : la fonction nettoie correctement les maps in-memory matchReadyPlayers et matchReadyLocks à partir des matchId d'un tournoi, mais elle n'était appelée que depuis les chemins de finalisation (handleSwiss/finalizeDoubleElim/advanceMatchWinner final). L'admin cancelTournament et la route DELETE /tournaments/{id} ne l'appelaient pas, donc les entrées des matchs de tournois cancellés/supprimés persistaient en mémoire jusqu'au restart serveur. Désormais cancelTournament call cleanupTournamentMapsExternal (la version async qui query la BDD pour les matchIds), et DELETE capture les matchIds avant la cascade-delete puis appelle cleanupTournamentMapsByIds (version synchrone qui prend la liste explicite). Aucun chemin de fin de tournoi ne leak plus."
+      ],
+      "changes_en": [
+        "Following the cleanupTournamentMaps fix from pass 49: the function correctly cleans the in-memory maps matchReadyPlayers and matchReadyLocks given a tournament's matchIds, but it was only called from the finalization paths (handleSwiss / finalizeDoubleElim / advanceMatchWinner final). The admin cancelTournament action and the DELETE /tournaments/{id} route did not call it, so entries for matches of cancelled/deleted tournaments stayed in memory until server restart. Now cancelTournament calls cleanupTournamentMapsExternal (the async version that queries DB for matchIds), and DELETE captures matchIds before the cascade-delete then calls cleanupTournamentMapsByIds (sync version that takes the explicit list). No tournament-end path leaks anymore."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois Suisse : tournoi annulé proprement si tous les actifs sont DQ mid-tournament",
       "title_en": "Swiss tournaments: cleanly cancelled if all active players are DQ'd mid-tournament",
       "changes_fr": [

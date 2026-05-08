@@ -89,6 +89,11 @@ export async function DELETE(
       }, { status: 400 });
     }
 
+    const matchIds = (await prisma.tournamentMatch.findMany({
+      where: { tournamentId: id },
+      select: { id: true },
+    })).map(m => m.id);
+
     await prisma.$transaction([
       prisma.tournamentMatch.deleteMany({ where: { tournamentId: id } }),
       prisma.tournamentParticipant.deleteMany({ where: { tournamentId: id } }),
@@ -98,6 +103,13 @@ export async function DELETE(
 
     const io = getSocketIO();
     if (io) io.to(`tournament:${id}`).emit('tournament:cancelled', { reason: 'deleted', tournamentId: id });
+
+    try {
+      const { cleanupTournamentMapsByIds } = await import('@/lib/socket/tournamentHandlers');
+      cleanupTournamentMapsByIds(id, matchIds);
+    } catch (err) {
+      console.error('[Tournament] cleanupTournamentMapsByIds failed on delete:', err);
+    }
 
     return NextResponse.json({ success: true });
   } catch {
