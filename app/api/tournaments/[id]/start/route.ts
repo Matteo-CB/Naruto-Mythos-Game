@@ -107,6 +107,7 @@ export async function POST(
     }
 
     const isSwiss = tournament.format === 'swiss';
+    const isDoubleElim = tournament.format === 'double_elimination';
 
     if (isSwiss) {
       
@@ -152,8 +153,48 @@ export async function POST(
           startedAt: new Date(),
         },
       });
+    } else if (isDoubleElim) {
+
+      const { generateDoubleElimBracket } = await import('@/lib/tournament/doubleElimEngine');
+      const participants = orderedParticipants.map(p => ({ userId: p.userId, username: p.username }));
+      const { matches, totalRounds } = generateDoubleElimBracket(participants);
+
+      for (const m of matches) {
+        await prisma.tournamentMatch.create({
+          data: {
+            tournamentId: id,
+            bracket: m.bracket,
+            round: m.round,
+            matchIndex: m.matchIndex,
+            player1Id: m.player1Id,
+            player1Username: m.player1Username,
+            player2Id: m.player2Id,
+            player2Username: m.player2Username,
+            winnerId: m.winnerId,
+            winnerUsername: m.winnerUsername,
+            isBye: m.isBye,
+            status: m.status,
+          },
+        });
+        if (m.isBye && m.winnerId) {
+          await prisma.tournamentParticipant.updateMany({
+            where: { tournamentId: id, userId: m.winnerId },
+            data: { hasBye: true },
+          });
+        }
+      }
+
+      await prisma.tournament.update({
+        where: { id },
+        data: {
+          status: 'in_progress',
+          currentRound: 1,
+          totalRounds,
+          startedAt: new Date(),
+        },
+      });
     } else {
-      
+
       const participants = orderedParticipants.map(p => ({
         userId: p.userId,
         username: p.username,
@@ -163,6 +204,7 @@ export async function POST(
       for (const m of matches) {
         const matchData = {
           tournamentId: id,
+          bracket: 'main',
           round: m.round,
           matchIndex: m.matchIndex,
           player1Id: m.player1.participantId,

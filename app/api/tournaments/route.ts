@@ -61,16 +61,20 @@ export async function POST(req: NextRequest) {
       format: rawFormat,
     } = body;
     const type = 'simulator'; // Only simulator tournaments
-    const format = (rawFormat === 'elimination') ? 'elimination' : 'swiss';
+    const format = (rawFormat === 'elimination')
+      ? 'elimination'
+      : (rawFormat === 'double_elimination')
+        ? 'double_elimination'
+        : 'swiss';
 
     if (!isAdmin(session)) {
       return NextResponse.json({ error: 'Only admins can create tournaments' }, { status: 403 });
     }
 
-    if (format === 'elimination') {
+    if (format === 'elimination' || format === 'double_elimination') {
       const validSizes = [4, 8, 16, 32];
       if (!validSizes.includes(maxPlayers)) {
-        return NextResponse.json({ error: 'Max players must be 4, 8, 16, or 32 for elimination' }, { status: 400 });
+        return NextResponse.json({ error: 'Max players must be 4, 8, 16, or 32 for elimination formats' }, { status: 400 });
       }
     } else {
       if (typeof maxPlayers !== 'number' || maxPlayers < 4 || maxPlayers > 32) {

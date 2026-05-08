@@ -213,6 +213,7 @@ export default function TournamentDetailPage() {
   
   const tour = activeTournament;
   const isSwiss = tour?.format === 'swiss';
+  const isDoubleElim = tour?.format === 'double_elimination';
   const swissStandings: SwissStandingEntry[] = useMemo(() => {
     if (!isSwiss || !tour) return [];
     if (tour.standings && tour.standings.length > 0) {
@@ -571,6 +572,21 @@ export default function TournamentDetailPage() {
               <h2 className="text-sm font-medium uppercase tracking-wider mb-4" style={{ color: '#c4a35a' }}>{isSwiss ? t('swissStandings') : t('bracket')}</h2>
               {isSwiss ? (
                 <SwissStandings standings={swissStandings} matches={tour.matches} totalRounds={tour.totalRounds} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+              ) : isDoubleElim ? (
+                <div className="flex flex-col gap-6">
+                  <div>
+                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>{t('bracketWinners')}</h3>
+                    <BracketTree matches={tour.matches.filter((m) => m.bracket === 'winners')} totalRounds={Math.max(1, ...tour.matches.filter((m) => m.bracket === 'winners').map((m) => m.round))} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>{t('bracketLosers')}</h3>
+                    <BracketTree matches={tour.matches.filter((m) => m.bracket === 'losers')} totalRounds={Math.max(1, ...tour.matches.filter((m) => m.bracket === 'losers').map((m) => m.round))} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>{t('bracketGrandFinal')}</h3>
+                    <BracketTree matches={tour.matches.filter((m) => m.bracket === 'grand_final')} totalRounds={Math.max(1, ...tour.matches.filter((m) => m.bracket === 'grand_final').map((m) => m.round))} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+                  </div>
+                </div>
               ) : (
                 <BracketTree matches={tour.matches} totalRounds={tour.totalRounds} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
               )}
@@ -587,6 +603,21 @@ export default function TournamentDetailPage() {
               <h2 className="text-sm font-medium uppercase tracking-wider mb-4" style={{ color: '#c4a35a' }}>{isSwiss ? t('swissStandings') : t('bracket')}</h2>
               {isSwiss ? (
                 <SwissStandings standings={swissStandings} matches={tour.matches} totalRounds={tour.totalRounds} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+              ) : isDoubleElim ? (
+                <div className="flex flex-col gap-6">
+                  <div>
+                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>{t('bracketWinners')}</h3>
+                    <BracketTree matches={tour.matches.filter((m) => m.bracket === 'winners')} totalRounds={Math.max(1, ...tour.matches.filter((m) => m.bracket === 'winners').map((m) => m.round))} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>{t('bracketLosers')}</h3>
+                    <BracketTree matches={tour.matches.filter((m) => m.bracket === 'losers')} totalRounds={Math.max(1, ...tour.matches.filter((m) => m.bracket === 'losers').map((m) => m.round))} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>{t('bracketGrandFinal')}</h3>
+                    <BracketTree matches={tour.matches.filter((m) => m.bracket === 'grand_final')} totalRounds={Math.max(1, ...tour.matches.filter((m) => m.bracket === 'grand_final').map((m) => m.round))} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+                  </div>
+                </div>
               ) : (
                 <BracketTree matches={tour.matches} totalRounds={tour.totalRounds} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
               )}

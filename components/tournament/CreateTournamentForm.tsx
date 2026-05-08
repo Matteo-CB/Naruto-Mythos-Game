@@ -16,7 +16,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
   const { createTournament } = useTournamentStore();
 
   const [name, setName] = useState('');
-  const [format, setFormat] = useState<'swiss' | 'elimination'>('swiss');
+  const [format, setFormat] = useState<'swiss' | 'elimination' | 'double_elimination'>('swiss');
   const [gameMode, setGameMode] = useState<'classic' | 'sealed' | 'restricted'>('classic');
   const [maxPlayers, setMaxPlayers] = useState(8);
   const [isPublic, setIsPublic] = useState(true);
@@ -124,6 +124,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
         <div className="flex gap-2">
           <ToggleBtn val="swiss" cur={format} onClick={() => setFormat('swiss')}>{t('formatSwiss')}</ToggleBtn>
           <ToggleBtn val="elimination" cur={format} onClick={() => setFormat('elimination')}>{t('formatElimination')}</ToggleBtn>
+          <ToggleBtn val="double_elimination" cur={format} onClick={() => setFormat('double_elimination')}>{t('formatDoubleElim')}</ToggleBtn>
         </div>
       </div>
 

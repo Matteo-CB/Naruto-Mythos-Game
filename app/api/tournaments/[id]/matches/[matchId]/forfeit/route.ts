@@ -86,8 +86,9 @@ export async function POST(
 
       const nextMatch = await prisma.tournamentMatch.findUnique({
         where: {
-          tournamentId_round_matchIndex: {
+          tournamentId_bracket_round_matchIndex: {
             tournamentId: id,
+            bracket: match.bracket,
             round: nextRound,
             matchIndex: nextMatchIndex,
           },

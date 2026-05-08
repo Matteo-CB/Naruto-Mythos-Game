@@ -265,6 +265,7 @@ model TournamentMatch {
   id              String     @id @default(auto()) @map("_id") @db.ObjectId
   tournamentId    String     @db.ObjectId
   tournament      Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  bracket         String     @default("main")
   round           Int
   matchIndex      Int
   player1Id       String?    @db.ObjectId
@@ -283,7 +284,7 @@ model TournamentMatch {
   completedAt     DateTime?
   createdAt       DateTime   @default(now())
 
-  @@unique([tournamentId, round, matchIndex])
+  @@unique([tournamentId, bracket, round, matchIndex])
 }
 
 model TournamentAdminLog {

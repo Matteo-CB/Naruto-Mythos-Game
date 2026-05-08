@@ -1205,16 +1205,17 @@ export function setupSocketHandlers(io: SocketIOServer) {
           );
 
           const isSwissFormat = t.format === 'swiss';
+          const isDoubleElimFormat = t.format === 'double_elimination';
           const playerList = participants.map(p => ({ userId: p.userId, username: p.username, seed: 0 }));
 
           if (isSwissFormat) {
-            
+
             const { computeSwissRoundCount, generateSwissRound1 } = await import('@/lib/tournament/swissEngine');
             const totalRounds = computeSwissRoundCount(playerList.length);
             const round1 = generateSwissRound1(playerList.map((p, i) => ({ ...p, seed: i + 1 })));
             await prisma.tournamentMatch.createMany({
               data: round1.map((m) => ({
-                tournamentId: t.id, round: m.round, matchIndex: m.matchIndex,
+                tournamentId: t.id, bracket: 'main', round: m.round, matchIndex: m.matchIndex,
                 player1Id: m.player1.userId, player1Username: m.player1.username,
                 player2Id: m.player2?.userId ?? null, player2Username: m.player2?.username ?? null,
                 winnerId: m.player2 === null ? m.player1.userId : null,
@@ -1226,13 +1227,32 @@ export function setupSocketHandlers(io: SocketIOServer) {
               where: { id: t.id },
               data: { status: 'in_progress', currentRound: 1, totalRounds, startedAt: now },
             });
+          } else if (isDoubleElimFormat) {
+            const { generateDoubleElimBracket } = await import('@/lib/tournament/doubleElimEngine');
+            const de = generateDoubleElimBracket(participants.map(p => ({ userId: p.userId, username: p.username })));
+            await prisma.tournamentMatch.createMany({
+              data: de.matches.map((m) => ({
+                tournamentId: t.id,
+                bracket: m.bracket,
+                round: m.round,
+                matchIndex: m.matchIndex,
+                player1Id: m.player1Id, player1Username: m.player1Username,
+                player2Id: m.player2Id, player2Username: m.player2Username,
+                winnerId: m.winnerId, winnerUsername: m.winnerUsername,
+                isBye: m.isBye, status: m.status,
+              })),
+            });
+            await prisma.tournament.update({
+              where: { id: t.id },
+              data: { status: 'in_progress', currentRound: 1, totalRounds: de.totalRounds, startedAt: now },
+            });
           } else {
-            
+
             const { generateBracket } = await import('@/lib/tournament/tournamentEngine');
             const bracket = generateBracket(participants.map(p => ({ userId: p.userId, username: p.username })));
             await prisma.tournamentMatch.createMany({
               data: bracket.matches.map((m) => ({
-                tournamentId: t.id, round: m.round, matchIndex: m.matchIndex,
+                tournamentId: t.id, bracket: 'main', round: m.round, matchIndex: m.matchIndex,
                 player1Id: (m as any).player1?.participantId || null,
                 player1Username: (m as any).player1?.username || null,
                 player2Id: (m as any).player2?.participantId || null,

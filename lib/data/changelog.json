@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : double élimination disponible",
+      "title_en": "Tournaments: double elimination is now available",
+      "changes_fr": [
+        "Nouveau format de tournoi : double élimination. Chaque joueur a droit à une seconde chance dans le tableau des perdants avant d'être définitivement éliminé. La grande finale peut nécessiter un match de réinitialisation (le gagnant du tableau des perdants doit gagner deux fois pour remporter le tournoi).",
+        "Disponible pour 4, 8, 16 ou 32 joueurs. La page du tournoi affiche maintenant trois sous-tableaux : tableau des gagnants, tableau des perdants, grande finale."
+      ],
+      "changes_en": [
+        "New tournament format: double elimination. Each player gets a second chance in the losers bracket before being eliminated for good. The grand final may require a reset match (the losers-bracket winner must win twice to take the tournament).",
+        "Available for 4, 8, 16 or 32 players. The tournament page now shows three sub-brackets: winners, losers, and grand final."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : audit log, banlist gelée au start, détection des matches orphelins",
       "title_en": "Tournaments: admin audit log, ban list frozen at start, orphan match detection",
       "changes_fr": [

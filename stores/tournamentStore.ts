@@ -4,6 +4,7 @@ import type { SwissStanding } from '@/lib/tournament/swissEngine';
 export interface TournamentMatch {
   id: string;
   tournamentId: string;
+  bracket: string;
   round: number;
   matchIndex: number;
   player1Id: string | null;
@@ -49,7 +50,7 @@ export interface TournamentData {
   discordRoleReward: string | null;
   bannedCardIds: string[];
   allowedLeagues: string[];
-  format?: 'swiss' | 'elimination';
+  format?: 'swiss' | 'elimination' | 'double_elimination';
   scheduledStartAt?: string | null;
   winnerId: string | null;
   winnerUsername: string | null;
@@ -88,7 +89,7 @@ interface TournamentStore {
 export interface CreateTournamentInput {
   name: string;
   type: 'simulator';
-  format?: 'swiss' | 'elimination';
+  format?: 'swiss' | 'elimination' | 'double_elimination';
   gameMode: 'classic' | 'sealed' | 'restricted';
   maxPlayers: number;
   isPublic: boolean;
