@@ -122,6 +122,14 @@ export async function POST(
         const { userId, reason } = body;
         if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
 
+        const participantExists = await prisma.tournamentParticipant.findFirst({
+          where: { tournamentId, userId },
+          select: { id: true },
+        });
+        if (!participantExists) {
+          return NextResponse.json({ error: 'Participant not found in this tournament' }, { status: 404 });
+        }
+
         await prisma.tournamentParticipant.updateMany({
           where: { tournamentId, userId },
           data: { eliminated: true, eliminatedRound: tournament.currentRound || 0 },
@@ -536,9 +544,20 @@ export async function POST(
       
       case 'updateNote': {
         const { note } = body;
+        if (note != null && typeof note !== 'string') {
+          return NextResponse.json({ error: 'note must be a string or null' }, { status: 400 });
+        }
+        if (typeof note === 'string' && note.length > 500) {
+          return NextResponse.json({ error: 'Note must be at most 500 characters' }, { status: 400 });
+        }
         await prisma.tournament.update({
           where: { id: tournamentId },
           data: { restrictionNote: note ?? null },
+        });
+        await logAdminAction({
+          tournamentId, actorId, actorUsername,
+          action: 'updateNote',
+          details: { length: typeof note === 'string' ? note.length : 0 },
         });
         return NextResponse.json({ success: true });
       }

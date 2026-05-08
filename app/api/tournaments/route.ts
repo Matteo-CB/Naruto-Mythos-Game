@@ -85,6 +85,18 @@ export async function POST(req: NextRequest) {
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     }
+    if (name.trim().length > 80) {
+      return NextResponse.json({ error: 'Name must be at most 80 characters' }, { status: 400 });
+    }
+    if (typeof restrictionNote === 'string' && restrictionNote.length > 500) {
+      return NextResponse.json({ error: 'Restriction note must be at most 500 characters' }, { status: 400 });
+    }
+    if (gameMode === 'sealed') {
+      const count = sealedBoosterCount ?? 5;
+      if (typeof count !== 'number' || !Number.isInteger(count) || count < 1 || count > 12) {
+        return NextResponse.json({ error: 'Sealed booster count must be an integer between 1 and 12' }, { status: 400 });
+      }
+    }
 
     
     const leagueRestrictions: string[] = [];

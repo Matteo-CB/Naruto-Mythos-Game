@@ -2,19 +2,27 @@
   "entries": [
     {
       "date": "2026-05-08",
-      "title_fr": "Tournois : routes secondaires sécurisées (join, delete, seeds)",
-      "title_en": "Tournaments: secondary routes hardened (join, delete, seeds)",
+      "title_fr": "Tournois : audit complet des routes (join, start, admin, créa)",
+      "title_en": "Tournaments: full route audit (join, start, admin, create)",
       "changes_fr": [
-        "Inscription au tournoi : course condition corrigée. Quand 2 joueurs cliquaient 'rejoindre' au même instant alors qu'il restait 1 place, les deux passaient et le tournoi se retrouvait en surcapacité. Une vérification compensatoire annule désormais la dernière inscription si la limite est dépassée.",
-        "Inscription par code : la route ne vérifiait ni le bannissement de tournoi, ni la restriction de ligue. Un joueur banni pouvait contourner la sanction en utilisant le code. Les deux contrôles sont maintenant appliqués comme sur la route d'inscription publique.",
-        "DELETE tournoi refuse de supprimer un tournoi en cours. La suppression nettoie aussi les logs d'audit, dans une transaction Prisma pour éviter les états incohérents.",
-        "Pairings manuels : la route valide que tous les userIds fournis sont bien des participants du tournoi (rejet 400 sinon). L'action est loguée dans le journal d'audit admin."
+        "Inscription au tournoi : course condition corrigée. Quand 2 joueurs cliquaient 'rejoindre' au même instant alors qu'il restait 1 place, les deux passaient et le tournoi se retrouvait en surcapacité. Vérification compensatoire ajoutée.",
+        "Inscription par code : la route ne vérifiait ni le bannissement de tournoi, ni la restriction de ligue. Un joueur banni pouvait contourner la sanction. Les deux contrôles sont maintenant appliqués.",
+        "Start du tournoi : les decks sont désormais re-validés au démarrage. Avant, on se contentait du booléen mis en cache au moment de la sélection. Si l'admin ajoutait des cartes au banlist global ou si le joueur supprimait son deck entre la sélection et le start, le joueur démarrait avec un deck invalide. Désormais, le deck est rechargé et revalidé contre le banlist gelé au démarrage.",
+        "Création de tournoi : nom plafonné à 80 caractères, note de restriction à 500, et le nombre de boosters scellés validé entre 1 et 12 (anti-DoS).",
+        "Admin updateNote : note plafonnée à 500 caractères et action loguée dans le journal d'audit (cohérence avec les autres actions admin).",
+        "Admin disqualify : retournait 'success' silencieusement même quand le userId ne correspondait à aucun participant. Renvoie maintenant 404 'Participant not found in this tournament'.",
+        "DELETE tournoi refuse de supprimer un tournoi en cours, nettoie les logs d'audit dans une transaction.",
+        "Pairings manuels : valide que tous les userIds sont bien des participants du tournoi, action loguée."
       ],
       "changes_en": [
-        "Tournament join: race condition fixed. When 2 players clicked 'join' simultaneously with 1 spot left, both passed the capacity check and the tournament went over its limit. A compensating check now removes the latest registration if capacity is exceeded.",
-        "Join by code: the route was missing the tournament-ban check and the league restriction check. A banned player could bypass the ban by using a code. Both checks now apply as they do on the public join route.",
-        "DELETE tournament refuses to delete an in-progress tournament. Deletion also clears the audit logs, wrapped in a Prisma transaction to avoid inconsistent state.",
-        "Manual pairings: the route validates that all provided userIds match actual tournament participants (400 otherwise). The action is logged in the admin audit journal."
+        "Tournament join: race condition fixed. When 2 players clicked 'join' simultaneously with 1 spot left, both passed the capacity check and the tournament went over capacity. Compensating check added.",
+        "Join by code: the route was missing the tournament-ban check and the league restriction check. A banned player could bypass the ban. Both checks now apply.",
+        "Tournament start: decks are now re-validated at start. Previously we trusted the cached boolean from selection time. If the admin added cards to the global banlist or the player deleted their deck between selection and start, the player would start with an invalid deck. Decks are now reloaded and re-validated against the banlist frozen at start.",
+        "Tournament creation: name capped at 80 chars, restriction note at 500, and sealed booster count validated to be between 1 and 12 (anti-DoS).",
+        "Admin updateNote: note capped at 500 chars and action logged in the audit journal (consistency with the other admin actions).",
+        "Admin disqualify: silently returned 'success' even when the userId didn't match any participant. Now returns 404 'Participant not found in this tournament'.",
+        "DELETE tournament refuses to delete an in-progress tournament, clears audit logs inside a transaction.",
+        "Manual pairings: validates that all userIds are actual participants, action logged."
       ]
     },
     {

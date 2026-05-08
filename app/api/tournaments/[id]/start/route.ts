@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { generateBracket } from '@/lib/tournament/tournamentEngine';
 import { computeSwissRoundCount, generateSwissRound1 } from '@/lib/tournament/swissEngine';
 import type { SwissPlayer } from '@/lib/tournament/swissEngine';
+import { validateDeckForTournament } from '@/lib/tournament/deckValidation';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
@@ -73,16 +74,41 @@ export async function POST(
 
 
     if (tournament.gameMode !== 'sealed') {
-      const invalidPlayers = tournament.participants.filter(p => !p.deckValid || !p.deckId);
+      const stillValidIds = new Set<string>();
+      for (const p of tournament.participants) {
+        if (!p.deckId) continue;
+        const deck = await prisma.deck.findUnique({ where: { id: p.deckId } });
+        if (!deck || deck.userId !== p.userId) {
+          await prisma.tournamentParticipant.update({
+            where: { id: p.id },
+            data: { deckValid: false },
+          });
+          continue;
+        }
+        const result = validateDeckForTournament(deck, tournament);
+        if (result.valid) {
+          stillValidIds.add(p.id);
+          if (!p.deckValid) {
+            await prisma.tournamentParticipant.update({
+              where: { id: p.id },
+              data: { deckValid: true },
+            });
+          }
+        } else {
+          await prisma.tournamentParticipant.update({
+            where: { id: p.id },
+            data: { deckValid: false },
+          });
+        }
+      }
+      const invalidPlayers = tournament.participants.filter(p => !stillValidIds.has(p.id));
       for (const p of invalidPlayers) {
         await prisma.tournamentParticipant.update({
           where: { id: p.id },
           data: { eliminated: true, eliminatedRound: 0 },
         });
       }
-      
-      const validParticipants = tournament.participants.filter(p => p.deckValid && p.deckId);
-      tournament.participants = validParticipants;
+      tournament.participants = tournament.participants.filter(p => stillValidIds.has(p.id));
     }
 
     if (tournament.participants.length < 2) {
