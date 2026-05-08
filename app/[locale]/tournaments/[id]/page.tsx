@@ -113,7 +113,8 @@ export default function TournamentDetailPage() {
     socket.on('tournament:player-forfeited', onF); socket.on('tournament:match-ready', onMR); socket.on('tournament:absence-timer', onAT);
     socket.on('tournament:standings-updated', onSU); socket.on('tournament:swiss-round-generated', onSRG);
     socket.on('tournament:refresh', onRefresh);
-    return () => { socket.emit('tournament:unsubscribe', { tournamentId }); socket.off('tournament:update', onU); socket.off('tournament:match-updated', onM); socket.off('tournament:completed', onC); socket.off('tournament:round-complete', onR); socket.off('tournament:player-forfeited', onF); socket.off('tournament:match-ready', onMR); socket.off('tournament:absence-timer', onAT); socket.off('tournament:standings-updated', onSU); socket.off('tournament:swiss-round-generated', onSRG); socket.off('tournament:refresh', onRefresh); };
+    socket.on('tournament:cancelled', onRefresh); socket.on('tournament:started', onRefresh);
+    return () => { socket.emit('tournament:unsubscribe', { tournamentId }); socket.off('tournament:update', onU); socket.off('tournament:match-updated', onM); socket.off('tournament:completed', onC); socket.off('tournament:round-complete', onR); socket.off('tournament:player-forfeited', onF); socket.off('tournament:match-ready', onMR); socket.off('tournament:absence-timer', onAT); socket.off('tournament:standings-updated', onSU); socket.off('tournament:swiss-round-generated', onSRG); socket.off('tournament:refresh', onRefresh); socket.off('tournament:cancelled', onRefresh); socket.off('tournament:started', onRefresh); };
   }, [socket, tournamentId, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, handleStandingsUpdate, handleSwissRoundGenerated, fetchTournament]);
 
   

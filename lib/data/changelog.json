@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : la page se met à jour automatiquement quand le tournoi est annulé ou démarre",
+      "title_en": "Tournaments: page now auto-updates when the tournament is cancelled or starts",
+      "changes_fr": [
+        "La page d'un tournoi écoutait les events de match (match-updated, match-ready, etc.) mais pas tournament:cancelled ni tournament:started. Conséquence : si un admin annulait le tournoi pendant que tu étais sur la page, ou si un tournoi programmé démarrait automatiquement à l'heure prévue, ta page restait figée sur l'ancien état jusqu'à ce que tu rafraîchisses. Désormais, la page rafraîchit automatiquement les données quand l'un de ces deux events arrive.",
+        "Sécurité interne : suppression du handler socket tournament:report-present qui était du code mort (aucun client ne l'émettait) mais qui ouvrait un vecteur de blocage potentiel : un joueur reverse-engineerant le protocole pouvait clear son propre timer d'absence sans cliquer 'prêt', laissant son adversaire en attente perpétuelle."
+      ],
+      "changes_en": [
+        "The tournament page was listening to match events (match-updated, match-ready, etc.) but not to tournament:cancelled or tournament:started. Consequence: if an admin cancelled the tournament while you were on the page, or if a scheduled tournament auto-started at its time, your page would stay stuck on the old state until you refreshed. Now the page auto-refetches when either event arrives.",
+        "Internal security: removed the socket handler tournament:report-present which was dead code (no client emitted it) but opened a potential stalling vector: a player reverse-engineering the protocol could clear their own absence timer without clicking 'ready', leaving their opponent in perpetual wait."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois privés : le joinCode n'est plus exposé par l'API aux non-créateurs",
       "title_en": "Private tournaments: joinCode no longer exposed by the API to non-creators",
       "changes_fr": [

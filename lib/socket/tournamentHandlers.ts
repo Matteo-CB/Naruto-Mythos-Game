@@ -255,20 +255,6 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
     });
   });
 
-  socket.on('tournament:report-present', async ({ matchId }: { matchId: string }) => {
-    const authedUserId = (socket.data as { userId?: string }).userId;
-    if (!authedUserId) return;
-    const match = await prisma.tournamentMatch.findUnique({
-      where: { id: matchId },
-      select: { player1Id: true, player2Id: true },
-    });
-    if (!match) return;
-    if (match.player1Id !== authedUserId && match.player2Id !== authedUserId) {
-      console.warn(`[Tournament] tournament:report-present rejected: user ${authedUserId} not in match ${matchId}`);
-      return;
-    }
-    clearAbsenceTimer(matchId);
-  });
 }
 
 
