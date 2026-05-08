@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : faille d'authentification corrigée sur les events socket",
+      "title_en": "Tournaments: socket-event auth bypass fixed",
+      "changes_fr": [
+        "tournament:ready et tournament:report-present acceptaient n'importe quel userId envoyé par le client. Un joueur malveillant pouvait se faire passer pour un autre, marquer son adversaire comme 'prêt' (forçant le démarrage du match), ou annuler le timer d'absence d'un autre match pour empêcher un forfait. Désormais, le userId du body doit correspondre à l'identité authentifiée du socket, et le user doit être un des deux joueurs du match concerné."
+      ],
+      "changes_en": [
+        "tournament:ready and tournament:report-present accepted any userId sent by the client. A malicious player could impersonate another, mark their opponent as 'ready' (forcing the match to start), or cancel another match's absence timer to prevent a forfeit. Now the userId from the body must match the socket's authenticated identity, and the user must be one of the match's two players."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : écran de fin de partie correct après disqualification ou reset admin",
       "title_en": "Tournaments: correct end-of-game screen after admin disqualification or reset",
       "changes_fr": [

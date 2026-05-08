@@ -64,9 +64,19 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
     tournamentId: string; matchId: string; userId: string;
   }) => {
     try {
+      const authedUserId = (socket.data as { userId?: string }).userId;
+      if (!authedUserId || authedUserId !== userId) {
+        console.warn(`[Tournament] tournament:ready rejected: socket auth mismatch (claim=${userId}, auth=${authedUserId ?? 'null'})`);
+        return;
+      }
+
       const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
       if (!match || match.tournamentId !== tournamentId) return;
-      
+      if (match.player1Id !== userId && match.player2Id !== userId) {
+        console.warn(`[Tournament] tournament:ready rejected: user ${userId} not in match ${matchId}`);
+        return;
+      }
+
       if (match.status !== 'ready' && match.status !== 'pending' && match.status !== 'in_progress') return;
 
       if (!matchReadyPlayers.has(matchId)) matchReadyPlayers.set(matchId, new Set());
@@ -224,6 +234,17 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
   });
 
   socket.on('tournament:report-present', async ({ matchId }: { matchId: string }) => {
+    const authedUserId = (socket.data as { userId?: string }).userId;
+    if (!authedUserId) return;
+    const match = await prisma.tournamentMatch.findUnique({
+      where: { id: matchId },
+      select: { player1Id: true, player2Id: true },
+    });
+    if (!match) return;
+    if (match.player1Id !== authedUserId && match.player2Id !== authedUserId) {
+      console.warn(`[Tournament] tournament:report-present rejected: user ${authedUserId} not in match ${matchId}`);
+      return;
+    }
     clearAbsenceTimer(matchId);
   });
 }

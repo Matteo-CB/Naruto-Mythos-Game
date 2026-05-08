@@ -1285,6 +1285,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     socket.on('auth:register', (data: { userId: string; username?: string }) => {
       if (data.userId) {
         registerUserSocket(data.userId, socket.id);
+        (socket.data as { userId?: string }).userId = data.userId;
         if (data.username) {
           userNames.set(data.userId, data.username);
         }
