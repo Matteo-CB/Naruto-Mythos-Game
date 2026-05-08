@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : 7e passe — extraction validation deck + 34 tests dynamiques",
+      "title_en": "Tournaments: 7th pass — deck validation extracted + 34 dynamic tests",
+      "changes_fr": [
+        "La validation des decks de tournoi (mode restricted) est extraite dans un module séparé testable, avec 17 tests couvrant : tailles min/max, missions, bannis, copies max, raretés autorisées/bannies, max par rareté, plafond chakra, groupes, déduplication d'erreurs.",
+        "7 tests de cascades de forfait ajoutés : forfait WB R1 droppe correctement en LB, forfait WB final propage à la grande finale, plusieurs forfaits consécutifs gardent le bracket cohérent, Swiss avec forfaits évite les rematches au round suivant.",
+        "10 tests de génération de pool sealed : nombre de boosters, taille des cartes, structure attendue (4C+3UC+1R+1H+1M), unicité des sealedInstanceId, présence de la mission, isHolo sur le rare."
+      ],
+      "changes_en": [
+        "Tournament deck validation (restricted mode) extracted into a dedicated testable module, with 17 tests covering: min/max sizes, missions, banned, copy limits, allowed/banned rarities, max-per-rarity, chakra cap, groups, error deduplication.",
+        "7 forfeit-cascade tests added: a WB R1 forfeit drops the loser correctly into LB, a WB-final forfeit propagates to the grand final, multiple consecutive forfeits keep the bracket consistent, Swiss with forfeits avoids rematches in the next round.",
+        "10 sealed-pool generation tests: booster count, card count per booster, expected structure (4C+3UC+1R+1H+1M), uniqueness of sealedInstanceId, mission presence, isHolo on the rare slot."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : 6e passe d'audit — fixes mineurs et 49 tests exhaustifs",
       "title_en": "Tournaments: 6th audit pass — minor fixes and 49 exhaustive tests",
       "changes_fr": [
