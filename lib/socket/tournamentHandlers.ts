@@ -56,18 +56,19 @@ async function withMatchReadyLock<T>(matchId: string, fn: () => Promise<T>): Pro
 }
 
 
-function cleanupTournamentMaps(tournamentId: string): void {
+async function cleanupTournamentMaps(tournamentId: string): Promise<void> {
+  const matchIds = (await prisma.tournamentMatch.findMany({
+    where: { tournamentId },
+    select: { id: true },
+  })).map(m => m.id);
 
-  for (const [matchId] of matchReadyPlayers) {
-    if (matchId.includes(tournamentId)) matchReadyPlayers.delete(matchId);
+  for (const matchId of matchIds) {
+    matchReadyPlayers.delete(matchId);
+    matchReadyLocks.delete(matchId);
   }
 
   for (const [key] of swissRoundLocks) {
     if (key.startsWith(tournamentId)) swissRoundLocks.delete(key);
-  }
-
-  for (const [matchId] of matchReadyLocks) {
-    if (matchId.includes(tournamentId)) matchReadyLocks.delete(matchId);
   }
 }
 
@@ -639,7 +640,7 @@ export async function handleSwissMatchEnd(
           data: { status: 'cancelled', completedAt: new Date() },
         });
         io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated' });
-        cleanupTournamentMaps(tournamentId);
+        await cleanupTournamentMaps(tournamentId);
         return;
       }
       await prisma.tournament.update({
@@ -663,7 +664,7 @@ export async function handleSwissMatchEnd(
         standings,
       });
 
-      cleanupTournamentMaps(tournamentId);
+      await cleanupTournamentMaps(tournamentId);
 
       
       let newRoleName: string | null = null;
@@ -766,7 +767,7 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
         data: { status: 'cancelled', completedAt: new Date() },
       });
       io?.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated' });
-      cleanupTournamentMaps(tournamentId);
+      await cleanupTournamentMaps(tournamentId);
       return;
     }
     await prisma.tournament.update({
@@ -779,7 +780,7 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
     });
     io?.to(`tournament:${tournamentId}`).emit('tournament:completed', { winnerId, winnerUsername });
 
-    cleanupTournamentMaps(tournamentId);
+    await cleanupTournamentMaps(tournamentId);
 
     
     let newRoleName: string | null = null;
@@ -1040,7 +1041,7 @@ async function finalizeDoubleElim(
       data: { status: 'cancelled', completedAt: new Date() },
     });
     io?.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated' });
-    cleanupTournamentMaps(tournamentId);
+    await cleanupTournamentMaps(tournamentId);
     void finalMatch;
     return;
   }
@@ -1053,7 +1054,7 @@ async function finalizeDoubleElim(
     data: { tournamentWins: { increment: 1 } },
   });
   io?.to(`tournament:${tournamentId}`).emit('tournament:completed', { winnerId, winnerUsername });
-  cleanupTournamentMaps(tournamentId);
+  await cleanupTournamentMaps(tournamentId);
 
   let newRoleName: string | null = null;
   try {

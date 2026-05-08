@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : memory leak des maps in-memory corrigé",
+      "title_en": "Tournaments: in-memory map memory leak fixed",
+      "changes_fr": [
+        "Le helper cleanupTournamentMaps (appelé à la fin de chaque tournoi) utilisait matchId.includes(tournamentId) pour décider quoi nettoyer dans matchReadyPlayers et matchReadyLocks. Mais matchId est un Mongo ObjectId qui ne contient jamais la string du tournamentId. Le filter ne matchait donc rien et le cleanup ne supprimait rien. Memory leak silencieux qui grossissait avec chaque tournoi terminé jusqu'au restart serveur. Sur un serveur tournant longtemps avec beaucoup de tournois, les maps pouvaient accumuler des dizaines de milliers d'entrées orphelines. Désormais le helper fait une query DB pour récupérer tous les matchId du tournoi et nettoie spécifiquement ces entrées. swissRoundLocks utilise déjà un préfixe tournamentId: pour ses clés et continue d'être nettoyé via startsWith."
+      ],
+      "changes_en": [
+        "The cleanupTournamentMaps helper (called at the end of every tournament) used matchId.includes(tournamentId) to decide what to clean in matchReadyPlayers and matchReadyLocks. But matchId is a Mongo ObjectId that never contains the tournamentId string. The filter never matched anything and the cleanup deleted nothing. Silent memory leak that grew with every finished tournament until server restart. On a long-running server with many tournaments, the maps could accumulate tens of thousands of orphan entries. Now the helper queries the DB to get all matchIds of the tournament and cleans those specific entries. swissRoundLocks already uses a tournamentId: prefix for its keys and keeps being cleaned via startsWith."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois Suisse : génération de round suivant idempotente",
       "title_en": "Swiss tournaments: next-round generation now idempotent",
       "changes_fr": [
