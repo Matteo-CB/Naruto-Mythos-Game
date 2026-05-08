@@ -365,6 +365,19 @@ export async function handleSwissDoubleAbsence(io: Server, tournamentId: string,
     data: { status: 'forfeit', winnerId: null, winnerUsername: null, completedAt: new Date() },
   });
 
+  if (match.roomCode && rooms.has(match.roomCode)) {
+    const room = rooms.get(match.roomCode)!;
+    room.finalized = true;
+    if (room.tournamentJoinTimer) { clearTimeout(room.tournamentJoinTimer); room.tournamentJoinTimer = null; }
+    if (room.disconnectTimer) { clearTimeout(room.disconnectTimer); room.disconnectTimer = null; }
+    if (room.actionTimer) { clearTimeout(room.actionTimer); room.actionTimer = null; }
+    if (room.mulliganTimer) { clearTimeout(room.mulliganTimer); room.mulliganTimer = null; }
+    setTimeout(() => {
+      const r = rooms.get(match.roomCode!);
+      if (r === room) rooms.delete(match.roomCode!);
+    }, 10_000);
+  }
+
   io.to(`tournament:${tournamentId}`).emit('tournament:player-forfeited', {
     matchId, forfeitedPlayerId: match.player1Id, winnerId: null, winnerUsername: null, doubleForfeit: true,
   });
@@ -388,6 +401,19 @@ async function handleMatchForfeit(io: Server, tournamentId: string, matchId: str
     where: { id: matchId },
     data: { status: 'forfeit', winnerId, winnerUsername, completedAt: new Date() },
   });
+
+  if (match.roomCode && rooms.has(match.roomCode)) {
+    const room = rooms.get(match.roomCode)!;
+    room.finalized = true;
+    if (room.tournamentJoinTimer) { clearTimeout(room.tournamentJoinTimer); room.tournamentJoinTimer = null; }
+    if (room.disconnectTimer) { clearTimeout(room.disconnectTimer); room.disconnectTimer = null; }
+    if (room.actionTimer) { clearTimeout(room.actionTimer); room.actionTimer = null; }
+    if (room.mulliganTimer) { clearTimeout(room.mulliganTimer); room.mulliganTimer = null; }
+    setTimeout(() => {
+      const r = rooms.get(match.roomCode!);
+      if (r === room) rooms.delete(match.roomCode!);
+    }, 10_000);
+  }
 
 
   const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId }, select: { format: true } });

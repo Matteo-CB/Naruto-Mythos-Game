@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : nettoyage de la room après forfait par timer",
+      "title_en": "Tournaments: room cleanup after timer-driven forfeit",
+      "changes_fr": [
+        "Quand un match de tournoi était forfait par le timer de join 2 minutes (room créée mais joueurs n'ont jamais effectivement chargé la page de jeu), le record DB du match passait bien en forfeit, mais la room en mémoire restait là avec tous ses timers (mulligan, action, déconnexion, joinTimer) et son état (hostSocket, chatMessages). Elle ne disparaissait que via la cleanup automatique des rooms anciennes (4 heures). Pareil pour le double forfait Swiss. Désormais handleMatchForfeit et handleSwissDoubleAbsence clear tous les timers de la room et la suppriment de la map après 10 secondes (le délai laisse le temps aux events socket d'arriver aux clients restants)."
+      ],
+      "changes_en": [
+        "When a tournament match was forfeited by the 2-minute join timer (room created but players never actually loaded the game page), the match DB record correctly transitioned to forfeit, but the in-memory room lingered with all its timers (mulligan, action, disconnect, joinTimer) and state (hostSocket, chatMessages). It only got cleaned up by the periodic stale-rooms sweep (4-hour TTL). Same for Swiss double forfeit. Now handleMatchForfeit and handleSwissDoubleAbsence clear all the room's timers and remove it from the map after 10 seconds (the delay lets the socket events reach any remaining clients)."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : validation du gameMode à la création (classic/sealed/restricted uniquement)",
       "title_en": "Tournaments: gameMode validation at creation (classic/sealed/restricted only)",
       "changes_fr": [
