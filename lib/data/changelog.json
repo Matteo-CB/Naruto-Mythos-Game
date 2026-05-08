@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois double-élim : currentRound enfin mis à jour quand on progresse",
+      "title_en": "Double-elim tournaments: currentRound finally updates as rounds progress",
+      "changes_fr": [
+        "Asymétrie corrigée : en single-élim et en Suisse, advanceMatchWinner / handleSwissMatchEnd updataient tournament.currentRound quand le round courant se terminait. En double-élim, advanceMatchWinnerDoubleElim ne touchait jamais currentRound, qui restait coincé à 1 toute la durée du tournoi (valeur set au start). Le BracketTree de la page tournoi utilise currentRound pour highlighter le round actif, donc en DE on voyait Round 1 mis en évidence même quand le tournoi était en finale. Désormais, après chaque match DE complété, on recalcule le round le plus haut encore en cours (n'importe quel match avec status ready/in_progress/pending dans n'importe quel bracket WB/LB/GF) et on update currentRound. Si le tournoi est terminé, on n'écrit pas (ongoing=0)."
+      ],
+      "changes_en": [
+        "Asymmetry fixed: in single-elim and Swiss, advanceMatchWinner / handleSwissMatchEnd updated tournament.currentRound when the current round ended. In double-elim, advanceMatchWinnerDoubleElim never touched currentRound, which stayed pinned at 1 for the whole tournament (the value set at start). The page's BracketTree uses currentRound to highlight the active round, so in DE you saw Round 1 highlighted even when the tournament was at the grand final. Now, after each DE match completes, we recompute the highest round still ongoing (any match with status ready/in_progress/pending in any bracket WB/LB/GF) and update currentRound. If the tournament is finished, we don't write (ongoing=0)."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Admin : action 'reinstate' pour annuler un DQ erroné en registration",
       "title_en": "Admin: 'reinstate' action to undo an erroneous DQ during registration",
       "changes_fr": [

@@ -949,6 +949,18 @@ export async function advanceMatchWinnerDoubleElim(
       await applySlot(io, tournamentId, loseTarget, loserId, loserUser?.username ?? null);
     }
   }
+
+  const ongoing = await prisma.tournamentMatch.findMany({
+    where: { tournamentId, status: { in: ['ready', 'in_progress', 'pending'] } },
+    select: { round: true },
+  });
+  if (ongoing.length > 0) {
+    const maxOngoing = ongoing.reduce((acc, m) => m.round > acc ? m.round : acc, 0);
+    await prisma.tournament.update({
+      where: { id: tournamentId },
+      data: { currentRound: maxOngoing },
+    }).catch(() => {});
+  }
 }
 
 async function applySlot(
