@@ -143,7 +143,8 @@ export async function POST(
 
         const activeMatch = tournament.matches.find(
           m => (m.player1Id === userId || m.player2Id === userId)
-            && (m.status === 'ready' || m.status === 'in_progress' || m.status === 'pending'),
+            && (m.status === 'ready' || m.status === 'in_progress' || m.status === 'pending')
+            && m.player1Id !== null && m.player2Id !== null,
         );
         if (activeMatch) {
           const winnerId = activeMatch.player1Id === userId ? activeMatch.player2Id : activeMatch.player1Id;

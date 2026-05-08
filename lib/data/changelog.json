@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois élim/double-élim : DQ d'un joueur en attente ne casse plus le bracket",
+      "title_en": "Elim/double-elim tournaments: DQ of a pending-slot player no longer breaks the bracket",
+      "changes_fr": [
+        "Quand un admin DQ'ait un joueur en double-élim alors qu'il avait un match futur en 'pending' (un seul slot rempli, l'autre attendant le gagnant d'un match en cours), le code marquait ce match en 'forfeit' avec winnerId=null. Plus tard, quand l'autre slot se remplissait, applySlot ne le réactivait pas (vérification stricte de status='pending') et le bracket restait définitivement coincé. La grande finale n'arrivait jamais. Désormais, disqualify ne touche pas un match dont l'autre slot est encore vide : on laisse l'avancement naturel du bracket s'occuper du remplissage.",
+        "Auto-forfait quand un slot est rempli avec un joueur DQ'd : que ce soit en single-élim ou en double-élim, dès que les deux slots d'un match sont remplis, on vérifie si l'un des deux joueurs est éliminé. Si oui, on déclenche immédiatement un forfait au lieu d'attendre 2 minutes le timer d'absence. Ça économise du temps fantôme et propage proprement la disqualification dans le bracket."
+      ],
+      "changes_en": [
+        "When an admin DQ'd a player in double-elim while they had an upcoming pending match (one slot filled, the other waiting for the winner of an in-progress match), the code marked that match as 'forfeit' with winnerId=null. Later, when the other slot was filled, applySlot would not reactivate it (strict status='pending' check) and the bracket would stay permanently stuck. The grand final would never happen. Now, disqualify does not touch matches whose other slot is still empty: natural bracket advancement handles the filling.",
+        "Auto-forfeit when a slot is filled with a DQ'd player: in both single-elim and double-elim, as soon as both slots of a match are filled, we check whether either player is eliminated. If so, we trigger an immediate forfeit instead of waiting 2 minutes for the absence timer. Saves ghost-timer time and propagates the disqualification cleanly through the bracket."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois Suisse : joueurs disqualifiés exclus des pairings suivants",
       "title_en": "Swiss tournaments: disqualified players excluded from subsequent pairings",
       "changes_fr": [

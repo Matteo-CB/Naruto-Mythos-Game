@@ -341,6 +341,24 @@ export async function rehydrateAbsenceTimers(io: Server): Promise<void> {
   }
 }
 
+async function autoForfeitIfEliminated(
+  io: Server,
+  tournamentId: string,
+  matchId: string,
+): Promise<boolean> {
+  const m = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
+  if (!m || !m.player1Id || !m.player2Id) return false;
+  if (m.status === 'completed' || m.status === 'forfeit') return false;
+  const elim = await prisma.tournamentParticipant.findMany({
+    where: { tournamentId, userId: { in: [m.player1Id, m.player2Id] }, eliminated: true },
+    select: { userId: true },
+  });
+  if (elim.length === 0) return false;
+  const elimId = elim[0].userId;
+  await handleMatchForfeit(io, tournamentId, matchId, elimId);
+  return true;
+}
+
 async function handleSwissDoubleAbsence(io: Server, tournamentId: string, matchId: string) {
   const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
   if (!match || match.status === 'completed' || match.status === 'forfeit') return;
@@ -747,7 +765,11 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
   const p2 = isTopSlot ? updated.player2Id : winnerId;
   if (p1 && p2) {
     await prisma.tournamentMatch.update({ where: { id: nextMatch.id }, data: { status: 'ready' } });
-    
+
+    if (io && await autoForfeitIfEliminated(io, tournamentId, nextMatch.id)) {
+      return;
+    }
+
     if (io) {
       const deadline = startAbsenceTimer(nextMatch.id, async () => {
         const ready = matchReadyPlayers.get(nextMatch.id);
@@ -903,6 +925,15 @@ async function applySlot(
   }
 
   if (io && refreshed.player1Id && refreshed.player2Id && refreshed.status === 'ready') {
+    if (await autoForfeitIfEliminated(io, tournamentId, refreshed.id)) {
+      io.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
+        matchId: refreshed.id,
+        bracket: plan.bracket,
+        round: plan.round,
+        matchIndex: plan.matchIndex,
+      });
+      return;
+    }
     const deadline = new Date(Date.now() + ABSENCE_TIMEOUT_MS);
     await prisma.tournamentMatch.update({
       where: { id: refreshed.id },
