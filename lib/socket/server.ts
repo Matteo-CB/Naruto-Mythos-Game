@@ -1261,7 +1261,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-      
+      const authedUserId = (socket.data as { userId?: string }).userId;
+      if (!authedUserId || authedUserId !== userId) {
+        console.warn(`[Socket] game:rejoin rejected: socket auth mismatch (claim=${userId}, auth=${authedUserId ?? 'null'})`);
+        return;
+      }
+
       const isHost = room.hostId === userId;
       const isGuest = room.guestId === userId;
       if (!isHost && !isGuest) {

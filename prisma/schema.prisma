@@ -44,6 +44,9 @@ model User {
   allowSpectatorHand Boolean     @default(false)
   consecutiveWins    Int          @default(0)
   consecutiveLosses  Int          @default(0)
+
+  @@index([elo])
+  @@index([createdAt])
 }
 
 /// Per-game ELO snapshot. Survives the Game row purge (72h) up to 14 days so

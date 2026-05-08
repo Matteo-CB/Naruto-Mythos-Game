@@ -48,7 +48,7 @@ export async function GET(
 
     const limit = page * perPage;
 
-    const [totalRanked, eloRows, aiGamesAsP1, aiGamesAsP2] = await Promise.all([
+    const [totalRanked, eloRows, aiGames] = await Promise.all([
       prisma.eloHistory.count({ where: { userId: user.id } }),
       prisma.eloHistory.findMany({
         where: { userId: user.id },
@@ -56,22 +56,11 @@ export async function GET(
         take: limit,
       }),
       prisma.game.findMany({
-        where: { player1Id: user.id, status: 'completed', isAiGame: true },
-        select: {
-          id: true,
+        where: {
+          OR: [{ player1Id: user.id }, { player2Id: user.id }],
+          status: 'completed',
           isAiGame: true,
-          aiDifficulty: true,
-          winnerId: true,
-          player1Score: true,
-          player2Score: true,
-          eloChange: true,
-          completedAt: true,
         },
-        orderBy: { completedAt: 'desc' },
-        take: limit,
-      }),
-      prisma.game.findMany({
-        where: { player2Id: user.id, status: 'completed', isAiGame: true },
         select: {
           id: true,
           isAiGame: true,
@@ -134,7 +123,7 @@ export async function GET(
       };
     });
 
-    const aiEntries: Entry[] = [...aiGamesAsP1, ...aiGamesAsP2].map((g) => ({
+    const aiEntries: Entry[] = aiGames.map((g) => ({
       id: g.id,
       player1: { username: user.username },
       player2: null,
@@ -151,7 +140,7 @@ export async function GET(
     const merged = [...pvpEntries, ...aiEntries].sort(
       (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
     );
-    const totalGames = totalRanked + aiGamesAsP1.length + aiGamesAsP2.length;
+    const totalGames = totalRanked + aiGames.length;
     const recentGames = merged.slice((page - 1) * perPage, limit);
 
     return NextResponse.json({ ...user, recentGames, totalGames, page, perPage });

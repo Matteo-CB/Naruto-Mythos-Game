@@ -16,6 +16,25 @@
       ]
     },
     {
+      "date": "2026-05-09",
+      "title_fr": "Audit online phase 3 : home, leaderboard, profile, reconnect, lazy images",
+      "title_en": "Online audit phase 3: home, leaderboard, profile, reconnect, lazy images",
+      "changes_fr": [
+        "Home page : 2 fetches séparées /api/user/me + /api/tournaments?type=simulator fusionnées en une seule. /api/user/me retourne désormais le rôle ET le tournamentStatus + tournamentNeedsDeck du user, calculés via une seule query Prisma. La home charge donc 1 fetch au lieu de 2, sans payload inutile (avant on rapatriait la liste complète des tournois publics juste pour vérifier si l'utilisateur en avait un).",
+        "Leaderboard : ajout d'un index BDD sur User.elo (pour le tri orderBy elo desc, la query principale du leaderboard). Sans cet index, MongoDB faisait un collection scan + sort sur des dizaines de milliers d'utilisateurs. Index aussi sur User.createdAt (utilisé par le tri unranked).",
+        "Profile [username] : 2 queries Game séparées (player1Id puis player2Id pour les parties IA) fusionnées en 1 query avec OR. Sur un profil avec 100 parties IA, économise 1 round-trip DB.",
+        "Reconnect (game:rejoin) : trou de sécurité. Le handler faisait confiance à userId du payload client sans vérifier l'identité authentifiée du socket. Un attaquant authentifié comme A pouvait envoyer game:rejoin avec userId=B et prendre le slot de B dans une partie en cours. Désormais le userId du payload doit matcher socket.data.userId (set par auth:register).",
+        "Images de cartes : ajout de loading='lazy' et decoding='async' sur les composants CardFace et MissionCard. Sur la page collection (~274 cartes), seules les cartes visibles sont téléchargées au scroll, les autres sont différées. Réduction du time-to-interactive de plusieurs secondes sur connexion lente."
+      ],
+      "changes_en": [
+        "Home page: 2 separate fetches /api/user/me + /api/tournaments?type=simulator merged into one. /api/user/me now returns role AND tournamentStatus + tournamentNeedsDeck of the user, computed in a single Prisma query. Home now loads 1 fetch instead of 2, with no useless payload (before, the full public tournaments list was downloaded just to check if the user was in one).",
+        "Leaderboard: added a DB index on User.elo (for the orderBy elo desc, the leaderboard's main query). Without this index, MongoDB was doing a collection scan + sort across tens of thousands of users. Also added User.createdAt index (used by the unranked tab sort).",
+        "Profile [username]: 2 separate Game queries (player1Id then player2Id for AI games) merged into 1 with OR. On a profile with 100 AI games, saves 1 DB round-trip.",
+        "Reconnect (game:rejoin): security hole. The handler trusted userId from the client payload without verifying the socket's authenticated identity. A user authenticated as A could send game:rejoin with userId=B and take over B's slot in an in-progress game. Now userId from the payload must match socket.data.userId (set by auth:register).",
+        "Card images: added loading='lazy' and decoding='async' on CardFace and MissionCard components. On the collection page (~274 cards), only visible cards are downloaded as you scroll, the others are deferred. Reduces time-to-interactive by several seconds on slow connections."
+      ]
+    },
+    {
       "date": "2026-05-08",
       "title_fr": "Audit online phase 2 : maintenance, broadcasts scopés, build prod validé",
       "title_en": "Online audit phase 2: maintenance check, scoped broadcasts, prod build validated",

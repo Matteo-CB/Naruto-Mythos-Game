@@ -93,6 +93,8 @@ function MissionCardInner({
           src={imageSrc}
           alt={getCardName(card, locale as 'en' | 'fr')}
           draggable={false}
+          loading="lazy"
+          decoding="async"
           style={{
             position: 'absolute',
             inset: 0,

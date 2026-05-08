@@ -106,37 +106,17 @@ export default function Home() {
     }
   }, [session, sessionRefreshed, updateSession]);
 
-  
-  useEffect(() => {
-    if (session?.user) {
-      fetch('/api/user/me')
-        .then((r) => r.ok ? r.json() : null)
-        .then((data) => { if (data?.role) setUserRole(data.role); })
-        .catch(() => {});
-    }
-  }, [session]);
-
-  
   const [tournamentStatus, setTournamentStatus] = useState<'none' | 'registration' | 'in_progress'>('none');
   const [tournamentNeedsDeck, setTournamentNeedsDeck] = useState(false);
+
   useEffect(() => {
     if (!session?.user) return;
-    const myId = (session.user as { id?: string })?.id;
-    fetch('/api/tournaments?type=simulator')
+    fetch('/api/user/me')
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
-        if (!data?.tournaments?.length) return;
-        const active = data.tournaments.find((t: { status: string }) => t.status === 'in_progress');
-        const reg = data.tournaments.find((t: { status: string }) => t.status === 'registration');
-        if (reg) setTournamentStatus('registration');
-        else if (active) setTournamentStatus('in_progress');
-        
-        if (reg && myId) {
-          const myPart = reg.participants?.find((p: { userId: string }) => p.userId === myId);
-          if (myPart && !(myPart as any).deckValid && reg.gameMode !== 'sealed') {
-            setTournamentNeedsDeck(true);
-          }
-        }
+        if (data?.role) setUserRole(data.role);
+        if (data?.tournamentStatus) setTournamentStatus(data.tournamentStatus);
+        if (data?.tournamentNeedsDeck) setTournamentNeedsDeck(true);
       })
       .catch(() => {});
   }, [session]);
