@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { executeTournamentStart } from '@/lib/tournament/startLogic';
+import { getSocketIO } from '@/lib/socket/server';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
@@ -50,6 +51,9 @@ export async function POST(
         matches: { orderBy: [{ round: 'asc' }, { matchIndex: 'asc' }] },
       },
     });
+
+    const io = getSocketIO();
+    if (io) io.to(`tournament:${id}`).emit('tournament:started');
 
     return NextResponse.json({ tournament: updated });
   } catch (err) {

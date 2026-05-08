@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : démarrage manuel par admin émet aussi tournament:started",
+      "title_en": "Tournaments: manual admin start now also emits tournament:started",
+      "changes_fr": [
+        "Asymétrie corrigée : l'auto-start interval (pour les tournois programmés) émettait tournament:started aux abonnés du tournoi, donc les joueurs sur la page registration voyaient le passage en in_progress instantanément. Mais le démarrage manuel par l'admin (POST /api/tournaments/{id}/start) ne diffusait rien. Les joueurs restaient bloqués sur l'écran de registration jusqu'à F5 manuel. Désormais la route manuelle émet aussi tournament:started, et la page (qui écoute l'event depuis quelques passes) refresh automatiquement."
+      ],
+      "changes_en": [
+        "Asymmetry fixed: the auto-start interval (for scheduled tournaments) emitted tournament:started to subscribers, so players on the registration page saw the transition to in_progress instantly. But the manual admin start (POST /api/tournaments/{id}/start) broadcast nothing. Players stayed stuck on the registration screen until manual F5. Now the manual route emits tournament:started too, and the page (which listens for the event since a few passes ago) auto-refreshes."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Admin disqualify et cancelTournament : nettoyage des timers de la room avant suppression",
       "title_en": "Admin disqualify and cancelTournament: clear room timers before deletion",
       "changes_fr": [
