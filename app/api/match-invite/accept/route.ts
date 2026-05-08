@@ -55,11 +55,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    
+
     if (invite.expiresAt <= new Date()) {
       return NextResponse.json(
         { error: 'Invitation has expired' },
         { status: 400 },
+      );
+    }
+
+    const conflicting = await prisma.tournamentMatch.findFirst({
+      where: {
+        status: { in: ['in_progress', 'ready'] },
+        OR: [
+          { player1Id: invite.senderId },
+          { player2Id: invite.senderId },
+          { player1Id: session.user.id },
+          { player2Id: session.user.id },
+        ],
+        tournament: { status: 'in_progress' },
+      },
+      select: { id: true, player1Id: true, player2Id: true },
+    });
+    if (conflicting) {
+      const blockedSelf = conflicting.player1Id === session.user.id || conflicting.player2Id === session.user.id;
+      return NextResponse.json(
+        {
+          error: blockedSelf
+            ? 'You are currently in a tournament match. Finish it first.'
+            : 'The other player is currently in a tournament match. Try again later.',
+        },
+        { status: 409 },
       );
     }
 

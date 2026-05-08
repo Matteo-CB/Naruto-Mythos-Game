@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Invitations de match bloquées si l'un des deux joueurs est en match de tournoi",
+      "title_en": "Match invitations blocked if either player is in a tournament match",
+      "changes_fr": [
+        "Quand on acceptait une invitation à jouer reçue d'un ami, aucun contrôle ne vérifiait que les deux joueurs étaient libres. Scénario réel : A envoie une invitation à B à 12h00, le tournoi de A démarre à 12h01 et l'apparie avec C, leur match commence. À 12h02, B accepte l'invitation, A se retrouve dans deux parties à la fois, son match de tournoi devient orphelin et risque le forfait. La route refuse maintenant l'acceptation avec un 409 si l'un des deux joueurs (sender ou receiver) est dans un match de tournoi en status ready ou in_progress. Le message d'erreur précise qui est bloqué."
+      ],
+      "changes_en": [
+        "Accepting a match invitation from a friend was not checking that both players were free. Real scenario: A sends an invite to B at 12:00, A's tournament starts at 12:01 and pairs A with C, their match starts. At 12:02, B accepts the invite, A is now in two games at once, the tournament match becomes orphaned and risks a forfeit. The route now refuses acceptance with a 409 if either player (sender or receiver) is in a tournament match with status ready or in_progress. The error message tells you who is blocked."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : la page se met à jour automatiquement quand le tournoi est annulé ou démarre",
       "title_en": "Tournaments: page now auto-updates when the tournament is cancelled or starts",
       "changes_fr": [
