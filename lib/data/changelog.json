@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Admin disqualify et cancelTournament : nettoyage des timers de la room avant suppression",
+      "title_en": "Admin disqualify and cancelTournament: clear room timers before deletion",
+      "changes_fr": [
+        "Suite des passes sur les memory leaks de timers : disqualify et cancelTournament marquaient la room comme finalized et planifiaient sa suppression dans 10s, mais ne cleartaient pas les timers en flight (mulligan, action, disconnect, joinTimer). Ces timers continuaient à tourner dans le vide pendant 60s à 2min selon leur configuration. Pendant ces 10s avant la suppression de la room, des callbacks pouvaient encore fire et faire du travail inutile. Désormais les deux actions clearent tous les timers de la room avant le scheduling de delete, comme handleMatchForfeit et handleSwissDoubleAbsence (passe précédente)."
+      ],
+      "changes_en": [
+        "Following the timer memory leak passes: disqualify and cancelTournament marked the room as finalized and scheduled its deletion in 10s, but did not clear the in-flight timers (mulligan, action, disconnect, joinTimer). These timers kept ticking pointlessly for 60s to 2min depending on their configuration. During the 10s before the room is removed, callbacks could still fire and do wasted work. Both actions now clear all of the room's timers before scheduling the delete, matching handleMatchForfeit and handleSwissDoubleAbsence from the previous pass."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Admin : la page tournoi se rafraîchit après removeParticipant et updateNote",
       "title_en": "Admin: tournament page refreshes after removeParticipant and updateNote",
       "changes_fr": [

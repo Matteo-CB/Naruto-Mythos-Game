@@ -164,6 +164,10 @@ export async function POST(
               const ioInst = getSocketIO();
               if (ioInst) ioInst.to(activeMatch.roomCode).emit('tournament:disqualified', { matchId: activeMatch.id, userId });
               room.finalized = true;
+              if (room.tournamentJoinTimer) { clearTimeout(room.tournamentJoinTimer); room.tournamentJoinTimer = null; }
+              if (room.disconnectTimer) { clearTimeout(room.disconnectTimer); room.disconnectTimer = null; }
+              if (room.actionTimer) { clearTimeout(room.actionTimer); room.actionTimer = null; }
+              if (room.mulliganTimer) { clearTimeout(room.mulliganTimer); room.mulliganTimer = null; }
               setTimeout(() => {
                 const stillThere = rooms.get(activeMatch.roomCode!);
                 if (stillThere) rooms.delete(activeMatch.roomCode!);
@@ -535,6 +539,10 @@ export async function POST(
           if (m.roomCode && rooms.has(m.roomCode)) {
             const room = rooms.get(m.roomCode)!;
             room.finalized = true;
+            if (room.tournamentJoinTimer) { clearTimeout(room.tournamentJoinTimer); room.tournamentJoinTimer = null; }
+            if (room.disconnectTimer) { clearTimeout(room.disconnectTimer); room.disconnectTimer = null; }
+            if (room.actionTimer) { clearTimeout(room.actionTimer); room.actionTimer = null; }
+            if (room.mulliganTimer) { clearTimeout(room.mulliganTimer); room.mulliganTimer = null; }
             if (io) io.to(m.roomCode).emit('tournament:cancelled', { reason: 'admin' });
             setTimeout(() => {
               const r = rooms.get(m.roomCode!);
