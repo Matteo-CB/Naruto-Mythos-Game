@@ -581,8 +581,18 @@ export async function handleSwissMatchEnd(
       });
       io.to(`tournament:${tournamentId}`).emit('tournament:standings-updated', { standings });
     } else {
-      
-      const winner = standings[0];
+
+      const eliminatedIds = new Set(tournament.participants.filter(p => p.eliminated).map(p => p.userId));
+      const winner = standings.find(s => !eliminatedIds.has(s.userId));
+      if (!winner) {
+        await prisma.tournament.update({
+          where: { id: tournamentId },
+          data: { status: 'cancelled', completedAt: new Date() },
+        });
+        io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated' });
+        cleanupTournamentMaps(tournamentId);
+        return;
+      }
       await prisma.tournament.update({
         where: { id: tournamentId },
         data: {
@@ -697,7 +707,19 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
   });
 
   if (!nextMatch) {
-    
+    const winnerEliminated = await prisma.tournamentParticipant.findFirst({
+      where: { tournamentId, userId: winnerId, eliminated: true },
+      select: { id: true },
+    });
+    if (winnerEliminated) {
+      await prisma.tournament.update({
+        where: { id: tournamentId },
+        data: { status: 'cancelled', completedAt: new Date() },
+      });
+      io?.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated' });
+      cleanupTournamentMaps(tournamentId);
+      return;
+    }
     await prisma.tournament.update({
       where: { id: tournamentId },
       data: { status: 'completed', winnerId, winnerUsername, completedAt: new Date() },
@@ -959,6 +981,20 @@ async function finalizeDoubleElim(
   winnerUsername: string | null,
   finalMatch: { round: number; matchIndex: number; bracket: string },
 ): Promise<void> {
+  const winnerEliminated = await prisma.tournamentParticipant.findFirst({
+    where: { tournamentId, userId: winnerId, eliminated: true },
+    select: { id: true },
+  });
+  if (winnerEliminated) {
+    await prisma.tournament.update({
+      where: { id: tournamentId },
+      data: { status: 'cancelled', completedAt: new Date() },
+    });
+    io?.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated' });
+    cleanupTournamentMaps(tournamentId);
+    void finalMatch;
+    return;
+  }
   await prisma.tournament.update({
     where: { id: tournamentId },
     data: { status: 'completed', winnerId, winnerUsername, completedAt: new Date() },

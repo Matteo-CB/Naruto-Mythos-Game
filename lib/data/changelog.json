@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : un joueur disqualifié ne peut plus être déclaré champion",
+      "title_en": "Tournaments: a disqualified player can no longer be declared champion",
+      "changes_fr": [
+        "Trois cas réels où un joueur disqualifié pouvait quand même remporter le tournoi : en Suisse, les joueurs DQ restaient dans les standings avec leurs stats figées (correction de la passe précédente), donc si l'un avait pris la tête avant son DQ il pouvait rester en standings[0] à la fin et être déclaré champion. En single-élim et en double-élim, si les deux finalistes étaient DQ, l'auto-forfait choisissait arbitrairement l'un des deux, et l'autre 'gagnait' la finale en étant lui-même éliminé. Dans les trois cas le winner recevait tournamentWins += 1, le rôle Discord 'Vainqueur de tournoi N', et apparaissait sur le webhook des résultats. Désormais : Suisse cherche le premier non-éliminé dans les standings (ou annule si tous le sont) ; single-élim et DE vérifient avant la finalisation que le winner n'est pas éliminé, sinon le tournoi est marqué cancelled avec reason='all_eliminated'."
+      ],
+      "changes_en": [
+        "Three real cases where a disqualified player could still win the tournament: in Swiss, DQ'd players stayed in the standings with frozen stats (per the previous fix), so if one had been leading before their DQ they could remain standings[0] at the end and be declared champion. In single-elim and double-elim, if both finalists were DQ'd, the auto-forfeit picked one arbitrarily and the other 'won' the final while being eliminated themselves. In all three cases the winner received tournamentWins += 1, the 'Tournament Winner N' Discord role, and appeared in the results webhook. Now: Swiss looks for the first non-eliminated in the standings (or cancels if all are); single-elim and DE check before finalizing that the winner is not eliminated, otherwise the tournament is marked cancelled with reason='all_eliminated'."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Validation deck : Rare Art compte comme la même version que sa Rare de base",
       "title_en": "Deck validation: Rare Art counts as the same version as its base Rare",
       "changes_fr": [
