@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Création/jointure de room casual bloquée pendant un match de tournoi",
+      "title_en": "Casual room create/join blocked during a tournament match",
+      "changes_fr": [
+        "Suite logique du fix d'hier sur les invitations de match : les events socket room:create et room:join ne vérifiaient pas non plus si le joueur avait un match de tournoi en cours. Un joueur pouvait créer un nouveau room ou rejoindre un room casual via un code de partage pendant qu'il était dans un match de tournoi, finir dans deux parties simultanées et forfaiter le match de tournoi par déconnexion. Désormais ces deux events refusent l'opération avec un message indiquant le code du match de tournoi à finir d'abord. Le rejoin du tournoi lui-même reste autorisé (on ne bloque que si le code visé n'est pas celui du match en cours)."
+      ],
+      "changes_en": [
+        "Logical follow-up to yesterday's match-invite fix: the room:create and room:join socket events were also not checking whether the player had an active tournament match. A player could create a new room or join a casual room via a share code while in a tournament match, end up in two games at once, and forfeit the tournament match by disconnect. These two events now refuse the operation with a message pointing to the tournament match code to finish first. Re-joining the tournament match itself is still allowed (we only block when the targeted code is different from the in-progress one)."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Invitations de match bloquées si l'un des deux joueurs est en match de tournoi",
       "title_en": "Match invitations blocked if either player is in a tournament match",
       "changes_fr": [

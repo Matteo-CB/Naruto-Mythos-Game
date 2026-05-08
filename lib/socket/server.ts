@@ -115,6 +115,17 @@ function generateRoomCode(): string {
   return code;
 }
 
+async function getActiveTournamentMatchForUser(userId: string): Promise<{ id: string; roomCode: string | null } | null> {
+  return prisma.tournamentMatch.findFirst({
+    where: {
+      status: { in: ['ready', 'in_progress'] },
+      OR: [{ player1Id: userId }, { player2Id: userId }],
+      tournament: { status: 'in_progress' },
+    },
+    select: { id: true, roomCode: true },
+  });
+}
+
 
 function cleanupPlayerRoom(socket: Socket): void {
   const existingCode = playerRooms.get(socket.id);
@@ -1416,9 +1427,15 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
+      const tournamentBusy = await getActiveTournamentMatchForUser(data.userId);
+      if (tournamentBusy) {
+        socket.emit('room:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.` });
+        return;
+      }
+
       console.log(`[Socket] Creating room for user ${data.userId}, socket ${socket.id}`);
 
-      
+
       cleanupPlayerRoom(socket);
 
       let code: string;
@@ -1489,7 +1506,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
     
     socket.on('room:join', async (data: { code: string; userId: string }) => {
       console.log(`[Socket] User ${data.userId} trying to join room ${data.code}`);
-      
+
+      const tournamentBusy = await getActiveTournamentMatchForUser(data.userId);
+      if (tournamentBusy && tournamentBusy.roomCode !== data.code) {
+        socket.emit('room:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.` });
+        return;
+      }
+
       const room = rooms.get(data.code);
       if (!room) {
         console.log(`[Socket] Room ${data.code} not found`);
