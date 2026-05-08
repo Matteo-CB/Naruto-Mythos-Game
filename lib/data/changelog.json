@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : refacto, instrumentation, tests intégration",
+      "title_en": "Tournaments: refactor, instrumentation, integration tests",
+      "changes_fr": [
+        "Refacto interne : 5 sites avec la même séquence de clearTimeout pour les room timers (mulligan/action/disconnect/joinTimer/sealedTimer) sont désormais factorisés dans un helper partagé finalizeAndScheduleRoomDeletion. Idem pour le cleanup des maps in-memory (matchReadyPlayers, matchReadyLocks, swissRoundLocks) qui passe par cleanupTournamentMapsByIds (synchrone) ou cleanupTournamentMapsExternal (async, fait son propre fetch).",
+        "Instrumentation : nouveau module matchEventLog qui produit des entrées JSON-friendly avec timestamp ISO pour chaque transition critique : match.completed.played, match.forfeit.absence/admin/double, match.auto-forfeit.eliminated, tournament.start.begin/success/failed, tournament.completed, tournament.cancelled.* (admin/all-eliminated/not-enough-players/start-failed/deleted). Toutes les surfaces (auto-start, manual start, admin disqualify/cancel/delete, finalisations Swiss/single-élim/DE) émettent ces logs.",
+        "Tests intégration : 23 nouveaux tests dans tournamentHelpers.test.ts et tournamentRouteIntegration.test.ts couvrant le comportement des helpers de cleanup, la sérialisation du logger, la génération de bracket pour tous les counts valides (4/8/16/32 single-élim et DE, 2-32 Swiss), des simulations end-to-end de tournois Swiss complets, et la sémantique des compensating actions."
+      ],
+      "changes_en": [
+        "Internal refactor: 5 sites with the same clearTimeout sequence for room timers (mulligan/action/disconnect/joinTimer/sealedTimer) are now factored into a shared helper finalizeAndScheduleRoomDeletion. Same for in-memory maps cleanup (matchReadyPlayers, matchReadyLocks, swissRoundLocks) routed through cleanupTournamentMapsByIds (sync) or cleanupTournamentMapsExternal (async, does its own fetch).",
+        "Instrumentation: new matchEventLog module that produces JSON-friendly entries with ISO timestamp for every critical transition: match.completed.played, match.forfeit.absence/admin/double, match.auto-forfeit.eliminated, tournament.start.begin/success/failed, tournament.completed, tournament.cancelled.* (admin/all-eliminated/not-enough-players/start-failed/deleted). All surfaces (auto-start, manual start, admin disqualify/cancel/delete, Swiss/single-elim/DE finalizations) emit these logs.",
+        "Integration tests: 23 new tests in tournamentHelpers.test.ts and tournamentRouteIntegration.test.ts covering cleanup helper behavior, logger serialization, bracket generation across every valid count (4/8/16/32 single-elim and DE, 2-32 Swiss), end-to-end Swiss tournament simulations, and compensating-action semantics."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois /leave : même fenêtre de course avec auto-start fermée",
       "title_en": "Tournament /leave: same race window with auto-start closed",
       "changes_fr": [

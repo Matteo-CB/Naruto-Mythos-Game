@@ -156,22 +156,26 @@ export async function POST(
               completedAt: new Date(),
             },
           });
+          const { logMatchEvent } = await import('@/lib/tournament/matchEventLog');
+          logMatchEvent({
+            type: 'match.forfeit.admin',
+            tournamentId,
+            matchId: activeMatch.id,
+            bracket: activeMatch.bracket ?? undefined,
+            round: activeMatch.round,
+            matchIndex: activeMatch.matchIndex,
+            forfeitedPlayerId: userId,
+            winnerId,
+            reason: reason ?? undefined,
+          });
 
           if (activeMatch.roomCode) {
             const { rooms } = await import('@/lib/socket/server');
-            const room = rooms.get(activeMatch.roomCode);
-            if (room) {
+            const { finalizeAndScheduleRoomDeletion } = await import('@/lib/tournament/matchRoomCleanup');
+            if (rooms.get(activeMatch.roomCode)) {
               const ioInst = getSocketIO();
               if (ioInst) ioInst.to(activeMatch.roomCode).emit('tournament:disqualified', { matchId: activeMatch.id, userId });
-              room.finalized = true;
-              if (room.tournamentJoinTimer) { clearTimeout(room.tournamentJoinTimer); room.tournamentJoinTimer = null; }
-              if (room.disconnectTimer) { clearTimeout(room.disconnectTimer); room.disconnectTimer = null; }
-              if (room.actionTimer) { clearTimeout(room.actionTimer); room.actionTimer = null; }
-              if (room.mulliganTimer) { clearTimeout(room.mulliganTimer); room.mulliganTimer = null; }
-              setTimeout(() => {
-                const stillThere = rooms.get(activeMatch.roomCode!);
-                if (stillThere) rooms.delete(activeMatch.roomCode!);
-              }, 10_000);
+              finalizeAndScheduleRoomDeletion(rooms, activeMatch.roomCode);
             }
           }
 
@@ -567,19 +571,11 @@ export async function POST(
           clearAbsenceTimer(m.id);
         }
 
+        const { finalizeAndScheduleRoomDeletion } = await import('@/lib/tournament/matchRoomCleanup');
         for (const m of inProgressMatches) {
           if (m.roomCode && rooms.has(m.roomCode)) {
-            const room = rooms.get(m.roomCode)!;
-            room.finalized = true;
-            if (room.tournamentJoinTimer) { clearTimeout(room.tournamentJoinTimer); room.tournamentJoinTimer = null; }
-            if (room.disconnectTimer) { clearTimeout(room.disconnectTimer); room.disconnectTimer = null; }
-            if (room.actionTimer) { clearTimeout(room.actionTimer); room.actionTimer = null; }
-            if (room.mulliganTimer) { clearTimeout(room.mulliganTimer); room.mulliganTimer = null; }
             if (io) io.to(m.roomCode).emit('tournament:cancelled', { reason: 'admin', tournamentId });
-            setTimeout(() => {
-              const r = rooms.get(m.roomCode!);
-              if (r) rooms.delete(m.roomCode!);
-            }, 10_000);
+            finalizeAndScheduleRoomDeletion(rooms, m.roomCode);
           }
           await prisma.tournamentMatch.update({
             where: { id: m.id },
@@ -596,6 +592,8 @@ export async function POST(
           where: { id: tournamentId },
           data: { status: 'cancelled' },
         });
+        const { logMatchEvent } = await import('@/lib/tournament/matchEventLog');
+        logMatchEvent({ type: 'tournament.cancelled.admin', tournamentId, reason: 'admin' });
         if (io) io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'admin', tournamentId });
 
         try {

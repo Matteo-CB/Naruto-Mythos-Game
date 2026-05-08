@@ -1193,23 +1193,25 @@ export function setupSocketHandlers(io: SocketIOServer) {
         where: { status: 'registration', scheduledStartAt: { not: null, lte: now } },
         include: { _count: { select: { participants: true } } },
       });
+      const { logMatchEvent } = await import('@/lib/tournament/matchEventLog');
       for (const t of scheduledTournaments) {
         if (t._count.participants < 2) {
           await prisma.tournament.update({ where: { id: t.id }, data: { status: 'cancelled' } });
+          logMatchEvent({ type: 'tournament.cancelled.not-enough-players', tournamentId: t.id });
           io.to(`tournament:${t.id}`).emit('tournament:cancelled', { reason: 'not_enough_players', tournamentId: t.id });
-          console.log(`[Tournament] Auto-cancelled ${t.name} (${t.id}) — not enough players`);
           continue;
         }
-        console.log(`[Tournament] Auto-starting scheduled tournament ${t.name} (${t.id})`);
+        logMatchEvent({ type: 'tournament.start.begin', tournamentId: t.id, format: t.format });
         try {
           const { executeTournamentStart } = await import('@/lib/tournament/startLogic');
           const result = await executeTournamentStart(t.id);
           if (!result.ok) {
             await prisma.tournament.update({ where: { id: t.id }, data: { status: 'cancelled' } });
+            logMatchEvent({ type: 'tournament.cancelled.start-failed', tournamentId: t.id, detail: result.error });
             io.to(`tournament:${t.id}`).emit('tournament:cancelled', { reason: 'start_failed', detail: result.error, tournamentId: t.id });
-            console.log(`[Tournament] Auto-start aborted for ${t.id}: ${result.error}`);
             continue;
           }
+          logMatchEvent({ type: 'tournament.start.success', tournamentId: t.id, format: t.format });
           io.to(`tournament:${t.id}`).emit('tournament:started');
         } catch (err) {
           console.error(`[Tournament] Auto-start error for ${t.id}:`, err);

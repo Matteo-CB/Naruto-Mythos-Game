@@ -73,20 +73,22 @@ export async function POST(
       },
     });
 
+    const { logMatchEvent } = await import('@/lib/tournament/matchEventLog');
+    logMatchEvent({
+      type: 'match.forfeit.admin',
+      tournamentId: id,
+      matchId,
+      bracket: match.bracket ?? undefined,
+      round: match.round,
+      matchIndex: match.matchIndex,
+      forfeitedPlayerId: forfeitPlayerId,
+      winnerId,
+    });
+
     if (match.roomCode) {
       const { rooms } = await import('@/lib/socket/server');
-      const room = rooms.get(match.roomCode);
-      if (room) {
-        room.finalized = true;
-        if (room.tournamentJoinTimer) { clearTimeout(room.tournamentJoinTimer); room.tournamentJoinTimer = null; }
-        if (room.disconnectTimer) { clearTimeout(room.disconnectTimer); room.disconnectTimer = null; }
-        if (room.actionTimer) { clearTimeout(room.actionTimer); room.actionTimer = null; }
-        if (room.mulliganTimer) { clearTimeout(room.mulliganTimer); room.mulliganTimer = null; }
-        setTimeout(() => {
-          const r = rooms.get(match.roomCode!);
-          if (r === room) rooms.delete(match.roomCode!);
-        }, 10_000);
-      }
+      const { finalizeAndScheduleRoomDeletion } = await import('@/lib/tournament/matchRoomCleanup');
+      finalizeAndScheduleRoomDeletion(rooms, match.roomCode);
       const { clearAbsenceTimer } = await import('@/lib/tournament/absenceManager');
       clearAbsenceTimer(matchId);
     }

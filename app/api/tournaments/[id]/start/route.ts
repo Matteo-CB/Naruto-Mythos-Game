@@ -39,10 +39,14 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    const { logMatchEvent } = await import('@/lib/tournament/matchEventLog');
+    logMatchEvent({ type: 'tournament.start.begin', tournamentId: id });
     const result = await executeTournamentStart(id);
     if (!result.ok) {
+      logMatchEvent({ type: 'tournament.start.failed', tournamentId: id, detail: result.error });
       return NextResponse.json({ error: result.error }, { status: result.status });
     }
+    logMatchEvent({ type: 'tournament.start.success', tournamentId: id });
 
     const updated = await prisma.tournament.findUnique({
       where: { id },

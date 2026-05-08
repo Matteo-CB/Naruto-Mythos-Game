@@ -102,6 +102,8 @@ export async function DELETE(
     ]);
 
     const io = getSocketIO();
+    const { logMatchEvent } = await import('@/lib/tournament/matchEventLog');
+    logMatchEvent({ type: 'tournament.cancelled.deleted', tournamentId: id });
     if (io) io.to(`tournament:${id}`).emit('tournament:cancelled', { reason: 'deleted', tournamentId: id });
 
     try {

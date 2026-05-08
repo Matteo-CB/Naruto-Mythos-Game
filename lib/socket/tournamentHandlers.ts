@@ -5,6 +5,8 @@ import { startAbsenceTimer, clearAbsenceTimer, scheduleAbsenceTimerWithDeadline,
 import { assignTournamentWinnerRole } from '@/lib/discord/tournamentRoles';
 import { sendTournamentResults } from '@/lib/discord/tournamentWebhook';
 import { rooms, type RoomData } from '@/lib/socket/server';
+import { finalizeAndScheduleRoomDeletion } from '@/lib/tournament/matchRoomCleanup';
+import { logMatchEvent } from '@/lib/tournament/matchEventLog';
 import {
   computeStandings,
   generateSwissPairings,
@@ -56,33 +58,25 @@ async function withMatchReadyLock<T>(matchId: string, fn: () => Promise<T>): Pro
 }
 
 
+export function cleanupTournamentMapsByIds(tournamentId: string, matchIds: readonly string[]): void {
+  for (const matchId of matchIds) {
+    matchReadyPlayers.delete(matchId);
+    matchReadyLocks.delete(matchId);
+  }
+  for (const [key] of swissRoundLocks) {
+    if (key.startsWith(tournamentId)) swissRoundLocks.delete(key);
+  }
+}
+
 async function cleanupTournamentMaps(tournamentId: string): Promise<void> {
   const matchIds = (await prisma.tournamentMatch.findMany({
     where: { tournamentId },
     select: { id: true },
   })).map(m => m.id);
-
-  for (const matchId of matchIds) {
-    matchReadyPlayers.delete(matchId);
-    matchReadyLocks.delete(matchId);
-  }
-
-  for (const [key] of swissRoundLocks) {
-    if (key.startsWith(tournamentId)) swissRoundLocks.delete(key);
-  }
+  cleanupTournamentMapsByIds(tournamentId, matchIds);
 }
 
 export const cleanupTournamentMapsExternal = cleanupTournamentMaps;
-
-export function cleanupTournamentMapsByIds(tournamentId: string, matchIds: string[]): void {
-  for (const matchId of matchIds) {
-    matchReadyPlayers.delete(matchId);
-    matchReadyLocks.delete(matchId);
-  }
-  for (const [key] of swissRoundLocks) {
-    if (key.startsWith(tournamentId)) swissRoundLocks.delete(key);
-  }
-}
 
 export function registerTournamentHandlers(io: Server, socket: Socket) {
   socket.on('tournament:subscribe', async ({ tournamentId }: { tournamentId: string }) => {
@@ -381,6 +375,15 @@ async function autoForfeitIfEliminated(
   });
   if (elim.length === 0) return false;
   const elimId = elim[0].userId;
+  logMatchEvent({
+    type: 'match.auto-forfeit.eliminated',
+    tournamentId,
+    matchId,
+    bracket: m.bracket ?? undefined,
+    round: m.round,
+    matchIndex: m.matchIndex,
+    forfeitedPlayerId: elimId,
+  });
   await handleMatchForfeit(io, tournamentId, matchId, elimId);
   return true;
 }
@@ -394,17 +397,19 @@ export async function handleSwissDoubleAbsence(io: Server, tournamentId: string,
     data: { status: 'forfeit', winnerId: null, winnerUsername: null, completedAt: new Date() },
   });
 
-  if (match.roomCode && rooms.has(match.roomCode)) {
-    const room = rooms.get(match.roomCode)!;
-    room.finalized = true;
-    if (room.tournamentJoinTimer) { clearTimeout(room.tournamentJoinTimer); room.tournamentJoinTimer = null; }
-    if (room.disconnectTimer) { clearTimeout(room.disconnectTimer); room.disconnectTimer = null; }
-    if (room.actionTimer) { clearTimeout(room.actionTimer); room.actionTimer = null; }
-    if (room.mulliganTimer) { clearTimeout(room.mulliganTimer); room.mulliganTimer = null; }
-    setTimeout(() => {
-      const r = rooms.get(match.roomCode!);
-      if (r === room) rooms.delete(match.roomCode!);
-    }, 10_000);
+  logMatchEvent({
+    type: 'match.forfeit.double',
+    tournamentId,
+    matchId,
+    bracket: match.bracket ?? undefined,
+    round: match.round,
+    matchIndex: match.matchIndex,
+    forfeitedPlayerId: match.player1Id ?? null,
+    forfeitedPlayer2Id: match.player2Id ?? null,
+  });
+
+  if (match.roomCode) {
+    finalizeAndScheduleRoomDeletion(rooms, match.roomCode);
   }
 
   io.to(`tournament:${tournamentId}`).emit('tournament:player-forfeited', {
@@ -431,17 +436,19 @@ async function handleMatchForfeit(io: Server, tournamentId: string, matchId: str
     data: { status: 'forfeit', winnerId, winnerUsername, completedAt: new Date() },
   });
 
-  if (match.roomCode && rooms.has(match.roomCode)) {
-    const room = rooms.get(match.roomCode)!;
-    room.finalized = true;
-    if (room.tournamentJoinTimer) { clearTimeout(room.tournamentJoinTimer); room.tournamentJoinTimer = null; }
-    if (room.disconnectTimer) { clearTimeout(room.disconnectTimer); room.disconnectTimer = null; }
-    if (room.actionTimer) { clearTimeout(room.actionTimer); room.actionTimer = null; }
-    if (room.mulliganTimer) { clearTimeout(room.mulliganTimer); room.mulliganTimer = null; }
-    setTimeout(() => {
-      const r = rooms.get(match.roomCode!);
-      if (r === room) rooms.delete(match.roomCode!);
-    }, 10_000);
+  logMatchEvent({
+    type: 'match.forfeit.absence',
+    tournamentId,
+    matchId,
+    bracket: match.bracket ?? undefined,
+    round: match.round,
+    matchIndex: match.matchIndex,
+    forfeitedPlayerId: forfeitPlayerId,
+    winnerId,
+  });
+
+  if (match.roomCode) {
+    finalizeAndScheduleRoomDeletion(rooms, match.roomCode);
   }
 
 
@@ -488,6 +495,17 @@ export async function handleTournamentMatchEnd(io: Server, tournamentId: string,
     await prisma.tournamentMatch.update({
       where: { id: matchId },
       data: { status: 'completed', winnerId, winnerUsername, gameId, completedAt: new Date() },
+    });
+
+    logMatchEvent({
+      type: 'match.completed.played',
+      tournamentId,
+      matchId,
+      bracket: match.bracket ?? undefined,
+      round: match.round,
+      matchIndex: match.matchIndex,
+      winnerId,
+      loserId: loserId ?? null,
     });
 
 
@@ -661,6 +679,7 @@ export async function handleSwissMatchEnd(
           where: { id: tournamentId },
           data: { status: 'cancelled', completedAt: new Date() },
         });
+        logMatchEvent({ type: 'tournament.cancelled.all-eliminated', tournamentId, format: 'swiss' });
         io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated', tournamentId });
         await cleanupTournamentMaps(tournamentId);
         return;
@@ -678,6 +697,13 @@ export async function handleSwissMatchEnd(
       const updatedUser = await prisma.user.update({
         where: { id: winner.userId },
         data: { tournamentWins: { increment: 1 } },
+      });
+
+      logMatchEvent({
+        type: 'tournament.completed',
+        tournamentId,
+        winnerId: winner.userId,
+        format: 'swiss',
       });
 
       io.to(`tournament:${tournamentId}`).emit('tournament:completed', {
@@ -788,6 +814,7 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
         where: { id: tournamentId },
         data: { status: 'cancelled', completedAt: new Date() },
       });
+      logMatchEvent({ type: 'tournament.cancelled.all-eliminated', tournamentId, format: 'elimination' });
       io?.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated', tournamentId });
       await cleanupTournamentMaps(tournamentId);
       return;
@@ -800,6 +827,7 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
       where: { id: winnerId },
       data: { tournamentWins: { increment: 1 } },
     });
+    logMatchEvent({ type: 'tournament.completed', tournamentId, winnerId, format: 'elimination' });
     io?.to(`tournament:${tournamentId}`).emit('tournament:completed', { winnerId, winnerUsername });
 
     await cleanupTournamentMaps(tournamentId);
@@ -1072,6 +1100,7 @@ async function finalizeDoubleElim(
       where: { id: tournamentId },
       data: { status: 'cancelled', completedAt: new Date() },
     });
+    logMatchEvent({ type: 'tournament.cancelled.all-eliminated', tournamentId, format: 'double_elimination' });
     io?.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated', tournamentId });
     await cleanupTournamentMaps(tournamentId);
     void finalMatch;
@@ -1085,6 +1114,7 @@ async function finalizeDoubleElim(
     where: { id: winnerId },
     data: { tournamentWins: { increment: 1 } },
   });
+  logMatchEvent({ type: 'tournament.completed', tournamentId, winnerId, format: 'double_elimination' });
   io?.to(`tournament:${tournamentId}`).emit('tournament:completed', { winnerId, winnerUsername });
   await cleanupTournamentMaps(tournamentId);
 
