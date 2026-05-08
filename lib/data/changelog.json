@@ -17,6 +17,17 @@
     },
     {
       "date": "2026-05-08",
+      "title_fr": "Hygiène : suppression du double-scheduling de room.delete en double-disconnect Swiss",
+      "title_en": "Hygiene: removed duplicate room.delete scheduling in Swiss in-game double-disconnect",
+      "changes_fr": [
+        "Petite redondance trouvée en re-relisant le fix de la passe 28 : quand les deux joueurs étaient déconnectés en plein match Swiss, le code routait via handleSwissDoubleAbsence (qui depuis la passe 37 appelle finalizeAndScheduleRoomDeletion en interne, soit un setTimeout(rooms.delete) à 10s), puis le bloc disconnect-grace ajoutait un SECOND setTimeout(rooms.delete) à 10s sur la même room. Les deux callbacks firaient quasi-simultanément 10s plus tard ; le premier supprime la room, le second ne trouve plus rien. Pas de bug fonctionnel, juste un setTimeout fantôme. Suppression du second."
+      ],
+      "changes_en": [
+        "Small redundancy found while re-reading the pass-28 fix: when both players were disconnected mid-Swiss-match, the code routed through handleSwissDoubleAbsence (which since pass 37 calls finalizeAndScheduleRoomDeletion internally — i.e. setTimeout(rooms.delete) at 10s), then the disconnect-grace block added a SECOND setTimeout(rooms.delete) at 10s for the same room. Both callbacks would fire near-simultaneously 10s later; the first deletes, the second finds nothing. Not a functional bug, just a phantom setTimeout. The duplicate is removed."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois /leave : même fenêtre de course avec auto-start fermée",
       "title_en": "Tournament /leave: same race window with auto-start closed",
       "changes_fr": [

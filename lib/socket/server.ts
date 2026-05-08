@@ -2753,10 +2753,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
                     console.log(`[Socket] Both players AFK in tournament Swiss match ${room.tournamentMatchId}, double forfeit`);
                     const { handleSwissDoubleAbsence } = await import('@/lib/socket/tournamentHandlers');
                     await handleSwissDoubleAbsence(io, room.tournamentId, room.tournamentMatchId);
-                    room.finalized = true;
-                    setTimeout(() => {
-                      if (rooms.get(code) === room) rooms.delete(code);
-                    }, 10_000);
                     return;
                   }
                 }
