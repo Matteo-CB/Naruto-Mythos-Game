@@ -1,6 +1,25 @@
 {
   "entries": [
     {
+      "date": "2026-05-08",
+      "title_fr": "Tournois : audit complet, plus de tournois bloqués, timers raccourcis",
+      "title_en": "Tournaments: full audit, no more stuck tournaments, shorter timers",
+      "changes_fr": [
+        "Race condition corrigée : quand deux matches d'un round Swiss finissaient en même temps, le round suivant pouvait ne jamais être généré et le tournoi restait bloqué. Le verrou est maintenant un vrai async lock idempotent qui attend le premier traitement et vérifie si le round suivant existe déjà.",
+        "Délai pour rejoindre une salle de match passe de 5 minutes à 2 minutes. Si un joueur n'a pas rejoint dans ce délai : forfait automatique.",
+        "Timer d'absence (avant que la salle soit créée) passe aussi de 5 minutes à 2 minutes.",
+        "Réhydratation des timers d'absence au redémarrage du serveur : les matches en attente avec une deadline expirée déclenchent un forfait immédiat, ceux avec une deadline future relancent un timer pour la durée restante. Plus de matches bloqués 'pour toujours' après un redémarrage.",
+        "Les actions admin (DQ, set winner, reset match, annulation) re-émettent maintenant les standings et notifient les clients. Plus de classement obsolète après une intervention admin."
+      ],
+      "changes_en": [
+        "Race condition fixed: when two matches of a Swiss round finished at the same time, the next round could fail to generate and the tournament stayed stuck. The lock is now a proper async idempotent lock that waits for the first run and checks if the next round already exists.",
+        "Match-room join timeout reduced from 5 minutes to 2 minutes. If a player hasn't joined by then, they auto-forfeit.",
+        "Absence timer (before the room is created) also reduced from 5 minutes to 2 minutes.",
+        "Absence timers are now rehydrated when the server restarts: matches with an expired deadline trigger an immediate forfeit, matches with a future deadline schedule a new timer for the remaining duration. No more 'stuck forever' matches after a restart.",
+        "Admin actions (DQ, set winner, reset match, cancel) now re-emit standings and notify the clients. No more stale standings after an admin intervention."
+      ]
+    },
+    {
       "date": "2026-05-05",
       "title_fr": "Prise de contrôle : un personnage volé déjà upgrade revient bien à son propriétaire si le contrôleur quitte",
       "title_en": "Take control: a stolen character that was already upgraded now returns to its owner when the controller leaves",

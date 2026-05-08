@@ -1,7 +1,7 @@
 
 import type { Server, Socket } from 'socket.io';
 import { prisma } from '@/lib/db/prisma';
-import { startAbsenceTimer, clearAbsenceTimer } from '@/lib/tournament/absenceManager';
+import { startAbsenceTimer, clearAbsenceTimer, scheduleAbsenceTimerWithDeadline } from '@/lib/tournament/absenceManager';
 import { assignTournamentWinnerRole } from '@/lib/discord/tournamentRoles';
 import { sendTournamentResults } from '@/lib/discord/tournamentWebhook';
 import { rooms, type RoomData } from '@/lib/socket/server';
@@ -17,15 +17,30 @@ import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 const matchReadyPlayers = new Map<string, Set<string>>();
 
 
-const swissRoundLocks = new Map<string, boolean>();
+const swissRoundLocks = new Map<string, Promise<void>>();
+
+async function withSwissRoundLock<T>(lockKey: string, fn: () => Promise<T>): Promise<T> {
+  while (swissRoundLocks.has(lockKey)) {
+    try { await swissRoundLocks.get(lockKey); } catch { /* ignore */ }
+  }
+  let release!: () => void;
+  const promise = new Promise<void>((resolve) => { release = resolve; });
+  swissRoundLocks.set(lockKey, promise);
+  try {
+    return await fn();
+  } finally {
+    swissRoundLocks.delete(lockKey);
+    release();
+  }
+}
 
 
 function cleanupTournamentMaps(tournamentId: string): void {
-  
+
   for (const [matchId] of matchReadyPlayers) {
     if (matchId.includes(tournamentId)) matchReadyPlayers.delete(matchId);
   }
-  
+
   for (const [key] of swissRoundLocks) {
     if (key.startsWith(tournamentId)) swissRoundLocks.delete(key);
   }
@@ -159,7 +174,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
 
         const createdRoom = rooms.get(roomCode);
         if (createdRoom && !createdRoom.tournamentJoinTimer) {
-          const TOURNAMENT_JOIN_TIMEOUT_MS = 5 * 60_000;
+          const TOURNAMENT_JOIN_TIMEOUT_MS = 2 * 60_000;
           createdRoom.tournamentJoinDeadline = Date.now() + TOURNAMENT_JOIN_TIMEOUT_MS;
           createdRoom.tournamentJoinTimer = setTimeout(async () => {
             const r = rooms.get(roomCode);
@@ -183,6 +198,47 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
   socket.on('tournament:report-present', async ({ matchId }: { matchId: string }) => {
     clearAbsenceTimer(matchId);
   });
+}
+
+
+export async function rehydrateAbsenceTimers(io: Server): Promise<void> {
+  try {
+    const pendingMatches = await prisma.tournamentMatch.findMany({
+      where: {
+        absenceDeadline: { not: null },
+        status: { in: ['ready', 'pending'] },
+        absentPlayerId: { not: null },
+      },
+      select: {
+        id: true,
+        tournamentId: true,
+        absenceDeadline: true,
+        absentPlayerId: true,
+      },
+    });
+
+    for (const m of pendingMatches) {
+      if (!m.absenceDeadline || !m.absentPlayerId) continue;
+      const remaining = m.absenceDeadline.getTime() - Date.now();
+      if (remaining <= 0) {
+        console.log(`[Tournament] Rehydrate: deadline already passed for match ${m.id}, forfeiting now`);
+        await handleMatchForfeit(io, m.tournamentId, m.id, m.absentPlayerId).catch((err) => {
+          console.error(`[Tournament] Rehydrate forfeit error for ${m.id}:`, err);
+        });
+        continue;
+      }
+      const tournamentId = m.tournamentId;
+      const matchId = m.id;
+      const absentPlayerId = m.absentPlayerId;
+      scheduleAbsenceTimerWithDeadline(matchId, m.absenceDeadline, async () => {
+        await handleMatchForfeit(io, tournamentId, matchId, absentPlayerId);
+        matchReadyPlayers.delete(matchId);
+      });
+      console.log(`[Tournament] Rehydrated absence timer for match ${matchId}, fires in ${Math.round(remaining / 1000)}s`);
+    }
+  } catch (err) {
+    console.error('[Tournament] Rehydrate absence timers error:', err);
+  }
 }
 
 async function handleMatchForfeit(io: Server, tournamentId: string, matchId: string, forfeitPlayerId: string) {
@@ -273,7 +329,7 @@ async function handleSwissMatchEnd(
   tournamentId: string,
   match: { round: number; matchIndex: number },
 ) {
-  
+
   const allRoundMatches = await prisma.tournamentMatch.findMany({
     where: { tournamentId, round: match.round },
   });
@@ -282,18 +338,16 @@ async function handleSwissMatchEnd(
   );
 
   if (!roundComplete) {
-    
+
     const standings = await buildCurrentStandings(tournamentId);
     io.to(`tournament:${tournamentId}`).emit('tournament:standings-updated', { standings });
     return;
   }
 
-  
-  const lockKey = `${tournamentId}:${match.round}`;
-  if (swissRoundLocks.get(lockKey)) return;
-  swissRoundLocks.set(lockKey, true);
 
-  try {
+  const lockKey = `${tournamentId}:${match.round}`;
+  return withSwissRoundLock(lockKey, async () => {
+
     const tournament = await prisma.tournament.findUnique({
       where: { id: tournamentId },
       include: {
@@ -302,6 +356,8 @@ async function handleSwissMatchEnd(
       },
     });
     if (!tournament) return;
+    if (tournament.currentRound > match.round) return;
+    if (tournament.status === 'completed') return;
 
     const { swissPlayers, swissResults } = buildSwissData(tournament.participants, tournament.matches);
     const standings = computeStandings(swissPlayers, swissResults);
@@ -425,10 +481,7 @@ async function handleSwissMatchEnd(
         console.error('[Tournament] Webhook error:', err);
       }
     }
-  } finally {
-    
-    setTimeout(() => swissRoundLocks.delete(lockKey), 2000);
-  }
+  });
 }
 
 

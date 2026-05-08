@@ -6,7 +6,7 @@ import { prisma } from '@/lib/db/prisma';
 import { calculateEloChanges } from '@/lib/elo/elo';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
 import { sendRankUpNotification } from '@/lib/discord/rankUpWebhook';
-import { registerTournamentHandlers, handleTournamentMatchEnd } from '@/lib/socket/tournamentHandlers';
+import { registerTournamentHandlers, handleTournamentMatchEnd, rehydrateAbsenceTimers } from '@/lib/socket/tournamentHandlers';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
@@ -88,6 +88,10 @@ const playerRooms = new Map<string, string>(); // socketId -> roomCode
 const userNames = new Map<string, string>(); // userId -> username (populated on auth:register)
 const MATCHMAKING_ROOM_TTL_MS = 5 * 60 * 1000; // 5 min stale room cleanup
 let ioInstance: SocketIOServer | null = null; // Stored for getPublicRoomList socket liveness check
+
+export function getSocketIO(): SocketIOServer | null {
+  return ioInstance;
+}
 
 
 let bannedCardCache: Map<string, string | null> | null = null; // cardId -> reason
@@ -1150,7 +1154,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
     console.error('[FATAL] Unhandled rejection:', reason instanceof Error ? reason.message : reason);
   });
 
-  
+
+  rehydrateAbsenceTimers(io).catch((err) => {
+    console.error('[Tournament] Initial absence rehydrate error:', err);
+  });
+
+
   setInterval(() => cleanupStaleRooms(), 60_000);
 
   

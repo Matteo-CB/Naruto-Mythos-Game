@@ -3,6 +3,43 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { assignTournamentWinnerRole, removeTournamentRole } from '@/lib/discord/tournamentRoles';
 import { advanceMatchWinner } from '@/lib/socket/tournamentHandlers';
+import { getSocketIO } from '@/lib/socket/server';
+import { computeStandings } from '@/lib/tournament/swissEngine';
+
+async function broadcastTournamentRefresh(tournamentId: string): Promise<void> {
+  const io = getSocketIO();
+  if (!io) return;
+  try {
+    const t = await prisma.tournament.findUnique({
+      where: { id: tournamentId },
+      include: {
+        participants: true,
+        matches: { orderBy: [{ round: 'asc' }, { matchIndex: 'asc' }] },
+      },
+    });
+    if (!t) return;
+    if (t.format === 'swiss') {
+      const players = t.participants.map((p, i) => ({
+        userId: p.userId, username: p.username, seed: p.seed ?? (i + 1),
+      }));
+      const results = t.matches
+        .filter(m => m.status === 'completed' || m.status === 'forfeit')
+        .filter(m => m.player1Id !== null)
+        .map(m => ({
+          round: m.round,
+          player1Id: m.player1Id!,
+          player2Id: m.player2Id ?? m.player1Id!,
+          winnerId: m.winnerId,
+          isBye: m.isBye,
+        }));
+      const standings = computeStandings(players, results);
+      io.to(`tournament:${tournamentId}`).emit('tournament:standings-updated', { standings });
+    }
+    io.to(`tournament:${tournamentId}`).emit('tournament:refresh');
+  } catch (err) {
+    console.error('[Tournament] broadcastTournamentRefresh error:', err);
+  }
+}
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
@@ -75,6 +112,7 @@ export async function POST(
           }
         }
 
+        await broadcastTournamentRefresh(tournamentId);
         return NextResponse.json({ success: true, message: `Player disqualified${reason ? ': ' + reason : ''}` });
       }
 
@@ -128,9 +166,10 @@ export async function POST(
           data: { eliminated: false, eliminatedRound: null },
         });
 
-        
+
         await advanceMatchWinner(null, tournamentId, match, winnerId, winnerUsername);
 
+        await broadcastTournamentRefresh(tournamentId);
         return NextResponse.json({ success: true, message: `Match winner set to ${winnerUsername}` });
       }
 
@@ -168,6 +207,7 @@ export async function POST(
           });
         }
 
+        await broadcastTournamentRefresh(tournamentId);
         return NextResponse.json({ success: true, message: 'Match reset' });
       }
 
@@ -216,6 +256,8 @@ export async function POST(
           where: { id: tournamentId },
           data: { status: 'cancelled' },
         });
+        const io = getSocketIO();
+        if (io) io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'admin' });
         return NextResponse.json({ success: true, message: 'Tournament cancelled' });
       }
 
