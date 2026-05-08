@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois single-élim : event round-complete émis même quand autoForfeit cascade",
+      "title_en": "Single-elim tournaments: round-complete event emitted even when autoForfeit cascades",
+      "changes_fr": [
+        "Quand autoForfeitIfEliminated triggerait dans advanceMatchWinner (par exemple, le gagnant nouvellement avancé est un joueur DQ qu'il faut auto-forfeiter), la fonction faisait un return early. Conséquence : le check roundComplete situé après le bloc if(p1 && p2) ne s'exécutait pas. Si le match qui vient de se finir était le dernier match du round courant (R1 par exemple), tournament.currentRound n'était pas updaté à R2 et l'event tournament:round-complete n'était pas émis. Les clients continuaient d'afficher le round précédent jusqu'à ce qu'un autre event force un refresh. Désormais le résultat de autoForfeit est stocké dans un flag, l'absence timer est skip si oui, mais le post-bloc emit + roundComplete check tourne toujours."
+      ],
+      "changes_en": [
+        "When autoForfeitIfEliminated triggered inside advanceMatchWinner (for example, the newly-advanced winner is a DQ'd player who must be auto-forfeited), the function returned early. Consequence: the roundComplete check after the if(p1 && p2) block did not run. If the match that just ended was the last match of the current round (R1 for example), tournament.currentRound was not updated to R2 and the tournament:round-complete event was not emitted. Clients kept showing the previous round until some other event forced a refresh. Now the autoForfeit result is stored in a flag, the absence timer is skipped if true, but the post-block emit + roundComplete check still runs."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : memory leak des maps in-memory corrigé",
       "title_en": "Tournaments: in-memory map memory leak fixed",
       "changes_fr": [

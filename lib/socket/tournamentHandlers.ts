@@ -835,11 +835,9 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
   if (p1 && p2) {
     await prisma.tournamentMatch.update({ where: { id: nextMatch.id }, data: { status: 'ready' } });
 
-    if (io && await autoForfeitIfEliminated(io, tournamentId, nextMatch.id)) {
-      return;
-    }
+    const autoForfeitTriggered = io ? await autoForfeitIfEliminated(io, tournamentId, nextMatch.id) : false;
 
-    if (io) {
+    if (!autoForfeitTriggered && io) {
       const deadline = startAbsenceTimer(nextMatch.id, async () => {
         const ready = matchReadyPlayers.get(nextMatch.id);
         const absent1 = !ready?.has(p1!);
