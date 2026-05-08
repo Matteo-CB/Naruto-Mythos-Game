@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Sélection de deck : même fenêtre de course avec auto-start fermée",
+      "title_en": "Deck selection: same race window with auto-start closed",
+      "changes_fr": [
+        "Symétrique du fix d'hier sur /join : la route /select-deck avait la même fenêtre de course. Lecture de tournament.status='registration', puis enchaînement d'awaits (fetch participant, fetch deck, validation), puis update du participant. Si l'auto-start interval ou le clic Start admin transitionnait le tournoi en in_progress entre la lecture et l'update, le bracket était généré avec l'ANCIEN deckId du participant, mais participant.deckId pointait ensuite sur le NOUVEAU deck à l'instant du match. Vecteur de triche : un joueur pouvait swap son deck pile au moment où le tournoi démarrait, faisant valider l'ancien deck mais jouer le nouveau. Désormais la route relit tournament.status après l'update et rollback les valeurs précédentes (deckId + deckValid) si le tournoi a démarré entre temps."
+      ],
+      "changes_en": [
+        "Symmetric to yesterday's /join fix: the /select-deck route had the same race window. Read tournament.status='registration', then a chain of awaits (fetch participant, fetch deck, validate), then update the participant. If the auto-start interval or the admin Start button transitioned the tournament to in_progress between read and update, the bracket would be generated with the participant's OLD deckId, but participant.deckId then pointed to the NEW deck at match time. Cheating vector: a player could swap their deck right when the tournament started, getting the old one validated but playing the new one. Now the route re-reads tournament.status after the update and rolls back the previous deckId + deckValid if the tournament started in the meantime."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Inscription tournoi : fenêtre de course avec auto-start fermée",
       "title_en": "Tournament join: race window with auto-start closed",
       "changes_fr": [

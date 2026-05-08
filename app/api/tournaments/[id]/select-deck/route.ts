@@ -68,6 +68,8 @@ export async function POST(
     const validation = validateDeckForTournament(deck, effectiveTournament);
 
     
+    const previousDeckId = participant.deckId;
+    const previousDeckValid = participant.deckValid;
     await prisma.tournamentParticipant.update({
       where: { id: participant.id },
       data: {
@@ -75,6 +77,18 @@ export async function POST(
         deckValid: validation.valid,
       },
     });
+
+    const fresh = await prisma.tournament.findUnique({
+      where: { id: tournamentId },
+      select: { status: true },
+    });
+    if (fresh?.status !== 'registration') {
+      await prisma.tournamentParticipant.update({
+        where: { id: participant.id },
+        data: { deckId: previousDeckId, deckValid: previousDeckValid },
+      }).catch(() => {});
+      return NextResponse.json({ error: 'Tournament is no longer accepting deck changes' }, { status: 400 });
+    }
 
     const io = getSocketIO();
     if (io) io.to(`tournament:${tournamentId}`).emit('tournament:refresh');
