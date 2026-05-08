@@ -1196,7 +1196,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       for (const t of scheduledTournaments) {
         if (t._count.participants < 2) {
           await prisma.tournament.update({ where: { id: t.id }, data: { status: 'cancelled' } });
-          io.to(`tournament:${t.id}`).emit('tournament:cancelled', { reason: 'not_enough_players' });
+          io.to(`tournament:${t.id}`).emit('tournament:cancelled', { reason: 'not_enough_players', tournamentId: t.id });
           console.log(`[Tournament] Auto-cancelled ${t.name} (${t.id}) — not enough players`);
           continue;
         }
@@ -1206,7 +1206,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           const result = await executeTournamentStart(t.id);
           if (!result.ok) {
             await prisma.tournament.update({ where: { id: t.id }, data: { status: 'cancelled' } });
-            io.to(`tournament:${t.id}`).emit('tournament:cancelled', { reason: 'start_failed', detail: result.error });
+            io.to(`tournament:${t.id}`).emit('tournament:cancelled', { reason: 'start_failed', detail: result.error, tournamentId: t.id });
             console.log(`[Tournament] Auto-start aborted for ${t.id}: ${result.error}`);
             continue;
           }

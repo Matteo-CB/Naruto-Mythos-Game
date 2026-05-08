@@ -543,7 +543,7 @@ export async function POST(
             if (room.disconnectTimer) { clearTimeout(room.disconnectTimer); room.disconnectTimer = null; }
             if (room.actionTimer) { clearTimeout(room.actionTimer); room.actionTimer = null; }
             if (room.mulliganTimer) { clearTimeout(room.mulliganTimer); room.mulliganTimer = null; }
-            if (io) io.to(m.roomCode).emit('tournament:cancelled', { reason: 'admin' });
+            if (io) io.to(m.roomCode).emit('tournament:cancelled', { reason: 'admin', tournamentId });
             setTimeout(() => {
               const r = rooms.get(m.roomCode!);
               if (r) rooms.delete(m.roomCode!);
@@ -564,7 +564,7 @@ export async function POST(
           where: { id: tournamentId },
           data: { status: 'cancelled' },
         });
-        if (io) io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'admin' });
+        if (io) io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'admin', tournamentId });
         await logAdminAction({
           tournamentId, actorId, actorUsername,
           action: 'cancelTournament',

@@ -467,8 +467,11 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         });
       });
 
-      socket.on('tournament:cancelled', (data: { reason: string }) => {
-        console.log('[Socket] Tournament cancelled:', data.reason);
+      socket.on('tournament:cancelled', (data: { reason: string; tournamentId?: string }) => {
+        console.log('[Socket] Tournament cancelled:', data.reason, 'tournamentId:', data.tournamentId ?? 'unknown');
+        if (!get().tournamentMatchRoom) {
+          return;
+        }
         const resyncT = get()._resyncTimer;
         if (resyncT) clearInterval(resyncT);
         set({

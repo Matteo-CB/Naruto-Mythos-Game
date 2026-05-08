@@ -639,7 +639,7 @@ export async function handleSwissMatchEnd(
           where: { id: tournamentId },
           data: { status: 'cancelled', completedAt: new Date() },
         });
-        io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated' });
+        io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated', tournamentId });
         await cleanupTournamentMaps(tournamentId);
         return;
       }
@@ -766,7 +766,7 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
         where: { id: tournamentId },
         data: { status: 'cancelled', completedAt: new Date() },
       });
-      io?.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated' });
+      io?.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated', tournamentId });
       await cleanupTournamentMaps(tournamentId);
       return;
     }
@@ -1038,7 +1038,7 @@ async function finalizeDoubleElim(
       where: { id: tournamentId },
       data: { status: 'cancelled', completedAt: new Date() },
     });
-    io?.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated' });
+    io?.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated', tournamentId });
     await cleanupTournamentMaps(tournamentId);
     void finalMatch;
     return;

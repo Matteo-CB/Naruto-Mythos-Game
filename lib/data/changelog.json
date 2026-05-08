@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : un cancel d'un autre tournoi ne casse plus la partie en cours",
+      "title_en": "Tournaments: cancelling another tournament no longer breaks the current game",
+      "changes_fr": [
+        "Le handler tournament:cancelled côté client mettait gameEnded=true et winner=null sans vérifier si le joueur était effectivement dans un match de tournoi. Si un joueur naviguait sur la page tournoi A puis B (souscription transitoire) puis revenait sur A, son socket était abonné aux deux rooms tournoi. Quand B était annulé par un admin, le joueur recevait l'event et sa partie en cours (qu'elle soit tournoi A ou même casual) était brutalement marquée comme finie sans gagnant. Désormais le handler vérifie tournamentMatchRoom (le flag set quand le joueur rejoint une room de match de tournoi) avant d'appliquer gameEnded. Pas de tournament match en cours = on ignore l'event. Bonus : tous les emits côté serveur incluent maintenant tournamentId dans le payload, prêt pour un filtrage plus précis dans le futur."
+      ],
+      "changes_en": [
+        "The tournament:cancelled client handler was setting gameEnded=true and winner=null without checking whether the player was actually in a tournament match. If a player navigated to tournament A's page then B's (transient subscription) then back to A, their socket was subscribed to both tournament rooms. When B got cancelled by an admin, the player received the event and their current game (whether it be tournament A or even a casual game) was abruptly marked as ended with no winner. Now the handler checks tournamentMatchRoom (the flag set when the player joins a tournament match room) before applying gameEnded. No tournament match in progress = ignore the event. Bonus: all server-side emits now include tournamentId in the payload, ready for finer filtering in the future."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois single-élim : event round-complete émis même quand autoForfeit cascade",
       "title_en": "Single-elim tournaments: round-complete event emitted even when autoForfeit cascades",
       "changes_fr": [

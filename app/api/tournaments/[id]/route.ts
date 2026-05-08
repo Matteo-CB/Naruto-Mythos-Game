@@ -97,7 +97,7 @@ export async function DELETE(
     ]);
 
     const io = getSocketIO();
-    if (io) io.to(`tournament:${id}`).emit('tournament:cancelled', { reason: 'deleted' });
+    if (io) io.to(`tournament:${id}`).emit('tournament:cancelled', { reason: 'deleted', tournamentId: id });
 
     return NextResponse.json({ success: true });
   } catch {
