@@ -31,15 +31,25 @@ export async function GET(req: NextRequest) {
       take: 50,
       include: {
         _count: { select: { participants: true, matches: true } },
+        participants: { select: { userId: true } },
       },
     });
 
     const session = await auth();
     const viewerId = session?.user?.id;
     const viewerIsAdmin = isAdmin(session);
-    const safe = tournaments.map(t =>
-      (t.creatorId === viewerId || viewerIsAdmin) ? t : { ...t, joinCode: null },
-    );
+    const visible = tournaments.filter(t => {
+      if (t.isPublic) return true;
+      if (viewerIsAdmin) return true;
+      if (viewerId && t.creatorId === viewerId) return true;
+      if (viewerId && t.participants.some(p => p.userId === viewerId)) return true;
+      return false;
+    });
+    const safe = visible.map(t => {
+      const { participants, ...rest } = t;
+      void participants;
+      return (t.creatorId === viewerId || viewerIsAdmin) ? rest : { ...rest, joinCode: null };
+    });
 
     return NextResponse.json({ tournaments: safe });
   } catch {

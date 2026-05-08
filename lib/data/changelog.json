@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois privés : enfin invisibles dans la liste publique",
+      "title_en": "Private tournaments: finally hidden from the public listing",
+      "changes_fr": [
+        "Le flag isPublic=false était censé rendre un tournoi privé : créé via un join code partagé manuellement, invisible dans la liste publique. Mais l'API GET /api/tournaments listait tous les tournois sans filtrer sur isPublic. La passe sur la redaction du joinCode masquait juste le code dans la réponse, mais le tournoi lui-même était toujours visible (nom, format, mode, comptes de participants). Désormais la liste filtre les tournois privés : seuls le créateur, les admins du site, et les participants déjà inscrits peuvent les voir. Les autres viewers ne savent même pas qu'ils existent."
+      ],
+      "changes_en": [
+        "The isPublic=false flag was supposed to make a tournament private: created via a manually-shared join code, invisible in the public listing. But the API GET /api/tournaments listed every tournament without filtering on isPublic. The earlier joinCode redaction pass was just hiding the code in the response, but the tournament itself was still visible (name, format, mode, participant counts). Now the listing filters out private tournaments: only the creator, site admins, and already-registered participants can see them. Other viewers don't even know they exist."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : nettoyage de la room après forfait par timer",
       "title_en": "Tournaments: room cleanup after timer-driven forfeit",
       "changes_fr": [
