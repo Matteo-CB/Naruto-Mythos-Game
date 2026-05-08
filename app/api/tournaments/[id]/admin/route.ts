@@ -319,6 +319,28 @@ export async function POST(
         const match = tournament.matches.find(m => m.id === resetMatchId);
         if (!match) return NextResponse.json({ error: 'Match not found' }, { status: 404 });
 
+        if (tournament.format !== 'swiss' && match.winnerId) {
+          let blockingMatch: { round: number; matchIndex: number; bracket: string | null } | null = null;
+          if (tournament.format === 'elimination') {
+            const next = tournament.matches.find(m =>
+              m.bracket === match.bracket && m.round === match.round + 1 && m.matchIndex === Math.floor(match.matchIndex / 2),
+            );
+            if (next && next.status !== 'pending') blockingMatch = next;
+          } else if (tournament.format === 'double_elimination') {
+            const downstream = tournament.matches.filter(m =>
+              (m.player1Id === match.winnerId || m.player2Id === match.winnerId) &&
+              m.id !== match.id &&
+              m.status !== 'pending',
+            );
+            if (downstream.length > 0) blockingMatch = downstream[0];
+          }
+          if (blockingMatch) {
+            return NextResponse.json({
+              error: `Cannot reset: match ${blockingMatch.bracket ?? 'main'} R${blockingMatch.round} M${blockingMatch.matchIndex} is already ${blockingMatch.bracket === null ? 'set' : 'in flight or concluded'}. Reset that match first to clear the chain.`,
+            }, { status: 409 });
+          }
+        }
+
         const { clearAbsenceTimer } = await import('@/lib/tournament/absenceManager');
         clearAbsenceTimer(resetMatchId);
 

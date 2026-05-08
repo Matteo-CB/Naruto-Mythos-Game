@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Admin resetMatch : refus si le match aval est déjà en cours ou conclu",
+      "title_en": "Admin resetMatch: refuses when downstream match is already in flight or concluded",
+      "changes_fr": [
+        "Symétrique du fix d'hier sur setMatchWinner force : l'action admin resetMatch (qui clear un match pour le rejouer) avait le même problème de cascade incomplète. Si le gagnant du match resetté avait déjà avancé et joué un match suivant, ce match suivant restait avec son ancien état : winnerId/gameId/completedAt non-clearés alors qu'on a nullé la slot, ou pire, le match suivant était in_progress (game en cours) et on lui retirait un slot, ce qui aurait crashé la partie. Désormais le reset est refusé si le match aval (single-élim) ou n'importe quel match downstream impliquant le gagnant (double-élim) n'est pas en status pending. Message d'erreur indique précisément quel match reset d'abord."
+      ],
+      "changes_en": [
+        "Symmetric to yesterday's fix on setMatchWinner force: the admin resetMatch action (which clears a match to replay it) had the same incomplete-cascade problem. If the winner of the reset match had already advanced and played a subsequent match, that subsequent match was left with stale state: winnerId/gameId/completedAt unchanged while we nulled the slot, or worse, the next match was in_progress (game running) and we'd remove a slot, which would have crashed the live game. Now reset is refused if the downstream match (single-elim) or any downstream match involving the winner (double-elim) is not in pending status. Error message says which match to reset first."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Admin setMatchWinner force : refus de l'override si la chaîne avale a déjà avancé",
       "title_en": "Admin setMatchWinner force: refuses override when downstream chain has already advanced",
       "changes_fr": [
