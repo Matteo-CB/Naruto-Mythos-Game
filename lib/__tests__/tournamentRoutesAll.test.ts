@@ -56,6 +56,7 @@ import { POST as forfeitPOST } from '../../app/api/tournaments/[id]/matches/[mat
 import { POST as joinByCodePOST } from '../../app/api/tournaments/join-by-code/route';
 import { GET as singleGET, DELETE as singleDELETE } from '../../app/api/tournaments/[id]/route';
 import { POST as startPOST } from '../../app/api/tournaments/[id]/start/route';
+import { GET as listGET, POST as createPOST } from '../../app/api/tournaments/route';
 
 const p = prisma as never as {
   tournament: { findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn>; delete: ReturnType<typeof vi.fn>; findMany: ReturnType<typeof vi.fn> };
@@ -356,5 +357,87 @@ describe('POST /api/tournaments/[id]/start', () => {
     p.tournament.findUnique.mockResolvedValue({ id: 't1', creatorId: 'someone-else' });
     const res = await startPOST(req({}) as never, { params: params('t1') });
     expect(res.status).toBe(403);
+  });
+});
+
+describe('GET /api/tournaments (list)', () => {
+  it('returns tournaments unaffected by privacy when isPublic=true', async () => {
+    authMock.mockResolvedValue({ user: { id: 'random' } });
+    p.tournament.findMany.mockResolvedValue([
+      { id: 't1', creatorId: 'someone', isPublic: true, joinCode: 'ABC', participants: [], _count: { participants: 0, matches: 0 } },
+    ]);
+    const res = await listGET(new Request('http://localhost/api/tournaments?type=simulator') as never);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.tournaments).toHaveLength(1);
+    expect(body.tournaments[0].joinCode).toBeNull();
+  });
+  it('hides isPublic=false tournaments from non-creator non-participant', async () => {
+    authMock.mockResolvedValue({ user: { id: 'random' } });
+    p.tournament.findMany.mockResolvedValue([
+      { id: 't1', creatorId: 'someone', isPublic: false, joinCode: 'ABC', participants: [{ userId: 'x' }], _count: { participants: 1, matches: 0 } },
+      { id: 't2', creatorId: 'someone', isPublic: true, joinCode: 'XYZ', participants: [], _count: { participants: 0, matches: 0 } },
+    ]);
+    const res = await listGET(new Request('http://localhost/api/tournaments') as never);
+    const body = await res.json();
+    expect(body.tournaments).toHaveLength(1);
+    expect(body.tournaments[0].id).toBe('t2');
+  });
+  it('shows private tournament to its participant', async () => {
+    authMock.mockResolvedValue({ user: { id: 'partUser' } });
+    p.tournament.findMany.mockResolvedValue([
+      { id: 't1', creatorId: 'someone', isPublic: false, joinCode: 'ABC', participants: [{ userId: 'partUser' }], _count: { participants: 1, matches: 0 } },
+    ]);
+    const res = await listGET(new Request('http://localhost/api/tournaments') as never);
+    const body = await res.json();
+    expect(body.tournaments).toHaveLength(1);
+    expect(body.tournaments[0].joinCode).toBeNull();
+  });
+});
+
+describe('POST /api/tournaments (create)', () => {
+  it('returns 401 without auth', async () => {
+    authMock.mockResolvedValue(null);
+    const res = await createPOST(req({ name: 'T', maxPlayers: 8 }) as never);
+    expect(res.status).toBe(401);
+  });
+  it('rejects non-admin', async () => {
+    authMock.mockResolvedValue({ user: { id: 'random', email: 'x@y.z', name: 'Random' } });
+    const res = await createPOST(req({ name: 'T', maxPlayers: 8 }) as never);
+    expect(res.status).toBe(403);
+  });
+  it('rejects elimination format with non-power-of-2 players', async () => {
+    authMock.mockResolvedValue({ user: { id: 'admin', email: 'matteo.biyikli3224@gmail.com', name: 'Kutxyt' } });
+    const res = await createPOST(req({ name: 'T', maxPlayers: 5, format: 'elimination' }) as never);
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toMatch(/4, 8, 16, or 32/);
+  });
+  it('rejects empty name', async () => {
+    authMock.mockResolvedValue({ user: { id: 'admin', name: 'Kutxyt' } });
+    const res = await createPOST(req({ name: '   ', maxPlayers: 8 }) as never);
+    expect(res.status).toBe(400);
+  });
+  it('rejects name longer than 80 chars', async () => {
+    authMock.mockResolvedValue({ user: { id: 'admin', name: 'Kutxyt' } });
+    const res = await createPOST(req({ name: 'x'.repeat(81), maxPlayers: 8 }) as never);
+    expect(res.status).toBe(400);
+  });
+  it('rejects gameMode outside the whitelist', async () => {
+    authMock.mockResolvedValue({ user: { id: 'admin', name: 'Kutxyt' } });
+    const res = await createPOST(req({ name: 'T', maxPlayers: 8, gameMode: 'foobar' }) as never);
+    expect(res.status).toBe(400);
+  });
+  it('rejects sealed booster count out of [1,12]', async () => {
+    authMock.mockResolvedValue({ user: { id: 'admin', name: 'Kutxyt' } });
+    const res = await createPOST(req({ name: 'T', maxPlayers: 8, gameMode: 'sealed', sealedBoosterCount: 99 }) as never);
+    expect(res.status).toBe(400);
+  });
+  it('happy path creates a tournament and returns 201', async () => {
+    authMock.mockResolvedValue({ user: { id: 'admin', name: 'Kutxyt' } });
+    p.user.findUnique.mockResolvedValue({ username: 'admin' });
+    (p.tournament as { create?: ReturnType<typeof vi.fn> }).create = vi.fn().mockResolvedValue({ id: 'newT', name: 'T' });
+    const res = await createPOST(req({ name: 'My Tournament', maxPlayers: 8, format: 'swiss' }) as never);
+    expect(res.status).toBe(201);
   });
 });

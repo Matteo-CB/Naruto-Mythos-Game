@@ -880,6 +880,15 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
   else { updateData.player2Id = winnerId; updateData.player2Username = winnerUsername; }
 
   const updated = await prisma.tournamentMatch.update({ where: { id: nextMatch.id }, data: updateData });
+  logMatchEvent({
+    type: 'match.advance',
+    tournamentId,
+    matchId: nextMatch.id,
+    bracket: nextMatch.bracket ?? undefined,
+    round: nextMatch.round,
+    matchIndex: nextMatch.matchIndex,
+    winnerId,
+  });
   const p1 = isTopSlot ? winnerId : updated.player1Id;
   const p2 = isTopSlot ? updated.player2Id : winnerId;
   if (p1 && p2) {
@@ -1052,6 +1061,16 @@ async function applySlot(
     console.error(`[Tournament] applySlot: target not found ${plan.bracket} R${plan.round} M${plan.matchIndex} (tournament ${tournamentId})`);
     return;
   }
+
+  logMatchEvent({
+    type: 'match.advance',
+    tournamentId,
+    matchId: refreshed.id,
+    bracket: plan.bracket,
+    round: plan.round,
+    matchIndex: plan.matchIndex,
+    winnerId: userId,
+  });
 
   if (io && refreshed.player1Id && refreshed.player2Id && refreshed.status === 'ready') {
     if (await autoForfeitIfEliminated(io, tournamentId, refreshed.id)) {
