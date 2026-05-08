@@ -223,10 +223,11 @@ export function generateSwissPairings(
   players: SwissPlayer[],
   results: SwissMatchResult[],
   roundNumber: number,
+  excludeUserIds: Set<string> = new Set(),
 ): SwissPairing[] {
   const standings = computeStandings(players, results);
 
-  
+
   const previousPairings = new Set<string>();
   for (const r of results) {
     if (!r.isBye) {
@@ -234,20 +235,20 @@ export function generateSwissPairings(
     }
   }
 
-  
+
   const hadByeSet = new Set<string>();
   for (const s of standings) {
     if (s.hadBye) hadByeSet.add(s.userId);
   }
 
-  
+
   const playerMap = new Map<string, SwissPlayer>();
   for (const p of players) {
     playerMap.set(p.userId, p);
   }
 
-  
-  let toPair = standings.map(s => s.userId);
+
+  let toPair = standings.map(s => s.userId).filter(id => !excludeUserIds.has(id));
 
   const pairings: SwissPairing[] = [];
   let matchIndex = 0;

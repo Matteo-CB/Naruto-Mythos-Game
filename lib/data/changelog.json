@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois Suisse : joueurs disqualifiés exclus des pairings suivants",
+      "title_en": "Swiss tournaments: disqualified players excluded from subsequent pairings",
+      "changes_fr": [
+        "Quand un admin disqualifiait un joueur en plein milieu d'un tournoi Suisse, le joueur restait dans la liste des participants à apparier au round suivant. Conséquence : il était apparié à un autre joueur, le timer d'absence de 2 minutes s'écoulait, et l'autre gagnait par forfait. Pour un Suisse à 5 rounds, un DQ au round 1 produisait jusqu'à 4 timers fantômes de 2 minutes chacun. Désormais, les joueurs avec eliminated=true sont filtrés des nouvelles pairings. Leurs statistiques restent figées dans les standings (toujours visibles, comptées correctement dans le Buchholz des adversaires précédents)."
+      ],
+      "changes_en": [
+        "When an admin disqualified a player mid-Swiss-tournament, the player stayed in the list of participants to pair for the next round. Consequence: they got paired with another player, the 2-minute absence timer ticked, and the other won by forfeit. For a 5-round Swiss, a round-1 DQ produced up to 4 phantom 2-minute timers. Now, players with eliminated=true are filtered out of new pairings. Their stats remain frozen in the standings (still visible, correctly counted in past opponents' Buchholz)."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Decks verrouillés pendant un tournoi en cours + race condition de match-ready corrigée",
       "title_en": "Decks locked during in-progress tournaments + match-ready race condition fixed",
       "changes_fr": [

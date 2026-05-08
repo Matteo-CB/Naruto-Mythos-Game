@@ -494,9 +494,9 @@ export async function handleSwissMatchEnd(
     const standings = computeStandings(swissPlayers, swissResults);
 
     if (match.round < tournament.totalRounds) {
-      
       const nextRound = match.round + 1;
-      const pairings = generateSwissPairings(swissPlayers, swissResults, nextRound);
+      const eliminatedIds = new Set(tournament.participants.filter(p => p.eliminated).map(p => p.userId));
+      const pairings = generateSwissPairings(swissPlayers, swissResults, nextRound, eliminatedIds);
 
       
       await prisma.tournamentMatch.createMany({

@@ -9,6 +9,7 @@ import { generateBracket } from '../tournament/tournamentEngine';
 import {
   computeSwissRoundCount,
   generateSwissRound1,
+  generateSwissPairings,
   computeStandings,
   type SwissPlayer,
   type SwissMatchResult,
@@ -239,6 +240,53 @@ describe('Tournament logic — Swiss double absence (no-show)', () => {
     expect(u3.matchPoints).toBe(0);
     expect(u1.matchPoints).toBe(6);
     expect(u1.buchholz).toBe(0);
+  });
+});
+
+describe('Tournament logic — Swiss eliminated player exclusion', () => {
+  it('excluded user ids are not paired in subsequent rounds', () => {
+    const ps: SwissPlayer[] = players(4).map((p, i) => ({ ...p, seed: i + 1 }));
+    const r1Results: SwissMatchResult[] = [
+      { round: 1, player1Id: 'u1', player2Id: 'u2', winnerId: 'u1', isBye: false },
+      { round: 1, player1Id: 'u3', player2Id: 'u4', winnerId: 'u3', isBye: false },
+    ];
+    const r2 = generateSwissPairings(ps, r1Results, 2, new Set(['u3']));
+    const allPairedIds = r2.flatMap(m => [m.player1.userId, m.player2?.userId].filter(Boolean) as string[]);
+    expect(allPairedIds).not.toContain('u3');
+    expect(new Set(allPairedIds).size).toBe(allPairedIds.length);
+  });
+
+  it('with one eliminated player out of 4, the other 3 produce 1 match + 1 bye', () => {
+    const ps: SwissPlayer[] = players(4).map((p, i) => ({ ...p, seed: i + 1 }));
+    const r1Results: SwissMatchResult[] = [
+      { round: 1, player1Id: 'u1', player2Id: 'u2', winnerId: 'u1', isBye: false },
+      { round: 1, player1Id: 'u3', player2Id: 'u4', winnerId: 'u3', isBye: false },
+    ];
+    const r2 = generateSwissPairings(ps, r1Results, 2, new Set(['u4']));
+    expect(r2.length).toBe(2);
+    const byes = r2.filter(m => m.player2 === null);
+    expect(byes.length).toBe(1);
+  });
+
+  it('standings still include eliminated players (their stats are frozen)', () => {
+    const ps: SwissPlayer[] = players(4).map((p, i) => ({ ...p, seed: i + 1 }));
+    const results: SwissMatchResult[] = [
+      { round: 1, player1Id: 'u1', player2Id: 'u2', winnerId: 'u1', isBye: false },
+      { round: 1, player1Id: 'u3', player2Id: 'u4', winnerId: 'u3', isBye: false },
+    ];
+    const standings = computeStandings(ps, results);
+    expect(standings.find(s => s.userId === 'u4')).toBeDefined();
+    expect(standings.find(s => s.userId === 'u4')?.matchPoints).toBe(0);
+  });
+
+  it('excluding all players returns no pairings (does not crash)', () => {
+    const ps: SwissPlayer[] = players(4).map((p, i) => ({ ...p, seed: i + 1 }));
+    const results: SwissMatchResult[] = [
+      { round: 1, player1Id: 'u1', player2Id: 'u2', winnerId: 'u1', isBye: false },
+      { round: 1, player1Id: 'u3', player2Id: 'u4', winnerId: 'u3', isBye: false },
+    ];
+    const r2 = generateSwissPairings(ps, results, 2, new Set(['u1', 'u2', 'u3', 'u4']));
+    expect(r2).toEqual([]);
   });
 });
 
