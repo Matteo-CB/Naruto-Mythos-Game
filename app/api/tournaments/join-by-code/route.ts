@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
+import { getSocketIO } from '@/lib/socket/server';
 
 
 export async function POST(req: NextRequest) {
@@ -105,6 +106,8 @@ export async function POST(req: NextRequest) {
         await prisma.tournamentParticipant.delete({ where: { id: participant.id } }).catch(() => {});
         return NextResponse.json({ error: 'Tournament is full' }, { status: 400 });
       }
+      const io = getSocketIO();
+      if (io) io.to(`tournament:${tournament.id}`).emit('tournament:refresh');
       return NextResponse.json({
         participant,
         tournamentId: tournament.id,

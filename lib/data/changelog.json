@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : join, leave, select-deck et forfeit route notifient maintenant les subscribers",
+      "title_en": "Tournaments: join, leave, select-deck and forfeit route now notify subscribers",
+      "changes_fr": [
+        "Suite et fin des fixes broadcast : 4 routes mutaient l'état tournoi sans notifier les abonnés socket. /join et /join-by-code créaient un participant sans le diffuser, donc les autres viewers de la page registration ne voyaient pas le nouveau venu. /leave supprimait le participant sans diffuser. /select-deck mettait à jour deckId/deckValid sans diffuser, donc les admins/créateurs ne voyaient pas en live qui avait sélectionné un deck. Les 4 émettent maintenant tournament:refresh. Bonus : la route /matches/{matchId}/forfeit (admin force un forfait sur un match précis) ne nettoyait pas la room en mémoire si le match était in_progress avec un roomCode, même bug que la passe sur handleMatchForfeit. Maintenant elle clear les timers, marque finalized=true, et schedule la suppression dans 10s."
+      ],
+      "changes_en": [
+        "Continuation and wrap-up of the broadcast fixes: 4 routes mutated tournament state without notifying socket subscribers. /join and /join-by-code created a participant without broadcasting, so other viewers on the registration page did not see the new arrival. /leave removed the participant silently. /select-deck updated deckId/deckValid silently, so admins/creators did not see who had picked a deck in real time. All 4 now emit tournament:refresh. Bonus: the /matches/{matchId}/forfeit route (admin force-forfeits a specific match) did not clean up the in-memory room when the match was in_progress with a roomCode, same bug as the handleMatchForfeit pass. It now clears the room timers, marks finalized=true, and schedules removal in 10s."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : pairings manuels et delete émettent maintenant l'event de refresh",
       "title_en": "Tournaments: manual pairings and delete now emit the refresh event",
       "changes_fr": [

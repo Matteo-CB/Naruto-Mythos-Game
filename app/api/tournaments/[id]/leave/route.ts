@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { getSocketIO } from '@/lib/socket/server';
 
 
 export async function POST(
@@ -30,6 +31,9 @@ export async function POST(
     await prisma.tournamentParticipant.deleteMany({
       where: { tournamentId: id, userId: session.user.id },
     });
+
+    const io = getSocketIO();
+    if (io) io.to(`tournament:${id}`).emit('tournament:refresh');
 
     return NextResponse.json({ success: true });
   } catch {

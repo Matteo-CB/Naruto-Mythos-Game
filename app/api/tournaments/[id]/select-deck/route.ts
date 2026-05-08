@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { validateDeckForTournament } from '@/lib/tournament/deckValidation';
+import { getSocketIO } from '@/lib/socket/server';
 
 
 export async function POST(
@@ -74,6 +75,9 @@ export async function POST(
         deckValid: validation.valid,
       },
     });
+
+    const io = getSocketIO();
+    if (io) io.to(`tournament:${tournamentId}`).emit('tournament:refresh');
 
     return NextResponse.json({
       deckId,
