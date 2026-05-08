@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois Suisse : tournoi annulé proprement si tous les actifs sont DQ mid-tournament",
+      "title_en": "Swiss tournaments: cleanly cancelled if all active players are DQ'd mid-tournament",
+      "changes_fr": [
+        "Edge case rare : si un admin disqualifiait tous les participants actifs en plein milieu d'un tournoi Suisse (par exemple cheating massif découvert), le code générait 0 pairings pour le round suivant (plus personne à apparier), aucun match n'était créé, et plus aucun event de match-end ne triggerrait. Le tournoi restait coincé en in_progress indéfiniment, jusqu'à la cleanup de 30 jours. Désormais, avant de générer le round suivant, on compte les participants actifs (non eliminated). Si zéro, le tournoi est immédiatement marqué cancelled avec reason='all_eliminated', cleanup des maps in-memory effectué, event diffusé. Le tournoi se libère proprement."
+      ],
+      "changes_en": [
+        "Rare edge case: if an admin disqualified every active participant mid-Swiss-tournament (e.g. mass cheating discovery), the code generated 0 pairings for the next round (no one left to pair), no match was created, and no match-end event ever fired again. The tournament stayed wedged in_progress until the 30-day cleanup. Now, before generating the next round, we count the active participants (non-eliminated). If zero, the tournament is immediately marked cancelled with reason='all_eliminated', in-memory maps are cleaned, the event is broadcast. The tournament releases cleanly."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : démarrage idempotent même après crash partiel",
       "title_en": "Tournaments: start is idempotent even after partial crash",
       "changes_fr": [

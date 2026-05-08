@@ -554,6 +554,16 @@ export async function handleSwissMatchEnd(
     if (match.round < tournament.totalRounds) {
       const nextRound = match.round + 1;
       const eliminatedIds = new Set(tournament.participants.filter(p => p.eliminated).map(p => p.userId));
+      const activeCount = tournament.participants.length - eliminatedIds.size;
+      if (activeCount === 0) {
+        await prisma.tournament.update({
+          where: { id: tournamentId },
+          data: { status: 'cancelled', completedAt: new Date() },
+        });
+        io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated', tournamentId });
+        await cleanupTournamentMaps(tournamentId);
+        return;
+      }
       const pairings = generateSwissPairings(swissPlayers, swissResults, nextRound, eliminatedIds);
 
       const existingNext = await prisma.tournamentMatch.findFirst({
