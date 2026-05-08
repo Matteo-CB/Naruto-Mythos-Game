@@ -62,12 +62,14 @@ export async function POST(
       }
     }
 
-    for (let i = 0; i < orderedPlayerIds.length; i++) {
-      await prisma.tournamentParticipant.updateMany({
-        where: { tournamentId: id, userId: orderedPlayerIds[i] },
-        data: { seed: i + 1 },
-      });
-    }
+    await prisma.$transaction(
+      orderedPlayerIds.map((uid, i) =>
+        prisma.tournamentParticipant.updateMany({
+          where: { tournamentId: id, userId: uid },
+          data: { seed: i + 1 },
+        }),
+      ),
+    );
 
     await prisma.tournamentAdminLog.create({
       data: {

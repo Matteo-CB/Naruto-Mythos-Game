@@ -76,7 +76,6 @@ export interface RoomData {
 
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
 const MULLIGAN_TIMEOUT_MS = 60_000; // 1 minute for the mulligan + edge phase
-const TOURNAMENT_JOIN_TIMEOUT_MS = 5 * 60_000; // 5 minutes after room creation to actually join and start
 const EFFECT_TIMEOUT_MS = 60_000; // 1 minute per effect resolution
 const MAX_CONSECUTIVE_TIMEOUTS = 3; // 3 timeouts = auto-forfeit
 const DISCONNECT_GRACE_MS = 60_000; // 1 minute before disconnect = forfeit
@@ -1573,15 +1572,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
       playerRooms.set(socket.id, data.code);
       socket.join(data.code);
 
-      
-      if (!room.guestName) {
-        try {
-          const guestUser = await prisma.user.findUnique({ where: { id: data.userId }, select: { username: true } });
-          if (guestUser?.username) room.guestName = guestUser.username;
-        } catch { /* ignore */ }
-      }
       try {
-        const guestUser = await prisma.user.findUnique({ where: { id: data.userId }, select: { allowSpectatorHand: true } });
+        const guestUser = await prisma.user.findUnique({
+          where: { id: data.userId },
+          select: { username: true, allowSpectatorHand: true },
+        });
+        if (!room.guestName && guestUser?.username) room.guestName = guestUser.username;
         room.guestAllowSpectatorHand = guestUser?.allowSpectatorHand ?? false;
       } catch { /* default false */ }
 

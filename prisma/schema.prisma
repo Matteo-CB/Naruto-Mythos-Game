@@ -240,6 +240,10 @@ model Tournament {
   createdAt          DateTime                @default(now())
   participants       TournamentParticipant[]
   matches            TournamentMatch[]
+
+  @@index([status, createdAt])
+  @@index([status, scheduledStartAt])
+  @@index([creatorId])
 }
 
 model TournamentParticipant {

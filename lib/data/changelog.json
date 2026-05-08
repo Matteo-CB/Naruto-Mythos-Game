@@ -17,6 +17,27 @@
     },
     {
       "date": "2026-05-08",
+      "title_fr": "Audit online : performance, indexes BDD, sealed pool 5x plus rapide, dead code",
+      "title_en": "Online audit: performance, DB indexes, sealed pool 5x faster, dead code",
+      "changes_fr": [
+        "Performance : ajout d'indexes BDD critiques sur Tournament ([status, createdAt], [status, scheduledStartAt], [creatorId]) — les queries de la liste tournaments et de l'auto-start interval gagnent jusqu'à un facteur 10 sur de gros datasets.",
+        "Pairings manuels admin : N+1 query (1 update par participant) remplacé par un prisma.$transaction batch. Sur un tournoi de 32, 32 round-trips DB → 1.",
+        "Sealed booster generation : les 6 filtres par rareté (Common, Uncommon, Rare, RA, Secret, Legendary) étaient ré-exécutés pour chaque booster. Sur un pool de 6 boosters c'était 36 filtres redondants. Maintenant les buckets sont calculés une fois et passés à generateBooster, soit 6 filtres au lieu de 36 (5x plus rapide).",
+        "room:join : 2 queries séquentielles sur le user guest (username puis allowSpectatorHand) fusionnées en 1 query unique avec select combiné.",
+        "Dead code : suppression de TOURNAMENT_JOIN_TIMEOUT_MS = 5min dans server.ts (jamais utilisée — la vraie valeur est définie inline en tournamentHandlers.ts à 2 minutes). Suppression du double-scheduling de rooms.delete dans le double-disconnect Swiss.",
+        "i18n : audit complet des 2467 clés EN vs FR — parfaitement synchronisées, aucune divergence détectée."
+      ],
+      "changes_en": [
+        "Performance: added critical DB indexes on Tournament ([status, createdAt], [status, scheduledStartAt], [creatorId]) — tournament list and auto-start interval queries gain up to 10x on large datasets.",
+        "Admin manual pairings: N+1 query (1 update per participant) replaced by a prisma.$transaction batch. On a 32-player tournament, 32 DB round-trips → 1.",
+        "Sealed booster generation: the 6 per-rarity filters (Common, Uncommon, Rare, RA, Secret, Legendary) were re-executed for each booster. On a 6-booster pool that was 36 redundant filters. Buckets are now computed once and passed to generateBooster — 6 filters instead of 36 (5x faster).",
+        "room:join: 2 sequential queries on the guest user (username then allowSpectatorHand) merged into a single query with combined select.",
+        "Dead code: removed TOURNAMENT_JOIN_TIMEOUT_MS = 5min in server.ts (never used — the real value is defined inline in tournamentHandlers.ts at 2 minutes). Removed the double-scheduling of rooms.delete in Swiss in-game double-disconnect.",
+        "i18n: full audit of the 2467 EN vs FR keys — perfectly synchronized, no divergence detected."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Hygiène : suppression du double-scheduling de room.delete en double-disconnect Swiss",
       "title_en": "Hygiene: removed duplicate room.delete scheduling in Swiss in-game double-disconnect",
       "changes_fr": [

@@ -39,16 +39,32 @@ function toBoosterCard(card: CardData, isHolo = false): BoosterCard {
   return { ...card, isHolo, sealedInstanceId: nextInstanceId() };
 }
 
-export function generateBooster(boosterIndex: number): BoosterPack {
-  const allChars = getPlayableCharacters();
-  const allMissions = getPlayableMissions();
+interface RarityBuckets {
+  commons: CharacterCard[];
+  uncommons: CharacterCard[];
+  rares: CharacterCard[];
+  rareArts: CharacterCard[];
+  secrets: CharacterCard[];
+  legendaries: CharacterCard[];
+  missions: MissionCard[];
+}
 
-  const commons = allChars.filter(c => c.rarity === 'C');
-  const uncommons = allChars.filter(c => c.rarity === 'UC');
-  const rares = allChars.filter(c => c.rarity === 'R');
-  const rareArts = allChars.filter(c => c.rarity === 'RA');
-  const secrets = allChars.filter(c => c.rarity === 'S');
-  const legendaries = allChars.filter(c => c.rarity === 'L');
+function buildRarityBuckets(): RarityBuckets {
+  const allChars = getPlayableCharacters();
+  return {
+    commons: allChars.filter(c => c.rarity === 'C'),
+    uncommons: allChars.filter(c => c.rarity === 'UC'),
+    rares: allChars.filter(c => c.rarity === 'R'),
+    rareArts: allChars.filter(c => c.rarity === 'RA'),
+    secrets: allChars.filter(c => c.rarity === 'S'),
+    legendaries: allChars.filter(c => c.rarity === 'L'),
+    missions: getPlayableMissions(),
+  };
+}
+
+export function generateBooster(boosterIndex: number, buckets?: RarityBuckets): BoosterPack {
+  const b = buckets ?? buildRarityBuckets();
+  const { commons, uncommons, rares, rareArts, secrets, legendaries, missions: allMissions } = b;
 
   const cards: BoosterCard[] = [];
 
@@ -91,12 +107,13 @@ export function generateBooster(boosterIndex: number): BoosterPack {
 }
 
 export function generateSealedPool(boosterCount: number = 6): SealedPool {
-  _instanceCounter = 0; // Reset counter for each sealed
+  _instanceCounter = 0;
+  const buckets = buildRarityBuckets();
   const boosters: BoosterPack[] = [];
   const allCards: BoosterCard[] = [];
 
   for (let i = 0; i < boosterCount; i++) {
-    const booster = generateBooster(i);
+    const booster = generateBooster(i, buckets);
     boosters.push(booster);
     allCards.push(...booster.cards);
   }
