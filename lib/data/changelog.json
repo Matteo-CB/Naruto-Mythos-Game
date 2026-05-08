@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Cleanup : tournois complétés/annulés purgés au bout de 30 jours",
+      "title_en": "Cleanup: completed/cancelled tournaments purged after 30 days",
+      "changes_fr": [
+        "Le job de cleanup horaire purgeait Game (72h), EloHistory (14 jours) et TournamentAdminLog (30 jours), mais jamais les tournois eux-mêmes ni leurs participants/matchs. Avec un BDD limité à 500 Mo gratuit, ça finissait par s'accumuler, surtout pour les tournois sealed (chaque participant stocke son pool d'environ 25 Ko). Désormais, les tournois en status completed ou cancelled depuis plus de 30 jours sont supprimés en cascade : matchs, participants, logs d'audit, puis le tournoi lui-même, le tout dans une transaction Prisma. Les compteurs tournamentWins sur les profils utilisateurs ne sont pas affectés (ils sont stockés sur le User, pas dérivés des Tournament records)."
+      ],
+      "changes_en": [
+        "The hourly cleanup job purged Game (72h), EloHistory (14 days) and TournamentAdminLog (30 days), but never tournaments themselves or their participants/matches. With a 500MB-free DB, that piled up, especially for sealed tournaments (each participant stores a roughly 25KB pool). Now, tournaments with status completed or cancelled older than 30 days are cascade-deleted: matches, participants, admin logs, then the tournament itself, all in a Prisma transaction. The tournamentWins counter on user profiles is not affected (it lives on the User model, not derived from Tournament records)."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois élim/double-élim : DQ d'un joueur en attente ne casse plus le bracket",
       "title_en": "Elim/double-elim tournaments: DQ of a pending-slot player no longer breaks the bracket",
       "changes_fr": [

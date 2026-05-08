@@ -12,6 +12,8 @@ export const ELO_HISTORY_TTL_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
 
 export const TOURNAMENT_ADMIN_LOG_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
+export const TOURNAMENT_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
 let lastCleanup = 0;
 const CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // Run at most once per hour
 
@@ -61,6 +63,29 @@ export async function cleanupOldGames(): Promise<void> {
     });
     if (adminLogPurge.count > 0) {
       console.log(`[GameCleanup] Deleted ${adminLogPurge.count} TournamentAdminLog rows older than 30 days`);
+    }
+
+
+    const tournamentCutoff = new Date(now - TOURNAMENT_TTL_MS);
+    const oldTournaments = await prisma.tournament.findMany({
+      where: {
+        OR: [
+          { status: 'completed', completedAt: { lt: tournamentCutoff } },
+          { status: 'cancelled', completedAt: { lt: tournamentCutoff } },
+          { status: 'cancelled', completedAt: null, createdAt: { lt: tournamentCutoff } },
+        ],
+      },
+      select: { id: true },
+    });
+    if (oldTournaments.length > 0) {
+      const ids = oldTournaments.map(t => t.id);
+      const [matches, participants, adminLogs, tournaments] = await prisma.$transaction([
+        prisma.tournamentMatch.deleteMany({ where: { tournamentId: { in: ids } } }),
+        prisma.tournamentParticipant.deleteMany({ where: { tournamentId: { in: ids } } }),
+        prisma.tournamentAdminLog.deleteMany({ where: { tournamentId: { in: ids } } }),
+        prisma.tournament.deleteMany({ where: { id: { in: ids } } }),
+      ]);
+      console.log(`[GameCleanup] Purged ${tournaments.count} tournaments older than 30 days (${matches.count} matches, ${participants.count} participants, ${adminLogs.count} admin logs)`);
     }
   } catch (err) {
     console.error('[GameCleanup] Error during cleanup:', err);
