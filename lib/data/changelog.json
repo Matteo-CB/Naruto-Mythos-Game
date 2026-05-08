@@ -17,6 +17,21 @@
     },
     {
       "date": "2026-05-08",
+      "title_fr": "Audit online phase 2 : maintenance, broadcasts scopés, build prod validé",
+      "title_en": "Online audit phase 2: maintenance check, scoped broadcasts, prod build validated",
+      "changes_fr": [
+        "Maintenance mode : room:join laissait passer la jointure d'une room même quand le mode maintenance était actif. Pour les rooms vides (pas encore de gameState), on peut commencer une nouvelle partie qui sera coupée par la fin de maintenance. Désormais room:join refuse avec 'maintenance' si le mode est actif et la room est encore en pré-jeu. Les rooms avec game déjà en cours peuvent finir normalement.",
+        "Broadcasts scopés : broadcastRoomList et broadcastActiveGames émettaient à TOUS les clients connectés via io.emit. Avec 100+ utilisateurs concurrents, c'était N broadcasts à chaque changement de room. Désormais ils ciblent uniquement les rooms socket.io 'lobby' (créée par room:list) et 'games-watchers' (créée par games:list). Nouveaux events de désinscription room:list-unsubscribe et games:list-unsubscribe pour quitter ces rooms quand on navigue ailleurs.",
+        "Build prod validé : npx next build passe sans erreur en 7.8s, 56 pages statiques générées. 1 warning de dépréciation Next 16 sur 'middleware → proxy' laissé en place (rename casserait next-intl)."
+      ],
+      "changes_en": [
+        "Maintenance mode: room:join was letting the join through even when maintenance was active. For empty rooms (no gameState yet), a new game could start only to be cut off by the maintenance end. Now room:join refuses with 'maintenance' if the mode is active and the room is still pre-game. Rooms with an in-progress game can finish normally.",
+        "Scoped broadcasts: broadcastRoomList and broadcastActiveGames were emitting to ALL connected clients via io.emit. With 100+ concurrent users, that meant N broadcasts per room change. They now target the 'lobby' and 'games-watchers' socket.io rooms (joined by room:list and games:list emits). New unsubscribe events room:list-unsubscribe and games:list-unsubscribe to leave when navigating away.",
+        "Prod build validated: npx next build passes cleanly in 7.8s, 56 static pages generated. One deprecation warning from Next 16 about 'middleware → proxy' left in place (renaming would break next-intl integration)."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Audit online : performance, indexes BDD, sealed pool 5x plus rapide, dead code",
       "title_en": "Online audit: performance, DB indexes, sealed pool 5x faster, dead code",
       "changes_fr": [

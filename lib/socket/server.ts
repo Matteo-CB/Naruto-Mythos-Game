@@ -183,7 +183,7 @@ function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: 
 }
 
 function broadcastRoomList(io: SocketIOServer): void {
-  io.emit('room:list-update', getPublicRoomList());
+  io.to('lobby').emit('room:list-update', getPublicRoomList());
 }
 
 function broadcastActiveGames(io: SocketIOServer): void {
@@ -212,7 +212,7 @@ function broadcastActiveGames(io: SocketIOServer): void {
       isPrivate: room.isPrivate,
     });
   }
-  io.emit('games:list-update', { games: activeGames });
+  io.to('games-watchers').emit('games:list-update', { games: activeGames });
 }
 
 
@@ -1521,7 +1521,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-      
+      if (isMaintenanceActive() && !room.gameState) {
+        socket.emit('room:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
+        return;
+      }
+
+
       if (room.hostId === data.userId) {
         if (room.tournamentId) {
           console.log(`[Socket] Tournament host ${data.userId} joining room ${data.code}`);
@@ -2138,7 +2143,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
     
     socket.on('room:list', () => {
+      socket.join('lobby');
       socket.emit('room:list-update', getPublicRoomList());
+    });
+
+    socket.on('room:list-unsubscribe', () => {
+      socket.leave('lobby');
     });
 
     
@@ -2604,6 +2614,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     
 
     socket.on('games:list', () => {
+      socket.join('games-watchers');
       const activeGames: Array<{
         roomCode: string;
         player1Name: string;
@@ -2628,6 +2639,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
 
       socket.emit('games:list-update', { games: activeGames });
+    });
+
+    socket.on('games:list-unsubscribe', () => {
+      socket.leave('games-watchers');
     });
 
     
