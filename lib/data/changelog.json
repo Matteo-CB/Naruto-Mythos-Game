@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Admin : la page tournoi se rafraîchit après removeParticipant et updateNote",
+      "title_en": "Admin: tournament page refreshes after removeParticipant and updateNote",
+      "changes_fr": [
+        "Les actions admin disqualify, setMatchWinner, resetMatch et cancelTournament déclenchaient un broadcastTournamentRefresh ou un event tournament:cancelled, donc les joueurs sur la page voyaient le changement instantanément. Mais removeParticipant et updateNote ne broadcastaient rien : un participant viré pendant la registration restait visible dans la liste pour les autres jusqu'au F5 manuel, et une note de restriction modifiée ne se mettait pas à jour. Ces deux actions appellent maintenant broadcastTournamentRefresh comme les autres."
+      ],
+      "changes_en": [
+        "The admin actions disqualify, setMatchWinner, resetMatch and cancelTournament triggered a broadcastTournamentRefresh or a tournament:cancelled event, so players on the page saw the change instantly. But removeParticipant and updateNote broadcast nothing: a participant kicked during registration stayed visible in the list for everyone else until manual F5, and an edited restriction note did not propagate. Both actions now call broadcastTournamentRefresh like the others."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois privés : route /matches et tournament:subscribe socket aussi gated",
       "title_en": "Private tournaments: /matches route and tournament:subscribe socket also gated",
       "changes_fr": [

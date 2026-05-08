@@ -585,6 +585,7 @@ export async function POST(
           targetUserId: removeUserId,
           targetUsername: removedUser?.username,
         });
+        await broadcastTournamentRefresh(tournamentId);
         return NextResponse.json({ success: true, message: 'Participant removed' });
       }
 
@@ -606,6 +607,7 @@ export async function POST(
           action: 'updateNote',
           details: { length: typeof note === 'string' ? note.length : 0 },
         });
+        await broadcastTournamentRefresh(tournamentId);
         return NextResponse.json({ success: true });
       }
 
