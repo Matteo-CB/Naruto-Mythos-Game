@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois privés : route /matches et tournament:subscribe socket aussi gated",
+      "title_en": "Private tournaments: /matches route and tournament:subscribe socket also gated",
+      "changes_fr": [
+        "Suite des fixes privacy 38 et 39 : la route GET /api/tournaments/{id}/matches retournait directement tous les matchs sans aucun check, donc un viewer non autorisé pouvait connaître les pairings, scores et roomCodes d'un tournoi privé. L'event socket tournament:subscribe acceptait n'importe quel tournamentId et ajoutait le socket à la salle, donc en s'abonnant à un tournoi privé un attaquant recevait en temps réel tous les events (match-ready, match-updated, standings, completed). Les deux surfaces refusent maintenant l'accès si le tournoi est privé et que le viewer/socket n'est pas créateur, admin ou participant."
+      ],
+      "changes_en": [
+        "Following the previous two privacy fixes: the GET /api/tournaments/{id}/matches route returned all matches with zero auth check, so an unauthorized viewer could read the pairings, scores and roomCodes of a private tournament. The socket event tournament:subscribe accepted any tournamentId and added the socket to the room, so by subscribing to a private tournament an attacker received all live events (match-ready, match-updated, standings, completed). Both surfaces now reject access if the tournament is private and the viewer/socket is neither creator, admin nor participant."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois privés : single GET aussi protégé contre l'énumération",
       "title_en": "Private tournaments: single GET also protected from enumeration",
       "changes_fr": [

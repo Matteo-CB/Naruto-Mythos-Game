@@ -72,7 +72,23 @@ function cleanupTournamentMaps(tournamentId: string): void {
 }
 
 export function registerTournamentHandlers(io: Server, socket: Socket) {
-  socket.on('tournament:subscribe', ({ tournamentId }: { tournamentId: string }) => {
+  socket.on('tournament:subscribe', async ({ tournamentId }: { tournamentId: string }) => {
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: tournamentId },
+      select: { isPublic: true, creatorId: true },
+    });
+    if (!tournament) return;
+    if (!tournament.isPublic) {
+      const authedUserId = (socket.data as { userId?: string }).userId;
+      if (!authedUserId) return;
+      if (tournament.creatorId !== authedUserId) {
+        const p = await prisma.tournamentParticipant.findFirst({
+          where: { tournamentId, userId: authedUserId },
+          select: { id: true },
+        });
+        if (!p) return;
+      }
+    }
     socket.join(`tournament:${tournamentId}`);
   });
 
