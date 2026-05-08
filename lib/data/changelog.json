@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois Suisse : double no-show post-room aussi traité comme double défaite",
+      "title_en": "Swiss tournaments: post-room double no-show also handled as double loss",
+      "changes_fr": [
+        "Suite logique de la passe sur le double no-show Swiss au démarrage de round : il existait un autre timer 2 minutes qui se déclenchait après que les deux joueurs aient cliqué 'prêt' mais avant qu'ils n'arrivent réellement dans la room (ex: réseau qui coupe entre les deux events, onglet fermé par accident). Ce second timer choisissait arbitrairement le host comme forfait et donnait la victoire au guest, qui n'était pas non plus dans la room. Le guest récoltait 3 points et un Buchholz immérité. Ce chemin utilise maintenant le même handleSwissDoubleAbsence : 0 point pour les deux, une défaite pour chacun. Pour les formats à élimination, on garde la sélection arbitraire (quelqu'un doit avancer) puisque l'autoForfeitIfEliminated (passe précédente) propage la disqualification au round suivant."
+      ],
+      "changes_en": [
+        "Logical follow-up to the Swiss round-start double no-show fix: there was another 2-minute timer that fired after both players clicked 'ready' but before they actually arrived in the room (e.g. network drop between the two events, tab closed by accident). This second timer was arbitrarily picking the host as forfeit and awarding the win to the guest, who was also not in the room. The guest got 3 points and undeserved Buchholz contribution. This path now uses the same handleSwissDoubleAbsence: 0 points for both, one loss each. For elimination formats, the arbitrary pick remains (someone has to advance) since autoForfeitIfEliminated from the previous fix cascades the disqualification through next rounds."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Cleanup : tournois abandonnés en registration purgés au bout de 30 jours",
       "title_en": "Cleanup: abandoned registration tournaments purged after 30 days",
       "changes_fr": [

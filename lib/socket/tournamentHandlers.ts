@@ -242,6 +242,17 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             const hostJoined = !!r.hostSocket;
             const guestJoined = !!r.guestSocket;
             if (hostJoined && guestJoined) return;
+            if (!hostJoined && !guestJoined) {
+              const t = await prisma.tournament.findUnique({
+                where: { id: tournamentId },
+                select: { format: true },
+              });
+              if (t?.format === 'swiss') {
+                console.log(`[Tournament] Match ${matchId} double no-show: both players did not join within ${TOURNAMENT_JOIN_TIMEOUT_MS}ms`);
+                await handleSwissDoubleAbsence(io, tournamentId, matchId);
+                return;
+              }
+            }
             const absentPlayerId = !hostJoined ? r.hostId : r.guestId;
             if (!absentPlayerId) return;
             console.log(`[Tournament] Match ${matchId} forfeit: player ${absentPlayerId} did not join within ${TOURNAMENT_JOIN_TIMEOUT_MS}ms`);
