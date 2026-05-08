@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : 6e passe d'audit — fixes mineurs et 49 tests exhaustifs",
+      "title_en": "Tournaments: 6th audit pass — minor fixes and 49 exhaustive tests",
+      "changes_fr": [
+        "Annulation de tournoi : les timers d'absence sont maintenant nettoyés pour TOUS les matches en attente (ready ou pending), pas seulement les matches en cours. Plus de forfait fantôme déclenché après une annulation.",
+        "Route /join : les messages d'erreur Prisma bruts ne sont plus exposés au client. Une collision d'inscription simultanée renvoie maintenant 409 'Already joined' au lieu d'un message technique.",
+        "49 tests exhaustifs ajoutés couvrant : Swiss pour chaque N de 2 à 32 (formule rounds, byes, unicité des paires), single élim pour 4/8/16/32 (counts, unicité R1), double élim pour 4/8/16/32 (counts WB+LB+GF, unicité des targets de drop, advance), simulation complète d'un bracket 8 joueurs jusqu'à la grande finale, invariant nextPowerOf2 pour N de 2 à 1024."
+      ],
+      "changes_en": [
+        "Tournament cancellation: absence timers are now cleared for ALL pending matches (ready or pending), not only in-progress ones. No more phantom forfeit fired after a cancel.",
+        "/join route: raw Prisma error messages are no longer exposed to the client. A simultaneous registration collision now returns 409 'Already joined' instead of a technical message.",
+        "49 exhaustive tests added covering: Swiss for every N from 2 to 32 (rounds formula, byes, pairing uniqueness), single elim for 4/8/16/32 (counts, R1 player uniqueness), double elim for 4/8/16/32 (WB+LB+GF counts, drop and advance target uniqueness), full play-through of an 8-player double-elim bracket up to the grand final, nextPowerOf2 invariant for N from 2 to 1024."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : 3 derniers bugs subtils corrigés et tests Swiss 2-3 joueurs",
       "title_en": "Tournaments: 3 last subtle bugs fixed + Swiss 2-3 player tests",
       "changes_fr": [

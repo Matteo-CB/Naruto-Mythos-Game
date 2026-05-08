@@ -83,17 +83,24 @@ export async function POST(
       return NextResponse.json({ error: 'Already joined' }, { status: 400 });
     }
 
-    const participant = await prisma.tournamentParticipant.create({
-      data: {
-        tournamentId: id,
-        userId: session.user.id,
-        username: user?.username || 'Unknown',
-      },
-    });
-
-    return NextResponse.json({ participant }, { status: 201 });
+    try {
+      const participant = await prisma.tournamentParticipant.create({
+        data: {
+          tournamentId: id,
+          userId: session.user.id,
+          username: user?.username || 'Unknown',
+        },
+      });
+      return NextResponse.json({ participant }, { status: 201 });
+    } catch (createErr) {
+      const msg = createErr instanceof Error ? createErr.message : '';
+      if (msg.includes('Unique constraint') || msg.includes('duplicate key')) {
+        return NextResponse.json({ error: 'Already joined' }, { status: 409 });
+      }
+      throw createErr;
+    }
   } catch (err) {
     console.error('[API] POST /api/tournaments/join error:', err instanceof Error ? err.message : err);
-    return NextResponse.json({ error: err instanceof Error ? err.message : 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

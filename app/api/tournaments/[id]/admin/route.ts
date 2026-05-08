@@ -459,11 +459,16 @@ export async function POST(
         }
 
         const inProgressMatches = tournament.matches.filter((m) => m.status === 'in_progress' && m.roomCode);
+        const matchesWithTimer = tournament.matches.filter((m) => m.absenceDeadline !== null);
         const { rooms } = await import('@/lib/socket/server');
         const { clearAbsenceTimer } = await import('@/lib/tournament/absenceManager');
         const io = getSocketIO();
-        for (const m of inProgressMatches) {
+
+        for (const m of matchesWithTimer) {
           clearAbsenceTimer(m.id);
+        }
+
+        for (const m of inProgressMatches) {
           if (m.roomCode && rooms.has(m.roomCode)) {
             const room = rooms.get(m.roomCode)!;
             room.finalized = true;
@@ -479,6 +484,11 @@ export async function POST(
           });
         }
 
+        await prisma.tournamentMatch.updateMany({
+          where: { tournamentId, absenceDeadline: { not: null }, status: { in: ['ready', 'pending'] } },
+          data: { absenceDeadline: null, absentPlayerId: null },
+        });
+
         await prisma.tournament.update({
           where: { id: tournamentId },
           data: { status: 'cancelled' },
@@ -487,7 +497,10 @@ export async function POST(
         await logAdminAction({
           tournamentId, actorId, actorUsername,
           action: 'cancelTournament',
-          details: { in_progress_matches_cancelled: inProgressMatches.length },
+          details: {
+            in_progress_matches_cancelled: inProgressMatches.length,
+            absence_timers_cleared: matchesWithTimer.length,
+          },
         });
         return NextResponse.json({ success: true, message: 'Tournament cancelled (in-progress matches stopped)' });
       }
