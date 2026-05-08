@@ -31,7 +31,7 @@ describe('Tournament logic — Swiss', () => {
   });
 
   it('R1 produces floor(N/2) matches with one bye for odd counts', () => {
-    for (const n of [4, 5, 6, 7, 8, 9, 16, 17, 32]) {
+    for (const n of [2, 3, 4, 5, 6, 7, 8, 9, 16, 17, 32]) {
       const ps: SwissPlayer[] = players(n).map((p, i) => ({ ...p, seed: i + 1 }));
       const r1 = generateSwissRound1(ps);
       const realMatches = r1.filter((m) => m.player2 !== null);
@@ -40,6 +40,25 @@ describe('Tournament logic — Swiss', () => {
       expect(realMatches.length).toBe(Math.floor(n / 2));
       expect(byes.length).toBe(n % 2 === 1 ? 1 : 0);
     }
+  });
+
+  it('Swiss with 2 players: 1 round, 1 match, no bye', () => {
+    const ps: SwissPlayer[] = players(2).map((p, i) => ({ ...p, seed: i + 1 }));
+    expect(computeSwissRoundCount(2)).toBe(1);
+    const r1 = generateSwissRound1(ps);
+    expect(r1.length).toBe(1);
+    expect(r1[0].player2).not.toBeNull();
+  });
+
+  it('Swiss with 3 players: 2 rounds, R1 has 1 match + 1 bye', () => {
+    const ps: SwissPlayer[] = players(3).map((p, i) => ({ ...p, seed: i + 1 }));
+    expect(computeSwissRoundCount(3)).toBe(2);
+    const r1 = generateSwissRound1(ps);
+    expect(r1.length).toBe(2);
+    const real = r1.filter((m) => m.player2 !== null);
+    const bye = r1.filter((m) => m.player2 === null);
+    expect(real.length).toBe(1);
+    expect(bye.length).toBe(1);
   });
 
   it('Bye match in R1 has player1 as the lowest-seed and no player2', () => {

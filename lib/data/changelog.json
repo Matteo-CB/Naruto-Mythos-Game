@@ -2,6 +2,23 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : 3 derniers bugs subtils corrigés et tests Swiss 2-3 joueurs",
+      "title_en": "Tournaments: 3 last subtle bugs fixed + Swiss 2-3 player tests",
+      "changes_fr": [
+        "Race condition très improbable corrigée : la deadline d'absence est maintenant écrite en base AVANT que le timer ne démarre. Si le serveur crashe entre les deux, la réhydratation au boot trouve la deadline et reprend correctement.",
+        "L'action admin 'définir le gagnant' (setMatchWinner) émet désormais les mises à jour socket en temps réel à tous les clients connectés (avant : ils devaient attendre un refresh global).",
+        "setMatchWinner refuse maintenant de modifier un match déjà completed ou forfeit, sauf si l'admin passe explicitement { force: true }. Le winnerId doit aussi correspondre à un des joueurs du match.",
+        "setMatchWinner et la disqualification gèrent désormais l'avancement selon le format (Swiss / simple élim / double élim) au lieu d'utiliser l'avancement single-elim par défaut."
+      ],
+      "changes_en": [
+        "Very unlikely race condition fixed: the absence deadline is now written to the database BEFORE the timer starts. If the server crashes between the two, boot rehydration finds the deadline and reschedules correctly.",
+        "The 'set match winner' admin action (setMatchWinner) now emits socket updates in real-time to all connected clients (before: clients had to wait for a global refresh).",
+        "setMatchWinner now refuses to modify an already completed or forfeit match unless the admin explicitly passes { force: true }. winnerId must also be one of the match players.",
+        "setMatchWinner and disqualify now route advancement based on tournament format (Swiss / single elim / double elim) instead of always using the single-elim path."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : 7 bugs critiques corrigés (forfait, reset, DQ, annulation, race conditions)",
       "title_en": "Tournaments: 7 critical bugs fixed (forfeit, reset, DQ, cancel, race conditions)",
       "changes_fr": [

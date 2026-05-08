@@ -190,11 +190,22 @@ export async function POST(
 
       
       case 'setMatchWinner': {
-        const { matchId, winnerId } = body;
+        const { matchId, winnerId, force } = body;
         if (!matchId || !winnerId) return NextResponse.json({ error: 'matchId and winnerId required' }, { status: 400 });
 
         const match = tournament.matches.find(m => m.id === matchId);
         if (!match) return NextResponse.json({ error: 'Match not found' }, { status: 404 });
+
+        if ((match.status === 'completed' || match.status === 'forfeit') && !force) {
+          return NextResponse.json({
+            error: `Match already ${match.status}. Pass { force: true } to override.`,
+            currentWinnerId: match.winnerId,
+          }, { status: 409 });
+        }
+
+        if (winnerId !== match.player1Id && winnerId !== match.player2Id) {
+          return NextResponse.json({ error: 'winnerId must match one of the match players' }, { status: 400 });
+        }
 
         const winnerUsername = match.player1Id === winnerId ? match.player1Username : match.player2Username;
         const loserId = match.player1Id === winnerId ? match.player2Id : match.player1Id;
@@ -239,7 +250,16 @@ export async function POST(
         });
 
 
-        await advanceMatchWinner(null, tournamentId, match, winnerId, winnerUsername);
+        const ioInst = getSocketIO();
+        if (tournament.format === 'double_elimination') {
+          const { advanceMatchWinnerDoubleElim } = await import('@/lib/socket/tournamentHandlers');
+          await advanceMatchWinnerDoubleElim(ioInst, tournamentId, match as never, winnerId, winnerUsername, loserId);
+        } else if (tournament.format === 'swiss' && ioInst) {
+          const { handleSwissMatchEnd } = await import('@/lib/socket/tournamentHandlers');
+          await handleSwissMatchEnd(ioInst, tournamentId, match);
+        } else {
+          await advanceMatchWinner(ioInst, tournamentId, match, winnerId, winnerUsername);
+        }
 
         await logAdminAction({
           tournamentId, actorId, actorUsername,

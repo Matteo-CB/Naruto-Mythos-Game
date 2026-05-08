@@ -1,7 +1,7 @@
 
 import type { Server, Socket } from 'socket.io';
 import { prisma } from '@/lib/db/prisma';
-import { startAbsenceTimer, clearAbsenceTimer, scheduleAbsenceTimerWithDeadline } from '@/lib/tournament/absenceManager';
+import { startAbsenceTimer, clearAbsenceTimer, scheduleAbsenceTimerWithDeadline, ABSENCE_TIMEOUT_MS } from '@/lib/tournament/absenceManager';
 import { assignTournamentWinnerRole } from '@/lib/discord/tournamentRoles';
 import { sendTournamentResults } from '@/lib/discord/tournamentWebhook';
 import { rooms, type RoomData } from '@/lib/socket/server';
@@ -734,14 +734,6 @@ export async function advanceMatchWinnerDoubleElim(
 
   const bracket = match.bracket as DEBracket;
 
-  const winnerCameFromLosers = bracket === 'losers';
-  if (bracket === 'grand_final' && match.round === 1 && winnerCameFromLosers === false && loserId) {
-    if (loserId === match.player1Id || loserId === match.player2Id) {
-      const winnerWasFromWB = winnerId === match.player1Id;
-      void winnerWasFromWB;
-    }
-  }
-
   if (bracket === 'grand_final' && match.round === 1) {
     const player1WasWB = match.player1Id === winnerId;
     if (!player1WasWB) {
@@ -842,16 +834,17 @@ async function applySlot(
   }
 
   if (io && refreshed.player1Id && refreshed.player2Id && refreshed.status === 'ready') {
-    const deadline = startAbsenceTimer(refreshed.id, async () => {
+    const deadline = new Date(Date.now() + ABSENCE_TIMEOUT_MS);
+    await prisma.tournamentMatch.update({
+      where: { id: refreshed.id },
+      data: { absenceDeadline: deadline },
+    });
+    scheduleAbsenceTimerWithDeadline(refreshed.id, deadline, async () => {
       const ready = matchReadyPlayers.get(refreshed.id);
       const absent1 = !ready?.has(refreshed.player1Id ?? '');
       const forfeitId = absent1 ? refreshed.player1Id! : refreshed.player2Id!;
       await handleMatchForfeit(io, tournamentId, refreshed.id, forfeitId);
       matchReadyPlayers.delete(refreshed.id);
-    });
-    await prisma.tournamentMatch.update({
-      where: { id: refreshed.id },
-      data: { absenceDeadline: deadline },
     });
   }
   io?.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
