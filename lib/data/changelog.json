@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois privés : le joinCode n'est plus exposé par l'API aux non-créateurs",
+      "title_en": "Private tournaments: joinCode no longer exposed by the API to non-creators",
+      "changes_fr": [
+        "L'UI cachait déjà le joinCode des tournois privés aux non-créateurs, mais l'API GET /api/tournaments et GET /api/tournaments/{id} retournaient le joinCode à n'importe qui. Un client appelant l'API directement pouvait récupérer tous les codes des tournois privés et les rejoindre. Désormais, le joinCode est mis à null dans la réponse pour tous les viewers qui ne sont ni le créateur du tournoi, ni admin du site. Les chemins légitimes (création, démarrage, admin) gardent l'accès complet."
+      ],
+      "changes_en": [
+        "The UI already hid the joinCode of private tournaments from non-creators, but the API GET /api/tournaments and GET /api/tournaments/{id} returned the joinCode to anyone. A client calling the API directly could retrieve every private tournament's code and join it. Now, joinCode is set to null in the response for all viewers who are neither the tournament creator nor a site admin. Legitimate paths (create, start, admin) keep full access."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Cleanup : tournois complétés/annulés purgés au bout de 30 jours",
       "title_en": "Cleanup: completed/cancelled tournaments purged after 30 days",
       "changes_fr": [

@@ -40,7 +40,13 @@ export async function GET(
       return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ tournament });
+    const session = await auth();
+    const viewerId = session?.user?.id;
+    const safe = (tournament.creatorId === viewerId || isAdmin(session))
+      ? tournament
+      : { ...tournament, joinCode: null };
+
+    return NextResponse.json({ tournament: safe });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

@@ -34,7 +34,14 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ tournaments });
+    const session = await auth();
+    const viewerId = session?.user?.id;
+    const viewerIsAdmin = isAdmin(session);
+    const safe = tournaments.map(t =>
+      (t.creatorId === viewerId || viewerIsAdmin) ? t : { ...t, joinCode: null },
+    );
+
+    return NextResponse.json({ tournaments: safe });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
