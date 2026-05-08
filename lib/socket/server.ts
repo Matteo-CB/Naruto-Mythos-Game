@@ -6,7 +6,7 @@ import { prisma } from '@/lib/db/prisma';
 import { calculateEloChanges } from '@/lib/elo/elo';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
 import { sendRankUpNotification } from '@/lib/discord/rankUpWebhook';
-import { registerTournamentHandlers, handleTournamentMatchEnd, rehydrateAbsenceTimers } from '@/lib/socket/tournamentHandlers';
+import { registerTournamentHandlers, handleTournamentMatchEnd, rehydrateAbsenceTimers, sweepOrphanTournamentMatches } from '@/lib/socket/tournamentHandlers';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
@@ -1158,6 +1158,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
   rehydrateAbsenceTimers(io).catch((err) => {
     console.error('[Tournament] Initial absence rehydrate error:', err);
   });
+  sweepOrphanTournamentMatches(io).catch((err) => {
+    console.error('[Tournament] Initial orphan sweep error:', err);
+  });
+  setInterval(() => sweepOrphanTournamentMatches(io).catch(() => {}), 5 * 60_000);
 
 
   setInterval(() => cleanupStaleRooms(), 60_000);

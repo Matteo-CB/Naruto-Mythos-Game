@@ -45,7 +45,19 @@ export async function POST(
       return NextResponse.json({ error: 'Tournament already started or completed' }, { status: 400 });
     }
 
-    
+
+    if (tournament.useBanList) {
+      const globalBans = await prisma.bannedCard.findMany({ select: { cardId: true } });
+      const merged = new Set<string>([...(tournament.bannedCardIds ?? []), ...globalBans.map(b => b.cardId)]);
+      await prisma.tournament.update({
+        where: { id },
+        data: { bannedCardIds: Array.from(merged), useBanList: false },
+      });
+      tournament.bannedCardIds = Array.from(merged);
+      tournament.useBanList = false;
+    }
+
+
     if (tournament.gameMode !== 'sealed') {
       const invalidPlayers = tournament.participants.filter(p => !p.deckValid || !p.deckId);
       for (const p of invalidPlayers) {

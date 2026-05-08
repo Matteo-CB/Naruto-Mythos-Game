@@ -201,6 +201,35 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
 }
 
 
+export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
+  try {
+    const inProgress = await prisma.tournamentMatch.findMany({
+      where: { status: 'in_progress' },
+      select: { id: true, tournamentId: true, roomCode: true, startedAt: true, player1Id: true, player2Id: true },
+    });
+    if (inProgress.length === 0) return;
+    for (const m of inProgress) {
+      if (!m.roomCode) continue;
+      if (rooms.has(m.roomCode)) continue;
+      const startedMs = m.startedAt ? m.startedAt.getTime() : 0;
+      const ageMs = Date.now() - startedMs;
+      if (ageMs < 60_000) continue;
+      console.log(`[Tournament] Orphan match detected ${m.id} (room ${m.roomCode} gone, age ${Math.round(ageMs / 1000)}s) — resetting to ready`);
+      const newStatus = m.player1Id && m.player2Id ? 'ready' : 'pending';
+      await prisma.tournamentMatch.update({
+        where: { id: m.id },
+        data: { status: newStatus, roomCode: null, startedAt: null, absenceDeadline: null, absentPlayerId: null },
+      });
+      io.to(`tournament:${m.tournamentId}`).emit('tournament:match-updated', {
+        matchId: m.id, status: newStatus, roomCode: null,
+      });
+    }
+  } catch (err) {
+    console.error('[Tournament] sweepOrphanTournamentMatches error:', err);
+  }
+}
+
+
 export async function rehydrateAbsenceTimers(io: Server): Promise<void> {
   try {
     const pendingMatches = await prisma.tournamentMatch.findMany({

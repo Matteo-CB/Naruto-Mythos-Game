@@ -10,6 +10,8 @@ export const GAME_TTL_MS = 72 * 60 * 60 * 1000; // 72 hours
 
 export const ELO_HISTORY_TTL_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
 
+export const TOURNAMENT_ADMIN_LOG_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
 let lastCleanup = 0;
 const CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // Run at most once per hour
 
@@ -50,6 +52,15 @@ export async function cleanupOldGames(): Promise<void> {
     });
     if (eloPurge.count > 0) {
       console.log(`[GameCleanup] Deleted ${eloPurge.count} EloHistory rows older than 14 days`);
+    }
+
+
+    const adminLogCutoff = new Date(now - TOURNAMENT_ADMIN_LOG_TTL_MS);
+    const adminLogPurge = await prisma.tournamentAdminLog.deleteMany({
+      where: { createdAt: { lt: adminLogCutoff } },
+    });
+    if (adminLogPurge.count > 0) {
+      console.log(`[GameCleanup] Deleted ${adminLogPurge.count} TournamentAdminLog rows older than 30 days`);
     }
   } catch (err) {
     console.error('[GameCleanup] Error during cleanup:', err);

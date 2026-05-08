@@ -6,6 +6,34 @@ import { advanceMatchWinner } from '@/lib/socket/tournamentHandlers';
 import { getSocketIO } from '@/lib/socket/server';
 import { computeStandings } from '@/lib/tournament/swissEngine';
 
+async function logAdminAction(params: {
+  tournamentId: string;
+  actorId: string;
+  actorUsername: string;
+  action: string;
+  targetUserId?: string;
+  targetUsername?: string;
+  matchId?: string;
+  details?: Record<string, unknown>;
+}): Promise<void> {
+  try {
+    await prisma.tournamentAdminLog.create({
+      data: {
+        tournamentId: params.tournamentId,
+        actorId: params.actorId,
+        actorUsername: params.actorUsername,
+        action: params.action,
+        targetUserId: params.targetUserId,
+        targetUsername: params.targetUsername,
+        matchId: params.matchId,
+        details: params.details as never,
+      },
+    });
+  } catch (err) {
+    console.error('[Tournament] logAdminAction error:', err);
+  }
+}
+
 async function broadcastTournamentRefresh(tournamentId: string): Promise<void> {
   const io = getSocketIO();
   if (!io) return;
@@ -80,6 +108,9 @@ export async function POST(
     const body = await request.json();
     const { action } = body;
 
+    const actorId = session.user.id;
+    const actorUsername = session.user.name ?? 'unknown';
+
     switch (action) {
       
       case 'disqualify': {
@@ -112,6 +143,14 @@ export async function POST(
           }
         }
 
+        const dqUser = await prisma.user.findUnique({ where: { id: userId }, select: { username: true } });
+        await logAdminAction({
+          tournamentId, actorId, actorUsername,
+          action: 'disqualify',
+          targetUserId: userId,
+          targetUsername: dqUser?.username,
+          details: { reason: reason ?? null },
+        });
         await broadcastTournamentRefresh(tournamentId);
         return NextResponse.json({ success: true, message: `Player disqualified${reason ? ': ' + reason : ''}` });
       }
@@ -169,6 +208,14 @@ export async function POST(
 
         await advanceMatchWinner(null, tournamentId, match, winnerId, winnerUsername);
 
+        await logAdminAction({
+          tournamentId, actorId, actorUsername,
+          action: 'setMatchWinner',
+          targetUserId: winnerId,
+          targetUsername: winnerUsername ?? undefined,
+          matchId,
+          details: { round: match.round, matchIndex: match.matchIndex, previousWinnerId: previousWinnerId ?? null },
+        });
         await broadcastTournamentRefresh(tournamentId);
         return NextResponse.json({ success: true, message: `Match winner set to ${winnerUsername}` });
       }
@@ -207,6 +254,12 @@ export async function POST(
           });
         }
 
+        await logAdminAction({
+          tournamentId, actorId, actorUsername,
+          action: 'resetMatch',
+          matchId: resetMatchId,
+          details: { round: match.round, matchIndex: match.matchIndex },
+        });
         await broadcastTournamentRefresh(tournamentId);
         return NextResponse.json({ success: true, message: 'Match reset' });
       }
@@ -232,6 +285,13 @@ export async function POST(
           },
         });
 
+        await logAdminAction({
+          tournamentId, actorId, actorUsername,
+          action: 'banPlayer',
+          targetUserId: banUserId,
+          targetUsername: user?.username,
+          details: { permanent: permanent ?? false, durationDays: durationDays ?? 7, reason: banReason ?? null },
+        });
         return NextResponse.json({ success: true, message: `Player banned from tournaments${permanent ? ' (permanent)' : ` for ${durationDays || 7} days`}` });
       }
 
@@ -244,6 +304,11 @@ export async function POST(
           where: { userId: unbanUserId, type: 'tournament' },
         });
 
+        await logAdminAction({
+          tournamentId, actorId, actorUsername,
+          action: 'unbanPlayer',
+          targetUserId: unbanUserId,
+        });
         return NextResponse.json({ success: true, message: 'Tournament ban removed' });
       }
 
@@ -258,6 +323,10 @@ export async function POST(
         });
         const io = getSocketIO();
         if (io) io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'admin' });
+        await logAdminAction({
+          tournamentId, actorId, actorUsername,
+          action: 'cancelTournament',
+        });
         return NextResponse.json({ success: true, message: 'Tournament cancelled' });
       }
 
@@ -268,8 +337,15 @@ export async function POST(
         if (tournament.status !== 'registration') {
           return NextResponse.json({ error: 'Can only remove during registration' }, { status: 400 });
         }
+        const removedUser = await prisma.user.findUnique({ where: { id: removeUserId }, select: { username: true } });
         await prisma.tournamentParticipant.deleteMany({
           where: { tournamentId, userId: removeUserId },
+        });
+        await logAdminAction({
+          tournamentId, actorId, actorUsername,
+          action: 'removeParticipant',
+          targetUserId: removeUserId,
+          targetUsername: removedUser?.username,
         });
         return NextResponse.json({ success: true, message: 'Participant removed' });
       }

@@ -286,6 +286,21 @@ model TournamentMatch {
   @@unique([tournamentId, round, matchIndex])
 }
 
+model TournamentAdminLog {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  tournamentId   String   @db.ObjectId
+  actorId        String   @db.ObjectId
+  actorUsername  String
+  action         String
+  targetUserId   String?  @db.ObjectId
+  targetUsername String?
+  matchId        String?  @db.ObjectId
+  details        Json?
+  createdAt      DateTime @default(now())
+
+  @@index([tournamentId, createdAt])
+}
+
 model CardIssue {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   cardIds     String[] // Array of card IDs sharing the same issue

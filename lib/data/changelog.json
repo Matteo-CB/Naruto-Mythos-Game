@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : audit log, banlist gelée au start, détection des matches orphelins",
+      "title_en": "Tournaments: admin audit log, ban list frozen at start, orphan match detection",
+      "changes_fr": [
+        "Toutes les actions admin sur un tournoi (DQ, set winner, reset match, ban joueur, annulation, retrait participant) sont enregistrées dans un journal d'audit, conservé 30 jours pour ne pas saturer la base.",
+        "La liste des cartes interdites est gelée au démarrage du tournoi : ajouter une carte au banlist global après le start n'invalide plus les decks déjà sélectionnés.",
+        "Détection automatique des matches orphelins : un match in_progress dont la salle a disparu (ex: redémarrage serveur) est remis en 'ready' pour que les joueurs puissent recommencer. Sweep toutes les 5 minutes."
+      ],
+      "changes_en": [
+        "All admin actions on a tournament (DQ, set winner, reset match, ban player, cancel, remove participant) are recorded in an audit log, kept for 30 days to avoid database bloat.",
+        "The ban list is frozen at tournament start: adding a card to the global ban list after start no longer invalidates already-selected decks.",
+        "Auto-detection of orphan matches: an in_progress match whose room is gone (e.g. server restart) is reset to 'ready' so players can re-ready. Sweep runs every 5 minutes."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : audit complet, plus de tournois bloqués, timers raccourcis",
       "title_en": "Tournaments: full audit, no more stuck tournaments, shorter timers",
       "changes_fr": [
