@@ -206,7 +206,39 @@ export async function POST(
         return NextResponse.json({ success: true, message: `Player disqualified${reason ? ': ' + reason : ''}` });
       }
 
-      
+
+      case 'reinstate': {
+        const { userId } = body;
+        if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
+        if (tournament.status !== 'registration') {
+          return NextResponse.json({ error: 'Can only reinstate during registration' }, { status: 400 });
+        }
+        const participant = await prisma.tournamentParticipant.findFirst({
+          where: { tournamentId, userId },
+          select: { id: true, eliminated: true },
+        });
+        if (!participant) {
+          return NextResponse.json({ error: 'Participant not found in this tournament' }, { status: 404 });
+        }
+        if (!participant.eliminated) {
+          return NextResponse.json({ error: 'Participant is not eliminated' }, { status: 400 });
+        }
+        await prisma.tournamentParticipant.update({
+          where: { id: participant.id },
+          data: { eliminated: false, eliminatedRound: null },
+        });
+        const reUser = await prisma.user.findUnique({ where: { id: userId }, select: { username: true } });
+        await logAdminAction({
+          tournamentId, actorId, actorUsername,
+          action: 'reinstate',
+          targetUserId: userId,
+          targetUsername: reUser?.username,
+        });
+        await broadcastTournamentRefresh(tournamentId);
+        return NextResponse.json({ success: true, message: 'Participant reinstated' });
+      }
+
+
       case 'setMatchWinner': {
         const { matchId, winnerId, force } = body;
         if (!matchId || !winnerId) return NextResponse.json({ error: 'matchId and winnerId required' }, { status: 400 });

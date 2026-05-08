@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Admin : action 'reinstate' pour annuler un DQ erroné en registration",
+      "title_en": "Admin: 'reinstate' action to undo an erroneous DQ during registration",
+      "changes_fr": [
+        "Trou fonctionnel : une fois un participant disqualifié par admin pendant la phase registration, il n'y avait aucun moyen de le réintégrer si le DQ était une erreur (mauvais clic, mauvais joueur visé). En élim ou double élim, ça pouvait rendre le tournoi non-startable parce que le filtre eliminated (passe précédente) le retirait du décompte et le résultat tombait hors des valeurs valides 4/8/16/32. La nouvelle action admin 'reinstate' remet eliminated=false sur un participant donné, mais uniquement pendant la phase registration (pas en cours, pour éviter de casser le bracket). Le user doit déjà être eliminated pour être reinstatable. L'action est loguée dans le journal d'audit et déclenche un broadcast pour mettre à jour les autres clients."
+      ],
+      "changes_en": [
+        "Functional gap: once a participant was disqualified by admin during the registration phase, there was no way to reinstate them if the DQ was a mistake (wrong click, wrong target). In elim or double-elim, this could make the tournament non-startable because the eliminated filter (from the previous pass) removed them from the count and the result fell out of the valid 4/8/16/32 values. The new admin 'reinstate' action sets eliminated=false on a given participant, but only during the registration phase (not in_progress, to avoid breaking the bracket). The user must already be eliminated to be reinstatable. The action is audit-logged and triggers a broadcast to refresh other clients."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : un cancel d'un autre tournoi ne casse plus la partie en cours",
       "title_en": "Tournaments: cancelling another tournament no longer breaks the current game",
       "changes_fr": [
