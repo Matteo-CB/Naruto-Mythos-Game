@@ -57,6 +57,7 @@ import { POST as joinByCodePOST } from '../../app/api/tournaments/join-by-code/r
 import { GET as singleGET, DELETE as singleDELETE } from '../../app/api/tournaments/[id]/route';
 import { POST as startPOST } from '../../app/api/tournaments/[id]/start/route';
 import { GET as listGET, POST as createPOST } from '../../app/api/tournaments/route';
+import { GET as matchesListGET } from '../../app/api/tournaments/[id]/matches/route';
 
 const p = prisma as never as {
   tournament: { findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn>; delete: ReturnType<typeof vi.fn>; findMany: ReturnType<typeof vi.fn> };
@@ -392,6 +393,39 @@ describe('GET /api/tournaments (list)', () => {
     const body = await res.json();
     expect(body.tournaments).toHaveLength(1);
     expect(body.tournaments[0].joinCode).toBeNull();
+  });
+});
+
+describe('GET /api/tournaments/[id]/matches', () => {
+  it('returns 404 when tournament does not exist', async () => {
+    p.tournament.findUnique.mockResolvedValue(null);
+    const res = await matchesListGET(new Request('http://localhost/') as never, { params: params('t1') });
+    expect(res.status).toBe(404);
+  });
+  it('returns 200 with matches for public tournament', async () => {
+    p.tournament.findUnique.mockResolvedValue({ isPublic: true, creatorId: 'c1' });
+    p.tournamentMatch.findMany.mockResolvedValue([{ id: 'm1', round: 1 }]);
+    const res = await matchesListGET(new Request('http://localhost/') as never, { params: params('t1') });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.matches).toHaveLength(1);
+  });
+  it('hides matches from non-participant for private tournament (404)', async () => {
+    authMock.mockResolvedValue({ user: { id: 'random' } });
+    p.tournament.findUnique.mockResolvedValue({ isPublic: false, creatorId: 'someone' });
+    p.tournamentParticipant.findFirst.mockResolvedValue(null);
+    const res = await matchesListGET(new Request('http://localhost/') as never, { params: params('t1') });
+    expect(res.status).toBe(404);
+  });
+  it('shows matches to participant of private tournament', async () => {
+    authMock.mockResolvedValue({ user: { id: 'partUser' } });
+    p.tournament.findUnique.mockResolvedValue({ isPublic: false, creatorId: 'someone' });
+    p.tournamentParticipant.findFirst.mockResolvedValue({ id: 'p1' });
+    p.tournamentMatch.findMany.mockResolvedValue([{ id: 'm1' }, { id: 'm2' }]);
+    const res = await matchesListGET(new Request('http://localhost/') as never, { params: params('t1') });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.matches).toHaveLength(2);
   });
 });
 
