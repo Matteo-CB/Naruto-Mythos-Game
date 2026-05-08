@@ -21,6 +21,15 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
     return { ok: false, status: 400, error: 'Tournament already started or completed' };
   }
 
+  const partialMatches = await prisma.tournamentMatch.findFirst({
+    where: { tournamentId },
+    select: { id: true },
+  });
+  if (partialMatches) {
+    await prisma.tournamentMatch.deleteMany({ where: { tournamentId } });
+    console.log(`[Tournament] executeTournamentStart: cleaned partial bracket for ${tournamentId} before retry`);
+  }
+
   if (tournament.useBanList) {
     const globalBans = await prisma.bannedCard.findMany({ select: { cardId: true } });
     const merged = new Set<string>([...(tournament.bannedCardIds ?? []), ...globalBans.map(b => b.cardId)]);

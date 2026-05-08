@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : démarrage idempotent même après crash partiel",
+      "title_en": "Tournaments: start is idempotent even after partial crash",
+      "changes_fr": [
+        "executeTournamentStart enchaînait plusieurs étapes non-transactionnelles : freeze banlist, génération sealed pools, re-validation decks, attribution seeds, création des matchs, mise à jour status. Si quoi que ce soit plantait après création partielle de matchs (par exemple 4 matchs sur 8 créés puis erreur DB transient), le tournoi restait en registration et un retry hit la contrainte unique sur les 4 matchs déjà existants. Status restait coincé. Désormais, en début de fonction on détecte les matchs partiels d'une exécution précédente. Si trouvés (le tournoi étant encore en registration), on les supprime avant de re-générer proprement. Le retry réussit. Note : ne s'active QUE si le tournoi est encore en registration, donc pas de risque de wipe d'un bracket d'un tournoi en cours."
+      ],
+      "changes_en": [
+        "executeTournamentStart chained several non-transactional steps: banlist freeze, sealed pool generation, deck re-validation, seed assignment, match creation, status update. If anything crashed after a partial match creation (say 4 of 8 matches created then a transient DB error), the tournament stayed in registration and a retry hit the unique constraint on the 4 already-existing matches. Status was wedged. Now, at the top of the function, we detect partial matches from a prior failed run. If found (and the tournament is still in registration), we wipe them before re-generating cleanly. The retry succeeds. Note: this only triggers if the tournament is still in registration, so there is no risk of nuking the bracket of an in-progress tournament."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois double-élim : currentRound enfin mis à jour quand on progresse",
       "title_en": "Double-elim tournaments: currentRound finally updates as rounds progress",
       "changes_fr": [
