@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : 12 tests E2E supplémentaires (cycle complet de tournoi)",
+      "title_en": "Tournaments: 12 more E2E tests (full tournament lifecycle)",
+      "changes_fr": [
+        "12 nouveaux tests qui simulent le cycle complet d'un tournoi du début à la fin : génération R1 → résolution → pairings R2 → résolution → standings finaux. Couverture pour Swiss 4/5/8/16 joueurs et double élimination 4/8 joueurs.",
+        "Vérifications additionnelles : pas de rematch sur 8 joueurs en Swiss, byes correctement distribués sur 5 joueurs, top seed gagne tous ses matches, gagnant du WB est player1 de la grande finale et perdant du LB est player2."
+      ],
+      "changes_en": [
+        "12 new tests simulating the full tournament lifecycle from start to finish: R1 generation → resolution → R2 pairings → resolution → final standings. Coverage for Swiss 4/5/8/16 players and double elimination 4/8 players.",
+        "Additional checks: no rematches across 3 rounds of 8-player Swiss, byes correctly distributed in 5-player Swiss, top seed wins all matches, WB winner is player1 of grand final and LB winner is player2."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : 7e passe — extraction validation deck + 34 tests dynamiques",
       "title_en": "Tournaments: 7th pass — deck validation extracted + 34 dynamic tests",
       "changes_fr": [
