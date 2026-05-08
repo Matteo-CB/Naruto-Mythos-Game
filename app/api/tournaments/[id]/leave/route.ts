@@ -28,9 +28,35 @@ export async function POST(
       return NextResponse.json({ error: 'Creator cannot leave. Cancel the tournament instead.' }, { status: 400 });
     }
 
+    const existing = await prisma.tournamentParticipant.findFirst({
+      where: { tournamentId: id, userId: session.user.id },
+    });
+
     await prisma.tournamentParticipant.deleteMany({
       where: { tournamentId: id, userId: session.user.id },
     });
+
+    const fresh = await prisma.tournament.findUnique({
+      where: { id },
+      select: { status: true },
+    });
+    if (fresh?.status !== 'registration' && existing) {
+      await prisma.tournamentParticipant.create({
+        data: {
+          tournamentId: existing.tournamentId,
+          userId: existing.userId,
+          username: existing.username,
+          seed: existing.seed,
+          eliminated: existing.eliminated,
+          eliminatedRound: existing.eliminatedRound,
+          hasBye: existing.hasBye,
+          deckId: existing.deckId,
+          deckValid: existing.deckValid,
+          sealedPool: existing.sealedPool ?? undefined,
+        },
+      }).catch(() => {});
+      return NextResponse.json({ error: 'Tournament started before your leave was processed' }, { status: 400 });
+    }
 
     const io = getSocketIO();
     if (io) io.to(`tournament:${id}`).emit('tournament:refresh');

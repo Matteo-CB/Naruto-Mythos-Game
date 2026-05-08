@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois /leave : même fenêtre de course avec auto-start fermée",
+      "title_en": "Tournament /leave: same race window with auto-start closed",
+      "changes_fr": [
+        "Pendant que /join et /select-deck étaient déjà protégés contre la course avec l'auto-start (passes 46-47), /leave avait encore le même trou. Si un participant cliquait Quitter pile au moment où le tournoi auto-démarrait, l'ordre des opérations était : lecture du status à 'registration', auto-start fire (status passe à 'in_progress', bracket généré incluant ce participant), suppression du participant. Résultat : le bracket référence un participant qui n'existe plus. Ses matchs futurs auraient attendu 2 minutes en absence-timer avant de forfeit. Désormais on snapshot le record participant avant le delete, on vérifie le status après, et si le tournoi a démarré entre temps on recrée le participant à l'identique et on retourne 400."
+      ],
+      "changes_en": [
+        "While /join and /select-deck were already protected against the auto-start race (passes 46-47), /leave still had the same gap. If a participant clicked Leave right as the tournament auto-started, the operation order was: read status='registration', auto-start fires (status flips to 'in_progress', bracket generated including this participant), participant deletion. Result: the bracket references a participant who no longer exists. Their future matches would have waited 2 minutes on absence-timer before forfeiting. Now we snapshot the participant record before the delete, re-check status after, and if the tournament started in the meantime we recreate the participant identically and return 400."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Memory leak persistant après cancel/delete admin corrigé",
       "title_en": "Persistent memory leak after admin cancel/delete fixed",
       "changes_fr": [
