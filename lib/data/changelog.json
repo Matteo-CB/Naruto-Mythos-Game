@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Admin setMatchWinner force : refus de l'override si la chaîne avale a déjà avancé",
+      "title_en": "Admin setMatchWinner force: refuses override when downstream chain has already advanced",
+      "changes_fr": [
+        "L'action admin setMatchWinner avec force=true permettait de réécrire le gagnant d'un match déjà complété, et propageait le nouveau gagnant à la slot suivante du bracket. Mais si l'ancien gagnant avait déjà joué et gagné des matchs encore plus loin, ces matchs n'étaient pas nettoyés. Exemple en single-élim : A gagne R1, A gagne R2, A est en R3. Admin force-override R1 pour B. Le code mettait B en slot R2 (overwriting A) mais R3 contenait toujours A en slot, le bracket devenait incohérent. Désormais, l'override est refusé si le match suivant (single-élim) ou n'importe quel match downstream impliquant l'ancien gagnant (double-élim) a déjà conclu. Le message d'erreur indique précisément quel match doit être reset d'abord."
+      ],
+      "changes_en": [
+        "The admin setMatchWinner action with force=true allowed rewriting the winner of an already-completed match, and would propagate the new winner into the next bracket slot. But if the previous winner had already played and won matches further down, those matches were not cleaned up. Example in single-elim: A wins R1, A wins R2, A is in R3. Admin force-overrides R1 for B. The code put B in R2 slot (overwriting A) but R3 still had A in slot, bracket inconsistent. Now the override is refused if the immediate next match (single-elim) or any downstream match involving the previous winner (double-elim) has already concluded. The error message identifies which match needs to be reset first."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : un joueur disqualifié ne peut plus être déclaré champion",
       "title_en": "Tournaments: a disqualified player can no longer be declared champion",
       "changes_fr": [

@@ -225,6 +225,30 @@ export async function POST(
         const loserId = match.player1Id === winnerId ? match.player2Id : match.player1Id;
         const previousWinnerId = match.winnerId;
 
+        if (force && previousWinnerId && previousWinnerId !== winnerId && tournament.format !== 'swiss') {
+          let blockingMatch: { round: number; matchIndex: number; bracket: string | null } | null = null;
+          if (tournament.format === 'elimination') {
+            const nextMatchInBracket = tournament.matches.find(m =>
+              m.bracket === match.bracket && m.round === match.round + 1 && m.matchIndex === Math.floor(match.matchIndex / 2),
+            );
+            if (nextMatchInBracket && (nextMatchInBracket.status === 'completed' || nextMatchInBracket.status === 'forfeit')) {
+              blockingMatch = nextMatchInBracket;
+            }
+          } else if (tournament.format === 'double_elimination') {
+            const downstream = tournament.matches.filter(m =>
+              (m.player1Id === previousWinnerId || m.player2Id === previousWinnerId) &&
+              m.id !== match.id &&
+              (m.status === 'completed' || m.status === 'forfeit'),
+            );
+            if (downstream.length > 0) blockingMatch = downstream[0];
+          }
+          if (blockingMatch) {
+            return NextResponse.json({
+              error: `Cannot override: match ${blockingMatch.bracket ?? 'main'} R${blockingMatch.round} M${blockingMatch.matchIndex} has already concluded with the previous winner. Reset that match first to clear the chain.`,
+            }, { status: 409 });
+          }
+        }
+
         await prisma.tournamentMatch.update({
           where: { id: matchId },
           data: { status: 'completed', winnerId, winnerUsername, completedAt: new Date() },
