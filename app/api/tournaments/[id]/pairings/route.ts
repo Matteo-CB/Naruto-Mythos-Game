@@ -52,13 +52,31 @@ export async function POST(
       return NextResponse.json({ error: 'orderedPlayerIds array required' }, { status: 400 });
     }
 
-    
+    const participantUserIds = new Set(tournament.participants.map((p) => p.userId));
+    for (const uid of orderedPlayerIds) {
+      if (typeof uid !== 'string' || !participantUserIds.has(uid)) {
+        return NextResponse.json({
+          error: 'orderedPlayerIds must contain only userIds of participants in this tournament',
+        }, { status: 400 });
+      }
+    }
+
     for (let i = 0; i < orderedPlayerIds.length; i++) {
       await prisma.tournamentParticipant.updateMany({
         where: { tournamentId: id, userId: orderedPlayerIds[i] },
         data: { seed: i + 1 },
       });
     }
+
+    await prisma.tournamentAdminLog.create({
+      data: {
+        tournamentId: id,
+        actorId: session.user.id,
+        actorUsername: session.user.name ?? 'unknown',
+        action: 'setManualSeeds',
+        details: { seedCount: orderedPlayerIds.length } as never,
+      },
+    }).catch((err) => console.error('[Tournament] pairings audit log failed:', err));
 
     return NextResponse.json({ success: true });
   } catch {

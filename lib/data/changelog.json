@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : suppression sécurisée + validation des seeds manuels",
+      "title_en": "Tournaments: safe deletion + manual seed validation",
+      "changes_fr": [
+        "DELETE tournoi refuse maintenant de supprimer un tournoi en cours (status='in_progress'). L'admin doit d'abord l'annuler. La suppression nettoie aussi les logs d'audit du tournoi, et tout est fait dans une transaction Prisma pour éviter les états incohérents si une étape échoue.",
+        "Pairings manuels : la route valide désormais que tous les userIds fournis correspondent à des participants du tournoi (rejet 400 sinon, au lieu d'un silencieux no-op). L'action est aussi loguée dans le journal d'audit admin."
+      ],
+      "changes_en": [
+        "DELETE tournament now refuses to delete an in-progress tournament (status='in_progress'). The admin must cancel it first. Deletion now also clears the tournament's audit logs, all wrapped in a Prisma transaction to avoid inconsistent state if a step fails.",
+        "Manual pairings: the route now validates that all provided userIds match actual tournament participants (400 rejection otherwise, instead of a silent no-op). The action is also logged to the admin audit journal."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : faille d'authentification corrigée sur les events socket",
       "title_en": "Tournaments: socket-event auth bypass fixed",
       "changes_fr": [

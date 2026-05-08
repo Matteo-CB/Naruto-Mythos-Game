@@ -68,10 +68,18 @@ export async function DELETE(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    
-    await prisma.tournamentMatch.deleteMany({ where: { tournamentId: id } });
-    await prisma.tournamentParticipant.deleteMany({ where: { tournamentId: id } });
-    await prisma.tournament.delete({ where: { id } });
+    if (tournament.status === 'in_progress') {
+      return NextResponse.json({
+        error: 'Cannot delete an in-progress tournament. Cancel it first.',
+      }, { status: 400 });
+    }
+
+    await prisma.$transaction([
+      prisma.tournamentMatch.deleteMany({ where: { tournamentId: id } }),
+      prisma.tournamentParticipant.deleteMany({ where: { tournamentId: id } }),
+      prisma.tournamentAdminLog.deleteMany({ where: { tournamentId: id } }),
+      prisma.tournament.delete({ where: { id } }),
+    ]);
 
     return NextResponse.json({ success: true });
   } catch {
