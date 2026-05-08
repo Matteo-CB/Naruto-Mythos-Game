@@ -67,12 +67,21 @@ export async function cleanupOldGames(): Promise<void> {
 
 
     const tournamentCutoff = new Date(now - TOURNAMENT_TTL_MS);
+    const nowDate = new Date(now);
     const oldTournaments = await prisma.tournament.findMany({
       where: {
         OR: [
           { status: 'completed', completedAt: { lt: tournamentCutoff } },
           { status: 'cancelled', completedAt: { lt: tournamentCutoff } },
           { status: 'cancelled', completedAt: null, createdAt: { lt: tournamentCutoff } },
+          {
+            status: 'registration',
+            createdAt: { lt: tournamentCutoff },
+            OR: [
+              { scheduledStartAt: null },
+              { scheduledStartAt: { lt: nowDate } },
+            ],
+          },
         ],
       },
       select: { id: true },

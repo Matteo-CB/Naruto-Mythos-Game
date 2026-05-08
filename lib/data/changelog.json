@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Cleanup : tournois abandonnés en registration purgés au bout de 30 jours",
+      "title_en": "Cleanup: abandoned registration tournaments purged after 30 days",
+      "changes_fr": [
+        "Le TTL de la passe précédente couvrait les tournois completed et cancelled mais oubliait les tournois bloqués en registration : un admin qui crée un tournoi sans scheduledStartAt et l'oublie, ou un tournoi dont le scheduledStartAt est passé sans auto-démarrage (par exemple le serveur était down à l'heure prévue). Ces fantômes restaient indéfiniment en BDD avec leurs participants. Désormais le cleanup horaire les purge aussi : status registration + createdAt > 30 jours + (pas de scheduledStartAt OU scheduledStartAt déjà passé). Les tournois programmés dans le futur restent intacts."
+      ],
+      "changes_en": [
+        "The previous TTL covered completed and cancelled tournaments but missed tournaments stuck in registration: an admin creating a tournament without scheduledStartAt and forgetting it, or a tournament whose scheduledStartAt passed without auto-start firing (for example the server was down at the time). These ghosts stayed in DB forever with their participants. The hourly cleanup now also purges them: status=registration + createdAt > 30 days + (no scheduledStartAt OR scheduledStartAt already in the past). Tournaments scheduled in the future stay untouched."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Matchmaking et rematch bloqués pendant un match de tournoi",
       "title_en": "Matchmaking and rematch blocked during a tournament match",
       "changes_fr": [
