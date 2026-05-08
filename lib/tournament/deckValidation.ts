@@ -64,9 +64,10 @@ export function validateDeckForTournament(deck: DeckData, tournament: Tournament
       const card = getCardById(cardId);
       if (!card) continue;
 
-      copyCounts[cardId] = (copyCounts[cardId] ?? 0) + 1;
-      if (copyCounts[cardId] > maxCopies) {
-        errors.push(`Too many copies of ${card.name_fr} (${cardId}): max ${maxCopies}`);
+      const versionKey = card.number ? `n:${card.number}` : `id:${cardId}`;
+      copyCounts[versionKey] = (copyCounts[versionKey] ?? 0) + 1;
+      if (copyCounts[versionKey] > maxCopies) {
+        errors.push(`Too many copies of ${card.name_fr} (number ${card.number || cardId}): max ${maxCopies}`);
       }
 
       const rarity = card.rarity;

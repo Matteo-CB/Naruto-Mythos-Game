@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Validation deck : Rare Art compte comme la même version que sa Rare de base",
+      "title_en": "Deck validation: Rare Art counts as the same version as its base Rare",
+      "changes_fr": [
+        "Le rulebook officiel précise que les variantes Rare Art (RA) partagent la version de leur Rare de base : un joueur ne peut donc pas avoir plus de 2 copies d'une carte 104 même en mixant 2x KS-104-R + 2x KS-104-RA. Le validateur de tournoi comptait pourtant les copies par cardId complet (rarité incluse), donc 2x R + 2x RA = 4 copies passaient validation. Désormais, le compteur de copies utilise card.number comme clé : 104 d'un côté, 104 de l'autre via la RA, total 4 → erreur. Conformité avec la règle 'Max 2 copies of the same version'."
+      ],
+      "changes_en": [
+        "The official rulebook states that Rare Art (RA) variants share the version of their base Rare: a player cannot have more than 2 copies of card 104 even by mixing 2x KS-104-R + 2x KS-104-RA. The tournament validator was counting copies by full cardId (rarity included), so 2x R + 2x RA = 4 copies passed validation. Now the copy counter uses card.number as the key: 104 on one side, 104 via the RA on the other, total 4 → error. Compliance with the 'Max 2 copies of the same version' rule."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : ban de jeu (gameBanned) aussi appliqué à la jointure",
       "title_en": "Tournaments: game ban (gameBanned) also enforced on join",
       "changes_fr": [

@@ -201,4 +201,37 @@ describe('validateDeckForTournament — combinations', () => {
     );
     expect(r.errors.filter((e) => e.includes(KS_001_C)).length).toBe(1);
   });
+
+  it('treats Rare and Rare Art variants of the same card as the same version for max-copies', () => {
+    const baseR = getCardById(KS_104_R);
+    const variantRA = getCardById('KS-104-RA');
+    if (!baseR || !variantRA) return;
+    expect(baseR.number).toBe(variantRA.number);
+    const cards = [
+      KS_104_R, KS_104_R,
+      'KS-104-RA', 'KS-104-RA',
+      ...fillTo30().slice(0, 26),
+    ];
+    const r = validateDeckForTournament(
+      { cardIds: cards, missionIds: MISSIONS_OK },
+      emptyTournamentRules(),
+    );
+    expect(r.valid).toBe(false);
+    expect(r.errors.some(e => e.includes('Too many copies') && e.includes('104'))).toBe(true);
+  });
+
+  it('allows 1 R + 1 RA of the same card under default max 2 copies', () => {
+    const baseR = getCardById(KS_104_R);
+    const variantRA = getCardById('KS-104-RA');
+    if (!baseR || !variantRA) return;
+    const cards = [
+      KS_104_R, 'KS-104-RA',
+      ...fillTo30().slice(0, 28),
+    ];
+    const r = validateDeckForTournament(
+      { cardIds: cards, missionIds: MISSIONS_OK },
+      emptyTournamentRules(),
+    );
+    expect(r.errors.filter(e => e.includes('Too many copies'))).toEqual([]);
+  });
 });
