@@ -184,6 +184,49 @@ describe('Ino 020 (UC) - Take Control', () => {
       expect(returned?.isHidden).toBe(true);
     });
 
+    it('thief upgrades stolen card -> stack STAYS with thief when controller leaves', () => {
+      const baseEnemy = mockCard({ id: 'KS-100-C', number: 100, name_fr: 'NARUTO UZUMAKI', chakra: 2, power: 2 });
+      const stolenStack = mockChar({
+        instanceId: 'naruto-stolen',
+        card: baseEnemy,
+        stack: [baseEnemy],
+        controlledBy: 'player2',
+        originalOwner: 'player1',
+        controllerInstanceId: 'ino-1',
+      });
+      const ino = mockChar({
+        instanceId: 'ino-1', card: ino020,
+        controlledBy: 'player2', originalOwner: 'player2',
+      });
+      const state = makeState({
+        activeMissions: [
+          mockMission({ player1Characters: [], player2Characters: [ino, stolenStack] }),
+          mockMission({ rank: 'C', rankBonus: 2 }),
+        ],
+      });
+
+      state.activeMissions[0].player2Characters[1] = {
+        ...state.activeMissions[0].player2Characters[1],
+        controllerInstanceId: undefined,
+        originalOwner: 'player2',
+        stack: [
+          baseEnemy,
+          mockCard({ id: 'KS-133-S', number: 133, name_fr: 'NARUTO UZUMAKI', chakra: 6, power: 6 }),
+        ],
+      };
+
+      const after = EffectEngine.defeatCharacterDirect(state, 'ino-1');
+
+      const stillOnP2 = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'naruto-stolen');
+      expect(stillOnP2).toBeDefined();
+      expect(stillOnP2?.controlledBy).toBe('player2');
+      expect(stillOnP2?.originalOwner).toBe('player2');
+      expect(stillOnP2?.stack.length).toBe(2);
+
+      const onP1 = after.activeMissions[0].player1Characters.find((c: { instanceId: string }) => c.instanceId === 'naruto-stolen');
+      expect(onP1).toBeUndefined();
+    });
+
     it('Choji 018 post-move hide on the controller returns the stolen card', () => {
       const itachi = mockChar({
         instanceId: 'itachi-1',
