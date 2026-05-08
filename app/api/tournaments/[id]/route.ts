@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { getSocketIO } from '@/lib/socket/server';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
@@ -94,6 +95,9 @@ export async function DELETE(
       prisma.tournamentAdminLog.deleteMany({ where: { tournamentId: id } }),
       prisma.tournament.delete({ where: { id } }),
     ]);
+
+    const io = getSocketIO();
+    if (io) io.to(`tournament:${id}`).emit('tournament:cancelled', { reason: 'deleted' });
 
     return NextResponse.json({ success: true });
   } catch {

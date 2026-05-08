@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { getSocketIO } from '@/lib/socket/server';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
@@ -77,6 +78,9 @@ export async function POST(
         details: { seedCount: orderedPlayerIds.length } as never,
       },
     }).catch((err) => console.error('[Tournament] pairings audit log failed:', err));
+
+    const io = getSocketIO();
+    if (io) io.to(`tournament:${id}`).emit('tournament:refresh', { tournamentId: id });
 
     return NextResponse.json({ success: true });
   } catch {

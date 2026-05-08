@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : pairings manuels et delete émettent maintenant l'event de refresh",
+      "title_en": "Tournaments: manual pairings and delete now emit the refresh event",
+      "changes_fr": [
+        "Suite des fixes de cohérence broadcast : la route POST /api/tournaments/{id}/pairings (admin set seeds manuels) updatait les participants en BDD mais n'émettait rien, donc les autres joueurs sur la page registration ne voyaient pas le nouvel ordre tant qu'ils ne rafraîchissaient pas. Idem pour DELETE /api/tournaments/{id} (admin supprime un tournoi non-in_progress) : le tournoi disparaissait de la BDD mais les abonnés socket ne savaient pas. Les deux routes émettent maintenant l'event approprié (tournament:refresh pour les pairings, tournament:cancelled avec reason=deleted pour la suppression). Les deux events sont déjà écoutés par la page tournoi et déclenchent un refetch."
+      ],
+      "changes_en": [
+        "Following the broadcast-consistency fixes: the POST /api/tournaments/{id}/pairings route (admin sets manual seeds) updated participant seeds in DB but emitted nothing, so other players on the registration page did not see the new order until manual refresh. Same for DELETE /api/tournaments/{id} (admin deletes a non-in_progress tournament): the tournament disappeared from DB but socket subscribers did not know. Both routes now emit the appropriate event (tournament:refresh for pairings, tournament:cancelled with reason=deleted for the deletion). Both events are already listened to by the tournament page and trigger a refetch."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : démarrage manuel par admin émet aussi tournament:started",
       "title_en": "Tournaments: manual admin start now also emits tournament:started",
       "changes_fr": [
