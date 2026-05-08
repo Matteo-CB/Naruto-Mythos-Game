@@ -39,11 +39,22 @@ export async function POST(
       }
     }
 
-    
+
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { username: true, discordId: true, elo: true },
+      select: { username: true, discordId: true, elo: true, gameBanned: true, gameBanUntil: true },
     });
+
+    if (user?.gameBanned) {
+      const now = new Date();
+      if (!user.gameBanUntil || user.gameBanUntil > now) {
+        return NextResponse.json({ error: 'You are banned from playing online' }, { status: 403 });
+      }
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: { gameBanned: false, gameBanUntil: null },
+      });
+    }
 
     
 

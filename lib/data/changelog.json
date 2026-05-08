@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : ban de jeu (gameBanned) aussi appliqué à la jointure",
+      "title_en": "Tournaments: game ban (gameBanned) also enforced on join",
+      "changes_fr": [
+        "Le simulateur a deux systèmes de ban distincts : la table UserBan (avec type='tournament' ou 'chat') et le flag User.gameBanned set par les rapports admin pour bannir un joueur du jeu en ligne en général. Les routes de jointure de tournoi vérifiaient déjà le premier mais ignoraient le second. Un joueur gameBanned=true pouvait rejoindre n'importe quel tournoi pour ensuite ne pas pouvoir jouer ses matchs (le ban étant censé bloquer le jeu). Désormais les deux routes /join et /join-by-code refusent la jointure si gameBanned=true et que la durée du ban n'est pas expirée. Si la durée est passée, le ban est nettoyé automatiquement (cohérence avec le check d'expiration existant ailleurs)."
+      ],
+      "changes_en": [
+        "The simulator has two distinct ban systems: the UserBan table (with type='tournament' or 'chat') and the User.gameBanned flag set by admin reports to ban a player from online play generally. The tournament join routes already checked the first but ignored the second. A player with gameBanned=true could join any tournament only to then be unable to play their matches (the ban being supposed to block play). Now both /join and /join-by-code refuse joining if gameBanned=true and the ban duration has not expired. If the duration has passed, the ban is auto-cleared (matching the expiration check pattern used elsewhere)."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : Discord requis enfin vérifié à la jointure",
       "title_en": "Tournaments: Discord requirement finally enforced on join",
       "changes_fr": [
