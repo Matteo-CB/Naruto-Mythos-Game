@@ -2,15 +2,19 @@
   "entries": [
     {
       "date": "2026-05-08",
-      "title_fr": "Tournois : suppression sécurisée + validation des seeds manuels",
-      "title_en": "Tournaments: safe deletion + manual seed validation",
+      "title_fr": "Tournois : routes secondaires sécurisées (join, delete, seeds)",
+      "title_en": "Tournaments: secondary routes hardened (join, delete, seeds)",
       "changes_fr": [
-        "DELETE tournoi refuse maintenant de supprimer un tournoi en cours (status='in_progress'). L'admin doit d'abord l'annuler. La suppression nettoie aussi les logs d'audit du tournoi, et tout est fait dans une transaction Prisma pour éviter les états incohérents si une étape échoue.",
-        "Pairings manuels : la route valide désormais que tous les userIds fournis correspondent à des participants du tournoi (rejet 400 sinon, au lieu d'un silencieux no-op). L'action est aussi loguée dans le journal d'audit admin."
+        "Inscription au tournoi : course condition corrigée. Quand 2 joueurs cliquaient 'rejoindre' au même instant alors qu'il restait 1 place, les deux passaient et le tournoi se retrouvait en surcapacité. Une vérification compensatoire annule désormais la dernière inscription si la limite est dépassée.",
+        "Inscription par code : la route ne vérifiait ni le bannissement de tournoi, ni la restriction de ligue. Un joueur banni pouvait contourner la sanction en utilisant le code. Les deux contrôles sont maintenant appliqués comme sur la route d'inscription publique.",
+        "DELETE tournoi refuse de supprimer un tournoi en cours. La suppression nettoie aussi les logs d'audit, dans une transaction Prisma pour éviter les états incohérents.",
+        "Pairings manuels : la route valide que tous les userIds fournis sont bien des participants du tournoi (rejet 400 sinon). L'action est loguée dans le journal d'audit admin."
       ],
       "changes_en": [
-        "DELETE tournament now refuses to delete an in-progress tournament (status='in_progress'). The admin must cancel it first. Deletion now also clears the tournament's audit logs, all wrapped in a Prisma transaction to avoid inconsistent state if a step fails.",
-        "Manual pairings: the route now validates that all provided userIds match actual tournament participants (400 rejection otherwise, instead of a silent no-op). The action is also logged to the admin audit journal."
+        "Tournament join: race condition fixed. When 2 players clicked 'join' simultaneously with 1 spot left, both passed the capacity check and the tournament went over its limit. A compensating check now removes the latest registration if capacity is exceeded.",
+        "Join by code: the route was missing the tournament-ban check and the league restriction check. A banned player could bypass the ban by using a code. Both checks now apply as they do on the public join route.",
+        "DELETE tournament refuses to delete an in-progress tournament. Deletion also clears the audit logs, wrapped in a Prisma transaction to avoid inconsistent state.",
+        "Manual pairings: the route validates that all provided userIds match actual tournament participants (400 otherwise). The action is logged in the admin audit journal."
       ]
     },
     {

@@ -91,6 +91,13 @@ export async function POST(
           username: user?.username || 'Unknown',
         },
       });
+      const newCount = await prisma.tournamentParticipant.count({
+        where: { tournamentId: id },
+      });
+      if (newCount > tournament.maxPlayers) {
+        await prisma.tournamentParticipant.delete({ where: { id: participant.id } }).catch(() => {});
+        return NextResponse.json({ error: 'Tournament is full' }, { status: 400 });
+      }
       return NextResponse.json({ participant }, { status: 201 });
     } catch (createErr) {
       const msg = createErr instanceof Error ? createErr.message : '';
