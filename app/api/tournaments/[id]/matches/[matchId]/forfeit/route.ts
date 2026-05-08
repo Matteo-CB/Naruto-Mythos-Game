@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { getSocketIO } from '@/lib/socket/server';
+import { advanceMatchWinner, advanceMatchWinnerDoubleElim, handleSwissMatchEnd } from '@/lib/socket/tournamentHandlers';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
@@ -49,7 +51,6 @@ export async function POST(
       return NextResponse.json({ error: 'Match already resolved' }, { status: 400 });
     }
 
-    
     let winnerId: string | null = null;
     let winnerUsername: string | null = null;
     if (match.player1Id === forfeitPlayerId) {
@@ -72,74 +73,48 @@ export async function POST(
       },
     });
 
-    
-    await prisma.tournamentParticipant.updateMany({
-      where: { tournamentId: id, userId: forfeitPlayerId },
-      data: { eliminated: true, eliminatedRound: match.round },
-    });
-
-    
-    if (winnerId && winnerUsername) {
-      const nextRound = match.round + 1;
-      const nextMatchIndex = Math.floor(match.matchIndex / 2);
-      const isTopSlot = match.matchIndex % 2 === 0;
-
-      const nextMatch = await prisma.tournamentMatch.findUnique({
-        where: {
-          tournamentId_bracket_round_matchIndex: {
-            tournamentId: id,
-            bracket: match.bracket,
-            round: nextRound,
-            matchIndex: nextMatchIndex,
-          },
-        },
+    if (tournament.format !== 'swiss' && tournament.format !== 'double_elimination') {
+      await prisma.tournamentParticipant.updateMany({
+        where: { tournamentId: id, userId: forfeitPlayerId },
+        data: { eliminated: true, eliminatedRound: match.round },
       });
+    }
 
-      if (nextMatch) {
-        const updateData: Record<string, unknown> = {};
-        if (isTopSlot) {
-          updateData.player1Id = winnerId;
-          updateData.player1Username = winnerUsername;
-        } else {
-          updateData.player2Id = winnerId;
-          updateData.player2Username = winnerUsername;
-        }
+    const io = getSocketIO();
 
-        const updated = await prisma.tournamentMatch.update({
-          where: { id: nextMatch.id },
-          data: updateData,
-        });
-
-        
-        const p1 = isTopSlot ? winnerId : updated.player1Id;
-        const p2 = isTopSlot ? updated.player2Id : winnerId;
-        if (p1 && p2) {
-          await prisma.tournamentMatch.update({
-            where: { id: nextMatch.id },
-            data: { status: 'ready' },
-          });
-        }
+    if (winnerId) {
+      if (tournament.format === 'double_elimination') {
+        await advanceMatchWinnerDoubleElim(
+          io,
+          id,
+          { ...match, bracket: match.bracket } as never,
+          winnerId,
+          winnerUsername,
+          forfeitPlayerId,
+        );
+      } else if (tournament.format === 'swiss') {
+        if (io) await handleSwissMatchEnd(io, id, match);
       } else {
-        
-        await prisma.tournament.update({
-          where: { id },
-          data: {
-            status: 'completed',
-            winnerId,
-            winnerUsername,
-            completedAt: new Date(),
-          },
-        });
-
-        await prisma.user.update({
-          where: { id: winnerId },
-          data: { tournamentWins: { increment: 1 } },
-        });
+        await advanceMatchWinner(
+          io,
+          id,
+          match,
+          winnerId,
+          winnerUsername,
+        );
       }
     }
 
+    if (io) {
+      io.to(`tournament:${id}`).emit('tournament:player-forfeited', {
+        matchId, forfeitedPlayerId: forfeitPlayerId, winnerId, winnerUsername,
+      });
+      io.to(`tournament:${id}`).emit('tournament:refresh');
+    }
+
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    console.error('[Tournament] forfeit route error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

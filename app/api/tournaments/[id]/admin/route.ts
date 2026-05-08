@@ -121,8 +121,13 @@ export async function POST(
           where: { tournamentId, userId },
           data: { eliminated: true, eliminatedRound: tournament.currentRound || 0 },
         });
+        if (tournament.gameMode === 'sealed') {
+          await prisma.tournamentParticipant.updateMany({
+            where: { tournamentId, userId },
+            data: { sealedPool: null as never },
+          });
+        }
 
-        
         const activeMatch = tournament.matches.find(
           m => (m.player1Id === userId || m.player2Id === userId)
             && (m.status === 'ready' || m.status === 'in_progress' || m.status === 'pending'),
@@ -137,9 +142,37 @@ export async function POST(
               completedAt: new Date(),
             },
           });
-          
+
+          if (activeMatch.roomCode) {
+            const { rooms } = await import('@/lib/socket/server');
+            const room = rooms.get(activeMatch.roomCode);
+            if (room) {
+              const ioInst = getSocketIO();
+              if (ioInst) ioInst.to(activeMatch.roomCode).emit('tournament:disqualified', { matchId: activeMatch.id, userId });
+              room.finalized = true;
+              setTimeout(() => {
+                const stillThere = rooms.get(activeMatch.roomCode!);
+                if (stillThere) rooms.delete(activeMatch.roomCode!);
+              }, 10_000);
+            }
+          }
+
+          const { clearAbsenceTimer } = await import('@/lib/tournament/absenceManager');
+          clearAbsenceTimer(activeMatch.id);
+
           if (winnerId) {
-            await advanceMatchWinner(null, tournamentId, activeMatch, winnerId, winnerUsername);
+            const ioInst = getSocketIO();
+            if (tournament.format === 'double_elimination') {
+              const { advanceMatchWinnerDoubleElim } = await import('@/lib/socket/tournamentHandlers');
+              await advanceMatchWinnerDoubleElim(ioInst, tournamentId, activeMatch as never, winnerId, winnerUsername, userId);
+            } else if (tournament.format === 'swiss') {
+              if (ioInst) {
+                const { handleSwissMatchEnd } = await import('@/lib/socket/tournamentHandlers');
+                await handleSwissMatchEnd(ioInst, tournamentId, activeMatch);
+              }
+            } else {
+              await advanceMatchWinner(ioInst, tournamentId, activeMatch, winnerId, winnerUsername);
+            }
           }
         }
 
@@ -228,7 +261,95 @@ export async function POST(
         const match = tournament.matches.find(m => m.id === resetMatchId);
         if (!match) return NextResponse.json({ error: 'Match not found' }, { status: 404 });
 
-        
+        const { clearAbsenceTimer } = await import('@/lib/tournament/absenceManager');
+        clearAbsenceTimer(resetMatchId);
+
+        if (match.roomCode) {
+          const { rooms } = await import('@/lib/socket/server');
+          const room = rooms.get(match.roomCode);
+          if (room) {
+            const ioInstance = getSocketIO();
+            if (ioInstance) ioInstance.to(match.roomCode).emit('tournament:match-reset', { matchId: resetMatchId });
+            rooms.delete(match.roomCode);
+          }
+        }
+
+        if (tournament.format === 'double_elimination') {
+          const { winnerAdvanceTarget, loserDropTarget } = await import('@/lib/tournament/doubleElimEngine');
+          const wbCount = tournament.matches.filter((m) => m.bracket === 'winners').length;
+          const wbRounds = Math.max(1, ...tournament.matches.filter((m) => m.bracket === 'winners').map((m) => m.round));
+          const lbRounds = Math.max(0, ...tournament.matches.filter((m) => m.bracket === 'losers').map((m) => m.round));
+
+          const winTarget = winnerAdvanceTarget(
+            { bracket: match.bracket as 'winners' | 'losers' | 'grand_final', round: match.round, matchIndex: match.matchIndex },
+            wbRounds, lbRounds,
+          );
+          if (winTarget) {
+            const target = await prisma.tournamentMatch.findFirst({
+              where: { tournamentId, bracket: winTarget.bracket, round: winTarget.round, matchIndex: winTarget.matchIndex },
+            });
+            if (target) {
+              const upd: Record<string, unknown> = { status: 'pending' };
+              if (winTarget.slot === 'player1') {
+                upd.player1Id = null;
+                upd.player1Username = null;
+              } else {
+                upd.player2Id = null;
+                upd.player2Username = null;
+              }
+              await prisma.tournamentMatch.update({ where: { id: target.id }, data: upd });
+            }
+          }
+
+          if (match.bracket === 'winners') {
+            const loseTarget = loserDropTarget(
+              { bracket: 'winners', round: match.round, matchIndex: match.matchIndex },
+              wbRounds,
+            );
+            if (loseTarget) {
+              const target = await prisma.tournamentMatch.findFirst({
+                where: { tournamentId, bracket: loseTarget.bracket, round: loseTarget.round, matchIndex: loseTarget.matchIndex },
+              });
+              if (target) {
+                const upd: Record<string, unknown> = { status: 'pending' };
+                if (loseTarget.slot === 'player1') {
+                  upd.player1Id = null;
+                  upd.player1Username = null;
+                } else {
+                  upd.player2Id = null;
+                  upd.player2Username = null;
+                }
+                await prisma.tournamentMatch.update({ where: { id: target.id }, data: upd });
+              }
+            }
+          }
+
+          if (match.bracket === 'grand_final' && match.round === 1) {
+            await prisma.tournamentMatch.deleteMany({
+              where: { tournamentId, bracket: 'grand_final', round: 2 },
+            });
+          }
+          void wbCount;
+        } else if (tournament.format === 'elimination') {
+          const nextRound = match.round + 1;
+          const nextMatchIndex = Math.floor(match.matchIndex / 2);
+          const isTopSlot = match.matchIndex % 2 === 0;
+          const next = await prisma.tournamentMatch.findFirst({
+            where: { tournamentId, bracket: match.bracket, round: nextRound, matchIndex: nextMatchIndex },
+          });
+          if (next) {
+            const upd: Record<string, unknown> = { status: 'pending' };
+            if (isTopSlot) {
+              upd.player1Id = null;
+              upd.player1Username = null;
+            } else {
+              upd.player2Id = null;
+              upd.player2Username = null;
+            }
+            await prisma.tournamentMatch.update({ where: { id: next.id }, data: upd });
+          }
+        }
+
         const newStatus = match.player1Id && match.player2Id ? 'ready' : 'pending';
 
         await prisma.tournamentMatch.update({
@@ -240,7 +361,6 @@ export async function POST(
           },
         });
 
-        
         if (match.player1Id) {
           await prisma.tournamentParticipant.updateMany({
             where: { tournamentId, userId: match.player1Id, eliminatedRound: match.round },
@@ -258,10 +378,10 @@ export async function POST(
           tournamentId, actorId, actorUsername,
           action: 'resetMatch',
           matchId: resetMatchId,
-          details: { round: match.round, matchIndex: match.matchIndex },
+          details: { round: match.round, matchIndex: match.matchIndex, bracket: match.bracket },
         });
         await broadcastTournamentRefresh(tournamentId);
-        return NextResponse.json({ success: true, message: 'Match reset' });
+        return NextResponse.json({ success: true, message: 'Match reset (cascade cleanup applied)' });
       }
 
       
@@ -317,17 +437,39 @@ export async function POST(
         if (tournament.status === 'completed') {
           return NextResponse.json({ error: 'Cannot cancel completed tournament' }, { status: 400 });
         }
+
+        const inProgressMatches = tournament.matches.filter((m) => m.status === 'in_progress' && m.roomCode);
+        const { rooms } = await import('@/lib/socket/server');
+        const { clearAbsenceTimer } = await import('@/lib/tournament/absenceManager');
+        const io = getSocketIO();
+        for (const m of inProgressMatches) {
+          clearAbsenceTimer(m.id);
+          if (m.roomCode && rooms.has(m.roomCode)) {
+            const room = rooms.get(m.roomCode)!;
+            room.finalized = true;
+            if (io) io.to(m.roomCode).emit('tournament:cancelled', { reason: 'admin' });
+            setTimeout(() => {
+              const r = rooms.get(m.roomCode!);
+              if (r) rooms.delete(m.roomCode!);
+            }, 10_000);
+          }
+          await prisma.tournamentMatch.update({
+            where: { id: m.id },
+            data: { status: 'forfeit', completedAt: new Date(), absenceDeadline: null, absentPlayerId: null },
+          });
+        }
+
         await prisma.tournament.update({
           where: { id: tournamentId },
           data: { status: 'cancelled' },
         });
-        const io = getSocketIO();
         if (io) io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'admin' });
         await logAdminAction({
           tournamentId, actorId, actorUsername,
           action: 'cancelTournament',
+          details: { in_progress_matches_cancelled: inProgressMatches.length },
         });
-        return NextResponse.json({ success: true, message: 'Tournament cancelled' });
+        return NextResponse.json({ success: true, message: 'Tournament cancelled (in-progress matches stopped)' });
       }
 
       

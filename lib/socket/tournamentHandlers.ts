@@ -391,7 +391,7 @@ export async function handleTournamentMatchEnd(io: Server, tournamentId: string,
 
 
 
-async function handleSwissMatchEnd(
+export async function handleSwissMatchEnd(
   io: Server,
   tournamentId: string,
   match: { round: number; matchIndex: number },
@@ -808,45 +808,54 @@ async function applySlot(
   userId: string,
   username: string | null,
 ): Promise<void> {
-  const target = await prisma.tournamentMatch.findUnique({
-    where: {
-      tournamentId_bracket_round_matchIndex: {
-        tournamentId, bracket: plan.bracket, round: plan.round, matchIndex: plan.matchIndex,
+  const refreshed = await prisma.$transaction(async (tx) => {
+    const target = await tx.tournamentMatch.findUnique({
+      where: {
+        tournamentId_bracket_round_matchIndex: {
+          tournamentId, bracket: plan.bracket, round: plan.round, matchIndex: plan.matchIndex,
+        },
       },
-    },
+    });
+    if (!target) return null;
+    const update: Record<string, unknown> = {};
+    if (plan.slot === 'player1') {
+      update.player1Id = userId;
+      update.player1Username = username;
+    } else {
+      update.player2Id = userId;
+      update.player2Username = username;
+    }
+    const updated = await tx.tournamentMatch.update({ where: { id: target.id }, data: update });
+    if (updated.player1Id && updated.player2Id && updated.status === 'pending') {
+      const ready = await tx.tournamentMatch.update({
+        where: { id: updated.id },
+        data: { status: 'ready' },
+      });
+      return ready;
+    }
+    return updated;
   });
-  if (!target) {
+
+  if (!refreshed) {
     console.error(`[Tournament] applySlot: target not found ${plan.bracket} R${plan.round} M${plan.matchIndex} (tournament ${tournamentId})`);
     return;
   }
-  const update: Record<string, unknown> = {};
-  if (plan.slot === 'player1') {
-    update.player1Id = userId;
-    update.player1Username = username;
-  } else {
-    update.player2Id = userId;
-    update.player2Username = username;
-  }
-  await prisma.tournamentMatch.update({ where: { id: target.id }, data: update });
-  const refreshed = await prisma.tournamentMatch.findUnique({ where: { id: target.id } });
-  if (refreshed && refreshed.player1Id && refreshed.player2Id && refreshed.status === 'pending') {
-    await prisma.tournamentMatch.update({ where: { id: refreshed.id }, data: { status: 'ready' } });
-    if (io) {
-      const deadline = startAbsenceTimer(refreshed.id, async () => {
-        const ready = matchReadyPlayers.get(refreshed.id);
-        const absent1 = !ready?.has(refreshed.player1Id ?? '');
-        const forfeitId = absent1 ? refreshed.player1Id! : refreshed.player2Id!;
-        await handleMatchForfeit(io, tournamentId, refreshed.id, forfeitId);
-        matchReadyPlayers.delete(refreshed.id);
-      });
-      await prisma.tournamentMatch.update({
-        where: { id: refreshed.id },
-        data: { absenceDeadline: deadline },
-      });
-    }
+
+  if (io && refreshed.player1Id && refreshed.player2Id && refreshed.status === 'ready') {
+    const deadline = startAbsenceTimer(refreshed.id, async () => {
+      const ready = matchReadyPlayers.get(refreshed.id);
+      const absent1 = !ready?.has(refreshed.player1Id ?? '');
+      const forfeitId = absent1 ? refreshed.player1Id! : refreshed.player2Id!;
+      await handleMatchForfeit(io, tournamentId, refreshed.id, forfeitId);
+      matchReadyPlayers.delete(refreshed.id);
+    });
+    await prisma.tournamentMatch.update({
+      where: { id: refreshed.id },
+      data: { absenceDeadline: deadline },
+    });
   }
   io?.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
-    matchId: target.id,
+    matchId: refreshed.id,
     bracket: plan.bracket,
     round: plan.round,
     matchIndex: plan.matchIndex,

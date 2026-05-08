@@ -2,6 +2,27 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : 7 bugs critiques corrigés (forfait, reset, DQ, annulation, race conditions)",
+      "title_en": "Tournaments: 7 critical bugs fixed (forfeit, reset, DQ, cancel, race conditions)",
+      "changes_fr": [
+        "La route forfait admin gère désormais correctement les trois formats (Swiss, simple élim, double élim) au lieu de seulement simple élim. Avant, un forfait admin sur un match Swiss ou double élim cassait silencieusement le tournoi.",
+        "Reset match (admin) nettoie maintenant en cascade : les slots des matches suivants où le gagnant et le perdant étaient déjà avancés sont remis à zéro, et le timer d'absence est annulé. En double élimination, si on reset une grande finale R1, la grande finale R2 (reset) éventuelle est aussi supprimée.",
+        "Disqualifier un joueur en cours de match nettoie la salle de jeu, annule le timer d'absence, et avance correctement le tournoi selon le format (Swiss, simple ou double élim).",
+        "Annuler un tournoi termine proprement les matches en cours : les salles sont marquées finalisées, les sockets reçoivent une notification, et les rooms sont nettoyées après 10 secondes.",
+        "L'avancement de match en double élimination utilise maintenant une transaction Prisma pour éviter une race condition quand deux matches finissent simultanément et veulent remplir le même slot.",
+        "Pool sealed nettoyé quand un joueur est disqualifié (libère ~50KB par joueur DQ)."
+      ],
+      "changes_en": [
+        "The admin forfeit route now correctly handles all three formats (Swiss, single elim, double elim) instead of only single elim. Before, an admin-forced forfeit on a Swiss or double-elim match silently broke the tournament.",
+        "Reset match (admin) now cascades cleanup: slots in downstream matches where the winner and loser had already been advanced are cleared, and the absence timer is cancelled. In double elimination, if you reset a grand final R1, any existing grand final R2 (reset) is also deleted.",
+        "Disqualifying a player mid-match now cleans up the game room, cancels the absence timer, and properly advances the tournament according to the format.",
+        "Cancelling a tournament now properly stops in-progress matches: rooms are marked finalized, sockets receive a notification, and rooms are cleaned up after 10 seconds.",
+        "Match advancement in double elimination is now wrapped in a Prisma transaction to avoid a race condition when two matches finish simultaneously and target the same slot.",
+        "Sealed pool is cleared when a player is disqualified (frees ~50KB per DQ'd player)."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : sealed entièrement fonctionnel + plusieurs sécurités",
       "title_en": "Tournaments: sealed mode fully working + several safeguards",
       "changes_fr": [
