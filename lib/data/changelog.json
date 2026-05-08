@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Inscription tournoi : fenêtre de course avec auto-start fermée",
+      "title_en": "Tournament join: race window with auto-start closed",
+      "changes_fr": [
+        "Race condition rare mais réelle : un joueur appelait /join ou /join-by-code, le serveur lisait tournament.status='registration', validait toutes les contraintes... pendant ce temps l'auto-start interval (qui fire toutes les 30s) ou un admin cliquait Start, faisant transitionner le tournoi vers in_progress avec le bracket déjà généré. Le create du participant aboutissait quand même, créant un fantôme : un participant inscrit dans un tournoi in_progress mais absent du bracket. Désormais juste après la création, on relit tournament.status. Si ce n'est plus 'registration', on rollback la création et renvoie 400 'Registration closed'."
+      ],
+      "changes_en": [
+        "Rare but real race condition: a player called /join or /join-by-code, the server read tournament.status='registration', validated all constraints... meanwhile the auto-start interval (firing every 30s) or an admin clicking Start transitioned the tournament to in_progress with the bracket already generated. The participant create succeeded anyway, creating a ghost: a participant registered in an in_progress tournament but absent from the bracket. Now right after the create, we re-read tournament.status. If no longer 'registration', we roll back the create and return 400 'Registration closed'."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : join, leave, select-deck et forfeit route notifient maintenant les subscribers",
       "title_en": "Tournaments: join, leave, select-deck and forfeit route now notify subscribers",
       "changes_fr": [

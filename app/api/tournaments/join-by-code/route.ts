@@ -106,6 +106,14 @@ export async function POST(req: NextRequest) {
         await prisma.tournamentParticipant.delete({ where: { id: participant.id } }).catch(() => {});
         return NextResponse.json({ error: 'Tournament is full' }, { status: 400 });
       }
+      const fresh = await prisma.tournament.findUnique({
+        where: { id: tournament.id },
+        select: { status: true },
+      });
+      if (fresh?.status !== 'registration') {
+        await prisma.tournamentParticipant.delete({ where: { id: participant.id } }).catch(() => {});
+        return NextResponse.json({ error: 'Registration closed' }, { status: 400 });
+      }
       const io = getSocketIO();
       if (io) io.to(`tournament:${tournament.id}`).emit('tournament:refresh');
       return NextResponse.json({

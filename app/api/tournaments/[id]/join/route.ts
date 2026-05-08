@@ -106,6 +106,14 @@ export async function POST(
           username: user?.username || 'Unknown',
         },
       });
+      const fresh = await prisma.tournament.findUnique({
+        where: { id },
+        select: { status: true },
+      });
+      if (fresh?.status !== 'registration') {
+        await prisma.tournamentParticipant.delete({ where: { id: participant.id } }).catch(() => {});
+        return NextResponse.json({ error: 'Registration closed' }, { status: 400 });
+      }
       const newCount = await prisma.tournamentParticipant.count({
         where: { tournamentId: id },
       });
