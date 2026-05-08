@@ -42,7 +42,15 @@ export async function GET(
 
     const session = await auth();
     const viewerId = session?.user?.id;
-    const safe = (tournament.creatorId === viewerId || isAdmin(session))
+    const viewerIsAdmin = isAdmin(session);
+    const isCreator = !!viewerId && tournament.creatorId === viewerId;
+    const isParticipant = !!viewerId && tournament.participants.some(p => p.userId === viewerId);
+
+    if (!tournament.isPublic && !isCreator && !viewerIsAdmin && !isParticipant) {
+      return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
+    }
+
+    const safe = (isCreator || viewerIsAdmin)
       ? tournament
       : { ...tournament, joinCode: null };
 

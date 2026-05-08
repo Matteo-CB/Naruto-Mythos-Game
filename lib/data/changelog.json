@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois privés : single GET aussi protégé contre l'énumération",
+      "title_en": "Private tournaments: single GET also protected from enumeration",
+      "changes_fr": [
+        "Suite logique du fix sur la liste : la route GET /api/tournaments/{id} (le détail d'un tournoi par son id) ne filtrait pas non plus sur isPublic. Quelqu'un qui devinait ou récupérait l'id d'un tournoi privé pouvait fetcher tous ses détails (nom, format, mode, liste complète des participants avec leurs userIds, matchs avec scores et roomCodes). Désormais la route renvoie 404 (pas 403, pour ne pas confirmer l'existence) si le viewer n'est ni le créateur ni admin ni un participant inscrit. Combiné avec le filtre de la liste, un tournoi privé est désormais totalement invisible aux non-autorisés."
+      ],
+      "changes_en": [
+        "Logical follow-up to the listing fix: the GET /api/tournaments/{id} route (single-tournament detail by id) was not filtering on isPublic either. Someone who guessed or retrieved a private tournament's id could fetch every detail (name, format, mode, full participant list with userIds, matches with scores and roomCodes). The route now returns 404 (not 403, to avoid confirming existence) if the viewer is neither the creator nor an admin nor a registered participant. Combined with the listing filter, a private tournament is now completely invisible to unauthorized viewers."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois privés : enfin invisibles dans la liste publique",
       "title_en": "Private tournaments: finally hidden from the public listing",
       "changes_fr": [
