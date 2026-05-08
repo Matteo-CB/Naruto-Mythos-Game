@@ -3,6 +3,7 @@ import { generateBracket } from '@/lib/tournament/tournamentEngine';
 import { computeSwissRoundCount, generateSwissRound1 } from '@/lib/tournament/swissEngine';
 import type { SwissPlayer } from '@/lib/tournament/swissEngine';
 import { validateDeckForTournament } from '@/lib/tournament/deckValidation';
+import { logMatchEvent } from '@/lib/tournament/matchEventLog';
 
 export type StartResult =
   | { ok: true }
@@ -180,6 +181,13 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
         await prisma.tournamentParticipant.updateMany({
           where: { tournamentId, userId: pairing.player1.userId },
           data: { hasBye: true },
+        });
+        logMatchEvent({
+          type: 'match.advance.bye',
+          tournamentId,
+          round: pairing.round,
+          matchIndex: pairing.matchIndex,
+          winnerId: pairing.player1.userId,
         });
       }
     }

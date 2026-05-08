@@ -221,4 +221,37 @@ describe('tournament:ready socket handler (auth from pass 11)', () => {
     await sock.handlers['tournament:ready']({ tournamentId: 't1', matchId: 'm1', userId: 'u1' });
     expect(p.tournamentMatch.update).not.toHaveBeenCalled();
   });
+
+  it('happy path: first ready triggers absence-timer setup + DB update for waiting opponent', async () => {
+    const { startAbsenceTimer } = await import('@/lib/tournament/absenceManager');
+    (startAbsenceTimer as ReturnType<typeof vi.fn>).mockClear();
+    const io = fakeIO();
+    const sock = fakeSocket('u1');
+    p.tournamentMatch.findUnique.mockResolvedValue({
+      id: 'm1', tournamentId: 't1', player1Id: 'u1', player2Id: 'u2',
+      status: 'ready', roomCode: null,
+    });
+    p.tournamentMatch.update.mockResolvedValue({});
+    registerTournamentHandlers(io as never, sock as never);
+    await sock.handlers['tournament:ready']({ tournamentId: 't1', matchId: 'm1', userId: 'u1' });
+    expect(startAbsenceTimer).toHaveBeenCalledWith('m1', expect.any(Function));
+    expect(p.tournamentMatch.update).toHaveBeenCalled();
+    const updateArgs = p.tournamentMatch.update.mock.calls[0][0] as { data: { absentPlayerId: string } };
+    expect(updateArgs.data.absentPlayerId).toBe('u2');
+  });
+
+  it('returns silently when room already exists for the match', async () => {
+    const { rooms } = await import('@/lib/socket/server');
+    (rooms as Map<string, unknown>).set('T-existing', { code: 'T-existing' });
+    const io = fakeIO();
+    const sock = fakeSocket('u1');
+    p.tournamentMatch.findUnique.mockResolvedValue({
+      id: 'm1', tournamentId: 't1', player1Id: 'u1', player2Id: 'u2',
+      status: 'ready', roomCode: 'T-existing',
+    });
+    registerTournamentHandlers(io as never, sock as never);
+    await sock.handlers['tournament:ready']({ tournamentId: 't1', matchId: 'm1', userId: 'u1' });
+    expect(p.tournamentMatch.update).not.toHaveBeenCalled();
+    (rooms as Map<string, unknown>).delete('T-existing');
+  });
 });

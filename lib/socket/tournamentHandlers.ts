@@ -619,6 +619,17 @@ export async function handleSwissMatchEnd(
             };
           }),
         });
+        for (const pairing of pairings) {
+          if (pairing.player2 === null) {
+            logMatchEvent({
+              type: 'match.advance.bye',
+              tournamentId,
+              round: pairing.round,
+              matchIndex: pairing.matchIndex,
+              winnerId: pairing.player1.userId,
+            });
+          }
+        }
       } else {
         console.log(`[Tournament] Swiss round ${nextRound} matches already exist for ${tournamentId}, skipping createMany (recovering from prior partial state)`);
       }
