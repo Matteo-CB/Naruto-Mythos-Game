@@ -23,6 +23,7 @@ const matchReadyPlayers = new Map<string, Set<string>>();
 
 
 const swissRoundLocks = new Map<string, Promise<void>>();
+const matchReadyLocks = new Map<string, Promise<void>>();
 
 async function withSwissRoundLock<T>(lockKey: string, fn: () => Promise<T>): Promise<T> {
   while (swissRoundLocks.has(lockKey)) {
@@ -39,6 +40,21 @@ async function withSwissRoundLock<T>(lockKey: string, fn: () => Promise<T>): Pro
   }
 }
 
+async function withMatchReadyLock<T>(matchId: string, fn: () => Promise<T>): Promise<T> {
+  while (matchReadyLocks.has(matchId)) {
+    try { await matchReadyLocks.get(matchId); } catch { /* ignore */ }
+  }
+  let release!: () => void;
+  const promise = new Promise<void>((resolve) => { release = resolve; });
+  matchReadyLocks.set(matchId, promise);
+  try {
+    return await fn();
+  } finally {
+    matchReadyLocks.delete(matchId);
+    release();
+  }
+}
+
 
 function cleanupTournamentMaps(tournamentId: string): void {
 
@@ -48,6 +64,10 @@ function cleanupTournamentMaps(tournamentId: string): void {
 
   for (const [key] of swissRoundLocks) {
     if (key.startsWith(tournamentId)) swissRoundLocks.delete(key);
+  }
+
+  for (const [matchId] of matchReadyLocks) {
+    if (matchId.includes(tournamentId)) matchReadyLocks.delete(matchId);
   }
 }
 
@@ -63,13 +83,13 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
   socket.on('tournament:ready', async ({ tournamentId, matchId, userId }: {
     tournamentId: string; matchId: string; userId: string;
   }) => {
+    const authedUserId = (socket.data as { userId?: string }).userId;
+    if (!authedUserId || authedUserId !== userId) {
+      console.warn(`[Tournament] tournament:ready rejected: socket auth mismatch (claim=${userId}, auth=${authedUserId ?? 'null'})`);
+      return;
+    }
+    await withMatchReadyLock(matchId, async () => {
     try {
-      const authedUserId = (socket.data as { userId?: string }).userId;
-      if (!authedUserId || authedUserId !== userId) {
-        console.warn(`[Tournament] tournament:ready rejected: socket auth mismatch (claim=${userId}, auth=${authedUserId ?? 'null'})`);
-        return;
-      }
-
       const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
       if (!match || match.tournamentId !== tournamentId) return;
       if (match.player1Id !== userId && match.player2Id !== userId) {
@@ -78,6 +98,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
       }
 
       if (match.status !== 'ready' && match.status !== 'pending' && match.status !== 'in_progress') return;
+      if (match.roomCode && rooms.has(match.roomCode)) return;
 
       if (!matchReadyPlayers.has(matchId)) matchReadyPlayers.set(matchId, new Set());
       const ready = matchReadyPlayers.get(matchId)!;
@@ -231,6 +252,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
     } catch (err) {
       console.error('[Tournament] Ready handler error:', err);
     }
+    });
   });
 
   socket.on('tournament:report-present', async ({ matchId }: { matchId: string }) => {

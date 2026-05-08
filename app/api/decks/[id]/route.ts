@@ -31,6 +31,17 @@ export async function GET(
   }
 }
 
+async function isLockedByActiveTournament(deckId: string): Promise<boolean> {
+  const inUse = await prisma.tournamentParticipant.findFirst({
+    where: {
+      deckId,
+      tournament: { status: 'in_progress' },
+    },
+    select: { id: true },
+  });
+  return inUse !== null;
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -48,6 +59,14 @@ export async function PUT(
     const existing = await prisma.deck.findUnique({ where: { id } });
     if (!existing || existing.userId !== session.user.id) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+
+    const editingCards = (cardIds !== undefined) || (missionIds !== undefined);
+    if (editingCards && await isLockedByActiveTournament(id)) {
+      return NextResponse.json(
+        { error: 'Cannot edit deck contents while it is selected in a tournament in progress' },
+        { status: 409 },
+      );
     }
 
     if (cardIds && cardIds.length < 30) {
@@ -97,6 +116,13 @@ export async function DELETE(
     const existing = await prisma.deck.findUnique({ where: { id } });
     if (!existing || existing.userId !== session.user.id) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+
+    if (await isLockedByActiveTournament(id)) {
+      return NextResponse.json(
+        { error: 'Cannot delete deck while it is selected in a tournament in progress' },
+        { status: 409 },
+      );
     }
 
     await prisma.deck.delete({ where: { id } });

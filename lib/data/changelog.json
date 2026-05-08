@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Decks verrouillés pendant un tournoi en cours + race condition de match-ready corrigée",
+      "title_en": "Decks locked during in-progress tournaments + match-ready race condition fixed",
+      "changes_fr": [
+        "Decks : impossible désormais de supprimer ou de modifier les cartes/missions d'un deck pendant qu'il est sélectionné dans un tournoi en status 'in_progress'. Avant, supprimer son deck en plein tournoi crashait le prochain match (le serveur tentait de charger un deck inexistant), et modifier le deck entre 2 rounds permettait de tricher en swappant les cartes. Pendant l'inscription (status 'registration'), modifier reste autorisé et la re-validation du start (passe précédente) gère la cohérence.",
+        "Match-ready : ajout d'un lock par match. Quand les deux joueurs cliquaient 'prêt' dans le même intervalle de quelques millisecondes, les deux handlers concurrents pouvaient atteindre la branche 'tout le monde est prêt' simultanément, avec à la clé : double émission des events match-ready, double démarrage du timer d'absence, double tentative de création de room. La création de room était déjà protégée par un check d'existence, mais les events doublés et les timers fantômes pouvaient persister."
+      ],
+      "changes_en": [
+        "Decks: it is no longer possible to delete or to edit the cards/missions of a deck while it is selected in a tournament with status 'in_progress'. Before, deleting your deck mid-tournament crashed the next match (the server tried to load a non-existent deck), and editing the deck between rounds allowed cheating by swapping cards. During registration (status 'registration'), editing is still allowed and the start re-validation (previous pass) handles coherence.",
+        "Match-ready: per-match lock added. When both players clicked 'ready' within the same few-millisecond window, the two concurrent handlers could both reach the 'everyone ready' branch simultaneously, leading to: doubled match-ready event emission, doubled absence-timer start, doubled room-creation attempt. Room creation was already guarded by an existence check, but the doubled events and ghost timers could linger."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois programmés : auto-start corrige le banlist gelé, le sealed et la revalidation",
       "title_en": "Scheduled tournaments: auto-start now freezes banlist, generates sealed pools, re-validates decks",
       "changes_fr": [
