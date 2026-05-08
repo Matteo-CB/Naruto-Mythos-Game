@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois : écran de fin de partie correct après disqualification ou reset admin",
+      "title_en": "Tournaments: correct end-of-game screen after admin disqualification or reset",
+      "changes_fr": [
+        "Quand un joueur était disqualifié pendant qu'il jouait, l'écran de fin affichait 'tu as perdu' aux DEUX joueurs (le DQ et son adversaire) parce que le winner stocké était un string non-reconnu. Désormais, le winner est correctement déduit du userId disqualifié vs l'identité du joueur courant : le DQ voit 'tu as perdu', l'adversaire voit 'tu as gagné'.",
+        "Reset match admin et annulation de tournoi pendant un match en cours affichent maintenant un écran de match nul (pas de gagnant), ce qui correspond mieux à la réalité que 'l'autre a gagné'."
+      ],
+      "changes_en": [
+        "When a player was disqualified mid-game, the end-of-game screen showed 'you lost' to BOTH players (the DQ and the opponent) because the stored winner was an unrecognized string. The winner is now correctly derived from the disqualified userId vs the current player's identity: the DQ sees 'you lost', the opponent sees 'you won'.",
+        "Admin match reset and tournament cancel during an in-progress match now show a draw screen (no winner), which matches the situation better than 'the other player won'."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois : 3 events socket reliés au client + double-cancel guard",
       "title_en": "Tournaments: 3 socket events wired up on client + double-cancel guard",
       "changes_fr": [

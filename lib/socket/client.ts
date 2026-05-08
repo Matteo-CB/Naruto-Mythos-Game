@@ -432,10 +432,15 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         console.log('[Socket] Player disqualified from tournament match:', data);
         const resyncT = get()._resyncTimer;
         if (resyncT) clearInterval(resyncT);
+        const myUid = get().userId;
+        const myRole = get().playerRole;
+        const iAmDisqualified = myUid === data.userId;
+        const oppRole: 'player1' | 'player2' = myRole === 'player1' ? 'player2' : 'player1';
+        const winner = myRole ? (iAmDisqualified ? oppRole : myRole) : null;
         set({
           gameEnded: true,
           gameResult: {
-            winner: 'disqualified',
+            winner,
             player1Score: 0, player2Score: 0,
             winReason: 'forfeit' as const,
             tournamentId: null,
@@ -452,7 +457,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({
           gameEnded: true,
           gameResult: {
-            winner: 'reset',
+            winner: null,
             player1Score: 0, player2Score: 0,
             winReason: 'forfeit' as const,
             tournamentId: null,
@@ -469,7 +474,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({
           gameEnded: true,
           gameResult: {
-            winner: 'cancelled',
+            winner: null,
             player1Score: 0, player2Score: 0,
             winReason: 'forfeit' as const,
             tournamentId: null,
