@@ -356,7 +356,7 @@ async function autoForfeitIfEliminated(
   return true;
 }
 
-async function handleSwissDoubleAbsence(io: Server, tournamentId: string, matchId: string) {
+export async function handleSwissDoubleAbsence(io: Server, tournamentId: string, matchId: string) {
   const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
   if (!match || match.status === 'completed' || match.status === 'forfeit') return;
 

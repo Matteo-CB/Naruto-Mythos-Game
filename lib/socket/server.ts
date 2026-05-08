@@ -2739,6 +2739,27 @@ export function setupSocketHandlers(io: SocketIOServer) {
               room.disconnectDeadline = null;
               if (!room.gameState || room.gameState.phase === 'gameOver') return;
 
+              if (room.tournamentId && room.tournamentMatchId) {
+                const opponentSocketId = isHost ? room.guestSocket : room.hostSocket;
+                const opponentConnected = !!opponentSocketId && !!io.sockets.sockets.get(opponentSocketId)?.connected;
+                if (!opponentConnected) {
+                  const tInfo = await prisma.tournament.findUnique({
+                    where: { id: room.tournamentId },
+                    select: { format: true },
+                  });
+                  if (tInfo?.format === 'swiss') {
+                    console.log(`[Socket] Both players AFK in tournament Swiss match ${room.tournamentMatchId}, double forfeit`);
+                    const { handleSwissDoubleAbsence } = await import('@/lib/socket/tournamentHandlers');
+                    await handleSwissDoubleAbsence(io, room.tournamentId, room.tournamentMatchId);
+                    room.finalized = true;
+                    setTimeout(() => {
+                      if (rooms.get(code) === room) rooms.delete(code);
+                    }, 10_000);
+                    return;
+                  }
+                }
+              }
+
               console.log(`[Socket] Grace period expired for ${player} in room ${code}, auto-forfeiting`);
               room.gameState = GameEngine.applyAction(room.gameState, player, {
                 type: 'FORFEIT',

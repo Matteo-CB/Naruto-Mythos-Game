@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-08",
+      "title_fr": "Tournois Suisse : double déconnexion en plein match aussi traitée comme double défaite",
+      "title_en": "Swiss tournaments: in-game double disconnect also handled as double forfeit",
+      "changes_fr": [
+        "Le système de déconnexion ne suivait qu'un seul joueur déconnecté à la fois (un seul timer de grace par room). Si P1 perdait sa connexion, puis P2 perdait aussi la sienne 10 secondes plus tard, le timer de P1 était écrasé par celui de P2. Au bout de 60s, seul P2 était forfait, et P1 'gagnait' le match alors qu'il était également AFK. En Suisse, P1 récoltait 3 points et un Buchholz immérité. Désormais, quand le timer de grace fire en match de tournoi, on vérifie si l'adversaire est aussi déconnecté (socket non-connecté). Si oui en Suisse, on déclenche le double forfait via handleSwissDoubleAbsence : 0 point pour les deux, défaite pour chacun, room nettoyée."
+      ],
+      "changes_en": [
+        "The disconnect system only tracked one disconnected player at a time (a single grace timer per room). If P1 lost their connection, then P2 lost theirs 10 seconds later, P1's timer was overwritten by P2's. After 60s, only P2 was forfeited, and P1 'won' the match even though they were also AFK. In Swiss, P1 received 3 points and an undeserved Buchholz contribution. Now, when the grace timer fires in a tournament match, we check whether the opponent is also disconnected (socket not connected). If yes in Swiss, we trigger the double forfeit via handleSwissDoubleAbsence: 0 points for both, loss for each, room cleaned up."
+      ]
+    },
+    {
+      "date": "2026-05-08",
       "title_fr": "Tournois Suisse : double no-show post-room aussi traité comme double défaite",
       "title_en": "Swiss tournaments: post-room double no-show also handled as double loss",
       "changes_fr": [
