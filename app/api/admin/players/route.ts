@@ -43,7 +43,6 @@ export async function POST(request: NextRequest) {
 
   switch (action) {
     case 'reset-player': {
-      
       await prisma.user.update({
         where: { id: userId },
         data: { elo: 500, wins: 0, losses: 0, draws: 0, discordHighestElo: 0 },
@@ -51,6 +50,7 @@ export async function POST(request: NextRequest) {
       const deleted = await prisma.game.deleteMany({
         where: { OR: [{ player1Id: userId }, { player2Id: userId }] },
       });
+      await prisma.deckStats.deleteMany({ where: { userId } }).catch(() => {});
       syncDiscordRole(userId).catch(() => {});
       return NextResponse.json({ success: true, gamesDeleted: deleted.count });
     }

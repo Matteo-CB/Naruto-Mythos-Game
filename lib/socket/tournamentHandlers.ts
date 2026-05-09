@@ -162,6 +162,8 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
 
         let hostDeck: { characters: CharacterCard[]; missions: MissionCard[] } | null = null;
         let guestDeck: { characters: CharacterCard[]; missions: MissionCard[] } | null = null;
+        const hostDeckId: string | undefined = !isSealedTournament && p1Participant?.deckId ? p1Participant.deckId : undefined;
+        const guestDeckId: string | undefined = !isSealedTournament && p2Participant?.deckId ? p2Participant.deckId : undefined;
 
         if (!isSealedTournament) {
           if (p1Participant?.deckId) {
@@ -218,6 +220,8 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             timerEnabled: true,
             tournamentId,
             tournamentMatchId: matchId,
+            hostDeckId,
+            guestDeckId,
             coinFlipDone: { player1: false, player2: false },
             spectators: new Map(),
             hostAllowSpectatorHand: false,

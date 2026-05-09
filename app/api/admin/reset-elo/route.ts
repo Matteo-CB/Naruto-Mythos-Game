@@ -22,6 +22,8 @@ export async function POST() {
       },
     });
 
+    await prisma.deckStats.deleteMany({}).catch(() => {});
+
     const discordUsers = await prisma.user.findMany({
       where: { discordId: { not: null } },
       select: { id: true },
