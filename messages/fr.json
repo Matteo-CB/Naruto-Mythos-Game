@@ -886,15 +886,12 @@
       "invalidMission": "Index de mission invalide.",
       "targetNotFound": "Personnage cible introuvable.",
       "cannotUpgradeOpponent": "Impossible d'UPGRADE le personnage adverse.",
-      "cannotUpgradeControlled": "Impossible d'UPGRADE un personnage sous contrôle.",
-      "cannotUpgradeHidden": "Impossible d'UPGRADE un personnage cache.",
       "upgradeSameName": "L'UPGRADE doit porter le meme nom de personnage.",
       "flexibleUpgradeRestriction": "Impossible d'UPGRADE sur un Invocation ou Orochimaru.",
       "upgradeHigherCost": "L'UPGRADE doit avoir un cout strictement superieur. Nouveau : {newCost}, Actuel : {currentCost}.",
       "notEnoughChakraUpgrade": "Pas assez de chakra. Besoin de {need} (difference), vous avez {have}.",
       "actionNotAllowed": "Action non autorisee.",
       "effectFailed": "L'effet n'a pas pu s'appliquer. Veuillez reessayer.",
-      "invalidUpgradeTarget": "Cible d'UPGRADE invalide.",
       "connectionTimeout": "Connexion expiree. Le serveur est peut-etre indisponible.",
       "connectionLost": "Connexion au serveur perdue.",
       "reconnectFailed": "Impossible de se reconnecter au serveur.",
@@ -914,7 +911,8 @@
       "roomFull": "La salle est pleine.",
       "sealedGenFailed": "Échec de la génération des boosters scellés.",
       "notYourTurn": "Ce n'est pas votre tour.",
-      "invalidAction": "Action invalide."
+      "invalidAction": "Action invalide.",
+      "upgradeNameConflict": "Impossible d'upgrader : créerait un doublon de {name} sur cette mission."
     },
     "opponentDisconnected": "Adversaire deconnecte. Il a {time} pour se reconnecter ou la partie est forfait.",
     "reconnect": {

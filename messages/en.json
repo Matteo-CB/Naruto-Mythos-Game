@@ -886,15 +886,12 @@
       "invalidMission": "Invalid mission index.",
       "targetNotFound": "Target character not found.",
       "cannotUpgradeOpponent": "Cannot upgrade opponent's character.",
-      "cannotUpgradeControlled": "Cannot upgrade a controlled character.",
-      "cannotUpgradeHidden": "Cannot upgrade a hidden character.",
       "upgradeSameName": "Upgrade must be same character name.",
       "flexibleUpgradeRestriction": "Cannot upgrade onto a Summon or Orochimaru.",
       "upgradeHigherCost": "Upgrade must have strictly higher chakra cost. New: {newCost}, Current: {currentCost}.",
       "notEnoughChakraUpgrade": "Not enough chakra. Need {need} (difference), have {have}.",
       "actionNotAllowed": "Action not allowed.",
       "effectFailed": "Effect failed to apply. Please try again.",
-      "invalidUpgradeTarget": "Invalid upgrade target.",
       "connectionTimeout": "Connection timed out. Server may be unavailable.",
       "connectionLost": "Lost connection to server.",
       "reconnectFailed": "Unable to reconnect to server.",
@@ -914,7 +911,8 @@
       "roomFull": "Room is full.",
       "sealedGenFailed": "Failed to generate sealed boosters.",
       "notYourTurn": "Not your turn.",
-      "invalidAction": "Invalid action."
+      "invalidAction": "Invalid action.",
+      "upgradeNameConflict": "Cannot upgrade: would create duplicate {name} on this mission."
     },
     "opponentDisconnected": "Opponent disconnected. They have {time} to reconnect or the game is forfeit.",
     "reconnect": {
