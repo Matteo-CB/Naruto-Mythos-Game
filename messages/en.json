@@ -2660,7 +2660,11 @@
       "restrictionTooLong": "Restriction note must be at most 500 characters.",
       "invalidGameMode": "Invalid game mode.",
       "invalidBoosterCount": "Sealed booster count must be an integer between 1 and 12.",
-      "invalidLeagueKeys": "Invalid league tier keys."
+      "invalidLeagueKeys": "Invalid league tier keys.",
+      "cannotLeaveStarted": "Cannot leave after the tournament has started.",
+      "creatorCannotLeave": "Creator cannot leave. Cancel the tournament instead.",
+      "startedDuringLeave": "Tournament started before your leave was processed.",
+      "failedToFetch": "Failed to load tournament(s)."
     },
     "deckError": {
       "tooFewCards": "Deck must have at least {min} cards (has {count}).",

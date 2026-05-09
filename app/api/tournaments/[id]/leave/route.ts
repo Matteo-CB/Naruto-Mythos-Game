@@ -11,21 +11,21 @@ export async function POST(
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized', errorKey: 'tournament.error.unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
     const tournament = await prisma.tournament.findUnique({ where: { id } });
     if (!tournament) {
-      return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Tournament not found', errorKey: 'tournament.error.notFound' }, { status: 404 });
     }
     if (tournament.status !== 'registration') {
-      return NextResponse.json({ error: 'Cannot leave after tournament started' }, { status: 400 });
+      return NextResponse.json({ error: 'Cannot leave after tournament started', errorKey: 'tournament.error.cannotLeaveStarted' }, { status: 400 });
     }
 
     
     if (tournament.creatorId === session.user.id) {
-      return NextResponse.json({ error: 'Creator cannot leave. Cancel the tournament instead.' }, { status: 400 });
+      return NextResponse.json({ error: 'Creator cannot leave. Cancel the tournament instead.', errorKey: 'tournament.error.creatorCannotLeave' }, { status: 400 });
     }
 
     const existing = await prisma.tournamentParticipant.findFirst({
@@ -55,7 +55,7 @@ export async function POST(
           sealedPool: existing.sealedPool ?? undefined,
         },
       }).catch(() => {});
-      return NextResponse.json({ error: 'Tournament started before your leave was processed' }, { status: 400 });
+      return NextResponse.json({ error: 'Tournament started before your leave was processed', errorKey: 'tournament.error.startedDuringLeave' }, { status: 400 });
     }
 
     const io = getSocketIO();
@@ -63,6 +63,6 @@ export async function POST(
 
     return NextResponse.json({ success: true });
   } catch {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error', errorKey: 'tournament.error.serverError' }, { status: 500 });
   }
 }

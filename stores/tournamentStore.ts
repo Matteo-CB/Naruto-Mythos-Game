@@ -67,6 +67,7 @@ interface TournamentStore {
   playerTournaments: TournamentData[];
   loading: boolean;
   error: string | null;
+  errorKey: string | null;
   fetchTournaments: (type: 'simulator' | 'player') => Promise<void>;
   fetchTournament: (id: string) => Promise<void>;
   joinTournament: (id: string, code?: string) => Promise<void>;
@@ -119,32 +120,32 @@ export const useTournamentStore = create<TournamentStore>()((set, get) => ({
   playerTournaments: [],
   loading: false,
   error: null,
+  errorKey: null,
 
   fetchTournaments: async (type) => {
-    set({ loading: true, error: null });
+    set({ loading: true, error: null, errorKey: null });
     try {
       const res = await fetch(`/api/tournaments?type=${type}`);
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
       if (type === 'simulator') set({ simulatorTournaments: data.tournaments });
       else set({ playerTournaments: data.tournaments });
-    } catch { set({ error: 'Failed to fetch tournaments' }); }
+    } catch { set({ error: 'Failed to fetch tournaments', errorKey: 'tournament.error.failedToFetch' }); }
     finally { set({ loading: false }); }
   },
 
   fetchTournament: async (id) => {
-    
     const current = get().activeTournament;
     const isFirstLoad = !current || current.id !== id;
-    if (isFirstLoad) set({ loading: true, error: null });
-    else set({ error: null });
+    if (isFirstLoad) set({ loading: true, error: null, errorKey: null });
+    else set({ error: null, errorKey: null });
     try {
       const res = await fetch(`/api/tournaments/${id}`);
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
       set({ activeTournament: data.tournament, loading: false });
     } catch {
-      set({ error: 'Tournament not found', loading: false });
+      set({ error: 'Tournament not found', errorKey: 'tournament.error.notFound', loading: false });
     }
   },
 
@@ -179,7 +180,12 @@ export const useTournamentStore = create<TournamentStore>()((set, get) => ({
 
   leaveTournament: async (id) => {
     const res = await fetch(`/api/tournaments/${id}/leave`, { method: 'POST' });
-    if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to leave'); }
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const err = new Error(data.error || 'Failed to leave') as Error & { errorKey?: string };
+      if (typeof data.errorKey === 'string') err.errorKey = data.errorKey;
+      throw err;
+    }
     await get().fetchTournament(id);
   },
 
@@ -266,5 +272,5 @@ export const useTournamentStore = create<TournamentStore>()((set, get) => ({
   },
 
   clearActiveTournament: () => set({ activeTournament: null }),
-  clearError: () => set({ error: null }),
+  clearError: () => set({ error: null, errorKey: null }),
 }));

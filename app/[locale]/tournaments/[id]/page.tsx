@@ -69,7 +69,7 @@ export default function TournamentDetailPage() {
   const { data: session, status } = useSession();
   const { animationsEnabled } = useSettingsStore();
   const { socket, connect, connected } = useSocketStore();
-  const { activeTournament, loading, error, fetchTournament, joinTournament, leaveTournament, selectDeck, clearActiveTournament, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, handleStandingsUpdate, handleSwissRoundGenerated, clearError } = useTournamentStore();
+  const { activeTournament, loading, error, errorKey: storeErrorKey, fetchTournament, joinTournament, leaveTournament, selectDeck, clearActiveTournament, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, handleStandingsUpdate, handleSwissRoundGenerated, clearError } = useTournamentStore();
 
   const userId = (session?.user as { id?: string })?.id;
   const [myDecks, setMyDecks] = useState<Array<{ id: string; name: string }>>([]);
@@ -438,7 +438,12 @@ export default function TournamentDetailPage() {
           </motion.div>
         )}
 
-        {error && <div className="mb-4 p-3 text-xs" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#cc4444' }}>{error}</div>}
+        {error && <div className="mb-4 p-3 text-xs" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#cc4444' }}>{(() => {
+          if (storeErrorKey) {
+            try { return tRoot(storeErrorKey); } catch { /* fall through */ }
+          }
+          return error;
+        })()}</div>}
         
 
         
