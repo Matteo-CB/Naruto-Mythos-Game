@@ -38,6 +38,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
 
+    if (
+      typeof messageId !== 'string' || messageId.length > 80 ||
+      typeof targetId !== 'string' || targetId.length > 80 ||
+      typeof targetName !== 'string' || targetName.length > 50 ||
+      typeof messageText !== 'string' || messageText.length > 500 ||
+      typeof roomCode !== 'string' || roomCode.length > 20 ||
+      (reason !== undefined && (typeof reason !== 'string' || reason.length > 500))
+    ) {
+      return NextResponse.json({ error: 'Invalid field types or sizes' }, { status: 400 });
+    }
+
     if (targetId === userId) {
       return NextResponse.json({ error: 'Cannot report yourself' }, { status: 400 });
     }

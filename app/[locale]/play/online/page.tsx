@@ -56,6 +56,7 @@ export default function PlayOnlinePage() {
     changeDeck,
     opponentChangingDeck,
     requestRoomList,
+    unsubscribeRoomList,
     clearError,
   } = useSocketStore();
 
@@ -86,7 +87,10 @@ export default function PlayOnlinePage() {
     if (session?.user?.id) {
       connectAndFetch();
     }
-  }, [session?.user?.id, connectAndFetch]);
+    return () => {
+      unsubscribeRoomList();
+    };
+  }, [session?.user?.id, connectAndFetch, unsubscribeRoomList]);
 
   useEffect(() => {
     return () => {
@@ -656,11 +660,16 @@ function LiveGamesSection() {
   const spectateGame = useSocketStore((s) => s.spectateGame);
   const startOnlineGame = useGameStore((s) => s.startOnlineGame);
 
+  const unsubscribeActiveGames = useSocketStore((s) => s.unsubscribeActiveGames);
+
   useEffect(() => {
     requestActiveGames();
     const interval = setInterval(requestActiveGames, 5000);
-    return () => clearInterval(interval);
-  }, [requestActiveGames]);
+    return () => {
+      clearInterval(interval);
+      unsubscribeActiveGames();
+    };
+  }, [requestActiveGames, unsubscribeActiveGames]);
 
   const publicGames = activeGames.filter((g) => !g.isPrivate);
 

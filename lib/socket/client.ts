@@ -81,6 +81,8 @@ interface SocketStore {
   joinMatchmaking: (userId: string, isRanked?: boolean) => void;
   leaveMatchmaking: () => void;
   requestRoomList: () => void;
+  unsubscribeRoomList: () => void;
+  unsubscribeActiveGames: () => void;
   offerRematch: () => void;
   acceptRematch: () => void;
   declineRematch: () => void;
@@ -974,6 +976,20 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     const { socket, connected } = get();
     if (socket && connected) {
       socket.emit('games:list');
+    }
+  },
+
+  unsubscribeRoomList: () => {
+    const { socket, connected } = get();
+    if (socket && connected) {
+      socket.emit('room:list-unsubscribe');
+    }
+  },
+
+  unsubscribeActiveGames: () => {
+    const { socket, connected } = get();
+    if (socket && connected) {
+      socket.emit('games:list-unsubscribe');
     }
   },
 }));
