@@ -236,11 +236,13 @@ function broadcastActiveGames(io: SocketIOServer): void {
 function cleanupStaleRooms(): void {
   const now = Date.now();
   let cleaned = 0;
+  const PRIVATE_EMPTY_TTL_MS = 30 * 60 * 1000;
   for (const [code, room] of rooms) {
-    
-    if (!room.isPrivate && !room.guestId && !room.gameState) {
-      if (!room.createdAt || now - room.createdAt > MATCHMAKING_ROOM_TTL_MS) {
+    if (!room.guestId && !room.gameState) {
+      const ttl = room.isPrivate ? PRIVATE_EMPTY_TTL_MS : MATCHMAKING_ROOM_TTL_MS;
+      if (!room.createdAt || now - room.createdAt > ttl) {
         if (room.hostSocket) playerRooms.delete(room.hostSocket);
+        if (room.sealedTimer) clearTimeout(room.sealedTimer);
         rooms.delete(code);
         cleaned++;
         continue;
