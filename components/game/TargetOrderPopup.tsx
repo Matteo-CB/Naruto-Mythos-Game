@@ -13,6 +13,8 @@ import {
   PopupTitle,
   PopupActionButton,
   PopupDismissLink,
+  PopupMinimizeX,
+  PopupMinimizePill,
 } from './PopupPrimitives';
 
 export interface OrderTarget {
@@ -58,6 +60,9 @@ export function TargetOrderPopup({
   const t = useTranslations();
   const locale = useLocale() as 'en' | 'fr';
   const zoomCard = useUIStore((s) => s.zoomCard);
+  const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
+  const minimizeEffectPopup = useUIStore((s) => s.minimizeEffectPopup);
+  const restoreEffectPopup = useUIStore((s) => s.restoreEffectPopup);
 
   const [orderedIds, setOrderedIds] = useState<string[]>([]);
 
@@ -99,11 +104,17 @@ export function TargetOrderPopup({
     return null;
   }
 
+  if (effectPopupMinimized) {
+    const titleText = t.has(titleKey) ? t(titleKey) : badgeLabel;
+    return <PopupMinimizePill text={titleText} onRestore={restoreEffectPopup} />;
+  }
+
   return (
     <AnimatePresence>
       <PopupOverlay>
         <PopupCornerFrame accentColor={`${accentColor}55`} maxWidth="600px" padding="24px 20px">
-          
+          <PopupMinimizeX onClick={minimizeEffectPopup} />
+
           <PopupTitle accentColor={accentColor} size="lg">
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </PopupTitle>

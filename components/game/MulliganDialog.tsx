@@ -18,6 +18,8 @@ import {
   PopupTitle,
   PopupActionButton,
   PopupDismissLink,
+  PopupMinimizeX,
+  PopupMinimizePill,
   PanelFrame,
 } from './PopupPrimitives';
 
@@ -298,6 +300,9 @@ export function MulliganDialog() {
   const isProcessing = useGameStore((s) => s.isProcessing);
   const coinFlipComplete = useUIStore((s) => s.coinFlipComplete);
   const missionDeckIntroComplete = useUIStore((s) => s.missionDeckIntroComplete);
+  const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
+  const minimizeEffectPopup = useUIStore((s) => s.minimizeEffectPopup);
+  const restoreEffectPopup = useUIStore((s) => s.restoreEffectPopup);
   const [selectedCard, setSelectedCard] = useState<CharacterCard | null>(null);
 
   if (!visibleState || visibleState.phase !== 'mulligan' || !coinFlipComplete || !missionDeckIntroComplete) return null;
@@ -336,6 +341,10 @@ export function MulliganDialog() {
     setSelectedCard((prev) => (prev?.id === card.id ? null : card));
   };
 
+  if (effectPopupMinimized) {
+    return <PopupMinimizePill text={t('game.mulligan.title')} onRestore={restoreEffectPopup} />;
+  }
+
   return (
     <PopupOverlay onClickBg={() => setSelectedCard(null)}>
       <PopupCornerFrame
@@ -348,9 +357,10 @@ export function MulliganDialog() {
           style={{ maxHeight: '85vh' }}
           onClick={(e) => e.stopPropagation()}
         >
-          
+          <PopupMinimizeX onClick={minimizeEffectPopup} />
+
           <div className="flex flex-col items-center gap-5 overflow-y-auto w-full shrink min-h-0">
-            
+
             <PopupTitle accentColor="#c4a35a" size="lg">
               {t('game.mulligan.title')}
             </PopupTitle>

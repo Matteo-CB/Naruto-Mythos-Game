@@ -1,6 +1,19 @@
 {
   "entries": [
     {
+      "date": "2026-05-11",
+      "title_fr": "Sakura 012 : la défausse n'est plus skippable + popups minimisables (fin de partie, mulligan, ordre de cibles)",
+      "title_en": "Sakura 012: discard no longer skippable + minimizable popups (end-of-game, mulligan, target order)",
+      "changes_fr": [
+        "Sakura Haruno (012) UPGRADE 'Pioche 1 carte. Si tu le fais, tu dois défausser 1 carte.' : la défausse était skippable. Bug : le flag rootOptional du choix initial 'piocher ou pas' se propageait sur le sous-effet de défausse, le marquant skippable même quand le handler avait posé isMandatory=true. Corrigé à deux endroits : EffectEngine.ts ne propage plus rootOptional aux sous-effets explicitement marqués isMandatory, et gameStore.ts honore isMandatory en priorité sur isOptional/rootOptional pour décider si un bouton Skip apparaît.",
+        "Tous les popups en partie sont désormais minimisables pour permettre de revoir le terrain : ajout de PopupMinimizeX au mulligan dialog, au popup d'ordre de cibles (TargetOrderPopup), et à l'écran de fin de partie GameEndScreen. Avant : ces popups occupaient tout l'écran sans moyen de les réduire. La nouvelle pill PopupMinimizePill s'affiche en bas de l'écran pour restaurer. Pour la fin de partie, un nouveau state gameEndMinimized dans uiStore permet de minimiser et de revoir le board même après la fin de la partie. Le state est reset à chaque nouvelle partie."
+      ],
+      "changes_en": [
+        "Sakura Haruno (012) UPGRADE 'Draw 1 card. If you do so, you must discard 1 card.': the discard was skippable. Bug: the rootOptional flag from the initial 'draw or not' choice propagated onto the discard sub-effect, marking it skippable even when the handler had set isMandatory=true. Fixed in two places: EffectEngine.ts no longer propagates rootOptional onto sub-effects explicitly marked isMandatory, and gameStore.ts now honors isMandatory over isOptional/rootOptional when deciding whether to show a Skip button.",
+        "All in-game popups are now minimizable so you can review the board: added PopupMinimizeX to the mulligan dialog, the target order popup (TargetOrderPopup), and the end-of-game screen (GameEndScreen). Before: these popups covered the whole screen with no way to shrink them. The new PopupMinimizePill renders at the bottom of the screen for restore. For the end-of-game screen, a new gameEndMinimized state in uiStore lets you minimize and review the board even after the match ends. State resets on every new game."
+      ]
+    },
+    {
       "date": "2026-05-10",
       "title_fr": "Stats par deck (3 mois, ultra compressé)",
       "title_en": "Per-deck stats (3 months, ultra-compressed)",

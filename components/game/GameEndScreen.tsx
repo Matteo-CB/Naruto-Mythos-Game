@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { useGameStore } from '@/stores/gameStore';
+import { useUIStore } from '@/stores/uiStore';
 import { useSocketStore } from '@/lib/socket/client';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 import { EloBadge, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
@@ -14,6 +15,8 @@ import {
   PopupTitle,
   PopupActionButton,
   PopupDismissLink,
+  PopupMinimizeX,
+  PopupMinimizePill,
   SectionDivider,
 } from './PopupPrimitives';
 
@@ -39,6 +42,9 @@ export function GameEndScreen() {
   const offerRematch = useSocketStore((s) => s.offerRematch);
   const acceptRematch = useSocketStore((s) => s.acceptRematch);
   const declineRematch = useSocketStore((s) => s.declineRematch);
+  const gameEndMinimized = useUIStore((s) => s.gameEndMinimized);
+  const minimizeGameEnd = useUIStore((s) => s.minimizeGameEnd);
+  const restoreGameEnd = useUIStore((s) => s.restoreGameEnd);
 
   
   
@@ -207,6 +213,15 @@ export function GameEndScreen() {
     headingColor = '#b33e3e';
   }
 
+  if (gameEndMinimized) {
+    return (
+      <PopupMinimizePill
+        text={`${headingText} ${myScore}-${oppScore}`}
+        onRestore={restoreGameEnd}
+      />
+    );
+  }
+
   return (
     <AnimatePresence>
       <PopupOverlay>
@@ -215,7 +230,8 @@ export function GameEndScreen() {
           maxWidth="520px"
           padding="40px 32px"
         >
-          
+          <PopupMinimizeX onClick={minimizeGameEnd} />
+
           <PopupTitle accentColor={headingColor} size="xl">
             {headingText}
           </PopupTitle>

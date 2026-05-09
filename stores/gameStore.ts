@@ -388,6 +388,7 @@ interface PendingEffectData {
   effectDescription: string;
   isOptional?: boolean;
   rootOptional?: boolean;
+  isMandatory?: boolean;
 }
 
 
@@ -843,11 +844,9 @@ function buildPendingTargetSelectionUI(
     onSelect,
     onDecline: isMultiSelectChoose
       ? onDecline
-      
-      
-      
-      
-      : ((pendingEffect?.isOptional || pendingEffect?.rootOptional) ? onDecline : undefined),
+      : (pendingEffect?.isMandatory
+          ? undefined
+          : ((pendingEffect?.isOptional || pendingEffect?.rootOptional) ? onDecline : undefined)),
     declineLabelKey: isMultiSelectChoose ? 'game.board.skip' : declineLabelKey,
     isMultiSelect: isMultiSelectChoose || undefined,
     minSelections: isMultiSelectChoose ? (pendingAction.minSelections ?? 0) : (tst === 'ORDERED_DEFEAT' ? pendingAction.minSelections : undefined),
@@ -2019,6 +2018,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     useUIStore.getState().resetHandOrder();
     useUIStore.getState().setCoinFlipComplete(false);
     useUIStore.getState().setMissionDeckIntroComplete(false);
+    useUIStore.getState().restoreGameEnd();
+    useUIStore.getState().restoreEffectPopup();
     set({
       gameState: null,
       visibleState: null,

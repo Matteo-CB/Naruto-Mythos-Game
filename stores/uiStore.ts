@@ -56,6 +56,11 @@ interface UIStore {
   minimizeEffectPopup: () => void;
   restoreEffectPopup: () => void;
 
+
+  gameEndMinimized: boolean;
+  minimizeGameEnd: () => void;
+  restoreGameEnd: () => void;
+
   
   coinFlipComplete: boolean;
   setCoinFlipComplete: (done: boolean) => void;
@@ -143,6 +148,10 @@ export const useUIStore = create<UIStore>((set) => ({
   effectPopupMinimized: false,
   minimizeEffectPopup: () => set({ effectPopupMinimized: true }),
   restoreEffectPopup: () => set({ effectPopupMinimized: false }),
+
+  gameEndMinimized: false,
+  minimizeGameEnd: () => set({ gameEndMinimized: true }),
+  restoreGameEnd: () => set({ gameEndMinimized: false }),
 
   coinFlipComplete: false,
   setCoinFlipComplete: (done) => set({ coinFlipComplete: done }),

@@ -14946,6 +14946,7 @@ export class EffectEngine {
     if (parentWasOptional) {
       for (const pe of newState.pendingEffects) {
         if (!preDispatchPendingIds.has(pe.id) && pe.id !== pendingEffect.id) {
+          if (pe.isMandatory) continue;
           pe.rootOptional = true;
         }
       }
