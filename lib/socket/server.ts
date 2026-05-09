@@ -1810,11 +1810,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       if (socket.id === room.hostSocket) {
         room.hostDeck = null;
+        room.hostDeckId = undefined;
       } else if (socket.id === room.guestSocket) {
         room.guestDeck = null;
+        room.guestDeckId = undefined;
       }
 
-      
       const otherSocket = socket.id === room.hostSocket ? room.guestSocket : room.hostSocket;
       if (otherSocket) {
         io.to(otherSocket).emit('room:opponent-changing-deck');
@@ -2367,6 +2368,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
       room.gameState = null;
       room.hostDeck = null;
       room.guestDeck = null;
+      room.hostDeckId = undefined;
+      room.guestDeckId = undefined;
       room.replayInitialState = null;
       room.replayStateSnapshots = null;
       room.replaySnapshotLogLengths = null;
