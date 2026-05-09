@@ -57,6 +57,8 @@ export interface RoomData {
   sealedBoosterCount: 4 | 5 | 6;
   sealedTimer: ReturnType<typeof setTimeout> | null;
   sealedDeadline: number | null;
+  hostSealedPoolIds?: string[];
+  guestSealedPoolIds?: string[];
   
   timerEnabled: boolean;
   
@@ -1737,7 +1739,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
           const hostPool = generateSealedPool(count);
           const guestPool = generateSealedPool(count);
 
-          
+          room.hostSealedPoolIds = hostPool.allCards.map(c => c.id);
+          room.guestSealedPoolIds = guestPool.allCards.map(c => c.id);
+
           if (room.hostSocket) {
             io.to(room.hostSocket).emit('sealed:boosters', {
               boosters: hostPool.boosters,
@@ -1870,6 +1874,25 @@ export function setupSocketHandlers(io: SocketIOServer) {
         resolvedMissions.push(canon);
       }
       const safeDeck = { characters: resolvedChars, missions: resolvedMissions };
+
+      if (room.isSealed) {
+        const isHost = socket.id === room.hostSocket;
+        const poolIds = isHost ? room.hostSealedPoolIds : room.guestSealedPoolIds;
+        if (!poolIds || poolIds.length === 0) {
+          socket.emit('room:error', { message: 'Sealed pool not initialized', errorKey: 'game.error.invalidDeck' });
+          return;
+        }
+        const remaining = new Map<string, number>();
+        for (const id of poolIds) remaining.set(id, (remaining.get(id) ?? 0) + 1);
+        for (const c of resolvedChars) {
+          const left = remaining.get(c.id) ?? 0;
+          if (left <= 0) {
+            socket.emit('room:error', { message: `Card ${c.id} is not in your sealed pool`, errorKey: 'game.error.invalidDeck' });
+            return;
+          }
+          remaining.set(c.id, left - 1);
+        }
+      }
 
       if (socket.id === room.hostSocket) {
         room.hostDeck = safeDeck;
@@ -2331,6 +2354,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
           const count = room.sealedBoosterCount ?? 6;
           const hostPool = generateSealedPool(count);
           const guestPool = generateSealedPool(count);
+          room.hostSealedPoolIds = hostPool.allCards.map(c => c.id);
+          room.guestSealedPoolIds = guestPool.allCards.map(c => c.id);
 
           if (room.hostSocket) {
             io.to(room.hostSocket).emit('sealed:boosters', {
