@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, use } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -54,6 +54,7 @@ export default function ProfilePage({
   const t = useTranslations('profile');
   const tc = useTranslations('common');
   const td = useTranslations('discord');
+  const locale = useLocale();
   const { data: session, update: updateSession } = useSession();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -215,7 +216,7 @@ export default function ProfilePage({
               </div>
 
               <p className="text-xs mt-1" style={{ color: '#555' }}>
-                {t('memberSince', { date: new Date(profile.createdAt).toLocaleDateString() })}
+                {t('memberSince', { date: new Date(profile.createdAt).toLocaleDateString(locale) })}
               </p>
 
               
@@ -381,7 +382,7 @@ export default function ProfilePage({
                       {deck.name}
                     </span>
                     <span className="text-[10px] shrink-0 ml-3" style={{ color: '#444' }}>
-                      {new Date(deck.createdAt).toLocaleDateString()}
+                      {new Date(deck.createdAt).toLocaleDateString(locale)}
                     </span>
                   </div>
                 ))}
@@ -482,7 +483,7 @@ export default function ProfilePage({
                     
                     {game.completedAt && (
                       <span className="text-[10px] shrink-0 hidden sm:block" style={{ color: '#444' }}>
-                        {new Date(game.completedAt).toLocaleDateString()}
+                        {new Date(game.completedAt).toLocaleDateString(locale)}
                       </span>
                     )}
                   </div>

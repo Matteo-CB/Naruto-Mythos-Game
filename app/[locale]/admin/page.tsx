@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
@@ -25,6 +25,7 @@ type FilterMode = 'all' | 'banned' | 'authorized';
 export default function AdminPage() {
   const t = useTranslations('adminSettings');
   const tc = useTranslations();
+  const locale = useLocale();
   const { data: session } = useSession();
   const [tab, setTab] = useState<Tab>('settings');
 
@@ -808,7 +809,7 @@ export default function AdminPage() {
                             </span>
                           )}
                           <span className="text-[9px] shrink-0" style={{ color: '#444' }}>
-                            {game.completedAt ? new Date(game.completedAt).toLocaleDateString() : ''}
+                            {game.completedAt ? new Date(game.completedAt).toLocaleDateString(locale) : ''}
                           </span>
 
                           {confirmDeleteGameId === game.id ? (
@@ -850,6 +851,7 @@ export default function AdminPage() {
 
 function ReportsPanel() {
   const t = useTranslations();
+  const locale = useLocale();
   const [reports, setReports] = useState<Array<{
     id: string; reporterName: string; targetName: string; messageText: string;
     roomCode: string; reason: string; status: string; action: string | null;
@@ -917,7 +919,7 @@ function ReportsPanel() {
           <div className="flex flex-wrap gap-3 text-xs mb-2">
             <span style={{ color: '#888' }}>{t('moderation.reporter')}: <span style={{ color: '#e0e0e0' }}>{report.reporterName}</span></span>
             <span style={{ color: '#888' }}>{t('moderation.target')}: <span style={{ color: '#b33e3e' }}>{report.targetName}</span></span>
-            <span style={{ color: '#555' }}>{new Date(report.createdAt).toLocaleString()}</span>
+            <span style={{ color: '#555' }}>{new Date(report.createdAt).toLocaleString(locale)}</span>
           </div>
           <div className="text-xs px-3 py-2 rounded mb-3" style={{ backgroundColor: '#0a0a0a', border: '1px solid #1e1e1e', color: '#ccc', fontFamily: "'Inter', sans-serif" }}>
             {report.messageText}
@@ -988,7 +990,7 @@ function ReportsPanel() {
                 backgroundColor: report.status === 'dismissed' ? 'rgba(136,136,136,0.1)' : 'rgba(62,139,62,0.1)',
                 color: report.status === 'dismissed' ? '#888' : '#3e8b3e',
               }}>{report.action ?? report.status}</span>
-              <span className="text-[10px]" style={{ color: '#444' }}>{new Date(report.createdAt).toLocaleDateString()}</span>
+              <span className="text-[10px]" style={{ color: '#444' }}>{new Date(report.createdAt).toLocaleDateString(locale)}</span>
             </div>
           ))}
         </>
@@ -1026,6 +1028,7 @@ interface SuspiciousFinding {
 
 function SuspiciousPanel() {
   const t = useTranslations('suspicious');
+  const locale = useLocale();
   const [findings, setFindings] = useState<SuspiciousFinding[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -1192,7 +1195,7 @@ function SuspiciousPanel() {
                   <span style={{ color: '#666' }}>W/L/D {u.wins}/{u.losses}/{u.draws}</span>
                   <span style={{ color: '#555' }}>{u.email}</span>
                   {u.discordId && <span style={{ color: '#555' }}>{t('discordId', { id: u.discordId })}</span>}
-                  <span style={{ color: '#444' }}>{t('createdAt', { date: new Date(u.createdAt).toLocaleString() })}</span>
+                  <span style={{ color: '#444' }}>{t('createdAt', { date: new Date(u.createdAt).toLocaleString(locale) })}</span>
                 </div>
               ))}
             </div>
@@ -1206,7 +1209,7 @@ function SuspiciousPanel() {
                 <span>{f.game.player1Name ?? '?'} {f.game.player1Score} — {f.game.player2Score} {f.game.player2Name ?? '?'}</span>
                 {f.game.durationSec != null && <span style={{ color: '#666' }}>{f.game.durationSec}s</span>}
                 {f.game.eloChange != null && <span style={{ color: '#666' }}>{t('eloDelta', { delta: f.game.eloChange })}</span>}
-                {f.game.completedAt && <span style={{ color: '#444' }}>{new Date(f.game.completedAt).toLocaleString()}</span>}
+                {f.game.completedAt && <span style={{ color: '#444' }}>{new Date(f.game.completedAt).toLocaleString(locale)}</span>}
               </div>
               {confirmRevertGameId === f.game.id ? (
                 <div className="flex items-center gap-2 mt-2">

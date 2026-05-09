@@ -57,10 +57,11 @@ export async function POST(request: NextRequest) {
 
     case 'set-elo': {
       const { elo } = body;
-      if (typeof elo !== 'number' || elo < 0) return NextResponse.json({ error: 'Invalid ELO' }, { status: 400 });
-      await prisma.user.update({ where: { id: userId }, data: { elo } });
+      if (typeof elo !== 'number' || !Number.isFinite(elo)) return NextResponse.json({ error: 'Invalid ELO' }, { status: 400 });
+      const clamped = Math.max(100, Math.min(3000, Math.round(elo)));
+      await prisma.user.update({ where: { id: userId }, data: { elo: clamped } });
       syncDiscordRole(userId).catch(() => {});
-      return NextResponse.json({ success: true });
+      return NextResponse.json({ success: true, elo: clamped });
     }
 
     case 'set-role': {

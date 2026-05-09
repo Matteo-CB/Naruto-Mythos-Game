@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
@@ -118,19 +118,25 @@ export default function TournamentDetailPage() {
   }, [socket, tournamentId, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, handleStandingsUpdate, handleSwissRoundGenerated, fetchTournament]);
 
   
+  const isSealedTournament = activeTournament?.gameMode === 'sealed';
+  const decksFetchedRef = useRef(false);
   useEffect(() => {
-    if (!session?.user || !activeTournament || activeTournament.gameMode === 'sealed') return;
+    if (!session?.user || !activeTournament || isSealedTournament) return;
+    if (decksFetchedRef.current) return;
+    decksFetchedRef.current = true;
     fetch('/api/decks').then(r => r.ok ? r.json() : null).then(data => {
-      
       const decks = Array.isArray(data) ? data : data?.decks ?? [];
       if (decks.length > 0) setMyDecks(decks.map((d: { id: string; name: string }) => ({ id: d.id, name: d.name })));
-    }).catch(() => {});
-    
+    }).catch(() => { decksFetchedRef.current = false; });
+  }, [session?.user, isSealedTournament, activeTournament]);
+
+  useEffect(() => {
+    if (!activeTournament || !userId) return;
     const myParticipant = activeTournament.participants.find(p => p.userId === userId);
     if (myParticipant && (myParticipant as any).deckId) {
       setSelectedDeckId((myParticipant as any).deckId);
     }
-  }, [session, activeTournament, userId]);
+  }, [activeTournament, userId]);
 
   const [joinCodeInput, setJoinCodeInput] = useState('');
   const [joinError, setJoinError] = useState('');

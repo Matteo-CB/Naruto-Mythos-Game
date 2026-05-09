@@ -2865,5 +2865,31 @@
         "desc": "Full expectimax search, samples hidden info, hardly slips"
       }
     }
+  },
+  "eloHistory": {
+    "loading": "Loading ELO history…",
+    "errorPrefix": "ELO history",
+    "emptyWindow": "No ranked games in the last {days} days.",
+    "title": "ELO history",
+    "windowLabel": "last {days} days",
+    "statGames": "games",
+    "statWLD": "W / L / D",
+    "statEloChange": "ELO change",
+    "statOpponents": "opponents",
+    "chartStart": "{elo} start",
+    "chartNow": "{elo} now",
+    "result": {
+      "win": "win",
+      "loss": "loss",
+      "draw": "draw"
+    },
+    "vsOpponent": "vs {name}",
+    "oppElo": "opp ELO {elo}",
+    "myElo": "my ELO {elo}",
+    "eloDelta": "{delta} ELO",
+    "topOpponents": "top opponents",
+    "matchCount": "{count, plural, one {# match} other {# matches}}",
+    "winShort": "W",
+    "lossShort": "L"
   }
 }

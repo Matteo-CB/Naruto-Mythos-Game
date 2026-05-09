@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useSession } from 'next-auth/react';
 
 interface BanInfo {
@@ -18,6 +18,7 @@ interface ReportNotification {
 
 export function BanNotification() {
   const t = useTranslations('ban');
+  const locale = useLocale();
   const { data: session } = useSession();
   const [bans, setBans] = useState<BanInfo[]>([]);
   const [notifications, setNotifications] = useState<ReportNotification[]>([]);
@@ -57,7 +58,7 @@ export function BanNotification() {
 
   
   if (gameBan && !dismissed.has('gameBan')) {
-    const dateStr = gameBan.expiresAt ? new Date(gameBan.expiresAt).toLocaleDateString() : '';
+    const dateStr = gameBan.expiresAt ? new Date(gameBan.expiresAt).toLocaleDateString(locale) : '';
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.9)' }}>
         <div className="flex flex-col items-center gap-4 max-w-md w-full text-center px-6 py-8" style={{
@@ -85,7 +86,7 @@ export function BanNotification() {
 
   
   if (chatBan && !dismissed.has('chatBan')) {
-    const dateStr = chatBan.expiresAt ? new Date(chatBan.expiresAt).toLocaleDateString() : '';
+    const dateStr = chatBan.expiresAt ? new Date(chatBan.expiresAt).toLocaleDateString(locale) : '';
     items.push({
       key: 'chatBan',
       content: (

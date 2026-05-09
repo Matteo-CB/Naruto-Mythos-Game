@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 
 
@@ -46,6 +46,7 @@ const FILTER_TABS: FilterTab[] = ['all', 1, 2, 3, 4, 5];
 
 export function QuizLeaderboard() {
   const t = useTranslations('learn');
+  const locale = useLocale();
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -208,7 +209,7 @@ export function QuizLeaderboard() {
                 const dateStr = (() => {
                   try {
                     const d = new Date(entry.date);
-                    return d.toLocaleDateString(undefined, {
+                    return d.toLocaleDateString(locale, {
                       month: 'short',
                       day: 'numeric',
                     });

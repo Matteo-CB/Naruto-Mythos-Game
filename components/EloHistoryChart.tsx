@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface EloPoint {
   t: string;
@@ -52,6 +53,8 @@ interface Props {
 }
 
 export function EloHistoryChart({ username, compact }: Props) {
+  const t = useTranslations('eloHistory');
+  const locale = useLocale();
   const [data, setData] = useState<EloHistoryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -132,7 +135,7 @@ export function EloHistoryChart({ username, compact }: Props) {
     return (
       <div className={compact ? 'py-4' : 'rounded-lg p-5 border'}
         style={compact ? {} : { backgroundColor: '#111', borderColor: '#1e1e1e' }}>
-        <p className="text-xs" style={{ color: '#666' }}>Loading ELO history…</p>
+        <p className="text-xs" style={{ color: '#666' }}>{t('loading')}</p>
       </div>
     );
   }
@@ -141,7 +144,7 @@ export function EloHistoryChart({ username, compact }: Props) {
     return (
       <div className={compact ? 'py-4' : 'rounded-lg p-5 border'}
         style={compact ? {} : { backgroundColor: '#111', borderColor: '#1e1e1e' }}>
-        <p className="text-xs" style={{ color: RED }}>ELO history: {error}</p>
+        <p className="text-xs" style={{ color: RED }}>{t('errorPrefix')}: {error}</p>
       </div>
     );
   }
@@ -151,7 +154,7 @@ export function EloHistoryChart({ username, compact }: Props) {
       <div className={compact ? 'py-4' : 'rounded-lg p-5 border'}
         style={compact ? {} : { backgroundColor: '#111', borderColor: '#1e1e1e' }}>
         <p className="text-xs text-center py-6" style={{ color: '#555' }}>
-          No ranked games in the last {data?.windowDays ?? 14} days.
+          {t('emptyWindow', { days: data?.windowDays ?? 14 })}
         </p>
       </div>
     );
@@ -166,24 +169,24 @@ export function EloHistoryChart({ username, compact }: Props) {
       {!compact && (
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xs font-bold uppercase tracking-widest" style={{ color: GOLD }}>
-            ELO history
+            {t('title')}
           </h2>
           <span className="text-[10px] uppercase tracking-wider" style={{ color: '#555' }}>
-            last {data.windowDays} days
+            {t('windowLabel', { days: data.windowDays })}
           </span>
         </div>
       )}
 
-      
+
       <div className="grid grid-cols-4 gap-3 mb-5">
-        <Stat label="games" value={data.summary.games} />
-        <Stat label="W / L / D" value={`${data.summary.wins} / ${data.summary.losses} / ${data.summary.draws}`} />
+        <Stat label={t('statGames')} value={data.summary.games} />
+        <Stat label={t('statWLD')} value={`${data.summary.wins} / ${data.summary.losses} / ${data.summary.draws}`} />
         <Stat
-          label="ELO change"
+          label={t('statEloChange')}
           value={`${data.summary.totalDelta > 0 ? '+' : ''}${data.summary.totalDelta}`}
           valueColor={totalDeltaColor}
         />
-        <Stat label="opponents" value={data.summary.distinctOpponents} />
+        <Stat label={t('statOpponents')} value={data.summary.distinctOpponents} />
       </div>
 
       
@@ -252,7 +255,7 @@ export function EloHistoryChart({ username, compact }: Props) {
               fontSize={9} fill="#555"
               fontFamily="ui-monospace, monospace"
             >
-              {chart.startElo} start
+              {t('chartStart', { elo: chart.startElo })}
             </text>
             <text
               x={chart.W - chart.padR} y={chart.H - 10}
@@ -260,14 +263,14 @@ export function EloHistoryChart({ username, compact }: Props) {
               textAnchor="end"
               fontFamily="ui-monospace, monospace"
             >
-              {chart.endElo} now
+              {t('chartNow', { elo: chart.endElo })}
             </text>
           </svg>
 
           
           {hovered && (() => {
             const p = data.points[hovered.idx];
-            const dateStr = new Date(p.t).toLocaleString();
+            const dateStr = new Date(p.t).toLocaleString(locale);
             const deltaColor = p.delta > 0 ? GREEN : p.delta < 0 ? RED : GREY;
             const resultColor = p.result === 'win' ? GREEN : p.result === 'loss' ? RED : GREY;
             
@@ -287,15 +290,15 @@ export function EloHistoryChart({ username, compact }: Props) {
                 }}
               >
                 <div className="flex items-center gap-2">
-                  <span className="uppercase font-bold" style={{ color: resultColor }}>{p.result}</span>
-                  <span style={{ color: '#ccc' }}>vs {p.opponentUsername}</span>
+                  <span className="uppercase font-bold" style={{ color: resultColor }}>{t(`result.${p.result}`)}</span>
+                  <span style={{ color: '#ccc' }}>{t('vsOpponent', { name: p.opponentUsername })}</span>
                 </div>
                 <div style={{ color: '#666' }} className="mt-0.5">
-                  opp ELO {p.opponentElo}  ·  my ELO {p.elo}
+                  {t('oppElo', { elo: p.opponentElo })}  ·  {t('myElo', { elo: p.elo })}
                 </div>
                 <div className="mt-0.5">
                   <span style={{ color: deltaColor, fontWeight: 700 }}>
-                    {p.delta > 0 ? '+' : ''}{p.delta} ELO
+                    {t('eloDelta', { delta: p.delta > 0 ? `+${p.delta}` : `${p.delta}` })}
                   </span>
                 </div>
                 <div style={{ color: '#444' }} className="mt-0.5">{dateStr}</div>
@@ -310,7 +313,7 @@ export function EloHistoryChart({ username, compact }: Props) {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <h3 className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#555' }}>
-              top opponents
+              {t('topOpponents')}
             </h3>
             <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
             <span className="text-[10px]" style={{ color: '#444' }}>
@@ -330,10 +333,10 @@ export function EloHistoryChart({ username, compact }: Props) {
                     {o.username}
                   </span>
                   <span className="tabular-nums shrink-0" style={{ color: '#666' }}>
-                    {o.games} {o.games === 1 ? 'match' : 'matches'}
+                    {t('matchCount', { count: o.games })}
                   </span>
                   <span className="tabular-nums shrink-0 w-20 text-right" style={{ color: '#888' }}>
-                    {o.wins}W {o.losses}L
+                    {o.wins}{t('winShort')} {o.losses}{t('lossShort')}
                   </span>
                   <span
                     className="tabular-nums shrink-0 w-12 text-right text-[11px] font-bold"

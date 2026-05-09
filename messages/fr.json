@@ -2865,5 +2865,31 @@
         "desc": "Recherche expectimax complète, échantillonne les infos cachées, ne se trompe presque jamais"
       }
     }
+  },
+  "eloHistory": {
+    "loading": "Chargement de l'historique ELO…",
+    "errorPrefix": "Historique ELO",
+    "emptyWindow": "Aucune partie classée sur les {days} derniers jours.",
+    "title": "Historique ELO",
+    "windowLabel": "{days} derniers jours",
+    "statGames": "parties",
+    "statWLD": "V / D / N",
+    "statEloChange": "Variation ELO",
+    "statOpponents": "adversaires",
+    "chartStart": "{elo} départ",
+    "chartNow": "{elo} actuel",
+    "result": {
+      "win": "victoire",
+      "loss": "défaite",
+      "draw": "nul"
+    },
+    "vsOpponent": "vs {name}",
+    "oppElo": "ELO adv. {elo}",
+    "myElo": "mon ELO {elo}",
+    "eloDelta": "{delta} ELO",
+    "topOpponents": "principaux adversaires",
+    "matchCount": "{count, plural, one {# match} other {# matchs}}",
+    "winShort": "V",
+    "lossShort": "D"
   }
 }
