@@ -72,7 +72,8 @@ export async function recordDeckGame(
     if (result === 'win') todayEntry.w += 1;
     else if (result === 'loss') todayEntry.l += 1;
     else todayEntry.x += 1;
-    todayEntry.e += Math.round(eloDelta);
+    const safeDelta = Number.isFinite(eloDelta) ? Math.round(eloDelta) : 0;
+    todayEntry.e += safeDelta;
 
     daily.sort((a, b) => a.d - b.d);
 

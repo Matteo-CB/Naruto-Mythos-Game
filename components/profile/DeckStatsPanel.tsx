@@ -176,19 +176,18 @@ export function DeckStatsPanel({ decks }: { decks: Deck[] }) {
       return;
     }
     let cancelled = false;
-    Promise.all(
-      decks.map((d) =>
-        fetch(`/api/decks/${d.id}/stats`)
-          .then((r) => (r.ok ? r.json() : null))
-          .catch(() => null),
-      ),
-    ).then((results) => {
-      if (cancelled) return;
-      const next: Record<string, DeckStats | null> = {};
-      decks.forEach((d, i) => { next[d.id] = results[i] as DeckStats | null; });
-      setStatsByDeck(next);
-      setLoading(false);
-    });
+    fetch('/api/decks/stats')
+      .then((r) => (r.ok ? r.json() : { decks: [] }))
+      .then((data: { decks: DeckStats[] }) => {
+        if (cancelled) return;
+        const next: Record<string, DeckStats | null> = {};
+        for (const s of data.decks ?? []) next[s.deckId] = s;
+        setStatsByDeck(next);
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => { cancelled = true; };
   }, [decks]);
 
