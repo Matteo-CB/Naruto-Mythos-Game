@@ -945,7 +945,8 @@
     "cardsShown": "{count} cards shown",
     "basePoints": "Base Points",
     "id": "ID",
-    "missions": "Missions"
+    "missions": "Missions",
+    "bannedPlaceholder": "BANNED"
   },
   "deckBuilder": {
     "title": "Deck Builder",

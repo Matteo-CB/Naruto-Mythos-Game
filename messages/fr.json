@@ -945,7 +945,8 @@
     "cardsShown": "{count} cartes affichees",
     "basePoints": "Points de Base",
     "id": "ID",
-    "missions": "Missions"
+    "missions": "Missions",
+    "bannedPlaceholder": "BANNIE"
   },
   "deckBuilder": {
     "title": "Constructeur de Deck",

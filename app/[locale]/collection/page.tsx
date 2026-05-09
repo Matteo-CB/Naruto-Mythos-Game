@@ -34,6 +34,7 @@ export default function CollectionPage() {
   const t = useTranslations();
   const locale = useLocale();
   const [allCards, setAllCards] = useState<AnyCard[]>([]);
+  const [cardsLoading, setCardsLoading] = useState(true);
   const [filterRarity, setFilterRarity] = useState<string>('all');
   const [filterGroup, setFilterGroup] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -46,6 +47,7 @@ export default function CollectionPage() {
     import('@/lib/data/cardLoader').then((mod) => {
       const cards = mod.getAllCards();
       setAllCards(cards);
+      setCardsLoading(false);
     });
   }, []);
 
@@ -145,10 +147,17 @@ export default function CollectionPage() {
           </select>
         </div>
 
-        
+
         <p className="text-xs text-[#555] mb-4">{t('collection.total', { count: filteredCards.length })}</p>
 
-        
+        {cardsLoading && (
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 mb-4">
+            {Array.from({ length: 24 }).map((_, i) => (
+              <div key={i} className="card-aspect bg-[#141414] border border-[#262626] animate-pulse" />
+            ))}
+          </div>
+        )}
+
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
           {paginatedChars.map((card) => {
             const isBanned = bannedIds.has(card.id);
@@ -172,7 +181,7 @@ export default function CollectionPage() {
                   />
                 ) : isBanned ? (
                   <div className="w-full h-full flex flex-col items-center justify-center p-1" style={{ backgroundColor: '#1a1a1a' }}>
-                    <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#333333' }}>MYTHOS</div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#333333' }}>{t('collection.bannedPlaceholder')}</div>
                   </div>
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center p-1">
@@ -243,7 +252,7 @@ export default function CollectionPage() {
                       />
                     ) : isBanned ? (
                       <div className="w-full h-full flex flex-col items-center justify-center p-1" style={{ backgroundColor: '#1a1a1a' }}>
-                        <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#333333' }}>MYTHOS</div>
+                        <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#333333' }}>{t('collection.bannedPlaceholder')}</div>
                       </div>
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center p-1">
