@@ -271,12 +271,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return true;
     },
     async jwt({ token, user, account, trigger }) {
-      if (user) {
+      if (user?.id) {
         token.id = user.id;
         token.name = user.name;
       }
 
-      
       if (account?.provider === 'discord' && user?.id) {
         token.id = user.id;
         token.name = user.name;

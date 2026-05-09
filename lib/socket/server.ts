@@ -1,4 +1,5 @@
 import type { Server as SocketIOServer, Socket } from 'socket.io';
+import { decode } from 'next-auth/jwt';
 import { GameEngine } from '@/lib/engine/GameEngine';
 import type { GameState, GameAction, CharacterCard, MissionCard, PlayerConfig, GameConfig } from '@/lib/engine/types';
 import { registerUserSocket, removeSocketFromAll } from '@/lib/socket/io';
@@ -1241,25 +1242,47 @@ export function setupSocketHandlers(io: SocketIOServer) {
     registerTournamentHandlers(io, socket);
 
     
-    socket.on('auth:register', (data: { userId: string; username?: string }) => {
-      if (data.userId) {
-        registerUserSocket(data.userId, socket.id);
-        (socket.data as { userId?: string }).userId = data.userId;
-        if (data.username) {
-          userNames.set(data.userId, data.username);
-        }
-        
-        for (const [code, room] of rooms) {
-          if (!room.gameState || room.gameState.phase === 'gameOver') continue;
-          const isHost = room.hostId === data.userId;
-          const isGuest = room.guestId === data.userId;
-          if (isHost || isGuest) {
-            socket.emit('game:active-game', {
-              roomCode: code,
-              playerRole: isHost ? 'player1' : 'player2',
-            });
-            break;
+    socket.on('auth:register', async (data: { userId: string; username?: string }) => {
+      if (!data.userId) return;
+
+      try {
+        const cookieHeader = socket.handshake.headers.cookie ?? '';
+        const cookies = Object.fromEntries(
+          cookieHeader.split(';').map(c => c.trim().split('=')).filter(p => p.length === 2).map(([k, v]) => [k, decodeURIComponent(v)]),
+        );
+        const tokenStr = cookies['__Secure-authjs.session-token'] || cookies['authjs.session-token'];
+        if (tokenStr) {
+          const secret = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET;
+          if (secret) {
+            const decoded = await decode({ token: tokenStr, secret, salt: cookies['__Secure-authjs.session-token'] ? '__Secure-authjs.session-token' : 'authjs.session-token' });
+            const trustedId = decoded?.id as string | undefined;
+            if (trustedId && trustedId !== data.userId) {
+              console.warn(`[Socket] auth:register rejected: claim=${data.userId} but session=${trustedId}`);
+              socket.emit('game:error', { message: 'Authentication mismatch' });
+              return;
+            }
           }
+        }
+      } catch (err) {
+        console.warn('[Socket] auth:register session decode failed (allowing anyway):', err instanceof Error ? err.message : err);
+      }
+
+      registerUserSocket(data.userId, socket.id);
+      (socket.data as { userId?: string }).userId = data.userId;
+      if (data.username && typeof data.username === 'string' && data.username.length <= 50) {
+        userNames.set(data.userId, data.username);
+      }
+
+      for (const [code, room] of rooms) {
+        if (!room.gameState || room.gameState.phase === 'gameOver') continue;
+        const isHost = room.hostId === data.userId;
+        const isGuest = room.guestId === data.userId;
+        if (isHost || isGuest) {
+          socket.emit('game:active-game', {
+            roomCode: code,
+            playerRole: isHost ? 'player1' : 'player2',
+          });
+          break;
         }
       }
     });
@@ -1453,6 +1476,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
+      const authedUserId_create = (socket.data as { userId?: string }).userId;
+      if (!authedUserId_create || authedUserId_create !== data.userId) {
+        console.warn(`[Socket] room:create rejected: socket auth mismatch (claim=${data.userId}, auth=${authedUserId_create ?? 'null'})`);
+        socket.emit('room:error', { message: 'Authentication mismatch' });
+        return;
+      }
+
       if (await isUserGameBanned(data.userId)) {
         socket.emit('room:error', { message: 'You are banned from playing online games', errorKey: 'game.error.gameBanned' });
         return;
@@ -1474,7 +1504,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
         code = generateRoomCode();
       } while (rooms.has(code));
 
-      const gameMode = data.gameMode ?? (data.isSealed ? 'sealed' : data.isRanked ? 'ranked' : 'casual');
+      const VALID_MODES = ['casual', 'ranked', 'sealed'] as const;
+      const requestedMode = data.gameMode ?? (data.isSealed ? 'sealed' : data.isRanked ? 'ranked' : 'casual');
+      const gameMode = (VALID_MODES as readonly string[]).includes(requestedMode) ? requestedMode : 'casual';
+      const safeBoosterCount = data.sealedBoosterCount === 4 || data.sealedBoosterCount === 5 || data.sealedBoosterCount === 6 ? data.sealedBoosterCount : 6;
+      const safeHostName = typeof data.hostName === 'string' && data.hostName.length > 0 && data.hostName.length <= 50 ? data.hostName : (userNames.get(data.userId) || 'Unknown');
 
       const room: RoomData = {
         code,
@@ -1490,7 +1524,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         isAnonymous: data.isAnonymous ?? false,
         gameMode,
         createdAt: Date.now(),
-        hostName: data.hostName || userNames.get(data.userId) || 'Unknown',
+        hostName: safeHostName,
         actionTimer: null,
         timerDeadline: null,
         disconnectTimer: null,
@@ -1503,7 +1537,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         replaySnapshotLogLengths: null,
         finalized: false,
         isSealed: gameMode === 'sealed',
-        sealedBoosterCount: data.sealedBoosterCount ?? 6,
+        sealedBoosterCount: safeBoosterCount,
         sealedTimer: null,
         sealedDeadline: null,
         timerEnabled: gameMode === 'ranked' || (data.timerEnabled ?? false),
@@ -1537,6 +1571,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
     
     socket.on('room:join', async (data: { code: string; userId: string }) => {
       console.log(`[Socket] User ${data.userId} trying to join room ${data.code}`);
+
+      const authedUserId_join = (socket.data as { userId?: string }).userId;
+      if (!authedUserId_join || authedUserId_join !== data.userId) {
+        console.warn(`[Socket] room:join rejected: socket auth mismatch (claim=${data.userId}, auth=${authedUserId_join ?? 'null'})`);
+        socket.emit('room:error', { message: 'Authentication mismatch' });
+        return;
+      }
 
       if (await isUserGameBanned(data.userId)) {
         socket.emit('room:error', { message: 'You are banned from playing online games', errorKey: 'game.error.gameBanned' });
@@ -2314,6 +2355,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
     socket.on('matchmaking:join', async (data: { userId: string; isRanked?: boolean; hostName?: string }) => {
       if (isMaintenanceActive()) {
         socket.emit('game:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
+        return;
+      }
+
+      const authedUserId_mm = (socket.data as { userId?: string }).userId;
+      if (!authedUserId_mm || authedUserId_mm !== data.userId) {
+        console.warn(`[Socket] matchmaking:join rejected: socket auth mismatch (claim=${data.userId}, auth=${authedUserId_mm ?? 'null'})`);
+        socket.emit('game:error', { message: 'Authentication mismatch' });
         return;
       }
 
