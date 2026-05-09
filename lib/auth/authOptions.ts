@@ -8,6 +8,10 @@ import { syncDiscordRole } from '@/lib/discord/roleSync';
 
 const useSecureCookies = process.env.NEXTAUTH_URL?.startsWith('https://') ?? false;
 
+const loginAttempts = new Map<string, number[]>();
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const LOGIN_MAX_ATTEMPTS = 10;
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: { strategy: 'jwt' },
@@ -50,18 +54,42 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        const emailKey = (credentials.email as string).trim().toLowerCase();
+        const now = Date.now();
+        const windowStart = now - LOGIN_WINDOW_MS;
+        const recent = (loginAttempts.get(emailKey) ?? []).filter((t) => t > windowStart);
+        if (recent.length >= LOGIN_MAX_ATTEMPTS) {
+          console.warn(`[Auth] Login rate limit hit for ${emailKey}`);
+          return null;
+        }
+
         const user = await prisma.user.findUnique({
           where: { email: credentials.email as string },
         });
 
-        if (!user || !user.password) return null;
+        if (!user || !user.password) {
+          recent.push(now);
+          loginAttempts.set(emailKey, recent);
+          return null;
+        }
 
         const isValid = await bcrypt.compare(
           credentials.password as string,
           user.password,
         );
 
-        if (!isValid) return null;
+        if (!isValid) {
+          recent.push(now);
+          loginAttempts.set(emailKey, recent);
+          return null;
+        }
+
+        loginAttempts.delete(emailKey);
+        if (loginAttempts.size > 5000) {
+          for (const [k, ts] of loginAttempts) {
+            if (ts.length === 0 || ts[ts.length - 1] < windowStart) loginAttempts.delete(k);
+          }
+        }
 
         return {
           id: user.id,

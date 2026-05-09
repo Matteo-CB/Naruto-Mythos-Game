@@ -110,7 +110,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
   return (
     <div className="flex flex-col gap-3 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626', borderLeft: '3px solid #c4a35a' }}>
       <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
-        {isAdmin ? 'Admin Panel' : t('organizer')}
+        {isAdmin ? t('adminPanel') : t('organizer')}
       </h3>
 
       
@@ -160,16 +160,16 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
       
       {tour.status === 'in_progress' && (
         <div style={sectionStyle}>
-          <SectionHeader id="disqualify" label="Disqualify Player" color="#ef4444" />
+          <SectionHeader id="disqualify" label={t('disqualifyPlayer')} color="#ef4444" />
           {expandedSection === 'disqualify' && (
             <div className="flex flex-col gap-2 mt-2">
               <SmallSelect value={dqUserId} onChange={setDqUserId}>
-                <option value="">-- Select player --</option>
+                <option value="">{`-- ${t('selectPlayer')} --`}</option>
                 {tour.participants.filter(p => !p.eliminated).map(p => <option key={p.userId} value={p.userId}>{p.username}</option>)}
               </SmallSelect>
-              <input type="text" value={dqReason} onChange={e => setDqReason(e.target.value)} placeholder="Reason (optional)"
+              <input type="text" value={dqReason} onChange={e => setDqReason(e.target.value)} placeholder={t('reasonOptional')}
                 className="text-[10px] px-2 py-1" style={{ backgroundColor: '#111', color: '#ccc', border: '1px solid #333' }} />
-              <ActionBtn onClick={() => { adminAction({ action: 'disqualify', userId: dqUserId, reason: dqReason }); setDqUserId(''); setDqReason(''); }} disabled={!dqUserId} color="#ef4444">Disqualify</ActionBtn>
+              <ActionBtn onClick={() => { adminAction({ action: 'disqualify', userId: dqUserId, reason: dqReason }); setDqUserId(''); setDqReason(''); }} disabled={!dqUserId} color="#ef4444">{t('disqualify')}</ActionBtn>
             </div>
           )}
         </div>
@@ -178,11 +178,11 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
       
       {tour.status === 'in_progress' && (
         <div style={sectionStyle}>
-          <SectionHeader id="setWinner" label="Override Match Result" color="#f59e0b" />
+          <SectionHeader id="setWinner" label={t('overrideMatchResult')} color="#f59e0b" />
           {expandedSection === 'setWinner' && (
             <div className="flex flex-col gap-2 mt-2">
               <SmallSelect value={swMatchId} onChange={(v) => { setSwMatchId(v); setSwWinnerId(''); }}>
-                <option value="">-- Select match --</option>
+                <option value="">{`-- ${t('selectMatch')} --`}</option>
                 {allMatches.filter(m => m.player1Id && m.player2Id).map(m => (
                   <option key={m.id} value={m.id}>R{m.round} - {m.player1Username || '?'} vs {m.player2Username || '?'} [{m.status}]</option>
                 ))}
@@ -199,7 +199,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
                   </div>
                 );
               })()}
-              {swMatchId && swWinnerId && <ActionBtn onClick={() => { adminAction({ action: 'setMatchWinner', matchId: swMatchId, winnerId: swWinnerId }); setSwMatchId(''); setSwWinnerId(''); }} color="#f59e0b">Set Winner</ActionBtn>}
+              {swMatchId && swWinnerId && <ActionBtn onClick={() => { adminAction({ action: 'setMatchWinner', matchId: swMatchId, winnerId: swWinnerId }); setSwMatchId(''); setSwWinnerId(''); }} color="#f59e0b">{t('setWinner')}</ActionBtn>}
             </div>
           )}
         </div>
@@ -208,16 +208,16 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
       
       {tour.status === 'in_progress' && (
         <div style={sectionStyle}>
-          <SectionHeader id="resetMatch" label="Reset Match" color="#3b82f6" />
+          <SectionHeader id="resetMatch" label={t('resetMatch')} color="#3b82f6" />
           {expandedSection === 'resetMatch' && (
             <div className="flex flex-col gap-2 mt-2">
               <SmallSelect value={resetMatchId} onChange={setResetMatchId}>
-                <option value="">-- Select match --</option>
+                <option value="">{`-- ${t('selectMatch')} --`}</option>
                 {allMatches.filter(m => m.status === 'completed' || m.status === 'forfeit' || m.status === 'in_progress').map(m => (
                   <option key={m.id} value={m.id}>R{m.round} - {m.player1Username || '?'} vs {m.player2Username || '?'} [{m.status}]</option>
                 ))}
               </SmallSelect>
-              {resetMatchId && <ActionBtn onClick={() => { adminAction({ action: 'resetMatch', matchId: resetMatchId }); setResetMatchId(''); }} color="#3b82f6">Reset Match</ActionBtn>}
+              {resetMatchId && <ActionBtn onClick={() => { adminAction({ action: 'resetMatch', matchId: resetMatchId }); setResetMatchId(''); }} color="#3b82f6">{t('resetMatch')}</ActionBtn>}
             </div>
           )}
         </div>
@@ -226,14 +226,14 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
       
       {tour.status === 'registration' && tour.participants.length > 0 && (
         <div style={sectionStyle}>
-          <SectionHeader id="removePlayer" label="Remove Player" color="#f97316" />
+          <SectionHeader id="removePlayer" label={t('removePlayer')} color="#f97316" />
           {expandedSection === 'removePlayer' && (
             <div className="flex flex-col gap-2 mt-2">
               <SmallSelect value={removeUserId} onChange={setRemoveUserId}>
-                <option value="">-- Select player --</option>
+                <option value="">{`-- ${t('selectPlayer')} --`}</option>
                 {tour.participants.filter(p => p.userId !== tour.creatorId).map(p => <option key={p.userId} value={p.userId}>{p.username}</option>)}
               </SmallSelect>
-              {removeUserId && <ActionBtn onClick={() => { adminAction({ action: 'removeParticipant', userId: removeUserId }); setRemoveUserId(''); }} color="#f97316">Remove</ActionBtn>}
+              {removeUserId && <ActionBtn onClick={() => { adminAction({ action: 'removeParticipant', userId: removeUserId }); setRemoveUserId(''); }} color="#f97316">{t('remove')}</ActionBtn>}
             </div>
           )}
         </div>
@@ -241,23 +241,23 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
 
       
       <div style={sectionStyle}>
-        <SectionHeader id="banPlayer" label="Ban Player" color="#dc2626" />
+        <SectionHeader id="banPlayer" label={t('banPlayer')} color="#dc2626" />
         {expandedSection === 'banPlayer' && (
           <div className="flex flex-col gap-2 mt-2">
             <SmallSelect value={banUserId} onChange={setBanUserId}>
-              <option value="">-- Select player --</option>
+              <option value="">{`-- ${t('selectPlayer')} --`}</option>
               {tour.participants.map(p => <option key={p.userId} value={p.userId}>{p.username}</option>)}
             </SmallSelect>
-            <input type="text" value={banReason} onChange={e => setBanReason(e.target.value)} placeholder="Ban reason"
+            <input type="text" value={banReason} onChange={e => setBanReason(e.target.value)} placeholder={t('banReason')}
               className="text-[10px] px-2 py-1" style={{ backgroundColor: '#111', color: '#ccc', border: '1px solid #333' }} />
             <div className="flex items-center gap-3">
               <label className="flex items-center gap-1 cursor-pointer">
                 <input type="checkbox" checked={banPermanent} onChange={e => setBanPermanent(e.target.checked)} />
-                <span className="text-[10px]" style={{ color: '#ccc' }}>Permanent</span>
+                <span className="text-[10px]" style={{ color: '#ccc' }}>{t('permanent')}</span>
               </label>
               {!banPermanent && (
                 <label className="flex items-center gap-1">
-                  <span className="text-[10px]" style={{ color: '#888' }}>Days:</span>
+                  <span className="text-[10px]" style={{ color: '#888' }}>{t('daysLabel')}</span>
                   <input type="number" min="1" max="365" value={banDays} onChange={e => setBanDays(e.target.value)}
                     className="w-12 text-[10px] text-center" style={{ backgroundColor: '#111', color: '#ccc', border: '1px solid #333' }} />
                 </label>
@@ -267,7 +267,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
               <ActionBtn onClick={() => {
                 adminAction({ action: 'banPlayer', userId: banUserId, reason: banReason, permanent: banPermanent, durationDays: parseInt(banDays) || 7 });
                 setBanUserId(''); setBanReason('');
-              }} color="#dc2626">Ban from Tournaments</ActionBtn>
+              }} color="#dc2626">{t('banFromTournaments')}</ActionBtn>
             )}
           </div>
         )}
@@ -279,7 +279,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
           <SectionHeader id="cancel" label={t('cancel')} color="#666" />
           {expandedSection === 'cancel' && (
             <div className="flex flex-col gap-2 mt-2">
-              <p className="text-[10px]" style={{ color: '#cc4444' }}>This will cancel the entire tournament. This action cannot be undone.</p>
+              <p className="text-[10px]" style={{ color: '#cc4444' }}>{t('cancelTournamentWarning')}</p>
               <ActionBtn onClick={() => adminAction({ action: 'cancelTournament' })} color="#666">{t('cancel')}</ActionBtn>
             </div>
           )}

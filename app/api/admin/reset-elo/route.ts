@@ -22,17 +22,20 @@ export async function POST() {
       },
     });
 
-    
     const discordUsers = await prisma.user.findMany({
       where: { discordId: { not: null } },
       select: { id: true },
     });
-    for (const user of discordUsers) {
-      syncDiscordRole(user.id).catch(() => {});
-    }
+    const BATCH = 5;
+    (async () => {
+      for (let i = 0; i < discordUsers.length; i += BATCH) {
+        const slice = discordUsers.slice(i, i + BATCH);
+        await Promise.allSettled(slice.map(u => syncDiscordRole(u.id)));
+      }
+    })().catch(() => {});
 
     return NextResponse.json({
-      message: `Reset ${result.count} users to ELO 500, W/L/D = 0`,
+      message: `Reset ${result.count} users to ELO 500, W/L/D = 0. Discord sync queued for ${discordUsers.length} users.`,
       count: result.count,
     });
   } catch {

@@ -39,6 +39,7 @@ export async function GET(request: Request) {
         ? { id: filter }
         : { username: { contains: filter, mode: 'insensitive' } },
       select: { id: true, username: true },
+      take: 100,
     });
     const ids = users.map((u) => u.id);
     const findings = ids.length > 0 ? await runHeuristicsForUsers(ids) : [];

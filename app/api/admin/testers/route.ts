@@ -15,6 +15,7 @@ export async function GET() {
       where: { role: 'tester' },
       select: { id: true, username: true, elo: true },
       orderBy: { username: 'asc' },
+      take: 200,
     });
 
     return NextResponse.json({ testers });

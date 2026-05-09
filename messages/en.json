@@ -73,7 +73,8 @@
     "usernameTaken": "This username is already taken",
     "USERNAME_TOO_SHORT": "Username must be at least 3 characters",
     "USERNAME_TOO_LONG": "Username must be at most 20 characters",
-    "USERNAME_INVALID_CHARS": "Username can only contain letters, numbers, hyphens and underscores. No spaces or special characters."
+    "USERNAME_INVALID_CHARS": "Username can only contain letters, numbers, hyphens and underscores. No spaces or special characters.",
+    "usernameCooldown": "You can only change your username once per day."
   },
   "game": {
     "turn": "Turn {turn}",
@@ -104,7 +105,12 @@
     "deck": "Deck",
     "discard": "Discard",
     "opponentDiscard": "Opponent Discard Pile",
-    "hand": "Hand",
+    "hand": {
+      "sortCost": "Sort by Cost",
+      "sortPower": "Sort by Power",
+      "moveLeft": "Left",
+      "moveRight": "Right"
+    },
     "pass": "Pass",
     "passConfirm": "Pass with {chakra} chakra?",
     "play": "Play",
@@ -367,12 +373,6 @@
       "restoreEffect": "Pending Effect"
     },
     "handLabel": "Hand",
-    "hand": {
-      "sortCost": "Sort by Cost",
-      "sortPower": "Sort by Power",
-      "moveLeft": "Left",
-      "moveRight": "Right"
-    },
     "effect": {
       "orochimaruReveal": "Orochimaru: Infiltration",
       "orochimaruSteal": "Cost 3 or less. Taking control!",
@@ -673,7 +673,6 @@
         "kimimaro056DiscardAndHide": "Choose a card to discard, then hide a character with cost 4 or less.",
         "kimimaro056ChooseHide": "Choose a character to hide (cost 4 or less).",
         "kin073ChooseEnemy": "Choose an enemy character with Power 4 or less to hide.",
-        "kin073ChooseDiscard": "Choose a card from your hand to discard.",
         "kisame093StealTokens": "Select an enemy character in play to steal up to 2 Power tokens from.",
         "kisame093StealAllTokens": "Select an enemy character in play to steal ALL Power tokens from.",
         "chooseTokenAmountRemove": "Choose how many Power tokens to remove.",
@@ -756,7 +755,7 @@
         "tenten118DefeatHidden": "Select a hidden character in this mission to defeat.",
         "ukon124bHide": "Choose an enemy character with Power 5 or less to hide.",
         "gaara139Defeat": "Select an enemy character with cost less than {hiddenCount} to defeat.",
-        "itachi140DefeatByCost": "Select an enemy character with cost {cost} or less to defeat.",
+        "itachi140DefeatByCost": "Choose an enemy with cost {cost} or less to defeat.",
         "jiraiya008ChooseSummon": "Choose a Summon character from your hand to play (paying 2 less).",
         "jiraiya132ChooseSummon": "Choose a Summon character from your hand to play (paying 5 less).",
         "jiraiya132OpponentChooseDefeat": "You must defeat one of your characters in mission {mission} ({count} > 2).",
@@ -855,8 +854,7 @@
         "kakashi148ConfirmAmbush": "AMBUSH: Copy an instant effect of a friendly Team 7 character.",
         "naruto141ChooseDiscard": "Choose a card from your hand to discard.",
         "sasuke142ChooseDiscard": "Choose a card from your hand to discard.",
-        "gaara139DefeatByCost": "Choose an enemy with cost less than {count} to defeat.",
-        "itachi140DefeatByCost": "Choose an enemy with cost {cost} or less to defeat."
+        "gaara139DefeatByCost": "Choose an enemy with cost less than {count} to defeat."
       }
     },
     "anim": {
@@ -903,7 +901,10 @@
       "notConnected": "Not connected to server.",
       "maintenance": "The server is under maintenance. Please wait...",
       "maintenanceNoNewGames": "Server entering maintenance. No new games can be started. The site will be back in a few minutes.",
-      "syncError": "State sync error. Reconnecting..."
+      "syncError": "State sync error. Reconnecting...",
+      "sealedTimeout": "Sealed deck-building time expired. The room has been closed.",
+      "alreadyQueued": "You are already queued in another tab",
+      "gameBanned": "You are banned from playing online games. Check your profile for details."
     },
     "opponentDisconnected": "Opponent disconnected. They have {time} to reconnect or the game is forfeit.",
     "reconnect": {
@@ -1066,15 +1067,7 @@
       "example5": "Cards with both Jutsu AND Team 7 keywords",
       "example6": "Cards that ONLY have the Summon keyword"
     },
-    "sort": {
-      "byNumber": "Sort by Number",
-      "byName": "Sort by Name",
-      "byChakra": "Sort by Chakra",
-      "byPower": "Sort by Power",
-      "byRarity": "Sort by Rarity",
-      "ascending": "Ascending",
-      "descending": "Descending"
-    },
+    "sort": "Sort",
     "error": {
       "maxCopies": "Max {max} copies of {name}",
       "maxMissions": "Max {max} missions",
@@ -1082,7 +1075,6 @@
     },
     "hoverToPreview": "Hover over a card to see its details",
     "sortByCost": "Sort by Cost",
-    "sort": "Sort",
     "dragToReorder": "Drag cards to reorder",
     "hideBanned": "Hide Banned",
     "showBanned": "Show Banned",
@@ -2566,7 +2558,24 @@
     "swissStatusReady": "Ready",
     "swissStatusInProgress": "In Progress",
     "swissStatusCompleted": "Completed",
-    "swissStatusForfeit": "Forfeit"
+    "swissStatusForfeit": "Forfeit",
+    "adminPanel": "Admin Panel",
+    "disqualifyPlayer": "Disqualify Player",
+    "disqualify": "Disqualify",
+    "overrideMatchResult": "Override Match Result",
+    "setWinner": "Set Winner",
+    "resetMatch": "Reset Match",
+    "removePlayer": "Remove Player",
+    "remove": "Remove",
+    "banPlayer": "Ban Player",
+    "banFromTournaments": "Ban from Tournaments",
+    "banReason": "Ban reason",
+    "permanent": "Permanent",
+    "daysLabel": "Days:",
+    "selectMatch": "Select match",
+    "selectPlayer": "Select player",
+    "reasonOptional": "Reason (optional)",
+    "cancelTournamentWarning": "This will cancel the entire tournament. This action cannot be undone."
   },
   "playHub": {
     "title": "Play",

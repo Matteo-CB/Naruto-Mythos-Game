@@ -22,6 +22,7 @@ export async function GET() {
         sender: { select: { id: true, username: true, elo: true } },
         receiver: { select: { id: true, username: true, elo: true } },
       },
+      take: 500,
     });
 
     const friends = friendships.map((f: typeof friendships[number]) => {

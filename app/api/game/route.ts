@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
-import { calculateEloChanges } from '@/lib/elo/elo';
-import { syncDiscordRole } from '@/lib/discord/roleSync';
-import { sendRankUpNotification } from '@/lib/discord/rankUpWebhook';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,13 +10,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { isAiGame, aiDifficulty } = body;
+    const { aiDifficulty } = body;
+
+    const VALID_DIFFICULTIES = ['easy', 'medium', 'hard', 'expert'];
+    const difficulty = typeof aiDifficulty === 'string' && VALID_DIFFICULTIES.includes(aiDifficulty)
+      ? aiDifficulty
+      : 'medium';
 
     const game = await prisma.game.create({
       data: {
         player1Id: session.user.id,
-        isAiGame: isAiGame ?? true,
-        aiDifficulty: aiDifficulty ?? 'medium',
+        isAiGame: true,
+        aiDifficulty: difficulty,
         status: 'in_progress',
       },
     });
@@ -42,11 +44,22 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { gameId, winnerId, player1Score, player2Score, gameLog } = body;
+    const { gameId, winnerId, player1Score, player2Score } = body;
 
     const game = await prisma.game.findUnique({ where: { id: gameId } });
     if (!game) {
       return NextResponse.json({ error: 'Game not found' }, { status: 404 });
+    }
+
+    if (!game.isAiGame) {
+      return NextResponse.json(
+        { error: 'PvP games are completed server-side via socket and cannot be completed via this route' },
+        { status: 403 },
+      );
+    }
+
+    if (game.player1Id !== session.user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     if (game.status === 'completed') {
@@ -56,84 +69,19 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    
-    let eloChange = 0;
-    if (!game.isAiGame && game.player1Id && game.player2Id) {
-      const player1 = await prisma.user.findUnique({
-        where: { id: game.player1Id },
-      });
-      const player2 = await prisma.user.findUnique({
-        where: { id: game.player2Id },
-      });
-
-      if (player1 && player2) {
-        const result =
-          winnerId === game.player1Id
-            ? 'player1'
-            : winnerId === game.player2Id
-              ? 'player2'
-              : 'draw';
-
-        const eloChanges = calculateEloChanges(
-          player1.elo,
-          player2.elo,
-          result,
-        );
-        eloChange = eloChanges.player1Delta;
-
-        
-        const p1Stats =
-          result === 'player1'
-            ? { wins: { increment: 1 } }
-            : result === 'player2'
-              ? { losses: { increment: 1 } }
-              : { draws: { increment: 1 } };
-        const p2Stats =
-          result === 'player2'
-            ? { wins: { increment: 1 } }
-            : result === 'player1'
-              ? { losses: { increment: 1 } }
-              : { draws: { increment: 1 } };
-
-        await Promise.all([
-          prisma.user.update({
-            where: { id: game.player1Id },
-            data: {
-              elo: eloChanges.player1NewElo,
-              ...p1Stats,
-            },
-          }),
-          prisma.user.update({
-            where: { id: game.player2Id },
-            data: {
-              elo: eloChanges.player2NewElo,
-              ...p2Stats,
-            },
-          }),
-        ]);
-
-        
-        syncDiscordRole(game.player1Id).catch(() => {});
-        syncDiscordRole(game.player2Id).catch(() => {});
-
-        
-        const p1OldTotal = player1.wins + player1.losses + player1.draws;
-        const p2OldTotal = player2.wins + player2.losses + player2.draws;
-        sendRankUpNotification(player1.username, player1.discordId, player1.elo, eloChanges.player1NewElo, p1OldTotal, p1OldTotal + 1).catch(() => {});
-        sendRankUpNotification(player2.username, player2.discordId, player2.elo, eloChanges.player2NewElo, p2OldTotal, p2OldTotal + 1).catch(() => {});
-      }
+    if (typeof player1Score !== 'number' || typeof player2Score !== 'number') {
+      return NextResponse.json({ error: 'Invalid scores' }, { status: 400 });
     }
 
     const updatedGame = await prisma.game.update({
       where: { id: gameId },
       data: {
         status: 'completed',
-        winnerId,
+        winnerId: typeof winnerId === 'string' ? winnerId : null,
         player1Score,
         player2Score,
-        eloChange,
+        eloChange: 0,
         completedAt: new Date(),
-        ...(gameLog && !game.isAiGame ? { gameState: gameLog } : {}),
       },
     });
 

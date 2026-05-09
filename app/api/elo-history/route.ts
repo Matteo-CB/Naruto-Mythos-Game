@@ -26,7 +26,8 @@ export async function GET(request: Request) {
   const cutoff = new Date(Date.now() - ELO_HISTORY_TTL_MS);
   const history = await prisma.eloHistory.findMany({
     where: { userId: user.id, createdAt: { gte: cutoff } },
-    orderBy: { createdAt: 'asc' }, // ascending so the chart reads left-to-right
+    orderBy: { createdAt: 'asc' },
+    take: 2000,
   });
 
   let totalDelta = 0;
@@ -64,7 +65,7 @@ export async function GET(request: Request) {
     oppMap.set(key, cur);
   }
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     user: {
       id: user.id,
       username: user.username,
@@ -80,7 +81,6 @@ export async function GET(request: Request) {
     opponents: [...oppMap.values()]
       .sort((a, b) => b.games - a.games)
       .slice(0, 20),
-    
     points: history.map((h) => ({
       t: h.createdAt.toISOString(),
       elo: h.newElo,
@@ -90,4 +90,6 @@ export async function GET(request: Request) {
       opponentElo: h.opponentElo,
     })),
   });
+  response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+  return response;
 }

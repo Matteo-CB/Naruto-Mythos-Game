@@ -11,27 +11,30 @@ export async function GET() {
 
     const userId = session.user.id;
 
-    const incoming = await prisma.friendship.findMany({
-      where: {
-        receiverId: userId,
-        status: 'pending',
-      },
-      include: {
-        sender: { select: { id: true, username: true, elo: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    const outgoing = await prisma.friendship.findMany({
-      where: {
-        senderId: userId,
-        status: 'pending',
-      },
-      include: {
-        receiver: { select: { id: true, username: true, elo: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    const [incoming, outgoing] = await Promise.all([
+      prisma.friendship.findMany({
+        where: {
+          receiverId: userId,
+          status: 'pending',
+        },
+        include: {
+          sender: { select: { id: true, username: true, elo: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 200,
+      }),
+      prisma.friendship.findMany({
+        where: {
+          senderId: userId,
+          status: 'pending',
+        },
+        include: {
+          receiver: { select: { id: true, username: true, elo: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 200,
+      }),
+    ]);
 
     return NextResponse.json({ incoming, outgoing });
   } catch {

@@ -45,10 +45,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await prisma.friendship.update({
-      where: { id: friendshipId },
+    const claim = await prisma.friendship.updateMany({
+      where: { id: friendshipId, status: 'pending', receiverId: userId },
       data: { status: 'declined' },
     });
+    if (claim.count === 0) {
+      return NextResponse.json(
+        { error: 'Request is no longer pending' },
+        { status: 409 },
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch {

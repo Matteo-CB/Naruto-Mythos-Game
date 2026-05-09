@@ -12,34 +12,36 @@ export async function GET() {
     const now = new Date();
 
     
-    const incoming = await prisma.matchInvite.findMany({
-      where: {
-        receiverId: session.user.id,
-        status: 'pending',
-        expiresAt: { gt: now },
-      },
-      include: {
-        sender: {
-          select: { id: true, username: true, elo: true },
+    const [incoming, outgoing] = await Promise.all([
+      prisma.matchInvite.findMany({
+        where: {
+          receiverId: session.user.id,
+          status: 'pending',
+          expiresAt: { gt: now },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    
-    const outgoing = await prisma.matchInvite.findMany({
-      where: {
-        senderId: session.user.id,
-        status: 'pending',
-        expiresAt: { gt: now },
-      },
-      include: {
-        receiver: {
-          select: { id: true, username: true, elo: true },
+        include: {
+          sender: {
+            select: { id: true, username: true, elo: true },
+          },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      }),
+      prisma.matchInvite.findMany({
+        where: {
+          senderId: session.user.id,
+          status: 'pending',
+          expiresAt: { gt: now },
+        },
+        include: {
+          receiver: {
+            select: { id: true, username: true, elo: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      }),
+    ]);
 
     return NextResponse.json({ incoming, outgoing });
   } catch {

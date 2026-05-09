@@ -73,7 +73,8 @@
     "usernameTaken": "Ce pseudo est deja pris",
     "USERNAME_TOO_SHORT": "Le pseudo doit contenir au moins 3 caracteres",
     "USERNAME_TOO_LONG": "Le pseudo ne peut pas depasser 20 caracteres",
-    "USERNAME_INVALID_CHARS": "Le pseudo ne peut contenir que des lettres, chiffres, tirets et underscores. Pas d'espaces ni de caracteres speciaux."
+    "USERNAME_INVALID_CHARS": "Le pseudo ne peut contenir que des lettres, chiffres, tirets et underscores. Pas d'espaces ni de caracteres speciaux.",
+    "usernameCooldown": "Vous ne pouvez changer votre pseudo qu'une fois par jour."
   },
   "game": {
     "turn": "Tour {turn}",
@@ -104,7 +105,12 @@
     "deck": "Deck",
     "discard": "Defausse",
     "opponentDiscard": "Defausse adversaire",
-    "hand": "Main",
+    "hand": {
+      "sortCost": "Trier par Cout",
+      "sortPower": "Trier par Puissance",
+      "moveLeft": "Gauche",
+      "moveRight": "Droite"
+    },
     "pass": "Passer",
     "passConfirm": "Passer avec {chakra} chakra ?",
     "play": "Jouer",
@@ -367,12 +373,6 @@
       "restoreEffect": "Effet en attente"
     },
     "handLabel": "Main",
-    "hand": {
-      "sortCost": "Trier par Cout",
-      "sortPower": "Trier par Puissance",
-      "moveLeft": "Gauche",
-      "moveRight": "Droite"
-    },
     "effect": {
       "orochimaruReveal": "Orochimaru: Infiltration",
       "orochimaruSteal": "Cout 3 ou moins. Prise de controle !",
@@ -535,7 +535,7 @@
         "zaku071ChooseEnemy": "Choisissez un personnage ennemi a deplacer vers une autre mission.",
         "kin073ConfirmMain": "MAIN : Defaussez une carte pour cacher un personnage ennemi avec 4 de Puissance ou moins.",
         "kin073ConfirmUpgrade": "UPGRADE : Placez la carte du dessus de votre deck comme personnage cache dans cette mission.",
-        "kin073ChooseDiscard": "Choisissez une carte de votre main a defausser.",
+        "kin073ChooseDiscard": "Choisissez une carte de votre main à défausser.",
         "gaara074ConfirmMain": "MAIN : POWERUP X. X = nombre de personnages allies caches dans cette mission.",
         "kankuro078ConfirmAmbush": "EMBUSCADE : Deplacez un personnage avec 4 de Puissance ou moins vers une autre mission.",
         "kankuro078ConfirmUpgrade": "UPGRADE : Revelez un personnage allie cache en payant 1 de moins.",
@@ -673,7 +673,6 @@
         "kimimaro056DiscardAndHide": "Choisissez une carte a defausser, puis cachez un personnage avec cout 4 ou moins.",
         "kimimaro056ChooseHide": "Choisissez un personnage a cacher (cout 4 ou moins).",
         "kin073ChooseEnemy": "Choisissez un personnage ennemi avec Puissance 4 ou moins à cacher.",
-        "kin073ChooseDiscard": "Choisissez une carte de votre main à défausser.",
         "kisame093StealTokens": "Selectionnez un personnage ennemi en jeu pour voler jusqu'a 2 jetons de Puissance.",
         "kisame093StealAllTokens": "Selectionnez un personnage ennemi en jeu pour voler TOUS les jetons de Puissance.",
         "chooseTokenAmountRemove": "Choisissez combien de jetons de Puissance retirer.",
@@ -756,7 +755,7 @@
         "tenten118DefeatHidden": "Selectionnez un personnage cache dans cette mission a vaincre.",
         "ukon124bHide": "Choisissez un personnage ennemi avec Puissance 5 ou moins a cacher.",
         "gaara139Defeat": "Selectionnez un personnage ennemi avec cout inferieur a {hiddenCount} a vaincre.",
-        "itachi140DefeatByCost": "Selectionnez un personnage ennemi avec cout {cost} ou moins a vaincre.",
+        "itachi140DefeatByCost": "Choisissez un ennemi avec un cout de {cost} ou moins a vaincre.",
         "jiraiya008ChooseSummon": "Choisissez une Invocation de votre main a jouer (2 de moins).",
         "jiraiya132ChooseSummon": "Choisissez une Invocation de votre main a jouer (5 de moins).",
         "jiraiya132OpponentChooseDefeat": "Vous devez vaincre un de vos personnages dans la mission {mission} ({count} > 2).",
@@ -855,8 +854,7 @@
         "kakashi148ConfirmAmbush": "EMBUSCADE : Copier un effet instantane d'un personnage Team 7 allie.",
         "naruto141ChooseDiscard": "Choisissez une carte de votre main a defausser.",
         "sasuke142ChooseDiscard": "Choisissez une carte de votre main a defausser.",
-        "gaara139DefeatByCost": "Choisissez un ennemi avec un cout inferieur a {count} a vaincre.",
-        "itachi140DefeatByCost": "Choisissez un ennemi avec un cout de {cost} ou moins a vaincre."
+        "gaara139DefeatByCost": "Choisissez un ennemi avec un cout inferieur a {count} a vaincre."
       }
     },
     "anim": {
@@ -903,7 +901,10 @@
       "notConnected": "Non connecte au serveur.",
       "maintenance": "Le serveur est en maintenance. Veuillez patienter...",
       "maintenanceNoNewGames": "Le serveur entre en maintenance. Aucune nouvelle partie ne peut etre lancee. Le site sera de retour dans quelques minutes.",
-      "syncError": "Erreur de synchronisation. Reconnexion en cours..."
+      "syncError": "Erreur de synchronisation. Reconnexion en cours...",
+      "sealedTimeout": "Le temps de construction du deck scellé est écoulé. La salle a été fermée.",
+      "alreadyQueued": "Vous êtes déjà en file dans un autre onglet",
+      "gameBanned": "Vous êtes banni des parties en ligne. Vérifiez votre profil pour plus de détails."
     },
     "opponentDisconnected": "Adversaire deconnecte. Il a {time} pour se reconnecter ou la partie est forfait.",
     "reconnect": {
@@ -1066,15 +1067,7 @@
       "example5": "Cartes ayant les mots-cles Jutsu ET Team 7",
       "example6": "Cartes ayant UNIQUEMENT le mot-cle Summon"
     },
-    "sort": {
-      "byNumber": "Trier par numero",
-      "byName": "Trier par nom",
-      "byChakra": "Trier par chakra",
-      "byPower": "Trier par puissance",
-      "byRarity": "Trier par rarete",
-      "ascending": "Croissant",
-      "descending": "Decroissant"
-    },
+    "sort": "Trier",
     "error": {
       "maxCopies": "Max {max} copies de {name}",
       "maxMissions": "Max {max} missions",
@@ -1082,7 +1075,6 @@
     },
     "hoverToPreview": "Survolez une carte pour voir ses details",
     "sortByCost": "Trier par cout",
-    "sort": "Trier",
     "dragToReorder": "Glissez les cartes pour les reorganiser",
     "hideBanned": "Masquer bannies",
     "showBanned": "Afficher bannies",
@@ -2566,7 +2558,24 @@
     "swissStatusReady": "Pret",
     "swissStatusInProgress": "En cours",
     "swissStatusCompleted": "Termine",
-    "swissStatusForfeit": "Forfait"
+    "swissStatusForfeit": "Forfait",
+    "adminPanel": "Panneau Admin",
+    "disqualifyPlayer": "Disqualifier un joueur",
+    "disqualify": "Disqualifier",
+    "overrideMatchResult": "Forcer le résultat du match",
+    "setWinner": "Choisir le vainqueur",
+    "resetMatch": "Réinitialiser le match",
+    "removePlayer": "Retirer un joueur",
+    "remove": "Retirer",
+    "banPlayer": "Bannir un joueur",
+    "banFromTournaments": "Bannir des tournois",
+    "banReason": "Raison du ban",
+    "permanent": "Permanent",
+    "daysLabel": "Jours :",
+    "selectMatch": "Sélectionner un match",
+    "selectPlayer": "Sélectionner un joueur",
+    "reasonOptional": "Raison (optionnel)",
+    "cancelTournamentWarning": "Cette action annulera le tournoi entier. Action irréversible."
   },
   "playHub": {
     "title": "Jouer",

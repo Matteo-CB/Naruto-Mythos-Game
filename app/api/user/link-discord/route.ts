@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { signLinkState } from '@/lib/auth/linkState';
 
 export async function GET() {
   try {
@@ -26,7 +27,7 @@ export async function GET() {
 
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
     const redirectUri = `${baseUrl}/api/user/link-discord/callback`;
-    const state = Buffer.from(JSON.stringify({ userId: session.user.id, ts: Date.now() })).toString('base64url');
+    const state = signLinkState({ userId: session.user.id, ts: Date.now() });
 
     const params = new URLSearchParams({
       client_id: clientId,

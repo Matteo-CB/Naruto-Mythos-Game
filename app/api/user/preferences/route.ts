@@ -37,7 +37,7 @@ export async function PATCH(request: NextRequest) {
     if (typeof body.animationsEnabled === 'boolean') {
       update.animationsEnabled = body.animationsEnabled;
     }
-    if (typeof body.gameBackground === 'string' && body.gameBackground.length > 0) {
+    if (typeof body.gameBackground === 'string' && body.gameBackground.length > 0 && body.gameBackground.length <= 100) {
       update.gameBackground = body.gameBackground;
     }
     if (typeof body.allowSpectatorHand === 'boolean') {

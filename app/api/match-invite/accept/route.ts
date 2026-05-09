@@ -19,6 +19,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const me = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { gameBanned: true, gameBanUntil: true },
+    });
+    if (me?.gameBanned && (!me.gameBanUntil || me.gameBanUntil > new Date())) {
+      return NextResponse.json(
+        { error: 'You are banned from playing online games' },
+        { status: 403 },
+      );
+    }
+
     const body = await request.json();
     const { inviteId } = body;
 
@@ -96,14 +107,17 @@ export async function POST(request: NextRequest) {
       existingRoom = await prisma.room.findUnique({ where: { code: roomCode } });
     }
 
-    
-    const updatedInvite = await prisma.matchInvite.update({
-      where: { id: inviteId },
-      data: {
-        status: 'accepted',
-        roomCode,
-      },
+    const claim = await prisma.matchInvite.updateMany({
+      where: { id: inviteId, status: 'pending' },
+      data: { status: 'accepted', roomCode },
     });
+    if (claim.count === 0) {
+      return NextResponse.json(
+        { error: 'Invitation is no longer pending' },
+        { status: 409 },
+      );
+    }
+    const updatedInvite = await prisma.matchInvite.findUnique({ where: { id: inviteId } });
 
     
     await prisma.room.create({
@@ -124,7 +138,7 @@ export async function POST(request: NextRequest) {
 
     
     emitToUser(invite.senderId, 'match:invite-accepted', {
-      inviteId: updatedInvite.id,
+      inviteId: updatedInvite!.id,
       roomCode,
       receiver: {
         id: receiver!.id,

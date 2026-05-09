@@ -3,8 +3,33 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/db/prisma';
 import { validateUsername } from '@/lib/auth/usernameValidator';
 
+const registerRate = new Map<string, number[]>();
+const REGISTER_WINDOW_MS = 60 * 60 * 1000;
+const REGISTER_MAX = 5;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      || request.headers.get('x-real-ip')
+      || 'unknown';
+    const now = Date.now();
+    const windowStart = now - REGISTER_WINDOW_MS;
+    const recent = (registerRate.get(ip) ?? []).filter((t) => t > windowStart);
+    if (recent.length >= REGISTER_MAX) {
+      return NextResponse.json(
+        { error: 'Too many registration attempts, try again later' },
+        { status: 429 },
+      );
+    }
+    recent.push(now);
+    registerRate.set(ip, recent);
+    if (registerRate.size > 5000) {
+      for (const [k, ts] of registerRate) {
+        if (ts.length === 0 || ts[ts.length - 1] < windowStart) registerRate.delete(k);
+      }
+    }
+
     const body = await request.json();
     const rawUsername = typeof body.username === 'string' ? body.username.trim() : '';
     const { email, password } = body;
@@ -12,6 +37,13 @@ export async function POST(request: NextRequest) {
     if (!rawUsername || !email || !password) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 },
+      );
+    }
+
+    if (typeof email !== 'string' || !EMAIL_RE.test(email)) {
+      return NextResponse.json(
+        { error: 'Invalid email format' },
         { status: 400 },
       );
     }

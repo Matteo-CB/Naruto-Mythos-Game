@@ -47,13 +47,26 @@ export async function cleanupOldGames(): Promise<void> {
       console.log(`[GameCleanup] Deleted ${abandoned.count} abandoned in_progress games`);
     }
 
-    
+
     const eloCutoff = new Date(now - ELO_HISTORY_TTL_MS);
     const eloPurge = await prisma.eloHistory.deleteMany({
       where: { createdAt: { lt: eloCutoff } },
     });
     if (eloPurge.count > 0) {
       console.log(`[GameCleanup] Deleted ${eloPurge.count} EloHistory rows older than 14 days`);
+    }
+
+    const inviteCutoff = new Date(now - 24 * 60 * 60 * 1000);
+    const invitePurge = await prisma.matchInvite.deleteMany({
+      where: {
+        OR: [
+          { expiresAt: { lt: new Date(now) } },
+          { status: { in: ['accepted', 'declined', 'cancelled'] }, createdAt: { lt: inviteCutoff } },
+        ],
+      },
+    });
+    if (invitePurge.count > 0) {
+      console.log(`[GameCleanup] Deleted ${invitePurge.count} expired/resolved match invites`);
     }
 
 

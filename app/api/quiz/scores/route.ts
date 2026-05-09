@@ -16,13 +16,17 @@ export async function POST(request: NextRequest) {
       typeof difficulty !== 'number' ||
       difficulty < 1 ||
       difficulty > 5 ||
-      typeof score !== 'number' ||
-      typeof correct !== 'number' ||
-      typeof total !== 'number' ||
-      typeof accuracy !== 'number' ||
-      typeof bestStreak !== 'number'
+      typeof score !== 'number' || score < 0 || score > 1_000_000 ||
+      typeof correct !== 'number' || correct < 0 ||
+      typeof total !== 'number' || total < 1 || total > 500 ||
+      typeof accuracy !== 'number' || accuracy < 0 || accuracy > 100 ||
+      typeof bestStreak !== 'number' || bestStreak < 0
     ) {
       return NextResponse.json({ error: 'Invalid quiz score data' }, { status: 400 });
+    }
+
+    if (correct > total || bestStreak > correct) {
+      return NextResponse.json({ error: 'Inconsistent quiz score data' }, { status: 400 });
     }
 
     const quizScore = await prisma.quizScore.create({

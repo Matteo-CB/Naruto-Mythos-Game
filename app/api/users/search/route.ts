@@ -10,10 +10,11 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const q = searchParams.get('q');
-    const limit = parseInt(searchParams.get('limit') || '10', 10);
+    const q = searchParams.get('q')?.trim() ?? '';
+    const rawLimit = parseInt(searchParams.get('limit') || '10', 10);
+    const limit = Math.min(50, Math.max(1, isNaN(rawLimit) ? 10 : rawLimit));
 
-    if (!q || q.trim().length === 0) {
+    if (q.length < 2) {
       return NextResponse.json({ users: [] });
     }
 

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
+import { auth } from '@/lib/auth/authOptions';
+import { verifyLinkState } from '@/lib/auth/linkState';
 
 function getLocale(request: NextRequest): string {
   
@@ -23,18 +25,19 @@ export async function GET(request: NextRequest) {
       return redirectWithError(request, 'Missing code or state');
     }
 
-    
-    let userId: string;
-    try {
-      const decoded = JSON.parse(Buffer.from(state, 'base64url').toString());
-      userId = decoded.userId;
-      
-      if (Date.now() - decoded.ts > 10 * 60 * 1000) {
-        return redirectWithError(request, 'Link expired');
-      }
-    } catch {
+    const payload = verifyLinkState(state);
+    if (!payload) {
       return redirectWithError(request, 'Invalid state');
     }
+    if (Date.now() - payload.ts > 10 * 60 * 1000) {
+      return redirectWithError(request, 'Link expired');
+    }
+
+    const session = await auth();
+    if (!session?.user?.id || session.user.id !== payload.userId) {
+      return redirectWithError(request, 'Session mismatch');
+    }
+    const userId = payload.userId;
 
     
     const user = await prisma.user.findUnique({

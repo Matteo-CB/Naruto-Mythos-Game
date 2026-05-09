@@ -5,13 +5,19 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const difficultyParam = searchParams.get('difficulty') || 'all';
-    const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
-    const offset = parseInt(searchParams.get('offset') || '0', 10);
+    const rawLimit = parseInt(searchParams.get('limit') || '50', 10);
+    const rawOffset = parseInt(searchParams.get('offset') || '0', 10);
+    const limit = Math.min(100, Math.max(1, isNaN(rawLimit) ? 50 : rawLimit));
+    const offset = Math.max(0, isNaN(rawOffset) ? 0 : rawOffset);
 
-    const where =
-      difficultyParam !== 'all'
-        ? { difficulty: parseInt(difficultyParam, 10) }
-        : {};
+    let where: Record<string, unknown> = {};
+    if (difficultyParam !== 'all') {
+      const diff = parseInt(difficultyParam, 10);
+      if (isNaN(diff) || diff < 1 || diff > 5) {
+        return NextResponse.json({ error: 'Invalid difficulty' }, { status: 400 });
+      }
+      where = { difficulty: diff };
+    }
 
     const [scores, total] = await Promise.all([
       prisma.quizScore.findMany({
@@ -42,7 +48,9 @@ export async function GET(request: NextRequest) {
       completedAt: s.completedAt.toISOString(),
     }));
 
-    return NextResponse.json({ entries, total, limit, offset });
+    const response = NextResponse.json({ entries, total, limit, offset });
+    response.headers.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
+    return response;
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

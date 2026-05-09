@@ -41,7 +41,11 @@ export async function GET(
     const { getReplayPayload } = await import('@/lib/db/replayCompression');
     const replayState = getReplayPayload(game);
     const { gameStateGz: _gz, gameState: _gs, ...rest } = game;
-    return NextResponse.json({ ...rest, gameState: replayState });
+    const response = NextResponse.json({ ...rest, gameState: replayState });
+    if (game.status === 'completed') {
+      response.headers.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600');
+    }
+    return response;
   } catch {
     return NextResponse.json(
       { error: 'Internal server error' },

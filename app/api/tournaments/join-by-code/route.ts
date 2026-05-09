@@ -4,12 +4,26 @@ import { prisma } from '@/lib/db/prisma';
 import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
 import { getSocketIO } from '@/lib/socket/server';
 
+const joinCodeAttempts = new Map<string, number[]>();
+const JOIN_CODE_WINDOW_MS = 60 * 60 * 1000;
+const JOIN_CODE_MAX = 20;
 
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+    const now = Date.now();
+    const windowStart = now - JOIN_CODE_WINDOW_MS;
+    const recent = (joinCodeAttempts.get(userId) ?? []).filter((t) => t > windowStart);
+    if (recent.length >= JOIN_CODE_MAX) {
+      return NextResponse.json(
+        { error: 'Too many join attempts, please wait' },
+        { status: 429 },
+      );
     }
 
     const body = await req.json();
@@ -25,6 +39,13 @@ export async function POST(req: NextRequest) {
     });
 
     if (!tournament) {
+      recent.push(now);
+      joinCodeAttempts.set(userId, recent);
+      if (joinCodeAttempts.size > 5000) {
+        for (const [k, ts] of joinCodeAttempts) {
+          if (ts.length === 0 || ts[ts.length - 1] < windowStart) joinCodeAttempts.delete(k);
+        }
+      }
       return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
     }
     if (tournament.status !== 'registration') {

@@ -3,6 +3,10 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { emitToUser } from '@/lib/socket/io';
 
+const friendRequestRate = new Map<string, number[]>();
+const FRIEND_REQUEST_WINDOW_MS = 60_000;
+const FRIEND_REQUEST_MAX = 10;
+
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
@@ -11,6 +15,25 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = session.user.id;
+
+    const now = Date.now();
+    const windowStart = now - FRIEND_REQUEST_WINDOW_MS;
+    const recent = (friendRequestRate.get(userId) ?? []).filter((t) => t > windowStart);
+    if (recent.length >= FRIEND_REQUEST_MAX) {
+      return NextResponse.json(
+        { error: 'Too many friend requests, please slow down' },
+        { status: 429 },
+      );
+    }
+    recent.push(now);
+    friendRequestRate.set(userId, recent);
+
+    if (friendRequestRate.size > 5000) {
+      for (const [uid, ts] of friendRequestRate) {
+        if (ts.length === 0 || ts[ts.length - 1] < windowStart) friendRequestRate.delete(uid);
+      }
+    }
+
     const body = await request.json();
     const { receiverId } = body;
 

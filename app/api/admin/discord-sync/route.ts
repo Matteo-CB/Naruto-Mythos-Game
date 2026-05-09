@@ -11,9 +11,11 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const result = await syncAllDiscordRoles();
+    syncAllDiscordRoles().catch((err) => {
+      console.error('[admin/discord-sync] Bulk sync failed:', err instanceof Error ? err.message : err);
+    });
 
-    return NextResponse.json(result);
+    return NextResponse.json({ queued: true, message: 'Discord role sync started in background. Check server logs for progress.' });
   } catch {
     return NextResponse.json(
       { error: 'Internal server error' },

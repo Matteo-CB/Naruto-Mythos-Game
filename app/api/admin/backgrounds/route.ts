@@ -40,12 +40,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing file or name' }, { status: 400 });
     }
 
+    if (name.length > 100) {
+      return NextResponse.json({ error: 'Name too long (max 100 chars)' }, { status: 400 });
+    }
+
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 });
     }
 
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ error: 'File must be an image' }, { status: 400 });
+    const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+    if (!ALLOWED_TYPES.has(file.type)) {
+      return NextResponse.json({ error: 'File type not allowed (jpeg/png/webp/gif only)' }, { status: 400 });
     }
 
     

@@ -3,11 +3,24 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { validateUsername } from '@/lib/auth/usernameValidator';
 
+const usernameChangeAt = new Map<string, number>();
+const USERNAME_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+
 export async function PATCH(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+    const lastChange = usernameChangeAt.get(userId);
+    if (lastChange && Date.now() - lastChange < USERNAME_COOLDOWN_MS) {
+      const hoursLeft = Math.ceil((USERNAME_COOLDOWN_MS - (Date.now() - lastChange)) / (60 * 60 * 1000));
+      return NextResponse.json(
+        { error: `Username can only be changed once per day (${hoursLeft}h left)`, errorKey: 'settings.usernameCooldown' },
+        { status: 429 },
+      );
     }
 
     const body = await request.json();
@@ -24,11 +37,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error, errorKey }, { status: 400 });
     }
 
-    
     const existing = await prisma.user.findFirst({
       where: {
         username: { equals: newUsername, mode: 'insensitive' },
-        id: { not: session.user.id },
+        id: { not: userId },
       },
     });
 
@@ -37,9 +49,11 @@ export async function PATCH(request: NextRequest) {
     }
 
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: userId },
       data: { username: newUsername },
     });
+
+    usernameChangeAt.set(userId, Date.now());
 
     return NextResponse.json({ username: newUsername });
   } catch {

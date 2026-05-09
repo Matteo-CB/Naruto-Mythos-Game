@@ -11,7 +11,8 @@ export async function GET(
   try {
     const { username } = await params;
     const { searchParams } = new URL(request.url);
-    const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10));
+    const rawPage = parseInt(searchParams.get('page') ?? '1', 10);
+    const page = Math.min(50, Math.max(1, isNaN(rawPage) ? 1 : rawPage));
     const perPage = 20;
 
     const now = Date.now();

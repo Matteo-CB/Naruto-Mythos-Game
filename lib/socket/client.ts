@@ -644,6 +644,11 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ maintenanceWarning: true });
       });
 
+      socket.on('maintenance:ended', () => {
+        console.log('[Socket] Maintenance cancelled');
+        set({ maintenanceWarning: false });
+      });
+
       
 
       socket.on('spectate:state-update', (data: {

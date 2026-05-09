@@ -59,9 +59,14 @@ export async function GET(request: NextRequest) {
 
     
     if (league === 'unranked') {
-      
+      const unrankedConditions: Record<string, unknown>[] = [
+        { wins: { lt: PLACEMENT_MATCHES } },
+        { losses: { lt: PLACEMENT_MATCHES } },
+        { draws: { lt: PLACEMENT_MATCHES } },
+      ];
+      if (search) unrankedConditions.push({ username: { contains: search, mode: 'insensitive' as const } });
       const allUsers = await prisma.user.findMany({
-        where: search ? { username: { contains: search, mode: 'insensitive' as const } } : {},
+        where: { AND: unrankedConditions },
         select: { id: true, username: true, elo: true, wins: true, losses: true, draws: true, role: true, badgePrefs: true },
         orderBy: { createdAt: 'desc' },
         take: 500,

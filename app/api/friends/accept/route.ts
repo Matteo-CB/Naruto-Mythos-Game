@@ -46,9 +46,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const friendship = await prisma.friendship.update({
-      where: { id: friendshipId },
+    const claim = await prisma.friendship.updateMany({
+      where: { id: friendshipId, status: 'pending', receiverId: userId },
       data: { status: 'accepted' },
+    });
+    if (claim.count === 0) {
+      return NextResponse.json(
+        { error: 'Request is no longer pending' },
+        { status: 409 },
+      );
+    }
+
+    const friendship = await prisma.friendship.findUniqueOrThrow({
+      where: { id: friendshipId },
       include: {
         sender: { select: { id: true, username: true, elo: true } },
         receiver: { select: { id: true, username: true, elo: true } },

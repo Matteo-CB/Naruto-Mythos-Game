@@ -85,6 +85,9 @@ const SEALED_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes for sealed deck building
 export const rooms = new Map<string, RoomData>();
 const playerRooms = new Map<string, string>(); // socketId -> roomCode
 const userNames = new Map<string, string>(); // userId -> username (populated on auth:register)
+const chatRateLimit = new Map<string, number[]>(); // userId -> recent message timestamps
+const CHAT_RATE_WINDOW_MS = 10_000;
+const CHAT_RATE_MAX = 8;
 const MATCHMAKING_ROOM_TTL_MS = 5 * 60 * 1000; // 5 min stale room cleanup
 let ioInstance: SocketIOServer | null = null; // Stored for getPublicRoomList socket liveness check
 
@@ -123,6 +126,16 @@ async function getActiveTournamentMatchForUser(userId: string): Promise<{ id: st
     },
     select: { id: true, roomCode: true },
   });
+}
+
+async function isUserGameBanned(userId: string): Promise<boolean> {
+  const u = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { gameBanned: true, gameBanUntil: true },
+  });
+  if (!u || !u.gameBanned) return false;
+  if (u.gameBanUntil && u.gameBanUntil < new Date()) return false;
+  return true;
 }
 
 
@@ -294,8 +307,11 @@ async function finalizeGameEnd(
   room.finalized = true;
 
   clearActionTimer(room);
-  
-  
+  if (room.sealedTimer) {
+    clearTimeout(room.sealedTimer);
+    room.sealedTimer = null;
+    room.sealedDeadline = null;
+  }
   if (room.disconnectTimer) {
     clearTimeout(room.disconnectTimer);
     room.disconnectTimer = null;
@@ -1132,14 +1148,12 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
           handSize: p2HandSize,
         },
       };
-      for (const [, spec] of room.spectators) {
-        io.to(spec.socketId).emit('spectate:state-update', {
-          visibleState: spectatorState,
-          playerNames,
-          spectatorCount: room.spectators.size,
-          roomCode: room.code,
-        });
-      }
+      io.to(`spec:${room.code}`).emit('spectate:state-update', {
+        visibleState: spectatorState,
+        playerNames,
+        spectatorCount: room.spectators.size,
+        roomCode: room.code,
+      });
     }
   } catch (err) {
     console.error('[Socket] broadcastState error:', err instanceof Error ? err.message : err);
@@ -1286,11 +1300,17 @@ export function setupSocketHandlers(io: SocketIOServer) {
         room.guestSocket = socket.id;
       }
 
-      
-      if (oldSocketId) playerRooms.delete(oldSocketId);
+
+      if (oldSocketId && oldSocketId !== socket.id) {
+        playerRooms.delete(oldSocketId);
+        const oldSock = io.sockets.sockets.get(oldSocketId);
+        if (oldSock) {
+          oldSock.leave(roomCode);
+          oldSock.leave(`spec:${roomCode}`);
+        }
+      }
       playerRooms.set(socket.id, roomCode);
 
-      
       socket.join(roomCode);
 
       
@@ -1433,6 +1453,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
+      if (await isUserGameBanned(data.userId)) {
+        socket.emit('room:error', { message: 'You are banned from playing online games', errorKey: 'game.error.gameBanned' });
+        return;
+      }
+
       const tournamentBusy = await getActiveTournamentMatchForUser(data.userId);
       if (tournamentBusy) {
         socket.emit('room:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.` });
@@ -1512,6 +1537,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
     
     socket.on('room:join', async (data: { code: string; userId: string }) => {
       console.log(`[Socket] User ${data.userId} trying to join room ${data.code}`);
+
+      if (await isUserGameBanned(data.userId)) {
+        socket.emit('room:error', { message: 'You are banned from playing online games', errorKey: 'game.error.gameBanned' });
+        return;
+      }
 
       const tournamentBusy = await getActiveTournamentMatchForUser(data.userId);
       if (tournamentBusy && tournamentBusy.roomCode !== data.code) {
@@ -1685,13 +1715,17 @@ export function setupSocketHandlers(io: SocketIOServer) {
           io.to(data.code).emit('sealed:timer-start', { deadline, durationMs: SEALED_TIMEOUT_MS });
 
           room.sealedTimer = setTimeout(() => {
-            
             if (!room.hostDeck || !room.guestDeck) {
               console.log(`[Socket] Sealed time expired for room ${data.code}`);
               io.to(data.code).emit('sealed:time-expired');
-              
+              io.to(data.code).emit('room:error', { message: 'Sealed time expired', errorKey: 'game.error.sealedTimeout' });
               if (room.sealedTimer) clearTimeout(room.sealedTimer);
               room.sealedTimer = null;
+              const wasPublic = !room.isPrivate;
+              rooms.delete(data.code);
+              if (room.hostSocket) playerRooms.delete(room.hostSocket);
+              if (room.guestSocket) playerRooms.delete(room.guestSocket);
+              if (wasPublic) broadcastRoomList(io);
             }
           }, SEALED_TIMEOUT_MS);
         } catch (err) {
@@ -2246,8 +2280,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
             if (!room.hostDeck || !room.guestDeck) {
               console.log(`[Socket] Sealed rematch time expired for room ${roomCode}`);
               io.to(roomCode).emit('sealed:time-expired');
+              io.to(roomCode).emit('room:error', { message: 'Sealed time expired', errorKey: 'game.error.sealedTimeout' });
               if (room.sealedTimer) clearTimeout(room.sealedTimer);
               room.sealedTimer = null;
+              const wasPublic = !room.isPrivate;
+              rooms.delete(roomCode);
+              if (room.hostSocket) playerRooms.delete(room.hostSocket);
+              if (room.guestSocket) playerRooms.delete(room.guestSocket);
+              if (wasPublic) broadcastRoomList(io);
             }
           }, SEALED_TIMEOUT_MS);
         } catch (err) {
@@ -2277,6 +2317,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
+      if (await isUserGameBanned(data.userId)) {
+        socket.emit('game:error', { message: 'You are banned from playing online games', errorKey: 'game.error.gameBanned' });
+        return;
+      }
+
       const tournamentBusy = await getActiveTournamentMatchForUser(data.userId);
       if (tournamentBusy) {
         socket.emit('game:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.` });
@@ -2289,11 +2334,25 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       cleanupPlayerRoom(socket);
 
-      
+
       cleanupStaleRooms();
 
-      
-      
+      for (const [existingCode, existingRoom] of rooms) {
+        if (existingRoom.hostId === data.userId && !existingRoom.guestId && !existingRoom.gameState && existingRoom.hostSocket !== socket.id) {
+          const existingHostSock = io.sockets.sockets.get(existingRoom.hostSocket);
+          if (existingHostSock && existingHostSock.connected) {
+            console.log(`[Socket] User ${data.userId} already queued in room ${existingCode}, rejecting duplicate matchmaking from socket ${socket.id}`);
+            socket.emit('game:error', { message: 'You are already queued in another tab', errorKey: 'game.error.alreadyQueued' });
+            return;
+          }
+          rooms.delete(existingCode);
+          playerRooms.delete(existingRoom.hostSocket);
+          if (!existingRoom.isPrivate) broadcastRoomList(io);
+        }
+      }
+
+
+
       let foundRoom: RoomData | null = null;
       for (const [code, room] of rooms) {
         if (!room.isPrivate && !room.guestId && room.hostId !== data.userId && room.isRanked === wantRanked) {
@@ -2420,7 +2479,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       
       room.spectators.set(socket.id, { socketId: socket.id, userId: data.userId, username: data.username });
       socket.join(data.roomCode);
-      
+      socket.join(`spec:${data.roomCode}`);
       playerRooms.set(socket.id, `spec:${data.roomCode}`);
 
       
@@ -2510,6 +2569,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         const spec = room.spectators.get(socket.id);
         room.spectators.delete(socket.id);
         socket.leave(roomCode);
+        socket.leave(`spec:${roomCode}`);
         io.to(roomCode).emit('spectate:count-update', { count: room.spectators.size });
         if (spec) {
           const leaveMsg = {
@@ -2528,9 +2588,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
     
 
     socket.on('chat:send', async (data: { message: string; isEmote: boolean }) => {
-      if (!data.message || data.message.length > 200) return;
+      const trimmed = (data.message ?? '').trim();
+      if (!trimmed || trimmed.length > 200) return;
 
-      
       let roomCode = playerRooms.get(socket.id);
       let isSpectator = false;
       if (roomCode?.startsWith('spec:')) {
@@ -2556,7 +2616,17 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
       if (!userId) return;
 
-      
+      const now = Date.now();
+      const recent = chatRateLimit.get(userId) ?? [];
+      const windowStart = now - CHAT_RATE_WINDOW_MS;
+      const fresh = recent.filter(t => t > windowStart);
+      if (fresh.length >= CHAT_RATE_MAX) {
+        socket.emit('chat:error', { message: 'Slow down, you are sending messages too fast', errorKey: 'chat.rateLimit' });
+        return;
+      }
+      fresh.push(now);
+      chatRateLimit.set(userId, fresh);
+
       try {
         const user = await prisma.user.findUnique({
           where: { id: userId },
@@ -2575,7 +2645,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const chatMsg = {
         id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         userId, username,
-        message: data.message.trim(),
+        message: trimmed,
         isEmote: data.isEmote,
         isSpectator,
         timestamp: Date.now(),
@@ -2602,17 +2672,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
       
       
       if (isSpectator) {
-        for (const [, spec] of room.spectators) {
-          io.to(spec.socketId).emit('chat:message', chatMsg);
-        }
+        io.to(`spec:${roomCode}`).emit('chat:message', chatMsg);
       } else {
-        
         if (room.hostSocket) io.to(room.hostSocket).emit('chat:message', chatMsg);
         if (room.guestSocket) io.to(room.guestSocket).emit('chat:message', chatMsg);
-        
-        for (const [, spec] of room.spectators) {
-          io.to(spec.socketId).emit('chat:message', chatMsg);
-        }
+        io.to(`spec:${roomCode}`).emit('chat:message', chatMsg);
       }
     });
 

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { getIO } from '@/lib/socket/io';
-import { isMaintenanceActive, getMaintenanceState } from '@/lib/socket/maintenance';
+import { isMaintenanceActive, getMaintenanceState, deactivateMaintenance } from '@/lib/socket/maintenance';
 import { startMaintenanceDrain, getActiveGameCount } from '@/lib/socket/server';
 
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
@@ -45,4 +45,21 @@ export async function POST() {
     activeGames: getActiveGameCount(),
     startedAt: Date.now(),
   });
+}
+
+export async function DELETE() {
+  const session = await auth();
+  if (!session?.user?.name || !ADMIN_USERNAMES.includes(session.user.name)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  if (!isMaintenanceActive()) {
+    return NextResponse.json({ error: 'Maintenance is not active' }, { status: 409 });
+  }
+
+  deactivateMaintenance();
+  const io = getIO();
+  if (io) io.emit('maintenance:ended');
+
+  return NextResponse.json({ active: false });
 }

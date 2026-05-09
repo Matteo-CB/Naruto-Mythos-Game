@@ -509,7 +509,11 @@ export async function POST(
         const { userId: banUserId, reason: banReason, permanent, durationDays } = body;
         if (!banUserId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
 
-        const expiresAt = permanent ? null : new Date(Date.now() + (durationDays || 7) * 24 * 60 * 60 * 1000);
+        const isPermanent = permanent === true;
+        const days = typeof durationDays === 'number' && durationDays >= 1 && durationDays <= 365
+          ? Math.floor(durationDays)
+          : 7;
+        const expiresAt = isPermanent ? null : new Date(Date.now() + days * 24 * 60 * 60 * 1000);
 
         const user = await prisma.user.findUnique({ where: { id: banUserId }, select: { username: true } });
 
@@ -518,9 +522,9 @@ export async function POST(
             userId: banUserId,
             username: user?.username ?? 'Unknown',
             type: 'tournament',
-            permanent: permanent ?? false,
+            permanent: isPermanent,
             expiresAt,
-            reason: banReason ?? '',
+            reason: typeof banReason === 'string' ? banReason.slice(0, 500) : '',
             issuedBy: session.user.id,
           },
         });
@@ -530,9 +534,9 @@ export async function POST(
           action: 'banPlayer',
           targetUserId: banUserId,
           targetUsername: user?.username,
-          details: { permanent: permanent ?? false, durationDays: durationDays ?? 7, reason: banReason ?? null },
+          details: { permanent: isPermanent, durationDays: days, reason: banReason ?? null },
         });
-        return NextResponse.json({ success: true, message: `Player banned from tournaments${permanent ? ' (permanent)' : ` for ${durationDays || 7} days`}` });
+        return NextResponse.json({ success: true, message: `Player banned from tournaments${isPermanent ? ' (permanent)' : ` for ${days} days`}` });
       }
 
       
