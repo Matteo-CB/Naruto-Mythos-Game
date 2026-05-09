@@ -32,14 +32,15 @@ export function unregisterUserSocket(userId: string, socketId: string) {
   }
 }
 
-export function removeSocketFromAll(socketId: string): string | null {
+export function removeSocketFromAll(socketId: string): { userId: string; isLastSocket: boolean } | null {
   for (const [userId, sockets] of userSockets) {
     if (sockets.has(socketId)) {
       sockets.delete(socketId);
-      if (sockets.size === 0) {
+      const isLastSocket = sockets.size === 0;
+      if (isLastSocket) {
         userSockets.delete(userId);
       }
-      return userId;
+      return { userId, isLastSocket };
     }
   }
   return null;

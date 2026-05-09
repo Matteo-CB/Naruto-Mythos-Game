@@ -2471,12 +2471,19 @@ export function setupSocketHandlers(io: SocketIOServer) {
     
 
     socket.on('spectate:join', (data: { roomCode: string; userId: string; username: string }) => {
+      const authedUserId = (socket.data as { userId?: string }).userId;
+      if (!authedUserId || authedUserId !== data.userId) {
+        console.warn(`[Socket] spectate:join rejected: socket auth mismatch (claim=${data.userId}, auth=${authedUserId ?? 'null'})`);
+        socket.emit('spectate:error', { message: 'Authentication mismatch' });
+        return;
+      }
+
       const room = rooms.get(data.roomCode);
       if (!room || !room.gameState) {
         socket.emit('spectate:error', { message: 'Game not found or not in progress' });
         return;
       }
-      
+
       room.spectators.set(socket.id, { socketId: socket.id, userId: data.userId, username: data.username });
       socket.join(data.roomCode);
       socket.join(`spec:${data.roomCode}`);
@@ -2626,6 +2633,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
       fresh.push(now);
       chatRateLimit.set(userId, fresh);
+      if (chatRateLimit.size > 5000) {
+        for (const [uid, ts] of chatRateLimit) {
+          if (ts.length === 0 || ts[ts.length - 1] < windowStart) chatRateLimit.delete(uid);
+        }
+      }
 
       try {
         const user = await prisma.user.findUnique({
@@ -2729,7 +2741,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
           io.to(roomCode).emit('spectate:count-update', { count: room.spectators.size });
         }
         playerRooms.delete(socket.id);
-        removeSocketFromAll(socket.id);
+        const sr = removeSocketFromAll(socket.id);
+        if (sr?.isLastSocket) userNames.delete(sr.userId);
         console.log(`[Socket] Spectator disconnected: ${socket.id}`);
         return;
       }
@@ -2886,8 +2899,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
         playerRooms.delete(socket.id);
       }
-      
-      removeSocketFromAll(socket.id);
+
+      const result = removeSocketFromAll(socket.id);
+      if (result?.isLastSocket) userNames.delete(result.userId);
 
       console.log(`[Socket] Player disconnected: ${socket.id}`);
     });
