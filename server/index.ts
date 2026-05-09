@@ -45,6 +45,10 @@ app.prepare().then(() => {
 
   
   expressApp.get('/api/health', (req, res) => {
+    if (isMaintenanceActive()) {
+      res.status(503).json({ status: 'maintenance', timestamp: new Date().toISOString() });
+      return;
+    }
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
