@@ -209,14 +209,13 @@ function broadcastActiveGames(io: SocketIOServer): void {
     roomCode: string; player1Name: string; player2Name: string;
     spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean;
   }> = [];
-  
+
   const seenPlayerIds = new Set<string>();
   const now = Date.now();
   for (const [code, room] of rooms) {
     if (!room.gameState || room.gameState.phase === 'gameOver') continue;
-    
+    if (room.isPrivate) continue;
     if (now - room.createdAt > 2 * 60 * 60 * 1000) continue;
-    
     if (seenPlayerIds.has(room.hostId) || (room.guestId && seenPlayerIds.has(room.guestId))) continue;
     seenPlayerIds.add(room.hostId);
     if (room.guestId) seenPlayerIds.add(room.guestId);
@@ -227,7 +226,7 @@ function broadcastActiveGames(io: SocketIOServer): void {
       spectatorCount: room.spectators.size,
       turn: room.gameState.turn,
       isRanked: room.isRanked,
-      isPrivate: room.isPrivate,
+      isPrivate: false,
     });
   }
   io.to('games-watchers').emit('games:list-update', { games: activeGames });
@@ -2612,6 +2611,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(data.roomCode);
       if (!room || !room.gameState) {
         socket.emit('spectate:error', { message: 'Game not found or not in progress' });
+        return;
+      }
+
+      if (room.isPrivate && room.hostId !== authedUserId && room.guestId !== authedUserId) {
+        socket.emit('spectate:error', { message: 'This is a private game' });
         return;
       }
 
