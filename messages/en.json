@@ -1292,7 +1292,11 @@
       "willOfFire": "Inheritor of the Will of Fire",
       "unranked": "Unranked",
       "placement": "Placement: {current}/{total}"
-    }
+    },
+    "statsWins": "Wins",
+    "statsLosses": "Losses",
+    "statsDraws": "Draws",
+    "statsWinrate": "Winrate"
   },
   "replay": {
     "title": "Match Recap",
@@ -2730,5 +2734,17 @@
     "errorPrivate": "This is a private game.",
     "errorLimit": "Spectator limit reached for this room.",
     "errorNotSubscribed": "You are not subscribed to this room."
+  },
+  "deckStats": {
+    "title": "Deck stats (last 90 days)",
+    "winrate": "Winrate",
+    "noGamesYet": "No online games yet with this deck.",
+    "games": "{n} games",
+    "never": "Never played",
+    "justNow": "Just played",
+    "minutesAgo": "{n}m ago",
+    "hoursAgo": "{n}h ago",
+    "daysAgo": "{n}d ago",
+    "weeksAgo": "{n}w ago"
   }
 }

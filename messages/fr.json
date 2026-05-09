@@ -1292,7 +1292,11 @@
       "willOfFire": "Heritier de la Volonte du Feu",
       "unranked": "Non classe",
       "placement": "Placement : {current}/{total}"
-    }
+    },
+    "statsWins": "Victoires",
+    "statsLosses": "Défaites",
+    "statsDraws": "Égalités",
+    "statsWinrate": "Ratio"
   },
   "replay": {
     "title": "Recapitulatif",
@@ -2730,5 +2734,17 @@
     "errorPrivate": "Cette partie est privée.",
     "errorLimit": "Limite de spectateurs atteinte pour cette partie.",
     "errorNotSubscribed": "Vous n'êtes pas inscrit dans cette partie."
+  },
+  "deckStats": {
+    "title": "Stats des decks (90 derniers jours)",
+    "winrate": "Victoires",
+    "noGamesYet": "Aucune partie en ligne avec ce deck.",
+    "games": "{n} parties",
+    "never": "Jamais joué",
+    "justNow": "À l'instant",
+    "minutesAgo": "il y a {n} min",
+    "hoursAgo": "il y a {n} h",
+    "daysAgo": "il y a {n} j",
+    "weeksAgo": "il y a {n} sem"
   }
 }

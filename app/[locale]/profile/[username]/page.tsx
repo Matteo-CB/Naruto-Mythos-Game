@@ -13,6 +13,7 @@ import { FriendshipButton } from '@/components/social/FriendshipButton';
 import { EloBadgeLarge, EloBadge } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
 import { EloHistoryChart } from '@/components/EloHistoryChart';
+import { DeckStatsPanel } from '@/components/profile/DeckStatsPanel';
 
 interface ProfileData {
   id: string;
@@ -264,26 +265,29 @@ export default function ProfilePage({
           </div>
         </div>
 
-        
         <div
-          className="grid grid-cols-4 gap-px rounded-lg overflow-hidden mb-6"
+          className="grid grid-cols-4 gap-px rounded-lg overflow-hidden mb-6 relative"
           style={{ backgroundColor: '#1e1e1e' }}
         >
+          <div
+            className="absolute top-0 left-0 right-0 h-px z-10 pointer-events-none"
+            style={{ background: 'linear-gradient(90deg, transparent 5%, #c4a35a44, transparent 95%)' }}
+          />
           {[
-            { label: 'W', value: profile.wins, color: '#3e8b3e' },
-            { label: 'L', value: profile.losses, color: '#b33e3e' },
-            { label: 'D', value: profile.draws, color: '#888888' },
-            { label: 'WR', value: `${winRate}%`, color: '#e0e0e0' },
+            { label: t('statsWins'), value: profile.wins, color: '#3e8b3e' },
+            { label: t('statsLosses'), value: profile.losses, color: '#b33e3e' },
+            { label: t('statsDraws'), value: profile.draws, color: '#888888' },
+            { label: t('statsWinrate'), value: `${winRate}%`, color: winRate >= 60 ? '#3e8b3e' : winRate >= 40 ? '#c4a35a' : '#b33e3e' },
           ].map((stat) => (
             <div
               key={stat.label}
               className="flex flex-col items-center py-4 sm:py-5"
               style={{ backgroundColor: '#111111' }}
             >
-              <span className="text-lg sm:text-xl font-bold tabular-nums" style={{ color: stat.color }}>
+              <span className="text-xl sm:text-2xl font-bold tabular-nums leading-tight" style={{ color: stat.color, fontFamily: "'NJNaruto', Arial, sans-serif" }}>
                 {stat.value}
               </span>
-              <span className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: '#555' }}>
+              <span className="text-[10px] uppercase tracking-wider mt-1" style={{ color: '#555' }}>
                 {stat.label}
               </span>
             </div>
@@ -353,33 +357,37 @@ export default function ProfilePage({
 
         
         {profile.decks.length > 0 && (
-          <section className="mb-6">
-            <div className="flex items-center gap-3 mb-3">
-              <h2 className="text-xs font-bold uppercase tracking-widest" style={{ color: '#555' }}>
-                {t('decks')}
-              </h2>
-              <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
-              <span className="text-[10px] tabular-nums" style={{ color: '#444' }}>
-                {profile.decks.length}
-              </span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {profile.decks.map((deck) => (
-                <div
-                  key={deck.id}
-                  className="rounded px-4 py-3 flex items-center justify-between"
-                  style={{ backgroundColor: '#111111', border: '1px solid #1e1e1e' }}
-                >
-                  <span className="text-sm truncate" style={{ color: '#e0e0e0' }}>
-                    {deck.name}
-                  </span>
-                  <span className="text-[10px] shrink-0 ml-3" style={{ color: '#444' }}>
-                    {new Date(deck.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
+          isOwner ? (
+            <DeckStatsPanel decks={profile.decks.map(d => ({ id: d.id, name: d.name }))} />
+          ) : (
+            <section className="mb-6">
+              <div className="flex items-center gap-3 mb-3">
+                <h2 className="text-xs font-bold uppercase tracking-widest" style={{ color: '#555' }}>
+                  {t('decks')}
+                </h2>
+                <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
+                <span className="text-[10px] tabular-nums" style={{ color: '#444' }}>
+                  {profile.decks.length}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {profile.decks.map((deck) => (
+                  <div
+                    key={deck.id}
+                    className="rounded px-4 py-3 flex items-center justify-between"
+                    style={{ backgroundColor: '#111111', border: '1px solid #1e1e1e' }}
+                  >
+                    <span className="text-sm truncate" style={{ color: '#e0e0e0' }}>
+                      {deck.name}
+                    </span>
+                    <span className="text-[10px] shrink-0 ml-3" style={{ color: '#444' }}>
+                      {new Date(deck.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )
         )}
 
         
