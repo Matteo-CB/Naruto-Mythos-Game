@@ -659,6 +659,17 @@ export default function DeckBuilderPage() {
   const handleRemoveChar = useCallback((idx: number) => removeChar(idx), [removeChar]);
   const handlePreview = useCallback((card: CharacterCard | MissionCard) => setPreviewCard(card), []);
   
+  const localizeApiError = useCallback((err: unknown, fallbackKey: string): string => {
+    if (err instanceof Error) {
+      const errorKey = (err as Error & { errorKey?: string }).errorKey;
+      if (typeof errorKey === 'string') {
+        try { return t(errorKey); } catch { /* unknown key, fall through */ }
+      }
+      return err.message || t(fallbackKey);
+    }
+    return t(fallbackKey);
+  }, [t]);
+
   const handleSave = useCallback(async () => {
     setSaveError(null);
     const trimmedName = (deckName || '').trim() || 'Untitled Deck';
@@ -667,17 +678,17 @@ export default function DeckBuilderPage() {
     );
     if (conflict) { setOverwriteConflict({ id: conflict.id, name: conflict.name }); return; }
     try { await saveDeck(); } catch (err: unknown) {
-      setSaveError(err instanceof Error ? err.message : t("deckBuilder.failedToSave"));
+      setSaveError(localizeApiError(err, "deckBuilder.failedToSave"));
     }
-  }, [saveDeck, t, deckName, savedDecks, loadedDeckId]);
+  }, [saveDeck, localizeApiError, deckName, savedDecks, loadedDeckId]);
 
   const handleOverwriteConfirm = useCallback(async () => {
     if (!overwriteConflict) return;
     setSaveError(null);
     try { await deleteDeck(overwriteConflict.id); await saveDeck(); } catch (err: unknown) {
-      setSaveError(err instanceof Error ? err.message : t("deckBuilder.failedToSave"));
+      setSaveError(localizeApiError(err, "deckBuilder.failedToSave"));
     } finally { setOverwriteConflict(null); }
-  }, [overwriteConflict, deleteDeck, saveDeck, t]);
+  }, [overwriteConflict, deleteDeck, saveDeck, localizeApiError]);
 
   const handleLoadDeck = useCallback(async (deckId: string) => {
     setSaveError(null);

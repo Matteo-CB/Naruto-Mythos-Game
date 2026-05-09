@@ -35,23 +35,24 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { cardId, reason } = body;
 
-    if (!cardId || typeof cardId !== 'string') {
+    if (!cardId || typeof cardId !== 'string' || cardId.length > 64) {
       return NextResponse.json({ error: 'cardId is required' }, { status: 400 });
     }
 
-    
+    const cleanReason = typeof reason === 'string'
+      ? reason.trim().slice(0, 200) || undefined
+      : undefined;
+
     const existing = await prisma.bannedCard.findUnique({
       where: { cardId },
     });
 
     if (existing) {
-      
       await prisma.bannedCard.delete({ where: { cardId } });
       return NextResponse.json({ cardId, banned: false });
     } else {
-      
-      await prisma.bannedCard.create({ data: { cardId, reason: typeof reason === 'string' ? reason.trim() || undefined : undefined } as any });
-      return NextResponse.json({ cardId, banned: true, reason: reason || null });
+      await prisma.bannedCard.create({ data: { cardId, reason: cleanReason } as any });
+      return NextResponse.json({ cardId, banned: true, reason: cleanReason ?? null });
     }
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

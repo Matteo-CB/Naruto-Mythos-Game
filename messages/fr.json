@@ -1085,7 +1085,15 @@
     "error": {
       "maxCopies": "Max {max} copies de {name}",
       "maxMissions": "Max {max} missions",
-      "alreadyInDeck": "{name} deja dans le deck"
+      "alreadyInDeck": "{name} deja dans le deck",
+      "missingFields": "Champs requis manquants.",
+      "invalidName": "Nom de deck invalide.",
+      "invalidPayload": "Données du deck invalides.",
+      "invalidCardCount": "Le deck doit contenir entre 30 et 200 cartes personnages.",
+      "invalidMissionCount": "Le deck doit contenir exactement 3 cartes mission.",
+      "invalidCardId": "ID de carte invalide.",
+      "invalidMissionId": "ID de mission invalide.",
+      "maxDecksReached": "Vous avez atteint le nombre maximum de decks (50)."
     },
     "hoverToPreview": "Survolez une carte pour voir ses details",
     "sortByCost": "Trier par cout",

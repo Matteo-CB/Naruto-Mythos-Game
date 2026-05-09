@@ -191,9 +191,14 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
 
     set({ isSaving: true });
 
+    const throwApiError = (data: { error?: string; errorKey?: string }, fallback: string) => {
+      const err = new Error(data.error || fallback) as Error & { errorKey?: string };
+      if (typeof data.errorKey === 'string') err.errorKey = data.errorKey;
+      throw err;
+    };
+
     try {
       if (loadedDeckId) {
-        
         const res = await fetch(`/api/decks/${loadedDeckId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -202,12 +207,11 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
         });
 
         if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || 'Failed to update deck');
+          const data = await res.json().catch(() => ({}));
+          throwApiError(data, 'Failed to update deck');
         }
         set({ isDirty: false });
       } else {
-        
         const res = await fetch('/api/decks', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -216,8 +220,8 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
         });
 
         if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || 'Failed to save deck');
+          const data = await res.json().catch(() => ({}));
+          throwApiError(data, 'Failed to save deck');
         }
 
         const created = await res.json();
