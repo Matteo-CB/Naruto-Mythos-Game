@@ -130,7 +130,7 @@ export async function POST(request: Request) {
         break;
       case 'eloDeduct': {
         const amount = parseInt(eloAmount, 10);
-        if (isNaN(amount) || amount <= 0) return NextResponse.json({ error: 'Invalid ELO amount' }, { status: 400 });
+        if (isNaN(amount) || amount <= 0 || amount > 500) return NextResponse.json({ error: 'Invalid ELO amount (1-500)' }, { status: 400 });
         const target = await prisma.user.findUnique({ where: { id: report.targetId }, select: { elo: true } });
         if (target) {
           await prisma.user.update({
@@ -144,8 +144,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
     }
 
-    
-    const rewardAmount = reporterReward ? parseInt(reporterReward, 10) : 0;
+    const rewardAmount = reporterReward ? Math.min(100, Math.max(0, parseInt(reporterReward, 10) || 0)) : 0;
     if (rewardAmount > 0 && action !== 'dismiss') {
       const reporter = await prisma.user.findUnique({ where: { id: report.reporterId }, select: { elo: true } });
       if (reporter) {
