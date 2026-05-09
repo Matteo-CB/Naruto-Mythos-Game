@@ -74,7 +74,22 @@
     "USERNAME_TOO_SHORT": "Le pseudo doit contenir au moins 3 caractères",
     "USERNAME_TOO_LONG": "Le pseudo ne peut pas dépasser 20 caractères",
     "USERNAME_INVALID_CHARS": "Le pseudo ne peut contenir que des lettres, chiffres, tirets et underscores. Pas d'espaces ni de caractères speciaux.",
-    "usernameCooldown": "Vous ne pouvez changer votre pseudo qu'une fois par jour."
+    "usernameCooldown": "Vous ne pouvez changer votre pseudo qu'une fois par jour.",
+    "deleteAccount": {
+      "title": "Supprimer le compte",
+      "description": "Supprimer définitivement votre compte et toutes les données associées. Cette action est irréversible.",
+      "openButton": "Supprimer mon compte",
+      "confirmHint": "Tapez {phrase} ci-dessous pour confirmer. Cette action est irréversible.",
+      "confirmButton": "Supprimer définitivement",
+      "cancelButton": "Annuler",
+      "error": {
+        "rateLimit": "Trop de tentatives. Patientez une heure et réessayez.",
+        "phraseMismatch": "La phrase de confirmation ne correspond pas. Le compte n'a PAS été supprimé.",
+        "notFound": "Compte introuvable.",
+        "adminBlocked": "Les comptes admin ne peuvent pas être supprimés par eux-mêmes. Contactez un autre admin.",
+        "serverError": "Erreur serveur pendant la suppression. Réessayez plus tard."
+      }
+    }
   },
   "game": {
     "turn": "Tour {turn}",
@@ -1393,7 +1408,8 @@
       "invalidEmail": "Format e-mail invalide.",
       "passwordTooShort": "Le mot de passe doit faire au moins 6 caractères.",
       "alreadyTaken": "Pseudo ou e-mail déjà utilisé.",
-      "serverError": "Erreur serveur. Veuillez réessayer."
+      "serverError": "Erreur serveur. Veuillez réessayer.",
+      "notAuthenticated": "Vous devez être connecté."
     }
   },
   "card": {

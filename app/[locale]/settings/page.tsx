@@ -1,12 +1,14 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useRouter, Link } from '@/lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { useEffect, useState, useCallback } from 'react';
+
+const DELETE_ACCOUNT_PHRASE = 'DELETE MY ACCOUNT';
 
 export default function SettingsPage() {
   const { data: session, status, update: updateSession } = useSession();
@@ -23,11 +25,42 @@ export default function SettingsPage() {
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [usernameError, setUsernameError] = useState('');
 
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletePhrase, setDeletePhrase] = useState('');
+  const [deleteStatus, setDeleteStatus] = useState<'idle' | 'deleting' | 'error'>('idle');
+  const [deleteError, setDeleteError] = useState('');
+
   useEffect(() => {
     if (session?.user?.name) {
       setUsernameInput(session.user.name);
     }
   }, [session?.user?.name]);
+
+  const handleDeleteAccount = useCallback(async () => {
+    if (deletePhrase.trim() !== DELETE_ACCOUNT_PHRASE) return;
+    setDeleteStatus('deleting');
+    setDeleteError('');
+    try {
+      const res = await fetch('/api/user/delete-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirmation: deletePhrase.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg = data.errorKey ? t(data.errorKey) : (data.error || t('deleteAccount.error.serverError'));
+        setDeleteError(msg);
+        setDeleteStatus('error');
+        return;
+      }
+      await signOut({ redirect: false });
+      router.replace('/');
+      router.refresh();
+    } catch {
+      setDeleteError(t('deleteAccount.error.serverError'));
+      setDeleteStatus('error');
+    }
+  }, [deletePhrase, t, router]);
 
   const handleUsernameSave = useCallback(async () => {
     const trimmed = usernameInput.trim();
@@ -264,7 +297,108 @@ export default function SettingsPage() {
           </div>
         )}
 
-        
+
+        <div
+          className="mt-4 flex flex-col gap-4 p-5"
+          style={{
+            backgroundColor: '#111111',
+            border: '1px solid rgba(179, 62, 62, 0.25)',
+          }}
+        >
+          <div className="flex flex-col gap-1">
+            <span
+              className="text-sm font-medium tracking-wide"
+              style={{ color: '#b33e3e' }}
+            >
+              {t('deleteAccount.title')}
+            </span>
+            <p className="text-xs tracking-wide" style={{ color: '#888888' }}>
+              {t('deleteAccount.description')}
+            </p>
+          </div>
+
+          {!deleteOpen ? (
+            <button
+              type="button"
+              onClick={() => setDeleteOpen(true)}
+              className="self-start px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors"
+              style={{
+                backgroundColor: '#1a1414',
+                border: '1px solid #b33e3e',
+                color: '#b33e3e',
+                cursor: 'pointer',
+              }}
+            >
+              {t('deleteAccount.openButton')}
+            </button>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <p className="text-xs leading-relaxed" style={{ color: '#cccccc' }}>
+                {t('deleteAccount.confirmHint', { phrase: DELETE_ACCOUNT_PHRASE })}
+              </p>
+              <input
+                type="text"
+                value={deletePhrase}
+                onChange={(e) => {
+                  setDeletePhrase(e.target.value);
+                  setDeleteStatus('idle');
+                  setDeleteError('');
+                }}
+                placeholder={DELETE_ACCOUNT_PHRASE}
+                disabled={deleteStatus === 'deleting'}
+                className="px-3 py-1.5 text-sm tracking-wide outline-none"
+                style={{
+                  backgroundColor: '#0a0a0a',
+                  border: '1px solid #b33e3e44',
+                  color: '#e0e0e0',
+                  fontFamily: 'monospace',
+                }}
+                onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = '#b33e3e'; }}
+                onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = '#b33e3e44'; }}
+              />
+              {deleteError && (
+                <p className="text-xs" style={{ color: '#b33e3e' }}>{deleteError}</p>
+              )}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={deleteStatus === 'deleting' || deletePhrase.trim() !== DELETE_ACCOUNT_PHRASE}
+                  className="px-4 py-2 text-xs font-bold uppercase tracking-wider"
+                  style={{
+                    backgroundColor: '#b33e3e',
+                    color: '#0a0a0a',
+                    opacity: (deleteStatus === 'deleting' || deletePhrase.trim() !== DELETE_ACCOUNT_PHRASE) ? 0.4 : 1,
+                    cursor: (deleteStatus === 'deleting' || deletePhrase.trim() !== DELETE_ACCOUNT_PHRASE) ? 'default' : 'pointer',
+                  }}
+                >
+                  {deleteStatus === 'deleting' ? '...' : t('deleteAccount.confirmButton')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeleteOpen(false);
+                    setDeletePhrase('');
+                    setDeleteError('');
+                    setDeleteStatus('idle');
+                  }}
+                  disabled={deleteStatus === 'deleting'}
+                  className="px-4 py-2 text-xs font-medium uppercase tracking-wider"
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '1px solid #333333',
+                    color: '#888888',
+                    cursor: deleteStatus === 'deleting' ? 'default' : 'pointer',
+                  }}
+                >
+                  {t('deleteAccount.cancelButton')}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+
         <div className="mt-6 text-center">
           <Link
             href="/"

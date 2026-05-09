@@ -74,7 +74,22 @@
     "USERNAME_TOO_SHORT": "Username must be at least 3 characters",
     "USERNAME_TOO_LONG": "Username must be at most 20 characters",
     "USERNAME_INVALID_CHARS": "Username can only contain letters, numbers, hyphens and underscores. No spaces or special characters.",
-    "usernameCooldown": "You can only change your username once per day."
+    "usernameCooldown": "You can only change your username once per day.",
+    "deleteAccount": {
+      "title": "Delete Account",
+      "description": "Permanently delete your account and all related data. This action cannot be undone.",
+      "openButton": "Delete my account",
+      "confirmHint": "Type {phrase} below to confirm. This is irreversible.",
+      "confirmButton": "Delete forever",
+      "cancelButton": "Cancel",
+      "error": {
+        "rateLimit": "Too many attempts. Please wait an hour and try again.",
+        "phraseMismatch": "The confirmation phrase does not match. Account was NOT deleted.",
+        "notFound": "Account not found.",
+        "adminBlocked": "Admin accounts cannot be self-deleted. Contact another admin.",
+        "serverError": "Server error during deletion. Try again later."
+      }
+    }
   },
   "game": {
     "turn": "Turn {turn}",
@@ -1393,7 +1408,8 @@
       "invalidEmail": "Invalid email format.",
       "passwordTooShort": "Password must be at least 6 characters.",
       "alreadyTaken": "Username or email already taken.",
-      "serverError": "Server error. Please try again."
+      "serverError": "Server error. Please try again.",
+      "notAuthenticated": "You must be signed in."
     }
   },
   "card": {
