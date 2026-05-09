@@ -59,6 +59,7 @@ export interface RoomData {
   sealedDeadline: number | null;
   hostSealedPoolIds?: string[];
   guestSealedPoolIds?: string[];
+  tournamentGameTimer?: ReturnType<typeof setTimeout> | null;
   
   timerEnabled: boolean;
   
@@ -317,6 +318,10 @@ async function finalizeGameEnd(
     clearTimeout(room.sealedTimer);
     room.sealedTimer = null;
     room.sealedDeadline = null;
+  }
+  if (room.tournamentGameTimer) {
+    clearTimeout(room.tournamentGameTimer);
+    room.tournamentGameTimer = null;
   }
   if (room.disconnectTimer) {
     clearTimeout(room.disconnectTimer);
@@ -1716,7 +1721,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             }
 
             const matchTimeLimit = 1800000;
-            (room as any).tournamentGameTimer = setTimeout(async () => {
+            room.tournamentGameTimer = setTimeout(async () => {
               if (!rooms.has(data.code) || !room.gameState || room.gameState.phase === 'gameOver') return;
               const p1S = room.gameState.player1.missionPoints;
               const p2S = room.gameState.player2.missionPoints;
@@ -2007,7 +2012,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           io.to(code).emit('game:tournament-deadline', { deadline: tournamentGameDeadline, durationMs: matchTimeLimit });
 
           
-          (room as any).tournamentGameTimer = setTimeout(async () => {
+          room.tournamentGameTimer = setTimeout(async () => {
             if (!rooms.has(code)) return;
             if (!room.gameState || room.gameState.phase === 'gameOver') return;
 
@@ -2074,6 +2079,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
     
     socket.on('action:perform', async (data: { action: GameAction }) => {
+      if (!data || typeof data !== 'object' || !data.action || typeof data.action !== 'object' || typeof (data.action as { type?: unknown }).type !== 'string') {
+        console.warn(`[Socket] action:perform: malformed payload from ${socket.id}`);
+        return;
+      }
+
       const code = playerRooms.get(socket.id);
       if (!code) {
         console.warn(`[Socket] action:perform from ${socket.id}: no room found`);
@@ -2085,7 +2095,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-      
       const player = socket.id === room.hostSocket ? 'player1' : 'player2';
       console.log(`[Socket] action:perform from ${player}: ${data.action.type}, phase: ${room.gameState.phase}`);
 
@@ -2734,7 +2743,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
     
 
     socket.on('chat:send', async (data: { message: string; isEmote: boolean }) => {
-      const trimmed = (data.message ?? '').trim();
+      if (!data || typeof data !== 'object') return;
+      const trimmed = (typeof data.message === 'string' ? data.message : '').trim();
       if (!trimmed || trimmed.length > 200) return;
 
       let roomCode = playerRooms.get(socket.id);
