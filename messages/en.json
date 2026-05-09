@@ -1303,7 +1303,8 @@
     "statsWins": "Wins",
     "statsLosses": "Losses",
     "statsDraws": "Draws",
-    "statsWinrate": "Winrate"
+    "statsWinrate": "Winrate",
+    "playerNotFound": "Player not found."
   },
   "replay": {
     "title": "Match Recap",
@@ -2762,7 +2763,9 @@
     "dismissed": "Dismissed",
     "pending": "Pending",
     "actionApplied": "Action applied",
-    "confirmAction": "Apply this action?"
+    "confirmAction": "Apply this action?",
+    "eloPlaceholder": "ELO",
+    "rewardPlaceholder": "+ELO"
   },
   "ban": {
     "chatBanned": "You are banned from chat",

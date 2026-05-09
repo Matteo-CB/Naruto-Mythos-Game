@@ -949,12 +949,12 @@ function ReportsPanel() {
               )}
               {selectedAction === 'eloDeduct' && (
                 <input type="number" value={eloAmount} onChange={(e) => setEloAmount(e.target.value)}
-                  className="w-16 text-xs px-2 py-1 rounded" placeholder="ELO"
+                  className="w-16 text-xs px-2 py-1 rounded" placeholder={t('moderation.eloPlaceholder')}
                   style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626', color: '#e0e0e0' }} />
               )}
               {selectedAction && selectedAction !== 'dismiss' && (
                 <input type="number" value={rewardAmount} onChange={(e) => setRewardAmount(e.target.value)}
-                  className="w-16 text-xs px-2 py-1 rounded" placeholder="+ELO"
+                  className="w-16 text-xs px-2 py-1 rounded" placeholder={t('moderation.rewardPlaceholder')}
                   title={t('moderation.rewardReporter')}
                   style={{ backgroundColor: '#0a0a0a', border: '1px solid #3e8b3e33', color: '#3e8b3e' }} />
               )}

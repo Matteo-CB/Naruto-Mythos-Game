@@ -97,7 +97,7 @@ export default function ProfilePage({
       }
       setCurrentPage(page);
     } catch {
-      setError('Player not found');
+      setError(t('playerNotFound'));
     } finally {
       setLoading(false);
       setLoadingMore(false);

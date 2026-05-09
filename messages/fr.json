@@ -1303,7 +1303,8 @@
     "statsWins": "Victoires",
     "statsLosses": "Défaites",
     "statsDraws": "Égalités",
-    "statsWinrate": "Ratio"
+    "statsWinrate": "Ratio",
+    "playerNotFound": "Joueur introuvable."
   },
   "replay": {
     "title": "Recapitulatif",
@@ -2762,7 +2763,9 @@
     "dismissed": "Rejete",
     "pending": "En attente",
     "actionApplied": "Action appliquee",
-    "confirmAction": "Appliquer cette action ?"
+    "confirmAction": "Appliquer cette action ?",
+    "eloPlaceholder": "ELO",
+    "rewardPlaceholder": "+ELO"
   },
   "ban": {
     "chatBanned": "Vous etes banni du chat",
