@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 
 export default function Error({
   error,
@@ -9,6 +10,7 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations('errorPage');
   const retryCount = useRef(0);
 
   useEffect(() => {
@@ -31,10 +33,10 @@ export default function Error({
       <div className="flex flex-col items-center gap-4 max-w-md w-full text-center px-4">
         <div className="w-12 h-px" style={{ backgroundColor: 'rgba(179, 62, 62, 0.4)' }} />
         <h2 className="text-lg font-bold uppercase tracking-wider" style={{ color: '#b33e3e' }}>
-          Something went wrong
+          {t('title')}
         </h2>
         <p className="text-xs" style={{ color: '#666' }}>
-          {error?.message || 'An unexpected error occurred.'}
+          {error?.message || t('defaultMessage')}
         </p>
         <div className="flex gap-3 mt-2">
           <button
@@ -46,7 +48,7 @@ export default function Error({
               color: '#c4a35a',
             }}
           >
-            Try Again
+            {t('tryAgain')}
           </button>
           <a
             href="/"
@@ -57,7 +59,7 @@ export default function Error({
               color: '#888',
             }}
           >
-            Home
+            {t('home')}
           </a>
         </div>
         <div className="w-12 h-px mt-2" style={{ backgroundColor: 'rgba(179, 62, 62, 0.4)' }} />

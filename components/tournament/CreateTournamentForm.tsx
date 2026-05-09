@@ -345,7 +345,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
 
       <div className="flex flex-col gap-1">
         <label style={labelStyle}>{t('scheduledStart')}</label>
-        <p className="text-xs" style={{ color: '#666' }}>Leave empty to start manually</p>
+        <p className="text-xs" style={{ color: '#666' }}>{t('scheduledStartHint')}</p>
         <div className="flex gap-2">
           <input type="date" value={scheduledDate} onChange={(e) => setScheduledDate(e.target.value)}
             style={{ ...inputStyle, width: 'auto', flex: 1 }} />

@@ -1,6 +1,7 @@
 'use client';
 
 import { memo, useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import type { CharacterCard } from '@/lib/engine/types';
 import CardFace from './CardFace';
@@ -45,6 +46,7 @@ function CardInHandInner({
   className = '',
   index = 0,
 }: CardInHandProps) {
+  const t = useTranslations('card');
   const [isHovered, setIsHovered] = useState(false);
 
   const handleClick = useCallback(() => {
@@ -193,7 +195,7 @@ function CardInHandInner({
                 fontWeight: 600,
               }}
             >
-              Not enough chakra
+              {t('notEnoughChakraShort')}
             </span>
           </div>
         </div>

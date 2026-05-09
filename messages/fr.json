@@ -1395,7 +1395,8 @@
     "title": "Titre",
     "cardId": "ID de carte",
     "clickToPin": "Cliquez pour epingler",
-    "back": "Dos de carte (cache)"
+    "back": "Dos de carte (cache)",
+    "notEnoughChakraShort": "Chakra insuffisant"
   },
   "learn": {
     "title": "Apprendre le jeu",
@@ -2565,7 +2566,10 @@
     "selectMatch": "Sélectionner un match",
     "selectPlayer": "Sélectionner un joueur",
     "reasonOptional": "Raison (optionnel)",
-    "cancelTournamentWarning": "Cette action annulera le tournoi entier. Action irréversible."
+    "cancelTournamentWarning": "Cette action annulera le tournoi entier. Action irréversible.",
+    "scheduledStartHint": "Laissez vide pour démarrer manuellement",
+    "noDecksAvailable": "Aucun deck disponible",
+    "buildADeck": "Créer un deck"
   },
   "playHub": {
     "title": "Jouer",
@@ -2746,5 +2750,11 @@
     "hoursAgo": "il y a {n} h",
     "daysAgo": "il y a {n} j",
     "weeksAgo": "il y a {n} sem"
+  },
+  "errorPage": {
+    "title": "Une erreur est survenue",
+    "defaultMessage": "Une erreur inattendue s'est produite.",
+    "tryAgain": "Réessayer",
+    "home": "Accueil"
   }
 }

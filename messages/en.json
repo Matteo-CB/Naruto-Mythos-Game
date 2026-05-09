@@ -1395,7 +1395,8 @@
     "title": "Title",
     "cardId": "Card ID",
     "clickToPin": "Click to pin preview",
-    "back": "Card back (hidden)"
+    "back": "Card back (hidden)",
+    "notEnoughChakraShort": "Not enough chakra"
   },
   "learn": {
     "title": "Learn the Game",
@@ -2565,7 +2566,10 @@
     "selectMatch": "Select match",
     "selectPlayer": "Select player",
     "reasonOptional": "Reason (optional)",
-    "cancelTournamentWarning": "This will cancel the entire tournament. This action cannot be undone."
+    "cancelTournamentWarning": "This will cancel the entire tournament. This action cannot be undone.",
+    "scheduledStartHint": "Leave empty to start manually",
+    "noDecksAvailable": "No decks available",
+    "buildADeck": "Build a deck"
   },
   "playHub": {
     "title": "Play",
@@ -2746,5 +2750,11 @@
     "hoursAgo": "{n}h ago",
     "daysAgo": "{n}d ago",
     "weeksAgo": "{n}w ago"
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "defaultMessage": "An unexpected error occurred.",
+    "tryAgain": "Try again",
+    "home": "Home"
   }
 }

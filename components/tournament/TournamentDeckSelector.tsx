@@ -35,9 +35,9 @@ export function TournamentDeckSelector({ decks, bannedCardIds, onSelect, selecte
   if (decks.length === 0) {
     return (
       <div className="flex flex-col items-center gap-3 p-6" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
-        <p className="text-xs" style={{ color: '#888' }}>No decks available</p>
+        <p className="text-xs" style={{ color: '#888' }}>{t('noDecksAvailable')}</p>
         <Link href="/deck-builder" className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
-          Build a Deck
+          {t('buildADeck')}
         </Link>
       </div>
     );
