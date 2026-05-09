@@ -906,7 +906,15 @@
       "alreadyQueued": "You are already queued in another tab",
       "gameBanned": "You are banned from playing online games. Check your profile for details.",
       "invalidDeck": "Your deck contains invalid or unknown cards.",
-      "deckBanned": "Your deck contains banned cards. Remove them to play in this mode."
+      "deckBanned": "Your deck contains banned cards. Remove them to play in this mode.",
+      "authMismatch": "Authentication mismatch.",
+      "tournamentBusy": "You are in a tournament match ({roomCode}). Finish it first.",
+      "roomNotFound": "Room not found.",
+      "youAreHost": "You are the host of this room.",
+      "roomFull": "Room is full.",
+      "sealedGenFailed": "Failed to generate sealed boosters.",
+      "notYourTurn": "Not your turn.",
+      "invalidAction": "Invalid action."
     },
     "opponentDisconnected": "Opponent disconnected. They have {time} to reconnect or the game is forfeit.",
     "reconnect": {

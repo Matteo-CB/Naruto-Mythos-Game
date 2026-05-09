@@ -906,7 +906,15 @@
       "alreadyQueued": "Vous êtes déjà en file dans un autre onglet",
       "gameBanned": "Vous êtes banni des parties en ligne. Vérifiez votre profil pour plus de détails.",
       "invalidDeck": "Votre deck contient des cartes invalides ou inconnues.",
-      "deckBanned": "Votre deck contient des cartes bannies. Retirez-les pour jouer dans ce mode."
+      "deckBanned": "Votre deck contient des cartes bannies. Retirez-les pour jouer dans ce mode.",
+      "authMismatch": "Erreur d'authentification.",
+      "tournamentBusy": "Vous êtes dans un match de tournoi ({roomCode}). Terminez-le d'abord.",
+      "roomNotFound": "Salle introuvable.",
+      "youAreHost": "Vous êtes l'hôte de cette salle.",
+      "roomFull": "La salle est pleine.",
+      "sealedGenFailed": "Échec de la génération des boosters scellés.",
+      "notYourTurn": "Ce n'est pas votre tour.",
+      "invalidAction": "Action invalide."
     },
     "opponentDisconnected": "Adversaire deconnecte. Il a {time} pour se reconnecter ou la partie est forfait.",
     "reconnect": {

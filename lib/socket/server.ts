@@ -1267,7 +1267,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             const trustedId = decoded?.id as string | undefined;
             if (trustedId && trustedId !== data.userId) {
               console.warn(`[Socket] auth:register rejected: claim=${data.userId} but session=${trustedId}`);
-              socket.emit('game:error', { message: 'Authentication mismatch' });
+              socket.emit('game:error', { message: 'Authentication mismatch', errorKey: 'game.error.authMismatch' });
               return;
             }
           }
@@ -1488,7 +1488,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const authedUserId_create = (socket.data as { userId?: string }).userId;
       if (!authedUserId_create || authedUserId_create !== data.userId) {
         console.warn(`[Socket] room:create rejected: socket auth mismatch (claim=${data.userId}, auth=${authedUserId_create ?? 'null'})`);
-        socket.emit('room:error', { message: 'Authentication mismatch' });
+        socket.emit('room:error', { message: 'Authentication mismatch', errorKey: 'game.error.authMismatch' });
         return;
       }
 
@@ -1499,7 +1499,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       const tournamentBusy = await getActiveTournamentMatchForUser(data.userId);
       if (tournamentBusy) {
-        socket.emit('room:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.` });
+        socket.emit('room:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.`, errorKey: 'game.error.tournamentBusy', errorParams: { roomCode: tournamentBusy.roomCode ?? 'pending' } });
         return;
       }
 
@@ -1584,7 +1584,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const authedUserId_join = (socket.data as { userId?: string }).userId;
       if (!authedUserId_join || authedUserId_join !== data.userId) {
         console.warn(`[Socket] room:join rejected: socket auth mismatch (claim=${data.userId}, auth=${authedUserId_join ?? 'null'})`);
-        socket.emit('room:error', { message: 'Authentication mismatch' });
+        socket.emit('room:error', { message: 'Authentication mismatch', errorKey: 'game.error.authMismatch' });
         return;
       }
 
@@ -1595,14 +1595,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       const tournamentBusy = await getActiveTournamentMatchForUser(data.userId);
       if (tournamentBusy && tournamentBusy.roomCode !== data.code) {
-        socket.emit('room:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.` });
+        socket.emit('room:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.`, errorKey: 'game.error.tournamentBusy', errorParams: { roomCode: tournamentBusy.roomCode ?? 'pending' } });
         return;
       }
 
       const room = rooms.get(data.code);
       if (!room) {
         console.log(`[Socket] Room ${data.code} not found`);
-        socket.emit('room:error', { message: 'Room not found' });
+        socket.emit('room:error', { message: 'Room not found', errorKey: 'game.error.roomNotFound' });
         return;
       }
 
@@ -1640,14 +1640,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
           return;
         }
         console.log(`[Socket] User ${data.userId} is the host of room ${data.code}`);
-        socket.emit('room:error', { message: 'You are the host of this room' });
+        socket.emit('room:error', { message: 'You are the host of this room', errorKey: 'game.error.youAreHost' });
         return;
       }
 
       
       if (room.guestId && room.guestId !== data.userId) {
         console.log(`[Socket] Room ${data.code} is full`);
-        socket.emit('room:error', { message: 'Room is full' });
+        socket.emit('room:error', { message: 'Room is full', errorKey: 'game.error.roomFull' });
         return;
       }
 
@@ -1782,7 +1782,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           }, SEALED_TIMEOUT_MS);
         } catch (err) {
           console.error(`[Socket] Sealed booster generation error:`, err);
-          io.to(data.code).emit('room:error', { message: 'Failed to generate sealed boosters' });
+          io.to(data.code).emit('room:error', { message: 'Failed to generate sealed boosters', errorKey: 'game.error.sealedGenFailed' });
         }
       }
     });
@@ -2100,7 +2100,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (room.gameState.activePlayer !== player && !hasPendingAction) {
         if (room.gameState.phase === 'action') {
           console.log(`[Socket] Rejected action from ${player}: not their turn`);
-          socket.emit('game:error', { message: 'Not your turn' });
+          socket.emit('game:error', { message: 'Not your turn', errorKey: 'game.error.notYourTurn' });
           return;
         }
       }
@@ -2258,6 +2258,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         broadcastState(room, io);
         socket.emit('game:error', {
           message: err instanceof Error ? err.message : 'Invalid action',
+          errorKey: 'game.error.invalidAction',
         });
       }
     });
@@ -2337,7 +2338,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (accepterUserId) {
         const tournamentBusy = await getActiveTournamentMatchForUser(accepterUserId);
         if (tournamentBusy && tournamentBusy.roomCode !== code) {
-          socket.emit('game:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.` });
+          socket.emit('game:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.`, errorKey: 'game.error.tournamentBusy', errorParams: { roomCode: tournamentBusy.roomCode ?? 'pending' } });
           return;
         }
       }
@@ -2441,7 +2442,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const authedUserId_mm = (socket.data as { userId?: string }).userId;
       if (!authedUserId_mm || authedUserId_mm !== data.userId) {
         console.warn(`[Socket] matchmaking:join rejected: socket auth mismatch (claim=${data.userId}, auth=${authedUserId_mm ?? 'null'})`);
-        socket.emit('game:error', { message: 'Authentication mismatch' });
+        socket.emit('game:error', { message: 'Authentication mismatch', errorKey: 'game.error.authMismatch' });
         return;
       }
 
@@ -2452,7 +2453,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       const tournamentBusy = await getActiveTournamentMatchForUser(data.userId);
       if (tournamentBusy) {
-        socket.emit('game:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.` });
+        socket.emit('game:error', { message: `You are in a tournament match (${tournamentBusy.roomCode ?? 'pending'}). Finish it first.`, errorKey: 'game.error.tournamentBusy', errorParams: { roomCode: tournamentBusy.roomCode ?? 'pending' } });
         return;
       }
 
