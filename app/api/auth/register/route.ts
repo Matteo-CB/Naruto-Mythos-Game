@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const recent = (registerRate.get(ip) ?? []).filter((t) => t > windowStart);
     if (recent.length >= REGISTER_MAX) {
       return NextResponse.json(
-        { error: 'Too many registration attempts, try again later' },
+        { error: 'Too many registration attempts, try again later', errorKey: 'auth.error.tooManyRegister' },
         { status: 429 },
       );
     }
@@ -36,14 +36,14 @@ export async function POST(request: NextRequest) {
 
     if (!rawUsername || !email || !password) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields', errorKey: 'auth.error.missingFields' },
         { status: 400 },
       );
     }
 
     if (typeof email !== 'string' || !EMAIL_RE.test(email)) {
       return NextResponse.json(
-        { error: 'Invalid email format' },
+        { error: 'Invalid email format', errorKey: 'auth.error.invalidEmail' },
         { status: 400 },
       );
     }
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     if (password.length < 6) {
       return NextResponse.json(
-        { error: 'Password must be at least 6 characters' },
+        { error: 'Password must be at least 6 characters', errorKey: 'auth.error.passwordTooShort' },
         { status: 400 },
       );
     }
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Username or email already taken' },
+        { error: 'Username or email already taken', errorKey: 'auth.error.alreadyTaken' },
         { status: 409 },
       );
     }
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
     );
   } catch {
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', errorKey: 'auth.error.serverError' },
       { status: 500 },
     );
   }

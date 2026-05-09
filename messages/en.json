@@ -1376,7 +1376,15 @@
     "goToLogin": "Back to Login",
     "signInWithDiscord": "Sign in with Discord",
     "signUpWithDiscord": "Sign up with Discord",
-    "orSeparator": "or"
+    "orSeparator": "or",
+    "error": {
+      "tooManyRegister": "Too many registration attempts, try again later.",
+      "missingFields": "Missing required fields.",
+      "invalidEmail": "Invalid email format.",
+      "passwordTooShort": "Password must be at least 6 characters.",
+      "alreadyTaken": "Username or email already taken.",
+      "serverError": "Server error. Please try again."
+    }
   },
   "card": {
     "effectTypes": {
@@ -2608,7 +2616,13 @@
     "scheduledStartHint": "Leave empty to start manually",
     "noDecksAvailable": "No decks available",
     "buildADeck": "Build a deck",
-    "codePlaceholder": "XXXXXX"
+    "codePlaceholder": "XXXXXX",
+    "admin": {
+      "error": "Error",
+      "done": "Done",
+      "networkError": "Network error",
+      "failedToDelete": "Failed to delete"
+    }
   },
   "playHub": {
     "title": "Play",

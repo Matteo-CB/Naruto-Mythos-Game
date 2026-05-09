@@ -50,7 +50,12 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || t('auth.registrationFailed'));
+        if (typeof data?.errorKey === 'string') {
+          try { setError(t(data.errorKey)); }
+          catch { setError(data.error || t('auth.registrationFailed')); }
+        } else {
+          setError(data.error || t('auth.registrationFailed'));
+        }
         return;
       }
 

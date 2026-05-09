@@ -1376,7 +1376,15 @@
     "goToLogin": "Retour a la connexion",
     "signInWithDiscord": "Se connecter avec Discord",
     "signUpWithDiscord": "S'inscrire avec Discord",
-    "orSeparator": "ou"
+    "orSeparator": "ou",
+    "error": {
+      "tooManyRegister": "Trop de tentatives d'inscription. Réessayez plus tard.",
+      "missingFields": "Champs requis manquants.",
+      "invalidEmail": "Format e-mail invalide.",
+      "passwordTooShort": "Le mot de passe doit faire au moins 6 caractères.",
+      "alreadyTaken": "Pseudo ou e-mail déjà utilisé.",
+      "serverError": "Erreur serveur. Veuillez réessayer."
+    }
   },
   "card": {
     "effectTypes": {
@@ -2608,7 +2616,13 @@
     "scheduledStartHint": "Laissez vide pour démarrer manuellement",
     "noDecksAvailable": "Aucun deck disponible",
     "buildADeck": "Créer un deck",
-    "codePlaceholder": "XXXXXX"
+    "codePlaceholder": "XXXXXX",
+    "admin": {
+      "error": "Erreur",
+      "done": "Fait",
+      "networkError": "Erreur réseau",
+      "failedToDelete": "Échec de la suppression"
+    }
   },
   "playHub": {
     "title": "Jouer",

@@ -63,10 +63,17 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         body: JSON.stringify(body),
       });
       const data = await res.json();
-      if (!res.ok) { setAdminError(data.error || 'Error'); return; }
-      setAdminMessage(data.message || 'Done');
+      if (!res.ok) {
+        let msg: string = data?.error || t('admin.error');
+        if (typeof data?.errorKey === 'string') {
+          try { msg = t(data.errorKey); } catch { /* fall back to msg */ }
+        }
+        setAdminError(msg);
+        return;
+      }
+      setAdminMessage(data.message || t('admin.done'));
       await fetchTournament(tournamentId);
-    } catch { setAdminError('Network error'); }
+    } catch { setAdminError(t('admin.networkError')); }
     finally { setAdminLoading(false); }
   }, [tournamentId, fetchTournament]);
 
@@ -302,9 +309,13 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
                     router.push('/tournaments' as '/');
                   } else {
                     const data = await res.json();
-                    setAdminError(data.error || 'Failed to delete');
+                    let msg: string = data?.error || t('admin.failedToDelete');
+                    if (typeof data?.errorKey === 'string') {
+                      try { msg = t(data.errorKey); } catch { /* fall back */ }
+                    }
+                    setAdminError(msg);
                   }
-                } catch { setAdminError('Network error'); }
+                } catch { setAdminError(t('admin.networkError')); }
                 finally { setDeleting(false); }
               }}
               color="#cc4444"
