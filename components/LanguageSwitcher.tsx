@@ -1,25 +1,26 @@
 'use client';
 
 import { usePathname, useRouter } from '@/lib/i18n/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { ChangelogButton } from './ChangelogButton';
 
 export function LanguageSwitcher() {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations('a11y');
 
   const switchLocale = (newLocale: 'en' | 'fr') => {
     router.replace(pathname, { locale: newLocale });
   };
 
   return (
-    <nav className="flex items-center gap-2" aria-label="Top menu">
+    <nav className="flex items-center gap-2" aria-label={t('topMenu')}>
       <ChangelogButton />
       <span className="text-xs" style={{ color: '#333333' }} aria-hidden="true">
         |
       </span>
-      <div className="flex items-center gap-1" aria-label="Language">
+      <div className="flex items-center gap-1" aria-label={t('language')}>
         <button
           onClick={() => switchLocale('en')}
           className="px-2 py-1 text-xs font-bold uppercase tracking-wider transition-colors"
@@ -27,7 +28,7 @@ export function LanguageSwitcher() {
             color: locale === 'en' ? '#c4a35a' : '#555555',
             borderBottom: locale === 'en' ? '2px solid #c4a35a' : '2px solid transparent',
           }}
-          aria-label="English"
+          aria-label={t('english')}
           aria-current={locale === 'en' ? 'true' : undefined}
         >
           EN
@@ -42,7 +43,7 @@ export function LanguageSwitcher() {
             color: locale === 'fr' ? '#c4a35a' : '#555555',
             borderBottom: locale === 'fr' ? '2px solid #c4a35a' : '2px solid transparent',
           }}
-          aria-label="Français"
+          aria-label={t('french')}
           aria-current={locale === 'fr' ? 'true' : undefined}
         >
           FR

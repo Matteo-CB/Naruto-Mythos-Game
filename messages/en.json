@@ -370,7 +370,8 @@
       "confirm": "OK",
       "details": "Details",
       "minimize": "Minimize",
-      "restoreEffect": "Pending Effect"
+      "restoreEffect": "Pending Effect",
+      "edge": "Edge"
     },
     "handLabel": "Hand",
     "effect": {
@@ -920,7 +921,8 @@
       "description": "You have an ongoing game. Would you like to rejoin or abandon it?",
       "rejoin": "Rejoin Game",
       "abandon": "Abandon"
-    }
+    },
+    "edgeToken": "Edge Token"
   },
   "collection": {
     "title": "Card Collection",
@@ -1073,7 +1075,10 @@
       "exampleBracket": "Effect text containing exact phrase discard pile",
       "example4": "Leaf Village cards with UPGRADE that mentions move",
       "example5": "Cards with both Jutsu AND Team 7 keywords",
-      "example6": "Cards that ONLY have the Summon keyword"
+      "example6": "Cards that ONLY have the Summon keyword",
+      "statsHeader": "Stats",
+      "propertiesHeader": "Properties",
+      "effectsHeader": "Effects"
     },
     "sort": "Sort",
     "error": {
@@ -2099,6 +2104,18 @@
         "player1": "Player 1",
         "player2": "Player 2"
       }
+    },
+    "alts": {
+      "narutoCard": "Naruto Uzumaki",
+      "orochimaruCard": "Orochimaru",
+      "lowerCost": "Lower cost",
+      "higherCost": "Higher cost",
+      "chuninExamMission": "Chunin Exam Mission",
+      "missionCard": "Mission",
+      "hiddenCharacter": "Hidden character",
+      "yourNaruto": "Naruto (yours)",
+      "narutoShort": "Naruto",
+      "hidden": "Hidden"
     }
   },
   "legal": {
@@ -2262,6 +2279,25 @@
       "disabled": "DISABLED",
       "enabledDesc": "All users can access Sealed mode",
       "disabledDesc": "Only admins can access Sealed mode"
+    },
+    "players": {
+      "searchPlaceholder": "Search by username...",
+      "search": "Search",
+      "editEloTooltip": "Click to edit ELO",
+      "ok": "OK",
+      "winShort": "W",
+      "lossShort": "L",
+      "drawShort": "D",
+      "games": "Games",
+      "resetConfirm": "Reset all?",
+      "reset": "Reset",
+      "yes": "Yes",
+      "no": "No",
+      "matchHistory": "Match History",
+      "close": "Close",
+      "noGames": "No games found.",
+      "deleteConfirm": "Delete + restore ELO?",
+      "delete": "Delete"
     }
   },
   "badges": {
@@ -2283,7 +2319,8 @@
       "all": "All",
       "banned": "Banned",
       "authorized": "Authorized"
-    }
+    },
+    "ban": "Ban"
   },
   "sealed": {
     "title": "Sealed Mode",
@@ -2786,5 +2823,47 @@
     "analysisFailed": "Analysis failed",
     "revertFailed": "Revert failed: {msg}",
     "unknownError": "unknown error"
+  },
+  "a11y": {
+    "hiddenCard": "Hidden card",
+    "cardBack": "Card back",
+    "topMenu": "Top menu",
+    "language": "Language",
+    "english": "English",
+    "french": "Français",
+    "mainNavigation": "Main navigation"
+  },
+  "training": {
+    "title": "Training Mode",
+    "intro": "Practice against the AI with detailed feedback after each game.",
+    "coachAnalyzes": "Your coach analyzes:",
+    "feature": {
+      "winProb": "Real-time win probability",
+      "moveQuality": "Quality grade for each of your moves",
+      "bestMove": "Best alternative when you misplay",
+      "missionAnalysis": "Mission-by-mission breakdown",
+      "handGrade": "Mulligan and hand grade",
+      "warnings": "Warnings on critical decisions"
+    },
+    "opponentDifficulty": "Opponent Difficulty",
+    "startTraining": "Start Training",
+    "difficulty": {
+      "easy": {
+        "label": "Easy",
+        "desc": "Random legal actions"
+      },
+      "medium": {
+        "label": "Medium",
+        "desc": "Greedy, plays the highest power card on the highest value mission"
+      },
+      "hard": {
+        "label": "Hard",
+        "desc": "Plans ahead, manages chakra, uses hidden plays strategically"
+      },
+      "impossible": {
+        "label": "Impossible",
+        "desc": "Full expectimax search, samples hidden info, hardly slips"
+      }
+    }
   }
 }

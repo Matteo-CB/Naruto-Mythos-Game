@@ -111,7 +111,7 @@ function LessonOverview({ t }: { t: ReturnType<typeof useTranslations> }) {
         >
           <Image
             src={CARD_IMAGES.narutoRare}
-            alt="Naruto Uzumaki"
+            alt={t('alts.narutoCard')}
             width={110}
             height={154}
             className="w-[90px] h-[126px] sm:w-[110px] sm:h-[154px]"
@@ -138,7 +138,7 @@ function LessonOverview({ t }: { t: ReturnType<typeof useTranslations> }) {
         >
           <Image
             src={CARD_IMAGES.orochimaru}
-            alt="Orochimaru"
+            alt={t('alts.orochimaruCard')}
             width={110}
             height={154}
             className="w-[90px] h-[126px] sm:w-[110px] sm:h-[154px]"
@@ -211,7 +211,7 @@ function LessonCardAnatomy({ t }: { t: ReturnType<typeof useTranslations> }) {
       >
         <Image
           src={CARD_IMAGES.narutoRare}
-          alt="Naruto Uzumaki"
+          alt={t('alts.narutoCard')}
           width={200}
           height={280}
           className="w-[180px] h-[252px] sm:w-[200px] sm:h-[280px]"
@@ -629,7 +629,7 @@ function LessonUpgrade({ t }: { t: ReturnType<typeof useTranslations> }) {
         >
           <Image
             src={CARD_IMAGES.orochimaru}
-            alt="Lower cost"
+            alt={t('alts.lowerCost')}
             width={100}
             height={140}
             style={{
@@ -647,7 +647,7 @@ function LessonUpgrade({ t }: { t: ReturnType<typeof useTranslations> }) {
         >
           <Image
             src={CARD_IMAGES.narutoRare}
-            alt="Higher cost"
+            alt={t('alts.higherCost')}
             width={100}
             height={140}
             style={{
@@ -891,7 +891,7 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             <>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
                 <motion.div initial={{ rotateY: 180, opacity: 0 }} animate={{ rotateY: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.2 }} style={{ perspective: '600px' }}>
-                  <Image src={CARD_IMAGES.missionChunin} alt="Chunin Exam Mission" width={160} height={116}
+                  <Image src={CARD_IMAGES.missionChunin} alt={t('alts.chuninExamMission')} width={160} height={116}
                     style={{ borderRadius: '8px', boxShadow: '0 4px 24px rgba(196, 163, 90, 0.3)' }} />
                 </motion.div>
                 <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.7 }}
@@ -928,11 +928,11 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <motion.div initial={{ y: 60, opacity: 0, scale: 0.9 }} animate={{ y: 0, opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.2, type: 'spring', stiffness: 200 }}>
-                  <Image src={CARD_IMAGES.narutoCommon} alt="Naruto Uzumaki" width={100} height={140} style={{ borderRadius: '8px', boxShadow: '0 8px 32px rgba(196, 163, 90, 0.3)' }} />
+                  <Image src={CARD_IMAGES.narutoCommon} alt={t('alts.narutoCard')} width={100} height={140} style={{ borderRadius: '8px', boxShadow: '0 8px 32px rgba(196, 163, 90, 0.3)' }} />
                 </motion.div>
                 <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} style={{ color: '#c4a35a', fontSize: '1.2rem', fontWeight: 300 }}>{'>'}</motion.span>
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.1 }}>
-                  <Image src={CARD_IMAGES.missionChunin} alt="Mission" width={120} height={87} style={{ borderRadius: '8px', boxShadow: '0 4px 16px rgba(0,0,0,0.5)' }} />
+                  <Image src={CARD_IMAGES.missionChunin} alt={t('alts.missionCard')} width={120} height={87} style={{ borderRadius: '8px', boxShadow: '0 4px 16px rgba(0,0,0,0.5)' }} />
                 </motion.div>
                 <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.7 }}
                   style={{ padding: '8px 14px', backgroundColor: 'rgba(10, 10, 14, 0.9)', border: '1px solid rgba(196, 163, 90, 0.3)', borderRadius: '6px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
@@ -949,12 +949,12 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <motion.div initial={{ y: -60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, delay: 0.2, type: 'spring', stiffness: 200 }}>
-                  <Image src={CARD_IMAGES.cardBack} alt="Hidden character" width={100} height={140} style={{ borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.6)' }} />
+                  <Image src={CARD_IMAGES.cardBack} alt={t('alts.hiddenCharacter')} width={100} height={140} style={{ borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.6)' }} />
                 </motion.div>
                 <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} style={{ color: '#c4a35a', fontSize: '1.2rem', fontWeight: 300 }}>{'>'}</motion.span>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                  <Image src={CARD_IMAGES.missionChunin} alt="Mission" width={100} height={73} style={{ borderRadius: '6px', boxShadow: '0 2px 12px rgba(0,0,0,0.4)' }} />
-                  <Image src={CARD_IMAGES.narutoCommon} alt="Naruto (yours)" width={50} height={70} style={{ borderRadius: '4px', boxShadow: '0 2px 8px rgba(0,0,0,0.4)', opacity: 0.8 }} />
+                  <Image src={CARD_IMAGES.missionChunin} alt={t('alts.missionCard')} width={100} height={73} style={{ borderRadius: '6px', boxShadow: '0 2px 12px rgba(0,0,0,0.4)' }} />
+                  <Image src={CARD_IMAGES.narutoCommon} alt={t('alts.yourNaruto')} width={50} height={70} style={{ borderRadius: '4px', boxShadow: '0 2px 8px rgba(0,0,0,0.4)', opacity: 0.8 }} />
                 </div>
                 <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.6 }}
                   style={{ padding: '8px 14px', backgroundColor: 'rgba(10, 10, 14, 0.9)', border: '1px solid rgba(196, 163, 90, 0.3)', borderRadius: '6px', textAlign: 'center' }}>
@@ -994,7 +994,7 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4, delay: 0.2 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                  <Image src={CARD_IMAGES.narutoCommon} alt="Naruto" width={70} height={98} style={{ borderRadius: '6px', boxShadow: '0 4px 20px rgba(196, 163, 90, 0.4)' }} />
+                  <Image src={CARD_IMAGES.narutoCommon} alt={t('alts.narutoShort')} width={70} height={98} style={{ borderRadius: '6px', boxShadow: '0 4px 20px rgba(196, 163, 90, 0.4)' }} />
                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.5 }}
                     style={{ padding: '3px 12px', backgroundColor: 'rgba(100, 180, 100, 0.2)', border: '1px solid rgba(100, 180, 100, 0.5)', borderRadius: '4px', color: '#8fc98f', fontSize: '0.8rem', fontWeight: 700 }}>
                     PWR 3
@@ -1002,7 +1002,7 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
                 </motion.div>
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.4 }} style={{ color: '#c4a35a', fontSize: '1.1rem', fontWeight: 700 }}>VS</motion.div>
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4, delay: 0.2 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                  <Image src={CARD_IMAGES.cardBack} alt="Hidden" width={70} height={98} style={{ borderRadius: '6px', boxShadow: '0 4px 16px rgba(0,0,0,0.5)', opacity: 0.7 }} />
+                  <Image src={CARD_IMAGES.cardBack} alt={t('alts.hidden')} width={70} height={98} style={{ borderRadius: '6px', boxShadow: '0 4px 16px rgba(0,0,0,0.5)', opacity: 0.7 }} />
                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.5 }}
                     style={{ padding: '3px 12px', backgroundColor: 'rgba(180, 80, 80, 0.2)', border: '1px solid rgba(180, 80, 80, 0.5)', borderRadius: '4px', color: '#cc6666', fontSize: '0.8rem', fontWeight: 700 }}>
                     PWR 0

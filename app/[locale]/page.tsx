@@ -85,6 +85,7 @@ const accountButtons = [
 export default function Home() {
   const t = useTranslations('home');
   const td = useTranslations('discord');
+  const ta = useTranslations('a11y');
   const { data: session, update: updateSession } = useSession();
   const [mounted, setMounted] = useState(false);
   const [featuredCard] = useState(() =>
@@ -181,7 +182,7 @@ export default function Home() {
 
             
             <motion.nav
-              aria-label="Main navigation"
+              aria-label={ta('mainNavigation')}
               className="flex w-full flex-col gap-2"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}

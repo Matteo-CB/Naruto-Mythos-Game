@@ -105,7 +105,7 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
           {isHidden ? (
             <img
               src="/images/card-back.webp"
-              alt="Hidden card"
+              alt={t('a11y.hiddenCard')}
               className="w-full h-full"
               style={{ objectFit: 'cover' }}
               draggable={false}
@@ -236,7 +236,7 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
           >
             <img
               src="/images/card-back.webp"
-              alt="Card back"
+              alt={t('a11y.cardBack')}
               className="w-full h-full"
               style={{ objectFit: 'cover' }}
               draggable={false}

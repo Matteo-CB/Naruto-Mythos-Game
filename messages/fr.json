@@ -370,7 +370,8 @@
       "confirm": "OK",
       "details": "Détails",
       "minimize": "Réduire",
-      "restoreEffect": "Effet en attente"
+      "restoreEffect": "Effet en attente",
+      "edge": "Edge"
     },
     "handLabel": "Main",
     "effect": {
@@ -920,7 +921,8 @@
       "description": "Vous avez une partie en cours. Voulez-vous la rejoindre ou l'abandonner ?",
       "rejoin": "Rejoindre",
       "abandon": "Abandonner"
-    }
+    },
+    "edgeToken": "Jeton Edge"
   },
   "collection": {
     "title": "Collection de Cartes",
@@ -1073,7 +1075,10 @@
       "exampleBracket": "Texte d'effet contenant la phrase exacte discard pile",
       "example4": "Cartes Village de la Feuille avec UPGRADE qui mentionne move",
       "example5": "Cartes ayant les mots-cles Jutsu ET Team 7",
-      "example6": "Cartes ayant UNIQUEMENT le mot-cle Summon"
+      "example6": "Cartes ayant UNIQUEMENT le mot-cle Summon",
+      "statsHeader": "Stats",
+      "propertiesHeader": "Propriétés",
+      "effectsHeader": "Effets"
     },
     "sort": "Trier",
     "error": {
@@ -2099,6 +2104,18 @@
         "player1": "Joueur 1",
         "player2": "Joueur 2"
       }
+    },
+    "alts": {
+      "narutoCard": "Naruto Uzumaki",
+      "orochimaruCard": "Orochimaru",
+      "lowerCost": "Coût inférieur",
+      "higherCost": "Coût supérieur",
+      "chuninExamMission": "Mission examen Chûnin",
+      "missionCard": "Mission",
+      "hiddenCharacter": "Personnage caché",
+      "yourNaruto": "Naruto (vous)",
+      "narutoShort": "Naruto",
+      "hidden": "Caché"
     }
   },
   "legal": {
@@ -2262,6 +2279,25 @@
       "disabled": "DESACTIVE",
       "enabledDesc": "Tous les utilisateurs peuvent acceder au mode Scelle",
       "disabledDesc": "Seuls les admins peuvent acceder au mode Scelle"
+    },
+    "players": {
+      "searchPlaceholder": "Rechercher par pseudo...",
+      "search": "Rechercher",
+      "editEloTooltip": "Cliquer pour modifier l'ELO",
+      "ok": "OK",
+      "winShort": "V",
+      "lossShort": "D",
+      "drawShort": "N",
+      "games": "Parties",
+      "resetConfirm": "Tout réinitialiser ?",
+      "reset": "Réinitialiser",
+      "yes": "Oui",
+      "no": "Non",
+      "matchHistory": "Historique des parties",
+      "close": "Fermer",
+      "noGames": "Aucune partie trouvée.",
+      "deleteConfirm": "Supprimer et restaurer l'ELO ?",
+      "delete": "Supprimer"
     }
   },
   "badges": {
@@ -2283,7 +2319,8 @@
       "all": "Toutes",
       "banned": "Interdites",
       "authorized": "Autorisees"
-    }
+    },
+    "ban": "Bannir"
   },
   "sealed": {
     "title": "Mode Scellé",
@@ -2786,5 +2823,47 @@
     "analysisFailed": "Échec de l'analyse",
     "revertFailed": "Échec de l'annulation : {msg}",
     "unknownError": "erreur inconnue"
+  },
+  "a11y": {
+    "hiddenCard": "Carte cachée",
+    "cardBack": "Dos de carte",
+    "topMenu": "Menu principal",
+    "language": "Langue",
+    "english": "Anglais",
+    "french": "Français",
+    "mainNavigation": "Navigation principale"
+  },
+  "training": {
+    "title": "Mode entraînement",
+    "intro": "Entraîne-toi contre l'IA avec un retour détaillé après chaque partie.",
+    "coachAnalyzes": "Votre coach analyse :",
+    "feature": {
+      "winProb": "Probabilité de victoire en temps réel",
+      "moveQuality": "Note de qualité pour chacun de vos coups",
+      "bestMove": "Meilleure alternative en cas d'erreur",
+      "missionAnalysis": "Analyse mission par mission",
+      "handGrade": "Note de mulligan et de main",
+      "warnings": "Avertissements sur les décisions critiques"
+    },
+    "opponentDifficulty": "Difficulté de l'adversaire",
+    "startTraining": "Commencer l'entraînement",
+    "difficulty": {
+      "easy": {
+        "label": "Facile",
+        "desc": "Actions légales au hasard"
+      },
+      "medium": {
+        "label": "Moyen",
+        "desc": "Avide, joue la carte la plus puissante sur la mission la plus valuable"
+      },
+      "hard": {
+        "label": "Difficile",
+        "desc": "Planifie, gère le chakra, utilise les plays cachés stratégiquement"
+      },
+      "impossible": {
+        "label": "Impossible",
+        "desc": "Recherche expectimax complète, échantillonne les infos cachées, ne se trompe presque jamais"
+      }
+    }
   }
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useCallback, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import '@/styles/holo-card.css';
 
 interface Props {
@@ -20,6 +21,7 @@ export function HoloCard({
   height = 448,
   rarity = 'rare',
 }: Props) {
+  const t = useTranslations();
   const cardRef = useRef<HTMLDivElement>(null);
   const [interacting, setInteracting] = useState(false);
   const [flipped, setFlipped] = useState(false);
@@ -108,7 +110,7 @@ export function HoloCard({
           <div className="holo-card__back">
             <img
               src={backSrc}
-              alt="Card back"
+              alt={t('a11y.cardBack')}
               draggable={false}
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             />

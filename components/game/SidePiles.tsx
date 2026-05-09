@@ -148,7 +148,7 @@ function DiscardPile({
           >
             <img
               src={topCardImage || '/images/card-back.webp'}
-              alt="Discard"
+              alt={t('game.discard')}
               className="w-full h-full"
               style={{ objectFit: 'cover', filter: topCardImage ? 'none' : 'brightness(0.4) sepia(0.3)' }}
               draggable={false}

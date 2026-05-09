@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/lib/i18n/navigation';
 import { useSession } from 'next-auth/react';
 import { CloudBackground } from '@/components/CloudBackground';
@@ -17,34 +18,16 @@ interface ResolvedDeck {
   missions: MissionCard[];
 }
 
-const DIFFICULTIES: { key: AIDifficulty; labelFr: string; descFr: string; color: string }[] = [
-  {
-    key: 'easy',
-    labelFr: 'Facile',
-    descFr: 'Idéal pour apprendre - l\'IA fait des erreurs occasionnelles',
-    color: '#4ade80',
-  },
-  {
-    key: 'medium',
-    labelFr: 'Moyen',
-    descFr: 'Jeu cohérent, bon défi pour pratiquer les stratégies',
-    color: '#c4a35a',
-  },
-  {
-    key: 'hard',
-    labelFr: 'Difficile',
-    descFr: 'Très fort - planification sur plusieurs tours',
-    color: '#f97316',
-  },
-  {
-    key: 'impossible',
-    labelFr: 'Impossible',
-    descFr: 'Réseau de neurones - quasi-imbattable. Apprends de tes erreurs',
-    color: '#ef4444',
-  },
+const DIFFICULTIES: { key: AIDifficulty; color: string }[] = [
+  { key: 'easy', color: '#4ade80' },
+  { key: 'medium', color: '#c4a35a' },
+  { key: 'hard', color: '#f97316' },
+  { key: 'impossible', color: '#ef4444' },
 ];
 
 export default function TrainingPage() {
+  const t = useTranslations('training');
+  const tc = useTranslations('common');
   const { data: session } = useSession();
   const router = useRouter();
   const startAIGame = useGameStore((s) => s.startAIGame);
@@ -119,34 +102,31 @@ export default function TrainingPage() {
           
           <div className="text-center">
             <h1 className="text-3xl font-bold text-[#e0e0e0] mb-1">
-              Mode Entraînement
+              {t('title')}
             </h1>
             <p className="text-sm text-[#888888]">
-              L&apos;IA coach analyse chaque coup et te guide en temps réel.
-              Ce mode n&apos;est pas disponible en partie normale.
+              {t('intro')}
             </p>
           </div>
 
-          
           <div
             className="border px-4 py-3 text-sm"
             style={{ borderColor: '#c4a35a22', backgroundColor: '#c4a35a0a' }}
           >
-            <p className="text-[#c4a35a] font-medium mb-1">Ce que le Coach analyse :</p>
+            <p className="text-[#c4a35a] font-medium mb-1">{t('coachAnalyzes')}</p>
             <ul className="text-[#888] space-y-0.5 text-xs list-none">
-              <li>- Probabilité de victoire en temps réel</li>
-              <li>- Qualité de chaque coup (Excellent / Bon / Erreur / Grosse erreur)</li>
-              <li>- Recommandation du meilleur coup disponible</li>
-              <li>- Analyse de chaque mission (domination / contestée / perdue)</li>
-              <li>- Note de chaque carte dans ta main (0-10)</li>
-              <li>- Avertissements et conseils stratégiques</li>
+              <li>- {t('feature.winProb')}</li>
+              <li>- {t('feature.moveQuality')}</li>
+              <li>- {t('feature.bestMove')}</li>
+              <li>- {t('feature.missionAnalysis')}</li>
+              <li>- {t('feature.handGrade')}</li>
+              <li>- {t('feature.warnings')}</li>
             </ul>
           </div>
 
-          
           <div className="flex flex-col gap-2">
             <p className="text-xs text-[#888888] uppercase tracking-wider mb-1">
-              Difficulté de l&apos;adversaire
+              {t('opponentDifficulty')}
             </p>
             {DIFFICULTIES.map((d) => (
               <button
@@ -163,8 +143,8 @@ export default function TrainingPage() {
                   style={{ backgroundColor: d.color }}
                 />
                 <div>
-                  <p className="text-sm font-medium text-[#e0e0e0]">{d.labelFr}</p>
-                  <p className="text-xs text-[#666] mt-0.5">{d.descFr}</p>
+                  <p className="text-sm font-medium text-[#e0e0e0]">{t(`difficulty.${d.key}.label`)}</p>
+                  <p className="text-xs text-[#666] mt-0.5">{t(`difficulty.${d.key}.desc`)}</p>
                 </div>
               </button>
             ))}
@@ -185,7 +165,7 @@ export default function TrainingPage() {
               onClick={() => router.push('/')}
               className="flex-1 h-12 bg-[#141414] border border-[#262626] text-[#888888] font-medium hover:bg-[#1a1a1a] transition-colors"
             >
-              Retour
+              {tc('back')}
             </button>
             <button
               onClick={handleStart}
@@ -197,7 +177,7 @@ export default function TrainingPage() {
                 color: '#e0e0e0',
               }}
             >
-              {isLoading ? 'Chargement...' : 'Démarrer l\'entraînement'}
+              {isLoading ? tc('loading') : t('startTraining')}
             </button>
           </div>
         </div>

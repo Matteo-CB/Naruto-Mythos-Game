@@ -669,7 +669,7 @@ export default function AdminPage() {
                 value={playerSearch}
                 onChange={(e) => setPlayerSearch(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') fetchPlayers(playerSearch); }}
-                placeholder="Search by username..."
+                placeholder={t('players.searchPlaceholder')}
                 className="flex-1 px-3 py-2 text-sm"
                 style={{ backgroundColor: '#111', border: '1px solid #262626', color: '#e0e0e0', outline: 'none' }}
               />
@@ -679,7 +679,7 @@ export default function AdminPage() {
                 className="px-4 py-2 text-xs font-bold uppercase cursor-pointer"
                 style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
               >
-                {playersLoading ? '...' : 'Search'}
+                {playersLoading ? '...' : t('players.search')}
               </button>
             </div>
 
@@ -714,20 +714,20 @@ export default function AdminPage() {
                           style={{ backgroundColor: '#0a0a0a', border: '1px solid #c4a35a', color: '#e0e0e0', outline: 'none' }}
                         />
                         <button onClick={() => { const v = parseInt(eloEditValue); if (!isNaN(v)) handleSetElo(p.id, v); }}
-                          className="text-[10px] px-1.5 py-0.5" style={{ backgroundColor: '#1a2a1a', color: '#3e8b3e', border: '1px solid #3e8b3e44' }}>OK</button>
+                          className="text-[10px] px-1.5 py-0.5" style={{ backgroundColor: '#1a2a1a', color: '#3e8b3e', border: '1px solid #3e8b3e44' }}>{t('players.ok')}</button>
                       </div>
                     ) : (
                       <button
                         onClick={() => { setEloEditId(p.id); setEloEditValue(String(p.elo)); }}
                         className="text-xs font-bold tabular-nums cursor-pointer"
                         style={{ color: '#c4a35a' }}
-                        title="Click to edit ELO"
+                        title={t('players.editEloTooltip')}
                       >
                         ELO {p.elo}
                       </button>
                     )}
 
-                    <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>{p.wins}W {p.losses}L {p.draws}D</span>
+                    <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>{p.wins}{t('players.winShort')} {p.losses}{t('players.lossShort')} {p.draws}{t('players.drawShort')}</span>
                     {p.discordUsername && <span className="text-[10px]" style={{ color: '#5865F2' }}>{p.discordUsername}</span>}
 
                     <div className="flex items-center gap-1.5 ml-auto">
@@ -736,16 +736,16 @@ export default function AdminPage() {
                         className="px-2 py-1 text-[10px] cursor-pointer"
                         style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888' }}
                       >
-                        Games
+                        {t('players.games')}
                       </button>
 
                       {confirmResetId === p.id ? (
                         <div className="flex items-center gap-1">
-                          <span className="text-[10px]" style={{ color: '#b33e3e' }}>Reset all?</span>
+                          <span className="text-[10px]" style={{ color: '#b33e3e' }}>{t('players.resetConfirm')}</span>
                           <button onClick={() => handleResetPlayer(p.id)} disabled={playerActionLoading}
-                            className="px-2 py-0.5 text-[10px]" style={{ backgroundColor: '#2a1a1a', color: '#b33e3e', border: '1px solid #b33e3e44' }}>Yes</button>
+                            className="px-2 py-0.5 text-[10px]" style={{ backgroundColor: '#2a1a1a', color: '#b33e3e', border: '1px solid #b33e3e44' }}>{t('players.yes')}</button>
                           <button onClick={() => setConfirmResetId(null)}
-                            className="px-2 py-0.5 text-[10px]" style={{ backgroundColor: '#141414', color: '#888', border: '1px solid #262626' }}>No</button>
+                            className="px-2 py-0.5 text-[10px]" style={{ backgroundColor: '#141414', color: '#888', border: '1px solid #262626' }}>{t('players.no')}</button>
                         </div>
                       ) : (
                         <button
@@ -753,7 +753,7 @@ export default function AdminPage() {
                           className="px-2 py-1 text-[10px] cursor-pointer"
                           style={{ backgroundColor: '#1a1414', border: '1px solid #b33e3e33', color: '#b33e3e' }}
                         >
-                          Reset
+                          {t('players.reset')}
                         </button>
                       )}
                     </div>
@@ -767,17 +767,17 @@ export default function AdminPage() {
               <div>
                 <div className="flex items-center gap-3 mb-3">
                   <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: '#555' }}>
-                    Match History
+                    {t('players.matchHistory')}
                   </h3>
                   <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
                   <button onClick={() => { setSelectedPlayerId(null); setPlayerGames([]); }}
-                    className="text-[10px] px-2 py-0.5" style={{ color: '#888', border: '1px solid #262626' }}>Close</button>
+                    className="text-[10px] px-2 py-0.5" style={{ color: '#888', border: '1px solid #262626' }}>{t('players.close')}</button>
                 </div>
 
                 {gamesLoading ? (
-                  <p className="text-xs py-4" style={{ color: '#555' }}>Loading...</p>
+                  <p className="text-xs py-4" style={{ color: '#555' }}>{tc('common.loading')}</p>
                 ) : playerGames.length === 0 ? (
-                  <p className="text-xs py-4" style={{ color: '#555' }}>No games found.</p>
+                  <p className="text-xs py-4" style={{ color: '#555' }}>{t('players.noGames')}</p>
                 ) : (
                   <div className="flex flex-col gap-1">
                     {playerGames.map((game) => {
@@ -799,7 +799,7 @@ export default function AdminPage() {
                           className="rounded flex items-center gap-2 px-3 py-2"
                           style={{ backgroundColor: '#111', borderLeft: `2px solid ${resultColor}` }}
                         >
-                          <span className="text-[10px] font-bold w-4 shrink-0" style={{ color: resultColor }}>{won ? 'W' : 'L'}</span>
+                          <span className="text-[10px] font-bold w-4 shrink-0" style={{ color: resultColor }}>{won ? t('players.winShort') : t('players.lossShort')}</span>
                           <span className="text-xs truncate flex-1" style={{ color: '#ccc' }}>{opponent}</span>
                           <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>{myScore}-{oppScore}</span>
                           {eloVal !== null && eloVal !== 0 && (
@@ -813,11 +813,11 @@ export default function AdminPage() {
 
                           {confirmDeleteGameId === game.id ? (
                             <div className="flex items-center gap-1 shrink-0">
-                              <span className="text-[9px]" style={{ color: '#b33e3e' }}>Delete + restore ELO?</span>
+                              <span className="text-[9px]" style={{ color: '#b33e3e' }}>{t('players.deleteConfirm')}</span>
                               <button onClick={() => handleDeleteGame(game.id)} disabled={playerActionLoading}
-                                className="px-1.5 py-0.5 text-[9px]" style={{ backgroundColor: '#2a1a1a', color: '#b33e3e', border: '1px solid #b33e3e44' }}>Yes</button>
+                                className="px-1.5 py-0.5 text-[9px]" style={{ backgroundColor: '#2a1a1a', color: '#b33e3e', border: '1px solid #b33e3e44' }}>{t('players.yes')}</button>
                               <button onClick={() => setConfirmDeleteGameId(null)}
-                                className="px-1.5 py-0.5 text-[9px]" style={{ backgroundColor: '#141414', color: '#888', border: '1px solid #262626' }}>No</button>
+                                className="px-1.5 py-0.5 text-[9px]" style={{ backgroundColor: '#141414', color: '#888', border: '1px solid #262626' }}>{t('players.no')}</button>
                             </div>
                           ) : (
                             <button
@@ -825,7 +825,7 @@ export default function AdminPage() {
                               className="px-2 py-0.5 text-[9px] shrink-0 cursor-pointer"
                               style={{ backgroundColor: '#1a1414', border: '1px solid #b33e3e22', color: '#b33e3e' }}
                             >
-                              Delete
+                              {t('players.delete')}
                             </button>
                           )}
                         </div>

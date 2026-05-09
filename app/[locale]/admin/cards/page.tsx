@@ -279,14 +279,15 @@ export default function AdminCardsPage() {
                               className="flex-1 py-1 text-xs font-bold uppercase"
                               style={{ backgroundColor: '#1a0a0a', border: '1px solid #b33e3e', color: '#b33e3e' }}
                             >
-                              Ban
+                              {t('adminCards.ban')}
                             </button>
                             <button
                               onClick={() => setBanReasonCardId(null)}
                               className="px-2 py-1 text-xs"
                               style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#555' }}
+                              aria-label={t('common.cancel')}
                             >
-                              X
+                              ×
                             </button>
                           </div>
                         </div>

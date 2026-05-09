@@ -1078,23 +1078,23 @@ export default function DeckBuilderPage() {
               
               <div>
                 <span className="text-sm tracking-wider block mb-3" style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
-                  Stats
+                  {t('deckBuilder.search.statsHeader')}
                 </span>
                 {statsFilters.map((f, i) => renderFilterRow(f, i, '#c4a35a'))}
               </div>
 
-              
+
               <div>
                 <span className="text-sm tracking-wider block mb-3" style={{ color: '#3e8b3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
-                  Properties
+                  {t('deckBuilder.search.propertiesHeader')}
                 </span>
                 {cardFilters.map((f, i) => renderFilterRow(f, i, '#3e8b3e'))}
               </div>
 
-              
+
               <div>
                 <span className="text-sm tracking-wider block mb-3" style={{ color: '#b33e3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
-                  Effects
+                  {t('deckBuilder.search.effectsHeader')}
                 </span>
                 {effectFilters.map((f, i) => {
                   const keyColors: Record<string, string> = { e: '#c4a35a', em: '#c4a35a', emi: '#c4a35a', emc: '#888', eup: '#3e8b3e', ea: '#b33e3e', es: '#6a6abb' };

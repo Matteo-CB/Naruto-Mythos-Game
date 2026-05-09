@@ -324,7 +324,7 @@ export function EdgeCoinFlip() {
                 >
                   <img
                     src="/images/naruto_token.png"
-                    alt="Edge Token"
+                    alt={t('game.edgeToken')}
                     className="w-full h-full"
                     style={{ objectFit: 'cover', borderRadius: '50%' }}
                     draggable={false}

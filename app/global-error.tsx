@@ -1,5 +1,16 @@
 'use client';
 
+const STR = {
+  en: { title: 'Application Error', defaultMsg: 'An unexpected error occurred.', tryAgain: 'Try Again', home: 'Home' },
+  fr: { title: 'Erreur de l\'application', defaultMsg: 'Une erreur inattendue s\'est produite.', tryAgain: 'Réessayer', home: 'Accueil' },
+} as const;
+
+function readLocaleCookie(): 'en' | 'fr' {
+  if (typeof document === 'undefined') return 'fr';
+  const m = document.cookie.match(/(?:^|;\s*)NEXT_LOCALE=(en|fr)/);
+  return m ? (m[1] as 'en' | 'fr') : 'fr';
+}
+
 export default function GlobalError({
   error,
   reset,
@@ -7,18 +18,20 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const lang = readLocaleCookie();
+  const s = STR[lang];
   return (
-    <html>
+    <html lang={lang}>
       <body style={{ backgroundColor: '#0a0a0a', margin: 0 }}>
         <div style={{
           minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <div style={{ textAlign: 'center', maxWidth: '400px', padding: '0 16px' }}>
             <h2 style={{ color: '#b33e3e', fontSize: '18px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-              Application Error
+              {s.title}
             </h2>
             <p style={{ color: '#666', fontSize: '12px', marginTop: '8px' }}>
-              {error?.message || 'An unexpected error occurred.'}
+              {error?.message || s.defaultMsg}
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '16px' }}>
               <button
@@ -29,7 +42,7 @@ export default function GlobalError({
                   color: '#c4a35a', cursor: 'pointer', letterSpacing: '0.1em',
                 }}
               >
-                Try Again
+                {s.tryAgain}
               </button>
               <a
                 href="/"
@@ -39,7 +52,7 @@ export default function GlobalError({
                   color: '#888', textDecoration: 'none', letterSpacing: '0.1em',
                 }}
               >
-                Home
+                {s.home}
               </a>
             </div>
           </div>

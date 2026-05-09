@@ -41,6 +41,7 @@ function ReplayCard({
   index: number;
   onCardClick?: (card: CharacterCard | MissionCard) => void;
 }) {
+  const t = useTranslations();
   const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
   const imagePath = normalizeImagePath(topCard.image_file);
   const power = calculateCharacterPower(state, char, char.controlledBy);
@@ -76,7 +77,7 @@ function ReplayCard({
       >
         <img
           src="/images/card-back.webp"
-          alt="Hidden"
+          alt={t('a11y.hiddenCard')}
           draggable={false}
           className="w-full h-full object-cover"
         />
@@ -414,6 +415,7 @@ function FannedCardBack({
   fanArc: number;
   fanRotation: number;
 }) {
+  const t = useTranslations();
   const midpoint = (total - 1) / 2;
   const offset = index - midpoint;
   const rotation = offset * fanRotation;
@@ -438,7 +440,7 @@ function FannedCardBack({
     >
       <img
         src="/images/card-back.webp"
-        alt="Card back"
+        alt={t('a11y.cardBack')}
         draggable={false}
         className="w-full h-full object-cover"
       />
@@ -855,7 +857,7 @@ function PlayerBar({
                 padding: '2px 6px',
               }}
             >
-              Edge
+              {t('game.board.edge')}
             </span>
           </div>
         )}

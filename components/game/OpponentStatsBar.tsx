@@ -51,7 +51,7 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
           }}
         />
         <span className="text-[10px]" style={{ color: hasEdge ? '#b33e3e' : '#555555' }}>
-          Edge
+          {t('game.board.edge')}
         </span>
       </div>
 

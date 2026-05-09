@@ -172,7 +172,7 @@ export function TargetOrderPopup({
                   {target.isHidden ? (
                     <img
                       src="/images/card-back.webp"
-                      alt="Hidden"
+                      alt={t('a11y.hiddenCard')}
                       draggable={false}
                       className="w-full h-full object-cover"
                     />
