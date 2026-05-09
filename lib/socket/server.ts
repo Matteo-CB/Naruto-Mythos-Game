@@ -2604,7 +2604,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-      room.spectators.set(socket.id, { socketId: socket.id, userId: data.userId, username: data.username });
+      const safeSpecUsername = typeof data.username === 'string' && data.username.length > 0 && data.username.length <= 50
+        ? data.username
+        : (userNames.get(data.userId) || 'Spectator');
+      room.spectators.set(socket.id, { socketId: socket.id, userId: data.userId, username: safeSpecUsername });
       socket.join(data.roomCode);
       socket.join(`spec:${data.roomCode}`);
       playerRooms.set(socket.id, `spec:${data.roomCode}`);
@@ -2646,18 +2649,25 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const joinMsg = {
         id: `sys-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         userId: 'system', username: 'System',
-        message: `${data.username} joined as spectator`,
+        message: `${safeSpecUsername} joined as spectator`,
         isEmote: false, isSpectator: false, timestamp: Date.now(),
       };
       room.chatMessages.push(joinMsg);
+      if (room.chatMessages.length > 100) room.chatMessages = room.chatMessages.slice(-100);
       io.to(data.roomCode).emit('chat:message', joinMsg);
     });
 
-    
+
     socket.on('spectate:request-state', (data: { roomCode: string }) => {
       const room = rooms.get(data.roomCode);
       if (!room || !room.gameState) {
         socket.emit('spectate:error', { message: 'Game not found or not in progress' });
+        return;
+      }
+      const isPlayer = socket.id === room.hostSocket || socket.id === room.guestSocket;
+      const isSpec = room.spectators.has(socket.id);
+      if (!isPlayer && !isSpec) {
+        socket.emit('spectate:error', { message: 'Not subscribed to this room' });
         return;
       }
       try {
@@ -2706,6 +2716,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             isEmote: false, isSpectator: false, timestamp: Date.now(),
           };
           room.chatMessages.push(leaveMsg);
+          if (room.chatMessages.length > 100) room.chatMessages = room.chatMessages.slice(-100);
           io.to(roomCode).emit('chat:message', leaveMsg);
         }
       }
