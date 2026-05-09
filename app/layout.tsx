@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import Script from "next/script";
+import { cookies } from "next/headers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -150,13 +151,22 @@ export const metadata: Metadata = {
   category: "games",
 };
 
-export default function RootLayout({
+const ROOT_STRINGS = {
+  en: { skipToContent: 'Skip to content', noJs: 'JavaScript is required to play Naruto Mythos TCG.' },
+  fr: { skipToContent: 'Aller au contenu', noJs: 'JavaScript est requis pour jouer à Naruto Mythos TCG.' },
+} as const;
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE')?.value;
+  const lang: 'en' | 'fr' = localeCookie === 'en' ? 'en' : 'fr';
+  const strings = ROOT_STRINGS[lang];
   return (
-    <html lang="fr" className="dark" suppressHydrationWarning>
+    <html lang={lang} className="dark" suppressHydrationWarning>
       <head>
         <link rel="preload" href="/fonts/njnaruto.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
@@ -174,11 +184,11 @@ export default function RootLayout({
           className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-9999 focus:px-4 focus:py-2 focus:text-sm focus:font-bold"
           style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
         >
-          Skip to content
+          {strings.skipToContent}
         </a>
         <noscript>
           <div style={{ padding: '16px', textAlign: 'center', backgroundColor: '#1a1a0a', color: '#c4a35a', borderBottom: '1px solid #c4a35a' }}>
-            JavaScript is required to play Naruto Mythos TCG.
+            {strings.noJs}
           </div>
         </noscript>
         {children}

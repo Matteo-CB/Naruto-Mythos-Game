@@ -1025,6 +1025,7 @@ interface SuspiciousFinding {
 }
 
 function SuspiciousPanel() {
+  const t = useTranslations('suspicious');
   const [findings, setFindings] = useState<SuspiciousFinding[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -1043,13 +1044,13 @@ function SuspiciousPanel() {
       const res = await fetch(`/api/admin/suspicious${qs}`);
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? 'Analysis failed');
+        setError(data.error ?? t('analysisFailed'));
         setFindings([]);
       } else {
         setFindings(data.findings ?? []);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Analysis failed');
+      setError(e instanceof Error ? e.message : t('analysisFailed'));
       setFindings([]);
     } finally {
       setLoading(false);
@@ -1071,13 +1072,13 @@ function SuspiciousPanel() {
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
-        setActionMsg(`Revert failed: ${data.message ?? data.error ?? 'unknown error'}`);
+        setActionMsg(t('revertFailed', { msg: data.message ?? data.error ?? t('unknownError') }));
       } else {
         setActionMsg(data.message);
         await runAnalysis(filter ? { user: filter } : undefined);
       }
     } catch (e) {
-      setActionMsg(`Revert failed: ${e instanceof Error ? e.message : 'unknown error'}`);
+      setActionMsg(t('revertFailed', { msg: e instanceof Error ? e.message : t('unknownError') }));
     } finally {
       setActioningId(null);
       setConfirmRevertGameId(null);
@@ -1093,15 +1094,15 @@ function SuspiciousPanel() {
     <div className="max-w-4xl flex flex-col gap-4">
       <div className="rounded-lg p-4" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
         <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>
-          Suspicious activity detector
+          {t('title')}
         </h2>
         <p className="text-[11px] mb-3" style={{ color: '#666' }}>
-          Heuristics: same email base / Discord ID across accounts, accounts created minutes apart that played each other, repeat opponents (last 72h), sub-60s ranked forfeits (last 72h), new accounts with abnormally high win rates. Completed ranked games older than 72h are purged by the server, so game-based signals only cover the most recent window.
+          {t('heuristicsDesc')}
         </p>
         <div className="flex items-center gap-2">
           <input
             type="text"
-            placeholder="Filter by user id or username…"
+            placeholder={t('filterPlaceholder')}
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && runAnalysis(filter ? { user: filter } : undefined)}
@@ -1114,7 +1115,7 @@ function SuspiciousPanel() {
             className="px-3 py-1.5 text-[11px] rounded uppercase tracking-wider font-bold cursor-pointer"
             style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
           >
-            {loading ? 'Running…' : 'Run analysis'}
+            {loading ? t('running') : t('runAnalysis')}
           </button>
           {filter && (
             <button
@@ -1122,7 +1123,7 @@ function SuspiciousPanel() {
               className="px-3 py-1.5 text-[11px] rounded"
               style={{ backgroundColor: '#141414', border: '1px solid #333', color: '#888' }}
             >
-              Clear
+              {t('clear')}
             </button>
           )}
         </div>
@@ -1137,15 +1138,15 @@ function SuspiciousPanel() {
           </div>
         )}
         <div className="mt-3 text-[10px]" style={{ color: '#555' }}>
-          {visible.length} finding{visible.length !== 1 ? 's' : ''} shown
-          {dismissed.size > 0 && ` (${dismissed.size} dismissed this session)`}
+          {t('findingsShown', { n: visible.length })}
+          {dismissed.size > 0 && ` ${t('dismissedSession', { n: dismissed.size })}`}
         </div>
       </div>
 
       {visible.length === 0 && !loading && (
         <div className="rounded-lg p-6 text-center" style={{ backgroundColor: '#111', border: '1px solid #1e1e1e' }}>
           <span className="text-xs" style={{ color: '#555' }}>
-            No findings. {filter ? 'Try a different user filter or clear it to see global results.' : 'Nothing flagged right now.'}
+            {filter ? t('noFindingsFiltered') : t('noFindingsGlobal')}
           </span>
         </div>
       )}
@@ -1173,9 +1174,9 @@ function SuspiciousPanel() {
               onClick={() => setDismissed((s) => new Set(s).add(f.id))}
               className="text-[10px] px-2 py-1 rounded"
               style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626', color: '#666' }}
-              title="Hide this finding for the rest of the session"
+              title={t('dismissTitle')}
             >
-              Dismiss
+              {t('dismiss')}
             </button>
           </div>
 
@@ -1183,15 +1184,15 @@ function SuspiciousPanel() {
 
           {f.users.length > 0 && (
             <div className="flex flex-col gap-1">
-              <div className="text-[10px] uppercase tracking-wider" style={{ color: '#555' }}>Involved accounts</div>
+              <div className="text-[10px] uppercase tracking-wider" style={{ color: '#555' }}>{t('involvedAccounts')}</div>
               {f.users.map((u) => (
                 <div key={u.id} className="flex items-center gap-3 text-[11px] flex-wrap" style={{ color: '#ccc' }}>
                   <span className="font-bold" style={{ color: '#c4a35a' }}>{u.username}</span>
                   <span style={{ color: '#666' }}>ELO {u.elo}</span>
                   <span style={{ color: '#666' }}>W/L/D {u.wins}/{u.losses}/{u.draws}</span>
                   <span style={{ color: '#555' }}>{u.email}</span>
-                  {u.discordId && <span style={{ color: '#555' }}>discord {u.discordId}</span>}
-                  <span style={{ color: '#444' }}>created {new Date(u.createdAt).toLocaleString()}</span>
+                  {u.discordId && <span style={{ color: '#555' }}>{t('discordId', { id: u.discordId })}</span>}
+                  <span style={{ color: '#444' }}>{t('createdAt', { date: new Date(u.createdAt).toLocaleString() })}</span>
                 </div>
               ))}
             </div>
@@ -1199,31 +1200,31 @@ function SuspiciousPanel() {
 
           {f.game && (
             <div className="flex flex-col gap-1 mt-1 pt-2" style={{ borderTop: '1px solid #262626' }}>
-              <div className="text-[10px] uppercase tracking-wider" style={{ color: '#555' }}>Game</div>
+              <div className="text-[10px] uppercase tracking-wider" style={{ color: '#555' }}>{t('gameLabel')}</div>
               <div className="text-[11px] flex items-center gap-3 flex-wrap" style={{ color: '#ccc' }}>
                 <span style={{ color: '#666' }}>#{f.game.id.slice(-8)}</span>
                 <span>{f.game.player1Name ?? '?'} {f.game.player1Score} — {f.game.player2Score} {f.game.player2Name ?? '?'}</span>
                 {f.game.durationSec != null && <span style={{ color: '#666' }}>{f.game.durationSec}s</span>}
-                {f.game.eloChange != null && <span style={{ color: '#666' }}>ELO Δ {f.game.eloChange}</span>}
+                {f.game.eloChange != null && <span style={{ color: '#666' }}>{t('eloDelta', { delta: f.game.eloChange })}</span>}
                 {f.game.completedAt && <span style={{ color: '#444' }}>{new Date(f.game.completedAt).toLocaleString()}</span>}
               </div>
               {confirmRevertGameId === f.game.id ? (
                 <div className="flex items-center gap-2 mt-2">
-                  <span className="text-[10px]" style={{ color: '#b33e3e' }}>Confirm revert ELO for this game?</span>
+                  <span className="text-[10px]" style={{ color: '#b33e3e' }}>{t('confirmRevert')}</span>
                   <button
                     onClick={() => f.game && handleRevertElo(f.game.id)}
                     disabled={actioningId === f.game.id}
                     className="text-[10px] px-3 py-1 rounded"
                     style={{ backgroundColor: '#b33e3e', color: '#fff' }}
                   >
-                    {actioningId === f.game.id ? 'Reverting…' : 'Yes, revert'}
+                    {actioningId === f.game.id ? t('reverting') : t('yesRevert')}
                   </button>
                   <button
                     onClick={() => setConfirmRevertGameId(null)}
                     className="text-[10px] px-3 py-1 rounded"
                     style={{ backgroundColor: '#0a0a0a', border: '1px solid #333', color: '#888' }}
                   >
-                    Cancel
+                    {t('cancel')}
                   </button>
                 </div>
               ) : (
@@ -1237,9 +1238,9 @@ function SuspiciousPanel() {
                       color: f.game.eloChange == null ? '#555' : '#b33e3e',
                       border: `1px solid ${f.game.eloChange == null ? '#262626' : '#b33e3e44'}`,
                     }}
-                    title={f.game.eloChange == null ? 'No ELO change to revert' : undefined}
+                    title={f.game.eloChange == null ? t('noEloToRevert') : undefined}
                   >
-                    Revert ELO
+                    {t('revertElo')}
                   </button>
                 </div>
               )}

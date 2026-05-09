@@ -2756,5 +2756,33 @@
     "defaultMessage": "Une erreur inattendue s'est produite.",
     "tryAgain": "Réessayer",
     "home": "Accueil"
+  },
+  "suspicious": {
+    "title": "Détecteur d'activité suspecte",
+    "heuristicsDesc": "Heuristiques : même base d'email / ID Discord sur plusieurs comptes, comptes créés à quelques minutes d'écart qui se sont affrontés, adversaires répétés (72 dernières h), forfaits classés sous 60s (72 dernières h), nouveaux comptes avec un winrate anormalement élevé. Les parties classées terminées de plus de 72h sont purgées par le serveur, donc les signaux basés sur les parties ne couvrent que la fenêtre récente.",
+    "filterPlaceholder": "Filtrer par ID utilisateur ou pseudo…",
+    "running": "Analyse…",
+    "runAnalysis": "Lancer l'analyse",
+    "clear": "Effacer",
+    "findingsShown": "{n, plural, =0 {0 résultat affiché} one {# résultat affiché} other {# résultats affichés}}",
+    "dismissedSession": "({n} masqués cette session)",
+    "noFindingsGlobal": "Aucun résultat. Rien de signalé pour le moment.",
+    "noFindingsFiltered": "Aucun résultat. Essayez un autre filtre utilisateur ou effacez-le pour voir les résultats globaux.",
+    "involvedAccounts": "Comptes impliqués",
+    "discordId": "discord {id}",
+    "createdAt": "créé le {date}",
+    "gameLabel": "Partie",
+    "eloDelta": "ELO Δ {delta}",
+    "confirmRevert": "Confirmer l'annulation ELO pour cette partie ?",
+    "reverting": "Annulation…",
+    "yesRevert": "Oui, annuler",
+    "cancel": "Annuler",
+    "noEloToRevert": "Aucun changement d'ELO à annuler",
+    "revertElo": "Annuler l'ELO",
+    "dismiss": "Masquer",
+    "dismissTitle": "Masquer ce résultat pour le reste de la session",
+    "analysisFailed": "Échec de l'analyse",
+    "revertFailed": "Échec de l'annulation : {msg}",
+    "unknownError": "erreur inconnue"
   }
 }

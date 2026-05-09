@@ -2756,5 +2756,33 @@
     "defaultMessage": "An unexpected error occurred.",
     "tryAgain": "Try again",
     "home": "Home"
+  },
+  "suspicious": {
+    "title": "Suspicious activity detector",
+    "heuristicsDesc": "Heuristics: same email base / Discord ID across accounts, accounts created minutes apart that played each other, repeat opponents (last 72h), sub-60s ranked forfeits (last 72h), new accounts with abnormally high win rates. Completed ranked games older than 72h are purged by the server, so game-based signals only cover the most recent window.",
+    "filterPlaceholder": "Filter by user id or username…",
+    "running": "Running…",
+    "runAnalysis": "Run analysis",
+    "clear": "Clear",
+    "findingsShown": "{n, plural, =0 {0 findings shown} one {# finding shown} other {# findings shown}}",
+    "dismissedSession": "({n} dismissed this session)",
+    "noFindingsGlobal": "No findings. Nothing flagged right now.",
+    "noFindingsFiltered": "No findings. Try a different user filter or clear it to see global results.",
+    "involvedAccounts": "Involved accounts",
+    "discordId": "discord {id}",
+    "createdAt": "created {date}",
+    "gameLabel": "Game",
+    "eloDelta": "ELO Δ {delta}",
+    "confirmRevert": "Confirm revert ELO for this game?",
+    "reverting": "Reverting…",
+    "yesRevert": "Yes, revert",
+    "cancel": "Cancel",
+    "noEloToRevert": "No ELO change to revert",
+    "revertElo": "Revert ELO",
+    "dismiss": "Dismiss",
+    "dismissTitle": "Hide this finding for the rest of the session",
+    "analysisFailed": "Analysis failed",
+    "revertFailed": "Revert failed: {msg}",
+    "unknownError": "unknown error"
   }
 }
