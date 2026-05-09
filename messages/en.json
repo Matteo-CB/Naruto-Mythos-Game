@@ -1246,7 +1246,8 @@
       "casual": "Unranked match, play for fun, no ELO changes",
       "ranked": "Ranked match, ELO rating will be updated",
       "sealed": "Sealed mode, build a deck from random boosters"
-    }
+    },
+    "codePlaceholder": "ABCD12"
   },
   "leaderboard": {
     "title": "Leaderboard",
@@ -2569,7 +2570,8 @@
     "cancelTournamentWarning": "This will cancel the entire tournament. This action cannot be undone.",
     "scheduledStartHint": "Leave empty to start manually",
     "noDecksAvailable": "No decks available",
-    "buildADeck": "Build a deck"
+    "buildADeck": "Build a deck",
+    "codePlaceholder": "XXXXXX"
   },
   "playHub": {
     "title": "Play",

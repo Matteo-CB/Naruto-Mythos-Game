@@ -487,7 +487,7 @@ export default function TournamentDetailPage() {
                         <label className="text-[10px] uppercase tracking-wider" style={{ color: '#888' }}>{t('enterCode')}</label>
                         <div className="flex gap-2">
                           <input type="text" value={joinCodeInput} onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
-                            placeholder="XXXXXX" maxLength={8}
+                            placeholder={t('codePlaceholder')} maxLength={8}
                             className="flex-1 px-3 py-2 text-sm font-mono text-center uppercase tracking-widest"
                             style={{ backgroundColor: '#0a0a0a', border: '1px solid #333', color: '#c4a35a' }}
                             onKeyDown={(e) => { if (e.key === 'Enter') handleJoin(); }}

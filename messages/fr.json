@@ -1246,7 +1246,8 @@
       "casual": "Match non classe, jouez pour le plaisir, pas de changement ELO",
       "ranked": "Match classe, votre classement ELO sera mis a jour",
       "sealed": "Mode scelle, construisez un deck a partir de boosters aleatoires"
-    }
+    },
+    "codePlaceholder": "ABCD12"
   },
   "leaderboard": {
     "title": "Classement",
@@ -2569,7 +2570,8 @@
     "cancelTournamentWarning": "Cette action annulera le tournoi entier. Action irréversible.",
     "scheduledStartHint": "Laissez vide pour démarrer manuellement",
     "noDecksAvailable": "Aucun deck disponible",
-    "buildADeck": "Créer un deck"
+    "buildADeck": "Créer un deck",
+    "codePlaceholder": "XXXXXX"
   },
   "playHub": {
     "title": "Jouer",

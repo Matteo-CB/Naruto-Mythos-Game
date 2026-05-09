@@ -524,7 +524,7 @@ export default function PlayOnlinePage() {
                       value={joinCode}
                       onChange={(e) => setJoinCode(e.target.value.toUpperCase().slice(0, 6))}
                       maxLength={6}
-                      placeholder="ABCD12"
+                      placeholder={t('online.codePlaceholder')}
                       className="w-full text-center text-2xl font-bold tracking-[0.3em] rounded py-3 outline-none uppercase"
                       style={{
                         backgroundColor: '#0a0a0a',

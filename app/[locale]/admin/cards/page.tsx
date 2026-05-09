@@ -267,7 +267,7 @@ export default function AdminCardsPage() {
                             type="text"
                             value={banReason}
                             onChange={(e) => setBanReason(e.target.value)}
-                            placeholder="Reason (optional)"
+                            placeholder={t('tournament.reasonOptional')}
                             className="w-full px-2 py-1 text-xs rounded"
                             style={{ backgroundColor: '#0a0a0f', border: '1px solid #b33e3e40', color: '#e0e0e0', outline: 'none' }}
                             autoFocus
