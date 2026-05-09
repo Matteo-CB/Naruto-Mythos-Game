@@ -2604,6 +2604,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
+      const MAX_SPECTATORS_PER_ROOM = 100;
+      if (room.spectators.size >= MAX_SPECTATORS_PER_ROOM && !room.spectators.has(socket.id)) {
+        socket.emit('spectate:error', { message: 'Spectator limit reached for this room' });
+        return;
+      }
+
       const safeSpecUsername = typeof data.username === 'string' && data.username.length > 0 && data.username.length <= 50
         ? data.username
         : (userNames.get(data.userId) || 'Spectator');
