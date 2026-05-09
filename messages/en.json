@@ -2697,5 +2697,12 @@
     "close": "Close",
     "empty": "No updates yet.",
     "latestBadge": "Latest"
+  },
+  "spectate": {
+    "errorAuth": "Authentication mismatch.",
+    "errorNotFound": "Game not found or not in progress.",
+    "errorPrivate": "This is a private game.",
+    "errorLimit": "Spectator limit reached for this room.",
+    "errorNotSubscribed": "You are not subscribed to this room."
   }
 }

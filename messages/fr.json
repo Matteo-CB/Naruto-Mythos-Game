@@ -2697,5 +2697,12 @@
     "close": "Fermer",
     "empty": "Aucune mise a jour pour le moment.",
     "latestBadge": "Nouveau"
+  },
+  "spectate": {
+    "errorAuth": "Erreur d'authentification.",
+    "errorNotFound": "Partie introuvable ou terminée.",
+    "errorPrivate": "Cette partie est privée.",
+    "errorLimit": "Limite de spectateurs atteinte pour cette partie.",
+    "errorNotSubscribed": "Vous n'êtes pas inscrit dans cette partie."
   }
 }

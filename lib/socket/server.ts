@@ -2602,24 +2602,24 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const authedUserId = (socket.data as { userId?: string }).userId;
       if (!authedUserId || authedUserId !== data.userId) {
         console.warn(`[Socket] spectate:join rejected: socket auth mismatch (claim=${data.userId}, auth=${authedUserId ?? 'null'})`);
-        socket.emit('spectate:error', { message: 'Authentication mismatch' });
+        socket.emit('spectate:error', { message: 'Authentication mismatch', errorKey: 'spectate.errorAuth' });
         return;
       }
 
       const room = rooms.get(data.roomCode);
       if (!room || !room.gameState) {
-        socket.emit('spectate:error', { message: 'Game not found or not in progress' });
+        socket.emit('spectate:error', { message: 'Game not found or not in progress', errorKey: 'spectate.errorNotFound' });
         return;
       }
 
       if (room.isPrivate && room.hostId !== authedUserId && room.guestId !== authedUserId) {
-        socket.emit('spectate:error', { message: 'This is a private game' });
+        socket.emit('spectate:error', { message: 'This is a private game', errorKey: 'spectate.errorPrivate' });
         return;
       }
 
       const MAX_SPECTATORS_PER_ROOM = 100;
       if (room.spectators.size >= MAX_SPECTATORS_PER_ROOM && !room.spectators.has(socket.id)) {
-        socket.emit('spectate:error', { message: 'Spectator limit reached for this room' });
+        socket.emit('spectate:error', { message: 'Spectator limit reached for this room', errorKey: 'spectate.errorLimit' });
         return;
       }
 
@@ -2680,13 +2680,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
     socket.on('spectate:request-state', (data: { roomCode: string }) => {
       const room = rooms.get(data.roomCode);
       if (!room || !room.gameState) {
-        socket.emit('spectate:error', { message: 'Game not found or not in progress' });
+        socket.emit('spectate:error', { message: 'Game not found or not in progress', errorKey: 'spectate.errorNotFound' });
         return;
       }
       const isPlayer = socket.id === room.hostSocket || socket.id === room.guestSocket;
       const isSpec = room.spectators.has(socket.id);
       if (!isPlayer && !isSpec) {
-        socket.emit('spectate:error', { message: 'Not subscribed to this room' });
+        socket.emit('spectate:error', { message: 'Not subscribed to this room', errorKey: 'spectate.errorNotSubscribed' });
         return;
       }
       try {

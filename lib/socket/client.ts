@@ -676,8 +676,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ spectatorCount: data.count });
       });
 
-      socket.on('spectate:error', (data: { message: string }) => {
-        set({ error: data.message });
+      socket.on('spectate:error', (data: { message: string; errorKey?: string }) => {
+        set({ error: data.message, errorKey: data.errorKey ?? null });
       });
 
       
