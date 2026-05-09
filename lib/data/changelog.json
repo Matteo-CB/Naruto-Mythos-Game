@@ -1,6 +1,23 @@
 {
   "entries": [
     {
+      "date": "2026-05-10",
+      "title_fr": "Stats par deck (3 mois, ultra compressé)",
+      "title_en": "Per-deck stats (3 months, ultra-compressed)",
+      "changes_fr": [
+        "Chaque deck enregistre désormais ses stats PvP (wins/losses/draws + ELO delta cumulé) sur une fenêtre roulante de 90 jours, plus une série journalière compressée pour le graphe historique. Les stats s'incrémentent automatiquement à chaque fin de partie en ligne où le deck était sélectionné.",
+        "Stockage extrêmement minimal : la série journalière 90 jours est stockée en gzip niveau 9 sur du JSON court — ~22 octets pour un deck inactif, ~95 octets pour un deck joué 10 jours, ~600 octets pour un deck joué tous les jours pendant 3 mois. Plus les counters agrégés (wins/losses/draws/eloDeltaSum). Total : ~150 à 700 octets par deck. Sur 1000 utilisateurs × 5 decks actifs = ~3.5 Mo max. Dérisoire vs le quota Atlas.",
+        "Auto-decay : les entrées journalières plus vieilles que 90 jours sont éliminées à chaque écriture, et un purge automatique supprime les rows DeckStats sans activité depuis 90 jours via cleanupOldGames. Quand un deck est supprimé, ses stats partent aussi.",
+        "API GET /api/decks/[id]/stats retourne wins/losses/draws/eloDeltaSum/winrate/lastPlayedAt + array daily des entrées journalières. Auth requise, ownership vérifié."
+      ],
+      "changes_en": [
+        "Every deck now records its PvP stats (wins/losses/draws + cumulative ELO delta) over a rolling 90-day window, plus a compressed daily time series for the history chart. Stats are incremented automatically when an online game ends with that deck selected.",
+        "Storage is extremely minimal: the 90-day daily series is stored as gzip level 9 over short JSON — ~22 bytes for an inactive deck, ~95 bytes for a deck played 10 days, ~600 bytes for a deck played every day for 3 months. Plus the aggregate counters (wins/losses/draws/eloDeltaSum). Total: ~150 to 700 bytes per deck. On 1000 users × 5 active decks = ~3.5 MB max. Negligible against the Atlas quota.",
+        "Auto-decay: daily entries older than 90 days are dropped on every write, and a periodic purge removes DeckStats rows with no activity for 90+ days via cleanupOldGames. When a deck is deleted, its stats are deleted too.",
+        "API GET /api/decks/[id]/stats returns wins/losses/draws/eloDeltaSum/winrate/lastPlayedAt + the daily array. Auth required, ownership verified."
+      ]
+    },
+    {
       "date": "2026-05-09",
       "title_fr": "Audit massif online : sécurité, performance, validations",
       "title_en": "Massive online audit: security, performance, validations",

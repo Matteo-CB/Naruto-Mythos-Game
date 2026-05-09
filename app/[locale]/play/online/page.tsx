@@ -20,6 +20,7 @@ type View = 'browse' | 'private';
 interface ResolvedDeck {
   characters: CharacterCard[];
   missions: MissionCard[];
+  id?: string;
 }
 
 export default function PlayOnlinePage() {
@@ -237,7 +238,7 @@ export default function PlayOnlinePage() {
   };
 
   const handleDeckSelect = (deck: ResolvedDeck) => {
-    selectDeck(deck.characters, deck.missions);
+    selectDeck(deck.characters, deck.missions, deck.id);
     setDeckSelected(true);
   };
 

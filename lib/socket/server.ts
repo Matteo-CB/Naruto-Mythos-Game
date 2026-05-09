@@ -60,6 +60,8 @@ export interface RoomData {
   hostSealedPoolIds?: string[];
   guestSealedPoolIds?: string[];
   tournamentGameTimer?: ReturnType<typeof setTimeout> | null;
+  hostDeckId?: string;
+  guestDeckId?: string;
   
   timerEnabled: boolean;
   
@@ -620,6 +622,17 @@ async function finalizeGameEnd(
   }
 
   broadcastActiveGames(io);
+
+  if (room.hostId && room.guestId && (room.hostDeckId || room.guestDeckId)) {
+    const p1Result: 'win' | 'loss' | 'draw' = winner === 'player1' ? 'win' : winner === 'player2' ? 'loss' : 'draw';
+    const p2Result: 'win' | 'loss' | 'draw' = winner === 'player2' ? 'win' : winner === 'player1' ? 'loss' : 'draw';
+    const p1Delta = eloData?.player1Delta ?? 0;
+    const p2Delta = eloData?.player2Delta ?? 0;
+    import('@/lib/db/deckStats').then(({ recordDeckGame }) => {
+      if (room.hostDeckId) recordDeckGame(room.hostDeckId, room.hostId, p1Result, p1Delta).catch(() => {});
+      if (room.guestDeckId) recordDeckGame(room.guestDeckId, room.guestId!, p2Result, p2Delta).catch(() => {});
+    }).catch(() => {});
+  }
 
   (async () => {
     if (!room.hostId || !room.guestId) return;
@@ -1812,6 +1825,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     socket.on('room:select-deck', async (data: {
       characters: CharacterCard[];
       missions: MissionCard[];
+      deckId?: string;
     }) => {
       const code = playerRooms.get(socket.id);
       if (!code) return;
@@ -1822,6 +1836,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         socket.emit('room:error', { message: 'Invalid deck payload', errorKey: 'game.error.invalidDeck' });
         return;
       }
+      const safeDeckId = typeof data.deckId === 'string' && /^[0-9a-f]{24}$/i.test(data.deckId) ? data.deckId : undefined;
       if (data.characters.length < 30 || data.characters.length > 200 || data.missions.length !== 3) {
         socket.emit('room:error', { message: 'Invalid deck size', errorKey: 'game.error.invalidDeck' });
         return;
@@ -1900,8 +1915,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       if (socket.id === room.hostSocket) {
         room.hostDeck = safeDeck;
+        if (safeDeckId) room.hostDeckId = safeDeckId;
       } else if (socket.id === room.guestSocket) {
         room.guestDeck = safeDeck;
+        if (safeDeckId) room.guestDeckId = safeDeckId;
       }
 
       if (room.isSealed) {

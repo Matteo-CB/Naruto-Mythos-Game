@@ -69,6 +69,14 @@ export async function cleanupOldGames(): Promise<void> {
       console.log(`[GameCleanup] Deleted ${invitePurge.count} expired/resolved match invites`);
     }
 
+    const deckStatsCutoff = new Date(now - 90 * 24 * 60 * 60 * 1000);
+    const deckStatsPurge = await prisma.deckStats.deleteMany({
+      where: { lastPlayedAt: { lt: deckStatsCutoff } },
+    });
+    if (deckStatsPurge.count > 0) {
+      console.log(`[GameCleanup] Deleted ${deckStatsPurge.count} DeckStats rows with no activity for 90+ days`);
+    }
+
 
     const adminLogCutoff = new Date(now - TOURNAMENT_ADMIN_LOG_TTL_MS);
     const adminLogPurge = await prisma.tournamentAdminLog.deleteMany({

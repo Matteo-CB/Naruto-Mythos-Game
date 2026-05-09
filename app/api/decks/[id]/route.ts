@@ -153,6 +153,7 @@ export async function DELETE(
     }
 
     await prisma.deck.delete({ where: { id } });
+    await prisma.deckStats.deleteMany({ where: { deckId: id } }).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch {

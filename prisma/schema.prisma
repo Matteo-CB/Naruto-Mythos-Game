@@ -103,6 +103,21 @@ model Deck {
   updatedAt  DateTime @updatedAt
 }
 
+model DeckStats {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  deckId       String   @unique @db.ObjectId
+  userId       String   @db.ObjectId
+  wins         Int      @default(0)
+  losses       Int      @default(0)
+  draws        Int      @default(0)
+  eloDeltaSum  Int      @default(0)
+  lastPlayedAt DateTime
+  dailyGz      Bytes?
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId, lastPlayedAt])
+}
+
 model Game {
   id           String    @id @default(auto()) @map("_id") @db.ObjectId
   player1Id    String?   @db.ObjectId

@@ -74,7 +74,7 @@ interface SocketStore {
   disconnect: () => void;
   createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, timerEnabled?: boolean, isAnonymous?: boolean) => void;
   joinRoom: (code: string, userId: string) => void;
-  selectDeck: (characters: unknown[], missions: unknown[]) => void;
+  selectDeck: (characters: unknown[], missions: unknown[], deckId?: string) => void;
   changeDeck: () => void;
   opponentChangingDeck: boolean;
   performAction: (action: GameAction) => void;
@@ -774,11 +774,11 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  selectDeck: (characters, missions) => {
+  selectDeck: (characters, missions, deckId) => {
     const { socket, connected } = get();
     if (socket && connected) {
       console.log('[Socket] Emitting room:select-deck, characters:', (characters as unknown[]).length, 'missions:', (missions as unknown[]).length);
-      socket.emit('room:select-deck', { characters, missions });
+      socket.emit('room:select-deck', { characters, missions, deckId });
     } else {
       console.error('[Socket] Cannot select deck: not connected');
       set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });

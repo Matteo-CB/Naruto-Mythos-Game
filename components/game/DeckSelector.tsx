@@ -15,6 +15,7 @@ interface SavedDeck {
 interface ResolvedDeck {
   characters: CharacterCard[];
   missions: MissionCard[];
+  id?: string;
 }
 
 interface DeckSelectorProps {
@@ -78,7 +79,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions }: DeckSelec
       console.warn('[DeckSelector] Deck resolved to 0 characters - IDs may be outdated:', deck.cardIds.slice(0, 5));
     }
 
-    onSelect({ characters, missions });
+    onSelect({ characters, missions, id: deck.id });
   };
 
   return (
