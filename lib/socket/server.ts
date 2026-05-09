@@ -4,6 +4,7 @@ import { GameEngine } from '@/lib/engine/GameEngine';
 import type { GameState, GameAction, CharacterCard, MissionCard, PlayerConfig, GameConfig } from '@/lib/engine/types';
 import { registerUserSocket, removeSocketFromAll } from '@/lib/socket/io';
 import { prisma } from '@/lib/db/prisma';
+import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
 import { calculateEloChanges } from '@/lib/elo/elo';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
 import { sendRankUpNotification } from '@/lib/discord/rankUpWebhook';
@@ -1834,13 +1835,48 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
       }
 
+      if (!Array.isArray(data.characters) || !Array.isArray(data.missions)) {
+        socket.emit('room:error', { message: 'Invalid deck payload', errorKey: 'game.error.invalidDeck' });
+        return;
+      }
+      if (data.characters.length < 30 || data.characters.length > 200 || data.missions.length !== 3) {
+        socket.emit('room:error', { message: 'Invalid deck size', errorKey: 'game.error.invalidDeck' });
+        return;
+      }
+      const resolvedChars: CharacterCard[] = [];
+      for (const c of data.characters) {
+        if (!c || typeof c.id !== 'string') {
+          socket.emit('room:error', { message: 'Invalid card in deck', errorKey: 'game.error.invalidDeck' });
+          return;
+        }
+        const canon = getCharacterById(c.id);
+        if (!canon) {
+          socket.emit('room:error', { message: `Unknown card ${c.id}`, errorKey: 'game.error.invalidDeck' });
+          return;
+        }
+        resolvedChars.push(canon);
+      }
+      const resolvedMissions: MissionCard[] = [];
+      for (const m of data.missions) {
+        if (!m || typeof m.id !== 'string') {
+          socket.emit('room:error', { message: 'Invalid mission in deck', errorKey: 'game.error.invalidDeck' });
+          return;
+        }
+        const canon = getMissionById(m.id);
+        if (!canon) {
+          socket.emit('room:error', { message: `Unknown mission ${m.id}`, errorKey: 'game.error.invalidDeck' });
+          return;
+        }
+        resolvedMissions.push(canon);
+      }
+      const safeDeck = { characters: resolvedChars, missions: resolvedMissions };
+
       if (socket.id === room.hostSocket) {
-        room.hostDeck = data;
+        room.hostDeck = safeDeck;
       } else if (socket.id === room.guestSocket) {
-        room.guestDeck = data;
+        room.guestDeck = safeDeck;
       }
 
-      
       if (room.isSealed) {
         
         const otherSocket = socket.id === room.hostSocket ? room.guestSocket : room.hostSocket;

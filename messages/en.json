@@ -904,7 +904,8 @@
       "syncError": "State sync error. Reconnecting...",
       "sealedTimeout": "Sealed deck-building time expired. The room has been closed.",
       "alreadyQueued": "You are already queued in another tab",
-      "gameBanned": "You are banned from playing online games. Check your profile for details."
+      "gameBanned": "You are banned from playing online games. Check your profile for details.",
+      "invalidDeck": "Your deck contains invalid or unknown cards."
     },
     "opponentDisconnected": "Opponent disconnected. They have {time} to reconnect or the game is forfeit.",
     "reconnect": {

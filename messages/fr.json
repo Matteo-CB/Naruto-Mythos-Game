@@ -904,7 +904,8 @@
       "syncError": "Erreur de synchronisation. Reconnexion en cours...",
       "sealedTimeout": "Le temps de construction du deck scellé est écoulé. La salle a été fermée.",
       "alreadyQueued": "Vous êtes déjà en file dans un autre onglet",
-      "gameBanned": "Vous êtes banni des parties en ligne. Vérifiez votre profil pour plus de détails."
+      "gameBanned": "Vous êtes banni des parties en ligne. Vérifiez votre profil pour plus de détails.",
+      "invalidDeck": "Votre deck contient des cartes invalides ou inconnues."
     },
     "opponentDisconnected": "Adversaire deconnecte. Il a {time} pour se reconnecter ou la partie est forfait.",
     "reconnect": {
