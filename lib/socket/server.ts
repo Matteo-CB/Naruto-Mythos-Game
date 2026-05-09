@@ -1818,17 +1818,25 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(code);
       if (!room) return;
 
-      
+      if (!data || typeof data !== 'object' || !Array.isArray(data.characters) || !Array.isArray(data.missions)) {
+        socket.emit('room:error', { message: 'Invalid deck payload', errorKey: 'game.error.invalidDeck' });
+        return;
+      }
+      if (data.characters.length < 30 || data.characters.length > 200 || data.missions.length !== 3) {
+        socket.emit('room:error', { message: 'Invalid deck size', errorKey: 'game.error.invalidDeck' });
+        return;
+      }
+
       if ((room.isRanked || room.gameMode === 'ranked') && !room.tournamentId) {
         try {
           const banned = await getBannedCards();
           if (banned.size > 0) {
             const foundBanned: Array<{ cardId: string; reason: string | null }> = [];
             for (const c of data.characters) {
-              if (banned.has(c.id)) foundBanned.push({ cardId: c.id, reason: banned.get(c.id) ?? null });
+              if (c && typeof c.id === 'string' && banned.has(c.id)) foundBanned.push({ cardId: c.id, reason: banned.get(c.id) ?? null });
             }
             for (const m of data.missions) {
-              if (banned.has(m.id)) foundBanned.push({ cardId: m.id, reason: banned.get(m.id) ?? null });
+              if (m && typeof m.id === 'string' && banned.has(m.id)) foundBanned.push({ cardId: m.id, reason: banned.get(m.id) ?? null });
             }
             if (foundBanned.length > 0) {
               socket.emit('room:error', {
@@ -1841,17 +1849,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           }
         } catch (err) {
           console.error('[Socket] Ban check error:', err);
-          
         }
-      }
-
-      if (!Array.isArray(data.characters) || !Array.isArray(data.missions)) {
-        socket.emit('room:error', { message: 'Invalid deck payload', errorKey: 'game.error.invalidDeck' });
-        return;
-      }
-      if (data.characters.length < 30 || data.characters.length > 200 || data.missions.length !== 3) {
-        socket.emit('room:error', { message: 'Invalid deck size', errorKey: 'game.error.invalidDeck' });
-        return;
       }
       const resolvedChars: CharacterCard[] = [];
       for (const c of data.characters) {
