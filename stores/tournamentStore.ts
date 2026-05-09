@@ -75,7 +75,7 @@ interface TournamentStore {
   createTournament: (data: CreateTournamentInput) => Promise<string>;
   startTournament: (id: string) => Promise<void>;
   forfeitMatch: (tournamentId: string, matchId: string, forfeitPlayerId: string) => Promise<void>;
-  selectDeck: (tournamentId: string, deckId: string) => Promise<{ valid: boolean; errors: string[] }>;
+  selectDeck: (tournamentId: string, deckId: string) => Promise<{ valid: boolean; errors: string[]; errorKeys?: Array<{ key: string; params?: Record<string, string | number> }> }>;
   handleTournamentUpdate: (data: Partial<TournamentData> & { id?: string }) => void;
   handleMatchUpdate: (data: Partial<TournamentMatch> & { matchId: string }) => void;
   handleTournamentComplete: (data: { winnerId: string; winnerUsername: string }) => void;
@@ -205,9 +205,13 @@ export const useTournamentStore = create<TournamentStore>()((set, get) => ({
       body: JSON.stringify({ deckId }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Deck selection failed');
+    if (!res.ok) {
+      const err = new Error(data.error || 'Deck selection failed') as Error & { errorKey?: string };
+      if (typeof data.errorKey === 'string') err.errorKey = data.errorKey;
+      throw err;
+    }
     await get().fetchTournament(tournamentId);
-    return { valid: data.deckValid, errors: data.errors ?? [] };
+    return { valid: data.deckValid, errors: data.errors ?? [], errorKeys: data.errorKeys ?? [] };
   },
 
   handleTournamentUpdate: (data) => {

@@ -693,16 +693,16 @@ export default function DeckBuilderPage() {
   const handleLoadDeck = useCallback(async (deckId: string) => {
     setSaveError(null);
     try { await loadDeck(deckId, availableChars, availableMissions); } catch (err: unknown) {
-      setSaveError(err instanceof Error ? err.message : t("deckBuilder.failedToLoad"));
+      setSaveError(localizeApiError(err, "deckBuilder.failedToLoad"));
     }
-  }, [loadDeck, availableChars, availableMissions, t]);
+  }, [loadDeck, availableChars, availableMissions, localizeApiError]);
 
   const handleDeleteDeck = useCallback(async (deckId: string) => {
     setSaveError(null);
     try { await deleteDeck(deckId); } catch (err: unknown) {
-      setSaveError(err instanceof Error ? err.message : t("deckBuilder.failedToDelete"));
+      setSaveError(localizeApiError(err, "deckBuilder.failedToDelete"));
     }
-  }, [deleteDeck, t]);
+  }, [deleteDeck, localizeApiError]);
 
   
   const handleImport = useCallback(() => {

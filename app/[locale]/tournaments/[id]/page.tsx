@@ -196,6 +196,7 @@ export default function TournamentDetailPage() {
     setTimeout(() => fetchTournament(tournamentId), 1000);
   }, [socket, tournamentId, userId, myMatch, fetchTournament]);
 
+  const tRoot = useTranslations();
   const handleSelectDeck = useCallback(async (deckId: string) => {
     if (!tournamentId) return;
     setDeckLoading(true);
@@ -203,13 +204,24 @@ export default function TournamentDetailPage() {
     try {
       const result = await selectDeck(tournamentId, deckId);
       setSelectedDeckId(deckId);
-      if (!result.valid) setDeckErrors(result.errors);
+      if (!result.valid) {
+        const localized = (result.errorKeys ?? []).map((e, i) => {
+          try { return tRoot(e.key, e.params as Record<string, string | number> | undefined); }
+          catch { return result.errors[i] ?? e.key; }
+        });
+        setDeckErrors(localized.length > 0 ? localized : result.errors);
+      }
     } catch (err) {
-      setDeckErrors([err instanceof Error ? err.message : 'Error']);
+      const errorKey = (err as Error & { errorKey?: string })?.errorKey;
+      if (typeof errorKey === 'string') {
+        try { setDeckErrors([tRoot(errorKey)]); return; }
+        catch { /* fall through */ }
+      }
+      setDeckErrors([err instanceof Error ? err.message : t('admin.error')]);
     } finally {
       setDeckLoading(false);
     }
-  }, [tournamentId, selectDeck]);
+  }, [tournamentId, selectDeck, t, tRoot]);
 
   const handleShare = useCallback(() => {
     const url = window.location.href;

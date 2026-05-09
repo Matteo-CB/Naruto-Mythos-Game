@@ -2632,6 +2632,32 @@
       "done": "Done",
       "networkError": "Network error",
       "failedToDelete": "Failed to delete"
+    },
+    "error": {
+      "unauthorized": "Unauthorized.",
+      "deckIdRequired": "Deck ID is required.",
+      "notFound": "Tournament not found.",
+      "deckChangesClosed": "Tournament is no longer accepting deck changes.",
+      "notInTournament": "You are not in this tournament.",
+      "sealedModeInGame": "Sealed mode builds decks in-game.",
+      "deckNotFound": "Deck not found or not yours.",
+      "serverError": "Server error. Please try again."
+    },
+    "deckError": {
+      "tooFewCards": "Deck must have at least {min} cards (has {count}).",
+      "tooManyCards": "Deck must have at most {max} cards (has {count}).",
+      "wrongMissionCount": "Deck must have exactly 3 mission cards (has {count}).",
+      "cardBanned": "Card {cardId} is banned in this tournament.",
+      "missionBanned": "Mission {missionId} is banned in this tournament.",
+      "tooManyCopies": "Too many copies of {name} (number {number}): max {max}.",
+      "rarityNotAllowed": "Rarity {rarity} is not allowed (card: {name}).",
+      "rarityBanned": "Rarity {rarity} is banned (card: {name}).",
+      "groupNotAllowed": "Group \"{group}\" is not allowed (card: {name}).",
+      "groupBanned": "Group \"{group}\" is banned (card: {name}).",
+      "noAllowedKeyword": "Card {name} has no allowed keyword.",
+      "keywordBanned": "Keyword \"{keyword}\" is banned (card: {name}).",
+      "tooMuchChakra": "Card {name} costs {chakra} chakra (max: {max}).",
+      "tooManyOfRarity": "Too many {rarity} cards: {count} (max: {max})."
     }
   },
   "playHub": {

@@ -20,37 +20,68 @@ export interface TournamentRules {
   maxChakraCost: number | null;
 }
 
+export interface ValidationErrorEntry {
+  key: string;
+  params?: Record<string, string | number>;
+}
+
 export interface ValidationResult {
   valid: boolean;
   errors: string[];
+  errorKeys: ValidationErrorEntry[];
 }
 
 
 export function validateDeckForTournament(deck: DeckData, tournament: TournamentRules): ValidationResult {
   const errors: string[] = [];
+  const errorKeys: ValidationErrorEntry[] = [];
+  const push = (msg: string, key: string, params?: Record<string, string | number>) => {
+    errors.push(msg);
+    errorKeys.push({ key, params });
+  };
 
   const minSize = tournament.minDeckSize ?? 30;
   const maxSize = tournament.maxDeckSize ?? 999;
 
   if (deck.cardIds.length < minSize) {
-    errors.push(`Deck must have at least ${minSize} cards (has ${deck.cardIds.length})`);
+    push(
+      `Deck must have at least ${minSize} cards (has ${deck.cardIds.length})`,
+      'tournament.deckError.tooFewCards',
+      { min: minSize, count: deck.cardIds.length },
+    );
   }
   if (deck.cardIds.length > maxSize) {
-    errors.push(`Deck must have at most ${maxSize} cards (has ${deck.cardIds.length})`);
+    push(
+      `Deck must have at most ${maxSize} cards (has ${deck.cardIds.length})`,
+      'tournament.deckError.tooManyCards',
+      { max: maxSize, count: deck.cardIds.length },
+    );
   }
   if (deck.missionIds.length !== 3) {
-    errors.push(`Deck must have exactly 3 mission cards (has ${deck.missionIds.length})`);
+    push(
+      `Deck must have exactly 3 mission cards (has ${deck.missionIds.length})`,
+      'tournament.deckError.wrongMissionCount',
+      { count: deck.missionIds.length },
+    );
   }
 
   if (tournament.bannedCardIds.length > 0) {
     for (const cardId of deck.cardIds) {
       if (tournament.bannedCardIds.includes(cardId)) {
-        errors.push(`Card ${cardId} is banned in this tournament`);
+        push(
+          `Card ${cardId} is banned in this tournament`,
+          'tournament.deckError.cardBanned',
+          { cardId },
+        );
       }
     }
     for (const missionId of deck.missionIds) {
       if (tournament.bannedCardIds.includes(missionId)) {
-        errors.push(`Mission ${missionId} is banned in this tournament`);
+        push(
+          `Mission ${missionId} is banned in this tournament`,
+          'tournament.deckError.missionBanned',
+          { missionId },
+        );
       }
     }
   }
@@ -67,42 +98,74 @@ export function validateDeckForTournament(deck: DeckData, tournament: Tournament
       const versionKey = card.number ? `n:${card.number}` : `id:${cardId}`;
       copyCounts[versionKey] = (copyCounts[versionKey] ?? 0) + 1;
       if (copyCounts[versionKey] > maxCopies) {
-        errors.push(`Too many copies of ${card.name_fr} (number ${card.number || cardId}): max ${maxCopies}`);
+        push(
+          `Too many copies of ${card.name_fr} (number ${card.number || cardId}): max ${maxCopies}`,
+          'tournament.deckError.tooManyCopies',
+          { name: card.name_fr, number: String(card.number || cardId), max: maxCopies },
+        );
       }
 
       const rarity = card.rarity;
       rarityCounts[rarity] = (rarityCounts[rarity] ?? 0) + 1;
 
       if (tournament.allowedRarities.length > 0 && !tournament.allowedRarities.includes(rarity)) {
-        errors.push(`Rarity ${rarity} is not allowed (card: ${card.name_fr})`);
+        push(
+          `Rarity ${rarity} is not allowed (card: ${card.name_fr})`,
+          'tournament.deckError.rarityNotAllowed',
+          { rarity, name: card.name_fr },
+        );
       }
       if (tournament.bannedRarities.includes(rarity)) {
-        errors.push(`Rarity ${rarity} is banned (card: ${card.name_fr})`);
+        push(
+          `Rarity ${rarity} is banned (card: ${card.name_fr})`,
+          'tournament.deckError.rarityBanned',
+          { rarity, name: card.name_fr },
+        );
       }
 
       const group = card.group ?? '';
       if (tournament.allowedGroups.length > 0 && group && !tournament.allowedGroups.includes(group)) {
-        errors.push(`Group "${group}" is not allowed (card: ${card.name_fr})`);
+        push(
+          `Group "${group}" is not allowed (card: ${card.name_fr})`,
+          'tournament.deckError.groupNotAllowed',
+          { group, name: card.name_fr },
+        );
       }
       if (tournament.bannedGroups.includes(group)) {
-        errors.push(`Group "${group}" is banned (card: ${card.name_fr})`);
+        push(
+          `Group "${group}" is banned (card: ${card.name_fr})`,
+          'tournament.deckError.groupBanned',
+          { group, name: card.name_fr },
+        );
       }
 
       const keywords: string[] = card.keywords ?? [];
       if (tournament.allowedKeywords.length > 0) {
         const hasAllowed = keywords.some((kw: string) => tournament.allowedKeywords.includes(kw));
         if (!hasAllowed && keywords.length > 0) {
-          errors.push(`Card ${card.name_fr} has no allowed keyword`);
+          push(
+            `Card ${card.name_fr} has no allowed keyword`,
+            'tournament.deckError.noAllowedKeyword',
+            { name: card.name_fr },
+          );
         }
       }
       for (const kw of keywords) {
         if (tournament.bannedKeywords.includes(kw)) {
-          errors.push(`Keyword "${kw}" is banned (card: ${card.name_fr})`);
+          push(
+            `Keyword "${kw}" is banned (card: ${card.name_fr})`,
+            'tournament.deckError.keywordBanned',
+            { keyword: kw, name: card.name_fr },
+          );
         }
       }
 
       if (tournament.maxChakraCost != null && (card.chakra ?? 0) > tournament.maxChakraCost) {
-        errors.push(`Card ${card.name_fr} costs ${card.chakra} chakra (max: ${tournament.maxChakraCost})`);
+        push(
+          `Card ${card.name_fr} costs ${card.chakra} chakra (max: ${tournament.maxChakraCost})`,
+          'tournament.deckError.tooMuchChakra',
+          { name: card.name_fr, chakra: card.chakra ?? 0, max: tournament.maxChakraCost },
+        );
       }
     }
 
@@ -110,7 +173,11 @@ export function validateDeckForTournament(deck: DeckData, tournament: Tournament
       const limits = tournament.maxPerRarity as Record<string, number>;
       for (const [rarity, max] of Object.entries(limits)) {
         if ((rarityCounts[rarity] ?? 0) > max) {
-          errors.push(`Too many ${rarity} cards: ${rarityCounts[rarity]} (max: ${max})`);
+          push(
+            `Too many ${rarity} cards: ${rarityCounts[rarity]} (max: ${max})`,
+            'tournament.deckError.tooManyOfRarity',
+            { rarity, count: rarityCounts[rarity] ?? 0, max },
+          );
         }
       }
     }
@@ -118,9 +185,18 @@ export function validateDeckForTournament(deck: DeckData, tournament: Tournament
     /* card data unavailable */
   }
 
-  const uniqueErrors = [...new Set(errors)];
+  // Deduplicate while preserving the first occurrence's errorKey entry
+  const seen = new Set<string>();
+  const uniqueErrors: string[] = [];
+  const uniqueKeys: ValidationErrorEntry[] = [];
+  for (let i = 0; i < errors.length; i++) {
+    if (seen.has(errors[i])) continue;
+    seen.add(errors[i]);
+    uniqueErrors.push(errors[i]);
+    uniqueKeys.push(errorKeys[i]);
+  }
 
-  return { valid: uniqueErrors.length === 0, errors: uniqueErrors };
+  return { valid: uniqueErrors.length === 0, errors: uniqueErrors, errorKeys: uniqueKeys };
 }
 
 

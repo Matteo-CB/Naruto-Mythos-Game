@@ -12,7 +12,7 @@ export async function POST(
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized', errorKey: 'tournament.error.unauthorized' }, { status: 401 });
     }
 
     const { id: tournamentId } = await params;
@@ -20,39 +20,39 @@ export async function POST(
     const { deckId } = body;
 
     if (!deckId || typeof deckId !== 'string') {
-      return NextResponse.json({ error: 'deckId is required' }, { status: 400 });
+      return NextResponse.json({ error: 'deckId is required', errorKey: 'tournament.error.deckIdRequired' }, { status: 400 });
     }
 
-    
+
     const tournament = await prisma.tournament.findUnique({
       where: { id: tournamentId },
     });
     if (!tournament) {
-      return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Tournament not found', errorKey: 'tournament.error.notFound' }, { status: 404 });
     }
     if (tournament.status !== 'registration') {
-      return NextResponse.json({ error: 'Tournament is no longer accepting deck changes' }, { status: 400 });
+      return NextResponse.json({ error: 'Tournament is no longer accepting deck changes', errorKey: 'tournament.error.deckChangesClosed' }, { status: 400 });
     }
 
-    
+
     const participant = await prisma.tournamentParticipant.findFirst({
       where: { tournamentId, userId: session.user.id },
     });
     if (!participant) {
-      return NextResponse.json({ error: 'You are not in this tournament' }, { status: 403 });
+      return NextResponse.json({ error: 'You are not in this tournament', errorKey: 'tournament.error.notInTournament' }, { status: 403 });
     }
 
-    
+
     if (tournament.gameMode === 'sealed') {
-      return NextResponse.json({ error: 'Sealed mode builds decks in-game' }, { status: 400 });
+      return NextResponse.json({ error: 'Sealed mode builds decks in-game', errorKey: 'tournament.error.sealedModeInGame' }, { status: 400 });
     }
 
-    
+
     const deck = await prisma.deck.findUnique({
       where: { id: deckId },
     });
     if (!deck || deck.userId !== session.user.id) {
-      return NextResponse.json({ error: 'Deck not found or not yours' }, { status: 404 });
+      return NextResponse.json({ error: 'Deck not found or not yours', errorKey: 'tournament.error.deckNotFound' }, { status: 404 });
     }
 
     
@@ -87,7 +87,7 @@ export async function POST(
         where: { id: participant.id },
         data: { deckId: previousDeckId, deckValid: previousDeckValid },
       }).catch(() => {});
-      return NextResponse.json({ error: 'Tournament is no longer accepting deck changes' }, { status: 400 });
+      return NextResponse.json({ error: 'Tournament is no longer accepting deck changes', errorKey: 'tournament.error.deckChangesClosed' }, { status: 400 });
     }
 
     const io = getSocketIO();
@@ -97,8 +97,9 @@ export async function POST(
       deckId,
       deckValid: validation.valid,
       errors: validation.errors,
+      errorKeys: validation.errorKeys,
     });
   } catch {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error', errorKey: 'tournament.error.serverError' }, { status: 500 });
   }
 }

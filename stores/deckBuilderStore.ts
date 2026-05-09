@@ -313,28 +313,29 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
   },
 
   deleteDeck: async (deckId: string) => {
-    try {
-      const res = await fetch(`/api/decks/${deckId}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
+    const res = await fetch(`/api/decks/${deckId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    }).catch(() => null);
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to delete deck');
-      }
-
-      
-      const { loadedDeckId } = get();
-      if (loadedDeckId === deckId) {
-        get().clearDeck();
-      }
-
-      
-      await get().loadSavedDecks();
-    } catch {
-      
-      throw new Error('Failed to delete deck');
+    if (!res) {
+      const err = new Error('Failed to delete deck') as Error & { errorKey?: string };
+      err.errorKey = 'deckBuilder.failedToDelete';
+      throw err;
     }
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const err = new Error(data.error || 'Failed to delete deck') as Error & { errorKey?: string };
+      err.errorKey = typeof data.errorKey === 'string' ? data.errorKey : 'deckBuilder.failedToDelete';
+      throw err;
+    }
+
+    const { loadedDeckId } = get();
+    if (loadedDeckId === deckId) {
+      get().clearDeck();
+    }
+
+    await get().loadSavedDecks();
   },
 }));

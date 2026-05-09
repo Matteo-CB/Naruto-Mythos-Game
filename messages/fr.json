@@ -2632,6 +2632,32 @@
       "done": "Fait",
       "networkError": "Erreur réseau",
       "failedToDelete": "Échec de la suppression"
+    },
+    "error": {
+      "unauthorized": "Non autorisé.",
+      "deckIdRequired": "L'identifiant du deck est requis.",
+      "notFound": "Tournoi introuvable.",
+      "deckChangesClosed": "Le tournoi n'accepte plus de changement de deck.",
+      "notInTournament": "Vous n'êtes pas inscrit à ce tournoi.",
+      "sealedModeInGame": "Le mode scellé construit les decks en partie.",
+      "deckNotFound": "Deck introuvable ou ne vous appartient pas.",
+      "serverError": "Erreur serveur. Veuillez réessayer."
+    },
+    "deckError": {
+      "tooFewCards": "Le deck doit contenir au moins {min} cartes (en a {count}).",
+      "tooManyCards": "Le deck doit contenir au plus {max} cartes (en a {count}).",
+      "wrongMissionCount": "Le deck doit contenir exactement 3 cartes mission (en a {count}).",
+      "cardBanned": "La carte {cardId} est bannie dans ce tournoi.",
+      "missionBanned": "La mission {missionId} est bannie dans ce tournoi.",
+      "tooManyCopies": "Trop de copies de {name} (numéro {number}) : max {max}.",
+      "rarityNotAllowed": "La rareté {rarity} n'est pas autorisée (carte : {name}).",
+      "rarityBanned": "La rareté {rarity} est bannie (carte : {name}).",
+      "groupNotAllowed": "Le groupe \"{group}\" n'est pas autorisé (carte : {name}).",
+      "groupBanned": "Le groupe \"{group}\" est banni (carte : {name}).",
+      "noAllowedKeyword": "La carte {name} n'a aucun mot-clé autorisé.",
+      "keywordBanned": "Le mot-clé \"{keyword}\" est banni (carte : {name}).",
+      "tooMuchChakra": "La carte {name} coûte {chakra} chakra (max : {max}).",
+      "tooManyOfRarity": "Trop de cartes {rarity} : {count} (max : {max})."
     }
   },
   "playHub": {
