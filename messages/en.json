@@ -905,7 +905,8 @@
       "sealedTimeout": "Sealed deck-building time expired. The room has been closed.",
       "alreadyQueued": "You are already queued in another tab",
       "gameBanned": "You are banned from playing online games. Check your profile for details.",
-      "invalidDeck": "Your deck contains invalid or unknown cards."
+      "invalidDeck": "Your deck contains invalid or unknown cards.",
+      "deckBanned": "Your deck contains banned cards. Remove them to play in this mode."
     },
     "opponentDisconnected": "Opponent disconnected. They have {time} to reconnect or the game is forfeit.",
     "reconnect": {
@@ -2758,7 +2759,8 @@
     "cooldown": "Please wait...",
     "chatBanned": "You are banned from chat",
     "unread": "{count} new",
-    "noMessages": "No messages yet"
+    "noMessages": "No messages yet",
+    "rateLimit": "You are sending messages too fast. Please slow down."
   },
   "moderation": {
     "reports": "Reports",
