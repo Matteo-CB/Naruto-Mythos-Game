@@ -312,9 +312,13 @@ export function MulliganDialog() {
 
   
   if (hasMulliganed) {
+    if (effectPopupMinimized) {
+      return <PopupMinimizePill text={t('game.mulliganWaiting')} onRestore={restoreEffectPopup} />;
+    }
     return (
       <PopupOverlay>
         <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.2)" maxWidth="400px" padding="32px 28px">
+          <PopupMinimizeX onClick={minimizeEffectPopup} />
           <div className="flex flex-col items-center gap-4">
             <span className="font-body text-sm" style={{ color: '#888888' }}>
               {t('game.mulliganWaiting')}
