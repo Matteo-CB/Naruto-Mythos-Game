@@ -1692,7 +1692,14 @@
         "canUpgrade": "Can you upgrade {name} from cost {fromCost} to cost {toCost}?",
         "missionRank": "What rank is a mission placed on turn {turn}?",
         "canAfford": "You have {chakra} chakra. Can you play {name} (cost {cost})?",
-        "effectRecall": "What does {name}'s {type} effect do?"
+        "effectRecall": "What does {name}'s {type} effect do?",
+        "hiddenPower": "A hidden character has power equal to its printed power.",
+        "hiddenCostPlay": "Playing a character hidden costs 1 chakra regardless of its printed cost.",
+        "hiddenChakraBonus": "Hidden characters still grant +1 chakra at the start of each round.",
+        "hiddenSameName": "You can have two hidden characters with the same name on the same mission.",
+        "edgeFirst": "The Edge holder takes the first action in the action phase.",
+        "edgePassFirst": "The first player to pass takes or keeps the Edge token.",
+        "edgeTiebreaker": "The Edge holder wins ties on missions during the mission phase."
       },
       "exp": {
         "chakraCost": "{name} costs {value} chakra",
@@ -1717,7 +1724,14 @@
         "canUpgrade": "Upgrading {name}: from {fromCost} to {toCost}. Must be strictly higher cost.",
         "missionRank": "Turn {turn} mission has rank {rank}.",
         "canAfford": "{name} costs {cost} chakra. You have {chakra}.",
-        "effectRecall": "{name}'s effect was correctly identified."
+        "effectRecall": "{name}'s effect was correctly identified.",
+        "hiddenPower": "False. Hidden characters have power 0 + power tokens regardless of printed power.",
+        "hiddenCostPlay": "True. Playing hidden always costs exactly 1 chakra.",
+        "hiddenChakraBonus": "True. Each character you control (hidden or face up) grants +1 chakra in the start phase.",
+        "hiddenSameName": "True. Hidden cards have no visible name, so the duplicate restriction does not apply until they are revealed.",
+        "edgeFirst": "True. The Edge token holder always acts first each round.",
+        "edgePassFirst": "True. Passing first grants the Edge for the next round.",
+        "edgeTiebreaker": "True. When power totals are equal on a mission, the Edge holder wins it."
       },
       "stmt": {
         "costIs": "{name} costs {value} chakra",
@@ -1728,7 +1742,8 @@
       },
       "unit": {
         "chakra": "chakra",
-        "seconds": "s"
+        "seconds": "s",
+        "points": "pts"
       },
       "group": {
         "leaf": "Leaf Village",
@@ -2072,6 +2087,11 @@
           "oD": "More cards wins",
           "exp": "If tied after turn 4, Edge token holder wins."
         }
+      },
+      "opt": {
+        "noOne": "No one",
+        "player1": "Player 1",
+        "player2": "Player 2"
       }
     }
   },

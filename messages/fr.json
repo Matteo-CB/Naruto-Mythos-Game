@@ -1692,7 +1692,14 @@
         "canUpgrade": "Pouvez-vous UPGRADE {name} du cout {fromCost} au cout {toCost} ?",
         "missionRank": "Quel rang a une mission placee au tour {turn} ?",
         "canAfford": "Vous avez {chakra} chakra. Pouvez-vous jouer {name} (cout {cost}) ?",
-        "effectRecall": "Que fait l'effet {type} de {name} ?"
+        "effectRecall": "Que fait l'effet {type} de {name} ?",
+        "hiddenPower": "Un personnage caché a une puissance égale à sa puissance imprimée.",
+        "hiddenCostPlay": "Jouer un personnage caché coûte 1 chakra peu importe son coût imprimé.",
+        "hiddenChakraBonus": "Les personnages cachés donnent toujours +1 chakra au début de chaque manche.",
+        "hiddenSameName": "On peut avoir deux personnages cachés du même nom sur la même mission.",
+        "edgeFirst": "Le détenteur du jeton Edge agit en premier dans la phase d'action.",
+        "edgePassFirst": "Le premier joueur à passer prend ou garde le jeton Edge.",
+        "edgeTiebreaker": "Le détenteur de l'Edge gagne les égalités sur les missions à la phase de mission."
       },
       "exp": {
         "chakraCost": "{name} coute {value} chakra",
@@ -1717,7 +1724,14 @@
         "canUpgrade": "UPGRADE {name} : de {fromCost} a {toCost}. Le cout doit etre strictement superieur.",
         "missionRank": "La mission du tour {turn} a le rang {rank}.",
         "canAfford": "{name} coute {cost} chakra. Vous avez {chakra}.",
-        "effectRecall": "L'effet de {name} a ete correctement identifie."
+        "effectRecall": "L'effet de {name} a ete correctement identifie.",
+        "hiddenPower": "Faux. Les personnages cachés ont 0 puissance + jetons de puissance, quelle que soit leur puissance imprimée.",
+        "hiddenCostPlay": "Vrai. Jouer caché coûte toujours exactement 1 chakra.",
+        "hiddenChakraBonus": "Vrai. Chaque personnage contrôlé (caché ou révélé) donne +1 chakra à la phase de départ.",
+        "hiddenSameName": "Vrai. Les cartes cachées n'ont pas de nom visible, donc la restriction de doublon ne s'applique pas tant qu'elles ne sont pas révélées.",
+        "edgeFirst": "Vrai. Le détenteur de l'Edge agit toujours en premier chaque manche.",
+        "edgePassFirst": "Vrai. Passer en premier donne l'Edge pour la manche suivante.",
+        "edgeTiebreaker": "Vrai. Quand les totaux de puissance sont égaux sur une mission, le détenteur de l'Edge la remporte."
       },
       "stmt": {
         "costIs": "{name} coute {value} chakra",
@@ -1728,7 +1742,8 @@
       },
       "unit": {
         "chakra": "chakra",
-        "seconds": "s"
+        "seconds": "s",
+        "points": "pts"
       },
       "group": {
         "leaf": "Village de Konoha",
@@ -2072,6 +2087,11 @@
           "oD": "Plus de cartes gagne",
           "exp": "En cas d'egalite apres le tour 4, le detenteur du Jeton d'Edge gagne."
         }
+      },
+      "opt": {
+        "noOne": "Personne",
+        "player1": "Joueur 1",
+        "player2": "Joueur 2"
       }
     }
   },
