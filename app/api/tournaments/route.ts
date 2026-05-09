@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ tournaments: safe });
   } catch {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error', errorKey: 'tournament.error.serverError' }, { status: 500 });
   }
 }
 
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized', errorKey: 'tournament.error.unauthorized' }, { status: 401 });
     }
 
     const body = await req.json();
@@ -85,38 +85,38 @@ export async function POST(req: NextRequest) {
         : 'swiss';
 
     if (!isAdmin(session)) {
-      return NextResponse.json({ error: 'Only admins can create tournaments' }, { status: 403 });
+      return NextResponse.json({ error: 'Only admins can create tournaments', errorKey: 'tournament.error.adminOnly' }, { status: 403 });
     }
 
     if (format === 'elimination' || format === 'double_elimination') {
       const validSizes = [4, 8, 16, 32];
       if (!validSizes.includes(maxPlayers)) {
-        return NextResponse.json({ error: 'Max players must be 4, 8, 16, or 32 for elimination formats' }, { status: 400 });
+        return NextResponse.json({ error: 'Max players must be 4, 8, 16, or 32 for elimination formats', errorKey: 'tournament.error.invalidElimSize' }, { status: 400 });
       }
     } else {
       if (typeof maxPlayers !== 'number' || maxPlayers < 4 || maxPlayers > 32) {
-        return NextResponse.json({ error: 'Max players must be between 4 and 32' }, { status: 400 });
+        return NextResponse.json({ error: 'Max players must be between 4 and 32', errorKey: 'tournament.error.invalidMaxPlayers' }, { status: 400 });
       }
     }
 
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+      return NextResponse.json({ error: 'Name is required', errorKey: 'tournament.error.nameRequired' }, { status: 400 });
     }
     if (name.trim().length > 80) {
-      return NextResponse.json({ error: 'Name must be at most 80 characters' }, { status: 400 });
+      return NextResponse.json({ error: 'Name must be at most 80 characters', errorKey: 'tournament.error.nameTooLong' }, { status: 400 });
     }
     if (typeof restrictionNote === 'string' && restrictionNote.length > 500) {
-      return NextResponse.json({ error: 'Restriction note must be at most 500 characters' }, { status: 400 });
+      return NextResponse.json({ error: 'Restriction note must be at most 500 characters', errorKey: 'tournament.error.restrictionTooLong' }, { status: 400 });
     }
     const VALID_GAME_MODES = ['classic', 'sealed', 'restricted'] as const;
     const resolvedGameMode = gameMode || 'classic';
     if (!VALID_GAME_MODES.includes(resolvedGameMode as typeof VALID_GAME_MODES[number])) {
-      return NextResponse.json({ error: `gameMode must be one of: ${VALID_GAME_MODES.join(', ')}` }, { status: 400 });
+      return NextResponse.json({ error: `gameMode must be one of: ${VALID_GAME_MODES.join(', ')}`, errorKey: 'tournament.error.invalidGameMode' }, { status: 400 });
     }
     if (resolvedGameMode === 'sealed') {
       const count = sealedBoosterCount ?? 5;
       if (typeof count !== 'number' || !Number.isInteger(count) || count < 1 || count > 12) {
-        return NextResponse.json({ error: 'Sealed booster count must be an integer between 1 and 12' }, { status: 400 });
+        return NextResponse.json({ error: 'Sealed booster count must be an integer between 1 and 12', errorKey: 'tournament.error.invalidBoosterCount' }, { status: 400 });
       }
     }
 
@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
     const leagueRestrictions: string[] = [];
     if (type === 'simulator' && Array.isArray(allowedLeagues) && allowedLeagues.length > 0) {
       if (!validateLeagueKeys(allowedLeagues)) {
-        return NextResponse.json({ error: 'Invalid league tier keys' }, { status: 400 });
+        return NextResponse.json({ error: 'Invalid league tier keys', errorKey: 'tournament.error.invalidLeagueKeys' }, { status: 400 });
       }
       leagueRestrictions.push(...allowedLeagues);
     }
@@ -171,6 +171,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ tournament }, { status: 201 });
   } catch (err) {
     console.error('[API] POST /api/tournaments error:', err instanceof Error ? err.message : err);
-    return NextResponse.json({ error: err instanceof Error ? err.message : 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error', errorKey: 'tournament.error.serverError' }, { status: 500 });
   }
 }

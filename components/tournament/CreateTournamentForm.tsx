@@ -12,6 +12,7 @@ interface Props {
 
 export function CreateTournamentForm({ isAdmin }: Props) {
   const t = useTranslations('tournament');
+  const tRoot = useTranslations();
   const router = useRouter();
   const { createTournament } = useTournamentStore();
 
@@ -94,7 +95,12 @@ export function CreateTournamentForm({ isAdmin }: Props) {
       const id = await createTournament(input);
       router.push(`/tournaments/${id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error');
+      const errorKey = (err as Error & { errorKey?: string })?.errorKey;
+      if (typeof errorKey === 'string') {
+        try { setError(tRoot(errorKey)); return; }
+        catch { /* fall through */ }
+      }
+      setError(err instanceof Error ? err.message : t('admin.error'));
     } finally {
       setSubmitting(false);
     }

@@ -153,7 +153,12 @@ export const useTournamentStore = create<TournamentStore>()((set, get) => ({
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ joinCode: code }),
     });
-    if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to join'); }
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const err = new Error(data.error || 'Failed to join') as Error & { errorKey?: string };
+      if (typeof data.errorKey === 'string') err.errorKey = data.errorKey;
+      throw err;
+    }
     await get().fetchTournament(id);
   },
 
@@ -162,7 +167,12 @@ export const useTournamentStore = create<TournamentStore>()((set, get) => ({
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code }),
     });
-    if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to join'); }
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const err = new Error(data.error || 'Failed to join') as Error & { errorKey?: string };
+      if (typeof data.errorKey === 'string') err.errorKey = data.errorKey;
+      throw err;
+    }
     const data = await res.json();
     return data.tournamentId;
   },
@@ -178,7 +188,12 @@ export const useTournamentStore = create<TournamentStore>()((set, get) => ({
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(input),
     });
-    if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to create'); }
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const err = new Error(data.error || 'Failed to create') as Error & { errorKey?: string };
+      if (typeof data.errorKey === 'string') err.errorKey = data.errorKey;
+      throw err;
+    }
     const data = await res.json();
     return data.tournament.id;
   },

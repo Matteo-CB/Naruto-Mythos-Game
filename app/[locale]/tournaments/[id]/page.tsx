@@ -62,6 +62,7 @@ function ScheduledCountdown({ deadline }: { deadline: string }) {
 export default function TournamentDetailPage() {
   const t = useTranslations('tournament');
   const tc = useTranslations('common');
+  const tRoot = useTranslations();
   const router = useRouter();
   const params = useParams();
   const tournamentId = params?.id as string;
@@ -156,9 +157,14 @@ export default function TournamentDetailPage() {
       await joinTournament(tournamentId, code);
       fetchTournament(tournamentId);
     } catch (err) {
-      setJoinError(err instanceof Error ? err.message : 'Failed to join');
+      const errorKey = (err as Error & { errorKey?: string })?.errorKey;
+      if (typeof errorKey === 'string') {
+        try { setJoinError(tRoot(errorKey)); return; }
+        catch { /* fall through */ }
+      }
+      setJoinError(err instanceof Error ? err.message : t('admin.error'));
     }
-  }, [tournamentId, joinTournament, fetchTournament, clearError, joinCodeInput, activeTournament]);
+  }, [tournamentId, joinTournament, fetchTournament, clearError, joinCodeInput, activeTournament, t, tRoot]);
 
   const handleJoin = useCallback(async () => {
     if (!hasDiscordLinked) {
@@ -196,7 +202,6 @@ export default function TournamentDetailPage() {
     setTimeout(() => fetchTournament(tournamentId), 1000);
   }, [socket, tournamentId, userId, myMatch, fetchTournament]);
 
-  const tRoot = useTranslations();
   const handleSelectDeck = useCallback(async (deckId: string) => {
     if (!tournamentId) return;
     setDeckLoading(true);

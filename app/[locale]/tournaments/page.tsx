@@ -21,6 +21,7 @@ type Tab = 'simulator' | 'create';
 export default function TournamentsPage() {
   const t = useTranslations('tournament');
   const tc = useTranslations('common');
+  const tRoot = useTranslations();
   const router = useRouter();
   const { data: session, status } = useSession();
   const { animationsEnabled } = useSettingsStore();
@@ -61,7 +62,12 @@ export default function TournamentsPage() {
       const id = await joinByCode(joinCodeInput.trim().toUpperCase());
       router.push(('/tournaments/' + id) as '/');
     } catch (err: unknown) {
-      setJoinError(err instanceof Error ? err.message : 'Error');
+      const errorKey = (err as Error & { errorKey?: string })?.errorKey;
+      if (typeof errorKey === 'string') {
+        try { setJoinError(tRoot(errorKey)); return; }
+        catch { /* fall through */ }
+      }
+      setJoinError(err instanceof Error ? err.message : t('admin.error'));
     }
   };
 

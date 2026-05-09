@@ -12,7 +12,7 @@ export async function POST(
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized', errorKey: 'tournament.error.unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
@@ -24,19 +24,19 @@ export async function POST(
     });
 
     if (!tournament) {
-      return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Tournament not found', errorKey: 'tournament.error.notFound' }, { status: 404 });
     }
     if (tournament.status !== 'registration') {
-      return NextResponse.json({ error: 'Registration is closed' }, { status: 400 });
+      return NextResponse.json({ error: 'Registration is closed', errorKey: 'tournament.error.registrationClosed' }, { status: 400 });
     }
     if (tournament._count.participants >= tournament.maxPlayers) {
-      return NextResponse.json({ error: 'Tournament is full' }, { status: 400 });
+      return NextResponse.json({ error: 'Tournament is full', errorKey: 'tournament.error.tournamentFull' }, { status: 400 });
     }
 
     
     if (!tournament.isPublic) {
       if (!body.joinCode || body.joinCode !== tournament.joinCode) {
-        return NextResponse.json({ error: 'Invalid join code' }, { status: 403 });
+        return NextResponse.json({ error: 'Invalid join code', errorKey: 'tournament.error.invalidJoinCode' }, { status: 403 });
       }
     }
 
@@ -49,7 +49,7 @@ export async function POST(
     if (user?.gameBanned) {
       const now = new Date();
       if (!user.gameBanUntil || user.gameBanUntil > now) {
-        return NextResponse.json({ error: 'You are banned from playing online' }, { status: 403 });
+        return NextResponse.json({ error: 'You are banned from playing online', errorKey: 'tournament.error.bannedFromGame' }, { status: 403 });
       }
       await prisma.user.update({
         where: { id: session.user.id },
@@ -67,12 +67,12 @@ export async function POST(
     ) {
       const playerLeague = getPlayerLeague(user?.elo ?? 0);
       if (!tournament.allowedLeagues.includes(playerLeague)) {
-        return NextResponse.json({ error: 'Your current rank does not meet the requirements for this tournament' }, { status: 403 });
+        return NextResponse.json({ error: 'Your current rank does not meet the requirements for this tournament', errorKey: 'tournament.error.rankNotAllowed' }, { status: 403 });
       }
     }
 
     if (tournament.requiresDiscord && !user?.discordId) {
-      return NextResponse.json({ error: 'Link your Discord account first' }, { status: 403 });
+      return NextResponse.json({ error: 'Link your Discord account first', errorKey: 'tournament.error.linkDiscord' }, { status: 403 });
     }
 
 
@@ -87,7 +87,7 @@ export async function POST(
       },
     });
     if (activeBan) {
-      return NextResponse.json({ error: 'You are banned from tournaments' }, { status: 403 });
+      return NextResponse.json({ error: 'You are banned from tournaments', errorKey: 'tournament.error.bannedFromTournaments' }, { status: 403 });
     }
 
     
@@ -95,7 +95,7 @@ export async function POST(
       where: { tournamentId_userId: { tournamentId: id, userId: session.user.id } },
     });
     if (existing) {
-      return NextResponse.json({ error: 'Already joined' }, { status: 400 });
+      return NextResponse.json({ error: 'Already joined', errorKey: 'tournament.error.alreadyJoined' }, { status: 400 });
     }
 
     try {
@@ -112,14 +112,14 @@ export async function POST(
       });
       if (fresh?.status !== 'registration') {
         await prisma.tournamentParticipant.delete({ where: { id: participant.id } }).catch(() => {});
-        return NextResponse.json({ error: 'Registration closed' }, { status: 400 });
+        return NextResponse.json({ error: 'Registration closed', errorKey: 'tournament.error.registrationClosed' }, { status: 400 });
       }
       const newCount = await prisma.tournamentParticipant.count({
         where: { tournamentId: id },
       });
       if (newCount > tournament.maxPlayers) {
         await prisma.tournamentParticipant.delete({ where: { id: participant.id } }).catch(() => {});
-        return NextResponse.json({ error: 'Tournament is full' }, { status: 400 });
+        return NextResponse.json({ error: 'Tournament is full', errorKey: 'tournament.error.tournamentFull' }, { status: 400 });
       }
       const io = getSocketIO();
       if (io) io.to(`tournament:${id}`).emit('tournament:refresh');
@@ -127,12 +127,12 @@ export async function POST(
     } catch (createErr) {
       const msg = createErr instanceof Error ? createErr.message : '';
       if (msg.includes('Unique constraint') || msg.includes('duplicate key')) {
-        return NextResponse.json({ error: 'Already joined' }, { status: 409 });
+        return NextResponse.json({ error: 'Already joined', errorKey: 'tournament.error.alreadyJoined' }, { status: 409 });
       }
       throw createErr;
     }
   } catch (err) {
     console.error('[API] POST /api/tournaments/join error:', err instanceof Error ? err.message : err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error', errorKey: 'tournament.error.serverError' }, { status: 500 });
   }
 }
