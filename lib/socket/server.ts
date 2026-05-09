@@ -2744,8 +2744,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
     socket.on('chat:send', async (data: { message: string; isEmote: boolean }) => {
       if (!data || typeof data !== 'object') return;
-      const trimmed = (typeof data.message === 'string' ? data.message : '').trim();
-      if (!trimmed || trimmed.length > 200) return;
+      const raw = typeof data.message === 'string' ? data.message : '';
+      const sanitized = raw.replace(/[\x00-\x08\x0B-\x1F\x7F]/g, '').replace(/\s+/g, ' ').trim();
+      if (!sanitized || sanitized.length > 200) return;
+      const trimmed = sanitized;
 
       let roomCode = playerRooms.get(socket.id);
       let isSpectator = false;
