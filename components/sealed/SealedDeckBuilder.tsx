@@ -169,7 +169,7 @@ export function SealedDeckBuilder({
       const key = getVersionKey(card);
       const inDeck = deckVersionCounts.get(key) ?? 0;
       const inPool = poolAvailability.get(key) ?? 0;
-      return inDeck < inPool; // No copy limit in sealed — can use all pulled copies
+      return inDeck < inPool;
     },
     [deckVersionCounts, poolAvailability],
   );

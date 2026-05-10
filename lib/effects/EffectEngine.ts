@@ -969,7 +969,7 @@ export class EffectEngine {
 
         if (ownHand_sur.length === 0 || oppHand_sur.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_NO_TARGET', 'Sasuke Uchiwa (014) UPGRADE: Cannot discard — empty hand.',
+            'EFFECT_NO_TARGET', 'Sasuke Uchiwa (014) UPGRADE: Cannot discard, empty hand.',
             'game.log.effect.noTarget', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
           break;
         }
@@ -2739,7 +2739,7 @@ export class EffectEngine {
 
         if (ownHand014u.length === 0 || oppHand014u.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_NO_TARGET', 'Sasuke Uchiwa (014) UPGRADE: Cannot discard — empty hand.',
+            'EFFECT_NO_TARGET', 'Sasuke Uchiwa (014) UPGRADE: Cannot discard, empty hand.',
             'game.log.effect.noTarget', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
           break;
         }
@@ -13865,7 +13865,7 @@ export class EffectEngine {
           });
           if (hasNameConflictFresh_k78) {
             newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-              'EFFECT_BLOCKED', `Kankuro (078): Cannot reveal ${topCard_k78.name_fr} — same name already visible in this mission.`,
+              'EFFECT_BLOCKED', `Kankuro (078): Cannot reveal ${topCard_k78.name_fr}, same name already visible in this mission.`,
               'game.log.effect.nameConflictBlocked', { card: 'KANKURO', id: 'KS-078-UC', target: topCard_k78.name_fr });
             break;
           }
@@ -15298,7 +15298,7 @@ export class EffectEngine {
         newState.log = logAction(
           newState.log, newState.turn, newState.phase, pending.sourcePlayer,
           'EFFECT',
-          `${newTopCard.name_en || newTopCard.name_fr} revealed under the stack but a duplicate was already in this mission — discarded (No Repetition).`,
+          `${newTopCard.name_en || newTopCard.name_fr} revealed under the stack but a duplicate was already in this mission, discarded (No Repetition).`,
           'game.log.effect.controlReturnedConflict',
           { card: newTopCard.name_fr, card_en: newTopCard.name_en || newTopCard.name_fr, target: newTopCard.name_fr, target_en: newTopCard.name_en || newTopCard.name_fr },
         );
@@ -15897,7 +15897,7 @@ export class EffectEngine {
     }
 
     if (controlledChars.length === 0) return state;
-    console.log(`[restoreControlOnLeave] Controller ${controllerInstanceId} leaving — returning ${controlledChars.length} controlled character(s)`);
+    console.log(`[restoreControlOnLeave] Controller ${controllerInstanceId} leaving, returning ${controlledChars.length} controlled character(s)`);
 
     let newState = deepClone(state);
 
@@ -15947,7 +15947,7 @@ export class EffectEngine {
               }
               newState.log = logAction(
                 newState.log, newState.turn, newState.phase, char.originalOwner,
-                'EFFECT', `${topCardCtrl.name_en || topCardCtrl.name_fr} returned to owner but same name already in play — discarded (No Repetition).`,
+                'EFFECT', `${topCardCtrl.name_en || topCardCtrl.name_fr} returned to owner but same name already in play, discarded (No Repetition).`,
                 'game.log.effect.controlReturnedConflict',
                 { card: topCardCtrl.name_fr, card_en: topCardCtrl.name_en || topCardCtrl.name_fr, target: topCardCtrl.name_fr, target_en: topCardCtrl.name_en || topCardCtrl.name_fr },
               );
@@ -18793,7 +18793,7 @@ export class EffectEngine {
           state.log = logAction(
             state.log, state.turn, state.phase, charOwner,
             'EFFECT',
-            `Gaara (075): Would be moved by ${effectCardName} (${effectCardId}) — hidden instead.`,
+            `Gaara (075): Would be moved by ${effectCardName} (${effectCardId}), hidden instead.`,
             'game.log.effect.gaara075HideOnMove',
             { card: effectCardName, id: effectCardId, target: charResult.character.card.name_fr },
           );

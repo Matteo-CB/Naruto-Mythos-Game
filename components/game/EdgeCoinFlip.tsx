@@ -230,7 +230,7 @@ export function EdgeCoinFlip() {
       return;
     }
     const fallback = setTimeout(() => {
-      console.warn('[EdgeCoinFlip] coin-flip-sync timeout — forcing complete');
+      console.warn('[EdgeCoinFlip] coin-flip-sync timeout, forcing complete');
       setCoinFlipComplete(true);
       setPhase('done');
     }, 5000);

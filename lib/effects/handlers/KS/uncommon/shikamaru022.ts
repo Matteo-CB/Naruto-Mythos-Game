@@ -87,7 +87,7 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
   
   if (state.activeMissions.length < 2) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Shikamaru Nara (022): Only 1 mission in play — cannot move.',
+      'Shikamaru Nara (022): Only 1 mission in play, cannot move.',
       'game.log.effect.noTarget', { card: 'SHIKAMARU NARA', id: 'KS-022-UC' }) } };
   }
 

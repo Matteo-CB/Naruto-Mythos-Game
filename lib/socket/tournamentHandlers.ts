@@ -309,7 +309,7 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
       const startedMs = m.startedAt ? m.startedAt.getTime() : 0;
       const ageMs = Date.now() - startedMs;
       if (ageMs < 60_000) continue;
-      console.log(`[Tournament] Orphan match detected ${m.id} (room ${m.roomCode} gone, age ${Math.round(ageMs / 1000)}s) — resetting to ready`);
+      console.log(`[Tournament] Orphan match detected ${m.id} (room ${m.roomCode} gone, age ${Math.round(ageMs / 1000)}s), resetting to ready`);
       const newStatus = m.player1Id && m.player2Id ? 'ready' : 'pending';
       await prisma.tournamentMatch.update({
         where: { id: m.id },

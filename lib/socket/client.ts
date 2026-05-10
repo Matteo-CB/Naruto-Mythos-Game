@@ -539,7 +539,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       });
 
       socket.on('game:rematch-reselect', ({ roomCode, isSealed }: { roomCode: string; isSealed?: boolean }) => {
-        console.log('[Socket] Rematch reselect — navigating to', isSealed ? 'sealed booster opening' : 'deck selection', 'with code:', roomCode);
+        console.log('[Socket] Rematch reselect, navigating to', isSealed ? 'sealed booster opening' : 'deck selection', 'with code:', roomCode);
         set({
           rematchRoomCode: roomCode,
           isSealedRoom: !!isSealed,
@@ -600,7 +600,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       
 
       socket.on('coin-flip-sync', () => {
-        console.log('[Socket] Both players completed coin flip — showing mulligan');
+        console.log('[Socket] Both players completed coin flip, showing mulligan');
         useUIStore.getState().setCoinFlipComplete(true);
       });
 

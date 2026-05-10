@@ -33,17 +33,17 @@ export class BoardEvaluator {
     
     const w = {
       missionPoints:    100,
-      missionControl:   25 + turn * 10,            // 35/45/55/65
-      boardPresence:    20 + turn * 2,             // 22/24/26/28 (was 13/11/9/7 — far too low)
+      missionControl:   25 + turn * 10,
+      boardPresence:    20 + turn * 2,
       chakraAdvantage:  turn <= 2 ? 6 : 2,
       handSize:         turn <= 2 ? 3 : 1,
       handQuality:      turn <= 2 ? 3 : 1,
       hiddenThreats:    5,
       overkillPenalty:  turn >= 3 ? 3 : 1,
-      scoreEffects:     2 + turn * 2,              // 4/6/8/10
+      scoreEffects:     2 + turn * 2,
       synergies:        3,
-      tempo:            3 + turn * 2,              // 5/7/9/11 (was 2/3/4/5 — too low)
-      passPenalty:      8 + turn * 4,              // 12/16/20/24 — NEW: penalize passing with playable cards
+      tempo:            3 + turn * 2,
+      passPenalty:      8 + turn * 4,
     };
 
     let score = 0;

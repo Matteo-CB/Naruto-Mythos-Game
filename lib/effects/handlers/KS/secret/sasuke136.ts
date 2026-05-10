@@ -78,7 +78,7 @@ function sasuke136UpgradeHandler(ctx: EffectContext): EffectResult {
     isMandatory: true,
     description: JSON.stringify({
       missionIndex: ctx.sourceMissionIndex,
-      text: 'Sasuke Uchiwa (136) UPGRADE: No friendly to sacrifice — choose an enemy to defeat.',
+      text: 'Sasuke Uchiwa (136) UPGRADE: No friendly to sacrifice, choose an enemy to defeat.',
     }),
     descriptionKey: 'game.effect.desc.sasuke136ChooseEnemy',
   };

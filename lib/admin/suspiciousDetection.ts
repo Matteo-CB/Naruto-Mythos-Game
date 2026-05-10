@@ -272,7 +272,7 @@ async function findRepeatOpponents(): Promise<Finding[]> {
       title: `${users[0]?.username ?? idA} vs ${users[1]?.username ?? idB}: ${v.gameIds.length} games in ${GAME_WINDOW_HOURS}h${oneSided ? ' (one-sided)' : ''}`,
       description:
         `These two players faced each other ${v.gameIds.length} time(s) in the last ${GAME_WINDOW_HOURS}h, ` +
-        `for a cumulative ±${v.totalElo} ELO transfer. ${oneSided ? 'The same side won every single game — strong farming signal.' : 'Mixed outcomes, still worth reviewing.'}`,
+        `for a cumulative ±${v.totalElo} ELO transfer. ${oneSided ? 'The same side won every single game, strong farming signal.' : 'Mixed outcomes, still worth reviewing.'}`,
       users,
       game: null,
       metrics: {
@@ -313,7 +313,7 @@ async function findShortForfeits(): Promise<Finding[]> {
       severity: 'medium',
       title: `Ranked game ${g.id} ended in ${Math.round(durationSec)}s`,
       description:
-        `Ranked game completed in less than 60 seconds — very likely a self-forfeit ` +
+        `Ranked game completed in less than 60 seconds, very likely a self-forfeit ` +
         `to transfer ELO. ELO moved: ${Math.abs(g.eloChange ?? 0)}.`,
       users,
       game,
@@ -347,7 +347,7 @@ async function findRapidWinsNewAccount(): Promise<Finding[]> {
       id: shortFinding('rapid_wins_new_account', [u.id]),
       type: 'rapid_wins_new_account',
       severity: 'medium',
-      title: `New account "${u.username}" — ${u.wins}/${total} wins (${Math.round(winRate * 100)}%)`,
+      title: `New account "${u.username}": ${u.wins}/${total} wins (${Math.round(winRate * 100)}%)`,
       description:
         `Account created ${Math.round((now - u.createdAt.getTime()) / 3600000)}h ago ` +
         `has already played ${total} ranked games with ${u.wins} wins. ` +

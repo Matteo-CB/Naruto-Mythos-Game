@@ -94,7 +94,7 @@ export function ActionBar() {
     const myChars = myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
     return myChars.filter(c => {
       if (c.controlledBy !== myPlayer) return false;
-      if (c.isHidden) return false; // Hidden chars have no name — can't upgrade over them
+      if (c.isHidden) return false;
       
       const charCard = c.topCard ?? c.card;
       if (!charCard) return false;

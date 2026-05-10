@@ -36,7 +36,7 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
   
   if (isMovementBlockedByKurenai(state, sourceMissionIndex, sourcePlayer)) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Choji Akimichi (018): Cannot move — Kurenai blocks movement from this mission.',
+      'Choji Akimichi (018): Cannot move, Kurenai blocks movement from this mission.',
       'game.log.effect.noTarget', { card: 'CHOJI AKIMICHI', id: 'KS-018-UC' }) } };
   }
 

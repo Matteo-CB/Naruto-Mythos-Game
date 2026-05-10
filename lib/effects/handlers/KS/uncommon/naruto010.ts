@@ -10,7 +10,7 @@ function handleNaruto010Ambush(ctx: EffectContext): EffectResult {
   
   if (isMovementBlockedByKurenai(state, sourceMissionIndex, sourcePlayer)) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Naruto Uzumaki (010): Cannot move — Kurenai blocks movement from this mission.',
+      'Naruto Uzumaki (010): Cannot move, Kurenai blocks movement from this mission.',
       'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-010-C' }) } };
   }
 

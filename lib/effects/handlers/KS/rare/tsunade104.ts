@@ -65,7 +65,7 @@ function tsunade104UpgradeHandler(ctx: EffectContext): EffectResult {
     requiresTargetSelection: true,
     targetSelectionType: 'TSUNADE104_CONFIRM_UPGRADE',
     validTargets: [sourceCard.instanceId],
-    isOptional: false, // mandatory — always applies if X > 0
+    isOptional: false,
     description: `Tsunade (104) UPGRADE: POWERUP ${mainSpent} (matching MAIN).`,
     descriptionKey: 'game.effect.desc.tsunade104ConfirmUpgrade',
   };

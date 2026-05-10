@@ -87,7 +87,7 @@ function Sparkline({ daily }: { daily: DailyEntry[] }) {
         className="flex items-center justify-center"
         style={{ width: 200, height: 36, color: '#333' }}
       >
-        <span className="text-[10px]">—</span>
+        <span className="text-[10px]">...</span>
       </div>
     );
   }

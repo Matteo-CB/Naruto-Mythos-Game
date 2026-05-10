@@ -298,7 +298,7 @@ export default function PlayOnlinePage() {
                   {bannedCardsError.map((bc) => (
                     <div key={bc.cardId} className="flex items-center gap-2" style={{ color: '#e0e0e0' }}>
                       <span style={{ color: '#b33e3e', fontWeight: 600 }}>{bc.cardId}</span>
-                      {bc.reason && <span style={{ color: '#888888', fontStyle: 'italic' }}>— {bc.reason}</span>}
+                      {bc.reason && <span style={{ color: '#888888', fontStyle: 'italic' }}>: {bc.reason}</span>}
                     </div>
                   ))}
                 </div>

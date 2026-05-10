@@ -12,7 +12,7 @@ function handleShizune006Main(ctx: EffectContext): EffectResult {
   
   if (state.activeMissions.length < 2) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Shizune (006): Only 1 mission in play — cannot move.',
+      'Shizune (006): Only 1 mission in play, cannot move.',
       'game.log.effect.noTarget', { card: 'SHIZUNE', id: 'KS-006-UC' }) } };
   }
 

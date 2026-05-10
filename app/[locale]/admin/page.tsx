@@ -1206,7 +1206,7 @@ function SuspiciousPanel() {
               <div className="text-[10px] uppercase tracking-wider" style={{ color: '#555' }}>{t('gameLabel')}</div>
               <div className="text-[11px] flex items-center gap-3 flex-wrap" style={{ color: '#ccc' }}>
                 <span style={{ color: '#666' }}>#{f.game.id.slice(-8)}</span>
-                <span>{f.game.player1Name ?? '?'} {f.game.player1Score} — {f.game.player2Score} {f.game.player2Name ?? '?'}</span>
+                <span>{f.game.player1Name ?? '?'} {f.game.player1Score} - {f.game.player2Score} {f.game.player2Name ?? '?'}</span>
                 {f.game.durationSec != null && <span style={{ color: '#666' }}>{f.game.durationSec}s</span>}
                 {f.game.eloChange != null && <span style={{ color: '#666' }}>{t('eloDelta', { delta: f.game.eloChange })}</span>}
                 {f.game.completedAt && <span style={{ color: '#444' }}>{new Date(f.game.completedAt).toLocaleString(locale)}</span>}

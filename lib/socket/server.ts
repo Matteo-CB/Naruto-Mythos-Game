@@ -567,7 +567,7 @@ async function finalizeGameEnd(
         await new Promise((resolve) => setTimeout(resolve, 250));
         const tier2Ok = await attemptEloUpdate('tier-2');
         if (!tier2Ok && !eloData) {
-          console.error('[Socket] ELO update failed after full purge — DB unrecoverable');
+          console.error('[Socket] ELO update failed after full purge, DB unrecoverable');
         }
       }
     }
@@ -1106,7 +1106,7 @@ function startMissionPhaseTimer(
     if (!rooms.has(code)) return;
     if (!room.gameState) return;
 
-    console.log(`[Socket] Mission phase timer expired for ${resolverPlayer} in room ${code} — auto-forfeit`);
+    console.log(`[Socket] Mission phase timer expired for ${resolverPlayer} in room ${code}, auto-forfeit`);
     room.gameState = GameEngine.applyAction(room.gameState, resolverPlayer, { type: 'FORFEIT', reason: 'timeout' });
     broadcastState(room, io);
     await finalizeGameEnd(room, code, io, 'timeout');
@@ -2957,7 +2957,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               : ++room.player2DisconnectCount);
 
             if (newCount > MAX_DISCONNECTS) {
-              console.log(`[Socket] ${player} disconnected ${newCount}× in room ${code} — instant forfeit (anti-troll)`);
+              console.log(`[Socket] ${player} disconnected ${newCount}× in room ${code}, instant forfeit (anti-troll)`);
               
               if (room.disconnectTimer) {
                 clearTimeout(room.disconnectTimer);

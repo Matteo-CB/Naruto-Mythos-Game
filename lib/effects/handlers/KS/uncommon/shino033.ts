@@ -11,7 +11,7 @@ function handleShino033Upgrade(ctx: EffectContext): EffectResult {
   
   if (state.activeMissions.length <= 1) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Shino Aburame (033): Only 1 mission in play — cannot move.',
+      'Shino Aburame (033): Only 1 mission in play, cannot move.',
       'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-033-UC' }) } };
   }
 
