@@ -10,7 +10,9 @@ import type { ReactNode } from 'react';
  * Idle: rectangular, thin border, centered title.
  * Hover: subtle bg lift + border tones up + 4px slide right.
  *
- * No glow, no halo, no particles, no pulse, no underline draw, no foil overlay.
+ * No glow, no halo, no particles, no pulse, no underline draw.
+ * The only flourish lives on the tournament button (subtle gold sheen) and is
+ * opted into via `innerClassName`.
  */
 
 export type MenuVariant = 'muted' | 'primary' | 'gold' | 'red' | 'blue';
@@ -29,6 +31,10 @@ interface Props {
   variant?: MenuVariant;
   delay?: number;
   rightSlot?: ReactNode;
+  /** Extra CSS class on the inner Link (used by the subtle holo sheen on tournaments) */
+  innerClassName?: string;
+  /** Extra inline style applied to the inner Link (used to inject CSS vars) */
+  innerStyle?: Record<string, string>;
 }
 
 export function HomeMenuButton({
@@ -37,8 +43,16 @@ export function HomeMenuButton({
   variant = 'muted',
   delay = 0,
   rightSlot,
+  innerClassName = '',
+  innerStyle,
 }: Props) {
   const v = VARIANT[variant];
+
+  const baseStyle: React.CSSProperties = {
+    backgroundColor: '#141414',
+    border: `1px solid ${v.idleBorder}`,
+    color: v.idleText,
+  };
 
   return (
     <motion.div
@@ -48,12 +62,8 @@ export function HomeMenuButton({
     >
       <Link
         href={href as Parameters<typeof Link>[0]['href']}
-        className="relative flex h-10 items-center justify-center text-sm font-semibold tracking-wide transition-[transform,border-color,color,background-color] duration-200 sm:h-12 sm:text-base"
-        style={{
-          backgroundColor: '#141414',
-          border: `1px solid ${v.idleBorder}`,
-          color: v.idleText,
-        }}
+        className={`relative flex h-10 items-center justify-center text-sm font-semibold tracking-wide overflow-hidden transition-[transform,border-color,color,background-color] duration-200 sm:h-12 sm:text-base ${innerClassName}`}
+        style={{ ...baseStyle, ...(innerStyle as React.CSSProperties | undefined) }}
         onMouseEnter={(e) => {
           const t = e.currentTarget as HTMLElement;
           t.style.transform = 'translateX(4px)';

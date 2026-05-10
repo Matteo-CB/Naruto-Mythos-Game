@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { HomeMenuButton } from './HomeMenuButton';
+import '@/styles/holo-menu.css';
 
 export type TournamentMenuStatus =
   | 'none'
@@ -20,17 +21,24 @@ interface Props {
   nextStartAt?: string | null;
 }
 
+const ACCENT: Record<TournamentMenuStatus, string> = {
+  none: '#c4a35a',
+  available: '#c4a35a',
+  registered: '#c4a35a',
+  needs_deck: '#b33e3e',
+  in_progress: '#3b82f6',
+};
+
 /**
- * Beautiful and subtle countdown display.
+ * Eye-catching but tasteful countdown. Inter Display 600, tabular numerals,
+ * sat inside a faint pill in the status accent color. The colon between
+ * units pulses like a real clock display.
  *
  * Format adapts to the remaining duration:
- *   > 1 day   → "Xd Yh"
- *   1h to 24h → "Xh Ym"
- *   < 1 hour  → "MM:SS"
- *   live (0)  → falls back to no render (handled outside)
- *
- * Visuals: NJNaruto display font, tabular-nums, soft drop-shadow in the
- * status accent color. No animation other than the natural per-second tick.
+ *   > 24h  → "Xd  Yh"
+ *   > 1h   → "Xh : Ym"
+ *   < 1h   → "MM : SS"
+ *   = 0    → returns null (caller handles)
  */
 function TournamentCountdown({ targetIso, accentColor }: { targetIso: string; accentColor: string }) {
   const [now, setNow] = useState(() => Date.now());
@@ -49,37 +57,42 @@ function TournamentCountdown({ targetIso, accentColor }: { targetIso: string; ac
   const mins = Math.floor((totalSec % 3600) / 60);
   const secs = totalSec % 60;
 
-  let label: string;
-  if (days > 0)        label = `${days}d ${hours}h`;
-  else if (hours > 0)  label = `${hours}h ${mins.toString().padStart(2, '0')}m`;
-  else                 label = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  let parts: { left: string; right: string; suffixLeft: string; suffixRight: string };
+  if (days > 0) {
+    parts = { left: String(days), right: String(hours), suffixLeft: 'd', suffixRight: 'h' };
+  } else if (hours > 0) {
+    parts = { left: String(hours), right: mins.toString().padStart(2, '0'), suffixLeft: 'h', suffixRight: 'm' };
+  } else {
+    parts = { left: mins.toString().padStart(2, '0'), right: secs.toString().padStart(2, '0'), suffixLeft: '', suffixRight: '' };
+  }
 
   return (
     <span
-      className="select-none"
+      className="select-none inline-flex items-center"
       style={{
-        fontFamily: '"NJNaruto", "Noto Serif JP", "ui-monospace", monospace',
+        fontFamily: 'var(--font-inter), Inter, system-ui, sans-serif',
         fontSize: '12px',
         fontWeight: 700,
-        letterSpacing: '0.08em',
+        letterSpacing: '0.04em',
         color: accentColor,
-        textShadow: `0 0 8px ${accentColor}55, 0 0 1px ${accentColor}33`,
+        backgroundColor: `${accentColor}14`,
+        border: `1px solid ${accentColor}33`,
+        borderRadius: '4px',
+        padding: '3px 8px',
+        gap: '2px',
         fontVariantNumeric: 'tabular-nums',
         whiteSpace: 'nowrap',
+        textShadow: `0 0 8px ${accentColor}33`,
       }}
     >
-      {label}
+      <span>{parts.left}</span>
+      {parts.suffixLeft && <span style={{ fontSize: '10px', opacity: 0.7, marginRight: '3px' }}>{parts.suffixLeft}</span>}
+      <span className="holo-clock-colon" style={{ marginInline: '1px' }}>:</span>
+      <span>{parts.right}</span>
+      {parts.suffixRight && <span style={{ fontSize: '10px', opacity: 0.7 }}>{parts.suffixRight}</span>}
     </span>
   );
 }
-
-const ACCENT: Record<TournamentMenuStatus, string> = {
-  none: '#c4a35a',
-  available: '#c4a35a',
-  registered: '#c4a35a',
-  needs_deck: '#b33e3e',
-  in_progress: '#3b82f6',
-};
 
 export function TournamentNavButton({ status, label, primary = false, delay = 0, nextStartAt }: Props) {
   const t = useTranslations('home');
@@ -112,6 +125,8 @@ export function TournamentNavButton({ status, label, primary = false, delay = 0,
       label={label}
       variant={variant}
       delay={delay}
+      innerClassName={isActive ? 'holo-menu-foil' : ''}
+      innerStyle={isActive ? { '--foil': accent } : undefined}
       rightSlot={
         showCountdown ? (
           <span aria-label={ariaLabel} title={ariaLabel}>
@@ -121,14 +136,19 @@ export function TournamentNavButton({ status, label, primary = false, delay = 0,
           <span
             aria-label={ariaLabel}
             title={ariaLabel}
-            className="select-none uppercase"
+            className="select-none inline-flex items-center"
             style={{
-              fontFamily: '"NJNaruto", "Noto Serif JP", serif',
+              fontFamily: 'var(--font-inter), Inter, system-ui, sans-serif',
               fontSize: '11px',
               fontWeight: 700,
               letterSpacing: '0.18em',
               color: accent,
-              textShadow: `0 0 8px ${accent}55`,
+              backgroundColor: `${accent}14`,
+              border: `1px solid ${accent}33`,
+              borderRadius: '4px',
+              padding: '3px 8px',
+              textTransform: 'uppercase',
+              textShadow: `0 0 8px ${accent}33`,
             }}
           >
             {t('tournamentBadgeInProgress')}
