@@ -5,26 +5,28 @@ import { Link } from '@/lib/i18n/navigation';
 import type { ReactNode } from 'react';
 
 /**
- * Home menu button — close to the original rectangular look, refined.
+ * Home menu button.
  *
- * Layout: a centered-title row with a thin left accent stripe.
- * Optional rightSlot for an indicator (kanji stamp on the tournament button).
+ * Idle: rectangular, thin border, centered title. No left stripe, no accent.
+ * Hover:
+ *   - background lifts slightly (very subtle).
+ *   - border tones to gold.
+ *   - a thin hand-drawn brush stroke draws across, just below the title baseline.
+ *   - the row glides 4px to the right.
  *
- * Idle: rectangular, thin border. Centered title in display weight.
- * Hover: border lightens to gold, slight scale (1.02), small slide right (3px).
- *        A 1px accent line draws under the title from left to right (subtle, no shimmer).
- *
- * No glow, no halo, no particles, no orbiting orbs.
+ * No glow, no halo, no particles, no pulse, no orbiting orbs, no sweep.
+ * The only true flourish lives on the tournament button (hanko stamp), and is
+ * animated once on first paint, then static.
  */
 
 export type MenuVariant = 'muted' | 'primary' | 'gold' | 'red' | 'blue';
 
-const VARIANT: Record<MenuVariant, { idleBorder: string; hoverBorder: string; accent: string; idleText: string; hoverText: string }> = {
-  muted:   { idleBorder: '#262626', hoverBorder: '#c4a35a', accent: '#c4a35a', idleText: '#e0e0e0', hoverText: '#c4a35a' },
-  primary: { idleBorder: '#c4a35a', hoverBorder: '#ffd966', accent: '#c4a35a', idleText: '#c4a35a', hoverText: '#ffd966' },
-  gold:    { idleBorder: '#c4a35a', hoverBorder: '#ffd966', accent: '#c4a35a', idleText: '#c4a35a', hoverText: '#ffd966' },
-  red:     { idleBorder: '#b33e3e', hoverBorder: '#ff6666', accent: '#b33e3e', idleText: '#cc6666', hoverText: '#ffaaaa' },
-  blue:    { idleBorder: '#3b82f6', hoverBorder: '#7eb6ff', accent: '#3b82f6', idleText: '#7eb6ff', hoverText: '#bfd9ff' },
+const VARIANT: Record<MenuVariant, { idleBorder: string; hoverBorder: string; ink: string; idleText: string; hoverText: string }> = {
+  muted:   { idleBorder: '#262626', hoverBorder: '#3a3a3a', ink: '#c4a35a', idleText: '#e0e0e0', hoverText: '#c4a35a' },
+  primary: { idleBorder: '#5a4520', hoverBorder: '#c4a35a', ink: '#c4a35a', idleText: '#c4a35a', hoverText: '#ffd966' },
+  gold:    { idleBorder: '#5a4520', hoverBorder: '#c4a35a', ink: '#c4a35a', idleText: '#c4a35a', hoverText: '#ffd966' },
+  red:     { idleBorder: '#5a2828', hoverBorder: '#b33e3e', ink: '#b33e3e', idleText: '#cc6666', hoverText: '#ffaaaa' },
+  blue:    { idleBorder: '#1f3a6a', hoverBorder: '#3b82f6', ink: '#3b82f6', idleText: '#7eb6ff', hoverText: '#bfd9ff' },
 };
 
 interface Props {
@@ -60,60 +62,49 @@ export function HomeMenuButton({
         }}
         onMouseEnter={(e) => {
           const t = e.currentTarget as HTMLElement;
-          t.style.transform = 'translateX(3px) scale(1.02)';
+          t.style.transform = 'translateX(4px)';
           t.style.borderColor = v.hoverBorder;
           t.style.color = v.hoverText;
-          t.style.backgroundColor = '#181818';
+          t.style.backgroundColor = '#191919';
           const path = t.querySelector('[data-menu-underline-path]') as SVGPathElement | null;
           if (path) path.style.strokeDashoffset = '0';
         }}
         onMouseLeave={(e) => {
           const t = e.currentTarget as HTMLElement;
-          t.style.transform = 'translateX(0) scale(1)';
+          t.style.transform = 'translateX(0)';
           t.style.borderColor = v.idleBorder;
           t.style.color = v.idleText;
           t.style.backgroundColor = '#141414';
           const path = t.querySelector('[data-menu-underline-path]') as SVGPathElement | null;
-          if (path) path.style.strokeDashoffset = '160';
+          if (path) path.style.strokeDashoffset = '180';
         }}
       >
-        {/* Left accent stripe (always present, color-coded by variant) */}
-        <span
-          aria-hidden
-          className="absolute left-0 top-0 h-full"
-          style={{
-            width: '3px',
-            backgroundColor: v.accent,
-          }}
-        />
-
         {/* Centered label */}
         <span className="relative z-10 px-4">{label}</span>
 
-        {/* Subtle ink line that draws under the label on hover */}
+        {/* Hand-painted brush stroke that draws under the label on hover. */}
         <svg
           aria-hidden
           className="pointer-events-none absolute"
-          width="160"
-          height="4"
-          viewBox="0 0 160 4"
+          width="180"
+          height="6"
+          viewBox="0 0 180 6"
           preserveAspectRatio="none"
-          style={{ bottom: '8px', left: '50%', transform: 'translateX(-50%)' }}
+          style={{ bottom: '7px', left: '50%', transform: 'translateX(-50%)' }}
         >
           <path
-            d="M 2 2 Q 40 1, 80 2 T 158 2"
-            stroke={v.accent}
-            strokeWidth="1"
+            d="M 4 3 Q 30 1, 60 3 Q 90 5, 120 3 Q 150 1, 176 3"
+            stroke={v.ink}
+            strokeWidth="1.2"
             strokeLinecap="round"
             fill="none"
-            strokeDasharray="160"
-            strokeDashoffset="160"
-            style={{ transition: 'stroke-dashoffset 0.45s ease-out' }}
+            strokeDasharray="180"
+            strokeDashoffset="180"
+            style={{ transition: 'stroke-dashoffset 0.55s ease-out' }}
             data-menu-underline-path
           />
         </svg>
 
-        {/* Right slot (status indicator, e.g. tournament hanko stamp) */}
         {rightSlot && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center">
             {rightSlot}
