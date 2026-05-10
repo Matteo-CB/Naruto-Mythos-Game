@@ -82,7 +82,7 @@ export function HomeMenuButton({
         <span className="relative z-10 px-4">{label}</span>
 
         {rightSlot && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center">
+          <span className="absolute z-10 flex items-center justify-center" style={{ top: '4px', right: '6px' }}>
             {rightSlot}
           </span>
         )}
