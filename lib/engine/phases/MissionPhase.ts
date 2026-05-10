@@ -169,9 +169,12 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
   let newState = { ...state, activeMissions: missions, log };
 
   if (winner && winner !== 'draw') {
-    const points = mission.basePoints + mission.rankBonus;
+    const basePts = Number.isFinite(mission.basePoints) ? mission.basePoints : 1;
+    const rankPts = Number.isFinite(mission.rankBonus) ? mission.rankBonus : 0;
+    const points = basePts + rankPts;
     const ps = { ...newState[winner] };
-    ps.missionPoints += points;
+    const prior = Number.isFinite(ps.missionPoints) ? ps.missionPoints : 0;
+    ps.missionPoints = prior + points;
 
     log = logAction(
       newState.log,

@@ -6780,7 +6780,8 @@ export class EffectEngine {
         }
 
         const r083Ps = { ...newState[r083Player] };
-        r083Ps.missionPoints = r083Ps.missionPoints + 1;
+        const r083Prior = Number.isFinite(r083Ps.missionPoints) ? r083Ps.missionPoints : 0;
+        r083Ps.missionPoints = r083Prior + 1;
         newState[r083Player] = r083Ps;
         newState.log = logAction(newState.log, newState.turn, newState.phase, r083Player,
           'SCORE_BONUS_POINT', 'Rasa (083): Another Sand Village character present - gained 1 bonus Mission point.',
@@ -11626,7 +11627,7 @@ export class EffectEngine {
           ...newState,
           [o138Player]: {
             ...newState[o138Player],
-            missionPoints: newState[o138Player].missionPoints + 2,
+            missionPoints: (Number.isFinite(newState[o138Player].missionPoints) ? newState[o138Player].missionPoints : 0) + 2,
           },
         };
         newState.log = logAction(newState.log, newState.turn, newState.phase, o138Player,

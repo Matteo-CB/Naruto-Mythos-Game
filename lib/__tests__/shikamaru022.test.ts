@@ -66,8 +66,9 @@ describe('Shikamaru 022 — AMBUSH no-target bug repro', () => {
       sourceCard: shikamaruHidden,
       sourcePlayer: 'player1',
       sourceMissionIndex: 0,
-      effectType: 'AMBUSH',
-      effectDescription: '',
+      triggerType: 'AMBUSH',
+      isUpgrade: false,
+      wasRevealed: true,
     });
 
     const pendingEffectsBefore = new Set(state.pendingEffects.map((p) => p.id));

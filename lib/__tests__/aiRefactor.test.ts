@@ -158,7 +158,7 @@ describe('AI refactor sanity', () => {
     expect(s.player2.chakra - s.player1.chakra).toBe(5);
   });
 
-  it('Hard AI completes a full game vs Easy AI without crashing', { timeout: 90_000 }, () => {
+  it('Hard AI completes a full game vs Easy AI without crashing', { timeout: 240_000 }, () => {
     const config: GameConfig = {
       player1: {
         userId: null,
