@@ -444,11 +444,7 @@ export class NeuralISMCTS {
 
   private heuristicValue(state: GameState, aiPlayer: PlayerID): number {
     const rawScore = BoardEvaluator.evaluate(state, aiPlayer);
-    
-    
-    
-    
-    return 1 / (1 + Math.exp(-rawScore / 80));
+    return 1 / (1 + Math.exp(-rawScore / 500));
   }
 
   
@@ -544,38 +540,24 @@ export class NeuralISMCTS {
   private pickBestAction(root: MCTSNode, validActions: GameAction[]): GameAction {
     let bestAction = validActions[0];
     let bestVisits = -1;
-    const hasNonPass = validActions.some(a => a.type !== 'PASS');
+    let bestValue = -Infinity;
 
     for (const action of validActions) {
       const key = actionKey(action);
       const child = root.children.get(key);
-      if (!child) continue;
+      if (!child || child.visits === 0) continue;
 
-      let effectiveVisits = child.visits;
-
-      
-      
-      
-      
-      if (action.type === 'PASS' && hasNonPass && child.visits > 0) {
-        if (child.value < 0.55) {
-          
-          effectiveVisits = Math.floor(child.visits * 0.5);
-        } else {
-          
-          effectiveVisits = Math.floor(child.visits * 0.7);
-        }
-      }
-
-      if (effectiveVisits > bestVisits) {
-        bestVisits = effectiveVisits;
+      if (
+        child.visits > bestVisits ||
+        (child.visits === bestVisits && child.value > bestValue)
+      ) {
+        bestVisits = child.visits;
+        bestValue = child.value;
         bestAction = action;
       }
     }
 
-    
     if (bestVisits <= 0 && validActions.length > 1) {
-      console.warn('[ISMCTS] Empty tree — all simulations failed. Using heuristic fallback.');
       return this.heuristicFallback(validActions);
     }
 
