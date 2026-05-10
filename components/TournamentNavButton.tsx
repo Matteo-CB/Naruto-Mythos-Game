@@ -1,10 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useId, useRef, useCallback } from 'react';
 import { HomeMenuButton } from './HomeMenuButton';
-import '@/styles/holo-menu.css';
 
 export type TournamentMenuStatus =
   | 'none'
@@ -18,112 +16,74 @@ interface Props {
   label: string;
   primary?: boolean;
   delay?: number;
+  /** ISO 8601 string of the closest upcoming tournament start, or null. */
+  nextStartAt?: string | null;
 }
 
-const STAMP: Record<TournamentMenuStatus, { kanji: string } | null> = {
-  none: null,
-  available:    { kanji: '開' },
-  registered:   { kanji: '入' },
-  needs_deck:   { kanji: '急' },
-  in_progress:  { kanji: '戦' },
-};
-
 /**
- * Hanko stamp painted in calligraphy on first appear.
- * The kanji uses the .holo-kanji class so its strokes shimmer through the rainbow foil.
+ * Beautiful and subtle countdown display.
+ *
+ * Format adapts to the remaining duration:
+ *   > 1 day   → "Xd Yh"
+ *   1h to 24h → "Xh Ym"
+ *   < 1 hour  → "MM:SS"
+ *   live (0)  → falls back to no render (handled outside)
+ *
+ * Visuals: NJNaruto display font, tabular-nums, soft drop-shadow in the
+ * status accent color. No animation other than the natural per-second tick.
  */
-function HankoStamp({ kanji, statusKey }: { kanji: string; statusKey: string }) {
-  const filterId = useId();
-  const maskId = useId();
-  const gradientId = useId();
+function TournamentCountdown({ targetIso, accentColor }: { targetIso: string; accentColor: string }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const target = new Date(targetIso).getTime();
+  const diff = Math.max(0, target - now);
+  if (diff === 0) return null;
+
+  const totalSec = Math.floor(diff / 1000);
+  const days = Math.floor(totalSec / 86400);
+  const hours = Math.floor((totalSec % 86400) / 3600);
+  const mins = Math.floor((totalSec % 3600) / 60);
+  const secs = totalSec % 60;
+
+  let label: string;
+  if (days > 0)        label = `${days}d ${hours}h`;
+  else if (hours > 0)  label = `${hours}h ${mins.toString().padStart(2, '0')}m`;
+  else                 label = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 
   return (
-    <motion.svg
-      key={statusKey}
-      width="28"
-      height="28"
-      viewBox="0 0 32 32"
-      initial={{ scale: 1.18, rotate: -12, opacity: 0 }}
-      animate={{ scale: 1, rotate: -7, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 280, damping: 24, delay: 0.1 }}
+    <span
       className="select-none"
-      style={{ overflow: 'visible' }}
+      style={{
+        fontFamily: '"NJNaruto", "Noto Serif JP", "ui-monospace", monospace',
+        fontSize: '12px',
+        fontWeight: 700,
+        letterSpacing: '0.08em',
+        color: accentColor,
+        textShadow: `0 0 8px ${accentColor}55, 0 0 1px ${accentColor}33`,
+        fontVariantNumeric: 'tabular-nums',
+        whiteSpace: 'nowrap',
+      }}
     >
-      <defs>
-        <filter id={filterId} x="-20%" y="-20%" width="140%" height="140%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" />
-          <feDisplacementMap in="SourceGraphic" scale="1.4" />
-        </filter>
-        <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%"   stopColor="#ff7773" />
-          <stop offset="20%"  stopColor="#ffed5f" />
-          <stop offset="40%"  stopColor="#a8ff5f" />
-          <stop offset="60%"  stopColor="#83fff7" />
-          <stop offset="80%"  stopColor="#7894ff" />
-          <stop offset="100%" stopColor="#d875ff" />
-        </linearGradient>
-        <mask id={maskId}>
-          <rect x="0" y="0" width="32" height="32" fill="black" />
-          <motion.rect
-            y="0"
-            width="40"
-            height="32"
-            fill="white"
-            initial={{ x: -34 }}
-            animate={{ x: 0 }}
-            transition={{ duration: 0.55, ease: [0.4, 0.0, 0.2, 1], delay: 0.45 }}
-          />
-        </mask>
-      </defs>
-      <g filter={`url(#${filterId})`}>
-        <motion.rect
-          x="4"
-          y="4"
-          width="24"
-          height="24"
-          fill={`url(#${gradientId})`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.18 }}
-          transition={{ duration: 0.4, delay: 0.5 }}
-        />
-        <motion.rect
-          x="2"
-          y="2"
-          width="28"
-          height="28"
-          fill="none"
-          stroke={`url(#${gradientId})`}
-          strokeWidth="2.4"
-          strokeDasharray="112"
-          initial={{ strokeDashoffset: 112 }}
-          animate={{ strokeDashoffset: 0 }}
-          transition={{ duration: 0.5, ease: 'easeOut', delay: 0.05 }}
-        />
-        <g mask={`url(#${maskId})`}>
-          <text
-            x="16"
-            y="22"
-            textAnchor="middle"
-            fontFamily='"NJNaruto", "Noto Serif JP", serif'
-            fontWeight="900"
-            fontSize="18"
-            fill={`url(#${gradientId})`}
-            style={{
-              filter: 'drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.5))',
-            }}
-          >
-            {kanji}
-          </text>
-        </g>
-      </g>
-    </motion.svg>
+      {label}
+    </span>
   );
 }
 
-export function TournamentNavButton({ status, label, primary = false, delay = 0 }: Props) {
+const ACCENT: Record<TournamentMenuStatus, string> = {
+  none: '#c4a35a',
+  available: '#c4a35a',
+  registered: '#c4a35a',
+  needs_deck: '#b33e3e',
+  in_progress: '#3b82f6',
+};
+
+export function TournamentNavButton({ status, label, primary = false, delay = 0, nextStartAt }: Props) {
   const t = useTranslations('home');
-  const stamp = STAMP[status];
-  const isActive = stamp !== null;
+  const isActive = status !== 'none';
 
   const variant = (() => {
     if (status === 'in_progress') return 'blue';
@@ -132,7 +92,7 @@ export function TournamentNavButton({ status, label, primary = false, delay = 0 
     return primary ? 'primary' : 'muted';
   })() as Parameters<typeof HomeMenuButton>[0]['variant'];
 
-  const stampLabel: string | undefined = (() => {
+  const ariaLabel: string | undefined = (() => {
     switch (status) {
       case 'available':   return t('tournamentBadgeAvailable');
       case 'registered':  return t('tournamentBadgeRegistered');
@@ -142,28 +102,9 @@ export function TournamentNavButton({ status, label, primary = false, delay = 0 
     }
   })();
 
-  // Track the cursor over the button so the foil iridescence shifts
-  // with the mouse position (CSS vars --posx and --posy are read by
-  // the holographic gradient overlay defined in styles/holo-menu.css).
-  const rafRef = useRef<number | null>(null);
-  const handleMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    if (!isActive) return;
-    const target = e.currentTarget as HTMLElement;
-    const rect = target.getBoundingClientRect();
-    const px = ((e.clientX - rect.left) / rect.width) * 100;
-    const py = ((e.clientY - rect.top) / rect.height) * 100;
-    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => {
-      target.style.setProperty('--posx', `${px}%`);
-      target.style.setProperty('--posy', `${py}%`);
-    });
-  }, [isActive]);
-  const handleLeave = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    if (!isActive) return;
-    const target = e.currentTarget as HTMLElement;
-    target.style.setProperty('--posx', '50%');
-    target.style.setProperty('--posy', '50%');
-  }, [isActive]);
+  const accent = ACCENT[status];
+  const showCountdown = isActive && status !== 'in_progress' && !!nextStartAt;
+  const showLive = status === 'in_progress';
 
   return (
     <HomeMenuButton
@@ -171,14 +112,26 @@ export function TournamentNavButton({ status, label, primary = false, delay = 0 
       label={label}
       variant={variant}
       delay={delay}
-      innerClassName={isActive ? 'holo-menu-foil' : ''}
-      innerData={{ 'data-foil': isActive ? 'on' : undefined }}
-      onMouseMoveExtra={handleMove}
-      onMouseLeaveExtra={handleLeave}
       rightSlot={
-        stamp ? (
-          <span aria-label={stampLabel} title={stampLabel}>
-            <HankoStamp kanji={stamp.kanji} statusKey={status} />
+        showCountdown ? (
+          <span aria-label={ariaLabel} title={ariaLabel}>
+            <TournamentCountdown targetIso={nextStartAt!} accentColor={accent} />
+          </span>
+        ) : showLive ? (
+          <span
+            aria-label={ariaLabel}
+            title={ariaLabel}
+            className="select-none uppercase"
+            style={{
+              fontFamily: '"NJNaruto", "Noto Serif JP", serif',
+              fontSize: '11px',
+              fontWeight: 700,
+              letterSpacing: '0.18em',
+              color: accent,
+              textShadow: `0 0 8px ${accent}55`,
+            }}
+          >
+            {t('tournamentBadgeInProgress')}
           </span>
         ) : undefined
       }

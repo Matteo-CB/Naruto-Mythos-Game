@@ -7,13 +7,10 @@ import type { ReactNode } from 'react';
 /**
  * Home menu button.
  *
- * Idle: rectangular, thin border, centered title. No left stripe, no underline.
+ * Idle: rectangular, thin border, centered title.
  * Hover: subtle bg lift + border tones up + 4px slide right.
  *
- * No glow, no halo, no particles, no pulse, no orbiting orbs, no underline draw.
- * The only flourish lives on the tournament button (holographic foil), wired by
- * passing extra classes/handlers through `wrapperClass`, `wrapperData`, and
- * `wrapperOnMouseMove`.
+ * No glow, no halo, no particles, no pulse, no underline draw, no foil overlay.
  */
 
 export type MenuVariant = 'muted' | 'primary' | 'gold' | 'red' | 'blue';
@@ -32,14 +29,6 @@ interface Props {
   variant?: MenuVariant;
   delay?: number;
   rightSlot?: ReactNode;
-  /** Extra classes applied to the inner Link (use to opt-in to holo foil etc.) */
-  innerClassName?: string;
-  /** Extra data-* attributes applied to the inner Link */
-  innerData?: Record<string, string | undefined>;
-  /** Extra mouse-move handler used by holo foil to track cursor position */
-  onMouseMoveExtra?: (e: React.MouseEvent<HTMLElement>) => void;
-  /** Extra mouse-leave handler */
-  onMouseLeaveExtra?: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
 export function HomeMenuButton({
@@ -48,10 +37,6 @@ export function HomeMenuButton({
   variant = 'muted',
   delay = 0,
   rightSlot,
-  innerClassName = '',
-  innerData = {},
-  onMouseMoveExtra,
-  onMouseLeaveExtra,
 }: Props) {
   const v = VARIANT[variant];
 
@@ -63,13 +48,12 @@ export function HomeMenuButton({
     >
       <Link
         href={href as Parameters<typeof Link>[0]['href']}
-        className={`relative flex h-10 items-center justify-center text-sm font-semibold tracking-wide overflow-hidden transition-[transform,border-color,color,background-color] duration-200 sm:h-12 sm:text-base ${innerClassName}`}
+        className="relative flex h-10 items-center justify-center text-sm font-semibold tracking-wide transition-[transform,border-color,color,background-color] duration-200 sm:h-12 sm:text-base"
         style={{
           backgroundColor: '#141414',
           border: `1px solid ${v.idleBorder}`,
           color: v.idleText,
         }}
-        {...Object.fromEntries(Object.entries(innerData).filter(([, val]) => val !== undefined))}
         onMouseEnter={(e) => {
           const t = e.currentTarget as HTMLElement;
           t.style.transform = 'translateX(4px)';
@@ -83,9 +67,7 @@ export function HomeMenuButton({
           t.style.borderColor = v.idleBorder;
           t.style.color = v.idleText;
           t.style.backgroundColor = '#141414';
-          onMouseLeaveExtra?.(e);
         }}
-        onMouseMove={onMouseMoveExtra}
       >
         <span className="relative z-10 px-4">{label}</span>
 

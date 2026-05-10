@@ -10,7 +10,7 @@ export async function GET() {
 
   const userId = session.user.id;
 
-  const [user, myParticipations, openTournamentCount] = await Promise.all([
+  const [user, myParticipations, openTournamentCount, nextUpcoming] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: { role: true },
@@ -30,6 +30,18 @@ export async function GET() {
     }),
     prisma.tournament.count({
       where: { status: 'registration', isPublic: true },
+    }),
+    prisma.tournament.findFirst({
+      where: {
+        status: 'registration',
+        scheduledStartAt: { not: null, gt: new Date() },
+        OR: [
+          { isPublic: true },
+          { participants: { some: { userId } } },
+        ],
+      },
+      orderBy: { scheduledStartAt: 'asc' },
+      select: { scheduledStartAt: true },
     }),
   ]);
 
@@ -61,5 +73,6 @@ export async function GET() {
     tournamentNeedsDeck,
     tournamentAvailable,
     openTournamentCount,
+    nextTournamentStartAt: nextUpcoming?.scheduledStartAt?.toISOString() ?? null,
   });
 }

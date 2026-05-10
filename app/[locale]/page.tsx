@@ -112,6 +112,7 @@ export default function Home() {
   const [tournamentStatus, setTournamentStatus] = useState<'none' | 'registration' | 'in_progress'>('none');
   const [tournamentNeedsDeck, setTournamentNeedsDeck] = useState(false);
   const [tournamentAvailable, setTournamentAvailable] = useState(false);
+  const [nextTournamentStartAt, setNextTournamentStartAt] = useState<string | null>(null);
   const [meRefresh, setMeRefresh] = useState(0);
 
   useEffect(() => {
@@ -125,6 +126,7 @@ export default function Home() {
         setTournamentStatus(data.tournamentStatus ?? 'none');
         setTournamentNeedsDeck(!!data.tournamentNeedsDeck);
         setTournamentAvailable(!!data.tournamentAvailable);
+        setNextTournamentStartAt(typeof data.nextTournamentStartAt === 'string' ? data.nextTournamentStartAt : null);
       })
       .catch(() => {});
     return () => { cancelled = true; };
@@ -226,6 +228,7 @@ export default function Home() {
                       label={t(btn.key)}
                       primary={btn.primary}
                       delay={0.8 + i * 0.06}
+                      nextStartAt={nextTournamentStartAt}
                     />
                   );
                 }
