@@ -83,13 +83,14 @@ export function HomeMenuButton({
         <span className="relative z-10 px-4">{label}</span>
       </Link>
 
-      {/* Right slot lives OUTSIDE the Link so it can poke above the button's
+      {/* Right slot lives OUTSIDE the Link so it can poke past the button's
           top-right corner like a real notification badge, without being clipped
-          by the Link's overflow-hidden (used to contain the holo sheen). */}
+          by the Link's overflow-hidden (used to contain the holo sheen).
+          Negative top + right makes it protrude both up and to the right. */}
       {rightSlot && (
         <span
           className="absolute z-20 pointer-events-none"
-          style={{ top: '-10px', right: '6px' }}
+          style={{ top: '-10px', right: '-8px' }}
         >
           {rightSlot}
         </span>

@@ -88,21 +88,22 @@ function TournamentCountdown({ targetIso, accentColor }: { targetIso: string; ac
         fontWeight: 700,
         letterSpacing: '0.02em',
         color: accentColor,
-        backgroundColor: `${accentColor}14`,
-        border: `1px solid ${accentColor}33`,
+        backgroundColor: '#0a0a0a',
+        border: `1px solid ${accentColor}`,
         borderRadius: '4px',
-        padding: '3px 9px',
+        padding: '4px 10px',
         gap: '7px',
         minWidth: '92px',
         fontVariantNumeric: 'tabular-nums',
         whiteSpace: 'nowrap',
-        textShadow: `0 0 8px ${accentColor}33`,
+        textShadow: `0 0 8px ${accentColor}55`,
+        boxShadow: `0 4px 12px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 14px ${accentColor}33`,
       }}
     >
       {units.map((u, i) => (
         <span key={i} style={{ display: 'inline-flex', alignItems: 'baseline', gap: '1px' }}>
           <span>{u.value}</span>
-          <span style={{ fontSize: '9px', opacity: 0.65, fontWeight: 600 }}>{u.suffix}</span>
+          <span style={{ fontSize: '9px', opacity: 0.7, fontWeight: 600 }}>{u.suffix}</span>
         </span>
       ))}
     </span>
@@ -158,12 +159,13 @@ export function TournamentNavButton({ status, label, primary = false, delay = 0,
               fontWeight: 700,
               letterSpacing: '0.18em',
               color: accent,
-              backgroundColor: `${accent}14`,
-              border: `1px solid ${accent}33`,
+              backgroundColor: '#0a0a0a',
+              border: `1px solid ${accent}`,
               borderRadius: '4px',
-              padding: '3px 8px',
+              padding: '4px 10px',
               textTransform: 'uppercase',
-              textShadow: `0 0 8px ${accent}33`,
+              textShadow: `0 0 8px ${accent}55`,
+              boxShadow: `0 4px 12px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 14px ${accent}33`,
             }}
           >
             {t('tournamentBadgeInProgress')}
