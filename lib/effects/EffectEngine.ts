@@ -657,6 +657,35 @@ export class EffectEngine {
     const preDispatchPendingIds = new Set(state.pendingEffects.map((pe) => pe.id));
     const parentWasOptional = !!(pendingEffect.rootOptional || pendingEffect.isOptional);
 
+
+
+
+
+
+
+
+
+
+    const fingerprintPermanentState = (s: GameState): string => {
+      const charSummary = s.activeMissions
+        .map((m) =>
+          [...m.player1Characters, ...m.player2Characters]
+            .map((c) => `${c.instanceId}:${c.isHidden ? 1 : 0}:${c.powerTokens ?? 0}:${c.stack?.length ?? 0}`)
+            .join(','),
+        )
+        .join('|');
+      const handIds = `${s.player1.hand.map((c) => c.id).join(',')}#${s.player2.hand.map((c) => c.id).join(',')}`;
+      return [
+        s.player1.chakra, s.player2.chakra,
+        s.player1.deck.length, s.player2.deck.length,
+        s.player1.discardPile.length, s.player2.discardPile.length,
+        s.player1.missionPoints, s.player2.missionPoints,
+        handIds,
+        charSummary,
+      ].join('|');
+    };
+    const stateFingerprintBefore = parentWasOptional ? fingerprintPermanentState(state) : '';
+
     
     
     const isMultiSelectType = pendingEffect.targetSelectionType === 'KIBA026_UPGRADE_CHOOSE'
@@ -14944,10 +14973,22 @@ export class EffectEngine {
     
     
     if (parentWasOptional) {
+
+      const stateFingerprintAfter = fingerprintPermanentState(newState);
+      const stateMutated = stateFingerprintBefore !== stateFingerprintAfter;
+
       for (const pe of newState.pendingEffects) {
         if (!preDispatchPendingIds.has(pe.id) && pe.id !== pendingEffect.id) {
-          if (pe.isMandatory) continue;
+
+          if (pe.isMandatory && stateMutated) continue;
+
+
           pe.rootOptional = true;
+
+
+          if (pe.isMandatory && !stateMutated) {
+            pe.isMandatory = false;
+          }
         }
       }
     }

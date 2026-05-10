@@ -6,6 +6,7 @@
       "title_en": "Customization page, account deletion, tournament alert and fixes",
       "changes_fr": [
         "Sakura Haruno (012) : la défausse obligatoire après la pioche ne peut plus être ignorée.",
+        "Sur tous les effets optionnels, après avoir cliqué sur Activer tu peux encore revenir en arrière tant que rien d'irréversible n'a eu lieu (avant, certaines cartes comme Temari (121) bloquaient le retour).",
         "Tu peux maintenant minimiser les fenêtres en partie pour voir le terrain (mulligan, ordre des cibles, écran de fin de partie).",
         "Bouton Supprimer mon compte ajouté dans Personnalisation, avec confirmation par phrase à taper.",
         "Le bouton Tournois affiche un compte à rebours élégant jusqu'au début du prochain tournoi.",
@@ -15,6 +16,7 @@
       ],
       "changes_en": [
         "Sakura Haruno (012): the mandatory discard after drawing can no longer be skipped.",
+        "On any optional effect, after clicking Activate you can still back out as long as nothing irreversible has happened (cards like Temari (121) used to lock you in).",
         "You can now minimize in-game popups to see the board (mulligan, target order, end-of-game screen).",
         "Delete-my-account button added in Customization, with a phrase to type for confirmation.",
         "The Tournaments button shows an elegant countdown until the next tournament begins.",
