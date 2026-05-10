@@ -11,6 +11,7 @@ import { HoloCard } from '@/components/HoloCard';
 import { Footer } from '@/components/Footer';
 import { CloudBackground } from '@/components/CloudBackground';
 import { TournamentNavButton, type TournamentMenuStatus } from '@/components/TournamentNavButton';
+import { HomeMenuButton } from '@/components/HomeMenuButton';
 
 
 const FEATURED_CARDS = [
@@ -229,88 +230,22 @@ export default function Home() {
                   );
                 }
                 return (
-                  <motion.div
+                  <HomeMenuButton
                     key={btn.key}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      duration: 0.3,
-                      delay: 0.8 + i * 0.06,
-                      ease: 'easeOut',
-                    }}
-                  >
-                    <Link
-                      href={btn.href}
-                      className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
-                      style={{
-                        backgroundColor: '#141414',
-                        border: btn.primary ? '1px solid #c4a35a' : '1px solid #262626',
-                        color: btn.primary ? '#c4a35a' : '#e0e0e0',
-                      }}
-                      onMouseEnter={(e) => {
-                        const target = e.currentTarget as HTMLElement;
-                        target.style.transform = 'scale(1.03)';
-                        target.style.borderColor = '#c4a35a';
-                        target.style.boxShadow = '0 0 20px rgba(196, 163, 90, 0.15)';
-                        target.style.color = '#c4a35a';
-                        target.style.backgroundColor = '#1a1a1a';
-                      }}
-                      onMouseLeave={(e) => {
-                        const target = e.currentTarget as HTMLElement;
-                        target.style.transform = 'scale(1)';
-                        target.style.borderColor = btn.primary ? '#c4a35a' : '#262626';
-                        target.style.boxShadow = 'none';
-                        target.style.color = btn.primary ? '#c4a35a' : '#e0e0e0';
-                        target.style.backgroundColor = '#141414';
-                      }}
-                    >
-                      <span
-                        className="absolute left-0 top-0 h-full w-1 transition-all"
-                        style={{ backgroundColor: btn.primary ? '#c4a35a' : 'transparent' }}
-                      />
-                      {t(btn.key)}
-                    </Link>
-                  </motion.div>
+                    href={btn.href}
+                    label={t(btn.key)}
+                    variant={btn.primary ? 'primary' : 'muted'}
+                    delay={0.8 + i * 0.06}
+                  />
                 );
               })}
-              
-              {(
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: 1.3, ease: 'easeOut' }}
-                >
-                  <Link
-                    href="/play/sealed"
-                    className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
-                    style={{
-                      backgroundColor: '#141414',
-                      border: '1px solid #c4a35a',
-                      color: '#c4a35a',
-                    }}
-                    onMouseEnter={(e) => {
-                      const target = e.currentTarget as HTMLElement;
-                      target.style.transform = 'scale(1.03)';
-                      target.style.borderColor = '#c4a35a';
-                      target.style.boxShadow = '0 0 20px rgba(196, 163, 90, 0.15)';
-                      target.style.backgroundColor = '#1a1a1a';
-                    }}
-                    onMouseLeave={(e) => {
-                      const target = e.currentTarget as HTMLElement;
-                      target.style.transform = 'scale(1)';
-                      target.style.borderColor = '#c4a35a';
-                      target.style.boxShadow = 'none';
-                      target.style.backgroundColor = '#141414';
-                    }}
-                  >
-                    <span
-                      className="absolute left-0 top-0 h-full w-1"
-                      style={{ backgroundColor: '#c4a35a' }}
-                    />
-                    {t('sealed')}
-                  </Link>
-                </motion.div>
-              )}
+
+              <HomeMenuButton
+                href="/play/sealed"
+                label={t('sealed')}
+                variant="primary"
+                delay={1.3}
+              />
             </motion.nav>
 
             

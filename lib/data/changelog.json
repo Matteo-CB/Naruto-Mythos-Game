@@ -2,19 +2,19 @@
   "entries": [
     {
       "date": "2026-05-11",
-      "title_fr": "Sakura 012 + popups minimisables + suppression de compte + bouton tournoi animé",
-      "title_en": "Sakura 012 + minimizable popups + account deletion + animated tournament button",
+      "title_fr": "Sakura 012 + popups minimisables + suppression de compte + menu refondu",
+      "title_en": "Sakura 012 + minimizable popups + account deletion + redesigned home menu",
       "changes_fr": [
         "Bug Sakura 012 UPGRADE corrigé : la défausse mandatoire ne peut plus être skippée. Le flag rootOptional du choix initial 'piocher' n'écrase plus isMandatory du sous-effet de défausse.",
         "Popups en partie minimisables pour revoir le terrain : mulligan (les 2 branches), ordre des cibles (TargetOrderPopup), écran de fin de partie (avec son propre state gameEndMinimized).",
         "Nouveau bouton 'Supprimer mon compte' dans /settings, avec confirmation par phrase tapée. Cascade complète (decks, ELO history, deck stats, amitiés, invitations, quiz, bans, chat, tournois, rooms, comptes OAuth, parties anonymisées). Rate-limit 3/h, comptes admin bloqués.",
-        "Bouton Tournois du menu d'accueil refait : 4 états distincts (open / inscrit / deck requis / en cours) avec animation originale (sweep conic-gradient rotatif, 6 embers en orbite, halo radial pulsant, gleam diagonal qui traverse, badge top-right qui ping). Surtout, /api/user/me détecte enfin les tournois publics ouverts auxquels tu n'es pas encore inscrit (avant : si tu créais un tournoi en admin, le menu n'affichait rien tant que personne ne s'inscrivait). Refresh auto au focus de la fenêtre + polling 60s."
+        "Menu d'accueil refondu : style sumi-e japonais authentique. Chaque entrée a un trait de pinceau noir/doré comme bord gauche (SVG path irrégulier avec mouchetures d'encre), des lignes de vitesse manga qui apparaissent au survol (3 traits diagonaux staggered), et plus de bordure rectangulaire ni d'effet brillant. Pour les Tournois : indicateur de statut sous forme de tampon hanko (un kanji rouge/doré/bleu légèrement incliné) — 開 (ouvert), 入 (inscrit), 急 (deck requis), 戦 (en cours). Aucune particule, aucun halo. /api/user/me détecte enfin les tournois publics ouverts auxquels tu n'es pas encore inscrit (avant : si tu créais un tournoi en admin, le menu n'affichait rien tant que personne ne s'inscrivait). Refresh auto au focus + polling 60s."
       ],
       "changes_en": [
         "Sakura 012 UPGRADE bug fixed: the mandatory discard can no longer be skipped. The rootOptional flag from the initial 'draw' choice no longer overrides isMandatory on the discard sub-effect.",
         "In-game popups minimizable so you can review the board: mulligan (both branches), target order popup, end-of-game screen (with its own gameEndMinimized state).",
         "New 'Delete my account' button in /settings with typed-phrase confirmation. Full cascade (decks, ELO history, deck stats, friendships, invites, quiz scores, bans, chat, tournaments, rooms, OAuth accounts, games anonymized). Rate-limited 3/h, admin accounts blocked.",
-        "Home menu Tournament button redesigned: 4 distinct states (open / registered / deck needed / in progress) with original animation (rotating conic-gradient sweep, 6 orbiting embers, pulsing radial halo, diagonal gleam crossing the button, top-right ping badge). More importantly, /api/user/me now detects open public tournaments the user hasn't joined yet (before: when an admin opened a tournament, the menu showed nothing until someone joined). Auto-refresh on window focus + 60s polling."
+        "Home menu fully redesigned in an authentic sumi-e Japanese style. Each entry has a black/gold ink-brush left edge (irregular SVG path with ink flecks), manga speed lines that fan in on hover (3 diagonal staggered strokes), no rectangular border, no glow effect. For Tournaments: status indicator is now a hanko (Japanese signature stamp) — a single slightly tilted kanji: 開 (open), 入 (registered), 急 (deck needed), 戦 (battle/in progress). No particles, no halo. /api/user/me now detects open public tournaments the user hasn't joined yet (before: when an admin opened a tournament, the menu showed nothing until someone joined). Auto-refresh on window focus + 60s polling."
       ]
     },
     {
