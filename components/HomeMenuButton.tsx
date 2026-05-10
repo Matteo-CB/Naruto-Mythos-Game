@@ -5,142 +5,222 @@ import { Link } from '@/lib/i18n/navigation';
 import type { ReactNode } from 'react';
 
 /**
- * Each variant gives the brushstroke + speed lines + accent text a different ink color.
+ * Home menu button — editorial "mission dossier" style.
+ *
+ * Layout: a 3-zone row.
+ *   ┌────┬─────────────────────────────────┬───────┐
+ *   │ Nº │  TITLE (display)                │ slot  │
+ *   │    │  caption (one informative line) │       │
+ *   └────┴─────────────────────────────────┴───────┘
+ *
+ * Idle: borderless, sits flush with the column. Caption muted.
+ * Hover: a brush-ink underline draws under the title from left to right
+ *        (SVG path with stroke-dashoffset transition), the caption brightens,
+ *        the row shifts 4px to the right.
+ *
+ * No border, no glow, no particles.
  */
+
 export type MenuVariant = 'muted' | 'primary' | 'gold' | 'red' | 'blue';
 
-const VARIANT_COLORS: Record<MenuVariant, { ink: string; text: string; textHover: string; accent: string }> = {
-  muted:   { ink: '#262626', text: '#e0e0e0', textHover: '#c4a35a', accent: '#c4a35a' },
-  primary: { ink: '#c4a35a', text: '#c4a35a', textHover: '#ffd966', accent: '#c4a35a' },
-  gold:    { ink: '#c4a35a', text: '#c4a35a', textHover: '#ffd966', accent: '#c4a35a' },
-  red:     { ink: '#b33e3e', text: '#cc6666', textHover: '#ffaaaa', accent: '#b33e3e' },
-  blue:    { ink: '#3b82f6', text: '#7eb6ff', textHover: '#bfd9ff', accent: '#3b82f6' },
+const VARIANT: Record<MenuVariant, { ink: string; title: string; titleHover: string; caption: string; captionHover: string; numberInk: string }> = {
+  muted:   { ink: '#c4a35a', title: '#e0e0e0', titleHover: '#ffffff', caption: '#666666', captionHover: '#a0a0a0', numberInk: '#444444' },
+  primary: { ink: '#c4a35a', title: '#c4a35a', titleHover: '#ffd966', caption: '#7a6438', captionHover: '#c4a35a', numberInk: '#7a6438' },
+  gold:    { ink: '#c4a35a', title: '#c4a35a', titleHover: '#ffd966', caption: '#7a6438', captionHover: '#c4a35a', numberInk: '#7a6438' },
+  red:     { ink: '#b33e3e', title: '#cc6666', titleHover: '#ffaaaa', caption: '#7a3838', captionHover: '#cc6666', numberInk: '#7a3838' },
+  blue:    { ink: '#3b82f6', title: '#7eb6ff', titleHover: '#bfd9ff', caption: '#3a5a8a', captionHover: '#7eb6ff', numberInk: '#3a5a8a' },
 };
+
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
 
 interface Props {
   href: string;
+  index: number;
   label: string;
+  caption: string;
   variant?: MenuVariant;
   delay?: number;
-  /** Optional rendered slot at the right edge — e.g. a kanji hanko stamp. Static, no animation expected. */
+  /** Optional rendered slot at the right edge — e.g. a kanji hanko stamp or a rank chip. */
   rightSlot?: ReactNode;
+  /** When true the button uses an "active" treatment: the index gets a vermillion fill block. */
+  active?: boolean;
 }
 
 /**
- * Sumi-e style brushstroke as the left edge of the button.
- * The path is intentionally irregular — heavier in the middle, with a small split
- * near the bottom, mimicking how a real ink brush leaves the paper.
+ * Brush-ink underline that appears beneath the title on hover.
+ * Drawn as an SVG path, animated via stroke-dashoffset.
  */
-function BrushEdge({ color }: { color: string }) {
+function BrushUnderline({ color }: { color: string }) {
   return (
     <svg
       aria-hidden
-      viewBox="0 0 12 60"
+      className="pointer-events-none absolute -bottom-0.5 left-0"
+      width="100%"
+      height="6"
+      viewBox="0 0 200 6"
       preserveAspectRatio="none"
-      className="absolute left-0 top-0 h-full pointer-events-none"
-      style={{ width: '12px' }}
+      style={{ opacity: 0, transition: 'opacity 0.3s' }}
+      data-brush-underline
     >
       <path
-        d="
-          M 5 1
-          C 7 8, 4 14, 8 22
-          C 10 30, 6 36, 9 44
-          C 11 50, 7 54, 8 59
-          L 0 59
-          L 0 1
-          Z
-        "
-        fill={color}
+        d="M 0 3 Q 30 1, 60 3 T 120 3 T 200 2"
+        stroke={color}
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        fill="none"
+        strokeDasharray="220"
+        strokeDashoffset="220"
+        style={{ transition: 'stroke-dashoffset 0.5s ease-out' }}
+        data-brush-path
       />
-      {/* Tiny ink fleck below the main stroke, for a hand-painted feel */}
-      <ellipse cx="3" cy="56" rx="1.5" ry="0.6" fill={color} opacity="0.55" />
-      <ellipse cx="6" cy="58" rx="0.8" ry="0.4" fill={color} opacity="0.4" />
     </svg>
-  );
-}
-
-/**
- * Manga speed lines that appear on hover. Three angled, staggered strokes on the right side.
- * Subtle. Each line draws itself from right to left.
- */
-function SpeedLines({ color }: { color: string }) {
-  return (
-    <span
-      aria-hidden
-      className="pointer-events-none absolute inset-y-0 right-0 overflow-hidden"
-      style={{ width: '40%' }}
-    >
-      {[0, 1, 2].map((i) => (
-        <motion.span
-          key={i}
-          className="absolute"
-          style={{
-            right: '6%',
-            top: `${28 + i * 22}%`,
-            width: '60%',
-            height: '1px',
-            background: `linear-gradient(to left, ${color}, transparent)`,
-            transformOrigin: 'right center',
-            transform: 'skewX(-18deg)',
-          }}
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={{ scaleX: 1, opacity: 1 }}
-          transition={{ duration: 0.22, delay: i * 0.05, ease: 'easeOut' }}
-        />
-      ))}
-    </span>
   );
 }
 
 export function HomeMenuButton({
   href,
+  index,
   label,
+  caption,
   variant = 'muted',
   delay = 0,
   rightSlot,
+  active = false,
 }: Props) {
-  const colors = VARIANT_COLORS[variant];
+  const v = VARIANT[variant];
+  const numeral = ROMAN[index] ?? String(index + 1);
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
+      initial={{ opacity: 0, x: -16 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3, delay, ease: 'easeOut' }}
+      transition={{ duration: 0.35, delay, ease: [0.22, 0.61, 0.36, 1] }}
     >
       <Link
         href={href as Parameters<typeof Link>[0]['href']}
-        className="group relative flex h-10 items-center justify-start text-sm font-semibold tracking-wide transition-colors sm:h-12 sm:text-base"
+        className="group relative flex items-center gap-4 px-1 py-3 transition-[transform,background-color] duration-200 sm:gap-5 sm:py-3.5"
         style={{
-          backgroundColor: '#141414',
-          color: colors.text,
-          paddingLeft: '24px',
-          paddingRight: rightSlot ? '52px' : '20px',
-          // No border. The brushstroke serves as the visual anchor.
-          borderTop: '1px solid transparent',
-          borderBottom: '1px solid #1a1a1a',
+          backgroundColor: 'transparent',
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.color = colors.textHover;
-          (e.currentTarget as HTMLElement).style.backgroundColor = '#181818';
+          const root = e.currentTarget as HTMLElement;
+          root.style.transform = 'translateX(4px)';
+          // brush underline reveal
+          const svg = root.querySelector('[data-brush-underline]') as SVGElement | null;
+          const path = root.querySelector('[data-brush-path]') as SVGPathElement | null;
+          if (svg) svg.style.opacity = '1';
+          if (path) path.style.strokeDashoffset = '0';
         }}
         onMouseLeave={(e) => {
-          (e.currentTarget as HTMLElement).style.color = colors.text;
-          (e.currentTarget as HTMLElement).style.backgroundColor = '#141414';
+          const root = e.currentTarget as HTMLElement;
+          root.style.transform = 'translateX(0)';
+          const svg = root.querySelector('[data-brush-underline]') as SVGElement | null;
+          const path = root.querySelector('[data-brush-path]') as SVGPathElement | null;
+          if (svg) svg.style.opacity = '0';
+          if (path) path.style.strokeDashoffset = '220';
         }}
       >
-        <BrushEdge color={colors.ink} />
-
-        {/* Speed lines: only render on group-hover — wrapped in a CSS-only display gate */}
-        <span className="hidden group-hover:inline">
-          <SpeedLines color={colors.accent} />
+        {/* Numeral column — small Roman numeral as a low-key index */}
+        <span
+          aria-hidden
+          className="flex flex-col items-center justify-center shrink-0 select-none"
+          style={{
+            width: '28px',
+            color: active ? v.ink : v.numberInk,
+            fontFamily: '"NJNaruto", "Noto Serif JP", serif',
+            fontSize: '14px',
+            fontWeight: 700,
+            letterSpacing: '0.05em',
+            lineHeight: 1,
+            transition: 'color 0.2s',
+          }}
+        >
+          {/* Vermillion block behind the numeral when active — looks like a printer's mark */}
+          {active && (
+            <span
+              aria-hidden
+              className="absolute"
+              style={{
+                width: '3px',
+                height: '32px',
+                backgroundColor: v.ink,
+                left: '0px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+              }}
+            />
+          )}
+          {numeral}
         </span>
 
-        <span className="relative z-10">{label}</span>
+        {/* Title + caption — main column */}
+        <span className="flex flex-col items-start min-w-0 flex-1 relative">
+          <span
+            className="relative font-semibold tracking-wide"
+            style={{
+              color: v.title,
+              fontSize: '14px',
+              lineHeight: 1.2,
+              transition: 'color 0.2s',
+            }}
+            data-title
+          >
+            <span className="block sm:hidden">{label}</span>
+            <span className="hidden sm:block" style={{ fontSize: '15px' }}>{label}</span>
+            <BrushUnderline color={v.ink} />
+          </span>
+          <span
+            className="text-[10px] tracking-wider uppercase mt-1 truncate w-full"
+            style={{
+              color: v.caption,
+              letterSpacing: '0.14em',
+              transition: 'color 0.2s',
+            }}
+            data-caption
+          >
+            {caption}
+          </span>
+        </span>
 
+        {/* Right slot — stamp / chip */}
         {rightSlot && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 z-10">{rightSlot}</span>
+          <span className="shrink-0 flex items-center justify-center" style={{ minWidth: '34px' }}>
+            {rightSlot}
+          </span>
         )}
+
+        {/* Inner hover state for caption + title using CSS pseudo (handled via group hover) */}
+        <style jsx>{`
+          .group:hover [data-title] { color: ${v.titleHover}; }
+          .group:hover [data-caption] { color: ${v.captionHover}; }
+        `}</style>
       </Link>
     </motion.div>
+  );
+}
+
+/**
+ * Subtle hairline divider with a small brush-ink dot in the middle.
+ * Used between menu entries to give the column an editorial rhythm.
+ */
+export function MenuHairline() {
+  return (
+    <div
+      aria-hidden
+      className="relative w-full"
+      style={{ height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.04)' }}
+    >
+      <span
+        className="absolute"
+        style={{
+          left: '50%',
+          top: '50%',
+          width: '4px',
+          height: '4px',
+          transform: 'translate(-50%, -50%) rotate(45deg)',
+          backgroundColor: 'rgba(196, 163, 90, 0.18)',
+        }}
+      />
+    </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { useId } from 'react';
 import { HomeMenuButton } from './HomeMenuButton';
 
 export type TournamentMenuStatus =
@@ -13,6 +14,7 @@ export type TournamentMenuStatus =
 
 interface Props {
   status: TournamentMenuStatus;
+  index: number;
   label: string;
   primary?: boolean;
   delay?: number;
@@ -28,43 +30,84 @@ interface Props {
  *
  * Static once placed. No pulse, no glow.
  */
-const STAMP: Record<TournamentMenuStatus, { kanji: string; color: string; bg: string } | null> = {
+const STAMP: Record<TournamentMenuStatus, { kanji: string; color: string } | null> = {
   none: null,
-  available:    { kanji: '開', color: '#c4a35a', bg: 'rgba(196,163,90,0.10)' },
-  registered:   { kanji: '入', color: '#c4a35a', bg: 'rgba(196,163,90,0.18)' },
-  needs_deck:   { kanji: '急', color: '#b33e3e', bg: 'rgba(179,62,62,0.18)' },
-  in_progress:  { kanji: '戦', color: '#3b82f6', bg: 'rgba(59,130,246,0.18)' },
+  available:    { kanji: '開', color: '#c4a35a' },
+  registered:   { kanji: '入', color: '#c4a35a' },
+  needs_deck:   { kanji: '急', color: '#b33e3e' },
+  in_progress:  { kanji: '戦', color: '#3b82f6' },
 };
 
-function HankoStamp({ kanji, color, bg }: { kanji: string; color: string; bg: string }) {
+/**
+ * Hanko stamp rendered as an SVG square with the kanji centered.
+ *
+ * Authenticity: a turbulence + displacement filter is applied to the whole stamp,
+ * which roughens the edges so the box and the glyph look like ink absorbed
+ * unevenly into porous paper. This is what makes it stop looking like a generic
+ * UI badge.
+ */
+function HankoStamp({ kanji, color }: { kanji: string; color: string }) {
+  const filterId = useId();
   return (
-    <motion.span
-      initial={{ scale: 1.25, rotate: -14, opacity: 0 }}
-      animate={{ scale: 1, rotate: -8, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 360, damping: 22, delay: 0.05 }}
-      className="inline-flex items-center justify-center select-none"
-      style={{
-        width: '28px',
-        height: '28px',
-        backgroundColor: bg,
-        border: `1px solid ${color}`,
-        color: color,
-        fontFamily: '"NJNaruto", "Noto Serif JP", serif',
-        fontWeight: 900,
-        fontSize: '15px',
-        lineHeight: 1,
-        // Slight inset to feel like ink absorbed by paper, not a flat box
-        boxShadow: `inset 0 0 4px ${color}33`,
-      }}
+    <motion.svg
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      initial={{ scale: 1.3, rotate: -16, opacity: 0 }}
+      animate={{ scale: 1, rotate: -7, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 22, delay: 0.05 }}
+      className="select-none"
+      style={{ overflow: 'visible' }}
     >
-      {kanji}
-    </motion.span>
+      <defs>
+        <filter id={filterId} x="-20%" y="-20%" width="140%" height="140%">
+          {/* Generate noise */}
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" />
+          {/* Displace the source pixels by the noise — gives ink-bleed irregularity */}
+          <feDisplacementMap in="SourceGraphic" scale="1.6" />
+        </filter>
+      </defs>
+      <g filter={`url(#${filterId})`}>
+        {/* Outer ink ring (square) */}
+        <rect
+          x="2"
+          y="2"
+          width="28"
+          height="28"
+          fill="none"
+          stroke={color}
+          strokeWidth="2.2"
+        />
+        {/* Inner soft fill, slightly translucent to read like ink soaking the paper */}
+        <rect
+          x="4"
+          y="4"
+          width="24"
+          height="24"
+          fill={color}
+          opacity="0.10"
+        />
+        {/* Centered kanji */}
+        <text
+          x="16"
+          y="22"
+          textAnchor="middle"
+          fontFamily='"NJNaruto", "Noto Serif JP", serif'
+          fontWeight="900"
+          fontSize="18"
+          fill={color}
+        >
+          {kanji}
+        </text>
+      </g>
+    </motion.svg>
   );
 }
 
-export function TournamentNavButton({ status, label, primary = false, delay = 0 }: Props) {
+export function TournamentNavButton({ status, index, label, primary = false, delay = 0 }: Props) {
   const t = useTranslations('home');
   const stamp = STAMP[status];
+  const isActive = stamp !== null;
 
   const variant = (() => {
     if (status === 'in_progress') return 'blue';
@@ -73,7 +116,18 @@ export function TournamentNavButton({ status, label, primary = false, delay = 0 
     return primary ? 'primary' : 'muted';
   })() as Parameters<typeof HomeMenuButton>[0]['variant'];
 
-  const ariaStatus: string | undefined = (() => {
+  // Caption changes based on status — gives the user instant context for "why is this lit?"
+  const caption: string = (() => {
+    switch (status) {
+      case 'available':   return t('tournamentCaptionAvailable');
+      case 'registered':  return t('tournamentCaptionRegistered');
+      case 'needs_deck':  return t('tournamentCaptionNeedsDeck');
+      case 'in_progress': return t('tournamentCaptionInProgress');
+      default:            return t('tournamentCaptionDefault');
+    }
+  })();
+
+  const stampLabel: string | undefined = (() => {
     switch (status) {
       case 'available':   return t('tournamentBadgeAvailable');
       case 'registered':  return t('tournamentBadgeRegistered');
@@ -86,13 +140,16 @@ export function TournamentNavButton({ status, label, primary = false, delay = 0 
   return (
     <HomeMenuButton
       href="/tournaments"
+      index={index}
       label={label}
+      caption={caption}
       variant={variant}
       delay={delay}
+      active={isActive}
       rightSlot={
         stamp ? (
-          <span aria-label={ariaStatus} title={ariaStatus}>
-            <HankoStamp kanji={stamp.kanji} color={stamp.color} bg={stamp.bg} />
+          <span aria-label={stampLabel} title={stampLabel}>
+            <HankoStamp kanji={stamp.kanji} color={stamp.color} />
           </span>
         ) : undefined
       }
