@@ -7,6 +7,7 @@ import { HardAI } from '../ai/strategies/HardAI';
 import { ImpossibleAI } from '../ai/strategies/ImpossibleAI';
 import { initializeRegistry } from '../effects/EffectRegistry';
 import { getAllCards } from '../data/cardLoader';
+import { executeStartPhase } from '../engine/phases/StartPhase';
 import type { GameConfig, CharacterCard, MissionCard, GameState } from '../engine/types';
 import { BASE_CHAKRA_PER_TURN } from '../engine/types';
 
@@ -137,6 +138,24 @@ describe('AI refactor sanity', () => {
     const impState = passMulligan(GameEngine.createGame(impConfig));
     const hardState = passMulligan(GameEngine.createGame(hardConfig));
     expect(impState.player2.chakra).toBeGreaterThan(hardState.player2.chakra);
+  });
+
+  it('Impossible chakra bonus applies on every Start phase (turn 2 and 3, not just turn 1)', () => {
+    const config = makeConfig(allChars, allMissions, 'impossible');
+    const state = GameEngine.createGame(config);
+    let s = passMulligan(state);
+
+    expect(s.turn).toBe(1);
+    const t1Chakra = s.player2.chakra;
+    expect(t1Chakra - s.player1.chakra).toBe(5);
+
+    s = { ...s, player1: { ...s.player1, chakra: 0 }, player2: { ...s.player2, chakra: 0 }, turn: 2 } as typeof s;
+    s = executeStartPhase(s);
+    expect(s.player2.chakra - s.player1.chakra).toBe(5);
+
+    s = { ...s, player1: { ...s.player1, chakra: 0 }, player2: { ...s.player2, chakra: 0 }, turn: 3 } as typeof s;
+    s = executeStartPhase(s);
+    expect(s.player2.chakra - s.player1.chakra).toBe(5);
   });
 
   it('Hard AI completes a full game vs Easy AI without crashing', { timeout: 90_000 }, () => {
