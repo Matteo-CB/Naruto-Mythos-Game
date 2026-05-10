@@ -50,7 +50,11 @@
     "play": "Play",
     "vsAI": "vs AI",
     "online": "Online",
-    "sealedMode": "Sealed"
+    "sealedMode": "Sealed",
+    "tournamentBadgeAvailable": "Open",
+    "tournamentBadgeRegistered": "Registered",
+    "tournamentBadgeNeedsDeck": "Deck needed",
+    "tournamentBadgeInProgress": "Live"
   },
   "settings": {
     "title": "Customization",

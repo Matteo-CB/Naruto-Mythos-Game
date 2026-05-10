@@ -10,6 +10,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { HoloCard } from '@/components/HoloCard';
 import { Footer } from '@/components/Footer';
 import { CloudBackground } from '@/components/CloudBackground';
+import { TournamentNavButton, type TournamentMenuStatus } from '@/components/TournamentNavButton';
 
 
 const FEATURED_CARDS = [
@@ -109,18 +110,45 @@ export default function Home() {
 
   const [tournamentStatus, setTournamentStatus] = useState<'none' | 'registration' | 'in_progress'>('none');
   const [tournamentNeedsDeck, setTournamentNeedsDeck] = useState(false);
+  const [tournamentAvailable, setTournamentAvailable] = useState(false);
+  const [meRefresh, setMeRefresh] = useState(0);
 
   useEffect(() => {
     if (!session?.user) return;
+    let cancelled = false;
     fetch('/api/user/me')
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
-        if (data?.role) setUserRole(data.role);
-        if (data?.tournamentStatus) setTournamentStatus(data.tournamentStatus);
-        if (data?.tournamentNeedsDeck) setTournamentNeedsDeck(true);
+        if (cancelled || !data) return;
+        if (data.role) setUserRole(data.role);
+        setTournamentStatus(data.tournamentStatus ?? 'none');
+        setTournamentNeedsDeck(!!data.tournamentNeedsDeck);
+        setTournamentAvailable(!!data.tournamentAvailable);
       })
       .catch(() => {});
+    return () => { cancelled = true; };
+  }, [session, meRefresh]);
+
+  // Live updates: refetch on window focus + on a 60s tick while on the home page
+  useEffect(() => {
+    if (!session?.user) return;
+    const onFocus = () => setMeRefresh((n) => n + 1);
+    window.addEventListener('focus', onFocus);
+    const interval = setInterval(() => setMeRefresh((n) => n + 1), 60_000);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      clearInterval(interval);
+    };
   }, [session]);
+
+  // Compute the rich status that the new TournamentNavButton consumes
+  const tournamentMenuStatus: TournamentMenuStatus = (() => {
+    if (tournamentStatus === 'in_progress') return 'in_progress';
+    if (tournamentNeedsDeck) return 'needs_deck';
+    if (tournamentStatus === 'registration') return 'registered';
+    if (tournamentAvailable) return 'available';
+    return 'none';
+  })();
 
   const titleText = t('title');
   const titleLetters = titleText.split('');
@@ -188,94 +216,63 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.7 }}
             >
-              {menuButtons.map((btn, i) => (
-                <motion.div
-                  key={btn.key}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: 0.8 + i * 0.06,
-                    ease: 'easeOut',
-                  }}
-                >
-                  <Link
-                    href={btn.href}
-                    className={`group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base ${btn.key === 'tournaments' && tournamentStatus !== 'none' ? 'animate-pulse-subtle' : ''}`}
-                    style={{
-                      backgroundColor: '#141414',
-                      border: btn.key === 'tournaments' && tournamentStatus === 'registration'
-                        ? '1px solid #ef4444'
-                        : btn.key === 'tournaments' && tournamentStatus === 'in_progress'
-                          ? '1px solid #3b82f6'
-                          : btn.primary ? '1px solid #c4a35a' : '1px solid #262626',
-                      color: btn.key === 'tournaments' && tournamentStatus === 'registration'
-                        ? '#ef4444'
-                        : btn.key === 'tournaments' && tournamentStatus === 'in_progress'
-                          ? '#3b82f6'
-                          : btn.primary ? '#c4a35a' : '#e0e0e0',
-                      boxShadow: btn.key === 'tournaments' && tournamentStatus === 'registration'
-                        ? '0 0 12px rgba(239, 68, 68, 0.15), inset 0 0 12px rgba(239, 68, 68, 0.05)'
-                        : btn.key === 'tournaments' && tournamentStatus === 'in_progress'
-                          ? '0 0 12px rgba(59, 130, 246, 0.15), inset 0 0 12px rgba(59, 130, 246, 0.05)'
-                          : undefined,
-                    }}
-                    onMouseEnter={(e) => {
-                      const target = e.currentTarget as HTMLElement;
-                      target.style.transform = 'scale(1.03)';
-                      target.style.borderColor = '#c4a35a';
-                      target.style.boxShadow = '0 0 20px rgba(196, 163, 90, 0.15)';
-                      target.style.color = '#c4a35a';
-                      target.style.backgroundColor = '#1a1a1a';
-                    }}
-                    onMouseLeave={(e) => {
-                      const target = e.currentTarget as HTMLElement;
-                      target.style.transform = 'scale(1)';
-                      target.style.borderColor = btn.primary ? '#c4a35a' : '#262626';
-                      target.style.boxShadow = 'none';
-                      target.style.color = btn.primary ? '#c4a35a' : '#e0e0e0';
-                      target.style.backgroundColor = '#141414';
+              {menuButtons.map((btn, i) => {
+                if (btn.key === 'tournaments') {
+                  return (
+                    <TournamentNavButton
+                      key={btn.key}
+                      status={tournamentMenuStatus}
+                      label={t(btn.key)}
+                      primary={btn.primary}
+                      delay={0.8 + i * 0.06}
+                    />
+                  );
+                }
+                return (
+                  <motion.div
+                    key={btn.key}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      duration: 0.3,
+                      delay: 0.8 + i * 0.06,
+                      ease: 'easeOut',
                     }}
                   >
-                    
-                    <span
-                      className="absolute left-0 top-0 h-full w-1 transition-all"
+                    <Link
+                      href={btn.href}
+                      className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
                       style={{
-                        backgroundColor: btn.key === 'tournaments' && tournamentStatus === 'registration'
-                          ? '#ef4444'
-                          : btn.key === 'tournaments' && tournamentStatus === 'in_progress'
-                            ? '#3b82f6'
-                            : btn.primary ? '#c4a35a' : 'transparent',
+                        backgroundColor: '#141414',
+                        border: btn.primary ? '1px solid #c4a35a' : '1px solid #262626',
+                        color: btn.primary ? '#c4a35a' : '#e0e0e0',
                       }}
-                    />
-                    {t(btn.key)}
-                    
-                    {btn.key === 'tournaments' && (tournamentStatus !== 'none' || tournamentNeedsDeck) && (
-                      <span className="relative ml-2 flex items-center justify-center">
-                        <span
-                          className="absolute inline-flex h-3 w-3 animate-ping rounded-full opacity-60"
-                          style={{
-                            backgroundColor: tournamentNeedsDeck ? '#ef4444' : tournamentStatus === 'registration' ? '#ef4444' : '#3b82f6',
-                          }}
-                        />
-                        <span
-                          className="relative inline-flex h-2.5 w-2.5 rounded-full items-center justify-center"
-                          style={{
-                            backgroundColor: tournamentNeedsDeck ? '#ef4444' : tournamentStatus === 'registration' ? '#ef4444' : '#3b82f6',
-                            boxShadow: tournamentNeedsDeck
-                              ? '0 0 8px rgba(239, 68, 68, 0.8), 0 0 20px rgba(239, 68, 68, 0.4)'
-                              : tournamentStatus === 'registration'
-                                ? '0 0 8px rgba(239, 68, 68, 0.6), 0 0 20px rgba(239, 68, 68, 0.3)'
-                                : '0 0 8px rgba(59, 130, 246, 0.6), 0 0 20px rgba(59, 130, 246, 0.3)',
-                          }}
-                        >
-                          {tournamentNeedsDeck && <span className="text-[6px] font-black" style={{ color: '#fff' }}>!</span>}
-                        </span>
-                      </span>
-                    )}
-                  </Link>
-                </motion.div>
-              ))}
+                      onMouseEnter={(e) => {
+                        const target = e.currentTarget as HTMLElement;
+                        target.style.transform = 'scale(1.03)';
+                        target.style.borderColor = '#c4a35a';
+                        target.style.boxShadow = '0 0 20px rgba(196, 163, 90, 0.15)';
+                        target.style.color = '#c4a35a';
+                        target.style.backgroundColor = '#1a1a1a';
+                      }}
+                      onMouseLeave={(e) => {
+                        const target = e.currentTarget as HTMLElement;
+                        target.style.transform = 'scale(1)';
+                        target.style.borderColor = btn.primary ? '#c4a35a' : '#262626';
+                        target.style.boxShadow = 'none';
+                        target.style.color = btn.primary ? '#c4a35a' : '#e0e0e0';
+                        target.style.backgroundColor = '#141414';
+                      }}
+                    >
+                      <span
+                        className="absolute left-0 top-0 h-full w-1 transition-all"
+                        style={{ backgroundColor: btn.primary ? '#c4a35a' : 'transparent' }}
+                      />
+                      {t(btn.key)}
+                    </Link>
+                  </motion.div>
+                );
+              })}
               
               {(
                 <motion.div

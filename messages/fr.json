@@ -50,7 +50,11 @@
     "play": "Jouer",
     "vsAI": "contre l'IA",
     "online": "En ligne",
-    "sealedMode": "Scellé"
+    "sealedMode": "Scellé",
+    "tournamentBadgeAvailable": "Ouvert",
+    "tournamentBadgeRegistered": "Inscrit",
+    "tournamentBadgeNeedsDeck": "Deck requis",
+    "tournamentBadgeInProgress": "En cours"
   },
   "settings": {
     "title": "Personnalisation",

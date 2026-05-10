@@ -10,7 +10,7 @@ export async function GET() {
 
   const userId = session.user.id;
 
-  const [user, myParticipations] = await Promise.all([
+  const [user, myParticipations, openTournamentCount] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: { role: true },
@@ -28,6 +28,9 @@ export async function GET() {
         },
       },
     }),
+    prisma.tournament.count({
+      where: { status: 'registration', isPublic: true },
+    }),
   ]);
 
   if (!user) {
@@ -36,7 +39,9 @@ export async function GET() {
 
   let tournamentStatus: 'none' | 'registration' | 'in_progress' = 'none';
   let tournamentNeedsDeck = false;
+  const joinedTournamentIds = new Set<string>();
   for (const p of myParticipations) {
+    joinedTournamentIds.add(p.tournament.id);
     if (p.eliminated) continue;
     if (p.tournament.status === 'registration') {
       tournamentStatus = 'registration';
@@ -48,9 +53,13 @@ export async function GET() {
     }
   }
 
+  const tournamentAvailable = tournamentStatus === 'none' && openTournamentCount > 0;
+
   return NextResponse.json({
     role: user.role,
     tournamentStatus,
     tournamentNeedsDeck,
+    tournamentAvailable,
+    openTournamentCount,
   });
 }
