@@ -59,6 +59,7 @@ export function HomeMenuButton({
       initial={{ opacity: 0, x: -16 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3, delay, ease: 'easeOut' }}
+      className="relative"
     >
       <Link
         href={href as Parameters<typeof Link>[0]['href']}
@@ -80,13 +81,19 @@ export function HomeMenuButton({
         }}
       >
         <span className="relative z-10 px-4">{label}</span>
-
-        {rightSlot && (
-          <span className="absolute z-10 flex items-center justify-center" style={{ top: '4px', right: '6px' }}>
-            {rightSlot}
-          </span>
-        )}
       </Link>
+
+      {/* Right slot lives OUTSIDE the Link so it can poke above the button's
+          top-right corner like a real notification badge, without being clipped
+          by the Link's overflow-hidden (used to contain the holo sheen). */}
+      {rightSlot && (
+        <span
+          className="absolute z-20 pointer-events-none"
+          style={{ top: '-10px', right: '6px' }}
+        >
+          {rightSlot}
+        </span>
+      )}
     </motion.div>
   );
 }
