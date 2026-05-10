@@ -119,10 +119,10 @@ export class NeuralISMCTS {
     
     
     if (failedSims > this.config.simulations * 0.6) {
-      return this.heuristicFallback(validActions);
+      return this.heuristicFallback(validActions, state, aiPlayer);
     }
 
-    return this.pickBestAction(root, validActions);
+    return this.pickBestAction(root, validActions, state, aiPlayer);
   }
 
   
@@ -222,10 +222,10 @@ export class NeuralISMCTS {
       }
     }
 
-    return this.pickBestAction(root, validActions);
+    return this.pickBestAction(root, validActions, state, aiPlayer);
   }
 
-  
+
 
   
   private simulate(
@@ -537,7 +537,12 @@ export class NeuralISMCTS {
   }
 
   
-  private pickBestAction(root: MCTSNode, validActions: GameAction[]): GameAction {
+  private pickBestAction(
+    root: MCTSNode,
+    validActions: GameAction[],
+    state?: GameState,
+    aiPlayer?: PlayerID,
+  ): GameAction {
     let bestAction = validActions[0];
     let bestVisits = -1;
     let bestValue = -Infinity;
@@ -558,23 +563,40 @@ export class NeuralISMCTS {
     }
 
     if (bestVisits <= 0 && validActions.length > 1) {
-      return this.heuristicFallback(validActions);
+      return this.heuristicFallback(validActions, state, aiPlayer);
     }
 
     return bestAction;
   }
 
-  
+
   private heuristicFallback(
     validActions: GameAction[],
+    state?: GameState,
+    aiPlayer?: PlayerID,
   ): GameAction {
-    
+    if (!state || !aiPlayer) {
+      for (const action of validActions) {
+        if (action.type !== 'PASS') return action;
+      }
+      return validActions[0];
+    }
+
+    let bestAction = validActions[0];
+    let bestScore = -Infinity;
     for (const action of validActions) {
-      if (action.type !== 'PASS') {
-        return action;
+      try {
+        const next = GameEngine.applyAction(state, aiPlayer, action);
+        const score = BoardEvaluator.evaluate(next, aiPlayer);
+        if (score > bestScore) {
+          bestScore = score;
+          bestAction = action;
+        }
+      } catch {
+        continue;
       }
     }
-    return validActions[0];
+    return bestAction;
   }
 
 
