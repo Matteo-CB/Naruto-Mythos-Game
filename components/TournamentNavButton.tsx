@@ -30,15 +30,16 @@ const ACCENT: Record<TournamentMenuStatus, string> = {
 };
 
 /**
- * Eye-catching but tasteful countdown. Inter Display 600, tabular numerals,
- * sat inside a faint pill in the status accent color. The colon between
- * units pulses like a real clock display.
+ * Eye-catching but tasteful countdown. Inter Display 700, tabular numerals,
+ * sits inside a faint pill in the status accent color.
  *
- * Format adapts to the remaining duration:
- *   > 24h  → "Xd  Yh"
- *   > 1h   → "Xh : Ym"
- *   < 1h   → "MM : SS"
- *   = 0    → returns null (caller handles)
+ * Format adapts to the remaining duration, always 3 visible units when possible:
+ *   ≥ 24h  → "Xd Yh Zm"     (days + hours + minutes)
+ *   1-24h  → "Xh Ym Zs"     (hours + minutes + seconds)
+ *   < 1h   → "Xm Ys"        (minutes + seconds)
+ *
+ * Centered both vertically (items-center) and horizontally (justify-center).
+ * The pill has a min-width so it doesn't jump as units shorten.
  */
 function TournamentCountdown({ targetIso, accentColor }: { targetIso: string; accentColor: string }) {
   const [now, setNow] = useState(() => Date.now());
@@ -57,39 +58,53 @@ function TournamentCountdown({ targetIso, accentColor }: { targetIso: string; ac
   const mins = Math.floor((totalSec % 3600) / 60);
   const secs = totalSec % 60;
 
-  let parts: { left: string; right: string; suffixLeft: string; suffixRight: string };
+  type Unit = { value: string; suffix: string };
+  let units: Unit[];
   if (days > 0) {
-    parts = { left: String(days), right: String(hours), suffixLeft: 'd', suffixRight: 'h' };
+    units = [
+      { value: String(days), suffix: 'd' },
+      { value: hours.toString().padStart(2, '0'), suffix: 'h' },
+      { value: mins.toString().padStart(2, '0'), suffix: 'm' },
+    ];
   } else if (hours > 0) {
-    parts = { left: String(hours), right: mins.toString().padStart(2, '0'), suffixLeft: 'h', suffixRight: 'm' };
+    units = [
+      { value: String(hours), suffix: 'h' },
+      { value: mins.toString().padStart(2, '0'), suffix: 'm' },
+      { value: secs.toString().padStart(2, '0'), suffix: 's' },
+    ];
   } else {
-    parts = { left: mins.toString().padStart(2, '0'), right: secs.toString().padStart(2, '0'), suffixLeft: '', suffixRight: '' };
+    units = [
+      { value: mins.toString().padStart(2, '0'), suffix: 'm' },
+      { value: secs.toString().padStart(2, '0'), suffix: 's' },
+    ];
   }
 
   return (
     <span
-      className="select-none inline-flex items-center"
+      className="select-none inline-flex items-center justify-center"
       style={{
         fontFamily: 'var(--font-inter), Inter, system-ui, sans-serif',
         fontSize: '12px',
         fontWeight: 700,
-        letterSpacing: '0.04em',
+        letterSpacing: '0.02em',
         color: accentColor,
         backgroundColor: `${accentColor}14`,
         border: `1px solid ${accentColor}33`,
         borderRadius: '4px',
-        padding: '3px 8px',
-        gap: '2px',
+        padding: '3px 9px',
+        gap: '7px',
+        minWidth: '92px',
         fontVariantNumeric: 'tabular-nums',
         whiteSpace: 'nowrap',
         textShadow: `0 0 8px ${accentColor}33`,
       }}
     >
-      <span>{parts.left}</span>
-      {parts.suffixLeft && <span style={{ fontSize: '10px', opacity: 0.7, marginRight: '3px' }}>{parts.suffixLeft}</span>}
-      <span className="holo-clock-colon" style={{ marginInline: '1px' }}>:</span>
-      <span>{parts.right}</span>
-      {parts.suffixRight && <span style={{ fontSize: '10px', opacity: 0.7 }}>{parts.suffixRight}</span>}
+      {units.map((u, i) => (
+        <span key={i} style={{ display: 'inline-flex', alignItems: 'baseline', gap: '1px' }}>
+          <span>{u.value}</span>
+          <span style={{ fontSize: '9px', opacity: 0.65, fontWeight: 600 }}>{u.suffix}</span>
+        </span>
+      ))}
     </span>
   );
 }
