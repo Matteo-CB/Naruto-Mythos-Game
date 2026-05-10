@@ -67,21 +67,27 @@ function revealMissionCard(state: GameState): GameState {
 }
 
 
+const IMPOSSIBLE_CHAKRA_BONUS = 5;
+
 function grantChakra(state: GameState, player: PlayerID): GameState {
   const playerState = { ...state[player] };
 
-  
+
   let charCount = 0;
   for (const mission of state.activeMissions) {
     const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
     charCount += chars.length;
   }
 
-  
-  
+
+
   const { total: chakraBonus, sources } = calculateChakraBonusDetailed(state, player);
 
-  const totalChakra = BASE_CHAKRA_PER_TURN + charCount + chakraBonus;
+  const impossibleBonus = (playerState.isAI && playerState.aiDifficulty === 'impossible')
+    ? IMPOSSIBLE_CHAKRA_BONUS
+    : 0;
+
+  const totalChakra = BASE_CHAKRA_PER_TURN + charCount + chakraBonus + impossibleBonus;
   playerState.chakra += totalChakra;
 
   let log = logAction(

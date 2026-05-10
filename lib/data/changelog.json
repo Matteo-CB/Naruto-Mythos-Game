@@ -12,7 +12,9 @@
         "Le bouton Tournois affiche un compte à rebours élégant jusqu'au début du prochain tournoi.",
         "Le menu repère désormais un tournoi ouvert même si tu n'es pas encore inscrit (avant rien ne s'affichait).",
         "Stats sauvegardées par deck sur 90 jours : taux de victoire, gain d'ELO, dernière partie.",
-        "Profil enrichi avec un panneau Stats des decks et un mini graphique d'évolution."
+        "Profil enrichi avec un panneau Stats des decks et un mini graphique d'évolution.",
+        "Refonte complète de l'IA : niveaux Facile, Moyen, Difficile et Impossible (Difficile avec le double de chakra par manche).",
+        "L'IA joue désormais avec l'un des meilleurs decks récents du classement, choisi au hasard à chaque partie."
       ],
       "changes_en": [
         "Sakura Haruno (012): the mandatory discard after drawing can no longer be skipped.",
@@ -22,7 +24,9 @@
         "The Tournaments button shows an elegant countdown until the next tournament begins.",
         "The menu now spots an open tournament even if you have not joined yet (before, nothing was shown).",
         "Per-deck stats kept for 90 days: win rate, ELO change, last played.",
-        "Profile gets a new Deck Stats panel with a small progression chart."
+        "Profile gets a new Deck Stats panel with a small progression chart.",
+        "Full AI overhaul: Easy, Medium, Hard and Impossible levels (Hard with double chakra per round).",
+        "The AI now plays one of the strongest recent decks from the leaderboard, picked at random each game."
       ]
     },
     {

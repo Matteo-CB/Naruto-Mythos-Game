@@ -1159,13 +1159,13 @@
     "selectDifficulty": "Select Difficulty",
     "difficulties": {
       "easy": "Easy",
-      "easyDesc": "Random legal actions",
+      "easyDesc": "Plays simply, makes mistakes",
       "medium": "Medium",
-      "mediumDesc": "Greedy strategy",
+      "mediumDesc": "Thinks short-term",
       "hard": "Hard",
-      "hardDesc": "Strategic evaluation",
+      "hardDesc": "Plans several turns ahead",
       "impossible": "Impossible",
-      "impossibleDesc": "Neural network,almost unbeatable"
+      "impossibleDesc": "Hard + double chakra per round"
     },
     "startGame": "Start Game",
     "selectDifficultyDesc": "Select difficulty and start a match",

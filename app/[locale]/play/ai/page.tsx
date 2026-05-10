@@ -45,12 +45,59 @@ export default function PlayAIPage() {
     });
   }, []);
 
-  const handleStart = () => {
+  const buildAIDeckFromRecommendation = async (
+    allChars: CharacterCard[],
+    allMissions: MissionCard[],
+    playerMissionIds: Set<string>,
+  ): Promise<{ deck: CharacterCard[]; missions: MissionCard[] } | null> => {
+    try {
+      const res = await fetch('/api/ai-decks/recommended', { cache: 'no-store' });
+      if (!res.ok) return null;
+      const data = await res.json();
+      const recs: Array<{ cardIds: string[]; missionIds: string[] }> = data.decks ?? [];
+      if (recs.length === 0) return null;
+
+      const pick = recs[Math.floor(Math.random() * recs.length)];
+
+      const charById = new Map(allChars.map((c) => [c.id, c]));
+      const missionById = new Map(allMissions.map((m) => [m.id, m]));
+
+      const deck: CharacterCard[] = [];
+      for (const cardId of pick.cardIds) {
+        const card = charById.get(cardId);
+        if (card) deck.push(card);
+      }
+      if (deck.length < 30) return null;
+
+      const missions: MissionCard[] = [];
+      for (const mid of pick.missionIds) {
+        const m = missionById.get(mid);
+        if (m && !playerMissionIds.has(m.id)) missions.push(m);
+        if (missions.length === 3) break;
+      }
+      if (missions.length < 3) {
+        const fallbackPool = allMissions.filter(
+          (m) => !playerMissionIds.has(m.id) && !missions.some((mm) => mm.id === m.id),
+        );
+        for (const m of [...fallbackPool].sort(() => Math.random() - 0.5)) {
+          missions.push(m);
+          if (missions.length === 3) break;
+        }
+      }
+      if (missions.length < 3) return null;
+
+      return { deck, missions };
+    } catch {
+      return null;
+    }
+  };
+
+  const handleStart = async () => {
     if (!cards || cards.characters.length < 30 || cards.missions.length < 3) return;
 
     setIsLoading(true);
 
-    
+
     const allChars = cards.characters;
     const allMissions = cards.missions;
 
@@ -61,16 +108,23 @@ export default function PlayAIPage() {
       ? selectedDeck.missions
       : [...allMissions].sort(() => Math.random() - 0.5).slice(0, 3);
 
-    
-    const player2Deck = [...allChars].sort(() => Math.random() - 0.5).slice(0, 30);
-
-    
     const playerMissionIds = new Set(player1Missions.map((m) => m.id));
-    const aiMissionPool = allMissions.filter((m) => !playerMissionIds.has(m.id));
-    const aiMissions = [...aiMissionPool].sort(() => Math.random() - 0.5);
-    const player2Missions = aiMissions.length >= 3
-      ? aiMissions.slice(0, 3)
-      : [...allMissions].sort(() => Math.random() - 0.5).slice(0, 3);
+
+    const recommended = await buildAIDeckFromRecommendation(allChars, allMissions, playerMissionIds);
+
+    let player2Deck: CharacterCard[];
+    let player2Missions: MissionCard[];
+    if (recommended) {
+      player2Deck = recommended.deck;
+      player2Missions = recommended.missions;
+    } else {
+      player2Deck = [...allChars].sort(() => Math.random() - 0.5).slice(0, 30);
+      const aiMissionPool = allMissions.filter((m) => !playerMissionIds.has(m.id));
+      const aiMissions = [...aiMissionPool].sort(() => Math.random() - 0.5);
+      player2Missions = aiMissions.length >= 3
+        ? aiMissions.slice(0, 3)
+        : [...allMissions].sort(() => Math.random() - 0.5).slice(0, 3);
+    }
 
     const config: GameConfig = {
       player1: {

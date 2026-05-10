@@ -81,32 +81,6 @@ export interface ISMCTSConfig {
   useBatchedEval: boolean;
 }
 
-export const DEFAULT_CHUNIN_CONFIG: ISMCTSConfig = {
-  simulations: 200,
-  maxDepth: 4,
-  explorationC: 1.41,
-  evaluator: null,
-  maxBranching: 10,
-  useBatchedEval: false,
-};
-
-export const DEFAULT_KAGE_CONFIG: ISMCTSConfig = {
-  simulations: 1000,
-  maxDepth: 6,
-  explorationC: 1.41,
-  evaluator: null,
-  maxBranching: 12,
-  useBatchedEval: true,
-};
-
-export const DEFAULT_RIKUDO_CONFIG: ISMCTSConfig = {
-  simulations: 5000,
-  maxDepth: 8,
-  explorationC: 1.2,
-  evaluator: null,
-  maxBranching: 15,
-  useBatchedEval: true,
-};
 
 
 
@@ -621,27 +595,39 @@ export class NeuralISMCTS {
     return validActions[0];
   }
 
-  
+
   private determinize(state: GameState, aiPlayer: PlayerID): GameState {
     const cloned = deepClone(state);
     const opponent: PlayerID = aiPlayer === 'player1' ? 'player2' : 'player1';
     const oppState = cloned[opponent];
 
-    const hasVisibleOpponentHand = oppState.hand.length > 0 && !this.isHiddenHandPlaceholder(oppState.hand);
-    if (hasVisibleOpponentHand) return cloned;
+    const handIsPlaceholder = oppState.hand.length > 0 && this.isHiddenHandPlaceholder(oppState.hand);
+    const handIsEmpty = oppState.hand.length === 0;
 
-    
-    
-    
-    const pool = shuffle([...cloned[aiPlayer].deck]);
+    if (!handIsPlaceholder && !handIsEmpty) return cloned;
 
-    if (pool.length === 0) return cloned;
+    const oppDeck = oppState.deck ?? [];
+    const oppDiscard = oppState.discardPile ?? [];
+    const handSize = oppState.hand.length;
 
-    
-    const estimatedHandSize = oppState.hand.length > 0
-      ? Math.min(pool.length, oppState.hand.length)
-      : Math.min(pool.length, Math.max(1, 5 - (state.turn - 1)));
-    cloned[opponent].hand = pool.slice(0, estimatedHandSize);
+    if (handSize === 0) return cloned;
+
+    const pool = shuffle([...oppDeck]);
+    if (pool.length === 0) {
+      cloned[opponent].hand = [];
+      return cloned;
+    }
+
+    const take = Math.min(pool.length, handSize);
+    const sampledHand = pool.slice(0, take);
+    const remainingDeck = pool.slice(take);
+
+    cloned[opponent] = {
+      ...oppState,
+      hand: sampledHand,
+      deck: remainingDeck,
+      discardPile: oppDiscard,
+    };
 
     return cloned;
   }

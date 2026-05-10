@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { aiDifficulty } = body;
 
-    const VALID_DIFFICULTIES = ['easy', 'medium', 'hard', 'expert'];
+    const VALID_DIFFICULTIES = ['easy', 'medium', 'hard', 'impossible'];
     const difficulty = typeof aiDifficulty === 'string' && VALID_DIFFICULTIES.includes(aiDifficulty)
       ? aiDifficulty
       : 'medium';

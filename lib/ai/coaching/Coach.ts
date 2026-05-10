@@ -3,7 +3,7 @@
 import type { GameState, GameAction, PlayerID, ActiveMission } from '../../engine/types';
 import { GameEngine } from '../../engine/GameEngine';
 import { AIPlayer } from '../AIPlayer';
-import { NeuralISMCTS, DEFAULT_KAGE_CONFIG } from '../neural/NeuralISMCTS';
+import { NeuralISMCTS } from '../neural/NeuralISMCTS';
 import { FeatureExtractor } from '../neural/FeatureExtractor';
 import { NeuralEvaluator } from '../neural/NeuralEvaluator';
 import { BoardEvaluator } from '../evaluation/BoardEvaluator';
@@ -24,10 +24,12 @@ export class Coach {
   constructor() {
     this.evaluator = NeuralEvaluator.getInstance();
     this.mcts = new NeuralISMCTS({
-      ...DEFAULT_KAGE_CONFIG,
       simulations: COACH_SIMULATIONS,
+      maxDepth: 5,
+      explorationC: 1.41,
+      maxBranching: 12,
       evaluator: this.evaluator,
-      useBatchedEval: false, // sync for coaching
+      useBatchedEval: false,
     });
   }
 

@@ -1159,13 +1159,13 @@
     "selectDifficulty": "Choisir la Difficulte",
     "difficulties": {
       "easy": "Facile",
-      "easyDesc": "Actions legales aleatoires",
+      "easyDesc": "Joue de maniere simple, fait des erreurs",
       "medium": "Moyen",
-      "mediumDesc": "Strategie gourmande",
+      "mediumDesc": "Reflechit a court terme",
       "hard": "Difficile",
-      "hardDesc": "Evaluation strategique",
+      "hardDesc": "Anticipe plusieurs tours d'avance",
       "impossible": "Impossible",
-      "impossibleDesc": "Reseau de neurones, quasi-imbattable"
+      "impossibleDesc": "Difficile + double chakra par manche"
     },
     "startGame": "Lancer la Partie",
     "selectDifficultyDesc": "Sélectionnez la difficulte et lancez un match",
