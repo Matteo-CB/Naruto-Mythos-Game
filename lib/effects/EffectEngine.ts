@@ -668,18 +668,32 @@ export class EffectEngine {
 
     const fingerprintPermanentState = (s: GameState): string => {
       const charSummary = s.activeMissions
-        .map((m) =>
+        .map((m, mi) =>
+          `${mi}:${m.wonBy ?? '-'}:` +
           [...m.player1Characters, ...m.player2Characters]
-            .map((c) => `${c.instanceId}:${c.isHidden ? 1 : 0}:${c.powerTokens ?? 0}:${c.stack?.length ?? 0}`)
+            .map((c) =>
+              `${c.instanceId}:` +
+              `${c.isHidden ? 1 : 0}:` +
+              `${c.powerTokens ?? 0}:` +
+              `${c.stack?.length ?? 0}:` +
+              `${c.controlledBy ?? '-'}:` +
+              `${c.wasRevealedAtLeastOnce ? 1 : 0}`
+            )
             .join(','),
         )
         .join('|');
       const handIds = `${s.player1.hand.map((c) => c.id).join(',')}#${s.player2.hand.map((c) => c.id).join(',')}`;
+      const discardTopIds = `${s.player1.discardPile.length}:${s.player1.discardPile.at(-1)?.id ?? '-'}#${s.player2.discardPile.length}:${s.player2.discardPile.at(-1)?.id ?? '-'}`;
+      const deckTopIds = `${s.player1.deck.length}:${s.player1.deck[0]?.id ?? '-'}#${s.player2.deck.length}:${s.player2.deck[0]?.id ?? '-'}`;
       return [
         s.player1.chakra, s.player2.chakra,
-        s.player1.deck.length, s.player2.deck.length,
-        s.player1.discardPile.length, s.player2.discardPile.length,
         s.player1.missionPoints, s.player2.missionPoints,
+        s.edgeHolder ?? '-',
+        s.activePlayer ?? '-',
+        s.turn,
+        s.phase,
+        deckTopIds,
+        discardTopIds,
         handIds,
         charSummary,
       ].join('|');
