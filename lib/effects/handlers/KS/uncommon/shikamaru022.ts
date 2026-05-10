@@ -34,7 +34,7 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
   let skippedSourceReveal = false;
   for (let i = state.log.length - 1; i >= 0; i--) {
     const entry = state.log[i];
-    if (entry.turn !== currentTurn || entry.phase !== 'action') break;
+    if (entry.turn !== currentTurn || entry.phase !== 'action') continue;
     if (entry.player !== sourcePlayer) continue;
     if (
       entry.action === 'PASS' ||
@@ -52,7 +52,7 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
 
   for (let i = lastOwnActionIdx + 1; i < state.log.length; i++) {
     const entry = state.log[i];
-    if (entry.turn !== currentTurn || entry.phase !== 'action') break;
+    if (entry.turn !== currentTurn || entry.phase !== 'action') continue;
     if (entry.player !== opponent) continue;
     if (entry.action === 'PASS') continue;
 

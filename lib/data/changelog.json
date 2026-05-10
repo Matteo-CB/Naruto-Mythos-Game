@@ -14,7 +14,8 @@
         "Stats sauvegardées par deck sur 90 jours : taux de victoire, gain d'ELO, dernière partie.",
         "Profil enrichi avec un panneau Stats des decks et un mini graphique d'évolution.",
         "Refonte complète de l'IA : niveaux Facile, Moyen, Difficile et Impossible (Difficile avec le double de chakra par manche).",
-        "L'IA joue désormais avec l'un des meilleurs decks récents du classement, choisi au hasard à chaque partie."
+        "L'IA joue désormais avec l'un des meilleurs decks récents du classement, choisi au hasard à chaque partie.",
+        "Shikamaru Nara (022) : son embuscade trouve désormais bien la carte adverse même quand il est révélé en première action de la manche."
       ],
       "changes_en": [
         "Sakura Haruno (012): the mandatory discard after drawing can no longer be skipped.",
@@ -26,7 +27,8 @@
         "Per-deck stats kept for 90 days: win rate, ELO change, last played.",
         "Profile gets a new Deck Stats panel with a small progression chart.",
         "Full AI overhaul: Easy, Medium, Hard and Impossible levels (Hard with double chakra per round).",
-        "The AI now plays one of the strongest recent decks from the leaderboard, picked at random each game."
+        "The AI now plays one of the strongest recent decks from the leaderboard, picked at random each game.",
+        "Shikamaru Nara (022): his ambush now correctly finds the enemy character even when he is revealed as the first action of the round."
       ]
     },
     {
