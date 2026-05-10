@@ -1,50 +1,49 @@
 {
   "entries": [
     {
-      "date": "2026-05-11",
-      "title_fr": "Sakura 012 + popups minimisables + suppression de compte + menu refondu",
-      "title_en": "Sakura 012 + minimizable popups + account deletion + redesigned home menu",
-      "changes_fr": [
-        "Bug Sakura 012 UPGRADE corrigé : la défausse mandatoire ne peut plus être skippée. Le flag rootOptional du choix initial 'piocher' n'écrase plus isMandatory du sous-effet de défausse.",
-        "Popups en partie minimisables pour revoir le terrain : mulligan (les 2 branches), ordre des cibles (TargetOrderPopup), écran de fin de partie (avec son propre state gameEndMinimized).",
-        "Nouveau bouton 'Supprimer mon compte' dans /settings, avec confirmation par phrase tapée. Cascade complète (decks, ELO history, deck stats, amitiés, invitations, quiz, bans, chat, tournois, rooms, comptes OAuth, parties anonymisées). Rate-limit 3/h, comptes admin bloqués.",
-        "Menu d'accueil entièrement refondu en style 'dossier de mission' éditorial. Chaque entrée est numérotée (chiffres romains I, II, III...), avec titre en gras + caption d'une ligne qui explique le mode (ex: 'Practice with 4 difficulties' sous Play). Pas de bordure, pas de halo, pas de particule. Au survol : un trait de pinceau (path SVG dessiné avec stroke-dashoffset) se trace sous le titre de gauche à droite, le caption s'éclaire et toute la ligne glisse de 4px vers la droite. Séparateurs hairline entre entrées avec un mini losange doré au centre. Pour les Tournois : tampon hanko avec vrai effet d'encre absorbée par le papier (filtre SVG feTurbulence + feDisplacementMap qui rend les bords du carré et le kanji légèrement irréguliers, comme un cachet japonais réel) — 開 (ouvert), 入 (inscrit), 急 (deck requis), 戦 (en cours). /api/user/me détecte enfin les tournois publics ouverts auxquels tu n'es pas encore inscrit. Refresh auto au focus + polling 60s."
-      ],
-      "changes_en": [
-        "Sakura 012 UPGRADE bug fixed: the mandatory discard can no longer be skipped. The rootOptional flag from the initial 'draw' choice no longer overrides isMandatory on the discard sub-effect.",
-        "In-game popups minimizable so you can review the board: mulligan (both branches), target order popup, end-of-game screen (with its own gameEndMinimized state).",
-        "New 'Delete my account' button in /settings with typed-phrase confirmation. Full cascade (decks, ELO history, deck stats, friendships, invites, quiz scores, bans, chat, tournaments, rooms, OAuth accounts, games anonymized). Rate-limited 3/h, admin accounts blocked.",
-        "Home menu fully redesigned in an editorial 'mission dossier' style. Each entry is numbered (Roman numerals I, II, III...), with a bold title plus a one-line caption that explains the mode (e.g. 'Practice with 4 difficulties' under Play). No border, no halo, no particles. On hover: a brush-ink stroke (SVG path animated via stroke-dashoffset) draws under the title left-to-right, the caption brightens, and the whole row slides 4px to the right. Hairline separators between entries with a small gold diamond in the middle. For Tournaments: hanko (Japanese signature stamp) with real ink-bleed effect — an SVG feTurbulence + feDisplacementMap filter makes the outer ink ring and the kanji's edges feather unevenly, like ink soaking into porous paper — 開 (open), 入 (registered), 急 (deck needed), 戦 (battle/in progress). /api/user/me now detects open public tournaments the user hasn't joined yet. Auto-refresh on window focus + 60s polling."
-      ]
-    },
-    {
       "date": "2026-05-10",
-      "title_fr": "Stats par deck (3 mois, ultra compressé)",
-      "title_en": "Per-deck stats (3 months, ultra-compressed)",
+      "title_fr": "Page de Personnalisation, suppression de compte, alerte tournoi et corrections",
+      "title_en": "Customization page, account deletion, tournament alert and fixes",
       "changes_fr": [
-        "Chaque deck enregistre ses stats PvP sur 90 jours roulants : wins/losses/draws, ELO delta cumulé, série journalière. Stockage gzip niveau 9 sur JSON court : ~150 à 700 octets par deck.",
-        "Profil massivement amélioré : nouveau panneau 'Stats des decks' avec winrate %, W/L/D, ELO ±90j, sparkline du delta cumulé, dernière partie en temps relatif. Trié par activité.",
-        "Couverture complète : tournament games trackées, admin reset wipes les deck stats, purge auto à 90 jours d'inactivité."
+        "Sakura Haruno (012) : la défausse obligatoire après la pioche ne peut plus être ignorée.",
+        "Tu peux maintenant minimiser les fenêtres en partie pour voir le terrain (mulligan, ordre des cibles, écran de fin de partie).",
+        "Bouton Supprimer mon compte ajouté dans Personnalisation, avec confirmation par phrase à taper.",
+        "Le bouton Tournois du menu affiche un cachet japonais quand un tournoi t'attend (ouvert, inscrit, deck à choisir, match en cours).",
+        "Le menu repère désormais un tournoi ouvert même si tu n'es pas encore inscrit (avant rien ne s'affichait).",
+        "Stats sauvegardées par deck sur 90 jours : taux de victoire, gain d'ELO, dernière partie.",
+        "Profil enrichi avec un panneau Stats des decks et un mini graphique d'évolution."
       ],
       "changes_en": [
-        "Every deck records its PvP stats over a rolling 90-day window: wins/losses/draws, cumulative ELO delta, daily time series. Stored as gzip level 9 over short JSON: ~150 to 700 bytes per deck.",
-        "Profile massively improved: new 'Deck stats' panel with winrate %, W/L/D, ELO ±90d, cumulative-delta sparkline, last-played relative time. Sorted by activity.",
-        "Full coverage: tournament games are tracked too, admin reset wipes deck stats, auto-purge after 90 days of inactivity."
+        "Sakura Haruno (012): the mandatory discard after drawing can no longer be skipped.",
+        "You can now minimize in-game popups to see the board (mulligan, target order, end-of-game screen).",
+        "Delete-my-account button added in Customization, with a phrase to type for confirmation.",
+        "The Tournaments menu button now shows a Japanese stamp when a tournament needs you (open, registered, deck to pick, match live).",
+        "The menu now spots an open tournament even if you have not joined yet (before, nothing was shown).",
+        "Per-deck stats kept for 90 days: win rate, ELO change, last played.",
+        "Profile gets a new Deck Stats panel with a small progression chart."
       ]
     },
     {
       "date": "2026-05-09",
-      "title_fr": "Audit massif online : sécurité, performance, i18n",
-      "title_en": "Massive online audit: security, performance, i18n",
+      "title_fr": "Audit en ligne : sécurité, vitesse, traductions",
+      "title_en": "Online audit: security, speed, translations",
       "changes_fr": [
-        "Sécurité critique : 7 exploits patchés (vol ELO via PUT /api/game, OAuth state non signé, auth socket sans check session, deck tampering, sealed pool falsifiable, forfait à distance, admin set-elo sans clamp). Rate-limits ajoutés sur chat, friend-requests, forgot-password, register, reports, match-invite, tournament codes, login échoués. Ban game-online enforcé partout.",
-        "Performance : indexes DB Tournament jusqu'à 10× plus rapides, sealed booster gen 5× plus rapide, broadcasts socket.io scopés sur lobby/spec/games-watchers, parallélisations friends/match-invite, HTTP cache replays/elo-history/quiz, anti-DoS caps partout. Build prod validé.",
-        "i18n complet : tous les errors API et socket émettent un errorKey traduit, dates locale-aware (toLocaleDateString reçoit le locale), EloHistoryChart entièrement traduit. ~803 chaînes FR re-accentuées sur 8 passes (défaite, créer, règles, rôle, système, préposition à...). Parité 2614/2614 EN+FR."
+        "Plusieurs failles de triche colmatées (vol d'ELO, lien Discord détourné, decks falsifiables).",
+        "Limites anti-spam ajoutées sur le chat, les invitations, l'inscription, le mot de passe oublié et les essais de connexion.",
+        "Un ban de jeu en ligne empêche aussi de rejoindre un tournoi ou une partie privée.",
+        "Pages plus rapides un peu partout, surtout les tournois et le classement.",
+        "Les dates s'affichent dans la langue du joueur (avant elles restaient en anglais en mode FR).",
+        "Beaucoup d'accents manquaient dans les traductions françaises : corrigés.",
+        "Plusieurs messages d'erreur restaient en anglais en mode FR : corrigés."
       ],
       "changes_en": [
-        "Critical security: 7 exploits patched (ELO theft via PUT /api/game, unsigned OAuth state, socket auth without session check, deck tampering, sealed pool spoofing, remote forfeit, admin set-elo without clamp). Rate limits added on chat, friend requests, forgot-password, register, reports, match invites, tournament codes, failed logins. Game-online ban enforced everywhere.",
-        "Performance: Tournament DB indexes up to 10× faster, sealed booster gen 5× faster, scoped socket.io broadcasts on lobby/spec/games-watchers, parallel friends/match-invite queries, HTTP cache for replays/elo-history/quiz, anti-DoS caps everywhere. Prod build validated.",
-        "Full i18n: every API and socket error emits a translated errorKey, dates are locale-aware (toLocaleDateString receives the locale), EloHistoryChart fully translated. ~803 FR strings re-accented across 8 passes (défaite, créer, règles, rôle, système, à preposition...). Parity 2614/2614 EN+FR."
+        "Several cheating exploits patched (ELO theft, Discord linking abuse, deck tampering).",
+        "Spam limits added on chat, invites, sign-up, forgot-password and login attempts.",
+        "An online game ban also blocks joining a tournament or a private game.",
+        "Most pages are faster, especially Tournaments and Leaderboard.",
+        "Dates now display in the player's language (they used to stay in English in FR mode).",
+        "Many missing accents in French translations: fixed.",
+        "Several error messages were stuck in English in FR mode: fixed."
       ]
     },
     {
@@ -52,423 +51,184 @@
       "title_fr": "Tournois : audit complet et stabilisation",
       "title_en": "Tournaments: full audit and stabilization",
       "changes_fr": [
-        "Tournois : audit complet sur 60 commits. ~15 race conditions corrigées (auto-start vs join/leave/select-deck, double-disconnect Swiss, rematch idempotent, manual start), 7 fuites mémoire colmatées (rooms, maps in-memory, timers), bugs forfait/reset/DQ/cancel patchés. Sealed mode fonctionnel, double élimination disponible, Swiss multi-joueur stable.",
-        "Confidentialité tournois privés : listing public masqué, joinCode plus exposé aux non-créateurs, /matches et tournament:subscribe gated, GET protégé contre l'énumération. Gates ajoutés : matchmaking/rematch/casual/match-invite/decks tous bloqués pendant un match de tournoi.",
-        "Validations + perf : gameMode strict (classic/sealed/restricted), Rare Art = même version que la Rare base, ban list freeze à start, orphan match detection, refresh socket événements sur join/leave/select-deck/forfeit/pairings/delete/admin-start. 100+ tests E2E ajoutés. Cleanup auto : tournois abandonnés purgés à 30j."
+        "Beaucoup de bugs de tournoi corrigés (forfaits, resets, disqualifications).",
+        "Le mode scellé fonctionne maintenant en tournoi.",
+        "Format double élimination disponible.",
+        "Les tournois privés sont vraiment privés (plus visibles dans la liste publique).",
+        "Le code de tournoi ne peut plus être deviné par force brute.",
+        "Tu ne peux plus être matché en casual ni invité en duel pendant un match de tournoi."
       ],
       "changes_en": [
-        "Tournaments: full audit across 60 commits. ~15 race conditions fixed (auto-start vs join/leave/select-deck, Swiss double-disconnect, idempotent rematch, manual start), 7 memory leaks plugged (rooms, in-memory maps, timers), forfeit/reset/DQ/cancel bugs patched. Sealed mode working, double elimination available, multi-player Swiss stable.",
-        "Private tournament privacy: public listing hidden, joinCode no longer exposed to non-creators, /matches and tournament:subscribe gated, GET protected against enumeration. Added gates: matchmaking/rematch/casual/match-invite/decks all blocked during a tournament match.",
-        "Validations + perf: strict gameMode (classic/sealed/restricted), Rare Art = same version as base Rare, ban list frozen at start, orphan match detection, socket refresh events on join/leave/select-deck/forfeit/pairings/delete/admin-start. 100+ E2E tests added. Auto-cleanup: abandoned tournaments purged after 30d."
+        "Lots of tournament bugs fixed (forfeits, resets, disqualifications).",
+        "Sealed mode now works in tournaments.",
+        "Double-elimination format available.",
+        "Private tournaments are actually private (no longer in the public list).",
+        "Tournament join codes can no longer be brute-forced.",
+        "You can no longer be matched in casual or invited to a duel while in a tournament match."
       ]
     },
     {
       "date": "2026-05-05",
-      "title_fr": "Prise de contrôle : un personnage volé déjà upgrade revient bien à son propriétaire si le contrôleur quitte",
-      "title_en": "Take control: a stolen character that was already upgraded now returns to its owner when the controller leaves",
+      "title_fr": "Prise de contrôle, timers raccourcis, Sakura/Kakashi et performance",
+      "title_en": "Take control, shorter timers, Sakura/Kakashi and performance",
       "changes_fr": [
-        "Quand Ino (ou un effet similaire) prenait le contrôle d'un personnage déjà upgrade (stack > 1) et que le contrôleur quittait le jeu (défaite, caché, retour en main), le personnage volé restait sur le côté du contrôleur. Conforme à la règle, il revient désormais à son propriétaire d'origine avec sa pile complète et son état (caché ou face visible)."
+        "Personnage volé déjà upgrade : revient bien à son propriétaire si le contrôleur quitte le jeu.",
+        "Mulligan + Edge : timer raccourci de 90 à 60 secondes.",
+        "Choix d'effets de score : timer raccourci de 2 minutes à 1 minute.",
+        "Reconnexion après déconnexion : 1 minute au lieu de 2.",
+        "Sakura Secret (135) : plus de boucle qui demande sans cesse de défausser.",
+        "Kakashi (016, 148) ne peut plus copier un autre Kakashi.",
+        "Replays beaucoup plus légers, fin de partie et chargement plus rapides.",
+        "MSS 05 (Ramener) : un personnage contrôlé revient bien à son propriétaire."
       ],
       "changes_en": [
-        "When Ino (or a similar effect) took control of an already-upgraded character (stack > 1) and the controller left play (defeated, hidden, returned to hand), the stolen character stayed on the controller's side. Per the rules, it now returns to its original owner with the full stack and its state (hidden or face-up)."
-      ]
-    },
-    {
-      "date": "2026-05-05",
-      "title_fr": "Timers raccourcis : mulligan, mission et déconnexion à 1 minute",
-      "title_en": "Shorter timers: mulligan, mission and disconnect at 1 minute",
-      "changes_fr": [
-        "La phase de mulligan + Edge passe de 90 à 60 secondes. Si un joueur ne joue pas, il est forfait.",
-        "La phase de mission (choix d'effets de score) passe de 2 minutes à 1 minute par décision.",
-        "Le délai de reconnexion après déconnexion passe de 2 minutes à 1 minute. Plus d'attente interminable quand l'adversaire quitte."
-      ],
-      "changes_en": [
-        "Mulligan + Edge phase goes from 90 to 60 seconds. A player who doesn't play in time is auto-forfeited.",
-        "Mission phase (score-effect choices) goes from 2 minutes to 1 minute per decision.",
-        "Reconnect grace after a disconnect goes from 2 minutes to 1 minute. No more endless wait when the opponent leaves."
-      ]
-    },
-    {
-      "date": "2026-05-05",
-      "title_fr": "Sakura Secret (135) plus de boucle infinie + Kakashi ne peut plus copier Kakashi",
-      "title_en": "Sakura Secret (135) no longer loops + Kakashi can't copy Kakashi anymore",
-      "changes_fr": [
-        "Sakura Secret (135) : la boucle où l'écran redemandait sans fin de défausser deux cartes après le choix est corrigée. L'effet termine proprement et joue la carte choisie.",
-        "Kakashi (016 Sharingan, 148 Mythos) ne peut plus copier un autre Kakashi en jeu. Tous les Kakashi sont retirés des cibles copiables, ce qui empêche les boucles infinies de copie."
-      ],
-      "changes_en": [
-        "Sakura Secret (135): the infinite loop where the screen kept asking to discard two cards after picking is fixed. The effect now resolves properly and plays the chosen card.",
-        "Kakashi (016 Sharingan, 148 Mythos) can no longer copy another Kakashi in play. All Kakashi are removed from the copyable target pool, which prevents the infinite copy loops."
-      ]
-    },
-    {
-      "date": "2026-05-05",
-      "title_fr": "Performances, replays compressés et fix MSS 05",
-      "title_en": "Performance, compressed replays and MSS 05 fix",
-      "changes_fr": [
-        "Replays compressés en gzip (~17× plus légers), fin de partie et chargement bien plus rapides.",
-        "ELO toujours enregistré même quand la base est saturée, profil plus fluide grâce aux nouveaux index.",
-        "MSS 05 (Ramener) : un personnage contrôlé revient bien dans la main de son propriétaire d'origine."
-      ],
-      "changes_en": [
-        "Replays gzip-compressed (~17× smaller), end-of-game and loading much faster.",
-        "ELO always recorded even when the database is full, profile loads faster thanks to new indexes.",
-        "MSS 05 (Bring it Back): a controlled character now returns to its original owner's hand."
+        "Stolen character already upgraded: returns to its owner if the controller leaves play.",
+        "Mulligan + Edge timer shortened from 90 to 60 seconds.",
+        "Mission scoring choices timer shortened from 2 minutes to 1 minute.",
+        "Reconnect grace cut from 2 minutes to 1 minute.",
+        "Sakura Secret (135): no more loop that keeps asking to discard.",
+        "Kakashi (016, 148) can no longer copy another Kakashi.",
+        "Replays much smaller, end-of-game and loading much faster.",
+        "MSS 05 (Bring it Back): a controlled character now returns to its real owner."
       ]
     },
     {
       "date": "2026-05-04",
-      "title_fr": "ELO rééquilibré : moins de farming des bas ELO, gains plus généreux pour les écarts moyens",
-      "title_en": "ELO rebalanced: less farming of low-ELO players, more generous gains for mid-gaps",
+      "title_fr": "ELO rééquilibré",
+      "title_en": "ELO rebalanced",
       "changes_fr": [
-        "Le minimum gagné sur une victoire descend de +10 à +5, mais ne s'applique qu'aux écarts d'ELO très importants (>=1500 points). Pour les écarts moyens (500-1000), le gain monte à +12/+13 au lieu de +10.",
-        "Le maximum perdu sur une défaite peut maintenant atteindre -32 (au lieu de -25), mais uniquement quand l'écart est très important (perdre contre quelqu'un >=1500 ELO en dessous de soi). Les défaites sur écarts proches restent à -16/-25 comme avant.",
+        "Moins de farm sur les bas-ELO, gains plus généreux pour les écarts moyens (jusqu'à +12/+13 au lieu de +10).",
+        "Pertes possibles jusqu'à -32 sur de très gros écarts (perdre face à un adversaire 1500+ en dessous).",
         "Les parties à ELO proche (écart < 200) ne changent pas."
       ],
       "changes_en": [
-        "The minimum win gain drops from +10 to +5, but only applies for very large ELO gaps (>=1500 points). For mid-gaps (500-1000), the gain goes up to +12/+13 instead of +10.",
-        "The maximum loss on a defeat can now reach -32 (instead of -25), but only for very large gaps (losing to someone >=1500 ELO below you). Close-gap losses stay at -16/-25 like before.",
+        "Less farming of low-ELO players, more generous gains on mid-gaps (up to +12/+13 instead of +10).",
+        "Losses can reach -32 for very large gaps (losing to someone 1500+ below you).",
         "Close-ELO matches (gap < 200) are unchanged."
       ]
     },
     {
       "date": "2026-05-02",
-      "title_fr": "Profils : page accessible pour tous les joueurs, plus d'erreur 'Joueur introuvable'",
-      "title_en": "Profiles: page works for every player, no more 'Player not found' error",
+      "title_fr": "Profils de tous les joueurs accessibles",
+      "title_en": "All player profiles accessible",
       "changes_fr": [
-        "Certains profils renvoyaient 'Joueur introuvable' à cause d'une requête trop lourde côté base de données. La requête a été réécrite et les profils s'ouvrent désormais pour tout le monde."
+        "Plus d'erreur Joueur introuvable : les profils s'ouvrent désormais pour tout le monde."
       ],
       "changes_en": [
-        "Some profiles returned 'Player not found' because of a database query that was too heavy. The query has been rewritten and profiles now open for everyone."
+        "No more 'Player not found' error: profiles open for everyone now."
       ]
     },
     {
       "date": "2026-05-01",
-      "title_fr": "Sakura Secret (135) : carte forcée non jouable est défaussée, plus disparue",
-      "title_en": "Sakura Secret (135): forced card that cannot be played is now discarded, no longer vanishes",
+      "title_fr": "Tournois solides, sauvegardes fiables, forfait propre",
+      "title_en": "Solid tournaments, reliable saves, clean forfeit",
       "changes_fr": [
-        "Quand l'effet de Sakura forçait à jouer une carte qui ne pouvait l'être nulle part (No Repetition ou chakra insuffisant), la carte disparaissait sans aller dans la défausse. Conforme à la règle, elle part maintenant à la défausse."
+        "Sakura Secret (135) : une carte forcée qui ne peut être jouée part bien à la défausse.",
+        "Tournois : timer de 5 minutes avant un match, forfait auto si un joueur ne rejoint pas.",
+        "Tournois : timer de 90 secondes au mulligan, forfait auto si inactif.",
+        "Plus de demande de choix de deck en tournoi (déjà fixé à l'inscription).",
+        "Beaucoup plus de parties sont désormais sauvegardées et donnent un replay.",
+        "Les entrées d'historique ELO ouvrent leur replay directement.",
+        "Cliquer plusieurs fois sur Abandonner ne crée plus plusieurs défaites.",
+        "Écran de fin de partie affiché plus tôt, sans attendre la sauvegarde complète."
       ],
       "changes_en": [
-        "When Sakura's effect forced a card that could not be played anywhere (No Repetition or not enough chakra), the card vanished instead of going to the discard pile. Per the rules, it now goes to the discard pile."
-      ]
-    },
-    {
-      "date": "2026-05-01",
-      "title_fr": "Tournois : timer pre-game, plus de blocage si un joueur ne rejoint pas",
-      "title_en": "Tournaments: pre-game timer, no more blocked games if a player doesn't join",
-      "changes_fr": [
-        "Une fois le match lancé, un timer surveille la phase d'avant-match. Si un joueur ne rejoint pas la salle dans les 5 minutes, il est forfait automatiquement.",
-        "La phase mulligan a aussi un timer (90 secondes). Si un joueur reste inactif, il est forfait automatiquement et le match continue.",
-        "Plus de demande de choix de deck dans une salle de tournoi : le deck est déjà fixé à l'inscription / au sealed."
-      ],
-      "changes_en": [
-        "Once a tournament match starts, a pre-game timer watches the room. If a player does not join within 5 minutes, they auto-forfeit.",
-        "The mulligan phase also has a timer (90 seconds). If a player stays inactive, they auto-forfeit and the match proceeds.",
-        "No more deck-selection prompt in a tournament room: the deck is already locked from registration / sealed."
-      ]
-    },
-    {
-      "date": "2026-05-01",
-      "title_fr": "Sauvegarde des parties plus fiable : replays disponibles plus souvent",
-      "title_en": "Game saves more reliable: replays available more often",
-      "changes_fr": [
-        "Beaucoup de parties ne créaient pas de sauvegarde, donc pas de replay et pas d'entrée d'historique cliquable. Le serveur essaie désormais plusieurs niveaux de réduction de taille avant d'abandonner (snapshots, journal, etc.).",
-        "Les entrées d'historique ELO sont maintenant liées à leur partie sauvegardée, ce qui permet d'ouvrir le replay depuis le profil."
-      ],
-      "changes_en": [
-        "Many games failed to create a save record, leaving no replay and no clickable history entry. The server now tries multiple levels of payload trimming before giving up (snapshots, log, etc.).",
-        "ELO history entries are now linked to their saved game, so replays can be opened directly from the profile."
-      ]
-    },
-    {
-      "date": "2026-05-01",
-      "title_fr": "Forfait : un seul clic suffit, plus de défaites en chaîne",
-      "title_en": "Forfeit: one click is enough, no more chained losses",
-      "changes_fr": [
-        "Cliquer plusieurs fois sur Abandonner ne crée plus plusieurs parties terminées avec plusieurs défaites. La fin de partie n'est traitée qu'une seule fois par room.",
-        "L'écran de fin de partie s'affiche dès que l'ELO est calculé, sans attendre la sauvegarde complète de la partie. Le bouton de replay devient actif quelques secondes plus tard."
-      ],
-      "changes_en": [
-        "Clicking Forfeit multiple times no longer creates multiple finished games with stacked losses. End-of-game is processed only once per room.",
-        "The end-of-game screen now appears as soon as ELO is computed, without waiting for the full game record save. The replay button becomes active a few seconds later."
+        "Sakura Secret (135): a forced card that can not be played goes to the discard pile.",
+        "Tournaments: 5-minute pre-match timer, auto-forfeit if a player does not join.",
+        "Tournaments: 90-second mulligan timer, auto-forfeit if inactive.",
+        "No more deck-pick prompt in a tournament (already locked at registration).",
+        "Many more games are now saved and produce a replay.",
+        "ELO history entries open their replay directly.",
+        "Clicking Forfeit multiple times no longer creates multiple losses.",
+        "End-of-game screen shows earlier, without waiting for the full save."
       ]
     },
     {
       "date": "2026-04-30",
-      "title_fr": "Phase de notation des missions : plus de blocage en fin de partie",
-      "title_en": "Mission scoring phase: no more blocked games at the end",
+      "title_fr": "Notation des missions, popups d'effet, replays fidèles",
+      "title_en": "Mission scoring, effect popups, faithful replays",
       "changes_fr": [
-        "La phase de notation peut maintenant toujours se finaliser, même si un effet de score a laissé un état résiduel. La partie passe à la phase de fin et est sauvegardée dans l'historique."
+        "La notation des missions ne bloque plus la fin de partie.",
+        "Popups d'effet : scroll uniquement si nécessaire, bouton Confirmer toujours visible.",
+        "Compteur de cibles de Gaara (120) corrigé.",
+        "Replays fidèles à la partie réelle (plus de doublons ou états incohérents).",
+        "Mulligan inclus dans le replay.",
+        "Orochimaru Permutation (051) : les missions suivantes du tour sont bien notées."
       ],
       "changes_en": [
-        "The scoring phase can now always finalize, even if a score effect left a residual state. The game advances to the End phase and is saved to history."
-      ]
-    },
-    {
-      "date": "2026-04-30",
-      "title_fr": "Popups d'effet : scroll seulement si nécessaire, compteur Gaara corrigé",
-      "title_en": "Effect popups: scroll only when needed, Gaara counter fixed",
-      "changes_fr": [
-        "Les popups d'effet restent dans l'écran et activent un scroll uniquement si leur contenu dépasse la fenêtre. Le bouton Confirmer reste toujours accessible.",
-        "Compteur de cibles corrigé sur Gaara (120) : il reflète désormais le maximum réellement atteignable selon la règle (1 personnage par mission)."
-      ],
-      "changes_en": [
-        "Effect popups stay inside the screen and only enable scrolling if the content overflows. The Confirm button stays reachable.",
-        "Fixed Gaara (120) target counter: it now reflects the actual maximum reachable per the rule (1 character per mission)."
-      ]
-    },
-    {
-      "date": "2026-04-30",
-      "title_fr": "Replays fidèles à la partie",
-      "title_en": "Replays faithful to the actual game",
-      "changes_fr": [
-        "Le serveur enregistre une photo de l'état après chaque action et le replay les rejoue directement. Plus de personnages dupliqués ou d'états incohérents.",
-        "Le mulligan est aussi capté. Les anciennes parties continuent de fonctionner avec l'ancien système."
-      ],
-      "changes_en": [
-        "The server records a state snapshot after every action and the replay plays them back directly. No more duplicate characters or incoherent states.",
-        "The mulligan is also captured. Older games keep working with the legacy system."
-      ]
-    },
-    {
-      "date": "2026-04-30",
-      "title_fr": "Orochimaru Permutation (051) : les missions suivantes sont notées",
-      "title_en": "Orochimaru Substitution (051): remaining missions get scored",
-      "changes_fr": [
-        "Quand Orochimaru perdait sa mission et choisissait une mission de destination, les missions suivantes du tour n'étaient plus notées. Toutes les missions sont maintenant évaluées dans l'ordre prévu."
-      ],
-      "changes_en": [
-        "When Orochimaru lost his mission and was picking a destination, the remaining missions of the turn were no longer scored. All missions are now evaluated in the proper order."
+        "Mission scoring no longer blocks the end of game.",
+        "Effect popups: only scroll if needed, Confirm button always reachable.",
+        "Gaara (120) target counter fixed.",
+        "Replays match the actual game (no more duplicate characters or weird states).",
+        "Mulligan now included in the replay.",
+        "Orochimaru Substitution (051): the remaining missions of the turn are scored."
       ]
     },
     {
       "date": "2026-04-29",
-      "title_fr": "Règle officielle du deck de Missions et nouvelle animation d'avant-match",
-      "title_en": "Official Mission Deck rule and new pre-game animation",
+      "title_fr": "Règles officielles, animation d'avant-match, plusieurs cartes corrigées",
+      "title_en": "Official rules, pre-match animation, several card fixes",
       "changes_fr": [
-        "En partie classée (compétitif) : chaque joueur amène 3 missions différentes avec son deck. Le moteur tire 2 missions au hasard par joueur et les alterne dans le deck final. La première mission révélée (rang D) provient toujours du joueur qui a l'Edge en début de partie, conformément aux règles officielles.",
-        "En partie casual : les missions tirées au hasard sont simplement mélangées, comme avant.",
-        "Nouvelle animation d'avant-match : juste après le tirage de l'Edge, une mini séquence montre la construction du deck de missions (4 emplacements D, C, B, A qui se remplissent un par un). En classé, l'origine de chaque mission (Edge ou Adversaire) est indiquée. L'animation se cale dans la file d'attente des animations existantes et ne se chevauche jamais avec une autre. Bouton \"Passer\" disponible (touches Échap, Espace ou Entrée)."
+        "Classé : la première mission révélée vient toujours du joueur avec l'Edge (règle officielle).",
+        "Casual : les missions tirées au hasard sont mélangées comme avant.",
+        "Nouvelle animation d'avant-match qui montre le deck de missions se construire, avec bouton Passer (Échap, Espace ou Entrée).",
+        "Gemma (049) ne redonne plus le tour à l'attaquant après son sacrifice.",
+        "Itachi Secret (140) ne redonne plus le tour à son joueur après que l'adversaire a réordonné sa défausse.",
+        "Parties contre un compte supprimé : ELO et stats désormais appliqués (parties récentes corrigées rétroactivement).",
+        "Effets UPGRADE liés à un AMBUSH ne se déclenchent plus si on joue la carte directement en upgrade depuis la main (Sasuke 014, Kidomaru 124).",
+        "Shikamaru (022) voit enfin tous les personnages joués par l'adversaire, y compris ceux joués en chaîne.",
+        "Kabuto Yakushi (054) cache maintenant tous les personnages éligibles d'un coup, sans choix.",
+        "Plus de plafond invisible à -16 en haut du classement : un top peut perdre jusqu'à -25, et un joueur faible gagner jusqu'à +25 en battant un top."
       ],
       "changes_en": [
-        "In ranked play (competitive): each player brings 3 different missions with their deck. The engine picks 2 missions at random per player and alternates them in the final deck. The first revealed mission (rank D) always comes from the player who has the Edge at game start, per the official rules.",
-        "In casual play: the randomly picked missions are simply shuffled together, as before.",
-        "New pre-game animation: right after the Edge coin flip, a short sequence shows the mission deck being built (slots D, C, B, A filled one by one). In ranked, each mission's origin (Edge or Opponent) is indicated. The animation is queued in the existing animation pipeline and never overlaps with another. \"Skip\" button available (Esc, Space, or Enter keys)."
-      ]
-    },
-    {
-      "date": "2026-04-29",
-      "title_fr": "Gemma (049) ne donne plus un tour supplémentaire à l'attaquant",
-      "title_en": "Gemma (049) no longer grants an extra turn to the attacker",
-      "changes_fr": [
-        "Quand Gemma Shiranui (049) déclenchait son sacrifice optionnel pour protéger un Village de la Feuille (face à un effet ennemi de défaite ou de cache, dont Kabuto 054), une fois le choix résolu par le défenseur, le tour repassait par erreur à l'attaquant.",
-        "Le tour passe maintenant correctement au défenseur, comme prévu après son action."
-      ],
-      "changes_en": [
-        "When Gemma Shiranui (049) prompted its optional sacrifice to protect a Leaf Village character (against an enemy defeat or hide effect, including Kabuto 054), once the defender resolved the choice, the turn was incorrectly handed back to the attacker.",
-        "The turn now properly passes to the defender, as expected after their action."
-      ]
-    },
-    {
-      "date": "2026-04-29",
-      "title_fr": "Parties contre un compte supprimé : ELO et stats appliqués correctement",
-      "title_en": "Games against a deleted account: ELO and stats applied properly",
-      "changes_fr": [
-        "Si un joueur terminait une partie classée contre un adversaire dont le compte avait été supprimé entre-temps (notamment lors de la fusion de comptes en double), aucun ELO ni statistique n'était mis à jour : la partie comptait pour 0 point.",
-        "Désormais le joueur encore présent reçoit le minimum garanti : +10 ELO en cas de victoire, -25 ELO en cas de défaite, avec mise à jour normale des wins/losses et de la série en cours.",
-        "17 parties récentes ont été corrigées rétroactivement et l'ELO des joueurs concernés a été ajusté."
-      ],
-      "changes_en": [
-        "If a player finished a ranked game against an opponent whose account had since been deleted (notably during duplicate account merges), no ELO or stats were applied — the game counted for 0 points.",
-        "The remaining player now receives the guaranteed minimum: +10 ELO on a win, -25 ELO on a loss, with normal updates to wins/losses and the current streak.",
-        "17 recent games have been retroactively corrected and the affected players' ELO has been adjusted."
-      ]
-    },
-    {
-      "date": "2026-04-29",
-      "title_fr": "Effets UPGRADE liés à un AMBUSH bloqués sur upgrade depuis la main",
-      "title_en": "AMBUSH-linked UPGRADE effects blocked when upgrading from hand",
-      "changes_fr": [
-        "Règle générale appliquée au moteur : si l'effet UPGRADE d'une carte est la continuité d'un AMBUSH (texte commençant par \"AMBUSH effect:\" / \"Effet EMBUSCADE :\"), il ne s'active plus quand la carte est jouée comme upgrade face visible depuis la main, sans révélation. Il ne s'active que dans le cadre d'un AMBUSH, donc lors d'une révélation.",
-        "Cas couverts : Sasuke Uchiwa (014) Sharingan, Kidomaru (124) et son variant rare art (KS-124-RA). Pour ces cartes, jouer la carte directement comme upgrade depuis la main n'active plus le bonus discard / power limit lié à l'embuscade.",
-        "Les effets UPGRADE classiques non liés à un AMBUSH (Kakashi 016, etc.) continuent de s'activer normalement sur upgrade depuis la main."
-      ],
-      "changes_en": [
-        "General rule enforced at the engine level: if a card's UPGRADE effect is the continuation of an AMBUSH (text starting with \"AMBUSH effect:\" / \"Effet EMBUSCADE :\"), it no longer activates when the card is played as a face-up upgrade from hand without being revealed. It only activates as part of an AMBUSH, that is on reveal.",
-        "Cases covered: Sasuke Uchiwa (014) Sharingan, Kidomaru (124) and its rare art variant (KS-124-RA). For these cards, playing the card directly as a face-up upgrade from hand no longer triggers the AMBUSH-linked discard / power-limit bonus.",
-        "Regular UPGRADE effects not linked to an AMBUSH (Kakashi 016, etc.) keep firing normally on upgrade from hand."
-      ]
-    },
-    {
-      "date": "2026-04-29",
-      "title_fr": "Shikamaru (022) voit enfin tous les personnages joués lors du dernier tour adverse",
-      "title_en": "Shikamaru (022) now sees every character played during the opponent's last turn",
-      "changes_fr": [
-        "Quand l'adversaire jouait une carte qui en jouait d'autres en chaîne (Sakura S qui ramène 2 personnages, Kakashi 4C qui copie un Kabuto 4C, etc.), Shikamaru ne proposait souvent qu'un seul personnage à déplacer, ou même aucun.",
-        "Le scan du log a été corrigé : il saute maintenant correctement la révélation de Shikamaru lui-même pour remonter jusqu'à la VRAIE action précédente du joueur. Tous les personnages joués entre temps par l'adversaire (action directe + effets en chaîne) sont maintenant ciblables.",
-        "Cas couverts : Sakura Secret qui en joue 2, Kakashi (016) qui copie un effet de jeu de l'adversaire, Hiruzen (002) qui joue un Village de la Feuille, Kabuto (053) qui joue depuis la défausse, et le cas où Shikamaru est révélé en upgrade."
-      ],
-      "changes_en": [
-        "When the opponent played a card that played others in a chain (Sakura Secret pulling 2 characters, Kakashi 4C copying a Kabuto 4C, etc.), Shikamaru often only offered one character to move, or none at all.",
-        "The log scan has been fixed: it now correctly skips Shikamaru's own reveal and walks back to the player's REAL previous action. Every character played by the opponent in between (direct action + chained effects) is now selectable.",
-        "Cases covered: Sakura Secret playing 2, Kakashi (016) copying an opponent's play effect, Hiruzen (002) playing a Leaf Village, Kabuto (053) playing from discard, and the case where Shikamaru is revealed as an upgrade."
-      ]
-    },
-    {
-      "date": "2026-04-29",
-      "title_fr": "Kabuto Yakushi (054) cache tous les personnages d'un coup",
-      "title_en": "Kabuto Yakushi (054) hides all characters at once",
-      "changes_fr": [
-        "Avant, quand Kabuto Yakushi (054) cachait les personnages avec moins de Puissance dans la mission, le jeu demandait de choisir lesquels cacher un par un. Si on oubliait de cliquer sur certains, ils restaient visibles.",
-        "Maintenant Kabuto cache instantanément tous les personnages éligibles, alliés comme ennemis, sans aucun choix d'ordre. Conforme à la règle de snapshot : la liste des cibles est figée au moment de l'activation et tous sont cachés simultanément."
-      ],
-      "changes_en": [
-        "Before, when Kabuto Yakushi (054) hid characters with less Power in the mission, the game asked you to pick them one by one. If you forgot to click on some, they stayed visible.",
-        "Now Kabuto instantly hides every eligible character, friend or enemy, with no order choice. Matches the snapshot rule: the target list is locked at activation time and they are all hidden simultaneously."
-      ]
-    },
-    {
-      "date": "2026-04-29",
-      "title_fr": "K-factor ELO unifié à 32 pour tous les niveaux",
-      "title_en": "ELO K-factor unified to 32 at every level",
-      "changes_fr": [
-        "Avant, dès qu'un joueur dépassait 2000 ELO, le K-factor passait de 32 à 16. Conséquence : un joueur à 2200+ ELO ne pouvait plus perdre que -16 par défaite, même contre un adversaire à 500 ELO. Les pertes restaient plafonnées à -16 et le clamp -25 ne pouvait jamais s'appliquer en haut du classement.",
-        "Le K-factor est maintenant fixé à 32 partout. Un joueur top peut désormais perdre jusqu'à -25 contre un adversaire beaucoup plus faible, et un joueur faible peut gagner jusqu'à +25 en battant un top. Le ladder devient plus dynamique et plus juste en haut du classement."
-      ],
-      "changes_en": [
-        "Previously, as soon as a player crossed 2000 ELO, the K-factor dropped from 32 to 16. As a result, a 2200+ ELO player could only lose -16 per defeat, even against a 500 ELO opponent. Losses were stuck at -16 and the -25 clamp could never apply at the top of the ladder.",
-        "The K-factor is now fixed at 32 everywhere. A top player can now lose up to -25 against a much weaker opponent, and a weaker player can gain up to +25 for beating a top one. The ladder becomes more dynamic and fairer at the top."
-      ]
-    },
-    {
-      "date": "2026-04-29",
-      "title_fr": "Itachi Secret (140) ne donne plus un tour supplémentaire à son joueur",
-      "title_en": "Itachi Secret (140) no longer grants an extra turn to its player",
-      "changes_fr": [
-        "Quand Itachi Uchiwa (140) faisait défausser et repiocher la main de l'adversaire, et que ce dernier devait choisir l'ordre de sa pile de défausse, le tour repassait par erreur à celui qui avait joué Itachi au lieu de passer à l'adversaire.",
-        "Le tour passe désormais correctement à l'adversaire après qu'il ait fini de réordonner sa défausse."
-      ],
-      "changes_en": [
-        "When Itachi Uchiwa (140) made the opponent discard and redraw their hand, and the opponent had to choose the order of their discard pile, the turn was incorrectly handed back to the Itachi player instead of passing to the opponent.",
-        "The turn now correctly passes to the opponent once they finish reordering their discard."
+        "Ranked: the first revealed mission always comes from the Edge holder (official rule).",
+        "Casual: randomly picked missions are shuffled like before.",
+        "New pre-match animation that shows the mission deck being built, with a Skip button (Esc, Space or Enter).",
+        "Gemma (049) no longer hands the turn back to the attacker after its sacrifice.",
+        "Itachi Secret (140) no longer hands the turn back to its player after the opponent reorders their discard.",
+        "Games against a deleted account: ELO and stats now applied (recent games retroactively corrected).",
+        "AMBUSH-linked UPGRADE effects no longer trigger when playing the card directly as an upgrade from hand (Sasuke 014, Kidomaru 124).",
+        "Shikamaru (022) now sees every character played by the opponent, including chained plays.",
+        "Kabuto Yakushi (054) now hides every eligible character at once, no manual picking.",
+        "No more invisible -16 cap at the top of the ladder: a top player can lose up to -25, and a weaker player can gain up to +25 by beating one."
       ]
     },
     {
       "date": "2026-04-25",
-      "title_fr": "Comptes en double fusionnés et liaison Discord/email corrigée",
-      "title_en": "Duplicate accounts merged and Discord/email linking fixed",
+      "title_fr": "Comptes en double fusionnés, effets de Neji et Hinata fiables",
+      "title_en": "Duplicate accounts merged, Neji and Hinata effects reliable",
       "changes_fr": [
-        "Si vous vous étiez inscrit avec un email/mot de passe puis que vous vous êtes ensuite connecté via Discord (ou l'inverse), un deuxième compte vide était créé à votre insu. Vos parties, votre ELO et vos decks pouvaient se retrouver répartis sur deux comptes selon la méthode de connexion.",
-        "21 comptes en double ont été fusionnés. Le compte le plus actif a été conservé avec ses parties, son ELO, ses decks et son ban historique, et les decks et l'email/mot de passe de l'autre compte ont été reportés dessus. Vous pouvez maintenant vous connecter avec Discord OU avec votre email et tomber sur le même compte.",
-        "Le flow d'authentification Discord a été corrigé : si l'email Discord correspond déjà à un compte email existant, le Discord est rattaché à ce compte au lieu d'en créer un nouveau."
+        "21 comptes en double fusionnés : Discord et email pointent vers le même compte.",
+        "Connexion Discord rattachée à votre compte email existant si l'adresse correspond.",
+        "Neji (037) POWERUP 1 et Hinata (031) +1 Chakra se déclenchent quand un personnage entre en jeu de n'importe quelle façon."
       ],
       "changes_en": [
-        "If you signed up with an email/password and later logged in through Discord (or the other way around), a second empty account was being created without you knowing. Your games, ELO and decks could end up split across two accounts depending on the login method.",
-        "21 duplicate accounts have been merged. The more active account is kept with its games, ELO, decks and ban history, and the decks and email/password from the other account were carried over to it. You can now sign in with Discord OR your email and land on the same account.",
-        "The Discord authentication flow was fixed: if the Discord email already matches an existing email-based account, Discord is now linked to that account instead of creating a new one."
-      ]
-    },
-    {
-      "date": "2026-04-25",
-      "title_fr": "Effets continus de Neji et Hinata déclenchés par TOUTES les mises en jeu",
-      "title_en": "Neji and Hinata triggered effects fire on EVERY way a character enters play",
-      "changes_fr": [
-        "Neji Hyuga (037) POWERUP 1 et Hinata Hyuga (031) +1 Chakra se déclenchent maintenant quand un personnage adverse arrive dans leur mission via n'importe quel effet : Kabuto (053) qui joue depuis la défausse, Jiraiya, Hiruzen (002) qui joue un Village de la Feuille, Sakura (135) qui joue depuis le deck, Kankuro (078) qui révèle un caché, Dosu (069) qui force une révélation, Kakashi (016) qui copie un effet de jeu, etc. Avant, seul un play depuis la main face visible déclenchait ces effets."
-      ],
-      "changes_en": [
-        "Neji Hyuga (037) POWERUP 1 and Hinata Hyuga (031) +1 Chakra now trigger when an enemy character enters their mission through any effect: Kabuto (053) playing from discard, Jiraiya, Hiruzen (002) playing a Leaf Village, Sakura (135) playing from deck, Kankuro (078) revealing a hidden, Dosu (069) forcing a reveal, Kakashi (016) copying a play effect, etc. Previously only a face-up play from hand triggered these effects."
+        "21 duplicate accounts merged: Discord and email now lead to the same account.",
+        "Discord login is linked to your existing email account if the address matches.",
+        "Neji (037) POWERUP 1 and Hinata (031) +1 Chakra trigger when a character enters play in any way."
       ]
     },
     {
       "date": "2026-04-24",
-      "title_fr": "Pseudos nettoyés et caractères spéciaux bloqués",
-      "title_en": "Usernames cleaned up, special characters blocked",
+      "title_fr": "Pseudos nettoyés, plusieurs cartes corrigées",
+      "title_en": "Usernames cleaned up, several card fixes",
       "changes_fr": [
-        "Les espaces et caractères spéciaux dans les pseudos (@, ., *, #, accents, etc.) causaient des bugs visibles : profil introuvable, liens cassés sur le leaderboard, etc.",
-        "Tous les pseudos existants ont été nettoyés automatiquement : les caractères interdits ont été remplacés par un underscore, et les doublons ont reçu un suffixe. 126 comptes renommés.",
-        "À l'inscription et dans les paramètres, seuls les lettres, chiffres, tirets et underscores sont désormais acceptés. Les caractères invalides sont bloqués directement dans le champ de saisie."
+        "126 pseudos nettoyés automatiquement, caractères spéciaux désormais bloqués (lettres, chiffres, tirets et underscores uniquement).",
+        "Shino (033) + Kurenai (034) : combo coût 0 quand un Jutsu ennemi est dans la mission.",
+        "Shikamaru (022) cible vraiment tous les personnages joués par l'adversaire, chaînes incluses.",
+        "Choji (018) : son déplacement utilise la puissance réelle (incluant les bonus continus).",
+        "Naruto (133) Rasengan : sélection de cibles plus claire et plus tolérante à l'ordre des clics.",
+        "Personnages contrôlés : retour au propriétaire d'origine quand le contrôleur quitte. Une carte volée upgrade reste à toi.",
+        "Shikamaru (111) bloque vraiment toutes les révélations sur sa mission, même celles forcées par Jiraiya, Hiruzen ou Kankuro."
       ],
       "changes_en": [
-        "Spaces and special characters in usernames (@, ., *, #, accents, etc.) caused visible bugs: profile not found, broken leaderboard links, and more.",
-        "All existing usernames have been cleaned up automatically: forbidden characters were replaced with underscores, and duplicates got a suffix. 126 accounts renamed.",
-        "During registration and in settings, only letters, digits, hyphens and underscores are now accepted. Invalid characters are blocked directly in the input field."
-      ]
-    },
-    {
-      "date": "2026-04-24",
-      "title_fr": "Shino 033 et Kurenai 034 : coût 0 en combo",
-      "title_en": "Shino 033 and Kurenai 034: cost 0 combo",
-      "changes_fr": [
-        "La réduction de coût de Shino (033) Clones d'Insectes est maintenant traitée comme un effet continu, comme les autres réductions similaires.",
-        "Quand Shino 033 est révélé à côté de Kurenai 034 avec un personnage ennemi Jutsu dans la mission, les deux réductions s'appliquent simultanément : Shino coûte 0 au lieu de 1. Cela vaut aussi pour les autres combos où une autre réduction couvre déjà le minimum de Kurenai."
-      ],
-      "changes_en": [
-        "Shino (033) Bug Clones cost reduction is now treated as a continuous effect, like other similar reductions.",
-        "When Shino 033 is revealed next to Kurenai 034 with an enemy Jutsu character in the mission, both reductions apply simultaneously: Shino costs 0 instead of 1. This also fixes other combos where a larger reduction already covers Kurenai's minimum."
-      ]
-    },
-    {
-      "date": "2026-04-24",
-      "title_fr": "Shikamaru 022 : cible tous les personnages joués par l'adversaire",
-      "title_en": "Shikamaru 022: targets all characters played by the opponent",
-      "changes_fr": [
-        "L'AMBUSH de Shikamaru Nara (022) voit maintenant TOUS les personnages que l'adversaire a joués depuis votre dernière action, pas seulement le tout dernier. Les chaînes (Sakura S qui joue Kabuto qui joue un autre personnage, Kakashi 4C qui copie Kabuto et joue depuis la défausse, etc.) sont correctement suivies jusqu'au bout."
-      ],
-      "changes_en": [
-        "Shikamaru Nara (022) AMBUSH now sees EVERY character the opponent played since your previous action, not only the very last one. Chains (Sakura S playing Kabuto which plays another character, Kakashi 4C copying Kabuto and playing from the discard pile, etc.) are tracked all the way through."
-      ]
-    },
-    {
-      "date": "2026-04-24",
-      "title_fr": "Choji 018 : puissance effective prise en compte",
-      "title_en": "Choji 018: effective power now taken into account",
-      "changes_fr": [
-        "Quand Choji Akimichi (018) se déplace sur une mission, son effet qui cache un ennemi de puissance inférieure utilise maintenant la puissance réelle (incluant les bonus/malus continus comme le -1 par allié de Sasuke) au lieu de la puissance imprimée."
-      ],
-      "changes_en": [
-        "When Choji Akimichi (018) moves into a mission, his effect that hides an enemy with less Power now uses the real effective power (including continuous bonuses and penalties like Sasuke's -1 per ally) instead of the printed power."
-      ]
-    },
-    {
-      "date": "2026-04-24",
-      "title_fr": "Naruto 133 : sélection des cibles plus claire",
-      "title_en": "Naruto 133: clearer target selection",
-      "changes_fr": [
-        "Quand vous jouez Naruto (133) Rasengan, le popup de sélection des cibles vous indique maintenant explicitement ce qui manque pour valider (une cible Puissance 5 ou moins dans cette mission, ou une cible Puissance 2 ou moins n'importe où).",
-        "Le bouton Confirmer apparaît dès que vos deux choix remplissent correctement les deux créneaux, quel que soit l'ordre dans lequel vous les cliquez.",
-        "Le créneau 'Puissance 2 ou moins n'importe où' accepte bien toute cible valide y compris dans la mission de Naruto : un ennemi Puissance 2 qui est déjà sur la mission où Naruto arrive peut remplir les deux créneaux selon votre choix de combinaison."
-      ],
-      "changes_en": [
-        "When you play Naruto (133) Rasengan, the target selection popup now explicitly tells you what is still needed to confirm (a Power 5 or less target in this mission, or a Power 2 or less target anywhere).",
-        "The Confirm button appears as soon as your two picks correctly fill both slots, regardless of the order you clicked them in.",
-        "The 'Power 2 or less anywhere' slot correctly accepts any valid target including those in Naruto's own mission: a Power 2 enemy already on Naruto's target mission can fill either slot depending on your combination."
-      ]
-    },
-    {
-      "date": "2026-04-24",
-      "title_fr": "Correction du contrôle de personnage",
-      "title_en": "Character control fix",
-      "changes_fr": [
-        "Quand un personnage qui contrôle une carte adverse est caché, défait ou retourne en main, la carte volée retourne immédiatement à son propriétaire d'origine, dans la même mission et dans le même état (visible ou cachée).",
-        "Vous pouvez maintenant évoluer une carte adverse que vous avez volée. Dans ce cas la pile vous appartient totalement : si le contrôleur meurt plus tard, la pile ne repart pas à l'adversaire."
-      ],
-      "changes_en": [
-        "When a character controlling a stolen card is hidden, defeated, or returns to hand, the stolen card immediately goes back to its original owner, in the same mission and in the same state (face-up or hidden).",
-        "You can now upgrade onto a stolen enemy card. When you do, the stack becomes fully yours: if the controller dies later, the stack does not return to the opponent."
-      ]
-    },
-    {
-      "date": "2026-04-24",
-      "title_fr": "Correction du verrou Shikamaru 111",
-      "title_en": "Shikamaru 111 lock fix",
-      "changes_fr": [
-        "Shikamaru (111) bloque maintenant correctement TOUTES les révélations de cartes cachées sur sa mission, y compris celles déclenchées par des effets comme Jiraiya (jouer une carte Invocation), Hiruzen (jouer un Village de la Feuille) ou Kankuro.",
-        "Dosu Kinuta (069) : si un Shikamaru adverse verrouille la mission, le personnage ciblé est automatiquement vaincu puisque l'option de le révéler n'est plus valide."
-      ],
-      "changes_en": [
-        "Shikamaru (111) now correctly blocks EVERY reveal of hidden characters on his mission, including reveals triggered by effects like Jiraiya (play a Summon), Hiruzen (play a Leaf Village), or Kankuro.",
-        "Dosu Kinuta (069): if an enemy Shikamaru locks the mission, the targeted character is auto-defeated since the reveal option is no longer available."
+        "126 usernames cleaned up automatically, special characters now blocked (letters, digits, hyphens and underscores only).",
+        "Shino (033) + Kurenai (034): cost-0 combo when an enemy Jutsu is in the mission.",
+        "Shikamaru (022) really targets every character played by the opponent, chained plays included.",
+        "Choji (018): movement uses real power (including continuous bonuses).",
+        "Naruto (133) Rasengan: clearer target selection, more forgiving on click order.",
+        "Controlled characters return to their owner when the controller leaves. A stolen card you upgrade stays yours.",
+        "Shikamaru (111) truly blocks every reveal on his mission, including those forced by Jiraiya, Hiruzen or Kankuro."
       ]
     },
     {
@@ -476,56 +236,45 @@
       "title_fr": "Ajustement du système ELO",
       "title_en": "ELO system tuning",
       "changes_fr": [
-        "Vous gagnez maintenant au moins 10 points ELO à chaque victoire, même contre un adversaire plus faible.",
-        "Vous ne pouvez plus perdre plus de 25 points ELO en une seule défaite. Un mauvais match ne plombe plus toute votre saison.",
-        "Le gain ou la perte affiché à la fin de la partie correspond exactement au changement appliqué sur votre profil."
+        "Vous gagnez au moins 10 points ELO à chaque victoire, même contre un adversaire plus faible.",
+        "Vous ne pouvez plus perdre plus de 25 points ELO en une seule défaite.",
+        "Le gain ou la perte affiché en fin de partie correspond exactement au changement appliqué sur votre profil."
       ],
       "changes_en": [
-        "You now gain at least 10 ELO points on every win, even against a weaker opponent.",
-        "You can no longer lose more than 25 ELO points in a single defeat. One bad matchup will not wreck your season anymore.",
+        "You gain at least 10 ELO points on every win, even against a weaker opponent.",
+        "You can no longer lose more than 25 ELO points in a single defeat.",
         "The gain or loss shown at the end of the game matches exactly what is applied to your profile."
       ]
     },
     {
       "date": "2026-04-22",
-      "title_fr": "Historique ELO public",
-      "title_en": "Public ELO history",
+      "title_fr": "Historique ELO public et plusieurs ajustements de règles",
+      "title_en": "Public ELO history and several rule adjustments",
       "changes_fr": [
-        "Votre profil affiche désormais une courbe de votre ELO sur les 14 derniers jours, avec les adversaires rencontrés.",
-        "Les parties jouées sont conservées 72 heures, le temps de revoir vos replays.",
-        "Les joueurs suspectés de farm ELO sont détectés automatiquement par plusieurs critères (mêmes IP, comptes créés ensemble, forfaits courts, etc.)."
+        "Courbe d'ELO sur 14 jours visible sur ton profil avec les adversaires rencontrés.",
+        "Parties conservées 72 heures pour revoir les replays.",
+        "Détection automatique des suspects de farm ELO (mêmes IP, comptes créés ensemble, forfaits courts).",
+        "Sasuke (136) doit défaire un personnage si possible.",
+        "Sakon (062) copie correctement l'embuscade de Kidomaru.",
+        "Itachi (140) peut prendre le contrôle de n'importe quel personnage.",
+        "Tayuya (125) cible uniquement les cartes en main.",
+        "Jirobo (122) se compte lui-même dans son effet.",
+        "Shino (115) ne peut plus être copié.",
+        "Hayate (048) et Gemma (049) respectent la non-répétition.",
+        "Personnages contrôlés reviennent à leur propriétaire d'origine quand ils quittent le jeu."
       ],
       "changes_en": [
-        "Your profile now shows an ELO curve for the last 14 days, with the opponents you faced.",
-        "Played games are kept for 72 hours so you have time to watch the replays.",
-        "Players suspected of ELO farming are flagged automatically through several signals (shared IPs, accounts made together, short forfeits, etc.)."
-      ]
-    },
-    {
-      "date": "2026-04-22",
-      "title_fr": "Ajustements de règles",
-      "title_en": "Rule adjustments",
-      "changes_fr": [
-        "Sasuke 136 doit désormais défaire un personnage si possible, même si seul un ennemi est une cible valide.",
-        "Sakon 062 copie correctement l'embuscade de Kidomaru et les autres effets révélés.",
-        "Shikamaru 022 voit bien tous les personnages joués au tour précédent, plus seulement le dernier.",
-        "Itachi 140 peut viser n'importe quel personnage avec son effet de prise de contrôle, pas uniquement un ennemi.",
-        "Tayuya 125 cible uniquement des cartes en main, plus les cartes cachées.",
-        "Jirobo 122 se compte lui-même dans son effet de décompte.",
-        "Shino 115 ne peut plus être copié par aucun effet.",
-        "Les effets statiques comme Hayate 048 et Gemma 049 respectent maintenant la règle de non-répétition.",
-        "Les personnages pris par Orochimaru, Itachi et autres effets de contrôle reviennent à leur propriétaire d'origine quand ils quittent le jeu."
-      ],
-      "changes_en": [
-        "Sasuke 136 must now defeat a character when able, even if only an enemy is a legal target.",
-        "Sakon 062 correctly copies Kidomaru's ambush and other revealed effects.",
-        "Shikamaru 022 now sees every character played on the previous turn, not just the last one.",
-        "Itachi 140 can target any character with his take-control effect, not only an enemy.",
-        "Tayuya 125 only targets cards in hand now, no longer hidden cards.",
-        "Jirobo 122 counts himself in his counting effect.",
-        "Shino 115 can no longer be copied by any effect.",
-        "Static effects like Hayate 048 and Gemma 049 now respect the no-repetition rule.",
-        "Characters stolen by Orochimaru, Itachi and other control effects return to their original owner when they leave play."
+        "14-day ELO curve on your profile with the opponents you faced.",
+        "Played games kept for 72 hours so you can watch the replays.",
+        "Automatic detection of ELO-farming suspects (shared IPs, accounts made together, short forfeits).",
+        "Sasuke (136) must defeat a character when able.",
+        "Sakon (062) correctly copies Kidomaru's ambush.",
+        "Itachi (140) can take control of any character.",
+        "Tayuya (125) only targets cards in hand.",
+        "Jirobo (122) counts himself in his effect.",
+        "Shino (115) can no longer be copied.",
+        "Hayate (048) and Gemma (049) respect the no-repetition rule.",
+        "Controlled characters return to their owner when they leave play."
       ]
     },
     {
@@ -533,20 +282,20 @@
       "title_fr": "Confort de jeu et anti-troll",
       "title_en": "Quality of life and anti-trolling",
       "changes_fr": [
-        "Un bouton Annuler est disponible sur tous les effets optionnels. Vous pouvez toujours revenir en arrière quand vous n'êtes pas obligé de choisir une cible.",
-        "Les flèches de déplacement des cartes en main affichent Gauche et Droite au lieu de caractères illisibles.",
-        "Un joueur qui se déconnecte 3 fois dans la même partie perd automatiquement, pour éviter les parties sabotées.",
-        "Le timer de déconnexion démarre désormais correctement quand un adversaire quitte la partie.",
-        "Le bouton rematch fonctionne de nouveau dans tous les modes.",
-        "Les cartes peuvent avoir une puissance négative. Il faut toujours au moins 1 de puissance pour remporter une mission."
+        "Bouton Annuler disponible sur tous les effets optionnels.",
+        "Flèches de tri en main affichent Gauche et Droite au lieu de caractères illisibles.",
+        "Forfait auto après 3 déconnexions dans la même partie.",
+        "Le timer de déconnexion démarre correctement quand un adversaire quitte.",
+        "Le bouton rematch fonctionne dans tous les modes.",
+        "Les puissances négatives existent. Il faut toujours au moins 1 de puissance pour gagner une mission."
       ],
       "changes_en": [
-        "A Cancel button is available on every optional effect. You can always back out when you are not required to choose a target.",
-        "The hand sort arrows now show Left and Right instead of unreadable characters.",
-        "A player who disconnects 3 times in the same game automatically forfeits, to stop sabotaged matches.",
-        "The disconnect timer now starts correctly when an opponent leaves the game.",
-        "The rematch button works again in every mode.",
-        "Characters can have negative power. You still need at least 1 total power to win a mission."
+        "Cancel button on every optional effect.",
+        "Hand sort arrows show Left and Right instead of unreadable characters.",
+        "Auto-forfeit after 3 disconnects in the same game.",
+        "The disconnect timer starts correctly when an opponent leaves.",
+        "Rematch button works in every mode.",
+        "Negative power exists. You still need at least 1 total power to win a mission."
       ]
     },
     {
@@ -554,14 +303,14 @@
       "title_fr": "Support mobile",
       "title_en": "Mobile support",
       "changes_fr": [
-        "Le plateau a été retravaillé pour les téléphones: 4 cartes par mission sont visibles avant d'avoir à scroller.",
-        "Les cartes en main et les emplacements de mission ont été réduits pour laisser plus de place au gameplay.",
-        "Les boutons de tri des cartes sont masqués sur mobile pour gagner de l'espace."
+        "Plateau retravaillé pour les téléphones : 4 cartes par mission visibles avant scroll.",
+        "Cartes en main et emplacements de mission réduits pour gagner de la place.",
+        "Boutons de tri masqués sur mobile."
       ],
       "changes_en": [
-        "The board has been reworked for phones: 4 cards per mission are visible before you need to scroll.",
-        "Hand cards and mission slots have been shrunk to leave more room for the gameplay.",
-        "The hand sort buttons are hidden on mobile to save space."
+        "Board reworked for phones: 4 cards per mission visible before scroll.",
+        "Hand cards and mission slots shrunk to leave more room.",
+        "Sort buttons hidden on mobile."
       ]
     }
   ]

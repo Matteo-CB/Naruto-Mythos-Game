@@ -11,7 +11,7 @@ import { HoloCard } from '@/components/HoloCard';
 import { Footer } from '@/components/Footer';
 import { CloudBackground } from '@/components/CloudBackground';
 import { TournamentNavButton, type TournamentMenuStatus } from '@/components/TournamentNavButton';
-import { HomeMenuButton, MenuHairline } from '@/components/HomeMenuButton';
+import { HomeMenuButton } from '@/components/HomeMenuButton';
 
 
 const FEATURED_CARDS = [
@@ -69,13 +69,13 @@ const floatingElements = [
 
 
 const menuButtons = [
-  { key: 'play' as const,         href: '/play',         primary: true,  captionKey: 'captionPlay' },
-  { key: 'customization' as const, href: '/settings',    primary: false, captionKey: 'captionSettings' },
-  { key: 'deckBuilder' as const,  href: '/deck-builder', primary: false, captionKey: 'captionDeckBuilder' },
-  { key: 'collection' as const,   href: '/collection',   primary: false, captionKey: 'captionCollection' },
-  { key: 'learn' as const,        href: '/learn',        primary: false, captionKey: 'captionLearn' },
-  { key: 'leaderboard' as const,  href: '/leaderboard',  primary: false, captionKey: 'captionLeaderboard' },
-  { key: 'tournaments' as const,  href: '/tournaments',  primary: false, captionKey: '' },
+  { key: 'play' as const,         href: '/play',         primary: true  },
+  { key: 'customization' as const, href: '/settings',    primary: false },
+  { key: 'deckBuilder' as const,  href: '/deck-builder', primary: false },
+  { key: 'collection' as const,   href: '/collection',   primary: false },
+  { key: 'learn' as const,        href: '/learn',        primary: false },
+  { key: 'leaderboard' as const,  href: '/leaderboard',  primary: false },
+  { key: 'tournaments' as const,  href: '/tournaments',  primary: false },
 ];
 
 
@@ -212,7 +212,7 @@ export default function Home() {
             
             <motion.nav
               aria-label={ta('mainNavigation')}
-              className="flex w-full flex-col"
+              className="flex w-full flex-col gap-2"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.7 }}
@@ -220,39 +220,29 @@ export default function Home() {
               {menuButtons.map((btn, i) => {
                 if (btn.key === 'tournaments') {
                   return (
-                    <div key={btn.key}>
-                      {i > 0 && <MenuHairline />}
-                      <TournamentNavButton
-                        status={tournamentMenuStatus}
-                        index={i}
-                        label={t(btn.key)}
-                        primary={btn.primary}
-                        delay={0.8 + i * 0.06}
-                      />
-                    </div>
+                    <TournamentNavButton
+                      key={btn.key}
+                      status={tournamentMenuStatus}
+                      label={t(btn.key)}
+                      primary={btn.primary}
+                      delay={0.8 + i * 0.06}
+                    />
                   );
                 }
                 return (
-                  <div key={btn.key}>
-                    {i > 0 && <MenuHairline />}
-                    <HomeMenuButton
-                      href={btn.href}
-                      index={i}
-                      label={t(btn.key)}
-                      caption={t(btn.captionKey)}
-                      variant={btn.primary ? 'primary' : 'muted'}
-                      delay={0.8 + i * 0.06}
-                    />
-                  </div>
+                  <HomeMenuButton
+                    key={btn.key}
+                    href={btn.href}
+                    label={t(btn.key)}
+                    variant={btn.primary ? 'primary' : 'muted'}
+                    delay={0.8 + i * 0.06}
+                  />
                 );
               })}
 
-              <MenuHairline />
               <HomeMenuButton
                 href="/play/sealed"
-                index={menuButtons.length}
                 label={t('sealed')}
-                caption={t('captionSealed')}
                 variant="primary"
                 delay={1.3}
               />
