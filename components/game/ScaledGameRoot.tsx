@@ -3,8 +3,8 @@
 import React, { useEffect, useState, type ReactNode } from 'react';
 import { GameScaleContext, DESKTOP_FIXED_DIMS } from './GameScaleContext';
 
-const BASE_WIDTH = 1920;
-const BASE_HEIGHT = 1080;
+const BASE_WIDTH = 1280;
+const BASE_HEIGHT = 720;
 
 interface Props {
   children: ReactNode;
