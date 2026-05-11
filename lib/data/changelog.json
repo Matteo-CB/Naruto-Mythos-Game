@@ -1,6 +1,19 @@
 {
   "entries": [
     {
+      "date": "2026-05-11",
+      "title_fr": "Mobile, profil et corrections",
+      "title_en": "Mobile, profile and fixes",
+      "changes_fr": [
+        "Sur téléphone, le terrain garde maintenant des proportions strictes et tout est dimensionné par rapport à l'écran, comme dans un jeu à résolution fixe.",
+        "Profil : la section Stats des decks n'affiche plus que les decks joués dans les 90 derniers jours."
+      ],
+      "changes_en": [
+        "On phone, the board now keeps strict proportions and everything is sized relative to the screen, like a fixed-resolution game.",
+        "Profile: the Deck Stats section now only shows decks played in the last 90 days."
+      ]
+    },
+    {
       "date": "2026-05-10",
       "title_fr": "Page de Personnalisation, suppression de compte, alerte tournoi et corrections",
       "title_en": "Customization page, account deletion, tournament alert and fixes",

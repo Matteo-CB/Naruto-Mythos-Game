@@ -193,7 +193,16 @@ export function DeckStatsPanel({ decks }: { decks: Deck[] }) {
 
   if (decks.length === 0) return null;
 
-  const sorted = [...decks].sort((a, b) => {
+  const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
+  const recent = decks.filter((d) => {
+    const last = statsByDeck[d.id]?.lastPlayedAt;
+    if (!last) return false;
+    return new Date(last).getTime() >= cutoff;
+  });
+
+  if (!loading && recent.length === 0) return null;
+
+  const sorted = [...recent].sort((a, b) => {
     const sa = statsByDeck[a.id];
     const sb = statsByDeck[b.id];
     const tA = sa?.lastPlayedAt ? new Date(sa.lastPlayedAt).getTime() : 0;
@@ -209,7 +218,7 @@ export function DeckStatsPanel({ decks }: { decks: Deck[] }) {
         </h2>
         <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
         <span className="text-[10px] tabular-nums" style={{ color: '#444' }}>
-          {decks.length}
+          {loading ? decks.length : sorted.length}
         </span>
       </div>
 
