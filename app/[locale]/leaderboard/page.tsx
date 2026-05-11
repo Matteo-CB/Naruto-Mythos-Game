@@ -26,13 +26,6 @@ interface LeaderboardUser {
   tournamentWins?: number;
 }
 
-const PODIUM_ACCENT: Record<1 | 2 | 3, { fg: string; glow: string }> = {
-  1: { fg: '#c4a35a', glow: 'rgba(196, 163, 90, 0.45)' },
-  2: { fg: '#cfcfcf', glow: 'rgba(207, 207, 207, 0.32)' },
-  3: { fg: '#b87a52', glow: 'rgba(184, 122, 82, 0.32)' },
-};
-
-const CHAMFER_CLIP = 'polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px)';
 const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
 
 function useCountUp(target: number, duration = 700): number {
@@ -58,167 +51,6 @@ function useCountUp(target: number, duration = 700): number {
   }, [target, duration]);
 
   return value;
-}
-
-function HeroChampion({
-  user,
-  leaguesEnabled,
-}: {
-  user: LeaderboardUser;
-  leaguesEnabled: boolean;
-}) {
-  const accent = PODIUM_ACCENT[1];
-  const total = user.wins + user.losses + user.draws;
-  const placed = total >= PLACEMENT_MATCHES_REQUIRED;
-  const tier = getRankTier(user.elo);
-  const winrate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
-  const eloCount = useCountUp(user.elo, 900);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ y: -3 }}
-      className="relative w-full"
-    >
-      <Link
-        href={`/profile/${encodeURIComponent(user.username)}` as '/'}
-        className="relative w-full flex flex-col sm:flex-row items-center sm:items-stretch overflow-hidden cursor-pointer"
-        style={{
-          backgroundColor: '#0d0c10',
-          minHeight: 220,
-          clipPath: CHAMFER_CLIP,
-          boxShadow: `0 0 80px -22px ${accent.glow}, 0 12px 28px rgba(0, 0, 0, 0.45)`,
-        }}
-      >
-        <div className="relative z-10 flex flex-col items-center justify-center px-6 sm:px-10 py-7 sm:py-8 sm:w-[42%]">
-          {leaguesEnabled && placed ? (
-            <Image
-              src={tier.image}
-              alt=""
-              width={110}
-              height={110}
-              unoptimized
-              priority
-              style={{ filter: `drop-shadow(0 0 26px ${accent.glow})` }}
-            />
-          ) : (
-            <div style={{ height: 110 }} />
-          )}
-        </div>
-
-        <div className="relative z-10 flex flex-col justify-center items-center sm:items-start px-6 sm:px-2 pb-7 sm:py-8 pr-6 sm:pr-10 sm:w-[58%] gap-3 text-center sm:text-left">
-          <div className="flex items-center gap-1.5 max-w-full">
-            <span
-              className="font-display text-2xl sm:text-3xl truncate"
-              style={{ color: '#f4f1e8', letterSpacing: '0.04em' }}
-            >
-              {user.username}
-            </span>
-            <UserBadges role={user.role} badgePrefs={user.badgePrefs} size="sm" />
-          </div>
-
-          <div
-            className="font-display tabular-nums leading-none text-5xl sm:text-7xl"
-            style={{
-              color: accent.fg,
-              textShadow: `0 0 32px ${accent.glow}`,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            {eloCount}
-          </div>
-
-          <div className="font-inter-force flex items-center gap-3 text-[11px] tabular-nums">
-            <span style={{ color: '#5fb05f' }}>{user.wins}W</span>
-            <span style={{ color: '#d97676' }}>{user.losses}L</span>
-            {total > 0 && <span style={{ color: '#888' }}>{winrate}%</span>}
-          </div>
-        </div>
-      </Link>
-    </motion.div>
-  );
-}
-
-function PodiumCard({
-  user,
-  rank,
-  leaguesEnabled,
-  delay,
-}: {
-  user: LeaderboardUser;
-  rank: 2 | 3;
-  leaguesEnabled: boolean;
-  delay: number;
-}) {
-  const accent = PODIUM_ACCENT[rank];
-  const total = user.wins + user.losses + user.draws;
-  const placed = total >= PLACEMENT_MATCHES_REQUIRED;
-  const tier = getRankTier(user.elo);
-  const winrate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
-  const eloCount = useCountUp(user.elo, 900);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="relative"
-      whileHover={{ y: -3 }}
-    >
-      <Link
-        href={`/profile/${encodeURIComponent(user.username)}` as '/'}
-        className="relative w-full flex flex-col items-center justify-center overflow-hidden cursor-pointer py-5"
-        style={{
-          backgroundColor: '#0d0c10',
-          minHeight: 190,
-          clipPath: CHAMFER_CLIP,
-          boxShadow: `0 0 44px -18px ${accent.glow}, 0 8px 16px rgba(0, 0, 0, 0.35)`,
-        }}
-      >
-        {leaguesEnabled && placed ? (
-          <Image
-            src={tier.image}
-            alt=""
-            width={62}
-            height={62}
-            unoptimized
-            priority
-            style={{ filter: `drop-shadow(0 0 14px ${accent.glow})` }}
-          />
-        ) : (
-          <div style={{ height: 62 }} />
-        )}
-
-        <div className="flex items-center gap-1.5 max-w-full px-3 mt-3">
-          <span
-            className="font-display text-sm sm:text-base truncate"
-            style={{ color: '#f2f0eb', letterSpacing: '0.04em' }}
-          >
-            {user.username}
-          </span>
-          <UserBadges role={user.role} badgePrefs={user.badgePrefs} size="sm" />
-        </div>
-
-        <div
-          className="font-display tabular-nums leading-none mt-2 text-3xl sm:text-4xl"
-          style={{
-            color: accent.fg,
-            textShadow: `0 0 20px ${accent.glow}`,
-          }}
-        >
-          {eloCount}
-        </div>
-
-        <div className="font-inter-force flex items-center gap-2 mt-2 text-[10px] tabular-nums">
-          <span style={{ color: '#5fb05f' }}>{user.wins}W</span>
-          <span style={{ color: '#d97676' }}>{user.losses}L</span>
-          {total > 0 && <span style={{ color: '#888' }}>{winrate}%</span>}
-        </div>
-      </Link>
-    </motion.div>
-  );
 }
 
 function LeaderRow({
@@ -350,35 +182,16 @@ function FilterPill({
 
 function SkeletonGrid() {
   return (
-    <div>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [0.18, 0.45, 0.18] }}
-        transition={{ duration: 1.4, repeat: Infinity }}
-        style={{ height: 220, backgroundColor: '#0d0c10', clipPath: CHAMFER_CLIP, marginBottom: 12 }}
-      />
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-6">
-        {[200, 200].map((h, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0.18, 0.42, 0.18] }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
-            style={{ height: h, backgroundColor: '#0d0c10', clipPath: CHAMFER_CLIP }}
-          />
-        ))}
-      </div>
-      <div className="flex flex-col gap-1">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0.18, 0.4, 0.18] }}
-            transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.05 }}
-            style={{ height: 46, backgroundColor: i % 2 === 0 ? '#0c0b10' : '#0a0a0d', clipPath: ROW_CLIP }}
-          />
-        ))}
-      </div>
+    <div className="flex flex-col gap-1">
+      {Array.from({ length: 12 }).map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0.18, 0.4, 0.18] }}
+          transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.05 }}
+          style={{ height: 46, backgroundColor: i % 2 === 0 ? '#0c0b10' : '#0a0a0d', clipPath: ROW_CLIP }}
+        />
+      ))}
     </div>
   );
 }
@@ -442,10 +255,6 @@ export default function LeaderboardPage() {
 
   const totalPages = Math.max(1, Math.ceil(totalPlayers / PLAYERS_PER_PAGE));
   const totalCount = useCountUp(totalPlayers, 600);
-  const showPodium = currentPage === 1 && !debouncedSearch && !leagueFilter && users.length >= 3;
-  const podiumUsers = showPodium ? users.slice(0, 3) : [];
-  const listUsers = showPodium ? users.slice(3) : users;
-  const listStartIndex = showPodium ? 3 : 0;
   const pageKey = useMemo(() => `${currentPage}-${debouncedSearch}-${leagueFilter}`, [currentPage, debouncedSearch, leagueFilter]);
 
   return (
@@ -583,19 +392,9 @@ export default function LeaderboardPage() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                {showPodium && (
-                  <div className="flex flex-col gap-2 sm:gap-3 mb-7">
-                    <HeroChampion user={podiumUsers[0]} leaguesEnabled={leaguesEnabled} />
-                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                      <PodiumCard user={podiumUsers[1]} rank={2} leaguesEnabled={leaguesEnabled} delay={0.08} />
-                      <PodiumCard user={podiumUsers[2]} rank={3} leaguesEnabled={leaguesEnabled} delay={0.14} />
-                    </div>
-                  </div>
-                )}
-
                 <div className="flex flex-col">
-                  {listUsers.map((user, index) => {
-                    const globalRank = (currentPage - 1) * PLAYERS_PER_PAGE + listStartIndex + index + 1;
+                  {users.map((user, index) => {
+                    const globalRank = (currentPage - 1) * PLAYERS_PER_PAGE + index + 1;
                     return (
                       <LeaderRow
                         key={user.id}
