@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { RANK_TIERS, PLACEMENT_MATCHES_REQUIRED, getRankTier } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
@@ -305,15 +306,13 @@ function FilterPill({
 }) {
   return (
     <motion.button
-      whileTap={{ scale: 0.93 }}
-      whileHover={{ y: -1 }}
+      whileTap={{ scale: 0.94 }}
       onClick={onClick}
       className="font-display shrink-0 flex items-center gap-1.5 px-3 py-1.5 cursor-pointer transition-colors"
       style={{
-        backgroundColor: active ? `${color}18` : 'rgba(255, 255, 255, 0.025)',
+        backgroundColor: active ? `${color}1f` : 'rgba(255, 255, 255, 0.03)',
         color: active ? color : '#666',
         borderRadius: 9999,
-        boxShadow: active ? `0 0 22px -6px ${color}, 0 0 0 1px ${color}28 inset` : 'none',
       }}
     >
       {imageSrc && (
@@ -323,7 +322,7 @@ function FilterPill({
           width={16}
           height={16}
           unoptimized
-          style={{ filter: active ? 'none' : 'grayscale(0.95) opacity(0.55)' }}
+          style={{ filter: active ? 'none' : 'grayscale(0.95) opacity(0.45)' }}
         />
       )}
       <span className="text-[11px] tracking-wider uppercase">{label}</span>
@@ -427,6 +426,7 @@ export default function LeaderboardPage() {
 
   return (
     <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
+      <CloudBackground />
       <div className="w-full max-w-4xl mx-auto relative z-10 flex-1 px-4 sm:px-8 py-6 sm:py-10">
 
         <motion.header
@@ -435,30 +435,29 @@ export default function LeaderboardPage() {
           transition={{ duration: 0.45, ease: 'easeOut' }}
           className="mb-8"
         >
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-3">
+          <div className="flex items-end justify-between gap-3 flex-wrap">
+            <div>
               <h1
                 className="font-display text-3xl sm:text-5xl tracking-wider uppercase leading-none"
                 style={{ color: '#f2efe7', letterSpacing: '0.08em', textShadow: '0 0 22px rgba(196, 163, 90, 0.18)' }}
               >
                 {t('title')}
               </h1>
-              <motion.span
-                className="font-display text-xs sm:text-sm tabular-nums px-2.5 py-1 ml-1"
-                style={{
-                  color: '#c4a35a',
-                  backgroundColor: 'rgba(196, 163, 90, 0.08)',
-                  borderRadius: 9999,
-                  boxShadow: '0 0 0 1px rgba(196, 163, 90, 0.18) inset',
-                }}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3, duration: 0.4 }}
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.4 }}
+                className="font-display flex items-baseline gap-2 mt-3"
               >
-                {totalCount}
-              </motion.span>
+                <span className="text-2xl tabular-nums leading-none" style={{ color: '#c4a35a', textShadow: '0 0 12px rgba(196, 163, 90, 0.35)' }}>
+                  {totalCount}
+                </span>
+                <span className="text-[11px] uppercase tracking-[0.3em]" style={{ color: '#666' }}>
+                  {t('player')}{totalCount > 1 ? 's' : ''}
+                </span>
+              </motion.div>
             </div>
-            <div className="flex items-center gap-1.5 ml-auto">
+            <div className="flex items-center gap-1.5">
               {leaguesEnabled && (
                 <button
                   onClick={() => setLeaguesModalOpen(true)}
