@@ -79,59 +79,155 @@ function HeroChampion({
       initial={{ opacity: 0, y: 28 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ y: -3 }}
+      whileHover={{ y: -4 }}
       className="relative w-full"
+      style={{ padding: '14px 10px 18px' }}
     >
+      <span
+        aria-hidden
+        className="absolute pointer-events-none"
+        style={{
+          top: 2,
+          left: 18,
+          right: 18,
+          bottom: 16,
+          backgroundColor: '#0a090c',
+          clipPath: CHAMFER_CLIP,
+          transform: 'rotate(-1.2deg)',
+          opacity: 0.6,
+        }}
+      />
+      <span
+        aria-hidden
+        className="absolute pointer-events-none"
+        style={{
+          top: 6,
+          left: 8,
+          right: 8,
+          bottom: 12,
+          backgroundColor: '#0b0a0d',
+          clipPath: CHAMFER_CLIP,
+          transform: 'rotate(0.8deg)',
+          opacity: 0.85,
+        }}
+      />
+
       <Link
         href={`/profile/${encodeURIComponent(user.username)}` as '/'}
         className="relative w-full flex flex-col sm:flex-row items-center sm:items-stretch overflow-hidden cursor-pointer"
         style={{
           backgroundColor: '#0d0c10',
-          minHeight: 220,
+          minHeight: 240,
           clipPath: CHAMFER_CLIP,
-          boxShadow: `0 0 70px -22px ${accent.glow}, 0 10px 26px rgba(0, 0, 0, 0.4)`,
+          boxShadow: `0 0 90px -22px ${accent.glow}, 0 14px 32px rgba(0, 0, 0, 0.5), inset 0 0 0 1px ${accent.fg}1c`,
         }}
       >
         <span
           aria-hidden
-          className="font-display pointer-events-none absolute leading-none"
+          className="font-display pointer-events-none absolute leading-none select-none"
           style={{
-            color: `${accent.fg}10`,
-            fontSize: 'clamp(180px, 30vw, 280px)',
-            top: -28,
-            right: -10,
+            color: `${accent.fg}0e`,
+            fontSize: 'clamp(200px, 34vw, 330px)',
+            top: -38,
+            right: -16,
             letterSpacing: '-0.06em',
           }}
         >
           I
         </span>
+        <motion.span
+          aria-hidden
+          className="font-display pointer-events-none absolute leading-none select-none"
+          style={{
+            color: accent.fg,
+            opacity: 0.06,
+            fontSize: 'clamp(80px, 14vw, 140px)',
+            bottom: -22,
+            left: -8,
+            letterSpacing: '-0.06em',
+          }}
+          animate={{ rotate: [0, 6, 0, -6, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          1
+        </motion.span>
 
-        <div className="relative z-10 flex flex-col items-center justify-center px-6 sm:px-10 py-6 sm:py-8 sm:w-[44%] gap-3">
-          {leaguesEnabled && placed ? (
-            <motion.div
-              initial={{ scale: 0.6, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.18, duration: 0.55, ease: 'backOut' }}
-              style={{ filter: `drop-shadow(0 0 16px ${accent.glow})` }}
-            >
-              <Image src={tier.image} alt="" width={96} height={96} unoptimized priority />
-            </motion.div>
-          ) : (
-            <div style={{ height: 96 }} />
-          )}
-          <span
-            className="font-display text-[10px] uppercase tracking-[0.4em]"
-            style={{ color: accent.fg, opacity: 0.7 }}
+        <span
+          aria-hidden
+          className="absolute pointer-events-none"
+          style={{
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 1,
+            backgroundColor: `${accent.fg}66`,
+            opacity: 0.5,
+          }}
+        />
+
+        <div className="relative z-10 flex flex-col items-center justify-center px-6 sm:px-10 py-7 sm:py-8 sm:w-[44%] gap-3">
+          <motion.span
+            aria-hidden
+            className="font-display absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-[0.5em]"
+            style={{ color: accent.fg, opacity: 0.85 }}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 0.85, y: 0 }}
+            transition={{ delay: 0.35, duration: 0.4 }}
           >
-            #1
-          </span>
+            CHAMPION
+          </motion.span>
+
+          {leaguesEnabled && placed ? (
+            <div className="relative" style={{ width: 112, height: 112 }}>
+              <motion.span
+                aria-hidden
+                className="absolute"
+                style={{
+                  inset: -14,
+                  backgroundColor: 'transparent',
+                  boxShadow: `inset 0 0 0 1.4px ${accent.fg}55`,
+                  clipPath: 'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
+                  opacity: 0.55,
+                }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 36, repeat: Infinity, ease: 'linear' }}
+              />
+              <motion.span
+                aria-hidden
+                className="absolute"
+                style={{
+                  inset: -6,
+                  backgroundColor: 'transparent',
+                  boxShadow: `inset 0 0 0 1px ${accent.fg}30`,
+                  clipPath: 'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
+                  opacity: 0.75,
+                }}
+                animate={{ rotate: -360 }}
+                transition={{ duration: 44, repeat: Infinity, ease: 'linear' }}
+              />
+              <motion.div
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1, y: [0, -4, 0] }}
+                transition={{
+                  scale: { delay: 0.18, duration: 0.55, ease: 'backOut' },
+                  opacity: { delay: 0.18, duration: 0.4 },
+                  y: { duration: 3.4, repeat: Infinity, ease: 'easeInOut', delay: 0.6 },
+                }}
+                style={{ filter: `drop-shadow(0 0 22px ${accent.glow})` }}
+              >
+                <Image src={tier.image} alt="" width={112} height={112} unoptimized priority />
+              </motion.div>
+            </div>
+          ) : (
+            <div style={{ height: 112 }} />
+          )}
         </div>
 
-        <div className="relative z-10 flex flex-col justify-center items-center sm:items-start px-6 sm:px-2 pb-6 sm:py-8 pr-6 sm:pr-10 sm:w-[56%] gap-2 text-center sm:text-left">
+        <div className="relative z-10 flex flex-col justify-center items-center sm:items-start px-6 sm:px-2 pb-7 sm:py-8 pr-6 sm:pr-10 sm:w-[56%] gap-2.5 text-center sm:text-left">
           <div className="flex items-center gap-1.5 max-w-full">
             <span
-              className="font-display text-xl sm:text-3xl truncate"
-              style={{ color: '#f2f0eb', letterSpacing: '0.04em' }}
+              className="font-display text-2xl sm:text-3xl truncate"
+              style={{ color: '#f4f1e8', letterSpacing: '0.04em' }}
             >
               {user.username}
             </span>
@@ -139,16 +235,32 @@ function HeroChampion({
           </div>
 
           <div
-            className="font-display tabular-nums leading-none text-5xl sm:text-6xl"
-            style={{ color: accent.fg, textShadow: `0 0 30px ${accent.glow}` }}
+            className="font-display tabular-nums leading-none text-5xl sm:text-7xl mt-2"
+            style={{
+              color: accent.fg,
+              textShadow: `0 0 36px ${accent.glow}, 0 0 6px ${accent.glow}, 0 2px 0 rgba(0,0,0,0.5)`,
+              letterSpacing: '-0.01em',
+            }}
           >
             {eloCount}
           </div>
 
-          <div className="font-inter-force flex items-center gap-3 text-[11px] tabular-nums mt-1">
-            <span style={{ color: '#5fb05f' }}>{user.wins}W</span>
-            <span style={{ color: '#d97676' }}>{user.losses}L</span>
-            {total > 0 && <span style={{ color: '#888' }}>{winrate}%</span>}
+          <div className="font-inter-force flex items-center gap-3 text-[11px] tabular-nums mt-2">
+            <span className="font-display tracking-[0.18em] uppercase text-[10px]" style={{ color: '#5fb05f' }}>
+              {user.wins} <span style={{ opacity: 0.55 }}>WINS</span>
+            </span>
+            <span style={{ color: '#2a2a30' }}>|</span>
+            <span className="font-display tracking-[0.18em] uppercase text-[10px]" style={{ color: '#d97676' }}>
+              {user.losses} <span style={{ opacity: 0.55 }}>LOSS</span>
+            </span>
+            {total > 0 && (
+              <>
+                <span style={{ color: '#2a2a30' }}>|</span>
+                <span className="font-display tracking-[0.18em] uppercase text-[10px]" style={{ color: '#888' }}>
+                  {winrate}<span style={{ opacity: 0.55 }}>%</span>
+                </span>
+              </>
+            )}
           </div>
         </div>
       </Link>
@@ -173,50 +285,104 @@ function PodiumCard({
   const tier = getRankTier(user.elo);
   const winrate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
   const eloCount = useCountUp(user.elo, 900);
+  const tilt = rank === 2 ? -1.2 : 1.2;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 22 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
       className="relative"
-      whileHover={{ y: -2 }}
+      whileHover={{ y: -3 }}
+      style={{ padding: '10px 8px 14px' }}
     >
+      <span
+        aria-hidden
+        className="absolute pointer-events-none"
+        style={{
+          top: 2,
+          left: rank === 2 ? 14 : 4,
+          right: rank === 2 ? 4 : 14,
+          bottom: 12,
+          backgroundColor: '#0a090c',
+          clipPath: CHAMFER_CLIP,
+          transform: `rotate(${tilt}deg)`,
+          opacity: 0.75,
+        }}
+      />
+
       <Link
         href={`/profile/${encodeURIComponent(user.username)}` as '/'}
         className="relative w-full flex flex-col items-center justify-end overflow-hidden cursor-pointer pt-5 pb-5"
         style={{
           backgroundColor: '#0d0c10',
-          minHeight: 200,
+          minHeight: 210,
           clipPath: CHAMFER_CLIP,
-          boxShadow: `0 0 44px -18px ${accent.glow}, 0 6px 16px rgba(0, 0, 0, 0.3)`,
+          boxShadow: `0 0 50px -18px ${accent.glow}, 0 8px 18px rgba(0, 0, 0, 0.35), inset 0 0 0 1px ${accent.fg}14`,
         }}
       >
         <span
           aria-hidden
-          className="font-display pointer-events-none absolute leading-none"
+          className="absolute pointer-events-none"
           style={{
-            color: `${accent.fg}12`,
-            fontSize: 'clamp(80px, 18vw, 130px)',
-            top: -10,
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 1,
+            backgroundColor: `${accent.fg}55`,
+            opacity: 0.4,
+          }}
+        />
+
+        <span
+          aria-hidden
+          className="font-display pointer-events-none absolute leading-none select-none"
+          style={{
+            color: `${accent.fg}10`,
+            fontSize: 'clamp(90px, 20vw, 150px)',
+            top: -14,
             letterSpacing: '-0.04em',
           }}
         >
           {rank === 2 ? 'II' : 'III'}
         </span>
 
+        <span
+          className="font-display absolute top-3 left-1/2 -translate-x-1/2 text-[8px] uppercase tracking-[0.45em]"
+          style={{ color: accent.fg, opacity: 0.75 }}
+        >
+          #{rank}
+        </span>
+
         {leaguesEnabled && placed ? (
-          <motion.div
-            className="relative z-10 mb-2"
-            initial={{ scale: 0.6, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: delay + 0.15, duration: 0.55, ease: 'backOut' }}
-            style={{ filter: `drop-shadow(0 0 10px ${accent.glow})` }}
-          >
-            <Image src={tier.image} alt="" width={56} height={56} unoptimized priority />
-          </motion.div>
+          <div className="relative z-10 mb-2" style={{ width: 64, height: 64 }}>
+            <motion.span
+              aria-hidden
+              className="absolute"
+              style={{
+                inset: -10,
+                boxShadow: `inset 0 0 0 1px ${accent.fg}45`,
+                clipPath: 'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
+                opacity: 0.6,
+              }}
+              animate={{ rotate: rank === 2 ? 360 : -360 }}
+              transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+            />
+            <motion.div
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1, y: [0, -3, 0] }}
+              transition={{
+                scale: { delay: delay + 0.15, duration: 0.55, ease: 'backOut' },
+                opacity: { delay: delay + 0.15, duration: 0.4 },
+                y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: delay + 0.7 },
+              }}
+              style={{ filter: `drop-shadow(0 0 12px ${accent.glow})` }}
+            >
+              <Image src={tier.image} alt="" width={64} height={64} unoptimized priority />
+            </motion.div>
+          </div>
         ) : (
-          <div className="mb-2" style={{ height: 56 }} />
+          <div className="mb-2" style={{ height: 64 }} />
         )}
 
         <div className="relative z-10 flex items-center gap-1.5 max-w-full px-3">
@@ -230,16 +396,25 @@ function PodiumCard({
         </div>
 
         <div
-          className="font-display relative z-10 tabular-nums leading-none mt-2.5 text-2xl sm:text-3xl"
-          style={{ color: accent.fg, textShadow: `0 0 18px ${accent.glow}` }}
+          className="font-display relative z-10 tabular-nums leading-none mt-3 text-3xl sm:text-4xl"
+          style={{
+            color: accent.fg,
+            textShadow: `0 0 22px ${accent.glow}, 0 1px 0 rgba(0,0,0,0.5)`,
+          }}
         >
           {eloCount}
         </div>
 
         <div className="font-inter-force relative z-10 flex items-center gap-2 mt-2 text-[10px] tabular-nums">
           <span style={{ color: '#5fb05f' }}>{user.wins}W</span>
+          <span style={{ color: '#2a2a30' }}>·</span>
           <span style={{ color: '#d97676' }}>{user.losses}L</span>
-          {total > 0 && <span style={{ color: '#888' }}>{winrate}%</span>}
+          {total > 0 && (
+            <>
+              <span style={{ color: '#2a2a30' }}>·</span>
+              <span style={{ color: '#888' }}>{winrate}%</span>
+            </>
+          )}
         </div>
       </Link>
     </motion.div>
