@@ -5,11 +5,12 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useSocialStore } from '@/stores/socialStore';
 
+const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
+
 export function FriendRequestsList() {
   const t = useTranslations('friends');
   const incomingRequests = useSocialStore((s) => s.incomingRequests);
   const outgoingRequests = useSocialStore((s) => s.outgoingRequests);
-  const loading = useSocialStore((s) => s.loading);
   const fetchRequests = useSocialStore((s) => s.fetchRequests);
   const acceptFriendRequest = useSocialStore((s) => s.acceptFriendRequest);
   const declineFriendRequest = useSocialStore((s) => s.declineFriendRequest);
@@ -20,165 +21,135 @@ export function FriendRequestsList() {
   }, [fetchRequests]);
 
   return (
-    <div className="flex flex-col gap-6">
-      
-      <div>
-        <h3
-          className="text-sm uppercase tracking-wider mb-3"
-          style={{ color: '#888888' }}
-        >
-          {t('requests.incoming')}
-        </h3>
-
+    <div className="flex flex-col gap-7">
+      <Section title={t('requests.incoming')}>
         {incomingRequests.length === 0 ? (
-          <div
-            className="text-sm py-3"
-            style={{ color: '#555555' }}
-          >
-            {t('requests.noIncoming')}
-          </div>
+          <EmptyState text={t('requests.noIncoming')} />
         ) : (
-          <div className="flex flex-col gap-2">
-            {incomingRequests.map((request) => (
-              <motion.div
+          <div className="flex flex-col">
+            {incomingRequests.map((request, i) => (
+              <RequestRow
                 key={request.friendshipId}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between"
-                style={{
-                  backgroundColor: '#111111',
-                  border: '1px solid #262626',
-                  borderRadius: 6,
-                  padding: '12px 16px',
-                }}
+                username={request.user.username}
+                elo={request.user.elo}
+                index={i}
               >
-                <div className="flex items-center gap-3">
-                  <span
-                    className="text-sm font-medium"
-                    style={{ color: '#e0e0e0' }}
-                  >
-                    {request.user.username}
-                  </span>
-                  <span
-                    className="text-xs px-2 py-0.5"
-                    style={{
-                      backgroundColor: 'rgba(196, 163, 90, 0.1)',
-                      border: '1px solid rgba(196, 163, 90, 0.25)',
-                      borderRadius: 4,
-                      color: '#c4a35a',
-                    }}
-                  >
-                    {request.user.elo}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <motion.button
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => acceptFriendRequest(request.friendshipId)}
-                    className="h-8 px-3 text-xs font-bold uppercase tracking-wider cursor-pointer"
-                    style={{
-                      backgroundColor: '#c4a35a',
-                      border: '1px solid #c4a35a',
-                      borderRadius: 4,
-                      color: '#0a0a0a',
-                    }}
-                  >
-                    {t('requests.accept')}
-                  </motion.button>
-
-                  <motion.button
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => declineFriendRequest(request.friendshipId)}
-                    className="h-8 px-3 text-xs font-bold uppercase tracking-wider cursor-pointer"
-                    style={{
-                      backgroundColor: 'transparent',
-                      border: '1px solid #333333',
-                      borderRadius: 4,
-                      color: '#888888',
-                    }}
-                  >
-                    {t('requests.decline')}
-                  </motion.button>
-                </div>
-              </motion.div>
+                <PillButton
+                  onClick={() => acceptFriendRequest(request.friendshipId)}
+                  color="#5fb05f"
+                  label={t('requests.accept')}
+                />
+                <PillButton
+                  onClick={() => declineFriendRequest(request.friendshipId)}
+                  color="#888"
+                  label={t('requests.decline')}
+                />
+              </RequestRow>
             ))}
           </div>
         )}
-      </div>
+      </Section>
 
-      
-      <div>
-        <h3
-          className="text-sm uppercase tracking-wider mb-3"
-          style={{ color: '#888888' }}
-        >
-          {t('requests.outgoing')}
-        </h3>
-
+      <Section title={t('requests.outgoing')}>
         {outgoingRequests.length === 0 ? (
-          <div
-            className="text-sm py-3"
-            style={{ color: '#555555' }}
-          >
-            {t('requests.noOutgoing')}
-          </div>
+          <EmptyState text={t('requests.noOutgoing')} />
         ) : (
-          <div className="flex flex-col gap-2">
-            {outgoingRequests.map((request) => (
-              <motion.div
+          <div className="flex flex-col">
+            {outgoingRequests.map((request, i) => (
+              <RequestRow
                 key={request.friendshipId}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between"
-                style={{
-                  backgroundColor: '#111111',
-                  border: '1px solid #262626',
-                  borderRadius: 6,
-                  padding: '12px 16px',
-                }}
+                username={request.user.username}
+                elo={request.user.elo}
+                index={i}
               >
-                <div className="flex items-center gap-3">
-                  <span
-                    className="text-sm font-medium"
-                    style={{ color: '#e0e0e0' }}
-                  >
-                    {request.user.username}
-                  </span>
-                  <span
-                    className="text-xs px-2 py-0.5"
-                    style={{
-                      backgroundColor: 'rgba(196, 163, 90, 0.1)',
-                      border: '1px solid rgba(196, 163, 90, 0.25)',
-                      borderRadius: 4,
-                      color: '#c4a35a',
-                    }}
-                  >
-                    {request.user.elo}
-                  </span>
-                </div>
-
-                <motion.button
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
+                <PillButton
                   onClick={() => removeFriend(request.friendshipId)}
-                  className="h-8 px-3 text-xs font-bold uppercase tracking-wider cursor-pointer"
-                  style={{
-                    backgroundColor: 'transparent',
-                    border: '1px solid #333333',
-                    borderRadius: 4,
-                    color: '#888888',
-                  }}
-                >
-                  {t('requests.cancel')}
-                </motion.button>
-              </motion.div>
+                  color="#888"
+                  label={t('requests.cancel')}
+                />
+              </RequestRow>
             ))}
           </div>
         )}
-      </div>
+      </Section>
     </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <h3
+        className="font-display text-[11px] uppercase tracking-widest mb-3"
+        style={{ color: '#666' }}
+      >
+        {title}
+      </h3>
+      {children}
+    </div>
+  );
+}
+
+function EmptyState({ text }: { text: string }) {
+  return (
+    <p className="font-display text-sm py-4 uppercase tracking-widest" style={{ color: '#444' }}>
+      {text}
+    </p>
+  );
+}
+
+function RequestRow({
+  username,
+  elo,
+  index,
+  children,
+}: {
+  username: string;
+  elo: number;
+  index: number;
+  children: React.ReactNode;
+}) {
+  const altBg = index % 2 === 0 ? '#0c0b10' : '#0a0a0d';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.3) }}
+      className="relative flex items-center justify-between gap-3 px-3 sm:px-5 py-2.5 mb-1.5"
+      style={{ backgroundColor: altBg, clipPath: ROW_CLIP }}
+    >
+      <div className="flex items-center gap-3 min-w-0 flex-1">
+        <span
+          className="font-display text-sm sm:text-base truncate"
+          style={{ color: '#e8e6df', letterSpacing: '0.03em' }}
+        >
+          {username}
+        </span>
+        <span className="font-display text-sm tabular-nums shrink-0" style={{ color: '#c4a35a' }}>
+          {elo}
+        </span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        {children}
+      </div>
+    </motion.div>
+  );
+}
+
+function PillButton({ onClick, color, label }: { onClick: () => void; color: string; label: string }) {
+  return (
+    <motion.button
+      whileTap={{ scale: 0.94 }}
+      onClick={onClick}
+      className="font-display px-3 sm:px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors"
+      style={{
+        color,
+        backgroundColor: `${color}14`,
+        borderRadius: 9999,
+      }}
+    >
+      {label}
+    </motion.button>
   );
 }

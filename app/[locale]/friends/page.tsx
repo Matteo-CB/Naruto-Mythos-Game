@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -281,8 +281,7 @@ export default function FriendsPage() {
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
-    if (!session?.user) return;
+  const reloadFriends = useCallback(() => {
     setFriendsLoading(true);
     fetch('/api/friends')
       .then((r) => r.ok ? r.json() : { friends: [] })
@@ -291,8 +290,26 @@ export default function FriendsPage() {
         setFriendsLoading(false);
       })
       .catch(() => setFriendsLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (!session?.user) return;
+    reloadFriends();
     fetchRequests();
-  }, [session, fetchRequests]);
+  }, [session, fetchRequests, reloadFriends]);
+
+  const socialFriendsCount = useSocialStore((s) => s.friends.length);
+  useEffect(() => {
+    if (session?.user) reloadFriends();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socialFriendsCount]);
+
+  useEffect(() => {
+    if (activeTab === 'friends' && session?.user) {
+      reloadFriends();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
 
   useEffect(() => {
     if (activeTab !== 'activity' || !session?.user) return;
