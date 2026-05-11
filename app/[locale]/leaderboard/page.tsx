@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { RANK_TIERS, PLACEMENT_MATCHES_REQUIRED, getRankTier } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
@@ -26,11 +25,14 @@ interface LeaderboardUser {
   tournamentWins?: number;
 }
 
-const PODIUM_ACCENT: Record<1 | 2 | 3, string> = {
-  1: '#c4a35a',
-  2: '#b8b8b8',
-  3: '#a87547',
+const PODIUM_ACCENT: Record<1 | 2 | 3, { fg: string; glow: string }> = {
+  1: { fg: '#c4a35a', glow: 'rgba(196, 163, 90, 0.45)' },
+  2: { fg: '#cfcfcf', glow: 'rgba(207, 207, 207, 0.32)' },
+  3: { fg: '#b87a52', glow: 'rgba(184, 122, 82, 0.32)' },
 };
+
+const CHAMFER_CLIP = 'polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px)';
+const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
 
 function useCountUp(target: number, duration = 700): number {
   const [value, setValue] = useState(0);
@@ -55,6 +57,22 @@ function useCountUp(target: number, duration = 700): number {
   }, [target, duration]);
 
   return value;
+}
+
+function Chip({ text, color }: { text: string; color: string }) {
+  return (
+    <span
+      className="font-display px-2 py-0.5 text-[10px] uppercase tracking-wider"
+      style={{
+        backgroundColor: `${color}14`,
+        color,
+        boxShadow: `0 0 0 1px ${color}30 inset`,
+        borderRadius: 9999,
+      }}
+    >
+      {text}
+    </span>
+  );
 }
 
 function PodiumCard({
@@ -85,37 +103,26 @@ function PodiumCard({
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="relative flex"
+      className="relative"
+      whileHover={{ y: -3 }}
     >
       <Link
         href={`/profile/${encodeURIComponent(user.username)}` as '/'}
-        className={`relative w-full flex flex-col items-center justify-end overflow-hidden cursor-pointer group ${tall ? 'pt-8 pb-6' : 'pt-5 pb-5'}`}
+        className={`relative w-full flex flex-col items-center justify-end overflow-hidden cursor-pointer ${tall ? 'pt-8 pb-7' : 'pt-5 pb-5'}`}
         style={{
-          backgroundColor: '#101015',
-          minHeight: tall ? 260 : 200,
-          boxShadow: `inset 0 1px 0 0 ${accent}55, inset 0 -1px 0 0 ${accent}22`,
+          backgroundColor: '#0d0c10',
+          minHeight: tall ? 270 : 210,
+          clipPath: CHAMFER_CLIP,
+          boxShadow: `0 0 60px -20px ${accent.glow}, 0 8px 20px rgba(0, 0, 0, 0.35)`,
         }}
       >
-        {rank === 1 && (
-          <motion.span
-            aria-hidden
-            className="pointer-events-none absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.35em] font-bold"
-            style={{ color: accent, fontFamily: 'var(--font-inter)' }}
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: delay + 0.4, duration: 0.4 }}
-          >
-            #1
-          </motion.span>
-        )}
-
         <span
           aria-hidden
-          className={`pointer-events-none absolute leading-none font-black ${tall ? 'text-[140px]' : 'text-[100px]'}`}
+          className="font-display pointer-events-none absolute leading-none"
           style={{
-            color: `${accent}10`,
-            top: tall ? '-22px' : '-10px',
-            fontFamily: 'var(--font-inter)',
+            color: `${accent.fg}14`,
+            fontSize: tall ? '170px' : '120px',
+            top: tall ? -22 : -10,
             letterSpacing: '-0.04em',
           }}
         >
@@ -125,27 +132,28 @@ function PodiumCard({
         {leaguesEnabled && placed ? (
           <motion.div
             className={`relative z-10 ${tall ? 'mb-3' : 'mb-2'}`}
-            initial={{ scale: 0.7, opacity: 0 }}
+            initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: delay + 0.15, duration: 0.5, ease: 'backOut' }}
+            transition={{ delay: delay + 0.15, duration: 0.55, ease: 'backOut' }}
+            style={{ filter: `drop-shadow(0 0 12px ${accent.glow})` }}
           >
             <Image
               src={tier.image}
               alt=""
-              width={tall ? 72 : 56}
-              height={tall ? 72 : 56}
+              width={tall ? 84 : 60}
+              height={tall ? 84 : 60}
               unoptimized
               priority
             />
           </motion.div>
         ) : (
-          <div className={tall ? 'mb-3' : 'mb-2'} style={{ height: tall ? 72 : 56 }} />
+          <div className={tall ? 'mb-3' : 'mb-2'} style={{ height: tall ? 84 : 60 }} />
         )}
 
-        <div className="relative z-10 flex items-center gap-1.5 max-w-full px-3">
+        <div className="relative z-10 flex items-center gap-1.5 max-w-full px-4">
           <span
-            className={`truncate font-semibold ${tall ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}
-            style={{ color: '#f0f0f0' }}
+            className={`font-display truncate ${tall ? 'text-lg sm:text-xl' : 'text-base sm:text-lg'}`}
+            style={{ color: '#f2f0eb', letterSpacing: '0.04em' }}
           >
             {user.username}
           </span>
@@ -153,13 +161,13 @@ function PodiumCard({
         </div>
 
         <div
-          className={`relative z-10 tabular-nums font-bold leading-none mt-2 ${tall ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'}`}
-          style={{ color: accent, fontFamily: 'var(--font-inter)' }}
+          className={`font-display relative z-10 tabular-nums leading-none mt-3 ${tall ? 'text-4xl sm:text-5xl' : 'text-3xl sm:text-4xl'}`}
+          style={{ color: accent.fg, textShadow: `0 0 24px ${accent.glow}` }}
         >
           {eloCount}
         </div>
 
-        <div className="relative z-10 flex items-center gap-2 mt-2.5 text-[10px] tabular-nums" style={{ fontFamily: 'var(--font-inter)' }}>
+        <div className="font-inter-force relative z-10 flex items-center gap-2 mt-3 text-[10px] tabular-nums">
           <span style={{ color: '#5fb05f' }}>{user.wins}W</span>
           <span style={{ color: '#3a3a3a' }}>·</span>
           <span style={{ color: '#d97676' }}>{user.losses}L</span>
@@ -173,48 +181,18 @@ function PodiumCard({
 
         {(streakWin || streakLoss || tournaments > 0) && (
           <motion.div
-            className="relative z-10 flex items-center gap-1 mt-2"
+            className="relative z-10 flex items-center gap-1 mt-2.5"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: delay + 0.35, duration: 0.3 }}
           >
-            {streakWin && (
-              <Chip text={`${user.consecutiveWins}W`} color="#5fb05f" />
-            )}
-            {streakLoss && (
-              <Chip text={`${user.consecutiveLosses}L`} color="#d97676" />
-            )}
-            {tournaments > 0 && (
-              <Chip text={`${tournaments}T`} color="#c4a35a" />
-            )}
+            {streakWin && <Chip text={`${user.consecutiveWins}W`} color="#5fb05f" />}
+            {streakLoss && <Chip text={`${user.consecutiveLosses}L`} color="#d97676" />}
+            {tournaments > 0 && <Chip text={`${tournaments}T`} color="#c4a35a" />}
           </motion.div>
         )}
-
-        <motion.span
-          aria-hidden
-          className="absolute bottom-0 left-0 h-0.5"
-          style={{ backgroundColor: accent }}
-          initial={{ width: 0 }}
-          animate={{ width: '100%' }}
-          transition={{ delay: delay + 0.2, duration: 0.6, ease: 'easeOut' }}
-        />
       </Link>
     </motion.div>
-  );
-}
-
-function Chip({ text, color }: { text: string; color: string }) {
-  return (
-    <span
-      className="px-1.5 py-0.5 text-[9px] uppercase tracking-wider font-bold"
-      style={{
-        backgroundColor: `${color}10`,
-        color,
-        boxShadow: `inset 0 0 0 1px ${color}38`,
-      }}
-    >
-      {text}
-    </span>
   );
 }
 
@@ -238,25 +216,26 @@ function LeaderRow({
   const streakWin = (user.consecutiveWins ?? 0) >= 3;
   const streakLoss = (user.consecutiveLosses ?? 0) >= 3;
   const tournaments = user.tournamentWins ?? 0;
-  const tierColor = placed && leaguesEnabled ? tier.color : '#444';
+  const tierColor = placed && leaguesEnabled ? tier.color : '#777';
+  const altBg = index % 2 === 0 ? '#0c0b10' : '#0a0a0d';
 
   return (
     <motion.div
-      layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.32, delay: Math.min(index * 0.025, 0.4), ease: 'easeOut' }}
-      className="relative grid items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-2.5 transition-colors hover:bg-[#13110e]"
+      transition={{ duration: 0.3, delay: Math.min(index * 0.025, 0.4), ease: 'easeOut' }}
+      whileHover={{ x: 4 }}
+      className="relative grid items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-2.5 cursor-default mb-1"
       style={{
-        backgroundColor: isSelf ? 'rgba(196, 163, 90, 0.05)' : '#0f0f12',
+        backgroundColor: isSelf ? 'rgba(196, 163, 90, 0.08)' : altBg,
         gridTemplateColumns: 'auto auto 1fr auto auto auto',
-        boxShadow: 'inset 0 -1px 0 0 rgba(255, 255, 255, 0.03)',
+        clipPath: ROW_CLIP,
       }}
     >
       <span
-        className="text-xs sm:text-sm font-bold tabular-nums w-7 sm:w-9 text-center"
-        style={{ color: '#5a5a5a', fontFamily: 'var(--font-inter)' }}
+        className="font-display text-base sm:text-lg tabular-nums w-7 sm:w-9 text-center"
+        style={{ color: isSelf ? '#c4a35a' : '#666', letterSpacing: '0.02em' }}
       >
         {globalRank}
       </span>
@@ -265,22 +244,23 @@ function LeaderRow({
         <Image
           src={tier.image}
           alt=""
-          width={26}
-          height={26}
+          width={30}
+          height={30}
           unoptimized
           className="shrink-0"
+          style={{ filter: `drop-shadow(0 0 5px ${tier.color}22)` }}
         />
       ) : (
-        <span className="inline-flex items-center justify-center text-[9px] uppercase tracking-wider" style={{ width: 26, height: 26, color: '#444' }}>
-          ?
+        <span className="inline-flex items-center justify-center font-display text-[14px]" style={{ width: 30, height: 30, color: '#3a3a3a' }}>
+          ·
         </span>
       )}
 
       <div className="flex items-center gap-1.5 min-w-0">
         <Link
           href={`/profile/${encodeURIComponent(user.username)}` as '/'}
-          className="text-sm truncate transition-colors hover:text-[#c4a35a]"
-          style={{ color: '#e0e0e0' }}
+          className="font-display text-base truncate transition-colors hover:text-[#c4a35a]"
+          style={{ color: '#e8e6df', letterSpacing: '0.02em' }}
         >
           {user.username}
         </Link>
@@ -290,29 +270,93 @@ function LeaderRow({
         {tournaments > 0 && <Chip text={`${tournaments}T`} color="#c4a35a" />}
       </div>
 
-      <div className="hidden sm:flex items-center gap-1" style={{ fontFamily: 'var(--font-inter)' }}>
-        <span className="text-[10px] tabular-nums px-1.5 py-0.5" style={{ backgroundColor: 'rgba(95, 176, 95, 0.08)', color: '#5fb05f' }}>
-          {user.wins}
-        </span>
-        <span className="text-[10px] tabular-nums px-1.5 py-0.5" style={{ backgroundColor: 'rgba(217, 118, 118, 0.08)', color: '#d97676' }}>
-          {user.losses}
-        </span>
-        <span className="text-[10px] tabular-nums px-1.5 py-0.5" style={{ backgroundColor: 'rgba(136, 136, 136, 0.06)', color: '#888' }}>
-          {user.draws}
-        </span>
+      <div className="hidden sm:flex font-inter-force items-center gap-1.5">
+        <span className="text-[10px] tabular-nums" style={{ color: '#5fb05f' }}>{user.wins}W</span>
+        <span className="text-[10px] tabular-nums" style={{ color: '#d97676' }}>{user.losses}L</span>
+        <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>{user.draws}D</span>
       </div>
 
-      <span className="hidden sm:block text-xs tabular-nums w-10 text-right" style={{ color: '#666', fontFamily: 'var(--font-inter)' }}>
+      <span className="hidden sm:block font-inter-force text-xs tabular-nums w-10 text-right" style={{ color: '#666' }}>
         {winRate}%
       </span>
 
       <span
-        className="text-sm sm:text-base font-bold tabular-nums w-14 text-right"
-        style={{ color: tierColor, fontFamily: 'var(--font-inter)' }}
+        className="font-display text-lg sm:text-xl tabular-nums w-16 text-right"
+        style={{ color: tierColor, textShadow: `0 0 10px ${tierColor}33`, letterSpacing: '0.02em' }}
       >
         {user.elo}
       </span>
     </motion.div>
+  );
+}
+
+function FilterPill({
+  active,
+  onClick,
+  label,
+  color,
+  imageSrc,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  color: string;
+  imageSrc?: string;
+}) {
+  return (
+    <motion.button
+      whileTap={{ scale: 0.93 }}
+      whileHover={{ y: -1 }}
+      onClick={onClick}
+      className="font-display shrink-0 flex items-center gap-1.5 px-3 py-1.5 cursor-pointer transition-colors"
+      style={{
+        backgroundColor: active ? `${color}18` : 'rgba(255, 255, 255, 0.025)',
+        color: active ? color : '#666',
+        borderRadius: 9999,
+        boxShadow: active ? `0 0 22px -6px ${color}, 0 0 0 1px ${color}28 inset` : 'none',
+      }}
+    >
+      {imageSrc && (
+        <Image
+          src={imageSrc}
+          alt=""
+          width={16}
+          height={16}
+          unoptimized
+          style={{ filter: active ? 'none' : 'grayscale(0.95) opacity(0.55)' }}
+        />
+      )}
+      <span className="text-[11px] tracking-wider uppercase">{label}</span>
+    </motion.button>
+  );
+}
+
+function SkeletonGrid() {
+  return (
+    <div>
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6 items-end">
+        {[210, 270, 210].map((h, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.18, 0.45, 0.18] }}
+            transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.1 }}
+            style={{ height: h, backgroundColor: '#0d0c10', clipPath: CHAMFER_CLIP }}
+          />
+        ))}
+      </div>
+      <div className="flex flex-col gap-1">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.18, 0.4, 0.18] }}
+            transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.05 }}
+            style={{ height: 46, backgroundColor: i % 2 === 0 ? '#0c0b10' : '#0a0a0d', clipPath: ROW_CLIP }}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -379,63 +423,47 @@ export default function LeaderboardPage() {
   const podiumUsers = showPodium ? users.slice(0, 3) : [];
   const listUsers = showPodium ? users.slice(3) : users;
   const listStartIndex = showPodium ? 3 : 0;
-
   const pageKey = useMemo(() => `${currentPage}-${debouncedSearch}-${leagueFilter}`, [currentPage, debouncedSearch, leagueFilter]);
 
   return (
-    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08080b' }}>
-      <CloudBackground />
-
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 select-none font-black opacity-[0.04]"
-        style={{
-          fontSize: 'clamp(180px, 28vw, 360px)',
-          color: '#c4a35a',
-          letterSpacing: '-0.06em',
-          lineHeight: 1,
-          fontFamily: 'var(--font-inter)',
-        }}
-      >
-        TOP
-      </span>
-
+    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
       <div className="w-full max-w-4xl mx-auto relative z-10 flex-1 px-4 sm:px-8 py-6 sm:py-10">
 
         <motion.header
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: 'easeOut' }}
-          className="mb-7 sm:mb-10"
+          className="mb-8"
         >
-          <div className="flex items-start justify-between gap-3 flex-wrap">
-            <div>
-              <div className="flex items-baseline gap-3 flex-wrap">
-                <h1 className="text-3xl sm:text-5xl font-black tracking-tight uppercase leading-none" style={{ color: '#f0f0f0', letterSpacing: '-0.02em' }}>
-                  {t('title')}
-                </h1>
-                <motion.span
-                  className="text-xs sm:text-sm font-bold tabular-nums"
-                  style={{ color: '#c4a35a', fontFamily: 'var(--font-inter)' }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.4 }}
-                >
-                  {totalCount} {t('player')}{totalCount > 1 ? 's' : ''}
-                </motion.span>
-              </div>
-              {leaguesEnabled && (
-                <p className="text-[11px] mt-2" style={{ color: '#555' }}>
-                  {t('subtitle', { count: PLACEMENT_MATCHES_REQUIRED })}
-                </p>
-              )}
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-3">
+              <h1
+                className="font-display text-3xl sm:text-5xl tracking-wider uppercase leading-none"
+                style={{ color: '#f2efe7', letterSpacing: '0.08em', textShadow: '0 0 22px rgba(196, 163, 90, 0.18)' }}
+              >
+                {t('title')}
+              </h1>
+              <motion.span
+                className="font-display text-xs sm:text-sm tabular-nums px-2.5 py-1 ml-1"
+                style={{
+                  color: '#c4a35a',
+                  backgroundColor: 'rgba(196, 163, 90, 0.08)',
+                  borderRadius: 9999,
+                  boxShadow: '0 0 0 1px rgba(196, 163, 90, 0.18) inset',
+                }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3, duration: 0.4 }}
+              >
+                {totalCount}
+              </motion.span>
             </div>
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex items-center gap-1.5 ml-auto">
               {leaguesEnabled && (
                 <button
                   onClick={() => setLeaguesModalOpen(true)}
-                  className="px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest cursor-pointer transition-colors hover:text-[#c4a35a]"
-                  style={{ backgroundColor: 'transparent', color: '#888' }}
+                  className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[#c4a35a]"
+                  style={{ color: '#888' }}
                 >
                   {t('leagues')}
                 </button>
@@ -443,46 +471,46 @@ export default function LeaderboardPage() {
               <LanguageSwitcher />
               <Link
                 href="/"
-                className="px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-colors"
-                style={{ backgroundColor: 'transparent', color: '#888' }}
+                className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
+                style={{ color: '#888' }}
               >
                 {tc('back')}
               </Link>
             </div>
           </div>
+          {leaguesEnabled && (
+            <p className="text-[11px] mt-3" style={{ color: '#555' }}>
+              {t('subtitle', { count: PLACEMENT_MATCHES_REQUIRED })}
+            </p>
+          )}
         </motion.header>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="relative mb-5"
+          className="relative mb-6"
         >
-          <input
-            ref={searchRef}
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t('searchPlaceholder')}
-            className="w-full px-5 py-3 text-sm transition-all"
-            style={{
-              backgroundColor: 'rgba(15, 15, 18, 0.85)',
-              color: '#f0f0f0',
-              outline: 'none',
-              boxShadow: 'inset 0 -1px 0 0 rgba(196, 163, 90, 0.22)',
-            }}
-            onFocus={(e) => (e.target.style.boxShadow = 'inset 0 -2px 0 0 rgba(196, 163, 90, 0.7)')}
-            onBlur={(e) => (e.target.style.boxShadow = 'inset 0 -1px 0 0 rgba(196, 163, 90, 0.22)')}
-          />
-          {searchQuery && (
-            <button
-              onClick={handleClearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs cursor-pointer"
-              style={{ color: '#888' }}
-            >
-              X
-            </button>
-          )}
+          <div className="flex items-center gap-3 px-5 py-3" style={{ backgroundColor: 'rgba(13, 12, 16, 0.85)', borderRadius: 9999 }}>
+            <input
+              ref={searchRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('searchPlaceholder')}
+              className="font-display flex-1 bg-transparent text-sm outline-none"
+              style={{ color: '#f0eee7', letterSpacing: '0.03em' }}
+            />
+            {searchQuery && (
+              <button
+                onClick={handleClearSearch}
+                className="font-display text-[11px] uppercase cursor-pointer"
+                style={{ color: '#888' }}
+              >
+                X
+              </button>
+            )}
+          </div>
         </motion.div>
 
         {leaguesEnabled && (
@@ -490,7 +518,7 @@ export default function LeaderboardPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.15 }}
-            className="flex items-center gap-1.5 mb-6 overflow-x-auto pb-1 no-scrollbar"
+            className="flex items-center gap-1.5 mb-7 overflow-x-auto pb-1 no-scrollbar"
           >
             <FilterPill active={!leagueFilter} onClick={() => setLeagueFilter('')} label={tc('all')} color="#c4a35a" />
             {RANK_TIERS.map((tier) => (
@@ -521,7 +549,7 @@ export default function LeaderboardPage() {
               animate={{ opacity: 1 }}
               className="flex items-center justify-center py-20"
             >
-              <p className="text-sm" style={{ color: '#555' }}>{t('noPlayers')}</p>
+              <p className="font-display text-sm uppercase tracking-widest" style={{ color: '#555' }}>{t('noPlayers')}</p>
             </motion.div>
           ) : (
             <AnimatePresence mode="wait">
@@ -533,7 +561,7 @@ export default function LeaderboardPage() {
                 transition={{ duration: 0.2 }}
               >
                 {showPodium && (
-                  <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6 items-end">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-7 items-end">
                     <div className="self-end">
                       <PodiumCard user={podiumUsers[1]} rank={2} leaguesEnabled={leaguesEnabled} delay={0.05} />
                     </div>
@@ -570,23 +598,23 @@ export default function LeaderboardPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.4 }}
-              className="flex items-center justify-center gap-3 mt-7"
+              className="flex items-center justify-center gap-6 mt-8"
             >
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage <= 1}
-                className="px-4 py-2 text-xs uppercase tracking-widest font-bold transition-colors disabled:opacity-20 cursor-pointer hover:text-[#c4a35a]"
+                className="font-display px-4 py-2 text-xs uppercase tracking-widest cursor-pointer disabled:opacity-20 transition-colors hover:text-[#c4a35a]"
                 style={{ color: '#888' }}
               >
                 {tc('previous')}
               </button>
-              <span className="text-xs tabular-nums" style={{ color: '#555', fontFamily: 'var(--font-inter)' }}>
+              <span className="font-display text-sm tabular-nums" style={{ color: '#c4a35a' }}>
                 {currentPage} / {totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage >= totalPages}
-                className="px-4 py-2 text-xs uppercase tracking-widest font-bold transition-colors disabled:opacity-20 cursor-pointer hover:text-[#c4a35a]"
+                className="font-display px-4 py-2 text-xs uppercase tracking-widest cursor-pointer disabled:opacity-20 transition-colors hover:text-[#c4a35a]"
                 style={{ color: '#888' }}
               >
                 {tc('next')}
@@ -601,73 +629,5 @@ export default function LeaderboardPage() {
         <LeaguesModal open={leaguesModalOpen} onClose={() => setLeaguesModalOpen(false)} />
       )}
     </main>
-  );
-}
-
-function FilterPill({
-  active,
-  onClick,
-  label,
-  color,
-  imageSrc,
-}: {
-  active: boolean;
-  onClick: () => void;
-  label: string;
-  color: string;
-  imageSrc?: string;
-}) {
-  return (
-    <motion.button
-      whileTap={{ scale: 0.94 }}
-      onClick={onClick}
-      className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 cursor-pointer transition-colors"
-      style={{
-        backgroundColor: active ? `${color}12` : 'transparent',
-        boxShadow: active ? `inset 0 -2px 0 0 ${color}` : 'inset 0 -1px 0 0 rgba(255,255,255,0.04)',
-        color: active ? color : '#555',
-      }}
-    >
-      {imageSrc && (
-        <Image
-          src={imageSrc}
-          alt=""
-          width={14}
-          height={14}
-          unoptimized
-          style={{ filter: active ? 'none' : 'grayscale(0.9) opacity(0.55)' }}
-        />
-      )}
-      <span className="text-[9px] uppercase font-bold tracking-widest">{label}</span>
-    </motion.button>
-  );
-}
-
-function SkeletonGrid() {
-  return (
-    <div>
-      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6 items-end">
-        {[200, 260, 200].map((h, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.1 }}
-            style={{ height: h, backgroundColor: '#101015' }}
-          />
-        ))}
-      </div>
-      <div className="flex flex-col">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0.2, 0.5, 0.2] }}
-            transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.05 }}
-            style={{ height: 44, backgroundColor: '#0f0f12', boxShadow: 'inset 0 -1px 0 0 rgba(255, 255, 255, 0.03)' }}
-          />
-        ))}
-      </div>
-    </div>
   );
 }
