@@ -320,48 +320,49 @@ export default function ProfilePage({
             minHeight: 200,
           }}
         >
-          <div className="relative z-10 flex flex-col items-center justify-center px-6 sm:px-10 py-7 sm:py-8 sm:w-[40%] gap-3">
+          <div className="relative z-10 flex items-center justify-center px-6 sm:px-10 py-7 sm:py-8 sm:w-[34%]">
             {leaguesEnabled && placed && tier ? (
-              <>
-                <Image
-                  src={tier.image}
-                  alt=""
-                  width={108}
-                  height={108}
-                  unoptimized
-                  priority
-                />
-                <span
-                  className="font-display text-sm sm:text-base uppercase whitespace-nowrap"
-                  style={{
-                    color: accentColor,
-                    letterSpacing: '0.32em',
-                    paddingLeft: '0.32em',
-                  }}
-                >
-                  {t(`rankNames.${tier.key}`)}
-                </span>
-              </>
+              <Image
+                src={tier.image}
+                alt=""
+                width={130}
+                height={130}
+                unoptimized
+                priority
+              />
             ) : (
-              <>
-                <div className="font-display text-4xl sm:text-5xl tabular-nums leading-none" style={{ color: '#3a3a3a' }}>
-                  ?
-                </div>
-                <span
-                  className="font-display text-sm sm:text-base uppercase whitespace-nowrap"
-                  style={{ color: '#666', letterSpacing: '0.32em', paddingLeft: '0.32em' }}
-                >
-                  {leaguesEnabled ? t('rankNames.unranked') : 'ELO'}
-                </span>
-              </>
+              <div className="font-display text-5xl sm:text-6xl tabular-nums leading-none" style={{ color: '#3a3a3a' }}>
+                ?
+              </div>
             )}
           </div>
 
-          <div className="relative z-10 flex flex-col justify-center items-center sm:items-start px-6 sm:px-4 pb-7 sm:py-8 pr-6 sm:pr-10 sm:w-[60%] gap-3 text-center sm:text-left">
+          <div className="relative z-10 flex flex-col justify-center items-center sm:items-start px-6 sm:px-4 pb-7 sm:py-8 pr-6 sm:pr-10 sm:w-[66%] gap-1.5 text-center sm:text-left">
+            <span className="font-display text-[10px] uppercase tracking-[0.4em]" style={{ color: '#555' }}>
+              {t('rank')}
+            </span>
+
+            <div
+              className="font-display uppercase leading-none wrap-break-word max-w-full"
+              style={{
+                color: accentColor,
+                fontSize: 'clamp(20px, 4vw, 30px)',
+                letterSpacing: '0.05em',
+              }}
+            >
+              {leaguesEnabled && placed && tier
+                ? t(`rankNames.${tier.key}`)
+                : leaguesEnabled
+                  ? t('rankNames.unranked')
+                  : '...'}
+            </div>
+
+            <div className="h-px w-12 sm:w-16 my-1.5" style={{ backgroundColor: '#1e1e1e' }} />
+
             <div className="flex items-center gap-1.5 max-w-full">
               <h1
-                className="font-display text-2xl sm:text-4xl truncate leading-none"
-                style={{ color: '#f4f1e8', letterSpacing: '0.04em' }}
+                className="font-display text-xl sm:text-2xl truncate leading-none"
+                style={{ color: '#e8e6df', letterSpacing: '0.04em' }}
               >
                 {profile.username}
               </h1>
@@ -372,19 +373,19 @@ export default function ProfilePage({
               />
             </div>
 
-            <div className="flex items-baseline gap-2.5">
+            <div className="flex items-baseline gap-2 mt-1">
               <div
-                className="font-display tabular-nums leading-none text-5xl sm:text-6xl"
-                style={{ color: accentColor, letterSpacing: '-0.01em' }}
+                className="font-display tabular-nums leading-none text-4xl sm:text-5xl"
+                style={{ color: '#f4f1e8', letterSpacing: '-0.01em' }}
               >
                 {eloCount}
               </div>
-              <span className="font-display text-[10px] uppercase tracking-[0.32em]" style={{ color: '#555' }}>
+              <span className="font-display text-[10px] uppercase tracking-[0.32em]" style={{ color: '#666' }}>
                 ELO
               </span>
             </div>
 
-            <p className="text-[11px]" style={{ color: '#555' }}>
+            <p className="text-[11px] mt-2" style={{ color: '#555' }}>
               {t('memberSince', { date: new Date(profile.createdAt).toLocaleDateString(locale) })}
             </p>
 
