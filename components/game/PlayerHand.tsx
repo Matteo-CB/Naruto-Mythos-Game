@@ -477,8 +477,8 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
           </div>
         )}
 
-        
-        {hand.length > 1 && !dims.isMobile && (
+
+        {hand.length > 1 && (
           <div className="flex items-center gap-2">
             <SortPill
               label={t('game.hand.sortCost')}
@@ -500,12 +500,10 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
           </div>
         )}
 
-        
-        {!dims.isMobile && (
-          <span className="text-[11px] tabular-nums" style={{ color: '#888888' }}>
-            {t('game.board.handCount', { count: hand.length })}
-          </span>
-        )}
+
+        <span className="text-[11px] tabular-nums" style={{ color: '#888888' }}>
+          {t('game.board.handCount', { count: hand.length })}
+        </span>
       </div>
     </div>
   );

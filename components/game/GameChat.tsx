@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { useSocketStore } from '@/lib/socket/client';
 import { useGameStore } from '@/stores/gameStore';
 import { useSession } from 'next-auth/react';
-import { useGameScale } from './GameScaleContext';
 
 const PRESET_MESSAGES = [
   { key: 'gg', label: 'GG', color: '#c4a35a' },
@@ -61,7 +60,6 @@ function renderMessage(text: string) {
 
 export function GameChat() {
   const t = useTranslations();
-  const dims = useGameScale();
   const { data: session } = useSession();
   const isOnlineGame = useGameStore((s) => s.isOnlineGame);
   const chatMessages = useSocketStore((s) => s.chatMessages);
@@ -96,8 +94,8 @@ export function GameChat() {
         onClick={() => setChatOpen(true)}
         className="fixed z-40 flex items-center gap-1.5 px-3 py-2 text-[11px] uppercase font-bold tracking-wider cursor-pointer"
         style={{
-          bottom: dims.isMobile ? '8px' : '16px',
-          left: dims.isMobile ? '8px' : '16px',
+          bottom: '16px',
+          left: '16px',
           backgroundColor: 'rgba(10, 10, 14, 0.9)',
           border: '1px solid rgba(196, 163, 90, 0.25)',
           color: '#c4a35a',
@@ -121,8 +119,8 @@ export function GameChat() {
       style={{
         bottom: 0,
         left: 0,
-        width: dims.isMobile ? 'min(280px, calc(100vw - 16px))' : '320px',
-        height: dims.isMobile ? '55vh' : '420px',
+        width: '320px',
+        height: '420px',
         maxHeight: '80vh',
         backgroundColor: 'rgba(8, 8, 12, 0.97)',
         borderRight: '1px solid #1e1e1e',

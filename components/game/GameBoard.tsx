@@ -448,25 +448,6 @@ function CardPreviewContent({
 
 
 
-function MobileDetailsButton() {
-  const t = useTranslations();
-  const dims = useGameScale();
-  const pinnedCard = useUIStore((s) => s.pinnedCard);
-  const showFullscreenCard = useUIStore((s) => s.showFullscreenCard);
-  const toggleFullscreenCard = useUIStore((s) => s.toggleFullscreenCard);
-  
-  if (!dims.isMobile || !pinnedCard || showFullscreenCard) return null;
-  return (
-    <button
-      onClick={(e) => { e.stopPropagation(); toggleFullscreenCard(); }}
-      className="fullscreen-btn"
-      style={{ position: 'fixed', bottom: '50px', right: '8px', zIndex: 9997, margin: 0 }}
-    >
-      {t('game.board.details')}
-    </button>
-  );
-}
-
 
 
 function CardPreview() {
@@ -481,7 +462,7 @@ function CardPreview() {
   const isPinned = !!pinnedCard;
 
   
-  if (!displayCard || dims.isMobile) return null;
+  if (!displayCard) return null;
 
   return (
     <AnimatePresence>
@@ -545,7 +526,7 @@ function FullscreenCardDetail() {
       
       <div className="flex items-center justify-between">
         <span
-          className={`${dims.isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-xs px-2 py-1'} font-bold uppercase tracking-wider`}
+          className={`text-xs px-2 py-1 font-bold uppercase tracking-wider`}
           style={{
             backgroundColor: isMission
               ? "rgba(196, 163, 90, 0.12)"
@@ -557,7 +538,7 @@ function FullscreenCardDetail() {
           {isMission ? t("card.mission") : t("card.character")}
         </span>
         <span
-          className={`${dims.isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-xs px-2 py-1'} shrink-0 font-bold`}
+          className={`text-xs px-2 py-1 shrink-0 font-bold`}
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.04)",
             borderLeft: `2px solid ${rarityColor}`,
@@ -571,13 +552,13 @@ function FullscreenCardDetail() {
       
       <div className="flex flex-col gap-0.5">
         <span
-          className={`${dims.isMobile ? 'text-sm' : 'text-lg'} font-bold leading-tight`}
+          className={`text-lg font-bold leading-tight`}
           style={{ color: "#e0e0e0" }}
         >
           {getCardName(card, locale as 'en' | 'fr')}
         </span>
         {(card.title_fr || card.title_en) && (
-          <span className={`${dims.isMobile ? 'text-[10px]' : 'text-sm'}`} style={{ color: "#999999" }}>
+          <span className="text-sm" style={{ color: "#999999" }}>
             {getCardTitle(card, locale as 'en' | 'fr')}
           </span>
         )}
@@ -586,7 +567,7 @@ function FullscreenCardDetail() {
       
       {isCharacter && (
         <div
-          className={`flex items-center ${dims.isMobile ? 'gap-3 p-1.5' : 'gap-6 p-3'}`}
+          className={`flex items-center gap-6 p-3`}
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.03)",
             borderLeft: "3px solid rgba(196, 163, 90, 0.3)",
@@ -594,13 +575,13 @@ function FullscreenCardDetail() {
         >
           <div className="flex flex-col items-center gap-0.5">
             <span
-              className={`${dims.isMobile ? 'text-[8px]' : 'text-xs'} uppercase tracking-wider`}
+              className="text-xs uppercase tracking-wider"
               style={{ color: "#888888" }}
             >
               {t("collection.details.cost")}
             </span>
             <span
-              className={`${dims.isMobile ? 'text-base' : 'text-xl'} font-bold`}
+              className="text-xl font-bold"
               style={{ color: "#c4a35a" }}
             >
               {(card as CharacterCard).chakra}
@@ -612,13 +593,13 @@ function FullscreenCardDetail() {
           />
           <div className="flex flex-col items-center gap-0.5">
             <span
-              className={`${dims.isMobile ? 'text-[8px]' : 'text-xs'} uppercase tracking-wider`}
+              className="text-xs uppercase tracking-wider"
               style={{ color: "#888888" }}
             >
               {t("collection.details.power")}
             </span>
             <span
-              className={`${dims.isMobile ? 'text-base' : 'text-xl'} font-bold`}
+              className="text-xl font-bold"
               style={{ color: "#e0e0e0" }}
             >
               {(card as CharacterCard).power}
@@ -630,18 +611,18 @@ function FullscreenCardDetail() {
       
       {isMission && missionContext && (
         <div
-          className={`flex flex-col gap-1 ${dims.isMobile ? 'p-1.5' : 'p-3'}`}
+          className="flex flex-col gap-1 p-3"
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.03)",
             borderLeft: `3px solid ${rankColorMap[missionContext.rank] ?? "#555"}`,
           }}
         >
           <div className="flex items-center justify-between">
-            <span className={`${dims.isMobile ? 'text-[10px]' : 'text-sm'}`} style={{ color: "#aaaaaa" }}>
+            <span className="text-sm" style={{ color: "#aaaaaa" }}>
               {t("card.rank")}
             </span>
             <span
-              className={`${dims.isMobile ? 'text-xs px-2 py-0.5' : 'text-base px-3 py-1'} font-bold`}
+              className="text-base px-3 py-1 font-bold"
               style={{
                 color: rankColorMap[missionContext.rank] ?? "#888",
                 backgroundColor: `${rankColorMap[missionContext.rank] ?? "#888"}15`,
@@ -651,10 +632,10 @@ function FullscreenCardDetail() {
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className={`${dims.isMobile ? 'text-[10px]' : 'text-sm'} font-bold`} style={{ color: "#c4a35a" }}>
+            <span className="text-sm font-bold" style={{ color: "#c4a35a" }}>
               {t("card.totalPoints")}
             </span>
-            <span className={`${dims.isMobile ? 'text-xs' : 'text-base'} font-bold tabular-nums`} style={{ color: "#c4a35a" }}>
+            <span className="text-base font-bold tabular-nums" style={{ color: "#c4a35a" }}>
               {missionContext.basePoints + missionContext.rankBonus} {t("game.board.pts")}
             </span>
           </div>
@@ -674,7 +655,7 @@ function FullscreenCardDetail() {
           {card.keywords.map((kw) => (
             <span
               key={kw}
-              className={`${dims.isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-xs px-2 py-0.5'}`}
+              className="text-xs px-2 py-0.5"
               style={{
                 backgroundColor: "rgba(255, 255, 255, 0.04)",
                 color: "#999999",
@@ -689,18 +670,18 @@ function FullscreenCardDetail() {
 
       
       {card.group && (
-        <span className={`${dims.isMobile ? 'text-[10px]' : 'text-sm'}`} style={{ color: "#999999" }}>
+        <span className="text-sm" style={{ color: "#999999" }}>
           {getCardGroup(card.group, locale as 'en' | 'fr')}
         </span>
       )}
 
       
       <div
-        className={`flex flex-col ${dims.isMobile ? 'gap-1.5 pt-1.5' : 'gap-2.5 pt-3'}`}
+        className="flex flex-col gap-2.5 pt-3"
         style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}
       >
         <span
-          className={`${dims.isMobile ? 'text-[9px]' : 'text-xs'} font-bold uppercase tracking-wider`}
+          className="text-xs font-bold uppercase tracking-wider"
           style={{ color: "#888888" }}
         >
           {t("card.effects")}
@@ -719,14 +700,14 @@ function FullscreenCardDetail() {
             return (
               <div
                 key={i}
-                className={`flex flex-col gap-0.5 ${dims.isMobile ? 'p-1.5' : 'p-3'}`}
+                className="flex flex-col gap-0.5 p-3"
                 style={{
                   backgroundColor: `${effectTypeColorMap[effect.type] ?? "#888888"}08`,
                   borderLeft: `3px solid ${effectTypeColorMap[effect.type] ?? "#888888"}`,
                 }}
               >
                 <span
-                  className={`${dims.isMobile ? 'text-[9px]' : 'text-xs'} font-bold uppercase`}
+                  className="text-xs font-bold uppercase"
                   style={{
                     color: effectTypeColorMap[effect.type] ?? "#888888",
                   }}
@@ -740,7 +721,7 @@ function FullscreenCardDetail() {
                   )}
                 </span>
                 <span
-                  className={`font-body ${dims.isMobile ? 'text-[10px] leading-snug' : 'text-sm leading-relaxed'}`}
+                  className="font-body text-sm leading-relaxed"
                   style={{ color: "#bbbbbb" }}
                 >
                   {description}
@@ -757,77 +738,8 @@ function FullscreenCardDetail() {
     </>
   );
 
-  
-  if (dims.isMobile) {
-    return (
-      <>
-        
-        <div
-          className="fixed inset-0 pointer-events-none"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", zIndex: 299 }}
-        />
-        
-        <motion.div
-          initial={{ y: "100%" }}
-          animate={{ y: 0 }}
-          transition={{ type: "spring", stiffness: 320, damping: 32 }}
-          className="fixed bottom-0 left-0 right-0 flex flex-col overflow-hidden"
-          style={{
-            zIndex: 300,
-            maxHeight: "80vh",
-            backgroundColor: "rgba(10, 10, 14, 0.98)",
-            borderTop: "2px solid rgba(196, 163, 90, 0.25)",
-            boxShadow: "0 -4px 24px rgba(0, 0, 0, 0.7)",
-          }}
-        >
-          
-          <button
-            onClick={() => toggleFullscreenCard()}
-            className="absolute top-2 right-2 z-10 w-7 h-7 flex items-center justify-center text-[11px] font-bold cursor-pointer"
-            style={{
-              backgroundColor: "rgba(0, 0, 0, 0.7)",
-              color: "#888888",
-              borderLeft: "2px solid rgba(255, 255, 255, 0.15)",
-            }}
-          >
-            X
-          </button>
 
-          
-          {imagePath ? (
-            <div
-              className="w-full shrink-0 flex items-center justify-center"
-              style={{ height: "min(45vw, 36vh)", backgroundColor: "#0a0a0c" }}
-            >
-              <img
-                src={imagePath}
-                alt={getCardName(card, locale as "en" | "fr")}
-                draggable={false}
-                className="h-full w-auto"
-                style={{ objectFit: "contain" }}
-              />
-            </div>
-          ) : (
-            <div
-              className="w-full shrink-0 flex items-center justify-center"
-              style={{ height: "48px", backgroundColor: "#1a1a1a" }}
-            >
-              <span className="text-[10px]" style={{ color: "#555555" }}>
-                {t("card.noImage")}
-              </span>
-            </div>
-          )}
 
-          
-          <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
-            {cardInfoContent}
-          </div>
-        </motion.div>
-      </>
-    );
-  }
-
-  
   return (
     <AnimatePresence>
       <motion.div
@@ -1138,7 +1050,7 @@ function GameBoardInner() {
             borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
             height: dims.opponentHandH + "px",
             backgroundColor: "rgba(8, 8, 12, 0.5)",
-            padding: dims.isMobile ? '0' : '4px 0',
+            padding: '4px 0',
           }}
         >
           <OpponentHand handSize={opponentState.handSize} />
@@ -1146,8 +1058,8 @@ function GameBoardInner() {
 
         
         <section className="flex-1 flex flex-col min-h-0">
-          <div className={`flex-1 flex items-stretch justify-center ${dims.isMobile ? 'px-1 py-0' : 'px-3 py-0.5'} min-h-0 overflow-hidden`}>
-            <div className={`flex ${dims.isMobile ? 'gap-0.5' : 'gap-1.5'} items-stretch justify-center w-full`}>
+          <div className="flex-1 flex items-stretch justify-center px-3 py-0.5 min-h-0 overflow-hidden">
+            <div className="flex gap-1.5 items-stretch justify-center w-full">
               {activeMissions.map((mission, index) => (
                 <MissionLane
                   key={`mission-${index}`}
@@ -1204,7 +1116,7 @@ function GameBoardInner() {
             borderTop: "1px solid rgba(255, 255, 255, 0.04)",
             height: dims.playerHandH + "px",
             backgroundColor: "rgba(8, 8, 12, 0.5)",
-            paddingBottom: dims.isMobile ? '2px' : '0',
+            paddingBottom: '0',
           }}
         >
           {isSpectating
@@ -1222,7 +1134,6 @@ function GameBoardInner() {
 
       <CardPreview />
       <FullscreenCardDetail />
-      <MobileDetailsButton />
 
       <EdgeCoinFlip />
       <MissionDeckIntro />

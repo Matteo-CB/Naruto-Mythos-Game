@@ -7,6 +7,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSocketStore } from '@/lib/socket/client';
 import dynamic from 'next/dynamic';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
+import { ScaledGameRoot } from '@/components/game/ScaledGameRoot';
 const TrainingCoachPanel = dynamic(
   () => import('@/components/game/TrainingCoachPanel').then((mod) => mod.TrainingCoachPanel),
   { ssr: false },
@@ -281,7 +282,9 @@ export default function GamePage() {
 
   return (
     <>
-      <GameBoard />
+      <ScaledGameRoot>
+        <GameBoard />
+      </ScaledGameRoot>
       <TrainingCoachPanel />
       <LandscapeBlocker />
       <BanNotification />
