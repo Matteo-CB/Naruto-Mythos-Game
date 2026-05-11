@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { CloudBackground } from '@/components/CloudBackground';
-import { DecorativeIcons } from '@/components/DecorativeIcons';
-import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { Footer } from '@/components/Footer';
 import { RANK_TIERS, PLACEMENT_MATCHES_REQUIRED, getRankTier } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
@@ -27,112 +26,293 @@ interface LeaderboardUser {
   tournamentWins?: number;
 }
 
-const PODIUM_ACCENTS: Record<1 | 2 | 3, { fg: string; bg: string; border: string }> = {
-  1: { fg: '#c4a35a', bg: 'rgba(196, 163, 90, 0.07)', border: 'rgba(196, 163, 90, 0.55)' },
-  2: { fg: '#b8b8b8', bg: 'rgba(184, 184, 184, 0.05)', border: 'rgba(184, 184, 184, 0.4)' },
-  3: { fg: '#a87547', bg: 'rgba(168, 117, 71, 0.05)', border: 'rgba(168, 117, 71, 0.4)' },
+const PODIUM_ACCENT: Record<1 | 2 | 3, string> = {
+  1: '#c4a35a',
+  2: '#b8b8b8',
+  3: '#a87547',
 };
+
+function useCountUp(target: number, duration = 700): number {
+  const [value, setValue] = useState(0);
+  const startRef = useRef<number | null>(null);
+  const fromRef = useRef(0);
+
+  useEffect(() => {
+    fromRef.current = value;
+    startRef.current = null;
+    let raf = 0;
+    const tick = (ts: number) => {
+      if (startRef.current === null) startRef.current = ts;
+      const t = Math.min(1, (ts - startRef.current) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const next = Math.round(fromRef.current + (target - fromRef.current) * eased);
+      setValue(next);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target, duration]);
+
+  return value;
+}
 
 function PodiumCard({
   user,
   rank,
   tall,
   leaguesEnabled,
+  delay,
 }: {
   user: LeaderboardUser;
   rank: 1 | 2 | 3;
   tall?: boolean;
   leaguesEnabled: boolean;
+  delay: number;
 }) {
-  const accent = PODIUM_ACCENTS[rank];
+  const accent = PODIUM_ACCENT[rank];
   const total = user.wins + user.losses + user.draws;
   const placed = total >= PLACEMENT_MATCHES_REQUIRED;
   const tier = getRankTier(user.elo);
   const winrate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
   const streakWin = (user.consecutiveWins ?? 0) >= 3;
   const streakLoss = (user.consecutiveLosses ?? 0) >= 3;
+  const tournaments = user.tournamentWins ?? 0;
+  const eloCount = useCountUp(user.elo, 900);
 
   return (
-    <Link
-      href={`/profile/${encodeURIComponent(user.username)}` as '/'}
-      className={`relative flex flex-col items-center justify-end overflow-hidden ${tall ? 'pt-6 pb-5 sm:pt-8 sm:pb-6' : 'pt-4 pb-4 sm:pt-5 sm:pb-5'}`}
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, delay, ease: [0.16, 1, 0.3, 1] }}
+      className="relative flex"
+    >
+      <Link
+        href={`/profile/${encodeURIComponent(user.username)}` as '/'}
+        className={`relative w-full flex flex-col items-center justify-end overflow-hidden cursor-pointer group ${tall ? 'pt-8 pb-6' : 'pt-5 pb-5'}`}
+        style={{
+          backgroundColor: '#101015',
+          minHeight: tall ? 260 : 200,
+          boxShadow: `inset 0 1px 0 0 ${accent}55, inset 0 -1px 0 0 ${accent}22`,
+        }}
+      >
+        {rank === 1 && (
+          <motion.span
+            aria-hidden
+            className="pointer-events-none absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.35em] font-bold"
+            style={{ color: accent, fontFamily: 'var(--font-inter)' }}
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: delay + 0.4, duration: 0.4 }}
+          >
+            #1
+          </motion.span>
+        )}
+
+        <span
+          aria-hidden
+          className={`pointer-events-none absolute leading-none font-black ${tall ? 'text-[140px]' : 'text-[100px]'}`}
+          style={{
+            color: `${accent}10`,
+            top: tall ? '-22px' : '-10px',
+            fontFamily: 'var(--font-inter)',
+            letterSpacing: '-0.04em',
+          }}
+        >
+          {rank === 1 ? 'I' : rank === 2 ? 'II' : 'III'}
+        </span>
+
+        {leaguesEnabled && placed ? (
+          <motion.div
+            className={`relative z-10 ${tall ? 'mb-3' : 'mb-2'}`}
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: delay + 0.15, duration: 0.5, ease: 'backOut' }}
+          >
+            <Image
+              src={tier.image}
+              alt=""
+              width={tall ? 72 : 56}
+              height={tall ? 72 : 56}
+              unoptimized
+              priority
+            />
+          </motion.div>
+        ) : (
+          <div className={tall ? 'mb-3' : 'mb-2'} style={{ height: tall ? 72 : 56 }} />
+        )}
+
+        <div className="relative z-10 flex items-center gap-1.5 max-w-full px-3">
+          <span
+            className={`truncate font-semibold ${tall ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}
+            style={{ color: '#f0f0f0' }}
+          >
+            {user.username}
+          </span>
+          <UserBadges role={user.role} badgePrefs={user.badgePrefs} size="sm" />
+        </div>
+
+        <div
+          className={`relative z-10 tabular-nums font-bold leading-none mt-2 ${tall ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'}`}
+          style={{ color: accent, fontFamily: 'var(--font-inter)' }}
+        >
+          {eloCount}
+        </div>
+
+        <div className="relative z-10 flex items-center gap-2 mt-2.5 text-[10px] tabular-nums" style={{ fontFamily: 'var(--font-inter)' }}>
+          <span style={{ color: '#5fb05f' }}>{user.wins}W</span>
+          <span style={{ color: '#3a3a3a' }}>·</span>
+          <span style={{ color: '#d97676' }}>{user.losses}L</span>
+          {total > 0 && (
+            <>
+              <span style={{ color: '#3a3a3a' }}>·</span>
+              <span style={{ color: '#888' }}>{winrate}%</span>
+            </>
+          )}
+        </div>
+
+        {(streakWin || streakLoss || tournaments > 0) && (
+          <motion.div
+            className="relative z-10 flex items-center gap-1 mt-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: delay + 0.35, duration: 0.3 }}
+          >
+            {streakWin && (
+              <Chip text={`${user.consecutiveWins}W`} color="#5fb05f" />
+            )}
+            {streakLoss && (
+              <Chip text={`${user.consecutiveLosses}L`} color="#d97676" />
+            )}
+            {tournaments > 0 && (
+              <Chip text={`${tournaments}T`} color="#c4a35a" />
+            )}
+          </motion.div>
+        )}
+
+        <motion.span
+          aria-hidden
+          className="absolute bottom-0 left-0 h-0.5"
+          style={{ backgroundColor: accent }}
+          initial={{ width: 0 }}
+          animate={{ width: '100%' }}
+          transition={{ delay: delay + 0.2, duration: 0.6, ease: 'easeOut' }}
+        />
+      </Link>
+    </motion.div>
+  );
+}
+
+function Chip({ text, color }: { text: string; color: string }) {
+  return (
+    <span
+      className="px-1.5 py-0.5 text-[9px] uppercase tracking-wider font-bold"
       style={{
-        backgroundColor: accent.bg,
-        border: `1px solid ${accent.border}`,
-        minHeight: tall ? 220 : 180,
+        backgroundColor: `${color}10`,
+        color,
+        boxShadow: `inset 0 0 0 1px ${color}38`,
       }}
     >
-      <div
-        className={`absolute top-0 left-1/2 -translate-x-1/2 font-bold leading-none ${tall ? 'text-[40px] sm:text-[56px]' : 'text-[32px] sm:text-[40px]'}`}
-        style={{ color: `${accent.fg}22`, fontFamily: 'var(--font-inter)', marginTop: tall ? -4 : -2 }}
+      {text}
+    </span>
+  );
+}
+
+function LeaderRow({
+  user,
+  globalRank,
+  leaguesEnabled,
+  index,
+  isSelf,
+}: {
+  user: LeaderboardUser;
+  globalRank: number;
+  leaguesEnabled: boolean;
+  index: number;
+  isSelf: boolean;
+}) {
+  const total = user.wins + user.losses + user.draws;
+  const winRate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
+  const tier = getRankTier(user.elo);
+  const placed = total >= PLACEMENT_MATCHES_REQUIRED;
+  const streakWin = (user.consecutiveWins ?? 0) >= 3;
+  const streakLoss = (user.consecutiveLosses ?? 0) >= 3;
+  const tournaments = user.tournamentWins ?? 0;
+  const tierColor = placed && leaguesEnabled ? tier.color : '#444';
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.32, delay: Math.min(index * 0.025, 0.4), ease: 'easeOut' }}
+      className="relative grid items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-2.5 transition-colors hover:bg-[#13110e]"
+      style={{
+        backgroundColor: isSelf ? 'rgba(196, 163, 90, 0.05)' : '#0f0f12',
+        gridTemplateColumns: 'auto auto 1fr auto auto auto',
+        boxShadow: 'inset 0 -1px 0 0 rgba(255, 255, 255, 0.03)',
+      }}
+    >
+      <span
+        className="text-xs sm:text-sm font-bold tabular-nums w-7 sm:w-9 text-center"
+        style={{ color: '#5a5a5a', fontFamily: 'var(--font-inter)' }}
       >
-        {rank === 1 ? 'I' : rank === 2 ? 'II' : 'III'}
-      </div>
+        {globalRank}
+      </span>
 
-      {leaguesEnabled && placed && (
-        <div className={tall ? 'mt-2 mb-3' : 'mt-1 mb-2'}>
-          <Image
-            src={tier.image}
-            alt=""
-            width={tall ? 56 : 44}
-            height={tall ? 56 : 44}
-            unoptimized
-          />
-        </div>
-      )}
-      {(!leaguesEnabled || !placed) && (
-        <div className={tall ? 'mt-2 mb-3' : 'mt-1 mb-2'} style={{ height: tall ? 56 : 44 }} />
+      {leaguesEnabled && placed ? (
+        <Image
+          src={tier.image}
+          alt=""
+          width={26}
+          height={26}
+          unoptimized
+          className="shrink-0"
+        />
+      ) : (
+        <span className="inline-flex items-center justify-center text-[9px] uppercase tracking-wider" style={{ width: 26, height: 26, color: '#444' }}>
+          ?
+        </span>
       )}
 
-      <div className="flex items-center gap-1.5 max-w-full px-2">
-        <span
-          className={`truncate font-semibold ${tall ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}
-          style={{ color: '#e8e8e8' }}
+      <div className="flex items-center gap-1.5 min-w-0">
+        <Link
+          href={`/profile/${encodeURIComponent(user.username)}` as '/'}
+          className="text-sm truncate transition-colors hover:text-[#c4a35a]"
+          style={{ color: '#e0e0e0' }}
         >
           {user.username}
-        </span>
+        </Link>
         <UserBadges role={user.role} badgePrefs={user.badgePrefs} size="sm" />
+        {streakWin && <Chip text={`${user.consecutiveWins}W`} color="#5fb05f" />}
+        {streakLoss && <Chip text={`${user.consecutiveLosses}L`} color="#d97676" />}
+        {tournaments > 0 && <Chip text={`${tournaments}T`} color="#c4a35a" />}
       </div>
 
-      <div
-        className={`tabular-nums font-bold leading-none mt-2 ${tall ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}
-        style={{ color: accent.fg, fontFamily: 'var(--font-inter)' }}
+      <div className="hidden sm:flex items-center gap-1" style={{ fontFamily: 'var(--font-inter)' }}>
+        <span className="text-[10px] tabular-nums px-1.5 py-0.5" style={{ backgroundColor: 'rgba(95, 176, 95, 0.08)', color: '#5fb05f' }}>
+          {user.wins}
+        </span>
+        <span className="text-[10px] tabular-nums px-1.5 py-0.5" style={{ backgroundColor: 'rgba(217, 118, 118, 0.08)', color: '#d97676' }}>
+          {user.losses}
+        </span>
+        <span className="text-[10px] tabular-nums px-1.5 py-0.5" style={{ backgroundColor: 'rgba(136, 136, 136, 0.06)', color: '#888' }}>
+          {user.draws}
+        </span>
+      </div>
+
+      <span className="hidden sm:block text-xs tabular-nums w-10 text-right" style={{ color: '#666', fontFamily: 'var(--font-inter)' }}>
+        {winRate}%
+      </span>
+
+      <span
+        className="text-sm sm:text-base font-bold tabular-nums w-14 text-right"
+        style={{ color: tierColor, fontFamily: 'var(--font-inter)' }}
       >
         {user.elo}
-      </div>
-
-      <div className="flex items-center gap-1.5 mt-2 text-[10px] tabular-nums" style={{ fontFamily: 'var(--font-inter)' }}>
-        <span style={{ color: '#3e8b3e' }}>{user.wins}W</span>
-        <span style={{ color: '#666' }}>·</span>
-        <span style={{ color: '#b33e3e' }}>{user.losses}L</span>
-        {total > 0 && (
-          <>
-            <span style={{ color: '#666' }}>·</span>
-            <span style={{ color: '#888' }}>{winrate}%</span>
-          </>
-        )}
-      </div>
-
-      {(streakWin || streakLoss || (user.tournamentWins ?? 0) > 0) && (
-        <div className="flex items-center gap-1 mt-2">
-          {streakWin && (
-            <span className="px-1.5 py-0.5 text-[9px] uppercase tracking-wider font-bold" style={{ backgroundColor: 'rgba(62, 139, 62, 0.12)', color: '#5fb05f', border: '1px solid rgba(62, 139, 62, 0.3)' }}>
-              {user.consecutiveWins}W
-            </span>
-          )}
-          {streakLoss && (
-            <span className="px-1.5 py-0.5 text-[9px] uppercase tracking-wider font-bold" style={{ backgroundColor: 'rgba(179, 62, 62, 0.12)', color: '#d97676', border: '1px solid rgba(179, 62, 62, 0.3)' }}>
-              {user.consecutiveLosses}L
-            </span>
-          )}
-          {(user.tournamentWins ?? 0) > 0 && (
-            <span className="px-1.5 py-0.5 text-[9px] uppercase tracking-wider font-bold" style={{ backgroundColor: 'rgba(196, 163, 90, 0.12)', color: '#c4a35a', border: '1px solid rgba(196, 163, 90, 0.3)' }}>
-              {user.tournamentWins}T
-            </span>
-          )}
-        </div>
-      )}
-    </Link>
+      </span>
+    </motion.div>
   );
 }
 
@@ -149,6 +329,7 @@ export default function LeaderboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [leagueFilter, setLeagueFilter] = useState('');
+  const [selfUsername, setSelfUsername] = useState<string | null>(null);
   const PLAYERS_PER_PAGE = 20;
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -165,6 +346,10 @@ export default function LeaderboardPage() {
     fetch('/api/settings')
       .then((res) => res.json())
       .then((data) => setLeaguesEnabled(data.leaguesEnabled ?? false))
+      .catch(() => {});
+    fetch('/api/user/me')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((d) => { if (d?.username) setSelfUsername(d.username); })
       .catch(() => {});
   }, []);
 
@@ -189,69 +374,105 @@ export default function LeaderboardPage() {
   }, []);
 
   const totalPages = Math.max(1, Math.ceil(totalPlayers / PLAYERS_PER_PAGE));
+  const totalCount = useCountUp(totalPlayers, 600);
+  const showPodium = currentPage === 1 && !debouncedSearch && !leagueFilter && users.length >= 3;
+  const podiumUsers = showPodium ? users.slice(0, 3) : [];
+  const listUsers = showPodium ? users.slice(3) : users;
+  const listStartIndex = showPodium ? 3 : 0;
+
+  const pageKey = useMemo(() => `${currentPage}-${debouncedSearch}-${leagueFilter}`, [currentPage, debouncedSearch, leagueFilter]);
 
   return (
-    <main id="main-content" className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08080b' }}>
       <CloudBackground />
-      <DecorativeIcons />
-      <CardBackgroundDecor variant="leaderboard" />
 
-      <div className="w-full max-w-3xl mx-auto relative z-10 flex-1 px-4 sm:px-6 py-6 sm:py-10">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 select-none font-black opacity-[0.04]"
+        style={{
+          fontSize: 'clamp(180px, 28vw, 360px)',
+          color: '#c4a35a',
+          letterSpacing: '-0.06em',
+          lineHeight: 1,
+          fontFamily: 'var(--font-inter)',
+        }}
+      >
+        TOP
+      </span>
 
-        
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-wider uppercase" style={{ color: '#c4a35a' }}>
-              {t('title')}
-            </h1>
-            {leaguesEnabled && (
-              <p className="text-[11px] mt-1" style={{ color: '#555' }}>
-                {t('subtitle', { count: PLACEMENT_MATCHES_REQUIRED })}
-              </p>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {leaguesEnabled && (
-              <button
-                onClick={() => setLeaguesModalOpen(true)}
-                className="px-3 py-1.5 text-[10px] sm:text-xs font-medium uppercase tracking-wider cursor-pointer transition-colors"
-                style={{
-                  backgroundColor: 'rgba(196, 163, 90, 0.06)',
-                  border: '1px solid rgba(196, 163, 90, 0.25)',
-                  color: '#c4a35a',
-                }}
+      <div className="w-full max-w-4xl mx-auto relative z-10 flex-1 px-4 sm:px-8 py-6 sm:py-10">
+
+        <motion.header
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
+          className="mb-7 sm:mb-10"
+        >
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div>
+              <div className="flex items-baseline gap-3 flex-wrap">
+                <h1 className="text-3xl sm:text-5xl font-black tracking-tight uppercase leading-none" style={{ color: '#f0f0f0', letterSpacing: '-0.02em' }}>
+                  {t('title')}
+                </h1>
+                <motion.span
+                  className="text-xs sm:text-sm font-bold tabular-nums"
+                  style={{ color: '#c4a35a', fontFamily: 'var(--font-inter)' }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.4 }}
+                >
+                  {totalCount} {t('player')}{totalCount > 1 ? 's' : ''}
+                </motion.span>
+              </div>
+              {leaguesEnabled && (
+                <p className="text-[11px] mt-2" style={{ color: '#555' }}>
+                  {t('subtitle', { count: PLACEMENT_MATCHES_REQUIRED })}
+                </p>
+              )}
+            </div>
+            <div className="flex items-center gap-2 ml-auto">
+              {leaguesEnabled && (
+                <button
+                  onClick={() => setLeaguesModalOpen(true)}
+                  className="px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest cursor-pointer transition-colors hover:text-[#c4a35a]"
+                  style={{ backgroundColor: 'transparent', color: '#888' }}
+                >
+                  {t('leagues')}
+                </button>
+              )}
+              <LanguageSwitcher />
+              <Link
+                href="/"
+                className="px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-colors"
+                style={{ backgroundColor: 'transparent', color: '#888' }}
               >
-                {t('leagues')}
-              </button>
-            )}
-            <LanguageSwitcher />
-            <Link
-              href="/"
-              className="px-3 py-1.5 text-xs transition-colors"
-              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888' }}
-            >
-              {tc('back')}
-            </Link>
+                {tc('back')}
+              </Link>
+            </div>
           </div>
-        </div>
+        </motion.header>
 
-        
-        <div className="relative mb-5">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="relative mb-5"
+        >
           <input
             ref={searchRef}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchPlaceholder')}
-            className="w-full px-4 py-2.5 text-sm rounded-lg"
+            className="w-full px-5 py-3 text-sm transition-all"
             style={{
-              backgroundColor: '#111',
-              border: '1px solid #1e1e1e',
-              color: '#e0e0e0',
+              backgroundColor: 'rgba(15, 15, 18, 0.85)',
+              color: '#f0f0f0',
               outline: 'none',
+              boxShadow: 'inset 0 -1px 0 0 rgba(196, 163, 90, 0.22)',
             }}
-            onFocus={(e) => (e.target.style.borderColor = '#c4a35a55')}
-            onBlur={(e) => (e.target.style.borderColor = '#1e1e1e')}
+            onFocus={(e) => (e.target.style.boxShadow = 'inset 0 -2px 0 0 rgba(196, 163, 90, 0.7)')}
+            onBlur={(e) => (e.target.style.boxShadow = 'inset 0 -1px 0 0 rgba(196, 163, 90, 0.22)')}
           />
           {searchQuery && (
             <button
@@ -262,215 +483,115 @@ export default function LeaderboardPage() {
               X
             </button>
           )}
-        </div>
+        </motion.div>
 
-        
         {leaguesEnabled && (
-          <div className="flex items-center gap-1 mb-4 overflow-x-auto pb-1 no-scrollbar">
-            <button
-              onClick={() => setLeagueFilter('')}
-              className="shrink-0 px-2 py-1 text-[10px] uppercase font-bold cursor-pointer"
-              style={{
-                backgroundColor: !leagueFilter ? 'rgba(196,163,90,0.15)' : 'transparent',
-                border: `1px solid ${!leagueFilter ? '#c4a35a' : '#262626'}`,
-                color: !leagueFilter ? '#c4a35a' : '#555',
-              }}
-            >{tc('all')}</button>
-            {RANK_TIERS.map((tier) => {
-              const active = leagueFilter === tier.key;
-              return (
-                <button
-                  key={tier.key}
-                  onClick={() => setLeagueFilter(active ? '' : tier.key)}
-                  className="shrink-0 flex items-center gap-1 px-2 py-1 cursor-pointer"
-                  style={{
-                    backgroundColor: active ? `${tier.color}15` : 'transparent',
-                    border: `1px solid ${active ? tier.color : '#262626'}`,
-                  }}
-                >
-                  <Image src={tier.image} alt="" width={14} height={14} unoptimized
-                    style={{ filter: active ? 'none' : 'grayscale(0.8) opacity(0.5)' }} />
-                  <span className="text-[9px] uppercase font-bold" style={{ color: active ? tier.color : '#555' }}>
-                    {tp(`rankNames.${tier.key}`)}
-                  </span>
-                </button>
-              );
-            })}
-            <div className="w-px h-4 shrink-0" style={{ backgroundColor: '#262626' }} />
-            <button
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.15 }}
+            className="flex items-center gap-1.5 mb-6 overflow-x-auto pb-1 no-scrollbar"
+          >
+            <FilterPill active={!leagueFilter} onClick={() => setLeagueFilter('')} label={tc('all')} color="#c4a35a" />
+            {RANK_TIERS.map((tier) => (
+              <FilterPill
+                key={tier.key}
+                active={leagueFilter === tier.key}
+                onClick={() => setLeagueFilter(leagueFilter === tier.key ? '' : tier.key)}
+                label={tp(`rankNames.${tier.key}`)}
+                color={tier.color}
+                imageSrc={tier.image}
+              />
+            ))}
+            <FilterPill
+              active={leagueFilter === 'unranked'}
               onClick={() => setLeagueFilter(leagueFilter === 'unranked' ? '' : 'unranked')}
-              className="shrink-0 px-2 py-1 text-[9px] uppercase font-bold cursor-pointer"
-              style={{
-                backgroundColor: leagueFilter === 'unranked' ? 'rgba(102,102,102,0.15)' : 'transparent',
-                border: `1px solid ${leagueFilter === 'unranked' ? '#666' : '#262626'}`,
-                color: leagueFilter === 'unranked' ? '#999' : '#444',
-              }}
-            >
-              {tp('rankNames.unranked')}
-            </button>
-          </div>
+              label={tp('rankNames.unranked')}
+              color="#888"
+            />
+          </motion.div>
         )}
-
-        
-        {!loading && totalPlayers > 0 && (
-          <div className="flex items-center gap-3 mb-3">
-            <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
-            <span className="text-[10px] uppercase tracking-wider tabular-nums" style={{ color: '#444' }}>
-              {totalPlayers} {t('player')}{totalPlayers > 1 ? 's' : ''}
-            </span>
-            <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
-          </div>
-        )}
-
 
         <section>
           {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <p className="text-sm" style={{ color: '#555' }}>{tc('loading')}</p>
-            </div>
+            <SkeletonGrid />
           ) : users.length === 0 ? (
-            <div className="flex items-center justify-center py-16">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center justify-center py-20"
+            >
               <p className="text-sm" style={{ color: '#555' }}>{t('noPlayers')}</p>
-            </div>
-          ) : (() => {
-            const showPodium = currentPage === 1 && !debouncedSearch && !leagueFilter && users.length >= 3;
-            const podiumUsers = showPodium ? users.slice(0, 3) : [];
-            const listUsers = showPodium ? users.slice(3) : users;
-            const listStartIndex = showPodium ? 3 : 0;
-
-            return (
-              <>
+            </motion.div>
+          ) : (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={pageKey}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
                 {showPodium && (
-                  <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-5">
-                    <div className="order-1 self-end">
-                      <PodiumCard user={podiumUsers[1]} rank={2} leaguesEnabled={leaguesEnabled} />
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6 items-end">
+                    <div className="self-end">
+                      <PodiumCard user={podiumUsers[1]} rank={2} leaguesEnabled={leaguesEnabled} delay={0.05} />
                     </div>
-                    <div className="order-2 self-end">
-                      <PodiumCard user={podiumUsers[0]} rank={1} tall leaguesEnabled={leaguesEnabled} />
+                    <div className="self-end">
+                      <PodiumCard user={podiumUsers[0]} rank={1} tall leaguesEnabled={leaguesEnabled} delay={0} />
                     </div>
-                    <div className="order-3 self-end">
-                      <PodiumCard user={podiumUsers[2]} rank={3} leaguesEnabled={leaguesEnabled} />
+                    <div className="self-end">
+                      <PodiumCard user={podiumUsers[2]} rank={3} leaguesEnabled={leaguesEnabled} delay={0.1} />
                     </div>
                   </div>
                 )}
 
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col">
                   {listUsers.map((user, index) => {
-                    const total = user.wins + user.losses + user.draws;
-                    const winRate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
                     const globalRank = (currentPage - 1) * PLAYERS_PER_PAGE + listStartIndex + index + 1;
-                    const tier = getRankTier(user.elo);
-                    const placed = total >= PLACEMENT_MATCHES_REQUIRED;
-                    const streakWin = (user.consecutiveWins ?? 0) >= 3;
-                    const streakLoss = (user.consecutiveLosses ?? 0) >= 3;
-                    const tournamentWins = user.tournamentWins ?? 0;
-
                     return (
-                      <div
+                      <LeaderRow
                         key={user.id}
-                        className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 hover:bg-[#13110e] transition-colors"
-                        style={{
-                          backgroundColor: '#111',
-                          borderLeft: `2px solid ${placed && leaguesEnabled ? `${tier.color}55` : '#1e1e1e'}`,
-                        }}
-                      >
-                        <span
-                          className="text-xs sm:text-sm font-bold tabular-nums w-6 sm:w-8 text-center shrink-0"
-                          style={{ color: '#666', fontFamily: 'var(--font-inter)' }}
-                        >
-                          {globalRank}
-                        </span>
-
-                        {leaguesEnabled && placed && (
-                          <Image
-                            src={tier.image}
-                            alt=""
-                            width={24}
-                            height={24}
-                            unoptimized
-                            className="shrink-0"
-                          />
-                        )}
-
-                        <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                          <Link
-                            href={`/profile/${encodeURIComponent(user.username)}` as '/'}
-                            className="text-sm truncate transition-colors hover:text-[#c4a35a]"
-                            style={{ color: '#e0e0e0' }}
-                          >
-                            {user.username}
-                          </Link>
-                          <UserBadges role={user.role} badgePrefs={user.badgePrefs} size="sm" />
-                          {streakWin && (
-                            <span className="inline px-1 py-0.5 text-[8px] uppercase font-bold shrink-0" style={{ backgroundColor: 'rgba(62, 139, 62, 0.12)', color: '#5fb05f', border: '1px solid rgba(62, 139, 62, 0.3)' }}>
-                              {user.consecutiveWins}W
-                            </span>
-                          )}
-                          {streakLoss && (
-                            <span className="inline px-1 py-0.5 text-[8px] uppercase font-bold shrink-0" style={{ backgroundColor: 'rgba(179, 62, 62, 0.12)', color: '#d97676', border: '1px solid rgba(179, 62, 62, 0.3)' }}>
-                              {user.consecutiveLosses}L
-                            </span>
-                          )}
-                          {tournamentWins > 0 && (
-                            <span className="inline px-1 py-0.5 text-[8px] uppercase font-bold shrink-0" style={{ backgroundColor: 'rgba(196, 163, 90, 0.12)', color: '#c4a35a', border: '1px solid rgba(196, 163, 90, 0.3)' }}>
-                              {tournamentWins}T
-                            </span>
-                          )}
-                        </div>
-
-                        <span
-                          className="text-sm font-semibold tabular-nums shrink-0 w-12 text-right"
-                          style={{ color: placed && leaguesEnabled ? tier.color : '#e0e0e0', fontFamily: 'var(--font-inter)' }}
-                        >
-                          {user.elo}
-                        </span>
-
-                        <div className="hidden sm:flex items-center gap-1 shrink-0" style={{ fontFamily: 'var(--font-inter)' }}>
-                          <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(62,139,62,0.1)', color: '#3e8b3e' }}>
-                            {user.wins}W
-                          </span>
-                          <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(179,62,62,0.1)', color: '#b33e3e' }}>
-                            {user.losses}L
-                          </span>
-                          <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(136,136,136,0.08)', color: '#888' }}>
-                            {user.draws}D
-                          </span>
-                        </div>
-
-                        <span className="hidden sm:block text-xs tabular-nums shrink-0 w-10 text-right" style={{ color: '#888', fontFamily: 'var(--font-inter)' }}>
-                          {winRate}%
-                        </span>
-                      </div>
+                        user={user}
+                        globalRank={globalRank}
+                        leaguesEnabled={leaguesEnabled}
+                        index={index}
+                        isSelf={selfUsername === user.username}
+                      />
                     );
                   })}
                 </div>
-              </>
-            );
-          })()}
+              </motion.div>
+            </AnimatePresence>
+          )}
 
-          
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-3 mt-5">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+              className="flex items-center justify-center gap-3 mt-7"
+            >
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage <= 1}
-                className="px-3 py-1.5 text-xs transition-colors disabled:opacity-25 cursor-pointer"
-                style={{ backgroundColor: '#141414', border: '1px solid #1e1e1e', color: '#888' }}
+                className="px-4 py-2 text-xs uppercase tracking-widest font-bold transition-colors disabled:opacity-20 cursor-pointer hover:text-[#c4a35a]"
+                style={{ color: '#888' }}
               >
                 {tc('previous')}
               </button>
-              <span className="text-xs tabular-nums" style={{ color: '#555' }}>
+              <span className="text-xs tabular-nums" style={{ color: '#555', fontFamily: 'var(--font-inter)' }}>
                 {currentPage} / {totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage >= totalPages}
-                className="px-3 py-1.5 text-xs transition-colors disabled:opacity-25 cursor-pointer"
-                style={{ backgroundColor: '#141414', border: '1px solid #1e1e1e', color: '#888' }}
+                className="px-4 py-2 text-xs uppercase tracking-widest font-bold transition-colors disabled:opacity-20 cursor-pointer hover:text-[#c4a35a]"
+                style={{ color: '#888' }}
               >
                 {tc('next')}
               </button>
-            </div>
+            </motion.div>
           )}
         </section>
       </div>
@@ -480,5 +601,73 @@ export default function LeaderboardPage() {
         <LeaguesModal open={leaguesModalOpen} onClose={() => setLeaguesModalOpen(false)} />
       )}
     </main>
+  );
+}
+
+function FilterPill({
+  active,
+  onClick,
+  label,
+  color,
+  imageSrc,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  color: string;
+  imageSrc?: string;
+}) {
+  return (
+    <motion.button
+      whileTap={{ scale: 0.94 }}
+      onClick={onClick}
+      className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 cursor-pointer transition-colors"
+      style={{
+        backgroundColor: active ? `${color}12` : 'transparent',
+        boxShadow: active ? `inset 0 -2px 0 0 ${color}` : 'inset 0 -1px 0 0 rgba(255,255,255,0.04)',
+        color: active ? color : '#555',
+      }}
+    >
+      {imageSrc && (
+        <Image
+          src={imageSrc}
+          alt=""
+          width={14}
+          height={14}
+          unoptimized
+          style={{ filter: active ? 'none' : 'grayscale(0.9) opacity(0.55)' }}
+        />
+      )}
+      <span className="text-[9px] uppercase font-bold tracking-widest">{label}</span>
+    </motion.button>
+  );
+}
+
+function SkeletonGrid() {
+  return (
+    <div>
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6 items-end">
+        {[200, 260, 200].map((h, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.1 }}
+            style={{ height: h, backgroundColor: '#101015' }}
+          />
+        ))}
+      </div>
+      <div className="flex flex-col">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.2, 0.5, 0.2] }}
+            transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.05 }}
+            style={{ height: 44, backgroundColor: '#0f0f12', boxShadow: 'inset 0 -1px 0 0 rgba(255, 255, 255, 0.03)' }}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
