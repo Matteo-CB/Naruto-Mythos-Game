@@ -959,57 +959,6 @@ function MaintenanceNotification() {
 
 
 
-const BETA_DISMISSED_KEY = 'naruto-mythos-beta-dismissed';
-
-function BetaNotification() {
-  const t = useTranslations('home');
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    try {
-      if (!localStorage.getItem(BETA_DISMISSED_KEY)) {
-        setVisible(true);
-      }
-    } catch { /* SSR / privacy */ }
-  }, []);
-
-  if (!visible) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 40 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 40 }}
-      transition={{ duration: 0.3 }}
-      className="fixed top-3 right-3 z-300 flex items-start gap-2 px-4 py-3"
-      style={{
-        maxWidth: '340px',
-        backgroundColor: 'rgba(12, 12, 18, 0.92)',
-        borderLeft: '3px solid rgba(255, 255, 255, 0.12)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
-      }}
-    >
-      <span className="text-[9px] leading-relaxed" style={{ color: '#cccccc', fontFamily: 'Inter, sans-serif' }}>
-        {t('betaBanner')}
-      </span>
-      <button
-        onClick={() => {
-          setVisible(false);
-          try { localStorage.setItem(BETA_DISMISSED_KEY, '1'); } catch { /* noop */ }
-        }}
-        className="shrink-0 w-5 h-5 flex items-center justify-center text-[10px] font-bold cursor-pointer mt-0.5"
-        style={{
-          backgroundColor: 'rgba(179, 62, 62, 0.15)',
-          color: '#b33e3e',
-          borderLeft: '2px solid rgba(179, 62, 62, 0.4)',
-        }}
-      >
-        X
-      </button>
-    </motion.div>
-  );
-}
-
 
 
 export default function GameBoard() {
@@ -1118,7 +1067,6 @@ function GameBoardInner() {
       />
 
       <MaintenanceNotification />
-      <BetaNotification />
       <SandboxToolbar />
 
       

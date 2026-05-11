@@ -15,8 +15,19 @@ interface ActivityEntry {
 
 const cache = new Map<string, { at: number; data: ActivityEntry[] }>();
 const CACHE_TTL_MS = 60 * 1000;
+const CACHE_MAX_USERS = 500;
 const ACTIVITY_WINDOW_DAYS = 7;
 const MAX_ENTRIES = 50;
+
+function evictExpired(now: number) {
+  for (const [k, v] of cache) {
+    if (now - v.at >= CACHE_TTL_MS) cache.delete(k);
+  }
+  if (cache.size > CACHE_MAX_USERS) {
+    const oldestKey = cache.keys().next().value;
+    if (oldestKey !== undefined) cache.delete(oldestKey);
+  }
+}
 
 export async function GET() {
   try {
@@ -27,6 +38,7 @@ export async function GET() {
 
     const userId = session.user.id;
     const now = Date.now();
+    evictExpired(now);
     const cached = cache.get(userId);
     if (cached && now - cached.at < CACHE_TTL_MS) {
       return NextResponse.json({ activity: cached.data, cached: true });

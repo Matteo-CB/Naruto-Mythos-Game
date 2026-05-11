@@ -37,10 +37,12 @@ export async function GET() {
       take: 500,
     });
 
-    const friendInfos = friendships.map((f) => {
-      const other = f.senderId === userId ? f.receiver : f.sender;
-      return { friendshipId: f.id, since: f.updatedAt, other };
-    });
+    const friendInfos = friendships
+      .map((f) => {
+        const other = f.senderId === userId ? f.receiver : f.sender;
+        return other ? { friendshipId: f.id, since: f.updatedAt, other } : null;
+      })
+      .filter((f): f is NonNullable<typeof f> => f !== null);
     const friendIds = friendInfos.map((f) => f.other.id);
 
     const myHistoryWithFriends = friendIds.length > 0
