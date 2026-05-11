@@ -60,32 +60,110 @@ function useCountUp(target: number, duration = 700): number {
   return value;
 }
 
-function Chip({ text, color }: { text: string; color: string }) {
+function HeroChampion({
+  user,
+  leaguesEnabled,
+}: {
+  user: LeaderboardUser;
+  leaguesEnabled: boolean;
+}) {
+  const accent = PODIUM_ACCENT[1];
+  const total = user.wins + user.losses + user.draws;
+  const placed = total >= PLACEMENT_MATCHES_REQUIRED;
+  const tier = getRankTier(user.elo);
+  const winrate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
+  const eloCount = useCountUp(user.elo, 900);
+
   return (
-    <span
-      className="font-display px-2 py-0.5 text-[10px] uppercase tracking-wider"
-      style={{
-        backgroundColor: `${color}14`,
-        color,
-        boxShadow: `0 0 0 1px ${color}30 inset`,
-        borderRadius: 9999,
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 28 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ y: -3 }}
+      className="relative w-full"
     >
-      {text}
-    </span>
+      <Link
+        href={`/profile/${encodeURIComponent(user.username)}` as '/'}
+        className="relative w-full flex flex-col sm:flex-row items-center sm:items-stretch overflow-hidden cursor-pointer"
+        style={{
+          backgroundColor: '#0d0c10',
+          minHeight: 220,
+          clipPath: CHAMFER_CLIP,
+          boxShadow: `0 0 70px -22px ${accent.glow}, 0 10px 26px rgba(0, 0, 0, 0.4)`,
+        }}
+      >
+        <span
+          aria-hidden
+          className="font-display pointer-events-none absolute leading-none"
+          style={{
+            color: `${accent.fg}10`,
+            fontSize: 'clamp(180px, 30vw, 280px)',
+            top: -28,
+            right: -10,
+            letterSpacing: '-0.06em',
+          }}
+        >
+          I
+        </span>
+
+        <div className="relative z-10 flex flex-col items-center justify-center px-6 sm:px-10 py-6 sm:py-8 sm:w-[44%] gap-3">
+          {leaguesEnabled && placed ? (
+            <motion.div
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.18, duration: 0.55, ease: 'backOut' }}
+              style={{ filter: `drop-shadow(0 0 16px ${accent.glow})` }}
+            >
+              <Image src={tier.image} alt="" width={96} height={96} unoptimized priority />
+            </motion.div>
+          ) : (
+            <div style={{ height: 96 }} />
+          )}
+          <span
+            className="font-display text-[10px] uppercase tracking-[0.4em]"
+            style={{ color: accent.fg, opacity: 0.7 }}
+          >
+            #1
+          </span>
+        </div>
+
+        <div className="relative z-10 flex flex-col justify-center items-center sm:items-start px-6 sm:px-2 pb-6 sm:py-8 pr-6 sm:pr-10 sm:w-[56%] gap-2 text-center sm:text-left">
+          <div className="flex items-center gap-1.5 max-w-full">
+            <span
+              className="font-display text-xl sm:text-3xl truncate"
+              style={{ color: '#f2f0eb', letterSpacing: '0.04em' }}
+            >
+              {user.username}
+            </span>
+            <UserBadges role={user.role} badgePrefs={user.badgePrefs} size="sm" />
+          </div>
+
+          <div
+            className="font-display tabular-nums leading-none text-5xl sm:text-6xl"
+            style={{ color: accent.fg, textShadow: `0 0 30px ${accent.glow}` }}
+          >
+            {eloCount}
+          </div>
+
+          <div className="font-inter-force flex items-center gap-3 text-[11px] tabular-nums mt-1">
+            <span style={{ color: '#5fb05f' }}>{user.wins}W</span>
+            <span style={{ color: '#d97676' }}>{user.losses}L</span>
+            {total > 0 && <span style={{ color: '#888' }}>{winrate}%</span>}
+          </div>
+        </div>
+      </Link>
+    </motion.div>
   );
 }
 
 function PodiumCard({
   user,
   rank,
-  tall,
   leaguesEnabled,
   delay,
 }: {
   user: LeaderboardUser;
-  rank: 1 | 2 | 3;
-  tall?: boolean;
+  rank: 2 | 3;
   leaguesEnabled: boolean;
   delay: number;
 }) {
@@ -94,66 +172,56 @@ function PodiumCard({
   const placed = total >= PLACEMENT_MATCHES_REQUIRED;
   const tier = getRankTier(user.elo);
   const winrate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
-  const streakWin = (user.consecutiveWins ?? 0) >= 3;
-  const streakLoss = (user.consecutiveLosses ?? 0) >= 3;
-  const tournaments = user.tournamentWins ?? 0;
   const eloCount = useCountUp(user.elo, 900);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, delay, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
       className="relative"
-      whileHover={{ y: -3 }}
+      whileHover={{ y: -2 }}
     >
       <Link
         href={`/profile/${encodeURIComponent(user.username)}` as '/'}
-        className={`relative w-full flex flex-col items-center justify-end overflow-hidden cursor-pointer ${tall ? 'pt-8 pb-7' : 'pt-5 pb-5'}`}
+        className="relative w-full flex flex-col items-center justify-end overflow-hidden cursor-pointer pt-5 pb-5"
         style={{
           backgroundColor: '#0d0c10',
-          minHeight: tall ? 270 : 210,
+          minHeight: 200,
           clipPath: CHAMFER_CLIP,
-          boxShadow: `0 0 60px -20px ${accent.glow}, 0 8px 20px rgba(0, 0, 0, 0.35)`,
+          boxShadow: `0 0 44px -18px ${accent.glow}, 0 6px 16px rgba(0, 0, 0, 0.3)`,
         }}
       >
         <span
           aria-hidden
           className="font-display pointer-events-none absolute leading-none"
           style={{
-            color: `${accent.fg}14`,
-            fontSize: tall ? '170px' : '120px',
-            top: tall ? -22 : -10,
+            color: `${accent.fg}12`,
+            fontSize: 'clamp(80px, 18vw, 130px)',
+            top: -10,
             letterSpacing: '-0.04em',
           }}
         >
-          {rank === 1 ? 'I' : rank === 2 ? 'II' : 'III'}
+          {rank === 2 ? 'II' : 'III'}
         </span>
 
         {leaguesEnabled && placed ? (
           <motion.div
-            className={`relative z-10 ${tall ? 'mb-3' : 'mb-2'}`}
+            className="relative z-10 mb-2"
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: delay + 0.15, duration: 0.55, ease: 'backOut' }}
-            style={{ filter: `drop-shadow(0 0 12px ${accent.glow})` }}
+            style={{ filter: `drop-shadow(0 0 10px ${accent.glow})` }}
           >
-            <Image
-              src={tier.image}
-              alt=""
-              width={tall ? 84 : 60}
-              height={tall ? 84 : 60}
-              unoptimized
-              priority
-            />
+            <Image src={tier.image} alt="" width={56} height={56} unoptimized priority />
           </motion.div>
         ) : (
-          <div className={tall ? 'mb-3' : 'mb-2'} style={{ height: tall ? 84 : 60 }} />
+          <div className="mb-2" style={{ height: 56 }} />
         )}
 
-        <div className="relative z-10 flex items-center gap-1.5 max-w-full px-4">
+        <div className="relative z-10 flex items-center gap-1.5 max-w-full px-3">
           <span
-            className={`font-display truncate ${tall ? 'text-lg sm:text-xl' : 'text-base sm:text-lg'}`}
+            className="font-display text-sm sm:text-base truncate"
             style={{ color: '#f2f0eb', letterSpacing: '0.04em' }}
           >
             {user.username}
@@ -162,36 +230,17 @@ function PodiumCard({
         </div>
 
         <div
-          className={`font-display relative z-10 tabular-nums leading-none mt-3 ${tall ? 'text-4xl sm:text-5xl' : 'text-3xl sm:text-4xl'}`}
-          style={{ color: accent.fg, textShadow: `0 0 24px ${accent.glow}` }}
+          className="font-display relative z-10 tabular-nums leading-none mt-2.5 text-2xl sm:text-3xl"
+          style={{ color: accent.fg, textShadow: `0 0 18px ${accent.glow}` }}
         >
           {eloCount}
         </div>
 
-        <div className="font-inter-force relative z-10 flex items-center gap-2 mt-3 text-[10px] tabular-nums">
+        <div className="font-inter-force relative z-10 flex items-center gap-2 mt-2 text-[10px] tabular-nums">
           <span style={{ color: '#5fb05f' }}>{user.wins}W</span>
-          <span style={{ color: '#3a3a3a' }}>·</span>
           <span style={{ color: '#d97676' }}>{user.losses}L</span>
-          {total > 0 && (
-            <>
-              <span style={{ color: '#3a3a3a' }}>·</span>
-              <span style={{ color: '#888' }}>{winrate}%</span>
-            </>
-          )}
+          {total > 0 && <span style={{ color: '#888' }}>{winrate}%</span>}
         </div>
-
-        {(streakWin || streakLoss || tournaments > 0) && (
-          <motion.div
-            className="relative z-10 flex items-center gap-1 mt-2.5"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: delay + 0.35, duration: 0.3 }}
-          >
-            {streakWin && <Chip text={`${user.consecutiveWins}W`} color="#5fb05f" />}
-            {streakLoss && <Chip text={`${user.consecutiveLosses}L`} color="#d97676" />}
-            {tournaments > 0 && <Chip text={`${tournaments}T`} color="#c4a35a" />}
-          </motion.div>
-        )}
       </Link>
     </motion.div>
   );
@@ -214,9 +263,6 @@ function LeaderRow({
   const winRate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
   const tier = getRankTier(user.elo);
   const placed = total >= PLACEMENT_MATCHES_REQUIRED;
-  const streakWin = (user.consecutiveWins ?? 0) >= 3;
-  const streakLoss = (user.consecutiveLosses ?? 0) >= 3;
-  const tournaments = user.tournamentWins ?? 0;
   const tierColor = placed && leaguesEnabled ? tier.color : '#777';
   const altBg = index % 2 === 0 ? '#0c0b10' : '#0a0a0d';
 
@@ -266,9 +312,6 @@ function LeaderRow({
           {user.username}
         </Link>
         <UserBadges role={user.role} badgePrefs={user.badgePrefs} size="sm" />
-        {streakWin && <Chip text={`${user.consecutiveWins}W`} color="#5fb05f" />}
-        {streakLoss && <Chip text={`${user.consecutiveLosses}L`} color="#d97676" />}
-        {tournaments > 0 && <Chip text={`${tournaments}T`} color="#c4a35a" />}
       </div>
 
       <div className="hidden sm:flex font-inter-force items-center gap-1.5">
@@ -333,13 +376,19 @@ function FilterPill({
 function SkeletonGrid() {
   return (
     <div>
-      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6 items-end">
-        {[210, 270, 210].map((h, i) => (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0.18, 0.45, 0.18] }}
+        transition={{ duration: 1.4, repeat: Infinity }}
+        style={{ height: 220, backgroundColor: '#0d0c10', clipPath: CHAMFER_CLIP, marginBottom: 12 }}
+      />
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-6">
+        {[200, 200].map((h, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0 }}
-            animate={{ opacity: [0.18, 0.45, 0.18] }}
-            transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.1 }}
+            animate={{ opacity: [0.18, 0.42, 0.18] }}
+            transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
             style={{ height: h, backgroundColor: '#0d0c10', clipPath: CHAMFER_CLIP }}
           />
         ))}
@@ -560,15 +609,11 @@ export default function LeaderboardPage() {
                 transition={{ duration: 0.2 }}
               >
                 {showPodium && (
-                  <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-7 items-end">
-                    <div className="self-end">
-                      <PodiumCard user={podiumUsers[1]} rank={2} leaguesEnabled={leaguesEnabled} delay={0.05} />
-                    </div>
-                    <div className="self-end">
-                      <PodiumCard user={podiumUsers[0]} rank={1} tall leaguesEnabled={leaguesEnabled} delay={0} />
-                    </div>
-                    <div className="self-end">
-                      <PodiumCard user={podiumUsers[2]} rank={3} leaguesEnabled={leaguesEnabled} delay={0.1} />
+                  <div className="flex flex-col gap-2 sm:gap-3 mb-7">
+                    <HeroChampion user={podiumUsers[0]} leaguesEnabled={leaguesEnabled} />
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                      <PodiumCard user={podiumUsers[1]} rank={2} leaguesEnabled={leaguesEnabled} delay={0.08} />
+                      <PodiumCard user={podiumUsers[2]} rank={3} leaguesEnabled={leaguesEnabled} delay={0.14} />
                     </div>
                   </div>
                 )}
