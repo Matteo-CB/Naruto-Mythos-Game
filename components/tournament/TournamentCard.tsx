@@ -1,8 +1,18 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import type { TournamentData } from '@/stores/tournamentStore';
+
+const ROW_CLIP = 'polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)';
+
+const STATUS_COLOR: Record<string, string> = {
+  registration: '#c4a35a',
+  in_progress: '#5fb05f',
+  completed: '#888888',
+  cancelled: '#d97676',
+};
 
 interface Props {
   tournament: TournamentData;
@@ -10,13 +20,6 @@ interface Props {
 
 export function TournamentCard({ tournament }: Props) {
   const t = useTranslations('tournament');
-
-  const statusColors: Record<string, string> = {
-    registration: '#c4a35a',
-    in_progress: '#4a9eff',
-    completed: '#44cc44',
-    cancelled: '#cc4444',
-  };
 
   const statusLabels: Record<string, string> = {
     registration: t('statusRegistration'),
@@ -26,48 +29,52 @@ export function TournamentCard({ tournament }: Props) {
   };
 
   const participantCount = tournament.participants?.length ?? tournament._count?.participants ?? 0;
+  const accent = STATUS_COLOR[tournament.status] || '#888';
+  const typeColor = tournament.type === 'simulator' ? '#c4a35a' : '#5fa3df';
 
   return (
-    <Link
-      href={`/tournaments/${tournament.id}`}
-      className="block transition-all"
-      style={{
-        backgroundColor: '#111111',
-        border: '1px solid #262626',
-        padding: '16px',
-      }}
-      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#c4a35a'; }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#262626'; }}
+    <motion.div
+      whileHover={{ x: 3 }}
+      transition={{ duration: 0.2 }}
     >
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-semibold tracking-wide" style={{ color: '#e0e0e0' }}>
-          {tournament.name}
-        </h3>
-        <span
-          className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5"
-          style={{
-            color: statusColors[tournament.status] || '#888',
-            border: `1px solid ${statusColors[tournament.status] || '#888'}`,
-          }}
-        >
-          {statusLabels[tournament.status] || tournament.status}
-        </span>
-      </div>
+      <Link
+        href={`/tournaments/${tournament.id}` as '/'}
+        className="block relative px-4 sm:px-5 py-3 sm:py-4 cursor-pointer transition-colors"
+        style={{ backgroundColor: '#0d0c10', clipPath: ROW_CLIP }}
+      >
+        <div className="flex items-start justify-between gap-3 mb-2 flex-wrap">
+          <h3
+            className="font-display text-sm sm:text-base flex-1 min-w-0 truncate"
+            style={{ color: '#f0eee7', letterSpacing: '0.03em' }}
+          >
+            {tournament.name}
+          </h3>
+          <span
+            className="font-display text-[9px] uppercase tracking-widest px-2 py-0.5 shrink-0"
+            style={{
+              color: accent,
+              backgroundColor: `${accent}14`,
+              borderRadius: 9999,
+            }}
+          >
+            {statusLabels[tournament.status] || tournament.status}
+          </span>
+        </div>
 
-      <div className="flex items-center gap-3 text-xs" style={{ color: '#777' }}>
-        <span
-          className="uppercase tracking-wider font-medium"
-          style={{ color: tournament.type === 'simulator' ? '#c4a35a' : '#4a9eff' }}
-        >
-          {tournament.type === 'simulator' ? t('typeSimulator') : t('typePlayer')}
-        </span>
-        <span>{tournament.gameMode === 'sealed' ? t('sealed') : t('classic')}</span>
-        <span>{t('players')}: {participantCount}/{tournament.maxPlayers}</span>
-      </div>
+        <div className="font-display flex items-center gap-3 flex-wrap text-[10px] sm:text-[11px] uppercase tracking-widest" style={{ color: '#666' }}>
+          <span style={{ color: typeColor }}>
+            {tournament.type === 'simulator' ? t('typeSimulator') : t('typePlayer')}
+          </span>
+          <span style={{ color: '#3a3a3a' }}>·</span>
+          <span>{tournament.gameMode === 'sealed' ? t('sealed') : t('classic')}</span>
+          <span style={{ color: '#3a3a3a' }}>·</span>
+          <span className="tabular-nums">{participantCount}/{tournament.maxPlayers}</span>
+        </div>
 
-      <div className="mt-2 text-[11px]" style={{ color: '#555' }}>
-        {t('createdBy')} {tournament.creatorUsername}
-      </div>
-    </Link>
+        <div className="font-display text-[10px] uppercase tracking-widest mt-2" style={{ color: '#444' }}>
+          {t('createdBy')} <span style={{ color: '#888' }}>{tournament.creatorUsername}</span>
+        </div>
+      </Link>
+    </motion.div>
   );
 }
