@@ -2191,8 +2191,25 @@
     "backToMenu": "Retour au menu",
     "tabs": {
       "friends": "Amis",
-      "requests": "Demandes"
+      "requests": "Demandes",
+      "activity": "Activité"
     },
+    "friendsCountLabel": "amis",
+    "rival": "Rival",
+    "profile": "Profil",
+    "h2hWins": "Vict.",
+    "h2hLosses": "Déf.",
+    "h2hElo": "ELO net",
+    "aggTotal": "Affrontements",
+    "aggRecord": "Bilan",
+    "aggNet": "ELO net",
+    "aggTop": "ELO max",
+    "activityEmpty": "Aucune activité récente chez tes amis.",
+    "beat": "a battu",
+    "lostTo": "a perdu contre",
+    "drewWith": "a fait nul contre",
+    "never": "jamais",
+    "justNow": "à l'instant",
     "search": {
       "placeholder": "Rechercher des joueurs par nom...",
       "noResults": "Aucun joueur trouve",

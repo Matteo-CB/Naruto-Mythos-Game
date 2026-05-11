@@ -1,55 +1,315 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useState, useEffect, useMemo } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { useSession } from 'next-auth/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
-import { motion } from 'framer-motion';
 import { CloudBackground } from '@/components/CloudBackground';
-import { DecorativeIcons } from '@/components/DecorativeIcons';
-import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { Footer } from '@/components/Footer';
 import { UserSearchDropdown } from '@/components/social/UserSearchDropdown';
-import { FriendsList } from '@/components/social/FriendsList';
 import { FriendRequestsList } from '@/components/social/FriendRequestsList';
 import { useSocialStore } from '@/stores/socialStore';
+import { getRankTier, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
+import Image from 'next/image';
+import '@/styles/holo-menu.css';
 
-type FriendsTab = 'friends' | 'requests';
+type FriendsTab = 'friends' | 'requests' | 'activity';
+
+interface RichFriend {
+  id: string;
+  username: string;
+  elo: number;
+  role?: string;
+  badgePrefs?: string[];
+  consecutiveWins?: number;
+  consecutiveLosses?: number;
+  tournamentWins?: number;
+  friendshipId: string;
+  since: string;
+  h2h: { wins: number; losses: number; netDelta: number; total: number };
+  lastSeenAt: string | null;
+  isRival: boolean;
+}
+
+interface ActivityEntry {
+  type: 'win' | 'loss' | 'draw';
+  friendId: string;
+  friendUsername: string;
+  opponentUsername: string;
+  delta: number;
+  newElo: number;
+  oldElo: number;
+  at: string;
+}
+
+const PANEL_CLIP = 'polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px)';
+const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
+
+function relativeShort(iso: string | null, t: ReturnType<typeof useTranslations>): string {
+  if (!iso) return t('never');
+  const ms = Date.now() - new Date(iso).getTime();
+  const min = Math.floor(ms / 60000);
+  if (min < 1) return t('justNow');
+  if (min < 60) return `${min}m`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `${h}h`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d}d`;
+  const w = Math.floor(d / 7);
+  return `${w}w`;
+}
+
+function FriendCard({
+  friend,
+  index,
+  leaguesEnabled,
+  expanded,
+  onToggle,
+  onInvite,
+  onRemove,
+  t,
+  tStats,
+}: {
+  friend: RichFriend;
+  index: number;
+  leaguesEnabled: boolean;
+  expanded: boolean;
+  onToggle: () => void;
+  onInvite: () => void;
+  onRemove: () => void;
+  t: ReturnType<typeof useTranslations>;
+  tStats: ReturnType<typeof useTranslations>;
+}) {
+  const tier = getRankTier(friend.elo);
+  const placed = (friend.consecutiveWins ?? 0) + (friend.consecutiveLosses ?? 0) >= 0; // assume placed by API
+  const accent = leaguesEnabled && placed ? tier.color : '#c4a35a';
+  const streakWin = (friend.consecutiveWins ?? 0) >= 3;
+  const streakLoss = (friend.consecutiveLosses ?? 0) >= 3;
+  const tournaments = friend.tournamentWins ?? 0;
+  const altBg = index % 2 === 0 ? '#0c0b10' : '#0a0a0d';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.4), ease: 'easeOut' }}
+      className="relative mb-1.5"
+    >
+      <button
+        onClick={onToggle}
+        className="relative w-full flex items-center gap-3 px-3 sm:px-5 py-2.5 sm:py-3 cursor-pointer text-left"
+        style={{
+          backgroundColor: altBg,
+          clipPath: ROW_CLIP,
+        }}
+      >
+        {leaguesEnabled && (
+          <Image
+            src={tier.image}
+            alt=""
+            width={32}
+            height={32}
+            unoptimized
+            className="shrink-0"
+          />
+        )}
+
+        <div className="flex flex-col min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 max-w-full">
+            <span
+              className="font-display text-sm sm:text-base truncate"
+              style={{ color: '#e8e6df', letterSpacing: '0.03em' }}
+            >
+              {friend.username}
+            </span>
+            {friend.isRival && (
+              <span
+                className="font-display text-[8px] uppercase px-1.5 py-0.5 tracking-widest shrink-0"
+                style={{ color: '#d97676', backgroundColor: 'rgba(217, 118, 118, 0.1)', borderRadius: 9999 }}
+              >
+                {t('rival')}
+              </span>
+            )}
+            {streakWin && (
+              <span
+                className="font-display text-[8px] uppercase px-1.5 py-0.5 tracking-widest shrink-0"
+                style={{ color: '#5fb05f', backgroundColor: 'rgba(95, 176, 95, 0.1)', borderRadius: 9999 }}
+              >
+                {friend.consecutiveWins}W
+              </span>
+            )}
+            {streakLoss && (
+              <span
+                className="font-display text-[8px] uppercase px-1.5 py-0.5 tracking-widest shrink-0"
+                style={{ color: '#d97676', backgroundColor: 'rgba(217, 118, 118, 0.1)', borderRadius: 9999 }}
+              >
+                {friend.consecutiveLosses}L
+              </span>
+            )}
+            {tournaments > 0 && (
+              <span
+                className="font-display text-[8px] uppercase px-1.5 py-0.5 tracking-widest shrink-0"
+                style={{ color: '#c4a35a', backgroundColor: 'rgba(196, 163, 90, 0.1)', borderRadius: 9999 }}
+              >
+                {tournaments}T
+              </span>
+            )}
+          </div>
+          <span className="font-display text-[10px] uppercase tracking-widest mt-0.5" style={{ color: '#555' }}>
+            {relativeShort(friend.lastSeenAt, tStats)}
+          </span>
+        </div>
+
+        <div className="font-display text-base sm:text-lg tabular-nums shrink-0" style={{ color: accent }}>
+          {friend.elo}
+        </div>
+      </button>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="overflow-hidden"
+          >
+            <div
+              className="mt-1.5 px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
+              style={{ backgroundColor: '#0a090d', clipPath: ROW_CLIP }}
+            >
+              <div className="flex-1 grid grid-cols-3 gap-3">
+                <div className="flex flex-col items-center">
+                  <span className="font-display text-xl tabular-nums" style={{ color: '#5fb05f' }}>
+                    {friend.h2h.wins}
+                  </span>
+                  <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#555' }}>
+                    {t('h2hWins')}
+                  </span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="font-display text-xl tabular-nums" style={{ color: '#d97676' }}>
+                    {friend.h2h.losses}
+                  </span>
+                  <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#555' }}>
+                    {t('h2hLosses')}
+                  </span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span
+                    className="font-display text-xl tabular-nums"
+                    style={{ color: friend.h2h.netDelta > 0 ? '#5fb05f' : friend.h2h.netDelta < 0 ? '#d97676' : '#888' }}
+                  >
+                    {friend.h2h.netDelta > 0 ? '+' : ''}{friend.h2h.netDelta}
+                  </span>
+                  <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#555' }}>
+                    {t('h2hElo')}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <motion.button
+                  whileTap={{ scale: 0.94 }}
+                  onClick={onInvite}
+                  className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[#c4a35a]"
+                  style={{ color: '#5fb05f', backgroundColor: 'rgba(95, 176, 95, 0.08)', borderRadius: 9999 }}
+                >
+                  {t('list.invite')}
+                </motion.button>
+                <Link
+                  href={`/profile/${encodeURIComponent(friend.username)}` as '/'}
+                  className="font-display px-4 py-2 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
+                  style={{ color: '#888' }}
+                >
+                  {t('profile')}
+                </Link>
+                <motion.button
+                  whileTap={{ scale: 0.94 }}
+                  onClick={onRemove}
+                  className="font-display px-3 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[#d97676]"
+                  style={{ color: '#555' }}
+                >
+                  {t('list.remove')}
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
 
 export default function FriendsPage() {
   const t = useTranslations('friends');
   const tc = useTranslations('common');
+  const tStats = useTranslations('deckStats');
+  const locale = useLocale();
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<FriendsTab>('friends');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [leaguesEnabled, setLeaguesEnabled] = useState(false);
+  const [friends, setFriends] = useState<RichFriend[]>([]);
+  const [friendsLoading, setFriendsLoading] = useState(true);
+  const [activity, setActivity] = useState<ActivityEntry[] | null>(null);
+  const [activityLoading, setActivityLoading] = useState(false);
 
   const {
-    friends,
     incomingRequests,
-    fetchFriends,
     fetchRequests,
+    sendMatchInvite,
+    removeFriend,
   } = useSocialStore();
 
   useEffect(() => {
-    if (session?.user) {
-      fetchFriends();
-      fetchRequests();
-    }
-  }, [session, fetchFriends, fetchRequests]);
+    fetch('/api/settings')
+      .then((r) => r.json())
+      .then((d) => setLeaguesEnabled(d.leaguesEnabled ?? false))
+      .catch(() => {});
+  }, []);
 
-  const incomingCount = incomingRequests.length;
+  useEffect(() => {
+    if (!session?.user) return;
+    setFriendsLoading(true);
+    fetch('/api/friends')
+      .then((r) => r.ok ? r.json() : { friends: [] })
+      .then((d) => {
+        setFriends(d.friends ?? []);
+        setFriendsLoading(false);
+      })
+      .catch(() => setFriendsLoading(false));
+    fetchRequests();
+  }, [session, fetchRequests]);
 
-  
+  useEffect(() => {
+    if (activeTab !== 'activity' || !session?.user) return;
+    setActivityLoading(true);
+    fetch('/api/friends/activity')
+      .then((r) => r.ok ? r.json() : { activity: [] })
+      .then((d) => {
+        setActivity(d.activity ?? []);
+        setActivityLoading(false);
+      })
+      .catch(() => setActivityLoading(false));
+  }, [activeTab, session]);
+
+  const aggregateStats = useMemo(() => {
+    if (friends.length === 0) return null;
+    const totalH2H = friends.reduce((sum, f) => sum + f.h2h.total, 0);
+    const wins = friends.reduce((sum, f) => sum + f.h2h.wins, 0);
+    const losses = friends.reduce((sum, f) => sum + f.h2h.losses, 0);
+    const netDelta = friends.reduce((sum, f) => sum + f.h2h.netDelta, 0);
+    const topElo = Math.max(...friends.map((f) => f.elo));
+    const avgElo = Math.round(friends.reduce((s, f) => s + f.elo, 0) / friends.length);
+    return { totalH2H, wins, losses, netDelta, topElo, avgElo };
+  }, [friends]);
+
   if (!session?.user) {
     return (
-      <div
-        id="main-content"
-        className="min-h-screen relative flex flex-col"
-        style={{ backgroundColor: '#0a0a0a' }}
-      >
+      <main id="main-content" className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#08070a' }}>
         <CloudBackground />
-        <DecorativeIcons />
-        <CardBackgroundDecor variant="profile" />
-
         <div className="flex-1 flex flex-col items-center justify-center relative z-10 px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -57,146 +317,293 @@ export default function FriendsPage() {
             transition={{ duration: 0.5 }}
             className="text-center"
           >
-            <h1
-              className="text-2xl font-bold uppercase tracking-wider mb-6"
-              style={{ color: '#c4a35a' }}
-            >
+            <h1 className="font-display text-3xl sm:text-4xl uppercase tracking-wider mb-6" style={{ color: '#f2efe7', letterSpacing: '0.08em' }}>
               {t('title')}
             </h1>
-            <p className="text-sm mb-6" style={{ color: '#888888' }}>
+            <p className="font-display text-sm uppercase tracking-widest mb-6" style={{ color: '#555' }}>
               {t('signInRequired')}
             </p>
             <Link
               href="/login"
-              className="px-6 py-2.5 text-sm font-medium rounded transition-colors"
-              style={{
-                backgroundColor: 'rgba(196, 163, 90, 0.1)',
-                border: '1px solid rgba(196, 163, 90, 0.3)',
-                color: '#c4a35a',
-              }}
+              className="font-display px-6 py-2.5 text-xs uppercase tracking-widest transition-colors"
+              style={{ color: '#c4a35a', backgroundColor: 'rgba(196, 163, 90, 0.1)', borderRadius: 9999 }}
             >
               {tc('signIn')}
             </Link>
           </motion.div>
         </div>
-
         <Footer />
-      </div>
+      </main>
     );
   }
 
   return (
-    <div
-      id="main-content"
-      className="min-h-screen relative flex flex-col"
-      style={{ backgroundColor: '#0a0a0a' }}
-    >
+    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
       <CloudBackground />
-      <DecorativeIcons />
-      <CardBackgroundDecor variant="profile" />
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
-        className="max-w-2xl mx-auto relative z-10 flex-1 w-full px-4 py-8"
-      >
-        
-        <motion.h1
-          initial={{ opacity: 0, y: -10 }}
+      <div className="w-full max-w-3xl mx-auto relative z-10 flex-1 px-4 sm:px-8 py-6 sm:py-10">
+
+        <motion.header
+          initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-2xl font-bold uppercase tracking-wider text-center mb-6"
-          style={{ color: '#c4a35a' }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
+          className="flex items-end justify-between gap-3 flex-wrap mb-7"
         >
-          {t('title')}
-        </motion.h1>
+          <div>
+            <h1
+              className="font-display text-3xl sm:text-5xl uppercase tracking-wider leading-none"
+              style={{ color: '#f2efe7', letterSpacing: '0.08em', textShadow: '0 0 22px rgba(196, 163, 90, 0.18)' }}
+            >
+              {t('title')}
+            </h1>
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25, duration: 0.4 }}
+              className="font-display flex items-baseline gap-2 mt-3"
+            >
+              <span className="text-2xl tabular-nums leading-none" style={{ color: '#c4a35a' }}>
+                {friends.length}
+              </span>
+              <span className="text-[11px] uppercase tracking-[0.3em]" style={{ color: '#666' }}>
+                {t('friendsCountLabel')}
+              </span>
+            </motion.div>
+          </div>
+          <Link
+            href="/"
+            className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
+            style={{ color: '#888' }}
+          >
+            {tc('back')}
+          </Link>
+        </motion.header>
 
-        
+        {aggregateStats && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="holo-menu-foil relative overflow-hidden mb-6 px-5 sm:px-8 py-4 sm:py-5 grid grid-cols-2 sm:grid-cols-4 gap-3"
+            style={{
+              backgroundColor: '#0d0c10',
+              clipPath: PANEL_CLIP,
+              ['--foil' as string]: '#c4a35a',
+            } as React.CSSProperties}
+          >
+            <Stat label={t('aggTotal')} value={aggregateStats.totalH2H} color="#c4a35a" />
+            <Stat
+              label={t('aggRecord')}
+              value={`${aggregateStats.wins}-${aggregateStats.losses}`}
+              color={aggregateStats.wins >= aggregateStats.losses ? '#5fb05f' : '#d97676'}
+            />
+            <Stat
+              label={t('aggNet')}
+              value={`${aggregateStats.netDelta > 0 ? '+' : ''}${aggregateStats.netDelta}`}
+              color={aggregateStats.netDelta > 0 ? '#5fb05f' : aggregateStats.netDelta < 0 ? '#d97676' : '#888'}
+            />
+            <Stat label={t('aggTop')} value={aggregateStats.topElo} color="#c4a35a" />
+          </motion.div>
+        )}
+
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.2 }}
           className="mb-6"
         >
           <UserSearchDropdown />
         </motion.div>
 
-        
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
-          className="flex mb-6"
-          style={{ borderBottom: '1px solid #262626' }}
+          transition={{ duration: 0.4, delay: 0.25 }}
+          className="flex items-center gap-1.5 mb-7"
         >
-          <button
-            onClick={() => setActiveTab('friends')}
-            className="flex-1 py-3 text-sm font-medium uppercase tracking-wider transition-colors"
-            style={{
-              color: activeTab === 'friends' ? '#c4a35a' : '#555555',
-              borderBottom: activeTab === 'friends' ? '2px solid #c4a35a' : '2px solid transparent',
-              backgroundColor: 'transparent',
-            }}
+          <TabPill active={activeTab === 'friends'} onClick={() => setActiveTab('friends')} label={t('tabs.friends')} count={friends.length} />
+          <TabPill active={activeTab === 'requests'} onClick={() => setActiveTab('requests')} label={t('tabs.requests')} count={incomingRequests.length} alert={incomingRequests.length > 0} />
+          <TabPill active={activeTab === 'activity'} onClick={() => setActiveTab('activity')} label={t('tabs.activity')} />
+        </motion.div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.25 }}
           >
-            {t('tabs.friends')}
-          </button>
-          <button
-            onClick={() => setActiveTab('requests')}
-            className="flex-1 py-3 text-sm font-medium uppercase tracking-wider transition-colors relative"
-            style={{
-              color: activeTab === 'requests' ? '#c4a35a' : '#555555',
-              borderBottom: activeTab === 'requests' ? '2px solid #c4a35a' : '2px solid transparent',
-              backgroundColor: 'transparent',
-            }}
-          >
-            {t('tabs.requests')}
-            {incomingCount > 0 && (
-              <span
-                className="ml-2 inline-flex items-center justify-center text-xs font-bold rounded-full"
-                style={{
-                  backgroundColor: '#c4a35a',
-                  color: '#0a0a0a',
-                  minWidth: '20px',
-                  height: '20px',
-                  padding: '0 6px',
-                }}
-              >
-                {incomingCount}
-              </span>
+            {activeTab === 'friends' && (
+              <>
+                {friendsLoading ? (
+                  <SkeletonRows count={5} />
+                ) : friends.length === 0 ? (
+                  <p className="font-display text-sm py-10 text-center uppercase tracking-widest" style={{ color: '#444' }}>
+                    {t('list.empty')}
+                  </p>
+                ) : (
+                  <div className="flex flex-col">
+                    {friends.map((f, i) => (
+                      <FriendCard
+                        key={f.friendshipId}
+                        friend={f}
+                        index={i}
+                        leaguesEnabled={leaguesEnabled}
+                        expanded={expandedId === f.id}
+                        onToggle={() => setExpandedId(expandedId === f.id ? null : f.id)}
+                        onInvite={() => sendMatchInvite(f.id)}
+                        onRemove={() => {
+                          removeFriend(f.friendshipId);
+                          setFriends(prev => prev.filter(p => p.friendshipId !== f.friendshipId));
+                        }}
+                        t={t}
+                        tStats={tStats}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
             )}
-          </button>
-        </motion.div>
 
-        
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          {activeTab === 'friends' && <FriendsList />}
-          {activeTab === 'requests' && <FriendRequestsList />}
-        </motion.div>
+            {activeTab === 'requests' && <FriendRequestsList />}
 
-        
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.4 }}
-          className="mt-8 text-center"
-        >
-          <Link
-            href="/"
-            className="text-sm transition-colors"
-            style={{ color: '#888888' }}
-          >
-            &lt; {t('backToMenu')}
-          </Link>
-        </motion.div>
-      </motion.div>
+            {activeTab === 'activity' && (
+              <>
+                {activityLoading ? (
+                  <SkeletonRows count={6} />
+                ) : !activity || activity.length === 0 ? (
+                  <p className="font-display text-sm py-10 text-center uppercase tracking-widest" style={{ color: '#444' }}>
+                    {t('activityEmpty')}
+                  </p>
+                ) : (
+                  <div className="flex flex-col">
+                    {activity.map((e, i) => (
+                      <ActivityRow key={`${e.friendId}-${e.at}-${i}`} entry={e} index={i} locale={locale} t={t} />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       <Footer />
+    </main>
+  );
+}
+
+function TabPill({ active, onClick, label, count, alert }: { active: boolean; onClick: () => void; label: string; count?: number; alert?: boolean }) {
+  return (
+    <motion.button
+      whileTap={{ scale: 0.94 }}
+      onClick={onClick}
+      className="font-display flex items-center gap-2 px-4 py-2 cursor-pointer transition-colors"
+      style={{
+        backgroundColor: active ? 'rgba(196, 163, 90, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+        color: active ? '#c4a35a' : '#666',
+        borderRadius: 9999,
+      }}
+    >
+      <span className="text-[11px] uppercase tracking-widest">{label}</span>
+      {count !== undefined && count > 0 && (
+        <span
+          className="text-[10px] tabular-nums px-1.5 py-0.5 leading-none"
+          style={{
+            color: alert ? '#0a0a0a' : active ? '#c4a35a' : '#888',
+            backgroundColor: alert ? '#c4a35a' : 'transparent',
+            borderRadius: 9999,
+          }}
+        >
+          {count}
+        </span>
+      )}
+    </motion.button>
+  );
+}
+
+function Stat({ label, value, color }: { label: string; value: string | number; color: string }) {
+  return (
+    <div className="flex flex-col items-center">
+      <span className="font-display text-xl sm:text-2xl tabular-nums leading-none" style={{ color }}>
+        {value}
+      </span>
+      <span className="font-display text-[9px] uppercase tracking-widest mt-1.5" style={{ color: '#555' }}>
+        {label}
+      </span>
     </div>
+  );
+}
+
+function SkeletonRows({ count }: { count: number }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      {Array.from({ length: count }).map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0.18, 0.42, 0.18] }}
+          transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.05 }}
+          style={{ height: 56, backgroundColor: i % 2 === 0 ? '#0c0b10' : '#0a0a0d', clipPath: ROW_CLIP }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function ActivityRow({ entry, index, locale, t }: { entry: ActivityEntry; index: number; locale: string; t: ReturnType<typeof useTranslations> }) {
+  const isWin = entry.type === 'win';
+  const isDraw = entry.type === 'draw';
+  const color = isDraw ? '#888' : isWin ? '#5fb05f' : '#d97676';
+  const altBg = index % 2 === 0 ? '#0c0b10' : '#0a0a0d';
+  const date = new Date(entry.at);
+  const ago = Math.floor((Date.now() - date.getTime()) / 60000);
+  let when: string;
+  if (ago < 60) when = `${Math.max(1, ago)}m`;
+  else if (ago < 60 * 24) when = `${Math.floor(ago / 60)}h`;
+  else when = `${Math.floor(ago / (60 * 24))}d`;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -6 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.28, delay: Math.min(index * 0.03, 0.35) }}
+      className="relative flex items-center gap-3 px-3 sm:px-5 py-2.5 mb-1"
+      style={{ backgroundColor: altBg, clipPath: ROW_CLIP }}
+    >
+      <span
+        className="font-display text-base tabular-nums w-6 text-center shrink-0"
+        style={{ color }}
+      >
+        {entry.type === 'win' ? 'W' : entry.type === 'loss' ? 'L' : 'D'}
+      </span>
+
+      <div className="flex flex-col flex-1 min-w-0">
+        <span className="font-display text-sm truncate" style={{ color: '#e8e6df' }}>
+          <Link href={`/profile/${encodeURIComponent(entry.friendUsername)}` as '/'} className="hover:text-[#c4a35a] transition-colors">
+            {entry.friendUsername}
+          </Link>
+          <span className="font-display text-[10px] uppercase tracking-widest mx-2" style={{ color: '#444' }}>
+            {t(entry.type === 'win' ? 'beat' : entry.type === 'loss' ? 'lostTo' : 'drewWith')}
+          </span>
+          <span style={{ color: '#aaa' }}>{entry.opponentUsername}</span>
+        </span>
+        <span className="font-display text-[9px] uppercase tracking-widest mt-0.5" style={{ color: '#555' }}>
+          {date.toLocaleDateString(locale)} · {when}
+        </span>
+      </div>
+
+      <span
+        className="font-inter-force text-xs tabular-nums shrink-0 w-12 text-right"
+        style={{ color: entry.delta > 0 ? '#5fb05f' : entry.delta < 0 ? '#d97676' : '#888' }}
+      >
+        {entry.delta > 0 ? '+' : ''}{entry.delta}
+      </span>
+
+      <span className="font-display text-xs tabular-nums shrink-0 w-12 text-right" style={{ color: '#666' }}>
+        {entry.newElo}
+      </span>
+    </motion.div>
   );
 }

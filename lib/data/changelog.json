@@ -7,12 +7,14 @@
       "changes_fr": [
         "Sur téléphone, le terrain garde maintenant des proportions strictes et tout est dimensionné par rapport à l'écran, comme dans un jeu à résolution fixe.",
         "Profil : la section Stats des decks n'affiche plus que les decks joués dans les 90 derniers jours.",
-        "Classement : refonte avec un podium pour le top 3, séries de victoires ou défaites en cours et nombre de tournois gagnés affichés directement à côté du pseudo."
+        "Refonte complète du classement, du profil et de la page Amis dans une nouvelle direction visuelle.",
+        "Page Amis enrichie : bilan face à face contre chaque ami, badge Rival pour l'adversaire le plus joué, séries en cours et tournois gagnés affichés directement, fil d'activité des 7 derniers jours."
       ],
       "changes_en": [
         "On phone, the board now keeps strict proportions and everything is sized relative to the screen, like a fixed-resolution game.",
         "Profile: the Deck Stats section now only shows decks played in the last 90 days.",
-        "Leaderboard: redesigned with a top 3 podium, current win and loss streaks, and tournament wins shown right next to the name."
+        "Full redesign of the leaderboard, profile and Friends pages in a new visual direction.",
+        "Friends page now shows head-to-head records against each friend, a Rival tag for your most-played opponent, active streaks and tournament wins inline, and a 7-day activity feed."
       ]
     },
     {
