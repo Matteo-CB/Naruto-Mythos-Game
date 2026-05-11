@@ -13,7 +13,7 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const rawPage = parseInt(searchParams.get('page') ?? '1', 10);
     const page = Math.min(50, Math.max(1, isNaN(rawPage) ? 1 : rawPage));
-    const perPage = 20;
+    const perPage = 5;
 
     const now = Date.now();
     if (now - lastCleanup > 5 * 60 * 1000) {
