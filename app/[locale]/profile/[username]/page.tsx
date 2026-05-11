@@ -85,7 +85,7 @@ function StatPanel({ label, value, color, delay }: { label: string; value: strin
     >
       <span
         className="font-display text-2xl sm:text-3xl tabular-nums leading-none"
-        style={{ color, textShadow: `0 0 16px ${color}33` }}
+        style={{ color }}
       >
         {value}
       </span>
@@ -138,7 +138,7 @@ function GameRow({
     >
       <span
         className="font-display text-base tabular-nums w-6 text-center shrink-0"
-        style={{ color: resultColor, textShadow: `0 0 10px ${resultColor}44` }}
+        style={{ color: resultColor }}
       >
         {resultLabel}
       </span>
@@ -318,10 +318,9 @@ export default function ProfilePage({
             backgroundColor: '#0d0c10',
             clipPath: PANEL_CLIP,
             minHeight: 200,
-            boxShadow: `0 0 70px -22px ${accentColor}55, 0 12px 26px rgba(0, 0, 0, 0.4)`,
           }}
         >
-          <div className="relative z-10 flex flex-col items-center justify-center px-6 sm:px-10 py-7 sm:py-8 sm:w-[40%]">
+          <div className="relative z-10 flex items-center justify-center px-6 sm:px-10 py-7 sm:py-8 sm:w-[38%]">
             {leaguesEnabled && placed && tier ? (
               <Image
                 src={tier.image}
@@ -330,16 +329,15 @@ export default function ProfilePage({
                 height={104}
                 unoptimized
                 priority
-                style={{ filter: `drop-shadow(0 0 22px ${accentColor}55)` }}
               />
             ) : (
               <div className="font-display text-[10px] uppercase tracking-[0.4em]" style={{ color: '#888' }}>
-                ELO
+                {leaguesEnabled ? t('rankNames.unranked') : 'ELO'}
               </div>
             )}
           </div>
 
-          <div className="relative z-10 flex flex-col justify-center items-center sm:items-start px-6 sm:px-2 pb-7 sm:py-8 pr-6 sm:pr-10 sm:w-[60%] gap-3 text-center sm:text-left">
+          <div className="relative z-10 flex flex-col justify-center items-center sm:items-start px-6 sm:px-2 pb-7 sm:py-8 pr-6 sm:pr-10 sm:w-[62%] gap-3 text-center sm:text-left">
             <div className="flex items-center gap-1.5 max-w-full">
               <h1
                 className="font-display text-2xl sm:text-3xl truncate"
@@ -349,21 +347,14 @@ export default function ProfilePage({
               </h1>
               <UserBadges
                 role={profile.role}
-                elo={profile.elo}
-                totalGames={total}
                 badgePrefs={profile.badgePrefs}
-                leaguesEnabled={leaguesEnabled}
                 size="md"
               />
             </div>
 
             <div
               className="font-display tabular-nums leading-none text-5xl sm:text-6xl"
-              style={{
-                color: accentColor,
-                textShadow: `0 0 30px ${accentColor}55`,
-                letterSpacing: '-0.01em',
-              }}
+              style={{ color: accentColor, letterSpacing: '-0.01em' }}
             >
               {eloCount}
             </div>
