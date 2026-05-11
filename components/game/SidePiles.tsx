@@ -193,7 +193,7 @@ export function OpponentSidePiles() {
   const visibleState = useGameStore((s) => s.visibleState);
   const dims = useGameScale();
   const [showDiscard, setShowDiscard] = useState(false);
-  if (!visibleState) return null;
+  if (!visibleState || dims.isMobile) return null;
 
   const { opponentState } = visibleState;
   const deckCount = opponentState.deckSize;
@@ -243,7 +243,7 @@ export function PlayerSidePiles() {
   const dims = useGameScale();
   const [showDiscard, setShowDiscard] = useState(false);
 
-  if (!visibleState) return null;
+  if (!visibleState || dims.isMobile) return null;
 
   const { myState } = visibleState;
   const deckCount = myState.deck.length;

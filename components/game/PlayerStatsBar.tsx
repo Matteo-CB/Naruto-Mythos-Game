@@ -4,9 +4,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
+import { useGameScale } from './GameScaleContext';
 
 export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
   const t = useTranslations();
+  const dims = useGameScale();
   const visibleState = useGameStore((s) => s.visibleState);
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
 
@@ -86,7 +88,15 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
       
       <div className="flex-1" />
 
+      
+      {dims.isMobile && (
+        <>
+          <StatPill label={t('game.deck')} value={myState.deck.length} color="#888888" />
+          <StatPill label={t('game.discard')} value={myState.discardPile.length} color="#888888" />
+        </>
+      )}
 
+      
       <StatPill label={t('game.chakra')} value={myState.chakra} color="#c4a35a" />
 
       
