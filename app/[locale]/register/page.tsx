@@ -90,7 +90,7 @@ export default function RegisterPage() {
       <CardBackgroundDecor variant="auth" />
       <div className="flex-1 flex items-center justify-center px-4">
       <div
-        className="w-full max-w-sm rounded-lg p-8 relative z-10"
+        className="w-full max-w-sm rounded-lg p-6 sm:p-8 relative z-10"
         style={{
           backgroundColor: '#141414',
           border: '1px solid #262626',

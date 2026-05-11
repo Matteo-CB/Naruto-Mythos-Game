@@ -178,7 +178,7 @@ export function EloHistoryChart({ username, compact }: Props) {
       )}
 
 
-      <div className="grid grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         <Stat label={t('statGames')} value={data.summary.games} />
         <Stat label={t('statWLD')} value={`${data.summary.wins} / ${data.summary.losses} / ${data.summary.draws}`} />
         <Stat
