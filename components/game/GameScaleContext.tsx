@@ -201,7 +201,9 @@ function getServerSnapshot() {
 
 
 
-const GameScaleContext = createContext<GameDimensions>(buildDimensions(1.0, 1400, 900));
+export const GameScaleContext = createContext<GameDimensions>(buildDimensions(1.0, 1400, 900));
+
+export const DESKTOP_FIXED_DIMS: GameDimensions = buildDimensions(1.0, 1600, 1000);
 
 export function GameScaleProvider({ children }: { children: React.ReactNode }) {
   const sizeKey = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);

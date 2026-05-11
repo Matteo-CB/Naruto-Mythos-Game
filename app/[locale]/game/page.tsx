@@ -7,6 +7,27 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSocketStore } from '@/lib/socket/client';
 import dynamic from 'next/dynamic';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
+import { ScaledGameRoot } from '@/components/game/ScaledGameRoot';
+
+function useIsMobileViewport(): boolean {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const touch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
+      setIsMobile((touch && (w < 1024 || h < 600)) || h < 500);
+    };
+    check();
+    window.addEventListener('resize', check);
+    window.addEventListener('orientationchange', check);
+    return () => {
+      window.removeEventListener('resize', check);
+      window.removeEventListener('orientationchange', check);
+    };
+  }, []);
+  return isMobile;
+}
 const TrainingCoachPanel = dynamic(
   () => import('@/components/game/TrainingCoachPanel').then((mod) => mod.TrainingCoachPanel),
   { ssr: false },
@@ -55,6 +76,7 @@ export default function GamePage() {
   const router = useRouter();
   const t = useTranslations('common');
   const tGame = useTranslations('game');
+  const isMobileViewport = useIsMobileViewport();
   const gameState = useGameStore((s) => s.gameState);
   const visibleState = useGameStore((s) => s.visibleState);
   const isOnlineGame = useGameStore((s) => s.isOnlineGame);
@@ -281,7 +303,13 @@ export default function GamePage() {
 
   return (
     <>
-      <GameBoard />
+      {isMobileViewport ? (
+        <ScaledGameRoot>
+          <GameBoard />
+        </ScaledGameRoot>
+      ) : (
+        <GameBoard />
+      )}
       <TrainingCoachPanel />
       <LandscapeBlocker />
       <BanNotification />
