@@ -8,6 +8,7 @@ import { useSocketStore } from '@/lib/socket/client';
 import dynamic from 'next/dynamic';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
 import { ScaledGameRoot } from '@/components/game/ScaledGameRoot';
+import { GameScaleProvider } from '@/components/game/GameScaleContext';
 
 function useIsMobileViewport(): boolean {
   const [isMobile, setIsMobile] = useState(false);
@@ -308,7 +309,9 @@ export default function GamePage() {
           <GameBoard />
         </ScaledGameRoot>
       ) : (
-        <GameBoard />
+        <GameScaleProvider>
+          <GameBoard />
+        </GameScaleProvider>
       )}
       <TrainingCoachPanel />
       <LandscapeBlocker />

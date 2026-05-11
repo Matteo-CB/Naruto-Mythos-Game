@@ -1013,11 +1013,7 @@ function BetaNotification() {
 
 
 export default function GameBoard() {
-  return (
-    <GameScaleProvider>
-      <GameBoardInner />
-    </GameScaleProvider>
-  );
+  return <GameBoardInner />;
 }
 
 function GameBoardInner() {
