@@ -6,11 +6,13 @@
       "title_en": "Mobile, profile and fixes",
       "changes_fr": [
         "Sur téléphone, le terrain garde maintenant des proportions strictes et tout est dimensionné par rapport à l'écran, comme dans un jeu à résolution fixe.",
-        "Profil : la section Stats des decks n'affiche plus que les decks joués dans les 90 derniers jours."
+        "Profil : la section Stats des decks n'affiche plus que les decks joués dans les 90 derniers jours.",
+        "Classement : refonte avec un podium pour le top 3, séries de victoires ou défaites en cours et nombre de tournois gagnés affichés directement à côté du pseudo."
       ],
       "changes_en": [
         "On phone, the board now keeps strict proportions and everything is sized relative to the screen, like a fixed-resolution game.",
-        "Profile: the Deck Stats section now only shows decks played in the last 90 days."
+        "Profile: the Deck Stats section now only shows decks played in the last 90 days.",
+        "Leaderboard: redesigned with a top 3 podium, current win and loss streaks, and tournament wins shown right next to the name."
       ]
     },
     {

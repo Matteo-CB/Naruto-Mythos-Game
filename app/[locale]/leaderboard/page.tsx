@@ -8,7 +8,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { Footer } from '@/components/Footer';
-import { EloBadge, RANK_TIERS, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
+import { RANK_TIERS, PLACEMENT_MATCHES_REQUIRED, getRankTier } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
 import { LeaguesModal } from '@/components/LeaguesModal';
 import Image from 'next/image';
@@ -22,6 +22,118 @@ interface LeaderboardUser {
   draws: number;
   role?: string;
   badgePrefs?: string[];
+  consecutiveWins?: number;
+  consecutiveLosses?: number;
+  tournamentWins?: number;
+}
+
+const PODIUM_ACCENTS: Record<1 | 2 | 3, { fg: string; bg: string; border: string }> = {
+  1: { fg: '#c4a35a', bg: 'rgba(196, 163, 90, 0.07)', border: 'rgba(196, 163, 90, 0.55)' },
+  2: { fg: '#b8b8b8', bg: 'rgba(184, 184, 184, 0.05)', border: 'rgba(184, 184, 184, 0.4)' },
+  3: { fg: '#a87547', bg: 'rgba(168, 117, 71, 0.05)', border: 'rgba(168, 117, 71, 0.4)' },
+};
+
+function PodiumCard({
+  user,
+  rank,
+  tall,
+  leaguesEnabled,
+}: {
+  user: LeaderboardUser;
+  rank: 1 | 2 | 3;
+  tall?: boolean;
+  leaguesEnabled: boolean;
+}) {
+  const accent = PODIUM_ACCENTS[rank];
+  const total = user.wins + user.losses + user.draws;
+  const placed = total >= PLACEMENT_MATCHES_REQUIRED;
+  const tier = getRankTier(user.elo);
+  const winrate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
+  const streakWin = (user.consecutiveWins ?? 0) >= 3;
+  const streakLoss = (user.consecutiveLosses ?? 0) >= 3;
+
+  return (
+    <Link
+      href={`/profile/${encodeURIComponent(user.username)}` as '/'}
+      className={`relative flex flex-col items-center justify-end overflow-hidden ${tall ? 'pt-6 pb-5 sm:pt-8 sm:pb-6' : 'pt-4 pb-4 sm:pt-5 sm:pb-5'}`}
+      style={{
+        backgroundColor: accent.bg,
+        border: `1px solid ${accent.border}`,
+        minHeight: tall ? 220 : 180,
+      }}
+    >
+      <div
+        className={`absolute top-0 left-1/2 -translate-x-1/2 font-bold leading-none ${tall ? 'text-[40px] sm:text-[56px]' : 'text-[32px] sm:text-[40px]'}`}
+        style={{ color: `${accent.fg}22`, fontFamily: 'var(--font-inter)', marginTop: tall ? -4 : -2 }}
+      >
+        {rank === 1 ? 'I' : rank === 2 ? 'II' : 'III'}
+      </div>
+
+      {leaguesEnabled && placed && (
+        <div className={tall ? 'mt-2 mb-3' : 'mt-1 mb-2'}>
+          <Image
+            src={tier.image}
+            alt=""
+            width={tall ? 56 : 44}
+            height={tall ? 56 : 44}
+            unoptimized
+          />
+        </div>
+      )}
+      {(!leaguesEnabled || !placed) && (
+        <div className={tall ? 'mt-2 mb-3' : 'mt-1 mb-2'} style={{ height: tall ? 56 : 44 }} />
+      )}
+
+      <div className="flex items-center gap-1.5 max-w-full px-2">
+        <span
+          className={`truncate font-semibold ${tall ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}
+          style={{ color: '#e8e8e8' }}
+        >
+          {user.username}
+        </span>
+        <UserBadges role={user.role} badgePrefs={user.badgePrefs} size="sm" />
+      </div>
+
+      <div
+        className={`tabular-nums font-bold leading-none mt-2 ${tall ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}
+        style={{ color: accent.fg, fontFamily: 'var(--font-inter)' }}
+      >
+        {user.elo}
+      </div>
+
+      <div className="flex items-center gap-1.5 mt-2 text-[10px] tabular-nums" style={{ fontFamily: 'var(--font-inter)' }}>
+        <span style={{ color: '#3e8b3e' }}>{user.wins}W</span>
+        <span style={{ color: '#666' }}>·</span>
+        <span style={{ color: '#b33e3e' }}>{user.losses}L</span>
+        {total > 0 && (
+          <>
+            <span style={{ color: '#666' }}>·</span>
+            <span style={{ color: '#888' }}>{winrate}%</span>
+          </>
+        )}
+      </div>
+
+      {(streakWin || streakLoss || (user.tournamentWins ?? 0) > 0) && (
+        <div className="flex items-center gap-1 mt-2">
+          {streakWin && (
+            <span className="px-1.5 py-0.5 text-[9px] uppercase tracking-wider font-bold" style={{ backgroundColor: 'rgba(62, 139, 62, 0.12)', color: '#5fb05f', border: '1px solid rgba(62, 139, 62, 0.3)' }}>
+              {user.consecutiveWins}W
+            </span>
+          )}
+          {streakLoss && (
+            <span className="px-1.5 py-0.5 text-[9px] uppercase tracking-wider font-bold" style={{ backgroundColor: 'rgba(179, 62, 62, 0.12)', color: '#d97676', border: '1px solid rgba(179, 62, 62, 0.3)' }}>
+              {user.consecutiveLosses}L
+            </span>
+          )}
+          {(user.tournamentWins ?? 0) > 0 && (
+            <span className="px-1.5 py-0.5 text-[9px] uppercase tracking-wider font-bold" style={{ backgroundColor: 'rgba(196, 163, 90, 0.12)', color: '#c4a35a', border: '1px solid rgba(196, 163, 90, 0.3)' }}>
+              {user.tournamentWins}T
+            </span>
+          )}
+        </div>
+      )}
+    </Link>
+  );
 }
 
 export default function LeaderboardPage() {
@@ -210,7 +322,7 @@ export default function LeaderboardPage() {
           </div>
         )}
 
-        
+
         <section>
           {loading ? (
             <div className="flex items-center justify-center py-16">
@@ -220,81 +332,121 @@ export default function LeaderboardPage() {
             <div className="flex items-center justify-center py-16">
               <p className="text-sm" style={{ color: '#555' }}>{t('noPlayers')}</p>
             </div>
-          ) : (
-            <div className="flex flex-col gap-1.5">
-              {users.map((user, index) => {
-                const total = user.wins + user.losses + user.draws;
-                const winRate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
-                const globalRank = (currentPage - 1) * PLAYERS_PER_PAGE + index + 1;
-                const isTop3 = globalRank <= 3;
-                const borderAccent = isTop3 ? '#c4a35a' : '#1e1e1e';
+          ) : (() => {
+            const showPodium = currentPage === 1 && !debouncedSearch && !leagueFilter && users.length >= 3;
+            const podiumUsers = showPodium ? users.slice(0, 3) : [];
+            const listUsers = showPodium ? users.slice(3) : users;
+            const listStartIndex = showPodium ? 3 : 0;
 
-                return (
-                  <div
-                    key={user.id}
-                    className="rounded-lg flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 transition-colors"
-                    style={{
-                      backgroundColor: isTop3 ? '#13110e' : '#111',
-                      borderLeft: `2px solid ${borderAccent}`,
-                    }}
-                  >
-                    
-                    <span
-                      className="text-xs sm:text-sm font-bold tabular-nums w-6 sm:w-8 text-center shrink-0"
-                      style={{ color: isTop3 ? '#c4a35a' : '#555', fontFamily: 'var(--font-inter)' }}
-                    >
-                      {globalRank}
-                    </span>
-
-                    
-                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                      <Link
-                        href={`/profile/${encodeURIComponent(user.username)}` as '/'}
-                        className="text-sm truncate transition-colors"
-                        style={{ color: '#e0e0e0' }}
-                      >
-                        {user.username}
-                      </Link>
-                      <UserBadges role={user.role} badgePrefs={user.badgePrefs} size="sm" />
+            return (
+              <>
+                {showPodium && (
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-5">
+                    <div className="order-1 self-end">
+                      <PodiumCard user={podiumUsers[1]} rank={2} leaguesEnabled={leaguesEnabled} />
                     </div>
-
-                    
-                    {leaguesEnabled && (
-                      <div className="shrink-0">
-                        <EloBadge elo={user.elo} size="sm" showElo={false} totalGames={total} />
-                      </div>
-                    )}
-
-                    
-                    <span
-                      className="text-sm font-semibold tabular-nums shrink-0 w-10 text-right"
-                      style={{ color: '#e0e0e0', fontFamily: 'var(--font-inter)' }}
-                    >
-                      {user.elo}
-                    </span>
-
-                    
-                    <div className="hidden sm:flex items-center gap-1 shrink-0" style={{ fontFamily: 'var(--font-inter)' }}>
-                      <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(62,139,62,0.1)', color: '#3e8b3e' }}>
-                        {user.wins}W
-                      </span>
-                      <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(179,62,62,0.1)', color: '#b33e3e' }}>
-                        {user.losses}L
-                      </span>
-                      <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(136,136,136,0.08)', color: '#888' }}>
-                        {user.draws}D
-                      </span>
+                    <div className="order-2 self-end">
+                      <PodiumCard user={podiumUsers[0]} rank={1} tall leaguesEnabled={leaguesEnabled} />
                     </div>
-
-                    
-                    <span className="hidden sm:block text-xs tabular-nums shrink-0 w-10 text-right" style={{ color: '#888', fontFamily: 'var(--font-inter)' }}>
-                      {winRate}%
-                    </span>
+                    <div className="order-3 self-end">
+                      <PodiumCard user={podiumUsers[2]} rank={3} leaguesEnabled={leaguesEnabled} />
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
+                )}
+
+                <div className="flex flex-col gap-1.5">
+                  {listUsers.map((user, index) => {
+                    const total = user.wins + user.losses + user.draws;
+                    const winRate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
+                    const globalRank = (currentPage - 1) * PLAYERS_PER_PAGE + listStartIndex + index + 1;
+                    const tier = getRankTier(user.elo);
+                    const placed = total >= PLACEMENT_MATCHES_REQUIRED;
+                    const streakWin = (user.consecutiveWins ?? 0) >= 3;
+                    const streakLoss = (user.consecutiveLosses ?? 0) >= 3;
+                    const tournamentWins = user.tournamentWins ?? 0;
+
+                    return (
+                      <div
+                        key={user.id}
+                        className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 hover:bg-[#13110e] transition-colors"
+                        style={{
+                          backgroundColor: '#111',
+                          borderLeft: `2px solid ${placed && leaguesEnabled ? `${tier.color}55` : '#1e1e1e'}`,
+                        }}
+                      >
+                        <span
+                          className="text-xs sm:text-sm font-bold tabular-nums w-6 sm:w-8 text-center shrink-0"
+                          style={{ color: '#666', fontFamily: 'var(--font-inter)' }}
+                        >
+                          {globalRank}
+                        </span>
+
+                        {leaguesEnabled && placed && (
+                          <Image
+                            src={tier.image}
+                            alt=""
+                            width={24}
+                            height={24}
+                            unoptimized
+                            className="shrink-0"
+                          />
+                        )}
+
+                        <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                          <Link
+                            href={`/profile/${encodeURIComponent(user.username)}` as '/'}
+                            className="text-sm truncate transition-colors hover:text-[#c4a35a]"
+                            style={{ color: '#e0e0e0' }}
+                          >
+                            {user.username}
+                          </Link>
+                          <UserBadges role={user.role} badgePrefs={user.badgePrefs} size="sm" />
+                          {streakWin && (
+                            <span className="inline px-1 py-0.5 text-[8px] uppercase font-bold shrink-0" style={{ backgroundColor: 'rgba(62, 139, 62, 0.12)', color: '#5fb05f', border: '1px solid rgba(62, 139, 62, 0.3)' }}>
+                              {user.consecutiveWins}W
+                            </span>
+                          )}
+                          {streakLoss && (
+                            <span className="inline px-1 py-0.5 text-[8px] uppercase font-bold shrink-0" style={{ backgroundColor: 'rgba(179, 62, 62, 0.12)', color: '#d97676', border: '1px solid rgba(179, 62, 62, 0.3)' }}>
+                              {user.consecutiveLosses}L
+                            </span>
+                          )}
+                          {tournamentWins > 0 && (
+                            <span className="inline px-1 py-0.5 text-[8px] uppercase font-bold shrink-0" style={{ backgroundColor: 'rgba(196, 163, 90, 0.12)', color: '#c4a35a', border: '1px solid rgba(196, 163, 90, 0.3)' }}>
+                              {tournamentWins}T
+                            </span>
+                          )}
+                        </div>
+
+                        <span
+                          className="text-sm font-semibold tabular-nums shrink-0 w-12 text-right"
+                          style={{ color: placed && leaguesEnabled ? tier.color : '#e0e0e0', fontFamily: 'var(--font-inter)' }}
+                        >
+                          {user.elo}
+                        </span>
+
+                        <div className="hidden sm:flex items-center gap-1 shrink-0" style={{ fontFamily: 'var(--font-inter)' }}>
+                          <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(62,139,62,0.1)', color: '#3e8b3e' }}>
+                            {user.wins}W
+                          </span>
+                          <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(179,62,62,0.1)', color: '#b33e3e' }}>
+                            {user.losses}L
+                          </span>
+                          <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(136,136,136,0.08)', color: '#888' }}>
+                            {user.draws}D
+                          </span>
+                        </div>
+
+                        <span className="hidden sm:block text-xs tabular-nums shrink-0 w-10 text-right" style={{ color: '#888', fontFamily: 'var(--font-inter)' }}>
+                          {winRate}%
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            );
+          })()}
 
           
           {totalPages > 1 && (
