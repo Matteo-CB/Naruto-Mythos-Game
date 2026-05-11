@@ -320,27 +320,47 @@ export default function ProfilePage({
             minHeight: 200,
           }}
         >
-          <div className="relative z-10 flex items-center justify-center px-6 sm:px-10 py-7 sm:py-8 sm:w-[38%]">
+          <div className="relative z-10 flex flex-col items-center justify-center px-6 sm:px-10 py-7 sm:py-8 sm:w-[40%] gap-3">
             {leaguesEnabled && placed && tier ? (
-              <Image
-                src={tier.image}
-                alt=""
-                width={104}
-                height={104}
-                unoptimized
-                priority
-              />
+              <>
+                <Image
+                  src={tier.image}
+                  alt=""
+                  width={108}
+                  height={108}
+                  unoptimized
+                  priority
+                />
+                <span
+                  className="font-display text-sm sm:text-base uppercase whitespace-nowrap"
+                  style={{
+                    color: accentColor,
+                    letterSpacing: '0.32em',
+                    paddingLeft: '0.32em',
+                  }}
+                >
+                  {t(`rankNames.${tier.key}`)}
+                </span>
+              </>
             ) : (
-              <div className="font-display text-[10px] uppercase tracking-[0.4em]" style={{ color: '#888' }}>
-                {leaguesEnabled ? t('rankNames.unranked') : 'ELO'}
-              </div>
+              <>
+                <div className="font-display text-4xl sm:text-5xl tabular-nums leading-none" style={{ color: '#3a3a3a' }}>
+                  ?
+                </div>
+                <span
+                  className="font-display text-sm sm:text-base uppercase whitespace-nowrap"
+                  style={{ color: '#666', letterSpacing: '0.32em', paddingLeft: '0.32em' }}
+                >
+                  {leaguesEnabled ? t('rankNames.unranked') : 'ELO'}
+                </span>
+              </>
             )}
           </div>
 
-          <div className="relative z-10 flex flex-col justify-center items-center sm:items-start px-6 sm:px-2 pb-7 sm:py-8 pr-6 sm:pr-10 sm:w-[62%] gap-3 text-center sm:text-left">
+          <div className="relative z-10 flex flex-col justify-center items-center sm:items-start px-6 sm:px-4 pb-7 sm:py-8 pr-6 sm:pr-10 sm:w-[60%] gap-3 text-center sm:text-left">
             <div className="flex items-center gap-1.5 max-w-full">
               <h1
-                className="font-display text-2xl sm:text-3xl truncate"
+                className="font-display text-2xl sm:text-4xl truncate leading-none"
                 style={{ color: '#f4f1e8', letterSpacing: '0.04em' }}
               >
                 {profile.username}
@@ -352,11 +372,16 @@ export default function ProfilePage({
               />
             </div>
 
-            <div
-              className="font-display tabular-nums leading-none text-5xl sm:text-6xl"
-              style={{ color: accentColor, letterSpacing: '-0.01em' }}
-            >
-              {eloCount}
+            <div className="flex items-baseline gap-2.5">
+              <div
+                className="font-display tabular-nums leading-none text-5xl sm:text-6xl"
+                style={{ color: accentColor, letterSpacing: '-0.01em' }}
+              >
+                {eloCount}
+              </div>
+              <span className="font-display text-[10px] uppercase tracking-[0.32em]" style={{ color: '#555' }}>
+                ELO
+              </span>
             </div>
 
             <p className="text-[11px]" style={{ color: '#555' }}>
