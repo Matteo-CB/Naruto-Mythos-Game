@@ -14,6 +14,7 @@ import { UserBadges } from '@/components/badges/UserBadges';
 import { EloHistoryChart } from '@/components/EloHistoryChart';
 import { DeckStatsPanel } from '@/components/profile/DeckStatsPanel';
 import Image from 'next/image';
+import '@/styles/holo-menu.css';
 
 interface ProfileData {
   id: string;
@@ -313,12 +314,13 @@ export default function ProfilePage({
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-          className="relative flex flex-col sm:flex-row items-center sm:items-stretch overflow-hidden mb-6"
+          className="holo-menu-foil relative flex flex-col sm:flex-row items-center sm:items-stretch overflow-hidden mb-6"
           style={{
             backgroundColor: '#0d0c10',
             clipPath: PANEL_CLIP,
             minHeight: 200,
-          }}
+            ['--foil' as string]: accentColor,
+          } as React.CSSProperties}
         >
           <div className="relative z-10 flex items-center justify-center px-6 sm:px-10 py-7 sm:py-8 sm:w-[34%]">
             {leaguesEnabled && placed && tier ? (
@@ -346,8 +348,8 @@ export default function ProfilePage({
               className="font-display uppercase leading-none wrap-break-word max-w-full"
               style={{
                 color: accentColor,
-                fontSize: 'clamp(20px, 4vw, 30px)',
-                letterSpacing: '0.05em',
+                fontSize: 'clamp(14px, 2.4vw, 18px)',
+                letterSpacing: '0.06em',
               }}
             >
               {leaguesEnabled && placed && tier
@@ -361,8 +363,8 @@ export default function ProfilePage({
 
             <div className="flex items-center gap-1.5 max-w-full">
               <h1
-                className="font-display text-xl sm:text-2xl truncate leading-none"
-                style={{ color: '#e8e6df', letterSpacing: '0.04em' }}
+                className="font-display text-lg sm:text-2xl leading-tight wrap-break-word"
+                style={{ color: '#e8e6df', letterSpacing: '0.04em', wordBreak: 'break-word' }}
               >
                 {profile.username}
               </h1>
@@ -375,7 +377,7 @@ export default function ProfilePage({
 
             <div className="flex items-baseline gap-2 mt-1">
               <div
-                className="font-display tabular-nums leading-none text-4xl sm:text-5xl"
+                className="font-display tabular-nums leading-none text-2xl sm:text-3xl"
                 style={{ color: '#f4f1e8', letterSpacing: '-0.01em' }}
               >
                 {eloCount}
