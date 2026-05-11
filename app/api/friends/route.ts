@@ -22,12 +22,14 @@ export async function GET() {
         sender: {
           select: {
             id: true, username: true, elo: true, role: true, badgePrefs: true,
+            wins: true, losses: true, draws: true,
             consecutiveWins: true, consecutiveLosses: true, tournamentWins: true,
           },
         },
         receiver: {
           select: {
             id: true, username: true, elo: true, role: true, badgePrefs: true,
+            wins: true, losses: true, draws: true,
             consecutiveWins: true, consecutiveLosses: true, tournamentWins: true,
           },
         },
@@ -91,6 +93,9 @@ export async function GET() {
         elo: f.other.elo,
         role: f.other.role,
         badgePrefs: f.other.badgePrefs,
+        wins: f.other.wins,
+        losses: f.other.losses,
+        draws: f.other.draws,
         consecutiveWins: f.other.consecutiveWins,
         consecutiveLosses: f.other.consecutiveLosses,
         tournamentWins: f.other.tournamentWins,

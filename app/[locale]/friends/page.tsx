@@ -22,6 +22,9 @@ interface RichFriend {
   elo: number;
   role?: string;
   badgePrefs?: string[];
+  wins: number;
+  losses: number;
+  draws: number;
   consecutiveWins?: number;
   consecutiveLosses?: number;
   tournamentWins?: number;
@@ -81,9 +84,10 @@ function FriendCard({
   t: ReturnType<typeof useTranslations>;
   tStats: ReturnType<typeof useTranslations>;
 }) {
+  const totalGames = friend.wins + friend.losses + friend.draws;
+  const placed = totalGames >= PLACEMENT_MATCHES_REQUIRED;
   const tier = getRankTier(friend.elo);
-  const placed = (friend.consecutiveWins ?? 0) + (friend.consecutiveLosses ?? 0) >= 0; // assume placed by API
-  const accent = leaguesEnabled && placed ? tier.color : '#c4a35a';
+  const accent = leaguesEnabled && placed ? tier.color : '#888';
   const streakWin = (friend.consecutiveWins ?? 0) >= 3;
   const streakLoss = (friend.consecutiveLosses ?? 0) >= 3;
   const tournaments = friend.tournamentWins ?? 0;
@@ -104,7 +108,7 @@ function FriendCard({
           clipPath: ROW_CLIP,
         }}
       >
-        {leaguesEnabled && (
+        {leaguesEnabled && placed ? (
           <Image
             src={tier.image}
             alt=""
@@ -113,7 +117,14 @@ function FriendCard({
             unoptimized
             className="shrink-0"
           />
-        )}
+        ) : leaguesEnabled ? (
+          <span
+            className="font-display text-[8px] uppercase tracking-widest shrink-0 inline-flex items-center justify-center"
+            style={{ width: 32, height: 32, color: '#666' }}
+          >
+            ?
+          </span>
+        ) : null}
 
         <div className="flex flex-col min-w-0 flex-1">
           <div className="flex items-center gap-1.5 max-w-full">
