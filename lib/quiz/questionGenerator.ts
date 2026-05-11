@@ -244,6 +244,36 @@ function distinctByName(cards: CharacterCard[]): CharacterCard[] {
   });
 }
 
+let _nameCountCache: { ref: CharacterCard[]; counts: Map<string, number> } | null = null;
+function getNameCounts(chars: CharacterCard[]): Map<string, number> {
+  if (_nameCountCache && _nameCountCache.ref === chars) return _nameCountCache.counts;
+  const m = new Map<string, number>();
+  for (const c of chars) {
+    const key = c.name_fr.toUpperCase();
+    m.set(key, (m.get(key) ?? 0) + 1);
+  }
+  _nameCountCache = { ref: chars, counts: m };
+  return m;
+}
+
+function cardLabel(card: CharacterCard, chars: CharacterCard[]): string {
+  const counts = getNameCounts(chars);
+  const occurrences = counts.get(card.name_fr.toUpperCase()) ?? 1;
+  if (occurrences <= 1) return card.name_fr;
+  const title = (card.title_fr || card.title_en || '').trim();
+  return title ? `${card.name_fr} (${title})` : `${card.name_fr} (${card.number})`;
+}
+
+function distinctByVersion(cards: CharacterCard[]): CharacterCard[] {
+  const seen = new Set<string>();
+  return cards.filter((c) => {
+    const key = `${c.name_fr.toUpperCase()}::${String(c.title_fr || c.title_en || c.number).toUpperCase()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 
 const GROUP_KEY: Record<string, string> = {
   'Leaf Village': 'quiz.group.leaf',
@@ -298,11 +328,11 @@ const genChakraCostMC: Gen = (chars, _, rng) => {
     category: 'stats',
     difficulty: 1,
     questionTextKey: 'quiz.q.whatChakraCost',
-    questionParams: { name: card.name_fr },
+    questionParams: { name: cardLabel(card, chars) },
     options,
     correctIndex: options.indexOf(card.chakra.toString()),
     explanationKey: 'quiz.exp.chakraCost',
-    explanationParams: { name: card.name_fr, value: card.chakra.toString() },
+    explanationParams: { name: cardLabel(card, chars), value: card.chakra.toString() },
   };
 };
 
@@ -320,11 +350,11 @@ const genPowerMC: Gen = (chars, _, rng) => {
     category: 'stats',
     difficulty: 1,
     questionTextKey: 'quiz.q.whatPower',
-    questionParams: { name: card.name_fr },
+    questionParams: { name: cardLabel(card, chars) },
     options,
     correctIndex: options.indexOf(card.power.toString()),
     explanationKey: 'quiz.exp.power',
-    explanationParams: { name: card.name_fr, value: card.power.toString() },
+    explanationParams: { name: cardLabel(card, chars), value: card.power.toString() },
   };
 };
 
@@ -337,11 +367,11 @@ const genChakraFill: Gen = (chars, _, rng) => {
     category: 'stats',
     difficulty: 1,
     questionTextKey: 'quiz.q.enterChakraCost',
-    questionParams: { name: card.name_fr },
+    questionParams: { name: cardLabel(card, chars) },
     correctAnswer: card.chakra,
     unitKey: 'quiz.unit.chakra',
     explanationKey: 'quiz.exp.chakraCost',
-    explanationParams: { name: card.name_fr, value: card.chakra.toString() },
+    explanationParams: { name: cardLabel(card, chars), value: card.chakra.toString() },
   };
 };
 
@@ -354,10 +384,10 @@ const genPowerFill: Gen = (chars, _, rng) => {
     category: 'stats',
     difficulty: 1,
     questionTextKey: 'quiz.q.enterPower',
-    questionParams: { name: card.name_fr },
+    questionParams: { name: cardLabel(card, chars) },
     correctAnswer: card.power,
     explanationKey: 'quiz.exp.power',
-    explanationParams: { name: card.name_fr, value: card.power.toString() },
+    explanationParams: { name: cardLabel(card, chars), value: card.power.toString() },
   };
 };
 
@@ -379,10 +409,10 @@ const genStatsTF: Gen = (chars, _, rng) => {
     category: 'stats',
     difficulty: 1,
     questionTextKey: isCost ? 'quiz.q.hasCostTF' : 'quiz.q.hasPowerTF',
-    questionParams: { name: card.name_fr, value: displayValue.toString() },
+    questionParams: { name: cardLabel(card, chars), value: displayValue.toString() },
     correctAnswer: isTrue,
     explanationKey: isCost ? 'quiz.exp.chakraCost' : 'quiz.exp.power',
-    explanationParams: { name: card.name_fr, value: stat.toString() },
+    explanationParams: { name: cardLabel(card, chars), value: stat.toString() },
   };
 };
 
@@ -404,7 +434,7 @@ const genMatchChakraPairs: Gen = (chars, _, rng) => {
     difficulty: 2,
     questionTextKey: 'quiz.q.matchChakraCost',
     pairs: distinct.map((c) => ({
-      left: c.name_fr,
+      left: cardLabel(c, chars),
       right: c.chakra.toString(),
     })),
     explanationKey: 'quiz.exp.correctMatch',
@@ -429,7 +459,7 @@ const genMatchPowerPairs: Gen = (chars, _, rng) => {
     difficulty: 2,
     questionTextKey: 'quiz.q.matchPower',
     pairs: distinct.map((c) => ({
-      left: c.name_fr,
+      left: cardLabel(c, chars),
       right: c.power.toString(),
     })),
     explanationKey: 'quiz.exp.correctMatch',
@@ -454,11 +484,11 @@ const genSortByPower: Gen = (chars, _, rng) => {
     category: 'stats',
     difficulty: 3,
     questionTextKey: 'quiz.q.sortByPower',
-    items: sorted.map((c) => ({ label: c.name_fr })),
+    items: sorted.map((c) => ({ label: cardLabel(c, chars) })),
     correctOrder: sorted.map((_, i) => i),
     explanationKey: 'quiz.exp.correctOrder',
     explanationParams: {
-      order: sorted.map((c) => `${c.name_fr}: ${c.power}`).join(', '),
+      order: sorted.map((c) => `${cardLabel(c, chars)}: ${c.power}`).join(', '),
     },
   };
 };
@@ -481,11 +511,11 @@ const genSortByChakra: Gen = (chars, _, rng) => {
     category: 'stats',
     difficulty: 3,
     questionTextKey: 'quiz.q.sortByChakra',
-    items: sorted.map((c) => ({ label: c.name_fr })),
+    items: sorted.map((c) => ({ label: cardLabel(c, chars) })),
     correctOrder: sorted.map((_, i) => i),
     explanationKey: 'quiz.exp.correctOrder',
     explanationParams: {
-      order: sorted.map((c) => `${c.name_fr}: ${c.chakra}`).join(', '),
+      order: sorted.map((c) => `${cardLabel(c, chars)}: ${c.chakra}`).join(', '),
     },
   };
 };
@@ -497,7 +527,7 @@ const genIdentifyCard: Gen = (chars, _, rng) => {
   if (unique.length < 4) return null;
   const selected = pick(unique, 4, rng);
   const correct = selected[0];
-  const options = shuffle(selected.map((c) => c.name_fr), rng);
+  const options = shuffle(selected.map((c) => cardLabel(c, chars)), rng);
   return {
     id: uid('id-mc'),
     type: 'multipleChoice',
@@ -507,9 +537,9 @@ const genIdentifyCard: Gen = (chars, _, rng) => {
     questionImage: correct.image_file,
     censorZone: 'name' as const,
     options,
-    correctIndex: options.indexOf(correct.name_fr),
+    correctIndex: options.indexOf(cardLabel(correct, chars)),
     explanationKey: 'quiz.exp.cardIs',
-    explanationParams: { name: correct.name_fr },
+    explanationParams: { name: cardLabel(correct, chars) },
   };
 };
 
@@ -526,12 +556,12 @@ const genRarityMC: Gen = (chars, _, rng) => {
     category: 'identity',
     difficulty: 2,
     questionTextKey: 'quiz.q.whatRarity',
-    questionParams: { name: card.name_fr },
+    questionParams: { name: cardLabel(card, chars) },
     options,
     optionsAreKeys: true,
     correctIndex: options.indexOf(correctKey),
     explanationKey: 'quiz.exp.rarity',
-    explanationParams: { name: card.name_fr, rarity: card.rarity },
+    explanationParams: { name: cardLabel(card, chars), rarity: card.rarity },
   };
 };
 
@@ -547,8 +577,8 @@ const genMatchImagePairs: Gen = (chars, _, rng) => {
     questionTextKey: 'quiz.q.matchImage',
     censorZone: 'name' as const,
     pairs: selected.map((c) => ({
-      left: c.name_fr,
-      right: c.name_fr,
+      left: cardLabel(c, chars),
+      right: cardLabel(c, chars),
       rightImage: c.image_file,
     })),
     explanationKey: 'quiz.exp.correctMatch',
@@ -568,11 +598,11 @@ const genTitleMC: Gen = (chars, _, rng) => {
     category: 'identity',
     difficulty: 2,
     questionTextKey: 'quiz.q.whatTitle',
-    questionParams: { name: correct.name_fr },
+    questionParams: { name: cardLabel(correct, chars) },
     options,
     correctIndex: options.indexOf(correct.title_fr),
     explanationKey: 'quiz.exp.title',
-    explanationParams: { name: correct.name_fr, title: correct.title_fr },
+    explanationParams: { name: cardLabel(correct, chars), title: correct.title_fr },
   };
 };
 
@@ -591,12 +621,12 @@ const genEffectTypeMC: Gen = (chars, _, rng) => {
     category: 'effects',
     difficulty: 2,
     questionTextKey: 'quiz.q.whatEffectType',
-    questionParams: { name: card.name_fr },
+    questionParams: { name: cardLabel(card, chars) },
     options,
     optionsAreKeys: true,
     correctIndex: options.indexOf(correctKey),
     explanationKey: 'quiz.exp.effectType',
-    explanationParams: { name: card.name_fr, types: types.join(', ') },
+    explanationParams: { name: cardLabel(card, chars), types: types.join(', ') },
   };
 };
 
@@ -613,10 +643,10 @@ const genEffectTF: Gen = (chars, _, rng) => {
     category: 'effects',
     difficulty: 2,
     questionTextKey: 'quiz.q.hasEffectTF',
-    questionParams: { name: card.name_fr, type: chosenType },
+    questionParams: { name: cardLabel(card, chars), type: chosenType },
     correctAnswer: isTrue,
     explanationKey: 'quiz.exp.effectType',
-    explanationParams: { name: card.name_fr, types: [...cardTypes].join(', ') },
+    explanationParams: { name: cardLabel(card, chars), types: [...cardTypes].join(', ') },
   };
 };
 
@@ -640,7 +670,7 @@ const genMatchEffectTypes: Gen = (chars, _, rng) => {
     difficulty: 3,
     questionTextKey: 'quiz.q.matchEffectType',
     pairs: selected.map((c) => ({
-      left: c.name_fr,
+      left: cardLabel(c, chars),
       right: c.effects[0].type,
     })),
     explanationKey: 'quiz.exp.correctMatch',
@@ -662,12 +692,12 @@ const genGroupMC: Gen = (chars, _, rng) => {
     category: 'groups',
     difficulty: 1,
     questionTextKey: 'quiz.q.whatGroup',
-    questionParams: { name: card.name_fr },
+    questionParams: { name: cardLabel(card, chars) },
     options,
     optionsAreKeys: true,
     correctIndex: options.indexOf(correctKey),
     explanationKey: 'quiz.exp.group',
-    explanationParams: { name: card.name_fr, group: card.group },
+    explanationParams: { name: cardLabel(card, chars), group: card.group },
   };
 };
 
@@ -692,10 +722,10 @@ const genKeywordTF: Gen = (chars, _, rng) => {
     category: 'groups',
     difficulty: 3,
     questionTextKey: 'quiz.q.hasKeywordTF',
-    questionParams: { name: card.name_fr, keyword },
+    questionParams: { name: cardLabel(card, chars), keyword },
     correctAnswer: isTrue,
     explanationKey: 'quiz.exp.keyword',
-    explanationParams: { name: card.name_fr, keywords: card.keywords.join(', ') },
+    explanationParams: { name: cardLabel(card, chars), keywords: card.keywords.join(', ') },
   };
 };
 
@@ -716,7 +746,7 @@ const genMatchGroupPairs: Gen = (chars, _, rng) => {
     difficulty: 2,
     questionTextKey: 'quiz.q.matchGroup',
     pairs: selected.map((c) => ({
-      left: c.name_fr,
+      left: cardLabel(c, chars),
       right: c.group,
     })),
     explanationKey: 'quiz.exp.correctMatch',
@@ -738,7 +768,7 @@ const genCategorySortGroup: Gen = (chars, _, rng) => {
   for (let gi = 0; gi < selectedGroups.length; gi++) {
     const groupCards = pick(byGroup[selectedGroups[gi]], 2, rng);
     for (const c of groupCards) {
-      items.push({ label: c.name_fr, correctCategory: gi });
+      items.push({ label: cardLabel(c, chars), correctCategory: gi });
     }
   }
   return {
@@ -870,7 +900,7 @@ const genSpotErrorCard: Gen = (chars, _, rng) => {
   statements.push({
     textKey: 'quiz.stmt.costIs',
     textParams: {
-      name: card.name_fr,
+      name: cardLabel(card, chars),
       value: (errorIndex === 0 ? Math.max(0, wrongChakra) : card.chakra).toString(),
     },
     isError: errorIndex === 0,
@@ -880,7 +910,7 @@ const genSpotErrorCard: Gen = (chars, _, rng) => {
   statements.push({
     textKey: 'quiz.stmt.powerIs',
     textParams: {
-      name: card.name_fr,
+      name: cardLabel(card, chars),
       value: (errorIndex === 1 ? Math.max(0, wrongPower) : card.power).toString(),
     },
     isError: errorIndex === 1,
@@ -891,7 +921,7 @@ const genSpotErrorCard: Gen = (chars, _, rng) => {
   statements.push({
     textKey: 'quiz.stmt.groupIs',
     textParams: {
-      name: card.name_fr,
+      name: cardLabel(card, chars),
       group: errorIndex === 2 ? wrongGroup : card.group,
     },
     isError: errorIndex === 2,
@@ -903,7 +933,7 @@ const genSpotErrorCard: Gen = (chars, _, rng) => {
   statements.push({
     textKey: 'quiz.stmt.effectIs',
     textParams: {
-      name: card.name_fr,
+      name: cardLabel(card, chars),
       type: errorIndex === 3 ? wrongType : cardTypes[0],
     },
     isError: errorIndex === 3,
@@ -915,10 +945,10 @@ const genSpotErrorCard: Gen = (chars, _, rng) => {
     category: 'advanced',
     difficulty: 3,
     questionTextKey: 'quiz.q.spotError',
-    questionParams: { name: card.name_fr },
+    questionParams: { name: cardLabel(card, chars) },
     statements,
     explanationKey: 'quiz.exp.spotError',
-    explanationParams: { name: card.name_fr },
+    explanationParams: { name: cardLabel(card, chars) },
   };
 };
 
@@ -977,7 +1007,7 @@ const genTeamMemberMC: Gen = (chars, _, rng) => {
 
   const correct = pickOne(members, rng);
   const distractors = pick(nonMembers, 3, rng);
-  const options = shuffle([correct.name_fr, ...distractors.map((c) => c.name_fr)], rng);
+  const options = shuffle([cardLabel(correct, chars), ...distractors.map((c) => cardLabel(c, chars))], rng);
 
   return {
     id: uid('tm-mc'),
@@ -987,9 +1017,9 @@ const genTeamMemberMC: Gen = (chars, _, rng) => {
     questionTextKey: 'quiz.q.whichTeamMember',
     questionParams: { keyword },
     options,
-    correctIndex: options.indexOf(correct.name_fr),
+    correctIndex: options.indexOf(cardLabel(correct, chars)),
     explanationKey: 'quiz.exp.teamMember',
-    explanationParams: { name: correct.name_fr, keyword },
+    explanationParams: { name: cardLabel(correct, chars), keyword },
   };
 };
 
@@ -1005,7 +1035,7 @@ const genNotInGroupMC: Gen = (chars, _, rng) => {
 
   const correct = pickOne(notInGroup, rng);
   const distractors = pick(inGroup, 3, rng);
-  const options = shuffle([correct.name_fr, ...distractors.map((c) => c.name_fr)], rng);
+  const options = shuffle([cardLabel(correct, chars), ...distractors.map((c) => cardLabel(c, chars))], rng);
   const groupKey = GROUP_KEY[group] || group;
 
   return {
@@ -1017,9 +1047,9 @@ const genNotInGroupMC: Gen = (chars, _, rng) => {
     questionParams: { group: groupKey },
     options,
     optionsAreKeys: false,
-    correctIndex: options.indexOf(correct.name_fr),
+    correctIndex: options.indexOf(cardLabel(correct, chars)),
     explanationKey: 'quiz.exp.notInGroup',
-    explanationParams: { name: correct.name_fr, group },
+    explanationParams: { name: cardLabel(correct, chars), group },
   };
 };
 
@@ -1049,9 +1079,9 @@ const genHigherPowerMC: Gen = (chars, _, rng) => {
     difficulty: 2,
     questionTextKey: 'quiz.q.higherPower',
     options,
-    correctIndex: options.indexOf(correct.name_fr),
+    correctIndex: options.indexOf(cardLabel(correct, chars)),
     explanationKey: 'quiz.exp.higherPower',
-    explanationParams: { name: correct.name_fr, value: correct.power.toString() },
+    explanationParams: { name: cardLabel(correct, chars), value: correct.power.toString() },
   };
 };
 
@@ -1294,10 +1324,10 @@ const genCanAffordTF: Gen = (chars, _, rng) => {
     category: 'scenario',
     difficulty: 1,
     questionTextKey: 'quiz.q.canAfford',
-    questionParams: { name: card.name_fr, chakra: chakra.toString(), cost: card.chakra.toString() },
+    questionParams: { name: cardLabel(card, chars), chakra: chakra.toString(), cost: card.chakra.toString() },
     correctAnswer: canAfford,
     explanationKey: 'quiz.exp.canAfford',
-    explanationParams: { name: card.name_fr, chakra: chakra.toString(), cost: card.chakra.toString() },
+    explanationParams: { name: cardLabel(card, chars), chakra: chakra.toString(), cost: card.chakra.toString() },
   };
 };
 
@@ -1321,11 +1351,11 @@ const genEffectRecallMC: Gen = (chars, _, rng) => {
     category: 'scenario',
     difficulty: 3,
     questionTextKey: 'quiz.q.effectRecall',
-    questionParams: { name: correct.name_fr, type: correct.effects[0].type },
+    questionParams: { name: cardLabel(correct, chars), type: correct.effects[0].type },
     options,
     correctIndex: options.indexOf(truncate(correctDesc)),
     explanationKey: 'quiz.exp.effectRecall',
-    explanationParams: { name: correct.name_fr },
+    explanationParams: { name: cardLabel(correct, chars) },
   };
 };
 

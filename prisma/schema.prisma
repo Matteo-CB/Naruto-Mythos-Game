@@ -153,16 +153,15 @@ model Room {
 }
 
 model QuizScore {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
-  user        User     @relation(fields: [userId], references: [id])
-  difficulty  Int
-  score       Int
-  correct     Int
-  total       Int
-  accuracy    Float
-  bestStreak  Int
-  completedAt DateTime @default(now())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @unique @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bestByDiff   Json
+  totalRuns    Int      @default(0)
+  totalCorrect Int      @default(0)
+  totalQ       Int      @default(0)
+  historyGz    Bytes?
+  updatedAt    DateTime @updatedAt
 }
 
 model Friendship {
