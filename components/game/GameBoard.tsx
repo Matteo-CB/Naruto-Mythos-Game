@@ -1102,9 +1102,10 @@ function GameBoardInner() {
 
   return (
     <div
-      className="w-screen flex overflow-hidden no-select"
+      className="flex overflow-hidden no-select"
       style={{
-        height: '100dvh',
+        width: 'var(--game-board-w, 100vw)',
+        height: 'var(--game-board-h, 100dvh)',
         backgroundColor: "#0a0a0a",
         backgroundImage: `url(${gameBackgroundUrl})`,
         backgroundSize: "cover",
