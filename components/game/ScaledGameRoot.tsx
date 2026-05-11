@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useEffect, useState, type ReactNode } from 'react';
-import { GameScaleContext, DESKTOP_FIXED_DIMS } from './GameScaleContext';
+import { GameScaleContext, MOBILE_FIXED_DIMS } from './GameScaleContext';
 
-const BASE_WIDTH = 1280;
-const BASE_HEIGHT = 720;
+const BASE_WIDTH = 1920;
+const BASE_HEIGHT = 1080;
 
 interface Props {
   children: ReactNode;
@@ -66,7 +66,7 @@ export function ScaledGameRoot({ children }: Props) {
             ['--game-board-h' as string]: `${BASE_HEIGHT}px`,
           } as React.CSSProperties}
         >
-          <GameScaleContext.Provider value={DESKTOP_FIXED_DIMS}>
+          <GameScaleContext.Provider value={MOBILE_FIXED_DIMS}>
             {children}
           </GameScaleContext.Provider>
         </div>

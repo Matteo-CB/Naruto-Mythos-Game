@@ -205,6 +205,29 @@ export const GameScaleContext = createContext<GameDimensions>(buildDimensions(1.
 
 export const DESKTOP_FIXED_DIMS: GameDimensions = buildDimensions(1.0, 1600, 1000);
 
+export const MOBILE_FIXED_DIMS: GameDimensions = {
+  ...DESKTOP_FIXED_DIMS,
+  handCard: { w: 170, h: 238 },
+  missionCard: { w: 150, h: 210 },
+  sideCard: { w: 110, h: 154 },
+  opponentCard: { w: 90, h: 126 },
+  targetCard: { w: 130, h: 182 },
+  mulliganCard: { w: 210, h: 294 },
+  handSelectorCard: { w: 200, h: 280 },
+  previewMed: { w: 240, h: 336 },
+  previewLg: { w: 280, h: 392 },
+  handFanSpacing: 95,
+  handContainerH: 230,
+  playerHandH: 285,
+  opponentHandH: 155,
+  opponentFanSpacing: 32,
+  opponentContainerH: 105,
+  sidePileW: 130,
+  missionMaxW: 230,
+  emptyLaneMinW: 350,
+  emptyLaneMaxW: 430,
+};
+
 export function GameScaleProvider({ children }: { children: React.ReactNode }) {
   const sizeKey = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
