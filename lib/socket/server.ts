@@ -13,6 +13,7 @@ import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, val
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
 import { isMaintenanceActive, activateMaintenance, setDrainTimeout, setCheckInterval } from '@/lib/socket/maintenance';
+import { createChessClock, type ChessClockState } from '@/lib/timing/chessClock';
 
 export interface RoomData {
   code: string;
@@ -82,6 +83,21 @@ export interface RoomData {
   
   chatMessages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }>;
   chatLastCleanup: number;
+
+  chessClock: ChessClockState;
+  chessClockTickTimer: ReturnType<typeof setInterval> | null;
+  chessClockMulliganTimer: ReturnType<typeof setTimeout> | null;
+}
+
+function clearChessClockTimers(room: RoomData): void {
+  if (room.chessClockTickTimer) {
+    clearInterval(room.chessClockTickTimer);
+    room.chessClockTickTimer = null;
+  }
+  if (room.chessClockMulliganTimer) {
+    clearTimeout(room.chessClockMulliganTimer);
+    room.chessClockMulliganTimer = null;
+  }
 }
 
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
@@ -162,6 +178,7 @@ function cleanupPlayerRoom(socket: Socket): void {
   
   if (existingRoom.hostSocket === socket.id && !existingRoom.gameState) {
     if (existingRoom.sealedTimer) clearTimeout(existingRoom.sealedTimer);
+    clearChessClockTimers(existingRoom);
     rooms.delete(existingCode);
     socket.leave(existingCode);
   }
@@ -202,6 +219,7 @@ function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: 
   for (const code of staleRoomCodes) {
     const room = rooms.get(code);
     if (room?.hostSocket) playerRooms.delete(room.hostSocket);
+    if (room) clearChessClockTimers(room);
     rooms.delete(code);
   }
   return list;
@@ -250,6 +268,7 @@ function cleanupStaleRooms(): void {
       if (!room.createdAt || now - room.createdAt > ttl) {
         if (room.hostSocket) playerRooms.delete(room.hostSocket);
         if (room.sealedTimer) clearTimeout(room.sealedTimer);
+        clearChessClockTimers(room);
         rooms.delete(code);
         cleaned++;
         continue;
@@ -260,16 +279,18 @@ function cleanupStaleRooms(): void {
       if (room.hostSocket) playerRooms.delete(room.hostSocket);
       if (room.guestSocket) playerRooms.delete(room.guestSocket);
       for (const [, spec] of room.spectators) playerRooms.delete(spec.socketId);
+      clearChessClockTimers(room);
       rooms.delete(code);
       cleaned++;
       continue;
     }
-    
+
     if (now - room.createdAt > 4 * 60 * 60 * 1000) {
       if (room.hostSocket) playerRooms.delete(room.hostSocket);
       if (room.guestSocket) playerRooms.delete(room.guestSocket);
       for (const [, spec] of room.spectators) playerRooms.delete(spec.socketId);
       clearActionTimer(room);
+      clearChessClockTimers(room);
       rooms.delete(code);
       cleaned++;
     }
@@ -1588,9 +1609,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
         guestAllowSpectatorHand: false,
         chatMessages: [],
         chatLastCleanup: 0,
+        chessClock: createChessClock(),
+        chessClockTickTimer: null,
+        chessClockMulliganTimer: null,
       };
 
-      
+
       try {
         const hostUser = await prisma.user.findUnique({ where: { id: data.userId }, select: { allowSpectatorHand: true } });
         room.hostAllowSpectatorHand = hostUser?.allowSpectatorHand ?? false;
@@ -1806,6 +1830,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               io.to(data.code).emit('room:error', { message: 'Sealed time expired', errorKey: 'game.error.sealedTimeout' });
               if (room.sealedTimer) clearTimeout(room.sealedTimer);
               room.sealedTimer = null;
+              clearChessClockTimers(room);
               const wasPublic = !room.isPrivate;
               rooms.delete(data.code);
               if (room.hostSocket) playerRooms.delete(room.hostSocket);
@@ -2446,6 +2471,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               io.to(roomCode).emit('room:error', { message: 'Sealed time expired', errorKey: 'game.error.sealedTimeout' });
               if (room.sealedTimer) clearTimeout(room.sealedTimer);
               room.sealedTimer = null;
+              clearChessClockTimers(room);
               const wasPublic = !room.isPrivate;
               rooms.delete(roomCode);
               if (room.hostSocket) playerRooms.delete(room.hostSocket);
@@ -2515,6 +2541,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             socket.emit('game:error', { message: 'You are already queued in another tab', errorKey: 'game.error.alreadyQueued' });
             return;
           }
+          clearChessClockTimers(existingRoom);
           rooms.delete(existingCode);
           playerRooms.delete(existingRoom.hostSocket);
           if (!existingRoom.isPrivate) broadcastRoomList(io);
@@ -2534,6 +2561,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           } else {
             
             console.log(`[Socket] Matchmaking: removing stale room ${code} (host socket disconnected)`);
+            clearChessClockTimers(room);
             rooms.delete(code);
             playerRooms.delete(room.hostSocket);
           }
@@ -2609,6 +2637,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
           guestAllowSpectatorHand: false,
           chatMessages: [],
           chatLastCleanup: 0,
+          chessClock: createChessClock(),
+          chessClockTickTimer: null,
+          chessClockMulliganTimer: null,
           };
 
         rooms.set(code, room);
@@ -2629,6 +2660,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       
       if (!room.guestId && !room.gameState) {
         const wasPublic = !room.isPrivate;
+        clearChessClockTimers(room);
         rooms.delete(code);
         playerRooms.delete(socket.id);
         socket.leave(code);
@@ -2965,7 +2997,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               
               io.to(opponentSocket).emit('game:opponent-left');
             }
-            
+            clearChessClockTimers(room);
             rooms.delete(code);
           }
 
@@ -3062,6 +3094,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               if (isHost) {
                 console.log(`[Socket] Grace period expired for host in sealed room ${code}, removing room`);
                 if (room.sealedTimer) clearTimeout(room.sealedTimer);
+                clearChessClockTimers(room);
                 const wasPublic = !room.isPrivate;
                 rooms.delete(code);
                 if (wasPublic) broadcastRoomList(io);
@@ -3078,6 +3111,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             if (!room.gameState) {
               console.log(`[Socket] Host left room ${code} before game started, removing room`);
               const wasPublic = !room.isPrivate;
+              clearChessClockTimers(room);
               rooms.delete(code);
               if (wasPublic) broadcastRoomList(io);
             }

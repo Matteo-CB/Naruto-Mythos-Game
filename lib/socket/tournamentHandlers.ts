@@ -5,6 +5,7 @@ import { startAbsenceTimer, clearAbsenceTimer, scheduleAbsenceTimerWithDeadline,
 import { assignTournamentWinnerRole } from '@/lib/discord/tournamentRoles';
 import { sendTournamentResults } from '@/lib/discord/tournamentWebhook';
 import { rooms, type RoomData } from '@/lib/socket/server';
+import { createChessClock } from '@/lib/timing/chessClock';
 import { finalizeAndScheduleRoomDeletion } from '@/lib/tournament/matchRoomCleanup';
 import { logMatchEvent } from '@/lib/tournament/matchEventLog';
 import {
@@ -229,6 +230,9 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             guestAllowSpectatorHand: false,
             chatMessages: [],
             chatLastCleanup: Date.now(),
+            chessClock: createChessClock(),
+            chessClockTickTimer: null,
+            chessClockMulliganTimer: null,
           } as RoomData);
         }
 
