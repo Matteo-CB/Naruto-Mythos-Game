@@ -26,9 +26,10 @@ export interface ChessClockState {
 }
 
 export function createChessClock(initialMs: number = CHESS_CLOCK_INITIAL_MS): ChessClockState {
+  const safe = Number.isFinite(initialMs) && initialMs >= 0 ? Math.floor(initialMs) : CHESS_CLOCK_INITIAL_MS;
   return {
-    player1: { remainingMs: initialMs, idleWarningUsed: false },
-    player2: { remainingMs: initialMs, idleWarningUsed: false },
+    player1: { remainingMs: safe, idleWarningUsed: false },
+    player2: { remainingMs: safe, idleWarningUsed: false },
     active: null,
     activeStartedAt: null,
     idleStartedAt: null,

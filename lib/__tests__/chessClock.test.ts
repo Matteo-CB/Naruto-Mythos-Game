@@ -18,7 +18,7 @@ import {
   CHESS_CLOCK_DISPLAY_RED_MS,
   CHESS_CLOCK_SOUND_TICK_MS,
   CHESS_CLOCK_SOUND_ALARM_MS,
-} from '@/lib/socket/chessClock';
+} from '@/lib/timing/chessClock';
 
 describe('chessClock', () => {
   it('creates a fresh clock with full bank and no active player', () => {
@@ -310,5 +310,41 @@ describe('chessClock', () => {
     snapshotForBroadcast(armed, t0 + 15_000);
     expect(armed.player1).toBe(originalPlayer1Ref);
     expect(armed.player1.remainingMs).toBe(CHESS_CLOCK_INITIAL_MS);
+  });
+
+  it('createChessClock rejects negative or non-finite initial bank and falls back to default', () => {
+    expect(createChessClock(-1000).player1.remainingMs).toBe(CHESS_CLOCK_INITIAL_MS);
+    expect(createChessClock(Number.NaN).player1.remainingMs).toBe(CHESS_CLOCK_INITIAL_MS);
+    expect(createChessClock(Number.POSITIVE_INFINITY).player1.remainingMs).toBe(CHESS_CLOCK_INITIAL_MS);
+    expect(createChessClock(0).player1.remainingMs).toBe(0);
+  });
+
+  it('bankEmpty correctly identifies an empty bank on a freshly snapshotted state', () => {
+    const t0 = 1_000_000;
+    const c = arm(createChessClock(1_000), 'player1', t0);
+    const snap = snapshotForBroadcast(c, t0 + 1_000);
+    expect(snap.player1.remainingMs).toBe(0);
+    expect(bankEmpty(snap, t0 + 1_000)).toBe(true);
+    expect(bankEmpty(snap, t0 + 5_000)).toBe(true);
+  });
+
+  it('handles server clock going backwards without granting negative time', () => {
+    const t0 = 1_000_000;
+    let c = arm(createChessClock(), 'player1', t0);
+    c = disarm(c, t0 - 5_000);
+    expect(c.player1.remainingMs).toBe(CHESS_CLOCK_INITIAL_MS);
+    c = arm(c, 'player1', t0);
+    expect(idleMs(c, t0 - 1_000)).toBe(0);
+    expect(snapshotRemaining(c, 'player1', t0 - 1_000)).toBe(CHESS_CLOCK_INITIAL_MS);
+  });
+
+  it('consumeIdleWarning is idempotent when already consumed', () => {
+    const t0 = 1_000_000;
+    let c = arm(createChessClock(), 'player1', t0);
+    c = consumeIdleWarning(c);
+    c = consumeIdleWarning(c);
+    c = consumeIdleWarning(c);
+    expect(hasIdleWarning(c, 'player1')).toBe(true);
+    expect(hasIdleWarning(c, 'player2')).toBe(false);
   });
 });
