@@ -20,8 +20,8 @@ export const SET_REGISTRY: Record<string, SetDescriptor> = {
   },
   SS: {
     id: 'SS',
-    nameEn: 'Shinobi Shinren',
-    nameFr: 'Shinobi Shinren',
+    nameEn: 'Shinobi Shiren',
+    nameFr: 'Shinobi Shiren',
     status: 'coming_soon',
     boosterImage: '/images/booster-SS.webp',
   },
