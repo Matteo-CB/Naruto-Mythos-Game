@@ -13,6 +13,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
     "@prisma/client": "^6.19.2",
+    "@tanstack/react-virtual": "^3.13.24",
     "bcryptjs": "^3.0.3",
     "express": "^5.2.1",
     "framer-motion": "^12.34.0",

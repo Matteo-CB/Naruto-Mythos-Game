@@ -310,14 +310,47 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
       const ageMs = Date.now() - startedMs;
       if (ageMs < 60_000) continue;
       console.log(`[Tournament] Orphan match detected ${m.id} (room ${m.roomCode} gone, age ${Math.round(ageMs / 1000)}s), resetting to ready`);
-      const newStatus = m.player1Id && m.player2Id ? 'ready' : 'pending';
+      const newStatus: 'ready' | 'pending' = m.player1Id && m.player2Id ? 'ready' : 'pending';
       await prisma.tournamentMatch.update({
         where: { id: m.id },
         data: { status: newStatus, roomCode: null, startedAt: null, absenceDeadline: null, absentPlayerId: null },
       });
+      matchReadyPlayers.delete(m.id);
       io.to(`tournament:${m.tournamentId}`).emit('tournament:match-updated', {
         matchId: m.id, status: newStatus, roomCode: null,
       });
+
+      if (newStatus === 'ready' && m.player1Id && m.player2Id) {
+        const tournamentId = m.tournamentId;
+        const matchId = m.id;
+        const p1 = m.player1Id;
+        const p2 = m.player2Id;
+        const tournament = await prisma.tournament.findUnique({
+          where: { id: tournamentId }, select: { format: true },
+        });
+        const isSwiss = tournament?.format === 'swiss';
+        const deadline = startAbsenceTimer(matchId, async () => {
+          const ready = matchReadyPlayers.get(matchId);
+          const absent1 = !ready?.has(p1);
+          const absent2 = !ready?.has(p2);
+          if (isSwiss && absent1 && absent2) {
+            await handleSwissDoubleAbsence(io, tournamentId, matchId);
+          } else if (absent1 && absent2) {
+            await handleMatchForfeit(io, tournamentId, matchId, p1);
+          } else {
+            const forfeitId = absent1 ? p1 : p2;
+            await handleMatchForfeit(io, tournamentId, matchId, forfeitId);
+          }
+          matchReadyPlayers.delete(matchId);
+        });
+        await prisma.tournamentMatch.update({
+          where: { id: matchId },
+          data: { absenceDeadline: deadline, absentPlayerId: null },
+        });
+        io.to(`tournament:${tournamentId}`).emit('tournament:absence-timer', {
+          matchId, playerId: null, deadline: deadline.toISOString(),
+        });
+      }
     }
   } catch (err) {
     console.error('[Tournament] sweepOrphanTournamentMatches error:', err);
@@ -331,33 +364,70 @@ export async function rehydrateAbsenceTimers(io: Server): Promise<void> {
       where: {
         absenceDeadline: { not: null },
         status: { in: ['ready', 'pending'] },
-        absentPlayerId: { not: null },
       },
       select: {
         id: true,
         tournamentId: true,
         absenceDeadline: true,
         absentPlayerId: true,
+        player1Id: true,
+        player2Id: true,
+        round: true,
       },
     });
 
+    const tournamentFormats = new Map<string, string>();
+    async function getFormat(tournamentId: string): Promise<string> {
+      const cached = tournamentFormats.get(tournamentId);
+      if (cached) return cached;
+      const t = await prisma.tournament.findUnique({
+        where: { id: tournamentId }, select: { format: true },
+      });
+      const f = t?.format ?? 'elimination';
+      tournamentFormats.set(tournamentId, f);
+      return f;
+    }
+
     for (const m of pendingMatches) {
-      if (!m.absenceDeadline || !m.absentPlayerId) continue;
+      if (!m.absenceDeadline) continue;
       const remaining = m.absenceDeadline.getTime() - Date.now();
-      if (remaining <= 0) {
-        console.log(`[Tournament] Rehydrate: deadline already passed for match ${m.id}, forfeiting now`);
-        await handleMatchForfeit(io, m.tournamentId, m.id, m.absentPlayerId).catch((err) => {
-          console.error(`[Tournament] Rehydrate forfeit error for ${m.id}:`, err);
-        });
-        continue;
-      }
       const tournamentId = m.tournamentId;
       const matchId = m.id;
-      const absentPlayerId = m.absentPlayerId;
-      scheduleAbsenceTimerWithDeadline(matchId, m.absenceDeadline, async () => {
-        await handleMatchForfeit(io, tournamentId, matchId, absentPlayerId);
+      const p1 = m.player1Id;
+      const p2 = m.player2Id;
+
+      const onFire = async () => {
+        const format = await getFormat(tournamentId);
+        const isSwiss = format === 'swiss';
+        const ready = matchReadyPlayers.get(matchId);
+
+        if (m.absentPlayerId) {
+          await handleMatchForfeit(io, tournamentId, matchId, m.absentPlayerId);
+          matchReadyPlayers.delete(matchId);
+          return;
+        }
+
+        if (!p1 || !p2) return;
+        const absent1 = !ready?.has(p1);
+        const absent2 = !ready?.has(p2);
+        if (isSwiss && absent1 && absent2) {
+          await handleSwissDoubleAbsence(io, tournamentId, matchId);
+        } else if (absent1 && absent2) {
+          await handleMatchForfeit(io, tournamentId, matchId, p1);
+        } else {
+          const forfeitId = absent1 ? p1 : p2;
+          await handleMatchForfeit(io, tournamentId, matchId, forfeitId);
+        }
         matchReadyPlayers.delete(matchId);
-      });
+      };
+
+      if (remaining <= 0) {
+        console.log(`[Tournament] Rehydrate: deadline already passed for match ${matchId}, firing now`);
+        onFire().catch((err) => console.error(`[Tournament] Rehydrate forfeit error for ${matchId}:`, err));
+        continue;
+      }
+
+      scheduleAbsenceTimerWithDeadline(matchId, m.absenceDeadline, onFire);
       console.log(`[Tournament] Rehydrated absence timer for match ${matchId}, fires in ${Math.round(remaining / 1000)}s`);
     }
   } catch (err) {
@@ -378,6 +448,27 @@ async function autoForfeitIfEliminated(
     select: { userId: true },
   });
   if (elim.length === 0) return false;
+
+  if (elim.length === 2) {
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: tournamentId }, select: { format: true },
+    });
+    if (tournament?.format === 'swiss') {
+      logMatchEvent({
+        type: 'match.auto-forfeit.eliminated.both',
+        tournamentId,
+        matchId,
+        bracket: m.bracket ?? undefined,
+        round: m.round,
+        matchIndex: m.matchIndex,
+        forfeitedPlayerId: m.player1Id,
+        forfeitedPlayer2Id: m.player2Id,
+      });
+      await handleSwissDoubleAbsence(io, tournamentId, matchId);
+      return true;
+    }
+  }
+
   const elimId = elim[0].userId;
   logMatchEvent({
     type: 'match.auto-forfeit.eliminated',
@@ -400,6 +491,14 @@ export async function handleSwissDoubleAbsence(io: Server, tournamentId: string,
     where: { id: matchId },
     data: { status: 'forfeit', winnerId: null, winnerUsername: null, completedAt: new Date() },
   });
+
+  const absentIds = [match.player1Id, match.player2Id].filter((id): id is string => !!id);
+  if (absentIds.length > 0) {
+    await prisma.tournamentParticipant.updateMany({
+      where: { tournamentId, userId: { in: absentIds } },
+      data: { eliminated: true, eliminatedRound: match.round },
+    });
+  }
 
   logMatchEvent({
     type: 'match.forfeit.double',
@@ -460,7 +559,7 @@ async function handleMatchForfeit(io: Server, tournamentId: string, matchId: str
   const isSwiss = tournament?.format === 'swiss';
   const isDoubleElim = tournament?.format === 'double_elimination';
 
-  if (!isSwiss && !isDoubleElim) {
+  if (!isDoubleElim) {
     await prisma.tournamentParticipant.updateMany({
       where: { tournamentId, userId: forfeitPlayerId },
       data: { eliminated: true, eliminatedRound: match.round },
@@ -479,6 +578,56 @@ async function handleMatchForfeit(io: Server, tournamentId: string, matchId: str
     } else {
       await advanceMatchWinner(io, tournamentId, match, winnerId, winnerUsername);
     }
+  }
+}
+
+export async function startInitialRoundAbsenceTimers(io: Server, tournamentId: string): Promise<void> {
+  const tournament = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { format: true, currentRound: true },
+  });
+  if (!tournament) return;
+  const isSwiss = tournament.format === 'swiss';
+  const isDoubleElim = tournament.format === 'double_elimination';
+  const round = tournament.currentRound;
+
+  const initialMatches = await prisma.tournamentMatch.findMany({
+    where: {
+      tournamentId,
+      round,
+      status: 'ready',
+      isBye: false,
+      absenceDeadline: null,
+      ...(isDoubleElim ? { bracket: 'winners' } : {}),
+    },
+  });
+
+  for (const nm of initialMatches) {
+    if (!nm.player1Id || !nm.player2Id) continue;
+    const matchId = nm.id;
+    const p1 = nm.player1Id;
+    const p2 = nm.player2Id;
+    const deadline = startAbsenceTimer(matchId, async () => {
+      const ready = matchReadyPlayers.get(matchId);
+      const absent1 = !ready?.has(p1);
+      const absent2 = !ready?.has(p2);
+      if (isSwiss && absent1 && absent2) {
+        await handleSwissDoubleAbsence(io, tournamentId, matchId);
+      } else if (absent1 && absent2) {
+        await handleMatchForfeit(io, tournamentId, matchId, p1);
+      } else {
+        const forfeitId = absent1 ? p1 : p2;
+        await handleMatchForfeit(io, tournamentId, matchId, forfeitId);
+      }
+      matchReadyPlayers.delete(matchId);
+    });
+    await prisma.tournamentMatch.update({
+      where: { id: matchId },
+      data: { absenceDeadline: deadline, absentPlayerId: null },
+    });
+    io.to(`tournament:${tournamentId}`).emit('tournament:absence-timer', {
+      matchId, playerId: null, deadline: deadline.toISOString(),
+    });
   }
 }
 
@@ -597,6 +746,58 @@ export async function handleSwissMatchEnd(
         io.to(`tournament:${tournamentId}`).emit('tournament:cancelled', { reason: 'all_eliminated', tournamentId });
         await cleanupTournamentMaps(tournamentId);
         return;
+      }
+      if (activeCount === 1) {
+        const winner = standings.find(s => !eliminatedIds.has(s.userId));
+        if (winner) {
+          await prisma.tournament.update({
+            where: { id: tournamentId },
+            data: {
+              status: 'completed',
+              winnerId: winner.userId,
+              winnerUsername: winner.username,
+              completedAt: new Date(),
+            },
+          });
+          const updatedUser = await prisma.user.update({
+            where: { id: winner.userId },
+            data: { tournamentWins: { increment: 1 } },
+          });
+          logMatchEvent({
+            type: 'tournament.completed',
+            tournamentId,
+            winnerId: winner.userId,
+            format: 'swiss',
+          });
+          io.to(`tournament:${tournamentId}`).emit('tournament:completed', {
+            winnerId: winner.userId,
+            winnerUsername: winner.username,
+            standings,
+          });
+          await cleanupTournamentMaps(tournamentId);
+          let assignedRoleName: string | null = null;
+          try {
+            assignedRoleName = await assignTournamentWinnerRole(winner.userId, updatedUser.tournamentWins);
+          } catch (err) {
+            console.error('[Tournament] Discord role assign error:', err);
+          }
+          try {
+            const podium = standings.slice(0, 3).map((s, i) => ({
+              userId: s.userId,
+              username: s.username,
+              place: (i + 1) as 1 | 2 | 3,
+            }));
+            await sendTournamentResults(
+              tournament.name,
+              podium,
+              tournament.participants.length,
+              assignedRoleName,
+            );
+          } catch (err) {
+            console.error('[Tournament] Discord webhook error:', err);
+          }
+          return;
+        }
       }
       const pairings = generateSwissPairings(swissPlayers, swissResults, nextRound, eliminatedIds);
 

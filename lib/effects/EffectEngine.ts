@@ -1865,7 +1865,7 @@ export class EffectEngine {
                 player: pendingEffect.sourcePlayer,
                 description: `Gaara (139) UPGRADE: Choose an enemy ${gaara139DefeatedName} to hide.`,
                 descriptionKey: 'game.effect.desc.gaara139HideSameName',
-                descriptionParams: { target: gaara139DefeatedName },
+                descriptionParams: { target: gaara139DefeatedName, cost: String(gaara139DefeatedCost) },
                 options: hideTargets,
                 minSelections: 1,
                 maxSelections: 1,
@@ -2171,7 +2171,7 @@ export class EffectEngine {
           newState = { ...newState, activeMissions: missions_h002u };
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT', 'Hiruzen Sarutobi (002): POWERUP 2 applied to the played character (UPGRADE effect).',
-            'game.log.effect.powerup', { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', amount: '2' });
+            'game.log.effect.powerup', { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', amount: '2', target: h002Res.character.card.name_fr });
         }
         
         delete (newState as any)._hiruzen002PlayedCharId;
@@ -2645,7 +2645,7 @@ export class EffectEngine {
 
         newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
           'EFFECT_LOOK_HAND', 'Sasuke Uchiwa (014): Revealed all cards in opponent\'s hand.',
-          'game.log.effect.sasuke014Reveal', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
+          'game.log.effect.sasuke014RevealAll', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
 
         const s014EffId = generateInstanceId();
         const s014ActId = generateInstanceId();
@@ -2668,7 +2668,7 @@ export class EffectEngine {
           id: s014ActId, type: 'SELECT_TARGET' as PendingAction['type'],
           player: pendingEffect.sourcePlayer,
           description: JSON.stringify({ text: 'Opponent hand revealed.', cards: allCards014 }),
-          descriptionKey: 'game.effect.desc.sasuke014Reveal',
+          descriptionKey: 'game.effect.desc.sasuke014RevealAll',
           options: ['confirm'], minSelections: 1, maxSelections: 1,
           sourceEffectId: s014EffId,
         }];
@@ -2699,7 +2699,7 @@ export class EffectEngine {
 
         newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
           'EFFECT_LOOK_HAND', 'Sasuke Uchiwa (014): Revealed all cards in opponent\'s hand.',
-          'game.log.effect.sasuke014Reveal', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
+          'game.log.effect.sasuke014RevealAll', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
 
         
         const s014umEffId = generateInstanceId();
@@ -2723,7 +2723,7 @@ export class EffectEngine {
           id: s014umActId, type: 'SELECT_TARGET' as PendingAction['type'],
           player: pendingEffect.sourcePlayer,
           description: JSON.stringify({ text: 'Opponent hand revealed.', cards: allCards014um }),
-          descriptionKey: 'game.effect.desc.sasuke014Reveal',
+          descriptionKey: 'game.effect.desc.sasuke014RevealAll',
           options: ['confirm'], minSelections: 1, maxSelections: 1,
           sourceEffectId: s014umEffId,
         }];
@@ -3798,11 +3798,12 @@ export class EffectEngine {
         }
 
         if (k035Targets.length === 1) {
-          
+          const k035TargetChar = EffectEngine.findCharByInstanceId(newState, k035Targets[0]);
+          const k035TargetName = k035TargetChar?.character.card.name_fr ?? 'enemy';
           newState = EffectEngine.defeatCharacter(newState, k035Targets[0], k035Player);
           newState.log = logAction(newState.log, newState.turn, newState.phase, k035Player,
             'EFFECT_DEFEAT', 'Yuhi Kurenai (035): Defeated enemy character with Power 1 or less (upgrade).',
-            'game.log.effect.defeat', { card: 'YUHI KURENAI', id: 'KS-035-UC' });
+            'game.log.effect.defeat', { card: 'YUHI KURENAI', id: 'KS-035-UC', target: k035TargetName });
           break;
         }
 
@@ -4749,7 +4750,7 @@ export class EffectEngine {
             newState.log, newState.turn, newState.phase, kb054mPlayer,
             'EFFECT_HIDE',
             `Kabuto Yakushi (054): Hid ${kb054mHiddenCount} character(s) in this mission.`,
-            'game.log.effect.hide',
+            'game.log.effect.hideMultiple',
             { card: 'KABUTO YAKUSHI', id: 'KS-054-UC', count: String(kb054mHiddenCount) },
           );
         }
@@ -5018,7 +5019,7 @@ export class EffectEngine {
         newState = { ...newState, activeMissions: missions_j058 };
         newState.log = logAction(newState.log, newState.turn, newState.phase, j058Player,
           'EFFECT_POWERUP', `Jirobo (058) MAIN: POWERUP 1 on ${j058Targets.length} Sound Four character(s) in this mission.`,
-          'game.log.effect.powerup', { card: 'JIROBO', id: 'KS-058-UC', amount: '1', count: j058Targets.length });
+          'game.log.effect.powerupMultiple', { card: 'JIROBO', id: 'KS-058-UC', amount: '1', count: j058Targets.length });
         break;
       }
 
@@ -5063,7 +5064,7 @@ export class EffectEngine {
         newState = { ...newState, activeMissions: missions_j058u };
         newState.log = logAction(newState.log, newState.turn, newState.phase, j058uPlayer,
           'EFFECT_POWERUP', `Jirobo (058) UPGRADE: POWERUP 1 on ${j058uTargets.length} Sound Four character(s) in other missions.`,
-          'game.log.effect.powerup', { card: 'JIROBO', id: 'KS-058-UC', amount: '1', count: j058uTargets.length });
+          'game.log.effect.powerupMultiple', { card: 'JIROBO', id: 'KS-058-UC', amount: '1', count: j058uTargets.length });
         break;
       }
 
@@ -5568,6 +5569,7 @@ export class EffectEngine {
               topCards: cardInfos065,
             }),
             descriptionKey: 'game.effect.desc.tayuya065UpgradeReveal',
+            descriptionParams: { looked: String(lookCount065), drawn: '0' },
             options: ['confirm'], minSelections: 1, maxSelections: 1,
             sourceEffectId: t065rEffId,
           }];
@@ -6240,7 +6242,7 @@ export class EffectEngine {
         newState = { ...newState, activeMissions: missions_k073u };
         newState.log = logAction(newState.log, newState.turn, newState.phase, k073uPlayer,
           'EFFECT', 'Kin Tsuchi (073) UPGRADE: Placed top card of deck as hidden character.',
-          'game.log.effect.placeHidden', { card: 'KIN TSUCHI', id: 'KS-073-UC' });
+          'game.log.effect.placeHidden', { card: 'KIN TSUCHI', id: 'KS-073-UC', mission: String(k073uMI + 1) });
         break;
       }
 
@@ -6666,10 +6668,12 @@ export class EffectEngine {
         }
 
         if (b082sTargets.length === 1) {
+          const b082Target = EffectEngine.findCharByInstanceId(newState, b082sTargets[0]);
+          const b082TargetName = b082Target?.character.card.name_fr ?? 'hidden character';
           newState = EffectEngine.defeatCharacter(newState, b082sTargets[0], b082sPlayer);
           newState.log = logAction(newState.log, newState.turn, newState.phase, b082sPlayer,
             'SCORE_DEFEAT', 'Baki (082): [SCORE] Defeated the only hidden character in play.',
-            'game.log.score.defeat', { card: 'BAKI', id: 'KS-082-UC' });
+            'game.log.score.defeat', { card: 'BAKI', target: b082TargetName });
           break;
         }
 
@@ -6930,7 +6934,7 @@ export class EffectEngine {
         if (isMovementBlockedByKurenai(newState, p099MI, p099Player)) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, p099Player,
             'EFFECT_BLOCKED', 'Pakkun (099): Movement blocked by Kurenai Yuhi (035).',
-            'game.log.effect.moveBlocked', { card: 'PAKKUN', id: 'KS-099-C' });
+            'game.log.effect.moveBlocked', { card: 'PAKKUN', id: 'KS-099-C', target: 'PAKKUN' });
           break;
         }
         const p099ValidDests: string[] = [];
@@ -7391,7 +7395,7 @@ export class EffectEngine {
         if (ctm107CharMission >= 0 && isMovementBlockedByKurenai(newState, ctm107CharMission, ctm107Player)) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, ctm107Player,
             'EFFECT_BLOCKED', `Sasuke Uchiwa (107): Movement of ${ctm107CharName} blocked by Kurenai Yuhi (035).`,
-            'game.log.effect.moveBlocked', { card: 'SASUKE UCHIWA', id: 'KS-107-R' });
+            'game.log.effect.moveBlocked', { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: ctm107CharName });
           
           
         } else {
@@ -10182,13 +10186,15 @@ export class EffectEngine {
             }
           }
           if (validDestMissions.length === 0) {
-            
+
+            const blockedMoveSrc = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+            const blockedMoveSrcName = blockedMoveSrc?.character.card.name_fr ?? 'Character';
             newState.log = logAction(
               newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
               'EFFECT_BLOCKED',
               `Cannot move ${moveCharResult.character.card.name_fr} â€' no valid destination mission.`,
               'game.log.effect.moveBlocked',
-              { target: moveCharResult.character.card.name_fr },
+              { card: blockedMoveSrcName, id: pendingEffect.sourceCardId, target: moveCharResult.character.card.name_fr },
             );
           } else if (validDestMissions.length === 1) {
             
@@ -10354,12 +10360,14 @@ export class EffectEngine {
             }
           }
           if (charSourceMission107 >= 0 && isMovementBlockedByKurenai(newState, charSourceMission107, player107)) {
+            const blocked107Char = EffectEngine.findCharByInstanceId(newState, charId107);
+            const blocked107Name = blocked107Char?.character.card.name_fr ?? 'character';
             newState.log = logAction(
               newState.log, newState.turn, newState.phase, player107,
               'EFFECT_BLOCKED',
               `Sasuke Uchiwa (107): Movement blocked by Kurenai Yuhi (035) - character stays in place.`,
               'game.log.effect.moveBlocked',
-              { card: 'SASUKE UCHIWA', id: 'KS-107-R' },
+              { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: blocked107Name },
             );
           } else {
             
@@ -11632,7 +11640,7 @@ export class EffectEngine {
         };
         newState.log = logAction(newState.log, newState.turn, newState.phase, o138Player,
           'EFFECT_POINTS', `Orochimaru (138): Gained 2 mission points (upgraded from ${o138Parsed.previousCardName ?? 'unknown'} with Power ${o138Parsed.previousCardPower ?? '?'}).`,
-          'game.log.effect.gainPoints', { card: 'OROCHIMARU', id: 'KS-138-S', amount: 2 });
+          'game.log.effect.gainPoints', { card: 'OROCHIMARU', id: 'KS-138-S', points: 2 });
         break;
       }
 
@@ -13253,7 +13261,7 @@ export class EffectEngine {
             newState.log, newState.turn, newState.phase, batchSourceP,
             'EFFECT_HIDE',
             `Kabuto Yakushi (054): Hid ${batchHiddenCount} character(s) in this mission.`,
-            'game.log.effect.hide',
+            'game.log.effect.hideMultiple',
             { card: 'KABUTO YAKUSHI', id: 'KS-054-UC', count: String(batchHiddenCount) },
           );
         }
@@ -14940,12 +14948,13 @@ export class EffectEngine {
           if (removeTargetId) {
             newState = EffectEngine.removeTokensFromTarget(newState, removeTargetId, amountRemove);
             const removedChar = EffectEngine.findCharByInstanceId(newState, removeTargetId);
+            const removeSrc = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
             newState.log = logAction(
               newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
               'EFFECT_REMOVE_TOKENS',
               `Removed ${amountRemove} Power token(s) from ${removedChar?.character.card.name_fr ?? 'target'}.`,
               'game.log.effect.removeTokens',
-              { amount: amountRemove, target: removedChar?.character.card.name_fr ?? 'target' },
+              { card: removeSrc?.character.card.name_fr ?? 'Character', id: pendingEffect.sourceCardId, amount: amountRemove, target: removedChar?.character.card.name_fr ?? 'target' },
             );
           }
         }
@@ -14963,12 +14972,13 @@ export class EffectEngine {
             newState = EffectEngine.removeTokensFromTarget(newState, stealFromId, amountSteal);
             newState = EffectEngine.applyPowerupToTarget(newState, stealToId, amountSteal);
             const stolenFromChar = EffectEngine.findCharByInstanceId(newState, stealFromId);
+            const stealSrc = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
             newState.log = logAction(
               newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
               'EFFECT_STEAL_TOKENS',
               `Stole ${amountSteal} Power token(s) from ${stolenFromChar?.character.card.name_fr ?? 'target'}.`,
               'game.log.effect.stealTokens',
-              { amount: amountSteal, target: stolenFromChar?.character.card.name_fr ?? 'target' },
+              { card: stealSrc?.character.card.name_fr ?? 'Character', id: pendingEffect.sourceCardId, amount: amountSteal, target: stolenFromChar?.character.card.name_fr ?? 'target' },
             );
           }
         }
@@ -15180,8 +15190,8 @@ export class EffectEngine {
         loggedState.log, loggedState.turn, loggedState.phase, charResult.player,
         'EFFECT_BLOCKED',
         `Cannot move ${charResult.character.card.name_fr} to mission ${destMissionIndex + 1} â€' a character with the same name already exists there.`,
-        'game.log.effect.moveBlocked',
-        { target: charResult.character.card.name_fr },
+        'game.log.effect.moveBlockedNameConflict',
+        { target: charResult.character.card.name_fr, mission: String(destMissionIndex + 1) },
       );
       return loggedState;
     }
@@ -17936,7 +17946,7 @@ export class EffectEngine {
         'EFFECT_UPGRADE',
         `Jiraiya effect: Upgraded ${card.name_fr} as Summon on mission ${missionIndex + 1} for ${cost} chakra.`,
         'game.log.effect.upgradeSummon',
-        { card: 'Jiraya', target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
+        { card: 'JIRAIYA', id: 'KS-007-C', target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
       );
     } else {
       
@@ -18861,7 +18871,7 @@ export class EffectEngine {
       'EFFECT_MOVE',
       `${effectCardName} (${effectCardId}): Moved ${movedCharName} from mission ${charResult.missionIndex + 1} to mission ${destMissionIndex + 1}.`,
       'game.log.effect.move',
-      { card: effectCardName, id: effectCardId, target: movedCharName, mission: `mission ${destMissionIndex + 1}` },
+      { card: effectCardName, id: effectCardId, target: movedCharName, from: String(charResult.missionIndex + 1), to: String(destMissionIndex + 1) },
     );
 
     

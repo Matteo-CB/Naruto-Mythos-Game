@@ -1,6 +1,23 @@
 {
   "entries": [
     {
+      "date": "2026-05-12",
+      "title_fr": "Connexion en ligne et tournois",
+      "title_en": "Online connection and tournaments",
+      "changes_fr": [
+        "Les petites coupures de connexion en partie (moins de 15 secondes) ne comptent plus dans le quota de déconnexions et ne déclenchent plus de forfait surprise quand tu reviens vite. Le délai de grâce passe aussi à 1 minute 30.",
+        "Page tournoi : un panneau au-dessus du bracket montre en direct l'état de chaque match du round en cours (en attente, en partie, terminé), avec le temps écoulé et le compte à rebours d'absence pour chaque match.",
+        "Chaque case du bracket affiche aussi son propre mini chrono d'absence quand un joueur risque le forfait.",
+        "Tournois : tu peux maintenant quitter un tournoi en cours, ton match actif est alors forfaité proprement et le tour suivant continue normalement."
+      ],
+      "changes_en": [
+        "Brief network blips in-game (under 15 seconds) no longer count toward the disconnect cap and no longer trigger a surprise forfeit when you reconnect quickly. The grace period also bumps to 1 minute 30.",
+        "Tournament page: a live panel above the bracket shows the state of every match in the current round (waiting, playing, finished), with elapsed time and the absence countdown per match.",
+        "Each bracket cell also shows its own small absence countdown when a player is at risk of forfeit.",
+        "Tournaments: you can now leave a tournament in progress; your active match is forfeited cleanly and the next round continues normally."
+      ]
+    },
+    {
       "date": "2026-05-11",
       "title_fr": "Mobile, profil et corrections",
       "title_en": "Mobile, profile and fixes",
@@ -8,13 +25,49 @@
         "Sur téléphone, le terrain garde maintenant des proportions strictes et tout est dimensionné par rapport à l'écran, comme dans un jeu à résolution fixe.",
         "Profil : la section Stats des decks n'affiche plus que les decks joués dans les 90 derniers jours.",
         "Refonte complète du classement, du profil et de la page Amis dans une nouvelle direction visuelle.",
-        "Page Amis enrichie : bilan face à face contre chaque ami, badge Rival pour l'adversaire le plus joué, séries en cours et tournois gagnés affichés directement, fil d'activité des 7 derniers jours."
+        "Page Amis enrichie : bilan face à face contre chaque ami, badge Rival pour l'adversaire le plus joué, séries en cours et tournois gagnés affichés directement, fil d'activité des 7 derniers jours.",
+        "Beaucoup d'entrees du journal de partie et de fenetres d'effet sont corrigees : deplacements, blocages, effets de Kabuto, Itachi, Gaara, Sasuke, Baki, Jirôbô, Kin, Dosu, Tayuya, Ino et Hiruzen affichent enfin le bon texte avec les bons noms.",
+        "Les illustrations des cartes pesent maintenant deux fois moins lourd, ce qui rend le site plus rapide partout, surtout en debut de partie et sur mobile.",
+        "Le fond nuageux animé, plusieurs effets lumineux et la sélection des cibles consomment beaucoup moins de ressources : les pages sont plus fluides et la batterie tient plus longtemps en partie.",
+        "Les animations s'arrêtent quand tu passes sur un autre onglet, pour ne plus tourner pour rien en arrière-plan.",
+        "Le deck builder ne dessine plus que les cartes visibles, le défilement est nettement plus fluide même avec toute la collection ouverte.",
+        "Les fenêtres de sélection de cibles en partie ouvrent et ferment plus rapidement, sans temps mort.",
+        "Le site garde maintenant en mémoire les ressources qu'il a déjà téléchargées : tes visites suivantes chargent quasi instantanément.",
+        "Tournois : un joueur absent au début de son match est désormais disqualifié automatiquement après le délai, et le tournoi continue sans rester bloqué (premier round inclus, peu importe le format).",
+        "Panneau admin du tournoi : les listes déroulantes se laissent enfin sélectionner sans se refermer immédiatement.",
+        "Tournois : le forfait manuel par l'admin élimine désormais correctement le joueur en Swiss, qui n'est plus apparié au tour suivant.",
+        "Tournois : après un redémarrage serveur, les chronos d'absence en cours sont correctement repris, même pour le premier tour.",
+        "Tournois Swiss : quand il ne reste plus qu'un joueur actif, le tournoi se termine immédiatement avec ce joueur déclaré vainqueur, au lieu de tourner à vide.",
+        "En partie, le journal et les animations ne se redessinent plus à chaque coup mais uniquement quand quelque chose change vraiment, ce qui réduit nettement le travail du téléphone et améliore la fluidité.",
+        "Le décompte de temps d'action ne tourne plus en arrière-plan quand tu changes d'onglet, et reprend exact à la seconde près à ton retour.",
+        "Page d'accueil : les rafraîchissements automatiques s'arrêtent quand tu changes d'onglet, ce qui évite de tirer pour rien sur la batterie et la connexion.",
+        "Shikamaru Nara (022) : son embuscade trouve désormais l'ennemi joué lors de la manche précédente quand Shikamaru est révélé au début d'une nouvelle manche, et plus seulement dans la même manche.",
+        "Sur téléphone en partie, la fenêtre de détail d'une carte prend maintenant tout l'écran avec l'image et le texte côte à côte, au lieu d'un petit panneau écrasé en bas.",
+        "Sur téléphone, toutes les fenêtres en partie (mulligan, choix de cibles, choix d'effets, etc.) s'étalent maintenant sur quasi toute la largeur de l'écran au lieu d'être bridées à 400-560 pixels, et le texte y est nettement plus lisible."
       ],
       "changes_en": [
         "On phone, the board now keeps strict proportions and everything is sized relative to the screen, like a fixed-resolution game.",
         "Profile: the Deck Stats section now only shows decks played in the last 90 days.",
         "Full redesign of the leaderboard, profile and Friends pages in a new visual direction.",
-        "Friends page now shows head-to-head records against each friend, a Rival tag for your most-played opponent, active streaks and tournament wins inline, and a 7-day activity feed."
+        "Friends page now shows head-to-head records against each friend, a Rival tag for your most-played opponent, active streaks and tournament wins inline, and a 7-day activity feed.",
+        "Many game log entries and effect popups are fixed: movements, blocks, Kabuto/Itachi/Gaara/Sasuke/Baki/Jirobo/Kin/Dosu/Tayuya/Ino/Hiruzen effects now display the correct text with the right character names.",
+        "Card art is now about half the weight, making the site faster across the board, especially at the start of a game and on mobile.",
+        "Animated cloud background, several glow effects and target selection use far fewer resources: pages feel smoother and battery lasts longer during a game.",
+        "Animations now pause when you switch to another tab, so nothing keeps running in the background for no reason.",
+        "The deck builder now only draws cards that are visible, so scrolling through the full collection is much smoother.",
+        "Target selection popups in-game open and close faster, with no lag.",
+        "The site now keeps in memory the resources it has already downloaded: your next visits load almost instantly.",
+        "Tournaments: a player missing at the start of their match is now disqualified automatically after the timer, and the tournament keeps moving forward instead of stalling (round one included, all formats).",
+        "Tournament admin panel: dropdown menus can now actually be used without immediately closing.",
+        "Tournaments: manual admin forfeit now properly eliminates the player in Swiss, so they are no longer paired in the next round.",
+        "Tournaments: after a server restart, ongoing absence timers resume correctly, including for round one.",
+        "Swiss tournaments: when only one active player remains, the tournament ends immediately with that player as the winner instead of stalling.",
+        "In-game, the log and animations no longer redraw on every action and only react when something actually changes, noticeably easing the phone's workload and smoothing gameplay.",
+        "The action timer no longer keeps running in the background when you switch tabs, and resumes precisely to the second when you come back.",
+        "Home page: auto-refresh stops when you switch tabs, saving battery and bandwidth.",
+        "Shikamaru Nara (022): his ambush now finds the enemy played during the previous round when Shikamaru is revealed at the start of a new round, not just within the same round.",
+        "On phone in-game, the card detail window now takes the full screen with the image and text side by side, instead of a small panel squashed at the bottom.",
+        "On phone, all in-game popups (mulligan, target selection, effect choices, etc.) now span almost the full width of the screen instead of being capped at 400-560 pixels, with much more readable text."
       ]
     },
     {

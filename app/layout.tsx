@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import Script from "next/script";
 import { cookies } from "next/headers";
+import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -168,7 +169,7 @@ export default async function RootLayout({
   return (
     <html lang={lang} className="dark" suppressHydrationWarning>
       <head>
-        <link rel="preload" href="/fonts/njnaruto.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/njnaruto-accented.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
         <link rel="prefetch" href="/images/cards/KS/rare_art/KS-108-RA.webp" />
@@ -192,6 +193,7 @@ export default async function RootLayout({
           </div>
         </noscript>
         {children}
+        <ServiceWorkerRegistrar />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-7R10MZLMBD"
           strategy="afterInteractive"

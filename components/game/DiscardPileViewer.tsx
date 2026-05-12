@@ -93,6 +93,8 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
                               draggable={false}
                               className="w-full"
                               style={{ aspectRatio: '5/7', objectFit: 'cover' }}
+                              loading="lazy"
+                              decoding="async"
                             />
                           ) : (
                             <div

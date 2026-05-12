@@ -15,6 +15,41 @@ const sectionStyle = { backgroundColor: '#0d0d0d', border: '1px solid #262626', 
 const labelStyle = { color: '#888', fontSize: '10px', textTransform: 'uppercase' as const, letterSpacing: '0.08em' };
 const btnBase = 'px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider cursor-pointer transition-opacity';
 
+function SectionHeader({
+  id, label, color, currentExpanded, onToggle,
+}: { id: string; label: string; color: string; currentExpanded: string | null; onToggle: (id: string) => void }) {
+  const expanded = currentExpanded === id;
+  return (
+    <button type="button" onClick={() => onToggle(id)} className="w-full flex items-center justify-between py-1.5 cursor-pointer"
+      style={{ borderBottom: '1px solid #1e1e1e' }}>
+      <span className="text-[11px] font-medium uppercase tracking-wider" style={{ color }}>{label}</span>
+      <span className="text-[10px]" style={{ color: '#555' }}>{expanded ? '-' : '+'}</span>
+    </button>
+  );
+}
+
+function SmallSelect({
+  value, onChange, children,
+}: { value: string; onChange: (v: string) => void; children: React.ReactNode }) {
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value)}
+      className="text-[10px] px-2 py-1 w-full" style={{ backgroundColor: '#111', color: '#ccc', border: '1px solid #333' }}>
+      {children}
+    </select>
+  );
+}
+
+function ActionBtn({
+  onClick, disabled, color, loading = false, children,
+}: { onClick: () => void; disabled?: boolean; color: string; loading?: boolean; children: React.ReactNode }) {
+  return (
+    <button type="button" onClick={onClick} disabled={disabled || loading}
+      className={btnBase} style={{ backgroundColor: color, color: '#fff', opacity: (disabled || loading) ? 0.4 : 1 }}>
+      {loading ? '...' : children}
+    </button>
+  );
+}
+
 export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
   const t = useTranslations('tournament');
   const router = useRouter();
@@ -92,28 +127,6 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
 
   const toggle = (s: string) => setExpandedSection(prev => prev === s ? null : s);
 
-  const SectionHeader = ({ id, label, color }: { id: string; label: string; color: string }) => (
-    <button type="button" onClick={() => toggle(id)} className="w-full flex items-center justify-between py-1.5 cursor-pointer"
-      style={{ borderBottom: '1px solid #1e1e1e' }}>
-      <span className="text-[11px] font-medium uppercase tracking-wider" style={{ color }}>{label}</span>
-      <span className="text-[10px]" style={{ color: '#555' }}>{expandedSection === id ? '-' : '+'}</span>
-    </button>
-  );
-
-  const SmallSelect = ({ value, onChange, children }: { value: string; onChange: (v: string) => void; children: React.ReactNode }) => (
-    <select value={value} onChange={(e) => onChange(e.target.value)}
-      className="text-[10px] px-2 py-1 w-full" style={{ backgroundColor: '#111', color: '#ccc', border: '1px solid #333' }}>
-      {children}
-    </select>
-  );
-
-  const ActionBtn = ({ onClick, disabled, color, children }: { onClick: () => void; disabled?: boolean; color: string; children: React.ReactNode }) => (
-    <button type="button" onClick={onClick} disabled={disabled || adminLoading}
-      className={btnBase} style={{ backgroundColor: color, color: '#fff', opacity: (disabled || adminLoading) ? 0.4 : 1 }}>
-      {adminLoading ? '...' : children}
-    </button>
-  );
-
   return (
     <div className="flex flex-col gap-3 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626', borderLeft: '3px solid #c4a35a' }}>
       <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
@@ -139,7 +152,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
       
       {tour.status === 'in_progress' && activeMatches.length > 0 && (
         <div style={sectionStyle}>
-          <SectionHeader id="forfeit" label={t('forceForfeit')} color="#cc4444" />
+          <SectionHeader id="forfeit" label={t('forceForfeit')} color="#cc4444" currentExpanded={expandedSection} onToggle={toggle} />
           {expandedSection === 'forfeit' && (
             <div className="flex flex-col gap-2 mt-2">
               <SmallSelect value={forfeitMatchId} onChange={(v) => { setForfeitMatchId(v); setForfeitPlayerId(''); }}>
@@ -158,7 +171,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
                   </div>
                 );
               })()}
-              {forfeitMatchId && forfeitPlayerId && <ActionBtn onClick={handleForfeit} color="#cc4444">{t('forceForfeit')}</ActionBtn>}
+              {forfeitMatchId && forfeitPlayerId && <ActionBtn onClick={handleForfeit} color="#cc4444" loading={adminLoading}>{t('forceForfeit')}</ActionBtn>}
             </div>
           )}
         </div>
@@ -167,7 +180,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
       
       {tour.status === 'in_progress' && (
         <div style={sectionStyle}>
-          <SectionHeader id="disqualify" label={t('disqualifyPlayer')} color="#ef4444" />
+          <SectionHeader id="disqualify" label={t('disqualifyPlayer')} color="#ef4444" currentExpanded={expandedSection} onToggle={toggle} />
           {expandedSection === 'disqualify' && (
             <div className="flex flex-col gap-2 mt-2">
               <SmallSelect value={dqUserId} onChange={setDqUserId}>
@@ -176,7 +189,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
               </SmallSelect>
               <input type="text" value={dqReason} onChange={e => setDqReason(e.target.value)} placeholder={t('reasonOptional')}
                 className="text-[10px] px-2 py-1" style={{ backgroundColor: '#111', color: '#ccc', border: '1px solid #333' }} />
-              <ActionBtn onClick={() => { adminAction({ action: 'disqualify', userId: dqUserId, reason: dqReason }); setDqUserId(''); setDqReason(''); }} disabled={!dqUserId} color="#ef4444">{t('disqualify')}</ActionBtn>
+              <ActionBtn onClick={() => { adminAction({ action: 'disqualify', userId: dqUserId, reason: dqReason }); setDqUserId(''); setDqReason(''); }} disabled={!dqUserId} color="#ef4444" loading={adminLoading}>{t('disqualify')}</ActionBtn>
             </div>
           )}
         </div>
@@ -185,7 +198,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
       
       {tour.status === 'in_progress' && (
         <div style={sectionStyle}>
-          <SectionHeader id="setWinner" label={t('overrideMatchResult')} color="#f59e0b" />
+          <SectionHeader id="setWinner" label={t('overrideMatchResult')} color="#f59e0b" currentExpanded={expandedSection} onToggle={toggle} />
           {expandedSection === 'setWinner' && (
             <div className="flex flex-col gap-2 mt-2">
               <SmallSelect value={swMatchId} onChange={(v) => { setSwMatchId(v); setSwWinnerId(''); }}>
@@ -206,7 +219,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
                   </div>
                 );
               })()}
-              {swMatchId && swWinnerId && <ActionBtn onClick={() => { adminAction({ action: 'setMatchWinner', matchId: swMatchId, winnerId: swWinnerId }); setSwMatchId(''); setSwWinnerId(''); }} color="#f59e0b">{t('setWinner')}</ActionBtn>}
+              {swMatchId && swWinnerId && <ActionBtn onClick={() => { adminAction({ action: 'setMatchWinner', matchId: swMatchId, winnerId: swWinnerId }); setSwMatchId(''); setSwWinnerId(''); }} color="#f59e0b" loading={adminLoading}>{t('setWinner')}</ActionBtn>}
             </div>
           )}
         </div>
@@ -215,7 +228,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
       
       {tour.status === 'in_progress' && (
         <div style={sectionStyle}>
-          <SectionHeader id="resetMatch" label={t('resetMatch')} color="#3b82f6" />
+          <SectionHeader id="resetMatch" label={t('resetMatch')} color="#3b82f6" currentExpanded={expandedSection} onToggle={toggle} />
           {expandedSection === 'resetMatch' && (
             <div className="flex flex-col gap-2 mt-2">
               <SmallSelect value={resetMatchId} onChange={setResetMatchId}>
@@ -224,7 +237,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
                   <option key={m.id} value={m.id}>R{m.round} - {m.player1Username || '?'} vs {m.player2Username || '?'} [{m.status}]</option>
                 ))}
               </SmallSelect>
-              {resetMatchId && <ActionBtn onClick={() => { adminAction({ action: 'resetMatch', matchId: resetMatchId }); setResetMatchId(''); }} color="#3b82f6">{t('resetMatch')}</ActionBtn>}
+              {resetMatchId && <ActionBtn onClick={() => { adminAction({ action: 'resetMatch', matchId: resetMatchId }); setResetMatchId(''); }} color="#3b82f6" loading={adminLoading}>{t('resetMatch')}</ActionBtn>}
             </div>
           )}
         </div>
@@ -233,14 +246,14 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
       
       {tour.status === 'registration' && tour.participants.length > 0 && (
         <div style={sectionStyle}>
-          <SectionHeader id="removePlayer" label={t('removePlayer')} color="#f97316" />
+          <SectionHeader id="removePlayer" label={t('removePlayer')} color="#f97316" currentExpanded={expandedSection} onToggle={toggle} />
           {expandedSection === 'removePlayer' && (
             <div className="flex flex-col gap-2 mt-2">
               <SmallSelect value={removeUserId} onChange={setRemoveUserId}>
                 <option value="">{`-- ${t('selectPlayer')} --`}</option>
                 {tour.participants.filter(p => p.userId !== tour.creatorId).map(p => <option key={p.userId} value={p.userId}>{p.username}</option>)}
               </SmallSelect>
-              {removeUserId && <ActionBtn onClick={() => { adminAction({ action: 'removeParticipant', userId: removeUserId }); setRemoveUserId(''); }} color="#f97316">{t('remove')}</ActionBtn>}
+              {removeUserId && <ActionBtn onClick={() => { adminAction({ action: 'removeParticipant', userId: removeUserId }); setRemoveUserId(''); }} color="#f97316" loading={adminLoading}>{t('remove')}</ActionBtn>}
             </div>
           )}
         </div>
@@ -248,7 +261,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
 
       
       <div style={sectionStyle}>
-        <SectionHeader id="banPlayer" label={t('banPlayer')} color="#dc2626" />
+        <SectionHeader id="banPlayer" label={t('banPlayer')} color="#dc2626" currentExpanded={expandedSection} onToggle={toggle} />
         {expandedSection === 'banPlayer' && (
           <div className="flex flex-col gap-2 mt-2">
             <SmallSelect value={banUserId} onChange={setBanUserId}>
@@ -274,7 +287,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
               <ActionBtn onClick={() => {
                 adminAction({ action: 'banPlayer', userId: banUserId, reason: banReason, permanent: banPermanent, durationDays: parseInt(banDays) || 7 });
                 setBanUserId(''); setBanReason('');
-              }} color="#dc2626">{t('banFromTournaments')}</ActionBtn>
+              }} color="#dc2626" loading={adminLoading}>{t('banFromTournaments')}</ActionBtn>
             )}
           </div>
         )}
@@ -283,11 +296,11 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
       
       {tour.status !== 'completed' && tour.status !== 'cancelled' && (
         <div style={sectionStyle}>
-          <SectionHeader id="cancel" label={t('cancel')} color="#666" />
+          <SectionHeader id="cancel" label={t('cancel')} color="#666" currentExpanded={expandedSection} onToggle={toggle} />
           {expandedSection === 'cancel' && (
             <div className="flex flex-col gap-2 mt-2">
               <p className="text-[10px]" style={{ color: '#cc4444' }}>{t('cancelTournamentWarning')}</p>
-              <ActionBtn onClick={() => adminAction({ action: 'cancelTournament' })} color="#666">{t('cancel')}</ActionBtn>
+              <ActionBtn onClick={() => adminAction({ action: 'cancelTournament' })} color="#666" loading={adminLoading}>{t('cancel')}</ActionBtn>
             </div>
           )}
         </div>
@@ -295,7 +308,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
 
       
       <div style={sectionStyle}>
-        <SectionHeader id="delete" label={t('deleteTournament')} color="#cc4444" />
+        <SectionHeader id="delete" label={t('deleteTournament')} color="#cc4444" currentExpanded={expandedSection} onToggle={toggle} />
         {expandedSection === 'delete' && (
           <div className="flex flex-col gap-2 mt-2">
             <p className="text-[10px]" style={{ color: '#cc4444' }}>{t('deleteTournamentWarning')}</p>

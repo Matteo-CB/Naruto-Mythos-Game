@@ -42,7 +42,7 @@ function asuma113bAmbushHandler(ctx: EffectContext): EffectResult {
         'EFFECT_DRAW',
         `Asuma Sarutobi (113b) AMBUSH: Drew 1 card.`,
         'game.log.effect.draw',
-        { card: 'ASUMA SARUTOBI', id: 'KS-113b-R', amount: 1 },
+        { card: 'ASUMA SARUTOBI', id: 'KS-113b-R', count: 1 },
       ),
     },
   };

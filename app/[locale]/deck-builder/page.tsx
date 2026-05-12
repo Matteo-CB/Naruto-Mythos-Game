@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback, memo, useDeferredValue } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef, memo, useDeferredValue } from "react";
+import { VirtualCardGrid } from "@/components/deckBuilder/VirtualCardGrid";
 import { useTranslations, useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Link } from "@/lib/i18n/navigation";
@@ -443,6 +444,7 @@ export default function DeckBuilderPage() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [previewCard, setPreviewCard] = useState<CharacterCard | MissionCard | null>(null);
   const [mobileView, setMobileView] = useState<'catalog' | 'deck'>('catalog');
+  const mobileScrollRef = useRef<HTMLDivElement | null>(null);
   const [mobileInfoOpen, setMobileInfoOpen] = useState(false);
 
   
@@ -1522,23 +1524,26 @@ export default function DeckBuilderPage() {
             </button>
           </div>
 
-          
-          <div className="flex-1 overflow-y-auto px-3 pb-3" style={{ minHeight: 0 }}>
-
-            
-            <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))' }}>
-              {filteredChars.map((card) => (
-                <CatalogCard
-                  key={card.id}
-                  card={card}
-                  allowed={allowedMap.get(card.id) ?? true}
-                  inDeckCount={deckCardCounts.get(card.id) || 0}
-                  onAdd={handleAddChar}
-                  onHover={handlePreview}
-                />
-              ))}
-            </div>
-          </div>
+          <VirtualCardGrid
+            items={filteredChars}
+            getItemKey={(c) => c.id}
+            minColWidth={72}
+            gap={6}
+            cellAspectRatio={7 / 5}
+            paddingX={12}
+            paddingBottom={12}
+            className="flex-1"
+            style={{ minHeight: 0 }}
+            renderItem={(card) => (
+              <CatalogCard
+                card={card}
+                allowed={allowedMap.get(card.id) ?? true}
+                inDeckCount={deckCardCounts.get(card.id) || 0}
+                onAdd={handleAddChar}
+                onHover={handlePreview}
+              />
+            )}
+          />
         </div>
       </div>
 
@@ -1588,7 +1593,7 @@ export default function DeckBuilderPage() {
         )}
 
         
-        <div className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
+        <div ref={mobileScrollRef} className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
           {mobileView === 'catalog' ? (
             <div className="px-3 py-2">
               
@@ -1659,13 +1664,23 @@ export default function DeckBuilderPage() {
               <span className="text-[9px] uppercase font-bold block mb-1" style={{ color: '#777' }}>
                 {t("deckBuilder.characters", { count: filteredChars.length })}
               </span>
-              <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5">
-                {filteredChars.map((card) => (
-                  <CatalogCard key={card.id} card={card} allowed={allowedMap.get(card.id) ?? true}
+              <VirtualCardGrid
+                items={filteredChars}
+                getItemKey={(c) => c.id}
+                minColWidth={64}
+                gap={6}
+                cellAspectRatio={7 / 5}
+                scrollElementRef={mobileScrollRef}
+                renderItem={(card) => (
+                  <CatalogCard
+                    card={card}
+                    allowed={allowedMap.get(card.id) ?? true}
                     inDeckCount={deckCardCounts.get(card.id) || 0}
-                    onAdd={handleAddChar} onHover={handlePreview} />
-                ))}
-              </div>
+                    onAdd={handleAddChar}
+                    onHover={handlePreview}
+                  />
+                )}
+              />
             </div>
           ) : (
             <div className="px-3 py-2">

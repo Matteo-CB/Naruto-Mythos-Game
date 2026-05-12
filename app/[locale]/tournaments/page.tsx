@@ -108,7 +108,7 @@ export default function TournamentsPage() {
                 {simulatorTournaments.length}
               </span>
               <span className="text-[11px] uppercase tracking-[0.3em]" style={{ color: '#666' }}>
-                {t('subtitle') ?? 'tournaments'}
+                {t('countLabel')}
               </span>
             </motion.div>
           </div>

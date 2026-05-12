@@ -6,6 +6,7 @@ type MatchEventType =
   | 'match.forfeit.admin'
   | 'match.forfeit.double'
   | 'match.auto-forfeit.eliminated'
+  | 'match.auto-forfeit.eliminated.both'
   | 'match.completed.played'
   | 'tournament.start.begin'
   | 'tournament.start.success'

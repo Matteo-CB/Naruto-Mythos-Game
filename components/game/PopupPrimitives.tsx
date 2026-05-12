@@ -1,8 +1,30 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+
+
+function useIsCompactPopup(): boolean {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const check = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      setCompact(vh < 500 || (vw < 768 && vw / vh > 1.2));
+    };
+    check();
+    window.addEventListener('resize', check);
+    window.addEventListener('orientationchange', check);
+    return () => {
+      window.removeEventListener('resize', check);
+      window.removeEventListener('orientationchange', check);
+    };
+  }, []);
+  return compact;
+}
 
 
 export function useNeedsScroll(): {
@@ -53,13 +75,17 @@ export function PopupOverlay({
   children: React.ReactNode;
   onClickBg?: () => void;
 }) {
-  return (
+  const compact = useIsCompactPopup();
+
+  if (typeof document === 'undefined') return null;
+
+  const overlay = (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center p-2"
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center ${compact ? 'p-2' : 'p-4'}`}
       onClick={onClickBg}
       style={{
         backgroundColor: 'rgba(4, 4, 8, 0.92)',
@@ -70,6 +96,8 @@ export function PopupOverlay({
       {children}
     </motion.div>
   );
+
+  return createPortal(overlay, document.body);
 }
 
 
@@ -128,6 +156,19 @@ export function PopupCornerFrame({
   maxHeight?: string;
 }) {
   const { ref, needsY } = useNeedsScroll();
+  const compact = useIsCompactPopup();
+
+  const compactCap = '480px';
+  const effectiveMaxWidth = compact
+    ? `min(${maxWidth}, ${compactCap}, calc(100vw - 32px))`
+    : `min(${maxWidth}, calc(100vw - 24px))`;
+  const effectiveWidth = compact
+    ? (fitContent ? 'fit-content' : `min(${maxWidth}, ${compactCap}, calc(100vw - 32px))`)
+    : (fitContent ? 'fit-content' : 'min(90%, calc(100vw - 24px))');
+  const effectivePadding = compact ? '14px 16px' : padding;
+  const effectiveMaxHeight = compact
+    ? (maxHeight ?? 'calc(100dvh - 32px)')
+    : (maxHeight ?? 'calc(100dvh - 24px)');
 
   return (
     <motion.div
@@ -137,11 +178,11 @@ export function PopupCornerFrame({
       transition={{ type: 'spring', stiffness: 260, damping: 22, delay: 0.05 }}
       className={`relative ${className}`}
       style={{
-        maxWidth: `min(${maxWidth}, calc(100vw - 24px))`,
-        width: fitContent ? 'fit-content' : '90vw',
-        minWidth: fitContent ? '220px' : undefined,
-        maxHeight: maxHeight ?? 'calc(100dvh - 24px)',
-        padding,
+        maxWidth: effectiveMaxWidth,
+        width: effectiveWidth,
+        minWidth: fitContent ? (compact ? '180px' : '220px') : undefined,
+        maxHeight: effectiveMaxHeight,
+        padding: effectivePadding,
         boxSizing: 'border-box' as const,
         backgroundColor,
         boxShadow: '0 12px 48px rgba(0,0,0,0.6), 0 0 1px rgba(255,255,255,0.04)',
@@ -169,11 +210,12 @@ export function PopupTitle({
   accentColor?: string;
   size?: 'md' | 'lg' | 'xl';
 }) {
+  const compact = useIsCompactPopup();
   const fontSizes = { md: '14px', lg: '18px', xl: '22px' };
   const lineWidths = { md: 100, lg: 160, xl: 200 };
 
   return (
-    <div className="flex flex-col items-center gap-3 mb-5">
+    <div className={`flex flex-col items-center ${compact ? 'gap-1 mb-2' : 'gap-3 mb-5'}`}>
       <span
         className="uppercase text-center"
         style={{
@@ -243,18 +285,19 @@ export function PopupDescription({
   children: React.ReactNode;
   accentColor?: string;
 }) {
+  const compact = useIsCompactPopup();
   return (
     <motion.div
       initial={{ x: -12, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ delay: 0.12, duration: 0.35 }}
-      className="mb-5 px-5 py-3"
+      className={compact ? 'mb-2 px-3 py-1.5' : 'mb-5 px-5 py-3'}
       style={{
         borderLeft: `3px solid ${accentColor}`,
-        maxWidth: 'min(480px, calc(100vw - 48px))',
+        maxWidth: compact ? 'calc(100vw - 40px)' : 'min(480px, calc(100vw - 48px))',
       }}
     >
-      <span className="font-body text-xs leading-relaxed" style={{ color: '#c8c8c8' }}>
+      <span className={`font-body leading-relaxed ${compact ? 'text-[13px]' : 'text-xs'}`} style={{ color: '#c8c8c8' }}>
         {children}
       </span>
     </motion.div>

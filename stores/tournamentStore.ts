@@ -19,6 +19,8 @@ export interface TournamentMatch {
   gameId: string | null;
   absenceDeadline: string | null;
   absentPlayerId: string | null;
+  startedAt?: string | null;
+  completedAt?: string | null;
 }
 
 export interface TournamentParticipant {

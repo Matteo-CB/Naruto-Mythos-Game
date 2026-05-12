@@ -176,7 +176,6 @@ export function EloBadge({ elo, size = 'md', showElo = true, totalGames }: EloBa
           height={s.imgSize}
           unoptimized
           className="shrink-0"
-          style={{ filter: `drop-shadow(0 0 4px ${tier.glowColor})` }}
         />
       )}
       <span

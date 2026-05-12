@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { TournamentMatch } from '@/stores/tournamentStore';
 
 
@@ -344,7 +344,10 @@ export function SwissStandings({
                     </span>
                   )}
                 </div>
-                <MatchStatusBadge status={m.status} />
+                <div className="flex items-center gap-2">
+                  {(m.status === 'ready' || m.status === 'pending') && <MatchCountdown deadline={m.absenceDeadline ?? null} />}
+                  <MatchStatusBadge status={m.status} />
+                </div>
               </motion.div>
             ))}
           </div>
@@ -460,6 +463,38 @@ export function SwissStandings({
 
 
 
+
+function MatchCountdown({ deadline }: { deadline: string | null | undefined }) {
+  const [remaining, setRemaining] = useState<number | null>(() => {
+    if (!deadline) return null;
+    return Math.max(0, Math.ceil((new Date(deadline).getTime() - Date.now()) / 1000));
+  });
+  useEffect(() => {
+    if (!deadline) { setRemaining(null); return; }
+    const tick = () => setRemaining(Math.max(0, Math.ceil((new Date(deadline).getTime() - Date.now()) / 1000)));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [deadline]);
+  if (remaining === null || remaining <= 0) return null;
+  const mins = Math.floor(remaining / 60);
+  const secs = remaining % 60;
+  const urgent = remaining <= 60;
+  return (
+    <span
+      className="text-[9px] tabular-nums px-1.5 py-0.5 inline-flex items-center gap-1"
+      style={{
+        color: urgent ? '#cc4444' : '#c4a35a',
+        backgroundColor: urgent ? 'rgba(204,68,68,0.1)' : 'rgba(196,163,90,0.08)',
+        border: `1px solid ${urgent ? '#cc4444' : '#c4a35a'}33`,
+      }}
+      title="Time before auto-forfeit"
+    >
+      <span style={{ opacity: 0.7 }}>⏱</span>
+      {mins}:{secs.toString().padStart(2, '0')}
+    </span>
+  );
+}
 
 function MatchStatusBadge({ status }: { status: string }) {
   const t = useTranslations('tournament');

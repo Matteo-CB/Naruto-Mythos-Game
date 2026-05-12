@@ -26,33 +26,24 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
   const opponent = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
-  const currentTurn = state.turn;
 
   const playedChars: PlayedChar[] = [];
-
-  let lastOwnActionIdx = -1;
   let skippedSourceReveal = false;
+
   for (let i = state.log.length - 1; i >= 0; i--) {
     const entry = state.log[i];
-    if (entry.turn !== currentTurn || entry.phase !== 'action') continue;
-    if (entry.player !== sourcePlayer) continue;
-    if (
-      entry.action === 'PASS' ||
-      entry.action === 'PLAY_HIDDEN' ||
-      PLAY_ACTIONS.has(entry.action)
-    ) {
-      if (!skippedSourceReveal) {
+    if (entry.phase !== 'action') continue;
+
+    if (entry.player === sourcePlayer) {
+      const isPlayLike = PLAY_ACTIONS.has(entry.action) || entry.action === 'PLAY_HIDDEN';
+      if (!skippedSourceReveal && isPlayLike) {
         skippedSourceReveal = true;
         continue;
       }
-      lastOwnActionIdx = i;
-      break;
+      if (isPlayLike) break;
+      continue;
     }
-  }
 
-  for (let i = lastOwnActionIdx + 1; i < state.log.length; i++) {
-    const entry = state.log[i];
-    if (entry.turn !== currentTurn || entry.phase !== 'action') continue;
     if (entry.player !== opponent) continue;
     if (entry.action === 'PASS') continue;
 
@@ -77,6 +68,8 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
       }
     }
   }
+
+  playedChars.reverse();
 
   if (playedChars.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',

@@ -57,6 +57,13 @@ html, body {
   overflow-x: hidden;
 }
 
+html[data-tab-hidden="true"] *,
+html[data-tab-hidden="true"] *::before,
+html[data-tab-hidden="true"] *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

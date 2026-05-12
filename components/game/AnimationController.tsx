@@ -952,12 +952,13 @@ export function AnimationController() {
     setVolume(soundVolume);
   }, [soundEnabled, soundVolume]);
 
-  
-  const visibleState = useGameStore((s) => s.visibleState);
+
+  const logLength = useGameStore((s) => s.visibleState?.log.length ?? 0);
   const prevLogLenRef = useRef(0);
   useEffect(() => {
-    if (!visibleState) return;
-    const log = visibleState.log;
+    const state = useGameStore.getState().visibleState;
+    if (!state) return;
+    const log = state.log;
     const prevLen = prevLogLenRef.current;
     if (log.length <= prevLen) {
       prevLogLenRef.current = log.length;
@@ -969,7 +970,7 @@ export function AnimationController() {
     let hasEffect = false;
     for (const entry of newEntries) {
       const a = entry.action;
-      
+
       if (a.startsWith('EFFECT') || a === 'SCORE_RETURN' || a === 'POWERUP' || a === 'CHAKRA_STEAL') {
         hasEffect = true;
         break;
@@ -978,7 +979,7 @@ export function AnimationController() {
     if (hasEffect) {
       playSound('jutsu');
     }
-  }, [visibleState?.log.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [logLength]);
 
   
   useEffect(() => {

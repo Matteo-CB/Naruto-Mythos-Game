@@ -50,6 +50,9 @@ export async function POST(request: NextRequest) {
       const deleted = await prisma.game.deleteMany({
         where: { OR: [{ player1Id: userId }, { player2Id: userId }] },
       });
+      await prisma.eloHistory.deleteMany({
+        where: { OR: [{ userId }, { opponentId: userId }] },
+      }).catch(() => {});
       await prisma.deckStats.deleteMany({ where: { userId } }).catch(() => {});
       syncDiscordRole(userId).catch(() => {});
       return NextResponse.json({ success: true, gamesDeleted: deleted.count });

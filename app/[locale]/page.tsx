@@ -133,15 +133,32 @@ export default function Home() {
     return () => { cancelled = true; };
   }, [session, meRefresh]);
 
-  // Live updates: refetch on window focus + on a 60s tick while on the home page
   useEffect(() => {
     if (!session?.user) return;
     const onFocus = () => setMeRefresh((n) => n + 1);
     window.addEventListener('focus', onFocus);
-    const interval = setInterval(() => setMeRefresh((n) => n + 1), 60_000);
+
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const startInterval = () => {
+      if (interval || document.hidden) return;
+      interval = setInterval(() => setMeRefresh((n) => n + 1), 60_000);
+    };
+    const stopInterval = () => {
+      if (!interval) return;
+      clearInterval(interval);
+      interval = null;
+    };
+    const onVisibilityChange = () => {
+      if (document.hidden) stopInterval();
+      else startInterval();
+    };
+    startInterval();
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
     return () => {
       window.removeEventListener('focus', onFocus);
-      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      stopInterval();
     };
   }, [session]);
 

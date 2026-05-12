@@ -42,6 +42,8 @@ export interface RoomData {
   
   player1DisconnectCount: number;
   player2DisconnectCount: number;
+  player1LastDisconnectAt?: number | null;
+  player2LastDisconnectAt?: number | null;
   
   replayInitialState: GameState | null;
   replayStateSnapshots: GameState[] | null;
@@ -85,8 +87,10 @@ const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
 const MULLIGAN_TIMEOUT_MS = 60_000; // 1 minute for the mulligan + edge phase
 const EFFECT_TIMEOUT_MS = 60_000; // 1 minute per effect resolution
 const MAX_CONSECUTIVE_TIMEOUTS = 3; // 3 timeouts = auto-forfeit
-const DISCONNECT_GRACE_MS = 60_000; // 1 minute before disconnect = forfeit
-const MAX_DISCONNECTS = 2; // More than 2 in-game disconnects = instant forfeit (anti-troll)
+const DISCONNECT_GRACE_MS = 90_000; // 1.5 minutes before disconnect = forfeit
+const MAX_DISCONNECTS = 4; // anti-troll cap on disconnects that lasted long enough to count
+const DISCONNECT_BLIP_THRESHOLD_MS = 15_000; // disconnects shorter than this don't count toward MAX
+const DISCONNECT_DECAY_MS = 5 * 60 * 1000; // 5 minutes of stable connection forgives one prior disconnect
 const SEALED_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes for sealed deck building
 
 export const rooms = new Map<string, RoomData>();
@@ -1375,9 +1379,21 @@ export function setupSocketHandlers(io: SocketIOServer) {
         room.disconnectTimer = null;
         room.disconnectedPlayer = null;
         room.disconnectDeadline = null;
-        console.log(`[Socket] Cancelled disconnect timer for ${player} in room ${roomCode}`);
 
-        
+        const lastDcAt = player === 'player1' ? room.player1LastDisconnectAt : room.player2LastDisconnectAt;
+        if (lastDcAt) {
+          const downMs = Date.now() - lastDcAt;
+          if (downMs > DISCONNECT_BLIP_THRESHOLD_MS) {
+            if (player === 'player1') room.player1DisconnectCount++;
+            else room.player2DisconnectCount++;
+            console.log(`[Socket] ${player} reconnected after ${Math.round(downMs/1000)}s — counted (now ${player === 'player1' ? room.player1DisconnectCount : room.player2DisconnectCount}/${MAX_DISCONNECTS + 1})`);
+          } else {
+            console.log(`[Socket] ${player} reconnected after ${Math.round(downMs/1000)}s — blip, not counted`);
+          }
+        }
+        if (player === 'player1') room.player1LastDisconnectAt = null;
+        else room.player2LastDisconnectAt = null;
+
         const opponentSock = isHost ? room.guestSocket : room.hostSocket;
         if (opponentSock) {
           io.to(opponentSock).emit('game:opponent-reconnected');
@@ -2948,17 +2964,15 @@ export function setupSocketHandlers(io: SocketIOServer) {
             rooms.delete(code);
           }
 
-          
-          else if (room.gameState && room.gameState.phase !== 'gameOver') {
-            
-            
-            const newCount = (player === 'player1'
-              ? ++room.player1DisconnectCount
-              : ++room.player2DisconnectCount);
 
-            if (newCount > MAX_DISCONNECTS) {
-              console.log(`[Socket] ${player} disconnected ${newCount}× in room ${code}, instant forfeit (anti-troll)`);
-              
+          else if (room.gameState && room.gameState.phase !== 'gameOver') {
+
+            const currentCount = player === 'player1'
+              ? room.player1DisconnectCount
+              : room.player2DisconnectCount;
+
+            if (currentCount > MAX_DISCONNECTS) {
+              console.log(`[Socket] ${player} already past disconnect cap in room ${code}, instant forfeit`);
               if (room.disconnectTimer) {
                 clearTimeout(room.disconnectTimer);
                 room.disconnectTimer = null;
@@ -2976,15 +2990,15 @@ export function setupSocketHandlers(io: SocketIOServer) {
               return;
             }
 
-            
-            
-            
             if (room.disconnectTimer) {
               clearTimeout(room.disconnectTimer);
               room.disconnectTimer = null;
             }
 
-            console.log(`[Socket] ${player} disconnected during game in room ${code} (${newCount}/${MAX_DISCONNECTS + 1}), starting ${DISCONNECT_GRACE_MS / 1000}s grace period`);
+            if (player === 'player1') room.player1LastDisconnectAt = Date.now();
+            else room.player2LastDisconnectAt = Date.now();
+
+            console.log(`[Socket] ${player} disconnected during game in room ${code} (count ${currentCount}/${MAX_DISCONNECTS + 1}), starting ${DISCONNECT_GRACE_MS / 1000}s grace period`);
             
             
 
@@ -2997,7 +3011,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               io.to(opponentSock).emit('game:opponent-disconnected', {
                 deadline: disconnectDeadline,
                 durationMs: DISCONNECT_GRACE_MS,
-                disconnectCount: newCount,
+                disconnectCount: currentCount,
                 maxDisconnects: MAX_DISCONNECTS,
               });
             }

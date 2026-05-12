@@ -23,7 +23,7 @@ interface SettingsState {
   setGameBackground: (id: string, url: string) => Promise<void>;
 }
 
-const DEFAULT_BG_URL = '/images/backgrounds/bg-game.webp';
+const DEFAULT_BG_URL = '/images/backgrounds/1.webp';
 
 
 function getCachedBackgrounds(): BackgroundOption[] {

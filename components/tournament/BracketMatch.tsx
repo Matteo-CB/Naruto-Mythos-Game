@@ -2,11 +2,30 @@
 
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import type { TournamentMatch } from '@/stores/tournamentStore';
 
 interface Props {
   match: TournamentMatch;
   index: number;
+}
+
+function useCountdown(deadline: string | null | undefined): number | null {
+  const [remaining, setRemaining] = useState<number | null>(() => {
+    if (!deadline) return null;
+    return Math.max(0, Math.ceil((new Date(deadline).getTime() - Date.now()) / 1000));
+  });
+  useEffect(() => {
+    if (!deadline) { setRemaining(null); return; }
+    const tick = () => {
+      const secs = Math.max(0, Math.ceil((new Date(deadline).getTime() - Date.now()) / 1000));
+      setRemaining(secs);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [deadline]);
+  return remaining;
 }
 
 export function BracketMatch({ match, index }: Props) {
@@ -15,6 +34,8 @@ export function BracketMatch({ match, index }: Props) {
   const isActive = match.status === 'in_progress';
   const isReady = match.status === 'ready';
   const isComplete = match.status === 'completed' || match.status === 'forfeit';
+
+  const remaining = useCountdown(match.absenceDeadline ?? null);
 
   const borderColor = isActive ? '#4a9eff' : isReady ? '#c4a35a' : isComplete ? '#333' : '#222';
 
@@ -69,7 +90,20 @@ export function BracketMatch({ match, index }: Props) {
         {match.winnerId === match.player2Id && <span style={{ color: '#c4a35a' }}>W</span>}
       </div>
 
-      
+      {isReady && remaining !== null && remaining > 0 && (
+        <div
+          className="px-2 py-1 flex items-center justify-center gap-1 text-[10px] tabular-nums"
+          style={{
+            backgroundColor: remaining <= 60 ? 'rgba(204, 68, 68, 0.12)' : 'rgba(196, 163, 90, 0.08)',
+            borderTop: `1px solid ${remaining <= 60 ? '#cc4444' : '#c4a35a'}33`,
+            color: remaining <= 60 ? '#cc4444' : '#c4a35a',
+          }}
+        >
+          <span style={{ opacity: 0.7 }}>⏱</span>
+          <span>{Math.floor(remaining / 60)}:{(remaining % 60).toString().padStart(2, '0')}</span>
+        </div>
+      )}
+
       {isActive && match.roomCode && (
         <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-wider cursor-pointer"
           style={{ color: '#4a9eff' }}>

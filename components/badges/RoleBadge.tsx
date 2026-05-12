@@ -50,7 +50,7 @@ export function RoleBadge({ role, size = 'sm' }: RoleBadgeProps) {
         padding: s.padding,
         backgroundColor: config.bgColor,
         border: `${s.borderWidth} solid ${config.borderColor}`,
-        boxShadow: `0 0 10px ${config.glowColor}, 0 0 20px ${config.innerGlow}, inset 0 1px 0 rgba(255,255,255,0.04)`,
+        boxShadow: `0 0 8px ${config.glowColor}, inset 0 1px 0 rgba(255,255,255,0.04)`,
         gap: s.gap,
       }}
     >

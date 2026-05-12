@@ -205,14 +205,6 @@ model SiteSettings {
   discordRoleIds  Json?
 }
 
-model GameBackground {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String   @unique
-  url       String
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
-}
-
 model Tournament {
   id                 String                  @id @default(auto()) @map("_id") @db.ObjectId
   name               String

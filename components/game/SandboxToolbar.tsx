@@ -356,6 +356,8 @@ function AllCardsModal({
                       className="w-full h-full"
                       style={{ objectFit: 'cover' }}
                       draggable={false}
+                      loading="lazy"
+                      decoding="async"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">

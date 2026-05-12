@@ -269,27 +269,12 @@ export default function LeaderboardPage() {
           className="mb-8"
         >
           <div className="flex items-end justify-between gap-3 flex-wrap">
-            <div>
-              <h1
-                className="font-display text-3xl sm:text-5xl tracking-wider uppercase leading-none"
-                style={{ color: '#f2efe7', letterSpacing: '0.08em', textShadow: '0 0 22px rgba(196, 163, 90, 0.18)' }}
-              >
-                {t('title')}
-              </h1>
-              <motion.div
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25, duration: 0.4 }}
-                className="font-display flex items-baseline gap-2 mt-3"
-              >
-                <span className="text-2xl tabular-nums leading-none" style={{ color: '#c4a35a', textShadow: '0 0 12px rgba(196, 163, 90, 0.35)' }}>
-                  {totalCount}
-                </span>
-                <span className="text-[11px] uppercase tracking-[0.3em]" style={{ color: '#666' }}>
-                  {t('player')}{totalCount > 1 ? 's' : ''}
-                </span>
-              </motion.div>
-            </div>
+            <h1
+              className="font-display text-3xl sm:text-5xl tracking-wider uppercase leading-none"
+              style={{ color: '#f2efe7', letterSpacing: '0.08em', textShadow: '0 0 22px rgba(196, 163, 90, 0.18)' }}
+            >
+              {t('title')}
+            </h1>
             <div className="flex items-center gap-1.5">
               {leaguesEnabled && (
                 <button
@@ -373,6 +358,21 @@ export default function LeaderboardPage() {
         )}
 
         <section>
+          {!loading && totalPlayers > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4 }}
+              className="flex items-center gap-3 mb-3"
+            >
+              <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)' }} />
+              <span className="font-display text-[10px] uppercase tracking-[0.3em] tabular-nums" style={{ color: '#777' }}>
+                <span style={{ color: '#c4a35a' }}>{totalCount}</span> {t('player')}{totalCount > 1 ? 's' : ''}
+              </span>
+              <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)' }} />
+            </motion.div>
+          )}
+
           {loading ? (
             <SkeletonGrid />
           ) : users.length === 0 ? (

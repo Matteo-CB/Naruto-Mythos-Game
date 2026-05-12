@@ -295,6 +295,7 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
 
 export function MulliganDialog() {
   const t = useTranslations();
+  const dims = useGameScale();
   const visibleState = useGameStore((s) => s.visibleState);
   const performAction = useGameStore((s) => s.performAction);
   const isProcessing = useGameStore((s) => s.isProcessing);
@@ -303,6 +304,7 @@ export function MulliganDialog() {
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
   const minimizeEffectPopup = useUIStore((s) => s.minimizeEffectPopup);
   const restoreEffectPopup = useUIStore((s) => s.restoreEffectPopup);
+  const zoomCard = useUIStore((s) => s.zoomCard);
   const [selectedCard, setSelectedCard] = useState<CharacterCard | null>(null);
 
   if (!visibleState || visibleState.phase !== 'mulligan' || !coinFlipComplete || !missionDeckIntroComplete) return null;
@@ -342,6 +344,10 @@ export function MulliganDialog() {
   };
 
   const toggleSelect = (card: CharacterCard) => {
+    if (dims.isMobile) {
+      zoomCard(card);
+      return;
+    }
     setSelectedCard((prev) => (prev?.id === card.id ? null : card));
   };
 

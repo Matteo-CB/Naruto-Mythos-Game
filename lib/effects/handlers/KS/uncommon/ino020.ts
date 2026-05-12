@@ -38,7 +38,8 @@ function handleIno020Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     const limitStr = isUpgrade ? '3' : '2';
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Ino Yamanaka (020): No enemy character with cost ' + limitStr + ' or less in this mission to take control of.') },
+      'Ino Yamanaka (020): No enemy character with cost ' + limitStr + ' or less in this mission to take control of.',
+      'game.log.effect.noTarget', { card: 'INO YAMANAKA', id: 'KS-020-UC' }) },
     descriptionKey: 'game.effect.desc.ino020TakeControl',
     descriptionParams: { costLimit: limitStr },
   };

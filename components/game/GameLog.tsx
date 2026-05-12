@@ -9,6 +9,7 @@ import { useUIStore } from '@/stores/uiStore';
 import { useSocketStore } from '@/lib/socket/client';
 import type { GameLogEntry, GamePhase } from '@/lib/engine/types';
 
+const EMPTY_LOG: GameLogEntry[] = [];
 
 function localizeParams(
   params: Record<string, string | number> | undefined,
@@ -92,14 +93,12 @@ const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDispla
 export function GameLog() {
   const t = useTranslations();
   const locale = useLocale();
-  const visibleState = useGameStore((s) => s.visibleState);
+  const log = useGameStore((s) => s.visibleState?.log ?? EMPTY_LOG);
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
   const showGameLog = useUIStore((s) => s.showGameLog);
   const toggleGameLog = useUIStore((s) => s.toggleGameLog);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isSpectating = useSocketStore((s) => s.isSpectating);
-
-  const log = visibleState?.log ?? [];
 
   const formatPhase = (phase: GamePhase): string => {
     const key = phaseTranslationKeys[phase];

@@ -13,6 +13,7 @@ import { SwissStandings } from '@/components/tournament/SwissStandings';
 import type { SwissStandingEntry } from '@/components/tournament/SwissStandings';
 import { TournamentAdmin } from '@/components/tournament/TournamentAdmin';
 import { AbsenceTimer } from '@/components/tournament/AbsenceTimer';
+import { LiveMatchesPanel } from '@/components/tournament/LiveMatchesPanel';
 import { TournamentResults } from '@/components/tournament/TournamentResults';
 import { useTournamentStore } from '@/stores/tournamentStore';
 import { useSocketStore } from '@/lib/socket/client';
@@ -571,9 +572,16 @@ export default function TournamentDetailPage() {
           </motion.div>
         )}
 
-        
+
         {tour.status === 'in_progress' && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
+            <LiveMatchesPanel
+              matches={tour.matches}
+              currentRound={tour.currentRound}
+              totalRounds={tour.totalRounds}
+              userId={userId}
+              format={tour.format}
+            />
             {myMatch && (
               <div className="mb-6 p-4" style={{ backgroundColor: '#111111', border: '1px solid rgba(196, 163, 90, 0.3)' }}>
                 <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>{t('yourMatchReady')}</h2>

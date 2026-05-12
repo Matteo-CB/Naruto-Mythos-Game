@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { executeTournamentStart } from '@/lib/tournament/startLogic';
 import { getSocketIO } from '@/lib/socket/server';
+import { startInitialRoundAbsenceTimers } from '@/lib/socket/tournamentHandlers';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
@@ -57,7 +58,14 @@ export async function POST(
     });
 
     const io = getSocketIO();
-    if (io) io.to(`tournament:${id}`).emit('tournament:started');
+    if (io) {
+      io.to(`tournament:${id}`).emit('tournament:started');
+      try {
+        await startInitialRoundAbsenceTimers(io, id);
+      } catch (timerErr) {
+        console.error('[Tournament] startInitialRoundAbsenceTimers failed:', timerErr);
+      }
+    }
 
     return NextResponse.json({ tournament: updated });
   } catch (err) {

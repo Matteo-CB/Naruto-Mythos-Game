@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
@@ -31,7 +31,7 @@ interface TargetCharacterProps {
   onSelect: (instanceId: string) => void;
 }
 
-function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacterProps) {
+const TargetCharacter = React.memo(function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacterProps) {
   const t = useTranslations();
   const locale = useLocale();
   const dims = useGameScale();
@@ -81,16 +81,13 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
           style={{
             borderRadius: '8px',
             border: '2px solid rgba(196, 163, 90, 0.9)',
+            boxShadow: '0 0 14px rgba(196, 163, 90, 0.5)',
             pointerEvents: 'none',
+            willChange: 'opacity, transform',
+            transformOrigin: 'center',
           }}
-          animate={{
-            boxShadow: [
-              '0 0 8px rgba(196, 163, 90, 0.3)',
-              '0 0 18px rgba(196, 163, 90, 0.6)',
-              '0 0 8px rgba(196, 163, 90, 0.3)',
-            ],
-          }}
-          transition={{ repeat: Infinity, duration: 1.2 }}
+          animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.025, 1] }}
+          transition={{ repeat: Infinity, duration: 1.1, ease: 'easeInOut' }}
         />
       )}
 
@@ -190,7 +187,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
       )}
     </motion.div>
   );
-}
+});
 
 
 
@@ -382,8 +379,7 @@ function OrderedDefeatPopup({
   const rankColors: Record<string, string> = { D: '#3e8b3e', C: '#c4a35a', B: '#b37e3e', A: '#b33e3e' };
 
   return (
-    <AnimatePresence>
-      <PopupOverlay>
+    <PopupOverlay>
         <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.25)" maxWidth="90vw" padding="16px 12px" backgroundColor="rgba(4, 4, 8, 0.95)" fitContent>
           <PopupMinimizeX onClick={minimizeEffectPopup} />
           <PopupTitle accentColor="#c4a35a" size="lg">
@@ -480,11 +476,10 @@ function OrderedDefeatPopup({
           </div>
         </PopupCornerFrame>
       </PopupOverlay>
-    </AnimatePresence>
   );
 }
 
-function OrderedDefeatCard({ character, isValid, isSelected, orderNumber, onClick }: {
+const OrderedDefeatCard = React.memo(function OrderedDefeatCard({ character, isValid, isSelected, orderNumber, onClick }: {
   character: VisibleCharacter;
   isValid: boolean;
   isSelected: boolean;
@@ -540,7 +535,7 @@ function OrderedDefeatCard({ character, isValid, isSelected, orderNumber, onClic
       )}
     </motion.div>
   );
-}
+});
 
 
 
@@ -552,7 +547,7 @@ interface TargetMissionLaneProps {
   myPlayer: string;
 }
 
-function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPlayer }: TargetMissionLaneProps) {
+const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPlayer }: TargetMissionLaneProps) {
   const t = useTranslations();
   const locale = useLocale();
   const rankColors: Record<MissionRank, string> = {
@@ -681,7 +676,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
       </div>
     </div>
   );
-}
+});
 
 
 
@@ -915,7 +910,6 @@ export function TargetSelector() {
   if (pendingTargetSelection.selectionType === 'DRAW_CARD') {
     const deckCount = pendingTargetSelection.deckSize ?? 0;
     return (
-      <AnimatePresence>
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.4)" maxWidth="420px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
@@ -993,7 +987,6 @@ export function TargetSelector() {
             </div>
           </PopupCornerFrame>
         </PopupOverlay>
-      </AnimatePresence>
     );
   }
 
@@ -1006,7 +999,6 @@ export function TargetSelector() {
     const confirmLabelKey = isDefeat ? 'game.effect.confirmDefeatBtn' : 'game.effect.confirmHideBtn';
 
     return (
-      <AnimatePresence>
         <PopupOverlay>
           <PopupCornerFrame accentColor={`${accentColor}66`} maxWidth="400px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
@@ -1091,7 +1083,6 @@ export function TargetSelector() {
             </div>
           </PopupCornerFrame>
         </PopupOverlay>
-      </AnimatePresence>
     );
   }
 
@@ -1128,7 +1119,6 @@ export function TargetSelector() {
     };
 
     return (
-      <AnimatePresence>
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(138, 92, 246, 0.4)" maxWidth="740px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
@@ -1230,7 +1220,6 @@ export function TargetSelector() {
             </div>
           </PopupCornerFrame>
         </PopupOverlay>
-      </AnimatePresence>
     );
   }
 
@@ -1240,7 +1229,6 @@ export function TargetSelector() {
     const resultColor = '#c4a35a';
 
     return (
-      <AnimatePresence>
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(138, 92, 246, 0.4)" maxWidth="740px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
@@ -1325,7 +1313,6 @@ export function TargetSelector() {
             </div>
           </PopupCornerFrame>
         </PopupOverlay>
-      </AnimatePresence>
     );
   }
 
@@ -1336,7 +1323,6 @@ export function TargetSelector() {
     const resultColor = hasCustomKeys ? '#c4a35a' : (revealedCard.canSteal ? '#c4a35a' : '#b33e3e');
 
     return (
-      <AnimatePresence>
         <PopupOverlay>
           <PopupCornerFrame accentColor={`${resultColor}55`} maxWidth="420px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
@@ -1398,7 +1384,6 @@ export function TargetSelector() {
             </div>
           </PopupCornerFrame>
         </PopupOverlay>
-      </AnimatePresence>
     );
   }
 
@@ -1417,7 +1402,6 @@ export function TargetSelector() {
     }
 
     return (
-      <AnimatePresence>
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="520px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
@@ -1484,7 +1468,6 @@ export function TargetSelector() {
             </div>
           </PopupCornerFrame>
         </PopupOverlay>
-      </AnimatePresence>
     );
   }
 
@@ -1518,7 +1501,6 @@ export function TargetSelector() {
   if (pendingTargetSelection.selectionType === 'CHOOSE_EFFECT_ORDER' && pendingTargetSelection.effectOrderChoices) {
     const choices = pendingTargetSelection.effectOrderChoices;
     return (
-      <AnimatePresence>
         <motion.div
           key="effect-order-bar"
           initial={{ y: 80, opacity: 0 }}
@@ -1635,7 +1617,6 @@ export function TargetSelector() {
             })}
           </div>
         </motion.div>
-      </AnimatePresence>
     );
   }
 
@@ -1666,7 +1647,6 @@ export function TargetSelector() {
     }
 
     return (
-      <AnimatePresence>
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="440px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
@@ -1707,7 +1687,6 @@ export function TargetSelector() {
             </div>
           </PopupCornerFrame>
         </PopupOverlay>
-      </AnimatePresence>
     );
   }
 
@@ -1719,8 +1698,7 @@ export function TargetSelector() {
   const popupMaxWidth = isMissionOnlyTargeting ? '90vw' : '85vw';
 
   return (
-    <AnimatePresence>
-      <PopupOverlay>
+    <PopupOverlay>
         <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.25)" maxWidth={popupMaxWidth} padding="20px 16px" backgroundColor="rgba(4, 4, 8, 0.95)" fitContent={isMissionOnlyTargeting}>
           <PopupMinimizeX onClick={minimizeEffectPopup} />
           <PopupTitle accentColor="#c4a35a" size="lg">
@@ -1775,6 +1753,5 @@ export function TargetSelector() {
           )}
         </PopupCornerFrame>
       </PopupOverlay>
-    </AnimatePresence>
   );
 }

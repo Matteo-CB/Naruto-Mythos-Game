@@ -13,7 +13,7 @@ import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
-type Tab = 'settings' | 'cards' | 'backgrounds' | 'players' | 'reports' | 'suspicious';
+type Tab = 'settings' | 'cards' | 'players' | 'reports' | 'suspicious';
 
 interface ActionResult {
   success: boolean;
@@ -49,14 +49,6 @@ export default function AdminPage() {
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
   
-  const [bgList, setBgList] = useState<Array<{ id: string; name: string; url: string; sortOrder: number }>>([]);
-  const [bgLoading, setBgLoading] = useState(true);
-  const [bgUploading, setBgUploading] = useState(false);
-  const [bgName, setBgName] = useState('');
-  const [bgFile, setBgFile] = useState<File | null>(null);
-  const [bgConfirmDeleteId, setBgConfirmDeleteId] = useState<string | null>(null);
-
-  
   const [playerSearch, setPlayerSearch] = useState('');
   const [players, setPlayers] = useState<Array<{ id: string; username: string; elo: number; wins: number; losses: number; draws: number; role: string; discordUsername: string | null }>>([]);
   const [playersLoading, setPlayersLoading] = useState(false);
@@ -88,17 +80,6 @@ export default function AdminPage() {
       .then((res) => res.json())
       .then((data) => setTesters(data.testers ?? []))
       .catch(() => {});
-  };
-
-  const fetchBackgrounds = async () => {
-    setBgLoading(true);
-    try {
-      const res = await fetch('/api/admin/backgrounds');
-      const data = await res.json();
-      if (res.ok) setBgList(data.backgrounds ?? []);
-    } catch { /* ignore */ } finally {
-      setBgLoading(false);
-    }
   };
 
   const fetchPlayers = async (search: string) => {
@@ -162,49 +143,6 @@ export default function AdminPage() {
         fetchPlayers(playerSearch);
       }
     } catch { /* ignore */ } finally { setPlayerActionLoading(false); setConfirmDeleteGameId(null); }
-  };
-
-  const handleBgUpload = async () => {
-    if (!bgFile || !bgName.trim()) return;
-    setBgUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', bgFile);
-      formData.append('name', bgName.trim());
-      const res = await fetch('/api/admin/backgrounds', { method: 'POST', body: formData });
-      if (res.ok) {
-        addResult({ success: true, message: t('backgrounds.uploadSuccess') + ': ' + bgName.trim() });
-        setBgName('');
-        setBgFile(null);
-        fetchBackgrounds();
-      } else {
-        const data = await res.json();
-        addResult({ success: false, message: t('backgrounds.uploadError') + ': ' + (data.error || 'Unknown') });
-      }
-    } catch (err) {
-      addResult({ success: false, message: t('backgrounds.uploadError') + ': ' + err });
-    } finally {
-      setBgUploading(false);
-    }
-  };
-
-  const handleBgDelete = async (id: string) => {
-    try {
-      const res = await fetch('/api/admin/backgrounds', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      });
-      if (res.ok) {
-        addResult({ success: true, message: t('backgrounds.deleteSuccess') });
-        fetchBackgrounds();
-      } else {
-        addResult({ success: false, message: t('backgrounds.deleteError') });
-      }
-    } catch {
-      addResult({ success: false, message: t('backgrounds.deleteError') });
-    }
-    setBgConfirmDeleteId(null);
   };
 
   const fetchBanned = async () => {
@@ -395,7 +333,6 @@ export default function AdminPage() {
   const tabs: { key: Tab; label: string }[] = [
     { key: 'settings', label: t('tabSettings') },
     { key: 'cards', label: t('tabCards') },
-    { key: 'backgrounds', label: t('tabBackgrounds') },
     { key: 'players', label: 'Players' },
     { key: 'reports', label: tc('moderation.reports') },
     { key: 'suspicious', label: 'Suspicious' },
@@ -597,70 +534,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        
-        {tab === 'backgrounds' && (
-          <div className="max-w-2xl">
-            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: '#888888' }}>{t('backgrounds.title')}</h2>
-              <p className="text-xs mb-4" style={{ color: '#555555' }}>{t('backgrounds.description')}</p>
-
-              
-              <div className="flex flex-col gap-3 mb-6 p-4 rounded" style={{ backgroundColor: '#0a0a0a', border: '1px solid #1a1a1a' }}>
-                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#888888' }}>{t('backgrounds.uploadLabel')}</label>
-                <input
-                  type="text"
-                  value={bgName}
-                  onChange={(e) => setBgName(e.target.value)}
-                  placeholder={t('backgrounds.namePlaceholder')}
-                  className="px-3 py-2 text-sm rounded"
-                  style={{ backgroundColor: '#141414', border: '1px solid #333333', color: '#e0e0e0', outline: 'none' }}
-                />
-                <input type="file" accept="image/*" onChange={(e) => setBgFile(e.target.files?.[0] || null)} className="text-xs" style={{ color: '#888888' }} />
-                <button
-                  onClick={handleBgUpload}
-                  disabled={bgUploading || !bgFile || !bgName.trim()}
-                  className="px-4 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer self-start"
-                  style={{
-                    backgroundColor: bgUploading || !bgFile || !bgName.trim() ? '#333333' : '#c4a35a',
-                    color: '#0a0a0a',
-                    border: '1px solid #c4a35a',
-                    opacity: bgUploading || !bgFile || !bgName.trim() ? 0.5 : 1,
-                  }}
-                >
-                  {bgUploading ? t('backgrounds.uploading') : t('backgrounds.upload')}
-                </button>
-              </div>
-
-              
-              {bgLoading ? (
-                <p className="text-sm" style={{ color: '#888888' }}>{tc('common.loading')}</p>
-              ) : bgList.length === 0 ? (
-                <p className="text-sm" style={{ color: '#555555' }}>{t('backgrounds.noBackgrounds')}</p>
-              ) : (
-                <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
-                  {bgList.map((bg) => (
-                    <div key={bg.id} className="rounded-lg overflow-hidden" style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626' }}>
-                      <img src={bg.url} alt={bg.name} className="w-full object-cover" style={{ aspectRatio: '16/9' }} />
-                      <div className="p-2 flex items-center justify-between">
-                        <span className="text-xs font-medium" style={{ color: '#e0e0e0' }}>{bg.name}</span>
-                        {bgConfirmDeleteId === bg.id ? (
-                          <div className="flex gap-1">
-                            <button onClick={() => handleBgDelete(bg.id)} className="px-2 py-1 text-[10px] bg-[#2a1a1a] border border-[#b33e3e]/40 text-[#b33e3e] cursor-pointer">{tc('common.confirm')}</button>
-                            <button onClick={() => setBgConfirmDeleteId(null)} className="px-2 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888] cursor-pointer">{tc('common.cancel')}</button>
-                          </div>
-                        ) : (
-                          <button onClick={() => setBgConfirmDeleteId(bg.id)} className="px-2 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#b33e3e] hover:bg-[#1a1414] cursor-pointer">{t('backgrounds.delete')}</button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        
         {tab === 'players' && (
           <div className="max-w-4xl">
             

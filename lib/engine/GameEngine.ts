@@ -742,7 +742,7 @@ export class GameEngine {
             defeated.log, defeated.turn, defeated.phase, dosuPlayer,
             'EFFECT_DEFEAT',
             `Dosu Kinuta (069): Hidden character was defeated (opponent chose not to reveal).`,
-            'game.log.effect.dosu069AutoDefeat',
+            'game.log.effect.dosu069DeclineDefeat',
             { card: 'DOSU KINUTA', id: 'KS-069-UC' },
           );
           if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
@@ -833,7 +833,7 @@ export class GameEngine {
             newState.log, newState.turn, newState.phase, batchSourceP049,
             'EFFECT_HIDE',
             `Kabuto Yakushi (054): Hid ${hiddenCount049} character(s) in this mission (Gemma protection declined).`,
-            'game.log.effect.hide',
+            'game.log.effect.hideMultiple',
             { card: 'KABUTO YAKUSHI', id: 'KS-054-UC', count: String(hiddenCount049) },
           );
         }

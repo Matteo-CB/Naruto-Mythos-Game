@@ -17,29 +17,37 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
     >
       
       {animated ? (
-        <motion.div
+        <div
           className="absolute"
           style={{
             top: '-8%',
             left: '-8%',
             width: '116%',
             height: '116%',
-            backgroundImage: 'url(/bgmenu/bgmenu.webp)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
             filter: 'blur(2px) saturate(0.8) brightness(0.45)',
+            willChange: 'transform',
           }}
-          animate={{
-            x: [0, 20, -15, 10, -5, 0],
-            y: [0, -12, 8, -18, 5, 0],
-            scale: [1, 1.03, 1.01, 1.04, 1.02, 1],
-          }}
-          transition={{
-            duration: 60,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
+        >
+          <motion.div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: 'url(/bgmenu/bgmenu.webp)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              willChange: 'transform',
+            }}
+            animate={{
+              x: [0, 20, -15, 10, -5, 0],
+              y: [0, -12, 8, -18, 5, 0],
+              scale: [1, 1.03, 1.01, 1.04, 1.02, 1],
+            }}
+            transition={{
+              duration: 60,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+        </div>
       ) : (
         <div
           className="absolute inset-0"

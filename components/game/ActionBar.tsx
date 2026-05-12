@@ -635,13 +635,38 @@ function ActionTimer({ deadline }: { deadline: number }) {
   );
 
   useEffect(() => {
-    setSecondsLeft(Math.max(0, Math.ceil((deadline - Date.now()) / 1000)));
-    const interval = setInterval(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let cancelled = false;
+
+    const tick = () => {
+      if (cancelled) return;
       const remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
-      setSecondsLeft(remaining);
-      if (remaining <= 0) clearInterval(interval);
-    }, 1000);
-    return () => clearInterval(interval);
+      setSecondsLeft((prev) => (prev === remaining ? prev : remaining));
+      if (remaining <= 0) return;
+      if (typeof document !== 'undefined' && document.hidden) {
+        timeoutId = setTimeout(tick, 1000);
+        return;
+      }
+      const drift = (deadline - Date.now()) % 1000;
+      const delay = drift > 0 ? drift : 1000;
+      timeoutId = setTimeout(tick, delay);
+    };
+
+    const onVisibilityChange = () => {
+      if (!document.hidden) {
+        if (timeoutId) clearTimeout(timeoutId);
+        tick();
+      }
+    };
+
+    tick();
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      cancelled = true;
+      if (timeoutId) clearTimeout(timeoutId);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
   }, [deadline]);
 
   const minutes = Math.floor(secondsLeft / 60);

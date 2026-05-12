@@ -93,7 +93,7 @@ export async function POST(
       clearAbsenceTimer(matchId);
     }
 
-    if (tournament.format !== 'swiss' && tournament.format !== 'double_elimination') {
+    if (tournament.format !== 'double_elimination') {
       await prisma.tournamentParticipant.updateMany({
         where: { tournamentId: id, userId: forfeitPlayerId },
         data: { eliminated: true, eliminatedRound: match.round },
