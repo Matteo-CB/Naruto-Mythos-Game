@@ -12,6 +12,8 @@ import {
   snapshotForBroadcast,
   CHESS_CLOCK_INITIAL_MS,
   CHESS_CLOCK_IDLE_LIMIT_MS,
+  CHESS_CLOCK_IDLE_TOAST_MS,
+  CHESS_CLOCK_MULLIGAN_IDLE_MS,
 } from '@/lib/socket/chessClock';
 
 describe('chessClock', () => {
@@ -130,6 +132,19 @@ describe('chessClock', () => {
     expect(CHESS_CLOCK_IDLE_LIMIT_MS).toBe(3 * 60 * 1000);
   });
 
+  it('idle toast constant is 2 minutes (1 min before auto-action triggers)', () => {
+    expect(CHESS_CLOCK_IDLE_TOAST_MS).toBe(2 * 60 * 1000);
+    expect(CHESS_CLOCK_IDLE_TOAST_MS).toBeLessThan(CHESS_CLOCK_IDLE_LIMIT_MS);
+  });
+
+  it('mulligan idle cancel constant is 1 minute', () => {
+    expect(CHESS_CLOCK_MULLIGAN_IDLE_MS).toBe(60 * 1000);
+  });
+
+  it('initial bank constant is 15 minutes', () => {
+    expect(CHESS_CLOCK_INITIAL_MS).toBe(15 * 60 * 1000);
+  });
+
   it('disarm is a no-op when no player is active', () => {
     const c = createChessClock();
     const after = disarm(c, Date.now());
@@ -190,5 +205,29 @@ describe('chessClock', () => {
     c = arm(c, 'player1', t0 + 90_000);
     expect(idleMs(c, t0 + 90_000)).toBe(0);
     expect(c.player1.remainingMs).toBe(CHESS_CLOCK_INITIAL_MS - 90_000);
+  });
+
+  it('arm does not mutate the input state', () => {
+    const t0 = 1_000_000;
+    const original = createChessClock();
+    const snapshot = JSON.stringify(original);
+    arm(original, 'player1', t0);
+    expect(JSON.stringify(original)).toBe(snapshot);
+  });
+
+  it('disarm does not mutate the input state', () => {
+    const t0 = 1_000_000;
+    const armed = arm(createChessClock(), 'player1', t0);
+    const snapshot = JSON.stringify(armed);
+    disarm(armed, t0 + 5_000);
+    expect(JSON.stringify(armed)).toBe(snapshot);
+  });
+
+  it('consumeIdleWarning does not mutate the input state', () => {
+    const t0 = 1_000_000;
+    const armed = arm(createChessClock(), 'player1', t0);
+    const snapshot = JSON.stringify(armed);
+    consumeIdleWarning(armed);
+    expect(JSON.stringify(armed)).toBe(snapshot);
   });
 });
