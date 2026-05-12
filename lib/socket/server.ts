@@ -2409,7 +2409,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       console.log(`[Socket] Rematch accepted in room ${code}, redirecting to deck select (sealed: ${room.isSealed})`);
       room.rematchOffer = undefined;
 
-      
+
       room.gameState = null;
       room.hostDeck = null;
       room.guestDeck = null;
@@ -2421,6 +2421,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
       room.finalized = false;
       room.coinFlipDone = { player1: false, player2: false };
       clearActionTimer(room);
+      clearChessClockTimers(room);
+      room.chessClock = createChessClock();
 
       
       if (room.hostSocket) {
