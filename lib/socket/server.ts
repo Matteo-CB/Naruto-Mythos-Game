@@ -106,16 +106,6 @@ export function whoseInputIsAwaited(state: GameState | null): PlayerID | null {
   if (state.forfeitedBy) return null;
   if (state.phase === 'gameOver') return null;
   if (state.phase === 'setup' || state.phase === 'mulligan') return null;
-  if (state.phase === 'start' || state.phase === 'end') {
-    if (state.pendingActions && state.pendingActions.length > 0) {
-      return state.pendingActions[0].player;
-    }
-    if (state.pendingEffects) {
-      const eff = state.pendingEffects.find((e) => !e.resolved);
-      if (eff?.selectingPlayer) return eff.selectingPlayer;
-    }
-    return null;
-  }
   if (state.pendingForcedResolver) return state.pendingForcedResolver;
   if (state.pendingActions && state.pendingActions.length > 0) {
     return state.pendingActions[0].player;
@@ -124,6 +114,7 @@ export function whoseInputIsAwaited(state: GameState | null): PlayerID | null {
     const eff = state.pendingEffects.find((e) => !e.resolved && e.selectingPlayer);
     if (eff?.selectingPlayer) return eff.selectingPlayer;
   }
+  if (state.phase === 'start' || state.phase === 'end') return null;
   if (state.phase === 'mission' && state.missionScoringProgress) {
     return state.missionScoringProgress.winner;
   }
@@ -143,7 +134,8 @@ export function computeAwaitedInputKey(state: GameState | null): string | null {
     if (eff) return 'pe:' + eff.id;
   }
   if (state.phase === 'mission' && state.missionScoringProgress) {
-    return 'mission:' + state.missionScoringProgress.winner + ':' + state.missionScoringProgress.currentRankIndex;
+    const p = state.missionScoringProgress;
+    return 'mission:' + p.winner + ':' + p.currentRankIndex + ':' + (p.missionCardScoreDone ? '1' : '0') + ':' + p.processedCharacterIds.length;
   }
   if (state.phase === 'action') return 'action:' + state.activePlayer + ':' + state.turn;
   return null;

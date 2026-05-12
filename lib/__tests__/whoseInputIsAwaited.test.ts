@@ -183,6 +183,30 @@ describe('whoseInputIsAwaited', () => {
     });
     expect(whoseInputIsAwaited(s)).toBe(null);
   });
+
+  it('returns pendingForcedResolver during start phase (not just action)', () => {
+    const s = makeState({ phase: 'start', pendingForcedResolver: 'player2' });
+    expect(whoseInputIsAwaited(s)).toBe('player2');
+  });
+
+  it('returns pendingForcedResolver during end phase', () => {
+    const s = makeState({ phase: 'end', pendingForcedResolver: 'player2' });
+    expect(whoseInputIsAwaited(s)).toBe('player2');
+  });
+
+  it('returns pendingForcedResolver during mission phase (above missionScoringProgress.winner)', () => {
+    const s = makeState({
+      phase: 'mission',
+      pendingForcedResolver: 'player1',
+      missionScoringProgress: {
+        currentRankIndex: 0,
+        missionCardScoreDone: false,
+        processedCharacterIds: [],
+        winner: 'player2',
+      },
+    });
+    expect(whoseInputIsAwaited(s)).toBe('player1');
+  });
 });
 
 describe('computeAwaitedInputKey', () => {
@@ -241,5 +265,49 @@ describe('computeAwaitedInputKey', () => {
     const s1 = makeState({ pendingForcedResolver: 'player1' });
     const s2 = makeState({ pendingForcedResolver: 'player1' });
     expect(computeAwaitedInputKey(s1)).toBe(computeAwaitedInputKey(s2));
+  });
+
+  it('mission scoring key differentiates missionCardScoreDone transitions', () => {
+    const before = makeState({
+      phase: 'mission',
+      missionScoringProgress: {
+        currentRankIndex: 0,
+        missionCardScoreDone: false,
+        processedCharacterIds: [],
+        winner: 'player1',
+      },
+    });
+    const after = makeState({
+      phase: 'mission',
+      missionScoringProgress: {
+        currentRankIndex: 0,
+        missionCardScoreDone: true,
+        processedCharacterIds: [],
+        winner: 'player1',
+      },
+    });
+    expect(computeAwaitedInputKey(before)).not.toBe(computeAwaitedInputKey(after));
+  });
+
+  it('mission scoring key differentiates each processed character', () => {
+    const after1 = makeState({
+      phase: 'mission',
+      missionScoringProgress: {
+        currentRankIndex: 0,
+        missionCardScoreDone: true,
+        processedCharacterIds: ['char-1'],
+        winner: 'player1',
+      },
+    });
+    const after2 = makeState({
+      phase: 'mission',
+      missionScoringProgress: {
+        currentRankIndex: 0,
+        missionCardScoreDone: true,
+        processedCharacterIds: ['char-1', 'char-2'],
+        winner: 'player1',
+      },
+    });
+    expect(computeAwaitedInputKey(after1)).not.toBe(computeAwaitedInputKey(after2));
   });
 });
