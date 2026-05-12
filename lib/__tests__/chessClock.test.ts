@@ -286,4 +286,29 @@ describe('chessClock', () => {
     consumeIdleWarning(armed);
     expect(JSON.stringify(armed)).toBe(snapshot);
   });
+
+  it('resetIdle does not mutate the input state', () => {
+    const t0 = 1_000_000;
+    const armed = arm(createChessClock(), 'player1', t0);
+    const snapshot = JSON.stringify(armed);
+    resetIdle(armed, t0 + 30_000);
+    expect(JSON.stringify(armed)).toBe(snapshot);
+  });
+
+  it('snapshotForBroadcast does not mutate the input state', () => {
+    const t0 = 1_000_000;
+    const armed = arm(createChessClock(), 'player1', t0);
+    const snapshot = JSON.stringify(armed);
+    snapshotForBroadcast(armed, t0 + 15_000);
+    expect(JSON.stringify(armed)).toBe(snapshot);
+  });
+
+  it('snapshotForBroadcast does not mutate the active player nested object', () => {
+    const t0 = 1_000_000;
+    const armed = arm(createChessClock(), 'player1', t0);
+    const originalPlayer1Ref = armed.player1;
+    snapshotForBroadcast(armed, t0 + 15_000);
+    expect(armed.player1).toBe(originalPlayer1Ref);
+    expect(armed.player1.remainingMs).toBe(CHESS_CLOCK_INITIAL_MS);
+  });
 });
