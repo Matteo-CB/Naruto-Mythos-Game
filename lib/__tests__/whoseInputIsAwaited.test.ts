@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { whoseInputIsAwaited } from '@/lib/socket/server';
+import { whoseInputIsAwaited, computeAwaitedInputKey } from '@/lib/socket/server';
 import type { GameState, PendingAction, PendingEffect, PlayerID } from '@/lib/engine/types';
 
 
@@ -182,5 +182,64 @@ describe('whoseInputIsAwaited', () => {
       pendingForcedResolver: 'player1',
     });
     expect(whoseInputIsAwaited(s)).toBe(null);
+  });
+});
+
+describe('computeAwaitedInputKey', () => {
+  it('returns null for null/gameOver/forfeit', () => {
+    expect(computeAwaitedInputKey(null)).toBe(null);
+    expect(computeAwaitedInputKey(makeState({ phase: 'gameOver' }))).toBe(null);
+    expect(computeAwaitedInputKey(makeState({ forfeitedBy: 'player1' }))).toBe(null);
+  });
+
+  it('returns different keys for different pending actions of the same player', () => {
+    const s1 = makeState({ pendingActions: [makePendingAction('player1', { id: 'pa-A' })] });
+    const s2 = makeState({ pendingActions: [makePendingAction('player1', { id: 'pa-B' })] });
+    expect(computeAwaitedInputKey(s1)).not.toBe(computeAwaitedInputKey(s2));
+  });
+
+  it('returns the same key when the same pending action is queried twice', () => {
+    const s = makeState({ pendingActions: [makePendingAction('player1', { id: 'pa-A' })] });
+    expect(computeAwaitedInputKey(s)).toBe(computeAwaitedInputKey(s));
+  });
+
+  it('returns different keys for different pending effects of the same player', () => {
+    const s1 = makeState({ pendingEffects: [makePendingEffect('player1', { id: 'pe-A' })] });
+    const s2 = makeState({ pendingEffects: [makePendingEffect('player1', { id: 'pe-B' })] });
+    expect(computeAwaitedInputKey(s1)).not.toBe(computeAwaitedInputKey(s2));
+  });
+
+  it('returns turn-namespaced key in action phase so a new turn resets idle for the same activePlayer', () => {
+    const s1 = makeState({ phase: 'action', activePlayer: 'player1', turn: 1 });
+    const s2 = makeState({ phase: 'action', activePlayer: 'player1', turn: 2 });
+    expect(computeAwaitedInputKey(s1)).not.toBe(computeAwaitedInputKey(s2));
+  });
+
+  it('returns mission rank-namespaced key so each mission scoring step changes the key', () => {
+    const s1 = makeState({
+      phase: 'mission',
+      missionScoringProgress: {
+        currentRankIndex: 0,
+        missionCardScoreDone: false,
+        processedCharacterIds: [],
+        winner: 'player1',
+      },
+    });
+    const s2 = makeState({
+      phase: 'mission',
+      missionScoringProgress: {
+        currentRankIndex: 1,
+        missionCardScoreDone: false,
+        processedCharacterIds: [],
+        winner: 'player1',
+      },
+    });
+    expect(computeAwaitedInputKey(s1)).not.toBe(computeAwaitedInputKey(s2));
+  });
+
+  it('forced resolver produces a stable key', () => {
+    const s1 = makeState({ pendingForcedResolver: 'player1' });
+    const s2 = makeState({ pendingForcedResolver: 'player1' });
+    expect(computeAwaitedInputKey(s1)).toBe(computeAwaitedInputKey(s2));
   });
 });

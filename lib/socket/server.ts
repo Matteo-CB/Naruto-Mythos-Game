@@ -87,6 +87,7 @@ export interface RoomData {
   chessClock: ChessClockState;
   chessClockTickTimer: ReturnType<typeof setInterval> | null;
   chessClockMulliganTimer: ReturnType<typeof setTimeout> | null;
+  chessClockLastInputKey: string | null;
 }
 
 function clearChessClockTimers(room: RoomData): void {
@@ -130,20 +131,41 @@ export function whoseInputIsAwaited(state: GameState | null): PlayerID | null {
   return null;
 }
 
+export function computeAwaitedInputKey(state: GameState | null): string | null {
+  if (!state) return null;
+  if (state.forfeitedBy || state.phase === 'gameOver') return null;
+  if (state.pendingForcedResolver) return 'forced:' + state.pendingForcedResolver;
+  if (state.pendingActions && state.pendingActions.length > 0) {
+    return 'pa:' + state.pendingActions[0].id;
+  }
+  if (state.pendingEffects) {
+    const eff = state.pendingEffects.find((e) => !e.resolved && e.selectingPlayer);
+    if (eff) return 'pe:' + eff.id;
+  }
+  if (state.phase === 'mission' && state.missionScoringProgress) {
+    return 'mission:' + state.missionScoringProgress.winner + ':' + state.missionScoringProgress.currentRankIndex;
+  }
+  if (state.phase === 'action') return 'action:' + state.activePlayer + ':' + state.turn;
+  return null;
+}
+
 function syncChessClock(room: RoomData, now: number = Date.now()): void {
   const needed = whoseInputIsAwaited(room.gameState);
+  const newKey = computeAwaitedInputKey(room.gameState);
   if (needed === null) {
     room.chessClock = disarmChessClock(room.chessClock, now);
+    room.chessClockLastInputKey = null;
     return;
   }
   if (room.chessClock.active === needed) {
+    if (newKey !== room.chessClockLastInputKey) {
+      room.chessClock = resetChessClockIdle(room.chessClock, now);
+      room.chessClockLastInputKey = newKey;
+    }
     return;
   }
   room.chessClock = armChessClock(room.chessClock, needed, now);
-}
-
-function bumpIdleCountdown(room: RoomData, now: number = Date.now()): void {
-  room.chessClock = resetChessClockIdle(room.chessClock, now);
+  room.chessClockLastInputKey = newKey;
 }
 
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
@@ -402,6 +424,7 @@ async function finalizeGameEnd(
   }
   clearChessClockTimers(room);
   room.chessClock = disarmChessClock(room.chessClock, Date.now());
+  room.chessClockLastInputKey = null;
   room.disconnectedPlayer = null;
   room.disconnectDeadline = null;
 
@@ -1662,6 +1685,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         chessClock: createChessClock(),
         chessClockTickTimer: null,
         chessClockMulliganTimer: null,
+        chessClockLastInputKey: null,
       };
 
 
@@ -2473,6 +2497,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       clearActionTimer(room);
       clearChessClockTimers(room);
       room.chessClock = createChessClock();
+      room.chessClockLastInputKey = null;
 
       
       if (room.hostSocket) {
@@ -2692,6 +2717,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           chessClock: createChessClock(),
           chessClockTickTimer: null,
           chessClockMulliganTimer: null,
+          chessClockLastInputKey: null,
           };
 
         rooms.set(code, room);

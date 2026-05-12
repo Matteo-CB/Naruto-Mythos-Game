@@ -233,6 +233,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             chessClock: createChessClock(),
             chessClockTickTimer: null,
             chessClockMulliganTimer: null,
+            chessClockLastInputKey: null,
           } as RoomData);
         }
 
