@@ -96,6 +96,23 @@ describe('chessClock', () => {
     expect(liveRemaining).toBe(CHESS_CLOCK_INITIAL_MS - 10_000);
   });
 
+  it('snapshotForBroadcast PRESERVES idleStartedAt as the original server timestamp', () => {
+    const t0 = 1_000_000;
+    const c = arm(createChessClock(), 'player1', t0);
+    const snap = snapshotForBroadcast(c, t0 + 90_000);
+    expect(snap.idleStartedAt).toBe(t0);
+    expect(idleMs(snap, t0 + 90_000)).toBe(90_000);
+  });
+
+  it('snapshot then live idle measurement reflects total idle, not just the post-snapshot delta', () => {
+    const t0 = 1_000_000;
+    const c = arm(createChessClock(), 'player1', t0);
+    const snap = snapshotForBroadcast(c, t0 + 90_000);
+    const clientNow = t0 + 120_000;
+    const idle = clientNow - snap.idleStartedAt!;
+    expect(idle).toBe(120_000);
+  });
+
   it('idleMs measures time since idleStartedAt', () => {
     const t0 = 1_000_000;
     const c = arm(createChessClock(), 'player1', t0);
