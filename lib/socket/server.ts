@@ -141,7 +141,7 @@ export function computeAwaitedInputKey(state: GameState | null): string | null {
   return null;
 }
 
-function syncChessClock(room: RoomData, now: number = Date.now()): void {
+export function syncChessClock(room: RoomData, now: number = Date.now()): void {
   const needed = whoseInputIsAwaited(room.gameState);
   const newKey = computeAwaitedInputKey(room.gameState);
   if (needed === null) {

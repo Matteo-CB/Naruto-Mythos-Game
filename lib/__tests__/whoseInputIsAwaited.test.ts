@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { whoseInputIsAwaited, computeAwaitedInputKey } from '@/lib/socket/server';
+import { whoseInputIsAwaited, computeAwaitedInputKey, syncChessClock } from '@/lib/socket/server';
+import { createChessClock, CHESS_CLOCK_INITIAL_MS } from '@/lib/timing/chessClock';
 import type { GameState, PendingAction, PendingEffect, PlayerID } from '@/lib/engine/types';
+import type { RoomData } from '@/lib/socket/server';
 
 
 function makeState(overrides: Partial<GameState> = {}): GameState {
@@ -309,5 +311,85 @@ describe('computeAwaitedInputKey', () => {
       },
     });
     expect(computeAwaitedInputKey(after1)).not.toBe(computeAwaitedInputKey(after2));
+  });
+});
+
+function makeMockRoom(state: GameState | null): RoomData {
+  return {
+    chessClock: createChessClock(),
+    chessClockTickTimer: null,
+    chessClockMulliganTimer: null,
+    chessClockLastInputKey: null,
+    gameState: state,
+  } as RoomData;
+}
+
+describe('syncChessClock orchestration', () => {
+  it('arms the active player when starting from null and key is set', () => {
+    const room = makeMockRoom(makeState({ phase: 'action', activePlayer: 'player1', turn: 1 }));
+    syncChessClock(room, 1_000);
+    expect(room.chessClock.active).toBe('player1');
+    expect(room.chessClock.activeStartedAt).toBe(1_000);
+    expect(room.chessClockLastInputKey).toBe('action:player1:1');
+  });
+
+  it('disarms and clears key when no input awaited (game over)', () => {
+    const room = makeMockRoom(makeState({ phase: 'action', activePlayer: 'player1' }));
+    syncChessClock(room, 1_000);
+    expect(room.chessClock.active).toBe('player1');
+    room.gameState = makeState({ phase: 'gameOver' });
+    syncChessClock(room, 5_000);
+    expect(room.chessClock.active).toBe(null);
+    expect(room.chessClockLastInputKey).toBe(null);
+  });
+
+  it('switches active player when whoseInputIsAwaited changes', () => {
+    const room = makeMockRoom(makeState({ phase: 'action', activePlayer: 'player1', turn: 1 }));
+    syncChessClock(room, 1_000);
+    room.gameState = makeState({ phase: 'action', activePlayer: 'player2', turn: 1 });
+    syncChessClock(room, 5_000);
+    expect(room.chessClock.active).toBe('player2');
+    expect(room.chessClockLastInputKey).toBe('action:player2:1');
+  });
+
+  it('is no-op when active player and input key are unchanged (re-broadcast)', () => {
+    const room = makeMockRoom(makeState({ phase: 'action', activePlayer: 'player1', turn: 1 }));
+    syncChessClock(room, 1_000);
+    const firstActiveStartedAt = room.chessClock.activeStartedAt;
+    const firstIdleStartedAt = room.chessClock.idleStartedAt;
+    syncChessClock(room, 5_000);
+    expect(room.chessClock.activeStartedAt).toBe(firstActiveStartedAt);
+    expect(room.chessClock.idleStartedAt).toBe(firstIdleStartedAt);
+  });
+
+  it('resets idle (NOT bank) when same player has a new sub-decision', () => {
+    const room = makeMockRoom(makeState({
+      phase: 'action',
+      activePlayer: 'player1',
+      pendingEffects: [makePendingEffect('player1', { id: 'pe-A' })],
+    }));
+    syncChessClock(room, 1_000);
+    const bankBefore = room.chessClock.player1.remainingMs;
+    expect(room.chessClockLastInputKey).toBe('pe:pe-A');
+
+    room.gameState = makeState({
+      phase: 'action',
+      activePlayer: 'player1',
+      pendingEffects: [makePendingEffect('player1', { id: 'pe-B' })],
+    });
+    syncChessClock(room, 5_000);
+    expect(room.chessClock.active).toBe('player1');
+    expect(room.chessClock.idleStartedAt).toBe(5_000);
+    expect(room.chessClock.player1.remainingMs).toBe(bankBefore);
+    expect(room.chessClockLastInputKey).toBe('pe:pe-B');
+  });
+
+  it('deducts elapsed bank time when switching active player', () => {
+    const room = makeMockRoom(makeState({ phase: 'action', activePlayer: 'player1', turn: 1 }));
+    syncChessClock(room, 1_000);
+    room.gameState = makeState({ phase: 'action', activePlayer: 'player2', turn: 1 });
+    syncChessClock(room, 11_000);
+    expect(room.chessClock.player1.remainingMs).toBe(CHESS_CLOCK_INITIAL_MS - 10_000);
+    expect(room.chessClock.active).toBe('player2');
   });
 });
