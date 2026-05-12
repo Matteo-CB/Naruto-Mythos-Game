@@ -14,6 +14,10 @@ import {
   CHESS_CLOCK_IDLE_LIMIT_MS,
   CHESS_CLOCK_IDLE_TOAST_MS,
   CHESS_CLOCK_MULLIGAN_IDLE_MS,
+  CHESS_CLOCK_DISPLAY_ORANGE_MS,
+  CHESS_CLOCK_DISPLAY_RED_MS,
+  CHESS_CLOCK_SOUND_TICK_MS,
+  CHESS_CLOCK_SOUND_ALARM_MS,
 } from '@/lib/socket/chessClock';
 
 describe('chessClock', () => {
@@ -143,6 +147,22 @@ describe('chessClock', () => {
 
   it('initial bank constant is 15 minutes', () => {
     expect(CHESS_CLOCK_INITIAL_MS).toBe(15 * 60 * 1000);
+  });
+
+  it('display threshold constants match spec (orange 60s, red 30s)', () => {
+    expect(CHESS_CLOCK_DISPLAY_ORANGE_MS).toBe(60 * 1000);
+    expect(CHESS_CLOCK_DISPLAY_RED_MS).toBe(30 * 1000);
+    expect(CHESS_CLOCK_DISPLAY_RED_MS).toBeLessThan(CHESS_CLOCK_DISPLAY_ORANGE_MS);
+  });
+
+  it('sound threshold constants match spec (tick 30s, alarm 10s)', () => {
+    expect(CHESS_CLOCK_SOUND_TICK_MS).toBe(30 * 1000);
+    expect(CHESS_CLOCK_SOUND_ALARM_MS).toBe(10 * 1000);
+    expect(CHESS_CLOCK_SOUND_ALARM_MS).toBeLessThan(CHESS_CLOCK_SOUND_TICK_MS);
+  });
+
+  it('display orange and sound tick happen at the same threshold (30s)', () => {
+    expect(CHESS_CLOCK_SOUND_TICK_MS).toBe(CHESS_CLOCK_DISPLAY_RED_MS);
   });
 
   it('disarm is a no-op when no player is active', () => {

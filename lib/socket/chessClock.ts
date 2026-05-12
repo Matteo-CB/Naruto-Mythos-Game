@@ -6,6 +6,11 @@ export const CHESS_CLOCK_IDLE_LIMIT_MS = 3 * 60 * 1000;
 export const CHESS_CLOCK_IDLE_TOAST_MS = 2 * 60 * 1000;
 export const CHESS_CLOCK_MULLIGAN_IDLE_MS = 60 * 1000;
 
+export const CHESS_CLOCK_DISPLAY_ORANGE_MS = 60 * 1000;
+export const CHESS_CLOCK_DISPLAY_RED_MS = 30 * 1000;
+export const CHESS_CLOCK_SOUND_TICK_MS = 30 * 1000;
+export const CHESS_CLOCK_SOUND_ALARM_MS = 10 * 1000;
+
 
 export interface PlayerClock {
   remainingMs: number;
