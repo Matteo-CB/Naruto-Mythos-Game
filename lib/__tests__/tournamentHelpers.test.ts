@@ -16,6 +16,8 @@ interface FakeRoom {
   mulliganTimer: FakeTimer | null;
   tournamentJoinTimer: FakeTimer | null;
   sealedTimer: FakeTimer | null;
+  chessClockTickTimer: FakeTimer | null;
+  chessClockMulliganTimer: FakeTimer | null;
   [key: string]: unknown;
 }
 
@@ -32,6 +34,8 @@ function makeRoom(overrides: Partial<FakeRoom> = {}): FakeRoom {
     mulliganTimer: 4 as unknown as FakeTimer,
     tournamentJoinTimer: 5 as unknown as FakeTimer,
     sealedTimer: 3 as unknown as FakeTimer,
+    chessClockTickTimer: 6 as unknown as FakeTimer,
+    chessClockMulliganTimer: 7 as unknown as FakeTimer,
     ...overrides,
   };
 }
@@ -48,6 +52,8 @@ describe('matchRoomCleanup helpers', () => {
     expect(room.mulliganTimer).not.toBeNull();
     expect(room.tournamentJoinTimer).not.toBeNull();
     expect(room.sealedTimer).not.toBeNull();
+    expect(room.chessClockTickTimer).not.toBeNull();
+    expect(room.chessClockMulliganTimer).not.toBeNull();
 
     clearAllMatchRoomTimers(room as never);
 
@@ -56,6 +62,8 @@ describe('matchRoomCleanup helpers', () => {
     expect(room.mulliganTimer).toBeNull();
     expect(room.tournamentJoinTimer).toBeNull();
     expect(room.sealedTimer).toBeNull();
+    expect(room.chessClockTickTimer).toBeNull();
+    expect(room.chessClockMulliganTimer).toBeNull();
   });
 
   it('clearAllMatchRoomTimers is a no-op when timers are already null', () => {
@@ -65,6 +73,8 @@ describe('matchRoomCleanup helpers', () => {
       mulliganTimer: null,
       tournamentJoinTimer: null,
       sealedTimer: null,
+      chessClockTickTimer: null,
+      chessClockMulliganTimer: null,
     });
     expect(() => clearAllMatchRoomTimers(room as never)).not.toThrow();
   });

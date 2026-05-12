@@ -21,6 +21,14 @@ export function clearAllMatchRoomTimers(room: RoomData): void {
     clearTimeout(room.sealedTimer);
     room.sealedTimer = null;
   }
+  if (room.chessClockTickTimer) {
+    clearInterval(room.chessClockTickTimer);
+    room.chessClockTickTimer = null;
+  }
+  if (room.chessClockMulliganTimer) {
+    clearTimeout(room.chessClockMulliganTimer);
+    room.chessClockMulliganTimer = null;
+  }
 }
 
 export function finalizeAndScheduleRoomDeletion(

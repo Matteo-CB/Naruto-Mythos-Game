@@ -386,10 +386,12 @@ export async function POST(
 
         if (match.roomCode) {
           const { rooms } = await import('@/lib/socket/server');
+          const { clearAllMatchRoomTimers } = await import('@/lib/tournament/matchRoomCleanup');
           const room = rooms.get(match.roomCode);
           if (room) {
             const ioInstance = getSocketIO();
             if (ioInstance) ioInstance.to(match.roomCode).emit('tournament:match-reset', { matchId: resetMatchId });
+            clearAllMatchRoomTimers(room);
             rooms.delete(match.roomCode);
           }
         }
