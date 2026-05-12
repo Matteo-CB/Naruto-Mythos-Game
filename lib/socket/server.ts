@@ -1,7 +1,7 @@
 import type { Server as SocketIOServer, Socket } from 'socket.io';
 import { decode } from 'next-auth/jwt';
 import { GameEngine } from '@/lib/engine/GameEngine';
-import type { GameState, GameAction, CharacterCard, MissionCard, PlayerConfig, GameConfig } from '@/lib/engine/types';
+import type { GameState, GameAction, CharacterCard, MissionCard, PlayerConfig, GameConfig, PlayerID } from '@/lib/engine/types';
 import { registerUserSocket, removeSocketFromAll } from '@/lib/socket/io';
 import { prisma } from '@/lib/db/prisma';
 import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
@@ -13,7 +13,7 @@ import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, val
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
 import { isMaintenanceActive, activateMaintenance, setDrainTimeout, setCheckInterval } from '@/lib/socket/maintenance';
-import { createChessClock, type ChessClockState } from '@/lib/timing/chessClock';
+import { createChessClock, arm as armChessClock, disarm as disarmChessClock, resetIdle as resetChessClockIdle, type ChessClockState } from '@/lib/timing/chessClock';
 
 export interface RoomData {
   code: string;
@@ -98,6 +98,52 @@ function clearChessClockTimers(room: RoomData): void {
     clearTimeout(room.chessClockMulliganTimer);
     room.chessClockMulliganTimer = null;
   }
+}
+
+export function whoseInputIsAwaited(state: GameState | null): PlayerID | null {
+  if (!state) return null;
+  if (state.forfeitedBy) return null;
+  if (state.phase === 'gameOver') return null;
+  if (state.phase === 'setup' || state.phase === 'mulligan') return null;
+  if (state.phase === 'start' || state.phase === 'end') {
+    if (state.pendingActions && state.pendingActions.length > 0) {
+      return state.pendingActions[0].player;
+    }
+    if (state.pendingEffects) {
+      const eff = state.pendingEffects.find((e) => !e.resolved);
+      if (eff?.selectingPlayer) return eff.selectingPlayer;
+    }
+    return null;
+  }
+  if (state.pendingForcedResolver) return state.pendingForcedResolver;
+  if (state.pendingActions && state.pendingActions.length > 0) {
+    return state.pendingActions[0].player;
+  }
+  if (state.pendingEffects) {
+    const eff = state.pendingEffects.find((e) => !e.resolved && e.selectingPlayer);
+    if (eff?.selectingPlayer) return eff.selectingPlayer;
+  }
+  if (state.phase === 'mission' && state.missionScoringProgress) {
+    return state.missionScoringProgress.winner;
+  }
+  if (state.phase === 'action') return state.activePlayer;
+  return null;
+}
+
+function syncChessClock(room: RoomData, now: number = Date.now()): void {
+  const needed = whoseInputIsAwaited(room.gameState);
+  if (needed === null) {
+    room.chessClock = disarmChessClock(room.chessClock, now);
+    return;
+  }
+  if (room.chessClock.active === needed) {
+    return;
+  }
+  room.chessClock = armChessClock(room.chessClock, needed, now);
+}
+
+function bumpIdleCountdown(room: RoomData, now: number = Date.now()): void {
+  room.chessClock = resetChessClockIdle(room.chessClock, now);
 }
 
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
@@ -355,6 +401,7 @@ async function finalizeGameEnd(
     room.disconnectTimer = null;
   }
   clearChessClockTimers(room);
+  room.chessClock = disarmChessClock(room.chessClock, Date.now());
   room.disconnectedPlayer = null;
   room.disconnectDeadline = null;
 
@@ -1143,6 +1190,8 @@ function startMissionPhaseTimer(
 
 function broadcastState(room: RoomData, io: SocketIOServer): void {
   if (!room.gameState) return;
+
+  syncChessClock(room);
 
   const playerNames = {
     player1: room.hostName ?? 'Player 1',
