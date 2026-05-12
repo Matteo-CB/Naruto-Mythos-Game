@@ -1573,6 +1573,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
           room.hostName = hostName;
           room.guestName = guestName;
 
+          syncChessClock(room);
+
           const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
           const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
 
@@ -1829,6 +1831,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             room.replayInitialState.actionHistory = [];
             room.replayStateSnapshots = [];
             room.replaySnapshotLogLengths = [];
+            syncChessClock(room);
             const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
             const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
             const playerNames = { player1: hostName, player2: guestName };
@@ -2094,7 +2097,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
         room.hostName = hostName;
         room.guestName = guestName;
 
-        
+        syncChessClock(room);
+
         const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
         const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
         console.log(`[Socket] P1 visible: hand=${p1State.myState.hand.length}, phase=${p1State.phase}`);
