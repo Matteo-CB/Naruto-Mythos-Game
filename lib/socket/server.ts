@@ -354,6 +354,7 @@ async function finalizeGameEnd(
     clearTimeout(room.disconnectTimer);
     room.disconnectTimer = null;
   }
+  clearChessClockTimers(room);
   room.disconnectedPlayer = null;
   room.disconnectDeadline = null;
 
