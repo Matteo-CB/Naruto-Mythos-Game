@@ -87,9 +87,10 @@ export function arm(state: ChessClockState, player: PlayerID, now: number): Ches
 
 export function resetIdle(state: ChessClockState, now: number): ChessClockState {
   if (state.active === null) return state;
+  const safeNow = state.idleStartedAt !== null && now < state.idleStartedAt ? state.idleStartedAt : now;
   return {
     ...state,
-    idleStartedAt: now,
+    idleStartedAt: safeNow,
   };
 }
 

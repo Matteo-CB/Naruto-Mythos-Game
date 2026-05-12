@@ -82,9 +82,9 @@ describe('chessClock', () => {
     const c = arm(createChessClock(), 'player1', t0);
     const snap = snapshotForBroadcast(c, t0 + 7_500);
     expect(snap.activeStartedAt).toBe(t0 + 7_500);
-    const clientNow = t0 + 7_500;
+    const clientNow = t0 + 8_000;
     const liveRemaining = snap.player1.remainingMs - (clientNow - snap.activeStartedAt!);
-    expect(liveRemaining).toBe(CHESS_CLOCK_INITIAL_MS - 7_500);
+    expect(liveRemaining).toBe(CHESS_CLOCK_INITIAL_MS - 8_000);
   });
 
   it('snapshotForBroadcast at a later client tick still reads correctly', () => {
@@ -336,6 +336,14 @@ describe('chessClock', () => {
     c = arm(c, 'player1', t0);
     expect(idleMs(c, t0 - 1_000)).toBe(0);
     expect(snapshotRemaining(c, 'player1', t0 - 1_000)).toBe(CHESS_CLOCK_INITIAL_MS);
+  });
+
+  it('resetIdle clamps backwards-clock calls so idleStartedAt is never moved into the past', () => {
+    const t0 = 1_000_000;
+    let c = arm(createChessClock(), 'player1', t0 + 30_000);
+    c = resetIdle(c, t0 + 10_000);
+    expect(c.idleStartedAt).toBe(t0 + 30_000);
+    expect(idleMs(c, t0 + 30_000)).toBe(0);
   });
 
   it('consumeIdleWarning is idempotent when already consumed', () => {
