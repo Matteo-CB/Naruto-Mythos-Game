@@ -55,6 +55,7 @@ export function snapshotForBroadcast(state: ChessClockState, now: number): Chess
       ...state[active],
       remainingMs: Math.max(0, state[active].remainingMs - elapsedSinceActive(state, now)),
     },
+    activeStartedAt: now,
   };
 }
 

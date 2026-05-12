@@ -77,6 +77,25 @@ describe('chessClock', () => {
     expect(snap.player2.remainingMs).toBe(CHESS_CLOCK_INITIAL_MS);
   });
 
+  it('snapshotForBroadcast resets activeStartedAt so client interpolation does not double-count', () => {
+    const t0 = 1_000_000;
+    const c = arm(createChessClock(), 'player1', t0);
+    const snap = snapshotForBroadcast(c, t0 + 7_500);
+    expect(snap.activeStartedAt).toBe(t0 + 7_500);
+    const clientNow = t0 + 7_500;
+    const liveRemaining = snap.player1.remainingMs - (clientNow - snap.activeStartedAt!);
+    expect(liveRemaining).toBe(CHESS_CLOCK_INITIAL_MS - 7_500);
+  });
+
+  it('snapshotForBroadcast at a later client tick still reads correctly', () => {
+    const t0 = 1_000_000;
+    const c = arm(createChessClock(), 'player1', t0);
+    const snap = snapshotForBroadcast(c, t0 + 7_500);
+    const clientNow = t0 + 10_000;
+    const liveRemaining = snap.player1.remainingMs - (clientNow - snap.activeStartedAt!);
+    expect(liveRemaining).toBe(CHESS_CLOCK_INITIAL_MS - 10_000);
+  });
+
   it('idleMs measures time since idleStartedAt', () => {
     const t0 = 1_000_000;
     const c = arm(createChessClock(), 'player1', t0);
