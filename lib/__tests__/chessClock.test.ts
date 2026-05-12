@@ -129,4 +129,66 @@ describe('chessClock', () => {
   it('idle limit constant is 3 minutes', () => {
     expect(CHESS_CLOCK_IDLE_LIMIT_MS).toBe(3 * 60 * 1000);
   });
+
+  it('disarm is a no-op when no player is active', () => {
+    const c = createChessClock();
+    const after = disarm(c, Date.now());
+    expect(after).toBe(c);
+  });
+
+  it('resetIdle is a no-op when no player is active', () => {
+    const c = createChessClock();
+    const after = resetIdle(c, Date.now());
+    expect(after).toBe(c);
+  });
+
+  it('idleMs returns 0 when no player is active', () => {
+    const c = createChessClock();
+    expect(idleMs(c, Date.now())).toBe(0);
+  });
+
+  it('snapshotForBroadcast returns state unchanged when no player is active', () => {
+    const c = createChessClock();
+    expect(snapshotForBroadcast(c, Date.now())).toBe(c);
+  });
+
+  it('consumeIdleWarning is a no-op when no player is active', () => {
+    const c = createChessClock();
+    const after = consumeIdleWarning(c);
+    expect(after).toBe(c);
+  });
+
+  it('arming player1 does not affect player2 bank', () => {
+    const t0 = 1_000_000;
+    let c = arm(createChessClock(), 'player1', t0);
+    c = disarm(c, t0 + 60_000);
+    expect(c.player2.remainingMs).toBe(CHESS_CLOCK_INITIAL_MS);
+  });
+
+  it('idle warnings are independent per player', () => {
+    const t0 = 1_000_000;
+    let c = arm(createChessClock(), 'player1', t0);
+    c = consumeIdleWarning(c);
+    c = arm(c, 'player2', t0 + 10_000);
+    expect(hasIdleWarning(c, 'player1')).toBe(true);
+    expect(hasIdleWarning(c, 'player2')).toBe(false);
+    c = consumeIdleWarning(c);
+    expect(hasIdleWarning(c, 'player1')).toBe(true);
+    expect(hasIdleWarning(c, 'player2')).toBe(true);
+  });
+
+  it('createChessClock accepts a custom initial bank', () => {
+    const c = createChessClock(60_000);
+    expect(c.player1.remainingMs).toBe(60_000);
+    expect(c.player2.remainingMs).toBe(60_000);
+  });
+
+  it('re-arming the same player resets the idle countdown without losing bank time', () => {
+    const t0 = 1_000_000;
+    let c = arm(createChessClock(), 'player1', t0);
+    expect(idleMs(c, t0 + 90_000)).toBe(90_000);
+    c = arm(c, 'player1', t0 + 90_000);
+    expect(idleMs(c, t0 + 90_000)).toBe(0);
+    expect(c.player1.remainingMs).toBe(CHESS_CLOCK_INITIAL_MS - 90_000);
+  });
 });
