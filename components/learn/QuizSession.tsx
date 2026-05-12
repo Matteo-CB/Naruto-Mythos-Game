@@ -199,21 +199,21 @@ function TopBar({ timeLimit }: { timeLimit: number }) {
   const streak = useQuizStore((s) => s.streak);
 
   return (
-    <div className="mb-6">
-      
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-base font-bold" style={{ color: TEXT_LIGHT }}>
+    <div className="mb-4 sm:mb-6">
+
+      <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+        <span className="text-sm sm:text-base font-bold flex-shrink-0" style={{ color: TEXT_LIGHT }}>
           {t('quiz.questionCounter', {
             current: currentIndex + 1,
             total: questions.length,
           })}
         </span>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
           {streak >= 3 && (
             <motion.span
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="text-sm font-bold px-3 py-1"
+              className="text-xs sm:text-sm font-bold px-2 py-0.5 sm:px-3 sm:py-1"
               style={{
                 color: GOLD,
                 backgroundColor: 'rgba(196, 163, 90, 0.12)',
@@ -223,16 +223,16 @@ function TopBar({ timeLimit }: { timeLimit: number }) {
               {t('quiz.streakCount', { count: streak.toString() })}
             </motion.span>
           )}
-          <span className="text-base font-bold" style={{ color: GOLD }}>
+          <span className="text-sm sm:text-base font-bold tabular-nums" style={{ color: GOLD }}>
             {score}
           </span>
         </div>
       </div>
 
-      
+
       <TimerBar timeRemaining={timeRemaining} timeLimit={timeLimit} />
       <div className="text-right mt-1">
-        <span className="text-xs" style={{ color: TEXT_DIM }}>
+        <span className="text-xs tabular-nums" style={{ color: TEXT_DIM }}>
           {timeRemaining}s
         </span>
       </div>
@@ -260,13 +260,14 @@ function QuestionImage({
 
   return (
     <div className="flex justify-center mb-4">
-      <div style={{ position: 'relative', display: 'inline-block' }}>
+      <div style={{ position: 'relative', display: 'inline-block', maxWidth: '100%' }}>
         <img
           src={fullPath}
           alt=""
           draggable={false}
           style={{
-            maxHeight: '360px',
+            maxHeight: 'min(360px, 45vh)',
+            maxWidth: '100%',
             borderRadius: '10px',
             objectFit: 'contain',
             filter: blurred ? 'blur(20px)' : 'none',
@@ -460,7 +461,7 @@ function MultipleChoiceRenderer({
                 onSubmit({ type: 'multipleChoice', selectedIndex: i });
               }
             }}
-            className="px-5 py-4 text-left text-base transition-all"
+            className="px-3 sm:px-5 py-3 sm:py-4 text-left text-sm sm:text-base transition-all"
             style={{
               backgroundColor: bgColor,
               border: `2px solid ${borderColor}`,
@@ -468,11 +469,12 @@ function MultipleChoiceRenderer({
               color: TEXT_LIGHT,
               cursor: showingAnswer ? 'default' : 'pointer',
               outline: 'none',
-              lineHeight: 1.5,
+              lineHeight: 1.4,
+              wordBreak: 'break-word',
             }}
           >
             <span
-              className="inline-block w-6 text-sm font-bold mr-2"
+              className="inline-block w-5 sm:w-6 text-xs sm:text-sm font-bold mr-1.5 sm:mr-2 flex-shrink-0"
               style={{ color: TEXT_DIM }}
             >
               {String.fromCharCode(65 + i)}.
@@ -510,7 +512,7 @@ function TrueFalseRenderer({
   ];
 
   return (
-    <div className="flex gap-4 justify-center">
+    <div className="flex gap-3 sm:gap-4 justify-center flex-wrap">
       {buttons.map(({ value, label }) => {
         const isCorrect = value === question.correctAnswer;
         const isSelected = userBool === value;
@@ -538,7 +540,7 @@ function TrueFalseRenderer({
                 onSubmit({ type: 'trueFalse', answer: value });
               }
             }}
-            className="px-10 py-5 text-lg font-bold uppercase tracking-wider transition-all"
+            className="flex-1 sm:flex-none px-6 sm:px-10 py-4 sm:py-5 text-base sm:text-lg font-bold uppercase tracking-wider transition-all"
             style={{
               backgroundColor: bgColor,
               border: `2px solid ${borderColor}`,
@@ -546,7 +548,8 @@ function TrueFalseRenderer({
               color: TEXT_LIGHT,
               cursor: showingAnswer ? 'default' : 'pointer',
               outline: 'none',
-              minWidth: '150px',
+              minWidth: '120px',
+              maxWidth: '50%',
             }}
           >
             {label}
@@ -718,12 +721,12 @@ function MatchPairsRenderer({
           return (
             <div
               key={leftIdx}
-              className="flex items-center gap-3"
+              className="flex items-center gap-2 sm:gap-3"
               style={{ minHeight: '48px' }}
             >
-              
+
               <div
-                className="flex items-center gap-3 flex-1 px-4 py-3"
+                className="flex items-center gap-2 sm:gap-3 flex-1 px-2 sm:px-4 py-2 sm:py-3"
                 style={{
                   backgroundColor: PANEL_BG,
                   border: `1px solid ${BORDER}`,
@@ -731,27 +734,27 @@ function MatchPairsRenderer({
                   minWidth: 0,
                 }}
               >
-                <CardThumbnail src={pair.leftImage} size={44} blurred={blurThumbnails} censorZone={censorZone} />
-                <span className="text-sm truncate" style={{ color: TEXT_LIGHT }}>
+                <CardThumbnail src={pair.leftImage} size={36} blurred={blurThumbnails} censorZone={censorZone} />
+                <span className="text-xs sm:text-sm truncate" style={{ color: TEXT_LIGHT }}>
                   {pair.left}
                 </span>
               </div>
 
-              
+
               <span
                 className="text-xs flex-shrink-0"
                 style={{ color: TEXT_DIM }}
               >
-                --&gt;
+                {'→'}
               </span>
 
-              
+
               <div
                 onDragOver={(e) => handleDragOver(e, leftIdx)}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, leftIdx)}
                 onClick={() => handleZoneClick(leftIdx)}
-                className="flex items-center gap-3 flex-1 px-4 py-3 transition-all"
+                className="flex items-center gap-2 sm:gap-3 flex-1 px-2 sm:px-4 py-2 sm:py-3 transition-all"
                 style={{
                   backgroundColor: hasPlaced
                     ? 'rgba(196, 163, 90, 0.06)'
@@ -760,25 +763,26 @@ function MatchPairsRenderer({
                   borderRadius: '6px',
                   minHeight: '52px',
                   cursor: showingAnswer ? 'default' : 'pointer',
+                  minWidth: 0,
                 }}
               >
                 {hasPlaced && placedRightIdx !== undefined ? (
                   <>
                     <CardThumbnail
                       src={pairs[placedRightIdx]?.rightImage}
-                      size={36}
+                      size={32}
                       blurred={blurThumbnails}
                       censorZone={censorZone}
                     />
                     <span
-                      className="text-sm truncate"
+                      className="text-xs sm:text-sm truncate"
                       style={{ color: TEXT_LIGHT }}
                     >
                       {pairs[placedRightIdx]?.right}
                     </span>
                   </>
                 ) : (
-                  <span className="text-sm" style={{ color: TEXT_DIM }}>
+                  <span className="text-xs sm:text-sm" style={{ color: TEXT_DIM }}>
                     {t('quiz.dropHere')}
                   </span>
                 )}
@@ -978,7 +982,7 @@ function SortOrderRenderer({
               onDragOver={(e) => handleDragOver(e, posIdx)}
               onDrop={(e) => handleDrop(e, posIdx)}
               onDragEnd={handleDragEnd}
-              className="flex items-center gap-3 px-4 py-3 transition-all"
+              className="flex items-center gap-2 sm:gap-3 px-2 sm:px-4 py-2 sm:py-3 transition-all"
               style={{
                 backgroundColor: PANEL_BG,
                 border: `2px solid ${borderColor}`,
@@ -988,10 +992,10 @@ function SortOrderRenderer({
                 userSelect: 'none',
               }}
             >
-              
+
               <span
-                className="text-sm font-bold flex-shrink-0"
-                style={{ color: TEXT_DIM, width: '24px', textAlign: 'center' }}
+                className="text-xs sm:text-sm font-bold flex-shrink-0"
+                style={{ color: TEXT_DIM, width: '20px', textAlign: 'center' }}
               >
                 {posIdx + 1}
               </span>
@@ -1342,9 +1346,11 @@ function CategorySortRenderer({
     <div>
       
       <div
-        className="grid gap-3 mb-4"
+        className="grid gap-2 sm:gap-3 mb-4"
         style={{
-          gridTemplateColumns: `repeat(${Math.min(categories.length, 3)}, 1fr)`,
+          gridTemplateColumns: categories.length <= 2
+            ? `repeat(${categories.length}, 1fr)`
+            : `repeat(${Math.min(categories.length, 3)}, minmax(0, 1fr))`,
         }}
       >
         {categories.map((cat, catIdx) => {
@@ -1371,19 +1377,20 @@ function CategorySortRenderer({
                 cursor: showingAnswer ? 'default' : 'pointer',
               }}
             >
-              
+
               <div
-                className="px-3 py-3 text-sm font-bold uppercase tracking-wider text-center"
+                className="px-2 sm:px-3 py-2 sm:py-3 text-[11px] sm:text-sm font-bold uppercase tracking-wider text-center"
                 style={{
                   color: GOLD,
                   borderBottom: `1px solid ${BORDER}`,
+                  wordBreak: 'break-word',
                 }}
               >
                 {t(cat as Parameters<typeof t>[0])}
               </div>
 
-              
-              <div className="flex flex-col gap-2 p-3">
+
+              <div className="flex flex-col gap-1.5 sm:gap-2 p-2 sm:p-3">
                 {catItems.map((itemIdx) => {
                   const item = items[itemIdx];
                   let itemBorder = 'transparent';
@@ -1400,18 +1407,19 @@ function CategorySortRenderer({
                         e.stopPropagation();
                         handleRemoveFromCat(itemIdx);
                       }}
-                      className="flex items-center gap-2 px-3 py-2 transition-all"
+                      className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 transition-all"
                       style={{
                         backgroundColor: 'rgba(0, 0, 0, 0.3)',
                         border: `1px solid ${itemBorder}`,
                         borderRadius: '4px',
                         cursor: showingAnswer ? 'default' : 'pointer',
+                        minWidth: 0,
                       }}
                     >
-                      <CardThumbnail src={item?.image} size={32} blurred={blurThumbnails} />
+                      <CardThumbnail src={item?.image} size={28} blurred={blurThumbnails} />
                       <span
-                        className="text-sm truncate"
-                        style={{ color: TEXT_LIGHT }}
+                        className="text-[11px] sm:text-sm truncate"
+                        style={{ color: TEXT_LIGHT, minWidth: 0 }}
                       >
                         {item?.label}
                       </span>
@@ -1586,7 +1594,7 @@ function SpotErrorRenderer({
               key={idx}
               onClick={() => toggleStatement(idx)}
               disabled={showingAnswer}
-              className="flex items-center gap-4 w-full text-left px-5 py-4 transition-all"
+              className="flex items-center gap-2 sm:gap-4 w-full text-left px-3 sm:px-5 py-3 sm:py-4 transition-all"
               style={{
                 backgroundColor: bgColor,
                 border: `2px solid ${borderColor}`,
@@ -1595,7 +1603,7 @@ function SpotErrorRenderer({
                 outline: 'none',
               }}
             >
-              
+
               <div
                 className="flex-shrink-0 flex items-center justify-center text-sm"
                 style={{
@@ -1612,17 +1620,17 @@ function SpotErrorRenderer({
                 {isChecked ? 'X' : ''}
               </div>
 
-              <span className="font-body text-sm" style={{ color: TEXT_LIGHT, lineHeight: 1.5 }}>
+              <span className="font-body text-xs sm:text-sm flex-1 min-w-0" style={{ color: TEXT_LIGHT, lineHeight: 1.4, wordBreak: 'break-word' }}>
                 {t(
                   stmt.textKey as Parameters<typeof t>[0],
                   stmt.textParams as Record<string, string> | undefined
                 )}
               </span>
 
-              
+
               {showingAnswer && stmt.isError && (
                 <span
-                  className="text-sm ml-auto flex-shrink-0 font-bold"
+                  className="text-xs sm:text-sm ml-auto flex-shrink-0 font-bold"
                   style={{ color: FEEDBACK_RED }}
                 >
                   {t('quiz.isError')}
@@ -1901,14 +1909,14 @@ export function QuizSession() {
 
   return (
     <div
-      className="min-h-[calc(100vh-80px)] flex items-start justify-center px-4 py-4"
+      className="min-h-[calc(100vh-80px)] flex items-start justify-center px-2 sm:px-4 py-3 sm:py-4"
       style={{ backgroundColor: DARK_BG }}
     >
       <div className="max-w-2xl w-full">
-        
+
         <TopBar timeLimit={timeLimit} />
 
-        
+
         <AnimatePresence mode="wait">
           <motion.div
             key={`question-${currentIndex}`}
@@ -1917,7 +1925,7 @@ export function QuizSession() {
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.25 }}
           >
-            
+
             <QuestionImage
               src={question.questionImage}
               blurred={
@@ -1930,10 +1938,10 @@ export function QuizSession() {
               censorZone={!showingAnswer ? question.censorZone : undefined}
             />
 
-            
+
             <div
-              className="text-lg font-bold mb-5 text-center"
-              style={{ color: TEXT_LIGHT, lineHeight: 1.5 }}
+              className="text-base sm:text-lg font-bold mb-4 sm:mb-5 text-center"
+              style={{ color: TEXT_LIGHT, lineHeight: 1.4, wordBreak: 'break-word' }}
             >
               {t(
                 question.questionTextKey as Parameters<typeof t>[0],

@@ -50,7 +50,7 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
 
   return (
     <div
-      className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-4"
+      className="min-h-[calc(100vh-80px)] flex items-center justify-center px-2 sm:px-4 py-3 sm:py-4"
       style={{ backgroundColor: '#0a0a0a' }}
     >
       
@@ -120,7 +120,7 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.35, delay: 0.1 + index * 0.07 }}
                 onClick={() => setSelected(diff)}
-                className="w-full text-left px-5 py-3 transition-all"
+                className="w-full text-left px-3 sm:px-5 py-3 transition-all"
                 style={{
                   backgroundColor: isSelected ? 'rgba(196, 163, 90, 0.08)' : '#111111',
                   border: isSelected
@@ -131,14 +131,14 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
                   outline: 'none',
                 }}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+
                     <div
                       className="flex-shrink-0 flex items-center justify-center text-xs font-bold uppercase"
                       style={{
-                        width: '44px',
-                        height: '44px',
+                        width: '40px',
+                        height: '40px',
                         borderRadius: '6px',
                         backgroundColor: 'rgba(0, 0, 0, 0.4)',
                         border: `2px solid ${rankColor}`,
@@ -149,36 +149,36 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
                       {diff}
                     </div>
 
-                    <div>
-                      
+                    <div className="min-w-0 flex-1">
+
                       <div
-                        className="text-sm font-bold uppercase tracking-wide"
+                        className="text-xs sm:text-sm font-bold uppercase tracking-wide truncate"
                         style={{ color: rankColor }}
                       >
                         {t(`quiz.difficulties.${diff}`)}
                       </div>
-                      
+
                       <div
-                        className="text-xs mt-0.5"
-                        style={{ color: '#888888' }}
+                        className="text-[10px] sm:text-xs mt-0.5"
+                        style={{ color: '#888888', wordBreak: 'break-word' }}
                       >
                         {t(`quiz.difficultyDesc.${diff}`)}
                       </div>
                     </div>
                   </div>
 
-                  
-                  <div className="text-right flex-shrink-0 ml-4">
-                    <div className="text-xs" style={{ color: '#aaaaaa' }}>
+
+                  <div className="text-right flex-shrink-0">
+                    <div className="text-[10px] sm:text-xs whitespace-nowrap" style={{ color: '#aaaaaa' }}>
                       {QUESTION_COUNTS[diff]} {t('quiz.questions')}
                     </div>
-                    <div className="text-xs mt-0.5" style={{ color: '#888888' }}>
+                    <div className="text-[10px] sm:text-xs mt-0.5 whitespace-nowrap" style={{ color: '#888888' }}>
                       {TIME_LIMITS[diff]}s / {t('quiz.perQuestion')}
                     </div>
-                    
+
                     {bestScores && bestScores[diff] !== undefined && (
                       <div
-                        className="text-xs mt-1 font-bold"
+                        className="text-[10px] sm:text-xs mt-1 font-bold whitespace-nowrap"
                         style={{ color: '#c4a35a' }}
                       >
                         {t('quiz.bestScore', { score: String(bestScores[diff]) })}

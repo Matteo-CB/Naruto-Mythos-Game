@@ -73,14 +73,17 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
 
       const prefs = prefsRes.ok ? await prefsRes.json() : {};
       const bgsData = bgsRes.ok ? await bgsRes.json() : { backgrounds: [] };
-      const backgrounds = bgsData.backgrounds || [];
+      const backgrounds: BackgroundOption[] = bgsData.backgrounds || [];
       const bgId = prefs.gameBackground || 'default';
 
-      
-      const match = backgrounds.find((bg: { id: string }) => bg.id === bgId);
-      const bgUrl = match?.url || DEFAULT_BG_URL;
+      let bgUrl: string;
+      if (bgId === 'random' && backgrounds.length > 0) {
+        bgUrl = backgrounds[Math.floor(Math.random() * backgrounds.length)].url;
+      } else {
+        const match = backgrounds.find((bg) => bg.id === bgId);
+        bgUrl = match?.url || DEFAULT_BG_URL;
+      }
 
-      
       cacheBackgrounds(backgrounds);
 
       set({
@@ -142,7 +145,16 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   setGameBackground: async (id: string, url: string) => {
     const prevId = get().gameBackground;
     const prevUrl = get().gameBackgroundUrl;
-    set({ gameBackground: id, gameBackgroundUrl: url });
+    let resolvedUrl = url;
+    if (id === 'random') {
+      const list = get().availableBackgrounds;
+      if (list.length > 0) {
+        resolvedUrl = list[Math.floor(Math.random() * list.length)].url;
+      } else {
+        resolvedUrl = DEFAULT_BG_URL;
+      }
+    }
+    set({ gameBackground: id, gameBackgroundUrl: resolvedUrl });
     try {
       const res = await fetch('/api/user/preferences', {
         method: 'PATCH',

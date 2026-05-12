@@ -222,6 +222,7 @@ model Tournament {
   requiresDiscord    Boolean                 @default(true)
   useBanList         Boolean                 @default(true)
   sealedBoosterCount Int?
+  sealedSetChoice    String?
   discordRoleReward  String?
   discordRoleBadge   String?
   bannedCardIds      String[]                @default([])

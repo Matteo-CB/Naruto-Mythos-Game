@@ -4,6 +4,7 @@ import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import type { BoosterPack, BoosterCard } from '@/lib/sealed/boosterGenerator';
+import { SET_REGISTRY } from '@/lib/data/sets/registry';
 import { CardReveal } from './CardReveal';
 
 interface BoosterOpeningProps {
@@ -149,7 +150,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
           >
             
             <img
-              src="/images/booster.webp"
+              src={(currentBooster && SET_REGISTRY[currentBooster.setId]?.boosterImage) || '/images/booster-KS.webp'}
               alt={t('boosterPack')}
               style={{
                 width: '240px',

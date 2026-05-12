@@ -244,24 +244,40 @@ function distinctByName(cards: CharacterCard[]): CharacterCard[] {
   });
 }
 
-let _nameCountCache: { ref: CharacterCard[]; counts: Map<string, number> } | null = null;
-function getNameCounts(chars: CharacterCard[]): Map<string, number> {
-  if (_nameCountCache && _nameCountCache.ref === chars) return _nameCountCache.counts;
-  const m = new Map<string, number>();
+let _labelCache: { ref: CharacterCard[]; labels: Map<string, string> } | null = null;
+function buildLabels(chars: CharacterCard[]): Map<string, string> {
+  if (_labelCache && _labelCache.ref === chars) return _labelCache.labels;
+  const sameName = new Map<string, CharacterCard[]>();
   for (const c of chars) {
-    const key = c.name_fr.toUpperCase();
-    m.set(key, (m.get(key) ?? 0) + 1);
+    const k = c.name_fr.toUpperCase();
+    if (!sameName.has(k)) sameName.set(k, []);
+    sameName.get(k)!.push(c);
   }
-  _nameCountCache = { ref: chars, counts: m };
-  return m;
+  const labels = new Map<string, string>();
+  for (const c of chars) {
+    const k = c.name_fr.toUpperCase();
+    const group = sameName.get(k)!;
+    if (group.length <= 1) {
+      labels.set(c.id, c.name_fr);
+      continue;
+    }
+    const title = (c.title_fr || c.title_en || '').trim();
+    const sameTitle = title
+      ? group.filter((x) => (x.title_fr || x.title_en || '').trim() === title)
+      : [];
+    if (title && sameTitle.length === 1) {
+      labels.set(c.id, `${c.name_fr} (${title})`);
+    } else {
+      labels.set(c.id, `${c.name_fr} (${c.id})`);
+    }
+  }
+  _labelCache = { ref: chars, labels };
+  return labels;
 }
 
 function cardLabel(card: CharacterCard, chars: CharacterCard[]): string {
-  const counts = getNameCounts(chars);
-  const occurrences = counts.get(card.name_fr.toUpperCase()) ?? 1;
-  if (occurrences <= 1) return card.name_fr;
-  const title = (card.title_fr || card.title_en || '').trim();
-  return title ? `${card.name_fr} (${title})` : `${card.name_fr} (${card.number})`;
+  const labels = buildLabels(chars);
+  return labels.get(card.id) ?? card.name_fr;
 }
 
 function distinctByVersion(cards: CharacterCard[]): CharacterCard[] {
@@ -588,10 +604,20 @@ const genMatchImagePairs: Gen = (chars, _, rng) => {
 const genTitleMC: Gen = (chars, _, rng) => {
   const withTitle = chars.filter((c) => c.title_fr && c.title_fr.trim() !== '');
   if (withTitle.length < 4) return null;
-  const selected = pick(distinctByName(withTitle), 4, rng);
-  if (selected.length < 4) return null;
-  const correct = selected[0];
-  const options = shuffle(selected.map((c) => c.title_fr), rng);
+  const distinct: CharacterCard[] = [];
+  const usedNames = new Set<string>();
+  const usedTitles = new Set<string>();
+  for (const c of shuffle(withTitle, rng)) {
+    const t = c.title_fr.trim();
+    if (usedNames.has(c.name_fr) || usedTitles.has(t)) continue;
+    distinct.push(c);
+    usedNames.add(c.name_fr);
+    usedTitles.add(t);
+    if (distinct.length === 4) break;
+  }
+  if (distinct.length < 4) return null;
+  const correct = distinct[0];
+  const options = shuffle(distinct.map((c) => c.title_fr), rng);
   return {
     id: uid('ti-mc'),
     type: 'multipleChoice',
@@ -807,13 +833,21 @@ const genIdentifyMission: Gen = (_, missions, rng) => {
 };
 
 const genMissionEffectMC: Gen = (_, missions, rng) => {
-  const withEffects = missions.filter((m) => m.effects.length > 0);
+  const withEffects = missions.filter((m) => m.effects.length > 0 && (m.effects[0]?.description ?? '').trim() !== '');
   if (withEffects.length < 4) return null;
-  const selected = pick(withEffects, 4, rng);
-  const correct = selected[0];
-  const correctDesc = correct.effects[0]?.description ?? '';
-  if (!correctDesc) return null;
-  const options = shuffle(selected.map((m) => m.effects[0]?.description ?? '?'), rng);
+  const distinct: MissionCard[] = [];
+  const usedDesc = new Set<string>();
+  for (const m of shuffle(withEffects, rng)) {
+    const d = m.effects[0]?.description ?? '';
+    if (usedDesc.has(d)) continue;
+    distinct.push(m);
+    usedDesc.add(d);
+    if (distinct.length === 4) break;
+  }
+  if (distinct.length < 4) return null;
+  const correct = distinct[0];
+  const correctDesc = correct.effects[0].description;
+  const options = shuffle(distinct.map((m) => m.effects[0].description), rng);
   return {
     id: uid('me-mc'),
     type: 'multipleChoice',
@@ -967,7 +1001,7 @@ const genCategorySortRarity: Gen = (chars, _, rng) => {
   for (let ri = 0; ri < selectedRarities.length; ri++) {
     const rarityCards = pick(byRarity[selectedRarities[ri]], 2, rng);
     for (const c of rarityCards) {
-      items.push({ label: c.name_fr, correctCategory: ri });
+      items.push({ label: cardLabel(c, chars), correctCategory: ri });
     }
   }
   return {
@@ -1056,12 +1090,13 @@ const genNotInGroupMC: Gen = (chars, _, rng) => {
 
 const genHigherPowerMC: Gen = (chars, _, rng) => {
   const distinct: CharacterCard[] = [];
-  const usedNames = new Set<string>();
+  const usedLabels = new Set<string>();
   const usedPowers = new Set<number>();
   for (const c of shuffle(chars, rng)) {
-    if (!usedNames.has(c.name_fr) && !usedPowers.has(c.power) && c.power > 0) {
+    const label = cardLabel(c, chars);
+    if (!usedLabels.has(label) && !usedPowers.has(c.power) && c.power > 0) {
       distinct.push(c);
-      usedNames.add(c.name_fr);
+      usedLabels.add(label);
       usedPowers.add(c.power);
       if (distinct.length === 4) break;
     }
@@ -1070,7 +1105,7 @@ const genHigherPowerMC: Gen = (chars, _, rng) => {
 
   const sorted = [...distinct].sort((a, b) => b.power - a.power);
   const correct = sorted[0];
-  const options = shuffle(distinct.map((c) => c.name_fr), rng);
+  const options = shuffle(distinct.map((c) => cardLabel(c, chars)), rng);
 
   return {
     id: uid('hp-mc'),
@@ -1336,14 +1371,23 @@ const genEffectRecallMC: Gen = (chars, _, rng) => {
   const withEffects = chars.filter((c) => c.effects.length > 0 && c.effects[0].description.length > 15);
   if (withEffects.length < 4) return null;
 
-  const selected = pick(distinctByName(withEffects), 4, rng);
-  if (selected.length < 4) return null;
-
-  const correct = selected[0];
-  const correctDesc = correct.effects[0].description;
-  
   const truncate = (s: string) => s.length > 80 ? s.substring(0, 77) + '...' : s;
-  const options = shuffle(selected.map((c) => truncate(c.effects[0].description)), rng);
+  const distinct: CharacterCard[] = [];
+  const usedNames = new Set<string>();
+  const usedDesc = new Set<string>();
+  for (const c of shuffle(withEffects, rng)) {
+    const d = truncate(c.effects[0].description);
+    if (usedNames.has(c.name_fr) || usedDesc.has(d)) continue;
+    distinct.push(c);
+    usedNames.add(c.name_fr);
+    usedDesc.add(d);
+    if (distinct.length === 4) break;
+  }
+  if (distinct.length < 4) return null;
+
+  const correct = distinct[0];
+  const correctDesc = correct.effects[0].description;
+  const options = shuffle(distinct.map((c) => truncate(c.effects[0].description)), rng);
 
   return {
     id: uid('er-mc'),

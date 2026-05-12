@@ -49,6 +49,7 @@ export interface TournamentData {
   requiresDiscord: boolean;
   useBanList: boolean;
   sealedBoosterCount: number | null;
+  sealedSetChoice: string | null;
   discordRoleReward: string | null;
   bannedCardIds: string[];
   allowedLeagues: string[];
@@ -98,6 +99,7 @@ export interface CreateTournamentInput {
   isPublic: boolean;
   useBanList: boolean;
   sealedBoosterCount?: 4 | 5 | 6;
+  sealedSetChoice?: string;
   bannedCardIds?: string[];
   allowedLeagues?: string[];
   scheduledStartAt?: string;

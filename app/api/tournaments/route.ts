@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       name, gameMode, maxPlayers, isPublic,
-      useBanList, sealedBoosterCount,
+      useBanList, sealedBoosterCount, sealedSetChoice,
       bannedCardIds, allowedLeagues, scheduledStartAt,
       
       allowedGroups, bannedGroups, allowedKeywords, bannedKeywords,
@@ -118,6 +118,17 @@ export async function POST(req: NextRequest) {
       if (typeof count !== 'number' || !Number.isInteger(count) || count < 1 || count > 12) {
         return NextResponse.json({ error: 'Sealed booster count must be an integer between 1 and 12', errorKey: 'tournament.error.invalidBoosterCount' }, { status: 400 });
       }
+      if (sealedSetChoice !== undefined) {
+        if (typeof sealedSetChoice !== 'string' || sealedSetChoice.length > 16) {
+          return NextResponse.json({ error: 'Invalid sealedSetChoice', errorKey: 'tournament.error.invalidSetChoice' }, { status: 400 });
+        }
+        if (sealedSetChoice !== 'random') {
+          const { isSetAvailable } = await import('@/lib/data/sets/registry');
+          if (!isSetAvailable(sealedSetChoice)) {
+            return NextResponse.json({ error: 'Set is not available', errorKey: 'tournament.error.setUnavailable' }, { status: 400 });
+          }
+        }
+      }
     }
 
     
@@ -149,6 +160,7 @@ export async function POST(req: NextRequest) {
         requiresDiscord: true,
         useBanList: useBanList !== false,
         sealedBoosterCount: resolvedGameMode === 'sealed' ? (sealedBoosterCount || 5) : null,
+        sealedSetChoice: resolvedGameMode === 'sealed' ? (typeof sealedSetChoice === 'string' && sealedSetChoice.length > 0 ? sealedSetChoice : 'random') : null,
         bannedCardIds: Array.isArray(bannedCardIds) ? bannedCardIds : [],
         allowedLeagues: leagueRestrictions,
         

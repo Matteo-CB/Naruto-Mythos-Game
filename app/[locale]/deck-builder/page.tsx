@@ -445,7 +445,8 @@ export default function DeckBuilderPage() {
   const [previewCard, setPreviewCard] = useState<CharacterCard | MissionCard | null>(null);
   const [mobileView, setMobileView] = useState<'catalog' | 'deck'>('catalog');
   const mobileScrollRef = useRef<HTMLDivElement | null>(null);
-  const [mobileInfoOpen, setMobileInfoOpen] = useState(false);
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   
   const [showSavedDecks, setShowSavedDecks] = useState(false);
@@ -1548,126 +1549,197 @@ export default function DeckBuilderPage() {
       </div>
 
       
-      <div className="lg:hidden flex flex-col relative z-10" style={{ height: '100vh' }}>
-        
-        <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{
-          backgroundColor: 'rgba(10, 10, 10, 0.95)',
-          borderBottom: '1px solid rgba(196, 163, 90, 0.12)',
+      <div className="lg:hidden flex flex-col relative z-10" style={{ height: '100dvh' }}>
+
+        <div className="flex items-center gap-2 px-2 flex-shrink-0" style={{
+          height: 44,
+          backgroundColor: 'rgba(10, 10, 10, 0.96)',
+          borderBottom: '1px solid rgba(196, 163, 90, 0.18)',
         }}>
-          <Link href="/" className="text-[10px] uppercase flex-shrink-0" style={{ color: '#555' }}>{t("common.back")}</Link>
-          <div className="flex gap-0 flex-shrink-0">
-            <button onClick={() => setMobileView('catalog')}
-              className="px-2 py-1 text-[10px] font-bold uppercase cursor-pointer"
-              style={{
-                backgroundColor: mobileView === 'catalog' ? 'rgba(196,163,90,0.15)' : 'transparent',
-                borderBottom: mobileView === 'catalog' ? '2px solid #c4a35a' : '2px solid transparent',
-                color: mobileView === 'catalog' ? '#c4a35a' : '#555',
-              }}>{t("deckBuilder.availableCards")}</button>
-            <button onClick={() => setMobileView('deck')}
-              className="px-2 py-1 text-[10px] font-bold uppercase cursor-pointer"
-              style={{
-                backgroundColor: mobileView === 'deck' ? 'rgba(196,163,90,0.15)' : 'transparent',
-                borderBottom: mobileView === 'deck' ? '2px solid #c4a35a' : '2px solid transparent',
-                color: mobileView === 'deck' ? '#c4a35a' : '#555',
-              }}>{t("deckBuilder.currentDeck")}</button>
-          </div>
-          <div className="flex-1" />
-          <span className="text-[10px] tabular-nums flex-shrink-0" style={{ color: deckChars.length >= 30 ? '#3e8b3e' : '#b33e3e' }}>
-            {deckChars.length}/30
-          </span>
-          <span className="text-[10px] tabular-nums flex-shrink-0" style={{ color: deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e' }}>
-            M:{deckMissions.length}/3
-          </span>
-          <AngularButton onClick={handleSave} accentColor={loadedDeckId && isDirty ? '#c47a1a' : '#3e8b3e'} variant={validation.valid ? 'primary' : 'muted'} disabled={isSaving || !validation.valid} size="sm">
-            {isSaving ? '...' : loadedDeckId ? t("deckBuilder.updateDeck") : t("deckBuilder.saveDeck")}
-          </AngularButton>
+          <Link href="/" className="flex items-center justify-center flex-shrink-0" style={{
+            width: 32, height: 32,
+            backgroundColor: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.06)',
+            color: '#888', fontSize: 16, lineHeight: 1,
+          }}>{'\u2190'}</Link>
+          <input type="text" placeholder={t("deckBuilder.deckName")} value={deckName}
+            onChange={(e) => setDeckName(e.target.value)}
+            className="flex-1 min-w-0 px-2 py-2 text-xs focus:outline-none"
+            style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', borderLeft: '3px solid rgba(196,163,90,0.3)', color: '#e0e0e0' }}
+          />
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="flex items-center justify-center flex-shrink-0 cursor-pointer"
+            style={{
+              width: 32, height: 32,
+              backgroundColor: 'rgba(196,163,90,0.08)',
+              border: '1px solid rgba(196,163,90,0.3)',
+              color: '#c4a35a', fontSize: 18, lineHeight: 1,
+            }}
+            aria-label={t("common.menu")}
+          >{'\u22EE'}</button>
         </div>
 
-        
+
+        <div className="flex items-center gap-1.5 px-3 py-1.5 flex-shrink-0" style={{
+          backgroundColor: 'rgba(10, 10, 10, 0.9)',
+          borderBottom: '1px solid rgba(255,255,255,0.04)',
+        }}>
+          <span className="text-[10px] tabular-nums font-bold px-1.5 py-0.5 flex-shrink-0" style={{
+            backgroundColor: deckChars.length >= 30 ? 'rgba(62,139,62,0.12)' : 'rgba(179,62,62,0.1)',
+            borderLeft: `2px solid ${deckChars.length >= 30 ? '#3e8b3e' : '#b33e3e'}`,
+            color: deckChars.length >= 30 ? '#3e8b3e' : '#b33e3e',
+          }}>{deckChars.length}/30</span>
+          <span className="text-[10px] tabular-nums font-bold px-1.5 py-0.5 flex-shrink-0" style={{
+            backgroundColor: deckMissions.length === 3 ? 'rgba(62,139,62,0.12)' : 'rgba(179,62,62,0.1)',
+            borderLeft: `2px solid ${deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e'}`,
+            color: deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e',
+          }}>{deckMissions.length}/3 M</span>
+          {validation.valid && (
+            <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 flex-shrink-0" style={{
+              backgroundColor: 'rgba(62,139,62,0.12)', borderLeft: '2px solid #3e8b3e', color: '#3e8b3e',
+            }}>{t("deckBuilder.validation.valid")}</span>
+          )}
+          {loadedDeckId && (
+            <span className="text-[8px] uppercase font-bold px-1.5 py-0.5 flex-shrink-0 truncate" style={{
+              backgroundColor: 'rgba(196,163,90,0.1)', borderLeft: '2px solid rgba(196,163,90,0.5)', color: '#c4a35a',
+              maxWidth: '110px',
+            }}>{t("deckBuilder.currentlyEditing")}</span>
+          )}
+          <div className="flex-1 min-w-0" />
+        </div>
+
+
+        <div className="flex flex-shrink-0" style={{
+          backgroundColor: 'rgba(10, 10, 10, 0.88)',
+          borderBottom: '1px solid rgba(255,255,255,0.04)',
+        }}>
+          {(['catalog', 'deck'] as const).map((view) => {
+            const active = mobileView === view;
+            const label = view === 'catalog' ? t("deckBuilder.availableCards") : `${t("deckBuilder.currentDeck")} (${deckChars.length})`;
+            return (
+              <button
+                key={view}
+                onClick={() => setMobileView(view)}
+                className="flex-1 text-center py-2.5 text-[11px] font-bold uppercase cursor-pointer"
+                style={{
+                  backgroundColor: active ? 'rgba(196,163,90,0.12)' : 'transparent',
+                  borderBottom: active ? '3px solid #c4a35a' : '3px solid transparent',
+                  color: active ? '#c4a35a' : '#777',
+                  letterSpacing: '0.08em',
+                }}
+              >{label}</button>
+            );
+          })}
+        </div>
+
+
         {(saveError || addError) && (
-          <div className="px-3 py-1 flex-shrink-0">
-            <div className="text-[10px] py-1 px-2" style={{
+          <div className="px-3 py-1.5 flex-shrink-0">
+            <div className="text-[10px] py-1.5 px-2" style={{
               borderLeft: '3px solid #b33e3e', backgroundColor: 'rgba(179,62,62,0.08)', color: '#b33e3e',
             }}>{addError ? (addErrorKey ? t(addErrorKey, addErrorParams ?? {}) : addError) : saveError}</div>
           </div>
         )}
 
-        
+
         <div ref={mobileScrollRef} className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
           {mobileView === 'catalog' ? (
             <div className="px-3 py-2">
-              
-              <div className="flex items-center gap-1.5 mb-1">
-                <input type="text" placeholder={t("collection.search")} value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 min-w-0 px-2.5 py-1.5 text-xs focus:outline-none"
-                  style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', borderLeft: '3px solid rgba(196,163,90,0.25)', color: '#e0e0e0' }}
-                />
-                <button
-                  onClick={() => setShowSearchHelp(true)}
-                  className="font-body text-[10px] font-bold px-2.5 py-1.5 cursor-pointer shrink-0"
-                  style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}
-                >
-                  ?
-                </button>
-                <div className="relative">
+
+              <div className="sticky top-0 z-20 -mx-3 px-3 pt-1 pb-2" style={{ backgroundColor: '#0a0a0a' }}>
+                <div className="flex items-center gap-1.5">
+                  <input type="text" placeholder={t("collection.search")} value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="flex-1 min-w-0 px-2.5 py-2 text-xs focus:outline-none"
+                    style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', borderLeft: '3px solid rgba(196,163,90,0.25)', color: '#e0e0e0' }}
+                  />
                   <button
-                    onClick={() => setShowSortDropdown((v) => !v)}
-                    className="font-body text-[10px] font-bold px-2.5 py-1.5 cursor-pointer shrink-0"
-                    style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}
-                  >{'\u21C5'}</button>
-                  {showSortDropdown && (
-                    <>
-                      <div className="fixed inset-0 z-30" onClick={() => setShowSortDropdown(false)} />
-                      <div className="absolute right-0 top-full mt-1 z-40 flex flex-col rounded overflow-hidden"
-                        style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', minWidth: '120px' }}>
-                        {([
-                          { key: 'number' as SortField, label: '#' },
-                          { key: 'name' as SortField, label: 'Name' },
-                          { key: 'chakra' as SortField, label: 'Chakra' },
-                          { key: 'power' as SortField, label: 'Power' },
-                          { key: 'rarity' as SortField, label: 'Rarity' },
-                        ]).map((opt) => (
-                          <button key={opt.key}
-                            onClick={() => {
-                              if (sortBy === opt.key) setSortOrder((o) => o === 'asc' ? 'desc' : 'asc');
-                              else { setSortBy(opt.key); setSortOrder('asc'); }
-                              setShowSortDropdown(false);
-                            }}
-                            className="px-3 py-1.5 text-[10px] text-left hover:bg-[#262626] transition-colors flex items-center justify-between"
-                            style={{ color: sortBy === opt.key ? '#c4a35a' : '#ccc' }}>
-                            <span>{opt.label}</span>
-                            {sortBy === opt.key && <span>{sortOrder === 'asc' ? '\u2191' : '\u2193'}</span>}
-                          </button>
-                        ))}
-                      </div>
-                    </>
+                    onClick={() => setShowSearchHelp(true)}
+                    className="font-body text-[11px] font-bold cursor-pointer shrink-0"
+                    style={{ width: 34, height: 34, backgroundColor: 'rgba(196,163,90,0.08)', border: '1px solid rgba(196,163,90,0.3)', color: '#c4a35a' }}
+                  >?</button>
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowSortDropdown((v) => !v)}
+                      className="font-body text-[12px] font-bold cursor-pointer shrink-0"
+                      style={{ width: 34, height: 34, backgroundColor: 'rgba(196,163,90,0.08)', border: '1px solid rgba(196,163,90,0.3)', color: '#c4a35a' }}
+                    >{'\u21C5'}</button>
+                    {showSortDropdown && (
+                      <>
+                        <div className="fixed inset-0 z-30" onClick={() => setShowSortDropdown(false)} />
+                        <div className="absolute right-0 top-full mt-1 z-40 flex flex-col rounded overflow-hidden"
+                          style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', minWidth: '140px' }}>
+                          {([
+                            { key: 'number' as SortField, label: '#' },
+                            { key: 'name' as SortField, label: t("deckBuilder.sortName") },
+                            { key: 'chakra' as SortField, label: t("deckBuilder.chakra") },
+                            { key: 'power' as SortField, label: t("deckBuilder.power") },
+                            { key: 'rarity' as SortField, label: t("deckBuilder.sortRarity") },
+                          ]).map((opt) => (
+                            <button key={opt.key}
+                              onClick={() => {
+                                if (sortBy === opt.key) setSortOrder((o) => o === 'asc' ? 'desc' : 'asc');
+                                else { setSortBy(opt.key); setSortOrder('asc'); }
+                                setShowSortDropdown(false);
+                              }}
+                              className="px-3 py-2 text-[11px] text-left hover:bg-[#262626] transition-colors flex items-center justify-between"
+                              style={{ color: sortBy === opt.key ? '#c4a35a' : '#ccc' }}>
+                              <span>{opt.label}</span>
+                              {sortBy === opt.key && <span>{sortOrder === 'asc' ? '\u2191' : '\u2193'}</span>}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <span className="text-[9px]" style={{ color: '#666' }}>
+                    {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
+                  </span>
+                  <button
+                    onClick={() => setShowAltArt(!showAltArt)}
+                    className="text-[9px] uppercase font-bold px-2 py-0.5"
+                    style={{
+                      backgroundColor: showAltArt ? 'rgba(196,163,90,0.1)' : 'rgba(136,136,136,0.06)',
+                      borderLeft: `2px solid ${showAltArt ? '#c4a35a' : '#555'}`,
+                      color: showAltArt ? '#c4a35a' : '#666',
+                    }}
+                  >{showAltArt ? t("deckBuilder.hideAlt") : t("deckBuilder.showAlt")}</button>
+                  {bannedIds.size > 0 && (
+                    <button
+                      onClick={() => setShowBanned(!showBanned)}
+                      className="text-[9px] uppercase font-bold px-2 py-0.5"
+                      style={{
+                        backgroundColor: showBanned ? 'rgba(179,62,62,0.08)' : 'rgba(62,139,62,0.08)',
+                        borderLeft: `2px solid ${showBanned ? '#b33e3e' : '#3e8b3e'}`,
+                        color: showBanned ? '#b33e3e' : '#3e8b3e',
+                      }}
+                    >{showBanned ? t("deckBuilder.hideBanned") : t("deckBuilder.showBanned")} ({bannedIds.size})</button>
                   )}
                 </div>
               </div>
-              <div className="text-[8px] mb-2" style={{ color: '#444' }}>
-                {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
-              </div>
 
-              
-              <span className="text-[9px] uppercase font-bold block mb-1" style={{ color: '#777' }}>{t("deckBuilder.missionCards")}</span>
-              <div className="grid grid-cols-5 gap-1 mb-3">
+
+              <span className="text-[10px] uppercase font-bold block mb-1.5 mt-1" style={{ color: '#888', letterSpacing: '0.08em' }}>{t("deckBuilder.missionCards")}</span>
+              <div className="grid grid-cols-5 gap-1.5 mb-3">
                 {filteredMissions.map((m) => (
                   <CatalogMission key={m.id} card={m} allowed={missionAllowedMap.get(m.id) ?? true}
                     onAdd={handleAddMission} onHover={handlePreview} />
                 ))}
               </div>
 
-              <div className="h-px my-2" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }} />
+              <div className="h-px my-2" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }} />
 
-              
-              <span className="text-[9px] uppercase font-bold block mb-1" style={{ color: '#777' }}>
+
+              <span className="text-[10px] uppercase font-bold block mb-1.5" style={{ color: '#888', letterSpacing: '0.08em' }}>
                 {t("deckBuilder.characters", { count: filteredChars.length })}
               </span>
               <VirtualCardGrid
                 items={filteredChars}
                 getItemKey={(c) => c.id}
-                minColWidth={64}
+                minColWidth={80}
                 gap={6}
                 cellAspectRatio={7 / 5}
                 scrollElementRef={mobileScrollRef}
@@ -1683,65 +1755,148 @@ export default function DeckBuilderPage() {
               />
             </div>
           ) : (
-            <div className="px-3 py-2">
-              
-              <input type="text" placeholder={t("deckBuilder.deckName")} value={deckName}
-                onChange={(e) => setDeckName(e.target.value)}
-                className="w-full px-2 py-1.5 text-xs mb-2 focus:outline-none"
-                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', borderLeft: '3px solid rgba(196,163,90,0.3)', color: '#e0e0e0' }}
-              />
-
+            <div className="px-3 py-2 pb-4">
               {renderDeckContent()}
-
-              
-              <div className="flex flex-wrap gap-1.5 mt-4 mb-2">
-                <AngularButton onClick={() => setShowSavedDecks(true)} variant="secondary" size="sm">{t("deckBuilder.loadDeck")}</AngularButton>
-                <AngularButton onClick={() => setShowImportModal(true)} variant="secondary" size="sm">{t("deckBuilder.importButton")}</AngularButton>
-                <AngularButton onClick={() => setShowExportModal(true)} variant="muted" disabled={deckChars.length === 0} size="sm">{t("deckBuilder.exportButton")}</AngularButton>
-                <Link href="/deck-builder/manage" className="text-center text-[10px] uppercase font-bold py-1.5 px-3 no-select inline-block"
-                  style={{
-                    backgroundColor: 'rgba(196,163,90,0.08)', borderLeft: '3px solid rgba(196,163,90,0.5)',
-                    color: '#c4a35a', letterSpacing: '0.1em', transform: 'skewX(-3deg)',
-                  }}>
-                  <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>{t("deckManager.manageButton")}</span>
-                </Link>
-                <AngularButton onClick={clearDeck} variant="danger" size="sm">{t("deckBuilder.clearDeck")}</AngularButton>
-              </div>
             </div>
           )}
         </div>
 
-        
-        {previewCard && (
-          <div className="flex-shrink-0 cursor-pointer" style={{
-            backgroundColor: 'rgba(10, 10, 10, 0.98)',
-            borderTop: '1px solid rgba(196,163,90,0.15)',
-          }} onClick={() => setMobileInfoOpen(!mobileInfoOpen)}>
-            <div className="flex items-center gap-2 px-3 py-2">
-              <div className="flex-shrink-0 overflow-hidden" style={{
-                width: previewCard.card_type === 'mission' ? '50px' : '35px',
-                height: previewCard.card_type === 'mission' ? '36px' : '49px',
-                backgroundColor: '#111',
+
+        <div className="flex-shrink-0 px-3 py-2 flex items-center gap-2" style={{
+          backgroundColor: 'rgba(10, 10, 10, 0.96)',
+          borderTop: '1px solid rgba(196,163,90,0.18)',
+        }}>
+          <button
+            onClick={handleSave}
+            disabled={isSaving || !validation.valid}
+            className="flex-1 text-center text-[12px] uppercase font-bold py-2.5 cursor-pointer disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: !validation.valid
+                ? 'rgba(255,255,255,0.04)'
+                : (loadedDeckId && isDirty ? 'rgba(196,122,26,0.18)' : 'rgba(62,139,62,0.18)'),
+              border: !validation.valid
+                ? '1px solid rgba(255,255,255,0.06)'
+                : `1px solid ${loadedDeckId && isDirty ? '#c47a1a' : '#3e8b3e'}`,
+              borderLeft: !validation.valid
+                ? '3px solid rgba(255,255,255,0.06)'
+                : `3px solid ${loadedDeckId && isDirty ? '#c47a1a' : '#3e8b3e'}`,
+              color: !validation.valid
+                ? '#555'
+                : (loadedDeckId && isDirty ? '#c47a1a' : '#3e8b3e'),
+              letterSpacing: '0.1em',
+              opacity: isSaving ? 0.6 : 1,
+            }}
+          >
+            {isSaving ? t("common.loading") : loadedDeckId ? t("deckBuilder.updateDeck") : t("deckBuilder.saveDeck")}
+          </button>
+          {previewCard && mobileView === 'catalog' && (
+            <button
+              onClick={() => setMobileDetailOpen(true)}
+              className="flex items-center justify-center flex-shrink-0 cursor-pointer"
+              style={{
+                width: 44, height: 44,
+                backgroundColor: 'rgba(196,163,90,0.08)',
+                border: '1px solid rgba(196,163,90,0.3)',
+                color: '#c4a35a', fontSize: 14, lineHeight: 1,
+                fontWeight: 'bold',
+              }}
+              aria-label={t("deckBuilder.detail") || 'Detail'}
+            >{'\u2139'}</button>
+          )}
+        </div>
+
+
+        {mobileDetailOpen && previewCard && (
+          <div
+            className="fixed inset-0 z-50 flex items-end"
+            style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
+            onClick={() => setMobileDetailOpen(false)}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div
+              className="w-full flex flex-col"
+              style={{
+                maxHeight: '92dvh',
+                backgroundColor: '#0a0a0a',
+                borderTop: '2px solid rgba(196,163,90,0.4)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{
+                backgroundColor: 'rgba(10,10,10,0.95)',
+                borderBottom: '1px solid rgba(255,255,255,0.05)',
               }}>
-                {normalizeImagePath(previewCard.image_file) && (
-                  <img src={normalizeImagePath(previewCard.image_file)!} alt="" className="w-full h-full object-cover" />
-                )}
+                <span className="text-[11px] uppercase font-bold flex-1 truncate" style={{ color: '#c4a35a', letterSpacing: '0.08em' }}>
+                  {t("deckBuilder.cardDetail") || getCardName(previewCard, loc)}
+                </span>
+                <button
+                  onClick={() => setMobileDetailOpen(false)}
+                  className="flex items-center justify-center cursor-pointer"
+                  style={{ width: 30, height: 30, color: '#888', fontSize: 18, lineHeight: 1 }}
+                  aria-label={t("common.close")}
+                >{'\u2715'}</button>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-[11px] font-bold truncate" style={{ color: '#e0e0e0' }}>{getCardName(previewCard, loc)}</div>
-                {previewCard.card_type !== 'mission' && (
-                  <div className="text-[9px]" style={{ color: '#777' }}>
-                    {t("deckBuilder.chakra")}:{(previewCard as CharacterCard).chakra} {t("deckBuilder.power")}:{(previewCard as CharacterCard).power}
-                  </div>
-                )}
-              </div>
-              <span className="text-[10px] flex-shrink-0" style={{ color: '#555' }}>{mobileInfoOpen ? 'v' : '^'}</span>
-            </div>
-            {mobileInfoOpen && (
-              <div className="overflow-y-auto px-3 pb-3" style={{ maxHeight: '50vh', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+              <div className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
                 {renderInfoContent()}
               </div>
-            )}
+            </div>
+          </div>
+        )}
+
+
+        {mobileMenuOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-end"
+            style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
+            onClick={() => setMobileMenuOpen(false)}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div
+              className="w-full flex flex-col gap-2 px-4 py-4"
+              style={{
+                backgroundColor: '#0a0a0a',
+                borderTop: '2px solid rgba(196,163,90,0.4)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="text-[10px] uppercase font-bold mb-1" style={{ color: '#888', letterSpacing: '0.1em' }}>
+                {t("deckBuilder.actions") || 'Actions'}
+              </span>
+              <button
+                onClick={() => { setShowSavedDecks(true); setMobileMenuOpen(false); }}
+                className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer"
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderLeft: '3px solid rgba(196,163,90,0.5)', color: '#c4a35a', letterSpacing: '0.08em' }}
+              >{t("deckBuilder.loadDeck")}</button>
+              <button
+                onClick={() => { setShowImportModal(true); setMobileMenuOpen(false); }}
+                className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer"
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderLeft: '3px solid rgba(74,122,181,0.5)', color: '#4a7ab5', letterSpacing: '0.08em' }}
+              >{t("deckBuilder.importButton")}</button>
+              <button
+                onClick={() => { setShowExportModal(true); setMobileMenuOpen(false); }}
+                disabled={deckChars.length === 0}
+                className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderLeft: '3px solid rgba(196,163,90,0.5)', color: '#c4a35a', letterSpacing: '0.08em' }}
+              >{t("deckBuilder.exportButton")}</button>
+              <Link
+                href="/deck-builder/manage"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer"
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderLeft: '3px solid rgba(196,163,90,0.5)', color: '#c4a35a', letterSpacing: '0.08em', display: 'block' }}
+              >{t("deckManager.manageButton")}</Link>
+              <button
+                onClick={() => { clearDeck(); setMobileMenuOpen(false); }}
+                className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer mt-1"
+                style={{ backgroundColor: 'rgba(179,62,62,0.08)', borderLeft: '3px solid rgba(179,62,62,0.5)', color: '#b33e3e', letterSpacing: '0.08em' }}
+              >{t("deckBuilder.clearDeck")}</button>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-center text-[11px] uppercase font-bold py-2 mt-2 cursor-pointer"
+                style={{ color: '#666', letterSpacing: '0.08em' }}
+              >{t("common.cancel")}</button>
+            </div>
           </div>
         )}
       </div>

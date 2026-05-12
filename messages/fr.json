@@ -22,7 +22,9 @@
     "close": "Fermer",
     "all": "Tous",
     "maintenanceBanner": "Maintenance imminente du serveur. Aucune nouvelle partie ne pourra être lancee après votre partie en cours. Le site sera de retour dans quelques minutes.",
-    "home": "Accueil"
+    "home": "Accueil",
+    "comingSoon": "Bientôt disponible",
+    "menu": "Menu"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -66,6 +68,7 @@
     "loading": "Chargement...",
     "back": "Retour au menu",
     "gameBackground": "Fond de jeu",
+    "gameBackgroundRandom": "Aléatoire",
     "selected": "Actif",
     "username": "Pseudo",
     "usernameSave": "Sauvegarder",
@@ -959,6 +962,7 @@
     "filters": "Filtres",
     "allRarities": "Toutes les Raretes",
     "allGroups": "Tous les Groupes",
+    "allSets": "Toutes les Extensions",
     "total": "{count} cartes",
     "noResults": "Aucune carte ne correspond a vos filtres",
     "details": {
@@ -1126,6 +1130,10 @@
     },
     "hoverToPreview": "Survolez une carte pour voir ses détails",
     "sortByCost": "Trier par coût",
+    "sortName": "Nom",
+    "sortRarity": "Rareté",
+    "actions": "Actions",
+    "detail": "Détails",
     "dragToReorder": "Glissez les cartes pour les reorganiser",
     "hideBanned": "Masquer bannies",
     "showBanned": "Afficher bannies",
@@ -2392,6 +2400,8 @@
     "description": "Ouvrez 6 boosters, construisez un deck avec les cartes obtenues, puis combattez !",
     "descriptionWithCount": "Ouvrez {count} boosters, construisez un deck avec les cartes obtenues, puis combattez !",
     "boosterCountLabel": "Boosters",
+    "setChoiceLabel": "Extension",
+    "setRandom": "Aleatoire",
     "vsAI": "Scelle vs IA",
     "vsAIDesc": "Ouvrez des boosters et construisez un deck pour affronter l'IA",
     "online": "Scelle en Ligne",

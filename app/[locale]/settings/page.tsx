@@ -255,6 +255,52 @@ export default function SettingsPage() {
             </span>
 
             <div className="grid grid-cols-2 gap-3">
+              {(() => {
+                const isRandomSelected = gameBackground === 'random';
+                return (
+                  <button
+                    type="button"
+                    disabled={!isLoaded || backgrounds.length === 0}
+                    onClick={() => setGameBackground('random', '')}
+                    className="relative overflow-hidden transition-all flex items-center justify-center"
+                    style={{
+                      aspectRatio: '16/9',
+                      border: isRandomSelected ? '2px solid #c4a35a' : '2px solid #333333',
+                      backgroundColor: 'rgba(196, 163, 90, 0.06)',
+                      opacity: isLoaded && backgrounds.length > 0 ? 1 : 0.5,
+                      cursor: isLoaded && backgrounds.length > 0 ? 'pointer' : 'default',
+                    }}
+                  >
+                    <div className="flex flex-col items-center gap-1.5">
+                      <span
+                        className="text-2xl font-bold tracking-wider"
+                        style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", letterSpacing: '0.1em' }}
+                      >
+                        ?
+                      </span>
+                      <span
+                        className="text-[10px] font-bold uppercase tracking-[0.3em]"
+                        style={{ color: isRandomSelected ? '#c4a35a' : '#888' }}
+                      >
+                        {t('gameBackgroundRandom')}
+                      </span>
+                    </div>
+                    {isRandomSelected && (
+                      <div
+                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                        style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)' }}
+                      >
+                        <span
+                          className="text-xs font-bold uppercase tracking-wider"
+                          style={{ color: '#c4a35a' }}
+                        >
+                          {t('selected')}
+                        </span>
+                      </div>
+                    )}
+                  </button>
+                );
+              })()}
               {backgrounds.map((bg) => {
                 const isSelected = gameBackground === bg.id;
                 return (

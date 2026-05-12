@@ -204,7 +204,7 @@ export default function PlayOnlinePage() {
       }
       const actualMode = mode ?? selectedMode;
       const isRanked = actualMode === 'ranked';
-      createRoom(session.user.id, false, isRanked, false, actualMode, session.user.name ?? undefined, undefined, isRanked ? true : timerEnabled, isAnonymous);
+      createRoom(session.user.id, false, isRanked, false, actualMode, session.user.name ?? undefined, undefined, undefined, isRanked ? true : timerEnabled, isAnonymous);
       setIsPrivateRoom(false);
     } catch {
       
@@ -217,7 +217,7 @@ export default function PlayOnlinePage() {
         await connect(session.user.id, session.user.name ?? undefined);
       }
       const isRanked = selectedMode === 'ranked';
-      createRoom(session.user.id, true, isRanked, false, selectedMode, session.user.name ?? undefined, undefined, isRanked ? true : timerEnabled);
+      createRoom(session.user.id, true, isRanked, false, selectedMode, session.user.name ?? undefined, undefined, undefined, isRanked ? true : timerEnabled);
       setIsPrivateRoom(true);
     } catch {
       

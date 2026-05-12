@@ -57,6 +57,7 @@ export interface RoomData {
   
   isSealed: boolean;
   sealedBoosterCount: 4 | 5 | 6;
+  sealedSetChoice?: string;
   sealedTimer: ReturnType<typeof setTimeout> | null;
   sealedDeadline: number | null;
   hostSealedPoolIds?: string[];
@@ -1508,7 +1509,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     
-    socket.on('room:create', async (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; timerEnabled?: boolean; isAnonymous?: boolean }) => {
+    socket.on('room:create', async (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; sealedSetChoice?: string; timerEnabled?: boolean; isAnonymous?: boolean }) => {
       if (isMaintenanceActive()) {
         socket.emit('room:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
         return;
@@ -1546,6 +1547,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const requestedMode = data.gameMode ?? (data.isSealed ? 'sealed' : data.isRanked ? 'ranked' : 'casual');
       const gameMode = (VALID_MODES as readonly string[]).includes(requestedMode) ? requestedMode : 'casual';
       const safeBoosterCount = data.sealedBoosterCount === 4 || data.sealedBoosterCount === 5 || data.sealedBoosterCount === 6 ? data.sealedBoosterCount : 6;
+      const safeSealedSetChoice = (typeof data.sealedSetChoice === 'string' && data.sealedSetChoice.length > 0 && data.sealedSetChoice.length <= 16) ? data.sealedSetChoice : 'random';
       const safeHostName = typeof data.hostName === 'string' && data.hostName.length > 0 && data.hostName.length <= 50 ? data.hostName : (userNames.get(data.userId) || 'Unknown');
 
       const room: RoomData = {
@@ -1576,6 +1578,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         finalized: false,
         isSealed: gameMode === 'sealed',
         sealedBoosterCount: safeBoosterCount,
+        sealedSetChoice: safeSealedSetChoice,
         sealedTimer: null,
         sealedDeadline: null,
         timerEnabled: gameMode === 'ranked' || (data.timerEnabled ?? false),
@@ -1771,8 +1774,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
         try {
           const { generateSealedPool } = await import('@/lib/sealed/boosterGenerator');
           const count = room.sealedBoosterCount ?? 6;
-          const hostPool = generateSealedPool(count);
-          const guestPool = generateSealedPool(count);
+          const choice = room.sealedSetChoice ?? 'random';
+          const hostPool = generateSealedPool(count, choice);
+          const guestPool = generateSealedPool(count, choice);
 
           room.hostSealedPoolIds = hostPool.allCards.map(c => c.id);
           room.guestSealedPoolIds = guestPool.allCards.map(c => c.id);
@@ -2408,8 +2412,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
         try {
           const { generateSealedPool } = await import('@/lib/sealed/boosterGenerator');
           const count = room.sealedBoosterCount ?? 6;
-          const hostPool = generateSealedPool(count);
-          const guestPool = generateSealedPool(count);
+          const choice = room.sealedSetChoice ?? 'random';
+          const hostPool = generateSealedPool(count, choice);
+          const guestPool = generateSealedPool(count, choice);
           room.hostSealedPoolIds = hostPool.allCards.map(c => c.id);
           room.guestSealedPoolIds = guestPool.allCards.map(c => c.id);
 

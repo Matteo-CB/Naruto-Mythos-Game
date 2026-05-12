@@ -72,7 +72,7 @@ interface SocketStore {
 
   connect: (userId?: string, username?: string) => Promise<void>;
   disconnect: () => void;
-  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, timerEnabled?: boolean, isAnonymous?: boolean) => void;
+  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, timerEnabled?: boolean, isAnonymous?: boolean) => void;
   joinRoom: (code: string, userId: string) => void;
   selectDeck: (characters: unknown[], missions: unknown[], deckId?: string) => void;
   changeDeck: () => void;
@@ -750,12 +750,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  createRoom: (userId: string, isPrivate = true, isRanked = false, isSealed = false, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, timerEnabled?: boolean, isAnonymous?: boolean) => {
+  createRoom: (userId: string, isPrivate = true, isRanked = false, isSealed = false, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, timerEnabled?: boolean, isAnonymous?: boolean) => {
     const { socket, connected } = get();
     if (socket && connected) {
-      console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}${sealedBoosterCount ? ` boosters: ${sealedBoosterCount}` : ''}${timerEnabled === false ? ' (no timer)' : ''}${isAnonymous ? ' (anonymous)' : ''}`);
+      console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}${sealedBoosterCount ? ` boosters: ${sealedBoosterCount}` : ''}${sealedSetChoice ? ` set: ${sealedSetChoice}` : ''}${timerEnabled === false ? ' (no timer)' : ''}${isAnonymous ? ' (anonymous)' : ''}`);
       set({ isSealedRoom: isSealed, rematchState: 'none', chatMessages: [], unreadChatCount: 0 });
-      socket.emit('room:create', { userId, isPrivate, isRanked, isSealed, gameMode, hostName, sealedBoosterCount, timerEnabled, isAnonymous });
+      socket.emit('room:create', { userId, isPrivate, isRanked, isSealed, gameMode, hostName, sealedBoosterCount, sealedSetChoice, timerEnabled, isAnonymous });
     } else {
       console.error('[Socket] Cannot create room: not connected');
       set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });

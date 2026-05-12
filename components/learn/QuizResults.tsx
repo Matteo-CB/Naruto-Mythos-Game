@@ -180,7 +180,7 @@ export function QuizResults({
 
   return (
     <div
-      className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-4"
+      className="min-h-[calc(100vh-80px)] flex items-center justify-center px-2 sm:px-4 py-3 sm:py-4"
       style={{ backgroundColor: DARK_BG }}
     >
       <div className="max-w-md w-full">

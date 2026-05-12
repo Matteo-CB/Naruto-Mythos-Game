@@ -47,9 +47,10 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
   if (tournament.gameMode === 'sealed') {
     const { generateSealedPool } = await import('@/lib/sealed/boosterGenerator');
     const count = tournament.sealedBoosterCount ?? 5;
+    const choice = (tournament as { sealedSetChoice?: string }).sealedSetChoice ?? 'random';
     for (const p of tournament.participants) {
       if (p.sealedPool) continue;
-      const pool = generateSealedPool(count);
+      const pool = generateSealedPool(count, choice);
       await prisma.tournamentParticipant.update({
         where: { id: p.id },
         data: { sealedPool: pool as never },

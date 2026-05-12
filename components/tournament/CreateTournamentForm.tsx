@@ -1,10 +1,11 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useState } from 'react';
 import { useTournamentStore, type CreateTournamentInput } from '@/stores/tournamentStore';
 import { useRouter } from '@/lib/i18n/navigation';
 import { RANK_TIERS } from '@/components/EloBadge';
+import { ALL_SET_IDS, SET_REGISTRY, isSetAvailable } from '@/lib/data/sets/registry';
 
 interface Props {
   isAdmin: boolean;
@@ -13,6 +14,7 @@ interface Props {
 export function CreateTournamentForm({ isAdmin }: Props) {
   const t = useTranslations('tournament');
   const tRoot = useTranslations();
+  const locale = useLocale();
   const router = useRouter();
   const { createTournament } = useTournamentStore();
 
@@ -23,6 +25,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
   const [isPublic, setIsPublic] = useState(true);
   const [useBanList, setUseBanList] = useState(true);
   const [sealedBoosters, setSealedBoosters] = useState<4 | 5 | 6>(5);
+  const [sealedSetChoice, setSealedSetChoice] = useState<string>('random');
   const [allowedLeagues, setAllowedLeagues] = useState<string[]>([]);
   const [scheduledDate, setScheduledDate] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
@@ -73,7 +76,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
         maxPlayers,
         isPublic,
         useBanList,
-        ...(gameMode === 'sealed' ? { sealedBoosterCount: sealedBoosters } : {}),
+        ...(gameMode === 'sealed' ? { sealedBoosterCount: sealedBoosters, sealedSetChoice } : {}),
         ...(allowedLeagues.length > 0 ? { allowedLeagues } : {}),
         ...(scheduledStartAt ? { scheduledStartAt } : {}),
         ...(bannedCardIds.trim() ? { bannedCardIds: bannedCardIds.split(',').map(s => s.trim()).filter(Boolean) } : {}),
@@ -144,14 +147,47 @@ export function CreateTournamentForm({ isAdmin }: Props) {
       </div>
 
       {gameMode === 'sealed' && (
-        <div className="flex flex-col gap-1">
-          <label style={labelStyle}>{t('sealedBoosters')}</label>
-          <div className="flex gap-2">
-            {([4, 5, 6] as const).map(v => (
-              <ToggleBtn key={v} val={String(v)} cur={String(sealedBoosters)} onClick={() => setSealedBoosters(v)}>{v}</ToggleBtn>
-            ))}
+        <>
+          <div className="flex flex-col gap-1">
+            <label style={labelStyle}>{t('sealedBoosters')}</label>
+            <div className="flex gap-2">
+              {([4, 5, 6] as const).map(v => (
+                <ToggleBtn key={v} val={String(v)} cur={String(sealedBoosters)} onClick={() => setSealedBoosters(v)}>{v}</ToggleBtn>
+              ))}
+            </div>
           </div>
-        </div>
+          <div className="flex flex-col gap-1">
+            <label style={labelStyle}>{tRoot('sealed.setChoiceLabel')}</label>
+            <div className="flex flex-wrap gap-2">
+              <ToggleBtn val="random" cur={sealedSetChoice} onClick={() => setSealedSetChoice('random')}>{tRoot('sealed.setRandom')}</ToggleBtn>
+              {ALL_SET_IDS.map((sid) => {
+                const desc = SET_REGISTRY[sid];
+                const name = locale === 'fr' ? desc.nameFr : desc.nameEn;
+                const available = isSetAvailable(sid);
+                const cur = sealedSetChoice;
+                return (
+                  <button
+                    key={sid}
+                    type="button"
+                    onClick={() => available && setSealedSetChoice(sid)}
+                    disabled={!available}
+                    className="px-3 py-1.5 text-xs uppercase tracking-wider font-medium cursor-pointer disabled:cursor-not-allowed"
+                    style={{
+                      backgroundColor: cur === sid ? '#c4a35a' : '#1a1a1a',
+                      color: !available ? '#444' : cur === sid ? '#0a0a0a' : '#888',
+                      border: '1px solid ' + (cur === sid ? '#c4a35a' : '#333'),
+                      opacity: available ? 1 : 0.6,
+                    }}
+                    title={!available ? tRoot('common.comingSoon') : undefined}
+                  >
+                    {name}
+                    {!available && <span className="ml-1 text-[9px] normal-case opacity-70">({tRoot('common.comingSoon')})</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </>
       )}
 
       {gameMode === 'restricted' && (

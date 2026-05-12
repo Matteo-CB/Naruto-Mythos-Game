@@ -151,7 +151,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
 
         const tournamentMeta = await prisma.tournament.findUnique({
           where: { id: tournamentId },
-          select: { gameMode: true, sealedBoosterCount: true },
+          select: { gameMode: true, sealedBoosterCount: true, sealedSetChoice: true },
         });
         const isSealedTournament = tournamentMeta?.gameMode === 'sealed';
 
@@ -215,6 +215,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             finalized: false,
             isSealed: isSealedTournament,
             sealedBoosterCount: (tournamentMeta?.sealedBoosterCount ?? 5) as 4 | 5 | 6,
+            sealedSetChoice: tournamentMeta?.sealedSetChoice ?? 'random',
             sealedTimer: null,
             sealedDeadline: null,
             timerEnabled: true,

@@ -12,6 +12,7 @@ import { Footer } from '@/components/Footer';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
+import { ALL_SET_IDS, SET_REGISTRY } from '@/lib/data/sets/registry';
 import type { CharacterCard, MissionCard, CardData, Rarity } from '@/lib/engine/types';
 
 type AnyCard = CardData;
@@ -37,6 +38,7 @@ export default function CollectionPage() {
   const [cardsLoading, setCardsLoading] = useState(true);
   const [filterRarity, setFilterRarity] = useState<string>('all');
   const [filterGroup, setFilterGroup] = useState<string>('all');
+  const [filterSet, setFilterSet] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,6 +65,7 @@ export default function CollectionPage() {
     return allCards.filter((card) => {
       if (filterRarity !== 'all' && card.rarity !== filterRarity) return false;
       if (filterGroup !== 'all' && card.group !== filterGroup) return false;
+      if (filterSet !== 'all' && card.set !== filterSet) return false;
       if (searchQuery) {
         const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const q = normalize(searchQuery);
@@ -77,12 +80,12 @@ export default function CollectionPage() {
       }
       return true;
     });
-  }, [allCards, filterRarity, filterGroup, searchQuery]);
+  }, [allCards, filterRarity, filterGroup, filterSet, searchQuery, locale]);
 
-  
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [filterRarity, filterGroup, searchQuery]);
+  }, [filterRarity, filterGroup, filterSet, searchQuery]);
 
   const characterCards = useMemo(() => filteredCards.filter((c) => c.card_type !== 'mission'), [filteredCards]);
   const totalCharPages = Math.max(1, Math.ceil(characterCards.length / CARDS_PER_PAGE));
@@ -144,6 +147,20 @@ export default function CollectionPage() {
             {groups.map((g) => (
               <option key={g} value={g}>{getCardGroup(g, locale as 'en' | 'fr')}</option>
             ))}
+          </select>
+          <select
+            value={filterSet}
+            onChange={(e) => setFilterSet(e.target.value)}
+            className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm focus:outline-none"
+            aria-label={t('collection.allSets')}
+          >
+            <option value="all">{t('collection.allSets')}</option>
+            {ALL_SET_IDS.map((sid) => {
+              const desc = SET_REGISTRY[sid];
+              const name = locale === 'fr' ? desc.nameFr : desc.nameEn;
+              const suffix = desc.status === 'coming_soon' ? ' (' + t('common.comingSoon') + ')' : '';
+              return <option key={sid} value={sid}>{name + suffix}</option>;
+            })}
           </select>
         </div>
 

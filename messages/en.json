@@ -22,7 +22,9 @@
     "close": "Close",
     "all": "All",
     "maintenanceBanner": "Server maintenance incoming. No new games can be started after your current game. The site will be back in a few minutes.",
-    "home": "Home"
+    "home": "Home",
+    "comingSoon": "Coming soon",
+    "menu": "Menu"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -66,6 +68,7 @@
     "loading": "Loading...",
     "back": "Back to menu",
     "gameBackground": "Game Background",
+    "gameBackgroundRandom": "Random",
     "selected": "Selected",
     "username": "Username",
     "usernameSave": "Save",
@@ -959,6 +962,7 @@
     "filters": "Filters",
     "allRarities": "All Rarities",
     "allGroups": "All Groups",
+    "allSets": "All Sets",
     "total": "{count} cards",
     "noResults": "No cards match your filters",
     "details": {
@@ -1126,6 +1130,10 @@
     },
     "hoverToPreview": "Hover over a card to see its details",
     "sortByCost": "Sort by Cost",
+    "sortName": "Name",
+    "sortRarity": "Rarity",
+    "actions": "Actions",
+    "detail": "Detail",
     "dragToReorder": "Drag cards to reorder",
     "hideBanned": "Hide Banned",
     "showBanned": "Show Banned",
@@ -2392,6 +2400,8 @@
     "description": "Open 6 boosters, build a deck from the cards you pull, then battle!",
     "descriptionWithCount": "Open {count} boosters, build a deck from the cards you pull, then battle!",
     "boosterCountLabel": "Boosters",
+    "setChoiceLabel": "Set",
+    "setRandom": "Random",
     "vsAI": "Sealed vs AI",
     "vsAIDesc": "Open boosters and build a deck to fight the AI",
     "online": "Sealed Online",

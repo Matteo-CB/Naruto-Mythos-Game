@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from '@/lib/i18n/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CloudBackground } from '@/components/CloudBackground';
@@ -14,7 +14,8 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSocketStore } from '@/lib/socket/client';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { AIDifficulty } from '@/lib/ai/AIPlayer';
-import type { BoosterCard, BoosterPack, SealedPool } from '@/lib/sealed/boosterGenerator';
+import type { BoosterCard, BoosterPack, SealedPool, SealedSetChoice } from '@/lib/sealed/boosterGenerator';
+import { ALL_SET_IDS, SET_REGISTRY, isSetAvailable } from '@/lib/data/sets/registry';
 
 type SealedStep =
   | 'loading'
@@ -69,6 +70,7 @@ export default function SealedPage() {
   const [onlineView, setOnlineView] = useState<'browse' | 'private'>('browse');
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
   const [boosterCount, setBoosterCount] = useState<4 | 5 | 6>(6);
+  const [setChoice, setSetChoice] = useState<SealedSetChoice>('random');
 
   
   useEffect(() => {
@@ -162,13 +164,13 @@ export default function SealedPage() {
       if (!socketConnected) {
         await socketConnect(session.user.id);
       }
-      socketCreateRoom(session.user.id, false, false, true, 'sealed', session.user.name ?? undefined, boosterCount);
+      socketCreateRoom(session.user.id, false, false, true, 'sealed', session.user.name ?? undefined, boosterCount, setChoice);
       setIsPrivateRoom(false);
       setStep('online-waiting');
     } catch {
-      
+
     }
-  }, [session?.user?.id, socketConnected, socketConnect, socketCreateRoom, boosterCount]);
+  }, [session?.user?.id, socketConnected, socketConnect, socketCreateRoom, boosterCount, setChoice]);
 
   const handleOnlineCreatePrivate = useCallback(async () => {
     if (!session?.user?.id) return;
@@ -176,13 +178,13 @@ export default function SealedPage() {
       if (!socketConnected) {
         await socketConnect(session.user.id);
       }
-      socketCreateRoom(session.user.id, true, false, true, 'sealed', session.user.name ?? undefined, boosterCount);
+      socketCreateRoom(session.user.id, true, false, true, 'sealed', session.user.name ?? undefined, boosterCount, setChoice);
       setIsPrivateRoom(true);
       setStep('online-waiting');
     } catch {
-      
+
     }
-  }, [session?.user?.id, socketConnected, socketConnect, socketCreateRoom, boosterCount]);
+  }, [session?.user?.id, socketConnected, socketConnect, socketCreateRoom, boosterCount, setChoice]);
 
   const handleOnlineJoin = useCallback(async (code?: string) => {
     const codeToJoin = code || joinCode.trim().toUpperCase();
@@ -204,7 +206,7 @@ export default function SealedPage() {
     
     import('@/lib/sealed/boosterGenerator').then((mod) => {
       try {
-        const pool = mod.generateSealedPool(boosterCount);
+        const pool = mod.generateSealedPool(boosterCount, setChoice);
         setSealedPool(pool);
         setStep('opening');
       } catch (err) {
@@ -215,7 +217,7 @@ export default function SealedPage() {
       console.error('[Sealed] Failed to load booster module:', err);
       setStep('mode-select');
     });
-  }, [boosterCount]);
+  }, [boosterCount, setChoice]);
 
   const handleBoostersComplete = useCallback((cards: BoosterCard[]) => {
     setAllOpenedCards(cards);
@@ -238,7 +240,7 @@ export default function SealedPage() {
           import('@/lib/data/cardLoader'),
         ]).then(([boosterMod, aiMod, cardMod]) => {
           try {
-            const aiPool = boosterMod.generateSealedPool(boosterCount);
+            const aiPool = boosterMod.generateSealedPool(boosterCount, setChoice);
             const aiDeck = aiMod.buildAISealedDeck(aiPool);
 
             
@@ -294,7 +296,7 @@ export default function SealedPage() {
         setStep('starting');
       }
     },
-    [mode, difficulty, startAIGame, setSealedDeck, session?.user?.name, router, socketSelectDeck],
+    [mode, difficulty, startAIGame, setSealedDeck, session?.user?.name, router, socketSelectDeck, boosterCount, setChoice],
   );
 
   const handleTimeUp = useCallback(() => {
@@ -451,7 +453,7 @@ export default function SealedPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="flex flex-col gap-2 w-full"
               >
-                
+
                 <div className="flex items-center justify-between p-3 rounded-lg mb-1" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
                   <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
                     {t('boosterCountLabel')}
@@ -473,6 +475,8 @@ export default function SealedPage() {
                     ))}
                   </div>
                 </div>
+
+                <SealedSetPicker value={setChoice} onChange={setSetChoice} />
 
                 <p className="text-xs uppercase tracking-wider mb-1" style={{ color: '#888888' }}>
                   {tAI('selectDifficulty')}
@@ -500,7 +504,7 @@ export default function SealedPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="flex flex-col gap-4 w-full"
               >
-                
+
                 <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
                   <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
                     {t('boosterCountLabel')}
@@ -523,7 +527,9 @@ export default function SealedPage() {
                   </div>
                 </div>
 
-                
+                <SealedSetPicker value={setChoice} onChange={setSetChoice} />
+
+
                 <div
                   className="flex w-full rounded-lg overflow-hidden"
                   style={{ border: '1px solid #262626' }}
@@ -730,4 +736,57 @@ function formatTimeAgo(timestamp: number, t: ReturnType<typeof useTranslations>)
   if (seconds < 60) return t('timeJustNow');
   const minutes = Math.floor(seconds / 60);
   return t('timeMinutesAgo', { minutes });
+}
+
+function SealedSetPicker({ value, onChange }: { value: SealedSetChoice; onChange: (v: SealedSetChoice) => void }) {
+  const t = useTranslations();
+  const locale = useLocale();
+  const choices: Array<{ id: SealedSetChoice; label: string; disabled: boolean; subLabel?: string }> = [];
+  choices.push({ id: 'random', label: t('sealed.setRandom'), disabled: false });
+  for (const sid of ALL_SET_IDS) {
+    const desc = SET_REGISTRY[sid];
+    const name = locale === 'fr' ? desc.nameFr : desc.nameEn;
+    const available = isSetAvailable(sid);
+    choices.push({
+      id: sid,
+      label: name,
+      disabled: !available,
+      subLabel: !available ? t('common.comingSoon') : undefined,
+    });
+  }
+
+  return (
+    <div className="flex flex-col gap-1 p-3 rounded-lg" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
+      <span className="text-xs uppercase tracking-wider mb-1" style={{ color: '#888888' }}>
+        {t('sealed.setChoiceLabel')}
+      </span>
+      <div className="grid grid-cols-3 gap-1.5">
+        {choices.map((c) => {
+          const active = value === c.id;
+          return (
+            <button
+              key={c.id}
+              onClick={() => !c.disabled && onChange(c.id)}
+              disabled={c.disabled}
+              className="px-2 py-2 text-[11px] font-bold transition-colors cursor-pointer text-center disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: active ? '#c4a35a' : '#0a0a0a',
+                color: c.disabled ? '#444' : active ? '#0a0a0a' : '#aaa',
+                border: '1px solid ' + (active ? '#c4a35a' : '#262626'),
+                opacity: c.disabled ? 0.55 : 1,
+              }}
+              title={c.subLabel}
+            >
+              <div>{c.label}</div>
+              {c.subLabel && (
+                <div className="text-[9px] mt-0.5 normal-case" style={{ color: c.disabled ? '#555' : '#888' }}>
+                  {c.subLabel}
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 }

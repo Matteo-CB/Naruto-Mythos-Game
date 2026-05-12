@@ -8,13 +8,23 @@
         "Les petites coupures de connexion en partie (moins de 15 secondes) ne comptent plus dans le quota de déconnexions et ne déclenchent plus de forfait surprise quand tu reviens vite. Le délai de grâce passe aussi à 1 minute 30.",
         "Page tournoi : un panneau au-dessus du bracket montre en direct l'état de chaque match du round en cours (en attente, en partie, terminé), avec le temps écoulé et le compte à rebours d'absence pour chaque match.",
         "Chaque case du bracket affiche aussi son propre mini chrono d'absence quand un joueur risque le forfait.",
-        "Tournois : tu peux maintenant quitter un tournoi en cours, ton match actif est alors forfaité proprement et le tour suivant continue normalement."
+        "Tournois : tu peux maintenant quitter un tournoi en cours, ton match actif est alors forfaité proprement et le tour suivant continue normalement.",
+        "Préparation de la prochaine extension Shinobi Shinren : la collection, le deck builder, le scellé et la création de tournoi proposent désormais un choix d'extension (Konoha Shido, Shinobi Shinren ou aléatoire), Shinobi Shinren étant marqué bientôt disponible en attendant ses cartes.",
+        "Sur mobile, ta pioche et ta défausse (et celles de l'adversaire) sont à nouveau visibles sur les côtés du plateau, avec le nombre de cartes et un clic pour ouvrir le contenu de la défausse.",
+        "Refonte complète du deck builder sur mobile : nouvelle barre du haut avec menu d'actions, onglets Catalogue et Mon Deck plus grands, barre de recherche fixe, cellules de cartes plus grandes pour le tap, bouton Sauvegarder en pleine largeur en bas, et fenêtre de détails de carte plein écran.",
+        "Quiz adapté au mobile : questions, boutons et grilles redimensionnés pour s'afficher correctement sur téléphone, plus aucun débordement sur les écrans étroits.",
+        "Quiz : les questions qui montraient uniquement un prénom (par exemple \"Naruto\" alors qu'il existe plusieurs versions) précisent maintenant le titre ou le numéro de la carte, et la bonne réponse est toujours sélectionnable."
       ],
       "changes_en": [
         "Brief network blips in-game (under 15 seconds) no longer count toward the disconnect cap and no longer trigger a surprise forfeit when you reconnect quickly. The grace period also bumps to 1 minute 30.",
         "Tournament page: a live panel above the bracket shows the state of every match in the current round (waiting, playing, finished), with elapsed time and the absence countdown per match.",
         "Each bracket cell also shows its own small absence countdown when a player is at risk of forfeit.",
-        "Tournaments: you can now leave a tournament in progress; your active match is forfeited cleanly and the next round continues normally."
+        "Tournaments: you can now leave a tournament in progress; your active match is forfeited cleanly and the next round continues normally.",
+        "Prep work for the upcoming Shinobi Shinren expansion: collection, deck builder, sealed and tournament creation now offer a set picker (Konoha Shido, Shinobi Shinren or random), with Shinobi Shinren marked coming soon until its cards land.",
+        "On mobile, your deck and discard pile (and the opponent's) are visible again on the sides of the board, with card counts and a tap to open the discard contents.",
+        "Full mobile redesign of the deck builder: new top bar with action menu, bigger Catalog and My Deck tabs, sticky search row, larger card cells for easier tapping, full-width Save button at the bottom, and a fullscreen card detail sheet.",
+        "Quiz on mobile: questions, buttons and grids now scale to phone screens, no more overflow on narrow displays.",
+        "Quiz: questions that only showed a first name (e.g. \"Naruto\" when several versions exist) now include the card's title or number, and the correct answer is always selectable."
       ]
     },
     {
