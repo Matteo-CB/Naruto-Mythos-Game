@@ -13,7 +13,7 @@ import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, val
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
 import { isMaintenanceActive, activateMaintenance, setDrainTimeout, setCheckInterval } from '@/lib/socket/maintenance';
-import { createChessClock, arm as armChessClock, disarm as disarmChessClock, resetIdle as resetChessClockIdle, snapshotForBroadcast as snapshotChessClockForBroadcast, bankEmpty as chessClockBankEmpty, idleMs as chessClockIdleMs, consumeIdleWarning as consumeChessClockIdleWarning, CHESS_CLOCK_IDLE_LIMIT_MS, CHESS_CLOCK_IDLE_TOAST_MS, type ChessClockState } from '@/lib/timing/chessClock';
+import { createChessClock, arm as armChessClock, disarm as disarmChessClock, resetIdle as resetChessClockIdle, snapshotForBroadcast as snapshotChessClockForBroadcast, bankEmpty as chessClockBankEmpty, idleMs as chessClockIdleMs, consumeIdleWarning as consumeChessClockIdleWarning, CHESS_CLOCK_IDLE_LIMIT_MS, CHESS_CLOCK_IDLE_TOAST_MS, CHESS_CLOCK_MULLIGAN_IDLE_MS, type ChessClockState } from '@/lib/timing/chessClock';
 
 export interface RoomData {
   code: string;
@@ -1034,35 +1034,36 @@ function startMulliganTimer(
   code: string,
   io: SocketIOServer,
 ): void {
+  armMulliganIdleTimer(room, code, io);
+}
+
+export function armMulliganIdleTimer(
+  room: RoomData,
+  code: string,
+  io: SocketIOServer,
+): void {
+  if (room.chessClockMulliganTimer) {
+    clearTimeout(room.chessClockMulliganTimer);
+    room.chessClockMulliganTimer = null;
+  }
   if (room.mulliganTimer) {
     clearTimeout(room.mulliganTimer);
     room.mulliganTimer = null;
   }
   if (!room.gameState || room.gameState.phase !== 'mulligan') return;
-  const deadline = Date.now() + MULLIGAN_TIMEOUT_MS;
+  if (room.gameState.player1.hasMulliganed && room.gameState.player2.hasMulliganed) return;
+  if (room.finalized) return;
+
+  const deadline = Date.now() + CHESS_CLOCK_MULLIGAN_IDLE_MS;
   room.mulliganDeadline = deadline;
-  if (room.hostSocket) io.to(room.hostSocket).emit('game:mulligan-deadline', { deadline, durationMs: MULLIGAN_TIMEOUT_MS });
-  if (room.guestSocket) io.to(room.guestSocket).emit('game:mulligan-deadline', { deadline, durationMs: MULLIGAN_TIMEOUT_MS });
-  room.mulliganTimer = setTimeout(async () => {
-    if (!rooms.has(code)) return;
-    if (!room.gameState || room.gameState.phase !== 'mulligan') return;
-    const p1Done = room.gameState.player1.hasMulliganed;
-    const p2Done = room.gameState.player2.hasMulliganed;
-    console.log(`[Socket] Mulligan timeout in room ${code} | p1Done=${p1Done} p2Done=${p2Done}`);
-    if (!p1Done && !p2Done) {
-      try { room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'MULLIGAN', doMulligan: false }); } catch { /* ignore */ }
-      try { room.gameState = GameEngine.applyAction(room.gameState, 'player2', { type: 'MULLIGAN', doMulligan: false }); } catch { /* ignore */ }
-      broadcastState(room, io);
-      if (room.gameState.phase === 'action') startActionTimer(room, code, io);
-      return;
-    }
-    const absent: 'player1' | 'player2' | null = !p1Done ? 'player1' : !p2Done ? 'player2' : null;
-    if (!absent) return;
-    console.log(`[Socket] Auto-forfeit ${absent} in room ${code} (mulligan timeout)`);
-    room.gameState = GameEngine.applyAction(room.gameState, absent, { type: 'FORFEIT', reason: 'timeout' });
-    broadcastState(room, io);
-    await finalizeGameEnd(room, code, io, 'timeout');
-  }, MULLIGAN_TIMEOUT_MS);
+  if (room.hostSocket) io.to(room.hostSocket).emit('game:mulligan-deadline', { deadline, durationMs: CHESS_CLOCK_MULLIGAN_IDLE_MS });
+  if (room.guestSocket) io.to(room.guestSocket).emit('game:mulligan-deadline', { deadline, durationMs: CHESS_CLOCK_MULLIGAN_IDLE_MS });
+
+  room.chessClockMulliganTimer = setTimeout(() => {
+    handleMulliganIdleTimeout(room, code, io).catch((err) => {
+      console.error('[ChessClock] handleMulliganIdleTimeout error:', err instanceof Error ? err.message : err);
+    });
+  }, CHESS_CLOCK_MULLIGAN_IDLE_MS);
 }
 
 function clearMulliganTimer(room: RoomData): void {
@@ -1070,7 +1071,73 @@ function clearMulliganTimer(room: RoomData): void {
     clearTimeout(room.mulliganTimer);
     room.mulliganTimer = null;
   }
+  if (room.chessClockMulliganTimer) {
+    clearTimeout(room.chessClockMulliganTimer);
+    room.chessClockMulliganTimer = null;
+  }
   room.mulliganDeadline = null;
+}
+
+export async function handleMulliganIdleTimeout(
+  room: RoomData,
+  code: string,
+  io: SocketIOServer,
+): Promise<void> {
+  if (!room.gameState || room.finalized) return;
+  if (room.gameState.phase !== 'mulligan') return;
+  if (room.gameState.player1.hasMulliganed && room.gameState.player2.hasMulliganed) return;
+
+  const p1Done = room.gameState.player1.hasMulliganed;
+  const p2Done = room.gameState.player2.hasMulliganed;
+  console.log(`[ChessClock] ${code}: mulligan idle timeout -> cancelling game (p1Done=${p1Done} p2Done=${p2Done})`);
+
+  room.finalized = true;
+  clearMulliganTimer(room);
+  clearChessClockTimers(room);
+  clearActionTimer(room);
+  if (room.sealedTimer) {
+    clearTimeout(room.sealedTimer);
+    room.sealedTimer = null;
+    room.sealedDeadline = null;
+  }
+  if (room.tournamentGameTimer) {
+    clearTimeout(room.tournamentGameTimer);
+    room.tournamentGameTimer = null;
+  }
+  if (room.disconnectTimer) {
+    clearTimeout(room.disconnectTimer);
+    room.disconnectTimer = null;
+  }
+  room.chessClock = disarmChessClock(room.chessClock, Date.now());
+  room.chessClockLastInputKey = null;
+
+  const cancelPayload = { reason: 'mulligan-idle' as const, roomCode: code };
+  if (room.hostSocket) io.to(room.hostSocket).emit('game:cancelled', cancelPayload);
+  if (room.guestSocket) io.to(room.guestSocket).emit('game:cancelled', cancelPayload);
+  if (room.spectators.size > 0) {
+    io.to(`spec:${code}`).emit('game:cancelled', cancelPayload);
+  }
+
+  const gameId = room.gameState.gameId;
+  if (gameId) {
+    try {
+      await prisma.game.deleteMany({ where: { id: gameId } });
+    } catch (err) {
+      console.warn('[ChessClock] failed to delete cancelled game record:', err instanceof Error ? err.message : err);
+    }
+  }
+
+  if (room.tournamentId && room.tournamentMatchId) {
+    console.log(`[ChessClock] mulligan-idle cancel inside tournament match ${room.tournamentMatchId}: leaving match for tournament handler`);
+  }
+
+  setTimeout(() => {
+    if (!rooms.has(code)) return;
+    if (room.hostSocket) playerRooms.delete(room.hostSocket);
+    if (room.guestSocket) playerRooms.delete(room.guestSocket);
+    for (const [, spec] of room.spectators) playerRooms.delete(spec.socketId);
+    rooms.delete(code);
+  }, 5_000);
 }
 
 function startActionTimer(
@@ -2533,16 +2600,20 @@ export function setupSocketHandlers(io: SocketIOServer) {
           room.gameState.consecutiveTimeouts[player] = 0;
         }
 
-        
+
         broadcastState(room, io);
 
-        
+
         io.to(code).emit('game:action-performed', {
           player,
           action: data.action,
         });
 
-        
+        if (data.action.type === 'MULLIGAN' && room.gameState.phase === 'mulligan') {
+          armMulliganIdleTimer(room, code, io);
+        }
+
+
         const winner = GameEngine.getWinner(room.gameState);
         if (winner) {
           await finalizeGameEnd(room, code, io, 'score');

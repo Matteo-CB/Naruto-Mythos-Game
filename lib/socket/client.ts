@@ -44,6 +44,7 @@ interface SocketStore {
     replayData?: unknown;
     tournamentId?: string | null;
   } | null;
+  gameCancelled: { reason: 'mulligan-idle'; roomCode: string } | null;
   playerNames: { player1: string; player2: string } | null;
   actionDeadline: number | null;
 
@@ -137,6 +138,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   gameEnded: false,
   playerNames: null,
   gameResult: null,
+  gameCancelled: null,
   actionDeadline: null,
   isSealedRoom: false,
   tournamentMatchRoom: false,
@@ -469,6 +471,19 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         });
       });
 
+      socket.on('game:cancelled', (data: { reason: 'mulligan-idle'; roomCode: string }) => {
+        console.log('[Socket] Game cancelled:', data.reason, 'roomCode:', data.roomCode);
+        const resyncT = get()._resyncTimer;
+        if (resyncT) clearInterval(resyncT);
+        set({
+          gameCancelled: { reason: data.reason, roomCode: data.roomCode },
+          gameEnded: false,
+          gameResult: null,
+          actionDeadline: null,
+          _resyncTimer: null,
+        });
+      });
+
       socket.on('tournament:cancelled', (data: { reason: string; tournamentId?: string }) => {
         console.log('[Socket] Tournament cancelled:', data.reason, 'tournamentId:', data.tournamentId ?? 'unknown');
         if (!get().tournamentMatchRoom) {
@@ -531,6 +546,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           rematchState: 'accepted',
           gameEnded: false,
           gameResult: null,
+          gameCancelled: null,
           actionDeadline: null,
           gameStarted: false,
           visibleState: null,
@@ -733,6 +749,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         gameStarted: false,
         gameEnded: false,
         gameResult: null,
+        gameCancelled: null,
         actionDeadline: null,
         publicRooms: [],
         maintenanceWarning: false,
@@ -818,6 +835,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         gameStarted: false,
         gameEnded: false,
         gameResult: null,
+        gameCancelled: null,
         playerNames: null,
         actionDeadline: null,
         error: null,

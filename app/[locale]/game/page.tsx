@@ -89,6 +89,7 @@ export default function GamePage() {
   const socketGameStarted = useSocketStore((s) => s.gameStarted);
   const socketGameEnded = useSocketStore((s) => s.gameEnded);
   const socketGameResult = useSocketStore((s) => s.gameResult);
+  const socketGameCancelled = useSocketStore((s) => s.gameCancelled);
   const socketConnected = useSocketStore((s) => s.connected);
   const socketError = useSocketStore((s) => s.error);
   const socketErrorKey = useSocketStore((s) => s.errorKey);
@@ -99,7 +100,23 @@ export default function GamePage() {
   
   const hasActiveGame = gameState || (isOnlineGame && visibleState) || isSpectating;
 
-  
+  const cancelToastT = useTranslations('game.end');
+  useEffect(() => {
+    if (!socketGameCancelled) return;
+    if (typeof window !== 'undefined') {
+      try {
+        const msg = cancelToastT('cancelledMulliganIdle');
+        if (typeof window.alert === 'function') window.alert(msg);
+      } catch { /* ignore */ }
+    }
+    const timer = setTimeout(() => {
+      useSocketStore.setState({ gameCancelled: null });
+      router.push('/play/online');
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [socketGameCancelled, router, cancelToastT]);
+
+
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!hasActiveGame) {

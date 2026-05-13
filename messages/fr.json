@@ -347,6 +347,7 @@
       "youLostOnClock": "Vous avez épuisé votre chrono",
       "opponentLostByIdle": "L'adversaire est resté inactif trop longtemps",
       "youLostByIdle": "Vous êtes resté inactif trop longtemps",
+      "cancelledMulliganIdle": "Partie annulée : inactivité au mulligan",
       "saveReplay": "Enregistrer la partie",
       "savingReplay": "Enregistrement...",
       "replaySaved": "Partie enregistrée",

@@ -347,6 +347,7 @@
       "youLostOnClock": "You ran out of time",
       "opponentLostByIdle": "Opponent stayed inactive too long",
       "youLostByIdle": "You stayed inactive too long",
+      "cancelledMulliganIdle": "Game cancelled: inactivity at mulligan",
       "saveReplay": "Save Replay",
       "savingReplay": "Saving...",
       "replaySaved": "Replay Saved",
