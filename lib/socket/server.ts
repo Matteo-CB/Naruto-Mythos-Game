@@ -1069,7 +1069,36 @@ export async function handleMulliganIdleTimeout(
   }
 
   if (room.tournamentId && room.tournamentMatchId) {
-    console.log(`[ChessClock] mulligan-idle cancel inside tournament match ${room.tournamentMatchId}: leaving match for tournament handler`);
+    try {
+      const tInfo = await prisma.tournament.findUnique({
+        where: { id: room.tournamentId },
+        select: { format: true },
+      });
+      if (tInfo?.format === 'swiss') {
+        console.log(`[ChessClock] mulligan-idle in Swiss tournament match ${room.tournamentMatchId}: triggering double absence`);
+        const { handleSwissDoubleAbsence } = await import('@/lib/socket/tournamentHandlers');
+        await handleSwissDoubleAbsence(io, room.tournamentId, room.tournamentMatchId);
+      } else {
+        console.log(`[ChessClock] mulligan-idle in elimination tournament match ${room.tournamentMatchId}: marking match as forfeit (no winner), admin to resolve`);
+        try {
+          await prisma.tournamentMatch.update({
+            where: { id: room.tournamentMatchId },
+            data: { status: 'forfeit', winnerId: null, winnerUsername: null, completedAt: new Date(), absenceDeadline: null, absentPlayerId: null },
+          });
+          io.to(`tournament:${room.tournamentId}`).emit('tournament:player-forfeited', {
+            matchId: room.tournamentMatchId,
+            forfeitedPlayerId: null,
+            winnerId: null,
+            winnerUsername: null,
+            doubleForfeit: true,
+          });
+        } catch (err) {
+          console.error('[ChessClock] failed to update elimination tournament match on mulligan-idle:', err instanceof Error ? err.message : err);
+        }
+      }
+    } catch (err) {
+      console.error('[ChessClock] tournament mulligan-idle handler failed:', err instanceof Error ? err.message : err);
+    }
   }
 
   broadcastActiveGames(io);
