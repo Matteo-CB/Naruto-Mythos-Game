@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useSocketStore } from '@/lib/socket/client';
@@ -12,6 +12,25 @@ interface GameCancelledOverlayProps {
 export const GameCancelledOverlay = React.memo(function GameCancelledOverlay({ onAcknowledge }: GameCancelledOverlayProps) {
   const t = useTranslations('game.end');
   const gameCancelled = useSocketStore((s) => s.gameCancelled);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (gameCancelled && buttonRef.current) {
+      buttonRef.current.focus();
+    }
+  }, [gameCancelled]);
+
+  useEffect(() => {
+    if (!gameCancelled) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Enter') {
+        e.preventDefault();
+        onAcknowledge();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [gameCancelled, onAcknowledge]);
 
   if (!gameCancelled) return null;
 
@@ -67,6 +86,7 @@ export const GameCancelledOverlay = React.memo(function GameCancelledOverlay({ o
         <div style={{ fontSize: 16, marginTop: 12, lineHeight: 1.4 }}>{message}</div>
         <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end' }}>
           <button
+            ref={buttonRef}
             type="button"
             onClick={onAcknowledge}
             style={{
