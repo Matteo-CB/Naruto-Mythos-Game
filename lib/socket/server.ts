@@ -554,11 +554,6 @@ function clearActionTimer(room: RoomData): void {
     room.mulliganTimer = null;
     room.mulliganDeadline = null;
   }
-  if (room.chessClockMulliganTimer) {
-    clearTimeout(room.chessClockMulliganTimer);
-    room.chessClockMulliganTimer = null;
-    room.mulliganDeadline = null;
-  }
   if (room.tournamentJoinTimer) {
     clearTimeout(room.tournamentJoinTimer);
     room.tournamentJoinTimer = null;
@@ -1255,6 +1250,7 @@ function startForcedResolverTimer(
   io: SocketIOServer,
 ): void {
   clearActionTimer(room);
+  clearMulliganTimer(room);
 
   if (!room.gameState) return;
   const forcedPlayer = room.gameState.pendingForcedResolver;
@@ -1332,6 +1328,7 @@ function startEffectTimer(
   io: SocketIOServer,
 ): void {
   clearActionTimer(room);
+  clearMulliganTimer(room);
 
   if (!room.gameState) return;
   if (!room.timerEnabled) return;
@@ -1424,6 +1421,7 @@ function startMissionPhaseTimer(
   io: SocketIOServer,
 ): void {
   clearActionTimer(room);
+  clearMulliganTimer(room);
 
   if (!room.gameState) return;
   if (!room.timerEnabled) return;
