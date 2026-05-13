@@ -8,6 +8,38 @@ import { useUIStore } from '@/stores/uiStore';
 
 const CONNECT_TIMEOUT_MS = 10000;
 
+export interface ChessClockBroadcast {
+  player1: { remainingMs: number; idleWarningUsed: boolean };
+  player2: { remainingMs: number; idleWarningUsed: boolean };
+  active: 'player1' | 'player2' | null;
+  activeStartedAt: number | null;
+  idleStartedAt: number | null;
+  serverNow: number;
+  idleToastAtMs: number;
+  idleLimitMs: number;
+}
+
+export function computeChessClockRemainingMs(
+  state: ChessClockBroadcast | null,
+  player: 'player1' | 'player2',
+  now: number = Date.now(),
+): number {
+  if (!state) return 0;
+  const base = Math.max(0, state[player].remainingMs);
+  if (state.active !== player || state.activeStartedAt === null) return base;
+  const elapsed = Math.max(0, now - state.activeStartedAt);
+  return Math.max(0, base - elapsed);
+}
+
+export function computeChessClockIdleMs(
+  state: ChessClockBroadcast | null,
+  player: 'player1' | 'player2',
+  now: number = Date.now(),
+): number {
+  if (!state || state.active !== player || state.idleStartedAt === null) return 0;
+  return Math.max(0, now - state.idleStartedAt);
+}
+
 interface PublicRoom {
   code: string;
   hostName: string;
@@ -45,6 +77,7 @@ interface SocketStore {
     tournamentId?: string | null;
   } | null;
   gameCancelled: { reason: 'mulligan-idle'; roomCode: string } | null;
+  chessClock: ChessClockBroadcast | null;
   playerNames: { player1: string; player2: string } | null;
   actionDeadline: number | null;
 
@@ -139,6 +172,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   playerNames: null,
   gameResult: null,
   gameCancelled: null,
+  chessClock: null,
   actionDeadline: null,
   isSealedRoom: false,
   tournamentMatchRoom: false,
@@ -382,6 +416,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           visibleState: VisibleGameState;
           playerRole: 'player1' | 'player2';
           playerNames?: { player1: string; player2: string };
+          chessClock?: ChessClockBroadcast;
         }) => {
           console.log('[Socket] State update received, phase:', data.visibleState?.phase,
             'hand size:', data.visibleState?.myState?.hand?.length ?? 0);
@@ -389,16 +424,21 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
             visibleState: data.visibleState,
             playerRole: data.playerRole,
             _lastStateUpdate: Date.now(),
-            
-            
-            
           };
           if (data.playerNames) {
             update.playerNames = data.playerNames;
           }
+          if (data.chessClock) {
+            update.chessClock = data.chessClock;
+          }
           set(update as SocketStore);
         },
       );
+
+      socket.on('game:clock-update', (payload: { chessClock: ChessClockBroadcast }) => {
+        if (!payload || !payload.chessClock) return;
+        set({ chessClock: payload.chessClock });
+      });
 
       socket.on('game:error', (data: { message: string; errorKey?: string; errorParams?: Record<string, string | number> }) => {
         console.error('[Socket] Game error:', data.message);
@@ -421,7 +461,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           console.log('[Socket] Game ended, winner:', data.winner, 'reason:', data.winReason, 'gameId:', data.gameId, 'tournament:', data.tournamentId ?? 'none');
           const resyncT = get()._resyncTimer;
           if (resyncT) { clearInterval(resyncT); }
-          set({ gameEnded: true, gameResult: data, actionDeadline: null, _resyncTimer: null, opponentDisconnected: false, opponentDisconnectDeadline: null });
+          set({ gameEnded: true, gameResult: data, chessClock: null, actionDeadline: null, _resyncTimer: null, opponentDisconnected: false, opponentDisconnectDeadline: null });
         },
       );
 
@@ -479,6 +519,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           gameCancelled: { reason: data.reason, roomCode: data.roomCode },
           gameEnded: false,
           gameResult: null,
+          chessClock: null,
           actionDeadline: null,
           _resyncTimer: null,
         });
@@ -547,6 +588,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           gameEnded: false,
           gameResult: null,
           gameCancelled: null,
+          chessClock: null,
           actionDeadline: null,
           gameStarted: false,
           visibleState: null,
@@ -674,18 +716,23 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         playerNames: { player1: string; player2: string };
         spectatorCount: number;
         roomCode?: string;
+        chessClock?: ChessClockBroadcast;
       }) => {
         const current = get();
-        
+
         if (!current.isSpectating && !current.spectatingRoomCode) return;
         if (data.roomCode && current.spectatingRoomCode && data.roomCode !== current.spectatingRoomCode) return;
-        set({
+        const update: Partial<SocketStore> = {
           visibleState: data.visibleState,
           playerNames: data.playerNames,
           spectatorCount: data.spectatorCount,
           isSpectating: true,
           gameStarted: true,
-        });
+        };
+        if (data.chessClock) {
+          update.chessClock = data.chessClock;
+        }
+        set(update as SocketStore);
       });
 
       socket.on('spectate:count-update', (data: { count: number }) => {
@@ -750,6 +797,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         gameEnded: false,
         gameResult: null,
         gameCancelled: null,
+        chessClock: null,
         actionDeadline: null,
         publicRooms: [],
         maintenanceWarning: false,
@@ -836,6 +884,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         gameEnded: false,
         gameResult: null,
         gameCancelled: null,
+        chessClock: null,
         playerNames: null,
         actionDeadline: null,
         error: null,
