@@ -2133,7 +2133,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           snap.actionHistory = [];
           room.replayStateSnapshots.push(snap);
           if (room.replayClockSnapshots) {
-            room.replayClockSnapshots.push({ ...room.chessClock });
+            room.replayClockSnapshots.push(deepClone(room.chessClock));
           }
         }
 
