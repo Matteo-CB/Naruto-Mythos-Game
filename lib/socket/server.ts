@@ -2781,8 +2781,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
       socket.join(`spec:${data.roomCode}`);
       playerRooms.set(socket.id, `spec:${data.roomCode}`);
 
-      
+
       try {
+        syncChessClock(room);
         const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
         const specMs = p1State.activeMissions.map((m: any) => ({
           ...m,
@@ -2804,7 +2805,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           spectatorCount: room.spectators.size,
           roomCode: data.roomCode,
         });
-        
+
         socket.emit('chat:history', { messages: room.chatMessages.slice(-50) });
       } catch (err) {
         console.error('[Socket] Spectator state error:', err);
@@ -2840,6 +2841,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
       try {
+        syncChessClock(room);
         const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
         const specMs = p1State.activeMissions.map((m: any) => ({
           ...m,
