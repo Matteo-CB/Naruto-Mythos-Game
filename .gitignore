@@ -50,6 +50,9 @@ newvisual/brute*_progress.json
 # local-only project notes, not published
 CLAUDE.md
 
+# local-only discord announcement draft, not published
+discord-announcement.txt
+
 # local-only design / planning docs, not published
 doc/
 

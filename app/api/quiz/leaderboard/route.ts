@@ -108,7 +108,8 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.json({ entries: paginated, total, limit, offset });
     response.headers.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
     return response;
-  } catch {
+  } catch (err) {
+    console.error('[API /quiz/leaderboard]', err instanceof Error ? err.stack ?? err.message : err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
