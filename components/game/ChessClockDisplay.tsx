@@ -60,10 +60,13 @@ function pulseAnimForRemaining(remainingMs: number): PulseSpec | null {
 
 export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player, isOpponent }: ChessClockDisplayProps) {
   const chessClock = useSocketStore((s) => s.chessClock);
+  const playerRole = useSocketStore((s) => s.playerRole);
   const { isMobile } = useGameScale();
   const [remaining, setRemaining] = useState<number>(() => computeChessClockRemainingMs(chessClock, player));
   const playedWarningSoundRef = useRef<boolean>(false);
   const urgentLoopRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const soundsEnabledForThisInstance = playerRole === player;
 
   useEffect(() => {
     if (!chessClock) {
@@ -79,6 +82,14 @@ export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player,
   }, [chessClock, player]);
 
   useEffect(() => {
+    if (!soundsEnabledForThisInstance) {
+      playedWarningSoundRef.current = false;
+      if (urgentLoopRef.current) {
+        clearInterval(urgentLoopRef.current);
+        urgentLoopRef.current = null;
+      }
+      return;
+    }
     const isActive = chessClock?.active === player;
     if (!isActive) {
       playedWarningSoundRef.current = false;
@@ -112,7 +123,7 @@ export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player,
     urgentLoopRef.current = setInterval(() => {
       playSound('clockUrgent');
     }, 1000);
-  }, [chessClock?.active, player, remaining]);
+  }, [chessClock?.active, player, remaining, soundsEnabledForThisInstance]);
 
   useEffect(() => () => {
     if (urgentLoopRef.current) clearInterval(urgentLoopRef.current);
