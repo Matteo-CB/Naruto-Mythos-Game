@@ -2914,7 +2914,8 @@
     "errorNotFound": "Game not found or not in progress.",
     "errorPrivate": "This is a private game.",
     "errorLimit": "Spectator limit reached for this room.",
-    "errorNotSubscribed": "You are not subscribed to this room."
+    "errorNotSubscribed": "You are not subscribed to this room.",
+    "errorEnded": "This game has ended."
   },
   "deckStats": {
     "title": "Deck stats (last 90 days)",

@@ -2914,7 +2914,8 @@
     "errorNotFound": "Partie introuvable ou terminée.",
     "errorPrivate": "Cette partie est privée.",
     "errorLimit": "Limite de spectateurs atteinte pour cette partie.",
-    "errorNotSubscribed": "Vous n'êtes pas inscrite dans cette partie."
+    "errorNotSubscribed": "Vous n'êtes pas inscrite dans cette partie.",
+    "errorEnded": "Cette partie est terminée."
   },
   "deckStats": {
     "title": "Stats des decks (90 derniers jours)",

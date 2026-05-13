@@ -1753,7 +1753,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       registerUserSocket(userId, socket.id);
 
       
-      if (room.gameState) {
+      if (room.gameState && !room.finalized) {
         syncChessClock(room);
         startChessClockTickLoop(room, io);
         const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
@@ -2456,6 +2456,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (!code) return;
       const room = rooms.get(code);
       if (!room || !room.gameState) return;
+      if (room.finalized) {
+        console.warn(`[Socket] game:request-state: room ${code} is finalized, skipping`);
+        return;
+      }
       syncChessClock(room);
       startChessClockTickLoop(room, io);
       const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
@@ -3049,6 +3053,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
         socket.emit('spectate:error', { message: 'Game not found or not in progress', errorKey: 'spectate.errorNotFound' });
         return;
       }
+      if (room.finalized) {
+        socket.emit('spectate:error', { message: 'Game has ended', errorKey: 'spectate.errorEnded' });
+        return;
+      }
 
       if (room.isPrivate && room.hostId !== authedUserId && room.guestId !== authedUserId) {
         socket.emit('spectate:error', { message: 'This is a private game', errorKey: 'spectate.errorPrivate' });
@@ -3123,6 +3131,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(data.roomCode);
       if (!room || !room.gameState) {
         socket.emit('spectate:error', { message: 'Game not found or not in progress', errorKey: 'spectate.errorNotFound' });
+        return;
+      }
+      if (room.finalized) {
+        socket.emit('spectate:error', { message: 'Game has ended', errorKey: 'spectate.errorEnded' });
         return;
       }
       const isPlayer = socket.id === room.hostSocket || socket.id === room.guestSocket;
