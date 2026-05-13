@@ -20,7 +20,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
 
   const [name, setName] = useState('');
   const [format, setFormat] = useState<'swiss' | 'elimination' | 'double_elimination'>('swiss');
-  const [gameMode, setGameMode] = useState<'classic' | 'sealed' | 'restricted'>('classic');
+  const [gameMode, setGameMode] = useState<'classic' | 'sealed' | 'restricted' | 'evolving'>('classic');
   const [maxPlayers, setMaxPlayers] = useState(8);
   const [isPublic, setIsPublic] = useState(true);
   const [useBanList, setUseBanList] = useState(true);
@@ -139,11 +139,17 @@ export function CreateTournamentForm({ isAdmin }: Props) {
 
       <div className="flex flex-col gap-1">
         <label style={labelStyle}>{t('mode')}</label>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <ToggleBtn val="classic" cur={gameMode} onClick={() => setGameMode('classic')}>{t('modeClassic')}</ToggleBtn>
           <ToggleBtn val="sealed" cur={gameMode} onClick={() => setGameMode('sealed')}>{t('modeSealed')}</ToggleBtn>
           <ToggleBtn val="restricted" cur={gameMode} onClick={() => setGameMode('restricted')}>{t('modeRestricted')}</ToggleBtn>
+          <ToggleBtn val="evolving" cur={gameMode} onClick={() => setGameMode('evolving')}>{t('modeEvolving')}</ToggleBtn>
         </div>
+        {gameMode === 'evolving' && (
+          <p className="text-[10px] mt-1" style={{ color: '#888' }}>
+            {t('modeEvolvingHint')}
+          </p>
+        )}
       </div>
 
       {gameMode === 'sealed' && (

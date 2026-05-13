@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
+import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
 
 interface DailyEntry {
   d: number;
@@ -27,6 +29,8 @@ interface DeckStats {
 interface Deck {
   id: string;
   name: string;
+  evolvingPoints?: number;
+  evolvingCompatible?: boolean;
 }
 
 function relativeTime(iso: string | null, t: ReturnType<typeof useTranslations>): string {
@@ -101,11 +105,12 @@ function Sparkline({ daily }: { daily: DailyEntry[] }) {
   );
 }
 
-function DeckCard({ stats, t, tStats }: { stats: DeckStats; t: ReturnType<typeof useTranslations>; tStats: ReturnType<typeof useTranslations> }) {
+function DeckCard({ stats, evolvingPoints, evolvingCompatible, t, tStats }: { stats: DeckStats; evolvingPoints?: number; evolvingCompatible?: boolean; t: ReturnType<typeof useTranslations>; tStats: ReturnType<typeof useTranslations> }) {
   const eloColor = stats.eloDeltaSum > 0 ? '#3e8b3e' : stats.eloDeltaSum < 0 ? '#b33e3e' : '#888';
   const winrateColor = stats.winrate >= 60 ? '#3e8b3e' : stats.winrate >= 40 ? '#c4a35a' : '#b33e3e';
 
   return (
+    <EvolvingDeckHolo points={evolvingPoints ?? 0} enabled={evolvingCompatible === true} intensity="subtle">
     <div
       className="relative rounded-lg overflow-hidden"
       style={{ backgroundColor: '#111111', border: '1px solid #1e1e1e' }}
@@ -116,9 +121,14 @@ function DeckCard({ stats, t, tStats }: { stats: DeckStats; t: ReturnType<typeof
       />
 
       <div className="flex items-start justify-between gap-3 px-4 pt-4 pb-2">
-        <h3 className="text-sm font-semibold truncate flex-1" style={{ color: '#e0e0e0' }}>
-          {stats.deckName}
-        </h3>
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <h3 className="text-sm font-semibold truncate" style={{ color: '#e0e0e0' }}>
+            {stats.deckName}
+          </h3>
+          {evolvingCompatible === true && typeof evolvingPoints === 'number' && (
+            <EvolvingDeckBadge points={evolvingPoints} />
+          )}
+        </div>
         <span className="text-[10px] shrink-0" style={{ color: '#555' }}>
           {relativeTime(stats.lastPlayedAt, tStats)}
         </span>
@@ -161,6 +171,7 @@ function DeckCard({ stats, t, tStats }: { stats: DeckStats; t: ReturnType<typeof
         </div>
       )}
     </div>
+    </EvolvingDeckHolo>
   );
 }
 
@@ -246,7 +257,7 @@ export function DeckStatsPanel({ decks }: { decks: Deck[] }) {
               lastPlayedAt: null,
               daily: [],
             };
-            return <DeckCard key={deck.id} stats={stats} t={t} tStats={tStats} />;
+            return <DeckCard key={deck.id} stats={stats} evolvingPoints={deck.evolvingPoints} evolvingCompatible={deck.evolvingCompatible} t={t} tStats={tStats} />;
           })}
         </div>
       )}

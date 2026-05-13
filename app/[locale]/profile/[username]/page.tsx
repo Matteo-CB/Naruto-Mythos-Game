@@ -15,11 +15,16 @@ import { EloHistoryChart } from '@/components/EloHistoryChart';
 import { DeckStatsPanel } from '@/components/profile/DeckStatsPanel';
 import Image from 'next/image';
 import '@/styles/holo-menu.css';
+import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
+import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
 
 interface ProfileData {
   id: string;
   username: string;
   elo: number;
+  evolvingElo?: number;
+  evolvingWins?: number;
+  evolvingLosses?: number;
   wins: number;
   losses: number;
   draws: number;
@@ -27,7 +32,7 @@ interface ProfileData {
   badgePrefs?: string[];
   discordUsername: string | null;
   createdAt: string;
-  decks: Array<{ id: string; name: string; createdAt: string }>;
+  decks: Array<{ id: string; name: string; createdAt: string; evolvingPoints?: number; evolvingCompatible?: boolean }>;
   recentGames: Array<{
     id: string;
     player1: { username: string } | null;
@@ -511,29 +516,93 @@ export default function ProfilePage({
         )}
 
         {profile.decks.length > 0 && (
-          isOwner ? (
-            <DeckStatsPanel decks={profile.decks.map(d => ({ id: d.id, name: d.name }))} />
-          ) : (
+          <>
+            {isOwner && (
+              <DeckStatsPanel decks={profile.decks.map(d => ({ id: d.id, name: d.name, evolvingPoints: d.evolvingPoints, evolvingCompatible: d.evolvingCompatible }))} />
+            )}
             <section className="mb-7">
               <SectionTitle label={t('decks')} count={profile.decks.length} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {profile.decks.map((deck) => (
-                  <div
+                  <EvolvingDeckHolo
                     key={deck.id}
+                    points={deck.evolvingPoints ?? 0}
+                    enabled={deck.evolvingCompatible === true}
+                    intensity="subtle"
+                    style={{ clipPath: STAT_CLIP }}
+                  >
+                  <div
                     className="px-4 py-3 flex items-center justify-between"
                     style={{ backgroundColor: '#0d0c10', clipPath: STAT_CLIP }}
                   >
-                    <span className="font-display text-sm truncate" style={{ color: '#e8e6df' }}>
-                      {deck.name}
-                    </span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-display text-sm truncate" style={{ color: '#e8e6df' }}>
+                        {deck.name}
+                      </span>
+                      {deck.evolvingCompatible === true && typeof deck.evolvingPoints === 'number' && (
+                        <EvolvingDeckBadge points={deck.evolvingPoints} />
+                      )}
+                    </div>
                     <span className="font-inter-force text-[10px] shrink-0 ml-3" style={{ color: '#555' }}>
                       {new Date(deck.createdAt).toLocaleDateString(locale)}
                     </span>
                   </div>
+                  </EvolvingDeckHolo>
                 ))}
               </div>
             </section>
-          )
+          </>
+        )}
+
+        {(typeof profile.evolvingElo === 'number' || (profile.evolvingWins ?? 0) > 0 || (profile.evolvingLosses ?? 0) > 0) && (
+          <section className="mb-6">
+            <SectionTitle label={t('evolvingTitle')} />
+            <div
+              className="flex flex-col sm:flex-row items-stretch overflow-hidden"
+              style={{ backgroundColor: '#0d0c10', clipPath: STAT_CLIP }}
+            >
+              <div className="flex flex-col items-center justify-center px-6 py-5 sm:py-6 sm:w-[44%]" style={{ borderBottom: '1px solid #1a1a1d' }}>
+                <span className="font-display text-[10px] uppercase tracking-[0.32em] mb-1" style={{ color: '#666' }}>
+                  {t('evolvingElo')}
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="font-display text-3xl sm:text-4xl tabular-nums" style={{ color: '#c4a35a', letterSpacing: '-0.01em' }}>
+                    {profile.evolvingElo ?? 500}
+                  </span>
+                  <span className="font-display text-[10px] uppercase tracking-[0.28em]" style={{ color: '#666' }}>
+                    ELO
+                  </span>
+                </div>
+              </div>
+              <div className="flex-1 flex flex-col justify-center px-6 py-5 sm:py-6 gap-2">
+                <span className="font-display text-[10px] uppercase tracking-[0.32em]" style={{ color: '#666' }}>
+                  {t('evolvingMatches')}
+                </span>
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="flex flex-col">
+                    <span className="font-display text-xl tabular-nums" style={{ color: '#4a9e4a' }}>
+                      {profile.evolvingWins ?? 0}
+                    </span>
+                    <span className="text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>{t('wins')}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-display text-xl tabular-nums" style={{ color: '#b33e3e' }}>
+                      {profile.evolvingLosses ?? 0}
+                    </span>
+                    <span className="text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>{t('losses')}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-display text-xl tabular-nums" style={{ color: '#888' }}>
+                      {((profile.evolvingWins ?? 0) + (profile.evolvingLosses ?? 0)) > 0
+                        ? Math.round(((profile.evolvingWins ?? 0) / ((profile.evolvingWins ?? 0) + (profile.evolvingLosses ?? 0))) * 100)
+                        : 0}%
+                    </span>
+                    <span className="text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>{t('winRate')}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         )}
 
         <section className="mb-7">
@@ -590,15 +659,17 @@ export default function ProfilePage({
   );
 }
 
-function SectionTitle({ label, count }: { label: string; count: number }) {
+function SectionTitle({ label, count }: { label: string; count?: number }) {
   return (
     <div className="flex items-center gap-3 mb-4">
       <h2 className="font-display text-[11px] uppercase tracking-widest" style={{ color: '#666' }}>
         {label}
       </h2>
-      <span className="font-display text-[11px] tabular-nums" style={{ color: '#c4a35a' }}>
-        {count}
-      </span>
+      {typeof count === 'number' && (
+        <span className="font-display text-[11px] tabular-nums" style={{ color: '#c4a35a' }}>
+          {count}
+        </span>
+      )}
     </div>
   );
 }

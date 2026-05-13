@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { computeDeckEvolvingPoints, deckUsesOnlyAllowedSets } from '@/lib/evolving/computePoints';
+import { EVOLVING_MAX_POINTS } from '@/lib/evolving/constants';
 
 export async function GET(
   _request: NextRequest,
@@ -110,13 +112,27 @@ export async function PUT(
       }
     }
 
+    const updateData: {
+      name?: string;
+      cardIds?: string[];
+      missionIds?: string[];
+      evolvingPoints?: number;
+      evolvingCompatible?: boolean;
+    } = {};
+    if (name) updateData.name = name;
+    if (cardIds) updateData.cardIds = cardIds;
+    if (missionIds) updateData.missionIds = missionIds;
+
+    if (cardIds || missionIds) {
+      const finalCards = cardIds ?? existing.cardIds;
+      const finalMissions = missionIds ?? existing.missionIds;
+      updateData.evolvingPoints = computeDeckEvolvingPoints(finalCards);
+      updateData.evolvingCompatible = deckUsesOnlyAllowedSets(finalCards, finalMissions) && updateData.evolvingPoints <= EVOLVING_MAX_POINTS;
+    }
+
     const deck = await prisma.deck.update({
       where: { id },
-      data: {
-        ...(name && { name }),
-        ...(cardIds && { cardIds }),
-        ...(missionIds && { missionIds }),
-      },
+      data: updateData,
     });
 
     return NextResponse.json(deck);

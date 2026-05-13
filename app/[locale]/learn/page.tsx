@@ -210,6 +210,7 @@ export default function LearnPage() {
                 onRetry={handleRetry}
                 onChangeDifficulty={handleChangeDifficulty}
                 onSaveScore={session?.user ? handleSaveScore : undefined}
+                onViewLeaderboard={handleShowLeaderboard}
               />
             )}
 

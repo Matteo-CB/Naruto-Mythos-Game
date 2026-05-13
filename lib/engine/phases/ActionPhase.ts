@@ -305,9 +305,9 @@ function handleRevealCharacter(
   
   let upgradeTarget: CharacterInPlay | undefined;
   if (upgradeTargetInstanceId) {
-    
+
     const candidate = chars.find((c) => c.instanceId === upgradeTargetInstanceId);
-    if (candidate && !candidate.isHidden) {
+    if (candidate && !candidate.isHidden && candidate.controlledBy === candidate.originalOwner) {
       const cTop = candidate.stack?.length > 0 ? candidate.stack[candidate.stack?.length - 1] : candidate.card;
       if (charTopCard.chakra > cTop.chakra) {
         const isSameName = cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
@@ -317,10 +317,11 @@ function handleRevealCharacter(
       }
     }
   } else {
-    
+
     upgradeTarget = chars.find((c) => {
       if (c.instanceId === characterInstanceId) return false;
       if (c.isHidden) return false;
+      if (c.controlledBy !== c.originalOwner) return false;
       const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       if (charTopCard.chakra <= cTop.chakra) return false;
       return cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
@@ -357,12 +358,6 @@ function handleRevealCharacter(
       upgraded.controllerInstanceId = undefined;
     }
 
-    if (upgraded.controlledBy !== upgraded.originalOwner) {
-      upgraded.originalOwner = player;
-      upgraded.controllerInstanceId = undefined;
-    }
-
-    
     const updatedChars = chars.filter((c) => c.instanceId !== characterInstanceId);
     const mergedIdx = updatedChars.findIndex((c) => c.instanceId === upgradeTarget.instanceId);
     if (mergedIdx !== -1) updatedChars[mergedIdx] = upgraded;
@@ -513,11 +508,6 @@ function handleUpgradeCharacter(
   
   
   if (existingChar.controllerInstanceId && existingChar.controlledBy === player) {
-    existingChar.controllerInstanceId = undefined;
-  }
-
-  if (existingChar.controlledBy !== existingChar.originalOwner) {
-    existingChar.originalOwner = player;
     existingChar.controllerInstanceId = undefined;
   }
 

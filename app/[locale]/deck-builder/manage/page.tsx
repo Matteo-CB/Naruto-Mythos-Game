@@ -7,6 +7,8 @@ import { Link } from '@/lib/i18n/navigation';
 import { exportDeckAsImage } from '@/lib/utils/exportDeckImage';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
+import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
+import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
 
 interface DeckItem {
   id: string;
@@ -14,6 +16,8 @@ interface DeckItem {
   cardIds: string[];
   missionIds: string[];
   sortOrder: number;
+  evolvingPoints: number;
+  evolvingCompatible?: boolean;
   updatedAt: string;
 }
 
@@ -222,8 +226,13 @@ export default function ManageDecksPage() {
               const isRenaming = renamingId === deck.id;
 
               return (
-                <div
+                <EvolvingDeckHolo
                   key={deck.id}
+                  points={deck.evolvingPoints}
+                  enabled={deck.evolvingCompatible === true}
+                  intensity="subtle"
+                >
+                <div
                   draggable
                   onDragStart={() => handleDragStart(index)}
                   onDragOver={(e) => handleDragOver(e, index)}
@@ -293,9 +302,12 @@ export default function ManageDecksPage() {
                         </div>
                       ) : (
                         <>
-                          <span className="text-sm font-medium" style={{ color: '#e0e0e0' }}>
-                            {deck.name}
-                          </span>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-medium" style={{ color: '#e0e0e0' }}>
+                              {deck.name}
+                            </span>
+                            {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints} />}
+                          </div>
                           <div className="flex items-center gap-3 mt-0.5">
                             <span className="text-[11px]" style={{ color: '#555555' }}>
                               {deck.cardIds.length} {t('deckManager.cards')} + {deck.missionIds.length} missions
@@ -387,6 +399,7 @@ export default function ManageDecksPage() {
                     )}
                   </div>
                 </div>
+                </EvolvingDeckHolo>
               );
             })}
           </div>

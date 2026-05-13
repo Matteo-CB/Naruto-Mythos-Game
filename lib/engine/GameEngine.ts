@@ -80,6 +80,10 @@ export class GameEngine {
     const p1Hand = p1Deck.splice(0, INITIAL_HAND_SIZE);
     const p2Hand = p2Deck.splice(0, INITIAL_HAND_SIZE);
 
+    const p1StartMP = config.startingMissionPoints?.player1 ?? 0;
+    const p2StartMP = config.startingMissionPoints?.player2 ?? 0;
+    const safeStartMP = (n: number): number => (Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0);
+
     const player1: PlayerState = {
       id: 'player1',
       userId: config.player1.userId,
@@ -90,7 +94,7 @@ export class GameEngine {
       discardPile: [],
       missionCards: config.player1.missionCards,
       chakra: 0,
-      missionPoints: 0,
+      missionPoints: safeStartMP(p1StartMP),
       hasPassed: false,
       hasMulliganed: false,
       charactersInPlay: 0,
@@ -107,7 +111,7 @@ export class GameEngine {
       discardPile: [],
       missionCards: config.player2.missionCards,
       chakra: 0,
-      missionPoints: 0,
+      missionPoints: safeStartMP(p2StartMP),
       hasPassed: false,
       hasMulliganed: false,
       charactersInPlay: 0,

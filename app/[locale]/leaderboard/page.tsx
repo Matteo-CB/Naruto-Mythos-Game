@@ -16,6 +16,7 @@ interface LeaderboardUser {
   id: string;
   username: string;
   elo: number;
+  evolvingElo?: number;
   wins: number;
   losses: number;
   draws: number;
@@ -25,6 +26,8 @@ interface LeaderboardUser {
   consecutiveLosses?: number;
   tournamentWins?: number;
 }
+
+type LeaderboardType = 'ranked' | 'evolving';
 
 const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
 
@@ -59,18 +62,22 @@ function LeaderRow({
   leaguesEnabled,
   index,
   isSelf,
+  type,
 }: {
   user: LeaderboardUser;
   globalRank: number;
   leaguesEnabled: boolean;
   index: number;
   isSelf: boolean;
+  type: LeaderboardType;
 }) {
   const total = user.wins + user.losses + user.draws;
   const winRate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
+  const displayElo = type === 'evolving' ? (user.evolvingElo ?? 500) : user.elo;
   const tier = getRankTier(user.elo);
   const placed = total >= PLACEMENT_MATCHES_REQUIRED;
-  const tierColor = placed && leaguesEnabled ? tier.color : '#777';
+  const showLeagueIcon = type !== 'evolving' && leaguesEnabled && placed;
+  const tierColor = type === 'evolving' ? '#c4a35a' : (placed && leaguesEnabled ? tier.color : '#777');
   const altBg = index % 2 === 0 ? '#0c0b10' : '#0a0a0d';
 
   return (
@@ -94,7 +101,7 @@ function LeaderRow({
         {globalRank}
       </span>
 
-      {leaguesEnabled && placed ? (
+      {showLeagueIcon ? (
         <Image
           src={tier.image}
           alt=""
@@ -135,7 +142,7 @@ function LeaderRow({
         className="font-display text-lg sm:text-xl tabular-nums w-16 text-right"
         style={{ color: tierColor, textShadow: `0 0 10px ${tierColor}33`, letterSpacing: '0.02em' }}
       >
-        {user.elo}
+        {displayElo}
       </span>
     </motion.div>
   );
@@ -210,8 +217,24 @@ export default function LeaderboardPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [leagueFilter, setLeagueFilter] = useState('');
   const [selfUsername, setSelfUsername] = useState<string | null>(null);
+  const [boardType, setBoardType] = useState<LeaderboardType>(() => {
+    if (typeof window === 'undefined') return 'ranked';
+    const url = new URL(window.location.href);
+    return url.searchParams.get('type') === 'evolving' ? 'evolving' : 'ranked';
+  });
   const PLAYERS_PER_PAGE = 20;
   const searchRef = useRef<HTMLInputElement>(null);
+
+  const handleBoardTypeChange = useCallback((next: LeaderboardType) => {
+    setBoardType(next);
+    setCurrentPage(1);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (next === 'evolving') url.searchParams.set('type', 'evolving');
+      else url.searchParams.delete('type');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300);
@@ -237,8 +260,9 @@ export default function LeaderboardPage() {
     setLoading(true);
     const offset = (currentPage - 1) * PLAYERS_PER_PAGE;
     const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : '';
-    const leagueParam = leagueFilter ? `&league=${encodeURIComponent(leagueFilter)}` : '';
-    fetch(`/api/leaderboard?limit=${PLAYERS_PER_PAGE}&offset=${offset}${searchParam}${leagueParam}`)
+    const leagueParam = boardType === 'evolving' || !leagueFilter ? '' : `&league=${encodeURIComponent(leagueFilter)}`;
+    const typeParam = boardType === 'evolving' ? `&type=evolving` : '';
+    fetch(`/api/leaderboard?limit=${PLAYERS_PER_PAGE}&offset=${offset}${searchParam}${leagueParam}${typeParam}`)
       .then((res) => res.json())
       .then((data) => {
         setUsers(data.users || []);
@@ -246,7 +270,7 @@ export default function LeaderboardPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [currentPage, debouncedSearch, leagueFilter]);
+  }, [currentPage, debouncedSearch, leagueFilter, boardType]);
 
   const handleClearSearch = useCallback(() => {
     setSearchQuery('');
@@ -303,6 +327,44 @@ export default function LeaderboardPage() {
         </motion.header>
 
         <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.05 }}
+          className="flex items-center justify-center gap-1.5 mb-4"
+        >
+          <button
+            type="button"
+            onClick={() => handleBoardTypeChange('ranked')}
+            className="font-display text-[11px] uppercase tracking-widest px-4 py-1.5 transition-colors"
+            style={{
+              color: boardType === 'ranked' ? '#0a0a0a' : '#c4a35a',
+              backgroundColor: boardType === 'ranked' ? '#c4a35a' : 'transparent',
+              border: '1px solid #c4a35a',
+              borderRadius: 9999,
+              cursor: 'pointer',
+              outline: 'none',
+            }}
+          >
+            {t('toggleType.ranked')}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleBoardTypeChange('evolving')}
+            className="font-display text-[11px] uppercase tracking-widest px-4 py-1.5 transition-colors"
+            style={{
+              color: boardType === 'evolving' ? '#0a0a0a' : '#c4a35a',
+              backgroundColor: boardType === 'evolving' ? '#c4a35a' : 'transparent',
+              border: '1px solid #c4a35a',
+              borderRadius: 9999,
+              cursor: 'pointer',
+              outline: 'none',
+            }}
+          >
+            {t('toggleType.evolving')}
+          </button>
+        </motion.div>
+
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.1 }}
@@ -330,7 +392,7 @@ export default function LeaderboardPage() {
           </div>
         </motion.div>
 
-        {leaguesEnabled && (
+        {leaguesEnabled && boardType !== 'evolving' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -403,6 +465,7 @@ export default function LeaderboardPage() {
                         leaguesEnabled={leaguesEnabled}
                         index={index}
                         isSelf={selfUsername === user.username}
+                        type={boardType}
                       />
                     );
                   })}

@@ -44,9 +44,11 @@ model User {
   allowSpectatorHand Boolean     @default(false)
   consecutiveWins    Int          @default(0)
   consecutiveLosses  Int          @default(0)
+  evolvingElo        Int          @default(500)
 
   @@index([elo])
   @@index([createdAt])
+  @@index([evolvingElo])
 }
 
 /// Per-game ELO snapshot. Survives the Game row purge (72h) up to 14 days so
@@ -67,10 +69,12 @@ model EloHistory {
   myScore          Int                     // mission points scored by this user
   opponentScore    Int                     // mission points scored by the opponent
   isRanked         Boolean   @default(true)
+  eloType          String    @default("ranked")
   createdAt        DateTime  @default(now())
 
   @@index([userId, createdAt])
   @@index([createdAt])
+  @@index([userId, eloType, createdAt])
 }
 
 model Account {
@@ -92,15 +96,20 @@ model Account {
 }
 
 model Deck {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  name       String
-  userId     String   @db.ObjectId
-  user       User     @relation(fields: [userId], references: [id])
-  cardIds    String[]
-  missionIds String[]
-  sortOrder  Int      @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  name               String
+  userId             String   @db.ObjectId
+  user               User     @relation(fields: [userId], references: [id])
+  cardIds            String[]
+  missionIds         String[]
+  sortOrder          Int      @default(0)
+  evolvingPoints     Int      @default(0)
+  evolvingCompatible Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([userId, evolvingPoints])
+  @@index([userId, evolvingCompatible])
 }
 
 model DeckStats {
@@ -133,12 +142,14 @@ model Game {
   player1Score Int       @default(0)
   player2Score Int       @default(0)
   eloChange    Int?
+  isEvolving   Boolean   @default(false)
   createdAt    DateTime  @default(now())
   completedAt  DateTime?
 
   @@index([status, completedAt])
   @@index([player1Id, completedAt])
   @@index([player2Id, completedAt])
+  @@index([isEvolving, completedAt])
 }
 
 model Room {

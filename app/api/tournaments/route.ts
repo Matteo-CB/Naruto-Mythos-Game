@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
     if (typeof restrictionNote === 'string' && restrictionNote.length > 500) {
       return NextResponse.json({ error: 'Restriction note must be at most 500 characters', errorKey: 'tournament.error.restrictionTooLong' }, { status: 400 });
     }
-    const VALID_GAME_MODES = ['classic', 'sealed', 'restricted'] as const;
+    const VALID_GAME_MODES = ['classic', 'sealed', 'restricted', 'evolving'] as const;
     const resolvedGameMode = gameMode || 'classic';
     if (!VALID_GAME_MODES.includes(resolvedGameMode as typeof VALID_GAME_MODES[number])) {
       return NextResponse.json({ error: `gameMode must be one of: ${VALID_GAME_MODES.join(', ')}`, errorKey: 'tournament.error.invalidGameMode' }, { status: 400 });

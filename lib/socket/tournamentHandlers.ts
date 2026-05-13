@@ -21,6 +21,7 @@ import {
 } from '@/lib/tournament/doubleElimEngine';
 import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
+import { computeDeckEvolvingPoints } from '@/lib/evolving/computePoints';
 
 const matchReadyPlayers = new Map<string, Set<string>>();
 
@@ -79,6 +80,101 @@ async function cleanupTournamentMaps(tournamentId: string): Promise<void> {
 
 export const cleanupTournamentMapsExternal = cleanupTournamentMaps;
 
+const ABSENCE_GRACE_RETRY_MS = 30_000;
+
+export function getConnectedUserIdsInTournament(io: Server, tournamentId: string): Set<string> {
+  const roomName = `tournament:${tournamentId}`;
+  const connected = new Set<string>();
+  try {
+    const allSockets = (io as unknown as { sockets: { sockets: Map<string, { data?: { userId?: string }; rooms?: Set<string> }> } }).sockets?.sockets;
+    if (!allSockets) return connected;
+    for (const [, sock] of allSockets) {
+      const userId = sock.data?.userId;
+      if (!userId) continue;
+      const rooms = sock.rooms;
+      if (rooms && rooms.has(roomName)) {
+        connected.add(userId);
+      }
+    }
+  } catch (err) {
+    console.error('[Tournament] getConnectedUserIdsInTournament error:', err);
+  }
+  return connected;
+}
+
+export async function fireAbsenceTimerCallback(
+  io: Server,
+  tournamentId: string,
+  matchId: string,
+  p1: string,
+  p2: string,
+  knownAbsentPlayerId: string | null,
+  retried: boolean,
+): Promise<void> {
+  const ready = matchReadyPlayers.get(matchId);
+
+  let absent1: boolean;
+  let absent2: boolean;
+  if (knownAbsentPlayerId !== null) {
+    absent1 = knownAbsentPlayerId === p1;
+    absent2 = knownAbsentPlayerId === p2;
+  } else {
+    absent1 = !ready?.has(p1);
+    absent2 = !ready?.has(p2);
+  }
+
+  if (!retried && (absent1 || absent2)) {
+    const connected = getConnectedUserIdsInTournament(io, tournamentId);
+    if (absent1 && connected.has(p1)) absent1 = false;
+    if (absent2 && connected.has(p2)) absent2 = false;
+
+    if (!absent1 && !absent2) {
+      console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} all players have live sockets, granting ${ABSENCE_GRACE_RETRY_MS / 1000}s grace period`);
+      io.to(`tournament:${tournamentId}`).emit('tournament:please-confirm-ready', { matchId });
+      const newDeadline = new Date(Date.now() + ABSENCE_GRACE_RETRY_MS);
+      scheduleAbsenceTimerWithDeadline(matchId, newDeadline, async () => {
+        await fireAbsenceTimerCallback(io, tournamentId, matchId, p1, p2, null, true);
+      });
+      try {
+        await prisma.tournamentMatch.update({
+          where: { id: matchId },
+          data: { absenceDeadline: newDeadline },
+        });
+      } catch (err) {
+        console.error(`[Tournament] fireAbsenceTimerCallback: failed to persist grace deadline for ${matchId}:`, err);
+      }
+      io.to(`tournament:${tournamentId}`).emit('tournament:absence-timer', {
+        matchId, playerId: null, deadline: newDeadline.toISOString(),
+      });
+      return;
+    }
+  }
+
+  let isSwiss = false;
+  try {
+    const t = await prisma.tournament.findUnique({
+      where: { id: tournamentId }, select: { format: true },
+    });
+    isSwiss = t?.format === 'swiss';
+  } catch (err) {
+    console.error(`[Tournament] fireAbsenceTimerCallback: format lookup failed for ${tournamentId}:`, err);
+  }
+
+  if (absent1 && absent2) {
+    if (isSwiss) {
+      await handleSwissDoubleAbsence(io, tournamentId, matchId);
+    } else {
+      await handleMatchForfeit(io, tournamentId, matchId, p1);
+    }
+  } else if (absent1 || absent2) {
+    const forfeitId = absent1 ? p1 : p2;
+    await handleMatchForfeit(io, tournamentId, matchId, forfeitId);
+  } else {
+    console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} no absent player at fire time, no-op`);
+  }
+  matchReadyPlayers.delete(matchId);
+}
+
 export function registerTournamentHandlers(io: Server, socket: Socket) {
   socket.on('tournament:subscribe', async ({ tournamentId }: { tournamentId: string }) => {
     const tournament = await prisma.tournament.findUnique({
@@ -130,10 +226,11 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
 
       if (ready.size === 1) {
         const absentPlayerId = match.player1Id === userId ? match.player2Id : match.player1Id;
-        if (absentPlayerId) {
+        if (absentPlayerId && match.player1Id && match.player2Id) {
+          const p1 = match.player1Id;
+          const p2 = match.player2Id;
           const deadline = startAbsenceTimer(matchId, async () => {
-            await handleMatchForfeit(io, tournamentId, matchId, absentPlayerId);
-            matchReadyPlayers.delete(matchId);
+            await fireAbsenceTimerCallback(io, tournamentId, matchId, p1, p2, absentPlayerId, false);
           });
           await prisma.tournamentMatch.update({
             where: { id: matchId },
@@ -155,6 +252,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
           select: { gameMode: true, sealedBoosterCount: true, sealedSetChoice: true },
         });
         const isSealedTournament = tournamentMeta?.gameMode === 'sealed';
+        const isEvolvingTournament = tournamentMeta?.gameMode === 'evolving';
 
         const [p1Participant, p2Participant] = await Promise.all([
           prisma.tournamentParticipant.findFirst({ where: { tournamentId, userId: match.player1Id } }),
@@ -165,6 +263,8 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
         let guestDeck: { characters: CharacterCard[]; missions: MissionCard[] } | null = null;
         const hostDeckId: string | undefined = !isSealedTournament && p1Participant?.deckId ? p1Participant.deckId : undefined;
         const guestDeckId: string | undefined = !isSealedTournament && p2Participant?.deckId ? p2Participant.deckId : undefined;
+        let hostEvolvingPoints = 0;
+        let guestEvolvingPoints = 0;
 
         if (!isSealedTournament) {
           if (p1Participant?.deckId) {
@@ -174,6 +274,9 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
                 characters: (deck.cardIds ?? []).map((id: string) => getCharacterById(id)).filter(Boolean) as CharacterCard[],
                 missions: (deck.missionIds ?? []).map((id: string) => getMissionById(id)).filter(Boolean) as MissionCard[],
               };
+              if (isEvolvingTournament) {
+                hostEvolvingPoints = computeDeckEvolvingPoints(hostDeck.characters.map((c) => c.id));
+              }
             }
           }
           if (p2Participant?.deckId) {
@@ -183,6 +286,9 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
                 characters: (deck.cardIds ?? []).map((id: string) => getCharacterById(id)).filter(Boolean) as CharacterCard[],
                 missions: (deck.missionIds ?? []).map((id: string) => getMissionById(id)).filter(Boolean) as MissionCard[],
               };
+              if (isEvolvingTournament) {
+                guestEvolvingPoints = computeDeckEvolvingPoints(guestDeck.characters.map((c) => c.id));
+              }
             }
           }
         }
@@ -201,7 +307,10 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             isPrivate: true,
             isRanked: false,
             isAnonymous: false,
-            gameMode: isSealedTournament ? 'sealed' : 'casual',
+            gameMode: isSealedTournament ? 'sealed' : isEvolvingTournament ? 'evolving' : 'casual',
+            isEvolving: isEvolvingTournament,
+            hostEvolvingPoints,
+            guestEvolvingPoints,
             createdAt: Date.now(),
             replayInitialState: null,
             replayStateSnapshots: null,
@@ -324,23 +433,8 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
         const matchId = m.id;
         const p1 = m.player1Id;
         const p2 = m.player2Id;
-        const tournament = await prisma.tournament.findUnique({
-          where: { id: tournamentId }, select: { format: true },
-        });
-        const isSwiss = tournament?.format === 'swiss';
         const deadline = startAbsenceTimer(matchId, async () => {
-          const ready = matchReadyPlayers.get(matchId);
-          const absent1 = !ready?.has(p1);
-          const absent2 = !ready?.has(p2);
-          if (isSwiss && absent1 && absent2) {
-            await handleSwissDoubleAbsence(io, tournamentId, matchId);
-          } else if (absent1 && absent2) {
-            await handleMatchForfeit(io, tournamentId, matchId, p1);
-          } else {
-            const forfeitId = absent1 ? p1 : p2;
-            await handleMatchForfeit(io, tournamentId, matchId, forfeitId);
-          }
-          matchReadyPlayers.delete(matchId);
+          await fireAbsenceTimerCallback(io, tournamentId, matchId, p1, p2, null, false);
         });
         await prisma.tournamentMatch.update({
           where: { id: matchId },
@@ -375,18 +469,6 @@ export async function rehydrateAbsenceTimers(io: Server): Promise<void> {
       },
     });
 
-    const tournamentFormats = new Map<string, string>();
-    async function getFormat(tournamentId: string): Promise<string> {
-      const cached = tournamentFormats.get(tournamentId);
-      if (cached) return cached;
-      const t = await prisma.tournament.findUnique({
-        where: { id: tournamentId }, select: { format: true },
-      });
-      const f = t?.format ?? 'elimination';
-      tournamentFormats.set(tournamentId, f);
-      return f;
-    }
-
     for (const m of pendingMatches) {
       if (!m.absenceDeadline) continue;
       const remaining = m.absenceDeadline.getTime() - Date.now();
@@ -395,29 +477,10 @@ export async function rehydrateAbsenceTimers(io: Server): Promise<void> {
       const p1 = m.player1Id;
       const p2 = m.player2Id;
 
+      if (!p1 || !p2) continue;
+
       const onFire = async () => {
-        const format = await getFormat(tournamentId);
-        const isSwiss = format === 'swiss';
-        const ready = matchReadyPlayers.get(matchId);
-
-        if (m.absentPlayerId) {
-          await handleMatchForfeit(io, tournamentId, matchId, m.absentPlayerId);
-          matchReadyPlayers.delete(matchId);
-          return;
-        }
-
-        if (!p1 || !p2) return;
-        const absent1 = !ready?.has(p1);
-        const absent2 = !ready?.has(p2);
-        if (isSwiss && absent1 && absent2) {
-          await handleSwissDoubleAbsence(io, tournamentId, matchId);
-        } else if (absent1 && absent2) {
-          await handleMatchForfeit(io, tournamentId, matchId, p1);
-        } else {
-          const forfeitId = absent1 ? p1 : p2;
-          await handleMatchForfeit(io, tournamentId, matchId, forfeitId);
-        }
-        matchReadyPlayers.delete(matchId);
+        await fireAbsenceTimerCallback(io, tournamentId, matchId, p1, p2, m.absentPlayerId ?? null, false);
       };
 
       if (remaining <= 0) {
@@ -586,7 +649,6 @@ export async function startInitialRoundAbsenceTimers(io: Server, tournamentId: s
     select: { format: true, currentRound: true },
   });
   if (!tournament) return;
-  const isSwiss = tournament.format === 'swiss';
   const isDoubleElim = tournament.format === 'double_elimination';
   const round = tournament.currentRound;
 
@@ -607,18 +669,7 @@ export async function startInitialRoundAbsenceTimers(io: Server, tournamentId: s
     const p1 = nm.player1Id;
     const p2 = nm.player2Id;
     const deadline = startAbsenceTimer(matchId, async () => {
-      const ready = matchReadyPlayers.get(matchId);
-      const absent1 = !ready?.has(p1);
-      const absent2 = !ready?.has(p2);
-      if (isSwiss && absent1 && absent2) {
-        await handleSwissDoubleAbsence(io, tournamentId, matchId);
-      } else if (absent1 && absent2) {
-        await handleMatchForfeit(io, tournamentId, matchId, p1);
-      } else {
-        const forfeitId = absent1 ? p1 : p2;
-        await handleMatchForfeit(io, tournamentId, matchId, forfeitId);
-      }
-      matchReadyPlayers.delete(matchId);
+      await fireAbsenceTimerCallback(io, tournamentId, matchId, p1, p2, null, false);
     });
     await prisma.tournamentMatch.update({
       where: { id: matchId },
@@ -858,26 +909,19 @@ export async function handleSwissMatchEnd(
         where: { tournamentId, round: nextRound, status: 'ready', isBye: false },
       });
       for (const nm of newMatches) {
-        const deadline = startAbsenceTimer(nm.id, async () => {
-          const ready = matchReadyPlayers.get(nm.id);
-          const absent1 = !ready?.has(nm.player1Id ?? '');
-          const absent2 = !ready?.has(nm.player2Id ?? '');
-          if (absent1 && absent2) {
-            await handleSwissDoubleAbsence(io, tournamentId, nm.id);
-          } else {
-            const forfeitId = absent1 ? nm.player1Id : nm.player2Id;
-            if (forfeitId) {
-              await handleMatchForfeit(io, tournamentId, nm.id, forfeitId);
-            }
-          }
-          matchReadyPlayers.delete(nm.id);
+        if (!nm.player1Id || !nm.player2Id) continue;
+        const matchId = nm.id;
+        const p1 = nm.player1Id;
+        const p2 = nm.player2Id;
+        const deadline = startAbsenceTimer(matchId, async () => {
+          await fireAbsenceTimerCallback(io, tournamentId, matchId, p1, p2, null, false);
         });
         await prisma.tournamentMatch.update({
-          where: { id: nm.id },
+          where: { id: matchId },
           data: { absenceDeadline: deadline, absentPlayerId: null },
         });
         io.to(`tournament:${tournamentId}`).emit('tournament:absence-timer', {
-          matchId: nm.id, playerId: null, deadline: deadline.toISOString(),
+          matchId, playerId: null, deadline: deadline.toISOString(),
         });
       }
 
@@ -1112,19 +1156,19 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
     const autoForfeitTriggered = io ? await autoForfeitIfEliminated(io, tournamentId, nextMatch.id) : false;
 
     if (!autoForfeitTriggered && io) {
-      const deadline = startAbsenceTimer(nextMatch.id, async () => {
-        const ready = matchReadyPlayers.get(nextMatch.id);
-        const absent1 = !ready?.has(p1!);
-        const forfeitId = absent1 ? p1! : p2!;
-        await handleMatchForfeit(io, tournamentId, nextMatch.id, forfeitId);
-        matchReadyPlayers.delete(nextMatch.id);
+      const ioRef = io;
+      const matchIdRef = nextMatch.id;
+      const p1Ref = p1!;
+      const p2Ref = p2!;
+      const deadline = startAbsenceTimer(matchIdRef, async () => {
+        await fireAbsenceTimerCallback(ioRef, tournamentId, matchIdRef, p1Ref, p2Ref, null, false);
       });
       await prisma.tournamentMatch.update({
-        where: { id: nextMatch.id },
+        where: { id: matchIdRef },
         data: { absenceDeadline: deadline },
       });
       io.to(`tournament:${tournamentId}`).emit('tournament:absence-timer', {
-        matchId: nextMatch.id, playerId: null, deadline: deadline.toISOString(),
+        matchId: matchIdRef, playerId: null, deadline: deadline.toISOString(),
       });
     }
   }
@@ -1302,12 +1346,11 @@ async function applySlot(
       where: { id: refreshed.id },
       data: { absenceDeadline: deadline },
     });
-    scheduleAbsenceTimerWithDeadline(refreshed.id, deadline, async () => {
-      const ready = matchReadyPlayers.get(refreshed.id);
-      const absent1 = !ready?.has(refreshed.player1Id ?? '');
-      const forfeitId = absent1 ? refreshed.player1Id! : refreshed.player2Id!;
-      await handleMatchForfeit(io, tournamentId, refreshed.id, forfeitId);
-      matchReadyPlayers.delete(refreshed.id);
+    const matchIdRef = refreshed.id;
+    const p1Ref = refreshed.player1Id!;
+    const p2Ref = refreshed.player2Id!;
+    scheduleAbsenceTimerWithDeadline(matchIdRef, deadline, async () => {
+      await fireAbsenceTimerCallback(io, tournamentId, matchIdRef, p1Ref, p2Ref, null, false);
     });
   }
   io?.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {

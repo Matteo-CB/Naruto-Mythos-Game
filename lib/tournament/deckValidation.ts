@@ -1,4 +1,6 @@
 import { getCardById } from '@/lib/data/cardIndex';
+import { checkEvolvingCompatibility } from '@/lib/evolving/computePoints';
+import { EVOLVING_MAX_POINTS } from '@/lib/evolving/constants';
 
 export interface DeckData {
   cardIds: string[];
@@ -18,6 +20,7 @@ export interface TournamentRules {
   minDeckSize: number | null;
   maxDeckSize: number | null;
   maxChakraCost: number | null;
+  gameMode?: string;
 }
 
 export interface ValidationErrorEntry {
@@ -63,6 +66,23 @@ export function validateDeckForTournament(deck: DeckData, tournament: Tournament
       'tournament.deckError.wrongMissionCount',
       { count: deck.missionIds.length },
     );
+  }
+
+  if (tournament.gameMode === 'evolving') {
+    const evo = checkEvolvingCompatibility(deck.cardIds, deck.missionIds);
+    if (evo.kind === 'set-not-allowed') {
+      push(
+        `Card ${evo.cardId} is from set ${evo.set} which is not allowed in Evolving mode`,
+        'tournament.deckError.evolvingSetNotAllowed',
+        { cardId: evo.cardId, set: evo.set },
+      );
+    } else if (evo.kind === 'over-budget') {
+      push(
+        `Deck uses ${evo.points} Evolving points (max ${EVOLVING_MAX_POINTS})`,
+        'tournament.deckError.evolvingOverBudget',
+        { points: evo.points, max: EVOLVING_MAX_POINTS },
+      );
+    }
   }
 
   if (tournament.bannedCardIds.length > 0) {
@@ -214,5 +234,6 @@ export function emptyTournamentRules(): TournamentRules {
     minDeckSize: null,
     maxDeckSize: null,
     maxChakraCost: null,
+    gameMode: undefined,
   };
 }

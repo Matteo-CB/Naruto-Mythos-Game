@@ -11,16 +11,17 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0', 10);
     const search = searchParams.get('search')?.trim() || '';
     const league = searchParams.get('league')?.trim() || '';
+    const type = searchParams.get('type')?.trim() === 'evolving' ? 'evolving' : 'ranked';
+    const isEvolving = type === 'evolving';
+    const eloField = isEvolving ? 'evolvingElo' : 'elo';
 
-    
     const conditions: Record<string, unknown>[] = [];
 
     if (search) {
       conditions.push({ username: { contains: search, mode: 'insensitive' as const } });
     }
 
-    
-    if (league && league !== 'unranked') {
+    if (!isEvolving && league && league !== 'unranked') {
       const tierIdx = LEAGUE_TIERS.findIndex((t) => t.key === league);
       if (tierIdx >= 0) {
         const tier = LEAGUE_TIERS[tierIdx];
@@ -35,8 +36,7 @@ export async function GET(request: NextRequest) {
       ? conditions.length === 1 ? conditions[0] : { AND: conditions }
       : {};
 
-    
-    const needsPostFilter = !!league && league !== 'unranked';
+    const needsPostFilter = !isEvolving && !!league && league !== 'unranked';
     const fetchLimit = needsPostFilter ? Math.min(limit * 3, 150) : limit;
     const fetchSkip = needsPostFilter ? 0 : offset;
 
@@ -46,6 +46,7 @@ export async function GET(request: NextRequest) {
         id: true,
         username: true,
         elo: true,
+        evolvingElo: true,
         wins: true,
         losses: true,
         draws: true,
@@ -55,13 +56,12 @@ export async function GET(request: NextRequest) {
         consecutiveLosses: true,
         tournamentWins: true,
       },
-      orderBy: { elo: 'desc' },
+      orderBy: { [eloField]: 'desc' },
       take: fetchLimit,
       skip: fetchSkip,
     });
 
-    
-    if (league === 'unranked') {
+    if (!isEvolving && league === 'unranked') {
       const unrankedConditions: Record<string, unknown>[] = [
         { wins: { lt: PLACEMENT_MATCHES } },
         { losses: { lt: PLACEMENT_MATCHES } },
@@ -70,23 +70,24 @@ export async function GET(request: NextRequest) {
       if (search) unrankedConditions.push({ username: { contains: search, mode: 'insensitive' as const } });
       const allUsers = await prisma.user.findMany({
         where: { AND: unrankedConditions },
-        select: { id: true, username: true, elo: true, wins: true, losses: true, draws: true, role: true, badgePrefs: true, consecutiveWins: true, consecutiveLosses: true, tournamentWins: true },
+        select: { id: true, username: true, elo: true, evolvingElo: true, wins: true, losses: true, draws: true, role: true, badgePrefs: true, consecutiveWins: true, consecutiveLosses: true, tournamentWins: true },
         orderBy: { createdAt: 'desc' },
         take: 500,
       });
       users = allUsers.filter((u) => u.wins + u.losses + u.draws < PLACEMENT_MATCHES);
-    } else if (league) {
+    } else if (!isEvolving && league) {
       users = users.filter((u) => u.wins + u.losses + u.draws >= PLACEMENT_MATCHES);
     }
 
-    const total = (league === 'unranked' || needsPostFilter) ? users.length : await prisma.user.count({ where });
+    const total = (!isEvolving && (league === 'unranked' || needsPostFilter))
+      ? users.length
+      : await prisma.user.count({ where });
 
-    
-    if (league === 'unranked' || needsPostFilter) {
+    if (!isEvolving && (league === 'unranked' || needsPostFilter)) {
       users = users.slice(offset, offset + limit);
     }
 
-    const response = NextResponse.json({ users, total, limit, offset });
+    const response = NextResponse.json({ users, total, limit, offset, type });
     response.headers.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60');
     return response;
   } catch {

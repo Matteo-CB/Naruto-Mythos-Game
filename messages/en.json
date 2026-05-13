@@ -349,6 +349,7 @@
       "backToTournament": "Back to Tournament",
       "tieBreaker": "Tie broken by Edge Token holder",
       "rankedMatch": "Ranked Match",
+      "evolvingMatch": "Evolving Match",
       "opponentAbandoned": "Opponent Abandoned",
       "youAbandoned": "You Abandoned",
       "opponentTimedOut": "Opponent Timed Out",
@@ -937,6 +938,7 @@
       "invalidMission": "Invalid mission index.",
       "targetNotFound": "Target character not found.",
       "cannotUpgradeOpponent": "Cannot upgrade opponent's character.",
+      "cannotUpgradeControlled": "Cannot upgrade a character you control but don't own.",
       "upgradeSameName": "Upgrade must be same character name.",
       "flexibleUpgradeRestriction": "Cannot upgrade onto a Summon or Orochimaru.",
       "upgradeHigherCost": "Upgrade must have strictly higher chakra cost. New: {newCost}, Current: {currentCost}.",
@@ -1181,6 +1183,54 @@
     "linkError": "Failed to link Discord",
     "usedByAnother": "This Discord account is linked to another user"
   },
+  "evolving": {
+    "costLabel": "{points}/{max} pt",
+    "compatibleBadge": "Compatible",
+    "notCompatibleBadge": "Set restricted",
+    "overBudgetBadge": "Over budget",
+    "modeOn": "Evolving mode ON",
+    "modeOff": "Evolving mode",
+    "rules": {
+      "title": "Evolving Mode",
+      "close": "Close",
+      "intro": "Each player has {max} Hero points to spend on a curated list of characters.",
+      "costRule": "Each card in the list costs 1 or 2 points. Ton Ton and Shikamaru 021 cost 1pt total for 1 OR 2 copies.",
+      "bonusRule": "At match start, the player with fewer points starts with the difference in Mission Points.",
+      "setRule": "Format restricted to set KS (Konoha Shido). Decks with cards from other sets are not Evolving-compatible.",
+      "freeRule": "Cards not in the list (but still from set KS) cost 0 points. Mix freely with Hero characters.",
+      "cardListTitle": "Card list",
+      "flatBadge": "Flat 1pt"
+    },
+    "helper": {
+      "title": "Evolving builder helper",
+      "exit": "Exit",
+      "description": "Quick-add Hero characters within your {max}-point budget.",
+      "remainingLabel": "Remaining",
+      "addAria": "Add {name}",
+      "hint": "Tip: cards not in this list are free. Mix Hero cards with regular KS characters."
+    },
+    "lobbySubtitle": "Hero-point budget format. Lower budget = mission point head start.",
+    "lobbyDeckPickerTitle": "Your compatible decks",
+    "noCompatibleDeck": "You have no Evolving-compatible deck (5 points max).",
+    "noDeckCtaTitle": "Quick start",
+    "noDeckCtaDesc": "Use a random 0-point KS deck. You'll start with up to 5 mission points if your opponent goes Hero.",
+    "useRandomDeck": "Use a random Evolving deck",
+    "lobbyError": {
+      "fetchFailed": "Failed to load decks. Refresh the page.",
+      "randomDeckFailed": "Failed to build a random deck. Try again."
+    },
+    "lobby": {
+      "title": "Evolving Mode",
+      "topPlayersTitle": "Top 5 Evolving",
+      "viewAll": "View all",
+      "noTopPlayers": "No ranked players yet. Be the first.",
+      "publicRoomsHeader": "Public Evolving rooms",
+      "createPublicEvolvingRoom": "Create public Evolving room",
+      "privateRoomDesc": "Ranked Evolving match. Share the code with a friend.",
+      "pickDeckTitle": "Pick your deck",
+      "evolvingDecksOnly": "Evolving-compatible only"
+    }
+  },
   "deckManager": {
     "title": "Manage Decks",
     "manageButton": "Manage Decks",
@@ -1318,6 +1368,10 @@
   "leaderboard": {
     "title": "Leaderboard",
     "subtitle": "Minimum {count} ranked matches to earn a league",
+    "toggleType": {
+      "ranked": "Ranked",
+      "evolving": "Evolving"
+    },
     "rank": "Rank",
     "player": "Player",
     "elo": "ELO",
@@ -1347,6 +1401,12 @@
     "loadMore": "Load more",
     "discordLinked": "Discord",
     "rank": "Rank",
+    "evolvingTitle": "Evolving Mode",
+    "evolvingElo": "Evolving ELO",
+    "evolvingMatches": "Evolving Matches",
+    "wins": "Wins",
+    "losses": "Losses",
+    "winRate": "Winrate",
     "rankNames": {
       "academyStudent": "Academy Student",
       "genin": "Genin",
@@ -1733,6 +1793,8 @@
         "accuracy": "Accuracy",
         "difficulty": "Difficulty",
         "date": "Date",
+        "questions": "Q",
+        "you": "You",
         "noScores": "No scores yet",
         "loading": "Loading rankings...",
         "error": "Failed to load rankings",
@@ -2539,6 +2601,16 @@
     "removeBanned": "Remove banned cards first",
     "cardBanned": "BANNED",
     "resultsTitle": "Tournament Results",
+    "results": {
+      "podium": "Final standings",
+      "matchHistory": "Match history",
+      "outcomePlayed": "Played",
+      "outcomeForfeit": "Forfeit (absence)",
+      "outcomeDoubleForfeit": "Double absence",
+      "outcomeBye": "Bye",
+      "outcomeIncomplete": "Incomplete",
+      "forfeitSummary": "{single} forfeit(s) by absence, {double} double absence(s). Affected players were absent at match start."
+    },
     "pastTournaments": "Past Tournaments",
     "viewBracket": "View Bracket",
     "noResults": "No completed tournaments",
@@ -2599,6 +2671,8 @@
     "matchTimeLimit": "Match Time Limit",
     "joinTimeLimit": "Join Time Limit",
     "modeRestricted": "Restricted",
+    "modeEvolving": "Evolving",
+    "modeEvolvingHint": "Each player has 5 Hero points to spend. Lower-budget deck starts the tournament match with bonus Mission Points.",
     "restrictedSettings": "Deck Restrictions",
     "allowedGroups": "Allowed Groups",
     "allowedGroupsHint": "Leave empty to allow all groups",
@@ -2627,6 +2701,7 @@
     "deckErrors": "Deck Errors",
     "changeDeck": "Change Deck",
     "noDeckWarning": "No saved decks. Create one in the deck builder first, then come back to select it.",
+    "noEvolvingDeckWarning": "No Evolving-compatible decks. Build one (KS cards only, 5 Hero points max) in the deck builder, then come back.",
     "noValidDeckHint": "None of your decks match the tournament rules? Create or edit one in the deck builder.",
     "rulesTitle": "Tournament Rules",
     "rulesFormat": "Format: Single elimination bracket",
@@ -2634,6 +2709,7 @@
     "rulesClassic": "Classic: Bring your own deck (30+ cards, 3 missions)",
     "rulesSealed": "Sealed: Build a deck from randomly opened boosters",
     "rulesRestricted": "Restricted: Build a deck following the tournament restrictions below",
+    "rulesEvolving": "Evolving: KS cards only, 5 Hero points max per deck. Lower-budget deck starts each match with bonus Mission Points.",
     "rulesDeck": "You must select a valid deck before the tournament starts or you will be disqualified",
     "rulesMatch": "Matches have a time limit. If time expires, the player with the most mission points wins",
     "rulesAbsence": "You must join your match within the join time limit or you will be forfeited",
@@ -2753,7 +2829,9 @@
       "noAllowedKeyword": "Card {name} has no allowed keyword.",
       "keywordBanned": "Keyword \"{keyword}\" is banned (card: {name}).",
       "tooMuchChakra": "Card {name} costs {chakra} chakra (max: {max}).",
-      "tooManyOfRarity": "Too many {rarity} cards: {count} (max: {max})."
+      "tooManyOfRarity": "Too many {rarity} cards: {count} (max: {max}).",
+      "evolvingSetNotAllowed": "Card {cardId} is from set {set} which is not allowed in Evolving mode.",
+      "evolvingOverBudget": "Deck uses {points} Evolving points (max {max})."
     }
   },
   "playHub": {
@@ -2761,6 +2839,7 @@
     "subtitle": "Choose your game mode",
     "onlineTitle": "Play Online",
     "onlineDesc": "Challenge real players in ranked or private matches",
+    "evolvingDesc": "Hero-point budget format",
     "aiTitle": "Play vs AI",
     "aiDesc": "Train against AI opponents of varying difficulty",
     "hotseatTitle": "Solo v Self",

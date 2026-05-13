@@ -48,11 +48,12 @@ const DARK = '#0a0a0a';
 
 interface Props {
   username: string;
-  
+
   compact?: boolean;
+  eloType?: 'ranked' | 'evolving';
 }
 
-export function EloHistoryChart({ username, compact }: Props) {
+export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props) {
   const t = useTranslations('eloHistory');
   const locale = useLocale();
   const [data, setData] = useState<EloHistoryData | null>(null);
@@ -65,7 +66,8 @@ export function EloHistoryChart({ username, compact }: Props) {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    fetch(`/api/elo-history?user=${encodeURIComponent(username)}`)
+    const typeParam = eloType === 'evolving' ? '&type=evolving' : '';
+    fetch(`/api/elo-history?user=${encodeURIComponent(username)}${typeParam}`)
       .then(async (res) => {
         if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? `HTTP ${res.status}`);
         return res.json();
@@ -74,7 +76,7 @@ export function EloHistoryChart({ username, compact }: Props) {
       .catch((e: unknown) => { if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load'); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [username]);
+  }, [username, eloType]);
 
   
   const chart = useMemo(() => {

@@ -175,6 +175,7 @@ export function GameEndScreen() {
   if (!gameOver || !visibleState) return null;
 
   const isRanked = isOnlineGame && gameResult?.isRanked;
+  const isEvolving = isOnlineGame && gameResult?.isEvolving;
   const eloDelta = gameResult?.eloDelta;
   const newElo = gameResult?.newElo;
   const totalGames = gameResult?.totalGames;
@@ -319,7 +320,7 @@ export function GameEndScreen() {
               className="flex flex-col items-center gap-2 mb-4"
             >
               <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
-                {t('game.end.rankedMatch')}
+                {isEvolving ? t('game.end.evolvingMatch') : t('game.end.rankedMatch')}
               </span>
               <span
                 className="text-lg font-bold tabular-nums"

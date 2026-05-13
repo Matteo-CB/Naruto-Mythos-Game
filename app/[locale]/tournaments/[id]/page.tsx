@@ -15,6 +15,8 @@ import { TournamentAdmin } from '@/components/tournament/TournamentAdmin';
 import { AbsenceTimer } from '@/components/tournament/AbsenceTimer';
 import { LiveMatchesPanel } from '@/components/tournament/LiveMatchesPanel';
 import { TournamentResults } from '@/components/tournament/TournamentResults';
+import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
+import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
 import { useTournamentStore } from '@/stores/tournamentStore';
 import { useSocketStore } from '@/lib/socket/client';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -79,7 +81,7 @@ export default function TournamentDetailPage() {
   const { activeTournament, loading, error, errorKey: storeErrorKey, fetchTournament, joinTournament, leaveTournament, selectDeck, clearActiveTournament, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, handleStandingsUpdate, handleSwissRoundGenerated, clearError } = useTournamentStore();
 
   const userId = (session?.user as { id?: string })?.id;
-  const [myDecks, setMyDecks] = useState<Array<{ id: string; name: string }>>([]);
+  const [myDecks, setMyDecks] = useState<Array<{ id: string; name: string; evolvingPoints?: number; evolvingCompatible?: boolean }>>([]);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const [deckErrors, setDeckErrors] = useState<string[]>([]);
   const [deckLoading, setDeckLoading] = useState(false);
@@ -117,26 +119,54 @@ export default function TournamentDetailPage() {
     const onSU = (d: Parameters<typeof handleStandingsUpdate>[0]) => handleStandingsUpdate(d);
     const onSRG = (d: Parameters<typeof handleSwissRoundGenerated>[0]) => handleSwissRoundGenerated(d);
     const onRefresh = () => { fetchTournament(tournamentId); };
+    const onPleaseConfirm = (d: { matchId: string }) => {
+      if (!userId || !d?.matchId) return;
+      socket.emit('tournament:ready', { tournamentId, matchId: d.matchId, userId });
+      fetchTournament(tournamentId);
+    };
+    const onConnect = () => {
+      socket.emit('tournament:subscribe', { tournamentId });
+      fetchTournament(tournamentId);
+    };
     socket.on('tournament:update', onU); socket.on('tournament:match-updated', onM); socket.on('tournament:completed', onC); socket.on('tournament:round-complete', onR);
     socket.on('tournament:player-forfeited', onF); socket.on('tournament:match-ready', onMR); socket.on('tournament:absence-timer', onAT);
     socket.on('tournament:standings-updated', onSU); socket.on('tournament:swiss-round-generated', onSRG);
     socket.on('tournament:refresh', onRefresh);
     socket.on('tournament:cancelled', onRefresh); socket.on('tournament:started', onRefresh);
-    return () => { socket.emit('tournament:unsubscribe', { tournamentId }); socket.off('tournament:update', onU); socket.off('tournament:match-updated', onM); socket.off('tournament:completed', onC); socket.off('tournament:round-complete', onR); socket.off('tournament:player-forfeited', onF); socket.off('tournament:match-ready', onMR); socket.off('tournament:absence-timer', onAT); socket.off('tournament:standings-updated', onSU); socket.off('tournament:swiss-round-generated', onSRG); socket.off('tournament:refresh', onRefresh); socket.off('tournament:cancelled', onRefresh); socket.off('tournament:started', onRefresh); };
-  }, [socket, tournamentId, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, handleStandingsUpdate, handleSwissRoundGenerated, fetchTournament]);
+    socket.on('tournament:please-confirm-ready', onPleaseConfirm);
+    socket.on('connect', onConnect);
+    return () => { socket.emit('tournament:unsubscribe', { tournamentId }); socket.off('tournament:update', onU); socket.off('tournament:match-updated', onM); socket.off('tournament:completed', onC); socket.off('tournament:round-complete', onR); socket.off('tournament:player-forfeited', onF); socket.off('tournament:match-ready', onMR); socket.off('tournament:absence-timer', onAT); socket.off('tournament:standings-updated', onSU); socket.off('tournament:swiss-round-generated', onSRG); socket.off('tournament:refresh', onRefresh); socket.off('tournament:cancelled', onRefresh); socket.off('tournament:started', onRefresh); socket.off('tournament:please-confirm-ready', onPleaseConfirm); socket.off('connect', onConnect); };
+  }, [socket, tournamentId, userId, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, handleStandingsUpdate, handleSwissRoundGenerated, fetchTournament]);
+
+  useEffect(() => {
+    if (!tournamentId || !session?.user) return;
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchTournament(tournamentId);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('focus', onVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('focus', onVisibility);
+    };
+  }, [tournamentId, session?.user, fetchTournament]);
 
   
   const isSealedTournament = activeTournament?.gameMode === 'sealed';
+  const isEvolvingTournament = activeTournament?.gameMode === 'evolving';
   const decksFetchedRef = useRef(false);
   useEffect(() => {
     if (!session?.user || !activeTournament || isSealedTournament) return;
     if (decksFetchedRef.current) return;
     decksFetchedRef.current = true;
-    fetch('/api/decks').then(r => r.ok ? r.json() : null).then(data => {
+    const url = isEvolvingTournament ? '/api/decks?evolving=true' : '/api/decks';
+    fetch(url).then(r => r.ok ? r.json() : null).then(data => {
       const decks = Array.isArray(data) ? data : data?.decks ?? [];
-      if (decks.length > 0) setMyDecks(decks.map((d: { id: string; name: string }) => ({ id: d.id, name: d.name })));
+      if (decks.length > 0) setMyDecks(decks.map((d: { id: string; name: string; evolvingPoints?: number; evolvingCompatible?: boolean }) => ({ id: d.id, name: d.name, evolvingPoints: typeof d.evolvingPoints === 'number' ? d.evolvingPoints : 0, evolvingCompatible: d.evolvingCompatible === true })));
     }).catch(() => { decksFetchedRef.current = false; });
-  }, [session?.user, isSealedTournament, activeTournament]);
+  }, [session?.user, isSealedTournament, isEvolvingTournament, activeTournament]);
 
   useEffect(() => {
     if (!activeTournament || !userId) return;
@@ -283,7 +313,7 @@ export default function TournamentDetailPage() {
   }
 
   const statusKey = tour.status === 'registration' ? 'statusRegistration' : tour.status === 'in_progress' ? 'statusInProgress' : tour.status === 'completed' ? 'statusCompleted' : 'statusCancelled';
-  const modeKey = tour.gameMode === 'sealed' ? 'sealed' : tour.gameMode === 'restricted' ? 'modeRestricted' : 'classic';
+  const modeKey = tour.gameMode === 'sealed' ? 'sealed' : tour.gameMode === 'restricted' ? 'modeRestricted' : tour.gameMode === 'evolving' ? 'modeEvolving' : 'classic';
   const myParticipant = tour.participants.find(p => p.userId === userId);
   const myDeckValid = (myParticipant as any)?.deckValid ?? false;
   const myDeckId = (myParticipant as any)?.deckId ?? null;
@@ -336,6 +366,7 @@ export default function TournamentDetailPage() {
             {tour.gameMode === 'classic' && <p>{t('rulesClassic')}</p>}
             {tour.gameMode === 'sealed' && <p>{t('rulesSealed')}</p>}
             {tour.gameMode === 'restricted' && <p>{t('rulesRestricted')}</p>}
+            {tour.gameMode === 'evolving' && <p>{t('rulesEvolving')}</p>}
             {tour.gameMode !== 'sealed' && <p>{t('rulesDeck')}</p>}
             <p>{t('rulesMatch')}</p>
             <p>{t('rulesAbsence')}</p>
@@ -419,20 +450,25 @@ export default function TournamentDetailPage() {
             )}
             <div className="flex flex-col gap-1.5">
               {myDecks.map(deck => (
-                <button key={deck.id} onClick={() => handleSelectDeck(deck.id)} disabled={deckLoading}
-                  className="flex items-center justify-between px-3 py-2 text-xs cursor-pointer transition-colors"
+                <EvolvingDeckHolo key={deck.id} points={deck.evolvingPoints ?? 0} enabled={deck.evolvingCompatible === true} intensity="subtle">
+                <button onClick={() => handleSelectDeck(deck.id)} disabled={deckLoading}
+                  className="flex items-center justify-between px-3 py-2 text-xs cursor-pointer transition-colors w-full"
                   style={{
                     backgroundColor: selectedDeckId === deck.id ? 'rgba(196, 163, 90, 0.1)' : '#0d0d0d',
                     border: `1px solid ${selectedDeckId === deck.id ? '#c4a35a' : '#333'}`,
                     color: selectedDeckId === deck.id ? '#c4a35a' : '#ccc',
                   }}>
-                  <span>{deck.name}</span>
+                  <div className="flex items-center gap-2 flex-wrap min-w-0">
+                    <span className="truncate">{deck.name}</span>
+                    {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints ?? 0} />}
+                  </div>
                   {selectedDeckId === deck.id && <span style={{ color: myDeckValid ? '#4ade80' : '#f87171' }}>{myDeckValid ? t('deckValid') : t('deckInvalid')}</span>}
                 </button>
+                </EvolvingDeckHolo>
               ))}
               {myDecks.length === 0 && (
                 <p className="text-xs" style={{ color: '#888' }}>
-                  {t('noDeckWarning')}
+                  {isEvolvingTournament ? t('noEvolvingDeckWarning') : t('noDeckWarning')}
                 </p>
               )}
               {myDecks.length > 0 && !myDeckValid && (

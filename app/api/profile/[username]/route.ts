@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { cleanupOldGames } from '@/lib/db/gameCleanup';
+import { deckUsesOnlyAllowedSets } from '@/lib/evolving/computePoints';
+import { EVOLVING_MAX_POINTS } from '@/lib/evolving/constants';
 
 let lastCleanup = 0;
 
@@ -29,6 +31,7 @@ export async function GET(
         id: true,
         username: true,
         elo: true,
+        evolvingElo: true,
         wins: true,
         losses: true,
         draws: true,
@@ -37,7 +40,7 @@ export async function GET(
         discordUsername: true,
         createdAt: true,
         decks: {
-          select: { id: true, name: true, createdAt: true },
+          select: { id: true, name: true, createdAt: true, evolvingPoints: true, evolvingCompatible: true, cardIds: true, missionIds: true },
           orderBy: { updatedAt: 'desc' },
         },
       },
@@ -49,7 +52,7 @@ export async function GET(
 
     const limit = page * perPage;
 
-    const [totalRanked, eloRows, aiGames] = await Promise.all([
+    const [totalRanked, eloRows, aiGames, evolvingWins, evolvingLosses] = await Promise.all([
       prisma.eloHistory.count({ where: { userId: user.id } }),
       prisma.eloHistory.findMany({
         where: { userId: user.id },
@@ -75,6 +78,8 @@ export async function GET(
         orderBy: { completedAt: 'desc' },
         take: limit,
       }),
+      prisma.eloHistory.count({ where: { userId: user.id, eloType: 'evolving', result: 'win' } }),
+      prisma.eloHistory.count({ where: { userId: user.id, eloType: 'evolving', result: 'loss' } }),
     ]);
 
     const candidateGameIds = eloRows
@@ -144,7 +149,32 @@ export async function GET(
     const totalGames = totalRanked + aiGames.length;
     const recentGames = merged.slice((page - 1) * perPage, limit);
 
-    return NextResponse.json({ ...user, recentGames, totalGames, page, perPage });
+    const backfillDeckIds: string[] = [];
+    const decks = user.decks.map((d) => {
+      let compatible = d.evolvingCompatible;
+      if (!compatible && d.evolvingPoints <= EVOLVING_MAX_POINTS) {
+        compatible = deckUsesOnlyAllowedSets(d.cardIds, d.missionIds);
+        if (compatible) backfillDeckIds.push(d.id);
+      }
+      return {
+        id: d.id,
+        name: d.name,
+        createdAt: d.createdAt,
+        evolvingPoints: d.evolvingPoints,
+        evolvingCompatible: compatible,
+      };
+    });
+
+    if (backfillDeckIds.length > 0) {
+      prisma.deck.updateMany({
+        where: { id: { in: backfillDeckIds } },
+        data: { evolvingCompatible: true },
+      }).catch(() => {});
+    }
+
+    const { decks: _omit, ...userWithoutDecks } = user;
+    void _omit;
+    return NextResponse.json({ ...userWithoutDecks, decks, evolvingWins, evolvingLosses, recentGames, totalGames, page, perPage });
   } catch (err) {
     console.error('[profile] error:', err);
     return NextResponse.json(

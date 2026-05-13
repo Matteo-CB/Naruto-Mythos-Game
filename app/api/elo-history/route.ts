@@ -10,13 +10,14 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const q = url.searchParams.get('user') ?? '';
   if (!q) return NextResponse.json({ error: 'Missing user query param' }, { status: 400 });
+  const eloType = url.searchParams.get('type') === 'evolving' ? 'evolving' : 'ranked';
 
   const looksLikeId = /^[0-9a-f]{24}$/i.test(q);
   const user = await prisma.user.findFirst({
     where: looksLikeId
       ? { id: q }
       : { username: { equals: q, mode: 'insensitive' } },
-    select: { id: true, username: true, elo: true, wins: true, losses: true, draws: true, createdAt: true },
+    select: { id: true, username: true, elo: true, evolvingElo: true, wins: true, losses: true, draws: true, createdAt: true },
   });
 
   if (!user) {
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
 
   const cutoff = new Date(Date.now() - ELO_HISTORY_TTL_MS);
   const history = await prisma.eloHistory.findMany({
-    where: { userId: user.id, createdAt: { gte: cutoff } },
+    where: { userId: user.id, createdAt: { gte: cutoff }, eloType },
     orderBy: { createdAt: 'asc' },
     take: 2000,
   });
@@ -69,12 +70,13 @@ export async function GET(request: Request) {
     user: {
       id: user.id,
       username: user.username,
-      elo: user.elo,
+      elo: eloType === 'evolving' ? (user.evolvingElo ?? 500) : user.elo,
       wins: user.wins,
       losses: user.losses,
       draws: user.draws,
       createdAt: user.createdAt.toISOString(),
     },
+    eloType,
     windowDays: WINDOW_DAYS,
     summary: { games: history.length, wins, losses, draws, totalDelta, distinctOpponents: oppMap.size },
     perDay: [...byDay.entries()].map(([day, v]) => ({ day, ...v })),

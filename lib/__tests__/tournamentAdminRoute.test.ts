@@ -12,6 +12,8 @@ vi.mock('@/lib/db/prisma', () => {
     tournamentMatch: {
       update: vi.fn(),
       updateMany: vi.fn(),
+      findFirst: vi.fn(),
+      deleteMany: vi.fn(),
     },
     tournamentAdminLog: { create: vi.fn().mockResolvedValue({}) },
     user: { findUnique: vi.fn(), update: vi.fn() },
@@ -40,6 +42,7 @@ vi.mock('@/lib/socket/tournamentHandlers', () => ({
   handleSwissMatchEnd: vi.fn(),
   cleanupTournamentMapsExternal: vi.fn(),
   cleanupTournamentMapsByIds: vi.fn(),
+  fireAbsenceTimerCallback: vi.fn(),
 }));
 
 vi.mock('@/lib/tournament/swissEngine', () => ({
@@ -48,6 +51,7 @@ vi.mock('@/lib/tournament/swissEngine', () => ({
 
 vi.mock('@/lib/tournament/absenceManager', () => ({
   clearAbsenceTimer: vi.fn(),
+  startAbsenceTimer: vi.fn(() => new Date(Date.now() + 120_000)),
 }));
 
 vi.mock('@/lib/tournament/matchEventLog', () => ({
@@ -70,7 +74,7 @@ const p = prisma as unknown as {
     updateMany: ReturnType<typeof vi.fn>;
     deleteMany: ReturnType<typeof vi.fn>;
   };
-  tournamentMatch: { update: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn> };
+  tournamentMatch: { update: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn>; findFirst: ReturnType<typeof vi.fn>; deleteMany: ReturnType<typeof vi.fn> };
   tournamentAdminLog: { create: ReturnType<typeof vi.fn> };
   user: { findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
 };
@@ -197,5 +201,154 @@ describe('POST /api/tournaments/[id]/admin', () => {
     });
     const res = await adminPOST(makeRequest({ action: 'foobarBogus' }) as never, { params: params('t1') });
     expect(res.status).toBe(400);
+  });
+});
+
+describe('POST /admin resetMatch (Fix #4 forfeit recovery)', () => {
+  beforeEach(() => {
+    authMock.mockReset();
+    for (const model of Object.values(p)) {
+      if (typeof model === 'object' && model !== null) {
+        for (const fn of Object.values(model as Record<string, unknown>)) {
+          if (typeof fn === 'function' && 'mockReset' in fn) (fn as ReturnType<typeof vi.fn>).mockReset();
+        }
+      }
+    }
+    p.tournamentAdminLog.create.mockResolvedValue({});
+  });
+
+  it('un-eliminates participants whose eliminatedRound matches the forfeited match round', async () => {
+    authMock.mockResolvedValue({ user: { id: 'creator', name: 'Bob' } });
+    const forfeitMatch = {
+      id: 'm1', tournamentId: 't1', bracket: 'main', round: 3, matchIndex: 1,
+      player1Id: 'p1', player2Id: 'p2', player1Username: 'P1', player2Username: 'P2',
+      status: 'forfeit', winnerId: null, winnerUsername: null, isBye: false,
+      roomCode: null, gameId: null,
+    };
+    p.tournament.findUnique.mockResolvedValue({
+      id: 't1', creatorId: 'creator', status: 'in_progress', format: 'swiss',
+      currentRound: 3, totalRounds: 3, gameMode: 'classic',
+      matches: [forfeitMatch], participants: [],
+    });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentParticipant.updateMany.mockResolvedValue({ count: 1 });
+
+    const res = await adminPOST(
+      makeRequest({ action: 'resetMatch', matchId: 'm1' }) as never,
+      { params: params('t1') },
+    );
+
+    expect(res.status).toBe(200);
+    expect(p.tournamentParticipant.updateMany).toHaveBeenCalledWith({
+      where: { tournamentId: 't1', userId: 'p1', eliminatedRound: 3 },
+      data: { eliminated: false, eliminatedRound: null },
+    });
+    expect(p.tournamentParticipant.updateMany).toHaveBeenCalledWith({
+      where: { tournamentId: 't1', userId: 'p2', eliminatedRound: 3 },
+      data: { eliminated: false, eliminatedRound: null },
+    });
+  });
+
+  it('reverts tournament.status when a forfeit reset on a Swiss completed tournament', async () => {
+    authMock.mockResolvedValue({ user: { id: 'creator', name: 'Bob' } });
+    const forfeitMatch = {
+      id: 'm1', tournamentId: 't1', bracket: 'main', round: 3, matchIndex: 1,
+      player1Id: 'p1', player2Id: 'p2', player1Username: 'P1', player2Username: 'P2',
+      status: 'forfeit', winnerId: null, winnerUsername: null, isBye: false,
+      roomCode: null, gameId: null,
+    };
+    p.tournament.findUnique.mockResolvedValue({
+      id: 't1', creatorId: 'creator', status: 'completed', format: 'swiss',
+      currentRound: 3, totalRounds: 3, winnerId: 'yclooney', winnerUsername: 'yclooney',
+      gameMode: 'classic',
+      matches: [forfeitMatch], participants: [],
+    });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentParticipant.updateMany.mockResolvedValue({ count: 1 });
+    p.tournament.update.mockResolvedValue({});
+    p.user.update.mockResolvedValue({});
+
+    const res = await adminPOST(
+      makeRequest({ action: 'resetMatch', matchId: 'm1' }) as never,
+      { params: params('t1') },
+    );
+
+    expect(res.status).toBe(200);
+    expect(p.tournament.update).toHaveBeenCalledWith({
+      where: { id: 't1' },
+      data: expect.objectContaining({
+        status: 'in_progress',
+        winnerId: null,
+        winnerUsername: null,
+        completedAt: null,
+      }),
+    });
+    expect(p.user.update).toHaveBeenCalledWith({
+      where: { id: 'yclooney' },
+      data: { tournamentWins: { decrement: 1 } },
+    });
+
+    const body = await res.json();
+    expect(body.tournamentStatusReverted).toBe(true);
+    expect(body.wasForfeit).toBe(true);
+  });
+
+  it('does NOT revert tournament.status when match was completed normally (not forfeit)', async () => {
+    authMock.mockResolvedValue({ user: { id: 'creator', name: 'Bob' } });
+    const normalMatch = {
+      id: 'm1', tournamentId: 't1', bracket: 'main', round: 3, matchIndex: 0,
+      player1Id: 'p1', player2Id: 'p2', player1Username: 'P1', player2Username: 'P2',
+      status: 'completed', winnerId: 'p1', winnerUsername: 'P1', isBye: false,
+      roomCode: null, gameId: 'g1',
+    };
+    p.tournament.findUnique.mockResolvedValue({
+      id: 't1', creatorId: 'creator', status: 'in_progress', format: 'swiss',
+      currentRound: 3, totalRounds: 3,
+      gameMode: 'classic',
+      matches: [normalMatch], participants: [],
+    });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentParticipant.updateMany.mockResolvedValue({ count: 1 });
+
+    const res = await adminPOST(
+      makeRequest({ action: 'resetMatch', matchId: 'm1' }) as never,
+      { params: params('t1') },
+    );
+
+    expect(res.status).toBe(200);
+    const updateCalls = p.tournament.update.mock.calls.filter((c: unknown[]) => {
+      const args = c[0] as { data?: { status?: string } };
+      return args?.data?.status !== undefined;
+    });
+    expect(updateCalls).toHaveLength(0);
+    const body = await res.json();
+    expect(body.tournamentStatusReverted).toBe(false);
+  });
+
+  it('does NOT revert tournament.status for elimination format even on forfeit', async () => {
+    authMock.mockResolvedValue({ user: { id: 'creator', name: 'Bob' } });
+    const forfeitMatch = {
+      id: 'm1', tournamentId: 't1', bracket: 'main', round: 2, matchIndex: 0,
+      player1Id: 'p1', player2Id: 'p2', player1Username: 'P1', player2Username: 'P2',
+      status: 'forfeit', winnerId: 'p1', winnerUsername: 'P1', isBye: false,
+      roomCode: null, gameId: null,
+    };
+    p.tournament.findUnique.mockResolvedValue({
+      id: 't1', creatorId: 'creator', status: 'completed', format: 'elimination',
+      currentRound: 2, totalRounds: 2, winnerId: 'p1', winnerUsername: 'P1',
+      gameMode: 'classic',
+      matches: [forfeitMatch], participants: [],
+    });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentParticipant.updateMany.mockResolvedValue({ count: 1 });
+
+    const res = await adminPOST(
+      makeRequest({ action: 'resetMatch', matchId: 'm1' }) as never,
+      { params: params('t1') },
+    );
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.tournamentStatusReverted).toBe(false);
   });
 });

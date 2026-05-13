@@ -4,12 +4,15 @@ import { create } from 'zustand';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { MAX_COPIES_PER_VERSION, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
 import { resolveCardId } from '@/lib/data/cardLoader';
+import { computeDeckEvolvingPoints, isEvolvingCompatible } from '@/lib/evolving/computePoints';
 
 interface SavedDeck {
   id: string;
   name: string;
   cardIds: string[];
   missionIds: string[];
+  evolvingPoints: number;
+  evolvingCompatible: boolean;
 }
 
 interface AddCheckResult {
@@ -20,27 +23,29 @@ interface AddCheckResult {
 }
 
 interface DeckBuilderStore {
-  
+
   deckName: string;
   deckChars: CharacterCard[];
   deckMissions: MissionCard[];
 
-  
+
   savedDecks: SavedDeck[];
   isLoading: boolean;
   isSaving: boolean;
 
-  
+
   loadedDeckId: string | null;
-  
+
   isDirty: boolean;
 
-  
+
   addError: string | null;
   addErrorKey: string | null;
   addErrorParams: Record<string, string | number> | null;
 
-  
+  evolvingMode: boolean;
+
+
   setDeckName: (name: string) => void;
   addChar: (card: CharacterCard) => void;
   removeChar: (index: number) => void;
@@ -50,12 +55,15 @@ interface DeckBuilderStore {
   clearAddError: () => void;
   reorderChars: (fromIndex: number, toIndex: number) => void;
   sortCharsByCost: () => void;
+  setEvolvingMode: (on: boolean) => void;
 
-  
+
   canAddChar: (card: CharacterCard) => AddCheckResult;
   canAddMission: (card: MissionCard) => AddCheckResult;
+  computeCurrentEvolvingPoints: () => number;
+  isCurrentDeckEvolvingCompatible: () => boolean;
 
-  
+
   saveDeck: () => Promise<void>;
   loadSavedDecks: () => Promise<void>;
   loadDeck: (deckId: string, allChars: CharacterCard[], allMissions: MissionCard[]) => Promise<void>;
@@ -86,6 +94,29 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
   addError: null,
   addErrorKey: null,
   addErrorParams: null,
+  evolvingMode: false,
+
+  setEvolvingMode: (on: boolean) => {
+    set({ evolvingMode: on });
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('nmtcg-deckbuilder-evolving-mode', on ? '1' : '0');
+      }
+    } catch { /* ignore */ }
+  },
+
+  computeCurrentEvolvingPoints: () => {
+    const { deckChars } = get();
+    return computeDeckEvolvingPoints(deckChars.map((c) => c.id));
+  },
+
+  isCurrentDeckEvolvingCompatible: () => {
+    const { deckChars, deckMissions } = get();
+    return isEvolvingCompatible(
+      deckChars.map((c) => c.id),
+      deckMissions.map((m) => m.id),
+    );
+  },
 
   setDeckName: (name: string) => {
     set({ deckName: name, isDirty: true });
@@ -253,6 +284,8 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
         name: d.name as string,
         cardIds: d.cardIds as string[],
         missionIds: d.missionIds as string[],
+        evolvingPoints: typeof d.evolvingPoints === 'number' ? d.evolvingPoints : 0,
+        evolvingCompatible: d.evolvingCompatible === true,
       }));
 
       set({ savedDecks: decks });

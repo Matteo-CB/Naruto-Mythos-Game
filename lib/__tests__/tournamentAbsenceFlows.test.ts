@@ -59,6 +59,8 @@ import {
   startInitialRoundAbsenceTimers,
   rehydrateAbsenceTimers,
   sweepOrphanTournamentMatches,
+  fireAbsenceTimerCallback,
+  getConnectedUserIdsInTournament,
 } from '../socket/tournamentHandlers';
 
 const p = prisma as never as {
@@ -80,6 +82,22 @@ function fakeIo(): FakeIo {
       return { emit: (event: string, data: unknown) => emissions.push({ room, event, data }) };
     },
   };
+}
+
+type FakeIoWithSockets = FakeIo & {
+  sockets: { sockets: Map<string, { data: { userId?: string }; rooms: Set<string> }> };
+};
+
+function fakeIoWithConnectedUsers(tournamentId: string, connectedUserIds: string[]): FakeIoWithSockets {
+  const base = fakeIo();
+  const sockets = new Map<string, { data: { userId?: string }; rooms: Set<string> }>();
+  connectedUserIds.forEach((uid, idx) => {
+    sockets.set(`sock-${idx}`, {
+      data: { userId: uid },
+      rooms: new Set([`tournament:${tournamentId}`]),
+    });
+  });
+  return Object.assign(base, { sockets: { sockets } });
 }
 
 beforeEach(() => {
@@ -275,5 +293,162 @@ describe('sweepOrphanTournamentMatches', () => {
     p.tournamentMatch.findMany.mockResolvedValue([]);
     await sweepOrphanTournamentMatches(io as never);
     expect(p.tournamentMatch.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('getConnectedUserIdsInTournament', () => {
+  it('returns userIds whose sockets are in tournament:<id>', () => {
+    const io = {
+      sockets: {
+        sockets: new Map<string, { data: { userId?: string }; rooms: Set<string> }>([
+          ['s1', { data: { userId: 'u1' }, rooms: new Set(['tournament:t1', 'other-room']) }],
+          ['s2', { data: { userId: 'u2' }, rooms: new Set(['tournament:t1']) }],
+          ['s3', { data: { userId: 'u3' }, rooms: new Set(['tournament:other']) }],
+          ['s4', { data: {}, rooms: new Set(['tournament:t1']) }],
+        ]),
+      },
+    };
+    const result = getConnectedUserIdsInTournament(io as never, 't1');
+    expect(result.has('u1')).toBe(true);
+    expect(result.has('u2')).toBe(true);
+    expect(result.has('u3')).toBe(false);
+    expect(result.size).toBe(2);
+  });
+
+  it('returns empty set when io.sockets.sockets is missing', () => {
+    const io = {} as never;
+    expect(getConnectedUserIdsInTournament(io, 't1').size).toBe(0);
+  });
+
+  it('returns empty set when no sockets are in the room', () => {
+    const io = {
+      sockets: {
+        sockets: new Map<string, { data: { userId?: string }; rooms: Set<string> }>([
+          ['s1', { data: { userId: 'u1' }, rooms: new Set(['other-room']) }],
+        ]),
+      },
+    };
+    expect(getConnectedUserIdsInTournament(io as never, 't1').size).toBe(0);
+  });
+});
+
+describe('fireAbsenceTimerCallback (grace-period defense against mass-forfeit)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    p.tournament.findUnique.mockReset();
+    p.tournament.update.mockReset();
+    p.tournamentParticipant.updateMany.mockReset();
+    p.tournamentMatch.findUnique.mockReset();
+    p.tournamentMatch.findMany.mockReset();
+    p.tournamentMatch.update.mockReset();
+    p.tournamentMatch.updateMany.mockReset();
+  });
+
+  it('grants 30s grace + emits please-confirm-ready when BOTH players have live sockets (Swiss)', async () => {
+    const io = fakeIoWithConnectedUsers('t1', ['p1', 'p2']);
+    p.tournamentMatch.update.mockResolvedValue({});
+
+    await fireAbsenceTimerCallback(io as never, 't1', 'm1', 'p1', 'p2', null, false);
+
+    const confirmEmit = io.emissions.find(e => e.event === 'tournament:please-confirm-ready');
+    expect(confirmEmit).toBeDefined();
+    expect((confirmEmit!.data as { matchId: string }).matchId).toBe('m1');
+
+    expect(p.tournamentMatch.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'm1' },
+      data: expect.objectContaining({ absenceDeadline: expect.any(Date) }),
+    }));
+
+    expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
+    expect(io.emissions.some(e => e.event === 'tournament:player-forfeited')).toBe(false);
+  });
+
+  it('grants grace when ONE player connected and matchReadyPlayers has the other', async () => {
+    const io = fakeIoWithConnectedUsers('t1', ['p2']);
+    p.tournamentMatch.update.mockResolvedValue({});
+
+    await fireAbsenceTimerCallback(io as never, 't1', 'm1', 'p1', 'p2', 'p2', false);
+
+    expect(io.emissions.some(e => e.event === 'tournament:please-confirm-ready')).toBe(true);
+    expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
+  });
+
+  it('skips grace and fires Swiss double-absence forfeit when neither player connected', async () => {
+    const io = fakeIoWithConnectedUsers('t1', []);
+    p.tournamentMatch.findUnique.mockResolvedValue({
+      id: 'm1', tournamentId: 't1', status: 'ready',
+      player1Id: 'p1', player2Id: 'p2', round: 1, matchIndex: 0, bracket: null, roomCode: null,
+    });
+    p.tournament.findUnique.mockImplementation(async (args: { include?: { participants?: unknown } }) => {
+      if (args?.include?.participants) {
+        return { id: 't1', currentRound: 1, totalRounds: 3, status: 'in_progress', participants: [], matches: [] };
+      }
+      return { format: 'swiss' };
+    });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentParticipant.updateMany.mockResolvedValue({ count: 2 });
+    p.tournamentMatch.findMany.mockResolvedValue([{ id: 'm1', status: 'forfeit', round: 1 }]);
+
+    await fireAbsenceTimerCallback(io as never, 't1', 'm1', 'p1', 'p2', null, false);
+
+    expect(io.emissions.some(e => e.event === 'tournament:please-confirm-ready')).toBe(false);
+    expect(p.tournamentParticipant.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ userId: { in: ['p1', 'p2'] } }),
+      data: expect.objectContaining({ eliminated: true }),
+    }));
+  });
+
+  it('on retry=true: skips connection check entirely, forfeits per matchReadyPlayers state', async () => {
+    const io = fakeIoWithConnectedUsers('t1', ['p1', 'p2']);
+    p.tournamentMatch.findUnique.mockResolvedValue({
+      id: 'm1', tournamentId: 't1', status: 'ready',
+      player1Id: 'p1', player2Id: 'p2', round: 1, matchIndex: 0, bracket: null, roomCode: null,
+    });
+    p.tournament.findUnique.mockImplementation(async (args: { include?: { participants?: unknown } }) => {
+      if (args?.include?.participants) {
+        return { id: 't1', currentRound: 1, totalRounds: 3, status: 'in_progress', participants: [], matches: [] };
+      }
+      return { format: 'swiss' };
+    });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentParticipant.updateMany.mockResolvedValue({ count: 2 });
+    p.tournamentMatch.findMany.mockResolvedValue([{ id: 'm1', status: 'forfeit', round: 1 }]);
+
+    await fireAbsenceTimerCallback(io as never, 't1', 'm1', 'p1', 'p2', null, true);
+
+    expect(io.emissions.some(e => e.event === 'tournament:please-confirm-ready')).toBe(false);
+    expect(p.tournamentParticipant.updateMany).toHaveBeenCalled();
+  });
+
+  it('with knownAbsentPlayerId set and that player NOT connected, forfeits only that player', async () => {
+    const io = fakeIoWithConnectedUsers('t1', ['p1']);
+    p.tournamentMatch.findUnique.mockResolvedValue({
+      id: 'm1', tournamentId: 't1', status: 'ready',
+      player1Id: 'p1', player2Id: 'p2', player1Username: 'P1', player2Username: 'P2',
+      round: 1, matchIndex: 0, bracket: null, roomCode: null,
+    });
+    p.tournament.findUnique.mockResolvedValue({ format: 'elimination' });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentParticipant.updateMany.mockResolvedValue({ count: 1 });
+    p.tournamentMatch.findMany.mockResolvedValue([]);
+
+    await fireAbsenceTimerCallback(io as never, 't1', 'm1', 'p1', 'p2', 'p2', false);
+
+    expect(io.emissions.some(e => e.event === 'tournament:please-confirm-ready')).toBe(false);
+    expect(p.tournamentMatch.update).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ status: 'forfeit', winnerId: 'p1' }),
+    }));
+  });
+
+  it('regression: the 2026-05-12 mass-forfeit scenario no longer triggers when players are on the tournament page', async () => {
+    const io = fakeIoWithConnectedUsers('t1', ['Trafalgar', 'mak52554', 'legoubz', 'Mister_Mrozikk']);
+    p.tournamentMatch.update.mockResolvedValue({});
+
+    await fireAbsenceTimerCallback(io as never, 't1', 'r3-match1', 'Trafalgar', 'mak52554', null, false);
+    await fireAbsenceTimerCallback(io as never, 't1', 'r3-match3', 'legoubz', 'Mister_Mrozikk', null, false);
+
+    const confirms = io.emissions.filter(e => e.event === 'tournament:please-confirm-ready');
+    expect(confirms).toHaveLength(2);
+    expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
   });
 });

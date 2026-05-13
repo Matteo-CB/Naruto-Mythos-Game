@@ -1,6 +1,29 @@
 {
   "entries": [
     {
+      "date": "2026-05-14",
+      "title_fr": "Evolving Mode et nouvelle regle d'upgrade",
+      "title_en": "Evolving Mode and new upgrade rule",
+      "changes_fr": [
+        "Nouveau mode Evolving Mode : chaque joueur a 5 points a depenser sur une liste de 13 personnages a 1 ou 2 points. Le joueur avec moins de points commence la partie avec une avance en points de mission egale a la difference.",
+        "Les decks compatibles Evolving sont marques d'un effet brillant dont la couleur change selon le nombre de points utilises.",
+        "Nouveau classement Evolving separe du classement normal, accessible sur la page Classement via un bouton.",
+        "Nouveau salon en ligne dedie au mode Evolving avec le top 5 des joueurs et la liste des salons disponibles.",
+        "Tu peux maintenant creer des tournois en format Evolving, avec rejet automatique des decks non compatibles.",
+        "Sur ton profil, tes statistiques Evolving (ELO, victoires, defaites) sont affichees a cote de tes stats normales.",
+        "Regle de jeu : un personnage que tu controles mais qui ne t'appartient pas (vole a l'adversaire) ne peut plus etre upgrade."
+      ],
+      "changes_en": [
+        "New Evolving Mode: each player has 5 points to spend on a list of 13 characters costing 1 or 2 points each. The player with fewer points starts the match with a Mission Point lead equal to the difference.",
+        "Evolving-compatible decks now show a shimmering effect whose color depends on the number of points used.",
+        "New Evolving leaderboard, separate from the regular one, available on the Leaderboard page via a toggle.",
+        "New online lobby dedicated to Evolving Mode with the top 5 players and the list of available rooms.",
+        "You can now create tournaments in Evolving format, with non-compatible decks automatically rejected.",
+        "On your profile, your Evolving stats (ELO, wins, losses) are shown alongside your regular stats.",
+        "Rule change: a character you control but don't own (stolen from the opponent) can no longer be upgraded."
+      ]
+    },
+    {
       "date": "2026-05-13",
       "title_fr": "Nouveau système de chrono en parties en ligne",
       "title_en": "New game clock in online matches",

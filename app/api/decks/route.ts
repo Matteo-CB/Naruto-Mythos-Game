@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { computeDeckEvolvingPoints, deckUsesOnlyAllowedSets } from '@/lib/evolving/computePoints';
+import { EVOLVING_MAX_POINTS } from '@/lib/evolving/constants';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const { searchParams } = new URL(request.url);
+    const evolvingOnly = searchParams.get('evolving') === 'true';
 
     const decks = await prisma.deck.findMany({
       where: { userId: session.user.id },
@@ -15,7 +20,26 @@ export async function GET() {
       take: 50,
     });
 
-    return NextResponse.json(decks);
+    const backfillIds: string[] = [];
+    const enriched = decks.map((d) => {
+      if (d.evolvingCompatible || d.evolvingPoints > EVOLVING_MAX_POINTS) return d;
+      const compatible = deckUsesOnlyAllowedSets(d.cardIds, d.missionIds) && d.evolvingPoints <= EVOLVING_MAX_POINTS;
+      if (compatible) {
+        backfillIds.push(d.id);
+        return { ...d, evolvingCompatible: true };
+      }
+      return d;
+    });
+
+    if (backfillIds.length > 0) {
+      prisma.deck.updateMany({
+        where: { id: { in: backfillIds } },
+        data: { evolvingCompatible: true },
+      }).catch(() => {});
+    }
+
+    const filtered = evolvingOnly ? enriched.filter((d) => d.evolvingCompatible) : enriched;
+    return NextResponse.json(filtered);
   } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -83,12 +107,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const evolvingPoints = computeDeckEvolvingPoints(cardIds);
+    const evolvingCompatible = deckUsesOnlyAllowedSets(cardIds, missionIds) && evolvingPoints <= EVOLVING_MAX_POINTS;
+
     const deck = await prisma.deck.create({
       data: {
         name,
         userId: session.user.id,
         cardIds,
         missionIds,
+        evolvingPoints,
+        evolvingCompatible,
       },
     });
 

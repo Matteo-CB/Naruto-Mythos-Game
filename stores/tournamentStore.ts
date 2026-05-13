@@ -94,7 +94,7 @@ export interface CreateTournamentInput {
   name: string;
   type: 'simulator';
   format?: 'swiss' | 'elimination' | 'double_elimination';
-  gameMode: 'classic' | 'sealed' | 'restricted';
+  gameMode: 'classic' | 'sealed' | 'restricted' | 'evolving';
   maxPlayers: number;
   isPublic: boolean;
   useBanList: boolean;
@@ -258,7 +258,9 @@ export const useTournamentStore = create<TournamentStore>()((set, get) => ({
 
   handleRoundComplete: (data) => {
     const current = get().activeTournament;
-    if (current) set({ activeTournament: { ...current, currentRound: data.nextRound } });
+    if (!current) return;
+    set({ activeTournament: { ...current, currentRound: data.nextRound } });
+    get().fetchTournament(current.id);
   },
 
   handleStandingsUpdate: (data) => {

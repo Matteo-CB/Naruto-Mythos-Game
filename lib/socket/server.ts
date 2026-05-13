@@ -14,6 +14,24 @@ import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
 import { isMaintenanceActive, activateMaintenance, setDrainTimeout, setCheckInterval } from '@/lib/socket/maintenance';
 import { createChessClock, arm as armChessClock, disarm as disarmChessClock, resetIdle as resetChessClockIdle, snapshotForBroadcast as snapshotChessClockForBroadcast, bankEmpty as chessClockBankEmpty, idleMs as chessClockIdleMs, consumeIdleWarning as consumeChessClockIdleWarning, CHESS_CLOCK_IDLE_LIMIT_MS, CHESS_CLOCK_IDLE_TOAST_MS, CHESS_CLOCK_MULLIGAN_IDLE_MS, type ChessClockState } from '@/lib/timing/chessClock';
+import { computeEvolvingMpBonus } from '@/lib/evolving/mpBonus';
+import { computeDeckEvolvingPoints } from '@/lib/evolving/computePoints';
+
+export function buildEvolvingGameConfigExtras(room: Pick<RoomData, 'isEvolving' | 'hostEvolvingPoints' | 'guestEvolvingPoints'>): Pick<GameConfig, 'startingMissionPoints'> {
+  if (!room.isEvolving) return {};
+  const hostPts = Number.isFinite(room.hostEvolvingPoints) ? room.hostEvolvingPoints : 0;
+  const guestPts = Number.isFinite(room.guestEvolvingPoints) ? room.guestEvolvingPoints : 0;
+  const bonus = computeEvolvingMpBonus(hostPts, guestPts);
+  return { startingMissionPoints: bonus };
+}
+
+export function getEvolvingEloField(isEvolving: boolean): 'elo' | 'evolvingElo' {
+  return isEvolving ? 'evolvingElo' : 'elo';
+}
+
+export function getEvolvingEloType(isEvolving: boolean): 'ranked' | 'evolving' {
+  return isEvolving ? 'evolving' : 'ranked';
+}
 
 export interface RoomData {
   code: string;
@@ -27,7 +45,10 @@ export interface RoomData {
   isPrivate: boolean;
   isRanked: boolean;
   isAnonymous: boolean;
-  gameMode: 'casual' | 'ranked' | 'sealed';
+  gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving';
+  isEvolving: boolean;
+  hostEvolvingPoints: number;
+  guestEvolvingPoints: number;
   createdAt: number;
   hostName?: string;
   guestName?: string;
@@ -573,6 +594,12 @@ async function finalizeGameEnd(
     .catch(() => {});
 
   
+  const isEvolving = room.isEvolving === true;
+  const eloField: 'elo' | 'evolvingElo' = isEvolving ? 'evolvingElo' : 'elo';
+  const eloType: 'ranked' | 'evolving' = isEvolving ? 'evolving' : 'ranked';
+  const getElo = (u: { elo: number; evolvingElo?: number | null }): number =>
+    isEvolving ? (u.evolvingElo ?? 500) : u.elo;
+
   try {
     if (room.isRanked && room.hostId && room.guestId) {
       const [player1, player2] = await Promise.all([
@@ -587,21 +614,23 @@ async function finalizeGameEnd(
         const survivorWon = (survivorIsP1 && winner === 'player1') || (!survivorIsP1 && winner === 'player2');
         const result: 'win' | 'loss' = survivorWon ? 'win' : 'loss';
         const delta = survivorWon ? 10 : -25;
-        const newElo = Math.max(100, survivor.elo + delta);
+        const oldElo = getElo(survivor);
+        const newElo = Math.max(100, oldElo + delta);
         const stats = survivorWon ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
         const updated = await prisma.user.update({
           where: { id: survivor.id },
           data: {
-            elo: newElo, ...stats,
+            [eloField]: newElo, ...stats,
             consecutiveWins: survivorWon ? (survivor.consecutiveWins ?? 0) + 1 : 0,
             consecutiveLosses: survivorWon ? 0 : (survivor.consecutiveLosses ?? 0) + 1,
-          },
+          } as never,
         });
+        const updatedElo = getElo(updated);
         eloData = {
-          player1Delta: survivorIsP1 ? (newElo - survivor.elo) : 0,
-          player2Delta: survivorIsP1 ? 0 : (newElo - survivor.elo),
-          player1NewElo: survivorIsP1 ? updated.elo : 0,
-          player2NewElo: survivorIsP1 ? 0 : updated.elo,
+          player1Delta: survivorIsP1 ? (newElo - oldElo) : 0,
+          player2Delta: survivorIsP1 ? 0 : (newElo - oldElo),
+          player1NewElo: survivorIsP1 ? updatedElo : 0,
+          player2NewElo: survivorIsP1 ? 0 : updatedElo,
           player1TotalGames: survivorIsP1 ? updated.wins + updated.losses + updated.draws : 0,
           player2TotalGames: survivorIsP1 ? 0 : updated.wins + updated.losses + updated.draws,
         };
@@ -611,24 +640,29 @@ async function finalizeGameEnd(
             opponentId: survivorIsP1 ? room.guestId! : room.hostId,
             opponentUsername: 'deleted_user',
             opponentElo: 0,
-            oldElo: survivor.elo,
-            newElo: updated.elo,
-            delta: newElo - survivor.elo,
+            oldElo,
+            newElo: updatedElo,
+            delta: newElo - oldElo,
             result,
             myScore: survivorIsP1 ? p1Score : p2Score,
             opponentScore: survivorIsP1 ? p2Score : p1Score,
             isRanked: true,
+            eloType,
           },
         }).catch((err) => {
           console.warn('[Socket] EloHistory write failed (one-side):', err instanceof Error ? err.message : err);
         });
-        syncDiscordRole(survivor.id).catch(() => {});
-        const oldTotal = survivor.wins + survivor.losses + survivor.draws;
-        sendRankUpNotification(survivor.username, survivor.discordId, survivor.elo, updated.elo, oldTotal, oldTotal + 1).catch(() => {});
+        if (!isEvolving) {
+          syncDiscordRole(survivor.id).catch(() => {});
+          const oldTotal = survivor.wins + survivor.losses + survivor.draws;
+          sendRankUpNotification(survivor.username, survivor.discordId, oldElo, updatedElo, oldTotal, oldTotal + 1).catch(() => {});
+        }
       } else if (player1 && player2) {
+        const p1OldElo = getElo(player1);
+        const p2OldElo = getElo(player2);
         const changes = calculateEloChanges({
-          player1Elo: player1.elo,
-          player2Elo: player2.elo,
+          player1Elo: p1OldElo,
+          player2Elo: p2OldElo,
           winner: winner === 'player1' ? 'player1' : 'player2',
           player1Score: p1Score,
           player2Score: p2Score,
@@ -645,33 +679,30 @@ async function finalizeGameEnd(
           prisma.user.update({
             where: { id: room.hostId },
             data: {
-              elo: changes.player1NewElo, ...p1Stats,
+              [eloField]: changes.player1NewElo, ...p1Stats,
               consecutiveWins: changes.player1NewConsecWins,
               consecutiveLosses: changes.player1NewConsecLosses,
-            },
+            } as never,
           }),
           prisma.user.update({
             where: { id: room.guestId! },
             data: {
-              elo: changes.player2NewElo, ...p2Stats,
+              [eloField]: changes.player2NewElo, ...p2Stats,
               consecutiveWins: changes.player2NewConsecWins,
               consecutiveLosses: changes.player2NewConsecLosses,
-            },
+            } as never,
           }),
         ]);
 
         eloData = {
           player1Delta: changes.player1Delta,
           player2Delta: changes.player2Delta,
-          player1NewElo: updatedP1.elo,
-          player2NewElo: updatedP2.elo,
+          player1NewElo: getElo(updatedP1),
+          player2NewElo: getElo(updatedP2),
           player1TotalGames: updatedP1.wins + updatedP1.losses + updatedP1.draws,
           player2TotalGames: updatedP2.wins + updatedP2.losses + updatedP2.draws,
         };
 
-        
-        
-        
         const p1Result: 'win' | 'loss' = winner === 'player1' ? 'win' : 'loss';
         const p2Result: 'win' | 'loss' = winner === 'player2' ? 'win' : 'loss';
         const [e1, e2] = await Promise.all([
@@ -680,14 +711,15 @@ async function finalizeGameEnd(
               userId: room.hostId!,
               opponentId: room.guestId!,
               opponentUsername: player2.username,
-              opponentElo: player2.elo,
-              oldElo: player1.elo,
+              opponentElo: p2OldElo,
+              oldElo: p1OldElo,
               newElo: changes.player1NewElo,
               delta: changes.player1Delta,
               result: p1Result,
               myScore: p1Score,
               opponentScore: p2Score,
               isRanked: true,
+              eloType,
             },
           }).catch((err) => { console.warn('[Socket] EloHistory write 1 failed:', err instanceof Error ? err.message : err); return null; }),
           prisma.eloHistory.create({
@@ -695,28 +727,29 @@ async function finalizeGameEnd(
               userId: room.guestId!,
               opponentId: room.hostId!,
               opponentUsername: player1.username,
-              opponentElo: player1.elo,
-              oldElo: player2.elo,
+              opponentElo: p1OldElo,
+              oldElo: p2OldElo,
               newElo: changes.player2NewElo,
               delta: changes.player2Delta,
               result: p2Result,
               myScore: p2Score,
               opponentScore: p1Score,
               isRanked: true,
+              eloType,
             },
           }).catch((err) => { console.warn('[Socket] EloHistory write 2 failed:', err instanceof Error ? err.message : err); return null; }),
         ]);
         room.pendingEloHistoryIds = [e1?.id, e2?.id].filter((x): x is string => !!x);
 
-        
-        syncDiscordRole(room.hostId).catch(() => {});
-        syncDiscordRole(room.guestId!).catch(() => {});
+        if (!isEvolving) {
+          syncDiscordRole(room.hostId).catch(() => {});
+          syncDiscordRole(room.guestId!).catch(() => {});
 
-        
-        const p1OldTotal = player1.wins + player1.losses + player1.draws;
-        const p2OldTotal = player2.wins + player2.losses + player2.draws;
-        sendRankUpNotification(player1.username, player1.discordId, player1.elo, changes.player1NewElo, p1OldTotal, p1OldTotal + 1).catch(() => {});
-        sendRankUpNotification(player2.username, player2.discordId, player2.elo, changes.player2NewElo, p2OldTotal, p2OldTotal + 1).catch(() => {});
+          const p1OldTotal = player1.wins + player1.losses + player1.draws;
+          const p2OldTotal = player2.wins + player2.losses + player2.draws;
+          sendRankUpNotification(player1.username, player1.discordId, p1OldElo, changes.player1NewElo, p1OldTotal, p1OldTotal + 1).catch(() => {});
+          sendRankUpNotification(player2.username, player2.discordId, p2OldElo, changes.player2NewElo, p2OldTotal, p2OldTotal + 1).catch(() => {});
+        }
       }
     }
   } catch (eloErr) {
@@ -733,8 +766,10 @@ async function finalizeGameEnd(
             prisma.user.findUnique({ where: { id: room.guestId! } }),
           ]);
           if (!p1Retry || !p2Retry) return false;
+          const p1RetryOldElo = getElo(p1Retry);
+          const p2RetryOldElo = getElo(p2Retry);
           const retryChanges = calculateEloChanges({
-            player1Elo: p1Retry.elo, player2Elo: p2Retry.elo,
+            player1Elo: p1RetryOldElo, player2Elo: p2RetryOldElo,
             winner: winner === 'player1' ? 'player1' : 'player2',
             player1Score: p1Score, player2Score: p2Score,
             player1ConsecWins: p1Retry.consecutiveWins ?? 0, player1ConsecLosses: p1Retry.consecutiveLosses ?? 0,
@@ -743,23 +778,25 @@ async function finalizeGameEnd(
           const p1S = winner === 'player1' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
           const p2S = winner === 'player2' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
           const [uP1, uP2] = await Promise.all([
-            prisma.user.update({ where: { id: room.hostId! }, data: { elo: retryChanges.player1NewElo, ...p1S, consecutiveWins: retryChanges.player1NewConsecWins, consecutiveLosses: retryChanges.player1NewConsecLosses } }),
-            prisma.user.update({ where: { id: room.guestId! }, data: { elo: retryChanges.player2NewElo, ...p2S, consecutiveWins: retryChanges.player2NewConsecWins, consecutiveLosses: retryChanges.player2NewConsecLosses } }),
+            prisma.user.update({ where: { id: room.hostId! }, data: { [eloField]: retryChanges.player1NewElo, ...p1S, consecutiveWins: retryChanges.player1NewConsecWins, consecutiveLosses: retryChanges.player1NewConsecLosses } as never }),
+            prisma.user.update({ where: { id: room.guestId! }, data: { [eloField]: retryChanges.player2NewElo, ...p2S, consecutiveWins: retryChanges.player2NewConsecWins, consecutiveLosses: retryChanges.player2NewConsecLosses } as never }),
           ]);
-          eloData = { player1Delta: retryChanges.player1Delta, player2Delta: retryChanges.player2Delta, player1NewElo: uP1.elo, player2NewElo: uP2.elo, player1TotalGames: uP1.wins + uP1.losses + uP1.draws, player2TotalGames: uP2.wins + uP2.losses + uP2.draws };
+          eloData = { player1Delta: retryChanges.player1Delta, player2Delta: retryChanges.player2Delta, player1NewElo: getElo(uP1), player2NewElo: getElo(uP2), player1TotalGames: uP1.wins + uP1.losses + uP1.draws, player2TotalGames: uP2.wins + uP2.losses + uP2.draws };
           console.log(`[Socket] ELO retry (${label}) succeeded`);
           prisma.eloHistory.create({
             data: {
-              userId: room.hostId!, opponentId: room.guestId!, opponentUsername: p2Retry.username, opponentElo: p2Retry.elo,
-              oldElo: p1Retry.elo, newElo: retryChanges.player1NewElo, delta: retryChanges.player1Delta,
+              userId: room.hostId!, opponentId: room.guestId!, opponentUsername: p2Retry.username, opponentElo: p2RetryOldElo,
+              oldElo: p1RetryOldElo, newElo: retryChanges.player1NewElo, delta: retryChanges.player1Delta,
               result: winner === 'player1' ? 'win' : 'loss', myScore: p1Score, opponentScore: p2Score, isRanked: true,
+              eloType,
             },
           }).catch((e) => console.warn(`[Socket] EloHistory write 1 (${label}) failed:`, e instanceof Error ? e.message : e));
           prisma.eloHistory.create({
             data: {
-              userId: room.guestId!, opponentId: room.hostId!, opponentUsername: p1Retry.username, opponentElo: p1Retry.elo,
-              oldElo: p2Retry.elo, newElo: retryChanges.player2NewElo, delta: retryChanges.player2Delta,
+              userId: room.guestId!, opponentId: room.hostId!, opponentUsername: p1Retry.username, opponentElo: p1RetryOldElo,
+              oldElo: p2RetryOldElo, newElo: retryChanges.player2NewElo, delta: retryChanges.player2Delta,
               result: winner === 'player2' ? 'win' : 'loss', myScore: p2Score, opponentScore: p1Score, isRanked: true,
+              eloType,
             },
           }).catch((e) => console.warn(`[Socket] EloHistory write 2 (${label}) failed:`, e instanceof Error ? e.message : e));
           return true;
@@ -822,6 +859,7 @@ async function finalizeGameEnd(
       player1Score: p1Score,
       player2Score: p2Score,
       isRanked: room.isRanked,
+      isEvolving,
       eloDelta: eloData?.player1Delta ?? null,
       newElo: eloData?.player1NewElo,
       totalGames: eloData?.player1TotalGames,
@@ -837,6 +875,7 @@ async function finalizeGameEnd(
       player1Score: p1Score,
       player2Score: p2Score,
       isRanked: room.isRanked,
+      isEvolving,
       eloDelta: eloData?.player2Delta ?? null,
       newElo: eloData?.player2NewElo,
       totalGames: eloData?.player2TotalGames,
@@ -892,6 +931,7 @@ async function finalizeGameEnd(
       player1Score: p1Score,
       player2Score: p2Score,
       eloChange: eloData?.player1Delta ?? 0,
+      isEvolving: room.isEvolving === true,
       completedAt: new Date(),
     };
 
@@ -1437,6 +1477,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               missionCards: room.guestDeck.missions,
             },
             gameMode: room.gameMode,
+            ...buildEvolvingGameConfigExtras(room),
           };
 
           room.gameState = GameEngine.createGame(config);
@@ -1488,7 +1529,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     
-    socket.on('room:create', async (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; sealedSetChoice?: string; isAnonymous?: boolean }) => {
+    socket.on('room:create', async (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; sealedSetChoice?: string; isAnonymous?: boolean }) => {
       if (isMaintenanceActive()) {
         socket.emit('room:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
         return;
@@ -1522,7 +1563,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         code = generateRoomCode();
       } while (rooms.has(code));
 
-      const VALID_MODES = ['casual', 'ranked', 'sealed'] as const;
+      const VALID_MODES = ['casual', 'ranked', 'sealed', 'evolving'] as const;
       const requestedMode = data.gameMode ?? (data.isSealed ? 'sealed' : data.isRanked ? 'ranked' : 'casual');
       const gameMode = (VALID_MODES as readonly string[]).includes(requestedMode) ? requestedMode : 'casual';
       const safeBoosterCount = data.sealedBoosterCount === 4 || data.sealedBoosterCount === 5 || data.sealedBoosterCount === 6 ? data.sealedBoosterCount : 6;
@@ -1539,9 +1580,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
         hostDeck: null,
         guestDeck: null,
         isPrivate: data.isPrivate ?? false,
-        isRanked: gameMode === 'ranked',
+        isRanked: gameMode === 'ranked' || gameMode === 'evolving',
         isAnonymous: data.isAnonymous ?? false,
         gameMode,
+        isEvolving: gameMode === 'evolving',
+        hostEvolvingPoints: 0,
+        guestEvolvingPoints: 0,
         createdAt: Date.now(),
         hostName: safeHostName,
         replayInitialState: null,
@@ -1710,6 +1754,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               player1: { userId: room.hostId, isAI: false, deck: room.hostDeck!.characters, missionCards: room.hostDeck!.missions },
               player2: { userId: room.guestId!, isAI: false, deck: room.guestDeck!.characters, missionCards: room.guestDeck!.missions },
               gameMode: room.gameMode,
+              ...buildEvolvingGameConfigExtras(room),
             };
             const { resetIdCounter } = require('@/lib/engine/utils/id');
             resetIdCounter();
@@ -1918,11 +1963,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
       }
 
+      const deckPoints = computeDeckEvolvingPoints(safeDeck.characters.map((c) => c.id));
       if (socket.id === room.hostSocket) {
         room.hostDeck = safeDeck;
+        room.hostEvolvingPoints = deckPoints;
         if (safeDeckId) room.hostDeckId = safeDeckId;
       } else if (socket.id === room.guestSocket) {
         room.guestDeck = safeDeck;
+        room.guestEvolvingPoints = deckPoints;
         if (safeDeckId) room.guestDeckId = safeDeckId;
       }
 
@@ -1960,6 +2008,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             missionCards: room.guestDeck.missions,
           },
           gameMode: room.gameMode,
+          ...buildEvolvingGameConfigExtras(room),
         };
 
         room.gameState = GameEngine.createGame(config);
@@ -2576,6 +2625,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
           isRanked: wantRanked,
           isAnonymous: false,
           gameMode: wantRanked ? 'ranked' : 'casual',
+          isEvolving: false,
+          hostEvolvingPoints: 0,
+          guestEvolvingPoints: 0,
           createdAt: Date.now(),
           replayInitialState: null,
           replayStateSnapshots: null,

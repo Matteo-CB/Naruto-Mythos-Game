@@ -115,6 +115,9 @@ export async function POST(
     if (matchMutatingActions.has(action) && tournament.status === 'cancelled') {
       return NextResponse.json({ error: 'Tournament is cancelled, no match changes allowed' }, { status: 400 });
     }
+    if (matchMutatingActions.has(action) && tournament.status === 'completed' && action !== 'resetMatch') {
+      return NextResponse.json({ error: 'Tournament is completed, no match changes allowed' }, { status: 400 });
+    }
 
     switch (action) {
       
@@ -473,6 +476,7 @@ export async function POST(
         }
 
         const newStatus = match.player1Id && match.player2Id ? 'ready' : 'pending';
+        const wasForfeit = match.status === 'forfeit';
 
         await prisma.tournamentMatch.update({
           where: { id: resetMatchId },
@@ -496,14 +500,71 @@ export async function POST(
           });
         }
 
+        let tournamentStatusReverted = false;
+        if (wasForfeit && tournament.status === 'completed' && tournament.format === 'swiss') {
+          await prisma.tournament.update({
+            where: { id: tournamentId },
+            data: {
+              status: 'in_progress',
+              winnerId: null,
+              winnerUsername: null,
+              completedAt: null,
+            },
+          });
+          if (tournament.winnerId) {
+            await prisma.user.update({
+              where: { id: tournament.winnerId },
+              data: { tournamentWins: { decrement: 1 } },
+            }).catch((err) => {
+              console.error('[Tournament] failed to decrement tournamentWins on revert:', err);
+            });
+          }
+          tournamentStatusReverted = true;
+        }
+
+        let timerArmed = false;
+        if (newStatus === 'ready' && match.player1Id && match.player2Id) {
+          const io = getSocketIO();
+          if (io) {
+            const { startAbsenceTimer } = await import('@/lib/tournament/absenceManager');
+            const { fireAbsenceTimerCallback } = await import('@/lib/socket/tournamentHandlers');
+            const p1 = match.player1Id;
+            const p2 = match.player2Id;
+            const deadline = startAbsenceTimer(resetMatchId, async () => {
+              await fireAbsenceTimerCallback(io, tournamentId, resetMatchId, p1, p2, null, false);
+            });
+            await prisma.tournamentMatch.update({
+              where: { id: resetMatchId },
+              data: { absenceDeadline: deadline, absentPlayerId: null },
+            });
+            io.to(`tournament:${tournamentId}`).emit('tournament:absence-timer', {
+              matchId: resetMatchId, playerId: null, deadline: deadline.toISOString(),
+            });
+            timerArmed = true;
+          }
+        }
+
         await logAdminAction({
           tournamentId, actorId, actorUsername,
           action: 'resetMatch',
           matchId: resetMatchId,
-          details: { round: match.round, matchIndex: match.matchIndex, bracket: match.bracket },
+          details: {
+            round: match.round,
+            matchIndex: match.matchIndex,
+            bracket: match.bracket,
+            wasForfeit,
+            tournamentStatusReverted,
+            timerArmed,
+          },
         });
         await broadcastTournamentRefresh(tournamentId);
-        return NextResponse.json({ success: true, message: 'Match reset (cascade cleanup applied)' });
+        return NextResponse.json({
+          success: true,
+          message: 'Match reset (cascade cleanup applied)',
+          wasForfeit,
+          tournamentStatusReverted,
+          timerArmed,
+        });
       }
 
       

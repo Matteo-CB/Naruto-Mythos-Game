@@ -68,6 +68,7 @@ interface SocketStore {
     player1Score: number;
     player2Score: number;
     isRanked?: boolean;
+    isEvolving?: boolean;
     eloDelta?: number | null;
     newElo?: number;
     totalGames?: number;
@@ -105,7 +106,7 @@ interface SocketStore {
 
   connect: (userId?: string, username?: string) => Promise<void>;
   disconnect: () => void;
-  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean) => void;
+  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean) => void;
   joinRoom: (code: string, userId: string) => void;
   selectDeck: (characters: unknown[], missions: unknown[], deckId?: string) => void;
   changeDeck: () => void;
@@ -448,6 +449,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           player1Score: number;
           player2Score: number;
           isRanked?: boolean;
+          isEvolving?: boolean;
           eloDelta?: number | null;
           winReason?: 'score' | 'forfeit' | 'timeout' | 'clock' | 'idle';
           gameId?: string | null;
@@ -785,7 +787,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  createRoom: (userId: string, isPrivate = true, isRanked = false, isSealed = false, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean) => {
+  createRoom: (userId: string, isPrivate = true, isRanked = false, isSealed = false, gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean) => {
     const { socket, connected } = get();
     if (socket && connected) {
       console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}${sealedBoosterCount ? ` boosters: ${sealedBoosterCount}` : ''}${sealedSetChoice ? ` set: ${sealedSetChoice}` : ''}${isAnonymous ? ' (anonymous)' : ''}`);

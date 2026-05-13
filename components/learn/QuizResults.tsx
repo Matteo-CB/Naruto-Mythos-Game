@@ -35,6 +35,7 @@ interface QuizResultsProps {
   onRetry: () => void;
   onChangeDifficulty: () => void;
   onSaveScore?: () => Promise<void>;
+  onViewLeaderboard?: () => void;
 }
 
 
@@ -124,6 +125,7 @@ export function QuizResults({
   onRetry,
   onChangeDifficulty,
   onSaveScore,
+  onViewLeaderboard,
 }: QuizResultsProps) {
   const t = useTranslations('learn');
 
@@ -404,7 +406,22 @@ export function QuizResults({
             {t('quiz.tryAgain')}
           </button>
 
-          
+          {onViewLeaderboard && (
+            <button
+              onClick={onViewLeaderboard}
+              className="w-full px-6 py-3 text-sm uppercase tracking-wider transition-all"
+              style={{
+                backgroundColor: 'transparent',
+                border: `1px solid ${BORDER}`,
+                borderRadius: '6px',
+                color: TEXT_LIGHT,
+                cursor: 'pointer',
+              }}
+            >
+              {t('quiz.leaderboard.title')}
+            </button>
+          )}
+
           <button
             onClick={onChangeDifficulty}
             className="w-full px-6 py-3 text-sm uppercase tracking-wider transition-all"

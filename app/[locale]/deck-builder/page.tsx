@@ -20,6 +20,10 @@ import {
   PopupOverlay, PopupCornerFrame, PopupTitle, PopupActionButton,
   PopupDismissLink, SectionDivider, AngularButton,
 } from "@/components/game/PopupPrimitives";
+import { EvolvingCostMeter } from "@/components/deckBuilder/EvolvingCostMeter";
+import { EvolvingBuilderHelper } from "@/components/deckBuilder/EvolvingBuilderHelper";
+import { EvolvingDeckHolo } from "@/components/evolving/EvolvingDeckHolo";
+import { EvolvingDeckBadge } from "@/components/evolving/EvolvingDeckBadge";
 
 
 
@@ -468,6 +472,7 @@ export default function DeckBuilderPage() {
   const isSaving = useDeckBuilderStore((s) => s.isSaving);
   const loadedDeckId = useDeckBuilderStore((s) => s.loadedDeckId);
   const addError = useDeckBuilderStore((s) => s.addError);
+  const evolvingMode = useDeckBuilderStore((s) => s.evolvingMode);
   const addErrorKey = useDeckBuilderStore((s) => s.addErrorKey);
   const addErrorParams = useDeckBuilderStore((s) => s.addErrorParams);
   const setDeckName = useDeckBuilderStore((s) => s.setDeckName);
@@ -1357,6 +1362,7 @@ export default function DeckBuilderPage() {
               <span style={{ color: deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e' }}>
                 {t("deckBuilder.missions", { count: deckMissions.length })}
               </span>
+              <EvolvingCostMeter compact />
               {validation.valid && <span style={{ color: '#3e8b3e' }}>{t("deckBuilder.validation.valid")}</span>}
               {loadedDeckId && (
                 <span className="text-[8px] uppercase px-1.5 py-0.5" style={{
@@ -1375,7 +1381,13 @@ export default function DeckBuilderPage() {
             </div>
           )}
 
-          
+
+          {evolvingMode && (
+            <div className="px-4 py-2 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+              <EvolvingBuilderHelper />
+            </div>
+          )}
+
           <div className="flex-1 overflow-y-auto px-4 py-3" style={{ minHeight: 0 }}>
             {renderDeckContent()}
           </div>
@@ -1918,13 +1930,15 @@ export default function DeckBuilderPage() {
                 const isActive = loadedDeckId === deck.id;
                 const isConfirming = confirmDeleteId === deck.id;
                 return (
-                  <div key={deck.id} className="flex items-center gap-3 px-3 py-2" style={{
+                  <EvolvingDeckHolo key={deck.id} points={deck.evolvingPoints ?? 0} enabled={deck.evolvingCompatible === true} intensity="subtle">
+                  <div className="flex items-center gap-3 px-3 py-2" style={{
                     backgroundColor: 'rgba(255,255,255,0.02)',
                     borderLeft: `3px solid ${isActive ? '#3e8b3e' : 'rgba(196,163,90,0.2)'}`,
                   }}>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-xs font-medium truncate" style={{ color: '#e0e0e0' }}>{deck.name}</span>
+                        {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints ?? 0} />}
                         {isActive && (
                           <span className="text-[8px] uppercase px-1 py-0.5 flex-shrink-0" style={{
                             backgroundColor: 'rgba(62,139,62,0.15)', borderLeft: '2px solid #3e8b3e', color: '#3e8b3e',
@@ -1954,6 +1968,7 @@ export default function DeckBuilderPage() {
                       </div>
                     )}
                   </div>
+                  </EvolvingDeckHolo>
                 );
               })}
             </div>

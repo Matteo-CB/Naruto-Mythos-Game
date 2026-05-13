@@ -349,6 +349,7 @@
       "backToTournament": "Retour au Tournoi",
       "tieBreaker": "Égalité brisee par le detenteur du Jeton d'Edge",
       "rankedMatch": "Match Classe",
+      "evolvingMatch": "Match Evolving",
       "opponentAbandoned": "L'adversaire a abandonne",
       "youAbandoned": "Vous avez abandonne",
       "opponentTimedOut": "L'adversaire a dépasse le temps",
@@ -937,6 +938,7 @@
       "invalidMission": "Index de mission invalide.",
       "targetNotFound": "Personnage cible introuvable.",
       "cannotUpgradeOpponent": "Impossible d'UPGRADE le personnage adverse.",
+      "cannotUpgradeControlled": "Impossible d'UPGRADE un personnage que tu controles mais ne possedes pas.",
       "upgradeSameName": "L'UPGRADE doit porter le même nom de personnage.",
       "flexibleUpgradeRestriction": "Impossible d'UPGRADE sur un Invocation ou Orochimaru.",
       "upgradeHigherCost": "L'UPGRADE doit avoir un coût strictement supérieur. Nouveau : {newCost}, Actuel : {currentCost}.",
@@ -1181,6 +1183,54 @@
     "linkError": "Erreur de liaison Discord",
     "usedByAnother": "Ce compte Discord est déjà lie a un autre utilisateur"
   },
+  "evolving": {
+    "costLabel": "{points}/{max} pt",
+    "compatibleBadge": "Compatible",
+    "notCompatibleBadge": "Set restreint",
+    "overBudgetBadge": "Hors budget",
+    "modeOn": "Mode Evolving ON",
+    "modeOff": "Mode Evolving",
+    "rules": {
+      "title": "Evolving Mode",
+      "close": "Fermer",
+      "intro": "Chaque joueur a {max} points Hero a depenser sur une liste selectionnee de personnages.",
+      "costRule": "Chaque carte de la liste coute 1 ou 2 points. Ton Ton et Shikamaru 021 coutent 1pt total pour 1 OU 2 copies.",
+      "bonusRule": "Au debut du match, le joueur avec moins de points commence avec la difference en points de mission.",
+      "setRule": "Format restreint au set KS (Konoha Shido). Les decks avec des cartes d'autres sets ne sont pas compatibles Evolving.",
+      "freeRule": "Les cartes non listees (mais du set KS) coutent 0 points. Mixe librement avec les personnages Hero.",
+      "cardListTitle": "Liste des cartes",
+      "flatBadge": "Forfait 1pt"
+    },
+    "helper": {
+      "title": "Assistant Evolving",
+      "exit": "Quitter",
+      "description": "Ajoute rapidement des personnages Hero dans ton budget de {max} points.",
+      "remainingLabel": "Restant",
+      "addAria": "Ajouter {name}",
+      "hint": "Astuce : les cartes non listees sont gratuites. Mixe les cartes Hero avec d'autres personnages KS."
+    },
+    "lobbySubtitle": "Format avec budget Hero. Moins de budget = avance en points de mission.",
+    "lobbyDeckPickerTitle": "Tes decks compatibles",
+    "noCompatibleDeck": "Tu n'as aucun deck compatible Evolving (5 points max).",
+    "noDeckCtaTitle": "Demarrage rapide",
+    "noDeckCtaDesc": "Utilise un deck KS aleatoire a 0 point. Tu commenceras avec jusqu'a 5 points de mission si ton adversaire joue Hero.",
+    "useRandomDeck": "Utiliser un deck Evolving aleatoire",
+    "lobbyError": {
+      "fetchFailed": "Echec du chargement des decks. Rafraichis la page.",
+      "randomDeckFailed": "Echec de la generation du deck aleatoire. Reessaie."
+    },
+    "lobby": {
+      "title": "Evolving Mode",
+      "topPlayersTitle": "Top 5 Evolving",
+      "viewAll": "Voir tout",
+      "noTopPlayers": "Aucun joueur classe. Sois le premier.",
+      "publicRoomsHeader": "Salons Evolving publics",
+      "createPublicEvolvingRoom": "Creer un salon Evolving public",
+      "privateRoomDesc": "Match Evolving classe. Partage le code a un ami.",
+      "pickDeckTitle": "Choisis ton deck",
+      "evolvingDecksOnly": "Compatibles Evolving uniquement"
+    }
+  },
   "deckManager": {
     "title": "Gérer les Decks",
     "manageButton": "Gérer les Decks",
@@ -1318,6 +1368,10 @@
   "leaderboard": {
     "title": "Classement",
     "subtitle": "Minimum {count} matchs classes pour obtenir une ligue",
+    "toggleType": {
+      "ranked": "Classe",
+      "evolving": "Evolving"
+    },
     "rank": "Rang",
     "player": "Joueur",
     "elo": "ELO",
@@ -1347,6 +1401,12 @@
     "loadMore": "Charger plus",
     "discordLinked": "Discord",
     "rank": "Rang",
+    "evolvingTitle": "Evolving Mode",
+    "evolvingElo": "ELO Evolving",
+    "evolvingMatches": "Matchs Evolving",
+    "wins": "Victoires",
+    "losses": "Defaites",
+    "winRate": "Taux de victoire",
     "rankNames": {
       "academyStudent": "Etudiant de l'Academie",
       "genin": "Genin",
@@ -1733,6 +1793,8 @@
         "accuracy": "Precision",
         "difficulty": "Difficulte",
         "date": "Date",
+        "questions": "Q",
+        "you": "Toi",
         "noScores": "Aucun score",
         "loading": "Chargement du classement...",
         "error": "Échec du chargement",
@@ -2539,6 +2601,16 @@
     "removeBanned": "Retirez les cartes bannies",
     "cardBanned": "BANNIE",
     "resultsTitle": "Résultats des tournois",
+    "results": {
+      "podium": "Classement final",
+      "matchHistory": "Historique des matchs",
+      "outcomePlayed": "Joué",
+      "outcomeForfeit": "Forfait (absence)",
+      "outcomeDoubleForfeit": "Double absence",
+      "outcomeBye": "Bye",
+      "outcomeIncomplete": "Incomplet",
+      "forfeitSummary": "{single} forfait(s) par absence, {double} double absence(s). Les joueurs concernés étaient absents au début du match."
+    },
     "pastTournaments": "Tournois passes",
     "viewBracket": "Voir l'arbre",
     "noResults": "Aucun tournoi terminé",
@@ -2599,6 +2671,8 @@
     "matchTimeLimit": "Duree max par match",
     "joinTimeLimit": "Temps pour rejoindre",
     "modeRestricted": "Restreint",
+    "modeEvolving": "Evolving",
+    "modeEvolvingHint": "Chaque joueur a 5 points Hero a depenser. Le deck au budget le plus bas commence le match avec des points de mission en bonus.",
     "restrictedSettings": "Restrictions de Deck",
     "allowedGroups": "Groupes autorisés",
     "allowedGroupsHint": "Laisser vide pour autoriser tous les groupes",
@@ -2627,6 +2701,7 @@
     "deckErrors": "Erreurs du deck",
     "changeDeck": "Changer de deck",
     "noDeckWarning": "Aucun deck enregistré. Creez-en un dans le constructeur de deck, puis revenez le sélectionner.",
+    "noEvolvingDeckWarning": "Aucun deck compatible Evolving. Construis-en un (cartes KS uniquement, 5 points Hero max) dans le constructeur, puis reviens.",
     "noValidDeckHint": "Aucun de vos decks ne respecte les règles du tournoi ? Creez ou modifiez-en un dans le constructeur de deck.",
     "rulesTitle": "Règles du tournoi",
     "rulesFormat": "Format : Elimination directe (bracket)",
@@ -2634,6 +2709,7 @@
     "rulesClassic": "Classique : Amenez votre propre deck (30+ cartes, 3 missions)",
     "rulesSealed": "Scelle : Construisez un deck a partir de boosters ouverts aleatoirement",
     "rulesRestricted": "Restreint : Construisez un deck en respectant les restrictions ci-dessous",
+    "rulesEvolving": "Evolving : cartes KS uniquement, 5 points Hero max par deck. Le deck au budget le plus bas commence chaque match avec des points de mission en bonus.",
     "rulesDeck": "Vous devez sélectionner un deck valide avant le début du tournoi sinon vous serez disqualifie",
     "rulesMatch": "Les matchs ont une limite de temps. Si le temps expire, le joueur avec le plus de points de mission gagne",
     "rulesAbsence": "Vous devez rejoindre votre match dans le temps imparti sinon vous serez forfait",
@@ -2753,7 +2829,9 @@
       "noAllowedKeyword": "La carte {name} n'a aucun mot-clé autorisé.",
       "keywordBanned": "Le mot-clé \"{keyword}\" est banni (carte : {name}).",
       "tooMuchChakra": "La carte {name} coûte {chakra} chakra (max : {max}).",
-      "tooManyOfRarity": "Trop de cartes {rarity} : {count} (max : {max})."
+      "tooManyOfRarity": "Trop de cartes {rarity} : {count} (max : {max}).",
+      "evolvingSetNotAllowed": "La carte {cardId} appartient au set {set} qui n'est pas autorisé en mode Evolving.",
+      "evolvingOverBudget": "Le deck utilise {points} points Evolving (max {max})."
     }
   },
   "playHub": {
@@ -2761,6 +2839,7 @@
     "subtitle": "Choisissez votre mode de jeu",
     "onlineTitle": "Jouer en ligne",
     "onlineDesc": "Affrontez de vrais joueurs en classe ou en privé",
+    "evolvingDesc": "Format avec budget Hero",
     "aiTitle": "Jouer contre l IA",
     "aiDesc": "Entrainez-vous contre des IA de difficulte variable",
     "hotseatTitle": "Solo contre soi-même",
