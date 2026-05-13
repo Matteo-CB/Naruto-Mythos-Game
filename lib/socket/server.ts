@@ -2196,9 +2196,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
         console.log(`[Socket] Action applied, new phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
 
         
-        if (data.action.type !== 'PASS' || room.gameState.consecutiveTimeouts[player] === 0) {
-          room.gameState.consecutiveTimeouts[player] = 0;
-        }
 
 
         broadcastState(room, io);
