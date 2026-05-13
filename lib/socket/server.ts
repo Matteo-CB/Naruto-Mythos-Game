@@ -2182,6 +2182,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (!code) return;
       const room = rooms.get(code);
       if (!room || !room.gameState) return;
+      syncChessClock(room);
       const player = socket.id === room.hostSocket ? 'player1' : 'player2';
       const visibleState = GameEngine.getVisibleState(room.gameState, player);
       const playerNames = {
