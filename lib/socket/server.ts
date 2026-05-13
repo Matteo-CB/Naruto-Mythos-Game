@@ -1131,6 +1131,8 @@ export async function handleMulliganIdleTimeout(
     console.log(`[ChessClock] mulligan-idle cancel inside tournament match ${room.tournamentMatchId}: leaving match for tournament handler`);
   }
 
+  broadcastActiveGames(io);
+
   setTimeout(() => {
     if (!rooms.has(code)) return;
     if (room.hostSocket) playerRooms.delete(room.hostSocket);
