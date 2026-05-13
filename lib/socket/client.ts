@@ -982,6 +982,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     set({
       isSpectating: false, spectatingRoomCode: null, spectatorCount: 0,
       visibleState: null, playerNames: null, gameStarted: false,
+      chessClock: null,
       chatMessages: [], unreadChatCount: 0,
     });
   },
