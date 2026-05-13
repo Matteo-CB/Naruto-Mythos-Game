@@ -35,6 +35,7 @@ export interface RoomData {
   replayInitialState: GameState | null;
   replayStateSnapshots: GameState[] | null;
   replaySnapshotLogLengths: number[] | null;
+  replayClockSnapshots: ChessClockState[] | null;
   finalized: boolean;
   pendingEloHistoryIds?: string[];
   mulliganDeadline?: number | null;
@@ -879,6 +880,7 @@ async function finalizeGameEnd(
       actionHistory: room.gameState.actionHistory ?? [],
       stateSnapshots: room.replayStateSnapshots ?? null,
       snapshotLogLengths: room.replaySnapshotLogLengths ?? null,
+      clockSnapshots: room.replayClockSnapshots ?? null,
     } : null;
 
     const baseData = {
@@ -904,13 +906,13 @@ async function finalizeGameEnd(
         return buf;
       });
       tryStates.push(() => {
-        const trimmed = { ...replayForDb, stateSnapshots: null, snapshotLogLengths: null };
+        const trimmed = { ...replayForDb, stateSnapshots: null, snapshotLogLengths: null, clockSnapshots: null };
         const buf = compressReplay(trimmed);
         if (buf.length > 12_000_000) throw new Error(`compressed size ${(buf.length / 1_000_000).toFixed(1)}MB`);
         return buf;
       });
       tryStates.push(() => {
-        const trimmed = { ...replayForDb, stateSnapshots: null, snapshotLogLengths: null, actionHistory: [], log: replayForDb.log.slice(-200) };
+        const trimmed = { ...replayForDb, stateSnapshots: null, snapshotLogLengths: null, clockSnapshots: null, actionHistory: [], log: replayForDb.log.slice(-200) };
         return compressReplay(trimmed);
       });
     }
@@ -1413,6 +1415,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           room.replayInitialState.actionHistory = [];
           room.replayStateSnapshots = [];
           room.replaySnapshotLogLengths = [];
+          room.replayClockSnapshots = [];
 
 
           let hostName = 'Player 1';
@@ -1515,6 +1518,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         replayInitialState: null,
         replayStateSnapshots: null,
         replaySnapshotLogLengths: null,
+        replayClockSnapshots: null,
         finalized: false,
         isSealed: gameMode === 'sealed',
         sealedBoosterCount: safeBoosterCount,
@@ -1685,6 +1689,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             room.replayInitialState.actionHistory = [];
             room.replayStateSnapshots = [];
             room.replaySnapshotLogLengths = [];
+            room.replayClockSnapshots = [];
             syncChessClock(room);
             startChessClockTickLoop(room, io);
             const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
@@ -1933,6 +1938,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         room.replayInitialState.actionHistory = [];
         room.replayStateSnapshots = [];
         room.replaySnapshotLogLengths = [];
+        room.replayClockSnapshots = [];
 
         console.log(`[Socket] Game created, phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
         console.log(`[Socket] P1 hand: ${room.gameState.player1.hand.length}, P2 hand: ${room.gameState.player2.hand.length}`);
@@ -2118,13 +2124,17 @@ export function setupSocketHandlers(io: SocketIOServer) {
           data.action,
         );
 
-        
+        syncChessClock(room);
+
         if (room.replayStateSnapshots && room.replaySnapshotLogLengths) {
           room.replaySnapshotLogLengths.push(room.gameState.log.length);
           const snap = deepClone(room.gameState);
           snap.log = [];
           snap.actionHistory = [];
           room.replayStateSnapshots.push(snap);
+          if (room.replayClockSnapshots) {
+            room.replayClockSnapshots.push({ ...room.chessClock });
+          }
         }
 
         
@@ -2337,6 +2347,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       room.replayInitialState = null;
       room.replayStateSnapshots = null;
       room.replaySnapshotLogLengths = null;
+      room.replayClockSnapshots = null;
       room.finalized = false;
       room.coinFlipDone = { player1: false, player2: false };
       clearTournamentJoinTimer(room);
@@ -2540,6 +2551,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           replayInitialState: null,
           replayStateSnapshots: null,
           replaySnapshotLogLengths: null,
+          replayClockSnapshots: null,
           finalized: false,
           isSealed: false,
           sealedBoosterCount: 6,

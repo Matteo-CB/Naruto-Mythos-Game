@@ -7,6 +7,8 @@ import type { GameState, PlayerID, CharacterInPlay, ActiveMission, CharacterCard
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { calculateCharacterPower } from '@/lib/engine/phases/PowerCalculation';
+import type { ChessClockState } from '@/lib/timing/chessClock';
+import { ReplayChessClockDisplay } from '@/components/replay/ReplayChessClockDisplay';
 
 
 
@@ -802,6 +804,7 @@ function PlayerBar({
   isTop,
   locale,
   onCardClick,
+  clockSnapshot,
 }: {
   player: PlayerID;
   state: GameState;
@@ -809,6 +812,7 @@ function PlayerBar({
   isTop: boolean;
   locale?: 'en' | 'fr';
   onCardClick?: (card: CharacterCard | MissionCard) => void;
+  clockSnapshot?: ChessClockState | null;
 }) {
   const t = useTranslations();
   const ps = state[player];
@@ -930,6 +934,10 @@ function PlayerBar({
             {t('game.discard')} ({ps.discardPile?.length ?? 0})
           </button>
         </div>
+
+        {clockSnapshot && (
+          <ReplayChessClockDisplay snapshot={clockSnapshot} player={player} isOpponent={isTop} />
+        )}
       </div>
 
       
@@ -995,9 +1003,10 @@ interface ReplayBoardProps {
   backgroundUrl?: string;
   viewAs?: PlayerID;
   onCardClick?: (card: CharacterCard | MissionCard, missionCtx?: { rank: string; basePoints: number; rankBonus: number }) => void;
+  clockSnapshot?: ChessClockState | null;
 }
 
-export function ReplayBoard({ state, playerNames, locale, backgroundUrl, viewAs, onCardClick }: ReplayBoardProps) {
+export function ReplayBoard({ state, playerNames, locale, backgroundUrl, viewAs, onCardClick, clockSnapshot }: ReplayBoardProps) {
   const t = useTranslations();
   const phaseColor = phaseColorMap[state.phase] ?? '#888';
 
@@ -1035,7 +1044,7 @@ export function ReplayBoard({ state, playerNames, locale, backgroundUrl, viewAs,
       </div>
 
       
-      <PlayerBar player={topPlayer} state={state} playerNames={playerNames} isTop={true} locale={locale} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} />
+      <PlayerBar player={topPlayer} state={state} playerNames={playerNames} isTop={true} locale={locale} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} clockSnapshot={clockSnapshot} />
 
       
       <PlayerHandRow cards={state[topPlayer].hand} locale={locale} player={topPlayer} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} />
@@ -1064,7 +1073,7 @@ export function ReplayBoard({ state, playerNames, locale, backgroundUrl, viewAs,
       <PlayerHandRow cards={state[bottomPlayer].hand} locale={locale} player={bottomPlayer} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} />
 
       
-      <PlayerBar player={bottomPlayer} state={state} playerNames={playerNames} isTop={false} locale={locale} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} />
+      <PlayerBar player={bottomPlayer} state={state} playerNames={playerNames} isTop={false} locale={locale} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} clockSnapshot={clockSnapshot} />
     </div>
   );
 }

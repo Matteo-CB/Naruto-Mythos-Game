@@ -17,6 +17,7 @@ import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/u
 import { PanelFrame } from '@/components/game/PopupPrimitives';
 import { useSession } from 'next-auth/react';
 import type { GameState, GamePhase, GameAction, PlayerID, CharacterCard, MissionCard } from '@/lib/engine/types';
+import type { ChessClockState } from '@/lib/timing/chessClock';
 
 interface ReplayLogEntry {
   turn: number;
@@ -58,6 +59,7 @@ interface GameData {
     actionHistory?: Array<{ player: PlayerID; action: GameAction; createdIds?: string[] }>;
     stateSnapshots?: GameState[] | null;
     snapshotLogLengths?: number[] | null;
+    clockSnapshots?: ChessClockState[] | null;
   } | null;
 }
 
@@ -736,6 +738,7 @@ function VisualReplay({
   defaultViewAs,
   stateSnapshots,
   snapshotLogLengths,
+  clockSnapshots,
 }: {
   initialState: GameState;
   actionHistory: Array<{ player: PlayerID; action: GameAction; createdIds?: string[] }>;
@@ -746,6 +749,7 @@ function VisualReplay({
   defaultViewAs?: PlayerID;
   stateSnapshots?: GameState[] | null;
   snapshotLogLengths?: number[] | null;
+  clockSnapshots?: ChessClockState[] | null;
 }) {
   const tr = useTranslations('replay');
   const t = useTranslations();
@@ -1265,6 +1269,8 @@ function VisualReplay({
   const currentState = states[currentStep];
   if (!currentState) return null;
 
+  const currentClock = (clockSnapshots && currentStep > 0 && clockSnapshots[currentStep - 1]) ? clockSnapshots[currentStep - 1] : null;
+
   return (
     <div
       className="w-screen flex flex-col overflow-hidden no-select"
@@ -1342,7 +1348,7 @@ function VisualReplay({
 
       
       <div className="flex-1 min-h-0 relative z-10">
-        <ReplayBoard state={currentState} playerNames={playerNames} locale={locale} backgroundUrl={backgroundUrl} viewAs={viewAs} onCardClick={handleCardClick} />
+        <ReplayBoard state={currentState} playerNames={playerNames} locale={locale} backgroundUrl={backgroundUrl} viewAs={viewAs} onCardClick={handleCardClick} clockSnapshot={currentClock} />
       </div>
 
       
@@ -1706,6 +1712,7 @@ export default function ReplayPage({
         defaultViewAs={defaultViewAs}
         stateSnapshots={game.gameState.stateSnapshots ?? null}
         snapshotLogLengths={game.gameState.snapshotLogLengths ?? null}
+        clockSnapshots={game.gameState.clockSnapshots ?? null}
       />
     );
   }

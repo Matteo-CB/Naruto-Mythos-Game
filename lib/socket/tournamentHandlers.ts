@@ -206,6 +206,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             replayInitialState: null,
             replayStateSnapshots: null,
             replaySnapshotLogLengths: null,
+            replayClockSnapshots: null,
             finalized: false,
             isSealed: isSealedTournament,
             sealedBoosterCount: (tournamentMeta?.sealedBoosterCount ?? 5) as 4 | 5 | 6,
