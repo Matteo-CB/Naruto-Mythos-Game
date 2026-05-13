@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import type { ChessClockState } from '@/lib/timing/chessClock';
 import { snapshotForBroadcast } from '@/lib/timing/chessClock';
 
@@ -33,6 +34,7 @@ export const ReplayChessClockDisplay = React.memo(function ReplayChessClockDispl
   player,
   isOpponent,
 }: ReplayChessClockDisplayProps) {
+  const t = useTranslations('game.clock');
   if (!snapshot) return null;
 
   const anchorNow = snapshot.activeStartedAt ?? 0;
@@ -71,6 +73,7 @@ export const ReplayChessClockDisplay = React.memo(function ReplayChessClockDispl
       {idleWarningUsed && (
         <span
           aria-label="idle-warning-used"
+          title={t('firstWarningUsed')}
           style={{
             display: 'inline-block',
             width: 6,

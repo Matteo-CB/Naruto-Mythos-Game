@@ -101,10 +101,14 @@
     "turn": "Turn {turn}",
     "turnLabel": "Turn",
     "clock": {
+      "label": "Time",
       "idleWarningTitle": "Inactivity detected",
       "idleWarningMessage": "Auto-action in {seconds}. Take an action to reset.",
       "idleSecondTitle": "Second inactivity",
-      "idleSecondMessage": "Defeat in {seconds} if no action."
+      "idleSecondMessage": "Defeat in {seconds} if no action.",
+      "idleAutoPass": "Inactivity: turn passed automatically",
+      "idleAutoSkip": "Inactivity: choice skipped automatically",
+      "firstWarningUsed": "Your idle warning is used. Next inactivity = defeat."
     },
     "phase": {
       "start": "Start Phase",

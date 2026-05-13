@@ -101,10 +101,14 @@
     "turn": "Tour {turn}",
     "turnLabel": "Tour",
     "clock": {
+      "label": "Temps",
       "idleWarningTitle": "Inactivité détectée",
       "idleWarningMessage": "Action automatique dans {seconds}. Joue pour réinitialiser.",
       "idleSecondTitle": "Deuxième inactivité",
-      "idleSecondMessage": "Défaite dans {seconds} si pas d'action."
+      "idleSecondMessage": "Défaite dans {seconds} si pas d'action.",
+      "idleAutoPass": "Inactivité : tour passé automatiquement",
+      "idleAutoSkip": "Inactivité : choix passé automatiquement",
+      "firstWarningUsed": "Avertissement utilisé. Prochaine inactivité = défaite."
     },
     "phase": {
       "start": "Phase de Début",

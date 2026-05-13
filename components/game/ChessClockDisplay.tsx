@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { useSocketStore, computeChessClockRemainingMs } from '@/lib/socket/client';
 import { useGameScale } from '@/components/game/GameScaleContext';
 import { playSound } from '@/lib/sound/SoundManager';
@@ -59,6 +60,7 @@ function pulseAnimForRemaining(remainingMs: number): PulseSpec | null {
 }
 
 export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player, isOpponent }: ChessClockDisplayProps) {
+  const t = useTranslations('game.clock');
   const chessClock = useSocketStore((s) => s.chessClock);
   const playerRole = useSocketStore((s) => s.playerRole);
   const { isMobile } = useGameScale();
@@ -175,6 +177,7 @@ export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player,
       {idleWarningUsed && (
         <span
           aria-label="idle-warning-used"
+          title={t('firstWarningUsed')}
           style={{
             display: 'inline-block',
             width: 6,
