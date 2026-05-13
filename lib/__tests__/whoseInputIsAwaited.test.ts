@@ -392,4 +392,14 @@ describe('syncChessClock orchestration', () => {
     expect(room.chessClock.player1.remainingMs).toBe(CHESS_CLOCK_INITIAL_MS - 10_000);
     expect(room.chessClock.active).toBe('player2');
   });
+
+  it('treats null/undefined/empty-string from whoseInputIsAwaited as no-input-awaited (defensive)', () => {
+    const room = makeMockRoom(makeState({ phase: 'action', activePlayer: 'player1', turn: 1 }));
+    syncChessClock(room, 1_000);
+    expect(room.chessClock.active).toBe('player1');
+    room.gameState = null;
+    syncChessClock(room, 5_000);
+    expect(room.chessClock.active).toBe(null);
+    expect(room.chessClockLastInputKey).toBe(null);
+  });
 });
