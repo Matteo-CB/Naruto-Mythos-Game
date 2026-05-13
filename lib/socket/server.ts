@@ -273,14 +273,16 @@ export function handleChessClockIdleLimit(room: RoomData, player: PlayerID, io: 
 
 function applyChessClockIdleAuto(room: RoomData, player: PlayerID, io: SocketIOServer, action: GameAction): void {
   if (!room.gameState || room.finalized) return;
-  room.chessClock = consumeChessClockIdleWarning(room.chessClock);
+  let newState: GameState;
   try {
-    room.gameState = GameEngine.applyAction(room.gameState, player, action);
+    newState = GameEngine.applyAction(room.gameState, player, action);
   } catch (err) {
     console.error(`[ChessClock] auto-action ${action.type} failed:`, err instanceof Error ? err.message : err);
     handleChessClockExpiry(room, player, io, 'idle-unhandled');
     return;
   }
+  room.gameState = newState;
+  room.chessClock = consumeChessClockIdleWarning(room.chessClock);
   console.log(`[ChessClock] ${room.code}: auto-${action.type} for ${player} (idle warning consumed)`);
   const winner = GameEngine.getWinner(room.gameState);
   broadcastState(room, io);

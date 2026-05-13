@@ -237,7 +237,7 @@ describe('handleChessClockIdleLimit', () => {
     expect(applySpy).not.toHaveBeenCalled();
   });
 
-  it('applyAction throwing during auto-decline falls back to FORFEIT', () => {
+  it('applyAction throwing during auto-decline falls back to FORFEIT (warning NOT consumed)', () => {
     const { io } = makeIoMock();
     let callCount = 0;
     applySpy.mockImplementation((state: any, _player, action: any) => {
@@ -252,6 +252,20 @@ describe('handleChessClockIdleLimit', () => {
     handleChessClockIdleLimit(room, 'player1', io);
     expect(applySpy).toHaveBeenCalledTimes(2);
     expect((applySpy.mock.calls[1][2] as GameAction).type).toBe('FORFEIT');
+    expect(room.chessClock.player1.idleWarningUsed).toBe(false);
+  });
+
+  it('auto-action that ends the game triggers finalizeGameEnd via getWinner', () => {
+    const { io } = makeIoMock();
+    winnerSpy.mockReturnValue('player2');
+    const room = makeRoom({
+      gameState: makeState({ phase: 'action', activePlayer: 'player1' }),
+    });
+    handleChessClockIdleLimit(room, 'player1', io);
+    expect(applySpy).toHaveBeenCalled();
+    expect((applySpy.mock.calls[0][2] as GameAction).type).toBe('PASS');
+    expect(winnerSpy).toHaveBeenCalled();
+    expect(room.chessClock.player1.idleWarningUsed).toBe(true);
   });
 
   it('idle for player2 when player2 has the pending action -> their warning is consumed (not player1s)', () => {
