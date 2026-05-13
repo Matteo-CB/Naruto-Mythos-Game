@@ -1,11 +1,39 @@
 {
   "entries": [
     {
+      "date": "2026-05-13",
+      "title_fr": "Nouveau système de chrono en parties en ligne",
+      "title_en": "New game clock in online matches",
+      "changes_fr": [
+        "Nouveau chrono en parties en ligne uniquement : chaque joueur a 15 minutes au total, son chrono ne tourne que quand c'est à lui de jouer.",
+        "Quand ton chrono atteint zéro, défaite immédiate, comme un forfait classique.",
+        "Si tu restes inactif 3 minutes pendant un choix, le jeu passe ou refuse automatiquement pour toi (cette aide ne s'utilise qu'une fois par partie).",
+        "Une deuxième inactivité de 3 minutes te fait perdre directement la partie.",
+        "Au mulligan, si personne ne décide pendant 1 minute, la partie est annulée sans impact sur le classement.",
+        "Le minuteur par action de 60 secondes et l'ancien système de déconnexions (3 coupures forfait, délai de grâce) sont remplacés par ce chrono total.",
+        "Si tu te déconnectes en partie, ton chrono continue de tourner, il faut revenir avant qu'il ne tombe à zéro.",
+        "Bug corrigé : plus de partie bloquée après une reconnexion, le serveur garde toujours la main sur le temps.",
+        "Les deux chronos sont affichés en permanence sur le plateau, passent à l'orange sous 1 minute puis au rouge sous 30 secondes, avec une alarme sonore sous 10 secondes.",
+        "Pas de chrono dans les parties contre l'IA ni en hotseat, rien ne change pour ces modes."
+      ],
+      "changes_en": [
+        "New game clock in online matches only: each player has 15 minutes total, ticking only while it is their move.",
+        "When your clock hits zero, instant defeat, same as a regular forfeit.",
+        "If you stay idle 3 minutes during a choice, the game passes or skips automatically for you (this safety net only fires once per match).",
+        "A second 3-minute idle period makes you lose the match directly.",
+        "At mulligan, if nobody decides for 1 minute, the match is cancelled with no impact on your ranking.",
+        "The 60-second per-action timer and the old disconnect rules (3 disconnects forfeit, grace period) are replaced by this total clock.",
+        "If you disconnect during a match, your clock keeps running; you need to come back before it hits zero.",
+        "Bug fixed: matches no longer get stuck after a reconnect, the server always owns the time.",
+        "Both clocks are shown at all times on the board, turning orange under 1 minute then red under 30 seconds, with a sound alarm under 10 seconds.",
+        "No clock in vs-AI or hotseat games, nothing changes for those modes."
+      ]
+    },
+    {
       "date": "2026-05-12",
       "title_fr": "Connexion en ligne et tournois",
       "title_en": "Online connection and tournaments",
       "changes_fr": [
-        "Les petites coupures de connexion en partie (moins de 15 secondes) ne comptent plus dans le quota de déconnexions et ne déclenchent plus de forfait surprise quand tu reviens vite. Le délai de grâce passe aussi à 1 minute 30.",
         "Page tournoi : un panneau au-dessus du bracket montre en direct l'état de chaque match du round en cours (en attente, en partie, terminé), avec le temps écoulé et le compte à rebours d'absence pour chaque match.",
         "Chaque case du bracket affiche aussi son propre mini chrono d'absence quand un joueur risque le forfait.",
         "Tournois : tu peux maintenant quitter un tournoi en cours, ton match actif est alors forfaité proprement et le tour suivant continue normalement.",
@@ -16,7 +44,6 @@
         "Quiz : les questions qui montraient uniquement un prénom (par exemple \"Naruto\" alors qu'il existe plusieurs versions) précisent maintenant le titre ou le numéro de la carte, et la bonne réponse est toujours sélectionnable."
       ],
       "changes_en": [
-        "Brief network blips in-game (under 15 seconds) no longer count toward the disconnect cap and no longer trigger a surprise forfeit when you reconnect quickly. The grace period also bumps to 1 minute 30.",
         "Tournament page: a live panel above the bracket shows the state of every match in the current round (waiting, playing, finished), with elapsed time and the absence countdown per match.",
         "Each bracket cell also shows its own small absence countdown when a player is at risk of forfeit.",
         "Tournaments: you can now leave a tournament in progress; your active match is forfeited cleanly and the next round continues normally.",
@@ -49,7 +76,6 @@
         "Tournois : après un redémarrage serveur, les chronos d'absence en cours sont correctement repris, même pour le premier tour.",
         "Tournois Swiss : quand il ne reste plus qu'un joueur actif, le tournoi se termine immédiatement avec ce joueur déclaré vainqueur, au lieu de tourner à vide.",
         "En partie, le journal et les animations ne se redessinent plus à chaque coup mais uniquement quand quelque chose change vraiment, ce qui réduit nettement le travail du téléphone et améliore la fluidité.",
-        "Le décompte de temps d'action ne tourne plus en arrière-plan quand tu changes d'onglet, et reprend exact à la seconde près à ton retour.",
         "Page d'accueil : les rafraîchissements automatiques s'arrêtent quand tu changes d'onglet, ce qui évite de tirer pour rien sur la batterie et la connexion.",
         "Shikamaru Nara (022) : son embuscade trouve désormais l'ennemi joué lors de la manche précédente quand Shikamaru est révélé au début d'une nouvelle manche, et plus seulement dans la même manche.",
         "Sur téléphone en partie, la fenêtre de détail d'une carte prend maintenant tout l'écran avec l'image et le texte côte à côte, au lieu d'un petit panneau écrasé en bas.",
@@ -73,7 +99,6 @@
         "Tournaments: after a server restart, ongoing absence timers resume correctly, including for round one.",
         "Swiss tournaments: when only one active player remains, the tournament ends immediately with that player as the winner instead of stalling.",
         "In-game, the log and animations no longer redraw on every action and only react when something actually changes, noticeably easing the phone's workload and smoothing gameplay.",
-        "The action timer no longer keeps running in the background when you switch tabs, and resumes precisely to the second when you come back.",
         "Home page: auto-refresh stops when you switch tabs, saving battery and bandwidth.",
         "Shikamaru Nara (022): his ambush now finds the enemy played during the previous round when Shikamaru is revealed at the start of a new round, not just within the same round.",
         "On phone in-game, the card detail window now takes the full screen with the image and text side by side, instead of a small panel squashed at the bottom.",
