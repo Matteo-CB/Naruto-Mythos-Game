@@ -127,9 +127,8 @@ export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player,
 
   const padX = isMobile ? 6 : 8;
   const padY = isMobile ? 2 : 3;
-  const fontSize = isMobile ? 12 : 14;
-  const labelFont = isMobile ? 8 : 9;
-  const minW = isMobile ? 50 : 64;
+  const fontSize = isMobile ? 13 : 14;
+  const minW = isMobile ? 56 : 68;
 
   const containerStyle: React.CSSProperties = {
     backgroundColor: 'rgba(255, 255, 255, 0.04)',
@@ -141,14 +140,10 @@ export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player,
     minWidth: minW,
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 4,
   };
 
-  const labelStyle: React.CSSProperties = {
-    color: '#666666',
-    fontSize: labelFont,
-    letterSpacing: '0.05em',
-  };
   const valueStyle: React.CSSProperties = {
     color,
     fontSize,
@@ -159,7 +154,6 @@ export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player,
 
   return (
     <div style={containerStyle} aria-label={isActive ? 'chess-clock-active' : 'chess-clock'}>
-      <span style={labelStyle}>{isMobile ? '' : 'TIME'}</span>
       {pulse ? (
         <motion.span style={valueStyle} animate={pulse.animate} transition={pulse.transition}>
           {formatRemaining(remaining)}
@@ -169,7 +163,6 @@ export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player,
       )}
       {idleWarningUsed && (
         <span
-          title="Idle warning used"
           aria-label="idle-warning-used"
           style={{
             display: 'inline-block',
