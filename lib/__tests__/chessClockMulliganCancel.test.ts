@@ -61,7 +61,6 @@ function makeRoom(overrides: Partial<RoomData> = {}): RoomData {
     chessClockTickTimer: null,
     chessClockMulliganTimer: null,
     chessClockLastInputKey: null,
-    mulliganTimer: null,
     mulliganDeadline: null,
     spectators: new Map(),
     gameState: makeState(),
