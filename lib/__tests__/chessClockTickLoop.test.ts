@@ -53,6 +53,8 @@ function makeState(overrides: Partial<GameState> = {}): GameState {
 function makeRoom(overrides: Partial<RoomData> = {}): RoomData {
   return {
     code: 'TEST01',
+    hostSocket: 'host-sock',
+    guestSocket: 'guest-sock',
     chessClock: createChessClock(),
     chessClockTickTimer: null,
     chessClockMulliganTimer: null,
@@ -144,6 +146,20 @@ describe('startChessClockTickLoop / stopChessClockTickLoop', () => {
     expect(room.chessClockTickTimer).toBeNull();
   });
 
+  it('startChessClockTickLoop refuses to arm if room is finalized', () => {
+    const { io } = makeIoMock();
+    const room = makeRoom({ finalized: true });
+    startChessClockTickLoop(room, io);
+    expect(room.chessClockTickTimer).toBeNull();
+  });
+
+  it('startChessClockTickLoop refuses to arm if gameState is null', () => {
+    const { io } = makeIoMock();
+    const room = makeRoom({ gameState: null });
+    startChessClockTickLoop(room, io);
+    expect(room.chessClockTickTimer).toBeNull();
+  });
+
   it('ticks fire onChessClockTick roughly every 1s', () => {
     const { io, emits } = makeIoMock();
     const room = makeRoom();
@@ -174,17 +190,19 @@ describe('onChessClockTick', () => {
     expect(emits).toHaveLength(0);
   });
 
-  it('broadcasts game:clock-update to the room when active', () => {
+  it('broadcasts game:clock-update directly to host and guest sockets when active', () => {
     const { io, emits } = makeIoMock();
     const room = makeRoom();
     room.chessClock = arm(room.chessClock, 'player1', 1_000_000);
     withFixedNow(1_000_500, () => onChessClockTick(room, io));
-    const clockEmit = emits.find((e) => e.event === 'game:clock-update' && e.room === room.code);
-    expect(clockEmit).toBeDefined();
-    expect(clockEmit!.payload.chessClock.active).toBe('player1');
+    const hostEmit = emits.find((e) => e.event === 'game:clock-update' && e.room === 'host-sock');
+    const guestEmit = emits.find((e) => e.event === 'game:clock-update' && e.room === 'guest-sock');
+    expect(hostEmit).toBeDefined();
+    expect(guestEmit).toBeDefined();
+    expect(hostEmit!.payload.chessClock.active).toBe('player1');
   });
 
-  it('also broadcasts to the spectator namespace when spectators are present', () => {
+  it('also broadcasts to the spectator namespace when spectators are present (single emit, not duplicate via room.code)', () => {
     const { io, emits } = makeIoMock();
     const room = makeRoom();
     room.chessClock = arm(room.chessClock, 'player1', 1_000_000);
@@ -192,6 +210,8 @@ describe('onChessClockTick', () => {
     withFixedNow(1_000_500, () => onChessClockTick(room, io));
     const specEmit = emits.find((e) => e.event === 'game:clock-update' && e.room === `spec:${room.code}`);
     expect(specEmit).toBeDefined();
+    const roomCodeEmit = emits.find((e) => e.event === 'game:clock-update' && e.room === room.code);
+    expect(roomCodeEmit).toBeUndefined();
   });
 
   it('skips the spectator broadcast when no spectators are present', () => {
@@ -203,13 +223,25 @@ describe('onChessClockTick', () => {
     expect(specEmit).toBeUndefined();
   });
 
-  it('clears the tick interval handle when called on a finalized room', () => {
+  it('skips host emit when hostSocket is null but still broadcasts to guest', () => {
+    const { io, emits } = makeIoMock();
+    const room = makeRoom({ hostSocket: null as never });
+    room.chessClock = arm(room.chessClock, 'player1', 1_000_000);
+    withFixedNow(1_000_500, () => onChessClockTick(room, io));
+    const guestEmit = emits.find((e) => e.event === 'game:clock-update' && e.room === 'guest-sock');
+    expect(guestEmit).toBeDefined();
+    const allEmits = emits.filter((e) => e.event === 'game:clock-update');
+    expect(allEmits).toHaveLength(1);
+  });
+
+  it('clears the tick interval handle when called on a finalized room with a stale timer', () => {
     const { io } = makeIoMock();
     vi.useFakeTimers();
     try {
-      const room = makeRoom({ finalized: true });
+      const room = makeRoom();
       startChessClockTickLoop(room, io);
       expect(room.chessClockTickTimer).not.toBeNull();
+      room.finalized = true;
       onChessClockTick(room, io);
       expect(room.chessClockTickTimer).toBeNull();
     } finally {
@@ -217,13 +249,14 @@ describe('onChessClockTick', () => {
     }
   });
 
-  it('clears the tick interval handle when called with null gameState', () => {
+  it('clears the tick interval handle when called with null gameState after a stale timer', () => {
     const { io } = makeIoMock();
     vi.useFakeTimers();
     try {
-      const room = makeRoom({ gameState: null });
+      const room = makeRoom();
       startChessClockTickLoop(room, io);
       expect(room.chessClockTickTimer).not.toBeNull();
+      room.gameState = null;
       onChessClockTick(room, io);
       expect(room.chessClockTickTimer).toBeNull();
     } finally {

@@ -187,7 +187,8 @@ export function buildChessClockBroadcast(state: ChessClockState, now: number): C
 
 function broadcastChessClockTick(room: RoomData, io: SocketIOServer, now: number): void {
   const payload = { chessClock: buildChessClockBroadcast(room.chessClock, now) };
-  io.to(room.code).emit('game:clock-update', payload);
+  if (room.hostSocket) io.to(room.hostSocket).emit('game:clock-update', payload);
+  if (room.guestSocket) io.to(room.guestSocket).emit('game:clock-update', payload);
   if (room.spectators.size > 0) {
     io.to(`spec:${room.code}`).emit('game:clock-update', payload);
   }
@@ -238,6 +239,8 @@ export function onChessClockTick(room: RoomData, io: SocketIOServer): void {
 }
 
 export function startChessClockTickLoop(room: RoomData, io: SocketIOServer): void {
+  if (room.finalized) return;
+  if (!room.gameState) return;
   if (room.chessClockTickTimer) return;
   room.chessClockTickTimer = setInterval(() => {
     onChessClockTick(room, io);
@@ -2293,6 +2296,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(code);
       if (!room || !room.gameState) return;
       syncChessClock(room);
+      startChessClockTickLoop(room, io);
       const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
       const player = socket.id === room.hostSocket ? 'player1' : 'player2';
       const visibleState = GameEngine.getVisibleState(room.gameState, player);
