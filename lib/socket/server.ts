@@ -1362,6 +1362,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
         socket.emit('game:started');
         socket.emit('game:state-update', { visibleState, playerRole: player, playerNames, chessClock });
+        socket.emit('chat:history', { messages: room.chatMessages.slice(-50) });
 
         if (room.gameState.phase === 'mulligan' && room.mulliganDeadline && room.chessClockMulliganTimer) {
           socket.emit('game:mulligan-deadline', {
