@@ -39,7 +39,7 @@ interface SocketStore {
     eloDelta?: number | null;
     newElo?: number;
     totalGames?: number;
-    winReason?: 'score' | 'forfeit' | 'timeout';
+    winReason?: 'score' | 'forfeit' | 'timeout' | 'clock' | 'idle';
     gameId?: string | null;
     replayData?: unknown;
     tournamentId?: string | null;
@@ -411,7 +411,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           player2Score: number;
           isRanked?: boolean;
           eloDelta?: number | null;
-          winReason?: 'score' | 'forfeit' | 'timeout';
+          winReason?: 'score' | 'forfeit' | 'timeout' | 'clock' | 'idle';
           gameId?: string | null;
           replayData?: unknown;
           tournamentId?: string | null;

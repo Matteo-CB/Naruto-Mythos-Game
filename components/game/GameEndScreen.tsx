@@ -185,7 +185,7 @@ export function GameEndScreen() {
   const myPlayer = visibleState.myPlayer;
   const playerWon = winner === myPlayer;
   const isDraw = winner === null;
-  const isForfeit = winReason === 'forfeit' || winReason === 'timeout';
+  const isForfeit = winReason === 'forfeit' || winReason === 'timeout' || winReason === 'clock' || winReason === 'idle';
 
   const myScore = visibleState.myState.missionPoints;
   const oppScore = visibleState.opponentState.missionPoints;
@@ -196,10 +196,16 @@ export function GameEndScreen() {
   let headingColor: string;
   if (isForfeit) {
     if (forfeitedByMe) {
-      headingText = winReason === 'timeout' ? t('game.end.youTimedOut') : t('game.end.youAbandoned');
+      if (winReason === 'clock') headingText = t('game.end.youLostOnClock');
+      else if (winReason === 'idle') headingText = t('game.end.youLostByIdle');
+      else if (winReason === 'timeout') headingText = t('game.end.youTimedOut');
+      else headingText = t('game.end.youAbandoned');
       headingColor = '#b33e3e';
     } else {
-      headingText = winReason === 'timeout' ? t('game.end.opponentTimedOut') : t('game.end.opponentAbandoned');
+      if (winReason === 'clock') headingText = t('game.end.opponentLostOnClock');
+      else if (winReason === 'idle') headingText = t('game.end.opponentLostByIdle');
+      else if (winReason === 'timeout') headingText = t('game.end.opponentTimedOut');
+      else headingText = t('game.end.opponentAbandoned');
       headingColor = '#c4a35a';
     }
   } else if (isDraw) {

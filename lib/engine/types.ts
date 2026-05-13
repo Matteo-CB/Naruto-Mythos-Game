@@ -285,7 +285,7 @@ export type GameAction =
   | { type: 'SELECT_TARGET'; pendingActionId: string; selectedTargets: string[] }
   | { type: 'DECLINE_OPTIONAL_EFFECT'; pendingEffectId: string }
   | { type: 'REORDER_EFFECTS'; selectedEffectId: string }
-  | { type: 'FORFEIT'; reason: 'abandon' | 'timeout' }
+  | { type: 'FORFEIT'; reason: 'abandon' | 'timeout' | 'clock' | 'idle' }
   | { type: 'ADVANCE_PHASE' };
 
 

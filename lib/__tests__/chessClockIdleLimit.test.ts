@@ -240,7 +240,7 @@ describe('handleChessClockIdleLimit', () => {
   it('applyAction throwing during auto-decline falls back to FORFEIT (warning NOT consumed)', () => {
     const { io } = makeIoMock();
     let callCount = 0;
-    applySpy.mockImplementation((state: any, _player, action: any) => {
+    applySpy.mockImplementation((state: any, _player: any, action: any) => {
       callCount++;
       if (callCount === 1 && action.type === 'DECLINE_OPTIONAL_EFFECT') {
         throw new Error('boom');

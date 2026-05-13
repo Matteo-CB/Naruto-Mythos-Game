@@ -196,18 +196,25 @@ function broadcastChessClockTick(room: RoomData, io: SocketIOServer, now: number
 
 export type ChessClockExpiryReason = 'bank-empty' | 'idle-mandatory' | 'idle-second' | 'idle-unhandled';
 
+export function chessClockExpiryReasonToWinReason(reason: ChessClockExpiryReason): 'clock' | 'idle' {
+  return reason === 'bank-empty' ? 'clock' : 'idle';
+}
+
 export function handleChessClockExpiry(room: RoomData, loser: PlayerID, io: SocketIOServer, reason: ChessClockExpiryReason): void {
   if (!room.gameState || room.finalized) return;
-  console.log(`[ChessClock] ${room.code}: ${loser} loses by clock (${reason})`);
+  const winReason = chessClockExpiryReasonToWinReason(reason);
+  console.log(`[ChessClock] ${room.code}: ${loser} loses by clock (reason=${reason}, winReason=${winReason})`);
   try {
-    room.gameState = GameEngine.applyAction(room.gameState, loser, { type: 'FORFEIT', reason: 'timeout' });
+    room.gameState = GameEngine.applyAction(room.gameState, loser, { type: 'FORFEIT', reason: winReason });
   } catch (err) {
     console.error('[ChessClock] applyAction(FORFEIT) failed:', err instanceof Error ? err.message : err);
     return;
   }
   stopChessClockTickLoop(room);
+  room.chessClock = disarmChessClock(room.chessClock, Date.now());
+  room.chessClockLastInputKey = null;
   broadcastState(room, io);
-  finalizeGameEnd(room, room.code, io, 'timeout').catch((err) => {
+  finalizeGameEnd(room, room.code, io, winReason).catch((err) => {
     console.error('[ChessClock] finalizeGameEnd error:', err instanceof Error ? err.message : err);
   });
 }
@@ -555,11 +562,13 @@ function clearActionTimer(room: RoomData): void {
 }
 
 
+export type GameEndWinReason = 'score' | 'forfeit' | 'timeout' | 'clock' | 'idle';
+
 async function finalizeGameEnd(
   room: RoomData,
   code: string,
   io: SocketIOServer,
-  winReason: 'score' | 'forfeit' | 'timeout' = 'score',
+  winReason: GameEndWinReason = 'score',
 ): Promise<void> {
   if (!room.gameState) return;
   if (room.finalized) {
