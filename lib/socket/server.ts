@@ -2610,7 +2610,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
         });
 
         if (data.action.type === 'MULLIGAN' && room.gameState.phase === 'mulligan') {
-          armMulliganIdleTimer(room, code, io);
+          const playerJustMulliganed = !prevState[player].hasMulliganed && room.gameState[player].hasMulliganed;
+          if (playerJustMulliganed) {
+            armMulliganIdleTimer(room, code, io);
+          }
         }
 
 
