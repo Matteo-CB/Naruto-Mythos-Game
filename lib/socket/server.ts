@@ -13,7 +13,7 @@ import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, val
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
 import { isMaintenanceActive, activateMaintenance, setDrainTimeout, setCheckInterval } from '@/lib/socket/maintenance';
-import { createChessClock, arm as armChessClock, disarm as disarmChessClock, resetIdle as resetChessClockIdle, snapshotForBroadcast as snapshotChessClockForBroadcast, bankEmpty as chessClockBankEmpty, idleMs as chessClockIdleMs, CHESS_CLOCK_IDLE_LIMIT_MS, CHESS_CLOCK_IDLE_TOAST_MS, type ChessClockState } from '@/lib/timing/chessClock';
+import { createChessClock, arm as armChessClock, disarm as disarmChessClock, resetIdle as resetChessClockIdle, snapshotForBroadcast as snapshotChessClockForBroadcast, bankEmpty as chessClockBankEmpty, idleMs as chessClockIdleMs, consumeIdleWarning as consumeChessClockIdleWarning, CHESS_CLOCK_IDLE_LIMIT_MS, CHESS_CLOCK_IDLE_TOAST_MS, type ChessClockState } from '@/lib/timing/chessClock';
 
 export interface RoomData {
   code: string;
@@ -194,7 +194,9 @@ function broadcastChessClockTick(room: RoomData, io: SocketIOServer, now: number
   }
 }
 
-function handleChessClockExpiry(room: RoomData, loser: PlayerID, io: SocketIOServer, reason: 'bank-empty' | 'idle-mandatory' | 'idle-second'): void {
+export type ChessClockExpiryReason = 'bank-empty' | 'idle-mandatory' | 'idle-second' | 'idle-unhandled';
+
+export function handleChessClockExpiry(room: RoomData, loser: PlayerID, io: SocketIOServer, reason: ChessClockExpiryReason): void {
   if (!room.gameState || room.finalized) return;
   console.log(`[ChessClock] ${room.code}: ${loser} loses by clock (${reason})`);
   try {
@@ -210,13 +212,83 @@ function handleChessClockExpiry(room: RoomData, loser: PlayerID, io: SocketIOSer
   });
 }
 
-function handleChessClockIdleLimit(room: RoomData, active: PlayerID, io: SocketIOServer): void {
+function isPendingEffectDeclinable(effect: { isOptional: boolean; isMandatory: boolean; rootOptional?: boolean }): boolean {
+  if (effect.rootOptional) return true;
+  if (effect.isOptional) return true;
+  return !effect.isMandatory;
+}
+
+export function handleChessClockIdleLimit(room: RoomData, player: PlayerID, io: SocketIOServer): void {
   if (!room.gameState || room.finalized) return;
-  if (room.chessClock[active].idleWarningUsed) {
-    handleChessClockExpiry(room, active, io, 'idle-second');
+  const state = room.gameState;
+
+  if (room.chessClock[player].idleWarningUsed) {
+    handleChessClockExpiry(room, player, io, 'idle-second');
     return;
   }
-  console.log(`[ChessClock] ${room.code}: ${active} reached 3 min idle limit (Phase 4 will handle auto-pass/skip)`);
+
+  const pendingActionForPlayer = state.pendingActions.find((a) => a.player === player);
+  if (pendingActionForPlayer) {
+    const sourceEffect = pendingActionForPlayer.sourceEffectId
+      ? state.pendingEffects.find((e) => e.id === pendingActionForPlayer.sourceEffectId)
+      : undefined;
+    if (sourceEffect && isPendingEffectDeclinable(sourceEffect)) {
+      applyChessClockIdleAuto(room, player, io, {
+        type: 'DECLINE_OPTIONAL_EFFECT',
+        pendingEffectId: sourceEffect.id,
+      });
+      return;
+    }
+    handleChessClockExpiry(room, player, io, 'idle-mandatory');
+    return;
+  }
+
+  const optionalEffect = state.pendingEffects.find(
+    (e) => !e.resolved && e.selectingPlayer === player && isPendingEffectDeclinable(e),
+  );
+  if (optionalEffect) {
+    applyChessClockIdleAuto(room, player, io, {
+      type: 'DECLINE_OPTIONAL_EFFECT',
+      pendingEffectId: optionalEffect.id,
+    });
+    return;
+  }
+
+  const mandatoryEffect = state.pendingEffects.find(
+    (e) => !e.resolved && e.selectingPlayer === player,
+  );
+  if (mandatoryEffect) {
+    handleChessClockExpiry(room, player, io, 'idle-mandatory');
+    return;
+  }
+
+  if (state.phase === 'action' && state.activePlayer === player && !state.pendingForcedResolver) {
+    applyChessClockIdleAuto(room, player, io, { type: 'PASS' });
+    return;
+  }
+
+  console.warn(`[ChessClock] ${room.code}: idle-unhandled fallback for ${player} (phase=${state.phase})`);
+  handleChessClockExpiry(room, player, io, 'idle-unhandled');
+}
+
+function applyChessClockIdleAuto(room: RoomData, player: PlayerID, io: SocketIOServer, action: GameAction): void {
+  if (!room.gameState || room.finalized) return;
+  room.chessClock = consumeChessClockIdleWarning(room.chessClock);
+  try {
+    room.gameState = GameEngine.applyAction(room.gameState, player, action);
+  } catch (err) {
+    console.error(`[ChessClock] auto-action ${action.type} failed:`, err instanceof Error ? err.message : err);
+    handleChessClockExpiry(room, player, io, 'idle-unhandled');
+    return;
+  }
+  console.log(`[ChessClock] ${room.code}: auto-${action.type} for ${player} (idle warning consumed)`);
+  const winner = GameEngine.getWinner(room.gameState);
+  broadcastState(room, io);
+  if (winner) {
+    finalizeGameEnd(room, room.code, io, 'score').catch((err) => {
+      console.error('[ChessClock] finalizeGameEnd after auto-action failed:', err instanceof Error ? err.message : err);
+    });
+  }
 }
 
 export function onChessClockTick(room: RoomData, io: SocketIOServer): void {
