@@ -1500,9 +1500,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       
       if (room.gameState) {
+        syncChessClock(room);
         const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
         const visibleState = GameEngine.getVisibleState(room.gameState, player);
-        
+
         socket.emit('game:started');
         socket.emit('game:state-update', { visibleState, playerRole: player, playerNames });
 
@@ -1753,6 +1754,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           });
           
           if (room.gameState) {
+            syncChessClock(room);
             const visible = GameEngine.getVisibleState(room.gameState, 'player1');
             const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
             socket.emit('game:state-update', { visibleState: visible, playerRole: 'player1', playerNames });
