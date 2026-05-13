@@ -554,6 +554,11 @@ function clearActionTimer(room: RoomData): void {
     room.mulliganTimer = null;
     room.mulliganDeadline = null;
   }
+  if (room.chessClockMulliganTimer) {
+    clearTimeout(room.chessClockMulliganTimer);
+    room.chessClockMulliganTimer = null;
+    room.mulliganDeadline = null;
+  }
   if (room.tournamentJoinTimer) {
     clearTimeout(room.tournamentJoinTimer);
     room.tournamentJoinTimer = null;
@@ -1760,13 +1765,19 @@ export function setupSocketHandlers(io: SocketIOServer) {
         socket.emit('game:started');
         socket.emit('game:state-update', { visibleState, playerRole: player, playerNames, chessClock });
 
-        
+        if (room.gameState.phase === 'mulligan' && room.mulliganDeadline && room.chessClockMulliganTimer) {
+          socket.emit('game:mulligan-deadline', {
+            deadline: room.mulliganDeadline,
+            durationMs: Math.max(0, room.mulliganDeadline - Date.now()),
+          });
+        }
+
         if (room.gameState.phase === 'action' && !room.actionTimer) {
           startActionTimer(room, roomCode, io);
         }
 
-        
-        
+
+
         if (rehydrateOpponentDisconnect) {
           socket.emit('game:opponent-disconnected', rehydrateOpponentDisconnect);
         }

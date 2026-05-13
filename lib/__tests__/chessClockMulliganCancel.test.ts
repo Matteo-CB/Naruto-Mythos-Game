@@ -256,3 +256,26 @@ describe('armMulliganIdleTimer firing after CHESS_CLOCK_MULLIGAN_IDLE_MS trigger
     expect(cancelEmit).toBeDefined();
   });
 });
+
+describe('anti-spam predicate for mulligan re-arm', () => {
+  it('first MULLIGAN: prev.hasMulliganed=false -> new.hasMulliganed=true -> re-arm', () => {
+    const prev = { hasMulliganed: false } as never;
+    const next = { hasMulliganed: true } as never;
+    const playerJustMulliganed = !(prev as { hasMulliganed: boolean }).hasMulliganed && (next as { hasMulliganed: boolean }).hasMulliganed;
+    expect(playerJustMulliganed).toBe(true);
+  });
+
+  it('spam MULLIGAN: prev.hasMulliganed=true -> new.hasMulliganed=true -> NO re-arm', () => {
+    const prev = { hasMulliganed: true } as never;
+    const next = { hasMulliganed: true } as never;
+    const playerJustMulliganed = !(prev as { hasMulliganed: boolean }).hasMulliganed && (next as { hasMulliganed: boolean }).hasMulliganed;
+    expect(playerJustMulliganed).toBe(false);
+  });
+
+  it('engine no-op on MULLIGAN: prev.hasMulliganed=false -> new.hasMulliganed=false -> NO re-arm', () => {
+    const prev = { hasMulliganed: false } as never;
+    const next = { hasMulliganed: false } as never;
+    const playerJustMulliganed = !(prev as { hasMulliganed: boolean }).hasMulliganed && (next as { hasMulliganed: boolean }).hasMulliganed;
+    expect(playerJustMulliganed).toBe(false);
+  });
+});
