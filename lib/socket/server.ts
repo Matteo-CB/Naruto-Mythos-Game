@@ -2503,6 +2503,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
         console.warn(`[Socket] action:perform: room ${code} has no game state`);
         return;
       }
+      if (room.finalized) {
+        console.warn(`[Socket] action:perform: room ${code} is already finalized, rejecting`);
+        return;
+      }
 
       const player = socket.id === room.hostSocket ? 'player1' : 'player2';
       console.log(`[Socket] action:perform from ${player}: ${data.action.type}, phase: ${room.gameState.phase}`);
@@ -3370,7 +3374,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           }
 
 
-          else if (room.gameState && room.gameState.phase !== 'gameOver') {
+          else if (room.gameState && room.gameState.phase !== 'gameOver' && !room.finalized) {
 
             const currentCount = player === 'player1'
               ? room.player1DisconnectCount
