@@ -40,6 +40,7 @@ export default function PlayOnlinePage() {
   const {
     connected,
     roomCode,
+    currentRoomGameMode,
     playerRole,
     opponentJoined,
     gameStarted,
@@ -317,6 +318,7 @@ export default function PlayOnlinePage() {
               onSelect={handleDeckSelect}
               allCharacters={cards.characters}
               allMissions={cards.missions}
+              evolvingOnly={currentRoomGameMode === 'evolving'}
             />
           </div>
         )}

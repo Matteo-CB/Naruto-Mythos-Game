@@ -1621,7 +1621,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       socket.join(code);
 
       console.log(`[Socket] Room ${code} created by ${data.userId} (mode: ${gameMode})`);
-      socket.emit('room:created', { code, isSealed: room.isSealed });
+      socket.emit('room:created', { code, isSealed: room.isSealed, gameMode: room.gameMode });
 
       
       if (!room.isPrivate) {
@@ -1689,8 +1689,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
             socket.emit('game:state-update', { visibleState: visible, playerRole: 'player1', playerNames, chessClock });
             socket.emit('game:started');
           } else if (room.hostDeck && room.guestDeck && room.guestSocket) {
-            
-            io.to(data.code).emit('room:player-joined', { hostId: room.hostId, guestId: room.guestId });
+
+            io.to(data.code).emit('room:player-joined', { hostId: room.hostId, guestId: room.guestId, gameMode: room.gameMode });
           }
           return;
         }
@@ -1731,6 +1731,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         hostId: room.hostId,
         guestId: room.guestId,
         isSealed: room.isSealed,
+        gameMode: room.gameMode,
       });
 
       
@@ -2590,6 +2591,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         io.to(foundRoom.code).emit('room:player-joined', {
           hostId: foundRoom.hostId,
           guestId: foundRoom.guestId,
+          gameMode: foundRoom.gameMode,
         });
 
         

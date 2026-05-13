@@ -53,6 +53,7 @@ interface SocketStore {
   userId: string | null;
   userName: string | null;
   roomCode: string | null;
+  currentRoomGameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' | null;
   playerRole: 'player1' | 'player2' | null;
   visibleState: VisibleGameState | null;
   matchmakingStatus: 'idle' | 'waiting' | 'found';
@@ -158,6 +159,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   userId: null,
   userName: null,
   roomCode: null,
+  currentRoomGameMode: null,
   playerRole: null,
   visibleState: null,
   matchmakingStatus: 'idle',
@@ -302,19 +304,19 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       
 
-      socket.on('room:created', (data: { code: string }) => {
+      socket.on('room:created', (data: { code: string; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' }) => {
         console.log('[Socket] Room created:', data.code);
-        set({ roomCode: data.code, playerRole: 'player1' });
+        set({ roomCode: data.code, playerRole: 'player1', currentRoomGameMode: data.gameMode ?? null });
       });
 
-      socket.on('room:joined', (data: { code: string; playerRole: 'player1' | 'player2'; tournamentId?: string | null }) => {
-        console.log('[Socket] Joined room:', data.code, 'tournament:', data.tournamentId ?? 'none');
-        set({ roomCode: data.code, playerRole: data.playerRole, tournamentMatchRoom: !!data.tournamentId });
+      socket.on('room:joined', (data: { code: string; playerRole: 'player1' | 'player2'; tournamentId?: string | null; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' }) => {
+        console.log('[Socket] Joined room:', data.code, 'tournament:', data.tournamentId ?? 'none', 'mode:', data.gameMode ?? 'unknown');
+        set({ roomCode: data.code, playerRole: data.playerRole, tournamentMatchRoom: !!data.tournamentId, currentRoomGameMode: data.gameMode ?? null });
       });
 
-      socket.on('room:player-joined', () => {
-        console.log('[Socket] Player joined');
-        set({ opponentJoined: true });
+      socket.on('room:player-joined', (data?: { gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' }) => {
+        console.log('[Socket] Player joined, mode:', data?.gameMode ?? 'unchanged');
+        set((s) => ({ opponentJoined: true, currentRoomGameMode: data?.gameMode ?? s.currentRoomGameMode }));
       });
 
       socket.on('room:player-left', () => {
@@ -761,6 +763,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         userId: null,
         userName: null,
         roomCode: null,
+        currentRoomGameMode: null,
         playerRole: null,
         visibleState: null,
         matchmakingStatus: 'idle',
@@ -848,6 +851,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       
       set({
         roomCode: null,
+        currentRoomGameMode: null,
         playerRole: null,
         visibleState: null,
         matchmakingStatus: 'idle',

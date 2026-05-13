@@ -12,7 +12,8 @@
         "Tu peux maintenant creer des tournois en format Evolving, avec rejet automatique des decks non compatibles.",
         "Sur ton profil, tes statistiques Evolving (ELO, victoires, defaites) sont affichees a cote de tes stats normales.",
         "Regle de jeu : un personnage que tu controles mais qui ne t'appartient pas (vole a l'adversaire) ne peut plus etre upgrade.",
-        "Bug corrige : le classement du quiz se chargeait plus, il est revenu."
+        "Bug corrige : le classement du quiz se chargeait plus, il est revenu.",
+        "Bug corrige : le bouton Deck Aleatoire dans un salon Evolving piochait parfois des cartes hors-format, il respecte maintenant les regles du mode."
       ],
       "changes_en": [
         "New Evolving Mode: each player has 5 points to spend on a list of 13 characters costing 1 or 2 points each. The player with fewer points starts the match with a Mission Point lead equal to the difference.",
@@ -22,7 +23,8 @@
         "You can now create tournaments in Evolving format, with non-compatible decks automatically rejected.",
         "On your profile, your Evolving stats (ELO, wins, losses) are shown alongside your regular stats.",
         "Rule change: a character you control but don't own (stolen from the opponent) can no longer be upgraded.",
-        "Bug fixed: the quiz leaderboard was no longer loading, it is back."
+        "Bug fixed: the quiz leaderboard was no longer loading, it is back.",
+        "Bug fixed: the Random Deck button in an Evolving room sometimes picked cards outside the format, it now respects the mode's rules."
       ]
     },
     {
