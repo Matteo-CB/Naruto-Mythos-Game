@@ -31,31 +31,16 @@ export interface RoomData {
   createdAt: number;
   hostName?: string;
   guestName?: string;
-  
-  actionTimer: ReturnType<typeof setTimeout> | null;
-  timerDeadline: number | null;
-  disconnectTimer: ReturnType<typeof setTimeout> | null;
-  
-  
-  
-  disconnectedPlayer: 'player1' | 'player2' | null;
-  disconnectDeadline: number | null;
-  
-  player1DisconnectCount: number;
-  player2DisconnectCount: number;
-  player1LastDisconnectAt?: number | null;
-  player2LastDisconnectAt?: number | null;
-  
+
   replayInitialState: GameState | null;
   replayStateSnapshots: GameState[] | null;
   replaySnapshotLogLengths: number[] | null;
   finalized: boolean;
   pendingEloHistoryIds?: string[];
-  mulliganTimer?: ReturnType<typeof setTimeout> | null;
   mulliganDeadline?: number | null;
   tournamentJoinTimer?: ReturnType<typeof setTimeout> | null;
   tournamentJoinDeadline?: number | null;
-  
+
   isSealed: boolean;
   sealedBoosterCount: 4 | 5 | 6;
   sealedSetChoice?: string;
@@ -66,9 +51,7 @@ export interface RoomData {
   tournamentGameTimer?: ReturnType<typeof setTimeout> | null;
   hostDeckId?: string;
   guestDeckId?: string;
-  
-  timerEnabled: boolean;
-  
+
   rematchOffer?: 'player1' | 'player2';
   
   tournamentId?: string;
@@ -335,14 +318,6 @@ export function stopChessClockTickLoop(room: RoomData): void {
   }
 }
 
-const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
-const MULLIGAN_TIMEOUT_MS = 60_000; // 1 minute for the mulligan + edge phase
-const EFFECT_TIMEOUT_MS = 60_000; // 1 minute per effect resolution
-const MAX_CONSECUTIVE_TIMEOUTS = 3; // 3 timeouts = auto-forfeit
-const DISCONNECT_GRACE_MS = 90_000; // 1.5 minutes before disconnect = forfeit
-const MAX_DISCONNECTS = 4; // anti-troll cap on disconnects that lasted long enough to count
-const DISCONNECT_BLIP_THRESHOLD_MS = 15_000; // disconnects shorter than this don't count toward MAX
-const DISCONNECT_DECAY_MS = 5 * 60 * 1000; // 5 minutes of stable connection forgives one prior disconnect
 const SEALED_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes for sealed deck building
 
 export const rooms = new Map<string, RoomData>();
@@ -524,7 +499,7 @@ function cleanupStaleRooms(): void {
       if (room.hostSocket) playerRooms.delete(room.hostSocket);
       if (room.guestSocket) playerRooms.delete(room.guestSocket);
       for (const [, spec] of room.spectators) playerRooms.delete(spec.socketId);
-      clearActionTimer(room);
+      clearTournamentJoinTimer(room);
       clearChessClockTimers(room);
       rooms.delete(code);
       cleaned++;
@@ -543,17 +518,7 @@ function cleanupStaleRooms(): void {
   }
 }
 
-function clearActionTimer(room: RoomData): void {
-  if (room.actionTimer) {
-    clearTimeout(room.actionTimer);
-    room.actionTimer = null;
-    room.timerDeadline = null;
-  }
-  if (room.mulliganTimer) {
-    clearTimeout(room.mulliganTimer);
-    room.mulliganTimer = null;
-    room.mulliganDeadline = null;
-  }
+function clearTournamentJoinTimer(room: RoomData): void {
   if (room.tournamentJoinTimer) {
     clearTimeout(room.tournamentJoinTimer);
     room.tournamentJoinTimer = null;
@@ -577,7 +542,7 @@ async function finalizeGameEnd(
   }
   room.finalized = true;
 
-  clearActionTimer(room);
+  clearTournamentJoinTimer(room);
   if (room.sealedTimer) {
     clearTimeout(room.sealedTimer);
     room.sealedTimer = null;
@@ -587,15 +552,9 @@ async function finalizeGameEnd(
     clearTimeout(room.tournamentGameTimer);
     room.tournamentGameTimer = null;
   }
-  if (room.disconnectTimer) {
-    clearTimeout(room.disconnectTimer);
-    room.disconnectTimer = null;
-  }
   clearChessClockTimers(room);
   room.chessClock = disarmChessClock(room.chessClock, Date.now());
   room.chessClockLastInputKey = null;
-  room.disconnectedPlayer = null;
-  room.disconnectDeadline = null;
 
   const winner = GameEngine.getWinner(room.gameState);
   if (!winner) {
@@ -1029,14 +988,6 @@ async function finalizeGameEnd(
 }
 
 
-function startMulliganTimer(
-  room: RoomData,
-  code: string,
-  io: SocketIOServer,
-): void {
-  armMulliganIdleTimer(room, code, io);
-}
-
 export function armMulliganIdleTimer(
   room: RoomData,
   code: string,
@@ -1045,10 +996,6 @@ export function armMulliganIdleTimer(
   if (room.chessClockMulliganTimer) {
     clearTimeout(room.chessClockMulliganTimer);
     room.chessClockMulliganTimer = null;
-  }
-  if (room.mulliganTimer) {
-    clearTimeout(room.mulliganTimer);
-    room.mulliganTimer = null;
   }
   if (!room.gameState || room.gameState.phase !== 'mulligan') return;
   if (room.gameState.player1.hasMulliganed && room.gameState.player2.hasMulliganed) return;
@@ -1067,10 +1014,6 @@ export function armMulliganIdleTimer(
 }
 
 function clearMulliganTimer(room: RoomData): void {
-  if (room.mulliganTimer) {
-    clearTimeout(room.mulliganTimer);
-    room.mulliganTimer = null;
-  }
   if (room.chessClockMulliganTimer) {
     clearTimeout(room.chessClockMulliganTimer);
     room.chessClockMulliganTimer = null;
@@ -1094,7 +1037,7 @@ export async function handleMulliganIdleTimeout(
   room.finalized = true;
   clearMulliganTimer(room);
   clearChessClockTimers(room);
-  clearActionTimer(room);
+  clearTournamentJoinTimer(room);
   if (room.sealedTimer) {
     clearTimeout(room.sealedTimer);
     room.sealedTimer = null;
@@ -1103,10 +1046,6 @@ export async function handleMulliganIdleTimeout(
   if (room.tournamentGameTimer) {
     clearTimeout(room.tournamentGameTimer);
     room.tournamentGameTimer = null;
-  }
-  if (room.disconnectTimer) {
-    clearTimeout(room.disconnectTimer);
-    room.disconnectTimer = null;
   }
   room.chessClock = disarmChessClock(room.chessClock, Date.now());
   room.chessClockLastInputKey = null;
@@ -1141,316 +1080,6 @@ export async function handleMulliganIdleTimeout(
     rooms.delete(code);
   }, 5_000);
 }
-
-function startActionTimer(
-  room: RoomData,
-  code: string,
-  io: SocketIOServer,
-): void {
-  clearActionTimer(room);
-  clearMulliganTimer(room);
-
-  if (!room.gameState) return;
-
-  if (room.gameState.phase !== 'action') return;
-
-  if (!room.timerEnabled) return;
-
-  const activePlayer = room.gameState.activePlayer;
-  const targetSocket = activePlayer === 'player1' ? room.hostSocket : room.guestSocket;
-
-  const deadline = Date.now() + ACTION_TIMEOUT_MS;
-  room.timerDeadline = deadline;
-
-  
-  if (targetSocket) {
-    io.to(targetSocket).emit('game:action-deadline', { deadline, durationMs: ACTION_TIMEOUT_MS });
-  }
-
-  room.actionTimer = setTimeout(async () => {
-    if (!rooms.has(code)) return; // Room was deleted (disconnect/cleanup)
-    if (!room.gameState || room.gameState.phase !== 'action') return;
-
-    const player = room.gameState.activePlayer;
-    const timeouts = room.gameState.consecutiveTimeouts[player] + 1;
-    room.gameState.consecutiveTimeouts[player] = timeouts;
-
-    console.log(`[Socket] Timer expired for ${player} in room ${code} (timeout #${timeouts})`);
-
-    if (timeouts >= MAX_CONSECUTIVE_TIMEOUTS) {
-      
-      console.log(`[Socket] Auto-forfeit for ${player} after ${timeouts} consecutive timeouts`);
-      room.gameState = GameEngine.applyAction(room.gameState, player, { type: 'FORFEIT', reason: 'timeout' });
-
-      
-      broadcastState(room, io);
-      await finalizeGameEnd(room, code, io, 'timeout');
-    } else {
-      
-      if (room.gameState.pendingActions.length > 0) {
-        const pendingForPlayer = room.gameState.pendingActions.filter(p => p.player === player);
-        if (pendingForPlayer.length > 0) {
-          const pa = pendingForPlayer[0];
-          
-          const pe = room.gameState.pendingEffects.find(e => e.id === pa.sourceEffectId);
-          if (pe && (pe.isOptional || !pe.isMandatory)) {
-            console.log(`[Socket] Timer: auto-declining optional effect for ${player}`);
-            room.gameState = GameEngine.applyAction(room.gameState, player, { type: 'DECLINE_OPTIONAL_EFFECT', pendingEffectId: pe.id });
-          } else if (pa.options.length > 0) {
-            console.log(`[Socket] Timer: auto-selecting first target for ${player}`);
-            room.gameState = GameEngine.applyAction(room.gameState, player, { type: 'SELECT_TARGET', pendingActionId: pa.id, selectedTargets: [pa.options[0]] });
-          }
-        }
-      }
-      
-      const stateBeforePass = room.gameState;
-      console.log(`[Socket] Auto-pass for ${player} in room ${code}`);
-      room.gameState = GameEngine.applyAction(room.gameState, player, { type: 'PASS' });
-
-      
-      if (targetSocket) {
-        io.to(targetSocket).emit('game:auto-passed');
-      }
-
-      
-      broadcastState(room, io);
-
-      
-      const winner = GameEngine.getWinner(room.gameState);
-      if (winner) {
-        await finalizeGameEnd(room, code, io, 'score');
-      } else if (room.gameState.missionScoringComplete) {
-        
-        setTimeout(async () => {
-          if (!rooms.has(code)) return; // Room was deleted
-          if (!room.gameState || !room.gameState.missionScoringComplete) return;
-          room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'ADVANCE_PHASE' });
-          broadcastState(room, io);
-          const winnerAfterEnd = GameEngine.getWinner(room.gameState);
-          if (winnerAfterEnd) {
-            await finalizeGameEnd(room, code, io, 'score');
-          } else if (room.gameState.phase === 'action') {
-            startActionTimer(room, code, io);
-          } else if (room.gameState.phase === 'end' && room.gameState.pendingActions.length > 0) {
-            startEffectTimer(room, code, io);
-          }
-        }, 1500);
-      } else if (room.gameState.phase === 'action') {
-        
-        startActionTimer(room, code, io);
-      }
-    }
-  }, ACTION_TIMEOUT_MS);
-}
-
-
-function startForcedResolverTimer(
-  room: RoomData,
-  code: string,
-  io: SocketIOServer,
-): void {
-  clearActionTimer(room);
-  clearMulliganTimer(room);
-
-  if (!room.gameState) return;
-  const forcedPlayer = room.gameState.pendingForcedResolver;
-  if (!forcedPlayer) return;
-
-  const forcedSocket = forcedPlayer === 'player1' ? room.hostSocket : room.guestSocket;
-  const activeSocket = forcedPlayer === 'player1' ? room.guestSocket : room.hostSocket;
-
-  
-  if (activeSocket) {
-    io.to(activeSocket).emit('game:action-deadline-pause');
-  }
-
-  
-  const deadline = Date.now() + ACTION_TIMEOUT_MS;
-  room.timerDeadline = deadline;
-  if (forcedSocket) {
-    io.to(forcedSocket).emit('game:action-deadline', { deadline });
-  }
-
-  room.actionTimer = setTimeout(async () => {
-    if (!rooms.has(code)) return; // Room was deleted
-    if (!room.gameState || !room.gameState.pendingForcedResolver) return;
-
-    const resolver = room.gameState.pendingForcedResolver;
-    console.log(`[Socket] Forced resolver timer expired for ${resolver} in room ${code}`);
-
-    
-    const pendingEffect = room.gameState.pendingEffects.find(
-      (e: { selectingPlayer?: string; sourcePlayer: string; isOptional?: boolean }) =>
-        (e.selectingPlayer === resolver || e.sourcePlayer === resolver),
-    );
-    if (pendingEffect) {
-      room.gameState = GameEngine.applyAction(room.gameState, resolver, {
-        type: 'DECLINE_OPTIONAL_EFFECT',
-        pendingEffectId: pendingEffect.id,
-      });
-    } else {
-      
-      const pendingAction = room.gameState.pendingActions.find(
-        (a: { player: string }) => a.player === resolver,
-      );
-      if (pendingAction) {
-        room.gameState = GameEngine.applyAction(room.gameState, resolver, {
-          type: 'SELECT_TARGET',
-          pendingActionId: pendingAction.id,
-          selectedTargets: [],
-        });
-      }
-    }
-
-    
-    if (forcedSocket) {
-      io.to(forcedSocket).emit('game:auto-declined');
-    }
-
-    
-    broadcastState(room, io);
-
-    
-    const winner = GameEngine.getWinner(room.gameState);
-    if (winner) {
-      await finalizeGameEnd(room, code, io, 'score');
-    } else if (room.gameState.phase === 'action') {
-      
-      startActionTimer(room, code, io);
-    }
-  }, ACTION_TIMEOUT_MS);
-}
-
-
-function startEffectTimer(
-  room: RoomData,
-  code: string,
-  io: SocketIOServer,
-): void {
-  clearActionTimer(room);
-  clearMulliganTimer(room);
-
-  if (!room.gameState) return;
-  if (!room.timerEnabled) return;
-
-  
-  const pendingAction = room.gameState.pendingActions[0];
-  if (!pendingAction) return;
-
-  const resolverPlayer = pendingAction.player;
-  const resolverSocket = resolverPlayer === 'player1' ? room.hostSocket : room.guestSocket;
-
-  const deadline = Date.now() + EFFECT_TIMEOUT_MS;
-  room.timerDeadline = deadline;
-
-  if (resolverSocket) {
-    io.to(resolverSocket).emit('game:action-deadline', { deadline, durationMs: EFFECT_TIMEOUT_MS });
-  }
-
-  
-  const otherSocket = resolverPlayer === 'player1' ? room.guestSocket : room.hostSocket;
-  if (otherSocket) {
-    io.to(otherSocket).emit('game:action-deadline-pause');
-  }
-
-  room.actionTimer = setTimeout(async () => {
-    if (!rooms.has(code)) return;
-    if (!room.gameState) return;
-
-    const pendingEffect = room.gameState.pendingEffects.find(
-      (e: { selectingPlayer?: string; sourcePlayer: string }) =>
-        e.selectingPlayer === resolverPlayer || e.sourcePlayer === resolverPlayer,
-    );
-    const currentPendingAction = room.gameState.pendingActions.find(
-      (a: { player: string }) => a.player === resolverPlayer,
-    );
-
-    if (!pendingEffect && !currentPendingAction) return;
-
-    console.log(`[Socket] Effect timer expired for ${resolverPlayer} in room ${code}`);
-
-    const isOptional = pendingEffect?.isOptional ?? true;
-
-    if (isOptional && pendingEffect) {
-      
-      console.log(`[Socket] Auto-declining optional effect for ${resolverPlayer}`);
-      room.gameState = GameEngine.applyAction(room.gameState, resolverPlayer, {
-        type: 'DECLINE_OPTIONAL_EFFECT',
-        pendingEffectId: pendingEffect.id,
-      });
-    } else if (pendingEffect && currentPendingAction) {
-      
-      const validTargets = pendingEffect.validTargets ?? currentPendingAction.options ?? [];
-      if (validTargets.length > 0) {
-        const randomTarget = validTargets[Math.floor(Math.random() * validTargets.length)];
-        console.log(`[Socket] Auto-selecting random target "${randomTarget}" for mandatory effect (${resolverPlayer})`);
-        room.gameState = GameEngine.applyAction(room.gameState, resolverPlayer, {
-          type: 'SELECT_TARGET',
-          pendingActionId: currentPendingAction.id,
-          selectedTargets: [randomTarget],
-        });
-      }
-    }
-
-    if (resolverSocket) {
-      io.to(resolverSocket).emit('game:auto-declined');
-    }
-
-    broadcastState(room, io);
-
-    const winner = GameEngine.getWinner(room.gameState);
-    if (winner) {
-      await finalizeGameEnd(room, code, io, 'score');
-    } else if (room.gameState.phase === 'action') {
-      
-      if (room.gameState.pendingEffects.length > 0 || room.gameState.pendingActions.length > 0) {
-        startEffectTimer(room, code, io);
-      } else {
-        startActionTimer(room, code, io);
-      }
-    }
-  }, EFFECT_TIMEOUT_MS);
-}
-
-const MISSION_PHASE_TIMEOUT_MS = 60_000; // 1 minute for mission phase choices
-
-
-function startMissionPhaseTimer(
-  room: RoomData,
-  code: string,
-  io: SocketIOServer,
-): void {
-  clearActionTimer(room);
-  clearMulliganTimer(room);
-
-  if (!room.gameState) return;
-  if (!room.timerEnabled) return;
-  if (!room.isRanked && !room.tournamentId) return; // Active in ranked AND tournament rooms
-
-  const pendingAction = room.gameState.pendingActions[0];
-  if (!pendingAction) return;
-
-  const resolverPlayer = pendingAction.player;
-  const resolverSocket = resolverPlayer === 'player1' ? room.hostSocket : room.guestSocket;
-
-  const deadline = Date.now() + MISSION_PHASE_TIMEOUT_MS;
-  room.timerDeadline = deadline;
-
-  if (resolverSocket) {
-    io.to(resolverSocket).emit('game:action-deadline', { deadline, durationMs: MISSION_PHASE_TIMEOUT_MS });
-  }
-
-  room.actionTimer = setTimeout(async () => {
-    if (!rooms.has(code)) return;
-    if (!room.gameState) return;
-
-    console.log(`[Socket] Mission phase timer expired for ${resolverPlayer} in room ${code}, auto-forfeit`);
-    room.gameState = GameEngine.applyAction(room.gameState, resolverPlayer, { type: 'FORFEIT', reason: 'timeout' });
-    broadcastState(room, io);
-    await finalizeGameEnd(room, code, io, 'timeout');
-  }, MISSION_PHASE_TIMEOUT_MS);
-}
-
 
 function broadcastState(room: RoomData, io: SocketIOServer): void {
   if (!room.gameState) return;
@@ -1714,39 +1343,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
       
       
       
-      let rehydrateOpponentDisconnect: { deadline: number; durationMs: number } | null = null;
-      if (room.disconnectedPlayer === player && room.disconnectTimer) {
-        clearTimeout(room.disconnectTimer);
-        room.disconnectTimer = null;
-        room.disconnectedPlayer = null;
-        room.disconnectDeadline = null;
-
-        const lastDcAt = player === 'player1' ? room.player1LastDisconnectAt : room.player2LastDisconnectAt;
-        if (lastDcAt) {
-          const downMs = Date.now() - lastDcAt;
-          if (downMs > DISCONNECT_BLIP_THRESHOLD_MS) {
-            if (player === 'player1') room.player1DisconnectCount++;
-            else room.player2DisconnectCount++;
-            console.log(`[Socket] ${player} reconnected after ${Math.round(downMs/1000)}s — counted (now ${player === 'player1' ? room.player1DisconnectCount : room.player2DisconnectCount}/${MAX_DISCONNECTS + 1})`);
-          } else {
-            console.log(`[Socket] ${player} reconnected after ${Math.round(downMs/1000)}s — blip, not counted`);
-          }
-        }
-        if (player === 'player1') room.player1LastDisconnectAt = null;
-        else room.player2LastDisconnectAt = null;
-
-        const opponentSock = isHost ? room.guestSocket : room.hostSocket;
-        if (opponentSock) {
-          io.to(opponentSock).emit('game:opponent-reconnected');
-        }
-      } else if (room.disconnectedPlayer && room.disconnectDeadline) {
-        const remaining = Math.max(0, room.disconnectDeadline - Date.now());
-        console.log(`[Socket] ${player} rejoined but opponent ${room.disconnectedPlayer} still down (${Math.round(remaining / 1000)}s left)`);
-        rehydrateOpponentDisconnect = { deadline: room.disconnectDeadline, durationMs: remaining };
-      } else if (room.disconnectTimer && !room.gameState) {
-        clearTimeout(room.disconnectTimer);
-        room.disconnectTimer = null;
-        console.log(`[Socket] Cancelled sealed pre-game cleanup timer for ${player} in room ${roomCode}`);
+      console.log(`[Socket] ${player} rejoined room ${roomCode}, chess clock continues`);
+      const opponentSock = isHost ? room.guestSocket : room.hostSocket;
+      if (opponentSock) {
+        io.to(opponentSock).emit('game:opponent-reconnected');
       }
 
       
@@ -1770,15 +1370,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
           });
         }
 
-        if (room.gameState.phase === 'action' && !room.actionTimer) {
-          startActionTimer(room, roomCode, io);
-        }
-
-
-
-        if (rehydrateOpponentDisconnect) {
-          socket.emit('game:opponent-disconnected', rehydrateOpponentDisconnect);
-        }
       } else {
         
         console.log(`[Socket] game:rejoin: ${player} rejoined room ${roomCode} during pre-game phase`);
@@ -1864,7 +1455,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     
-    socket.on('room:create', async (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; sealedSetChoice?: string; timerEnabled?: boolean; isAnonymous?: boolean }) => {
+    socket.on('room:create', async (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; sealedSetChoice?: string; isAnonymous?: boolean }) => {
       if (isMaintenanceActive()) {
         socket.emit('room:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
         return;
@@ -1920,13 +1511,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
         gameMode,
         createdAt: Date.now(),
         hostName: safeHostName,
-        actionTimer: null,
-        timerDeadline: null,
-        disconnectTimer: null,
-        disconnectedPlayer: null,
-        disconnectDeadline: null,
-        player1DisconnectCount: 0,
-        player2DisconnectCount: 0,
         replayInitialState: null,
         replayStateSnapshots: null,
         replaySnapshotLogLengths: null,
@@ -1936,7 +1520,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
         sealedSetChoice: safeSealedSetChoice,
         sealedTimer: null,
         sealedDeadline: null,
-        timerEnabled: gameMode === 'ranked' || (data.timerEnabled ?? false),
         coinFlipDone: { player1: false, player2: false },
         spectators: new Map(),
         hostAllowSpectatorHand: false,
@@ -2113,7 +1696,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             console.log(`[Socket] Tournament game auto-started in room ${data.code}`);
 
             if (room.gameState && room.gameState.phase === 'mulligan') {
-              startMulliganTimer(room, data.code, io);
+              armMulliganIdleTimer(room, data.code, io);
             }
 
             const matchTimeLimit = 1800000;
@@ -2405,10 +1988,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
         console.log(`[Socket] Game started event emitted to room ${code}`);
         broadcastActiveGames(io);
 
-        if (room.gameState.phase === 'action') {
-          startActionTimer(room, code, io);
-        } else if (room.gameState.phase === 'mulligan') {
-          startMulliganTimer(room, code, io);
+        if (room.gameState.phase === 'mulligan') {
+          armMulliganIdleTimer(room, code, io);
         }
 
         
@@ -2640,44 +2221,20 @@ export function setupSocketHandlers(io: SocketIOServer) {
         if (winner) {
           await finalizeGameEnd(room, code, io, 'score');
         } else if (room.gameState.missionScoringComplete) {
-          
-          clearActionTimer(room);
           setTimeout(async () => {
             try {
-              if (!rooms.has(code)) return; // Room was deleted
+              if (!rooms.has(code)) return;
               if (!room.gameState || !room.gameState.missionScoringComplete) return;
               room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'ADVANCE_PHASE' });
               broadcastState(room, io);
-
               const winnerAfterEnd = GameEngine.getWinner(room.gameState);
               if (winnerAfterEnd) {
                 await finalizeGameEnd(room, code, io, 'score');
-              } else if (room.gameState.phase === 'action') {
-                startActionTimer(room, code, io);
-              } else if (room.gameState.phase === 'end' && room.gameState.pendingActions.length > 0) {
-                
-                startEffectTimer(room, code, io);
               }
             } catch (err) {
               console.error('[Socket] Auto-advance error:', err instanceof Error ? err.message : err);
             }
           }, 1500);
-        } else if (room.gameState.phase === 'action' && room.gameState.pendingForcedResolver) {
-          
-          startForcedResolverTimer(room, code, io);
-        } else if (room.gameState.phase === 'action' && (room.gameState.pendingEffects.length > 0 || room.gameState.pendingActions.length > 0)) {
-          
-          startEffectTimer(room, code, io);
-        } else if (room.gameState.phase === 'action') {
-          
-          startActionTimer(room, code, io);
-        } else if (room.gameState.phase === 'mission' && room.gameState.pendingActions.length > 0) {
-          
-          startMissionPhaseTimer(room, code, io);
-        } else if (room.gameState.phase === 'end' && room.gameState.pendingActions.length > 0) {
-          startEffectTimer(room, code, io);
-        } else {
-          clearActionTimer(room);
         }
       } catch (err) {
         
@@ -2784,7 +2341,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       room.replaySnapshotLogLengths = null;
       room.finalized = false;
       room.coinFlipDone = { player1: false, player2: false };
-      clearActionTimer(room);
+      clearTournamentJoinTimer(room);
       clearChessClockTimers(room);
       room.chessClock = createChessClock();
       room.chessClockLastInputKey = null;
@@ -2982,22 +2539,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
           isAnonymous: false,
           gameMode: wantRanked ? 'ranked' : 'casual',
           createdAt: Date.now(),
-          actionTimer: null,
-          timerDeadline: null,
-          disconnectTimer: null,
-          disconnectedPlayer: null,
-          disconnectDeadline: null,
-          player1DisconnectCount: 0,
-          player2DisconnectCount: 0,
           replayInitialState: null,
           replayStateSnapshots: null,
           replaySnapshotLogLengths: null,
-        finalized: false,
+          finalized: false,
           isSealed: false,
           sealedBoosterCount: 6,
           sealedTimer: null,
           sealedDeadline: null,
-          timerEnabled: wantRanked,
           coinFlipDone: { player1: false, player2: false },
           spectators: new Map(),
           hostAllowSpectatorHand: false,
@@ -3387,109 +2936,25 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
 
           else if (room.gameState && room.gameState.phase !== 'gameOver' && !room.finalized) {
-
-            const currentCount = player === 'player1'
-              ? room.player1DisconnectCount
-              : room.player2DisconnectCount;
-
-            if (currentCount > MAX_DISCONNECTS) {
-              console.log(`[Socket] ${player} already past disconnect cap in room ${code}, instant forfeit`);
-              if (room.disconnectTimer) {
-                clearTimeout(room.disconnectTimer);
-                room.disconnectTimer = null;
-              }
-              room.disconnectedPlayer = null;
-              room.disconnectDeadline = null;
-              room.gameState = GameEngine.applyAction(room.gameState, player, {
-                type: 'FORFEIT',
-                reason: 'abandon',
-              });
-              broadcastState(room, io);
-              finalizeGameEnd(room, code, io, 'forfeit').catch((err) => {
-                console.error(`[Socket] finalizeGameEnd error for ${code}:`, err);
-              });
-              return;
-            }
-
-            if (room.disconnectTimer) {
-              clearTimeout(room.disconnectTimer);
-              room.disconnectTimer = null;
-            }
-
-            if (player === 'player1') room.player1LastDisconnectAt = Date.now();
-            else room.player2LastDisconnectAt = Date.now();
-
-            console.log(`[Socket] ${player} disconnected during game in room ${code} (count ${currentCount}/${MAX_DISCONNECTS + 1}), starting ${DISCONNECT_GRACE_MS / 1000}s grace period`);
-            
-            
-
-            
-            const disconnectDeadline = Date.now() + DISCONNECT_GRACE_MS;
-            room.disconnectedPlayer = player;
-            room.disconnectDeadline = disconnectDeadline;
+            console.log(`[Socket] ${player} disconnected during game in room ${code}, chess clock continues`);
             const opponentSock = isHost ? room.guestSocket : room.hostSocket;
             if (opponentSock) {
-              io.to(opponentSock).emit('game:opponent-disconnected', {
-                deadline: disconnectDeadline,
-                durationMs: DISCONNECT_GRACE_MS,
-                disconnectCount: currentCount,
-                maxDisconnects: MAX_DISCONNECTS,
-              });
+              io.to(opponentSock).emit('game:opponent-disconnected');
             }
-
-            room.disconnectTimer = setTimeout(async () => {
-              room.disconnectTimer = null;
-              room.disconnectedPlayer = null;
-              room.disconnectDeadline = null;
-              if (!room.gameState || room.gameState.phase === 'gameOver') return;
-
-              if (room.tournamentId && room.tournamentMatchId) {
-                const opponentSocketId = isHost ? room.guestSocket : room.hostSocket;
-                const opponentConnected = !!opponentSocketId && !!io.sockets.sockets.get(opponentSocketId)?.connected;
-                if (!opponentConnected) {
-                  const tInfo = await prisma.tournament.findUnique({
-                    where: { id: room.tournamentId },
-                    select: { format: true },
-                  });
-                  if (tInfo?.format === 'swiss') {
-                    console.log(`[Socket] Both players AFK in tournament Swiss match ${room.tournamentMatchId}, double forfeit`);
-                    const { handleSwissDoubleAbsence } = await import('@/lib/socket/tournamentHandlers');
-                    await handleSwissDoubleAbsence(io, room.tournamentId, room.tournamentMatchId);
-                    return;
-                  }
-                }
-              }
-
-              console.log(`[Socket] Grace period expired for ${player} in room ${code}, auto-forfeiting`);
-              room.gameState = GameEngine.applyAction(room.gameState, player, {
-                type: 'FORFEIT',
-                reason: 'abandon',
-              });
-
-              broadcastState(room, io);
-              await finalizeGameEnd(room, code, io, 'forfeit');
-            }, DISCONNECT_GRACE_MS);
           } else if (room.isSealed && room.guestId && !room.gameState) {
-            
-            
-            console.log(`[Socket] ${player} disconnected during sealed deck-building in room ${code}, starting ${DISCONNECT_GRACE_MS / 1000}s grace period`);
-            room.disconnectTimer = setTimeout(() => {
-              
-              if (isHost) {
-                console.log(`[Socket] Grace period expired for host in sealed room ${code}, removing room`);
-                if (room.sealedTimer) clearTimeout(room.sealedTimer);
-                clearChessClockTimers(room);
-                const wasPublic = !room.isPrivate;
-                rooms.delete(code);
-                if (wasPublic) broadcastRoomList(io);
-              } else {
-                console.log(`[Socket] Grace period expired for guest in sealed room ${code}, resetting guest`);
-                room.guestId = null;
-                room.guestSocket = null;
-                room.guestDeck = null;
-                if (!room.isPrivate) broadcastRoomList(io);
-              }
-            }, DISCONNECT_GRACE_MS);
+            console.log(`[Socket] ${player} disconnected during sealed deck-building in room ${code}`);
+            if (isHost) {
+              if (room.sealedTimer) clearTimeout(room.sealedTimer);
+              clearChessClockTimers(room);
+              const wasPublic = !room.isPrivate;
+              rooms.delete(code);
+              if (wasPublic) broadcastRoomList(io);
+            } else {
+              room.guestId = null;
+              room.guestSocket = null;
+              room.guestDeck = null;
+              if (!room.isPrivate) broadcastRoomList(io);
+            }
           } else if (isHost) {
             
             if (!room.gameState) {

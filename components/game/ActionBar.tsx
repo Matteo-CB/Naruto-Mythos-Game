@@ -32,7 +32,6 @@ export function ActionBar() {
   const [showAbandonConfirm, setShowAbandonConfirm] = useState(false);
   const [confirmingPass, setConfirmingPass] = useState(false);
   const socketForfeit = useSocketStore((s) => s.forfeit);
-  const actionDeadline = useSocketStore((s) => s.actionDeadline);
 
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
 
@@ -484,9 +483,6 @@ export function ActionBar() {
           )}
 
           
-          {isOnlineGame && isMyTurn && actionDeadline && (
-            <ActionTimer deadline={actionDeadline} />
-          )}
 
           
           {confirmingPass ? (
@@ -628,65 +624,6 @@ function ActionButton({
 }
 
 
-
-function ActionTimer({ deadline }: { deadline: number }) {
-  const [secondsLeft, setSecondsLeft] = useState(() =>
-    Math.max(0, Math.ceil((deadline - Date.now()) / 1000)),
-  );
-
-  useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
-    let cancelled = false;
-
-    const tick = () => {
-      if (cancelled) return;
-      const remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
-      setSecondsLeft((prev) => (prev === remaining ? prev : remaining));
-      if (remaining <= 0) return;
-      if (typeof document !== 'undefined' && document.hidden) {
-        timeoutId = setTimeout(tick, 1000);
-        return;
-      }
-      const drift = (deadline - Date.now()) % 1000;
-      const delay = drift > 0 ? drift : 1000;
-      timeoutId = setTimeout(tick, delay);
-    };
-
-    const onVisibilityChange = () => {
-      if (!document.hidden) {
-        if (timeoutId) clearTimeout(timeoutId);
-        tick();
-      }
-    };
-
-    tick();
-    document.addEventListener('visibilitychange', onVisibilityChange);
-
-    return () => {
-      cancelled = true;
-      if (timeoutId) clearTimeout(timeoutId);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-    };
-  }, [deadline]);
-
-  const minutes = Math.floor(secondsLeft / 60);
-  const seconds = secondsLeft % 60;
-  const isWarning = secondsLeft <= 30;
-
-  return (
-    <motion.span
-      className="text-xs font-bold tabular-nums px-2 py-0.5"
-      style={{
-        color: isWarning ? '#b33e3e' : '#888888',
-        backgroundColor: isWarning ? 'rgba(179, 62, 62, 0.12)' : 'transparent',
-      }}
-      animate={isWarning ? { opacity: [1, 0.5, 1] } : { opacity: 1 }}
-      transition={isWarning ? { repeat: Infinity, duration: 1 } : {}}
-    >
-      {minutes}:{seconds.toString().padStart(2, '0')}
-    </motion.span>
-  );
-}
 
 
 

@@ -35,7 +35,6 @@ export default function PlayOnlinePage() {
   const [deckSelected, setDeckSelected] = useState(false);
   const [showJoinInput, setShowJoinInput] = useState(false);
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
-  const [timerEnabled, setTimerEnabled] = useState(true);
   const [isAnonymous, setIsAnonymous] = useState(false);
 
   const {
@@ -204,7 +203,7 @@ export default function PlayOnlinePage() {
       }
       const actualMode = mode ?? selectedMode;
       const isRanked = actualMode === 'ranked';
-      createRoom(session.user.id, false, isRanked, false, actualMode, session.user.name ?? undefined, undefined, undefined, isRanked ? true : timerEnabled, isAnonymous);
+      createRoom(session.user.id, false, isRanked, false, actualMode, session.user.name ?? undefined, undefined, undefined, isAnonymous);
       setIsPrivateRoom(false);
     } catch {
       
@@ -217,7 +216,7 @@ export default function PlayOnlinePage() {
         await connect(session.user.id, session.user.name ?? undefined);
       }
       const isRanked = selectedMode === 'ranked';
-      createRoom(session.user.id, true, isRanked, false, selectedMode, session.user.name ?? undefined, undefined, undefined, isRanked ? true : timerEnabled);
+      createRoom(session.user.id, true, isRanked, false, selectedMode, session.user.name ?? undefined, undefined, undefined);
       setIsPrivateRoom(true);
     } catch {
       
@@ -569,38 +568,6 @@ export default function PlayOnlinePage() {
                     <p className="text-xs -mt-2" style={{ color: '#555555' }}>
                       {t(`online.modeDesc.${selectedMode}`)}
                     </p>
-
-                    
-                    {selectedMode === 'casual' && (
-                      <div
-                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg"
-                        style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626' }}
-                      >
-                        <div className="flex flex-col gap-0.5">
-                          <span className="text-xs font-medium" style={{ color: '#e0e0e0' }}>
-                            {t('online.timer.label')}
-                          </span>
-                          <span className="text-[10px]" style={{ color: '#555555' }}>
-                            {t('online.timer.description')}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => setTimerEnabled(!timerEnabled)}
-                          className="relative w-10 h-5 rounded-full transition-colors"
-                          style={{
-                            backgroundColor: timerEnabled ? '#c4a35a' : '#333333',
-                          }}
-                        >
-                          <span
-                            className="absolute top-0.5 w-4 h-4 rounded-full transition-transform"
-                            style={{
-                              backgroundColor: '#0a0a0a',
-                              left: timerEnabled ? '22px' : '2px',
-                            }}
-                          />
-                        </button>
-                      </div>
-                    )}
 
                     <button
                       onClick={handleCreatePrivateRoom}

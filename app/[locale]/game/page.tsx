@@ -50,27 +50,14 @@ const GameBoard = dynamic(
   },
 );
 
-function OpponentDisconnectBanner({ deadline }: { deadline: number | null }) {
+function OpponentDisconnectBanner() {
   const t = useTranslations('game');
-  const [remaining, setRemaining] = useState('');
-  useEffect(() => {
-    if (!deadline) return;
-    const tick = () => {
-      const left = Math.max(0, deadline - Date.now());
-      const mins = Math.floor(left / 60000);
-      const secs = Math.floor((left % 60000) / 1000);
-      setRemaining(`${mins}:${secs.toString().padStart(2, '0')}`);
-    };
-    tick();
-    const interval = setInterval(tick, 1000);
-    return () => clearInterval(interval);
-  }, [deadline]);
   return (
     <div
       className="fixed top-0 left-0 right-0 z-50 text-center py-2.5 text-xs font-medium"
       style={{ backgroundColor: 'rgba(196, 163, 90, 0.95)', color: '#0a0a0a' }}
     >
-      {t('opponentDisconnected', { time: remaining })}
+      {t('opponentDisconnectedShort')}
     </div>
   );
 }
@@ -291,7 +278,6 @@ export default function GamePage() {
   
   const showConnectionLost = isOnlineGame && !socketConnected && hasActiveGame;
   const opponentDisconnected = useSocketStore((s) => s.opponentDisconnected);
-  const opponentDisconnectDeadline = useSocketStore((s) => s.opponentDisconnectDeadline);
 
   if (!hasActiveGame) {
     return (
@@ -336,7 +322,7 @@ export default function GamePage() {
         </div>
       )}
       {isOnlineGame && opponentDisconnected && (
-        <OpponentDisconnectBanner deadline={opponentDisconnectDeadline} />
+        <OpponentDisconnectBanner />
       )}
       {isOnlineGame && <IdleWarningToast />}
       {isOnlineGame && socketGameCancelled && (

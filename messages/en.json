@@ -962,6 +962,7 @@
       "upgradeNameConflict": "Cannot upgrade: would create duplicate {name} on this mission."
     },
     "opponentDisconnected": "Opponent disconnected. They have {time} to reconnect or the game is forfeit.",
+    "opponentDisconnectedShort": "Opponent disconnected. Their chess clock continues to run.",
     "reconnect": {
       "title": "Active Game",
       "description": "You have an ongoing game. Would you like to rejoin or abandon it?",

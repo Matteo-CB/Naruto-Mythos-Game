@@ -5,18 +5,6 @@ export function clearAllMatchRoomTimers(room: RoomData): void {
     clearTimeout(room.tournamentJoinTimer);
     room.tournamentJoinTimer = null;
   }
-  if (room.disconnectTimer) {
-    clearTimeout(room.disconnectTimer);
-    room.disconnectTimer = null;
-  }
-  if (room.actionTimer) {
-    clearTimeout(room.actionTimer);
-    room.actionTimer = null;
-  }
-  if (room.mulliganTimer) {
-    clearTimeout(room.mulliganTimer);
-    room.mulliganTimer = null;
-  }
   if (room.sealedTimer) {
     clearTimeout(room.sealedTimer);
     room.sealedTimer = null;

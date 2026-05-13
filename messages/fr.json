@@ -962,6 +962,7 @@
       "upgradeNameConflict": "Impossible d'upgrader : créerait un doublon de {name} sur cette mission."
     },
     "opponentDisconnected": "Adversaire déconnecté. Il a {time} pour se reconnecter ou la partie est forfait.",
+    "opponentDisconnectedShort": "Adversaire déconnecté. Son chrono continue de tourner.",
     "reconnect": {
       "title": "Partie en cours",
       "description": "Vous avez une partie en cours. Voulez-vous la rejoindre ou l'abandonner ?",

@@ -11,9 +11,6 @@ interface FakeRoom {
   guestId: string | null;
   guestSocket: string | null;
   finalized: boolean;
-  actionTimer: FakeTimer | null;
-  disconnectTimer: FakeTimer | null;
-  mulliganTimer: FakeTimer | null;
   tournamentJoinTimer: FakeTimer | null;
   sealedTimer: FakeTimer | null;
   chessClockTickTimer: FakeTimer | null;
@@ -29,9 +26,6 @@ function makeRoom(overrides: Partial<FakeRoom> = {}): FakeRoom {
     guestId: 'g1',
     guestSocket: 's2',
     finalized: false,
-    actionTimer: 1 as unknown as FakeTimer,
-    disconnectTimer: 2 as unknown as FakeTimer,
-    mulliganTimer: 4 as unknown as FakeTimer,
     tournamentJoinTimer: 5 as unknown as FakeTimer,
     sealedTimer: 3 as unknown as FakeTimer,
     chessClockTickTimer: 6 as unknown as FakeTimer,
@@ -47,9 +41,6 @@ describe('matchRoomCleanup helpers', () => {
 
   it('clearAllMatchRoomTimers nulls every timer field', () => {
     const room = makeRoom();
-    expect(room.actionTimer).not.toBeNull();
-    expect(room.disconnectTimer).not.toBeNull();
-    expect(room.mulliganTimer).not.toBeNull();
     expect(room.tournamentJoinTimer).not.toBeNull();
     expect(room.sealedTimer).not.toBeNull();
     expect(room.chessClockTickTimer).not.toBeNull();
@@ -57,9 +48,6 @@ describe('matchRoomCleanup helpers', () => {
 
     clearAllMatchRoomTimers(room as never);
 
-    expect(room.actionTimer).toBeNull();
-    expect(room.disconnectTimer).toBeNull();
-    expect(room.mulliganTimer).toBeNull();
     expect(room.tournamentJoinTimer).toBeNull();
     expect(room.sealedTimer).toBeNull();
     expect(room.chessClockTickTimer).toBeNull();
@@ -68,9 +56,6 @@ describe('matchRoomCleanup helpers', () => {
 
   it('clearAllMatchRoomTimers is a no-op when timers are already null', () => {
     const room = makeRoom({
-      actionTimer: null,
-      disconnectTimer: null,
-      mulliganTimer: null,
       tournamentJoinTimer: null,
       sealedTimer: null,
       chessClockTickTimer: null,
@@ -87,7 +72,7 @@ describe('matchRoomCleanup helpers', () => {
     finalizeAndScheduleRoomDeletion(rooms as never, room.code, 5_000);
 
     expect(room.finalized).toBe(true);
-    expect(room.actionTimer).toBeNull();
+    expect(room.tournamentJoinTimer).toBeNull();
     expect(rooms.has(room.code)).toBe(true);
 
     vi.advanceTimersByTime(5_000);

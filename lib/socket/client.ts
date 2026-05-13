@@ -79,7 +79,6 @@ interface SocketStore {
   gameCancelled: { reason: 'mulligan-idle'; roomCode: string } | null;
   chessClock: ChessClockBroadcast | null;
   playerNames: { player1: string; player2: string } | null;
-  actionDeadline: number | null;
 
   
   publicRooms: PublicRoom[];
@@ -106,7 +105,7 @@ interface SocketStore {
 
   connect: (userId?: string, username?: string) => Promise<void>;
   disconnect: () => void;
-  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, timerEnabled?: boolean, isAnonymous?: boolean) => void;
+  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean) => void;
   joinRoom: (code: string, userId: string) => void;
   selectDeck: (characters: unknown[], missions: unknown[], deckId?: string) => void;
   changeDeck: () => void;
@@ -141,7 +140,6 @@ interface SocketStore {
 
   
   opponentDisconnected: boolean;
-  opponentDisconnectDeadline: number | null;
 
   
   pendingReconnect: { roomCode: string; playerRole: 'player1' | 'player2' } | null;
@@ -173,7 +171,6 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   gameResult: null,
   gameCancelled: null,
   chessClock: null,
-  actionDeadline: null,
   isSealedRoom: false,
   tournamentMatchRoom: false,
   publicRooms: [],
@@ -265,7 +262,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('disconnect', (reason) => {
         console.log('[Socket] Disconnected, reason:', reason);
-        set({ connected: false, opponentDisconnected: false, opponentDisconnectDeadline: null });
+        set({ connected: false, opponentDisconnected: false });
         
         if (reason === 'io server disconnect') {
           set({ error: 'Disconnected by server.', errorKey: 'game.error.connectionLost' });
@@ -384,7 +381,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('game:started', () => {
         console.log('[Socket] Game started');
-        set({ gameStarted: true, _lastStateUpdate: Date.now(), opponentDisconnected: false, opponentDisconnectDeadline: null });
+        set({ gameStarted: true, _lastStateUpdate: Date.now(), opponentDisconnected: false });
 
         
         
@@ -461,7 +458,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           console.log('[Socket] Game ended, winner:', data.winner, 'reason:', data.winReason, 'gameId:', data.gameId, 'tournament:', data.tournamentId ?? 'none');
           const resyncT = get()._resyncTimer;
           if (resyncT) { clearInterval(resyncT); }
-          set({ gameEnded: true, gameResult: data, chessClock: null, actionDeadline: null, _resyncTimer: null, opponentDisconnected: false, opponentDisconnectDeadline: null });
+          set({ gameEnded: true, gameResult: data, chessClock: null, _resyncTimer: null, opponentDisconnected: false });
         },
       );
 
@@ -489,8 +486,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
             winReason: 'forfeit' as const,
             tournamentId: null,
           } as never,
-          actionDeadline: null,
-          _resyncTimer: null,
+                  _resyncTimer: null,
         });
       });
 
@@ -506,8 +502,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
             winReason: 'forfeit' as const,
             tournamentId: null,
           } as never,
-          actionDeadline: null,
-          _resyncTimer: null,
+                  _resyncTimer: null,
         });
       });
 
@@ -520,8 +515,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           gameEnded: false,
           gameResult: null,
           chessClock: null,
-          actionDeadline: null,
-          _resyncTimer: null,
+                  _resyncTimer: null,
         });
       });
 
@@ -540,33 +534,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
             winReason: 'forfeit' as const,
             tournamentId: null,
           } as never,
-          actionDeadline: null,
-          _resyncTimer: null,
+                  _resyncTimer: null,
         });
       });
 
       
 
-      socket.on('game:action-deadline', (data: { deadline: number; durationMs?: number }) => {
-        
-        const localDeadline = data.durationMs ? Date.now() + data.durationMs : data.deadline;
-        set({ actionDeadline: localDeadline });
-      });
-
-      socket.on('game:action-deadline-pause', () => {
-        console.log('[Socket] Timer paused (opponent making forced choice)');
-        set({ actionDeadline: null });
-      });
-
-      socket.on('game:auto-passed', () => {
-        console.log('[Socket] You were auto-passed due to timeout');
-        set({ actionDeadline: null });
-      });
-
-      socket.on('game:auto-declined', () => {
-        console.log('[Socket] Your forced choice was auto-declined due to timeout');
-        set({ actionDeadline: null });
-      });
 
       
 
@@ -589,8 +562,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           gameResult: null,
           gameCancelled: null,
           chessClock: null,
-          actionDeadline: null,
-          gameStarted: false,
+                  gameStarted: false,
           visibleState: null,
           opponentJoined: true, // both players are still in the room
         });
@@ -619,14 +591,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ rematchState: 'declined' });
       });
 
-      socket.on('game:opponent-disconnected', (data: { deadline: number; durationMs: number }) => {
-        console.log('[Socket] Opponent disconnected, deadline:', new Date(data.deadline).toLocaleTimeString());
-        set({ opponentDisconnected: true, opponentDisconnectDeadline: data.deadline });
+      socket.on('game:opponent-disconnected', () => {
+        console.log('[Socket] Opponent disconnected');
+        set({ opponentDisconnected: true });
       });
 
       socket.on('game:opponent-reconnected', () => {
         console.log('[Socket] Opponent reconnected');
-        set({ opponentDisconnected: false, opponentDisconnectDeadline: null });
+        set({ opponentDisconnected: false });
       });
 
       socket.on('game:active-game', (data: { roomCode: string; playerRole: 'player1' | 'player2' }) => {
@@ -798,8 +770,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         gameResult: null,
         gameCancelled: null,
         chessClock: null,
-        actionDeadline: null,
-        publicRooms: [],
+              publicRooms: [],
         maintenanceWarning: false,
         rematchState: 'none',
         isSealedRoom: false,
@@ -815,12 +786,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  createRoom: (userId: string, isPrivate = true, isRanked = false, isSealed = false, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, timerEnabled?: boolean, isAnonymous?: boolean) => {
+  createRoom: (userId: string, isPrivate = true, isRanked = false, isSealed = false, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean) => {
     const { socket, connected } = get();
     if (socket && connected) {
-      console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}${sealedBoosterCount ? ` boosters: ${sealedBoosterCount}` : ''}${sealedSetChoice ? ` set: ${sealedSetChoice}` : ''}${timerEnabled === false ? ' (no timer)' : ''}${isAnonymous ? ' (anonymous)' : ''}`);
+      console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}${sealedBoosterCount ? ` boosters: ${sealedBoosterCount}` : ''}${sealedSetChoice ? ` set: ${sealedSetChoice}` : ''}${isAnonymous ? ' (anonymous)' : ''}`);
       set({ isSealedRoom: isSealed, rematchState: 'none', chatMessages: [], unreadChatCount: 0 });
-      socket.emit('room:create', { userId, isPrivate, isRanked, isSealed, gameMode, hostName, sealedBoosterCount, sealedSetChoice, timerEnabled, isAnonymous });
+      socket.emit('room:create', { userId, isPrivate, isRanked, isSealed, gameMode, hostName, sealedBoosterCount, sealedSetChoice, isAnonymous });
     } else {
       console.error('[Socket] Cannot create room: not connected');
       set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
@@ -886,8 +857,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         gameCancelled: null,
         chessClock: null,
         playerNames: null,
-        actionDeadline: null,
-        error: null,
+              error: null,
       });
       console.log('[Socket] Emitting matchmaking:join');
       socket.emit('matchmaking:join', { userId, isRanked });
@@ -1020,7 +990,6 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         gameStarted: true,
         pendingReconnect: null,
         opponentDisconnected: false,
-        opponentDisconnectDeadline: null,
       });
     }
   },
