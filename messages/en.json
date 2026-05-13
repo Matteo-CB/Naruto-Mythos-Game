@@ -1281,10 +1281,6 @@
     "deckBannedTitle": "Your deck contains banned cards",
     "deckBannedRankedOnly": "These cards are banned in Ranked mode only. You can still use them in Casual mode.",
     "createPrivateRoom": "Create Private Room",
-    "timer": {
-      "label": "Action Timer",
-      "description": "2 min per action, auto-pass on timeout"
-    },
     "anonymous": {
       "label": "Anonymous Room",
       "description": "Your name is hidden until both players have chosen their deck",

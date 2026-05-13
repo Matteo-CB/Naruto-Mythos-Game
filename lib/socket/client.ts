@@ -192,7 +192,6 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   unreadChatCount: 0,
   chatOpen: false,
   opponentDisconnected: false,
-  opponentDisconnectDeadline: null,
   pendingReconnect: null,
   activeGames: (() => {
     try {

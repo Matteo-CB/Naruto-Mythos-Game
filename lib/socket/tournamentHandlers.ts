@@ -219,7 +219,6 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             sealedSetChoice: tournamentMeta?.sealedSetChoice ?? 'random',
             sealedTimer: null,
             sealedDeadline: null,
-            timerEnabled: true,
             tournamentId,
             tournamentMatchId: matchId,
             hostDeckId,

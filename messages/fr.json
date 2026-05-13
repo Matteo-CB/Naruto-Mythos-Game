@@ -1281,10 +1281,6 @@
     "deckBannedTitle": "Votre deck contient des cartes bannies",
     "deckBannedRankedOnly": "Ces cartes sont bannies en mode Classe uniquement. Vous pouvez les utiliser en mode Casual.",
     "createPrivateRoom": "Créer un Salon Privé",
-    "timer": {
-      "label": "Timer d'action",
-      "description": "2 min par action, passe automatique si le temps expire"
-    },
     "anonymous": {
       "label": "Salon Anonyme",
       "description": "Votre nom est cache jusqu'à ce que les deux joueurs aient choisi leur deck",
