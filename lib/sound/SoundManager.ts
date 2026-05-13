@@ -1,12 +1,14 @@
 
 
-export type SoundName = 'cardPlay' | 'mulligan' | 'newTurn' | 'jutsu';
+export type SoundName = 'cardPlay' | 'mulligan' | 'newTurn' | 'jutsu' | 'clockWarning' | 'clockUrgent';
 
 const SOUND_PATHS: Record<SoundName, string> = {
   cardPlay: '/sound/cardplaying.wav',
   mulligan: '/sound/mulligan.wav',
   newTurn: '/sound/newturn.mp3',
   jutsu: '/sound/justu.mp3',
+  clockWarning: '/sound/clock-warning.mp3',
+  clockUrgent: '/sound/clock-urgent.mp3',
 };
 
 
@@ -15,6 +17,8 @@ const SOUND_GAIN: Record<SoundName, number> = {
   mulligan: 1.0,
   newTurn: 0.2,
   jutsu: 0.25,
+  clockWarning: 0.4,
+  clockUrgent: 0.45,
 };
 
 

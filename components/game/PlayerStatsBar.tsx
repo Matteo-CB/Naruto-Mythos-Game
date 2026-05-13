@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
+import { ChessClockDisplay } from '@/components/game/ChessClockDisplay';
 
 export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
   const t = useTranslations();
@@ -89,8 +90,10 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
 
       <StatPill label={t('game.chakra')} value={myState.chakra} color="#c4a35a" />
 
-      
+
       <StatPill label={t('game.score')} value={myState.missionPoints} color="#e0e0e0" />
+
+      <ChessClockDisplay player={myPlayer} isOpponent={false} />
     </div>
   );
 });

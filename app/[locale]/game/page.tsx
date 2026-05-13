@@ -9,6 +9,8 @@ import dynamic from 'next/dynamic';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
 import { ScaledGameRoot } from '@/components/game/ScaledGameRoot';
 import { GameScaleProvider } from '@/components/game/GameScaleContext';
+import { IdleWarningToast } from '@/components/game/IdleWarningToast';
+import { GameCancelledOverlay } from '@/components/game/GameCancelledOverlay';
 
 function useIsMobileViewport(): boolean {
   const [isMobile, setIsMobile] = useState(false);
@@ -100,21 +102,10 @@ export default function GamePage() {
   
   const hasActiveGame = gameState || (isOnlineGame && visibleState) || isSpectating;
 
-  const cancelToastT = useTranslations('game.end');
-  useEffect(() => {
-    if (!socketGameCancelled) return;
-    if (typeof window !== 'undefined') {
-      try {
-        const msg = cancelToastT('cancelledMulliganIdle');
-        if (typeof window.alert === 'function') window.alert(msg);
-      } catch { /* ignore */ }
-    }
-    const timer = setTimeout(() => {
-      useSocketStore.setState({ gameCancelled: null });
-      router.push('/play/online');
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [socketGameCancelled, router, cancelToastT]);
+  const acknowledgeGameCancelled = useCallback(() => {
+    useSocketStore.setState({ gameCancelled: null });
+    router.push('/play/online');
+  }, [router]);
 
 
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -346,6 +337,10 @@ export default function GamePage() {
       )}
       {isOnlineGame && opponentDisconnected && (
         <OpponentDisconnectBanner deadline={opponentDisconnectDeadline} />
+      )}
+      {isOnlineGame && <IdleWarningToast />}
+      {isOnlineGame && socketGameCancelled && (
+        <GameCancelledOverlay onAcknowledge={acknowledgeGameCancelled} />
       )}
     </>
   );

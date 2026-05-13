@@ -100,6 +100,12 @@
   "game": {
     "turn": "Tour {turn}",
     "turnLabel": "Tour",
+    "clock": {
+      "idleWarningTitle": "Inactivité détectée",
+      "idleWarningMessage": "Action automatique dans {seconds}. Joue pour réinitialiser.",
+      "idleSecondTitle": "Deuxième inactivité",
+      "idleSecondMessage": "Défaite dans {seconds} si pas d'action."
+    },
     "phase": {
       "start": "Phase de Début",
       "action": "Phase d'Action",
@@ -348,6 +354,9 @@
       "opponentLostByIdle": "L'adversaire est resté inactif trop longtemps",
       "youLostByIdle": "Vous êtes resté inactif trop longtemps",
       "cancelledMulliganIdle": "Partie annulée : inactivité au mulligan",
+      "cancelledGeneric": "Partie annulée",
+      "cancelledTitle": "Partie annulée",
+      "cancelledAcknowledge": "Retour au lobby",
       "saveReplay": "Enregistrer la partie",
       "savingReplay": "Enregistrement...",
       "replaySaved": "Partie enregistrée",

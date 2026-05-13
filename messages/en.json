@@ -100,6 +100,12 @@
   "game": {
     "turn": "Turn {turn}",
     "turnLabel": "Turn",
+    "clock": {
+      "idleWarningTitle": "Inactivity detected",
+      "idleWarningMessage": "Auto-action in {seconds}. Take an action to reset.",
+      "idleSecondTitle": "Second inactivity",
+      "idleSecondMessage": "Defeat in {seconds} if no action."
+    },
     "phase": {
       "start": "Start Phase",
       "action": "Action Phase",
@@ -348,6 +354,9 @@
       "opponentLostByIdle": "Opponent stayed inactive too long",
       "youLostByIdle": "You stayed inactive too long",
       "cancelledMulliganIdle": "Game cancelled: inactivity at mulligan",
+      "cancelledGeneric": "Game cancelled",
+      "cancelledTitle": "Game cancelled",
+      "cancelledAcknowledge": "Back to lobby",
       "saveReplay": "Save Replay",
       "savingReplay": "Saving...",
       "replaySaved": "Replay Saved",
