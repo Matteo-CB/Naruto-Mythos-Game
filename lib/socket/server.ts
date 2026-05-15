@@ -594,12 +594,20 @@ async function finalizeGameEnd(
     .then(({ cleanupOldGames }) => cleanupOldGames())
     .catch(() => {});
 
-  
+
   const isEvolving = room.isEvolving === true;
   const eloField: 'elo' | 'evolvingElo' = isEvolving ? 'evolvingElo' : 'elo';
   const eloType: 'ranked' | 'evolving' = isEvolving ? 'evolving' : 'ranked';
+  const winsField: 'wins' | 'evolvingWins' = isEvolving ? 'evolvingWins' : 'wins';
+  const lossesField: 'losses' | 'evolvingLosses' = isEvolving ? 'evolvingLosses' : 'losses';
   const getElo = (u: { elo: number; evolvingElo?: number | null }): number =>
     isEvolving ? (u.evolvingElo ?? 500) : u.elo;
+  const buildWinStats = () => ({ [winsField]: { increment: 1 } });
+  const buildLossStats = () => ({ [lossesField]: { increment: 1 } });
+  const getTotalGames = (u: { wins: number; losses: number; draws: number; evolvingWins?: number | null; evolvingLosses?: number | null; evolvingDraws?: number | null }): number =>
+    isEvolving
+      ? ((u.evolvingWins ?? 0) + (u.evolvingLosses ?? 0) + (u.evolvingDraws ?? 0))
+      : (u.wins + u.losses + u.draws);
 
   try {
     if (room.isRanked && room.hostId && room.guestId) {
@@ -617,7 +625,7 @@ async function finalizeGameEnd(
         const delta = survivorWon ? 10 : -25;
         const oldElo = getElo(survivor);
         const newElo = Math.max(100, oldElo + delta);
-        const stats = survivorWon ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
+        const stats = survivorWon ? buildWinStats() : buildLossStats();
         const updated = await prisma.user.update({
           where: { id: survivor.id },
           data: {
@@ -633,8 +641,8 @@ async function finalizeGameEnd(
           player2Delta: survivorIsP1 ? 0 : (newElo - oldElo),
           player1NewElo: survivorIsP1 ? updatedElo : 0,
           player2NewElo: survivorIsP1 ? 0 : updatedElo,
-          player1TotalGames: survivorIsP1 ? updated.wins + updated.losses + updated.draws : 0,
-          player2TotalGames: survivorIsP1 ? 0 : updated.wins + updated.losses + updated.draws,
+          player1TotalGames: survivorIsP1 ? getTotalGames(updated) : 0,
+          player2TotalGames: survivorIsP1 ? 0 : getTotalGames(updated),
         };
         prisma.eloHistory.create({
           data: {
@@ -674,8 +682,8 @@ async function finalizeGameEnd(
           player2ConsecLosses: player2.consecutiveLosses ?? 0,
         });
 
-        const p1Stats = winner === 'player1' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
-        const p2Stats = winner === 'player2' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
+        const p1Stats = winner === 'player1' ? buildWinStats() : buildLossStats();
+        const p2Stats = winner === 'player2' ? buildWinStats() : buildLossStats();
 
         const [updatedP1, updatedP2] = await Promise.all([
           prisma.user.update({
@@ -703,8 +711,8 @@ async function finalizeGameEnd(
           player2Delta: changes.player2Delta,
           player1NewElo: getElo(updatedP1),
           player2NewElo: getElo(updatedP2),
-          player1TotalGames: updatedP1.wins + updatedP1.losses + updatedP1.draws,
-          player2TotalGames: updatedP2.wins + updatedP2.losses + updatedP2.draws,
+          player1TotalGames: getTotalGames(updatedP1),
+          player2TotalGames: getTotalGames(updatedP2),
         };
 
         const p1Result: 'win' | 'loss' = winner === 'player1' ? 'win' : 'loss';
@@ -779,13 +787,13 @@ async function finalizeGameEnd(
             player1ConsecWins: p1Retry.consecutiveWins ?? 0, player1ConsecLosses: p1Retry.consecutiveLosses ?? 0,
             player2ConsecWins: p2Retry.consecutiveWins ?? 0, player2ConsecLosses: p2Retry.consecutiveLosses ?? 0,
           });
-          const p1S = winner === 'player1' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
-          const p2S = winner === 'player2' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
+          const p1S = winner === 'player1' ? buildWinStats() : buildLossStats();
+          const p2S = winner === 'player2' ? buildWinStats() : buildLossStats();
           const [uP1, uP2] = await Promise.all([
             prisma.user.update({ where: { id: room.hostId! }, data: { [eloField]: retryChanges.player1NewElo, ...p1S, consecutiveWins: retryChanges.player1NewConsecWins, consecutiveLosses: retryChanges.player1NewConsecLosses, ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}) } as never }),
             prisma.user.update({ where: { id: room.guestId! }, data: { [eloField]: retryChanges.player2NewElo, ...p2S, consecutiveWins: retryChanges.player2NewConsecWins, consecutiveLosses: retryChanges.player2NewConsecLosses, ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}) } as never }),
           ]);
-          eloData = { player1Delta: retryChanges.player1Delta, player2Delta: retryChanges.player2Delta, player1NewElo: getElo(uP1), player2NewElo: getElo(uP2), player1TotalGames: uP1.wins + uP1.losses + uP1.draws, player2TotalGames: uP2.wins + uP2.losses + uP2.draws };
+          eloData = { player1Delta: retryChanges.player1Delta, player2Delta: retryChanges.player2Delta, player1NewElo: getElo(uP1), player2NewElo: getElo(uP2), player1TotalGames: getTotalGames(uP1), player2TotalGames: getTotalGames(uP2) };
           console.log(`[Socket] ELO retry (${label}) succeeded`);
           prisma.eloHistory.create({
             data: {

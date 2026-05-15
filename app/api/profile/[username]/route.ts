@@ -35,6 +35,9 @@ export async function GET(
         wins: true,
         losses: true,
         draws: true,
+        evolvingWins: true,
+        evolvingLosses: true,
+        evolvingDraws: true,
         role: true,
         badgePrefs: true,
         discordUsername: true,
@@ -52,7 +55,7 @@ export async function GET(
 
     const limit = page * perPage;
 
-    const [totalRanked, eloRows, aiGames, evolvingWins, evolvingLosses] = await Promise.all([
+    const [totalRanked, eloRows, aiGames] = await Promise.all([
       prisma.eloHistory.count({ where: { userId: user.id } }),
       prisma.eloHistory.findMany({
         where: { userId: user.id },
@@ -78,8 +81,6 @@ export async function GET(
         orderBy: { completedAt: 'desc' },
         take: limit,
       }),
-      prisma.eloHistory.count({ where: { userId: user.id, eloType: 'evolving', result: 'win' } }),
-      prisma.eloHistory.count({ where: { userId: user.id, eloType: 'evolving', result: 'loss' } }),
     ]);
 
     const candidateGameIds = eloRows
@@ -174,7 +175,7 @@ export async function GET(
 
     const { decks: _omit, ...userWithoutDecks } = user;
     void _omit;
-    return NextResponse.json({ ...userWithoutDecks, decks, evolvingWins, evolvingLosses, recentGames, totalGames, page, perPage });
+    return NextResponse.json({ ...userWithoutDecks, decks, recentGames, totalGames, page, perPage });
   } catch (err) {
     console.error('[profile] error:', err);
     return NextResponse.json(

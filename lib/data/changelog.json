@@ -8,13 +8,15 @@
         "Discord : les roles de vainqueur de tournoi sont desormais en anglais (Tournament Winner X). Les roles existants sont renommes automatiquement sans perdre tes attributions.",
         "Bug corrige : l'annonce du vainqueur de tournoi sur Discord ne partait plus dans certains cas. Le webhook recupere maintenant la variable d'environnement a chaque appel et explique clairement dans les logs si l'envoi echoue.",
         "Discord : a chaque creation de tournoi, un message detaille est poste dans le salon planning avec le format, le mode de jeu, le nombre max de joueurs, la date de debut (affichee dans le fuseau horaire de chaque lecteur), un compte a rebours, les eventuelles restrictions et un ping du role Tournament.",
-        "Discord : tu peux maintenant t'inscrire aux notifications de tournois en reagissant avec l'emoji trophee sur le message d'annonce du salon inscription. Retire la reaction pour ne plus etre ping."
+        "Discord : tu peux maintenant t'inscrire aux notifications de tournois en reagissant avec l'emoji trophee sur le message d'annonce du salon inscription. Retire la reaction pour ne plus etre ping.",
+        "Les stats Evolving sont desormais separees des stats classees sur les profils et les classements. Les anciennes parties sont recuperees automatiquement et le classement Evolving n'affiche que les victoires / defaites / nuls Evolving."
       ],
       "changes_en": [
         "Discord: tournament winner roles are now in English (Tournament Winner X). Existing roles are renamed automatically without losing any role assignments.",
         "Bug fixed: the tournament winner announcement on Discord did not always fire. The webhook now reads its environment variable on every call and logs a clear reason if the post fails.",
         "Discord: every new tournament now posts a detailed announcement in the planning channel with format, game mode, max players, start time (displayed in each viewer's timezone), a countdown, any restrictions, and a Tournament role ping.",
-        "Discord: you can now sign up for tournament notifications by reacting with the trophy emoji on the signup message. Remove the reaction to opt out."
+        "Discord: you can now sign up for tournament notifications by reacting with the trophy emoji on the signup message. Remove the reaction to opt out.",
+        "Evolving stats are now fully separated from ranked stats on profiles and leaderboards. Past games are recovered automatically and the Evolving leaderboard only shows Evolving wins / losses / draws."
       ]
     },
     {

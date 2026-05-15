@@ -25,6 +25,7 @@ interface ProfileData {
   evolvingElo?: number;
   evolvingWins?: number;
   evolvingLosses?: number;
+  evolvingDraws?: number;
   wins: number;
   losses: number;
   draws: number;

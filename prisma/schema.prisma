@@ -46,6 +46,9 @@ model User {
   consecutiveLosses  Int          @default(0)
   evolvingElo        Int          @default(500)
   evolvingGamesPlayed Int         @default(0)
+  evolvingWins       Int          @default(0)
+  evolvingLosses     Int          @default(0)
+  evolvingDraws      Int          @default(0)
 
   @@index([elo])
   @@index([createdAt])

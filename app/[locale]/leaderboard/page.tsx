@@ -20,6 +20,9 @@ interface LeaderboardUser {
   wins: number;
   losses: number;
   draws: number;
+  evolvingWins?: number;
+  evolvingLosses?: number;
+  evolvingDraws?: number;
   role?: string;
   badgePrefs?: string[];
   consecutiveWins?: number;
@@ -71,8 +74,11 @@ function LeaderRow({
   isSelf: boolean;
   type: LeaderboardType;
 }) {
-  const total = user.wins + user.losses + user.draws;
-  const winRate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
+  const wins = type === 'evolving' ? (user.evolvingWins ?? 0) : user.wins;
+  const losses = type === 'evolving' ? (user.evolvingLosses ?? 0) : user.losses;
+  const draws = type === 'evolving' ? (user.evolvingDraws ?? 0) : user.draws;
+  const total = wins + losses + draws;
+  const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
   const displayElo = type === 'evolving' ? (user.evolvingElo ?? 500) : user.elo;
   const tier = getRankTier(user.elo);
   const placed = total >= PLACEMENT_MATCHES_REQUIRED;
@@ -129,9 +135,9 @@ function LeaderRow({
       </div>
 
       <div className="hidden sm:flex font-inter-force items-center gap-1.5">
-        <span className="text-[10px] tabular-nums" style={{ color: '#5fb05f' }}>{user.wins}W</span>
-        <span className="text-[10px] tabular-nums" style={{ color: '#d97676' }}>{user.losses}L</span>
-        <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>{user.draws}D</span>
+        <span className="text-[10px] tabular-nums" style={{ color: '#5fb05f' }}>{wins}W</span>
+        <span className="text-[10px] tabular-nums" style={{ color: '#d97676' }}>{losses}L</span>
+        <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>{draws}D</span>
       </div>
 
       <span className="hidden sm:block font-inter-force text-xs tabular-nums w-10 text-right" style={{ color: '#666' }}>
