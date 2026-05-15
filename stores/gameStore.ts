@@ -884,7 +884,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     useSocketStore.setState({ isSpectating: false, spectatingRoomCode: null, spectatorCount: 0 });
     useUIStore.getState().setCoinFlipComplete(false);
-    useUIStore.getState().setMissionDeckIntroComplete(false);
+    useUIStore.getState().setMissionDeckIntroComplete(true);
     const humanName = playerName || 'Player';
     const oppName = opponentName || 'Opponent';
     const playerDisplayNames = {
@@ -977,7 +977,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     useSocketStore.setState({ isSpectating: false, spectatingRoomCode: null, spectatorCount: 0 });
     
     useUIStore.getState().setCoinFlipComplete(false);
-    useUIStore.getState().setMissionDeckIntroComplete(false);
+    useUIStore.getState().setMissionDeckIntroComplete(true);
     
     
     useTrainingStore.getState().disable();
@@ -1041,7 +1041,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     useSocketStore.setState({ isSpectating: false, spectatingRoomCode: null, spectatorCount: 0 });
     useUIStore.getState().setCoinFlipComplete(false);
-    useUIStore.getState().setMissionDeckIntroComplete(false);
+    useUIStore.getState().setMissionDeckIntroComplete(true);
     useTrainingStore.getState().disable();
     resetIdCounter();
     const state = GameEngine.createGame(config);
@@ -2017,7 +2017,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     useUIStore.getState().resetHandOrder();
     useUIStore.getState().setCoinFlipComplete(false);
-    useUIStore.getState().setMissionDeckIntroComplete(false);
+    useUIStore.getState().setMissionDeckIntroComplete(true);
     useUIStore.getState().restoreGameEnd();
     useUIStore.getState().restoreEffectPopup();
     set({

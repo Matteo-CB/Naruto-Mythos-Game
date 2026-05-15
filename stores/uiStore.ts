@@ -156,7 +156,7 @@ export const useUIStore = create<UIStore>((set) => ({
   coinFlipComplete: false,
   setCoinFlipComplete: (done) => set({ coinFlipComplete: done }),
 
-  missionDeckIntroComplete: false,
+  missionDeckIntroComplete: true,
   setMissionDeckIntroComplete: (done) => set({ missionDeckIntroComplete: done }),
 
   handOrder: null,

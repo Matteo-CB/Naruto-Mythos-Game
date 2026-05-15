@@ -3124,11 +3124,9 @@ export class EffectEngine {
       }
 
       case 'SHIKAMARU022_CONFIRM_AMBUSH': {
-        
         const s022Opponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
         const s022EnemySide: 'player1Characters' | 'player2Characters' =
           pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
-        const s022Turn = newState.turn;
 
         const PLAY_ACTIONS_022 = new Set([
           'PLAY_CHARACTER', 'REVEAL_CHARACTER', 'REVEAL_UPGRADE', 'UPGRADE_CHARACTER',
@@ -3138,30 +3136,24 @@ export class EffectEngine {
         ]);
 
         const s022PlayedChars: { name?: string; instanceId?: string; mission: number }[] = [];
-        let s022LastOwnIdx = -1;
         let s022SkippedSource = false;
         for (let i = newState.log.length - 1; i >= 0; i--) {
           const entry = newState.log[i];
-          if (entry.turn !== s022Turn || entry.phase !== 'action') break;
-          if (entry.player !== pendingEffect.sourcePlayer) continue;
-          if (
-            entry.action === 'PASS' ||
-            entry.action === 'PLAY_HIDDEN' ||
-            PLAY_ACTIONS_022.has(entry.action)
-          ) {
-            if (!s022SkippedSource) {
+          if (entry.phase !== 'action') continue;
+
+          if (entry.player === pendingEffect.sourcePlayer) {
+            const isPlayLike022 = PLAY_ACTIONS_022.has(entry.action) || entry.action === 'PLAY_HIDDEN';
+            if (!s022SkippedSource && isPlayLike022) {
               s022SkippedSource = true;
               continue;
             }
-            s022LastOwnIdx = i;
-            break;
+            if (isPlayLike022) break;
+            continue;
           }
-        }
-        for (let i = s022LastOwnIdx + 1; i < newState.log.length; i++) {
-          const entry = newState.log[i];
-          if (entry.turn !== s022Turn || entry.phase !== 'action') break;
+
           if (entry.player !== s022Opponent) continue;
           if (entry.action === 'PASS') continue;
+
           const missionNum = entry.messageParams?.mission != null ? Number(entry.messageParams.mission) - 1 : null;
           if (entry.action === 'PLAY_HIDDEN') {
             const instId = entry.messageParams?.instanceId as string | undefined;
@@ -3174,6 +3166,7 @@ export class EffectEngine {
             if (charName && missionNum !== null) s022PlayedChars.push({ name: charName, mission: missionNum });
           }
         }
+        s022PlayedChars.reverse();
 
         const s022Targets: string[] = [];
         for (const played of s022PlayedChars) {
@@ -10021,6 +10014,13 @@ export class EffectEngine {
       
       
       
+      case 'KIBA149_CHOOSE_AKAMARU':
+      case 'KIBA149_CHOOSE_AKAMARU_DEFEAT': {
+        const useDefeat_k149 = pendingEffect.targetSelectionType === 'KIBA149_CHOOSE_AKAMARU_DEFEAT';
+        newState = EffectEngine.kiba149ResolveAkamaruChoice(newState, pendingEffect, targetId, useDefeat_k149);
+        break;
+      }
+
       case 'KIBA113_CHOOSE_AKAMARU':
       case 'KIBA113_CHOOSE_AKAMARU_DEFEAT': {
         const isDefeatMode = pendingEffect.targetSelectionType === 'KIBA113_CHOOSE_AKAMARU_DEFEAT';
@@ -19308,27 +19308,19 @@ export class EffectEngine {
 
     const friendlySide: 'player1Characters' | 'player2Characters' =
       pending.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-    const enemySide: 'player1Characters' | 'player2Characters' =
-      pending.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
-    const opponentPlayer: PlayerID = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
 
-    
-    let akamaru: CharacterInPlay | null = null;
-    let akamaruMI = -1;
+    const akamaruTargets: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       for (const char of newState.activeMissions[i][friendlySide]) {
         if (char.isHidden) continue;
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if (topCard.name_fr.toUpperCase().includes('AKAMARU')) {
-          akamaru = char;
-          akamaruMI = i;
-          break;
+          akamaruTargets.push(char.instanceId);
         }
       }
-      if (akamaru) break;
     }
 
-    if (!akamaru || akamaruMI === -1) {
+    if (akamaruTargets.length === 0) {
       newState.log = logAction(
         newState.log, newState.turn, newState.phase, pending.sourcePlayer,
         'EFFECT_NO_TARGET',
@@ -19339,7 +19331,69 @@ export class EffectEngine {
       return newState;
     }
 
-    
+    const selType = useDefeat ? 'KIBA149_CHOOSE_AKAMARU_DEFEAT' : 'KIBA149_CHOOSE_AKAMARU';
+    const descKey = useDefeat
+      ? 'game.effect.desc.kiba149ChooseAkamaruDefeat'
+      : 'game.effect.desc.kiba149ChooseAkamaru';
+    const extraData = JSON.stringify({ sourceMissionIndex: confData.sourceMissionIndex });
+
+    const effId = generateInstanceId();
+    const actId = generateInstanceId();
+    newState.pendingEffects = [...newState.pendingEffects, {
+      id: effId,
+      sourceCardId: pending.sourceCardId,
+      sourceInstanceId: pending.sourceInstanceId,
+      sourceMissionIndex: confData.sourceMissionIndex,
+      effectType: pending.effectType,
+      effectDescription: extraData,
+      targetSelectionType: selType,
+      sourcePlayer: pending.sourcePlayer,
+      requiresTargetSelection: true,
+      validTargets: akamaruTargets,
+      isOptional: true,
+      isMandatory: false,
+      resolved: false,
+      isUpgrade: useDefeat,
+    }];
+    newState.pendingActions = [...newState.pendingActions, {
+      id: actId,
+      type: 'SELECT_TARGET' as PendingAction['type'],
+      player: pending.sourcePlayer,
+      description: useDefeat
+        ? 'Kiba Inuzuka (113 MV): Choose which Akamaru to defeat.'
+        : 'Kiba Inuzuka (113 MV): Choose which Akamaru to hide.',
+      descriptionKey: descKey,
+      options: akamaruTargets,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effId,
+    }];
+
+    return newState;
+  }
+
+  static kiba149ResolveAkamaruChoice(
+    state: GameState,
+    pending: PendingEffect,
+    chosenAkamaruInstanceId: string,
+    useDefeat: boolean,
+  ): GameState {
+    let newState = { ...state };
+    let confData: { sourceMissionIndex: number } | null = null;
+    try { confData = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
+    if (!confData) return newState;
+
+    const friendlySide: 'player1Characters' | 'player2Characters' =
+      pending.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+    const enemySide: 'player1Characters' | 'player2Characters' =
+      pending.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+    const opponentPlayer: PlayerID = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
+
+    const akamaruResult = EffectEngine.findCharByInstanceId(newState, chosenAkamaruInstanceId);
+    if (!akamaruResult) return newState;
+    const akamaru = akamaruResult.character;
+    const akamaruMI = akamaruResult.missionIndex;
+
     if (useDefeat) {
       newState = defeatFriendlyCharacter(newState, akamaruMI, akamaru.instanceId, pending.sourcePlayer);
       newState.log = logAction(
@@ -19350,10 +19404,6 @@ export class EffectEngine {
         { card: 'KIBA INUZUKA', id: 'KS-113-MV', target: akamaru.card.name_fr },
       );
     } else {
-      
-      
-      
-      
       newState = EffectEngine.hideCharacter(newState, akamaru.instanceId);
       newState = {
         ...newState,
@@ -19367,7 +19417,6 @@ export class EffectEngine {
       };
     }
 
-    
     const srcMI = confData.sourceMissionIndex;
     const thisMission = newState.activeMissions[srcMI];
     if (!thisMission) return newState;
@@ -19375,7 +19424,7 @@ export class EffectEngine {
     const validTargets: string[] = [];
     for (const char of thisMission[friendlySide]) {
       if (char.isHidden) continue;
-      if (char.instanceId === confData.sourceCardInstanceId) continue;
+      if (char.instanceId === pending.sourceInstanceId) continue;
       if (char.instanceId === akamaru.instanceId) continue;
       validTargets.push(char.instanceId);
     }

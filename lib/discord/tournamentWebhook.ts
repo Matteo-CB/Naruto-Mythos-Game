@@ -1,9 +1,6 @@
 import { prisma } from '@/lib/db/prisma';
 import { isDiscordMember } from './tournamentRoles';
 
-const WEBHOOK_URL = process.env.TOURNOI_WINNER_WEBHOOK;
-const GUILD_ID = process.env.SERVER_DISCORD_ID;
-
 interface PodiumEntry {
   userId: string;
   username: string;
@@ -32,8 +29,13 @@ export async function sendTournamentResults(
   totalParticipants: number,
   newRoleName: string | null,
 ): Promise<void> {
-  if (!WEBHOOK_URL) {
-    console.warn('[TournamentWebhook] TOURNOI_WINNER_WEBHOOK not set');
+  const webhookUrl = process.env.TOURNOI_WINNER_WEBHOOK;
+  if (!webhookUrl) {
+    console.warn('[TournamentWebhook] TOURNOI_WINNER_WEBHOOK not set, skipping results announcement');
+    return;
+  }
+  if (!podium || podium.length === 0) {
+    console.warn(`[TournamentWebhook] Empty podium for "${tournamentName}", skipping announcement`);
     return;
   }
 
@@ -41,7 +43,12 @@ export async function sendTournamentResults(
   const finalist = podium.find(p => p.place === 2);
   const thirdPlace = podium.find(p => p.place === 3);
 
-  if (!winner) return;
+  if (!winner) {
+    console.warn(`[TournamentWebhook] No 1st place in podium for "${tournamentName}" (entries: ${podium.length}), skipping announcement`);
+    return;
+  }
+
+  console.log(`[TournamentWebhook] Sending results for "${tournamentName}" podium=${podium.length} participants=${totalParticipants} role=${newRoleName ?? 'none'}`);
 
   const winnerMention = await getDiscordMention(winner.userId);
   const finalistMention = finalist ? await getDiscordMention(finalist.userId) : '';
@@ -65,7 +72,7 @@ export async function sendTournamentResults(
   }
 
   try {
-    const res = await fetch(WEBHOOK_URL, {
+    const res = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -78,9 +85,16 @@ export async function sendTournamentResults(
       }),
     });
     if (!res.ok) {
-      console.error(`[TournamentWebhook] Failed to send: ${res.status}`);
+      const body = await res.text().catch(() => '(could not read body)');
+      if (res.status === 401 || res.status === 404) {
+        console.error(`[TournamentWebhook] CRITICAL: webhook returned ${res.status}, likely revoked or deleted. Body: ${body}`);
+      } else {
+        console.error(`[TournamentWebhook] Failed to send (${res.status}): ${body}`);
+      }
+      return;
     }
+    console.log(`[TournamentWebhook] Results posted for "${tournamentName}"`);
   } catch (err) {
-    console.error('[TournamentWebhook] Error:', err);
+    console.error('[TournamentWebhook] Network error sending results:', err instanceof Error ? err.message : err);
   }
 }

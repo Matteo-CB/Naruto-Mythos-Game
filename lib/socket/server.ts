@@ -464,7 +464,7 @@ function broadcastRoomList(io: SocketIOServer): void {
 function broadcastActiveGames(io: SocketIOServer): void {
   const activeGames: Array<{
     roomCode: string; player1Name: string; player2Name: string;
-    spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean;
+    spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean; isEvolving: boolean;
   }> = [];
 
   const seenPlayerIds = new Set<string>();
@@ -484,6 +484,7 @@ function broadcastActiveGames(io: SocketIOServer): void {
       turn: room.gameState.turn,
       isRanked: room.isRanked,
       isPrivate: false,
+      isEvolving: room.isEvolving === true,
     });
   }
   io.to('games-watchers').emit('games:list-update', { games: activeGames });
@@ -623,6 +624,7 @@ async function finalizeGameEnd(
             [eloField]: newElo, ...stats,
             consecutiveWins: survivorWon ? (survivor.consecutiveWins ?? 0) + 1 : 0,
             consecutiveLosses: survivorWon ? 0 : (survivor.consecutiveLosses ?? 0) + 1,
+            ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}),
           } as never,
         });
         const updatedElo = getElo(updated);
@@ -682,6 +684,7 @@ async function finalizeGameEnd(
               [eloField]: changes.player1NewElo, ...p1Stats,
               consecutiveWins: changes.player1NewConsecWins,
               consecutiveLosses: changes.player1NewConsecLosses,
+              ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}),
             } as never,
           }),
           prisma.user.update({
@@ -690,6 +693,7 @@ async function finalizeGameEnd(
               [eloField]: changes.player2NewElo, ...p2Stats,
               consecutiveWins: changes.player2NewConsecWins,
               consecutiveLosses: changes.player2NewConsecLosses,
+              ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}),
             } as never,
           }),
         ]);
@@ -778,8 +782,8 @@ async function finalizeGameEnd(
           const p1S = winner === 'player1' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
           const p2S = winner === 'player2' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
           const [uP1, uP2] = await Promise.all([
-            prisma.user.update({ where: { id: room.hostId! }, data: { [eloField]: retryChanges.player1NewElo, ...p1S, consecutiveWins: retryChanges.player1NewConsecWins, consecutiveLosses: retryChanges.player1NewConsecLosses } as never }),
-            prisma.user.update({ where: { id: room.guestId! }, data: { [eloField]: retryChanges.player2NewElo, ...p2S, consecutiveWins: retryChanges.player2NewConsecWins, consecutiveLosses: retryChanges.player2NewConsecLosses } as never }),
+            prisma.user.update({ where: { id: room.hostId! }, data: { [eloField]: retryChanges.player1NewElo, ...p1S, consecutiveWins: retryChanges.player1NewConsecWins, consecutiveLosses: retryChanges.player1NewConsecLosses, ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}) } as never }),
+            prisma.user.update({ where: { id: room.guestId! }, data: { [eloField]: retryChanges.player2NewElo, ...p2S, consecutiveWins: retryChanges.player2NewConsecWins, consecutiveLosses: retryChanges.player2NewConsecLosses, ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}) } as never }),
           ]);
           eloData = { player1Delta: retryChanges.player1Delta, player2Delta: retryChanges.player2Delta, player1NewElo: getElo(uP1), player2NewElo: getElo(uP2), player1TotalGames: uP1.wins + uP1.losses + uP1.draws, player2TotalGames: uP2.wins + uP2.losses + uP2.draws };
           console.log(`[Socket] ELO retry (${label}) succeeded`);
@@ -1238,7 +1242,13 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
 export function setupSocketHandlers(io: SocketIOServer) {
   ioInstance = io;
 
-  
+  if (!process.env.TOURNOI_WINNER_WEBHOOK) {
+    console.warn('[Boot] TOURNOI_WINNER_WEBHOOK not set, tournament results will not be announced on Discord');
+  }
+  if (!process.env.TOURNAMENT_PLANNING_WEBHOOK) {
+    console.warn('[Boot] TOURNAMENT_PLANNING_WEBHOOK not set, new tournaments will not be announced on Discord');
+  }
+
   process.on('uncaughtException', (err) => {
     console.error('[FATAL] Uncaught exception:', err.message, err.stack);
   });
@@ -2434,14 +2444,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
       room.chessClock = createChessClock();
       room.chessClockLastInputKey = null;
 
-      
+      const rematchReselectPayload = { roomCode: code, isSealed: room.isSealed, isEvolving: room.isEvolving === true };
       if (room.hostSocket) {
         io.to(room.hostSocket).emit('game:rematch-accepted');
-        io.to(room.hostSocket).emit('game:rematch-reselect', { roomCode: code, isSealed: room.isSealed });
+        io.to(room.hostSocket).emit('game:rematch-reselect', rematchReselectPayload);
       }
       if (room.guestSocket) {
         io.to(room.guestSocket).emit('game:rematch-accepted');
-        io.to(room.guestSocket).emit('game:rematch-reselect', { roomCode: code, isSealed: room.isSealed });
+        io.to(room.guestSocket).emit('game:rematch-reselect', rematchReselectPayload);
       }
 
       
@@ -2957,6 +2967,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         turn: number;
         isRanked: boolean;
         isPrivate: boolean;
+        isEvolving: boolean;
       }> = [];
 
       for (const [code, room] of rooms) {
@@ -2969,6 +2980,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           turn: room.gameState.turn,
           isRanked: room.isRanked,
           isPrivate: room.isPrivate,
+          isEvolving: room.isEvolving === true,
         });
       }
 

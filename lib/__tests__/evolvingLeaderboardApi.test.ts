@@ -68,6 +68,32 @@ describe('Phase 9 — leaderboard ?type=evolving', () => {
     p.user.findMany.mockResolvedValue([]);
     await GetLeaderboard(makeReq('?type=evolving&league=academyStudent') as never);
     const call = p.user.findMany.mock.calls[0][0];
+    expect(call.where).toEqual({ evolvingGamesPlayed: { gt: 0 } });
+  });
+
+  it('filters out users who never played an Evolving game (evolvingGamesPlayed: gt 0)', async () => {
+    p.user.findMany.mockResolvedValue([]);
+    await GetLeaderboard(makeReq('?type=evolving') as never);
+    const call = p.user.findMany.mock.calls[0][0];
+    expect(call.where).toEqual({ evolvingGamesPlayed: { gt: 0 } });
+  });
+
+  it('combines evolvingGamesPlayed filter with search when both provided', async () => {
+    p.user.findMany.mockResolvedValue([]);
+    await GetLeaderboard(makeReq('?type=evolving&search=Alice') as never);
+    const call = p.user.findMany.mock.calls[0][0];
+    expect(call.where).toEqual({
+      AND: [
+        { username: { contains: 'Alice', mode: 'insensitive' } },
+        { evolvingGamesPlayed: { gt: 0 } },
+      ],
+    });
+  });
+
+  it('ranked leaderboard does NOT add evolvingGamesPlayed filter', async () => {
+    p.user.findMany.mockResolvedValue([]);
+    await GetLeaderboard(makeReq('') as never);
+    const call = p.user.findMany.mock.calls[0][0];
     expect(call.where).toEqual({});
   });
 

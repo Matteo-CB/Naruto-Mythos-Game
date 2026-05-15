@@ -91,6 +91,7 @@ export default function GamePage() {
 
   const acknowledgeGameCancelled = useCallback(() => {
     useSocketStore.setState({ gameCancelled: null });
+    useGameStore.setState({ gameState: null, visibleState: null, gameOver: false, isOnlineGame: false });
     router.push('/play/online');
   }, [router]);
 
@@ -231,7 +232,9 @@ export default function GamePage() {
   const rematchRoomCode = useSocketStore((s) => s.rematchRoomCode);
   useEffect(() => {
     if (!rematchRoomCode) return;
-    const sealed = useSocketStore.getState().isSealedRoom;
+    const ss = useSocketStore.getState();
+    const sealed = ss.isSealedRoom;
+    const evolving = ss.currentRoomGameMode === 'evolving';
     useSocketStore.setState({ rematchRoomCode: null, rematchState: 'none' });
     useGameStore.setState({
       gameState: null,
@@ -248,7 +251,7 @@ export default function GamePage() {
       sealedDeckCardIds: null,
       sealedDeckMissionIds: null,
     });
-    router.push(sealed ? '/play/sealed' : '/play/online');
+    router.push(sealed ? '/play/sealed' : evolving ? '/play/online/evolving' : '/play/online');
   }, [rematchRoomCode, router]);
 
   

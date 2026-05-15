@@ -13,6 +13,7 @@ import { Footer } from '@/components/Footer';
 import { DeckSelector } from '@/components/game/DeckSelector';
 import { EvolvingTop5 } from '@/components/evolving/EvolvingTop5';
 import { EvolvingRulesModal } from '@/components/deckBuilder/EvolvingRulesModal';
+import { LiveGamesSection } from '@/components/online/LiveGamesSection';
 import { useSocketStore } from '@/lib/socket/client';
 import { useGameStore } from '@/stores/gameStore';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
@@ -433,6 +434,8 @@ export default function PlayOnlineEvolvingPage() {
                       {t('evolving.lobby.createPublicEvolvingRoom')}
                     </button>
                   </div>
+
+                  <LiveGamesSection filter="evolving" />
                 </div>
               )}
 

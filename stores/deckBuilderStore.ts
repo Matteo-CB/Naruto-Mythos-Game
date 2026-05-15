@@ -55,6 +55,7 @@ interface DeckBuilderStore {
   clearAddError: () => void;
   reorderChars: (fromIndex: number, toIndex: number) => void;
   sortCharsByCost: () => void;
+  sortCharsByName: () => void;
   setEvolvingMode: (on: boolean) => void;
 
 
@@ -209,6 +210,16 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
       const costDiff = (a.chakra ?? 0) - (b.chakra ?? 0);
       if (costDiff !== 0) return costDiff;
       return a.name_fr.localeCompare(b.name_fr);
+    });
+    set({ deckChars: sorted });
+  },
+
+  sortCharsByName: () => {
+    const { deckChars } = get();
+    const sorted = [...deckChars].sort((a, b) => {
+      const nameDiff = a.name_fr.localeCompare(b.name_fr);
+      if (nameDiff !== 0) return nameDiff;
+      return (a.chakra ?? 0) - (b.chakra ?? 0);
     });
     set({ deckChars: sorted });
   },

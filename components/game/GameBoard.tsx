@@ -30,7 +30,6 @@ import { normalizeImagePath } from "@/lib/utils/imagePath";
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from "@/lib/utils/cardLocale";
 import { SandboxToolbar } from "./SandboxToolbar";
 import { EdgeCoinFlip } from "./EdgeCoinFlip";
-import { MissionDeckIntro } from "./MissionDeckIntro";
 import { useSocketStore } from "@/lib/socket/client";
 import { GameChat } from "./GameChat";
 import { SpectatorBanner } from "./SpectatorBanner";
@@ -1195,7 +1194,6 @@ function GameBoardInner() {
       <MobileDetailsButton />
 
       <EdgeCoinFlip />
-      <MissionDeckIntro />
       <SpectatorBanner />
       <MulliganDialog />
       <GameLog />

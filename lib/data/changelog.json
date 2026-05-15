@@ -1,6 +1,23 @@
 {
   "entries": [
     {
+      "date": "2026-05-16",
+      "title_fr": "Integration Discord : roles, annonces, salon inscription",
+      "title_en": "Discord integration: roles, announcements, signup channel",
+      "changes_fr": [
+        "Discord : les roles de vainqueur de tournoi sont desormais en anglais (Tournament Winner X). Les roles existants sont renommes automatiquement sans perdre tes attributions.",
+        "Bug corrige : l'annonce du vainqueur de tournoi sur Discord ne partait plus dans certains cas. Le webhook recupere maintenant la variable d'environnement a chaque appel et explique clairement dans les logs si l'envoi echoue.",
+        "Discord : a chaque creation de tournoi, un message detaille est poste dans le salon planning avec le format, le mode de jeu, le nombre max de joueurs, la date de debut (affichee dans le fuseau horaire de chaque lecteur), un compte a rebours, les eventuelles restrictions et un ping du role Tournament.",
+        "Discord : tu peux maintenant t'inscrire aux notifications de tournois en reagissant avec l'emoji trophee sur le message d'annonce du salon inscription. Retire la reaction pour ne plus etre ping."
+      ],
+      "changes_en": [
+        "Discord: tournament winner roles are now in English (Tournament Winner X). Existing roles are renamed automatically without losing any role assignments.",
+        "Bug fixed: the tournament winner announcement on Discord did not always fire. The webhook now reads its environment variable on every call and logs a clear reason if the post fails.",
+        "Discord: every new tournament now posts a detailed announcement in the planning channel with format, game mode, max players, start time (displayed in each viewer's timezone), a countdown, any restrictions, and a Tournament role ping.",
+        "Discord: you can now sign up for tournament notifications by reacting with the trophy emoji on the signup message. Remove the reaction to opt out."
+      ]
+    },
+    {
       "date": "2026-05-15",
       "title_fr": "Precisions de regles : doublons de nom, Rashomon, et personnages upgradees",
       "title_en": "Rule clarifications: name duplicates, Rashomon, and upgraded characters",
@@ -9,14 +26,40 @@
         "Precision regle : jouer, reveler ou deplacer un personnage vers un doublon de nom est bloque avant le paiement du chakra.",
         "Precision regle : les effets statics (auras, conditions de missions du type 4+ Puissance) lisent la valeur de base du personnage (puissance imprimee + jetons puissance), pas sa puissance modifiee.",
         "Precision regle Rashomon : met sa cible exactement a 0 Puissance, en ignorant tous les autres modificateurs positifs ou negatifs. Choisit la cible avec la plus haute puissance de base et la garde jusqu'a un changement de situation.",
-        "Precision regle : quand un personnage upgrade est renvoye en main (par exemple par la mission Bring it Back ou Tsunade 004), seule la carte du dessus retourne en main. Les cartes en dessous vont a la pile de defausse de leur proprietaire."
+        "Precision regle : quand un personnage upgrade est renvoye en main (par exemple par la mission Bring it Back ou Tsunade 004), seule la carte du dessus retourne en main. Les cartes en dessous vont a la pile de defausse de leur proprietaire.",
+        "Constructeur de deck : nouveau bouton Trier par nom a cote de Trier par cout, range les personnages par nom puis par cout. Disponible aussi sur mobile.",
+        "Constructeur de deck mobile : Evolving Mode est maintenant accessible (compteur de points, bouton ON/OFF, et liste des cartes Evolving avec leur cout).",
+        "Classement Evolving : les joueurs qui n'ont jamais joue de partie Evolving n'apparaissent plus dans le classement.",
+        "Bug corrige : quand tu refusais de sacrifier Genma 049 pour proteger un personnage, les autres effets de defaite (Tsunade 003, Sasuke 136) ne se declenchaient pas. Ils se declenchent maintenant normalement.",
+        "Salon Evolving : les parties Evolving en cours apparaissent maintenant dans la liste comme dans Jouer en ligne. Tu peux les regarder en spectateur.",
+        "Bug corrige : quand l'adversaire restait inactif au mulligan, la partie etait annulee mais le joueur restait coince sur l'ecran de jeu. La partie se ferme maintenant proprement et tu retournes au salon en cliquant sur le bouton.",
+        "Bug corrige : Kiba Inuzuka 113 (Mythos) cachait toujours l'Akamaru le plus a gauche au lieu de te laisser choisir. Tu peux maintenant choisir lequel cacher comme avec la version Rare.",
+        "Ecran de fin de partie : quand l'adversaire abandonne, une ligne explicite te confirme que tu remportes la partie.",
+        "L'animation de revelation des 4 missions au debut de partie a ete retiree. La phase de mulligan demarre directement.",
+        "Page d'accueil : le scintillement sur telephone et tablette est corrige. L'animation lente du fond est maintenant reservee aux ecrans larges.",
+        "Petit fix : la croix de fermeture sur la fenetre 'En attente de l'adversaire' apres le mulligan a ete retiree, elle servait a rien.",
+        "Bug corrige : Shikamaru Nara (cout 3) ne prenait pas en compte les personnages reveles ou joues au tour precedent. Tous ces personnages comptent maintenant pour son effet de deplacement.",
+        "Bug corrige : la revanche en Evolving renvoyait vers la selection de deck normale, qui affichait tous tes decks. Elle te ramene maintenant au salon Evolving et ne te propose que tes decks Evolving."
       ],
       "changes_en": [
         "Rule clarification: if an effect creates a same-name duplicate on your side of a mission, the newly arriving card is discarded to its owner with no defeat effects.",
         "Rule clarification: playing, revealing or moving a character into a same-name duplicate is blocked before chakra is paid.",
         "Rule clarification: static effects (auras, mission conditions like 4+ Power) read a character's base value (printed power + power tokens), not its modified power.",
         "Rule clarification Rashomon: sets its target to exactly 0 Power, ignoring every other positive or negative modifier. Picks the target with the highest base power and keeps it until the situation changes.",
-        "Rule clarification: when an upgraded character returns to hand (for example via Bring it Back mission or Tsunade 004), only the top card returns to hand. The cards underneath go to their owner's discard pile."
+        "Rule clarification: when an upgraded character returns to hand (for example via Bring it Back mission or Tsunade 004), only the top card returns to hand. The cards underneath go to their owner's discard pile.",
+        "Deck builder: new Sort by Name button next to Sort by Cost, orders characters by name then by cost. Available on mobile too.",
+        "Mobile deck builder: Evolving Mode is now accessible (points counter, ON/OFF toggle, and list of Evolving cards with their cost).",
+        "Evolving leaderboard: players who have never played an Evolving game no longer appear in the ranking.",
+        "Bug fixed: when you declined to sacrifice Gemma 049 to protect a character, the other defeat triggers (Tsunade 003, Sasuke 136) did not fire. They now fire correctly.",
+        "Evolving lobby: ongoing Evolving games now appear in the list like in Play Online. You can join any of them as a spectator.",
+        "Bug fixed: when the opponent stayed idle at mulligan, the game was cancelled but the player got stuck on the game screen. The game now closes cleanly and you return to the lobby with one click.",
+        "Bug fixed: Kiba Inuzuka 113 (Mythos variant) always hid the leftmost Akamaru instead of letting you pick. You can now choose which Akamaru to hide, like with the Rare version.",
+        "End-of-game screen: when the opponent abandons, an explicit line now confirms you win the match.",
+        "The mission deck reveal animation at the start of the match has been removed. Mulligan now starts directly.",
+        "Home page: the flicker on phone and tablet is fixed. The slow background animation is now only enabled on larger screens.",
+        "Small fix: the close X on the 'Waiting for opponent' window after mulligan has been removed, it served no purpose.",
+        "Bug fixed: Shikamaru Nara (cost 3) did not count characters revealed or played on the previous round. They are now all valid targets for his move effect.",
+        "Bug fixed: rematch from an Evolving game opened the regular deck selection, showing all your decks. It now returns to the Evolving lobby and only offers your Evolving decks."
       ]
     },
     {

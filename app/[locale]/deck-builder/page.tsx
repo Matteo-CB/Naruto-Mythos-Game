@@ -490,6 +490,7 @@ export default function DeckBuilderPage() {
   const canAddMission = useDeckBuilderStore((s) => s.canAddMission);
   const clearAddError = useDeckBuilderStore((s) => s.clearAddError);
   const sortCharsByCost = useDeckBuilderStore((s) => s.sortCharsByCost);
+  const sortCharsByName = useDeckBuilderStore((s) => s.sortCharsByName);
   const { bannedIds } = useBannedCards();
   const [showBanned, setShowBanned] = useState(true);
   const [showAltArt, setShowAltArt] = useState(true);
@@ -1224,6 +1225,16 @@ export default function DeckBuilderPage() {
           }}>
           {t("deckBuilder.sortByCost")}
         </button>
+        <button onClick={deckChars.length > 1 ? sortCharsByName : undefined}
+          className="px-2 py-0.5 text-[9px] uppercase font-bold"
+          style={{
+            backgroundColor: deckChars.length > 1 ? 'rgba(196,163,90,0.08)' : 'rgba(255,255,255,0.02)',
+            borderLeft: deckChars.length > 1 ? '2px solid rgba(196,163,90,0.4)' : '2px solid rgba(255,255,255,0.06)',
+            color: deckChars.length > 1 ? '#c4a35a' : '#333',
+            cursor: deckChars.length > 1 ? 'pointer' : 'default',
+          }}>
+          {t("deckBuilder.sortByName")}
+        </button>
         <div className="h-3 w-px" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
         
         {(['grid', 'rows'] as DeckViewMode[]).map((m) => (
@@ -1618,6 +1629,9 @@ export default function DeckBuilderPage() {
               maxWidth: '110px',
             }}>{t("deckBuilder.currentlyEditing")}</span>
           )}
+          <div className="flex-shrink-0">
+            <EvolvingCostMeter compact />
+          </div>
           <div className="flex-1 min-w-0" />
         </div>
 
@@ -1656,6 +1670,11 @@ export default function DeckBuilderPage() {
 
 
         <div ref={mobileScrollRef} className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
+          {evolvingMode && (
+            <div className="px-3 py-2">
+              <EvolvingBuilderHelper />
+            </div>
+          )}
           {mobileView === 'catalog' ? (
             <div className="px-3 py-2">
 

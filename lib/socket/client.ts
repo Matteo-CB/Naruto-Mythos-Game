@@ -40,6 +40,27 @@ export function computeChessClockIdleMs(
   return Math.max(0, now - state.idleStartedAt);
 }
 
+export function buildGameCancelledStateReset(reason: 'mulligan-idle', roomCode: string) {
+  return {
+    gameCancelled: { reason, roomCode },
+    gameEnded: false,
+    gameResult: null,
+    chessClock: null,
+    _resyncTimer: null,
+    visibleState: null,
+    gameStarted: false,
+    roomCode: null,
+    playerRole: null,
+    opponentJoined: false,
+    opponentDisconnected: false,
+    playerNames: null,
+    currentRoomGameMode: null,
+    rematchState: 'none' as const,
+    rematchRoomCode: null,
+    pendingReconnect: null,
+  };
+}
+
 interface PublicRoom {
   code: string;
   hostName: string;
@@ -149,7 +170,7 @@ interface SocketStore {
   acceptReconnect: () => void;
 
   
-  activeGames: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean }>;
+  activeGames: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean; isEvolving: boolean }>;
   requestActiveGames: () => void;
 }
 
@@ -201,8 +222,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       const cached = typeof window !== 'undefined' ? localStorage.getItem('nmtcg-active-games') : null;
       if (cached) {
         const { games, ts } = JSON.parse(cached);
-        
-        if (Date.now() - ts < 30000 && Array.isArray(games)) return games;
+
+        if (Date.now() - ts < 30000 && Array.isArray(games)) {
+          return games.map((g: { roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean; isEvolving?: boolean }) => ({ ...g, isEvolving: g.isEvolving === true }));
+        }
       }
     } catch { /* ignore */ }
     return [];
@@ -513,13 +536,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         console.log('[Socket] Game cancelled:', data.reason, 'roomCode:', data.roomCode);
         const resyncT = get()._resyncTimer;
         if (resyncT) clearInterval(resyncT);
-        set({
-          gameCancelled: { reason: data.reason, roomCode: data.roomCode },
-          gameEnded: false,
-          gameResult: null,
-          chessClock: null,
-                  _resyncTimer: null,
-        });
+        set(buildGameCancelledStateReset(data.reason, data.roomCode));
       });
 
       socket.on('tournament:cancelled', (data: { reason: string; tournamentId?: string }) => {
@@ -571,17 +588,20 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         });
       });
 
-      socket.on('game:rematch-reselect', ({ roomCode, isSealed }: { roomCode: string; isSealed?: boolean }) => {
-        console.log('[Socket] Rematch reselect, navigating to', isSealed ? 'sealed booster opening' : 'deck selection', 'with code:', roomCode);
-        set({
+      socket.on('game:rematch-reselect', ({ roomCode, isSealed, isEvolving }: { roomCode: string; isSealed?: boolean; isEvolving?: boolean }) => {
+        console.log('[Socket] Rematch reselect, navigating to',
+          isSealed ? 'sealed booster opening' : isEvolving ? 'evolving deck selection' : 'deck selection',
+          'with code:', roomCode);
+        set((s) => ({
           rematchRoomCode: roomCode,
           isSealedRoom: !!isSealed,
+          currentRoomGameMode: isEvolving ? 'evolving' : s.currentRoomGameMode,
           sealedDeckSubmitted: false,
           sealedOpponentReady: false,
           sealedBoosters: null,
           sealedAllCards: null,
           sealedDeadline: null,
-        });
+        }));
       });
 
       socket.on('game:rematch-declined', () => {
@@ -740,10 +760,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       
 
-      socket.on('games:list-update', (data: { games: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean }> }) => {
-        const games = data.games ?? [];
+      socket.on('games:list-update', (data: { games: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean; isEvolving?: boolean }> }) => {
+        const games = (data.games ?? []).map((g) => ({ ...g, isEvolving: g.isEvolving === true }));
         set({ activeGames: games });
-        
+
         try { localStorage.setItem('nmtcg-active-games', JSON.stringify({ games, ts: Date.now() })); } catch { /* ignore */ }
       });
 

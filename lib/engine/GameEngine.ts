@@ -31,6 +31,7 @@ import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleGi
 import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
 import { isRempartZeroed, canBeHiddenByEnemy } from '../effects/ContinuousEffects';
+import { triggerOnDefeatEffects } from '../effects/onDefeatTriggers';
 import { getEffectivePower } from '../effects/powerUtils';
 
 
@@ -765,9 +766,8 @@ export class GameEngine {
         newState.pendingEffects.splice(effectIdx, 1);
         newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
         if (defeatTargetId049) {
-          
+          const charResult049 = EffectEngine.findCharByInstanceId(newState, defeatTargetId049);
           newState = EffectEngine.defeatCharacterDirect(newState, defeatTargetId049);
-          const charResult049 = EffectEngine.findCharByInstanceId(state, defeatTargetId049);
           if (charResult049) {
             newState.log = logAction(
               newState.log, newState.turn, newState.phase, effectSource049,
@@ -775,6 +775,7 @@ export class GameEngine {
               'game.log.effect.defeat',
               { card: '???', id: '', target: charResult049.character.card.name_fr },
             );
+            newState = triggerOnDefeatEffects(newState, charResult049.character, charResult049.player);
           }
         }
         if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {

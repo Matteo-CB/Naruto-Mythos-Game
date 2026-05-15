@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface CloudBackgroundProps {
@@ -9,14 +9,24 @@ interface CloudBackgroundProps {
 }
 
 export const CloudBackground = memo(function CloudBackground({ className = '', animated = true }: CloudBackgroundProps) {
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+
+  useEffect(() => {
+    if (!animated || typeof window === 'undefined') return;
+    const mq = window.matchMedia('(min-width: 1024px) and (prefers-reduced-motion: no-preference)');
+    const apply = () => setShouldAnimate(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, [animated]);
+
   return (
     <div
       className={`fixed inset-0 pointer-events-none overflow-hidden ${className}`}
       style={{ zIndex: 0 }}
       aria-hidden="true"
     >
-      
-      {animated ? (
+      {shouldAnimate ? (
         <div
           className="absolute"
           style={{

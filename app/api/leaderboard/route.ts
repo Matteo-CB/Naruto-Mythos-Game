@@ -21,6 +21,10 @@ export async function GET(request: NextRequest) {
       conditions.push({ username: { contains: search, mode: 'insensitive' as const } });
     }
 
+    if (isEvolving) {
+      conditions.push({ evolvingGamesPlayed: { gt: 0 } });
+    }
+
     if (!isEvolving && league && league !== 'unranked') {
       const tierIdx = LEAGUE_TIERS.findIndex((t) => t.key === league);
       if (tierIdx >= 0) {

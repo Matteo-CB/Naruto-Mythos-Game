@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
 import { validateLeagueKeys } from '@/lib/tournament/leagueUtils';
+import { sendTournamentCreated } from '@/lib/discord/tournamentCreatedWebhook';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
@@ -179,6 +180,10 @@ export async function POST(req: NextRequest) {
         scheduledStartAt: scheduledStartAt ? new Date(scheduledStartAt) : null,
       },
     });
+
+    sendTournamentCreated(tournament).catch((err) =>
+      console.error('[API] sendTournamentCreated failed:', err instanceof Error ? err.message : err),
+    );
 
     return NextResponse.json({ tournament }, { status: 201 });
   } catch (err) {

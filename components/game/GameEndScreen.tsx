@@ -243,7 +243,31 @@ export function GameEndScreen() {
             {headingText}
           </PopupTitle>
 
-          
+          {isForfeit && !forfeitedByMe && !isDraw && (
+            <motion.div
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-center text-xs mb-4"
+              style={{ color: '#c4a35a', letterSpacing: '0.08em' }}
+            >
+              {t('game.end.opponentForfeitSubtitle')}
+            </motion.div>
+          )}
+
+          {isForfeit && forfeitedByMe && (
+            <motion.div
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-center text-xs mb-4"
+              style={{ color: '#888888', letterSpacing: '0.08em' }}
+            >
+              {t('game.end.youForfeitSubtitle')}
+            </motion.div>
+          )}
+
+
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
