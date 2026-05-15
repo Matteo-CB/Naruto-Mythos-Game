@@ -748,11 +748,15 @@ export function returnCharacterToHand(state: GameState, instanceId: string, play
         mission[side] = chars;
         missions[i] = mission;
 
-        
         const owner = char.originalOwner;
         const ps = { ...newState[owner] };
-        const allCards = char.stack?.length > 0 ? [...char.stack] : [char.card];
-        ps.hand = [...ps.hand, ...allCards];
+        const stackCards = char.stack?.length > 0 ? char.stack : [char.card];
+        const topToHand = stackCards[stackCards.length - 1];
+        const underToDiscard = stackCards.length > 1 ? stackCards.slice(0, -1) : [];
+        ps.hand = [...ps.hand, topToHand];
+        if (underToDiscard.length > 0) {
+          ps.discardPile = [...ps.discardPile, ...underToDiscard];
+        }
         ps.charactersInPlay = Math.max(0, ps.charactersInPlay - 1);
         newState[owner] = ps;
 

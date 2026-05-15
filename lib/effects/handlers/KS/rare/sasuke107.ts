@@ -62,68 +62,43 @@ function moveCharTo(
   player: PlayerID,
 ): GameState {
   const friendlySide = side(player);
-  const missions = [...state.activeMissions];
 
-  
-  
-  for (let i = 0; i < missions.length; i++) {
-    const chars = missions[i][friendlySide];
-    if (chars.some(c => c.instanceId === charInstanceId)) {
-      if (isMovementBlockedByKurenai(state, i, player)) {
-        
-        return state;
-      }
+
+  let sourceMissionIndex = -1;
+  let sourceChar: CharacterInPlay | null = null;
+  for (let i = 0; i < state.activeMissions.length; i++) {
+    const found = state.activeMissions[i][friendlySide].find((c) => c.instanceId === charInstanceId);
+    if (found) {
+      sourceMissionIndex = i;
+      sourceChar = found;
       break;
     }
   }
+  if (!sourceChar || sourceMissionIndex === -1) return state;
 
-  
-  let movedChar: CharacterInPlay | null = null;
-  for (let i = 0; i < missions.length; i++) {
-    const chars = missions[i][friendlySide];
-    const idx = chars.findIndex((c) => c.instanceId === charInstanceId);
-    if (idx !== -1) {
-      missions[i] = { ...missions[i] };
-      const newChars = [...missions[i][friendlySide]];
-      [movedChar] = newChars.splice(idx, 1);
-      missions[i][friendlySide] = newChars;
-      break;
-    }
-  }
+  if (isMovementBlockedByKurenai(state, sourceMissionIndex, player)) return state;
 
-  if (!movedChar) return state;
-
-  
-  const destMission = { ...missions[destMissionIndex] };
-  const destChars = [...destMission[friendlySide]];
-  const movedTopCard = movedChar.stack?.length > 0
-    ? movedChar.stack[movedChar.stack?.length - 1]
-    : movedChar.card;
+  const movedTopCard = sourceChar.stack?.length > 0
+    ? sourceChar.stack[sourceChar.stack.length - 1]
+    : sourceChar.card;
   const movedName = movedTopCard.name_fr.toUpperCase();
-
-  const conflictIdx = destChars.findIndex((c) => {
+  const destHasConflict = state.activeMissions[destMissionIndex][friendlySide].some((c) => {
     if (c.isHidden) return false;
-    const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+    const topCard = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
     return topCard.name_fr.toUpperCase() === movedName;
   });
+  if (destHasConflict) return state;
 
-  if (conflictIdx !== -1) {
-    
-    const owner = movedChar.originalOwner;
-    const ownerState = { ...state[owner] };
-    const cardsToDiscard = movedChar.stack?.length > 0 ? [...movedChar.stack] : [movedChar.card];
-    ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
-    ownerState.charactersInPlay = Math.max(0, ownerState.charactersInPlay - 1);
-    destMission[friendlySide] = destChars;
-    missions[destMissionIndex] = destMission;
-    return { ...state, activeMissions: missions, [owner]: ownerState };
-  }
-
-  
-  destChars.push({ ...movedChar, missionIndex: destMissionIndex });
-
-  destMission[friendlySide] = destChars;
-  missions[destMissionIndex] = destMission;
+  const missions = [...state.activeMissions];
+  missions[sourceMissionIndex] = {
+    ...missions[sourceMissionIndex],
+    [friendlySide]: missions[sourceMissionIndex][friendlySide].filter((c) => c.instanceId !== charInstanceId),
+  };
+  const movedChar = { ...sourceChar, missionIndex: destMissionIndex };
+  missions[destMissionIndex] = {
+    ...missions[destMissionIndex],
+    [friendlySide]: [...missions[destMissionIndex][friendlySide], movedChar],
+  };
 
   return { ...state, activeMissions: missions };
 }

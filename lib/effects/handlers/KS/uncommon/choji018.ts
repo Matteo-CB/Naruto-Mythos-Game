@@ -149,37 +149,60 @@ function moveCharacterToMission(
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  const newState = { ...state };
-  const missions = [...state.activeMissions];
-  const fromMission = { ...missions[fromMissionIdx] };
-  const toMission = { ...missions[toMissionIdx] };
+  const fromMission = state.activeMissions[fromMissionIdx];
+  const toMission = state.activeMissions[toMissionIdx];
 
-  const fromChars = [...fromMission[friendlySide]];
-  const toChars = [...toMission[friendlySide]];
-
-  
-  const charIdx = fromChars.findIndex(c => c.instanceId === charInstanceId);
+  const fromChars = fromMission[friendlySide];
+  const charIdx = fromChars.findIndex((c) => c.instanceId === charInstanceId);
   if (charIdx === -1) return state;
 
-  const movedChar = { ...fromChars[charIdx], missionIndex: toMissionIdx };
-  fromChars.splice(charIdx, 1);
-  toChars.push(movedChar);
+  const sourceChar = fromChars[charIdx];
+  if (!sourceChar.isHidden) {
+    const movedTopCard = sourceChar.stack?.length > 0
+      ? sourceChar.stack[sourceChar.stack.length - 1]
+      : sourceChar.card;
+    const movedName = movedTopCard.name_fr.toUpperCase();
+    const destHasConflict = toMission[friendlySide].some((c) => {
+      if (c.isHidden) return false;
+      const cTop = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return cTop.name_fr.toUpperCase() === movedName;
+    });
+    if (destHasConflict) {
+      return {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, sourcePlayer,
+          'EFFECT_BLOCKED',
+          `Choji Akimichi (018): Cannot move ${movedTopCard.name_fr} to mission ${toMissionIdx + 1}, same name already on destination side (No Repetition).`,
+          'game.log.effect.moveNameConflictBlocked',
+          { card: 'CHOJI AKIMICHI', id: 'KS-018-UC', target: movedTopCard.name_fr },
+        ),
+      };
+    }
+  }
 
-  fromMission[friendlySide] = fromChars;
-  toMission[friendlySide] = toChars;
-  missions[fromMissionIdx] = fromMission;
-  missions[toMissionIdx] = toMission;
+  const missions = [...state.activeMissions];
+  missions[fromMissionIdx] = {
+    ...missions[fromMissionIdx],
+    [friendlySide]: missions[fromMissionIdx][friendlySide].filter((c) => c.instanceId !== charInstanceId),
+  };
+  const movedChar = { ...sourceChar, missionIndex: toMissionIdx };
+  missions[toMissionIdx] = {
+    ...missions[toMissionIdx],
+    [friendlySide]: [...missions[toMissionIdx][friendlySide], movedChar],
+  };
 
-  newState.activeMissions = missions;
-  newState.log = logAction(
-    state.log, state.turn, state.phase, sourcePlayer,
-    'EFFECT_MOVE',
-    `Choji Akimichi (018): Moved self from mission ${fromMissionIdx + 1} to mission ${toMissionIdx + 1} (upgrade effect).`,
-    'game.log.effect.moveSelf',
-    { card: 'CHOJI AKIMICHI', id: 'KS-018-UC', from: String(fromMissionIdx + 1), to: String(toMissionIdx + 1) },
-  );
-
-  return newState;
+  return {
+    ...state,
+    activeMissions: missions,
+    log: logAction(
+      state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_MOVE',
+      `Choji Akimichi (018): Moved self from mission ${fromMissionIdx + 1} to mission ${toMissionIdx + 1} (upgrade effect).`,
+      'game.log.effect.moveSelf',
+      { card: 'CHOJI AKIMICHI', id: 'KS-018-UC', from: String(fromMissionIdx + 1), to: String(toMissionIdx + 1) },
+    ),
+  };
 }
 
 export function registerChoji018Handlers(): void {

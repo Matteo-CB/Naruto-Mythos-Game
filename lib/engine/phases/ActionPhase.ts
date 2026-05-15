@@ -339,7 +339,7 @@ function handleRevealCharacter(
     costToPay = Math.max(0, fullCost - existingTopCard.chakra);
   }
 
-  
+
   const ps = { ...state[player] };
   if (ps.chakra < costToPay) return state;
   ps.chakra -= costToPay;
@@ -399,8 +399,8 @@ function handleRevealCharacter(
     return newState;
   }
 
-  
-  
+
+
   char.isHidden = false;
   char.wasRevealedAtLeastOnce = true;
   chars[charIdx] = char;

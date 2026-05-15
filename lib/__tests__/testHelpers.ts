@@ -61,7 +61,7 @@ export function mockCharInPlay(
   cardOverrides: Partial<CharacterCard> = {},
 ): CharacterInPlay {
   const card = mockCharacter(cardOverrides);
-  return {
+  const base: CharacterInPlay = {
     instanceId: overrides.instanceId ?? generateInstanceId(),
     card,
     isHidden: overrides.isHidden ?? false,
@@ -72,6 +72,9 @@ export function mockCharInPlay(
     originalOwner: overrides.originalOwner ?? 'player1',
     missionIndex: overrides.missionIndex ?? 0,
   };
+  if (overrides.controllerInstanceId !== undefined) base.controllerInstanceId = overrides.controllerInstanceId;
+  if (overrides.rempartLockedTargetId !== undefined) base.rempartLockedTargetId = overrides.rempartLockedTargetId;
+  return base;
 }
 
 

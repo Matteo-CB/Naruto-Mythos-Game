@@ -140,7 +140,38 @@ export function calculateContinuousPowerModifier(
   missionIndex: number,
   char: CharacterInPlay,
 ): number {
-  
+
+  if (!char.isHidden) {
+    const mission_zc = state.activeMissions[missionIndex];
+    if (mission_zc) {
+      const enemyChars_zc = player === 'player1' ? mission_zc.player2Characters : mission_zc.player1Characters;
+      const friendlyChars_zc = player === 'player1' ? mission_zc.player1Characters : mission_zc.player2Characters;
+      for (const enemy_zc of enemyChars_zc) {
+        if (enemy_zc.isHidden) continue;
+        const enemyTop_zc = enemy_zc.stack?.length > 0 ? enemy_zc.stack[enemy_zc.stack.length - 1] : enemy_zc.card;
+        if (enemyTop_zc.number !== 67) continue;
+        const hasRempart_zc = (enemyTop_zc.effects ?? []).some(
+          (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
+        );
+        if (!hasRempart_zc) continue;
+        let targetId_zc = enemy_zc.rempartLockedTargetId;
+        if (!targetId_zc || !friendlyChars_zc.some((f) => f.instanceId === targetId_zc && !f.isHidden)) {
+          let maxPower_zc = -1;
+          for (const f of friendlyChars_zc) {
+            if (f.isHidden) continue;
+            const fTop = f.stack?.length > 0 ? f.stack[f.stack.length - 1] : f.card;
+            const basePower = (fTop.power ?? 0) + f.powerTokens;
+            if (basePower > maxPower_zc) { maxPower_zc = basePower; targetId_zc = f.instanceId; }
+          }
+        }
+        if (targetId_zc === char.instanceId) {
+          const selfTop_zc = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          return -((selfTop_zc.power ?? 0) + char.powerTokens);
+        }
+      }
+    }
+  }
+
   if (char.isHidden) {
     const mission = state.activeMissions[missionIndex];
     if (!mission) return 0;
@@ -242,37 +273,8 @@ export function calculateContinuousPowerModifier(
   
   
   
-  let rempartZeroed = false;
-  for (const enemy of enemyChars) {
-    if (enemy.isHidden) continue;
-    const enemyTopCard = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
-    if (enemyTopCard.number === 67) {
-      const hasRempartEffect = (enemyTopCard.effects ?? []).some(
-        (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
-      );
-      if (hasRempartEffect) {
-        
-        let targetId = enemy.rempartLockedTargetId;
-        if (!targetId || !friendlyChars.some(f => f.instanceId === targetId && !f.isHidden)) {
-          
-          let maxPower = -1;
-          for (const f of friendlyChars) {
-            if (f.isHidden) continue;
-            const fTop = f.stack?.length > 0 ? f.stack[f.stack?.length - 1] : f.card;
-            const basePower = (fTop.power ?? 0) + f.powerTokens;
-            if (basePower > maxPower) { maxPower = basePower; targetId = f.instanceId; }
-          }
-        }
-        if (targetId === char.instanceId) {
-          const selfTop = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-          modifier -= (selfTop.power ?? 0) + char.powerTokens;
-          rempartZeroed = true;
-        }
-      }
-    }
-  }
 
-  
+
   const selfTopCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
   for (const effect of selfTopCard.effects ?? []) {
     if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
@@ -327,26 +329,14 @@ export function calculateContinuousPowerModifier(
     
     
     if (mEffect.description.includes('All non-hidden characters') && mEffect.description.includes('+1 Power')) {
-      if (!rempartZeroed) {
-        modifier += 1;
-      }
+      modifier += 1;
     }
 
-    
-    
-    
-    
     if (mEffect.description.includes('4 Power or more') && mEffect.description.includes('+1 Power')) {
-      if (!rempartZeroed) {
-        const selfTop = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-        
-        
-        let powerForThreshold = (selfTop.power ?? 0) + char.powerTokens;
-        
-        powerForThreshold += modifier;
-        if (powerForThreshold >= 4) {
-          modifier += 1;
-        }
+      const selfTop = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
+      const corePower = (selfTop.power ?? 0) + char.powerTokens;
+      if (corePower >= 4) {
+        modifier += 1;
       }
     }
   }
@@ -635,8 +625,33 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
 
 export function applyRempartTokenRemoval(state: GameState): GameState {
   let newState = state;
-  const missions = [...newState.activeMissions];
   let changed = false;
+
+  for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
+    const m = newState.activeMissions[mIdx];
+    for (const sideKey of ['player1Characters', 'player2Characters'] as const) {
+      const sideChars = m[sideKey];
+      let sideChanged = false;
+      const nextChars = sideChars.map((c) => {
+        const top = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        if (top.number === 67 && c.rempartLockedTargetId !== undefined) {
+          sideChanged = true;
+          return { ...c, rempartLockedTargetId: undefined };
+        }
+        return c;
+      });
+      if (sideChanged) {
+        if (!changed) {
+          newState = { ...newState, activeMissions: [...newState.activeMissions] };
+          changed = true;
+        }
+        const updatedMission = { ...newState.activeMissions[mIdx], [sideKey]: nextChars };
+        newState.activeMissions[mIdx] = updatedMission;
+      }
+    }
+  }
+
+  const missions = newState.activeMissions;
 
   for (let mIdx = 0; mIdx < missions.length; mIdx++) {
     for (const playerSide of ['player1', 'player2'] as const) {

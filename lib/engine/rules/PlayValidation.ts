@@ -154,9 +154,10 @@ export function validateRevealCharacter(
   
   const flexibleUpgradeTarget = !sameNameChar ? chars.find((c) => {
     if (c.instanceId === characterInstanceId || c.isHidden) return false;
+    if (c.controlledBy !== c.originalOwner) return false;
     const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
     if (!checkFlexibleUpgrade(charTopCard, cTop) || charTopCard.chakra <= cTop.chakra) return false;
-    
+
     const wouldConflict = chars.some((other) => {
       if (other.instanceId === characterInstanceId || other.instanceId === c.instanceId) return false;
       if (other.isHidden) return false;
@@ -170,10 +171,14 @@ export function validateRevealCharacter(
 
   let effectiveCost: number;
   if (upgradeTarget) {
+    const targetIsControlled = upgradeTarget.controlledBy !== upgradeTarget.originalOwner;
     const existingTopCard = upgradeTarget.stack?.length > 0
       ? upgradeTarget.stack[upgradeTarget.stack?.length - 1]
       : upgradeTarget.card;
-    if (charTopCard.chakra > existingTopCard.chakra) {
+    if (sameNameChar && targetIsControlled) {
+      return { valid: false, reason: `Cannot reveal ${charTopCard.name_fr}: same name already on this side and the existing one is controlled (cannot be upgraded onto).`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
+    }
+    if (charTopCard.chakra > existingTopCard.chakra && !targetIsControlled) {
 
       const revealCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
       effectiveCost = Math.max(0, revealCost - existingTopCard.chakra);

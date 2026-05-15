@@ -15279,10 +15279,11 @@ export class EffectEngine {
       card: newTopCard,
     };
 
-    
-    const enemyPS = { ...newState[player] };
-    enemyPS.discardPile = [...enemyPS.discardPile, discardedCard];
-    newState[player] = enemyPS;
+
+    const topOwner = targetChar.originalOwner;
+    const topOwnerPS = { ...newState[topOwner] };
+    topOwnerPS.discardPile = [...topOwnerPS.discardPile, discardedCard];
+    newState[topOwner] = topOwnerPS;
 
     newState.log = logAction(
       newState.log, newState.turn, newState.phase, pending.sourcePlayer,
@@ -17918,82 +17919,8 @@ export class EffectEngine {
     return EffectEngine.genericPlaceOnMission(newState, player, missionIndex, 0, 'Jiraya', pending.sourceCardId ?? '', costReduction);
   }
 
-  
-  private static jiraiyaPlaceOnMission(state: GameState, player: PlayerID, missionIndex: number, cost: number): GameState {
-    const ps = state[player];
-    const card = ps.discardPile.pop();
-    if (!card) return state;
 
-    const friendlySide: 'player1Characters' | 'player2Characters' =
-      player === 'player1' ? 'player1Characters' : 'player2Characters';
 
-    const missions = [...state.activeMissions];
-    const mission = { ...missions[missionIndex] };
-
-    
-    const existingIdx = findUpgradeTargetIdx(mission[friendlySide], card);
-
-    let placedChar: CharacterInPlay;
-    let isCardUpgrade = false;
-
-    if (existingIdx >= 0) {
-      
-      const existing = mission[friendlySide][existingIdx];
-      const updatedChars = [...mission[friendlySide]];
-      updatedChars[existingIdx] = {
-        ...existing,
-        card: card as any,
-        stack: [...existing.stack, card as any],
-      };
-      mission[friendlySide] = updatedChars;
-      missions[missionIndex] = mission;
-      state.activeMissions = missions;
-      placedChar = updatedChars[existingIdx];
-      isCardUpgrade = true;
-
-      state.log = logAction(
-        state.log, state.turn, 'action', player,
-        'EFFECT_UPGRADE',
-        `Jiraiya effect: Upgraded ${card.name_fr} as Summon on mission ${missionIndex + 1} for ${cost} chakra.`,
-        'game.log.effect.upgradeSummon',
-        { card: 'JIRAIYA', id: 'KS-007-C', target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
-      );
-    } else {
-      
-      const charInPlay: CharacterInPlay = {
-        instanceId: generateInstanceId(),
-        card: card as any,
-        isHidden: false,
-        wasRevealedAtLeastOnce: true,
-        powerTokens: 0,
-        stack: [card as any],
-        controlledBy: player,
-        originalOwner: player,
-        missionIndex,
-      };
-
-      mission[friendlySide] = [...mission[friendlySide], charInPlay];
-      missions[missionIndex] = mission;
-      state.activeMissions = missions;
-      placedChar = charInPlay;
-
-      ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
-
-      state.log = logAction(
-        state.log, state.turn, 'action', player,
-        'EFFECT', `Jiraiya effect: Plays ${card.name_fr} as Summon on mission ${missionIndex + 1} for ${cost} chakra.`,
-        'game.log.effect.playSummon', { card: 'Jiraya', id: 'KS-007-C', target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
-      );
-    }
-
-    
-    state = EffectEngine.resolvePlayEffects(state, player, placedChar, missionIndex, isCardUpgrade);
-
-    return state;
-  }
-
-  
-  
   
 
   
@@ -18645,30 +18572,6 @@ export class EffectEngine {
     const player = pending.sourcePlayer;
     const missionIndex = charResult.missionIndex;
 
-    
-    
-    if (!charResult.character.isHidden) {
-      const destMission = state.activeMissions[missionIndex];
-      const friendlyCharsInMission = player === 'player1'
-        ? destMission.player1Characters
-        : destMission.player2Characters;
-      const charName = charResult.character.card.name_fr.toUpperCase();
-      const hasSameName = friendlyCharsInMission.some(
-        (c) => !c.isHidden && c.card.name_fr.toUpperCase() === charName,
-      );
-      if (hasSameName) {
-        const blockedState = deepClone(state);
-        blockedState.log = logAction(
-          blockedState.log, blockedState.turn, blockedState.phase, player,
-          'EFFECT_BLOCKED',
-          `Ino Yamanaka (020): Cannot take control of ${charResult.character.card.name_fr} â€' a character with the same name already exists on your side of this mission.`,
-          'game.log.effect.takeControlBlocked',
-          { card: 'INO YAMANAKA', id: 'KS-020-UC', target: charResult.character.card.name_fr },
-        );
-        return blockedState;
-      }
-    }
-
     const newState = deepClone(state);
     const mission = newState.activeMissions[missionIndex];
 
@@ -18679,22 +18582,53 @@ export class EffectEngine {
     if (targetIdx === -1) return state;
 
     const targetChar = { ...mission[enemySide][targetIdx], controlledBy: player, controllerInstanceId: pending.sourceInstanceId };
-    const targetName = targetChar.card.name_fr;
+    const targetTopCard = targetChar.stack?.length > 0 ? targetChar.stack[targetChar.stack.length - 1] : targetChar.card;
+    const targetName = targetTopCard.name_fr;
+    const targetNameEn = targetTopCard.name_en || targetTopCard.name_fr;
 
     mission[enemySide] = mission[enemySide].filter((_: CharacterInPlay, i: number) => i !== targetIdx);
     mission[friendlySide] = [...mission[friendlySide], targetChar];
 
-    
+    let postTransferDiscard = false;
+    if (!targetChar.isHidden) {
+      const friendlyName = targetTopCard.name_fr.toUpperCase();
+      const conflict = mission[friendlySide].some((c: CharacterInPlay) => {
+        if (c.instanceId === targetChar.instanceId) return false;
+        if (c.isHidden) return false;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        return cTop.name_fr.toUpperCase() === friendlyName;
+      });
+      if (conflict) {
+        mission[friendlySide] = mission[friendlySide].filter((c: CharacterInPlay) => c.instanceId !== targetChar.instanceId);
+        const owner = targetChar.originalOwner;
+        const ownerState = { ...newState[owner] };
+        const cardsToDiscard = targetChar.stack?.length > 0 ? [...targetChar.stack] : [targetChar.card];
+        ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
+        newState[owner] = ownerState;
+        postTransferDiscard = true;
+      }
+    }
+
     newState.player1.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player1');
     newState.player2.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player2');
 
-    newState.log = logAction(
-      newState.log, newState.turn, newState.phase, player,
-      'EFFECT_TAKE_CONTROL',
-      `Ino Yamanaka (020): Takes control of ${targetName} in this mission.`,
-      'game.log.effect.takeControl',
-      { card: 'INO YAMANAKA', id: 'KS-020-UC', target: targetName },
-    );
+    if (postTransferDiscard) {
+      newState.log = logAction(
+        newState.log, newState.turn, newState.phase, player,
+        'EFFECT_DISCARD',
+        `Took control of ${targetName} but a character with the same name already on this side, ${targetName} discarded (No Repetition).`,
+        'game.log.effect.takeControlNoRepDiscard',
+        { card: 'INO YAMANAKA', id: 'KS-020-UC', target: targetName, target_en: targetNameEn },
+      );
+    } else {
+      newState.log = logAction(
+        newState.log, newState.turn, newState.phase, player,
+        'EFFECT_TAKE_CONTROL',
+        `Ino Yamanaka (020): Takes control of ${targetName} in this mission.`,
+        'game.log.effect.takeControl',
+        { card: 'INO YAMANAKA', id: 'KS-020-UC', target: targetName },
+      );
+    }
 
     return newState;
   }
@@ -18764,35 +18698,13 @@ export class EffectEngine {
     if (!charResult) return state;
     if (charResult.missionIndex === destMissionIndex) return state;
 
-    
+
     if (!EffectEngine.validateNameUniquenessForMove(state, charResult.character, destMissionIndex, charResult.player)) {
-      
-      state = EffectEngine.restoreControlOnLeave(state, charInstanceId);
-      
-      const friendlySideDiscard: 'player1Characters' | 'player2Characters' =
-        charResult.player === 'player1' ? 'player1Characters' : 'player2Characters';
-      const missions = [...state.activeMissions];
-      const srcMission = { ...missions[charResult.missionIndex] };
-      const discardedChar = srcMission[friendlySideDiscard].find(c => c.instanceId === charInstanceId);
-      srcMission[friendlySideDiscard] = srcMission[friendlySideDiscard].filter(c => c.instanceId !== charInstanceId);
-      missions[charResult.missionIndex] = srcMission;
-      state.activeMissions = missions;
-
-      
-      if (discardedChar) {
-        const owner = discardedChar.originalOwner ?? charResult.player;
-        const ownerState = { ...state[owner] };
-        const cardsToDiscard = discardedChar.stack?.length > 0 ? [...discardedChar.stack] : [discardedChar.card];
-        ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
-        ownerState.charactersInPlay = EffectEngine.countCharsForPlayer({ ...state, [owner]: ownerState }, owner);
-        state[owner] = ownerState;
-      }
-
       state.log = logAction(
         state.log, state.turn, state.phase, charOwner,
-        'EFFECT_DISCARD',
-        `${effectCardName} (${effectCardId}): ${charResult.character.card.name_fr} moved to mission ${destMissionIndex + 1} but discarded due to same-name conflict.`,
-        'game.log.effect.moveNameConflictDiscard',
+        'EFFECT_BLOCKED',
+        `${effectCardName} (${effectCardId}): cannot move ${charResult.character.card.name_fr} to mission ${destMissionIndex + 1}, same-name conflict on destination side (No Repetition).`,
+        'game.log.effect.moveNameConflictBlocked',
         { card: effectCardName, id: effectCardId, target: charResult.character.card.name_fr },
       );
       return state;

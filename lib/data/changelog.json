@@ -1,6 +1,25 @@
 {
   "entries": [
     {
+      "date": "2026-05-15",
+      "title_fr": "Precisions de regles : doublons de nom, Rashomon, et personnages upgradees",
+      "title_en": "Rule clarifications: name duplicates, Rashomon, and upgraded characters",
+      "changes_fr": [
+        "Precision regle : si un effet cree un doublon de nom visible sur ton cote d'une mission, la nouvelle carte qui arrive est defaussee chez son proprietaire sans declencher d'effet de defaite.",
+        "Precision regle : jouer, reveler ou deplacer un personnage vers un doublon de nom est bloque avant le paiement du chakra.",
+        "Precision regle : les effets statics (auras, conditions de missions du type 4+ Puissance) lisent la valeur de base du personnage (puissance imprimee + jetons puissance), pas sa puissance modifiee.",
+        "Precision regle Rashomon : met sa cible exactement a 0 Puissance, en ignorant tous les autres modificateurs positifs ou negatifs. Choisit la cible avec la plus haute puissance de base et la garde jusqu'a un changement de situation.",
+        "Precision regle : quand un personnage upgrade est renvoye en main (par exemple par la mission Bring it Back ou Tsunade 004), seule la carte du dessus retourne en main. Les cartes en dessous vont a la pile de defausse de leur proprietaire."
+      ],
+      "changes_en": [
+        "Rule clarification: if an effect creates a same-name duplicate on your side of a mission, the newly arriving card is discarded to its owner with no defeat effects.",
+        "Rule clarification: playing, revealing or moving a character into a same-name duplicate is blocked before chakra is paid.",
+        "Rule clarification: static effects (auras, mission conditions like 4+ Power) read a character's base value (printed power + power tokens), not its modified power.",
+        "Rule clarification Rashomon: sets its target to exactly 0 Power, ignoring every other positive or negative modifier. Picks the target with the highest base power and keeps it until the situation changes.",
+        "Rule clarification: when an upgraded character returns to hand (for example via Bring it Back mission or Tsunade 004), only the top card returns to hand. The cards underneath go to their owner's discard pile."
+      ]
+    },
+    {
       "date": "2026-05-14",
       "title_fr": "Evolving Mode et nouvelle regle d'upgrade",
       "title_en": "Evolving Mode and new upgrade rule",
