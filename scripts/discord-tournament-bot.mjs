@@ -62,11 +62,7 @@ function isTrophyOnTargetMessage(reaction) {
 async function assignRole(userId) {
   try {
     const guild = await client.guilds.fetch(GUILD_ID);
-    const member = await guild.members.fetch(userId);
-    if (member.roles.cache.has(ROLE_ID)) {
-      console.log(`[TournamentBot] User ${userId} already has the Tournament role, skipping`);
-      return;
-    }
+    const member = await guild.members.fetch({ user: userId, force: true });
     await member.roles.add(ROLE_ID, 'Reacted with trophy on the signup message');
     console.log(`[TournamentBot] Added Tournament role to ${member.user?.tag ?? userId}`);
   } catch (err) {
@@ -77,11 +73,7 @@ async function assignRole(userId) {
 async function removeRole(userId) {
   try {
     const guild = await client.guilds.fetch(GUILD_ID);
-    const member = await guild.members.fetch(userId);
-    if (!member.roles.cache.has(ROLE_ID)) {
-      console.log(`[TournamentBot] User ${userId} did not have the Tournament role, skipping`);
-      return;
-    }
+    const member = await guild.members.fetch({ user: userId, force: true });
     await member.roles.remove(ROLE_ID, 'Removed trophy reaction on the signup message');
     console.log(`[TournamentBot] Removed Tournament role from ${member.user?.tag ?? userId}`);
   } catch (err) {
