@@ -297,7 +297,10 @@ export async function POST(
           data: { status: 'completed', winnerId, winnerUsername, completedAt: new Date() },
         });
 
-        if (loserId) {
+
+
+
+        if (loserId && tournament.format === 'elimination') {
           await prisma.tournamentParticipant.updateMany({
             where: { tournamentId, userId: loserId },
             data: { eliminated: true, eliminatedRound: match.round },

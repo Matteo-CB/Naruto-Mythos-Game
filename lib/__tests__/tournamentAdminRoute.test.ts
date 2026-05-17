@@ -352,3 +352,158 @@ describe('POST /admin resetMatch (Fix #4 forfeit recovery)', () => {
     expect(body.tournamentStatusReverted).toBe(false);
   });
 });
+
+
+
+
+describe('setMatchWinner — Swiss loser must NOT be eliminated', () => {
+  const swissMatchInRound1 = {
+    id: 'm-swiss-r1',
+    bracket: null,
+    round: 1,
+    matchIndex: 0,
+    player1Id: 'p1',
+    player1Username: 'P1',
+    player2Id: 'p2',
+    player2Username: 'P2',
+    winnerId: null,
+    winnerUsername: null,
+    status: 'ready',
+  };
+
+  it('does NOT eliminate the Swiss loser when admin force-sets a winner', async () => {
+    authMock.mockResolvedValue({ user: { id: 'creator', name: 'Bob' } });
+    p.tournament.findUnique.mockResolvedValue({
+      id: 't1',
+      creatorId: 'creator',
+      status: 'in_progress',
+      format: 'swiss',
+      totalRounds: 4,
+      currentRound: 1,
+      matches: [swissMatchInRound1],
+      participants: [],
+      winnerId: null,
+    });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentParticipant.updateMany.mockResolvedValue({ count: 0 });
+    p.user.findUnique.mockResolvedValue({ tournamentWins: 0 });
+
+    const res = await adminPOST(
+      makeRequest({ action: 'setMatchWinner', matchId: 'm-swiss-r1', winnerId: 'p1' }) as never,
+      { params: params('t1') },
+    );
+
+    expect(res.status).toBe(200);
+    const eliminationCalls = p.tournamentParticipant.updateMany.mock.calls.filter((c: unknown[]) => {
+      const arg = c[0] as { data?: { eliminated?: boolean } };
+      return arg?.data?.eliminated === true;
+    });
+    expect(eliminationCalls).toEqual([]);
+  });
+
+  it('does NOT eliminate the double_elimination loser when admin force-sets winner (loserDrop handles it)', async () => {
+    authMock.mockResolvedValue({ user: { id: 'creator', name: 'Bob' } });
+    p.tournament.findUnique.mockResolvedValue({
+      id: 't1',
+      creatorId: 'creator',
+      status: 'in_progress',
+      format: 'double_elimination',
+      totalRounds: 4,
+      currentRound: 1,
+      matches: [{
+        id: 'm-de-r1', bracket: 'winners', round: 1, matchIndex: 0,
+        player1Id: 'p1', player1Username: 'P1',
+        player2Id: 'p2', player2Username: 'P2',
+        winnerId: null, winnerUsername: null, status: 'ready',
+      }],
+      participants: [],
+      winnerId: null,
+    });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentParticipant.updateMany.mockResolvedValue({ count: 0 });
+    p.user.findUnique.mockResolvedValue({ tournamentWins: 0 });
+
+    const res = await adminPOST(
+      makeRequest({ action: 'setMatchWinner', matchId: 'm-de-r1', winnerId: 'p1' }) as never,
+      { params: params('t1') },
+    );
+
+    expect(res.status).toBe(200);
+    const eliminationCalls = p.tournamentParticipant.updateMany.mock.calls.filter((c: unknown[]) => {
+      const arg = c[0] as { data?: { eliminated?: boolean } };
+      return arg?.data?.eliminated === true;
+    });
+    expect(eliminationCalls).toEqual([]);
+  });
+
+  it('DOES eliminate the single-elimination loser when admin force-sets winner', async () => {
+    authMock.mockResolvedValue({ user: { id: 'creator', name: 'Bob' } });
+    p.tournament.findUnique.mockResolvedValue({
+      id: 't1',
+      creatorId: 'creator',
+      status: 'in_progress',
+      format: 'elimination',
+      totalRounds: 4,
+      currentRound: 1,
+      matches: [{
+        id: 'm-elim-r1', bracket: 'main', round: 1, matchIndex: 0,
+        player1Id: 'p1', player1Username: 'P1',
+        player2Id: 'p2', player2Username: 'P2',
+        winnerId: null, winnerUsername: null, status: 'ready',
+      }],
+      participants: [],
+      winnerId: null,
+    });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentParticipant.updateMany.mockResolvedValue({ count: 1 });
+    p.user.findUnique.mockResolvedValue({ tournamentWins: 0 });
+
+    const res = await adminPOST(
+      makeRequest({ action: 'setMatchWinner', matchId: 'm-elim-r1', winnerId: 'p1' }) as never,
+      { params: params('t1') },
+    );
+
+    expect(res.status).toBe(200);
+    const eliminationCalls = p.tournamentParticipant.updateMany.mock.calls.filter((c: unknown[]) => {
+      const arg = c[0] as { data?: { eliminated?: boolean }; where?: { userId?: string } };
+      return arg?.data?.eliminated === true && arg.where?.userId === 'p2';
+    });
+    expect(eliminationCalls.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('does NOT mark tournament winner when admin sets winner on a NON-final match', async () => {
+    authMock.mockResolvedValue({ user: { id: 'creator', name: 'Bob' } });
+    p.tournament.findUnique.mockResolvedValue({
+      id: 't1',
+      creatorId: 'creator',
+      status: 'in_progress',
+      format: 'elimination',
+      totalRounds: 4,
+      currentRound: 1,
+      matches: [{
+        id: 'm-r1', bracket: 'main', round: 1, matchIndex: 0,
+        player1Id: 'p1', player1Username: 'P1',
+        player2Id: 'p2', player2Username: 'P2',
+        winnerId: null, winnerUsername: null, status: 'ready',
+      }],
+      participants: [],
+      winnerId: null,
+    });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentParticipant.updateMany.mockResolvedValue({ count: 0 });
+    p.user.findUnique.mockResolvedValue({ tournamentWins: 0 });
+    p.tournament.update.mockResolvedValue({});
+
+    const res = await adminPOST(
+      makeRequest({ action: 'setMatchWinner', matchId: 'm-r1', winnerId: 'p1' }) as never,
+      { params: params('t1') },
+    );
+
+    expect(res.status).toBe(200);
+    const tournamentCompletionCalls = p.tournament.update.mock.calls.filter((c: unknown[]) => {
+      const arg = c[0] as { data?: { winnerId?: string } };
+      return arg?.data?.winnerId !== undefined;
+    });
+    expect(tournamentCompletionCalls).toEqual([]);
+  });
+});

@@ -220,29 +220,42 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
       if (match.status !== 'ready' && match.status !== 'pending' && match.status !== 'in_progress') return;
       if (match.roomCode && rooms.has(match.roomCode)) return;
 
+      const otherPlayerId = match.player1Id === userId ? match.player2Id : match.player1Id;
+      if (!otherPlayerId || !match.player1Id || !match.player2Id) return;
+
       if (!matchReadyPlayers.has(matchId)) matchReadyPlayers.set(matchId, new Set());
       const ready = matchReadyPlayers.get(matchId)!;
       ready.add(userId);
 
-      if (ready.size === 1) {
-        const absentPlayerId = match.player1Id === userId ? match.player2Id : match.player1Id;
-        if (absentPlayerId && match.player1Id && match.player2Id) {
+
+
+
+      const dbSaysOtherWasReady = match.absentPlayerId === userId;
+      const memorySaysBothReady = ready.size >= 2;
+      const bothReady = memorySaysBothReady || dbSaysOtherWasReady;
+
+      if (!bothReady) {
+
+
+        const alreadyWaitingForOther = match.absentPlayerId === otherPlayerId;
+        if (!alreadyWaitingForOther) {
           const p1 = match.player1Id;
           const p2 = match.player2Id;
           const deadline = startAbsenceTimer(matchId, async () => {
-            await fireAbsenceTimerCallback(io, tournamentId, matchId, p1, p2, absentPlayerId, false);
+            await fireAbsenceTimerCallback(io, tournamentId, matchId, p1, p2, otherPlayerId, false);
           });
           await prisma.tournamentMatch.update({
             where: { id: matchId },
-            data: { absenceDeadline: deadline, absentPlayerId },
+            data: { absenceDeadline: deadline, absentPlayerId: otherPlayerId },
           });
           io.to(`tournament:${tournamentId}`).emit('tournament:absence-timer', {
-            matchId, playerId: absentPlayerId, deadline: deadline.toISOString(),
+            matchId, playerId: otherPlayerId, deadline: deadline.toISOString(),
           });
         }
       }
 
-      if (ready.size >= 2 && match.player1Id && match.player2Id) {
+      if (bothReady) {
+        ready.add(otherPlayerId);
         clearAbsenceTimer(matchId);
         matchReadyPlayers.delete(matchId);
         const roomCode = match.roomCode || `T-${matchId.slice(-6)}`;
@@ -309,6 +322,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             isAnonymous: false,
             gameMode: isSealedTournament ? 'sealed' : isEvolvingTournament ? 'evolving' : 'casual',
             isEvolving: isEvolvingTournament,
+            holoHue: isEvolvingTournament ? Math.floor(Math.random() * 360) : null,
             hostEvolvingPoints,
             guestEvolvingPoints,
             createdAt: Date.now(),
@@ -1064,6 +1078,27 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
   });
 
   if (!nextMatch) {
+
+
+
+
+    const tournamentMeta = await prisma.tournament.findUnique({
+      where: { id: tournamentId },
+      select: { totalRounds: true, status: true },
+    });
+    if (!tournamentMeta) {
+      console.error(`[Tournament] advanceMatchWinner: tournament ${tournamentId} not found while finalizing`);
+      return;
+    }
+    if (tournamentMeta.status === 'completed' || tournamentMeta.status === 'cancelled') {
+      console.warn(`[Tournament] advanceMatchWinner: tournament ${tournamentId} already ${tournamentMeta.status}, skipping completion`);
+      return;
+    }
+    if (match.round < tournamentMeta.totalRounds) {
+      console.error(`[Tournament] advanceMatchWinner: refusing to complete tournament ${tournamentId} on non-final match (round ${match.round}/${tournamentMeta.totalRounds}). Bracket DB integrity issue: nextMatch missing for round ${match.round + 1} matchIndex ${nextMatchIndex}.`);
+      return;
+    }
+
     const winnerEliminated = await prisma.tournamentParticipant.findFirst({
       where: { tournamentId, userId: winnerId, eliminated: true },
       select: { id: true },
