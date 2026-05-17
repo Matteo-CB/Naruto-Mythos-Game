@@ -183,11 +183,21 @@ describe('startChessClockTickLoop / stopChessClockTickLoop', () => {
 });
 
 describe('onChessClockTick', () => {
-  it('no broadcast when no active player', () => {
+  it('no broadcast when no input is awaited (gameOver phase)', () => {
     const { io, emits } = makeIoMock();
-    const room = makeRoom();
+    const room = makeRoom({ gameState: makeState({ phase: 'gameOver' }) });
     onChessClockTick(room, io);
     expect(emits).toHaveLength(0);
+  });
+
+  it('auto-syncs and broadcasts when state expects input but clock is unarmed (drift recovery)', () => {
+    const { io, emits } = makeIoMock();
+    const room = makeRoom();
+    expect(room.chessClock.active).toBeNull();
+    onChessClockTick(room, io);
+    expect(room.chessClock.active).toBe('player1');
+    const clockEmit = emits.find((e) => e.event === 'game:clock-update');
+    expect(clockEmit).toBeDefined();
   });
 
   it('broadcasts game:clock-update directly to host and guest sockets when active', () => {

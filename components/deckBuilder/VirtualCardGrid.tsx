@@ -37,6 +37,7 @@ export function VirtualCardGrid<T>({
   const ownRef = useRef<HTMLDivElement | null>(null);
   const sizingRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [scrollMargin, setScrollMargin] = useState(0);
   const usingExternalScroll = !!scrollElementRef;
 
   useLayoutEffect(() => {
@@ -45,13 +46,23 @@ export function VirtualCardGrid<T>({
     const measure = () => {
       const w = el.clientWidth - paddingX * 2;
       if (w > 0) setContainerWidth(w);
+      if (usingExternalScroll && scrollElementRef?.current) {
+        const scrollEl = scrollElementRef.current;
+        const elRect = el.getBoundingClientRect();
+        const scrollRect = scrollEl.getBoundingClientRect();
+        const margin = (elRect.top - scrollRect.top) + scrollEl.scrollTop;
+        setScrollMargin(Math.max(0, Math.round(margin)));
+      }
     };
     measure();
     if (typeof ResizeObserver === 'undefined') return;
     const ro = new ResizeObserver(() => measure());
     ro.observe(el);
+    if (usingExternalScroll && scrollElementRef?.current) {
+      ro.observe(scrollElementRef.current);
+    }
     return () => ro.disconnect();
-  }, [paddingX]);
+  }, [paddingX, usingExternalScroll, scrollElementRef]);
 
   const { columnCount, cellWidth, cellHeight, rowHeight } = useMemo(() => {
     if (containerWidth <= 0) {
@@ -82,11 +93,12 @@ export function VirtualCardGrid<T>({
     getScrollElement,
     estimateSize: () => rowHeight || 1,
     overscan: overscanRows,
+    scrollMargin: usingExternalScroll ? scrollMargin : 0,
   });
 
   useEffect(() => {
     rowVirtualizer.measure();
-  }, [rowHeight, rowCount, rowVirtualizer]);
+  }, [rowHeight, rowCount, rowVirtualizer, scrollMargin]);
 
   const totalHeight = rowCount * rowHeight - (rowCount > 0 ? gap : 0) + paddingBottom;
 
@@ -116,12 +128,13 @@ export function VirtualCardGrid<T>({
             </div>,
           );
         }
+        const rowTop = usingExternalScroll ? virtualRow.start - scrollMargin : virtualRow.start;
         return (
           <div
             key={virtualRow.key}
             style={{
               position: 'absolute',
-              top: virtualRow.start,
+              top: rowTop,
               left: 0,
               right: 0,
               height: cellHeight,

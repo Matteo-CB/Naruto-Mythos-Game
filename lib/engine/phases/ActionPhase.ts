@@ -283,7 +283,7 @@ function handleRevealCharacter(
 ): GameState {
   if (missionIndex < 0 || missionIndex >= state.activeMissions.length) return state;
 
-  const validation = validateRevealCharacter(state, player, missionIndex, characterInstanceId);
+  const validation = validateRevealCharacter(state, player, missionIndex, characterInstanceId, upgradeTargetInstanceId);
   if (!validation.valid) return state;
 
   const missions = [...state.activeMissions];

@@ -1393,13 +1393,12 @@ export default function DeckBuilderPage() {
           )}
 
 
-          {evolvingMode && (
-            <div className="px-4 py-2 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-              <EvolvingBuilderHelper />
-            </div>
-          )}
-
           <div className="flex-1 overflow-y-auto px-4 py-3" style={{ minHeight: 0 }}>
+            {evolvingMode && (
+              <div className="mb-3">
+                <EvolvingBuilderHelper />
+              </div>
+            )}
             {renderDeckContent()}
           </div>
 

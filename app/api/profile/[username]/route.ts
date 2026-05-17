@@ -55,7 +55,7 @@ export async function GET(
 
     const limit = page * perPage;
 
-    const [totalRanked, eloRows, aiGames] = await Promise.all([
+    const [totalRanked, eloRows, aiGames, rankedStreakRows, evolvingStreakRows] = await Promise.all([
       prisma.eloHistory.count({ where: { userId: user.id } }),
       prisma.eloHistory.findMany({
         where: { userId: user.id },
@@ -81,7 +81,30 @@ export async function GET(
         orderBy: { completedAt: 'desc' },
         take: limit,
       }),
+      prisma.eloHistory.findMany({
+        where: { userId: user.id, eloType: 'ranked' },
+        orderBy: { createdAt: 'desc' },
+        select: { result: true },
+        take: 50,
+      }),
+      prisma.eloHistory.findMany({
+        where: { userId: user.id, eloType: 'evolving' },
+        orderBy: { createdAt: 'desc' },
+        select: { result: true },
+        take: 50,
+      }),
     ]);
+
+    const countLeadingWins = (rows: { result: string }[]): number => {
+      let n = 0;
+      for (const r of rows) {
+        if (r.result === 'win') n++;
+        else break;
+      }
+      return n;
+    };
+    const consecutiveWinsRanked = countLeadingWins(rankedStreakRows);
+    const consecutiveWinsEvolving = countLeadingWins(evolvingStreakRows);
 
     const candidateGameIds = eloRows
       .map((r) => r.gameId)
@@ -175,7 +198,16 @@ export async function GET(
 
     const { decks: _omit, ...userWithoutDecks } = user;
     void _omit;
-    return NextResponse.json({ ...userWithoutDecks, decks, recentGames, totalGames, page, perPage });
+    return NextResponse.json({
+      ...userWithoutDecks,
+      decks,
+      recentGames,
+      totalGames,
+      page,
+      perPage,
+      consecutiveWinsRanked,
+      consecutiveWinsEvolving,
+    });
   } catch (err) {
     console.error('[profile] error:', err);
     return NextResponse.json(

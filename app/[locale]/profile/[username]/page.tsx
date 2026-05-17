@@ -17,6 +17,7 @@ import Image from 'next/image';
 import '@/styles/holo-menu.css';
 import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
 import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
+import { LeaderboardModeSwitch, type LeaderboardMode } from '@/components/play-online/LeaderboardModeSwitch';
 
 interface ProfileData {
   id: string;
@@ -25,10 +26,8 @@ interface ProfileData {
   evolvingElo?: number;
   evolvingWins?: number;
   evolvingLosses?: number;
-  evolvingDraws?: number;
   wins: number;
   losses: number;
-  draws: number;
   role?: string;
   badgePrefs?: string[];
   discordUsername: string | null;
@@ -256,12 +255,25 @@ export default function ProfilePage({
 
   const isOwner = session?.user?.id === profile?.id;
 
-  const total = profile ? profile.wins + profile.losses + profile.draws : 0;
-  const placed = total >= PLACEMENT_MATCHES_REQUIRED;
-  const winRate = total > 0 ? Math.round(((profile?.wins ?? 0) / total) * 100) : 0;
+  const [profileMode, setProfileMode] = useState<LeaderboardMode>('ranked');
+
+  const rankedTotal = profile ? profile.wins + profile.losses : 0;
+  const evoTotal = profile ? (profile.evolvingWins ?? 0) + (profile.evolvingLosses ?? 0) : 0;
+
+  const displayedWins = profileMode === 'evolving' ? (profile?.evolvingWins ?? 0) : (profile?.wins ?? 0);
+  const displayedLosses = profileMode === 'evolving' ? (profile?.evolvingLosses ?? 0) : (profile?.losses ?? 0);
+  const displayedElo = profileMode === 'evolving' ? (profile?.evolvingElo ?? 500) : (profile?.elo ?? 0);
+  const displayedTotal = profileMode === 'evolving' ? evoTotal : rankedTotal;
+
+  const placed = rankedTotal >= PLACEMENT_MATCHES_REQUIRED;
+  const evoPlaced = evoTotal >= PLACEMENT_MATCHES_REQUIRED;
+  const winRate = displayedTotal > 0 ? Math.round((displayedWins / displayedTotal) * 100) : 0;
   const tier = profile ? getRankTier(profile.elo) : null;
-  const eloCount = useCountUp(profile?.elo ?? 0, 900);
-  const accentColor = leaguesEnabled && placed && tier ? tier.color : '#c4a35a';
+  const evoTier = profile ? getRankTier(profile.evolvingElo ?? 500) : null;
+  const displayedTier = profileMode === 'evolving' ? evoTier : tier;
+  const displayedPlaced = profileMode === 'evolving' ? evoPlaced : placed;
+  const eloCount = useCountUp(displayedElo, 900);
+  const accentColor = leaguesEnabled && displayedPlaced && displayedTier ? displayedTier.color : '#c4a35a';
 
   if (loading) {
     return (
@@ -329,9 +341,9 @@ export default function ProfilePage({
           } as React.CSSProperties}
         >
           <div className="relative z-10 flex items-center justify-center px-6 sm:px-10 py-7 sm:py-8 sm:w-[34%]">
-            {leaguesEnabled && placed && tier ? (
+            {leaguesEnabled && displayedPlaced && displayedTier ? (
               <Image
-                src={tier.image}
+                src={displayedTier.image}
                 alt=""
                 width={130}
                 height={130}
@@ -358,8 +370,8 @@ export default function ProfilePage({
                 letterSpacing: '0.06em',
               }}
             >
-              {leaguesEnabled && placed && tier
-                ? t(`rankNames.${tier.key}`)
+              {leaguesEnabled && displayedPlaced && displayedTier
+                ? t(`rankNames.${displayedTier.key}`)
                 : leaguesEnabled
                   ? t('rankNames.unranked')
                   : '...'}
@@ -441,17 +453,29 @@ export default function ProfilePage({
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-7">
-          <StatPanel label={t('statsWins')} value={profile.wins} color="#5fb05f" delay={0.05} />
-          <StatPanel label={t('statsLosses')} value={profile.losses} color="#d97676" delay={0.1} />
-          <StatPanel label={t('statsDraws')} value={profile.draws} color="#888" delay={0.15} />
+        <div className="flex items-center justify-between gap-3 mb-3">
+          <span className="font-display text-[11px] uppercase" style={{ color: '#666', letterSpacing: '0.28em' }}>
+            {t('statsTitle')}
+          </span>
+          <LeaderboardModeSwitch value={profileMode} onChange={setProfileMode} layoutId="profile-mode-pill" size="sm" />
+        </div>
+
+        <motion.div
+          key={profileMode}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.18 }}
+          className="grid grid-cols-3 gap-2 mb-7"
+        >
+          <StatPanel label={t('statsWins')} value={displayedWins} color="#5fb05f" delay={0.05} />
+          <StatPanel label={t('statsLosses')} value={displayedLosses} color="#d97676" delay={0.1} />
           <StatPanel
             label={t('statsWinrate')}
             value={`${winRate}%`}
             color={winRate >= 60 ? '#5fb05f' : winRate >= 40 ? '#c4a35a' : '#d97676'}
             delay={0.2}
           />
-        </div>
+        </motion.div>
 
         {isOwner && (profile.role === 'admin' || leaguesEnabled) && (
           <motion.div
@@ -607,7 +631,7 @@ export default function ProfilePage({
         )}
 
         <section className="mb-7">
-          <EloHistoryChart username={profile.username} />
+          <EloHistoryChart key={profileMode} username={profile.username} eloType={profileMode} />
         </section>
 
         <section>

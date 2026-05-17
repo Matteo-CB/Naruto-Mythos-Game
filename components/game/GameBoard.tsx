@@ -1161,9 +1161,11 @@ function GameBoardInner() {
           </div>
 
           
-          <div className="shrink-0 flex justify-center py-0.5" style={{ pointerEvents: 'auto' }}>
-            <ActionBar />
-          </div>
+          {!isSpectating && (
+            <div className="shrink-0 flex justify-center py-0.5" style={{ pointerEvents: 'auto' }}>
+              <ActionBar />
+            </div>
+          )}
         </section>
 
         

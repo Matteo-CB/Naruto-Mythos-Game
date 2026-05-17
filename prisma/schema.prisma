@@ -157,14 +157,16 @@ model Game {
 }
 
 model Room {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  code      String   @unique
-  hostId    String   @db.ObjectId
-  guestId   String?  @db.ObjectId
-  gameId    String?  @db.ObjectId
-  status    String
-  isPrivate Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  code       String   @unique
+  hostId     String   @db.ObjectId
+  guestId    String?  @db.ObjectId
+  gameId     String?  @db.ObjectId
+  status     String
+  isPrivate  Boolean  @default(false)
+  isEvolving Boolean  @default(false)
+  holoHue    Int?
+  createdAt  DateTime @default(now())
 }
 
 model QuizScore {

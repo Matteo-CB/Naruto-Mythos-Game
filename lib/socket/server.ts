@@ -33,6 +33,26 @@ export function getEvolvingEloType(isEvolving: boolean): 'ranked' | 'evolving' {
   return isEvolving ? 'evolving' : 'ranked';
 }
 
+export async function userHasEvolvingDeck(userId: string): Promise<boolean> {
+  try {
+    const count = await prisma.deck.count({ where: { userId, evolvingCompatible: true } });
+    return count > 0;
+  } catch (err) {
+    console.error(`[Socket] userHasEvolvingDeck check failed for ${userId}:`, err instanceof Error ? err.message : err);
+    return false;
+  }
+}
+
+export async function assertCanJoinEvolving(
+  userId: string,
+  room: Pick<RoomData, 'isEvolving'>,
+): Promise<{ ok: true } | { ok: false; errorKey: string }> {
+  if (!room.isEvolving) return { ok: true };
+  const has = await userHasEvolvingDeck(userId);
+  if (!has) return { ok: false, errorKey: 'room.error.evolvingNoDeck' };
+  return { ok: true };
+}
+
 export interface RoomData {
   code: string;
   hostId: string;
@@ -47,6 +67,7 @@ export interface RoomData {
   isAnonymous: boolean;
   gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving';
   isEvolving: boolean;
+  holoHue: number | null;
   hostEvolvingPoints: number;
   guestEvolvingPoints: number;
   createdAt: number;
@@ -311,6 +332,9 @@ export function onChessClockTick(room: RoomData, io: SocketIOServer): void {
     return;
   }
   const now = Date.now();
+  if (room.chessClock.active === null && whoseInputIsAwaited(room.gameState) !== null) {
+    syncChessClock(room, now);
+  }
   const active = room.chessClock.active;
   if (!active) return;
   if (chessClockBankEmpty(room.chessClock, now)) {
@@ -425,14 +449,14 @@ function cleanupPlayerRoom(socket: Socket): void {
 }
 
 
-function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: string; createdAt: number }> {
-  const list: Array<{ code: string; hostName: string; gameMode: string; createdAt: number }> = [];
+function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: string; createdAt: number; isEvolving: boolean; holoHue: number | null; isRanked: boolean; isAnonymous: boolean }> {
+  const list: Array<{ code: string; hostName: string; gameMode: string; createdAt: number; isEvolving: boolean; holoHue: number | null; isRanked: boolean; isAnonymous: boolean }> = [];
   const staleRoomCodes: string[] = [];
   for (const [code, room] of rooms) {
     if (room.isPrivate) continue;
     if (room.guestId) continue; // Already has a guest
     if (room.gameState) continue; // Game already started
-    
+
     if (room.hostSocket && ioInstance) {
       const hostSock = ioInstance.sockets.sockets.get(room.hostSocket);
       if (!hostSock || !hostSock.connected) {
@@ -445,6 +469,10 @@ function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: 
       hostName: room.isAnonymous ? '__anonymous__' : (room.hostName ?? 'Unknown'),
       gameMode: room.gameMode,
       createdAt: room.createdAt,
+      isEvolving: room.isEvolving === true,
+      holoHue: room.holoHue ?? null,
+      isRanked: room.isRanked === true,
+      isAnonymous: room.isAnonymous === true,
     });
   }
   
@@ -464,7 +492,8 @@ function broadcastRoomList(io: SocketIOServer): void {
 function broadcastActiveGames(io: SocketIOServer): void {
   const activeGames: Array<{
     roomCode: string; player1Name: string; player2Name: string;
-    spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean; isEvolving: boolean;
+    spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean;
+    isEvolving: boolean; holoHue: number | null; isAnonymous: boolean; phase: string;
   }> = [];
 
   const seenPlayerIds = new Set<string>();
@@ -478,13 +507,16 @@ function broadcastActiveGames(io: SocketIOServer): void {
     if (room.guestId) seenPlayerIds.add(room.guestId);
     activeGames.push({
       roomCode: code,
-      player1Name: room.hostName ?? 'Player 1',
-      player2Name: room.guestName ?? 'Player 2',
+      player1Name: room.isAnonymous ? '__anonymous__' : (room.hostName ?? 'Player 1'),
+      player2Name: room.isAnonymous ? '__anonymous__' : (room.guestName ?? 'Player 2'),
       spectatorCount: room.spectators.size,
       turn: room.gameState.turn,
       isRanked: room.isRanked,
       isPrivate: false,
       isEvolving: room.isEvolving === true,
+      holoHue: room.holoHue ?? null,
+      isAnonymous: room.isAnonymous === true,
+      phase: room.gameState.phase,
     });
   }
   io.to('games-watchers').emit('games:list-update', { games: activeGames });
@@ -1233,6 +1265,8 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
         spectatorCount: room.spectators.size,
         roomCode: room.code,
         chessClock,
+        isEvolving: room.isEvolving === true,
+        holoHue: room.holoHue ?? null,
       });
     }
   } catch (err) {
@@ -1547,7 +1581,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     
-    socket.on('room:create', async (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; sealedSetChoice?: string; isAnonymous?: boolean }) => {
+    socket.on('room:create', async (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; isEvolving?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; sealedSetChoice?: string; isAnonymous?: boolean }) => {
       if (isMaintenanceActive()) {
         socket.emit('room:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
         return;
@@ -1583,7 +1617,24 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       const VALID_MODES = ['casual', 'ranked', 'sealed', 'evolving'] as const;
       const requestedMode = data.gameMode ?? (data.isSealed ? 'sealed' : data.isRanked ? 'ranked' : 'casual');
-      const gameMode = (VALID_MODES as readonly string[]).includes(requestedMode) ? requestedMode : 'casual';
+      const baseMode = (VALID_MODES as readonly string[]).includes(requestedMode) ? requestedMode : 'casual';
+
+      const evolvingFlag = data.isEvolving === true || baseMode === 'evolving';
+      const isRankedFlag = baseMode === 'ranked' || baseMode === 'evolving' || (data.isRanked === true && baseMode !== 'sealed');
+      const gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' =
+        baseMode === 'sealed' ? 'sealed' :
+        evolvingFlag && isRankedFlag ? 'evolving' :
+        isRankedFlag ? 'ranked' :
+        'casual';
+
+      if (evolvingFlag) {
+        const evoDeckCount = await prisma.deck.count({ where: { userId: data.userId, evolvingCompatible: true } });
+        if (evoDeckCount === 0) {
+          socket.emit('room:error', { message: 'You need an evolving deck to create an evolving room', errorKey: 'room.error.evolvingNoDeck' });
+          return;
+        }
+      }
+
       const safeBoosterCount = data.sealedBoosterCount === 4 || data.sealedBoosterCount === 5 || data.sealedBoosterCount === 6 ? data.sealedBoosterCount : 6;
       const safeSealedSetChoice = (typeof data.sealedSetChoice === 'string' && data.sealedSetChoice.length > 0 && data.sealedSetChoice.length <= 16) ? data.sealedSetChoice : 'random';
       const safeHostName = typeof data.hostName === 'string' && data.hostName.length > 0 && data.hostName.length <= 50 ? data.hostName : (userNames.get(data.userId) || 'Unknown');
@@ -1598,10 +1649,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
         hostDeck: null,
         guestDeck: null,
         isPrivate: data.isPrivate ?? false,
-        isRanked: gameMode === 'ranked' || gameMode === 'evolving',
+        isRanked: isRankedFlag,
         isAnonymous: data.isAnonymous ?? false,
         gameMode,
-        isEvolving: gameMode === 'evolving',
+        isEvolving: evolvingFlag,
+        holoHue: evolvingFlag ? Math.floor(Math.random() * 360) : null,
         hostEvolvingPoints: 0,
         guestEvolvingPoints: 0,
         createdAt: Date.now(),
@@ -1638,8 +1690,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
       playerRooms.set(socket.id, code);
       socket.join(code);
 
-      console.log(`[Socket] Room ${code} created by ${data.userId} (mode: ${gameMode})`);
-      socket.emit('room:created', { code, isSealed: room.isSealed, gameMode: room.gameMode });
+      console.log(`[Socket] Room ${code} created by ${data.userId} (mode: ${gameMode}, evolving: ${evolvingFlag}, ranked: ${isRankedFlag})`);
+      socket.emit('room:created', {
+        code,
+        isSealed: room.isSealed,
+        gameMode: room.gameMode,
+        isEvolving: room.isEvolving,
+        holoHue: room.holoHue,
+      });
 
       
       if (!room.isPrivate) {
@@ -1696,6 +1754,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
             gameMode: room.gameMode,
             isRanked: room.isRanked,
             tournamentId: room.tournamentId,
+            isEvolving: room.isEvolving === true,
+            holoHue: room.holoHue ?? null,
           });
           
           if (room.gameState) {
@@ -1717,16 +1777,23 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-      
+
       if (room.guestId && room.guestId !== data.userId) {
         console.log(`[Socket] Room ${data.code} is full`);
         socket.emit('room:error', { message: 'Room is full', errorKey: 'game.error.roomFull' });
         return;
       }
 
-      
+
       if (room.guestId === data.userId) {
         console.log(`[Socket] User ${data.userId} rejoining room ${data.code}`);
+      } else {
+        const evoCheck = await assertCanJoinEvolving(data.userId, room);
+        if (!evoCheck.ok) {
+          console.log(`[Socket] User ${data.userId} rejected from room ${data.code}: no evolving deck`);
+          socket.emit('room:error', { message: 'You need an evolving deck to join this room', errorKey: evoCheck.errorKey });
+          return;
+        }
       }
 
       room.guestId = data.userId;
@@ -1750,6 +1817,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
         guestId: room.guestId,
         isSealed: room.isSealed,
         gameMode: room.gameMode,
+        isEvolving: room.isEvolving === true,
+        holoHue: room.holoHue ?? null,
       });
 
       
@@ -2200,7 +2269,23 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const player = socket.id === room.hostSocket ? 'player1' : 'player2';
       console.log(`[Socket] action:perform from ${player}: ${data.action.type}, phase: ${room.gameState.phase}`);
 
-      
+      {
+        const nowChk = Date.now();
+        if (room.chessClock.active === player) {
+          if (chessClockBankEmpty(room.chessClock, nowChk)) {
+            console.warn(`[Socket] action:perform from ${player}: bank empty, forfeiting`);
+            handleChessClockExpiry(room, player, io, 'bank-empty');
+            return;
+          }
+          if (chessClockIdleMs(room.chessClock, nowChk) >= CHESS_CLOCK_IDLE_LIMIT_MS) {
+            console.warn(`[Socket] action:perform from ${player}: idle limit exceeded, triggering idle handler`);
+            handleChessClockIdleLimit(room, player, io);
+            return;
+          }
+        }
+      }
+
+
       const hasPendingAction = room.gameState.pendingActions.some((p: { player: string }) => p.player === player);
       if (room.gameState.activePlayer !== player && !hasPendingAction) {
         if (room.gameState.phase === 'action') {
@@ -2282,7 +2367,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               if (result.reasonKey) errorKey = result.reasonKey;
               if (result.reasonParams) errorParams = result.reasonParams;
             } else if (data.action.type === 'REVEAL_CHARACTER') {
-              const result = validateRevealCharacter(prevState, player as 'player1' | 'player2', data.action.missionIndex, data.action.characterInstanceId);
+              const result = validateRevealCharacter(prevState, player as 'player1' | 'player2', data.action.missionIndex, data.action.characterInstanceId, data.action.upgradeTargetInstanceId);
               if (result.reason) errorMessage = result.reason;
               if (result.reasonKey) errorKey = result.reasonKey;
               if (result.reasonParams) errorParams = result.reasonParams;
@@ -2530,7 +2615,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     
-    socket.on('matchmaking:join', async (data: { userId: string; isRanked?: boolean; hostName?: string }) => {
+    socket.on('matchmaking:join', async (data: { userId: string; isRanked?: boolean; isEvolving?: boolean; hostName?: string }) => {
       if (isMaintenanceActive()) {
         socket.emit('game:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
         return;
@@ -2554,8 +2639,17 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-      console.log(`[Socket] User ${data.userId} joining matchmaking (ranked: ${data.isRanked ?? true})`);
       const wantRanked = data.isRanked ?? true;
+      const wantEvolving = data.isEvolving === true;
+      console.log(`[Socket] User ${data.userId} joining matchmaking (ranked: ${wantRanked}, evolving: ${wantEvolving})`);
+
+      if (wantEvolving) {
+        const has = await userHasEvolvingDeck(data.userId);
+        if (!has) {
+          socket.emit('game:error', { message: 'You need an evolving deck to matchmake in evolving', errorKey: 'room.error.evolvingNoDeck' });
+          return;
+        }
+      }
 
 
       cleanupPlayerRoom(socket);
@@ -2582,7 +2676,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       let foundRoom: RoomData | null = null;
       for (const [code, room] of rooms) {
-        if (!room.isPrivate && !room.guestId && room.hostId !== data.userId && room.isRanked === wantRanked) {
+        if (!room.isPrivate && !room.guestId && room.hostId !== data.userId && room.isRanked === wantRanked && room.isEvolving === wantEvolving) {
           
           const hostSocketObj = io.sockets.sockets.get(room.hostSocket);
           if (hostSocketObj && hostSocketObj.connected) {
@@ -2610,6 +2704,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
           hostId: foundRoom.hostId,
           guestId: foundRoom.guestId,
           gameMode: foundRoom.gameMode,
+          isEvolving: foundRoom.isEvolving === true,
+          holoHue: foundRoom.holoHue ?? null,
         });
 
         
@@ -2644,8 +2740,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
           isPrivate: false,
           isRanked: wantRanked,
           isAnonymous: false,
-          gameMode: wantRanked ? 'ranked' : 'casual',
-          isEvolving: false,
+          gameMode: wantEvolving && wantRanked ? 'evolving' : (wantRanked ? 'ranked' : 'casual'),
+          isEvolving: wantEvolving,
+          holoHue: wantEvolving ? Math.floor(Math.random() * 360) : null,
           hostEvolvingPoints: 0,
           guestEvolvingPoints: 0,
           createdAt: Date.now(),
@@ -2763,6 +2860,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
           spectatorCount: room.spectators.size,
           roomCode: data.roomCode,
           chessClock,
+          isEvolving: room.isEvolving === true,
+          holoHue: room.holoHue ?? null,
         });
 
         socket.emit('chat:history', { messages: room.chatMessages.slice(-50) });
@@ -2828,6 +2927,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
           spectatorCount: room.spectators.size,
           roomCode: data.roomCode,
           chessClock,
+          isEvolving: room.isEvolving === true,
+          holoHue: room.holoHue ?? null,
         });
       } catch (err) {
         console.error('[Socket] Spectator request-state error:', err);

@@ -251,7 +251,7 @@ export default function GamePage() {
       sealedDeckCardIds: null,
       sealedDeckMissionIds: null,
     });
-    router.push(sealed ? '/play/sealed' : evolving ? '/play/online/evolving' : '/play/online');
+    router.push((sealed ? '/play/sealed' : evolving ? '/play/online?mode=evolving' : '/play/online') as '/play/online');
   }, [rematchRoomCode, router]);
 
   

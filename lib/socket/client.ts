@@ -66,6 +66,10 @@ interface PublicRoom {
   hostName: string;
   gameMode: string;
   createdAt: number;
+  isEvolving: boolean;
+  holoHue: number | null;
+  isRanked: boolean;
+  isAnonymous: boolean;
 }
 
 interface SocketStore {
@@ -75,6 +79,8 @@ interface SocketStore {
   userName: string | null;
   roomCode: string | null;
   currentRoomGameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' | null;
+  currentRoomIsEvolving: boolean;
+  currentRoomHoloHue: number | null;
   playerRole: 'player1' | 'player2' | null;
   visibleState: VisibleGameState | null;
   matchmakingStatus: 'idle' | 'waiting' | 'found';
@@ -128,7 +134,7 @@ interface SocketStore {
 
   connect: (userId?: string, username?: string) => Promise<void>;
   disconnect: () => void;
-  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean) => void;
+  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean, isEvolving?: boolean) => void;
   joinRoom: (code: string, userId: string) => void;
   selectDeck: (characters: unknown[], missions: unknown[], deckId?: string) => void;
   changeDeck: () => void;
@@ -170,7 +176,7 @@ interface SocketStore {
   acceptReconnect: () => void;
 
   
-  activeGames: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean; isEvolving: boolean }>;
+  activeGames: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean; isEvolving: boolean; holoHue: number | null; isAnonymous: boolean; phase: string }>;
   requestActiveGames: () => void;
 }
 
@@ -181,6 +187,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   userName: null,
   roomCode: null,
   currentRoomGameMode: null,
+  currentRoomIsEvolving: false,
+  currentRoomHoloHue: null,
   playerRole: null,
   visibleState: null,
   matchmakingStatus: 'idle',
@@ -224,7 +232,13 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         const { games, ts } = JSON.parse(cached);
 
         if (Date.now() - ts < 30000 && Array.isArray(games)) {
-          return games.map((g: { roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean; isEvolving?: boolean }) => ({ ...g, isEvolving: g.isEvolving === true }));
+          return games.map((g: { roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean; isEvolving?: boolean; holoHue?: number | null; isAnonymous?: boolean; phase?: string }) => ({
+            ...g,
+            isEvolving: g.isEvolving === true,
+            holoHue: typeof g.holoHue === 'number' ? g.holoHue : null,
+            isAnonymous: g.isAnonymous === true,
+            phase: typeof g.phase === 'string' ? g.phase : 'action',
+          }));
         }
       }
     } catch { /* ignore */ }
@@ -327,19 +341,37 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       
 
-      socket.on('room:created', (data: { code: string; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' }) => {
-        console.log('[Socket] Room created:', data.code);
-        set({ roomCode: data.code, playerRole: 'player1', currentRoomGameMode: data.gameMode ?? null });
+      socket.on('room:created', (data: { code: string; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving'; isEvolving?: boolean; holoHue?: number | null }) => {
+        console.log('[Socket] Room created:', data.code, 'evolving:', data.isEvolving === true);
+        set({
+          roomCode: data.code,
+          playerRole: 'player1',
+          currentRoomGameMode: data.gameMode ?? null,
+          currentRoomIsEvolving: data.isEvolving === true,
+          currentRoomHoloHue: typeof data.holoHue === 'number' ? data.holoHue : null,
+        });
       });
 
-      socket.on('room:joined', (data: { code: string; playerRole: 'player1' | 'player2'; tournamentId?: string | null; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' }) => {
-        console.log('[Socket] Joined room:', data.code, 'tournament:', data.tournamentId ?? 'none', 'mode:', data.gameMode ?? 'unknown');
-        set({ roomCode: data.code, playerRole: data.playerRole, tournamentMatchRoom: !!data.tournamentId, currentRoomGameMode: data.gameMode ?? null });
+      socket.on('room:joined', (data: { code: string; playerRole: 'player1' | 'player2'; tournamentId?: string | null; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving'; isEvolving?: boolean; holoHue?: number | null }) => {
+        console.log('[Socket] Joined room:', data.code, 'tournament:', data.tournamentId ?? 'none', 'mode:', data.gameMode ?? 'unknown', 'evolving:', data.isEvolving === true);
+        set({
+          roomCode: data.code,
+          playerRole: data.playerRole,
+          tournamentMatchRoom: !!data.tournamentId,
+          currentRoomGameMode: data.gameMode ?? null,
+          currentRoomIsEvolving: data.isEvolving === true,
+          currentRoomHoloHue: typeof data.holoHue === 'number' ? data.holoHue : null,
+        });
       });
 
-      socket.on('room:player-joined', (data?: { gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' }) => {
+      socket.on('room:player-joined', (data?: { gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving'; isEvolving?: boolean; holoHue?: number | null }) => {
         console.log('[Socket] Player joined, mode:', data?.gameMode ?? 'unchanged');
-        set((s) => ({ opponentJoined: true, currentRoomGameMode: data?.gameMode ?? s.currentRoomGameMode }));
+        set((s) => ({
+          opponentJoined: true,
+          currentRoomGameMode: data?.gameMode ?? s.currentRoomGameMode,
+          currentRoomIsEvolving: typeof data?.isEvolving === 'boolean' ? data.isEvolving : s.currentRoomIsEvolving,
+          currentRoomHoloHue: typeof data?.holoHue === 'number' ? data.holoHue : s.currentRoomHoloHue,
+        }));
       });
 
       socket.on('room:player-left', () => {
@@ -563,8 +595,18 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       
 
-      socket.on('room:list-update', (rooms: PublicRoom[]) => {
-        set({ publicRooms: rooms });
+      socket.on('room:list-update', (rooms: Array<Partial<PublicRoom> & { code: string; hostName: string; gameMode: string; createdAt: number }>) => {
+        const normalized: PublicRoom[] = rooms.map((r) => ({
+          code: r.code,
+          hostName: r.hostName,
+          gameMode: r.gameMode,
+          createdAt: r.createdAt,
+          isEvolving: r.isEvolving === true,
+          holoHue: typeof r.holoHue === 'number' ? r.holoHue : null,
+          isRanked: r.isRanked === true,
+          isAnonymous: r.isAnonymous === true,
+        }));
+        set({ publicRooms: normalized });
       });
 
       
@@ -712,6 +754,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         spectatorCount: number;
         roomCode?: string;
         chessClock?: ChessClockBroadcast;
+        isEvolving?: boolean;
+        holoHue?: number | null;
       }) => {
         const current = get();
 
@@ -723,6 +767,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           spectatorCount: data.spectatorCount,
           isSpectating: true,
           gameStarted: true,
+          currentRoomIsEvolving: data.isEvolving === true,
+          currentRoomHoloHue: typeof data.holoHue === 'number' ? data.holoHue : null,
         };
         if (data.chessClock) {
           update.chessClock = data.chessClock;
@@ -760,8 +806,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       
 
-      socket.on('games:list-update', (data: { games: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean; isEvolving?: boolean }> }) => {
-        const games = (data.games ?? []).map((g) => ({ ...g, isEvolving: g.isEvolving === true }));
+      socket.on('games:list-update', (data: { games: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean; isEvolving?: boolean; holoHue?: number | null; isAnonymous?: boolean; phase?: string }> }) => {
+        const games = (data.games ?? []).map((g) => ({
+          ...g,
+          isEvolving: g.isEvolving === true,
+          holoHue: typeof g.holoHue === 'number' ? g.holoHue : null,
+          isAnonymous: g.isAnonymous === true,
+          phase: typeof g.phase === 'string' ? g.phase : 'action',
+        }));
         set({ activeGames: games });
 
         try { localStorage.setItem('nmtcg-active-games', JSON.stringify({ games, ts: Date.now() })); } catch { /* ignore */ }
@@ -788,6 +840,9 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         visibleState: null,
         matchmakingStatus: 'idle',
         error: null,
+        errorKey: null,
+        errorParams: null,
+        bannedCardsError: null,
         opponentJoined: false,
         gameStarted: false,
         gameEnded: false,
@@ -810,12 +865,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  createRoom: (userId: string, isPrivate = true, isRanked = false, isSealed = false, gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean) => {
+  createRoom: (userId: string, isPrivate = true, isRanked = false, isSealed = false, gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean, isEvolving?: boolean) => {
     const { socket, connected } = get();
     if (socket && connected) {
-      console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}${sealedBoosterCount ? ` boosters: ${sealedBoosterCount}` : ''}${sealedSetChoice ? ` set: ${sealedSetChoice}` : ''}${isAnonymous ? ' (anonymous)' : ''}`);
+      console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}${sealedBoosterCount ? ` boosters: ${sealedBoosterCount}` : ''}${sealedSetChoice ? ` set: ${sealedSetChoice}` : ''}${isAnonymous ? ' (anonymous)' : ''}${isEvolving ? ' (evolving)' : ''}`);
       set({ isSealedRoom: isSealed, rematchState: 'none', chatMessages: [], unreadChatCount: 0 });
-      socket.emit('room:create', { userId, isPrivate, isRanked, isSealed, gameMode, hostName, sealedBoosterCount, sealedSetChoice, isAnonymous });
+      socket.emit('room:create', { userId, isPrivate, isRanked, isSealed, gameMode, hostName, sealedBoosterCount, sealedSetChoice, isAnonymous, isEvolving });
     } else {
       console.error('[Socket] Cannot create room: not connected');
       set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
@@ -978,6 +1033,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       isSpectating: false, spectatingRoomCode: null, spectatorCount: 0,
       visibleState: null, playerNames: null, gameStarted: false,
       chessClock: null,
+      currentRoomIsEvolving: false, currentRoomHoloHue: null,
       chatMessages: [], unreadChatCount: 0,
     });
   },

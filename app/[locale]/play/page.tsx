@@ -7,16 +7,12 @@ import { CloudBackground } from "@/components/CloudBackground";
 import { DecorativeIcons } from "@/components/DecorativeIcons";
 import { Footer } from "@/components/Footer";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { EvolvingDeckHolo } from "@/components/evolving/EvolvingDeckHolo";
 
 type ModeEntry = {
   key: string;
-  href: "/play/online" | "/play/online/evolving" | "/play/ai" | "/play/hotseat";
+  href: "/play/online" | "/play/ai" | "/play/hotseat";
   titleKey: "onlineTitle" | "aiTitle" | "hotseatTitle";
   descKey: "onlineDesc" | "aiDesc" | "hotseatDesc";
-  literalTitle?: string;
-  literalDescKey?: "evolvingDesc";
-  evolving?: boolean;
 };
 
 export default function PlayHubPage() {
@@ -25,7 +21,6 @@ export default function PlayHubPage() {
 
   const modes: ModeEntry[] = [
     { key: "online", href: "/play/online", titleKey: "onlineTitle", descKey: "onlineDesc" },
-    { key: "evolving", href: "/play/online/evolving", titleKey: "onlineTitle", descKey: "onlineDesc", literalTitle: "Evolving Mode", literalDescKey: "evolvingDesc", evolving: true },
     { key: "ai", href: "/play/ai", titleKey: "aiTitle", descKey: "aiDesc" },
     { key: "hotseat", href: "/play/hotseat", titleKey: "hotseatTitle", descKey: "hotseatDesc" },
   ];
@@ -60,8 +55,13 @@ export default function PlayHubPage() {
         </motion.p>
 
         <div className="flex flex-col gap-3 w-full">
-          {modes.map((mode, i) => {
-            const button = (
+          {modes.map((mode, i) => (
+            <motion.div
+              key={mode.key}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.3 + i * 0.1 }}
+            >
               <Link
                 href={mode.href}
                 className="group relative flex flex-col items-center justify-center p-5 transition-all"
@@ -83,31 +83,14 @@ export default function PlayHubPage() {
                 }}
               >
                 <span className="text-sm font-bold uppercase tracking-wider" style={{ color: "#c4a35a" }}>
-                  {mode.literalTitle ?? t(mode.titleKey)}
+                  {t(mode.titleKey)}
                 </span>
                 <span className="text-xs mt-1 font-inter-force" style={{ color: "#888888" }}>
-                  {mode.literalDescKey ? t(mode.literalDescKey) : t(mode.descKey)}
+                  {t(mode.descKey)}
                 </span>
               </Link>
-            );
-
-            return (
-              <motion.div
-                key={mode.key}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.3 + i * 0.1 }}
-              >
-                {mode.evolving ? (
-                  <EvolvingDeckHolo points={3} intensity="subtle">
-                    {button}
-                  </EvolvingDeckHolo>
-                ) : (
-                  button
-                )}
-              </motion.div>
-            );
-          })}
+            </motion.div>
+          ))}
         </div>
 
         <motion.div

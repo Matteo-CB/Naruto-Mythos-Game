@@ -24,7 +24,13 @@
     "maintenanceBanner": "Server maintenance incoming. No new games can be started after your current game. The site will be back in a few minutes.",
     "home": "Home",
     "comingSoon": "Coming soon",
-    "menu": "Menu"
+    "menu": "Menu",
+    "dismiss": "Dismiss",
+    "connection": {
+      "reconnecting": "Reconnecting",
+      "offline": "Offline",
+      "retry": "Retry"
+    }
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -1217,26 +1223,11 @@
       "addAria": "Add {name}",
       "hint": "Tip: cards not in this list are free. Mix Hero cards with regular KS characters."
     },
-    "lobbySubtitle": "Hero-point budget format. Lower budget = mission point head start.",
-    "lobbyDeckPickerTitle": "Your compatible decks",
-    "noCompatibleDeck": "You have no Evolving-compatible deck (5 points max).",
-    "noDeckCtaTitle": "Quick start",
-    "noDeckCtaDesc": "Use a random 0-point KS deck. You'll start with up to 5 mission points if your opponent goes Hero.",
-    "useRandomDeck": "Use a random Evolving deck",
-    "lobbyError": {
-      "fetchFailed": "Failed to load decks. Refresh the page.",
-      "randomDeckFailed": "Failed to build a random deck. Try again."
-    },
     "lobby": {
       "title": "Evolving Mode",
       "topPlayersTitle": "Top 5 Evolving",
       "viewAll": "View all",
-      "noTopPlayers": "No ranked players yet. Be the first.",
-      "publicRoomsHeader": "Public Evolving rooms",
-      "createPublicEvolvingRoom": "Create public Evolving room",
-      "privateRoomDesc": "Ranked Evolving match. Share the code with a friend.",
-      "pickDeckTitle": "Pick your deck",
-      "evolvingDecksOnly": "Evolving-compatible only"
+      "noTopPlayers": "No ranked players yet. Be the first."
     }
   },
   "deckManager": {
@@ -1371,7 +1362,40 @@
       "ranked": "Ranked match, ELO rating will be updated",
       "sealed": "Sealed mode, build a deck from random boosters"
     },
-    "codePlaceholder": "ABCD12"
+    "codePlaceholder": "ABCD12",
+    "leaderboard": {
+      "title": "Leaderboard",
+      "ranked": "Ranked",
+      "evolving": "Evolving",
+      "empty": "No players yet",
+      "winShort": "W",
+      "lossShort": "L"
+    },
+    "myStats": {
+      "title": "My stats",
+      "eloLabel": "ELO",
+      "wins": "Wins",
+      "losses": "Losses",
+      "winRate": "Win rate",
+      "streakWin": "Win streak"
+    },
+    "activeGames": {
+      "title": "Live games",
+      "empty": "No live game right now"
+    },
+    "badge": {
+      "evolving": "EVOLVING",
+      "anonymous": "ANONYMOUS"
+    },
+    "evolving": {
+      "toggleLabel": "Evolving mode",
+      "toggleDescription": "Match with players using evolving decks",
+      "noDeckTitle": "Evolving deck required",
+      "noDeck": "You need an evolving deck to join or create this room",
+      "createDeck": "Create an evolving deck",
+      "needDeckHint": "Create an evolving deck to enable this mode",
+      "noDeckInSelector": "No evolving deck available. Create one to play in this room."
+    }
   },
   "leaderboard": {
     "title": "Leaderboard",
@@ -1426,13 +1450,14 @@
       "sageOfSixPaths": "Sage of Six Paths",
       "willOfFire": "Inheritor of the Will of Fire",
       "unranked": "Unranked",
-      "placement": "Placement: {current}/{total}"
+      "placement": "Placement: {current}/{total}",
+      "evolving": "Evolving"
     },
     "statsWins": "Wins",
     "statsLosses": "Losses",
-    "statsDraws": "Draws",
     "statsWinrate": "Winrate",
-    "playerNotFound": "Player not found."
+    "playerNotFound": "Player not found.",
+    "statsTitle": "Statistics"
   },
   "replay": {
     "title": "Match Recap",
@@ -2929,7 +2954,8 @@
     "privateGame": "Private game",
     "turn": "Turn {turn}",
     "ranked": "Ranked",
-    "casual": "Casual"
+    "casual": "Casual",
+    "evolvingTag": "EVOLVING"
   },
   "chat": {
     "title": "Chat",

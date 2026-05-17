@@ -1,6 +1,27 @@
 {
   "entries": [
     {
+      "date": "2026-05-18",
+      "title_fr": "Le mode evolving rejoint Jouer en ligne",
+      "title_en": "Evolving mode joins Play Online",
+      "changes_fr": [
+        "Le mode evolving est integre directement dans la page Jouer en ligne, plus besoin d'une page separee.",
+        "Tu peux activer l'evolving au moment de creer une room, en casual comme en classee, et une apparence holographique propre a chaque room distingue les parties evolving.",
+        "Le classement bascule entre Classee et Evolving d'un seul geste, et tes stats suivent la vue que tu choisis.",
+        "Les rooms evolving ne peuvent etre rejointes qu'avec un deck evolving, avec un message clair et non bloquant si tu n'en as pas.",
+        "Tes stats affichent maintenant ta plus longue serie de victoires en cours et n'incluent plus les egalites (qui n'existent pas dans le jeu).",
+        "Un petit indicateur de connexion apparait en haut a droite uniquement en cas de souci reseau, et l'ancienne grosse erreur 'deck banni' ne s'affiche plus a tort quand le probleme vient en realite du reseau."
+      ],
+      "changes_en": [
+        "Evolving mode is now part of the Play Online page, no more separate page.",
+        "You can enable evolving when creating a room, both in casual and ranked, and a holographic look unique to each room highlights evolving games.",
+        "The leaderboard toggles between Ranked and Evolving in one tap, and your stats follow the view you pick.",
+        "Evolving rooms can only be joined with an evolving deck, with a clear non-blocking message if you do not have one.",
+        "Your stats now show your current best win streak and no longer include draws (which cannot happen in the game).",
+        "A small connection indicator now appears in the top right only when the network is acting up, and the old large 'banned deck' error no longer pops up wrongly when the issue is actually the network."
+      ]
+    },
+    {
       "date": "2026-05-16",
       "title_fr": "Integration Discord : roles, annonces, salon inscription",
       "title_en": "Discord integration: roles, announcements, signup channel",

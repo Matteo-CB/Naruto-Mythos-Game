@@ -24,7 +24,13 @@
     "maintenanceBanner": "Maintenance imminente du serveur. Aucune nouvelle partie ne pourra être lancee après votre partie en cours. Le site sera de retour dans quelques minutes.",
     "home": "Accueil",
     "comingSoon": "Bientôt disponible",
-    "menu": "Menu"
+    "menu": "Menu",
+    "dismiss": "Fermer",
+    "connection": {
+      "reconnecting": "Reconnexion",
+      "offline": "Hors-ligne",
+      "retry": "Reessayer"
+    }
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -1217,26 +1223,11 @@
       "addAria": "Ajouter {name}",
       "hint": "Astuce : les cartes non listees sont gratuites. Mixe les cartes Hero avec d'autres personnages KS."
     },
-    "lobbySubtitle": "Format avec budget Hero. Moins de budget = avance en points de mission.",
-    "lobbyDeckPickerTitle": "Tes decks compatibles",
-    "noCompatibleDeck": "Tu n'as aucun deck compatible Evolving (5 points max).",
-    "noDeckCtaTitle": "Demarrage rapide",
-    "noDeckCtaDesc": "Utilise un deck KS aleatoire a 0 point. Tu commenceras avec jusqu'a 5 points de mission si ton adversaire joue Hero.",
-    "useRandomDeck": "Utiliser un deck Evolving aleatoire",
-    "lobbyError": {
-      "fetchFailed": "Echec du chargement des decks. Rafraichis la page.",
-      "randomDeckFailed": "Echec de la generation du deck aleatoire. Reessaie."
-    },
     "lobby": {
       "title": "Evolving Mode",
       "topPlayersTitle": "Top 5 Evolving",
       "viewAll": "Voir tout",
-      "noTopPlayers": "Aucun joueur classe. Sois le premier.",
-      "publicRoomsHeader": "Salons Evolving publics",
-      "createPublicEvolvingRoom": "Creer un salon Evolving public",
-      "privateRoomDesc": "Match Evolving classe. Partage le code a un ami.",
-      "pickDeckTitle": "Choisis ton deck",
-      "evolvingDecksOnly": "Compatibles Evolving uniquement"
+      "noTopPlayers": "Aucun joueur classe. Sois le premier."
     }
   },
   "deckManager": {
@@ -1371,7 +1362,40 @@
       "ranked": "Match classé, votre classement ELO sera mis à jour",
       "sealed": "Mode scelle, construisez un deck a partir de boosters aleatoires"
     },
-    "codePlaceholder": "ABCD12"
+    "codePlaceholder": "ABCD12",
+    "leaderboard": {
+      "title": "Classement",
+      "ranked": "Ranked",
+      "evolving": "Evolving",
+      "empty": "Aucun joueur pour le moment",
+      "winShort": "V",
+      "lossShort": "D"
+    },
+    "myStats": {
+      "title": "Mes stats",
+      "eloLabel": "ELO",
+      "wins": "Victoires",
+      "losses": "Defaites",
+      "winRate": "Taux de victoire",
+      "streakWin": "Serie de victoires"
+    },
+    "activeGames": {
+      "title": "Parties en cours",
+      "empty": "Aucune partie en cours"
+    },
+    "badge": {
+      "evolving": "EVOLVING",
+      "anonymous": "ANONYME"
+    },
+    "evolving": {
+      "toggleLabel": "Mode evolving",
+      "toggleDescription": "Joue contre des adversaires en deck evolving",
+      "noDeckTitle": "Deck evolving requis",
+      "noDeck": "Tu dois avoir un deck evolving pour rejoindre ou creer cette room",
+      "createDeck": "Creer un deck evolving",
+      "needDeckHint": "Crée un deck evolving pour activer ce mode",
+      "noDeckInSelector": "Aucun deck evolving disponible. Crée-en un pour jouer dans cette room."
+    }
   },
   "leaderboard": {
     "title": "Classement",
@@ -1426,13 +1450,14 @@
       "sageOfSixPaths": "Rikudo Sennin",
       "willOfFire": "Heritier de la Volonte du Feu",
       "unranked": "Non classe",
-      "placement": "Placement : {current}/{total}"
+      "placement": "Placement : {current}/{total}",
+      "evolving": "Evolving"
     },
     "statsWins": "Victoires",
     "statsLosses": "Défaites",
-    "statsDraws": "Égalités",
     "statsWinrate": "Ratio",
-    "playerNotFound": "Joueur introuvable."
+    "playerNotFound": "Joueur introuvable.",
+    "statsTitle": "Statistiques"
   },
   "replay": {
     "title": "Recapitulatif",
@@ -2929,7 +2954,8 @@
     "privateGame": "Partie privee",
     "turn": "Tour {turn}",
     "ranked": "Classee",
-    "casual": "Casual"
+    "casual": "Casual",
+    "evolvingTag": "EVOLVING"
   },
   "chat": {
     "title": "Chat",

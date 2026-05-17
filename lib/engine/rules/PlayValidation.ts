@@ -89,6 +89,7 @@ export function validateRevealCharacter(
   player: PlayerID,
   missionIndex: number,
   characterInstanceId: string,
+  upgradeTargetInstanceId?: string,
 ): ValidationResult {
   if (missionIndex < 0 || missionIndex >= state.activeMissions.length) {
     return { valid: false, reason: 'Invalid mission index.', reasonKey: 'game.error.invalidMission' };
@@ -139,8 +140,8 @@ export function validateRevealCharacter(
     }
   }
 
-  
-  
+
+
   const sameNameChar = chars.find((c) => {
     if (c.instanceId === characterInstanceId) return false;
     if (!c.isHidden) {
@@ -150,24 +151,40 @@ export function validateRevealCharacter(
     return false;
   });
 
-  
-  
-  const flexibleUpgradeTarget = !sameNameChar ? chars.find((c) => {
-    if (c.instanceId === characterInstanceId || c.isHidden) return false;
-    if (c.controlledBy !== c.originalOwner) return false;
-    const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-    if (!checkFlexibleUpgrade(charTopCard, cTop) || charTopCard.chakra <= cTop.chakra) return false;
 
-    const wouldConflict = chars.some((other) => {
-      if (other.instanceId === characterInstanceId || other.instanceId === c.instanceId) return false;
-      if (other.isHidden) return false;
-      const oTop = other.stack?.length > 0 ? other.stack[other.stack?.length - 1] : other.card;
-      return oTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
-    });
-    return !wouldConflict;
-  }) : null;
 
-  const upgradeTarget = sameNameChar ?? flexibleUpgradeTarget;
+
+  let upgradeTarget: typeof chars[number] | undefined | null;
+  if (upgradeTargetInstanceId) {
+    const candidate = chars.find((c) => c.instanceId === upgradeTargetInstanceId);
+    if (candidate && !candidate.isHidden && candidate.controlledBy === candidate.originalOwner) {
+      const cTop = candidate.stack?.length > 0 ? candidate.stack[candidate.stack?.length - 1] : candidate.card;
+      if (charTopCard.chakra > cTop.chakra) {
+        const isSameName = cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
+        if (isSameName || checkFlexibleUpgrade(charTopCard, cTop)) {
+          upgradeTarget = candidate;
+        }
+      }
+    }
+  } else {
+
+    const flexibleUpgradeTarget = !sameNameChar ? chars.find((c) => {
+      if (c.instanceId === characterInstanceId || c.isHidden) return false;
+      if (c.controlledBy !== c.originalOwner) return false;
+      const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+      if (!checkFlexibleUpgrade(charTopCard, cTop) || charTopCard.chakra <= cTop.chakra) return false;
+
+      const wouldConflict = chars.some((other) => {
+        if (other.instanceId === characterInstanceId || other.instanceId === c.instanceId) return false;
+        if (other.isHidden) return false;
+        const oTop = other.stack?.length > 0 ? other.stack[other.stack?.length - 1] : other.card;
+        return oTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
+      });
+      return !wouldConflict;
+    }) : null;
+
+    upgradeTarget = sameNameChar ?? flexibleUpgradeTarget;
+  }
 
   let effectiveCost: number;
   if (upgradeTarget) {

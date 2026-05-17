@@ -77,8 +77,7 @@ export function TargetOrderPopup({
   const toggleTarget = useCallback((instanceId: string) => {
     setOrderedIds((prev) => {
       if (prev.includes(instanceId)) {
-        
-        return prev.slice(0, prev.indexOf(instanceId));
+        return prev.filter((id) => id !== instanceId);
       }
       return [...prev, instanceId];
     });
@@ -93,6 +92,14 @@ export function TargetOrderPopup({
   }, [allSelected, orderedIds, onConfirm]);
 
   const autoConfirmedRef = useRef(false);
+
+  useEffect(() => {
+    if (allSelected && targets.length > 1 && !autoConfirmedRef.current) {
+      autoConfirmedRef.current = true;
+      onConfirm(orderedIds);
+    }
+  }, [allSelected, orderedIds, targets.length, onConfirm]);
+
   useEffect(() => {
     if (targets.length === 1 && !autoConfirmedRef.current) {
       autoConfirmedRef.current = true;

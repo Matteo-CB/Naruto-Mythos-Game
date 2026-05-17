@@ -370,7 +370,7 @@ function OrderedDefeatPopup({
 
   const toggleTarget = useCallback((id: string) => {
     setOrderedIds(prev => {
-      if (prev.includes(id)) return prev.slice(0, prev.indexOf(id));
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
       if (prev.length >= validTargets.length) return prev;
       return [...prev, id];
     });

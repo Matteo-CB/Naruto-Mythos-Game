@@ -6,6 +6,7 @@ import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { resolveCardId } from '@/lib/data/cardLoader';
 import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
 import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
+import { Link } from '@/lib/i18n/navigation';
 
 interface SavedDeck {
   id: string;
@@ -115,54 +116,83 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
 
   return (
     <div className="flex flex-col gap-3 w-full">
-      <p className="text-xs text-[#888888] uppercase tracking-wider">
+      <p className="text-xs uppercase" style={{ color: '#888', letterSpacing: '0.18em' }}>
         {t('playAI.selectDeck')}
       </p>
 
-      
-      <button
-        onClick={() => {
-          setSelectedDeckId(null);
-          resolveAndSelect(null);
-        }}
-        className={`flex flex-col items-start p-3 border transition-colors text-left ${
-          selectedDeckId === null
-            ? 'bg-[#1a1a1a] border-[#c4a35a] text-[#e0e0e0]'
-            : 'bg-[#141414] border-[#262626] text-[#888888] hover:bg-[#1a1a1a] hover:border-[#333]'
-        }`}
-      >
-        <span className="text-sm font-medium">{t('playAI.randomDeck')}</span>
-        <span className="text-xs text-[#666] mt-0.5 font-inter-force">{t('playAI.randomDeckDesc')}</span>
-      </button>
-
-      
-      {loading && (
-        <p className="text-xs text-[#555] italic">{t('common.loading')}</p>
-      )}
-      {!loading && savedDecks.length === 0 && (
-        <p className="text-xs text-[#555] italic">{t('deckBuilder.noSavedDecks')}</p>
-      )}
-      {savedDecks.map((deck) => (
-        <EvolvingDeckHolo key={deck.id} points={deck.evolvingPoints ?? 0} enabled={deck.evolvingCompatible === true} intensity="subtle">
+      {!evolvingOnly && (
         <button
           onClick={() => {
-            setSelectedDeckId(deck.id);
-            resolveAndSelect(deck.id);
+            setSelectedDeckId(null);
+            resolveAndSelect(null);
           }}
-          className={`flex flex-col items-start p-3 border transition-colors text-left w-full ${
-            selectedDeckId === deck.id
-              ? 'bg-[#1a1a1a] border-[#c4a35a] text-[#e0e0e0]'
-              : 'bg-[#141414] border-[#262626] text-[#888888] hover:bg-[#1a1a1a] hover:border-[#333]'
-          }`}
+          className="flex flex-col items-start p-3 transition-colors text-left no-select"
+          style={{
+            backgroundColor: selectedDeckId === null ? 'rgba(26, 26, 26, 0.95)' : 'rgba(20, 20, 20, 0.85)',
+            color: selectedDeckId === null ? '#e8e8e8' : '#888',
+            boxShadow: selectedDeckId === null ? 'inset 0 -2px 0 #c4a35a' : 'inset 0 -2px 0 transparent',
+          }}
         >
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-medium">{deck.name}</span>
-            {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints ?? 0} />}
-          </div>
-          <span className="text-xs text-[#666] mt-0.5 font-inter-force">
-            {deck.cardIds.length} {t('deckBuilder.characters', { count: deck.cardIds.length })} + {deck.missionIds.length} missions
+          <span className="text-sm font-medium">{t('playAI.randomDeck')}</span>
+          <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>
+            {t('playAI.randomDeckDesc')}
           </span>
         </button>
+      )}
+
+      {loading && (
+        <p className="text-xs italic" style={{ color: '#555' }}>{t('common.loading')}</p>
+      )}
+
+      {!loading && savedDecks.length === 0 && (
+        evolvingOnly ? (
+          <div className="flex flex-col gap-3 items-center text-center p-5" style={{ backgroundColor: 'rgba(20, 20, 20, 0.85)' }}>
+            <p className="text-xs italic" style={{ color: '#888' }}>
+              {t('online.evolving.noDeckInSelector')}
+            </p>
+            <Link
+              href={'/deck-builder/manage?evolving=1' as '/deck-builder/manage'}
+              className="px-4 py-2 text-[11px] font-bold uppercase no-select"
+              style={{ backgroundColor: '#c4a35a', color: '#0a0a0a', letterSpacing: '0.18em' }}
+            >
+              {t('online.evolving.createDeck')}
+            </Link>
+          </div>
+        ) : (
+          <p className="text-xs italic" style={{ color: '#555' }}>{t('deckBuilder.noSavedDecks')}</p>
+        )
+      )}
+
+      {savedDecks.map((deck) => (
+        <EvolvingDeckHolo
+          key={deck.id}
+          points={deck.evolvingPoints ?? 0}
+          enabled={deck.evolvingCompatible === true}
+          intensity="subtle"
+          className="overflow-hidden"
+        >
+          <button
+            onClick={() => {
+              setSelectedDeckId(deck.id);
+              resolveAndSelect(deck.id);
+            }}
+            className="flex flex-col items-start p-3 transition-colors text-left w-full no-select"
+            style={{
+              backgroundColor: selectedDeckId === deck.id ? 'rgba(26, 26, 26, 0.95)' : 'rgba(20, 20, 20, 0.85)',
+              color: selectedDeckId === deck.id ? '#e8e8e8' : '#888',
+              boxShadow: selectedDeckId === deck.id ? 'inset 0 -2px 0 #c4a35a' : 'inset 0 -2px 0 transparent',
+              position: 'relative',
+              zIndex: 1,
+            }}
+          >
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm font-medium">{deck.name}</span>
+              {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints ?? 0} />}
+            </div>
+            <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>
+              {deck.cardIds.length} {t('deckBuilder.characters', { count: deck.cardIds.length })} + {deck.missionIds.length} missions
+            </span>
+          </button>
         </EvolvingDeckHolo>
       ))}
     </div>
