@@ -5,7 +5,6 @@ import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
-
 function useIsCompactPopup(): boolean {
   const [compact, setCompact] = useState(false);
   useEffect(() => {
@@ -25,7 +24,6 @@ function useIsCompactPopup(): boolean {
   }, []);
   return compact;
 }
-
 
 export function useNeedsScroll(): {
   ref: React.RefObject<HTMLDivElement | null>;
@@ -60,14 +58,6 @@ export function useNeedsScroll(): {
   return { ref, needsX, needsY };
 }
 
-
-
-
-
-
-
-
-
 export function PopupOverlay({
   children,
   onClickBg,
@@ -99,9 +89,6 @@ export function PopupOverlay({
 
   return createPortal(overlay, document.body);
 }
-
-
-
 
 const CORNER_SIZE = 24;
 const CORNER_THICKNESS = 2;
@@ -199,8 +186,6 @@ export function PopupCornerFrame({
   );
 }
 
-
-
 export function PopupTitle({
   children,
   accentColor = '#c4a35a',
@@ -276,8 +261,6 @@ export function PopupTitle({
   );
 }
 
-
-
 export function PopupDescription({
   children,
   accentColor = 'rgba(196, 163, 90, 0.4)',
@@ -293,7 +276,6 @@ export function PopupDescription({
       transition={{ delay: 0.12, duration: 0.35 }}
       className={compact ? 'mb-2 px-3 py-1.5' : 'mb-5 px-5 py-3'}
       style={{
-        borderLeft: `3px solid ${accentColor}`,
         maxWidth: compact ? 'calc(100vw - 40px)' : 'min(480px, calc(100vw - 48px))',
       }}
     >
@@ -303,8 +285,6 @@ export function PopupDescription({
     </motion.div>
   );
 }
-
-
 
 export function PopupActionButton({
   onClick,
@@ -336,7 +316,6 @@ export function PopupActionButton({
         backgroundColor: bgColor,
         color: textColor,
         border: 'none',
-        borderLeft: `3px solid ${borderColor}`,
         fontSize: '13px',
         fontWeight: 700,
         letterSpacing: '0.14em',
@@ -352,8 +331,6 @@ export function PopupActionButton({
     </motion.button>
   );
 }
-
-
 
 export function PopupDismissLink({
   onClick,
@@ -389,8 +366,6 @@ export function PopupDismissLink({
   );
 }
 
-
-
 export function PopupMinimizePill({
   text,
   onRestore,
@@ -421,7 +396,6 @@ export function PopupMinimizePill({
         fontWeight: 700,
         cursor: 'pointer',
         border: '1px solid rgba(196, 163, 90, 0.25)',
-        borderLeft: '3px solid #c4a35a',
         boxShadow: '0 4px 24px rgba(0, 0, 0, 0.5)',
         letterSpacing: '0.06em',
       }}
@@ -431,8 +405,6 @@ export function PopupMinimizePill({
     </motion.button>
   );
 }
-
-
 
 export function PopupMinimizeX({ onClick }: { onClick: () => void }) {
   const t = useTranslations();
@@ -470,8 +442,6 @@ export function PopupMinimizeX({ onClick }: { onClick: () => void }) {
     </div>
   );
 }
-
-
 
 const SMALL_CORNER = 16;
 const SMALL_CORNER_THICKNESS = 1;
@@ -534,8 +504,6 @@ export function PanelFrame({
   );
 }
 
-
-
 export function SectionDivider({
   color = 'rgba(196, 163, 90, 0.2)',
   width = 60,
@@ -576,8 +544,6 @@ export function SectionDivider({
   );
 }
 
-
-
 export function StatValue({
   value,
   color = '#c4a35a',
@@ -602,8 +568,6 @@ export function StatValue({
     </motion.span>
   );
 }
-
-
 
 export function AngularButton({
   onClick,
@@ -673,7 +637,6 @@ export function AngularButton({
         backgroundColor: c.bg,
         color: c.text,
         border: 'none',
-        borderLeft: `3px solid ${c.border}`,
         fontSize: fontSizes[size],
         fontWeight: 700,
         letterSpacing: '0.12em',
@@ -689,8 +652,6 @@ export function AngularButton({
     </motion.button>
   );
 }
-
-
 
 export function PopupTargetCount({
   count,

@@ -1,7 +1,5 @@
 'use client';
 
-
-
 import { useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
@@ -23,8 +21,6 @@ import { getCardName } from '@/lib/utils/cardLocale';
 import type { CoachAdvice, MissionCoachAnalysis } from '@/lib/ai/coaching/CoachTypes';
 import type { GameState } from '@/lib/engine/types';
 
-
-
 const coachMCTS = new NeuralISMCTS({
   simulations: 80,
   maxDepth: 4,
@@ -33,8 +29,6 @@ const coachMCTS = new NeuralISMCTS({
   maxBranching: 8,
   useBatchedEval: false,
 });
-
-
 
 function estimateWinProbability(state: GameState, player: 'player1'): number {
   try {
@@ -51,8 +45,6 @@ function estimateWinProbability(state: GameState, player: 'player1'): number {
   }
 }
 
-
-
 type TranslateFn = (key: string, params?: Record<string, string | number>) => string;
 
 function buildQuickAdvice(state: GameState, t: TranslateFn, locale: string): CoachAdvice {
@@ -63,7 +55,6 @@ function buildQuickAdvice(state: GameState, t: TranslateFn, locale: string): Coa
   const winProb = estimateWinProbability(state, player);
   const loc = locale as 'en' | 'fr';
 
-  
   const missionAnalysis: MissionCoachAnalysis[] = state.activeMissions.map((mission, idx) => {
     const myChars = mission.player1Characters;
     const oppChars = mission.player2Characters;
@@ -105,7 +96,6 @@ function buildQuickAdvice(state: GameState, t: TranslateFn, locale: string): Coa
     return { missionIndex: idx, rank: mission.rank, myWinProbability, myPower, opponentPower: oppPower, pointValue, status, recommendation, note };
   });
 
-  
   const actionStats = validActions.length > 0 && validActions.length <= 15
     ? coachMCTS.getActionStats(sanitized, player, validActions, 80)
     : [];
@@ -119,7 +109,6 @@ function buildQuickAdvice(state: GameState, t: TranslateFn, locale: string): Coa
       advantage: t('coach.action.simulations', { visits: stat.visits, winRate: `${(stat.winRate * 100).toFixed(0)}%` }),
     }));
 
-  
   const myState = state.player1;
   const handRatings = myState.hand.map((card, i) => {
     const power = card.power ?? 0;
@@ -144,7 +133,6 @@ function buildQuickAdvice(state: GameState, t: TranslateFn, locale: string): Coa
     };
   });
 
-  
   const warnings: string[] = [];
   const oppHidden = state.activeMissions.reduce(
     (s, m) => s + m.player2Characters.filter(c => c.isHidden).length, 0
@@ -154,7 +142,6 @@ function buildQuickAdvice(state: GameState, t: TranslateFn, locale: string): Coa
   if (myState.missionPoints < state.player2.missionPoints && state.turn >= 3)
     warnings.push(t('coach.warn.behind', { diff: state.player2.missionPoints - myState.missionPoints, turn: state.turn }));
 
-  
   const tips: string[] = [];
   const bestMission = missionAnalysis.find(m => m.status === 'empty' || m.status === 'tied');
   if (bestMission) tips.push(t('coach.tip.missionOpen', { rank: bestMission.rank, pts: bestMission.pointValue }));
@@ -204,8 +191,6 @@ function describeAction(action: any, state: GameState, winRate: number, t: Trans
   }
 }
 
-
-
 const BOARD_KEYS: Record<CoachAdvice['boardAssessment'], string> = {
   winning:         'coach.board.winning',
   slightly_ahead:  'coach.board.slightlyAhead',
@@ -222,8 +207,6 @@ const BOARD_COLORS: Record<CoachAdvice['boardAssessment'], string> = {
   losing:          '#ef4444',
 };
 
-
-
 const STATUS_COLORS: Record<MissionCoachAnalysis['status'], string> = {
   dominating: '#4ade80',
   winning:    '#86efac',
@@ -231,8 +214,6 @@ const STATUS_COLORS: Record<MissionCoachAnalysis['status'], string> = {
   losing:     '#f97316',
   empty:      '#444444',
 };
-
-
 
 export function TrainingCoachPanel() {
   const t = useTranslations();
@@ -263,7 +244,6 @@ export function TrainingCoachPanel() {
     try {
       const advice = buildQuickAdvice(state, t, locale);
 
-      
       if (prevWinProbRef.current !== null && prevStateRef.current !== null) {
         if (prevStateRef.current.activePlayer === humanPlayer) {
           const delta = advice.winProbability - prevWinProbRef.current;
@@ -325,7 +305,6 @@ export function TrainingCoachPanel() {
         {isPanelOpen ? t('coach.close') : t('coach.open')}
       </button>
 
-      
       <AnimatePresence>
         {isPanelOpen && (
           <motion.aside
@@ -354,7 +333,6 @@ export function TrainingCoachPanel() {
               )}
             </div>
 
-            
             <AnimatePresence>
               {lastMoveQuality && lastMoveDelta !== null && (
                 <motion.div
@@ -390,13 +368,11 @@ export function TrainingCoachPanel() {
             {coachAdvice ? (
               <div className="px-3 space-y-4 mt-3">
 
-                
                 <WinProbBar
                   probability={coachAdvice.winProbability}
                   assessment={coachAdvice.boardAssessment}
                 />
 
-                
                 <section>
                   <SectionTitle>{t('coach.missions')}</SectionTitle>
                   <div className="space-y-1.5">
@@ -406,7 +382,6 @@ export function TrainingCoachPanel() {
                   </div>
                 </section>
 
-                
                 {coachAdvice.bestAction && (
                   <section>
                     <SectionTitle>{t('coach.bestMove')}</SectionTitle>
@@ -419,7 +394,6 @@ export function TrainingCoachPanel() {
                   </section>
                 )}
 
-                
                 {coachAdvice.handRatings.length > 0 && (
                   <section>
                     <SectionTitle>{t('coach.handCards')}</SectionTitle>
@@ -431,7 +405,6 @@ export function TrainingCoachPanel() {
                   </section>
                 )}
 
-                
                 {coachAdvice.warnings.length > 0 && (
                   <section>
                     <SectionTitle>{t('coach.warnings')}</SectionTitle>
@@ -453,7 +426,6 @@ export function TrainingCoachPanel() {
                   </section>
                 )}
 
-                
                 {coachAdvice.tips.length > 0 && (
                   <section>
                     <SectionTitle>{t('coach.tips')}</SectionTitle>
@@ -475,7 +447,6 @@ export function TrainingCoachPanel() {
                   </section>
                 )}
 
-                
                 <p className="text-[10px] text-[#333] text-center pt-2">
                   {coachAdvice.neuralNetUsed ? t('coach.neuralActive') : t('coach.heuristicMode')} - {t('coach.sims', { count: coachAdvice.simulationsUsed })}
                 </p>
@@ -491,8 +462,6 @@ export function TrainingCoachPanel() {
     </>
   );
 }
-
-
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (

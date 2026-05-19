@@ -59,7 +59,6 @@ export default function RegisterPage() {
         return;
       }
 
-      
       const result = await nextAuthSignIn('credentials', {
         email,
         password,
@@ -220,7 +219,6 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        
         <div className="flex items-center gap-3 my-5">
           <div className="flex-1 h-px" style={{ backgroundColor: '#262626' }} />
           <span className="text-xs uppercase tracking-wider" style={{ color: '#555555' }}>
@@ -229,7 +227,6 @@ export default function RegisterPage() {
           <div className="flex-1 h-px" style={{ backgroundColor: '#262626' }} />
         </div>
 
-        
         <button
           onClick={() => nextAuthSignIn('discord', { callbackUrl: '/' })}
           className="w-full rounded py-2.5 text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2"

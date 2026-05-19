@@ -78,15 +78,12 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
     return () => { cancelled = true; };
   }, [username, eloType]);
 
-  
   const chart = useMemo(() => {
     if (!data || data.points.length === 0) return null;
     const W = 720, H = 220, padL = 40, padR = 12, padT = 12, padB = 28;
     const innerW = W - padL - padR;
     const innerH = H - padT - padB;
 
-    
-    
     const first = data.points[0];
     const startElo = first.elo - first.delta;
     const series: Array<{ t: number; elo: number; idx: number | null; point: EloPoint | null }> = [
@@ -109,12 +106,10 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
     const xOf = (t: number) => padL + ((t - minT) / tSpan) * innerW;
     const yOf = (elo: number) => padT + (1 - (elo - yBot) / ySpan) * innerH;
 
-    
     const path = series
       .map((s, i) => `${i === 0 ? 'M' : 'L'} ${xOf(s.t).toFixed(1)} ${yOf(s.elo).toFixed(1)}`)
       .join(' ');
 
-    
     const nodes = series
       .filter((s) => s.idx !== null)
       .map((s) => ({
@@ -124,7 +119,6 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
         point: s.point!,
       }));
 
-    
     const ticks = [0.0, 0.33, 0.66, 1.0].map((frac) => {
       const elo = yBot + frac * ySpan;
       return { y: padT + (1 - frac) * innerH, label: Math.round(elo) };
@@ -179,7 +173,6 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
         </div>
       )}
 
-
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         <Stat label={t('statGames')} value={data.summary.games} />
         <Stat label={t('statWLD')} value={`${data.summary.wins} / ${data.summary.losses} / ${data.summary.draws}`} />
@@ -191,7 +184,6 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
         <Stat label={t('statOpponents')} value={data.summary.distinctOpponents} />
       </div>
 
-      
       {chart && (
         <div className="relative mb-5" style={{ backgroundColor: DARK, border: `1px solid #1e1e1e`, padding: '8px' }}>
           <svg
@@ -219,7 +211,6 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
               </g>
             ))}
 
-            
             <path
               d={chart.path}
               fill="none"
@@ -229,7 +220,6 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
               strokeLinecap="round"
             />
 
-            
             {chart.nodes.map((n) => {
               const color = n.point.result === 'win' ? GREEN : n.point.result === 'loss' ? RED : GREY;
               const isHover = hovered?.idx === n.idx;
@@ -251,7 +241,6 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
               );
             })}
 
-            
             <text
               x={chart.padL} y={chart.H - 10}
               fontSize={9} fill="#555"
@@ -269,7 +258,6 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
             </text>
           </svg>
 
-          
           {hovered && (() => {
             const p = data.points[hovered.idx];
             const dateStr = new Date(p.t).toLocaleString(locale);
@@ -310,7 +298,6 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
         </div>
       )}
 
-      
       {data.opponents.length > 0 && (
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -329,7 +316,7 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
                 <div
                   key={o.username}
                   className="flex items-center gap-3 px-3 py-1.5 text-xs"
-                  style={{ backgroundColor: '#0e0e0e', borderLeft: `2px solid ${color}` }}
+                  style={{ backgroundColor: `${color}1a` }}
                 >
                   <span className="truncate flex-1 min-w-0" style={{ color: '#ccc' }}>
                     {o.username}

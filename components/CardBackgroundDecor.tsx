@@ -87,7 +87,6 @@ export function CardBackgroundDecor({ variant: _variant }: Props) {
         />
       </div>
 
-      
       <div
         className="absolute"
         style={{

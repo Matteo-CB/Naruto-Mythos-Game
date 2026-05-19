@@ -8,8 +8,6 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { useGameScale } from './GameScaleContext';
 import { playSound, setVolume, setMuted } from '@/lib/sound/SoundManager';
 
-
-
 type AnimationType =
   | 'card-play'
   | 'card-reveal'
@@ -58,8 +56,6 @@ function getAnimationDuration(type: AnimationType): number {
       return 800;
   }
 }
-
-
 
 interface AnimationEvent {
   id: string;
@@ -135,7 +131,6 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
           )}
         </motion.div>
 
-        
         <motion.div
           className="flex flex-col items-center gap-1 px-6 py-2"
           style={{
@@ -244,7 +239,6 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
           </div>
         </motion.div>
 
-        
         <motion.div
           className="absolute"
           style={{
@@ -257,13 +251,11 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
           transition={{ duration: 0.7, times: [0, 0.5, 1] }}
         />
 
-        
         <motion.div
           className="flex flex-col items-center gap-1 px-6 py-2"
           style={{
             backgroundColor: 'rgba(10, 10, 10, 0.9)',
-            border: '1px solid rgba(179, 62, 62, 0.3)',
-          }}
+            }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
@@ -300,7 +292,6 @@ function CardDefeatAnimation({ data }: { data: Record<string, unknown> }) {
         className="px-10 py-6 flex flex-col items-center gap-2"
         style={{
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
-          border: '1px solid #b33e3e',
           boxShadow: '0 0 30px rgba(179, 62, 62, 0.3)',
         }}
         initial={{ scale: 1.2, opacity: 0 }}
@@ -495,13 +486,11 @@ function CardUpgradeAnimation({ data }: { data: Record<string, unknown> }) {
           )}
         </motion.div>
 
-        
         <motion.div
           className="flex flex-col items-center gap-1 px-6 py-2"
           style={{
             backgroundColor: 'rgba(10, 10, 10, 0.9)',
-            border: '1px solid rgba(62, 139, 62, 0.3)',
-          }}
+            }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
@@ -745,7 +734,6 @@ function EdgeTransferAnimation({ data }: { data: Record<string, unknown> }) {
         className="flex flex-col items-center gap-2 px-8 py-5"
         style={{
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
-          border: '1px solid #c4a35a',
           boxShadow: '0 0 20px rgba(196, 163, 90, 0.2)',
         }}
         initial={{ x: toPlayer === 'player1' ? 60 : -60, opacity: 0 }}
@@ -784,8 +772,7 @@ function EdgeTransferAnimation({ data }: { data: Record<string, unknown> }) {
 function TurnTransitionAnimation({ data }: { data: Record<string, unknown> }) {
   const t = useTranslations();
   const turn = (data.turn as number) || 1;
-  
-  
+
   return (
     <motion.div
       key="turn-transition"
@@ -871,7 +858,6 @@ function CardDealAnimation({ data }: { data: Record<string, unknown> }) {
           ))}
         </div>
 
-        
         <motion.div
           className="flex items-center gap-2 px-4 py-1.5"
           style={{
@@ -899,8 +885,6 @@ function CardDealAnimation({ data }: { data: Record<string, unknown> }) {
     </motion.div>
   );
 }
-
-
 
 function renderAnimation(anim: AnimationEvent) {
   switch (anim.type) {
@@ -936,8 +920,6 @@ function renderAnimation(anim: AnimationEvent) {
   }
 }
 
-
-
 export function AnimationController() {
   const animationQueue = useGameStore((s) => s.animationQueue);
   const completeAnimation = useGameStore((s) => s.completeAnimation);
@@ -946,12 +928,10 @@ export function AnimationController() {
   const soundEnabled = useSettingsStore((s) => s.soundEnabled);
   const soundVolume = useSettingsStore((s) => s.soundVolume);
 
-  
   useEffect(() => {
     setMuted(!soundEnabled);
     setVolume(soundVolume);
   }, [soundEnabled, soundVolume]);
-
 
   const logLength = useGameStore((s) => s.visibleState?.log.length ?? 0);
   const prevLogLenRef = useRef(0);
@@ -981,7 +961,6 @@ export function AnimationController() {
     }
   }, [logLength]);
 
-  
   useEffect(() => {
     if (animationQueue.length > 0) {
       setAnimating(true);
@@ -990,10 +969,8 @@ export function AnimationController() {
     }
   }, [animationQueue.length, setAnimating]);
 
-  
   const currentAnim = animationQueue[0] as AnimationEvent | undefined;
 
-  
   useEffect(() => {
     if (!currentAnim) return;
     const type = currentAnim.type as AnimationType;
@@ -1008,12 +985,10 @@ export function AnimationController() {
       case 'card-move':
         playSound('jutsu');
         break;
-      
-      
+
     }
   }, [currentAnim?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  
   useEffect(() => {
     if (!currentAnim) return;
     const duration = animationsEnabled ? getAnimationDuration(currentAnim.type as AnimationType) : 0;

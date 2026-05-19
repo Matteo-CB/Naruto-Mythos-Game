@@ -93,8 +93,6 @@ function formatTimestamp(ts: number): string {
   return `${mins}:${secs}`;
 }
 
-
-
 function ReplayCardPreview({
   card,
   missionContext,
@@ -150,7 +148,6 @@ function ReplayCardPreview({
         </div>
       )}
 
-      
       <div className="p-3.5 flex flex-col gap-2 overflow-y-auto" style={{ maxHeight: '380px' }}>
         
         <div className="flex items-center justify-between">
@@ -159,36 +156,32 @@ function ReplayCardPreview({
             style={{
               backgroundColor: isMission ? 'rgba(196, 163, 90, 0.12)' : 'rgba(255, 255, 255, 0.04)',
               color: isMission ? '#c4a35a' : '#888888',
-              borderLeft: `2px solid ${isMission ? 'rgba(196, 163, 90, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
             }}
           >
             {isMission ? t('card.mission') : t('card.character')}
           </span>
           <span
             className="text-[10px] px-1.5 py-0.5 shrink-0 font-bold"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', borderLeft: `2px solid ${rarityColor}`, color: rarityColor }}
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', color: rarityColor }}
           >
             {card.rarity}
           </span>
         </div>
 
-        
         <span className="text-sm font-bold leading-tight" style={{ color: '#e0e0e0' }}>
           {getCardName(card, locale as 'en' | 'fr')}
         </span>
 
-        
         {(card.title_fr || card.title_en) && (
           <span className="text-xs" style={{ color: '#999999' }}>
             {getCardTitle(card, locale as 'en' | 'fr')}
           </span>
         )}
 
-        
         {isMission && missionContext && (
           <div
             className="flex flex-col gap-1.5 p-2.5 mt-0.5"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', borderLeft: `3px solid ${rankColorMap[missionContext.rank] ?? '#555'}` }}
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', }}
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium" style={{ color: '#aaaaaa' }}>{t('card.rank')}</span>
@@ -216,11 +209,10 @@ function ReplayCardPreview({
           </div>
         )}
 
-        
         {isCharacter && (
           <div
             className="flex items-center gap-4 p-2 mt-0.5"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', borderLeft: '3px solid rgba(196, 163, 90, 0.3)' }}
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', }}
           >
             <div className="flex flex-col items-center gap-0.5">
               <span className="text-[10px] uppercase tracking-wider" style={{ color: '#888888' }}>{t('collection.details.cost')}</span>
@@ -234,14 +226,13 @@ function ReplayCardPreview({
           </div>
         )}
 
-        
         {card.keywords && card.keywords.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-0.5">
             {card.keywords.map((kw) => (
               <span
                 key={kw}
                 className="text-[10px] px-1.5 py-0.5"
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', color: '#999999', borderLeft: '2px solid rgba(255, 255, 255, 0.08)' }}
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', color: '#999999', }}
               >
                 {getCardKeyword(kw, locale as 'en' | 'fr')}
               </span>
@@ -249,17 +240,14 @@ function ReplayCardPreview({
           </div>
         )}
 
-        
         {card.group && (
           <span className="text-[10px]" style={{ color: '#777777' }}>
             {t('collection.details.group')}: {getCardGroup(card.group, locale as 'en' | 'fr')}
           </span>
         )}
 
-        
         <span className="text-[9px]" style={{ color: '#444444' }}>{card.id}</span>
 
-        
         <div className="mt-0.5 flex flex-col gap-2 pt-2" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
           <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#888888' }}>{t('card.effects')}</span>
           {card.effects && card.effects.length > 0 ? (
@@ -276,7 +264,6 @@ function ReplayCardPreview({
                   className="flex flex-col gap-0.5 p-2"
                   style={{
                     backgroundColor: `${effectTypeColorMap[effect.type] ?? '#888888'}08`,
-                    borderLeft: `3px solid ${effectTypeColorMap[effect.type] ?? '#888888'}`,
                   }}
                 >
                   <span className="text-[10px] font-bold uppercase" style={{ color: effectTypeColorMap[effect.type] ?? '#888888' }}>
@@ -292,12 +279,11 @@ function ReplayCardPreview({
         </div>
       </div>
 
-      
       <div className="flex items-center justify-end px-3 py-2 shrink-0" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', backgroundColor: 'rgba(0, 0, 0, 0.3)' }}>
         <button
           onClick={onClose}
           className="text-[11px] font-bold px-2.5 py-1 cursor-pointer"
-          style={{ backgroundColor: 'rgba(179, 62, 62, 0.12)', color: '#b33e3e', borderLeft: '2px solid rgba(179, 62, 62, 0.5)' }}
+          style={{ backgroundColor: 'rgba(179, 62, 62, 0.12)', color: '#b33e3e', }}
         >
           X
         </button>
@@ -305,8 +291,6 @@ function ReplayCardPreview({
     </div>
   );
 }
-
-
 
 function ShareButton({ gameId }: { gameId: string }) {
   const t = useTranslations('replay');
@@ -358,8 +342,6 @@ function ShareButton({ gameId }: { gameId: string }) {
     </button>
   );
 }
-
-
 
 function ScoreOverlay({
   game,
@@ -440,7 +422,6 @@ function ScoreOverlay({
 
         <span className="text-[10px]" style={{ color: '#333' }}>-</span>
 
-        
         <div className="flex items-center gap-2">
           <span
             className="text-lg font-bold tabular-nums"
@@ -456,8 +437,6 @@ function ScoreOverlay({
     </PanelFrame>
   );
 }
-
-
 
 function TextTimeline({
   log,
@@ -487,7 +466,6 @@ function TextTimeline({
   const filteredLog = selectedTurn === null ? log : log.filter((e) => e.turn === selectedTurn);
   const turns = [...new Set(log.map((e) => e.turn))].sort((a, b) => a - b);
 
-  
   const syncedLogLength = useMemo(() => {
     if (currentStep == null || !states || states.length === 0) return null;
     const state = states[currentStep];
@@ -495,7 +473,6 @@ function TextTimeline({
     return state.log?.length ?? 0;
   }, [currentStep, states]);
 
-  
   const highlightedIndices = useMemo(() => {
     if (currentStep == null || !states || states.length === 0 || syncedLogLength == null) return new Set<number>();
     const prevLogLen = currentStep > 0 ? (states[currentStep - 1]?.log?.length ?? 0) : 0;
@@ -514,7 +491,6 @@ function TextTimeline({
     }
   }, []);
 
-  
   useEffect(() => {
     if (syncedLogLength != null) {
       setVisibleCount(syncedLogLength);
@@ -533,7 +509,6 @@ function TextTimeline({
     return () => { if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; } };
   }, [isPlaying, speed, filteredLog.length, stopAutoPlay]);
 
-  
   useEffect(() => {
     if (highlightRef.current && scrollRef.current) {
       highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -555,8 +530,6 @@ function TextTimeline({
     return key ? t(key) : phase;
   };
 
-  
-  
   const displayEntries = syncedLogLength != null ? filteredLog : filteredLog.slice(0, visibleCount);
 
   return (
@@ -571,7 +544,6 @@ function TextTimeline({
         onClick={onClose}
       />
 
-      
       <motion.div
         initial={{ x: -340 }}
         animate={{ x: 0 }}
@@ -617,7 +589,6 @@ function TextTimeline({
               style={{
                 transform: 'skewX(-3deg)',
                 backgroundColor: 'rgba(255,255,255,0.03)',
-                borderLeft: '2px solid rgba(255,255,255,0.08)',
                 color: '#888',
               }}
             >
@@ -628,14 +599,13 @@ function TextTimeline({
             <button
               onClick={onClose}
               className="px-2 py-1 text-[10px] cursor-pointer"
-              style={{ backgroundColor: 'rgba(179,62,62,0.12)', borderLeft: '2px solid rgba(179,62,62,0.5)', color: '#b33e3e' }}
+              style={{ backgroundColor: 'rgba(179,62,62,0.12)', color: '#b33e3e' }}
             >
               X
             </button>
           </div>
         </div>
 
-        
         <div className="flex gap-1 px-4 py-2 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
           <button
             onClick={() => setSelectedTurn(null)}
@@ -667,7 +637,6 @@ function TextTimeline({
           ))}
         </div>
 
-        
         <div ref={scrollRef} className="overflow-y-auto flex-1">
           {displayEntries.length === 0 ? (
             <div className="flex items-center justify-center py-12">
@@ -704,7 +673,7 @@ function TextTimeline({
                   </span>
                   <span
                     className="shrink-0 px-1 py-0.5 text-[9px] uppercase font-bold"
-                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', color: '#555', borderLeft: '2px solid rgba(255,255,255,0.06)', minWidth: '50px', textAlign: 'center' }}
+                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', color: '#555', minWidth: '50px', textAlign: 'center' }}
                   >
                     T{entry.turn} {formatPhase(entry.phase)}
                   </span>
@@ -725,8 +694,6 @@ function TextTimeline({
     </div>
   );
 }
-
-
 
 function VisualReplay({
   initialState,
@@ -787,11 +754,8 @@ function VisualReplay({
     const result: GameState[] = [turn1Start, initialState];
     let current = initialState;
 
-    
-    
     const idMap = new Map<string, string>();
 
-    
     function collectCharIds(st: GameState): Set<string> {
       const ids = new Set<string>();
       for (const m of st.activeMissions) {
@@ -802,28 +766,21 @@ function VisualReplay({
       return ids;
     }
 
-    
-    
-    
     function updateIdMap(prev: GameState, next: GameState, origAction: GameAction, origCreatedIds?: string[]) {
       const prevIds = collectCharIds(prev);
       const nextIds = collectCharIds(next);
 
-      
       const replayNewIds: string[] = [];
       for (const id of nextIds) {
         if (!prevIds.has(id)) replayNewIds.push(id);
       }
 
-      
-      
       if (origCreatedIds && origCreatedIds.length > 0 && replayNewIds.length > 0) {
         for (let i = 0; i < origCreatedIds.length && i < replayNewIds.length; i++) {
           idMap.set(origCreatedIds[i], replayNewIds[i]);
         }
       }
 
-      
       for (const newId of replayNewIds) {
         if (!idMap.has(newId)) {
           idMap.set(newId, newId);
@@ -831,7 +788,6 @@ function VisualReplay({
       }
     }
 
-    
     function mapId(id: string): string {
       return idMap.get(id) ?? id;
     }
@@ -937,7 +893,6 @@ function VisualReplay({
       return action;
     }
 
-    
     function autoResolvePending(st: GameState): GameState | null {
       
       if (st.pendingEffects.length >= 2 && st.pendingActions.length >= 2) {
@@ -955,9 +910,6 @@ function VisualReplay({
         const pa = st.pendingActions[0];
         const pe = st.pendingEffects.find((e) => e.id === pa.sourceEffectId);
 
-        
-        
-        
         const isConfirmPopup = pe?.isOptional && pa.options.length === 1 &&
           pe.targetSelectionType?.includes('CONFIRM');
 
@@ -1002,7 +954,6 @@ function VisualReplay({
       return null;
     }
 
-    
     for (const { player, action, createdIds } of actionHistory) {
       const prevTurn = current.turn;
       const counterBefore = getIdCounter();
@@ -1046,7 +997,6 @@ function VisualReplay({
       result.push(current);
     }
 
-    
     let recovery = 0;
     while (current.phase !== 'gameOver' && recovery < 500) {
       let advanced: GameState | null = null;
@@ -1056,7 +1006,6 @@ function VisualReplay({
           current = { ...current, pendingEffects: [] };
         }
 
-        
         if (current.pendingActions.length > 0) {
           advanced = autoResolvePending(current);
         } else if (current.phase === 'action') {
@@ -1211,7 +1160,6 @@ function VisualReplay({
       recovery++;
     }
 
-    
     if (current.phase !== 'gameOver') {
       console.warn('[Replay] Recovery could not reach gameOver naturally, forcing. Final state:', {
         turn: current.turn, phase: current.phase,
@@ -1291,7 +1239,6 @@ function VisualReplay({
         style={{ backgroundColor: backgroundUrl ? 'rgba(0, 0, 0, 0.35)' : 'transparent' }}
       />
 
-      
       <div className="absolute top-2 left-2 z-30 flex items-center gap-1.5">
         <Link
           href="/"
@@ -1300,7 +1247,6 @@ function VisualReplay({
             transform: 'skewX(-3deg)',
             backgroundColor: 'rgba(10, 10, 18, 0.88)',
             backdropFilter: 'blur(12px)',
-            borderLeft: '3px solid rgba(255,255,255,0.15)',
             color: '#888',
           }}
         >
@@ -1328,7 +1274,6 @@ function VisualReplay({
             backgroundColor: 'rgba(10, 10, 18, 0.88)',
             backdropFilter: 'blur(12px)',
             color: '#888',
-            borderLeft: '3px solid rgba(255,255,255,0.08)',
           }}
         >
           <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
@@ -1337,7 +1282,6 @@ function VisualReplay({
         </button>
       </div>
 
-      
       {currentStep >= states.length - 1 && (
         <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
           <div className="pointer-events-auto">
@@ -1346,12 +1290,10 @@ function VisualReplay({
         </div>
       )}
 
-      
       <div className="flex-1 min-h-0 relative z-10">
         <ReplayBoard state={currentState} playerNames={playerNames} locale={locale} backgroundUrl={backgroundUrl} viewAs={viewAs} onCardClick={handleCardClick} clockSnapshot={currentClock} />
       </div>
 
-      
       <div className="shrink-0 relative z-20">
         <PlaybackControls
           currentStep={currentStep}
@@ -1362,7 +1304,6 @@ function VisualReplay({
         />
       </div>
 
-      
       <AnimatePresence>
         {previewCard && (
           <motion.div
@@ -1384,15 +1325,12 @@ function VisualReplay({
         )}
       </AnimatePresence>
 
-      
       <AnimatePresence>
         {showLog && <TextTimeline log={log} playerNames={playerNames} onClose={() => setShowLog(false)} currentStep={currentStep} states={states} />}
       </AnimatePresence>
     </div>
   );
 }
-
-
 
 function TextOnlyReplay({
   log,
@@ -1460,7 +1398,6 @@ function TextOnlyReplay({
             style={{
               transform: 'skewX(-3deg)',
               backgroundColor: '#141414',
-              borderLeft: '3px solid rgba(255,255,255,0.15)',
               color: '#888',
             }}
           >
@@ -1484,7 +1421,6 @@ function TextOnlyReplay({
         </div>
       </div>
 
-      
       <div className="flex items-center gap-2 px-4 py-2 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <button
           onClick={isPlaying ? stopAutoPlay : () => { setVisibleCount(0); setIsPlaying(true); }}
@@ -1509,7 +1445,6 @@ function TextOnlyReplay({
           style={{
             transform: 'skewX(-3deg)',
             backgroundColor: 'rgba(255,255,255,0.03)',
-            borderLeft: '2px solid rgba(255,255,255,0.08)',
             color: '#888',
           }}
         >
@@ -1548,7 +1483,6 @@ function TextOnlyReplay({
         ))}
       </div>
 
-      
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         {displayEntries.length === 0 ? (
           <div className="flex items-center justify-center py-12">
@@ -1572,7 +1506,7 @@ function TextOnlyReplay({
                 </span>
                 <span
                   className="shrink-0 px-1 py-0.5 text-[9px] uppercase font-bold"
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', color: '#555', borderLeft: '2px solid rgba(255,255,255,0.06)', minWidth: '50px', textAlign: 'center' }}
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', color: '#555', minWidth: '50px', textAlign: 'center' }}
                 >
                   T{entry.turn} {formatPhase(entry.phase)}
                 </span>
@@ -1592,8 +1526,6 @@ function TextOnlyReplay({
     </div>
   );
 }
-
-
 
 export default function ReplayPage({
   params,
@@ -1660,7 +1592,6 @@ export default function ReplayPage({
           style={{
             transform: 'skewX(-3deg)',
             backgroundColor: '#141414',
-            borderLeft: '3px solid rgba(255,255,255,0.15)',
             color: '#888',
           }}
         >
@@ -1680,7 +1611,6 @@ export default function ReplayPage({
           style={{
             transform: 'skewX(-3deg)',
             backgroundColor: '#141414',
-            borderLeft: '3px solid rgba(255,255,255,0.15)',
             color: '#888',
           }}
         >
@@ -1694,7 +1624,6 @@ export default function ReplayPage({
   const log = game.gameState.log ?? [];
   const hasVisualReplay = !!game.gameState.initialState && !!game.gameState.actionHistory && game.gameState.actionHistory.length > 0;
 
-  
   const userId = session?.user?.id;
   const defaultViewAs: PlayerID | undefined = userId
     ? userId === game.player2Id ? 'player2' : 'player1'

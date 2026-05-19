@@ -84,7 +84,6 @@ export function EffectChoiceSelector() {
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </PopupDescription>
 
-          
           <div className="flex flex-col gap-3 mb-5">
             {effectChoices.map((choice, idx) => {
               const style = EFFECT_TYPE_STYLES[choice.effectType] || DEFAULT_STYLE;
@@ -106,9 +105,8 @@ export function EffectChoiceSelector() {
                   style={{
                     backgroundColor: style.bg,
                     border: 'none',
-                    borderLeft: `3px solid ${style.accent}`,
-                    boxShadow: `0 2px 12px rgba(0, 0, 0, 0.3)`,
-                    transition: 'background-color 0.2s, border-left-width 0.15s',
+                    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.3)',
+                    transition: 'background-color 0.2s',
                   }}
                 >
                   
@@ -130,7 +128,6 @@ export function EffectChoiceSelector() {
                     )}
                   </div>
 
-                  
                   <span
                     className="font-body text-[12px] leading-relaxed flex-1"
                     style={{ color: '#c8c8c8' }}

@@ -23,8 +23,6 @@ import {
 } from './PopupPrimitives';
 import { TargetOrderPopup } from './TargetOrderPopup';
 
-
-
 interface TargetCharacterProps {
   character: VisibleCharacter;
   isValidTarget: boolean;
@@ -145,7 +143,6 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
         </>
       )}
 
-      
       {!isHidden && (
         <div
           className="absolute bottom-0.5 right-0.5 px-1 text-[9px] font-bold tabular-nums"
@@ -158,7 +155,6 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
         </div>
       )}
 
-      
       {isValidTarget && (
         <div
           className="absolute inset-x-0 bottom-0 text-center py-0.5 text-[7px] font-medium truncate px-0.5"
@@ -171,7 +167,6 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
         </div>
       )}
 
-      
       {character.card && !isHidden && (
         <button
           onClick={(e) => { e.stopPropagation(); zoomCard(character.card as CharacterCard | MissionCard); }}
@@ -188,15 +183,6 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
     </motion.div>
   );
 });
-
-
-
-
-
-
-
-
-
 
 type ConstraintMode = 'free' | 'one-per-mission' | 'all-in-mission' | 'naruto133';
 
@@ -260,7 +246,6 @@ function OrderedDefeatPopup({
     return validTargets.length;
   }, [mode, validTargets, charMissionMap]);
 
-  
   const lockedTargets = useMemo(() => {
     const locked = new Set<string>();
     if (mode === 'one-per-mission') {
@@ -279,8 +264,7 @@ function OrderedDefeatPopup({
         }
       }
     } else if (mode === 'naruto133') {
-      
-      
+
       if (orderedIds.length >= 2) {
         
         for (const t of validTargets) {
@@ -292,7 +276,6 @@ function OrderedDefeatPopup({
         const firstInG2 = targetGroups.group2.has(firstId);
         const firstOnlyG1 = firstInG1 && !firstInG2; // P 3-5 in this mission
         const firstOnlyG2 = firstInG2 && !firstInG1; // P≤2 in another mission
-        
 
         if (firstOnlyG1) {
           
@@ -313,18 +296,15 @@ function OrderedDefeatPopup({
     return locked;
   }, [mode, orderedIds, validTargets, charMissionMap, targetGroups]);
 
-  
   const lockedMission = useMemo(() => {
     if (mode !== 'all-in-mission' || orderedIds.length === 0) return undefined;
     return charMissionMap.get(orderedIds[0]);
   }, [mode, orderedIds, charMissionMap]);
 
-  
   const missionTargetCount = useMemo(() => {
     if (lockedMission === undefined) return 0;
     return validTargets.filter(t => charMissionMap.get(t) === lockedMission).length;
   }, [lockedMission, validTargets, charMissionMap]);
-
 
   const naruto133SlotFit = useMemo(() => {
     const maxSlotsFor = (ids: string[]) => {
@@ -416,7 +396,6 @@ function OrderedDefeatPopup({
                     {getCardName(mission.card, locale as 'en' | 'fr')}
                   </span>
 
-                  
                   <div className="flex flex-col items-center gap-1">
                     <span className="text-[9px]" style={{ color: '#555' }}>{t('game.opponent')}</span>
                     <div className="flex flex-wrap gap-1 justify-center" style={{ minHeight: '94px' }}>
@@ -435,7 +414,6 @@ function OrderedDefeatPopup({
 
                   <div className="w-full h-px" style={{ backgroundColor: hasTargets ? '#333' : '#1a1a1a' }} />
 
-                  
                   <div className="flex flex-col items-center gap-1">
                     <span className="text-[9px]" style={{ color: '#555' }}>{t('game.you')}</span>
                     <div className="flex flex-wrap gap-1 justify-center" style={{ minHeight: '94px' }}>
@@ -517,7 +495,6 @@ const OrderedDefeatCard = React.memo(function OrderedDefeatCard({ character, isV
         </div>
       )}
 
-      
       {isSelected && orderNumber && (
         <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <span className="text-2xl font-black" style={{ color: '#c4a35a', textShadow: '0 0 8px rgba(196,163,90,0.8)' }}>
@@ -526,7 +503,6 @@ const OrderedDefeatCard = React.memo(function OrderedDefeatCard({ character, isV
         </div>
       )}
 
-      
       {!isHidden && topCard && (
         <div className="absolute bottom-0.5 right-0.5 px-1 text-[9px] font-bold tabular-nums"
           style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0' }}>
@@ -536,8 +512,6 @@ const OrderedDefeatCard = React.memo(function OrderedDefeatCard({ character, isV
     </motion.div>
   );
 });
-
-
 
 interface TargetMissionLaneProps {
   mission: VisibleMission;
@@ -562,16 +536,13 @@ const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missi
     ...mission.player2Characters,
   ];
 
-  
   const myChars = myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
   const oppChars = myPlayer === 'player1' ? mission.player2Characters : mission.player1Characters;
   const myPower = myChars.reduce((sum, c) => sum + (c.isHidden ? 0 : c.effectivePower), 0);
   const oppPower = oppChars.reduce((sum, c) => sum + (c.isHidden && !c.isOwn ? 0 : c.effectivePower), 0);
 
-  
   const isMissionTarget = validTargets.includes(String(missionIndex));
 
-  
   const hasValidCharTargets = allChars.some(c => validTargets.includes(c.instanceId));
   const hasValidTargets = isMissionTarget || hasValidCharTargets;
 
@@ -606,7 +577,6 @@ const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missi
         {t('game.board.missionRank', { rank: mission.rank })}
       </div>
 
-      
       <span
         className="text-[10px] text-center truncate"
         style={{
@@ -617,7 +587,6 @@ const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missi
         {getCardName(mission.card, locale as 'en' | 'fr')}
       </span>
 
-      
       <div
         className="flex items-center justify-center gap-2 w-full px-2 py-0.5"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
@@ -637,7 +606,6 @@ const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missi
         </span>
       </div>
 
-      
       <div className="flex flex-col items-center gap-1">
         <span className="text-[9px]" style={{ color: '#555555' }}>{t('game.opponent')}</span>
         <div className="flex flex-wrap gap-1 justify-center" style={{ minHeight: '94px' }}>
@@ -652,7 +620,6 @@ const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missi
         </div>
       </div>
 
-      
       <div
         className="w-full h-px"
         style={{
@@ -660,7 +627,6 @@ const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missi
         }}
       />
 
-      
       <div className="flex flex-col items-center gap-1">
         <span className="text-[9px]" style={{ color: '#555555' }}>{t('game.you')}</span>
         <div className="flex flex-wrap gap-1 justify-center" style={{ minHeight: '94px' }}>
@@ -678,8 +644,6 @@ const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missi
   );
 });
 
-
-
 export function TargetSelector() {
   const t = useTranslations();
   const locale = useLocale();
@@ -694,7 +658,6 @@ export function TargetSelector() {
   const minimizeEffectPopup = useUIStore((s) => s.minimizeEffectPopup);
   const restoreEffectPopup = useUIStore((s) => s.restoreEffectPopup);
 
-  
   const prevPendingIdRef = useRef<string | null>(null);
   const currentPendingId = pendingTargetSelection?.descriptionKey ?? pendingTargetSelection?.description ?? null;
   useEffect(() => {
@@ -715,13 +678,10 @@ export function TargetSelector() {
     declineTarget();
   }, [declineTarget]);
 
-  
   const [multiSelectChoices, setMultiSelectChoices] = useState<Set<string>>(new Set());
 
-  
   const queuedOrderRef = useRef<string[]>([]);
 
-  
   useEffect(() => {
     if (!pendingTargetSelection || queuedOrderRef.current.length === 0) return;
     const eTstQ = pendingTargetSelection.engineTargetSelectionType ?? '';
@@ -752,10 +712,8 @@ export function TargetSelector() {
 
   if (!pendingTargetSelection || !visibleState) return null;
 
-  
   if (pendingTargetSelection.selectionType === 'CHOOSE_FROM_HAND') return null;
 
-  
   if (effectPopupMinimized) {
     const effectDesc = pendingTargetSelection.descriptionKey
       ? t(pendingTargetSelection.descriptionKey, pendingTargetSelection.descriptionParams as Record<string, string> | undefined)
@@ -768,7 +726,6 @@ export function TargetSelector() {
   const displayName = playerName || t('game.you');
   const isInfoReveal = pendingTargetSelection.selectionType === 'INFO_REVEAL';
 
-  
   const eTst = pendingTargetSelection.engineTargetSelectionType ?? '';
   const isHideOrder = eTst.includes('CHOOSE_HIDE_TARGET') || eTst === 'KYUBI134_CHOOSE_HIDE_TARGETS';
   const isDefeatOrder = eTst.includes('CHOOSE_DEFEAT_TARGET');
@@ -819,7 +776,6 @@ export function TargetSelector() {
     }
   }
 
-  
   if (eTst === 'ORDERED_DEFEAT' && visibleState && validTargets.length > 0) {
     let odConstraint: ConstraintMode = 'free';
     let odSourceMission: number | undefined;
@@ -852,7 +808,6 @@ export function TargetSelector() {
     );
   }
 
-  
   const isReorderDiscard = eTst === 'REORDER_DISCARD';
   if (isReorderDiscard && validTargets.length > 1 && visibleState) {
     
@@ -906,7 +861,6 @@ export function TargetSelector() {
     }
   }
 
-  
   if (pendingTargetSelection.selectionType === 'DRAW_CARD') {
     const deckCount = pendingTargetSelection.deckSize ?? 0;
     return (
@@ -917,7 +871,6 @@ export function TargetSelector() {
               {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
             </PopupTitle>
 
-            
             <motion.div
               initial={{ scale: 0.7, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -990,7 +943,6 @@ export function TargetSelector() {
     );
   }
 
-  
   if (pendingTargetSelection.selectionType === 'CONFIRM_HIDE' || pendingTargetSelection.selectionType === 'CONFIRM_DEFEAT') {
     const isDefeat = pendingTargetSelection.selectionType === 'CONFIRM_DEFEAT';
     const cardData = pendingTargetSelection.confirmCardData;
@@ -1006,7 +958,6 @@ export function TargetSelector() {
               {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
             </PopupTitle>
 
-            
             <motion.div
               initial={{ scale: 0.7, rotateY: 15, opacity: 0 }}
               animate={{ scale: 1, rotateY: 0, opacity: 1 }}
@@ -1086,7 +1037,6 @@ export function TargetSelector() {
     );
   }
 
-  
   if (pendingTargetSelection.isMultiSelect && pendingTargetSelection.revealedCards && pendingTargetSelection.revealedCards.length > 0) {
     const cards = pendingTargetSelection.revealedCards;
     const maxSel = pendingTargetSelection.maxSelections ?? 1;
@@ -1134,7 +1084,6 @@ export function TargetSelector() {
               </PopupDescription>
             )}
 
-            
             <div className="flex flex-wrap gap-3 mb-6 justify-center">
               {cards.map((card, idx) => {
                 const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
@@ -1175,11 +1124,10 @@ export function TargetSelector() {
                       </div>
                     )}
 
-                    
                     {isSelected && (
                       <motion.div
                         className="absolute inset-0"
-                        style={{ borderLeft: '3px solid #4aff6b', borderBottom: '3px solid #4aff6b', pointerEvents: 'none' }}
+                        style={{ pointerEvents: 'none' }}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                       />
@@ -1223,7 +1171,6 @@ export function TargetSelector() {
     );
   }
 
-  
   if (isInfoReveal && pendingTargetSelection.revealedCards && pendingTargetSelection.revealedCards.length > 0) {
     const cards = pendingTargetSelection.revealedCards;
     const resultColor = '#c4a35a';
@@ -1243,10 +1190,7 @@ export function TargetSelector() {
                 const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
                 const isHighlight = card.isSummon || card.isMatch;
                 const borderColor = isHighlight ? '#4aff6b' : card.isDiscarded ? '#b33e3e' : '#333333';
-                
-                
-                
-                
+
                 const openZoom = () => useUIStore.getState().zoomCard(card as unknown as CharacterCard);
                 return (
                   <motion.div
@@ -1316,7 +1260,6 @@ export function TargetSelector() {
     );
   }
 
-  
   if (isInfoReveal && revealedCard) {
     const imagePath = revealedCard.image_file ? normalizeImagePath(revealedCard.image_file) : null;
     const hasCustomKeys = !!revealedCard.revealTitleKey;
@@ -1332,7 +1275,6 @@ export function TargetSelector() {
                 : t('game.effect.orochimaruReveal')}
             </PopupTitle>
 
-            
             <motion.div
               initial={{ scale: 0.3, rotateY: 180, opacity: 0 }}
               animate={{ scale: 1, rotateY: 0, opacity: 1 }}
@@ -1387,7 +1329,6 @@ export function TargetSelector() {
     );
   }
 
-  
   if (pendingTargetSelection.selectionType === 'EFFECT_PLAY_UPGRADE_OR_FRESH') {
     const upgradeTargets = validTargets.filter(id => id !== 'FRESH');
     
@@ -1426,7 +1367,6 @@ export function TargetSelector() {
                   style={{
                     backgroundColor: 'rgba(74, 158, 255, 0.06)',
                     border: '1px solid rgba(74, 158, 255, 0.4)',
-                    borderLeft: '3px solid #4a9eff',
                     minWidth: '120px',
                   }}
                 >
@@ -1440,7 +1380,6 @@ export function TargetSelector() {
               </motion.div>
               )}
 
-              
               {validTargets.includes('FRESH') && upgradeChars.length > 0 && (
               <div className="flex flex-col items-center justify-center self-stretch">
                 <div className="w-px flex-1" style={{ backgroundColor: '#262626' }} />
@@ -1449,7 +1388,6 @@ export function TargetSelector() {
               </div>
               )}
 
-              
               <motion.div
                 initial={{ x: 20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -1471,7 +1409,6 @@ export function TargetSelector() {
     );
   }
 
-  
   if (
     (pendingTargetSelection.selectionType === 'ORDER_DEFEAT_TARGETS' ||
      pendingTargetSelection.selectionType === 'ORDER_HIDE_TARGETS') &&
@@ -1497,7 +1434,6 @@ export function TargetSelector() {
     );
   }
 
-  
   if (pendingTargetSelection.selectionType === 'CHOOSE_EFFECT_ORDER' && pendingTargetSelection.effectOrderChoices) {
     const choices = pendingTargetSelection.effectOrderChoices;
     return (
@@ -1530,7 +1466,6 @@ export function TargetSelector() {
             {t('game.effect.chooseEffectOrder')}
           </div>
 
-          
           <div className="flex items-stretch gap-3">
             {choices.map((choice, idx) => {
               const imgPath = choice.sourceCardImage ? normalizeImagePath(choice.sourceCardImage) : null;
@@ -1570,7 +1505,6 @@ export function TargetSelector() {
                     transition={{ repeat: Infinity, duration: 1.5 }}
                   />
 
-                  
                   <div className="relative w-full" style={{ height: '100px' }}>
                     {imgPath ? (
                       <img
@@ -1590,7 +1524,6 @@ export function TargetSelector() {
                       style={{ background: 'linear-gradient(transparent, rgba(4,4,8,0.95))' }} />
                   </div>
 
-                  
                   <div
                     className="w-full px-2 py-1.5 text-center"
                     style={{ backgroundColor: `${accent}15` }}
@@ -1603,7 +1536,6 @@ export function TargetSelector() {
                     </span>
                   </div>
 
-                  
                   <div className="w-full px-2 py-2 text-center" style={{ minHeight: '36px' }}>
                     <span
                       className="font-bold leading-tight"
@@ -1620,7 +1552,6 @@ export function TargetSelector() {
     );
   }
 
-  
   if (pendingTargetSelection.selectionType === 'EFFECT_CONFIRM') {
     const confirmTarget = validTargets[0];
     let confirmImage: string | null = null;
@@ -1690,8 +1621,6 @@ export function TargetSelector() {
     );
   }
 
-  
-  
   const isMissionOnlyTargeting = validTargets.length > 0 && validTargets.every(t => /^\d+$/.test(t));
   const missionCount = visibleState.activeMissions.length;
   
@@ -1723,7 +1652,6 @@ export function TargetSelector() {
             <PopupTargetCount count={validTargets.length} accentColor="#c4a35a" />
           </div>
 
-          
           <motion.div
             ref={tsMissionRow.ref}
             initial={{ scale: 0.95, opacity: 0 }}

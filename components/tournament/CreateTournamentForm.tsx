@@ -197,10 +197,9 @@ export function CreateTournamentForm({ isAdmin }: Props) {
       )}
 
       {gameMode === 'restricted' && (
-        <div className="flex flex-col gap-3 p-4" style={{ backgroundColor: '#0d0d0d', border: '1px solid #333', borderLeft: '3px solid #c4a35a' }}>
+        <div className="flex flex-col gap-3 p-4" style={{ backgroundColor: '#0d0d0d', border: '1px solid #333', }}>
           <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#c4a35a' }}>{t('restrictedSettings')}</h3>
 
-          
           <div className="flex flex-col gap-1">
             <label style={labelStyle}>{t('allowedGroups')}</label>
             <p className="text-[10px]" style={{ color: '#555' }}>{t('allowedGroupsHint')}</p>
@@ -213,7 +212,6 @@ export function CreateTournamentForm({ isAdmin }: Props) {
             </div>
           </div>
 
-          
           <div className="flex flex-col gap-1">
             <label style={labelStyle}>{t('bannedGroups')}</label>
             <div className="flex flex-wrap gap-1.5">
@@ -225,7 +223,6 @@ export function CreateTournamentForm({ isAdmin }: Props) {
             </div>
           </div>
 
-          
           <div className="flex flex-col gap-1">
             <label style={labelStyle}>{t('allowedKeywords')}</label>
             <p className="text-[10px]" style={{ color: '#555' }}>{t('allowedKeywordsHint')}</p>
@@ -238,7 +235,6 @@ export function CreateTournamentForm({ isAdmin }: Props) {
             </div>
           </div>
 
-          
           <div className="flex flex-col gap-1">
             <label style={labelStyle}>{t('bannedKeywords')}</label>
             <div className="flex flex-wrap gap-1.5">
@@ -250,7 +246,6 @@ export function CreateTournamentForm({ isAdmin }: Props) {
             </div>
           </div>
 
-          
           <div className="flex flex-col gap-1">
             <label style={labelStyle}>{t('allowedRarities')}</label>
             <p className="text-[10px]" style={{ color: '#555' }}>{t('allowedRaritiesHint')}</p>
@@ -263,7 +258,6 @@ export function CreateTournamentForm({ isAdmin }: Props) {
             </div>
           </div>
 
-          
           <div className="flex flex-col gap-1">
             <label style={labelStyle}>{t('bannedRarities')}</label>
             <div className="flex flex-wrap gap-1.5">
@@ -275,7 +269,6 @@ export function CreateTournamentForm({ isAdmin }: Props) {
             </div>
           </div>
 
-          
           <div className="flex flex-col gap-1">
             <label style={labelStyle}>{t('maxPerRarity')}</label>
             <p className="text-[10px]" style={{ color: '#555' }}>{t('maxPerRarityHint')}</p>
@@ -291,7 +284,6 @@ export function CreateTournamentForm({ isAdmin }: Props) {
             </div>
           </div>
 
-          
           <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col gap-1">
               <label style={labelStyle}>{t('maxCopiesPerCard')}</label>
@@ -315,14 +307,12 @@ export function CreateTournamentForm({ isAdmin }: Props) {
             </div>
           </div>
 
-          
           <div className="flex flex-col gap-1">
             <label style={labelStyle}>{t('bannedCards')}</label>
             <input type="text" value={bannedCardIds} onChange={(e) => setBannedCardIds(e.target.value)}
               placeholder="KS-133-S, KS-143-M, ..." style={{ ...inputStyle, padding: '4px 8px', fontSize: '11px' }} />
           </div>
 
-          
           <div className="flex flex-col gap-1">
             <label style={labelStyle}>{t('restrictionNote')}</label>
             <textarea value={restrictionNote} onChange={(e) => setRestrictionNote(e.target.value)}

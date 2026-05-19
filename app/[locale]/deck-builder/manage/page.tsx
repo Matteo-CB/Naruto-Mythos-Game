@@ -148,7 +148,6 @@ export default function ManageDecksPage() {
     saveOrder(newDecks);
   };
 
-  
   const handleDragStart = (index: number) => {
     setDragIndex(index);
   };
@@ -240,7 +239,6 @@ export default function ManageDecksPage() {
                   className="rounded-lg p-4 transition-all"
                   style={{
                     backgroundColor: dragIndex === index ? '#1a1a1a' : '#141414',
-                    border: `1px solid ${dragIndex === index ? '#c4a35a' : '#262626'}`,
                     cursor: 'grab',
                     opacity: dragIndex === index ? 0.8 : 1,
                   }}
@@ -272,7 +270,6 @@ export default function ManageDecksPage() {
                       </button>
                     </div>
 
-                    
                     <div className="flex-1 min-w-0">
                       {isRenaming ? (
                         <div className="flex items-center gap-2">
@@ -317,7 +314,6 @@ export default function ManageDecksPage() {
                       )}
                     </div>
 
-                    
                     {!isRenaming && (
                       <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                         {isConfirming ? (

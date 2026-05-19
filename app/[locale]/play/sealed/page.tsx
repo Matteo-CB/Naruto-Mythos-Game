@@ -40,7 +40,6 @@ export default function SealedPage() {
   const setSealedDeck = useGameStore((s) => s.setSealedDeck);
   const startOnlineGame = useGameStore((s) => s.startOnlineGame);
 
-  
   const socketConnect = useSocketStore((s) => s.connect);
   const socketCreateRoom = useSocketStore((s) => s.createRoom);
   const socketJoinRoom = useSocketStore((s) => s.joinRoom);
@@ -72,7 +71,6 @@ export default function SealedPage() {
   const [boosterCount, setBoosterCount] = useState<4 | 5 | 6>(6);
   const [setChoice, setSetChoice] = useState<SealedSetChoice>('random');
 
-  
   useEffect(() => {
     if (status === 'loading') return;
     if (status === 'unauthenticated') {
@@ -84,7 +82,6 @@ export default function SealedPage() {
     }
   }, [status, step, router]);
 
-  
   useEffect(() => {
     if (socketConnected && socketRoomCode && socketOpponentJoined && !socketGameStarted && mode === null) {
       setMode('online');
@@ -92,7 +89,6 @@ export default function SealedPage() {
     }
   }, [socketConnected, socketRoomCode, socketOpponentJoined, socketGameStarted, mode]);
 
-  
   useEffect(() => {
     if (mode === 'online' && sealedBoosters && sealedAllCards && (step === 'online-waiting' || step === 'loading')) {
       const pool: SealedPool = {
@@ -104,7 +100,6 @@ export default function SealedPage() {
     }
   }, [mode, sealedBoosters, sealedAllCards, step]);
 
-  
   const gameInitRef = useRef(false);
   useEffect(() => {
     if (
@@ -133,7 +128,6 @@ export default function SealedPage() {
     }
   }, []);
 
-  
   useEffect(() => {
     if (step === 'online-create' && session?.user?.id) {
       (async () => {
@@ -149,7 +143,6 @@ export default function SealedPage() {
     }
   }, [step, session?.user?.id, socketConnected, socketConnect, requestRoomList]);
 
-  
   useEffect(() => {
     return () => {
       if (!useSocketStore.getState().gameStarted) {
@@ -203,7 +196,6 @@ export default function SealedPage() {
   const handleDifficultySelect = useCallback((diff: AIDifficulty) => {
     setDifficulty(diff);
 
-    
     import('@/lib/sealed/boosterGenerator').then((mod) => {
       try {
         const pool = mod.generateSealedPool(boosterCount, setChoice);
@@ -233,7 +225,6 @@ export default function SealedPage() {
       if (mode === 'ai') {
         setStep('starting');
 
-        
         Promise.all([
           import('@/lib/sealed/boosterGenerator'),
           import('@/lib/sealed/aiSealedDeckBuilder'),
@@ -243,7 +234,6 @@ export default function SealedPage() {
             const aiPool = boosterMod.generateSealedPool(boosterCount, setChoice);
             const aiDeck = aiMod.buildAISealedDeck(aiPool);
 
-            
             const playerMissionIds = new Set(missions.map((m) => m.id));
             let aiMissions = aiDeck.missions.filter((m) => !playerMissionIds.has(m.id));
             if (aiMissions.length < 3) {
@@ -303,12 +293,10 @@ export default function SealedPage() {
     router.push('/');
   }, [router]);
 
-  
   const onlineTimerSeconds = sealedDeadline
     ? Math.max(0, Math.floor((sealedDeadline - Date.now()) / 1000))
     : 900;
 
-  
   const sealedPublicRooms = publicRooms.filter((r) => r.gameMode === 'sealed');
 
   const DIFFICULTIES = [
@@ -318,7 +306,6 @@ export default function SealedPage() {
     { key: 'impossible' as AIDifficulty, label: tAI('difficulties.impossible'), description: tAI('difficulties.impossibleDesc') },
   ];
 
-  
   if (step === 'loading') {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
@@ -327,7 +314,6 @@ export default function SealedPage() {
     );
   }
 
-  
   if (step === 'denied') {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
@@ -345,17 +331,14 @@ export default function SealedPage() {
     );
   }
 
-  
   if (step === 'opening' && sealedPool) {
     return <BoosterOpening boosters={sealedPool.boosters} onComplete={handleBoostersComplete} />;
   }
 
-  
   if (step === 'review' && allOpenedCards.length > 0) {
     return <SealedPoolReview cards={allOpenedCards} onContinue={handleContinueToBuilding} />;
   }
 
-  
   if (step === 'building' && allOpenedCards.length > 0) {
     return (
       <SealedDeckBuilder
@@ -368,7 +351,6 @@ export default function SealedPage() {
     );
   }
 
-  
   if (step === 'starting') {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
@@ -390,7 +372,6 @@ export default function SealedPage() {
     );
   }
 
-  
   return (
     <main id="main-content" className="flex min-h-screen relative flex-col bg-[#0a0a0a]">
       <CloudBackground />
@@ -444,7 +425,6 @@ export default function SealedPage() {
               </motion.div>
             )}
 
-            
             {step === 'difficulty' && (
               <motion.div
                 key="difficulty"
@@ -495,7 +475,6 @@ export default function SealedPage() {
               </motion.div>
             )}
 
-            
             {step === 'online-create' && (
               <motion.div
                 key="online-create"
@@ -529,7 +508,6 @@ export default function SealedPage() {
 
                 <SealedSetPicker value={setChoice} onChange={setSetChoice} />
 
-
                 <div
                   className="flex w-full rounded-lg overflow-hidden"
                   style={{ border: '1px solid #262626' }}
@@ -557,7 +535,6 @@ export default function SealedPage() {
                   </button>
                 </div>
 
-                
                 {onlineView === 'browse' && (
                   <>
                     <div
@@ -609,7 +586,6 @@ export default function SealedPage() {
                   </>
                 )}
 
-                
                 {onlineView === 'private' && (
                   <div className="flex flex-col gap-3">
                     <button
@@ -660,7 +636,6 @@ export default function SealedPage() {
               </motion.div>
             )}
 
-            
             {step === 'online-waiting' && (
               <motion.div
                 key="online-waiting"
@@ -707,7 +682,6 @@ export default function SealedPage() {
             )}
           </AnimatePresence>
 
-          
           <button
             onClick={() => {
               if (step === 'difficulty') {

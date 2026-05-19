@@ -6,9 +6,6 @@ import { motion } from 'framer-motion';
 import type { CharacterCard } from '@/lib/engine/types';
 import CardFace from './CardFace';
 
-
-
-
 export interface CardInHandProps {
   card: CharacterCard;
   
@@ -30,9 +27,6 @@ export interface CardInHandProps {
   
   index?: number;
 }
-
-
-
 
 function CardInHandInner({
   card,
@@ -139,7 +133,6 @@ function CardInHandInner({
         <CardFace card={card} />
       </div>
 
-      
       {displayCost !== undefined && displayCost !== card.chakra && (
         <div
           style={{
@@ -168,7 +161,6 @@ function CardInHandInner({
         </div>
       )}
 
-      
       {!canAfford && isPlayable && (
         <div
           style={{
@@ -201,7 +193,6 @@ function CardInHandInner({
         </div>
       )}
 
-      
       {isSelected && (
         <div
           style={{

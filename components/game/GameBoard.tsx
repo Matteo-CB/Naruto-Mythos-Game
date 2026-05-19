@@ -34,8 +34,6 @@ import { useSocketStore } from "@/lib/socket/client";
 import { GameChat } from "./GameChat";
 import { SpectatorBanner } from "./SpectatorBanner";
 
-
-
 const rarityColorMap: Record<string, string> = {
   C: "#888888",
   UC: "#3e8b3e",
@@ -62,8 +60,6 @@ const rankColorMap: Record<string, string> = {
   A: "#b33e3e",
 };
 
-
-
 function CardPreviewContent({
   card,
   missionContext,
@@ -77,8 +73,6 @@ function CardPreviewContent({
   const locale = useLocale();
   const unpinCard = useUIStore((s) => s.unpinCard);
   const toggleFullscreenCard = useUIStore((s) => s.toggleFullscreenCard);
-
-  
 
   const isCharacter = card.card_type === "character";
   const isMission = card.card_type === "mission";
@@ -94,9 +88,6 @@ function CardPreviewContent({
         border: isMission
           ? `1px solid ${rankColorMap[missionContext?.rank ?? ""] ?? "rgba(196, 163, 90, 0.15)"}40`
           : "1px solid rgba(255, 255, 255, 0.08)",
-        borderLeft: isMission
-          ? `3px solid ${rankColorMap[missionContext?.rank ?? ""] ?? "rgba(196, 163, 90, 0.3)"}`
-          : "3px solid rgba(196, 163, 90, 0.25)",
         boxShadow:
           "0 8px 40px rgba(0, 0, 0, 0.8)",
         maxHeight: "calc(100vh - 32px)",
@@ -133,7 +124,6 @@ function CardPreviewContent({
         </div>
       )}
 
-      
       <div
         className="p-3.5 flex flex-col gap-2 overflow-y-auto"
         style={{ maxHeight: "380px" }}
@@ -147,7 +137,6 @@ function CardPreviewContent({
                 ? "rgba(196, 163, 90, 0.12)"
                 : "rgba(255, 255, 255, 0.04)",
               color: isMission ? "#c4a35a" : "#888888",
-              borderLeft: `2px solid ${isMission ? "rgba(196, 163, 90, 0.4)" : "rgba(255, 255, 255, 0.1)"}`,
             }}
           >
             {isMission ? t("card.mission") : t("card.character")}
@@ -156,7 +145,6 @@ function CardPreviewContent({
             className="text-[10px] px-1.5 py-0.5 shrink-0 font-bold"
             style={{
               backgroundColor: "rgba(255, 255, 255, 0.04)",
-              borderLeft: `2px solid ${rarityColor}`,
               color: rarityColor,
             }}
           >
@@ -164,7 +152,6 @@ function CardPreviewContent({
           </span>
         </div>
 
-        
         <span
           className="text-sm font-bold leading-tight"
           style={{ color: "#e0e0e0" }}
@@ -172,27 +159,23 @@ function CardPreviewContent({
           {getCardName(card, locale as 'en' | 'fr')}
         </span>
 
-        
         {isMission && card.name_en && locale !== 'en' && (
           <span className="text-xs -mt-1" style={{ color: "#666666" }}>
             {card.name_en}
           </span>
         )}
 
-        
         {(card.title_fr || card.title_en) && (
           <span className="text-xs" style={{ color: "#999999" }}>
             {getCardTitle(card, locale as 'en' | 'fr')}
           </span>
         )}
 
-        
         {isMission && missionContext && (
           <div
             className="flex flex-col gap-1.5 p-2.5 mt-0.5"
             style={{
               backgroundColor: "rgba(255, 255, 255, 0.03)",
-              borderLeft: `3px solid ${rankColorMap[missionContext.rank] ?? "#555"}`,
             }}
           >
             <div className="flex items-center justify-between">
@@ -255,7 +238,6 @@ function CardPreviewContent({
           </div>
         )}
 
-        
         {isMission && !missionContext && "basePoints" in card && (
           <div className="flex items-center gap-3 mt-0.5">
             <span className="text-xs" style={{ color: "#c4a35a" }}>
@@ -265,13 +247,11 @@ function CardPreviewContent({
           </div>
         )}
 
-        
         {isCharacter && (
           <div
             className="flex items-center gap-4 p-2 mt-0.5"
             style={{
               backgroundColor: "rgba(255, 255, 255, 0.03)",
-              borderLeft: "3px solid rgba(196, 163, 90, 0.3)",
             }}
           >
             <div className="flex flex-col items-center gap-0.5">
@@ -309,7 +289,6 @@ function CardPreviewContent({
           </div>
         )}
 
-        
         {card.keywords && card.keywords.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-0.5">
             {card.keywords.map((kw) => (
@@ -319,7 +298,6 @@ function CardPreviewContent({
                 style={{
                   backgroundColor: "rgba(255, 255, 255, 0.04)",
                   color: "#999999",
-                  borderLeft: "2px solid rgba(255, 255, 255, 0.08)",
                 }}
               >
                 {getCardKeyword(kw, locale as 'en' | 'fr')}
@@ -328,19 +306,16 @@ function CardPreviewContent({
           </div>
         )}
 
-        
         {card.group && (
           <span className="text-[10px]" style={{ color: "#777777" }}>
             {t("collection.details.group")}: {getCardGroup(card.group, locale as 'en' | 'fr')}
           </span>
         )}
 
-        
         <span className="text-[9px]" style={{ color: "#444444" }}>
           {card.id}
         </span>
 
-        
         <div
           className="mt-0.5 flex flex-col gap-2 pt-2"
           style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}
@@ -368,7 +343,6 @@ function CardPreviewContent({
                   className="flex flex-col gap-0.5 p-2"
                   style={{
                     backgroundColor: `${effectTypeColorMap[effect.type] ?? "#888888"}08`,
-                    borderLeft: `3px solid ${effectTypeColorMap[effect.type] ?? "#888888"}`,
                   }}
                 >
                   <span
@@ -402,7 +376,6 @@ function CardPreviewContent({
         </div>
       </div>
 
-      
       {isPinned && (
         <div
           className="flex items-center justify-between px-3 py-2 shrink-0"
@@ -420,7 +393,6 @@ function CardPreviewContent({
             style={{
               backgroundColor: "rgba(196, 163, 90, 0.12)",
               color: "#c4a35a",
-              borderLeft: "3px solid rgba(196, 163, 90, 0.5)",
               transform: "skewX(-3deg)",
             }}
           >
@@ -435,7 +407,6 @@ function CardPreviewContent({
             style={{
               backgroundColor: "rgba(179, 62, 62, 0.12)",
               color: "#b33e3e",
-              borderLeft: "2px solid rgba(179, 62, 62, 0.5)",
             }}
           >
             X
@@ -445,8 +416,6 @@ function CardPreviewContent({
     </div>
   );
 }
-
-
 
 function MobileDetailsButton() {
   const t = useTranslations();
@@ -476,7 +445,6 @@ function MobileDetailsButton() {
         color: '#c4a35a',
         backgroundColor: 'rgba(10, 10, 14, 0.85)',
         border: 'none',
-        borderLeft: '2px solid #c4a35a',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
         cursor: 'pointer',
         fontWeight: 600,
@@ -490,8 +458,6 @@ function MobileDetailsButton() {
   return createPortal(btn, document.body);
 }
 
-
-
 function CardPreview() {
   const dims = useGameScale();
   const previewCard = useUIStore((s) => s.previewCard);
@@ -503,7 +469,6 @@ function CardPreview() {
   const displayMissionContext = pinnedCard ? pinnedMissionContext : previewMissionContext;
   const isPinned = !!pinnedCard;
 
-  
   if (!displayCard || dims.isMobile) return null;
 
   return (
@@ -533,8 +498,6 @@ function CardPreview() {
   );
 }
 
-
-
 function FullscreenCardDetail() {
   const t = useTranslations();
   const locale = useLocale();
@@ -561,7 +524,6 @@ function FullscreenCardDetail() {
     unpinCard();
   };
 
-  
   const cardInfoContent = (
     <>
       
@@ -573,7 +535,6 @@ function FullscreenCardDetail() {
               ? "rgba(196, 163, 90, 0.12)"
               : "rgba(255, 255, 255, 0.04)",
             color: isMission ? "#c4a35a" : "#888888",
-            borderLeft: `2px solid ${isMission ? "rgba(196, 163, 90, 0.4)" : "rgba(255, 255, 255, 0.1)"}`,
           }}
         >
           {isMission ? t("card.mission") : t("card.character")}
@@ -582,7 +543,6 @@ function FullscreenCardDetail() {
           className={`text-xs px-2 py-1 shrink-0 font-bold`}
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.04)",
-            borderLeft: `2px solid ${rarityColor}`,
             color: rarityColor,
           }}
         >
@@ -590,7 +550,6 @@ function FullscreenCardDetail() {
         </span>
       </div>
 
-      
       <div className="flex flex-col gap-0.5">
         <span
           className={`text-lg font-bold leading-tight`}
@@ -605,13 +564,11 @@ function FullscreenCardDetail() {
         )}
       </div>
 
-      
       {isCharacter && (
         <div
           className={`flex items-center gap-6 p-3`}
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.03)",
-            borderLeft: "3px solid rgba(196, 163, 90, 0.3)",
           }}
         >
           <div className="flex flex-col items-center gap-0.5">
@@ -649,13 +606,11 @@ function FullscreenCardDetail() {
         </div>
       )}
 
-      
       {isMission && missionContext && (
         <div
           className={`flex flex-col gap-1 p-3`}
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.03)",
-            borderLeft: `3px solid ${rankColorMap[missionContext.rank] ?? "#555"}`,
           }}
         >
           <div className="flex items-center justify-between">
@@ -683,14 +638,12 @@ function FullscreenCardDetail() {
         </div>
       )}
 
-      
       {isMission && !missionContext && "basePoints" in card && (
         <span className="text-xs" style={{ color: "#c4a35a" }}>
           {t("game.board.base")}: {(card as MissionCard).basePoints} {t("game.board.pts")}
         </span>
       )}
 
-      
       {card.keywords && card.keywords.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {card.keywords.map((kw) => (
@@ -700,7 +653,6 @@ function FullscreenCardDetail() {
               style={{
                 backgroundColor: "rgba(255, 255, 255, 0.04)",
                 color: "#999999",
-                borderLeft: "2px solid rgba(255, 255, 255, 0.08)",
               }}
             >
               {getCardKeyword(kw, locale as 'en' | 'fr')}
@@ -709,14 +661,12 @@ function FullscreenCardDetail() {
         </div>
       )}
 
-      
       {card.group && (
         <span className={`text-sm`} style={{ color: "#999999" }}>
           {getCardGroup(card.group, locale as 'en' | 'fr')}
         </span>
       )}
 
-      
       <div
         className={`flex flex-col gap-2.5 pt-3`}
         style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}
@@ -744,7 +694,6 @@ function FullscreenCardDetail() {
                 className={`flex flex-col gap-0.5 p-3`}
                 style={{
                   backgroundColor: `${effectTypeColorMap[effect.type] ?? "#888888"}08`,
-                  borderLeft: `3px solid ${effectTypeColorMap[effect.type] ?? "#888888"}`,
                 }}
               >
                 <span
@@ -778,7 +727,6 @@ function FullscreenCardDetail() {
       </div>
     </>
   );
-
 
   if (dims.isMobile) {
     const mobileModal = (
@@ -852,7 +800,6 @@ function FullscreenCardDetail() {
     return createPortal(mobileModal, document.body);
   }
 
-
   return (
     <AnimatePresence>
       <motion.div
@@ -882,12 +829,11 @@ function FullscreenCardDetail() {
           onClick={(e) => e.stopPropagation()}
         >
           
-          <div className="absolute top-0 left-0 w-6 h-6 pointer-events-none" style={{ borderTop: '2px solid rgba(196, 163, 90, 0.5)', borderLeft: '2px solid rgba(196, 163, 90, 0.5)' }} />
-          <div className="absolute top-0 right-0 w-6 h-6 pointer-events-none" style={{ borderTop: '2px solid rgba(196, 163, 90, 0.5)', borderRight: '2px solid rgba(196, 163, 90, 0.5)' }} />
-          <div className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none" style={{ borderBottom: '2px solid rgba(196, 163, 90, 0.5)', borderLeft: '2px solid rgba(196, 163, 90, 0.5)' }} />
-          <div className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none" style={{ borderBottom: '2px solid rgba(196, 163, 90, 0.5)', borderRight: '2px solid rgba(196, 163, 90, 0.5)' }} />
+          <div className="absolute top-0 left-0 w-6 h-6 pointer-events-none" style={{ }} />
+          <div className="absolute top-0 right-0 w-6 h-6 pointer-events-none" style={{ }} />
+          <div className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none" style={{ }} />
+          <div className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none" style={{ }} />
 
-          
           <button
             onClick={handleClose}
             className="absolute top-3 left-1/2 -translate-x-1/2 z-10 px-5 h-8 flex items-center justify-center text-xs font-bold uppercase tracking-wider cursor-pointer"
@@ -900,7 +846,6 @@ function FullscreenCardDetail() {
             X
           </button>
 
-          
           {imagePath ? (
             <div
               className="w-full shrink-0 flex items-center justify-center"
@@ -931,7 +876,6 @@ function FullscreenCardDetail() {
             </div>
           )}
 
-          
           <div
             className="p-5 flex flex-col gap-3 overflow-y-auto"
             style={{ maxHeight: "calc(90vh - 340px)" }}
@@ -944,14 +888,11 @@ function FullscreenCardDetail() {
   );
 }
 
-
-
 function MaintenanceNotification() {
   const t = useTranslations('common');
   const socketWarning = useSocketStore((s) => s.maintenanceWarning);
   const [apiWarning, setApiWarning] = useState(false);
 
-  
   useEffect(() => {
     if (socketWarning) return;
     fetch('/api/admin/maintenance')
@@ -971,7 +912,6 @@ function MaintenanceNotification() {
       style={{
         maxWidth: '340px',
         backgroundColor: 'rgba(40, 30, 10, 0.92)',
-        borderLeft: '3px solid rgba(196, 163, 90, 0.4)',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
       }}
     >
@@ -981,10 +921,6 @@ function MaintenanceNotification() {
     </motion.div>
   );
 }
-
-
-
-
 
 export default function GameBoard() {
   return <GameBoardInner />;
@@ -1004,14 +940,10 @@ function GameBoardInner() {
   const fetchSettings = useSettingsStore((s) => s.fetchFromServer);
   const isSpectating = useSocketStore((s) => s.isSpectating);
 
-  
   useEffect(() => { fetchSettings(); }, [fetchSettings]);
 
   const prevTurnRef = useRef<number | null>(null);
 
-  
-  
-  
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
@@ -1040,9 +972,6 @@ function GameBoardInner() {
     prevTurnRef.current = currentTurn;
   }, [visibleState?.turn, addAnimation]);
 
-  
-  
-  
   const handleBoardClick = useCallback(() => {
     if (pinnedCard && !showFullscreenCard) {
       unpinCard();
@@ -1091,16 +1020,16 @@ function GameBoardInner() {
       />
 
       <MaintenanceNotification />
-      <SandboxToolbar />
 
-      
       <OpponentSidePiles />
 
       <main className="flex-1 flex flex-col min-w-0 relative z-10">
-        
+
+        <SandboxToolbar />
+
+
         <OpponentStatsBar />
 
-        
         <section
           className="shrink-0 flex items-center justify-center"
           style={{
@@ -1113,7 +1042,6 @@ function GameBoardInner() {
           <OpponentHand handSize={opponentState.handSize} />
         </section>
 
-        
         <section className="flex-1 flex flex-col min-h-0">
           <div className={`flex-1 flex items-stretch justify-center ${dims.isMobile ? 'px-1 py-0' : 'px-3 py-0.5'} min-h-0 overflow-hidden`}>
             <div className={`flex ${dims.isMobile ? 'gap-0.5' : 'gap-1.5'} items-stretch justify-center w-full`}>
@@ -1160,7 +1088,6 @@ function GameBoardInner() {
             </div>
           </div>
 
-          
           {!isSpectating && (
             <div className="shrink-0 flex justify-center py-0.5" style={{ pointerEvents: 'auto' }}>
               <ActionBar />
@@ -1168,7 +1095,6 @@ function GameBoardInner() {
           )}
         </section>
 
-        
         <section
           className="shrink-0 flex items-end justify-center"
           style={{
@@ -1184,11 +1110,9 @@ function GameBoardInner() {
           }
         </section>
 
-        
         <PlayerStatsBar />
       </main>
 
-      
       <PlayerSidePiles />
 
       <CardPreview />
@@ -1216,7 +1140,6 @@ function GameBoardInner() {
             className="fixed top-3 left-1/2 -translate-x-1/2 z-30 py-1.5 px-4"
             style={{
               backgroundColor: "rgba(10, 10, 14, 0.85)",
-              borderLeft: "3px solid rgba(196, 163, 90, 0.3)",
               boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5)",
             }}
           >

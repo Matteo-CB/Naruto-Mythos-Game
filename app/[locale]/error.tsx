@@ -23,7 +23,6 @@ export default function Error({
     }
   }, [error, reset]);
 
-  
   if (retryCount.current < 3) {
     return null;
   }
@@ -44,7 +43,6 @@ export default function Error({
             className="px-5 py-2 text-xs font-bold uppercase tracking-wider cursor-pointer"
             style={{
               backgroundColor: 'rgba(196, 163, 90, 0.1)',
-              border: '1px solid rgba(196, 163, 90, 0.3)',
               color: '#c4a35a',
             }}
           >

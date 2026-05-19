@@ -50,7 +50,6 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
                   style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.05)',
                     color: '#888888',
-                    borderLeft: '2px solid rgba(196, 163, 90, 0.3)',
                   }}
                 >
                   {cards.length}
@@ -59,7 +58,6 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
               <PopupMinimizeX onClick={onClose} />
             </div>
 
-            
             <div className="p-4 overflow-y-auto flex-1">
               {cards.length === 0 ? (
                 <div className="flex items-center justify-center py-12">

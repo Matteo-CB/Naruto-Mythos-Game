@@ -67,7 +67,6 @@ export function OpponentHand({ handSize }: OpponentHandProps) {
         {t('game.board.opponentHandCount', { count: handSize })}
       </span>
 
-      
       <div
         className="relative flex items-center justify-center"
         style={{ height: dims.opponentContainerH + 'px', minWidth: dims.opponentMinW + 'px' }}

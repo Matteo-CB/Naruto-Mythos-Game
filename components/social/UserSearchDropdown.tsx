@@ -44,7 +44,6 @@ export function UserSearchDropdown({ namespace }: UserSearchDropdownProps) {
     [searchUsers, clearSearch],
   );
 
-  
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -61,7 +60,6 @@ export function UserSearchDropdown({ namespace }: UserSearchDropdownProps) {
     };
   }, []);
 
-  
   useEffect(() => {
     return () => {
       if (debounceRef.current) {
@@ -70,7 +68,6 @@ export function UserSearchDropdown({ namespace }: UserSearchDropdownProps) {
     };
   }, []);
 
-  
   useEffect(() => {
     if (query.trim() && (searchResults.length > 0 || searchLoading)) {
       setIsOpen(true);

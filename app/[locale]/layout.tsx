@@ -59,7 +59,6 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   const messages = await getMessages();
 
-  
   const webAppJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
@@ -93,7 +92,6 @@ export default async function LocaleLayout({ children, params }: Props) {
     genre: 'Card Game',
   };
 
-  
   const videoGameJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'VideoGame',
@@ -127,7 +125,6 @@ export default async function LocaleLayout({ children, params }: Props) {
     inLanguage: ['en', 'fr'],
   };
 
-  
   const orgJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',

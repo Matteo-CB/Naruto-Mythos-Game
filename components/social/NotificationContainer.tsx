@@ -28,7 +28,6 @@ export function NotificationContainer() {
   const prevInviteIdsRef = useRef<Set<string>>(new Set());
   const dismissTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
-  
   useEffect(() => {
     const currentIds = new Set(incomingRequests.map((r) => r.friendshipId));
     const prevIds = prevRequestIdsRef.current;
@@ -46,14 +45,12 @@ export function NotificationContainer() {
           addedAt: Date.now(),
         }));
 
-        
         const existingIds = new Set(prev.map((n) => n.id));
         const uniqueNew = newNotifs.filter((n) => !existingIds.has(n.id));
 
         return [...prev, ...uniqueNew];
       });
 
-      
       for (const r of newRequests) {
         const notifId = `friend-${r.friendshipId}`;
         const timer = setTimeout(() => {
@@ -66,7 +63,6 @@ export function NotificationContainer() {
     prevRequestIdsRef.current = currentIds;
   }, [incomingRequests]);
 
-  
   useEffect(() => {
     const currentIds = new Set(incomingMatchInvites.map((inv) => inv.inviteId));
     const prevIds = prevInviteIdsRef.current;
@@ -94,7 +90,6 @@ export function NotificationContainer() {
     prevInviteIdsRef.current = currentIds;
   }, [incomingMatchInvites]);
 
-  
   useEffect(() => {
     return () => {
       for (const timer of dismissTimersRef.current.values()) {
@@ -119,7 +114,6 @@ export function NotificationContainer() {
     [router],
   );
 
-  
   const visibleNotifications = activeNotifications.slice(-MAX_VISIBLE);
 
   return (

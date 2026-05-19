@@ -85,7 +85,6 @@ function HandCard({
         style={{ width: '3px', backgroundColor: '#c4a35a', opacity: 0.6 }}
       />
 
-      
       {imagePath ? (
         <div
           className="w-full h-full bg-cover bg-center"
@@ -102,7 +101,6 @@ function HandCard({
         </div>
       )}
 
-      
       {card.chakra !== undefined && (
         <div
           className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[9px] font-bold"
@@ -116,7 +114,6 @@ function HandCard({
         </div>
       )}
 
-      
       {card.power !== undefined && (
         <div
           className="absolute bottom-1 right-1 px-1.5 py-0.5 text-[10px] font-bold"
@@ -129,7 +126,6 @@ function HandCard({
         </div>
       )}
 
-      
       {card.missionLabel && (
         <div
           className="absolute top-1 right-1 px-1.5 py-0.5 text-[8px] font-bold uppercase"
@@ -142,7 +138,6 @@ function HandCard({
         </div>
       )}
 
-      
       <div
         className="absolute inset-x-0 bottom-0 text-center py-1 text-[8px] font-medium truncate px-1"
         style={{
@@ -153,7 +148,6 @@ function HandCard({
         {getCardName(card as Parameters<typeof getCardName>[0], locale as 'en' | 'fr')}
       </div>
 
-      
       <button
         onClick={(e) => { e.stopPropagation(); zoomCard(card as CharacterCard | MissionCard); }}
         className="absolute bottom-7 right-1 px-1.5 py-0.5 text-[8px] font-bold cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
@@ -229,7 +223,6 @@ export function HandCardSelector() {
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </PopupDescription>
 
-          
           <div
             className="flex flex-wrap gap-3 px-2 py-3 mb-4 justify-center"
             style={{ maxWidth: '100%' }}

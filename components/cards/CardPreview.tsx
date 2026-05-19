@@ -8,9 +8,6 @@ import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import type { CharacterCard, MissionCard, CardEffect, Rarity } from '@/lib/engine/types';
 import CardBack from './CardBack';
 
-
-
-
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
 
@@ -34,9 +31,6 @@ const EFFECT_TYPE_COLORS: Record<string, string> = {
   SCORE: '#eab308',
 };
 
-
-
-
 export interface CardPreviewProps {
   card: CharacterCard | MissionCard | null;
   visible: boolean;
@@ -44,9 +38,6 @@ export interface CardPreviewProps {
   powerTokens?: number;
   banned?: boolean;
 }
-
-
-
 
 function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = false }: CardPreviewProps) {
   const t = useTranslations();
@@ -130,7 +121,6 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 </div>
               )}
 
-              
               <div
                 style={{
                   position: 'absolute',
@@ -154,7 +144,6 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
               </div>
             </div>
 
-            
             <div style={{ padding: '12px 14px' }}>
               
               <div style={{ marginBottom: '8px' }}>
@@ -182,7 +171,6 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 )}
               </div>
 
-              
               <div
                 style={{
                   display: 'flex',
@@ -211,7 +199,6 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 )}
               </div>
 
-              
               {card.keywords && card.keywords.length > 0 && (
                 <div style={{ marginBottom: '8px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                   {card.keywords.map((kw) => (
@@ -232,7 +219,6 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 </div>
               )}
 
-              
               {card.group && (
                 <div
                   style={{
@@ -245,7 +231,6 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 </div>
               )}
 
-              
               {card.effects && card.effects.length > 0 && (
                 <div
                   style={{
@@ -289,7 +274,6 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 </div>
               )}
 
-              
               <div
                 style={{
                   color: '#444444',
@@ -307,9 +291,6 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
     </AnimatePresence>
   );
 }
-
-
-
 
 function StatBadge({
   label,

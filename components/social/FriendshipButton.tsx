@@ -145,7 +145,6 @@ export function FriendshipButton({ userId, username }: FriendshipButtonProps) {
     );
   }
 
-  
   return (
     <div className="flex items-center gap-2">
       <span

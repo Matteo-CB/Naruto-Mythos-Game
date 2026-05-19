@@ -5,10 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo, useEffect } from 'react';
 import type { TournamentMatch } from '@/stores/tournamentStore';
 
-
-
-
-
 export interface SwissStandingEntry {
   userId: string;
   username: string;
@@ -32,18 +28,10 @@ interface SwissStandingsProps {
   winnerUsername?: string | null;
 }
 
-
-
-
-
 const GOLD = '#c4a35a';
 const SILVER = '#a8a8a8';
 const BRONZE = '#cd7f32';
 const MEDAL_COLORS = [GOLD, SILVER, BRONZE];
-
-
-
-
 
 export function SwissStandings({
   standings,
@@ -55,7 +43,6 @@ export function SwissStandings({
 }: SwissStandingsProps) {
   const t = useTranslations('tournament');
 
-  
   const [expandedRounds, setExpandedRounds] = useState<Set<number>>(new Set());
 
   const toggleRound = (round: number) => {
@@ -67,7 +54,6 @@ export function SwissStandings({
     });
   };
 
-  
   const currentRoundMatches = useMemo(
     () =>
       matches
@@ -126,7 +112,6 @@ export function SwissStandings({
             {winnerUsername}
           </motion.span>
 
-          
           {standings.length >= 2 && (
             <div className="flex items-end gap-6 mt-4">
               {standings.slice(0, 3).map((s, i) => (
@@ -156,7 +141,6 @@ export function SwissStandings({
         </motion.div>
       )}
 
-      
       <div className="flex items-center justify-between">
         <h3
           className="text-sm font-bold uppercase tracking-widest"
@@ -169,7 +153,6 @@ export function SwissStandings({
         </span>
       </div>
 
-      
       <div
         className="overflow-x-auto"
         style={{ border: '1px solid #262626', backgroundColor: '#111' }}
@@ -286,7 +269,6 @@ export function SwissStandings({
         </table>
       </div>
 
-      
       {!isCompleted && currentRoundMatches.length > 0 && (
         <div>
           <h4
@@ -354,7 +336,6 @@ export function SwissStandings({
         </div>
       )}
 
-      
       {pastRounds.length > 0 && (
         <div>
           <h4
@@ -459,10 +440,6 @@ export function SwissStandings({
     </div>
   );
 }
-
-
-
-
 
 function MatchCountdown({ deadline }: { deadline: string | null | undefined }) {
   const [remaining, setRemaining] = useState<number | null>(() => {

@@ -148,16 +148,29 @@ export class GameEngine {
 
   
   static applyAction(state: GameState, player: PlayerID, action: GameAction): GameState {
-    
+
     const prevCharIds = collectCharInstanceIds(state);
 
     let newState = deepClone(state);
 
-    
+
     if (!newState.actionHistory) newState.actionHistory = [];
     newState.actionHistory.push({ player, action });
 
-    
+
+
+
+    const isNewActionStart =
+      action.type === 'PLAY_CHARACTER' ||
+      action.type === 'PLAY_HIDDEN' ||
+      action.type === 'REVEAL_CHARACTER' ||
+      action.type === 'UPGRADE_CHARACTER' ||
+      action.type === 'PASS';
+    if (isNewActionStart) {
+      newState.turnPlayedIds = [];
+    }
+
+
     if (action.type === 'FORFEIT') {
       newState.phase = 'gameOver';
       newState.forfeitedBy = player;
@@ -192,7 +205,7 @@ export class GameEngine {
               ? (pdr.discardOwner === 'player1' ? 'player2' : 'player1') // Itachi 140: opponent chooses their own pile
               : pdr.chooser; // Normal: attacker chooses opponent's pile
             const selectingOverride = pdr.chooser === pdr.discardOwner ? pdr.chooser : undefined;
-            newState = EffectEngine.createReorderDiscardPending(newState, pdr.discardOwner, effectSource, pdr.count, selectingOverride);
+            newState = EffectEngine.createReorderDiscardPending(newState, pdr.discardOwner, effectSource, pdr.count, selectingOverride, undefined, pdr.targetInstanceIds);
             break;
           }
 
@@ -233,7 +246,7 @@ export class GameEngine {
               ? (pdr2.discardOwner === 'player1' ? 'player2' : 'player1')
               : pdr2.chooser;
             const selectingOverride2 = pdr2.chooser === pdr2.discardOwner ? pdr2.chooser : undefined;
-            newState = EffectEngine.createReorderDiscardPending(newState, pdr2.discardOwner, effectSource2, pdr2.count, selectingOverride2);
+            newState = EffectEngine.createReorderDiscardPending(newState, pdr2.discardOwner, effectSource2, pdr2.count, selectingOverride2, undefined, pdr2.targetInstanceIds);
             break;
           }
 

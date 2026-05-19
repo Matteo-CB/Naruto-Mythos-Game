@@ -32,8 +32,6 @@ interface HandCardProps {
   fanSpacing: number;
 }
 
-
-
 function reconcileHandOrder(
   prevOrder: number[],
   prevHand: CharacterCard[],
@@ -44,7 +42,6 @@ function reconcileHandOrder(
   const usedNewIndices = new Set<number>();
   const newOrder: number[] = [];
 
-  
   for (const origIdx of prevOrder) {
     const oldCard = prevHand[origIdx];
     if (!oldCard) continue;
@@ -58,21 +55,17 @@ function reconcileHandOrder(
     }
   }
 
-  
   for (let i = 0; i < newHand.length; i++) {
     if (!usedNewIndices.has(i)) {
       newOrder.push(i);
     }
   }
 
-  
   if (newOrder.length === newHand.length && newOrder.every((v, i) => v === i)) {
     return null;
   }
   return newOrder;
 }
-
-
 
 const HandCard = React.memo(function HandCard({
   card,
@@ -91,7 +84,6 @@ const HandCard = React.memo(function HandCard({
   const locale = useLocale();
   const dims = useGameScale();
 
-  
   const midpoint = (total - 1) / 2;
   const offset = displayIndex - midpoint;
   const rotation = offset * 2.5;
@@ -186,7 +178,6 @@ const HandCard = React.memo(function HandCard({
         </div>
       )}
 
-      
       <div
         className="absolute inset-x-0 bottom-0 px-1 py-1 flex items-end justify-between"
         style={{
@@ -207,7 +198,6 @@ const HandCard = React.memo(function HandCard({
         </span>
       </div>
 
-      
       <div
         className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[10px] font-bold"
         style={{
@@ -222,7 +212,6 @@ const HandCard = React.memo(function HandCard({
         {card.chakra}
       </div>
 
-      
       {!canAfford && (
         <div
           className="absolute inset-0"
@@ -232,8 +221,6 @@ const HandCard = React.memo(function HandCard({
     </motion.div>
   );
 });
-
-
 
 function SortPill({
   label,
@@ -261,9 +248,8 @@ function SortPill({
         letterSpacing: '0.04em',
         padding: '4px 10px',
         border: 'none',
-        borderLeft: `2px solid ${active ? accentColor : 'rgba(255, 255, 255, 0.08)'}`,
         backgroundColor: active
-          ? 'rgba(196, 163, 90, 0.12)'
+          ? 'rgba(196, 163, 90, 0.20)'
           : 'rgba(255, 255, 255, 0.04)',
         color: active ? '#c4a35a' : '#888888',
         lineHeight: 1.3,
@@ -273,8 +259,6 @@ function SortPill({
     </motion.button>
   );
 }
-
-
 
 export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpectatorOpponent }: PlayerHandProps) {
   const t = useTranslations();
@@ -298,8 +282,6 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
 
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
 
-  
-
   const prevHandRef = useRef<CharacterCard[]>(hand);
   const prevHandLenRef = useRef(hand.length);
 
@@ -309,7 +291,6 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     prevHandRef.current = hand;
     prevHandLenRef.current = hand.length;
 
-    
     if (prevHand === hand) return;
 
     const currentOrder = useUIStore.getState().handOrder;
@@ -318,8 +299,6 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     const newOrder = reconcileHandOrder(currentOrder, prevHand, hand);
     setHandOrder(newOrder);
   }, [hand, setHandOrder]);
-
-  
 
   const displayHand = useMemo(() => {
     if (!handOrder || handOrder.length !== hand.length) {
@@ -330,10 +309,6 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
       originalIndex: origIdx,
     }));
   }, [hand, handOrder]);
-
-  
-
-  
 
   const handleSelect = useCallback(
     (originalIndex: number) => {
@@ -346,8 +321,6 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     },
     [isMyTurn, effectPopupMinimized, selectedCardIndex, selectCard],
   );
-
-  
 
   const moveCardLeft = useCallback(() => {
     if (selectedCardIndex === null || hand.length <= 1) return;
@@ -379,7 +352,6 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     setHandOrder(isNatural ? null : currentOrder);
   }, [selectedCardIndex, handOrder, hand, setHandOrder]);
 
-  
   const selectedDisplayIdx = useMemo(() => {
     if (selectedCardIndex === null) return -1;
     const currentOrder =
@@ -391,8 +363,6 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
 
   const canMoveLeft = selectedCardIndex !== null && selectedDisplayIdx > 0;
   const canMoveRight = selectedCardIndex !== null && selectedDisplayIdx >= 0 && selectedDisplayIdx < hand.length - 1;
-
-  
 
   const sortByCost = useCallback(() => {
     if (hand.length <= 1) return;
@@ -410,7 +380,6 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     setHandOrder(isNatural ? null : indices);
   }, [hand, setHandOrder]);
 
-  
   const activeSortType = useMemo(() => {
     if (!handOrder || handOrder.length !== hand.length) return null;
 
@@ -459,7 +428,6 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
         })}
       </div>
 
-      
       <div className="flex items-center justify-center gap-3 py-1">
         
         {selectedCardIndex !== null && hand.length > 1 && (
@@ -477,7 +445,6 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
           </div>
         )}
 
-        
         {hand.length > 1 && !dims.isMobile && (
           <div className="flex items-center gap-2">
             <SortPill
@@ -500,7 +467,6 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
           </div>
         )}
 
-        
         {!dims.isMobile && (
           <span className="text-[11px] tabular-nums" style={{ color: '#888888' }}>
             {t('game.board.handCount', { count: hand.length })}

@@ -59,7 +59,6 @@ function CardCarousel() {
   const N = CAROUSEL_CARDS.length;
   const angle = 360 / N;
 
-  
   const [cardSize, setCardSize] = useState({ w: 160, h: 224 });
   useEffect(() => {
     function update() {
@@ -96,8 +95,7 @@ function CardCarousel() {
                   transform: `rotateY(${i * angle}deg) translateZ(${radius}px)`,
                   backfaceVisibility: 'hidden',
                   boxShadow: '0 4px 24px rgba(0,0,0,0.7), 0 0 12px rgba(196, 163, 90, 0.08)',
-                  border: '1px solid rgba(196, 163, 90, 0.15)',
-                }}
+                  }}
               >
                 <Image
                   src={src}
@@ -139,7 +137,6 @@ export default function MaintenancePage() {
     return () => clearInterval(interval);
   }, []);
 
-  
   useEffect(() => {
     const poll = setInterval(async () => {
       try {
@@ -175,7 +172,6 @@ export default function MaintenancePage() {
         <LanguageSwitcher />
       </div>
 
-      
       <div className="relative z-10 flex flex-col items-center px-4 max-w-[600px] text-center">
         <h1
           className="font-display tracking-wider"
@@ -200,7 +196,6 @@ export default function MaintenancePage() {
           {t('subtitle')}
         </p>
 
-        
         <div className="my-6" style={{ width: 120, height: 1, background: 'rgba(196, 163, 90, 0.1)' }} />
 
         <p
@@ -215,7 +210,6 @@ export default function MaintenancePage() {
           {t('message')}
         </p>
 
-        
         <div className="mt-7 text-center">
           <p
             className="font-body uppercase"
@@ -236,11 +230,9 @@ export default function MaintenancePage() {
           </p>
         </div>
 
-        
         <CardCarousel />
       </div>
 
-      
       <div
         className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10"
         style={{ fontSize: '0.7rem', color: '#888888', letterSpacing: '0.05em' }}

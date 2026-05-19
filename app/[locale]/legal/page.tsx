@@ -56,7 +56,6 @@ export default function LegalPage() {
           className="text-sm px-3 py-1.5 rounded"
           style={{
             color: '#c4a35a',
-            border: '1px solid rgba(196, 163, 90, 0.3)',
             backgroundColor: 'rgba(196, 163, 90, 0.05)',
           }}
         >
@@ -79,8 +78,7 @@ export default function LegalPage() {
           className="rounded p-6 mb-6"
           style={{
             backgroundColor: 'rgba(20, 20, 20, 0.8)',
-            border: '1px solid rgba(196, 163, 90, 0.1)',
-          }}
+            }}
         >
           <h2
             className="text-base font-bold uppercase tracking-wider mb-5 text-center"
@@ -102,13 +100,11 @@ export default function LegalPage() {
           </Section>
         </div>
 
-        
         <div
           className="rounded p-6"
           style={{
             backgroundColor: 'rgba(20, 20, 20, 0.8)',
-            border: '1px solid rgba(196, 163, 90, 0.1)',
-          }}
+            }}
         >
           <h2
             className="text-base font-bold uppercase tracking-wider mb-5 text-center"

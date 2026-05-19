@@ -2,8 +2,6 @@
 
 import { createContext, useContext, useMemo, useSyncExternalStore } from 'react';
 
-
-
 const BASE = {
   
   handCardW: 100, handCardH: 140,
@@ -38,8 +36,6 @@ const BASE = {
   previewMedW: 160, previewMedH: 224,
   previewLgW: 200, previewLgH: 280,
 } as const;
-
-
 
 export interface GameDimensions {
   scale: number;
@@ -80,12 +76,9 @@ export interface GameDimensions {
   previewLg: { w: number; h: number };
 }
 
-
-
 function computeScale(vw: number, vh: number): number {
   const isMobile = vh < 500;
-  
-  
+
   const refW = isMobile ? 1000 : 1600;
   const refH = isMobile ? 600 : 1000;
   const raw = Math.min(vw / refW, vh / refH);
@@ -100,37 +93,25 @@ function s(base: number, scale: number): number {
 function buildDimensions(scale: number, vw: number, vh: number): GameDimensions {
   const isMobile = vh < 500;
 
-  
-  
-  
-  
-  
   const emptyLaneMinW = isMobile ? Math.round(110 * scale) : s(BASE.emptyLaneMinW, scale);
   const emptyLaneMaxW = isMobile ? Math.round(170 * scale) : s(BASE.emptyLaneMaxW, scale);
-  
-  
-  
+
   const missionMaxW = isMobile ? Math.round(70 * scale) : s(BASE.missionMaxW, scale);
   const sidePileW = isMobile ? Math.round(38 * scale) : s(BASE.sidePileW, scale);
   const handMinW = isMobile ? Math.round(240 * scale) : s(BASE.handMinW, scale);
   const opponentMinW = isMobile ? Math.round(150 * scale) : s(BASE.opponentMinW, scale);
 
-  
-  
   const opponentHandH = isMobile ? Math.round(44 * scale) : s(BASE.opponentHandH, scale);
   const playerHandH = isMobile ? Math.round(110 * scale) : s(BASE.playerHandH, scale);
   const handFanSpacing = isMobile ? Math.round(38 * scale) : s(BASE.handFanSpacing, scale);
   const opponentFanSpacing = isMobile ? Math.round(14 * scale) : s(BASE.opponentFanSpacing, scale);
   const opponentContainerH = isMobile ? Math.round(36 * scale) : s(BASE.opponentContainerH, scale);
 
-  
   const handCardW = isMobile ? Math.round(78 * scale) : s(BASE.handCardW, scale);
   const handCardH = isMobile ? Math.round(109 * scale) : s(BASE.handCardH, scale);
   const opponentCardW = isMobile ? Math.round(32 * scale) : s(BASE.opponentCardW, scale);
   const opponentCardH = isMobile ? Math.round(45 * scale) : s(BASE.opponentCardH, scale);
 
-  
-  
   const missionCardW = isMobile ? Math.round(48 * scale) : s(BASE.missionCardW, scale);
   const missionCardH = isMobile ? Math.round(68 * scale) : s(BASE.missionCardH, scale);
 
@@ -166,8 +147,6 @@ function buildDimensions(scale: number, vw: number, vh: number): GameDimensions 
   };
 }
 
-
-
 let cachedWidth = typeof window !== 'undefined' ? window.innerWidth : 1400;
 let cachedHeight = typeof window !== 'undefined' ? window.innerHeight : 900;
 let listeners: Array<() => void> = [];
@@ -198,8 +177,6 @@ function getSnapshot() {
 function getServerSnapshot() {
   return '1400x900';
 }
-
-
 
 export const GameScaleContext = createContext<GameDimensions>(buildDimensions(1.0, 1400, 900));
 

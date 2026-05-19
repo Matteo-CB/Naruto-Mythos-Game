@@ -27,7 +27,6 @@ export function BanNotification() {
   useEffect(() => {
     if (!session?.user?.id) return;
 
-    
     try {
       const seen = localStorage.getItem('ban-notif-dismissed');
       if (seen) setDismissed(new Set(JSON.parse(seen)));
@@ -56,14 +55,12 @@ export function BanNotification() {
   const gameBan = bans.find((b) => b.type === 'game');
   const chatBan = bans.find((b) => b.type === 'chat');
 
-  
   if (gameBan && !dismissed.has('gameBan')) {
     const dateStr = gameBan.expiresAt ? new Date(gameBan.expiresAt).toLocaleDateString(locale) : '';
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.9)' }}>
         <div className="flex flex-col items-center gap-4 max-w-md w-full text-center px-6 py-8" style={{
-          backgroundColor: '#111', border: '1px solid rgba(179,62,62,0.3)',
-        }}>
+          backgroundColor: '#111', }}>
           <div className="w-16 h-px" style={{ backgroundColor: 'rgba(179,62,62,0.4)' }} />
           <h2 className="text-lg font-bold uppercase tracking-wider" style={{ color: '#b33e3e' }}>
             {t('gameBanned')}
@@ -73,7 +70,7 @@ export function BanNotification() {
           </p>
           <button onClick={() => dismiss('gameBan')}
             className="px-5 py-2 text-xs font-bold uppercase tracking-wider cursor-pointer mt-2"
-            style={{ backgroundColor: 'rgba(179,62,62,0.1)', border: '1px solid rgba(179,62,62,0.3)', color: '#b33e3e' }}>
+            style={{ backgroundColor: 'rgba(179,62,62,0.1)', color: '#b33e3e' }}>
             {t('understood')}
           </button>
           <div className="w-16 h-px" style={{ backgroundColor: 'rgba(179,62,62,0.4)' }} />
@@ -84,7 +81,6 @@ export function BanNotification() {
 
   const items: Array<{ key: string; content: React.ReactNode }> = [];
 
-  
   if (chatBan && !dismissed.has('chatBan')) {
     const dateStr = chatBan.expiresAt ? new Date(chatBan.expiresAt).toLocaleDateString(locale) : '';
     items.push({
@@ -97,7 +93,6 @@ export function BanNotification() {
     });
   }
 
-  
   for (let i = 0; i < notifications.length; i++) {
     const notif = notifications[i];
     const key = `report-${i}`;

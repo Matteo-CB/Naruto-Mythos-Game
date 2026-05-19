@@ -13,7 +13,6 @@ import { useGameStore } from '@/stores/gameStore';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { AIDifficulty } from '@/lib/ai/AIPlayer';
 
-
 interface ResolvedDeck {
   characters: CharacterCard[];
   missions: MissionCard[];
@@ -35,7 +34,6 @@ export default function PlayAIPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [cards, setCards] = useState<{ characters: CharacterCard[]; missions: MissionCard[] } | null>(null);
   const [selectedDeck, setSelectedDeck] = useState<ResolvedDeck | null>(null);
-  
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
@@ -97,7 +95,6 @@ export default function PlayAIPage() {
 
     setIsLoading(true);
 
-
     const allChars = cards.characters;
     const allMissions = cards.missions;
 
@@ -158,7 +155,6 @@ export default function PlayAIPage() {
           <p className="text-sm text-[#888888]">{t('playAI.selectDifficultyDesc')}</p>
         </div>
 
-        
         <div className="flex flex-col gap-2 w-full">
           <p className="text-xs text-[#888888] uppercase tracking-wider mb-1">{t('playAI.selectDifficulty')}</p>
           {DIFFICULTIES.map((d) => (
@@ -177,7 +173,6 @@ export default function PlayAIPage() {
           ))}
         </div>
 
-        
         {cards && (
           <DeckSelector
             onSelect={(deck) => setSelectedDeck(deck)}
@@ -186,14 +181,12 @@ export default function PlayAIPage() {
           />
         )}
 
-        
         {cards && (
           <p className="text-xs text-[#555]">
             {t('playAI.cardsLoaded', { chars: cards.characters.length, missions: cards.missions.length })}
           </p>
         )}
 
-        
         <div className="flex gap-3 w-full">
           <button
             onClick={() => router.push('/')}

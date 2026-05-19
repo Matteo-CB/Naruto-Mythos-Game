@@ -2,15 +2,9 @@
 
 import { memo } from 'react';
 
-
-
-
 export interface CardBackProps {
   className?: string;
 }
-
-
-
 
 function CardBackInner({ className = '' }: CardBackProps) {
   return (
@@ -31,7 +25,6 @@ function CardBackInner({ className = '' }: CardBackProps) {
         }}
       />
 
-      
       <div
         style={{
           position: 'absolute',
@@ -44,7 +37,6 @@ function CardBackInner({ className = '' }: CardBackProps) {
         }}
       />
 
-      
       <div
         style={{
           position: 'absolute',
@@ -57,7 +49,6 @@ function CardBackInner({ className = '' }: CardBackProps) {
         }}
       />
 
-      
       <div
         style={{
           position: 'absolute',
@@ -69,7 +60,6 @@ function CardBackInner({ className = '' }: CardBackProps) {
         }}
       />
 
-      
       <div
         style={{
           position: 'absolute',
@@ -102,8 +92,6 @@ function CardBackInner({ className = '' }: CardBackProps) {
         </div>
       </div>
 
-      
-      
       <div
         style={{
           position: 'absolute',

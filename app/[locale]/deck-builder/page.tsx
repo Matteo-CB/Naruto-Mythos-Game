@@ -25,8 +25,6 @@ import { EvolvingBuilderHelper } from "@/components/deckBuilder/EvolvingBuilderH
 import { EvolvingDeckHolo } from "@/components/evolving/EvolvingDeckHolo";
 import { EvolvingDeckBadge } from "@/components/evolving/EvolvingDeckBadge";
 
-
-
 const RARITY_COLORS: Record<string, string> = {
   C: '#888888', UC: '#3e8b3e', R: '#c4a35a', RA: '#c4a35a',
   S: '#b33e3e', M: '#6a6abb', Legendary: '#c4a35a', Mission: '#c4a35a',
@@ -37,9 +35,6 @@ const EFFECT_TYPE_COLORS: Record<string, string> = {
 };
 type SortField = 'number' | 'name' | 'chakra' | 'power' | 'rarity';
 const normalizeStr = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-
-
 
 type EffectFunction = 'defeat' | 'hide' | 'draw' | 'move' | 'powerup' | 'chakra' | 'control' | 'play' | 'protect' | 'continuous' | 'score';
 
@@ -82,8 +77,6 @@ const EFFECT_FN_LABELS: Record<EffectFunction, { en: string; fr: string }> = {
   continuous: { en: 'Continuous', fr: 'Continu' },
   score: { en: 'Score', fr: 'Score' },
 };
-
-
 
 interface KeywordFilter {
   terms: string[];  // all must match (AND)
@@ -130,7 +123,6 @@ function parseSearchQuery(raw: string): SearchFilter {
   
   normalized = normalized.replace(/(\w+):?\[([^\]]+)\](\+\S+)?/g, (_, key, content, suffix) => `${key}:"${content}${suffix ?? ''}"`);
 
-  
   const tokenRegex = /(-)?(eup|emi|emc|em|ea|es|nv|[cpkgresf])(:|=|>=|<=|>|<)("([^"]+)"|(\S+))/gi;
   let remaining = normalized;
 
@@ -142,7 +134,6 @@ function parseSearchQuery(raw: string): SearchFilter {
     const value = match[5] ?? match[6];
     remaining = remaining.replace(match[0], '');
 
-    
     const values = value.split('/').map((v) => v.trim()).filter(Boolean);
 
     for (const val of values) {
@@ -188,7 +179,6 @@ function parseSearchQuery(raw: string): SearchFilter {
     }
   }
 
-  
   const leftover = remaining.trim();
   if (leftover) {
     
@@ -314,8 +304,6 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
   return true;
 }
 
-
-
 const CatalogCard = memo(function CatalogCard({
   card, allowed, inDeckCount, onAdd, onHover,
 }: {
@@ -356,8 +344,6 @@ const CatalogCard = memo(function CatalogCard({
   );
 });
 
-
-
 const CatalogMission = memo(function CatalogMission({
   card, allowed, onAdd, onHover,
 }: {
@@ -391,8 +377,6 @@ const CatalogMission = memo(function CatalogMission({
   );
 });
 
-
-
 const DeckCard = memo(function DeckCard({
   card, idx, onRemove, onHover,
 }: {
@@ -425,23 +409,17 @@ const DeckCard = memo(function DeckCard({
   );
 });
 
-
-
-
-
 export default function DeckBuilderPage() {
   const t = useTranslations();
   const locale = useLocale();
   const loc = locale as "en" | "fr";
   const { data: session, status } = useSession();
 
-  
   const [availableChars, setAvailableChars] = useState<CharacterCard[]>([]);
   const [availableMissions, setAvailableMissions] = useState<MissionCard[]>([]);
   const [allChars, setAllChars] = useState<CharacterCard[]>([]);
   const [allMissions, setAllMissions] = useState<MissionCard[]>([]);
 
-  
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearch = useDeferredValue(searchQuery);
   const [sortBy, setSortBy] = useState<SortField>('number');
@@ -452,7 +430,6 @@ export default function DeckBuilderPage() {
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  
   const [showSavedDecks, setShowSavedDecks] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
@@ -463,7 +440,6 @@ export default function DeckBuilderPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
-  
   const deckName = useDeckBuilderStore((s) => s.deckName);
   const deckChars = useDeckBuilderStore((s) => s.deckChars);
   const deckMissions = useDeckBuilderStore((s) => s.deckMissions);
@@ -499,7 +475,6 @@ export default function DeckBuilderPage() {
   const [deckViewMode, setDeckViewMode] = useState<DeckViewMode>('grid');
   const [deckGroupBy, setDeckGroupBy] = useState<DeckGroupBy>('chakra');
 
-  
   useEffect(() => {
     import("@/lib/data/cardLoader").then((mod) => {
       setAvailableChars(mod.getPlayableCharacters());
@@ -511,7 +486,6 @@ export default function DeckBuilderPage() {
 
   useEffect(() => { loadSavedDecks(); }, [loadSavedDecks]);
 
-  
   useEffect(() => {
     try {
       const pendingId = sessionStorage.getItem('loadDeckId');
@@ -522,7 +496,6 @@ export default function DeckBuilderPage() {
     } catch { /* SSR / privacy */ }
   }, [availableChars, availableMissions, loadDeck]);
 
-  
   useEffect(() => {
     if (addError) {
       const timer = setTimeout(() => clearAddError(), 3000);
@@ -530,15 +503,12 @@ export default function DeckBuilderPage() {
     }
   }, [addError, clearAddError]);
 
-  
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = prev; };
   }, []);
 
-
-  
   const parsedSearch = useMemo(() => parseSearchQuery(deferredSearch), [deferredSearch]);
 
   const filteredChars = useMemo(() => {
@@ -566,7 +536,6 @@ export default function DeckBuilderPage() {
     return [...availableMissions];
   }, [availableMissions, showBanned, bannedIds]);
 
-  
   const validation = useMemo(() => validateDeck(deckChars, deckMissions), [deckChars, deckMissions]);
 
   const deckCardCounts = useMemo(() => {
@@ -575,7 +544,6 @@ export default function DeckBuilderPage() {
     return counts;
   }, [deckChars]);
 
-  
   const allowedMap = useMemo(() => {
     const map = new Map<string, boolean>();
     for (const c of filteredChars) map.set(c.id, canAddChar(c).allowed);
@@ -601,7 +569,6 @@ export default function DeckBuilderPage() {
     return Array.from(groups.entries()).sort((a, b) => a[0] - b[0]);
   }, [deckChars]);
 
-  
   const deckGroupedRows = useMemo(() => {
     const groups = new Map<string, { card: CharacterCard; idx: number }[]>();
     deckChars.forEach((card, i) => {
@@ -653,7 +620,6 @@ export default function DeckBuilderPage() {
     });
   }, [deckChars, deckGroupBy]);
 
-  
   const previewAddCheck = useMemo(() => {
     if (!previewCard) return null;
     return previewCard.card_type !== 'mission'
@@ -662,7 +628,6 @@ export default function DeckBuilderPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [previewCard, deckChars, deckMissions]);
 
-  
   const handleAddChar = useCallback((card: CharacterCard) => addChar(card), [addChar]);
   const handleAddMission = useCallback((card: MissionCard) => addMission(card), [addMission]);
   const handleRemoveChar = useCallback((idx: number) => removeChar(idx), [removeChar]);
@@ -713,7 +678,6 @@ export default function DeckBuilderPage() {
     }
   }, [deleteDeck, localizeApiError]);
 
-  
   const handleImport = useCallback(() => {
     const code = importCode.trim();
     if (!code) return;
@@ -747,7 +711,6 @@ export default function DeckBuilderPage() {
       if (!match) { setImportMessage({ type: "error", text: t("deckBuilder.importError") }); return; }
       const rawCardId = match[1]; const qty = parseInt(match[2], 10);
 
-      
       const variantParsed = parseVariantFormat(rawCardId);
       if (variantParsed) {
         const candidates = charByNumber.get(variantParsed.num);
@@ -799,7 +762,6 @@ export default function DeckBuilderPage() {
     setImportCode("");
   }, [importCode, allChars, allMissions, clearDeck, setDeckName, addChar, addMission, t]);
 
-  
   const exportCode = useMemo(() => {
     const counts = new Map<string, number>();
     for (const c of deckChars) { const id = c.cardId || c.id; counts.set(id, (counts.get(id) || 0) + 1); }
@@ -816,10 +778,6 @@ export default function DeckBuilderPage() {
       setTimeout(() => setExportCopied(false), 2000);
     });
   }, [exportCode]);
-
-  
-  
-  
 
   if (status === 'loading') {
     return (
@@ -838,18 +796,14 @@ export default function DeckBuilderPage() {
             <div className="w-16 h-px mx-auto" style={{ backgroundColor: 'rgba(196, 163, 90, 0.3)' }} />
             <p className="text-sm" style={{ color: "#888888" }}>{t("online.signInRequired")}</p>
             <div className="flex gap-3">
-              <Link href="/login" className="px-6 py-2.5 text-sm font-bold uppercase tracking-wider" style={{ backgroundColor: "#c4a35a", color: "#0a0a0a", borderLeft: '3px solid #a88a3a' }}>{t("common.signIn")}</Link>
-              <Link href="/" className="px-6 py-2.5 text-sm" style={{ backgroundColor: "#141414", border: "1px solid #262626", borderLeft: '3px solid rgba(255,255,255,0.1)', color: "#888888" }}>{t("common.back")}</Link>
+              <Link href="/login" className="px-6 py-2.5 text-sm font-bold uppercase tracking-wider" style={{ backgroundColor: "#c4a35a", color: "#0a0a0a", }}>{t("common.signIn")}</Link>
+              <Link href="/" className="px-6 py-2.5 text-sm" style={{ backgroundColor: "#141414", border: "1px solid #262626", color: "#888888" }}>{t("common.back")}</Link>
             </div>
           </div>
         </div>
       </main>
     );
   }
-
-  
-  
-  
 
   const renderInfoContent = () => {
     if (!previewCard || !previewAddCheck) {
@@ -888,27 +842,22 @@ export default function DeckBuilderPage() {
           )}
         </div>
 
-        
         <div className="flex items-center gap-2 mb-1">
           <span className="text-[10px] uppercase font-bold px-1.5 py-0.5" style={{
             backgroundColor: isChar ? 'rgba(255,255,255,0.04)' : 'rgba(196,163,90,0.12)',
-            borderLeft: `2px solid ${isChar ? 'rgba(255,255,255,0.15)' : '#c4a35a'}`,
             color: isChar ? '#999' : '#c4a35a',
           }}>{isChar ? t("deckBuilder.characterCards") : t("deckBuilder.missionCards")}</span>
           <span className="text-[10px] uppercase font-bold px-1.5 py-0.5" style={{
-            backgroundColor: `${rarColor}12`, borderLeft: `2px solid ${rarColor}`, color: rarColor,
+            backgroundColor: `${rarColor}12`, color: rarColor,
           }}>{getRarityLabel(card.rarity, loc)}</span>
         </div>
 
-        
         <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{getCardName(card, loc)}</div>
         {isChar && <div className="text-[11px] mb-2" style={{ color: '#777' }}>{getCardTitle(charCard, loc)}</div>}
 
-        
         {isChar && (
           <div className="flex items-center gap-0 my-2 py-2" style={{
-            backgroundColor: 'rgba(255,255,255,0.02)', borderLeft: '3px solid rgba(196, 163, 90, 0.3)',
-          }}>
+            backgroundColor: 'rgba(255,255,255,0.02)', }}>
             <div className="flex-1 flex flex-col items-center">
               <span className="text-[9px] uppercase" style={{ color: '#777', letterSpacing: '0.08em' }}>{t("deckBuilder.chakra")}</span>
               <span className="text-lg font-bold tabular-nums" style={{ color: '#c4a35a' }}>{charCard.chakra}</span>
@@ -921,23 +870,20 @@ export default function DeckBuilderPage() {
           </div>
         )}
 
-        
         {isChar && charCard.group && (
           <div className="text-[10px] mb-1" style={{ color: '#6b8a6b' }}>{getCardGroup(charCard.group, loc)}</div>
         )}
 
-        
         {isChar && charCard.keywords && charCard.keywords.length > 0 && (
           <div className="flex gap-1 mt-1 mb-2 flex-wrap">
             {charCard.keywords.map((kw, i) => (
               <span key={i} className="text-[9px] px-1.5 py-0.5" style={{
-                backgroundColor: 'rgba(255,255,255,0.04)', borderLeft: '2px solid rgba(255,255,255,0.08)', color: '#999',
+                backgroundColor: 'rgba(255,255,255,0.04)', color: '#999',
               }}>{getCardKeyword(kw, loc)}</span>
             ))}
           </div>
         )}
 
-        
         {card.effects && card.effects.length > 0 && (
           <div className="flex flex-col gap-1.5 mt-2">
             {card.effects.map((eff, i) => {
@@ -947,7 +893,7 @@ export default function DeckBuilderPage() {
               const description = locale === 'fr' ? (frDescs?.[i] ?? eff.description) : (enDescs?.[i] ?? eff.description);
               const effColor = EFFECT_TYPE_COLORS[eff.type] ?? '#888';
               return (
-                <div key={i} className="py-1.5 px-2" style={{ borderLeft: `3px solid ${effColor}`, backgroundColor: `${effColor}08` }}>
+                <div key={i} className="py-1.5 px-2" style={{ backgroundColor: `${effColor}08` }}>
                   <span className="text-[10px] font-bold uppercase" style={{ color: effColor, letterSpacing: '0.06em' }}>{eff.type}</span>
                   <div className="text-[10px] leading-snug mt-0.5" style={{ color: '#bbb' }}>{description}</div>
                 </div>
@@ -956,7 +902,6 @@ export default function DeckBuilderPage() {
           </div>
         )}
 
-        
         <div className="mt-3">
           <AngularButton
             onClick={() => isChar ? addChar(charCard) : addMission(card as MissionCard)}
@@ -973,13 +918,6 @@ export default function DeckBuilderPage() {
     );
   };
 
-  
-  
-  
-
-  
-  
-  
   const [showSearchHelp, setShowSearchHelp] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
@@ -1010,7 +948,6 @@ export default function DeckBuilderPage() {
 
   const heroCards = ['/images/cards/KS/secret/KS-133-S.webp', '/images/cards/KS/mythos/KS-143-M.webp', '/images/cards/KS/secret/KS-136-S.webp', '/images/cards/KS/secret/KS-137-S.webp', '/images/cards/KS/mythos/KS-144-M.webp'];
 
-  
   const statsFilters = searchFilters.slice(0, 2);   // c, p
   const cardFilters = searchFilters.slice(2, 9);     // k, k+, k!, g, r, s, nv
   const effectFilters = searchFilters.slice(9);       // e, e text, em, emi, emc, eup, ea, es
@@ -1026,7 +963,7 @@ export default function DeckBuilderPage() {
         {examples.map((ex) => (
           <button key={ex} onClick={() => tryExample(ex)}
             className="font-body text-[11px] px-3 py-1 cursor-pointer"
-            style={{ backgroundColor: '#111111', color, borderBottom: `2px solid ${color}25` }}>
+            style={{ backgroundColor: '#111111', color, }}>
             {ex}
           </button>
         ))}
@@ -1046,7 +983,6 @@ export default function DeckBuilderPage() {
           maxWidth: '1050px',
           maxHeight: 'calc(100vh - 24px)',
           backgroundColor: '#0a0a0a',
-          border: '1px solid rgba(196, 163, 90, 0.08)',
           boxShadow: '0 0 80px rgba(0,0,0,0.6)',
         }}
         onClick={(e) => e.stopPropagation()}
@@ -1074,28 +1010,24 @@ export default function DeckBuilderPage() {
           </button>
         </div>
 
-        
         <div className="flex-1 overflow-y-auto py-5">
           <div className="max-w-4xl mx-auto px-5 sm:px-8">
 
-            
             <div className="mb-5 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
               <p className="font-body text-[11px] mb-2" style={{ color: '#888' }}>{t('deckBuilder.search.nameDesc')}</p>
               <div className="flex flex-wrap gap-1.5">
                 {['naruto', 'KS-133', 'sakura', 'orochimaru'].map((ex) => (
                   <button key={ex} onClick={() => tryExample(ex)}
                     className="font-body text-[11px] px-3 py-1.5 cursor-pointer"
-                    style={{ backgroundColor: '#111111', color: '#bbb', borderBottom: '2px solid rgba(255,255,255,0.06)' }}>
+                    style={{ backgroundColor: '#111111', color: '#bbb', }}>
                     {ex}
                   </button>
                 ))}
               </div>
             </div>
 
-            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
 
-              
               <div>
                 <span className="text-sm tracking-wider block mb-3" style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
                   {t('deckBuilder.search.statsHeader')}
@@ -1103,14 +1035,12 @@ export default function DeckBuilderPage() {
                 {statsFilters.map((f, i) => renderFilterRow(f, i, '#c4a35a'))}
               </div>
 
-
               <div>
                 <span className="text-sm tracking-wider block mb-3" style={{ color: '#3e8b3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
                   {t('deckBuilder.search.propertiesHeader')}
                 </span>
                 {cardFilters.map((f, i) => renderFilterRow(f, i, '#3e8b3e'))}
               </div>
-
 
               <div>
                 <span className="text-sm tracking-wider block mb-3" style={{ color: '#b33e3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
@@ -1123,7 +1053,6 @@ export default function DeckBuilderPage() {
               </div>
             </div>
 
-            
             <div className="pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
               <span className="text-sm tracking-wider block mb-1" style={{ color: '#6a6abb', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
                 {t('deckBuilder.search.combineTitle')}
@@ -1145,7 +1074,7 @@ export default function DeckBuilderPage() {
                 ].map(({ query, desc }) => (
                   <button key={query} onClick={() => tryExample(query)}
                     className="flex flex-col items-start text-left px-4 py-2 cursor-pointer"
-                    style={{ backgroundColor: '#0e0e0e', borderLeft: '3px solid rgba(106,106,187,0.3)' }}>
+                    style={{ backgroundColor: '#0e0e0e', }}>
                     <span className="font-body text-[11px] font-medium" style={{ color: '#c4a35a' }}>{query}</span>
                     <span className="font-body text-[10px] mt-0.5" style={{ color: '#555' }}>{desc}</span>
                   </button>
@@ -1157,10 +1086,6 @@ export default function DeckBuilderPage() {
       </div>
     </div>
   ) : null;
-
-  
-  
-  
 
   const renderDeckContent = () => (
     <>
@@ -1213,7 +1138,6 @@ export default function DeckBuilderPage() {
 
       <SectionDivider width={100} />
 
-      
       <div className="flex items-center gap-2 mb-2 flex-wrap">
         <button onClick={deckChars.length > 1 ? sortCharsByCost : undefined}
           className="px-2 py-0.5 text-[9px] uppercase font-bold"
@@ -1267,7 +1191,6 @@ export default function DeckBuilderPage() {
         )}
       </div>
 
-      
       {deckViewMode === 'grid' ? (
         <div className="grid gap-0.5" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
           {Array.from({ length: Math.max(30, deckChars.length) }).map((_, i) => {
@@ -1323,17 +1246,11 @@ export default function DeckBuilderPage() {
     </>
   );
 
-  
-  
-  
-
   return (
     <main id="main-content" className="relative" style={{ backgroundColor: '#0a0a0a', height: '100vh', overflow: 'hidden' }}>
 
-      
       <div className="hidden lg:flex relative z-10" style={{ height: '100vh' }}>
 
-        
         <div className="flex flex-col flex-shrink-0" style={{
           width: '250px',
           backgroundColor: 'rgba(10, 10, 10, 0.95)',
@@ -1348,7 +1265,6 @@ export default function DeckBuilderPage() {
           {renderInfoContent()}
         </div>
 
-        
         <div className="flex-1 flex flex-col overflow-hidden" style={{ minWidth: 0 }}>
           
           <div className="flex items-center gap-3 px-4 py-2 flex-shrink-0" style={{
@@ -1363,7 +1279,7 @@ export default function DeckBuilderPage() {
               className="flex-1 min-w-[120px] max-w-[280px] px-2 py-1 text-xs focus:outline-none"
               style={{
                 backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)',
-                borderLeft: '3px solid rgba(196, 163, 90, 0.3)', color: '#e0e0e0',
+                color: '#e0e0e0',
               }}
             />
             <div className="flex items-center gap-2 text-[10px] flex-shrink-0">
@@ -1377,21 +1293,19 @@ export default function DeckBuilderPage() {
               {validation.valid && <span style={{ color: '#3e8b3e' }}>{t("deckBuilder.validation.valid")}</span>}
               {loadedDeckId && (
                 <span className="text-[8px] uppercase px-1.5 py-0.5" style={{
-                  backgroundColor: 'rgba(62, 139, 62, 0.15)', borderLeft: '2px solid #3e8b3e', color: '#3e8b3e',
+                  backgroundColor: 'rgba(62, 139, 62, 0.15)', color: '#3e8b3e',
                 }}>{t("deckBuilder.currentlyEditing")}</span>
               )}
             </div>
           </div>
 
-          
           {(saveError || addError) && (
             <div className="px-4 py-1 flex-shrink-0">
               <div className="text-[10px] py-1 px-2" style={{
-                borderLeft: '3px solid #b33e3e', backgroundColor: 'rgba(179,62,62,0.08)', color: '#b33e3e',
+                backgroundColor: 'rgba(179,62,62,0.08)', color: '#b33e3e',
               }}>{addError ? (addErrorKey ? t(addErrorKey, addErrorParams ?? {}) : addError) : saveError}</div>
             </div>
           )}
-
 
           <div className="flex-1 overflow-y-auto px-4 py-3" style={{ minHeight: 0 }}>
             {evolvingMode && (
@@ -1402,7 +1316,6 @@ export default function DeckBuilderPage() {
             {renderDeckContent()}
           </div>
 
-          
           <div className="flex items-center gap-2 px-4 py-2 flex-shrink-0 flex-wrap" style={{
             borderTop: '1px solid rgba(255,255,255,0.04)', backgroundColor: 'rgba(10, 10, 10, 0.9)',
           }}>
@@ -1414,8 +1327,7 @@ export default function DeckBuilderPage() {
             <AngularButton onClick={() => setShowExportModal(true)} variant="muted" disabled={deckChars.length === 0} size="sm">{t("deckBuilder.exportButton")}</AngularButton>
             <Link href="/deck-builder/manage" className="text-center text-[10px] uppercase font-bold py-1.5 px-3 no-select inline-block"
               style={{
-                backgroundColor: 'rgba(196,163,90,0.08)', borderLeft: '3px solid rgba(196,163,90,0.5)',
-                color: '#c4a35a', letterSpacing: '0.1em', transform: 'skewX(-3deg)',
+                backgroundColor: 'rgba(196,163,90,0.08)', color: '#c4a35a', letterSpacing: '0.1em', transform: 'skewX(-3deg)',
               }}>
               <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>{t("deckManager.manageButton")}</span>
             </Link>
@@ -1424,7 +1336,6 @@ export default function DeckBuilderPage() {
           </div>
         </div>
 
-        
         <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{
           width: '540px',
           backgroundColor: 'rgba(10, 10, 10, 0.95)',
@@ -1448,7 +1359,6 @@ export default function DeckBuilderPage() {
 
           <div className="h-px mx-3" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }} />
 
-          
           <div className="px-3 pt-2 pb-2 flex-shrink-0">
             <div className="flex items-center gap-1.5">
               <input
@@ -1459,13 +1369,13 @@ export default function DeckBuilderPage() {
                 className="flex-1 min-w-0 px-2.5 py-1.5 text-xs focus:outline-none"
                 style={{
                   backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)',
-                  borderLeft: '3px solid rgba(196, 163, 90, 0.25)', color: '#e0e0e0',
+                  color: '#e0e0e0',
                 }}
               />
               <button
                 onClick={() => setShowSearchHelp(true)}
                 className="font-body text-[10px] font-bold px-3 py-1.5 cursor-pointer shrink-0 whitespace-nowrap"
-                style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}
+                style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', color: '#c4a35a' }}
               >
                 ?
               </button>
@@ -1474,7 +1384,7 @@ export default function DeckBuilderPage() {
                 <button
                   onClick={() => setShowSortDropdown((v) => !v)}
                   className="font-body text-[10px] font-bold px-3 py-1.5 cursor-pointer shrink-0 whitespace-nowrap"
-                  style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}
+                  style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', color: '#c4a35a' }}
                 >
                   {'\u21C5'}
                 </button>
@@ -1514,7 +1424,6 @@ export default function DeckBuilderPage() {
             </div>
           </div>
 
-          
           {bannedIds.size > 0 && (
             <div className="px-3 pb-1 flex-shrink-0">
               <button
@@ -1522,7 +1431,6 @@ export default function DeckBuilderPage() {
                 className="text-[9px] uppercase font-bold px-2 py-1"
                 style={{
                   backgroundColor: showBanned ? 'rgba(179,62,62,0.1)' : 'rgba(62,139,62,0.1)',
-                  borderLeft: `2px solid ${showBanned ? '#b33e3e' : '#3e8b3e'}`,
                   color: showBanned ? '#b33e3e' : '#3e8b3e',
                 }}
               >
@@ -1532,14 +1440,12 @@ export default function DeckBuilderPage() {
             </div>
           )}
 
-          
           <div className="px-3 pb-1 flex-shrink-0">
             <button
               onClick={() => setShowAltArt(!showAltArt)}
               className="text-[9px] uppercase font-bold px-2 py-1"
               style={{
                 backgroundColor: showAltArt ? 'rgba(196,163,90,0.1)' : 'rgba(136,136,136,0.08)',
-                borderLeft: `2px solid ${showAltArt ? '#c4a35a' : '#555'}`,
                 color: showAltArt ? '#c4a35a' : '#555',
               }}
             >
@@ -1570,7 +1476,6 @@ export default function DeckBuilderPage() {
         </div>
       </div>
 
-      
       <div className="lg:hidden flex flex-col relative z-10" style={{ height: '100dvh' }}>
 
         <div className="flex items-center gap-2 px-2 flex-shrink-0" style={{
@@ -1587,7 +1492,7 @@ export default function DeckBuilderPage() {
           <input type="text" placeholder={t("deckBuilder.deckName")} value={deckName}
             onChange={(e) => setDeckName(e.target.value)}
             className="flex-1 min-w-0 px-2 py-2 text-xs focus:outline-none"
-            style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', borderLeft: '3px solid rgba(196,163,90,0.3)', color: '#e0e0e0' }}
+            style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
           />
           <button
             onClick={() => setMobileMenuOpen(true)}
@@ -1595,13 +1500,11 @@ export default function DeckBuilderPage() {
             style={{
               width: 32, height: 32,
               backgroundColor: 'rgba(196,163,90,0.08)',
-              border: '1px solid rgba(196,163,90,0.3)',
               color: '#c4a35a', fontSize: 18, lineHeight: 1,
             }}
             aria-label={t("common.menu")}
           >{'\u22EE'}</button>
         </div>
-
 
         <div className="flex items-center gap-1.5 px-3 py-1.5 flex-shrink-0" style={{
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
@@ -1609,22 +1512,20 @@ export default function DeckBuilderPage() {
         }}>
           <span className="text-[10px] tabular-nums font-bold px-1.5 py-0.5 flex-shrink-0" style={{
             backgroundColor: deckChars.length >= 30 ? 'rgba(62,139,62,0.12)' : 'rgba(179,62,62,0.1)',
-            borderLeft: `2px solid ${deckChars.length >= 30 ? '#3e8b3e' : '#b33e3e'}`,
             color: deckChars.length >= 30 ? '#3e8b3e' : '#b33e3e',
           }}>{deckChars.length}/30</span>
           <span className="text-[10px] tabular-nums font-bold px-1.5 py-0.5 flex-shrink-0" style={{
             backgroundColor: deckMissions.length === 3 ? 'rgba(62,139,62,0.12)' : 'rgba(179,62,62,0.1)',
-            borderLeft: `2px solid ${deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e'}`,
             color: deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e',
           }}>{deckMissions.length}/3 M</span>
           {validation.valid && (
             <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 flex-shrink-0" style={{
-              backgroundColor: 'rgba(62,139,62,0.12)', borderLeft: '2px solid #3e8b3e', color: '#3e8b3e',
+              backgroundColor: 'rgba(62,139,62,0.12)', color: '#3e8b3e',
             }}>{t("deckBuilder.validation.valid")}</span>
           )}
           {loadedDeckId && (
             <span className="text-[8px] uppercase font-bold px-1.5 py-0.5 flex-shrink-0 truncate" style={{
-              backgroundColor: 'rgba(196,163,90,0.1)', borderLeft: '2px solid rgba(196,163,90,0.5)', color: '#c4a35a',
+              backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a',
               maxWidth: '110px',
             }}>{t("deckBuilder.currentlyEditing")}</span>
           )}
@@ -1633,7 +1534,6 @@ export default function DeckBuilderPage() {
           </div>
           <div className="flex-1 min-w-0" />
         </div>
-
 
         <div className="flex flex-shrink-0" style={{
           backgroundColor: 'rgba(10, 10, 10, 0.88)',
@@ -1658,15 +1558,13 @@ export default function DeckBuilderPage() {
           })}
         </div>
 
-
         {(saveError || addError) && (
           <div className="px-3 py-1.5 flex-shrink-0">
             <div className="text-[10px] py-1.5 px-2" style={{
-              borderLeft: '3px solid #b33e3e', backgroundColor: 'rgba(179,62,62,0.08)', color: '#b33e3e',
+              backgroundColor: 'rgba(179,62,62,0.08)', color: '#b33e3e',
             }}>{addError ? (addErrorKey ? t(addErrorKey, addErrorParams ?? {}) : addError) : saveError}</div>
           </div>
         )}
-
 
         <div ref={mobileScrollRef} className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
           {evolvingMode && (
@@ -1682,18 +1580,18 @@ export default function DeckBuilderPage() {
                   <input type="text" placeholder={t("collection.search")} value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="flex-1 min-w-0 px-2.5 py-2 text-xs focus:outline-none"
-                    style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', borderLeft: '3px solid rgba(196,163,90,0.25)', color: '#e0e0e0' }}
+                    style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
                   />
                   <button
                     onClick={() => setShowSearchHelp(true)}
                     className="font-body text-[11px] font-bold cursor-pointer shrink-0"
-                    style={{ width: 34, height: 34, backgroundColor: 'rgba(196,163,90,0.08)', border: '1px solid rgba(196,163,90,0.3)', color: '#c4a35a' }}
+                    style={{ width: 34, height: 34, backgroundColor: 'rgba(196,163,90,0.08)', color: '#c4a35a' }}
                   >?</button>
                   <div className="relative">
                     <button
                       onClick={() => setShowSortDropdown((v) => !v)}
                       className="font-body text-[12px] font-bold cursor-pointer shrink-0"
-                      style={{ width: 34, height: 34, backgroundColor: 'rgba(196,163,90,0.08)', border: '1px solid rgba(196,163,90,0.3)', color: '#c4a35a' }}
+                      style={{ width: 34, height: 34, backgroundColor: 'rgba(196,163,90,0.08)', color: '#c4a35a' }}
                     >{'\u21C5'}</button>
                     {showSortDropdown && (
                       <>
@@ -1733,7 +1631,6 @@ export default function DeckBuilderPage() {
                     className="text-[9px] uppercase font-bold px-2 py-0.5"
                     style={{
                       backgroundColor: showAltArt ? 'rgba(196,163,90,0.1)' : 'rgba(136,136,136,0.06)',
-                      borderLeft: `2px solid ${showAltArt ? '#c4a35a' : '#555'}`,
                       color: showAltArt ? '#c4a35a' : '#666',
                     }}
                   >{showAltArt ? t("deckBuilder.hideAlt") : t("deckBuilder.showAlt")}</button>
@@ -1743,14 +1640,12 @@ export default function DeckBuilderPage() {
                       className="text-[9px] uppercase font-bold px-2 py-0.5"
                       style={{
                         backgroundColor: showBanned ? 'rgba(179,62,62,0.08)' : 'rgba(62,139,62,0.08)',
-                        borderLeft: `2px solid ${showBanned ? '#b33e3e' : '#3e8b3e'}`,
                         color: showBanned ? '#b33e3e' : '#3e8b3e',
                       }}
                     >{showBanned ? t("deckBuilder.hideBanned") : t("deckBuilder.showBanned")} ({bannedIds.size})</button>
                   )}
                 </div>
               </div>
-
 
               <span className="text-[10px] uppercase font-bold block mb-1.5 mt-1" style={{ color: '#888', letterSpacing: '0.08em' }}>{t("deckBuilder.missionCards")}</span>
               <div className="grid grid-cols-5 gap-1.5 mb-3">
@@ -1761,7 +1656,6 @@ export default function DeckBuilderPage() {
               </div>
 
               <div className="h-px my-2" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }} />
-
 
               <span className="text-[10px] uppercase font-bold block mb-1.5" style={{ color: '#888', letterSpacing: '0.08em' }}>
                 {t("deckBuilder.characters", { count: filteredChars.length })}
@@ -1790,7 +1684,6 @@ export default function DeckBuilderPage() {
             </div>
           )}
         </div>
-
 
         <div className="flex-shrink-0 px-3 py-2 flex items-center gap-2" style={{
           backgroundColor: 'rgba(10, 10, 10, 0.96)',
@@ -1826,7 +1719,6 @@ export default function DeckBuilderPage() {
               style={{
                 width: 44, height: 44,
                 backgroundColor: 'rgba(196,163,90,0.08)',
-                border: '1px solid rgba(196,163,90,0.3)',
                 color: '#c4a35a', fontSize: 14, lineHeight: 1,
                 fontWeight: 'bold',
               }}
@@ -1834,7 +1726,6 @@ export default function DeckBuilderPage() {
             >{'\u2139'}</button>
           )}
         </div>
-
 
         {mobileDetailOpen && previewCard && (
           <div
@@ -1849,7 +1740,6 @@ export default function DeckBuilderPage() {
               style={{
                 maxHeight: '92dvh',
                 backgroundColor: '#0a0a0a',
-                borderTop: '2px solid rgba(196,163,90,0.4)',
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -1874,7 +1764,6 @@ export default function DeckBuilderPage() {
           </div>
         )}
 
-
         {mobileMenuOpen && (
           <div
             className="fixed inset-0 z-50 flex items-end"
@@ -1887,7 +1776,6 @@ export default function DeckBuilderPage() {
               className="w-full flex flex-col gap-2 px-4 py-4"
               style={{
                 backgroundColor: '#0a0a0a',
-                borderTop: '2px solid rgba(196,163,90,0.4)',
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -1897,29 +1785,29 @@ export default function DeckBuilderPage() {
               <button
                 onClick={() => { setShowSavedDecks(true); setMobileMenuOpen(false); }}
                 className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer"
-                style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderLeft: '3px solid rgba(196,163,90,0.5)', color: '#c4a35a', letterSpacing: '0.08em' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: '#c4a35a', letterSpacing: '0.08em' }}
               >{t("deckBuilder.loadDeck")}</button>
               <button
                 onClick={() => { setShowImportModal(true); setMobileMenuOpen(false); }}
                 className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer"
-                style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderLeft: '3px solid rgba(74,122,181,0.5)', color: '#4a7ab5', letterSpacing: '0.08em' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: '#4a7ab5', letterSpacing: '0.08em' }}
               >{t("deckBuilder.importButton")}</button>
               <button
                 onClick={() => { setShowExportModal(true); setMobileMenuOpen(false); }}
                 disabled={deckChars.length === 0}
                 className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
-                style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderLeft: '3px solid rgba(196,163,90,0.5)', color: '#c4a35a', letterSpacing: '0.08em' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: '#c4a35a', letterSpacing: '0.08em' }}
               >{t("deckBuilder.exportButton")}</button>
               <Link
                 href="/deck-builder/manage"
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer"
-                style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderLeft: '3px solid rgba(196,163,90,0.5)', color: '#c4a35a', letterSpacing: '0.08em', display: 'block' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: '#c4a35a', letterSpacing: '0.08em', display: 'block' }}
               >{t("deckManager.manageButton")}</Link>
               <button
                 onClick={() => { clearDeck(); setMobileMenuOpen(false); }}
                 className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer mt-1"
-                style={{ backgroundColor: 'rgba(179,62,62,0.08)', borderLeft: '3px solid rgba(179,62,62,0.5)', color: '#b33e3e', letterSpacing: '0.08em' }}
+                style={{ backgroundColor: 'rgba(179,62,62,0.08)', color: '#b33e3e', letterSpacing: '0.08em' }}
               >{t("deckBuilder.clearDeck")}</button>
               <button
                 onClick={() => setMobileMenuOpen(false)}
@@ -1931,12 +1819,8 @@ export default function DeckBuilderPage() {
         )}
       </div>
 
-      
-
-      
       {renderSearchHelp()}
 
-      
       {showSavedDecks && (
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="480px">
@@ -1951,7 +1835,6 @@ export default function DeckBuilderPage() {
                   <EvolvingDeckHolo key={deck.id} points={deck.evolvingPoints ?? 0} enabled={deck.evolvingCompatible === true} intensity="subtle">
                   <div className="flex items-center gap-3 px-3 py-2" style={{
                     backgroundColor: 'rgba(255,255,255,0.02)',
-                    borderLeft: `3px solid ${isActive ? '#3e8b3e' : 'rgba(196,163,90,0.2)'}`,
                   }}>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -1959,7 +1842,7 @@ export default function DeckBuilderPage() {
                         {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints ?? 0} />}
                         {isActive && (
                           <span className="text-[8px] uppercase px-1 py-0.5 flex-shrink-0" style={{
-                            backgroundColor: 'rgba(62,139,62,0.15)', borderLeft: '2px solid #3e8b3e', color: '#3e8b3e',
+                            backgroundColor: 'rgba(62,139,62,0.15)', color: '#3e8b3e',
                           }}>{t("deckBuilder.currentlyEditing")}</span>
                         )}
                       </div>
@@ -2000,18 +1883,17 @@ export default function DeckBuilderPage() {
         </PopupOverlay>
       )}
 
-      
       {showImportModal && (
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(74, 122, 181, 0.35)" maxWidth="480px">
             <PopupTitle accentColor="#4a7ab5" size="lg">{t("deckBuilder.importTitle")}</PopupTitle>
-            <p className="text-xs mb-3" style={{ color: '#888', borderLeft: '3px solid rgba(74,122,181,0.3)', paddingLeft: '8px' }}>
+            <p className="text-xs mb-3" style={{ color: '#888', paddingLeft: '8px' }}>
               {t("deckBuilder.importDesc")}
             </p>
             <div className="mb-3">
               <a href="https://exburst.dev/naruto/deckbuilder" target="_blank" rel="noopener noreferrer"
                 className="inline-block text-[10px] uppercase font-bold px-3 py-1.5"
-                style={{ backgroundColor: 'rgba(74,122,181,0.12)', borderLeft: '3px solid #4a7ab5', color: '#4a7ab5', letterSpacing: '0.08em' }}>
+                style={{ backgroundColor: 'rgba(74,122,181,0.12)', color: '#4a7ab5', letterSpacing: '0.08em' }}>
                 {t("deckBuilder.importVisit")}
               </a>
             </div>
@@ -2020,7 +1902,7 @@ export default function DeckBuilderPage() {
                 onChange={(e) => setImportCode(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") handleImport(); }}
                 className="flex-1 px-3 py-1.5 text-xs font-mono focus:outline-none"
-                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', borderLeft: '3px solid rgba(74,122,181,0.3)', color: '#e0e0e0' }}
+                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
               />
               <PopupActionButton accentColor="#3e8b3e" onClick={handleImport} disabled={!importCode.trim()}>
                 {t("deckBuilder.importButton")}
@@ -2028,7 +1910,6 @@ export default function DeckBuilderPage() {
             </div>
             {importMessage && (
               <div className="text-xs mb-3 py-1 px-2" style={{
-                borderLeft: `3px solid ${importMessage.type === 'success' ? '#3e8b3e' : '#b33e3e'}`,
                 backgroundColor: importMessage.type === 'success' ? 'rgba(62,139,62,0.08)' : 'rgba(179,62,62,0.08)',
                 color: importMessage.type === 'success' ? '#3e8b3e' : '#b33e3e',
               }}>{importMessage.text}</div>
@@ -2038,7 +1919,6 @@ export default function DeckBuilderPage() {
         </PopupOverlay>
       )}
 
-      
       {showExportModal && (
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="480px">
@@ -2048,14 +1928,14 @@ export default function DeckBuilderPage() {
                 {t("deckBuilder.exportAsImage")}
               </PopupActionButton>
             </div>
-            <p className="text-xs mb-2" style={{ color: '#888', borderLeft: '3px solid rgba(196,163,90,0.3)', paddingLeft: '8px' }}>
+            <p className="text-xs mb-2" style={{ color: '#888', paddingLeft: '8px' }}>
               {t("deckBuilder.exportTextDesc")}
             </p>
             <div className="flex items-center gap-2 mb-3">
               <input type="text" readOnly value={exportCode}
                 onClick={(e) => (e.target as HTMLInputElement).select()}
                 className="flex-1 px-3 py-1.5 text-xs font-mono focus:outline-none"
-                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', borderLeft: '3px solid rgba(196,163,90,0.3)', color: '#e0e0e0' }}
+                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
               />
               <PopupActionButton accentColor={exportCopied ? '#3e8b3e' : '#c4a35a'} onClick={handleCopyExportCode}>
                 {exportCopied ? t("deckBuilder.exportCopied") : t("deckBuilder.exportCopy")}
@@ -2066,7 +1946,6 @@ export default function DeckBuilderPage() {
         </PopupOverlay>
       )}
 
-      
       {overwriteConflict && (
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(179, 62, 62, 0.35)" maxWidth="400px">

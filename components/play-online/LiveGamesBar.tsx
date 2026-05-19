@@ -85,8 +85,8 @@ export function LiveGamesBar() {
         </div>
       ) : (
         <div
-          className="flex gap-2 px-2 py-2 overflow-x-auto"
-          style={{ scrollSnapType: 'x mandatory' }}
+          className="flex flex-col gap-1.5 px-2 py-2 overflow-y-auto"
+          style={{ maxHeight: 320 }}
         >
           {publicGames.map((g) => (
             <LiveGameCard
@@ -130,13 +130,10 @@ function LiveGameCard({ game, loading, onSpectate }: { game: LiveGame; loading: 
     <motion.div
       animate={isWaiting ? { opacity: [0.92, 1, 0.92] } : { opacity: 1 }}
       transition={isWaiting ? { duration: 4, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.2 }}
-      className="flex flex-col gap-1.5 px-3 py-2.5 cursor-pointer shrink-0 no-select"
+      className="flex flex-col gap-1.5 px-3 py-2 cursor-pointer no-select w-full"
       onClick={onSpectate}
       style={{
         backgroundColor: game.isEvolving ? 'rgba(10, 10, 14, 0.55)' : 'rgba(15, 15, 20, 0.85)',
-        scrollSnapAlign: 'start',
-        minWidth: 200,
-        maxWidth: 260,
         position: 'relative',
         zIndex: 1,
       }}
@@ -200,8 +197,7 @@ function LiveGameCard({ game, loading, onSpectate }: { game: LiveGame; loading: 
       hue={game.holoHue}
       intensity="banner"
       motion={isWaiting || isLatePhase ? 'active' : 'idle'}
-      className="shrink-0 overflow-hidden"
-      style={{ scrollSnapAlign: 'start' }}
+      className="w-full overflow-hidden"
     >
       {card}
     </HoloSurface>

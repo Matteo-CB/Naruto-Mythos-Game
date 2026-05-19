@@ -114,6 +114,8 @@ export interface RoomData {
   chessClockTickTimer: ReturnType<typeof setInterval> | null;
   chessClockMulliganTimer: ReturnType<typeof setTimeout> | null;
   chessClockLastInputKey: string | null;
+  player1DisconnectedAt?: number | null;
+  player2DisconnectedAt?: number | null;
 }
 
 function clearChessClockTimers(room: RoomData): void {
@@ -361,6 +363,63 @@ export function stopChessClockTickLoop(room: RoomData): void {
   if (room.chessClockTickTimer) {
     clearInterval(room.chessClockTickTimer);
     room.chessClockTickTimer = null;
+  }
+}
+
+
+
+
+const CHESS_CLOCK_WATCHDOG_INTERVAL_MS = 30_000;
+
+
+
+
+const DISCONNECT_HARD_FORFEIT_MS = 15 * 60 * 1000;
+
+
+export function chessClockWatchdog(io: SocketIOServer): void {
+  const now = Date.now();
+  for (const [code, room] of rooms.entries()) {
+    if (!room.gameState || room.finalized) continue;
+    if (room.gameState.phase === 'gameOver') continue;
+    if (room.gameState.phase === 'mulligan') continue;
+
+    try {
+      const needed = whoseInputIsAwaited(room.gameState);
+      const active = room.chessClock.active;
+
+
+      if (needed && active !== needed) {
+        console.warn(`[ChessClockWatchdog] ${code}: clock active=${active} but input needed from ${needed}, re-syncing`);
+        syncChessClock(room, now);
+      }
+
+
+      if (room.chessClock.active && !room.chessClockTickTimer) {
+        console.warn(`[ChessClockWatchdog] ${code}: tick timer missing while clock active=${room.chessClock.active}, restarting`);
+        startChessClockTickLoop(room, io);
+      }
+
+
+      onChessClockTick(room, io);
+      if (room.finalized) continue;
+
+
+      const p1Disc = room.player1DisconnectedAt;
+      const p2Disc = room.player2DisconnectedAt;
+      if (p1Disc && (now - p1Disc) > DISCONNECT_HARD_FORFEIT_MS) {
+        console.warn(`[ChessClockWatchdog] ${code}: player1 disconnected ${Math.round((now - p1Disc) / 1000)}s, force forfeit (failsafe)`);
+        handleChessClockExpiry(room, 'player1', io, 'idle-second');
+        continue;
+      }
+      if (p2Disc && (now - p2Disc) > DISCONNECT_HARD_FORFEIT_MS) {
+        console.warn(`[ChessClockWatchdog] ${code}: player2 disconnected ${Math.round((now - p2Disc) / 1000)}s, force forfeit (failsafe)`);
+        handleChessClockExpiry(room, 'player2', io, 'idle-second');
+        continue;
+      }
+    } catch (err) {
+      console.error(`[ChessClockWatchdog] ${code} error:`, err instanceof Error ? err.message : err);
+    }
   }
 }
 
@@ -1310,6 +1369,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
   setInterval(() => cleanupStaleRooms(), 60_000);
 
+
+  setInterval(() => {
+    try { chessClockWatchdog(io); } catch (err) {
+      console.error('[ChessClockWatchdog] tick error:', err instanceof Error ? err.message : err);
+    }
+  }, CHESS_CLOCK_WATCHDOG_INTERVAL_MS);
+
   
   setInterval(async () => {
     try {
@@ -1435,11 +1501,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       console.log(`[Socket] game:rejoin: ${player} reconnecting in room ${roomCode}, old socket: ${oldSocketId}, new socket: ${socket.id}`);
 
-      
+
       if (isHost) {
         room.hostSocket = socket.id;
+        room.player1DisconnectedAt = null;
       } else {
         room.guestSocket = socket.id;
+        room.player2DisconnectedAt = null;
       }
 
 
@@ -3154,6 +3222,15 @@ export function setupSocketHandlers(io: SocketIOServer) {
             const opponentSock = isHost ? room.guestSocket : room.hostSocket;
             if (opponentSock) {
               io.to(opponentSock).emit('game:opponent-disconnected');
+            }
+
+
+            if (isHost) {
+              if (room.hostSocket === socket.id) room.hostSocket = '';
+              room.player1DisconnectedAt = Date.now();
+            } else {
+              if (room.guestSocket === socket.id) room.guestSocket = null;
+              room.player2DisconnectedAt = Date.now();
             }
           } else if (room.isSealed && room.guestId && !room.gameState) {
             console.log(`[Socket] ${player} disconnected during sealed deck-building in room ${code}`);

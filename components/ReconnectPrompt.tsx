@@ -15,8 +15,7 @@ export function ReconnectPrompt() {
 
   const handleReconnect = () => {
     acceptReconnect();
-    
-    
+
     const checkState = () => {
       const ss = useSocketStore.getState();
       if (ss.visibleState || ss.gameStarted) {

@@ -16,10 +16,6 @@ import type {
   SpotErrorQuestion,
 } from '@/lib/quiz/questionGenerator';
 
-
-
-
-
 const TIME_LIMITS: Record<number, number> = {
   1: 30,
   2: 25,
@@ -37,10 +33,6 @@ const BORDER = '#262626';
 const TEXT_LIGHT = '#cccccc';
 const TEXT_DIM = '#888888';
 
-
-
-
-
 function extractCardInfoFromPath(imagePath: string): { number: string; name: string } {
   const path = imagePath.replace(/\\/g, '/');
   
@@ -53,10 +45,6 @@ function extractCardInfoFromPath(imagePath: string): { number: string; name: str
   return { number: '', name: filename };
 }
 
-
-
-
-
 const NO_BLUR_QUESTION_KEYS = new Set([
   'quiz.q.identifyCard',
   'quiz.q.identifyMission',
@@ -66,10 +54,6 @@ const NO_BLUR_QUESTION_KEYS = new Set([
 function shouldBlurImage(questionTextKey: string, hasImage: boolean): boolean {
   return hasImage && !NO_BLUR_QUESTION_KEYS.has(questionTextKey);
 }
-
-
-
-
 
 function seededShuffle<T>(arr: T[], seed: string): T[] {
   let s = 0;
@@ -87,11 +71,6 @@ function seededShuffle<T>(arr: T[], seed: string): T[] {
   }
   return result;
 }
-
-
-
-
-
 
 function isNameAtBottom(src?: string): boolean {
   if (!src) return false;
@@ -147,10 +126,6 @@ function CardThumbnail({
   );
 }
 
-
-
-
-
 function TimerBar({
   timeRemaining,
   timeLimit,
@@ -185,10 +160,6 @@ function TimerBar({
     </div>
   );
 }
-
-
-
-
 
 function TopBar({ timeLimit }: { timeLimit: number }) {
   const t = useTranslations('learn');
@@ -229,7 +200,6 @@ function TopBar({ timeLimit }: { timeLimit: number }) {
         </div>
       </div>
 
-
       <TimerBar timeRemaining={timeRemaining} timeLimit={timeLimit} />
       <div className="text-right mt-1">
         <span className="text-xs tabular-nums" style={{ color: TEXT_DIM }}>
@@ -239,10 +209,6 @@ function TopBar({ timeLimit }: { timeLimit: number }) {
     </div>
   );
 }
-
-
-
-
 
 function QuestionImage({
   src,
@@ -343,10 +309,6 @@ function QuestionImage({
   );
 }
 
-
-
-
-
 function ExplanationPanel({
   question,
   isCorrect,
@@ -406,10 +368,6 @@ function ExplanationPanel({
     </motion.div>
   );
 }
-
-
-
-
 
 function MultipleChoiceRenderer({
   question,
@@ -487,10 +445,6 @@ function MultipleChoiceRenderer({
   );
 }
 
-
-
-
-
 function TrueFalseRenderer({
   question,
   onSubmit,
@@ -560,10 +514,6 @@ function TrueFalseRenderer({
   );
 }
 
-
-
-
-
 function MatchPairsRenderer({
   question,
   onSubmit,
@@ -583,14 +533,12 @@ function MatchPairsRenderer({
   const pairs = question.pairs;
   const pairCount = pairs.length;
 
-  
   const [mapping, setMapping] = useState<Record<number, number>>({});
   
   const [clickSelected, setClickSelected] = useState<number | null>(null);
   
   const [dragOverZone, setDragOverZone] = useState<number | null>(null);
 
-  
   const shuffledRight = useMemo(
     () =>
       seededShuffle(
@@ -600,13 +548,11 @@ function MatchPairsRenderer({
     [pairs, question.id]
   );
 
-  
   const placedRight = new Set(Object.values(mapping));
   const poolItems = shuffledRight.filter((i) => !placedRight.has(i));
 
   const allPlaced = Object.keys(mapping).length === pairCount;
 
-  
   const handleDragStart = useCallback(
     (e: React.DragEvent, rightIdx: number) => {
       e.dataTransfer.setData('text/plain', String(rightIdx));
@@ -649,7 +595,6 @@ function MatchPairsRenderer({
     []
   );
 
-  
   const handlePoolClick = useCallback(
     (rightIdx: number) => {
       if (showingAnswer) return;
@@ -687,13 +632,11 @@ function MatchPairsRenderer({
     [showingAnswer, clickSelected, mapping]
   );
 
-  
   const handleSubmit = useCallback(() => {
     if (!allPlaced || showingAnswer) return;
     onSubmit({ type: 'matchPairs', mapping });
   }, [allPlaced, showingAnswer, mapping, onSubmit]);
 
-  
   const userMapping =
     userAnswer && userAnswer.type === 'matchPairs' ? userAnswer.mapping : null;
 
@@ -708,7 +651,6 @@ function MatchPairsRenderer({
           const hasPlaced = placedRightIdx !== undefined;
           const isOver = dragOverZone === leftIdx;
 
-          
           let zoneBorder = BORDER;
           if (showingAnswer && userMapping) {
             
@@ -740,14 +682,12 @@ function MatchPairsRenderer({
                 </span>
               </div>
 
-
               <span
                 className="text-xs flex-shrink-0"
                 style={{ color: TEXT_DIM }}
               >
                 {'→'}
               </span>
-
 
               <div
                 onDragOver={(e) => handleDragOver(e, leftIdx)}
@@ -792,7 +732,6 @@ function MatchPairsRenderer({
         })}
       </div>
 
-      
       {!showingAnswer && poolItems.length > 0 && (
         <div className="mb-4">
           <div className="text-sm mb-2" style={{ color: TEXT_DIM }}>
@@ -834,7 +773,6 @@ function MatchPairsRenderer({
         </div>
       )}
 
-      
       {!showingAnswer && (
         <div className="flex justify-center">
           <button
@@ -858,10 +796,6 @@ function MatchPairsRenderer({
   );
 }
 
-
-
-
-
 function SortOrderRenderer({
   question,
   onSubmit,
@@ -878,7 +812,6 @@ function SortOrderRenderer({
   const t = useTranslations('learn');
   const items = question.items;
 
-  
   const initialOrder = useMemo(
     () =>
       seededShuffle(
@@ -935,7 +868,6 @@ function SortOrderRenderer({
     []
   );
 
-  
   const moveItem = useCallback((posIdx: number, direction: -1 | 1) => {
     setOrder((prev) => {
       const next = [...prev];
@@ -951,7 +883,6 @@ function SortOrderRenderer({
     onSubmit({ type: 'sortOrder', order });
   }, [order, showingAnswer, onSubmit]);
 
-  
   const userOrder =
     userAnswer && userAnswer.type === 'sortOrder' ? userAnswer.order : null;
 
@@ -1000,7 +931,6 @@ function SortOrderRenderer({
                 {posIdx + 1}
               </span>
 
-              
               {!showingAnswer && (
                 <span
                   className="text-sm flex-shrink-0"
@@ -1018,7 +948,6 @@ function SortOrderRenderer({
                 {item?.label}
               </span>
 
-              
               {!showingAnswer && (
                 <div className="flex flex-col gap-0.5 flex-shrink-0">
                   <button
@@ -1089,10 +1018,6 @@ function SortOrderRenderer({
   );
 }
 
-
-
-
-
 function FillNumberRenderer({
   question,
   onSubmit,
@@ -1142,7 +1067,6 @@ function FillNumberRenderer({
           </button>
         )}
 
-        
         <div className="flex items-center gap-2">
           {showingAnswer ? (
             <div
@@ -1183,7 +1107,6 @@ function FillNumberRenderer({
           )}
         </div>
 
-        
         {!showingAnswer && (
           <button
             onClick={() => setValue((v) => v + 1)}
@@ -1203,7 +1126,6 @@ function FillNumberRenderer({
         )}
       </div>
 
-      
       {showingAnswer && userVal !== question.correctAnswer && (
         <div className="text-center text-xs mb-3" style={{ color: FEEDBACK_GREEN }}>
           {t('quiz.correctAnswer')}: {question.correctAnswer}
@@ -1232,10 +1154,6 @@ function FillNumberRenderer({
   );
 }
 
-
-
-
-
 function CategorySortRenderer({
   question,
   onSubmit,
@@ -1252,14 +1170,12 @@ function CategorySortRenderer({
   const t = useTranslations('learn');
   const { categories, items } = question;
 
-  
   const [mapping, setMapping] = useState<Record<number, number>>({});
   const [clickSelected, setClickSelected] = useState<number | null>(null);
   const [dragOverCat, setDragOverCat] = useState<number | null>(null);
 
   const allPlaced = Object.keys(mapping).length === items.length;
 
-  
   const handleDragStart = useCallback(
     (e: React.DragEvent, itemIdx: number) => {
       e.dataTransfer.setData('text/plain', String(itemIdx));
@@ -1291,7 +1207,6 @@ function CategorySortRenderer({
     []
   );
 
-  
   const handlePoolItemClick = useCallback(
     (itemIdx: number) => {
       if (showingAnswer) return;
@@ -1309,7 +1224,6 @@ function CategorySortRenderer({
     [showingAnswer, clickSelected]
   );
 
-  
   const handleRemoveFromCat = useCallback(
     (itemIdx: number) => {
       if (showingAnswer) return;
@@ -1327,14 +1241,12 @@ function CategorySortRenderer({
     onSubmit({ type: 'categorySort', mapping });
   }, [allPlaced, showingAnswer, mapping, onSubmit]);
 
-  
   const userMapping =
     userAnswer && userAnswer.type === 'categorySort'
       ? userAnswer.mapping
       : null;
   const displayMapping = showingAnswer && userMapping ? userMapping : mapping;
 
-  
   const placedSet = new Set(
     Object.keys(displayMapping).map(Number)
   );
@@ -1388,7 +1300,6 @@ function CategorySortRenderer({
               >
                 {t(cat as Parameters<typeof t>[0])}
               </div>
-
 
               <div className="flex flex-col gap-1.5 sm:gap-2 p-2 sm:p-3">
                 {catItems.map((itemIdx) => {
@@ -1448,7 +1359,6 @@ function CategorySortRenderer({
         })}
       </div>
 
-      
       {!showingAnswer && poolItems.length > 0 && (
         <div className="mb-4">
           <div className="text-sm mb-2" style={{ color: TEXT_DIM }}>
@@ -1488,7 +1398,6 @@ function CategorySortRenderer({
         </div>
       )}
 
-      
       {!showingAnswer && (
         <div className="flex justify-center">
           <button
@@ -1511,10 +1420,6 @@ function CategorySortRenderer({
     </div>
   );
 }
-
-
-
-
 
 function SpotErrorRenderer({
   question,
@@ -1627,7 +1532,6 @@ function SpotErrorRenderer({
                 )}
               </span>
 
-
               {showingAnswer && stmt.isError && (
                 <span
                   className="text-xs sm:text-sm ml-auto flex-shrink-0 font-bold"
@@ -1661,10 +1565,6 @@ function SpotErrorRenderer({
     </div>
   );
 }
-
-
-
-
 
 function QuestionRenderer({
   question,
@@ -1754,14 +1654,9 @@ function QuestionRenderer({
   }
 }
 
-
-
-
-
 export function QuizSession() {
   const t = useTranslations('learn');
 
-  
   const difficulty = useQuizStore((s) => s.difficulty);
   const questions = useQuizStore((s) => s.questions);
   const currentIndex = useQuizStore((s) => s.currentIndex);
@@ -1776,14 +1671,12 @@ export function QuizSession() {
   const userAnswer = answers[currentIndex] ?? null;
   const timeLimit = TIME_LIMITS[difficulty ?? 1] ?? 30;
 
-  
   const questionStartRef = useRef<number>(Date.now());
 
   useEffect(() => {
     questionStartRef.current = Date.now();
   }, [currentIndex]);
 
-  
   useEffect(() => {
     if (!timerActive) return;
     const interval = setInterval(() => {
@@ -1792,7 +1685,6 @@ export function QuizSession() {
     return () => clearInterval(interval);
   }, [timerActive, tickTimer]);
 
-  
   const handleSubmit = useCallback(
     (answer: QuizAnswer) => {
       if (showingAnswer) return;
@@ -1802,7 +1694,6 @@ export function QuizSession() {
     [showingAnswer, submitAnswer]
   );
 
-  
   const isCorrect = useMemo(() => {
     if (!showingAnswer || !question || !userAnswer) return false;
     
@@ -1853,7 +1744,6 @@ export function QuizSession() {
     }
   }, [showingAnswer, question, userAnswer]);
 
-  
   const partialMsg = useMemo(() => {
     if (!showingAnswer || !question || !userAnswer || isCorrect) return undefined;
     let partial = 0;
@@ -1916,7 +1806,6 @@ export function QuizSession() {
 
         <TopBar timeLimit={timeLimit} />
 
-
         <AnimatePresence mode="wait">
           <motion.div
             key={`question-${currentIndex}`}
@@ -1938,7 +1827,6 @@ export function QuizSession() {
               censorZone={!showingAnswer ? question.censorZone : undefined}
             />
 
-
             <div
               className="text-base sm:text-lg font-bold mb-4 sm:mb-5 text-center"
               style={{ color: TEXT_LIGHT, lineHeight: 1.4, wordBreak: 'break-word' }}
@@ -1949,7 +1837,6 @@ export function QuizSession() {
               )}
             </div>
 
-            
             <QuestionRenderer
               question={question}
               onSubmit={handleSubmit}
@@ -1965,7 +1852,6 @@ export function QuizSession() {
               censorZone={!showingAnswer ? question.censorZone : undefined}
             />
 
-            
             {showingAnswer && userAnswer === null && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -1977,7 +1863,6 @@ export function QuizSession() {
               </motion.div>
             )}
 
-            
             {showingAnswer && (
               <ExplanationPanel
                 question={question}

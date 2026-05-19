@@ -37,8 +37,7 @@ export function ChakraPool({ amount, label, isOpponent = false }: ChakraPoolProp
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           className="flex items-center justify-center px-3 py-1.5"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.03)',
-            borderLeft: '3px solid rgba(196, 163, 90, 0.2)',
+            backgroundColor: 'rgba(196, 163, 90, 0.08)',
             minWidth: '52px',
           }}
         >

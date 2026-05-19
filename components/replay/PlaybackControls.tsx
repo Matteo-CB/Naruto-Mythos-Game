@@ -41,7 +41,6 @@ export function PlaybackControls({
     setIsPlaying(true);
   }, [currentStep, totalSteps, onStepChange]);
 
-  
   useEffect(() => {
     if (isPlaying) {
       intervalRef.current = setInterval(() => {
@@ -56,14 +55,12 @@ export function PlaybackControls({
     };
   }, [isPlaying, speed, onStepChange]);
 
-  
   useEffect(() => {
     if (isPlaying && currentStep >= totalSteps - 1) {
       stopPlay();
     }
   }, [currentStep, totalSteps, isPlaying, stopPlay]);
 
-  
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -125,7 +122,6 @@ export function PlaybackControls({
     return turnStarts[0]?.turn ?? 1;
   })();
 
-  
   const handleProgressClick = (e: React.MouseEvent) => {
     const bar = progressBarRef.current;
     if (!bar) return;
@@ -167,7 +163,7 @@ export function PlaybackControls({
       {actionLabel && (
         <div
           className="px-4 py-1"
-          style={{ borderLeft: '3px solid rgba(196, 163, 90, 0.15)', margin: '0 16px' }}
+          style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', margin: '0 16px' }}
         >
           <span className="text-[11px] leading-relaxed" style={{ color: '#c0c0c0' }}>
             {actionLabel}
@@ -175,7 +171,6 @@ export function PlaybackControls({
         </div>
       )}
 
-      
       <div className="px-4 pt-2 pb-0.5">
         <div
           ref={progressBarRef}
@@ -223,7 +218,6 @@ export function PlaybackControls({
         </div>
       </div>
 
-      
       <div className="flex items-center justify-between px-4 py-1.5 gap-3">
         
         <div className="flex items-center gap-1">
@@ -245,7 +239,6 @@ export function PlaybackControls({
           ))}
         </div>
 
-        
         <div className="flex items-center gap-1">
           <button
             onClick={goToStart}
@@ -253,7 +246,6 @@ export function PlaybackControls({
             style={{
               transform: 'skewX(-3deg)',
               backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              borderLeft: '2px solid rgba(255, 255, 255, 0.08)',
               color: '#777',
             }}
             title={t('start')}
@@ -266,7 +258,6 @@ export function PlaybackControls({
             style={{
               transform: 'skewX(-3deg)',
               backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              borderLeft: '2px solid rgba(255, 255, 255, 0.08)',
               color: '#777',
             }}
             title={t('stepBack')}
@@ -293,7 +284,6 @@ export function PlaybackControls({
             style={{
               transform: 'skewX(-3deg)',
               backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              borderLeft: '2px solid rgba(255, 255, 255, 0.08)',
               color: '#777',
             }}
             title={t('stepForward')}
@@ -306,7 +296,6 @@ export function PlaybackControls({
             style={{
               transform: 'skewX(-3deg)',
               backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              borderLeft: '2px solid rgba(255, 255, 255, 0.08)',
               color: '#777',
             }}
             title={t('end')}
@@ -315,7 +304,6 @@ export function PlaybackControls({
           </button>
         </div>
 
-        
         <div className="flex items-center gap-3">
           <button
             onClick={cycleSpeed}
@@ -323,7 +311,6 @@ export function PlaybackControls({
             style={{
               transform: 'skewX(-3deg)',
               backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              borderLeft: `2px solid ${speed === 'fast' ? 'rgba(196,163,90,0.5)' : speed === 'slow' ? 'rgba(90,122,187,0.5)' : 'rgba(255,255,255,0.08)'}`,
               color: speed === 'fast' ? '#c4a35a' : speed === 'slow' ? '#5A7ABB' : '#888',
             }}
             title={`${t('speed')}: ${t(speed)}`}

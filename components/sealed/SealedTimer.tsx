@@ -10,7 +10,6 @@ interface SealedTimerProps {
   paused?: boolean;
 }
 
-
 function playBeep(frequency: number, duration: number, volume: number) {
   try {
     const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
@@ -24,7 +23,6 @@ function playBeep(frequency: number, duration: number, volume: number) {
     oscillator.type = 'sine';
     gainNode.gain.value = volume;
 
-    
     gainNode.gain.setValueAtTime(volume, ctx.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
 
@@ -79,7 +77,6 @@ export function SealedTimer({ totalSeconds, onTimeUp, paused = false }: SealedTi
     return () => clearInterval(interval);
   }, [paused, remaining]);
 
-  
   const checkAlerts = useCallback(() => {
     const alerts: Array<{ time: number; level: 'info' | 'warning' | 'critical' }> = [
       { time: 600, level: 'info' },     // 10:00

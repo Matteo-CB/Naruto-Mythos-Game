@@ -11858,7 +11858,12 @@ export class EffectEngine {
         
         
         if (i140HandSize >= 2) {
-          newState.pendingDiscardReorder = { discardOwner: i140Opponent, chooser: i140Opponent, count: i140HandSize };
+          newState.pendingDiscardReorder = {
+            discardOwner: i140Opponent,
+            chooser: i140Opponent,
+            count: i140HandSize,
+            targetInstanceIds: i140DiscardedHand.map((c: { instanceId: string }) => c.instanceId),
+          };
         }
 
         
@@ -12754,32 +12759,44 @@ export class EffectEngine {
       }
 
       case 'REORDER_DISCARD': {
-        
-        
+
+
         let reorderList: string[] = [];
         try { reorderList = JSON.parse(targetId); } catch {
-          
+
           reorderList = [targetId];
         }
         let parsedReorder: { count?: number; discardOwner?: string; sakura135Chain?: boolean; costReduction?: number } = {};
         try { parsedReorder = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const reorderCount = parsedReorder.count ?? reorderList.length;
-        
-        
+
+
         const reorderTarget = (parsedReorder.discardOwner as PlayerID) ?? (pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1');
         const ownerPS = { ...newState[reorderTarget] };
         const discard = [...ownerPS.discardPile];
 
-        if (discard.length >= reorderCount && reorderList.length === reorderCount) {
-          
-          const removedCards = discard.splice(-reorderCount, reorderCount);
-          
-          
-          
+        if (reorderList.length === reorderCount) {
+
+
+
+
+          const validTargetSet = new Set<string>((pendingEffect.validTargets ?? []).map((v) => v.replace(/__dup\d+$/, '')));
+          const removedCards: typeof discard = [];
+          const keptCards: typeof discard = [];
+          const dupCounter = new Map<string, number>();
+          for (const c of discard) {
+            const id = (c as { instanceId?: string; id?: string }).instanceId || (c as { id?: string }).id || '';
+            if (!id) { keptCards.push(c); continue; }
+            if (!validTargetSet.has(id)) { keptCards.push(c); continue; }
+            const seen = dupCounter.get(id) ?? 0;
+            dupCounter.set(id, seen + 1);
+            removedCards.push(c);
+          }
+
           const usedIndices = new Set<number>();
-          const reorderedCards = reorderList.map(id => {
+          const reorderedCards = reorderList.map((id) => {
             const cleanId = id.replace(/__dup\d+$/, '');
-            const idx = removedCards.findIndex((c: any, i: number) => {
+            const idx = removedCards.findIndex((c: { instanceId?: string; id?: string }, i: number) => {
               if (usedIndices.has(i)) return false;
               return (c.instanceId || c.id) === cleanId;
             });
@@ -12789,9 +12806,12 @@ export class EffectEngine {
             }
             return undefined;
           }).filter((c): c is NonNullable<typeof c> => c !== undefined);
-          
-          discard.push(...reorderedCards);
-          ownerPS.discardPile = discard;
+
+          for (let i = 0; i < removedCards.length; i++) {
+            if (!usedIndices.has(i)) reorderedCards.push(removedCards[i]);
+          }
+
+          ownerPS.discardPile = [...keptCards, ...reorderedCards];
           newState[reorderTarget] = ownerPS;
 
           newState.log = logAction(
@@ -15676,14 +15696,29 @@ export class EffectEngine {
   static createReorderDiscardPending(
     state: GameState, discardOwner: PlayerID, effectSourcePlayer: PlayerID, count: number,
     selectingPlayer?: PlayerID, chainData?: Record<string, unknown>,
+    explicitInstanceIds?: string[],
   ): GameState {
     const newState = { ...state };
     const discard = newState[discardOwner].discardPile;
     if (discard.length < 2 || count < 2) return state;
 
-    const actualCount = Math.min(count, discard.length);
-    const cardsToOrder = discard.slice(-actualCount);
-    
+
+
+
+    let cardsToOrder: typeof discard;
+    if (explicitInstanceIds && explicitInstanceIds.length >= 2) {
+      const wantedSet = new Set(explicitInstanceIds);
+      cardsToOrder = discard.filter((c) => {
+        const id = (c as { instanceId?: string }).instanceId;
+        return !!id && wantedSet.has(id);
+      });
+      if (cardsToOrder.length < 2) return state;
+    } else {
+      const fallbackCount = Math.min(count, discard.length);
+      cardsToOrder = discard.slice(-fallbackCount);
+    }
+    const actualCount = cardsToOrder.length;
+
     const seenIds = new Map<string, number>();
     const cardInstanceIds = cardsToOrder.map((c: any) => {
       const baseId = c.instanceId || c.id || generateInstanceId();

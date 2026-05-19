@@ -38,8 +38,7 @@ export default function GlobalError({
                 onClick={reset}
                 style={{
                   padding: '8px 20px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase',
-                  backgroundColor: 'rgba(196, 163, 90, 0.1)', border: '1px solid rgba(196, 163, 90, 0.3)',
-                  color: '#c4a35a', cursor: 'pointer', letterSpacing: '0.1em',
+                  backgroundColor: 'rgba(196, 163, 90, 0.1)', color: '#c4a35a', cursor: 'pointer', letterSpacing: '0.1em',
                 }}
               >
                 {s.tryAgain}

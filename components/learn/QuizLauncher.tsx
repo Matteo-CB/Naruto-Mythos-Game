@@ -4,16 +4,10 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
-
-
-
 interface QuizLauncherProps {
   onStart: (difficulty: number) => void;
   bestScores?: Record<number, number>;
 }
-
-
-
 
 const DIFFICULTIES = [1, 2, 3, 4, 5] as const;
 
@@ -41,18 +35,12 @@ const RANK_COLORS: Record<number, string> = {
   5: '#6a6abb',
 };
 
-
-
-
 export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
   const t = useTranslations('learn');
   const [selected, setSelected] = useState<number | null>(null);
 
   return (
-    <div
-      className="min-h-[calc(100vh-80px)] flex items-center justify-center px-2 sm:px-4 py-3 sm:py-4"
-      style={{ backgroundColor: '#0a0a0a' }}
-    >
+    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-2 sm:px-4 py-3 sm:py-4">
       
       <div
         className="fixed top-12 left-4 hidden lg:block"
@@ -107,7 +95,6 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
           {t('quiz.selectDifficulty')}
         </motion.p>
 
-        
         <div className="flex flex-col gap-2 mb-4">
           {DIFFICULTIES.map((diff, index) => {
             const isSelected = selected === diff;
@@ -167,7 +154,6 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
                     </div>
                   </div>
 
-
                   <div className="text-right flex-shrink-0">
                     <div className="text-[10px] sm:text-xs whitespace-nowrap" style={{ color: '#aaaaaa' }}>
                       {QUESTION_COUNTS[diff]} {t('quiz.questions')}
@@ -191,7 +177,6 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
           })}
         </div>
 
-        
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

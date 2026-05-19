@@ -39,7 +39,6 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
       className="font-display flex items-center gap-2 px-3 py-1 w-full"
       style={{
         backgroundColor: 'rgba(8, 8, 12, 0.85)',
-        borderTop: '2px solid rgba(196, 163, 90, 0.15)',
       }}
     >
       
@@ -47,7 +46,6 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
         {playerName}
       </span>
 
-      
       <div className="flex items-center gap-1 shrink-0" title={t('game.edge')}>
         <div
           style={{
@@ -63,7 +61,6 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
         </span>
       </div>
 
-      
       <div className="flex items-center gap-1.5 shrink-0">
         <span className="text-[10px]" style={{ color: '#888888' }}>
           {t('game.turnLabel')}
@@ -75,45 +72,51 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
         <span
           className="text-[10px] px-1.5 py-0.5"
           style={{
-            backgroundColor: 'rgba(196, 163, 90, 0.08)',
+            backgroundColor: 'rgba(196, 163, 90, 0.12)',
             color: '#c4a35a',
-            borderLeft: '2px solid rgba(196, 163, 90, 0.3)',
           }}
         >
           {phaseKeys[phase] ? t(phaseKeys[phase]) : phase}
         </span>
       </div>
 
-      
       <div className="flex-1" />
-
 
       <StatPill label={t('game.chakra')} value={myState.chakra} color="#c4a35a" />
 
-
-      <StatPill label={t('game.score')} value={myState.missionPoints} color="#e0e0e0" />
+      <StatPill label={t('game.score')} value={myState.missionPoints} color="#e0e0e0" accent="#c4a35a" />
 
       <ChessClockDisplay player={myPlayer} isOpponent={false} />
     </div>
   );
 });
 
-function StatPill({ label, value, color }: { label: string; value: number; color: string }) {
+function StatPill({ label, value, color }: { label: string; value: number; color: string; accent?: string }) {
   return (
-    <div
-      className="flex items-center gap-1 px-2 py-0.5"
-      style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-        borderLeft: '2px solid rgba(255, 255, 255, 0.08)',
-      }}
-    >
-      <span className="text-[10px]" style={{ color: '#666666' }}>{label}</span>
+    <div className="flex items-baseline gap-1.5 sm:gap-2 px-1.5 sm:px-2 shrink-0">
+      <span
+        className="uppercase font-bold whitespace-nowrap"
+        style={{
+          color: '#666666',
+          letterSpacing: '0.22em',
+          fontSize: 'clamp(8px, 1vw, 10px)',
+          lineHeight: 1,
+        }}
+      >
+        {label}
+      </span>
       <motion.span
         key={value}
-        initial={{ scale: 1.3, opacity: 0.7 }}
+        initial={{ scale: 1.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="text-xs tabular-nums font-bold"
-        style={{ color }}
+        transition={{ duration: 0.22, ease: 'easeOut' }}
+        className="tabular-nums font-bold leading-none"
+        style={{
+          color,
+          fontSize: 'clamp(14px, 1.6vw, 18px)',
+          letterSpacing: '-0.01em',
+          textShadow: `0 1px 3px rgba(0,0,0,0.8), 0 0 10px ${color}55`,
+        }}
       >
         {value}
       </motion.span>

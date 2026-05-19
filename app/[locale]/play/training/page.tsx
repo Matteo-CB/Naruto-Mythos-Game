@@ -99,7 +99,6 @@ export default function TrainingPage() {
       <div className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="flex flex-col gap-6 max-w-lg w-full relative z-10">
 
-          
           <div className="text-center">
             <h1 className="text-3xl font-bold text-[#e0e0e0] mb-1">
               {t('title')}
@@ -150,7 +149,6 @@ export default function TrainingPage() {
             ))}
           </div>
 
-          
           {cards && (
             <DeckSelector
               onSelect={setSelectedDeck}
@@ -159,7 +157,6 @@ export default function TrainingPage() {
             />
           )}
 
-          
           <div className="flex gap-3 w-full">
             <button
               onClick={() => router.push('/')}

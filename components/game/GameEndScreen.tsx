@@ -46,15 +46,11 @@ export function GameEndScreen() {
   const minimizeGameEnd = useUIStore((s) => s.minimizeGameEnd);
   const restoreGameEnd = useUIStore((s) => s.restoreGameEnd);
 
-  
-  
-
   const handleChangeDeck = useCallback(() => {
     resetGame();
     router.push('/play/ai');
   }, [resetGame, router]);
 
-  
   const tournamentId = gameResult?.tournamentId;
   const tournamentRedirectRef = useRef(false);
   useEffect(() => {
@@ -267,7 +263,6 @@ export function GameEndScreen() {
             </motion.div>
           )}
 
-
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -293,7 +288,6 @@ export function GameEndScreen() {
               </span>
             </div>
 
-            
             <div
               style={{
                 width: '1px',
@@ -302,7 +296,6 @@ export function GameEndScreen() {
               }}
             />
 
-            
             <div className="flex flex-col items-center gap-1">
               <span className="text-sm" style={{ color: '#888888' }}>
                 {t('game.opponent')}
@@ -322,7 +315,6 @@ export function GameEndScreen() {
             </div>
           </motion.div>
 
-          
           {isDraw && (
             <motion.span
               initial={{ opacity: 0 }}
@@ -335,7 +327,6 @@ export function GameEndScreen() {
             </motion.span>
           )}
 
-          
           {isRanked && eloDelta != null && (
             <motion.div
               initial={{ opacity: 0, y: 5 }}
@@ -396,7 +387,6 @@ export function GameEndScreen() {
 
           <SectionDivider color="rgba(255, 255, 255, 0.06)" width={100} />
 
-          
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -415,7 +405,6 @@ export function GameEndScreen() {
               </span>
             )}
 
-            
             {saveState === 'saved' && savedGameId && (
               <>
                 <span className="text-xs" style={{ color: '#4a9e4a' }}>
@@ -428,7 +417,6 @@ export function GameEndScreen() {
                     padding: '10px 28px',
                     backgroundColor: 'rgba(74, 158, 74, 0.12)',
                     color: '#4a9e4a',
-                    borderLeft: '3px solid #4a9e4a',
                     transform: 'skewX(-3deg)',
                     display: 'inline-block',
                     letterSpacing: '0.12em',
@@ -441,7 +429,6 @@ export function GameEndScreen() {
               </>
             )}
 
-            
             {!!session?.user?.id && sealedDeckCardIds && sealedDeckMissionIds && sealedSaveState !== 'saved' && (
               <div className="flex flex-col items-center gap-2">
                 <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
@@ -457,7 +444,6 @@ export function GameEndScreen() {
                     style={{
                       backgroundColor: '#0a0a0f',
                       border: '1px solid rgba(196, 163, 90, 0.2)',
-                      borderLeft: '3px solid rgba(196, 163, 90, 0.4)',
                       color: '#e0e0e0',
                       outline: 'none',
                       width: '200px',
@@ -484,7 +470,6 @@ export function GameEndScreen() {
               </span>
             )}
 
-            
             {tournamentId ? (
               <PopupActionButton
                 onClick={() => { resetGame(); router.push(`/tournaments/${tournamentId}`); }}
@@ -501,7 +486,6 @@ export function GameEndScreen() {
                   </PopupActionButton>
                 )}
 
-                
                 {isOnlineGame && rematchState === 'none' && (
                   <PopupActionButton onClick={offerRematch} accentColor="#c4a35a">
                     {t('game.end.rematch')}
@@ -531,7 +515,6 @@ export function GameEndScreen() {
                   </span>
                 )}
 
-                
                 <PopupActionButton onClick={resetGame} accentColor="#c4a35a">
                   {t('game.end.backToMenu')}
                 </PopupActionButton>

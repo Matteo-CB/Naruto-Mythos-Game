@@ -99,7 +99,6 @@ export default function TournamentDetailPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tournamentId, session?.user?.id]);
 
-  
   useEffect(() => {
     if (session?.user?.id && !connected) {
       connect(session.user.id);
@@ -153,7 +152,6 @@ export default function TournamentDetailPage() {
     };
   }, [tournamentId, session?.user, fetchTournament]);
 
-  
   const isSealedTournament = activeTournament?.gameMode === 'sealed';
   const isEvolvingTournament = activeTournament?.gameMode === 'evolving';
   const decksFetchedRef = useRef(false);
@@ -181,7 +179,6 @@ export default function TournamentDetailPage() {
   
   const [discordPopupType, setDiscordPopupType] = useState<'not-linked' | 'not-in-server' | null>(null);
 
-  
   const userDiscordId = (session?.user as Record<string, unknown>)?.discordId as string | null;
   const hasDiscordLinked = !!userDiscordId;
 
@@ -224,7 +221,6 @@ export default function TournamentDetailPage() {
 
   const handleLeave = useCallback(async () => { if (!tournamentId) return; clearError(); try { await leaveTournament(tournamentId); fetchTournament(tournamentId); } catch { /* err in store */ } }, [tournamentId, leaveTournament, fetchTournament, clearError]);
 
-  
   useEffect(() => {
     if (!socket || !tournamentId || !userId || !myMatch) return;
     if (myMatch.status === 'ready' || myMatch.status === 'pending') {
@@ -273,7 +269,6 @@ export default function TournamentDetailPage() {
     }).catch(() => {});
   }, []);
 
-  
   const tour = activeTournament;
   const isSwiss = tour?.format === 'swiss';
   const isDoubleElim = tour?.format === 'double_elimination';
@@ -328,7 +323,7 @@ export default function TournamentDetailPage() {
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="mb-6">
           <h1 className="font-display text-2xl sm:text-3xl uppercase tracking-wider mb-2 leading-tight wrap-break-word" style={{ color: '#f2efe7', letterSpacing: '0.06em', textShadow: '0 0 18px rgba(196, 163, 90, 0.18)' }}>{tour.name}</h1>
           <div className="flex flex-wrap items-center gap-3 text-xs" style={{ color: '#888888' }}>
-            <span className="px-2 py-1 uppercase tracking-wider" style={{ backgroundColor: 'rgba(196, 163, 90, 0.1)', border: '1px solid rgba(196, 163, 90, 0.2)', color: '#c4a35a' }}>{tour.type === 'simulator' ? t('typeSimulator') : t('typePlayer')}</span>
+            <span className="px-2 py-1 uppercase tracking-wider" style={{ backgroundColor: 'rgba(196, 163, 90, 0.1)', color: '#c4a35a' }}>{tour.type === 'simulator' ? t('typeSimulator') : t('typePlayer')}</span>
             <span className="px-2 py-1 uppercase tracking-wider" style={{ backgroundColor: '#111111', border: '1px solid #262626', color: '#e0e0e0' }}>{t(statusKey)}</span>
             <span style={{ color: '#666666' }}>{t(modeKey)}</span>
             <span style={{ color: '#666666' }}>{t('players')}: {tour.participants.length}/{tour.maxPlayers}</span>
@@ -344,22 +339,19 @@ export default function TournamentDetailPage() {
           )}
         </motion.div>
 
-        
         {tour.status === 'registration' && tour.scheduledStartAt && (
           <ScheduledCountdown deadline={tour.scheduledStartAt} />
         )}
 
-        
         <div className="mb-4 flex gap-2">
           <button onClick={handleShare} className="px-4 py-1.5 text-xs font-medium uppercase tracking-wider cursor-pointer transition-colors"
-            style={{ backgroundColor: linkCopied ? '#1a3a1a' : '#1a1a1a', border: `1px solid ${linkCopied ? '#4ade80' : '#333'}`, color: linkCopied ? '#4ade80' : '#888' }}>
+            style={{ backgroundColor: linkCopied ? '#1a3a1a' : '#1a1a1a', color: linkCopied ? '#4ade80' : '#888' }}>
             {linkCopied ? t('copied') : t('share')}
           </button>
         </div>
 
-        
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }}
-          className="mb-4 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626', borderLeft: '3px solid rgba(196, 163, 90, 0.3)' }}>
+          className="mb-4 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626', }}>
           <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>{t('rulesTitle')}</h2>
           <div className="flex flex-col gap-1.5 text-xs" style={{ color: '#aaa' }}>
             <p>{isSwiss ? t('rulesFormatSwiss') : t('rulesFormat')}</p>
@@ -374,10 +366,9 @@ export default function TournamentDetailPage() {
           </div>
         </motion.div>
 
-        
         {hasRestrictions && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}
-            className="mb-4 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626', borderLeft: '3px solid #ef4444' }}>
+            className="mb-4 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626', }}>
             <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#ef4444' }}>{t('restrictions')}</h2>
             <div className="flex flex-col gap-2 text-xs" style={{ color: '#ccc' }}>
               {(tour as any).allowedGroups?.length > 0 && (
@@ -417,17 +408,16 @@ export default function TournamentDetailPage() {
           </motion.div>
         )}
 
-        
         {needsDeck && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.25 }}
-            className="mb-4 p-4" style={{ backgroundColor: '#111111', border: `1px solid ${myDeckId && myDeckValid ? '#333' : '#ef4444'}`, borderLeft: `3px solid ${myDeckId && myDeckValid ? '#4ade80' : '#ef4444'}` }}>
+            className="mb-4 p-4" style={{ backgroundColor: '#111111', }}>
             <h2 className="text-sm font-medium uppercase tracking-wider mb-2" style={{ color: myDeckId && myDeckValid ? '#4ade80' : '#ef4444' }}>
               {t('selectDeck')}
             </h2>
             <p className="text-xs mb-3" style={{ color: '#888' }}>{t('selectDeckHint')}</p>
             
             {((tour as any).allowedGroups?.length > 0 || (tour as any).allowedKeywords?.length > 0 || (tour as any).bannedRarities?.length > 0 || (tour as any).bannedCardIds?.length > 0 || (tour as any).maxCopiesPerCard || (tour as any).restrictionNote) && (
-              <div className="mb-3 p-2 text-xs" style={{ backgroundColor: 'rgba(196, 163, 90, 0.05)', border: '1px solid rgba(196, 163, 90, 0.2)' }}>
+              <div className="mb-3 p-2 text-xs" style={{ backgroundColor: 'rgba(196, 163, 90, 0.05)', }}>
                 <p className="font-medium mb-1" style={{ color: '#c4a35a' }}>{t('restrictions')}:</p>
                 {(tour as any).allowedGroups?.length > 0 && <p style={{ color: '#999' }}>{t('allowedGroups')}: <span style={{ color: '#4ade80' }}>{(tour as any).allowedGroups.join(', ')}</span></p>}
                 {(tour as any).allowedKeywords?.length > 0 && <p style={{ color: '#999' }}>{t('allowedKeywords')}: <span style={{ color: '#4ade80' }}>{(tour as any).allowedKeywords.join(', ')}</span></p>}
@@ -455,7 +445,6 @@ export default function TournamentDetailPage() {
                   className="flex items-center justify-between px-3 py-2 text-xs cursor-pointer transition-colors w-full"
                   style={{
                     backgroundColor: selectedDeckId === deck.id ? 'rgba(196, 163, 90, 0.1)' : '#0d0d0d',
-                    border: `1px solid ${selectedDeckId === deck.id ? '#c4a35a' : '#333'}`,
                     color: selectedDeckId === deck.id ? '#c4a35a' : '#ccc',
                   }}>
                   <div className="flex items-center gap-2 flex-wrap min-w-0">
@@ -486,9 +475,7 @@ export default function TournamentDetailPage() {
           }
           return error;
         })()}</div>}
-        
 
-        
         {tour.status === 'registration' && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
             
@@ -508,7 +495,6 @@ export default function TournamentDetailPage() {
               )}
             </div>
 
-            
             <div className="mb-4">
               {!isParticipant ? (
                 <div className="p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
@@ -542,7 +528,7 @@ export default function TournamentDetailPage() {
                           )}
                           <button onClick={() => { setDiscordPopupType(null); doJoin(); }}
                             className="w-full px-4 py-2 text-xs font-medium uppercase tracking-wider cursor-pointer transition-colors"
-                            style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.2)', color: '#888' }}>
+                            style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', color: '#888' }}>
                             {t('discordContinueWithout')}
                           </button>
                         </div>
@@ -566,15 +552,13 @@ export default function TournamentDetailPage() {
                       </div>
                     )}
 
-                    
                     <button onClick={handleJoin}
                       disabled={tour.participants.length >= tour.maxPlayers || (!tour.isPublic && !joinCodeInput.trim())}
                       className="w-full px-5 py-2.5 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors disabled:opacity-40"
-                      style={{ backgroundColor: 'rgba(196, 163, 90, 0.1)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}>
+                      style={{ backgroundColor: 'rgba(196, 163, 90, 0.1)', color: '#c4a35a' }}>
                       {t('join')}
                     </button>
 
-                    
                     {joinError && (
                       <p className="text-xs px-2 py-1.5" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#f87171' }}>
                         {joinError}
@@ -596,7 +580,6 @@ export default function TournamentDetailPage() {
               )}
             </div>
 
-            
             {(isAdmin || isCreator) && !tour.isPublic && tour.joinCode && (
               <div className="mb-4 p-3 flex items-center gap-3" style={{ backgroundColor: '#111', border: '1px solid #333' }}>
                 <span className="text-[10px] uppercase tracking-wider" style={{ color: '#888' }}>{t('codeLabel')}:</span>
@@ -608,7 +591,6 @@ export default function TournamentDetailPage() {
           </motion.div>
         )}
 
-
         {tour.status === 'in_progress' && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
             <LiveMatchesPanel
@@ -619,7 +601,7 @@ export default function TournamentDetailPage() {
               format={tour.format}
             />
             {myMatch && (
-              <div className="mb-6 p-4" style={{ backgroundColor: '#111111', border: '1px solid rgba(196, 163, 90, 0.3)' }}>
+              <div className="mb-6 p-4" style={{ backgroundColor: '#111111', }}>
                 <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>{t('yourMatchReady')}</h2>
                 <p className="text-xs mb-3" style={{ color: '#e0e0e0' }}>{myMatch.player1Username ?? t('tbd')} vs {myMatch.player2Username ?? t('tbd')}</p>
                 
@@ -675,7 +657,6 @@ export default function TournamentDetailPage() {
           </motion.div>
         )}
 
-        
         {tour.status === 'completed' && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
             <TournamentResults tournament={tour} />

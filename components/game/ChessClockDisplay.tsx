@@ -144,11 +144,7 @@ export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player,
   const minW = isMobile ? 56 : 68;
 
   const containerStyle: React.CSSProperties = {
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderLeft: isActive
-      ? '2px solid #c4a35a'
-      : '2px solid rgba(255, 255, 255, 0.08)',
-    boxShadow: isActive ? '0 0 8px rgba(196, 163, 90, 0.7)' : 'none',
+    backgroundColor: isActive ? 'rgba(196, 163, 90, 0.10)' : 'transparent',
     padding: `${padY}px ${padX}px`,
     minWidth: minW,
     display: 'flex',

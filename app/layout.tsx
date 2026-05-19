@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { cookies } from "next/headers";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
@@ -13,12 +13,6 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const inter = Inter({
-  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
@@ -170,6 +164,7 @@ export default async function RootLayout({
     <html lang={lang} className="dark" suppressHydrationWarning>
       <head>
         <link rel="preload" href="/fonts/njnaruto-accented.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/geist-regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
         <link rel="prefetch" href="/images/cards/KS/rare_art/KS-108-RA.webp" />
@@ -178,7 +173,7 @@ export default async function RootLayout({
         <link rel="preload" href="/images/icons/cloud-6.webp" as="image" type="image/webp" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased bg-[#0a0a0a] text-[#e0e0e0] min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0a] text-[#e0e0e0] min-h-screen`}
       >
         <a
           href="#main-content"

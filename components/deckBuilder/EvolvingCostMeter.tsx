@@ -65,7 +65,6 @@ export function EvolvingCostMeter({ compact = false }: Props) {
                 top: '50px',
                 backgroundColor: PANEL_BG,
                 border: `1px solid ${BORDER}`,
-                borderTop: `2px solid ${overBudget ? WARN : color}`,
               }}
               onClick={(e) => e.stopPropagation()}
             >

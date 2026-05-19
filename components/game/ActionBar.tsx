@@ -35,7 +35,6 @@ export function ActionBar() {
 
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
 
-  
   useEffect(() => {
     setConfirmingPass(false);
   }, [visibleState?.phase, visibleState?.activePlayer]);
@@ -54,19 +53,16 @@ export function ActionBar() {
   const hasPassed = myState.hasPassed;
   const actionsBlocked = effectPopupMinimized;
 
-  
   const hasCardSelected = selectedCardIndex !== null;
   const hasMissionSelected = selectedMissionIndex !== null;
   const hasTargetSelected = selectedTargetId !== null;
   const cardAndMissionReady = hasCardSelected && hasMissionSelected;
 
-  
   const selectedCard =
     hasCardSelected && selectedCardIndex < myState.hand.length
       ? myState.hand[selectedCardIndex]
       : null;
 
-  
   const effectiveCost = useMemo(() => {
     if (!selectedCard || selectedMissionIndex === null || !visibleState) return selectedCard?.chakra ?? 0;
     try {
@@ -85,7 +81,6 @@ export function ActionBar() {
   const canAffordCard = selectedCard ? myState.chakra >= effectiveCost : false;
   const canAffordHidden = myState.chakra >= 1;
 
-  
   const upgradeTargets = useMemo(() => {
     if (!selectedCard || selectedMissionIndex === null || !visibleState?.activeMissions) return [];
     const mission = visibleState.activeMissions[selectedMissionIndex];
@@ -134,8 +129,6 @@ export function ActionBar() {
       const nameOk = sameNameMatch || isFlexUpgrade;
       if (!nameOk || charCard.chakra >= selectedCard.chakra) return false;
 
-      
-      
       if (!sameNameMatch && isFlexUpgrade) {
         const wouldConflict = myChars.some(other => {
           if (other.instanceId === c.instanceId || other.isHidden) return false;
@@ -149,7 +142,6 @@ export function ActionBar() {
     });
   }, [selectedCard, selectedMissionIndex, visibleState?.activeMissions, myPlayer]);
 
-  
   const canReveal = isMyTurn && isActionPhase && hasTargetSelected && !hasPassed;
   
   let revealBaseCost = 0;
@@ -198,13 +190,11 @@ export function ActionBar() {
       }
     }
   }
-  
-  
+
   const hasSameNameRevealUpgrade = revealUpgradeTargets.some(t => t.isSameName);
   const canShowPlainReveal = !hasSameNameRevealUpgrade;
   const canAffordReveal = myState.chakra >= revealBaseCost;
 
-  
   const handlePlayVisible = () => {
     if (!cardAndMissionReady || !canAffordCard || !isMyTurn || hasPassed || actionsBlocked) return;
     clearActionError();
@@ -301,7 +291,6 @@ export function ActionBar() {
     }
   };
 
-  
   if (!isActionPhase) {
     return (
       <>
@@ -309,8 +298,6 @@ export function ActionBar() {
           className="flex items-center justify-center gap-2 py-1.5 px-4"
           style={{
             backgroundColor: 'rgba(10, 10, 14, 0.9)',
-            borderLeft: '3px solid rgba(196, 163, 90, 0.2)',
-            borderRight: '3px solid rgba(196, 163, 90, 0.2)',
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
           }}
         >
@@ -354,8 +341,6 @@ export function ActionBar() {
       className="flex items-center justify-center gap-2 py-2 px-4"
       style={{
         backgroundColor: 'rgba(10, 10, 14, 0.9)',
-        borderLeft: '3px solid rgba(196, 163, 90, 0.2)',
-        borderRight: '3px solid rgba(196, 163, 90, 0.2)',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
       }}
     >
@@ -386,7 +371,6 @@ export function ActionBar() {
             </motion.span>
           )}
 
-          
           {!actionError && !hasCardSelected && !hasTargetSelected && (
             <span className="text-xs" style={{ color: '#888888' }}>
               {t('game.selectTarget')}
@@ -399,12 +383,10 @@ export function ActionBar() {
             </span>
           )}
 
-          
           {cardAndMissionReady && upgradeTargets.map((target) => {
             const charCard = target.topCard ?? target.card;
             const isHiddenTarget = target.isHidden;
-            
-            
+
             const rawUpgradeCost = isHiddenTarget
               ? effectiveCost
               : effectiveCost - (charCard?.chakra ?? 0);
@@ -428,7 +410,6 @@ export function ActionBar() {
             );
           })}
 
-          
           {cardAndMissionReady && (
             <ActionButton
               label={`${t('game.play')} (${costLabel} ${t('game.chakra').toLowerCase()})`}
@@ -438,7 +419,6 @@ export function ActionBar() {
             />
           )}
 
-          
           {cardAndMissionReady && (
             <ActionButton
               label={t('game.actions.playHiddenCharacter')}
@@ -448,7 +428,6 @@ export function ActionBar() {
             />
           )}
 
-          
           {canReveal && revealUpgradeTargets.map((opt) => {
             const canAfford = myState.chakra >= opt.cost;
             return (
@@ -462,7 +441,6 @@ export function ActionBar() {
             );
           })}
 
-          
           {canReveal && canShowPlainReveal && (
             <ActionButton
               label={`${t('game.reveal')} (${revealBaseCost} ${t('game.chakra').toLowerCase()})`}
@@ -472,7 +450,6 @@ export function ActionBar() {
             />
           )}
 
-          
           {(hasCardSelected || hasTargetSelected || hasMissionSelected) && (
             <ActionButton
               label={t('common.cancel')}
@@ -482,9 +459,6 @@ export function ActionBar() {
             />
           )}
 
-          
-
-          
           {confirmingPass ? (
             <div className="flex items-center gap-1.5">
               <span className="text-[10px] whitespace-nowrap" style={{ color: '#c4a35a' }}>
@@ -514,7 +488,6 @@ export function ActionBar() {
         </>
       )}
 
-      
       {isOnlineGame && (
         <ActionButton
           label={t('game.actions.abandon')}
@@ -524,7 +497,6 @@ export function ActionBar() {
         />
       )}
 
-      
       <AnimatePresence>
         {showAbandonConfirm && (
           <AbandonConfirmDialog
@@ -537,8 +509,6 @@ export function ActionBar() {
     </motion.div>
   );
 }
-
-
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'muted';
 
@@ -606,7 +576,6 @@ function ActionButton({
       style={{
         backgroundColor: disabled ? 'rgba(255, 255, 255, 0.02)' : styles.bg,
         border: 'none',
-        borderLeft: `3px solid ${disabled ? 'rgba(255, 255, 255, 0.08)' : styles.border}`,
         color: disabled ? styles.textDisabled : styles.text,
         opacity: disabled ? 0.5 : 1,
         cursor: disabled ? 'not-allowed' : 'pointer',
@@ -623,10 +592,6 @@ function ActionButton({
   );
 }
 
-
-
-
-
 function AbandonConfirmDialog({
   onConfirm,
   onCancel,
@@ -636,8 +601,7 @@ function AbandonConfirmDialog({
   onCancel: () => void;
   t: ReturnType<typeof useTranslations>;
 }) {
-  
-  
+
   return createPortal(
     <motion.div
       initial={{ opacity: 0 }}
@@ -661,10 +625,10 @@ function AbandonConfirmDialog({
         }}
       >
         
-        <div style={{ position: 'absolute', top: -1, left: -1, width: 20, height: 20, borderTop: '2px solid rgba(179, 62, 62, 0.5)', borderLeft: '2px solid rgba(179, 62, 62, 0.5)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', top: -1, right: -1, width: 20, height: 20, borderTop: '2px solid rgba(179, 62, 62, 0.5)', borderRight: '2px solid rgba(179, 62, 62, 0.5)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: -1, left: -1, width: 20, height: 20, borderBottom: '2px solid rgba(179, 62, 62, 0.5)', borderLeft: '2px solid rgba(179, 62, 62, 0.5)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: -1, right: -1, width: 20, height: 20, borderBottom: '2px solid rgba(179, 62, 62, 0.5)', borderRight: '2px solid rgba(179, 62, 62, 0.5)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -1, left: -1, width: 20, height: 20, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -1, right: -1, width: 20, height: 20, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -1, left: -1, width: 20, height: 20, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -1, right: -1, width: 20, height: 20, pointerEvents: 'none' }} />
 
         <span className="text-lg font-bold text-center uppercase tracking-wider" style={{ color: '#b33e3e' }}>
           {t('game.actions.abandonConfirmTitle')}
@@ -679,9 +643,8 @@ function AbandonConfirmDialog({
             onClick={onConfirm}
             className="px-6 py-2 text-sm font-bold cursor-pointer uppercase"
             style={{
-              backgroundColor: 'rgba(179, 62, 62, 0.15)',
+              backgroundColor: 'rgba(179, 62, 62, 0.18)',
               border: 'none',
-              borderLeft: '3px solid #b33e3e',
               color: '#b33e3e',
               transform: 'skewX(-3deg)',
               letterSpacing: '0.1em',

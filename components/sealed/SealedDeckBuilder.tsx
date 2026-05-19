@@ -23,7 +23,6 @@ interface SealedDeckBuilderProps {
 
 type FilterRarity = 'all' | 'C' | 'UC' | 'R' | 'RA' | 'S' | 'M' | 'MMS';
 
-
 function getVersionKey(card: BoosterCard): string {
   const match = card.id.match(/^(KS-\d+)/);
   return match ? match[1] : card.id.replace(/\s*A$/, '').trim();
@@ -39,18 +38,15 @@ export function SealedDeckBuilder({
   const t = useTranslations('sealed');
   const locale = useLocale() as 'en' | 'fr';
 
-  
   const [deckChars, setDeckChars] = useState<BoosterCard[]>([]);
   const [deckMissions, setDeckMissions] = useState<BoosterCard[]>([]);
 
-  
   const [filterRarity, setFilterRarity] = useState<FilterRarity>('all');
   const [filterGroup, setFilterGroup] = useState<string>('all');
   const [searchText, setSearchText] = useState('');
   const [previewCard, setPreviewCard] = useState<BoosterCard | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
-  
   const { characters, missions } = useMemo(() => {
     const chars: BoosterCard[] = [];
     const miss: BoosterCard[] = [];
@@ -61,7 +57,6 @@ export function SealedDeckBuilder({
     return { characters: chars, missions: miss };
   }, [pool]);
 
-  
   const poolAvailability = useMemo(() => {
     const counts = new Map<string, number>();
     for (const c of characters) {
@@ -71,7 +66,6 @@ export function SealedDeckBuilder({
     return counts;
   }, [characters]);
 
-  
   const catalogChars = useMemo(() => {
     const seen = new Map<string, BoosterCard>();
     for (const c of characters) {
@@ -81,7 +75,6 @@ export function SealedDeckBuilder({
     return Array.from(seen.values());
   }, [characters]);
 
-  
   const missionAvailability = useMemo(() => {
     const counts = new Map<string, number>();
     for (const m of missions) {
@@ -90,7 +83,6 @@ export function SealedDeckBuilder({
     return counts;
   }, [missions]);
 
-  
   const catalogMissions = useMemo(() => {
     const seen = new Map<string, BoosterCard>();
     for (const m of missions) {
@@ -99,7 +91,6 @@ export function SealedDeckBuilder({
     return Array.from(seen.values());
   }, [missions]);
 
-  
   const availableGroups = useMemo(() => {
     const groups = new Set<string>();
     for (const c of catalogChars) {
@@ -108,7 +99,6 @@ export function SealedDeckBuilder({
     return Array.from(groups).sort();
   }, [catalogChars]);
 
-  
   const filteredCatalog = useMemo(() => {
     return catalogChars
       .filter((c) => {
@@ -133,7 +123,6 @@ export function SealedDeckBuilder({
       });
   }, [catalogChars, filterRarity, filterGroup, searchText, locale]);
 
-  
   const deckVersionCounts = useMemo(() => {
     const counts = new Map<string, number>();
     for (const c of deckChars) {
@@ -143,12 +132,10 @@ export function SealedDeckBuilder({
     return counts;
   }, [deckChars]);
 
-  
   const deckMissionInstanceIds = useMemo(() => {
     return new Set(deckMissions.map((m) => m.sealedInstanceId));
   }, [deckMissions]);
 
-  
   const errors = useMemo(() => {
     const errs: string[] = [];
     if (deckChars.length < MIN_DECK_SIZE) {
@@ -163,7 +150,6 @@ export function SealedDeckBuilder({
 
   const isValid = errors.length === 0 && deckChars.length >= MIN_DECK_SIZE && deckMissions.length === MISSION_CARDS_PER_PLAYER;
 
-  
   const canAddChar = useCallback(
     (card: BoosterCard) => {
       const key = getVersionKey(card);
@@ -174,7 +160,6 @@ export function SealedDeckBuilder({
     [deckVersionCounts, poolAvailability],
   );
 
-  
   const canAddMission = useCallback(
     (card: BoosterCard) => {
       if (deckMissions.length >= MISSION_CARDS_PER_PLAYER) return false;
@@ -183,7 +168,6 @@ export function SealedDeckBuilder({
     [deckMissions.length, deckMissionInstanceIds],
   );
 
-  
   const addChar = useCallback(
     (card: BoosterCard) => {
       if (!canAddChar(card)) return;
@@ -192,7 +176,6 @@ export function SealedDeckBuilder({
     [canAddChar],
   );
 
-  
   const removeChar = useCallback((index: number) => {
     setDeckChars((prev) => {
       const next = [...prev];
@@ -201,7 +184,6 @@ export function SealedDeckBuilder({
     });
   }, []);
 
-  
   const addMission = useCallback(
     (card: BoosterCard) => {
       if (!canAddMission(card)) return;
@@ -210,7 +192,6 @@ export function SealedDeckBuilder({
     [canAddMission],
   );
 
-  
   const removeMission = useCallback((index: number) => {
     setDeckMissions((prev) => {
       const next = [...prev];
@@ -219,7 +200,6 @@ export function SealedDeckBuilder({
     });
   }, []);
 
-  
   const selectAll = useCallback(() => {
     const chars: BoosterCard[] = [];
     const counts = new Map<string, number>();
@@ -232,7 +212,6 @@ export function SealedDeckBuilder({
     }
     setDeckChars(chars);
 
-    
     setDeckMissions(missions.slice(0, MISSION_CARDS_PER_PLAYER));
   }, [characters, missions]);
 
@@ -320,7 +299,6 @@ export function SealedDeckBuilder({
         </div>
       </div>
 
-      
       <div
         className="shrink-0 px-3 py-1.5 flex items-center gap-3 overflow-x-auto"
         style={{ backgroundColor: '#111', borderBottom: '1px solid #262626', minHeight: '36px' }}
@@ -338,7 +316,6 @@ export function SealedDeckBuilder({
 
         <div className="w-px h-5 shrink-0" style={{ backgroundColor: '#333' }} />
 
-        
         <span className="text-[9px] font-bold uppercase shrink-0" style={{ color: '#e67e22' }}>M:</span>
         {deckMissions.map((m, i) => (
           <span
@@ -353,7 +330,6 @@ export function SealedDeckBuilder({
 
         <div className="w-px h-5 shrink-0" style={{ backgroundColor: '#333' }} />
 
-        
         <span className="text-[9px] font-bold uppercase shrink-0" style={{ color: '#888' }}>
           {t('characters')}: {deckChars.length}
         </span>
@@ -379,7 +355,6 @@ export function SealedDeckBuilder({
           })}
       </div>
 
-      
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
         
         <div className="flex-1 overflow-y-auto" style={{ borderRight: '1px solid #262626', minHeight: 0 }}>
@@ -440,7 +415,6 @@ export function SealedDeckBuilder({
             </div>
           </div>
 
-          
           <div className="px-3 py-2" style={{ borderBottom: '1px solid #1a1a1a' }}>
             <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#e67e22' }}>
               {t('missionsLabel')} ({deckMissions.length}/{MISSION_CARDS_PER_PLAYER})
@@ -493,7 +467,6 @@ export function SealedDeckBuilder({
             </div>
           </div>
 
-          
           <div className="px-3 py-2">
             <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#888' }}>
               {t('characters')} ({filteredCatalog.length})
@@ -528,7 +501,6 @@ export function SealedDeckBuilder({
                       </div>
                     )}
 
-                    
                     <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
                       <div className="flex items-center justify-between">
                         <span className="text-[8px] truncate" style={{ color: '#e0e0e0' }}>{getCardName(card, locale)}</span>
@@ -540,14 +512,12 @@ export function SealedDeckBuilder({
                       </div>
                     </div>
 
-                    
                     <div className="absolute top-1 right-1 px-1 py-0.5 rounded" style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}>
                       <span className="text-[9px] font-bold" style={{ color: inDeck > 0 ? rarityColor : '#666' }}>
                         {inDeck}/{inPool}
                       </span>
                     </div>
 
-                    
                     {card.isHolo && (
                       <div className="absolute top-1 left-1">
                         <span className="text-[7px] px-1 rounded font-bold" style={{ backgroundColor: 'rgba(196,163,90,0.8)', color: '#0a0a0a' }}>
@@ -570,7 +540,6 @@ export function SealedDeckBuilder({
           </div>
         </div>
 
-        
         <AnimatePresence>
           {previewCard && (
             <motion.div
@@ -596,7 +565,6 @@ export function SealedDeckBuilder({
                   </button>
                 </div>
 
-                
                 <div
                   className="relative rounded overflow-hidden mb-3 mx-auto"
                   style={{
@@ -617,13 +585,11 @@ export function SealedDeckBuilder({
                   )}
                 </div>
 
-                
                 <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{getCardName(previewCard, locale)}</div>
                 {(previewCard.title_fr || previewCard.title_en) && (
                   <div className="text-[11px]" style={{ color: '#888' }}>{getCardTitle(previewCard, locale)}</div>
                 )}
 
-                
                 <div className="flex gap-2 mt-1 flex-wrap">
                   {previewCard.card_type !== 'mission' && (
                     <>
@@ -639,7 +605,6 @@ export function SealedDeckBuilder({
                   )}
                 </div>
 
-                
                 {previewCard.keywords && previewCard.keywords.length > 0 && (
                   <div className="flex gap-1 mt-1 flex-wrap">
                     {previewCard.keywords.map((kw: string, i: number) => (
@@ -654,7 +619,6 @@ export function SealedDeckBuilder({
                   </div>
                 )}
 
-                
                 {previewCard.effects?.length > 0 && (
                   <div className="mt-2 flex flex-col gap-1.5">
                     {previewCard.effects.map((eff: { type: string; description: string }, i: number) => {
@@ -674,7 +638,6 @@ export function SealedDeckBuilder({
                   </div>
                 )}
 
-                
                 {previewCard.card_type === 'mission' ? (
                   <button
                     onClick={() => {
@@ -714,7 +677,6 @@ export function SealedDeckBuilder({
         </AnimatePresence>
       </div>
 
-      
       <AnimatePresence>
         {previewCard && (
           <motion.div
@@ -723,7 +685,7 @@ export function SealedDeckBuilder({
             exit={{ y: '100%' }}
             transition={{ duration: 0.2 }}
             className="lg:hidden fixed bottom-0 left-0 right-0 z-50 overflow-y-auto"
-            style={{ backgroundColor: '#0d0d0d', borderTop: '2px solid #c4a35a', maxHeight: '60vh' }}
+            style={{ backgroundColor: '#0d0d0d', maxHeight: '60vh' }}
           >
             <div className="px-4 py-3">
               <div className="flex items-center justify-between mb-2">
@@ -761,7 +723,6 @@ export function SealedDeckBuilder({
                   )}
                 </div>
 
-                
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{getCardName(previewCard, locale)}</div>
                   {(previewCard.title_fr || previewCard.title_en) && (
@@ -793,7 +754,6 @@ export function SealedDeckBuilder({
                 </div>
               </div>
 
-              
               {previewCard.effects?.length > 0 && (
                 <div className="mt-2 flex flex-col gap-1.5">
                   {previewCard.effects.map((eff: { type: string; description: string }, i: number) => {
@@ -813,7 +773,6 @@ export function SealedDeckBuilder({
                 </div>
               )}
 
-              
               {previewCard.card_type === 'mission' ? (
                 <button
                   onClick={() => {

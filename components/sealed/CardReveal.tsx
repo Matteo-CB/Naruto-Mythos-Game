@@ -69,7 +69,6 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
     }, flipDuration);
   }, [highRarity, onRevealed]);
 
-  
   useEffect(() => {
     if (!autoReveal || hasFlippedRef.current) return;
     const timer = setTimeout(() => {
@@ -130,7 +129,6 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
           )}
         </div>
 
-        
         <div
           style={{
             position: 'absolute',
@@ -159,7 +157,6 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             </div>
           )}
 
-          
           {card.isHolo && (
             <motion.div
               className="absolute inset-0 pointer-events-none"
@@ -174,7 +171,6 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
         </div>
       </motion.div>
 
-      
       {isFlipped && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -188,7 +184,6 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
         />
       )}
 
-      
       {isFlipped && (
         <motion.div
           initial={{ opacity: 0, y: 5 }}

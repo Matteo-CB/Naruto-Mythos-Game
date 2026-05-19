@@ -2,9 +2,6 @@
 
 import { motion } from 'framer-motion';
 
-
-
-
 export interface LessonBubbleProps {
   title: string;
   description: string;
@@ -14,15 +11,7 @@ export interface LessonBubbleProps {
   image?: string;
 }
 
-
-
-
 const ARROW_SIZE = 8;
-
-
-
-
-
 
 function getSlideOffset(arrowSide: 'top' | 'bottom' | 'left' | 'right') {
   switch (arrowSide) {
@@ -36,9 +25,6 @@ function getSlideOffset(arrowSide: 'top' | 'bottom' | 'left' | 'right') {
       return { x: 12, y: 0 };
   }
 }
-
-
-
 
 function getArrowStyles(side: 'top' | 'bottom' | 'left' | 'right'): React.CSSProperties {
   const base: React.CSSProperties = {
@@ -91,9 +77,6 @@ function getArrowStyles(side: 'top' | 'bottom' | 'left' | 'right'): React.CSSPro
   }
 }
 
-
-
-
 export function LessonBubble({
   title,
   description,
@@ -128,7 +111,6 @@ export function LessonBubble({
       
       <div style={getArrowStyles(arrowSide)} />
 
-      
       <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
         
         {image && (
@@ -161,7 +143,6 @@ export function LessonBubble({
             {title}
           </div>
 
-          
           <div
             className="font-body"
             style={{

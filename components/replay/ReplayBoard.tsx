@@ -10,8 +10,6 @@ import { calculateCharacterPower } from '@/lib/engine/phases/PowerCalculation';
 import type { ChessClockState } from '@/lib/timing/chessClock';
 import { ReplayChessClockDisplay } from '@/components/replay/ReplayChessClockDisplay';
 
-
-
 const rankColorMap: Record<string, string> = {
   D: '#3e8b3e',
   C: '#c4a35a',
@@ -27,8 +25,6 @@ const phaseColorMap: Record<string, string> = {
   gameOver: '#FFD700',
   mulligan: '#5A7ABB',
 };
-
-
 
 function ReplayCard({
   char,
@@ -56,7 +52,6 @@ function ReplayCard({
     if (onCardClick && topCard) onCardClick(topCard);
   };
 
-  
   if (char.isHidden && !isReHidden) {
     return (
       <motion.div
@@ -113,7 +108,6 @@ function ReplayCard({
     );
   }
 
-  
   if (isReHidden) {
     return (
       <motion.div
@@ -179,7 +173,6 @@ function ReplayCard({
     );
   }
 
-  
   return (
     <motion.div
       layout
@@ -212,7 +205,6 @@ function ReplayCard({
         </div>
       )}
 
-      
       <div
         className={`absolute bottom-0.5 right-0.5 flex items-center justify-center text-[11px] font-bold tabular-nums${hasPowerTokens ? ' power-glow' : ''}`}
         style={{
@@ -229,7 +221,6 @@ function ReplayCard({
         {power}
       </div>
 
-      
       {hasPowerTokens && (
         <div className="absolute top-0.5 right-0.5 flex flex-col items-end gap-0.5" style={{ pointerEvents: 'none' }}>
           {Array.from({ length: Math.min(char.powerTokens, 5) }).map((_, i) => (
@@ -262,7 +253,6 @@ function ReplayCard({
         </div>
       )}
 
-      
       <div
         className="absolute top-0.5 left-0.5 w-5 h-5 flex items-center justify-center text-[9px] font-bold"
         style={{
@@ -275,7 +265,6 @@ function ReplayCard({
         {topCard.chakra}
       </div>
 
-      
       {stackSize > 1 && (
         <motion.div
           initial={{ scale: 0 }}
@@ -296,8 +285,6 @@ function ReplayCard({
     </motion.div>
   );
 }
-
-
 
 function FannedHandCard({
   card,
@@ -398,8 +385,6 @@ function FannedHandCard({
   );
 }
 
-
-
 function FannedCardBack({
   index,
   total,
@@ -449,8 +434,6 @@ function FannedCardBack({
     </motion.div>
   );
 }
-
-
 
 function PlayerHandRow({
   cards,
@@ -507,8 +490,6 @@ function PlayerHandRow({
   );
 }
 
-
-
 function OpponentHandRow({ handSize }: { handSize: number }) {
   const cardW = 44;
   const cardH = 62;
@@ -541,8 +522,6 @@ function OpponentHandRow({ handSize }: { handSize: number }) {
     </div>
   );
 }
-
-
 
 function CharacterArea({
   chars,
@@ -578,8 +557,6 @@ function CharacterArea({
     </div>
   );
 }
-
-
 
 function ReplayMissionLane({
   mission,
@@ -639,7 +616,6 @@ function ReplayMissionLane({
       
       <CharacterArea chars={topChars} state={state} locale={locale} player={topPlayer} isTop={true} onCardClick={cardClick} />
 
-      
       {(topChars.length > 0 || bottomChars.length > 0) && (
         <div className="flex items-center justify-center px-2 py-0.5 w-full shrink-0">
           <span
@@ -651,7 +627,6 @@ function ReplayMissionLane({
         </div>
       )}
 
-      
       <div
         className="relative w-full shrink-0 overflow-hidden no-select"
         style={{
@@ -714,14 +689,7 @@ function ReplayMissionLane({
                     : mission.wonBy === bottomPlayer
                       ? '#c4a35a'
                       : '#b33e3e',
-                  borderLeft: `3px solid ${
-                    mission.wonBy === 'draw'
-                      ? 'rgba(136,136,136,0.5)'
-                      : mission.wonBy === bottomPlayer
-                        ? 'rgba(196,163,90,0.6)'
-                        : 'rgba(179,62,62,0.6)'
-                  }`,
-                }}
+                  }}
               >
                 {mission.wonBy === 'draw' ? 'DRAW' : mission.wonBy === bottomPlayer ? 'P1' : 'P2'}
               </span>
@@ -730,7 +698,6 @@ function ReplayMissionLane({
         </div>
       </div>
 
-      
       {(topChars.length > 0 || bottomChars.length > 0) && (
         <div className="flex items-center justify-center px-2 py-0.5 w-full shrink-0">
           <span
@@ -742,10 +709,8 @@ function ReplayMissionLane({
         </div>
       )}
 
-      
       <CharacterArea chars={bottomChars} state={state} locale={locale} player={bottomPlayer} isTop={false} onCardClick={cardClick} />
 
-      
       <div
         className="flex items-center justify-center gap-2 w-full px-2 py-1 shrink-0"
         style={{ backgroundColor: `${rankColor}15` }}
@@ -766,8 +731,6 @@ function ReplayMissionLane({
     </div>
   );
 }
-
-
 
 function EmptyMissionSlot({ turnIndex }: { turnIndex: number }) {
   const t = useTranslations();
@@ -794,8 +757,6 @@ function EmptyMissionSlot({ turnIndex }: { turnIndex: number }) {
     </div>
   );
 }
-
-
 
 function PlayerBar({
   player,
@@ -857,7 +818,6 @@ function PlayerBar({
               style={{
                 color: '#c4a35a',
                 backgroundColor: 'rgba(196, 163, 90, 0.08)',
-                borderLeft: '2px solid rgba(196, 163, 90, 0.3)',
                 padding: '2px 6px',
               }}
             >
@@ -871,7 +831,6 @@ function PlayerBar({
             style={{
               color: '#666',
               backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              borderLeft: '2px solid rgba(136, 136, 136, 0.2)',
               padding: '2px 6px',
             }}
           >
@@ -880,12 +839,11 @@ function PlayerBar({
         )}
       </div>
 
-      
       <div className="flex items-center gap-3">
         
         <div
           className="flex items-center gap-1.5 px-2 py-0.5"
-          style={{ borderLeft: '2px solid rgba(90, 122, 187, 0.3)', backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
+          style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
         >
           <span className="text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>
             {t('game.chakra')}
@@ -898,10 +856,9 @@ function PlayerBar({
           </span>
         </div>
 
-        
         <div
           className="flex items-center gap-1.5 px-2 py-0.5"
-          style={{ borderLeft: `2px solid ${color}30`, backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
+          style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
         >
           <span className="text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>
             {t('game.score')}
@@ -914,8 +871,7 @@ function PlayerBar({
           </span>
         </div>
 
-        
-        <div className="flex items-center gap-2 px-2 py-0.5" style={{ borderLeft: '2px solid rgba(255,255,255,0.06)' }}>
+        <div className="flex items-center gap-2 px-2 py-0.5" style={{ }}>
           <span className="text-[8px] tabular-nums" style={{ color: '#555' }}>
             {t('game.handLabel')}: {ps.hand.length}
           </span>
@@ -940,7 +896,6 @@ function PlayerBar({
         )}
       </div>
 
-      
       <AnimatePresence>
         {showDiscard && (ps.discardPile?.length ?? 0) > 0 && (
           <motion.div
@@ -994,8 +949,6 @@ function PlayerBar({
   );
 }
 
-
-
 interface ReplayBoardProps {
   state: GameState;
   playerNames: { player1: string; player2: string };
@@ -1010,7 +963,6 @@ export function ReplayBoard({ state, playerNames, locale, backgroundUrl, viewAs,
   const t = useTranslations();
   const phaseColor = phaseColorMap[state.phase] ?? '#888';
 
-  
   const bottomPlayer: PlayerID = viewAs ?? 'player1';
   const topPlayer: PlayerID = bottomPlayer === 'player1' ? 'player2' : 'player1';
 
@@ -1036,20 +988,16 @@ export function ReplayBoard({ state, playerNames, locale, backgroundUrl, viewAs,
           style={{
             color: phaseColor,
             backgroundColor: `${phaseColor}18`,
-            borderLeft: `2px solid ${phaseColor}40`,
           }}
         >
           {t(`game.phase.${state.phase}`)}
         </span>
       </div>
 
-      
       <PlayerBar player={topPlayer} state={state} playerNames={playerNames} isTop={true} locale={locale} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} clockSnapshot={clockSnapshot} />
 
-      
       <PlayerHandRow cards={state[topPlayer].hand} locale={locale} player={topPlayer} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} />
 
-      
       <div className="flex-1 flex items-stretch gap-1.5 px-3 py-1 min-h-0 overflow-hidden">
         {Array.from({ length: 4 }).map((_, slotIdx) => {
           const mission = state.activeMissions[slotIdx];
@@ -1069,10 +1017,8 @@ export function ReplayBoard({ state, playerNames, locale, backgroundUrl, viewAs,
         })}
       </div>
 
-      
       <PlayerHandRow cards={state[bottomPlayer].hand} locale={locale} player={bottomPlayer} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} />
 
-      
       <PlayerBar player={bottomPlayer} state={state} playerNames={playerNames} isTop={false} locale={locale} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} clockSnapshot={clockSnapshot} />
     </div>
   );

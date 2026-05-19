@@ -5,9 +5,6 @@ import type { CharacterCard, VisibleCharacter } from '@/lib/engine/types';
 import CardFace from './CardFace';
 import CardBack from './CardBack';
 
-
-
-
 export interface CardStackProps {
   
   character: VisibleCharacter;
@@ -16,9 +13,6 @@ export interface CardStackProps {
   
   onClick?: () => void;
 }
-
-
-
 
 function CardStackInner({ character, className = '', onClick }: CardStackProps) {
   const { isHidden, card, powerTokens, stackSize } = character;
@@ -72,7 +66,6 @@ function CardStackInner({ character, className = '', onClick }: CardStackProps) 
           );
         })}
 
-      
       <div
         className={className}
         style={{
@@ -87,7 +80,6 @@ function CardStackInner({ character, className = '', onClick }: CardStackProps) 
         )}
       </div>
 
-      
       {hasStack && (
         <div
           style={{

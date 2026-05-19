@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { motion } from 'framer-motion';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
@@ -12,12 +13,8 @@ import { Footer } from '@/components/Footer';
 import { DeckSelector } from '@/components/game/DeckSelector';
 import { useSocketStore } from '@/lib/socket/client';
 import { useGameStore } from '@/stores/gameStore';
-import { LeaderboardPanel } from '@/components/play-online/LeaderboardPanel';
-import { MyStatsPanel } from '@/components/play-online/MyStatsPanel';
 import { LiveGamesBar } from '@/components/play-online/LiveGamesBar';
 import { RoomCard } from '@/components/play-online/RoomCard';
-import type { LeaderboardMode } from '@/components/play-online/LeaderboardModeSwitch';
-import { LeaderboardModeSwitch } from '@/components/play-online/LeaderboardModeSwitch';
 import { HoloSurface } from '@/components/HoloSurface';
 import { useHasEvolvingDeck } from '@/components/play-online/useHasEvolvingDeck';
 import { useMemo } from 'react';
@@ -34,7 +31,7 @@ interface ResolvedDeck {
   id?: string;
 }
 
-const LB_MODE_STORAGE_KEY = 'naruto-mythos-leaderboard-mode';
+const EVOLVING_TOGGLE_STORAGE_KEY = 'naruto-mythos-evolving-toggle';
 
 export default function PlayOnlinePage() {
   const t = useTranslations();
@@ -42,18 +39,13 @@ export default function PlayOnlinePage() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
 
-  const initialMode: LeaderboardMode = (() => {
-    if (typeof window === 'undefined') return 'ranked';
+  const initialEvolving = (() => {
+    if (typeof window === 'undefined') return false;
     const fromUrl = searchParams.get('mode');
-    if (fromUrl === 'evolving' || fromUrl === 'ranked') return fromUrl;
-    const fromStorage = localStorage.getItem(LB_MODE_STORAGE_KEY);
-    if (fromStorage === 'evolving' || fromStorage === 'ranked') return fromStorage;
-    return 'ranked';
+    if (fromUrl === 'evolving') return true;
+    if (fromUrl === 'ranked') return false;
+    return localStorage.getItem(EVOLVING_TOGGLE_STORAGE_KEY) === '1';
   })();
-  const [leaderboardMode, setLeaderboardMode] = useState<LeaderboardMode>(initialMode);
-  useEffect(() => {
-    try { localStorage.setItem(LB_MODE_STORAGE_KEY, leaderboardMode); } catch { /* ignore */ }
-  }, [leaderboardMode]);
 
   const [view, setView] = useState<View>('browse');
   const [selectedMode, setSelectedMode] = useState<GameMode>('casual');
@@ -63,7 +55,10 @@ export default function PlayOnlinePage() {
   const [showJoinInput, setShowJoinInput] = useState(false);
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [isEvolvingToggle, setIsEvolvingToggle] = useState(leaderboardMode === 'evolving');
+  const [isEvolvingToggle, setIsEvolvingToggle] = useState(initialEvolving);
+  useEffect(() => {
+    try { localStorage.setItem(EVOLVING_TOGGLE_STORAGE_KEY, isEvolvingToggle ? '1' : '0'); } catch { /* ignore */ }
+  }, [isEvolvingToggle]);
   const showToast = useToastStore((s) => s.showToast);
   const triggerEvoErrorToast = useCallback(() => {
     showToast({
@@ -321,9 +316,8 @@ export default function PlayOnlinePage() {
   }, [tournamentMatchRoom, deckSelected]);
 
   const modeStyle = (mode: GameMode) => ({
-    backgroundColor: selectedMode === mode ? 'rgba(196, 163, 90, 0.12)' : 'transparent',
-    boxShadow: selectedMode === mode ? 'inset 0 -2px 0 #c4a35a' : 'none',
-    color: selectedMode === mode ? '#e8e8e8' : '#555555',
+    backgroundColor: selectedMode === mode ? 'rgba(196, 163, 90, 0.14)' : 'transparent',
+    color: selectedMode === mode ? '#e8c477' : '#666666',
   });
 
   return (
@@ -336,16 +330,31 @@ export default function PlayOnlinePage() {
       <DecorativeIcons />
       <CardBackgroundDecor variant="playOnline" />
 
-      <div className="flex-1 px-2 sm:px-4 py-4 sm:py-6 relative z-10">
-        <div className="mx-auto w-full" style={{ maxWidth: 1280 }}>
-          <header className="flex flex-col items-center gap-1 mb-4 sm:mb-5">
-            <h1 className="text-xl sm:text-2xl font-bold uppercase" style={{ color: '#c4a35a', letterSpacing: '0.28em' }}>
+      <div className="flex-1 px-3 sm:px-6 py-6 sm:py-10 relative z-10">
+        <div className="mx-auto w-full" style={{ maxWidth: 960 }}>
+          <motion.header
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-col items-center gap-2 mb-6 sm:mb-8"
+          >
+            <h1
+              className="font-display text-2xl sm:text-3xl md:text-4xl font-bold uppercase leading-none"
+              style={{
+                color: '#e8c477',
+                letterSpacing: '0.18em',
+                textShadow: '0 2px 18px rgba(196, 163, 90, 0.22)',
+              }}
+            >
               {t('online.title')}
             </h1>
-            <p className="text-[10px] sm:text-[11px]" style={{ color: '#555' }}>
+            <p
+              className="font-body text-[10px] sm:text-[11px] uppercase"
+              style={{ color: '#666', letterSpacing: '0.32em' }}
+            >
               {t('online.signedInAs', { name: session.user.name })}
             </p>
-          </header>
+          </motion.header>
 
           {bannedCardsError && bannedCardsError.length > 0 && (
             <div
@@ -413,41 +422,8 @@ export default function PlayOnlinePage() {
           )}
 
           {!showDeckSelector && !deckSelected && (
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4">
-              <div className="flex flex-col gap-4 min-w-0">
-                <LiveGamesBar />
-
-                <div
-                  className="flex w-full overflow-hidden"
-                  style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}
-                >
-                  <button
-                    onClick={() => setView('browse')}
-                    className="flex-1 py-2.5 text-[11px] font-bold uppercase cursor-pointer no-select"
-                    style={{
-                      letterSpacing: '0.22em',
-                      backgroundColor: view === 'browse' ? 'rgba(196, 163, 90, 0.10)' : 'transparent',
-                      boxShadow: view === 'browse' ? 'inset 0 -2px 0 #c4a35a' : 'inset 0 -2px 0 transparent',
-                      color: view === 'browse' ? '#e8e8e8' : '#555',
-                      transition: 'color 0.15s',
-                    }}
-                  >
-                    {t('online.publicRooms')}
-                  </button>
-                  <button
-                    onClick={() => setView('private')}
-                    className="flex-1 py-2.5 text-[11px] font-bold uppercase cursor-pointer no-select"
-                    style={{
-                      letterSpacing: '0.22em',
-                      backgroundColor: view === 'private' ? 'rgba(196, 163, 90, 0.10)' : 'transparent',
-                      boxShadow: view === 'private' ? 'inset 0 -2px 0 #c4a35a' : 'inset 0 -2px 0 transparent',
-                      color: view === 'private' ? '#e8e8e8' : '#555',
-                      transition: 'color 0.15s',
-                    }}
-                  >
-                    {t('online.privateRoom')}
-                  </button>
-                </div>
+            <div className="flex flex-col gap-5">
+                <ViewTabs view={view} onChange={setView} />
 
                 {view === 'browse' && !roomCode && (
                   <div className="flex flex-col gap-3">
@@ -488,17 +464,21 @@ export default function PlayOnlinePage() {
                 {view === 'private' && (
                   <div className="p-5 sm:p-6" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
                     {roomCode ? (
-                      <div className="flex flex-col gap-4 items-center">
-                        <p className="text-xs uppercase" style={{ color: '#888', letterSpacing: '0.2em' }}>
+                      <div className="flex flex-col gap-5 items-center py-3">
+                        <p className="font-body text-[11px] uppercase" style={{ color: '#888', letterSpacing: '0.32em' }}>
                           {t('online.roomCreated')}
                         </p>
                         <p
-                          className="text-3xl font-bold"
-                          style={{ color: '#c4a35a', letterSpacing: '0.3em' }}
+                          className="font-display text-3xl sm:text-4xl font-bold"
+                          style={{
+                            color: '#e8c477',
+                            letterSpacing: '0.32em',
+                            textShadow: '0 2px 18px rgba(196, 163, 90, 0.35)',
+                          }}
                         >
                           {roomCode}
                         </p>
-                        <p className="text-xs" style={{ color: '#555' }}>
+                        <p className="font-body text-[11px] uppercase" style={{ color: '#555', letterSpacing: '0.2em' }}>
                           {opponentJoined ? t('online.opponentJoined') : t('online.waitingForOpponent')}
                         </p>
                       </div>
@@ -597,26 +577,18 @@ export default function PlayOnlinePage() {
                     )}
                   </div>
                 )}
-              </div>
 
-              <aside className="flex flex-col gap-4 min-w-0">
-                <LeaderboardPanel mode={leaderboardMode} onModeChange={setLeaderboardMode} topCount={5} />
-                <MyStatsPanel
-                  username={session.user.name ?? ''}
-                  mode={leaderboardMode}
-                  onModeChange={setLeaderboardMode}
-                />
-              </aside>
+              <LiveGamesBar />
             </div>
           )}
 
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center mt-10 sm:mt-12">
             <Link
               href="/"
-              className="px-6 py-2 text-xs uppercase no-select"
-              style={{ backgroundColor: 'rgba(20, 20, 20, 0.85)', color: '#888', letterSpacing: '0.18em' }}
+              className="text-[11px] uppercase no-select transition-opacity hover:opacity-100"
+              style={{ color: '#888', letterSpacing: '0.3em', opacity: 0.7 }}
             >
-              {t('auth.backToHome')}
+              {'<'} {t('auth.backToHome')}
             </Link>
           </div>
         </div>
@@ -719,23 +691,27 @@ function RoomColumn({
   emptyLabel: string;
   disableCreate?: boolean;
 }) {
+  const tintBg = accent === '#b33e3e' ? 'rgba(179, 62, 62, 0.12)' : 'rgba(196, 163, 90, 0.10)';
   return (
     <div className="flex flex-col" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
       <div
-        className="px-3 py-2"
-        style={{ boxShadow: `inset 0 -2px 0 ${accent}` }}
+        className="px-4 py-3 flex items-center justify-center"
+        style={{ backgroundColor: tintBg }}
       >
-        <span className="text-[11px] font-bold uppercase" style={{ color: accent, letterSpacing: '0.22em' }}>
+        <span
+          className="font-display text-[12px] font-bold uppercase"
+          style={{ color: accent, letterSpacing: '0.28em' }}
+        >
           {title}
         </span>
       </div>
-      <div className="flex-1 min-h-[88px]">
+      <div className="flex-1 min-h-[100px]">
         {rooms.length === 0 ? (
-          <div className="px-3 py-6 text-center">
-            <span className="text-[10px]" style={{ color: '#444' }}>{emptyLabel}</span>
+          <div className="px-3 py-8 text-center">
+            <span className="font-body text-[10px] uppercase" style={{ color: '#444', letterSpacing: '0.2em' }}>{emptyLabel}</span>
           </div>
         ) : (
-          <div className="max-h-56 overflow-y-auto flex flex-col gap-1.5 p-1.5">
+          <div className="max-h-56 overflow-y-auto flex flex-col gap-1.5 p-2">
             {rooms.map((room) => (
               <RoomCard
                 key={room.code}
@@ -756,17 +732,59 @@ function RoomColumn({
       <button
         onClick={onCreate}
         disabled={disableCreate}
-        className="w-full py-2.5 text-[11px] font-bold uppercase no-select"
+        className="w-full py-3 text-[11px] font-bold uppercase no-select transition-opacity"
         style={{
-          backgroundColor: disableCreate ? '#333' : accent,
-          color: accent === '#b33e3e' && !disableCreate ? '#e8e8e8' : '#0a0a0a',
-          letterSpacing: '0.18em',
+          backgroundColor: disableCreate ? '#2a2a2a' : accent,
+          color: accent === '#b33e3e' && !disableCreate ? '#ffffff' : '#0a0a0a',
+          letterSpacing: '0.22em',
           cursor: disableCreate ? 'not-allowed' : 'pointer',
-          opacity: disableCreate ? 0.55 : 1,
+          opacity: disableCreate ? 0.45 : 1,
         }}
       >
         {createLabel}
       </button>
+    </div>
+  );
+}
+
+function ViewTabs({ view, onChange }: { view: View; onChange: (v: View) => void }) {
+  const t = useTranslations();
+  const tabs: { key: View; labelKey: string }[] = [
+    { key: 'browse', labelKey: 'online.publicRooms' },
+    { key: 'private', labelKey: 'online.privateRoom' },
+  ];
+  return (
+    <div
+      className="relative flex w-full overflow-hidden"
+      style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}
+    >
+      {tabs.map((tab) => {
+        const active = view === tab.key;
+        return (
+          <button
+            key={tab.key}
+            onClick={() => onChange(tab.key)}
+            className="relative flex-1 py-3 text-[11px] font-bold uppercase cursor-pointer no-select"
+            style={{
+              letterSpacing: '0.26em',
+              backgroundColor: 'transparent',
+              color: active ? '#e8c477' : '#666',
+              transition: 'color 0.18s',
+              zIndex: 1,
+            }}
+          >
+            {active && (
+              <motion.span
+                layoutId="view-tab-bg"
+                className="absolute inset-0"
+                style={{ backgroundColor: 'rgba(196, 163, 90, 0.10)', zIndex: -1 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+              />
+            )}
+            {t(tab.labelKey)}
+          </button>
+        );
+      })}
     </div>
   );
 }

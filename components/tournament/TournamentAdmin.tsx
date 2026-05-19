@@ -128,16 +128,14 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
   const toggle = (s: string) => setExpandedSection(prev => prev === s ? null : s);
 
   return (
-    <div className="flex flex-col gap-3 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626', borderLeft: '3px solid #c4a35a' }}>
+    <div className="flex flex-col gap-3 p-4" style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)' }}>
       <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
         {isAdmin ? t('adminPanel') : t('organizer')}
       </h3>
 
-      
       {adminMessage && <p className="text-[10px] px-2 py-1" style={{ backgroundColor: '#1a3a1a', color: '#4ade80', border: '1px solid #333' }}>{adminMessage}</p>}
       {adminError && <p className="text-[10px] px-2 py-1" style={{ backgroundColor: '#3a1a1a', color: '#f87171', border: '1px solid #333' }}>{adminError}</p>}
 
-      
       {tour.status === 'registration' && (
         <div style={sectionStyle}>
           <button onClick={handleStart} disabled={!canStart || startingTournament}
@@ -149,7 +147,6 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      
       {tour.status === 'in_progress' && activeMatches.length > 0 && (
         <div style={sectionStyle}>
           <SectionHeader id="forfeit" label={t('forceForfeit')} color="#cc4444" currentExpanded={expandedSection} onToggle={toggle} />
@@ -177,7 +174,6 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      
       {tour.status === 'in_progress' && (
         <div style={sectionStyle}>
           <SectionHeader id="disqualify" label={t('disqualifyPlayer')} color="#ef4444" currentExpanded={expandedSection} onToggle={toggle} />
@@ -195,7 +191,6 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      
       {tour.status === 'in_progress' && (
         <div style={sectionStyle}>
           <SectionHeader id="setWinner" label={t('overrideMatchResult')} color="#f59e0b" currentExpanded={expandedSection} onToggle={toggle} />
@@ -225,7 +220,6 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      
       {tour.status === 'in_progress' && (
         <div style={sectionStyle}>
           <SectionHeader id="resetMatch" label={t('resetMatch')} color="#3b82f6" currentExpanded={expandedSection} onToggle={toggle} />
@@ -243,7 +237,6 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      
       {tour.status === 'registration' && tour.participants.length > 0 && (
         <div style={sectionStyle}>
           <SectionHeader id="removePlayer" label={t('removePlayer')} color="#f97316" currentExpanded={expandedSection} onToggle={toggle} />
@@ -259,7 +252,6 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      
       <div style={sectionStyle}>
         <SectionHeader id="banPlayer" label={t('banPlayer')} color="#dc2626" currentExpanded={expandedSection} onToggle={toggle} />
         {expandedSection === 'banPlayer' && (
@@ -293,7 +285,6 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         )}
       </div>
 
-      
       {tour.status !== 'completed' && tour.status !== 'cancelled' && (
         <div style={sectionStyle}>
           <SectionHeader id="cancel" label={t('cancel')} color="#666" currentExpanded={expandedSection} onToggle={toggle} />
@@ -306,7 +297,6 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      
       <div style={sectionStyle}>
         <SectionHeader id="delete" label={t('deleteTournament')} color="#cc4444" currentExpanded={expandedSection} onToggle={toggle} />
         {expandedSection === 'delete' && (

@@ -74,7 +74,6 @@ export function EvolvingRulesModal({ open, onClose }: Props) {
             style={{
               backgroundColor: PANEL_BG,
               border: `1px solid ${BORDER}`,
-              borderTop: `3px solid ${GOLD}`,
             }}
             onClick={(e) => e.stopPropagation()}
           >

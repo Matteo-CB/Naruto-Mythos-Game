@@ -62,7 +62,7 @@ function Toast({ toast }: { toast: ToastItem }) {
       className="flex flex-col gap-1.5 px-4 py-3 pointer-events-auto no-select"
       style={{
         backgroundColor: colors.bg,
-        boxShadow: `0 16px 40px rgba(0,0,0,0.55), inset 1px 0 0 ${colors.accent}, inset 0 -1px 0 rgba(255,255,255,0.04)`,
+        boxShadow: '0 16px 40px rgba(0,0,0,0.55)',
       }}
     >
       {title && (

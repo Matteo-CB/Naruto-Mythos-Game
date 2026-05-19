@@ -80,7 +80,7 @@ export function HomeMenuButton({
           t.style.backgroundColor = '#141414';
         }}
       >
-        <span className="relative z-10 px-4">{label}</span>
+        <span className="font-display relative z-10 px-4">{label}</span>
       </Link>
 
       {/* Right slot lives OUTSIDE the Link so it can poke past the button's

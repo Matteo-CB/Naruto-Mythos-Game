@@ -61,29 +61,36 @@ const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDispla
       initial={{ opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.2 }}
-      className="flex flex-col gap-0.5 px-3 py-1.5 font-body"
-      style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.03)' }}
+      className="flex flex-col gap-1.5 px-4 py-3 font-body"
+      style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}
     >
-      
-      <div className="flex items-center gap-2 text-[10px]">
+
+      <div className="flex items-center gap-2.5 text-[11px]">
         <span
-          className="shrink-0 px-1 py-0.5 uppercase font-medium"
+          className="shrink-0 px-1.5 py-0.5 uppercase font-bold"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.04)',
-            color: '#777777',
-            borderLeft: '2px solid rgba(196, 163, 90, 0.2)',
+            backgroundColor: 'rgba(196, 163, 90, 0.10)',
+            color: '#888888',
+            letterSpacing: '0.12em',
+            fontSize: '8.5px',
           }}
         >
           T{entry.turn} {formatPhase(entry.phase)}
         </span>
         {entry.player && (
-          <span className="shrink-0 font-medium" style={{ color: playerColor }}>
+          <span
+            className="shrink-0 font-bold uppercase"
+            style={{ color: playerColor, fontSize: '10px', letterSpacing: '0.12em' }}
+          >
             {displayName}
           </span>
         )}
       </div>
-      
-      <div className="text-xs pl-1" style={{ color: '#e0e0e0' }}>
+
+      <div
+        className="text-[13px] leading-relaxed"
+        style={{ color: '#e8e8e8', paddingLeft: 2 }}
+      >
         {entry.messageKey ? t(entry.messageKey, localizeParams(entry.messageParams, locale) ?? {}) : (entry.details || entry.action)}
       </div>
     </motion.div>
@@ -99,6 +106,13 @@ export function GameLog() {
   const toggleGameLog = useUIStore((s) => s.toggleGameLog);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isSpectating = useSocketStore((s) => s.isSpectating);
+  const isSandboxMode = useGameStore((s) => s.isSandboxMode);
+
+  const baseTopPx = isSpectating ? 36 : 0;
+  const sandboxOffsetPx = isSandboxMode ? 40 : 0;
+  const statsBarPx = 44;
+  const toggleTopPx = baseTopPx + sandboxOffsetPx + statsBarPx + 8;
+  const panelTopPx = baseTopPx;
 
   const formatPhase = (phase: GamePhase): string => {
     const key = phaseTranslationKeys[phase];
@@ -117,11 +131,11 @@ export function GameLog() {
       {!showGameLog && (
         <button
           onClick={toggleGameLog}
-          className={`fixed ${isSpectating ? 'top-16' : 'top-10'} right-4 z-40 px-3 py-2 text-xs font-medium cursor-pointer uppercase tracking-wider`}
+          className="fixed right-4 z-40 px-3 py-2 text-xs font-medium cursor-pointer uppercase tracking-wider"
           style={{
-            backgroundColor: 'rgba(10, 10, 14, 0.9)',
-            borderLeft: '3px solid rgba(196, 163, 90, 0.3)',
-            color: '#888888',
+            top: toggleTopPx,
+            backgroundColor: 'rgba(196, 163, 90, 0.10)',
+            color: '#c4a35a',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
           }}
         >
@@ -129,7 +143,6 @@ export function GameLog() {
         </button>
       )}
 
-      
       <AnimatePresence>
         {showGameLog && (
           <motion.div
@@ -137,12 +150,13 @@ export function GameLog() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 300, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className={`fixed ${isSpectating ? 'top-9' : 'top-7'} right-0 z-30 flex flex-col`}
+            className="fixed right-0 z-30 flex flex-col"
             style={{
-              height: isSpectating ? 'calc(100% - 36px)' : 'calc(100% - 56px)',
+              top: panelTopPx,
+              height: `calc(100% - ${panelTopPx}px)`,
               width: 'min(320px, calc(100vw - 8px))',
               backgroundColor: 'rgba(8, 8, 12, 0.97)',
-              borderLeft: '3px solid rgba(196, 163, 90, 0.15)',
+              boxShadow: '-8px 0 24px rgba(0,0,0,0.5)',
             }}
           >
             
@@ -160,9 +174,8 @@ export function GameLog() {
                 onClick={toggleGameLog}
                 className="text-xs px-3 py-1 cursor-pointer uppercase tracking-wider font-bold"
                 style={{
-                  backgroundColor: 'rgba(179, 62, 62, 0.15)',
+                  backgroundColor: 'rgba(179, 62, 62, 0.18)',
                   border: 'none',
-                  borderLeft: '2px solid rgba(179, 62, 62, 0.4)',
                   color: '#b33e3e',
                 }}
               >
@@ -170,7 +183,6 @@ export function GameLog() {
               </button>
             </div>
 
-            
             <div
               ref={scrollRef}
               className="flex-1 overflow-y-auto"

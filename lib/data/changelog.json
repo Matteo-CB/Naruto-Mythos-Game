@@ -1,16 +1,41 @@
 {
   "entries": [
     {
+      "date": "2026-05-19",
+      "title_fr": "Refonte visuelle : nouvelle police, infos de jeu plus claires",
+      "title_en": "Visual refresh: new font, clearer in-game info",
+      "changes_fr": [
+        "Nouvelle police d'écriture (Geist) utilisée dans tout le site pour une lecture plus douce et homogène.",
+        "Le chakra et le score en haut de l'écran sont plus gros et plus lisibles, avec une animation à chaque changement.",
+        "Les bordures colorées sur un seul côté (à gauche, en haut ou en bas) ont été supprimées partout pour un rendu plus propre.",
+        "Journal de partie : entrées plus aérées et plus lisibles.",
+        "Solo contre soi-même : la barre d'outils ne masque plus le score de l'adversaire.",
+        "Surlignage blanc des cartes jouées : il change maintenant à chaque action et non plus à chaque tour complet.",
+        "Page Apprendre et Quiz : fond transparent pour mieux profiter du décor de fond.",
+        "Page Jouer : refonte visuelle complète, les trois modes (en ligne, contre l'IA, solo contre soi-même) sont maintenant présentés en trois cartes côte à côte sur grand écran, avec un visuel plus soigné."
+      ],
+      "changes_en": [
+        "New body font (Geist) used across the whole site for a smoother and more consistent read.",
+        "Chakra and score at the top of the screen are now bigger and easier to read, with an animation on every change.",
+        "One-sided coloured borders (left, top or bottom) have been removed everywhere for a cleaner look.",
+        "Game log: entries are more spaced out and easier to read.",
+        "Solo against yourself: the toolbar no longer hides the opponent's score.",
+        "White outline on played cards now changes with every action instead of every full turn.",
+        "Learn and Quiz pages: transparent background to better enjoy the decor in the back.",
+        "Play page: full visual refresh, the three modes (online, vs AI, solo vs self) now sit as three cards side by side on wide screens, with a more polished look."
+      ]
+    },
+    {
       "date": "2026-05-18",
       "title_fr": "Le mode evolving rejoint Jouer en ligne",
       "title_en": "Evolving mode joins Play Online",
       "changes_fr": [
-        "Le mode evolving est integre directement dans la page Jouer en ligne, plus besoin d'une page separee.",
-        "Tu peux activer l'evolving au moment de creer une room, en casual comme en classee, et une apparence holographique propre a chaque room distingue les parties evolving.",
-        "Le classement bascule entre Classee et Evolving d'un seul geste, et tes stats suivent la vue que tu choisis.",
-        "Les rooms evolving ne peuvent etre rejointes qu'avec un deck evolving, avec un message clair et non bloquant si tu n'en as pas.",
-        "Tes stats affichent maintenant ta plus longue serie de victoires en cours et n'incluent plus les egalites (qui n'existent pas dans le jeu).",
-        "Un petit indicateur de connexion apparait en haut a droite uniquement en cas de souci reseau, et l'ancienne grosse erreur 'deck banni' ne s'affiche plus a tort quand le probleme vient en realite du reseau."
+        "Le mode evolving est intégré directement dans la page Jouer en ligne, plus besoin d'une page séparée.",
+        "Tu peux activer l'evolving au moment de créer une room, en casual comme en classée, et une apparence holographique propre à chaque room distingue les parties evolving.",
+        "Le classement bascule entre Classée et Evolving d'un seul geste, et tes stats suivent la vue que tu choisis.",
+        "Les rooms evolving ne peuvent être rejointes qu'avec un deck evolving, avec un message clair et non bloquant si tu n'en as pas.",
+        "Tes stats affichent maintenant ta plus longue série de victoires en cours et n'incluent plus les égalités (qui n'existent pas dans le jeu).",
+        "Un petit indicateur de connexion apparaît en haut à droite uniquement en cas de souci réseau, et l'ancienne grosse erreur 'deck banni' ne s'affiche plus à tort quand le problème vient en réalité du réseau."
       ],
       "changes_en": [
         "Evolving mode is now part of the Play Online page, no more separate page.",
@@ -23,14 +48,14 @@
     },
     {
       "date": "2026-05-16",
-      "title_fr": "Integration Discord : roles, annonces, salon inscription",
+      "title_fr": "Intégration Discord : rôles, annonces, salon inscription",
       "title_en": "Discord integration: roles, announcements, signup channel",
       "changes_fr": [
-        "Discord : les roles de vainqueur de tournoi sont desormais en anglais (Tournament Winner X). Les roles existants sont renommes automatiquement sans perdre tes attributions.",
-        "Bug corrige : l'annonce du vainqueur de tournoi sur Discord ne partait plus dans certains cas. Le webhook recupere maintenant la variable d'environnement a chaque appel et explique clairement dans les logs si l'envoi echoue.",
-        "Discord : a chaque creation de tournoi, un message detaille est poste dans le salon planning avec le format, le mode de jeu, le nombre max de joueurs, la date de debut (affichee dans le fuseau horaire de chaque lecteur), un compte a rebours, les eventuelles restrictions et un ping du role Tournament.",
-        "Discord : tu peux maintenant t'inscrire aux notifications de tournois en reagissant avec l'emoji trophee sur le message d'annonce du salon inscription. Retire la reaction pour ne plus etre ping.",
-        "Les stats Evolving sont desormais separees des stats classees sur les profils et les classements. Les anciennes parties sont recuperees automatiquement et le classement Evolving n'affiche que les victoires / defaites / nuls Evolving."
+        "Discord : les rôles de vainqueur de tournoi sont désormais en anglais (Tournament Winner X). Les rôles existants sont renommés automatiquement sans perdre tes attributions.",
+        "Bug corrigé : l'annonce du vainqueur de tournoi sur Discord ne partait plus dans certains cas. Le webhook récupère maintenant la variable d'environnement à chaque appel et explique clairement dans les logs si l'envoi échoue.",
+        "Discord : à chaque création de tournoi, un message détaillé est posté dans le salon planning avec le format, le mode de jeu, le nombre max de joueurs, la date de début (affichée dans le fuseau horaire de chaque lecteur), un compte à rebours, les éventuelles restrictions et un ping du rôle Tournament.",
+        "Discord : tu peux maintenant t'inscrire aux notifications de tournois en réagissant avec l'emoji trophée sur le message d'annonce du salon inscription. Retire la réaction pour ne plus être ping.",
+        "Les stats Evolving sont désormais séparées des stats classées sur les profils et les classements. Les anciennes parties sont récupérées automatiquement et le classement Evolving n'affiche que les victoires / défaites / nuls Evolving."
       ],
       "changes_en": [
         "Discord: tournament winner roles are now in English (Tournament Winner X). Existing roles are renamed automatically without losing any role assignments.",
@@ -42,27 +67,27 @@
     },
     {
       "date": "2026-05-15",
-      "title_fr": "Precisions de regles : doublons de nom, Rashomon, et personnages upgradees",
+      "title_fr": "Précisions de règles : doublons de nom, Rashomon, et personnages upgradés",
       "title_en": "Rule clarifications: name duplicates, Rashomon, and upgraded characters",
       "changes_fr": [
-        "Precision regle : si un effet cree un doublon de nom visible sur ton cote d'une mission, la nouvelle carte qui arrive est defaussee chez son proprietaire sans declencher d'effet de defaite.",
-        "Precision regle : jouer, reveler ou deplacer un personnage vers un doublon de nom est bloque avant le paiement du chakra.",
-        "Precision regle : les effets statics (auras, conditions de missions du type 4+ Puissance) lisent la valeur de base du personnage (puissance imprimee + jetons puissance), pas sa puissance modifiee.",
-        "Precision regle Rashomon : met sa cible exactement a 0 Puissance, en ignorant tous les autres modificateurs positifs ou negatifs. Choisit la cible avec la plus haute puissance de base et la garde jusqu'a un changement de situation.",
-        "Precision regle : quand un personnage upgrade est renvoye en main (par exemple par la mission Bring it Back ou Tsunade 004), seule la carte du dessus retourne en main. Les cartes en dessous vont a la pile de defausse de leur proprietaire.",
-        "Constructeur de deck : nouveau bouton Trier par nom a cote de Trier par cout, range les personnages par nom puis par cout. Disponible aussi sur mobile.",
-        "Constructeur de deck mobile : Evolving Mode est maintenant accessible (compteur de points, bouton ON/OFF, et liste des cartes Evolving avec leur cout).",
-        "Classement Evolving : les joueurs qui n'ont jamais joue de partie Evolving n'apparaissent plus dans le classement.",
-        "Bug corrige : quand tu refusais de sacrifier Genma 049 pour proteger un personnage, les autres effets de defaite (Tsunade 003, Sasuke 136) ne se declenchaient pas. Ils se declenchent maintenant normalement.",
+        "Précision règle : si un effet crée un doublon de nom visible sur ton côté d'une mission, la nouvelle carte qui arrive est défaussée chez son propriétaire sans déclencher d'effet de défaite.",
+        "Précision règle : jouer, révéler ou déplacer un personnage vers un doublon de nom est bloqué avant le paiement du chakra.",
+        "Précision règle : les effets statics (auras, conditions de missions du type 4+ Puissance) lisent la valeur de base du personnage (puissance imprimée + jetons puissance), pas sa puissance modifiée.",
+        "Précision règle Rashomon : met sa cible exactement à 0 Puissance, en ignorant tous les autres modificateurs positifs ou négatifs. Choisit la cible avec la plus haute puissance de base et la garde jusqu'à un changement de situation.",
+        "Précision règle : quand un personnage upgradé est renvoyé en main (par exemple par la mission Bring it Back ou Tsunade 004), seule la carte du dessus retourne en main. Les cartes en dessous vont à la pile de défausse de leur propriétaire.",
+        "Constructeur de deck : nouveau bouton Trier par nom à côté de Trier par coût, range les personnages par nom puis par coût. Disponible aussi sur mobile.",
+        "Constructeur de deck mobile : Evolving Mode est maintenant accessible (compteur de points, bouton ON/OFF, et liste des cartes Evolving avec leur coût).",
+        "Classement Evolving : les joueurs qui n'ont jamais joué de partie Evolving n'apparaissent plus dans le classement.",
+        "Bug corrigé : quand tu refusais de sacrifier Genma 049 pour protéger un personnage, les autres effets de défaite (Tsunade 003, Sasuke 136) ne se déclenchaient pas. Ils se déclenchent maintenant normalement.",
         "Salon Evolving : les parties Evolving en cours apparaissent maintenant dans la liste comme dans Jouer en ligne. Tu peux les regarder en spectateur.",
-        "Bug corrige : quand l'adversaire restait inactif au mulligan, la partie etait annulee mais le joueur restait coince sur l'ecran de jeu. La partie se ferme maintenant proprement et tu retournes au salon en cliquant sur le bouton.",
-        "Bug corrige : Kiba Inuzuka 113 (Mythos) cachait toujours l'Akamaru le plus a gauche au lieu de te laisser choisir. Tu peux maintenant choisir lequel cacher comme avec la version Rare.",
-        "Ecran de fin de partie : quand l'adversaire abandonne, une ligne explicite te confirme que tu remportes la partie.",
-        "L'animation de revelation des 4 missions au debut de partie a ete retiree. La phase de mulligan demarre directement.",
-        "Page d'accueil : le scintillement sur telephone et tablette est corrige. L'animation lente du fond est maintenant reservee aux ecrans larges.",
-        "Petit fix : la croix de fermeture sur la fenetre 'En attente de l'adversaire' apres le mulligan a ete retiree, elle servait a rien.",
-        "Bug corrige : Shikamaru Nara (cout 3) ne prenait pas en compte les personnages reveles ou joues au tour precedent. Tous ces personnages comptent maintenant pour son effet de deplacement.",
-        "Bug corrige : la revanche en Evolving renvoyait vers la selection de deck normale, qui affichait tous tes decks. Elle te ramene maintenant au salon Evolving et ne te propose que tes decks Evolving."
+        "Bug corrigé : quand l'adversaire restait inactif au mulligan, la partie était annulée mais le joueur restait coincé sur l'écran de jeu. La partie se ferme maintenant proprement et tu retournes au salon en cliquant sur le bouton.",
+        "Bug corrigé : Kiba Inuzuka 113 (Mythos) cachait toujours l'Akamaru le plus à gauche au lieu de te laisser choisir. Tu peux maintenant choisir lequel cacher comme avec la version Rare.",
+        "Écran de fin de partie : quand l'adversaire abandonne, une ligne explicite te confirme que tu remportes la partie.",
+        "L'animation de révélation des 4 missions au début de partie a été retirée. La phase de mulligan démarre directement.",
+        "Page d'accueil : le scintillement sur téléphone et tablette est corrigé. L'animation lente du fond est maintenant réservée aux écrans larges.",
+        "Petit fix : la croix de fermeture sur la fenêtre 'En attente de l'adversaire' après le mulligan a été retirée, elle servait à rien.",
+        "Bug corrigé : Shikamaru Nara (coût 3) ne prenait pas en compte les personnages révélés ou joués au tour précédent. Tous ces personnages comptent maintenant pour son effet de déplacement.",
+        "Bug corrigé : la revanche en Evolving renvoyait vers la sélection de deck normale, qui affichait tous tes decks. Elle te ramène maintenant au salon Evolving et ne te propose que tes decks Evolving."
       ],
       "changes_en": [
         "Rule clarification: if an effect creates a same-name duplicate on your side of a mission, the newly arriving card is discarded to its owner with no defeat effects.",
@@ -87,18 +112,18 @@
     },
     {
       "date": "2026-05-14",
-      "title_fr": "Evolving Mode et nouvelle regle d'upgrade",
+      "title_fr": "Evolving Mode et nouvelle règle d'upgrade",
       "title_en": "Evolving Mode and new upgrade rule",
       "changes_fr": [
-        "Nouveau mode Evolving Mode : chaque joueur a 5 points a depenser sur une liste de 13 personnages a 1 ou 2 points. Le joueur avec moins de points commence la partie avec une avance en points de mission egale a la difference.",
-        "Les decks compatibles Evolving sont marques d'un effet brillant dont la couleur change selon le nombre de points utilises.",
-        "Nouveau classement Evolving separe du classement normal, accessible sur la page Classement via un bouton.",
-        "Nouveau salon en ligne dedie au mode Evolving avec le top 5 des joueurs et la liste des salons disponibles.",
-        "Tu peux maintenant creer des tournois en format Evolving, avec rejet automatique des decks non compatibles.",
-        "Sur ton profil, tes statistiques Evolving (ELO, victoires, defaites) sont affichees a cote de tes stats normales.",
-        "Regle de jeu : un personnage que tu controles mais qui ne t'appartient pas (vole a l'adversaire) ne peut plus etre upgrade.",
-        "Bug corrige : le classement du quiz se chargeait plus, il est revenu.",
-        "Bug corrige : le bouton Deck Aleatoire dans un salon Evolving piochait parfois des cartes hors-format, il respecte maintenant les regles du mode."
+        "Nouveau mode Evolving Mode : chaque joueur a 5 points à dépenser sur une liste de 13 personnages à 1 ou 2 points. Le joueur avec moins de points commence la partie avec une avance en points de mission égale à la différence.",
+        "Les decks compatibles Evolving sont marqués d'un effet brillant dont la couleur change selon le nombre de points utilisés.",
+        "Nouveau classement Evolving séparé du classement normal, accessible sur la page Classement via un bouton.",
+        "Nouveau salon en ligne dédié au mode Evolving avec le top 5 des joueurs et la liste des salons disponibles.",
+        "Tu peux maintenant créer des tournois en format Evolving, avec rejet automatique des decks non compatibles.",
+        "Sur ton profil, tes statistiques Evolving (ELO, victoires, défaites) sont affichées à côté de tes stats normales.",
+        "Règle de jeu : un personnage que tu contrôles mais qui ne t'appartient pas (volé à l'adversaire) ne peut plus être upgradé.",
+        "Bug corrigé : le classement du quiz se chargeait plus, il est revenu.",
+        "Bug corrigé : le bouton Deck Aléatoire dans un salon Evolving piochait parfois des cartes hors-format, il respecte maintenant les règles du mode."
       ],
       "changes_en": [
         "New Evolving Mode: each player has 5 points to spend on a list of 13 characters costing 1 or 2 points each. The player with fewer points starts the match with a Mission Point lead equal to the difference.",

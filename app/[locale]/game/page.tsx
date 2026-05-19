@@ -37,7 +37,6 @@ const TrainingCoachPanel = dynamic(
 );
 import { BanNotification } from '@/components/BanNotification';
 
-
 const GameBoard = dynamic(
   () => import('@/components/game/GameBoard').then((mod) => mod.default),
   {
@@ -73,7 +72,6 @@ export default function GamePage() {
   const updateOnlineState = useGameStore((s) => s.updateOnlineState);
   const endOnlineGame = useGameStore((s) => s.endOnlineGame);
 
-  
   const socketVisibleState = useSocketStore((s) => s.visibleState);
   const socketGameStarted = useSocketStore((s) => s.gameStarted);
   const socketGameEnded = useSocketStore((s) => s.gameEnded);
@@ -86,7 +84,6 @@ export default function GamePage() {
   const socketClearError = useSocketStore((s) => s.clearError);
   const isSpectating = useSocketStore((s) => s.isSpectating);
 
-  
   const hasActiveGame = gameState || (isOnlineGame && visibleState) || isSpectating;
 
   const acknowledgeGameCancelled = useCallback(() => {
@@ -94,7 +91,6 @@ export default function GamePage() {
     useGameStore.setState({ gameState: null, visibleState: null, gameOver: false, isOnlineGame: false });
     router.push('/play/online');
   }, [router]);
-
 
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
@@ -113,7 +109,6 @@ export default function GamePage() {
     };
   }, [hasActiveGame, router]);
 
-  
   useEffect(() => {
     return () => {
       const ss = useSocketStore.getState();
@@ -124,7 +119,6 @@ export default function GamePage() {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  
   const prevSpectatingRef = useRef(isSpectating);
   useEffect(() => {
     if (prevSpectatingRef.current && !isSpectating) {
@@ -135,7 +129,6 @@ export default function GamePage() {
     prevSpectatingRef.current = isSpectating;
   }, [isSpectating, router]);
 
-  
   const syncSpectatorState = useCallback(() => {
     const socketState = useSocketStore.getState();
     if (socketState.isSpectating && socketState.visibleState) {
@@ -157,12 +150,10 @@ export default function GamePage() {
     }
   }, []);
 
-  
   useEffect(() => {
     syncSpectatorState();
   }, [isSpectating, socketVisibleState, syncSpectatorState]);
 
-  
   useEffect(() => {
     if (!isSpectating) return;
     const unsub = useSocketStore.subscribe((state) => {
@@ -173,7 +164,6 @@ export default function GamePage() {
     return unsub;
   }, [isSpectating, syncSpectatorState]);
 
-  
   useEffect(() => {
     if (!isSpectating || !socketError) return;
     useSocketStore.getState().leaveSpectating();
@@ -181,7 +171,6 @@ export default function GamePage() {
     return () => clearTimeout(timer);
   }, [isSpectating, socketError, router]);
 
-  
   const spectateRetryRef = useRef(0);
   useEffect(() => {
     if (!isSpectating || visibleState) {
@@ -192,8 +181,7 @@ export default function GamePage() {
       syncSpectatorState();
       return;
     }
-    
-    
+
     const timer = setTimeout(() => {
       spectateRetryRef.current += 1;
       if (spectateRetryRef.current > 15) {
@@ -207,7 +195,6 @@ export default function GamePage() {
     return () => clearTimeout(timer);
   }, [isSpectating, visibleState, socketVisibleState, router, syncSpectatorState]);
 
-  
   useEffect(() => {
     if (isOnlineGame && socketGameStarted && socketVisibleState && !isSpectating) {
       console.log('[GamePage] Syncing socket state to gameStore, phase:', socketVisibleState.phase,
@@ -216,19 +203,12 @@ export default function GamePage() {
     }
   }, [isOnlineGame, socketGameStarted, socketVisibleState, updateOnlineState, isSpectating]);
 
-  
   useEffect(() => {
     if (isOnlineGame && socketGameEnded && socketGameResult) {
       endOnlineGame(socketGameResult.winner);
     }
   }, [isOnlineGame, socketGameEnded, socketGameResult, endOnlineGame]);
 
-  
-  
-  
-  
-  
-  
   const rematchRoomCode = useSocketStore((s) => s.rematchRoomCode);
   useEffect(() => {
     if (!rematchRoomCode) return;
@@ -254,7 +234,6 @@ export default function GamePage() {
     router.push((sealed ? '/play/sealed' : evolving ? '/play/online?mode=evolving' : '/play/online') as '/play/online');
   }, [rematchRoomCode, router]);
 
-  
   useEffect(() => {
     if (isOnlineGame && socketError) {
       useGameStore.setState({
@@ -278,7 +257,6 @@ export default function GamePage() {
     }
   }, [isOnlineGame, socketError, socketErrorKey, socketErrorParams, socketClearError]);
 
-  
   const showConnectionLost = isOnlineGame && !socketConnected && hasActiveGame;
   const opponentDisconnected = useSocketStore((s) => s.opponentDisconnected);
 
@@ -290,7 +268,6 @@ export default function GamePage() {
     );
   }
 
-  
   if (isSpectating && !visibleState) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">

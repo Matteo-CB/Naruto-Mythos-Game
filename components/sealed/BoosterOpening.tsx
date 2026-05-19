@@ -20,7 +20,6 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
   const [stage, setStage] = useState<Stage>('ready');
   const [collectedCards, setCollectedCards] = useState<BoosterCard[]>([]);
 
-  
   const revealedCountRef = useRef(0);
   const isTransitioningRef = useRef(false);
   const collectedCardsRef = useRef<BoosterCard[]>([]);
@@ -28,7 +27,6 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
   const currentBooster = boosters[currentIndex];
   const totalBoosters = boosters.length;
 
-  
   const sortedCards = currentBooster
     ? [...currentBooster.cards].sort((a, b) => {
         const order: Record<string, number> = { C: 0, UC: 1, R: 2, RA: 3, MMS: 4, S: 5, SV: 5, M: 6, MV: 6, L: 7 };
@@ -40,7 +38,6 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
     if (stage !== 'ready') return;
     setStage('shaking');
 
-    
     setTimeout(() => {
       setStage('opening');
       
@@ -68,7 +65,6 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
         setCollectedCards(newCollected);
         setStage('collected');
 
-        
         setTimeout(() => {
           if (currentIndex + 1 < totalBoosters) {
             setCurrentIndex((prev) => prev + 1);
@@ -97,7 +93,6 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
         </span>
       </motion.div>
 
-      
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {Array.from({ length: 20 }).map((_, i) => (
           <motion.div
@@ -159,7 +154,6 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
               }}
             />
 
-            
             {stage === 'ready' && (
               <motion.div
                 className="absolute -bottom-12 left-0 right-0 text-center"
@@ -174,7 +168,6 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
           </motion.div>
         )}
 
-        
         {stage === 'revealing' && (
           <motion.div
             key={`reveal-${currentIndex}`}
@@ -196,7 +189,6 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
           </motion.div>
         )}
 
-        
         {stage === 'collected' && (
           <motion.div
             key={`collected-${currentIndex}`}
@@ -215,7 +207,6 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
         )}
       </AnimatePresence>
 
-      
       {collectedCards.length > 0 && (
         <motion.div
           className="absolute bottom-6 left-1/2 -translate-x-1/2"

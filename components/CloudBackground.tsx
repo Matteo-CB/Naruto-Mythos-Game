@@ -70,7 +70,6 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
         />
       )}
 
-      
       <div
         className="absolute inset-0"
         style={{
@@ -79,7 +78,6 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
         }}
       />
 
-      
       <div
         className="absolute inset-0"
         style={{
@@ -87,7 +85,6 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
         }}
       />
 
-      
       <div
         className="absolute inset-0"
         style={{
@@ -95,7 +92,6 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
         }}
       />
 
-      
       <div
         className="absolute inset-x-0 top-0 h-24"
         style={{ background: 'linear-gradient(to bottom, rgba(6, 6, 10, 0.9), transparent)' }}

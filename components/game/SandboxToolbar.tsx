@@ -42,7 +42,7 @@ export function SandboxToolbar() {
     <>
       
       <div
-        className="fixed top-0 left-0 right-0 z-[60] flex flex-col"
+        className="relative w-full z-30 flex flex-col shrink-0"
         style={{
           backgroundColor: 'rgba(17, 17, 17, 0.95)',
           borderBottom: '1px solid #262626',
@@ -65,7 +65,6 @@ export function SandboxToolbar() {
 
           <ToolbarButton label="+5 Chakra" onClick={() => sandboxAddChakra(5)} />
 
-          
           {chakraInput ? (
             <div className="flex items-center gap-1">
               <input
@@ -93,7 +92,6 @@ export function SandboxToolbar() {
 
           <div className="w-px h-4 mx-0.5" style={{ backgroundColor: '#333' }} />
 
-          
           <div className="flex items-center gap-0.5">
             <span className="text-[8px] uppercase" style={{ color: '#666' }}>T</span>
             {[1, 2, 3, 4].map((turn) => (
@@ -110,7 +108,6 @@ export function SandboxToolbar() {
             ))}
           </div>
 
-          
           <div className="flex items-center gap-0.5">
             {(['action', 'mission'] as const).map((phase) => (
               <button
@@ -131,7 +128,6 @@ export function SandboxToolbar() {
         </div>
       </div>
 
-      
       {modal === 'draw' && (
         <CardGridModal
           title={t('sandbox.drawCard')}
@@ -202,7 +198,6 @@ function ToolbarButton({ label, onClick, accent }: { label: string; onClick: () 
   );
 }
 
-
 function CardGridModal({
   title,
   subtitle,
@@ -255,7 +250,6 @@ function CardGridModal({
     </div>
   );
 }
-
 
 function AllCardsModal({
   onSelect,
@@ -316,7 +310,6 @@ function AllCardsModal({
           </button>
         </div>
 
-        
         <div className="px-3 pt-3 pb-2">
           <input
             type="text"
@@ -331,7 +324,6 @@ function AllCardsModal({
           />
         </div>
 
-        
         <div className="flex-1 overflow-y-auto p-3">
           <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
             {filtered.map((card: CharacterCard) => {
@@ -396,7 +388,6 @@ function AllCardsModal({
     </div>
   );
 }
-
 
 function BoardCharactersModal({
   title,
@@ -507,7 +498,6 @@ function BoardCharactersModal({
   );
 }
 
-
 function MoveCharacterModal({
   onMove,
   onClose,
@@ -567,7 +557,6 @@ function MoveCharacterModal({
     );
   }
 
-  
   const hasAnyChars = missions.some((m) =>
     m.player1Characters.length > 0 || m.player2Characters.length > 0
   );

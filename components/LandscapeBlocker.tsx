@@ -15,7 +15,6 @@ async function requestFullscreenAndLandscape() {
     
   }
 
-  
   try {
     const orientation = screen.orientation as any;
     if (orientation && typeof orientation.lock === 'function') {
@@ -52,7 +51,6 @@ export function LandscapeBlocker() {
         </div>
       </div>
 
-      
       <button
         className="fullscreen-float"
         onClick={handleFullscreen}

@@ -9,13 +9,10 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { useTrainingStore } from '@/stores/trainingStore';
 import { useSocketStore } from '@/lib/socket/client';
 
-
-
 const TOKEN_SIZE = 150;
 const SPIN_DURATION_MS = 2800;
 const RESULT_HOLD_MS = 2000;
 const REVOLUTIONS = 7;
-
 
 function easeOutCoinFlip(t: number): number {
   if (t < 0.72) {
@@ -38,7 +35,6 @@ function easeOutCoinFlip(t: number): number {
   return 0.72 + 0.28 * (1 + (1 - p) * 0.001);
 }
 
-
 function arcOffset(t: number): number {
   if (t < 0.72) {
     
@@ -59,7 +55,6 @@ function arcOffset(t: number): number {
   return 0;
 }
 
-
 function wobble(t: number): { z: number; x: number } {
   if (t < 0.72) return { z: 0, x: 0 };
   if (t < 0.82) {
@@ -76,7 +71,6 @@ function wobble(t: number): { z: number; x: number } {
   }
   return { z: 0, x: 0 };
 }
-
 
 function shadowScale(t: number): { scale: number; opacity: number } {
   const h = Math.abs(arcOffset(t));
@@ -104,7 +98,6 @@ export function EdgeCoinFlip() {
   const [phase, setPhase] = useState<Phase>('idle');
   const [hasTriggered, setHasTriggered] = useState(false);
 
-  
   const coinRef = useRef<HTMLDivElement>(null);
   const arcRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef<HTMLDivElement>(null);
@@ -121,26 +114,20 @@ export function EdgeCoinFlip() {
   const accentColor = playerHasEdge ? '#c4a35a' : '#b33e3e';
   const accentRgb = playerHasEdge ? '196,163,90' : '179,62,62';
 
-  
   const animate = useCallback((timestamp: number) => {
     if (!startTimeRef.current) startTimeRef.current = timestamp;
     const elapsed = timestamp - startTimeRef.current;
     const progress = Math.min(elapsed / SPIN_DURATION_MS, 1);
 
-    
     const easedProgress = easeOutCoinFlip(progress);
     const currentDeg = easedProgress * totalDeg;
 
-    
     const w = wobble(progress);
 
-    
     const yOffset = arcOffset(progress);
 
-    
     const s = shadowScale(progress);
 
-    
     if (coinRef.current) {
       coinRef.current.style.transform =
         `rotateY(${currentDeg}deg) rotateZ(${w.z}deg) rotateX(${w.x}deg)`;
@@ -175,27 +162,23 @@ export function EdgeCoinFlip() {
 
   const setCoinFlipComplete = useUIStore((s) => s.setCoinFlipComplete);
 
-  
   useEffect(() => {
     if (isMulliganPhase && (isSandboxMode || isHotseatGame || isTrainingMode)) {
       setCoinFlipComplete(true);
     }
   }, [isMulliganPhase, isSandboxMode, isHotseatGame, isTrainingMode, setCoinFlipComplete]);
 
-  
   useEffect(() => {
     if (!isMulliganPhase || hasTriggered || isSandboxMode || isHotseatGame || isTrainingMode) return;
     setHasTriggered(true);
     if (!animationsEnabled) {
-      
-      
+
       setPhase('result');
       return;
     }
     setPhase('animating');
   }, [isMulliganPhase, hasTriggered, isSandboxMode, isHotseatGame, isTrainingMode, animationsEnabled]);
 
-  
   useEffect(() => {
     if (phase !== 'animating') return;
     startTimeRef.current = 0;
@@ -205,7 +188,6 @@ export function EdgeCoinFlip() {
     };
   }, [phase, animate]);
 
-  
   useEffect(() => {
     if (phase !== 'result') return;
     const timer = setTimeout(() => {
@@ -221,8 +203,6 @@ export function EdgeCoinFlip() {
     return () => clearTimeout(timer);
   }, [phase, setCoinFlipComplete, isOnlineGame, coinFlipDoneSocket]);
 
-  
-  
   useEffect(() => {
     if (phase !== 'waiting') return;
     if (coinFlipComplete) {
@@ -283,7 +263,6 @@ export function EdgeCoinFlip() {
           />
         )}
 
-        
         <div style={{ position: 'relative', width: TOKEN_SIZE, height: TOKEN_SIZE + 20 }}>
           
           <div
@@ -339,7 +318,6 @@ export function EdgeCoinFlip() {
                   />
                 </div>
 
-                
                 <div
                   className="absolute inset-0 rounded-full overflow-hidden"
                   style={{
@@ -362,7 +340,6 @@ export function EdgeCoinFlip() {
                     }}
                   />
 
-                  
                   <div
                     className="absolute inset-0 rounded-full"
                     style={{
@@ -376,7 +353,6 @@ export function EdgeCoinFlip() {
                     }}
                   />
 
-                  
                   <div
                     className="absolute inset-0 rounded-full"
                     style={{
@@ -385,7 +361,6 @@ export function EdgeCoinFlip() {
                     }}
                   />
 
-                  
                   <div
                     className="absolute inset-0 rounded-full"
                     style={{
@@ -398,7 +373,6 @@ export function EdgeCoinFlip() {
             </div>
           </div>
 
-          
           <div
             ref={shadowRef}
             style={{
@@ -416,7 +390,6 @@ export function EdgeCoinFlip() {
           />
         </div>
 
-        
         <AnimatePresence>
           {showResultText && (
             <motion.div

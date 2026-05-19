@@ -160,6 +160,7 @@ export interface GameState {
     discardOwner: PlayerID;
     chooser: PlayerID;
     count: number;
+    targetInstanceIds?: string[];
   };
   
   pendingContinuation?: {

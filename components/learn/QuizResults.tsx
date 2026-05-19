@@ -6,10 +6,6 @@ import { useTranslations } from 'next-intl';
 import { useQuizStore } from '@/stores/quizStore';
 import { isAnswerCorrect, getPartialScore } from '@/lib/quiz/questionGenerator';
 
-
-
-
-
 const GOLD = '#c4a35a';
 const DARK_BG = '#0a0a0a';
 const PANEL_BG = '#111111';
@@ -27,20 +23,12 @@ const DIFFICULTY_COLORS: Record<number, string> = {
   5: '#6a6abb',
 };
 
-
-
-
-
 interface QuizResultsProps {
   onRetry: () => void;
   onChangeDifficulty: () => void;
   onSaveScore?: () => Promise<void>;
   onViewLeaderboard?: () => void;
 }
-
-
-
-
 
 function AnimatedCounter({
   target,
@@ -79,10 +67,6 @@ function AnimatedCounter({
   );
 }
 
-
-
-
-
 function StatCard({
   label,
   value,
@@ -117,10 +101,6 @@ function StatCard({
   );
 }
 
-
-
-
-
 export function QuizResults({
   onRetry,
   onChangeDifficulty,
@@ -140,7 +120,6 @@ export function QuizResults({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  
   const total = questions.length;
   let correctCount = 0;
   let partialCount = 0;
@@ -195,12 +174,11 @@ export function QuizResults({
         >
           <h2
             className="text-xl font-bold uppercase tracking-wider mb-2"
-            style={{ color: GOLD }}
+            style={{ color: GOLD, fontFamily: "'Nevanta', system-ui, sans-serif" }}
           >
             {t('quiz.resultsTitle')}
           </h2>
 
-          
           <span
             className="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider"
             style={{
@@ -214,7 +192,6 @@ export function QuizResults({
           </span>
         </motion.div>
 
-        
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -227,7 +204,6 @@ export function QuizResults({
           </div>
         </motion.div>
 
-        
         <div className="grid grid-cols-2 gap-2 mb-4">
           <StatCard
             label={t('quiz.statCorrect')}
@@ -251,7 +227,6 @@ export function QuizResults({
           />
         </div>
 
-        
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -361,7 +336,6 @@ export function QuizResults({
           </AnimatePresence>
         </motion.div>
 
-        
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -391,7 +365,6 @@ export function QuizResults({
             </button>
           )}
 
-          
           <button
             onClick={onRetry}
             className="w-full px-6 py-3 text-sm font-bold uppercase tracking-wider transition-all"

@@ -151,7 +151,7 @@ export async function exportDeckAsImage(
 
   
   ctx.fillStyle = TEXT_MUTED;
-  ctx.font = '13px "Inter", "Segoe UI", sans-serif';
+  ctx.font = '13px "Nevanta", "Segoe UI", sans-serif';
   ctx.fillText(
     `${characters.length} characters  |  ${missions.length} missions`,
     PADDING + 20,
@@ -226,7 +226,7 @@ export async function exportDeckAsImage(
       drawRoundedRect(ctx, x + 1, cy + 1, CARD_W - 2, CARD_H - 2, 3);
       ctx.fill();
       ctx.fillStyle = '#555';
-      ctx.font = '10px "Inter", sans-serif';
+      ctx.font = '10px "Nevanta", sans-serif';
       ctx.textBaseline = 'middle';
       ctx.fillText(sorted[i].name_fr, x + 6, cy + CARD_H / 2, CARD_W - 12);
     }
@@ -303,7 +303,7 @@ export async function exportDeckAsImage(
       drawRoundedRect(ctx, x + 1, my + 1, MISSION_W - 2, MISSION_H - 2, 3);
       ctx.fill();
       ctx.fillStyle = GOLD;
-      ctx.font = '11px "Inter", sans-serif';
+      ctx.font = '11px "Nevanta", sans-serif';
       ctx.textBaseline = 'middle';
       ctx.fillText(missions[i].name_fr, x + 8, my + MISSION_H / 2, MISSION_W - 16);
     }
@@ -318,7 +318,7 @@ export async function exportDeckAsImage(
   
   const footerY = canvasH - PADDING - 10;
   ctx.fillStyle = 'rgba(136,136,136,0.4)';
-  ctx.font = '11px "Inter", sans-serif';
+  ctx.font = '11px "Nevanta", sans-serif';
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'center';
   ctx.fillText('narutomythosgame.com', canvasW / 2, footerY);

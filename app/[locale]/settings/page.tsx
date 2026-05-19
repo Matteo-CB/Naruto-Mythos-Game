@@ -20,7 +20,6 @@ export default function SettingsPage() {
   } = useSettingsStore();
   const backgrounds = availableBackgrounds;
 
-  
   const [usernameInput, setUsernameInput] = useState('');
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [usernameError, setUsernameError] = useState('');
@@ -89,14 +88,12 @@ export default function SettingsPage() {
     }
   }, [usernameInput, session?.user?.name, t, updateSession]);
 
-  
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.replace('/login');
     }
   }, [status, router]);
 
-  
   useEffect(() => {
     if (status === 'authenticated') {
       fetchFromServer();
@@ -127,7 +124,6 @@ export default function SettingsPage() {
           {t('title')}
         </h1>
 
-        
         <div
           className="flex flex-col gap-3 p-5"
           style={{
@@ -186,7 +182,6 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        
         <div
           className="mt-4 flex flex-col gap-4 p-5"
           style={{
@@ -226,10 +221,8 @@ export default function SettingsPage() {
             </button>
           </div>
 
-          
           <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
 
-          
           <p
             className="text-xs tracking-wide"
             style={{ color: '#555555' }}
@@ -238,7 +231,6 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        
         {backgrounds.length > 0 && (
           <div
             className="mt-4 flex flex-col gap-4 p-5"
@@ -343,13 +335,11 @@ export default function SettingsPage() {
           </div>
         )}
 
-
         <div
           className="mt-4 flex flex-col gap-4 p-5"
           style={{
             backgroundColor: '#111111',
-            border: '1px solid rgba(179, 62, 62, 0.25)',
-          }}
+            }}
         >
           <div className="flex flex-col gap-1">
             <span
@@ -370,7 +360,6 @@ export default function SettingsPage() {
               className="self-start px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors"
               style={{
                 backgroundColor: '#1a1414',
-                border: '1px solid #b33e3e',
                 color: '#b33e3e',
                 cursor: 'pointer',
               }}
@@ -395,7 +384,6 @@ export default function SettingsPage() {
                 className="px-3 py-1.5 text-sm tracking-wide outline-none"
                 style={{
                   backgroundColor: '#0a0a0a',
-                  border: '1px solid #b33e3e44',
                   color: '#e0e0e0',
                   fontFamily: 'monospace',
                 }}
@@ -443,7 +431,6 @@ export default function SettingsPage() {
             </div>
           )}
         </div>
-
 
         <div className="mt-6 text-center">
           <Link

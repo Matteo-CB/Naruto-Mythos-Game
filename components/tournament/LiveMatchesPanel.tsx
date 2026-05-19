@@ -107,7 +107,6 @@ export function LiveMatchesPanel({ matches, currentRound, totalRounds, userId, f
               className="flex items-center justify-between px-3 py-2 text-xs"
               style={{
                 backgroundColor: 'rgba(59, 130, 246, 0.06)',
-                borderLeft: '3px solid #4a9eff',
               }}
             >
               <span style={{ color: '#e0e0e0' }}>
@@ -133,7 +132,6 @@ export function LiveMatchesPanel({ matches, currentRound, totalRounds, userId, f
               className="flex items-center justify-between px-3 py-2 text-xs"
               style={{
                 backgroundColor: 'rgba(196, 163, 90, 0.04)',
-                borderLeft: '3px solid #c4a35a',
               }}
             >
               <span style={{ color: '#e0e0e0' }}>
@@ -159,7 +157,6 @@ export function LiveMatchesPanel({ matches, currentRound, totalRounds, userId, f
               className="flex items-center justify-between px-3 py-1.5 text-xs"
               style={{
                 backgroundColor: 'rgba(74, 222, 128, 0.04)',
-                borderLeft: '3px solid rgba(74, 222, 128, 0.3)',
                 opacity: 0.75,
               }}
             >

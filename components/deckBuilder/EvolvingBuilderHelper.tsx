@@ -82,8 +82,6 @@ export function EvolvingBuilderHelper() {
         className="flex flex-col gap-3 p-3 sm:p-4"
         style={{
           backgroundColor: PANEL_BG,
-          border: `1px solid ${BORDER}`,
-          borderLeft: `3px solid ${GOLD}`,
         }}
       >
         <div className="flex items-center justify-between gap-2 flex-wrap">

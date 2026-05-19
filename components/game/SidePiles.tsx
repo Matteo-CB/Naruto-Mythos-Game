@@ -8,9 +8,6 @@ import { DiscardPileViewer } from './DiscardPileViewer';
 import { useGameScale } from './GameScaleContext';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 
-
-
-
 function DeckPile({ count, accentColor }: { count: number; accentColor: string }) {
   const t = useTranslations();
   const dims = useGameScale();
@@ -81,9 +78,6 @@ function DeckPile({ count, accentColor }: { count: number; accentColor: string }
     </div>
   );
 }
-
-
-
 
 function DiscardPile({
   count,
@@ -185,9 +179,6 @@ function DiscardPile({
   );
 }
 
-
-
-
 export function OpponentSidePiles() {
   const t = useTranslations();
   const visibleState = useGameStore((s) => s.visibleState);
@@ -233,9 +224,6 @@ export function OpponentSidePiles() {
     </>
   );
 }
-
-
-
 
 export function PlayerSidePiles() {
   const t = useTranslations();

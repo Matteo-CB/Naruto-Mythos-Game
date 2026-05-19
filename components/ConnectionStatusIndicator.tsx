@@ -85,9 +85,9 @@ export function ConnectionStatusIndicator() {
             transition={{ duration: 0.22, ease: 'easeOut' }}
             className="pointer-events-auto flex items-center gap-2 px-2.5 py-1.5"
             style={{
-              backgroundColor: 'rgba(10, 10, 14, 0.85)',
+              backgroundColor: `${color}1f`,
               backdropFilter: 'blur(6px)',
-              boxShadow: `0 6px 18px rgba(0,0,0,0.45), inset 1px 0 0 ${color}`,
+              boxShadow: '0 6px 18px rgba(0,0,0,0.45)',
             }}
           >
             <SignalBars status={status} color={color} />
@@ -109,7 +109,7 @@ export function ConnectionStatusIndicator() {
                   border: 'none',
                   padding: '0 0 0 6px',
                   lineHeight: 1,
-                  boxShadow: 'inset 1px 0 0 rgba(255,255,255,0.12)',
+                  opacity: 0.85,
                 }}
               >
                 {t('retry')}

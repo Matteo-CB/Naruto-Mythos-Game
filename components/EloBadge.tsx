@@ -206,7 +206,6 @@ export function EloBadge({ elo, size = 'md', showElo = true, totalGames }: EloBa
   );
 }
 
-
 export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: number }) {
   const t = useTranslations('profile');
   const tier = getRankTier(elo);
@@ -237,7 +236,6 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
         }}
       />
 
-      
       {unranked ? (
         <span
           style={{
@@ -264,7 +262,6 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
         />
       )}
 
-      
       <span
         className="font-bold uppercase tracking-widest text-center"
         style={{
@@ -277,7 +274,6 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
         {unranked ? t('rankNames.unranked') : t(`rankNames.${tier.key}`)}
       </span>
 
-      
       <span
         className="tabular-nums font-bold mt-2"
         style={{
@@ -297,7 +293,6 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
         ELO
       </span>
 
-      
       {unranked && totalGames !== undefined && (
         <div className="flex flex-col items-center mt-3 w-full">
           <span
@@ -322,7 +317,6 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
         </div>
       )}
 
-      
       <div
         className="absolute bottom-0 left-0 right-0 h-px"
         style={{

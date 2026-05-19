@@ -83,7 +83,7 @@ function TournamentCountdown({ targetIso, accentColor }: { targetIso: string; ac
     <span
       className="select-none inline-flex items-center justify-center"
       style={{
-        fontFamily: 'var(--font-inter), Inter, system-ui, sans-serif',
+        fontFamily: 'Nevanta, system-ui, sans-serif',
         fontSize: '12px',
         fontWeight: 700,
         letterSpacing: '0.02em',
@@ -154,7 +154,7 @@ export function TournamentNavButton({ status, label, primary = false, delay = 0,
             title={ariaLabel}
             className="select-none inline-flex items-center"
             style={{
-              fontFamily: 'var(--font-inter), Inter, system-ui, sans-serif',
+              fontFamily: 'Nevanta, system-ui, sans-serif',
               fontSize: '11px',
               fontWeight: 700,
               letterSpacing: '0.18em',

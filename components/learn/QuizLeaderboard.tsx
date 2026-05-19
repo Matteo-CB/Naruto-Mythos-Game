@@ -260,7 +260,6 @@ function PodiumCard({ entry, rank, heightClass, order, myUsername, locale, t }: 
       style={{
         backgroundColor: '#111111',
         border: `1px solid ${color}`,
-        borderTop: `3px solid ${color}`,
         borderRadius: '6px',
         boxShadow: rank === 1 ? '0 0 24px -8px rgba(196, 163, 90, 0.4)' : 'none',
       }}

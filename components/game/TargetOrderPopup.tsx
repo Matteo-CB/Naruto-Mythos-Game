@@ -126,7 +126,6 @@ export function TargetOrderPopup({
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </PopupTitle>
 
-          
           <p
             className="font-body text-xs text-center mb-4"
             style={{ color: '#777' }}
@@ -138,7 +137,6 @@ export function TargetOrderPopup({
             )}
           </p>
 
-          
           {sourceCardName && (
             <div className="flex justify-center mb-3">
               <span
@@ -146,7 +144,6 @@ export function TargetOrderPopup({
                 style={{
                   color: accentColor,
                   backgroundColor: `${accentColor}12`,
-                  borderLeft: `3px solid ${accentColor}60`,
                 }}
               >
                 {sourceCardName}
@@ -154,7 +151,6 @@ export function TargetOrderPopup({
             </div>
           )}
 
-          
           <div className="flex flex-wrap justify-center gap-3 mb-5">
             {targets.map((target) => {
               const orderIndex = orderedIds.indexOf(target.instanceId);
@@ -216,7 +212,6 @@ export function TargetOrderPopup({
                     </div>
                   )}
 
-                  
                   {isSelected && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -237,7 +232,6 @@ export function TargetOrderPopup({
                     </motion.div>
                   )}
 
-                  
                   {isSelected && (
                     <motion.div
                       initial={{ opacity: 0 }}
@@ -261,7 +255,6 @@ export function TargetOrderPopup({
                     </motion.div>
                   )}
 
-                  
                   {!isSelected && (
                     <motion.div
                       className="absolute inset-0 pointer-events-none"
@@ -277,7 +270,6 @@ export function TargetOrderPopup({
                     />
                   )}
 
-                  
                   <div
                     className="absolute top-1 right-1 px-1.5 py-0.5 text-[8px] font-bold uppercase"
                     style={{
@@ -289,7 +281,6 @@ export function TargetOrderPopup({
                     {target.missionRank ?? `M${target.missionIndex + 1}`}
                   </div>
 
-                  
                   <div
                     className="absolute inset-x-0 bottom-0 px-1 py-1 text-center"
                     style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
@@ -307,7 +298,6 @@ export function TargetOrderPopup({
                     )}
                   </div>
 
-                  
                   {!target.isHidden && target.image_file && (
                     <button
                       onClick={(e) => {
@@ -329,7 +319,6 @@ export function TargetOrderPopup({
             })}
           </div>
 
-          
           <div className="flex justify-center gap-1.5 mb-4">
             {targets.map((_, i) => (
               <div
@@ -346,7 +335,6 @@ export function TargetOrderPopup({
             ))}
           </div>
 
-          
           <div className="flex items-center justify-center gap-5">
             <PopupActionButton
               onClick={handleConfirm}

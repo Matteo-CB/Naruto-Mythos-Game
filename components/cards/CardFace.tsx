@@ -9,9 +9,6 @@ import CardBack from './CardBack';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
 
-
-
-
 const RARITY_COLORS: Record<Rarity, string> = {
   C: '#6b7280',       // gray
   UC: '#22c55e',      // green
@@ -25,9 +22,6 @@ const RARITY_COLORS: Record<Rarity, string> = {
   MMS: '#6b7280',     // gray
 };
 
-
-
-
 export interface CardFaceProps {
   card: CharacterCard | MissionCard;
   powerTokens?: number;
@@ -36,13 +30,9 @@ export interface CardFaceProps {
   banned?: boolean;
 }
 
-
-
-
 function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = false, banned = false }: CardFaceProps) {
   const locale = useLocale();
 
-  
   if (banned) {
     return <CardBack className={className} />;
   }
@@ -169,7 +159,6 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      
       {hasImage && (
         <div
           style={{
@@ -184,7 +173,6 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         />
       )}
 
-      
       {card.card_type === 'character' && card.chakra !== undefined && (
         <div
           style={{
@@ -223,7 +211,6 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      
       {card.card_type === 'character' && (
         <div
           style={{
@@ -262,7 +249,6 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      
       {powerTokens > 0 && (
         <div
           style={{
@@ -270,7 +256,6 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
             bottom: '22%',
             right: '4%',
             backgroundColor: '#7c2d12',
-            border: '1px solid #dc2626',
             borderRadius: '4px',
             padding: '1px 4px',
           }}
@@ -288,7 +273,6 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      
       {hasImage && (
         <div
           style={{
@@ -331,7 +315,6 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      
       <div
         style={{
           position: 'absolute',
@@ -344,7 +327,6 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         }}
       />
 
-      
       {showEffects && card.effects && card.effects.length > 0 && (
         <div
           style={{

@@ -25,7 +25,6 @@ export default function LearnPage() {
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<Tab>('rules');
 
-  
   const [quizView, setQuizView] = useState<QuizView>('launcher');
   const [bestScores, setBestScores] = useState<Record<number, number>>({});
   const quizDiffRef = useRef<number>(1);
@@ -116,7 +115,6 @@ export default function LearnPage() {
     <div
       id="main-content"
       className="min-h-screen relative flex flex-col"
-      style={{ backgroundColor: '#0a0a0a' }}
     >
       <CloudBackground />
       <DecorativeIcons />
@@ -131,7 +129,6 @@ export default function LearnPage() {
           className="text-sm px-3 py-1.5 rounded"
           style={{
             color: '#c4a35a',
-            border: '1px solid rgba(196, 163, 90, 0.3)',
             backgroundColor: 'rgba(196, 163, 90, 0.05)',
           }}
         >
@@ -148,7 +145,6 @@ export default function LearnPage() {
         <LanguageSwitcher />
       </header>
 
-      
       <div
         className="relative z-20 flex justify-center gap-1 px-4 py-2"
         style={{ borderBottom: '1px solid rgba(196, 163, 90, 0.1)' }}
@@ -193,7 +189,6 @@ export default function LearnPage() {
                     className="text-sm px-4 py-2 rounded transition-colors"
                     style={{
                       color: '#c4a35a',
-                      border: '1px solid rgba(196, 163, 90, 0.3)',
                       backgroundColor: 'rgba(196, 163, 90, 0.05)',
                     }}
                   >
@@ -221,8 +216,7 @@ export default function LearnPage() {
                   className="mb-3 text-sm px-3 py-1 rounded"
                   style={{
                     color: '#c4a35a',
-                    border: '1px solid rgba(196, 163, 90, 0.3)',
-                  }}
+                    }}
                 >
                   ← {t('quiz.selectDifficulty')}
                 </button>

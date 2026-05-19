@@ -77,7 +77,6 @@ export function ChangelogButton() {
         className="relative px-2 py-1 text-xs font-bold uppercase tracking-wider transition-colors"
         style={{
           color: hasNew ? '#c4a35a' : '#888888',
-          borderBottom: '2px solid transparent',
         }}
         aria-label={t('buttonLabel')}
       >
@@ -174,8 +173,7 @@ export function ChangelogButton() {
                                 style={{
                                   backgroundColor: 'rgba(196,163,90,0.15)',
                                   color: '#c4a35a',
-                                  border: '1px solid rgba(196,163,90,0.35)',
-                                }}
+                                  }}
                               >
                                 {t('latestBadge')}
                               </span>

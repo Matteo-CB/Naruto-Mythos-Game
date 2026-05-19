@@ -52,10 +52,10 @@ export function TurnOverlay() {
             style={{ padding: '24px 48px' }}
           >
             
-            <div style={{ position: 'absolute', top: 0, left: 0, width: 28, height: 28, borderTop: '2px solid rgba(196, 163, 90, 0.4)', borderLeft: '2px solid rgba(196, 163, 90, 0.4)', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', top: 0, right: 0, width: 28, height: 28, borderTop: '2px solid rgba(196, 163, 90, 0.4)', borderRight: '2px solid rgba(196, 163, 90, 0.4)', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: 28, height: 28, borderBottom: '2px solid rgba(196, 163, 90, 0.4)', borderLeft: '2px solid rgba(196, 163, 90, 0.4)', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', bottom: 0, right: 0, width: 28, height: 28, borderBottom: '2px solid rgba(196, 163, 90, 0.4)', borderRight: '2px solid rgba(196, 163, 90, 0.4)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: 0, left: 0, width: 28, height: 28, pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: 0, right: 0, width: 28, height: 28, pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, width: 28, height: 28, pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', bottom: 0, right: 0, width: 28, height: 28, pointerEvents: 'none' }} />
 
             <motion.span
               className="font-display text-5xl font-bold tracking-widest uppercase"
@@ -73,7 +73,6 @@ export function TurnOverlay() {
               {turnOverlayText}
             </motion.span>
 
-            
             <svg
               width={200}
               height="3"

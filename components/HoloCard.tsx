@@ -42,15 +42,12 @@ export function HoloCard({
     const mx = (px * 100).toFixed(1) + '%';
     const my = (py * 100).toFixed(1) + '%';
 
-    
     const ry = ((px - 0.5) * 30).toFixed(2) + 'deg';
     const rx = ((0.5 - py) * 30).toFixed(2) + 'deg';
 
-    
     const posx = (px * 100).toFixed(1) + '%';
     const posy = (py * 100).toFixed(1) + '%';
 
-    
     const cx = px - 0.5;
     const cy = py - 0.5;
     const hyp = Math.sqrt(cx * cx + cy * cy).toFixed(3);

@@ -61,7 +61,6 @@ export function BracketMatch({ match, index }: Props) {
         />
       )}
 
-      
       <div
         className="flex items-center justify-between px-3 py-2 text-xs"
         style={{
@@ -76,7 +75,6 @@ export function BracketMatch({ match, index }: Props) {
         {match.winnerId === match.player1Id && <span style={{ color: '#c4a35a' }}>W</span>}
       </div>
 
-      
       <div
         className="flex items-center justify-between px-3 py-2 text-xs"
         style={{

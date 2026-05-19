@@ -5,9 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
-
-
-
 const TOTAL_LESSONS = 8;
 
 const CARD_IMAGES = {
@@ -23,9 +20,6 @@ const CARD_IMAGES = {
   cloud: '/images/icons/cloud-2.webp',
 } as const;
 
-
-
-
 const slideVariants = {
   enter: (direction: number) => ({
     x: direction > 0 ? 300 : -300,
@@ -40,9 +34,6 @@ const slideVariants = {
     opacity: 0,
   }),
 };
-
-
-
 
 function InfoPanel({
   title,
@@ -84,10 +75,6 @@ function InfoPanel({
     </motion.div>
   );
 }
-
-
-
-
 
 function LessonOverview({ t }: { t: ReturnType<typeof useTranslations> }) {
   return (
@@ -150,7 +137,6 @@ function LessonOverview({ t }: { t: ReturnType<typeof useTranslations> }) {
         </motion.div>
       </div>
 
-      
       <div
         style={{
           display: 'grid',
@@ -221,7 +207,6 @@ function LessonCardAnatomy({ t }: { t: ReturnType<typeof useTranslations> }) {
           }}
         />
 
-        
         {ANNOTATIONS.map((a, i) => (
           <motion.div
             key={a.id}
@@ -253,7 +238,6 @@ function LessonCardAnatomy({ t }: { t: ReturnType<typeof useTranslations> }) {
         ))}
       </motion.div>
 
-      
       <div
         style={{
           display: 'grid',
@@ -399,7 +383,6 @@ function LessonTurnStructure({ t }: { t: ReturnType<typeof useTranslations> }) {
         ))}
       </div>
 
-      
       <div
         style={{
           display: 'grid',
@@ -504,7 +487,6 @@ function LessonPlayingCards({ t }: { t: ReturnType<typeof useTranslations> }) {
               />
             )}
 
-            
             <span
               style={{
                 color: '#c4a35a',
@@ -517,7 +499,6 @@ function LessonPlayingCards({ t }: { t: ReturnType<typeof useTranslations> }) {
               {t(`tutorial.lessons.playingCards.${mode.key}Label`)}
             </span>
 
-            
             <div className="font-body" style={{ color: '#cccccc', fontSize: '0.88rem', lineHeight: 1.55, textAlign: 'center' }}>
               {t(`tutorial.lessons.playingCards.${mode.key}Bubble`)}
             </div>
@@ -571,7 +552,6 @@ function LessonMissions({ t }: { t: ReturnType<typeof useTranslations> }) {
         </motion.div>
       </div>
 
-      
       <div
         style={{
           display: 'grid',
@@ -674,7 +654,6 @@ function LessonUpgrade({ t }: { t: ReturnType<typeof useTranslations> }) {
         </motion.div>
       </div>
 
-      
       <div
         style={{
           display: 'grid',
@@ -770,7 +749,6 @@ function LessonSpecialMechanics({ t }: { t: ReturnType<typeof useTranslations> }
         ))}
       </div>
 
-      
       <InfoPanel
         title={t('tutorial.lessons.special.tipsTitle')}
         description={t('tutorial.lessons.special.tipsBubble')}
@@ -779,9 +757,6 @@ function LessonSpecialMechanics({ t }: { t: ReturnType<typeof useTranslations> }
     </div>
   );
 }
-
-
-
 
 function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
   const [step, setStep] = useState(0);
@@ -795,7 +770,6 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
     if (step > 0) setStep((s) => s - 1);
   }, [step]);
 
-  
   const stepInfo = (titleKey: string, descKey: string, delay: number) => (
     <InfoPanel
       title={t(`tutorial.lessons.gameplay.${titleKey}` as Parameters<typeof t>[0])}
@@ -886,7 +860,6 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          
           {step === 1 && (
             <>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
@@ -903,7 +876,6 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          
           {step === 2 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '40px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -923,7 +895,6 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          
           {step === 3 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -944,7 +915,6 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          
           {step === 4 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -966,7 +936,6 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          
           {step === 5 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '40px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -989,7 +958,6 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          
           {step === 6 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -1018,7 +986,6 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          
           {step === 7 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '32px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -1047,7 +1014,6 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
         </motion.div>
       </AnimatePresence>
 
-      
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <button
           onClick={goPrevStep}
@@ -1089,9 +1055,6 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
   );
 }
 
-
-
-
 export function LessonViewer() {
   const t = useTranslations('learn');
   const [currentLesson, setCurrentLesson] = useState(0);
@@ -1124,7 +1087,6 @@ export function LessonViewer() {
 
   const progressPercent = ((currentLesson + 1) / TOTAL_LESSONS) * 100;
 
-  
   function renderLessonScene(index: number) {
     switch (index) {
       case 0:
@@ -1155,10 +1117,9 @@ export function LessonViewer() {
         width: '100%',
         maxWidth: '860px',
         margin: '0 auto',
-        backgroundColor: '#0a0a0a',
+        backgroundColor: 'transparent',
         borderRadius: '12px',
         overflow: 'hidden',
-        border: '1px solid rgba(196, 163, 90, 0.15)',
       }}
     >
       
@@ -1180,7 +1141,6 @@ export function LessonViewer() {
         />
       </div>
 
-      
       <div
         style={{
           padding: '16px 20px 8px',
@@ -1218,7 +1178,6 @@ export function LessonViewer() {
         </motion.p>
       </div>
 
-      
       <div
         style={{
           position: 'relative',
@@ -1248,7 +1207,6 @@ export function LessonViewer() {
         </AnimatePresence>
       </div>
 
-      
       <div
         style={{
           display: 'flex',
@@ -1290,7 +1248,6 @@ export function LessonViewer() {
           {t('tutorial.prev')}
         </button>
 
-        
         <span
           style={{
             color: '#666666',
@@ -1302,7 +1259,6 @@ export function LessonViewer() {
           {t('tutorial.lesson', { current: String(currentLesson + 1), total: String(TOTAL_LESSONS) })}
         </span>
 
-        
         <button
           onClick={goNext}
           disabled={currentLesson === TOTAL_LESSONS - 1}

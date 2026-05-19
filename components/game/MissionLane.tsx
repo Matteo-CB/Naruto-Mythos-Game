@@ -16,8 +16,6 @@ import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
 
-
-
 interface CharacterSlotProps {
   character: VisibleCharacter;
   isOwn: boolean;
@@ -35,9 +33,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   const hidePreview = useUIStore((s) => s.hidePreview);
   const pinCard = useUIStore((s) => s.pinCard);
   const zoomCard = useUIStore((s) => s.zoomCard);
-  
 
-  
   const isSandboxMode = useGameStore((s) => s.isSandboxMode);
   const sandboxDefeatCharacter = useGameStore((s) => s.sandboxDefeatCharacter);
   const sandboxReturnToHand = useGameStore((s) => s.sandboxReturnToHand);
@@ -47,7 +43,6 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   const [showSandboxMenu, setShowSandboxMenu] = useState(false);
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
 
-  
   const isMyTurn = useGameStore((s) =>
     !s.isProcessing &&
     s.visibleState?.phase === 'action' &&
@@ -56,17 +51,13 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
 
   const isSelected = selectedTargetId === character.instanceId;
   const isHidden = character.isHidden;
-  
-  
+
   const hasCardData = !!character.card;
 
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
 
-  
-  
   const isRevealable = isOwn && isHidden && isMyTurn && hasCardData && !effectPopupMinimized;
 
-  
   const isReHidden = isHidden && character.wasRevealedAtLeastOnce;
   
   const isUnknownHiddenEnemy = isHidden && !isOwn && !character.wasRevealedAtLeastOnce;
@@ -74,8 +65,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isMyTurn) {
-      
-      
+
       if (!isUnknownHiddenEnemy && character.card) {
         pinCard(character.card);
       }
@@ -102,10 +92,8 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     }
   };
 
-  
   const imagePath = hasCardData ? normalizeImagePath(character.card?.image_file) : null;
 
-  
   const totalPower = character.effectivePower;
 
   const handleMouseEnter = (e: React.MouseEvent) => {
@@ -263,7 +251,6 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </>
       )}
 
-      
       {!isHidden && (
         <div
           className={`absolute bottom-0.5 right-0.5 flex items-center justify-center text-[11px] font-bold tabular-nums${character.powerTokens > 0 ? ' power-glow' : ''}`}
@@ -282,7 +269,6 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </div>
       )}
 
-      
       {character.powerTokens > 0 && (
         <div
           className="absolute top-0.5 right-0.5 flex flex-col items-end gap-0.5"
@@ -316,7 +302,6 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </div>
       )}
 
-      
       {!isHidden && character.card && (
         <div
           className="absolute top-0.5 left-0.5 w-5 h-5 flex items-center justify-center text-[9px] font-bold"
@@ -331,7 +316,6 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </div>
       )}
 
-      
       {character.stackSize > 1 && (
         <motion.div
           initial={false}
@@ -362,8 +346,6 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     prev.character.card?.id === next.character.card?.id &&
     prev.isOwn === next.isOwn,
 );
-
-
 
 function MissionCardDisplay({
   mission,
@@ -435,7 +417,6 @@ function MissionCardDisplay({
       </>
     )}
 
-    
     {showSwapModal && isSandboxMode && (
       <MissionSwapModal
         missionIndex={index}
@@ -502,7 +483,6 @@ function MissionCardDisplay({
         </div>
       )}
 
-      
       <div
         className="absolute top-1 left-1 px-1.5 py-0.5 text-[10px] font-bold"
         style={{
@@ -515,7 +495,6 @@ function MissionCardDisplay({
         {mission.rank}
       </div>
 
-      
       <div
         className="absolute top-1 right-1 px-1 py-0.5 text-[9px] font-bold tabular-nums"
         style={{
@@ -527,7 +506,6 @@ function MissionCardDisplay({
         {totalPoints} {t('game.board.pts')}
       </div>
 
-      
       {mission.wonBy && (
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
@@ -540,7 +518,6 @@ function MissionCardDisplay({
             style={{
               backgroundColor: 'rgba(0, 0, 0, 0.85)',
               color: mission.wonBy === 'draw' ? '#888888' : mission.wonBy === myPlayer ? '#c4a35a' : '#b33e3e',
-              borderLeft: `3px solid ${mission.wonBy === 'draw' ? '#888888' : mission.wonBy === myPlayer ? '#c4a35a' : '#b33e3e'}`,
             }}
           >
             {mission.wonBy === 'draw' ? t('game.board.draw') : mission.wonBy === myPlayer ? t('game.board.won') : t('game.board.lost')}
@@ -551,7 +528,6 @@ function MissionCardDisplay({
     </>
   );
 }
-
 
 function MissionSwapModal({
   missionIndex,
@@ -640,8 +616,6 @@ function MissionSwapModal({
   );
 }
 
-
-
 interface MissionLaneProps {
   mission: VisibleMission;
   missionIndex: number;
@@ -667,12 +641,9 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
 
   const effectPopupMinimized_ml = useUIStore((s) => s.effectPopupMinimized);
 
-  
-  
   const isTargetable = isMyTurn && selectedCardIndex !== null && !effectPopupMinimized_ml;
   const isSelected = selectedMissionIndex === missionIndex;
 
-  
   const myChars =
     myPlayer === 'player1'
       ? mission.player1Characters
@@ -682,7 +653,6 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
       ? mission.player2Characters
       : mission.player1Characters;
 
-  
   const myPower = useMemo(
     () => myChars.reduce((sum, c) => sum + c.effectivePower, 0),
     [myChars],
@@ -755,7 +725,6 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         )}
       </div>
 
-      
       <div className="relative w-full flex justify-center shrink-0">
         
         {isSelected && (
@@ -772,7 +741,6 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         <MissionCardDisplay mission={mission} index={missionIndex} myPlayer={myPlayer} />
       </div>
 
-      
       <div
         className="flex-1 flex flex-col min-h-0"
       >
@@ -805,7 +773,6 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         </div>
       </div>
 
-      
       <div
         className="shrink-0 flex items-center justify-center gap-1 w-full px-1.5 py-0.5"
         style={{

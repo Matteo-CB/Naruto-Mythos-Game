@@ -6,9 +6,6 @@ import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
 import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import type { MissionCard, MissionRank, PlayerID, CardEffect } from '@/lib/engine/types';
 
-
-
-
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 
@@ -26,9 +23,6 @@ const EFFECT_TYPE_COLORS: Record<string, string> = {
   SCORE: '#eab308',
 };
 
-
-
-
 export interface MissionCardProps {
   card: MissionCard;
   rank: MissionRank;
@@ -39,9 +33,6 @@ export interface MissionCardProps {
   onClick?: () => void;
   highlight?: boolean;
 }
-
-
-
 
 function MissionCardInner({
   card,
@@ -114,7 +105,6 @@ function MissionCardInner({
         />
       )}
 
-      
       <div
         style={{
           position: 'absolute',
@@ -124,7 +114,6 @@ function MissionCardInner({
         }}
       />
 
-      
       <div
         style={{
           position: 'absolute',
@@ -160,7 +149,6 @@ function MissionCardInner({
         </div>
       </div>
 
-      
       <div
         style={{
           position: 'absolute',
@@ -209,7 +197,6 @@ function MissionCardInner({
         </div>
       </div>
 
-      
       <div
         style={{
           position: 'absolute',
@@ -245,7 +232,6 @@ function MissionCardInner({
         )}
       </div>
 
-      
       {card.effects && card.effects.length > 0 && (
         <div
           style={{
@@ -294,7 +280,6 @@ function MissionCardInner({
         </div>
       )}
 
-      
       {wonBy && (() => {
         const isDraw = wonBy === 'draw';
         const didWin = !isDraw && (myPlayer ? wonBy === myPlayer : true);

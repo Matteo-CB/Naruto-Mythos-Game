@@ -82,7 +82,6 @@ export default function CollectionPage() {
     });
   }, [allCards, filterRarity, filterGroup, filterSet, searchQuery, locale]);
 
-
   useEffect(() => {
     setCurrentPage(1);
   }, [filterRarity, filterGroup, filterSet, searchQuery]);
@@ -116,7 +115,6 @@ export default function CollectionPage() {
           </Link>
         </div>
 
-        
         <div className="flex flex-wrap gap-3 mb-6">
           <input
             type="search"
@@ -163,7 +161,6 @@ export default function CollectionPage() {
             })}
           </select>
         </div>
-
 
         <p className="text-xs text-[#555] mb-4">{t('collection.total', { count: filteredCards.length })}</p>
 
@@ -213,7 +210,6 @@ export default function CollectionPage() {
           })}
         </div>
 
-        
         {totalCharPages > 1 && (
           <div className="flex items-center justify-center gap-3 mt-4 mb-2">
             <button
@@ -238,7 +234,6 @@ export default function CollectionPage() {
           </div>
         )}
 
-        
         {filteredCards.some((c) => c.card_type === 'mission') && (
           <>
             <div className="mt-8 mb-4 flex items-center gap-3">
@@ -286,7 +281,6 @@ export default function CollectionPage() {
           </>
         )}
 
-        
         {selectedCard && (
           <div
             className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
@@ -317,7 +311,6 @@ export default function CollectionPage() {
                   )}
                 </div>
 
-                
                 <div className="flex-1 min-w-0 font-body">
                   <h2 className="text-xl font-bold text-[#e0e0e0]">{getCardName(selectedCard, locale as 'en' | 'fr')}</h2>
                   <p className="text-sm text-[#888888] mb-3">{getCardTitle(selectedCard, locale as 'en' | 'fr')}</p>
@@ -362,7 +355,6 @@ export default function CollectionPage() {
                     </p>
                   )}
 
-                  
                   {selectedCard.effects && selectedCard.effects.length > 0 && (
                     <div className="mt-3 space-y-2">
                       {selectedCard.effects.map((effect, i) => {

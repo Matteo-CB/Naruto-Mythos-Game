@@ -101,7 +101,6 @@ function MulliganCard({
         </div>
       )}
 
-      
       <div
         className="absolute inset-x-0 bottom-0 px-1.5 py-1.5 flex items-end justify-between"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
@@ -120,7 +119,6 @@ function MulliganCard({
         </span>
       </div>
 
-      
       <div
         className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[10px] font-bold"
         style={{
@@ -132,7 +130,6 @@ function MulliganCard({
         {card.chakra}
       </div>
 
-      
       <div
         className="absolute top-1 right-1 px-1 text-[8px] font-medium"
         style={{
@@ -181,19 +178,16 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
             </span>
           </div>
 
-          
           {title && (
             <span className="font-body text-xs -mt-1" style={{ color: '#999999' }}>
               {title}
             </span>
           )}
 
-          
           <div
             className="flex items-center gap-4 p-2"
             style={{
               backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              borderLeft: '2px solid rgba(196, 163, 90, 0.3)',
             }}
           >
             <div className="flex flex-col items-center gap-0.5">
@@ -215,7 +209,6 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
             </div>
           </div>
 
-          
           {card.keywords && card.keywords.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {card.keywords.map((kw) => (
@@ -225,7 +218,6 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
                   style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.05)',
                     color: '#999999',
-                    borderLeft: '2px solid rgba(255, 255, 255, 0.1)',
                   }}
                 >
                   {getCardKeyword(kw, locale)}
@@ -234,14 +226,12 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
             </div>
           )}
 
-          
           {card.group && (
             <span className="font-body text-[10px]" style={{ color: '#777777' }}>
               {t('collection.details.group')}: {getCardGroup(card.group, locale)}
             </span>
           )}
 
-          
           {card.effects && card.effects.length > 0 && (
             <div
               className="flex flex-col gap-2 pt-2 mt-0.5"
@@ -265,7 +255,6 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
                     className="flex flex-col gap-0.5 p-2"
                     style={{
                       backgroundColor: `${effectTypeColors[effect.type] ?? '#888888'}08`,
-                      borderLeft: `2px solid ${effectTypeColors[effect.type] ?? '#888888'}40`,
                     }}
                   >
                     <span
@@ -311,7 +300,6 @@ export function MulliganDialog() {
 
   const hand = visibleState.myState.hand;
   const hasMulliganed = visibleState.myState.hasMulliganed;
-
 
   if (hasMulliganed) {
     return (
@@ -375,7 +363,6 @@ export function MulliganDialog() {
               {t('game.mulligan.description')}
             </span>
 
-            
             <span
               className="font-body text-xs text-center px-3 py-1.5"
               style={{
@@ -383,17 +370,13 @@ export function MulliganDialog() {
                 backgroundColor: visibleState.edgeHolder === visibleState.myPlayer
                   ? 'rgba(196, 163, 90, 0.08)'
                   : 'rgba(179, 62, 62, 0.08)',
-                borderLeft: `3px solid ${visibleState.edgeHolder === visibleState.myPlayer
-                  ? 'rgba(196, 163, 90, 0.4)'
-                  : 'rgba(179, 62, 62, 0.4)'}`,
-              }}
+                }}
             >
               {visibleState.edgeHolder === visibleState.myPlayer
                 ? t('game.mulligan.youHaveEdge')
                 : t('game.mulligan.opponentHasEdge')}
             </span>
 
-            
             <div className="flex gap-3 justify-center flex-wrap">
               {hand.map((card, i) => (
                 <MulliganCard
@@ -406,14 +389,12 @@ export function MulliganDialog() {
               ))}
             </div>
 
-            
             {!selectedCard && (
               <span className="font-body text-[11px]" style={{ color: '#555555' }}>
                 {t('game.mulligan.clickHint')}
               </span>
             )}
 
-            
             <AnimatePresence mode="wait">
               {selectedCard && (
                 <MulliganCardDetail key={selectedCard.id} card={selectedCard} />
@@ -421,7 +402,6 @@ export function MulliganDialog() {
             </AnimatePresence>
           </div>
 
-          
           <div className="flex gap-4 items-center shrink-0">
             <PopupActionButton onClick={handleKeep} disabled={isProcessing} accentColor="#c4a35a">
               {t('game.mulligan.keep')}

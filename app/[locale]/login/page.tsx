@@ -142,7 +142,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        
         <div className="flex items-center gap-3 my-5">
           <div className="flex-1 h-px" style={{ backgroundColor: '#262626' }} />
           <span className="text-xs uppercase tracking-wider" style={{ color: '#555555' }}>
@@ -151,7 +150,6 @@ export default function LoginPage() {
           <div className="flex-1 h-px" style={{ backgroundColor: '#262626' }} />
         </div>
 
-        
         <button
           onClick={() => signIn('discord', { callbackUrl: '/' })}
           className="w-full rounded py-2.5 text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2"

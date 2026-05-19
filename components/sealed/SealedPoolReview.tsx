@@ -53,7 +53,6 @@ export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
   const characters = sortedCards.filter((c) => c.card_type === 'character');
   const missions = sortedCards.filter((c) => c.card_type === 'mission');
 
-  
   const rarityCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const c of cards) {
@@ -88,7 +87,6 @@ export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
         </motion.button>
       </div>
 
-      
       <div className="flex gap-3 px-4 py-2 flex-wrap shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
         {Object.entries(rarityCounts)
           .sort(([a], [b]) => (RARITY_ORDER[a] ?? 99) - (RARITY_ORDER[b] ?? 99))
@@ -99,7 +97,6 @@ export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
           ))}
       </div>
 
-      
       <div className="flex-1 overflow-y-auto px-4 py-3">
         
         {missions.length > 0 && (
@@ -115,7 +112,6 @@ export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
           </div>
         )}
 
-        
         <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#888' }}>
           {t('characters')} ({characters.length})
         </h3>

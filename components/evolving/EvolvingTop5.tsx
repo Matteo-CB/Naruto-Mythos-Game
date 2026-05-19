@@ -58,7 +58,6 @@ export function EvolvingTop5() {
       style={{
         backgroundColor: PANEL_BG,
         border: `1px solid ${BORDER}`,
-        borderTop: `2px solid ${GOLD}`,
       }}
     >
       <div

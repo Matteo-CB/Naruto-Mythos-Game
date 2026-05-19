@@ -345,7 +345,6 @@ export default function LeaderboardPage() {
             style={{
               color: boardType === 'ranked' ? '#0a0a0a' : '#c4a35a',
               backgroundColor: boardType === 'ranked' ? '#c4a35a' : 'transparent',
-              border: '1px solid #c4a35a',
               borderRadius: 9999,
               cursor: 'pointer',
               outline: 'none',
@@ -360,7 +359,6 @@ export default function LeaderboardPage() {
             style={{
               color: boardType === 'evolving' ? '#0a0a0a' : '#c4a35a',
               backgroundColor: boardType === 'evolving' ? '#c4a35a' : 'transparent',
-              border: '1px solid #c4a35a',
               borderRadius: 9999,
               cursor: 'pointer',
               outline: 'none',

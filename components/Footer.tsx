@@ -45,7 +45,6 @@ export function Footer() {
         {t('legal')}
       </Link>
 
-      
       <div className="flex items-center gap-3">
         
         <SocialLink href={DISCORD_URL} label="Discord">

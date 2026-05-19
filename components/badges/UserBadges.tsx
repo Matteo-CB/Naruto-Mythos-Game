@@ -12,7 +12,6 @@ interface UserBadgesProps {
   size?: 'sm' | 'md';
 }
 
-
 export function UserBadges({
   role = 'user',
   elo,

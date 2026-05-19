@@ -82,7 +82,6 @@ export function GameInfo() {
               style={{
                 color: '#e0e0e0',
                 backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                borderLeft: '2px solid rgba(196, 163, 90, 0.3)',
               }}
             >
               {translatedPhase}
@@ -106,12 +105,10 @@ export function GameInfo() {
         </div>
       </PanelFrame>
 
-      
       <EdgeToken holder={edgeHolder} myPlayer={myPlayer} />
 
       <SectionDivider color="rgba(196, 163, 90, 0.15)" width={80} showDiamond />
 
-      
       <ScoreDisplay
         playerScore={myState.missionPoints}
         opponentScore={opponentState.missionPoints}
@@ -121,7 +118,6 @@ export function GameInfo() {
 
       <SectionDivider color="rgba(196, 163, 90, 0.15)" width={80} />
 
-      
       <PanelFrame accentColor="rgba(196, 163, 90, 0.2)" padding="8px 10px">
         <div className="flex flex-col gap-1.5">
           <span
@@ -137,7 +133,6 @@ export function GameInfo() {
 
       <SectionDivider color="rgba(255, 255, 255, 0.06)" width={60} />
 
-      
       <div className="flex flex-col gap-1.5">
         <span
           className="text-[10px] uppercase tracking-wider font-medium"
@@ -152,7 +147,6 @@ export function GameInfo() {
 
       <SectionDivider color="rgba(255, 255, 255, 0.06)" width={60} />
 
-      
       <div className="flex flex-col gap-1.5">
         <span
           className="text-[10px] uppercase tracking-wider font-medium"
@@ -164,7 +158,6 @@ export function GameInfo() {
         <InfoRow label={t('game.opponent')} value={opponentState.discardPileSize} valueColor="#888888" />
       </div>
 
-      
       {phase === 'action' && (
         <>
           <SectionDivider color="rgba(255, 255, 255, 0.06)" width={60} />

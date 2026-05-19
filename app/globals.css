@@ -9,6 +9,38 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Nevanta';
+  src: url('/fonts/geist-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nevanta';
+  src: url('/fonts/geist-medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nevanta';
+  src: url('/fonts/geist-semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nevanta';
+  src: url('/fonts/geist-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #0a0a0a;
   --foreground: #e0e0e0;
@@ -31,9 +63,9 @@
   --color-accent: var(--accent);
   --color-danger: var(--danger);
   --color-success: var(--success);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: 'Nevanta', system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
-  --font-body: var(--font-inter);
+  --font-body: 'Nevanta', system-ui, sans-serif;
 }
 
 ::selection {
@@ -67,7 +99,7 @@ html[data-tab-hidden="true"] *::after {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), 'Inter', sans-serif;
+  font-family: 'Nevanta', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeSpeed;
@@ -83,26 +115,39 @@ th, td,
   font-family: 'NJNaruto', Arial, sans-serif;
 }
 
+input, textarea, div, p {
+  font-family: 'Nevanta', system-ui, sans-serif;
+}
+
 
 .font-inter-force,
+.font-body-force,
 .font-inter-force a,
 .font-inter-force button,
 .font-inter-force span,
 .font-inter-force nav,
 .font-inter-force label,
-.font-inter-force small {
-  font-family: var(--font-inter), 'Inter', sans-serif !important;
+.font-inter-force small,
+.font-body-force a,
+.font-body-force button,
+.font-body-force span,
+.font-body-force nav,
+.font-body-force label,
+.font-body-force small {
+  font-family: 'Nevanta', system-ui, sans-serif !important;
 }
 
 
 p, .font-body {
-  font-family: var(--font-inter), 'Inter', sans-serif;
+  font-family: 'Nevanta', system-ui, sans-serif;
 }
 
 
 .font-inter-force,
-.font-inter-force * {
-  font-family: var(--font-inter), 'Inter', sans-serif !important;
+.font-inter-force *,
+.font-body-force,
+.font-body-force * {
+  font-family: 'Nevanta', system-ui, sans-serif !important;
 }
 
 * {
