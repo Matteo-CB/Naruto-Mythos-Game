@@ -291,4 +291,32 @@ describe('onChessClockTick', () => {
     const clockEmit = emits.find((e) => e.event === 'game:clock-update');
     expect(clockEmit).toBeUndefined();
   });
+
+  it('failsafe: forfeits player1 if their bank is already at 0 even when clock is disarmed (phase-transition race)', () => {
+    const { io } = makeIoMock();
+    const room = makeRoom();
+    room.chessClock = {
+      ...room.chessClock,
+      player1: { remainingMs: 0, idleWarningUsed: false },
+      active: null,
+      activeStartedAt: null,
+      idleStartedAt: null,
+    };
+    withFixedNow(2_000_000, () => onChessClockTick(room, io));
+    expect(room.gameState?.forfeitedBy).toBe('player1');
+  });
+
+  it('failsafe: forfeits player2 if their bank is already at 0 even when clock is disarmed', () => {
+    const { io } = makeIoMock();
+    const room = makeRoom();
+    room.chessClock = {
+      ...room.chessClock,
+      player2: { remainingMs: 0, idleWarningUsed: false },
+      active: null,
+      activeStartedAt: null,
+      idleStartedAt: null,
+    };
+    withFixedNow(2_000_000, () => onChessClockTick(room, io));
+    expect(room.gameState?.forfeitedBy).toBe('player2');
+  });
 });

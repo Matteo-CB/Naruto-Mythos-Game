@@ -692,8 +692,9 @@ function buildPendingTargetSelectionUI(
   const isKiba026Reveal = tst === 'KIBA026_UPGRADE_REVEAL';
   const isTayuya065Choose = tst === 'TAYUYA065_UPGRADE_CHOOSE';
   const isKiba026Choose = tst === 'KIBA026_UPGRADE_CHOOSE';
+  const isKabuto052ChooseMission = tst === 'KABUTO_CHOOSE_MISSION';
   const isMultiSelectChoose = isTayuya065Choose || isKiba026Choose;
-  const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal;
+  const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal || isKabuto052ChooseMission;
 
   let revealedCard: PendingTargetSelection['revealedCard'];
   let revealedCards: PendingTargetSelection['revealedCards'];
@@ -758,6 +759,14 @@ function buildPendingTargetSelectionUI(
         revealedCards = (rd.topCards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isMatch?: boolean }) => ({
           name_fr: c.name_fr, chakra: c.chakra, power: c.power, image_file: c.image_file, isMatch: c.isMatch,
         }));
+      } else if (isKabuto052ChooseMission) {
+        revealedCard = {
+          name_fr: rd.cardName_fr, name_en: rd.cardName_en,
+          chakra: rd.cardCost, power: rd.cardPower,
+          image_file: rd.cardImageFile, canSteal: false,
+          revealTitleKey: 'game.effect.kabuto052ChooseRevealTitle',
+          revealResultKey: 'game.effect.kabuto052ChooseRevealResult',
+        };
       }
     } catch { /* ignore */ }
   }

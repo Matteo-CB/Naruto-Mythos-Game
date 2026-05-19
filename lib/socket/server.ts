@@ -15,7 +15,7 @@ import { deepClone } from '@/lib/engine/utils/deepClone';
 import { isMaintenanceActive, activateMaintenance, setDrainTimeout, setCheckInterval } from '@/lib/socket/maintenance';
 import { createChessClock, arm as armChessClock, disarm as disarmChessClock, resetIdle as resetChessClockIdle, snapshotForBroadcast as snapshotChessClockForBroadcast, bankEmpty as chessClockBankEmpty, idleMs as chessClockIdleMs, consumeIdleWarning as consumeChessClockIdleWarning, CHESS_CLOCK_IDLE_LIMIT_MS, CHESS_CLOCK_IDLE_TOAST_MS, CHESS_CLOCK_MULLIGAN_IDLE_MS, type ChessClockState } from '@/lib/timing/chessClock';
 import { computeEvolvingMpBonus } from '@/lib/evolving/mpBonus';
-import { computeDeckEvolvingPoints } from '@/lib/evolving/computePoints';
+import { computeDeckEvolvingPoints, isEvolvingCompatible } from '@/lib/evolving/computePoints';
 
 export function buildEvolvingGameConfigExtras(room: Pick<RoomData, 'isEvolving' | 'hostEvolvingPoints' | 'guestEvolvingPoints'>): Pick<GameConfig, 'startingMissionPoints'> {
   if (!room.isEvolving) return {};
@@ -334,6 +334,16 @@ export function onChessClockTick(room: RoomData, io: SocketIOServer): void {
     return;
   }
   const now = Date.now();
+
+  if (room.chessClock.player1.remainingMs <= 0) {
+    handleChessClockExpiry(room, 'player1', io, 'bank-empty');
+    return;
+  }
+  if (room.chessClock.player2.remainingMs <= 0) {
+    handleChessClockExpiry(room, 'player2', io, 'bank-empty');
+    return;
+  }
+
   if (room.chessClock.active === null && whoseInputIsAwaited(room.gameState) !== null) {
     syncChessClock(room, now);
   }
@@ -2116,6 +2126,18 @@ export function setupSocketHandlers(io: SocketIOServer) {
             return;
           }
           remaining.set(c.id, left - 1);
+        }
+      }
+
+      if (room.isEvolving) {
+        const cardIds = safeDeck.characters.map((c) => c.id);
+        const missionIds = safeDeck.missions.map((m) => m.id);
+        if (!isEvolvingCompatible(cardIds, missionIds)) {
+          socket.emit('room:error', {
+            message: 'Deck is not compatible with Evolving mode',
+            errorKey: 'room.error.evolvingNoDeck',
+          });
+          return;
         }
       }
 

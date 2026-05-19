@@ -168,12 +168,12 @@ describe('chessClock', () => {
     expect(c.player1.remainingMs).toBe(CHESS_CLOCK_INITIAL_MS - 15_000);
   });
 
-  it('idle limit constant is 3 minutes', () => {
-    expect(CHESS_CLOCK_IDLE_LIMIT_MS).toBe(3 * 60 * 1000);
+  it('idle limit constant is 2 minutes', () => {
+    expect(CHESS_CLOCK_IDLE_LIMIT_MS).toBe(2 * 60 * 1000);
   });
 
-  it('idle toast constant is 2 minutes (1 min before auto-action triggers)', () => {
-    expect(CHESS_CLOCK_IDLE_TOAST_MS).toBe(2 * 60 * 1000);
+  it('idle toast constant is 1 minute (1 min before auto-action triggers)', () => {
+    expect(CHESS_CLOCK_IDLE_TOAST_MS).toBe(60 * 1000);
     expect(CHESS_CLOCK_IDLE_TOAST_MS).toBeLessThan(CHESS_CLOCK_IDLE_LIMIT_MS);
   });
 

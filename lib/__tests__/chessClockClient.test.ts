@@ -13,8 +13,8 @@ function makeBroadcast(overrides: Partial<ChessClockBroadcast> = {}): ChessClock
     activeStartedAt: null,
     idleStartedAt: null,
     serverNow: 1_000_000,
-    idleToastAtMs: 120_000,
-    idleLimitMs: 180_000,
+    idleToastAtMs: 60_000,
+    idleLimitMs: 120_000,
     ...overrides,
   };
 }

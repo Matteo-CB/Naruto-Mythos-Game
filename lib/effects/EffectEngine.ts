@@ -4398,34 +4398,13 @@ export class EffectEngine {
           kb052Missions.push(String(i));
         }
 
-        if (kb052Missions.length === 1) {
-          const kb052FriendlySide: 'player1Characters' | 'player2Characters' =
-            kb052Player === 'player1' ? 'player1Characters' : 'player2Characters';
-          const newChar_kb052: CharacterInPlay = {
-            instanceId: generateInstanceId(),
-            card: kb052Drawn,
-            isHidden: true,
-            wasRevealedAtLeastOnce: false,
-            powerTokens: 0,
-            stack: [kb052Drawn],
-            controlledBy: kb052Player,
-            originalOwner: kb052Opponent,
-            controllerInstanceId: pendingEffect.sourceInstanceId,
-            missionIndex: 0,
-          };
-          const missions_kb052 = [...newState.activeMissions];
-          const mission_kb052 = { ...missions_kb052[0] };
-          mission_kb052[kb052FriendlySide] = [...mission_kb052[kb052FriendlySide], newChar_kb052];
-          missions_kb052[0] = mission_kb052;
-          newState.activeMissions = missions_kb052;
-          newState[kb052Player] = { ...newState[kb052Player], charactersInPlay: EffectEngine.countCharsForPlayer(newState, kb052Player) };
-          delete (newState as any)._pendingHiddenCard;
-          delete (newState as any)._pendingOriginalOwner;
-          newState.log = logAction(newState.log, newState.turn, newState.phase, kb052Player,
-            'EFFECT', 'Kabuto Yakushi (052): Placed stolen card hidden on mission 1.',
-            'game.log.effect.kabutoSteal', { card: 'KABUTO YAKUSHI', id: 'KS-052-C', mission: '1' });
-          break;
-        }
+        const kb052RevealPayload = JSON.stringify({
+          cardName_fr: kb052Drawn.name_fr,
+          cardName_en: kb052Drawn.name_en ?? kb052Drawn.name_fr,
+          cardCost: kb052Drawn.chakra ?? 0,
+          cardPower: kb052Drawn.power ?? 0,
+          cardImageFile: kb052Drawn.image_file,
+        });
 
         const kb052EffId = generateInstanceId();
         const kb052ActId = generateInstanceId();
@@ -4434,7 +4413,7 @@ export class EffectEngine {
           sourceInstanceId: pendingEffect.sourceInstanceId,
           sourceMissionIndex: pendingEffect.sourceMissionIndex,
           effectType: pendingEffect.effectType,
-          effectDescription: '', targetSelectionType: 'KABUTO_CHOOSE_MISSION',
+          effectDescription: kb052RevealPayload, targetSelectionType: 'KABUTO_CHOOSE_MISSION',
           sourcePlayer: kb052Player, requiresTargetSelection: true,
           validTargets: kb052Missions, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,

@@ -14,8 +14,8 @@ function makeBroadcastFromState(state: ChessClockState, now: number): ChessClock
     activeStartedAt: snap.activeStartedAt,
     idleStartedAt: snap.idleStartedAt,
     serverNow: now,
-    idleToastAtMs: 120_000,
-    idleLimitMs: 180_000,
+    idleToastAtMs: 60_000,
+    idleLimitMs: 120_000,
   };
 }
 

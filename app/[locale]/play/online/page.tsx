@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -215,7 +215,7 @@ export default function PlayOnlinePage() {
         <CardBackgroundDecor variant="playOnline" />
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="flex flex-col items-center gap-6 max-w-md w-full text-center relative z-10">
-            <h1 className="text-2xl font-bold uppercase" style={{ color: '#c4a35a', letterSpacing: '0.22em' }}>
+            <h1 className="text-2xl font-bold" style={{ color: '#c4a35a', letterSpacing: '0.22em' }}>
               {t('online.title')}
             </h1>
             <p className="text-sm" style={{ color: '#888888' }}>
@@ -224,7 +224,7 @@ export default function PlayOnlinePage() {
             <div className="flex gap-3">
               <Link
                 href="/login"
-                className="px-6 py-2.5 text-sm font-bold uppercase tracking-wider"
+                className="px-6 py-2.5 text-sm font-bold tracking-wider"
                 style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
               >
                 {t('common.signIn')}
@@ -339,7 +339,7 @@ export default function PlayOnlinePage() {
             className="flex flex-col items-center gap-2 mb-6 sm:mb-8"
           >
             <h1
-              className="font-display text-2xl sm:text-3xl md:text-4xl font-bold uppercase leading-none"
+              className="font-display text-2xl sm:text-3xl md:text-4xl font-bold leading-none"
               style={{
                 color: '#e8c477',
                 letterSpacing: '0.18em',
@@ -349,7 +349,7 @@ export default function PlayOnlinePage() {
               {t('online.title')}
             </h1>
             <p
-              className="font-body text-[10px] sm:text-[11px] uppercase"
+              className="font-body text-[10px] sm:text-[11px]"
               style={{ color: '#666', letterSpacing: '0.32em' }}
             >
               {t('online.signedInAs', { name: session.user.name })}
@@ -426,119 +426,9 @@ export default function PlayOnlinePage() {
                 <ViewTabs view={view} onChange={setView} />
 
                 {view === 'browse' && !roomCode && (
-                  <div className="flex flex-col gap-3">
-                    <ToggleRow
-                      label={t('online.anonymous.label')}
-                      description={t('online.anonymous.description')}
-                      checked={isAnonymous}
-                      onChange={setIsAnonymous}
-                    />
-                    <EvolvingToggleBlock
-                      checked={isEvolvingToggle}
-                      onChange={setIsEvolvingToggle}
-                      blocked={evoToggleBlocked}
-                      previewHue={previewHue}
-                    />
-
-                    <RoomsGrid
-                      casualRooms={publicRooms.filter((r) => !r.isRanked)}
-                      rankedRooms={publicRooms.filter((r) => r.isRanked)}
-                      onJoin={handleJoinRoom}
-                      onCreateCasual={() => handleCreatePublicRoom('casual')}
-                      onCreateRanked={() => handleCreatePublicRoom('ranked')}
-                      disableCreate={evoToggleBlocked}
-                    />
-                  </div>
-                )}
-
-                {view === 'browse' && roomCode && (
-                  <div className="p-6" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
-                    <div className="flex flex-col gap-4 items-center">
-                      <p className="text-sm font-bold uppercase" style={{ color: '#c4a35a', letterSpacing: '0.18em' }}>
-                        {opponentJoined ? t('online.opponentJoined') : t('online.waitingForOpponent')}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {view === 'private' && (
-                  <div className="p-5 sm:p-6" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
-                    {roomCode ? (
-                      <div className="flex flex-col gap-5 items-center py-3">
-                        <p className="font-body text-[11px] uppercase" style={{ color: '#888', letterSpacing: '0.32em' }}>
-                          {t('online.roomCreated')}
-                        </p>
-                        <p
-                          className="font-display text-3xl sm:text-4xl font-bold"
-                          style={{
-                            color: '#e8c477',
-                            letterSpacing: '0.32em',
-                            textShadow: '0 2px 18px rgba(196, 163, 90, 0.35)',
-                          }}
-                        >
-                          {roomCode}
-                        </p>
-                        <p className="font-body text-[11px] uppercase" style={{ color: '#555', letterSpacing: '0.2em' }}>
-                          {opponentJoined ? t('online.opponentJoined') : t('online.waitingForOpponent')}
-                        </p>
-                      </div>
-                    ) : showJoinInput ? (
-                      <div className="flex flex-col gap-4 items-center">
-                        <p className="text-xs uppercase" style={{ color: '#888', letterSpacing: '0.2em' }}>
-                          {t('online.enterCode')}
-                        </p>
-                        <input
-                          type="text"
-                          value={joinCode}
-                          onChange={(e) => setJoinCode(e.target.value.toUpperCase().slice(0, 6))}
-                          maxLength={6}
-                          placeholder={t('online.codePlaceholder')}
-                          className="w-full text-center text-2xl font-bold py-3 outline-none uppercase"
-                          style={{
-                            backgroundColor: 'rgba(8, 8, 14, 0.7)',
-                            color: '#e8e8e8',
-                            letterSpacing: '0.3em',
-                            boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
-                          }}
-                        />
-                        <button
-                          onClick={() => handleJoinRoom()}
-                          disabled={joinCode.length < 6}
-                          className="w-full py-3 text-sm font-bold uppercase cursor-pointer no-select"
-                          style={{
-                            backgroundColor: joinCode.length < 6 ? '#333' : '#c4a35a',
-                            color: '#0a0a0a',
-                            letterSpacing: '0.18em',
-                          }}
-                        >
-                          {t('online.joinRoom')}
-                        </button>
-                        <button
-                          onClick={() => setShowJoinInput(false)}
-                          className="text-xs underline cursor-pointer"
-                          style={{ color: '#888' }}
-                        >
-                          {t('common.back')}
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col gap-3">
-                        <div className="flex w-full overflow-hidden">
-                          {(['casual', 'ranked'] as GameMode[]).map((mode) => (
-                            <button
-                              key={mode}
-                              onClick={() => setSelectedMode(mode)}
-                              className="flex-1 py-3 text-xs font-bold uppercase cursor-pointer no-select"
-                              style={{ letterSpacing: '0.22em', ...modeStyle(mode) }}
-                            >
-                              {t(`online.mode.${mode}`)}
-                            </button>
-                          ))}
-                        </div>
-                        <p className="text-xs" style={{ color: '#555' }}>
-                          {t(`online.modeDesc.${selectedMode}`)}
-                        </p>
-
+                  <div className="flex flex-col gap-5">
+                    <Section title={t('online.sectionOptions')}>
+                      <div className="flex flex-col gap-2">
                         <ToggleRow
                           label={t('online.anonymous.label')}
                           description={t('online.anonymous.description')}
@@ -551,28 +441,216 @@ export default function PlayOnlinePage() {
                           blocked={evoToggleBlocked}
                           previewHue={previewHue}
                         />
+                      </div>
+                    </Section>
 
-                        <button
-                          onClick={handleCreatePrivateRoom}
-                          disabled={evoToggleBlocked}
-                          className="w-full py-3 text-sm font-bold uppercase no-select"
+                    <Section title={t('online.sectionRooms')}>
+                      <RoomsGrid
+                        casualRooms={publicRooms.filter((r) => !r.isRanked)}
+                        rankedRooms={publicRooms.filter((r) => r.isRanked)}
+                        onJoin={handleJoinRoom}
+                        onCreateCasual={() => handleCreatePublicRoom('casual')}
+                        onCreateRanked={() => handleCreatePublicRoom('ranked')}
+                        disableCreate={evoToggleBlocked}
+                      />
+                    </Section>
+                  </div>
+                )}
+
+                {view === 'browse' && roomCode && (
+                  <div className="p-6" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
+                    <div className="flex flex-col gap-4 items-center">
+                      <p className="text-sm font-bold" style={{ color: '#c4a35a', letterSpacing: '0.18em' }}>
+                        {opponentJoined ? t('online.opponentJoined') : t('online.waitingForOpponent')}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {view === 'private' && (
+                  <div className="p-5 sm:p-7" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
+                    {roomCode ? (
+                      <div className="flex flex-col gap-5 items-center py-3">
+                        <p className="font-body text-[11px]" style={{ color: '#888', letterSpacing: '0.32em' }}>
+                          {t('online.roomCreated')}
+                        </p>
+                        <div
+                          className="px-8 py-5"
                           style={{
-                            backgroundColor: evoToggleBlocked ? '#333' : '#c4a35a',
-                            color: '#0a0a0a',
-                            letterSpacing: '0.18em',
-                            cursor: evoToggleBlocked ? 'not-allowed' : 'pointer',
-                            opacity: evoToggleBlocked ? 0.55 : 1,
+                            backgroundColor: 'rgba(196, 163, 90, 0.06)',
+                            boxShadow: 'inset 0 0 0 1px rgba(196, 163, 90, 0.25)',
                           }}
                         >
-                          {t('online.createPrivateRoom')}
-                        </button>
+                          <p
+                            className="font-display text-3xl sm:text-4xl font-bold"
+                            style={{
+                              color: '#e8c477',
+                              letterSpacing: '0.32em',
+                              textShadow: '0 2px 18px rgba(196, 163, 90, 0.35)',
+                            }}
+                          >
+                            {roomCode}
+                          </p>
+                        </div>
+                        <p className="font-body text-[11px]" style={{ color: '#555', letterSpacing: '0.2em' }}>
+                          {opponentJoined ? t('online.opponentJoined') : t('online.waitingForOpponent')}
+                        </p>
+                      </div>
+                    ) : showJoinInput ? (
+                      <div className="flex flex-col gap-5 items-center">
+                        <p className="font-body text-[11px]" style={{ color: '#888', letterSpacing: '0.32em' }}>
+                          {t('online.enterCode')}
+                        </p>
+                        <input
+                          type="text"
+                          value={joinCode}
+                          onChange={(e) => setJoinCode(e.target.value.toUpperCase().slice(0, 6))}
+                          maxLength={6}
+                          placeholder={t('online.codePlaceholder')}
+                          className="font-display w-full text-center text-3xl font-bold py-4 outline-none"
+                          style={{
+                            backgroundColor: 'rgba(8, 8, 14, 0.7)',
+                            color: '#e8e8e8',
+                            letterSpacing: '0.32em',
+                            boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
+                          }}
+                        />
                         <button
-                          onClick={() => setShowJoinInput(true)}
-                          className="w-full py-3 text-sm font-bold uppercase cursor-pointer no-select"
-                          style={{ backgroundColor: 'rgba(20, 20, 20, 0.85)', color: '#e8e8e8', letterSpacing: '0.18em' }}
+                          onClick={() => handleJoinRoom()}
+                          disabled={joinCode.length < 6}
+                          className="w-full py-3 text-sm font-bold cursor-pointer no-select transition-opacity"
+                          style={{
+                            backgroundColor: joinCode.length < 6 ? '#2a2a2a' : '#c4a35a',
+                            color: joinCode.length < 6 ? '#666' : '#0a0a0a',
+                            letterSpacing: '0.22em',
+                          }}
                         >
                           {t('online.joinRoom')}
                         </button>
+                        <button
+                          onClick={() => setShowJoinInput(false)}
+                          className="font-body text-[11px] cursor-pointer transition-opacity hover:opacity-100"
+                          style={{ color: '#888', letterSpacing: '0.3em', opacity: 0.7 }}
+                        >
+                          {'<'} {t('common.back')}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-5">
+                        <Section title={t('online.sectionMode')}>
+                          <div
+                            className="relative flex w-full"
+                            style={{ backgroundColor: 'rgba(8, 8, 12, 0.55)' }}
+                          >
+                            {(['casual', 'ranked'] as GameMode[]).map((mode) => {
+                              const active = selectedMode === mode;
+                              const accent = mode === 'ranked' ? '#b33e3e' : '#c4a35a';
+                              const activeColor = mode === 'ranked' ? '#ec8a8a' : '#f0d089';
+                              const subtleBg = mode === 'ranked' ? 'rgba(179, 62, 62, 0.05)' : 'rgba(196, 163, 90, 0.04)';
+                              return (
+                                <button
+                                  key={mode}
+                                  onClick={() => setSelectedMode(mode)}
+                                  className="relative flex-1 py-4 text-[12px] font-bold cursor-pointer no-select"
+                                  style={{
+                                    letterSpacing: '0.3em',
+                                    backgroundColor: 'transparent',
+                                    color: active ? activeColor : '#5a5a5a',
+                                    transition: 'color 0.2s',
+                                    textShadow: active ? `0 0 18px ${accent}66` : 'none',
+                                    zIndex: 1,
+                                  }}
+                                >
+                                  {active && (
+                                    <motion.span
+                                      layoutId="private-mode-bg"
+                                      className="absolute inset-x-0"
+                                      style={{
+                                        top: 0,
+                                        bottom: 3,
+                                        backgroundColor: subtleBg,
+                                        zIndex: -1,
+                                      }}
+                                      transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+                                    />
+                                  )}
+                                  {t(`online.mode.${mode}`)}
+                                  {active && (
+                                    <motion.span
+                                      layoutId="private-mode-underline"
+                                      className="absolute left-0 right-0"
+                                      style={{
+                                        bottom: 0,
+                                        height: 3,
+                                        backgroundColor: accent,
+                                        boxShadow: `0 0 10px ${accent}aa`,
+                                      }}
+                                      transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+                                    />
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                          <p
+                            className="font-body text-xs mt-3 px-1"
+                            style={{ color: '#888', lineHeight: 1.5 }}
+                          >
+                            {t(`online.modeDesc.${selectedMode}`)}
+                          </p>
+                        </Section>
+
+                        <Section title={t('online.sectionOptions')}>
+                          <div className="flex flex-col gap-2">
+                            <ToggleRow
+                              label={t('online.anonymous.label')}
+                              description={t('online.anonymous.description')}
+                              checked={isAnonymous}
+                              onChange={setIsAnonymous}
+                            />
+                            <EvolvingToggleBlock
+                              checked={isEvolvingToggle}
+                              onChange={setIsEvolvingToggle}
+                              blocked={evoToggleBlocked}
+                              previewHue={previewHue}
+                            />
+                          </div>
+                        </Section>
+
+                        <div className="flex flex-col gap-2 pt-1">
+                          <button
+                            onClick={handleCreatePrivateRoom}
+                            disabled={evoToggleBlocked}
+                            className="w-full py-3.5 text-sm font-bold no-select transition-opacity"
+                            style={{
+                              backgroundColor: evoToggleBlocked ? '#2a2a2a' : '#c4a35a',
+                              color: evoToggleBlocked ? '#666' : '#0a0a0a',
+                              letterSpacing: '0.22em',
+                              cursor: evoToggleBlocked ? 'not-allowed' : 'pointer',
+                              opacity: evoToggleBlocked ? 0.55 : 1,
+                            }}
+                          >
+                            {t('online.createPrivateRoom')}
+                          </button>
+                          <button
+                            onClick={() => setShowJoinInput(true)}
+                            className="w-full py-3 text-[12px] font-bold cursor-pointer no-select transition-colors"
+                            style={{
+                              backgroundColor: 'transparent',
+                              color: '#c4a35a',
+                              letterSpacing: '0.22em',
+                              boxShadow: 'inset 0 0 0 1px rgba(196, 163, 90, 0.35)',
+                            }}
+                            onMouseEnter={(e) => {
+                              (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(196, 163, 90, 0.08)';
+                            }}
+                            onMouseLeave={(e) => {
+                              (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                            }}
+                          >
+                            {t('online.joinRoom')}
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -585,7 +663,7 @@ export default function PlayOnlinePage() {
           <div className="flex justify-center mt-10 sm:mt-12">
             <Link
               href="/"
-              className="text-[11px] uppercase no-select transition-opacity hover:opacity-100"
+              className="text-[11px] no-select transition-opacity hover:opacity-100"
               style={{ color: '#888', letterSpacing: '0.3em', opacity: 0.7 }}
             >
               {'<'} {t('auth.backToHome')}
@@ -614,10 +692,10 @@ function ToggleRow({
       style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.3)' }}
     >
       <div className="flex flex-col gap-0.5 pr-2 min-w-0">
-        <span className="text-[11px] font-medium uppercase truncate" style={{ color: '#e8e8e8', letterSpacing: '0.16em' }}>
+        <span className="text-[11px] font-medium truncate" style={{ color: '#e8e8e8', letterSpacing: '0.16em' }}>
           {label}
         </span>
-        <span className="text-[9px]" style={{ color: '#555' }}>{description}</span>
+        <span className="font-body text-[10px] leading-snug" style={{ color: '#888' }}>{description}</span>
       </div>
       <button
         type="button"
@@ -691,24 +769,34 @@ function RoomColumn({
   emptyLabel: string;
   disableCreate?: boolean;
 }) {
-  const tintBg = accent === '#b33e3e' ? 'rgba(179, 62, 62, 0.12)' : 'rgba(196, 163, 90, 0.10)';
   return (
     <div className="flex flex-col" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
-      <div
-        className="px-4 py-3 flex items-center justify-center"
-        style={{ backgroundColor: tintBg }}
-      >
+      <div className="relative px-4 pt-5 pb-4 flex flex-col items-center">
         <span
-          className="font-display text-[12px] font-bold uppercase"
-          style={{ color: accent, letterSpacing: '0.28em' }}
+          className="font-display text-sm font-bold"
+          style={{
+            color: accent,
+            letterSpacing: '0.36em',
+            textShadow: `0 0 18px ${accent}66`,
+          }}
         >
           {title}
         </span>
+        <span
+          aria-hidden
+          className="absolute left-0 right-0"
+          style={{
+            bottom: 0,
+            height: 3,
+            backgroundColor: accent,
+            boxShadow: `0 0 10px ${accent}aa`,
+          }}
+        />
       </div>
       <div className="flex-1 min-h-[100px]">
         {rooms.length === 0 ? (
           <div className="px-3 py-8 text-center">
-            <span className="font-body text-[10px] uppercase" style={{ color: '#444', letterSpacing: '0.2em' }}>{emptyLabel}</span>
+            <span className="font-body text-[10px]" style={{ color: '#444', letterSpacing: '0.2em' }}>{emptyLabel}</span>
           </div>
         ) : (
           <div className="max-h-56 overflow-y-auto flex flex-col gap-1.5 p-2">
@@ -732,7 +820,7 @@ function RoomColumn({
       <button
         onClick={onCreate}
         disabled={disableCreate}
-        className="w-full py-3 text-[11px] font-bold uppercase no-select transition-opacity"
+        className="w-full py-3 text-[11px] font-bold no-select transition-opacity"
         style={{
           backgroundColor: disableCreate ? '#2a2a2a' : accent,
           color: accent === '#b33e3e' && !disableCreate ? '#ffffff' : '#0a0a0a',
@@ -747,6 +835,20 @@ function RoomColumn({
   );
 }
 
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <span
+        className="font-display text-[10px] font-bold px-1"
+        style={{ color: '#666', letterSpacing: '0.36em' }}
+      >
+        {title}
+      </span>
+      {children}
+    </div>
+  );
+}
+
 function ViewTabs({ view, onChange }: { view: View; onChange: (v: View) => void }) {
   const t = useTranslations();
   const tabs: { key: View; labelKey: string }[] = [
@@ -754,34 +856,50 @@ function ViewTabs({ view, onChange }: { view: View; onChange: (v: View) => void 
     { key: 'private', labelKey: 'online.privateRoom' },
   ];
   return (
-    <div
-      className="relative flex w-full overflow-hidden"
-      style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}
-    >
+    <div className="relative flex w-full" style={{ backgroundColor: 'rgba(15, 15, 20, 0.6)' }}>
       {tabs.map((tab) => {
         const active = view === tab.key;
         return (
           <button
             key={tab.key}
             onClick={() => onChange(tab.key)}
-            className="relative flex-1 py-3 text-[11px] font-bold uppercase cursor-pointer no-select"
+            className="relative flex-1 py-4 text-[12px] font-bold cursor-pointer no-select"
             style={{
-              letterSpacing: '0.26em',
+              letterSpacing: '0.3em',
               backgroundColor: 'transparent',
-              color: active ? '#e8c477' : '#666',
-              transition: 'color 0.18s',
+              color: active ? '#f0d089' : '#5a5a5a',
+              transition: 'color 0.2s',
+              textShadow: active ? '0 0 18px rgba(196, 163, 90, 0.55)' : 'none',
               zIndex: 1,
             }}
           >
             {active && (
               <motion.span
                 layoutId="view-tab-bg"
-                className="absolute inset-0"
-                style={{ backgroundColor: 'rgba(196, 163, 90, 0.10)', zIndex: -1 }}
+                className="absolute inset-x-0"
+                style={{
+                  top: 0,
+                  bottom: 3,
+                  backgroundColor: 'rgba(196, 163, 90, 0.04)',
+                  zIndex: -1,
+                }}
                 transition={{ type: 'spring', stiffness: 320, damping: 32 }}
               />
             )}
             {t(tab.labelKey)}
+            {active && (
+              <motion.span
+                layoutId="view-tab-underline"
+                className="absolute left-0 right-0"
+                style={{
+                  bottom: 0,
+                  height: 3,
+                  backgroundColor: '#c4a35a',
+                  boxShadow: '0 0 10px rgba(196, 163, 90, 0.6)',
+                }}
+                transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+              />
+            )}
           </button>
         );
       })}
