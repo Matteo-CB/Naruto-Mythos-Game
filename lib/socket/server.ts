@@ -395,6 +395,28 @@ export function chessClockWatchdog(io: SocketIOServer): void {
     if (room.gameState.phase === 'mulligan') continue;
 
     try {
+      if (
+        room.gameState.phase === 'mission' &&
+        room.gameState.missionScoringComplete === true &&
+        room.gameState.pendingActions.length === 0 &&
+        room.gameState.pendingEffects.length === 0
+      ) {
+        console.warn(`[ChessClockWatchdog] ${code}: missionScoringComplete stuck (auto-advance setTimeout missed), forcing ADVANCE_PHASE`);
+        try {
+          room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'ADVANCE_PHASE' });
+          broadcastState(room, io);
+          const winnerAfter = GameEngine.getWinner(room.gameState);
+          if (winnerAfter) {
+            finalizeGameEnd(room, code, io, 'score').catch((err) => {
+              console.error(`[ChessClockWatchdog] ${code}: finalizeGameEnd error:`, err instanceof Error ? err.message : err);
+            });
+            continue;
+          }
+        } catch (err) {
+          console.error(`[ChessClockWatchdog] ${code}: force-advance error:`, err instanceof Error ? err.message : err);
+        }
+      }
+
       const needed = whoseInputIsAwaited(room.gameState);
       const active = room.chessClock.active;
 

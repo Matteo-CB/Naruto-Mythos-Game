@@ -15,7 +15,8 @@
         "Page Jouer : refonte visuelle complète, les trois modes (en ligne, contre l'IA, solo contre soi-même) sont maintenant présentés en trois cartes côte à côte sur grand écran, avec un visuel plus soigné.",
         "En ligne : le délai d'inactivité passe de 3 à 2 minutes (avertissement à 1 minute). Si tu restes inactif trop longtemps, le jeu passe automatiquement ou refuse l'action pour toi.",
         "Kabuto Yakushi (carte à 3 chakra) : tu vois maintenant la carte volée à l'adversaire avant de choisir où la placer cachée sur le terrain.",
-        "Mode Evolving : le serveur refuse maintenant un deck non-evolving dans une partie evolving. Avant, il était possible de tomber sur un adversaire qui jouait un deck normal dans une partie Evolving."
+        "Mode Evolving : le serveur refuse maintenant un deck non-evolving dans une partie evolving. Avant, il était possible de tomber sur un adversaire qui jouait un deck normal dans une partie Evolving.",
+        "Bug corrigé : lors du calcul des missions au tour 4, certaines parties restaient figées et obligeaient à abandonner. Le serveur surveille maintenant cet état toutes les 30 secondes et débloque la partie automatiquement."
       ],
       "changes_en": [
         "New body font (Geist) used across the whole site for a smoother and more consistent read.",
@@ -28,7 +29,8 @@
         "Play page: full visual refresh, the three modes (online, vs AI, solo vs self) now sit as three cards side by side on wide screens, with a more polished look.",
         "Online: the idle timeout is now 2 minutes instead of 3 (warning at 1 minute remaining). If you stay idle too long the game auto-passes or skips the action for you.",
         "Kabuto Yakushi (3-chakra card): you now see the card stolen from the opponent's deck before choosing where to place it hidden on the board.",
-        "Evolving mode: the server now refuses a non-evolving deck in an Evolving game. Before, you could end up facing a player using a normal deck inside an Evolving room."
+        "Evolving mode: the server now refuses a non-evolving deck in an Evolving game. Before, you could end up facing a player using a normal deck inside an Evolving room.",
+        "Bug fixed: during mission scoring at turn 4, some games would freeze and force a manual concession. The server now watches for this state every 30 seconds and unblocks the game automatically."
       ]
     },
     {

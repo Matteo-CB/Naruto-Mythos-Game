@@ -138,6 +138,27 @@ describe('chessClockWatchdog: heals desync + force-forfeits long disconnect', ()
     expect(room.gameState?.forfeitedBy).toBeFalsy();
   });
 
+  it('force-advances a room stuck with missionScoringComplete=true and no pending (auto-advance setTimeout missed)', () => {
+    const stuckState: GameState = {
+      ...fakeActionState('player1'),
+      phase: 'mission',
+      missionScoringComplete: true,
+      turn: 2,
+      pendingActions: [],
+      pendingEffects: [],
+    } as unknown as GameState;
+    const room = makeRoom({
+      code: 'STUCK-MSC-1',
+      gameState: stuckState,
+    });
+    rooms.set(room.code, room);
+
+    chessClockWatchdog(makeIO() as never);
+
+    expect(room.gameState?.phase).not.toBe('mission');
+    expect(room.gameState?.missionScoringComplete).toBeFalsy();
+  });
+
   it('skips rooms that are finalized, gameOver, or in mulligan', () => {
     const finalized = makeRoom({ code: 'F-1', finalized: true, gameState: fakeActionState('player1') });
     const gameOver = makeRoom({ code: 'GO-1', gameState: { ...fakeActionState('player1'), phase: 'gameOver' } });
