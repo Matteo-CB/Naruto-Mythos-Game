@@ -42,7 +42,7 @@ function ichibi130UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  
+
   return {
     state,
     requiresTargetSelection: true,
@@ -51,6 +51,7 @@ function ichibi130UpgradeHandler(ctx: EffectContext): EffectResult {
     description: 'Ichibi (130) UPGRADE: Choose a mission and defeat all hidden enemies there.',
     descriptionKey: 'game.effect.desc.ichibi130ConfirmUpgrade',
     isOptional: true,
+    isMandatory: false,
   };
 }
 

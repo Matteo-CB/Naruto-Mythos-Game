@@ -8908,28 +8908,19 @@ export class EffectEngine {
       }
 
       case 'ICHIBI130_CONFIRM_UPGRADE': {
-        
+
         const i130Player = pendingEffect.sourcePlayer;
         const i130EnemySide: 'player1Characters' | 'player2Characters' =
           i130Player === 'player1' ? 'player2Characters' : 'player1Characters';
-        const i130AllHidden: string[] = [];
+        const i130MissionsWithHidden: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
-          for (const c of newState.activeMissions[i][i130EnemySide]) {
-            if (c.isHidden) i130AllHidden.push(c.instanceId);
-          }
+          const hasHidden = newState.activeMissions[i][i130EnemySide].some((c: CharacterInPlay) => c.isHidden);
+          if (hasHidden) i130MissionsWithHidden.push(String(i));
         }
-        if (i130AllHidden.length === 0) {
+        if (i130MissionsWithHidden.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, i130Player,
             'EFFECT_NO_TARGET', 'Ichibi (130) UPGRADE: No hidden enemy characters (state changed).',
             'game.log.effect.noTarget', { card: 'ICHIBI', id: 'KS-130-R' });
-          break;
-        }
-        if (i130AllHidden.length === 1) {
-          
-          newState = EffectEngine.defeatCharacter(newState, i130AllHidden[0], i130Player);
-          newState.log = logAction(newState.log, newState.turn, newState.phase, i130Player,
-            'EFFECT_DEFEAT', 'Ichibi (130) UPGRADE: Defeated 1 hidden enemy character.',
-            'game.log.effect.defeat', { card: 'ICHIBI', id: 'KS-130-R', target: '1 hidden enemy' });
           break;
         }
         {
@@ -8938,20 +8929,18 @@ export class EffectEngine {
           newState.pendingEffects.push({
             id: i130EffId, sourceCardId: 'KS-130-R', sourceInstanceId: pendingEffect.sourceInstanceId,
             sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: 'UPGRADE' as EffectType,
-            effectDescription: JSON.stringify({ constraintMode: 'all-in-mission' }),
-            targetSelectionType: 'ORDERED_DEFEAT', sourcePlayer: i130Player,
-            requiresTargetSelection: true, validTargets: i130AllHidden,
+            effectDescription: '',
+            targetSelectionType: 'ICHIBI130_CHOOSE_MISSION', sourcePlayer: i130Player,
+            requiresTargetSelection: true, validTargets: i130MissionsWithHidden,
             isOptional: false, isMandatory: true, resolved: false, isUpgrade: true,
-            descriptionKey: 'game.effect.desc.ichibi130OrderDefeat',
-            descriptionParams: { count: String(i130AllHidden.length) },
+            descriptionKey: 'game.effect.desc.ichibi130ChooseMission',
           } as PendingEffect);
           newState.pendingActions.push({
             id: i130ActId, type: 'SELECT_TARGET' as PendingAction['type'],
             player: i130Player,
-            description: `Ichibi (130) UPGRADE: Choose defeat order for ${i130AllHidden.length} hidden enemies.`,
-            descriptionKey: 'game.effect.desc.ichibi130OrderDefeat',
-            descriptionParams: { count: String(i130AllHidden.length) },
-            options: i130AllHidden, minSelections: i130AllHidden.length, maxSelections: i130AllHidden.length,
+            description: 'Ichibi (130) UPGRADE: Choose a mission to defeat all hidden enemies there.',
+            descriptionKey: 'game.effect.desc.ichibi130ChooseMission',
+            options: i130MissionsWithHidden, minSelections: 1, maxSelections: 1,
             sourceEffectId: i130EffId,
           });
         }

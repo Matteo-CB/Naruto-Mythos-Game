@@ -23,7 +23,8 @@
         "Spectate : un bouton Regarder bien visible apparaît maintenant sur chaque partie en cours pour qu'on comprenne mieux qu'on peut entrer en spectateur.",
         "Replay : sur mobile, le simulateur demande maintenant de tourner le téléphone en mode paysage quand on ouvre un replay, comme en jeu ou en spectateur.",
         "Replay : les parties non classées (casual et evolving casual) apparaissent maintenant dans tes parties récentes du profil avec leur lien de replay.",
-        "Bug corrigé : quand une carte qui joue un personnage avec réduction de coût (Jiraiya 105 et 132, Tayuya 125, Kabuto 053, etc.) était utilisée dans une mission avec Tayuya 125 ennemie, le surcoût de Tayuya n'était pas appliqué. Le calcul prend désormais en compte tous les effets continus de coût."
+        "Bug corrigé : quand une carte qui joue un personnage avec réduction de coût (Jiraiya 105 et 132, Tayuya 125, Kabuto 053, etc.) était utilisée dans une mission avec Tayuya 125 ennemie, le surcoût de Tayuya n'était pas appliqué. Le calcul prend désormais en compte tous les effets continus de coût.",
+        "Bug corrigé : Ichibi à 7 chakra défaisait automatiquement tous les personnages cachés ennemis de toutes les missions, sans demander de choisir. Tu choisis désormais une mission précise, et l'effet reste optionnel comme prévu."
       ],
       "changes_en": [
         "New body font (Geist) used across the whole site for a smoother and more consistent read.",
@@ -44,7 +45,8 @@
         "Spectate: a clearly visible Watch button now appears on every live game so it is obvious you can enter as a spectator.",
         "Replay: on mobile, the simulator now asks you to rotate your phone to landscape when you open a replay, like in-game and spectator mode.",
         "Replay: unranked games (casual and evolving casual) now appear in your recent games on the profile along with their replay link.",
-        "Bug fixed: when a card that plays another character with a cost reduction (Jiraiya 105 and 132, Tayuya 125, Kabuto 053, etc.) was used in a mission containing an enemy Tayuya 125, the extra chakra cost from Tayuya was ignored. The cost calculation now respects every continuous cost modifier."
+        "Bug fixed: when a card that plays another character with a cost reduction (Jiraiya 105 and 132, Tayuya 125, Kabuto 053, etc.) was used in a mission containing an enemy Tayuya 125, the extra chakra cost from Tayuya was ignored. The cost calculation now respects every continuous cost modifier.",
+        "Bug fixed: Ichibi (7-chakra) automatically defeated every hidden enemy in every mission without asking. You now pick a specific mission, and the effect stays optional as intended."
       ]
     },
     {
