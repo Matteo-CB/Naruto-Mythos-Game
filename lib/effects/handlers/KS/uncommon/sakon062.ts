@@ -24,7 +24,7 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
         const hasInstantEffect = topCard.effects?.some((eff) => {
           if (eff.type === 'SCORE') return false; // SCORE never copyable
           if (eff.description && eff.description.includes('[⧗]')) return false;
-          if (eff.description && (eff.description.startsWith('effect:') || eff.description.startsWith('effect.'))) return false;
+          if (eff.description && /(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
           return true;
         });
         if (hasInstantEffect) {

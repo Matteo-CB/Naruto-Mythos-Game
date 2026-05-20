@@ -2805,7 +2805,7 @@ export class EffectEngine {
               if (eff.type === 'UPGRADE') return false; // Kakashi 016 CANNOT copy UPGRADE
               if (eff.type === 'AMBUSH' && !k016WasRevealed) return false;
               if (eff.description.includes('[⧗]')) return false;
-              if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
+              if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
               return true;
             });
             if (hasInstant) k016Targets.push(char.instanceId);
@@ -2859,7 +2859,7 @@ export class EffectEngine {
               if (eff.type === 'UPGRADE') return false; // Kakashi 016 CANNOT copy UPGRADE
               if (eff.type === 'AMBUSH' && !k016uWasRevealed) return false;
               if (eff.description.includes('[⧗]')) return false;
-              if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
+              if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
               return true;
             });
             if (hasInstant) k016uTargets.push(char.instanceId);
@@ -5320,7 +5320,7 @@ export class EffectEngine {
               const hasInstant = topCard.effects?.some((eff: any) => {
                 if (eff.type === 'SCORE') return false; // SCORE never copyable
                 if (eff.description && eff.description.includes('[⧗]')) return false;
-                if (eff.description && (eff.description.startsWith('effect:') || eff.description.startsWith('effect.'))) return false;
+                if (eff.description && /(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
                 return true;
               });
               if (hasInstant) s062Targets.push(char.instanceId);
@@ -5345,7 +5345,7 @@ export class EffectEngine {
           const s062Copyable = (s062TopCard.effects ?? []).filter((eff: any) => {
             if (eff.type === 'SCORE') return false; // SCORE never copyable
             if (eff.description.includes('[⧗]')) return false;
-            if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
+            if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
             return true;
           });
           if (s062Copyable.length === 0) break;
@@ -12257,7 +12257,7 @@ export class EffectEngine {
               if (effect.type === 'SCORE') return false;
               if (effect.type === 'UPGRADE' && !charIsUpgraded) return false;
               if (effect.description.includes('[⧗]')) return false;
-              if (effect.description.startsWith('effect:') || effect.description.startsWith('effect.')) return false;
+              if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(effect.description)) return false;
               return true;
             });
             if (hasCopyableEffect) {
@@ -12583,7 +12583,7 @@ export class EffectEngine {
         const k148Copyable = !isCharacterCopyable(k148TopCard) ? [] : (k148TopCard.effects ?? []).filter((eff) => {
           if (eff.type === 'SCORE') return false;
           if (eff.description.includes('[⧗]')) return false;
-          if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
+          if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
           if (eff.type === 'UPGRADE' && !k148TargetIsUpgraded) return false;
           return eff.type === 'MAIN' || eff.type === 'AMBUSH' || eff.type === 'UPGRADE';
         });
@@ -14384,7 +14384,7 @@ export class EffectEngine {
           if (eff.type === 'UPGRADE' && !isSakon062) return false;
           if (eff.type === 'AMBUSH' && !copierWasRevealed) return false;
           if (eff.description.includes('[⧗]')) return false;
-          if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
+          if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
           return true;
         });
 
@@ -15322,7 +15322,7 @@ export class EffectEngine {
           if (e.type === 'UPGRADE') return false;
           if (e.type === 'AMBUSH' && !copier106WasRevealed) return false;
           if (e.description.includes('[⧗]')) return false;
-          if (e.description.startsWith('effect:') || e.description.startsWith('effect.')) return false;
+          if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(e.description)) return false;
           return true;
         },
       );

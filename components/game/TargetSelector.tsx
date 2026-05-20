@@ -1631,8 +1631,40 @@ export function TargetSelector() {
         <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.25)" maxWidth={popupMaxWidth} padding="20px 16px" backgroundColor="rgba(4, 4, 8, 0.95)" fitContent={isMissionOnlyTargeting}>
           <PopupMinimizeX onClick={minimizeEffectPopup} />
           <PopupTitle accentColor="#c4a35a" size="lg">
-            {t('game.mustChooseTarget', { player: displayName })}
+            {revealedCard?.revealTitleKey ? t(revealedCard.revealTitleKey) : t('game.mustChooseTarget', { player: displayName })}
           </PopupTitle>
+
+          {revealedCard && (
+            <motion.div
+              initial={{ y: -8, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.25 }}
+              className="flex items-center justify-center gap-3 mb-4 mx-auto"
+              style={{
+                backgroundColor: 'rgba(196, 163, 90, 0.06)',
+                padding: '10px 14px',
+                maxWidth: 360,
+              }}
+            >
+              {revealedCard.image_file && (
+                <img
+                  src={normalizeImagePath(revealedCard.image_file) || undefined}
+                  alt={revealedCard.name_fr}
+                  style={{ width: 56, height: 78, objectFit: 'cover' }}
+                  onClick={() => useUIStore.getState().zoomCard(revealedCard as unknown as CharacterCard)}
+                  className="cursor-pointer"
+                />
+              )}
+              <div className="flex flex-col gap-1">
+                <span className="font-display text-sm font-bold" style={{ color: '#e8c477', letterSpacing: '0.06em' }}>
+                  {locale === 'en' && revealedCard.name_en ? revealedCard.name_en : revealedCard.name_fr}
+                </span>
+                <span className="text-[11px]" style={{ color: '#aaa' }}>
+                  {t('collection.details.cost')}: {revealedCard.chakra} · {t('collection.details.power')}: {revealedCard.power}
+                </span>
+              </div>
+            </motion.div>
+          )}
 
           <motion.div
             initial={{ x: -12, opacity: 0 }}

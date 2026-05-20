@@ -56,6 +56,8 @@ export default function PlayOnlinePage() {
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isEvolvingToggle, setIsEvolvingToggle] = useState(initialEvolving);
+  const [roomCreatedAt, setRoomCreatedAt] = useState<number | null>(null);
+  const [, setRoomTick] = useState(0);
   useEffect(() => {
     try { localStorage.setItem(EVOLVING_TOGGLE_STORAGE_KEY, isEvolvingToggle ? '1' : '0'); } catch { /* ignore */ }
   }, [isEvolvingToggle]);
@@ -136,6 +138,20 @@ export default function PlayOnlinePage() {
       }
     };
   }, [disconnect]);
+
+  useEffect(() => {
+    if (roomCode && !opponentJoined && roomCreatedAt === null) {
+      setRoomCreatedAt(Date.now());
+    } else if (!roomCode) {
+      setRoomCreatedAt(null);
+    }
+  }, [roomCode, opponentJoined, roomCreatedAt]);
+
+  useEffect(() => {
+    if (roomCreatedAt === null) return;
+    const id = setInterval(() => setRoomTick((t) => t + 1), 1000);
+    return () => clearInterval(id);
+  }, [roomCreatedAt]);
 
   useEffect(() => {
     if (errorKey === 'room.error.evolvingNoDeck') {
@@ -458,18 +474,33 @@ export default function PlayOnlinePage() {
                 )}
 
                 {view === 'browse' && roomCode && (
-                  <div className="p-6" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
-                    <div className="flex flex-col gap-4 items-center">
-                      <p className="text-sm font-bold" style={{ color: '#c4a35a', letterSpacing: '0.18em' }}>
-                        {opponentJoined ? t('online.opponentJoined') : t('online.waitingForOpponent')}
-                      </p>
+                  <div>
+                    <WaitingRoomHeader
+                      gameMode={currentRoomGameMode}
+                      isEvolving={currentRoomIsEvolving}
+                      createdAt={roomCreatedAt}
+                    />
+                    <div className="p-6" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
+                      <div className="flex flex-col gap-4 items-center">
+                        <p className="text-sm font-bold" style={{ color: '#c4a35a', letterSpacing: '0.18em' }}>
+                          {opponentJoined ? t('online.opponentJoined') : t('online.waitingForOpponent')}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {view === 'private' && (
-                  <div className="p-5 sm:p-7" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
-                    {roomCode ? (
+                  <div>
+                    {roomCode && (
+                      <WaitingRoomHeader
+                        gameMode={currentRoomGameMode}
+                        isEvolving={currentRoomIsEvolving}
+                        createdAt={roomCreatedAt}
+                      />
+                    )}
+                    <div className="p-5 sm:p-7" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
+                      {roomCode ? (
                       <div className="flex flex-col gap-5 items-center py-3">
                         <p className="font-body text-[11px]" style={{ color: '#888', letterSpacing: '0.32em' }}>
                           {t('online.roomCreated')}
@@ -653,6 +684,7 @@ export default function PlayOnlinePage() {
                         </div>
                       </div>
                     )}
+                    </div>
                   </div>
                 )}
 
@@ -831,6 +863,65 @@ function RoomColumn({
       >
         {createLabel}
       </button>
+    </div>
+  );
+}
+
+function formatElapsed(ms: number): string {
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  const mins = Math.floor(totalSec / 60);
+  const secs = totalSec % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+function getRoomModeLabel(
+  gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' | null,
+  isEvolving: boolean,
+): { labelKey: string; accent: string } {
+  if (gameMode === 'evolving') {
+    return { labelKey: 'online.modeLabel.rankedEvolving', accent: '#b33e3e' };
+  }
+  if (gameMode === 'ranked') {
+    return { labelKey: 'online.modeLabel.ranked', accent: '#b33e3e' };
+  }
+  if (gameMode === 'casual' && isEvolving) {
+    return { labelKey: 'online.modeLabel.casualEvolving', accent: '#c4a35a' };
+  }
+  return { labelKey: 'online.modeLabel.casual', accent: '#c4a35a' };
+}
+
+function WaitingRoomHeader({
+  gameMode,
+  isEvolving,
+  createdAt,
+}: {
+  gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' | null;
+  isEvolving: boolean;
+  createdAt: number | null;
+}) {
+  const t = useTranslations();
+  const { labelKey, accent } = getRoomModeLabel(gameMode, isEvolving);
+  const elapsed = createdAt ? Date.now() - createdAt : 0;
+  return (
+    <div className="flex flex-col items-center gap-2 mb-3">
+      <span
+        className="font-display text-sm font-bold"
+        style={{
+          color: accent,
+          letterSpacing: '0.32em',
+          textShadow: `0 0 14px ${accent}55`,
+        }}
+      >
+        {t(labelKey)}
+      </span>
+      {createdAt !== null && (
+        <span
+          className="font-body text-[10px]"
+          style={{ color: '#777', letterSpacing: '0.3em' }}
+        >
+          {t('online.roomOpenSince')} · {formatElapsed(elapsed)}
+        </span>
+      )}
     </div>
   );
 }

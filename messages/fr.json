@@ -1353,6 +1353,13 @@
     "sectionOptions": "Options",
     "sectionRooms": "Salons disponibles",
     "sectionMode": "Type de partie",
+    "modeLabel": {
+      "casual": "Casual",
+      "ranked": "Classé",
+      "casualEvolving": "Casual Evolving",
+      "rankedEvolving": "Classé Evolving"
+    },
+    "roomOpenSince": "Salon ouvert depuis",
     "createPublicRoom": "Créer un Salon",
     "noRooms": "Aucun salon disponible. Créez-en un !",
     "timeJustNow": "À l'instant",

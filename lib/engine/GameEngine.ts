@@ -1506,7 +1506,7 @@ export class GameEngine {
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
               if (eff.type === 'UPGRADE') return false;
               if (eff.description.includes('[⧗]')) return false;
-              if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
+              if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
               return true;
             });
             if (hasInstant) k016dTargets.push(char.instanceId);

@@ -46,7 +46,7 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
         
         if (effect.description.includes('[⧗]')) return false;
         
-        if (effect.description.startsWith('effect:') || effect.description.startsWith('effect.')) return false;
+        if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(effect.description)) return false;
         return true;
       });
 

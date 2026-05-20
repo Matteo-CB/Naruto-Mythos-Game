@@ -694,11 +694,12 @@ function buildPendingTargetSelectionUI(
   const isKiba026Choose = tst === 'KIBA026_UPGRADE_CHOOSE';
   const isKabuto052ChooseMission = tst === 'KABUTO_CHOOSE_MISSION';
   const isMultiSelectChoose = isTayuya065Choose || isKiba026Choose;
-  const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal || isKabuto052ChooseMission;
+  const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal;
+  const shouldParseRevealedCard = isInfoReveal || isKabuto052ChooseMission;
 
   let revealedCard: PendingTargetSelection['revealedCard'];
   let revealedCards: PendingTargetSelection['revealedCards'];
-  if (isInfoReveal && pendingEffect) {
+  if (shouldParseRevealedCard && pendingEffect) {
     try {
       const rd = JSON.parse(pendingEffect.effectDescription);
       if (isOroReveal) {

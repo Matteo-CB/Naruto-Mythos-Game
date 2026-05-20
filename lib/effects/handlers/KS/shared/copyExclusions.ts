@@ -14,3 +14,9 @@ const UNCOPYABLE_CARD_NUMBERS = new Set<number>([
 export function isCharacterCopyable(topCard: CharacterCard): boolean {
   return !UNCOPYABLE_CARD_NUMBERS.has(topCard.number);
 }
+
+
+export function isEffectAlteration(description: string | undefined | null): boolean {
+  if (!description) return false;
+  return /(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(description);
+}

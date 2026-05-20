@@ -1353,6 +1353,13 @@
     "sectionOptions": "Options",
     "sectionRooms": "Available rooms",
     "sectionMode": "Match type",
+    "modeLabel": {
+      "casual": "Casual",
+      "ranked": "Ranked",
+      "casualEvolving": "Casual Evolving",
+      "rankedEvolving": "Ranked Evolving"
+    },
+    "roomOpenSince": "Room open for",
     "createPublicRoom": "Create Room",
     "noRooms": "No rooms available. Create one!",
     "timeJustNow": "Just now",
