@@ -18,7 +18,12 @@
         "Mode Evolving : le serveur refuse maintenant un deck non-evolving dans une partie evolving. Avant, il était possible de tomber sur un adversaire qui jouait un deck normal dans une partie Evolving.",
         "Bug corrigé : lors du calcul des missions au tour 4, certaines parties restaient figées et obligeaient à abandonner. Le serveur surveille maintenant cet état toutes les 30 secondes et débloque la partie automatiquement.",
         "Bug corrigé : Tenten ciblait n'importe quel personnage caché, y compris les tiens. Du coup elle pouvait défaire un caché ami et déclencher le gain de chakra de Tsunade. Elle ne cible désormais que les cachés ennemis.",
-        "Bug corrigé : il était possible de révéler un personnage caché alors qu'un personnage du même nom contrôlé (volé à l'adversaire) était déjà visible sur la même mission, en passant ce dernier comme cible d'upgrade. Cette révélation est désormais bloquée."
+        "Bug corrigé : il était possible de révéler un personnage caché alors qu'un personnage du même nom contrôlé (volé à l'adversaire) était déjà visible sur la même mission, en passant ce dernier comme cible d'upgrade. Cette révélation est désormais bloquée.",
+        "Bug corrigé : Kidomaru à 3 chakra refusait de déplacer un personnage caché vers une mission où un personnage du même nom était visible. Comme un personnage caché n'a pas de nom visible, ce déplacement est désormais autorisé.",
+        "Spectate : un bouton Regarder bien visible apparaît maintenant sur chaque partie en cours pour qu'on comprenne mieux qu'on peut entrer en spectateur.",
+        "Replay : sur mobile, le simulateur demande maintenant de tourner le téléphone en mode paysage quand on ouvre un replay, comme en jeu ou en spectateur.",
+        "Replay : les parties non classées (casual et evolving casual) apparaissent maintenant dans tes parties récentes du profil avec leur lien de replay.",
+        "Bug corrigé : quand une carte qui joue un personnage avec réduction de coût (Jiraiya 105 et 132, Tayuya 125, Kabuto 053, etc.) était utilisée dans une mission avec Tayuya 125 ennemie, le surcoût de Tayuya n'était pas appliqué. Le calcul prend désormais en compte tous les effets continus de coût."
       ],
       "changes_en": [
         "New body font (Geist) used across the whole site for a smoother and more consistent read.",
@@ -34,7 +39,12 @@
         "Evolving mode: the server now refuses a non-evolving deck in an Evolving game. Before, you could end up facing a player using a normal deck inside an Evolving room.",
         "Bug fixed: during mission scoring at turn 4, some games would freeze and force a manual concession. The server now watches for this state every 30 seconds and unblocks the game automatically.",
         "Bug fixed: Tenten would target any hidden character including your own, which could defeat a friendly hidden and trigger Tsunade's chakra gain. She now only targets enemy hidden characters.",
-        "Bug fixed: it was possible to reveal a hidden character while a same-name controlled character (stolen from the opponent) was already visible on the same mission, by passing it as the upgrade target. This reveal is now blocked."
+        "Bug fixed: it was possible to reveal a hidden character while a same-name controlled character (stolen from the opponent) was already visible on the same mission, by passing it as the upgrade target. This reveal is now blocked.",
+        "Bug fixed: Kidomaru (3-chakra) refused to move a hidden character to a mission where a same-name character was visible. Since hidden characters have no visible name, this move is now allowed.",
+        "Spectate: a clearly visible Watch button now appears on every live game so it is obvious you can enter as a spectator.",
+        "Replay: on mobile, the simulator now asks you to rotate your phone to landscape when you open a replay, like in-game and spectator mode.",
+        "Replay: unranked games (casual and evolving casual) now appear in your recent games on the profile along with their replay link.",
+        "Bug fixed: when a card that plays another character with a cost reduction (Jiraiya 105 and 132, Tayuya 125, Kabuto 053, etc.) was used in a mission containing an enemy Tayuya 125, the extra chakra cost from Tayuya was ignored. The cost calculation now respects every continuous cost modifier."
       ]
     },
     {

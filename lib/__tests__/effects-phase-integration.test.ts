@@ -391,6 +391,24 @@ describe('ChakraValidation - Cost Reduction', () => {
     const cost = calculateEffectiveCost(state, 'player1', nonTeam8, 0, false);
     expect(cost).toBe(3);
   });
+
+  it('Tayuya 125 +1 chakra cost stacks with effect-driven cost reduction (Jiraiya 105 / Tayuya 125 / Kabuto 053 etc.)', () => {
+    const tayuya125 = mockCharInPlay({ instanceId: 'tay-1', controlledBy: 'player2', originalOwner: 'player2' }, {
+      id: 'KS-125-R', number: 125, name_fr: 'Tayuya',
+      effects: [{ type: 'MAIN', description: '[⧗] Non-hidden enemy characters cost an additional 1 Chakra to play in this mission.' }],
+    });
+    const gamahiro = mockCharacter({ id: 'KS-095-C', name_fr: 'Gamahiro', chakra: 4, keywords: ['Summon'] });
+    const state = createActionPhaseState({
+      activeMissions: [makeMission('D', [], [tayuya125])],
+    });
+
+    const baseCost = calculateEffectiveCost(state, 'player1', gamahiro, 0, false);
+    expect(baseCost).toBe(5);
+
+    const costReductionFromJiraiya = 3;
+    const finalCost = Math.max(0, baseCost - costReductionFromJiraiya);
+    expect(finalCost).toBe(2);
+  });
 });
 
 

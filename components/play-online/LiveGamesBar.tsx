@@ -130,63 +130,74 @@ function LiveGameCard({ game, loading, onSpectate }: { game: LiveGame; loading: 
     <motion.div
       animate={isWaiting ? { opacity: [0.92, 1, 0.92] } : { opacity: 1 }}
       transition={isWaiting ? { duration: 4, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.2 }}
-      className="flex flex-col gap-1.5 px-3 py-2 cursor-pointer no-select w-full"
-      onClick={onSpectate}
+      className="flex items-stretch no-select w-full"
       style={{
         backgroundColor: game.isEvolving ? 'rgba(10, 10, 14, 0.55)' : 'rgba(15, 15, 20, 0.85)',
         position: 'relative',
         zIndex: 1,
       }}
     >
-      <div className="flex items-center justify-between gap-2 min-w-0">
-        <span
-          className="text-[11px] font-medium truncate flex-1"
-          style={{ color: '#e8e8e8' }}
-        >
-          {p1}
-        </span>
-        <span className="text-[9px]" style={{ color: '#444' }}>{t('spectator.vs')}</span>
-        <span
-          className="text-[11px] font-medium truncate flex-1 text-right"
-          style={{ color: '#e8e8e8' }}
-        >
-          {p2}
-        </span>
-      </div>
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[8.5px] uppercase font-bold" style={{ color: '#555', letterSpacing: '0.18em' }}>
-            {t('spectator.turn', { turn: game.turn })}
+      <div
+        className="flex flex-col gap-1.5 px-3 py-2 flex-1 min-w-0 cursor-pointer"
+        onClick={onSpectate}
+      >
+        <div className="flex items-center justify-between gap-2 min-w-0">
+          <span
+            className="text-[11px] font-medium truncate flex-1"
+            style={{ color: '#e8e8e8' }}
+          >
+            {p1}
           </span>
-          {game.isRanked && (
-            <span className="text-[8.5px] uppercase font-bold" style={{ color: '#b33e3e', letterSpacing: '0.18em' }}>
-              {t('spectator.ranked')}
+          <span className="text-[9px]" style={{ color: '#444' }}>{t('spectator.vs')}</span>
+          <span
+            className="text-[11px] font-medium truncate flex-1 text-right"
+            style={{ color: '#e8e8e8' }}
+          >
+            {p2}
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[8.5px] uppercase font-bold" style={{ color: '#555', letterSpacing: '0.18em' }}>
+              {t('spectator.turn', { turn: game.turn })}
             </span>
-          )}
-          {game.isEvolving && (
-            <span className="text-[8.5px] uppercase font-bold" style={{ color: '#c4a35a', letterSpacing: '0.18em' }}>
-              {t('online.badge.evolving')}
+            {game.isRanked && (
+              <span className="text-[8.5px] uppercase font-bold" style={{ color: '#b33e3e', letterSpacing: '0.18em' }}>
+                {t('spectator.ranked')}
+              </span>
+            )}
+            {game.isEvolving && (
+              <span className="text-[8.5px] uppercase font-bold" style={{ color: '#c4a35a', letterSpacing: '0.18em' }}>
+                {t('online.badge.evolving')}
+              </span>
+            )}
+          </div>
+          {game.spectatorCount > 0 && (
+            <span className="text-[8.5px] tabular-nums" style={{ color: '#444' }}>
+              {t('spectator.spectators', { count: game.spectatorCount })}
             </span>
           )}
         </div>
-        {game.spectatorCount > 0 && (
-          <span className="text-[8.5px] tabular-nums" style={{ color: '#444' }}>
-            {t('spectator.spectators', { count: game.spectatorCount })}
-          </span>
-        )}
       </div>
-      {loading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="absolute inset-0 flex items-center justify-center"
-          style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
-        >
-          <span className="text-[10px] uppercase font-bold" style={{ color: '#c4a35a', letterSpacing: '0.2em' }}>
-            ...
-          </span>
-        </motion.div>
-      )}
+
+      <button
+        type="button"
+        onClick={onSpectate}
+        disabled={loading}
+        className="px-3 sm:px-4 flex items-center justify-center cursor-pointer no-select transition-colors shrink-0"
+        style={{
+          backgroundColor: loading ? '#2a2a2a' : '#c4a35a',
+          color: loading ? '#666' : '#0a0a0a',
+          fontSize: '10px',
+          fontWeight: 700,
+          letterSpacing: '0.18em',
+          minWidth: 78,
+          textTransform: 'uppercase',
+        }}
+        aria-label={t('spectator.joinSpectate')}
+      >
+        {loading ? '...' : t('spectator.joinSpectate')}
+      </button>
     </motion.div>
   );
 

@@ -13,6 +13,7 @@ import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEne
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 import { getEffectivePower } from './powerUtils';
 import { checkFlexibleUpgrade } from '../engine/rules/PlayValidation';
+import { calculateEffectiveCost } from '../engine/rules/ChakraValidation';
 import { canAffordAsUpgrade } from './handlers/KS/shared/upgradeCheck';
 import { moveCharTo, getValidMissions, applyUpgradePowerup } from './handlers/KS/rare/sasuke107';
 import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard } from './handlers/KS/shared/summonSearch';
@@ -82,31 +83,43 @@ function hasSameNameConflict(
 
 
 function isMissionValidForPlay(
-  mission: { player1Characters: CharacterInPlay[]; player2Characters: CharacterInPlay[] },
+  state: GameState,
+  player: PlayerID,
+  missionIndex: number,
   friendlySide: 'player1Characters' | 'player2Characters',
-  card: { name_fr: string; chakra: number; number?: number; effects?: Array<{ type: string; description: string }> },
+  card: { id?: string; name_fr: string; chakra: number; number?: number; effects?: Array<{ type: string; description: string }>; keywords?: string[] },
   availableChakra: number,
   costReduction: number,
   excludeInstanceId?: string,
 ): boolean {
+  const mission = state.activeMissions[missionIndex];
+  if (!mission) return false;
   const chars = mission[friendlySide];
   const upgradeIdx = findUpgradeTargetIdx(chars, card, excludeInstanceId);
+
+  const baseEffectiveCost = calculateEffectiveCost(
+    state,
+    player,
+    card as never,
+    missionIndex,
+    false,
+  );
 
   if (upgradeIdx >= 0) {
     const existing = chars[upgradeIdx];
     const existingTopCard = existing.stack?.length > 0 ? existing.stack[existing.stack?.length - 1] : existing.card;
-    const upgradeCost = Math.max(0, ((card.chakra ?? 0) - (existingTopCard.chakra ?? 0)) - costReduction);
+    const upgradeCost = Math.max(0, (baseEffectiveCost - (existingTopCard.chakra ?? 0)) - costReduction);
     if (availableChakra >= upgradeCost) return true;
-    
+
   }
 
-  
+
   if (hasSameNameConflict(chars, card, excludeInstanceId)) {
     return false; // Same name exists but can't upgrade (lower or equal cost)
   }
 
-  
-  const freshCost = Math.max(0, (card.chakra ?? 0) - costReduction);
+
+  const freshCost = Math.max(0, baseEffectiveCost - costReduction);
   return availableChakra >= freshCost;
 }
 
@@ -5068,7 +5081,7 @@ export class EffectEngine {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             const charName = topCard.name_fr;
-            const hasValidDest = newState.activeMissions.some((m: any, di: number) => {
+            const hasValidDest = char.isHidden || newState.activeMissions.some((m: any, di: number) => {
               if (di === i) return false;
               return !m[k059FriendlySide].some((c: any) => {
                 if (c.instanceId === char.instanceId) return false;
@@ -16522,7 +16535,7 @@ export class EffectEngine {
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
-      if (isMissionValidForPlay(mission, friendlySide, chosenCard, ps.chakra, costReduction)) {
+      if (isMissionValidForPlay(newState, player, i, friendlySide, chosenCard, ps.chakra, costReduction)) {
         validMissions.push(String(i));
       }
     }
@@ -16622,7 +16635,8 @@ export class EffectEngine {
             if (wouldConflict) continue;
           }
 
-          const upgCost = Math.max(0, ((card.chakra ?? 0) - (cTop.chakra ?? 0)) - costReduction);
+          const baseEffectiveCostUpgT = calculateEffectiveCost(state, player, card as never, missionIndex, false);
+          const upgCost = Math.max(0, (baseEffectiveCostUpgT - (cTop.chakra ?? 0)) - costReduction);
           if (ps.chakra >= upgCost) upgradeTargetIds.push(c.instanceId);
         }
       }
@@ -16708,7 +16722,8 @@ export class EffectEngine {
 
       
       const eTopGpm = existing.stack?.length > 0 ? existing.stack[existing.stack?.length - 1] : existing.card;
-      const actualCost = Math.max(0, ((card.chakra ?? 0) - (eTopGpm.chakra ?? 0)) - costReduction);
+      const baseEffectiveCostUpg = calculateEffectiveCost(state, player, card as never, missionIndex, false);
+      const actualCost = Math.max(0, (baseEffectiveCostUpg - (eTopGpm.chakra ?? 0)) - costReduction);
       if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
       ps.chakra -= actualCost;
 
@@ -16740,7 +16755,8 @@ export class EffectEngine {
       }
 
       
-      const actualCost = Math.max(0, (card.chakra ?? 0) - costReduction);
+      const baseEffectiveCostFresh = calculateEffectiveCost(state, player, card as never, missionIndex, false);
+      const actualCost = Math.max(0, baseEffectiveCostFresh - costReduction);
       if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
       ps.chakra -= actualCost;
 
@@ -16812,7 +16828,8 @@ export class EffectEngine {
         if (wouldConflict) { ps.discardPile.push(card); return state; }
       }
 
-      const actualCost = Math.max(0, ((card.chakra ?? 0) - (eTop.chakra ?? 0)) - costReduction);
+      const baseEffectiveCostUpgChoice = calculateEffectiveCost(state, player, card as never, missionIndex, false);
+      const actualCost = Math.max(0, (baseEffectiveCostUpgChoice - (eTop.chakra ?? 0)) - costReduction);
       if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
       ps.chakra -= actualCost;
 
@@ -16845,7 +16862,8 @@ export class EffectEngine {
       });
       if (hasNameConflictFresh) { ps.discardPile.push(card); return state; }
 
-      const actualCost = Math.max(0, (card.chakra ?? 0) - costReduction);
+      const baseEffectiveCostFresh = calculateEffectiveCost(state, player, card as never, missionIndex, false);
+      const actualCost = Math.max(0, baseEffectiveCostFresh - costReduction);
       if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
       ps.chakra -= actualCost;
 
@@ -18265,7 +18283,7 @@ export class EffectEngine {
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
-      if (isMissionValidForPlay(mission, friendlySide, chosenCard, ps.chakra, costReduction)) {
+      if (isMissionValidForPlay(newState, player, i, friendlySide, chosenCard, ps.chakra, costReduction)) {
         validMissions.push(String(i));
       }
     }
@@ -18406,7 +18424,7 @@ export class EffectEngine {
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
-      if (isMissionValidForPlay(mission, friendlySide, chosenCard, ps.chakra, costReduction)) {
+      if (isMissionValidForPlay(newState, player, i, friendlySide, chosenCard, ps.chakra, costReduction)) {
         validMissions.push(String(i));
       }
     }

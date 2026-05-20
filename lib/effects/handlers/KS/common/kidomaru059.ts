@@ -41,10 +41,10 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
     if (isMovementBlockedByKurenai(state, i, sourcePlayer)) continue;
     for (const char of state.activeMissions[i][friendlySide]) {
       if (char.instanceId === ctx.sourceCard.instanceId) continue;
-      
+
       const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       const charName = topCard.name_fr;
-      const hasValidDest = state.activeMissions.some((m, di) => {
+      const hasValidDest = char.isHidden || state.activeMissions.some((m, di) => {
         if (di === i) return false;
         return !m[friendlySide].some((c) => {
           if (c.instanceId === char.instanceId) return false;

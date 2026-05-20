@@ -55,7 +55,7 @@ export async function GET(
 
     const limit = page * perPage;
 
-    const [totalRanked, eloRows, aiGames, rankedStreakRows, evolvingStreakRows] = await Promise.all([
+    const [totalRanked, eloRows, aiGames, pvpGames, rankedStreakRows, evolvingStreakRows] = await Promise.all([
       prisma.eloHistory.count({ where: { userId: user.id } }),
       prisma.eloHistory.findMany({
         where: { userId: user.id },
@@ -77,6 +77,29 @@ export async function GET(
           player2Score: true,
           eloChange: true,
           completedAt: true,
+        },
+        orderBy: { completedAt: 'desc' },
+        take: limit,
+      }),
+      prisma.game.findMany({
+        where: {
+          OR: [{ player1Id: user.id }, { player2Id: user.id }],
+          status: 'completed',
+          isAiGame: false,
+        },
+        select: {
+          id: true,
+          player1Id: true,
+          player2Id: true,
+          player1: { select: { username: true } },
+          player2: { select: { username: true } },
+          winnerId: true,
+          player1Score: true,
+          player2Score: true,
+          eloChange: true,
+          completedAt: true,
+          gameState: true,
+          gameStateGz: true,
         },
         orderBy: { completedAt: 'desc' },
         take: limit,
@@ -120,6 +143,7 @@ export async function GET(
         })
       : [];
     const replayableSet = new Set(existingGames.map((g) => g.id));
+    const rankedGameIds = new Set(candidateGameIds);
 
     type Entry = {
       id: string;
@@ -167,10 +191,26 @@ export async function GET(
       hasReplay: false,
     }));
 
-    const merged = [...pvpEntries, ...aiEntries].sort(
+    const casualPvpEntries: Entry[] = pvpGames
+      .filter((g) => !rankedGameIds.has(g.id))
+      .map((g) => ({
+        id: g.id,
+        player1: g.player1 ? { username: g.player1.username } : null,
+        player2: g.player2 ? { username: g.player2.username } : null,
+        isAiGame: false,
+        aiDifficulty: null,
+        winnerId: g.winnerId,
+        player1Score: g.player1Score,
+        player2Score: g.player2Score,
+        eloChange: null,
+        completedAt: g.completedAt ? g.completedAt.toISOString() : new Date(0).toISOString(),
+        hasReplay: g.gameState !== null || g.gameStateGz !== null,
+      }));
+
+    const merged = [...pvpEntries, ...casualPvpEntries, ...aiEntries].sort(
       (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
     );
-    const totalGames = totalRanked + aiGames.length;
+    const totalGames = totalRanked + casualPvpEntries.length + aiGames.length;
     const recentGames = merged.slice((page - 1) * perPage, limit);
 
     const backfillDeckIds: string[] = [];

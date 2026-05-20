@@ -16,6 +16,7 @@ import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
 import { PanelFrame } from '@/components/game/PopupPrimitives';
 import { useSession } from 'next-auth/react';
+import { LandscapeBlocker } from '@/components/LandscapeBlocker';
 import type { GameState, GamePhase, GameAction, PlayerID, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { ChessClockState } from '@/lib/timing/chessClock';
 
@@ -1233,7 +1234,8 @@ function VisualReplay({
       }}
       onClick={() => previewCard && setPreviewCard(null)}
     >
-      
+      <LandscapeBlocker />
+
       <div
         className="absolute inset-0 pointer-events-none"
         style={{ backgroundColor: backgroundUrl ? 'rgba(0, 0, 0, 0.35)' : 'transparent' }}
