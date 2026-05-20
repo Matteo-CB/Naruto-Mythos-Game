@@ -134,4 +134,54 @@ describe('Reveal No Repetition (2026-05-14, post-Marcello clarification): reveal
     const result = validateRevealCharacter(state, 'player1', 0, ownHiddenFlexNaruto.instanceId);
     expect(result.valid).toBe(true);
   });
+
+  it('blocks reveal even when upgradeTargetInstanceId points to a controlled char (sameNameChar still applies)', () => {
+    const state = createActionPhaseState({});
+    state.player1.chakra = 20;
+    const stolenFaceUp = mockCharInPlay(
+      { controlledBy: 'player1', originalOwner: 'player2', missionIndex: 0, isHidden: false, controllerInstanceId: 'inst-ino' },
+      { id: 'KS-014-R', name_fr: 'Sasuke', chakra: 3 },
+    );
+    const ownHidden = mockCharInPlay(
+      { controlledBy: 'player1', originalOwner: 'player1', missionIndex: 0, isHidden: true, wasRevealedAtLeastOnce: false },
+      { id: 'KS-136-S', name_fr: 'Sasuke', chakra: 6 },
+    );
+    state.activeMissions[0].player1Characters = [stolenFaceUp, ownHidden];
+
+    const result = validateRevealCharacter(state, 'player1', 0, ownHidden.instanceId, stolenFaceUp.instanceId);
+    expect(result.valid).toBe(false);
+    expect(result.reasonKey).toBe('game.error.duplicateNameReveal');
+  });
+
+  it('GameEngine: reveal blocked even when upgradeTargetInstanceId targets a controlled same-name char (no 2 visible same name)', () => {
+    const state = createActionPhaseState({});
+    state.player1.chakra = 20;
+    const chakraBefore = state.player1.chakra;
+    const stolenFaceUp = mockCharInPlay(
+      { controlledBy: 'player1', originalOwner: 'player2', missionIndex: 0, isHidden: false, controllerInstanceId: 'inst-ino' },
+      { id: 'KS-014-R', name_fr: 'Sasuke', chakra: 3 },
+    );
+    const ownHidden = mockCharInPlay(
+      { controlledBy: 'player1', originalOwner: 'player1', missionIndex: 0, isHidden: true, wasRevealedAtLeastOnce: false },
+      { id: 'KS-136-S', name_fr: 'Sasuke', chakra: 6 },
+    );
+    state.activeMissions[0].player1Characters = [stolenFaceUp, ownHidden];
+
+    const newState = GameEngine.applyAction(state, 'player1', {
+      type: 'REVEAL_CHARACTER',
+      missionIndex: 0,
+      characterInstanceId: ownHidden.instanceId,
+      upgradeTargetInstanceId: stolenFaceUp.instanceId,
+    });
+
+    expect(newState.player1.chakra).toBe(chakraBefore);
+    const stillHidden = newState.activeMissions[0].player1Characters.find((c) => c.instanceId === ownHidden.instanceId);
+    expect(stillHidden?.isHidden).toBe(true);
+    const visibleSasukes = newState.activeMissions[0].player1Characters.filter((c) => {
+      if (c.isHidden) return false;
+      const top = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return top.name_fr === 'Sasuke';
+    });
+    expect(visibleSasukes.length).toBe(1);
+  });
 });

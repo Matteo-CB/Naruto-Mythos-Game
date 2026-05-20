@@ -1999,9 +1999,11 @@ export class EffectEngine {
 
         
         if (tenten118PrintedPower <= 3) {
+          const tt118SecondEnemySide: 'player1Characters' | 'player2Characters' =
+            pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
           const hiddenTargets: string[] = [];
           for (const mission of newState.activeMissions) {
-            for (const c of [...mission.player1Characters, ...mission.player2Characters]) {
+            for (const c of mission[tt118SecondEnemySide]) {
               if (c.isHidden) {
                 hiddenTargets.push(c.instanceId);
               }
@@ -3976,15 +3978,17 @@ export class EffectEngine {
       
 
       case 'TENTEN041_CONFIRM_MAIN': {
-        
+
         const tt041SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
         if (!tt041SrcChar) break;
         const tt041MIdx = tt041SrcChar.missionIndex;
         const tt041Mission = newState.activeMissions[tt041MIdx];
         if (!tt041Mission) break;
 
+        const tt041EnemySide: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         const tt041Targets: string[] = [];
-        for (const char of [...tt041Mission.player1Characters, ...tt041Mission.player2Characters]) {
+        for (const char of tt041Mission[tt041EnemySide]) {
           if (char.isHidden && char.instanceId !== pendingEffect.sourceInstanceId) {
             tt041Targets.push(char.instanceId);
           }
@@ -8417,8 +8421,10 @@ export class EffectEngine {
         const tt118MI = pendingEffect.sourceMissionIndex;
         const tt118Mission = newState.activeMissions[tt118MI];
         if (!tt118Mission) break;
+        const tt118EnemySide: 'player1Characters' | 'player2Characters' =
+          tt118Player === 'player1' ? 'player2Characters' : 'player1Characters';
         const tt118Targets: string[] = [];
-        for (const char of [...tt118Mission.player1Characters, ...tt118Mission.player2Characters]) {
+        for (const char of tt118Mission[tt118EnemySide]) {
           if (char.isHidden) tt118Targets.push(char.instanceId);
         }
         if (tt118Targets.length === 0) {

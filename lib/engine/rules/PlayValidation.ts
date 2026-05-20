@@ -205,10 +205,13 @@ export function validateRevealCharacter(
       effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
     }
   } else {
+    if (sameNameChar) {
+      return { valid: false, reason: `Cannot reveal ${charTopCard.name_fr}: a character with the same name is already on this side of this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
+    }
     effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
   }
 
-  
+
   const ps = state[player];
   if (ps.chakra < effectiveCost) {
     return { valid: false, reason: `Not enough chakra. Need ${effectiveCost}, have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakra', reasonParams: { need: effectiveCost, have: ps.chakra } };

@@ -8,16 +8,13 @@ import { defeatCharacterInPlay } from '@/lib/effects/defeatUtils';
 function handleTenten041Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
+  const enemySide: 'player1Characters' | 'player2Characters' =
+    sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  
+
   const validTargets: string[] = [];
 
-  for (const char of mission.player1Characters) {
-    if (char.isHidden && char.instanceId !== sourceCard.instanceId) {
-      validTargets.push(char.instanceId);
-    }
-  }
-  for (const char of mission.player2Characters) {
+  for (const char of mission[enemySide]) {
     if (char.isHidden && char.instanceId !== sourceCard.instanceId) {
       validTargets.push(char.instanceId);
     }
