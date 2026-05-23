@@ -5097,7 +5097,7 @@ export class EffectEngine {
           break;
         }
 
-        
+
         const k059EffId = generateInstanceId();
         const k059ActId = generateInstanceId();
         newState.pendingEffects = [...newState.pendingEffects, {
@@ -5105,7 +5105,7 @@ export class EffectEngine {
           sourceInstanceId: pendingEffect.sourceInstanceId,
           sourceMissionIndex: pendingEffect.sourceMissionIndex,
           effectType: pendingEffect.effectType,
-          effectDescription: JSON.stringify({ movesRemaining: k059X }),
+          effectDescription: JSON.stringify({ movesRemaining: k059X, snapshotTargets: k059Targets, movedIds: [] }),
           targetSelectionType: 'KIDOMARU_CHOOSE_CHARACTER',
           sourcePlayer: k059Player, requiresTargetSelection: true,
           validTargets: k059Targets, isOptional: false, isMandatory: true,
@@ -18093,14 +18093,18 @@ export class EffectEngine {
     const charResult = EffectEngine.findCharByInstanceId(newState, targetId);
     if (!charResult) return state;
 
-    
+
     let movesRemaining = 1;
+    let snapshotTargets: string[] = [];
+    let movedIds: string[] = [];
     try {
       const desc = JSON.parse(pending.effectDescription);
       movesRemaining = desc.movesRemaining ?? 1;
+      snapshotTargets = Array.isArray(desc.snapshotTargets) ? desc.snapshotTargets : [];
+      movedIds = Array.isArray(desc.movedIds) ? desc.movedIds : [];
     } catch { /* ignore */ }
 
-    
+
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       if (i !== charResult.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, charResult.character, i, charResult.player)) {
@@ -18111,18 +18115,18 @@ export class EffectEngine {
     if (validMissions.length === 0) return state;
 
     if (validMissions.length === 1) {
-      
       let result = EffectEngine.moveCharToMissionDirect(
         newState, targetId, parseInt(validMissions[0], 10), player, 'Kidomaru', 'KS-059-C',
       );
+      const newMovedIds = [...movedIds, targetId];
       const remaining = movesRemaining - 1;
       if (remaining > 0) {
-        result = EffectEngine.createKidomaruNextMove(result, pending, player, remaining);
+        result = EffectEngine.createKidomaruNextMove(result, pending, player, remaining, snapshotTargets, newMovedIds);
       }
       return result;
     }
 
-    
+
     const effectId = generateInstanceId();
     const actionId = generateInstanceId();
 
@@ -18132,7 +18136,7 @@ export class EffectEngine {
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
-      effectDescription: JSON.stringify({ charInstanceId: targetId, movesRemaining }),
+      effectDescription: JSON.stringify({ charInstanceId: targetId, movesRemaining, snapshotTargets, movedIds }),
       targetSelectionType: 'KIDOMARU_CHOOSE_DESTINATION',
       sourcePlayer: player,
       requiresTargetSelection: true,
@@ -18159,7 +18163,7 @@ export class EffectEngine {
     return newState;
   }
 
-  
+
   static kidomaruChooseDestination(state: GameState, pending: PendingEffect, targetId: string): GameState {
     const destMission = parseInt(targetId, 10);
     if (isNaN(destMission)) return state;
@@ -18169,35 +18173,62 @@ export class EffectEngine {
 
     let charInstanceId = '';
     let movesRemaining = 1;
+    let snapshotTargets: string[] = [];
+    let movedIds: string[] = [];
     try {
       const desc = JSON.parse(pending.effectDescription);
       charInstanceId = desc.charInstanceId ?? '';
       movesRemaining = desc.movesRemaining ?? 1;
+      snapshotTargets = Array.isArray(desc.snapshotTargets) ? desc.snapshotTargets : [];
+      movedIds = Array.isArray(desc.movedIds) ? desc.movedIds : [];
     } catch { /* ignore */ }
 
     if (!charInstanceId) return state;
 
     let result = EffectEngine.moveCharToMissionDirect(newState, charInstanceId, destMission, player, 'Kidomaru', 'KS-059-C');
 
+    const newMovedIds = [...movedIds, charInstanceId];
     const remaining = movesRemaining - 1;
     if (remaining > 0) {
-      result = EffectEngine.createKidomaruNextMove(result, pending, player, remaining);
+      result = EffectEngine.createKidomaruNextMove(result, pending, player, remaining, snapshotTargets, newMovedIds);
     }
 
     return result;
   }
 
-  
-  private static createKidomaruNextMove(state: GameState, prevPending: PendingEffect, player: PlayerID, movesRemaining: number): GameState {
+
+  private static createKidomaruNextMove(
+    state: GameState,
+    prevPending: PendingEffect,
+    player: PlayerID,
+    movesRemaining: number,
+    snapshotTargets: string[],
+    movedIds: string[],
+  ): GameState {
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
-    
+    const movedSet = new Set(movedIds);
     const validTargets: string[] = [];
     if (state.activeMissions.length > 1) {
       for (let i = 0; i < state.activeMissions.length; i++) {
+        if (isMovementBlockedByKurenai(state, i, player)) continue;
         for (const char of state.activeMissions[i][friendlySide]) {
-          validTargets.push(char.instanceId);
+          if (char.instanceId === prevPending.sourceInstanceId) continue;
+          if (movedSet.has(char.instanceId)) continue;
+          if (!snapshotTargets.includes(char.instanceId)) continue;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
+          const charName = topCard.name_fr;
+          const hasValidDest = char.isHidden || state.activeMissions.some((m, di) => {
+            if (di === i) return false;
+            return !m[friendlySide].some((c) => {
+              if (c.instanceId === char.instanceId) return false;
+              if (c.isHidden) return false;
+              const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+              return cTop.name_fr === charName;
+            });
+          });
+          if (hasValidDest) validTargets.push(char.instanceId);
         }
       }
     }
@@ -18213,13 +18244,13 @@ export class EffectEngine {
       sourceInstanceId: prevPending.sourceInstanceId,
       sourceMissionIndex: prevPending.sourceMissionIndex,
       effectType: prevPending.effectType,
-      effectDescription: JSON.stringify({ text: `Choose a character to move (${movesRemaining} remaining).`, movesRemaining }),
+      effectDescription: JSON.stringify({ text: `Choose a character to move (${movesRemaining} remaining).`, movesRemaining, snapshotTargets, movedIds }),
       targetSelectionType: 'KIDOMARU_CHOOSE_CHARACTER',
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets,
-      isOptional: false,
-      isMandatory: true,
+      isOptional: true,
+      isMandatory: false,
       resolved: false,
       isUpgrade: false,
     });

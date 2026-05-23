@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "date": "2026-05-24",
+      "title_fr": "Correction Kidômaru et règle de déplacement simultané",
+      "title_en": "Kidômaru fix and simultaneous-movement rule",
+      "changes_fr": [
+        "Bug corrigé : Kidômaru (3 chakra) pouvait se déplacer lui-même au lieu de ne déplacer que des alliés, et le même personnage pouvait être choisi plusieurs fois pour les déplacements successifs. La liste des cibles est désormais figée au moment où l'effet est joué, et chaque carte ne peut être déplacée qu'une seule fois."
+      ],
+      "changes_en": [
+        "Bug fixed: Kidômaru (3-chakra) could move himself instead of moving only friendly characters, and the same character could be picked multiple times across the successive moves. The target list is now locked at the moment the effect resolves, and each card can only be moved once."
+      ]
+    },
+    {
       "date": "2026-05-23",
       "title_fr": "Tournoi scellé jouable, corrections Kisame et Kyûbi",
       "title_en": "Sealed tournament playable, Kisame and Kyûbi fixes",
