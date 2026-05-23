@@ -83,6 +83,7 @@ export interface RoomData {
   mulliganDeadline?: number | null;
   tournamentJoinTimer?: ReturnType<typeof setTimeout> | null;
   tournamentJoinDeadline?: number | null;
+  tournamentPendingForfeit?: string | null;
 
   isSealed: boolean;
   sealedBoosterCount: 4 | 5 | 6;
@@ -455,7 +456,7 @@ export function chessClockWatchdog(io: SocketIOServer): void {
   }
 }
 
-const SEALED_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes for sealed deck building
+const SEALED_TIMEOUT_MS = 10 * 60 * 1000;
 
 export const rooms = new Map<string, RoomData>();
 const playerRooms = new Map<string, string>(); // socketId -> roomCode
@@ -1857,7 +1858,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             isEvolving: room.isEvolving === true,
             holoHue: room.holoHue ?? null,
           });
-          
+
           if (room.gameState) {
             syncChessClock(room);
             startChessClockTickLoop(room, io);
@@ -1869,6 +1870,28 @@ export function setupSocketHandlers(io: SocketIOServer) {
           } else if (room.hostDeck && room.guestDeck && room.guestSocket) {
 
             io.to(data.code).emit('room:player-joined', { hostId: room.hostId, guestId: room.guestId, gameMode: room.gameMode });
+          } else if (room.isSealed && !room.hostDeck) {
+            try {
+              const participant = await prisma.tournamentParticipant.findFirst({
+                where: { tournamentId: room.tournamentId, userId: data.userId },
+                select: { sealedPool: true },
+              });
+              if (participant?.sealedPool) {
+                const pool = participant.sealedPool as { boosters: unknown; allCards: Array<{ id: string }> };
+                if (pool.allCards && Array.isArray(pool.allCards)) {
+                  room.hostSealedPoolIds = pool.allCards.map((c) => c.id);
+                }
+                socket.emit('sealed:boosters', pool);
+                if (room.sealedDeadline) {
+                  const remaining = room.sealedDeadline - Date.now();
+                  if (remaining > 0) {
+                    socket.emit('sealed:timer-start', { deadline: room.sealedDeadline, durationMs: remaining });
+                  }
+                }
+              }
+            } catch (err) {
+              console.error('[Socket] Failed to re-emit sealed pool on host rejoin:', err);
+            }
           }
           return;
         }
@@ -1985,8 +2008,37 @@ export function setupSocketHandlers(io: SocketIOServer) {
         fakeSelectEvent();
       }
 
-      
-      if (room.isSealed && room.guestId) {
+
+      if (room.isSealed && room.tournamentId) {
+        try {
+          const participant = await prisma.tournamentParticipant.findFirst({
+            where: { tournamentId: room.tournamentId, userId: data.userId },
+            select: { sealedPool: true, sealedDeck: true },
+          });
+          const myBuiltDeck = (room.hostId === data.userId ? room.hostDeck : room.guestDeck);
+          if (!myBuiltDeck && participant?.sealedPool) {
+            const pool = participant.sealedPool as { boosters: unknown; allCards: Array<{ id: string }> };
+            if (pool.allCards && Array.isArray(pool.allCards)) {
+              if (room.hostId === data.userId) {
+                room.hostSealedPoolIds = pool.allCards.map((c) => c.id);
+              } else {
+                room.guestSealedPoolIds = pool.allCards.map((c) => c.id);
+              }
+            }
+            socket.emit('sealed:boosters', pool);
+            if (room.sealedDeadline) {
+              const remaining = room.sealedDeadline - Date.now();
+              if (remaining > 0) {
+                socket.emit('sealed:timer-start', { deadline: room.sealedDeadline, durationMs: remaining });
+              }
+            }
+          }
+        } catch (err) {
+          console.error('[Socket] Failed to re-emit sealed pool on rejoin:', err);
+        }
+      }
+
+      if (room.isSealed && room.guestId && !room.tournamentId) {
         try {
           const { generateSealedPool } = await import('@/lib/sealed/boosterGenerator');
           const count = room.sealedBoosterCount ?? 6;
@@ -2164,6 +2216,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
 
       const deckPoints = computeDeckEvolvingPoints(safeDeck.characters.map((c) => c.id));
+      const submittingUserId = socket.id === room.hostSocket ? room.hostId : (socket.id === room.guestSocket ? room.guestId : null);
       if (socket.id === room.hostSocket) {
         room.hostDeck = safeDeck;
         room.hostEvolvingPoints = deckPoints;
@@ -2174,15 +2227,49 @@ export function setupSocketHandlers(io: SocketIOServer) {
         if (safeDeckId) room.guestDeckId = safeDeckId;
       }
 
+      if (room.isSealed && room.tournamentId && submittingUserId) {
+        try {
+          await prisma.tournamentParticipant.updateMany({
+            where: { tournamentId: room.tournamentId, userId: submittingUserId },
+            data: {
+              sealedDeck: {
+                cardIds: safeDeck.characters.map((c) => c.id),
+                missionIds: safeDeck.missions.map((m) => m.id),
+              } as never,
+            },
+          });
+        } catch (err) {
+          console.error('[Socket] Failed to persist sealed deck for tournament:', err);
+        }
+      }
+
       if (room.isSealed) {
-        
+
         const otherSocket = socket.id === room.hostSocket ? room.guestSocket : room.hostSocket;
         if (otherSocket) {
           io.to(otherSocket).emit('sealed:opponent-ready');
         }
       }
 
-      
+      if (room.isSealed && room.tournamentId && room.tournamentMatchId && room.tournamentPendingForfeit) {
+        const tournamentIdForForfeit = room.tournamentId;
+        const matchIdForForfeit = room.tournamentMatchId;
+        const forfeitedPlayerId = room.tournamentPendingForfeit;
+        room.tournamentPendingForfeit = null;
+        if (room.sealedTimer) {
+          clearTimeout(room.sealedTimer);
+          room.sealedTimer = null;
+          room.sealedDeadline = null;
+        }
+        try {
+          const { handleMatchForfeit } = await import('@/lib/socket/tournamentHandlers');
+          await handleMatchForfeit(io, tournamentIdForForfeit, matchIdForForfeit, forfeitedPlayerId);
+        } catch (err) {
+          console.error('[Socket] Failed to finalize deferred sealed forfeit:', err);
+        }
+        return;
+      }
+
       if (room.hostDeck && room.guestDeck) {
         
         if (room.sealedTimer) {

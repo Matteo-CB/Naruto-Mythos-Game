@@ -305,11 +305,12 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
 }
 
 const CatalogCard = memo(function CatalogCard({
-  card, allowed, inDeckCount, onAdd, onHover,
+  card, allowed, inDeckCount, isBanned, onAdd, onHover,
 }: {
   card: CharacterCard;
   allowed: boolean;
   inDeckCount: number;
+  isBanned: boolean;
   onAdd: (card: CharacterCard) => void;
   onHover: (card: CharacterCard | MissionCard) => void;
 }) {
@@ -336,6 +337,12 @@ const CatalogCard = memo(function CatalogCard({
           x{inDeckCount}
         </div>
       )}
+      {isBanned && (
+        <span aria-hidden className="absolute top-0 left-0 font-display font-bold uppercase pointer-events-none"
+          style={{ padding: '1px 5px', fontSize: 8, letterSpacing: '0.18em', color: '#fff', backgroundColor: 'rgba(179, 62, 62, 0.95)', boxShadow: '0 2px 6px rgba(0,0,0,0.45)' }}>
+          BAN
+        </span>
+      )}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none"
         style={{ backgroundColor: allowed ? 'rgba(62,139,62,0.35)' : 'rgba(179,62,62,0.35)', transition: 'opacity 80ms' }}>
         <span className="text-lg font-bold" style={{ color: '#fff' }}>{allowed ? '+' : ''}</span>
@@ -345,10 +352,11 @@ const CatalogCard = memo(function CatalogCard({
 });
 
 const CatalogMission = memo(function CatalogMission({
-  card, allowed, onAdd, onHover,
+  card, allowed, isBanned, onAdd, onHover,
 }: {
   card: MissionCard;
   allowed: boolean;
+  isBanned: boolean;
   onAdd: (card: MissionCard) => void;
   onHover: (card: CharacterCard | MissionCard) => void;
 }) {
@@ -368,6 +376,12 @@ const CatalogMission = memo(function CatalogMission({
         <img src={imgPath} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
       ) : (
         <div className="w-full h-full" style={{ backgroundColor: '#111' }} />
+      )}
+      {isBanned && (
+        <span aria-hidden className="absolute top-0 left-0 font-display font-bold uppercase pointer-events-none"
+          style={{ padding: '1px 5px', fontSize: 8, letterSpacing: '0.18em', color: '#fff', backgroundColor: 'rgba(179, 62, 62, 0.95)', boxShadow: '0 2px 6px rgba(0,0,0,0.45)' }}>
+          BAN
+        </span>
       )}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none"
         style={{ backgroundColor: allowed ? 'rgba(62,139,62,0.35)' : 'rgba(179,62,62,0.35)', transition: 'opacity 80ms' }}>
@@ -468,7 +482,6 @@ export default function DeckBuilderPage() {
   const sortCharsByCost = useDeckBuilderStore((s) => s.sortCharsByCost);
   const sortCharsByName = useDeckBuilderStore((s) => s.sortCharsByName);
   const { bannedIds } = useBannedCards();
-  const [showBanned, setShowBanned] = useState(true);
   const [showAltArt, setShowAltArt] = useState(true);
   type DeckViewMode = 'grid' | 'rows';
   type DeckGroupBy = 'chakra' | 'group' | 'rarity' | 'power' | 'keyword' | 'effect';
@@ -513,7 +526,6 @@ export default function DeckBuilderPage() {
 
   const filteredChars = useMemo(() => {
     let chars = [...availableChars];
-    if (!showBanned) chars = chars.filter((c) => !bannedIds.has(c.id));
     if (!showAltArt) chars = chars.filter((c) => !['RA', 'MV', 'SV', 'L'].includes(c.rarity));
     if (deferredSearch) {
       chars = chars.filter((c) => matchesSearchFilter(c, parsedSearch, loc));
@@ -529,12 +541,9 @@ export default function DeckBuilderPage() {
       }
       return sortOrder === 'desc' ? -cmp : cmp;
     });
-  }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showBanned, bannedIds, showAltArt]);
+  }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showAltArt]);
 
-  const filteredMissions = useMemo(() => {
-    if (!showBanned) return availableMissions.filter((m) => !bannedIds.has(m.id));
-    return [...availableMissions];
-  }, [availableMissions, showBanned, bannedIds]);
+  const filteredMissions = useMemo(() => [...availableMissions], [availableMissions]);
 
   const validation = useMemo(() => validateDeck(deckChars, deckMissions), [deckChars, deckMissions]);
 
@@ -1350,6 +1359,7 @@ export default function DeckBuilderPage() {
                   key={m.id}
                   card={m}
                   allowed={missionAllowedMap.get(m.id) ?? true}
+                  isBanned={bannedIds.has(m.id)}
                   onAdd={handleAddMission}
                   onHover={handlePreview}
                 />
@@ -1424,22 +1434,6 @@ export default function DeckBuilderPage() {
             </div>
           </div>
 
-          {bannedIds.size > 0 && (
-            <div className="px-3 pb-1 flex-shrink-0">
-              <button
-                onClick={() => setShowBanned(!showBanned)}
-                className="text-[9px] uppercase font-bold px-2 py-1"
-                style={{
-                  backgroundColor: showBanned ? 'rgba(179,62,62,0.1)' : 'rgba(62,139,62,0.1)',
-                  color: showBanned ? '#b33e3e' : '#3e8b3e',
-                }}
-              >
-                {showBanned ? t("deckBuilder.hideBanned") : t("deckBuilder.showBanned")}
-                {' '}({bannedIds.size})
-              </button>
-            </div>
-          )}
-
           <div className="px-3 pb-1 flex-shrink-0">
             <button
               onClick={() => setShowAltArt(!showAltArt)}
@@ -1468,6 +1462,7 @@ export default function DeckBuilderPage() {
                 card={card}
                 allowed={allowedMap.get(card.id) ?? true}
                 inDeckCount={deckCardCounts.get(card.id) || 0}
+                isBanned={bannedIds.has(card.id)}
                 onAdd={handleAddChar}
                 onHover={handlePreview}
               />
@@ -1634,16 +1629,6 @@ export default function DeckBuilderPage() {
                       color: showAltArt ? '#c4a35a' : '#666',
                     }}
                   >{showAltArt ? t("deckBuilder.hideAlt") : t("deckBuilder.showAlt")}</button>
-                  {bannedIds.size > 0 && (
-                    <button
-                      onClick={() => setShowBanned(!showBanned)}
-                      className="text-[9px] uppercase font-bold px-2 py-0.5"
-                      style={{
-                        backgroundColor: showBanned ? 'rgba(179,62,62,0.08)' : 'rgba(62,139,62,0.08)',
-                        color: showBanned ? '#b33e3e' : '#3e8b3e',
-                      }}
-                    >{showBanned ? t("deckBuilder.hideBanned") : t("deckBuilder.showBanned")} ({bannedIds.size})</button>
-                  )}
                 </div>
               </div>
 
@@ -1651,6 +1636,7 @@ export default function DeckBuilderPage() {
               <div className="grid grid-cols-5 gap-1.5 mb-3">
                 {filteredMissions.map((m) => (
                   <CatalogMission key={m.id} card={m} allowed={missionAllowedMap.get(m.id) ?? true}
+                    isBanned={bannedIds.has(m.id)}
                     onAdd={handleAddMission} onHover={handlePreview} />
                 ))}
               </div>
@@ -1672,6 +1658,7 @@ export default function DeckBuilderPage() {
                     card={card}
                     allowed={allowedMap.get(card.id) ?? true}
                     inDeckCount={deckCardCounts.get(card.id) || 0}
+                    isBanned={bannedIds.has(card.id)}
                     onAdd={handleAddChar}
                     onHover={handlePreview}
                   />

@@ -151,7 +151,10 @@ export function validateRevealCharacter(
     return false;
   });
 
-
+  const charIsControlled = char.controlledBy !== char.originalOwner;
+  if (charIsControlled && sameNameChar) {
+    return { valid: false, reason: `Cannot reveal ${charTopCard.name_fr}: this character is controlled and revealing would create a duplicate on this side.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
+  }
 
 
   let upgradeTarget: typeof chars[number] | undefined | null;

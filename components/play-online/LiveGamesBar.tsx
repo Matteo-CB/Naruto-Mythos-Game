@@ -184,19 +184,28 @@ function LiveGameCard({ game, loading, onSpectate }: { game: LiveGame; loading: 
         type="button"
         onClick={onSpectate}
         disabled={loading}
-        className="px-3 sm:px-4 flex items-center justify-center cursor-pointer no-select transition-colors shrink-0"
+        className="px-3 flex items-center gap-1 cursor-pointer no-select transition-colors shrink-0"
         style={{
-          backgroundColor: loading ? '#2a2a2a' : '#c4a35a',
-          color: loading ? '#666' : '#0a0a0a',
+          backgroundColor: 'transparent',
+          color: loading ? '#555' : '#c4a35a',
           fontSize: '10px',
-          fontWeight: 700,
-          letterSpacing: '0.18em',
-          minWidth: 78,
-          textTransform: 'uppercase',
+          fontWeight: 600,
+          letterSpacing: '0.05em',
+        }}
+        onMouseEnter={(e) => {
+          if (!loading) (e.currentTarget as HTMLElement).style.color = '#e8c477';
+        }}
+        onMouseLeave={(e) => {
+          if (!loading) (e.currentTarget as HTMLElement).style.color = '#c4a35a';
         }}
         aria-label={t('spectator.joinSpectate')}
       >
-        {loading ? '...' : t('spectator.joinSpectate')}
+        {loading ? '…' : (
+          <>
+            <span>{t('spectator.joinSpectate')}</span>
+            <span style={{ fontSize: '11px' }}>›</span>
+          </>
+        )}
       </button>
     </motion.div>
   );

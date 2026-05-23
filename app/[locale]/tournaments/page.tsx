@@ -207,7 +207,10 @@ export default function TournamentsPage() {
             ) : simulatorTournaments.length === 0 ? (
               <p className="font-display text-sm uppercase tracking-widest text-center py-10" style={{ color: '#555' }}>{t('noTournaments')}</p>
             ) : (
-              <div className="flex flex-col gap-3">
+              <div
+                className="flex flex-col gap-3"
+                style={simulatorTournaments.length > 5 ? { maxHeight: '60vh', overflowY: 'auto', paddingRight: '4px' } : undefined}
+              >
                 {simulatorTournaments.map((tournament) => (
                   <TournamentCard key={tournament.id} tournament={tournament} />
                 ))}

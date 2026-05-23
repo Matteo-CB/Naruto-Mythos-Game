@@ -22,7 +22,14 @@ export async function GET(request: NextRequest) {
     }
 
     if (isEvolving) {
-      conditions.push({ evolvingGamesPlayed: { gt: 0 } });
+      conditions.push({
+        OR: [
+          { evolvingGamesPlayed: { gt: 0 } },
+          { evolvingWins: { gt: 0 } },
+          { evolvingLosses: { gt: 0 } },
+          { evolvingDraws: { gt: 0 } },
+        ],
+      });
     }
 
     if (!isEvolving && league && league !== 'unranked') {

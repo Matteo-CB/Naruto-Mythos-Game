@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/lib/i18n/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSession } from 'next-auth/react';
@@ -60,6 +61,8 @@ export default function SealedPage() {
   const sealedDeadline = useSocketStore((s) => s.sealedDeadline);
 
   const { status } = useSession();
+  const searchParams = useSearchParams();
+  const roomParam = searchParams.get('room');
   const [step, setStep] = useState<SealedStep>('loading');
   const [mode, setMode] = useState<'ai' | 'online' | null>(null);
   const [difficulty, setDifficulty] = useState<AIDifficulty>('medium');
@@ -78,9 +81,31 @@ export default function SealedPage() {
       return;
     }
     if (step === 'loading') {
-      setStep('mode-select');
+      if (roomParam) {
+        setMode('online');
+        setStep('online-waiting');
+      } else {
+        setStep('mode-select');
+      }
     }
-  }, [status, step, router]);
+  }, [status, step, router, roomParam]);
+
+  const autoJoinRef = useRef(false);
+  useEffect(() => {
+    if (!roomParam || autoJoinRef.current) return;
+    if (!session?.user?.id) return;
+    autoJoinRef.current = true;
+    (async () => {
+      try {
+        if (!socketConnected) {
+          await socketConnect(session.user.id);
+        }
+        socketJoinRoom(roomParam, session.user.id);
+      } catch {
+        autoJoinRef.current = false;
+      }
+    })();
+  }, [roomParam, session?.user?.id, socketConnected, socketConnect, socketJoinRoom]);
 
   useEffect(() => {
     if (socketConnected && socketRoomCode && socketOpponentJoined && !socketGameStarted && mode === null) {

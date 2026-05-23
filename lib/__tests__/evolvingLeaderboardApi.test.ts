@@ -64,28 +64,37 @@ describe('Phase 9 — leaderboard ?type=evolving', () => {
     expect(body.type).toBe('evolving');
   });
 
+  const EVOLVING_PARTICIPATION_CLAUSE = {
+    OR: [
+      { evolvingGamesPlayed: { gt: 0 } },
+      { evolvingWins: { gt: 0 } },
+      { evolvingLosses: { gt: 0 } },
+      { evolvingDraws: { gt: 0 } },
+    ],
+  };
+
   it('ignores league filter when type=evolving (Evolving has no leagues)', async () => {
     p.user.findMany.mockResolvedValue([]);
     await GetLeaderboard(makeReq('?type=evolving&league=academyStudent') as never);
     const call = p.user.findMany.mock.calls[0][0];
-    expect(call.where).toEqual({ evolvingGamesPlayed: { gt: 0 } });
+    expect(call.where).toEqual(EVOLVING_PARTICIPATION_CLAUSE);
   });
 
-  it('filters out users who never played an Evolving game (evolvingGamesPlayed: gt 0)', async () => {
+  it('filters out users who never played an Evolving game (any evolving stat > 0)', async () => {
     p.user.findMany.mockResolvedValue([]);
     await GetLeaderboard(makeReq('?type=evolving') as never);
     const call = p.user.findMany.mock.calls[0][0];
-    expect(call.where).toEqual({ evolvingGamesPlayed: { gt: 0 } });
+    expect(call.where).toEqual(EVOLVING_PARTICIPATION_CLAUSE);
   });
 
-  it('combines evolvingGamesPlayed filter with search when both provided', async () => {
+  it('combines evolving participation filter with search when both provided', async () => {
     p.user.findMany.mockResolvedValue([]);
     await GetLeaderboard(makeReq('?type=evolving&search=Alice') as never);
     const call = p.user.findMany.mock.calls[0][0];
     expect(call.where).toEqual({
       AND: [
         { username: { contains: 'Alice', mode: 'insensitive' } },
-        { evolvingGamesPlayed: { gt: 0 } },
+        EVOLVING_PARTICIPATION_CLAUSE,
       ],
     });
   });

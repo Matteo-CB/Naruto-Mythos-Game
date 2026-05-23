@@ -2012,11 +2012,9 @@ export class EffectEngine {
 
         
         if (tenten118PrintedPower <= 3) {
-          const tt118SecondEnemySide: 'player1Characters' | 'player2Characters' =
-            pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
           const hiddenTargets: string[] = [];
           for (const mission of newState.activeMissions) {
-            for (const c of mission[tt118SecondEnemySide]) {
+            for (const c of [...mission.player1Characters, ...mission.player2Characters]) {
               if (c.isHidden) {
                 hiddenTargets.push(c.instanceId);
               }
@@ -3998,10 +3996,8 @@ export class EffectEngine {
         const tt041Mission = newState.activeMissions[tt041MIdx];
         if (!tt041Mission) break;
 
-        const tt041EnemySide: 'player1Characters' | 'player2Characters' =
-          pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         const tt041Targets: string[] = [];
-        for (const char of tt041Mission[tt041EnemySide]) {
+        for (const char of [...tt041Mission.player1Characters, ...tt041Mission.player2Characters]) {
           if (char.isHidden && char.instanceId !== pendingEffect.sourceInstanceId) {
             tt041Targets.push(char.instanceId);
           }
@@ -6874,7 +6870,7 @@ export class EffectEngine {
             resolved: false, isUpgrade: false,
           });
           newState.pendingActions.push({
-            id: k092ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            id: k092ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
             player: k092Player,
             description: `Kisame Hoshigaki (092): Choose how many Power tokens to steal from ${k092Target.card.name_fr}.`,
             descriptionKey: 'game.effect.desc.chooseTokenAmountSteal',
@@ -8434,10 +8430,8 @@ export class EffectEngine {
         const tt118MI = pendingEffect.sourceMissionIndex;
         const tt118Mission = newState.activeMissions[tt118MI];
         if (!tt118Mission) break;
-        const tt118EnemySide: 'player1Characters' | 'player2Characters' =
-          tt118Player === 'player1' ? 'player2Characters' : 'player1Characters';
         const tt118Targets: string[] = [];
-        for (const char of tt118Mission[tt118EnemySide]) {
+        for (const char of [...tt118Mission.player1Characters, ...tt118Mission.player2Characters]) {
           if (char.isHidden) tt118Targets.push(char.instanceId);
         }
         if (tt118Targets.length === 0) {
@@ -11213,8 +11207,9 @@ export class EffectEngine {
         const k134Player = pendingEffect.sourcePlayer;
         const k134Opponent: PlayerID = k134Player === 'player1' ? 'player2' : 'player1';
 
-        
+
         const k134ValidTargets: string[] = [];
+        const k134PowerSnapshot: Record<string, number> = {};
         for (let i = 0; i < newState.activeMissions.length; i++) {
           const mission = newState.activeMissions[i];
           for (const side of ['player1Characters', 'player2Characters'] as const) {
@@ -11222,7 +11217,8 @@ export class EffectEngine {
             for (const char of mission[side]) {
               if (char.isHidden) continue;
               if (char.instanceId === pendingEffect.sourceInstanceId) continue;
-              const power = getEffectivePower(newState, char, sidePlayer);
+              const power = Math.max(0, getEffectivePower(newState, char, sidePlayer));
+              k134PowerSnapshot[char.instanceId] = power;
               if (power <= 6) {
                 k134ValidTargets.push(char.instanceId);
               }
@@ -11244,7 +11240,7 @@ export class EffectEngine {
             id: k134EffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
             sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
-            effectDescription: JSON.stringify({ remainingPower: 6, hiddenIds: [] }),
+            effectDescription: JSON.stringify({ remainingPower: 6, hiddenIds: [], powerSnapshot: k134PowerSnapshot }),
             targetSelectionType: 'KYUBI134_CHOOSE_HIDE_TARGETS',
             sourcePlayer: k134Player, requiresTargetSelection: true,
             validTargets: k134ValidTargets, isOptional: true, isMandatory: false,
@@ -16222,43 +16218,44 @@ export class EffectEngine {
 
   
   static kyubi134ApplyHide(state: GameState, pending: PendingEffect, targetId: string): GameState {
-    let parsed: { remainingPower?: number; hiddenIds?: string[] } = {};
+    let parsed: { remainingPower?: number; hiddenIds?: string[]; powerSnapshot?: Record<string, number> } = {};
     try { parsed = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
     let remainingPower = parsed.remainingPower ?? 6;
     const hiddenIds = parsed.hiddenIds ?? [];
+    const powerSnapshot = parsed.powerSnapshot ?? {};
 
-    
+
     const charResult = EffectEngine.findCharByInstanceId(state, targetId);
     if (!charResult || charResult.character.isHidden) return state;
-    const targetPower = getEffectivePower(state, charResult.character, charResult.player);
+    const targetPower = powerSnapshot[targetId] ?? Math.max(0, getEffectivePower(state, charResult.character, charResult.player));
 
-    
+
     let newState = EffectEngine.hideCharacterWithLog(state, targetId, pending.sourcePlayer);
     remainingPower -= targetPower;
     hiddenIds.push(targetId);
 
-    if (remainingPower <= 0) return newState; // No budget left
+    if (remainingPower <= 0) return newState;
 
-    
+
     const validNext: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       for (const side of ['player1Characters', 'player2Characters'] as const) {
         for (const char of newState.activeMissions[i][side]) {
           if (char.isHidden) continue;
-          if (char.instanceId === pending.sourceInstanceId) continue; // not self (Kyubi)
+          if (char.instanceId === pending.sourceInstanceId) continue;
           if (hiddenIds.includes(char.instanceId)) continue;
-          const charOwner3 = newState.activeMissions[i].player1Characters.includes(char) ? 'player1' : 'player2';
-          const pw = getEffectivePower(newState, char, charOwner3 as PlayerID);
-          if (pw <= remainingPower) {
+          const snapshotPower = powerSnapshot[char.instanceId];
+          if (snapshotPower === undefined) continue;
+          if (snapshotPower <= remainingPower) {
             validNext.push(char.instanceId);
           }
         }
       }
     }
 
-    if (validNext.length === 0) return newState; // No more valid targets
+    if (validNext.length === 0) return newState;
 
-    
+
     const effectId = generateInstanceId();
     const actionId = generateInstanceId();
 
@@ -16268,7 +16265,7 @@ export class EffectEngine {
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: 'UPGRADE',
-      effectDescription: JSON.stringify({ remainingPower, hiddenIds }),
+      effectDescription: JSON.stringify({ remainingPower, hiddenIds, powerSnapshot }),
       targetSelectionType: 'KYUBI134_CHOOSE_HIDE_TARGETS',
       sourcePlayer: pending.sourcePlayer,
       requiresTargetSelection: true,
@@ -18921,9 +18918,30 @@ export class EffectEngine {
       };
     }
 
-    
+
     const friendlySideRhr = player === "player1" ? "player1Characters" : "player2Characters";
     const missionRhr = newState.activeMissions[mIdx];
+
+    const isControlledCharRhr = char.controlledBy !== char.originalOwner;
+    if (isControlledCharRhr) {
+      const wouldDuplicateRhr = missionRhr[friendlySideRhr].some((c: CharacterInPlay) => {
+        if (c.isHidden || c.instanceId === instanceId) return false;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+        return cTop.name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
+      });
+      if (wouldDuplicateRhr) {
+        return {
+          ...state,
+          log: logAction(
+            state.log, state.turn, state.phase, player,
+            'EFFECT_BLOCKED',
+            `Cannot reveal ${topCard.name_fr}: this character is controlled and revealing would create a duplicate on this side.`,
+            'game.log.effect.duplicateNameReveal',
+            { card: topCard.name_fr },
+          ),
+        };
+      }
+    }
 
     
     const allUpgradeTargets: string[] = [];

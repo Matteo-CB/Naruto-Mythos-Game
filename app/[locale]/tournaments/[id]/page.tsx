@@ -612,7 +612,9 @@ export default function TournamentDetailPage() {
                 )}
                 
                 {myMatch.roomCode ? (
-                  <Link href={('/play/online?room=' + myMatch.roomCode) as '/'} onClick={handlePlayMatch}
+                  <Link
+                    href={((isSealedTournament ? '/play/sealed?room=' : '/play/online?room=') + myMatch.roomCode) as '/'}
+                    onClick={handlePlayMatch}
                     className="block w-full text-center py-3 text-sm font-bold uppercase tracking-wider transition-colors"
                     style={{ backgroundColor: 'rgba(196, 163, 90, 0.2)', border: '2px solid #c4a35a', color: '#c4a35a' }}>
                     {t('playMatch')}

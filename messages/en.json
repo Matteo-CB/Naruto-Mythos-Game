@@ -1014,7 +1014,7 @@
     "basePoints": "Base Points",
     "id": "ID",
     "missions": "Missions",
-    "bannedPlaceholder": "BANNED"
+    "bannedPlaceholder": "BAN"
   },
   "deckBuilder": {
     "title": "Deck Builder",
@@ -1040,6 +1040,8 @@
     "clickToAdd": "Click cards to add them",
     "savedDecks": "Saved Decks",
     "noSavedDecks": "No saved decks",
+    "searchDecks": "Search decks...",
+    "noDeckMatch": "No deck matches your search",
     "deckCount": "{chars}/30 characters, {missions}/3 missions",
     "failedToSave": "Failed to save deck",
     "failedToLoad": "Failed to load deck",

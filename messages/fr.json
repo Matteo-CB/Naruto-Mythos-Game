@@ -1014,7 +1014,7 @@
     "basePoints": "Points de Base",
     "id": "ID",
     "missions": "Missions",
-    "bannedPlaceholder": "BANNIE"
+    "bannedPlaceholder": "BAN"
   },
   "deckBuilder": {
     "title": "Constructeur de Deck",
@@ -1040,6 +1040,8 @@
     "clickToAdd": "Cliquez sur les cartes pour les ajouter",
     "savedDecks": "Decks Sauvegardés",
     "noSavedDecks": "Aucun deck sauvegardé",
+    "searchDecks": "Rechercher un deck...",
+    "noDeckMatch": "Aucun deck ne correspond à ta recherche",
     "deckCount": "{chars}/30 personnages, {missions}/3 missions",
     "failedToSave": "Échec de la sauvegarde du deck",
     "failedToLoad": "Échec du chargement du deck",

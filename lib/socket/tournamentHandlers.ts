@@ -304,6 +304,24 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
               }
             }
           }
+        } else {
+          const loadSealedDeck = (sealed: unknown): { characters: CharacterCard[]; missions: MissionCard[] } | null => {
+            if (!sealed || typeof sealed !== 'object') return null;
+            const obj = sealed as { cardIds?: unknown; missionIds?: unknown };
+            if (!Array.isArray(obj.cardIds) || !Array.isArray(obj.missionIds)) return null;
+            const chars = obj.cardIds
+              .filter((id): id is string => typeof id === 'string')
+              .map((id) => getCharacterById(id))
+              .filter(Boolean) as CharacterCard[];
+            const miss = obj.missionIds
+              .filter((id): id is string => typeof id === 'string')
+              .map((id) => getMissionById(id))
+              .filter(Boolean) as MissionCard[];
+            if (chars.length < 30 || miss.length !== 3) return null;
+            return { characters: chars, missions: miss };
+          };
+          hostDeck = loadSealedDeck(p1Participant?.sealedDeck);
+          guestDeck = loadSealedDeck(p2Participant?.sealedDeck);
         }
 
         
@@ -365,18 +383,64 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
         });
 
         if (isSealedTournament) {
-          const hostPool = (p1Participant?.sealedPool as { boosters: unknown; allCards: unknown } | null) ?? null;
-          const guestPool = (p2Participant?.sealedPool as { boosters: unknown; allCards: unknown } | null) ?? null;
+          const createdRoomSealed = rooms.get(roomCode);
+          const hostPool = (p1Participant?.sealedPool as { boosters: unknown; allCards: Array<{ id: string }> } | null) ?? null;
+          const guestPool = (p2Participant?.sealedPool as { boosters: unknown; allCards: Array<{ id: string }> } | null) ?? null;
+          if (createdRoomSealed) {
+            if (hostPool?.allCards && Array.isArray(hostPool.allCards)) {
+              createdRoomSealed.hostSealedPoolIds = hostPool.allCards.map((c) => c.id);
+            }
+            if (guestPool?.allCards && Array.isArray(guestPool.allCards)) {
+              createdRoomSealed.guestSealedPoolIds = guestPool.allCards.map((c) => c.id);
+            }
+          }
           const userSockets = new Map<string, string>();
           for (const [, sock] of io.sockets.sockets) {
             const data = (sock as unknown as { data?: { userId?: string } }).data;
             if (data?.userId) userSockets.set(data.userId, sock.id);
           }
-          if (hostPool && userSockets.has(match.player1Id)) {
+          const hostNeedsBuild = !hostDeck;
+          const guestNeedsBuild = !guestDeck;
+          if (hostNeedsBuild && hostPool && userSockets.has(match.player1Id)) {
             io.to(userSockets.get(match.player1Id)!).emit('sealed:boosters', hostPool);
           }
-          if (guestPool && userSockets.has(match.player2Id)) {
+          if (guestNeedsBuild && guestPool && userSockets.has(match.player2Id)) {
             io.to(userSockets.get(match.player2Id)!).emit('sealed:boosters', guestPool);
+          }
+          if ((hostNeedsBuild || guestNeedsBuild) && createdRoomSealed) {
+            const SEALED_BUILD_MS = 10 * 60_000;
+            const deadline = Date.now() + SEALED_BUILD_MS;
+            createdRoomSealed.sealedDeadline = deadline;
+            io.to(roomCode).emit('sealed:timer-start', { deadline, durationMs: SEALED_BUILD_MS });
+            if (hostNeedsBuild && userSockets.has(match.player1Id)) {
+              io.to(userSockets.get(match.player1Id)!).emit('sealed:timer-start', { deadline, durationMs: SEALED_BUILD_MS });
+            }
+            if (guestNeedsBuild && userSockets.has(match.player2Id)) {
+              io.to(userSockets.get(match.player2Id)!).emit('sealed:timer-start', { deadline, durationMs: SEALED_BUILD_MS });
+            }
+            if (createdRoomSealed.sealedTimer) {
+              clearTimeout(createdRoomSealed.sealedTimer);
+            }
+            const sealedMatchId = matchId;
+            const sealedTournamentId = tournamentId;
+            const sealedP1 = match.player1Id;
+            const sealedP2 = match.player2Id;
+            createdRoomSealed.sealedTimer = setTimeout(async () => {
+              const r = rooms.get(roomCode);
+              if (!r) return;
+              if (r.gameState) return;
+              const hostSubmitted = !!r.hostDeck;
+              const guestSubmitted = !!r.guestDeck;
+              if (hostSubmitted && guestSubmitted) return;
+              if (!hostSubmitted && !guestSubmitted) {
+                console.log(`[Tournament] Sealed match ${sealedMatchId} build timeout: neither player submitted a deck`);
+                await handleSwissDoubleAbsence(io, sealedTournamentId, sealedMatchId);
+                return;
+              }
+              const noBuildId = !hostSubmitted ? sealedP1 : sealedP2;
+              console.log(`[Tournament] Sealed match ${sealedMatchId} build timeout: player ${noBuildId} did not submit a deck`);
+              await handleMatchForfeit(io, sealedTournamentId, sealedMatchId, noBuildId);
+            }, SEALED_BUILD_MS);
           }
         }
 
@@ -404,6 +468,11 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             }
             const absentPlayerId = !hostJoined ? r.hostId : r.guestId;
             if (!absentPlayerId) return;
+            if (r.isSealed) {
+              console.log(`[Tournament] Sealed match ${matchId}: player ${absentPlayerId} did not join within ${TOURNAMENT_JOIN_TIMEOUT_MS}ms, deferring forfeit until deck build completes`);
+              r.tournamentPendingForfeit = absentPlayerId;
+              return;
+            }
             console.log(`[Tournament] Match ${matchId} forfeit: player ${absentPlayerId} did not join within ${TOURNAMENT_JOIN_TIMEOUT_MS}ms`);
             await handleMatchForfeit(io, tournamentId, matchId, absentPlayerId);
           }, TOURNAMENT_JOIN_TIMEOUT_MS);
@@ -603,7 +672,7 @@ export async function handleSwissDoubleAbsence(io: Server, tournamentId: string,
   await handleSwissMatchEnd(io, tournamentId, match);
 }
 
-async function handleMatchForfeit(io: Server, tournamentId: string, matchId: string, forfeitPlayerId: string) {
+export async function handleMatchForfeit(io: Server, tournamentId: string, matchId: string, forfeitPlayerId: string) {
   const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
   if (!match || match.status === 'completed' || match.status === 'forfeit') return;
 
