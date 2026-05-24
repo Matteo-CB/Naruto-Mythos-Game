@@ -2,13 +2,15 @@
   "entries": [
     {
       "date": "2026-05-24",
-      "title_fr": "Correction Kidômaru et règle de déplacement simultané",
-      "title_en": "Kidômaru fix and simultaneous-movement rule",
+      "title_fr": "Correction Kidômaru et sélection de deck simplifiée",
+      "title_en": "Kidômaru fix and simpler deck selection",
       "changes_fr": [
-        "Bug corrigé : Kidômaru (3 chakra) pouvait se déplacer lui-même au lieu de ne déplacer que des alliés, et le même personnage pouvait être choisi plusieurs fois pour les déplacements successifs. La liste des cibles est désormais figée au moment où l'effet est joué, et chaque carte ne peut être déplacée qu'une seule fois."
+        "Bug corrigé : Kidômaru (3 chakra) pouvait se déplacer lui-même au lieu de ne déplacer que des alliés, et le même personnage pouvait être choisi plusieurs fois pour les déplacements successifs. La liste des cibles est désormais figée au moment où l'effet est joué, et chaque carte ne peut être déplacée qu'une seule fois.",
+        "Sélection de deck avant une partie : seuls les 5 premiers decks s'affichent, avec un bouton Afficher plus pour voir les suivants par paquet de 10. Plus de zone défilable interne ni de barre de recherche qui coupait l'affichage."
       ],
       "changes_en": [
-        "Bug fixed: Kidômaru (3-chakra) could move himself instead of moving only friendly characters, and the same character could be picked multiple times across the successive moves. The target list is now locked at the moment the effect resolves, and each card can only be moved once."
+        "Bug fixed: Kidômaru (3-chakra) could move himself instead of moving only friendly characters, and the same character could be picked multiple times across the successive moves. The target list is now locked at the moment the effect resolves, and each card can only be moved once.",
+        "Pre-game deck selection: only the first 5 decks show up, with a Show More button to load the next 10 at a time. No more internal scroll area or search bar that was cutting off the display."
       ]
     },
     {
@@ -23,7 +25,6 @@
         "Tournoi scellé : ton deck est construit une seule fois en manche 1 puis réutilisé tel quel pour les manches suivantes, plus besoin de rouvrir les boosters à chaque tour.",
         "Tournoi scellé : si tu rafraîchis la page pendant la construction, tes boosters et ton timer sont renvoyés automatiquement, tu ne perds pas ta progression.",
         "Bug corrigé : un personnage caché volé par Ino pouvait être révélé pour s'empiler sur un personnage du même nom de son ravisseur, ce qui transférait définitivement la carte volée. La révélation est désormais bloquée quand elle créerait un doublon.",
-        "Sélection de deck avant une partie : si tu as plus de 5 decks sauvegardés, une barre de recherche apparaît et la liste devient une zone défilable. Plus de mur de decks à scroller.",
         "Menu Tournois : la liste devient une zone défilable au-delà de 5 tournois affichés, le reste de la page ne se fait plus pousser hors de l'écran."
       ],
       "changes_en": [
@@ -34,7 +35,6 @@
         "Sealed tournament: your deck is built once in round 1 and reused as-is for the following rounds, no need to reopen boosters every round.",
         "Sealed tournament: if you refresh the page during deck building, your boosters and timer are sent back automatically, you don't lose progress.",
         "Bug fixed: a hidden character stolen by Ino could be revealed to stack on top of a same-name character on its captor's side, which permanently transferred the stolen card. The reveal is now blocked when it would create a duplicate.",
-        "Pre-game deck selection: if you have more than 5 saved decks, a search bar appears and the list becomes a scrollable area. No more wall of decks to scroll through.",
         "Tournaments menu: the list becomes a scrollable area past 5 tournaments displayed, the rest of the page no longer gets pushed off-screen."
       ]
     },

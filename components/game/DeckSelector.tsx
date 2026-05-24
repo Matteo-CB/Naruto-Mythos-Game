@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { resolveCardId } from '@/lib/data/cardLoader';
@@ -30,20 +30,18 @@ interface DeckSelectorProps {
   evolvingOnly?: boolean;
 }
 
+const INITIAL_DECK_LIMIT = 5;
+const LOAD_MORE_STEP = 10;
+
 export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnly = false }: DeckSelectorProps) {
   const t = useTranslations();
   const [savedDecks, setSavedDecks] = useState<SavedDeck[]>([]);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [visibleCount, setVisibleCount] = useState(INITIAL_DECK_LIMIT);
 
-  const filteredDecks = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return savedDecks;
-    return savedDecks.filter((d) => d.name.toLowerCase().includes(q));
-  }, [savedDecks, searchQuery]);
-
-  const showSearch = savedDecks.length > 5;
+  const visibleDecks = savedDecks.slice(0, visibleCount);
+  const hiddenCount = Math.max(0, savedDecks.length - visibleCount);
 
   useEffect(() => {
     const url = evolvingOnly ? '/api/decks?evolving=true' : '/api/decks';
@@ -172,63 +170,52 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
         )
       )}
 
-      {showSearch && (
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={t('deckBuilder.searchDecks')}
-          className="px-3 py-2 text-xs w-full"
+      {visibleDecks.map((deck) => (
+        <EvolvingDeckHolo
+          key={deck.id}
+          points={deck.evolvingPoints ?? 0}
+          enabled={deck.evolvingCompatible === true}
+          intensity="subtle"
+          className="overflow-hidden"
+        >
+          <button
+            onClick={() => {
+              setSelectedDeckId(deck.id);
+              resolveAndSelect(deck.id);
+            }}
+            className="flex flex-col items-start p-3 transition-colors text-left w-full no-select"
+            style={{
+              backgroundColor: selectedDeckId === deck.id ? 'rgba(26, 26, 26, 0.95)' : 'rgba(20, 20, 20, 0.85)',
+              color: selectedDeckId === deck.id ? '#e8e8e8' : '#888',
+              boxShadow: selectedDeckId === deck.id ? 'inset 0 -2px 0 #c4a35a' : 'inset 0 -2px 0 transparent',
+              position: 'relative',
+              zIndex: 1,
+            }}
+          >
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm font-medium">{deck.name}</span>
+              {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints ?? 0} />}
+            </div>
+            <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>
+              {deck.cardIds.length} {t('deckBuilder.characters', { count: deck.cardIds.length })} + {deck.missionIds.length} missions
+            </span>
+          </button>
+        </EvolvingDeckHolo>
+      ))}
+
+      {hiddenCount > 0 && (
+        <button
+          onClick={() => setVisibleCount((n) => n + LOAD_MORE_STEP)}
+          className="px-3 py-2 text-xs uppercase no-select cursor-pointer transition-colors"
           style={{
             backgroundColor: 'rgba(20, 20, 20, 0.85)',
-            border: '1px solid #262626',
-            color: '#e0e0e0',
-            outline: 'none',
-            letterSpacing: '0.05em',
+            color: '#c4a35a',
+            letterSpacing: '0.18em',
           }}
-        />
+        >
+          {t('deckBuilder.loadMoreDecks', { count: hiddenCount })}
+        </button>
       )}
-
-      <div
-        className="flex flex-col gap-3"
-        style={savedDecks.length > 5 ? { maxHeight: '50vh', overflowY: 'auto', paddingRight: '4px' } : undefined}
-      >
-        {filteredDecks.length === 0 && savedDecks.length > 0 && (
-          <p className="text-xs italic" style={{ color: '#555' }}>{t('deckBuilder.noDeckMatch')}</p>
-        )}
-        {filteredDecks.map((deck) => (
-          <EvolvingDeckHolo
-            key={deck.id}
-            points={deck.evolvingPoints ?? 0}
-            enabled={deck.evolvingCompatible === true}
-            intensity="subtle"
-            className="overflow-hidden"
-          >
-            <button
-              onClick={() => {
-                setSelectedDeckId(deck.id);
-                resolveAndSelect(deck.id);
-              }}
-              className="flex flex-col items-start p-3 transition-colors text-left w-full no-select"
-              style={{
-                backgroundColor: selectedDeckId === deck.id ? 'rgba(26, 26, 26, 0.95)' : 'rgba(20, 20, 20, 0.85)',
-                color: selectedDeckId === deck.id ? '#e8e8e8' : '#888',
-                boxShadow: selectedDeckId === deck.id ? 'inset 0 -2px 0 #c4a35a' : 'inset 0 -2px 0 transparent',
-                position: 'relative',
-                zIndex: 1,
-              }}
-            >
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm font-medium">{deck.name}</span>
-                {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints ?? 0} />}
-              </div>
-              <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>
-                {deck.cardIds.length} {t('deckBuilder.characters', { count: deck.cardIds.length })} + {deck.missionIds.length} missions
-              </span>
-            </button>
-          </EvolvingDeckHolo>
-        ))}
-      </div>
     </div>
   );
 }
