@@ -60,7 +60,6 @@ export async function POST(request: NextRequest) {
       prisma.eloHistory.deleteMany({ where: { OR: [{ userId }, { opponentId: userId }] } }).catch(() => ({ count: 0 })),
       prisma.friendship.deleteMany({ where: { OR: [{ senderId: userId }, { receiverId: userId }] } }),
       prisma.matchInvite.deleteMany({ where: { OR: [{ senderId: userId }, { receiverId: userId }] } }),
-      prisma.quizScore.deleteMany({ where: { userId } }),
       prisma.userBan.deleteMany({ where: { userId } }),
       prisma.chatReport.deleteMany({ where: { OR: [{ reporterId: userId }, { targetId: userId }] } }),
       prisma.chatMessage.deleteMany({ where: { userId } }),

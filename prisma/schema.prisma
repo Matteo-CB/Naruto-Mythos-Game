@@ -29,7 +29,6 @@ model User {
   decks             Deck[]
   gamesAsPlayer1    Game[]       @relation("Player1")
   gamesAsPlayer2    Game[]       @relation("Player2")
-  quizScores        QuizScore[]
   friendshipsSent     Friendship[]  @relation("FriendshipSent")
   friendshipsReceived Friendship[]  @relation("FriendshipReceived")
   matchInvitesSent     MatchInvite[] @relation("MatchInviteSent")
@@ -167,18 +166,6 @@ model Room {
   isEvolving Boolean  @default(false)
   holoHue    Int?
   createdAt  DateTime @default(now())
-}
-
-model QuizScore {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId       String   @unique @db.ObjectId
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bestByDiff   Json
-  totalRuns    Int      @default(0)
-  totalCorrect Int      @default(0)
-  totalQ       Int      @default(0)
-  historyGz    Bytes?
-  updatedAt    DateTime @updatedAt
 }
 
 model Friendship {

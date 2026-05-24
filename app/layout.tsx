@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     template: "%s | Naruto Mythos TCG",
   },
   description:
-    "Jouez gratuitement au Naruto Mythos Trading Card Game en ligne. Affrontez une IA intelligente sur 4 niveaux de difficulte ou defiez d'autres joueurs en multijoueur temps reel. Construisez votre deck strategique parmi 186 cartes uniques inspirees de Naruto Shippuden, collectionnez des cartes rares et grimpez le classement ELO competitif. Jeu de cartes a collectionner gratuit avec deck builder, quiz Naruto et systeme de matchmaking.",
+    "Jouez gratuitement au Naruto Mythos Trading Card Game en ligne. Affrontez une IA intelligente sur 4 niveaux de difficulté ou défiez d'autres joueurs en multijoueur temps réel. Construisez votre deck stratégique parmi 186 cartes uniques inspirées de Naruto Shippuden, collectionnez des cartes rares et grimpez le classement ELO compétitif. Jeu de cartes à collectionner gratuit avec deck builder et système de matchmaking.",
   keywords: [
     "Naruto",
     "TCG",
@@ -106,7 +106,7 @@ export const metadata: Metadata = {
     siteName: "Naruto Mythos TCG",
     title: "Naruto Mythos TCG - Jeu de Cartes Naruto Gratuit en Ligne",
     description:
-      "Jeu de cartes Naruto Shippuden gratuit en ligne. 186 cartes uniques, IA intelligente, multijoueur temps reel, deck builder, classement ELO et quiz. Jouez maintenant sans telechargement.",
+      "Jeu de cartes Naruto Shippuden gratuit en ligne. 186 cartes uniques, IA intelligente, multijoueur temps réel, deck builder et classement ELO. Jouez maintenant sans téléchargement.",
     images: [
       {
         url: `${SITE_URL}/images/og-image.webp?v=2`,

@@ -6,8 +6,6 @@ type Variant =
   | 'collection'
   | 'deck'
   | 'leaderboard'
-  | 'learn'
-  | 'quiz'
   | 'playAI'
   | 'playOnline'
   | 'auth'
@@ -25,14 +23,6 @@ const CARD_SETS: Record<Variant, [string, string]> = {
   leaderboard: [
     '/images/cards/KS/mythos/KS-143-M.webp',
     '/images/cards/KS/mythos/KS-144-M.webp',
-  ],
-  learn: [
-    '/images/cards/KS/rare_art/KS-108-RA.webp',
-    '/images/cards/KS/secret/KS-135-S.webp',
-  ],
-  quiz: [
-    '/images/cards/KS/rare_art/KS-120-RA.webp',
-    '/images/cards/KS/secret/KS-133-S.webp',
   ],
   playAI: [
     '/images/cards/KS/secret/KS-136-S.webp',

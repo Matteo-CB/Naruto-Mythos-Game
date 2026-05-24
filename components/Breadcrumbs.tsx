@@ -7,8 +7,6 @@ const SITE_URL = 'https://narutomythosgame.com';
 const PAGE_NAMES: Record<string, Record<string, string>> = {
   collection: { en: 'Card Collection', fr: 'Collection de Cartes' },
   'deck-builder': { en: 'Deck Builder', fr: 'Constructeur de Deck' },
-  learn: { en: 'Learn the Rules', fr: 'Apprendre les Regles' },
-  quiz: { en: 'Quiz', fr: 'Quiz' },
   leaderboard: { en: 'ELO Leaderboard', fr: 'Classement ELO' },
   login: { en: 'Sign In', fr: 'Connexion' },
   register: { en: 'Create Account', fr: 'Creer un Compte' },

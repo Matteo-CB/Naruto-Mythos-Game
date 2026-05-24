@@ -13,8 +13,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/collection", priority: 0.85, changeFrequency: "monthly" as const },
     { path: "/deck-builder", priority: 0.85, changeFrequency: "monthly" as const },
     { path: "/leaderboard", priority: 0.8, changeFrequency: "daily" as const },
-    { path: "/learn", priority: 0.8, changeFrequency: "monthly" as const },
-    { path: "/quiz", priority: 0.7, changeFrequency: "monthly" as const },
     { path: "/register", priority: 0.5, changeFrequency: "yearly" as const },
     { path: "/login", priority: 0.4, changeFrequency: "yearly" as const },
     { path: "/friends", priority: 0.3, changeFrequency: "monthly" as const },

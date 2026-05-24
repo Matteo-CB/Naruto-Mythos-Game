@@ -2,17 +2,19 @@
   "entries": [
     {
       "date": "2026-05-25",
-      "title_fr": "Nouvelles variantes Secret V et Légendaire",
-      "title_en": "New Secret V and Legendary variants",
+      "title_fr": "Nouvelles variantes Secret V, Légendaire et suppression d'Apprendre / Quiz",
+      "title_en": "New Secret V, Legendary variants and removal of Learn / Quiz",
       "changes_fr": [
         "Nouvelles variantes Secret V : Jiraiya, Gaara, Itachi Uchiwa. Mêmes effets que leurs cartes Secret de base.",
         "Nouvelle Légendaire Rock Lee (Poing Ivre), variante de la carte Rare. Mêmes effets que la version Rare.",
-        "Menu d'accueil : la carte holographique tourne maintenant entre 6 variantes (Naruto Mythos V, Sasuke Légendaire, Rock Lee Légendaire, Jiraiya SV, Gaara SV, Itachi SV)."
+        "Menu d'accueil : la carte holographique tourne maintenant entre 6 variantes (Naruto Mythos V, Sasuke Légendaire, Rock Lee Légendaire, Jiraiya SV, Gaara SV, Itachi SV).",
+        "Les pages Apprendre et Quiz ont été retirées du site. Les scores et l'historique de quiz ont été supprimés du compte. Le bouton sur le menu principal a disparu."
       ],
       "changes_en": [
         "New Secret V variants: Jiraiya, Gaara, Itachi Uchiwa. Same effects as their base Secret cards.",
         "New Legendary Rock Lee (Loopy Fist), variant of the Rare card. Same effects as the Rare version.",
-        "Home menu: the holographic card now rotates between 6 variants (Naruto Mythos V, Sasuke Legendary, Rock Lee Legendary, Jiraiya SV, Gaara SV, Itachi SV)."
+        "Home menu: the holographic card now rotates between 6 variants (Naruto Mythos V, Sasuke Legendary, Rock Lee Legendary, Jiraiya SV, Gaara SV, Itachi SV).",
+        "The Learn and Quiz pages have been removed from the site. Quiz scores and quiz history have been deleted from accounts. The button on the main menu is gone."
       ]
     },
     {
