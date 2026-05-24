@@ -10,7 +10,7 @@ const CARD_TIER: Record<string, number> = {
   'KS-133-S':   10,  // Naruto Rasengan - hide/defeat 2 enemies (5 or less + 2 or less)
   'KS-133-SV':  10,
   'KS-133-MV':  10,
-  'KS-000-L':   10,  // Naruto Legendary - same as 133
+  'KS-133-L':   10,  // Naruto Legendary - same as 133
   'KS-134-S':   10,  // Kyubi 134 - 12 power, can't be hidden/defeated + UPGRADE hide total power ≤6
   'KS-132-S':    9,  // Jiraiya - play Summon -5 + UPGRADE force opponent to 2 chars
   'KS-136-S':    9,  // Sasuke - 8 power + UPGRADE mutual defeat + chakra on defeat
@@ -232,7 +232,7 @@ const CARD_SYNERGIES: SynergyGroup[] = [
   { cards: ['KS-101-C', 'KS-003-C', 'KS-004-UC', 'KS-104-R', 'KS-104-RA', 'KS-104-MV', 'KS-131-S', 'KS-131-SV', 'KS-005-C', 'KS-006-UC'], bonus: 2, minCount: 2 },  // TonTon + Tsunade/Shizune
 
   
-  { cards: ['KS-009-C', 'KS-010-C', 'KS-108-R', 'KS-108-RA', 'KS-108-MV', 'KS-133-S', 'KS-133-SV', 'KS-133-MV', 'KS-000-L', 'KS-141-M', 'KS-145-M', 'KS-129-R', 'KS-129-RA', 'KS-134-S'], bonus: 5, minCount: 2 },  // Naruto/Kyubi chain
+  { cards: ['KS-009-C', 'KS-010-C', 'KS-108-R', 'KS-108-RA', 'KS-108-MV', 'KS-133-S', 'KS-133-SV', 'KS-133-MV', 'KS-133-L', 'KS-141-M', 'KS-145-M', 'KS-129-R', 'KS-129-RA', 'KS-134-S'], bonus: 5, minCount: 2 },  // Naruto/Kyubi chain
   { cards: ['KS-074-C', 'KS-075-C', 'KS-120-R', 'KS-120-RA', 'KS-120-MV', 'KS-076-UC', 'KS-139-S', 'KS-130-R', 'KS-130-RA'], bonus: 5, minCount: 2 },  // Gaara/Ichibi chain
   { cards: ['KS-013-C', 'KS-014-UC', 'KS-107-R', 'KS-107-RA', 'KS-136-S', 'KS-136-SV', 'KS-136-MV', 'KS-142-M', 'KS-146-M'], bonus: 4, minCount: 2 },  // Sasuke chain
   { cards: ['KS-015-C', 'KS-016-UC', 'KS-106-R', 'KS-106-RA', 'KS-137-S', 'KS-137-SV', 'KS-137-MV', 'KS-148-M'], bonus: 4, minCount: 2 },  // Kakashi chain

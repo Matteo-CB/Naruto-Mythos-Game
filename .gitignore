@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# card image finder output (local verification only)
+/card-finds/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

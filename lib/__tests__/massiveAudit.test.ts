@@ -844,8 +844,8 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
 
   describe('2.7 Legendary Card Effects (L)', () => {
 
-    it('KS-000-L Naruto Legendary - Should have proper effects', () => {
-      const handler = getEffectHandler('KS-000-L', 'MAIN');
+    it('KS-133-L Naruto Legendary - Should have proper effects', () => {
+      const handler = getEffectHandler('KS-133-L', 'MAIN');
       expect(handler).toBeDefined();
     });
   });

@@ -45,4 +45,6 @@ export function registerRockLee117Handlers(): void {
   registerEffect('KS-117-R', 'UPGRADE', rockLee117UpgradeHandler);
   registerEffect('KS-117-MV', 'MAIN', rockLee117MainHandler);
   registerEffect('KS-117-MV', 'UPGRADE', rockLee117UpgradeHandler);
+  registerEffect('KS-117-L', 'MAIN', rockLee117MainHandler);
+  registerEffect('KS-117-L', 'UPGRADE', rockLee117UpgradeHandler);
 }

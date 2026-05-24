@@ -691,7 +691,7 @@ describe('Non-common registry completeness', () => {
     { id: 'KS-137-S', types: ['MAIN', 'UPGRADE'] },
     { id: 'KS-143-M', types: ['MAIN', 'AMBUSH'] },
     { id: 'KS-144-M', types: ['MAIN'] },
-    { id: 'KS-000-L', types: ['MAIN'] },
+    { id: 'KS-133-L', types: ['MAIN'] },
   ];
 
   it.each(cardIds)('should have all handlers for $id', ({ id, types }) => {

@@ -675,6 +675,12 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'Reveal and discard the top card of your deck: POWERUP X where X is the cost of the discarded card.',
   ],
 
+
+  'KS-117-L': [
+    '[⧗] At the end of the round, you must move this character to another mission, if able.',
+    'Reveal and discard the top card of your deck: POWERUP X where X is the cost of the discarded card.',
+  ],
+
   
   'KS-118-R': [
     'Defeat a hidden character in this mission. If the defeated character had a printed Power of 3 or less, defeat a hidden character in play.',
@@ -784,6 +790,12 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'The opponent must choose characters to be defeated until they only have up to 2 assigned in this mission.',
   ],
 
+
+  'KS-132-SV': [
+    'Play a Summon character anywhere, paying 5 less.',
+    'The opponent must choose characters to be defeated until they only have up to 2 assigned in this mission.',
+  ],
+
   
   'KS-133-S': [
     'Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.',
@@ -844,8 +856,20 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'MAIN effect: In addition, hide one other enemy character with same name and cost less than the defeated character.',
   ],
 
-  
+
+  'KS-139-SV': [
+    'Defeat an enemy character with a cost less than the number of friendly hidden characters in play.',
+    'MAIN effect: In addition, hide one other enemy character with same name and cost less than the defeated character.',
+  ],
+
+
   'KS-140-S': [
+    'The opponent discards their entire hand, then draws the same number of cards discarded this way.',
+    'Defeat a character in play with cost X or less, where X is the number of cards discarded by the MAIN effect.',
+  ],
+
+
+  'KS-140-SV': [
     'The opponent discards their entire hand, then draws the same number of cards discarded this way.',
     'Defeat a character in play with cost X or less, where X is the number of cards discarded by the MAIN effect.',
   ],
@@ -931,7 +955,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   
 
   
-  'KS-000-L': [
+  'KS-133-L': [
     'Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.',
     'MAIN effect: Instead, defeat both of them.',
   ],

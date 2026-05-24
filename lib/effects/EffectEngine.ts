@@ -1109,7 +1109,7 @@ export class EffectEngine {
         if (nlValidT1.length === 0 && nlValidT2.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, nlPlayer,
             'EFFECT_NO_TARGET', 'Naruto Uzumaki (Legendary): No valid targets (state changed).',
-            'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-000-L' });
+            'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-133-L' });
           break;
         }
 
@@ -1225,7 +1225,7 @@ export class EffectEngine {
         if (nlmValidT1.length === 0 && nlmValidT2.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, nlmPlayer,
             'EFFECT_NO_TARGET', 'Naruto Uzumaki (Legendary): No valid targets (state changed after modifier).',
-            'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-000-L' });
+            'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-133-L' });
           break;
         }
 
@@ -1309,7 +1309,7 @@ export class EffectEngine {
         if (nlValidT2a.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, nlPlayerT1,
             'EFFECT_NO_TARGET', 'Naruto Uzumaki (Legendary): No valid second enemy with Power 2 or less in play.',
-            'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-000-L' });
+            'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-133-L' });
         } else if (nlValidT2a.length === 1) {
           if (nlUseDefeatT1) {
             newState = EffectEngine.defeatCharacter(newState, nlValidT2a[0], nlPlayerT1);

@@ -5176,10 +5176,10 @@
       "data_complete": true,
       "old_id": "MSS 10"
     },
-    "KS-000-L": {
-      "id": "KS-000-L",
+    "KS-133-L": {
+      "id": "KS-133-L",
       "rarity": "L",
-      "number": "000",
+      "number": "133",
       "set": "KS",
       "card_type": "character",
       "name_en": "NARUTO UZUMAKI",
@@ -5206,9 +5206,9 @@
           "description_fr": ""
         }
       ],
-      "image_url": "/images/cards/KS/legendary/KS-000-L.webp",
-      "rarity_display": "",
-      "image_file": "images/cards/KS/legendary/KS-000-L.webp",
+      "image_url": "/images/cards/KS/legendary/KS-133-L.webp",
+      "rarity_display": "Legendary",
+      "image_file": "images/cards/KS/legendary/KS-133-L.webp",
       "data_complete": true,
       "old_id": "Legendary"
     },
@@ -6619,6 +6619,150 @@
       "image_file": "images/cards/KS/secret_v/KS-137-SV.webp",
       "data_complete": true,
       "old_id": "137/130"
+    },
+    "KS-132-SV": {
+      "id": "KS-132-SV",
+      "rarity": "SV",
+      "number": "132",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "JIRAIYA",
+      "name_fr": "JIRAYA",
+      "title_fr": "Toad Mouth Trap",
+      "title_en": "Toad Mouth Trap",
+      "has_visual": true,
+      "chakra": 8,
+      "power": 8,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Play a Summon character anywhere, paying 5 less.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "The opponent must choose characters to be defeated until they only have up to 2 assigned in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret_v/KS-132-SV.webp",
+      "rarity_display": "Secret V",
+      "image_file": "images/cards/KS/secret_v/KS-132-SV.webp",
+      "data_complete": true,
+      "old_id": "132/130 V"
+    },
+    "KS-139-SV": {
+      "id": "KS-139-SV",
+      "rarity": "SV",
+      "number": "139",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "title_fr": "Le Tombeau du Désert",
+      "title_en": "Sand Burial",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 4,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Defeat an enemy character with a cost less than the number of friendly hidden characters in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: In addition, hide one other enemy character with same name and cost less than the defeated character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret_v/KS-139-SV.webp",
+      "rarity_display": "Secret V",
+      "image_file": "images/cards/KS/secret_v/KS-139-SV.webp",
+      "data_complete": true,
+      "old_id": "139/130 V"
+    },
+    "KS-140-SV": {
+      "id": "KS-140-SV",
+      "rarity": "SV",
+      "number": "140",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ITACHI UCHIHA",
+      "name_fr": "ITACHI UCHIWA",
+      "title_fr": "Tsukuyomi",
+      "title_en": "Tsukuyomi",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "The opponent discards their entire hand, then draws the same number of cards discarded in this way.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Defeat a character in play with cost X or less, where X is the number of cards discarded by the MAIN effect.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret_v/KS-140-SV.webp",
+      "rarity_display": "Secret V",
+      "image_file": "images/cards/KS/secret_v/KS-140-SV.webp",
+      "data_complete": true,
+      "old_id": "140/130 V"
+    },
+    "KS-117-L": {
+      "id": "KS-117-L",
+      "rarity": "L",
+      "number": "117",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ROCK LEE",
+      "name_fr": "ROCK LEE",
+      "title_fr": "Poing Ivre",
+      "title_en": "Loopy Fist",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team Guy",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must move this character to another mission, if able.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Discard the top card of your deck: POWERUP X where X is the cost of the discarded card.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/legendary/KS-117-L.webp",
+      "rarity_display": "Legendary",
+      "image_file": "images/cards/KS/legendary/KS-117-L.webp",
+      "data_complete": true,
+      "old_id": "Legendary"
     },
     "KS-135-MV": {
       "id": "KS-135-MV",

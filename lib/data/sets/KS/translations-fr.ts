@@ -743,8 +743,14 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   
   'KS-117-R': [
-    '[⧗] A la fin du tour, vous devez deplacer ce personnage vers une autre mission, si possible.',
-    'Revelez et defaussez la carte du dessus de votre deck : POWERUP X ou X est le cout de la carte defaussee.',
+    '[⧗] À la fin du tour, vous devez déplacer ce personnage vers une autre mission, si possible.',
+    'Révélez et défaussez la carte du dessus de votre deck : POWERUP X où X est le coût de la carte défaussée.',
+  ],
+
+
+  'KS-117-L': [
+    '[⧗] À la fin du tour, vous devez déplacer ce personnage vers une autre mission, si possible.',
+    'Révélez et défaussez la carte du dessus de votre deck : POWERUP X où X est le coût de la carte défaussée.',
   ],
 
   
@@ -842,8 +848,14 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   
   'KS-132-S': [
-    'Jouez un personnage Invocation n\'importe ou en payant 5 de moins.',
-    'L\'adversaire doit choisir des personnages a vaincre jusqu\'a ce qu\'il n\'en ait plus que 2 dans cette mission au maximum.',
+    'Jouez un personnage Invocation n\'importe où en payant 5 de moins.',
+    'L\'adversaire doit choisir des personnages à vaincre jusqu\'à ce qu\'il n\'en ait plus que 2 dans cette mission au maximum.',
+  ],
+
+
+  'KS-132-SV': [
+    'Jouez un personnage Invocation n\'importe où en payant 5 de moins.',
+    'L\'adversaire doit choisir des personnages à vaincre jusqu\'à ce qu\'il n\'en ait plus que 2 dans cette mission au maximum.',
   ],
 
   
@@ -860,14 +872,26 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   
   'KS-139-S': [
-    'Vainquez un personnage ennemi avec un cout inferieur au nombre de personnages allies caches en jeu.',
-    'MAIN effect : En plus, cachez un autre personnage ennemi du meme nom avec un cout inferieur au personnage vaincu.',
+    'Vainquez un personnage ennemi avec un coût inférieur au nombre de personnages alliés cachés en jeu.',
+    'MAIN effect : En plus, cachez un autre personnage ennemi du même nom avec un coût inférieur au personnage vaincu.',
   ],
 
-  
+
+  'KS-139-SV': [
+    'Vainquez un personnage ennemi avec un coût inférieur au nombre de personnages alliés cachés en jeu.',
+    'MAIN effect : En plus, cachez un autre personnage ennemi du même nom avec un coût inférieur au personnage vaincu.',
+  ],
+
+
   'KS-140-S': [
-    'L\'adversaire defausse toute sa main, puis pioche le meme nombre de cartes defaussees.',
-    'Vainquez un personnage en jeu avec un cout de X ou moins, ou X est le nombre de cartes defaussees par l\'effet MAIN.',
+    'L\'adversaire défausse toute sa main, puis pioche le même nombre de cartes défaussées.',
+    'Vainquez un personnage en jeu avec un coût de X ou moins, où X est le nombre de cartes défaussées par l\'effet MAIN.',
+  ],
+
+
+  'KS-140-SV': [
+    'L\'adversaire défausse toute sa main, puis pioche le même nombre de cartes défaussées.',
+    'Vainquez un personnage en jeu avec un coût de X ou moins, où X est le nombre de cartes défaussées par l\'effet MAIN.',
   ],
 
   
@@ -940,9 +964,9 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   
 
   
-  'KS-000-L': [
+  'KS-133-L': [
     'Cachez un personnage ennemi avec une Puissance de 5 ou moins dans cette mission et un autre personnage ennemi avec une Puissance de 2 ou moins en jeu.',
-    'MAIN effect : A la place, vainquez-les tous les deux.',
+    'MAIN effect : À la place, vainquez-les tous les deux.',
   ],
 
   

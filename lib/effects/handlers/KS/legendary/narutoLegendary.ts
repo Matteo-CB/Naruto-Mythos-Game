@@ -30,7 +30,7 @@ function narutoLegendaryMainHandler(ctx: EffectContext): EffectResult {
   if (validTarget1.length === 0 && validTarget2.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer,
       'EFFECT_NO_TARGET', 'Naruto Uzumaki (Legendary): No valid enemy targets in play.',
-      'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-000-L' }) } };
+      'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-133-L' }) } };
   }
 
   
@@ -46,6 +46,6 @@ function narutoLegendaryMainHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerNarutoLegendaryHandlers(): void {
-  registerEffect('KS-000-L', 'MAIN', narutoLegendaryMainHandler);
-  registerEffect('KS-000-L', 'UPGRADE', (ctx) => ({ state: ctx.state })); // Handled by MAIN via isUpgrade
+  registerEffect('KS-133-L', 'MAIN', narutoLegendaryMainHandler);
+  registerEffect('KS-133-L', 'UPGRADE', (ctx) => ({ state: ctx.state })); // Handled by MAIN via isUpgrade
 }

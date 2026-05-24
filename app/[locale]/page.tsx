@@ -17,6 +17,10 @@ import { HomeMenuButton } from '@/components/HomeMenuButton';
 const FEATURED_CARDS = [
   { src: '/images/cards/KS/mythos_v/KS-108_2-MV.webp', alt: 'Naruto Uzumaki - Shadow Clone Jutsu', rarity: 'mythos' as const },
   { src: '/images/cards/KS/legendary/KS-136-L.webp', alt: 'Sasuke Uchiwa - Heaven Curse Mark', rarity: 'legendary' as const },
+  { src: '/images/cards/KS/legendary/KS-117-L.webp', alt: 'Rock Lee - Loopy Fist', rarity: 'legendary' as const },
+  { src: '/images/cards/KS/secret_v/KS-132-SV.webp', alt: 'Jiraiya - Toad Mouth Trap', rarity: 'secret' as const },
+  { src: '/images/cards/KS/secret_v/KS-139-SV.webp', alt: 'Gaara - Sand Burial', rarity: 'secret' as const },
+  { src: '/images/cards/KS/secret_v/KS-140-SV.webp', alt: 'Itachi Uchiwa - Tsukuyomi', rarity: 'secret' as const },
 ];
 
 
