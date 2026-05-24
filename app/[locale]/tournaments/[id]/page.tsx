@@ -312,6 +312,10 @@ export default function TournamentDetailPage() {
   const myParticipant = tour.participants.find(p => p.userId === userId);
   const myDeckValid = (myParticipant as any)?.deckValid ?? false;
   const myDeckId = (myParticipant as any)?.deckId ?? null;
+  const mySealedDeck = (myParticipant as any)?.sealedDeck ?? null;
+  const myJoinedAt = (myParticipant as any)?.joinedAt ? new Date((myParticipant as any).joinedAt).getTime() : 0;
+  const sealedBuildDeadline = myJoinedAt ? myJoinedAt + 15 * 60 * 1000 : 0;
+  const needsSealedBuild = isParticipant && tour.gameMode === 'sealed' && tour.status === 'registration' && !mySealedDeck;
   const needsDeck = isParticipant && tour.gameMode !== 'sealed' && tour.status === 'registration';
   const hasRestrictions = tour.gameMode === 'restricted' || (tour as any).bannedCardIds?.length > 0;
 
@@ -405,6 +409,34 @@ export default function TournamentDetailPage() {
                 </div>
               )}
             </div>
+          </motion.div>
+        )}
+
+        {needsSealedBuild && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.25 }}
+            className="mb-4 p-4" style={{ backgroundColor: '#111111' }}>
+            <h2 className="text-sm font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>
+              {t('sealedBuildAction')}
+            </h2>
+            <p className="text-xs mb-3" style={{ color: '#888' }}>
+              {t('sealedBuildDeadline')}: {sealedBuildDeadline ? new Date(sealedBuildDeadline).toLocaleTimeString() : '-'}
+            </p>
+            <Link
+              href={('/tournaments/' + tournamentId + '/sealed-build') as '/'}
+              className="inline-block px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors"
+              style={{ backgroundColor: 'rgba(196, 163, 90, 0.18)', border: '1px solid #c4a35a', color: '#c4a35a' }}
+            >
+              {t('sealedBuildAction')}
+            </Link>
+          </motion.div>
+        )}
+
+        {isParticipant && tour.gameMode === 'sealed' && mySealedDeck && tour.status === 'registration' && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.25 }}
+            className="mb-4 p-4" style={{ backgroundColor: '#111111' }}>
+            <p className="text-xs uppercase tracking-wider" style={{ color: '#4ade80' }}>
+              {t('sealedDeckReady')}
+            </p>
           </motion.div>
         )}
 
@@ -613,7 +645,7 @@ export default function TournamentDetailPage() {
                 
                 {myMatch.roomCode ? (
                   <Link
-                    href={((isSealedTournament ? '/play/sealed?room=' : '/play/online?room=') + myMatch.roomCode) as '/'}
+                    href={('/play/online?room=' + myMatch.roomCode) as '/'}
                     onClick={handlePlayMatch}
                     className="block w-full text-center py-3 text-sm font-bold uppercase tracking-wider transition-colors"
                     style={{ backgroundColor: 'rgba(196, 163, 90, 0.2)', border: '2px solid #c4a35a', color: '#c4a35a' }}>

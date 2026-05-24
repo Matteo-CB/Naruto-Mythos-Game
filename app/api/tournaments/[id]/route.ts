@@ -29,6 +29,7 @@ export async function GET(
             id: true, userId: true, username: true,
             seed: true, eliminated: true, eliminatedRound: true, hasBye: true,
             deckId: true, deckValid: true,
+            sealedDeck: true, joinedAt: true,
           },
         },
         matches: {

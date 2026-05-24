@@ -384,8 +384,8 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
 
         if (isSealedTournament) {
           const createdRoomSealed = rooms.get(roomCode);
-          const hostPool = (p1Participant?.sealedPool as { boosters: unknown; allCards: Array<{ id: string }> } | null) ?? null;
-          const guestPool = (p2Participant?.sealedPool as { boosters: unknown; allCards: Array<{ id: string }> } | null) ?? null;
+          const hostPool = (p1Participant?.sealedPool as { allCards?: Array<{ id: string }> } | null) ?? null;
+          const guestPool = (p2Participant?.sealedPool as { allCards?: Array<{ id: string }> } | null) ?? null;
           if (createdRoomSealed) {
             if (hostPool?.allCards && Array.isArray(hostPool.allCards)) {
               createdRoomSealed.hostSealedPoolIds = hostPool.allCards.map((c) => c.id);
@@ -393,54 +393,6 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             if (guestPool?.allCards && Array.isArray(guestPool.allCards)) {
               createdRoomSealed.guestSealedPoolIds = guestPool.allCards.map((c) => c.id);
             }
-          }
-          const userSockets = new Map<string, string>();
-          for (const [, sock] of io.sockets.sockets) {
-            const data = (sock as unknown as { data?: { userId?: string } }).data;
-            if (data?.userId) userSockets.set(data.userId, sock.id);
-          }
-          const hostNeedsBuild = !hostDeck;
-          const guestNeedsBuild = !guestDeck;
-          if (hostNeedsBuild && hostPool && userSockets.has(match.player1Id)) {
-            io.to(userSockets.get(match.player1Id)!).emit('sealed:boosters', hostPool);
-          }
-          if (guestNeedsBuild && guestPool && userSockets.has(match.player2Id)) {
-            io.to(userSockets.get(match.player2Id)!).emit('sealed:boosters', guestPool);
-          }
-          if ((hostNeedsBuild || guestNeedsBuild) && createdRoomSealed) {
-            const SEALED_BUILD_MS = 10 * 60_000;
-            const deadline = Date.now() + SEALED_BUILD_MS;
-            createdRoomSealed.sealedDeadline = deadline;
-            io.to(roomCode).emit('sealed:timer-start', { deadline, durationMs: SEALED_BUILD_MS });
-            if (hostNeedsBuild && userSockets.has(match.player1Id)) {
-              io.to(userSockets.get(match.player1Id)!).emit('sealed:timer-start', { deadline, durationMs: SEALED_BUILD_MS });
-            }
-            if (guestNeedsBuild && userSockets.has(match.player2Id)) {
-              io.to(userSockets.get(match.player2Id)!).emit('sealed:timer-start', { deadline, durationMs: SEALED_BUILD_MS });
-            }
-            if (createdRoomSealed.sealedTimer) {
-              clearTimeout(createdRoomSealed.sealedTimer);
-            }
-            const sealedMatchId = matchId;
-            const sealedTournamentId = tournamentId;
-            const sealedP1 = match.player1Id;
-            const sealedP2 = match.player2Id;
-            createdRoomSealed.sealedTimer = setTimeout(async () => {
-              const r = rooms.get(roomCode);
-              if (!r) return;
-              if (r.gameState) return;
-              const hostSubmitted = !!r.hostDeck;
-              const guestSubmitted = !!r.guestDeck;
-              if (hostSubmitted && guestSubmitted) return;
-              if (!hostSubmitted && !guestSubmitted) {
-                console.log(`[Tournament] Sealed match ${sealedMatchId} build timeout: neither player submitted a deck`);
-                await handleSwissDoubleAbsence(io, sealedTournamentId, sealedMatchId);
-                return;
-              }
-              const noBuildId = !hostSubmitted ? sealedP1 : sealedP2;
-              console.log(`[Tournament] Sealed match ${sealedMatchId} build timeout: player ${noBuildId} did not submit a deck`);
-              await handleMatchForfeit(io, sealedTournamentId, sealedMatchId, noBuildId);
-            }, SEALED_BUILD_MS);
           }
         }
 
@@ -468,11 +420,6 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             }
             const absentPlayerId = !hostJoined ? r.hostId : r.guestId;
             if (!absentPlayerId) return;
-            if (r.isSealed) {
-              console.log(`[Tournament] Sealed match ${matchId}: player ${absentPlayerId} did not join within ${TOURNAMENT_JOIN_TIMEOUT_MS}ms, deferring forfeit until deck build completes`);
-              r.tournamentPendingForfeit = absentPlayerId;
-              return;
-            }
             console.log(`[Tournament] Match ${matchId} forfeit: player ${absentPlayerId} did not join within ${TOURNAMENT_JOIN_TIMEOUT_MS}ms`);
             await handleMatchForfeit(io, tournamentId, matchId, absentPlayerId);
           }, TOURNAMENT_JOIN_TIMEOUT_MS);

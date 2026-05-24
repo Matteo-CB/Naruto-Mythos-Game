@@ -46,15 +46,34 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
 
   if (tournament.gameMode === 'sealed') {
     const { generateSealedPool } = await import('@/lib/sealed/boosterGenerator');
+    const { buildAISealedDeck } = await import('@/lib/sealed/aiSealedDeckBuilder');
     const count = tournament.sealedBoosterCount ?? 5;
     const choice = (tournament as { sealedSetChoice?: string }).sealedSetChoice ?? 'random';
     for (const p of tournament.participants) {
-      if (p.sealedPool) continue;
-      const pool = generateSealedPool(count, choice);
-      await prisma.tournamentParticipant.update({
-        where: { id: p.id },
-        data: { sealedPool: pool as never },
-      });
+      let pool = p.sealedPool as { boosters: unknown; allCards: unknown } | null;
+      if (!pool) {
+        pool = generateSealedPool(count, choice as never);
+        await prisma.tournamentParticipant.update({
+          where: { id: p.id },
+          data: { sealedPool: pool as never },
+        });
+      }
+      if (!p.sealedDeck) {
+        try {
+          const aiDeck = buildAISealedDeck(pool as never);
+          await prisma.tournamentParticipant.update({
+            where: { id: p.id },
+            data: {
+              sealedDeck: {
+                cardIds: aiDeck.characters.map((c) => c.id),
+                missionIds: aiDeck.missions.map((m) => m.id),
+              } as never,
+            },
+          });
+        } catch (err) {
+          console.error(`[startLogic] Auto-build failed for participant ${p.id}:`, err);
+        }
+      }
     }
   }
 
