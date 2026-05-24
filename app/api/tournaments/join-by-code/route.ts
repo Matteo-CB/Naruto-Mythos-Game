@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
 import { getSocketIO } from '@/lib/socket/server';
+import { generateSealedPool, type SealedSetChoice } from '@/lib/sealed/boosterGenerator';
 
 const joinCodeAttempts = new Map<string, number[]>();
 const JOIN_CODE_WINDOW_MS = 60 * 60 * 1000;
@@ -113,11 +114,24 @@ export async function POST(req: NextRequest) {
     }
 
     try {
+      let sealedPoolData: { boosters: unknown; allCards: unknown } | null = null;
+      if (tournament.gameMode === 'sealed') {
+        try {
+          const count = (tournament.sealedBoosterCount ?? 5) as 4 | 5 | 6;
+          const choice: SealedSetChoice = (tournament.sealedSetChoice ?? 'random') as SealedSetChoice;
+          sealedPoolData = generateSealedPool(count, choice);
+        } catch (poolErr) {
+          console.error('[API] Sealed pool generation failed on join-by-code:', poolErr);
+          return NextResponse.json({ error: 'Failed to generate sealed pool', errorKey: 'tournament.error.serverError' }, { status: 500 });
+        }
+      }
+
       const participant = await prisma.tournamentParticipant.create({
         data: {
           tournamentId: tournament.id,
           userId: session.user.id,
           username: user?.username || 'Unknown',
+          ...(sealedPoolData ? { sealedPool: sealedPoolData as never } : {}),
         },
       });
       const newCount = await prisma.tournamentParticipant.count({
