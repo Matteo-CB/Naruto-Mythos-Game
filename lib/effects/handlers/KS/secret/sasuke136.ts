@@ -89,4 +89,6 @@ export function registerSasuke136Handlers(): void {
   registerEffect('KS-136-S', 'UPGRADE', sasuke136UpgradeHandler);
   registerEffect('KS-136-MV', 'MAIN', sasuke136MainHandler);
   registerEffect('KS-136-MV', 'UPGRADE', sasuke136UpgradeHandler);
+  registerEffect('KS-136-L', 'MAIN', sasuke136MainHandler);
+  registerEffect('KS-136-L', 'UPGRADE', sasuke136UpgradeHandler);
 }

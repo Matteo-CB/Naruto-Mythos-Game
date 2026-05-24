@@ -5423,6 +5423,42 @@
       "data_complete": false,
       "old_id": "108/130 V"
     },
+    "KS-108_2-MV": {
+      "id": "KS-108_2-MV",
+      "rarity": "MV",
+      "number": "108",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Jutsu du Multiclonage",
+      "title_en": "Shadow Clone Jutsu",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos_v/KS-108_2-MV.webp",
+      "rarity_display": "Mythos V",
+      "image_file": "images/cards/KS/mythos_v/KS-108_2-MV.webp",
+      "data_complete": true,
+      "old_id": "108/130 V"
+    },
     "KS-104-RA": {
       "id": "KS-104-RA",
       "rarity": "RA",
@@ -6654,6 +6690,42 @@
       "image_file": "images/cards/KS/mythos_v/KS-136-MV.webp",
       "data_complete": true,
       "old_id": ""
+    },
+    "KS-136-L": {
+      "id": "KS-136-L",
+      "rarity": "L",
+      "number": "136",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_fr": "SASUKE UCHIWA",
+      "title_fr": "Marque maudite du Ciel",
+      "title_en": "Heaven Curse Mark",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 8,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When a character is defeated, gain 1 Chakra.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/legendary/KS-136-L.webp",
+      "rarity_display": "Legendary",
+      "image_file": "images/cards/KS/legendary/KS-136-L.webp",
+      "data_complete": true,
+      "old_id": "0001/1500"
     },
     "KS-104-MV": {
       "id": "KS-104-MV",

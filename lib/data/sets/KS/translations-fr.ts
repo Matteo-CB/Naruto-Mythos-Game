@@ -306,11 +306,16 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   
   'KS-136-MV': [
     '[⧗] Quand un personnage est vaincu, gagnez 1 Chakra.',
-    'Vous devez choisir un personnage allie non cache et un personnage ennemi dans cette mission et les vaincre, si possible.',
+    'Vous devez choisir un personnage allié non caché et un personnage ennemi dans cette mission et les vaincre, si possible.',
   ],
 
-  
-  
+
+  'KS-136-L': [
+    '[⧗] Quand un personnage est vaincu, gagnez 1 Chakra.',
+    'Vous devez choisir un personnage allié non caché et un personnage ennemi dans cette mission et les vaincre, si possible.',
+  ],
+
+
   'KS-137-S': [
     'Deplacez ce personnage sur une autre mission.',
     'Cachez un personnage ameliore dans cette mission.',
@@ -947,7 +952,13 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   
   'KS-108-MV': [
     'Cachez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
-    'MAIN effect : POWERUP X ou X est la Puissance du personnage ennemi qui est cache.',
+    'MAIN effect : POWERUP X où X est la Puissance du personnage ennemi qui est caché.',
+  ],
+
+
+  'KS-108_2-MV': [
+    'Cachez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
+    'MAIN effect : POWERUP X où X est la Puissance du personnage ennemi qui est caché.',
   ],
 
   

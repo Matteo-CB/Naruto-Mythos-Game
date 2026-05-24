@@ -15,18 +15,8 @@ import { HomeMenuButton } from '@/components/HomeMenuButton';
 
 
 const FEATURED_CARDS = [
-  { src: '/images/cards/KS/mythos_v/KS-104-MV.webp', alt: 'Tsunade - Mythos V', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos_v/KS-108-MV.webp', alt: 'Naruto Uzumaki - Mythos V', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos_v/KS-111-MV.webp', alt: 'Shikamaru Nara - Mythos V', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos_v/KS-113-MV.webp', alt: 'Kiba Inuzuka - Mythos V', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos_v/KS-117-MV.webp', alt: 'Rock Lee - Mythos V', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos_v/KS-120-MV.webp', alt: 'Gaara - Mythos V', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos_v/KS-128-MV.webp', alt: 'Itachi Uchiwa - Mythos V', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos_v/KS-133-MV.webp', alt: 'Naruto Rasengan - Mythos V', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos_v/KS-133_2-MV.webp', alt: 'Naruto Rasengan Alt - Mythos V', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos_v/KS-135-MV.webp', alt: 'Sakura Haruno - Mythos V', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos_v/KS-136-MV.webp', alt: 'Sasuke Uchiwa - Mythos V', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos_v/KS-137-MV.webp', alt: 'Kakashi Hatake - Mythos V', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-108_2-MV.webp', alt: 'Naruto Uzumaki - Shadow Clone Jutsu', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/legendary/KS-136-L.webp', alt: 'Sasuke Uchiwa - Heaven Curse Mark', rarity: 'legendary' as const },
 ];
 
 

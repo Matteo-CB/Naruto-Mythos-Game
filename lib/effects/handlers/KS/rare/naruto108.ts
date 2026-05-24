@@ -46,4 +46,6 @@ function naruto108MainHandler(ctx: EffectContext): EffectResult {
 
 export function registerNaruto108Handlers(): void {
   registerEffect('KS-108-R', 'MAIN', naruto108MainHandler);
+  registerEffect('KS-108-MV', 'MAIN', naruto108MainHandler);
+  registerEffect('KS-108_2-MV', 'MAIN', naruto108MainHandler);
 }

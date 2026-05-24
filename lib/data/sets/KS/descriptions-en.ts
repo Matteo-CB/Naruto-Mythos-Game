@@ -820,7 +820,13 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.',
   ],
 
-  
+
+  'KS-136-L': [
+    '[⧗] When a character is defeated, gain 1 Chakra.',
+    'You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.',
+  ],
+
+
   'KS-137-S': [
     'Move this character to another mission.',
     'Hide an upgraded character in this mission.',
@@ -936,6 +942,12 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   
   'KS-108-MV': [
+    'Hide an enemy character with Power 3 or less in this mission.',
+    'MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.',
+  ],
+
+
+  'KS-108_2-MV': [
     'Hide an enemy character with Power 3 or less in this mission.',
     'MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.',
   ],
