@@ -2588,6 +2588,7 @@
     "deleteTournament": "Delete Tournament",
     "deleteTournamentWarning": "This will permanently delete the tournament and all its data from the database. This cannot be undone.",
     "deleteTournamentConfirm": "Are you sure you want to permanently delete this tournament?",
+    "confirmDelete": "Confirm Delete",
     "backToList": "Back to Tournaments",
     "name": "Tournament Name",
     "namePlaceholder": "Enter a name...",

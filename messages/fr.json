@@ -2588,6 +2588,7 @@
     "deleteTournament": "Supprimer le tournoi",
     "deleteTournamentWarning": "Ceci supprimera définitivement le tournoi et toutes ses données de la base de données. Cette action est irréversible.",
     "deleteTournamentConfirm": "Êtes-vous sûr de vouloir supprimer définitivement ce tournoi ?",
+    "confirmDelete": "Confirmer la suppression",
     "backToList": "Retour aux tournois",
     "name": "Nom du tournoi",
     "namePlaceholder": "Entrez un nom...",

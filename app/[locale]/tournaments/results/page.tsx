@@ -10,6 +10,9 @@ import { Footer } from '@/components/Footer';
 import { TournamentCard } from '@/components/tournament/TournamentCard';
 import type { TournamentData } from '@/stores/tournamentStore';
 
+const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
+
 type FilterTab = 'all' | 'simulator';
 
 export default function TournamentResultsPage() {
@@ -21,6 +24,13 @@ export default function TournamentResultsPage() {
   const [results, setResults] = useState<TournamentData[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterTab, setFilterTab] = useState<FilterTab>('all');
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const isAdmin =
+    ADMIN_EMAILS.includes(session?.user?.email ?? '') ||
+    ADMIN_USERNAMES.includes(session?.user?.name ?? '');
 
   useEffect(() => { if (status === 'unauthenticated') router.replace('/login'); }, [status, router]);
 
@@ -34,6 +44,26 @@ export default function TournamentResultsPage() {
   }, [session]);
 
   const filteredResults = filterTab === 'all' ? results : results.filter((r) => r.type === filterTab);
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    setDeleteError(null);
+    try {
+      const res = await fetch(`/api/tournaments/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setDeleteError(data?.error ?? 'Failed to delete');
+        setDeletingId(null);
+        return;
+      }
+      setResults((prev) => prev.filter((r) => r.id !== id));
+      setConfirmId(null);
+      setDeletingId(null);
+    } catch {
+      setDeleteError('Network error');
+      setDeletingId(null);
+    }
+  };
 
   if (status === 'loading' || status === 'unauthenticated') {
     return (
@@ -126,11 +156,53 @@ export default function TournamentResultsPage() {
             ) : filteredResults.length === 0 ? (
               <p className="font-display text-sm uppercase tracking-widest text-center py-10" style={{ color: '#555' }}>{t('noResults')}</p>
             ) : (
-              <div className="flex flex-col gap-3">
+              <div
+                className="flex flex-col gap-3"
+                style={filteredResults.length > 5 ? { maxHeight: '60vh', overflowY: 'auto', paddingRight: '4px' } : undefined}
+              >
+                {deleteError && (
+                  <p className="font-display text-[11px] uppercase tracking-widest" style={{ color: '#d97676' }}>
+                    {deleteError}
+                  </p>
+                )}
                 {filteredResults.map((tournament) => (
-                  <Link key={tournament.id} href={('/tournaments/' + tournament.id) as '/'} className="block">
-                    <TournamentCard tournament={tournament} />
-                  </Link>
+                  <div key={tournament.id} className="flex flex-col gap-1">
+                    <Link href={('/tournaments/' + tournament.id) as '/'} className="block">
+                      <TournamentCard tournament={tournament} />
+                    </Link>
+                    {isAdmin && (
+                      <div className="flex justify-end gap-2 px-1">
+                        {confirmId === tournament.id ? (
+                          <>
+                            <button
+                              onClick={() => setConfirmId(null)}
+                              disabled={deletingId === tournament.id}
+                              className="font-display px-3 py-1 text-[10px] uppercase tracking-widest cursor-pointer transition-colors"
+                              style={{ color: '#888', backgroundColor: 'rgba(255,255,255,0.03)' }}
+                            >
+                              {tc('cancel')}
+                            </button>
+                            <button
+                              onClick={() => handleDelete(tournament.id)}
+                              disabled={deletingId === tournament.id}
+                              className="font-display px-3 py-1 text-[10px] uppercase tracking-widest cursor-pointer transition-colors"
+                              style={{ color: '#d97676', backgroundColor: 'rgba(217,118,118,0.12)' }}
+                            >
+                              {deletingId === tournament.id ? tc('loading') : t('confirmDelete')}
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmId(tournament.id)}
+                            className="font-display px-3 py-1 text-[10px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[#d97676]"
+                            style={{ color: '#666', backgroundColor: 'rgba(255,255,255,0.03)' }}
+                          >
+                            {t('deleteTournament')}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             )}

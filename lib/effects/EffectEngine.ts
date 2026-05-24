@@ -7742,7 +7742,8 @@ export class EffectEngine {
           for (const c of [...m.player1Characters, ...m.player2Characters]) {
             if (c.instanceId === pendingEffect.sourceInstanceId) continue;
             const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-            if ((topCard.chakra ?? 0) <= 5) k123DefeatTargets.push(c.instanceId);
+            const targetCost = c.isHidden ? 0 : (topCard.chakra ?? 0);
+            if (targetCost <= 5) k123DefeatTargets.push(c.instanceId);
           }
         }
         if (k123DefeatTargets.length === 0) {
@@ -7752,15 +7753,16 @@ export class EffectEngine {
           break;
         }
         if (k123Hand.length === 1) {
-          
+
           newState = EffectEngine.discardFromHand(newState, k123Player, 0);
-          
+
           const k123DefeatAfter: string[] = [];
           for (const m of newState.activeMissions) {
             for (const c of [...m.player1Characters, ...m.player2Characters]) {
               if (c.instanceId === pendingEffect.sourceInstanceId) continue;
               const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-              if ((topCard.chakra ?? 0) <= 5) k123DefeatAfter.push(c.instanceId);
+              const targetCost = c.isHidden ? 0 : (topCard.chakra ?? 0);
+              if (targetCost <= 5) k123DefeatAfter.push(c.instanceId);
             }
           }
           if (k123DefeatAfter.length === 1) {
@@ -10901,7 +10903,8 @@ export class EffectEngine {
             for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
               if (char.instanceId === pendingEffect.sourceInstanceId) continue;
               const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-              if ((topCard.chakra ?? 0) <= 5) {
+              const targetCost = char.isHidden ? 0 : (topCard.chakra ?? 0);
+              if (targetCost <= 5) {
                 defeatTargets_k.push(char.instanceId);
               }
             }

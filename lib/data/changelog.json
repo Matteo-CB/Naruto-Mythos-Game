@@ -2,15 +2,19 @@
   "entries": [
     {
       "date": "2026-05-24",
-      "title_fr": "Correction Kidômaru et sélection de deck simplifiée",
-      "title_en": "Kidômaru fix and simpler deck selection",
+      "title_fr": "Kidômaru, Kimimaro, sélection de deck simplifiée, admin tournois",
+      "title_en": "Kidômaru, Kimimaro, simpler deck selection, tournament admin",
       "changes_fr": [
         "Bug corrigé : Kidômaru (3 chakra) pouvait se déplacer lui-même au lieu de ne déplacer que des alliés, et le même personnage pouvait être choisi plusieurs fois pour les déplacements successifs. La liste des cibles est désormais figée au moment où l'effet est joué, et chaque carte ne peut être déplacée qu'une seule fois.",
-        "Sélection de deck avant une partie : seuls les 5 premiers decks s'affichent, avec un bouton Afficher plus pour voir les suivants par paquet de 10. Plus de zone défilable interne ni de barre de recherche qui coupait l'affichage."
+        "Bug corrigé : Kimimaro (6 chakra, version améliorée) ne pouvait pas viser un personnage caché à cause de son coût imprimé élevé. Les cartes cachées sont considérées comme coût 0, donc elles sont maintenant des cibles valides pour son effet vaincre.",
+        "Sélection de deck avant une partie : seuls les 5 premiers decks s'affichent, avec un bouton Afficher plus pour voir les suivants par paquet de 10. Plus de zone défilable interne ni de barre de recherche qui coupait l'affichage.",
+        "Admin : un bouton Supprimer le tournoi apparaît sur chaque tournoi terminé dans la page des résultats, pour faire le ménage des anciennes parties."
       ],
       "changes_en": [
         "Bug fixed: Kidômaru (3-chakra) could move himself instead of moving only friendly characters, and the same character could be picked multiple times across the successive moves. The target list is now locked at the moment the effect resolves, and each card can only be moved once.",
-        "Pre-game deck selection: only the first 5 decks show up, with a Show More button to load the next 10 at a time. No more internal scroll area or search bar that was cutting off the display."
+        "Bug fixed: Kimimaro (6-chakra upgraded version) could not target a hidden character because of its high printed cost. Hidden cards count as cost 0, so they are now valid targets for his defeat effect.",
+        "Pre-game deck selection: only the first 5 decks show up, with a Show More button to load the next 10 at a time. No more internal scroll area or search bar that was cutting off the display.",
+        "Admin: a Delete Tournament button now appears on every completed tournament in the results page, to clean up old games."
       ]
     },
     {
