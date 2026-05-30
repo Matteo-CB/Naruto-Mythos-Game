@@ -2059,6 +2059,7 @@
     "prizeNone": "None",
     "prizePanelTitle": "Winner Prize",
     "prizeDescription": "Reward granted automatically at tournament completion.",
+    "prizeDisclaimer": "This card is a cosmetic reward for the simulator only. It is not won in real life.",
     "discordRole": "Discord Role Reward",
     "discordRolePlaceholder": "e.g. Tournament Champion",
     "requiresDiscord": "Requires Discord",
@@ -2677,6 +2678,7 @@
     "boostersGrantedToast": "+{count} variant boosters added to your inventory",
     "cardClaimedFallback": "Tier {tier} card unlocked in your collection",
     "animationLabel": "Tier Reward {tier}",
+    "freeNote": "Everything here is fully free, no purchase or payment required.",
     "error": {
       "invalidBody": "Invalid request.",
       "notCardTier": "This tier has no card reward.",

@@ -398,6 +398,7 @@ export default function TournamentDetailPage() {
                     <p className="text-[10px]" style={{ color: '#888' }}>{getCardTitle(card, locale as 'en' | 'fr')}</p>
                     <p className="text-[10px]" style={{ color: '#666' }}>{number} Mythos V</p>
                     <p className="text-[10px] mt-2" style={{ color: '#aaa' }}>{t('prizeDescription')}</p>
+                    <p className="text-[10px] mt-2 italic" style={{ color: '#888' }}>{t('prizeDisclaimer')}</p>
                   </>
                 );
               })()}

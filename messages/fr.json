@@ -2059,6 +2059,7 @@
     "prizeNone": "Aucun",
     "prizePanelTitle": "Prix du vainqueur",
     "prizeDescription": "Récompense remise automatiquement à la fin du tournoi.",
+    "prizeDisclaimer": "Cette carte est une récompense cosmétique pour le simulateur uniquement. Elle n'est pas gagnée en vrai.",
     "discordRole": "Rôle Discord récompense",
     "discordRolePlaceholder": "ex. Champion du Tournoi",
     "requiresDiscord": "Discord requis",
@@ -2677,6 +2678,7 @@
     "boostersGrantedToast": "+{count} boosters variantes ajoutés à ton inventaire",
     "cardClaimedFallback": "Carte du palier {tier} débloquée dans ta collection",
     "animationLabel": "Récompense de niveau {tier}",
+    "freeNote": "Tout est entièrement gratuit, aucun achat ni paiement requis.",
     "error": {
       "invalidBody": "Requête invalide.",
       "notCardTier": "Ce palier n'a pas de récompense carte.",

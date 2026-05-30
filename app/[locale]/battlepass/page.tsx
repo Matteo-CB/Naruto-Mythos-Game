@@ -446,6 +446,15 @@ export default function RewardsHubPage() {
         >
           {t('subtitle')}
         </motion.p>
+        <motion.p
+          className="text-[11px] mb-1 italic"
+          style={{ color: '#4a9e4a' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+        >
+          {t('freeNote')}
+        </motion.p>
         {tab === 'quests' && (
           <motion.p
             key="quests-subtitle"
