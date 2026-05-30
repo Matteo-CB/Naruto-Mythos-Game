@@ -15,7 +15,9 @@
         "Nouveau set Akatsuki annoncé en bientôt disponible, avec son booster mystère en attendant l'illustration finale.",
         "Les boosters s'affichent désormais sur une seule ligne avec des flèches pour défiler, et chaque set porte son numéro d'ordre.",
         "La fenêtre des nouveautés s'affiche maintenant au-dessus de tous les autres éléments, même sur la page Récompenses.",
-        "Les récompenses de booster du Battlepass apparaissent désormais en silhouette, sans cadre carré autour."
+        "Les récompenses de booster du Battlepass apparaissent désormais en silhouette, sans cadre carré autour.",
+        "Sur mobile, le premier booster de la liste était caché par le centrage : le défilement horizontal reste maintenant accessible jusqu'au bord.",
+        "Sélection de deck pour une partie : 20 decks visibles d'office (au lieu de 5) pour que tu voies toute ta liste sans avoir à cliquer."
       ],
       "changes_en": [
         "Maximum ELO lost per defeat capped at 24, regardless of your rank.",
@@ -28,7 +30,9 @@
         "New Akatsuki set announced as coming soon, with a placeholder mystery booster until the final artwork.",
         "Boosters now display in a single row with arrows to scroll, and each set shows its order number.",
         "The News window now opens above every other element, including on the Rewards page.",
-        "Booster tier rewards on the Battlepass now show as a silhouette, with no square frame around them."
+        "Booster tier rewards on the Battlepass now show as a silhouette, with no square frame around them.",
+        "On mobile, the first booster in the list was clipped by the centering: the carousel now scrolls all the way to the leftmost item.",
+        "Deck picker when launching a game: 20 decks now visible by default (was 5) so you see your whole list without extra clicks."
       ]
     },
     {

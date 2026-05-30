@@ -32,8 +32,8 @@ interface DeckSelectorProps {
   evolvingOnly?: boolean;
 }
 
-const INITIAL_DECK_LIMIT = 5;
-const LOAD_MORE_STEP = 10;
+const INITIAL_DECK_LIMIT = 20;
+const LOAD_MORE_STEP = 30;
 
 export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnly = false }: DeckSelectorProps) {
   const t = useTranslations();

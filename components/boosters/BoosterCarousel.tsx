@@ -57,8 +57,8 @@ export function BoosterCarousel({ children, stepPx = 304 }: Props) {
       )}
       <div
         ref={scrollRef}
-        className="flex flex-row gap-6 overflow-x-auto scroll-smooth no-scrollbar pb-2 px-1 justify-center"
-        style={{ scrollSnapType: 'x mandatory' }}
+        className="flex flex-row gap-4 sm:gap-6 overflow-x-auto scroll-smooth no-scrollbar pb-2 px-1"
+        style={{ scrollSnapType: 'x mandatory', justifyContent: 'safe center' }}
       >
         {children}
       </div>
