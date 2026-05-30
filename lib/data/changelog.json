@@ -17,7 +17,9 @@
         "La fenêtre des nouveautés s'affiche maintenant au-dessus de tous les autres éléments, même sur la page Récompenses.",
         "Les récompenses de booster du Battlepass apparaissent désormais en silhouette, sans cadre carré autour.",
         "Sur mobile, le premier booster de la liste était caché par le centrage : le défilement horizontal reste maintenant accessible jusqu'au bord.",
-        "Sélection de deck pour une partie : 20 decks visibles d'office (au lieu de 5) pour que tu voies toute ta liste sans avoir à cliquer."
+        "Sélection de deck pour une partie : 20 decks visibles d'office (au lieu de 5) pour que tu voies toute ta liste sans avoir à cliquer.",
+        "Tayuya Rare (125) : quand son effet d'upgrade te propose de jouer un personnage du Village du Son à coût réduit, les cartes s'affichent maintenant correctement (avant : des rectangles avec ??).",
+        "Quand tu essayais de réclamer une quête déjà obtenue via la quête du jour (ou inversement), le message d'erreur affichait la clé brute au lieu d'une vraie phrase. Corrigé en FR et EN."
       ],
       "changes_en": [
         "Maximum ELO lost per defeat capped at 24, regardless of your rank.",
@@ -32,7 +34,9 @@
         "The News window now opens above every other element, including on the Rewards page.",
         "Booster tier rewards on the Battlepass now show as a silhouette, with no square frame around them.",
         "On mobile, the first booster in the list was clipped by the centering: the carousel now scrolls all the way to the leftmost item.",
-        "Deck picker when launching a game: 20 decks now visible by default (was 5) so you see your whole list without extra clicks."
+        "Deck picker when launching a game: 20 decks now visible by default (was 5) so you see your whole list without extra clicks.",
+        "Tayuya Rare (125): when her upgrade effect lets you play a Sound Village character at reduced cost, the cards now display properly (was: blank rectangles with ??).",
+        "When you tried to claim a quest you already claimed as today's daily (or vice-versa), the error message showed the raw key instead of a real sentence. Fixed in both FR and EN."
       ]
     },
     {

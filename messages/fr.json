@@ -2644,7 +2644,14 @@
     "doneTitle": "Quête terminée !",
     "dailyDoneTitle": "Quête quotidienne terminée !",
     "error": {
-      "claimError": "Impossible de réclamer cette quête. Réessaie."
+      "claimError": "Impossible de réclamer cette quête. Réessaie.",
+      "alreadyClaimed": "Cette quête a déjà été réclamée.",
+      "alreadyClaimedAsDaily": "Tu as déjà réclamé cette quête en tant que quête du jour.",
+      "alreadyClaimedAsMain": "Tu as déjà réclamé cette quête depuis la liste principale.",
+      "notCompleted": "Cette quête n'est pas encore terminée.",
+      "noProgress": "Aucune progression sur cette quête.",
+      "notFound": "Quête introuvable.",
+      "serverError": "Erreur serveur, réessaie dans un instant."
     }
   },
   "battlepass": {

@@ -2644,7 +2644,14 @@
     "doneTitle": "Quest completed!",
     "dailyDoneTitle": "Daily quest completed!",
     "error": {
-      "claimError": "Failed to claim quest. Try again."
+      "claimError": "Failed to claim quest. Try again.",
+      "alreadyClaimed": "This quest has already been claimed.",
+      "alreadyClaimedAsDaily": "You already claimed this quest as today's daily.",
+      "alreadyClaimedAsMain": "You already claimed this quest from the main list.",
+      "notCompleted": "This quest is not completed yet.",
+      "noProgress": "No progress on this quest.",
+      "notFound": "Quest not found.",
+      "serverError": "Server error, try again in a moment."
     }
   },
   "battlepass": {

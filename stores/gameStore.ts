@@ -610,35 +610,8 @@ function buildPendingTargetSelectionUI(
           card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
         };
       });
-    } else if (tst === 'TAYUYA125_CHOOSE_SOUND') {
-      
-      let hiddenCharsInfo125: Array<{ instanceId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number }> = [];
-      try { hiddenCharsInfo125 = JSON.parse(pendingEffect?.effectDescription ?? '{}').hiddenChars ?? []; } catch { /* ignore */ }
-      const missionRanks125 = dataSource.activeMissions.map((m) => m.rank || '?');
-      handCards = pendingAction.options.map((optStr, optIdx) => {
-        if (optStr.startsWith('board:')) {
-          const instId = optStr.slice(6);
-          const hInfo = hiddenCharsInfo125.find((h) => h.instanceId === instId);
-          const mLabel = hInfo ? (missionRanks125[hInfo.missionIndex] || `M${hInfo.missionIndex + 1}`) : '?';
-          return {
-            index: optIdx,
-            targetId: optStr,
-            card: hInfo ? {
-              name_fr: hInfo.name_fr, name_en: hInfo.name_en, chakra: hInfo.chakra, power: hInfo.power,
-              image_file: hInfo.image_file, missionLabel: `Mission ${mLabel} (hidden)`,
-            } : { name_fr: '???', missionLabel: '?' },
-          };
-        } else {
-          const idx = parseInt(optStr, 10);
-          const card = dataSource.playerHand[idx];
-          return {
-            index: optIdx,
-            targetId: optStr,
-            card: card ? fullCardData(card) : { name_fr: '???' },
-          };
-        }
-      });
     } else if (
+      tst === 'TAYUYA125_CHOOSE_SOUND' ||
       tst === 'JIRAIYA_CHOOSE_SUMMON' || tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
       tst === 'JIRAIYA105_CHOOSE_SUMMON' || tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
       tst === 'HIRUZEN002_CHOOSE_CARD'
