@@ -74,10 +74,8 @@ export function MatchInviteToast({ invite, onDismiss, onAccepted }: MatchInviteT
     >
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <span
-            className="text-sm font-medium"
-            style={{ color: '#e0e0e0' }}
-          >
+          <span className="flex items-center gap-2 text-sm font-medium" style={{ color: '#e0e0e0' }}>
+            <img src="/images/icons/match-invite.svg" alt="" draggable={false} style={{ width: 16, height: 16, opacity: 0.7 }} />
             {t('inviteFrom', { name: invite.user.username })}
           </span>
         </div>

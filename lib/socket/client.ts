@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import type { VisibleGameState, GameAction } from '@/lib/engine/types';
 import { useSocialStore } from '@/stores/socialStore';
 import { useUIStore } from '@/stores/uiStore';
+import { useToastStore } from '@/stores/toastStore';
 
 const CONNECT_TIMEOUT_MS = 10000;
 
@@ -53,6 +54,7 @@ export function buildGameCancelledStateReset(reason: 'mulligan-idle', roomCode: 
     playerRole: null,
     opponentJoined: false,
     opponentDisconnected: false,
+    opponentForfeitAt: null,
     playerNames: null,
     currentRoomGameMode: null,
     rematchState: 'none' as const,
@@ -104,6 +106,14 @@ interface SocketStore {
     gameId?: string | null;
     replayData?: unknown;
     tournamentId?: string | null;
+    performanceBonus?: {
+      scoreBonus: number;
+      boardBonus: number;
+      total: number;
+      scoreGap: number;
+      loserBoardCount: number;
+      applied: boolean;
+    } | null;
   } | null;
   gameCancelled: { reason: 'mulligan-idle'; roomCode: string } | null;
   chessClock: ChessClockBroadcast | null;
@@ -169,8 +179,9 @@ interface SocketStore {
 
   
   opponentDisconnected: boolean;
+  opponentForfeitAt: number | null;
 
-  
+
   pendingReconnect: { roomCode: string; playerRole: 'player1' | 'player2' } | null;
   dismissReconnect: () => void;
   acceptReconnect: () => void;
@@ -224,6 +235,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   unreadChatCount: 0,
   chatOpen: false,
   opponentDisconnected: false,
+  opponentForfeitAt: null,
   pendingReconnect: null,
   activeGames: (() => {
     try {
@@ -301,7 +313,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('disconnect', (reason) => {
         console.log('[Socket] Disconnected, reason:', reason);
-        set({ connected: false, opponentDisconnected: false });
+        set({ connected: false, opponentDisconnected: false, opponentForfeitAt: null });
         
         if (reason === 'io server disconnect') {
           set({ error: 'Disconnected by server.', errorKey: 'game.error.connectionLost' });
@@ -438,7 +450,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('game:started', () => {
         console.log('[Socket] Game started');
-        set({ gameStarted: true, _lastStateUpdate: Date.now(), opponentDisconnected: false });
+        set({ gameStarted: true, _lastStateUpdate: Date.now(), opponentDisconnected: false, opponentForfeitAt: null });
 
         
         
@@ -512,11 +524,19 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           gameId?: string | null;
           replayData?: unknown;
           tournamentId?: string | null;
+          performanceBonus?: {
+            scoreBonus: number;
+            boardBonus: number;
+            total: number;
+            scoreGap: number;
+            loserBoardCount: number;
+            applied: boolean;
+          } | null;
         }) => {
           console.log('[Socket] Game ended, winner:', data.winner, 'reason:', data.winReason, 'gameId:', data.gameId, 'tournament:', data.tournamentId ?? 'none');
           const resyncT = get()._resyncTimer;
           if (resyncT) { clearInterval(resyncT); }
-          set({ gameEnded: true, gameResult: data, chessClock: null, _resyncTimer: null, opponentDisconnected: false });
+          set({ gameEnded: true, gameResult: data, chessClock: null, _resyncTimer: null, opponentDisconnected: false, opponentForfeitAt: null });
         },
       );
 
@@ -656,14 +676,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ rematchState: 'declined' });
       });
 
-      socket.on('game:opponent-disconnected', () => {
+      socket.on('game:opponent-disconnected', (data?: { forfeitAt?: number; forfeitMs?: number }) => {
         console.log('[Socket] Opponent disconnected');
-        set({ opponentDisconnected: true });
+        set({ opponentDisconnected: true, opponentForfeitAt: typeof data?.forfeitAt === 'number' ? data.forfeitAt : null });
       });
 
       socket.on('game:opponent-reconnected', () => {
         console.log('[Socket] Opponent reconnected');
-        set({ opponentDisconnected: false });
+        set({ opponentDisconnected: false, opponentForfeitAt: null });
       });
 
       socket.on('game:active-game', (data: { roomCode: string; playerRole: 'player1' | 'player2' }) => {
@@ -798,6 +818,42 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('chat:history', (data: { messages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }> }) => {
         set({ chatMessages: data.messages ?? [] });
+      });
+
+      socket.on('quest:progress', (data: {
+        questId: string;
+        isDaily: boolean;
+        progress: number;
+        target: number;
+        completedNow: boolean;
+        text_fr: string;
+        text_en: string;
+      }) => {
+        const locale = typeof document !== 'undefined' && document.documentElement.lang === 'fr' ? 'fr' : 'en';
+        const text = locale === 'fr' ? data.text_fr : data.text_en;
+        const scope = data.isDaily ? 'd' : 's';
+        if (data.completedNow) {
+          useToastStore.getState().showToast({
+            type: 'info',
+            titleKey: data.isDaily ? 'quests.dailyDoneTitle' : 'quests.doneTitle',
+            message: text,
+            dedupeKey: `quest-done-${data.questId}-${scope}`,
+            durationMs: 4000,
+          });
+        } else {
+          useToastStore.getState().showToast({
+            type: 'info',
+            message: `${text} (${data.progress}/${data.target})`,
+            dedupeKey: `quest-progress-${data.questId}-${scope}`,
+            durationMs: 3000,
+          });
+        }
+      });
+
+      socket.on('daily-quest:rotated', () => {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('daily-quest:rotated'));
+        }
       });
 
       socket.on('chat:error', (data: { message: string; errorKey?: string }) => {
@@ -1071,6 +1127,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         gameStarted: true,
         pendingReconnect: null,
         opponentDisconnected: false,
+        opponentForfeitAt: null,
       });
     }
   },

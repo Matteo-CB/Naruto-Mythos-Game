@@ -12,6 +12,8 @@ import { useTrainingStore } from '@/stores/trainingStore';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { AIDifficulty } from '@/lib/ai/AIPlayer';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
+import { isVariantRarity } from '@/lib/variants/constants';
+import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 
 interface ResolvedDeck {
   characters: CharacterCard[];
@@ -39,6 +41,7 @@ export default function TrainingPage() {
   const [selectedDeck, setSelectedDeck] = useState<ResolvedDeck | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { bannedIds } = useBannedCards();
+  const { unlockedIds } = useUnlockedVariants();
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
@@ -54,11 +57,12 @@ export default function TrainingPage() {
     setIsLoading(true);
 
     const availableChars = cards.characters.filter((c) => !bannedIds.has(c.id));
+    const randomPool = availableChars.filter((c) => !isVariantRarity(c.rarity) || unlockedIds.has(c.id));
     const availableMissions = cards.missions.filter((m) => !bannedIds.has(m.id));
 
     const player1Deck = selectedDeck
       ? selectedDeck.characters
-      : [...availableChars].sort(() => Math.random() - 0.5).slice(0, 30);
+      : [...randomPool].sort(() => Math.random() - 0.5).slice(0, 30);
     const player1Missions = selectedDeck
       ? selectedDeck.missions
       : [...availableMissions].sort(() => Math.random() - 0.5).slice(0, 3);

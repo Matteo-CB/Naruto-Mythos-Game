@@ -1,15 +1,11 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 const STR = {
   en: { title: 'Application Error', defaultMsg: 'An unexpected error occurred.', tryAgain: 'Try Again', home: 'Home' },
   fr: { title: 'Erreur de l\'application', defaultMsg: 'Une erreur inattendue s\'est produite.', tryAgain: 'Réessayer', home: 'Accueil' },
 } as const;
-
-function readLocaleCookie(): 'en' | 'fr' {
-  if (typeof document === 'undefined') return 'fr';
-  const m = document.cookie.match(/(?:^|;\s*)NEXT_LOCALE=(en|fr)/);
-  return m ? (m[1] as 'en' | 'fr') : 'fr';
-}
 
 export default function GlobalError({
   error,
@@ -18,7 +14,13 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const lang = readLocaleCookie();
+  const [lang, setLang] = useState<'en' | 'fr'>('fr');
+
+  useEffect(() => {
+    const m = document.cookie.match(/(?:^|;\s*)NEXT_LOCALE=(en|fr)/);
+    if (m) setLang(m[1] as 'en' | 'fr');
+  }, []);
+
   const s = STR[lang];
   return (
     <html lang={lang}>

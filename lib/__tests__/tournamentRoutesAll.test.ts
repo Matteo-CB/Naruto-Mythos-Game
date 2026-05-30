@@ -40,6 +40,9 @@ vi.mock('@/lib/tournament/leagueUtils', () => ({
 vi.mock('@/lib/tournament/deckValidation', () => ({
   validateDeckForTournament: vi.fn(() => ({ valid: true, errors: [] })),
 }));
+vi.mock('@/lib/variants/serverValidation', () => ({
+  validateDeckVariantUnlocks: vi.fn(async () => ({ ok: true, lockedCardIds: [] })),
+}));
 vi.mock('@/lib/tournament/startLogic', () => ({
   executeTournamentStart: vi.fn(() => ({ ok: true })),
 }));
@@ -49,6 +52,7 @@ vi.mock('@/lib/tournament/tournamentEngine', () => ({
 
 import { prisma } from '@/lib/db/prisma';
 import { auth } from '@/lib/auth/authOptions';
+import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
 import { POST as leavePOST } from '../../app/api/tournaments/[id]/leave/route';
 import { POST as selectDeckPOST } from '../../app/api/tournaments/[id]/select-deck/route';
 import { POST as pairingsPOST } from '../../app/api/tournaments/[id]/pairings/route';
@@ -172,6 +176,18 @@ describe('POST /api/tournaments/[id]/select-deck', () => {
     p.deck.findUnique.mockResolvedValue({ id: 'd1', userId: 'someone-else' });
     const res = await selectDeckPOST(req({ deckId: 'd1' }) as never, { params: params('t1') });
     expect(res.status).toBe(404);
+  });
+  it('rejects a deck containing an unowned locked variant', async () => {
+    authMock.mockResolvedValue({ user: { id: 'u1' } });
+    p.tournament.findUnique.mockResolvedValue({ id: 't1', status: 'registration', gameMode: 'classic', useBanList: false });
+    p.tournamentParticipant.findFirst.mockResolvedValue({ id: 'p1', deckId: null, deckValid: false });
+    p.deck.findUnique.mockResolvedValue({ id: 'd1', userId: 'u1', cardIds: ['KS-107-MV'], missionIds: [] });
+    (validateDeckVariantUnlocks as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ok: false, lockedCardIds: ['KS-107-MV'] });
+    const res = await selectDeckPOST(req({ deckId: 'd1' }) as never, { params: params('t1') });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.errorKey).toBe('deckBuilder.error.variantLocked');
+    expect(p.tournamentParticipant.update).not.toHaveBeenCalled();
   });
   it('compensating-action rolls back if status flipped during select', async () => {
     authMock.mockResolvedValue({ user: { id: 'u1' } });

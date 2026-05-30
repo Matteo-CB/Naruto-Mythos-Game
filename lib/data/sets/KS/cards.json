@@ -5387,6 +5387,42 @@
       "old_id": "120/130",
       "is_rare_art": false
     },
+    "KS-107-MV": {
+      "id": "KS-107-MV",
+      "rarity": "MV",
+      "number": "107",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_fr": "SASUKE UCHIWA",
+      "title_fr": "Chidori",
+      "title_en": "Chidori",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "You must move all other non-hidden friendly characters from this mission, if able.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP X where X is the number of the characters moved this way.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos_v/KS-107-MV.webp",
+      "rarity_display": "Mythos V",
+      "image_file": "images/cards/KS/mythos_v/KS-107-MV.webp",
+      "data_complete": true,
+      "old_id": "107/130 V"
+    },
     "KS-108-MV": {
       "id": "KS-108-MV",
       "rarity": "MV",

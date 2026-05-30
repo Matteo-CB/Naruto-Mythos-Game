@@ -8,6 +8,9 @@ import { Link } from "@/lib/i18n/navigation";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { validateDeck } from "@/lib/engine/rules/DeckValidation";
 import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
+import { useUnlockedVariants } from "@/lib/hooks/useUnlockedVariants";
+import { isVariantCard } from "@/lib/variants/isVariant";
+import { useTrackOnMount, trackUiHook } from "@/lib/hooks/useTrackUi";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
 import {
@@ -468,6 +471,7 @@ export default function DeckBuilderPage() {
   const setDeckName = useDeckBuilderStore((s) => s.setDeckName);
   const addChar = useDeckBuilderStore((s) => s.addChar);
   const removeChar = useDeckBuilderStore((s) => s.removeChar);
+  const removeLockedVariants = useDeckBuilderStore((s) => s.removeLockedVariants);
   const addMission = useDeckBuilderStore((s) => s.addMission);
   const removeMission = useDeckBuilderStore((s) => s.removeMission);
   const clearDeck = useDeckBuilderStore((s) => s.clearDeck);
@@ -481,7 +485,14 @@ export default function DeckBuilderPage() {
   const clearAddError = useDeckBuilderStore((s) => s.clearAddError);
   const sortCharsByCost = useDeckBuilderStore((s) => s.sortCharsByCost);
   const sortCharsByName = useDeckBuilderStore((s) => s.sortCharsByName);
+  const setUnlockedVariantIds = useDeckBuilderStore((s) => s.setUnlockedVariantIds);
   const { bannedIds } = useBannedCards();
+  const { unlockedIds: unlockedVariantIds, loading: variantsLoading } = useUnlockedVariants();
+  useTrackOnMount('ui.deck_builder.opened');
+
+  useEffect(() => {
+    setUnlockedVariantIds(unlockedVariantIds);
+  }, [unlockedVariantIds, setUnlockedVariantIds]);
   const [showAltArt, setShowAltArt] = useState(true);
   type DeckViewMode = 'grid' | 'rows';
   type DeckGroupBy = 'chakra' | 'group' | 'rarity' | 'power' | 'keyword' | 'effect';
@@ -546,6 +557,23 @@ export default function DeckBuilderPage() {
   const filteredMissions = useMemo(() => [...availableMissions], [availableMissions]);
 
   const validation = useMemo(() => validateDeck(deckChars, deckMissions), [deckChars, deckMissions]);
+
+  const lockedVariantsInDeck = useMemo(() => {
+    if (variantsLoading) return [];
+    const seen = new Set<string>();
+    const result: CharacterCard[] = [];
+    for (const c of deckChars) {
+      if (isVariantCard(c) && !unlockedVariantIds.has(c.id) && !seen.has(c.id)) {
+        seen.add(c.id);
+        result.push(c);
+      }
+    }
+    return result;
+  }, [deckChars, unlockedVariantIds, variantsLoading]);
+
+  const handleRepairLockedVariants = useCallback(() => {
+    removeLockedVariants();
+  }, [removeLockedVariants]);
 
   const deckCardCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -785,6 +813,7 @@ export default function DeckBuilderPage() {
     navigator.clipboard.writeText(exportCode).then(() => {
       setExportCopied(true);
       setTimeout(() => setExportCopied(false), 2000);
+      trackUiHook('deck.exported');
     });
   }, [exportCode]);
 
@@ -1316,6 +1345,23 @@ export default function DeckBuilderPage() {
             </div>
           )}
 
+          {lockedVariantsInDeck.length > 0 && (
+            <div className="px-4 py-1 flex-shrink-0">
+              <div className="flex items-center gap-3 text-[10px] py-1.5 px-2.5" style={{
+                backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a',
+              }}>
+                <span className="flex-1">
+                  {t("deckBuilder.lockedVariantsWarning", { count: lockedVariantsInDeck.length })}
+                </span>
+                <button onClick={handleRepairLockedVariants}
+                  className="uppercase font-bold py-1 px-2.5 no-select flex-shrink-0"
+                  style={{ backgroundColor: 'rgba(196,163,90,0.2)', color: '#c4a35a', letterSpacing: '0.08em' }}>
+                  {t("deckBuilder.repairDeck")}
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="flex-1 overflow-y-auto px-4 py-3" style={{ minHeight: 0 }}>
             {evolvingMode && (
               <div className="mb-3">
@@ -1667,6 +1713,20 @@ export default function DeckBuilderPage() {
             </div>
           ) : (
             <div className="px-3 py-2 pb-4">
+              {lockedVariantsInDeck.length > 0 && (
+                <div className="flex items-center gap-3 text-[10px] py-1.5 px-2.5 mb-2" style={{
+                  backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a',
+                }}>
+                  <span className="flex-1">
+                    {t("deckBuilder.lockedVariantsWarning", { count: lockedVariantsInDeck.length })}
+                  </span>
+                  <button onClick={handleRepairLockedVariants}
+                    className="uppercase font-bold py-1 px-2.5 no-select flex-shrink-0"
+                    style={{ backgroundColor: 'rgba(196,163,90,0.2)', color: '#c4a35a', letterSpacing: '0.08em' }}>
+                    {t("deckBuilder.repairDeck")}
+                  </button>
+                </div>
+              )}
               {renderDeckContent()}
             </div>
           )}
@@ -1911,7 +1971,7 @@ export default function DeckBuilderPage() {
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="480px">
             <PopupTitle accentColor="#c4a35a" size="lg">{t("deckBuilder.exportTitle")}</PopupTitle>
             <div className="flex gap-2 mb-4">
-              <PopupActionButton accentColor="#c4a35a" onClick={() => { exportDeckAsImage(deckName, deckChars, deckMissions); setShowExportModal(false); }}>
+              <PopupActionButton accentColor="#c4a35a" onClick={() => { exportDeckAsImage(deckName, deckChars, deckMissions); trackUiHook('deck.exported'); setShowExportModal(false); }}>
                 {t("deckBuilder.exportAsImage")}
               </PopupActionButton>
             </div>

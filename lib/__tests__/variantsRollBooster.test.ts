@@ -1,0 +1,161 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { CardData, Rarity } from '@/lib/engine/types';
+import { rollVariantBooster } from '@/lib/variants/rollBooster';
+import { mulberry32 } from '@/lib/variants/rng';
+import { BOOSTER_EXCLUDED_VARIANTS, VARIANT_PACK_PROBABILITIES, VARIANT_PACK_SIZE } from '@/lib/variants/constants';
+
+function mockCard(id: string, rarity: Rarity, set = 'KS'): CardData {
+  return {
+    id,
+    cardId: id,
+    set,
+    number: parseInt(id.split('-')[1], 10) || 0,
+    name_fr: id,
+    title_fr: '',
+    name_en: id,
+    title_en: '',
+    rarity,
+    card_type: 'character',
+    has_visual: true,
+    chakra: 1,
+    power: 1,
+    keywords: [],
+    group: '',
+    effects: [],
+  };
+}
+
+const RA_POOL = Array.from({ length: 20 }, (_, i) => mockCard(`KS-${100 + i}-RA`, 'RA'));
+const MV_POOL = [
+  mockCard('KS-141-MV', 'MV'),
+  mockCard('KS-142-MV', 'MV'),
+  mockCard('KS-143-MV', 'MV'),
+];
+const SV_POOL = [
+  mockCard('KS-132-SV', 'SV'),
+  mockCard('KS-140-SV', 'SV'),
+];
+const L_POOL = [
+  mockCard('KS-117-L', 'L'),
+  mockCard('KS-133-L', 'L'),
+];
+const EXCLUDED = [
+  mockCard('KS-108-MV', 'MV'),
+  mockCard('KS-120-MV', 'MV'),
+  mockCard('KS-128-MV', 'MV'),
+  mockCard('KS-137-MV', 'MV'),
+  mockCard('KS-133-MV', 'MV'),
+  mockCard('KS-133_2-MV', 'MV'),
+];
+const SS_VARIANTS = [mockCard('SS-001-RA', 'RA', 'SS')];
+
+vi.mock('@/lib/data/cardLoader', () => ({
+  getAllCards: () =>
+    [
+      ...RA_POOL,
+      ...MV_POOL,
+      ...SV_POOL,
+      ...L_POOL,
+      ...EXCLUDED,
+      ...SS_VARIANTS,
+      mockCard('KS-001-C', 'C'),
+      mockCard('KS-130-R', 'R'),
+    ],
+}));
+
+describe('rollVariantBooster', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns 3 cards per booster', () => {
+    const rng = mulberry32(42);
+    const pack = rollVariantBooster('KS', { rng });
+    expect(pack).toHaveLength(VARIANT_PACK_SIZE);
+  });
+
+  it('only rolls variant rarities', () => {
+    const rng = mulberry32(1234);
+    for (let i = 0; i < 100; i++) {
+      const pack = rollVariantBooster('KS', { rng });
+      for (const card of pack) {
+        expect(['RA', 'MV', 'SV', 'L']).toContain(card.rarity);
+      }
+    }
+  });
+
+  it('never rolls excluded MVs', () => {
+    const rng = mulberry32(7);
+    for (let i = 0; i < 500; i++) {
+      const pack = rollVariantBooster('KS', { rng });
+      for (const card of pack) {
+        expect(BOOSTER_EXCLUDED_VARIANTS.has(card.cardId)).toBe(false);
+      }
+    }
+  });
+
+  it('only rolls cards from the requested set', () => {
+    const rng = mulberry32(99);
+    for (let i = 0; i < 200; i++) {
+      const pack = rollVariantBooster('KS', { rng });
+      for (const card of pack) {
+        expect(card.set).toBe('KS');
+      }
+    }
+  });
+
+  it('forceL mode guarantees a Legendary in slot 1', () => {
+    const rng = mulberry32(11);
+    for (let i = 0; i < 20; i++) {
+      const pack = rollVariantBooster('KS', { rng, mode: 'forceL' });
+      expect(pack[0]?.rarity).toBe('L');
+    }
+  });
+
+  it('forceSV mode guarantees a Secret Variant in slot 1', () => {
+    const rng = mulberry32(13);
+    for (let i = 0; i < 20; i++) {
+      const pack = rollVariantBooster('KS', { rng, mode: 'forceSV' });
+      expect(pack[0]?.rarity).toBe('SV');
+    }
+  });
+
+  it('probabilities converge to spec over 1M full rollVariantBooster calls', () => {
+    const rng = mulberry32(20240525);
+    const counts = { RA: 0, MV: 0, SV: 0, L: 0 };
+    const N = 1_000_000;
+    let totalSlots = 0;
+    for (let i = 0; i < N; i++) {
+      const pack = rollVariantBooster('KS', { rng });
+      for (const card of pack) {
+        const r = card.rarity as 'RA' | 'MV' | 'SV' | 'L';
+        counts[r]++;
+        totalSlots++;
+      }
+    }
+
+    const ra = counts.RA / totalSlots;
+    const mv = counts.MV / totalSlots;
+    const sv = counts.SV / totalSlots;
+    const l = counts.L / totalSlots;
+
+    expect(totalSlots).toBeGreaterThan(N * 2);
+    expect(Math.abs(ra - VARIANT_PACK_PROBABILITIES.RA)).toBeLessThan(0.005);
+    expect(Math.abs(mv - VARIANT_PACK_PROBABILITIES.MV)).toBeLessThan(0.003);
+    expect(Math.abs(l - VARIANT_PACK_PROBABILITIES.L)).toBeLessThan(0.002);
+    expect(Math.abs(sv - VARIANT_PACK_PROBABILITIES.SV)).toBeLessThan(0.001);
+  }, 60_000);
+
+  it('over 1M rolls, every rarity appears at least once', () => {
+    const rng = mulberry32(2024);
+    const seen = new Set<string>();
+    for (let i = 0; i < 50_000 && seen.size < 4; i++) {
+      const pack = rollVariantBooster('KS', { rng });
+      for (const c of pack) seen.add(c.rarity);
+    }
+    expect(seen.has('RA')).toBe(true);
+    expect(seen.has('MV')).toBe(true);
+    expect(seen.has('L')).toBe(true);
+    expect(seen.has('SV')).toBe(true);
+  }, 30_000);
+});

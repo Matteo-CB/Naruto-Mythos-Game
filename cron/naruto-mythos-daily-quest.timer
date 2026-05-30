@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Naruto Mythos daily quest rotation at 00:00 UTC
+
+[Timer]
+OnCalendar=*-*-* 00:00:00 UTC
+Persistent=true
+Unit=naruto-mythos-daily-quest.service
+
+[Install]
+WantedBy=timers.target

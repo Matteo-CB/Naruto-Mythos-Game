@@ -2,6 +2,8 @@
 
 const K_FACTOR = 32;
 const ELO_FLOOR = 100;
+const MIN_WIN_GAIN = 10;
+const MAX_LOSS = 24;
 
 function getKFactor(_elo: number): number {
   return K_FACTOR;
@@ -11,23 +13,12 @@ export function expectedScore(playerElo: number, opponentElo: number): number {
   return 1 / (1 + Math.pow(10, (opponentElo - playerElo) / 400));
 }
 
-export function getMinWinGain(myElo: number, opponentElo: number): number {
-  const gap = myElo - opponentElo;
-  if (gap >= 1500) return 5;
-  if (gap >= 1200) return 7;
-  if (gap >= 1000) return 9;
-  if (gap >= 700) return 12;
-  if (gap >= 400) return 13;
-  return 10;
+export function getMinWinGain(_myElo: number, _opponentElo: number): number {
+  return MIN_WIN_GAIN;
 }
 
-export function getMaxLoss(myElo: number, opponentElo: number): number {
-  const gap = myElo - opponentElo;
-  if (gap >= 1500) return 32;
-  if (gap >= 1200) return 30;
-  if (gap >= 1000) return 28;
-  if (gap >= 700) return 26;
-  return 25;
+export function getMaxLoss(_myElo: number, _opponentElo: number): number {
+  return MAX_LOSS;
 }
 
 export function calculateNewElo(
@@ -51,6 +42,65 @@ export function calculateNewElo(
   return Math.max(ELO_FLOOR, playerElo + delta);
 }
 
+export interface PerformanceBonusInput {
+  winnerScore: number;
+  loserScore: number;
+  loserBoardCount: number;
+  isForfeit: boolean;
+}
+
+export interface PerformanceBonus {
+  scoreBonus: number;
+  boardBonus: number;
+  total: number;
+  scoreGap: number;
+  loserBoardCount: number;
+  applied: boolean;
+}
+
+function calcScoreBonus(scoreGap: number): number {
+  if (scoreGap >= 25) return 8;
+  if (scoreGap >= 20) return 6;
+  if (scoreGap >= 15) return 4;
+  if (scoreGap >= 10) return 2;
+  return 0;
+}
+
+function calcBoardBonus(loserBoardCount: number): number {
+  if (loserBoardCount <= 0) return 6;
+  if (loserBoardCount === 1) return 5;
+  if (loserBoardCount === 2) return 4;
+  if (loserBoardCount === 3) return 3;
+  if (loserBoardCount === 4) return 2;
+  if (loserBoardCount === 5) return 1;
+  return 0;
+}
+
+export function calculatePerformanceBonus(input: PerformanceBonusInput): PerformanceBonus {
+  const scoreGap = Math.max(0, input.winnerScore - input.loserScore);
+  const loserBoardCount = Math.max(0, input.loserBoardCount);
+  if (input.isForfeit) {
+    return {
+      scoreBonus: 0,
+      boardBonus: 0,
+      total: 0,
+      scoreGap,
+      loserBoardCount,
+      applied: false,
+    };
+  }
+  const scoreBonus = calcScoreBonus(scoreGap);
+  const boardBonus = calcBoardBonus(loserBoardCount);
+  return {
+    scoreBonus,
+    boardBonus,
+    total: scoreBonus + boardBonus,
+    scoreGap,
+    loserBoardCount,
+    applied: true,
+  };
+}
+
 export interface EloInput {
   player1Elo: number;
   player2Elo: number;
@@ -61,6 +111,7 @@ export interface EloInput {
   player1ConsecLosses: number;
   player2ConsecWins: number;
   player2ConsecLosses: number;
+  performanceBonus?: PerformanceBonus | null;
 }
 
 export interface EloResult {
@@ -72,6 +123,7 @@ export interface EloResult {
   player1NewConsecLosses: number;
   player2NewConsecWins: number;
   player2NewConsecLosses: number;
+  performanceBonus: PerformanceBonus | null;
 }
 
 export function calculateEloChanges(input: EloInput): EloResult;
@@ -104,13 +156,22 @@ export function calculateEloChanges(
 
 
   const { player1Elo, player2Elo, winner, player1ConsecWins, player1ConsecLosses,
-          player2ConsecWins, player2ConsecLosses } = p1EloOrInput;
+          player2ConsecWins, player2ConsecLosses, performanceBonus } = p1EloOrInput;
 
   const p1ActualScore = winner === 'player1' ? 1.0 : 0.0;
   const p2ActualScore = winner === 'player2' ? 1.0 : 0.0;
 
-  const player1NewElo = calculateNewElo(player1Elo, player2Elo, p1ActualScore);
-  const player2NewElo = calculateNewElo(player2Elo, player1Elo, p2ActualScore);
+  let player1NewElo = calculateNewElo(player1Elo, player2Elo, p1ActualScore);
+  let player2NewElo = calculateNewElo(player2Elo, player1Elo, p2ActualScore);
+
+  const bonus = performanceBonus ?? null;
+  if (bonus && bonus.total > 0) {
+    if (winner === 'player1') {
+      player1NewElo = Math.max(ELO_FLOOR, player1NewElo + bonus.total);
+    } else {
+      player2NewElo = Math.max(ELO_FLOOR, player2NewElo + bonus.total);
+    }
+  }
 
   const p1IsWinner = winner === 'player1';
   return {
@@ -122,5 +183,6 @@ export function calculateEloChanges(
     player1NewConsecLosses: p1IsWinner ? 0 : player1ConsecLosses + 1,
     player2NewConsecWins: p1IsWinner ? 0 : player2ConsecWins + 1,
     player2NewConsecLosses: p1IsWinner ? player2ConsecLosses + 1 : 0,
+    performanceBonus: bonus,
   };
 }

@@ -284,7 +284,8 @@ export function validateUpgradeCharacter(
 
   
   
-  if ((newCard.number === 51 || newCard.number === 138) &&
+  const newCardNumberValidate = typeof newCard.number === 'string' ? parseInt(newCard.number, 10) : newCard.number;
+  if ((newCardNumberValidate === 51 || newCardNumberValidate === 138) &&
     (newCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'))) {
     const isSummon = (topCard.keywords ?? []).includes('Summon');
     const isOrochimaru = topCard.name_fr.toUpperCase().includes('OROCHIMARU');
@@ -311,11 +312,13 @@ export function validateUpgradeCharacter(
 
 
 export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: CharacterCard): boolean {
-  
+
   if (newCard.name_fr.toUpperCase() === targetCard.name_fr.toUpperCase()) return false;
 
-  
-  if (newCard.number === 51 || newCard.number === 138) {
+  const newCardNumber = typeof newCard.number === 'string' ? parseInt(newCard.number, 10) : newCard.number;
+
+
+  if (newCardNumber === 51 || newCardNumber === 138) {
     const hasFlexible = (newCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('upgrade'),
     );
@@ -326,8 +329,8 @@ export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: Charact
     }
   }
 
-  
-  if (newCard.number === 29) {
+
+  if (newCardNumber === 29) {
     const hasFlexible = (newCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('Kiba Inuzuka'),
     );
@@ -336,14 +339,14 @@ export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: Charact
     }
   }
 
-  
-  
-  if (newCard.number === 76) {
+
+
+  if (newCardNumber === 76) {
     return targetCard.name_fr.toUpperCase() === 'GAARA';
   }
 
-  
-  if (newCard.number === 129) {
+
+  if (newCardNumber === 129) {
     const hasFlexible = (newCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('Naruto Uzumaki'),
     );
@@ -352,8 +355,8 @@ export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: Charact
     }
   }
 
-  
-  if (newCard.number === 63 || newCard.number === 124 || newCard.number === 127) {
+
+  if (newCardNumber === 63 || newCardNumber === 124 || newCardNumber === 127) {
     const hasFlexible = (newCard.effects ?? []).some(
       (e) => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'),
     );

@@ -51,12 +51,29 @@ const GameBoard = dynamic(
 
 function OpponentDisconnectBanner() {
   const t = useTranslations('game');
+  const forfeitAt = useSocketStore((s) => s.opponentForfeitAt);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!forfeitAt) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [forfeitAt]);
+
+  let label = t('opponentDisconnectedShort');
+  if (forfeitAt) {
+    const totalSec = Math.max(0, Math.ceil((forfeitAt - now) / 1000));
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    label = t('opponentDisconnectedCountdown', { time: `${m}:${s.toString().padStart(2, '0')}` });
+  }
+
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-50 text-center py-2.5 text-xs font-medium"
+      className="fixed top-0 left-0 right-0 z-50 text-center py-2.5 text-xs font-medium tabular-nums"
       style={{ backgroundColor: 'rgba(196, 163, 90, 0.95)', color: '#0a0a0a' }}
     >
-      {t('opponentDisconnectedShort')}
+      {label}
     </div>
   );
 }

@@ -6,6 +6,10 @@ import { useTournamentStore, type CreateTournamentInput } from '@/stores/tournam
 import { useRouter } from '@/lib/i18n/navigation';
 import { RANK_TIERS } from '@/components/EloBadge';
 import { ALL_SET_IDS, SET_REGISTRY, isSetAvailable } from '@/lib/data/sets/registry';
+import { TOURNAMENT_PRIZE_CARD_IDS } from '@/lib/variants/constants';
+import { getCardById } from '@/lib/data/cardIndex';
+import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
+import Image from 'next/image';
 
 interface Props {
   isAdmin: boolean;
@@ -45,6 +49,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
   const [maxChakraCost, setMaxChakraCost] = useState('');
   const [restrictionNote, setRestrictionNote] = useState('');
   const [bannedCardIds, setBannedCardIds] = useState('');
+  const [prizeCardId, setPrizeCardId] = useState<string>('');
 
   const ALL_GROUPS = ['Leaf Village', 'Sand Village', 'Sound Village', 'Akatsuki', 'Independent'];
   const ALL_KEYWORDS = ['Team 7', 'Team 8', 'Team 10', 'Team Gai', 'Team Baki', 'Sannin', 'Jutsu', 'Summon', 'Rogue Ninja', 'Sound Four'];
@@ -80,6 +85,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
         ...(allowedLeagues.length > 0 ? { allowedLeagues } : {}),
         ...(scheduledStartAt ? { scheduledStartAt } : {}),
         ...(bannedCardIds.trim() ? { bannedCardIds: bannedCardIds.split(',').map(s => s.trim()).filter(Boolean) } : {}),
+        ...(prizeCardId ? { prizeCardId } : {}),
         ...(gameMode === 'restricted' ? {
           ...(allowedGroups.length > 0 ? { allowedGroups } : {}),
           ...(bannedGroups.length > 0 ? { bannedGroups } : {}),
@@ -150,6 +156,67 @@ export function CreateTournamentForm({ isAdmin }: Props) {
             {t('modeEvolvingHint')}
           </p>
         )}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label style={labelStyle}>{t('prizeLabel')}</label>
+        <p className="text-[10px]" style={{ color: '#555' }}>{t('prizeHint')}</p>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => setPrizeCardId('')}
+            className="cursor-pointer flex flex-col items-center justify-center"
+            style={{
+              width: 110, minHeight: 160,
+              backgroundColor: '#0a0a0a',
+              border: `1px solid ${prizeCardId === '' ? '#c4a35a' : '#333'}`,
+              boxShadow: prizeCardId === '' ? '0 0 18px #c4a35a66' : 'none',
+              color: prizeCardId === '' ? '#c4a35a' : '#888',
+              fontSize: 11,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+            }}
+          >
+            {t('prizeNone')}
+          </button>
+          {TOURNAMENT_PRIZE_CARD_IDS.map((cardId) => {
+            const selected = prizeCardId === cardId;
+            const card = getCardById(cardId);
+            const number = cardId.split('-')[1] ?? '';
+            const displayLabel = card
+              ? `${getCardName(card, locale as 'en' | 'fr')} ${getCardTitle(card, locale as 'en' | 'fr')}`
+              : cardId;
+            return (
+              <button
+                key={cardId}
+                type="button"
+                onClick={() => setPrizeCardId(cardId)}
+                className="cursor-pointer flex flex-col"
+                style={{
+                  width: 110,
+                  border: `1px solid ${selected ? '#c4a35a' : '#333'}`,
+                  boxShadow: selected ? '0 0 18px #c4a35a66' : 'none',
+                  backgroundColor: '#0a0a0a',
+                }}
+                title={displayLabel}
+              >
+                <div className="relative" style={{ width: '100%', aspectRatio: '110 / 160' }}>
+                  <Image
+                    src={`/images/cards/KS/mythos_v/${cardId}.webp`}
+                    alt=""
+                    fill
+                    sizes="110px"
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+                <div className="px-2 py-1.5 text-[10px] tracking-wide" style={{ color: selected ? '#c4a35a' : '#bbb' }}>
+                  <div className="truncate">{card ? getCardName(card, locale as 'en' | 'fr') : cardId}</div>
+                  <div className="text-[9px]" style={{ color: '#666' }}>{number} MV</div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {gameMode === 'sealed' && (

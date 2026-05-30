@@ -1,9 +1,11 @@
 import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoader';
 import { getAvailableSetIds } from '@/lib/data/sets/registry';
 import type { CharacterCard, MissionCard, CardData } from '@/lib/engine/types';
+import { isVariantRarity } from '@/lib/variants/constants';
 
 export interface BoosterCard extends CardData {
   isHolo?: boolean;
+  isTemporaryVariant?: boolean;
   sealedInstanceId: string;
 }
 
@@ -16,6 +18,7 @@ export interface BoosterPack {
 export interface SealedPool {
   boosters: BoosterPack[];
   allCards: BoosterCard[];
+  temporaryVariants: string[];
 }
 
 export type SealedSetChoice = string | 'random';
@@ -37,7 +40,7 @@ function nextInstanceId(): string {
 }
 
 function toBoosterCard(card: CardData, isHolo = false): BoosterCard {
-  return { ...card, isHolo, sealedInstanceId: nextInstanceId() };
+  return { ...card, isHolo, isTemporaryVariant: isVariantRarity(card.rarity), sealedInstanceId: nextInstanceId() };
 }
 
 interface RarityBuckets {
@@ -116,6 +119,7 @@ export function generateSealedPool(boosterCount: number = 6, setChoice: SealedSe
   _instanceCounter = 0;
   const boosters: BoosterPack[] = [];
   const allCards: BoosterCard[] = [];
+  const temporaryVariants: string[] = [];
 
   const bucketCache = new Map<string, RarityBuckets>();
   const getBuckets = (id: string): RarityBuckets => {
@@ -135,9 +139,12 @@ export function generateSealedPool(boosterCount: number = 6, setChoice: SealedSe
     const booster = generateBooster(i, setId, getBuckets(setId));
     boosters.push(booster);
     allCards.push(...booster.cards);
+    for (const c of booster.cards) {
+      if (c.isTemporaryVariant) temporaryVariants.push(c.id);
+    }
   }
 
-  return { boosters, allCards };
+  return { boosters, allCards, temporaryVariants };
 }
 
 

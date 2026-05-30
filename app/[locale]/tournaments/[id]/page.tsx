@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import Image from 'next/image';
+import { getCardById } from '@/lib/data/cardIndex';
+import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
 import { Link, useRouter } from '@/lib/i18n/navigation';
@@ -72,6 +75,7 @@ export default function TournamentDetailPage() {
   const t = useTranslations('tournament');
   const tc = useTranslations('common');
   const tRoot = useTranslations();
+  const locale = useLocale();
   const router = useRouter();
   const params = useParams();
   const tournamentId = params?.id as string;
@@ -369,6 +373,37 @@ export default function TournamentDetailPage() {
             <p>{t('rulesEdge')}</p>
           </div>
         </motion.div>
+
+        {tour.prizeCardId && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.18 }}
+            className="mb-4 p-4 flex gap-4 items-center" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
+            <div className="relative shrink-0" style={{ width: 110, height: 160 }}>
+              <Image
+                src={`/images/cards/KS/mythos_v/${tour.prizeCardId}.webp`}
+                alt=""
+                fill
+                sizes="110px"
+                style={{ objectFit: 'cover', boxShadow: '0 0 18px #c4a35a44' }}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <h2 className="text-sm font-medium uppercase tracking-wider mb-1" style={{ color: '#c4a35a' }}>{t('prizePanelTitle')}</h2>
+              {(() => {
+                const card = getCardById(tour.prizeCardId);
+                const number = tour.prizeCardId.split('-')[1] ?? '';
+                if (!card) return <p className="text-xs" style={{ color: '#aaa' }}>{tour.prizeCardId}</p>;
+                return (
+                  <>
+                    <p className="text-xs font-display" style={{ color: '#e8e8e8' }}>{getCardName(card, locale as 'en' | 'fr')}</p>
+                    <p className="text-[10px]" style={{ color: '#888' }}>{getCardTitle(card, locale as 'en' | 'fr')}</p>
+                    <p className="text-[10px]" style={{ color: '#666' }}>{number} Mythos V</p>
+                    <p className="text-[10px] mt-2" style={{ color: '#aaa' }}>{t('prizeDescription')}</p>
+                  </>
+                );
+              })()}
+            </div>
+          </motion.div>
+        )}
 
         {hasRestrictions && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}

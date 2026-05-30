@@ -378,7 +378,39 @@ export default function AdminPage() {
         
         {tab === 'settings' && (
           <div className="max-w-2xl">
-            
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{tc('adminBoosterSim.title')}</h2>
+              <p className="text-xs mb-4" style={{ color: '#555555' }}>{tc('adminBoosterSim.subtitle')}</p>
+              <Link
+                href="/admin/booster-simulator"
+                className="inline-block px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
+                style={{ backgroundColor: '#1a1a2e', color: '#c4a35a', border: '1px solid #c4a35a' }}
+              >
+                {tc('adminBoosterSim.runCta')}
+              </Link>
+            </div>
+
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{tc('adminTradeHistory.title')}</h2>
+              <p className="text-xs mb-4" style={{ color: '#555555' }}>{tc('adminTradeHistory.subtitle')}</p>
+              <div className="flex items-center gap-3 flex-wrap">
+                <Link
+                  href="/admin/trade-history"
+                  className="inline-block px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
+                  style={{ backgroundColor: '#1a1a2e', color: '#c4a35a', border: '1px solid #c4a35a' }}
+                >
+                  {tc('adminTradeHistory.title')}
+                </Link>
+                <Link
+                  href="/admin/trade-simulator"
+                  className="inline-block px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
+                  style={{ backgroundColor: '#1a1a2e', color: '#888888', border: '1px solid #333333' }}
+                >
+                  Trade simulator
+                </Link>
+              </div>
+            </div>
+
             <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
               <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{t('leagues.title')}</h2>
               <p className="text-xs mb-4" style={{ color: '#555555' }}>{t('leagues.description')}</p>

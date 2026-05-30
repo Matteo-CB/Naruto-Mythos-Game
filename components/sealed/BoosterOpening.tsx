@@ -145,8 +145,12 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
           >
             
             <img
-              src={(currentBooster && SET_REGISTRY[currentBooster.setId]?.boosterImage) || '/images/booster-KS.webp'}
+              src={(currentBooster && SET_REGISTRY[currentBooster.setId]?.boosterImage) || '/images/booster-unknown.webp'}
               alt={t('boosterPack')}
+              onError={(e) => {
+                const tEl = e.currentTarget as HTMLImageElement;
+                if (!tEl.src.endsWith('/images/booster-unknown.webp')) tEl.src = '/images/booster-unknown.webp';
+              }}
               style={{
                 width: '240px',
                 height: 'auto',

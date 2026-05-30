@@ -12,6 +12,7 @@ import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
 import { SealedTimer } from './SealedTimer';
+import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 
 interface SealedDeckBuilderProps {
   pool: BoosterCard[];
@@ -47,14 +48,16 @@ export function SealedDeckBuilder({
   const [previewCard, setPreviewCard] = useState<BoosterCard | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
-  const { characters, missions } = useMemo(() => {
+  const { characters, missions, hasTemporaryVariants } = useMemo(() => {
     const chars: BoosterCard[] = [];
     const miss: BoosterCard[] = [];
+    let anyVariant = false;
     for (const card of pool) {
       if (card.card_type === 'mission') miss.push(card);
       else chars.push(card);
+      if (card.isTemporaryVariant) anyVariant = true;
     }
-    return { characters: chars, missions: miss };
+    return { characters: chars, missions: miss, hasTemporaryVariants: anyVariant };
   }, [pool]);
 
   const poolAvailability = useMemo(() => {
@@ -278,6 +281,15 @@ export function SealedDeckBuilder({
           </div>
         </div>
         <div className="flex items-center gap-4">
+          {hasTemporaryVariants && (
+            <span
+              className="text-[9px] sm:text-[10px] tracking-wider uppercase truncate"
+              style={{ color: '#c4a35a', maxWidth: 320 }}
+              title={t('temporaryVariantTooltip')}
+            >
+              {t('temporaryVariantsLegend')}
+            </span>
+          )}
           {isOnline && (
             <SealedTimer
               totalSeconds={timerSeconds}
@@ -518,12 +530,30 @@ export function SealedDeckBuilder({
                       </span>
                     </div>
 
-                    {card.isHolo && (
+                    {card.isHolo && !card.isTemporaryVariant && (
                       <div className="absolute top-1 left-1">
                         <span className="text-[7px] px-1 rounded font-bold" style={{ backgroundColor: 'rgba(196,163,90,0.8)', color: '#0a0a0a' }}>
                           {t('holo')}
                         </span>
                       </div>
+                    )}
+
+                    {card.isTemporaryVariant && (
+                      <>
+                        <VariantHoloOverlay intensity="subtle" />
+                        <div className="absolute top-1 left-1 z-10" title={t('temporaryVariantTooltip')}>
+                          <span
+                            className="font-display text-[9px] px-1 py-0.5 tracking-widest uppercase"
+                            style={{
+                              backgroundColor: 'rgba(196,163,90,0.85)',
+                              color: '#0a0a0a',
+                              letterSpacing: '0.1em',
+                            }}
+                          >
+                            {t('temporaryVariantTag')}
+                          </span>
+                        </div>
+                      </>
                     )}
                     
                     <button

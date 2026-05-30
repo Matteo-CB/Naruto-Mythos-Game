@@ -5,17 +5,114 @@ import type { GameState, GameAction, CharacterCard, MissionCard, PlayerConfig, G
 import { registerUserSocket, removeSocketFromAll } from '@/lib/socket/io';
 import { prisma } from '@/lib/db/prisma';
 import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
-import { calculateEloChanges } from '@/lib/elo/elo';
+import { calculateEloChanges, calculatePerformanceBonus, type PerformanceBonus } from '@/lib/elo/elo';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
 import { sendRankUpNotification } from '@/lib/discord/rankUpWebhook';
 import { registerTournamentHandlers, handleTournamentMatchEnd, rehydrateAbsenceTimers, sweepOrphanTournamentMatches } from '@/lib/socket/tournamentHandlers';
+import { registerTradeHandlers } from '@/lib/socket/tradeHandlers';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
 import { isMaintenanceActive, activateMaintenance, setDrainTimeout, setCheckInterval } from '@/lib/socket/maintenance';
-import { createChessClock, arm as armChessClock, disarm as disarmChessClock, resetIdle as resetChessClockIdle, snapshotForBroadcast as snapshotChessClockForBroadcast, bankEmpty as chessClockBankEmpty, idleMs as chessClockIdleMs, consumeIdleWarning as consumeChessClockIdleWarning, CHESS_CLOCK_IDLE_LIMIT_MS, CHESS_CLOCK_IDLE_TOAST_MS, CHESS_CLOCK_MULLIGAN_IDLE_MS, type ChessClockState } from '@/lib/timing/chessClock';
+import { createChessClock, arm as armChessClock, disarm as disarmChessClock, resetIdle as resetChessClockIdle, snapshotForBroadcast as snapshotChessClockForBroadcast, bankEmpty as chessClockBankEmpty, idleMs as chessClockIdleMs, consumeIdleWarning as consumeChessClockIdleWarning, CHESS_CLOCK_IDLE_LIMIT_MS, CHESS_CLOCK_IDLE_TOAST_MS, CHESS_CLOCK_MULLIGAN_IDLE_MS, CHESS_CLOCK_DISCONNECT_FORFEIT_MS, type ChessClockState } from '@/lib/timing/chessClock';
 import { computeEvolvingMpBonus } from '@/lib/evolving/mpBonus';
 import { computeDeckEvolvingPoints, isEvolvingCompatible } from '@/lib/evolving/computePoints';
+import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
+import { emitQuestEvent } from '@/lib/quests/hooks';
+import { emitDrawDiffEvents, emitTokenDiffEvents } from '@/lib/quests/engineEmit';
+import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
+import type { GameMode } from '@/lib/quests/hooks';
+
+ensureQuestPersistenceListener();
+
+function resolveQuestGameMode(room: Pick<RoomData, 'isRanked' | 'isEvolving' | 'gameMode' | 'tournamentId'>): GameMode {
+  if (room.tournamentId) return 'tournament';
+  if (room.isEvolving) return 'evolving';
+  if (room.isRanked) return 'ranked';
+  if (room.gameMode === 'sealed') return 'sealed';
+  return 'casual';
+}
+
+function emitFinalizeQuests(
+  room: RoomData,
+  winner: PlayerID,
+  winReason: GameEndWinReason,
+  finalRound: number,
+): void {
+  const mode = resolveQuestGameMode(room);
+  const p1 = room.hostId;
+  const p2 = room.guestId;
+  if (!p1 || !p2) return;
+
+  emitQuestEvent('match.played', p1, { gameMode: mode });
+  emitQuestEvent('match.played', p2, { gameMode: mode });
+
+  const winnerId = winner === 'player1' ? p1 : p2;
+  const loserId = winner === 'player1' ? p2 : p1;
+  const winnerSide: 'player1Characters' | 'player2Characters' =
+    winner === 'player1' ? 'player1Characters' : 'player2Characters';
+
+  if (mode === 'ranked') {
+    emitQuestEvent('ranked.win', winnerId, { gameMode: mode });
+    const winnerEffectsUsed = winner === 'player1'
+      ? room.gameState?.player1EffectsUsed
+      : room.gameState?.player2EffectsUsed;
+    if (!winnerEffectsUsed) {
+      emitQuestEvent('ranked.win.no_effects_used', winnerId, { gameMode: mode });
+    }
+  } else if (mode === 'evolving') {
+    emitQuestEvent('match.won.evolving', winnerId, { gameMode: mode });
+  } else if (mode === 'sealed') {
+    emitQuestEvent('match.won.sealed', winnerId, { gameMode: mode });
+  }
+
+  if (finalRound <= 3 && winReason === 'score') {
+    emitQuestEvent('match.won.short', winnerId, { gameMode: mode, maxRound: 3 });
+  }
+
+  const winnerPlayerState = winner === 'player1' ? room.gameState?.player1 : room.gameState?.player2;
+  const loserPlayerState = winner === 'player1' ? room.gameState?.player2 : room.gameState?.player1;
+  if (winnerPlayerState) {
+    const winnerScore = winnerPlayerState.missionPoints ?? 0;
+    if (winnerScore >= 12) {
+      emitQuestEvent('mission_points.scored.match', winnerId, { gameMode: mode, threshold: winnerScore });
+    }
+    const winnerDefeats = winnerPlayerState.discardPile?.filter((c) => 'chakra' in c).length ?? 0;
+    if (winnerDefeats === 0) {
+      emitQuestEvent('match.won.no_defeats_own', winnerId, { gameMode: mode });
+    }
+  }
+  if (loserPlayerState && loserId) {
+    const loserScore = loserPlayerState.missionPoints ?? 0;
+    if (loserScore >= 12) {
+      emitQuestEvent('mission_points.scored.match', loserId, { gameMode: mode, threshold: loserScore });
+    }
+  }
+
+  const finalState = room.gameState;
+  if (finalState) {
+    for (const mission of finalState.activeMissions) {
+      if (mission.wonBy === winner) {
+        emitQuestEvent('mission.won', winnerId, { gameMode: mode, rank: mission.rank });
+      } else if (mission.wonBy && mission.wonBy !== winner) {
+        emitQuestEvent('mission.won', loserId, { gameMode: mode, rank: mission.rank });
+      }
+    }
+
+    const winnerChars = finalState.activeMissions.flatMap((m) => m[winnerSide]);
+    for (const ch of winnerChars) {
+      if (ch.isHidden) continue;
+      const top = ch.stack && ch.stack.length > 0 ? ch.stack[ch.stack.length - 1] : ch.card;
+      if (!top) continue;
+      if (top.group) {
+        emitQuestEvent('character.played.group', winnerId, { gameMode: mode, group: top.group });
+      }
+      for (const kw of top.keywords ?? []) {
+        emitQuestEvent('character.played.keyword', winnerId, { gameMode: mode, keyword: kw });
+      }
+    }
+  }
+}
 
 export function buildEvolvingGameConfigExtras(room: Pick<RoomData, 'isEvolving' | 'hostEvolvingPoints' | 'guestEvolvingPoints'>): Pick<GameConfig, 'startingMissionPoints'> {
   if (!room.isEvolving) return {};
@@ -223,7 +320,7 @@ function broadcastChessClockTick(room: RoomData, io: SocketIOServer, now: number
   }
 }
 
-export type ChessClockExpiryReason = 'bank-empty' | 'idle-mandatory' | 'idle-second' | 'idle-unhandled';
+export type ChessClockExpiryReason = 'bank-empty' | 'idle-mandatory' | 'idle-second' | 'idle-unhandled' | 'disconnect';
 
 export function chessClockExpiryReasonToWinReason(reason: ChessClockExpiryReason): 'clock' | 'idle' {
   return reason === 'bank-empty' ? 'clock' : 'idle';
@@ -257,6 +354,12 @@ function isPendingEffectDeclinable(effect: { isOptional: boolean; isMandatory: b
 export function handleChessClockIdleLimit(room: RoomData, player: PlayerID, io: SocketIOServer): void {
   if (!room.gameState || room.finalized) return;
   const state = room.gameState;
+
+  const playerDisconnectedAt = player === 'player1' ? room.player1DisconnectedAt : room.player2DisconnectedAt;
+  if (playerDisconnectedAt) {
+    handleChessClockExpiry(room, player, io, 'disconnect');
+    return;
+  }
 
   if (room.chessClock[player].idleWarningUsed) {
     handleChessClockExpiry(room, player, io, 'idle-second');
@@ -310,6 +413,7 @@ export function handleChessClockIdleLimit(room: RoomData, player: PlayerID, io: 
 function applyChessClockIdleAuto(room: RoomData, player: PlayerID, io: SocketIOServer, action: GameAction): void {
   if (!room.gameState || room.finalized) return;
   let newState: GameState;
+  const oldState = room.gameState;
   try {
     newState = GameEngine.applyAction(room.gameState, player, action);
   } catch (err) {
@@ -317,6 +421,8 @@ function applyChessClockIdleAuto(room: RoomData, player: PlayerID, io: SocketIOS
     handleChessClockExpiry(room, player, io, 'idle-unhandled');
     return;
   }
+  emitDrawDiffEvents(oldState, newState);
+  emitTokenDiffEvents(oldState, newState);
   room.gameState = newState;
   room.chessClock = consumeChessClockIdleWarning(room.chessClock);
   console.log(`[ChessClock] ${room.code}: auto-${action.type} for ${player} (idle warning consumed)`);
@@ -345,6 +451,16 @@ export function onChessClockTick(room: RoomData, io: SocketIOServer): void {
     return;
   }
 
+
+  if (room.player1DisconnectedAt && now - room.player1DisconnectedAt >= CHESS_CLOCK_DISCONNECT_FORFEIT_MS) {
+    handleChessClockExpiry(room, 'player1', io, 'disconnect');
+    return;
+  }
+  if (room.player2DisconnectedAt && now - room.player2DisconnectedAt >= CHESS_CLOCK_DISCONNECT_FORFEIT_MS) {
+    handleChessClockExpiry(room, 'player2', io, 'disconnect');
+    return;
+  }
+
   if (room.chessClock.active === null && whoseInputIsAwaited(room.gameState) !== null) {
     syncChessClock(room, now);
   }
@@ -352,6 +468,17 @@ export function onChessClockTick(room: RoomData, io: SocketIOServer): void {
   if (!active) return;
   if (chessClockBankEmpty(room.chessClock, now)) {
     handleChessClockExpiry(room, active, io, 'bank-empty');
+    return;
+  }
+
+
+  const opponentOfActive: PlayerID = active === 'player1' ? 'player2' : 'player1';
+  const opponentDisconnected = opponentOfActive === 'player1'
+    ? !!room.player1DisconnectedAt
+    : !!room.player2DisconnectedAt;
+  if (opponentDisconnected) {
+    room.chessClock = resetChessClockIdle(room.chessClock, now);
+    broadcastChessClockTick(room, io, now);
     return;
   }
   if (chessClockIdleMs(room.chessClock, now) >= CHESS_CLOCK_IDLE_LIMIT_MS) {
@@ -385,7 +512,7 @@ const CHESS_CLOCK_WATCHDOG_INTERVAL_MS = 30_000;
 
 
 
-const DISCONNECT_HARD_FORFEIT_MS = 15 * 60 * 1000;
+const DISCONNECT_HARD_FORFEIT_MS = CHESS_CLOCK_DISCONNECT_FORFEIT_MS;
 
 
 export function chessClockWatchdog(io: SocketIOServer): void {
@@ -440,14 +567,14 @@ export function chessClockWatchdog(io: SocketIOServer): void {
 
       const p1Disc = room.player1DisconnectedAt;
       const p2Disc = room.player2DisconnectedAt;
-      if (p1Disc && (now - p1Disc) > DISCONNECT_HARD_FORFEIT_MS) {
-        console.warn(`[ChessClockWatchdog] ${code}: player1 disconnected ${Math.round((now - p1Disc) / 1000)}s, force forfeit (failsafe)`);
-        handleChessClockExpiry(room, 'player1', io, 'idle-second');
+      if (p1Disc && (now - p1Disc) >= DISCONNECT_HARD_FORFEIT_MS) {
+        console.warn(`[ChessClockWatchdog] ${code}: player1 disconnected ${Math.round((now - p1Disc) / 1000)}s, force forfeit`);
+        handleChessClockExpiry(room, 'player1', io, 'disconnect');
         continue;
       }
-      if (p2Disc && (now - p2Disc) > DISCONNECT_HARD_FORFEIT_MS) {
-        console.warn(`[ChessClockWatchdog] ${code}: player2 disconnected ${Math.round((now - p2Disc) / 1000)}s, force forfeit (failsafe)`);
-        handleChessClockExpiry(room, 'player2', io, 'idle-second');
+      if (p2Disc && (now - p2Disc) >= DISCONNECT_HARD_FORFEIT_MS) {
+        console.warn(`[ChessClockWatchdog] ${code}: player2 disconnected ${Math.round((now - p2Disc) / 1000)}s, force forfeit`);
+        handleChessClockExpiry(room, 'player2', io, 'disconnect');
         continue;
       }
     } catch (err) {
@@ -712,7 +839,22 @@ async function finalizeGameEnd(
   const p1Score = room.gameState.player1.missionPoints;
   const p2Score = room.gameState.player2.missionPoints;
 
-  let eloData: { player1Delta: number; player2Delta: number; player1NewElo: number; player2NewElo: number; player1TotalGames: number; player2TotalGames: number } | null = null;
+  const isForfeitEnd = winReason !== 'score';
+  const loserId: PlayerID = winner === 'player1' ? 'player2' : 'player1';
+  const loserBoardCount = room.gameState.activeMissions.reduce((acc, mission) => {
+    const chars = loserId === 'player1' ? mission.player1Characters : mission.player2Characters;
+    return acc + chars.length;
+  }, 0);
+  const winnerScore = winner === 'player1' ? p1Score : p2Score;
+  const loserScore = winner === 'player1' ? p2Score : p1Score;
+  const performanceBonus = calculatePerformanceBonus({
+    winnerScore,
+    loserScore,
+    loserBoardCount,
+    isForfeit: isForfeitEnd,
+  });
+
+  let eloData: { player1Delta: number; player2Delta: number; player1NewElo: number; player2NewElo: number; player1TotalGames: number; player2TotalGames: number; performanceBonus: PerformanceBonus | null } | null = null;
 
   import('@/lib/db/gameCleanup')
     .then(({ cleanupOldGames }) => cleanupOldGames())
@@ -746,7 +888,7 @@ async function finalizeGameEnd(
         const survivorIsP1 = !!player1;
         const survivorWon = (survivorIsP1 && winner === 'player1') || (!survivorIsP1 && winner === 'player2');
         const result: 'win' | 'loss' = survivorWon ? 'win' : 'loss';
-        const delta = survivorWon ? 10 : -25;
+        const delta = survivorWon ? 10 : -24;
         const oldElo = getElo(survivor);
         const newElo = Math.max(100, oldElo + delta);
         const stats = survivorWon ? buildWinStats() : buildLossStats();
@@ -767,6 +909,7 @@ async function finalizeGameEnd(
           player2NewElo: survivorIsP1 ? 0 : updatedElo,
           player1TotalGames: survivorIsP1 ? getTotalGames(updated) : 0,
           player2TotalGames: survivorIsP1 ? 0 : getTotalGames(updated),
+          performanceBonus: null,
         };
         prisma.eloHistory.create({
           data: {
@@ -804,6 +947,7 @@ async function finalizeGameEnd(
           player1ConsecLosses: player1.consecutiveLosses ?? 0,
           player2ConsecWins: player2.consecutiveWins ?? 0,
           player2ConsecLosses: player2.consecutiveLosses ?? 0,
+          performanceBonus,
         });
 
         const p1Stats = winner === 'player1' ? buildWinStats() : buildLossStats();
@@ -837,7 +981,54 @@ async function finalizeGameEnd(
           player2NewElo: getElo(updatedP2),
           player1TotalGames: getTotalGames(updatedP1),
           player2TotalGames: getTotalGames(updatedP2),
+          performanceBonus: changes.performanceBonus,
         };
+
+        if (!isEvolving && room.hostId && room.guestId) {
+          const ELO_TIER_THRESHOLDS: Array<{ tier: string; minElo: number }> = [
+            { tier: 'genin', minElo: 450 },
+            { tier: 'chunin', minElo: 550 },
+            { tier: 'special_jonin', minElo: 700 },
+            { tier: 'elite_jonin', minElo: 1000 },
+            { tier: 'legendary_sannin', minElo: 1200 },
+            { tier: 'kage', minElo: 1700 },
+            { tier: 'sage', minElo: 2000 },
+            { tier: 'will_of_fire', minElo: 2500 },
+          ];
+          const checkTier = (userId: string, oldElo: number, newElo: number): void => {
+            for (const t of ELO_TIER_THRESHOLDS) {
+              if (oldElo < t.minElo && newElo >= t.minElo) {
+                emitQuestEvent('elo.tier.reached', userId, { gameMode: 'ranked', tier: t.tier });
+              }
+            }
+          };
+          checkTier(room.hostId, getElo(player1!), changes.player1NewElo);
+          checkTier(room.guestId, getElo(player2!), changes.player2NewElo);
+        }
+
+        if (!isEvolving && room.hostId && room.guestId) {
+          const p1Wins = changes.player1NewConsecWins;
+          const p2Wins = changes.player2NewConsecWins;
+          if (p1Wins >= 2) emitQuestEvent('ranked.win.streak', room.hostId, { gameMode: 'ranked', streak: p1Wins });
+          if (p2Wins >= 2) emitQuestEvent('ranked.win.streak', room.guestId, { gameMode: 'ranked', streak: p2Wins });
+
+          const winnerIsP1 = winner === 'player1';
+          const winnerUserId = winnerIsP1 ? room.hostId : room.guestId;
+          const winnerDeck = winnerIsP1 ? room.hostDeck : room.guestDeck;
+          if (winnerDeck && winnerUserId) {
+            const charNames = winnerDeck.characters.map((c) => c.name_fr.toUpperCase());
+            const groups = new Set(winnerDeck.characters.map((c) => c.group).filter(Boolean));
+            const monoGroup = groups.size === 1 ? Array.from(groups)[0] : undefined;
+            if (monoGroup) {
+              emitQuestEvent('ranked.win.deck', winnerUserId, { gameMode: 'ranked', monoGroup });
+            }
+            emitQuestEvent('ranked.win.deck.contains', winnerUserId, { gameMode: 'ranked', names: charNames });
+            const allHighPower = winnerDeck.characters.every((c) => (c.power ?? 0) >= 4);
+            if (allHighPower) {
+              emitQuestEvent('match.won.deck.power_minimum', winnerUserId, { gameMode: 'ranked', minPrinted: 4 });
+            }
+          }
+        }
 
         const p1Result: 'win' | 'loss' = winner === 'player1' ? 'win' : 'loss';
         const p2Result: 'win' | 'loss' = winner === 'player2' ? 'win' : 'loss';
@@ -910,6 +1101,7 @@ async function finalizeGameEnd(
             player1Score: p1Score, player2Score: p2Score,
             player1ConsecWins: p1Retry.consecutiveWins ?? 0, player1ConsecLosses: p1Retry.consecutiveLosses ?? 0,
             player2ConsecWins: p2Retry.consecutiveWins ?? 0, player2ConsecLosses: p2Retry.consecutiveLosses ?? 0,
+            performanceBonus,
           });
           const p1S = winner === 'player1' ? buildWinStats() : buildLossStats();
           const p2S = winner === 'player2' ? buildWinStats() : buildLossStats();
@@ -917,7 +1109,7 @@ async function finalizeGameEnd(
             prisma.user.update({ where: { id: room.hostId! }, data: { [eloField]: retryChanges.player1NewElo, ...p1S, consecutiveWins: retryChanges.player1NewConsecWins, consecutiveLosses: retryChanges.player1NewConsecLosses, ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}) } as never }),
             prisma.user.update({ where: { id: room.guestId! }, data: { [eloField]: retryChanges.player2NewElo, ...p2S, consecutiveWins: retryChanges.player2NewConsecWins, consecutiveLosses: retryChanges.player2NewConsecLosses, ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}) } as never }),
           ]);
-          eloData = { player1Delta: retryChanges.player1Delta, player2Delta: retryChanges.player2Delta, player1NewElo: getElo(uP1), player2NewElo: getElo(uP2), player1TotalGames: getTotalGames(uP1), player2TotalGames: getTotalGames(uP2) };
+          eloData = { player1Delta: retryChanges.player1Delta, player2Delta: retryChanges.player2Delta, player1NewElo: getElo(uP1), player2NewElo: getElo(uP2), player1TotalGames: getTotalGames(uP1), player2TotalGames: getTotalGames(uP2), performanceBonus: retryChanges.performanceBonus };
           console.log(`[Socket] ELO retry (${label}) succeeded`);
           prisma.eloHistory.create({
             data: {
@@ -989,6 +1181,17 @@ async function finalizeGameEnd(
     actionHistory: room.gameState.actionHistory ?? [],
   } : null;
 
+  try {
+    if (room.gameState) {
+      emitFinalizeQuests(room, winner, winReason, room.gameState.turn);
+    }
+  } catch (err) {
+    console.error('[quests] emitFinalizeQuests error:', err instanceof Error ? err.message : err);
+  }
+
+  const perfForHost = winner === 'player1' ? eloData?.performanceBonus ?? null : null;
+  const perfForGuest = winner === 'player2' ? eloData?.performanceBonus ?? null : null;
+
   if (room.hostSocket) {
     io.to(room.hostSocket).emit('game:ended', {
       winner,
@@ -1003,6 +1206,7 @@ async function finalizeGameEnd(
       gameId: null,
       replayData,
       tournamentId: room.tournamentId ?? null,
+      performanceBonus: perfForHost,
     });
   }
   if (room.guestSocket) {
@@ -1019,6 +1223,7 @@ async function finalizeGameEnd(
       gameId: null,
       replayData,
       tournamentId: room.tournamentId ?? null,
+      performanceBonus: perfForGuest,
     });
   }
 
@@ -1456,8 +1661,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
   io.on('connection', (socket: Socket) => {
     console.log(`Player connected: ${socket.id}`);
-    
+
     registerTournamentHandlers(io, socket);
+    registerTradeHandlers(io, socket);
 
     
     socket.on('auth:register', async (data: { userId: string; username?: string }) => {
@@ -1634,6 +1840,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
           };
 
           room.gameState = GameEngine.createGame(config);
+          if (room.hostId) room.gameState.player1UserId = room.hostId;
+          if (room.guestId) room.gameState.player2UserId = room.guestId;
           room.replayInitialState = deepClone(room.gameState);
           room.replayInitialState.actionHistory = [];
           room.replayStateSnapshots = [];
@@ -1970,6 +2178,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
             const { resetIdCounter } = require('@/lib/engine/utils/id');
             resetIdCounter();
             room.gameState = GameEngine.createGame(config);
+          if (room.hostId) room.gameState.player1UserId = room.hostId;
+          if (room.guestId) room.gameState.player2UserId = room.guestId;
             room.replayInitialState = deepClone(room.gameState);
             room.replayInitialState.actionHistory = [];
             room.replayStateSnapshots = [];
@@ -2203,6 +2413,25 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
       }
 
+      if (!room.isSealed) {
+        const ownerId = socket.id === room.hostSocket ? room.hostId : (socket.id === room.guestSocket ? room.guestId : null);
+        if (ownerId) {
+          try {
+            const variantCheck = await validateDeckVariantUnlocks(ownerId, resolvedChars.map((c) => c.id));
+            if (!variantCheck.ok) {
+              socket.emit('room:error', {
+                message: 'Deck contains locked variant cards',
+                errorKey: 'deckBuilder.error.variantLocked',
+                lockedCardIds: variantCheck.lockedCardIds,
+              });
+              return;
+            }
+          } catch (err) {
+            console.error('[Socket] Variant unlock check error:', err);
+          }
+        }
+      }
+
       if (room.isEvolving) {
         const cardIds = safeDeck.characters.map((c) => c.id);
         const missionIds = safeDeck.missions.map((m) => m.id);
@@ -2263,6 +2492,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
         try {
           const { handleMatchForfeit } = await import('@/lib/socket/tournamentHandlers');
+          const { markParticipantAbsence } = await import('@/lib/tournament/prizes');
+          await markParticipantAbsence(tournamentIdForForfeit, forfeitedPlayerId);
           await handleMatchForfeit(io, tournamentIdForForfeit, matchIdForForfeit, forfeitedPlayerId);
         } catch (err) {
           console.error('[Socket] Failed to finalize deferred sealed forfeit:', err);
@@ -2495,7 +2726,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
 
       try {
-        
+
         const oldLogLength = room.gameState.log.length;
         const prevState = room.gameState;
 
@@ -2504,6 +2735,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
           player,
           data.action,
         );
+
+        emitDrawDiffEvents(prevState, room.gameState);
+        emitTokenDiffEvents(prevState, room.gameState);
 
         syncChessClock(room);
 
@@ -3029,6 +3263,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         ? data.username
         : (userNames.get(data.userId) || 'Spectator');
       room.spectators.set(socket.id, { socketId: socket.id, userId: data.userId, username: safeSpecUsername });
+      emitQuestEvent('social.spectator.entered', data.userId);
       socket.join(data.roomCode);
       socket.join(`spec:${data.roomCode}`);
       playerRooms.set(socket.id, `spec:${data.roomCode}`);
@@ -3235,8 +3470,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
       };
 
       room.chatMessages.push(chatMsg);
-      
+
       if (room.chatMessages.length > 100) room.chatMessages = room.chatMessages.slice(-100);
+
+      if (userId && !data.isEmote) {
+        emitQuestEvent('social.chat.message.sent', userId);
+      }
 
       
       prisma.chatMessage.create({
@@ -3350,18 +3589,22 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
           else if (room.gameState && room.gameState.phase !== 'gameOver' && !room.finalized) {
             console.log(`[Socket] ${player} disconnected during game in room ${code}, chess clock continues`);
+            const disconnectedAt = Date.now();
             const opponentSock = isHost ? room.guestSocket : room.hostSocket;
             if (opponentSock) {
-              io.to(opponentSock).emit('game:opponent-disconnected');
+              io.to(opponentSock).emit('game:opponent-disconnected', {
+                forfeitAt: disconnectedAt + CHESS_CLOCK_DISCONNECT_FORFEIT_MS,
+                forfeitMs: CHESS_CLOCK_DISCONNECT_FORFEIT_MS,
+              });
             }
 
 
             if (isHost) {
               if (room.hostSocket === socket.id) room.hostSocket = '';
-              room.player1DisconnectedAt = Date.now();
+              room.player1DisconnectedAt = disconnectedAt;
             } else {
               if (room.guestSocket === socket.id) room.guestSocket = null;
-              room.player2DisconnectedAt = Date.now();
+              room.player2DisconnectedAt = disconnectedAt;
             }
           } else if (room.isSealed && room.guestId && !room.gameState) {
             console.log(`[Socket] ${player} disconnected during sealed deck-building in room ${code}`);

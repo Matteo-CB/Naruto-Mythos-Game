@@ -2,6 +2,7 @@ import type { GameState, PlayerID, TurnNumber, MissionRank, CharacterInPlay } fr
 import { BASE_CHAKRA_PER_TURN, CARDS_DRAWN_PER_TURN, TURN_TO_RANK, RANK_BONUS } from '../types';
 import { logSystem, logAction } from '../utils/gameLog';
 import { calculateContinuousChakraBonus, calculateMissionChakraBonus } from '../../effects/ContinuousEffects';
+import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 
 
 export function executeStartPhase(state: GameState): GameState {

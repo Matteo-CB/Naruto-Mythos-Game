@@ -60,7 +60,13 @@
     "tournamentBadgeAvailable": "Open",
     "tournamentBadgeRegistered": "Registered",
     "tournamentBadgeNeedsDeck": "Deck needed",
-    "tournamentBadgeInProgress": "Live"
+    "tournamentBadgeInProgress": "Live",
+    "boosters": "Boosters",
+    "boostersBadgeTooltip": "{count} unopened boosters",
+    "battlepass": "Rewards",
+    "battlepassBadgeTooltip": "{count} card(s) to claim",
+    "quests": "Quests",
+    "questsBadgeTooltip": "{count} reward(s) to claim"
   },
   "settings": {
     "title": "Customization",
@@ -384,7 +390,10 @@
       "rematchDecline": "Decline",
       "rematchDeclined": "Opponent declined the rematch",
       "placementMatch": "Placement match {current}/{total}",
-      "nowRanked": "You are now ranked!"
+      "nowRanked": "You are now ranked!",
+      "performanceBonus": "Performance bonus",
+      "scoreGapBonus": "Score gap {gap}+: +{bonus} ELO",
+      "boardPressureBonus": "Opponent left with {count} characters in play: +{bonus} ELO"
     },
     "timer": {
       "autoPassed": "Time expired, auto-passed"
@@ -982,6 +991,7 @@
     },
     "opponentDisconnected": "Opponent disconnected. They have {time} to reconnect or the game is forfeit.",
     "opponentDisconnectedShort": "Opponent disconnected. Their chess clock continues to run.",
+    "opponentDisconnectedCountdown": "Opponent disconnected. Forfeits in {time}.",
     "reconnect": {
       "title": "Active Game",
       "description": "You have an ongoing game. Would you like to rejoin or abandon it?",
@@ -1013,7 +1023,15 @@
     "basePoints": "Base Points",
     "id": "ID",
     "missions": "Missions",
-    "bannedPlaceholder": "BAN"
+    "bannedPlaceholder": "BAN",
+    "variantsOnly": "Variants",
+    "filterTradeable": "Tradeable",
+    "showAll": "All cards",
+    "lockedBadge": "Locked",
+    "lockedTooltip": "Locked. How to unlock?",
+    "lockedBannerTitle": "Locked",
+    "lockedBannerDescription": "Unlock via a variant booster or a direct reward.",
+    "lockedToastMessage": "This card is locked. Get it from a variant booster, the Rewards or a tournament."
   },
   "deckBuilder": {
     "title": "Deck Builder",
@@ -1032,6 +1050,8 @@
     "availableCards": "Available Cards",
     "currentDeck": "Current Deck",
     "updateDeck": "Update Deck",
+    "lockedVariantsWarning": "{count, plural, one {This deck contains a variant you no longer own.} other {This deck contains # variants you no longer own.}}",
+    "repairDeck": "Repair",
     "saving": "Saving...",
     "missionCards": "Mission Cards",
     "characterCards": "Character Cards",
@@ -1161,7 +1181,8 @@
       "invalidMissionCount": "Deck must have exactly 3 mission cards.",
       "invalidCardId": "Invalid card id.",
       "invalidMissionId": "Invalid mission id.",
-      "maxDecksReached": "You have reached the maximum number of decks (50)."
+      "maxDecksReached": "You have reached the maximum number of decks (50).",
+      "variantLocked": "This variant is locked. Unlock it from a variant booster, the Rewards or a tournament."
     },
     "hoverToPreview": "Hover over a card to see its details",
     "sortByCost": "Sort by Cost",
@@ -1407,6 +1428,12 @@
       "createDeck": "Create an evolving deck",
       "needDeckHint": "Create an evolving deck to enable this mode",
       "noDeckInSelector": "No evolving deck available. Create one to play in this room."
+    },
+    "sealed": {
+      "toggleLabel": "Sealed mode",
+      "toggleDescription": "Open 5 boosters and build your deck on the spot. Saved decks are not used.",
+      "setChoiceLabel": "Set to use",
+      "setRandom": "Random"
     }
   },
   "leaderboard": {
@@ -1601,7 +1628,11 @@
     "dataDuration": "Data Retention",
     "dataDurationText": "Your data is retained as long as your account is active. Game replays are automatically deleted after 7 days. You may request deletion of your account and all your data at any time.",
     "dataSharing": "Data Sharing",
-    "dataSharingText": "We do not sell, rent or share your personal data with third parties for commercial purposes. The only sharing is with:\n- IONOS (VPS server hosting)\n- MongoDB Atlas (data storage)\n- Discord (if you link your account, only your Discord ID)",
+    "dataSharingText": "We do not sell, rent or share your personal data with third parties for commercial purposes. The only sharing is with:\n- IONOS (VPS server hosting)\n- MongoDB Atlas (data storage)\n- Discord (if you link your account, only your Discord ID)\n- TopDeck.gg (only for querying their public APIs to display tournaments; no personal data is sent to them)",
+    "topdeckData": "TopDeck.gg data",
+    "topdeckDataText": "The TopDeck tab displays Naruto Mythos tournaments and events sourced from the third-party platform TopDeck.gg. This data is:\n- Fetched from TopDeck.gg's public API (completed tournaments with standings) and its Event Hub (upcoming events).\n- Cached on our server to minimize requests to TopDeck.gg.\n- Shown with the mandatory credit \"Data provided by TopDeck.gg\" and a link back to the original page for registration or details.\nTopDeck.gg is responsible for the accuracy of its own data. For any question about a specific tournament, please contact TopDeck.gg or the event organizer directly.",
+    "geolocation": "Geolocation",
+    "geolocationText": "On the TopDeck page, the application asks for your geographic position (via the standard browser API) to sort events by distance. This permission is strictly optional:\n- You can accept or refuse at any time; refusing does not prevent using the site, events will simply be sorted by date.\n- Your position is sent to our server only for the duration of a request, to compute distances, and is never stored or shared with any third party.\n- The permission is managed by your browser; to revoke it, use your browser settings.",
     "cookies": "Cookies",
     "cookiesText": "This site uses only essential technical cookies required for the service to function (authentication session). No advertising or tracking cookies are used.",
     "userRights": "Your Rights",
@@ -1684,6 +1715,42 @@
     "decline": "Decline",
     "cancel": "Cancel Invitation",
     "expiresIn": "Expires in {time}"
+  },
+  "adminBoosterSim": {
+    "title": "Booster Simulator",
+    "subtitle": "Roll statistics over N variant boosters",
+    "setLabel": "Set",
+    "modeLabel": "Mode",
+    "modeNormal": "Normal",
+    "modeForceL": "Force one Legendary (slot 1)",
+    "modeForceSV": "Force one Secret V (slot 1)",
+    "countLabel": "Booster count",
+    "runCta": "Run simulation",
+    "running": "Computing…",
+    "playSample": "Play first booster animation",
+    "serverError": "Server error. Try again.",
+    "forbidden": "Admin only.",
+    "perRarityHeader": "Distribution by rarity ({count} slots rolled)",
+    "perCardHeader": "Per-card histogram ({count} unique cards rolled)",
+    "colRarity": "Rarity",
+    "colActual": "Actual",
+    "colExpected": "Expected",
+    "colDeviation": "Deviation",
+    "sampleAnimationLabel": "Simulation · first booster"
+  },
+  "adminTradeHistory": {
+    "title": "Trade history",
+    "subtitle": "All executed trades, for audit.",
+    "back": "< Admin",
+    "filterPlaceholder": "Filter by username",
+    "filter": "Filter",
+    "clear": "All",
+    "loading": "Loading…",
+    "empty": "No trades.",
+    "tradeBetween": "{a} and {b}",
+    "gave": "gave",
+    "adminSimBadge": "Admin sim",
+    "forbidden": "Admin only."
   },
   "adminSettings": {
     "title": "Admin Panel",
@@ -1828,6 +1895,9 @@
     "selectAllBtn": "Select All",
     "clearAllBtn": "Clear",
     "deckReady": "Deck Ready!",
+    "temporaryVariantTag": "Temporary variant",
+    "temporaryVariantTooltip": "Available for this match only. Does not stay in your collection.",
+    "temporaryVariantsLegend": "Variants opened here are playable for this match only and do not join your collection.",
     "startGame": "Start Game",
     "submitted": "Submitted",
     "cardDetail": "Card Detail",
@@ -1855,6 +1925,105 @@
     "holo": "HOLO",
     "cardBack": "Card back",
     "boosterPack": "Booster Pack"
+  },
+  "topdeck": {
+    "title": "TopDeck",
+    "subtitle": "Card game tournaments from around the world",
+    "searchPlaceholder": "Search a tournament, a city...",
+    "status": {
+      "all": "All",
+      "upcoming": "Upcoming",
+      "ongoing": "Live",
+      "completed": "Completed",
+      "unknown": "Unknown"
+    },
+    "filters": {
+      "game": "Game",
+      "format": "Format",
+      "country": "Country",
+      "allGames": "All games",
+      "allFormats": "All formats",
+      "allCountries": "All countries",
+      "minParticipants": "Min. players",
+      "more": "More filters",
+      "fewer": "Fewer filters",
+      "clear": "Clear filters"
+    },
+    "sort": {
+      "label": "Sort",
+      "recent": "Most recent",
+      "oldest": "Oldest",
+      "biggest": "Biggest"
+    },
+    "card": {
+      "players": "players",
+      "topCut": "Top {count}",
+      "swiss": "{count} rounds",
+      "register": "Register on TopDeck",
+      "viewDetails": "View details",
+      "noLocation": "Location not specified",
+      "date": "Date"
+    },
+    "count": "{count} tournament",
+    "countPlural": "{count} tournaments",
+    "empty": {
+      "title": "No tournament found",
+      "hint": "Try widening your filters or searching another game."
+    },
+    "loadError": "Could not load tournaments. Please try again.",
+    "detail": {
+      "standings": "Standings",
+      "pairings": "Pairings",
+      "decklists": "Decklists",
+      "rank": "Rank",
+      "player": "Player",
+      "points": "Points",
+      "winRate": "Win rate",
+      "oppWinRate": "Opp. win rate",
+      "round": "Round {n}",
+      "table": "Table",
+      "topCut": "Top cut",
+      "swiss": "Swiss",
+      "winner": "Winner",
+      "draw": "Draw",
+      "pending": "In progress",
+      "noStandings": "Standings are not available yet for this tournament.",
+      "noPairings": "Pairings are not available for this tournament.",
+      "noDecklists": "No decklist was shared for this tournament.",
+      "viewDecklist": "View decklist",
+      "searchPlayer": "Search a player...",
+      "bracket": "Bracket",
+      "cards": "{count} cards",
+      "registerOnTopdeck": "Register on TopDeck",
+      "viewOnTopdeck": "View on TopDeck",
+      "notFound": "This tournament is not in our index yet.",
+      "backToList": "All tournaments"
+    },
+    "players": {
+      "title": "Players",
+      "navLink": "Players",
+      "searchPlaceholder": "Search a player by name...",
+      "hint": "Type at least 2 characters to search.",
+      "tournamentsPlayed": "Tournaments",
+      "bestFinish": "Best finish",
+      "wins": "Wins",
+      "top8s": "Top 8",
+      "avgWinRate": "Avg. win rate",
+      "history": "History",
+      "noResults": "No player found.",
+      "notFound": "This player is not in our index yet.",
+      "backToPlayers": "Player search"
+    },
+    "proximity": {
+      "enable": "Sort near me",
+      "sortedNear": "Sorted by distance, then date",
+      "sortedDate": "Sorted by date",
+      "locating": "Locating...",
+      "radius": "Radius",
+      "radiusAll": "All",
+      "radiusKm": "{km} km"
+    },
+    "attribution": "Data provided by TopDeck.gg"
   },
   "tournament": {
     "title": "Tournaments",
@@ -1885,6 +2054,11 @@
     "private": "Private (Code)",
     "useBanList": "Use Ranked Ban List",
     "sealedBoosters": "Booster Count",
+    "prizeLabel": "Winner Prize",
+    "prizeHint": "The winner gets 3 variant boosters plus this card (or 200 XP if they already own it). All participants who stayed until the end get 1 booster.",
+    "prizeNone": "None",
+    "prizePanelTitle": "Winner Prize",
+    "prizeDescription": "Reward granted automatically at tournament completion.",
     "discordRole": "Discord Role Reward",
     "discordRolePlaceholder": "e.g. Tournament Champion",
     "requiresDiscord": "Requires Discord",
@@ -2456,5 +2630,138 @@
     "matchCount": "{count, plural, one {# match} other {# matches}}",
     "winShort": "W",
     "lossShort": "L"
+  },
+  "quests": {
+    "title": "Quests",
+    "subtitle": "100 quests + 1 daily quest to earn XP",
+    "dailyHeader": "Daily quest",
+    "claim": "Claim",
+    "claimed": "Claimed",
+    "claimedXpToast": "+{xp} XP",
+    "levelLabel": "Lv. {level}",
+    "unauthMessage": "Sign in to see your quests.",
+    "loadError": "Failed to load quests. Try again.",
+    "doneTitle": "Quest completed!",
+    "dailyDoneTitle": "Daily quest completed!",
+    "error": {
+      "claimError": "Failed to claim quest. Try again."
+    }
+  },
+  "battlepass": {
+    "title": "Rewards",
+    "subtitle": "Konoha Shido Season",
+    "tabRewards": "Tiers",
+    "tabBoosters": "Boosters",
+    "tabQuests": "Quests",
+    "recommendedQuestsTitle": "Recommended quests",
+    "recommendedQuestsSeeAll": "See all",
+    "recommendedQuestsEmpty": "All recommendable quests are already claimed.",
+    "currentTier": "Current tier",
+    "xpProgress": "XP progress",
+    "xpToNext": "{xp} XP until next tier",
+    "infiniteBoosters": "Infinite boosters earned",
+    "trackLabel": "Tier rewards",
+    "infiniteLabel": "Infinite rewards (after tier 50)",
+    "unauthMessage": "Sign in to track your progress.",
+    "loadError": "Failed to load progression. Try again.",
+    "autoGrantNote": "Boosters are granted automatically when you reach a tier and land in your inventory. Cards from tiers 25 and 50 must be claimed manually with their reveal animation.",
+    "claim": "Claim",
+    "claimAll": "Claim All",
+    "boostersGrantedToast": "+{count} variant boosters added to your inventory",
+    "cardClaimedFallback": "Tier {tier} card unlocked in your collection",
+    "animationLabel": "Tier Reward {tier}",
+    "error": {
+      "invalidBody": "Invalid request.",
+      "notCardTier": "This tier has no card reward.",
+      "notCardReward": "Internal reward error.",
+      "tierNotReached": "Tier not reached yet.",
+      "alreadyUnlocked": "You already own this card.",
+      "claimError": "Failed to claim reward. Try again."
+    }
+  },
+  "trade": {
+    "title": "Trade",
+    "invite": "Trade",
+    "inviteToast": "{name} wants to trade with you",
+    "accept": "Accept",
+    "decline": "Decline",
+    "yourOffer": "Your offer",
+    "theirOffer": "{name}'s offer",
+    "yourInventory": "Your inventory",
+    "confirm": "Confirm trade",
+    "confirmed": "Confirmed",
+    "waitingFor": "Waiting for {name}...",
+    "cancel": "Cancel",
+    "cancelConfirm": "Cancel this trade?",
+    "cancelConfirmYes": "Yes, cancel",
+    "cancelConfirmNo": "Keep trading",
+    "completed": "Trade complete. +{count} card(s) received.",
+    "cancelled": "The trade was cancelled.",
+    "cancelledBy": "{name} cancelled the trade.",
+    "waitingJoin": "Waiting for {name} to join the trade...",
+    "offerEmpty": "Click a card in your inventory to add it to your offer.",
+    "inventoryEmpty": "You have no tradeable variants right now.",
+    "count": "x{count}",
+    "tournamentNote": "Tournament cards can only be traded for each other.",
+    "loading": "Loading trade...",
+    "back": "Back",
+    "history": "Trade history",
+    "historyEmpty": "No trades yet.",
+    "historyGave": "Gave",
+    "historyReceived": "Received",
+    "historyWith": "with {name}",
+    "error": {
+      "invalidBody": "Invalid request.",
+      "notFriend": "You can only trade with friends.",
+      "tierTooLow": "You must be at least league 5 to trade.",
+      "notFound": "Trade not found.",
+      "closed": "This trade is closed.",
+      "tooMany": "20 cards maximum per offer.",
+      "excluded": "This card cannot be traded.",
+      "rateLimit": "Too many trades created today.",
+      "executeFailed": "Trade failed: a player no longer has enough cards.",
+      "loadError": "Failed to load the trade. Try again."
+    }
+  },
+  "boosters": {
+    "title": "Variant Boosters",
+    "totalUnopened": "{count} unopened boosters",
+    "countLine": "You have {count} available",
+    "openCta": "Open",
+    "comingSoonCta": "Soon",
+    "cardsPerBooster": "{count} cards per booster",
+    "ratesTitle": "Drop rates",
+    "ratesSubtitle": "Chance to pull each rarity on a booster slot.",
+    "unavailable": "Unavailable",
+    "helpTitle": "How to earn boosters",
+    "helpBattlepass": "Win a Rewards tier",
+    "helpTournamentWinner": "Win a tournament (3 boosters)",
+    "helpTournamentFinisher": "Finish a tournament to the end (1 booster)",
+    "error": {
+      "invalidBody": "Invalid request.",
+      "setRequired": "Set is required.",
+      "setNotAvailable": "This set is not available.",
+      "noBoosterAvailable": "No booster available anymore. Please refresh the page.",
+      "serverError": "Failed to open booster. Please try again."
+    },
+    "animation": {
+      "opening": "Opening…",
+      "skip": "Skip",
+      "continue": "Continue",
+      "newUnlock": "New",
+      "tapToOpen": "Click to open",
+      "aria": "Opening a variant booster",
+      "finale": {
+        "RA": "Rare Art",
+        "MV": "Mythos Variant",
+        "SV": "Secret Variant",
+        "L": "Legendary"
+      }
+    },
+    "recovery": {
+      "title": "Display unavailable",
+      "body": "Booster opened but display unavailable. Your cards have been added to the collection.",
+      "back": "Back"
+    }
   }
 }

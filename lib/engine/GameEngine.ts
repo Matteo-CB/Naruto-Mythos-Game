@@ -122,6 +122,8 @@ export class GameEngine {
     const state: GameState = {
       gameId,
       gameMode: config.gameMode,
+      player1UserId: config.player1.userId ?? undefined,
+      player2UserId: config.player2.userId ?? undefined,
       turn: 1 as TurnNumber,
       phase: 'mulligan',
       activePlayer: startingPlayer,

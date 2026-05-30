@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getRarityLabel } from '@/lib/utils/cardLocale';
+import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 
 interface SealedPoolReviewProps {
   cards: BoosterCard[];
@@ -156,12 +157,25 @@ function PoolCard({ card, index, locale }: { card: BoosterCard; index: number; l
           <span className="text-[8px] font-bold" style={{ color: rarityColor }}>{card.rarity}</span>
         </div>
       </div>
-      {card.isHolo && (
+      {card.isHolo && !card.isTemporaryVariant && (
         <div className="absolute top-0.5 left-0.5">
           <span className="text-[6px] px-0.5 rounded font-bold" style={{ backgroundColor: 'rgba(196,163,90,0.8)', color: '#0a0a0a' }}>
             {t('holo')}
           </span>
         </div>
+      )}
+      {card.isTemporaryVariant && (
+        <>
+          <VariantHoloOverlay intensity="subtle" />
+          <div className="absolute top-0.5 left-0.5 z-10" title={t('temporaryVariantTooltip')}>
+            <span
+              className="font-display text-[7px] px-0.5 tracking-widest uppercase"
+              style={{ backgroundColor: 'rgba(196,163,90,0.85)', color: '#0a0a0a' }}
+            >
+              {t('temporaryVariantTag')}
+            </span>
+          </div>
+        </>
       )}
     </motion.div>
   );

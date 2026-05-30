@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { emitToUser } from '@/lib/socket/io';
+import { emitQuestEvent } from '@/lib/quests/hooks';
+import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
+
+ensureQuestPersistenceListener();
 
 const inviteRate = new Map<string, number[]>();
 const INVITE_WINDOW_MS = 60 * 60 * 1000;
@@ -112,7 +116,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    
+    emitQuestEvent('social.match.invite.sent', userId);
+
     emitToUser(receiverId, 'match:invite-received', {
       inviteId: invite.id,
       sender: {

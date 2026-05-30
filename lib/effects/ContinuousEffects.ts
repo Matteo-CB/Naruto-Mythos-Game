@@ -544,12 +544,13 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
   for (const char of opponentChars) {
     if (char.isHidden) continue;
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
+    const topCardNumber = typeof topCard.number === 'string' ? parseInt(topCard.number, 10) : topCard.number;
 
     for (const effect of topCard.effects ?? []) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
-      
-      if (topCard.number === 37 && effect.description.includes('POWERUP 1')) {
+
+      if (topCardNumber === 37 && effect.description.includes('POWERUP 1')) {
         const missions = [...newState.activeMissions];
         const updatedMission = { ...missions[missionIndex] };
         const side = opponent === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -568,7 +569,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
       }
 
       
-      if (topCard.number === 31 && effect.description.includes('1 Chakra')) {
+      if (topCardNumber === 31 && effect.description.includes('1 Chakra')) {
         const ps = { ...newState[opponent] };
         ps.chakra += 1;
         newState = { ...newState, [opponent]: ps };

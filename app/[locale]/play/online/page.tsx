@@ -21,6 +21,8 @@ import { useMemo } from 'react';
 import { randomHoloHue } from '@/lib/utils/holoColor';
 import { useToastStore } from '@/stores/toastStore';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
+import { ALL_SET_IDS, SET_REGISTRY, isSetAvailable } from '@/lib/data/sets/registry';
+import { useLocale } from 'next-intl';
 
 type GameMode = 'casual' | 'ranked';
 type View = 'browse' | 'private';
@@ -32,6 +34,9 @@ interface ResolvedDeck {
 }
 
 const EVOLVING_TOGGLE_STORAGE_KEY = 'naruto-mythos-evolving-toggle';
+const SEALED_TOGGLE_STORAGE_KEY = 'naruto-mythos-sealed-toggle';
+const SEALED_DEFAULT_BOOSTER_COUNT: 4 | 5 | 6 = 5;
+const SEALED_DEFAULT_SET_CHOICE = 'KS';
 
 export default function PlayOnlinePage() {
   const t = useTranslations();
@@ -43,8 +48,15 @@ export default function PlayOnlinePage() {
     if (typeof window === 'undefined') return false;
     const fromUrl = searchParams.get('mode');
     if (fromUrl === 'evolving') return true;
-    if (fromUrl === 'ranked') return false;
+    if (fromUrl === 'ranked' || fromUrl === 'sealed') return false;
     return localStorage.getItem(EVOLVING_TOGGLE_STORAGE_KEY) === '1';
+  })();
+  const initialSealed = (() => {
+    if (typeof window === 'undefined') return false;
+    const fromUrl = searchParams.get('mode');
+    if (fromUrl === 'sealed') return true;
+    if (fromUrl === 'evolving' || fromUrl === 'ranked') return false;
+    try { return localStorage.getItem(SEALED_TOGGLE_STORAGE_KEY) === '1'; } catch { return false; }
   })();
 
   const [view, setView] = useState<View>('browse');
@@ -55,12 +67,26 @@ export default function PlayOnlinePage() {
   const [showJoinInput, setShowJoinInput] = useState(false);
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [isEvolvingToggle, setIsEvolvingToggle] = useState(initialEvolving);
+  const [isEvolvingToggle, setIsEvolvingToggleRaw] = useState(initialEvolving);
+  const [isSealedToggle, setIsSealedToggleRaw] = useState<boolean>(initialSealed);
+  const setIsEvolvingToggle = useCallback((v: boolean) => {
+    setIsEvolvingToggleRaw(v);
+    if (v) setIsSealedToggleRaw(false);
+  }, []);
+  const setIsSealedToggle = useCallback((v: boolean) => {
+    setIsSealedToggleRaw(v);
+    if (v) setIsEvolvingToggleRaw(false);
+  }, []);
   const [roomCreatedAt, setRoomCreatedAt] = useState<number | null>(null);
   const [, setRoomTick] = useState(0);
   useEffect(() => {
     try { localStorage.setItem(EVOLVING_TOGGLE_STORAGE_KEY, isEvolvingToggle ? '1' : '0'); } catch { /* ignore */ }
   }, [isEvolvingToggle]);
+  useEffect(() => {
+    try { localStorage.setItem(SEALED_TOGGLE_STORAGE_KEY, isSealedToggle ? '1' : '0'); } catch { /* ignore */ }
+  }, [isSealedToggle]);
+  const [sealedSetChoice, setSealedSetChoice] = useState<string>(SEALED_DEFAULT_SET_CHOICE);
+  const locale = useLocale() as 'en' | 'fr';
   const showToast = useToastStore((s) => s.showToast);
   const triggerEvoErrorToast = useCallback(() => {
     showToast({
@@ -268,18 +294,33 @@ export default function PlayOnlinePage() {
     try {
       if (!connected) await connect(session.user.id, session.user.name ?? undefined);
       const isRanked = mode === 'ranked';
-      createRoom(
-        session.user.id,
-        false,
-        isRanked,
-        false,
-        isEvolvingToggle && isRanked ? 'evolving' : mode,
-        session.user.name ?? undefined,
-        undefined,
-        undefined,
-        isAnonymous,
-        isEvolvingToggle,
-      );
+      if (isSealedToggle) {
+        createRoom(
+          session.user.id,
+          false,
+          false,
+          true,
+          'sealed',
+          session.user.name ?? undefined,
+          SEALED_DEFAULT_BOOSTER_COUNT,
+          sealedSetChoice,
+          isAnonymous,
+          false,
+        );
+      } else {
+        createRoom(
+          session.user.id,
+          false,
+          isRanked,
+          false,
+          isEvolvingToggle && isRanked ? 'evolving' : mode,
+          session.user.name ?? undefined,
+          undefined,
+          undefined,
+          isAnonymous,
+          isEvolvingToggle,
+        );
+      }
       setIsPrivateRoom(false);
     } catch { /* ignore */ }
   };
@@ -292,18 +333,33 @@ export default function PlayOnlinePage() {
     try {
       if (!connected) await connect(session.user.id, session.user.name ?? undefined);
       const isRanked = selectedMode === 'ranked';
-      createRoom(
-        session.user.id,
-        true,
-        isRanked,
-        false,
-        isEvolvingToggle && isRanked ? 'evolving' : selectedMode,
-        session.user.name ?? undefined,
-        undefined,
-        undefined,
-        isAnonymous,
-        isEvolvingToggle,
-      );
+      if (isSealedToggle) {
+        createRoom(
+          session.user.id,
+          true,
+          false,
+          true,
+          'sealed',
+          session.user.name ?? undefined,
+          SEALED_DEFAULT_BOOSTER_COUNT,
+          sealedSetChoice,
+          isAnonymous,
+          false,
+        );
+      } else {
+        createRoom(
+          session.user.id,
+          true,
+          isRanked,
+          false,
+          isEvolvingToggle && isRanked ? 'evolving' : selectedMode,
+          session.user.name ?? undefined,
+          undefined,
+          undefined,
+          isAnonymous,
+          isEvolvingToggle,
+        );
+      }
       setIsPrivateRoom(true);
     } catch { /* ignore */ }
   };
@@ -316,6 +372,12 @@ export default function PlayOnlinePage() {
       joinRoom(codeToJoin, session.user.id);
     } catch { /* ignore */ }
   };
+
+  useEffect(() => {
+    if (roomCode && currentRoomGameMode === 'sealed' && !tournamentMatchRoom) {
+      router.replace(`/play/sealed?room=${encodeURIComponent(roomCode)}`);
+    }
+  }, [roomCode, currentRoomGameMode, router, tournamentMatchRoom]);
 
   const handleDeckSelect = (deck: ResolvedDeck) => {
     selectDeck(deck.characters, deck.missions, deck.id);
@@ -456,6 +518,13 @@ export default function PlayOnlinePage() {
                           onChange={setIsEvolvingToggle}
                           blocked={evoToggleBlocked}
                           previewHue={previewHue}
+                        />
+                        <SealedToggleBlock
+                          checked={isSealedToggle}
+                          onChange={setIsSealedToggle}
+                          setChoice={sealedSetChoice}
+                          onSetChoiceChange={setSealedSetChoice}
+                          locale={locale}
                         />
                       </div>
                     </Section>
@@ -997,6 +1066,85 @@ function ViewTabs({ view, onChange }: { view: View; onChange: (v: View) => void 
     </div>
   );
 }
+
+function SealedToggleBlock({
+  checked, onChange, setChoice, onSetChoiceChange, locale,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  setChoice: string;
+  onSetChoiceChange: (v: string) => void;
+  locale: 'en' | 'fr';
+}) {
+  const t = useTranslations();
+  return (
+    <div className="flex flex-col gap-1">
+      <ToggleRow
+        label={t('online.sealed.toggleLabel')}
+        description={t('online.sealed.toggleDescription')}
+        checked={checked}
+        onChange={onChange}
+        accent="#c4a35a"
+      />
+      <div
+        className="flex flex-col gap-2 px-3 sm:px-4 py-2.5"
+        style={{
+          backgroundColor: 'rgba(15, 15, 20, 0.78)',
+          boxShadow: '0 12px 32px rgba(0,0,0,0.3)',
+          opacity: checked ? 1 : 0.55,
+        }}
+      >
+        <span className="text-[10px] uppercase tracking-widest" style={{ color: '#888' }}>
+          {t('online.sealed.setChoiceLabel')}
+        </span>
+        <div className="flex flex-wrap gap-2">
+          {ALL_SET_IDS.map((sid) => {
+            const desc = SET_REGISTRY[sid];
+            const name = locale === 'fr' ? desc.nameFr : desc.nameEn;
+            const available = isSetAvailable(sid);
+            const selectable = checked && available;
+            const isSelected = setChoice === sid;
+            return (
+              <button
+                key={sid}
+                type="button"
+                onClick={() => selectable && onSetChoiceChange(sid)}
+                disabled={!selectable}
+                className="px-3 py-1.5 text-[10px] uppercase tracking-widest font-display"
+                style={{
+                  backgroundColor: isSelected ? '#c4a35a' : '#1a1a1a',
+                  color: !selectable ? '#444' : isSelected ? '#0a0a0a' : '#888',
+                  cursor: selectable ? 'pointer' : 'not-allowed',
+                  opacity: selectable ? 1 : 0.6,
+                }}
+                title={!available ? t('common.comingSoon') : undefined}
+              >
+                {name}
+                {!available && <span className="ml-1 normal-case opacity-70">({t('common.comingSoon')})</span>}
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            disabled
+            className="px-3 py-1.5 text-[10px] uppercase tracking-widest font-display"
+            style={{
+              backgroundColor: '#1a1a1a',
+              color: '#444',
+              cursor: 'not-allowed',
+              opacity: 0.6,
+            }}
+            title={t('common.comingSoon')}
+          >
+            {t('online.sealed.setRandom')}
+            <span className="ml-1 normal-case opacity-70">({t('common.comingSoon')})</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 function EvolvingToggleBlock({
   checked, onChange, blocked, previewHue,

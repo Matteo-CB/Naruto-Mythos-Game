@@ -1,6 +1,10 @@
 
 import type { Server, Socket } from 'socket.io';
 import { prisma } from '@/lib/db/prisma';
+import { emitQuestEvent } from '@/lib/quests/hooks';
+import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
+
+ensureQuestPersistenceListener();
 import { startAbsenceTimer, clearAbsenceTimer, scheduleAbsenceTimerWithDeadline, ABSENCE_TIMEOUT_MS } from '@/lib/tournament/absenceManager';
 import { assignTournamentWinnerRole } from '@/lib/discord/tournamentRoles';
 import { sendTournamentResults } from '@/lib/discord/tournamentWebhook';
@@ -22,8 +26,43 @@ import {
 import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { computeDeckEvolvingPoints } from '@/lib/evolving/computePoints';
+import {
+  grantWinnerPrize,
+  grantParticipantReward,
+  listEligibleParticipantsForReward,
+  markParticipantAbsence,
+  readTournamentPrizeCardId,
+  acquirePrizeAwardLock,
+} from '@/lib/tournament/prizes';
 
 const matchReadyPlayers = new Map<string, Set<string>>();
+
+async function isWinnerDeckMonoVillage(tournamentId: string, winnerUserId: string): Promise<boolean> {
+  try {
+    const participant = await prisma.tournamentParticipant.findFirst({
+      where: { tournamentId, userId: winnerUserId },
+      select: { deckId: true, sealedDeck: true },
+    });
+    if (!participant) return false;
+    let cardIds: string[] = [];
+    if (participant.deckId) {
+      const deck = await prisma.deck.findUnique({ where: { id: participant.deckId }, select: { cardIds: true } });
+      if (deck?.cardIds) cardIds = deck.cardIds;
+    } else if (participant.sealedDeck && typeof participant.sealedDeck === 'object') {
+      const sealed = participant.sealedDeck as { cardIds?: unknown };
+      if (Array.isArray(sealed.cardIds)) cardIds = sealed.cardIds.filter((id): id is string => typeof id === 'string');
+    }
+    if (cardIds.length === 0) return false;
+    const groups = new Set<string>();
+    for (const id of cardIds) {
+      const c = getCharacterById(id);
+      if (c?.group) groups.add(c.group);
+    }
+    return groups.size === 1;
+  } catch {
+    return false;
+  }
+}
 
 
 const swissRoundLocks = new Map<string, Promise<void>>();
@@ -164,10 +203,13 @@ export async function fireAbsenceTimerCallback(
     if (isSwiss) {
       await handleSwissDoubleAbsence(io, tournamentId, matchId);
     } else {
+      await markParticipantAbsence(tournamentId, p1);
+      if (p2) await markParticipantAbsence(tournamentId, p2);
       await handleMatchForfeit(io, tournamentId, matchId, p1);
     }
   } else if (absent1 || absent2) {
     const forfeitId = absent1 ? p1 : p2;
+    if (forfeitId) await markParticipantAbsence(tournamentId, forfeitId);
     await handleMatchForfeit(io, tournamentId, matchId, forfeitId);
   } else {
     console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} no absent player at fire time, no-op`);
@@ -421,6 +463,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             const absentPlayerId = !hostJoined ? r.hostId : r.guestId;
             if (!absentPlayerId) return;
             console.log(`[Tournament] Match ${matchId} forfeit: player ${absentPlayerId} did not join within ${TOURNAMENT_JOIN_TIMEOUT_MS}ms`);
+            await markParticipantAbsence(tournamentId, absentPlayerId);
             await handleMatchForfeit(io, tournamentId, matchId, absentPlayerId);
           }, TOURNAMENT_JOIN_TIMEOUT_MS);
         }
@@ -590,6 +633,9 @@ export async function handleSwissDoubleAbsence(io: Server, tournamentId: string,
       where: { tournamentId, userId: { in: absentIds } },
       data: { eliminated: true, eliminatedRound: match.round },
     });
+    for (const id of absentIds) {
+      await markParticipantAbsence(tournamentId, id);
+    }
   }
 
   logMatchEvent({
@@ -995,6 +1041,28 @@ export async function handleSwissMatchEnd(
         format: 'swiss',
       });
 
+      try {
+        emitQuestEvent('tournament.won.swiss', winner.userId);
+        const isMono = await isWinnerDeckMonoVillage(tournamentId, winner.userId);
+        if (isMono) emitQuestEvent('tournament.won.mono_village', winner.userId);
+      } catch (err) {
+        console.error('[quests] swiss tournament emit failed:', err instanceof Error ? err.message : err);
+      }
+
+      try {
+        const acquired = await acquirePrizeAwardLock(tournamentId);
+        if (acquired) {
+          const prizeCardId = await readTournamentPrizeCardId(tournamentId);
+          await grantWinnerPrize(winner.userId, prizeCardId);
+          const eligibles = await listEligibleParticipantsForReward(tournamentId, winner.userId);
+          for (const p of eligibles) {
+            if (p.stayedUntilEnd) await grantParticipantReward(p.userId);
+          }
+        }
+      } catch (err) {
+        console.error('[Tournament] swiss prize grant failed:', err instanceof Error ? err.message : err);
+      }
+
       io.to(`tournament:${tournamentId}`).emit('tournament:completed', {
         winnerId: winner.userId,
         winnerUsername: winner.username,
@@ -1139,6 +1207,30 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
     });
     logMatchEvent({ type: 'tournament.completed', tournamentId, winnerId, format: 'elimination' });
     io?.to(`tournament:${tournamentId}`).emit('tournament:completed', { winnerId, winnerUsername });
+
+    try {
+      const meta = await prisma.tournament.findUnique({
+        where: { id: tournamentId },
+        select: { format: true, gameMode: true },
+      });
+      const format: string = meta?.format ?? 'single';
+      if (format === 'swiss') emitQuestEvent('tournament.won.swiss', winnerId);
+      else emitQuestEvent('tournament.won.single', winnerId);
+      const isMono = await isWinnerDeckMonoVillage(tournamentId, winnerId);
+      if (isMono) emitQuestEvent('tournament.won.mono_village', winnerId);
+
+      const acquired = await acquirePrizeAwardLock(tournamentId);
+      if (acquired) {
+        const prizeCardId = await readTournamentPrizeCardId(tournamentId);
+        await grantWinnerPrize(winnerId, prizeCardId);
+        const eligibles = await listEligibleParticipantsForReward(tournamentId, winnerId);
+        for (const p of eligibles) {
+          if (p.stayedUntilEnd) await grantParticipantReward(p.userId);
+        }
+      }
+    } catch (err) {
+      console.error('[quests] tournament emit failed:', err instanceof Error ? err.message : err);
+    }
 
     await cleanupTournamentMaps(tournamentId);
 
@@ -1444,6 +1536,24 @@ async function finalizeDoubleElim(
   });
   logMatchEvent({ type: 'tournament.completed', tournamentId, winnerId, format: 'double_elimination' });
   io?.to(`tournament:${tournamentId}`).emit('tournament:completed', { winnerId, winnerUsername });
+
+  try {
+    emitQuestEvent('tournament.won.single', winnerId);
+    const isMono = await isWinnerDeckMonoVillage(tournamentId, winnerId);
+    if (isMono) emitQuestEvent('tournament.won.mono_village', winnerId);
+
+    const acquired = await acquirePrizeAwardLock(tournamentId);
+    if (acquired) {
+      const prizeCardId = await readTournamentPrizeCardId(tournamentId);
+      await grantWinnerPrize(winnerId, prizeCardId);
+      const eligibles = await listEligibleParticipantsForReward(tournamentId, winnerId);
+      for (const p of eligibles) {
+        if (p.stayedUntilEnd) await grantParticipantReward(p.userId);
+      }
+    }
+  } catch (err) {
+    console.error('[quests] tournament emit failed:', err instanceof Error ? err.message : err);
+  }
   await cleanupTournamentMaps(tournamentId);
 
   let newRoleName: string | null = null;

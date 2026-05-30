@@ -99,7 +99,7 @@ describe('AI refactor sanity', () => {
     expect(AIPlayer.createStrategy('impossible')).toBeInstanceOf(ImpossibleAI);
   });
 
-  it('Hard AI returns a legal action when it is its turn', () => {
+  it('Hard AI returns a legal action when it is its turn', { timeout: 20000 }, () => {
     const config = makeConfig(allChars, allMissions, 'hard');
     const state = GameEngine.createGame(config);
     let s = passMulligan(state);

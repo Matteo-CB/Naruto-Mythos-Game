@@ -48,10 +48,71 @@ model User {
   evolvingWins       Int          @default(0)
   evolvingLosses     Int          @default(0)
   evolvingDraws      Int          @default(0)
+  unlockedVariantCardIds   String[]              @default([])
+  battlepassXp             Int                   @default(0)
+  battlepassTier           Int                   @default(0)
+  infiniteBoostersGranted  Int                   @default(0)
+  unopenedBoosters         BoosterInventory[]
+  questProgresses          QuestProgress[]
+  dailyQuestProgresses     DailyQuestProgress[]
 
   @@index([elo])
   @@index([createdAt])
   @@index([evolvingElo])
+}
+
+model BoosterInventory {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  setId     String
+  count     Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, setId])
+  @@index([userId])
+}
+
+model QuestProgress {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String    @db.ObjectId
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questId     String
+  progress    Int       @default(0)
+  target      Int
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  claimed     Boolean   @default(false)
+  claimedAt   DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, questId])
+  @@index([userId, completed, claimed])
+}
+
+model DailyQuestAssignment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  date      String   @unique
+  questId   String
+  createdAt DateTime @default(now())
+}
+
+model DailyQuestProgress {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String    @db.ObjectId
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date        String
+  questId     String
+  progress    Int       @default(0)
+  target      Int
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  claimed     Boolean   @default(false)
+  claimedAt   DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId, claimed])
 }
 
 /// Per-game ELO snapshot. Survives the Game row purge (72h) up to 14 days so
@@ -244,6 +305,7 @@ model Tournament {
   maxDeckSize        Int?                                  // optional max deck size
   maxChakraCost      Int?                                  // max individual card chakra cost
   restrictionNote    String?                               // free-text note shown to players
+  prizeCardId        String?                               // Phase 6: tournament winner prize card (KS-108-MV / KS-120-MV / KS-128-MV / KS-137-MV)
   scheduledStartAt   DateTime?
   matchTimeLimitMs   Int                     @default(1800000)
   joinTimeLimitMs    Int                     @default(300000)
@@ -390,4 +452,102 @@ model Suggestion {
   upvotes     Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model VariantInventory {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String @db.ObjectId
+  cardId   String
+  count    Int    @default(1)
+
+  @@unique([userId, cardId])
+  @@index([userId])
+}
+
+model TradeRoom {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  creatorId     String    @db.ObjectId
+  guestId       String    @db.ObjectId
+  status        String    @default("pending")
+  creatorOffer  String[]  @default([])
+  guestOffer    String[]  @default([])
+  creatorReady  Boolean   @default(false)
+  guestReady    Boolean   @default(false)
+  completedAt   DateTime?
+  cancelledAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([creatorId])
+  @@index([guestId])
+  @@index([status, createdAt])
+}
+
+model TradeLog {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  tradeRoomId    String   @db.ObjectId
+  senderId       String   @db.ObjectId
+  receiverId     String   @db.ObjectId
+  senderCards    String[]
+  receiverCards  String[]
+  executedAt     DateTime @default(now())
+
+  @@index([senderId, executedAt])
+  @@index([receiverId, executedAt])
+}
+
+model TopdeckTournament {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  tid             String    @unique
+  name            String
+  game            String
+  format          String
+  startDate       DateTime?
+  endDate         DateTime?
+  status          String
+  city            String?
+  state           String?
+  country         String?
+  locationName    String?
+  location        Json?
+  participants    Int       @default(0)
+  topCut          Int?
+  swissNum        Int?
+  standings       Json?
+  rounds          Json?
+  hasDetail       Boolean   @default(false)
+  raw             Json?
+  fetchedAt       DateTime
+  detailFetchedAt DateTime?
+
+  @@index([status, startDate])
+  @@index([game, format, startDate])
+  @@index([city])
+  @@index([state])
+  @@index([country])
+}
+
+model TopdeckPollerState {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  key         String   @unique
+  value       Json
+  heartbeatAt DateTime
+}
+
+model TopdeckPlayerResult {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  playerKey      String
+  playerName     String
+  playerId       String?
+  tid            String
+  tournamentName String
+  game           String
+  format         String
+  startDate      DateTime?
+  standing       Int?
+  points         Float?
+  winRate        Float?
+
+  @@unique([tid, playerKey])
+  @@index([playerKey])
+  @@index([playerName])
 }

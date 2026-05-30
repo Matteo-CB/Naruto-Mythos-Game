@@ -6,10 +6,12 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { useToastStore, type ToastItem, type ToastType } from '@/stores/toastStore';
 
-const TYPE_COLOR: Record<ToastType, { accent: string; bg: string }> = {
-  error: { accent: '#b33e3e', bg: 'rgba(20, 8, 8, 0.94)' },
-  info: { accent: '#c4a35a', bg: 'rgba(15, 14, 10, 0.94)' },
-  success: { accent: '#5fb05f', bg: 'rgba(10, 18, 12, 0.94)' },
+const TOAST_CLIP = 'polygon(11px 0, calc(100% - 11px) 0, 100% 11px, 100% calc(100% - 11px), calc(100% - 11px) 100%, 11px 100%, 0 calc(100% - 11px), 0 11px)';
+
+const TYPE_ACCENT: Record<ToastType, string> = {
+  error: '#d97676',
+  info: '#c4a35a',
+  success: '#5fb05f',
 };
 
 export function ToastContainer() {
@@ -17,7 +19,7 @@ export function ToastContainer() {
 
   return (
     <div
-      className="fixed inset-x-3 sm:inset-x-auto sm:right-4 sm:left-auto bottom-3 sm:bottom-4 z-50 flex flex-col gap-2 sm:max-w-sm pointer-events-none"
+      className="fixed inset-x-3 sm:inset-x-auto sm:right-5 sm:left-auto bottom-4 sm:bottom-5 z-50 flex flex-col items-stretch sm:items-end gap-2.5 pointer-events-none"
       role="status"
       aria-live="polite"
     >
@@ -33,7 +35,7 @@ export function ToastContainer() {
 function Toast({ toast }: { toast: ToastItem }) {
   const t = useTranslations();
   const dismiss = useToastStore((s) => s.dismissToast);
-  const colors = TYPE_COLOR[toast.type];
+  const accent = TYPE_ACCENT[toast.type];
 
   useEffect(() => {
     if (toast.durationMs <= 0) return;
@@ -55,59 +57,71 @@ function Toast({ toast }: { toast: ToastItem }) {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 16, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 12, scale: 0.97 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="flex flex-col gap-1.5 px-4 py-3 pointer-events-auto no-select"
+      initial={{ opacity: 0, x: 56, scale: 0.94 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      exit={{ opacity: 0, x: 56, scale: 0.94 }}
+      transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
+      className="relative w-full sm:w-[340px] pointer-events-auto no-select overflow-hidden"
       style={{
-        backgroundColor: colors.bg,
-        boxShadow: '0 16px 40px rgba(0,0,0,0.55)',
+        backgroundColor: '#0d0c10',
+        clipPath: TOAST_CLIP,
+        boxShadow: `0 18px 44px rgba(0,0,0,0.6), 0 0 18px ${accent}22`,
       }}
     >
-      {title && (
-        <span
-          className="text-[10px] font-bold uppercase"
-          style={{ color: colors.accent, letterSpacing: '0.22em' }}
-        >
-          {title}
-        </span>
-      )}
-      {message && (
-        <span className="text-[12px]" style={{ color: '#e8e8e8' }}>
-          {message}
-        </span>
-      )}
-      <div className="flex items-center justify-between gap-3 mt-1">
-        {toast.action && actionLabel ? (
-          toast.action.href ? (
-            <Link
-              href={toast.action.href as '/'}
-              onClick={() => dismiss(toast.id)}
-              className="text-[11px] uppercase font-bold cursor-pointer"
-              style={{ color: '#c4a35a', letterSpacing: '0.14em', textDecoration: 'underline' }}
+      <div className="flex flex-col gap-1.5 px-4 py-3" style={{ backgroundColor: `${accent}12` }}>
+        {title && (
+          <div className="flex items-center gap-2.5">
+            <span
+              className="font-display text-[10px] uppercase leading-none whitespace-nowrap"
+              style={{ color: accent, letterSpacing: '0.26em' }}
             >
-              {actionLabel}
-            </Link>
-          ) : (
-            <button
-              type="button"
-              onClick={onActionClick}
-              className="text-[11px] uppercase font-bold cursor-pointer"
-              style={{ color: '#c4a35a', letterSpacing: '0.14em', textDecoration: 'underline', background: 'none', border: 'none', padding: 0 }}
-            >
-              {actionLabel}
-            </button>
-          )
-        ) : <span />}
-        <button
-          type="button"
-          onClick={() => dismiss(toast.id)}
-          className="text-[10px] uppercase cursor-pointer"
-          style={{ color: '#555', letterSpacing: '0.14em', background: 'none', border: 'none', padding: 0 }}
-        >
-          {t('common.dismiss')}
-        </button>
+              {title}
+            </span>
+            <motion.span
+              className="flex-1 h-px origin-left"
+              style={{ backgroundColor: `${accent}55` }}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.06 }}
+            />
+          </div>
+        )}
+        {message && (
+          <span className="text-[12.5px] leading-snug" style={{ color: '#e8e6df' }}>
+            {message}
+          </span>
+        )}
+        <div className="flex items-center justify-between gap-3 mt-0.5">
+          {toast.action && actionLabel ? (
+            toast.action.href ? (
+              <Link
+                href={toast.action.href as '/'}
+                onClick={() => dismiss(toast.id)}
+                className="font-display text-[10px] uppercase cursor-pointer transition-opacity hover:opacity-80"
+                style={{ color: accent, letterSpacing: '0.16em' }}
+              >
+                {actionLabel}
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={onActionClick}
+                className="font-display text-[10px] uppercase cursor-pointer transition-opacity hover:opacity-80"
+                style={{ color: accent, letterSpacing: '0.16em', background: 'none', border: 'none', padding: 0 }}
+              >
+                {actionLabel}
+              </button>
+            )
+          ) : <span />}
+          <button
+            type="button"
+            onClick={() => dismiss(toast.id)}
+            className="font-display text-[9px] uppercase cursor-pointer transition-colors hover:text-[#999]"
+            style={{ color: '#555', letterSpacing: '0.16em', background: 'none', border: 'none', padding: 0 }}
+          >
+            {t('common.dismiss')}
+          </button>
+        </div>
       </div>
     </motion.div>
   );

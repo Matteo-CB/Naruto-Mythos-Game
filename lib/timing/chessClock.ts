@@ -3,6 +3,7 @@ import type { PlayerID } from '@/lib/engine/types';
 
 export const CHESS_CLOCK_INITIAL_MS = 15 * 60 * 1000;
 export const CHESS_CLOCK_IDLE_LIMIT_MS = 2 * 60 * 1000;
+export const CHESS_CLOCK_DISCONNECT_FORFEIT_MS = 2 * 60 * 1000;
 export const CHESS_CLOCK_IDLE_TOAST_MS = 60 * 1000;
 export const CHESS_CLOCK_MULLIGAN_IDLE_MS = 60 * 1000;
 

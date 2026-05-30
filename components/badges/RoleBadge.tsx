@@ -26,18 +26,14 @@ export function RoleBadge({ role, size = 'sm' }: RoleBadgeProps) {
 
   const sizes = {
     sm: {
-      padding: '1px 7px',
       fontSize: '9px',
       symbolSize: '8px',
       gap: '3px',
-      borderWidth: '1px',
     },
     md: {
-      padding: '3px 10px',
       fontSize: '11px',
       symbolSize: '11px',
       gap: '4px',
-      borderWidth: '1px',
     },
   };
 
@@ -45,25 +41,22 @@ export function RoleBadge({ role, size = 'sm' }: RoleBadgeProps) {
 
   return (
     <div
-      className="inline-flex items-center rounded-full"
+      className="inline-flex items-center"
       style={{
-        padding: s.padding,
-        backgroundColor: config.bgColor,
-        border: `${s.borderWidth} solid ${config.borderColor}`,
-        boxShadow: `0 0 8px ${config.glowColor}, inset 0 1px 0 rgba(255,255,255,0.04)`,
         gap: s.gap,
       }}
     >
-      <span
+      <img
+        src="/images/icons/admin-shield.svg"
+        alt=""
+        draggable={false}
         style={{
-          color: config.color,
-          fontSize: s.symbolSize,
-          lineHeight: 1,
-          textShadow: `0 0 6px ${config.glowColor}`,
+          width: s.symbolSize,
+          height: s.symbolSize,
+          display: 'block',
+          filter: `drop-shadow(0 0 4px ${config.glowColor})`,
         }}
-      >
-        {config.secondarySymbol}
-      </span>
+      />
       <span
         className="font-bold uppercase tracking-widest"
         style={{
@@ -76,16 +69,17 @@ export function RoleBadge({ role, size = 'sm' }: RoleBadgeProps) {
       >
         {t(role)}
       </span>
-      <span
+      <img
+        src="/images/icons/admin-shield.svg"
+        alt=""
+        draggable={false}
         style={{
-          color: config.color,
-          fontSize: s.symbolSize,
-          lineHeight: 1,
-          textShadow: `0 0 6px ${config.glowColor}`,
+          width: s.symbolSize,
+          height: s.symbolSize,
+          display: 'block',
+          filter: `drop-shadow(0 0 4px ${config.glowColor})`,
         }}
-      >
-        {config.symbol}
-      </span>
+      />
     </div>
   );
 }

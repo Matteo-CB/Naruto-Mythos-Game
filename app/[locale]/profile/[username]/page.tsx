@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, use } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSession } from 'next-auth/react';
+import { useTrackOnMount } from '@/lib/hooks/useTrackUi';
 import { motion } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -195,6 +196,7 @@ export default function ProfilePage({
   const tc = useTranslations('common');
   const td = useTranslations('discord');
   const locale = useLocale();
+  useTrackOnMount('ui.profile.opened');
   const { data: session, update: updateSession } = useSession();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);

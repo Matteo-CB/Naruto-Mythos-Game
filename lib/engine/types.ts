@@ -126,6 +126,10 @@ export interface MissionScoringProgress {
 export interface GameState {
   gameId: string;
   gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving';
+  player1UserId?: string;
+  player2UserId?: string;
+  player1EffectsUsed?: boolean;
+  player2EffectsUsed?: boolean;
   turn: TurnNumber;
   phase: GamePhase;
   activePlayer: PlayerID;

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { validateDeckForTournament } from '@/lib/tournament/deckValidation';
+import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
 import { getSocketIO } from '@/lib/socket/server';
 
 
@@ -55,7 +56,15 @@ export async function POST(
       return NextResponse.json({ error: 'Deck not found or not yours', errorKey: 'tournament.error.deckNotFound' }, { status: 404 });
     }
 
-    
+    const variantCheck = await validateDeckVariantUnlocks(session.user.id, deck.cardIds);
+    if (!variantCheck.ok) {
+      return NextResponse.json(
+        { error: 'Deck contains locked variant cards', errorKey: 'deckBuilder.error.variantLocked', lockedCardIds: variantCheck.lockedCardIds },
+        { status: 400 },
+      );
+    }
+
+
     let effectiveTournament = tournament;
     if (tournament.useBanList) {
       const globalBanned = await prisma.bannedCard.findMany({ select: { cardId: true } });

@@ -112,7 +112,10 @@ export function ConnectionStatusIndicator() {
                   opacity: 0.85,
                 }}
               >
-                {t('retry')}
+                <span className="inline-flex items-center gap-1">
+                  <img src="/images/icons/refresh.svg" alt="" draggable={false} style={{ width: 10, height: 10, opacity: 0.85 }} />
+                  {t('retry')}
+                </span>
               </button>
             )}
           </motion.div>

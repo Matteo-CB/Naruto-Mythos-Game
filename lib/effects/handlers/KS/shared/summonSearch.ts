@@ -90,6 +90,73 @@ export function findHiddenSummonsOnBoard(
 }
 
 
+export function findHiddenSoundVillageOnBoard(
+  state: GameState,
+  player: PlayerID,
+  costReduction: number,
+): HiddenCharTarget[] {
+  return findHiddenByGroupOnBoard(state, player, 'Sound Village', costReduction);
+}
+
+
+function findHiddenByGroupOnBoard(
+  state: GameState,
+  player: PlayerID,
+  group: string,
+  costReduction: number,
+): HiddenCharTarget[] {
+  const ps = state[player];
+  const friendlySide = player === 'player1' ? 'player1Characters' : 'player2Characters';
+  const targets: HiddenCharTarget[] = [];
+
+  for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
+    const mission = state.activeMissions[mIdx];
+    if (isHiddenRevealBlocked(state, mIdx, player)) continue;
+    for (const char of mission[friendlySide]) {
+      if (!char.isHidden) continue;
+      if (char.controlledBy !== player) continue;
+
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
+      if (topCard.group !== group) continue;
+
+      const sameNameVisible = mission[friendlySide].find((c) => {
+        if (c.isHidden) return false;
+        if (c.instanceId === char.instanceId) return false;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+        return cTop.name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
+      });
+
+      let revealCost: number;
+      if (sameNameVisible) {
+        const existingTop = sameNameVisible.stack?.length > 0
+          ? sameNameVisible.stack[sameNameVisible.stack?.length - 1]
+          : sameNameVisible.card;
+        if ((topCard.chakra ?? 0) <= (existingTop.chakra ?? 0)) {
+          continue;
+        }
+        revealCost = Math.max(0, ((topCard.chakra ?? 0) - (existingTop.chakra ?? 0)) - costReduction);
+      } else {
+        revealCost = Math.max(0, (topCard.chakra ?? 0) - costReduction);
+      }
+
+      if (ps.chakra >= revealCost) {
+        targets.push({
+          instanceId: char.instanceId,
+          name_fr: topCard.name_fr,
+          name_en: topCard.name_en,
+          chakra: topCard.chakra ?? 0,
+          power: topCard.power ?? 0,
+          image_file: topCard.image_file,
+          missionIndex: mIdx,
+        });
+      }
+    }
+  }
+
+  return targets;
+}
+
+
 export function findHiddenLeafOnBoard(
   state: GameState,
   player: PlayerID,

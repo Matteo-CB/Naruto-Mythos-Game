@@ -15,7 +15,7 @@ import type { ReactNode } from 'react';
  * opted into via `innerClassName`.
  */
 
-export type MenuVariant = 'muted' | 'primary' | 'gold' | 'red' | 'blue';
+export type MenuVariant = 'muted' | 'primary' | 'gold' | 'red' | 'blue' | 'pink';
 
 const VARIANT: Record<MenuVariant, { idleBorder: string; hoverBorder: string; idleText: string; hoverText: string }> = {
   muted:   { idleBorder: '#262626', hoverBorder: '#3a3a3a', idleText: '#e0e0e0', hoverText: '#c4a35a' },
@@ -23,6 +23,7 @@ const VARIANT: Record<MenuVariant, { idleBorder: string; hoverBorder: string; id
   gold:    { idleBorder: '#5a4520', hoverBorder: '#c4a35a', idleText: '#c4a35a', hoverText: '#ffd966' },
   red:     { idleBorder: '#5a2828', hoverBorder: '#b33e3e', idleText: '#cc6666', hoverText: '#ffaaaa' },
   blue:    { idleBorder: '#1f3a6a', hoverBorder: '#3b82f6', idleText: '#7eb6ff', hoverText: '#bfd9ff' },
+  pink:    { idleBorder: '#7c2d50', hoverBorder: '#f472b6', idleText: '#f9a8d4', hoverText: '#fbcfe8' },
 };
 
 interface Props {
@@ -31,10 +32,14 @@ interface Props {
   variant?: MenuVariant;
   delay?: number;
   rightSlot?: ReactNode;
+  /** Decoration rendered inside the Link, to the left of the label */
+  leftSlot?: ReactNode;
   /** Extra CSS class on the inner Link (used by the subtle holo sheen on tournaments) */
   innerClassName?: string;
   /** Extra inline style applied to the inner Link (used to inject CSS vars) */
   innerStyle?: Record<string, string>;
+  /** When set, renders a logo image centered instead of the text label (label becomes the alt text) */
+  image?: { src: string; height?: number };
 }
 
 export function HomeMenuButton({
@@ -43,8 +48,10 @@ export function HomeMenuButton({
   variant = 'muted',
   delay = 0,
   rightSlot,
+  leftSlot,
   innerClassName = '',
   innerStyle,
+  image,
 }: Props) {
   const v = VARIANT[variant];
 
@@ -80,7 +87,24 @@ export function HomeMenuButton({
           t.style.backgroundColor = '#141414';
         }}
       >
-        <span className="font-display relative z-10 px-4">{label}</span>
+        {leftSlot && (
+          <span
+            className="absolute z-10 flex items-center justify-center pointer-events-none"
+            style={{ left: 10, top: '50%', transform: 'translateY(-50%)' }}
+          >
+            {leftSlot}
+          </span>
+        )}
+        {image ? (
+          <img
+            src={image.src}
+            alt={label}
+            className="relative z-10"
+            style={{ height: image.height ?? 22, width: 'auto', opacity: 0.92 }}
+          />
+        ) : (
+          <span className="font-display relative z-10 px-4">{label}</span>
+        )}
       </Link>
 
       {/* Right slot lives OUTSIDE the Link so it can poke past the button's

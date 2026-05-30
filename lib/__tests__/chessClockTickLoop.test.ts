@@ -12,6 +12,7 @@ import {
   CHESS_CLOCK_IDLE_LIMIT_MS,
   CHESS_CLOCK_IDLE_TOAST_MS,
   CHESS_CLOCK_INITIAL_MS,
+  CHESS_CLOCK_DISCONNECT_FORFEIT_MS,
 } from '@/lib/timing/chessClock';
 import type { GameState } from '@/lib/engine/types';
 
@@ -318,5 +319,21 @@ describe('onChessClockTick', () => {
     };
     withFixedNow(2_000_000, () => onChessClockTick(room, io));
     expect(room.gameState?.forfeitedBy).toBe('player2');
+  });
+
+  it('forfeits a player disconnected for 2 minutes (flat, regardless of whose turn)', () => {
+    const { io } = makeIoMock();
+    const room = makeRoom({ player1DisconnectedAt: 1000 });
+    withFixedNow(1000 + CHESS_CLOCK_DISCONNECT_FORFEIT_MS, () => onChessClockTick(room, io));
+    expect(room.gameState?.forfeitedBy === 'player1' || room.gameState?.phase === 'gameOver' || room.finalized).toBe(true);
+  });
+
+  it('does NOT forfeit the connected active player for idle while the opponent is disconnected', () => {
+    const { io } = makeIoMock();
+    const room = makeRoom({ player2DisconnectedAt: 70_000 });
+    room.chessClock = arm(room.chessClock, 'player1', 0);
+    withFixedNow(125_000, () => onChessClockTick(room, io));
+    expect(room.gameState?.forfeitedBy).toBeFalsy();
+    expect(room.finalized).toBe(false);
   });
 });

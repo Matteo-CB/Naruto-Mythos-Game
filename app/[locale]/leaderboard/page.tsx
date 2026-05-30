@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import { useTrackOnMount } from '@/lib/hooks/useTrackUi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -10,7 +11,10 @@ import { Footer } from '@/components/Footer';
 import { RANK_TIERS, PLACEMENT_MATCHES_REQUIRED, getRankTier } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
 import { LeaguesModal } from '@/components/LeaguesModal';
+import { FriendsSection } from '@/components/social/FriendsSection';
 import Image from 'next/image';
+
+type HubTab = 'leaderboard' | 'friends';
 
 interface LeaderboardUser {
   id: string;
@@ -211,8 +215,15 @@ function SkeletonGrid() {
 
 export default function LeaderboardPage() {
   const t = useTranslations('leaderboard');
+  const tf = useTranslations('friends');
   const tc = useTranslations('common');
   const tp = useTranslations('profile');
+  useTrackOnMount('ui.leaderboard.opened');
+  const [hubTab, setHubTab] = useState<HubTab>(() => {
+    if (typeof window === 'undefined') return 'leaderboard';
+    const url = new URL(window.location.href);
+    return url.searchParams.get('tab') === 'friends' ? 'friends' : 'leaderboard';
+  });
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -228,6 +239,17 @@ export default function LeaderboardPage() {
     const url = new URL(window.location.href);
     return url.searchParams.get('type') === 'evolving' ? 'evolving' : 'ranked';
   });
+
+  const switchHubTab = useCallback((next: HubTab) => {
+    if (next === hubTab) return;
+    setHubTab(next);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (next === 'friends') url.searchParams.set('tab', 'friends');
+      else url.searchParams.delete('tab');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [hubTab]);
   const PLAYERS_PER_PAGE = 20;
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -303,7 +325,7 @@ export default function LeaderboardPage() {
               className="font-display text-3xl sm:text-5xl tracking-wider uppercase leading-none"
               style={{ color: '#f2efe7', letterSpacing: '0.08em', textShadow: '0 0 22px rgba(196, 163, 90, 0.18)' }}
             >
-              {t('title')}
+              {hubTab === 'friends' ? tf('title') : t('title')}
             </h1>
             <div className="flex items-center gap-1.5">
               {leaguesEnabled && (
@@ -325,13 +347,53 @@ export default function LeaderboardPage() {
               </Link>
             </div>
           </div>
-          {leaguesEnabled && (
+          {leaguesEnabled && hubTab === 'leaderboard' && (
             <p className="text-[11px] mt-3" style={{ color: '#555' }}>
               {t('subtitle', { count: PLACEMENT_MATCHES_REQUIRED })}
             </p>
           )}
         </motion.header>
 
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.02 }}
+          className="flex items-center justify-center gap-1.5 mb-6"
+        >
+          <button
+            type="button"
+            onClick={() => switchHubTab('leaderboard')}
+            className="font-display text-[11px] uppercase tracking-widest px-5 py-2 transition-colors"
+            style={{
+              color: hubTab === 'leaderboard' ? '#0a0a0a' : '#c4a35a',
+              backgroundColor: hubTab === 'leaderboard' ? '#c4a35a' : 'transparent',
+              borderRadius: 9999,
+              cursor: 'pointer',
+              outline: 'none',
+            }}
+          >
+            {t('title')}
+          </button>
+          <button
+            type="button"
+            onClick={() => switchHubTab('friends')}
+            className="font-display text-[11px] uppercase tracking-widest px-5 py-2 transition-colors"
+            style={{
+              color: hubTab === 'friends' ? '#0a0a0a' : '#c4a35a',
+              backgroundColor: hubTab === 'friends' ? '#c4a35a' : 'transparent',
+              borderRadius: 9999,
+              cursor: 'pointer',
+              outline: 'none',
+            }}
+          >
+            {tf('title')}
+          </button>
+        </motion.div>
+
+        {hubTab === 'friends' ? (
+          <FriendsSection />
+        ) : (
+          <>
         <motion.div
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
@@ -375,6 +437,7 @@ export default function LeaderboardPage() {
           className="relative mb-6"
         >
           <div className="flex items-center gap-3 px-5 py-3" style={{ backgroundColor: 'rgba(13, 12, 16, 0.85)', borderRadius: 9999 }}>
+            <img src="/images/icons/search.svg" alt="" draggable={false} style={{ width: 16, height: 16, opacity: 0.35, flexShrink: 0 }} />
             <input
               ref={searchRef}
               type="text"
@@ -507,6 +570,8 @@ export default function LeaderboardPage() {
             </motion.div>
           )}
         </section>
+          </>
+        )}
       </div>
       <Footer />
 

@@ -55,6 +55,7 @@ export interface TournamentData {
   allowedLeagues: string[];
   format?: 'swiss' | 'elimination' | 'double_elimination';
   scheduledStartAt?: string | null;
+  prizeCardId?: string | null;
   winnerId: string | null;
   winnerUsername: string | null;
   participants: TournamentParticipant[];
@@ -116,6 +117,7 @@ export interface CreateTournamentInput {
   maxDeckSize?: number;
   maxChakraCost?: number;
   restrictionNote?: string;
+  prizeCardId?: string;
 }
 
 export const useTournamentStore = create<TournamentStore>()((set, get) => ({

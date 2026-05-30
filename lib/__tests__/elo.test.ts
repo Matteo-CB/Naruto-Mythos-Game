@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { expectedScore, calculateNewElo, calculateEloChanges } from '../elo/elo';
+import {
+  expectedScore,
+  calculateNewElo,
+  calculateEloChanges,
+  calculatePerformanceBonus,
+  getMaxLoss,
+  getMinWinGain,
+} from '../elo/elo';
 
 describe('ELO System', () => {
   describe('expectedScore', () => {
@@ -42,18 +49,16 @@ describe('ELO System', () => {
 
     it('should not change much on draw against equal opponent', () => {
       const newElo = calculateNewElo(1000, 1000, 0.5);
-      expect(newElo).toBe(1000); // Exactly 0.5 expected, 0.5 actual
+      expect(newElo).toBe(1000);
     });
 
     it('should use K=32 at low ELO', () => {
       const newElo = calculateNewElo(1000, 1000, 1.0);
-
       expect(newElo).toBe(1016);
     });
 
     it('should still use K=32 at/above 2000 ELO', () => {
       const newElo = calculateNewElo(2000, 2000, 1.0);
-
       expect(newElo).toBe(2016);
     });
 
@@ -74,25 +79,15 @@ describe('ELO System', () => {
       expect(gainVsHigh).toBeGreaterThan(gainVsEqual);
     });
 
-    it('should floor win gain at +5 only for very large gaps (>=1500)', () => {
-      const gain = calculateNewElo(1700, 100, 1.0) - 1700;
-      expect(gain).toBe(5);
+    it('floors win gain at +10 even for very large gaps', () => {
+      expect(calculateNewElo(1700, 100, 1.0) - 1700).toBe(10);
+      expect(calculateNewElo(2500, 100, 1.0) - 2500).toBe(10);
     });
 
-    it('should give meaningful gain at moderate gap (~800)', () => {
-      const gain = calculateNewElo(2000, 1200, 1.0) - 2000;
-      expect(gain).toBeGreaterThanOrEqual(10);
-      expect(gain).toBeLessThanOrEqual(15);
-    });
-
-    it('should cap a favored player\'s upset loss at -32 for very large gaps', () => {
-      const hardLoss = calculateNewElo(1700, 100, 0.0) - 1700;
-      expect(hardLoss).toBe(-32);
-    });
-
-    it('should keep -25 max loss for moderate gaps', () => {
-      const loss = calculateNewElo(1500, 1000, 0.0) - 1500;
-      expect(loss).toBe(-25);
+    it('caps loss at -24 universally (no harder penalty for high ELO)', () => {
+      expect(calculateNewElo(1500, 1000, 0.0) - 1500).toBe(-24);
+      expect(calculateNewElo(1700, 100, 0.0) - 1700).toBe(-24);
+      expect(calculateNewElo(2500, 500, 0.0) - 2500).toBe(-24);
     });
 
     it('should not apply clamps to draws', () => {
@@ -101,7 +96,21 @@ describe('ELO System', () => {
     });
   });
 
-  describe('calculateEloChanges', () => {
+  describe('getMaxLoss / getMinWinGain', () => {
+    it('returns 24 max loss regardless of gap', () => {
+      expect(getMaxLoss(1000, 1000)).toBe(24);
+      expect(getMaxLoss(2500, 100)).toBe(24);
+      expect(getMaxLoss(100, 2500)).toBe(24);
+    });
+
+    it('returns 10 min win gain regardless of gap', () => {
+      expect(getMinWinGain(1000, 1000)).toBe(10);
+      expect(getMinWinGain(2500, 100)).toBe(10);
+      expect(getMinWinGain(100, 2500)).toBe(10);
+    });
+  });
+
+  describe('calculateEloChanges (legacy API)', () => {
     it('should return correct changes for player1 win', () => {
       const result = calculateEloChanges(1000, 1000, 'player1');
       expect(result.player1Delta).toBeGreaterThan(0);
@@ -123,6 +132,116 @@ describe('ELO System', () => {
     it('should have symmetric absolute deltas for equal-rated players', () => {
       const result = calculateEloChanges(1000, 1000, 'player1');
       expect(Math.abs(result.player1Delta)).toBe(Math.abs(result.player2Delta));
+    });
+  });
+
+  describe('calculatePerformanceBonus', () => {
+    it('returns no bonus on forfeit', () => {
+      const r = calculatePerformanceBonus({ winnerScore: 30, loserScore: 0, loserBoardCount: 0, isForfeit: true });
+      expect(r.applied).toBe(false);
+      expect(r.total).toBe(0);
+      expect(r.scoreBonus).toBe(0);
+      expect(r.boardBonus).toBe(0);
+    });
+
+    it('returns 0 when score gap < 10 and loser has 6+ characters', () => {
+      const r = calculatePerformanceBonus({ winnerScore: 10, loserScore: 5, loserBoardCount: 8, isForfeit: false });
+      expect(r.total).toBe(0);
+      expect(r.applied).toBe(true);
+    });
+
+    it('score gap tiers: 10/15/20/25 -> +2/+4/+6/+8', () => {
+      const a = calculatePerformanceBonus({ winnerScore: 10, loserScore: 0, loserBoardCount: 10, isForfeit: false });
+      expect(a.scoreBonus).toBe(2);
+      const b = calculatePerformanceBonus({ winnerScore: 15, loserScore: 0, loserBoardCount: 10, isForfeit: false });
+      expect(b.scoreBonus).toBe(4);
+      const c = calculatePerformanceBonus({ winnerScore: 20, loserScore: 0, loserBoardCount: 10, isForfeit: false });
+      expect(c.scoreBonus).toBe(6);
+      const d = calculatePerformanceBonus({ winnerScore: 30, loserScore: 0, loserBoardCount: 10, isForfeit: false });
+      expect(d.scoreBonus).toBe(8);
+    });
+
+    it('board pressure tiers: 5/4/3/2/1/0 -> +1/+2/+3/+4/+5/+6', () => {
+      const make = (n: number) =>
+        calculatePerformanceBonus({ winnerScore: 5, loserScore: 5, loserBoardCount: n, isForfeit: false }).boardBonus;
+      expect(make(6)).toBe(0);
+      expect(make(5)).toBe(1);
+      expect(make(4)).toBe(2);
+      expect(make(3)).toBe(3);
+      expect(make(2)).toBe(4);
+      expect(make(1)).toBe(5);
+      expect(make(0)).toBe(6);
+    });
+
+    it('combines both bonuses', () => {
+      const r = calculatePerformanceBonus({ winnerScore: 22, loserScore: 0, loserBoardCount: 1, isForfeit: false });
+      expect(r.scoreBonus).toBe(6);
+      expect(r.boardBonus).toBe(5);
+      expect(r.total).toBe(11);
+    });
+
+    it('max possible bonus is +14 (gap 25+, board 0)', () => {
+      const r = calculatePerformanceBonus({ winnerScore: 30, loserScore: 0, loserBoardCount: 0, isForfeit: false });
+      expect(r.total).toBe(14);
+    });
+  });
+
+  describe('calculateEloChanges with performance bonus', () => {
+    it('adds bonus to winner only, leaves loser delta untouched', () => {
+      const noBonus = calculateEloChanges({
+        player1Elo: 1000, player2Elo: 1000, winner: 'player1',
+        player1Score: 20, player2Score: 0,
+        player1ConsecWins: 0, player1ConsecLosses: 0,
+        player2ConsecWins: 0, player2ConsecLosses: 0,
+      });
+      const bonus = calculatePerformanceBonus({ winnerScore: 20, loserScore: 0, loserBoardCount: 2, isForfeit: false });
+      const withBonus = calculateEloChanges({
+        player1Elo: 1000, player2Elo: 1000, winner: 'player1',
+        player1Score: 20, player2Score: 0,
+        player1ConsecWins: 0, player1ConsecLosses: 0,
+        player2ConsecWins: 0, player2ConsecLosses: 0,
+        performanceBonus: bonus,
+      });
+      expect(withBonus.player1Delta).toBe(noBonus.player1Delta + bonus.total);
+      expect(withBonus.player2Delta).toBe(noBonus.player2Delta);
+      expect(withBonus.performanceBonus).toBe(bonus);
+    });
+
+    it('no bonus applied on forfeit even when scores show a gap', () => {
+      const bonus = calculatePerformanceBonus({ winnerScore: 30, loserScore: 0, loserBoardCount: 0, isForfeit: true });
+      const r = calculateEloChanges({
+        player1Elo: 1000, player2Elo: 1000, winner: 'player1',
+        player1Score: 30, player2Score: 0,
+        player1ConsecWins: 0, player1ConsecLosses: 0,
+        player2ConsecWins: 0, player2ConsecLosses: 0,
+        performanceBonus: bonus,
+      });
+      expect(bonus.total).toBe(0);
+      expect(r.performanceBonus?.applied).toBe(false);
+    });
+
+    it('high-ELO winner with big bonus can gain meaningful ELO vs much lower opponent', () => {
+      const bonus = calculatePerformanceBonus({ winnerScore: 30, loserScore: 0, loserBoardCount: 0, isForfeit: false });
+      const r = calculateEloChanges({
+        player1Elo: 2000, player2Elo: 800, winner: 'player1',
+        player1Score: 30, player2Score: 0,
+        player1ConsecWins: 0, player1ConsecLosses: 0,
+        player2ConsecWins: 0, player2ConsecLosses: 0,
+        performanceBonus: bonus,
+      });
+      expect(r.player1Delta).toBeGreaterThanOrEqual(10 + 14);
+    });
+
+    it('loss is capped at -24 even with extreme score gap and full board pressure on the other side', () => {
+      const bonus = calculatePerformanceBonus({ winnerScore: 30, loserScore: 0, loserBoardCount: 0, isForfeit: false });
+      const r = calculateEloChanges({
+        player1Elo: 1500, player2Elo: 800, winner: 'player2',
+        player1Score: 0, player2Score: 30,
+        player1ConsecWins: 0, player1ConsecLosses: 0,
+        player2ConsecWins: 0, player2ConsecLosses: 0,
+        performanceBonus: bonus,
+      });
+      expect(r.player1Delta).toBe(-24);
     });
   });
 });

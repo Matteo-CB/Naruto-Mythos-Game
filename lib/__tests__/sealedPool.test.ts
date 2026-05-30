@@ -40,7 +40,7 @@ describe('generateSealedPool — invariants', () => {
 });
 
 describe('generateBooster — structure', () => {
-  it('produces exactly 10 cards (4C + 3UC + 1R + 1H + 1M)', () => {
+  it('produces exactly 10 cards (4C + 3UC + 1R + 1H + 1M), matching a real booster', () => {
     const b = generateBooster(0);
     expect(b.cards.length).toBe(10);
   });

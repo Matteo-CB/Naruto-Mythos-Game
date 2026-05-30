@@ -65,7 +65,11 @@ export default function TournamentSealedBuildPage() {
   const autoSubmitRandom = useCallback(async () => {
     if (allCards.length === 0) return;
     try {
-      const pool = { boosters, allCards };
+      const pool = {
+        boosters,
+        allCards,
+        temporaryVariants: allCards.filter((c) => c.isTemporaryVariant).map((c) => c.id),
+      };
       const aiDeck = buildAISealedDeck(pool);
       await submitDeck(aiDeck.characters, aiDeck.missions);
     } catch (err) {

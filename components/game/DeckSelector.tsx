@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { resolveCardId } from '@/lib/data/cardLoader';
+import { isVariantRarity } from '@/lib/variants/constants';
+import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
 import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
 import { Link } from '@/lib/i18n/navigation';
@@ -35,6 +37,7 @@ const LOAD_MORE_STEP = 10;
 
 export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnly = false }: DeckSelectorProps) {
   const t = useTranslations();
+  const { unlockedIds } = useUnlockedVariants();
   const [savedDecks, setSavedDecks] = useState<SavedDeck[]>([]);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -85,7 +88,8 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
 
         }
       }
-      const shuffledChars = [...allCharacters].sort(() => Math.random() - 0.5);
+      const availableChars = allCharacters.filter((c) => !isVariantRarity(c.rarity) || unlockedIds.has(c.id));
+      const shuffledChars = [...availableChars].sort(() => Math.random() - 0.5);
       const shuffledMissions = [...allMissions].sort(() => Math.random() - 0.5);
       onSelect({
         characters: shuffledChars.slice(0, 30),
@@ -166,7 +170,10 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
             </Link>
           </div>
         ) : (
-          <p className="text-xs italic" style={{ color: '#555' }}>{t('deckBuilder.noSavedDecks')}</p>
+          <div className="flex flex-col items-center py-6 gap-2">
+            <img src="/images/icons/empty-decks.svg" alt="" draggable={false} style={{ width: 36, height: 36, opacity: 0.2 }} />
+            <p className="text-xs italic" style={{ color: '#555' }}>{t('deckBuilder.noSavedDecks')}</p>
+          </div>
         )
       )}
 

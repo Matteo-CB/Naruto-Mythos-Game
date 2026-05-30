@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { computeDeckEvolvingPoints, deckUsesOnlyAllowedSets } from '@/lib/evolving/computePoints';
 import { EVOLVING_MAX_POINTS } from '@/lib/evolving/constants';
+import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
 
 export async function GET(request: NextRequest) {
   try {
@@ -104,6 +105,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'You have reached the maximum number of decks (50)', errorKey: 'deckBuilder.error.maxDecksReached' },
         { status: 409 },
+      );
+    }
+
+    const variantCheck = await validateDeckVariantUnlocks(session.user.id, cardIds);
+    if (!variantCheck.ok) {
+      return NextResponse.json(
+        {
+          error: 'Deck contains locked variant cards',
+          errorKey: 'deckBuilder.error.variantLocked',
+          lockedCardIds: variantCheck.lockedCardIds,
+        },
+        { status: 400 },
       );
     }
 

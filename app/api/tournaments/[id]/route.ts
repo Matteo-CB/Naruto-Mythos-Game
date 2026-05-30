@@ -52,9 +52,12 @@ export async function GET(
       return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
     }
 
+    const { readTournamentPrizeCardId } = await import('@/lib/tournament/prizes');
+    const prizeCardId = await readTournamentPrizeCardId(id);
+
     const safe = (isCreator || viewerIsAdmin)
-      ? tournament
-      : { ...tournament, joinCode: null };
+      ? { ...tournament, prizeCardId }
+      : { ...tournament, joinCode: null, prizeCardId };
 
     return NextResponse.json({ tournament: safe });
   } catch {

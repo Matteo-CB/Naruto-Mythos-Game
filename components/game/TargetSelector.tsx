@@ -819,7 +819,13 @@ export function TargetSelector() {
       ? (visibleState.myState.discardPile ?? [])
       : (visibleState.opponentState.discardPile ?? []);
     const count = validTargets.length;
-    const lastN = targetDiscard.slice(-count);
+
+    const reorderIdSet = new Set(validTargets.map((v) => v.replace(/__dup\d+$/, '')));
+    const matchedByTarget = targetDiscard.filter((c) => {
+      const id = (c as { instanceId?: string; id?: string }).instanceId || (c as { id?: string }).id;
+      return !!id && reorderIdSet.has(id);
+    });
+    const lastN = matchedByTarget.length === count ? matchedByTarget : targetDiscard.slice(-count);
     const discardTargets: Array<{ instanceId: string; name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; isHidden?: boolean; isOwn?: boolean }> = [];
     
     const discardIdMap: Record<string, string> = {};

@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
       allowedGroups, bannedGroups, allowedKeywords, bannedKeywords,
       allowedRarities, bannedRarities, maxPerRarity,
       maxCopiesPerCard, minDeckSize, maxDeckSize, maxChakraCost,
-      restrictionNote,
+      restrictionNote, prizeCardId,
       format: rawFormat,
     } = body;
     const type = 'simulator'; // Only simulator tournaments
@@ -108,6 +108,12 @@ export async function POST(req: NextRequest) {
     }
     if (typeof restrictionNote === 'string' && restrictionNote.length > 500) {
       return NextResponse.json({ error: 'Restriction note must be at most 500 characters', errorKey: 'tournament.error.restrictionTooLong' }, { status: 400 });
+    }
+    if (prizeCardId !== undefined && prizeCardId !== null && prizeCardId !== '') {
+      const { isValidPrizeCardId } = await import('@/lib/tournament/prizes');
+      if (!isValidPrizeCardId(prizeCardId)) {
+        return NextResponse.json({ error: 'Invalid prize card id', errorKey: 'tournament.error.invalidPrize' }, { status: 400 });
+      }
     }
     const VALID_GAME_MODES = ['classic', 'sealed', 'restricted', 'evolving'] as const;
     const resolvedGameMode = gameMode || 'classic';
@@ -164,7 +170,7 @@ export async function POST(req: NextRequest) {
         sealedSetChoice: resolvedGameMode === 'sealed' ? (typeof sealedSetChoice === 'string' && sealedSetChoice.length > 0 ? sealedSetChoice : 'random') : null,
         bannedCardIds: Array.isArray(bannedCardIds) ? bannedCardIds : [],
         allowedLeagues: leagueRestrictions,
-        
+
         allowedGroups: Array.isArray(allowedGroups) ? allowedGroups : [],
         bannedGroups: Array.isArray(bannedGroups) ? bannedGroups : [],
         allowedKeywords: Array.isArray(allowedKeywords) ? allowedKeywords : [],
@@ -180,6 +186,22 @@ export async function POST(req: NextRequest) {
         scheduledStartAt: scheduledStartAt ? new Date(scheduledStartAt) : null,
       },
     });
+
+    if (typeof prizeCardId === 'string' && prizeCardId.length > 0) {
+      try {
+        await prisma.$runCommandRaw({
+          update: 'Tournament',
+          updates: [
+            {
+              q: { _id: { $oid: tournament.id } },
+              u: { $set: { prizeCardId } },
+            },
+          ],
+        });
+      } catch (err) {
+        console.error('[API] Failed to persist prizeCardId:', err instanceof Error ? err.message : err);
+      }
+    }
 
     sendTournamentCreated(tournament).catch((err) =>
       console.error('[API] sendTournamentCreated failed:', err instanceof Error ? err.message : err),

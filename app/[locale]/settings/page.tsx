@@ -191,10 +191,8 @@ export default function SettingsPage() {
         >
           
           <div className="flex items-center justify-between gap-4">
-            <span
-              className="text-sm font-medium tracking-wide"
-              style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}
-            >
+            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+              <img src="/images/icons/play.svg" alt="" draggable={false} style={{ width: 16, height: 16, opacity: 0.5 }} />
               {t('animations')}
             </span>
             <button

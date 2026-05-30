@@ -14,6 +14,13 @@ import { useBannedCards } from '@/lib/hooks/useBannedCards';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
 import { ALL_SET_IDS, SET_REGISTRY } from '@/lib/data/sets/registry';
 import type { CharacterCard, MissionCard, CardData, Rarity } from '@/lib/engine/types';
+import { isVariantCard } from '@/lib/variants/isVariant';
+import { filterCollectionCards } from '@/lib/collection/filter';
+import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
+import { useTrackOnMount } from '@/lib/hooks/useTrackUi';
+import { LockedCardWrapper } from '@/components/cards/LockedCardWrapper';
+import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
+import { VariantLockedBanner } from '@/components/cards/VariantLockedBanner';
 
 type AnyCard = CardData;
 
@@ -39,11 +46,15 @@ export default function CollectionPage() {
   const [filterRarity, setFilterRarity] = useState<string>('all');
   const [filterGroup, setFilterGroup] = useState<string>('all');
   const [filterSet, setFilterSet] = useState<string>('all');
+  const [filterVariantsOnly, setFilterVariantsOnly] = useState(false);
+  const [filterTradeableOnly, setFilterTradeableOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const CARDS_PER_PAGE = 24;
   const { bannedIds } = useBannedCards();
+  const { unlockedIds: unlockedVariantIds, inventory: variantInventory } = useUnlockedVariants();
+  useTrackOnMount('ui.collection.opened');
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
@@ -61,30 +72,25 @@ export default function CollectionPage() {
     return Array.from(groupSet).sort();
   }, [allCards]);
 
-  const filteredCards = useMemo(() => {
-    return allCards.filter((card) => {
-      if (filterRarity !== 'all' && card.rarity !== filterRarity) return false;
-      if (filterGroup !== 'all' && card.group !== filterGroup) return false;
-      if (filterSet !== 'all' && card.set !== filterSet) return false;
-      if (searchQuery) {
-        const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        const q = normalize(searchQuery);
-        if (
-          !normalize(getCardName(card, locale as 'en' | 'fr')).includes(q) &&
-          !normalize(getCardTitle(card, locale as 'en' | 'fr')).includes(q) &&
-          !normalize(card.name_fr).includes(q) &&
-          !card.id.toLowerCase().includes(q)
-        ) {
-          return false;
-        }
-      }
-      return true;
-    });
-  }, [allCards, filterRarity, filterGroup, filterSet, searchQuery, locale]);
+  const filteredCards = useMemo(
+    () => {
+      const base = filterCollectionCards(allCards, {
+        variantsOnly: filterVariantsOnly,
+        rarity: filterRarity,
+        group: filterGroup,
+        set: filterSet,
+        searchQuery,
+        locale: locale as 'en' | 'fr',
+      });
+      if (!filterTradeableOnly) return base;
+      return base.filter((c) => (variantInventory.get(c.id) ?? 0) >= 2);
+    },
+    [allCards, filterRarity, filterGroup, filterSet, filterVariantsOnly, filterTradeableOnly, variantInventory, searchQuery, locale],
+  );
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [filterRarity, filterGroup, filterSet, searchQuery]);
+  }, [filterRarity, filterGroup, filterSet, filterVariantsOnly, filterTradeableOnly, searchQuery]);
 
   const characterCards = useMemo(() => filteredCards.filter((c) => c.card_type !== 'mission'), [filteredCards]);
   const totalCharPages = Math.max(1, Math.ceil(characterCards.length / CARDS_PER_PAGE));
@@ -160,6 +166,32 @@ export default function CollectionPage() {
               return <option key={sid} value={sid}>{name + suffix}</option>;
             })}
           </select>
+          <button
+            type="button"
+            onClick={() => setFilterVariantsOnly((v) => !v)}
+            aria-pressed={filterVariantsOnly}
+            className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
+            style={{
+              backgroundColor: filterVariantsOnly ? '#c4a35a1f' : '#141414',
+              color: filterVariantsOnly ? '#c4a35a' : '#888888',
+              boxShadow: filterVariantsOnly ? '0 0 12px #c4a35a33' : 'none',
+            }}
+          >
+            {t('collection.variantsOnly')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterTradeableOnly((v) => !v)}
+            aria-pressed={filterTradeableOnly}
+            className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
+            style={{
+              backgroundColor: filterTradeableOnly ? '#c4a35a1f' : '#141414',
+              color: filterTradeableOnly ? '#c4a35a' : '#888888',
+              boxShadow: filterTradeableOnly ? '0 0 12px #c4a35a33' : 'none',
+            }}
+          >
+            {t('collection.filterTradeable')}
+          </button>
         </div>
 
         <p className="text-xs text-[#555] mb-4">{t('collection.total', { count: filteredCards.length })}</p>
@@ -176,12 +208,10 @@ export default function CollectionPage() {
           {paginatedChars.map((card) => {
             const isBanned = bannedIds.has(card.id);
             const imgPath = getImagePath(card);
-            return (
-              <button
-                key={card.id}
-                onClick={() => setSelectedCard(card)}
-                className="relative card-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
-              >
+            const variant = isVariantCard(card);
+            const locked = variant && !unlockedVariantIds.has(card.id);
+            const inner = (
+              <>
                 {imgPath ? (
                   <img
                     src={imgPath}
@@ -200,7 +230,35 @@ export default function CollectionPage() {
                     </span>
                   </div>
                 )}
+                {variant && !locked && <VariantHoloOverlay intensity="subtle" />}
+              </>
+            );
+            return (
+              <button
+                key={card.id}
+                onClick={() => setSelectedCard(card)}
+                className="relative card-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
+                aria-label={getCardName(card, locale as 'en' | 'fr')}
+              >
+                {locked ? (
+                  <LockedCardWrapper
+                    badgeLabel={t('collection.lockedBadge')}
+                    badgeTooltip={t('collection.lockedTooltip')}
+                  >
+                    {inner}
+                  </LockedCardWrapper>
+                ) : (
+                  inner
+                )}
                 {isBanned && <BanBadge label={t('collection.bannedPlaceholder')} />}
+                {variant && !locked && (variantInventory.get(card.id) ?? 0) >= 2 && (
+                  <span
+                    className="absolute bottom-1 right-1 z-10 px-1.5 py-0.5 text-[9px] font-bold"
+                    style={{ backgroundColor: '#c4a35a33', color: '#c4a35a', fontVariantNumeric: 'tabular-nums' }}
+                  >
+                    x{variantInventory.get(card.id)}
+                  </span>
+                )}
               </button>
             );
           })}
@@ -379,6 +437,13 @@ export default function CollectionPage() {
                   )}
                 </div>
               </div>
+
+              {isVariantCard(selectedCard) && !unlockedVariantIds.has(selectedCard.id) && (
+                <VariantLockedBanner
+                  title={t('collection.lockedBannerTitle')}
+                  description={t('collection.lockedBannerDescription')}
+                />
+              )}
 
               <button
                 onClick={() => setSelectedCard(null)}

@@ -1,6 +1,113 @@
 {
   "entries": [
     {
+      "date": "2026-05-30",
+      "title_fr": "Système ELO rééquilibré, bonus de performance et nouveau set Akatsuki",
+      "title_en": "ELO rebalanced, performance bonus, and new Akatsuki set",
+      "changes_fr": [
+        "Perte d'ELO maximale réduite à 24 par défaite, quel que soit ton classement.",
+        "Bonus de performance affiché sur l'écran de victoire : jusqu'à +14 ELO en plus quand tu domines ta partie.",
+        "Bonus de score : +2 à +8 ELO si tu gagnes avec 10, 15, 20 ou 25 points d'écart.",
+        "Bonus de pression : +1 à +6 ELO si l'adversaire termine avec peu de personnages en jeu (5, 4, 3, 2, 1 ou 0).",
+        "Les bonus ne s'appliquent pas si l'adversaire abandonne ou perd au chrono.",
+        "Le Kakashi Mythos Variant 137 s'obtient maintenant au palier 25 du Battlepass (au lieu d'être une récompense de tournoi).",
+        "Le Naruto Mythos Variant 133 (deuxième art) se débloque maintenant dès le palier 5 du Battlepass.",
+        "Nouveau set Akatsuki annoncé en bientôt disponible, avec son booster mystère en attendant l'illustration finale.",
+        "Les boosters s'affichent désormais sur une seule ligne avec des flèches pour défiler, et chaque set porte son numéro d'ordre.",
+        "La fenêtre des nouveautés s'affiche maintenant au-dessus de tous les autres éléments, même sur la page Récompenses.",
+        "Les récompenses de booster du Battlepass apparaissent désormais en silhouette, sans cadre carré autour."
+      ],
+      "changes_en": [
+        "Maximum ELO lost per defeat capped at 24, regardless of your rank.",
+        "Performance bonus shown on the victory screen: up to +14 extra ELO when you dominate the match.",
+        "Score bonus: +2 to +8 ELO if you win with a 10, 15, 20, or 25 point lead.",
+        "Board-pressure bonus: +1 to +6 ELO if the opponent ends with few characters in play (5, 4, 3, 2, 1, or 0).",
+        "Bonuses do not apply if the opponent forfeits or loses on the clock.",
+        "Kakashi Mythos Variant 137 now unlocks at Battlepass tier 25 (no longer a tournament reward).",
+        "Naruto Mythos Variant 133 (second art) now unlocks at Battlepass tier 5.",
+        "New Akatsuki set announced as coming soon, with a placeholder mystery booster until the final artwork.",
+        "Boosters now display in a single row with arrows to scroll, and each set shows its order number.",
+        "The News window now opens above every other element, including on the Rewards page.",
+        "Booster tier rewards on the Battlepass now show as a silhouette, with no square frame around them."
+      ]
+    },
+    {
+      "date": "2026-05-29",
+      "title_fr": "Taux d'obtention des boosters, correctif Yashamaru et refonte visuelle",
+      "title_en": "Booster drop rates, Yashamaru fix, and visual refresh",
+      "changes_fr": [
+        "Yashamaru (085) : quand il se sacrifie avec son effet de mission, il est désormais compté comme vaincu, donc Tsunade (004) le renvoie dans ta main au lieu de la défausse.",
+        "Nouveau panneau Taux d'obtention dans l'onglet Boosters : la chance de tirer chaque rareté (Rare Art, Mythos V, Secret V, Légendaire) est affichée avec une carte exemple.",
+        "Pages Récompenses et Échanges et notifications redessinées dans le style soigné du profil, avec un indicateur de récompenses plus clair dans le menu.",
+        "Réordonner la défausse (effet d'Itachi) pouvait afficher les mauvaises cartes ou en oublier : toutes les cartes défaussées s'affichent désormais correctement.",
+        "Partie en ligne : un joueur déconnecté est maintenant forfait après 2 minutes, et le bandeau de déconnexion affiche le compte à rebours.",
+        "Pendant qu'un adversaire est déconnecté, tu n'es plus pénalisé pour ton inactivité (mais ton temps continue de tourner à ton tour)."
+      ],
+      "changes_en": [
+        "Yashamaru (085): when he sacrifices himself with his mission effect, he now counts as defeated, so Tsunade (004) returns him to your hand instead of the discard pile.",
+        "New Drop rates panel in the Boosters tab: the chance to pull each rarity (Rare Art, Mythos V, Secret V, Legendary) is shown with an example card.",
+        "Rewards and Trade pages and notifications restyled to match the clean profile look, with a clearer rewards indicator in the menu.",
+        "Reordering the discard pile (Itachi's effect) could show the wrong cards or miss some: all discarded cards now display correctly.",
+        "Online game: a disconnected player now forfeits after 2 minutes, and the disconnect banner shows a live countdown.",
+        "While an opponent is disconnected, you are no longer penalized for inactivity (but your own clock still ticks on your turn)."
+      ]
+    },
+    {
+      "date": "2026-05-28",
+      "title_fr": "Échanges entre amis, nouvelles quêtes et récompenses de tournoi",
+      "title_en": "Friend trading, new quests, and tournament rewards",
+      "changes_fr": [
+        "Nouveau : échange de variantes entre amis. Depuis la page Amis, clique sur Échanger à côté d'un ami pour ouvrir une salle d'échange en temps réel.",
+        "Chaque joueur propose jusqu'à 20 cartes, voit l'offre de l'autre en direct, et les deux doivent confirmer pour que l'échange se fasse.",
+        "Les variantes en double s'accumulent maintenant dans ta collection : un compteur indique combien d'exemplaires tu possèdes.",
+        "Il faut être au minimum Jonin d'Élite pour pouvoir échanger.",
+        "Les cartes de récompense Naruto Mythos réservées ne sont pas échangeables, et les cartes promo de tournoi ne s'échangent qu'entre elles.",
+        "Nouvelle page Historique des échanges : retrouve tes échanges passés, avec qui, ce que tu as donné et reçu.",
+        "Collection : nouveau filtre Échangeables pour n'afficher que les cartes dont tu possèdes au moins 2 exemplaires.",
+        "Nouvelles quêtes liées aux échanges.",
+        "Constructeur de deck : si un deck contient une variante que tu ne possèdes plus, un avertissement apparaît avec un bouton Réparer pour la retirer.",
+        "2 boosters variantes offerts à tous les joueurs.",
+        "Les tournois affichent le prix du vainqueur : une carte Naruto Mythos V exclusive (Naruto 108, Gaara 120, Itachi 128 ou Kakashi 137), visible à l'avance par tous les inscrits.",
+        "Le vainqueur reçoit automatiquement 3 boosters variantes plus la carte du tournoi débloquée dans sa collection. S'il possède déjà la carte, il reçoit 200 XP à la place.",
+        "Tous les autres participants qui sont restés jusqu'à la fin du tournoi (sans absence forfait sur aucun round) reçoivent automatiquement 1 booster variantes.",
+        "Mode Scellé : la possibilité de sauvegarder ton deck scellé après une partie a été retirée. Le deck est consommé par le match et est perdu à la fin.",
+        "Nouvelle page Quêtes dans le menu d'accueil : 100 quêtes réparties sur 4 niveaux de difficulté plus 1 quête quotidienne qui change à minuit (UTC). Compléter une quête te donne de l'XP.",
+        "Le bouton Quêtes du menu affiche un point doré quand tu as des récompenses à réclamer. Un toast in-game apparaît quand tu progresses sur une quête et un autre quand tu la termines.",
+        "Tayuya (125) Flûte Démoniaque : son effet UPGRADE peut maintenant aussi révéler un personnage caché du Village du Son sur ta zone à coût réduit de 2, en plus de jouer une carte de la main. Le contrôle de groupe se fait après la révélation, comme pour Jiraya.",
+        "Quand un upgrade échoue, le message d'erreur précise maintenant la vraie raison (carte sous contrôle, pas assez de chakra, conflit de nom, restriction d'upgrade) au lieu d'un générique \"cible invalide\".",
+        "Bug corrigé : rejoindre une room scellée depuis Jouer en ligne ne propose plus le choix d'un deck mais lance l'ouverture des boosters et la construction de deck, comme attendu.",
+        "Nouveau : on peut maintenant créer une room scellée directement depuis Jouer en ligne en cochant la case Mode Scellé (mutuellement exclusive avec Evolving). Un mini panneau juste en dessous permet de choisir l'extension (Konoha Shido). Shinobi Shiren et Aléatoire restent grisés tant que Shinobi Shiren n'est pas disponible. Tout le panneau est grisé si Mode Scellé n'est pas coché.",
+        "Le menu Battlepass s'appelle désormais Récompenses. Les paliers individuels sont libellés Récompense de niveau N.",
+        "Récompenses, Boosters et Quêtes sont maintenant regroupés dans une seule page avec 3 onglets. Bandeau XP et palier toujours visible en haut, chaque onglet montre un compteur d'éléments à réclamer.",
+        "Classement et Amis sont maintenant sur la même page avec deux onglets. Toutes les fonctions Amis (recherche, demandes, activité, statistiques head-to-head, invitations) sont préservées."
+      ],
+      "changes_en": [
+        "New: trade variants with your friends. From the Friends page, click Trade next to a friend to open a live trade room.",
+        "Each player offers up to 20 cards, sees the other's offer live, and both must confirm for the trade to go through.",
+        "Duplicate variants now stack in your collection: a counter shows how many copies you own.",
+        "You must be at least Elite Jonin to trade.",
+        "The reserved Naruto Mythos reward cards cannot be traded, and tournament promo cards can only be traded among themselves.",
+        "New Trade history page: review your past trades, with who, what you gave and what you received.",
+        "Collection: new Tradeable filter to show only the cards you own at least 2 copies of.",
+        "New quests tied to trading.",
+        "Deck builder: if a deck contains a variant you no longer own, a warning appears with a Repair button to remove it.",
+        "2 variant boosters granted to all players.",
+        "Tournaments show the winner prize: an exclusive Naruto Mythos V card (Naruto 108, Gaara 120, Itachi 128 or Kakashi 137), visible to all entrants ahead of time.",
+        "The winner automatically gets 3 variant boosters plus the tournament card unlocked in their collection. If they already own it, they get 200 XP instead.",
+        "All other participants who stayed until the end of the tournament (no absence forfeit on any round) automatically receive 1 variant booster.",
+        "Sealed mode: the option to save your sealed deck after a match has been removed. The deck is consumed by the match and dropped at the end.",
+        "New Quests page in the home menu: 100 quests across 4 difficulty levels plus 1 daily quest that rotates at midnight (UTC). Completing quests grants XP.",
+        "Quests menu button now shows a gold dot when you have rewards ready to claim. In-game toast appears when you make progress on a quest and another when you complete one.",
+        "Tayuya (125) Demonic Flute: her UPGRADE effect can now also reveal a hidden Sound Village character on your side at cost-2, in addition to playing one from hand. The group check happens after the reveal, same logic as Jiraiya.",
+        "When an upgrade fails, the error message now states the real reason (card is controlled, not enough chakra, name conflict, upgrade restriction) instead of a generic \"invalid target\".",
+        "Bug fixed: joining a sealed room from Play Online no longer asks for a deck, it now launches booster opening and deck building as expected.",
+        "New: you can now create a sealed room directly from Play Online by ticking the Sealed mode checkbox (mutually exclusive with Evolving). A small panel below lets you choose the set (Konoha Shido). Shinobi Shiren and Random stay greyed out until Shinobi Shiren ships. The whole panel is greyed out if Sealed mode is unchecked.",
+        "The Battlepass menu is now called Rewards. Individual tiers are labelled Tier Reward N.",
+        "Rewards, Boosters and Quests are now grouped on a single page with 3 tabs. XP and tier bar always visible at the top, each tab shows a counter of items ready to claim.",
+        "Leaderboard and Friends are now on the same page with two tabs. All Friends features (search, requests, activity, head-to-head stats, invitations) are preserved."
+      ]
+    },
+    {
       "date": "2026-05-25",
       "title_fr": "Nouvelles variantes Secret V, Légendaire et suppression d'Apprendre / Quiz",
       "title_en": "New Secret V, Legendary variants and removal of Learn / Quiz",
@@ -9,14 +116,18 @@
         "Nouvelle Légendaire Rock Lee (Poing Ivre), variante de la carte Rare. Mêmes effets que la version Rare.",
         "Menu d'accueil : la carte holographique tourne maintenant entre 6 variantes (Naruto Mythos V, Sasuke Légendaire, Rock Lee Légendaire, Jiraiya SV, Gaara SV, Itachi SV).",
         "Les pages Apprendre et Quiz ont été retirées du site. Les scores et l'historique de quiz ont été supprimés du compte. Le bouton sur le menu principal a disparu.",
-        "Tournoi scellé refondu : tu construis ton deck dès l'inscription dans une fenêtre de 15 minutes avec les boosters fournis. Si tu dépasses, un deck aléatoire est créé à partir de ton pool. Le tournoi se déroule ensuite normalement avec ces decks pré-construits, sans phase de boosters au moment des matchs."
+        "Tournoi scellé refondu : tu construis ton deck dès l'inscription dans une fenêtre de 15 minutes avec les boosters fournis. Si tu dépasses, un deck aléatoire est créé à partir de ton pool. Le tournoi se déroule ensuite normalement avec ces decks pré-construits, sans phase de boosters au moment des matchs.",
+        "Nouvelle page Récompenses dans le menu d'accueil : 50 paliers de récompenses pour la Saison Konoha Shido. Chaque palier offre un booster variantes, sauf les paliers 25 et 50 qui débloquent des cartes Naruto Mythos V exclusives. Au-delà du palier 50, tous les 500 XP de plus te donnent un booster variantes en bonus.",
+        "Récompenses : les boosters arrivent automatiquement dans ton inventaire dès que tu atteins un palier. Les cartes des paliers 25 et 50 ont un bouton Réclamer avec animation, comme l'ouverture d'un booster. Un point doré s'affiche sur le bouton Récompenses quand tu montes de palier."
       ],
       "changes_en": [
         "New Secret V variants: Jiraiya, Gaara, Itachi Uchiwa. Same effects as their base Secret cards.",
         "New Legendary Rock Lee (Loopy Fist), variant of the Rare card. Same effects as the Rare version.",
         "Home menu: the holographic card now rotates between 6 variants (Naruto Mythos V, Sasuke Legendary, Rock Lee Legendary, Jiraiya SV, Gaara SV, Itachi SV).",
         "The Learn and Quiz pages have been removed from the site. Quiz scores and quiz history have been deleted from accounts. The button on the main menu is gone.",
-        "Sealed tournaments reworked: you build your deck at registration in a 15-minute window from the provided boosters. If you run out of time, a random deck is built from your pool. The tournament then runs normally with these pre-built decks, no booster phase at match time."
+        "Sealed tournaments reworked: you build your deck at registration in a 15-minute window from the provided boosters. If you run out of time, a random deck is built from your pool. The tournament then runs normally with these pre-built decks, no booster phase at match time.",
+        "New Rewards page in the home menu: 50 reward tiers for the Konoha Shido Season. Each tier grants a variant booster, except tiers 25 and 50 which unlock exclusive Naruto Mythos V cards. Past tier 50, every additional 500 XP earns one bonus variant booster.",
+        "Rewards: boosters arrive automatically in your inventory the moment you reach a tier. Cards from tiers 25 and 50 have a Claim button with a reveal animation, like opening a booster. A gold dot appears on the Rewards button when you level up."
       ]
     },
     {

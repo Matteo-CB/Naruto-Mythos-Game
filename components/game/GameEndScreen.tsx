@@ -35,8 +35,6 @@ export function GameEndScreen() {
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
   const resetGame = useGameStore((s) => s.resetGame);
   const replayInitialState = useGameStore((s) => s.replayInitialState);
-  const sealedDeckCardIds = useGameStore((s) => s.sealedDeckCardIds);
-  const sealedDeckMissionIds = useGameStore((s) => s.sealedDeckMissionIds);
   const gameResult = useSocketStore((s) => s.gameResult);
   const rematchState = useSocketStore((s) => s.rematchState);
   const offerRematch = useSocketStore((s) => s.offerRematch);
@@ -66,8 +64,6 @@ export function GameEndScreen() {
 
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [savedGameId, setSavedGameId] = useState<string | null>(null);
-  const [sealedDeckName, setSealedDeckName] = useState('');
-  const [sealedSaveState, setSealedSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const autoSaveAttempted = useRef(false);
   const [leaguesEnabled, setLeaguesEnabled] = useState(false);
 
@@ -140,34 +136,6 @@ export function GameEndScreen() {
     }
   }, [gameOver, session?.user?.id, isAIGame, gameState, gameResult, handleSaveReplay]);
 
-  const handleSaveSealedDeck = useCallback(async () => {
-    if (sealedSaveState === 'saving' || sealedSaveState === 'saved') return;
-    if (!sealedDeckCardIds || !sealedDeckMissionIds) return;
-
-    setSealedSaveState('saving');
-    try {
-      const name = sealedDeckName.trim() || t('sealed.saveDeckPlaceholder');
-      const res = await fetch('/api/decks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          cardIds: sealedDeckCardIds,
-          missionIds: sealedDeckMissionIds,
-        }),
-      });
-      if (res.ok) {
-        setSealedSaveState('saved');
-      } else {
-        setSealedSaveState('error');
-        setTimeout(() => setSealedSaveState('idle'), 2000);
-      }
-    } catch {
-      setSealedSaveState('error');
-      setTimeout(() => setSealedSaveState('idle'), 2000);
-    }
-  }, [sealedSaveState, sealedDeckCardIds, sealedDeckMissionIds, sealedDeckName]);
-
   if (!gameOver || !visibleState) return null;
 
   const isRanked = isOnlineGame && gameResult?.isRanked;
@@ -176,6 +144,7 @@ export function GameEndScreen() {
   const newElo = gameResult?.newElo;
   const totalGames = gameResult?.totalGames;
   const winReason = gameResult?.winReason;
+  const perfBonus = gameResult?.performanceBonus ?? null;
   const isPlacement = totalGames !== undefined && totalGames < PLACEMENT_MATCHES_REQUIRED;
   const justBecameRanked = totalGames !== undefined && totalGames === PLACEMENT_MATCHES_REQUIRED;
 
@@ -344,6 +313,39 @@ export function GameEndScreen() {
                 {eloDelta >= 0 ? '+' : ''}{eloDelta} ELO
               </span>
 
+              {perfBonus && perfBonus.applied && perfBonus.total > 0 && playerWon && (
+                <motion.div
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.6 }}
+                  className="flex flex-col items-center gap-1 mt-1"
+                  style={{
+                    backgroundColor: 'rgba(74, 158, 74, 0.08)',
+                    padding: '8px 14px',
+                    minWidth: '220px',
+                  }}
+                >
+                  <span
+                    className="text-[10px] uppercase tracking-wider"
+                    style={{ color: '#4a9e4a' }}
+                  >
+                    {t('game.end.performanceBonus')}
+                    {' '}
+                    <span className="font-bold tabular-nums">+{perfBonus.total} ELO</span>
+                  </span>
+                  {perfBonus.scoreBonus > 0 && (
+                    <span className="text-[10px]" style={{ color: '#888888' }}>
+                      {t('game.end.scoreGapBonus', { gap: perfBonus.scoreGap, bonus: perfBonus.scoreBonus })}
+                    </span>
+                  )}
+                  {perfBonus.boardBonus > 0 && (
+                    <span className="text-[10px]" style={{ color: '#888888' }}>
+                      {t('game.end.boardPressureBonus', { count: perfBonus.loserBoardCount, bonus: perfBonus.boardBonus })}
+                    </span>
+                  )}
+                </motion.div>
+              )}
+
               {leaguesEnabled && newElo !== undefined && (
                 <div className="flex flex-col items-center gap-2 mt-1">
                   <EloBadge elo={newElo} size="md" showElo totalGames={totalGames} />
@@ -427,47 +429,6 @@ export function GameEndScreen() {
                   </span>
                 </Link>
               </>
-            )}
-
-            {!!session?.user?.id && sealedDeckCardIds && sealedDeckMissionIds && sealedSaveState !== 'saved' && (
-              <div className="flex flex-col items-center gap-2">
-                <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
-                  {t('sealed.saveDeck')}
-                </span>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={sealedDeckName}
-                    onChange={(e) => setSealedDeckName(e.target.value)}
-                    placeholder={t('sealed.saveDeckPlaceholder')}
-                    className="px-3 py-2 text-sm"
-                    style={{
-                      backgroundColor: '#0a0a0f',
-                      border: '1px solid rgba(196, 163, 90, 0.2)',
-                      color: '#e0e0e0',
-                      outline: 'none',
-                      width: '200px',
-                    }}
-                  />
-                  <PopupActionButton
-                    onClick={handleSaveSealedDeck}
-                    disabled={sealedSaveState === 'saving'}
-                    accentColor={sealedSaveState === 'error' ? '#b33e3e' : '#c4a35a'}
-                  >
-                    {sealedSaveState === 'saving'
-                      ? t('common.loading')
-                      : sealedSaveState === 'error'
-                        ? t('sealed.deckSaveError')
-                        : t('common.save')}
-                  </PopupActionButton>
-                </div>
-              </div>
-            )}
-
-            {sealedSaveState === 'saved' && (
-              <span className="text-xs" style={{ color: '#4a9e4a' }}>
-                {t('sealed.deckSaved')}
-              </span>
             )}
 
             {tournamentId ? (

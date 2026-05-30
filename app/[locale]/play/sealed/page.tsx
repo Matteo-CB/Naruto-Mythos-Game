@@ -94,6 +94,10 @@ export default function SealedPage() {
   useEffect(() => {
     if (!roomParam || autoJoinRef.current) return;
     if (!session?.user?.id) return;
+    if (socketRoomCode === roomParam) {
+      autoJoinRef.current = true;
+      return;
+    }
     autoJoinRef.current = true;
     (async () => {
       try {
@@ -105,7 +109,7 @@ export default function SealedPage() {
         autoJoinRef.current = false;
       }
     })();
-  }, [roomParam, session?.user?.id, socketConnected, socketConnect, socketJoinRoom]);
+  }, [roomParam, session?.user?.id, socketConnected, socketConnect, socketJoinRoom, socketRoomCode]);
 
   useEffect(() => {
     if (socketConnected && socketRoomCode && socketOpponentJoined && !socketGameStarted && mode === null) {
@@ -116,9 +120,11 @@ export default function SealedPage() {
 
   useEffect(() => {
     if (mode === 'online' && sealedBoosters && sealedAllCards && (step === 'online-waiting' || step === 'loading')) {
+      const allCardsTyped = sealedAllCards as BoosterCard[];
       const pool: SealedPool = {
         boosters: sealedBoosters as BoosterPack[],
-        allCards: sealedAllCards as BoosterCard[],
+        allCards: allCardsTyped,
+        temporaryVariants: allCardsTyped.filter((c) => c.isTemporaryVariant).map((c) => c.id),
       };
       setSealedPool(pool);
       setStep('opening');

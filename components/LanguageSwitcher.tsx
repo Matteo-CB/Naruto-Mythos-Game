@@ -21,6 +21,7 @@ export function LanguageSwitcher() {
         |
       </span>
       <div className="flex items-center gap-1" aria-label={t('language')}>
+        <img src="/images/icons/globe.svg" alt="" draggable={false} style={{ width: 14, height: 14, opacity: 0.45 }} />
         <button
           onClick={() => switchLocale('en')}
           className="px-2 py-1 text-xs font-bold uppercase tracking-wider transition-colors"

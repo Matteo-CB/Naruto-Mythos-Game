@@ -5,6 +5,8 @@ import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { MAX_COPIES_PER_VERSION, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
 import { resolveCardId } from '@/lib/data/cardLoader';
 import { computeDeckEvolvingPoints, isEvolvingCompatible } from '@/lib/evolving/computePoints';
+import { isVariantCard } from '@/lib/variants/isVariant';
+import { useToastStore } from '@/stores/toastStore';
 
 interface SavedDeck {
   id: string;
@@ -45,10 +47,13 @@ interface DeckBuilderStore {
 
   evolvingMode: boolean;
 
+  unlockedVariantIds: Set<string>;
+
 
   setDeckName: (name: string) => void;
   addChar: (card: CharacterCard) => void;
   removeChar: (index: number) => void;
+  removeLockedVariants: () => number;
   addMission: (card: MissionCard) => void;
   removeMission: (index: number) => void;
   clearDeck: () => void;
@@ -57,6 +62,7 @@ interface DeckBuilderStore {
   sortCharsByCost: () => void;
   sortCharsByName: () => void;
   setEvolvingMode: (on: boolean) => void;
+  setUnlockedVariantIds: (ids: Set<string>) => void;
 
 
   canAddChar: (card: CharacterCard) => AddCheckResult;
@@ -96,6 +102,11 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
   addErrorKey: null,
   addErrorParams: null,
   evolvingMode: false,
+  unlockedVariantIds: new Set<string>(),
+
+  setUnlockedVariantIds: (ids: Set<string>) => {
+    set({ unlockedVariantIds: ids });
+  },
 
   setEvolvingMode: (on: boolean) => {
     set({ evolvingMode: on });
@@ -124,7 +135,14 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
   },
 
   canAddChar: (card: CharacterCard): AddCheckResult => {
-    const { deckChars } = get();
+    const { deckChars, unlockedVariantIds } = get();
+    if (isVariantCard(card) && !unlockedVariantIds.has(card.id)) {
+      return {
+        allowed: false,
+        reason: 'Variant locked',
+        reasonKey: 'deckBuilder.error.variantLocked',
+      };
+    }
     const baseVersion = normalizeVersionId(card.id);
     const count = deckChars.filter(
       (c) => normalizeVersionId(c.id) === baseVersion,
@@ -150,6 +168,14 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
     const check = get().canAddChar(card);
     if (!check.allowed) {
       set({ addError: check.reason || null, addErrorKey: check.reasonKey || null, addErrorParams: check.reasonParams || null });
+      if (check.reasonKey === 'deckBuilder.error.variantLocked') {
+        useToastStore.getState().showToast({
+          type: 'info',
+          messageKey: 'collection.lockedToastMessage',
+          dedupeKey: `variant-locked-${card.id}`,
+          durationMs: 3500,
+        });
+      }
       return;
     }
     set({ deckChars: [...get().deckChars, card], addError: null, addErrorKey: null, addErrorParams: null, isDirty: true });
@@ -160,6 +186,14 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
     const updated = [...deckChars];
     updated.splice(index, 1);
     set({ deckChars: updated, isDirty: true });
+  },
+
+  removeLockedVariants: () => {
+    const { deckChars, unlockedVariantIds } = get();
+    const kept = deckChars.filter((c) => !(isVariantCard(c) && !unlockedVariantIds.has(c.id)));
+    const removed = deckChars.length - kept.length;
+    if (removed > 0) set({ deckChars: kept, isDirty: true });
+    return removed;
   },
 
   addMission: (card: MissionCard) => {

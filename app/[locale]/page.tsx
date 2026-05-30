@@ -12,10 +12,16 @@ import { Footer } from '@/components/Footer';
 import { CloudBackground } from '@/components/CloudBackground';
 import { TournamentNavButton, type TournamentMenuStatus } from '@/components/TournamentNavButton';
 import { HomeMenuButton } from '@/components/HomeMenuButton';
+import { useBoosterBadge } from '@/lib/hooks/useBoosterBadge';
+import { useBattlepassBadge } from '@/lib/hooks/useBattlepassBadge';
+import { useQuestBadge } from '@/lib/hooks/useQuestBadge';
+import { MenuBadge } from '@/components/notifications/MenuBadge';
+import '@/styles/holo-evolving.css';
 
 
 const FEATURED_CARDS = [
   { src: '/images/cards/KS/mythos_v/KS-108_2-MV.webp', alt: 'Naruto Uzumaki - Shadow Clone Jutsu', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-107-MV.webp', alt: 'Sasuke Uchiwa - Chidori', rarity: 'mythos' as const },
   { src: '/images/cards/KS/legendary/KS-136-L.webp', alt: 'Sasuke Uchiwa - Heaven Curse Mark', rarity: 'legendary' as const },
   { src: '/images/cards/KS/legendary/KS-117-L.webp', alt: 'Rock Lee - Loopy Fist', rarity: 'legendary' as const },
   { src: '/images/cards/KS/secret_v/KS-132-SV.webp', alt: 'Jiraiya - Toad Mouth Trap', rarity: 'secret' as const },
@@ -68,8 +74,8 @@ const menuButtons = [
   { key: 'deckBuilder' as const,   href: '/deck-builder', primary: false },
   { key: 'collection' as const,    href: '/collection',   primary: false },
   { key: 'leaderboard' as const,   href: '/leaderboard',  primary: false },
-  { key: 'friends' as const,       href: '/friends',      primary: false },
   { key: 'tournaments' as const,   href: '/tournaments',  primary: false },
+  { key: 'battlepass' as const,    href: '/battlepass',   primary: false },
 ];
 
 
@@ -108,6 +114,9 @@ export default function Home() {
   const [tournamentAvailable, setTournamentAvailable] = useState(false);
   const [nextTournamentStartAt, setNextTournamentStartAt] = useState<string | null>(null);
   const [meRefresh, setMeRefresh] = useState(0);
+  const { totalUnopened: totalUnopenedBoosters } = useBoosterBadge();
+  const { showBadge: showBattlepassBadge, cardClaimableTiers: bpClaimable } = useBattlepassBadge();
+  const { showBadge: showQuestBadge, unclaimedStandardCount, dailyClaimable } = useQuestBadge();
 
   useEffect(() => {
     if (!session?.user) return;
@@ -243,22 +252,50 @@ export default function Home() {
                     />
                   );
                 }
+                const isBp = btn.key === 'battlepass';
                 return (
                   <HomeMenuButton
                     key={btn.key}
                     href={btn.href}
                     label={t(btn.key)}
-                    variant={btn.primary ? 'primary' : 'muted'}
+                    variant={isBp ? 'pink' : (btn.primary ? 'primary' : 'muted')}
                     delay={0.8 + i * 0.06}
+                    innerClassName={isBp ? 'holo-evolving holo-evolving--subtle' : ''}
+                    innerStyle={isBp ? { ['--foil' as string]: '#f472b6' } : undefined}
+                    rightSlot={
+                      isBp && (totalUnopenedBoosters > 0 || showBattlepassBadge || showQuestBadge)
+                        ? <MenuBadge
+                            accent="pink"
+                            count={
+                              (showBattlepassBadge ? bpClaimable.length : 0)
+                              + totalUnopenedBoosters
+                              + (showQuestBadge ? unclaimedStandardCount + (dailyClaimable ? 1 : 0) : 0)
+                            }
+                            tooltip={[
+                              showBattlepassBadge ? t('battlepassBadgeTooltip', { count: bpClaimable.length }) : null,
+                              totalUnopenedBoosters > 0 ? t('boostersBadgeTooltip', { count: totalUnopenedBoosters }) : null,
+                              showQuestBadge ? t('questsBadgeTooltip', { count: unclaimedStandardCount + (dailyClaimable ? 1 : 0) }) : null,
+                            ].filter(Boolean).join(' · ')}
+                          />
+                        : undefined
+                    }
                   />
                 );
               })}
 
               <HomeMenuButton
+                href="/topdeck"
+                label="TopDeck"
+                variant="muted"
+                delay={1.26}
+                image={{ src: '/images/topdeck-logo.webp', height: 22 }}
+              />
+
+              <HomeMenuButton
                 href="/play/sealed"
                 label={t('sealed')}
                 variant="primary"
-                delay={1.3}
+                delay={1.32}
               />
             </motion.nav>
 

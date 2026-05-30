@@ -1,0 +1,16 @@
+[Unit]
+Description=Naruto Mythos — daily quest rotation
+Documentation=https://github.com/anthropics/claude-code
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/naruto-mythos
+EnvironmentFile=/opt/naruto-mythos/.env
+ExecStart=/usr/bin/node /opt/naruto-mythos/scripts/rotate-daily-quest.mjs
+StandardOutput=journal
+StandardError=journal
+User=naruto
+Group=naruto
+
+[Install]
+WantedBy=multi-user.target

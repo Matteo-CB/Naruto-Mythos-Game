@@ -437,7 +437,7 @@ export function PopupMinimizeX({ onClick }: { onClick: () => void }) {
         }}
         title={t('game.board.minimize')}
       >
-        <span style={{ transform: 'rotate(-45deg)', display: 'block' }}>&#x2715;</span>
+        <img src="/images/icons/close-x.svg" alt="" draggable={false} style={{ width: 16, height: 16, display: 'block', transform: 'rotate(-45deg)', opacity: 0.85 }} />
       </motion.button>
     </div>
   );

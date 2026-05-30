@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { emitToUser } from '@/lib/socket/io';
+import { emitQuestEvent } from '@/lib/quests/hooks';
+import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
+
+ensureQuestPersistenceListener();
 
 function generateRoomCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -119,7 +123,7 @@ export async function POST(request: NextRequest) {
     }
     const updatedInvite = await prisma.matchInvite.findUnique({ where: { id: inviteId } });
 
-    
+
     await prisma.room.create({
       data: {
         code: roomCode,
@@ -129,6 +133,21 @@ export async function POST(request: NextRequest) {
         isPrivate: true,
       },
     });
+
+    const friendship = await prisma.friendship.findFirst({
+      where: {
+        status: 'accepted',
+        OR: [
+          { senderId: invite.senderId, receiverId: session.user.id },
+          { senderId: session.user.id, receiverId: invite.senderId },
+        ],
+      },
+      select: { id: true },
+    });
+    if (friendship) {
+      emitQuestEvent('social.match.played.friend', invite.senderId);
+      emitQuestEvent('social.match.played.friend', session.user.id);
+    }
 
     
     const receiver = await prisma.user.findUnique({

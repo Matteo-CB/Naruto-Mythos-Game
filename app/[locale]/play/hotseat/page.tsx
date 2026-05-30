@@ -10,6 +10,8 @@ import { DeckSelector } from '@/components/game/DeckSelector';
 import { useGameStore } from '@/stores/gameStore';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
+import { isVariantRarity } from '@/lib/variants/constants';
+import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 
 interface ResolvedDeck {
   characters: CharacterCard[];
@@ -25,6 +27,7 @@ export default function HotseatPage() {
   const [deck1, setDeck1] = useState<ResolvedDeck | null>(null);
   const [deck2, setDeck2] = useState<ResolvedDeck | null>(null);
   const { bannedIds } = useBannedCards();
+  const { unlockedIds } = useUnlockedVariants();
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
@@ -39,18 +42,19 @@ export default function HotseatPage() {
     setIsLoading(true);
 
     const availableChars = cards.characters.filter((c) => !bannedIds.has(c.id));
+    const randomPool = availableChars.filter((c) => !isVariantRarity(c.rarity) || unlockedIds.has(c.id));
     const availableMissions = cards.missions.filter((m) => !bannedIds.has(m.id));
 
     const p1Deck = deck1
       ? deck1.characters
-      : [...availableChars].sort(() => Math.random() - 0.5).slice(0, 30);
+      : [...randomPool].sort(() => Math.random() - 0.5).slice(0, 30);
     const p1Missions = deck1
       ? deck1.missions
       : [...availableMissions].sort(() => Math.random() - 0.5).slice(0, 3);
 
     const p2Deck = deck2
       ? deck2.characters
-      : [...availableChars].sort(() => Math.random() - 0.5).slice(0, 30);
+      : [...randomPool].sort(() => Math.random() - 0.5).slice(0, 30);
 
     const p1MissionIds = new Set(p1Missions.map((m) => m.id));
     const p2MissionPool = availableMissions.filter((m) => !p1MissionIds.has(m.id));

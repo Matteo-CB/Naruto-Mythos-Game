@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getRarityLabel } from '@/lib/utils/cardLocale';
+import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 
 interface CardRevealProps {
   card: BoosterCard;
@@ -157,7 +158,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             </div>
           )}
 
-          {card.isHolo && (
+          {card.isHolo && !card.isTemporaryVariant && (
             <motion.div
               className="absolute inset-0 pointer-events-none"
               animate={{ opacity: [0.05, 0.2, 0.05] }}
@@ -167,6 +168,9 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
                 backgroundColor: 'rgba(255, 255, 255, 0.1)',
               }}
             />
+          )}
+          {card.isTemporaryVariant && isFlipped && (
+            <VariantHoloOverlay intensity="strong" />
           )}
         </div>
       </motion.div>

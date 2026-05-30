@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocale, useTranslations } from 'next-intl';
 import { AnimatePresence, motion } from 'framer-motion';
 import changelog from '@/lib/data/changelog.json';
@@ -33,6 +34,11 @@ export function ChangelogButton() {
   const t = useTranslations('changelog');
   const [open, setOpen] = useState(false);
   const [hasNew, setHasNew] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const entries = (changelog.entries ?? []) as Entry[];
   const latestDate = entries[0]?.date ?? '';
@@ -69,42 +75,22 @@ export function ChangelogButton() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  return (
-    <>
-      <button
-        type="button"
-        onClick={openModal}
-        className="relative px-2 py-1 text-xs font-bold uppercase tracking-wider transition-colors"
-        style={{
-          color: hasNew ? '#c4a35a' : '#888888',
-        }}
-        aria-label={t('buttonLabel')}
-      >
-        {t('buttonLabel')}
-        {hasNew && (
-          <span
-            className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full"
-            style={{ backgroundColor: '#c4a35a' }}
-            aria-hidden="true"
-          />
-        )}
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            key="changelog-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-100 flex items-center justify-center p-4"
-            style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}
-            onClick={closeModal}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="changelog-title"
-          >
+  const modal = (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          key="changelog-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-9999 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}
+          onClick={closeModal}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="changelog-title"
+        >
             <motion.div
               key="changelog-panel"
               initial={{ opacity: 0, y: 12, scale: 0.98 }}
@@ -204,9 +190,32 @@ export function ChangelogButton() {
                 )}
               </div>
             </motion.div>
-          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={openModal}
+        className="relative px-2 py-1 text-xs font-bold uppercase tracking-wider transition-colors"
+        style={{
+          color: hasNew ? '#c4a35a' : '#888888',
+        }}
+        aria-label={t('buttonLabel')}
+      >
+        {t('buttonLabel')}
+        {hasNew && (
+          <span
+            className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full"
+            style={{ backgroundColor: '#c4a35a' }}
+            aria-hidden="true"
+          />
         )}
-      </AnimatePresence>
+      </button>
+      {mounted ? createPortal(modal, document.body) : null}
     </>
   );
 }

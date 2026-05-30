@@ -1,6 +1,17 @@
 
 
-export type SoundName = 'cardPlay' | 'mulligan' | 'newTurn' | 'jutsu' | 'clockWarning' | 'clockUrgent';
+export type SoundName =
+  | 'cardPlay'
+  | 'mulligan'
+  | 'newTurn'
+  | 'jutsu'
+  | 'clockWarning'
+  | 'clockUrgent'
+  | 'legendaryReveal'
+  | 'secretVariantReveal'
+  | 'mythosHum'
+  | 'boosterTear'
+  | 'claimSuccess';
 
 const SOUND_PATHS: Record<SoundName, string> = {
   cardPlay: '/sound/cardplaying.wav',
@@ -9,6 +20,11 @@ const SOUND_PATHS: Record<SoundName, string> = {
   jutsu: '/sound/justu.mp3',
   clockWarning: '/sound/clock-warning.mp3',
   clockUrgent: '/sound/clock-urgent.mp3',
+  legendaryReveal: '/sound/legendary.mp3',
+  secretVariantReveal: '/sound/secret-variant.mp3',
+  mythosHum: '/sound/mythos-hum.mp3',
+  boosterTear: '/sound/booster-tear.mp3',
+  claimSuccess: '/sound/claim-success.mp3',
 };
 
 
@@ -19,6 +35,11 @@ const SOUND_GAIN: Record<SoundName, number> = {
   jutsu: 0.25,
   clockWarning: 0.4,
   clockUrgent: 0.45,
+  legendaryReveal: 0.7,
+  secretVariantReveal: 0.7,
+  mythosHum: 0.5,
+  boosterTear: 0.6,
+  claimSuccess: 0.5,
 };
 
 

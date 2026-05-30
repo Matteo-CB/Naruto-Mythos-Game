@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { computeDeckEvolvingPoints, deckUsesOnlyAllowedSets } from '@/lib/evolving/computePoints';
 import { EVOLVING_MAX_POINTS } from '@/lib/evolving/constants';
+import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
 
 export async function GET(
   _request: NextRequest,
@@ -109,6 +110,20 @@ export async function PUT(
         if (typeof id !== 'string' || !ID_RE.test(id)) {
           return NextResponse.json({ error: 'Invalid mission id' }, { status: 400 });
         }
+      }
+    }
+
+    if (cardIds) {
+      const variantCheck = await validateDeckVariantUnlocks(session.user.id, cardIds);
+      if (!variantCheck.ok) {
+        return NextResponse.json(
+          {
+            error: 'Deck contains locked variant cards',
+            errorKey: 'deckBuilder.error.variantLocked',
+            lockedCardIds: variantCheck.lockedCardIds,
+          },
+          { status: 400 },
+        );
       }
     }
 

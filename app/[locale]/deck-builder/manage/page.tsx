@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { Link } from '@/lib/i18n/navigation';
 import { exportDeckAsImage } from '@/lib/utils/exportDeckImage';
+import { trackUiHook } from '@/lib/hooks/useTrackUi';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
@@ -111,8 +112,9 @@ export default function ManageDecksPage() {
         .map((id) => getMissionById(id))
         .filter((m): m is NonNullable<typeof m> => m != null);
       await exportDeckAsImage(deck.name, chars, missions);
+      trackUiHook('deck.exported');
     } catch {
-      
+
     } finally {
       setExportingId(null);
     }
@@ -129,6 +131,7 @@ export default function ManageDecksPage() {
     navigator.clipboard.writeText(code).then(() => {
       setCopiedId(deck.id);
       setTimeout(() => setCopiedId(null), 2000);
+      trackUiHook('deck.exported');
     });
   };
 

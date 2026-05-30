@@ -1,0 +1,166 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`collection filter — snapshot of real production filter > no filter: returns all cards 1`] = `
+[
+  {
+    "id": "KS-001-C",
+    "rarity": "C",
+    "set": "KS",
+  },
+  {
+    "id": "KS-002-C",
+    "rarity": "C",
+    "set": "KS",
+  },
+  {
+    "id": "KS-056-UC",
+    "rarity": "UC",
+    "set": "KS",
+  },
+  {
+    "id": "KS-104-R",
+    "rarity": "R",
+    "set": "KS",
+  },
+  {
+    "id": "KS-104-RA",
+    "rarity": "RA",
+    "set": "KS",
+  },
+  {
+    "id": "KS-108-MV",
+    "rarity": "MV",
+    "set": "KS",
+  },
+  {
+    "id": "KS-117-L",
+    "rarity": "L",
+    "set": "KS",
+  },
+  {
+    "id": "KS-117-R",
+    "rarity": "R",
+    "set": "KS",
+  },
+  {
+    "id": "KS-133-MV",
+    "rarity": "MV",
+    "set": "KS",
+  },
+  {
+    "id": "KS-133-S",
+    "rarity": "S",
+    "set": "KS",
+  },
+  {
+    "id": "KS-140-S",
+    "rarity": "S",
+    "set": "KS",
+  },
+  {
+    "id": "KS-140-SV",
+    "rarity": "SV",
+    "set": "KS",
+  },
+  {
+    "id": "SS-001-RA",
+    "rarity": "RA",
+    "set": "SS",
+  },
+]
+`;
+
+exports[`collection filter — snapshot of real production filter > rarity C without variantsOnly: only commons 1`] = `
+[
+  {
+    "id": "KS-001-C",
+    "rarity": "C",
+    "set": "KS",
+  },
+  {
+    "id": "KS-002-C",
+    "rarity": "C",
+    "set": "KS",
+  },
+]
+`;
+
+exports[`collection filter — snapshot of real production filter > variantsOnly + rarity MV: only Mythos variants 1`] = `
+[
+  {
+    "id": "KS-108-MV",
+    "rarity": "MV",
+    "set": "KS",
+  },
+  {
+    "id": "KS-133-MV",
+    "rarity": "MV",
+    "set": "KS",
+  },
+]
+`;
+
+exports[`collection filter — snapshot of real production filter > variantsOnly + set KS: excludes SS variants 1`] = `
+[
+  {
+    "id": "KS-104-RA",
+    "rarity": "RA",
+    "set": "KS",
+  },
+  {
+    "id": "KS-108-MV",
+    "rarity": "MV",
+    "set": "KS",
+  },
+  {
+    "id": "KS-117-L",
+    "rarity": "L",
+    "set": "KS",
+  },
+  {
+    "id": "KS-133-MV",
+    "rarity": "MV",
+    "set": "KS",
+  },
+  {
+    "id": "KS-140-SV",
+    "rarity": "SV",
+    "set": "KS",
+  },
+]
+`;
+
+exports[`collection filter — snapshot of real production filter > variantsOnly: returns RA, MV, SV, L across all sets 1`] = `
+[
+  {
+    "id": "KS-104-RA",
+    "rarity": "RA",
+    "set": "KS",
+  },
+  {
+    "id": "KS-108-MV",
+    "rarity": "MV",
+    "set": "KS",
+  },
+  {
+    "id": "KS-117-L",
+    "rarity": "L",
+    "set": "KS",
+  },
+  {
+    "id": "KS-133-MV",
+    "rarity": "MV",
+    "set": "KS",
+  },
+  {
+    "id": "KS-140-SV",
+    "rarity": "SV",
+    "set": "KS",
+  },
+  {
+    "id": "SS-001-RA",
+    "rarity": "RA",
+    "set": "SS",
+  },
+]
+`;

@@ -2,6 +2,7 @@ import type { GameState, PlayerID, CharacterInPlay } from '../engine/types';
 import { logAction } from '../engine/utils/gameLog';
 import { EffectEngine } from './EffectEngine';
 import { triggerOnDefeatEffects } from './onDefeatTriggers';
+import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 
 
 
@@ -110,8 +111,17 @@ export function defeatCharacterInPlay(
     }
   }
 
-  
+
   let newState = removeCharacterFromPlay(state, missionIndex, charInstanceId, side);
+
+  emitEngineQuestEvent(state, sourcePlayer, 'character.defeated', {
+    targetName: targetChar.card.name_fr,
+    targetKeywords: targetChar.card.keywords ?? [],
+    isHidden: targetChar.isHidden,
+  });
+  emitEngineQuestEvent(state, sourcePlayer, 'character.defeated.by.name', {
+    name: targetChar.card.name_fr,
+  });
 
   newState = {
     ...newState,
@@ -183,11 +193,17 @@ function removeCharacterFromPlay(
   
   const owner = defeated.originalOwner;
   const ownerState = { ...state[owner] };
-  const cardsToDiscard = defeated.stack?.length > 0 ? [...defeated.stack] : [defeated.card];
-  ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
-
-  
   const sidePlayer: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+
+  const allCards = defeated.stack?.length > 0 ? [...defeated.stack] : [defeated.card];
+  if (sidePlayer === owner && allCards.length > 0 && EffectEngine.hasTsunade004Active(state, owner)) {
+    const topCard = allCards[allCards.length - 1];
+    const underCards = allCards.slice(0, -1);
+    ownerState.hand = [...ownerState.hand, topCard];
+    ownerState.discardPile = [...ownerState.discardPile, ...underCards];
+  } else {
+    ownerState.discardPile = [...ownerState.discardPile, ...allCards];
+  }
 
   let result = {
     ...state,

@@ -7,6 +7,7 @@ import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, val
 import { calculateEffectiveCost } from '../rules/ChakraValidation';
 import { EffectEngine } from '../../effects/EffectEngine';
 import { applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
+import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 
 
 export function executeAction(state: GameState, player: PlayerID, action: GameAction): GameState {
@@ -190,6 +191,36 @@ function handlePlayCharacter(
   const updatedChars = player === 'player1' ? updatedMission.player1Characters : updatedMission.player2Characters;
   const playedChar = updatedChars[updatedChars.length - 1]; // Just added as last
   if (playedChar) {
+    emitEngineQuestEvent(newState, player, 'character.played', {
+      targetName: playedChar.card.name_fr,
+      targetKeywords: playedChar.card.keywords ?? [],
+      group: playedChar.card.group,
+    });
+    if (playedChar.card.group) {
+      emitEngineQuestEvent(newState, player, 'character.played.group', {
+        group: playedChar.card.group,
+      });
+    }
+    for (const kw of playedChar.card.keywords ?? []) {
+      emitEngineQuestEvent(newState, player, 'character.played.keyword', { keyword: kw });
+    }
+    const rarity = playedChar.card.rarity;
+    if (rarity === 'RA' || rarity === 'MV' || rarity === 'SV' || rarity === 'L') {
+      emitEngineQuestEvent(newState, player, 'variant.card.played', { rarity });
+    }
+    const stackDepth = playedChar.stack?.length ?? 1;
+    if (stackDepth >= 3) {
+      emitEngineQuestEvent(newState, player, 'upgrade.stack.depth', { depth: stackDepth });
+    }
+    const sideKey: 'player1Characters' | 'player2Characters' = player === 'player1' ? 'player1Characters' : 'player2Characters';
+    const friendlyNamesOnMission = Array.from(new Set(
+      updatedMission[sideKey]
+        .filter((c) => !c.isHidden)
+        .map((c) => (c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card).name_fr.toUpperCase()),
+    ));
+    if (friendlyNamesOnMission.length >= 2) {
+      emitEngineQuestEvent(newState, player, 'mission.has.characters', { names: friendlyNamesOnMission });
+    }
     newState = EffectEngine.resolvePlayEffects(newState, player, playedChar, missionIndex, false);
   }
 
@@ -437,6 +468,19 @@ function handleRevealCharacter(
   const revealedChars = player === 'player1' ? revealedMission.player1Characters : revealedMission.player2Characters;
   const revealedChar = revealedChars.find((c) => c.instanceId === characterInstanceId);
   if (revealedChar) {
+    emitEngineQuestEvent(newState, player, 'character.revealed', {
+      targetName: revealedChar.card.name_fr,
+      targetKeywords: revealedChar.card.keywords ?? [],
+    });
+    const topRevealed = revealedChar.stack?.length > 0 ? revealedChar.stack[revealedChar.stack.length - 1] : revealedChar.card;
+    const hasAmbush = (topRevealed.effects ?? []).some((e) =>
+      e.type === 'AMBUSH' && !e.description.includes('[⧗]'),
+    );
+    if (hasAmbush) {
+      emitEngineQuestEvent(newState, player, 'ambush.activated.via_reveal', {
+        targetName: topRevealed.name_fr,
+      });
+    }
     newState = EffectEngine.resolveRevealEffects(newState, player, revealedChar, missionIndex);
   }
 

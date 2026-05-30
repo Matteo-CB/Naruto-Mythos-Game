@@ -355,9 +355,12 @@ export function MulliganDialog() {
 
           <div className="flex flex-col items-center gap-5 overflow-y-auto w-full shrink min-h-0">
 
-            <PopupTitle accentColor="#c4a35a" size="lg">
-              {t('game.mulligan.title')}
-            </PopupTitle>
+            <div className="flex items-center gap-2">
+              <img src="/images/icons/mulligan-hand.svg" alt="" draggable={false} style={{ width: 22, height: 22, opacity: 0.65 }} />
+              <PopupTitle accentColor="#c4a35a" size="lg">
+                {t('game.mulligan.title')}
+              </PopupTitle>
+            </div>
 
             <span className="font-body text-sm text-center" style={{ color: '#888888' }}>
               {t('game.mulligan.description')}

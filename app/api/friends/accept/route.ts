@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { emitToUser } from '@/lib/socket/io';
+import { emitQuestEvent } from '@/lib/quests/hooks';
+import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
+
+ensureQuestPersistenceListener();
 
 export async function POST(request: NextRequest) {
   try {
@@ -64,6 +68,10 @@ export async function POST(request: NextRequest) {
         receiver: { select: { id: true, username: true, elo: true } },
       },
     });
+
+    emitQuestEvent('social.friend.request.accepted', userId);
+    emitQuestEvent('social.friend.added', userId);
+    emitQuestEvent('social.friend.added', friendship.senderId);
 
     emitToUser(friendship.senderId, 'friend:request-accepted', {
       friendshipId: friendship.id,

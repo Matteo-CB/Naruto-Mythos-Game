@@ -5,8 +5,12 @@ import type { GameState, GameAction, PlayerID, VisibleGameState, GameConfig, Cha
 import { GameEngine } from '@/lib/engine/GameEngine';
 import { AIPlayer, type AIDifficulty } from '@/lib/ai/AIPlayer';
 import { aiSelectTarget } from '@/lib/ai/targetSelection';
+import { trackAiResult } from '@/lib/hooks/trackAiResult';
+import { startQuestBuffer, drainQuestBuffer } from '@/lib/quests/clientBuffer';
+import { emitAiGameSummaryHooks } from '@/lib/quests/aiGameSummary';
+import { emitDrawDiffEvents, emitTokenDiffEvents } from '@/lib/quests/engineEmit';
 import { useSocketStore } from '@/lib/socket/client';
-import { validatePlayCharacter, validatePlayHidden } from '@/lib/engine/rules/PlayValidation';
+import { validatePlayCharacter, validatePlayHidden, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
 import { resetIdCounter } from '@/lib/engine/utils/id';
@@ -983,13 +987,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => {
-    
+    startQuestBuffer();
     useSocketStore.setState({ isSpectating: false, spectatingRoomCode: null, spectatorCount: 0 });
-    
+
     useUIStore.getState().setCoinFlipComplete(false);
     useUIStore.getState().setMissionDeckIntroComplete(true);
-    
-    
+
+
     useTrainingStore.getState().disable();
 
     
@@ -1038,6 +1042,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (aiAction) {
         try {
           const newState = GameEngine.applyAction(state, aiPlayerSide, aiAction);
+          emitDrawDiffEvents(state, newState);
+          emitTokenDiffEvents(state, newState);
           const newVisible = GameEngine.getVisibleState(newState, humanPlayer);
           set({ gameState: newState, visibleState: newVisible });
         } catch (err) {
@@ -1227,6 +1233,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let newState: GameState;
     try {
       newState = GameEngine.applyAction(gameState, humanPlayer, action);
+      if (get().isAIGame) {
+        emitDrawDiffEvents(gameState, newState);
+        emitTokenDiffEvents(gameState, newState);
+      }
     } catch (err) {
       console.error('[gameStore] performAction error:', err);
       set({ isProcessing: false });
@@ -1258,8 +1268,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           errorKey = result.reasonKey ?? null;
           errorParams = result.reasonParams ?? null;
         } else if (action.type === 'UPGRADE_CHARACTER' && action.cardIndex < gameState[humanPlayer].hand.length) {
-          errorReason = 'Invalid upgrade target.';
-          errorKey = 'game.error.invalidUpgradeTarget';
+          const card = gameState[humanPlayer].hand[action.cardIndex];
+          const result = validateUpgradeCharacter(gameState, humanPlayer, card, action.missionIndex, action.targetInstanceId);
+          errorReason = result.reason ?? 'Invalid upgrade target.';
+          errorKey = result.reasonKey ?? 'game.error.invalidUpgradeTarget';
+          errorParams = result.reasonParams ?? null;
         }
         set({
           isProcessing: false,
@@ -1306,15 +1319,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     
     if (newState.phase === 'gameOver') {
+      const winnerEnd = GameEngine.getWinner(newState);
       addAnimation({
         type: 'game-end',
-        data: { winner: GameEngine.getWinner(newState) },
+        data: { winner: winnerEnd },
       });
       set({
         gameOver: true,
-        winner: GameEngine.getWinner(newState),
+        winner: winnerEnd,
         isProcessing: false,
       });
+      const aiCfg = get().lastAIGameConfig;
+      if (get().isAIGame && aiCfg && winnerEnd) {
+        const hp = get().humanPlayer;
+        const gs = get().gameState;
+        if (gs && hp) emitAiGameSummaryHooks(gs, hp, winnerEnd === hp);
+        trackAiResult(aiCfg.difficulty, winnerEnd === hp ? 'won' : 'lost', drainQuestBuffer());
+      }
       return;
     }
 
@@ -1329,8 +1350,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const vis = GameEngine.getVisibleState(advanced, hp);
         set({ gameState: advanced, visibleState: vis });
         if (advanced.phase === 'gameOver') {
-          get().addAnimation({ type: 'game-end', data: { winner: GameEngine.getWinner(advanced) } });
-          set({ gameOver: true, winner: GameEngine.getWinner(advanced), isProcessing: false });
+          const winnerAdv = GameEngine.getWinner(advanced);
+          get().addAnimation({ type: 'game-end', data: { winner: winnerAdv } });
+          set({ gameOver: true, winner: winnerAdv, isProcessing: false });
+          const aiCfg = get().lastAIGameConfig;
+          if (get().isAIGame && aiCfg && winnerAdv) {
+            const hp = get().humanPlayer;
+            const gs = get().gameState;
+            if (gs && hp) emitAiGameSummaryHooks(gs, hp, winnerAdv === hp);
+            trackAiResult(aiCfg.difficulty, winnerAdv === hp ? 'won' : 'lost', drainQuestBuffer());
+          }
         } else if (get().isAIGame && get().aiPlayer) {
           setTimeout(() => {
             void get().processAITurn();
@@ -1528,6 +1557,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     
     let currentState = gameState;
+    const stateBeforeAI = gameState;
     let iterations = 0;
     const maxIterations = 20; // Safety limit
     const aiAnimations: Array<Omit<AnimationEvent, 'id' | 'timestamp'>> = [];
@@ -1729,13 +1759,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           });
 
           const visible = GameEngine.getVisibleState(currentState, humanPlayer);
+          const winnerCs = GameEngine.getWinner(currentState);
           set({
             gameState: currentState,
             visibleState: visible,
             gameOver: true,
-            winner: GameEngine.getWinner(currentState),
+            winner: winnerCs,
             isProcessing: false,
           });
+          const aiCfg = get().lastAIGameConfig;
+          if (get().isAIGame && aiCfg && winnerCs) {
+            const gs = get().gameState;
+            if (gs && humanPlayer) emitAiGameSummaryHooks(gs, humanPlayer, winnerCs === humanPlayer);
+            trackAiResult(aiCfg.difficulty, winnerCs === humanPlayer ? 'won' : 'lost', drainQuestBuffer());
+          }
           return;
         }
 
@@ -1743,7 +1780,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     } catch (err) {
       console.error('[gameStore] processAITurn error:', err);
-      
+
       const danglingAIPending = currentState.pendingActions.filter((p) => p.player === aiPlayer.player);
       if (danglingAIPending.length > 0) {
         console.warn('[gameStore] Cleaning up', danglingAIPending.length, 'dangling AI pending actions after error');
@@ -1770,7 +1807,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    
+    emitDrawDiffEvents(stateBeforeAI, currentState);
+    emitTokenDiffEvents(stateBeforeAI, currentState);
+
     for (const anim of aiAnimations) {
       addAnimation(anim);
     }
@@ -1792,8 +1831,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const vis = GameEngine.getVisibleState(advanced, hp);
         set({ gameState: advanced, visibleState: vis });
         if (advanced.phase === 'gameOver') {
-          get().addAnimation({ type: 'game-end', data: { winner: GameEngine.getWinner(advanced) } });
-          set({ gameOver: true, winner: GameEngine.getWinner(advanced), isProcessing: false });
+          const winnerAdv = GameEngine.getWinner(advanced);
+          get().addAnimation({ type: 'game-end', data: { winner: winnerAdv } });
+          set({ gameOver: true, winner: winnerAdv, isProcessing: false });
+          const aiCfg = get().lastAIGameConfig;
+          if (get().isAIGame && aiCfg && winnerAdv) {
+            const hp = get().humanPlayer;
+            const gs = get().gameState;
+            if (gs && hp) emitAiGameSummaryHooks(gs, hp, winnerAdv === hp);
+            trackAiResult(aiCfg.difficulty, winnerAdv === hp ? 'won' : 'lost', drainQuestBuffer());
+          }
         } else if (get().isAIGame && get().aiPlayer) {
           setTimeout(() => {
             void get().processAITurn();

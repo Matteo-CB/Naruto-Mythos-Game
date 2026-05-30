@@ -95,6 +95,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    await prisma.boosterInventory.create({
+      data: { userId: user.id, setId: 'KS', count: 2 },
+    }).catch(() => {});
+
     return NextResponse.json(
       {
         id: user.id,
