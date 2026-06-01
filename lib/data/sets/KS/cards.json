@@ -6764,6 +6764,42 @@
       "data_complete": true,
       "old_id": "140/130 V"
     },
+    "KS-138-SV": {
+      "id": "KS-138-SV",
+      "rarity": "SV",
+      "number": "138",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "OROCHIMARU",
+      "name_fr": "OROCHIMARU",
+      "title_fr": "Réanimation",
+      "title_en": "Reanimation",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 8,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can play this character as an upgrade to any character that is not a Summon nor Orochimaru.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Gain 2 Mission points if the character you upgraded from had Power 6 or more.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret_v/KS-138-SV.webp",
+      "rarity_display": "Secret V",
+      "image_file": "images/cards/KS/secret_v/KS-138-SV.webp",
+      "data_complete": true,
+      "old_id": "138/130 V"
+    },
     "KS-117-L": {
       "id": "KS-117-L",
       "rarity": "L",
