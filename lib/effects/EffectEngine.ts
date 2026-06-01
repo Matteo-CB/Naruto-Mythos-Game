@@ -16,7 +16,7 @@ import { checkFlexibleUpgrade } from '../engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '../engine/rules/ChakraValidation';
 import { canAffordAsUpgrade } from './handlers/KS/shared/upgradeCheck';
 import { moveCharTo, getValidMissions, applyUpgradePowerup } from './handlers/KS/rare/sasuke107';
-import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard, findHiddenSoundVillageOnBoard } from './handlers/KS/shared/summonSearch';
+import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard, findHiddenSoundVillageOnBoard, findAffordableSoundVillageInHand } from './handlers/KS/shared/summonSearch';
 import { isCharacterCopyable } from './handlers/KS/shared/copyExclusions';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 
@@ -8027,19 +8027,7 @@ export class EffectEngine {
 
       case 'TAYUYA125_CONFIRM_UPGRADE': {
         const t125Player = pendingEffect.sourcePlayer;
-        const t125State = newState[t125Player];
-        const t125Hand: number[] = [];
-        for (let i = 0; i < t125State.hand.length; i++) {
-          const card = t125State.hand[i];
-          if (card.group === 'Sound Village') {
-            const freshCost = Math.max(0, card.chakra - 2);
-            const canFresh = t125State.chakra >= freshCost;
-            const canUpgrade = canAffordAsUpgrade(newState, t125Player, card as { name_fr: string; chakra: number }, 2);
-            if (canFresh || canUpgrade) {
-              t125Hand.push(i);
-            }
-          }
-        }
+        const t125Hand = findAffordableSoundVillageInHand(newState, t125Player, 2);
         const t125Hidden = findHiddenSoundVillageOnBoard(newState, t125Player, 2);
         const t125Targets = [
           ...t125Hand.map((i) => `HAND_${i}`),

@@ -1,8 +1,10 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeCheck';
-import { findHiddenSoundVillageOnBoard } from '@/lib/effects/handlers/KS/shared/summonSearch';
+import {
+  findAffordableSoundVillageInHand,
+  findHiddenSoundVillageOnBoard,
+} from '@/lib/effects/handlers/KS/shared/summonSearch';
 
 
 
@@ -14,21 +16,8 @@ function tayuya125MainHandler(ctx: EffectContext): EffectResult {
 
 function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
-  const playerState = state[sourcePlayer];
 
-  const handTargets: number[] = [];
-  for (let i = 0; i < playerState.hand.length; i++) {
-    const card = playerState.hand[i];
-    if (card.group === 'Sound Village') {
-      const freshCost = Math.max(0, card.chakra - 2);
-      const canFresh = playerState.chakra >= freshCost;
-      const canUpgrade = canAffordAsUpgrade(state, sourcePlayer, card as { name_fr: string; chakra: number }, 2);
-      if (canFresh || canUpgrade) {
-        handTargets.push(i);
-      }
-    }
-  }
-
+  const handTargets = findAffordableSoundVillageInHand(state, sourcePlayer, 2);
   const hiddenTargets = findHiddenSoundVillageOnBoard(state, sourcePlayer, 2);
 
   if (handTargets.length === 0 && hiddenTargets.length === 0) {
