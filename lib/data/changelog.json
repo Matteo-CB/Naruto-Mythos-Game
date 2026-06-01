@@ -27,7 +27,8 @@
         "Les cartes que tu contrôles (prises à l'adversaire) portent maintenant un badge violet 'CTRL' dans le coin, visible aussi quand elles sont cachées. Le badge disparaît dès qu'elles repartent chez leur propriétaire d'origine.",
         "Bonus de performance ELO revus à la hausse : écart de score donne maintenant +3/+6/+9/+12 (10/15/20/25 d'écart), et le bonus de pression commence dès 7 cartes adverses pour monter jusqu'à +8 si l'adversaire n'a plus aucun perso. Nouveau bonus de +5 ELO quand l'adversaire abandonne.",
         "Les quêtes de pioche (genre 'pioche 10 cartes via un effet') ne comptent plus les 2 cartes piochées chaque début de tour ni les 5 cartes de la main de départ. Seuls les effets de cartes (Shikamaru, Itachi, etc.) qui font piocher comptent maintenant.",
-        "80 nouvelles quêtes ajoutées (20 par niveau de difficulté), toutes centrées sur des effets spécifiques de cartes : jouer un Naruto, défaitre avec Kidômaru, cacher avec Kabuto, copier des effets avec Kakashi, avoir un Itachi à 15 Puissance, réunir le trio Itachi + Sasuke + Kisame sur la même mission, etc."
+        "80 nouvelles quêtes ajoutées (20 par niveau de difficulté), toutes centrées sur des effets spécifiques de cartes : jouer un Naruto, défaitre avec Kidômaru, cacher avec Kabuto, copier des effets avec Kakashi, avoir un Itachi à 15 Puissance, réunir le trio Itachi + Sasuke + Kisame sur la même mission, etc.",
+        "Taux d'obtention des boosters variantes revus : Légendaire passe de 1/200 à 1/100, Secret Variant de 1/1000 à 1/400, Mythos Variant de 1/35 à 1/15. Les Rare Art baissent en proportion."
       ],
       "changes_en": [
         "Maximum ELO lost per defeat capped at 24, regardless of your rank.",
@@ -52,7 +53,8 @@
         "Cards you control (taken from your opponent) now show a purple 'CTRL' badge in the corner, visible even when they are hidden. The badge disappears as soon as they return to their original owner.",
         "ELO performance bonuses bumped up: score gap now gives +3/+6/+9/+12 (10/15/20/25 lead), board pressure starts at 7 opponent characters and ramps to +8 when the board is fully swept. New +5 ELO bonus when the opponent forfeits.",
         "Draw-card quests (e.g. 'draw 10 cards via effects') no longer count the 2-per-turn natural draw or the 5 starting hand cards. Only card-effect draws (Shikamaru, Itachi, etc.) count now.",
-        "80 new quests added (20 per difficulty level), all focused on specific card effects: play a Naruto, defeat with Kidômaru, hide with Kabuto, copy effects with Kakashi, have an Itachi at 15 Power, gather the Itachi + Sasuke + Kisame trio on the same mission, and more."
+        "80 new quests added (20 per difficulty level), all focused on specific card effects: play a Naruto, defeat with Kidômaru, hide with Kabuto, copy effects with Kakashi, have an Itachi at 15 Power, gather the Itachi + Sasuke + Kisame trio on the same mission, and more.",
+        "Variant booster pull rates raised: Legendary goes from 1/200 to 1/100, Secret Variant from 1/1000 to 1/400, Mythos Variant from 1/35 to 1/15. Rare Art rate drops accordingly."
       ]
     },
     {

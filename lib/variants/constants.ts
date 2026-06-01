@@ -13,10 +13,10 @@ export interface VariantPackProbabilities {
 }
 
 export const VARIANT_PACK_PROBABILITIES: VariantPackProbabilities = {
-  L: 1 / 200,
-  SV: 1 / 1000,
-  MV: 1 / 35,
-  RA: 1 - 1 / 200 - 1 / 1000 - 1 / 35,
+  L: 1 / 100,
+  SV: 1 / 400,
+  MV: 1 / 15,
+  RA: 1 - 1 / 100 - 1 / 400 - 1 / 15,
 };
 
 export const VARIANT_RARITY_ROLL_ORDER: VariantRarity[] = ['SV', 'L', 'MV', 'RA'];
