@@ -25,7 +25,8 @@
         "Quêtes : quand une quête est déjà obtenue (via la liste principale ou la quête du jour), le bouton 'Réclamer' est remplacé par un badge clair indiquant la source. Plus de clics dans le vide.",
         "Jiraya qui joue une Invocation à coût réduit ne ratait pas Gamakichi quand Naruto Uzumaki était dans la même mission : son réduction se cumule maintenant correctement avec celle de Gamakichi. Même correctif appliqué à Tayuya (Village du Son) et Hiruzen (Village de la Feuille).",
         "Les cartes que tu contrôles (prises à l'adversaire) portent maintenant un badge violet 'CTRL' dans le coin, visible aussi quand elles sont cachées. Le badge disparaît dès qu'elles repartent chez leur propriétaire d'origine.",
-        "Bonus de performance ELO revus à la hausse : écart de score donne maintenant +3/+6/+9/+12 (10/15/20/25 d'écart), et le bonus de pression commence dès 7 cartes adverses pour monter jusqu'à +8 si l'adversaire n'a plus aucun perso. Nouveau bonus de +5 ELO quand l'adversaire abandonne."
+        "Bonus de performance ELO revus à la hausse : écart de score donne maintenant +3/+6/+9/+12 (10/15/20/25 d'écart), et le bonus de pression commence dès 7 cartes adverses pour monter jusqu'à +8 si l'adversaire n'a plus aucun perso. Nouveau bonus de +5 ELO quand l'adversaire abandonne.",
+        "Les quêtes de pioche (genre 'pioche 10 cartes via un effet') ne comptent plus les 2 cartes piochées chaque début de tour ni les 5 cartes de la main de départ. Seuls les effets de cartes (Shikamaru, Itachi, etc.) qui font piocher comptent maintenant."
       ],
       "changes_en": [
         "Maximum ELO lost per defeat capped at 24, regardless of your rank.",
@@ -48,7 +49,8 @@
         "Quests: when a quest is already obtained (via the main list or today's daily), the 'Claim' button is replaced by a clear badge showing the source. No more clicking into the void.",
         "Jiraiya playing a Summon at reduced cost no longer skips Gamakichi when Naruto Uzumaki is in the same mission: the reductions now stack correctly with Gamakichi's own self-discount. Same fix applied to Tayuya (Sound Village) and Hiruzen (Leaf Village).",
         "Cards you control (taken from your opponent) now show a purple 'CTRL' badge in the corner, visible even when they are hidden. The badge disappears as soon as they return to their original owner.",
-        "ELO performance bonuses bumped up: score gap now gives +3/+6/+9/+12 (10/15/20/25 lead), board pressure starts at 7 opponent characters and ramps to +8 when the board is fully swept. New +5 ELO bonus when the opponent forfeits."
+        "ELO performance bonuses bumped up: score gap now gives +3/+6/+9/+12 (10/15/20/25 lead), board pressure starts at 7 opponent characters and ramps to +8 when the board is fully swept. New +5 ELO bonus when the opponent forfeits.",
+        "Draw-card quests (e.g. 'draw 10 cards via effects') no longer count the 2-per-turn natural draw or the 5 starting hand cards. Only card-effect draws (Shikamaru, Itachi, etc.) count now."
       ]
     },
     {

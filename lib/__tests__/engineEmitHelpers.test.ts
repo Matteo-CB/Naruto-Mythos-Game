@@ -85,6 +85,31 @@ describe('emitDrawDiffEvents', () => {
     expect(fakeEmit).not.toHaveBeenCalled();
   });
 
+  it('does NOT emit when phase was mulligan (initial 5-card setup)', () => {
+    const oldState = mockState({ phase: 'mulligan' });
+    oldState.player1.hand = [];
+    const newState = mockState({ phase: 'action' });
+    newState.player1.hand = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }, { id: 'e' }] as never;
+    emitDrawDiffEvents(oldState, newState);
+    expect(fakeEmit).not.toHaveBeenCalled();
+  });
+
+  it('subtracts the per-turn passive draw (2) when turn advances', () => {
+    const oldState = mockState({ phase: 'action', turn: 1 });
+    const newState = mockState({ phase: 'action', turn: 2 });
+    newState.player1.hand = [{ id: 'a' }, { id: 'b' }] as never;
+    emitDrawDiffEvents(oldState, newState);
+    expect(fakeEmit).not.toHaveBeenCalled();
+  });
+
+  it('counts only effect-driven surplus when turn advances and effect drew extra', () => {
+    const oldState = mockState({ phase: 'action', turn: 1 });
+    const newState = mockState({ phase: 'action', turn: 2 });
+    newState.player1.hand = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }] as never;
+    emitDrawDiffEvents(oldState, newState);
+    expect(fakeEmit).toHaveBeenCalledWith('card.drawn.via_effect', 'u-p1', expect.objectContaining({ delta: 2 }));
+  });
+
   it('handles partial / undefined states defensively', () => {
     expect(() => emitDrawDiffEvents(null as never, mockState())).not.toThrow();
     expect(() => emitDrawDiffEvents(mockState(), null as never)).not.toThrow();

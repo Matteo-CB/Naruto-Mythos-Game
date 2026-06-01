@@ -1,4 +1,5 @@
 import type { GameState, PlayerID } from '@/lib/engine/types';
+import { CARDS_DRAWN_PER_TURN } from '@/lib/engine/types';
 import { emitQuestEvent, type QuestEventPayload, type GameMode } from './hooks';
 
 function resolveUserId(state: GameState, player: PlayerID): string | undefined {
@@ -29,12 +30,17 @@ export function emitEngineQuestEvent(
 export function emitDrawDiffEvents(oldState: GameState, newState: GameState): void {
   if (!oldState || !newState) return;
   if (oldState.phase === 'start') return;
+  if (oldState.phase === 'mulligan') return;
+
+  const turnAdvanced = newState.turn > oldState.turn;
+  const passiveDrawPerPlayer = turnAdvanced ? CARDS_DRAWN_PER_TURN : 0;
+
   const oldP1 = oldState.player1?.hand?.length ?? 0;
   const oldP2 = oldState.player2?.hand?.length ?? 0;
   const newP1 = newState.player1?.hand?.length ?? 0;
   const newP2 = newState.player2?.hand?.length ?? 0;
-  const dP1 = newP1 - oldP1;
-  const dP2 = newP2 - oldP2;
+  const dP1 = newP1 - oldP1 - passiveDrawPerPlayer;
+  const dP2 = newP2 - oldP2 - passiveDrawPerPlayer;
   if (dP1 > 0) {
     emitEngineQuestEvent(newState, 'player1', 'card.drawn.via_effect', { delta: dP1 });
   }
