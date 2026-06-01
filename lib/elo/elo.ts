@@ -47,32 +47,39 @@ export interface PerformanceBonusInput {
   loserScore: number;
   loserBoardCount: number;
   isForfeit: boolean;
+  winReason?: 'score' | 'forfeit' | 'timeout' | 'clock' | 'idle';
 }
 
 export interface PerformanceBonus {
   scoreBonus: number;
   boardBonus: number;
+  forfeitBonus: number;
   total: number;
   scoreGap: number;
   loserBoardCount: number;
   applied: boolean;
+  isForfeit: boolean;
 }
 
+export const FORFEIT_BONUS = 5;
+
 function calcScoreBonus(scoreGap: number): number {
-  if (scoreGap >= 25) return 8;
-  if (scoreGap >= 20) return 6;
-  if (scoreGap >= 15) return 4;
-  if (scoreGap >= 10) return 2;
+  if (scoreGap >= 25) return 12;
+  if (scoreGap >= 20) return 9;
+  if (scoreGap >= 15) return 6;
+  if (scoreGap >= 10) return 3;
   return 0;
 }
 
 function calcBoardBonus(loserBoardCount: number): number {
-  if (loserBoardCount <= 0) return 6;
-  if (loserBoardCount === 1) return 5;
-  if (loserBoardCount === 2) return 4;
-  if (loserBoardCount === 3) return 3;
-  if (loserBoardCount === 4) return 2;
-  if (loserBoardCount === 5) return 1;
+  if (loserBoardCount <= 0) return 8;
+  if (loserBoardCount === 1) return 7;
+  if (loserBoardCount === 2) return 6;
+  if (loserBoardCount === 3) return 5;
+  if (loserBoardCount === 4) return 4;
+  if (loserBoardCount === 5) return 3;
+  if (loserBoardCount === 6) return 2;
+  if (loserBoardCount === 7) return 1;
   return 0;
 }
 
@@ -83,10 +90,12 @@ export function calculatePerformanceBonus(input: PerformanceBonusInput): Perform
     return {
       scoreBonus: 0,
       boardBonus: 0,
-      total: 0,
+      forfeitBonus: FORFEIT_BONUS,
+      total: FORFEIT_BONUS,
       scoreGap,
       loserBoardCount,
-      applied: false,
+      applied: true,
+      isForfeit: true,
     };
   }
   const scoreBonus = calcScoreBonus(scoreGap);
@@ -94,10 +103,12 @@ export function calculatePerformanceBonus(input: PerformanceBonusInput): Perform
   return {
     scoreBonus,
     boardBonus,
+    forfeitBonus: 0,
     total: scoreBonus + boardBonus,
     scoreGap,
     loserBoardCount,
     applied: true,
+    isForfeit: false,
   };
 }
 

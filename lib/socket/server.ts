@@ -852,6 +852,7 @@ async function finalizeGameEnd(
     loserScore,
     loserBoardCount,
     isForfeit: isForfeitEnd,
+    winReason,
   });
 
   let eloData: { player1Delta: number; player2Delta: number; player1NewElo: number; player2NewElo: number; player1TotalGames: number; player2TotalGames: number; performanceBonus: PerformanceBonus | null } | null = null;

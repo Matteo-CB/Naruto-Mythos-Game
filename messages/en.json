@@ -393,7 +393,8 @@
       "nowRanked": "You are now ranked!",
       "performanceBonus": "Performance bonus",
       "scoreGapBonus": "Score gap {gap}+: +{bonus} ELO",
-      "boardPressureBonus": "Opponent left with {count} characters in play: +{bonus} ELO"
+      "boardPressureBonus": "Opponent left with {count} characters in play: +{bonus} ELO",
+      "forfeitBonus": "Opponent forfeited: +{bonus} ELO"
     },
     "timer": {
       "autoPassed": "Time expired, auto-passed"

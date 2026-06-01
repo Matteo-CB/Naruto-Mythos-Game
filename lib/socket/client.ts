@@ -109,10 +109,12 @@ interface SocketStore {
     performanceBonus?: {
       scoreBonus: number;
       boardBonus: number;
+      forfeitBonus: number;
       total: number;
       scoreGap: number;
       loserBoardCount: number;
       applied: boolean;
+      isForfeit: boolean;
     } | null;
   } | null;
   gameCancelled: { reason: 'mulligan-idle'; roomCode: string } | null;
@@ -527,10 +529,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           performanceBonus?: {
             scoreBonus: number;
             boardBonus: number;
+            forfeitBonus: number;
             total: number;
             scoreGap: number;
             loserBoardCount: number;
             applied: boolean;
+            isForfeit: boolean;
           } | null;
         }) => {
           console.log('[Socket] Game ended, winner:', data.winner, 'reason:', data.winReason, 'gameId:', data.gameId, 'tournament:', data.tournamentId ?? 'none');

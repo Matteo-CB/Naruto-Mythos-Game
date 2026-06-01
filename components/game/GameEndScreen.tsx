@@ -333,6 +333,11 @@ export function GameEndScreen() {
                     {' '}
                     <span className="font-bold tabular-nums">+{perfBonus.total} ELO</span>
                   </span>
+                  {perfBonus.forfeitBonus > 0 && (
+                    <span className="text-[10px]" style={{ color: '#888888' }}>
+                      {t('game.end.forfeitBonus', { bonus: perfBonus.forfeitBonus })}
+                    </span>
+                  )}
                   {perfBonus.scoreBonus > 0 && (
                     <span className="text-[10px]" style={{ color: '#888888' }}>
                       {t('game.end.scoreGapBonus', { gap: perfBonus.scoreGap, bonus: perfBonus.scoreBonus })}

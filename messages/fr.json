@@ -393,7 +393,8 @@
       "nowRanked": "Vous êtes maintenant classé !",
       "performanceBonus": "Bonus de performance",
       "scoreGapBonus": "Écart de score {gap}+ : +{bonus} ELO",
-      "boardPressureBonus": "Adversaire à {count} personnages en jeu : +{bonus} ELO"
+      "boardPressureBonus": "Adversaire à {count} personnages en jeu : +{bonus} ELO",
+      "forfeitBonus": "Adversaire a abandonné : +{bonus} ELO"
     },
     "timer": {
       "autoPassed": "Temps écoulé, passe automatique"

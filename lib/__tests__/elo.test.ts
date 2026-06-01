@@ -136,53 +136,67 @@ describe('ELO System', () => {
   });
 
   describe('calculatePerformanceBonus', () => {
-    it('returns no bonus on forfeit', () => {
+    it('returns forfeit bonus of +5 on forfeit (no score/board bonus)', () => {
       const r = calculatePerformanceBonus({ winnerScore: 30, loserScore: 0, loserBoardCount: 0, isForfeit: true });
-      expect(r.applied).toBe(false);
-      expect(r.total).toBe(0);
+      expect(r.applied).toBe(true);
+      expect(r.isForfeit).toBe(true);
+      expect(r.forfeitBonus).toBe(5);
       expect(r.scoreBonus).toBe(0);
       expect(r.boardBonus).toBe(0);
+      expect(r.total).toBe(5);
     });
 
-    it('returns 0 when score gap < 10 and loser has 6+ characters', () => {
+    it('returns 0 when score gap < 10 and loser has 8+ characters', () => {
       const r = calculatePerformanceBonus({ winnerScore: 10, loserScore: 5, loserBoardCount: 8, isForfeit: false });
       expect(r.total).toBe(0);
       expect(r.applied).toBe(true);
+      expect(r.isForfeit).toBe(false);
     });
 
-    it('score gap tiers: 10/15/20/25 -> +2/+4/+6/+8', () => {
+    it('score gap tiers: 10/15/20/25 -> +3/+6/+9/+12', () => {
       const a = calculatePerformanceBonus({ winnerScore: 10, loserScore: 0, loserBoardCount: 10, isForfeit: false });
-      expect(a.scoreBonus).toBe(2);
+      expect(a.scoreBonus).toBe(3);
       const b = calculatePerformanceBonus({ winnerScore: 15, loserScore: 0, loserBoardCount: 10, isForfeit: false });
-      expect(b.scoreBonus).toBe(4);
+      expect(b.scoreBonus).toBe(6);
       const c = calculatePerformanceBonus({ winnerScore: 20, loserScore: 0, loserBoardCount: 10, isForfeit: false });
-      expect(c.scoreBonus).toBe(6);
+      expect(c.scoreBonus).toBe(9);
       const d = calculatePerformanceBonus({ winnerScore: 30, loserScore: 0, loserBoardCount: 10, isForfeit: false });
-      expect(d.scoreBonus).toBe(8);
+      expect(d.scoreBonus).toBe(12);
     });
 
-    it('board pressure tiers: 5/4/3/2/1/0 -> +1/+2/+3/+4/+5/+6', () => {
+    it('board pressure tiers: 7/6/5/4/3/2/1/0 -> +1/+2/+3/+4/+5/+6/+7/+8', () => {
       const make = (n: number) =>
         calculatePerformanceBonus({ winnerScore: 5, loserScore: 5, loserBoardCount: n, isForfeit: false }).boardBonus;
-      expect(make(6)).toBe(0);
-      expect(make(5)).toBe(1);
-      expect(make(4)).toBe(2);
-      expect(make(3)).toBe(3);
-      expect(make(2)).toBe(4);
-      expect(make(1)).toBe(5);
-      expect(make(0)).toBe(6);
+      expect(make(8)).toBe(0);
+      expect(make(7)).toBe(1);
+      expect(make(6)).toBe(2);
+      expect(make(5)).toBe(3);
+      expect(make(4)).toBe(4);
+      expect(make(3)).toBe(5);
+      expect(make(2)).toBe(6);
+      expect(make(1)).toBe(7);
+      expect(make(0)).toBe(8);
     });
 
-    it('combines both bonuses', () => {
+    it('combines score gap + board pressure on a normal win', () => {
       const r = calculatePerformanceBonus({ winnerScore: 22, loserScore: 0, loserBoardCount: 1, isForfeit: false });
-      expect(r.scoreBonus).toBe(6);
-      expect(r.boardBonus).toBe(5);
-      expect(r.total).toBe(11);
+      expect(r.scoreBonus).toBe(9);
+      expect(r.boardBonus).toBe(7);
+      expect(r.forfeitBonus).toBe(0);
+      expect(r.total).toBe(16);
     });
 
-    it('max possible bonus is +14 (gap 25+, board 0)', () => {
+    it('max possible bonus is +20 (gap 25+, board 0, no forfeit)', () => {
       const r = calculatePerformanceBonus({ winnerScore: 30, loserScore: 0, loserBoardCount: 0, isForfeit: false });
-      expect(r.total).toBe(14);
+      expect(r.total).toBe(20);
+    });
+
+    it('forfeit bonus does not stack with score/board (forfeit-only path)', () => {
+      const r = calculatePerformanceBonus({ winnerScore: 30, loserScore: 0, loserBoardCount: 0, isForfeit: true });
+      expect(r.forfeitBonus).toBe(5);
+      expect(r.scoreBonus).toBe(0);
+      expect(r.boardBonus).toBe(0);
+      expect(r.total).toBe(5);
     });
   });
 
@@ -207,8 +221,14 @@ describe('ELO System', () => {
       expect(withBonus.performanceBonus).toBe(bonus);
     });
 
-    it('no bonus applied on forfeit even when scores show a gap', () => {
+    it('applies +5 forfeit bonus on forfeit (ignores score/board)', () => {
       const bonus = calculatePerformanceBonus({ winnerScore: 30, loserScore: 0, loserBoardCount: 0, isForfeit: true });
+      const noBonus = calculateEloChanges({
+        player1Elo: 1000, player2Elo: 1000, winner: 'player1',
+        player1Score: 30, player2Score: 0,
+        player1ConsecWins: 0, player1ConsecLosses: 0,
+        player2ConsecWins: 0, player2ConsecLosses: 0,
+      });
       const r = calculateEloChanges({
         player1Elo: 1000, player2Elo: 1000, winner: 'player1',
         player1Score: 30, player2Score: 0,
@@ -216,8 +236,10 @@ describe('ELO System', () => {
         player2ConsecWins: 0, player2ConsecLosses: 0,
         performanceBonus: bonus,
       });
-      expect(bonus.total).toBe(0);
-      expect(r.performanceBonus?.applied).toBe(false);
+      expect(bonus.total).toBe(5);
+      expect(r.performanceBonus?.applied).toBe(true);
+      expect(r.performanceBonus?.isForfeit).toBe(true);
+      expect(r.player1Delta).toBe(noBonus.player1Delta + 5);
     });
 
     it('high-ELO winner with big bonus can gain meaningful ELO vs much lower opponent', () => {
@@ -229,7 +251,7 @@ describe('ELO System', () => {
         player2ConsecWins: 0, player2ConsecLosses: 0,
         performanceBonus: bonus,
       });
-      expect(r.player1Delta).toBeGreaterThanOrEqual(10 + 14);
+      expect(r.player1Delta).toBeGreaterThanOrEqual(10 + 20);
     });
 
     it('loss is capped at -24 even with extreme score gap and full board pressure on the other side', () => {
