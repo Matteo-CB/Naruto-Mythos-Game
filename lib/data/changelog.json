@@ -21,7 +21,8 @@
         "Tayuya Rare (125) : quand son effet d'upgrade te propose de jouer un personnage du Village du Son à coût réduit, les cartes s'affichent maintenant correctement (avant : des rectangles avec ??).",
         "Quand tu essayais de réclamer une quête déjà obtenue via la quête du jour (ou inversement), le message d'erreur affichait la clé brute au lieu d'une vraie phrase. Corrigé en FR et EN.",
         "Page d'un tournoi : la carte de récompense affiche désormais clairement qu'elle est cosmétique pour le simulateur uniquement et qu'elle n'est pas gagnée en vrai.",
-        "Page Récompenses : un rappel précise que tout est entièrement gratuit, aucun achat ni paiement requis."
+        "Page Récompenses : un rappel précise que tout est entièrement gratuit, aucun achat ni paiement requis.",
+        "Quêtes : quand une quête est déjà obtenue (via la liste principale ou la quête du jour), le bouton 'Réclamer' est remplacé par un badge clair indiquant la source. Plus de clics dans le vide."
       ],
       "changes_en": [
         "Maximum ELO lost per defeat capped at 24, regardless of your rank.",
@@ -40,7 +41,8 @@
         "Tayuya Rare (125): when her upgrade effect lets you play a Sound Village character at reduced cost, the cards now display properly (was: blank rectangles with ??).",
         "When you tried to claim a quest you already claimed as today's daily (or vice-versa), the error message showed the raw key instead of a real sentence. Fixed in both FR and EN.",
         "Tournament page: the reward card now clearly says it is cosmetic for the simulator only and is not won in real life.",
-        "Rewards page: a reminder notes that everything here is fully free, no purchase or payment required."
+        "Rewards page: a reminder notes that everything here is fully free, no purchase or payment required.",
+        "Quests: when a quest is already obtained (via the main list or today's daily), the 'Claim' button is replaced by a clear badge showing the source. No more clicking into the void."
       ]
     },
     {

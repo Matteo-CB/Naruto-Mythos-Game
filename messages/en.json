@@ -2638,6 +2638,8 @@
     "dailyHeader": "Daily quest",
     "claim": "Claim",
     "claimed": "Claimed",
+    "claimedViaDaily": "Got it as today's daily",
+    "claimedViaMain": "Got it from the main list",
     "claimedXpToast": "+{xp} XP",
     "levelLabel": "Lv. {level}",
     "unauthMessage": "Sign in to see your quests.",

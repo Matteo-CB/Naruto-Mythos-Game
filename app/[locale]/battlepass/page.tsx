@@ -70,6 +70,7 @@ interface QuestRow {
   progress: number;
   completed: boolean;
   claimed: boolean;
+  claimedVia?: 'main' | 'daily' | null;
 }
 
 interface DailyRow {
@@ -85,6 +86,7 @@ interface DailyRow {
   progress: number;
   completed: boolean;
   claimed: boolean;
+  claimedVia?: 'main' | 'daily' | null;
 }
 
 interface OpenedBooster {
@@ -335,6 +337,9 @@ export default function RewardsHubPage() {
         const body = await res.json().catch(() => ({}));
         const errorKey = typeof body.errorKey === 'string' ? body.errorKey : 'quests.error.claimError';
         showToast({ type: 'error', messageKey: errorKey, dedupeKey: `q-claim-${questId}` });
+        if (res.status === 409) {
+          await refreshAll();
+        }
         return;
       }
       const body = await res.json();
@@ -363,6 +368,9 @@ export default function RewardsHubPage() {
         const body = await res.json().catch(() => ({}));
         const errorKey = typeof body.errorKey === 'string' ? body.errorKey : 'quests.error.claimError';
         showToast({ type: 'error', messageKey: errorKey, dedupeKey: 'q-claim-daily' });
+        if (res.status === 409) {
+          await refreshAll();
+        }
         return;
       }
       const body = await res.json();
@@ -845,7 +853,18 @@ export default function RewardsHubPage() {
                           +{daily.quest.xpReward} XP
                         </span>
                         {daily.claimed ? (
-                          <span className="text-[10px] uppercase tracking-widest" style={{ color: '#666' }}>{tQuests('claimed')}</span>
+                          <span
+                            className="text-[10px] uppercase tracking-widest font-display"
+                            style={{
+                              color: daily.claimedVia === 'main' ? ACCENT : '#666',
+                              backgroundColor: daily.claimedVia === 'main' ? `${ACCENT}1f` : 'transparent',
+                              padding: daily.claimedVia === 'main' ? '4px 8px' : '0',
+                            }}
+                          >
+                            {daily.claimedVia === 'main'
+                              ? tQuests('claimedViaMain')
+                              : tQuests('claimed')}
+                          </span>
                         ) : daily.completed ? (
                           <button
                             type="button"
@@ -920,9 +939,21 @@ export default function RewardsHubPage() {
                         <span className="text-[10px]" style={{ color: ACCENT, fontVariantNumeric: 'tabular-nums', width: 60, textAlign: 'right' }}>
                           +{q.xpReward} XP
                         </span>
-                        <div style={{ width: 96, textAlign: 'right' }}>
+                        <div style={{ width: 110, textAlign: 'right' }}>
                           {q.claimed ? (
-                            <span className="text-[10px] uppercase tracking-widest" style={{ color: '#555' }}>{tQuests('claimed')}</span>
+                            <span
+                              className="text-[10px] uppercase tracking-widest font-display"
+                              style={{
+                                color: q.claimedVia === 'daily' ? ACCENT : '#555',
+                                backgroundColor: q.claimedVia === 'daily' ? `${ACCENT}1f` : 'transparent',
+                                padding: q.claimedVia === 'daily' ? '3px 6px' : '0',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {q.claimedVia === 'daily'
+                                ? tQuests('claimedViaDaily')
+                                : tQuests('claimed')}
+                            </span>
                           ) : q.completed ? (
                             <button
                               type="button"

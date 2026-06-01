@@ -2638,6 +2638,8 @@
     "dailyHeader": "Quête du jour",
     "claim": "Réclamer",
     "claimed": "Réclamée",
+    "claimedViaDaily": "Obtenue via la quête du jour",
+    "claimedViaMain": "Obtenue via la liste principale",
     "claimedXpToast": "+{xp} XP",
     "levelLabel": "Niv. {level}",
     "unauthMessage": "Connecte-toi pour voir tes quêtes.",

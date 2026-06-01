@@ -19,15 +19,24 @@ export async function GET() {
   }
   const userId = session.user.id;
   const { date, quest } = await ensureTodaysDailyQuest();
-  const progressRow = await prisma.dailyQuestProgress.findUnique({
-    where: { userId_date: { userId, date } },
-    select: { progress: true, target: true, completed: true, claimed: true, questId: true },
-  });
+  const [progressRow, mainRow] = await Promise.all([
+    prisma.dailyQuestProgress.findUnique({
+      where: { userId_date: { userId, date } },
+      select: { progress: true, target: true, completed: true, claimed: true, questId: true },
+    }),
+    prisma.questProgress.findUnique({
+      where: { userId_questId: { userId, questId: quest.id } },
+      select: { claimed: true },
+    }),
+  ]);
 
   const synced =
     progressRow && progressRow.questId === quest.id
       ? progressRow
       : { progress: 0, target: quest.target, completed: false, claimed: false, questId: quest.id };
+
+  const claimedViaMain = !!mainRow?.claimed && !synced.claimed;
+  const claimed = synced.claimed || claimedViaMain;
 
   return NextResponse.json({
     date,
@@ -41,7 +50,8 @@ export async function GET() {
     },
     progress: synced.progress,
     completed: synced.completed,
-    claimed: synced.claimed,
+    claimed,
+    claimedVia: synced.claimed ? 'daily' : claimedViaMain ? 'main' : null,
   });
 }
 
