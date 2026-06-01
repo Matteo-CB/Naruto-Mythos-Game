@@ -58,18 +58,18 @@ describe('quest data integrity', () => {
   const coreQuests = QUESTS.filter((q) => !q.hook.startsWith('trade.'));
   const tradeQuests = QUESTS.filter((q) => q.hook.startsWith('trade.'));
 
-  it('has exactly 100 core quests plus the trade quests', () => {
-    expect(coreQuests.length).toBe(100);
+  it('has exactly 180 core quests plus the trade quests', () => {
+    expect(coreQuests.length).toBe(180);
     expect(tradeQuests.length).toBe(3);
   });
 
-  it('has 25 core quests at each difficulty level', () => {
+  it('has 45 core quests at each difficulty level', () => {
     const byLevel = { 1: 0, 2: 0, 3: 0, 4: 0 };
     for (const q of coreQuests) byLevel[q.level]++;
-    expect(byLevel[1]).toBe(25);
-    expect(byLevel[2]).toBe(25);
-    expect(byLevel[3]).toBe(25);
-    expect(byLevel[4]).toBe(25);
+    expect(byLevel[1]).toBe(45);
+    expect(byLevel[2]).toBe(45);
+    expect(byLevel[3]).toBe(45);
+    expect(byLevel[4]).toBe(45);
   });
 
   it('every quest has a unique id', () => {
