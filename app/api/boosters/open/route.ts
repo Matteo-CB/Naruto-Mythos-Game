@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
       cardIds: result.cards.map((c) => c.cardId),
       newCardIds: result.newCardIds,
       duplicateCardIds: result.duplicateCardIds,
+      duplicateXpAwarded: result.duplicateXpAwarded,
       remainingInventory: result.remainingInventory,
     });
   } catch (err) {

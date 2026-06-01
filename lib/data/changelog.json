@@ -12,7 +12,8 @@
         "Les quêtes de pioche (genre 'pioche 10 cartes via un effet') ne comptent plus les 2 cartes piochées chaque début de tour ni les 5 cartes de la main de départ. Seuls les effets de cartes (Shikamaru, Itachi, etc.) qui font piocher comptent maintenant.",
         "80 nouvelles quêtes ajoutées (20 par niveau de difficulté), toutes centrées sur des effets spécifiques de cartes : jouer un Naruto, défaitre avec Kidômaru, cacher avec Kabuto, copier des effets avec Kakashi, avoir un Itachi à 15 Puissance, réunir le trio Itachi + Sasuke + Kisame sur la même mission, etc.",
         "Taux d'obtention des boosters variantes revus : Légendaire passe de 1/200 à 1/100, Secret Variant de 1/1000 à 1/400, Mythos Variant de 1/35 à 1/15. Les Rare Art baissent en proportion.",
-        "Nouvelle Secret Variant : Orochimaru 138 « Réanimation » est ajoutée et disponible dans les boosters variantes."
+        "Nouvelle Secret Variant : Orochimaru 138 « Réanimation » est ajoutée et disponible dans les boosters variantes.",
+        "Boosters variantes : les cartes en double te rapportent désormais de l'XP de Battlepass (10 pour une Rare Art, 50 pour une Mythos V, 200 pour une Secret V, 1000 pour une Légendaire). Avant, les dupes ne faisaient rien."
       ],
       "changes_en": [
         "Quests: when a quest is already obtained (via the main list or today's daily), the 'Claim' button is replaced by a clear badge showing the source. No more clicking into the void.",
@@ -22,7 +23,8 @@
         "Draw-card quests (e.g. 'draw 10 cards via effects') no longer count the 2-per-turn natural draw or the 5 starting hand cards. Only card-effect draws (Shikamaru, Itachi, etc.) count now.",
         "80 new quests added (20 per difficulty level), all focused on specific card effects: play a Naruto, defeat with Kidômaru, hide with Kabuto, copy effects with Kakashi, have an Itachi at 15 Power, gather the Itachi + Sasuke + Kisame trio on the same mission, and more.",
         "Variant booster pull rates raised: Legendary goes from 1/200 to 1/100, Secret Variant from 1/1000 to 1/400, Mythos Variant from 1/35 to 1/15. Rare Art rate drops accordingly.",
-        "New Secret Variant: Orochimaru 138 'Reanimation' is added and available in variant boosters."
+        "New Secret Variant: Orochimaru 138 'Reanimation' is added and available in variant boosters.",
+        "Variant boosters: duplicate cards now grant Battlepass XP (10 for a Rare Art, 50 for a Mythos V, 200 for a Secret V, 1000 for a Legendary). Before, duplicates were silently discarded."
       ]
     },
     {

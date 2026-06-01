@@ -2,6 +2,8 @@ import { prisma } from '@/lib/db/prisma';
 import type { CardData } from '@/lib/engine/types';
 import { rollVariantBooster, type RollMode } from '@/lib/variants/rollBooster';
 import { incrementVariant, getOwnedVariantIds } from '@/lib/variants/inventory';
+import { DUPLICATE_XP_BY_RARITY, isVariantRarity, type VariantRarity } from '@/lib/variants/constants';
+import { awardXp } from '@/lib/battlepass/awardXp';
 
 export class NoBoosterError extends Error {
   code = 'NO_BOOSTER' as const;
@@ -22,6 +24,7 @@ export interface OpenBoosterResult {
   newCardIds: string[];
   duplicateCardIds: string[];
   remainingInventory: number;
+  duplicateXpAwarded: number;
 }
 
 export interface OpenBoosterOptions {
@@ -52,14 +55,22 @@ export async function openBooster(
   const existing = await getOwnedVariantIds(userId);
   const newCardIds: string[] = [];
   const duplicateCardIds: string[] = [];
+  let duplicateXpAwarded = 0;
   for (const card of cards) {
     if (existing.has(card.cardId)) {
       duplicateCardIds.push(card.cardId);
+      if (isVariantRarity(card.rarity)) {
+        duplicateXpAwarded += DUPLICATE_XP_BY_RARITY[card.rarity as VariantRarity] ?? 0;
+      }
     } else {
       existing.add(card.cardId);
       newCardIds.push(card.cardId);
     }
     await incrementVariant(userId, card.cardId);
+  }
+
+  if (duplicateXpAwarded > 0) {
+    await awardXp(userId, duplicateXpAwarded);
   }
 
   const inv = await prisma.boosterInventory.findUnique({
@@ -68,7 +79,7 @@ export async function openBooster(
   });
   const remainingInventory = inv?.count ?? 0;
 
-  return { cards, newCardIds, duplicateCardIds, remainingInventory };
+  return { cards, newCardIds, duplicateCardIds, remainingInventory, duplicateXpAwarded };
 }
 
 export async function grantBoosters(
