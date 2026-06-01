@@ -434,6 +434,7 @@
       "skip": "Skip",
       "base": "Base",
       "up": "UP",
+      "controlled": "CTRL",
       "confirm": "OK",
       "details": "Details",
       "minimize": "Minimize",

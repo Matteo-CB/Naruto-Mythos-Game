@@ -23,7 +23,8 @@
         "Page d'un tournoi : la carte de récompense affiche désormais clairement qu'elle est cosmétique pour le simulateur uniquement et qu'elle n'est pas gagnée en vrai.",
         "Page Récompenses : un rappel précise que tout est entièrement gratuit, aucun achat ni paiement requis.",
         "Quêtes : quand une quête est déjà obtenue (via la liste principale ou la quête du jour), le bouton 'Réclamer' est remplacé par un badge clair indiquant la source. Plus de clics dans le vide.",
-        "Jiraya qui joue une Invocation à coût réduit ne ratait pas Gamakichi quand Naruto Uzumaki était dans la même mission : son réduction se cumule maintenant correctement avec celle de Gamakichi. Même correctif appliqué à Tayuya (Village du Son) et Hiruzen (Village de la Feuille)."
+        "Jiraya qui joue une Invocation à coût réduit ne ratait pas Gamakichi quand Naruto Uzumaki était dans la même mission : son réduction se cumule maintenant correctement avec celle de Gamakichi. Même correctif appliqué à Tayuya (Village du Son) et Hiruzen (Village de la Feuille).",
+        "Les cartes que tu contrôles (prises à l'adversaire) portent maintenant un badge violet 'CTRL' dans le coin, visible aussi quand elles sont cachées. Le badge disparaît dès qu'elles repartent chez leur propriétaire d'origine."
       ],
       "changes_en": [
         "Maximum ELO lost per defeat capped at 24, regardless of your rank.",
@@ -44,7 +45,8 @@
         "Tournament page: the reward card now clearly says it is cosmetic for the simulator only and is not won in real life.",
         "Rewards page: a reminder notes that everything here is fully free, no purchase or payment required.",
         "Quests: when a quest is already obtained (via the main list or today's daily), the 'Claim' button is replaced by a clear badge showing the source. No more clicking into the void.",
-        "Jiraiya playing a Summon at reduced cost no longer skips Gamakichi when Naruto Uzumaki is in the same mission: the reductions now stack correctly with Gamakichi's own self-discount. Same fix applied to Tayuya (Sound Village) and Hiruzen (Leaf Village)."
+        "Jiraiya playing a Summon at reduced cost no longer skips Gamakichi when Naruto Uzumaki is in the same mission: the reductions now stack correctly with Gamakichi's own self-discount. Same fix applied to Tayuya (Sound Village) and Hiruzen (Leaf Village).",
+        "Cards you control (taken from your opponent) now show a purple 'CTRL' badge in the corner, visible even when they are hidden. The badge disappears as soon as they return to their original owner."
       ]
     },
     {

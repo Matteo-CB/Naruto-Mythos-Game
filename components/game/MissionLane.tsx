@@ -316,21 +316,40 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </div>
       )}
 
-      {character.stackSize > 1 && (
-        <motion.div
-          initial={false}
-          animate={{ scale: 1 }}
-          className="absolute bottom-0.5 left-0.5 px-1 py-0.5 text-[8px] font-bold flex items-center gap-0.5 stack-pulse"
-          style={{
-            backgroundColor: 'rgba(62, 139, 62, 0.25)',
-            color: '#5cb85c',
-            border: '1px solid rgba(62, 139, 62, 0.5)',
-            textShadow: '0 0 4px rgba(62, 139, 62, 0.4)',
-          }}
-        >
-          <span style={{ fontSize: '7px', letterSpacing: '0.5px' }}>{t('game.board.up')}</span>
-          <span>{character.stackSize}</span>
-        </motion.div>
+      {(character.stackSize > 1 || character.controlledBy !== character.originalOwner) && (
+        <div className="absolute bottom-0.5 left-0.5 flex flex-col gap-0.5 items-start">
+          {character.controlledBy !== character.originalOwner && (
+            <motion.div
+              initial={false}
+              animate={{ scale: 1 }}
+              className="px-1 py-0.5 text-[8px] font-bold flex items-center stack-pulse"
+              style={{
+                backgroundColor: 'rgba(138, 92, 246, 0.25)',
+                color: '#b89bff',
+                border: '1px solid rgba(138, 92, 246, 0.55)',
+                textShadow: '0 0 4px rgba(138, 92, 246, 0.45)',
+              }}
+            >
+              <span style={{ fontSize: '7px', letterSpacing: '0.5px' }}>{t('game.board.controlled')}</span>
+            </motion.div>
+          )}
+          {character.stackSize > 1 && (
+            <motion.div
+              initial={false}
+              animate={{ scale: 1 }}
+              className="px-1 py-0.5 text-[8px] font-bold flex items-center gap-0.5 stack-pulse"
+              style={{
+                backgroundColor: 'rgba(62, 139, 62, 0.25)',
+                color: '#5cb85c',
+                border: '1px solid rgba(62, 139, 62, 0.5)',
+                textShadow: '0 0 4px rgba(62, 139, 62, 0.4)',
+              }}
+            >
+              <span style={{ fontSize: '7px', letterSpacing: '0.5px' }}>{t('game.board.up')}</span>
+              <span>{character.stackSize}</span>
+            </motion.div>
+          )}
+        </div>
       )}
     </motion.div>
     </>
@@ -343,6 +362,8 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     prev.character.wasRevealedAtLeastOnce === next.character.wasRevealedAtLeastOnce &&
     prev.character.effectivePower === next.character.effectivePower &&
     prev.character.stackSize === next.character.stackSize &&
+    prev.character.controlledBy === next.character.controlledBy &&
+    prev.character.originalOwner === next.character.originalOwner &&
     prev.character.card?.id === next.character.card?.id &&
     prev.isOwn === next.isOwn,
 );
