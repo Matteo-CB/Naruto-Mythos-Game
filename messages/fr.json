@@ -1,4 +1,11 @@
 {
+  "admin": {
+    "booster": {
+      "invalidBody": "Corps de requête invalide.",
+      "invalidCount": "Nombre de tirages invalide.",
+      "setNotAvailable": "Ce set n'est pas disponible."
+    }
+  },
   "common": {
     "back": "Retour",
     "cancel": "Annuler",
@@ -2326,7 +2333,11 @@
       "cannotLeaveStarted": "Impossible de quitter après le début du tournoi.",
       "creatorCannotLeave": "Le créateur ne peut pas quitter. Annulez le tournoi à la place.",
       "startedDuringLeave": "Le tournoi a démarré avant que votre départ soit traité.",
-      "failedToFetch": "Échec du chargement du/des tournoi(s)."
+      "failedToFetch": "Échec du chargement du/des tournoi(s).",
+      "invalidPrize": "Carte de récompense invalide.",
+      "invalidSetChoice": "Choix de set invalide.",
+      "setUnavailable": "Ce set n'est pas encore disponible.",
+      "alreadyFinished": "Ce tournoi est déjà terminé."
     },
     "deckError": {
       "tooFewCards": "Le deck doit contenir au moins {min} cartes (en a {count}).",

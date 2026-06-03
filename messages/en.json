@@ -1,4 +1,11 @@
 {
+  "admin": {
+    "booster": {
+      "invalidBody": "Invalid request body.",
+      "invalidCount": "Invalid roll count.",
+      "setNotAvailable": "This set is not available."
+    }
+  },
   "common": {
     "back": "Back",
     "cancel": "Cancel",
@@ -2326,7 +2333,11 @@
       "cannotLeaveStarted": "Cannot leave after the tournament has started.",
       "creatorCannotLeave": "Creator cannot leave. Cancel the tournament instead.",
       "startedDuringLeave": "Tournament started before your leave was processed.",
-      "failedToFetch": "Failed to load tournament(s)."
+      "failedToFetch": "Failed to load tournament(s).",
+      "invalidPrize": "Invalid prize card.",
+      "invalidSetChoice": "Invalid set choice.",
+      "setUnavailable": "This set is not available yet.",
+      "alreadyFinished": "This tournament is already finished."
     },
     "deckError": {
       "tooFewCards": "Deck must have at least {min} cards (has {count}).",
