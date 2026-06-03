@@ -11397,40 +11397,47 @@ export class EffectEngine {
           },
         };
 
-        
-        const s135Available = s135Top3.filter((card) => {
+
+        const isCardPlayable = (card: typeof s135Top3[number]): boolean => {
           if (card.card_type !== 'character') return false;
           const effectiveCost = Math.max(0, (card.chakra ?? 0) - s135CostReduction);
           if (effectiveCost <= newState[s135Player].chakra) return true;
           return canAffordAsUpgrade(newState, s135Player, card as any, s135CostReduction);
-        });
+        };
+        const s135Available = s135Top3.filter(isCardPlayable);
 
         if (s135Available.length === 0) {
-          
+
           newState = {
             ...newState,
             [s135Player]: {
               ...newState[s135Player],
-              discardPile: [...newState[s135Player].discardPile, ...s135Top3],
+              discardPile: [...newState[s135Player].discardPile, ...s135Top3.map((c, oi) => ({
+                ...c,
+                instanceId: (c as any).instanceId || (c as any).id + `-s135fallback-${oi}`,
+              } as any))],
             },
           };
           newState.log = logAction(newState.log, newState.turn, newState.phase, s135Player,
-            'EFFECT_NO_TARGET', 'Sakura Haruno (135): No affordable characters in top 3, all discarded.',
-            'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: 'KS-135-S' });
+            'EFFECT', 'Sakura Haruno (135): No playable character in top 3, choose the discard order.',
+            'game.log.effect.sakura135NoPlayChooseOrder', { card: 'SAKURA HARUNO', id: 'KS-135-S' });
+          pendingEffect.remainingEffectTypes = undefined;
+          newState = EffectEngine.createReorderDiscardPending(newState, s135Player, s135Player, s135Top3.length, s135Player);
           break;
         }
 
-        
+
         (newState as any)._sakura135DrawnCards = s135Top3;
 
-        
+
         {
           const s135EffId = generateInstanceId();
           const s135ActId = generateInstanceId();
-          const s135ValidIndices = s135Top3
-            .map((c, i) => ({ card: c, index: i }))
-            .filter(({ card }) => s135Available.some((a) => a.id === card.id))
-            .map(({ index }) => String(index));
+          const s135PlayableIndexSet = new Set(s135Top3.map((c, i) => isCardPlayable(c) ? i : -1).filter((i) => i >= 0));
+          const s135PlayableIndices = s135Top3
+            .map((_, i) => i)
+            .filter((i) => s135PlayableIndexSet.has(i))
+            .map((i) => String(i));
 
           newState.pendingEffects.push({
             id: s135EffId, sourceCardId: pendingEffect.sourceCardId,
@@ -11440,14 +11447,15 @@ export class EffectEngine {
               topCards: s135Top3.map((c, i) => ({
                 index: i, name: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0, isCharacter: c.card_type === 'character',
                 cardId: c.id, image_file: c.image_file,
+                isPlayable: s135PlayableIndexSet.has(i),
               })),
-              
+
               storedCards: s135Top3,
               costReduction: s135CostReduction,
             }),
             targetSelectionType: 'SAKURA135_CHOOSE_CARD',
             sourcePlayer: s135Player, requiresTargetSelection: true,
-            validTargets: s135ValidIndices, isOptional: false, isMandatory: true,
+            validTargets: s135PlayableIndices, isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: pendingEffect.isUpgrade,
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
@@ -11457,7 +11465,7 @@ export class EffectEngine {
             description: `Sakura Haruno (135): Choose a character from top 3 to play${s135CostReduction > 0 ? ` (cost reduced by ${s135CostReduction})` : ''}.`,
             descriptionKey: s135CostReduction > 0 ? 'game.effect.desc.sakura135ChooseCardUpgrade' : 'game.effect.desc.sakura135ChooseCard',
             descriptionParams: s135CostReduction > 0 ? { reduction: String(s135CostReduction) } : undefined,
-            options: s135ValidIndices, minSelections: 1, maxSelections: 1,
+            options: s135PlayableIndices, minSelections: 1, maxSelections: 1,
             sourceEffectId: s135EffId,
           });
           pendingEffect.remainingEffectTypes = undefined;
@@ -11489,37 +11497,44 @@ export class EffectEngine {
           [s135mPlayer]: { ...s135mPlayerState, deck: s135mDeck },
         };
 
-        const s135mAvailable = s135mTop3.filter((card) => {
+        const isS135mPlayable = (card: typeof s135mTop3[number]): boolean => {
           if (card.card_type !== 'character') return false;
           const effectiveCost = Math.max(0, (card.chakra ?? 0) - s135mCostReduction);
           if (effectiveCost <= newState[s135mPlayer].chakra) return true;
           return canAffordAsUpgrade(newState, s135mPlayer, card as any, s135mCostReduction);
-        });
+        };
+        const s135mAvailable = s135mTop3.filter(isS135mPlayable);
 
         if (s135mAvailable.length === 0) {
           newState = {
             ...newState,
             [s135mPlayer]: {
               ...newState[s135mPlayer],
-              discardPile: [...newState[s135mPlayer].discardPile, ...s135mTop3],
+              discardPile: [...newState[s135mPlayer].discardPile, ...s135mTop3.map((c, oi) => ({
+                ...c,
+                instanceId: (c as any).instanceId || (c as any).id + `-s135mfallback-${oi}`,
+              } as any))],
             },
           };
           newState.log = logAction(newState.log, newState.turn, newState.phase, s135mPlayer,
-            'EFFECT_NO_TARGET', 'Sakura Haruno (135): No affordable characters in top 3, all discarded.',
-            'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: 'KS-135-S' });
+            'EFFECT', 'Sakura Haruno (135): No playable character in top 3, choose the discard order.',
+            'game.log.effect.sakura135NoPlayChooseOrder', { card: 'SAKURA HARUNO', id: 'KS-135-S' });
+          pendingEffect.remainingEffectTypes = undefined;
+          newState = EffectEngine.createReorderDiscardPending(newState, s135mPlayer, s135mPlayer, s135mTop3.length, s135mPlayer);
           break;
         }
 
-        
+
         (newState as any)._sakura135DrawnCards = s135mTop3;
 
         {
           const s135mEffId = generateInstanceId();
           const s135mActId = generateInstanceId();
-          const s135mValidIndices = s135mTop3
-            .map((c, i) => ({ card: c, index: i }))
-            .filter(({ card }) => s135mAvailable.some((a) => a.id === card.id))
-            .map(({ index }) => String(index));
+          const s135mPlayableIndexSet = new Set(s135mTop3.map((c, i) => isS135mPlayable(c) ? i : -1).filter((i) => i >= 0));
+          const s135mPlayableIndices = s135mTop3
+            .map((_, i) => i)
+            .filter((i) => s135mPlayableIndexSet.has(i))
+            .map((i) => String(i));
 
           newState.pendingEffects.push({
             id: s135mEffId, sourceCardId: pendingEffect.sourceCardId,
@@ -11529,13 +11544,14 @@ export class EffectEngine {
               topCards: s135mTop3.map((c, i) => ({
                 index: i, name: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0, isCharacter: c.card_type === 'character',
                 cardId: c.id, image_file: c.image_file,
+                isPlayable: s135mPlayableIndexSet.has(i),
               })),
               storedCards: s135mTop3,
               costReduction: s135mCostReduction,
             }),
             targetSelectionType: 'SAKURA135_CHOOSE_CARD',
             sourcePlayer: s135mPlayer, requiresTargetSelection: true,
-            validTargets: s135mValidIndices, isOptional: false, isMandatory: true,
+            validTargets: s135mPlayableIndices, isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: pendingEffect.isUpgrade,
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
@@ -11545,7 +11561,7 @@ export class EffectEngine {
             description: `Sakura Haruno (135): Choose a character from top 3 to play (cost reduced by ${s135mCostReduction}).`,
             descriptionKey: 'game.effect.desc.sakura135ChooseCardUpgrade',
             descriptionParams: { reduction: String(s135mCostReduction) },
-            options: s135mValidIndices, minSelections: 1, maxSelections: 1,
+            options: s135mPlayableIndices, minSelections: 1, maxSelections: 1,
             sourceEffectId: s135mEffId,
           });
           pendingEffect.remainingEffectTypes = undefined;

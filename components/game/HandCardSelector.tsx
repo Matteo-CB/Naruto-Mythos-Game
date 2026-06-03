@@ -40,6 +40,7 @@ interface HandCardInfo {
     card_type?: string;
   };
   targetId?: string;
+  isPlayable?: boolean;
 }
 
 function HandCard({
@@ -58,6 +59,7 @@ function HandCard({
   const { card, index } = cardInfo;
 
   const imagePath = normalizeImagePath(card.image_file);
+  const disabled = cardInfo.isPlayable === false;
 
   return (
     <motion.div
@@ -65,24 +67,26 @@ function HandCard({
       initial={{ y: 30, opacity: 0, rotate: -2 }}
       animate={{ y: 0, opacity: 1, rotate: 0 }}
       transition={{ delay: idx * 0.06, type: 'spring', stiffness: 220, damping: 18 }}
-      whileHover={{ scale: 1.06, y: -6, rotate: 1 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={() => onSelect(cardInfo.targetId ?? String(index))}
+      whileHover={disabled ? undefined : { scale: 1.06, y: -6, rotate: 1 }}
+      whileTap={disabled ? undefined : { scale: 0.95 }}
+      onClick={() => { if (!disabled) onSelect(cardInfo.targetId ?? String(index)); }}
       className="relative no-select"
       style={{
         width: dims.handSelectorCard.w + 'px',
         aspectRatio: '5 / 7',
-        cursor: 'pointer',
-        border: '2px solid rgba(196, 163, 90, 0.4)',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        border: disabled ? '2px solid rgba(120, 120, 120, 0.4)' : '2px solid rgba(196, 163, 90, 0.4)',
         boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
         transition: 'border-color 0.2s',
         flexShrink: 0,
+        opacity: disabled ? 0.45 : 1,
+        filter: disabled ? 'grayscale(0.85)' : 'none',
       }}
     >
-      
+
       <div
         className="absolute left-0 top-0 bottom-0"
-        style={{ width: '3px', backgroundColor: '#c4a35a', opacity: 0.6 }}
+        style={{ width: '3px', backgroundColor: disabled ? '#666' : '#c4a35a', opacity: 0.6 }}
       />
 
       {imagePath ? (
