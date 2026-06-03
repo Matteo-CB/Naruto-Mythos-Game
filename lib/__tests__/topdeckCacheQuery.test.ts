@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const findMany = vi.fn();
 const count = vi.fn();
 const groupBy = vi.fn();
+const updateMany = vi.fn();
 
 vi.mock('@/lib/db/prisma', () => ({
   prisma: {
@@ -10,16 +11,54 @@ vi.mock('@/lib/db/prisma', () => ({
       findMany: (...a: unknown[]) => findMany(...a),
       count: (...a: unknown[]) => count(...a),
       groupBy: (...a: unknown[]) => groupBy(...a),
+      updateMany: (...a: unknown[]) => updateMany(...a),
     },
   },
 }));
 
-import { buildTournamentWhere, queryTournaments, getFilterFacets, haversineKm } from '@/lib/topdeck/cache';
+import { buildTournamentWhere, queryTournaments, getFilterFacets, haversineKm, reconcileStaleStatuses } from '@/lib/topdeck/cache';
 
 beforeEach(() => {
   findMany.mockReset();
   count.mockReset();
   groupBy.mockReset();
+  updateMany.mockReset();
+});
+
+describe('reconcileStaleStatuses', () => {
+  it('promotes upcoming-with-past-date to ongoing OR completed depending on age', async () => {
+    updateMany
+      .mockResolvedValueOnce({ count: 3 })
+      .mockResolvedValueOnce({ count: 7 })
+      .mockResolvedValueOnce({ count: 2 });
+
+    const NOW = Date.UTC(2026, 5, 3, 12, 0, 0);
+    const r = await reconcileStaleStatuses(NOW);
+
+    expect(r.toOngoing).toBe(3);
+    expect(r.toCompleted).toBe(9);
+    expect(updateMany).toHaveBeenCalledTimes(3);
+
+    const upcomingRecent = updateMany.mock.calls[0][0] as { where: Record<string, unknown>; data: { status: string } };
+    expect(upcomingRecent.where.status).toBe('upcoming');
+    expect(upcomingRecent.where.hasDetail).toBe(false);
+    expect(upcomingRecent.data.status).toBe('ongoing');
+
+    const upcomingLongPast = updateMany.mock.calls[1][0] as { where: Record<string, unknown>; data: { status: string } };
+    expect(upcomingLongPast.where.status).toBe('upcoming');
+    expect(upcomingLongPast.data.status).toBe('completed');
+
+    const ongoingLongPast = updateMany.mock.calls[2][0] as { where: Record<string, unknown>; data: { status: string } };
+    expect(ongoingLongPast.where.status).toBe('ongoing');
+    expect(ongoingLongPast.data.status).toBe('completed');
+  });
+
+  it('returns 0 counts when nothing is stale', async () => {
+    updateMany.mockResolvedValue({ count: 0 });
+    const r = await reconcileStaleStatuses(Date.UTC(2026, 0, 1));
+    expect(r.toOngoing).toBe(0);
+    expect(r.toCompleted).toBe(0);
+  });
 });
 
 describe('buildTournamentWhere', () => {

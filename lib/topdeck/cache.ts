@@ -35,6 +35,45 @@ function listFields(n: NormalizedTopdeckTournament, now: Date) {
   return base;
 }
 
+export async function reconcileStaleStatuses(now: number = Date.now()): Promise<{ toOngoing: number; toCompleted: number }> {
+  const { ONGOING_WINDOW_MS } = await import('./normalize');
+  const nowDate = new Date(now);
+  const ongoingCutoff = new Date(now - ONGOING_WINDOW_MS);
+
+
+  const upcomingPastButRecent = await prisma.topdeckTournament.updateMany({
+    where: {
+      status: 'upcoming',
+      hasDetail: false,
+      startDate: { lt: nowDate, gte: ongoingCutoff },
+    },
+    data: { status: 'ongoing' },
+  });
+
+  const upcomingLongPast = await prisma.topdeckTournament.updateMany({
+    where: {
+      status: 'upcoming',
+      hasDetail: false,
+      startDate: { lt: ongoingCutoff },
+    },
+    data: { status: 'completed' },
+  });
+
+  const ongoingLongPast = await prisma.topdeckTournament.updateMany({
+    where: {
+      status: 'ongoing',
+      hasDetail: false,
+      startDate: { lt: ongoingCutoff },
+    },
+    data: { status: 'completed' },
+  });
+
+  return {
+    toOngoing: upcomingPastButRecent.count,
+    toCompleted: upcomingLongPast.count + ongoingLongPast.count,
+  };
+}
+
 export async function upsertListTournaments(items: NormalizedTopdeckTournament[]): Promise<number> {
   if (!items.length) return 0;
   const tids = items.map((i) => i.tid);

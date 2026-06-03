@@ -35,7 +35,7 @@ export interface NormalizedTopdeckTournament {
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const ONGOING_WINDOW_MS = 2 * DAY_MS;
+export const ONGOING_WINDOW_MS = 2 * DAY_MS;
 
 function asString(v: unknown): string | null {
   if (typeof v === 'string') {

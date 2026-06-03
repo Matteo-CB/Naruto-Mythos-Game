@@ -7,6 +7,7 @@ import {
   readCursor,
   writeCursor,
   getTournamentByTid,
+  reconcileStaleStatuses,
 } from './cache';
 import { acquireOrRenewLeaderLock } from './leaderLock';
 import { createSingleFlight } from './singleFlight';
@@ -48,6 +49,7 @@ export interface PollResult {
   cursorEnd?: number;
   pairs: PairResult[];
   eventHub?: { fetched: number; upserted: number; error?: string };
+  reconciled?: { toOngoing: number; toCompleted: number; error?: string };
 }
 
 export async function searchPair(
@@ -128,6 +130,12 @@ export async function runPollerTick(instanceId: string, deps: PollDeps = {}): Pr
     result.eventHub = eh;
   } catch (e) {
     result.eventHub = { fetched: 0, upserted: 0, error: e instanceof Error ? e.message : String(e) };
+  }
+  try {
+    const now = deps.now ? deps.now() : Date.now();
+    result.reconciled = await reconcileStaleStatuses(now);
+  } catch (e) {
+    result.reconciled = { toOngoing: 0, toCompleted: 0, error: e instanceof Error ? e.message : String(e) };
   }
   return result;
 }
