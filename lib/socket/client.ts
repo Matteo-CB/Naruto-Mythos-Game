@@ -5,7 +5,6 @@ import { create } from 'zustand';
 import type { VisibleGameState, GameAction } from '@/lib/engine/types';
 import { useSocialStore } from '@/stores/socialStore';
 import { useUIStore } from '@/stores/uiStore';
-import { useToastStore } from '@/stores/toastStore';
 
 const CONNECT_TIMEOUT_MS = 10000;
 
@@ -822,36 +821,6 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('chat:history', (data: { messages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }> }) => {
         set({ chatMessages: data.messages ?? [] });
-      });
-
-      socket.on('quest:progress', (data: {
-        questId: string;
-        isDaily: boolean;
-        progress: number;
-        target: number;
-        completedNow: boolean;
-        text_fr: string;
-        text_en: string;
-      }) => {
-        const locale = typeof document !== 'undefined' && document.documentElement.lang === 'fr' ? 'fr' : 'en';
-        const text = locale === 'fr' ? data.text_fr : data.text_en;
-        const scope = data.isDaily ? 'd' : 's';
-        if (data.completedNow) {
-          useToastStore.getState().showToast({
-            type: 'info',
-            titleKey: data.isDaily ? 'quests.dailyDoneTitle' : 'quests.doneTitle',
-            message: text,
-            dedupeKey: `quest-done-${data.questId}-${scope}`,
-            durationMs: 4000,
-          });
-        } else {
-          useToastStore.getState().showToast({
-            type: 'info',
-            message: `${text} (${data.progress}/${data.target})`,
-            dedupeKey: `quest-progress-${data.questId}-${scope}`,
-            durationMs: 3000,
-          });
-        }
       });
 
       socket.on('daily-quest:rotated', () => {
