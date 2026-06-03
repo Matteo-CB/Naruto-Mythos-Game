@@ -538,6 +538,29 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
             ? m.player1Id ?? null
             : null;
         console.log(`[Tournament] Stuck match ${m.id} (room ${m.roomCode}, age ${Math.round(ageMs / 60_000)}min, p1Conn=${p1Connected}, p2Conn=${p2Connected}) -> force-finalize, winnerId=${winnerId ?? 'draw'}`);
+
+        room.finalized = true;
+        const winnerRole: 'player1' | 'player2' | null = winnerId
+          ? (winnerId === m.player1Id ? 'player1' : 'player2')
+          : null;
+        const endPayload = {
+          winner: winnerRole,
+          player1Score: room.gameState.player1.missionPoints,
+          player2Score: room.gameState.player2.missionPoints,
+          isRanked: room.isRanked,
+          isEvolving: room.isEvolving === true,
+          eloDelta: null,
+          newElo: undefined,
+          totalGames: undefined,
+          winReason: 'forfeit' as const,
+          gameId: null,
+          replayData: null,
+          tournamentId: m.tournamentId,
+          performanceBonus: null,
+        };
+        if (room.hostSocket) io.to(room.hostSocket).emit('game:ended', endPayload);
+        if (room.guestSocket) io.to(room.guestSocket).emit('game:ended', endPayload);
+
         if (winnerId) {
           await handleTournamentMatchEnd(io, m.tournamentId, m.id, winnerId, null).catch((err) => {
             console.error(`[Tournament] force-finalize failed for ${m.id}:`, err instanceof Error ? err.message : err);
@@ -551,6 +574,8 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
             matchId: m.id, status: 'completed', roomCode: null,
           });
         }
+
+        finalizeAndScheduleRoomDeletion(rooms, m.roomCode);
       }
     }
   } catch (err) {

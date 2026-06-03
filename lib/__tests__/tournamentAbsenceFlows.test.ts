@@ -294,6 +294,89 @@ describe('sweepOrphanTournamentMatches', () => {
     await sweepOrphanTournamentMatches(io as never);
     expect(p.tournamentMatch.update).not.toHaveBeenCalled();
   });
+
+  it('force-finalizes a 35min+ stuck match with one player connected -> winner = connected', async () => {
+    const io = fakeIo();
+    const { rooms } = await import('@/lib/socket/server');
+    const stuckStart = new Date(Date.now() - 36 * 60_000);
+    rooms.set('STUCK', {
+      hostSocket: '', guestSocket: 'g-sock', finalized: false,
+      isRanked: false, isEvolving: false,
+      gameState: { player1: { missionPoints: 0 }, player2: { missionPoints: 0 } },
+    } as never);
+    p.tournamentMatch.findMany.mockResolvedValue([
+      { id: 'm1', tournamentId: 't1', status: 'in_progress',
+        roomCode: 'STUCK', startedAt: stuckStart, player1Id: 'p1', player2Id: 'p2' },
+    ]);
+    p.tournamentMatch.findUnique.mockResolvedValue({
+      id: 'm1', tournamentId: 't1', status: 'in_progress',
+      player1Id: 'p1', player2Id: 'p2', player1Username: 'P1', player2Username: 'P2',
+      round: 1, matchIndex: 0, bracket: null, roomCode: 'STUCK',
+    });
+    p.tournament.findUnique.mockResolvedValue({ format: 'swiss' });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentMatch.findMany.mockResolvedValueOnce([
+      { id: 'm1', tournamentId: 't1', status: 'in_progress',
+        roomCode: 'STUCK', startedAt: stuckStart, player1Id: 'p1', player2Id: 'p2' },
+    ]);
+
+    await sweepOrphanTournamentMatches(io as never);
+
+    const room = rooms.get('STUCK');
+    expect(room?.finalized).toBe(true);
+    expect(io.emissions.some(e => e.event === 'game:ended')).toBe(true);
+    expect(p.tournamentMatch.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'm1' },
+      data: expect.objectContaining({ status: 'completed', winnerId: 'p2' }),
+    }));
+
+    rooms.delete('STUCK');
+  });
+
+  it('marks a 35min+ stuck match with neither player connected as completed (no winner)', async () => {
+    const io = fakeIo();
+    const { rooms } = await import('@/lib/socket/server');
+    const stuckStart = new Date(Date.now() - 36 * 60_000);
+    rooms.set('STUCK2', {
+      hostSocket: '', guestSocket: null, finalized: false,
+      isRanked: false, isEvolving: false,
+      gameState: { player1: { missionPoints: 0 }, player2: { missionPoints: 0 } },
+    } as never);
+    p.tournamentMatch.findMany.mockResolvedValue([
+      { id: 'm2', tournamentId: 't1', status: 'in_progress',
+        roomCode: 'STUCK2', startedAt: stuckStart, player1Id: 'p1', player2Id: 'p2' },
+    ]);
+    p.tournamentMatch.update.mockResolvedValue({});
+
+    await sweepOrphanTournamentMatches(io as never);
+
+    expect(p.tournamentMatch.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'm2' },
+      data: expect.objectContaining({ status: 'completed', roomCode: null }),
+    }));
+    rooms.delete('STUCK2');
+  });
+
+  it('does not force-finalize a 35min+ match if both players are connected', async () => {
+    const io = fakeIo();
+    const { rooms } = await import('@/lib/socket/server');
+    const stuckStart = new Date(Date.now() - 36 * 60_000);
+    rooms.set('STUCK3', {
+      hostSocket: 'h-sock', guestSocket: 'g-sock', finalized: false,
+      isRanked: false, isEvolving: false,
+      gameState: { player1: { missionPoints: 0 }, player2: { missionPoints: 0 } },
+    } as never);
+    p.tournamentMatch.findMany.mockResolvedValue([
+      { id: 'm3', tournamentId: 't1', status: 'in_progress',
+        roomCode: 'STUCK3', startedAt: stuckStart, player1Id: 'p1', player2Id: 'p2' },
+    ]);
+
+    await sweepOrphanTournamentMatches(io as never);
+
+    expect(p.tournamentMatch.update).not.toHaveBeenCalled();
+    expect(rooms.get('STUCK3')?.finalized).toBeFalsy();
+    rooms.delete('STUCK3');
+  });
 });
 
 describe('getConnectedUserIdsInTournament', () => {
