@@ -296,51 +296,45 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         }
       }, CONNECT_TIMEOUT_MS);
 
+      let firstConnect = true;
+
       socket.on('connect', () => {
         clearTimeout(timeoutId);
-        console.log('[Socket] Connected:', socket.id);
+        const wasFirstConnect = firstConnect;
+        firstConnect = false;
+        console.log('[Socket] Connected:', socket.id, wasFirstConnect ? '(initial)' : '(reconnect)');
         set({ connected: true, userId: userId || null, userName: username || null, error: null, errorKey: null });
 
-        
+
         if (userId) {
           socket.emit('auth:register', { userId, username });
         }
 
-        
+
         socket.emit('games:list');
 
-        resolve();
+
+        const rc = get().roomCode;
+        const uid = get().userId;
+        if (!wasFirstConnect && rc && uid) {
+          console.log('[Socket] Re-joining room', rc, 'after reconnect (socket.IO v4 fires connect, not reconnect, on transport restore)');
+          socket.emit('game:rejoin', { roomCode: rc, userId: uid });
+        }
+
+        if (wasFirstConnect) resolve();
       });
 
       socket.on('disconnect', (reason) => {
         console.log('[Socket] Disconnected, reason:', reason);
         set({ connected: false, opponentDisconnected: false, opponentForfeitAt: null });
-        
+
         if (reason === 'io server disconnect') {
           set({ error: 'Disconnected by server.', errorKey: 'game.error.connectionLost' });
         }
       });
 
-      socket.on('reconnect', (attemptNumber: number) => {
-        console.log('[Socket] Reconnected after', attemptNumber, 'attempts');
-        set({ connected: true, error: null, errorKey: null });
 
-        
-        const uid = get().userId;
-        const uname = get().userName;
-        if (uid) {
-          socket.emit('auth:register', { userId: uid, username: uname ?? undefined });
-        }
-
-        
-        const rc = get().roomCode;
-        if (rc && uid) {
-          console.log('[Socket] Rejoining room', rc, 'after reconnect');
-          socket.emit('game:rejoin', { roomCode: rc, userId: uid });
-        }
-      });
-
-      socket.on('reconnect_failed', () => {
+      socket.io.on('reconnect_failed', () => {
         console.error('[Socket] Reconnection failed after all attempts');
         set({ error: 'Unable to reconnect to server.', errorKey: 'game.error.reconnectFailed' });
       });

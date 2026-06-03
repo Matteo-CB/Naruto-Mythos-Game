@@ -477,6 +477,8 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
 }
 
 
+const STUCK_MATCH_HARD_TIMEOUT_MS = 35 * 60_000;
+
 export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
   try {
     const inProgress = await prisma.tournamentMatch.findMany({
@@ -485,37 +487,70 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
     });
     if (inProgress.length === 0) return;
     for (const m of inProgress) {
-      if (!m.roomCode) continue;
-      if (rooms.has(m.roomCode)) continue;
       const startedMs = m.startedAt ? m.startedAt.getTime() : 0;
       const ageMs = Date.now() - startedMs;
-      if (ageMs < 60_000) continue;
-      console.log(`[Tournament] Orphan match detected ${m.id} (room ${m.roomCode} gone, age ${Math.round(ageMs / 1000)}s), resetting to ready`);
-      const newStatus: 'ready' | 'pending' = m.player1Id && m.player2Id ? 'ready' : 'pending';
-      await prisma.tournamentMatch.update({
-        where: { id: m.id },
-        data: { status: newStatus, roomCode: null, startedAt: null, absenceDeadline: null, absentPlayerId: null },
-      });
-      matchReadyPlayers.delete(m.id);
-      io.to(`tournament:${m.tournamentId}`).emit('tournament:match-updated', {
-        matchId: m.id, status: newStatus, roomCode: null,
-      });
+      const roomGone = !m.roomCode || !rooms.has(m.roomCode);
 
-      if (newStatus === 'ready' && m.player1Id && m.player2Id) {
-        const tournamentId = m.tournamentId;
-        const matchId = m.id;
-        const p1 = m.player1Id;
-        const p2 = m.player2Id;
-        const deadline = startAbsenceTimer(matchId, async () => {
-          await fireAbsenceTimerCallback(io, tournamentId, matchId, p1, p2, null, false);
-        });
+      if (roomGone) {
+        if (ageMs < 60_000) continue;
+        console.log(`[Tournament] Orphan match ${m.id} (room ${m.roomCode ?? '<none>'} gone, age ${Math.round(ageMs / 1000)}s), resetting to ready`);
+        const newStatus: 'ready' | 'pending' = m.player1Id && m.player2Id ? 'ready' : 'pending';
         await prisma.tournamentMatch.update({
-          where: { id: matchId },
-          data: { absenceDeadline: deadline, absentPlayerId: null },
+          where: { id: m.id },
+          data: { status: newStatus, roomCode: null, startedAt: null, absenceDeadline: null, absentPlayerId: null },
         });
-        io.to(`tournament:${tournamentId}`).emit('tournament:absence-timer', {
-          matchId, playerId: null, deadline: deadline.toISOString(),
+        matchReadyPlayers.delete(m.id);
+        io.to(`tournament:${m.tournamentId}`).emit('tournament:match-updated', {
+          matchId: m.id, status: newStatus, roomCode: null,
         });
+
+        if (newStatus === 'ready' && m.player1Id && m.player2Id) {
+          const tournamentId = m.tournamentId;
+          const matchId = m.id;
+          const p1 = m.player1Id;
+          const p2 = m.player2Id;
+          const deadline = startAbsenceTimer(matchId, async () => {
+            await fireAbsenceTimerCallback(io, tournamentId, matchId, p1, p2, null, false);
+          });
+          await prisma.tournamentMatch.update({
+            where: { id: matchId },
+            data: { absenceDeadline: deadline, absentPlayerId: null },
+          });
+          io.to(`tournament:${tournamentId}`).emit('tournament:absence-timer', {
+            matchId, playerId: null, deadline: deadline.toISOString(),
+          });
+        }
+        continue;
+      }
+
+      if (ageMs >= STUCK_MATCH_HARD_TIMEOUT_MS && m.roomCode) {
+        const room = rooms.get(m.roomCode);
+        if (!room || !room.gameState || room.finalized) continue;
+        const p1Connected = !!room.hostSocket;
+        const p2Connected = !!room.guestSocket;
+        if (p1Connected && p2Connected) {
+          console.log(`[Tournament] Stuck match ${m.id} (room ${m.roomCode}, age ${Math.round(ageMs / 60_000)}min) but both players connected; skipping force-finalize`);
+          continue;
+        }
+        const winnerId: string | null = !p1Connected && p2Connected
+          ? m.player2Id ?? null
+          : p1Connected && !p2Connected
+            ? m.player1Id ?? null
+            : null;
+        console.log(`[Tournament] Stuck match ${m.id} (room ${m.roomCode}, age ${Math.round(ageMs / 60_000)}min, p1Conn=${p1Connected}, p2Conn=${p2Connected}) -> force-finalize, winnerId=${winnerId ?? 'draw'}`);
+        if (winnerId) {
+          await handleTournamentMatchEnd(io, m.tournamentId, m.id, winnerId, null).catch((err) => {
+            console.error(`[Tournament] force-finalize failed for ${m.id}:`, err instanceof Error ? err.message : err);
+          });
+        } else {
+          await prisma.tournamentMatch.update({
+            where: { id: m.id },
+            data: { status: 'completed', roomCode: null, startedAt: null, absenceDeadline: null, absentPlayerId: null, completedAt: new Date() },
+          });
+          io.to(`tournament:${m.tournamentId}`).emit('tournament:match-updated', {
+            matchId: m.id, status: 'completed', roomCode: null,
+          });
+        }
       }
     }
   } catch (err) {
@@ -757,7 +792,7 @@ export async function startInitialRoundAbsenceTimers(io: Server, tournamentId: s
   }
 }
 
-export async function handleTournamentMatchEnd(io: Server, tournamentId: string, matchId: string, winnerId: string, gameId: string) {
+export async function handleTournamentMatchEnd(io: Server, tournamentId: string, matchId: string, winnerId: string, gameId: string | null) {
   try {
     const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
     if (!match) return;
@@ -773,7 +808,7 @@ export async function handleTournamentMatchEnd(io: Server, tournamentId: string,
 
     await prisma.tournamentMatch.update({
       where: { id: matchId },
-      data: { status: 'completed', winnerId, winnerUsername, gameId, completedAt: new Date() },
+      data: { status: 'completed', winnerId, winnerUsername, ...(gameId ? { gameId } : {}), completedAt: new Date() },
     });
 
     logMatchEvent({
