@@ -523,7 +523,7 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
         continue;
       }
 
-      if (ageMs >= STUCK_MATCH_HARD_TIMEOUT_MS && m.roomCode) {
+      if (ageMs >= STUCK_MATCH_HARD_TIMEOUT_MS && m.roomCode && startedMs > 0) {
         const room = rooms.get(m.roomCode);
         if (!room || !room.gameState || room.finalized) continue;
         const p1Connected = !!room.hostSocket;

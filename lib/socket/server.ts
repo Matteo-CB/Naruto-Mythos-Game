@@ -1778,12 +1778,19 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const opponentSock = isHost ? room.guestSocket : room.hostSocket;
       if (opponentSock) {
         io.to(opponentSock).emit('game:opponent-reconnected');
+        if (room.gameState && !room.finalized) {
+          const oppRole: PlayerID = isHost ? 'player2' : 'player1';
+          const oppVisible = GameEngine.getVisibleState(room.gameState, oppRole);
+          const oppClock = buildChessClockBroadcast(room.chessClock, Date.now());
+          const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
+          io.to(opponentSock).emit('game:state-update', { visibleState: oppVisible, playerRole: oppRole, playerNames, chessClock: oppClock });
+        }
       }
 
-      
+
       registerUserSocket(userId, socket.id);
 
-      
+
       if (room.gameState && !room.finalized) {
         syncChessClock(room);
         startChessClockTickLoop(room, io);
