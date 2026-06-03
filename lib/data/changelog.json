@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "date": "2026-06-03",
+      "title_fr": "Nettoyage automatique des tournois après 24 heures",
+      "title_en": "Tournaments auto-deleted after 24 hours",
+      "changes_fr": [
+        "Tous les tournois (terminés, annulés ou bloqués) sont maintenant automatiquement supprimés 24 heures après. Les tournois planifiés dans le futur ne sont pas touchés."
+      ],
+      "changes_en": [
+        "All tournaments (completed, cancelled, or stuck) are now automatically deleted after 24 hours. Tournaments scheduled in the future are not affected."
+      ]
+    },
+    {
       "date": "2026-06-01",
       "title_fr": "Bonus ELO recalibrés, badges quêtes et 80 nouvelles quêtes",
       "title_en": "ELO bonuses recalibrated, quest badges and 80 new quests",
