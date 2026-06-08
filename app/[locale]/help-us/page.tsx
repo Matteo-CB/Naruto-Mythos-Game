@@ -8,6 +8,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { DonationSection } from '@/components/help-us/DonationSection';
 import { SuggestionsSection } from '@/components/help-us/SuggestionsSection';
+import { AdminHelpUsSection } from '@/components/help-us/AdminHelpUsSection';
 
 const ACCENT = '#c4a35a';
 const HELP_US_BG = '/bgmenu/help-us-bg.webp';
@@ -56,6 +57,7 @@ export default function HelpUsPage() {
 
         <DonationSection />
         <SuggestionsSection />
+        <AdminHelpUsSection />
       </div>
 
       <Footer />

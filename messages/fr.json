@@ -109,8 +109,67 @@
       }
     },
     "admin": {
+      "title": "Espace administrateur",
+      "tabDonations": "Dons",
+      "tabSuggestions": "Suggestions",
+      "loading": "Chargement...",
+      "stats": {
+        "monthTotal": "Total du mois",
+        "lifetimeTotal": "Total à vie",
+        "activeSubs": "Abonnés actifs"
+      },
+      "donations": {
+        "filtersTitle": "Filtres",
+        "filterStatusAll": "Tous statuts",
+        "filterModeAll": "Tous modes",
+        "filterModeOneTime": "Ponctuel",
+        "filterModeMonthly": "Mensuel",
+        "filterDateFrom": "Du",
+        "filterDateTo": "Au",
+        "reset": "Réinitialiser",
+        "loadMore": "Voir plus",
+        "empty": "Aucun don pour ces filtres."
+      },
+      "table": {
+        "date": "Date",
+        "amount": "Montant",
+        "currency": "Devise",
+        "mode": "Mode",
+        "status": "Statut",
+        "user": "Utilisateur",
+        "actions": "Actions",
+        "anonymous": "Anonyme",
+        "openInStripe": "Stripe"
+      },
+      "donationStatus": {
+        "pending": "En attente",
+        "succeeded": "Réussi",
+        "failed": "Échec",
+        "refunded": "Remboursé",
+        "cancelled": "Annulé"
+      },
+      "suggestion": {
+        "search": "Rechercher",
+        "searchPlaceholder": "Mot-clé...",
+        "filterAll": "Toutes",
+        "editStatus": "Statut",
+        "note": "Note interne",
+        "notePlaceholder": "Note privée admin...",
+        "noteSaving": "Enregistrement...",
+        "noteSaved": "Enregistré",
+        "delete": "Supprimer",
+        "confirmTitle": "Supprimer cette suggestion ?",
+        "confirmBody": "Cette action est définitive. Tous les votes seront supprimés.",
+        "confirmCancel": "Annuler",
+        "confirmCta": "Supprimer",
+        "toastDeleted": "Suggestion supprimée.",
+        "toastStatusChanged": "Statut mis à jour.",
+        "toastNoteSaved": "Note enregistrée.",
+        "toastError": "Erreur, ré-essaie."
+      },
       "error": {
-        "notAdmin": "Accès refusé."
+        "notAdmin": "Accès refusé.",
+        "loadFailed": "Impossible de charger les dons."
       }
     }
   },

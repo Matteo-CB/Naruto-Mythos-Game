@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { isAdmin } from '@/lib/auth/admins';
 import { prisma } from '@/lib/db/prisma';
 import { ADMIN_NOTE_MAX, isStatus } from '@/lib/suggestions/validation';
+import { logAdminAction } from '@/lib/admin/auditLog';
 
 const CLOSED_STATUSES = new Set(['done', 'rejected']);
 
@@ -66,6 +67,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     data,
   });
 
+  await logAdminAction({
+    actorId: session?.user?.id ?? '',
+    actorName: session?.user?.name ?? '',
+    action: 'suggestion.update',
+    targetId: id,
+    payload: data,
+  });
+
   return NextResponse.json({
     id: updated.id,
     userId: updated.userId,
@@ -102,5 +111,13 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   }
 
   await prisma.suggestion.delete({ where: { id } });
+
+  await logAdminAction({
+    actorId: session?.user?.id ?? '',
+    actorName: session?.user?.name ?? '',
+    action: 'suggestion.delete',
+    targetId: id,
+  });
+
   return new NextResponse(null, { status: 204 });
 }

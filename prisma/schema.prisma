@@ -487,6 +487,19 @@ model Suggestion {
   @@index([userId, createdAt])
 }
 
+model AdminAction {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  actorId   String   @db.ObjectId
+  actorName String
+  action    String
+  targetId  String?  @db.ObjectId
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  @@index([action, createdAt])
+  @@index([actorId, createdAt])
+}
+
 model SuggestionVote {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   suggestionId String   @db.ObjectId

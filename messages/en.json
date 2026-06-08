@@ -109,8 +109,67 @@
       }
     },
     "admin": {
+      "title": "Admin space",
+      "tabDonations": "Donations",
+      "tabSuggestions": "Suggestions",
+      "loading": "Loading...",
+      "stats": {
+        "monthTotal": "This month",
+        "lifetimeTotal": "Lifetime",
+        "activeSubs": "Active subscribers"
+      },
+      "donations": {
+        "filtersTitle": "Filters",
+        "filterStatusAll": "All statuses",
+        "filterModeAll": "All modes",
+        "filterModeOneTime": "One-time",
+        "filterModeMonthly": "Monthly",
+        "filterDateFrom": "From",
+        "filterDateTo": "To",
+        "reset": "Reset",
+        "loadMore": "Load more",
+        "empty": "No donation for these filters."
+      },
+      "table": {
+        "date": "Date",
+        "amount": "Amount",
+        "currency": "Currency",
+        "mode": "Mode",
+        "status": "Status",
+        "user": "User",
+        "actions": "Actions",
+        "anonymous": "Anonymous",
+        "openInStripe": "Stripe"
+      },
+      "donationStatus": {
+        "pending": "Pending",
+        "succeeded": "Succeeded",
+        "failed": "Failed",
+        "refunded": "Refunded",
+        "cancelled": "Cancelled"
+      },
+      "suggestion": {
+        "search": "Search",
+        "searchPlaceholder": "Keyword...",
+        "filterAll": "All",
+        "editStatus": "Status",
+        "note": "Admin note",
+        "notePlaceholder": "Private admin note...",
+        "noteSaving": "Saving...",
+        "noteSaved": "Saved",
+        "delete": "Delete",
+        "confirmTitle": "Delete this suggestion?",
+        "confirmBody": "This is permanent. All votes will be removed too.",
+        "confirmCancel": "Cancel",
+        "confirmCta": "Delete",
+        "toastDeleted": "Suggestion deleted.",
+        "toastStatusChanged": "Status updated.",
+        "toastNoteSaved": "Note saved.",
+        "toastError": "Error, try again."
+      },
       "error": {
-        "notAdmin": "Access denied."
+        "notAdmin": "Access denied.",
+        "loadFailed": "Could not load donations."
       }
     }
   },
