@@ -1,4 +1,8 @@
 {
+  "helpUs": {
+    "title": "Help Us",
+    "subtitle": "Support the project and propose improvements"
+  },
   "admin": {
     "booster": {
       "invalidBody": "Invalid request body.",

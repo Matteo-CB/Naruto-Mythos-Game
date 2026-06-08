@@ -6,9 +6,10 @@ import { motion } from 'framer-motion';
 interface CloudBackgroundProps {
   className?: string;
   animated?: boolean;
+  image?: string;
 }
 
-export const CloudBackground = memo(function CloudBackground({ className = '', animated = true }: CloudBackgroundProps) {
+export const CloudBackground = memo(function CloudBackground({ className = '', animated = true, image = '/bgmenu/bgmenu.webp' }: CloudBackgroundProps) {
   const [shouldAnimate, setShouldAnimate] = useState(false);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
           <motion.div
             className="absolute inset-0"
             style={{
-              backgroundImage: 'url(/bgmenu/bgmenu.webp)',
+              backgroundImage: `url(${image})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               willChange: 'transform',
@@ -62,7 +63,7 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: 'url(/bgmenu/bgmenu.webp)',
+            backgroundImage: `url(${image})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             filter: 'blur(2px) saturate(0.8) brightness(0.45)',

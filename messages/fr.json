@@ -1,4 +1,8 @@
 {
+  "helpUs": {
+    "title": "Help Us",
+    "subtitle": "Soutiens le projet et propose des améliorations"
+  },
   "admin": {
     "booster": {
       "invalidBody": "Corps de requête invalide.",
