@@ -29,6 +29,73 @@
       }
     },
     "suggestions": {
+      "sectionTitle": "Suggestions",
+      "intro": "Propose des améliorations ou vote pour celles des autres.",
+      "newButton": "Nouvelle suggestion",
+      "loginPrompt": "Connecte-toi pour proposer ou voter.",
+      "loginLink": "Se connecter",
+      "empty": "Aucune suggestion pour ces filtres.",
+      "resetFilters": "Réinitialiser les filtres",
+      "loadMore": "Voir plus",
+      "loadingMore": "Chargement...",
+      "loadError": "Impossible de charger les suggestions.",
+      "retry": "Réessayer",
+      "filterCategory": "Catégorie",
+      "filterCategoryAll": "Toutes",
+      "filterStatus": "Statut",
+      "filterStatusAll": "Tous",
+      "search": "Rechercher",
+      "searchPlaceholder": "Mot-clé...",
+      "sort": "Tri",
+      "sortVotes": "Plus votées",
+      "sortRecent": "Récentes",
+      "sortStatus": "Par statut",
+      "vote": "Voter",
+      "voted": "Voté",
+      "expand": "Voir plus",
+      "collapse": "Voir moins",
+      "by": "par",
+      "category": {
+        "bug": "Bug",
+        "feature": "Fonctionnalité",
+        "balance": "Équilibrage",
+        "ui": "UI / UX",
+        "other": "Autre"
+      },
+      "status": {
+        "open": "Ouverte",
+        "planned": "Planifiée",
+        "in_progress": "En cours",
+        "to_fix": "À corriger",
+        "done": "Faite",
+        "rejected": "Refusée"
+      },
+      "form": {
+        "title": "Nouvelle suggestion",
+        "categoryLabel": "Catégorie",
+        "titleLabel": "Titre",
+        "titlePlaceholder": "Résume ton idée en une phrase",
+        "bodyLabel": "Description",
+        "bodyPlaceholder": "Détaille ton idée, le contexte, la carte ou l'écran concerné",
+        "submit": "Envoyer",
+        "submitting": "Envoi...",
+        "cancel": "Annuler",
+        "close": "Fermer",
+        "confirmClose": "Abandonner cette suggestion ?",
+        "confirmCloseBody": "Le brouillon sera perdu.",
+        "confirmKeep": "Continuer la rédaction",
+        "confirmDiscard": "Abandonner",
+        "charsLeft": "{count} caractères"
+      },
+      "toast": {
+        "created": "Suggestion envoyée."
+      },
+      "date": {
+        "now": "à l'instant",
+        "minutesAgo": "il y a {count} min",
+        "hoursAgo": "il y a {count} h",
+        "daysAgo": "il y a {count} j"
+      },
       "error": {
         "loginRequired": "Connecte-toi pour proposer ou voter.",
         "invalidCategory": "Catégorie invalide.",

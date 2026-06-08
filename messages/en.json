@@ -29,6 +29,73 @@
       }
     },
     "suggestions": {
+      "sectionTitle": "Suggestions",
+      "intro": "Propose improvements or vote for those of others.",
+      "newButton": "New suggestion",
+      "loginPrompt": "Sign in to post or vote.",
+      "loginLink": "Sign in",
+      "empty": "No suggestion matches these filters.",
+      "resetFilters": "Reset filters",
+      "loadMore": "Load more",
+      "loadingMore": "Loading...",
+      "loadError": "Could not load suggestions.",
+      "retry": "Retry",
+      "filterCategory": "Category",
+      "filterCategoryAll": "All",
+      "filterStatus": "Status",
+      "filterStatusAll": "All",
+      "search": "Search",
+      "searchPlaceholder": "Keyword...",
+      "sort": "Sort",
+      "sortVotes": "Top voted",
+      "sortRecent": "Recent",
+      "sortStatus": "By status",
+      "vote": "Vote",
+      "voted": "Voted",
+      "expand": "Show more",
+      "collapse": "Show less",
+      "by": "by",
+      "category": {
+        "bug": "Bug",
+        "feature": "Feature",
+        "balance": "Balance",
+        "ui": "UI / UX",
+        "other": "Other"
+      },
+      "status": {
+        "open": "Open",
+        "planned": "Planned",
+        "in_progress": "In progress",
+        "to_fix": "To fix",
+        "done": "Done",
+        "rejected": "Rejected"
+      },
+      "form": {
+        "title": "New suggestion",
+        "categoryLabel": "Category",
+        "titleLabel": "Title",
+        "titlePlaceholder": "Sum up your idea in one sentence",
+        "bodyLabel": "Description",
+        "bodyPlaceholder": "Describe your idea, the context, the card or screen involved",
+        "submit": "Send",
+        "submitting": "Sending...",
+        "cancel": "Cancel",
+        "close": "Close",
+        "confirmClose": "Discard this suggestion?",
+        "confirmCloseBody": "The draft will be lost.",
+        "confirmKeep": "Keep writing",
+        "confirmDiscard": "Discard",
+        "charsLeft": "{count} characters"
+      },
+      "toast": {
+        "created": "Suggestion sent."
+      },
+      "date": {
+        "now": "just now",
+        "minutesAgo": "{count} min ago",
+        "hoursAgo": "{count} h ago",
+        "daysAgo": "{count} d ago"
+      },
       "error": {
         "loginRequired": "Sign in to post or vote.",
         "invalidCategory": "Invalid category.",

@@ -7,6 +7,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { DonationSection } from '@/components/help-us/DonationSection';
+import { SuggestionsSection } from '@/components/help-us/SuggestionsSection';
 
 const ACCENT = '#c4a35a';
 const HELP_US_BG = '/bgmenu/help-us-bg.webp';
@@ -34,7 +35,7 @@ export default function HelpUsPage() {
         <LanguageSwitcher />
       </header>
 
-      <div className="relative z-10 flex-1 px-4 sm:px-6 max-w-[1100px] w-full mx-auto pb-12">
+      <div className="relative z-10 flex-1 px-4 sm:px-6 max-w-275 w-full mx-auto pb-12">
         <motion.h1
           className="text-3xl sm:text-4xl font-display tracking-[0.3em] mb-3 mt-6 text-center uppercase"
           style={{ color: ACCENT }}
@@ -54,6 +55,7 @@ export default function HelpUsPage() {
         </motion.p>
 
         <DonationSection />
+        <SuggestionsSection />
       </div>
 
       <Footer />
