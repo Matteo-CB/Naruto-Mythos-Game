@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useLocale, useTranslations } from 'next-intl';
 import { AnimatePresence, motion } from 'framer-motion';
 import changelog from '@/lib/data/changelog.json';
+import { Z_APP_MODAL } from '@/lib/ui/zIndex';
 
 type Entry = {
   date: string;
@@ -84,8 +85,8 @@ export function ChangelogButton() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-9999 flex items-center justify-center p-4"
-          style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0,0,0,0.75)', zIndex: Z_APP_MODAL }}
           onClick={closeModal}
           role="dialog"
           aria-modal="true"

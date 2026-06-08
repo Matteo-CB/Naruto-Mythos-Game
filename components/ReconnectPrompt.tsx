@@ -3,6 +3,7 @@
 import { useSocketStore } from '@/lib/socket/client';
 import { useRouter } from '@/lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
+import { Z_APP_MODAL } from '@/lib/ui/zIndex';
 
 export function ReconnectPrompt() {
   const t = useTranslations('game');
@@ -35,7 +36,7 @@ export function ReconnectPrompt() {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
+    <div className="fixed inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.8)', zIndex: Z_APP_MODAL }}>
       <div
         className="flex flex-col items-center gap-5 px-8 py-6 rounded-xl max-w-sm w-full mx-4 text-center"
         style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
