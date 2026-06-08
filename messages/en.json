@@ -27,6 +27,24 @@
         "checkoutFailed": "Stripe is not responding. Try again shortly.",
         "portalUnavailable": "Could not open the subscription management page."
       }
+    },
+    "suggestions": {
+      "error": {
+        "loginRequired": "Sign in to post or vote.",
+        "invalidCategory": "Invalid category.",
+        "tooShort": "Text too short.",
+        "tooLong": "Text too long.",
+        "rateLimited": "Wait 1 minute before sending another suggestion.",
+        "maxOpen": "You already have 3 open suggestions. Wait until one is processed.",
+        "banned": "Your account is restricted.",
+        "notFound": "Suggestion not found.",
+        "voteFailed": "Could not register your vote."
+      }
+    },
+    "admin": {
+      "error": {
+        "notAdmin": "Access denied."
+      }
     }
   },
   "admin": {

@@ -27,6 +27,24 @@
         "checkoutFailed": "Stripe ne répond pas. Réessaie dans un instant.",
         "portalUnavailable": "Impossible d'ouvrir la gestion de l'abonnement."
       }
+    },
+    "suggestions": {
+      "error": {
+        "loginRequired": "Connecte-toi pour proposer ou voter.",
+        "invalidCategory": "Catégorie invalide.",
+        "tooShort": "Texte trop court.",
+        "tooLong": "Texte trop long.",
+        "rateLimited": "Attends 1 minute avant d'envoyer une autre suggestion.",
+        "maxOpen": "Tu as déjà 3 suggestions ouvertes. Attends qu'une soit traitée.",
+        "banned": "Ton compte est restreint.",
+        "notFound": "Suggestion introuvable.",
+        "voteFailed": "Impossible d'enregistrer ton vote."
+      }
+    },
+    "admin": {
+      "error": {
+        "notAdmin": "Accès refusé."
+      }
     }
   },
   "admin": {
