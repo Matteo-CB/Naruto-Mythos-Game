@@ -1,7 +1,16 @@
 {
   "helpUs": {
     "title": "Help Us",
-    "subtitle": "Soutiens le projet et propose des améliorations"
+    "subtitle": "Soutiens le projet et propose des améliorations",
+    "donate": {
+      "error": {
+        "amountInvalid": "Montant invalide. Minimum 1 €.",
+        "loginRequired": "Connecte-toi pour t'abonner mensuellement.",
+        "rateLimited": "Trop de tentatives. Réessaie dans quelques minutes.",
+        "checkoutFailed": "Stripe ne répond pas. Réessaie dans un instant.",
+        "portalUnavailable": "Impossible d'ouvrir la gestion de l'abonnement."
+      }
+    }
   },
   "admin": {
     "booster": {

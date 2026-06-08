@@ -1,7 +1,16 @@
 {
   "helpUs": {
     "title": "Help Us",
-    "subtitle": "Support the project and propose improvements"
+    "subtitle": "Support the project and propose improvements",
+    "donate": {
+      "error": {
+        "amountInvalid": "Invalid amount. Minimum 1 EUR.",
+        "loginRequired": "Sign in to start a monthly subscription.",
+        "rateLimited": "Too many attempts. Try again in a few minutes.",
+        "checkoutFailed": "Stripe is not responding. Try again shortly.",
+        "portalUnavailable": "Could not open the subscription management page."
+      }
+    }
   },
   "admin": {
     "booster": {
