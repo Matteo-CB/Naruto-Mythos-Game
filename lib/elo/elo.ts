@@ -3,7 +3,7 @@
 const K_FACTOR = 32;
 const ELO_FLOOR = 100;
 const MIN_WIN_GAIN = 10;
-const MAX_LOSS = 24;
+const MAX_LOSS = 32;
 
 function getKFactor(_elo: number): number {
   return K_FACTOR;
@@ -61,25 +61,23 @@ export interface PerformanceBonus {
   isForfeit: boolean;
 }
 
-export const FORFEIT_BONUS = 5;
+export const FORFEIT_BONUS = 3;
 
 function calcScoreBonus(scoreGap: number): number {
-  if (scoreGap >= 25) return 12;
-  if (scoreGap >= 20) return 9;
-  if (scoreGap >= 15) return 6;
-  if (scoreGap >= 10) return 3;
+  if (scoreGap >= 25) return 9;
+  if (scoreGap >= 20) return 7;
+  if (scoreGap >= 15) return 5;
+  if (scoreGap >= 10) return 2;
   return 0;
 }
 
 function calcBoardBonus(loserBoardCount: number): number {
-  if (loserBoardCount <= 0) return 8;
-  if (loserBoardCount === 1) return 7;
-  if (loserBoardCount === 2) return 6;
-  if (loserBoardCount === 3) return 5;
-  if (loserBoardCount === 4) return 4;
-  if (loserBoardCount === 5) return 3;
-  if (loserBoardCount === 6) return 2;
-  if (loserBoardCount === 7) return 1;
+  if (loserBoardCount <= 0) return 6;
+  if (loserBoardCount === 1) return 5;
+  if (loserBoardCount === 2) return 4;
+  if (loserBoardCount === 3) return 3;
+  if (loserBoardCount === 4) return 2;
+  if (loserBoardCount === 5) return 1;
   return 0;
 }
 

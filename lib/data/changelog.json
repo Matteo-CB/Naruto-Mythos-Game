@@ -8,13 +8,17 @@
         "Nouvelle page Help Us : tu peux soutenir le simulateur via Stripe (don ponctuel ou abonnement mensuel) et poster ou voter des suggestions d'amélioration. Aucun avantage en jeu, c'est juste un coup de pouce. La page n'est pas dans le menu pour l'instant, accessible via /help-us.",
         "Anti-blocage chrono : si une partie reste totalement bloquée sans aucune action pendant plus de 8 minutes (les deux joueurs connectés), elle est maintenant annulée automatiquement sans changement d'ELO pour personne. Avant, le joueur qui attendait pouvait perdre 24 ELO en fermant sa fenêtre. À 5 minutes sans action, le système tente d'abord de débloquer la partie via la logique d'inactivité habituelle.",
         "Kabuto Yakushi 052 : quand tu prends le contrôle d'un Kabuto qui contrôle déjà une carte volée à l'adversaire, la carte volée passe maintenant aussi de ton côté avec lui. Avant, elle restait coincée sur la mission d'origine sous le contrôle de l'ancien joueur.",
-        "Kurenai Yûhi 035 sur Kurenai Yûhi 034 : l'upgrade coûte maintenant au minimum 1 chakra quand le -1 de Kurenai 034 s'applique, comme dit sur sa carte (« min.1 »). Avant on pouvait upgrader pour 0 chakra dans cette situation, c'était un bug."
+        "Kurenai Yûhi 035 sur Kurenai Yûhi 034 : l'upgrade coûte maintenant au minimum 1 chakra quand le -1 de Kurenai 034 s'applique, comme dit sur sa carte (« min.1 »). Avant on pouvait upgrader pour 0 chakra dans cette situation, c'était un bug.",
+        "Perte maximale d'ELO en défaite portée de 24 à 32. Conséquence : nourrir un compte secondaire fait perdre beaucoup plus au feeder quand le compte secondaire est détecté.",
+        "Bonus de performance légèrement revus à la baisse : écart de score donne désormais +2/+5/+7/+9 (au lieu de +3/+6/+9/+12), bonus de pression commence à 5 cartes adverses pour monter jusqu'à +6 (au lieu de 7 cartes jusqu'à +8), bonus de victoire par abandon passe de +5 à +3. Le maximum combiné par victoire passe de +20 à +15."
       ],
       "changes_en": [
         "New Help Us page: you can now support the simulator via Stripe (one-time donation or monthly subscription) and post or vote on improvement suggestions. No in-game perks, it is purely a thank you. The page is not in the menu yet, accessible at /help-us.",
         "Chrono stall protection: if a game gets fully stuck with no action for more than 8 minutes (both players connected), it is now automatically cancelled with no ELO change for either side. Before, the waiting player could lose 24 ELO by closing the window. At 5 minutes without action, the system first tries to resolve the situation via the regular idle path.",
         "Kabuto Yakushi 052: when you take control of a Kabuto that itself controls a card stolen from the opponent's deck, the stolen card now follows Kabuto to your side. Previously, the stolen card stayed stuck on its mission under the old controller.",
-        "Kurenai Yuhi 035 over Kurenai Yuhi 034: the upgrade now costs at least 1 chakra when Kurenai 034's -1 applies, as printed on the card (\"min.1\"). It used to be playable for 0 chakra in that case, which was a bug."
+        "Kurenai Yuhi 035 over Kurenai Yuhi 034: the upgrade now costs at least 1 chakra when Kurenai 034's -1 applies, as printed on the card (\"min.1\"). It used to be playable for 0 chakra in that case, which was a bug.",
+        "Maximum ELO loss on a defeat raised from 24 to 32. As a result, feeding a smurf account costs the feeder a lot more when the smurf is detected.",
+        "Performance bonuses slightly lowered: score gap now gives +2/+5/+7/+9 (was +3/+6/+9/+12), board pressure starts at 5 enemy characters going up to +6 (was 7 enemy chars going up to +8), forfeit-win bonus drops from +5 to +3. Maximum combined bonus per win goes from +20 to +15."
       ]
     },
     {
