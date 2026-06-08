@@ -408,6 +408,8 @@
         "discard": "{card} ({id}) : Défausse {target}.",
         "takeControl": "{card} ({id}) : Prend le contrôle de {target}.",
         "takeControlNoRepDiscard": "{card} ({id}) : Prise de contrôle de {target}, mais un perso du même nom était déjà ici, {target} défaussé (No Repetition).",
+        "controlCascade": "{card} suit son contrôleur et change de côté.",
+        "controlCascadeDiscard": "{card} suivait son contrôleur mais un perso du même nom était déjà ici, {card} défaussé (No Repetition).",
         "returnToHand": "{card} ({id}) : Renvoie {target} en main.",
         "lookAtHidden": "{card} ({id}) : Regarde le personnage caché {target}.",
         "removeTokens": "{card} ({id}) : Retire jusqu'à {amount} jetons de Puissance de {target}.",

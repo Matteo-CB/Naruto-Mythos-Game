@@ -15619,10 +15619,10 @@ export class EffectEngine {
       { card: 'Orochimaru', id: pending.sourceCardId, target: parsed.cardName },
     );
 
-    return newState;
+    return EffectEngine.cascadeControlOnTakeover(newState, targetChar.instanceId, pending.sourcePlayer);
   }
 
-  
+
   static dosuLookAtHidden(state: GameState, pending: PendingEffect, targetId: string): GameState {
     const charResult = EffectEngine.findCharByInstanceId(state, targetId);
     if (!charResult || !charResult.character.isHidden) {
@@ -18759,6 +18759,78 @@ export class EffectEngine {
   
 
   
+  static cascadeControlOnTakeover(state: GameState, controllerInstanceId: string, newController: PlayerID): GameState {
+    const toTransfer: Array<{ instanceId: string }> = [];
+    for (let mi = 0; mi < state.activeMissions.length; mi++) {
+      const mission = state.activeMissions[mi];
+      for (const side of ['player1Characters', 'player2Characters'] as const) {
+        for (const c of mission[side]) {
+          if (c.controllerInstanceId === controllerInstanceId && c.controlledBy !== newController) {
+            toTransfer.push({ instanceId: c.instanceId });
+          }
+        }
+      }
+    }
+    if (toTransfer.length === 0) return state;
+
+    const newState = deepClone(state);
+    const toSideKey: 'player1Characters' | 'player2Characters' =
+      newController === 'player1' ? 'player1Characters' : 'player2Characters';
+
+    for (const { instanceId } of toTransfer) {
+      let mission: (typeof newState.activeMissions)[number] | null = null;
+      let fromSide: 'player1Characters' | 'player2Characters' | null = null;
+      let idx = -1;
+      for (const m of newState.activeMissions) {
+        for (const side of ['player1Characters', 'player2Characters'] as const) {
+          const i = m[side].findIndex((c: CharacterInPlay) => c.instanceId === instanceId);
+          if (i >= 0) { mission = m; fromSide = side; idx = i; break; }
+        }
+        if (mission) break;
+      }
+      if (!mission || !fromSide || idx === -1) continue;
+      if (fromSide === toSideKey) continue;
+
+      const char = mission[fromSide][idx];
+      const topCardCtrl = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const charName = topCardCtrl.name_fr.toUpperCase();
+      const hasSameName = !char.isHidden && mission[toSideKey].some((c: CharacterInPlay) => {
+        if (c.isHidden || c.instanceId === char.instanceId) return false;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        return cTop.name_fr.toUpperCase() === charName;
+      });
+
+      if (hasSameName) {
+        const removed = mission[fromSide].splice(idx, 1)[0];
+        for (const stCard of removed.stack ?? [removed.card]) {
+          newState[removed.originalOwner].discardPile.push(stCard);
+        }
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, newController,
+          'EFFECT',
+          `${topCardCtrl.name_en || topCardCtrl.name_fr} transferred with its new controller but same name already in play, discarded (No Repetition).`,
+          'game.log.effect.controlCascadeDiscard',
+          { card: topCardCtrl.name_fr, card_en: topCardCtrl.name_en || topCardCtrl.name_fr, target: topCardCtrl.name_fr, target_en: topCardCtrl.name_en || topCardCtrl.name_fr },
+        );
+      } else {
+        const removed = mission[fromSide].splice(idx, 1)[0];
+        removed.controlledBy = newController;
+        mission[toSideKey].push(removed);
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, newController,
+          'EFFECT',
+          `${topCardCtrl.name_en || topCardCtrl.name_fr} follows its controller and switches sides.`,
+          'game.log.effect.controlCascade',
+          { card: topCardCtrl.name_fr, card_en: topCardCtrl.name_en || topCardCtrl.name_fr, target: topCardCtrl.name_fr, target_en: topCardCtrl.name_en || topCardCtrl.name_fr },
+        );
+      }
+    }
+
+    newState.player1.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player1');
+    newState.player2.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player2');
+    return newState;
+  }
+
   static takeControlOfEnemy(state: GameState, pending: PendingEffect, targetId: string): GameState {
     const charResult = EffectEngine.findCharByInstanceId(state, targetId);
     if (!charResult) return state;
@@ -18814,17 +18886,17 @@ export class EffectEngine {
         'game.log.effect.takeControlNoRepDiscard',
         { card: 'INO YAMANAKA', id: 'KS-020-UC', target: targetName, target_en: targetNameEn },
       );
-    } else {
-      newState.log = logAction(
-        newState.log, newState.turn, newState.phase, player,
-        'EFFECT_TAKE_CONTROL',
-        `Ino Yamanaka (020): Takes control of ${targetName} in this mission.`,
-        'game.log.effect.takeControl',
-        { card: 'INO YAMANAKA', id: 'KS-020-UC', target: targetName },
-      );
+      return newState;
     }
+    newState.log = logAction(
+      newState.log, newState.turn, newState.phase, player,
+      'EFFECT_TAKE_CONTROL',
+      `Ino Yamanaka (020): Takes control of ${targetName} in this mission.`,
+      'game.log.effect.takeControl',
+      { card: 'INO YAMANAKA', id: 'KS-020-UC', target: targetName },
+    );
 
-    return newState;
+    return EffectEngine.cascadeControlOnTakeover(newState, targetChar.instanceId, player);
   }
 
   

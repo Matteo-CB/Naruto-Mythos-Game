@@ -1,6 +1,6 @@
 import type { GameState, PlayerID, CharacterCard } from '@/lib/engine/types';
 import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
-import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
+import { calculateEffectiveCost, hasKurenai034CostReduction } from '@/lib/engine/rules/ChakraValidation';
 
 
 export function canAffordAsUpgrade(
@@ -28,7 +28,10 @@ export function canAffordAsUpgrade(
 
       if (isSameName || isFlexible) {
         const effective = calculateEffectiveCost(state, player, card as CharacterCard, missionIndex, false);
-        const upgradeCost = Math.max(0, effective - (topCard.chakra ?? 0) - costReduction);
+        let upgradeCost = Math.max(0, effective - (topCard.chakra ?? 0) - costReduction);
+        if (hasKurenai034CostReduction(state, player, card as CharacterCard, missionIndex) && upgradeCost < 1) {
+          upgradeCost = 1;
+        }
         if (ps.chakra >= upgradeCost) {
           return true;
         }
