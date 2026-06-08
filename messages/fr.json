@@ -84,8 +84,7 @@
         "confirmClose": "Abandonner cette suggestion ?",
         "confirmCloseBody": "Le brouillon sera perdu.",
         "confirmKeep": "Continuer la rédaction",
-        "confirmDiscard": "Abandonner",
-        "charsLeft": "{count} caractères"
+        "confirmDiscard": "Abandonner"
       },
       "toast": {
         "created": "Suggestion envoyée."
@@ -119,7 +118,6 @@
         "activeSubs": "Abonnés actifs"
       },
       "donations": {
-        "filtersTitle": "Filtres",
         "filterStatusAll": "Tous statuts",
         "filterModeAll": "Tous modes",
         "filterModeOneTime": "Ponctuel",
@@ -133,7 +131,6 @@
       "table": {
         "date": "Date",
         "amount": "Montant",
-        "currency": "Devise",
         "mode": "Mode",
         "status": "Statut",
         "user": "Utilisateur",
@@ -164,7 +161,6 @@
         "confirmCta": "Supprimer",
         "toastDeleted": "Suggestion supprimée.",
         "toastStatusChanged": "Statut mis à jour.",
-        "toastNoteSaved": "Note enregistrée.",
         "toastError": "Erreur, ré-essaie."
       },
       "error": {

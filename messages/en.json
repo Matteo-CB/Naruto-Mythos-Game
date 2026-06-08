@@ -84,8 +84,7 @@
         "confirmClose": "Discard this suggestion?",
         "confirmCloseBody": "The draft will be lost.",
         "confirmKeep": "Keep writing",
-        "confirmDiscard": "Discard",
-        "charsLeft": "{count} characters"
+        "confirmDiscard": "Discard"
       },
       "toast": {
         "created": "Suggestion sent."
@@ -119,7 +118,6 @@
         "activeSubs": "Active subscribers"
       },
       "donations": {
-        "filtersTitle": "Filters",
         "filterStatusAll": "All statuses",
         "filterModeAll": "All modes",
         "filterModeOneTime": "One-time",
@@ -133,7 +131,6 @@
       "table": {
         "date": "Date",
         "amount": "Amount",
-        "currency": "Currency",
         "mode": "Mode",
         "status": "Status",
         "user": "User",
@@ -164,7 +161,6 @@
         "confirmCta": "Delete",
         "toastDeleted": "Suggestion deleted.",
         "toastStatusChanged": "Status updated.",
-        "toastNoteSaved": "Note saved.",
         "toastError": "Error, try again."
       },
       "error": {
