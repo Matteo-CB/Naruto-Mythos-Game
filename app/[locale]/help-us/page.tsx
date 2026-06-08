@@ -6,6 +6,7 @@ import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
+import { DonationSection } from '@/components/help-us/DonationSection';
 
 const ACCENT = '#c4a35a';
 const HELP_US_BG = '/bgmenu/help-us-bg.webp';
@@ -43,7 +44,7 @@ export default function HelpUsPage() {
           {t('title')}
         </motion.h1>
         <motion.p
-          className="text-xs sm:text-sm tracking-widest mb-12 uppercase text-center"
+          className="text-xs sm:text-sm tracking-widest mb-10 uppercase text-center"
           style={{ color: '#888' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -51,6 +52,8 @@ export default function HelpUsPage() {
         >
           {t('subtitle')}
         </motion.p>
+
+        <DonationSection />
       </div>
 
       <Footer />
