@@ -8,53 +8,54 @@ datasource db {
 }
 
 model User {
-  id                String       @id @default(auto()) @map("_id") @db.ObjectId
-  username          String       @unique
-  email             String       @unique
-  password          String       @default("")
-  elo               Int          @default(500)
-  wins              Int          @default(0)
-  losses            Int          @default(0)
-  draws             Int          @default(0)
-  discordId         String?
-  discordUsername   String?
-  discordHighestElo Int          @default(0)
-  role              String       @default("user")
-  badgePrefs        String[]     @default([])
-  animationsEnabled Boolean      @default(true)
-  gameBackground    String       @default("default")
-  resetToken        String?
-  resetTokenExpiry  DateTime?
-  createdAt         DateTime     @default(now())
-  decks             Deck[]
-  gamesAsPlayer1    Game[]       @relation("Player1")
-  gamesAsPlayer2    Game[]       @relation("Player2")
-  friendshipsSent     Friendship[]  @relation("FriendshipSent")
-  friendshipsReceived Friendship[]  @relation("FriendshipReceived")
-  matchInvitesSent     MatchInvite[] @relation("MatchInviteSent")
-  matchInvitesReceived MatchInvite[] @relation("MatchInviteReceived")
-  eloHistory        EloHistory[]
-  accounts          Account[]
-  tournamentWins    Int          @default(0)
-  chatBanned        Boolean      @default(false)
-  chatBanUntil      DateTime?
-  gameBanned        Boolean      @default(false)
-  gameBanUntil      DateTime?
-  allowSpectatorHand Boolean     @default(false)
-  consecutiveWins    Int          @default(0)
-  consecutiveLosses  Int          @default(0)
-  evolvingElo        Int          @default(500)
-  evolvingGamesPlayed Int         @default(0)
-  evolvingWins       Int          @default(0)
-  evolvingLosses     Int          @default(0)
-  evolvingDraws      Int          @default(0)
-  unlockedVariantCardIds   String[]              @default([])
-  battlepassXp             Int                   @default(0)
-  battlepassTier           Int                   @default(0)
-  infiniteBoostersGranted  Int                   @default(0)
-  unopenedBoosters         BoosterInventory[]
-  questProgresses          QuestProgress[]
-  dailyQuestProgresses     DailyQuestProgress[]
+  id                      String               @id @default(auto()) @map("_id") @db.ObjectId
+  username                String               @unique
+  email                   String               @unique
+  password                String               @default("")
+  elo                     Int                  @default(500)
+  wins                    Int                  @default(0)
+  losses                  Int                  @default(0)
+  draws                   Int                  @default(0)
+  discordId               String?
+  discordUsername         String?
+  discordHighestElo       Int                  @default(0)
+  role                    String               @default("user")
+  badgePrefs              String[]             @default([])
+  animationsEnabled       Boolean              @default(true)
+  gameBackground          String               @default("default")
+  resetToken              String?
+  resetTokenExpiry        DateTime?
+  createdAt               DateTime             @default(now())
+  decks                   Deck[]
+  gamesAsPlayer1          Game[]               @relation("Player1")
+  gamesAsPlayer2          Game[]               @relation("Player2")
+  friendshipsSent         Friendship[]         @relation("FriendshipSent")
+  friendshipsReceived     Friendship[]         @relation("FriendshipReceived")
+  matchInvitesSent        MatchInvite[]        @relation("MatchInviteSent")
+  matchInvitesReceived    MatchInvite[]        @relation("MatchInviteReceived")
+  eloHistory              EloHistory[]
+  accounts                Account[]
+  tournamentWins          Int                  @default(0)
+  chatBanned              Boolean              @default(false)
+  chatBanUntil            DateTime?
+  gameBanned              Boolean              @default(false)
+  gameBanUntil            DateTime?
+  allowSpectatorHand      Boolean              @default(false)
+  consecutiveWins         Int                  @default(0)
+  consecutiveLosses       Int                  @default(0)
+  evolvingElo             Int                  @default(500)
+  evolvingGamesPlayed     Int                  @default(0)
+  evolvingWins            Int                  @default(0)
+  evolvingLosses          Int                  @default(0)
+  evolvingDraws           Int                  @default(0)
+  unlockedVariantCardIds  String[]             @default([])
+  battlepassXp            Int                  @default(0)
+  battlepassTier          Int                  @default(0)
+  infiniteBoostersGranted Int                  @default(0)
+  unopenedBoosters        BoosterInventory[]
+  questProgresses         QuestProgress[]
+  dailyQuestProgresses    DailyQuestProgress[]
+  stripeCustomerId        String?
 
   @@index([elo])
   @@index([createdAt])
@@ -119,22 +120,22 @@ model DailyQuestProgress {
 /// admins can audit a player's recent ELO trajectory even after the source
 /// Game has been deleted. Purged by cleanupOldEloHistory in lib/db/gameCleanup.ts.
 model EloHistory {
-  id               String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId           String    @db.ObjectId
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  gameId           String?   @db.ObjectId  // may be null after the Game is purged
-  opponentId       String?   @db.ObjectId  // nullable: opponent account might be deleted
-  opponentUsername String                  // duplicated so the row is self-describing
-  opponentElo      Int                     // opponent ELO at the time the game finished
-  oldElo           Int                     // this user's ELO BEFORE the game
-  newElo           Int                     // this user's ELO AFTER the game
-  delta            Int                     // newElo - oldElo (signed)
-  result           String                  // "win" | "loss" | "draw"
-  myScore          Int                     // mission points scored by this user
-  opponentScore    Int                     // mission points scored by the opponent
-  isRanked         Boolean   @default(true)
-  eloType          String    @default("ranked")
-  createdAt        DateTime  @default(now())
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String   @db.ObjectId
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameId           String?  @db.ObjectId // may be null after the Game is purged
+  opponentId       String?  @db.ObjectId // nullable: opponent account might be deleted
+  opponentUsername String // duplicated so the row is self-describing
+  opponentElo      Int // opponent ELO at the time the game finished
+  oldElo           Int // this user's ELO BEFORE the game
+  newElo           Int // this user's ELO AFTER the game
+  delta            Int // newElo - oldElo (signed)
+  result           String // "win" | "loss" | "draw"
+  myScore          Int // mission points scored by this user
+  opponentScore    Int // mission points scored by the opponent
+  isRanked         Boolean  @default(true)
+  eloType          String   @default("ranked")
+  createdAt        DateTime @default(now())
 
   @@index([userId, createdAt])
   @@index([createdAt])
@@ -254,7 +255,6 @@ model MatchInvite {
   expiresAt  DateTime
 }
 
-
 model BannedCard {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
   cardId   String   @unique
@@ -263,11 +263,11 @@ model BannedCard {
 }
 
 model SiteSettings {
-  id              String  @id @default(auto()) @map("_id") @db.ObjectId
-  key             String  @unique
-  leaguesEnabled  Boolean @default(false)
-  sealedEnabled   Boolean @default(false) @map("draftEnabled")
-  discordRoleIds  Json?
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  key            String  @unique
+  leaguesEnabled Boolean @default(false)
+  sealedEnabled  Boolean @default(false) @map("draftEnabled")
+  discordRoleIds Json?
 }
 
 model Tournament {
@@ -283,7 +283,7 @@ model Tournament {
   isPublic           Boolean                 @default(true)
   joinCode           String?                 @unique
   creatorId          String                  @db.ObjectId
-  creatorUsername     String
+  creatorUsername    String
   requiresDiscord    Boolean                 @default(true)
   useBanList         Boolean                 @default(true)
   sealedBoosterCount Int?
@@ -293,26 +293,26 @@ model Tournament {
   bannedCardIds      String[]                @default([])
   allowedLeagues     String[]                @default([])
   // Restricted mode constraints (gameMode = "restricted")
-  allowedGroups      String[]                @default([])  // e.g. ["Leaf Village","Sand Village"] — empty = all allowed
-  bannedGroups       String[]                @default([])  // e.g. ["Akatsuki"]
-  allowedKeywords    String[]                @default([])  // e.g. ["Team 7"] — empty = all allowed
-  bannedKeywords     String[]                @default([])  // e.g. ["Summon","Rogue Ninja"]
-  allowedRarities    String[]                @default([])  // e.g. ["C","UC","R"] — empty = all allowed
-  bannedRarities     String[]                @default([])  // e.g. ["S","M"]
-  maxPerRarity       Json?                                 // e.g. {"R":4,"S":2} — max cards per rarity
-  maxCopiesPerCard   Int?                                  // override default 2 copies limit
-  minDeckSize        Int?                                  // override default 30
-  maxDeckSize        Int?                                  // optional max deck size
-  maxChakraCost      Int?                                  // max individual card chakra cost
-  restrictionNote    String?                               // free-text note shown to players
-  prizeCardId        String?                               // Phase 6: tournament winner prize card (KS-108-MV / KS-120-MV / KS-128-MV / KS-137-MV)
+  allowedGroups      String[]                @default([]) // e.g. ["Leaf Village","Sand Village"] — empty = all allowed
+  bannedGroups       String[]                @default([]) // e.g. ["Akatsuki"]
+  allowedKeywords    String[]                @default([]) // e.g. ["Team 7"] — empty = all allowed
+  bannedKeywords     String[]                @default([]) // e.g. ["Summon","Rogue Ninja"]
+  allowedRarities    String[]                @default([]) // e.g. ["C","UC","R"] — empty = all allowed
+  bannedRarities     String[]                @default([]) // e.g. ["S","M"]
+  maxPerRarity       Json? // e.g. {"R":4,"S":2} — max cards per rarity
+  maxCopiesPerCard   Int? // override default 2 copies limit
+  minDeckSize        Int? // override default 30
+  maxDeckSize        Int? // optional max deck size
+  maxChakraCost      Int? // max individual card chakra cost
+  restrictionNote    String? // free-text note shown to players
+  prizeCardId        String? // Phase 6: tournament winner prize card (KS-108-MV / KS-120-MV / KS-128-MV / KS-137-MV)
   scheduledStartAt   DateTime?
   matchTimeLimitMs   Int                     @default(1800000)
   joinTimeLimitMs    Int                     @default(300000)
   startedAt          DateTime?
   completedAt        DateTime?
   winnerId           String?                 @db.ObjectId
-  winnerUsername      String?
+  winnerUsername     String?
   createdAt          DateTime                @default(now())
   participants       TournamentParticipant[]
   matches            TournamentMatch[]
@@ -334,8 +334,8 @@ model TournamentParticipant {
   hasBye          Boolean    @default(false)
   sealedPool      Json?
   sealedDeck      Json?
-  deckId          String?    @db.ObjectId      // Selected deck for classic/restricted modes
-  deckValid       Boolean    @default(false)   // Whether selected deck passes tournament rules
+  deckId          String?    @db.ObjectId // Selected deck for classic/restricted modes
+  deckValid       Boolean    @default(false) // Whether selected deck passes tournament rules
   joinedAt        DateTime   @default(now())
 
   @@unique([tournamentId, userId])
@@ -353,7 +353,7 @@ model TournamentMatch {
   player1Username String?
   player2Username String?
   winnerId        String?    @db.ObjectId
-  winnerUsername   String?
+  winnerUsername  String?
   isBye           Boolean    @default(false)
   status          String
   roomCode        String?
@@ -395,87 +395,132 @@ model CardIssue {
 }
 
 model ChatMessage {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  roomCode  String
-  userId    String   @db.ObjectId
-  username  String
-  message   String
-  isEmote   Boolean  @default(false)
-  isSpectator Boolean @default(false)
-  createdAt DateTime @default(now())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  roomCode    String
+  userId      String   @db.ObjectId
+  username    String
+  message     String
+  isEmote     Boolean  @default(false)
+  isSpectator Boolean  @default(false)
+  createdAt   DateTime @default(now())
 }
 
 model ChatReport {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
-  messageId       String
-  reporterId      String    @db.ObjectId
-  reporterName    String
-  targetId        String    @db.ObjectId
-  targetName      String
-  messageText     String
-  roomCode        String
-  reason          String    @default("")
-  status          String    @default("pending")
-  createdAt       DateTime  @default(now())
-  resolvedAt      DateTime?
-  resolvedBy      String?
-  action          String?
-  reporterNotified Boolean  @default(false)
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  messageId        String
+  reporterId       String    @db.ObjectId
+  reporterName     String
+  targetId         String    @db.ObjectId
+  targetName       String
+  messageText      String
+  roomCode         String
+  reason           String    @default("")
+  status           String    @default("pending")
+  createdAt        DateTime  @default(now())
+  resolvedAt       DateTime?
+  resolvedBy       String?
+  action           String?
+  reporterNotified Boolean   @default(false)
   reporterReward   Int?
 }
 
 model UserBan {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String    @db.ObjectId
-  username    String
-  type        String
-  permanent   Boolean   @default(false)
-  expiresAt   DateTime?
-  reason      String    @default("")
-  issuedBy    String    @db.ObjectId
-  createdAt   DateTime  @default(now())
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  username  String
+  type      String
+  permanent Boolean   @default(false)
+  expiresAt DateTime?
+  reason    String    @default("")
+  issuedBy  String    @db.ObjectId
+  createdAt DateTime  @default(now())
+}
+
+model Donation {
+  id                   String    @id @default(auto()) @map("_id") @db.ObjectId
+  stripeSessionId      String?   @unique
+  stripeSubscriptionId String?
+  stripeCustomerId     String?
+  stripeInvoiceId      String?   @unique
+  stripeChargeId       String?   @unique
+  userId               String?   @db.ObjectId
+  userEmail            String?
+  username             String?
+  amountCents          Int
+  currency             String    @default("eur")
+  mode                 String
+  status               String
+  isRecurring          Boolean   @default(false)
+  paidAt               DateTime?
+  createdAt            DateTime  @default(now())
+  cancelledAt          DateTime?
+  refundedAt           DateTime?
+  failureReason        String?
+  thankYouMailSentAt   DateTime?
+
+  @@index([status, createdAt])
+  @@index([isRecurring, status])
+  @@index([userId, createdAt])
+  @@index([stripeSubscriptionId])
+  @@index([createdAt])
 }
 
 model Suggestion {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String
-  category    String   // gameplay | ui | cards | balance | social | other
-  status      String   @default("backlog") // backlog | planned | in_progress | done_unpublished | done_published | rejected
-  priority    String   @default("normal") // low | normal | high | critical
-  images      String[] // base64 data URLs
-  audioUrl    String?  // base64 data URL for audio
-  submittedBy String
-  assignedTo  String?
-  updatedBy   String?
-  adminNotes  String?
-  upvotes     Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  username  String
+  category  String
+  title     String
+  body      String
+  status    String    @default("open")
+  voteCount Int       @default(0)
+  adminNote String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  closedAt  DateTime?
+
+  votes SuggestionVote[]
+
+  @@index([status, voteCount])
+  @@index([status, createdAt])
+  @@index([category, status])
+  @@index([userId, createdAt])
+}
+
+model SuggestionVote {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  suggestionId String   @db.ObjectId
+  userId       String   @db.ObjectId
+  createdAt    DateTime @default(now())
+
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+
+  @@unique([suggestionId, userId])
+  @@index([userId])
 }
 
 model VariantInventory {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  userId   String @db.ObjectId
-  cardId   String
-  count    Int    @default(1)
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  cardId String
+  count  Int    @default(1)
 
   @@unique([userId, cardId])
   @@index([userId])
 }
 
 model TradeRoom {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  creatorId     String    @db.ObjectId
-  guestId       String    @db.ObjectId
-  status        String    @default("pending")
-  creatorOffer  String[]  @default([])
-  guestOffer    String[]  @default([])
-  creatorReady  Boolean   @default(false)
-  guestReady    Boolean   @default(false)
-  completedAt   DateTime?
-  cancelledAt   DateTime?
-  createdAt     DateTime  @default(now())
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  creatorId    String    @db.ObjectId
+  guestId      String    @db.ObjectId
+  status       String    @default("pending")
+  creatorOffer String[]  @default([])
+  guestOffer   String[]  @default([])
+  creatorReady Boolean   @default(false)
+  guestReady   Boolean   @default(false)
+  completedAt  DateTime?
+  cancelledAt  DateTime?
+  createdAt    DateTime  @default(now())
 
   @@index([creatorId])
   @@index([guestId])
@@ -483,13 +528,13 @@ model TradeRoom {
 }
 
 model TradeLog {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  tradeRoomId    String   @db.ObjectId
-  senderId       String   @db.ObjectId
-  receiverId     String   @db.ObjectId
-  senderCards    String[]
-  receiverCards  String[]
-  executedAt     DateTime @default(now())
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  tradeRoomId   String   @db.ObjectId
+  senderId      String   @db.ObjectId
+  receiverId    String   @db.ObjectId
+  senderCards   String[]
+  receiverCards String[]
+  executedAt    DateTime @default(now())
 
   @@index([senderId, executedAt])
   @@index([receiverId, executedAt])
