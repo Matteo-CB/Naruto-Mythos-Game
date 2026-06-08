@@ -551,6 +551,7 @@
       "opponentLostByIdle": "Opponent stayed inactive too long",
       "youLostByIdle": "You stayed inactive too long",
       "cancelledMulliganIdle": "Game cancelled: inactivity at mulligan",
+      "cancelledStalemate": "Game cancelled: the game stalled and no action was recorded. No ELO change for either player.",
       "cancelledGeneric": "Game cancelled",
       "cancelledTitle": "Game cancelled",
       "cancelledAcknowledge": "Back to lobby",

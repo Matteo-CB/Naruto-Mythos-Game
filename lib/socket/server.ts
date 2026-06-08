@@ -214,6 +214,8 @@ export interface RoomData {
   chessClockLastInputKey: string | null;
   player1DisconnectedAt?: number | null;
   player2DisconnectedAt?: number | null;
+  lastApplyActionAt?: number;
+  stalemateNoticeAt?: number | null;
 }
 
 function clearChessClockTimers(room: RoomData): void {
@@ -225,6 +227,11 @@ function clearChessClockTimers(room: RoomData): void {
     clearTimeout(room.chessClockMulliganTimer);
     room.chessClockMulliganTimer = null;
   }
+}
+
+function markRoomProgress(room: RoomData): void {
+  room.lastApplyActionAt = Date.now();
+  room.stalemateNoticeAt = null;
 }
 
 export function whoseInputIsAwaited(state: GameState | null): PlayerID | null {
@@ -424,6 +431,7 @@ function applyChessClockIdleAuto(room: RoomData, player: PlayerID, io: SocketIOS
   emitDrawDiffEvents(oldState, newState);
   emitTokenDiffEvents(oldState, newState);
   room.gameState = newState;
+  markRoomProgress(room);
   room.chessClock = consumeChessClockIdleWarning(room.chessClock);
   console.log(`[ChessClock] ${room.code}: auto-${action.type} for ${player} (idle warning consumed)`);
   const winner = GameEngine.getWinner(room.gameState);
@@ -509,7 +517,8 @@ export function stopChessClockTickLoop(room: RoomData): void {
 
 const CHESS_CLOCK_WATCHDOG_INTERVAL_MS = 30_000;
 
-
+export const STALEMATE_NO_PROGRESS_MS = 5 * 60 * 1000;
+export const STALEMATE_CANCEL_MS = 8 * 60 * 1000;
 
 
 const DISCONNECT_HARD_FORFEIT_MS = CHESS_CLOCK_DISCONNECT_FORFEIT_MS;
@@ -532,6 +541,7 @@ export function chessClockWatchdog(io: SocketIOServer): void {
         console.warn(`[ChessClockWatchdog] ${code}: missionScoringComplete stuck (auto-advance setTimeout missed), forcing ADVANCE_PHASE`);
         try {
           room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'ADVANCE_PHASE' });
+          markRoomProgress(room);
           broadcastState(room, io);
           const winnerAfter = GameEngine.getWinner(room.gameState);
           if (winnerAfter) {
@@ -576,6 +586,32 @@ export function chessClockWatchdog(io: SocketIOServer): void {
         console.warn(`[ChessClockWatchdog] ${code}: player2 disconnected ${Math.round((now - p2Disc) / 1000)}s, force forfeit`);
         handleChessClockExpiry(room, 'player2', io, 'disconnect');
         continue;
+      }
+
+      if (typeof room.lastApplyActionAt !== 'number') {
+        room.lastApplyActionAt = now;
+        continue;
+      }
+      const sinceApply = now - room.lastApplyActionAt;
+      if (sinceApply >= STALEMATE_CANCEL_MS && !p1Disc && !p2Disc) {
+        console.warn(`[ChessClockWatchdog] ${code}: stalemate detected (no action applied for ${Math.round(sinceApply / 1000)}s, no disconnect), cancelling game with NO elo impact`);
+        cancelGameNoElo(room, code, io, 'stalemate').catch((err) => {
+          console.error(`[ChessClockWatchdog] ${code}: cancelGameNoElo failed:`, err instanceof Error ? err.message : err);
+        });
+        continue;
+      }
+      if (sinceApply >= STALEMATE_NO_PROGRESS_MS && !p1Disc && !p2Disc) {
+        if (!room.stalemateNoticeAt) {
+          room.stalemateNoticeAt = now;
+          console.warn(`[ChessClockWatchdog] ${code}: no progress for ${Math.round(sinceApply / 1000)}s, idle handler will be triggered next tick`);
+          if (needed) {
+            try {
+              handleChessClockIdleLimit(room, needed, io);
+            } catch (err) {
+              console.error(`[ChessClockWatchdog] ${code}: forced idle handler failed:`, err instanceof Error ? err.message : err);
+            }
+          }
+        }
       }
     } catch (err) {
       console.error(`[ChessClockWatchdog] ${code} error:`, err instanceof Error ? err.message : err);
@@ -1403,6 +1439,58 @@ function clearMulliganTimer(room: RoomData): void {
     room.chessClockMulliganTimer = null;
   }
   room.mulliganDeadline = null;
+}
+
+export type CancelGameReason = 'mulligan-idle' | 'stalemate';
+
+export async function cancelGameNoElo(
+  room: RoomData,
+  code: string,
+  io: SocketIOServer,
+  reason: CancelGameReason,
+): Promise<void> {
+  if (!room.gameState || room.finalized) return;
+  room.finalized = true;
+  clearMulliganTimer(room);
+  clearChessClockTimers(room);
+  clearTournamentJoinTimer(room);
+  if (room.sealedTimer) {
+    clearTimeout(room.sealedTimer);
+    room.sealedTimer = null;
+    room.sealedDeadline = null;
+  }
+  if (room.tournamentGameTimer) {
+    clearTimeout(room.tournamentGameTimer);
+    room.tournamentGameTimer = null;
+  }
+  room.chessClock = disarmChessClock(room.chessClock, Date.now());
+  room.chessClockLastInputKey = null;
+
+  const cancelPayload = { reason, roomCode: code };
+  if (room.hostSocket) io.to(room.hostSocket).emit('game:cancelled', cancelPayload);
+  if (room.guestSocket) io.to(room.guestSocket).emit('game:cancelled', cancelPayload);
+  if (room.spectators.size > 0) {
+    io.to(`spec:${code}`).emit('game:cancelled', cancelPayload);
+  }
+
+  const gameId = room.gameState.gameId;
+  if (gameId) {
+    try {
+      await prisma.game.deleteMany({ where: { id: gameId } });
+    } catch (err) {
+      console.warn(`[CancelGame] ${reason}: failed to delete game record:`, err instanceof Error ? err.message : err);
+    }
+  }
+
+  broadcastActiveGames(io);
+
+  setTimeout(() => {
+    if (!rooms.has(code)) return;
+    if (room.hostSocket) playerRooms.delete(room.hostSocket);
+    if (room.guestSocket) playerRooms.delete(room.guestSocket);
+    for (const [, spec] of room.spectators) playerRooms.delete(spec.socketId);
+    rooms.delete(code);
+  }, 5_000);
 }
 
 export async function handleMulliganIdleTimeout(
@@ -2744,6 +2832,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
           data.action,
         );
 
+        markRoomProgress(room);
+
         emitDrawDiffEvents(prevState, room.gameState);
         emitTokenDiffEvents(prevState, room.gameState);
 
@@ -2857,6 +2947,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               if (!rooms.has(code)) return;
               if (!room.gameState || !room.gameState.missionScoringComplete) return;
               room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'ADVANCE_PHASE' });
+              markRoomProgress(room);
               broadcastState(room, io);
               const winnerAfterEnd = GameEngine.getWinner(room.gameState);
               if (winnerAfterEnd) {

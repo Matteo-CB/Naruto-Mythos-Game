@@ -40,7 +40,7 @@ export function computeChessClockIdleMs(
   return Math.max(0, now - state.idleStartedAt);
 }
 
-export function buildGameCancelledStateReset(reason: 'mulligan-idle', roomCode: string) {
+export function buildGameCancelledStateReset(reason: 'mulligan-idle' | 'stalemate', roomCode: string) {
   return {
     gameCancelled: { reason, roomCode },
     gameEnded: false,
@@ -116,7 +116,7 @@ interface SocketStore {
       isForfeit: boolean;
     } | null;
   } | null;
-  gameCancelled: { reason: 'mulligan-idle'; roomCode: string } | null;
+  gameCancelled: { reason: 'mulligan-idle' | 'stalemate'; roomCode: string } | null;
   chessClock: ChessClockBroadcast | null;
   playerNames: { player1: string; player2: string } | null;
 
@@ -581,7 +581,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         });
       });
 
-      socket.on('game:cancelled', (data: { reason: 'mulligan-idle'; roomCode: string }) => {
+      socket.on('game:cancelled', (data: { reason: 'mulligan-idle' | 'stalemate'; roomCode: string }) => {
         console.log('[Socket] Game cancelled:', data.reason, 'roomCode:', data.roomCode);
         const resyncT = get()._resyncTimer;
         if (resyncT) clearInterval(resyncT);

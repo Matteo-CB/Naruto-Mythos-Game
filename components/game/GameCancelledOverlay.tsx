@@ -37,6 +37,8 @@ export const GameCancelledOverlay = React.memo(function GameCancelledOverlay({ o
   const message =
     gameCancelled.reason === 'mulligan-idle'
       ? t('cancelledMulliganIdle')
+      : gameCancelled.reason === 'stalemate'
+      ? t('cancelledStalemate')
       : t('cancelledGeneric');
 
   return (

@@ -551,6 +551,7 @@
       "opponentLostByIdle": "L'adversaire est resté inactif trop longtemps",
       "youLostByIdle": "Vous êtes resté inactif trop longtemps",
       "cancelledMulliganIdle": "Partie annulée : inactivité au mulligan",
+      "cancelledStalemate": "Partie annulée : la partie était bloquée et plus aucune action n'a été enregistrée. Aucun changement d'ELO pour personne.",
       "cancelledGeneric": "Partie annulée",
       "cancelledTitle": "Partie annulée",
       "cancelledAcknowledge": "Retour au lobby",
