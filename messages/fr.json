@@ -1717,6 +1717,13 @@
     "switchPerspective": "Voir comme {player}",
     "replayComplete": "Replay terminé"
   },
+  "room": {
+    "error": {
+      "rankedEmailNotVerified": "Vérifie ton email avant de lancer une partie classée.",
+      "rankedNeedCasualGames": "Joue {needed} partie(s) casual de plus pour débloquer le classé.",
+      "evolvingNoDeck": "Il te faut un deck Evolving pour ce mode."
+    }
+  },
   "auth": {
     "signIn": "Se Connecter",
     "email": "Email",
@@ -1759,8 +1766,34 @@
       "invalidEmail": "Format e-mail invalide.",
       "passwordTooShort": "Le mot de passe doit faire au moins 6 caractères.",
       "alreadyTaken": "Pseudo ou e-mail déjà utilisé.",
+      "emailBaseTaken": "Un compte existe déjà pour ce courriel (variantes incluses).",
+      "verifyTokenInvalid": "Lien de vérification invalide.",
+      "verifyTokenExpired": "Ce lien de vérification a expiré.",
+      "verifyResendCooldown": "Patiente une minute avant de redemander un email.",
+      "verifyResendFailed": "Impossible d'envoyer le mail. Réessaie plus tard.",
+      "loginRequired": "Connecte-toi d'abord.",
+      "userNotFound": "Utilisateur introuvable.",
       "serverError": "Erreur serveur. Veuillez réessayer.",
       "notAuthenticated": "Vous devez être connecté."
+    },
+    "verifyEmail": {
+      "title": "Vérification de l'email",
+      "loading": "Vérification en cours...",
+      "successPrefix": "C'est bon",
+      "successRedirect": "Tu es redirigé vers l'accueil...",
+      "expired": "Ce lien a expiré.",
+      "invalid": "Ce lien est invalide ou déjà utilisé.",
+      "networkError": "Erreur réseau, ré-essaie.",
+      "retry": "Réessayer",
+      "requestNew": "Demander un nouveau lien",
+      "home": "Retour à l'accueil",
+      "pendingTitle": "Vérifie ton email",
+      "pendingBody": "On t'a envoyé un mail à ton adresse. Clique sur le lien pour activer ton compte. Tant que ton email n'est pas vérifié, tu ne peux pas jouer en classé.",
+      "resend": "Renvoyer le mail",
+      "resending": "Envoi...",
+      "resent": "Mail renvoyé",
+      "resendError": "Impossible de renvoyer le mail.",
+      "backHome": "Retour à l'accueil"
     }
   },
   "card": {

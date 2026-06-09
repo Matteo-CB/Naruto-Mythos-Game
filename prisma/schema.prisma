@@ -25,6 +25,11 @@ model User {
   gameBackground          String               @default("default")
   resetToken              String?
   resetTokenExpiry        DateTime?
+  emailBase               String?
+  emailVerified           Boolean              @default(false)
+  emailVerifyToken        String?
+  emailVerifyExpiry       DateTime?
+  casualGamesPlayed       Int                  @default(0)
   createdAt               DateTime             @default(now())
   decks                   Deck[]
   gamesAsPlayer1          Game[]               @relation("Player1")

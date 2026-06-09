@@ -6,6 +6,8 @@ import { registerUserSocket, removeSocketFromAll } from '@/lib/socket/io';
 import { prisma } from '@/lib/db/prisma';
 import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
 import { calculateEloChanges, calculatePerformanceBonus, type PerformanceBonus } from '@/lib/elo/elo';
+import { checkRankedGate } from '@/lib/auth/rankedGate';
+import { computeRepeatOpponentMultiplier } from '@/lib/elo/repeatOpponent';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
 import { sendRankUpNotification } from '@/lib/discord/rankUpWebhook';
 import { registerTournamentHandlers, handleTournamentMatchEnd, rehydrateAbsenceTimers, sweepOrphanTournamentMatches } from '@/lib/socket/tournamentHandlers';
@@ -974,7 +976,7 @@ async function finalizeGameEnd(
       } else if (player1 && player2) {
         const p1OldElo = getElo(player1);
         const p2OldElo = getElo(player2);
-        const changes = calculateEloChanges({
+        const rawChanges = calculateEloChanges({
           player1Elo: p1OldElo,
           player2Elo: p2OldElo,
           winner: winner === 'player1' ? 'player1' : 'player2',
@@ -986,6 +988,33 @@ async function finalizeGameEnd(
           player2ConsecLosses: player2.consecutiveLosses ?? 0,
           performanceBonus,
         });
+
+        let changes = rawChanges;
+        try {
+          const priorPairCount = await prisma.eloHistory.count({
+            where: {
+              userId: room.hostId,
+              opponentId: room.guestId,
+              eloType,
+              createdAt: { gt: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+            },
+          });
+          const decay = computeRepeatOpponentMultiplier(priorPairCount);
+          if (decay.multiplier < 1) {
+            const decayedP1Delta = Math.round(rawChanges.player1Delta * decay.multiplier);
+            const decayedP2Delta = Math.round(rawChanges.player2Delta * decay.multiplier);
+            changes = {
+              ...rawChanges,
+              player1Delta: decayedP1Delta,
+              player2Delta: decayedP2Delta,
+              player1NewElo: Math.max(100, p1OldElo + decayedP1Delta),
+              player2NewElo: Math.max(100, p2OldElo + decayedP2Delta),
+            };
+            console.log(`[ELO] Repeat-opponent decay applied: pair=${room.hostId}/${room.guestId} prior=${priorPairCount} tier=${decay.tier} multiplier=${decay.multiplier}`);
+          }
+        } catch (err) {
+          console.warn('[ELO] repeat-opponent count failed, falling back to full ELO:', err instanceof Error ? err.message : err);
+        }
 
         const p1Stats = winner === 'player1' ? buildWinStats() : buildLossStats();
         const p2Stats = winner === 'player2' ? buildWinStats() : buildLossStats();
@@ -1115,6 +1144,11 @@ async function finalizeGameEnd(
           sendRankUpNotification(player2.username, player2.discordId, p2OldElo, changes.player2NewElo, p2OldTotal, p2OldTotal + 1).catch(() => {});
         }
       }
+    } else if (!room.isRanked && room.hostId && room.guestId) {
+      await Promise.all([
+        prisma.user.update({ where: { id: room.hostId }, data: { casualGamesPlayed: { increment: 1 } } as never }).catch(() => {}),
+        prisma.user.update({ where: { id: room.guestId! }, data: { casualGamesPlayed: { increment: 1 } } as never }).catch(() => {}),
+      ]);
     }
   } catch (eloErr) {
     const errMsg = eloErr instanceof Error ? eloErr.message : String(eloErr);
@@ -2026,6 +2060,27 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       const evolvingFlag = data.isEvolving === true || baseMode === 'evolving';
       const isRankedFlag = baseMode === 'ranked' || baseMode === 'evolving' || (data.isRanked === true && baseMode !== 'sealed');
+
+      if (isRankedFlag) {
+        const gateUser = await prisma.user.findUnique({
+          where: { id: data.userId },
+          select: { casualGamesPlayed: true, emailVerified: true, role: true } as never,
+        }) as { casualGamesPlayed: number; emailVerified: boolean; role: string } | null;
+        const gate = checkRankedGate(gateUser ?? {});
+        if (!gate.allowed) {
+          const errorKey = gate.reason === 'emailNotVerified'
+            ? 'room.error.rankedEmailNotVerified'
+            : 'room.error.rankedNeedCasualGames';
+          socket.emit('room:error', {
+            message: gate.reason === 'emailNotVerified'
+              ? 'Verify your email to play ranked.'
+              : `Play ${gate.needed} more casual game${(gate.needed ?? 0) > 1 ? 's' : ''} to unlock ranked.`,
+            errorKey,
+            needed: gate.needed,
+          });
+          return;
+        }
+      }
       const gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' =
         baseMode === 'sealed' ? 'sealed' :
         evolvingFlag && isRankedFlag ? 'evolving' :
