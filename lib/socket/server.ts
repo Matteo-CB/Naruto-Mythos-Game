@@ -3230,6 +3230,27 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const wantEvolving = data.isEvolving === true;
       console.log(`[Socket] User ${data.userId} joining matchmaking (ranked: ${wantRanked}, evolving: ${wantEvolving})`);
 
+      if (wantRanked || wantEvolving) {
+        const gateUserMM = await prisma.user.findUnique({
+          where: { id: data.userId },
+          select: { casualGamesPlayed: true, emailVerified: true, role: true } as never,
+        }) as { casualGamesPlayed: number; emailVerified: boolean; role: string } | null;
+        const gateMM = checkRankedGate(gateUserMM ?? {});
+        if (!gateMM.allowed) {
+          const errorKey = gateMM.reason === 'emailNotVerified'
+            ? 'room.error.rankedEmailNotVerified'
+            : 'room.error.rankedNeedCasualGames';
+          socket.emit('game:error', {
+            message: gateMM.reason === 'emailNotVerified'
+              ? 'Verify your email to play ranked.'
+              : `Play ${gateMM.needed} more casual game${(gateMM.needed ?? 0) > 1 ? 's' : ''} to unlock ranked.`,
+            errorKey,
+            needed: gateMM.needed,
+          });
+          return;
+        }
+      }
+
       if (wantEvolving) {
         const has = await userHasEvolvingDeck(data.userId);
         if (!has) {

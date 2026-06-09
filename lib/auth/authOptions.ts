@@ -120,10 +120,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         if (existingUser) {
-          
+
           await prisma.user.update({
             where: { id: existingUser.id },
-            data: { discordUsername },
+            data: { discordUsername, emailVerified: true } as never,
           });
 
           
@@ -175,10 +175,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         if (existingAccount) {
-          
+
           await prisma.user.update({
             where: { id: existingAccount.userId },
-            data: { discordId, discordUsername },
+            data: { discordId, discordUsername, emailVerified: true } as never,
           });
 
           user.id = existingAccount.user.id;
@@ -209,7 +209,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (emailMatch) {
           await prisma.user.update({
             where: { id: emailMatch.id },
-            data: { discordId, discordUsername },
+            data: { discordId, discordUsername, emailVerified: true } as never,
           });
           await prisma.account.create({
             data: {
@@ -237,12 +237,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           data: {
             username: finalUsername,
             email,
-            password: '', // No password for OAuth users
+            password: '',
             discordId,
             discordUsername,
             elo: 500,
-          },
-        });
+            emailVerified: true,
+          } as never,
+        }) as { id: string; username: string; email: string };
 
         await prisma.account.create({
           data: {
