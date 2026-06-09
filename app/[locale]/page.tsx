@@ -70,12 +70,12 @@ const floatingElements = [
 
 const menuButtons = [
   { key: 'play' as const,          href: '/play',         primary: true  },
-  { key: 'customization' as const, href: '/settings',     primary: false },
   { key: 'deckBuilder' as const,   href: '/deck-builder', primary: false },
   { key: 'collection' as const,    href: '/collection',   primary: false },
   { key: 'leaderboard' as const,   href: '/leaderboard',  primary: false },
   { key: 'tournaments' as const,   href: '/tournaments',  primary: false },
   { key: 'battlepass' as const,    href: '/battlepass',   primary: false },
+  { key: 'helpUs' as const,        href: '/help-us',      primary: false },
 ];
 
 
@@ -317,31 +317,10 @@ export default function Home() {
             >
               {session ? (
                 <>
-                  <Link
-                    href={`/profile/${encodeURIComponent(session.user?.name ?? '')}`}
-                    className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
-                    style={{
-                      backgroundColor: 'transparent',
-                      border: '1px solid #c4a35a',
-                      color: '#c4a35a',
-                    }}
-                    onMouseEnter={(e) => {
-                      const target = e.currentTarget as HTMLElement;
-                      target.style.backgroundColor = 'rgba(196, 163, 90, 0.08)';
-                      target.style.boxShadow = '0 0 16px rgba(196, 163, 90, 0.12)';
-                    }}
-                    onMouseLeave={(e) => {
-                      const target = e.currentTarget as HTMLElement;
-                      target.style.backgroundColor = 'transparent';
-                      target.style.boxShadow = 'none';
-                    }}
-                  >
-                    {t('profile')}
-                  </Link>
                   {session?.user?.email === 'matteo.biyikli3224@gmail.com' && (
                     <Link
                       href="/admin"
-                      className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
+                      className="flex h-9 basis-full items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                       style={{
                         backgroundColor: 'transparent',
                         border: '1px solid #ef4444',
@@ -364,7 +343,7 @@ export default function Home() {
                   {!(session.user as Record<string, unknown>)?.discordId && (
                     <a
                       href="/api/user/link-discord"
-                      className="flex h-9 flex-1 items-center justify-center gap-1.5 text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
+                      className="flex h-9 basis-full items-center justify-center gap-1.5 text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                       style={{
                         backgroundColor: 'transparent',
                         border: '1px solid #5865F2',
@@ -387,6 +366,48 @@ export default function Home() {
                       {td('linkDiscord')}
                     </a>
                   )}
+                  <Link
+                    href={`/profile/${encodeURIComponent(session.user?.name ?? '')}`}
+                    className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: '1px solid #c4a35a',
+                      color: '#c4a35a',
+                    }}
+                    onMouseEnter={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.backgroundColor = 'rgba(196, 163, 90, 0.08)';
+                      target.style.boxShadow = '0 0 16px rgba(196, 163, 90, 0.12)';
+                    }}
+                    onMouseLeave={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.backgroundColor = 'transparent';
+                      target.style.boxShadow = 'none';
+                    }}
+                  >
+                    {t('profile')}
+                  </Link>
+                  <Link
+                    href="/settings"
+                    className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: '1px solid #c4a35a',
+                      color: '#c4a35a',
+                    }}
+                    onMouseEnter={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.backgroundColor = 'rgba(196, 163, 90, 0.08)';
+                      target.style.boxShadow = '0 0 16px rgba(196, 163, 90, 0.12)';
+                    }}
+                    onMouseLeave={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.backgroundColor = 'transparent';
+                      target.style.boxShadow = 'none';
+                    }}
+                  >
+                    {t('customization')}
+                  </Link>
                   <button
                     onClick={() => signOut({ callbackUrl: '/' })}
                     className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all cursor-pointer sm:h-10 sm:text-sm"

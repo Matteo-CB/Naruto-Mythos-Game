@@ -88,13 +88,20 @@ export async function createDonationCheckout(params: CreateDonationCheckoutParam
   if (mode === 'subscription' && customerId) {
     sessionParams.customer = customerId;
     sessionParams.subscription_data = {
+      description: 'Naruto Mythos TCG',
       metadata: {
         userId: userId ?? '',
         amountCents: String(amountCents),
       },
     };
-  } else if (userEmail) {
-    sessionParams.customer_email = userEmail;
+  } else {
+    sessionParams.payment_intent_data = {
+      statement_descriptor: 'NARUTO MYTHOS',
+      description: 'Naruto Mythos TCG',
+    };
+    if (userEmail) {
+      sessionParams.customer_email = userEmail;
+    }
   }
 
   const session = await stripe.checkout.sessions.create(sessionParams);

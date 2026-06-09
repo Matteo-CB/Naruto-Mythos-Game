@@ -123,7 +123,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           await prisma.user.update({
             where: { id: existingUser.id },
-            data: { discordUsername, emailVerified: true } as never,
+            data: { discordUsername } as never,
           });
 
           
@@ -178,7 +178,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           await prisma.user.update({
             where: { id: existingAccount.userId },
-            data: { discordId, discordUsername, emailVerified: true } as never,
+            data: { discordId, discordUsername } as never,
           });
 
           user.id = existingAccount.user.id;
@@ -209,7 +209,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (emailMatch) {
           await prisma.user.update({
             where: { id: emailMatch.id },
-            data: { discordId, discordUsername, emailVerified: true } as never,
+            data: { discordId, discordUsername } as never,
           });
           await prisma.account.create({
             data: {
@@ -241,7 +241,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             discordId,
             discordUsername,
             elo: 500,
-            emailVerified: true,
           } as never,
         }) as { id: string; username: string; email: string };
 
@@ -287,13 +286,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.id as string },
-            select: { username: true, discordId: true, role: true, emailVerified: true, casualGamesPlayed: true } as never,
-          }) as { username: string; discordId: string | null; role: string; emailVerified: boolean; casualGamesPlayed: number } | null;
+            select: { username: true, discordId: true, role: true } as never,
+          }) as { username: string; discordId: string | null; role: string } | null;
           if (dbUser?.username) token.name = dbUser.username;
           token.discordId = dbUser?.discordId ?? null;
           token.role = dbUser?.role ?? 'user';
-          (token as Record<string, unknown>).emailVerified = dbUser?.emailVerified ?? false;
-          (token as Record<string, unknown>).casualGamesPlayed = dbUser?.casualGamesPlayed ?? 0;
         } catch {
           
         }
@@ -307,8 +304,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.name = token.name as string;
         (session.user as unknown as Record<string, unknown>).discordId = token.discordId as string | null;
         (session.user as unknown as Record<string, unknown>).role = token.role as string ?? 'user';
-        (session.user as unknown as Record<string, unknown>).emailVerified = (token as Record<string, unknown>).emailVerified ?? false;
-        (session.user as unknown as Record<string, unknown>).casualGamesPlayed = (token as Record<string, unknown>).casualGamesPlayed ?? 0;
       }
       return session;
     },

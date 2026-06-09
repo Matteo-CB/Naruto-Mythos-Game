@@ -40,8 +40,8 @@ export function renderThankYouHtml(params: ThankYouMailParams): string {
     : `Thanks for your ${recurring ? `${amount}/month subscription` : `${amount} donation`}. Supporters like you are why the simulator can keep growing.`;
 
   const feedback = locale === 'fr'
-    ? `Si tu as des questions ou des idées d'amélioration, écris à <a href="mailto:matteo.biyikli3224@gmail.com" style="color:#c4a35a;">matteo.biyikli3224@gmail.com</a> ou poste une suggestion sur <a href="${APP_URL}/fr/help-us" style="color:#c4a35a;">help-us</a>.`
-    : `If you have questions or ideas, reach out at <a href="mailto:matteo.biyikli3224@gmail.com" style="color:#c4a35a;">matteo.biyikli3224@gmail.com</a> or post a suggestion at <a href="${APP_URL}/en/help-us" style="color:#c4a35a;">help-us</a>.`;
+    ? `Si tu as des questions ou des idées d'amélioration, rejoins le <a href="https://discord.gg/BBXVUsU3hn" style="color:#c4a35a;">Discord du serveur</a> ou poste une suggestion sur <a href="${APP_URL}/fr/help-us" style="color:#c4a35a;">la page Contribuer</a>.`
+    : `If you have questions or ideas, join the <a href="https://discord.gg/BBXVUsU3hn" style="color:#c4a35a;">server Discord</a> or post a suggestion on <a href="${APP_URL}/en/help-us" style="color:#c4a35a;">the Contribute page</a>.`;
 
   const portalBlock = recurring && managePortalUrl
     ? `<p style="text-align: center; color: #888888; font-size: 13px; margin-top: 24px;">
@@ -50,8 +50,12 @@ export function renderThankYouHtml(params: ThankYouMailParams): string {
     : '';
 
   const signoff = locale === 'fr'
-    ? 'A bientôt sur le simulateur.'
+    ? 'À bientôt sur le simulateur.'
     : 'See you on the simulator.';
+
+  const signature = locale === 'fr'
+    ? 'Kutayt (dev du simulateur)'
+    : 'Kutayt (simulator dev)';
 
   return `
     <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #0a0a0a; color: #e0e0e0;">
@@ -63,7 +67,7 @@ export function renderThankYouHtml(params: ThankYouMailParams): string {
       <p style="color: #888888; font-size: 13px; line-height: 1.6; margin-top: 24px;">${feedback}</p>
       ${portalBlock}
       <p style="text-align: center; color: #888888; font-size: 13px; margin-top: 32px;">${signoff}</p>
-      <p style="text-align: center; color: #555555; font-size: 11px; margin-top: 8px;">L'équipe Naruto Mythos TCG</p>
+      <p style="text-align: center; color: #555555; font-size: 11px; margin-top: 8px;">${signature}</p>
     </div>
   `;
 }

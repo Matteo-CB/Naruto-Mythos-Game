@@ -6,7 +6,6 @@ import { registerUserSocket, removeSocketFromAll } from '@/lib/socket/io';
 import { prisma } from '@/lib/db/prisma';
 import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
 import { calculateEloChanges, calculatePerformanceBonus, type PerformanceBonus } from '@/lib/elo/elo';
-import { checkRankedGate } from '@/lib/auth/rankedGate';
 import { computeRepeatOpponentMultiplier } from '@/lib/elo/repeatOpponent';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
 import { sendRankUpNotification } from '@/lib/discord/rankUpWebhook';
@@ -1175,11 +1174,6 @@ async function finalizeGameEnd(
           sendRankUpNotification(player2.username, player2.discordId, p2OldElo, changes.player2NewElo, p2OldTotal, p2OldTotal + 1).catch(() => {});
         }
       }
-    } else if (!room.isRanked && room.hostId && room.guestId) {
-      await Promise.all([
-        prisma.user.update({ where: { id: room.hostId }, data: { casualGamesPlayed: { increment: 1 } } as never }).catch(() => {}),
-        prisma.user.update({ where: { id: room.guestId! }, data: { casualGamesPlayed: { increment: 1 } } as never }).catch(() => {}),
-      ]);
     }
   } catch (eloErr) {
     const errMsg = eloErr instanceof Error ? eloErr.message : String(eloErr);
@@ -2092,26 +2086,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const evolvingFlag = data.isEvolving === true || baseMode === 'evolving';
       const isRankedFlag = baseMode === 'ranked' || baseMode === 'evolving' || (data.isRanked === true && baseMode !== 'sealed');
 
-      if (isRankedFlag) {
-        const gateUser = await prisma.user.findUnique({
-          where: { id: data.userId },
-          select: { casualGamesPlayed: true, emailVerified: true, role: true } as never,
-        }) as { casualGamesPlayed: number; emailVerified: boolean; role: string } | null;
-        const gate = checkRankedGate(gateUser ?? {});
-        if (!gate.allowed) {
-          const errorKey = gate.reason === 'emailNotVerified'
-            ? 'room.error.rankedEmailNotVerified'
-            : 'room.error.rankedNeedCasualGames';
-          socket.emit('room:error', {
-            message: gate.reason === 'emailNotVerified'
-              ? 'Verify your email to play ranked.'
-              : `Play ${gate.needed} more casual game${(gate.needed ?? 0) > 1 ? 's' : ''} to unlock ranked.`,
-            errorKey,
-            needed: gate.needed,
-          });
-          return;
-        }
-      }
       const gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' =
         baseMode === 'sealed' ? 'sealed' :
         evolvingFlag && isRankedFlag ? 'evolving' :
@@ -3260,27 +3234,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const wantRanked = data.isRanked ?? true;
       const wantEvolving = data.isEvolving === true;
       console.log(`[Socket] User ${data.userId} joining matchmaking (ranked: ${wantRanked}, evolving: ${wantEvolving})`);
-
-      if (wantRanked || wantEvolving) {
-        const gateUserMM = await prisma.user.findUnique({
-          where: { id: data.userId },
-          select: { casualGamesPlayed: true, emailVerified: true, role: true } as never,
-        }) as { casualGamesPlayed: number; emailVerified: boolean; role: string } | null;
-        const gateMM = checkRankedGate(gateUserMM ?? {});
-        if (!gateMM.allowed) {
-          const errorKey = gateMM.reason === 'emailNotVerified'
-            ? 'room.error.rankedEmailNotVerified'
-            : 'room.error.rankedNeedCasualGames';
-          socket.emit('game:error', {
-            message: gateMM.reason === 'emailNotVerified'
-              ? 'Verify your email to play ranked.'
-              : `Play ${gateMM.needed} more casual game${(gateMM.needed ?? 0) > 1 ? 's' : ''} to unlock ranked.`,
-            errorKey,
-            needed: gateMM.needed,
-          });
-          return;
-        }
-      }
 
       if (wantEvolving) {
         const has = await userHasEvolvingDeck(data.userId);

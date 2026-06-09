@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
 import { prisma } from '@/lib/db/prisma';
 import { validateUsername } from '@/lib/auth/usernameValidator';
 import { normalizeEmailBase } from '@/lib/auth/emailBase';
-import { sendVerifyEmail } from '@/lib/email/sendVerifyEmail';
-import { ADMIN_EMAILS, ADMIN_USERNAMES } from '@/lib/auth/admins';
-
-const adminEmailSet = new Set<string>(ADMIN_EMAILS.map((e) => e.toLowerCase()));
-const adminUsernameSet = new Set<string>(ADMIN_USERNAMES.map((u) => u.toLowerCase()));
-const VERIFY_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 
 const registerRate = new Map<string, number[]>();
 const REGISTER_WINDOW_MS = 60 * 60 * 1000;
@@ -106,36 +99,18 @@ export async function POST(request: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const isAdminAccount =
-      adminEmailSet.has(email.toLowerCase()) || adminUsernameSet.has(username.toLowerCase());
-
-    const verifyToken = isAdminAccount ? null : crypto.randomBytes(32).toString('hex');
-    const verifyExpiry = isAdminAccount ? null : new Date(Date.now() + VERIFY_TOKEN_TTL_MS);
-
     const user = await prisma.user.create({
       data: {
         username,
         email,
         password: hashedPassword,
         emailBase,
-        emailVerified: isAdminAccount,
-        emailVerifyToken: verifyToken,
-        emailVerifyExpiry: verifyExpiry,
       } as never,
-    }) as { id: string; username: string; email: string; elo: number; emailVerified: boolean };
+    }) as { id: string; username: string; email: string; elo: number };
 
     await prisma.boosterInventory.create({
       data: { userId: user.id, setId: 'KS', count: 2 },
     }).catch(() => {});
-
-    if (verifyToken) {
-      const locale = typeof body.locale === 'string' && body.locale === 'fr' ? 'fr' : 'en';
-      try {
-        await sendVerifyEmail(email, verifyToken, locale);
-      } catch (err) {
-        console.error('[register] verify email send failed:', err instanceof Error ? err.message : err);
-      }
-    }
 
     return NextResponse.json(
       {
@@ -143,7 +118,6 @@ export async function POST(request: NextRequest) {
         username: user.username,
         email: user.email,
         elo: user.elo,
-        emailVerified: user.emailVerified,
       },
       { status: 201 },
     );

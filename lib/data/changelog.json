@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "date": "2026-06-09",
+      "title_fr": "Menu réorganisé, gestion d'abonnement dans Options et accès direct au classé",
+      "title_en": "Menu reorganized, subscription management in Options and direct access to ranked",
+      "changes_fr": [
+        "Nouveau bouton Suggestions dans le menu principal qui mène à la page Contribuer (dons et propositions de la communauté).",
+        "Le bouton Personnalisation s'appelle désormais Options.",
+        "Sur le menu d'accueil, Profil, Options et Se déconnecter partagent une même ligne, et le bouton Administration prend une ligne entière au-dessus.",
+        "Si tu soutiens le simulateur via un abonnement mensuel, tu peux maintenant le gérer ou l'annuler directement depuis la page Options.",
+        "Les dons ponctuels par carte apparaissent désormais sous le nom NARUTO MYTHOS dans ton relevé bancaire au lieu de bunshin3d.",
+        "Plus besoin de vérifier ton email pour jouer en classé : la vérification est complètement supprimée.",
+        "Plus besoin de jouer 5 parties casual avant le classé : tu peux jouer en classé dès ta première partie.",
+        "Le mail de remerciement après un don est désormais signé Kutayt (dev du simulateur) et renvoie vers le Discord du serveur plutôt que vers une adresse perso.",
+        "Page Contribuer (anciennement Help Us) : titre maintenant en français, et un rappel précise que tu peux annuler ton soutien depuis la page Options."
+      ],
+      "changes_en": [
+        "New Suggestions button in the main menu that leads to the Contribute page (donations and community suggestions).",
+        "The Personnalisation button is now called Options.",
+        "On the home menu, Profile, Options and Sign out share one row, and the Administration button takes a full row above.",
+        "If you support the simulator with a monthly subscription, you can now manage or cancel it directly from the Options page.",
+        "One-time card donations now show as NARUTO MYTHOS on your bank statement instead of bunshin3d.",
+        "No more email verification required to play ranked: the check is fully removed.",
+        "No more 5 casual games requirement before ranked: you can play ranked from your very first game.",
+        "The thank-you email after a donation is now signed by Kutayt (simulator dev) and links to the server Discord instead of a personal address.",
+        "Contribute page (formerly Help Us): the title is now translated in French, and a reminder notes that you can cancel your support from the Options page."
+      ]
+    },
+    {
       "date": "2026-06-08",
       "title_fr": "Page Help Us, anti-blocage chrono et correctifs Kabuto et Kurenai",
       "title_en": "Help Us page, chrono stall protection, Kabuto and Kurenai fixes",

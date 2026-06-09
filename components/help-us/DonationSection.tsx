@@ -215,26 +215,31 @@ export function DonationSection() {
 
       {activeSub && (
         <div
-          className="mb-6 px-4 py-4 rounded-md flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+          className="mb-6 px-4 py-4 rounded-md flex flex-col gap-3"
           style={{ backgroundColor: 'rgba(196,163,90,0.10)', color: '#e8e8e8' }}
         >
-          <span className="text-sm font-body">
-            {t('alreadySubscribed', { amount: formatEur(activeSub.amountCents, locale) })}
-          </span>
-          <button
-            type="button"
-            onClick={onOpenPortal}
-            disabled={loadingPortal}
-            className="font-display uppercase text-xs tracking-widest px-4 py-2 rounded-md transition-opacity"
-            style={{
-              backgroundColor: ACCENT,
-              color: '#0a0a0a',
-              opacity: loadingPortal ? 0.6 : 1,
-              cursor: loadingPortal ? 'wait' : 'pointer',
-            }}
-          >
-            {loadingPortal ? t('managePortalLoading') : t('managePortal')}
-          </button>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-sm font-body">
+              {t('alreadySubscribed', { amount: formatEur(activeSub.amountCents, locale) })}
+            </span>
+            <button
+              type="button"
+              onClick={onOpenPortal}
+              disabled={loadingPortal}
+              className="font-display uppercase text-xs tracking-widest px-4 py-2 rounded-md transition-opacity"
+              style={{
+                backgroundColor: ACCENT,
+                color: '#0a0a0a',
+                opacity: loadingPortal ? 0.6 : 1,
+                cursor: loadingPortal ? 'wait' : 'pointer',
+              }}
+            >
+              {loadingPortal ? t('managePortalLoading') : t('managePortal')}
+            </button>
+          </div>
+          <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,232,232,0.7)' }}>
+            {t('cancelFromSettings')}
+          </p>
         </div>
       )}
 

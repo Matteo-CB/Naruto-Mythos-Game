@@ -1,6 +1,6 @@
 {
   "helpUs": {
-    "title": "Help Us",
+    "title": "Contribute",
     "subtitle": "Support the project and propose improvements",
     "donate": {
       "sectionTitle": "Support the simulator",
@@ -18,6 +18,7 @@
       "alreadySubscribed": "You already support the simulator at {amount} per month. Thank you!",
       "managePortal": "Manage my subscription",
       "managePortalLoading": "Opening...",
+      "cancelFromSettings": "You can also cancel your monthly support directly from the Options page.",
       "successBanner": "Thanks for your support! Your payment has been received.",
       "cancelledBanner": "Payment cancelled. You can try again whenever you want.",
       "error": {
@@ -228,7 +229,8 @@
     "sealed": "Sealed",
     "training": "Training Mode",
     "settings": "Settings",
-    "customization": "Customization",
+    "customization": "Options",
+    "helpUs": "Suggestions",
     "tournaments": "Tournaments",
     "play": "Play",
     "vsAI": "vs AI",
@@ -246,7 +248,15 @@
     "questsBadgeTooltip": "{count} reward(s) to claim"
   },
   "settings": {
-    "title": "Customization",
+    "title": "Options",
+    "subscription": {
+      "title": "My subscription",
+      "active": "You support the simulator at {amount} per month.",
+      "manage": "Manage or cancel",
+      "opening": "Opening...",
+      "errorPortal": "Could not open the subscription portal.",
+      "hint": "Cancel or change your monthly support any time from the Stripe portal."
+    },
     "animations": "Enable animations",
     "animationsOn": "Animations are enabled",
     "animationsOff": "Animations are disabled",
@@ -1719,8 +1729,6 @@
   },
   "room": {
     "error": {
-      "rankedEmailNotVerified": "Verify your email before starting a ranked game.",
-      "rankedNeedCasualGames": "Play {needed} more casual game(s) to unlock ranked.",
       "evolvingNoDeck": "You need an Evolving deck for this mode."
     }
   },
@@ -1767,33 +1775,10 @@
       "passwordTooShort": "Password must be at least 6 characters.",
       "alreadyTaken": "Username or email already taken.",
       "emailBaseTaken": "An account already exists for this email (variants included).",
-      "verifyTokenInvalid": "Invalid verification link.",
-      "verifyTokenExpired": "This verification link has expired.",
-      "verifyResendCooldown": "Wait a minute before requesting another email.",
-      "verifyResendFailed": "Could not send the email. Try again later.",
       "loginRequired": "Sign in first.",
       "userNotFound": "User not found.",
       "serverError": "Server error. Please try again.",
       "notAuthenticated": "You must be signed in."
-    },
-    "verifyEmail": {
-      "title": "Email verification",
-      "loading": "Verifying...",
-      "successPrefix": "All set",
-      "successRedirect": "Redirecting you home...",
-      "expired": "This link has expired.",
-      "invalid": "This link is invalid or already used.",
-      "networkError": "Network error, try again.",
-      "retry": "Retry",
-      "requestNew": "Request a new link",
-      "home": "Back home",
-      "pendingTitle": "Verify your email",
-      "pendingBody": "We sent a verification email to your address. Click the link to activate your account. Until your email is verified, you can't play ranked games.",
-      "resend": "Resend email",
-      "resending": "Sending...",
-      "resent": "Email sent",
-      "resendError": "Could not resend the email.",
-      "backHome": "Back home"
     }
   },
   "card": {
