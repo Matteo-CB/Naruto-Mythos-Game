@@ -38,6 +38,10 @@ app.prepare().then(() => {
       credentials: true,
     },
     transports: ['websocket', 'polling'],
+    pingTimeout: 60_000,
+    pingInterval: 25_000,
+    connectTimeout: 45_000,
+    maxHttpBufferSize: 5_000_000,
   });
 
   setIO(io);

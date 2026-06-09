@@ -280,7 +280,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       const socket = io(socketUrl, {
         transports: ['websocket', 'polling'],
         reconnection: true,
-        reconnectionAttempts: 10,
+        reconnectionAttempts: 20,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
         timeout: CONNECT_TIMEOUT_MS,
