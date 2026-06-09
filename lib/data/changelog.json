@@ -2,37 +2,28 @@
   "entries": [
     {
       "date": "2026-06-09",
-      "title_fr": "Menu réorganisé, gestion d'abonnement dans Options et accès direct au classé",
-      "title_en": "Menu reorganized, subscription management in Options and direct access to ranked",
+      "title_fr": "Menu réorganisé et accès direct au classé",
+      "title_en": "Menu reorganized and direct access to ranked",
       "changes_fr": [
-        "Nouveau bouton Suggestions dans le menu principal qui mène à la page Contribuer (dons et propositions de la communauté).",
+        "Nouveau bouton Suggestions dans le menu principal pour proposer des améliorations à la communauté.",
         "Le bouton Personnalisation s'appelle désormais Options.",
         "Sur le menu d'accueil, Profil, Options et Se déconnecter partagent une même ligne, et le bouton Administration prend une ligne entière au-dessus.",
-        "Si tu soutiens le simulateur via un abonnement mensuel, tu peux maintenant le gérer ou l'annuler directement depuis la page Options.",
-        "Les dons ponctuels par carte apparaissent désormais sous le nom NARUTO MYTHOS dans ton relevé bancaire au lieu de bunshin3d.",
         "Plus besoin de vérifier ton email pour jouer en classé : la vérification est complètement supprimée.",
-        "Plus besoin de jouer 5 parties casual avant le classé : tu peux jouer en classé dès ta première partie.",
-        "Le mail de remerciement après un don est désormais signé Kutayt (dev du simulateur) et renvoie vers le Discord du serveur plutôt que vers une adresse perso.",
-        "Page Contribuer (anciennement Help Us) : titre maintenant en français, et un rappel précise que tu peux annuler ton soutien depuis la page Options."
+        "Plus besoin de jouer 5 parties casual avant le classé : tu peux jouer en classé dès ta première partie."
       ],
       "changes_en": [
-        "New Suggestions button in the main menu that leads to the Contribute page (donations and community suggestions).",
+        "New Suggestions button in the main menu to post improvement ideas to the community.",
         "The Personnalisation button is now called Options.",
         "On the home menu, Profile, Options and Sign out share one row, and the Administration button takes a full row above.",
-        "If you support the simulator with a monthly subscription, you can now manage or cancel it directly from the Options page.",
-        "One-time card donations now show as NARUTO MYTHOS on your bank statement instead of bunshin3d.",
         "No more email verification required to play ranked: the check is fully removed.",
-        "No more 5 casual games requirement before ranked: you can play ranked from your very first game.",
-        "The thank-you email after a donation is now signed by Kutayt (simulator dev) and links to the server Discord instead of a personal address.",
-        "Contribute page (formerly Help Us): the title is now translated in French, and a reminder notes that you can cancel your support from the Options page."
+        "No more 5 casual games requirement before ranked: you can play ranked from your very first game."
       ]
     },
     {
       "date": "2026-06-08",
-      "title_fr": "Page Help Us, anti-blocage chrono et correctifs Kabuto et Kurenai",
-      "title_en": "Help Us page, chrono stall protection, Kabuto and Kurenai fixes",
+      "title_fr": "Anti-blocage chrono et correctifs Kabuto et Kurenai",
+      "title_en": "Chrono stall protection, Kabuto and Kurenai fixes",
       "changes_fr": [
-        "Nouvelle page Help Us : tu peux soutenir le simulateur via Stripe (don ponctuel ou abonnement mensuel) et poster ou voter des suggestions d'amélioration. Aucun avantage en jeu, c'est juste un coup de pouce. La page n'est pas dans le menu pour l'instant, accessible via /help-us.",
         "Anti-blocage chrono : si une partie reste totalement bloquée sans aucune action pendant plus de 8 minutes (les deux joueurs connectés), elle est maintenant annulée automatiquement sans changement d'ELO pour personne. Avant, le joueur qui attendait pouvait perdre 24 ELO en fermant sa fenêtre. À 5 minutes sans action, le système tente d'abord de débloquer la partie via la logique d'inactivité habituelle.",
         "Kabuto Yakushi 052 : quand tu prends le contrôle d'un Kabuto qui contrôle déjà une carte volée à l'adversaire, la carte volée passe maintenant aussi de ton côté avec lui. Avant, elle restait coincée sur la mission d'origine sous le contrôle de l'ancien joueur.",
         "Kurenai Yûhi 035 sur Kurenai Yûhi 034 : l'upgrade coûte maintenant au minimum 1 chakra quand le -1 de Kurenai 034 s'applique, comme dit sur sa carte (« min.1 »). Avant on pouvait upgrader pour 0 chakra dans cette situation, c'était un bug.",
@@ -40,7 +31,6 @@
         "Bonus de performance légèrement revus à la baisse : écart de score donne désormais +2/+5/+7/+9 (au lieu de +3/+6/+9/+12), bonus de pression commence à 5 cartes adverses pour monter jusqu'à +6 (au lieu de 7 cartes jusqu'à +8), bonus de victoire par abandon passe de +5 à +3. Le maximum combiné par victoire passe de +20 à +15."
       ],
       "changes_en": [
-        "New Help Us page: you can now support the simulator via Stripe (one-time donation or monthly subscription) and post or vote on improvement suggestions. No in-game perks, it is purely a thank you. The page is not in the menu yet, accessible at /help-us.",
         "Chrono stall protection: if a game gets fully stuck with no action for more than 8 minutes (both players connected), it is now automatically cancelled with no ELO change for either side. Before, the waiting player could lose 24 ELO by closing the window. At 5 minutes without action, the system first tries to resolve the situation via the regular idle path.",
         "Kabuto Yakushi 052: when you take control of a Kabuto that itself controls a card stolen from the opponent's deck, the stolen card now follows Kabuto to your side. Previously, the stolen card stayed stuck on its mission under the old controller.",
         "Kurenai Yuhi 035 over Kurenai Yuhi 034: the upgrade now costs at least 1 chakra when Kurenai 034's -1 applies, as printed on the card (\"min.1\"). It used to be playable for 0 chakra in that case, which was a bug.",
