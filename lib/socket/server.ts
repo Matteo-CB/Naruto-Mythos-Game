@@ -337,6 +337,17 @@ export function chessClockExpiryReasonToWinReason(reason: ChessClockExpiryReason
 
 export function handleChessClockExpiry(room: RoomData, loser: PlayerID, io: SocketIOServer, reason: ChessClockExpiryReason): void {
   if (!room.gameState || room.finalized) return;
+  if (reason === 'disconnect') {
+    const loserScore = loser === 'player1' ? room.gameState.player1.missionPoints : room.gameState.player2.missionPoints;
+    const winnerScore = loser === 'player1' ? room.gameState.player2.missionPoints : room.gameState.player1.missionPoints;
+    if (loserScore > winnerScore && loserScore - winnerScore >= 5) {
+      console.warn(`[ChessClock] ${room.code}: disconnect forfeit aborted — disconnected ${loser} was leading ${loserScore}-${winnerScore}, cancelling with NO elo (suspected server-side outage)`);
+      cancelGameNoElo(room, room.code, io, 'stalemate').catch((err) => {
+        console.error(`[ChessClock] ${room.code}: cancelGameNoElo failed:`, err instanceof Error ? err.message : err);
+      });
+      return;
+    }
+  }
   const winReason = chessClockExpiryReasonToWinReason(reason);
   console.log(`[ChessClock] ${room.code}: ${loser} loses by clock (reason=${reason}, winReason=${winReason})`);
   try {
@@ -462,6 +473,16 @@ export function onChessClockTick(room: RoomData, io: SocketIOServer): void {
   }
 
 
+  if (room.player1DisconnectedAt && room.player2DisconnectedAt) {
+    const oldestDisc = Math.min(room.player1DisconnectedAt, room.player2DisconnectedAt);
+    if (now - oldestDisc >= CHESS_CLOCK_DISCONNECT_FORFEIT_MS + 30_000) {
+      console.warn(`[ChessClock] ${room.code}: both players disconnected ${Math.round((now - oldestDisc) / 1000)}s, cancelling game with NO elo impact (suspected server outage)`);
+      cancelGameNoElo(room, room.code, io, 'stalemate').catch((err) => {
+        console.error(`[ChessClock] ${room.code}: cancelGameNoElo failed:`, err instanceof Error ? err.message : err);
+      });
+    }
+    return;
+  }
   if (room.player1DisconnectedAt && now - room.player1DisconnectedAt >= CHESS_CLOCK_DISCONNECT_FORFEIT_MS) {
     handleChessClockExpiry(room, 'player1', io, 'disconnect');
     return;
@@ -579,6 +600,16 @@ export function chessClockWatchdog(io: SocketIOServer): void {
 
       const p1Disc = room.player1DisconnectedAt;
       const p2Disc = room.player2DisconnectedAt;
+      if (p1Disc && p2Disc) {
+        const oldestDiscW = Math.min(p1Disc, p2Disc);
+        if ((now - oldestDiscW) >= DISCONNECT_HARD_FORFEIT_MS + 30_000) {
+          console.warn(`[ChessClockWatchdog] ${code}: both players disconnected ${Math.round((now - oldestDiscW) / 1000)}s, cancelling with NO elo (suspected server outage)`);
+          cancelGameNoElo(room, code, io, 'stalemate').catch((err) => {
+            console.error(`[ChessClockWatchdog] ${code}: cancelGameNoElo failed:`, err instanceof Error ? err.message : err);
+          });
+        }
+        continue;
+      }
       if (p1Disc && (now - p1Disc) >= DISCONNECT_HARD_FORFEIT_MS) {
         console.warn(`[ChessClockWatchdog] ${code}: player1 disconnected ${Math.round((now - p1Disc) / 1000)}s, force forfeit`);
         handleChessClockExpiry(room, 'player1', io, 'disconnect');
