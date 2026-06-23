@@ -906,18 +906,17 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   
   'KS-146-M': [
-    'Give the Edge to the opponent. If you do so, POWERUP 3.',
+    '[⧗] If you have the Edge, enemy hidden characters in this mission have -1 Power.',
   ],
 
-  
+
   'KS-147-M': [
-    '[⧗] If you don\'t have the Edge, CHAKRA +2.',
+    '[⧗] If you have the Edge, this character has +3 Power.',
   ],
 
-  
+
   'KS-148-M': [
-    'Gain the Edge.',
-    'Copy an instant effect of another friendly Team 7 character in play.',
+    '[↯] Gain the Edge. You can\'t lose it during this round.',
   ],
 
   

@@ -9,7 +9,7 @@ function sakura147MainHandler(ctx: EffectContext): EffectResult {
   const log = logAction(
     ctx.state.log, ctx.state.turn, ctx.state.phase, ctx.sourcePlayer,
     'EFFECT_CONTINUOUS',
-    'Sakura Haruno (147): CHAKRA +2 while you do not hold the Edge token (continuous).',
+    'Sakura Haruno (147): This character has +3 Power while you hold the Edge token (continuous).',
     'game.log.effect.continuous',
     { card: 'SAKURA HARUNO', id: 'KS-147-M' },
   );

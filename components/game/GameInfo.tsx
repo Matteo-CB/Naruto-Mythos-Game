@@ -38,6 +38,7 @@ export function GameInfo() {
     phase,
     activePlayer,
     edgeHolder,
+    edgeLockedFor,
     myPlayer,
     myState,
     opponentState,
@@ -105,7 +106,7 @@ export function GameInfo() {
         </div>
       </PanelFrame>
 
-      <EdgeToken holder={edgeHolder} myPlayer={myPlayer} />
+      <EdgeToken holder={edgeHolder} myPlayer={myPlayer} lockedFor={edgeLockedFor ?? null} />
 
       <SectionDivider color="rgba(196, 163, 90, 0.15)" width={80} showDiamond />
 

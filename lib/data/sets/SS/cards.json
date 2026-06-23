@@ -1,3 +1,33 @@
 {
-  "cards": {}
+  "cards": {
+    "SS-122-SPV": {
+      "id": "SS-122-SPV",
+      "rarity": "SPV",
+      "number": "122",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "MINATO NAMIKAZE",
+      "name_fr": "MINATO NAMIKAZE",
+      "title_en": "One Shinobi faced the Nine-Tailed Fox in mortal combat.",
+      "title_fr": "Un seul shinobi affronta le Renard à Neuf Queues dans un combat mortel.",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Hokage"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Discard all Tailed Beast characters from an enemy stack in this mission or move a friendly Tailed Beast character in play."
+        }
+      ],
+      "image_url": "/images/cards/SS/sp_v/SS-122-SPV.webp",
+      "rarity_display": "Special V",
+      "image_file": "images/cards/SS/sp_v/SS-122-SPV.webp",
+      "data_complete": true,
+      "old_id": "122/140 V"
+    }
+  }
 }

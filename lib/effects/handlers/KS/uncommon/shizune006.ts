@@ -28,10 +28,10 @@ function handleShizune006Main(ctx: EffectContext): EffectResult {
     const mission = state.activeMissions[mIdx];
     for (const char of mission[enemySide]) {
       if (getEffectivePower(state, char, opponentPlayer) <= 3) {
-        
+
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         const charName = topCard.name_fr;
-        const hasValidDest = state.activeMissions.some((m, i) => {
+        const hasValidDest = char.isHidden || state.activeMissions.some((m, i) => {
           if (i === mIdx) return false;
           return !m[enemySide].some((c) => {
             if (c.instanceId === char.instanceId) return false;

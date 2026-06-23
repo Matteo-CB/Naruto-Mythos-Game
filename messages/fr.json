@@ -488,6 +488,8 @@
         "hideMultiple": "{card} ({id}) : Cache {count} personnage(s).",
         "giveEdge": "{card} ({id}) : Donne le jeton Edge à l'adversaire.",
         "gainEdge": "{card} ({id}) : Gagne le jeton Edge.",
+        "kakashi148GainLockEdge": "{card} ({id}) : Gagne l'Initiative et ne peut pas la perdre cette manche.",
+        "minato122Discard": "{card} ({id}) : Défausse {amount} carte(s) Bête à Queues d'une pile ennemie.",
         "revealDiscard": "{card} ({id}) : Révèle et défausse {target} (coût {cost}) du deck.",
         "moveCharacter": "{card} ({id}) : Déplace {target} vers {mission}.",
         "sasuke014Reveal": "{card} ({id}) : Révèle {target} de la main adverse.",
@@ -630,7 +632,8 @@
       "details": "Détails",
       "minimize": "Réduire",
       "restoreEffect": "Effet en attente",
-      "edge": "Edge"
+      "edge": "Edge",
+      "edgeLocked": "Verrouillé"
     },
     "handLabel": "Main",
     "effect": {
@@ -1118,6 +1121,8 @@
         "sasuke146ConfirmMain": "MAIN : Donner le jeton d'Edge à l'adversaire. POWERUP 3.",
         "kakashi148ConfirmMain": "MAIN : Obtenir le jeton d'Edge.",
         "kakashi148ConfirmAmbush": "EMBUSCADE : Copier un effet instantané d'un personnage Team 7 allié.",
+        "minato122Select": "Clique sur une pile Bête à Queues ennemie pour la défausser, ou une Bête à Queues alliée pour la déplacer.",
+        "minato122MoveDest": "Choisis une mission où déplacer la Bête à Queues.",
         "naruto141ChooseDiscard": "Choisissez une carte de votre main à défausser.",
         "sasuke142ChooseDiscard": "Choisissez une carte de votre main à défausser.",
         "gaara139DefeatByCost": "Choisissez un ennemi avec un coût inférieur à {count} à vaincre."
@@ -2842,8 +2847,6 @@
     "dailyHeader": "Quête du jour",
     "claim": "Réclamer",
     "claimed": "Réclamée",
-    "claimedViaDaily": "Obtenue via la quête du jour",
-    "claimedViaMain": "Obtenue via la liste principale",
     "claimedXpToast": "+{xp} XP",
     "levelLabel": "Niv. {level}",
     "unauthMessage": "Connecte-toi pour voir tes quêtes.",

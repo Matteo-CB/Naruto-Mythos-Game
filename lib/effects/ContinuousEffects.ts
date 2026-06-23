@@ -79,13 +79,6 @@ export function calculateContinuousChakraBonus(
         bonus += 1;
       }
     }
-
-    
-    if (topCard.number === 147 && effect.description.includes('CHAKRA +2') && effect.description.includes('Edge')) {
-      if (state.edgeHolder !== player) {
-        bonus += 2;
-      }
-    }
   }
 
   return bonus;
@@ -199,14 +192,20 @@ export function calculateContinuousPowerModifier(
 
     
     const enemyCharsHidden = player === 'player1' ? mission.player2Characters : mission.player1Characters;
+    const ownerOfEnemyChars = player === 'player1' ? 'player2' : 'player1';
     for (const enemy of enemyCharsHidden) {
       if (enemy.isHidden) continue;
       const eTop = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
       for (const effect of eTop.effects ?? []) {
         if (!effect.description.includes('[⧗]')) continue;
-        
+
         if ((eTop.number === 128 && (effect.type === 'UPGRADE' || effect.type === 'MAIN')) || eTop.number === 152) {
           hiddenBonus -= 1;
+        }
+
+
+        if (eTop.number === 146 && effect.type === 'MAIN' && effect.description.includes('-1 Power')) {
+          if (state.edgeHolder === ownerOfEnemyChars) hiddenBonus -= 1;
         }
       }
     }
@@ -287,10 +286,17 @@ export function calculateContinuousPowerModifier(
       modifier -= otherNonHidden.length;
     }
 
-    
+
     if (selfTopCard.number === 79 && effect.description.includes('Edge')) {
       if (state.edgeHolder === player) {
         modifier += 2;
+      }
+    }
+
+
+    if (selfTopCard.number === 147 && effect.description.includes('Edge') && effect.description.includes('+3 Power')) {
+      if (state.edgeHolder === player) {
+        modifier += 3;
       }
     }
 

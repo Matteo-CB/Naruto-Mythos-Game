@@ -1,6 +1,44 @@
 {
   "entries": [
     {
+      "date": "2026-06-13",
+      "title_fr": "Équipe 7 d'origine repensée, carte Minato et déconnexion corrigée",
+      "title_en": "Original Team 7 reworked, Minato card and disconnect fix",
+      "changes_fr": [
+        "Les quatre cartes Mythos Équipe 7 d'origine (Naruto, Sasuke, Sakura, Kakashi) ont une nouvelle illustration et des effets repensés autour de l'Initiative.",
+        "Naruto Équipe 7 d'origine : tant que tu as l'Initiative, tes personnages cachés dans la mission gagnent +1 Puissance. Sasuke : les personnages cachés ennemis ont -1. Sakura : elle gagne +3 Puissance.",
+        "Kakashi Équipe 7 d'origine gagne l'Initiative et ne peut plus la perdre jusqu'à la fin de la manche. Le jeton d'Initiative affiche un effet verrouillé quand c'est le cas.",
+        "Nouvelle carte spéciale Minato Namikaze : disponible pour tout le monde dans la collection, jouable partout sauf en classé. Elle défausse les Bêtes à Queues d'une pile ennemie ou déplace une Bête à Queues alliée.",
+        "Le carrousel de cartes de l'accueil met en avant plus de cartes, dont Minato et l'Équipe 7 d'origine.",
+        "Quand l'adversaire se déconnecte en fin de partie alors qu'il est en train de perdre, il est maintenant déclaré forfait et tu remportes la partie. Avant, la partie pouvait s'annuler sans vainqueur si le joueur déconnecté menait encore au score des manches précédentes."
+      ],
+      "changes_en": [
+        "The four Original Team 7 Mythos cards (Naruto, Sasuke, Sakura, Kakashi) have new artwork and reworked effects built around the Edge.",
+        "Naruto Original Team 7: while you hold the Edge, your hidden characters in the mission gain +1 Power. Sasuke: enemy hidden characters get -1. Sakura: she gains +3 Power.",
+        "Kakashi Original Team 7 gains the Edge and can no longer lose it until the end of the round. The Edge token shows a locked state when this happens.",
+        "New special card Minato Namikaze: available to everyone in the collection, playable everywhere except ranked. It discards Tailed Beasts from an enemy stack or moves a friendly Tailed Beast.",
+        "The home card showcase now rotates more cards, including Minato and the Original Team 7.",
+        "When your opponent disconnects at the end of a game while they are losing, they now forfeit and you win. Before, the game could be cancelled with no winner if the disconnected player was still ahead on the previous rounds' score."
+      ]
+    },
+    {
+      "date": "2026-06-12",
+      "title_fr": "Correctifs Sasuke Uchiwa 136 et déplacement de personnages cachés",
+      "title_en": "Sasuke Uchiwa 136 and hidden-character move fixes",
+      "changes_fr": [
+        "Sasuke Uchiwa 136 (Secret) : quand Sasuke lui-même se fait vaincre, son effet \"gagne 1 chakra à chaque personnage vaincu\" ne s'active plus sur sa propre défaite, comme Tsunade. Avant, tu gagnais 1 chakra alors que Sasuke partait au cimetière.",
+        "Shizune 006 (et son effet copié par Kakashi 016) : tu peux maintenant déplacer un personnage ennemi caché situé dans une autre mission, même si l'ennemi possède un personnage visible du même nom ailleurs. Un personnage caché n'a pas de nom visible, donc il peut toujours être déplacé.",
+        "Gagner une partie classée donne de nouveau l'ELO complet avec les bonus, même contre le même adversaire plusieurs fois de suite. Avant, après plusieurs parties d'affilée contre la même personne, la victoire pouvait afficher un bonus mais donner 0 ELO.",
+        "La quête du jour se réclame maintenant uniquement dans son propre encadré. Elle n'apparaît plus en double dans la liste des quêtes et l'ancien message « Obtenue via la liste principale » a été retiré."
+      ],
+      "changes_en": [
+        "Sasuke Uchiwa 136 (Secret): when Sasuke himself is defeated, his \"gain 1 chakra whenever a character is defeated\" no longer triggers on his own defeat, just like Tsunade. Previously you gained 1 chakra while Sasuke went to the discard pile.",
+        "Shizune 006 (and its effect copied by Kakashi 016): you can now move a hidden enemy character in another mission, even when the opponent has a visible same-name character elsewhere. A hidden character has no visible name, so it can always be moved.",
+        "Winning a ranked game again grants full ELO with bonuses, even against the same opponent several times in a row. Before, after several back-to-back games against the same person, a win could show a bonus but grant 0 ELO.",
+        "The daily quest is now claimed only in its own box. It no longer shows up a second time in the quest list, and the old \"Got it from the main list\" message has been removed."
+      ]
+    },
+    {
       "date": "2026-06-09",
       "title_fr": "Menu réorganisé et accès direct au classé",
       "title_en": "Menu reorganized and direct access to ranked",

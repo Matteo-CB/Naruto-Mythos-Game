@@ -7,12 +7,14 @@ import type { PlayerID } from '@/lib/engine/types';
 interface EdgeTokenProps {
   holder: PlayerID;
   myPlayer: PlayerID;
+  lockedFor?: PlayerID | null;
 }
 
-export function EdgeToken({ holder, myPlayer }: EdgeTokenProps) {
+export function EdgeToken({ holder, myPlayer, lockedFor = null }: EdgeTokenProps) {
   const t = useTranslations();
   const isPlayerHolding = holder === myPlayer;
   const accentColor = isPlayerHolding ? '#c4a35a' : '#b33e3e';
+  const isLocked = lockedFor != null && lockedFor === holder;
 
   return (
     <div className="flex flex-col items-center gap-1">
@@ -30,12 +32,22 @@ export function EdgeToken({ holder, myPlayer }: EdgeTokenProps) {
           height: '36px',
           transform: 'rotate(45deg)',
           backgroundColor: accentColor,
-          border: '2px solid rgba(255, 255, 255, 0.1)',
+          border: isLocked ? '2px solid rgba(255, 255, 255, 0.5)' : '2px solid rgba(255, 255, 255, 0.1)',
         }}
-        animate={{
-          boxShadow: `0 0 16px ${accentColor}80, 0 2px 8px rgba(0, 0, 0, 0.3)`,
-        }}
-        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+        animate={
+          isLocked
+            ? { boxShadow: [
+                `0 0 10px ${accentColor}80, 0 2px 8px rgba(0,0,0,0.3)`,
+                `0 0 26px ${accentColor}, 0 0 6px #ffffffcc, 0 2px 8px rgba(0,0,0,0.3)`,
+                `0 0 10px ${accentColor}80, 0 2px 8px rgba(0,0,0,0.3)`,
+              ] }
+            : { boxShadow: `0 0 16px ${accentColor}80, 0 2px 8px rgba(0, 0, 0, 0.3)` }
+        }
+        transition={
+          isLocked
+            ? { repeat: Infinity, duration: 1.1, ease: 'easeInOut' }
+            : { type: 'spring', stiffness: 200, damping: 20 }
+        }
       >
         <motion.span
           className="text-xs font-bold"
@@ -43,8 +55,8 @@ export function EdgeToken({ holder, myPlayer }: EdgeTokenProps) {
             color: '#0a0a0a',
             transform: 'rotate(-45deg)',
           }}
-          animate={{ opacity: [0.7, 1, 0.7] }}
-          transition={{ repeat: Infinity, duration: 2 }}
+          animate={{ opacity: isLocked ? [0.85, 1, 0.85] : [0.7, 1, 0.7] }}
+          transition={{ repeat: Infinity, duration: isLocked ? 1.1 : 2 }}
         >
           E
         </motion.span>
@@ -58,6 +70,17 @@ export function EdgeToken({ holder, myPlayer }: EdgeTokenProps) {
       >
         {isPlayerHolding ? t('game.you') : t('game.opponent')}
       </motion.span>
+      {isLocked && (
+        <motion.span
+          initial={{ opacity: 0, y: -2 }}
+          animate={{ opacity: [0.6, 1, 0.6], y: 0 }}
+          transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
+          className="text-[10px] uppercase tracking-widest"
+          style={{ color: accentColor }}
+        >
+          {t('game.edgeLocked')}
+        </motion.span>
+      )}
     </div>
   );
 }

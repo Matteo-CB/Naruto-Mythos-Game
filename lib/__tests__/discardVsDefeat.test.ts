@@ -346,5 +346,26 @@ describe('No Repetition discard vs Defeat (Phase H)', () => {
 
       expect(newState.player1.chakra).toBe(p1ChakraBefore + 1);
     });
+
+    it('Sasuke Uchiwa (136) does NOT gain chakra when Sasuke himself is the defeated character', () => {
+      const state = createActionPhaseState({});
+      const sasuke136 = mockCharInPlay(
+        { controlledBy: 'player1', originalOwner: 'player1', missionIndex: 0, isHidden: false },
+        {
+          id: 'KS-136-S',
+          name_fr: 'Sasuke Uchiwa',
+          chakra: 6,
+          power: 6,
+          number: 136,
+          effects: [{ type: 'MAIN', description: '[⧗] When a character is defeated, gain 1 chakra.' }],
+        },
+      );
+      state.activeMissions[0].player1Characters = [sasuke136];
+
+      const p1ChakraBefore = state.player1.chakra;
+      const newState = EffectEngine.defeatCharacter(state, sasuke136.instanceId, 'player2');
+
+      expect(newState.player1.chakra).toBe(p1ChakraBefore);
+    });
   });
 });

@@ -96,7 +96,6 @@ export async function createDonationCheckout(params: CreateDonationCheckoutParam
     };
   } else {
     sessionParams.payment_intent_data = {
-      statement_descriptor: 'NARUTO MYTHOS',
       description: 'Naruto Mythos TCG',
     };
     if (userEmail) {

@@ -488,6 +488,8 @@
         "hideMultiple": "{card} ({id}): Hid {count} character(s).",
         "giveEdge": "{card} ({id}): Gave the Edge token to opponent.",
         "gainEdge": "{card} ({id}): Gained the Edge token.",
+        "kakashi148GainLockEdge": "{card} ({id}): Gained the Edge and cannot lose it this round.",
+        "minato122Discard": "{card} ({id}): Discarded {amount} Tailed Beast card(s) from an enemy stack.",
         "revealDiscard": "{card} ({id}): Revealed and discarded {target} (cost {cost}) from deck.",
         "moveCharacter": "{card} ({id}): Moved {target} to {mission}.",
         "sasuke014Reveal": "{card} ({id}): Revealed {target} from opponent's hand.",
@@ -630,7 +632,8 @@
       "details": "Details",
       "minimize": "Minimize",
       "restoreEffect": "Pending Effect",
-      "edge": "Edge"
+      "edge": "Edge",
+      "edgeLocked": "Locked"
     },
     "handLabel": "Hand",
     "effect": {
@@ -1118,6 +1121,8 @@
         "sasuke146ConfirmMain": "MAIN: Give the Edge token to opponent. POWERUP 3.",
         "kakashi148ConfirmMain": "MAIN: Gain the Edge token.",
         "kakashi148ConfirmAmbush": "AMBUSH: Copy an instant effect of a friendly Team 7 character.",
+        "minato122Select": "Click an enemy Tailed Beast stack to discard it, or a friendly Tailed Beast to move it.",
+        "minato122MoveDest": "Choose a mission to move the Tailed Beast to.",
         "naruto141ChooseDiscard": "Choose a card from your hand to discard.",
         "sasuke142ChooseDiscard": "Choose a card from your hand to discard.",
         "gaara139DefeatByCost": "Choose an enemy with cost less than {count} to defeat."
@@ -2842,8 +2847,6 @@
     "dailyHeader": "Daily quest",
     "claim": "Claim",
     "claimed": "Claimed",
-    "claimedViaDaily": "Got it as today's daily",
-    "claimedViaMain": "Got it from the main list",
     "claimedXpToast": "+{xp} XP",
     "levelLabel": "Lv. {level}",
     "unauthMessage": "Sign in to see your quests.",

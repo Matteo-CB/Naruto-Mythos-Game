@@ -5,7 +5,7 @@ export type GamePhase = 'setup' | 'mulligan' | 'start' | 'action' | 'mission' | 
 export type TurnNumber = 1 | 2 | 3 | 4;
 export type MissionRank = 'D' | 'C' | 'B' | 'A';
 export type EffectType = 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE';
-export type Rarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'MMS';
+export type Rarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'SP' | 'SPV' | 'MMS';
 
 
 
@@ -134,6 +134,7 @@ export interface GameState {
   phase: GamePhase;
   activePlayer: PlayerID;
   edgeHolder: PlayerID;
+  edgeLockedFor?: PlayerID | null;
   firstPasser: PlayerID | null;
   player1: PlayerState;
   player2: PlayerState;
@@ -327,6 +328,7 @@ export interface VisibleGameState {
   phase: GamePhase;
   activePlayer: PlayerID;
   edgeHolder: PlayerID;
+  edgeLockedFor?: PlayerID | null;
   firstPasser: PlayerID | null;
   myPlayer: PlayerID;
   myState: PlayerState;

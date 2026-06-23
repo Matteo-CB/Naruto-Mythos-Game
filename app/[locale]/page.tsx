@@ -20,8 +20,13 @@ import '@/styles/holo-evolving.css';
 
 
 const FEATURED_CARDS = [
+  { src: '/images/cards/SS/sp_v/SS-122-SPV.webp', alt: 'Minato Namikaze', rarity: 'special' as const },
   { src: '/images/cards/KS/mythos_v/KS-108_2-MV.webp', alt: 'Naruto Uzumaki - Shadow Clone Jutsu', rarity: 'mythos' as const },
   { src: '/images/cards/KS/mythos_v/KS-107-MV.webp', alt: 'Sasuke Uchiwa - Chidori', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos/KS-145-M.webp', alt: 'Naruto Uzumaki - Original Team 7', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos/KS-146-M.webp', alt: 'Sasuke Uchiha - Original Team 7', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos/KS-147-M.webp', alt: 'Sakura Haruno - Original Team 7', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos/KS-148-M.webp', alt: 'Kakashi Hatake - Original Team 7', rarity: 'mythos' as const },
   { src: '/images/cards/KS/legendary/KS-136-L.webp', alt: 'Sasuke Uchiwa - Heaven Curse Mark', rarity: 'legendary' as const },
   { src: '/images/cards/KS/legendary/KS-117-L.webp', alt: 'Rock Lee - Loopy Fist', rarity: 'legendary' as const },
   { src: '/images/cards/KS/secret_v/KS-132-SV.webp', alt: 'Jiraiya - Toad Mouth Trap', rarity: 'secret' as const },

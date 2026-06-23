@@ -157,7 +157,7 @@ describe('both-players-disconnected does NOT forfeit one player (server outage p
     expect(emits.some((e) => e.event === 'game:cancelled')).toBe(false);
   });
 
-  it('disconnect forfeit ABORTS if the disconnected player was leading by 5+ mission points (KingsleyComar case)', () => {
+  it('single disconnect FORFEITS even if the disconnected player leads on the (stale) scoreboard — no score-based cancel exploit', () => {
     const room = makeRoom({
       code: 'LEAD-DISC-1',
       gameState: actionState('player1'),
@@ -170,9 +170,7 @@ describe('both-players-disconnected does NOT forfeit one player (server outage p
 
     onChessClockTick(room, io);
 
-    expect(room.finalized).toBe(true);
-    const cancelEvt = emits.find((e) => e.event === 'game:cancelled');
-    expect(cancelEvt).toBeTruthy();
-    expect(room.gameState?.forfeitedBy).toBeFalsy();
+    expect(room.gameState?.forfeitedBy === 'player1' || room.finalized).toBe(true);
+    expect(emits.some((e) => e.event === 'game:cancelled')).toBe(false);
   });
 });

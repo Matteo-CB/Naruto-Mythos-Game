@@ -5,34 +5,14 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 
 
 function sasuke146MainHandler(ctx: EffectContext): EffectResult {
-  const state = ctx.state;
-
-  
-  
-  if (state.edgeHolder !== ctx.sourcePlayer) {
-    return {
-      state: {
-        ...state,
-        log: logAction(
-          state.log, state.turn, state.phase, ctx.sourcePlayer,
-          'EFFECT_NO_TARGET',
-          'Sasuke Uchiwa (146): Does not hold the Edge token - cannot give it. Effect fizzles.',
-          'game.log.effect.noTarget',
-          { card: 'SASUKE UCHIWA', id: 'KS-146-M' },
-        ),
-      },
-    };
-  }
-
-  
-  return {
-    state,
-    requiresTargetSelection: true,
-    targetSelectionType: 'SASUKE146_CONFIRM_MAIN',
-    validTargets: [ctx.sourceCard.instanceId],
-    description: JSON.stringify({ sourceMissionIndex: ctx.sourceMissionIndex }),
-    descriptionKey: 'game.effect.desc.sasuke146ConfirmMain',
-  };
+  const log = logAction(
+    ctx.state.log, ctx.state.turn, ctx.state.phase, ctx.sourcePlayer,
+    'EFFECT_CONTINUOUS',
+    'Sasuke Uchiwa (146): Enemy hidden characters in this mission have -1 Power while you hold the Edge token (continuous).',
+    'game.log.effect.continuous',
+    { card: 'SASUKE UCHIWA', id: 'KS-146-M' },
+  );
+  return { state: { ...ctx.state, log } };
 }
 
 export function registerHandler(): void {

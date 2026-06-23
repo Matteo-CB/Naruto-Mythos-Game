@@ -12,6 +12,8 @@ const RARITY_SUFFIX_FR: Record<Rarity, string> = {
   M: 'Mythos',
   MV: 'Mythos Variante',
   L: 'Légendaire',
+  SP: 'Spéciale',
+  SPV: 'Spéciale Variante',
   MMS: 'Mission',
 };
 
@@ -25,6 +27,8 @@ const RARITY_SUFFIX_EN: Record<Rarity, string> = {
   M: 'Mythos',
   MV: 'Mythos Variant',
   L: 'Legendary',
+  SP: 'Special',
+  SPV: 'Special Variant',
   MMS: 'Mission',
 };
 

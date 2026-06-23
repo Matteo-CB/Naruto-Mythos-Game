@@ -831,14 +831,15 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
       }
     });
 
-    it('KS-146-M Sasuke - MAIN: Give Edge to opponent; if you do, POWERUP 3', () => {
+    it('KS-146-M Sasuke - MAIN [continuous]: enemy hidden in this mission -1 Power while you hold the Edge', () => {
       const handler = getEffectHandler('KS-146-M', 'MAIN');
       expect(handler).toBeDefined();
     });
 
-    it('KS-148-M Kakashi - MAIN: Gain Edge / AMBUSH: Copy friendly Team 7 instant effect', () => {
+    it('KS-148-M Kakashi - MAIN: Gain the Edge and cannot lose it this round (no AMBUSH)', () => {
       const mainHandler = getEffectHandler('KS-148-M', 'MAIN');
       expect(mainHandler).toBeDefined();
+      expect(getEffectHandler('KS-148-M', 'AMBUSH')).toBeUndefined();
     });
   });
 

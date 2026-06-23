@@ -2337,10 +2337,10 @@ export class EffectEngine {
           const s006Mission = newState.activeMissions[s006mIdx];
           for (const char of (s006Mission as any)[s006EnemySide]) {
             if (getEffectivePower(newState, char, s006Opponent) <= 3) {
-              
+
               const s006TopCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
               const s006CharName = s006TopCard.name_fr;
-              const s006HasDest = newState.activeMissions.some((m: any, i: number) => {
+              const s006HasDest = char.isHidden || newState.activeMissions.some((m: any, i: number) => {
                 if (i === s006mIdx) return false;
                 return !m[s006EnemySide].some((c: any) => {
                   if (c.instanceId === char.instanceId) return false;
@@ -10687,9 +10687,109 @@ export class EffectEngine {
         break;
       }
 
-      
+      case 'MINATO122_SELECT': {
+        const m122 = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!m122) break;
+        const m122IsEnemy = m122.player !== pendingEffect.sourcePlayer;
+
+        if (m122IsEnemy) {
+          const owner = m122.character.originalOwner;
+          const side: 'player1Characters' | 'player2Characters' =
+            m122.player === 'player1' ? 'player1Characters' : 'player2Characters';
+          const cards = m122.character.stack?.length > 0 ? [...m122.character.stack] : [m122.character.card];
+          const remaining = cards.filter((c) => !((c.keywords ?? []).includes('Tailed Beast')));
+          const discarded = cards.filter((c) => (c.keywords ?? []).includes('Tailed Beast'));
+          if (discarded.length === 0) break;
+
+          const missions = [...newState.activeMissions];
+          const mission = { ...missions[m122.missionIndex] };
+          const arr = [...mission[side]];
+          const idx = arr.findIndex((c) => c.instanceId === targetId);
+          if (idx === -1) break;
+
+          const ownerState = { ...newState[owner] };
+          ownerState.discardPile = [...ownerState.discardPile, ...discarded];
+
+          if (remaining.length === 0) {
+            arr.splice(idx, 1);
+          } else {
+            arr[idx] = { ...arr[idx], stack: remaining, card: remaining[remaining.length - 1] };
+          }
+          mission[side] = arr;
+          missions[m122.missionIndex] = mission;
+          newState = {
+            ...newState,
+            activeMissions: missions,
+            [owner]: ownerState,
+            log: logAction(
+              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_DISCARD',
+              `Minato Namikaze (122): Discarded ${discarded.length} Tailed Beast card(s) from an enemy stack.`,
+              'game.log.effect.minato122Discard',
+              { card: 'MINATO NAMIKAZE', id: 'SS-122-SPV', amount: discarded.length },
+            ),
+          };
+          break;
+        }
+
+        const m122Dests: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (i !== m122.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, m122.character, i, m122.player)) {
+            m122Dests.push(String(i));
+          }
+        }
+        if (m122Dests.length === 1) {
+          newState = EffectEngine.moveCharToMissionDirectPublic(
+            newState, targetId, parseInt(m122Dests[0], 10),
+            m122.player, 'Minato Namikaze', 'SS-122-SPV', pendingEffect.sourcePlayer,
+          );
+        } else if (m122Dests.length > 1) {
+          const m122EffId = generateInstanceId();
+          const m122ActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: m122EffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ charInstanceId: targetId }),
+            targetSelectionType: 'MINATO122_MOVE_DEST',
+            sourcePlayer: pendingEffect.sourcePlayer,
+            requiresTargetSelection: true,
+            validTargets: m122Dests, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: false,
+          });
+          newState.pendingActions.push({
+            id: m122ActId, type: 'SELECT_TARGET',
+            player: pendingEffect.sourcePlayer,
+            description: 'Minato Namikaze (122): Choose a mission to move the Tailed Beast to.',
+            descriptionKey: 'game.effect.desc.minato122MoveDest',
+            options: m122Dests, minSelections: 1, maxSelections: 1,
+            sourceEffectId: m122EffId,
+          });
+        }
+        break;
+      }
+      case 'MINATO122_MOVE_DEST': {
+        const m122DestMission = parseInt(targetId, 10);
+        if (!isNaN(m122DestMission)) {
+          let m122CharId = '';
+          try { m122CharId = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+          if (m122CharId) {
+            const m122CharRes = EffectEngine.findCharByInstanceId(newState, m122CharId);
+            if (m122CharRes) {
+              newState = EffectEngine.moveCharToMissionDirectPublic(
+                newState, m122CharId, m122DestMission,
+                m122CharRes.player, 'Minato Namikaze', 'SS-122-SPV', pendingEffect.sourcePlayer,
+              );
+            }
+          }
+        }
+        break;
+      }
+
+
       case 'MOVE_ENEMY_FROM_THIS_MISSION': {
-        
+
         const zakuChar = EffectEngine.findCharByInstanceId(newState, targetId);
         if (zakuChar) {
           const validMissions_z: string[] = [];

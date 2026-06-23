@@ -4773,8 +4773,8 @@
       "title_fr": "Équipe 7 originelle",
       "title_en": "Original Team 7",
       "has_visual": true,
-      "chakra": 5,
-      "power": 5,
+      "chakra": 4,
+      "power": 4,
       "keywords": [
         "Team 7"
       ],
@@ -4802,8 +4802,8 @@
       "title_fr": "Équipe 7 originelle",
       "title_en": "Original Team 7",
       "has_visual": true,
-      "chakra": 3,
-      "power": 3,
+      "chakra": 4,
+      "power": 4,
       "keywords": [
         "Team 7"
       ],
@@ -4811,7 +4811,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Give the Edge to the opponent. If you do so, POWERUP 3.",
+          "description": "[⧗] If you have the Edge, enemy hidden characters in this mission have -1 Power.",
           "description_fr": ""
         }
       ],
@@ -4832,8 +4832,8 @@
       "title_fr": "Équipe 7 originelle",
       "title_en": "Original Team 7",
       "has_visual": true,
-      "chakra": 3,
-      "power": 3,
+      "chakra": 4,
+      "power": 4,
       "keywords": [
         "Team 7"
       ],
@@ -4841,7 +4841,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "[⧗] If you don't have the Edge, CHAKRA +2.",
+          "description": "[⧗] If you have the Edge, this character has +3 Power.",
           "description_fr": ""
         }
       ],
@@ -4871,12 +4871,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Gain the Edge.",
-          "description_fr": ""
-        },
-        {
-          "type": "AMBUSH",
-          "description": "Copy a non-continuous instant effect of another friendly Team 7 character in play.",
+          "description": "[↯] Gain the Edge. You can't lose it during this round.",
           "description_fr": ""
         }
       ],

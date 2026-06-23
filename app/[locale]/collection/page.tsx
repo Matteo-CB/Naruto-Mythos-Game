@@ -24,7 +24,7 @@ import { VariantLockedBanner } from '@/components/cards/VariantLockedBanner';
 
 type AnyCard = CardData;
 
-const RARITY_ORDER: Rarity[] = ['C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L', 'MMS'];
+const RARITY_ORDER: Rarity[] = ['C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L', 'SP', 'SPV', 'MMS'];
 const RARITY_COLORS: Record<Rarity, string> = {
   C: '#888888',
   UC: '#4a9e4a',
@@ -35,6 +35,8 @@ const RARITY_COLORS: Record<Rarity, string> = {
   M: '#b33e3e',
   MV: '#b33e3e',
   L: '#c4a35a',
+  SP: '#22b8cf',
+  SPV: '#22b8cf',
   MMS: '#5a8ab5',
 };
 

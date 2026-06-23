@@ -22,10 +22,10 @@ export function registerAllMythosHandlers(): void {
   
   registerNaruto141Handlers();     // 141/130 - NARUTO: Discard to hide P4 enemy
   registerSasuke142Handlers();     // 142/130 - SASUKE: Discard to POWERUP X+1
-  registerNaruto145();             // 145/130 - NARUTO: [continuous] hidden +1 Power if Edge
-  registerSasuke146();             // 146/130 - SASUKE: Give Edge, POWERUP 3
-  registerSakura147();             // 147/130 - SAKURA: [continuous] CHAKRA +2 if no Edge
-  registerKakashi148Handlers();    // 148/130 - KAKASHI: Gain Edge / AMBUSH copy Team 7 effect
+  registerNaruto145();
+  registerSasuke146();
+  registerSakura147();
+  registerKakashi148Handlers();
   registerKiba149Handlers();       // 113/130 V - KIBA MV: Hide Akamaru+another / UPGRADE defeat both
   registerShikamaru150Handlers();  // 111/130 V - SHIKAMARU MV: [continuous] block hidden / UPGRADE hide P3
   registerRockLee151Handlers();    // 117/130 V - ROCK LEE MV: [continuous] must move / UPGRADE discard POWERUP

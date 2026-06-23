@@ -910,23 +910,22 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   
   'KS-145-M': [
-    '[⧗] Si vous avez l\'Initiative, vos personnages caches dans cette mission ont +1 Puissance.',
+    '[⧗] Si vous avez l\'Initiative, vos personnages cachés dans cette mission ont +1 Puissance.',
   ],
 
-  
+
   'KS-146-M': [
-    'Donnez l\'Initiative a l\'adversaire. Si vous le faites, POWERUP 3.',
+    '[⧗] Si vous avez l\'Initiative, les personnages cachés ennemis dans cette mission ont -1 Puissance.',
   ],
 
-  
+
   'KS-147-M': [
-    '[⧗] Si vous n\'avez pas l\'Initiative, CHAKRA +2.',
+    '[⧗] Si vous avez l\'Initiative, ce personnage a +3 Puissance.',
   ],
 
-  
+
   'KS-148-M': [
-    'Gagnez l\'Initiative.',
-    'Copiez un effet instantané d\'un autre personnage Equipe 7 allié en jeu.',
+    '[↯] Gagnez l\'Initiative. Vous ne pouvez pas la perdre durant cette manche.',
   ],
 
   

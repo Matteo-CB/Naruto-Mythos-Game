@@ -495,6 +495,7 @@ export class GameEngine {
     newState.player1.hasPassed = false;
     newState.player2.hasPassed = false;
     newState.firstPasser = null;
+    newState.edgeLockedFor = null;
 
     
     newState = executeStartPhase(newState);
@@ -1749,6 +1750,7 @@ export class GameEngine {
       phase: state.phase,
       activePlayer: state.activePlayer,
       edgeHolder: state.edgeHolder,
+      edgeLockedFor: state.edgeLockedFor ?? null,
       firstPasser: state.firstPasser,
       myPlayer: player,
       myState: deepClone(myState),

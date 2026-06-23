@@ -322,6 +322,56 @@
 }
 
 
+.holo-card[data-rarity="special"] .holo-card__shine,
+.holo-card[data-rarity="special"] .holo-card__shine::after {
+  --angle: 125deg;
+}
+
+.holo-card[data-rarity="special"] .holo-card__shine {
+  background-image:
+    repeating-linear-gradient(
+      var(--angle),
+      rgba(8, 24, 40, 0.55) 0%,
+      hsl(190, 90%, 55%) 2%,
+      rgb(120, 235, 255) 4%,
+      hsl(48, 95%, 60%) 6%,
+      hsl(190, 90%, 55%) 8%,
+      rgba(8, 24, 40, 0.55) 12%
+    ),
+    var(--grain);
+
+  background-size: 700% 700%, 500px;
+  background-position: var(--card-posx) var(--card-posy), center;
+  background-blend-mode: color-dodge;
+
+  filter: brightness(calc((var(--card-hyp) * 0.55) + 0.85)) contrast(3) saturate(1.3);
+}
+
+.holo-card[data-rarity="special"] .holo-card__shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+
+  background-image:
+    repeating-linear-gradient(
+      var(--angle),
+      rgba(8, 24, 40, 0.55) 0%,
+      hsl(190, 90%, 55%) 2%,
+      rgb(120, 235, 255) 4%,
+      hsl(48, 95%, 60%) 6%,
+      hsl(190, 90%, 55%) 8%,
+      rgba(8, 24, 40, 0.55) 12%
+    );
+
+  background-position: calc(var(--card-posx) * -1) calc(var(--card-posy) * -1);
+  background-size: 700% 700%;
+
+  filter: brightness(calc((var(--card-hyp) * 0.45) + 0.85)) contrast(2.6) saturate(1.2);
+  mix-blend-mode: exclusion;
+}
+
+
 .holo-card__glare {
   opacity: var(--card-o);
   transition: opacity 0.25s ease;

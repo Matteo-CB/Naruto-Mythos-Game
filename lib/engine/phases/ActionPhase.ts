@@ -616,13 +616,15 @@ function handlePass(state: GameState, player: PlayerID): GameState {
   let edgeHolder = state.edgeHolder;
   let firstPasser = state.firstPasser;
 
-  
+  const edgeLockedElsewhere = state.edgeLockedFor != null && state.edgeLockedFor !== player;
   if (firstPasser === null) {
     firstPasser = player;
-    edgeHolder = player;
+    if (!edgeLockedElsewhere) {
+      edgeHolder = player;
+    }
   }
 
-  const takesEdge = firstPasser === player && state.firstPasser === null;
+  const takesEdge = firstPasser === player && state.firstPasser === null && !edgeLockedElsewhere;
   const log = logAction(
     state.log,
     state.turn,

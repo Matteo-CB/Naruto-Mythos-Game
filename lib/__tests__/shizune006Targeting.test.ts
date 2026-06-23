@@ -124,4 +124,33 @@ describe('Shizune 006 MAIN — Power threshold for "3 or less" targeting', () =>
     expect(targetPending!.validTargets).toContain(e1.instanceId);
     expect(targetPending!.validTargets).toContain(e2.instanceId);
   });
+
+  it('includes a HIDDEN enemy in another mission even with printed Power 5 (hidden = Power 0)', () => {
+    const { state, shizuneInstanceId } = setupShizune006();
+    const hidden = mockCharInPlay({
+      instanceId: 'hidden-big', controlledBy: 'player2', originalOwner: 'player2', missionIndex: 1, isHidden: true,
+    }, { id: 'enemy-big', number: 999, name_fr: 'BIGENEMY', chakra: 5, power: 5, group: 'Independent' });
+    state.activeMissions[1].player2Characters.push(hidden);
+
+    const newState = EffectEngine.applyTargetedEffect(state, state.pendingEffects[0], [shizuneInstanceId]);
+
+    const targetPending = newState.pendingEffects.find(p => p.targetSelectionType === 'MOVE_ENEMY_POWER_3_OR_LESS');
+    expect(targetPending).toBeDefined();
+    expect(targetPending!.validTargets).toContain('hidden-big');
+  });
+
+  it('includes a HIDDEN enemy whose real name matches a VISIBLE enemy on the only other mission (hidden has no visible name, so always movable)', () => {
+    const { state, shizuneInstanceId } = setupShizune006();
+    placeEnemy(state, 2, 'NARUTO', 0);
+    const hidden = mockCharInPlay({
+      instanceId: 'hidden-naruto', controlledBy: 'player2', originalOwner: 'player2', missionIndex: 1, isHidden: true,
+    }, { id: 'enemy-naruto-h', number: 99, name_fr: 'NARUTO', chakra: 5, power: 5, group: 'Independent' });
+    state.activeMissions[1].player2Characters.push(hidden);
+
+    const newState = EffectEngine.applyTargetedEffect(state, state.pendingEffects[0], [shizuneInstanceId]);
+
+    const targetPending = newState.pendingEffects.find(p => p.targetSelectionType === 'MOVE_ENEMY_POWER_3_OR_LESS');
+    expect(targetPending).toBeDefined();
+    expect(targetPending!.validTargets).toContain('hidden-naruto');
+  });
 });

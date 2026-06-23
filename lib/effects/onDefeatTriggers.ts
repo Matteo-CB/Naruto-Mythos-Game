@@ -16,7 +16,7 @@ export function triggerOnDefeatEffects(
 
       for (const char of mission[side]) {
         if (char.isHidden) continue;
-        
+        if (char.instanceId === defeatedChar.instanceId) continue;
         if (simultaneousDefeatIds && simultaneousDefeatIds.includes(char.instanceId)) continue;
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 

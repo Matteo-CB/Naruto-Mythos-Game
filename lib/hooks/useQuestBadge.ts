@@ -42,8 +42,9 @@ export function useQuestBadge(): UseQuestBadgeResult {
 
         if (cancelled) return;
 
+        const dailyQuestId: string | null = dailyData?.quest?.id ?? null;
         const quests: QuestSummary[] = Array.isArray(questsData?.quests) ? questsData.quests : [];
-        const unclaimed = quests.filter((q) => q.completed && !q.claimed);
+        const unclaimed = quests.filter((q) => q.completed && !q.claimed && q.id !== dailyQuestId);
 
         const daily: DailySummary | null = dailyData
           ? { completed: !!dailyData.completed, claimed: !!dailyData.claimed }

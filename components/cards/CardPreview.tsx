@@ -21,6 +21,8 @@ const RARITY_COLORS: Record<Rarity, string> = {
   M: '#ef4444',
   MV: '#ef4444',
   L: '#eab308',
+  SP: '#06b6d4',
+  SPV: '#06b6d4',
   MMS: '#6b7280',
 };
 

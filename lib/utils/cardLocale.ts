@@ -71,6 +71,8 @@ const RARITY_LABELS_EN: Record<string, string> = {
   M: 'Mythos',
   MV: 'Mythos V',
   L: 'Legendary',
+  SP: 'Special',
+  SPV: 'Special V',
   MMS: 'Mission',
 };
 
@@ -84,6 +86,8 @@ const RARITY_LABELS_FR: Record<string, string> = {
   M: 'Mythos',
   MV: 'Mythos V',
   L: 'Légendaire',
+  SP: 'Spéciale',
+  SPV: 'Spéciale V',
   MMS: 'Mission',
 };
 

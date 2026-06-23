@@ -6,7 +6,6 @@ import { registerUserSocket, removeSocketFromAll } from '@/lib/socket/io';
 import { prisma } from '@/lib/db/prisma';
 import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
 import { calculateEloChanges, calculatePerformanceBonus, type PerformanceBonus } from '@/lib/elo/elo';
-import { computeRepeatOpponentMultiplier } from '@/lib/elo/repeatOpponent';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
 import { sendRankUpNotification } from '@/lib/discord/rankUpWebhook';
 import { registerTournamentHandlers, handleTournamentMatchEnd, rehydrateAbsenceTimers, sweepOrphanTournamentMatches } from '@/lib/socket/tournamentHandlers';
@@ -336,17 +335,6 @@ export function chessClockExpiryReasonToWinReason(reason: ChessClockExpiryReason
 
 export function handleChessClockExpiry(room: RoomData, loser: PlayerID, io: SocketIOServer, reason: ChessClockExpiryReason): void {
   if (!room.gameState || room.finalized) return;
-  if (reason === 'disconnect') {
-    const loserScore = loser === 'player1' ? room.gameState.player1.missionPoints : room.gameState.player2.missionPoints;
-    const winnerScore = loser === 'player1' ? room.gameState.player2.missionPoints : room.gameState.player1.missionPoints;
-    if (loserScore > winnerScore && loserScore - winnerScore >= 5) {
-      console.warn(`[ChessClock] ${room.code}: disconnect forfeit aborted — disconnected ${loser} was leading ${loserScore}-${winnerScore}, cancelling with NO elo (suspected server-side outage)`);
-      cancelGameNoElo(room, room.code, io, 'stalemate').catch((err) => {
-        console.error(`[ChessClock] ${room.code}: cancelGameNoElo failed:`, err instanceof Error ? err.message : err);
-      });
-      return;
-    }
-  }
   const winReason = chessClockExpiryReasonToWinReason(reason);
   console.log(`[ChessClock] ${room.code}: ${loser} loses by clock (reason=${reason}, winReason=${winReason})`);
   try {
@@ -1019,32 +1007,7 @@ async function finalizeGameEnd(
           performanceBonus,
         });
 
-        let changes = rawChanges;
-        try {
-          const priorPairCount = await prisma.eloHistory.count({
-            where: {
-              userId: room.hostId,
-              opponentId: room.guestId,
-              eloType,
-              createdAt: { gt: new Date(Date.now() - 24 * 60 * 60 * 1000) },
-            },
-          });
-          const decay = computeRepeatOpponentMultiplier(priorPairCount);
-          if (decay.multiplier < 1) {
-            const decayedP1Delta = Math.round(rawChanges.player1Delta * decay.multiplier);
-            const decayedP2Delta = Math.round(rawChanges.player2Delta * decay.multiplier);
-            changes = {
-              ...rawChanges,
-              player1Delta: decayedP1Delta,
-              player2Delta: decayedP2Delta,
-              player1NewElo: Math.max(100, p1OldElo + decayedP1Delta),
-              player2NewElo: Math.max(100, p2OldElo + decayedP2Delta),
-            };
-            console.log(`[ELO] Repeat-opponent decay applied: pair=${room.hostId}/${room.guestId} prior=${priorPairCount} tier=${decay.tier} multiplier=${decay.multiplier}`);
-          }
-        } catch (err) {
-          console.warn('[ELO] repeat-opponent count failed, falling back to full ELO:', err instanceof Error ? err.message : err);
-        }
+        const changes = rawChanges;
 
         const p1Stats = winner === 'player1' ? buildWinStats() : buildLossStats();
         const p2Stats = winner === 'player2' ? buildWinStats() : buildLossStats();

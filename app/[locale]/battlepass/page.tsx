@@ -387,9 +387,12 @@ export default function RewardsHubPage() {
     }
   };
 
+  const dailyQuestId = daily?.quest.id ?? null;
+  const mainQuests = quests.filter((q) => q.id !== dailyQuestId);
+
   const claimableCardCount = claimableCardTiers.length;
   const claimableQuestCount =
-    quests.filter((q) => q.completed && !q.claimed).length +
+    mainQuests.filter((q) => q.completed && !q.claimed).length +
     (daily && daily.completed && !daily.claimed ? 1 : 0);
 
   const tabBadgeCount = (key: TabKey): number => {
@@ -406,7 +409,7 @@ export default function RewardsHubPage() {
 
   const recommendedQuests: QuestRow[] = (() => {
     const byLevel: Record<number, QuestRow | null> = { 1: null, 2: null, 3: null, 4: null };
-    for (const q of quests) {
+    for (const q of mainQuests) {
       if (q.claimed) continue;
       const cur = byLevel[q.level];
       const qScore = (q.completed ? 1 : 0) * 2 + (q.progress / Math.max(1, q.target));
@@ -418,12 +421,12 @@ export default function RewardsHubPage() {
 
   const levelCounts = [1, 2, 3, 4].map((level) => ({
     level,
-    total: quests.filter((q) => q.level === level).length,
-    completed: quests.filter((q) => q.level === level && q.completed).length,
-    claimable: quests.filter((q) => q.level === level && q.completed && !q.claimed).length,
+    total: mainQuests.filter((q) => q.level === level).length,
+    completed: mainQuests.filter((q) => q.level === level && q.completed).length,
+    claimable: mainQuests.filter((q) => q.level === level && q.completed && !q.claimed).length,
   }));
 
-  const filteredQuests = quests.filter((q) => q.level === activeLevel);
+  const filteredQuests = mainQuests.filter((q) => q.level === activeLevel);
 
   return (
     <main className="relative min-h-screen flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a', color: '#e8e8e8' }}>
@@ -855,15 +858,9 @@ export default function RewardsHubPage() {
                         {daily.claimed ? (
                           <span
                             className="text-[10px] uppercase tracking-widest font-display"
-                            style={{
-                              color: daily.claimedVia === 'main' ? ACCENT : '#666',
-                              backgroundColor: daily.claimedVia === 'main' ? `${ACCENT}1f` : 'transparent',
-                              padding: daily.claimedVia === 'main' ? '4px 8px' : '0',
-                            }}
+                            style={{ color: '#666' }}
                           >
-                            {daily.claimedVia === 'main'
-                              ? tQuests('claimedViaMain')
-                              : tQuests('claimed')}
+                            {tQuests('claimed')}
                           </span>
                         ) : daily.completed ? (
                           <button
@@ -943,16 +940,9 @@ export default function RewardsHubPage() {
                           {q.claimed ? (
                             <span
                               className="text-[10px] uppercase tracking-widest font-display"
-                              style={{
-                                color: q.claimedVia === 'daily' ? ACCENT : '#555',
-                                backgroundColor: q.claimedVia === 'daily' ? `${ACCENT}1f` : 'transparent',
-                                padding: q.claimedVia === 'daily' ? '3px 6px' : '0',
-                                whiteSpace: 'nowrap',
-                              }}
+                              style={{ color: '#555', whiteSpace: 'nowrap' }}
                             >
-                              {q.claimedVia === 'daily'
-                                ? tQuests('claimedViaDaily')
-                                : tQuests('claimed')}
+                              {tQuests('claimed')}
                             </span>
                           ) : q.completed ? (
                             <button
