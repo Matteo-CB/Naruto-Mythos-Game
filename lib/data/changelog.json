@@ -2,10 +2,10 @@
   "entries": [
     {
       "date": "2026-06-13",
-      "title_fr": "Équipe 7 d'origine repensée, carte Minato et déconnexion corrigée",
-      "title_en": "Original Team 7 reworked, Minato card and disconnect fix",
+      "title_fr": "Équipe 7 d'origine mise à jour, carte Minato et déconnexion corrigée",
+      "title_en": "Original Team 7 updated, Minato card and disconnect fix",
       "changes_fr": [
-        "Les quatre cartes Mythos Équipe 7 d'origine (Naruto, Sasuke, Sakura, Kakashi) ont une nouvelle illustration et des effets repensés autour de l'Initiative.",
+        "Les quatre cartes Mythos Équipe 7 d'origine (Naruto, Sasuke, Sakura, Kakashi) ont leur nouvelle illustration et leurs effets corrigés pour coller à la vraie carte, autour de l'Initiative.",
         "Naruto Équipe 7 d'origine : tant que tu as l'Initiative, tes personnages cachés dans la mission gagnent +1 Puissance. Sasuke : les personnages cachés ennemis ont -1. Sakura : elle gagne +3 Puissance.",
         "Kakashi Équipe 7 d'origine gagne l'Initiative et ne peut plus la perdre jusqu'à la fin de la manche. Le jeton d'Initiative affiche un effet verrouillé quand c'est le cas.",
         "Nouvelle carte spéciale Minato Namikaze : disponible pour tout le monde dans la collection, jouable partout sauf en classé. Elle défausse les Bêtes à Queues d'une pile ennemie ou déplace une Bête à Queues alliée.",
@@ -13,7 +13,7 @@
         "Quand l'adversaire se déconnecte en fin de partie alors qu'il est en train de perdre, il est maintenant déclaré forfait et tu remportes la partie. Avant, la partie pouvait s'annuler sans vainqueur si le joueur déconnecté menait encore au score des manches précédentes."
       ],
       "changes_en": [
-        "The four Original Team 7 Mythos cards (Naruto, Sasuke, Sakura, Kakashi) have new artwork and reworked effects built around the Edge.",
+        "The four Original Team 7 Mythos cards (Naruto, Sasuke, Sakura, Kakashi) now have their new artwork and their effects corrected to match the real card, built around the Edge.",
         "Naruto Original Team 7: while you hold the Edge, your hidden characters in the mission gain +1 Power. Sasuke: enemy hidden characters get -1. Sakura: she gains +3 Power.",
         "Kakashi Original Team 7 gains the Edge and can no longer lose it until the end of the round. The Edge token shows a locked state when this happens.",
         "New special card Minato Namikaze: available to everyone in the collection, playable everywhere except ranked. It discards Tailed Beasts from an enemy stack or moves a friendly Tailed Beast.",
