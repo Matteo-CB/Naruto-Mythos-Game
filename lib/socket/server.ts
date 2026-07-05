@@ -1409,6 +1409,14 @@ async function finalizeGameEnd(
 
     console.log(`[Socket] Game saved: ${recordId} | winner=${winner} (${winner === 'player1' ? room.hostId : room.guestId}) | ranked=${room.isRanked} | elo=${eloData ? `p1:${eloData.player1Delta} p2:${eloData.player2Delta}` : 'none'}`);
 
+    if (eloData && room.isEvolving !== true) {
+      const deckIdsOf = (d: { characters: CharacterCard[]; missions: MissionCard[] } | null) =>
+        d ? [...d.characters.map((c) => c.id), ...d.missions.map((m) => m.id)] : null;
+      import('@/lib/cards/usageLive')
+        .then(({ recordRankedDeckUsage }) => recordRankedDeckUsage([deckIdsOf(room.hostDeck), deckIdsOf(room.guestDeck)]))
+        .catch(() => {});
+    }
+
     if (room.pendingEloHistoryIds && room.pendingEloHistoryIds.length > 0) {
       await prisma.eloHistory.updateMany({
         where: { id: { in: room.pendingEloHistoryIds } },

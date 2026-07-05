@@ -6,7 +6,6 @@ interface DayTotal { date: string; decks: number; games: number }
 let dayRows: DayRow[] = [];
 let dayTotals: DayTotal[] = [];
 
-const fakeRunCommandRaw = vi.fn();
 const fakeEloFindMany = vi.fn();
 const fakeBannedFindMany = vi.fn();
 const fakeStatFindMany = vi.fn();
@@ -14,7 +13,6 @@ const fakeMetaFindUnique = vi.fn();
 
 vi.mock('@/lib/db/prisma', () => ({
   prisma: {
-    $runCommandRaw: (...a: unknown[]) => fakeRunCommandRaw(...a),
     cardUsageDay: {
       deleteMany: async ({ where }: { where: { date: string | { lt: string } } }) => {
         if (typeof where.date === 'string') {
@@ -26,17 +24,20 @@ vi.mock('@/lib/db/prisma', () => ({
         }
         return { count: 0 };
       },
-      createMany: async ({ data }: { data: DayRow[] }) => {
-        dayRows.push(...data);
-        return { count: data.length };
+      upsert: async ({ where, create }: { where: { date_cardId: { date: string; cardId: string } }; create: DayRow }) => {
+        const found = dayRows.find((r) => r.date === where.date_cardId.date && r.cardId === where.date_cardId.cardId);
+        if (found) found.decks += create.decks;
+        else dayRows.push({ ...create });
+        return create;
       },
       findMany: async ({ where }: { where: { date: { gte: string } } }) =>
         dayRows.filter((r) => r.date >= where.date.gte).map((r) => ({ cardId: r.cardId, decks: r.decks })),
     },
     cardUsageDayTotal: {
       upsert: async ({ where, create }: { where: { date: string }; create: DayTotal }) => {
-        dayTotals = dayTotals.filter((t) => t.date !== where.date);
-        dayTotals.push(create);
+        const found = dayTotals.find((t) => t.date === where.date);
+        if (found) { found.decks += create.decks; found.games += create.games; }
+        else dayTotals.push({ ...create });
         return create;
       },
       deleteMany: async ({ where }: { where: { date: { lt: string } } }) => {
@@ -55,42 +56,22 @@ vi.mock('@/lib/db/prisma', () => ({
 
 import { GET } from '@/app/api/cards/usage/route';
 import { computeCardUsage } from '@/lib/cards/usageCompute';
+import { recordRankedDeckUsage } from '@/lib/cards/usageLive';
 
-function rawResponse(games: Array<{ p1?: string[]; p2?: string[] }>) {
-  return { cursor: { firstBatch: games } };
-}
-
-describe('computeCardUsage (decks played in ranked games over the last 14 days)', () => {
+describe('recordRankedDeckUsage + computeCardUsage (decks played in ranked games, 14 days)', () => {
   beforeEach(() => {
     dayRows = [];
     dayTotals = [];
-    fakeRunCommandRaw.mockReset();
     fakeEloFindMany.mockReset();
     fakeBannedFindMany.mockReset();
     fakeBannedFindMany.mockResolvedValue([]);
     fakeEloFindMany.mockResolvedValue([]);
   });
 
-  it('aggregates only ranked-classic games (no AI, no evolving, elo-rated) from the Game collection', async () => {
-    fakeRunCommandRaw.mockResolvedValue(rawResponse([]));
-    await computeCardUsage();
-    const cmd = fakeRunCommandRaw.mock.calls[0][0] as { aggregate: string; pipeline: Array<Record<string, unknown>> };
-    expect(cmd.aggregate).toBe('Game');
-    const match = cmd.pipeline[0].$match as Record<string, unknown>;
-    expect(match.isAiGame).toBe(false);
-    expect(match.isEvolving).toBe(false);
-    expect(match.eloChange).toEqual({ $ne: null });
-    expect(match.completedAt).toBeDefined();
-  });
-
   it('counts each PLAYED deck once per game, shares the stat across variants, computes tiers', async () => {
-    fakeRunCommandRaw
-      .mockResolvedValueOnce(rawResponse([]))
-      .mockResolvedValueOnce(rawResponse([]))
-      .mockResolvedValueOnce(rawResponse([
-        { p1: ['KS-108-R', 'KS-108-R'], p2: ['KS-108-MV'] },
-        { p1: ['KS-005-C'], p2: [] },
-      ]));
+    await recordRankedDeckUsage([['KS-108-R', 'KS-108-R'], ['KS-108-MV']]);
+    await recordRankedDeckUsage([['KS-005-C'], null]);
+
     const r = await computeCardUsage();
 
     expect(r.totalDecks).toBe(3);
@@ -104,19 +85,22 @@ describe('computeCardUsage (decks played in ranked games over the last 14 days)'
     expect(base.tier).toBe('OU');
   });
 
-  it('sums decks across the daily snapshots of the 14-day window', async () => {
-    fakeRunCommandRaw
-      .mockResolvedValueOnce(rawResponse([{ p1: ['KS-005-C'], p2: ['KS-108-R'] }]))
-      .mockResolvedValueOnce(rawResponse([{ p1: ['KS-108-R'], p2: undefined }]))
-      .mockResolvedValueOnce(rawResponse([]));
+  it('skips missing decks from numerator and denominator', async () => {
+    await recordRankedDeckUsage([['KS-005-C'], undefined]);
+    await recordRankedDeckUsage([[], ['KS-108-R']]);
     const r = await computeCardUsage();
-    expect(r.totalDecks).toBe(3);
+    expect(r.totalDecks).toBe(2);
     const naruto = r.cards.find((c) => c.cardId === 'KS-108-R')!;
-    expect(naruto.count).toBe(2);
+    expect(naruto.count).toBe(1);
+  });
+
+  it('records nothing when no deck is provided', async () => {
+    await recordRankedDeckUsage([null, undefined]);
+    expect(dayTotals.length).toBe(0);
+    expect(dayRows.length).toBe(0);
   });
 
   it('counts active players from distinct ranked EloHistory rows (14 days)', async () => {
-    fakeRunCommandRaw.mockResolvedValue(rawResponse([]));
     fakeEloFindMany.mockResolvedValue([{ userId: 'u1' }, { userId: 'u2' }, { userId: 'u3' }]);
     const r = await computeCardUsage();
     expect(r.activePlayers).toBe(3);
@@ -126,14 +110,13 @@ describe('computeCardUsage (decks played in ranked games over the last 14 days)'
   });
 
   it('marks ranked-banned cards with the BAN tier', async () => {
-    fakeRunCommandRaw.mockResolvedValue(rawResponse([{ p1: ['KS-036-C'], p2: [] }]));
+    await recordRankedDeckUsage([['KS-036-C'], null]);
     const r = await computeCardUsage();
     const banned = r.cards.find((c) => c.cardId === 'SS-112-SPV')!;
     expect(banned.tier).toBe('BAN');
   });
 
   it('yields no data when there are no ranked games in the window', async () => {
-    fakeRunCommandRaw.mockResolvedValue(rawResponse([]));
     const r = await computeCardUsage();
     expect(r.activePlayers).toBe(0);
     expect(r.totalDecks).toBe(0);
