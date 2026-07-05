@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import CardFace from '@/components/cards/CardFace';
 import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoader';
+import { getCardName } from '@/lib/utils/cardLocale';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
@@ -17,6 +18,7 @@ type FilterMode = 'all' | 'banned' | 'authorized';
 
 export default function AdminCardsPage() {
   const t = useTranslations();
+  const locale = useLocale();
   const { data: session } = useSession();
   const [bannedIds, setBannedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -242,7 +244,7 @@ export default function AdminCardsPage() {
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        {card.name_fr}
+                        {getCardName(card, locale)}
                       </div>
                       <div
                         style={{

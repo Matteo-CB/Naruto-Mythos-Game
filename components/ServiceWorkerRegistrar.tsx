@@ -6,7 +6,18 @@ export function ServiceWorkerRegistrar() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (!('serviceWorker' in navigator)) return;
-    if (process.env.NODE_ENV !== 'production') return;
+
+    if (process.env.NODE_ENV !== 'production') {
+      navigator.serviceWorker.getRegistrations()
+        .then((regs) => Promise.all(regs.map((r) => r.unregister())))
+        .catch(() => { /* ignore */ });
+      if (typeof caches !== 'undefined') {
+        caches.keys()
+          .then((keys) => Promise.all(keys.map((k) => caches.delete(k))))
+          .catch(() => { /* ignore */ });
+      }
+      return;
+    }
 
     const register = async () => {
       try {

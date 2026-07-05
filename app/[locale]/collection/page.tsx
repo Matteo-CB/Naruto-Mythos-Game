@@ -6,43 +6,28 @@ import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
-import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
-import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
+import { CardQuickPreviewModal } from '@/components/cards/CardQuickPreviewModal';
+import { cardIdToSlug } from '@/lib/cards/slug';
 import { Footer } from '@/components/Footer';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
-import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
-import { ALL_SET_IDS, SET_REGISTRY } from '@/lib/data/sets/registry';
+import { getCardName, getCardGroup, getRarityLabel } from '@/lib/utils/cardLocale';
+import { ALL_SET_IDS, SET_REGISTRY, getSetName } from '@/lib/data/sets/registry';
 import type { CharacterCard, MissionCard, CardData, Rarity } from '@/lib/engine/types';
-import { isVariantCard } from '@/lib/variants/isVariant';
+import { isVariantCard, isLockedVariantCard } from '@/lib/variants/isVariant';
 import { filterCollectionCards } from '@/lib/collection/filter';
 import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 import { useTrackOnMount } from '@/lib/hooks/useTrackUi';
 import { LockedCardWrapper } from '@/components/cards/LockedCardWrapper';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
-import { VariantLockedBanner } from '@/components/cards/VariantLockedBanner';
 
 type AnyCard = CardData;
 
-const RARITY_ORDER: Rarity[] = ['C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L', 'SP', 'SPV', 'MMS'];
-const RARITY_COLORS: Record<Rarity, string> = {
-  C: '#888888',
-  UC: '#4a9e4a',
-  R: '#4a7ab5',
-  RA: '#8a5ab5',
-  S: '#c4a35a',
-  SV: '#c4a35a',
-  M: '#b33e3e',
-  MV: '#b33e3e',
-  L: '#c4a35a',
-  SP: '#22b8cf',
-  SPV: '#22b8cf',
-  MMS: '#5a8ab5',
-};
-
+const RARITY_ORDER: Rarity[] = ['C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L', 'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV', 'MMS'];
 export default function CollectionPage() {
   const t = useTranslations();
   const locale = useLocale();
+  const tCardMeta = useTranslations('cardMeta');
   const [allCards, setAllCards] = useState<AnyCard[]>([]);
   const [cardsLoading, setCardsLoading] = useState(true);
   const [filterRarity, setFilterRarity] = useState<string>('all');
@@ -140,7 +125,7 @@ export default function CollectionPage() {
           >
             <option value="all">{t('collection.allRarities')}</option>
             {RARITY_ORDER.map((r) => (
-              <option key={r} value={r}>{getRarityLabel(r, locale as 'en' | 'fr')}</option>
+              <option key={r} value={r}>{getRarityLabel(r, tCardMeta)}</option>
             ))}
           </select>
           <select
@@ -151,7 +136,7 @@ export default function CollectionPage() {
           >
             <option value="all">{t('collection.allGroups')}</option>
             {groups.map((g) => (
-              <option key={g} value={g}>{getCardGroup(g, locale as 'en' | 'fr')}</option>
+              <option key={g} value={g}>{getCardGroup(g, tCardMeta)}</option>
             ))}
           </select>
           <select
@@ -163,7 +148,7 @@ export default function CollectionPage() {
             <option value="all">{t('collection.allSets')}</option>
             {ALL_SET_IDS.map((sid) => {
               const desc = SET_REGISTRY[sid];
-              const name = locale === 'fr' ? desc.nameFr : desc.nameEn;
+              const name = getSetName(sid, locale);
               const suffix = desc.status === 'coming_soon' ? ' (' + t('common.comingSoon') + ')' : '';
               return <option key={sid} value={sid}>{name + suffix}</option>;
             })}
@@ -211,7 +196,7 @@ export default function CollectionPage() {
             const isBanned = bannedIds.has(card.id);
             const imgPath = getImagePath(card);
             const variant = isVariantCard(card);
-            const locked = variant && !unlockedVariantIds.has(card.id);
+            const locked = isLockedVariantCard(card) && !unlockedVariantIds.has(card.id);
             const inner = (
               <>
                 {imgPath ? (
@@ -236,22 +221,26 @@ export default function CollectionPage() {
               </>
             );
             return (
-              <button
+              <div
                 key={card.id}
-                onClick={() => setSelectedCard(card)}
                 className="relative card-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
-                aria-label={getCardName(card, locale as 'en' | 'fr')}
               >
-                {locked ? (
-                  <LockedCardWrapper
-                    badgeLabel={t('collection.lockedBadge')}
-                    badgeTooltip={t('collection.lockedTooltip')}
-                  >
-                    {inner}
-                  </LockedCardWrapper>
-                ) : (
-                  inner
-                )}
+                <Link
+                  href={`/cards/${cardIdToSlug(card.id)}`}
+                  className="block w-full h-full"
+                  aria-label={getCardName(card, locale)}
+                >
+                  {locked ? (
+                    <LockedCardWrapper
+                      badgeLabel={t('collection.lockedBadge')}
+                      badgeTooltip={t('collection.lockedTooltip')}
+                    >
+                      {inner}
+                    </LockedCardWrapper>
+                  ) : (
+                    inner
+                  )}
+                </Link>
                 {isBanned && <BanBadge label={t('collection.bannedPlaceholder')} />}
                 {variant && !locked && (variantInventory.get(card.id) ?? 0) >= 2 && (
                   <span
@@ -261,7 +250,19 @@ export default function CollectionPage() {
                     x{variantInventory.get(card.id)}
                   </span>
                 )}
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedCard(card)}
+                  className="absolute top-1 left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full opacity-70 hover:opacity-100 transition-opacity"
+                  style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: '#c4a35a' }}
+                  aria-label={t('collection.quickPreview')}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </button>
+              </div>
             );
           })}
         </div>
@@ -302,31 +303,48 @@ export default function CollectionPage() {
                 const isBanned = bannedIds.has(card.id);
                 const imgPath = getImagePath(card);
                 return (
-                  <button
+                  <div
                     key={card.id}
-                    onClick={() => setSelectedCard(card)}
                     className="relative mission-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
                   >
-                    {imgPath ? (
-                      <img
-                        src={imgPath}
-                        alt={getCardName(card, locale as 'en' | 'fr')}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        decoding="async"
-                        width={200}
-                        height={140}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center p-1">
-                        <div className="w-10 h-7 bg-[#1a1a1a] mb-1" />
-                        <span className="text-[8px] text-[#555] text-center leading-tight">
-                          {getCardName(card, locale as 'en' | 'fr')}
-                        </span>
-                      </div>
-                    )}
+                    <Link
+                      href={`/cards/${cardIdToSlug(card.id)}`}
+                      className="block w-full h-full"
+                      aria-label={getCardName(card, locale)}
+                    >
+                      {imgPath ? (
+                        <img
+                          src={imgPath}
+                          alt={getCardName(card, locale)}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                          width={200}
+                          height={140}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center p-1">
+                          <div className="w-10 h-7 bg-[#1a1a1a] mb-1" />
+                          <span className="text-[8px] text-[#555] text-center leading-tight">
+                            {getCardName(card, locale)}
+                          </span>
+                        </div>
+                      )}
+                    </Link>
                     {isBanned && <BanBadge label={t('collection.bannedPlaceholder')} />}
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCard(card)}
+                      className="absolute top-1 left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full opacity-70 hover:opacity-100 transition-opacity"
+                      style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: '#c4a35a' }}
+                      aria-label={t('collection.quickPreview')}
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                      </svg>
+                    </button>
+                  </div>
                 );
               })}
             </div>
@@ -334,128 +352,7 @@ export default function CollectionPage() {
         )}
 
         {selectedCard && (
-          <div
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-            onClick={() => setSelectedCard(null)}
-            role="dialog"
-            aria-modal="true"
-            aria-label={getCardName(selectedCard, locale as 'en' | 'fr')}
-          >
-            <div
-              className="bg-[#141414] border border-[#262626] max-w-lg w-full max-h-[90vh] overflow-y-auto p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className={selectedCard.card_type === 'mission' ? 'flex flex-col gap-4' : 'flex gap-4'}>
-                
-                <div className={`relative ${selectedCard.card_type === 'mission' ? 'w-full' : 'w-40 shrink-0'}`}>
-                  {getImagePath(selectedCard) ? (
-                    <img
-                      src={getImagePath(selectedCard)!}
-                      alt={getCardName(selectedCard, locale as 'en' | 'fr')}
-                      className={`w-full ${selectedCard.card_type === 'mission' ? 'mission-aspect' : 'card-aspect'} object-cover`}
-                      loading="eager"
-                      decoding="async"
-                    />
-                  ) : (
-                    <div className={`w-full ${selectedCard.card_type === 'mission' ? 'mission-aspect' : 'card-aspect'} bg-[#1a1a1a] flex items-center justify-center`}>
-                      <span className="text-xs text-[#555]">{t('card.noImage')}</span>
-                    </div>
-                  )}
-                  {bannedIds.has(selectedCard.id) && <BanBadge label={t('collection.bannedPlaceholder')} />}
-                </div>
-
-                <div className="flex-1 min-w-0 font-body">
-                  <h2 className="text-xl font-bold text-[#e0e0e0]">{getCardName(selectedCard, locale as 'en' | 'fr')}</h2>
-                  <p className="text-sm text-[#888888] mb-3">{getCardTitle(selectedCard, locale as 'en' | 'fr')}</p>
-
-                  <div className="flex gap-4 mb-3 text-sm">
-                    <span className="text-[#888888]">
-                      ID: <span className="text-[#e0e0e0]">{selectedCard.id}</span>
-                    </span>
-                    <span style={{ color: RARITY_COLORS[selectedCard.rarity] }}>
-                      {getRarityLabel(selectedCard.rarity, locale as 'en' | 'fr')}
-                    </span>
-                  </div>
-
-                  {selectedCard.card_type === 'character' && (
-                    <div className="flex gap-4 mb-3 text-sm">
-                      <span className="text-[#888888]">
-                        {t('collection.details.cost')}: <span className="text-[#e0e0e0]">{selectedCard.chakra}</span>
-                      </span>
-                      <span className="text-[#888888]">
-                        {t('collection.details.power')}: <span className="text-[#e0e0e0]">{selectedCard.power}</span>
-                      </span>
-                    </div>
-                  )}
-
-                  {selectedCard.card_type === 'mission' && 'basePoints' in selectedCard && (
-                    <div className="flex gap-4 mb-3 text-sm">
-                      <span className="text-[#888888]">
-                        {t('collection.basePoints')}: <span className="text-[#e0e0e0]">{(selectedCard as unknown as MissionCard).basePoints}</span>
-                      </span>
-                    </div>
-                  )}
-
-                  {selectedCard.group && (
-                    <p className="text-xs text-[#888888] mb-2">
-                      {t('collection.details.group')}: <span className="text-[#e0e0e0]">{getCardGroup(selectedCard.group, locale as 'en' | 'fr')}</span>
-                    </p>
-                  )}
-
-                  {selectedCard.keywords && selectedCard.keywords.length > 0 && (
-                    <p className="text-xs text-[#888888] mb-3">
-                      {t('collection.details.keywords')}: <span className="text-[#e0e0e0]">{selectedCard.keywords.map((kw) => getCardKeyword(kw, locale as 'en' | 'fr')).join(', ')}</span>
-                    </p>
-                  )}
-
-                  {selectedCard.effects && selectedCard.effects.length > 0 && (
-                    <div className="mt-3 space-y-2">
-                      {selectedCard.effects.map((effect, i) => {
-                        const raFallbackId = selectedCard.id.endsWith('-RA') ? selectedCard.id.replace('-RA', '-R') : undefined;
-                        const frDescriptions = effectDescriptionsFr[selectedCard.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
-                        const enDescriptions = effectDescriptionsEn[selectedCard.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
-                        const description = locale === 'fr'
-                          ? (frDescriptions?.[i] ?? enDescriptions?.[i] ?? effect.description)
-                          : (enDescriptions?.[i] ?? effect.description);
-                        return (
-                          <div key={i} className="text-xs">
-                            <span
-                              className="font-bold mr-1"
-                              style={{
-                                color:
-                                  effect.type === 'MAIN' ? '#e0e0e0' :
-                                  effect.type === 'UPGRADE' ? '#c4a35a' :
-                                  effect.type === 'AMBUSH' ? '#b33e3e' :
-                                  effect.type === 'SCORE' ? '#4a9e4a' : '#888888',
-                              }}
-                            >
-                              [{effect.type}]
-                            </span>
-                            <span className="font-body text-[#aaa]">{description}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {isVariantCard(selectedCard) && !unlockedVariantIds.has(selectedCard.id) && (
-                <VariantLockedBanner
-                  title={t('collection.lockedBannerTitle')}
-                  description={t('collection.lockedBannerDescription')}
-                />
-              )}
-
-              <button
-                onClick={() => setSelectedCard(null)}
-                className="mt-4 w-full py-2 bg-[#1a1a1a] border border-[#262626] text-[#888888] text-sm hover:bg-[#222] transition-colors"
-                aria-label={t('common.cancel')}
-              >
-                {t('common.cancel')}
-              </button>
-            </div>
-          </div>
+          <CardQuickPreviewModal card={selectedCard} onClose={() => setSelectedCard(null)} />
         )}
       </div>
       <Footer />

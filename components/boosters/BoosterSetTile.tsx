@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import type { BoosterInventoryEntry } from '@/lib/hooks/useBoosterInventory';
-import { BOOSTER_FALLBACK_IMAGE, getSetNumber } from '@/lib/data/sets/registry';
+import { BOOSTER_FALLBACK_IMAGE, getSetNumber, getSetName } from '@/lib/data/sets/registry';
 
 function handleBoosterError(e: React.SyntheticEvent<HTMLImageElement>) {
   const t = e.currentTarget;
@@ -12,7 +12,7 @@ function handleBoosterError(e: React.SyntheticEvent<HTMLImageElement>) {
 
 interface BoosterSetTileProps {
   entry: BoosterInventoryEntry;
-  locale: 'en' | 'fr';
+  locale: string;
   countLabel: string;
   perBoosterLabel: string;
   openLabel: string;
@@ -35,7 +35,7 @@ export function BoosterSetTile({
   const [hovering, setHovering] = useState(false);
   const isComingSoon = entry.status === 'coming_soon';
   const canOpen = !isComingSoon && entry.count > 0 && !disabled;
-  const name = locale === 'fr' ? entry.nameFr : entry.nameEn;
+  const name = getSetName(entry.setId, locale);
   const subtitle = perBoosterLabel;
   const tilt = !reduceMotion && hovering && !isComingSoon ? 4 : 0;
   const setNumber = getSetNumber(entry.setId);

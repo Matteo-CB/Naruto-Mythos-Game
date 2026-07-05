@@ -5,7 +5,7 @@ import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { MAX_COPIES_PER_VERSION, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
 import { resolveCardId } from '@/lib/data/cardLoader';
 import { computeDeckEvolvingPoints, isEvolvingCompatible } from '@/lib/evolving/computePoints';
-import { isVariantCard } from '@/lib/variants/isVariant';
+import { isLockedVariantCard } from '@/lib/variants/isVariant';
 import { useToastStore } from '@/stores/toastStore';
 
 interface SavedDeck {
@@ -136,7 +136,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
 
   canAddChar: (card: CharacterCard): AddCheckResult => {
     const { deckChars, unlockedVariantIds } = get();
-    if (isVariantCard(card) && !unlockedVariantIds.has(card.id)) {
+    if (isLockedVariantCard(card) && !unlockedVariantIds.has(card.id)) {
       return {
         allowed: false,
         reason: 'Variant locked',
@@ -190,7 +190,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
 
   removeLockedVariants: () => {
     const { deckChars, unlockedVariantIds } = get();
-    const kept = deckChars.filter((c) => !(isVariantCard(c) && !unlockedVariantIds.has(c.id)));
+    const kept = deckChars.filter((c) => !(isLockedVariantCard(c) && !unlockedVariantIds.has(c.id)));
     const removed = deckChars.length - kept.length;
     if (removed > 0) set({ deckChars: kept, isDirty: true });
     return removed;

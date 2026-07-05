@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
+import { moveWouldViolateNameUniqueness } from '@/lib/effects/moveNameUniqueness';
 
 
 function handleNaruto010Ambush(ctx: EffectContext): EffectResult {
@@ -81,6 +82,19 @@ function moveCharacterToMission(
   
   const charIdx = fromChars.findIndex(c => c.instanceId === charInstanceId);
   if (charIdx === -1) return state;
+
+  if (moveWouldViolateNameUniqueness(state, fromChars[charIdx], toMissionIdx, friendlySide)) {
+    return {
+      ...state,
+      log: logAction(
+        state.log, state.turn, state.phase, sourcePlayer,
+        'EFFECT_BLOCKED',
+        `Naruto Uzumaki (010): cannot move to mission ${toMissionIdx + 1}, a character with the same name is already there.`,
+        'game.log.effect.moveNameConflictBlocked',
+        { card: 'NARUTO UZUMAKI', id: 'KS-010-C', target: fromChars[charIdx].card.name_fr },
+      ),
+    };
+  }
 
   const movedChar = { ...fromChars[charIdx], missionIndex: toMissionIdx };
   fromChars.splice(charIdx, 1);

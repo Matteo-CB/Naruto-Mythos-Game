@@ -57,9 +57,31 @@ function CardBack({ index, total }: { index: number; total: number }) {
 export function OpponentHand({ handSize }: OpponentHandProps) {
   const t = useTranslations();
   const dims = useGameScale();
+
+  if (dims.isMobile) {
+    return (
+      <div className="flex items-center justify-center gap-3">
+        <div
+          className="relative flex items-center justify-center"
+          style={{ height: dims.opponentContainerH + 'px', minWidth: dims.opponentMinW + 'px' }}
+        >
+          {Array.from({ length: handSize }).map((_, i) => (
+            <CardBack key={i} index={i} total={handSize} />
+          ))}
+        </div>
+        <span
+          className="tabular-nums font-bold shrink-0"
+          style={{ fontSize: '13px', color: '#888888' }}
+        >
+          {t('game.board.opponentHandCount', { count: handSize })}
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center gap-1.5">
-      
+
       <span
         className="text-[11px] tabular-nums"
         style={{ color: '#888888' }}

@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
+import { FlagPicker } from '@/components/FlagPicker';
 import { useEffect, useState, useCallback } from 'react';
 
 const DELETE_ACCOUNT_PHRASE = 'DELETE MY ACCOUNT';
@@ -15,9 +16,9 @@ interface ActiveSubscription {
   subscriptionId: string | null;
 }
 
-function formatEur(amountCents: number, locale: string): string {
+function formatEur(amountCents: number, bcp47: string): string {
   try {
-    return new Intl.NumberFormat(locale === 'fr' ? 'fr-FR' : 'en-GB', {
+    return new Intl.NumberFormat(bcp47, {
       style: 'currency',
       currency: 'EUR',
       maximumFractionDigits: amountCents % 100 === 0 ? 0 : 2,
@@ -32,10 +33,14 @@ export default function SettingsPage() {
   const router = useRouter();
   const t = useTranslations('settings');
   const locale = useLocale();
+  const tMeta = useTranslations('_meta');
   const {
     animationsEnabled, gameBackground, isLoaded, availableBackgrounds,
     fetchFromServer, setAnimationsEnabled, setGameBackground,
+    hideDeckBuilderVariants, setHideDeckBuilderVariants,
+    countryCode, setCountryCode,
   } = useSettingsStore();
+  const tFlag = useTranslations('flag');
   const backgrounds = availableBackgrounds;
 
   const [usernameInput, setUsernameInput] = useState('');
@@ -253,7 +258,7 @@ export default function SettingsPage() {
               {t('subscription.title')}
             </span>
             <p className="text-sm" style={{ color: 'rgba(232,232,232,0.85)' }}>
-              {t('subscription.active', { amount: formatEur(activeSub.amountCents, locale) })}
+              {t('subscription.active', { amount: formatEur(activeSub.amountCents, tMeta('bcp47')) })}
             </p>
             <button
               type="button"
@@ -323,6 +328,51 @@ export default function SettingsPage() {
           >
             {!isLoaded ? t('loading') : animationsEnabled ? t('animationsOn') : t('animationsOff')}
           </p>
+
+          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+
+          <div className="flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+              {t('hideVariants')}
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={hideDeckBuilderVariants}
+              disabled={!isLoaded}
+              onClick={() => setHideDeckBuilderVariants(!hideDeckBuilderVariants)}
+              className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden"
+              style={{
+                backgroundColor: hideDeckBuilderVariants ? '#c4a35a' : '#333333',
+                cursor: isLoaded ? 'pointer' : 'default',
+                opacity: isLoaded ? 1 : 0.5,
+              }}
+            >
+              <span
+                className="absolute top-0.5 h-5 w-5 rounded-full"
+                style={{
+                  backgroundColor: '#0a0a0a',
+                  left: hideDeckBuilderVariants ? '22px' : '2px',
+                  transition: 'left 150ms ease',
+                }}
+              />
+            </button>
+          </div>
+          <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+            {t('hideVariantsHint')}
+          </p>
+
+          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+              {tFlag('label')}
+            </span>
+            <FlagPicker value={countryCode} onChange={setCountryCode} disabled={!isLoaded} />
+            <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+              {tFlag('hint')}
+            </p>
+          </div>
         </div>
 
         {backgrounds.length > 0 && (

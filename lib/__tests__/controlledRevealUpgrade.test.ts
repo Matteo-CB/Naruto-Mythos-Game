@@ -105,4 +105,95 @@ describe('Reveal of a controlled hidden character into own same-name face-up', (
     const result = validateRevealCharacter(state, 'player2', 0, ownHiddenId);
     expect(result.valid).toBe(true);
   });
+
+  it('blocks a controlled hidden card from flexibly upgrading over a different-name character', () => {
+    const mission = { card: mockMission({ id: 'm1' }), rank: 'D' as const, basePoints: 3, rankBonus: 1, player1Characters: [], player2Characters: [], wonBy: null };
+    const state = createActionPhaseState({ activeMissions: [mission] });
+    state.player2.chakra = 20;
+
+    const controlledHiddenId = generateInstanceId();
+    const controlledHidden = mockCharInPlay({
+      instanceId: controlledHiddenId,
+      isHidden: true,
+      wasRevealedAtLeastOnce: false,
+      controlledBy: 'player2',
+      originalOwner: 'player1',
+      missionIndex: 0,
+    }, {
+      id: 'KS-138-S',
+      number: 138,
+      name_fr: 'OROCHIMARU',
+      chakra: 6,
+      power: 5,
+      group: 'Sound Village',
+      effects: [{ type: 'MAIN', description: '[⧗] This card can upgrade over any character.' }],
+    });
+    state.activeMissions[0].player2Characters.push(controlledHidden);
+
+    const ownFaceUp = mockCharInPlay({
+      instanceId: generateInstanceId(),
+      isHidden: false,
+      wasRevealedAtLeastOnce: true,
+      controlledBy: 'player2',
+      originalOwner: 'player2',
+      missionIndex: 0,
+    }, {
+      id: 'KS-014-R',
+      number: 14,
+      name_fr: 'SASUKE UCHIWA',
+      chakra: 3,
+      power: 4,
+      group: 'Leaf Village',
+    });
+    state.activeMissions[0].player2Characters.push(ownFaceUp);
+
+    const result = validateRevealCharacter(state, 'player2', 0, controlledHiddenId);
+    expect(result.valid).toBe(false);
+    expect(result.reasonKey).toBe('game.error.cannotUpgradeWithControlled');
+  });
+
+  it('allows an owned hidden card to flexibly upgrade over a different-name character', () => {
+    const mission = { card: mockMission({ id: 'm1' }), rank: 'D' as const, basePoints: 3, rankBonus: 1, player1Characters: [], player2Characters: [], wonBy: null };
+    const state = createActionPhaseState({ activeMissions: [mission] });
+    state.player2.chakra = 20;
+
+    const ownHiddenId = generateInstanceId();
+    const ownHidden = mockCharInPlay({
+      instanceId: ownHiddenId,
+      isHidden: true,
+      wasRevealedAtLeastOnce: false,
+      controlledBy: 'player2',
+      originalOwner: 'player2',
+      missionIndex: 0,
+    }, {
+      id: 'KS-138-S',
+      number: 138,
+      name_fr: 'OROCHIMARU',
+      chakra: 6,
+      power: 5,
+      group: 'Sound Village',
+      effects: [{ type: 'MAIN', description: '[⧗] This card can upgrade over any character.' }],
+    });
+    state.activeMissions[0].player2Characters.push(ownHidden);
+
+    const ownFaceUp = mockCharInPlay({
+      instanceId: generateInstanceId(),
+      isHidden: false,
+      wasRevealedAtLeastOnce: true,
+      controlledBy: 'player2',
+      originalOwner: 'player2',
+      missionIndex: 0,
+    }, {
+      id: 'KS-014-R',
+      number: 14,
+      name_fr: 'SASUKE UCHIWA',
+      chakra: 3,
+      power: 4,
+      group: 'Leaf Village',
+    });
+    state.activeMissions[0].player2Characters.push(ownFaceUp);
+
+    const result = validateRevealCharacter(state, 'player2', 0, ownHiddenId);
+    expect(result.valid).toBe(true);
+  });
 });

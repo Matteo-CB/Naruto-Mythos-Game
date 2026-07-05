@@ -8,16 +8,17 @@ import { Link } from "@/lib/i18n/navigation";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { validateDeck } from "@/lib/engine/rules/DeckValidation";
 import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { useUnlockedVariants } from "@/lib/hooks/useUnlockedVariants";
-import { isVariantCard } from "@/lib/variants/isVariant";
+import { isVariantCard, isLockedVariantCard } from "@/lib/variants/isVariant";
 import { useTrackOnMount, trackUiHook } from "@/lib/hooks/useTrackUi";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
+import Image from "next/image";
 import {
   getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel,
 } from "@/lib/utils/cardLocale";
-import { effectDescriptionsEn } from "@/lib/data/effectDescriptionsEn";
-import { effectDescriptionsFr } from "@/lib/data/effectTranslationsFr";
+import { getCardEffectDescription } from "@/lib/data/effectDescriptions";
 import { exportDeckAsImage } from "@/lib/utils/exportDeckImage";
 import {
   PopupOverlay, PopupCornerFrame, PopupTitle, PopupActionButton,
@@ -66,20 +67,6 @@ function classifyCardEffects(card: { effects?: Array<{ description: string }> })
   }
   return Array.from(fns);
 }
-
-const EFFECT_FN_LABELS: Record<EffectFunction, { en: string; fr: string }> = {
-  defeat: { en: 'Defeat', fr: 'Defaite' },
-  hide: { en: 'Hide', fr: 'Cacher' },
-  draw: { en: 'Draw', fr: 'Piocher' },
-  move: { en: 'Move', fr: 'Deplacer' },
-  powerup: { en: 'Power Up', fr: 'Puissance+' },
-  chakra: { en: 'Chakra', fr: 'Chakra' },
-  control: { en: 'Control', fr: 'Controle' },
-  play: { en: 'Play/Reveal', fr: 'Jouer/Reveler' },
-  protect: { en: 'Protect', fr: 'Protection' },
-  continuous: { en: 'Continuous', fr: 'Continu' },
-  score: { en: 'Score', fr: 'Score' },
-};
 
 interface KeywordFilter {
   terms: string[];  // all must match (AND)
@@ -307,6 +294,20 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
   return true;
 }
 
+const GridThumb = memo(function GridThumb({ src }: { src: string }) {
+  return (
+    <Image
+      src={src}
+      alt=""
+      fill
+      sizes="128px"
+      quality={55}
+      draggable={false}
+      className="object-cover"
+    />
+  );
+});
+
 const CatalogCard = memo(function CatalogCard({
   card, allowed, inDeckCount, isBanned, onAdd, onHover,
 }: {
@@ -330,7 +331,7 @@ const CatalogCard = memo(function CatalogCard({
       }}
     >
       {imgPath ? (
-        <img src={imgPath} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+        <GridThumb src={imgPath} />
       ) : (
         <div className="w-full h-full" style={{ backgroundColor: '#111' }} />
       )}
@@ -376,7 +377,7 @@ const CatalogMission = memo(function CatalogMission({
       }}
     >
       {imgPath ? (
-        <img src={imgPath} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+        <GridThumb src={imgPath} />
       ) : (
         <div className="w-full h-full" style={{ backgroundColor: '#111' }} />
       )}
@@ -414,7 +415,7 @@ const DeckCard = memo(function DeckCard({
       }}
     >
       {imgPath ? (
-        <img src={imgPath} alt="" className="w-full h-full object-cover" draggable={false} />
+        <GridThumb src={imgPath} />
       ) : (
         <div className="w-full h-full" style={{ backgroundColor: '#111' }} />
       )}
@@ -430,6 +431,7 @@ export default function DeckBuilderPage() {
   const t = useTranslations();
   const locale = useLocale();
   const loc = locale as "en" | "fr";
+  const tCardMeta = useTranslations('cardMeta');
   const { data: session, status } = useSession();
 
   const [availableChars, setAvailableChars] = useState<CharacterCard[]>([]);
@@ -493,7 +495,12 @@ export default function DeckBuilderPage() {
   useEffect(() => {
     setUnlockedVariantIds(unlockedVariantIds);
   }, [unlockedVariantIds, setUnlockedVariantIds]);
-  const [showAltArt, setShowAltArt] = useState(true);
+  const hideVariants = useSettingsStore((s) => s.hideDeckBuilderVariants);
+  const setHideVariants = useSettingsStore((s) => s.setHideDeckBuilderVariants);
+  const settingsLoaded = useSettingsStore((s) => s.isLoaded);
+  const fetchSettings = useSettingsStore((s) => s.fetchFromServer);
+  useEffect(() => { if (!settingsLoaded) fetchSettings(); }, [settingsLoaded, fetchSettings]);
+  const showAltArt = !hideVariants;
   type DeckViewMode = 'grid' | 'rows';
   type DeckGroupBy = 'chakra' | 'group' | 'rarity' | 'power' | 'keyword' | 'effect';
   const [deckViewMode, setDeckViewMode] = useState<DeckViewMode>('grid');
@@ -563,7 +570,7 @@ export default function DeckBuilderPage() {
     const seen = new Set<string>();
     const result: CharacterCard[] = [];
     for (const c of deckChars) {
-      if (isVariantCard(c) && !unlockedVariantIds.has(c.id) && !seen.has(c.id)) {
+      if (isLockedVariantCard(c) && !unlockedVariantIds.has(c.id) && !seen.has(c.id)) {
         seen.add(c.id);
         result.push(c);
       }
@@ -887,7 +894,7 @@ export default function DeckBuilderPage() {
           }}>{isChar ? t("deckBuilder.characterCards") : t("deckBuilder.missionCards")}</span>
           <span className="text-[10px] uppercase font-bold px-1.5 py-0.5" style={{
             backgroundColor: `${rarColor}12`, color: rarColor,
-          }}>{getRarityLabel(card.rarity, loc)}</span>
+          }}>{getRarityLabel(card.rarity, tCardMeta)}</span>
         </div>
 
         <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{getCardName(card, loc)}</div>
@@ -909,7 +916,7 @@ export default function DeckBuilderPage() {
         )}
 
         {isChar && charCard.group && (
-          <div className="text-[10px] mb-1" style={{ color: '#6b8a6b' }}>{getCardGroup(charCard.group, loc)}</div>
+          <div className="text-[10px] mb-1" style={{ color: '#6b8a6b' }}>{getCardGroup(charCard.group, tCardMeta)}</div>
         )}
 
         {isChar && charCard.keywords && charCard.keywords.length > 0 && (
@@ -917,7 +924,7 @@ export default function DeckBuilderPage() {
             {charCard.keywords.map((kw, i) => (
               <span key={i} className="text-[9px] px-1.5 py-0.5" style={{
                 backgroundColor: 'rgba(255,255,255,0.04)', color: '#999',
-              }}>{getCardKeyword(kw, loc)}</span>
+              }}>{getCardKeyword(kw, tCardMeta)}</span>
             ))}
           </div>
         )}
@@ -925,10 +932,7 @@ export default function DeckBuilderPage() {
         {card.effects && card.effects.length > 0 && (
           <div className="flex flex-col gap-1.5 mt-2">
             {card.effects.map((eff, i) => {
-              const raFallbackId = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
-              const frDescs = effectDescriptionsFr[card.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
-              const enDescs = effectDescriptionsEn[card.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
-              const description = locale === 'fr' ? (frDescs?.[i] ?? eff.description) : (enDescs?.[i] ?? eff.description);
+              const description = getCardEffectDescription(card.id, i, locale, eff.description);
               const effColor = EFFECT_TYPE_COLORS[eff.type] ?? '#888';
               return (
                 <div key={i} className="py-1.5 px-2" style={{ backgroundColor: `${effColor}08` }}>
@@ -1258,10 +1262,10 @@ export default function DeckBuilderPage() {
           ) : deckGroupedRows.map(([groupKey, cards]) => {
             const label = deckGroupBy === 'chakra' ? `${t("deckBuilder.groupBy.chakra")} ${groupKey}`
               : deckGroupBy === 'power' ? `${t("deckBuilder.groupBy.power")} ${groupKey}`
-              : deckGroupBy === 'rarity' ? getRarityLabel(groupKey, loc)
-              : deckGroupBy === 'group' ? getCardGroup(groupKey, loc)
-              : deckGroupBy === 'effect' ? (groupKey === '-' ? t("deckBuilder.noEffect") : (EFFECT_FN_LABELS[groupKey as EffectFunction]?.[loc as 'en' | 'fr'] ?? groupKey))
-              : groupKey === '-' ? t("deckBuilder.noKeyword") : getCardKeyword(groupKey, loc);
+              : deckGroupBy === 'rarity' ? getRarityLabel(groupKey, tCardMeta)
+              : deckGroupBy === 'group' ? getCardGroup(groupKey, tCardMeta)
+              : deckGroupBy === 'effect' ? (groupKey === '-' ? t("deckBuilder.noEffect") : t(`deckBuilder.effectFn.${groupKey}`))
+              : groupKey === '-' ? t("deckBuilder.noKeyword") : getCardKeyword(groupKey, tCardMeta);
             return (
               <div key={groupKey}>
                 <div className="flex items-center gap-2 mb-1">
@@ -1482,7 +1486,7 @@ export default function DeckBuilderPage() {
 
           <div className="px-3 pb-1 flex-shrink-0">
             <button
-              onClick={() => setShowAltArt(!showAltArt)}
+              onClick={() => setHideVariants(!hideVariants)}
               className="text-[9px] uppercase font-bold px-2 py-1"
               style={{
                 backgroundColor: showAltArt ? 'rgba(196,163,90,0.1)' : 'rgba(136,136,136,0.08)',
@@ -1668,7 +1672,7 @@ export default function DeckBuilderPage() {
                     {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
                   </span>
                   <button
-                    onClick={() => setShowAltArt(!showAltArt)}
+                    onClick={() => setHideVariants(!hideVariants)}
                     className="text-[9px] uppercase font-bold px-2 py-0.5"
                     style={{
                       backgroundColor: showAltArt ? 'rgba(196,163,90,0.1)' : 'rgba(136,136,136,0.06)',

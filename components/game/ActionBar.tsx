@@ -3,7 +3,9 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { localizeMessageParams } from '@/lib/i18n/localizeMessageParams';
+import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useSocketStore } from '@/lib/socket/client';
@@ -13,6 +15,7 @@ import { useGameScale } from './GameScaleContext';
 
 export function ActionBar() {
   const t = useTranslations();
+  const locale = useLocale();
   const dims = useGameScale();
   const visibleState = useGameStore((s) => s.visibleState);
   const performAction = useGameStore((s) => s.performAction);
@@ -180,7 +183,7 @@ export function ActionBar() {
               ? Math.max(1, rawRevUpgCost) : rawRevUpgCost;
             revealUpgradeTargets.push({
               instanceId: c.instanceId,
-              name: cTop.name_fr,
+              name: getCardName(cTop, locale),
               cost: upgradeCost,
               isSameName,
             });
@@ -346,39 +349,39 @@ export function ActionBar() {
     >
       
       {!isMyTurn && (
-        <span className="text-xs" style={{ color: '#888888' }}>
+        <span style={{ fontSize: dims.isMobile ? '14px' : '12px', color: '#888888' }}>
           {t('game.opponentTurn')}
         </span>
       )}
 
       {isMyTurn && hasPassed && (
-        <span className="text-xs" style={{ color: '#888888' }}>
+        <span style={{ fontSize: dims.isMobile ? '14px' : '12px', color: '#888888' }}>
           {t('game.processing')}
         </span>
       )}
 
       {isMyTurn && !hasPassed && (
         <>
-          
+
           {actionError && (
             <motion.span
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-xs font-medium px-2 py-0.5"
-              style={{ color: '#ff6b6b', backgroundColor: 'rgba(179, 62, 62, 0.15)' }}
+              className="font-medium px-2 py-0.5"
+              style={{ fontSize: dims.isMobile ? '14px' : '12px', color: '#ff6b6b', backgroundColor: 'rgba(179, 62, 62, 0.15)' }}
             >
-              {actionErrorKey ? t(actionErrorKey, actionErrorParams ?? {}) : actionError}
+              {actionErrorKey ? t(actionErrorKey, localizeMessageParams(actionErrorParams ?? {}, locale) ?? {}) : actionError}
             </motion.span>
           )}
 
           {!actionError && !hasCardSelected && !hasTargetSelected && (
-            <span className="text-xs" style={{ color: '#888888' }}>
+            <span style={{ fontSize: dims.isMobile ? '14px' : '12px', color: '#888888' }}>
               {t('game.selectTarget')}
             </span>
           )}
 
           {!actionError && hasCardSelected && !hasMissionSelected && (
-            <span className="text-xs" style={{ color: '#888888' }}>
+            <span style={{ fontSize: dims.isMobile ? '14px' : '12px', color: '#888888' }}>
               {t('game.selectMission')}
             </span>
           )}
@@ -395,7 +398,7 @@ export function ActionBar() {
               && hasKurenai034CostReduction(visibleState, myPlayer, selectedCard, selectedMissionIndex))
               ? Math.max(1, rawUpgradeCost) : rawUpgradeCost;
             const canAffordUpgrade = myState.chakra >= upgradeCost;
-            const targetName = charCard?.name_fr ?? '';
+            const targetName = charCard ? getCardName(charCard, locale) : '';
             const upgradeLabel = isHiddenTarget
               ? `${t('game.reveal')} + ${t('game.actions.upgrade')} ${targetName} (${upgradeCost} ${t('game.chakra').toLowerCase()})`
               : `${t('game.actions.upgrade')} ${targetName} (${upgradeCost} ${t('game.chakra').toLowerCase()})`;
@@ -461,7 +464,7 @@ export function ActionBar() {
 
           {confirmingPass ? (
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] whitespace-nowrap" style={{ color: '#c4a35a' }}>
+              <span className="whitespace-nowrap" style={{ fontSize: dims.isMobile ? '13px' : '10px', color: '#c4a35a' }}>
                 {t('game.passConfirm', { chakra: myState.chakra })}
               </span>
               <ActionButton
@@ -572,7 +575,7 @@ function ActionButton({
       whileTap={disabled ? {} : { scale: 0.97 }}
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      className={`font-medium cursor-pointer uppercase ${dims.isCompact ? 'px-2.5 py-1 text-[10px]' : 'px-4 py-1.5 text-xs'}`}
+      className={`font-medium cursor-pointer uppercase ${dims.isMobile ? 'px-4 py-2 text-[14px]' : dims.isCompact ? 'px-2.5 py-1 text-[10px]' : 'px-4 py-1.5 text-xs'}`}
       style={{
         backgroundColor: disabled ? 'rgba(255, 255, 255, 0.02)' : styles.bg,
         border: 'none',

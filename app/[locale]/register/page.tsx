@@ -8,6 +8,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { Footer } from '@/components/Footer';
+import { FlagPicker } from '@/components/FlagPicker';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [countryCode, setCountryCode] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -44,7 +46,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username, email, password, countryCode }),
       });
 
       const data = await res.json();
@@ -198,6 +200,13 @@ export default function RegisterPage() {
                 color: '#e0e0e0',
               }}
             />
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
+              {t('flag.label')} <span style={{ color: '#555' }}>({t('auth.optional')})</span>
+            </label>
+            <FlagPicker value={countryCode} onChange={setCountryCode} />
           </div>
 
           {error && (

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import { withImageVersion } from '@/lib/utils/imagePath';
 
 interface InfiniteSegmentProps {
   setId: string;
@@ -38,11 +38,13 @@ export function InfiniteSegment({
           className="relative shrink-0 overflow-hidden"
           style={{ width: 72, height: 100 }}
         >
-          <Image
-            src={`/images/booster-${setId}.webp`}
+          <img
+            src={withImageVersion(`/images/booster-${setId}.webp`)}
             alt=""
-            fill
-            sizes="72px"
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+            className="absolute inset-0 w-full h-full"
             style={{ objectFit: 'contain' }}
           />
         </div>

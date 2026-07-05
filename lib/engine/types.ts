@@ -4,8 +4,8 @@ export type PlayerID = 'player1' | 'player2';
 export type GamePhase = 'setup' | 'mulligan' | 'start' | 'action' | 'mission' | 'end' | 'gameOver';
 export type TurnNumber = 1 | 2 | 3 | 4;
 export type MissionRank = 'D' | 'C' | 'B' | 'A';
-export type EffectType = 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE';
-export type Rarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'SP' | 'SPV' | 'MMS';
+export type EffectType = 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE' | 'DUEL';
+export type Rarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'SP' | 'SPV' | 'POP' | 'POPV' | 'CHIBI' | 'CHIBIV' | 'MMS';
 
 
 
@@ -25,6 +25,10 @@ export interface CardData {
   title_fr: string;
   name_en?: string;
   title_en?: string;
+  name_es?: string;
+  title_es?: string;
+  name_ja?: string;
+  title_ja?: string;
   rarity: Rarity;
   card_type: 'character' | 'mission';
   has_visual: boolean;

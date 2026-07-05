@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
-import { getRarityLabel } from '@/lib/utils/cardLocale';
+import { getRarityLabel, getCardName } from '@/lib/utils/cardLocale';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 
 interface CardRevealProps {
@@ -46,6 +46,7 @@ function isHighRarity(rarity: string): boolean {
 export function CardReveal({ card, index, onRevealed, autoReveal = false, delay = 0 }: CardRevealProps) {
   const locale = useLocale() as 'en' | 'fr';
   const t = useTranslations('sealed');
+  const tCardMeta = useTranslations('cardMeta');
   const [isFlipped, setIsFlipped] = useState(false);
   const hasFlippedRef = useRef(false);
   const hasCalledRevealedRef = useRef(false);
@@ -144,7 +145,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
           {imagePath ? (
             <img
               src={imagePath}
-              alt={card.name_fr}
+              alt={getCardName(card, locale)}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
@@ -153,7 +154,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
               style={{ backgroundColor: '#1a1a1a' }}
             >
               <span className="text-xs text-center px-2" style={{ color: '#888888' }}>
-                {card.name_fr}
+                {getCardName(card, locale)}
               </span>
             </div>
           )}
@@ -199,7 +200,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             className="text-[9px] font-bold uppercase tracking-wider"
             style={{ color: rarityInfo.color }}
           >
-            {getRarityLabel(card.rarity, locale)}
+            {getRarityLabel(card.rarity, tCardMeta)}
           </span>
         </motion.div>
       )}

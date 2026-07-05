@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
+import { localizeMessageParams } from '@/lib/i18n/localizeMessageParams';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
@@ -169,6 +170,7 @@ function HandCard({
 
 export function HandCardSelector() {
   const t = useTranslations();
+  const locale = useLocale();
   const pendingTargetSelection = useGameStore((s) => s.pendingTargetSelection);
   const selectTarget = useGameStore((s) => s.selectTarget);
   const declineTarget = useGameStore((s) => s.declineTarget);
@@ -208,7 +210,7 @@ export function HandCardSelector() {
 
   if (effectPopupMinimized) {
     const effectDesc = descriptionKey
-      ? t(descriptionKey, descriptionParams as Record<string, string> | undefined)
+      ? t(descriptionKey, localizeMessageParams(descriptionParams, locale) as Record<string, string> | undefined)
       : (description || t('game.board.restoreEffect'));
     return <PopupMinimizePill text={effectDesc} onRestore={restoreEffectPopup} />;
   }
@@ -224,7 +226,7 @@ export function HandCardSelector() {
           </PopupTitle>
 
           <PopupDescription>
-            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+            {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
           </PopupDescription>
 
           <div

@@ -11,6 +11,8 @@ interface SettingsState {
   soundEnabled: boolean;
   soundVolume: number;
   allowSpectatorHand: boolean;
+  hideDeckBuilderVariants: boolean;
+  countryCode: string | null;
   gameBackground: string; // background DB id or "default"
   gameBackgroundUrl: string; // resolved URL for the background image
   availableBackgrounds: BackgroundOption[];
@@ -20,6 +22,8 @@ interface SettingsState {
   setSoundEnabled: (v: boolean) => void;
   setSoundVolume: (v: number) => void;
   setAllowSpectatorHand: (v: boolean) => Promise<void>;
+  setHideDeckBuilderVariants: (v: boolean) => Promise<void>;
+  setCountryCode: (code: string | null) => Promise<void>;
   setGameBackground: (id: string, url: string) => Promise<void>;
 }
 
@@ -59,6 +63,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   soundEnabled: getLocalSound().enabled,
   soundVolume: getLocalSound().volume,
   allowSpectatorHand: false,
+  hideDeckBuilderVariants: false,
+  countryCode: null,
   gameBackground: 'default',
   gameBackgroundUrl: DEFAULT_BG_URL,
   availableBackgrounds: getCachedBackgrounds(),
@@ -89,6 +95,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       set({
         animationsEnabled: prefs.animationsEnabled ?? true,
         allowSpectatorHand: prefs.allowSpectatorHand ?? false,
+        hideDeckBuilderVariants: prefs.hideDeckBuilderVariants ?? false,
+        countryCode: prefs.countryCode ?? null,
         gameBackground: bgId,
         gameBackgroundUrl: bgUrl,
         availableBackgrounds: backgrounds,
@@ -139,6 +147,36 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       if (!res.ok) throw new Error('Failed to save');
     } catch {
       set({ allowSpectatorHand: prev });
+    }
+  },
+
+  setHideDeckBuilderVariants: async (v: boolean) => {
+    const prev = get().hideDeckBuilderVariants;
+    set({ hideDeckBuilderVariants: v });
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hideDeckBuilderVariants: v }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+    } catch {
+      set({ hideDeckBuilderVariants: prev });
+    }
+  },
+
+  setCountryCode: async (code: string | null) => {
+    const prev = get().countryCode;
+    set({ countryCode: code });
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ countryCode: code }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+    } catch {
+      set({ countryCode: prev });
     }
   },
 

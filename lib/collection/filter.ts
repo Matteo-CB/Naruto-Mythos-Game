@@ -1,6 +1,7 @@
 import type { CardData } from '@/lib/engine/types';
 import { isVariantCard } from '@/lib/variants/isVariant';
 import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
+import { routing } from '@/lib/i18n/routing';
 
 export interface CollectionFilterOptions {
   variantsOnly?: boolean;
@@ -8,7 +9,7 @@ export interface CollectionFilterOptions {
   group?: string;
   set?: string;
   searchQuery?: string;
-  locale?: 'en' | 'fr';
+  locale?: string;
 }
 
 function normalize(s: string): string {
@@ -21,7 +22,7 @@ export function matchesCollectionFilters(card: CardData, opts: CollectionFilterO
   if (opts.group && opts.group !== 'all' && card.group !== opts.group) return false;
   if (opts.set && opts.set !== 'all' && card.set !== opts.set) return false;
   if (opts.searchQuery && opts.searchQuery.trim() !== '') {
-    const locale = opts.locale ?? 'fr';
+    const locale = opts.locale ?? routing.defaultLocale;
     const q = normalize(opts.searchQuery);
     if (
       !normalize(getCardName(card, locale)).includes(q) &&

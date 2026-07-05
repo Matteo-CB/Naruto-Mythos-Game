@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import type { CharacterInPlay } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { moveWouldViolateNameUniqueness } from '@/lib/effects/moveNameUniqueness';
 
 
 
@@ -89,11 +90,12 @@ function autoMoveCharacter(
 
   if (!charToMove || fromMissionIndex === -1) return state;
 
-  
+
   let bestMission = -1;
   let fewest = Infinity;
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i === fromMissionIndex) continue;
+    if (moveWouldViolateNameUniqueness(state, charToMove, i, friendlySide)) continue;
     const count = state.activeMissions[i][friendlySide].length;
     if (count < fewest) {
       fewest = count;

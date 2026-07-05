@@ -152,6 +152,20 @@ function filterMoveableChars(
   const moveable: string[] = [];
   let s = state;
 
+  if (isMovementBlockedByKurenai(s, sourceMissionIndex, player)) {
+    s = {
+      ...s,
+      log: logAction(
+        s.log, s.turn, s.phase, player,
+        'EFFECT_BLOCKED',
+        'Sasuke Uchiwa (107): no character can leave this mission (movement blocked), no POWERUP.',
+        'game.log.effect.sasuke107KurenaiBlock',
+        { card: 'SASUKE UCHIWA', id: 'KS-107-R' },
+      ),
+    };
+    return { moveable: [], state: s };
+  }
+
   for (const charId of charIds) {
     
     let charExists = false;
@@ -342,6 +356,8 @@ function sasuke107UpgradeHandler(ctx: EffectContext): EffectResult {
 export function registerSasuke107Handlers(): void {
   registerEffect('KS-107-R', 'MAIN', sasuke107MainHandler);
   registerEffect('KS-107-R', 'UPGRADE', sasuke107UpgradeHandler);
+  registerEffect('KS-107_2-MV', 'MAIN', sasuke107MainHandler);
+  registerEffect('KS-107_2-MV', 'UPGRADE', sasuke107UpgradeHandler);
 }
 
 

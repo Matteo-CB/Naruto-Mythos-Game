@@ -5,9 +5,11 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { ChessClockDisplay } from '@/components/game/ChessClockDisplay';
+import { useGameScale } from './GameScaleContext';
 
 export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
   const t = useTranslations();
+  const dims = useGameScale();
   const visibleState = useGameStore((s) => s.visibleState);
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
 
@@ -32,22 +34,22 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
         backgroundColor: 'rgba(8, 8, 12, 0.85)',
       }}
     >
-      
-      <span className="text-xs font-semibold shrink-0" style={{ color: '#b33e3e' }}>
+
+      <span className="font-semibold shrink-0" style={{ fontSize: dims.isMobile ? '14px' : '12px', color: '#b33e3e' }}>
         {opponentName}
       </span>
 
       <div className="flex items-center gap-1 shrink-0" title={t('game.edge')}>
         <div
           style={{
-            width: 8,
-            height: 8,
+            width: dims.isMobile ? 10 : 8,
+            height: dims.isMobile ? 10 : 8,
             transform: 'rotate(45deg)',
             backgroundColor: hasEdge ? '#b33e3e' : 'rgba(255, 255, 255, 0.1)',
             boxShadow: hasEdge ? '0 0 6px rgba(179, 62, 62, 0.6)' : 'none',
           }}
         />
-        <span className="text-[10px]" style={{ color: hasEdge ? '#b33e3e' : '#555555' }}>
+        <span style={{ fontSize: dims.isMobile ? '12px' : '10px', color: hasEdge ? '#b33e3e' : '#555555' }}>
           {t('game.board.edge')}
         </span>
       </div>
@@ -56,8 +58,9 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
         <motion.span
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ repeat: Infinity, duration: 1.5 }}
-          className="text-[10px] px-1.5 py-0.5 shrink-0"
+          className="px-1.5 py-0.5 shrink-0"
           style={{
+            fontSize: dims.isMobile ? '12px' : '10px',
             backgroundColor: 'rgba(179, 62, 62, 0.16)',
             color: '#b33e3e',
           }}
@@ -68,16 +71,16 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
 
       <div className="flex-1" />
 
-      <StatPill label={t('game.chakra')} value={opponentState.chakra} color="#b33e3e" />
+      <StatPill label={t('game.chakra')} value={opponentState.chakra} color="#b33e3e" isMobile={dims.isMobile} />
 
-      <StatPill label={t('game.score')} value={opponentState.missionPoints} color="#e0e0e0" accent="#b33e3e" />
+      <StatPill label={t('game.score')} value={opponentState.missionPoints} color="#e0e0e0" accent="#b33e3e" isMobile={dims.isMobile} />
 
       <ChessClockDisplay player={opponentPlayer} isOpponent={true} />
     </div>
   );
 });
 
-function StatPill({ label, value, color }: { label: string; value: number; color: string; accent?: string }) {
+function StatPill({ label, value, color, isMobile }: { label: string; value: number; color: string; accent?: string; isMobile?: boolean }) {
   return (
     <div className="flex items-baseline gap-1.5 sm:gap-2 px-1.5 sm:px-2 shrink-0">
       <span
@@ -85,7 +88,7 @@ function StatPill({ label, value, color }: { label: string; value: number; color
         style={{
           color: '#666666',
           letterSpacing: '0.22em',
-          fontSize: 'clamp(8px, 1vw, 10px)',
+          fontSize: isMobile ? '11px' : 'clamp(8px, 1vw, 10px)',
           lineHeight: 1,
         }}
       >
@@ -99,7 +102,7 @@ function StatPill({ label, value, color }: { label: string; value: number; color
         className="tabular-nums font-bold leading-none"
         style={{
           color,
-          fontSize: 'clamp(14px, 1.6vw, 18px)',
+          fontSize: isMobile ? '20px' : 'clamp(14px, 1.6vw, 18px)',
           letterSpacing: '-0.01em',
           textShadow: `0 1px 3px rgba(0,0,0,0.8), 0 0 10px ${color}55`,
         }}

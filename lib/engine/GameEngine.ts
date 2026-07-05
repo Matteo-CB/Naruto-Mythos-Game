@@ -33,6 +33,7 @@ import { calculateCharacterPower } from './phases/PowerCalculation';
 import { isRempartZeroed, canBeHiddenByEnemy } from '../effects/ContinuousEffects';
 import { triggerOnDefeatEffects } from '../effects/onDefeatTriggers';
 import { getEffectivePower } from '../effects/powerUtils';
+import { isCopyableEffectType } from '../effects/handlers/KS/shared/copyExclusions';
 
 
 function collectCharInstanceIds(state: GameState): Set<string> {
@@ -657,7 +658,19 @@ export class GameEngine {
       
       if (!effect.isOptional && !effect.rootOptional) return state;
 
-      
+
+      if (effect.targetSelectionType === 'SASUKE014_CONFIRM_UPGRADE_MODIFIER') {
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+        newState = EffectEngine.sasuke014QueueHandReveal(
+          newState, effect.sourcePlayer, effect.sourceCardId,
+          effect.sourceInstanceId, effect.sourceMissionIndex,
+          effect.effectType, effect.remainingEffectTypes, false,
+        );
+        return newState;
+      }
+
+
       if (effect.targetSelectionType === 'GAARA120_CHOOSE_DEFEAT') {
         let gDesc: { defeatedCount?: number; nextMissionIndex?: number; isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number } = {};
         try { gDesc = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
@@ -1507,7 +1520,7 @@ export class GameEngine {
             const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
             if (topCard.chakra > 4) continue;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
-              if (eff.type === 'UPGRADE') return false;
+              if (!isCopyableEffectType(eff.type)) return false;
               if (eff.description.includes('[⧗]')) return false;
               if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
               return true;

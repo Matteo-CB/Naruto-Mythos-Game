@@ -13,8 +13,12 @@ interface RawJsonCard {
   card_type: 'character' | 'mission';
   name_en: string;
   name_fr: string;
+  name_ja?: string;
+  name_es?: string;
   title_fr: string;
   title_en: string;
+  title_ja?: string;
+  title_es?: string;
   has_visual: boolean;
   chakra: number | '';
   power: number | '';
@@ -46,6 +50,10 @@ function normalizeCard(raw: RawJsonCard): CardData {
     title_fr: raw.title_fr || '',
     name_en: raw.name_en || undefined,
     title_en: raw.title_en || undefined,
+    name_ja: raw.name_ja || undefined,
+    title_ja: raw.title_ja || undefined,
+    name_es: raw.name_es || undefined,
+    title_es: raw.title_es || undefined,
     rarity: raw.rarity as Rarity,
     card_type: raw.card_type,
     has_visual: raw.has_visual || !!raw.image_file,

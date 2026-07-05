@@ -21,7 +21,7 @@ import { useMemo } from 'react';
 import { randomHoloHue } from '@/lib/utils/holoColor';
 import { useToastStore } from '@/stores/toastStore';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
-import { ALL_SET_IDS, SET_REGISTRY, isSetAvailable } from '@/lib/data/sets/registry';
+import { ALL_SET_IDS, SET_REGISTRY, isSetAvailable, getSetName } from '@/lib/data/sets/registry';
 import { useLocale } from 'next-intl';
 
 type GameMode = 'casual' | 'ranked';
@@ -1074,7 +1074,7 @@ function SealedToggleBlock({
   onChange: (v: boolean) => void;
   setChoice: string;
   onSetChoiceChange: (v: string) => void;
-  locale: 'en' | 'fr';
+  locale: string;
 }) {
   const t = useTranslations();
   return (
@@ -1100,7 +1100,7 @@ function SealedToggleBlock({
         <div className="flex flex-wrap gap-2">
           {ALL_SET_IDS.map((sid) => {
             const desc = SET_REGISTRY[sid];
-            const name = locale === 'fr' ? desc.nameFr : desc.nameEn;
+            const name = getSetName(sid, locale);
             const available = isSetAvailable(sid);
             const selectable = checked && available;
             const isSelected = setChoice === sid;

@@ -11,7 +11,8 @@ export type SoundName =
   | 'secretVariantReveal'
   | 'mythosHum'
   | 'boosterTear'
-  | 'claimSuccess';
+  | 'claimSuccess'
+  | 'roomJoin';
 
 const SOUND_PATHS: Record<SoundName, string> = {
   cardPlay: '/sound/cardplaying.wav',
@@ -25,6 +26,7 @@ const SOUND_PATHS: Record<SoundName, string> = {
   mythosHum: '/sound/mythos-hum.mp3',
   boosterTear: '/sound/booster-tear.mp3',
   claimSuccess: '/sound/claim-success.mp3',
+  roomJoin: '/sound/room-join.mp3',
 };
 
 
@@ -40,6 +42,7 @@ const SOUND_GAIN: Record<SoundName, number> = {
   mythosHum: 0.5,
   boosterTear: 0.6,
   claimSuccess: 0.5,
+  roomJoin: 0.6,
 };
 
 

@@ -1145,4 +1145,36 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.',
     'MAIN effect: Instead, defeat both of them.',
   ],
+  'KS-104_2-MV': [
+    'Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.',
+    'POWERUP X.',
+  ],
+  'KS-105-MV': [
+    'Play a Summon character anywhere, paying 3 less.',
+    'Move any enemy character from this mission.',
+  ],
+  'KS-107_2-MV': [
+    'You must move all other non-hidden friendly characters from this mission, if able.',
+    'POWERUP X where X is the number of characters moved this way.',
+  ],
+  'KS-108_3-MV': [
+    'Hide an enemy character with Power 3 or less in this mission.',
+    'MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.',
+  ],
+  'KS-108_4-MV': [
+    'Hide an enemy character with Power 3 or less in this mission.',
+    'MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.',
+  ],
+  'KS-109-MV': [
+    'Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost.',
+    'MAIN effect: Instead, play the card paying 2 less.',
+  ],
+  'KS-126-MV': [
+    'Defeat the weakest non-hidden enemy character in play.',
+    'POWERUP 3.',
+  ],
+  'KS-128_2-MV': [
+    '[⧗] Every enemy character in this mission has -1 Power.',
+    'Move a friendly character in play.',
+  ],
 };

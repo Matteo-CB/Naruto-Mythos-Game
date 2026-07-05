@@ -18,6 +18,7 @@ import { createChessClock, arm as armChessClock, disarm as disarmChessClock, res
 import { computeEvolvingMpBonus } from '@/lib/evolving/mpBonus';
 import { computeDeckEvolvingPoints, isEvolvingCompatible } from '@/lib/evolving/computePoints';
 import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
+import { isStaticRankedBanned } from '@/lib/data/rankedBans';
 import { emitQuestEvent } from '@/lib/quests/hooks';
 import { emitDrawDiffEvents, emitTokenDiffEvents } from '@/lib/quests/engineEmit';
 import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
@@ -2464,22 +2465,22 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if ((room.isRanked || room.gameMode === 'ranked') && !room.tournamentId) {
         try {
           const banned = await getBannedCards();
-          if (banned.size > 0) {
-            const foundBanned: Array<{ cardId: string; reason: string | null }> = [];
-            for (const c of data.characters) {
-              if (c && typeof c.id === 'string' && banned.has(c.id)) foundBanned.push({ cardId: c.id, reason: banned.get(c.id) ?? null });
-            }
-            for (const m of data.missions) {
-              if (m && typeof m.id === 'string' && banned.has(m.id)) foundBanned.push({ cardId: m.id, reason: banned.get(m.id) ?? null });
-            }
-            if (foundBanned.length > 0) {
-              socket.emit('room:error', {
-                message: 'Deck contains banned cards',
-                errorKey: 'game.error.deckBanned',
-                bannedCards: foundBanned,
-              });
-              return;
-            }
+          const isBanned = (id: string): boolean => banned.has(id) || isStaticRankedBanned(id);
+          const banReason = (id: string): string | null => banned.get(id) ?? (isStaticRankedBanned(id) ? 'set2Unreleased' : null);
+          const foundBanned: Array<{ cardId: string; reason: string | null }> = [];
+          for (const c of data.characters) {
+            if (c && typeof c.id === 'string' && isBanned(c.id)) foundBanned.push({ cardId: c.id, reason: banReason(c.id) });
+          }
+          for (const m of data.missions) {
+            if (m && typeof m.id === 'string' && isBanned(m.id)) foundBanned.push({ cardId: m.id, reason: banReason(m.id) });
+          }
+          if (foundBanned.length > 0) {
+            socket.emit('room:error', {
+              message: 'Deck contains banned cards',
+              errorKey: 'game.error.deckBanned',
+              bannedCards: foundBanned,
+            });
+            return;
           }
         } catch (err) {
           console.error('[Socket] Ban check error:', err);

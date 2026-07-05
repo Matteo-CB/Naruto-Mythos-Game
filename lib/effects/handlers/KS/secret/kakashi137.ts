@@ -3,6 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
+import { moveWouldViolateNameUniqueness } from '@/lib/effects/moveNameUniqueness';
 
 
 
@@ -122,6 +123,19 @@ function moveKakashi137(
   const fromChars = [...fromMission[friendlySide]];
   const charIdx = fromChars.findIndex((c) => c.instanceId === sourceCard.instanceId);
   if (charIdx === -1) return state;
+
+  if (moveWouldViolateNameUniqueness(state, fromChars[charIdx], toMissionIdx, friendlySide)) {
+    return {
+      ...state,
+      log: logAction(
+        state.log, state.turn, state.phase, sourcePlayer,
+        'EFFECT_BLOCKED',
+        `Kakashi Hatake (137): cannot move to mission ${toMissionIdx + 1}, a character with the same name is already there.`,
+        'game.log.effect.moveNameConflictBlocked',
+        { card: 'KAKASHI HATAKE', id: 'KS-137-S', target: fromChars[charIdx].card.name_fr },
+      ),
+    };
+  }
 
   const movedChar = { ...fromChars[charIdx], missionIndex: toMissionIdx };
   fromChars.splice(charIdx, 1);

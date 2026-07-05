@@ -12,7 +12,7 @@ import { DeckSelector } from '@/components/game/DeckSelector';
 import { useGameStore } from '@/stores/gameStore';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { AIDifficulty } from '@/lib/ai/AIPlayer';
-import { isVariantRarity } from '@/lib/variants/constants';
+import { isLockedVariant } from '@/lib/variants/constants';
 import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 
 interface ResolvedDeck {
@@ -101,7 +101,7 @@ export default function PlayAIPage() {
     const allChars = cards.characters;
     const allMissions = cards.missions;
 
-    const p1Pool = allChars.filter((c) => !isVariantRarity(c.rarity) || unlockedIds.has(c.id));
+    const p1Pool = allChars.filter((c) => !isLockedVariant(c.rarity) || unlockedIds.has(c.id));
     const player1Deck = selectedDeck
       ? selectedDeck.characters
       : [...p1Pool].sort(() => Math.random() - 0.5).slice(0, 30);

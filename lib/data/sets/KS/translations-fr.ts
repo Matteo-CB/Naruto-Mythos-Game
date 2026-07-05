@@ -1154,4 +1154,36 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     'Cachez un personnage ennemi ayant une Puissance de 5 ou moins dans cette mission et un autre personnage ennemi ayant une Puissance de 2 ou moins en jeu.',
     'MAIN effect : Au lieu de cela, envoyez-les tous les deux dans la défausse.',
   ],
+  'KS-104_2-MV': [
+    'Depensez n\'importe quelle quantite de Chakra supplementaire. POWERUP X, ou X est la quantite de Chakra supplementaire depensee.',
+    'POWERUP X.',
+  ],
+  'KS-105-MV': [
+    'Jouez un personnage Invocation n\'importe ou en payant 3 de moins.',
+    'Deplacez n\'importe quel personnage ennemi depuis cette mission.',
+  ],
+  'KS-107_2-MV': [
+    '[↯] Vous devez deplacer tous les autres personnages allies non caches depuis cette mission, si possible.',
+    'POWERUP X ou X est le nombre de personnages deplaces de cette facon.',
+  ],
+  'KS-108_3-MV': [
+    'Cachez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
+    'Effet MAIN : POWERUP X ou X est la Puissance du personnage ennemi cache.',
+  ],
+  'KS-108_4-MV': [
+    'Cachez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
+    'Effet MAIN : POWERUP X où X est la Puissance du personnage ennemi caché.',
+  ],
+  'KS-109-MV': [
+    'Choisissez un de vos personnages Village de Konoha dans votre defausse et jouez-le n\'importe ou en payant son cout.',
+    'MAIN effect : A la place, jouez la carte en payant 2 de moins.',
+  ],
+  'KS-126-MV': [
+    'Vainquez le personnage ennemi non cache le plus faible en jeu.',
+    'POWERUP 3.',
+  ],
+  'KS-128_2-MV': [
+    '[⧗] Chaque personnage ennemi dans cette mission a -1 Puissance.',
+    'Deplacez un personnage allie en jeu.',
+  ],
 };

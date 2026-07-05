@@ -7,8 +7,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useGameStore } from "@/stores/gameStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { effectDescriptionsFr } from "@/lib/data/effectTranslationsFr";
-import { effectDescriptionsEn } from "@/lib/data/effectDescriptionsEn";
+import { getCardEffectDescription } from "@/lib/data/effectDescriptions";
 import { PlayerHand } from "./PlayerHand";
 import { OpponentHand } from "./OpponentHand";
 import { PlayerStatsBar } from "./PlayerStatsBar";
@@ -71,6 +70,7 @@ function CardPreviewContent({
 }) {
   const t = useTranslations();
   const locale = useLocale();
+  const tCardMeta = useTranslations('cardMeta');
   const unpinCard = useUIStore((s) => s.unpinCard);
   const toggleFullscreenCard = useUIStore((s) => s.toggleFullscreenCard);
 
@@ -159,7 +159,7 @@ function CardPreviewContent({
           {getCardName(card, locale as 'en' | 'fr')}
         </span>
 
-        {isMission && card.name_en && locale !== 'en' && (
+        {isMission && card.name_en && locale === 'fr' && (
           <span className="text-xs -mt-1" style={{ color: "#666666" }}>
             {card.name_en}
           </span>
@@ -300,7 +300,7 @@ function CardPreviewContent({
                   color: "#999999",
                 }}
               >
-                {getCardKeyword(kw, locale as 'en' | 'fr')}
+                {getCardKeyword(kw, tCardMeta)}
               </span>
             ))}
           </div>
@@ -308,7 +308,7 @@ function CardPreviewContent({
 
         {card.group && (
           <span className="text-[10px]" style={{ color: "#777777" }}>
-            {t("collection.details.group")}: {getCardGroup(card.group, locale as 'en' | 'fr')}
+            {t("collection.details.group")}: {getCardGroup(card.group, tCardMeta)}
           </span>
         )}
 
@@ -329,13 +329,7 @@ function CardPreviewContent({
 
           {card.effects && card.effects.length > 0 ? (
             card.effects.map((effect, i) => {
-              const raFallbackId = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
-              const frDescriptions = effectDescriptionsFr[card.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
-              const enDescriptions = effectDescriptionsEn[card.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
-              const description =
-                locale === "fr"
-                  ? (frDescriptions?.[i] ?? enDescriptions?.[i] ?? effect.description)
-                  : (enDescriptions?.[i] ?? effect.description);
+              const description = getCardEffectDescription(card.id, i, locale, effect.description);
 
               return (
                 <div
@@ -419,40 +413,93 @@ function CardPreviewContent({
 
 function MobileDetailsButton() {
   const t = useTranslations();
+  const locale = useLocale();
   const dims = useGameScale();
   const pinnedCard = useUIStore((s) => s.pinnedCard);
   const showFullscreenCard = useUIStore((s) => s.showFullscreenCard);
   const toggleFullscreenCard = useUIStore((s) => s.toggleFullscreenCard);
+  const unpinCard = useUIStore((s) => s.unpinCard);
 
   if (!dims.isMobile || !pinnedCard || showFullscreenCard) return null;
   if (typeof document === 'undefined') return null;
 
   const btn = (
-    <button
-      onClick={(e) => { e.stopPropagation(); toggleFullscreenCard(); }}
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
       style={{
         position: 'fixed',
-        top: '50%',
-        right: '10px',
-        transform: 'translateY(-50%)',
+        bottom: '120px',
+        right: '8px',
         zIndex: 9997,
-        margin: 0,
-        padding: '7px 12px',
-        fontFamily: "'NJNaruto', Arial, sans-serif",
-        fontSize: '11px',
-        letterSpacing: '0.18em',
-        textTransform: 'uppercase',
-        color: '#c4a35a',
-        backgroundColor: 'rgba(10, 10, 14, 0.85)',
-        border: 'none',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
-        cursor: 'pointer',
-        fontWeight: 600,
-        opacity: 0.92,
+        display: 'flex',
+        alignItems: 'stretch',
+        boxShadow: '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 12px rgba(196, 163, 90, 0.25)',
       }}
     >
-      {t('game.board.details')}
-    </button>
+      <button
+        onClick={(e) => { e.stopPropagation(); toggleFullscreenCard(); }}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          gap: '2px',
+          minHeight: '46px',
+          maxWidth: '180px',
+          margin: 0,
+          padding: '6px 14px',
+          backgroundColor: 'rgba(196, 163, 90, 0.95)',
+          border: 'none',
+          cursor: 'pointer',
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "'NJNaruto', Arial, sans-serif",
+            fontSize: '13px',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: '#0a0a0a',
+            fontWeight: 700,
+            lineHeight: 1.1,
+          }}
+        >
+          {t('game.board.details')}
+        </span>
+        <span
+          style={{
+            fontSize: '11px',
+            color: 'rgba(10, 10, 10, 0.75)',
+            fontWeight: 600,
+            lineHeight: 1.1,
+            maxWidth: '150px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {getCardName(pinnedCard, locale as 'en' | 'fr')}
+        </span>
+      </button>
+      <button
+        onClick={(e) => { e.stopPropagation(); unpinCard(); }}
+        aria-label={t('common.close')}
+        style={{
+          minWidth: '40px',
+          margin: 0,
+          padding: '0 10px',
+          backgroundColor: 'rgba(10, 10, 14, 0.92)',
+          border: 'none',
+          color: '#c4a35a',
+          fontSize: '15px',
+          fontWeight: 700,
+          cursor: 'pointer',
+        }}
+      >
+        X
+      </button>
+    </motion.div>
   );
 
   return createPortal(btn, document.body);
@@ -501,6 +548,7 @@ function CardPreview() {
 function FullscreenCardDetail() {
   const t = useTranslations();
   const locale = useLocale();
+  const tCardMeta = useTranslations('cardMeta');
   const dims = useGameScale();
   const pinnedCard = useUIStore((s) => s.pinnedCard);
   const pinnedMissionContext = useUIStore((s) => s.pinnedMissionContext);
@@ -655,7 +703,7 @@ function FullscreenCardDetail() {
                 color: "#999999",
               }}
             >
-              {getCardKeyword(kw, locale as 'en' | 'fr')}
+              {getCardKeyword(kw, tCardMeta)}
             </span>
           ))}
         </div>
@@ -663,7 +711,7 @@ function FullscreenCardDetail() {
 
       {card.group && (
         <span className={`text-sm`} style={{ color: "#999999" }}>
-          {getCardGroup(card.group, locale as 'en' | 'fr')}
+          {getCardGroup(card.group, tCardMeta)}
         </span>
       )}
 
@@ -680,13 +728,7 @@ function FullscreenCardDetail() {
 
         {card.effects && card.effects.length > 0 ? (
           card.effects.map((effect, i) => {
-            const raFallbackId2 = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
-            const frDescriptions = effectDescriptionsFr[card.id] ?? (raFallbackId2 ? effectDescriptionsFr[raFallbackId2] : undefined);
-            const enDescriptions2 = effectDescriptionsEn[card.id] ?? (raFallbackId2 ? effectDescriptionsEn[raFallbackId2] : undefined);
-            const description =
-              locale === "fr"
-                ? (frDescriptions?.[i] ?? enDescriptions2?.[i] ?? effect.description)
-                : (enDescriptions2?.[i] ?? effect.description);
+            const description = getCardEffectDescription(card.id, i, locale, effect.description);
 
             return (
               <div

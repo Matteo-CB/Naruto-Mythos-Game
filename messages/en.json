@@ -1,4 +1,294 @@
 {
+  "_meta": {
+    "name": "English",
+    "bcp47": "en-US",
+    "ogLocale": "en_US",
+    "dir": "ltr"
+  },
+  "languages": {
+    "en": "English",
+    "fr": "Français",
+    "es": "Español",
+    "ja": "日本語"
+  },
+  "seo": {
+    "siteTitle": "Naruto Mythos TCG - Free Online Naruto Card Game",
+    "siteDescription": "Free online Naruto Mythos card game simulator. Build decks, play vs AI or online, climb ELO rankings. Deck builder, tournaments and matchmaking.",
+    "webAppDescription": "Free Naruto Mythos card game simulator. AI, multiplayer, deck builder, and ELO rankings.",
+    "videoGameDescription": "Free Naruto Mythos card game simulator. Decks, AI, online matchmaking and tournaments."
+  },
+  "cardPage": {
+    "chakra": "Chakra",
+    "power": "Power",
+    "group": "Faction",
+    "keywords": "Keywords",
+    "effects": "Effects",
+    "rarity": "Rarity",
+    "set": "Set",
+    "otherLanguages": "In other languages",
+    "versions": "Same name, versions and variants",
+    "onlyVersion": "This is the only card with this name.",
+    "viewSimulation": "See the simulation",
+    "simulationSoon": "Coming soon",
+    "previous": "Previous card",
+    "next": "Next card",
+    "lockedVariant": "Locked variant",
+    "current": "Current card",
+    "viewFullPage": "View full page",
+    "variantsSameEffect": "Variants (same effect)",
+    "otherVersions": "Other cards with the same name",
+    "stats": "Statistics",
+    "efficiency": "Power efficiency",
+    "efficiencyHint": "Power per Chakra",
+    "setAverage": "average",
+    "vsAverage": "{percent}% of the average",
+    "deckUsage": "Deck presence",
+    "deckUsageValue": "In {count} of {total} decks",
+    "updatedDaily": "Updated daily",
+    "usageTier": "Usage tier",
+    "tier_OU": "Overused",
+    "tier_UU": "Underused",
+    "tier_RU": "Rarely used",
+    "tier_NU": "Never used",
+    "activePlayers14d": "among active players (last 14 days)",
+    "tier_BAN": "Banned",
+    "bannedInRanked": "Banned in ranked play",
+    "usageCollecting": "Usage statistics are being collected. Come back after some ranked games have been played.",
+    "usageRateLabel": "Appearance rate",
+    "usageDecksLabel": "In decks",
+    "usageDecksValue": "{count} of {total}",
+    "usagePlayersLabel": "Active players (14d)",
+    "usageTierLabel": "Tier",
+    "usageBasis": "Based on ranked-classic decks over the last 14 days. All variants of a card share the same rate.",
+    "rotateDeviceTitle": "Rotate your device",
+    "rotateDeviceDesc": "The effect simulation is best viewed in landscape.",
+    "replaySim": "Replay",
+    "demoYou": "You",
+    "demoOpponent": "Opponent",
+    "simSpectatorHint": "Someone else is playing this turn",
+    "simDone": "Turn complete"
+  },
+  "seoPages": {
+    "collection": {
+      "title": "Naruto Card Collection - All 186 Cards | Naruto Mythos TCG",
+      "description": "Explore the complete collection of all 186 Naruto Mythos TCG cards. Browse Common, Uncommon, Rare, Rare Art, Secret, and Mythos rarity cards. Filter by rarity, village (Leaf, Sand, Sound, Akatsuki), keyword (Sannin, Team 7, Summon), and character type. View official card artwork, chakra cost and power stats, and detailed effect descriptions for every card. Discover iconic characters like Naruto Uzumaki, Sasuke Uchiha, Kakashi Hatake, Itachi, Gaara, Sakura Haruno, Jiraiya, Orochimaru, and Tsunade in this free Naruto Shippuden card encyclopedia.",
+      "ogAlt": "Naruto Mythos TCG Card Collection"
+    },
+    "cardDetail": {
+      "title": "{name} {number} - Naruto Mythos TCG Card",
+      "description": "All the details of the {name} {number} card from the {set} set: chakra cost, power, effects, versions and variants. Free unofficial Naruto Mythos TCG card simulator.",
+      "ogAlt": "{name} {number} card"
+    },
+    "deckBuilder": {
+      "title": "Naruto Deck Builder - Create Your Strategy | Naruto Mythos TCG",
+      "description": "Build the perfect deck in Naruto Mythos TCG with our interactive deck builder. Choose from 66 illustrated playable cards, select 3 mission cards, and validate your composition (minimum 30 character cards, maximum 2 copies per version). Drag-and-drop or click to add cards, filter by rarity and village, and preview every card in real-time. Save your decks online and load them to play against AI or in multiplayer. Craft strategies with Leaf Village, Sand Village, Akatsuki, and more cards.",
+      "ogAlt": "Naruto Mythos TCG Deck Builder"
+    },
+    "leaderboard": {
+      "title": "Player ELO Rankings - Top Competitive Players | Naruto Mythos TCG",
+      "description": "View the official Naruto Mythos TCG ELO rankings updated in real-time. Discover the top competitive players with detailed statistics: ELO score, wins, losses, draws, win ratio, and performance history. Track your progress in the global rankings, compare your results with top players, and climb the ladder through ranked multiplayer matches. The ELO ranking system uses an adaptive K-factor for balanced and competitive matchmaking.",
+      "ogAlt": "Naruto Mythos TCG ELO Rankings"
+    },
+    "friends": {
+      "title": "Friends List - Manage Your Contacts | Naruto Mythos TCG",
+      "description": "Manage your friends list on Naruto Mythos TCG. Send and accept friend requests, view your contacts' profiles, challenge them to private matches, and track their online activity. Build your Naruto Shippuden player community."
+    },
+    "game": {
+      "title": "Game Board - Match in Progress | Naruto Mythos TCG",
+      "description": "Interactive Naruto Mythos TCG game board. Play your character cards on missions, manage your chakra, activate MAIN, UPGRADE, AMBUSH, and SCORE effects, and win missions to score points. Immersive interface with cinematic animations and real-time card previews."
+    },
+    "legal": {
+      "title": "Legal Notice and Terms of Use | Naruto Mythos TCG",
+      "description": "Legal notice, privacy policy, terms of use, and intellectual property information for Naruto Mythos TCG. Fan-made project not affiliated with Masashi Kishimoto, Shueisha, or Studio Pierrot. Developed by HiddenLab."
+    },
+    "login": {
+      "title": "Sign In - Access Your Account | Naruto Mythos TCG",
+      "description": "Sign in to your Naruto Mythos TCG account to access online multiplayer, save and load your custom decks, check your ELO ranking, match history, and friends list. Join the player community and compete in ranked matches."
+    },
+    "register": {
+      "title": "Create Free Account - Register | Naruto Mythos TCG",
+      "description": "Create your Naruto Mythos TCG account for free in seconds. Access online multiplayer, save your decks, compete in ELO ranked matches, add friends, and climb the global leaderboard. Quick and free registration to start playing the Naruto Shippuden card game online."
+    },
+    "playAi": {
+      "title": "Play vs AI - 4 Difficulty Levels | Naruto Mythos TCG",
+      "description": "Challenge the Naruto Mythos TCG artificial intelligence across 4 difficulty levels. Easy mode to learn the basics, Medium for balanced strategy, Hard with minimax and optimal chakra management, and Expert with advanced SCORE effect evaluation, multi-turn planning, and hidden card probability analysis. Choose your custom deck and launch a solo game instantly. Perfect for training before ranked online matches or discovering the Naruto Shippuden card game.",
+      "ogAlt": "Play vs AI - Naruto Mythos TCG"
+    },
+    "playOnline": {
+      "title": "Play Online - Real-Time Multiplayer | Naruto Mythos TCG",
+      "description": "Play Naruto Mythos TCG online against other players from around the world in real-time. Create a private room with a 6-character code to play with friends or use public matchmaking to find an opponent at your skill level. Compete in ranked matches to earn ELO points and climb the global leaderboard. Every action is server-validated for a fair and secure gaming experience. Challenge the community, improve your strategy, and become the best Naruto Shippuden card game player.",
+      "ogAlt": "Play Online - Naruto Mythos TCG"
+    },
+    "playSealed": {
+      "title": "Sealed Mode - Open Boosters | Naruto Mythos TCG",
+      "description": "Open 6 boosters, build a deck and battle an opponent in the Naruto Mythos TCG Sealed mode."
+    },
+    "profile": {
+      "title": "{name}'s Profile - Stats and Ranking | Naruto Mythos TCG",
+      "description": "View {name}'s profile on Naruto Mythos TCG. Detailed game statistics, ELO score, wins, losses, draws, recent match history, multiplayer performance, and global ranking progression."
+    }
+  },
+  "cardMeta": {
+    "group": {
+      "Leaf Village": "Leaf Village",
+      "Sand Village": "Sand Village",
+      "Sound Village": "Sound Village",
+      "Akatsuki": "Akatsuki",
+      "Independent": "Independent"
+    },
+    "keyword": {
+      "Team 7": "Team 7",
+      "Team 8": "Team 8",
+      "Team 10": "Team 10",
+      "Team Guy": "Team Guy",
+      "Team Baki": "Team Baki",
+      "Sannin": "Sannin",
+      "Summon": "Summon",
+      "Hokage": "Hokage",
+      "Rogue Ninja": "Rogue Ninja",
+      "Sound Four": "Sound Four",
+      "Sound Ninja": "Sound Ninja",
+      "Kekkei Genkai": "Kekkei Genkai",
+      "Taijutsu": "Taijutsu",
+      "Jutsu": "Jutsu",
+      "Weapon": "Weapon",
+      "Tailed Beast": "Tailed Beast",
+      "Ninja Hound": "Ninja Hound",
+      "Ninja Pig": "Ninja Pig",
+      "Special Jonin": "Special Jonin"
+    },
+    "rarity": {
+      "C": "Common",
+      "UC": "Uncommon",
+      "R": "Rare",
+      "RA": "Rare Art",
+      "S": "Secret",
+      "SV": "Secret V",
+      "M": "Mythos",
+      "MV": "Mythos V",
+      "L": "Legendary",
+      "SP": "Special",
+      "SPV": "Special V",
+      "POP": "Pop",
+      "POPV": "Pop V",
+      "CHIBI": "Chibi",
+      "CHIBIV": "Chibi V",
+      "MMS": "Mission"
+    },
+    "raritySuffix": {
+      "C": "Common",
+      "UC": "Uncommon",
+      "R": "Rare",
+      "RA": "Rare Art",
+      "S": "Secret",
+      "SV": "Secret Variant",
+      "M": "Mythos",
+      "MV": "Mythos Variant",
+      "L": "Legendary",
+      "SP": "Special",
+      "SPV": "Special Variant",
+      "POP": "Pop",
+      "POPV": "Pop Variant",
+      "CHIBI": "Chibi",
+      "CHIBIV": "Chibi Variant",
+      "MMS": "Mission"
+    }
+  },
+  "email": {
+    "donationThankYou": {
+      "subject": "Thanks for supporting Naruto Mythos TCG",
+      "greetingNamed": "Hi {name},",
+      "greeting": "Hi,",
+      "introRecurring": "Thanks for your {amount}/month subscription. Supporters like you are why the simulator can keep growing.",
+      "introOneTime": "Thanks for your {amount} donation. Supporters like you are why the simulator can keep growing.",
+      "feedback": "If you have questions or ideas, join the {discordLink} or post a suggestion on {contributeLink}.",
+      "discordLinkLabel": "server Discord",
+      "contributeLinkLabel": "the Contribute page",
+      "managePortal": "Manage or cancel my subscription",
+      "signoff": "See you on the simulator.",
+      "signature": "Kutayt (simulator dev)"
+    },
+    "passwordReset": {
+      "subject": "Naruto Mythos - Reset your password",
+      "intro": "You requested a password reset.",
+      "button": "Reset Password",
+      "expiry": "This link expires in 1 hour.",
+      "ignore": "If you did not request this, ignore this email."
+    }
+  },
+  "rootLayout": {
+    "skipToContent": "Skip to content",
+    "noJs": "JavaScript is required to play Naruto Mythos TCG."
+  },
+  "rootMeta": {
+    "titleDefault": "Naruto Mythos TCG - Online Card Game",
+    "titleTemplate": "%s | Naruto Mythos TCG",
+    "description": "Play the Naruto Mythos Trading Card Game online for free. Face a smart AI across 4 difficulty levels or challenge other players in real-time multiplayer. Build your strategic deck from 186 unique cards inspired by Naruto Shippuden, collect rare cards, and climb the competitive ELO ranking. Free collectible card game with a deck builder and matchmaking system.",
+    "ogTitle": "Naruto Mythos TCG - Free Online Naruto Card Game",
+    "ogDescription": "Free Naruto Shippuden card game online. 186 unique cards, smart AI, real-time multiplayer, deck builder and ELO ranking. Play now, no download.",
+    "ogImageAlt": "Naruto Mythos TCG - Trading Card Game",
+    "twitterTitle": "Naruto Mythos TCG - Free Naruto Card Game",
+    "twitterDescription": "Free Naruto Shippuden card game. 186 cards, AI across 4 levels, real-time multiplayer, deck builder and ELO ranking. Play now in your browser.",
+    "keywords": [
+      "Naruto",
+      "TCG",
+      "Trading Card Game",
+      "card game",
+      "Naruto Mythos",
+      "Naruto Mythos TCG",
+      "Naruto card",
+      "online game",
+      "free online game",
+      "deck builder",
+      "ELO",
+      "ELO ranking",
+      "multiplayer",
+      "anime card game",
+      "collectible card game",
+      "Naruto card game online",
+      "Naruto card game free",
+      "play Naruto card game",
+      "Naruto Shippuden",
+      "Naruto Shippuden card game",
+      "strategy card game",
+      "Naruto online card game",
+      "Naruto TCG online free",
+      "Naruto trading card game online",
+      "free anime card game",
+      "ninja card game",
+      "free Naruto game",
+      "Sasuke",
+      "Kakashi",
+      "Sakura",
+      "Itachi",
+      "Gaara",
+      "CCG",
+      "play Naruto online",
+      "multiplayer card game",
+      "competitive card game",
+      "ranked card game",
+      "build Naruto deck",
+      "free online card game",
+      "card game browser",
+      "Naruto fan game"
+    ]
+  },
+  "breadcrumbs": {
+    "root": "Naruto Mythos TCG",
+    "page": {
+      "collection": "Card Collection",
+      "deck-builder": "Deck Builder",
+      "leaderboard": "ELO Leaderboard",
+      "login": "Sign In",
+      "register": "Create Account",
+      "legal": "Legal Notice",
+      "friends": "Friends"
+    },
+    "play": {
+      "ai": "Play vs AI",
+      "online": "Play Online"
+    }
+  },
   "helpUs": {
     "title": "Contribute",
     "subtitle": "Support the project and propose improvements",
@@ -293,7 +583,9 @@
         "adminBlocked": "Admin accounts cannot be self-deleted. Contact another admin.",
         "serverError": "Server error during deletion. Try again later."
       }
-    }
+    },
+    "hideVariants": "Hide variants in the deck builder",
+    "hideVariantsHint": "When on, Rare Art, Mythos, Secret and special variant cards are hidden by default in the deck builder."
   },
   "game": {
     "turn": "Turn {turn}",
@@ -457,6 +749,8 @@
         "itachi091Discard": "{card} ({id}): Discarded {target} from opponent's hand.",
         "itachi091Draw": "{card} ({id}): Opponent draws 1 replacement card.",
         "continuous": "{card} ({id}): Continuous effect active.",
+        "continuousActive": "{card}'s continuous effect: {effect}",
+        "scoreAnnounce": "{card} — SCORE (when it wins its mission): {effect}",
         "rempartTokenRemoval": "{card} ({id}): Permanently removed {amount} Power token(s) from {target}.",
         "ambush": "{card} ({id}): Ambush effect triggered.",
         "bothDraw": "{card} ({id}): Each player draws {count} card(s).",
@@ -522,12 +816,16 @@
         "upgradeSummon": "{card} ({id}): Upgraded summon {target} on mission {mission} for {cost} chakra.",
         "sasuke107Discard": "{card} ({id}): {target} discarded, name conflict (mandatory move).",
         "sasuke107Skip": "{card} ({id}): {target} cannot move (name conflict at all destinations), stays.",
+        "sasuke107KurenaiBlock": "{card} ({id}): no character can leave this mission, no POWERUP.",
         "kimimaro056ProtectionBlocked": "{card} ({id}): Cannot pay 1 Chakra. Effect fails.",
         "kabutoStealDraw": "{card} ({id}): Stole top card from opponent's deck.",
         "moveBlockedKurenai": "{card} ({id}): Movement blocked by Yuhi Kurenai (035).",
         "discardAndDraw": "{card} ({id}): Opponent discards {discarded} card(s), then draws {drawn} new card(s).",
         "orderedDefeat": "{count} character(s) processed in chosen order.",
-        "kimimaro056NoPay": "{card} ({id}): Opponent has no Chakra and cannot pay. Effect proceeds."
+        "kimimaro056NoPay": "{card} ({id}): Opponent has no Chakra and cannot pay. Effect proceeds.",
+        "ss000Search": "Kakashi Hatake (SS-000): searched the deck, drew {count} Ninja Hound, then shuffled.",
+        "ss112RemoveTokens": "Neji Hyuga (SS-112): removed all Power tokens from an enemy character.",
+        "kakashi148Locked": "{card} ({id}): the opponent locked the Edge this round, it cannot be taken."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -870,7 +1168,7 @@
         "jirobo122ConfirmMain": "MAIN: POWERUP X where X is the number of characters in this mission.",
         "jirobo122ConfirmUpgrade": "UPGRADE: Defeat an enemy character with Power 1 or less in this mission.",
         "tsunade104ConfirmUpgrade": "UPGRADE: Spend any amount of additional Chakra. POWERUP X.",
-        "jiraiya007ChooseSummon": "Choose a Summon character from your hand to play (paying 1 less).",
+        "jiraiya007ChooseSummon": "Choose a Summon character to play from your hand or reveal a hidden one (paying 1 less).",
         "kabuto052PlaceHidden": "Choose a mission to place the stolen card hidden.",
         "kabuto052ChooseMission": "Choose a mission to place the stolen card hidden.",
         "neji036RemoveTokens": "Select an enemy character to remove up to 2 Power tokens from.",
@@ -907,8 +1205,8 @@
         "dosuLookReveal": "Dosu Kinuta: Revealed {target} (Cost {cost}, Power {power}).",
         "narutoLegendaryDefeatTarget2": "Choose a second enemy character with Power 2 or less in play to defeat.",
         "narutoLegendaryHideTarget2": "Choose a second enemy character with Power 2 or less in play to hide.",
-        "hiruzen002PlayLeaf": "Choose a Leaf Village character from your hand to play (cost -1).",
-        "hiruzen002PlayLeafUpgrade": "Choose a Leaf Village character from your hand to play (cost -1, + POWERUP 2).",
+        "hiruzen002PlayLeaf": "Choose a Leaf Village character to play from your hand or reveal a hidden one (cost -1).",
+        "hiruzen002PlayLeafUpgrade": "Choose a Leaf Village character to play from your hand or reveal a hidden one (cost -1, + POWERUP 2).",
         "ino020TakeControl": "Select an enemy character with cost {costLimit} or less to take control of.",
         "tsunade104ChooseChakra": "Tsunade (104): Choose how much extra chakra to spend (0-{max}). POWERUP X.",
         "itachi091ChooseHandCard": "Choose a card from the opponent's hand to look at.",
@@ -994,7 +1292,7 @@
         "ino110ChooseMove": "Choose the weakest enemy character to move from this mission.",
         "ino110ChooseMoveHide": "Choose the weakest enemy character to move and hide.",
         "itachi128MoveFriendly": "Choose a friendly character to move to Itachi's mission.",
-        "jiraiya105ChooseSummon": "Choose a Summon character from your hand to play (paying 3 less).",
+        "jiraiya105ChooseSummon": "Choose a Summon character to play from your hand or reveal a hidden one (paying 3 less).",
         "jiraiya105MoveEnemy": "Choose an enemy character in this mission to move.",
         "jirobo122Defeat": "Choose an enemy character with Power 1 or less to defeat.",
         "kakashi106Devolve": "Choose an upgraded enemy character to de-evolve (discard top card).",
@@ -1016,7 +1314,7 @@
         "sakura109PlayFromDiscard": "Choose a Leaf Village character from your discard pile to play.",
         "sakura109PlayFromDiscardUpgrade": "Choose a Leaf Village character from your discard pile to play (paying 2 less).",
         "shikamaru111HideEnemy": "Choose an enemy character with Power 3 or less to hide.",
-        "tayuya125PlaySound": "Choose a Sound Village character from your hand to play (paying 2 less).",
+        "tayuya125PlaySound": "Choose a Sound Village character to play from your hand or reveal a hidden one (paying 2 less).",
         "temari121MoveFriendly": "Choose a friendly character to move to another mission.",
         "temari121MoveAny": "Choose any character in play to move to another mission.",
         "shino115MoveFriendly": "Shino Aburame (115) AMBUSH: Choose a friendly character in this mission to move to another mission.",
@@ -1025,8 +1323,8 @@
         "ukon124bHide": "Choose an enemy character with Power 5 or less to hide.",
         "gaara139Defeat": "Select an enemy character with cost less than {hiddenCount} to defeat.",
         "itachi140DefeatByCost": "Choose an enemy with cost {cost} or less to defeat.",
-        "jiraiya008ChooseSummon": "Choose a Summon character from your hand to play (paying 2 less).",
-        "jiraiya132ChooseSummon": "Choose a Summon character from your hand to play (paying 5 less).",
+        "jiraiya008ChooseSummon": "Choose a Summon character to play from your hand or reveal a hidden one (paying 2 less).",
+        "jiraiya132ChooseSummon": "Choose a Summon character to play from your hand or reveal a hidden one (paying 5 less).",
         "jiraiya132OpponentChooseDefeat": "You must defeat one of your characters in mission {mission} ({count} > 2).",
         "kakashi137MoveSelf": "Select a mission to move this character to.",
         "kakashi137HideUpgraded": "Choose an upgraded character in this mission to hide.",
@@ -1125,7 +1423,17 @@
         "minato122MoveDest": "Choose a mission to move the Tailed Beast to.",
         "naruto141ChooseDiscard": "Choose a card from your hand to discard.",
         "sasuke142ChooseDiscard": "Choose a card from your hand to discard.",
-        "gaara139DefeatByCost": "Choose an enemy with cost less than {count} to defeat."
+        "gaara139DefeatByCost": "Choose an enemy with cost less than {count} to defeat.",
+        "ss112RemoveTokens": "Neji Hyuga (UPGRADE): Choose an enemy character to remove all its Power tokens.",
+        "ss112Hide": "Neji Hyuga (DUEL): Choose an enemy character without Power tokens to hide.",
+        "ss120Hide": "Kiba Inuzuka (DUEL): Choose an enemy character with Power 4 or less to hide.",
+        "ss126PlaySound": "Sasuke Uchiha (DUEL): Choose a Sound Village character to play, paying 3 less.",
+        "ss000PlayHound": "Kakashi Hatake: Choose a Ninja Hound character to play, paying 1 less.",
+        "playAnotherReduced": "Play another character, paying {reduction} less (or skip).",
+        "ss121MoveStack": "Naruto Uzumaki (DUEL): Choose a mission to move the bottom card of the upgrade stack to.",
+        "kakashi148Confirm": "Kakashi Hatake (148): Gain the Edge (you cannot lose it this round)?",
+        "ss147Confirm": "Naruto Uzumaki (SS-147): POWERUP {amount} (one per non-hidden enemy in play)?",
+        "ss134Confirm": "Kurenai Yuhi (SS-134): Defeat the strongest enemy character (Power {power})?"
       }
     },
     "anim": {
@@ -1158,6 +1466,7 @@
       "targetNotFound": "Target character not found.",
       "cannotUpgradeOpponent": "Cannot upgrade opponent's character.",
       "cannotUpgradeControlled": "Cannot upgrade a character you control but don't own.",
+      "cannotUpgradeWithControlled": "A character you control but don't own cannot be used to upgrade.",
       "upgradeSameName": "Upgrade must be same character name.",
       "flexibleUpgradeRestriction": "Cannot upgrade onto a Summon or Orochimaru.",
       "upgradeHigherCost": "Upgrade must have strictly higher chakra cost. New: {newCost}, Current: {currentCost}.",
@@ -1221,6 +1530,7 @@
     "id": "ID",
     "missions": "Missions",
     "bannedPlaceholder": "BAN",
+    "quickPreview": "Quick preview",
     "variantsOnly": "Variants",
     "filterTradeable": "Tradeable",
     "showAll": "All cards",
@@ -1407,7 +1717,20 @@
       "keyword": "Keyword",
       "effect": "Effect"
     },
-    "noEffect": "No Effect"
+    "noEffect": "No Effect",
+    "effectFn": {
+      "defeat": "Defeat",
+      "hide": "Hide",
+      "draw": "Draw",
+      "move": "Move",
+      "powerup": "Power Up",
+      "chakra": "Chakra",
+      "control": "Control",
+      "play": "Play/Reveal",
+      "protect": "Protect",
+      "continuous": "Continuous",
+      "score": "Score"
+    }
   },
   "discord": {
     "linkDiscord": "Link Discord",
@@ -1530,7 +1853,8 @@
     "phaseAction": "Action",
     "phaseMission": "Mission",
     "resetTokens": "Reset Tokens",
-    "switchPlayer": "Switch Player"
+    "switchPlayer": "Switch Player",
+    "missionRank": "Mission {rank}"
   },
   "online": {
     "title": "Play Online",
@@ -1784,7 +2108,8 @@
       "userNotFound": "User not found.",
       "serverError": "Server error. Please try again.",
       "notAuthenticated": "You must be signed in."
-    }
+    },
+    "optional": "optional"
   },
   "card": {
     "effectTypes": {
@@ -2981,5 +3306,12 @@
       "body": "Booster opened but display unavailable. Your cards have been added to the collection.",
       "back": "Back"
     }
+  },
+  "flag": {
+    "none": "No flag",
+    "search": "Search a country...",
+    "noResults": "No country found",
+    "label": "Country flag",
+    "hint": "Shown next to your name in the leaderboard and on your profile."
   }
 }

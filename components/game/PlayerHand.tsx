@@ -185,22 +185,25 @@ const HandCard = React.memo(function HandCard({
         }}
       >
         <span
-          className="text-[9px] font-medium truncate leading-tight"
-          style={{ color: '#e0e0e0', maxWidth: '60px' }}
+          className="font-medium truncate leading-tight"
+          style={{ fontSize: dims.isMobile ? '11px' : '9px', color: '#e0e0e0', maxWidth: dims.isMobile ? '62%' : '60px' }}
         >
           {getCardName(card, locale as 'en' | 'fr')}
         </span>
         <span
-          className="text-[10px] font-bold tabular-nums"
-          style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+          className="font-bold tabular-nums"
+          style={{ fontSize: dims.isMobile ? '13px' : '10px', color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
         >
           {card.power}
         </span>
       </div>
 
       <div
-        className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[10px] font-bold"
+        className="absolute top-1 left-1 flex items-center justify-center font-bold"
         style={{
+          width: dims.isMobile ? '26px' : '20px',
+          height: dims.isMobile ? '26px' : '20px',
+          fontSize: dims.isMobile ? '14px' : '10px',
           backgroundColor: canAfford
             ? 'rgba(196, 163, 90, 0.9)'
             : 'rgba(179, 62, 62, 0.9)',

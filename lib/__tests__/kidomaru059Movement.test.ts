@@ -129,7 +129,7 @@ describe('Kidomaru 059 MAIN — movement targeting rules', () => {
     }
   });
 
-  it('subsequent moves become optional (can be skipped if user wants)', () => {
+  it('subsequent moves are mandatory once the first move is made (pass button disappears)', () => {
     const { state, kidomaruId } = setupKidomaru059();
     const sakon = placeFriendly(state, 0, 'SAKON', true);
     placeFriendly(state, 1, 'TAYUYA', true);
@@ -142,9 +142,9 @@ describe('Kidomaru 059 MAIN — movement targeting rules', () => {
       s = EffectEngine.applyTargetedEffect(s, destPending, [destPending.validTargets![0]]);
     }
     const nextPending = s.pendingEffects.find(p => p.targetSelectionType === 'KIDOMARU_CHOOSE_CHARACTER');
-    if (nextPending) {
-      expect(nextPending.isOptional).toBe(true);
-      expect(nextPending.isMandatory).toBe(false);
-    }
+    expect(nextPending).toBeDefined();
+    expect(nextPending!.isMandatory).toBe(true);
+    expect(nextPending!.isOptional).toBe(false);
+    expect(nextPending!.rootOptional).not.toBe(true);
   });
 });

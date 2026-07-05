@@ -3,6 +3,12 @@ import type { Rarity } from '@/lib/engine/types';
 export const VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L'] as const;
 export type VariantRarity = (typeof VARIANT_RARITIES)[number];
 
+export const SPECIAL_VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L', 'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV'] as const;
+
+export const LOCKED_VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L', 'POPV', 'CHIBIV'] as const;
+
+export const FORCE_UNLOCKED_CARD_IDS: ReadonlySet<string> = new Set([]);
+
 export const VARIANT_PACK_SIZE = 4;
 
 export interface VariantPackProbabilities {
@@ -54,4 +60,14 @@ export const DUPLICATE_XP_BY_RARITY: Record<VariantRarity, number> = {
 export function isVariantRarity(r: Rarity | string | undefined | null): r is VariantRarity {
   if (!r) return false;
   return (VARIANT_RARITIES as readonly string[]).includes(r);
+}
+
+export function isSpecialVariant(r: Rarity | string | undefined | null): boolean {
+  if (!r) return false;
+  return (SPECIAL_VARIANT_RARITIES as readonly string[]).includes(r);
+}
+
+export function isLockedVariant(r: Rarity | string | undefined | null): boolean {
+  if (!r) return false;
+  return (LOCKED_VARIANT_RARITIES as readonly string[]).includes(r);
 }

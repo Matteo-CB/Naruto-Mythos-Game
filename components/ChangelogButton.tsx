@@ -13,14 +13,27 @@ type Entry = {
   title_en: string;
   changes_fr: string[];
   changes_en: string[];
+  [key: string]: string | string[];
 };
+
+function localizedTitle(entry: Entry, locale: string): string {
+  const v = entry[`title_${locale}`];
+  if (typeof v === 'string' && v) return v;
+  return entry.title_en || entry.title_fr;
+}
+
+function localizedChanges(entry: Entry, locale: string): string[] {
+  const v = entry[`changes_${locale}`];
+  if (Array.isArray(v) && v.length) return v;
+  return entry.changes_en ?? entry.changes_fr;
+}
 
 const STORAGE_KEY = 'naruto-mythos-changelog-lastseen';
 
-function formatDate(iso: string, locale: string): string {
+function formatDate(iso: string, bcp47: string): string {
   try {
     const d = new Date(iso + 'T00:00:00Z');
-    return d.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
+    return d.toLocaleDateString(bcp47, {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -33,6 +46,7 @@ function formatDate(iso: string, locale: string): string {
 export function ChangelogButton() {
   const locale = useLocale();
   const t = useTranslations('changelog');
+  const tMeta = useTranslations('_meta');
   const [open, setOpen] = useState(false);
   const [hasNew, setHasNew] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -142,8 +156,8 @@ export function ChangelogButton() {
                 ) : (
                   <ul className="flex flex-col gap-6">
                     {entries.map((entry, idx) => {
-                      const title = locale === 'fr' ? entry.title_fr : entry.title_en;
-                      const items = locale === 'fr' ? entry.changes_fr : entry.changes_en;
+                      const title = localizedTitle(entry, locale);
+                      const items = localizedChanges(entry, locale);
                       const isLatest = idx === 0;
                       return (
                         <li key={`${entry.date}-${idx}`}>
@@ -152,7 +166,7 @@ export function ChangelogButton() {
                               className="text-xs font-bold uppercase tracking-widest"
                               style={{ color: isLatest ? '#c4a35a' : '#666666' }}
                             >
-                              {formatDate(entry.date, locale)}
+                              {formatDate(entry.date, tMeta('bcp47'))}
                             </span>
                             {isLatest && (
                               <span

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { resolveCardId } from '@/lib/data/cardLoader';
-import { isVariantRarity } from '@/lib/variants/constants';
+import { isLockedVariant } from '@/lib/variants/constants';
 import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
 import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
@@ -88,7 +88,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
 
         }
       }
-      const availableChars = allCharacters.filter((c) => !isVariantRarity(c.rarity) || unlockedIds.has(c.id));
+      const availableChars = allCharacters.filter((c) => !isLockedVariant(c.rarity) || unlockedIds.has(c.id));
       const shuffledChars = [...availableChars].sort(() => Math.random() - 0.5);
       const shuffledMissions = [...allMissions].sort(() => Math.random() - 0.5);
       onSelect({

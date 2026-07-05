@@ -16,7 +16,8 @@ import { deepClone } from '@/lib/engine/utils/deepClone';
 import { resetIdCounter } from '@/lib/engine/utils/id';
 import { useTrainingStore } from '@/stores/trainingStore';
 import { useUIStore } from '@/stores/uiStore';
-import { getCharacterById } from '@/lib/data/cardIndex';
+import { getCharacterById, getCardById } from '@/lib/data/cardIndex';
+import { lookupCardByName } from '@/lib/i18n/localizeMessageParams';
 import { playSound } from '@/lib/sound/SoundManager';
 
 let _cardsJsonCache: Record<string, unknown> = {};
@@ -45,12 +46,12 @@ interface PendingTargetSelection {
   descriptionParams?: Record<string, string | number>; // interpolation params
   playerName?: string; // display name of the player who must choose
   selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT' | 'DRAW_CARD' | 'CONFIRM_HIDE' | 'CONFIRM_DEFEAT' | 'EFFECT_PLAY_UPGRADE_OR_FRESH' | 'EFFECT_CONFIRM' | 'CHOOSE_EFFECT_ORDER' | 'ORDER_DEFEAT_TARGETS' | 'ORDER_HIDE_TARGETS'; // type of selection
-  effectChoices?: Array<{ effectType: string; description: string }>; // for effect copy choice (Kakashi/Sakon)
+  effectChoices?: Array<{ effectType: string; description: string; cardId?: string; effectIndex?: number }>; // for effect copy choice (Kakashi/Sakon)
   handCards?: Array<{ index: number; card: { name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra?: number; power?: number; image_file?: string; missionLabel?: string; id?: string; cardId?: string; number?: number; rarity?: string; keywords?: string[]; group?: string; effects?: Array<{ type: string; description: string }>; card_type?: string }; targetId?: string; isPlayable?: boolean }>; // for hand selection
   revealedCard?: { name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
   revealedCards?: Array<{
-    id?: string; name_fr: string; name_en?: string;
-    title_fr?: string; title_en?: string;
+    id?: string; name_fr: string; name_en?: string; name_ja?: string; name_es?: string;
+    title_fr?: string; title_en?: string; title_ja?: string; title_es?: string;
     chakra: number; power: number; image_file?: string;
     isSummon?: boolean; isMatch?: boolean; isDiscarded?: boolean;
     
@@ -86,6 +87,8 @@ interface GameStore {
   isAIGame: boolean;
   isHotseatGame: boolean;
   isSandboxMode: boolean;
+  isSimMode: boolean;
+  isReplayMode: boolean;
   hotseatSwitchPending: boolean;
   hotseatNextPlayer: PlayerID | null;
   isOnlineGame: boolean;
@@ -398,7 +401,8 @@ interface PendingEffectData {
 
 function fullCardData(card: { name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra?: number; power?: number; image_file?: string; id?: string; cardId?: string; number?: number; rarity?: string; keywords?: string[]; group?: string; effects?: Array<{ type: string; description: string }>; card_type?: string }) {
   return {
-    name_fr: card.name_fr, name_en: card.name_en, title_fr: card.title_fr, title_en: card.title_en,
+    name_fr: card.name_fr, name_en: card.name_en, name_ja: (card as { name_ja?: string }).name_ja, name_es: (card as { name_es?: string }).name_es,
+    title_fr: card.title_fr, title_en: card.title_en, title_ja: (card as { title_ja?: string }).title_ja, title_es: (card as { title_es?: string }).title_es,
     chakra: card.chakra, power: card.power, image_file: card.image_file,
     id: card.id, cardId: card.cardId, number: card.number, rarity: card.rarity,
     keywords: card.keywords, group: card.group, effects: card.effects, card_type: card.card_type,
@@ -508,12 +512,19 @@ function buildPendingTargetSelectionUI(
   
   let effectChoices: PendingTargetSelection['effectChoices'];
   if (isEffectChoice) {
+    let copySourceCardId: string | undefined;
+    try { copySourceCardId = JSON.parse(pendingEffect?.effectDescription ?? '{}').cardId; } catch { /* not a copy-effect choice */ }
+    const copySourceCard = copySourceCardId ? getCardById(copySourceCardId) : undefined;
     effectChoices = pendingAction.options.map((opt) => {
       const sepIdx = opt.indexOf('::');
-      return {
-        effectType: sepIdx >= 0 ? opt.substring(0, sepIdx) : opt,
-        description: sepIdx >= 0 ? opt.substring(sepIdx + 2) : '',
-      };
+      const effectType = sepIdx >= 0 ? opt.substring(0, sepIdx) : opt;
+      const description = sepIdx >= 0 ? opt.substring(sepIdx + 2) : '';
+      let effectIndex: number | undefined;
+      if (copySourceCard) {
+        const i = (copySourceCard.effects ?? []).findIndex((e) => e.description === description);
+        if (i >= 0) effectIndex = i;
+      }
+      return { effectType, description, cardId: copySourceCardId, effectIndex };
     });
   }
 
@@ -680,6 +691,13 @@ function buildPendingTargetSelectionUI(
 
   let revealedCard: PendingTargetSelection['revealedCard'];
   let revealedCards: PendingTargetSelection['revealedCards'];
+  const enrichRevealedLocale = <T extends { id?: string; name_fr?: string; name_en?: string }>(item: T): T => {
+    const full = (item.id ? getCardById(item.id) : undefined)
+      ?? lookupCardByName(item.name_fr) ?? lookupCardByName(item.name_en);
+    if (!full) return item;
+    const f = full as { name_ja?: string; name_es?: string; title_ja?: string; title_es?: string };
+    return { ...item, name_ja: f.name_ja, name_es: f.name_es, title_ja: f.title_ja, title_es: f.title_es };
+  };
   if (shouldParseRevealedCard && pendingEffect) {
     try {
       const rd = JSON.parse(pendingEffect.effectDescription);
@@ -694,7 +712,7 @@ function buildPendingTargetSelectionUI(
           revealTitleKey: 'game.effect.itachi091RevealTitle',
           revealResultKey: 'game.effect.itachi091RevealResult',
         };
-        revealedCards = (rd.cards ?? []).map((c: { id?: string; name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra: number; power: number; image_file?: string; isDiscarded?: boolean; effects?: Array<{ type: string; description: string }>; keywords?: string[]; group?: string; rarity?: string; card_type?: string }) => ({
+        revealedCards = (rd.cards ?? []).map((c: { id?: string; name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra: number; power: number; image_file?: string; isDiscarded?: boolean; effects?: Array<{ type: string; description: string }>; keywords?: string[]; group?: string; rarity?: string; card_type?: string }) => enrichRevealedLocale({
           id: c.id, name_fr: c.name_fr, name_en: c.name_en,
           title_fr: c.title_fr, title_en: c.title_en,
           chakra: c.chakra, power: c.power, image_file: c.image_file,
@@ -715,7 +733,7 @@ function buildPendingTargetSelectionUI(
           revealTitleKey: 'game.effect.sasuke014RevealTitle',
           revealResultKey: 'game.effect.sasuke014RevealResult',
         };
-        revealedCards = (rd.cards ?? []).map((c: { id?: string; name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra: number; power: number; image_file?: string; effects?: Array<{ type: string; description: string }>; keywords?: string[]; group?: string; rarity?: string; card_type?: string }) => ({
+        revealedCards = (rd.cards ?? []).map((c: { id?: string; name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra: number; power: number; image_file?: string; effects?: Array<{ type: string; description: string }>; keywords?: string[]; group?: string; rarity?: string; card_type?: string }) => enrichRevealedLocale({
           id: c.id, name_fr: c.name_fr, name_en: c.name_en,
           title_fr: c.title_fr, title_en: c.title_en,
           chakra: c.chakra, power: c.power, image_file: c.image_file,
@@ -728,7 +746,7 @@ function buildPendingTargetSelectionUI(
           revealTitleKey: 'game.effect.tayuya065UpgradeRevealTitle',
           revealResultKey: rd.drawnCount > 0 ? 'game.effect.tayuya065UpgradeRevealDrawn' : 'game.effect.tayuya065UpgradeRevealNone',
         };
-        revealedCards = (rd.topCards ?? []).map((c: { name: string; chakra: number; power: number; image_file?: string; isSummon: boolean }) => ({
+        revealedCards = (rd.topCards ?? []).map((c: { name: string; chakra: number; power: number; image_file?: string; isSummon: boolean }) => enrichRevealedLocale({
           name_fr: c.name, chakra: c.chakra, power: c.power, image_file: c.image_file, isSummon: c.isSummon,
         }));
       } else if (isKiba026Reveal) {
@@ -738,7 +756,7 @@ function buildPendingTargetSelectionUI(
           revealResultKey: rd.topCards?.some((c: { isMatch?: boolean }) => c.isMatch)
             ? 'game.effect.kiba026UpgradeRevealFound' : 'game.effect.kiba026UpgradeRevealNone',
         };
-        revealedCards = (rd.topCards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isMatch?: boolean }) => ({
+        revealedCards = (rd.topCards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isMatch?: boolean }) => enrichRevealedLocale({
           name_fr: c.name_fr, chakra: c.chakra, power: c.power, image_file: c.image_file, isMatch: c.isMatch,
         }));
       } else if (isKabuto052ChooseMission) {
@@ -770,7 +788,7 @@ function buildPendingTargetSelectionUI(
           revealResultKey: 'game.effect.tayuya065UpgradeChooseHint',
         };
       }
-      revealedCards = (rd.topCards ?? []).map((c: { name_fr?: string; name?: string; chakra: number; power: number; image_file?: string; isSummon?: boolean; isMatch?: boolean }) => ({
+      revealedCards = (rd.topCards ?? []).map((c: { name_fr?: string; name?: string; chakra: number; power: number; image_file?: string; isSummon?: boolean; isMatch?: boolean }) => enrichRevealedLocale({
         name_fr: c.name_fr ?? c.name ?? '???', chakra: c.chakra, power: c.power,
         image_file: c.image_file, isSummon: c.isSummon, isMatch: c.isMatch,
       }));
@@ -853,6 +871,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   isAIGame: false,
   isHotseatGame: false,
   isSandboxMode: false,
+  isSimMode: false,
+  isReplayMode: false,
   hotseatSwitchPending: false,
   hotseatNextPlayer: null,
   isOnlineGame: false,
@@ -1136,7 +1156,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   performAction: (action: GameAction) => {
-    
+
+    if (get().isReplayMode) return;
+
     if (action.type === 'PLAY_CHARACTER' || action.type === 'PLAY_HIDDEN' ||
         action.type === 'REVEAL_CHARACTER' || action.type === 'UPGRADE_CHARACTER') {
       playSound('cardPlay');
@@ -1455,7 +1477,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     
     if (get().isHotseatGame) {
-      const isSandbox = get().isSandboxMode;
+      const isSandbox = get().isSandboxMode || get().isSimMode;
       const otherPlayer: PlayerID = humanPlayer === 'player1' ? 'player2' : 'player1';
       const otherPending = newState.pendingActions.filter((p) => p.player === otherPlayer);
 
@@ -2061,6 +2083,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isAIGame: false,
       isHotseatGame: false,
       isSandboxMode: false,
+      isSimMode: false,
+      isReplayMode: false,
       hotseatSwitchPending: false,
       hotseatNextPlayer: null,
       isOnlineGame: false,

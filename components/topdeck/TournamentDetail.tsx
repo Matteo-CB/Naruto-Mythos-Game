@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { useLocaleBcp47 } from '@/lib/i18n/useLocaleMeta';
 import { Link } from '@/lib/i18n/navigation';
 import {
   type TdTournament,
@@ -255,7 +256,7 @@ function DecklistsView({ decks, query, onQuery }: { decks: DeckEntry[]; query: s
 export function TournamentDetail({ tid }: { tid: string }) {
   const t = useTranslations('topdeck');
   const td = useTranslations('topdeck.detail');
-  const locale = useLocale();
+  const bcp47 = useLocaleBcp47();
   const [data, setData] = useState<TdTournament | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -318,7 +319,7 @@ export function TournamentDetail({ tid }: { tid: string }) {
 
   const standings = data.standings ?? [];
   const loc = formatLocation(data);
-  const date = formatTournamentDate(data.startDate, locale);
+  const date = formatTournamentDate(data.startDate, bcp47);
 
   const tabs: Tab[] = [];
   if (standings.length) tabs.push('standings');

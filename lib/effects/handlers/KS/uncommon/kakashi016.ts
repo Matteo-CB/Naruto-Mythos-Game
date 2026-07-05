@@ -1,7 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { isCharacterCopyable } from '@/lib/effects/handlers/KS/shared/copyExclusions';
+import { isCharacterCopyable, isCopyableEffectType } from '@/lib/effects/handlers/KS/shared/copyExclusions';
 
 
 function handleKakashi016Main(ctx: EffectContext): EffectResult {
@@ -23,9 +23,8 @@ function handleKakashi016Main(ctx: EffectContext): EffectResult {
 
       
       const hasInstantEffect = topCard.effects?.some(effect => {
-        if (effect.type === 'UPGRADE') return false; // Can't copy UPGRADE
-        if (effect.type === 'SCORE') return false;   // SCORE never copyable
-        if (effect.type === 'AMBUSH' && !ctx.wasRevealed) return false; // AMBUSH only if copier was revealed
+        if (!isCopyableEffectType(effect.type)) return false;
+        if (effect.type === 'AMBUSH' && !ctx.wasRevealed) return false;
         
         if (effect.description.includes('[⧗]')) return false;
         

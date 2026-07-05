@@ -323,6 +323,32 @@ export function calculateContinuousPowerModifier(
       );
       if (hasTsunadeOrShizune) modifier += 1;
     }
+
+
+    if (selfTopCard.set === 'SS' && selfTopCard.number === 121 && effect.description.includes('friendly Naruto Uzumaki')) {
+      let narutoCount = 0;
+      for (const m of state.activeMissions) {
+        const side = player === 'player1' ? m.player1Characters : m.player2Characters;
+        for (const c of side) {
+          if (c.isHidden) continue;
+          const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+          const nm = `${cTop.name_fr ?? ''} ${cTop.name_en ?? ''}`.toUpperCase();
+          if (nm.includes('NARUTO UZUMAKI')) narutoCount += 1;
+        }
+      }
+      modifier += narutoCount;
+    }
+
+
+    if (selfTopCard.set === 'SS' && selfTopCard.number === 126 && effect.description.includes('Sound Village')) {
+      let soundCount = 0;
+      for (const c of [...friendlyChars, ...enemyChars]) {
+        if (c.isHidden) continue;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+        if ((cTop.group ?? '') === 'Sound Village') soundCount += 1;
+      }
+      modifier += soundCount;
+    }
   }
 
   
@@ -518,7 +544,7 @@ export function isMovementBlockedByKurenai(
   for (const ch of allChars) {
     if (ch.isHidden) continue;
     const chTop = ch.stack?.length > 0 ? ch.stack[ch.stack?.length - 1] : ch.card;
-    if (chTop.number === 35) {
+    if (chTop.number === 35 || (chTop.set === 'SS' && chTop.number === 147)) {
       const hasRestriction = (chTop.effects ?? []).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
           (e.description.includes('cannot move') || e.description.includes("can't be moved")),

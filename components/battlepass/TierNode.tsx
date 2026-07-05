@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import { withImageVersion } from '@/lib/utils/imagePath';
 
 interface TierReward {
   type: 'booster' | 'card';
@@ -29,12 +29,12 @@ const ACCENT_DIM = '#5a4a2e';
 function rewardImage(reward: TierReward): { src: string; isCard: boolean } {
   if (reward.type === 'card' && reward.cardId) {
     return {
-      src: `/images/cards/${reward.setId}/mythos_v/${reward.cardId}.webp`,
+      src: withImageVersion(`/images/cards/${reward.setId}/mythos_v/${reward.cardId}.webp`),
       isCard: true,
     };
   }
   return {
-    src: `/images/booster-${reward.setId}.webp`,
+    src: withImageVersion(`/images/booster-${reward.setId}.webp`),
     isCard: false,
   };
 }
@@ -88,11 +88,13 @@ export function TierNode({ tier, xpRequired, reward, reached, isCurrent, fillRat
                   : 'none',
           }}
         >
-          <Image
+          <img
             src={img.src}
             alt=""
-            fill
-            sizes={isSpecial ? '96px' : '72px'}
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+            className="absolute inset-0 w-full h-full"
             style={{
               objectFit: img.isCard ? 'cover' : 'contain',
               opacity: reached ? 1 : 0.35,

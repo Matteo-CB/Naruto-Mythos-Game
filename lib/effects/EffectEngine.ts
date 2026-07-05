@@ -6,6 +6,9 @@ import { generateInstanceId } from '../engine/utils/id';
 import { moveOrochimaru051 } from '../engine/phases/MissionPhase';
 import { logAction } from '../engine/utils/gameLog';
 import { triggerOnDefeatEffects } from './onDefeatTriggers';
+import { hasResolvableInstantDuel } from './duelUtils';
+import { postMoveHide as choji018PostMoveHide } from './handlers/KS/uncommon/choji018';
+import { buildPlayLessTargets, type PlayLessCategory } from './handlers/shared/playLess';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
@@ -17,7 +20,7 @@ import { calculateEffectiveCost } from '../engine/rules/ChakraValidation';
 import { canAffordAsUpgrade } from './handlers/KS/shared/upgradeCheck';
 import { moveCharTo, getValidMissions, applyUpgradePowerup } from './handlers/KS/rare/sasuke107';
 import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard, findHiddenSoundVillageOnBoard, findAffordableSoundVillageInHand } from './handlers/KS/shared/summonSearch';
-import { isCharacterCopyable } from './handlers/KS/shared/copyExclusions';
+import { isCharacterCopyable, isCopyableEffectType } from './handlers/KS/shared/copyExclusions';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 
 
@@ -181,12 +184,16 @@ export class EffectEngine {
       }
     }
 
-    
+
     if (!orderedTypes.includes('MAIN')) {
       const hasMain = (topCard.effects ?? []).some(
         (e) => e.type === 'MAIN' && !e.description.startsWith('effect:') && !e.description.startsWith('effect.')
       );
       if (hasMain) orderedTypes.unshift('MAIN');
+    }
+
+    if (!orderedTypes.includes('DUEL') && hasResolvableInstantDuel(newState, missionIndex, topCard.effects)) {
+      orderedTypes.push('DUEL');
     }
 
     for (let i = 0; i < orderedTypes.length; i++) {
@@ -196,7 +203,7 @@ export class EffectEngine {
       if (!handler) continue;
 
       try {
-        
+
         const charResult = i > 0 ? EffectEngine.findCharByInstanceId(newState, character.instanceId) : null;
         const currentChar = charResult?.character ?? character;
         const currentMissionIndex = charResult?.missionIndex ?? missionIndex;
@@ -209,9 +216,6 @@ export class EffectEngine {
           triggerType: effectType,
           isUpgrade,
         };
-        if (isUpgrade) {
-          console.log(`[EffectEngine] resolvePlayEffects: ${topCard.id} ${effectType} isUpgrade=true orderedTypes=[${orderedTypes.join(',')}]`);
-        }
         const result = handler(ctx);
 
         if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
@@ -257,10 +261,14 @@ export class EffectEngine {
       }
     }
 
+    if (!orderedTypes.includes('DUEL') && hasResolvableInstantDuel(newState, missionIndex, topCard.effects)) {
+      orderedTypes.push('DUEL');
+    }
+
     for (let i = 0; i < orderedTypes.length; i++) {
       const effectType = orderedTypes[i];
 
-      
+
       const hasEffect = (topCard.effects ?? []).some((e) => {
         if (e.type !== effectType) return false;
         if (effectType === 'MAIN') {
@@ -631,6 +639,7 @@ export class EffectEngine {
       tst === 'SAKURA109_CHOOSE_DISCARD' ||
       tst === 'SAKURA135_CHOOSE_CARD' ||
       tst === 'TAYUYA125_CHOOSE_SOUND' ||
+      tst === 'PLAY_LESS_CATEGORY' ||
       tst === 'RECOVER_FROM_DISCARD' ||
       tst === 'HIRUZEN002_CHOOSE_CARD' ||
       tst === 'ITACHI091_CHOOSE_DISCARD' ||
@@ -774,9 +783,16 @@ export class EffectEngine {
 
     try {
     switch (pendingEffect.targetSelectionType) {
-      case 'POWERUP_2_LEAF_VILLAGE':
+      case 'POWERUP_2_LEAF_VILLAGE': {
         newState = EffectEngine.applyPowerupToTarget(newState, targetId, 2);
+        const p2lvTarget = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (p2lvTarget) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT', `Hiruzen Sarutobi (001): POWERUP 2 applied to ${p2lvTarget.character.card.name_fr}.`,
+            'game.log.effect.powerup', { card: 'HIRUZEN SARUTOBI', id: 'KS-001-C', amount: '2', target: p2lvTarget.character.card.name_fr });
+        }
         break;
+      }
 
       case 'REMOVE_POWER_TOKENS_ENEMY': {
         
@@ -991,9 +1007,9 @@ export class EffectEngine {
 
       case 'SASUKE014_HAND_REVEAL': {
 
-        let s014hrMeta: { isUpgrade?: boolean } = {};
+        let s014hrMeta: { applyModifier?: boolean } = {};
         try { s014hrMeta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-        if (!s014hrMeta.isUpgrade) break;
+        if (!s014hrMeta.applyModifier) break;
 
         const s014hrOpp = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
         const s014hrOwnHand = newState[pendingEffect.sourcePlayer].hand;
@@ -1005,30 +1021,26 @@ export class EffectEngine {
           break;
         }
 
-        const s014mEffId = generateInstanceId();
-        const s014mActId = generateInstanceId();
-        newState.pendingEffects = [...newState.pendingEffects, {
-          id: s014mEffId, sourceCardId: pendingEffect.sourceCardId,
-          sourceInstanceId: pendingEffect.sourceInstanceId,
-          sourceMissionIndex: pendingEffect.sourceMissionIndex,
-          effectType: 'UPGRADE',
-          effectDescription: JSON.stringify({ sourceCardInstanceId: pendingEffect.sourceInstanceId }),
-          targetSelectionType: 'SASUKE014_CONFIRM_UPGRADE_MODIFIER',
-          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
-          validTargets: [pendingEffect.sourceInstanceId], isOptional: true, isMandatory: false,
-          resolved: false, isUpgrade: true,
-          remainingEffectTypes: pendingEffect.remainingEffectTypes,
-        }];
-        newState.pendingActions = [...newState.pendingActions, {
-          id: s014mActId, type: 'SELECT_TARGET' as PendingAction['type'],
-          player: pendingEffect.sourcePlayer,
-          description: `Sasuke Uchiwa (014) UPGRADE: In addition, discard 1 card to discard 1 from opponent's hand?`,
-          descriptionKey: 'game.effect.desc.sasuke014ConfirmUpgradeModifier',
-          options: [pendingEffect.sourceInstanceId], minSelections: 1, maxSelections: 1,
-          sourceEffectId: s014mEffId,
-        }];
-        pendingEffect.remainingEffectTypes = undefined;
-        break;
+        const s014hrIndices = s014hrOwnHand.map((_: unknown, i: number) => String(i));
+        const s014hrChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        const s014hrStep: EffectResult = {
+          state: newState,
+          requiresTargetSelection: true,
+          targetSelectionType: 'SASUKE_014_DISCARD_OWN',
+          validTargets: s014hrIndices,
+          isMandatory: true,
+          description: 'Sasuke Uchiwa (014) UPGRADE: Discard 1 of your cards.',
+          descriptionKey: 'game.effect.desc.sasuke014DiscardOwn',
+        };
+        const s014hrRemaining = pendingEffect.remainingEffectTypes;
+        newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== pendingEffect.id);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== pendingEffect.id);
+        return EffectEngine.createPendingTargetSelection(
+          newState, pendingEffect.sourcePlayer,
+          s014hrChar?.character ?? null,
+          pendingEffect.sourceMissionIndex,
+          'UPGRADE', true, s014hrStep, s014hrRemaining ?? [],
+        );
       }
 
       case 'SASUKE014_UPGRADE_HAND_REVEAL': {
@@ -2703,10 +2715,11 @@ export class EffectEngine {
       case 'SASUKE014_CONFIRM_AMBUSH': {
         emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'ambush.activated.with.source', { sourceName: 'SASUKE UCHIWA' });
 
-        let s014Meta: { isUpgrade?: boolean } = {};
+        let s014Meta: { isUpgrade?: boolean; modifierDecided?: boolean; applyModifier?: boolean } = {};
         try { s014Meta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const s014Opponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
         const oppHand014 = newState[s014Opponent].hand;
+        const ownHand014 = newState[pendingEffect.sourcePlayer].hand;
 
         if (oppHand014.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
@@ -2715,84 +2728,36 @@ export class EffectEngine {
           break;
         }
 
-
-
-
-        const allCards014 = oppHand014.map((c: any, i: number) => ({
-          id: c.id, name_fr: c.name_fr, name_en: c.name_en,
-          title_fr: c.title_fr, title_en: c.title_en,
-          chakra: c.chakra ?? 0, power: c.power ?? 0,
-          image_file: c.image_file, originalIndex: i,
-          effects: c.effects, keywords: c.keywords, group: c.group,
-          rarity: c.rarity, card_type: c.card_type,
-        }));
-
-        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-          'EFFECT_LOOK_HAND', 'Sasuke Uchiwa (014): Revealed all cards in opponent\'s hand.',
-          'game.log.effect.sasuke014RevealAll', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
-
-        const s014EffId = generateInstanceId();
-        const s014ActId = generateInstanceId();
-        newState.pendingEffects = [...newState.pendingEffects, {
-          id: s014EffId, sourceCardId: pendingEffect.sourceCardId,
-          sourceInstanceId: pendingEffect.sourceInstanceId,
-          sourceMissionIndex: pendingEffect.sourceMissionIndex,
-          effectType: pendingEffect.effectType,
-          effectDescription: JSON.stringify({
-            text: 'Sasuke (014): Opponent\'s hand revealed.',
-            cards: allCards014,
-            isUpgrade: !!s014Meta.isUpgrade,
-          }),
-          targetSelectionType: 'SASUKE014_HAND_REVEAL',
-          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
-          validTargets: ['confirm'], isOptional: false, isMandatory: true,
-          resolved: false, isUpgrade: !!s014Meta.isUpgrade,
-          remainingEffectTypes: pendingEffect.remainingEffectTypes,
-        }];
-        newState.pendingActions = [...newState.pendingActions, {
-          id: s014ActId, type: 'SELECT_TARGET' as PendingAction['type'],
-          player: pendingEffect.sourcePlayer,
-          description: JSON.stringify({ text: 'Opponent hand revealed.', cards: allCards014 }),
-          descriptionKey: 'game.effect.desc.sasuke014RevealAll',
-          options: ['confirm'], minSelections: 1, maxSelections: 1,
-          sourceEffectId: s014EffId,
-        }];
+        const s014Remaining = pendingEffect.remainingEffectTypes;
         pendingEffect.remainingEffectTypes = undefined;
+
+
+        if (s014Meta.isUpgrade && !s014Meta.modifierDecided && ownHand014.length > 0) {
+          newState = EffectEngine.sasuke014QueueUpgradeDecision(
+            newState, pendingEffect.sourcePlayer, pendingEffect.sourceCardId,
+            pendingEffect.sourceInstanceId, pendingEffect.sourceMissionIndex,
+            pendingEffect.effectType, s014Remaining,
+          );
+          break;
+        }
+
+        newState = EffectEngine.sasuke014QueueHandReveal(
+          newState, pendingEffect.sourcePlayer, pendingEffect.sourceCardId,
+          pendingEffect.sourceInstanceId, pendingEffect.sourceMissionIndex,
+          pendingEffect.effectType, s014Remaining, !!s014Meta.applyModifier,
+        );
         break;
       }
 
       case 'SASUKE014_CONFIRM_UPGRADE_MODIFIER': {
-
-        const s014umOpponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-        const s014umOwnHand = newState[pendingEffect.sourcePlayer].hand;
-        const oppHand014um = newState[s014umOpponent].hand;
-
-        if (s014umOwnHand.length === 0 || oppHand014um.length === 0) {
-          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_NO_TARGET', 'Sasuke Uchiwa (014) UPGRADE: Cannot discard, empty hand.',
-            'game.log.effect.noTarget', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
-          break;
-        }
-
-        const handIndices014um = s014umOwnHand.map((_: unknown, i: number) => String(i));
-        const charResult014um = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
-        const step014um: EffectResult = {
-          state: newState,
-          requiresTargetSelection: true,
-          targetSelectionType: 'SASUKE_014_DISCARD_OWN',
-          validTargets: handIndices014um,
-          isMandatory: true,
-          description: 'Sasuke Uchiwa (014) UPGRADE: Discard 1 of your cards.',
-          descriptionKey: 'game.effect.desc.sasuke014DiscardOwn',
-        };
         newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== pendingEffect.id);
         newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== pendingEffect.id);
-        return EffectEngine.createPendingTargetSelection(
-          newState, pendingEffect.sourcePlayer,
-          charResult014um?.character ?? null,
-          pendingEffect.sourceMissionIndex,
-          'UPGRADE', true, step014um, [],
+        newState = EffectEngine.sasuke014QueueHandReveal(
+          newState, pendingEffect.sourcePlayer, pendingEffect.sourceCardId,
+          pendingEffect.sourceInstanceId, pendingEffect.sourceMissionIndex,
+          pendingEffect.effectType, pendingEffect.remainingEffectTypes, true,
         );
+        break;
       }
 
       case 'SASUKE014_CONFIRM_UPGRADE': {
@@ -2874,8 +2839,7 @@ export class EffectEngine {
             if (topCard.chakra > 4) continue;
             const k016WasRevealed = pendingEffect.wasRevealed ?? false;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
-              if (eff.type === 'SCORE') return false;
-              if (eff.type === 'UPGRADE') return false; // Kakashi 016 CANNOT copy UPGRADE
+              if (!isCopyableEffectType(eff.type)) return false;
               if (eff.type === 'AMBUSH' && !k016WasRevealed) return false;
               if (eff.description.includes('[⧗]')) return false;
               if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
@@ -2928,8 +2892,7 @@ export class EffectEngine {
             if (char.isHidden) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
-              if (eff.type === 'SCORE') return false;
-              if (eff.type === 'UPGRADE') return false; // Kakashi 016 CANNOT copy UPGRADE
+              if (!isCopyableEffectType(eff.type)) return false;
               if (eff.type === 'AMBUSH' && !k016uWasRevealed) return false;
               if (eff.description.includes('[⧗]')) return false;
               if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
@@ -5399,7 +5362,7 @@ export class EffectEngine {
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
               const hasInstant = topCard.effects?.some((eff: any) => {
-                if (eff.type === 'SCORE') return false; // SCORE never copyable
+                if (!isCopyableEffectType(eff.type)) return false;
                 if (eff.description && eff.description.includes('[⧗]')) return false;
                 if (eff.description && /(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
                 return true;
@@ -5424,7 +5387,7 @@ export class EffectEngine {
             ? s062AutoResult.character.stack[s062AutoResult.character.stack?.length - 1]
             : s062AutoResult.character.card;
           const s062Copyable = (s062TopCard.effects ?? []).filter((eff: any) => {
-            if (eff.type === 'SCORE') return false; // SCORE never copyable
+            if (!isCopyableEffectType(eff.type)) return false;
             if (eff.description.includes('[⧗]')) return false;
             if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
             return true;
@@ -5705,6 +5668,48 @@ export class EffectEngine {
         newState.log = logAction(newState.log, newState.turn, newState.phase, z070Player,
           'EFFECT_CHAKRA', 'Zaku Abumi (070): Opponent gains 1 Chakra.',
           'game.log.effect.oppGainChakra', { card: 'Zaku Abumi', id: 'KS-070-C', amount: '1' });
+        break;
+      }
+
+      case 'KAKASHI148_CONFIRM_MAIN': {
+        const k148Player = pendingEffect.sourcePlayer;
+        const k148Opp = k148Player === 'player1' ? 'player2' : 'player1';
+        if (newState.edgeLockedFor != null && newState.edgeLockedFor === k148Opp) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k148Player,
+            'EFFECT_NO_TARGET', 'Kakashi Hatake (148): The opponent locked the Edge this round, it cannot be taken.',
+            'game.log.effect.kakashi148Locked', { card: 'KAKASHI HATAKE', id: 'KS-148-M' });
+          break;
+        }
+        newState = { ...newState, edgeHolder: k148Player, edgeLockedFor: k148Player };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, k148Player,
+          'EFFECT', 'Kakashi Hatake (148): Gains the Edge and cannot lose it during this round.',
+          'game.log.effect.kakashi148GainLockEdge', { card: 'KAKASHI HATAKE', id: 'KS-148-M' });
+        break;
+      }
+
+      case 'SS147_CONFIRM_MAIN': {
+        let ss147Amt = 0;
+        try { ss147Amt = JSON.parse(pendingEffect.effectDescription).amount ?? 0; } catch { /* ignore */ }
+        if (ss147Amt > 0 && pendingEffect.sourceInstanceId) {
+          newState = EffectEngine.applyPowerupToTarget(newState, pendingEffect.sourceInstanceId, ss147Amt);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_POWERUP', `Naruto Uzumaki (SS-147): POWERUP ${ss147Amt}.`,
+            'game.log.effect.powerup', { card: 'NARUTO UZUMAKI', id: 'SS-147-POPV', amount: ss147Amt });
+        }
+        break;
+      }
+
+      case 'SS134_CONFIRM_MAIN': {
+        let ss134Target = '';
+        try { ss134Target = JSON.parse(pendingEffect.effectDescription).targetInstanceId ?? ''; } catch { /* ignore */ }
+        if (ss134Target) {
+          const ss134Found = EffectEngine.findCharByInstanceId(newState, ss134Target);
+          const ss134Name = ss134Found ? (ss134Found.character.stack?.length > 0 ? ss134Found.character.stack[ss134Found.character.stack.length - 1] : ss134Found.character.card).name_fr : '';
+          newState = EffectEngine.defeatCharacter(newState, ss134Target, pendingEffect.sourcePlayer);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DEFEAT', 'Kurenai Yuhi (SS-134): Defeated the strongest enemy character.',
+            'game.log.effect.defeat', { card: 'KURENAI YUHI', id: 'SS-134-R', target: ss134Name });
+        }
         break;
       }
 
@@ -10169,6 +10174,68 @@ export class EffectEngine {
         newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         break;
 
+      case 'SS120_HIDE':
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        break;
+
+      case 'SS112_REMOVE_TOKENS': {
+        newState.activeMissions = newState.activeMissions.map((m) => ({
+          ...m,
+          player1Characters: m.player1Characters.map((c) => c.instanceId === targetId ? { ...c, powerTokens: 0 } : c),
+          player2Characters: m.player2Characters.map((c) => c.instanceId === targetId ? { ...c, powerTokens: 0 } : c),
+        }));
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer, 'EFFECT',
+          'Neji Hyuga (SS-112): Removed all Power tokens from an enemy character.',
+          'game.log.effect.ss112RemoveTokens', { card: 'NEJI HYUGA', id: 'SS-112-SPV' });
+        break;
+      }
+
+      case 'SS121_MOVE_STACK': {
+        const ss121Dest = parseInt(targetId, 10);
+        if (isNaN(ss121Dest) || ss121Dest < 0 || ss121Dest >= newState.activeMissions.length) break;
+        let ss121Src: { sourceInstanceId?: string } = {};
+        try { ss121Src = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const ss121Found = EffectEngine.findCharByInstanceId(newState, ss121Src.sourceInstanceId ?? pendingEffect.sourceInstanceId ?? '');
+        if (!ss121Found) break;
+        const ss121Char = ss121Found.character;
+        if ((ss121Char.stack?.length ?? 0) < 2) break;
+        const ss121Bottom = ss121Char.stack[0];
+        const ss121Side: 'player1Characters' | 'player2Characters' =
+          ss121Char.controlledBy === 'player1' ? 'player1Characters' : 'player2Characters';
+        const ss121Dup = newState.activeMissions[ss121Dest][ss121Side].some((c) => {
+          if (c.isHidden) return false;
+          const t = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return (t.name_fr ?? '').toUpperCase() === (ss121Bottom.name_fr ?? '').toUpperCase();
+        });
+        if (ss121Dup) break;
+        const ss121Remaining = ss121Char.stack.slice(1);
+        const ss121Moved: CharacterInPlay = {
+          instanceId: generateInstanceId(),
+          card: ss121Bottom,
+          stack: [ss121Bottom],
+          isHidden: false,
+          wasRevealedAtLeastOnce: true,
+          powerTokens: 0,
+          controlledBy: ss121Char.controlledBy,
+          originalOwner: ss121Char.originalOwner,
+          missionIndex: ss121Dest,
+        };
+        newState.activeMissions = newState.activeMissions.map((m, i) => {
+          if (i === ss121Found.missionIndex) {
+            return { ...m, [ss121Side]: m[ss121Side].map((c) =>
+              c.instanceId === ss121Char.instanceId ? { ...c, stack: ss121Remaining, card: ss121Remaining[0] } : c) };
+          }
+          if (i === ss121Dest) {
+            return { ...m, [ss121Side]: [...m[ss121Side], ss121Moved] };
+          }
+          return m;
+        });
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_MOVE', `Naruto Uzumaki (SS-121): Moved ${ss121Bottom.name_fr} (bottom of the upgrade stack) to mission ${ss121Dest + 1}.`,
+          'game.log.effect.moveCharacter', { card: 'NARUTO UZUMAKI', id: 'SS-121-R', target: ss121Bottom.name_fr, mission: String(ss121Dest + 1) });
+        break;
+      }
+
       
       case 'NARUTO133_CHOOSE_TARGET1': {
         
@@ -12426,16 +12493,6 @@ export class EffectEngine {
       }
 
       
-      case 'KAKASHI148_CONFIRM_MAIN': {
-        const k148Player = pendingEffect.sourcePlayer;
-
-        
-        newState = { ...newState, edgeHolder: k148Player };
-        newState.log = logAction(newState.log, newState.turn, newState.phase, k148Player,
-          'EFFECT_EDGE', 'Kakashi Hatake (148): Gained the Edge token.',
-          'game.log.effect.gainEdge', { card: 'KAKASHI HATAKE', id: 'KS-148-M' });
-        break;
-      }
 
       
       case 'KAKASHI148_CONFIRM_AMBUSH': {
@@ -12453,10 +12510,8 @@ export class EffectEngine {
             if (char.isHidden) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
-            const charIsUpgraded = char.stack?.length > 1;
             const hasCopyableEffect = topCard.effects.some((effect: { type: string; description: string }) => {
-              if (effect.type === 'SCORE') return false;
-              if (effect.type === 'UPGRADE' && !charIsUpgraded) return false;
+              if (!isCopyableEffectType(effect.type)) return false;
               if (effect.description.includes('[⧗]')) return false;
               if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(effect.description)) return false;
               return true;
@@ -12726,6 +12781,46 @@ export class EffectEngine {
         break;
       }
 
+      case 'PLAY_LESS_CATEGORY': {
+        let plc: { costReduction?: number; category?: PlayLessCategory; sourceName?: string; sourceId?: string; repeatable?: boolean; descriptionKey?: string } = {};
+        try { plc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const plcReduction = plc.costReduction ?? 0;
+        if (targetId && targetId !== 'DONE') {
+          if (targetId.startsWith('HIDDEN_')) {
+            newState = EffectEngine.revealHiddenWithReduction(newState, pendingEffect, targetId.slice(7), plcReduction);
+          } else {
+            const plcRaw = targetId.startsWith('HAND_') ? targetId.slice(5) : targetId;
+            newState = EffectEngine.playCharFromHandWithReduction(
+              newState, pendingEffect, plcRaw, plcReduction,
+              plc.category?.value ?? '', plc.sourceName ?? '', plc.sourceId ?? '',
+            );
+          }
+          if (plc.repeatable && plc.category) {
+            const reoffer = buildPlayLessTargets(newState, pendingEffect.sourcePlayer, plc.category, plcReduction);
+            if (reoffer.targets.length > 0) {
+              const plcEffId = generateInstanceId();
+              const plcActId = generateInstanceId();
+              newState.pendingEffects.push({
+                id: plcEffId, sourceCardId: pendingEffect.sourceCardId, sourceInstanceId: pendingEffect.sourceInstanceId,
+                sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+                effectDescription: JSON.stringify({ ...plc, hiddenChars: reoffer.hiddenChars }),
+                targetSelectionType: 'PLAY_LESS_CATEGORY', sourcePlayer: pendingEffect.sourcePlayer,
+                requiresTargetSelection: true, validTargets: reoffer.targets, isOptional: true, isMandatory: false,
+                resolved: false, isUpgrade: false,
+              } as PendingEffect);
+              newState.pendingActions.push({
+                id: plcActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'], player: pendingEffect.sourcePlayer,
+                description: JSON.stringify({ text: `${plc.sourceName ?? ''}: play another, paying ${plcReduction} less.`, hiddenChars: reoffer.hiddenChars, costReduction: plcReduction }),
+                descriptionKey: 'game.effect.desc.playAnotherReduced',
+                descriptionParams: { reduction: plcReduction },
+                options: reoffer.targets, minSelections: 1, maxSelections: 1, sourceEffectId: plcEffId,
+              });
+            }
+          }
+        }
+        break;
+      }
+
       case 'ICHIBI130_CHOOSE_MISSION': {
         
         const missionIdx_i = parseInt(targetId, 10);
@@ -12785,13 +12880,11 @@ export class EffectEngine {
 
         
         
-        const k148TargetIsUpgraded = k148Target.character.stack?.length > 1;
         const k148Copyable = !isCharacterCopyable(k148TopCard) ? [] : (k148TopCard.effects ?? []).filter((eff) => {
-          if (eff.type === 'SCORE') return false;
+          if (!isCopyableEffectType(eff.type)) return false;
           if (eff.description.includes('[⧗]')) return false;
           if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
-          if (eff.type === 'UPGRADE' && !k148TargetIsUpgraded) return false;
-          return eff.type === 'MAIN' || eff.type === 'AMBUSH' || eff.type === 'UPGRADE';
+          return eff.type === 'MAIN' || eff.type === 'AMBUSH';
         });
 
         if (k148Copyable.length === 0) {
@@ -12967,15 +13060,9 @@ export class EffectEngine {
 
           const validTargetSet = new Set<string>((pendingEffect.validTargets ?? []).map((v) => v.replace(/__dup\d+$/, '')));
           const removedCards: typeof discard = [];
-          const keptCards: typeof discard = [];
-          const dupCounter = new Map<string, number>();
           for (const c of discard) {
             const id = (c as { instanceId?: string; id?: string }).instanceId || (c as { id?: string }).id || '';
-            if (!id) { keptCards.push(c); continue; }
-            if (!validTargetSet.has(id)) { keptCards.push(c); continue; }
-            const seen = dupCounter.get(id) ?? 0;
-            dupCounter.set(id, seen + 1);
-            removedCards.push(c);
+            if (id && validTargetSet.has(id)) removedCards.push(c);
           }
 
           const usedIndices = new Set<number>();
@@ -12996,7 +13083,17 @@ export class EffectEngine {
             if (!usedIndices.has(i)) reorderedCards.push(removedCards[i]);
           }
 
-          ownerPS.discardPile = [...keptCards, ...reorderedCards];
+
+
+
+          let reorderSlot = 0;
+          ownerPS.discardPile = discard.map((c) => {
+            const id = (c as { instanceId?: string; id?: string }).instanceId || (c as { id?: string }).id || '';
+            if (id && validTargetSet.has(id) && reorderSlot < reorderedCards.length) {
+              return reorderedCards[reorderSlot++];
+            }
+            return c;
+          });
           newState[reorderTarget] = ownerPS;
 
           newState.log = logAction(
@@ -13532,6 +13629,7 @@ export class EffectEngine {
       case 'NEJI037_REMOVE_ALL_TOKENS': {
         const nejiRes = EffectEngine.findCharByInstanceId(newState, targetId);
         if (nejiRes) {
+          const removedTokens_nj = nejiRes.character.powerTokens;
           const missions_nj = [...newState.activeMissions];
           const m_nj = { ...missions_nj[nejiRes.missionIndex] };
           const side_nj = nejiRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -13540,6 +13638,9 @@ export class EffectEngine {
           );
           missions_nj[nejiRes.missionIndex] = m_nj;
           newState = { ...newState, activeMissions: missions_nj };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_REMOVE_TOKENS', `Neji Hyuga (037): Removed all Power tokens from ${nejiRes.character.card.name_fr}.`,
+            'game.log.effect.removeTokens', { card: 'NEJI HYUGA', id: 'KS-037-UC', amount: removedTokens_nj, target: nejiRes.character.card.name_fr });
         }
         break;
       }
@@ -13868,6 +13969,9 @@ export class EffectEngine {
           ps_rc.discardPile = discard_rc;
           ps_rc.hand = [...ps_rc.hand, recovered];
           newState = { ...newState, [pendingEffect.sourcePlayer]: ps_rc };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_RECOVER', `${recovered.name_fr} recovered from the discard pile to hand.`,
+            'game.log.effect.recoverFromDiscard', { card: recovered.name_fr, card_en: recovered.name_en ?? recovered.name_fr, id: pendingEffect.sourceCardId, target: recovered.name_fr });
         }
         break;
       }
@@ -13876,17 +13980,16 @@ export class EffectEngine {
       
       
       case 'CHOJI_018_MOVE_SELF': {
-        
+
         newState = EffectEngine.moveSelfToMission(newState, pendingEffect, targetId);
         const destMIdx018 = parseInt(targetId, 10);
         if (!isNaN(destMIdx018)) {
-          const { postMoveHide } = require('./handlers/KS/uncommon/choji018');
-          const hideResult = postMoveHide(newState, pendingEffect.sourceInstanceId, destMIdx018, pendingEffect.sourcePlayer);
+          const hideResult = choji018PostMoveHide(newState, pendingEffect.sourceInstanceId, destMIdx018, pendingEffect.sourcePlayer);
           if (hideResult.requiresTargetSelection && hideResult.validTargets && hideResult.validTargets.length > 0) {
             
             hideResult.state = { ...hideResult.state };
-            hideResult.state.pendingEffects = hideResult.state.pendingEffects.filter((e: { id: string }) => e.id !== pendingEffect.id);
-            hideResult.state.pendingActions = hideResult.state.pendingActions.filter((a: { sourceEffectId: string }) => a.sourceEffectId !== pendingEffect.id);
+            hideResult.state.pendingEffects = hideResult.state.pendingEffects.filter((e) => e.id !== pendingEffect.id);
+            hideResult.state.pendingActions = hideResult.state.pendingActions.filter((a) => a.sourceEffectId !== pendingEffect.id);
             return EffectEngine.createPendingTargetSelection(
               hideResult.state, pendingEffect.sourcePlayer,
               EffectEngine.findCharByInstanceId(hideResult.state, pendingEffect.sourceInstanceId)?.character ?? { instanceId: pendingEffect.sourceInstanceId, card: { id: pendingEffect.sourceCardId } as any, isHidden: false, wasRevealedAtLeastOnce: true, powerTokens: 0, stack: [], controlledBy: pendingEffect.sourcePlayer, originalOwner: pendingEffect.sourcePlayer, missionIndex: destMIdx018 },
@@ -14010,7 +14113,8 @@ export class EffectEngine {
         
         const friendlySide_k78 = pendingEffect.sourcePlayer === "player1" ? "player1Characters" : "player2Characters";
         const m_k78_check = newState.activeMissions[mIdx_k78];
-        const upgradeTargetIdx_k78 = findUpgradeTargetIdx(m_k78_check[friendlySide_k78], topCard_k78, targetId);
+        const srcControlled_k78 = hiddenChar_k78.controlledBy !== hiddenChar_k78.originalOwner;
+        const upgradeTargetIdx_k78 = srcControlled_k78 ? -1 : findUpgradeTargetIdx(m_k78_check[friendlySide_k78], topCard_k78, targetId);
         const upgradeTarget_k78 = upgradeTargetIdx_k78 >= 0 ? m_k78_check[friendlySide_k78][upgradeTargetIdx_k78] : null;
 
         
@@ -14598,10 +14702,8 @@ export class EffectEngine {
         
         
         const copierWasRevealed = pendingEffect.wasRevealed ?? false;
-        const isSakon062 = pendingEffect.sourceCardId === 'KS-062-UC';
         const copyableEffects = (copyTargetTopCard.effects ?? []).filter((eff) => {
-          if (eff.type === 'SCORE') return false;
-          if (eff.type === 'UPGRADE' && !isSakon062) return false;
+          if (!isCopyableEffectType(eff.type)) return false;
           if (eff.type === 'AMBUSH' && !copierWasRevealed) return false;
           if (eff.description.includes('[⧗]')) return false;
           if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
@@ -14740,7 +14842,8 @@ export class EffectEngine {
             const friendlySide_h002r: 'player1Characters' | 'player2Characters' =
               player === 'player1' ? 'player1Characters' : 'player2Characters';
             const mChars_h002r = newState.activeMissions[charBeforeReveal.missionIndex][friendlySide_h002r];
-            const upgradeIdx_h002r = findUpgradeTargetIdx(mChars_h002r, topCard_h002r, instanceId_h002);
+            const srcControlled_h002r = charBeforeReveal.character.controlledBy !== charBeforeReveal.character.originalOwner;
+            const upgradeIdx_h002r = srcControlled_h002r ? -1 : findUpgradeTargetIdx(mChars_h002r, topCard_h002r, instanceId_h002);
             if (upgradeIdx_h002r >= 0) {
               resultingInstanceId_h002 = mChars_h002r[upgradeIdx_h002r].instanceId;
             }
@@ -15370,6 +15473,11 @@ export class EffectEngine {
     const stolen = Math.min(charResult.character.powerTokens, maxSteal);
     let newState = EffectEngine.removeTokensFromTarget(state, targetId, stolen);
     newState = EffectEngine.applyPowerupToTarget(newState, pending.sourceInstanceId, stolen);
+    if (stolen > 0) {
+      newState.log = logAction(newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+        'EFFECT_STEAL_TOKENS', `Stole ${stolen} Power token(s) from ${charResult.character.card.name_fr}.`,
+        'game.log.effect.stealTokens', { card: charResult.character.card.name_fr, id: pending.sourceCardId, amount: stolen, target: charResult.character.card.name_fr });
+    }
     return newState;
   }
 
@@ -15543,8 +15651,7 @@ export class EffectEngine {
       const copier106WasRevealed = pending.wasRevealed ?? false;
       const copyableEffects = !isCharacterCopyable(discardedCard) ? [] : (discardedCard.effects ?? []).filter(
         (e) => {
-          if (e.type === 'SCORE') return false;
-          if (e.type === 'UPGRADE') return false;
+          if (!isCopyableEffectType(e.type)) return false;
           if (e.type === 'AMBUSH' && !copier106WasRevealed) return false;
           if (e.description.includes('[⧗]')) return false;
           if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(e.description)) return false;
@@ -15600,7 +15707,15 @@ export class EffectEngine {
     const destMissionIndex = parseInt(targetId, 10);
     if (isNaN(destMissionIndex)) return state;
 
-    return EffectEngine.moveCharacterToMission(state, `${pending.sourceInstanceId}:${destMissionIndex}`);
+    const before = EffectEngine.findCharByInstanceId(state, pending.sourceInstanceId);
+    const newState = EffectEngine.moveCharacterToMission(state, `${pending.sourceInstanceId}:${destMissionIndex}`);
+    const after = EffectEngine.findCharByInstanceId(newState, pending.sourceInstanceId);
+    if (before && after && before.missionIndex !== after.missionIndex) {
+      newState.log = logAction(newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+        'EFFECT_MOVE', `${after.character.card.name_fr} moved from mission ${(before.missionIndex ?? 0) + 1} to mission ${destMissionIndex + 1}.`,
+        'game.log.effect.moveSelf', { card: after.character.card.name_fr, id: pending.sourceCardId, from: String((before.missionIndex ?? 0) + 1), to: String(destMissionIndex + 1) });
+    }
+    return newState;
   }
 
   
@@ -15978,11 +16093,6 @@ export class EffectEngine {
       console.warn(`[EffectEngine] defeatCharacter: character ${targetId} not found in any mission. Cannot defeat.`);
       return state;
     }
-
-    const charTopCard = charResult.character.stack?.length > 0
-      ? charResult.character.stack[charResult.character.stack?.length - 1]
-      : charResult.character.card;
-    console.log(`[EffectEngine] defeatCharacter: defeating ${charTopCard.name_fr} (${charTopCard.id}) instanceId=${targetId} hidden=${charResult.character.isHidden} mission=${charResult.missionIndex} player=${charResult.player}`);
 
     const effectSource = sourcePlayer ?? (charResult.player === 'player1' ? 'player2' : 'player1');
     const isEnemyEffect = effectSource !== charResult.player;
@@ -18481,8 +18591,8 @@ export class EffectEngine {
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets,
-      isOptional: true,
-      isMandatory: false,
+      isOptional: false,
+      isMandatory: true,
       resolved: false,
       isUpgrade: false,
     });
@@ -19023,6 +19133,91 @@ export class EffectEngine {
   
 
   
+  static sasuke014QueueHandReveal(
+    state: GameState,
+    sourcePlayer: PlayerID,
+    sourceCardId: string,
+    sourceInstanceId: string,
+    sourceMissionIndex: number,
+    effectType: EffectType,
+    remainingEffectTypes: EffectType[] | undefined,
+    applyModifier: boolean,
+  ): GameState {
+    const opponent = sourcePlayer === 'player1' ? 'player2' : 'player1';
+    const oppHand = state[opponent].hand;
+    if (oppHand.length === 0) {
+      state.log = logAction(state.log, state.turn, state.phase, sourcePlayer,
+        'EFFECT_NO_TARGET', 'Sasuke Uchiwa (014): Opponent hand empty.',
+        'game.log.effect.noTarget', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
+      return state;
+    }
+    const allCards = oppHand.map((c: any, i: number) => ({
+      id: c.id, name_fr: c.name_fr, name_en: c.name_en,
+      title_fr: c.title_fr, title_en: c.title_en,
+      chakra: c.chakra ?? 0, power: c.power ?? 0,
+      image_file: c.image_file, originalIndex: i,
+      effects: c.effects, keywords: c.keywords, group: c.group,
+      rarity: c.rarity, card_type: c.card_type,
+    }));
+    state.log = logAction(state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_LOOK_HAND', 'Sasuke Uchiwa (014): Revealed all cards in opponent\'s hand.',
+      'game.log.effect.sasuke014RevealAll', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
+    const effId = generateInstanceId();
+    const actId = generateInstanceId();
+    state.pendingEffects = [...state.pendingEffects, {
+      id: effId, sourceCardId,
+      sourceInstanceId, sourceMissionIndex, effectType,
+      effectDescription: JSON.stringify({ text: 'Sasuke (014): Opponent\'s hand revealed.', cards: allCards, applyModifier }),
+      targetSelectionType: 'SASUKE014_HAND_REVEAL',
+      sourcePlayer, requiresTargetSelection: true,
+      validTargets: ['confirm'], isOptional: false, isMandatory: true,
+      resolved: false, isUpgrade: applyModifier,
+      remainingEffectTypes,
+    }];
+    state.pendingActions = [...state.pendingActions, {
+      id: actId, type: 'SELECT_TARGET' as PendingAction['type'],
+      player: sourcePlayer,
+      description: JSON.stringify({ text: 'Opponent hand revealed.', cards: allCards }),
+      descriptionKey: 'game.effect.desc.sasuke014RevealAll',
+      options: ['confirm'], minSelections: 1, maxSelections: 1,
+      sourceEffectId: effId,
+    }];
+    return state;
+  }
+
+  static sasuke014QueueUpgradeDecision(
+    state: GameState,
+    sourcePlayer: PlayerID,
+    sourceCardId: string,
+    sourceInstanceId: string,
+    sourceMissionIndex: number,
+    effectType: EffectType,
+    remainingEffectTypes: EffectType[] | undefined,
+  ): GameState {
+    const effId = generateInstanceId();
+    const actId = generateInstanceId();
+    state.pendingEffects = [...state.pendingEffects, {
+      id: effId, sourceCardId,
+      sourceInstanceId, sourceMissionIndex,
+      effectType,
+      effectDescription: JSON.stringify({ sourceCardInstanceId: sourceInstanceId }),
+      targetSelectionType: 'SASUKE014_CONFIRM_UPGRADE_MODIFIER',
+      sourcePlayer, requiresTargetSelection: true,
+      validTargets: [sourceInstanceId], isOptional: true, isMandatory: false,
+      resolved: false, isUpgrade: true,
+      remainingEffectTypes,
+    }];
+    state.pendingActions = [...state.pendingActions, {
+      id: actId, type: 'SELECT_TARGET' as PendingAction['type'],
+      player: sourcePlayer,
+      description: `Sasuke Uchiwa (014) UPGRADE: In addition, discard 1 card to discard 1 from opponent's hand?`,
+      descriptionKey: 'game.effect.desc.sasuke014ConfirmUpgradeModifier',
+      options: [sourceInstanceId], minSelections: 1, maxSelections: 1,
+      sourceEffectId: effId,
+    }];
+    return state;
+  }
+
   static validateNameUniquenessForMove(
     state: GameState,
     charToMove: CharacterInPlay,
@@ -19108,12 +19303,12 @@ export class EffectEngine {
       for (const ch of allCharsInMission) {
         if (ch.isHidden) continue;
         const chTop = ch.stack?.length > 0 ? ch.stack[ch.stack?.length - 1] : ch.card;
-        if (chTop.number === 35) {
+        if (chTop.number === 35 || (chTop.set === 'SS' && chTop.number === 147)) {
           const hasRestriction = (chTop.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && (e.description.includes('cannot move') || e.description.includes("can't be moved")),
           );
           if (hasRestriction) {
-            
+
             const kurenaiOwner = sourceMission.player1Characters.some(c => c.instanceId === ch.instanceId) ? 'player1' : 'player2';
             
             if (charResult.player !== kurenaiOwner) {
@@ -19297,7 +19492,7 @@ export class EffectEngine {
 
     
     const allUpgradeTargets: string[] = [];
-    for (const c of missionRhr[friendlySideRhr]) {
+    for (const c of (isControlledCharRhr ? [] : missionRhr[friendlySideRhr])) {
       if (c.instanceId === instanceId || c.isHidden) continue;
       if (c.controlledBy !== c.originalOwner) continue;
       const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
@@ -19347,7 +19542,7 @@ export class EffectEngine {
     }
 
     
-    const upgradeTargetIdxRhr = findUpgradeTargetIdx(missionRhr[friendlySideRhr], topCard, instanceId);
+    const upgradeTargetIdxRhr = isControlledCharRhr ? -1 : findUpgradeTargetIdx(missionRhr[friendlySideRhr], topCard, instanceId);
     const upgradeTargetRhr = upgradeTargetIdxRhr >= 0 ? missionRhr[friendlySideRhr][upgradeTargetIdxRhr] : null;
 
     let cost: number;

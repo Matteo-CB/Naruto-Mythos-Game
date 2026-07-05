@@ -12,6 +12,7 @@ import { Footer } from '@/components/Footer';
 import { FriendshipButton } from '@/components/social/FriendshipButton';
 import { getRankTier, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
+import { CountryFlag } from '@/components/CountryFlag';
 import { EloHistoryChart } from '@/components/EloHistoryChart';
 import { DeckStatsPanel } from '@/components/profile/DeckStatsPanel';
 import Image from 'next/image';
@@ -23,6 +24,7 @@ import { LeaderboardModeSwitch, type LeaderboardMode } from '@/components/play-o
 interface ProfileData {
   id: string;
   username: string;
+  countryCode?: string | null;
   elo: number;
   evolvingElo?: number;
   evolvingWins?: number;
@@ -381,7 +383,8 @@ export default function ProfilePage({
 
             <div className="h-px w-12 sm:w-16 my-1.5" style={{ backgroundColor: '#1e1e1e' }} />
 
-            <div className="flex items-center gap-1.5 max-w-full">
+            <div className="flex items-center gap-2 max-w-full">
+              <CountryFlag code={profile.countryCode} size={26} />
               <h1
                 className="font-display text-lg sm:text-2xl leading-tight wrap-break-word"
                 style={{ color: '#e8e6df', letterSpacing: '0.04em', wordBreak: 'break-word' }}

@@ -1,24 +1,25 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
+import { routing } from '@/lib/i18n/routing';
 
 const SITE_URL = 'https://narutomythosgame.com';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'seoPages.legal' });
 
-  const title = locale === 'fr'
-    ? 'Mentions Legales et Conditions d\'Utilisation | Naruto Mythos TCG'
-    : 'Legal Notice and Terms of Use | Naruto Mythos TCG';
-
-  const description = locale === 'fr'
-    ? 'Mentions legales, politique de confidentialite, conditions d\'utilisation et informations sur la propriete intellectuelle du Naruto Mythos TCG. Projet fan-made non affilie a Masashi Kishimoto, Shueisha ou Studio Pierrot. Developpe par HiddenLab.'
-    : 'Legal notice, privacy policy, terms of use, and intellectual property information for Naruto Mythos TCG. Fan-made project not affiliated with Masashi Kishimoto, Shueisha, or Studio Pierrot. Developed by HiddenLab.';
+  const title = t('title');
+  const description = t('description');
+  const languages: Record<string, string> = {};
+  for (const loc of routing.locales) languages[loc] = `${SITE_URL}/${loc}/legal`;
+  languages['x-default'] = `${SITE_URL}/${routing.defaultLocale}/legal`;
 
   return {
     title,
     description,
     alternates: {
       canonical: `${SITE_URL}/${locale}/legal`,
-      languages: { en: `${SITE_URL}/en/legal`, fr: `${SITE_URL}/fr/legal` },
+      languages,
     },
     openGraph: {
       title,

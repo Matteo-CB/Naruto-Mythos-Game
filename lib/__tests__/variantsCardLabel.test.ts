@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
+import { createTranslator } from 'next-intl';
 import { formatCardLabel, formatCardLabelShort } from '@/lib/variants/cardLabel';
+import type { CardMetaTranslator } from '@/lib/utils/cardLocale';
+import fr from '@/messages/fr.json';
+import en from '@/messages/en.json';
+
+const tSuffixFr = createTranslator({ locale: 'fr', messages: fr, namespace: 'cardMeta.raritySuffix' }) as unknown as CardMetaTranslator;
+const tSuffixEn = createTranslator({ locale: 'en', messages: en, namespace: 'cardMeta.raritySuffix' }) as unknown as CardMetaTranslator;
 
 describe('formatCardLabel', () => {
   it('formats a French Rare card with full title', () => {
@@ -13,6 +20,7 @@ describe('formatCardLabel', () => {
         rarity: 'R',
       },
       'fr',
+      tSuffixFr,
     );
     expect(label).toBe('NARUTO UZUMAKI Le Jinchûriki 108 Rare');
   });
@@ -28,6 +36,7 @@ describe('formatCardLabel', () => {
         rarity: 'MV',
       },
       'en',
+      tSuffixEn,
     );
     expect(label).toBe('NARUTO UZUMAKI Shadow Clone Jutsu 133 Mythos Variant');
   });
@@ -46,6 +55,7 @@ describe('formatCardLabel', () => {
         rarity: 'C',
       },
       'fr',
+      tSuffixFr,
     );
     expect(label).toContain('001');
   });
@@ -59,6 +69,7 @@ describe('formatCardLabel', () => {
         rarity: 'C',
       },
       'fr',
+      tSuffixFr,
     );
     expect(label).toBe('AKAMARU 027 Commune');
   });

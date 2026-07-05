@@ -9,6 +9,7 @@ import {
   type SupportedLocale,
 } from '@/lib/stripe/checkout';
 import { rateLimit } from '@/lib/donations/rateLimit';
+import { routing } from '@/lib/i18n/routing';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'https://narutomythosgame.com';
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
@@ -19,7 +20,7 @@ function isMode(value: unknown): value is DonationMode {
 }
 
 function isLocale(value: unknown): value is SupportedLocale {
-  return value === 'fr' || value === 'en';
+  return typeof value === 'string' && (routing.locales as readonly string[]).includes(value);
 }
 
 function clientKey(req: NextRequest, userId: string | null): string {
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ errorKey: 'helpUs.donate.error.amountInvalid' }, { status: 400 });
   }
 
-  const locale: SupportedLocale = isLocale(bodyLocale) ? bodyLocale : 'fr';
+  const locale: SupportedLocale = isLocale(bodyLocale) ? bodyLocale : routing.defaultLocale;
 
   const session = await auth();
   const userId = session?.user?.id ?? null;

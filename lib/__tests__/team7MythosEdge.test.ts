@@ -76,6 +76,35 @@ describe('Kakashi 148 edge-lock', () => {
     const after = GameEngine.applyAction(state, 'player2', { type: 'PASS' });
     expect(after.edgeHolder).toBe('player2');
   });
+
+  it('a second Kakashi cannot override an opponent-locked Edge', () => {
+    const handler = getEffectHandler('KS-148-M', 'MAIN');
+    expect(handler).toBeTruthy();
+    const kakashi = mockCharInPlay(
+      { instanceId: 'kak2', missionIndex: 0, controlledBy: 'player1', originalOwner: 'player1' },
+      { number: 148, name_fr: 'KAKASHI HATAKE', id: 'KS-148-M' },
+    );
+    const base = createActionPhaseState({ edgeHolder: 'player2', edgeLockedFor: 'player2' });
+    const state: GameState = { ...base, activeMissions: [missionWith([kakashi], [])] };
+    const result = handler!({ state, sourcePlayer: 'player1', sourceCard: kakashi, sourceMissionIndex: 0, triggerType: 'MAIN', isUpgrade: false });
+    expect(result.requiresTargetSelection).toBeFalsy();
+    expect(result.state.edgeHolder).toBe('player2');
+    expect(result.state.edgeLockedFor).toBe('player2');
+  });
+
+  it('Kakashi prompts a confirm (does not auto-apply) when the Edge is free', () => {
+    const handler = getEffectHandler('KS-148-M', 'MAIN');
+    const kakashi = mockCharInPlay(
+      { instanceId: 'kak3', missionIndex: 0, controlledBy: 'player1', originalOwner: 'player1' },
+      { number: 148, name_fr: 'KAKASHI HATAKE', id: 'KS-148-M' },
+    );
+    const base = createActionPhaseState({ edgeHolder: 'player2', edgeLockedFor: null });
+    const state: GameState = { ...base, activeMissions: [missionWith([kakashi], [])] };
+    const result = handler!({ state, sourcePlayer: 'player1', sourceCard: kakashi, sourceMissionIndex: 0, triggerType: 'MAIN', isUpgrade: false });
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('KAKASHI148_CONFIRM_MAIN');
+    expect(result.state.edgeHolder).toBe('player2');
+  });
 });
 
 describe('Minato Namikaze SS-122-SPV (Special Variant)', () => {

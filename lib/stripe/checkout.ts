@@ -6,7 +6,7 @@ export const DONATION_AMOUNT_MAX_ONE_TIME_CENTS = 500_000;
 export const DONATION_AMOUNT_MAX_MONTHLY_CENTS = 50_000;
 
 export type DonationMode = 'payment' | 'subscription';
-export type SupportedLocale = 'fr' | 'en';
+export type SupportedLocale = string;
 
 export interface ValidateAmountOk {
   ok: true;
@@ -76,7 +76,7 @@ export async function createDonationCheckout(params: CreateDonationCheckoutParam
     line_items: [lineItem],
     success_url: successUrl,
     cancel_url: cancelUrl,
-    locale,
+    locale: (locale || 'auto') as Stripe.Checkout.SessionCreateParams.Locale,
     metadata: {
       userId: userId ?? '',
       locale,

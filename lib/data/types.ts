@@ -1,6 +1,6 @@
 
 
-export type RawRarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'SP' | 'SPV' | 'MMS';
+export type RawRarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'SP' | 'SPV' | 'POP' | 'POPV' | 'CHIBI' | 'CHIBIV' | 'MMS';
 
 export interface RawCardEffect {
   type: 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE';
@@ -18,6 +18,10 @@ export interface RawCardData {
   name_fr: string;
   title_fr: string;
   title_en: string;
+  name_es?: string;
+  title_es?: string;
+  name_ja?: string;
+  title_ja?: string;
   has_visual: boolean;
   chakra: number | '';
   power: number | '';

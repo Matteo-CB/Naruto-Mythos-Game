@@ -160,6 +160,7 @@ export function PopupCornerFrame({
   return (
     <motion.div
       ref={ref}
+      data-game-popup=""
       initial={{ scale: 0.96, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 260, damping: 22, delay: 0.05 }}

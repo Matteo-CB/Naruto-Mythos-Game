@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { COUNTRY_CODES } from '@/lib/data/countries';
 
 export async function GET() {
   try {
@@ -11,13 +12,15 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { animationsEnabled: true, gameBackground: true, allowSpectatorHand: true },
+      select: { animationsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, countryCode: true },
     });
 
     return NextResponse.json({
       animationsEnabled: user?.animationsEnabled ?? true,
       gameBackground: user?.gameBackground || 'default',
       allowSpectatorHand: user?.allowSpectatorHand ?? false,
+      hideDeckBuilderVariants: user?.hideDeckBuilderVariants ?? false,
+      countryCode: user?.countryCode ?? null,
     });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -42,6 +45,14 @@ export async function PATCH(request: NextRequest) {
     }
     if (typeof body.allowSpectatorHand === 'boolean') {
       update.allowSpectatorHand = body.allowSpectatorHand;
+    }
+    if (typeof body.hideDeckBuilderVariants === 'boolean') {
+      update.hideDeckBuilderVariants = body.hideDeckBuilderVariants;
+    }
+    if (body.countryCode === null) {
+      update.countryCode = null;
+    } else if (typeof body.countryCode === 'string' && COUNTRY_CODES.has(body.countryCode)) {
+      update.countryCode = body.countryCode;
     }
 
     if (Object.keys(update).length === 0) {

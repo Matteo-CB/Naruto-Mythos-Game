@@ -1,24 +1,25 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
+import { routing } from '@/lib/i18n/routing';
 
 const SITE_URL = 'https://narutomythosgame.com';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'seoPages.playSealed' });
 
-  const title = locale === 'fr'
-    ? 'Mode Scelle - Ouvrez des Boosters | Naruto Mythos TCG'
-    : 'Sealed Mode - Open Boosters | Naruto Mythos TCG';
-
-  const description = locale === 'fr'
-    ? 'Ouvrez 6 boosters, construisez un deck et affrontez un adversaire dans le mode Scelle du Naruto Mythos TCG.'
-    : 'Open 6 boosters, build a deck and battle an opponent in the Naruto Mythos TCG Sealed mode.';
+  const title = t('title');
+  const description = t('description');
+  const languages: Record<string, string> = {};
+  for (const loc of routing.locales) languages[loc] = `${SITE_URL}/${loc}/play/sealed`;
+  languages['x-default'] = `${SITE_URL}/${routing.defaultLocale}/play/sealed`;
 
   return {
     title,
     description,
     alternates: {
       canonical: `${SITE_URL}/${locale}/play/sealed`,
-      languages: { en: `${SITE_URL}/en/play/sealed`, fr: `${SITE_URL}/fr/play/sealed` },
+      languages,
     },
     openGraph: {
       title,

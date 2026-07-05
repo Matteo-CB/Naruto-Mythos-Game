@@ -53,4 +53,5 @@ function sakura109MainHandler(ctx: EffectContext): EffectResult {
 
 export function registerSakura109Handlers(): void {
   registerEffect('KS-109-R', 'MAIN', sakura109MainHandler);
+  registerEffect('KS-109-MV', 'MAIN', sakura109MainHandler);
 }

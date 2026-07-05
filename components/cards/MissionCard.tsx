@@ -2,8 +2,7 @@
 
 import { memo, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
-import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
+import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import type { MissionCard, MissionRank, PlayerID, CardEffect } from '@/lib/engine/types';
 
 import { normalizeImagePath } from '@/lib/utils/imagePath';
@@ -217,7 +216,7 @@ function MissionCardInner({
         >
           {getCardName(card, locale as 'en' | 'fr')}
         </div>
-        {card.name_en && card.name_fr && card.name_en !== card.name_fr && (
+        {(locale === 'en' || locale === 'fr') && card.name_en && card.name_fr && card.name_en !== card.name_fr && (
           <div
             style={{
               color: '#888888',
@@ -245,12 +244,7 @@ function MissionCardInner({
           }}
         >
           {card.effects.map((effect: CardEffect, idx: number) => {
-            const raFallbackId = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
-            const frDescriptions = effectDescriptionsFr[card.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
-            const enDescriptions = effectDescriptionsEn[card.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
-            const description = locale === 'fr'
-              ? (frDescriptions?.[idx] ?? effect.description)
-              : (enDescriptions?.[idx] ?? effect.description);
+            const description = getCardEffectDescription(card.id, idx, locale, effect.description);
             return (
             <div key={idx} style={{ marginBottom: idx < card.effects.length - 1 ? '2px' : 0 }}>
               <span

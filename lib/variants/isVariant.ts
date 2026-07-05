@@ -1,9 +1,14 @@
 import type { CardData } from '@/lib/engine/types';
-import { isVariantRarity, type VariantRarity } from './constants';
+import { isVariantRarity, isSpecialVariant, isLockedVariant, type VariantRarity } from './constants';
 
 export function isVariantCard(card: Pick<CardData, 'rarity'> | null | undefined): boolean {
   if (!card) return false;
-  return isVariantRarity(card.rarity);
+  return isSpecialVariant(card.rarity);
+}
+
+export function isLockedVariantCard(card: Pick<CardData, 'rarity'> | null | undefined): boolean {
+  if (!card) return false;
+  return isLockedVariant(card.rarity);
 }
 
 export function getVariantRarity(card: Pick<CardData, 'rarity'> | null | undefined): VariantRarity | null {

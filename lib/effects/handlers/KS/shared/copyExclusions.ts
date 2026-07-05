@@ -20,3 +20,8 @@ export function isEffectAlteration(description: string | undefined | null): bool
   if (!description) return false;
   return /(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(description);
 }
+
+
+export function isCopyableEffectType(effectType: string | undefined | null): boolean {
+  return effectType !== 'SCORE' && effectType !== 'UPGRADE';
+}

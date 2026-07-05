@@ -5,15 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
-import { ReplayBoard } from '@/components/replay/ReplayBoard';
+import { ReplayGameHost } from '@/components/replay/ReplayGameHost';
 import { PlaybackControls } from '@/components/replay/PlaybackControls';
 import { GameEngine } from '@/lib/engine/GameEngine';
 import { resetIdCounter, getIdCounter, setIdCounter } from '@/lib/engine/utils/id';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
-import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
-import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
 import { PanelFrame } from '@/components/game/PopupPrimitives';
 import { useSession } from 'next-auth/react';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
@@ -74,223 +70,11 @@ const phaseTranslationKeys: Record<string, string> = {
   gameOver: 'game.phase.gameOver',
 };
 
-const rarityColorMap: Record<string, string> = {
-  C: '#888888', UC: '#3e8b3e', R: '#c4a35a', RA: '#c4a35a',
-  S: '#b33e3e', SV: '#b33e3e', M: '#6a6abb', L: '#e0c040', MMS: '#c4a35a',
-};
-
-const effectTypeColorMap: Record<string, string> = {
-  MAIN: '#c4a35a', AMBUSH: '#b33e3e', UPGRADE: '#3e8b3e', SCORE: '#6a6abb',
-};
-
-const rankColorMap: Record<string, string> = {
-  D: '#3e8b3e', C: '#c4a35a', B: '#b37e3e', A: '#b33e3e',
-};
-
 function formatTimestamp(ts: number): string {
   const date = new Date(ts);
   const mins = date.getMinutes().toString().padStart(2, '0');
   const secs = date.getSeconds().toString().padStart(2, '0');
   return `${mins}:${secs}`;
-}
-
-function ReplayCardPreview({
-  card,
-  missionContext,
-  onClose,
-  locale,
-}: {
-  card: CharacterCard | MissionCard;
-  missionContext: { rank: string; basePoints: number; rankBonus: number } | null;
-  onClose: () => void;
-  locale: string;
-}) {
-  const t = useTranslations();
-  const isCharacter = card.card_type === 'character';
-  const isMission = card.card_type === 'mission';
-  const imagePath = normalizeImagePath(card.image_file);
-  const rarityColor = rarityColorMap[card.rarity] ?? '#888888';
-
-  return (
-    <div
-      className="overflow-hidden flex flex-col"
-      style={{
-        backgroundColor: 'rgba(8, 8, 12, 0.95)',
-        border: isMission
-          ? `1px solid ${rankColorMap[missionContext?.rank ?? ''] ?? 'rgba(196, 163, 90, 0.15)'}40`
-          : '1px solid rgba(255, 255, 255, 0.08)',
-        borderLeft: isMission
-          ? `3px solid ${rankColorMap[missionContext?.rank ?? ''] ?? 'rgba(196, 163, 90, 0.3)'}`
-          : '3px solid rgba(196, 163, 90, 0.25)',
-        boxShadow: '0 8px 40px rgba(0, 0, 0, 0.8)',
-        maxHeight: 'calc(100vh - 32px)',
-      }}
-    >
-      
-      {imagePath ? (
-        <div
-          className="w-full shrink-0 flex items-center justify-center"
-          style={{ backgroundColor: '#0a0a0c', height: isCharacter ? '200px' : '140px' }}
-        >
-          <img
-            src={imagePath}
-            alt={getCardName(card, locale as 'en' | 'fr')}
-            draggable={false}
-            className="w-full h-full"
-            style={{ objectFit: 'contain' }}
-          />
-        </div>
-      ) : (
-        <div
-          className="w-full shrink-0 flex items-center justify-center"
-          style={{ backgroundColor: '#1a1a1a', height: isCharacter ? '200px' : '140px' }}
-        >
-          <span className="text-xs" style={{ color: '#555555' }}>{t('card.noImage')}</span>
-        </div>
-      )}
-
-      <div className="p-3.5 flex flex-col gap-2 overflow-y-auto" style={{ maxHeight: '380px' }}>
-        
-        <div className="flex items-center justify-between">
-          <span
-            className="text-[10px] px-1.5 py-0.5 font-bold uppercase tracking-wider"
-            style={{
-              backgroundColor: isMission ? 'rgba(196, 163, 90, 0.12)' : 'rgba(255, 255, 255, 0.04)',
-              color: isMission ? '#c4a35a' : '#888888',
-            }}
-          >
-            {isMission ? t('card.mission') : t('card.character')}
-          </span>
-          <span
-            className="text-[10px] px-1.5 py-0.5 shrink-0 font-bold"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', color: rarityColor }}
-          >
-            {card.rarity}
-          </span>
-        </div>
-
-        <span className="text-sm font-bold leading-tight" style={{ color: '#e0e0e0' }}>
-          {getCardName(card, locale as 'en' | 'fr')}
-        </span>
-
-        {(card.title_fr || card.title_en) && (
-          <span className="text-xs" style={{ color: '#999999' }}>
-            {getCardTitle(card, locale as 'en' | 'fr')}
-          </span>
-        )}
-
-        {isMission && missionContext && (
-          <div
-            className="flex flex-col gap-1.5 p-2.5 mt-0.5"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', }}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium" style={{ color: '#aaaaaa' }}>{t('card.rank')}</span>
-              <span
-                className="text-sm font-bold px-2 py-0.5"
-                style={{ color: rankColorMap[missionContext.rank] ?? '#888', backgroundColor: `${rankColorMap[missionContext.rank] ?? '#888'}15` }}
-              >
-                {missionContext.rank}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs" style={{ color: '#888888' }}>{t('game.board.base')}</span>
-              <span className="text-xs tabular-nums" style={{ color: '#aaaaaa' }}>{missionContext.basePoints} {t('game.board.pts')}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs" style={{ color: '#888888' }}>{t('card.rankBonus')}</span>
-              <span className="text-xs tabular-nums" style={{ color: '#aaaaaa' }}>+{missionContext.rankBonus} {t('game.board.pts')}</span>
-            </div>
-            <div className="flex items-center justify-between pt-1.5 mt-0.5" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
-              <span className="text-xs font-bold" style={{ color: '#c4a35a' }}>{t('card.totalPoints')}</span>
-              <span className="text-sm font-bold tabular-nums" style={{ color: '#c4a35a' }}>
-                {missionContext.basePoints + missionContext.rankBonus} {t('game.board.pts')}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {isCharacter && (
-          <div
-            className="flex items-center gap-4 p-2 mt-0.5"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', }}
-          >
-            <div className="flex flex-col items-center gap-0.5">
-              <span className="text-[10px] uppercase tracking-wider" style={{ color: '#888888' }}>{t('collection.details.cost')}</span>
-              <span className="text-base font-bold" style={{ color: '#c4a35a' }}>{(card as CharacterCard).chakra}</span>
-            </div>
-            <div className="w-px h-6 shrink-0" style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }} />
-            <div className="flex flex-col items-center gap-0.5">
-              <span className="text-[10px] uppercase tracking-wider" style={{ color: '#888888' }}>{t('collection.details.power')}</span>
-              <span className="text-base font-bold" style={{ color: '#e0e0e0' }}>{(card as CharacterCard).power}</span>
-            </div>
-          </div>
-        )}
-
-        {card.keywords && card.keywords.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-0.5">
-            {card.keywords.map((kw) => (
-              <span
-                key={kw}
-                className="text-[10px] px-1.5 py-0.5"
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', color: '#999999', }}
-              >
-                {getCardKeyword(kw, locale as 'en' | 'fr')}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {card.group && (
-          <span className="text-[10px]" style={{ color: '#777777' }}>
-            {t('collection.details.group')}: {getCardGroup(card.group, locale as 'en' | 'fr')}
-          </span>
-        )}
-
-        <span className="text-[9px]" style={{ color: '#444444' }}>{card.id}</span>
-
-        <div className="mt-0.5 flex flex-col gap-2 pt-2" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
-          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#888888' }}>{t('card.effects')}</span>
-          {card.effects && card.effects.length > 0 ? (
-            card.effects.map((effect, i) => {
-              const raFallbackId = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
-              const frDescs = effectDescriptionsFr[card.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
-              const enDescs = effectDescriptionsEn[card.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
-              const description = locale === 'fr'
-                ? (frDescs?.[i] ?? enDescs?.[i] ?? effect.description)
-                : (enDescs?.[i] ?? effect.description);
-              return (
-                <div
-                  key={i}
-                  className="flex flex-col gap-0.5 p-2"
-                  style={{
-                    backgroundColor: `${effectTypeColorMap[effect.type] ?? '#888888'}08`,
-                  }}
-                >
-                  <span className="text-[10px] font-bold uppercase" style={{ color: effectTypeColorMap[effect.type] ?? '#888888' }}>
-                    {t(`card.effectTypes.${effect.type}` as 'card.effectTypes.MAIN' | 'card.effectTypes.UPGRADE' | 'card.effectTypes.AMBUSH' | 'card.effectTypes.SCORE')}
-                  </span>
-                  <span className="font-body text-[11px] leading-snug" style={{ color: '#aaaaaa' }}>{description}</span>
-                </div>
-              );
-            })
-          ) : (
-            <span className="text-[10px]" style={{ color: '#555555' }}>{t('card.noEffects')}</span>
-          )}
-        </div>
-      </div>
-
-      <div className="flex items-center justify-end px-3 py-2 shrink-0" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', backgroundColor: 'rgba(0, 0, 0, 0.3)' }}>
-        <button
-          onClick={onClose}
-          className="text-[11px] font-bold px-2.5 py-1 cursor-pointer"
-          style={{ backgroundColor: 'rgba(179, 62, 62, 0.12)', color: '#b33e3e', }}
-        >
-          X
-        </button>
-      </div>
-    </div>
-  );
 }
 
 function ShareButton({ gameId }: { gameId: string }) {
@@ -725,13 +509,6 @@ function VisualReplay({
   const [currentStep, setCurrentStep] = useState(0);
   const [showLog, setShowLog] = useState(false);
   const [viewAs, setViewAs] = useState<PlayerID>(defaultViewAs ?? 'player1');
-  const [previewCard, setPreviewCard] = useState<CharacterCard | MissionCard | null>(null);
-  const [previewMissionContext, setPreviewMissionContext] = useState<{ rank: string; basePoints: number; rankBonus: number } | null>(null);
-
-  const handleCardClick = useCallback((card: CharacterCard | MissionCard, missionCtx?: { rank: string; basePoints: number; rankBonus: number }) => {
-    setPreviewCard(prev => (prev as CharacterCard | MissionCard | null)?.id === card.id ? null : card);
-    setPreviewMissionContext(missionCtx ?? null);
-  }, []);
 
   const states = useMemo(() => {
     if (stateSnapshots && stateSnapshots.length > 0) {
@@ -1218,8 +995,6 @@ function VisualReplay({
   const currentState = states[currentStep];
   if (!currentState) return null;
 
-  const currentClock = (clockSnapshots && currentStep > 0 && clockSnapshots[currentStep - 1]) ? clockSnapshots[currentStep - 1] : null;
-
   return (
     <div
       className="w-screen flex flex-col overflow-hidden no-select"
@@ -1232,7 +1007,6 @@ function VisualReplay({
         position: 'relative',
         overscrollBehavior: 'none',
       }}
-      onClick={() => previewCard && setPreviewCard(null)}
     >
       <LandscapeBlocker />
 
@@ -1293,7 +1067,7 @@ function VisualReplay({
       )}
 
       <div className="flex-1 min-h-0 relative z-10">
-        <ReplayBoard state={currentState} playerNames={playerNames} locale={locale} backgroundUrl={backgroundUrl} viewAs={viewAs} onCardClick={handleCardClick} clockSnapshot={currentClock} />
+        <ReplayGameHost state={currentState} viewAs={viewAs} playerNames={playerNames} />
       </div>
 
       <div className="shrink-0 relative z-20">
@@ -1305,27 +1079,6 @@ function VisualReplay({
           actionLabel={actionLabel}
         />
       </div>
-
-      <AnimatePresence>
-        {previewCard && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.15 }}
-            className="fixed z-40"
-            style={{ right: '16px', top: '60px', width: '280px', maxHeight: 'calc(100vh - 80px)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <ReplayCardPreview
-              card={previewCard}
-              missionContext={previewMissionContext}
-              onClose={() => setPreviewCard(null)}
-              locale={locale}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <AnimatePresence>
         {showLog && <TextTimeline log={log} playerNames={playerNames} onClose={() => setShowLog(false)} currentStep={currentStep} states={states} />}

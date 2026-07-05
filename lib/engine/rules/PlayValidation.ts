@@ -189,6 +189,10 @@ export function validateRevealCharacter(
     upgradeTarget = sameNameChar ?? flexibleUpgradeTarget;
   }
 
+  if (charIsControlled && upgradeTarget) {
+    return { valid: false, reason: `Cannot upgrade with ${charTopCard.name_fr}: a character you control but don't own cannot be used to upgrade.`, reasonKey: 'game.error.cannotUpgradeWithControlled', reasonParams: { name: charTopCard.name_fr } };
+  }
+
   let effectiveCost: number;
   if (upgradeTarget) {
     const targetIsControlled = upgradeTarget.controlledBy !== upgradeTarget.originalOwner;

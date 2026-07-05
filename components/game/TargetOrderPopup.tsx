@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
+import { localizeMessageParams } from '@/lib/i18n/localizeMessageParams';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useUIStore } from '@/stores/uiStore';
@@ -21,6 +22,8 @@ export interface OrderTarget {
   instanceId: string;
   name_fr: string;
   name_en?: string;
+  name_ja?: string;
+  name_es?: string;
   image_file?: string;
   chakra?: number;
   power?: number;
@@ -123,7 +126,7 @@ export function TargetOrderPopup({
           <PopupMinimizeX onClick={minimizeEffectPopup} />
 
           <PopupTitle accentColor={accentColor} size="lg">
-            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+            {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
           </PopupTitle>
 
           <p
@@ -156,9 +159,7 @@ export function TargetOrderPopup({
               const orderIndex = orderedIds.indexOf(target.instanceId);
               const isSelected = orderIndex >= 0;
               const imagePath = normalizeImagePath(target.image_file);
-              const displayName = locale === 'en' && target.name_en
-                ? target.name_en
-                : target.name_fr;
+              const displayName = getCardName(target, locale);
               const missionColor = rankColorMap[target.missionRank ?? ''] ?? '#888';
 
               return (
@@ -302,7 +303,7 @@ export function TargetOrderPopup({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        zoomCard({ name_fr: target.name_fr, name_en: target.name_en, image_file: target.image_file } as CharacterCard);
+                        zoomCard({ name_fr: target.name_fr, name_en: target.name_en, name_ja: target.name_ja, name_es: target.name_es, image_file: target.image_file } as CharacterCard);
                       }}
                       className="absolute top-1 left-1 px-1 py-px text-[7px] font-bold cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
                       style={{

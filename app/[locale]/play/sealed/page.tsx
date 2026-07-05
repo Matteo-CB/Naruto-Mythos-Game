@@ -16,7 +16,7 @@ import { useSocketStore } from '@/lib/socket/client';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { AIDifficulty } from '@/lib/ai/AIPlayer';
 import type { BoosterCard, BoosterPack, SealedPool, SealedSetChoice } from '@/lib/sealed/boosterGenerator';
-import { ALL_SET_IDS, SET_REGISTRY, isSetAvailable } from '@/lib/data/sets/registry';
+import { ALL_SET_IDS, SET_REGISTRY, isSetAvailable, getSetName } from '@/lib/data/sets/registry';
 
 type SealedStep =
   | 'loading'
@@ -750,7 +750,7 @@ function SealedSetPicker({ value, onChange }: { value: SealedSetChoice; onChange
   choices.push({ id: 'random', label: t('sealed.setRandom'), disabled: false });
   for (const sid of ALL_SET_IDS) {
     const desc = SET_REGISTRY[sid];
-    const name = locale === 'fr' ? desc.nameFr : desc.nameEn;
+    const name = getSetName(sid, locale);
     const available = isSetAvailable(sid);
     choices.push({
       id: sid,

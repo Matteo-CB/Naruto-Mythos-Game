@@ -12,6 +12,7 @@ import { BattlepassTrack } from '@/components/battlepass/BattlepassTrack';
 import { InfiniteSegment } from '@/components/battlepass/InfiniteSegment';
 import { BoosterSetTile } from '@/components/boosters/BoosterSetTile';
 import { BoosterCarousel } from '@/components/boosters/BoosterCarousel';
+import { getSetName } from '@/lib/data/sets/registry';
 import { BoosterRatesPanel } from '@/components/boosters/BoosterRatesPanel';
 import { BoosterOpenAnimation } from '@/components/boosters/BoosterOpenAnimation';
 import { BoosterOpenFailureScreen } from '@/components/boosters/BoosterOpenFailureScreen';
@@ -65,12 +66,20 @@ interface QuestRow {
   hook: string;
   text_fr: string;
   text_en: string;
+  text_es?: string;
+  text_ja?: string;
   scope: string;
   xpReward: number;
   progress: number;
   completed: boolean;
   claimed: boolean;
   claimedVia?: 'main' | 'daily' | null;
+}
+
+function questText(q: { text_fr: string; text_en: string; text_es?: string; text_ja?: string }, locale: string): string {
+  const v = (q as Record<string, unknown>)[`text_${locale}`];
+  if (typeof v === 'string' && v) return v;
+  return q.text_en || q.text_fr;
 }
 
 interface DailyRow {
@@ -81,6 +90,8 @@ interface DailyRow {
     target: number;
     text_fr: string;
     text_en: string;
+    text_es?: string;
+    text_ja?: string;
     xpReward: number;
   };
   progress: number;
@@ -114,7 +125,7 @@ export default function RewardsHubPage() {
   const tBoosters = useTranslations('boosters');
   const tQuests = useTranslations('quests');
   const tCommon = useTranslations('common');
-  const locale = useLocale() as Locale;
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const showToast = useToastStore((s) => s.showToast);
 
@@ -313,7 +324,7 @@ export default function RewardsHubPage() {
         await refreshInventory();
         return;
       }
-      const setLabel = entry ? (locale === 'fr' ? entry.nameFr : entry.nameEn) : setId;
+      const setLabel = getSetName(setId, locale);
       setOpened({ cards, duplicateCardIds: dups, setLabel, boosterImage: entry?.boosterImage });
       clearBoosterInventoryCache();
       clearUnlockedVariantsCache();
@@ -700,7 +711,7 @@ export default function RewardsHubPage() {
                                 {tQuests('levelLabel', { level: q.level })}
                               </span>
                               <span className="text-xs flex-1" style={{ color: '#e8e8e8', minWidth: 180 }}>
-                                {locale === 'fr' ? q.text_fr : q.text_en}
+                                {questText(q, locale)}
                               </span>
                               <div className="flex items-center gap-2" style={{ minWidth: 140 }}>
                                 <div className="flex-1" style={{ height: 4, backgroundColor: '#1a1a1a', minWidth: 80 }}>
@@ -837,7 +848,7 @@ export default function RewardsHubPage() {
                         </span>
                       </div>
                       <p className="text-sm mb-3" style={{ color: '#e8e8e8' }}>
-                        {locale === 'fr' ? daily.quest.text_fr : daily.quest.text_en}
+                        {questText(daily.quest, locale)}
                       </p>
                       <div className="flex items-center gap-3">
                         <div className="flex-1" style={{ height: 4, backgroundColor: '#1a1a1a' }}>
@@ -917,7 +928,7 @@ export default function RewardsHubPage() {
                           {tQuests('levelLabel', { level: q.level })}
                         </span>
                         <span className="text-xs flex-1" style={{ color: '#e8e8e8', minWidth: 200 }}>
-                          {locale === 'fr' ? q.text_fr : q.text_en}
+                          {questText(q, locale)}
                         </span>
                         <div className="flex items-center gap-2" style={{ minWidth: 140 }}>
                           <div className="flex-1" style={{ height: 4, backgroundColor: '#1a1a1a', minWidth: 80 }}>

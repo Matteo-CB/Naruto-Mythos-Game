@@ -2,8 +2,25 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { cookies } from "next/headers";
+import { createTranslator } from "next-intl";
+import { routing } from "@/lib/i18n/routing";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 import "./globals.css";
+
+type RootMessages = Record<string, unknown> & { _meta?: { ogLocale?: string }; rootMeta?: { keywords?: string[] } };
+type StringTranslator = (key: string) => string;
+
+async function loadRootMessages(locale: string): Promise<RootMessages> {
+  return (await import(`@/messages/${locale}.json`)).default as RootMessages;
+}
+
+function pickRootLocale(cookieLocale: string | undefined): string {
+  return (routing.locales as readonly string[]).includes(cookieLocale ?? "") ? (cookieLocale as string) : routing.defaultLocale;
+}
+
+function rootTranslator(locale: string, messages: RootMessages, namespace: string): StringTranslator {
+  return createTranslator({ locale, messages, namespace }) as unknown as StringTranslator;
+}
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,129 +44,90 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: "Naruto Mythos TCG - Jeu de Cartes en Ligne",
-    template: "%s | Naruto Mythos TCG",
-  },
-  description:
-    "Jouez gratuitement au Naruto Mythos Trading Card Game en ligne. Affrontez une IA intelligente sur 4 niveaux de difficulté ou défiez d'autres joueurs en multijoueur temps réel. Construisez votre deck stratégique parmi 186 cartes uniques inspirées de Naruto Shippuden, collectionnez des cartes rares et grimpez le classement ELO compétitif. Jeu de cartes à collectionner gratuit avec deck builder et système de matchmaking.",
-  keywords: [
-    "Naruto",
-    "TCG",
-    "Trading Card Game",
-    "jeu de cartes",
-    "Naruto Mythos",
-    "Naruto Mythos TCG",
-    "carte Naruto",
-    "jeu en ligne",
-    "jeu en ligne gratuit",
-    "deck builder",
-    "constructeur de deck",
-    "ELO",
-    "classement ELO",
-    "multijoueur",
-    "anime card game",
-    "jeu de cartes a collectionner",
-    "Naruto card game online",
-    "Naruto card game free",
-    "play Naruto card game",
-    "Naruto Shippuden",
-    "Naruto Shippuden card game",
-    "jeu de cartes strategique",
-    "jeu de cartes Naruto en ligne",
-    "Naruto TCG online free",
-    "Naruto trading card game online",
-    "free anime card game",
-    "jeu de cartes anime gratuit",
-    "ninja card game",
-    "jeu Naruto gratuit",
-    "Sasuke",
-    "Kakashi",
-    "Sakura",
-    "Itachi",
-    "Gaara",
-    "collectible card game",
-    "CCG",
-    "carte a collectionner",
-    "jouer Naruto en ligne",
-    "jeu de cartes multijoueur",
-    "competitive card game",
-    "ranked card game",
-    "construire deck Naruto",
-    "jeu de cartes en ligne gratuit",
-    "card game browser",
-    "jeu de cartes navigateur",
-    "Naruto fan game",
-    "jeu Naruto fan",
-  ],
-  authors: [{ name: "HiddenLab", url: "https://hiddenlab.fr" }],
-  creator: "HiddenLab",
-  publisher: "HiddenLab",
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+export async function generateMetadata(): Promise<Metadata> {
+  const cookieStore = await cookies();
+  const locale = pickRootLocale(cookieStore.get("NEXT_LOCALE")?.value);
+  const messages = await loadRootMessages(locale);
+  const t = rootTranslator(locale, messages, "rootMeta");
+  const ogLocale = messages._meta?.ogLocale ?? "en_US";
+  const keywords = messages.rootMeta?.keywords ?? [];
+
+  const languages: Record<string, string> = {};
+  const alternateLocale: string[] = [];
+  for (const loc of routing.locales) {
+    languages[loc] = `${SITE_URL}/${loc}`;
+    if (loc !== locale) {
+      const otherOg = (await loadRootMessages(loc))._meta?.ogLocale;
+      if (otherOg) alternateLocale.push(otherOg);
+    }
+  }
+  languages['x-default'] = `${SITE_URL}/${routing.defaultLocale}`;
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: t("titleDefault"),
+      template: t("titleTemplate"),
+    },
+    description: t("description"),
+    keywords,
+    authors: [{ name: "HiddenLab", url: "https://hiddenlab.fr" }],
+    creator: "HiddenLab",
+    publisher: "HiddenLab",
+    robots: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
-  openGraph: {
-    type: "website",
-    locale: "fr_FR",
-    alternateLocale: "en_US",
-    url: SITE_URL,
-    siteName: "Naruto Mythos TCG",
-    title: "Naruto Mythos TCG - Jeu de Cartes Naruto Gratuit en Ligne",
-    description:
-      "Jeu de cartes Naruto Shippuden gratuit en ligne. 186 cartes uniques, IA intelligente, multijoueur temps réel, deck builder et classement ELO. Jouez maintenant sans téléchargement.",
-    images: [
-      {
-        url: `${SITE_URL}/images/og-image.webp?v=2`,
-        width: 1200,
-        height: 630,
-        alt: "Naruto Mythos TCG - Trading Card Game",
-        type: "image/webp",
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
       },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Naruto Mythos TCG - Jeu de Cartes Naruto Gratuit",
-    description:
-      "Jeu de cartes Naruto Shippuden gratuit. 186 cartes, IA sur 4 niveaux, multijoueur temps reel, deck builder et classement ELO. Jouez maintenant dans votre navigateur.",
-    images: [`${SITE_URL}/images/og-image.webp?v=2`],
-  },
-  icons: {
-    icon: [
-      { url: "/icons/favicon.ico", sizes: "any" },
-      { url: "/icons/icon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/icons/icon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: [
-      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
-  },
-  alternates: {
-    canonical: SITE_URL,
-    languages: {
-      en: `${SITE_URL}/en`,
-      fr: `${SITE_URL}/fr`,
     },
-  },
-  category: "games",
-};
-
-const ROOT_STRINGS = {
-  en: { skipToContent: 'Skip to content', noJs: 'JavaScript is required to play Naruto Mythos TCG.' },
-  fr: { skipToContent: 'Aller au contenu', noJs: 'JavaScript est requis pour jouer à Naruto Mythos TCG.' },
-} as const;
+    openGraph: {
+      type: "website",
+      locale: ogLocale,
+      alternateLocale,
+      url: SITE_URL,
+      siteName: "Naruto Mythos TCG",
+      title: t("ogTitle"),
+      description: t("ogDescription"),
+      images: [
+        {
+          url: `${SITE_URL}/images/og-image.webp?v=2`,
+          width: 1200,
+          height: 630,
+          alt: t("ogImageAlt"),
+          type: "image/webp",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t("twitterTitle"),
+      description: t("twitterDescription"),
+      images: [`${SITE_URL}/images/og-image.webp?v=2`],
+    },
+    icons: {
+      icon: [
+        { url: "/icons/favicon.ico", sizes: "any" },
+        { url: "/icons/icon-16x16.png", sizes: "16x16", type: "image/png" },
+        { url: "/icons/icon-32x32.png", sizes: "32x32", type: "image/png" },
+        { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+        { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+      ],
+      apple: [
+        { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      ],
+    },
+    alternates: {
+      canonical: SITE_URL,
+      languages,
+    },
+    category: "games",
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -157,11 +135,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const localeCookie = cookieStore.get('NEXT_LOCALE')?.value;
-  const lang: 'en' | 'fr' = localeCookie === 'en' ? 'en' : 'fr';
-  const strings = ROOT_STRINGS[lang];
+  const locale = pickRootLocale(cookieStore.get('NEXT_LOCALE')?.value);
+  const messages = await loadRootMessages(locale);
+  const t = rootTranslator(locale, messages, 'rootLayout');
   return (
-    <html lang={lang} className="dark" suppressHydrationWarning>
+    <html lang={locale} className="dark" suppressHydrationWarning>
       <head>
         <link rel="preload" href="/fonts/njnaruto-accented.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/geist-regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
@@ -175,16 +153,24 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0a] text-[#e0e0e0] min-h-screen`}
       >
+        {process.env.NODE_ENV !== 'production' && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html:
+                "(function(){try{if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){if(rs&&rs.length){Promise.all(rs.map(function(r){return r.unregister();})).then(function(){if(self.caches){caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k);}));}).then(rl);}else{rl();}});}});}function rl(){try{if(!sessionStorage.getItem('nm-sw-cleared')){sessionStorage.setItem('nm-sw-cleared','1');location.reload();}}catch(e){location.reload();}}}catch(e){}})();",
+            }}
+          />
+        )}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-9999 focus:px-4 focus:py-2 focus:text-sm focus:font-bold"
           style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
         >
-          {strings.skipToContent}
+          {t('skipToContent')}
         </a>
         <noscript>
           <div style={{ padding: '16px', textAlign: 'center', backgroundColor: '#1a1a0a', color: '#c4a35a', borderBottom: '1px solid #c4a35a' }}>
-            {strings.noJs}
+            {t('noJs')}
           </div>
         </noscript>
         {children}

@@ -6,6 +6,7 @@ import { useTrackOnMount } from '@/lib/hooks/useTrackUi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { CountryFlag } from '@/components/CountryFlag';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { RANK_TIERS, PLACEMENT_MATCHES_REQUIRED, getRankTier } from '@/components/EloBadge';
@@ -19,6 +20,7 @@ type HubTab = 'leaderboard' | 'friends';
 interface LeaderboardUser {
   id: string;
   username: string;
+  countryCode?: string | null;
   elo: number;
   evolvingElo?: number;
   wins: number;
@@ -128,6 +130,7 @@ function LeaderRow({
       )}
 
       <div className="flex items-center gap-1.5 min-w-0">
+        <CountryFlag code={user.countryCode} size={18} />
         <Link
           href={`/profile/${encodeURIComponent(user.username)}` as '/'}
           className="font-display text-base truncate transition-colors hover:text-[#c4a35a]"

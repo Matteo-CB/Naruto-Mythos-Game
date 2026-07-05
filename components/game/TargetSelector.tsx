@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
+import { localizeMessageParams, resolveNameToLocale } from '@/lib/i18n/localizeMessageParams';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import type { VisibleCharacter, VisibleMission, MissionRank, CharacterCard, MissionCard } from '@/lib/engine/types';
@@ -363,7 +364,7 @@ function OrderedDefeatPopup({
         <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.25)" maxWidth="90vw" padding="16px 12px" backgroundColor="rgba(4, 4, 8, 0.95)" fitContent>
           <PopupMinimizeX onClick={minimizeEffectPopup} />
           <PopupTitle accentColor="#c4a35a" size="lg">
-            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+            {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
           </PopupTitle>
 
           <div className="text-center mb-3">
@@ -733,7 +734,7 @@ export function TargetSelector() {
   const isMultiTargetEffect = maxSel === undefined || maxSel >= validTargets.length;
   if ((isHideOrder || isDefeatOrder) && validTargets.length > 1 && isMultiTargetEffect && visibleState && queuedOrderRef.current.length === 0) {
     
-    const orderTargets: Array<{ instanceId: string; name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; missionRank?: string; isHidden?: boolean; isOwn?: boolean }> = [];
+    const orderTargets: Array<{ instanceId: string; name_fr: string; name_en?: string; name_ja?: string; name_es?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; missionRank?: string; isHidden?: boolean; isOwn?: boolean }> = [];
     for (const targetId of validTargets) {
       for (let mIdx = 0; mIdx < visibleState.activeMissions.length; mIdx++) {
         const mission = visibleState.activeMissions[mIdx];
@@ -743,6 +744,8 @@ export function TargetSelector() {
               instanceId: c.instanceId,
               name_fr: c.card.name_fr,
               name_en: (c.card as any).name_en,
+              name_ja: (c.card as any).name_ja,
+              name_es: (c.card as any).name_es,
               image_file: c.card.image_file,
               chakra: c.card.chakra,
               power: c.effectivePower,
@@ -826,7 +829,7 @@ export function TargetSelector() {
       return !!id && reorderIdSet.has(id);
     });
     const lastN = matchedByTarget.length === count ? matchedByTarget : targetDiscard.slice(-count);
-    const discardTargets: Array<{ instanceId: string; name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; isHidden?: boolean; isOwn?: boolean }> = [];
+    const discardTargets: Array<{ instanceId: string; name_fr: string; name_en?: string; name_ja?: string; name_es?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; isHidden?: boolean; isOwn?: boolean }> = [];
     
     const discardIdMap: Record<string, string> = {};
     for (let di = 0; di < lastN.length; di++) {
@@ -840,6 +843,8 @@ export function TargetSelector() {
         instanceId: uniqueId,
         name_fr: wasHidden && !isOwnDiscard ? '???' : ((card as any).name_fr ?? ''),
         name_en: wasHidden && !isOwnDiscard ? undefined : (card as any).name_en,
+        name_ja: wasHidden && !isOwnDiscard ? undefined : (card as any).name_ja,
+        name_es: wasHidden && !isOwnDiscard ? undefined : (card as any).name_es,
         image_file: wasHidden && !isOwnDiscard ? undefined : (card as any).image_file,
         chakra: wasHidden && !isOwnDiscard ? undefined : (card as any).chakra,
         power: wasHidden && !isOwnDiscard ? undefined : (card as any).power,
@@ -874,7 +879,7 @@ export function TargetSelector() {
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.4)" maxWidth="420px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
             <PopupTitle accentColor="#c4a35a" size="lg">
-              {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+              {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
             </PopupTitle>
 
             <motion.div
@@ -961,7 +966,7 @@ export function TargetSelector() {
           <PopupCornerFrame accentColor={`${accentColor}66`} maxWidth="400px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
             <PopupTitle accentColor={accentColor} size="lg">
-              {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+              {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
             </PopupTitle>
 
             <motion.div
@@ -988,7 +993,7 @@ export function TargetSelector() {
               ) : (
                 <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
                   <span className="text-[8px] text-center px-1" style={{ color: '#888888' }}>
-                    {cardData ? (locale === 'en' && cardData.name_en ? cardData.name_en : cardData.name_fr) : '???'}
+                    {cardData ? (getCardName(cardData, locale)) : '???'}
                   </span>
                 </div>
               )}
@@ -1014,7 +1019,7 @@ export function TargetSelector() {
                 style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
               >
                 <span className="text-[9px] font-bold truncate block" style={{ color: '#e0e0e0' }}>
-                  {cardData ? (locale === 'en' && cardData.name_en ? cardData.name_en : cardData.name_fr) : '???'}
+                  {cardData ? (getCardName(cardData, locale)) : '???'}
                 </span>
               </div>
               {cardData && (
@@ -1125,7 +1130,7 @@ export function TargetSelector() {
                     ) : (
                       <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
                         <span className="text-xs text-center px-2" style={{ color: '#888888' }}>
-                          {locale === 'en' && card.name_en ? card.name_en : card.name_fr}
+                          {getCardName(card, locale)}
                         </span>
                       </div>
                     )}
@@ -1141,7 +1146,7 @@ export function TargetSelector() {
 
                     <div className="absolute inset-x-0 bottom-0 px-2 py-1.5 text-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}>
                       <div className="text-[10px] font-bold" style={{ color: '#e0e0e0' }}>
-                        {locale === 'en' && card.name_en ? card.name_en : card.name_fr}
+                        {getCardName(card, locale)}
                       </div>
                       {isSelectable && (
                         <div className="text-[9px] mt-0.5" style={{ color: isSelected ? '#4aff6b' : '#8b5cf6' }}>
@@ -1225,11 +1230,11 @@ export function TargetSelector() {
                       <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${imgPath}')` }} />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                        <span className="text-xs text-center px-2" style={{ color: '#888888' }}>{locale === 'en' && card.name_en ? card.name_en : card.name_fr}</span>
+                        <span className="text-xs text-center px-2" style={{ color: '#888888' }}>{getCardName(card, locale)}</span>
                       </div>
                     )}
                     <div className="absolute inset-x-0 bottom-0 px-2 py-1.5 text-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}>
-                      <div className="text-[10px] font-bold" style={{ color: '#e0e0e0' }}>{locale === 'en' && card.name_en ? card.name_en : card.name_fr}</div>
+                      <div className="text-[10px] font-bold" style={{ color: '#e0e0e0' }}>{getCardName(card, locale)}</div>
                       {(isHighlight || card.isDiscarded) && (
                         <div className="text-[9px] mt-0.5" style={{ color: isHighlight ? '#4aff6b' : '#b33e3e' }}>
                           {card.isSummon ? t('game.effect.tayuya065Summon') : card.isMatch ? t('game.effect.kiba026Match') : t('game.effect.cardDiscarded')}
@@ -1298,11 +1303,11 @@ export function TargetSelector() {
                 <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${imagePath}')` }} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                  <span className="text-sm text-center px-2" style={{ color: '#888888' }}>{locale === 'en' && revealedCard.name_en ? revealedCard.name_en : revealedCard.name_fr}</span>
+                  <span className="text-sm text-center px-2" style={{ color: '#888888' }}>{resolveNameToLocale(getCardName(revealedCard, locale), locale)}</span>
                 </div>
               )}
               <div className="absolute inset-x-0 bottom-0 px-2 py-2 text-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}>
-                <div className="text-xs font-bold" style={{ color: '#e0e0e0' }}>{locale === 'en' && revealedCard.name_en ? revealedCard.name_en : revealedCard.name_fr}</div>
+                <div className="text-xs font-bold" style={{ color: '#e0e0e0' }}>{resolveNameToLocale(getCardName(revealedCard, locale), locale)}</div>
                 <div className="text-[10px] mt-0.5" style={{ color: '#888888' }}>{t('collection.details.cost')}: {revealedCard.chakra} | {t('collection.details.power')}: {revealedCard.power}</div>
               </div>
               <div className="absolute top-1.5 left-1.5 w-6 h-6 flex items-center justify-center text-[10px] font-bold" style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#4a9eff', border: '1px solid #4a9eff' }}>
@@ -1353,7 +1358,7 @@ export function TargetSelector() {
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="520px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
             <PopupTitle accentColor="#c4a35a" size="lg">
-              {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+              {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
             </PopupTitle>
 
             <div className="flex gap-6 items-start justify-center">
@@ -1588,7 +1593,7 @@ export function TargetSelector() {
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="440px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
             <PopupTitle accentColor="#c4a35a" size="md">
-              {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+              {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
             </PopupTitle>
 
             {confirmImage && (
@@ -1655,7 +1660,7 @@ export function TargetSelector() {
               {revealedCard.image_file && (
                 <img
                   src={normalizeImagePath(revealedCard.image_file) || undefined}
-                  alt={revealedCard.name_fr}
+                  alt={resolveNameToLocale(getCardName(revealedCard, locale), locale)}
                   style={{ width: 56, height: 78, objectFit: 'cover' }}
                   onClick={() => useUIStore.getState().zoomCard(revealedCard as unknown as CharacterCard)}
                   className="cursor-pointer"
@@ -1663,7 +1668,7 @@ export function TargetSelector() {
               )}
               <div className="flex flex-col gap-1">
                 <span className="font-display text-sm font-bold" style={{ color: '#e8c477', letterSpacing: '0.06em' }}>
-                  {locale === 'en' && revealedCard.name_en ? revealedCard.name_en : revealedCard.name_fr}
+                  {resolveNameToLocale(getCardName(revealedCard, locale), locale)}
                 </span>
                 <span className="text-[11px]" style={{ color: '#aaa' }}>
                   {t('collection.details.cost')}: {revealedCard.chakra} · {t('collection.details.power')}: {revealedCard.power}
@@ -1683,7 +1688,7 @@ export function TargetSelector() {
               maxWidth: '420px',
             }}
           >
-            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+            {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
           </motion.div>
 
           <div className="flex justify-center mb-2">

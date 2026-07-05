@@ -2,7 +2,7 @@ import type { GameState, GameAction, PlayerID, CharacterInPlay, CharacterCard, P
 import { HIDDEN_PLAY_COST } from '../types';
 import { deepClone } from '../utils/deepClone';
 import { generateInstanceId } from '../utils/id';
-import { logAction } from '../utils/gameLog';
+import { logAction, logContinuousEffectsOnPlay } from '../utils/gameLog';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter, checkFlexibleUpgrade } from '../rules/PlayValidation';
 import { calculateEffectiveCost, hasKurenai034CostReduction } from '../rules/ChakraValidation';
 import { EffectEngine } from '../../effects/EffectEngine';
@@ -166,7 +166,7 @@ function handlePlayCharacter(
   
   ps.charactersInPlay = countPlayerCharsInMissions(missions, player);
 
-  const log = logAction(
+  let log = logAction(
     state.log,
     state.turn,
     'action',
@@ -176,6 +176,7 @@ function handlePlayCharacter(
     'game.log.playCharacter',
     { card: card.name_fr, title: card.title_fr, card_en: card.name_en || card.name_fr, title_en: card.title_en || card.title_fr, mission: missionIndex + 1, cost: effectiveCost },
   );
+  log = logContinuousEffectsOnPlay(log, state.turn, 'action', player, card);
 
   let newState: GameState = {
     ...state,

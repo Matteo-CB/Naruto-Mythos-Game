@@ -253,11 +253,12 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
 
       {!isHidden && (
         <div
-          className={`absolute bottom-0.5 right-0.5 flex items-center justify-center text-[11px] font-bold tabular-nums${character.powerTokens > 0 ? ' power-glow' : ''}`}
+          className={`absolute bottom-0.5 right-0.5 flex items-center justify-center font-bold tabular-nums${character.powerTokens > 0 ? ' power-glow' : ''}`}
           style={{
-            minWidth: '22px',
-            height: '18px',
+            minWidth: dims.isMobile ? '26px' : '22px',
+            height: dims.isMobile ? '22px' : '18px',
             padding: '0 4px',
+            fontSize: dims.isMobile ? '15px' : '11px',
             backgroundColor: character.powerTokens > 0 ? 'rgba(196, 163, 90, 0.25)' : 'rgba(0, 0, 0, 0.85)',
             color: character.powerTokens > 0 ? '#f0d890' : '#e0e0e0',
             border: character.powerTokens > 0 ? '1px solid rgba(196, 163, 90, 0.5)' : '1px solid rgba(255,255,255,0.1)',
@@ -280,8 +281,8 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
               initial={false}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               style={{
-                width: '11px',
-                height: '11px',
+                width: dims.isMobile ? '13px' : '11px',
+                height: dims.isMobile ? '13px' : '11px',
                 backgroundColor: '#c4a35a',
                 border: '1px solid #a8893a',
                 boxShadow: '0 1px 4px rgba(0,0,0,0.6), 0 0 4px rgba(196, 163, 90, 0.3)',
@@ -293,8 +294,8 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
             <motion.span
               initial={false}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-[8px] font-bold pr-0.5"
-              style={{ color: '#f0d890', textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
+              className="font-bold pr-0.5"
+              style={{ fontSize: dims.isMobile ? '11px' : '8px', color: '#f0d890', textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
             >
               +{character.powerTokens - 5}
             </motion.span>
@@ -304,8 +305,11 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
 
       {!isHidden && character.card && (
         <div
-          className="absolute top-0.5 left-0.5 w-5 h-5 flex items-center justify-center text-[9px] font-bold"
+          className="absolute top-0.5 left-0.5 flex items-center justify-center font-bold"
           style={{
+            width: dims.isMobile ? '24px' : '20px',
+            height: dims.isMobile ? '24px' : '20px',
+            fontSize: dims.isMobile ? '13px' : '9px',
             backgroundColor: 'rgba(196, 163, 90, 0.9)',
             color: '#0a0a0a',
             boxShadow: '0 1px 4px rgba(0, 0, 0, 0.4)',
@@ -322,30 +326,32 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
             <motion.div
               initial={false}
               animate={{ scale: 1 }}
-              className="px-1 py-0.5 text-[8px] font-bold flex items-center stack-pulse"
+              className="px-1 py-0.5 font-bold flex items-center stack-pulse"
               style={{
+                fontSize: dims.isMobile ? '10px' : '8px',
                 backgroundColor: 'rgba(138, 92, 246, 0.25)',
                 color: '#b89bff',
                 border: '1px solid rgba(138, 92, 246, 0.55)',
                 textShadow: '0 0 4px rgba(138, 92, 246, 0.45)',
               }}
             >
-              <span style={{ fontSize: '7px', letterSpacing: '0.5px' }}>{t('game.board.controlled')}</span>
+              <span style={{ fontSize: dims.isMobile ? '9px' : '7px', letterSpacing: '0.5px' }}>{t('game.board.controlled')}</span>
             </motion.div>
           )}
           {character.stackSize > 1 && (
             <motion.div
               initial={false}
               animate={{ scale: 1 }}
-              className="px-1 py-0.5 text-[8px] font-bold flex items-center gap-0.5 stack-pulse"
+              className="px-1 py-0.5 font-bold flex items-center gap-0.5 stack-pulse"
               style={{
+                fontSize: dims.isMobile ? '10px' : '8px',
                 backgroundColor: 'rgba(62, 139, 62, 0.25)',
                 color: '#5cb85c',
                 border: '1px solid rgba(62, 139, 62, 0.5)',
                 textShadow: '0 0 4px rgba(62, 139, 62, 0.4)',
               }}
             >
-              <span style={{ fontSize: '7px', letterSpacing: '0.5px' }}>{t('game.board.up')}</span>
+              <span style={{ fontSize: dims.isMobile ? '9px' : '7px', letterSpacing: '0.5px' }}>{t('game.board.up')}</span>
               <span>{character.stackSize}</span>
             </motion.div>
           )}
@@ -505,8 +511,9 @@ function MissionCardDisplay({
       )}
 
       <div
-        className="absolute top-1 left-1 px-1.5 py-0.5 text-[10px] font-bold"
+        className="absolute top-1 left-1 px-1.5 py-0.5 font-bold"
         style={{
+          fontSize: dims.isMobile ? '13px' : '10px',
           backgroundColor: rankColors[mission.rank],
           color: '#0a0a0a',
           boxShadow: '0 1px 4px rgba(0, 0, 0, 0.4)',
@@ -517,8 +524,9 @@ function MissionCardDisplay({
       </div>
 
       <div
-        className="absolute top-1 right-1 px-1 py-0.5 text-[9px] font-bold tabular-nums"
+        className="absolute top-1 right-1 px-1 py-0.5 font-bold tabular-nums"
         style={{
+          fontSize: dims.isMobile ? '12px' : '9px',
           backgroundColor: 'rgba(0, 0, 0, 0.85)',
           color: '#c4a35a',
           fontFamily: "'NJNaruto', Arial, sans-serif",
@@ -535,8 +543,9 @@ function MissionCardDisplay({
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
         >
           <span
-            className="text-sm font-bold px-3 py-1"
+            className="font-bold px-3 py-1"
             style={{
+              fontSize: dims.isMobile ? '16px' : '14px',
               backgroundColor: 'rgba(0, 0, 0, 0.85)',
               color: mission.wonBy === 'draw' ? '#888888' : mission.wonBy === myPlayer ? '#c4a35a' : '#b33e3e',
             }}
@@ -737,8 +746,8 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         {oppChars.length > 0 && (
           <div className="shrink-0 flex justify-center py-0.5">
             <span
-              className="text-[10px] font-bold tabular-nums"
-              style={{ color: '#b33e3e', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+              className="font-bold tabular-nums"
+              style={{ fontSize: dims.isMobile ? '15px' : '10px', lineHeight: 1.1, color: '#b33e3e', fontFamily: "'NJNaruto', Arial, sans-serif" }}
             >
               {oppPower}
             </span>
@@ -769,8 +778,8 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         {myChars.length > 0 && (
           <div className="shrink-0 flex justify-center py-0.5">
             <span
-              className="text-[10px] font-bold tabular-nums"
-              style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+              className="font-bold tabular-nums"
+              style={{ fontSize: dims.isMobile ? '15px' : '10px', lineHeight: 1.1, color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
             >
               {myPower}
             </span>
@@ -794,26 +803,28 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         </div>
       </div>
 
-      <div
-        className="shrink-0 flex items-center justify-center gap-1 w-full px-1.5 py-0.5"
-        style={{
-          backgroundColor: `${rc}15`,
-          fontFamily: "'NJNaruto', Arial, sans-serif",
-        }}
-      >
-        <span
-          className="text-[10px] font-bold px-1"
-          style={{ backgroundColor: rc, color: '#0a0a0a' }}
+      {!dims.isMobile && (
+        <div
+          className="shrink-0 flex items-center justify-center gap-1 w-full px-1.5 py-0.5"
+          style={{
+            backgroundColor: `${rc}15`,
+            fontFamily: "'NJNaruto', Arial, sans-serif",
+          }}
         >
-          {mission.rank}
-        </span>
-        <span
-          className="text-[11px] font-bold tabular-nums"
-          style={{ color: rc }}
-        >
-          {totalPoints}
-        </span>
-      </div>
+          <span
+            className="text-[10px] font-bold px-1"
+            style={{ backgroundColor: rc, color: '#0a0a0a' }}
+          >
+            {mission.rank}
+          </span>
+          <span
+            className="text-[11px] font-bold tabular-nums"
+            style={{ color: rc }}
+          >
+            {totalPoints}
+          </span>
+        </div>
+      )}
     </motion.div>
   );
 },

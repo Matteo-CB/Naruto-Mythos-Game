@@ -8,8 +8,7 @@ import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { MIN_DECK_SIZE, MAX_COPIES_PER_VERSION, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
-import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
-import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
+import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
 import { SealedTimer } from './SealedTimer';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
@@ -38,6 +37,7 @@ export function SealedDeckBuilder({
 }: SealedDeckBuilderProps) {
   const t = useTranslations('sealed');
   const locale = useLocale() as 'en' | 'fr';
+  const tCardMeta = useTranslations('cardMeta');
 
   const [deckChars, setDeckChars] = useState<BoosterCard[]>([]);
   const [deckMissions, setDeckMissions] = useState<BoosterCard[]>([]);
@@ -405,7 +405,7 @@ export function SealedDeckBuilder({
               >
                 <option value="all">{t('allGroups')}</option>
                 {availableGroups.map((g) => (
-                  <option key={g} value={g}>{getCardGroup(g, locale)}</option>
+                  <option key={g} value={g}>{getCardGroup(g, tCardMeta)}</option>
                 ))}
               </select>
             )}
@@ -628,10 +628,10 @@ export function SealedDeckBuilder({
                     </>
                   )}
                   <span className="text-[11px] font-bold" style={{ color: rarityColors[previewCard.rarity] ?? '#888' }}>
-                    {getRarityLabel(previewCard.rarity, locale)}
+                    {getRarityLabel(previewCard.rarity, tCardMeta)}
                   </span>
                   {previewCard.group && (
-                    <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{getCardGroup(previewCard.group, locale)}</span>
+                    <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{getCardGroup(previewCard.group, tCardMeta)}</span>
                   )}
                 </div>
 
@@ -643,7 +643,7 @@ export function SealedDeckBuilder({
                         className="text-[9px] px-1.5 py-0.5 rounded"
                         style={{ backgroundColor: '#1a1a2e', color: '#9999bb', border: '1px solid #2a2a3e' }}
                       >
-                        {getCardKeyword(kw, locale)}
+                        {getCardKeyword(kw, tCardMeta)}
                       </span>
                     ))}
                   </div>
@@ -652,12 +652,7 @@ export function SealedDeckBuilder({
                 {previewCard.effects?.length > 0 && (
                   <div className="mt-2 flex flex-col gap-1.5">
                     {previewCard.effects.map((eff: { type: string; description: string }, i: number) => {
-                      const raFallbackId = previewCard.id.endsWith('-RA') ? previewCard.id.replace('-RA', '-R') : undefined;
-                      const frDescs = effectDescriptionsFr[previewCard.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
-                      const enDescs = effectDescriptionsEn[previewCard.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
-                      const description = locale === 'fr'
-                        ? (frDescs?.[i] ?? eff.description)
-                        : (enDescs?.[i] ?? eff.description);
+                      const description = getCardEffectDescription(previewCard.id, i, locale, eff.description);
                       return (
                         <div key={i}>
                           <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{eff.type}</span>
@@ -766,17 +761,17 @@ export function SealedDeckBuilder({
                       </>
                     )}
                     <span className="text-[11px] font-bold" style={{ color: rarityColors[previewCard.rarity] ?? '#888' }}>
-                      {getRarityLabel(previewCard.rarity, locale)}
+                      {getRarityLabel(previewCard.rarity, tCardMeta)}
                     </span>
                     {previewCard.group && (
-                      <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{getCardGroup(previewCard.group, locale)}</span>
+                      <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{getCardGroup(previewCard.group, tCardMeta)}</span>
                     )}
                   </div>
                   {previewCard.keywords && previewCard.keywords.length > 0 && (
                     <div className="flex gap-1 mt-1 flex-wrap">
                       {previewCard.keywords.map((kw: string, i: number) => (
                         <span key={i} className="text-[9px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#1a1a2e', color: '#9999bb', border: '1px solid #2a2a3e' }}>
-                          {getCardKeyword(kw, locale)}
+                          {getCardKeyword(kw, tCardMeta)}
                         </span>
                       ))}
                     </div>
@@ -787,12 +782,7 @@ export function SealedDeckBuilder({
               {previewCard.effects?.length > 0 && (
                 <div className="mt-2 flex flex-col gap-1.5">
                   {previewCard.effects.map((eff: { type: string; description: string }, i: number) => {
-                    const raFallbackId = previewCard.id.endsWith('-RA') ? previewCard.id.replace('-RA', '-R') : undefined;
-                    const frDescs = effectDescriptionsFr[previewCard.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
-                    const enDescs = effectDescriptionsEn[previewCard.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
-                    const description = locale === 'fr'
-                      ? (frDescs?.[i] ?? eff.description)
-                      : (enDescs?.[i] ?? eff.description);
+                    const description = getCardEffectDescription(previewCard.id, i, locale, eff.description);
                     return (
                       <div key={i}>
                         <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{eff.type}</span>

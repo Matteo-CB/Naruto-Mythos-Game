@@ -2,6 +2,8 @@
 
 import { motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
+import { getCardName } from '@/lib/utils/cardLocale';
 import type { CardData } from '@/lib/engine/types';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
@@ -25,13 +27,6 @@ const RARITY_COLOR: Record<Rarity, string> = {
   L: '#d97676',
 };
 
-const RARITY_LABEL_FR: Record<Rarity, string> = {
-  RA: 'Rare Art',
-  MV: 'Mythos Variante',
-  SV: 'Secret Variante',
-  L: 'Légendaire',
-};
-
 export function BoosterRevealCard({
   card,
   isDuplicate,
@@ -42,6 +37,8 @@ export function BoosterRevealCard({
   instantReveal = false,
 }: BoosterRevealCardProps) {
   const reduceMotion = useReducedMotion();
+  const locale = useLocale();
+  const tSuffix = useTranslations('cardMeta.raritySuffix');
   const [flipped, setFlipped] = useState(instantReveal);
   const [zooming, setZooming] = useState(false);
   const imgPath = normalizeImagePath(card.image_file);
@@ -110,14 +107,14 @@ export function BoosterRevealCard({
           {imgPath ? (
             <img
               src={imgPath}
-              alt={card.name_fr}
+              alt={getCardName(card, locale)}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               loading="eager"
               decoding="async"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center" style={{ color: '#555', fontSize: 11 }}>
-              {card.name_fr}
+              {getCardName(card, locale)}
             </div>
           )}
           {flipped && <VariantHoloOverlay intensity="subtle" />}
@@ -142,7 +139,7 @@ export function BoosterRevealCard({
             textShadow: `0 0 8px ${accent}66`,
           }}
         >
-          {RARITY_LABEL_FR[rarity] ?? rarity}
+          {tSuffix.has(rarity) ? tSuffix(rarity) : rarity}
         </motion.div>
       )}
 

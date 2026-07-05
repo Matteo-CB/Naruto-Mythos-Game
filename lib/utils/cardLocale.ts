@@ -1,97 +1,49 @@
-import type { CardData, CharacterCard, MissionCard } from '../engine/types';
+export interface CardMetaTranslator {
+  (key: string): string;
+  has: (key: string) => boolean;
+}
 
-type Locale = 'en' | 'fr';
-type AnyCard = CardData | CharacterCard | MissionCard;
+interface LocalizableCard {
+  name_fr?: string;
+  name_en?: string;
+  title_fr?: string;
+  title_en?: string;
+}
 
-
-export function getCardName(card: AnyCard, locale: Locale): string {
-  if (locale === 'en' && card.name_en) return card.name_en;
-  return card.name_fr;
+function localizedField(card: LocalizableCard, base: 'name' | 'title', locale: string): string {
+  const rec = card as unknown as Record<string, unknown>;
+  const localized = rec[`${base}_${locale}`];
+  if (typeof localized === 'string' && localized) return localized;
+  const en = rec[`${base}_en`];
+  if (typeof en === 'string' && en) return en;
+  const fr = rec[`${base}_fr`];
+  return typeof fr === 'string' ? fr : '';
 }
 
 
-export function getCardTitle(card: AnyCard, locale: Locale): string {
-  if (locale === 'en' && card.title_en) return card.title_en;
-  return card.title_fr;
+export function getCardName(card: LocalizableCard, locale: string): string {
+  return localizedField(card, 'name', locale);
 }
 
 
-
-const GROUP_FR: Record<string, string> = {
-  'Leaf Village': 'Village de Konoha',
-  'Sand Village': 'Village du Sable',
-  'Sound Village': 'Village du Son',
-  'Akatsuki': 'Akatsuki',
-  'Independent': 'Indépendant',
-};
-
-export function getCardGroup(group: string, locale: Locale): string {
-  if (locale === 'fr') return GROUP_FR[group] ?? group;
-  return group;
+export function getCardTitle(card: LocalizableCard, locale: string): string {
+  return localizedField(card, 'title', locale);
 }
 
 
-
-const KEYWORD_FR: Record<string, string> = {
-  'Team 7': 'Équipe 7',
-  'Team 8': 'Équipe 8',
-  'Team 10': 'Équipe 10',
-  'Team Guy': 'Équipe Gaï',
-  'Team Baki': 'Équipe Baki',
-  'Sannin': 'Sannin',
-  'Summon': 'Invocation',
-  'Hokage': 'Hokage',
-  'Rogue Ninja': 'Ninja Déserteur',
-  'Sound Four': 'Quatre du Son',
-  'Sound Ninja': 'Ninja du Son',
-  'Kekkei Genkai': 'Kekkei Genkai',
-  'Taijutsu': 'Taijutsu',
-  'Jutsu': 'Jutsu',
-  'Weapon': 'Arme',
-  'Tailed Beast': 'Bijû',
-  'Ninja Hound': 'Chien Ninja',
-  'Ninja Pig': 'Cochon Ninja',
-  'Special Jonin': 'Jônin Spécial',
-};
-
-export function getCardKeyword(keyword: string, locale: Locale): string {
-  if (locale === 'fr') return KEYWORD_FR[keyword] ?? keyword;
-  return keyword;
+export function getCardGroup(group: string, t: CardMetaTranslator): string {
+  const key = `group.${group}`;
+  return t.has(key) ? t(key) : group;
 }
 
 
+export function getCardKeyword(keyword: string, t: CardMetaTranslator): string {
+  const key = `keyword.${keyword}`;
+  return t.has(key) ? t(key) : keyword;
+}
 
-const RARITY_LABELS_EN: Record<string, string> = {
-  C: 'Common',
-  UC: 'Uncommon',
-  R: 'Rare',
-  RA: 'Rare Art',
-  S: 'Secret',
-  SV: 'Secret V',
-  M: 'Mythos',
-  MV: 'Mythos V',
-  L: 'Legendary',
-  SP: 'Special',
-  SPV: 'Special V',
-  MMS: 'Mission',
-};
 
-const RARITY_LABELS_FR: Record<string, string> = {
-  C: 'Commune',
-  UC: 'Peu commune',
-  R: 'Rare',
-  RA: 'Rare Art',
-  S: 'Secrète',
-  SV: 'Secrète V',
-  M: 'Mythos',
-  MV: 'Mythos V',
-  L: 'Légendaire',
-  SP: 'Spéciale',
-  SPV: 'Spéciale V',
-  MMS: 'Mission',
-};
-
-export function getRarityLabel(rarity: string, locale: Locale): string {
-  if (locale === 'fr') return RARITY_LABELS_FR[rarity] ?? rarity;
-  return RARITY_LABELS_EN[rarity] ?? rarity;
+export function getRarityLabel(rarity: string, t: CardMetaTranslator): string {
+  const key = `rarity.${rarity}`;
+  return t.has(key) ? t(key) : rarity;
 }

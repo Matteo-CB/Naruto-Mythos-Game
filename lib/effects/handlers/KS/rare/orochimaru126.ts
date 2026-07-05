@@ -74,4 +74,6 @@ function orochimaru126UpgradeHandler(ctx: EffectContext): EffectResult {
 export function registerOrochimaru126Handlers(): void {
   registerEffect('KS-126-R', 'SCORE', orochimaru126ScoreHandler);
   registerEffect('KS-126-R', 'UPGRADE', orochimaru126UpgradeHandler);
+  registerEffect('KS-126-MV', 'SCORE', orochimaru126ScoreHandler);
+  registerEffect('KS-126-MV', 'UPGRADE', orochimaru126UpgradeHandler);
 }

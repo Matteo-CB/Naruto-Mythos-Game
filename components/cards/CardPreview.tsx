@@ -3,8 +3,7 @@
 import { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
-import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
-import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
+import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import type { CharacterCard, MissionCard, CardEffect, Rarity } from '@/lib/engine/types';
 import CardBack from './CardBack';
 
@@ -23,6 +22,10 @@ const RARITY_COLORS: Record<Rarity, string> = {
   L: '#eab308',
   SP: '#06b6d4',
   SPV: '#06b6d4',
+  POP: '#e84393',
+  POPV: '#e84393',
+  CHIBI: '#10b981',
+  CHIBIV: '#10b981',
   MMS: '#6b7280',
 };
 
@@ -31,6 +34,7 @@ const EFFECT_TYPE_COLORS: Record<string, string> = {
   UPGRADE: '#a78bfa',
   AMBUSH: '#f97316',
   SCORE: '#eab308',
+  DUEL: '#ef4444',
 };
 
 export interface CardPreviewProps {
@@ -44,6 +48,7 @@ export interface CardPreviewProps {
 function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = false }: CardPreviewProps) {
   const t = useTranslations();
   const locale = useLocale();
+  const tCardMeta = useTranslations('cardMeta');
   const imageSrc = useMemo(
     () => (card ? normalizeImagePath(card.image_file) : null),
     [card?.image_file]
@@ -141,7 +146,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                     fontWeight: 600,
                   }}
                 >
-                  {getRarityLabel(card.rarity, locale as 'en' | 'fr')}
+                  {getRarityLabel(card.rarity, tCardMeta)}
                 </span>
               </div>
             </div>
@@ -215,7 +220,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                         border: '1px solid #2a2a2a',
                       }}
                     >
-                      {getCardKeyword(kw, locale as 'en' | 'fr')}
+                      {getCardKeyword(kw, tCardMeta)}
                     </span>
                   ))}
                 </div>
@@ -229,7 +234,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                     marginBottom: '8px',
                   }}
                 >
-                  {getCardGroup(card.group, locale as 'en' | 'fr')}
+                  {getCardGroup(card.group, tCardMeta)}
                 </div>
               )}
 
@@ -241,12 +246,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                   }}
                 >
                   {card.effects.map((effect: CardEffect, idx: number) => {
-                    const raFallbackId = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
-                    const frDescriptions = effectDescriptionsFr[card.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
-                    const enDescriptions = effectDescriptionsEn[card.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
-                    const description = locale === 'fr'
-                      ? (frDescriptions?.[idx] ?? effect.description)
-                      : (enDescriptions?.[idx] ?? effect.description);
+                    const description = getCardEffectDescription(card.id, idx, locale, effect.description);
                     return (
                     <div key={idx} style={{ marginBottom: idx < card.effects.length - 1 ? '6px' : 0 }}>
                       <span

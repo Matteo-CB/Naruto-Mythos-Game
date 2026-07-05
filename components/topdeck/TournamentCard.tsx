@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { useLocaleBcp47 } from '@/lib/i18n/useLocaleMeta';
 import { Link } from '@/lib/i18n/navigation';
 import {
   type TdTournament,
@@ -27,8 +28,8 @@ function Meta({ label, value }: { label: string; value: string }) {
 
 export function TournamentCard({ t: data, index }: { t: TdTournament; index: number }) {
   const t = useTranslations('topdeck');
-  const locale = useLocale();
-  const date = formatTournamentDate(data.startDate, locale);
+  const bcp47 = useLocaleBcp47();
+  const date = formatTournamentDate(data.startDate, bcp47);
   const loc = formatLocation(data);
 
   return (

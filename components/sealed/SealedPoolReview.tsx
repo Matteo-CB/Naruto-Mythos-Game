@@ -42,6 +42,7 @@ const RARITY_COLORS: Record<string, string> = {
 export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
   const t = useTranslations('sealed');
   const locale = useLocale() as 'en' | 'fr';
+  const tCardMeta = useTranslations('cardMeta');
 
   const sortedCards = useMemo(
     () =>
@@ -93,7 +94,7 @@ export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
           .sort(([a], [b]) => (RARITY_ORDER[a] ?? 99) - (RARITY_ORDER[b] ?? 99))
           .map(([rarity, count]) => (
             <span key={rarity} className="text-xs font-bold" style={{ color: RARITY_COLORS[rarity] ?? '#888' }}>
-              {getRarityLabel(rarity, locale)}: {count}
+              {getRarityLabel(rarity, tCardMeta)}: {count}
             </span>
           ))}
       </div>
@@ -126,7 +127,7 @@ export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
   );
 }
 
-function PoolCard({ card, index, locale }: { card: BoosterCard; index: number; locale: 'en' | 'fr' }) {
+function PoolCard({ card, index, locale }: { card: BoosterCard; index: number; locale: string }) {
   const t = useTranslations('sealed');
   const imgPath = normalizeImagePath(card.image_file);
   const rarityColor = RARITY_COLORS[card.rarity] ?? '#888';

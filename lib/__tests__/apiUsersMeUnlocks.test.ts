@@ -36,6 +36,9 @@ vi.mock('@/lib/db/prisma', () => ({
 }));
 
 import { GET } from '@/app/api/users/me/unlocks/route';
+import { getForceUnlockedCardIds } from '@/lib/variants/forceUnlock';
+
+const FORCED = Array.from(getForceUnlockedCardIds());
 
 describe('GET /api/users/me/unlocks', () => {
   beforeEach(() => {
@@ -75,7 +78,7 @@ describe('GET /api/users/me/unlocks', () => {
     const body = await res.json();
     expect(res.status).toBe(200);
     expect(body.admin).toBe(false);
-    expect(body.unlockedCardIds.sort()).toEqual(['KS-104-RA', 'KS-133-MV']);
+    expect(body.unlockedCardIds.sort()).toEqual(['KS-104-RA', 'KS-133-MV', ...FORCED].sort());
   });
 
   it('returns empty array when new user has no unlocks', async () => {
@@ -84,7 +87,7 @@ describe('GET /api/users/me/unlocks', () => {
     fakeInvFindMany.mockResolvedValue([]);
     const res = await GET();
     const body = await res.json();
-    expect(body.unlockedCardIds).toEqual([]);
+    expect(body.unlockedCardIds.sort()).toEqual([...FORCED].sort());
     expect(body.admin).toBe(false);
   });
 

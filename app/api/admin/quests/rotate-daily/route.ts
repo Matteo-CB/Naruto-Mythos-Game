@@ -32,6 +32,8 @@ export async function POST(request: NextRequest) {
       questId: result.quest.id,
       text_fr: result.quest.text_fr,
       text_en: result.quest.text_en,
+      text_es: result.quest.text_es,
+      text_ja: result.quest.text_ja,
       level: result.quest.level,
       created: result.created,
     });

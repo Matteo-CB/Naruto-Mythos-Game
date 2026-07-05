@@ -5,6 +5,8 @@ import { create } from 'zustand';
 import type { VisibleGameState, GameAction } from '@/lib/engine/types';
 import { useSocialStore } from '@/stores/socialStore';
 import { useUIStore } from '@/stores/uiStore';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { playSound, setVolume, setMuted } from '@/lib/sound/SoundManager';
 
 const CONNECT_TIMEOUT_MS = 10000;
 
@@ -373,12 +375,24 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('room:player-joined', (data?: { gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving'; isEvolving?: boolean; holoHue?: number | null }) => {
         console.log('[Socket] Player joined, mode:', data?.gameMode ?? 'unchanged');
+        const wasAlone = !get().opponentJoined;
         set((s) => ({
           opponentJoined: true,
           currentRoomGameMode: data?.gameMode ?? s.currentRoomGameMode,
           currentRoomIsEvolving: typeof data?.isEvolving === 'boolean' ? data.isEvolving : s.currentRoomIsEvolving,
           currentRoomHoloHue: typeof data?.holoHue === 'number' ? data.holoHue : s.currentRoomHoloHue,
         }));
+
+        if (wasAlone && get().playerRole === 'player1') {
+          try {
+            const { soundEnabled, soundVolume } = useSettingsStore.getState();
+            if (soundEnabled) {
+              setMuted(false);
+              setVolume(soundVolume);
+              playSound('roomJoin');
+            }
+          } catch { /* sound is best-effort */ }
+        }
       });
 
       socket.on('room:player-left', () => {

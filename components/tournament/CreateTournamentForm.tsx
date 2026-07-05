@@ -5,10 +5,10 @@ import { useState } from 'react';
 import { useTournamentStore, type CreateTournamentInput } from '@/stores/tournamentStore';
 import { useRouter } from '@/lib/i18n/navigation';
 import { RANK_TIERS } from '@/components/EloBadge';
-import { ALL_SET_IDS, SET_REGISTRY, isSetAvailable } from '@/lib/data/sets/registry';
+import { ALL_SET_IDS, SET_REGISTRY, isSetAvailable, getSetName } from '@/lib/data/sets/registry';
 import { TOURNAMENT_PRIZE_CARD_IDS } from '@/lib/variants/constants';
 import { getCardById } from '@/lib/data/cardIndex';
-import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
+import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
 import Image from 'next/image';
 
 interface Props {
@@ -18,6 +18,7 @@ interface Props {
 export function CreateTournamentForm({ isAdmin }: Props) {
   const t = useTranslations('tournament');
   const tRoot = useTranslations();
+  const tCardMeta = useTranslations('cardMeta');
   const locale = useLocale();
   const router = useRouter();
   const { createTournament } = useTournamentStore();
@@ -235,7 +236,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
               <ToggleBtn val="random" cur={sealedSetChoice} onClick={() => setSealedSetChoice('random')}>{tRoot('sealed.setRandom')}</ToggleBtn>
               {ALL_SET_IDS.map((sid) => {
                 const desc = SET_REGISTRY[sid];
-                const name = locale === 'fr' ? desc.nameFr : desc.nameEn;
+                const name = getSetName(sid, locale);
                 const available = isSetAvailable(sid);
                 const cur = sealedSetChoice;
                 return (
@@ -274,7 +275,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
               {ALL_GROUPS.map(g => {
                 const sel = allowedGroups.includes(g);
                 return <button key={g} type="button" onClick={() => setAllowedGroups(prev => sel ? prev.filter(x => x !== g) : [...prev, g])}
-                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#1a3a1a' : '#1a1a1a', color: sel ? '#4ade80' : '#666', border: `1px solid ${sel ? '#4ade80' : '#333'}` }}>{g}</button>;
+                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#1a3a1a' : '#1a1a1a', color: sel ? '#4ade80' : '#666', border: `1px solid ${sel ? '#4ade80' : '#333'}` }}>{getCardGroup(g, tCardMeta)}</button>;
               })}
             </div>
           </div>
@@ -285,7 +286,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
               {ALL_GROUPS.map(g => {
                 const sel = bannedGroups.includes(g);
                 return <button key={g} type="button" onClick={() => setBannedGroups(prev => sel ? prev.filter(x => x !== g) : [...prev, g])}
-                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#3a1a1a' : '#1a1a1a', color: sel ? '#f87171' : '#666', border: `1px solid ${sel ? '#f87171' : '#333'}` }}>{g}</button>;
+                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#3a1a1a' : '#1a1a1a', color: sel ? '#f87171' : '#666', border: `1px solid ${sel ? '#f87171' : '#333'}` }}>{getCardGroup(g, tCardMeta)}</button>;
               })}
             </div>
           </div>
@@ -297,7 +298,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
               {ALL_KEYWORDS.map(kw => {
                 const sel = allowedKeywords.includes(kw);
                 return <button key={kw} type="button" onClick={() => setAllowedKeywords(prev => sel ? prev.filter(x => x !== kw) : [...prev, kw])}
-                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#1a3a1a' : '#1a1a1a', color: sel ? '#4ade80' : '#666', border: `1px solid ${sel ? '#4ade80' : '#333'}` }}>{kw}</button>;
+                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#1a3a1a' : '#1a1a1a', color: sel ? '#4ade80' : '#666', border: `1px solid ${sel ? '#4ade80' : '#333'}` }}>{getCardKeyword(kw, tCardMeta)}</button>;
               })}
             </div>
           </div>
@@ -308,7 +309,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
               {ALL_KEYWORDS.map(kw => {
                 const sel = bannedKeywords.includes(kw);
                 return <button key={kw} type="button" onClick={() => setBannedKeywords(prev => sel ? prev.filter(x => x !== kw) : [...prev, kw])}
-                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#3a1a1a' : '#1a1a1a', color: sel ? '#f87171' : '#666', border: `1px solid ${sel ? '#f87171' : '#333'}` }}>{kw}</button>;
+                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#3a1a1a' : '#1a1a1a', color: sel ? '#f87171' : '#666', border: `1px solid ${sel ? '#f87171' : '#333'}` }}>{getCardKeyword(kw, tCardMeta)}</button>;
               })}
             </div>
           </div>
@@ -320,7 +321,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
               {ALL_RARITIES.map(r => {
                 const sel = allowedRarities.includes(r);
                 return <button key={r} type="button" onClick={() => setAllowedRarities(prev => sel ? prev.filter(x => x !== r) : [...prev, r])}
-                  className="px-2 py-1 text-[10px] font-bold cursor-pointer" style={{ backgroundColor: sel ? '#1a3a1a' : '#1a1a1a', color: sel ? '#4ade80' : '#666', border: `1px solid ${sel ? '#4ade80' : '#333'}` }}>{r}</button>;
+                  className="px-2 py-1 text-[10px] font-bold cursor-pointer" style={{ backgroundColor: sel ? '#1a3a1a' : '#1a1a1a', color: sel ? '#4ade80' : '#666', border: `1px solid ${sel ? '#4ade80' : '#333'}` }}>{getRarityLabel(r, tCardMeta)}</button>;
               })}
             </div>
           </div>
@@ -331,7 +332,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
               {ALL_RARITIES.map(r => {
                 const sel = bannedRarities.includes(r);
                 return <button key={r} type="button" onClick={() => setBannedRarities(prev => sel ? prev.filter(x => x !== r) : [...prev, r])}
-                  className="px-2 py-1 text-[10px] font-bold cursor-pointer" style={{ backgroundColor: sel ? '#3a1a1a' : '#1a1a1a', color: sel ? '#f87171' : '#666', border: `1px solid ${sel ? '#f87171' : '#333'}` }}>{r}</button>;
+                  className="px-2 py-1 text-[10px] font-bold cursor-pointer" style={{ backgroundColor: sel ? '#3a1a1a' : '#1a1a1a', color: sel ? '#f87171' : '#666', border: `1px solid ${sel ? '#f87171' : '#333'}` }}>{getRarityLabel(r, tCardMeta)}</button>;
               })}
             </div>
           </div>
@@ -342,7 +343,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
             <div className="flex flex-wrap gap-2">
               {ALL_RARITIES.map(r => (
                 <div key={r} className="flex items-center gap-1">
-                  <span className="text-[10px] font-bold" style={{ color: '#888' }}>{r}:</span>
+                  <span className="text-[10px] font-bold" style={{ color: '#888' }}>{getRarityLabel(r, tCardMeta)}:</span>
                   <input type="number" min="0" max="30" value={maxPerRarity[r] ?? ''} placeholder="-"
                     onChange={(e) => setMaxPerRarity(prev => ({ ...prev, [r]: e.target.value }))}
                     className="w-10 text-center text-[10px]" style={{ backgroundColor: '#0a0a0a', border: '1px solid #333', color: '#e0e0e0', padding: '2px' }} />

@@ -1,17 +1,22 @@
 import { Resend } from 'resend';
+import { createTranslator } from 'next-intl';
+import { routing } from '@/lib/i18n/routing';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
+async function loadMessages(locale: string): Promise<Record<string, unknown>> {
+  const safe = (routing.locales as readonly string[]).includes(locale) ? locale : routing.defaultLocale;
+  return (await import(`@/messages/${safe}.json`)).default as Record<string, unknown>;
+}
+
 export async function sendResetEmail(email: string, token: string, locale: string = 'en') {
-  
   const resend = new Resend(process.env.RESEND_API_KEY);
   const resetUrl = `${APP_URL}/${locale}/reset-password?token=${token}`;
 
-  const isEn = locale === 'en';
+  const messages = await loadMessages(locale);
+  const t = createTranslator({ locale, messages, namespace: 'email.passwordReset' }) as unknown as (key: string) => string;
 
-  const subject = isEn
-    ? 'Naruto Mythos - Reset your password'
-    : 'Naruto Mythos - Reinitialiser votre mot de passe';
+  const subject = t('subject');
 
   const html = `
     <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #0a0a0a; color: #e0e0e0;">
@@ -19,18 +24,18 @@ export async function sendResetEmail(email: string, token: string, locale: strin
         Naruto Mythos TCG
       </h1>
       <p style="text-align: center; color: #888888; font-size: 14px; margin-top: 24px;">
-        ${isEn ? 'You requested a password reset.' : 'Vous avez demande une reinitialisation de mot de passe.'}
+        ${t('intro')}
       </p>
       <div style="text-align: center; margin: 32px 0;">
         <a href="${resetUrl}" style="display: inline-block; padding: 12px 32px; background: #c4a35a; color: #0a0a0a; text-decoration: none; font-weight: bold; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">
-          ${isEn ? 'Reset Password' : 'Reinitialiser'}
+          ${t('button')}
         </a>
       </div>
       <p style="text-align: center; color: #555555; font-size: 12px;">
-        ${isEn ? 'This link expires in 1 hour.' : 'Ce lien expire dans 1 heure.'}
+        ${t('expiry')}
       </p>
       <p style="text-align: center; color: #555555; font-size: 12px;">
-        ${isEn ? 'If you did not request this, ignore this email.' : 'Si vous n\'avez pas fait cette demande, ignorez cet email.'}
+        ${t('ignore')}
       </p>
     </div>
   `;

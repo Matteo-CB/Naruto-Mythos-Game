@@ -63,7 +63,7 @@ export function SandboxToolbar() {
 
           <div className="w-px h-4 mx-0.5" style={{ backgroundColor: '#333' }} />
 
-          <ToolbarButton label="+5 Chakra" onClick={() => sandboxAddChakra(5)} />
+          <ToolbarButton label={`+5 ${t('game.chakra')}`} onClick={() => sandboxAddChakra(5)} />
 
           {chakraInput ? (
             <div className="flex items-center gap-1">
@@ -480,7 +480,7 @@ function BoardCharactersModal({
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-[10px] font-bold px-1.5 py-0.5" style={{
                       backgroundColor: 'rgba(196,163,90,0.15)', color: '#c4a35a',
-                    }}>Mission {rankLabels[mi] || mi + 1}</span>
+                    }}>{t('sandbox.missionRank', { rank: rankLabels[mi] || mi + 1 })}</span>
                     <span className="text-[10px]" style={{ color: '#666' }}>
                       {getCardName(m.card, locale as 'en' | 'fr')}
                     </span>
@@ -589,7 +589,7 @@ function MoveCharacterModal({
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-[10px] font-bold px-1.5 py-0.5" style={{
                       backgroundColor: 'rgba(196,163,90,0.15)', color: '#c4a35a',
-                    }}>Mission {rankLabels[mi] || mi + 1}</span>
+                    }}>{t('sandbox.missionRank', { rank: rankLabels[mi] || mi + 1 })}</span>
                   </div>
                   <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
                     {allChars.map((char) => {
@@ -656,7 +656,7 @@ function DeckCardItem({
       {imagePath ? (
         <img
           src={imagePath}
-          alt={card.name_en || card.name_fr}
+          alt={getCardName(card, locale as 'en' | 'fr')}
           className="w-full h-full"
           style={{ objectFit: 'cover' }}
           draggable={false}
@@ -680,7 +680,7 @@ function DeckCardItem({
         className="absolute bottom-0 left-0 right-0 text-[7px] text-center truncate px-0.5"
         style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: '#ccc' }}
       >
-        {card.name_en || card.name_fr}
+        {getCardName(card, locale as 'en' | 'fr')}
       </span>
       <span
         onClick={(e) => { e.stopPropagation(); zoomCard(card); }}

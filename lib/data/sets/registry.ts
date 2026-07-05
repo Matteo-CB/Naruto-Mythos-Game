@@ -5,6 +5,8 @@ export interface SetDescriptor {
   number: number;
   nameEn: string;
   nameFr: string;
+  nameEs?: string;
+  nameJa?: string;
   status: SetStatus;
   boosterImage: string;
   releaseDate?: string;
@@ -16,6 +18,7 @@ export const SET_REGISTRY: Record<string, SetDescriptor> = {
     number: 1,
     nameEn: 'Konoha Shido',
     nameFr: 'Konoha Shido',
+    nameJa: '木ノ葉指導',
     status: 'available',
     boosterImage: '/images/booster-KS.webp',
     releaseDate: '2025-09-15',
@@ -25,6 +28,7 @@ export const SET_REGISTRY: Record<string, SetDescriptor> = {
     number: 2,
     nameEn: 'Shinobi Shiren',
     nameFr: 'Shinobi Shiren',
+    nameJa: '忍びの試練',
     status: 'coming_soon',
     boosterImage: '/images/booster-SS.webp',
   },
@@ -33,6 +37,7 @@ export const SET_REGISTRY: Record<string, SetDescriptor> = {
     number: 3,
     nameEn: 'Akatsuki',
     nameFr: 'Akatsuki',
+    nameJa: '暁',
     status: 'coming_soon',
     boosterImage: '/images/booster-unknown.webp',
   },
@@ -62,8 +67,10 @@ export function getSet(setId: string): SetDescriptor | undefined {
   return SET_REGISTRY[setId];
 }
 
-export function getSetName(setId: string, locale: 'en' | 'fr' = 'en'): string {
+export function getSetName(setId: string, locale: string = 'en'): string {
   const set = SET_REGISTRY[setId];
   if (!set) return setId;
-  return locale === 'fr' ? set.nameFr : set.nameEn;
+  const localized = (set as unknown as Record<string, unknown>)[`name${locale.charAt(0).toUpperCase()}${locale.slice(1)}`];
+  if (typeof localized === 'string' && localized) return localized;
+  return set.nameEn || set.nameFr;
 }

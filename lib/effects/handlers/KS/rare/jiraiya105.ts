@@ -76,4 +76,6 @@ function jiraiya105UpgradeHandler(ctx: EffectContext): EffectResult {
 export function registerJiraiya105Handlers(): void {
   registerEffect('KS-105-R', 'MAIN', handleJiraiya105Main);
   registerEffect('KS-105-R', 'UPGRADE', jiraiya105UpgradeHandler);
+  registerEffect('KS-105-MV', 'MAIN', handleJiraiya105Main);
+  registerEffect('KS-105-MV', 'UPGRADE', jiraiya105UpgradeHandler);
 }

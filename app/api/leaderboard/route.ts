@@ -56,6 +56,7 @@ export async function GET(request: NextRequest) {
       select: {
         id: true,
         username: true,
+        countryCode: true,
         elo: true,
         evolvingElo: true,
         wins: true,
@@ -84,7 +85,7 @@ export async function GET(request: NextRequest) {
       if (search) unrankedConditions.push({ username: { contains: search, mode: 'insensitive' as const } });
       const allUsers = await prisma.user.findMany({
         where: { AND: unrankedConditions },
-        select: { id: true, username: true, elo: true, evolvingElo: true, wins: true, losses: true, draws: true, evolvingWins: true, evolvingLosses: true, evolvingDraws: true, role: true, badgePrefs: true, consecutiveWins: true, consecutiveLosses: true, tournamentWins: true },
+        select: { id: true, username: true, countryCode: true, elo: true, evolvingElo: true, wins: true, losses: true, draws: true, evolvingWins: true, evolvingLosses: true, evolvingDraws: true, role: true, badgePrefs: true, consecutiveWins: true, consecutiveLosses: true, tournamentWins: true },
         orderBy: { createdAt: 'desc' },
         take: 500,
       });

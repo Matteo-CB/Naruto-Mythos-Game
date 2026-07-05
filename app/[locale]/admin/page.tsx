@@ -8,6 +8,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import CardFace from '@/components/cards/CardFace';
 import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoader';
+import { getCardName } from '@/lib/utils/cardLocale';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
@@ -552,7 +553,7 @@ export default function AdminPage() {
                     <div key={card.id} className="flex flex-col rounded-lg overflow-hidden" style={{ backgroundColor: '#141414', border: `1px solid ${isBanned ? '#b33e3e40' : '#262626'}`, opacity: isBanned ? 0.6 : 1, transition: 'opacity 0.2s, border-color 0.2s' }}>
                       <div style={{ width: '100%' }}><CardFace card={card} /></div>
                       <div className="p-2 flex flex-col gap-1.5">
-                        <div style={{ fontSize: '11px', fontWeight: 600, color: '#e0e0e0', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.name_fr}</div>
+                        <div style={{ fontSize: '11px', fontWeight: 600, color: '#e0e0e0', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{getCardName(card, locale)}</div>
                         <div style={{ fontSize: '10px', color: '#555555' }}>{card.id}</div>
                         <button onClick={() => toggleBan(card.id)} disabled={isToggling} className="w-full py-1.5 text-xs font-bold uppercase tracking-wider transition-colors" style={{ backgroundColor: isBanned ? '#1a0a0a' : '#0a1a0a', border: `1px solid ${isBanned ? '#b33e3e' : '#4a9e4a'}`, color: isBanned ? '#b33e3e' : '#4a9e4a', opacity: isToggling ? 0.5 : 1, cursor: isToggling ? 'wait' : 'pointer' }}>
                           {isBanned ? tc('adminCards.banned') : tc('adminCards.authorized')}

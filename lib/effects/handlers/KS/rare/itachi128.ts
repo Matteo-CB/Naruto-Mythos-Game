@@ -85,4 +85,6 @@ function canMoveToDestination(
 export function registerItachi128Handlers(): void {
   registerEffect('KS-128-R', 'MAIN', itachi128MainHandler);
   registerEffect('KS-128-R', 'UPGRADE', itachi128UpgradeHandler);
+  registerEffect('KS-128_2-MV', 'MAIN', itachi128MainHandler);
+  registerEffect('KS-128_2-MV', 'UPGRADE', itachi128UpgradeHandler);
 }

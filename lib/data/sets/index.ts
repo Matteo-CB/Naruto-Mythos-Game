@@ -2,16 +2,22 @@ import {
   cardData as ksCardData,
   effectDescriptionsFr as ksFr,
   effectDescriptionsEn as ksEn,
+  effectDescriptionsEs as ksEs,
+  effectDescriptionsJa as ksJa,
 } from './KS';
 import {
   cardData as ssCardData,
   effectDescriptionsFr as ssFr,
   effectDescriptionsEn as ssEn,
+  effectDescriptionsEs as ssEs,
+  effectDescriptionsJa as ssJa,
 } from './SS';
 import {
   cardData as akCardData,
   effectDescriptionsFr as akFr,
   effectDescriptionsEn as akEn,
+  effectDescriptionsEs as akEs,
+  effectDescriptionsJa as akJa,
 } from './AK';
 
 
@@ -28,3 +34,5 @@ export const allCardData = {
 
 export const allEffectDescriptionsFr: Record<string, string[]> = { ...ksFr, ...ssFr, ...akFr };
 export const allEffectDescriptionsEn: Record<string, string[]> = { ...ksEn, ...ssEn, ...akEn };
+export const allEffectDescriptionsEs: Record<string, string[]> = { ...ksEs, ...ssEs, ...akEs };
+export const allEffectDescriptionsJa: Record<string, string[]> = { ...ksJa, ...ssJa, ...akJa };

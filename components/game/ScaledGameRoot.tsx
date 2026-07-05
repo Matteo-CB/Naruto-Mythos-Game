@@ -3,9 +3,9 @@
 import React, { useEffect, useState, type ReactNode } from 'react';
 import { GameScaleContext, MOBILE_FIXED_DIMS } from './GameScaleContext';
 
-const BASE_WIDTH = 1920;
-const MIN_BASE_HEIGHT = 800;
-const MAX_BASE_HEIGHT = 1080;
+const BASE_WIDTH = 1180;
+const MIN_BASE_HEIGHT = 520;
+const MAX_BASE_HEIGHT = 670;
 
 interface Props {
   children: ReactNode;

@@ -1,49 +1,41 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { routing } from '@/lib/i18n/routing';
 
 const SITE_URL = 'https://narutomythosgame.com';
 
-const PAGE_NAMES: Record<string, Record<string, string>> = {
-  collection: { en: 'Card Collection', fr: 'Collection de Cartes' },
-  'deck-builder': { en: 'Deck Builder', fr: 'Constructeur de Deck' },
-  leaderboard: { en: 'ELO Leaderboard', fr: 'Classement ELO' },
-  login: { en: 'Sign In', fr: 'Connexion' },
-  register: { en: 'Create Account', fr: 'Creer un Compte' },
-  legal: { en: 'Legal Notice', fr: 'Mentions Legales' },
-  friends: { en: 'Friends', fr: 'Amis' },
-};
-
-const PLAY_NAMES: Record<string, Record<string, string>> = {
-  ai: { en: 'Play vs AI', fr: "Jouer contre l'IA" },
-  online: { en: 'Play Online', fr: 'Jouer en Ligne' },
-};
+const PAGE_SLUGS = ['collection', 'deck-builder', 'leaderboard', 'login', 'register', 'legal', 'friends'];
+const PLAY_SLUGS = ['ai', 'online'];
 
 export function BreadcrumbJsonLd() {
   const pathname = usePathname();
+  const t = useTranslations('breadcrumbs');
   if (!pathname) return null;
 
   const segments = pathname.split('/').filter(Boolean);
   if (segments.length < 2) return null;
 
   const locale = segments[0];
-  if (locale !== 'en' && locale !== 'fr') return null;
+  if (!(routing.locales as readonly string[]).includes(locale)) return null;
 
   const items: Array<{ name: string; url: string }> = [
-    { name: 'Naruto Mythos TCG', url: `${SITE_URL}/${locale}` },
+    { name: t('root'), url: `${SITE_URL}/${locale}` },
   ];
 
   const pageSlug = segments[1];
 
   if (pageSlug === 'play' && segments[2]) {
     const playType = segments[2];
+    if (!PLAY_SLUGS.includes(playType)) return null;
     items.push({
-      name: PLAY_NAMES[playType]?.[locale] || playType,
+      name: t(`play.${playType}`),
       url: `${SITE_URL}/${locale}/play/${playType}`,
     });
-  } else if (PAGE_NAMES[pageSlug]) {
+  } else if (PAGE_SLUGS.includes(pageSlug)) {
     items.push({
-      name: PAGE_NAMES[pageSlug][locale] || pageSlug,
+      name: t(`page.${pageSlug}`),
       url: `${SITE_URL}/${locale}/${pageSlug}`,
     });
   } else {

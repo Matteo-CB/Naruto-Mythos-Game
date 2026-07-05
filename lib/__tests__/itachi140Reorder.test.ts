@@ -128,7 +128,7 @@ describe('Itachi 140 (KS-140-S) reorder discard targets the right cards', () => 
     }
   });
 
-  it('REORDER_DISCARD consumer preserves non-target cards and moves only the targeted ones to the end in chosen order', () => {
+  it('REORDER_DISCARD reorders the targeted cards IN PLACE (keeps non-target cards, incl. a later-defeated card, at their positions)', () => {
     const discard = [
       { ...mockCard({ id: 'OLD-A' }), instanceId: 'old-a' },
       { ...mockCard({ id: 'I-1' }), instanceId: 'i1' },
@@ -162,10 +162,7 @@ describe('Itachi 140 (KS-140-S) reorder discard targets the right cards', () => 
 
     const finalPile = result.player1.discardPile;
     expect(finalPile.length).toBe(5);
-    expect((finalPile[0] as unknown as { instanceId: string }).instanceId).toBe('old-a');
-    expect((finalPile[1] as unknown as { instanceId: string }).instanceId).toBe('old-b');
-    expect((finalPile[2] as unknown as { instanceId: string }).instanceId).toBe('i2');
-    expect((finalPile[3] as unknown as { instanceId: string }).instanceId).toBe('i1');
-    expect((finalPile[4] as unknown as { instanceId: string }).instanceId).toBe('i3');
+    const ids = (finalPile as unknown as Array<{ instanceId: string }>).map((c) => c.instanceId);
+    expect(ids).toEqual(['old-a', 'i2', 'i1', 'old-b', 'i3']);
   });
 });

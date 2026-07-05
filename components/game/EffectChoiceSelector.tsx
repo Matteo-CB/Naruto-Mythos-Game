@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { localizeMessageParams } from '@/lib/i18n/localizeMessageParams';
+import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import {
@@ -26,6 +28,7 @@ const DEFAULT_STYLE = { accent: '#555555', text: '#e0e0e0', bg: 'rgba(85, 85, 85
 
 export function EffectChoiceSelector() {
   const t = useTranslations();
+  const locale = useLocale();
   const pendingTargetSelection = useGameStore((s) => s.pendingTargetSelection);
   const selectTarget = useGameStore((s) => s.selectTarget);
   const declineTarget = useGameStore((s) => s.declineTarget);
@@ -65,7 +68,7 @@ export function EffectChoiceSelector() {
 
   if (effectPopupMinimized) {
     const effectDesc = descriptionKey
-      ? t(descriptionKey, descriptionParams as Record<string, string> | undefined)
+      ? t(descriptionKey, localizeMessageParams(descriptionParams, locale) as Record<string, string> | undefined)
       : (description || t('game.board.restoreEffect'));
     return <PopupMinimizePill text={effectDesc} onRestore={restoreEffectPopup} />;
   }
@@ -81,7 +84,7 @@ export function EffectChoiceSelector() {
           </PopupTitle>
 
           <PopupDescription>
-            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+            {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
           </PopupDescription>
 
           <div className="flex flex-col gap-3 mb-5">
@@ -132,7 +135,9 @@ export function EffectChoiceSelector() {
                     className="font-body text-[12px] leading-relaxed flex-1"
                     style={{ color: '#c8c8c8' }}
                   >
-                    {choice.description}
+                    {choice.cardId != null && choice.effectIndex != null
+                      ? getCardEffectDescription(choice.cardId, choice.effectIndex, locale, choice.description)
+                      : choice.description}
                   </span>
                 </motion.button>
               );

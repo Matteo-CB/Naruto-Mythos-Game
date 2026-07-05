@@ -47,6 +47,8 @@ export async function GET() {
       hook: q.hook,
       text_fr: q.text_fr,
       text_en: q.text_en,
+      text_es: q.text_es,
+      text_ja: q.text_ja,
       scope: q.scope,
       xpReward: QUEST_XP_BY_LEVEL[q.level],
       progress: row?.progress ?? 0,

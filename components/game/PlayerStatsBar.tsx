@@ -5,9 +5,11 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { ChessClockDisplay } from '@/components/game/ChessClockDisplay';
+import { useGameScale } from './GameScaleContext';
 
 export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
   const t = useTranslations();
+  const dims = useGameScale();
   const visibleState = useGameStore((s) => s.visibleState);
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
 
@@ -42,36 +44,37 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
       }}
     >
       
-      <span className="text-xs font-semibold shrink-0" style={{ color: '#c4a35a' }}>
+      <span className="font-semibold shrink-0" style={{ fontSize: dims.isMobile ? '14px' : '12px', color: '#c4a35a' }}>
         {playerName}
       </span>
 
       <div className="flex items-center gap-1 shrink-0" title={t('game.edge')}>
         <div
           style={{
-            width: 8,
-            height: 8,
+            width: dims.isMobile ? 10 : 8,
+            height: dims.isMobile ? 10 : 8,
             transform: 'rotate(45deg)',
             backgroundColor: hasEdge ? '#c4a35a' : 'rgba(255, 255, 255, 0.1)',
             boxShadow: hasEdge ? '0 0 6px rgba(196, 163, 90, 0.6)' : 'none',
           }}
         />
-        <span className="text-[10px]" style={{ color: hasEdge ? '#c4a35a' : '#555555' }}>
+        <span style={{ fontSize: dims.isMobile ? '12px' : '10px', color: hasEdge ? '#c4a35a' : '#555555' }}>
           {t('game.edge')}
         </span>
       </div>
 
       <div className="flex items-center gap-1.5 shrink-0">
-        <span className="text-[10px]" style={{ color: '#888888' }}>
+        <span style={{ fontSize: dims.isMobile ? '12px' : '10px', color: '#888888' }}>
           {t('game.turnLabel')}
         </span>
-        <span className="text-xs font-bold tabular-nums" style={{ color: '#c4a35a' }}>
+        <span className="font-bold tabular-nums" style={{ fontSize: dims.isMobile ? '15px' : '12px', color: '#c4a35a' }}>
           {turn}
         </span>
-        <span className="text-[10px]" style={{ color: '#555555' }}>/4</span>
+        <span style={{ fontSize: dims.isMobile ? '12px' : '10px', color: '#555555' }}>/4</span>
         <span
-          className="text-[10px] px-1.5 py-0.5"
+          className="px-1.5 py-0.5"
           style={{
+            fontSize: dims.isMobile ? '12px' : '10px',
             backgroundColor: 'rgba(196, 163, 90, 0.12)',
             color: '#c4a35a',
           }}
@@ -82,16 +85,16 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
 
       <div className="flex-1" />
 
-      <StatPill label={t('game.chakra')} value={myState.chakra} color="#c4a35a" />
+      <StatPill label={t('game.chakra')} value={myState.chakra} color="#c4a35a" isMobile={dims.isMobile} />
 
-      <StatPill label={t('game.score')} value={myState.missionPoints} color="#e0e0e0" accent="#c4a35a" />
+      <StatPill label={t('game.score')} value={myState.missionPoints} color="#e0e0e0" accent="#c4a35a" isMobile={dims.isMobile} />
 
       <ChessClockDisplay player={myPlayer} isOpponent={false} />
     </div>
   );
 });
 
-function StatPill({ label, value, color }: { label: string; value: number; color: string; accent?: string }) {
+function StatPill({ label, value, color, isMobile }: { label: string; value: number; color: string; accent?: string; isMobile?: boolean }) {
   return (
     <div className="flex items-baseline gap-1.5 sm:gap-2 px-1.5 sm:px-2 shrink-0">
       <span
@@ -99,7 +102,7 @@ function StatPill({ label, value, color }: { label: string; value: number; color
         style={{
           color: '#666666',
           letterSpacing: '0.22em',
-          fontSize: 'clamp(8px, 1vw, 10px)',
+          fontSize: isMobile ? '11px' : 'clamp(8px, 1vw, 10px)',
           lineHeight: 1,
         }}
       >
@@ -113,7 +116,7 @@ function StatPill({ label, value, color }: { label: string; value: number; color
         className="tabular-nums font-bold leading-none"
         style={{
           color,
-          fontSize: 'clamp(14px, 1.6vw, 18px)',
+          fontSize: isMobile ? '20px' : 'clamp(14px, 1.6vw, 18px)',
           letterSpacing: '-0.01em',
           textShadow: `0 1px 3px rgba(0,0,0,0.8), 0 0 10px ${color}55`,
         }}

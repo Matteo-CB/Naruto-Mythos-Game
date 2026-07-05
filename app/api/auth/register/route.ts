@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/db/prisma';
+import { COUNTRY_CODES } from '@/lib/data/countries';
 import { validateUsername } from '@/lib/auth/usernameValidator';
 import { normalizeEmailBase } from '@/lib/auth/emailBase';
 
@@ -99,12 +100,15 @@ export async function POST(request: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    const countryCode = (typeof body.countryCode === 'string' && COUNTRY_CODES.has(body.countryCode)) ? body.countryCode : null;
+
     const user = await prisma.user.create({
       data: {
         username,
         email,
         password: hashedPassword,
         emailBase,
+        countryCode,
       } as never,
     }) as { id: string; username: string; email: string; elo: number };
 

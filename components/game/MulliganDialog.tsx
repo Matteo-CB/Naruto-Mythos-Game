@@ -8,8 +8,7 @@ import { useUIStore } from '@/stores/uiStore';
 import type { CharacterCard } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
-import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
-import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
+import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import { playSound } from '@/lib/sound/SoundManager';
 import { useGameScale } from './GameScaleContext';
 import {
@@ -146,6 +145,7 @@ function MulliganCard({
 function MulliganCardDetail({ card }: { card: CharacterCard }) {
   const t = useTranslations();
   const locale = useLocale() as 'en' | 'fr';
+  const tCardMeta = useTranslations('cardMeta');
   const title = getCardTitle(card, locale);
 
   return (
@@ -220,7 +220,7 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
                     color: '#999999',
                   }}
                 >
-                  {getCardKeyword(kw, locale)}
+                  {getCardKeyword(kw, tCardMeta)}
                 </span>
               ))}
             </div>
@@ -228,7 +228,7 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
 
           {card.group && (
             <span className="font-body text-[10px]" style={{ color: '#777777' }}>
-              {t('collection.details.group')}: {getCardGroup(card.group, locale)}
+              {t('collection.details.group')}: {getCardGroup(card.group, tCardMeta)}
             </span>
           )}
 
@@ -241,13 +241,7 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
                 {t('card.effects')}
               </span>
               {card.effects.map((effect, i) => {
-                const raFallbackId = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
-                const frDescs = effectDescriptionsFr[card.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
-                const enDescs = effectDescriptionsEn[card.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
-                const description =
-                  locale === 'fr'
-                    ? (frDescs?.[i] ?? enDescs?.[i] ?? effect.description)
-                    : (enDescs?.[i] ?? effect.description);
+                const description = getCardEffectDescription(card.id, i, locale, effect.description);
 
                 return (
                   <div

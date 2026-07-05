@@ -1,6 +1,8 @@
 import { Resend } from 'resend';
+import { createTranslator } from 'next-intl';
+import { routing } from '@/lib/i18n/routing';
 
-export type ThankYouLocale = 'fr' | 'en';
+export type ThankYouLocale = string;
 
 export interface ThankYouMailParams {
   to: string;
@@ -12,50 +14,51 @@ export interface ThankYouMailParams {
 }
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'https://narutomythosgame.com';
+const DISCORD_URL = 'https://discord.gg/BBXVUsU3hn';
 
-function formatAmountEur(amountCents: number): string {
-  const euros = (amountCents / 100).toFixed(2);
-  return `${euros.replace('.', ',')} €`;
+type MailTranslator = (key: string, values?: Record<string, string>) => string;
+
+async function loadMessages(locale: string): Promise<Record<string, unknown>> {
+  const safe = (routing.locales as readonly string[]).includes(locale) ? locale : routing.defaultLocale;
+  return (await import(`@/messages/${safe}.json`)).default as Record<string, unknown>;
 }
 
-export function renderThankYouSubject(locale: ThankYouLocale): string {
-  return locale === 'fr'
-    ? 'Merci pour ton soutien à Naruto Mythos TCG'
-    : 'Thanks for supporting Naruto Mythos TCG';
+function mailTranslator(locale: string, messages: Record<string, unknown>): MailTranslator {
+  return createTranslator({ locale, messages, namespace: 'email.donationThankYou' }) as unknown as MailTranslator;
 }
 
-export function renderThankYouHtml(params: ThankYouMailParams): string {
+function formatAmountEur(amountCents: number, bcp47: string): string {
+  return new Intl.NumberFormat(bcp47, { style: 'currency', currency: 'EUR' }).format(amountCents / 100);
+}
+
+export async function renderThankYouSubject(locale: ThankYouLocale): Promise<string> {
+  const messages = await loadMessages(locale);
+  const t = mailTranslator(locale, messages);
+  return t('subject');
+}
+
+export async function renderThankYouHtml(params: ThankYouMailParams): Promise<string> {
   const { amountCents, recurring, locale, recipientName, managePortalUrl } = params;
-  const amount = formatAmountEur(amountCents);
-  const greeting = recipientName
-    ? locale === 'fr'
-      ? `Salut ${recipientName},`
-      : `Hi ${recipientName},`
-    : locale === 'fr'
-      ? 'Salut,'
-      : 'Hi,';
+  const messages = await loadMessages(locale);
+  const bcp47 = ((messages._meta as { bcp47?: string } | undefined)?.bcp47) ?? 'en-US';
+  const t = mailTranslator(locale, messages);
+  const amount = formatAmountEur(amountCents, bcp47);
 
-  const intro = locale === 'fr'
-    ? `Merci pour ton ${recurring ? `abonnement de ${amount}/mois` : `don de ${amount}`}. C'est grâce à des soutiens comme le tien que le simulateur peut continuer à grandir.`
-    : `Thanks for your ${recurring ? `${amount}/month subscription` : `${amount} donation`}. Supporters like you are why the simulator can keep growing.`;
+  const greeting = recipientName ? t('greetingNamed', { name: recipientName }) : t('greeting');
+  const intro = recurring ? t('introRecurring', { amount }) : t('introOneTime', { amount });
 
-  const feedback = locale === 'fr'
-    ? `Si tu as des questions ou des idées d'amélioration, rejoins le <a href="https://discord.gg/BBXVUsU3hn" style="color:#c4a35a;">Discord du serveur</a> ou poste une suggestion sur <a href="${APP_URL}/fr/help-us" style="color:#c4a35a;">la page Contribuer</a>.`
-    : `If you have questions or ideas, join the <a href="https://discord.gg/BBXVUsU3hn" style="color:#c4a35a;">server Discord</a> or post a suggestion on <a href="${APP_URL}/en/help-us" style="color:#c4a35a;">the Contribute page</a>.`;
+  const discordLink = `<a href="${DISCORD_URL}" style="color:#c4a35a;">${t('discordLinkLabel')}</a>`;
+  const contributeLink = `<a href="${APP_URL}/${locale}/help-us" style="color:#c4a35a;">${t('contributeLinkLabel')}</a>`;
+  const feedback = t('feedback', { discordLink, contributeLink });
 
   const portalBlock = recurring && managePortalUrl
     ? `<p style="text-align: center; color: #888888; font-size: 13px; margin-top: 24px;">
-        <a href="${managePortalUrl}" style="color: #c4a35a;">${locale === 'fr' ? 'Gérer ou annuler mon abonnement' : 'Manage or cancel my subscription'}</a>
+        <a href="${managePortalUrl}" style="color: #c4a35a;">${t('managePortal')}</a>
       </p>`
     : '';
 
-  const signoff = locale === 'fr'
-    ? 'À bientôt sur le simulateur.'
-    : 'See you on the simulator.';
-
-  const signature = locale === 'fr'
-    ? 'Kutayt (dev du simulateur)'
-    : 'Kutayt (simulator dev)';
+  const signoff = t('signoff');
+  const signature = t('signature');
 
   return `
     <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #0a0a0a; color: #e0e0e0;">
@@ -78,8 +81,8 @@ export async function sendDonationThankYouMail(params: ThankYouMailParams): Prom
     return { ok: false, reason: 'no_api_key' };
   }
   const resend = new Resend(apiKey);
-  const subject = renderThankYouSubject(params.locale);
-  const html = renderThankYouHtml(params);
+  const subject = await renderThankYouSubject(params.locale);
+  const html = await renderThankYouHtml(params);
 
   try {
     const { error } = await resend.emails.send({

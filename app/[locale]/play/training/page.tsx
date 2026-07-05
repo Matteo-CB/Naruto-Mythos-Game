@@ -12,7 +12,7 @@ import { useTrainingStore } from '@/stores/trainingStore';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { AIDifficulty } from '@/lib/ai/AIPlayer';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
-import { isVariantRarity } from '@/lib/variants/constants';
+import { isLockedVariant } from '@/lib/variants/constants';
 import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 
 interface ResolvedDeck {
@@ -57,7 +57,7 @@ export default function TrainingPage() {
     setIsLoading(true);
 
     const availableChars = cards.characters.filter((c) => !bannedIds.has(c.id));
-    const randomPool = availableChars.filter((c) => !isVariantRarity(c.rarity) || unlockedIds.has(c.id));
+    const randomPool = availableChars.filter((c) => !isLockedVariant(c.rarity) || unlockedIds.has(c.id));
     const availableMissions = cards.missions.filter((m) => !bannedIds.has(m.id));
 
     const player1Deck = selectedDeck

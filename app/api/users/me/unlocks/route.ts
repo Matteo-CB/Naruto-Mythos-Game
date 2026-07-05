@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { isAdmin } from '@/lib/auth/admins';
 import { allVariantCards } from '@/lib/variants/variantPool';
 import { getVariantInventory } from '@/lib/variants/inventory';
+import { getForceUnlockedCardIds } from '@/lib/variants/forceUnlock';
 
 export async function GET() {
   const session = await auth();
@@ -28,9 +29,10 @@ export async function GET() {
   }
 
   const inventory = await getVariantInventory(userId);
+  const unlockedCardIds = Array.from(new Set([...Object.keys(inventory), ...getForceUnlockedCardIds()]));
   return NextResponse.json({
     inventory,
-    unlockedCardIds: Object.keys(inventory),
+    unlockedCardIds,
     admin: false,
   });
 }

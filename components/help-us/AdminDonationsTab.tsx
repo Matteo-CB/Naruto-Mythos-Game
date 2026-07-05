@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 const ACCENT = '#c4a35a';
 
@@ -42,16 +42,11 @@ const STATUS_COLORS: Record<Status, { text: string; bg: string }> = {
   cancelled: { text: '#7fa3d4', bg: 'rgba(127,163,212,0.10)' },
 };
 
-function formatEur(cents: number, locale: string): string {
-  const euros = cents / 100;
-  if (locale === 'fr') {
-    const fixed = euros.toFixed(2).replace('.', ',');
-    return `${fixed} €`;
-  }
-  return `€${euros.toFixed(2)}`;
+function formatEur(cents: number, bcp47: string): string {
+  return new Intl.NumberFormat(bcp47, { style: 'currency', currency: 'EUR' }).format(cents / 100);
 }
 
-function formatDateTime(iso: string, locale: string): string {
+function formatDateTime(iso: string, bcp47: string): string {
   const d = new Date(iso);
   if (!Number.isFinite(d.getTime())) return '';
   const opts: Intl.DateTimeFormatOptions = {
@@ -61,7 +56,7 @@ function formatDateTime(iso: string, locale: string): string {
     hour: '2-digit',
     minute: '2-digit',
   };
-  return new Intl.DateTimeFormat(locale === 'fr' ? 'fr-FR' : 'en-US', opts).format(d);
+  return new Intl.DateTimeFormat(bcp47, opts).format(d);
 }
 
 function isoDateInput(value: string): string {
@@ -71,7 +66,7 @@ function isoDateInput(value: string): string {
 export function AdminDonationsTab() {
   const t = useTranslations('helpUs.admin');
   const tStatus = useTranslations('helpUs.admin.donationStatus');
-  const locale = useLocale();
+  const tMeta = useTranslations('_meta');
 
   const [status, setStatus] = useState<'' | Status>('');
   const [mode, setMode] = useState<Mode>('');
@@ -133,8 +128,8 @@ export function AdminDonationsTab() {
   return (
     <div className="flex flex-col gap-5">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <StatTile label={t('stats.monthTotal')} value={totals ? formatEur(totals.monthCents, locale) : '…'} />
-        <StatTile label={t('stats.lifetimeTotal')} value={totals ? formatEur(totals.lifetimeCents, locale) : '…'} />
+        <StatTile label={t('stats.monthTotal')} value={totals ? formatEur(totals.monthCents, tMeta('bcp47')) : '…'} />
+        <StatTile label={t('stats.lifetimeTotal')} value={totals ? formatEur(totals.lifetimeCents, tMeta('bcp47')) : '…'} />
         <StatTile label={t('stats.activeSubs')} value={totals ? String(totals.activeSubscriptions) : '…'} />
       </div>
 
@@ -218,10 +213,10 @@ export function AdminDonationsTab() {
                 return (
                   <tr key={r.id} style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
                     <td className="px-2 py-2.5 whitespace-nowrap text-[12px]" style={{ color: '#bbb' }}>
-                      {formatDateTime(r.paidAt ?? r.createdAt, locale)}
+                      {formatDateTime(r.paidAt ?? r.createdAt, tMeta('bcp47'))}
                     </td>
                     <td className="px-2 py-2.5 text-right font-display" style={{ color: '#e8e8e8' }}>
-                      {formatEur(r.amountCents, locale)}
+                      {formatEur(r.amountCents, tMeta('bcp47'))}
                     </td>
                     <td className="px-2 py-2.5 hidden sm:table-cell text-[12px]" style={{ color: '#bbb' }}>
                       {r.mode === 'subscription' ? t('donations.filterModeMonthly') : t('donations.filterModeOneTime')}

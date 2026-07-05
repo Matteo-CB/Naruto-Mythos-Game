@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { createBillingPortalSession } from '@/lib/stripe/checkout';
+import { routing } from '@/lib/i18n/routing';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'https://narutomythosgame.com';
 
-function pickLocale(value: unknown): 'fr' | 'en' {
-  return value === 'en' ? 'en' : 'fr';
+function pickLocale(value: unknown): string {
+  return typeof value === 'string' && (routing.locales as readonly string[]).includes(value)
+    ? value
+    : routing.defaultLocale;
 }
 
 function pickReturnTo(value: unknown): 'settings' | 'help-us' {

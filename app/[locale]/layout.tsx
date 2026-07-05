@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/lib/i18n/routing';
 import { SessionProvider } from 'next-auth/react';
@@ -24,29 +24,30 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
 
-  const titles: Record<string, string> = {
-    en: 'Naruto Mythos TCG - Free Online Naruto Card Game',
-    fr: 'Naruto Mythos TCG - Jeu de Cartes Naruto Gratuit en Ligne',
-  };
+  const t = await getTranslations({ locale, namespace: 'seo' });
+  const tMeta = await getTranslations({ locale, namespace: '_meta' });
 
-  const descriptions: Record<string, string> = {
-    en: 'Free online Naruto Mythos card game simulator. Build decks, play vs AI or online, climb ELO rankings. Deck builder, tournaments and matchmaking.',
-    fr: 'Simulateur du jeu de cartes Naruto Mythos gratuit en ligne. Construisez vos decks, jouez contre l\'IA ou en ligne, grimpez le classement ELO. Deck builder, tournois et matchmaking.',
-  };
+  const languages: Record<string, string> = {};
+  const alternateLocale: string[] = [];
+  for (const loc of routing.locales) {
+    languages[loc] = `${SITE_URL}/${loc}`;
+    if (loc !== locale) {
+      const otherMeta = await getTranslations({ locale: loc, namespace: '_meta' });
+      alternateLocale.push(otherMeta('ogLocale'));
+    }
+  }
+  languages['x-default'] = `${SITE_URL}/${routing.defaultLocale}`;
 
   return {
-    title: titles[locale] || titles.en,
-    description: descriptions[locale] || descriptions.en,
+    title: t('siteTitle'),
+    description: t('siteDescription'),
     alternates: {
       canonical: `${SITE_URL}/${locale}`,
-      languages: {
-        en: `${SITE_URL}/en`,
-        fr: `${SITE_URL}/fr`,
-      },
+      languages,
     },
     openGraph: {
-      locale: locale === 'fr' ? 'fr_FR' : 'en_US',
-      alternateLocale: locale === 'fr' ? 'en_US' : 'fr_FR',
+      locale: tMeta('ogLocale'),
+      alternateLocale,
     },
   };
 }
@@ -59,6 +60,8 @@ export default async function LocaleLayout({ children, params }: Props) {
   }
 
   const messages = await getMessages();
+  const tSeo = await getTranslations({ locale, namespace: 'seo' });
+  const inLanguage = [...routing.locales];
 
   const webAppJsonLd = {
     '@context': 'https://schema.org',
@@ -68,9 +71,7 @@ export default async function LocaleLayout({ children, params }: Props) {
     applicationCategory: 'GameApplication',
     operatingSystem: 'Web Browser',
     browserRequirements: 'Requires JavaScript',
-    description: locale === 'fr'
-      ? "Simulateur du jeu de cartes Naruto Mythos gratuit en ligne. IA, multijoueur, deck builder et classement ELO."
-      : 'Free Naruto Mythos card game simulator. AI, multiplayer, deck builder, and ELO rankings.',
+    description: tSeo('webAppDescription'),
     offers: {
       '@type': 'Offer',
       price: '0',
@@ -89,7 +90,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       bestRating: '5',
       worstRating: '1',
     },
-    inLanguage: ['en', 'fr'],
+    inLanguage,
     genre: 'Card Game',
   };
 
@@ -97,9 +98,7 @@ export default async function LocaleLayout({ children, params }: Props) {
     '@context': 'https://schema.org',
     '@type': 'VideoGame',
     name: 'Naruto Mythos TCG',
-    description: locale === 'fr'
-      ? 'Simulateur du jeu de cartes Naruto Mythos gratuit. Decks, IA, matchmaking en ligne et tournois.'
-      : 'Free Naruto Mythos card game simulator. Decks, AI, online matchmaking and tournaments.',
+    description: tSeo('videoGameDescription'),
     url: `${SITE_URL}/${locale}`,
     image: `${SITE_URL}/images/og-image.webp`,
     genre: ['Card Game', 'Strategy Game', 'Collectible Card Game'],
@@ -123,7 +122,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       name: 'HiddenLab',
       url: 'https://hiddenlab.fr',
     },
-    inLanguage: ['en', 'fr'],
+    inLanguage,
   };
 
   const orgJsonLd = {

@@ -1,24 +1,25 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
+import { routing } from '@/lib/i18n/routing';
 
 const SITE_URL = 'https://narutomythosgame.com';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'seoPages.game' });
 
-  const title = locale === 'fr'
-    ? 'Plateau de Jeu - Partie en Cours | Naruto Mythos TCG'
-    : 'Game Board - Match in Progress | Naruto Mythos TCG';
-
-  const description = locale === 'fr'
-    ? 'Plateau de jeu interactif du Naruto Mythos TCG. Jouez vos cartes personnage sur les missions, gerez votre chakra, activez les effets MAIN, UPGRADE, AMBUSH et SCORE, et remportez les missions pour marquer des points. Interface immersive avec animations cinematiques et apercu des cartes en temps reel.'
-    : 'Interactive Naruto Mythos TCG game board. Play your character cards on missions, manage your chakra, activate MAIN, UPGRADE, AMBUSH, and SCORE effects, and win missions to score points. Immersive interface with cinematic animations and real-time card previews.';
+  const title = t('title');
+  const description = t('description');
+  const languages: Record<string, string> = {};
+  for (const loc of routing.locales) languages[loc] = `${SITE_URL}/${loc}/game`;
+  languages['x-default'] = `${SITE_URL}/${routing.defaultLocale}/game`;
 
   return {
     title,
     description,
     alternates: {
       canonical: `${SITE_URL}/${locale}/game`,
-      languages: { en: `${SITE_URL}/en/game`, fr: `${SITE_URL}/fr/game` },
+      languages,
     },
     openGraph: {
       title,

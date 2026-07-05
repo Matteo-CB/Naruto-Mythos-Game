@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/db/prisma';
 import { isAdmin } from '@/lib/auth/admins';
 import { getCardById } from '@/lib/data/cardIndex';
-import { isVariantCard } from './isVariant';
+import { isLockedVariantCard } from './isVariant';
 import { getOwnedVariantIds } from './inventory';
+import { isForceUnlockedCard } from './forceUnlock';
 
 export interface DeckVariantCheckResult {
   ok: boolean;
@@ -15,8 +16,9 @@ export async function validateDeckVariantUnlocks(
 ): Promise<DeckVariantCheckResult> {
   const variantIdsInDeck: string[] = [];
   for (const id of cardIds) {
+    if (isForceUnlockedCard(id)) continue;
     const card = getCardById(id);
-    if (card && isVariantCard(card)) variantIdsInDeck.push(id);
+    if (card && isLockedVariantCard(card)) variantIdsInDeck.push(id);
   }
   if (variantIdsInDeck.length === 0) return { ok: true, lockedCardIds: [] };
 

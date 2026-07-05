@@ -46,6 +46,8 @@ export async function GET() {
       target: quest.target,
       text_fr: quest.text_fr,
       text_en: quest.text_en,
+      text_es: quest.text_es,
+      text_ja: quest.text_ja,
       xpReward: QUEST_XP_BY_LEVEL[quest.level],
     },
     progress: synced.progress,

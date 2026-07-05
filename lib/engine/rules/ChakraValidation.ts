@@ -122,6 +122,11 @@ export function calculateEffectiveCost(
       if (enemyTopCard.number === 125 && effect.description.includes('additional 1 Chakra')) {
         cost += 1;
       }
+
+
+      if (enemyTopCard.set === 'SS' && enemyTopCard.number === 120 && isReveal && effect.description.includes('1 more Chakra')) {
+        cost += 1;
+      }
     }
   }
 

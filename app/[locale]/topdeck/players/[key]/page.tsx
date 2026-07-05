@@ -2,7 +2,8 @@
 
 import { use, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { useLocaleBcp47 } from '@/lib/i18n/useLocaleMeta';
 import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
@@ -46,7 +47,7 @@ export default function TopdeckPlayerStatsPage({ params }: { params: Promise<{ k
   const { key } = use(params);
   const t = useTranslations('topdeck.players');
   const tdt = useTranslations('topdeck.detail');
-  const locale = useLocale();
+  const bcp47 = useLocaleBcp47();
   const [data, setData] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -115,7 +116,7 @@ export default function TopdeckPlayerStatsPage({ params }: { params: Promise<{ k
                     <span className="font-display tabular-nums text-sm" style={{ color: r.standing && r.standing <= 3 ? '#c4a35a' : '#888' }}>{r.standing != null ? `#${r.standing}` : '-'}</span>
                     <span className="flex flex-col min-w-0">
                       <span className="font-display text-sm truncate" style={{ color: '#e8e2d4' }}>{r.tournamentName}</span>
-                      <span className="font-display text-[11px]" style={{ color: '#6a6a6a' }}>{r.format}{r.startDate ? `, ${formatTournamentDate(r.startDate, locale)}` : ''}</span>
+                      <span className="font-display text-[11px]" style={{ color: '#6a6a6a' }}>{r.format}{r.startDate ? `, ${formatTournamentDate(r.startDate, bcp47)}` : ''}</span>
                     </span>
                     <span className="font-display tabular-nums text-xs text-right" style={{ color: '#9a9a9a' }}>{pct(r.winRate)}</span>
                   </Link>

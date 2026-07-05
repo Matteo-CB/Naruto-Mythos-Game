@@ -17,7 +17,7 @@ function DeckPile({ count, accentColor }: { count: number; accentColor: string }
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className="text-[9px] uppercase tracking-wider font-medium" style={{ color: '#666' }}>
+      <span className="uppercase tracking-wider font-medium" style={{ fontSize: dims.isMobile ? '11px' : '9px', color: '#666' }}>
         {t('game.deck')}
       </span>
       <div className="relative" style={{ width: CARD_W + 6, height: CARD_H + 6 }}>
@@ -172,7 +172,7 @@ function DiscardPile({
       >
         {count}
       </motion.span>
-      <span className="text-[9px] uppercase tracking-wider font-medium" style={{ color: '#666' }}>
+      <span className="uppercase tracking-wider font-medium" style={{ fontSize: dims.isMobile ? '11px' : '9px', color: '#666' }}>
         {t('game.discard')}
       </span>
     </div>

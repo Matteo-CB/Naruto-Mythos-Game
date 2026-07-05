@@ -57,6 +57,8 @@ model User {
   questProgresses         QuestProgress[]
   dailyQuestProgresses    DailyQuestProgress[]
   stripeCustomerId        String?
+  hideDeckBuilderVariants Boolean              @default(false)
+  countryCode             String?
 
   @@index([elo])
   @@index([createdAt])
@@ -609,4 +611,21 @@ model TopdeckPlayerResult {
   @@unique([tid, playerKey])
   @@index([playerKey])
   @@index([playerName])
+}
+
+model CardUsageStat {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  cardId    String   @unique
+  count     Int      @default(0)
+  rate      Float    @default(0)
+  tier      String   @default("NU")
+  updatedAt DateTime @updatedAt
+}
+
+model CardUsageMeta {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  key           String   @unique @default("singleton")
+  totalDecks    Int      @default(0)
+  activePlayers Int      @default(0)
+  computedAt    DateTime @default(now())
 }

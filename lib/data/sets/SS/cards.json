@@ -1,5 +1,42 @@
 {
   "cards": {
+    "SS-112-SPV": {
+      "id": "SS-112-SPV",
+      "cardId": "SS-112-SPV",
+      "rarity": "SPV",
+      "number": "112",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NEJI HYUGA",
+      "name_ja": "日向ネジ",
+      "name_fr": "NEJI HYUGA",
+      "name_es": "NEJI HYUGA",
+      "title_en": "You never meant to be a ninja.",
+      "title_ja": "「お前は忍びになるべきではなかった。」",
+      "title_fr": "Tu n'étais pas fait pour devenir un ninja.",
+      "title_es": "Nunca estuviste destinado a ser un ninja.",
+      "has_visual": false,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team Guy",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Remove all Power tokens from an enemy character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Hinata Hyuga: Hide an enemy character without Power tokens in this mission."
+        }
+      ],
+      "rarity_display": "Special V",
+      "data_complete": true,
+      "old_id": "112/140 V"
+    },
     "SS-122-SPV": {
       "id": "SS-122-SPV",
       "rarity": "SPV",
@@ -7,8 +44,11 @@
       "set": "SS",
       "card_type": "character",
       "name_en": "MINATO NAMIKAZE",
+      "name_ja": "波風ミナト",
       "name_fr": "MINATO NAMIKAZE",
       "title_en": "One Shinobi faced the Nine-Tailed Fox in mortal combat.",
+      "title_ja": "一人の忍が九尾の妖狐と死闘を繰り広げた。",
+      "title_es": "Un shinobi se enfrentó al Zorro de las Nueve Colas en un combate a muerte.",
       "title_fr": "Un seul shinobi affronta le Renard à Neuf Queues dans un combat mortel.",
       "has_visual": true,
       "chakra": 5,
@@ -28,6 +68,231 @@
       "image_file": "images/cards/SS/sp_v/SS-122-SPV.webp",
       "data_complete": true,
       "old_id": "122/140 V"
+    },
+    "SS-121-R": {
+      "id": "SS-121-R",
+      "cardId": "SS-121-R",
+      "rarity": "R",
+      "number": "121",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_ja": "うずまきナルト",
+      "name_fr": "NARUTO UZUMAKI",
+      "name_es": "NARUTO UZUMAKI",
+      "title_en": "Don't ever underestimate me!",
+      "title_ja": "「オレを甘く見るな！」",
+      "title_fr": "Ne me sous-estime jamais !",
+      "title_es": "¡No me subestimes nunca!",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every friendly Naruto Uzumaki in play."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kiba Inuzuka: Move the card at the bottom of this upgrade stack to another mission."
+        }
+      ],
+      "rarity_display": "Rare",
+      "data_complete": true,
+      "old_id": "121/140",
+      "image_url": "/images/cards/SS/rare/SS-121-R.webp",
+      "image_file": "images/cards/SS/rare/SS-121-R.webp"
+    },
+    "SS-134-R": {
+      "id": "SS-134-R",
+      "cardId": "SS-134-R",
+      "rarity": "R",
+      "number": "134",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KURENAI YUHI",
+      "name_ja": "夕日紅",
+      "name_fr": "KURENAI YUHI",
+      "name_es": "KURENAI YUHI",
+      "title_en": "Alright... Let's end this!",
+      "title_ja": "「よし…終わらせよう！」",
+      "title_fr": "Bien... Finissons-en !",
+      "title_es": "Muy bien... ¡Acabemos con esto!",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Itachi Uchiha: Defeat the strongest enemy character in this mission if they have at least 6 Power."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "DUEL effect: Instead, defeat them if they have at least 5 Power."
+        }
+      ],
+      "rarity_display": "Rare",
+      "data_complete": true,
+      "old_id": "134/140"
+    },
+    "SS-126-SPV": {
+      "id": "SS-126-SPV",
+      "cardId": "SS-126-SPV",
+      "rarity": "SPV",
+      "number": "126",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_ja": "うちはサスケ",
+      "name_fr": "SASUKE UCHIHA",
+      "name_es": "SASUKE UCHIHA",
+      "title_en": "All I cared about was surviving to defeat my brother.",
+      "title_ja": "「兄を倒すために生き延びることだけを考えていた。」",
+      "title_fr": "Tout ce qui m'importait, c'était de survivre pour vaincre mon frère.",
+      "title_es": "Lo único que me importaba era sobrevivir para derrotar a mi hermano.",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every Sound Village character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Orochimaru: Play a Sound Village character anywhere, paying 3 less."
+        }
+      ],
+      "rarity_display": "Special V",
+      "data_complete": true,
+      "old_id": "126/140 V"
+    },
+    "SS-120-CHIBIV": {
+      "id": "SS-120-CHIBIV",
+      "cardId": "SS-120-CHIBIV",
+      "rarity": "CHIBIV",
+      "number": "120",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KIBA INUZUKA",
+      "name_ja": "犬塚キバ",
+      "name_fr": "KIBA INUZUKA",
+      "name_es": "KIBA INUZUKA",
+      "title_en": "I can smell you, kid.",
+      "title_ja": "「においで分かるぜ、坊主。」",
+      "title_fr": "Je peux te sentir, gamin.",
+      "title_es": "Puedo olerte, chico.",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 8"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] The opponent must pay 1 more Chakra when revealing characters from hidden in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Naruto Uzumaki: Hide an enemy character with Power 4 or less in play."
+        }
+      ],
+      "rarity_display": "Chibi V",
+      "data_complete": true,
+      "old_id": "120/140 V"
+    },
+    "SS-147-POPV": {
+      "id": "SS-147-POPV",
+      "cardId": "SS-147-POPV",
+      "rarity": "POPV",
+      "number": "147",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_ja": "うずまきナルト",
+      "name_fr": "NARUTO UZUMAKI",
+      "name_es": "NARUTO UZUMAKI",
+      "title_en": "I'm finding my own Ninja way.",
+      "title_ja": "「オレは自分の忍道を貫く。」",
+      "title_fr": "Je trace ma propre voie du ninja.",
+      "title_es": "Estoy encontrando mi propio camino ninja.",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Enemy characters cannot move out of this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Sasuke Uchiha: POWERUP 1 for every non-hidden enemy character in play."
+        }
+      ],
+      "rarity_display": "Pop V",
+      "data_complete": true,
+      "old_id": "147/140 V",
+      "image_url": "/images/cards/SS/pop_v/SS-147-POPV.webp",
+      "image_file": "images/cards/SS/pop_v/SS-147-POPV.webp"
+    },
+    "SS-000-L": {
+      "id": "SS-000-L",
+      "cardId": "SS-000-L",
+      "rarity": "L",
+      "number": "000",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KAKASHI HATAKE",
+      "name_ja": "はたけカカシ",
+      "name_fr": "KAKASHI HATAKE",
+      "name_es": "KAKASHI HATAKE",
+      "title_en": "Make-Out Paradise",
+      "title_ja": "イチャイチャパラダイス",
+      "title_fr": "Le Paradis du Batifolage",
+      "title_es": "Icha Icha Paradise",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Search your deck for up to 2 Ninja Hound characters, reveal and draw them, then shuffle your deck. Play any number of Ninja Hound characters anywhere, paying 1 less."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Zabuza Momochi: Repeat the MAIN effect."
+        }
+      ],
+      "rarity_display": "Legendary",
+      "data_complete": true,
+      "old_id": "SS-L",
+      "image_url": "/images/cards/SS/legendary/SS-000-L.webp",
+      "image_file": "images/cards/SS/legendary/SS-000-L.webp"
     }
   }
 }

@@ -8,26 +8,10 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useSocketStore } from '@/lib/socket/client';
 import type { GameLogEntry, GamePhase } from '@/lib/engine/types';
+import { localizeMessageParams as localizeParams } from '@/lib/i18n/localizeMessageParams';
+import { useGameScale } from './GameScaleContext';
 
 const EMPTY_LOG: GameLogEntry[] = [];
-
-function localizeParams(
-  params: Record<string, string | number> | undefined,
-  locale: string,
-): Record<string, string | number> | undefined {
-  if (!params || locale !== 'en') return params;
-  const result = { ...params };
-  const enSuffix = '_en';
-  for (const key of Object.keys(result)) {
-    if (key.endsWith(enSuffix)) {
-      const baseKey = key.slice(0, -enSuffix.length);
-      if (baseKey in result) {
-        result[baseKey] = result[key];
-      }
-    }
-  }
-  return result;
-}
 
 const phaseTranslationKeys: Record<string, string> = {
   setup: 'game.phase.start',
@@ -46,11 +30,12 @@ function formatTimestamp(ts: number): string {
   return `${mins}:${secs}`;
 }
 
-const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDisplayNames, locale }: {
+const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDisplayNames, locale, isMobile }: {
   entry: GameLogEntry;
   formatPhase: (phase: GamePhase) => string;
   playerDisplayNames: { player1: string; player2: string };
   locale: string;
+  isMobile: boolean;
 }) {
   const t = useTranslations();
   const playerColor = entry.player === 'player1' ? '#c4a35a' : '#b33e3e';
@@ -61,7 +46,7 @@ const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDispla
       initial={{ opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.2 }}
-      className="flex flex-col gap-1.5 px-4 py-3 font-body"
+      className={`flex flex-col gap-1.5 px-4 font-body ${isMobile ? 'py-2' : 'py-3'}`}
       style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}
     >
 
@@ -72,7 +57,7 @@ const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDispla
             backgroundColor: 'rgba(196, 163, 90, 0.10)',
             color: '#888888',
             letterSpacing: '0.12em',
-            fontSize: '8.5px',
+            fontSize: isMobile ? '10.5px' : '8.5px',
           }}
         >
           T{entry.turn} {formatPhase(entry.phase)}
@@ -80,7 +65,7 @@ const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDispla
         {entry.player && (
           <span
             className="shrink-0 font-bold uppercase"
-            style={{ color: playerColor, fontSize: '10px', letterSpacing: '0.12em' }}
+            style={{ color: playerColor, fontSize: isMobile ? '12px' : '10px', letterSpacing: '0.12em' }}
           >
             {displayName}
           </span>
@@ -88,8 +73,8 @@ const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDispla
       </div>
 
       <div
-        className="text-[13px] leading-relaxed"
-        style={{ color: '#e8e8e8', paddingLeft: 2 }}
+        className="leading-relaxed"
+        style={{ fontSize: isMobile ? '15px' : '13px', color: '#e8e8e8', paddingLeft: 2 }}
       >
         {entry.messageKey ? t(entry.messageKey, localizeParams(entry.messageParams, locale) ?? {}) : (entry.details || entry.action)}
       </div>
@@ -100,6 +85,7 @@ const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDispla
 export function GameLog() {
   const t = useTranslations();
   const locale = useLocale();
+  const dims = useGameScale();
   const log = useGameStore((s) => s.visibleState?.log ?? EMPTY_LOG);
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
   const showGameLog = useUIStore((s) => s.showGameLog);
@@ -131,7 +117,7 @@ export function GameLog() {
       {!showGameLog && (
         <button
           onClick={toggleGameLog}
-          className="fixed right-4 z-40 px-3 py-2 text-xs font-medium cursor-pointer uppercase tracking-wider"
+          className={`fixed right-4 z-40 font-medium cursor-pointer uppercase tracking-wider ${dims.isMobile ? 'px-4 py-2.5 text-sm' : 'px-3 py-2 text-xs'}`}
           style={{
             top: toggleTopPx,
             backgroundColor: 'rgba(196, 163, 90, 0.10)',
@@ -154,7 +140,7 @@ export function GameLog() {
             style={{
               top: panelTopPx,
               height: `calc(100% - ${panelTopPx}px)`,
-              width: 'min(320px, calc(100vw - 8px))',
+              width: dims.isMobile ? 'min(420px, 55%)' : 'min(320px, calc(100vw - 8px))',
               backgroundColor: 'rgba(8, 8, 12, 0.97)',
               boxShadow: '-8px 0 24px rgba(0,0,0,0.5)',
             }}
@@ -172,7 +158,7 @@ export function GameLog() {
               </span>
               <button
                 onClick={toggleGameLog}
-                className="text-xs px-3 py-1 cursor-pointer uppercase tracking-wider font-bold"
+                className={`cursor-pointer uppercase tracking-wider font-bold ${dims.isMobile ? 'text-sm px-4 py-1.5' : 'text-xs px-3 py-1'}`}
                 style={{
                   backgroundColor: 'rgba(179, 62, 62, 0.18)',
                   border: 'none',
@@ -195,7 +181,7 @@ export function GameLog() {
                 </div>
               ) : (
                 log.map((entry, i) => (
-                  <LogEntry key={`${entry.timestamp}-${i}`} entry={entry} formatPhase={formatPhase} playerDisplayNames={playerDisplayNames} locale={locale} />
+                  <LogEntry key={`${entry.timestamp}-${i}`} entry={entry} formatPhase={formatPhase} playerDisplayNames={playerDisplayNames} locale={locale} isMobile={dims.isMobile} />
                 ))
               )}
             </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToastStore } from '@/stores/toastStore';
 import { ConfirmDeleteModal } from './ConfirmDeleteModal';
@@ -36,10 +36,10 @@ interface ListResponse {
 const STATUSES: Status[] = ['open', 'planned', 'in_progress', 'to_fix', 'done', 'rejected'];
 const CATEGORIES: Category[] = ['bug', 'feature', 'balance', 'ui', 'other'];
 
-function formatDateTime(iso: string, locale: string): string {
+function formatDateTime(iso: string, bcp47: string): string {
   const d = new Date(iso);
   if (!Number.isFinite(d.getTime())) return '';
-  return new Intl.DateTimeFormat(locale === 'fr' ? 'fr-FR' : 'en-US', {
+  return new Intl.DateTimeFormat(bcp47, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -51,7 +51,7 @@ export function AdminSuggestionsTab() {
   const tStatus = useTranslations('helpUs.suggestions.status');
   const tCategory = useTranslations('helpUs.suggestions.category');
   const tAdmin = useTranslations('helpUs.admin');
-  const locale = useLocale();
+  const tMeta = useTranslations('_meta');
   const showToast = useToastStore((s) => s.showToast);
 
   const [filterCategory, setFilterCategory] = useState<Category | ''>('');
@@ -262,7 +262,7 @@ export function AdminSuggestionsTab() {
                       </span>
                     </div>
                     <p className="font-body text-[12px] mb-1" style={{ color: '#888' }}>
-                      {r.username} · {formatDateTime(r.createdAt, locale)} · {r.voteCount} votes
+                      {r.username} · {formatDateTime(r.createdAt, tMeta('bcp47'))} · {r.voteCount} votes
                     </p>
                     <p className="font-body text-[13px] leading-relaxed whitespace-pre-wrap" style={{ color: '#bbb' }}>
                       {r.body}

@@ -76,11 +76,11 @@ export function formatLocation(t: {
   return t.locationName ?? '';
 }
 
-export function formatTournamentDate(iso: string | null, locale: string): string {
+export function formatTournamentDate(iso: string | null, bcp47: string): string {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
-  return new Intl.DateTimeFormat(locale === 'fr' ? 'fr-FR' : 'en-US', {
+  return new Intl.DateTimeFormat(bcp47, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',

@@ -23,19 +23,19 @@ interface ActiveSubscription {
   amountCents: number;
 }
 
-function formatEur(amountCents: number, locale: string): string {
+function formatEur(amountCents: number, bcp47: string): string {
   const euros = amountCents / 100;
-  if (locale === 'fr') {
-    const fixed = Number.isInteger(euros) ? `${euros}` : euros.toFixed(2).replace('.', ',');
-    return `${fixed} €`;
-  }
-  const fixed = Number.isInteger(euros) ? `${euros}` : euros.toFixed(2);
-  return `€${fixed}`;
+  return new Intl.NumberFormat(bcp47, {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: Number.isInteger(euros) ? 0 : 2,
+  }).format(euros);
 }
 
 export function DonationSection() {
   const t = useTranslations('helpUs.donate');
   const locale = useLocale();
+  const tMeta = useTranslations('_meta');
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
@@ -220,7 +220,7 @@ export function DonationSection() {
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm font-body">
-              {t('alreadySubscribed', { amount: formatEur(activeSub.amountCents, locale) })}
+              {t('alreadySubscribed', { amount: formatEur(activeSub.amountCents, tMeta('bcp47')) })}
             </span>
             <button
               type="button"
@@ -297,7 +297,7 @@ export function DonationSection() {
               }}
               aria-pressed={isActive}
             >
-              {formatEur(cents, locale)}
+              {formatEur(cents, tMeta('bcp47'))}
               {mode === 'subscription' && (
                 <span className="block text-[10px] mt-0.5" style={{ color: isActive ? ACCENT : '#888' }}>
                   {t('perMonth')}

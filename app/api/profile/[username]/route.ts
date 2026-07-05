@@ -30,6 +30,7 @@ export async function GET(
       select: {
         id: true,
         username: true,
+        countryCode: true,
         elo: true,
         evolvingElo: true,
         wins: true,

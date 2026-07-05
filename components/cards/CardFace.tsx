@@ -1,10 +1,9 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { CharacterCard, MissionCard, Rarity } from '@/lib/engine/types';
-import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
-import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
+import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import CardBack from './CardBack';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
@@ -21,6 +20,10 @@ const RARITY_COLORS: Record<Rarity, string> = {
   L: '#eab308',       // gold
   SP: '#06b6d4',      // cyan (Special)
   SPV: '#06b6d4',     // cyan (Special Variant)
+  POP: '#e84393',     // magenta (Pop)
+  POPV: '#e84393',    // magenta (Pop Variant)
+  CHIBI: '#10b981',   // emerald (Chibi)
+  CHIBIV: '#10b981',  // emerald (Chibi Variant)
   MMS: '#6b7280',     // gray
 };
 
@@ -34,6 +37,7 @@ export interface CardFaceProps {
 
 function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = false, banned = false }: CardFaceProps) {
   const locale = useLocale();
+  const tCardMeta = useTranslations('cardMeta');
 
   if (banned) {
     return <CardBack className={className} />;
@@ -120,7 +124,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
               fontSize: '0.4em',
               marginBottom: '3%',
             }}>
-              {getCardGroup(card.group, locale as 'en' | 'fr')}
+              {getCardGroup(card.group, tCardMeta)}
             </div>
           )}
           
@@ -143,7 +147,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
                     border: '1px solid #2a2a2a',
                   }}
                 >
-                  {getCardKeyword(kw, locale as 'en' | 'fr')}
+                  {getCardKeyword(kw, tCardMeta)}
                 </span>
               ))}
             </div>
@@ -344,12 +348,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
           }}
         >
           {card.effects.map((effect, idx) => {
-            const raFallbackId = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
-            const frDescriptions = effectDescriptionsFr[card.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
-            const enDescriptions = effectDescriptionsEn[card.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
-            const description = locale === 'fr'
-              ? (frDescriptions?.[idx] ?? effect.description)
-              : (enDescriptions?.[idx] ?? effect.description);
+            const description = getCardEffectDescription(card.id, idx, locale, effect.description);
             return (
             <div key={idx} style={{ marginBottom: '3px' }}>
               <span
@@ -386,6 +385,7 @@ function getEffectTypeColor(type: string): string {
     case 'UPGRADE': return '#a78bfa';
     case 'AMBUSH': return '#f97316';
     case 'SCORE': return '#eab308';
+    case 'DUEL': return '#ef4444';
     default: return '#888888';
   }
 }
