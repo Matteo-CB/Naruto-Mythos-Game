@@ -385,9 +385,9 @@ export function PopupMinimizePill({
       whileHover={{ scale: 1.05, y: -2 }}
       whileTap={{ scale: 0.97 }}
       onClick={onRestore}
-      className="fixed z-50 flex items-center gap-2 no-select"
+      className="fixed flex items-center gap-2 no-select popup-minimize-pill"
       style={{
-        bottom: '14px',
+        zIndex: 60,
         left: '50%',
         transform: 'translateX(-50%) skewX(-2deg)',
         padding: '8px 22px',

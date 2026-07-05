@@ -413,3 +413,13 @@ p, .font-body {
     scroll-behavior: auto !important;
   }
 }
+
+.popup-minimize-pill {
+  bottom: 14px;
+}
+
+@media (pointer: coarse) and (max-width: 1024px) {
+  .popup-minimize-pill {
+    bottom: 108px;
+  }
+}

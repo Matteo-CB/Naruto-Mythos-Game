@@ -660,7 +660,13 @@ export function TargetSelector() {
   const restoreEffectPopup = useUIStore((s) => s.restoreEffectPopup);
 
   const prevPendingIdRef = useRef<string | null>(null);
-  const currentPendingId = pendingTargetSelection?.descriptionKey ?? pendingTargetSelection?.description ?? null;
+  const currentPendingId = pendingTargetSelection
+    ? [
+        pendingTargetSelection.descriptionKey ?? pendingTargetSelection.description ?? '',
+        JSON.stringify(pendingTargetSelection.descriptionParams ?? {}),
+        (pendingTargetSelection.validTargets ?? []).join(','),
+      ].join('|')
+    : null;
   useEffect(() => {
     if (currentPendingId && currentPendingId !== prevPendingIdRef.current) {
       restoreEffectPopup();
