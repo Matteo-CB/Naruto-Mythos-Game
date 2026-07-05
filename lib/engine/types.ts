@@ -171,6 +171,12 @@ export interface GameState {
     count: number;
     targetInstanceIds?: string[];
   };
+
+  drawAfterReorder?: {
+    player: PlayerID;
+    count: number;
+    sourceCardId: string;
+  };
   
   pendingContinuation?: {
     sourceCardId: string;

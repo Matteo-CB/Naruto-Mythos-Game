@@ -22,7 +22,10 @@
         "Sur téléphone, le bouton Détails d'une carte est maintenant une grande pastille dorée en bas à droite, avec le nom de la carte et une croix pour fermer.",
         "Les replays de parties se jouent maintenant sur le vrai plateau de jeu, comme une vraie partie, avec les commandes pour revenir en arrière, avancer et accélérer.",
         "Kidômaru (059) : une fois que tu commences à déplacer des personnages avec son effet, tu ne peux plus l'annuler et le bouton passer disparaît après le premier déplacement.",
-        "Le journal de partie affiche désormais des actions qui manquaient : un personnage déplacé par son propre effet, une carte reprise de la défausse, et le retrait ou le vol de jetons de puissance."
+        "Le journal de partie affiche désormais des actions qui manquaient : un personnage déplacé par son propre effet, une carte reprise de la défausse, et le retrait ou le vol de jetons de puissance.",
+        "Le chat en partie est bien plus lisible sur téléphone : textes et boutons agrandis.",
+        "Avec Tsunade (004) en jeu, une carte cachée vaincue qui revient en main n'est plus nommée dans le journal de partie.",
+        "Itachi Uchiwa (140) : l'adversaire range d'abord ses cartes défaussées dans l'ordre de son choix, puis pioche sa nouvelle main."
       ],
       "changes_en": [
         "On phones, the hand is more compact: action buttons like playing a card hidden stay visible and tappable.",
@@ -40,7 +43,10 @@
         "On phones, the card Details button is now a large gold chip at the bottom right, with the card name and a close cross.",
         "Game replays now play out on the real game board, like a real match, with controls to rewind, step forward and speed up.",
         "Kidomaru (059): once you start moving characters with his effect, you can no longer cancel it and the pass button disappears after the first move.",
-        "The game log now shows actions that were missing: a character moved by its own effect, a card taken back from the discard pile, and Power tokens removed or stolen."
+        "The game log now shows actions that were missing: a character moved by its own effect, a card taken back from the discard pile, and Power tokens removed or stolen.",
+        "The in-game chat is much more readable on phones: bigger texts and buttons.",
+        "With Tsunade (004) in play, a defeated hidden card returning to hand is no longer named in the game log.",
+        "Itachi Uchiha (140): the opponent first orders their discarded cards as they choose, then draws their new hand."
       ],
       "changes_ja": [
         "スマホで手札がよりコンパクトになり、カードを裏向きで出すなどのアクションボタンが常に見えて押せるようになりました。",
@@ -58,7 +64,10 @@
         "スマホでカードの詳細ボタンが右下の大きな金色のチップになり、カード名と閉じるボタンが付きました。",
         "対戦のリプレイが本物のゲーム盤上で、実際の対戦のように再生されるようになり、巻き戻し・コマ送り・早送りの操作ができます。",
         "キドウマル（059）：効果で移動を始めると途中でキャンセルできなくなり、最初の移動のあとパスボタンが消えます。",
-        "これまで表示されなかった行動がゲームログに出るようになりました：自身の効果で移動したキャラクター、捨札から手札に戻したカード、パワートークンの除去や奪取。"
+        "これまで表示されなかった行動がゲームログに出るようになりました：自身の効果で移動したキャラクター、捨札から手札に戻したカード、パワートークンの除去や奪取。",
+        "スマートフォンで対戦中のチャットが読みやすくなりました。文字とボタンを大きくしました。",
+        "綱手(004)が場にいるとき、撃破されて手札に戻る裏向きカードの名前が対戦ログに表示されなくなりました。",
+        "うちはイタチ(140)：相手はまず捨てたカードの順番を自分で決めてから、新しい手札を引くようになりました。"
       ],
       "changes_es": [
         "En el móvil, la mano es más compacta: los botones de acción como jugar una carta oculta permanecen visibles y pulsables.",
@@ -76,7 +85,10 @@
         "En el móvil, el botón de detalles de una carta es ahora una gran ficha dorada abajo a la derecha, con el nombre de la carta y una cruz para cerrar.",
         "Las repeticiones de partida ahora se reproducen en el tablero de juego real, como una partida de verdad, con controles para retroceder, avanzar y acelerar.",
         "Kidomaru (059): una vez que empiezas a mover personajes con su efecto, ya no puedes cancelarlo y el botón de pasar desaparece tras el primer movimiento.",
-        "El registro de partida ahora muestra acciones que faltaban: un personaje movido por su propio efecto, una carta recuperada de la pila de descartes, y la retirada o el robo de fichas de Poder."
+        "El registro de partida ahora muestra acciones que faltaban: un personaje movido por su propio efecto, una carta recuperada de la pila de descartes, y la retirada o el robo de fichas de Poder.",
+        "El chat en partida es mucho más legible en el móvil: textos y botones más grandes.",
+        "Con Tsunade (004) en juego, una carta oculta vencida que vuelve a la mano ya no se nombra en el registro de partida.",
+        "Itachi Uchiha (140): el adversario primero ordena sus cartas descartadas como elija, y después roba su nueva mano."
       ]
     },
     {

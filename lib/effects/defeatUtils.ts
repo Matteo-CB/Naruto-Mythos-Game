@@ -112,6 +112,12 @@ export function defeatCharacterInPlay(
   }
 
 
+  const sideOwnerForLog: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+  const goesToPrivateHand = targetChar.isHidden
+    && sideOwnerForLog === targetChar.originalOwner
+    && EffectEngine.hasTsunade004Active(state, targetChar.originalOwner);
+  const publicName = goesToPrivateHand ? '???' : targetChar.card.name_fr;
+
   let newState = removeCharacterFromPlay(state, missionIndex, charInstanceId, side);
 
   emitEngineQuestEvent(state, sourcePlayer, 'character.defeated', {
@@ -131,9 +137,9 @@ export function defeatCharacterInPlay(
       state.phase,
       sourcePlayer,
       'EFFECT_DEFEAT',
-      `${targetChar.card.name_fr} was defeated.`,
+      `${publicName} was defeated.`,
       'game.log.effect.defeat',
-      { card: '???', id: '', target: targetChar.card.name_fr },
+      { card: '???', id: '', target: publicName },
     ),
   };
 

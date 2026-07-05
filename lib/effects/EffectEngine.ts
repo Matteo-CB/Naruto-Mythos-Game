@@ -12078,36 +12078,43 @@ export class EffectEngine {
           ...c,
           instanceId: c.instanceId || generateInstanceId(),
         }));
-        const i140OpDeck = [...i140OpponentState.deck];
-        const i140DrawCount = Math.min(i140HandSize, i140OpDeck.length);
-        const i140DrawnCards = i140OpDeck.splice(0, i140DrawCount);
 
-        newState = {
-          ...newState,
-          [i140Opponent]: {
-            ...i140OpponentState,
-            hand: i140DrawnCards,
-            deck: i140OpDeck,
-            discardPile: [...i140OpponentState.discardPile, ...i140DiscardedHand],
-          },
-        };
-
-        newState.log = logAction(newState.log, newState.turn, newState.phase, i140Player,
-          'EFFECT_DISCARD', `Itachi Uchiwa (140): Opponent discarded ${i140HandSize} cards, then drew ${i140DrawCount} new cards.`,
-          'game.log.effect.discardAndDraw', { card: 'ITACHI UCHIWA', id: 'KS-140-S', discarded: String(i140HandSize), drawn: String(i140DrawCount) });
-
-        
-        
-        
-        
-        
         if (i140HandSize >= 2) {
+          newState = {
+            ...newState,
+            [i140Opponent]: {
+              ...i140OpponentState,
+              hand: [],
+              discardPile: [...i140OpponentState.discardPile, ...i140DiscardedHand],
+            },
+          };
           newState.pendingDiscardReorder = {
             discardOwner: i140Opponent,
             chooser: i140Opponent,
             count: i140HandSize,
             targetInstanceIds: i140DiscardedHand.map((c: { instanceId: string }) => c.instanceId),
           };
+          newState.drawAfterReorder = {
+            player: i140Opponent,
+            count: i140HandSize,
+            sourceCardId: 'KS-140-S',
+          };
+        } else {
+          const i140OpDeck = [...i140OpponentState.deck];
+          const i140DrawCount = Math.min(i140HandSize, i140OpDeck.length);
+          const i140DrawnCards = i140OpDeck.splice(0, i140DrawCount);
+          newState = {
+            ...newState,
+            [i140Opponent]: {
+              ...i140OpponentState,
+              hand: i140DrawnCards,
+              deck: i140OpDeck,
+              discardPile: [...i140OpponentState.discardPile, ...i140DiscardedHand],
+            },
+          };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, i140Player,
+            'EFFECT_DISCARD', `Itachi Uchiwa (140): Opponent discarded ${i140HandSize} cards, then drew ${i140DrawCount} new cards.`,
+            'game.log.effect.discardAndDraw', { card: 'ITACHI UCHIWA', id: 'KS-140-S', discarded: String(i140HandSize), drawn: String(i140DrawCount) });
         }
 
         
@@ -13103,9 +13110,24 @@ export class EffectEngine {
             'game.log.effect.reorderDiscard',
             { count: String(reorderCount) },
           );
+
+          const dar = newState.drawAfterReorder;
+          if (dar && dar.player === reorderTarget) {
+            newState.drawAfterReorder = undefined;
+            const darPS = { ...newState[dar.player] };
+            const darDeck = [...darPS.deck];
+            const darCount = Math.min(dar.count, darDeck.length);
+            const darDrawn = darDeck.splice(0, darCount);
+            darPS.hand = [...darPS.hand, ...darDrawn];
+            darPS.deck = darDeck;
+            newState[dar.player] = darPS;
+            newState.log = logAction(newState.log, newState.turn, newState.phase, dar.player === 'player1' ? 'player2' : 'player1',
+              'EFFECT_DISCARD', `Itachi Uchiwa (140): Opponent discarded ${dar.count} cards, then drew ${darCount} new cards.`,
+              'game.log.effect.discardAndDraw', { card: 'ITACHI UCHIWA', id: dar.sourceCardId, discarded: String(dar.count), drawn: String(darCount) });
+          }
         }
 
-        
+
         if (parsedReorder.sakura135Chain) {
           const s135Player = reorderTarget;
           

@@ -113,8 +113,9 @@ describe('Itachi 140 (KS-140-S) reorder discard targets the right cards', () => 
       selectedTargets: [itachiCard.instanceId],
     } as never);
 
-    expect(afterConfirm.player1.hand.length).toBe(6);
+    expect(afterConfirm.player1.hand.length).toBe(0);
     expect(afterConfirm.player1.discardPile.length).toBe(8);
+    expect(afterConfirm.drawAfterReorder).toEqual({ player: 'player1', count: 6, sourceCardId: 'KS-140-S' });
 
     const reorderEff = afterConfirm.pendingEffects.find((e) => e.targetSelectionType === 'REORDER_DISCARD');
     expect(reorderEff).toBeTruthy();
@@ -126,6 +127,19 @@ describe('Itachi 140 (KS-140-S) reorder discard targets the right cards', () => 
     for (let i = 1; i <= 6; i++) {
       expect(reorderTargetIds.has(`hand-${i}`)).toBe(true);
     }
+
+    const reorderPa = afterConfirm.pendingActions.find((a) => a.sourceEffectId === reorderEff!.id);
+    expect(reorderPa).toBeTruthy();
+    const order = JSON.stringify(reorderEff!.validTargets);
+    const afterReorder = GameEngine.applyAction(afterConfirm, reorderPa!.player, {
+      type: 'SELECT_TARGET',
+      pendingActionId: reorderPa!.id,
+      selectedTargets: [order],
+    } as never);
+
+    expect(afterReorder.player1.hand.length).toBe(6);
+    expect(afterReorder.player1.deck.length).toBe(2);
+    expect(afterReorder.drawAfterReorder).toBeUndefined();
   });
 
   it('REORDER_DISCARD reorders the targeted cards IN PLACE (keeps non-target cards, incl. a later-defeated card, at their positions)', () => {

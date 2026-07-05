@@ -93,8 +93,10 @@ export function GameChat() {
     return (
       <button
         onClick={() => setChatOpen(true)}
-        className="fixed z-40 flex items-center gap-1.5 px-3 py-2 text-[11px] uppercase font-bold tracking-wider cursor-pointer"
+        className="fixed z-40 flex items-center gap-1.5 uppercase font-bold tracking-wider cursor-pointer"
         style={{
+          fontSize: dims.isMobile ? '13px' : '11px',
+          padding: dims.isMobile ? '10px 14px' : '8px 12px',
           bottom: dims.isMobile ? '8px' : '16px',
           left: dims.isMobile ? '8px' : '16px',
           backgroundColor: 'rgba(10, 10, 14, 0.9)',
@@ -105,8 +107,8 @@ export function GameChat() {
       >
         {t('chat.title')}
         {unreadCount > 0 && (
-          <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[9px] font-bold rounded-full"
-            style={{ backgroundColor: '#b33e3e', color: '#fff' }}>
+          <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 font-bold rounded-full"
+            style={{ fontSize: dims.isMobile ? '11px' : '9px', backgroundColor: '#b33e3e', color: '#fff' }}>
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -120,8 +122,8 @@ export function GameChat() {
       style={{
         bottom: 0,
         left: 0,
-        width: dims.isMobile ? 'min(280px, calc(100vw - 16px))' : '320px',
-        height: dims.isMobile ? '55vh' : '420px',
+        width: dims.isMobile ? 'min(360px, calc(100vw - 16px))' : '320px',
+        height: dims.isMobile ? '60vh' : '420px',
         maxHeight: '80vh',
         backgroundColor: 'rgba(8, 8, 12, 0.97)',
         borderRight: '1px solid #1e1e1e',
@@ -130,11 +132,11 @@ export function GameChat() {
     >
       
       <div className="flex items-center justify-between px-3 py-2.5 shrink-0" style={{ borderBottom: '1px solid rgba(196,163,90,0.1)' }}>
-        <span className="text-[11px] uppercase font-bold tracking-widest" style={{ color: '#c4a35a', fontFamily: 'var(--font-display)' }}>
+        <span className="uppercase font-bold tracking-widest" style={{ fontSize: dims.isMobile ? '13px' : '11px', color: '#c4a35a', fontFamily: 'var(--font-display)' }}>
           {t('chat.title')}
         </span>
         <button onClick={() => setChatOpen(false)}
-          className="w-6 h-6 flex items-center justify-center text-[10px] cursor-pointer transition-colors"
+          className={`${dims.isMobile ? 'w-8 h-8 text-[13px]' : 'w-6 h-6 text-[10px]'} flex items-center justify-center cursor-pointer transition-colors`}
           style={{ color: '#666', border: '1px solid #262626', backgroundColor: 'rgba(255,255,255,0.02)' }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = '#c4a35a'; e.currentTarget.style.color = '#c4a35a'; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = '#262626'; e.currentTarget.style.color = '#666'; }}
@@ -145,19 +147,21 @@ export function GameChat() {
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-2" style={{ minHeight: 0 }}>
         {chatMessages.length === 0 ? (
-          <p className="text-[10px] text-center py-8" style={{ color: '#333' }}>{t('chat.noMessages')}</p>
+          <p className="text-center py-8" style={{ fontSize: dims.isMobile ? '12px' : '10px', color: '#333' }}>{t('chat.noMessages')}</p>
         ) : (
           chatMessages.map((msg) => {
             const isSystem = msg.userId === 'system';
             return (
               <div key={msg.id} className="mb-2">
-                <span className="text-[10px] font-bold mr-1.5" style={{
+                <span className="font-bold mr-1.5" style={{
+                  fontSize: dims.isMobile ? '13px' : '10px',
                   color: isSystem ? '#c4a35a' : '#e0e0e0',
                   fontFamily: 'var(--font-display)',
                 }}>
                   {isSystem ? t('chat.systemTag') : msg.username}
                 </span>
-                <span className="text-[10px]" style={{
+                <span style={{
+                  fontSize: dims.isMobile ? '13px' : '10px',
                   color: isSystem ? 'rgba(196,163,90,0.6)' : '#aaa',
                 }}>
                   {msg.isEmote ? renderMessage(msg.message) : msg.message}
@@ -175,8 +179,10 @@ export function GameChat() {
               key={pm.key}
               onClick={() => handleSend(pm.label, false)}
               disabled={cooldown}
-              className="px-2.5 py-1 text-[10px] font-semibold rounded-full cursor-pointer disabled:opacity-20 transition-all"
+              className="font-semibold rounded-full cursor-pointer disabled:opacity-20 transition-all"
               style={{
+                fontSize: dims.isMobile ? '13px' : '10px',
+                padding: dims.isMobile ? '6px 12px' : '4px 10px',
                 backgroundColor: `${pm.color}10`,
                 border: `1px solid ${pm.color}30`,
                 color: pm.color,
@@ -207,8 +213,8 @@ export function GameChat() {
               key={e.code}
               onClick={() => handleSend(e.code, true)}
               disabled={cooldown}
-              className="px-1.5 py-0.5 text-[9px] font-bold rounded cursor-pointer disabled:opacity-20 transition-all"
-              style={{ color: e.color, backgroundColor: e.bg, border: `1px solid ${e.color}20` }}
+              className="font-bold rounded cursor-pointer disabled:opacity-20 transition-all"
+              style={{ fontSize: dims.isMobile ? '12px' : '9px', padding: dims.isMobile ? '4px 8px' : '2px 6px', color: e.color, backgroundColor: e.bg, border: `1px solid ${e.color}20` }}
               onMouseEnter={(ev) => {
                 if (!cooldown) { ev.currentTarget.style.transform = 'scale(1.15)'; ev.currentTarget.style.boxShadow = `0 0 8px ${e.color}40`; }
               }}
