@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/db/prisma';
 import { getAllCards } from '@/lib/data/cardLoader';
+import { stripVariantSuffix } from '@/lib/variants/isVariant';
 
-export function usageGroupKey(card: { set: string; number: number; card_type: string }): string {
-  return card.card_type === 'mission' ? `${card.set}#M${card.number}` : `${card.set}#${card.number}`;
+export function usageGroupKey(card: { set: string; number: number | string; card_type: string }): string {
+  return `${card.card_type}|${card.set}|${stripVariantSuffix(String(card.number))}`;
 }
 
 let groupOf: Map<string, string> | null = null;
