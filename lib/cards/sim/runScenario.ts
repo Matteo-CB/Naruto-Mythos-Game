@@ -2,8 +2,12 @@ import type { GameState, PendingAction, PlayerID, GameAction } from '@/lib/engin
 import { GameEngine } from '@/lib/engine/GameEngine';
 import type { SimScenario } from '@/lib/cards/sim/scenarios';
 
-function defaultChoice(pending: PendingAction): string[] {
+function defaultChoice(state: GameState, pending: PendingAction): string[] {
   const options = pending.options ?? [];
+  const sourceEffect = state.pendingEffects.find((e) => e.id === pending.sourceEffectId);
+  if (sourceEffect?.targetSelectionType === 'REORDER_DISCARD') {
+    return [JSON.stringify(options)];
+  }
   const min = Math.max(1, pending.minSelections ?? 1);
   const allNumeric = options.length > 0 && options.every((o) => /^\d+$/.test(o));
   if (allNumeric && min === 1) {
@@ -23,7 +27,7 @@ export function runScenario(scenario: SimScenario): GameState[] {
     let guard = 0;
     while (state.pendingActions.length > 0 && guard++ < 40) {
       const pending = state.pendingActions[0];
-      const targets = scenario.choose ? scenario.choose(state, pending) : defaultChoice(pending);
+      const targets = scenario.choose ? scenario.choose(state, pending) : defaultChoice(state, pending);
       if (!targets || targets.length === 0) break;
       state = GameEngine.applyAction(state, pending.player, {
         type: 'SELECT_TARGET',

@@ -25,7 +25,8 @@
         "Le journal de partie affiche désormais des actions qui manquaient : un personnage déplacé par son propre effet, une carte reprise de la défausse, et le retrait ou le vol de jetons de puissance.",
         "Le chat en partie est bien plus lisible sur téléphone : textes et boutons agrandis.",
         "Avec Tsunade (004) en jeu, une carte cachée vaincue qui revient en main n'est plus nommée dans le journal de partie.",
-        "Itachi Uchiwa (140) : l'adversaire range d'abord ses cartes défaussées dans l'ordre de son choix, puis pioche sa nouvelle main."
+        "Itachi Uchiwa (140) : l'adversaire range d'abord ses cartes défaussées dans l'ordre de son choix, puis pioche sa nouvelle main.",
+        "La simulation d'Itachi Uchiwa (140) montre correctement la nouvelle main piochée après la remise en ordre de la défausse."
       ],
       "changes_en": [
         "On phones, the hand is more compact: action buttons like playing a card hidden stay visible and tappable.",
@@ -46,7 +47,8 @@
         "The game log now shows actions that were missing: a character moved by its own effect, a card taken back from the discard pile, and Power tokens removed or stolen.",
         "The in-game chat is much more readable on phones: bigger texts and buttons.",
         "With Tsunade (004) in play, a defeated hidden card returning to hand is no longer named in the game log.",
-        "Itachi Uchiha (140): the opponent first orders their discarded cards as they choose, then draws their new hand."
+        "Itachi Uchiha (140): the opponent first orders their discarded cards as they choose, then draws their new hand.",
+        "The Itachi Uchiha (140) simulation now correctly shows the new hand drawn after the discard pile is reordered."
       ],
       "changes_ja": [
         "スマホで手札がよりコンパクトになり、カードを裏向きで出すなどのアクションボタンが常に見えて押せるようになりました。",
@@ -67,7 +69,8 @@
         "これまで表示されなかった行動がゲームログに出るようになりました：自身の効果で移動したキャラクター、捨札から手札に戻したカード、パワートークンの除去や奪取。",
         "スマートフォンで対戦中のチャットが読みやすくなりました。文字とボタンを大きくしました。",
         "綱手(004)が場にいるとき、撃破されて手札に戻る裏向きカードの名前が対戦ログに表示されなくなりました。",
-        "うちはイタチ(140)：相手はまず捨てたカードの順番を自分で決めてから、新しい手札を引くようになりました。"
+        "うちはイタチ(140)：相手はまず捨てたカードの順番を自分で決めてから、新しい手札を引くようになりました。",
+        "うちはイタチ(140)のシミュレーションで、捨て札の並べ替えの後に引く新しい手札が正しく表示されるようになりました。"
       ],
       "changes_es": [
         "En el móvil, la mano es más compacta: los botones de acción como jugar una carta oculta permanecen visibles y pulsables.",
@@ -88,7 +91,8 @@
         "El registro de partida ahora muestra acciones que faltaban: un personaje movido por su propio efecto, una carta recuperada de la pila de descartes, y la retirada o el robo de fichas de Poder.",
         "El chat en partida es mucho más legible en el móvil: textos y botones más grandes.",
         "Con Tsunade (004) en juego, una carta oculta vencida que vuelve a la mano ya no se nombra en el registro de partida.",
-        "Itachi Uchiha (140): el adversario primero ordena sus cartas descartadas como elija, y después roba su nueva mano."
+        "Itachi Uchiha (140): el adversario primero ordena sus cartas descartadas como elija, y después roba su nueva mano.",
+        "La simulación de Itachi Uchiha (140) ahora muestra correctamente la nueva mano robada tras reordenar la pila de descartes."
       ]
     },
     {

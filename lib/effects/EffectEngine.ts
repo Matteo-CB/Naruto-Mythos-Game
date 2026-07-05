@@ -13110,21 +13110,21 @@ export class EffectEngine {
             'game.log.effect.reorderDiscard',
             { count: String(reorderCount) },
           );
+        }
 
-          const dar = newState.drawAfterReorder;
-          if (dar && dar.player === reorderTarget) {
-            newState.drawAfterReorder = undefined;
-            const darPS = { ...newState[dar.player] };
-            const darDeck = [...darPS.deck];
-            const darCount = Math.min(dar.count, darDeck.length);
-            const darDrawn = darDeck.splice(0, darCount);
-            darPS.hand = [...darPS.hand, ...darDrawn];
-            darPS.deck = darDeck;
-            newState[dar.player] = darPS;
-            newState.log = logAction(newState.log, newState.turn, newState.phase, dar.player === 'player1' ? 'player2' : 'player1',
-              'EFFECT_DISCARD', `Itachi Uchiwa (140): Opponent discarded ${dar.count} cards, then drew ${darCount} new cards.`,
-              'game.log.effect.discardAndDraw', { card: 'ITACHI UCHIWA', id: dar.sourceCardId, discarded: String(dar.count), drawn: String(darCount) });
-          }
+        const dar = newState.drawAfterReorder;
+        if (dar && dar.player === reorderTarget) {
+          newState.drawAfterReorder = undefined;
+          const darPS = { ...newState[dar.player] };
+          const darDeck = [...darPS.deck];
+          const darCount = Math.min(dar.count, darDeck.length);
+          const darDrawn = darDeck.splice(0, darCount);
+          darPS.hand = [...darPS.hand, ...darDrawn];
+          darPS.deck = darDeck;
+          newState[dar.player] = darPS;
+          newState.log = logAction(newState.log, newState.turn, newState.phase, dar.player === 'player1' ? 'player2' : 'player1',
+            'EFFECT_DISCARD', `Itachi Uchiwa (140): Opponent discarded ${dar.count} cards, then drew ${darCount} new cards.`,
+            'game.log.effect.discardAndDraw', { card: 'ITACHI UCHIWA', id: dar.sourceCardId, discarded: String(dar.count), drawn: String(darCount) });
         }
 
 
