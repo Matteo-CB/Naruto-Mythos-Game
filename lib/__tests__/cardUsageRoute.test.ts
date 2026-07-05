@@ -85,6 +85,21 @@ describe('recordRankedDeckUsage + computeCardUsage (decks played in ranked games
     expect(base.tier).toBe('OU');
   });
 
+  it('never merges a mission card with the character sharing its number', async () => {
+    await recordRankedDeckUsage([['KS-006-MMS'], ['KS-006-MMS']]);
+    await recordRankedDeckUsage([['KS-006-UC'], null]);
+
+    const r = await computeCardUsage();
+
+    expect(r.totalDecks).toBe(3);
+    const shizune = r.cards.find((c) => c.cardId === 'KS-006-UC')!;
+    const mission = r.cards.find((c) => c.cardId === 'KS-006-MMS')!;
+    expect(shizune.count).toBe(1);
+    expect(shizune.rate).toBeCloseTo(1 / 3);
+    expect(mission.count).toBe(2);
+    expect(mission.rate).toBeCloseTo(2 / 3);
+  });
+
   it('skips missing decks from numerator and denominator', async () => {
     await recordRankedDeckUsage([['KS-005-C'], undefined]);
     await recordRankedDeckUsage([[], ['KS-108-R']]);

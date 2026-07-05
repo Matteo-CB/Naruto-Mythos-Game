@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db/prisma';
 import { getAllCards } from '@/lib/data/cardLoader';
 import { assignUsageTiers, type UsageTier } from '@/lib/cards/usageTiers';
 import { STATIC_RANKED_BANNED_CARD_IDS } from '@/lib/data/rankedBans';
+import { usageGroupKey } from '@/lib/cards/usageLive';
 
 const WINDOW_DAYS = 14;
 const RETENTION_DAYS = 16;
@@ -18,10 +19,6 @@ export interface CardUsageResult {
   totalDecks: number;
   activePlayers: number;
   cards: ComputedCardUsage[];
-}
-
-function groupKeyOf(setId: string, number: number): string {
-  return `${setId}#${number}`;
 }
 
 function utcDateKey(d: Date): string {
@@ -67,7 +64,7 @@ export async function computeCardUsage(): Promise<CardUsageResult> {
 
   const cards = getAllCards();
   const groupOf = new Map<string, string>();
-  for (const c of cards) groupOf.set(c.id, groupKeyOf(c.set, c.number));
+  for (const c of cards) groupOf.set(c.id, usageGroupKey(c));
 
   const uniqueGroups = [...new Set(cards.map((c) => groupOf.get(c.id)!))];
   const groupRates = uniqueGroups.map((g) => ({

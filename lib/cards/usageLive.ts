@@ -1,12 +1,16 @@
 import { prisma } from '@/lib/db/prisma';
 import { getAllCards } from '@/lib/data/cardLoader';
 
+export function usageGroupKey(card: { set: string; number: number; card_type: string }): string {
+  return card.card_type === 'mission' ? `${card.set}#M${card.number}` : `${card.set}#${card.number}`;
+}
+
 let groupOf: Map<string, string> | null = null;
 
 function groups(): Map<string, string> {
   if (!groupOf) {
     groupOf = new Map();
-    for (const c of getAllCards()) groupOf.set(c.id, `${c.set}#${c.number}`);
+    for (const c of getAllCards()) groupOf.set(c.id, usageGroupKey(c));
   }
   return groupOf;
 }
