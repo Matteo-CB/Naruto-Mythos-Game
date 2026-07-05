@@ -7,6 +7,7 @@
       "title_ja": "スマホで盤面が見やすく、本物の盤面でリプレイ",
       "title_es": "Tablero más legible en el móvil, repeticiones en el tablero real",
       "changes_fr": [
+        "Naruto Uzumaki du set 2 : son bonus de puissance compte ses alliés Naruto Uzumaki, il ne se compte plus lui-même.",
         "Les égalités ne sont plus affichées dans le classement et les statistiques : une partie ne peut jamais finir à égalité.",
         "Les cartes s'affichent de nouveau dans le constructeur de deck.",
         "Le drapeau du pays choisi par chaque joueur s'affiche maintenant en jeu à côté de son pseudo.",
@@ -22,6 +23,7 @@
         "Le journal de partie affiche désormais des actions qui manquaient : un personnage déplacé par son propre effet, une carte reprise de la défausse, et le retrait ou le vol de jetons de puissance."
       ],
       "changes_en": [
+        "Set 2 Naruto Uzumaki: his Power bonus counts his Naruto Uzumaki allies, he no longer counts himself.",
         "Draws are no longer shown in the leaderboard and stats: a game can never end in a draw.",
         "Cards display again in the deck builder.",
         "Each player's chosen country flag now shows in game next to their username.",
@@ -37,6 +39,7 @@
         "The game log now shows actions that were missing: a character moved by its own effect, a card taken back from the discard pile, and Power tokens removed or stolen."
       ],
       "changes_ja": [
+        "第2弾のうずまきナルト：パワーボーナスは味方のうずまきナルトを数えるもので、自分自身は数えなくなりました。",
         "ランキングと統計から引き分けの表示を削除しました：対戦が引き分けで終わることはありません。",
         "デッキビルダーでカードが再び表示されるようになりました。",
         "各プレイヤーが選んだ国旗が、対戦中にユーザー名の横に表示されるようになりました。",
@@ -52,6 +55,7 @@
         "これまで表示されなかった行動がゲームログに出るようになりました：自身の効果で移動したキャラクター、捨札から手札に戻したカード、パワートークンの除去や奪取。"
       ],
       "changes_es": [
+        "Naruto Uzumaki del set 2: su bono de Poder cuenta a sus aliados Naruto Uzumaki, ya no se cuenta a sí mismo.",
         "Los empates ya no se muestran en la clasificación ni en las estadísticas: una partida nunca puede terminar en empate.",
         "Las cartas vuelven a mostrarse en el constructor de mazos.",
         "La bandera del país elegida por cada jugador ahora se muestra en partida junto a su nombre.",

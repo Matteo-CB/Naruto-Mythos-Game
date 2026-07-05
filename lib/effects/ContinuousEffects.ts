@@ -330,7 +330,7 @@ export function calculateContinuousPowerModifier(
       for (const m of state.activeMissions) {
         const side = player === 'player1' ? m.player1Characters : m.player2Characters;
         for (const c of side) {
-          if (c.isHidden) continue;
+          if (c.instanceId === char.instanceId || c.isHidden) continue;
           const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
           const nm = `${cTop.name_fr ?? ''} ${cTop.name_en ?? ''}`.toUpperCase();
           if (nm.includes('NARUTO UZUMAKI')) narutoCount += 1;

@@ -623,11 +623,12 @@ model CardUsageStat {
 }
 
 model CardUsageMeta {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  key           String   @unique @default("singleton")
-  totalDecks    Int      @default(0)
-  activePlayers Int      @default(0)
-  computedAt    DateTime @default(now())
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  key           String    @unique @default("singleton")
+  totalDecks    Int       @default(0)
+  activePlayers Int       @default(0)
+  computedAt    DateTime  @default(now())
+  firstDataAt   DateTime?
 }
 
 model CardUsageDay {

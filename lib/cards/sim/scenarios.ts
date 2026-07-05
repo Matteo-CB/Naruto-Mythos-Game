@@ -13,6 +13,7 @@ export interface SimScenario {
   choose?: (state: GameState, pending: PendingAction) => string[];
   focusInstanceId?: string;
   narrationKey?: string;
+  noMinimize?: boolean;
 }
 
 const DECKF = () => ['KS-021-C', 'KS-011-C', 'KS-007-C', 'KS-086-C', 'KS-052-C']
@@ -106,7 +107,20 @@ const FACTORIES: Record<string, Factory> = {
   'KS-110-R': (id) => ({ build: () => board({ hand: [id], e0: [{ id: 'KS-005-C', iid: 'sim-weak' }, { id: 'KS-086-C', iid: 'sim-strong' }] }), play: P1(FRESH) }),
   'KS-113-R': (id) => ({ build: () => board({ hand: [id], p1m0: ['KS-027-C', 'KS-009-C'] }), play: P1(FRESH) }),
   'KS-138-S': (id) => ({ build: () => board({ hand: [id], upgBase: { id: 'KS-063-UC', iid: 'sim-upg-base' } }), play: P1(upgrade('sim-upg-base')) }),
-  'SS-122-SPV': (id) => ({ build: () => board({ hand: [id], p1m0: [{ id: 'KS-076-UC', iid: 'sim-tb' }] }), play: P1(FRESH) }),
+  'SS-122-SPV': (id) => ({
+    build: () => board({
+      hand: [id],
+      p1m0: [{ id: 'KS-076-UC', iid: 'sim-tb' }],
+      extraP2m0: [upgradedEnemyStack('KS-075-C', 'KS-076-UC', 'sim-enemy-biju')],
+    }),
+    play: P1(FRESH),
+    choose: (state, pending) => {
+      const opts = pending.options ?? [];
+      if (opts.includes('sim-enemy-biju')) return ['sim-enemy-biju'];
+      return opts.slice(0, Math.max(1, pending.minSelections ?? 1));
+    },
+    noMinimize: true,
+  }),
 };
 
 // Resolve a variant (RA/MV/SV/L/_2...) to a curated base with the same set+number, since variants share the effect.
@@ -143,7 +157,7 @@ export function getScenario(cardId: string, effectIndex = 0): SimScenario | unde
   const cacheKey = `${cardId}#${effectIndex}`;
   if (minimizeCache.has(cacheKey)) return minimizeCache.get(cacheKey);
   const { scenario, kind } = buildScenario(cardId, effectIndex);
-  const result = (!scenario || (kind && SKIP_MINIMIZE_KINDS.has(kind))) ? scenario : minimizeScenario(scenario);
+  const result = (!scenario || scenario.noMinimize || (kind && SKIP_MINIMIZE_KINDS.has(kind))) ? scenario : minimizeScenario(scenario);
   minimizeCache.set(cacheKey, result);
   return result;
 }

@@ -102,6 +102,9 @@ function auraBoard(card: CharacterCard, includeDemo: boolean): GameState {
   if (AURA_HIDDEN_ENEMY !== card.id) p2.push(simChar(AURA_HIDDEN_ENEMY, { owner: 'player2', instanceId: 'au-he', hidden: true }));
   if (includeDemo) p1.push(simChar(card.id, { owner: 'player1', instanceId: 'au-demo' }));
   const st = buildSimState({ hand1: includeDemo ? [] : [card.id], p1, p2, missions: 2, chakra1: 20, edgeHolder: 'player1' });
+  if (card.id !== 'KS-108-R') {
+    st.activeMissions[1].player1Characters.push(simChar('KS-108-R', { owner: 'player1', instanceId: 'au-far-naruto', missionIndex: 1 }));
+  }
   st.player1.deck = deck();
   st.player2.deck = deck();
   return st;
