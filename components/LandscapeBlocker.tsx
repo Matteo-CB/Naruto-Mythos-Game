@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import { useTranslations } from 'next-intl';
+import { motion } from 'framer-motion';
 
 async function requestFullscreenAndLandscape() {
   const el = document.documentElement;
@@ -37,12 +38,12 @@ export function LandscapeBlocker() {
       
       <div className="portrait-blocker">
         <div className="portrait-blocker-content">
-          <div className="phone-rotate-animation">
-            <div className="phone-outline">
-              <div className="phone-screen" />
-              <div className="phone-notch" />
-            </div>
-          </div>
+          <motion.div
+            className="rounded-md"
+            style={{ width: 48, height: 80, border: '2px solid #c4a35a' }}
+            animate={{ rotate: [0, 0, 90, 90], opacity: [0.5, 1, 1, 0.7] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          />
           <p className="portrait-blocker-text">{t('rotateDevice')}</p>
           <button className="fullscreen-btn" onClick={handleFullscreen} type="button">
             <span className="fullscreen-icon"><span className="fullscreen-icon-inner" /></span>

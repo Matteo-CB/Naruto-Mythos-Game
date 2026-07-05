@@ -629,3 +629,20 @@ model CardUsageMeta {
   activePlayers Int      @default(0)
   computedAt    DateTime @default(now())
 }
+
+model CardUsageDay {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  date   String
+  cardId String
+  decks  Int    @default(0)
+
+  @@unique([date, cardId])
+  @@index([date])
+}
+
+model CardUsageDayTotal {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  date  String @unique
+  decks Int    @default(0)
+  games Int    @default(0)
+}

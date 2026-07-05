@@ -128,7 +128,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
   const arrowStyle = { backgroundColor: `${GOLD}1f`, color: GOLD };
 
   return (
-    <main id="main-content" className="min-h-screen relative bg-[#0a0a0a] flex flex-col text-[#e8e8e8]">
+    <main id="main-content" className="font-body-force min-h-screen relative bg-[#0a0a0a] flex flex-col text-[#e8e8e8]">
       <CloudBackground />
       <DecorativeIcons />
       <CardBackgroundDecor variant="collection" />
@@ -171,7 +171,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
           </div>
 
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold leading-tight">{name}</h1>
+            <h1 className="font-display-force text-2xl sm:text-3xl font-bold leading-tight">{name}</h1>
             {title && <p className="mt-1 text-base sm:text-lg text-[#b9b9b9] italic">{title}</p>}
             <p className="mt-1 text-sm text-[#8a8a8a] tracking-wider">N° {String(card.number).padStart(3, '0')}</p>
 

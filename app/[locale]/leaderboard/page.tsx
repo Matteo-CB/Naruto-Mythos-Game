@@ -82,8 +82,7 @@ function LeaderRow({
 }) {
   const wins = type === 'evolving' ? (user.evolvingWins ?? 0) : user.wins;
   const losses = type === 'evolving' ? (user.evolvingLosses ?? 0) : user.losses;
-  const draws = type === 'evolving' ? (user.evolvingDraws ?? 0) : user.draws;
-  const total = wins + losses + draws;
+  const total = wins + losses;
   const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
   const displayElo = type === 'evolving' ? (user.evolvingElo ?? 500) : user.elo;
   const tier = getRankTier(user.elo);
@@ -144,7 +143,6 @@ function LeaderRow({
       <div className="hidden sm:flex font-inter-force items-center gap-1.5">
         <span className="text-[10px] tabular-nums" style={{ color: '#5fb05f' }}>{wins}W</span>
         <span className="text-[10px] tabular-nums" style={{ color: '#d97676' }}>{losses}L</span>
-        <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>{draws}D</span>
       </div>
 
       <span className="hidden sm:block font-inter-force text-xs tabular-nums w-10 text-right" style={{ color: '#666' }}>

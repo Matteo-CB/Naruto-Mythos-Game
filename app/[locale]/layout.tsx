@@ -83,15 +83,22 @@ export default async function LocaleLayout({ children, params }: Props) {
       name: 'HiddenLab',
       url: 'https://hiddenlab.fr',
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '50',
-      bestRating: '5',
-      worstRating: '1',
-    },
     inLanguage,
     genre: 'Card Game',
+  };
+
+  const webSiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Naruto Mythos TCG',
+    alternateName: 'Naruto Mythos TCG Simulator',
+    url: SITE_URL,
+    inLanguage,
+    publisher: {
+      '@type': 'Organization',
+      name: 'HiddenLab',
+      url: 'https://hiddenlab.fr',
+    },
   };
 
   const videoGameJsonLd = {
@@ -139,6 +146,10 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <SessionProvider>
       <NextIntlClientProvider locale={locale} messages={messages}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppJsonLd) }}

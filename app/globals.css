@@ -269,54 +269,6 @@ p, .font-body {
 }
 
 
-.phone-rotate-animation {
-  width: 90px;
-  height: 90px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.phone-outline {
-  position: relative;
-  width: 36px;
-  height: 62px;
-  border: 2.5px solid var(--accent);
-  border-radius: 8px;
-  animation: rotate-phone 3s ease-in-out infinite;
-  transform-origin: center center;
-}
-
-.phone-screen {
-  position: absolute;
-  inset: 6px 3px;
-  border: 1px solid rgba(196, 163, 90, 0.3);
-  border-radius: 2px;
-}
-
-.phone-notch {
-  position: absolute;
-  bottom: 3px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 12px;
-  height: 2.5px;
-  border-radius: 2px;
-  background: var(--accent);
-  opacity: 0.5;
-}
-
-@keyframes rotate-phone {
-  0%, 15% {
-    transform: rotate(0deg);
-  }
-  35%, 65% {
-    transform: rotate(-90deg);
-  }
-  85%, 100% {
-    transform: rotate(0deg);
-  }
-}
 
 
 .fullscreen-btn {

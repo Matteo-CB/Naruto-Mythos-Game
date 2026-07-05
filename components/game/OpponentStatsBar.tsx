@@ -6,12 +6,16 @@ import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { ChessClockDisplay } from '@/components/game/ChessClockDisplay';
 import { useGameScale } from './GameScaleContext';
+import { CountryFlag } from '@/components/CountryFlag';
+import { usePlayerFlag } from '@/lib/hooks/usePlayerFlags';
 
 export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
   const t = useTranslations();
   const dims = useGameScale();
   const visibleState = useGameStore((s) => s.visibleState);
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
+  const oppPlayerId = visibleState ? (visibleState.myPlayer === 'player1' ? 'player2' : 'player1') : null;
+  const flagCode = usePlayerFlag(oppPlayerId ? playerDisplayNames[oppPlayerId] : null);
 
   if (!visibleState) return null;
 
@@ -35,7 +39,8 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
       }}
     >
 
-      <span className="font-semibold shrink-0" style={{ fontSize: dims.isMobile ? '14px' : '12px', color: '#b33e3e' }}>
+      <span className="font-semibold shrink-0 flex items-center gap-1.5" style={{ fontSize: dims.isMobile ? '14px' : '12px', color: '#b33e3e' }}>
+        <CountryFlag code={flagCode} size={dims.isMobile ? 16 : 14} />
         {opponentName}
       </span>
 

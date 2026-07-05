@@ -14,7 +14,6 @@ import { isVariantCard, isLockedVariantCard } from "@/lib/variants/isVariant";
 import { useTrackOnMount, trackUiHook } from "@/lib/hooks/useTrackUi";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
-import Image from "next/image";
 import {
   getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel,
 } from "@/lib/utils/cardLocale";
@@ -296,14 +295,13 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
 
 const GridThumb = memo(function GridThumb({ src }: { src: string }) {
   return (
-    <Image
+    <img
       src={src}
       alt=""
-      fill
-      sizes="128px"
-      quality={55}
+      loading="lazy"
+      decoding="async"
       draggable={false}
-      className="object-cover"
+      className="absolute inset-0 w-full h-full object-cover"
     />
   );
 });

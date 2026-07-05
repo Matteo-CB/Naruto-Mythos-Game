@@ -54,19 +54,20 @@
     "tier_BAN": "禁止",
     "bannedInRanked": "ランク戦で禁止",
     "usageCollecting": "使用統計を収集中です。ランク戦がプレイされたら再度ご確認ください。",
-    "usageRateLabel": "採用率",
-    "usageDecksLabel": "採用デッキ",
+    "usageRateLabel": "ランク戦使用率",
+    "usageDecksLabel": "プレイされたデッキ（14日間）",
     "usageDecksValue": "{total}中{count}",
     "usagePlayersLabel": "アクティブプレイヤー（14日間）",
     "usageTierLabel": "ランク",
-    "usageBasis": "過去14日間のランク戦クラシックのデッキに基づきます。カードの全バリアントは同じ採用率を共有します。",
+    "usageBasis": "過去14日間のランク戦でプレイされたデッキに基づいています。カードの全バリアントは同じ使用率を共有します。",
     "rotateDeviceTitle": "端末を横にしてください",
     "rotateDeviceDesc": "効果シミュレーションは横向きで見やすくなります。",
     "replaySim": "もう一度",
     "demoYou": "あなた",
     "demoOpponent": "相手",
     "simSpectatorHint": "他のプレイヤーがこのターンをプレイしています",
-    "simDone": "ターン終了"
+    "simDone": "ターン終了",
+    "startSim": "シミュレーションを開始"
   },
   "seoPages": {
     "collection": {
@@ -86,7 +87,7 @@
     },
     "leaderboard": {
       "title": "プレイヤーELOランキング - トップ競技プレイヤー | ナルト ミトス TCG",
-      "description": "リアルタイム更新のナルト ミトス TCG公式ELOランキングを確認しよう。ELOスコア、勝ち、負け、引き分け、勝率、成績履歴など、詳細な統計とともにトップの競技プレイヤーを紹介。世界ランキングで自分の進歩を追い、トッププレイヤーと結果を比べ、ランク対戦でランキングを駆け上がろう。ELOランキングシステムは、公平で競技的なマッチメイキングのために適応型のK係数を採用しています。",
+      "description": "リアルタイム更新のナルト ミトス TCG公式ELOランキングを確認しよう。ELOスコア、勝ち、負け、勝率、成績履歴など、詳細な統計とともにトップの競技プレイヤーを紹介。世界ランキングで自分の進歩を追い、トッププレイヤーと結果を比べ、ランク対戦でランキングを駆け上がろう。ELOランキングシステムは、公平で競技的なマッチメイキングのために適応型のK係数を採用しています。",
       "ogAlt": "ナルト ミトス TCG ELOランキング"
     },
     "friends": {
@@ -125,7 +126,52 @@
     },
     "profile": {
       "title": "{name} のプロフィール - 統計とランキング | ナルト ミトス TCG",
-      "description": "ナルト ミトス TCGの {name} のプロフィールを見てみよう。詳細なゲーム統計、ELOスコア、勝ち、負け、引き分け、直近の対戦履歴、対人戦の成績、世界ランキングの推移。"
+      "description": "ナルト ミトス TCGの {name} のプロフィールを見てみよう。詳細なゲーム統計、ELOスコア、勝ち、負け、直近の対戦履歴、対人戦の成績、世界ランキングの推移。"
+    },
+    "play": {
+      "title": "プレイ、すべてのゲームモード | Naruto Mythos TCG",
+      "description": "ゲームモードを選ぼう：オンラインランク戦、AI対戦、シールド戦、トレーニング、ローカル対戦。ブラウザでそのまま遊べる無料の非公式ナルト ミトス カードゲームシミュレーター。",
+      "ogAlt": "Naruto Mythos TCG、ゲームモード"
+    },
+    "playHotseat": {
+      "title": "ローカル2人対戦 | Naruto Mythos TCG",
+      "description": "同じ画面で友達と対戦：Naruto Mythos TCGシミュレーターのローカル対戦モード。ナルトのカードゲームのルールを友達と学ぶのに最適。無料でインストール不要。",
+      "ogAlt": "Naruto Mythos TCG、ローカル対戦"
+    },
+    "playTraining": {
+      "title": "ガイド付きトレーニングモード | Naruto Mythos TCG",
+      "description": "トレーニングモードでナルト ミトス カードゲームの遊び方を学ぼう：毎ターンのアドバイス付きでAIと対戦するステップバイステップのガイド付きマッチ。無料で始めるのに最適。",
+      "ogAlt": "Naruto Mythos TCG、トレーニング"
+    },
+    "playEvolving": {
+      "title": "Evolving Mode、もう一つのランク戦 | Naruto Mythos TCG",
+      "description": "Evolving Modeで遊ぼう：対戦ごとにデッキが進化するNaruto Mythos TCGシミュレーターのもう一つのランキング。独自のデッキ構築ルールで専用ELOを駆け上がろう。",
+      "ogAlt": "Naruto Mythos TCG、Evolving Mode"
+    },
+    "tournaments": {
+      "title": "コミュニティトーナメント | Naruto Mythos TCG",
+      "description": "Naruto Mythos TCGシミュレーターのコミュニティトーナメントに参加しよう：スイスドローまたはシングルエリミネーション、構築戦またはシールド戦、プロモカードの賞品付き。オンラインで無料登録。",
+      "ogAlt": "Naruto Mythos TCG、トーナメント"
+    },
+    "tournamentsResults": {
+      "title": "トーナメント結果 | Naruto Mythos TCG",
+      "description": "Naruto Mythos TCGコミュニティトーナメントの全結果：優勝者、最終順位、オンラインシミュレーターの過去大会の履歴。",
+      "ogAlt": "Naruto Mythos TCG、トーナメント結果"
+    },
+    "topdeck": {
+      "title": "公式店舗トーナメント | Naruto Mythos TCG",
+      "description": "世界中の店舗でプレイされているナルト ミトス カードゲームのリアル大会を追いかけよう：今後のイベント、結果、順位、デッキリスト。データ提供：TopDeck.gg。",
+      "ogAlt": "Naruto Mythos TCG、店舗トーナメント"
+    },
+    "topdeckPlayers": {
+      "title": "店舗トーナメントのプレイヤー | Naruto Mythos TCG",
+      "description": "ナルト ミトスのリアル大会のプレイヤーを検索して履歴を見よう：参加大会、順位、集計統計。データ提供：TopDeck.gg。",
+      "ogAlt": "Naruto Mythos TCG、大会プレイヤー"
+    },
+    "helpUs": {
+      "title": "プロジェクトを支援 | Naruto Mythos TCG",
+      "description": "無料のNaruto Mythos TCGシミュレーターの開発を支援しよう：広告なし、ボランティアで運営されるファンプロジェクト。プロジェクトの成長を助ける方法を見てみよう。",
+      "ogAlt": "Naruto Mythos TCG、プロジェクト支援"
     }
   },
   "cardMeta": {
@@ -3151,7 +3197,6 @@
     "title": "ELO履歴",
     "windowLabel": "過去 {days} 日",
     "statGames": "対戦",
-    "statWLD": "勝 / 敗 / 分",
     "statEloChange": "ELO変動",
     "statOpponents": "相手",
     "chartStart": "開始 {elo}",
@@ -3168,7 +3213,8 @@
     "topOpponents": "主な相手",
     "matchCount": "{count, plural, one {# 対戦} other {# 対戦}}",
     "winShort": "勝",
-    "lossShort": "敗"
+    "lossShort": "敗",
+    "statWL": "勝 / 敗"
   },
   "quests": {
     "title": "クエスト",

@@ -54,19 +54,20 @@
     "tier_BAN": "Prohibida",
     "bannedInRanked": "Prohibida en clasificatoria",
     "usageCollecting": "Recopilando estadísticas de uso. Vuelve cuando se hayan jugado partidas clasificatorias.",
-    "usageRateLabel": "Tasa de aparición",
-    "usageDecksLabel": "En mazos",
+    "usageRateLabel": "Tasa de uso en clasificatoria",
+    "usageDecksLabel": "Mazos jugados (14 d)",
     "usageDecksValue": "{count} de {total}",
     "usagePlayersLabel": "Jugadores activos (14 d)",
     "usageTierLabel": "Nivel",
-    "usageBasis": "Basado en mazos clasificatorios clásicos de los últimos 14 días. Todas las variantes de una carta comparten la misma tasa.",
+    "usageBasis": "Basado en los mazos jugados en partidas clasificatorias durante los últimos 14 días. Todas las variantes de una carta comparten la misma tasa.",
     "rotateDeviceTitle": "Gira tu dispositivo",
     "rotateDeviceDesc": "La simulación se ve mejor en horizontal.",
     "replaySim": "Repetir",
     "demoYou": "Tú",
     "demoOpponent": "Rival",
     "simSpectatorHint": "Otra persona juega este turno",
-    "simDone": "Turno completado"
+    "simDone": "Turno completado",
+    "startSim": "Iniciar la simulación"
   },
   "seoPages": {
     "collection": {
@@ -126,6 +127,51 @@
     "profile": {
       "title": "Perfil de {name} - Estadísticas y ranking | Naruto Mythos TCG",
       "description": "Consulta el perfil de {name} en Naruto Mythos TCG. Estadísticas de juego detalladas, puntuación ELO, victorias, derrotas, empates, historial reciente de partidas, rendimiento multijugador y progresión en la clasificación mundial."
+    },
+    "play": {
+      "title": "Jugar, todos los modos de juego | Naruto Mythos TCG",
+      "description": "Elige tu modo de juego: partidas clasificatorias en línea, partidas contra la IA, mazo sellado, entrenamiento o duelo local. Simulador gratuito y no oficial del juego de cartas Naruto Mythos, jugable directamente en tu navegador.",
+      "ogAlt": "Naruto Mythos TCG, modos de juego"
+    },
+    "playHotseat": {
+      "title": "Duelo local para dos jugadores | Naruto Mythos TCG",
+      "description": "Enfréntate a un amigo en la misma pantalla: el modo de duelo local del simulador Naruto Mythos TCG. Perfecto para aprender las reglas del juego de cartas Naruto entre amigos, gratis y sin instalación.",
+      "ogAlt": "Naruto Mythos TCG, duelo local"
+    },
+    "playTraining": {
+      "title": "Modo entrenamiento guiado | Naruto Mythos TCG",
+      "description": "Aprende a jugar al juego de cartas Naruto Mythos con el modo entrenamiento: una partida guiada paso a paso contra la IA con consejos en cada turno. Ideal para empezar gratis.",
+      "ogAlt": "Naruto Mythos TCG, entrenamiento"
+    },
+    "playEvolving": {
+      "title": "Evolving Mode, la clasificatoria alternativa | Naruto Mythos TCG",
+      "description": "Juega al Evolving Mode: una clasificación alternativa del simulador Naruto Mythos TCG donde tu mazo evoluciona partida tras partida. Sube un ELO dedicado con reglas de construcción únicas.",
+      "ogAlt": "Naruto Mythos TCG, Evolving Mode"
+    },
+    "tournaments": {
+      "title": "Torneos comunitarios | Naruto Mythos TCG",
+      "description": "Participa en los torneos comunitarios del simulador Naruto Mythos TCG: rondas suizas o eliminación directa, mazo construido o sellado, con cartas promocionales para ganar. Inscripción gratuita en línea.",
+      "ogAlt": "Naruto Mythos TCG, torneos"
+    },
+    "tournamentsResults": {
+      "title": "Resultados de torneos | Naruto Mythos TCG",
+      "description": "Todos los resultados de los torneos comunitarios de Naruto Mythos TCG: ganadores, clasificaciones finales e historial de las ediciones pasadas del simulador en línea.",
+      "ogAlt": "Naruto Mythos TCG, resultados de torneos"
+    },
+    "topdeck": {
+      "title": "Torneos oficiales en tienda | Naruto Mythos TCG",
+      "description": "Sigue los torneos reales del juego de cartas Naruto Mythos jugados en tiendas de todo el mundo: próximos eventos, resultados, clasificaciones y decklists. Datos proporcionados por TopDeck.gg.",
+      "ogAlt": "Naruto Mythos TCG, torneos en tienda"
+    },
+    "topdeckPlayers": {
+      "title": "Jugadores de torneos en tienda | Naruto Mythos TCG",
+      "description": "Busca a un jugador de los torneos reales de Naruto Mythos y consulta su historial: torneos jugados, clasificaciones y estadísticas agregadas. Datos proporcionados por TopDeck.gg.",
+      "ogAlt": "Naruto Mythos TCG, jugadores de torneos"
+    },
+    "helpUs": {
+      "title": "Apoyar el proyecto | Naruto Mythos TCG",
+      "description": "Apoya el desarrollo del simulador gratuito Naruto Mythos TCG: un proyecto de fans, sin publicidad, mantenido por voluntarios. Descubre cómo ayudar a crecer el proyecto.",
+      "ogAlt": "Naruto Mythos TCG, apoyar el proyecto"
     }
   },
   "cardMeta": {
@@ -3152,7 +3198,6 @@
     "title": "Historial de ELO",
     "windowLabel": "últimos {days} días",
     "statGames": "partidas",
-    "statWLD": "V / D / E",
     "statEloChange": "cambio de ELO",
     "statOpponents": "rivales",
     "chartStart": "{elo} inicio",
@@ -3169,7 +3214,8 @@
     "topOpponents": "rivales principales",
     "matchCount": "{count, plural, one {# partida} other {# partidas}}",
     "winShort": "V",
-    "lossShort": "D"
+    "lossShort": "D",
+    "statWL": "V / D"
   },
   "quests": {
     "title": "Misiones",

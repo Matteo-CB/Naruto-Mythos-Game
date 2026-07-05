@@ -634,7 +634,7 @@ export default function AdminPage() {
                       </button>
                     )}
 
-                    <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>{p.wins}{t('players.winShort')} {p.losses}{t('players.lossShort')} {p.draws}{t('players.drawShort')}</span>
+                    <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>{p.wins}{t('players.winShort')} {p.losses}{t('players.lossShort')}</span>
                     {p.discordUsername && <span className="text-[10px]" style={{ color: '#5865F2' }}>{p.discordUsername}</span>}
 
                     <div className="flex items-center gap-1.5 ml-auto">
@@ -1098,7 +1098,7 @@ function SuspiciousPanel() {
                 <div key={u.id} className="flex items-center gap-3 text-[11px] flex-wrap" style={{ color: '#ccc' }}>
                   <span className="font-bold" style={{ color: '#c4a35a' }}>{u.username}</span>
                   <span style={{ color: '#666' }}>ELO {u.elo}</span>
-                  <span style={{ color: '#666' }}>W/L/D {u.wins}/{u.losses}/{u.draws}</span>
+                  <span style={{ color: '#666' }}>W/L {u.wins}/{u.losses}</span>
                   <span style={{ color: '#555' }}>{u.email}</span>
                   {u.discordId && <span style={{ color: '#555' }}>{t('discordId', { id: u.discordId })}</span>}
                   <span style={{ color: '#444' }}>{t('createdAt', { date: new Date(u.createdAt).toLocaleString(locale) })}</span>

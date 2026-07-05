@@ -54,6 +54,7 @@ export function SimulationGame({ cardId, effectIndex, onClose }: { cardId: strin
 
   const [portrait, setPortrait] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [started, setStarted] = useState(false);
   const [done, setDone] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
   const [runToken, setRunToken] = useState(0);
@@ -71,6 +72,7 @@ export function SimulationGame({ cardId, effectIndex, onClose }: { cardId: strin
   }, []);
 
   useEffect(() => {
+    if (!started) return;
     const scenario = getScenario(cardId, effectIndex);
     if (!scenario) { setUnavailable(true); return; }
     initializeRegistry();
@@ -236,7 +238,7 @@ export function SimulationGame({ cardId, effectIndex, onClose }: { cardId: strin
       useUIStore.setState({ showGameLog: false });
       useGameStore.getState().resetGame();
     };
-  }, [cardId, effectIndex, runToken]);
+  }, [cardId, effectIndex, runToken, started]);
 
   const replay = useCallback(() => { setDone(false); setRunToken((x) => x + 1); }, []);
 
@@ -282,6 +284,31 @@ export function SimulationGame({ cardId, effectIndex, onClose }: { cardId: strin
   }
 
   if (typeof document === 'undefined') return null;
+
+  if (!started) {
+    return (
+      <div className="fixed inset-0 bg-[#050505] text-[#e8e8e8] flex flex-col items-center justify-center gap-6" style={{ zIndex: Z_APP_MODAL }}>
+        <motion.button
+          type="button"
+          onClick={() => setStarted(true)}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          className="px-8 py-4 text-base font-bold uppercase tracking-[0.14em] cursor-pointer"
+          style={{
+            backgroundColor: '#c4a35a',
+            color: '#0a0a0a',
+            border: 'none',
+            boxShadow: '0 0 24px rgba(196, 163, 90, 0.35), 0 8px 24px rgba(0, 0, 0, 0.6)',
+            transform: 'skewX(-3deg)',
+          }}
+        >
+          <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>{t('cardPage.startSim')}</span>
+        </motion.button>
+        <p className="text-sm max-w-xs text-center" style={{ color: '#9a9a9a' }}>{t('cardPage.simSpectatorHint')}</p>
+        {closeBtn}
+      </div>
+    );
+  }
 
   const board = <GameBoard />;
 

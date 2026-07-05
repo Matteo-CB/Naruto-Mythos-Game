@@ -3,7 +3,10 @@ import { getAllCards } from '@/lib/data/cardLoader';
 import { assignUsageTiers, type UsageTier } from '@/lib/cards/usageTiers';
 import { STATIC_RANKED_BANNED_CARD_IDS } from '@/lib/data/rankedBans';
 
-const ACTIVE_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
+const WINDOW_DAYS = 14;
+const SNAPSHOT_LOOKBACK_DAYS = 2;
+const RETENTION_DAYS = 16;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export interface ComputedCardUsage {
   cardId: string;
@@ -22,47 +25,135 @@ function groupKeyOf(setId: string, number: number): string {
   return `${setId}#${number}`;
 }
 
-export async function computeCardUsage(): Promise<CardUsageResult> {
-  const cutoff = new Date(Date.now() - ACTIVE_WINDOW_MS);
+function utcDateKey(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
 
-  const games = await prisma.game.findMany({
-    where: {
-      isAiGame: false,
-      isEvolving: false,
-      eloChange: { not: null },
-      completedAt: { gte: cutoff },
-    },
-    select: { player1Id: true, player2Id: true },
+function buildGroupMap(): Map<string, string> {
+  const groupOf = new Map<string, string>();
+  for (const c of getAllCards()) groupOf.set(c.id, groupKeyOf(c.set, c.number));
+  return groupOf;
+}
+
+interface RankedGameDecksDoc {
+  p1?: string[];
+  p2?: string[];
+}
+
+async function fetchRankedGameDecks(dayStart: Date, dayEnd: Date): Promise<RankedGameDecksDoc[]> {
+  const playerDeckIds = (player: 'player1' | 'player2') => ({
+    $concatArrays: [
+      { $ifNull: [`$gameState.initialState.${player}.deck.id`, []] },
+      { $ifNull: [`$gameState.initialState.${player}.hand.id`, []] },
+      { $ifNull: [`$gameState.initialState.${player}.missionCards.id`, []] },
+    ],
   });
 
-  const activeUserIds = new Set<string>();
-  for (const g of games) {
-    if (g.player1Id) activeUserIds.add(g.player1Id);
-    if (g.player2Id) activeUserIds.add(g.player2Id);
-  }
+  const res = await prisma.$runCommandRaw({
+    aggregate: 'Game',
+    pipeline: [
+      {
+        $match: {
+          isAiGame: false,
+          isEvolving: false,
+          eloChange: { $ne: null },
+          completedAt: { $gte: { $date: dayStart.toISOString() }, $lt: { $date: dayEnd.toISOString() } },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          p1: playerDeckIds('player1'),
+          p2: playerDeckIds('player2'),
+        },
+      },
+    ],
+    cursor: { batchSize: 10000 },
+  }) as unknown as { cursor?: { firstBatch?: RankedGameDecksDoc[] } };
 
-  const decks = activeUserIds.size > 0
-    ? await prisma.deck.findMany({
-        where: { userId: { in: [...activeUserIds] } },
-        select: { cardIds: true, missionIds: true },
-      })
-    : [];
-  const totalDecks = decks.length;
+  return res.cursor?.firstBatch ?? [];
+}
 
-  const cards = getAllCards();
-  const groupOf = new Map<string, string>();
-  for (const c of cards) groupOf.set(c.id, groupKeyOf(c.set, c.number));
+async function snapshotDay(dateKey: string, groupOf: Map<string, string>): Promise<void> {
+  const dayStart = new Date(`${dateKey}T00:00:00.000Z`);
+  const dayEnd = new Date(dayStart.getTime() + DAY_MS);
+
+  const games = await fetchRankedGameDecks(dayStart, dayEnd);
 
   const groupCounts: Record<string, number> = {};
-  for (const d of decks) {
-    const groupsInDeck = new Set<string>();
-    for (const id of [...(d.cardIds ?? []), ...(d.missionIds ?? [])]) {
-      const g = groupOf.get(id);
-      if (g) groupsInDeck.add(g);
+  let decks = 0;
+  for (const g of games) {
+    for (const deckIds of [g.p1, g.p2]) {
+      if (!Array.isArray(deckIds) || deckIds.length === 0) continue;
+      decks++;
+      const groupsInDeck = new Set<string>();
+      for (const id of deckIds) {
+        const grp = groupOf.get(id);
+        if (grp) groupsInDeck.add(grp);
+      }
+      for (const grp of groupsInDeck) groupCounts[grp] = (groupCounts[grp] ?? 0) + 1;
     }
-    for (const g of groupsInDeck) groupCounts[g] = (groupCounts[g] ?? 0) + 1;
   }
 
+  await prisma.cardUsageDay.deleteMany({ where: { date: dateKey } });
+  const rows = Object.entries(groupCounts).map(([cardId, count]) => ({ date: dateKey, cardId, decks: count }));
+  if (rows.length > 0) {
+    await prisma.cardUsageDay.createMany({ data: rows });
+  }
+  await prisma.cardUsageDayTotal.upsert({
+    where: { date: dateKey },
+    create: { date: dateKey, decks, games: games.length },
+    update: { decks, games: games.length },
+  });
+}
+
+async function snapshotRecentDays(now: Date, groupOf: Map<string, string>): Promise<void> {
+  for (let offset = SNAPSHOT_LOOKBACK_DAYS; offset >= 0; offset--) {
+    const dateKey = utcDateKey(new Date(now.getTime() - offset * DAY_MS));
+    await snapshotDay(dateKey, groupOf);
+  }
+}
+
+async function cleanupOldSnapshots(now: Date): Promise<void> {
+  const cutoffKey = utcDateKey(new Date(now.getTime() - RETENTION_DAYS * DAY_MS));
+  await prisma.cardUsageDay.deleteMany({ where: { date: { lt: cutoffKey } } });
+  await prisma.cardUsageDayTotal.deleteMany({ where: { date: { lt: cutoffKey } } });
+}
+
+export async function computeCardUsage(): Promise<CardUsageResult> {
+  const now = new Date();
+  const groupOf = buildGroupMap();
+
+  await snapshotRecentDays(now, groupOf);
+  await cleanupOldSnapshots(now);
+
+  const windowStartKey = utcDateKey(new Date(now.getTime() - (WINDOW_DAYS - 1) * DAY_MS));
+
+  const [dayRows, dayTotals, activeRows] = await Promise.all([
+    prisma.cardUsageDay.findMany({
+      where: { date: { gte: windowStartKey } },
+      select: { cardId: true, decks: true },
+    }),
+    prisma.cardUsageDayTotal.findMany({
+      where: { date: { gte: windowStartKey } },
+      select: { decks: true },
+    }),
+    prisma.eloHistory.findMany({
+      where: { isRanked: true, createdAt: { gte: new Date(now.getTime() - WINDOW_DAYS * DAY_MS) } },
+      select: { userId: true },
+      distinct: ['userId'],
+    }),
+  ]);
+
+  const totalDecks = dayTotals.reduce((sum, d) => sum + d.decks, 0);
+  const activePlayers = activeRows.length;
+
+  const groupCounts: Record<string, number> = {};
+  for (const row of dayRows) {
+    groupCounts[row.cardId] = (groupCounts[row.cardId] ?? 0) + row.decks;
+  }
+
+  const cards = getAllCards();
   const uniqueGroups = [...new Set(cards.map((c) => groupOf.get(c.id)!))];
   const groupRates = uniqueGroups.map((g) => ({
     cardId: g,
@@ -81,5 +172,5 @@ export async function computeCardUsage(): Promise<CardUsageResult> {
     return { cardId: c.id, count, rate, tier };
   });
 
-  return { totalDecks, activePlayers: activeUserIds.size, cards: cardsResult };
+  return { totalDecks, activePlayers, cards: cardsResult };
 }

@@ -54,19 +54,20 @@
     "tier_BAN": "Banned",
     "bannedInRanked": "Banned in ranked play",
     "usageCollecting": "Usage statistics are being collected. Come back after some ranked games have been played.",
-    "usageRateLabel": "Appearance rate",
-    "usageDecksLabel": "In decks",
+    "usageRateLabel": "Ranked usage rate",
+    "usageDecksLabel": "Decks played (14d)",
     "usageDecksValue": "{count} of {total}",
     "usagePlayersLabel": "Active players (14d)",
     "usageTierLabel": "Tier",
-    "usageBasis": "Based on ranked-classic decks over the last 14 days. All variants of a card share the same rate.",
+    "usageBasis": "Based on the decks played in ranked games over the last 14 days. All variants of a card share the same rate.",
     "rotateDeviceTitle": "Rotate your device",
     "rotateDeviceDesc": "The effect simulation is best viewed in landscape.",
     "replaySim": "Replay",
     "demoYou": "You",
     "demoOpponent": "Opponent",
     "simSpectatorHint": "Someone else is playing this turn",
-    "simDone": "Turn complete"
+    "simDone": "Turn complete",
+    "startSim": "Start the simulation"
   },
   "seoPages": {
     "collection": {
@@ -126,6 +127,51 @@
     "profile": {
       "title": "{name}'s Profile - Stats and Ranking | Naruto Mythos TCG",
       "description": "View {name}'s profile on Naruto Mythos TCG. Detailed game statistics, ELO score, wins, losses, draws, recent match history, multiplayer performance, and global ranking progression."
+    },
+    "play": {
+      "title": "Play, all game modes | Naruto Mythos TCG",
+      "description": "Pick your game mode: ranked online matches, games against the AI, sealed deck, training or local duel. Free unofficial Naruto Mythos card game simulator, playable right in your browser.",
+      "ogAlt": "Naruto Mythos TCG, game modes"
+    },
+    "playHotseat": {
+      "title": "Local two-player duel | Naruto Mythos TCG",
+      "description": "Face a friend on the same screen: the local duel mode of the Naruto Mythos TCG simulator. Perfect for learning the Naruto card game rules with friends, free and with no install.",
+      "ogAlt": "Naruto Mythos TCG, local duel"
+    },
+    "playTraining": {
+      "title": "Guided training mode | Naruto Mythos TCG",
+      "description": "Learn how to play the Naruto Mythos card game with the training mode: a step-by-step guided match against the AI with advice every turn. The ideal free way to start.",
+      "ogAlt": "Naruto Mythos TCG, training"
+    },
+    "playEvolving": {
+      "title": "Evolving Mode, the alternative ranked ladder | Naruto Mythos TCG",
+      "description": "Play Evolving Mode: an alternative ranked ladder of the Naruto Mythos TCG simulator where your deck evolves game after game. Climb a dedicated ELO with unique deck-building rules.",
+      "ogAlt": "Naruto Mythos TCG, Evolving Mode"
+    },
+    "tournaments": {
+      "title": "Community tournaments | Naruto Mythos TCG",
+      "description": "Join the community tournaments of the Naruto Mythos TCG simulator: Swiss rounds or single elimination, constructed or sealed deck, with promo cards to win. Free online registration.",
+      "ogAlt": "Naruto Mythos TCG, tournaments"
+    },
+    "tournamentsResults": {
+      "title": "Tournament results | Naruto Mythos TCG",
+      "description": "All the results of Naruto Mythos TCG community tournaments: winners, final standings and the history of past editions of the online simulator.",
+      "ogAlt": "Naruto Mythos TCG, tournament results"
+    },
+    "topdeck": {
+      "title": "Official in-store tournaments | Naruto Mythos TCG",
+      "description": "Follow the real Naruto Mythos card game tournaments played in stores worldwide: upcoming events, results, standings and decklists. Data provided by TopDeck.gg.",
+      "ogAlt": "Naruto Mythos TCG, in-store tournaments"
+    },
+    "topdeckPlayers": {
+      "title": "In-store tournament players | Naruto Mythos TCG",
+      "description": "Search a player from real Naruto Mythos tournaments and browse their history: tournaments played, standings and aggregated stats. Data provided by TopDeck.gg.",
+      "ogAlt": "Naruto Mythos TCG, tournament players"
+    },
+    "helpUs": {
+      "title": "Support the project | Naruto Mythos TCG",
+      "description": "Support the development of the free Naruto Mythos TCG simulator: a fan project, ad-free, maintained by volunteers. Find out how to help the project grow.",
+      "ogAlt": "Naruto Mythos TCG, support the project"
     }
   },
   "cardMeta": {
@@ -3147,7 +3193,6 @@
     "title": "ELO history",
     "windowLabel": "last {days} days",
     "statGames": "games",
-    "statWLD": "W / L / D",
     "statEloChange": "ELO change",
     "statOpponents": "opponents",
     "chartStart": "{elo} start",
@@ -3164,7 +3209,8 @@
     "topOpponents": "top opponents",
     "matchCount": "{count, plural, one {# match} other {# matches}}",
     "winShort": "W",
-    "lossShort": "L"
+    "lossShort": "L",
+    "statWL": "W / L"
   },
   "quests": {
     "title": "Quests",

@@ -7,6 +7,13 @@
       "title_ja": "スマホで盤面が見やすく、本物の盤面でリプレイ",
       "title_es": "Tablero más legible en el móvil, repeticiones en el tablero real",
       "changes_fr": [
+        "Les égalités ne sont plus affichées dans le classement et les statistiques : une partie ne peut jamais finir à égalité.",
+        "Les cartes s'affichent de nouveau dans le constructeur de deck.",
+        "Le drapeau du pays choisi par chaque joueur s'affiche maintenant en jeu à côté de son pseudo.",
+        "Les pourcentages d'utilisation des cartes sont désormais calculés sur les decks réellement joués en parties classées sur 14 jours, plus sur l'ensemble des decks enregistrés.",
+        "La page de chaque carte est plus lisible : la police stylisée est réservée au titre.",
+        "La simulation d'effet ne démarre plus toute seule : un bouton Lancer la simulation apparaît d'abord.",
+        "L'écran qui demande de tourner le téléphone en début de partie est plus élégant, avec son bouton plein écran.",
         "Sur téléphone, le plateau de jeu est beaucoup plus lisible : tous les textes, chiffres et badges sont nettement plus grands.",
         "Sur téléphone, les boutons d'action et le journal de partie sont plus grands et plus faciles à toucher.",
         "Sur téléphone, le bouton Détails d'une carte est maintenant une grande pastille dorée en bas à droite, avec le nom de la carte et une croix pour fermer.",
@@ -15,6 +22,13 @@
         "Le journal de partie affiche désormais des actions qui manquaient : un personnage déplacé par son propre effet, une carte reprise de la défausse, et le retrait ou le vol de jetons de puissance."
       ],
       "changes_en": [
+        "Draws are no longer shown in the leaderboard and stats: a game can never end in a draw.",
+        "Cards display again in the deck builder.",
+        "Each player's chosen country flag now shows in game next to their username.",
+        "Card usage percentages are now computed from the decks actually played in ranked games over 14 days, no longer from all saved decks.",
+        "Each card's page is more readable: the stylized font is reserved for the title.",
+        "The effect simulation no longer starts on its own: a Start the simulation button appears first.",
+        "The rotate-your-phone screen at the start of a game looks nicer, with its fullscreen button.",
         "On phones, the game board is much more readable: all texts, numbers and badges are clearly bigger.",
         "On phones, the action buttons and the game log are bigger and easier to tap.",
         "On phones, the card Details button is now a large gold chip at the bottom right, with the card name and a close cross.",
@@ -23,6 +37,13 @@
         "The game log now shows actions that were missing: a character moved by its own effect, a card taken back from the discard pile, and Power tokens removed or stolen."
       ],
       "changes_ja": [
+        "ランキングと統計から引き分けの表示を削除しました：対戦が引き分けで終わることはありません。",
+        "デッキビルダーでカードが再び表示されるようになりました。",
+        "各プレイヤーが選んだ国旗が、対戦中にユーザー名の横に表示されるようになりました。",
+        "カードの使用率が、保存された全デッキではなく、過去14日間のランク戦で実際にプレイされたデッキから計算されるようになりました。",
+        "各カードのページが読みやすくなりました：装飾フォントはタイトルのみに使用されます。",
+        "効果シミュレーションが自動で始まらなくなりました：まずシミュレーションを開始ボタンが表示されます。",
+        "対戦開始時のスマホを横にする画面がより美しくなり、フルスクリーンボタンが付きました。",
         "スマホでゲーム盤がずっと見やすくなりました：テキスト、数字、バッジがはっきり大きく表示されます。",
         "スマホでアクションボタンとゲームログが大きくなり、タップしやすくなりました。",
         "スマホでカードの詳細ボタンが右下の大きな金色のチップになり、カード名と閉じるボタンが付きました。",
@@ -31,6 +52,13 @@
         "これまで表示されなかった行動がゲームログに出るようになりました：自身の効果で移動したキャラクター、捨札から手札に戻したカード、パワートークンの除去や奪取。"
       ],
       "changes_es": [
+        "Los empates ya no se muestran en la clasificación ni en las estadísticas: una partida nunca puede terminar en empate.",
+        "Las cartas vuelven a mostrarse en el constructor de mazos.",
+        "La bandera del país elegida por cada jugador ahora se muestra en partida junto a su nombre.",
+        "Los porcentajes de uso de las cartas ahora se calculan sobre los mazos realmente jugados en partidas clasificatorias durante 14 días, ya no sobre todos los mazos guardados.",
+        "La página de cada carta es más legible: la fuente estilizada se reserva para el título.",
+        "La simulación de efecto ya no arranca sola: primero aparece un botón Iniciar la simulación.",
+        "La pantalla que pide girar el teléfono al empezar una partida es más elegante, con su botón de pantalla completa.",
         "En el móvil, el tablero de juego es mucho más legible: todos los textos, números e insignias son claramente más grandes.",
         "En el móvil, los botones de acción y el registro de partida son más grandes y más fáciles de tocar.",
         "En el móvil, el botón de detalles de una carta es ahora una gran ficha dorada abajo a la derecha, con el nombre de la carta y una cruz para cerrar.",
