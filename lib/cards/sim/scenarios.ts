@@ -30,7 +30,9 @@ interface BoardOpts {
   upgBase?: { id: string; iid: string };
   extraP2m0?: CharacterInPlay[];
   p2chakra?: number;
+  p2hand?: string[];
   missions?: number;
+  missionIds?: string[];
   chakra?: number;
   edge?: PlayerID;
 }
@@ -47,12 +49,13 @@ function board(o: BoardOpts): GameState {
   const p2: CharacterInPlay[] = (o.e0 ?? []).map((e, i) =>
     simChar(e.id, { owner: 'player2', instanceId: e.iid ?? `se0-${i}`, hidden: e.hidden, powerTokens: e.tokens }));
   for (const c of o.extraP2m0 ?? []) p2.push(c);
-  const st = buildSimState({ hand1: o.hand ?? [], p1, p2, missions: o.missions ?? 2, chakra1: o.chakra ?? 20, edgeHolder: o.edge ?? 'player1' });
+  const st = buildSimState({ hand1: o.hand ?? [], p1, p2, missions: o.missions ?? 2, missionIds: o.missionIds, chakra1: o.chakra ?? 20, edgeHolder: o.edge ?? 'player1' });
   (o.p1m1 ?? []).forEach((id, i) => st.activeMissions[1].player1Characters.push(simChar(id, { owner: 'player1', instanceId: `sf1-${i}`, missionIndex: 1 })));
   (o.e1 ?? []).forEach((e, i) => st.activeMissions[1].player2Characters.push(simChar(e.id, { owner: 'player2', instanceId: e.iid ?? `se1-${i}`, missionIndex: 1, hidden: e.hidden, powerTokens: e.tokens })));
   st.player1.deck = DECKF();
   st.player2.deck = DECKF();
   if (o.p2chakra != null) st.player2.chakra = o.p2chakra;
+  if (o.p2hand) st.player2.hand = o.p2hand.map((id) => getCharacterById(id)!).filter(Boolean);
   return st;
 }
 
@@ -123,6 +126,56 @@ const FACTORIES: Record<string, Factory> = {
   }),
 };
 
+const PASS_ACTION: GameAction = { type: 'PASS' };
+const VANILLA = 'KS-009-C';
+
+function missionFiller(missionId: string): string {
+  return missionId === 'KS-006-MMS' ? 'KS-001-MMS' : 'KS-006-MMS';
+}
+
+function scoreMissionScenario(missionId: string, extra: Partial<BoardOpts> = {}): SimScenario {
+  return {
+    build: () => board({ p1m0: [VANILLA], ...extra, missionIds: [missionId, missionFiller(missionId)] }),
+    play: P1(PASS_ACTION),
+    followups: [{ player: 'player2', action: PASS_ACTION }],
+    noMinimize: true,
+  };
+}
+
+const MISSION_FACTORIES: Record<string, () => SimScenario> = {
+  'KS-001-MMS': () => scoreMissionScenario('KS-001-MMS'),
+  'KS-002-MMS': () => ({
+    build: () => board({ hand: ['KS-086-C'], p1m0: [VANILLA], missionIds: ['KS-002-MMS', 'KS-006-MMS'] }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
+  'KS-003-MMS': () => scoreMissionScenario('KS-003-MMS', { p2hand: ['KS-005-C'] }),
+  'KS-004-MMS': () => scoreMissionScenario('KS-004-MMS', { e0: [{ id: 'KS-005-C', iid: 'sim-hid-enemy', hidden: true }] }),
+  'KS-005-MMS': () => scoreMissionScenario('KS-005-MMS'),
+  'KS-006-MMS': () => scoreMissionScenario('KS-006-MMS'),
+  'KS-007-MMS': () => scoreMissionScenario('KS-007-MMS', { hidden0: { id: 'KS-005-C', iid: 'sim-hid-ally' } }),
+  'KS-008-MMS': () => scoreMissionScenario('KS-008-MMS', { hand: ['KS-005-C'] }),
+  'KS-009-MMS': () => ({
+    build: () => board({ hand: ['KS-086-C'], p1m0: ['KS-005-C'], missionIds: ['KS-009-MMS', 'KS-006-MMS'] }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
+  'KS-010-MMS': () => ({
+    build: () => board({ p1m0: [VANILLA], missionIds: ['KS-010-MMS', 'KS-006-MMS'] }),
+    play: P1(PASS_ACTION),
+    followups: [
+      { player: 'player2', action: PASS_ACTION },
+      P1({ type: 'ADVANCE_PHASE' }),
+      P1({ type: 'ADVANCE_PHASE' }),
+    ],
+    noMinimize: true,
+  }),
+};
+
+export function hasMissionScenario(cardId: string): boolean {
+  return !!MISSION_FACTORIES[cardId];
+}
+
 // Resolve a variant (RA/MV/SV/L/_2...) to a curated base with the same set+number, since variants share the effect.
 function curatedBaseFor(cardId: string): string | undefined {
   if (FACTORIES[cardId]) return cardId;
@@ -143,6 +196,8 @@ const SKIP_MINIMIZE_KINDS = new Set(['moveblock', 'revealblock', 'hideallyblock'
 const minimizeCache = new Map<string, SimScenario | undefined>();
 
 function buildScenario(cardId: string, effectIndex: number): { scenario: SimScenario | undefined; kind: string | null } {
+  const missionFactory = MISSION_FACTORIES[cardId];
+  if (missionFactory) return { scenario: missionFactory(), kind: null };
   const card = getCharacterById(cardId);
   const eff = card?.effects?.[effectIndex];
   if (card && eff?.type === 'UPGRADE' && firesUpgrade(card)) return { scenario: upgradeScenario(card), kind: null };

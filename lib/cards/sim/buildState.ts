@@ -47,6 +47,7 @@ export interface BuildSimOpts {
   p1?: CharacterInPlay[];
   p2?: CharacterInPlay[];
   missions?: number;
+  missionIds?: string[];
   chakra1?: number;
   edgeHolder?: PlayerID;
 }
@@ -55,7 +56,7 @@ export function buildSimState(opts: BuildSimOpts = {}): GameState {
   const missionCount = Math.max(1, opts.missions ?? 2);
   const activeMissions: ActiveMission[] = [];
   for (let i = 0; i < missionCount; i++) {
-    const mcard = getMissionById(MISSION_IDS[i] ?? MISSION_IDS[0]) as MissionCard;
+    const mcard = getMissionById(opts.missionIds?.[i] ?? MISSION_IDS[i] ?? MISSION_IDS[0]) as MissionCard;
     activeMissions.push({
       card: mcard,
       rank: 'D',

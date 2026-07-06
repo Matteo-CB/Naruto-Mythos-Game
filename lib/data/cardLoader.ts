@@ -60,7 +60,7 @@ function normalizeCard(raw: RawJsonCard): CardData {
     chakra: typeof raw.chakra === 'number' ? raw.chakra : 0,
     power: typeof raw.power === 'number' ? raw.power : 0,
     keywords: raw.keywords || [],
-    group: raw.group || 'Independent',
+    group: raw.card_type === 'mission' ? '' : (raw.group || 'Independent'),
     effects: (raw.effects || []).map(e => ({
       type: e.type as 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE',
       description: e.description,

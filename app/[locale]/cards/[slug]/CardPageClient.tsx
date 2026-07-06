@@ -84,6 +84,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
   const hasImage = !!card.image_file && !!imgSrc;
   const locked = isLockedVariantCard(card);
   const isCharacter = card.card_type === 'character';
+  const isMission = card.card_type === 'mission';
 
   const localizedEffects = getCardEffectDescriptions(card.id, locale);
   const effects = card.effects.map((eff, i) => ({
@@ -147,12 +148,12 @@ export function CardPageClient({ cardId }: { cardId: string }) {
         </nav>
 
         <div className="flex flex-col md:flex-row gap-6 md:gap-10">
-          <div className="w-full max-w-[300px] mx-auto md:mx-0 shrink-0">
+          <div className={`w-full ${isMission ? 'max-w-[440px]' : 'max-w-[300px]'} mx-auto md:mx-0 shrink-0`}>
             <div className="relative">
               {hasImage && fine ? (
-                <HoloCard src={imgSrc!} alt={`${name} ${card.number}`} rarity={holoRarity(card.rarity)} width={300} height={420} />
+                <HoloCard src={imgSrc!} alt={`${name} ${card.number}`} rarity={holoRarity(card.rarity)} width={isMission ? 440 : 300} height={isMission ? 322 : 420} />
               ) : (
-                <div className="w-full" style={{ maxWidth: 300 }}>
+                <div className="w-full" style={{ maxWidth: isMission ? 440 : 300 }}>
                   <CardFace card={card} />
                 </div>
               )}
@@ -191,7 +192,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
               )}
             </div>
 
-            {card.group && (
+            {card.group && isCharacter && (
               <p className="mt-4 text-sm text-[#b9b9b9]">
                 <span className="text-[#8a8a8a] uppercase tracking-wider text-xs">{t('group')} : </span>
                 {getCardGroup(card.group, tCardMeta)}
