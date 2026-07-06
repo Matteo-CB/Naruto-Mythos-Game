@@ -13,6 +13,12 @@ interface PlaybackControlsProps {
   actionLabel?: string;
 }
 
+const BTN: React.CSSProperties = {
+  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  color: '#9a9a9a',
+  cursor: 'pointer',
+};
+
 export function PlaybackControls({
   currentStep,
   totalSteps,
@@ -92,7 +98,7 @@ export function PlaybackControls({
           break;
         case '1': case '2': case '3': case '4': {
           const turnNum = parseInt(e.key);
-          const ts = turnStarts.find(ts => ts.turn === turnNum);
+          const ts = turnStarts.find(x => x.turn === turnNum);
           if (ts) { stopPlay(); onStepChange(ts.step); }
           break;
         }
@@ -122,207 +128,145 @@ export function PlaybackControls({
     return turnStarts[0]?.turn ?? 1;
   })();
 
-  const handleProgressClick = (e: React.MouseEvent) => {
+  const seekFromClientX = useCallback((clientX: number) => {
     const bar = progressBarRef.current;
     if (!bar) return;
     const rect = bar.getBoundingClientRect();
-    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    stopPlay();
+    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     onStepChange(Math.round(pct * (totalSteps - 1)));
-  };
+  }, [onStepChange, totalSteps]);
 
-  const isDraggingRef = useRef(false);
-  const handleMouseDown = (e: React.MouseEvent) => {
-    isDraggingRef.current = true;
-    handleProgressClick(e);
-    const onMouseMove = (ev: MouseEvent) => {
-      if (!isDraggingRef.current || !progressBarRef.current) return;
-      const rect = progressBarRef.current.getBoundingClientRect();
-      const pct = Math.max(0, Math.min(1, (ev.clientX - rect.left) / rect.width));
-      onStepChange(Math.round(pct * (totalSteps - 1)));
+  const handlePointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    stopPlay();
+    seekFromClientX(e.clientX);
+    const onMove = (ev: PointerEvent) => seekFromClientX(ev.clientX);
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
     };
-    const onMouseUp = () => {
-      isDraggingRef.current = false;
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    };
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
   };
 
   return (
     <div
-      className="w-full overflow-hidden"
+      className="pointer-events-auto flex flex-col overflow-hidden"
       style={{
-        backgroundColor: 'rgba(8, 8, 14, 0.95)',
-        backdropFilter: 'blur(12px)',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
+        width: 'min(620px, calc(100vw - 16px))',
+        backgroundColor: 'rgba(8, 8, 14, 0.92)',
+        backdropFilter: 'blur(14px)',
+        borderRadius: '10px',
+        boxShadow: '0 10px 32px rgba(0, 0, 0, 0.55)',
       }}
     >
-      
-      {actionLabel && (
-        <div
-          className="px-4 py-1"
-          style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', margin: '0 16px' }}
-        >
-          <span className="text-[11px] leading-relaxed" style={{ color: '#c0c0c0' }}>
-            {actionLabel}
-          </span>
-        </div>
-      )}
-
-      <div className="px-4 pt-2 pb-0.5">
-        <div
-          ref={progressBarRef}
-          className="relative w-full h-1.5 cursor-pointer group"
-          style={{ backgroundColor: '#1a1a24' }}
-          onMouseDown={handleMouseDown}
-        >
+      <div
+        ref={progressBarRef}
+        className="relative w-full cursor-pointer"
+        style={{ height: '14px', touchAction: 'none' }}
+        onPointerDown={handlePointerDown}
+      >
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2" style={{ height: '4px', backgroundColor: '#1c1c26' }}>
           {turnStarts.map(({ turn, step }) => {
             const pct = totalSteps > 1 ? (step / (totalSteps - 1)) * 100 : 0;
             return (
               <div
                 key={turn}
-                className="absolute top-1/2 -translate-y-1/2 w-0.5 h-2.5"
-                style={{
-                  left: `${pct}%`,
-                  backgroundColor: 'rgba(255,255,255,0.15)',
-                  zIndex: 1,
-                }}
+                className="absolute top-1/2 -translate-y-1/2"
+                style={{ left: `${pct}%`, width: '2px', height: '8px', backgroundColor: 'rgba(255,255,255,0.18)' }}
               />
             );
           })}
-          
           <div
             className="absolute left-0 top-0 h-full"
             style={{
               width: `${progressPct}%`,
               backgroundColor: '#c4a35a',
-              transition: isPlaying ? 'none' : 'width 0.15s ease-out',
-            }}
-          />
-          
-          <div
-            className="absolute top-1/2 -translate-y-1/2 transition-all group-hover:scale-125"
-            style={{
-              left: `calc(${progressPct}% - 5px)`,
-              width: '10px',
-              height: '10px',
-              backgroundColor: '#c4a35a',
-              border: '2px solid #0a0a0a',
-              boxShadow: '0 0 6px rgba(196,163,90,0.4)',
-              transform: 'translateY(-50%) rotate(45deg)',
-              zIndex: 2,
+              transition: isPlaying ? 'none' : 'width 0.12s ease-out',
             }}
           />
         </div>
+        <div
+          className="absolute top-1/2"
+          style={{
+            left: `calc(${progressPct}% - 5px)`,
+            width: '10px',
+            height: '10px',
+            backgroundColor: '#c4a35a',
+            boxShadow: '0 0 8px rgba(196,163,90,0.5)',
+            transform: 'translateY(-50%) rotate(45deg)',
+          }}
+        />
       </div>
 
-      <div className="flex items-center justify-between px-4 py-1.5 gap-3">
-        
-        <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 px-2 pb-1.5 pt-0.5">
+        <div className="flex items-center gap-1 shrink-0">
+          <button onClick={goToStart} className="flex items-center justify-center w-7 h-7 text-[10px] rounded" style={BTN} title={t('start')}>
+            |&lt;
+          </button>
+          <button onClick={stepBack} className="flex items-center justify-center w-7 h-7 text-xs rounded" style={BTN} title={t('stepBack')}>
+            &lt;
+          </button>
+          <button
+            onClick={isPlaying ? stopPlay : startPlay}
+            className="flex items-center justify-center w-9 h-7 text-xs font-bold rounded"
+            style={{
+              backgroundColor: isPlaying ? 'rgba(179,62,62,0.18)' : 'rgba(62,139,62,0.18)',
+              color: isPlaying ? '#d16a6a' : '#5cb85c',
+              cursor: 'pointer',
+            }}
+          >
+            {isPlaying ? '||' : '|>'}
+          </button>
+          <button onClick={stepForward} className="flex items-center justify-center w-7 h-7 text-xs rounded" style={BTN} title={t('stepForward')}>
+            &gt;
+          </button>
+          <button onClick={goToEnd} className="flex items-center justify-center w-7 h-7 text-[10px] rounded" style={BTN} title={t('end')}>
+            &gt;|
+          </button>
+        </div>
+
+        <div className="flex items-center gap-1 shrink-0 ml-1">
           {turnStarts.map(({ turn, step }) => (
             <button
               key={turn}
               onClick={() => { stopPlay(); onStepChange(step); }}
-              className="flex items-center justify-center px-2 py-0.5 text-[10px] font-bold cursor-pointer transition-colors"
+              className="flex items-center justify-center w-7 h-7 text-[10px] font-bold rounded"
               style={{
-                transform: 'skewX(-3deg)',
-                backgroundColor: currentTurn === turn ? 'rgba(196, 163, 90, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                backgroundColor: currentTurn === turn ? 'rgba(196, 163, 90, 0.18)' : 'rgba(255, 255, 255, 0.04)',
                 color: currentTurn === turn ? '#c4a35a' : '#666',
-                borderLeft: currentTurn === turn ? '3px solid #c4a35a' : '3px solid rgba(255, 255, 255, 0.08)',
+                cursor: 'pointer',
                 fontFamily: "'NJNaruto', Arial, sans-serif",
               }}
             >
-              <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>T{turn}</span>
+              T{turn}
             </button>
           ))}
         </div>
 
-        <div className="flex items-center gap-1">
-          <button
-            onClick={goToStart}
-            className="flex items-center justify-center w-7 h-7 text-[10px] cursor-pointer transition-colors"
-            style={{
-              transform: 'skewX(-3deg)',
-              backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              color: '#777',
-            }}
-            title={t('start')}
-          >
-            <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>|&lt;</span>
-          </button>
-          <button
-            onClick={stepBack}
-            className="flex items-center justify-center w-7 h-7 text-xs cursor-pointer transition-colors"
-            style={{
-              transform: 'skewX(-3deg)',
-              backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              color: '#777',
-            }}
-            title={t('stepBack')}
-          >
-            <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>&lt;</span>
-          </button>
-          <button
-            onClick={isPlaying ? stopPlay : startPlay}
-            className="flex items-center justify-center w-9 h-7 text-xs font-bold cursor-pointer transition-colors"
-            style={{
-              transform: 'skewX(-3deg)',
-              backgroundColor: isPlaying ? 'rgba(179,62,62,0.12)' : 'rgba(62,139,62,0.12)',
-              borderLeft: isPlaying ? '3px solid rgba(179,62,62,0.6)' : '3px solid rgba(62,139,62,0.6)',
-              color: isPlaying ? '#b33e3e' : '#4a9e4a',
-            }}
-          >
-            <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
-              {isPlaying ? '||' : '|>'}
-            </span>
-          </button>
-          <button
-            onClick={stepForward}
-            className="flex items-center justify-center w-7 h-7 text-xs cursor-pointer transition-colors"
-            style={{
-              transform: 'skewX(-3deg)',
-              backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              color: '#777',
-            }}
-            title={t('stepForward')}
-          >
-            <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>&gt;</span>
-          </button>
-          <button
-            onClick={goToEnd}
-            className="flex items-center justify-center w-7 h-7 text-[10px] cursor-pointer transition-colors"
-            style={{
-              transform: 'skewX(-3deg)',
-              backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              color: '#777',
-            }}
-            title={t('end')}
-          >
-            <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>&gt;|</span>
-          </button>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={cycleSpeed}
-            className="flex items-center justify-center px-2 py-0.5 text-[10px] font-medium cursor-pointer transition-colors"
-            style={{
-              transform: 'skewX(-3deg)',
-              backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              color: speed === 'fast' ? '#c4a35a' : speed === 'slow' ? '#5A7ABB' : '#888',
-            }}
-            title={`${t('speed')}: ${t(speed)}`}
-          >
-            <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
-              {speed === 'slow' ? '0.5x' : speed === 'normal' ? '1x' : '2x'}
-            </span>
-          </button>
-          <span className="text-[10px] tabular-nums" style={{ color: '#555' }}>
-            {currentStep + 1}/{totalSteps}
+        {actionLabel ? (
+          <span className="flex-1 min-w-0 px-2 text-[11px] truncate" style={{ color: '#b9b9b9' }}>
+            {actionLabel}
           </span>
-        </div>
+        ) : (
+          <span className="flex-1" />
+        )}
+
+        <button
+          onClick={cycleSpeed}
+          className="flex items-center justify-center px-2 h-7 text-[10px] font-medium rounded shrink-0"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.04)',
+            color: speed === 'fast' ? '#c4a35a' : speed === 'slow' ? '#7a94cc' : '#888',
+            cursor: 'pointer',
+          }}
+          title={`${t('speed')}: ${t(speed)}`}
+        >
+          {speed === 'slow' ? '0.5x' : speed === 'normal' ? '1x' : '2x'}
+        </button>
+        <span className="text-[10px] tabular-nums shrink-0 pr-1" style={{ color: '#555' }}>
+          {currentStep + 1}/{totalSteps}
+        </span>
       </div>
     </div>
   );

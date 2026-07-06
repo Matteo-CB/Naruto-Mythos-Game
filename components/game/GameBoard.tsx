@@ -973,6 +973,7 @@ function GameBoardInner() {
   const dims = useGameScale();
   const visibleState = useGameStore((s) => s.visibleState);
   const gameOver = useGameStore((s) => s.gameOver);
+  const isReplayMode = useGameStore((s) => s.isReplayMode);
   const isProcessing = useGameStore((s) => s.isProcessing);
   const addAnimation = useGameStore((s) => s.addAnimation);
   const pinnedCard = useUIStore((s) => s.pinnedCard);
@@ -1161,15 +1162,19 @@ function GameBoardInner() {
       <FullscreenCardDetail />
       <MobileDetailsButton />
 
-      <EdgeCoinFlip />
+      {!isReplayMode && <EdgeCoinFlip />}
       <SpectatorBanner />
-      <MulliganDialog />
+      {!isReplayMode && <MulliganDialog />}
       <GameLog />
       <GameChat />
       <AnimationController />
-      <TargetSelector />
-      <HandCardSelector />
-      <EffectChoiceSelector />
+      {!isReplayMode && (
+        <>
+          <TargetSelector />
+          <HandCardSelector />
+          <EffectChoiceSelector />
+        </>
+      )}
 
       {gameOver && <GameEndScreen />}
 

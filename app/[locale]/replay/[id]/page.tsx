@@ -116,7 +116,6 @@ function ShareButton({ gameId }: { gameId: string }) {
       style={{
         transform: 'skewX(-3deg)',
         backgroundColor: copied ? 'rgba(62,139,62,0.15)' : 'rgba(10, 10, 18, 0.88)',
-        borderLeft: copied ? '3px solid rgba(62,139,62,0.4)' : '3px solid rgba(255,255,255,0.1)',
         color: copied ? '#4a9e4a' : '#888888',
         backdropFilter: 'blur(12px)',
       }}
@@ -357,7 +356,6 @@ function TextTimeline({
               style={{
                 transform: 'skewX(-3deg)',
                 backgroundColor: isPlaying ? 'rgba(179,62,62,0.1)' : 'rgba(62,139,62,0.1)',
-                borderLeft: isPlaying ? '3px solid rgba(179,62,62,0.5)' : '3px solid rgba(62,139,62,0.5)',
                 color: isPlaying ? '#b33e3e' : '#4a9e4a',
               }}
             >
@@ -399,7 +397,6 @@ function TextTimeline({
               transform: 'skewX(-3deg)',
               backgroundColor: selectedTurn === null ? 'rgba(196,163,90,0.15)' : 'rgba(255,255,255,0.03)',
               color: selectedTurn === null ? '#c4a35a' : '#666',
-              borderLeft: selectedTurn === null ? '3px solid #c4a35a' : '3px solid rgba(255,255,255,0.08)',
             }}
           >
             <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>{tr('allTurns')}</span>
@@ -413,7 +410,6 @@ function TextTimeline({
                 transform: 'skewX(-3deg)',
                 backgroundColor: selectedTurn === turn ? 'rgba(196,163,90,0.15)' : 'rgba(255,255,255,0.03)',
                 color: selectedTurn === turn ? '#c4a35a' : '#666',
-                borderLeft: selectedTurn === turn ? '3px solid #c4a35a' : '3px solid rgba(255,255,255,0.08)',
                 fontFamily: "'NJNaruto', Arial, sans-serif",
               }}
             >
@@ -448,7 +444,6 @@ function TextTimeline({
                       : entry.player
                         ? `${playerColor}05`
                         : 'transparent',
-                    borderLeft: isHighlighted ? '3px solid rgba(196, 163, 90, 0.6)' : '3px solid transparent',
                     opacity: isFuture ? 0.25 : 1,
                     transition: 'background-color 0.3s ease, opacity 0.3s ease',
                   }}
@@ -508,6 +503,7 @@ function VisualReplay({
   const locale = useLocale() as 'en' | 'fr';
   const [currentStep, setCurrentStep] = useState(0);
   const [showLog, setShowLog] = useState(false);
+  const [controlsHot, setControlsHot] = useState(true);
   const [viewAs, setViewAs] = useState<PlayerID>(defaultViewAs ?? 'player1');
 
   const states = useMemo(() => {
@@ -1037,7 +1033,6 @@ function VisualReplay({
             backgroundColor: showLog ? 'rgba(196,163,90,0.15)' : 'rgba(10, 10, 18, 0.88)',
             backdropFilter: 'blur(12px)',
             color: showLog ? '#c4a35a' : '#888',
-            borderLeft: showLog ? '3px solid rgba(196,163,90,0.6)' : '3px solid rgba(255,255,255,0.08)',
           }}
         >
           <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>{tr('eventTimeline')}</span>
@@ -1066,11 +1061,21 @@ function VisualReplay({
         </div>
       )}
 
-      <div className="flex-1 min-h-0 relative z-10">
+      <div className="absolute inset-0 z-10">
         <ReplayGameHost state={currentState} viewAs={viewAs} playerNames={playerNames} />
       </div>
 
-      <div className="shrink-0 relative z-20">
+      <div
+        className="absolute inset-x-0 z-20 flex justify-center pointer-events-none"
+        style={{
+          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
+          opacity: controlsHot ? 1 : 0.55,
+          transition: 'opacity 0.25s ease',
+        }}
+        onPointerEnter={() => setControlsHot(true)}
+        onPointerLeave={() => setControlsHot(false)}
+        onPointerDown={() => setControlsHot(true)}
+      >
         <PlaybackControls
           currentStep={currentStep}
           totalSteps={states.length}
@@ -1183,7 +1188,6 @@ function TextOnlyReplay({
           style={{
             transform: 'skewX(-3deg)',
             backgroundColor: isPlaying ? 'rgba(179,62,62,0.1)' : 'rgba(62,139,62,0.1)',
-            borderLeft: isPlaying ? '3px solid rgba(179,62,62,0.5)' : '3px solid rgba(62,139,62,0.5)',
             color: isPlaying ? '#b33e3e' : '#4a9e4a',
           }}
         >
@@ -1215,7 +1219,6 @@ function TextOnlyReplay({
             transform: 'skewX(-3deg)',
             backgroundColor: selectedTurn === null ? 'rgba(196,163,90,0.15)' : 'rgba(255,255,255,0.03)',
             color: selectedTurn === null ? '#c4a35a' : '#666',
-            borderLeft: selectedTurn === null ? '3px solid #c4a35a' : '3px solid rgba(255,255,255,0.08)',
           }}
         >
           <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>{tr('allTurns')}</span>
@@ -1229,7 +1232,6 @@ function TextOnlyReplay({
               transform: 'skewX(-3deg)',
               backgroundColor: selectedTurn === turn ? 'rgba(196,163,90,0.15)' : 'rgba(255,255,255,0.03)',
               color: selectedTurn === turn ? '#c4a35a' : '#666',
-              borderLeft: selectedTurn === turn ? '3px solid #c4a35a' : '3px solid rgba(255,255,255,0.08)',
               fontFamily: "'NJNaruto', Arial, sans-serif",
             }}
           >

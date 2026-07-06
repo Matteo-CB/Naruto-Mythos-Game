@@ -17,7 +17,10 @@
         "Dans le constructeur de deck et sur les pages de carte, les cartes sont maintenant rangées par set puis par numéro de collection : le set 1 d'abord, le set 2 ensuite.",
         "Les pages des cartes mission affichent maintenant la carte dans son vrai format panoramique.",
         "Chaque carte mission a désormais sa simulation : tu peux voir chacun de ses effets se jouer sur un vrai plateau.",
-        "Les cartes mission n'affichent plus de faction : elles n'en ont pas."
+        "Les cartes mission n'affichent plus de faction : elles n'en ont pas.",
+        "Les replays sont refaits : le plateau prend tout l'écran comme en jeu, sur téléphone comme sur PC.",
+        "Plus aucune fenêtre de choix ne bloque un replay : on regarde la partie se dérouler, rien à cliquer.",
+        "La barre de lecture des replays est une petite pilule flottante discrète : avancer, reculer, vitesse, saut de tour."
       ],
       "changes_en": [
         "Set 2 cards Kiba Inuzuka Chibi, Sasuke Uchiha, Neji Hyuga and Kurenai Yuhi now have their artwork.",
@@ -30,7 +33,10 @@
         "In the deck builder and on card pages, cards are now ordered by set then by collection number: set 1 first, set 2 after.",
         "Mission card pages now display the card in its real panoramic format.",
         "Every mission card now has its simulation: you can watch each of its effects play out on a real board.",
-        "Mission cards no longer show a faction: they have none."
+        "Mission cards no longer show a faction: they have none.",
+        "Replays are rebuilt: the board fills the whole screen like a real game, on phone and PC alike.",
+        "No more choice windows blocking a replay: you watch the game unfold, nothing to click.",
+        "The replay playback bar is a small discreet floating pill: forward, rewind, speed, turn jumps."
       ],
       "changes_es": [
         "Las cartas del set 2 Kiba Inuzuka Chibi, Sasuke Uchiha, Neji Hyuga y Kurenai Yuhi ya tienen su ilustración.",
@@ -43,7 +49,10 @@
         "En el constructor de mazos y en las páginas de cartas, las cartas ahora se ordenan por set y luego por número de colección: primero el set 1, después el set 2.",
         "Las páginas de las cartas de misión ahora muestran la carta en su verdadero formato panorámico.",
         "Cada carta de misión ahora tiene su simulación: puedes ver cada uno de sus efectos jugarse en un tablero real.",
-        "Las cartas de misión ya no muestran facción: no tienen ninguna."
+        "Las cartas de misión ya no muestran facción: no tienen ninguna.",
+        "Las repeticiones están rehechas: el tablero ocupa toda la pantalla como en una partida real, en móvil y en PC.",
+        "Ninguna ventana de elección bloquea ya una repetición: ves la partida desarrollarse, nada que pulsar.",
+        "La barra de reproducción es ahora una pequeña píldora flotante discreta: avanzar, retroceder, velocidad, salto de turno."
       ],
       "changes_ja": [
         "第2弾の犬塚キバ(ちび)、うちはサスケ、日向ネジ、夕日紅のカードにイラストが追加されました。",
@@ -56,7 +65,10 @@
         "デッキビルダーとカードページで、カードがセット順、次にコレクション番号順に並ぶようになりました。第1弾が先、第2弾が後です。",
         "ミッションカードのページで、カードが本来のパノラマ形式で表示されるようになりました。",
         "すべてのミッションカードにシミュレーションが追加され、各効果が実際の盤面で発動する様子を見られます。",
-        "ミッションカードに所属勢力が表示されなくなりました。ミッションには勢力がありません。"
+        "ミッションカードに所属勢力が表示されなくなりました。ミッションには勢力がありません。",
+        "リプレイを作り直しました。盤面が実際の対戦と同じように画面全体に表示されます。スマートフォンでもPCでも同様です。",
+        "選択ウィンドウがリプレイを妨げることがなくなりました。クリック不要で対戦の流れを観戦できます。",
+        "リプレイの再生バーが小さな浮かぶピルになりました。早送り、巻き戻し、速度変更、ターンジャンプができます。"
       ]
     },
     {
