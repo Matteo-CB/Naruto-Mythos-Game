@@ -17,6 +17,10 @@ function setRank(setId: string): number {
   return n == null ? Number.MAX_SAFE_INTEGER : n;
 }
 
+export function compareBySetOrder(a: CardData, b: CardData): number {
+  return compareCards(a, b);
+}
+
 function compareCards(a: CardData, b: CardData): number {
   const sa = setRank(a.set);
   const sb = setRank(b.set);

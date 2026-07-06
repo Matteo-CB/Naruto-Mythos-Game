@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { Link } from "@/lib/i18n/navigation";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { validateDeck } from "@/lib/engine/rules/DeckValidation";
+import { compareBySetOrder } from "@/lib/cards/order";
 import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useUnlockedVariants } from "@/lib/hooks/useUnlockedVariants";
@@ -549,12 +550,13 @@ export default function DeckBuilderPage() {
     return chars.sort((a, b) => {
       let cmp = 0;
       switch (sortBy) {
-        case 'number': cmp = a.number - b.number; break;
+        case 'number': cmp = compareBySetOrder(a, b); break;
         case 'name': cmp = getCardName(a, loc).localeCompare(getCardName(b, loc)); break;
         case 'chakra': cmp = (a.chakra ?? 0) - (b.chakra ?? 0); break;
         case 'power': cmp = (a.power ?? 0) - (b.power ?? 0); break;
         case 'rarity': cmp = (RARITY_ORDER[a.rarity] ?? 99) - (RARITY_ORDER[b.rarity] ?? 99); break;
       }
+      if (cmp === 0) cmp = compareBySetOrder(a, b);
       return sortOrder === 'desc' ? -cmp : cmp;
     });
   }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showAltArt]);

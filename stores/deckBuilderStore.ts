@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { MAX_COPIES_PER_VERSION, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
 import { resolveCardId } from '@/lib/data/cardLoader';
+import { compareBySetOrder } from '@/lib/cards/order';
 import { computeDeckEvolvingPoints, isEvolvingCompatible } from '@/lib/evolving/computePoints';
 import { isLockedVariantCard } from '@/lib/variants/isVariant';
 import { useToastStore } from '@/stores/toastStore';
@@ -243,7 +244,9 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
     const sorted = [...deckChars].sort((a, b) => {
       const costDiff = (a.chakra ?? 0) - (b.chakra ?? 0);
       if (costDiff !== 0) return costDiff;
-      return a.name_fr.localeCompare(b.name_fr);
+      const nameDiff = a.name_fr.localeCompare(b.name_fr);
+      if (nameDiff !== 0) return nameDiff;
+      return compareBySetOrder(a, b);
     });
     set({ deckChars: sorted });
   },
@@ -253,7 +256,9 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
     const sorted = [...deckChars].sort((a, b) => {
       const nameDiff = a.name_fr.localeCompare(b.name_fr);
       if (nameDiff !== 0) return nameDiff;
-      return (a.chakra ?? 0) - (b.chakra ?? 0);
+      const costDiff = (a.chakra ?? 0) - (b.chakra ?? 0);
+      if (costDiff !== 0) return costDiff;
+      return compareBySetOrder(a, b);
     });
     set({ deckChars: sorted });
   },

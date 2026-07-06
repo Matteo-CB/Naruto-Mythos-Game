@@ -11,7 +11,7 @@ const SimulationGame = dynamic(
   { ssr: false },
 );
 import { getCardById, getCardsByName } from '@/lib/data/cardIndex';
-import { getAdjacentCardIds } from '@/lib/cards/order';
+import { getAdjacentCardIds, compareBySetOrder } from '@/lib/cards/order';
 import { cardIdToSlug } from '@/lib/cards/slug';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
 import { getCardEffectDescriptions } from '@/lib/data/effectDescriptions';
@@ -95,10 +95,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
   const prevSlug = cardIdToSlug(prev);
   const nextSlug = cardIdToSlug(next);
 
-  const sameName = getCardsByName(card.name_fr).slice().sort((a, b) => {
-    if (a.number !== b.number) return a.number - b.number;
-    return a.id < b.id ? -1 : 1;
-  });
+  const sameName = getCardsByName(card.name_fr).slice().sort(compareBySetOrder);
   const variants = sameName.filter((c) => c.number === card.number);
   const otherVersions = sameName.filter((c) => c.number !== card.number);
 
