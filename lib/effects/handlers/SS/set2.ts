@@ -1,12 +1,10 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
-import type { PlayerID, CharacterInPlay, CardData, GameState } from '@/lib/engine/types';
+import type { PlayerID, CharacterInPlay } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 import { playLessSelectionResult } from '@/lib/effects/handlers/shared/playLess';
-import { shuffle } from '@/lib/engine/utils/shuffle';
-
-const NINJA_HOUND = 'Ninja Hound';
+import { ss000DeckHounds, ss000FinalizeSearch, ss000HoundChoicePayload, SS000_MAX_HOUNDS } from './ss000Search';
 
 function sideFor(player: PlayerID, which: 'friendly' | 'enemy'): 'player1Characters' | 'player2Characters' {
   const friendly = player === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -198,34 +196,24 @@ function ss121DuelHandler(ctx: EffectContext): EffectResult {
 
 
 function ss000SearchAndPlay(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
-  const ps = state[sourcePlayer];
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex, triggerType } = ctx;
 
-  const drawn: CardData[] = [];
-  const remaining: CardData[] = [];
-  for (const c of ps.deck) {
-    if (drawn.length < 2 && (c.keywords ?? []).includes(NINJA_HOUND)) drawn.push(c);
-    else remaining.push(c);
+  const hounds = ss000DeckHounds(state, sourcePlayer);
+  if (hounds.length === 0) {
+    return { state: ss000FinalizeSearch(state, sourcePlayer, triggerType, sourceCard.instanceId, sourceMissionIndex, 0) };
   }
 
-  const afterSearch: GameState = {
-    ...state,
-    [sourcePlayer]: { ...ps, hand: [...ps.hand, ...drawn], deck: shuffle(remaining) },
-    log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_DRAW',
-      `Kakashi Hatake (SS-000): Searched deck, drew ${drawn.length} Ninja Hound character(s), then shuffled.`,
-      'game.log.effect.ss000Search', { card: 'KAKASHI HATAKE', id: 'SS-000-L', count: drawn.length }),
+  const payload = ss000HoundChoicePayload(hounds, SS000_MAX_HOUNDS, 0);
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'SS000_CHOOSE_HOUNDS',
+    validTargets: payload.validTargets,
+    isOptional: true,
+    description: payload.description,
+    descriptionKey: payload.descriptionKey,
+    descriptionParams: payload.descriptionParams,
   };
-
-  const sel = playLessSelectionResult(afterSearch, sourcePlayer, {
-    category: { kind: 'keyword', value: NINJA_HOUND },
-    costReduction: 1,
-    sourceName: 'KAKASHI HATAKE',
-    sourceId: 'SS-000-L',
-    textFallback: 'Kakashi Hatake (SS-000): Play any number of Ninja Hound characters, paying 1 less.',
-    descriptionKey: 'game.effect.desc.ss000PlayHound',
-    repeatable: true,
-  });
-  return sel ?? { state: afterSearch };
 }
 
 

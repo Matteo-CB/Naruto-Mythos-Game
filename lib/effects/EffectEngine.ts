@@ -9,6 +9,7 @@ import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { hasResolvableInstantDuel } from './duelUtils';
 import { postMoveHide as choji018PostMoveHide } from './handlers/KS/uncommon/choji018';
 import { buildPlayLessTargets, type PlayLessCategory } from './handlers/shared/playLess';
+import { ss000DeckHounds, ss000FinalizeSearch, ss000HoundChoicePayload, SS000_NINJA_HOUND } from './handlers/SS/ss000Search';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
@@ -640,6 +641,7 @@ export class EffectEngine {
       tst === 'SAKURA135_CHOOSE_CARD' ||
       tst === 'TAYUYA125_CHOOSE_SOUND' ||
       tst === 'PLAY_LESS_CATEGORY' ||
+      tst === 'SS000_CHOOSE_HOUNDS' ||
       tst === 'RECOVER_FROM_DISCARD' ||
       tst === 'HIRUZEN002_CHOOSE_CARD' ||
       tst === 'ITACHI091_CHOOSE_DISCARD' ||
@@ -12823,6 +12825,55 @@ export class EffectEngine {
                 options: reoffer.targets, minSelections: 1, maxSelections: 1, sourceEffectId: plcEffId,
               });
             }
+          }
+        }
+        break;
+      }
+
+      case 'SS000_CHOOSE_HOUNDS': {
+        let ssMeta: { remaining?: number; drawn?: number } = {};
+        try { ssMeta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const ssPlayer = pendingEffect.sourcePlayer;
+        const ssIdx = targetId.startsWith('DECK_') ? parseInt(targetId.slice(5), 10) : NaN;
+        const ssPS = { ...newState[ssPlayer] };
+        const ssDeck = [...ssPS.deck];
+        if (!isNaN(ssIdx) && ssIdx >= 0 && ssIdx < ssDeck.length && (ssDeck[ssIdx].keywords ?? []).includes(SS000_NINJA_HOUND)) {
+          const [ssDrawnCard] = ssDeck.splice(ssIdx, 1);
+          ssPS.hand = [...ssPS.hand, ssDrawnCard];
+          ssPS.deck = ssDeck;
+          newState[ssPlayer] = ssPS;
+          newState.log = logAction(newState.log, newState.turn, newState.phase, ssPlayer, 'EFFECT_DRAW',
+            `Kakashi Hatake (SS-000): revealed and drew ${ssDrawnCard.name_fr}.`,
+            'game.log.effect.ss000Reveal', { card: 'KAKASHI HATAKE', id: 'SS-000-L', target: ssDrawnCard.name_fr });
+
+          const ssRemaining = (ssMeta.remaining ?? 1) - 1;
+          const ssDrawnCount = (ssMeta.drawn ?? 0) + 1;
+          const ssNextHounds = ssRemaining > 0 ? ss000DeckHounds(newState, ssPlayer) : [];
+          if (ssNextHounds.length > 0) {
+            const ssPayload = ss000HoundChoicePayload(ssNextHounds, ssRemaining, ssDrawnCount);
+            const ssEffId = generateInstanceId();
+            const ssActId = generateInstanceId();
+            newState.pendingEffects.push({
+              id: ssEffId, sourceCardId: pendingEffect.sourceCardId, sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+              effectDescription: ssPayload.description,
+              targetSelectionType: 'SS000_CHOOSE_HOUNDS', sourcePlayer: ssPlayer,
+              requiresTargetSelection: true, validTargets: ssPayload.validTargets, isOptional: true, isMandatory: false,
+              resolved: false, isUpgrade: false, rootOptional: true,
+            } as PendingEffect);
+            newState.pendingActions.push({
+              id: ssActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'], player: ssPlayer,
+              originPlayer: ssPlayer,
+              description: ssPayload.description,
+              descriptionKey: ssPayload.descriptionKey,
+              descriptionParams: ssPayload.descriptionParams,
+              options: ssPayload.validTargets, minSelections: 1, maxSelections: 1, sourceEffectId: ssEffId,
+            });
+          } else {
+            newState = ss000FinalizeSearch(
+              newState, ssPlayer, pendingEffect.effectType,
+              pendingEffect.sourceInstanceId, pendingEffect.sourceMissionIndex, ssDrawnCount,
+            );
           }
         }
         break;

@@ -876,7 +876,8 @@
         "kimimaro056NoPay": "{card} ({id}): El rival no tiene chakra y no puede pagar. El efecto continúa.",
         "ss000Search": "Kakashi Hatake (SS-000): buscó en el mazo, robó {count} Perro Ninja, luego barajó.",
         "ss112RemoveTokens": "Neji Hyuga (SS-112): retiró todos los contadores de Poder de un personaje enemigo.",
-        "kakashi148Locked": "{card} ({id}): el oponente bloqueó la Ventaja esta ronda, no se puede tomar."
+        "kakashi148Locked": "{card} ({id}): el oponente bloqueó la Ventaja esta ronda, no se puede tomar.",
+        "ss000Reveal": "Kakashi Hatake revela y roba {target}."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",
@@ -1484,7 +1485,8 @@
         "ss121MoveStack": "DUEL Kiba Inuzuka: Elige una misión a la que mover la carta del fondo de la pila de mejora.",
         "kakashi148Confirm": "Kakashi Hatake (148): ¿Tomar la Ventaja (no puedes perderla esta ronda)?",
         "ss147Confirm": "DUEL Sasuke Uchiha: ¿POWERUP {amount} (uno por enemigo no oculto en juego)?",
-        "ss134Confirm": "DUEL Itachi Uchiha: ¿Derrotar al personaje enemigo más fuerte (Poder {power})?"
+        "ss134Confirm": "DUEL Itachi Uchiha: ¿Derrotar al personaje enemigo más fuerte (Poder {power})?",
+        "ss000ChooseHound": "Kakashi Hatake: Elige un personaje Perro Ninja para revelar y robar ({remaining} restantes)."
       }
     },
     "anim": {

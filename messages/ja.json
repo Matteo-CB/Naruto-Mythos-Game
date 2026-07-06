@@ -875,7 +875,8 @@
         "kimimaro056NoPay": "{card}（{id}）：相手にチャクラがなく支払えません。効果は進行します。",
         "ss000Search": "はたけカカシ（SS-000）：山札を探して忍犬を{count}体引き、シャッフルした。",
         "ss112RemoveTokens": "日向ネジ（SS-112）：敵キャラクターのパワートークンをすべて取り除いた。",
-        "kakashi148Locked": "{card}（{id}）：相手がこのラウンド主導権をロックしており、奪えません。"
+        "kakashi148Locked": "{card}（{id}）：相手がこのラウンド主導権をロックしており、奪えません。",
+        "ss000Reveal": "はたけカカシが{target}を公開して引いた。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1483,7 +1484,8 @@
         "ss121MoveStack": "DUEL 犬塚キバ：強化スタックの一番下のカードを移動させるミッションを選ぶ。",
         "kakashi148Confirm": "はたけカカシ（148）：主導権を得る（このラウンド失わない）？",
         "ss147Confirm": "DUEL うちはサスケ：POWERUP {amount}（場の伏せていない敵1体につき1）？",
-        "ss134Confirm": "DUEL うちはイタチ：最も強い敵キャラクター（パワー{power}）を撃破する？"
+        "ss134Confirm": "DUEL うちはイタチ：最も強い敵キャラクター（パワー{power}）を撃破する？",
+        "ss000ChooseHound": "はたけカカシ：公開して引く忍犬キャラクターを選んでください（残り{remaining}体）。"
       }
     },
     "anim": {

@@ -871,7 +871,8 @@
         "kimimaro056NoPay": "{card} ({id}): Opponent has no Chakra and cannot pay. Effect proceeds.",
         "ss000Search": "Kakashi Hatake (SS-000): searched the deck, drew {count} Ninja Hound, then shuffled.",
         "ss112RemoveTokens": "Neji Hyuga (SS-112): removed all Power tokens from an enemy character.",
-        "kakashi148Locked": "{card} ({id}): the opponent locked the Edge this round, it cannot be taken."
+        "kakashi148Locked": "{card} ({id}): the opponent locked the Edge this round, it cannot be taken.",
+        "ss000Reveal": "Kakashi Hatake reveals and draws {target}."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -1479,7 +1480,8 @@
         "ss121MoveStack": "DUEL Kiba Inuzuka: Choose a mission to move the bottom card of the upgrade stack to.",
         "kakashi148Confirm": "Kakashi Hatake (148): Gain the Edge (you cannot lose it this round)?",
         "ss147Confirm": "DUEL Sasuke Uchiha: POWERUP {amount} (one per non-hidden enemy in play)?",
-        "ss134Confirm": "DUEL Itachi Uchiha: Defeat the strongest enemy character (Power {power})?"
+        "ss134Confirm": "DUEL Itachi Uchiha: Defeat the strongest enemy character (Power {power})?",
+        "ss000ChooseHound": "Kakashi Hatake: Choose a Ninja Hound character to reveal and draw ({remaining} remaining)."
       }
     },
     "anim": {

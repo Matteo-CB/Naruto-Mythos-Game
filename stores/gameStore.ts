@@ -625,6 +625,20 @@ function buildPendingTargetSelectionUI(
           card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
         };
       });
+    } else if (tst === 'SS000_CHOOSE_HOUNDS') {
+      let houndsInfo: Array<{ index: number; id?: string; name_fr: string; name_en?: string; chakra?: number; power?: number; image_file?: string }> = [];
+      try { houndsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').hounds ?? []; } catch { /* ignore */ }
+      handCards = pendingAction.options.map((optStr, optIdx) => {
+        const deckIdx = optStr.startsWith('DECK_') ? parseInt(optStr.slice(5), 10) : NaN;
+        const hound = houndsInfo.find((h) => h.index === deckIdx);
+        return {
+          index: optIdx,
+          targetId: optStr,
+          card: hound
+            ? { name_fr: hound.name_fr, name_en: hound.name_en, chakra: hound.chakra, power: hound.power, image_file: hound.image_file, id: hound.id }
+            : { name_fr: '???' },
+        };
+      });
     } else if (
       tst === 'TAYUYA125_CHOOSE_SOUND' ||
       tst === 'PLAY_LESS_CATEGORY' ||

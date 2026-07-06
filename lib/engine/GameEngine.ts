@@ -32,6 +32,7 @@ import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
 import { isRempartZeroed, canBeHiddenByEnemy } from '../effects/ContinuousEffects';
 import { triggerOnDefeatEffects } from '../effects/onDefeatTriggers';
+import { ss000FinalizeSearch } from '../effects/handlers/SS/ss000Search';
 import { getEffectivePower } from '../effects/powerUtils';
 import { isCopyableEffectType } from '../effects/handlers/KS/shared/copyExclusions';
 
@@ -658,6 +659,17 @@ export class GameEngine {
       
       if (!effect.isOptional && !effect.rootOptional) return state;
 
+
+      if (effect.targetSelectionType === 'SS000_CHOOSE_HOUNDS') {
+        let ssDeclineMeta: { drawn?: number } = {};
+        try { ssDeclineMeta = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+        return ss000FinalizeSearch(
+          newState, effect.sourcePlayer, effect.effectType,
+          effect.sourceInstanceId, effect.sourceMissionIndex, ssDeclineMeta.drawn ?? 0,
+        );
+      }
 
       if (effect.targetSelectionType === 'SASUKE014_CONFIRM_UPGRADE_MODIFIER') {
         newState.pendingEffects.splice(effectIdx, 1);

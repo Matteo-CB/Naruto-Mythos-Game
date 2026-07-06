@@ -877,7 +877,8 @@
         "kimimaro056NoPay": "{card} ({id}) : L'adversaire n'a pas de Chakra, ne peut pas payer. L'effet continue.",
         "ss000Search": "Kakashi Hatake (SS-000) : a cherché dans le deck, pioché {count} Chien Ninja, puis mélangé.",
         "ss112RemoveTokens": "Neji Hyûga (SS-112) : a retiré tous les jetons de Puissance d'un personnage ennemi.",
-        "kakashi148Locked": "{card} ({id}) : l'adversaire a verrouillé le Bonus ce tour, il ne peut pas être pris."
+        "kakashi148Locked": "{card} ({id}) : l'adversaire a verrouillé le Bonus ce tour, il ne peut pas être pris.",
+        "ss000Reveal": "Kakashi Hatake révèle et pioche {target}."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1485,7 +1486,8 @@
         "ss121MoveStack": "DUEL Kiba Inuzuka : Choisissez une mission où déplacer la carte du bas de la pile d'amélioration.",
         "kakashi148Confirm": "Kakashi Hatake (148) : Prendre le Bonus (vous ne pouvez pas le perdre ce tour) ?",
         "ss147Confirm": "DUEL Sasuke Uchiwa : POWERUP {amount} (un par ennemi non caché en jeu) ?",
-        "ss134Confirm": "DUEL Itachi Uchiwa : Vaincre le personnage ennemi le plus fort (Puissance {power}) ?"
+        "ss134Confirm": "DUEL Itachi Uchiwa : Vaincre le personnage ennemi le plus fort (Puissance {power}) ?",
+        "ss000ChooseHound": "Kakashi Hatake : Choisissez un personnage Chien Ninja à révéler et piocher ({remaining} restant)."
       }
     },
     "anim": {
