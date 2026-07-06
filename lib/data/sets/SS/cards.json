@@ -15,7 +15,7 @@
       "title_ja": "「お前は忍びになるべきではなかった。」",
       "title_fr": "Tu n'étais pas fait pour devenir un ninja.",
       "title_es": "Nunca estuviste destinado a ser un ninja.",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 6,
       "power": 6,
       "keywords": [
@@ -35,7 +35,8 @@
       ],
       "rarity_display": "Special V",
       "data_complete": true,
-      "old_id": "112/140 V"
+      "old_id": "112/140 V",
+      "image_file": "images/cards/SS/sp_v/SS-112-SPV.webp"
     },
     "SS-122-SPV": {
       "id": "SS-122-SPV",
@@ -123,7 +124,7 @@
       "title_ja": "「よし…終わらせよう！」",
       "title_fr": "Bien... Finissons-en !",
       "title_es": "Muy bien... ¡Acabemos con esto!",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 5,
       "power": 5,
       "keywords": [
@@ -143,7 +144,8 @@
       ],
       "rarity_display": "Rare",
       "data_complete": true,
-      "old_id": "134/140"
+      "old_id": "134/140",
+      "image_file": "images/cards/SS/rare/SS-134-R.webp"
     },
     "SS-126-SPV": {
       "id": "SS-126-SPV",
@@ -160,7 +162,7 @@
       "title_ja": "「兄を倒すために生き延びることだけを考えていた。」",
       "title_fr": "Tout ce qui m'importait, c'était de survivre pour vaincre mon frère.",
       "title_es": "Lo único que me importaba era sobrevivir para derrotar a mi hermano.",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 5,
       "power": 5,
       "keywords": [
@@ -179,7 +181,8 @@
       ],
       "rarity_display": "Special V",
       "data_complete": true,
-      "old_id": "126/140 V"
+      "old_id": "126/140 V",
+      "image_file": "images/cards/SS/sp_v/SS-126-SPV.webp"
     },
     "SS-120-CHIBIV": {
       "id": "SS-120-CHIBIV",
@@ -196,7 +199,7 @@
       "title_ja": "「においで分かるぜ、坊主。」",
       "title_fr": "Je peux te sentir, gamin.",
       "title_es": "Puedo olerte, chico.",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 5,
       "power": 6,
       "keywords": [
@@ -215,7 +218,8 @@
       ],
       "rarity_display": "Chibi V",
       "data_complete": true,
-      "old_id": "120/140 V"
+      "old_id": "120/140 V",
+      "image_file": "images/cards/SS/chibi_v/SS-120-CHIBIV.webp"
     },
     "SS-147-POPV": {
       "id": "SS-147-POPV",

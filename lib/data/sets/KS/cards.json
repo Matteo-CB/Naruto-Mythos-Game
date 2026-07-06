@@ -7855,7 +7855,7 @@
       "title_en": "Shadow Clone Jutsu",
       "title_ja": "影分身の術",
       "title_es": "Jutsu de Clones de Sombra",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 5,
       "power": 5,
       "keywords": [
@@ -7879,7 +7879,8 @@
       "data_complete": false,
       "old_id": "108/130 V",
       "cardId": "KS-108_4-MV",
-      "is_rare_art": false
+      "is_rare_art": false,
+      "image_file": "images/cards/KS/mythos_v/KS-108_4-MV.webp"
     },
     "KS-109-MV": {
       "id": "KS-109-MV",

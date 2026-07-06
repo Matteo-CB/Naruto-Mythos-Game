@@ -1,6 +1,29 @@
 {
   "entries": [
     {
+      "date": "2026-07-06",
+      "title_fr": "Cinq nouvelles illustrations de cartes",
+      "title_en": "Five new card artworks",
+      "title_es": "Cinco nuevas ilustraciones de cartas",
+      "title_ja": "カードイラストを5枚追加",
+      "changes_fr": [
+        "Les cartes Kiba Inuzuka Chibi, Sasuke Uchiha, Neji Hyuga et Kurenai Yuhi du set 2 ont maintenant leur illustration.",
+        "La variante Mythos de Naruto Uzumaki Multi Clonage qui n'avait pas d'image a reçu la sienne."
+      ],
+      "changes_en": [
+        "Set 2 cards Kiba Inuzuka Chibi, Sasuke Uchiha, Neji Hyuga and Kurenai Yuhi now have their artwork.",
+        "The Naruto Uzumaki Shadow Clone Jutsu Mythos variant that was missing its image received it."
+      ],
+      "changes_es": [
+        "Las cartas del set 2 Kiba Inuzuka Chibi, Sasuke Uchiha, Neji Hyuga y Kurenai Yuhi ya tienen su ilustración.",
+        "La variante Mythos de Naruto Uzumaki Jutsu: Clones de Sombra que no tenía imagen ya la tiene."
+      ],
+      "changes_ja": [
+        "第2弾の犬塚キバ(ちび)、うちはサスケ、日向ネジ、夕日紅のカードにイラストが追加されました。",
+        "イラストがなかったうずまきナルト影分身の術のMythosバリアントに画像が追加されました。"
+      ]
+    },
+    {
       "date": "2026-07-05",
       "title_fr": "Plateau plus lisible sur téléphone, replays sur le vrai plateau",
       "title_en": "More readable board on phones, replays on the real board",
