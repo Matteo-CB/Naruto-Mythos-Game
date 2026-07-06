@@ -128,6 +128,7 @@ export function EffectChoiceSelector() {
                       | 'card.effectTypes.UPGRADE'
                       | 'card.effectTypes.AMBUSH'
                       | 'card.effectTypes.SCORE'
+                      | 'card.effectTypes.DUEL'
                     )}
                   </div>
 

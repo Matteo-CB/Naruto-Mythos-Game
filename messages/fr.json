@@ -1487,7 +1487,14 @@
         "kakashi148Confirm": "Kakashi Hatake (148) : Prendre le Bonus (vous ne pouvez pas le perdre ce tour) ?",
         "ss147Confirm": "DUEL Sasuke Uchiwa : POWERUP {amount} (un par ennemi non caché en jeu) ?",
         "ss134Confirm": "DUEL Itachi Uchiwa : Vaincre le personnage ennemi le plus fort (Puissance {power}) ?",
-        "ss000ChooseHound": "Kakashi Hatake : Choisissez un personnage Chien Ninja à révéler et piocher ({remaining} restant)."
+        "ss000ChooseHound": "Kakashi Hatake : Choisissez un personnage Chien Ninja à révéler et piocher ({remaining} restant).",
+        "ss000ConfirmMain": "Kakashi Hatake : Chercher jusqu'à 2 personnages Chien Ninja dans votre deck, puis jouer des Chiens Ninja en payant 1 de moins ?",
+        "ss120ConfirmDuel": "DUEL Naruto Uzumaki : Cacher un personnage ennemi avec 4 Puissance ou moins en jeu ?",
+        "ss112ConfirmUpgrade": "UPGRADE : Retirer tous les jetons de Puissance d'un personnage ennemi dans cette mission ?",
+        "ss112ConfirmDuel": "DUEL Hinata Hyûga : Cacher un personnage ennemi sans jeton de Puissance dans cette mission ?",
+        "ss121ConfirmDuel": "DUEL Kiba Inuzuka : Déplacer la carte du bas de cette pile d'amélioration vers une autre mission ?",
+        "ss126ConfirmDuel": "DUEL Orochimaru : Jouer un personnage Village du Son n'importe où, en payant 3 de moins ?",
+        "ss134ConfirmUpgrade": "UPGRADE DUEL : Vaincre le personnage ennemi le plus fort (Puissance {power}, seuil abaissé à 5) ?"
       }
     },
     "anim": {
@@ -2170,7 +2177,8 @@
       "MAIN": "MAIN",
       "UPGRADE": "UPGRADE",
       "AMBUSH": "AMBUSH",
-      "SCORE": "SCORE"
+      "SCORE": "SCORE",
+      "DUEL": "DUEL"
     },
     "noImage": "Pas d'image",
     "hidden": "Caché",

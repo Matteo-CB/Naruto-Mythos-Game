@@ -85,7 +85,7 @@ function ss134DuelHandler(ctx: EffectContext): EffectResult {
     validTargets: [sourceCard.instanceId],
     isOptional: true,
     description: JSON.stringify({ targetInstanceId: strongest.instanceId }),
-    descriptionKey: 'game.effect.desc.ss134Confirm',
+    descriptionKey: threshold === 5 ? 'game.effect.desc.ss134ConfirmUpgrade' : 'game.effect.desc.ss134Confirm',
     descriptionParams: { power: maxP },
   };
 }
@@ -122,11 +122,11 @@ function ss120DuelHandler(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SS120_HIDE',
-    validTargets,
+    targetSelectionType: 'SS120_CONFIRM_DUEL',
+    validTargets: [ctx.sourceCard.instanceId],
     isOptional: true,
     description: JSON.stringify({}),
-    descriptionKey: 'game.effect.desc.ss120Hide',
+    descriptionKey: 'game.effect.desc.ss120ConfirmDuel',
   };
 }
 
@@ -151,7 +151,15 @@ function ss126DuelHandler(ctx: EffectContext): EffectResult {
       },
     };
   }
-  return sel;
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'SS126_CONFIRM_DUEL',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({}),
+    descriptionKey: 'game.effect.desc.ss126ConfirmDuel',
+  };
 }
 
 
@@ -186,11 +194,11 @@ function ss121DuelHandler(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SS121_MOVE_STACK',
-    validTargets: validDest,
+    targetSelectionType: 'SS121_CONFIRM_DUEL',
+    validTargets: [sourceCard.instanceId],
     isOptional: true,
     description: JSON.stringify({ sourceInstanceId: sourceCard.instanceId }),
-    descriptionKey: 'game.effect.desc.ss121MoveStack',
+    descriptionKey: 'game.effect.desc.ss121ConfirmDuel',
   };
 }
 
@@ -203,16 +211,14 @@ function ss000SearchAndPlay(ctx: EffectContext): EffectResult {
     return { state: ss000FinalizeSearch(state, sourcePlayer, triggerType, sourceCard.instanceId, sourceMissionIndex, 0) };
   }
 
-  const payload = ss000HoundChoicePayload(hounds, SS000_MAX_HOUNDS, 0);
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SS000_CHOOSE_HOUNDS',
-    validTargets: payload.validTargets,
+    targetSelectionType: 'SS000_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
     isOptional: true,
-    description: payload.description,
-    descriptionKey: payload.descriptionKey,
-    descriptionParams: payload.descriptionParams,
+    description: JSON.stringify({}),
+    descriptionKey: 'game.effect.desc.ss000ConfirmMain',
   };
 }
 
@@ -243,11 +249,11 @@ function ss112UpgradeHandler(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SS112_REMOVE_TOKENS',
-    validTargets,
+    targetSelectionType: 'SS112_CONFIRM_UPGRADE',
+    validTargets: [ctx.sourceCard.instanceId],
     isOptional: true,
     description: JSON.stringify({}),
-    descriptionKey: 'game.effect.desc.ss112RemoveTokens',
+    descriptionKey: 'game.effect.desc.ss112ConfirmUpgrade',
   };
 }
 
@@ -277,11 +283,11 @@ function ss112DuelHandler(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SS120_HIDE',
-    validTargets,
+    targetSelectionType: 'SS112_CONFIRM_DUEL',
+    validTargets: [ctx.sourceCard.instanceId],
     isOptional: true,
     description: JSON.stringify({}),
-    descriptionKey: 'game.effect.desc.ss112Hide',
+    descriptionKey: 'game.effect.desc.ss112ConfirmDuel',
   };
 }
 

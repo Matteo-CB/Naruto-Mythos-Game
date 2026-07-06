@@ -81,7 +81,10 @@ describe('SS Set 2 DUEL handlers', () => {
     const naruto = mockCharInPlay({ instanceId: 'nar', missionIndex: 0, controlledBy: 'player1', originalOwner: 'player1' }, { name_fr: 'NARUTO UZUMAKI', power: 5 });
     const weak = mockCharInPlay({ instanceId: 'weak', missionIndex: 0, controlledBy: 'player2', originalOwner: 'player2' }, { name_fr: 'WEAK', power: 3 });
     const state = createActionPhaseState({ activeMissions: [m([src, naruto], [weak])] }) as GameState;
-    const after = EffectEngine.resolvePlayEffects(state, 'player1', src, 0, false);
+    let after = EffectEngine.resolvePlayEffects(state, 'player1', src, 0, false);
+    const confirm = after.pendingEffects?.find((e) => e.targetSelectionType === 'SS120_CONFIRM_DUEL');
+    expect(confirm).toBeTruthy();
+    after = EffectEngine.applyTargetedEffect(after, confirm as never, confirm!.validTargets);
     const pending = after.pendingEffects?.find((e) => e.targetSelectionType === 'SS120_HIDE');
     expect(pending).toBeTruthy();
     expect(pending?.validTargets).toContain('weak');
@@ -118,7 +121,10 @@ describe('SS-112-SPV Neji Hyuga', () => {
     const noTokens = mockCharInPlay({ instanceId: 'e-clean', missionIndex: 0, controlledBy: 'player2', originalOwner: 'player2' }, { name_fr: 'ENEMY A', power: 3 });
     const withTokens = mockCharInPlay({ instanceId: 'e-tok', missionIndex: 0, controlledBy: 'player2', originalOwner: 'player2', powerTokens: 2 }, { name_fr: 'ENEMY B', power: 3 });
     const state = createActionPhaseState({ activeMissions: [m([neji, hinata], [noTokens, withTokens])] }) as GameState;
-    const after = EffectEngine.resolvePlayEffects(state, 'player1', neji, 0, false);
+    let after = EffectEngine.resolvePlayEffects(state, 'player1', neji, 0, false);
+    const confirm = after.pendingEffects?.find((e) => e.targetSelectionType === 'SS112_CONFIRM_DUEL');
+    expect(confirm).toBeTruthy();
+    after = EffectEngine.applyTargetedEffect(after, confirm as never, confirm!.validTargets);
     const pending = after.pendingEffects?.find((e) => e.targetSelectionType === 'SS120_HIDE');
     expect(pending).toBeTruthy();
     expect(pending!.validTargets).toContain('e-clean');
@@ -135,7 +141,7 @@ describe('SS-112-SPV Neji Hyuga', () => {
     const enemy = mockCharInPlay({ instanceId: 'e1', missionIndex: 0, controlledBy: 'player2', originalOwner: 'player2' }, { name_fr: 'ENEMY A', power: 3 });
     const state = createActionPhaseState({ activeMissions: [m([neji], [enemy])] }) as GameState;
     const after = EffectEngine.resolvePlayEffects(state, 'player1', neji, 0, false);
-    expect(after.pendingEffects?.some((e) => e.targetSelectionType === 'SS120_HIDE')).toBe(false);
+    expect(after.pendingEffects?.some((e) => e.targetSelectionType === 'SS112_CONFIRM_DUEL' || e.targetSelectionType === 'SS120_HIDE')).toBe(false);
     expect(after.activeMissions[0].player2Characters[0].isHidden).toBe(false);
   });
 
@@ -147,7 +153,10 @@ describe('SS-112-SPV Neji Hyuga', () => {
     const withTokens = mockCharInPlay({ instanceId: 'e-tok', missionIndex: 0, controlledBy: 'player2', originalOwner: 'player2', powerTokens: 3 }, { name_fr: 'ENEMY B', power: 3 });
     const noTokens = mockCharInPlay({ instanceId: 'e-clean', missionIndex: 0, controlledBy: 'player2', originalOwner: 'player2' }, { name_fr: 'ENEMY A', power: 3 });
     const state = createActionPhaseState({ activeMissions: [m([neji], [withTokens, noTokens])] }) as GameState;
-    const after = EffectEngine.resolvePlayEffects(state, 'player1', neji, 0, true);
+    let after = EffectEngine.resolvePlayEffects(state, 'player1', neji, 0, true);
+    const confirm = after.pendingEffects?.find((e) => e.targetSelectionType === 'SS112_CONFIRM_UPGRADE');
+    expect(confirm).toBeTruthy();
+    after = EffectEngine.applyTargetedEffect(after, confirm as never, confirm!.validTargets);
     const pending = after.pendingEffects?.find((e) => e.targetSelectionType === 'SS112_REMOVE_TOKENS');
     expect(pending).toBeTruthy();
     expect(pending!.validTargets).toContain('e-tok');

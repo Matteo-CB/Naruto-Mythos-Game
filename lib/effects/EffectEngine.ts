@@ -5715,6 +5715,216 @@ export class EffectEngine {
         break;
       }
 
+      case 'SS120_CONFIRM_DUEL':
+      case 'SS112_CONFIRM_DUEL': {
+        const sscPlayer = pendingEffect.sourcePlayer;
+        const sscEnemyPlayer: PlayerID = sscPlayer === 'player1' ? 'player2' : 'player1';
+        const sscEnemySide: 'player1Characters' | 'player2Characters' = sscPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const sscIsKiba = pendingEffect.targetSelectionType === 'SS120_CONFIRM_DUEL';
+        const sscTargets: string[] = [];
+        if (sscIsKiba) {
+          for (const m of newState.activeMissions) {
+            for (const c of m[sscEnemySide]) {
+              if (!c.isHidden && getEffectivePower(newState, c, sscEnemyPlayer) <= 4) sscTargets.push(c.instanceId);
+            }
+          }
+        } else {
+          const sscMission = newState.activeMissions[pendingEffect.sourceMissionIndex];
+          if (sscMission) {
+            for (const c of sscMission[sscEnemySide]) {
+              if (!c.isHidden && (c.powerTokens ?? 0) === 0) sscTargets.push(c.instanceId);
+            }
+          }
+        }
+        if (sscTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, sscPlayer,
+            'EFFECT_NO_TARGET', 'No valid enemy to hide (state changed).',
+            'game.log.effect.noTarget', { card: sscIsKiba ? 'KIBA INUZUKA' : 'NEJI HYÛGA', id: sscIsKiba ? 'SS-120-CHIBIV' : 'SS-112-SPV' });
+          break;
+        }
+        const sscEffId = generateInstanceId();
+        const sscActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: sscEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({}), targetSelectionType: 'SS120_HIDE',
+          sourcePlayer: sscPlayer, requiresTargetSelection: true,
+          validTargets: sscTargets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: sscActId, type: 'SELECT_TARGET' as PendingAction['type'], player: sscPlayer,
+          description: 'Choose an enemy character to hide.',
+          descriptionKey: sscIsKiba ? 'game.effect.desc.ss120Hide' : 'game.effect.desc.ss112Hide',
+          options: sscTargets, minSelections: 1, maxSelections: 1, sourceEffectId: sscEffId,
+        }];
+        break;
+      }
+
+      case 'SS112_CONFIRM_UPGRADE': {
+        const ssuPlayer = pendingEffect.sourcePlayer;
+        const ssuEnemySide: 'player1Characters' | 'player2Characters' = ssuPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const ssuMission = newState.activeMissions[pendingEffect.sourceMissionIndex];
+        const ssuTargets: string[] = [];
+        if (ssuMission) {
+          for (const c of ssuMission[ssuEnemySide]) {
+            if (!c.isHidden && (c.powerTokens ?? 0) > 0) ssuTargets.push(c.instanceId);
+          }
+        }
+        if (ssuTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, ssuPlayer,
+            'EFFECT_NO_TARGET', 'Neji Hyuga (SS-112): No enemy with Power tokens (state changed).',
+            'game.log.effect.noTarget', { card: 'NEJI HYÛGA', id: 'SS-112-SPV' });
+          break;
+        }
+        const ssuEffId = generateInstanceId();
+        const ssuActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: ssuEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({}), targetSelectionType: 'SS112_REMOVE_TOKENS',
+          sourcePlayer: ssuPlayer, requiresTargetSelection: true,
+          validTargets: ssuTargets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: ssuActId, type: 'SELECT_TARGET' as PendingAction['type'], player: ssuPlayer,
+          description: 'Choose an enemy character to remove all its Power tokens.',
+          descriptionKey: 'game.effect.desc.ss112RemoveTokens',
+          options: ssuTargets, minSelections: 1, maxSelections: 1, sourceEffectId: ssuEffId,
+        }];
+        break;
+      }
+
+      case 'SS121_CONFIRM_DUEL': {
+        const ss1Player = pendingEffect.sourcePlayer;
+        const ss1Found = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        const ss1Char = ss1Found?.character;
+        const ss1Stack = ss1Char?.stack ?? [];
+        if (!ss1Char || ss1Stack.length < 2) break;
+        const ss1Bottom = ss1Stack[0];
+        const ss1Side: 'player1Characters' | 'player2Characters' = ss1Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const ss1Dest: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (i === ss1Found.missionIndex) continue;
+          const dup = newState.activeMissions[i][ss1Side].some((c: CharacterInPlay) => {
+            const top = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            return !c.isHidden && (top.name_fr ?? '').toUpperCase() === (ss1Bottom.name_fr ?? '').toUpperCase();
+          });
+          if (!dup) ss1Dest.push(String(i));
+        }
+        if (ss1Dest.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, ss1Player,
+            'EFFECT_NO_TARGET', 'Naruto Uzumaki (SS-121): No valid destination mission (state changed).',
+            'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'SS-121-R' });
+          break;
+        }
+        const ss1EffId = generateInstanceId();
+        const ss1ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: ss1EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ sourceInstanceId: pendingEffect.sourceInstanceId }),
+          targetSelectionType: 'SS121_MOVE_STACK',
+          sourcePlayer: ss1Player, requiresTargetSelection: true,
+          validTargets: ss1Dest, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: ss1ActId, type: 'SELECT_TARGET' as PendingAction['type'], player: ss1Player,
+          description: 'Choose a mission to move the bottom card of the upgrade stack to.',
+          descriptionKey: 'game.effect.desc.ss121MoveStack',
+          options: ss1Dest, minSelections: 1, maxSelections: 1, sourceEffectId: ss1EffId,
+        }];
+        break;
+      }
+
+      case 'SS126_CONFIRM_DUEL': {
+        const ss6Player = pendingEffect.sourcePlayer;
+        const ss6Cat: PlayLessCategory = { kind: 'group', value: 'Sound Village' };
+        const ss6 = buildPlayLessTargets(newState, ss6Player, ss6Cat, 3);
+        if (ss6.targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, ss6Player,
+            'EFFECT_NO_TARGET', 'Sasuke Uchiha (SS-126): No affordable Sound Village character (state changed).',
+            'game.log.effect.noTarget', { card: 'SASUKE UCHIWA', id: 'SS-126-SPV' });
+          break;
+        }
+        const ss6EffId = generateInstanceId();
+        const ss6ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: ss6EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({
+            text: 'Sasuke Uchiha (SS-126): Play a Sound Village character anywhere, paying 3 less.',
+            hiddenChars: ss6.hiddenChars, costReduction: 3, category: ss6Cat,
+            sourceName: 'SASUKE UCHIWA', sourceId: 'SS-126-SPV', repeatable: false,
+          }),
+          targetSelectionType: 'PLAY_LESS_CATEGORY',
+          sourcePlayer: ss6Player, requiresTargetSelection: true,
+          validTargets: ss6.targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: ss6ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'], player: ss6Player,
+          description: 'Sasuke Uchiha (SS-126): Play a Sound Village character anywhere, paying 3 less.',
+          descriptionKey: 'game.effect.desc.ss126PlaySound',
+          descriptionParams: { reduction: 3 },
+          options: ss6.targets, minSelections: 1, maxSelections: 1, sourceEffectId: ss6EffId,
+        }];
+        break;
+      }
+
+      case 'SS000_CONFIRM_MAIN': {
+        const ss0Player = pendingEffect.sourcePlayer;
+        const ss0Hounds = ss000DeckHounds(newState, ss0Player);
+        if (ss0Hounds.length === 0) {
+          newState = ss000FinalizeSearch(
+            newState, ss0Player, pendingEffect.effectType,
+            pendingEffect.sourceInstanceId, pendingEffect.sourceMissionIndex, 0,
+          );
+          break;
+        }
+        const ss0Payload = ss000HoundChoicePayload(ss0Hounds, 2, 0);
+        const ss0EffId = generateInstanceId();
+        const ss0ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: ss0EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: ss0Payload.description, targetSelectionType: 'SS000_CHOOSE_HOUNDS',
+          sourcePlayer: ss0Player, requiresTargetSelection: true,
+          validTargets: ss0Payload.validTargets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade, rootOptional: true,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: ss0ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'], player: ss0Player,
+          description: ss0Payload.description,
+          descriptionKey: ss0Payload.descriptionKey,
+          descriptionParams: ss0Payload.descriptionParams,
+          options: ss0Payload.validTargets, minSelections: 1, maxSelections: 1, sourceEffectId: ss0EffId,
+        }];
+        break;
+      }
+
       case 'KIN072_CONFIRM_MAIN': {
         
         const k072Player = pendingEffect.sourcePlayer;

@@ -350,7 +350,8 @@ function CardPreviewContent({
                         | "card.effectTypes.MAIN"
                         | "card.effectTypes.UPGRADE"
                         | "card.effectTypes.AMBUSH"
-                        | "card.effectTypes.SCORE",
+                        | "card.effectTypes.SCORE"
+                        | "card.effectTypes.DUEL",
                     )}
                   </span>
                   <span

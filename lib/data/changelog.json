@@ -20,7 +20,10 @@
         "Les cartes mission n'affichent plus de faction : elles n'en ont pas.",
         "Les replays sont refaits : le plateau prend tout l'écran comme en jeu, sur téléphone comme sur PC.",
         "Plus aucune fenêtre de choix ne bloque un replay : on regarde la partie se dérouler, rien à cliquer.",
-        "La barre de lecture des replays est une petite pilule flottante discrète : avancer, reculer, vitesse, saut de tour."
+        "La barre de lecture des replays est une petite pilule flottante discrète : avancer, reculer, vitesse, saut de tour.",
+        "Tous les effets DUEL du set 2 et les effets de Kakashi Légendaire et Neji demandent maintenant confirmation avant de s'activer, comme les autres cartes.",
+        "Kurenai Yuhi améliorée : la confirmation du duel affiche clairement le seuil abaissé à 5 par son effet UPGRADE.",
+        "Le mot DUEL s'affiche correctement sur les cartes au lieu d'un texte technique."
       ],
       "changes_en": [
         "Set 2 cards Kiba Inuzuka Chibi, Sasuke Uchiha, Neji Hyuga and Kurenai Yuhi now have their artwork.",
@@ -36,7 +39,10 @@
         "Mission cards no longer show a faction: they have none.",
         "Replays are rebuilt: the board fills the whole screen like a real game, on phone and PC alike.",
         "No more choice windows blocking a replay: you watch the game unfold, nothing to click.",
-        "The replay playback bar is a small discreet floating pill: forward, rewind, speed, turn jumps."
+        "The replay playback bar is a small discreet floating pill: forward, rewind, speed, turn jumps.",
+        "All set 2 DUEL effects and the Legendary Kakashi and Neji effects now ask for confirmation before activating, like other cards.",
+        "Upgraded Kurenai Yuhi: the duel confirmation clearly shows the threshold lowered to 5 by her UPGRADE effect.",
+        "The word DUEL now displays correctly on cards instead of a technical text."
       ],
       "changes_es": [
         "Las cartas del set 2 Kiba Inuzuka Chibi, Sasuke Uchiha, Neji Hyuga y Kurenai Yuhi ya tienen su ilustración.",
@@ -52,7 +58,10 @@
         "Las cartas de misión ya no muestran facción: no tienen ninguna.",
         "Las repeticiones están rehechas: el tablero ocupa toda la pantalla como en una partida real, en móvil y en PC.",
         "Ninguna ventana de elección bloquea ya una repetición: ves la partida desarrollarse, nada que pulsar.",
-        "La barra de reproducción es ahora una pequeña píldora flotante discreta: avanzar, retroceder, velocidad, salto de turno."
+        "La barra de reproducción es ahora una pequeña píldora flotante discreta: avanzar, retroceder, velocidad, salto de turno.",
+        "Todos los efectos DUEL del set 2 y los efectos de Kakashi Legendario y Neji ahora piden confirmación antes de activarse, como las demás cartas.",
+        "Kurenai Yuhi mejorada: la confirmación del duelo muestra claramente el umbral reducido a 5 por su efecto UPGRADE.",
+        "La palabra DUEL ahora se muestra correctamente en las cartas en lugar de un texto técnico."
       ],
       "changes_ja": [
         "第2弾の犬塚キバ(ちび)、うちはサスケ、日向ネジ、夕日紅のカードにイラストが追加されました。",
@@ -68,7 +77,10 @@
         "ミッションカードに所属勢力が表示されなくなりました。ミッションには勢力がありません。",
         "リプレイを作り直しました。盤面が実際の対戦と同じように画面全体に表示されます。スマートフォンでもPCでも同様です。",
         "選択ウィンドウがリプレイを妨げることがなくなりました。クリック不要で対戦の流れを観戦できます。",
-        "リプレイの再生バーが小さな浮かぶピルになりました。早送り、巻き戻し、速度変更、ターンジャンプができます。"
+        "リプレイの再生バーが小さな浮かぶピルになりました。早送り、巻き戻し、速度変更、ターンジャンプができます。",
+        "第2弾のすべてのDUEL効果と伝説のカカシ、ネジの効果が、他のカードと同じように発動前に確認を求めるようになりました。",
+        "強化された夕日紅：デュエルの確認画面に、UPGRADE効果で条件が5に下がったことが明確に表示されます。",
+        "カードにDUELという単語が技術的な文字列ではなく正しく表示されるようになりました。"
       ]
     },
     {

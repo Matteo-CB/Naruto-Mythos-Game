@@ -1486,7 +1486,14 @@
         "kakashi148Confirm": "Kakashi Hatake (148): ¿Tomar la Ventaja (no puedes perderla esta ronda)?",
         "ss147Confirm": "DUEL Sasuke Uchiha: ¿POWERUP {amount} (uno por enemigo no oculto en juego)?",
         "ss134Confirm": "DUEL Itachi Uchiha: ¿Derrotar al personaje enemigo más fuerte (Poder {power})?",
-        "ss000ChooseHound": "Kakashi Hatake: Elige un personaje Perro Ninja para revelar y robar ({remaining} restantes)."
+        "ss000ChooseHound": "Kakashi Hatake: Elige un personaje Perro Ninja para revelar y robar ({remaining} restantes).",
+        "ss000ConfirmMain": "Kakashi Hatake: ¿Buscar hasta 2 personajes Perro Ninja en tu mazo y luego jugar Perros Ninja pagando 1 menos?",
+        "ss120ConfirmDuel": "DUEL Naruto Uzumaki: ¿Ocultar un personaje enemigo con Poder 4 o menos en juego?",
+        "ss112ConfirmUpgrade": "UPGRADE: ¿Retirar todos los contadores de Poder de un personaje enemigo en esta misión?",
+        "ss112ConfirmDuel": "DUEL Hinata Hyuga: ¿Ocultar un personaje enemigo sin contadores de Poder en esta misión?",
+        "ss121ConfirmDuel": "DUEL Kiba Inuzuka: ¿Mover la carta del fondo de esta pila de mejora a otra misión?",
+        "ss126ConfirmDuel": "DUEL Orochimaru: ¿Jugar un personaje de la Aldea del Sonido en cualquier sitio, pagando 3 menos?",
+        "ss134ConfirmUpgrade": "UPGRADE DUEL: ¿Derrotar al personaje enemigo más fuerte (Poder {power}, umbral reducido a 5)?"
       }
     },
     "anim": {
@@ -2169,7 +2176,8 @@
       "MAIN": "MAIN",
       "UPGRADE": "UPGRADE",
       "AMBUSH": "AMBUSH",
-      "SCORE": "SCORE"
+      "SCORE": "SCORE",
+      "DUEL": "DUEL"
     },
     "noImage": "Sin imagen",
     "hidden": "Oculta",

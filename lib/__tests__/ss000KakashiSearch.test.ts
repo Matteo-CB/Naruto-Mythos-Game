@@ -41,9 +41,27 @@ describe('Kakashi SS-000-L search and play UI flow', () => {
     return st;
   }
 
+  function confirmFirst(s: GameState): GameState {
+    expect(pendingTst(s)).toBe('SS000_CONFIRM_MAIN');
+    const pa = firstPending(s);
+    return GameEngine.applyAction(s, pa.player, { type: 'SELECT_TARGET', pendingActionId: pa.id, selectedTargets: [pa.options[0]] });
+  }
+
+  it('declining the initial confirm skips the whole effect', () => {
+    const st = baseState(['KS-099-C', 'KS-100-C']);
+    let s = GameEngine.applyAction(st, 'player1', { type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false });
+    expect(pendingTst(s)).toBe('SS000_CONFIRM_MAIN');
+    const pe = s.pendingEffects.find((e) => e.id === firstPending(s).sourceEffectId)!;
+    s = GameEngine.applyAction(s, 'player1', { type: 'DECLINE_OPTIONAL_EFFECT', pendingEffectId: pe.id });
+    expect(s.pendingActions.length).toBe(0);
+    expect(s.player1.hand.length).toBe(0);
+    expect(s.player1.deck.map((c) => c.id)).toEqual(['KS-099-C', 'KS-100-C']);
+  });
+
   it('lets the player choose which Ninja Hounds to draw, one by one, up to 2', () => {
     const st = baseState(['KS-005-C', 'KS-099-C', 'KS-011-C', 'KS-100-C', 'KS-099-C']);
     let s = GameEngine.applyAction(st, 'player1', { type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false });
+    s = confirmFirst(s);
 
     expect(pendingTst(s)).toBe('SS000_CHOOSE_HOUNDS');
     expect(firstPending(s).options.length).toBe(3);
@@ -69,6 +87,7 @@ describe('Kakashi SS-000-L search and play UI flow', () => {
   it('cancelling the search still shuffles and still offers to play hand Ninja Hounds', () => {
     const st = baseState(['KS-099-C', 'KS-005-C'], ['KS-100-C']);
     let s = GameEngine.applyAction(st, 'player1', { type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false });
+    s = confirmFirst(s);
 
     expect(pendingTst(s)).toBe('SS000_CHOOSE_HOUNDS');
     const pe = s.pendingEffects.find((e) => e.id === firstPending(s).sourceEffectId)!;
@@ -90,7 +109,7 @@ describe('Kakashi SS-000-L search and play UI flow', () => {
       assertHandOptionsAreReal(s);
       const pa = firstPending(s);
       const tst = pendingTst(s);
-      if (tst === 'SS000_CHOOSE_HOUNDS' || tst === 'PLAY_LESS_CATEGORY' || tst === 'GENERIC_CHOOSE_PLAY_MISSION') {
+      if (tst === 'SS000_CONFIRM_MAIN' || tst === 'SS000_CHOOSE_HOUNDS' || tst === 'PLAY_LESS_CATEGORY' || tst === 'GENERIC_CHOOSE_PLAY_MISSION') {
         if (tst === 'PLAY_LESS_CATEGORY') playedHounds++;
         s = GameEngine.applyAction(s, 'player1', { type: 'SELECT_TARGET', pendingActionId: pa.id, selectedTargets: [pa.options[0]] });
       } else {
@@ -121,8 +140,8 @@ describe('Kakashi SS-000-L search and play UI flow', () => {
       assertHandOptionsAreReal(s);
       const pa = firstPending(s);
       const tst = pendingTst(s);
-      if (tst === 'SS000_CHOOSE_HOUNDS') {
-        s = GameEngine.applyAction(s, 'player1', { type: 'SELECT_TARGET', pendingActionId: pa.id, selectedTargets: [pa.options[0]] });
+      if (tst === 'SS000_CONFIRM_MAIN' || tst === 'SS000_CHOOSE_HOUNDS') {
+        s = GameEngine.applyAction(s, pa.player, { type: 'SELECT_TARGET', pendingActionId: pa.id, selectedTargets: [pa.options[0]] });
       } else if (tst === 'PLAY_LESS_CATEGORY') {
         searchRounds++;
         const pe = s.pendingEffects.find((e) => e.id === pa.sourceEffectId)!;
