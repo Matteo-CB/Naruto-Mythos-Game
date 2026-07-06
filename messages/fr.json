@@ -1476,16 +1476,16 @@
         "naruto141ChooseDiscard": "Choisissez une carte de votre main à défausser.",
         "sasuke142ChooseDiscard": "Choisissez une carte de votre main à défausser.",
         "gaara139DefeatByCost": "Choisissez un ennemi avec un coût inférieur à {count} à vaincre.",
-        "ss112RemoveTokens": "Neji Hyûga (UPGRADE) : Choisissez un personnage ennemi pour retirer tous ses jetons de Puissance.",
-        "ss112Hide": "Neji Hyûga (DUEL) : Choisissez un personnage ennemi sans jeton de Puissance à cacher.",
-        "ss120Hide": "Kiba Inuzuka (DUEL) : Choisissez un personnage ennemi avec 4 Puissance ou moins à cacher.",
-        "ss126PlaySound": "Sasuke Uchiha (DUEL) : Choisissez un personnage Village du Son à jouer, en payant 3 de moins.",
+        "ss112RemoveTokens": "UPGRADE : Choisissez un personnage ennemi pour retirer tous ses jetons de Puissance.",
+        "ss112Hide": "DUEL Hinata Hyûga : Choisissez un personnage ennemi sans jeton de Puissance à cacher.",
+        "ss120Hide": "DUEL Naruto Uzumaki : Choisissez un personnage ennemi avec 4 Puissance ou moins à cacher.",
+        "ss126PlaySound": "DUEL Orochimaru : Choisissez un personnage Village du Son à jouer, en payant 3 de moins.",
         "ss000PlayHound": "Kakashi Hatake : Choisissez un personnage Chien Ninja à jouer, en payant 1 de moins.",
         "playAnotherReduced": "Jouez un autre personnage, en payant {reduction} de moins (ou passez).",
-        "ss121MoveStack": "Naruto Uzumaki (DUEL) : Choisissez une mission où déplacer la carte du bas de la pile d'amélioration.",
+        "ss121MoveStack": "DUEL Kiba Inuzuka : Choisissez une mission où déplacer la carte du bas de la pile d'amélioration.",
         "kakashi148Confirm": "Kakashi Hatake (148) : Prendre le Bonus (vous ne pouvez pas le perdre ce tour) ?",
-        "ss147Confirm": "Naruto Uzumaki (SS-147) : POWERUP {amount} (un par ennemi non caché en jeu) ?",
-        "ss134Confirm": "Kurenai Yuhi (SS-134) : Vaincre le personnage ennemi le plus fort (Puissance {power}) ?"
+        "ss147Confirm": "DUEL Sasuke Uchiwa : POWERUP {amount} (un par ennemi non caché en jeu) ?",
+        "ss134Confirm": "DUEL Itachi Uchiwa : Vaincre le personnage ennemi le plus fort (Puissance {power}) ?"
       }
     },
     "anim": {

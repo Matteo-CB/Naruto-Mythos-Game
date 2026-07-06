@@ -10186,7 +10186,7 @@ export class EffectEngine {
         }));
         newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer, 'EFFECT',
           'Neji Hyuga (SS-112): Removed all Power tokens from an enemy character.',
-          'game.log.effect.ss112RemoveTokens', { card: 'NEJI HYUGA', id: 'SS-112-SPV' });
+          'game.log.effect.ss112RemoveTokens', { card: 'NEJI HYÛGA', id: 'SS-112-SPV' });
         break;
       }
 

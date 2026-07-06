@@ -11,7 +11,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     "[↯] Kiba Inuzuka : Déplacez la carte au bas de cette pile d'amélioration vers une autre mission.",
   ],
   "SS-134-R": [
-    "[↯] Itachi Uchiha : Vainquez le personnage ennemi le plus fort dans cette mission s'il a au moins 6 Puissance.",
+    "[↯] Itachi Uchiwa : Vainquez le personnage ennemi le plus fort dans cette mission s'il a au moins 6 Puissance.",
     "Effet DUEL : À la place, vainquez-le s'il a au moins 5 Puissance.",
   ],
   "SS-126-SPV": [
@@ -24,7 +24,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   ],
   "SS-147-POPV": [
     "[⧗] Les personnages ennemis ne peuvent pas quitter cette mission.",
-    "[↯] Sasuke Uchiha : POWERUP 1 pour chaque personnage ennemi non caché en jeu.",
+    "[↯] Sasuke Uchiwa : POWERUP 1 pour chaque personnage ennemi non caché en jeu.",
   ],
   "SS-000-L": [
     "[↯] Cherchez jusqu'à 2 personnages Chien Ninja dans votre deck, révélez-les et piochez-les, puis mélangez votre deck. Jouez autant de personnages Chien Ninja que vous voulez n'importe où, en payant 1 de moins.",

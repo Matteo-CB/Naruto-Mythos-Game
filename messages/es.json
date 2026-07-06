@@ -1475,16 +1475,16 @@
         "naruto141ChooseDiscard": "Elige una carta de tu mano para descartar.",
         "sasuke142ChooseDiscard": "Elige una carta de tu mano para descartar.",
         "gaara139DefeatByCost": "Elige un enemigo con coste menor que {count} para derrotar.",
-        "ss112RemoveTokens": "Neji Hyuga (UPGRADE): Elige un personaje enemigo para retirar todos sus contadores de Poder.",
-        "ss112Hide": "Neji Hyuga (DUELO): Elige un personaje enemigo sin contadores de Poder para ocultar.",
-        "ss120Hide": "Kiba Inuzuka (DUELO): Elige un personaje enemigo con Poder 4 o menos para ocultar.",
-        "ss126PlaySound": "Sasuke Uchiha (DUELO): Elige un personaje de la Aldea del Sonido para jugar, pagando 3 menos.",
+        "ss112RemoveTokens": "UPGRADE: Elige un personaje enemigo para retirar todos sus contadores de Poder.",
+        "ss112Hide": "DUEL Hinata Hyuga: Elige un personaje enemigo sin contadores de Poder para ocultar.",
+        "ss120Hide": "DUEL Naruto Uzumaki: Elige un personaje enemigo con Poder 4 o menos para ocultar.",
+        "ss126PlaySound": "DUEL Orochimaru: Elige un personaje de la Aldea del Sonido para jugar, pagando 3 menos.",
         "ss000PlayHound": "Kakashi Hatake: Elige un personaje Perro Ninja para jugar, pagando 1 menos.",
         "playAnotherReduced": "Juega otro personaje, pagando {reduction} menos (o pasa).",
-        "ss121MoveStack": "Naruto Uzumaki (DUELO): Elige una misión a la que mover la carta del fondo de la pila de mejora.",
+        "ss121MoveStack": "DUEL Kiba Inuzuka: Elige una misión a la que mover la carta del fondo de la pila de mejora.",
         "kakashi148Confirm": "Kakashi Hatake (148): ¿Tomar la Ventaja (no puedes perderla esta ronda)?",
-        "ss147Confirm": "Naruto Uzumaki (SS-147): ¿POWERUP {amount} (uno por enemigo no oculto en juego)?",
-        "ss134Confirm": "Kurenai Yuhi (SS-134): ¿Derrotar al personaje enemigo más fuerte (Poder {power})?"
+        "ss147Confirm": "DUEL Sasuke Uchiha: ¿POWERUP {amount} (uno por enemigo no oculto en juego)?",
+        "ss134Confirm": "DUEL Itachi Uchiha: ¿Derrotar al personaje enemigo más fuerte (Poder {power})?"
       }
     },
     "anim": {

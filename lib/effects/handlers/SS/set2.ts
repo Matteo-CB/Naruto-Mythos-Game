@@ -138,7 +138,7 @@ function ss126DuelHandler(ctx: EffectContext): EffectResult {
   const sel = playLessSelectionResult(state, sourcePlayer, {
     category: { kind: 'group', value: 'Sound Village' },
     costReduction: 3,
-    sourceName: 'SASUKE UCHIHA',
+    sourceName: 'SASUKE UCHIWA',
     sourceId: 'SS-126-SPV',
     textFallback: 'Sasuke Uchiha (SS-126): Play a Sound Village character anywhere, paying 3 less.',
     descriptionKey: 'game.effect.desc.ss126PlaySound',
@@ -149,7 +149,7 @@ function ss126DuelHandler(ctx: EffectContext): EffectResult {
         ...state,
         log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
           'Sasuke Uchiha (SS-126): No affordable Sound Village character available.',
-          'game.log.effect.noTarget', { card: 'SASUKE UCHIHA', id: 'SS-126-SPV' }),
+          'game.log.effect.noTarget', { card: 'SASUKE UCHIWA', id: 'SS-126-SPV' }),
       },
     };
   }
@@ -247,7 +247,7 @@ function ss112UpgradeHandler(ctx: EffectContext): EffectResult {
         ...state,
         log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
           'Neji Hyuga (SS-112): No enemy with Power tokens to remove in this mission.',
-          'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'SS-112-SPV' }),
+          'game.log.effect.noTarget', { card: 'NEJI HYÛGA', id: 'SS-112-SPV' }),
       },
     };
   }
@@ -281,7 +281,7 @@ function ss112DuelHandler(ctx: EffectContext): EffectResult {
         ...state,
         log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
           'Neji Hyuga (SS-112): No enemy without Power tokens to hide in this mission.',
-          'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'SS-112-SPV' }),
+          'game.log.effect.noTarget', { card: 'NEJI HYÛGA', id: 'SS-112-SPV' }),
       },
     };
   }

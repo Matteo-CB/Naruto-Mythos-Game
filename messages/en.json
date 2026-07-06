@@ -1470,16 +1470,16 @@
         "naruto141ChooseDiscard": "Choose a card from your hand to discard.",
         "sasuke142ChooseDiscard": "Choose a card from your hand to discard.",
         "gaara139DefeatByCost": "Choose an enemy with cost less than {count} to defeat.",
-        "ss112RemoveTokens": "Neji Hyuga (UPGRADE): Choose an enemy character to remove all its Power tokens.",
-        "ss112Hide": "Neji Hyuga (DUEL): Choose an enemy character without Power tokens to hide.",
-        "ss120Hide": "Kiba Inuzuka (DUEL): Choose an enemy character with Power 4 or less to hide.",
-        "ss126PlaySound": "Sasuke Uchiha (DUEL): Choose a Sound Village character to play, paying 3 less.",
+        "ss112RemoveTokens": "UPGRADE: Choose an enemy character to remove all its Power tokens.",
+        "ss112Hide": "DUEL Hinata Hyuga: Choose an enemy character without Power tokens to hide.",
+        "ss120Hide": "DUEL Naruto Uzumaki: Choose an enemy character with Power 4 or less to hide.",
+        "ss126PlaySound": "DUEL Orochimaru: Choose a Sound Village character to play, paying 3 less.",
         "ss000PlayHound": "Kakashi Hatake: Choose a Ninja Hound character to play, paying 1 less.",
         "playAnotherReduced": "Play another character, paying {reduction} less (or skip).",
-        "ss121MoveStack": "Naruto Uzumaki (DUEL): Choose a mission to move the bottom card of the upgrade stack to.",
+        "ss121MoveStack": "DUEL Kiba Inuzuka: Choose a mission to move the bottom card of the upgrade stack to.",
         "kakashi148Confirm": "Kakashi Hatake (148): Gain the Edge (you cannot lose it this round)?",
-        "ss147Confirm": "Naruto Uzumaki (SS-147): POWERUP {amount} (one per non-hidden enemy in play)?",
-        "ss134Confirm": "Kurenai Yuhi (SS-134): Defeat the strongest enemy character (Power {power})?"
+        "ss147Confirm": "DUEL Sasuke Uchiha: POWERUP {amount} (one per non-hidden enemy in play)?",
+        "ss134Confirm": "DUEL Itachi Uchiha: Defeat the strongest enemy character (Power {power})?"
       }
     },
     "anim": {

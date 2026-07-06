@@ -627,6 +627,7 @@ function buildPendingTargetSelectionUI(
       });
     } else if (
       tst === 'TAYUYA125_CHOOSE_SOUND' ||
+      tst === 'PLAY_LESS_CATEGORY' ||
       tst === 'JIRAIYA_CHOOSE_SUMMON' || tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
       tst === 'JIRAIYA105_CHOOSE_SUMMON' || tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
       tst === 'HIRUZEN002_CHOOSE_CARD'

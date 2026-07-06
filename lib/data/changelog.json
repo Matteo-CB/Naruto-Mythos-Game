@@ -8,19 +8,31 @@
       "title_ja": "カードイラストを5枚追加",
       "changes_fr": [
         "Les cartes Kiba Inuzuka Chibi, Sasuke Uchiha, Neji Hyuga et Kurenai Yuhi du set 2 ont maintenant leur illustration.",
-        "La variante Mythos de Naruto Uzumaki Multi Clonage qui n'avait pas d'image a reçu la sienne."
+        "La variante Mythos de Naruto Uzumaki Multi Clonage qui n'avait pas d'image a reçu la sienne.",
+        "Sasuke Uchiwa et Neji Hyûga du set 2 peuvent maintenant améliorer leurs versions du set 1, et deux cartes du même personnage ne peuvent plus se retrouver côte à côte sur une mission.",
+        "L'effet de Sasuke Uchiwa du set 2 affiche désormais les vraies cartes jouables au lieu de cartes vides.",
+        "Les fenêtres des effets DUEL du set 2 indiquent maintenant le partenaire du duel, comme sur la carte imprimée."
       ],
       "changes_en": [
         "Set 2 cards Kiba Inuzuka Chibi, Sasuke Uchiha, Neji Hyuga and Kurenai Yuhi now have their artwork.",
-        "The Naruto Uzumaki Shadow Clone Jutsu Mythos variant that was missing its image received it."
+        "The Naruto Uzumaki Shadow Clone Jutsu Mythos variant that was missing its image received it.",
+        "Set 2 Sasuke Uchiha and Neji Hyuga can now upgrade their set 1 versions, and two cards of the same character can no longer sit side by side on a mission.",
+        "The set 2 Sasuke Uchiha effect now shows the real playable cards instead of blank ones.",
+        "Set 2 DUEL effect windows now name the duel partner, matching the printed card."
       ],
       "changes_es": [
         "Las cartas del set 2 Kiba Inuzuka Chibi, Sasuke Uchiha, Neji Hyuga y Kurenai Yuhi ya tienen su ilustración.",
-        "La variante Mythos de Naruto Uzumaki Jutsu: Clones de Sombra que no tenía imagen ya la tiene."
+        "La variante Mythos de Naruto Uzumaki Jutsu: Clones de Sombra que no tenía imagen ya la tiene.",
+        "Sasuke Uchiha y Neji Hyuga del set 2 ahora pueden mejorar sus versiones del set 1, y dos cartas del mismo personaje ya no pueden estar juntas en una misión.",
+        "El efecto de Sasuke Uchiha del set 2 ahora muestra las cartas jugables reales en lugar de cartas vacías.",
+        "Las ventanas de los efectos DUEL del set 2 ahora indican el compañero del duelo, como en la carta impresa."
       ],
       "changes_ja": [
         "第2弾の犬塚キバ(ちび)、うちはサスケ、日向ネジ、夕日紅のカードにイラストが追加されました。",
-        "イラストがなかったうずまきナルト影分身の術のMythosバリアントに画像が追加されました。"
+        "イラストがなかったうずまきナルト影分身の術のMythosバリアントに画像が追加されました。",
+        "第2弾のうちはサスケと日向ネジが第1弾の同名カードを強化できるようになり、同じキャラクターのカード2枚が同じミッションに並ぶことがなくなりました。",
+        "第2弾うちはサスケの効果で、空白のカードではなく実際にプレイできるカードが表示されるようになりました。",
+        "第2弾のDUEL効果のウィンドウに、印刷されたカードと同じようにデュエルの相手の名前が表示されるようになりました。"
       ]
     },
     {
