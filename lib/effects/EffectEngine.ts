@@ -363,12 +363,13 @@ export class EffectEngine {
           const result = handler(ctx);
 
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-            
+
             const remainingEffectTypes: EffectType[] = [];
             const hasAmbushEffect = (topCard.effects ?? []).some((e) => e.type === 'AMBUSH');
             if (hasAmbushEffect) remainingEffectTypes.push('AMBUSH');
+            if (hasResolvableInstantDuel(result.state, missionIndex, topCard.effects)) remainingEffectTypes.push('DUEL');
 
-            
+
             newState = EffectEngine.createPendingTargetSelection(
               result.state, player, character, missionIndex, 'MAIN', false,
               result, remainingEffectTypes, true,
@@ -382,7 +383,7 @@ export class EffectEngine {
       }
     }
 
-    
+
     const hasAmbushEffect = (topCard.effects ?? []).some((e) => e.type === 'AMBUSH');
     if (hasAmbushEffect) {
       const handler = getEffectHandler(topCard.id, 'AMBUSH');
@@ -400,16 +401,49 @@ export class EffectEngine {
           const result = handler(ctx);
 
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-            
+
+            const ambushRemaining: EffectType[] = [];
+            if (hasResolvableInstantDuel(result.state, missionIndex, topCard.effects)) ambushRemaining.push('DUEL');
+
             newState = EffectEngine.createPendingTargetSelection(
               result.state, player, character, missionIndex, 'AMBUSH', false,
-              result, [], true,
+              result, ambushRemaining, true,
             );
             return newState;
           }
           newState = result.state;
         } catch (err) {
           console.error(`[EffectEngine] AMBUSH handler error for ${topCard.id}:`, err);
+        }
+      }
+    }
+
+    if (hasResolvableInstantDuel(newState, missionIndex, topCard.effects)) {
+      const duelHandler = getEffectHandler(topCard.id, 'DUEL');
+      if (duelHandler) {
+        try {
+          const charResult = EffectEngine.findCharByInstanceId(newState, character.instanceId);
+          const ctx: EffectContext = {
+            state: newState,
+            sourcePlayer: player,
+            sourceCard: charResult?.character ?? character,
+            sourceMissionIndex: charResult?.missionIndex ?? missionIndex,
+            triggerType: 'DUEL',
+            isUpgrade: false,
+            wasRevealed: true,
+          };
+          const result = duelHandler(ctx);
+
+          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+            newState = EffectEngine.createPendingTargetSelection(
+              result.state, player, charResult?.character ?? character, charResult?.missionIndex ?? missionIndex, 'DUEL', false,
+              result, [], true,
+            );
+            return newState;
+          }
+          newState = result.state;
+        } catch (err) {
+          console.error(`[EffectEngine] DUEL handler error for ${topCard.id} (reveal):`, err);
         }
       }
     }

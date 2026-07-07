@@ -14,7 +14,8 @@
         "Kurenai Yuhi du set 2 : en cas d'égalité entre plusieurs ennemis les plus forts, tu choisis maintenant lequel vaincre.",
         "Kurenai Yuhi améliorée : le duel se confirme d'abord, puis une seconde fenêtre propose d'appliquer ou non son effet UPGRADE qui abaisse le seuil à 5.",
         "Kakashi Légendaire : la fenêtre du duel dit maintenant DUEL Zabuza Momochi : Répéter l'effet MAIN, et la confirmation s'affiche aussi quand le deck n'a plus de Chien Ninja mais qu'il en reste en main.",
-        "La défausse imposée par la mission Trouver le traître ne peut plus être passée : le choix de la carte est obligatoire."
+        "La défausse imposée par la mission Trouver le traître ne peut plus être passée : le choix de la carte est obligatoire.",
+        "Les effets DUEL se déclenchent maintenant aussi quand on révèle une carte cachée, comme pour un personnage joué normalement."
       ],
       "changes_en": [
         "Heaven Curse Mark Sasuke no longer gains chakra when defeated by the same effect that defeats another character.",
@@ -24,7 +25,8 @@
         "Set 2 Kurenai Yuhi: when several strongest enemies are tied, you now choose which one to defeat.",
         "Upgraded Kurenai Yuhi: the duel confirms first, then a second window asks whether to apply her UPGRADE effect that lowers the threshold to 5.",
         "Legendary Kakashi: the duel window now says DUEL Zabuza Momochi: Repeat the MAIN effect, and the confirmation also shows when the deck has no Ninja Hound left but some remain in hand.",
-        "The discard forced by the Find the Traitor mission can no longer be skipped: choosing the card is mandatory."
+        "The discard forced by the Find the Traitor mission can no longer be skipped: choosing the card is mandatory.",
+        "DUEL effects now also trigger when revealing a hidden card, just like a normally played character."
       ],
       "changes_es": [
         "Sasuke Marca Maldita del Cielo ya no gana chakra cuando es derrotado por el mismo efecto que derrota a otro personaje.",
@@ -34,7 +36,8 @@
         "Kurenai Yuhi del set 2: cuando varios enemigos más fuertes empatan, ahora eliges a cuál derrotar.",
         "Kurenai Yuhi mejorada: el duelo se confirma primero, y luego una segunda ventana pregunta si aplicar su efecto UPGRADE que baja el umbral a 5.",
         "Kakashi Legendario: la ventana del duelo ahora dice DUEL Zabuza Momochi: Repetir el efecto MAIN, y la confirmación también aparece cuando el mazo no tiene Perros Ninja pero quedan en la mano.",
-        "El descarte impuesto por la misión Encontrar al traidor ya no se puede omitir: elegir la carta es obligatorio."
+        "El descarte impuesto por la misión Encontrar al traidor ya no se puede omitir: elegir la carta es obligatorio.",
+        "Los efectos DUEL ahora también se activan al revelar una carta oculta, igual que con un personaje jugado normalmente."
       ],
       "changes_ja": [
         "天の呪印サスケが、他のキャラクターを撃破する同じ効果で撃破されたときにチャクラを得なくなりました。",
@@ -44,7 +47,8 @@
         "第2弾の夕日紅：最も強い敵が複数で同点のとき、どれを撃破するか選べるようになりました。",
         "強化された夕日紅：まずデュエルを確認し、その後2つ目のウィンドウで条件を5に下げるUPGRADE効果を適用するか選べます。",
         "伝説のカカシ：デュエルのウィンドウにDUEL 桃地再不斬：MAIN効果を繰り返すと表示され、山札に忍犬がなくても手札に残っていれば確認が表示されるようになりました。",
-        "ミッション「裏切り者を探せ」で強制される捨て札はスキップできなくなりました。カードの選択は必須です。"
+        "ミッション「裏切り者を探せ」で強制される捨て札はスキップできなくなりました。カードの選択は必須です。",
+        "伏せたカードを公開したときも、通常どおりプレイしたキャラクターと同じようにDUEL効果が発動するようになりました。"
       ]
     },
     {

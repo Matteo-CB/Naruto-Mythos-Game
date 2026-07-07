@@ -160,6 +160,52 @@ describe('set 2 optional effects always prompt a confirmation first', () => {
     expect(firstTst(s)).toBe('PLAY_LESS_CATEGORY');
   });
 
+  it('revealing a hidden card triggers its DUEL when the partner is present (Kiba SS-120)', () => {
+    const st = buildSimState({
+      p1: [
+        simChar('SS-120-CHIBIV', { owner: 'player1', instanceId: 'hidden-kiba', hidden: true }),
+        simChar('KS-009-C', { owner: 'player1', instanceId: 'naruto-partner' }),
+      ],
+      p2: [simChar('KS-005-C', { owner: 'player2', instanceId: 'weak-enemy' })],
+      missions: 2,
+      chakra1: 20,
+    });
+    let s = GameEngine.applyAction(st, 'player1', { type: 'REVEAL_CHARACTER', missionIndex: 0, characterInstanceId: 'hidden-kiba' } as GameAction);
+    expect(firstTst(s)).toBe('SS120_CONFIRM_DUEL');
+    let guard = 0;
+    while (s.pendingActions.length > 0 && guard++ < 10) {
+      const pa = s.pendingActions[0];
+      s = GameEngine.applyAction(s, pa.player, { type: 'SELECT_TARGET', pendingActionId: pa.id, selectedTargets: [pa.options[0]] });
+    }
+    expect(s.activeMissions[0].player2Characters.filter((c) => c.isHidden).length).toBe(1);
+  });
+
+  it('revealing Kakashi SS-000-L chains MAIN then the Zabuza DUEL repeat', () => {
+    const st = buildSimState({
+      p1: [simChar('SS-000-L', { owner: 'player1', instanceId: 'hidden-kakashi', hidden: true })],
+      p2: [simChar('KS-086-C', { owner: 'player2', instanceId: 'zabuza-partner' })],
+      missions: 2,
+      chakra1: 20,
+    });
+    st.player1.deck = ['KS-099-C', 'KS-100-C', 'KS-099-C'].map((id) => getCharacterById(id)!);
+    let s = GameEngine.applyAction(st, 'player1', { type: 'REVEAL_CHARACTER', missionIndex: 0, characterInstanceId: 'hidden-kakashi' } as GameAction);
+    let confirms = 0;
+    let guard = 0;
+    while (s.pendingActions.length > 0 && guard++ < 30) {
+      const pa = s.pendingActions[0];
+      const tst = firstTst(s);
+      if (tst === 'SS000_CONFIRM_MAIN') confirms++;
+      if (tst === 'PLAY_LESS_CATEGORY') {
+        const pe = s.pendingEffects.find((e) => e.id === pa.sourceEffectId)!;
+        s = GameEngine.applyAction(s, pa.player, { type: 'DECLINE_OPTIONAL_EFFECT', pendingEffectId: pe.id });
+      } else {
+        s = GameEngine.applyAction(s, pa.player, { type: 'SELECT_TARGET', pendingActionId: pa.id, selectedTargets: [pa.options[0]] });
+      }
+    }
+    expect(confirms).toBe(2);
+    expect(s.player1.hand.filter((c) => (c.keywords ?? []).includes('Ninja Hound')).length).toBe(3);
+  });
+
   it('Neji SS-112 upgrade chain: confirm UPGRADE, remove tokens, confirm DUEL, hide', () => {
     const st = buildSimState({
       hand1: ['SS-112-SPV'],
