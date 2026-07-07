@@ -27,6 +27,10 @@ export interface Ss000HoundInfo {
   image_file?: string;
 }
 
+export function ss000HasPlayableHound(state: GameState, player: PlayerID): boolean {
+  return buildPlayLessTargets(state, player, SS000_PLAY_OPTS.category, SS000_PLAY_OPTS.costReduction).targets.length > 0;
+}
+
 export function ss000DeckHounds(state: GameState, player: PlayerID): Ss000HoundInfo[] {
   const out: Ss000HoundInfo[] = [];
   state[player].deck.forEach((c: CardData, index: number) => {

@@ -660,6 +660,12 @@ export class GameEngine {
       if (!effect.isOptional && !effect.rootOptional) return state;
 
 
+      if (effect.targetSelectionType === 'SS134_CONFIRM_UPGRADE_MODIFIER') {
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+        return EffectEngine.kurenai134Resolve(newState, effect, 6);
+      }
+
       if (effect.targetSelectionType === 'SS000_CHOOSE_HOUNDS') {
         let ssDeclineMeta: { drawn?: number } = {};
         try { ssDeclineMeta = JSON.parse(effect.effectDescription); } catch { /* ignore */ }

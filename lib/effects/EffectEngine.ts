@@ -5709,16 +5709,49 @@ export class EffectEngine {
       }
 
       case 'SS134_CONFIRM_MAIN': {
-        let ss134Target = '';
-        try { ss134Target = JSON.parse(pendingEffect.effectDescription).targetInstanceId ?? ''; } catch { /* ignore */ }
-        if (ss134Target) {
-          const ss134Found = EffectEngine.findCharByInstanceId(newState, ss134Target);
-          const ss134Name = ss134Found ? (ss134Found.character.stack?.length > 0 ? ss134Found.character.stack[ss134Found.character.stack.length - 1] : ss134Found.character.card).name_fr : '';
-          newState = EffectEngine.defeatCharacter(newState, ss134Target, pendingEffect.sourcePlayer);
-          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_DEFEAT', 'Kurenai Yuhi (SS-134): Defeated the strongest enemy character.',
-            'game.log.effect.defeat', { card: 'KURENAI YUHI', id: 'SS-134-R', target: ss134Name });
+        let ss134Upgraded = false;
+        try { ss134Upgraded = !!JSON.parse(pendingEffect.effectDescription).isUpgraded; } catch { /* ignore */ }
+        if (!ss134Upgraded) {
+          newState = EffectEngine.kurenai134Resolve(newState, pendingEffect, 6);
+          break;
         }
+        const ss134mEffId = generateInstanceId();
+        const ss134mActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: ss134mEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({}),
+          targetSelectionType: 'SS134_CONFIRM_UPGRADE_MODIFIER',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: [pendingEffect.sourceInstanceId], isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: true,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: ss134mActId, type: 'SELECT_TARGET' as PendingAction['type'], player: pendingEffect.sourcePlayer,
+          description: 'UPGRADE DUEL: Instead, defeat them if they have at least 5 Power?',
+          descriptionKey: 'game.effect.desc.ss134ConfirmUpgradeModifier',
+          options: [pendingEffect.sourceInstanceId], minSelections: 1, maxSelections: 1,
+          sourceEffectId: ss134mEffId,
+        }];
+        break;
+      }
+
+      case 'SS134_CONFIRM_UPGRADE_MODIFIER': {
+        newState = EffectEngine.kurenai134Resolve(newState, pendingEffect, 5);
+        break;
+      }
+
+      case 'SS134_CHOOSE_TARGET': {
+        const ss134cFound = EffectEngine.findCharByInstanceId(newState, targetId);
+        const ss134cName = ss134cFound ? (ss134cFound.character.stack?.length > 0 ? ss134cFound.character.stack[ss134cFound.character.stack.length - 1] : ss134cFound.character.card).name_fr : '';
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', 'Kurenai Yuhi (SS-134): Defeated the strongest enemy character.',
+          'game.log.effect.defeat', { card: 'KURENAI YUHI', id: 'SS-134-R', target: ss134cName });
         break;
       }
 
@@ -15611,6 +15644,9 @@ export class EffectEngine {
       for (const pe of newState.pendingEffects) {
         if (!preDispatchPendingIds.has(pe.id) && pe.id !== pendingEffect.id) {
 
+          const peDecider = newState.pendingActions.find((a) => a.sourceEffectId === pe.id)?.player ?? pe.selectingPlayer ?? pe.sourcePlayer;
+          if (peDecider !== pe.sourcePlayer) continue;
+
           if (pe.isMandatory && stateMutated) continue;
 
 
@@ -16623,6 +16659,62 @@ export class EffectEngine {
   }
 
   
+  static kurenai134Resolve(state: GameState, pending: PendingEffect, threshold: number): GameState {
+    let newState = state;
+    const kEnemySide: 'player1Characters' | 'player2Characters' =
+      pending.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+    const kEnemyPlayer: PlayerID = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
+    const kMission = newState.activeMissions[pending.sourceMissionIndex];
+    const kNoTarget = () => {
+      newState.log = logAction(newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+        'EFFECT_NO_TARGET', 'Kurenai Yuhi (SS-134): No enemy strong enough to defeat.',
+        'game.log.effect.noTarget', { card: 'KURENAI YUHI', id: 'SS-134-R' });
+      return newState;
+    };
+    if (!kMission) return kNoTarget();
+    const kEnemies = kMission[kEnemySide].filter((c: CharacterInPlay) => !c.isHidden);
+    if (kEnemies.length === 0) return kNoTarget();
+    let kMaxP = -1;
+    for (const e of kEnemies) {
+      const pw = getEffectivePower(newState, e, kEnemyPlayer);
+      if (pw > kMaxP) kMaxP = pw;
+    }
+    if (kMaxP < threshold) return kNoTarget();
+    const kCandidates = kEnemies.filter((e: CharacterInPlay) => getEffectivePower(newState, e, kEnemyPlayer) === kMaxP);
+    if (kCandidates.length === 1) {
+      const kTop = kCandidates[0].stack?.length > 0 ? kCandidates[0].stack[kCandidates[0].stack.length - 1] : kCandidates[0].card;
+      newState = EffectEngine.defeatCharacter(newState, kCandidates[0].instanceId, pending.sourcePlayer);
+      newState.log = logAction(newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+        'EFFECT_DEFEAT', 'Kurenai Yuhi (SS-134): Defeated the strongest enemy character.',
+        'game.log.effect.defeat', { card: 'KURENAI YUHI', id: 'SS-134-R', target: kTop.name_fr });
+      return newState;
+    }
+    const kEffId = generateInstanceId();
+    const kActId = generateInstanceId();
+    newState.pendingEffects = [...newState.pendingEffects, {
+      id: kEffId, sourceCardId: pending.sourceCardId,
+      sourceInstanceId: pending.sourceInstanceId,
+      sourceMissionIndex: pending.sourceMissionIndex,
+      effectType: pending.effectType,
+      effectDescription: JSON.stringify({}),
+      targetSelectionType: 'SS134_CHOOSE_TARGET',
+      sourcePlayer: pending.sourcePlayer, requiresTargetSelection: true,
+      validTargets: kCandidates.map((c: CharacterInPlay) => c.instanceId),
+      isOptional: false, isMandatory: true,
+      resolved: false, isUpgrade: pending.isUpgrade,
+      remainingEffectTypes: pending.remainingEffectTypes,
+    }];
+    newState.pendingActions = [...newState.pendingActions, {
+      id: kActId, type: 'SELECT_TARGET' as PendingAction['type'], player: pending.sourcePlayer,
+      description: 'Kurenai Yuhi (SS-134): Choose which strongest enemy character to defeat.',
+      descriptionKey: 'game.effect.desc.ss134ChooseTarget',
+      options: kCandidates.map((c: CharacterInPlay) => c.instanceId),
+      minSelections: 1, maxSelections: 1,
+      sourceEffectId: kEffId,
+    }];
+    return newState;
+  }
+
   static defeatSimultaneously(state: GameState, targetIds: Array<string | null | undefined>, sourcePlayer: PlayerID): GameState {
     const ids = targetIds.filter((x): x is string => !!x);
     let newState = state;

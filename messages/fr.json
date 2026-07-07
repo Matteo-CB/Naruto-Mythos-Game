@@ -1491,13 +1491,15 @@
         "ss147Confirm": "DUEL Sasuke Uchiwa : POWERUP {amount} (un par ennemi non caché en jeu) ?",
         "ss134Confirm": "DUEL Itachi Uchiwa : Vaincre le personnage ennemi le plus fort (Puissance {power}) ?",
         "ss000ChooseHound": "Kakashi Hatake : Choisissez un personnage Chien Ninja à révéler et piocher ({remaining} restant).",
-        "ss000ConfirmMain": "Kakashi Hatake : Chercher jusqu'à 2 personnages Chien Ninja dans votre deck, puis jouer des Chiens Ninja en payant 1 de moins ?",
+        "ss000ConfirmMain": "MAIN : Chercher jusqu'à 2 personnages Chien Ninja dans votre deck, puis jouer des Chiens Ninja en payant 1 de moins ?",
         "ss120ConfirmDuel": "DUEL Naruto Uzumaki : Cacher un personnage ennemi avec 4 Puissance ou moins en jeu ?",
         "ss112ConfirmUpgrade": "UPGRADE : Retirer tous les jetons de Puissance d'un personnage ennemi dans cette mission ?",
         "ss112ConfirmDuel": "DUEL Hinata Hyûga : Cacher un personnage ennemi sans jeton de Puissance dans cette mission ?",
         "ss121ConfirmDuel": "DUEL Kiba Inuzuka : Déplacer la carte du bas de cette pile d'amélioration vers une autre mission ?",
         "ss126ConfirmDuel": "DUEL Orochimaru : Jouer un personnage Village du Son n'importe où, en payant 3 de moins ?",
-        "ss134ConfirmUpgrade": "UPGRADE DUEL : Vaincre le personnage ennemi le plus fort (Puissance {power}, seuil abaissé à 5) ?"
+        "ss000ConfirmDuel": "DUEL Zabuza Momochi : Répéter l'effet MAIN ?",
+        "ss134ConfirmUpgradeModifier": "UPGRADE DUEL : À la place, le vaincre s'il a au moins 5 Puissance ?",
+        "ss134ChooseTarget": "DUEL Itachi Uchiwa : Choisissez lequel des personnages ennemis les plus forts vaincre."
       }
     },
     "anim": {

@@ -4,7 +4,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 import { playLessSelectionResult } from '@/lib/effects/handlers/shared/playLess';
-import { ss000DeckHounds, ss000FinalizeSearch, ss000HoundChoicePayload, SS000_MAX_HOUNDS } from './ss000Search';
+import { ss000DeckHounds, ss000HasPlayableHound } from './ss000Search';
 
 function sideFor(player: PlayerID, which: 'friendly' | 'enemy'): 'player1Characters' | 'player2Characters' {
   const friendly = player === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -75,8 +75,10 @@ function ss134DuelHandler(ctx: EffectContext): EffectResult {
     if (p > maxP) { maxP = p; strongest = e; }
   }
 
-  const threshold = (isUpgrade || (sourceCard.stack?.length ?? 1) > 1) ? 5 : 6;
+  const isUpgraded = isUpgrade || (sourceCard.stack?.length ?? 1) > 1;
+  const threshold = isUpgraded ? 5 : 6;
   if (maxP < threshold) return noTarget();
+  void strongest;
 
   return {
     state,
@@ -84,8 +86,8 @@ function ss134DuelHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'SS134_CONFIRM_MAIN',
     validTargets: [sourceCard.instanceId],
     isOptional: true,
-    description: JSON.stringify({ targetInstanceId: strongest.instanceId }),
-    descriptionKey: threshold === 5 ? 'game.effect.desc.ss134ConfirmUpgrade' : 'game.effect.desc.ss134Confirm',
+    description: JSON.stringify({ isUpgraded }),
+    descriptionKey: 'game.effect.desc.ss134Confirm',
     descriptionParams: { power: maxP },
   };
 }
@@ -204,11 +206,14 @@ function ss121DuelHandler(ctx: EffectContext): EffectResult {
 
 
 function ss000SearchAndPlay(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceCard, sourceMissionIndex, triggerType } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
 
   const hounds = ss000DeckHounds(state, sourcePlayer);
-  if (hounds.length === 0) {
-    return { state: ss000FinalizeSearch(state, sourcePlayer, triggerType, sourceCard.instanceId, sourceMissionIndex, 0) };
+  const hasPlayable = ss000HasPlayableHound(state, sourcePlayer);
+  if (hounds.length === 0 && !hasPlayable) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Kakashi Hatake (SS-000): No Ninja Hound to search or play.',
+      'game.log.effect.noTarget', { card: 'KAKASHI HATAKE', id: 'SS-000-L' }) } };
   }
 
   return {
@@ -218,7 +223,7 @@ function ss000SearchAndPlay(ctx: EffectContext): EffectResult {
     validTargets: [sourceCard.instanceId],
     isOptional: true,
     description: JSON.stringify({}),
-    descriptionKey: 'game.effect.desc.ss000ConfirmMain',
+    descriptionKey: ctx.triggerType === 'DUEL' ? 'game.effect.desc.ss000ConfirmDuel' : 'game.effect.desc.ss000ConfirmMain',
   };
 }
 

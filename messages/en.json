@@ -1485,13 +1485,15 @@
         "ss147Confirm": "DUEL Sasuke Uchiha: POWERUP {amount} (one per non-hidden enemy in play)?",
         "ss134Confirm": "DUEL Itachi Uchiha: Defeat the strongest enemy character (Power {power})?",
         "ss000ChooseHound": "Kakashi Hatake: Choose a Ninja Hound character to reveal and draw ({remaining} remaining).",
-        "ss000ConfirmMain": "Kakashi Hatake: Search your deck for up to 2 Ninja Hound characters, then play Ninja Hounds paying 1 less?",
+        "ss000ConfirmMain": "MAIN: Search your deck for up to 2 Ninja Hound characters, then play Ninja Hounds paying 1 less?",
         "ss120ConfirmDuel": "DUEL Naruto Uzumaki: Hide an enemy character with Power 4 or less in play?",
         "ss112ConfirmUpgrade": "UPGRADE: Remove all Power tokens from an enemy character in this mission?",
         "ss112ConfirmDuel": "DUEL Hinata Hyuga: Hide an enemy character without Power tokens in this mission?",
         "ss121ConfirmDuel": "DUEL Kiba Inuzuka: Move the bottom card of this upgrade stack to another mission?",
         "ss126ConfirmDuel": "DUEL Orochimaru: Play a Sound Village character anywhere, paying 3 less?",
-        "ss134ConfirmUpgrade": "UPGRADE DUEL: Defeat the strongest enemy character (Power {power}, threshold lowered to 5)?"
+        "ss000ConfirmDuel": "DUEL Zabuza Momochi: Repeat the MAIN effect?",
+        "ss134ConfirmUpgradeModifier": "UPGRADE DUEL: Instead, defeat them if they have at least 5 Power?",
+        "ss134ChooseTarget": "DUEL Itachi Uchiha: Choose which strongest enemy character to defeat."
       }
     },
     "anim": {

@@ -1489,13 +1489,15 @@
         "ss147Confirm": "DUEL うちはサスケ：POWERUP {amount}（場の伏せていない敵1体につき1）？",
         "ss134Confirm": "DUEL うちはイタチ：最も強い敵キャラクター（パワー{power}）を撃破する？",
         "ss000ChooseHound": "はたけカカシ：公開して引く忍犬キャラクターを選んでください（残り{remaining}体）。",
-        "ss000ConfirmMain": "はたけカカシ：山札から忍犬キャラクターを最大2体探し、その後忍犬を1少ないコストで出しますか？",
+        "ss000ConfirmMain": "MAIN：山札から忍犬キャラクターを最大2体探し、その後忍犬を1少ないコストで出しますか？",
         "ss120ConfirmDuel": "DUEL うずまきナルト：場のパワー4以下の敵キャラクターを1体伏せますか？",
         "ss112ConfirmUpgrade": "UPGRADE：このミッションの敵キャラクター1体からパワートークンをすべて取り除きますか？",
         "ss112ConfirmDuel": "DUEL 日向ヒナタ：このミッションのパワートークンを持たない敵キャラクターを1体伏せますか？",
         "ss121ConfirmDuel": "DUEL 犬塚キバ：この強化スタックの一番下のカードを別のミッションに移動しますか？",
         "ss126ConfirmDuel": "DUEL 大蛇丸：音隠れの里キャラクターを1体、3少ないコストでどこにでも出しますか？",
-        "ss134ConfirmUpgrade": "UPGRADE DUEL：最も強い敵キャラクター（パワー{power}、条件が5に低下）を撃破しますか？"
+        "ss000ConfirmDuel": "DUEL 桃地再不斬：MAIN効果を繰り返しますか？",
+        "ss134ConfirmUpgradeModifier": "UPGRADE DUEL：代わりに、パワー5以上ならそれを撃破しますか？",
+        "ss134ChooseTarget": "DUEL うちはイタチ：撃破する最も強い敵キャラクターを選んでください。"
       }
     },
     "anim": {
