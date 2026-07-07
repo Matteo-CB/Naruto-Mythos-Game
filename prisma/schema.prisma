@@ -22,6 +22,7 @@ model User {
   role                    String               @default("user")
   badgePrefs              String[]             @default([])
   animationsEnabled       Boolean              @default(true)
+  soundsEnabled           Boolean              @default(true)
   gameBackground          String               @default("default")
   resetToken              String?
   resetTokenExpiry        DateTime?

@@ -637,7 +637,10 @@
       }
     },
     "hideVariants": "Masquer les variantes dans le deck builder",
-    "hideVariantsHint": "Quand activé, les cartes Rare Art, Mythos, Secret et variantes spéciales sont masquées par défaut dans le deck builder."
+    "hideVariantsHint": "Quand activé, les cartes Rare Art, Mythos, Secret et variantes spéciales sont masquées par défaut dans le deck builder.",
+    "sound": "Effets sonores",
+    "soundOn": "Les sons sont activés.",
+    "soundOff": "Tous les sons sont désactivés."
   },
   "game": {
     "turn": "Tour {turn}",

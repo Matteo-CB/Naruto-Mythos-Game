@@ -53,6 +53,13 @@ const FADE_OUT: Partial<Record<SoundName, number>> = {
 let audioCache: Record<string, HTMLAudioElement> | null = null;
 let volume = 0.7;
 let muted = false;
+if (typeof window !== 'undefined') {
+  try {
+    muted = localStorage.getItem('nmtcg-sound-enabled') === 'false';
+    const storedVol = parseFloat(localStorage.getItem('nmtcg-sound-volume') ?? '');
+    if (!isNaN(storedVol)) volume = Math.max(0, Math.min(1, storedVol));
+  } catch { /* ignore */ }
+}
 
 function ensureCache(): Record<string, HTMLAudioElement> {
   if (audioCache) return audioCache;

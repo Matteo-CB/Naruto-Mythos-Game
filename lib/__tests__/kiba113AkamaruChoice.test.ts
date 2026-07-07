@@ -154,16 +154,20 @@ describe('Kiba 113 R + 113 MV: player chooses which Akamaru to hide (not auto-le
       state, akamaruChoosePending, akamaruMiddle.instanceId, false,
     );
 
-    const leftStill = newState.activeMissions[0].player1Characters.find((c) => c.instanceId === akamaruLeft.instanceId);
-    const middleStill = newState.activeMissions[0].player1Characters.find((c) => c.instanceId === akamaruMiddle.instanceId);
-    expect(leftStill?.isHidden).toBe(false);
-    expect(middleStill?.isHidden).toBe(true);
-
     const step2 = newState.pendingEffects.find((e) => e.targetSelectionType === 'KIBA149_CHOOSE_HIDE_TARGET');
     expect(step2).toBeDefined();
     expect(step2!.validTargets).toContain(akamaruLeft.instanceId);
     expect(step2!.validTargets).toContain(enemyToHide.instanceId);
     expect(step2!.validTargets).not.toContain(akamaruMiddle.instanceId);
     expect(step2!.validTargets).not.toContain(kiba.instanceId);
+    expect(JSON.parse(step2!.effectDescription).friendlyId).toBe(akamaruMiddle.instanceId);
+
+    const done = EffectEngine.applyTargetedEffect(newState, step2 as never, [enemyToHide.instanceId]);
+    const leftAfter = done.activeMissions[0].player1Characters.find((c) => c.instanceId === akamaruLeft.instanceId);
+    const middleAfter = done.activeMissions[0].player1Characters.find((c) => c.instanceId === akamaruMiddle.instanceId);
+    const enemyAfter = done.activeMissions[0].player2Characters.find((c) => c.instanceId === enemyToHide.instanceId);
+    expect(leftAfter?.isHidden).toBe(false);
+    expect(middleAfter?.isHidden).toBe(true);
+    expect(enemyAfter?.isHidden).toBe(true);
   });
 });

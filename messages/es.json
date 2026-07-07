@@ -636,7 +636,10 @@
       }
     },
     "hideVariants": "Ocultar variantes en el creador de mazos",
-    "hideVariantsHint": "Cuando está activado, las cartas Rare Art, Mythos, Secreta y variantes especiales se ocultan por defecto en el creador de mazos."
+    "hideVariantsHint": "Cuando está activado, las cartas Rare Art, Mythos, Secreta y variantes especiales se ocultan por defecto en el creador de mazos.",
+    "sound": "Efectos de sonido",
+    "soundOn": "Los sonidos están activados.",
+    "soundOff": "Todos los sonidos están desactivados."
   },
   "game": {
     "turn": "Turno {turn}",

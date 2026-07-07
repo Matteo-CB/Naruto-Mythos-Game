@@ -39,6 +39,7 @@ export default function SettingsPage() {
     fetchFromServer, setAnimationsEnabled, setGameBackground,
     hideDeckBuilderVariants, setHideDeckBuilderVariants,
     countryCode, setCountryCode,
+    soundEnabled, setSoundEnabled,
   } = useSettingsStore();
   const tFlag = useTranslations('flag');
   const backgrounds = availableBackgrounds;
@@ -327,6 +328,40 @@ export default function SettingsPage() {
             style={{ color: '#555555' }}
           >
             {!isLoaded ? t('loading') : animationsEnabled ? t('animationsOn') : t('animationsOff')}
+          </p>
+
+          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+
+          <div className="flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: '#e0e0e0' }}>
+              {t('sound')}
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={soundEnabled}
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className="relative h-6 w-11 flex-shrink-0 rounded-full transition-colors overflow-hidden cursor-pointer"
+              style={{
+                backgroundColor: soundEnabled ? '#c4a35a' : '#333333',
+              }}
+            >
+              <span
+                className="absolute top-0.5 h-5 w-5 rounded-full"
+                style={{
+                  backgroundColor: '#0a0a0a',
+                  left: soundEnabled ? '22px' : '2px',
+                  transition: 'left 150ms ease',
+                }}
+              />
+            </button>
+          </div>
+
+          <p
+            className="text-xs tracking-wide"
+            style={{ color: '#555555' }}
+          >
+            {soundEnabled ? t('soundOn') : t('soundOff')}
           </p>
 
           <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />

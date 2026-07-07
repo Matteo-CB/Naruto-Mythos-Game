@@ -2057,9 +2057,12 @@ export class EffectEngine {
       case 'JIROBO122_DEFEAT_TARGET':
       case 'OROCHIMARU126_DEFEAT_WEAKEST':
       case 'KIBA149_CHOOSE_DEFEAT_TARGET':
-      case 'SASUKE136_CHOOSE_ENEMY':
-        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+      case 'SASUKE136_CHOOSE_ENEMY': {
+        let s136FriendlyId: string | null = null;
+        try { s136FriendlyId = JSON.parse(pendingEffect.effectDescription).friendlyId ?? null; } catch { /* ignore */ }
+        newState = EffectEngine.defeatBothForSasuke136(newState, pendingEffect.sourcePlayer, s136FriendlyId, targetId);
         break;
+      }
 
       
       case 'TENTEN_118_DEFEAT_HIDDEN_IN_MISSION': {
@@ -4750,10 +4753,14 @@ export class EffectEngine {
 
         const kb054mAllTargetIds = kb054mOrdered.map(t => t.instanceId);
         let kb054mHiddenCount = 0;
+        const kb054mActuallyHidden: string[] = [];
         for (const kb054mTargetId of kb054mAllTargetIds) {
-          newState = EffectEngine.hideCharacterWithLog(newState, kb054mTargetId, kb054mPlayer, true);
+          newState = EffectEngine.hideCharacterWithLog(newState, kb054mTargetId, kb054mPlayer, true, true);
           const kb054mAfter = EffectEngine.findCharByInstanceId(newState, kb054mTargetId);
-          if (kb054mAfter && kb054mAfter.character.isHidden) kb054mHiddenCount++;
+          if (kb054mAfter && kb054mAfter.character.isHidden) { kb054mHiddenCount++; kb054mActuallyHidden.push(kb054mTargetId); }
+        }
+        for (const kb054mHiddenId of kb054mActuallyHidden) {
+          newState = EffectEngine.restoreControlOnLeave(newState, kb054mHiddenId);
         }
         if (kb054mHiddenCount > 0) {
           newState.log = logAction(
@@ -10296,18 +10303,6 @@ export class EffectEngine {
         const enemySide_k113 = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
         
-        if (isDefeatMode) {
-          newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
-          newState.log = logAction(
-            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_DEFEAT', 'Kiba Inuzuka (113) UPGRADE: Defeated friendly Akamaru.',
-            'game.log.effect.defeat',
-            { card: 'KIBA INUZUKA', id: 'KS-113-R', target: 'Akamaru' },
-          );
-        } else {
-          newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
-        }
-
         
         
         const srcMission_k113 = newState.activeMissions[srcMI];
@@ -10320,6 +10315,9 @@ export class EffectEngine {
         }
 
         if (step2Targets.length === 0) {
+          newState = isDefeatMode
+            ? EffectEngine.defeatSimultaneously(newState, [targetId], pendingEffect.sourcePlayer)
+            : EffectEngine.hideSimultaneously(newState, [targetId], pendingEffect.sourcePlayer);
           newState.log = logAction(
             newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT_NO_TARGET', 'Kiba Inuzuka (113): No non-hidden character in this mission to target.',
@@ -10342,7 +10340,7 @@ export class EffectEngine {
           sourceInstanceId: pendingEffect.sourceInstanceId,
           sourceMissionIndex: srcMI,
           effectType: pendingEffect.effectType,
-          effectDescription: '',
+          effectDescription: JSON.stringify({ friendlyId: targetId }),
           targetSelectionType: step2Type,
           sourcePlayer: pendingEffect.sourcePlayer,
           requiresTargetSelection: true,
@@ -10370,10 +10368,16 @@ export class EffectEngine {
       
       
       case 'KIBA113_HIDE_TARGET':
+      case 'KIBA149_CHOOSE_HIDE_TARGET': {
+        let kibaPairFriendly: string | null = null;
+        try { kibaPairFriendly = JSON.parse(pendingEffect.effectDescription).friendlyId ?? null; } catch { /* ignore */ }
+        newState = EffectEngine.hideSimultaneously(newState, [kibaPairFriendly, targetId], pendingEffect.sourcePlayer);
+        break;
+      }
+
       case 'UKON124B_HIDE_TARGET':
       case 'SAKON127_HIDE_TARGET':
       case 'SHIKAMARU111_HIDE_ENEMY':
-      case 'KIBA149_CHOOSE_HIDE_TARGET':
       case 'SHIKAMARU150_CHOOSE_HIDE':
       case 'NARUTO141_CHOOSE_HIDE_TARGET':
       case 'JIRAIYA_HIDE_ENEMY_COST_3':
@@ -10459,10 +10463,9 @@ export class EffectEngine {
         let parsed133t2: { useDefeat?: boolean; target1Id?: string; discardSizeBefore?: number } = {};
         try { parsed133t2 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         if (parsed133t2.useDefeat) {
-          
-          newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+          newState = EffectEngine.defeatSimultaneously(newState, [parsed133t2.target1Id, targetId], pendingEffect.sourcePlayer);
         } else {
-          newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+          newState = EffectEngine.hideSimultaneously(newState, [parsed133t2.target1Id, targetId], pendingEffect.sourcePlayer);
         }
         break;
       }
@@ -13263,12 +13266,10 @@ export class EffectEngine {
         const odUseDefeat = odParsed.useDefeat !== false; // default true (Gaara, Ichibi always defeat)
         
         
-        for (const charId of odList) {
-          if (odUseDefeat) {
-            newState = EffectEngine.defeatCharacter(newState, charId, pendingEffect.sourcePlayer, odList);
-          } else {
-            newState = EffectEngine.hideCharacterWithLog(newState, charId, pendingEffect.sourcePlayer);
-          }
+        if (odUseDefeat) {
+          newState = EffectEngine.defeatSimultaneously(newState, odList, pendingEffect.sourcePlayer);
+        } else {
+          newState = EffectEngine.hideSimultaneously(newState, odList, pendingEffect.sourcePlayer);
         }
         newState.log = logAction(
           newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
@@ -15320,11 +15321,13 @@ export class EffectEngine {
 
       case 'GAARA120_CHOOSE_DEFEAT': {
         
-        let gaaraDesc: { defeatedCount?: number; nextMissionIndex?: number; isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number; missionIndex?: number } = {};
+        let gaaraDesc: { defeatedCount?: number; nextMissionIndex?: number; isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number; missionIndex?: number; pendingIds?: string[] } = {};
         try { gaaraDesc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
 
         const missionIdx_g = gaaraDesc.missionIndex ?? 0;
         let defeatedCount_g = gaaraDesc.defeatedCount ?? 0;
+        const g120PendingIds: string[] = [...(gaaraDesc.pendingIds ?? []), targetId];
+        void missionIdx_g;
 
         
         {
@@ -15338,31 +15341,6 @@ export class EffectEngine {
         }
 
         
-        const g120DefenderSide: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-        const g120DiscardBefore = newState[g120DefenderSide].discardPile.length;
-        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
-        
-        if (newState[g120DefenderSide].discardPile.length > g120DiscardBefore) {
-          defeatedCount_g++;
-        }
-        let defeatName_g = '';
-        for (const m of newState.activeMissions) {
-          for (const c of [...m.player1Characters, ...m.player2Characters]) {
-            if (c.instanceId === targetId) {
-              const tc = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-              defeatName_g = tc.name_fr;
-            }
-          }
-        }
-        
-        if (!defeatName_g) defeatName_g = 'enemy';
-        newState.log = logAction(
-          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-          'EFFECT_DEFEAT',
-          `Gaara (120): Defeated enemy ${defeatName_g} in mission ${missionIdx_g + 1}.`,
-          'game.log.effect.defeat',
-          { card: 'GAARA', id: 'KS-120-R', target: defeatName_g },
-        );
 
         
         const startMission_g = gaaraDesc.nextMissionIndex ?? (missionIdx_g + 1);
@@ -15387,6 +15365,7 @@ export class EffectEngine {
             sourceInstanceId: gaaraDesc.sourceInstanceId,
             sourceMissionIndex: gaaraDesc.sourceMissionIndex,
             missionIndex: mi,
+            pendingIds: g120PendingIds,
           });
           const effectId_g = generateInstanceId();
           const actionId_g = generateInstanceId();
@@ -15423,6 +15402,29 @@ export class EffectEngine {
         }
 
         
+        if (!chainedToNext) {
+          const g120DefenderSide: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+          for (const g120Id of g120PendingIds) {
+            const g120Found = EffectEngine.findCharByInstanceId(newState, g120Id);
+            const g120Top = g120Found
+              ? (g120Found.character.stack?.length > 0 ? g120Found.character.stack[g120Found.character.stack.length - 1] : g120Found.character.card)
+              : null;
+            const g120Name = g120Top ? g120Top.name_fr : 'enemy';
+            const g120Before = newState[g120DefenderSide].discardPile.length;
+            newState = EffectEngine.defeatCharacter(newState, g120Id, pendingEffect.sourcePlayer, g120PendingIds);
+            if (newState[g120DefenderSide].discardPile.length > g120Before) {
+              defeatedCount_g++;
+            }
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_DEFEAT',
+              `Gaara (120): Defeated enemy ${g120Name}.`,
+              'game.log.effect.defeat',
+              { card: 'GAARA', id: 'KS-120-R', target: g120Name },
+            );
+          }
+        }
+
         if (!chainedToNext && gaaraDesc.isUpgrade && defeatedCount_g > 0 && gaaraDesc.sourceInstanceId && gaaraDesc.sourceMissionIndex != null) {
           const g120uEffId = generateInstanceId();
           const g120uActId = generateInstanceId();
@@ -16501,7 +16503,7 @@ export class EffectEngine {
   }
 
   
-  static hideCharacter(state: GameState, targetId: string): GameState {
+  static hideCharacter(state: GameState, targetId: string, deferControlRestore = false): GameState {
     const newState = deepClone(state);
     let found = false;
     for (const mission of newState.activeMissions) {
@@ -16522,6 +16524,7 @@ export class EffectEngine {
       if (found) break;
     }
     if (!found) return state;
+    if (deferControlRestore) return newState;
     return EffectEngine.restoreControlOnLeave(newState, targetId);
   }
 
@@ -16620,11 +16623,35 @@ export class EffectEngine {
   }
 
   
-  static defeatFriendlyForSasuke136(state: GameState, pending: PendingEffect, targetId: string): GameState {
-    
-    let newState = EffectEngine.defeatCharacter(state, targetId, pending.sourcePlayer);
+  static defeatSimultaneously(state: GameState, targetIds: Array<string | null | undefined>, sourcePlayer: PlayerID): GameState {
+    const ids = targetIds.filter((x): x is string => !!x);
+    let newState = state;
+    for (const id of ids) newState = EffectEngine.defeatCharacter(newState, id, sourcePlayer, ids);
+    return newState;
+  }
 
-    
+  static hideSimultaneously(state: GameState, targetIds: Array<string | null | undefined>, sourcePlayer: PlayerID, skipProtection = false): GameState {
+    const ids = targetIds.filter((x): x is string => !!x);
+    let newState = state;
+    const actuallyHidden: string[] = [];
+    for (const id of ids) {
+      newState = EffectEngine.hideCharacterWithLog(newState, id, sourcePlayer, skipProtection, true);
+      const after = EffectEngine.findCharByInstanceId(newState, id);
+      if (after && after.character.isHidden) actuallyHidden.push(id);
+    }
+    for (const id of actuallyHidden) {
+      newState = EffectEngine.restoreControlOnLeave(newState, id);
+    }
+    return newState;
+  }
+
+  static defeatBothForSasuke136(state: GameState, sourcePlayer: PlayerID, friendlyId: string | null, enemyId: string | null): GameState {
+    return EffectEngine.defeatSimultaneously(state, [friendlyId, enemyId], sourcePlayer);
+  }
+
+  static defeatFriendlyForSasuke136(state: GameState, pending: PendingEffect, targetId: string): GameState {
+    let newState = state;
+
     let missionIdx = pending.sourceMissionIndex;
     try {
       const parsed = JSON.parse(pending.effectDescription);
@@ -16632,13 +16659,14 @@ export class EffectEngine {
     } catch { /* ignore */ }
 
     const mission = newState.activeMissions[missionIdx];
-    if (!mission) return newState;
+    if (!mission) return EffectEngine.defeatBothForSasuke136(newState, pending.sourcePlayer, targetId, null);
 
     const enemySide: 'player1Characters' | 'player2Characters' =
       pending.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
     const enemyTargets = mission[enemySide].map((c) => c.instanceId);
 
     if (enemyTargets.length === 0) {
+      newState = EffectEngine.defeatBothForSasuke136(newState, pending.sourcePlayer, targetId, null);
       newState.log = logAction(
         newState.log, newState.turn, newState.phase, pending.sourcePlayer,
         'EFFECT_NO_TARGET',
@@ -16650,11 +16678,10 @@ export class EffectEngine {
     }
 
     if (enemyTargets.length === 1) {
-      
-      return EffectEngine.defeatCharacter(newState, enemyTargets[0], pending.sourcePlayer);
+      return EffectEngine.defeatBothForSasuke136(newState, pending.sourcePlayer, targetId, enemyTargets[0]);
     }
 
-    
+
     const effectId = generateInstanceId();
     const actionId = generateInstanceId();
 
@@ -16664,7 +16691,7 @@ export class EffectEngine {
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: missionIdx,
       effectType: 'UPGRADE',
-      effectDescription: '',
+      effectDescription: JSON.stringify({ friendlyId: targetId }),
       targetSelectionType: 'SASUKE136_CHOOSE_ENEMY',
       sourcePlayer: pending.sourcePlayer,
       requiresTargetSelection: true,
@@ -16700,15 +16727,10 @@ export class EffectEngine {
     const n133DefenderT1: PlayerID = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
     const discardSizeBeforeT1 = state[n133DefenderT1].discardPile.length;
 
-    
-    let newState: GameState;
-    if (useDefeat) {
-      newState = EffectEngine.defeatCharacter(state, targetId, pending.sourcePlayer);
-    } else {
-      newState = EffectEngine.hideCharacterWithLog(state, targetId, pending.sourcePlayer);
-    }
 
-    
+    let newState: GameState = state;
+
+
     const enemySideKey: 'player1Characters' | 'player2Characters' =
       pending.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
     const enemyPlayer: PlayerID = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
@@ -16716,9 +16738,10 @@ export class EffectEngine {
     const validTarget2: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       for (const char of newState.activeMissions[i][enemySideKey]) {
-        
+        if (char.instanceId === targetId) continue;
+
         if (!useDefeat && char.isHidden) continue;
-        
+
         const power = calculateCharacterPower(newState, char, enemyPlayer);
         if (power <= 2) {
           validTarget2.push(char.instanceId);
@@ -16727,6 +16750,9 @@ export class EffectEngine {
     }
 
     if (validTarget2.length === 0) {
+      newState = useDefeat
+        ? EffectEngine.defeatSimultaneously(newState, [targetId], pending.sourcePlayer)
+        : EffectEngine.hideSimultaneously(newState, [targetId], pending.sourcePlayer);
       newState.log = logAction(
         newState.log, newState.turn, newState.phase, pending.sourcePlayer,
         'EFFECT_NO_TARGET',
@@ -16738,13 +16764,10 @@ export class EffectEngine {
     }
 
     if (validTarget2.length === 1) {
-      
       if (useDefeat) {
-        
-        newState = EffectEngine.defeatCharacter(newState, validTarget2[0], pending.sourcePlayer);
-        return newState;
+        return EffectEngine.defeatSimultaneously(newState, [targetId, validTarget2[0]], pending.sourcePlayer);
       } else {
-        return EffectEngine.hideCharacterWithLog(newState, validTarget2[0], pending.sourcePlayer);
+        return EffectEngine.hideSimultaneously(newState, [targetId, validTarget2[0]], pending.sourcePlayer);
       }
     }
 
@@ -16935,7 +16958,7 @@ export class EffectEngine {
   }
 
   
-  static hideCharacterWithLog(state: GameState, targetInstanceId: string, sourcePlayer: PlayerID, skipProtection: boolean = false): GameState {
+  static hideCharacterWithLog(state: GameState, targetInstanceId: string, sourcePlayer: PlayerID, skipProtection: boolean = false, deferControlRestore: boolean = false): GameState {
     const charResult = EffectEngine.findCharByInstanceId(state, targetInstanceId);
     if (!charResult) return state;
     if (charResult.character.isHidden) return state;
@@ -17056,7 +17079,7 @@ export class EffectEngine {
       }
     }
 
-    let newState = EffectEngine.hideCharacter(state, targetInstanceId);
+    let newState = EffectEngine.hideCharacter(state, targetInstanceId, deferControlRestore);
     const targetName = charResult.character.card.name_fr;
     emitEngineQuestEvent(state, sourcePlayer, 'character.hidden', {
       targetName,
@@ -17078,9 +17101,14 @@ export class EffectEngine {
   
   static resumeBatchHideAfterGemma(state: GameState, remainingTargetIds: string[], batchSourcePlayer: PlayerID): GameState {
     let currentState = state;
-    
+    const actuallyHidden: string[] = [];
     for (const targetId of remainingTargetIds) {
-      currentState = EffectEngine.hideCharacterWithLog(currentState, targetId, batchSourcePlayer, true);
+      currentState = EffectEngine.hideCharacterWithLog(currentState, targetId, batchSourcePlayer, true, true);
+      const after = EffectEngine.findCharByInstanceId(currentState, targetId);
+      if (after && after.character.isHidden) actuallyHidden.push(targetId);
+    }
+    for (const hiddenId of actuallyHidden) {
+      currentState = EffectEngine.restoreControlOnLeave(currentState, hiddenId);
     }
     return currentState;
   }
@@ -20259,29 +20287,6 @@ export class EffectEngine {
     const akamaru = akamaruResult.character;
     const akamaruMI = akamaruResult.missionIndex;
 
-    if (useDefeat) {
-      newState = defeatFriendlyCharacter(newState, akamaruMI, akamaru.instanceId, pending.sourcePlayer);
-      newState.log = logAction(
-        newState.log, newState.turn, newState.phase, pending.sourcePlayer,
-        'EFFECT_DEFEAT',
-        `Kiba Inuzuka (113 MV): Defeated friendly ${akamaru.card.name_fr} (upgrade).`,
-        'game.log.effect.defeat',
-        { card: 'KIBA INUZUKA', id: 'KS-113-MV', target: akamaru.card.name_fr },
-      );
-    } else {
-      newState = EffectEngine.hideCharacter(newState, akamaru.instanceId);
-      newState = {
-        ...newState,
-        log: logAction(
-          newState.log, newState.turn, newState.phase, pending.sourcePlayer,
-          'EFFECT_HIDE',
-          `Kiba Inuzuka (113 MV): Hid friendly ${akamaru.card.name_fr}.`,
-          'game.log.effect.hide',
-          { card: 'KIBA INUZUKA', id: 'KS-113-MV', target: akamaru.card.name_fr, mission: `mission ${akamaruMI}` },
-        ),
-      };
-    }
-
     const srcMI = confData.sourceMissionIndex;
     const thisMission = newState.activeMissions[srcMI];
     if (!thisMission) return newState;
@@ -20300,6 +20305,9 @@ export class EffectEngine {
     }
 
     if (validTargets.length === 0) {
+      newState = useDefeat
+        ? EffectEngine.defeatSimultaneously(newState, [akamaru.instanceId], pending.sourcePlayer)
+        : EffectEngine.hideSimultaneously(newState, [akamaru.instanceId], pending.sourcePlayer);
       newState.log = logAction(
         newState.log, newState.turn, newState.phase, pending.sourcePlayer,
         'EFFECT_NO_TARGET',
@@ -20321,7 +20329,7 @@ export class EffectEngine {
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: srcMI,
       effectType: pending.effectType,
-      effectDescription: '',
+      effectDescription: JSON.stringify({ friendlyId: akamaru.instanceId }),
       targetSelectionType: step2Type,
       sourcePlayer: pending.sourcePlayer,
       requiresTargetSelection: true,

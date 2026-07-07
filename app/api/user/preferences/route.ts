@@ -12,11 +12,12 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { animationsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, countryCode: true },
+      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, countryCode: true },
     });
 
     return NextResponse.json({
       animationsEnabled: user?.animationsEnabled ?? true,
+      soundsEnabled: user?.soundsEnabled ?? true,
       gameBackground: user?.gameBackground || 'default',
       allowSpectatorHand: user?.allowSpectatorHand ?? false,
       hideDeckBuilderVariants: user?.hideDeckBuilderVariants ?? false,
@@ -37,6 +38,9 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const update: Record<string, unknown> = {};
 
+    if (typeof body.soundsEnabled === 'boolean') {
+      update.soundsEnabled = body.soundsEnabled;
+    }
     if (typeof body.animationsEnabled === 'boolean') {
       update.animationsEnabled = body.animationsEnabled;
     }

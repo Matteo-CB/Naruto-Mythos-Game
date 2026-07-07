@@ -684,9 +684,11 @@ export class GameEngine {
 
 
       if (effect.targetSelectionType === 'GAARA120_CHOOSE_DEFEAT') {
-        let gDesc: { defeatedCount?: number; nextMissionIndex?: number; isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number } = {};
+        let gDesc: { defeatedCount?: number; nextMissionIndex?: number; isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number; pendingIds?: string[] } = {};
         try { gDesc = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
         const { defeatedCount = 0, nextMissionIndex = 0, isUpgrade = false, sourceInstanceId, sourceMissionIndex } = gDesc;
+        const gPendingIds: string[] = gDesc.pendingIds ?? [];
+        let gFlushedCount = defeatedCount;
 
         
         newState.pendingEffects.splice(effectIdx, 1);
@@ -712,7 +714,7 @@ export class GameEngine {
           if (validTargets_g.length === 0) continue;
 
           
-          const chainData = JSON.stringify({ defeatedCount, nextMissionIndex: mi + 1, isUpgrade, sourceInstanceId, sourceMissionIndex, missionIndex: mi });
+          const chainData = JSON.stringify({ defeatedCount, nextMissionIndex: mi + 1, isUpgrade, sourceInstanceId, sourceMissionIndex, missionIndex: mi, pendingIds: gPendingIds });
           const effId = generateInstanceId();
           const actId = generateInstanceId();
           newState.pendingEffects = [...newState.pendingEffects, {
@@ -748,7 +750,16 @@ export class GameEngine {
         }
 
         
-        if (!chainedToNext && isUpgrade && defeatedCount > 0 && sourceInstanceId && sourceMissionIndex != null) {
+        if (!chainedToNext && gPendingIds.length > 0) {
+          const gDefenderSide = effect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+          for (const gId of gPendingIds) {
+            const gBefore = newState[gDefenderSide].discardPile.length;
+            newState = EffectEngine.defeatCharacter(newState, gId, effect.sourcePlayer, gPendingIds);
+            if (newState[gDefenderSide].discardPile.length > gBefore) gFlushedCount++;
+          }
+        }
+
+        if (!chainedToNext && isUpgrade && gFlushedCount > 0 && sourceInstanceId && sourceMissionIndex != null) {
           const friendlySide_g: 'player1Characters' | 'player2Characters' =
             effect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
           const upgMissions = [...newState.activeMissions];
@@ -756,16 +767,16 @@ export class GameEngine {
           const upgChars = [...upgMission[friendlySide_g]];
           const selfIdx = upgChars.findIndex((c: CharacterInPlay) => c.instanceId === sourceInstanceId);
           if (selfIdx !== -1) {
-            upgChars[selfIdx] = { ...upgChars[selfIdx], powerTokens: upgChars[selfIdx].powerTokens + defeatedCount };
+            upgChars[selfIdx] = { ...upgChars[selfIdx], powerTokens: upgChars[selfIdx].powerTokens + gFlushedCount };
             upgMission[friendlySide_g] = upgChars;
             upgMissions[sourceMissionIndex] = upgMission;
             newState = { ...newState, activeMissions: upgMissions };
             newState.log = logAction(
               newState.log, newState.turn, newState.phase, effect.sourcePlayer,
               'EFFECT_POWERUP',
-              `Gaara (120): POWERUP ${defeatedCount} (upgrade, from missions skipped then completed).`,
+              `Gaara (120): POWERUP ${gFlushedCount} (upgrade, from missions skipped then completed).`,
               'game.log.effect.powerupSelf',
-              { card: 'GAARA', id: 'KS-120-R', amount: defeatedCount },
+              { card: 'GAARA', id: 'KS-120-R', amount: gFlushedCount },
             );
           }
         }

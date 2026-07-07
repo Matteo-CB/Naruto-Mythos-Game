@@ -94,6 +94,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
 
       set({
         animationsEnabled: prefs.animationsEnabled ?? true,
+        soundEnabled: prefs.soundsEnabled ?? get().soundEnabled,
         allowSpectatorHand: prefs.allowSpectatorHand ?? false,
         hideDeckBuilderVariants: prefs.hideDeckBuilderVariants ?? false,
         countryCode: prefs.countryCode ?? null,
@@ -102,6 +103,9 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         availableBackgrounds: backgrounds,
         isLoaded: true,
       });
+      const soundOn = get().soundEnabled;
+      try { localStorage.setItem('nmtcg-sound-enabled', String(soundOn)); } catch { /* ignore */ }
+      import('@/lib/sound/SoundManager').then(m => m.setMuted(!soundOn)).catch(() => {});
     } catch {
       set({ isLoaded: true });
     }
@@ -126,6 +130,11 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
     set({ soundEnabled: v });
     try { localStorage.setItem('nmtcg-sound-enabled', String(v)); } catch { /* ignore */ }
     import('@/lib/sound/SoundManager').then(m => m.setMuted(!v)).catch(() => {});
+    fetch('/api/user/preferences', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ soundsEnabled: v }),
+    }).catch(() => {});
   },
 
   setSoundVolume: (v: number) => {

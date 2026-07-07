@@ -1,6 +1,37 @@
 {
   "entries": [
     {
+      "date": "2026-07-08",
+      "title_fr": "Effets simultanés corrigés et option pour couper les sons",
+      "title_en": "Simultaneous effects fixed and a sound off option",
+      "title_es": "Efectos simultáneos corregidos y opción para silenciar",
+      "title_ja": "同時効果の修正とサウンドオフ設定",
+      "changes_fr": [
+        "Sasuke Marque Maudite du Ciel ne donne plus de chakra quand il est vaincu par le même effet qui vainc un autre personnage.",
+        "Un Kabuto contrôlé revient maintenant chez son propriétaire quand son contrôleur et la carte au même nom sont cachés en même temps, au lieu d'être défaussé.",
+        "Naruto 133, Kiba 113 et Gaara 120 : leurs cibles multiples tombent désormais toutes en même temps, comme le veut la règle de simultanéité.",
+        "Nouvelle option dans les réglages pour désactiver tous les effets sonores, mémorisée sur ton compte."
+      ],
+      "changes_en": [
+        "Heaven Curse Mark Sasuke no longer gains chakra when defeated by the same effect that defeats another character.",
+        "A controlled Kabuto now returns to its owner when its controller and the same-name card are hidden at the same time, instead of being discarded.",
+        "Naruto 133, Kiba 113 and Gaara 120: their multiple targets now all fall at the same time, as the simultaneity rule requires.",
+        "New option in the settings to turn off all sound effects, saved on your account."
+      ],
+      "changes_es": [
+        "Sasuke Marca Maldita del Cielo ya no gana chakra cuando es derrotado por el mismo efecto que derrota a otro personaje.",
+        "Un Kabuto controlado ahora vuelve con su dueño cuando su controlador y la carta del mismo nombre se ocultan a la vez, en lugar de ser descartado.",
+        "Naruto 133, Kiba 113 y Gaara 120: sus objetivos múltiples ahora caen todos al mismo tiempo, como exige la regla de simultaneidad.",
+        "Nueva opción en los ajustes para desactivar todos los efectos de sonido, guardada en tu cuenta."
+      ],
+      "changes_ja": [
+        "天の呪印サスケが、他のキャラクターを撃破する同じ効果で撃破されたときにチャクラを得なくなりました。",
+        "コントロールされたカブトは、コントローラーと同名カードが同時に伏せられたとき、捨てられずに持ち主のもとへ戻るようになりました。",
+        "ナルト133、キバ113、我愛羅120：複数の対象が同時性ルールどおり、すべて同時に倒れるようになりました。",
+        "設定にすべての効果音をオフにするオプションが追加され、アカウントに保存されます。"
+      ]
+    },
+    {
       "date": "2026-07-06",
       "title_fr": "Cinq nouvelles illustrations de cartes",
       "title_en": "Five new card artworks",
