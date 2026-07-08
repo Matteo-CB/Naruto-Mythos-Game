@@ -21,8 +21,6 @@
         "Les attachements ont leur propre section dans la collection et leur page de carte avec simulation complète, mais ne sont pas encore jouables en deck.",
         "Un personnage du set 2 ne déclenche plus par erreur les effets d'une carte du set 1 portant le même numéro.",
         "Les parties fantômes dont les deux joueurs sont partis disparaissent de la liste des parties en direct et ne peuvent plus être regardées.",
-        "Le plateau s'anime avec de vrais effets de particules : étincelles dorées quand une carte arrive, fumée de dissimulation, braises lors d'une défaite et spirales de chakra.",
-        "L'écran tremble légèrement lors d'une défaite ou d'une mission remportée pour donner plus d'impact aux moments forts.",
         "Les cartes jouées et révélées entrent désormais en 3D avec un reflet de lumière qui balaie la carte.",
         "Les images des cartes se préchargent pendant la partie : les animations s'affichent sans temps de chargement.",
         "Le journal de partie reste fluide même dans les très longues parties."
@@ -42,8 +40,6 @@
         "Attachments have their own section in the collection and their card page with a full simulation, but cannot be put in decks yet.",
         "A set 2 character no longer wrongly triggers the effects of a set 1 card sharing the same number.",
         "Ghost games whose both players left disappear from the live games list and can no longer be spectated.",
-        "The board now comes alive with real particle effects: golden sparks when a card lands, concealment smoke, embers on a defeat and chakra spirals.",
-        "The screen shakes slightly on a defeat or a won mission to give big moments more impact.",
         "Played and revealed cards now enter in 3D with a light reflection sweeping across the card.",
         "Card images preload during the game so animations show up with no loading delay.",
         "The game log stays smooth even in very long games."
@@ -63,8 +59,6 @@
         "Los accesorios tienen su propia sección en la colección y su página de carta con simulación completa, pero aún no se pueden poner en mazos.",
         "Un personaje del set 2 ya no activa por error los efectos de una carta del set 1 con el mismo número.",
         "Las partidas fantasma cuyos dos jugadores se fueron desaparecen de la lista de partidas en vivo y ya no se pueden observar.",
-        "El tablero cobra vida con efectos de partículas reales: chispas doradas cuando llega una carta, humo de ocultación, brasas en una derrota y espirales de chakra.",
-        "La pantalla tiembla ligeramente en una derrota o una misión ganada para dar más impacto a los grandes momentos.",
         "Las cartas jugadas y reveladas ahora entran en 3D con un reflejo de luz que recorre la carta.",
         "Las imágenes de las cartas se precargan durante la partida: las animaciones aparecen sin tiempos de carga.",
         "El registro de la partida se mantiene fluido incluso en partidas muy largas."
@@ -84,8 +78,6 @@
         "アタッチメントはコレクションに専用セクションがあり、カードページで完全なシミュレーションを見られますが、まだデッキには入れられません。",
         "第2弾のキャラクターが、同じ番号を持つ第1弾カードの効果を誤って発動することがなくなりました。",
         "両方のプレイヤーが退出したゴーストゲームは、ライブ観戦リストから消え、観戦できなくなりました。",
-        "盤面に本物のパーティクル演出が追加：カードが着地すると金色の火花、隠れ状態の煙、撃破時の火の粉、チャクラの渦が舞います。",
-        "撃破やミッション勝利の瞬間に画面が小さく揺れ、迫力が増しました。",
         "カードのプレイと公開が3D演出になり、光の反射がカードの上を走ります。",
         "対戦中にカード画像を先読みするため、演出が読み込み待ちなしで表示されます。",
         "非常に長い対戦でもログが軽快に動きます。"

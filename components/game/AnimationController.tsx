@@ -7,7 +7,6 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useGameScale } from './GameScaleContext';
 import { playSound, setVolume, setMuted } from '@/lib/sound/SoundManager';
-import { emitFx, shakeScreen, FX_GOLD, FX_RED, FX_BLUE, FX_WHITE, FX_SMOKE } from '@/lib/fx/fxBus';
 
 type AnimationType =
   | 'card-play'
@@ -63,59 +62,6 @@ interface AnimationEvent {
   type: AnimationType;
   data: Record<string, unknown>;
   timestamp: number;
-}
-
-function emitFxForAnimation(type: AnimationType, data: Record<string, unknown>) {
-  const cy = typeof window !== 'undefined' ? window.innerHeight / 2 : 0;
-  switch (type) {
-    case 'card-play':
-      if (data.hidden === true) {
-        emitFx({ kind: 'smoke', color: FX_SMOKE, count: 16 });
-      } else {
-        emitFx({ kind: 'ring', color: FX_GOLD, count: 30 });
-        emitFx({ kind: 'sparksUp', color: FX_GOLD, count: 14, y: cy + 90 });
-      }
-      break;
-    case 'card-reveal':
-      emitFx({ kind: 'flash', color: FX_WHITE, scale: 1.15 });
-      emitFx({ kind: 'smoke', color: FX_SMOKE, count: 10 });
-      break;
-    case 'card-defeat':
-      emitFx({ kind: 'embers', color: FX_RED, count: 34, scale: 1.1 });
-      emitFx({ kind: 'burst', color: '#8a2f20', count: 16 });
-      shakeScreen('hard');
-      break;
-    case 'card-hide':
-      emitFx({ kind: 'smoke', color: FX_SMOKE, count: 18, scale: 1.1 });
-      break;
-    case 'card-move':
-      emitFx({ kind: 'burst', color: FX_BLUE, count: 12, scale: 0.7 });
-      break;
-    case 'card-upgrade':
-      emitFx({ kind: 'spiral', color: FX_GOLD, count: 24 });
-      emitFx({ kind: 'flash', color: FX_GOLD, scale: 0.9, count: 10 });
-      break;
-    case 'power-token':
-      emitFx({ kind: 'sparksUp', color: FX_GOLD, count: 18 });
-      break;
-    case 'chakra-gain':
-      emitFx({ kind: 'spiral', color: FX_BLUE, count: 20 });
-      break;
-    case 'mission-score':
-      emitFx({ kind: 'flash', color: FX_GOLD, scale: 1.3, count: 22 });
-      emitFx({ kind: 'ring', color: FX_GOLD, count: 36, scale: 1.2 });
-      shakeScreen('soft');
-      break;
-    case 'edge-transfer':
-      emitFx({ kind: 'burst', color: FX_GOLD, count: 14, scale: 0.8 });
-      break;
-    case 'turn-transition':
-      emitFx({ kind: 'storm', color: FX_GOLD, count: 40 });
-      break;
-    case 'game-end':
-      emitFx({ kind: 'storm', color: FX_GOLD, count: 120 });
-      break;
-  }
 }
 
 function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
@@ -1056,9 +1002,6 @@ export function AnimationController() {
   useEffect(() => {
     if (!currentAnim) return;
     const type = currentAnim.type as AnimationType;
-    if (animationsEnabled) {
-      emitFxForAnimation(type, currentAnim.data);
-    }
     switch (type) {
       case 'turn-transition':
         playSound('newTurn');

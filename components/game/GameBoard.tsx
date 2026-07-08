@@ -18,7 +18,6 @@ import { MulliganDialog } from "./MulliganDialog";
 import { GameEndScreen } from "./GameEndScreen";
 import { GameLog } from "./GameLog";
 import { AnimationController } from "./AnimationController";
-import { FXLayer } from "./FXLayer";
 import { TargetSelector } from "./TargetSelector";
 import { HandCardSelector } from "./HandCardSelector";
 import { EffectChoiceSelector } from "./EffectChoiceSelector";
@@ -1064,7 +1063,6 @@ function GameBoardInner() {
 
   return (
     <div
-      id="game-board-root"
       className="flex overflow-hidden no-select"
       style={{
         width: 'var(--game-board-w, 100vw)',
@@ -1190,7 +1188,6 @@ function GameBoardInner() {
       <GameLog />
       <GameChat />
       <AnimationController />
-      <FXLayer />
       {!isReplayMode && (
         <>
           <TargetSelector />
