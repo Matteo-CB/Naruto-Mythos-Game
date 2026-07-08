@@ -776,8 +776,11 @@ function broadcastActiveGames(io: SocketIOServer): void {
   const now = Date.now();
   for (const [code, room] of rooms) {
     if (!room.gameState || room.gameState.phase === 'gameOver') continue;
+    if (room.finalized) continue;
     if (room.isPrivate) continue;
     if (now - room.createdAt > 2 * 60 * 60 * 1000) continue;
+    if (room.player1DisconnectedAt && room.player2DisconnectedAt) continue;
+    if (room.lastApplyActionAt && now - room.lastApplyActionAt > 10 * 60 * 1000) continue;
     if (seenPlayerIds.has(room.hostId) || (room.guestId && seenPlayerIds.has(room.guestId))) continue;
     seenPlayerIds.add(room.hostId);
     if (room.guestId) seenPlayerIds.add(room.guestId);
@@ -799,7 +802,7 @@ function broadcastActiveGames(io: SocketIOServer): void {
 }
 
 
-function cleanupStaleRooms(): void {
+function cleanupStaleRooms(io: SocketIOServer): void {
   const now = Date.now();
   let cleaned = 0;
   const PRIVATE_EMPTY_TTL_MS = 30 * 60 * 1000;
@@ -816,6 +819,32 @@ function cleanupStaleRooms(): void {
       }
     }
     
+    if (room.gameState && !room.finalized && room.player1DisconnectedAt && room.player2DisconnectedAt) {
+      const oldestDisc = Math.min(room.player1DisconnectedAt, room.player2DisconnectedAt);
+      if (now - oldestDisc > 10 * 60 * 1000) {
+        console.warn(`[Cleanup] ${code}: zombie game, both players disconnected ${Math.round((now - oldestDisc) / 1000)}s, cancelling with no elo impact`);
+        cancelGameNoElo(room, code, io, 'stalemate').catch(() => {
+          if (room.hostSocket) playerRooms.delete(room.hostSocket);
+          if (room.guestSocket) playerRooms.delete(room.guestSocket);
+          for (const [, spec] of room.spectators) playerRooms.delete(spec.socketId);
+          clearChessClockTimers(room);
+          rooms.delete(code);
+        });
+        cleaned++;
+        continue;
+      }
+    }
+
+    if (room.finalized && room.gameState && now - (room.lastApplyActionAt ?? room.createdAt) > 10 * 60 * 1000) {
+      if (room.hostSocket) playerRooms.delete(room.hostSocket);
+      if (room.guestSocket) playerRooms.delete(room.guestSocket);
+      for (const [, spec] of room.spectators) playerRooms.delete(spec.socketId);
+      clearChessClockTimers(room);
+      rooms.delete(code);
+      cleaned++;
+      continue;
+    }
+
     if (room.gameState?.phase === 'gameOver' && now - room.createdAt > 10 * 60 * 1000) {
       if (room.hostSocket) playerRooms.delete(room.hostSocket);
       if (room.guestSocket) playerRooms.delete(room.guestSocket);
@@ -1725,7 +1754,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
   setInterval(() => sweepOrphanTournamentMatches(io).catch(() => {}), 5 * 60_000);
 
 
-  setInterval(() => cleanupStaleRooms(), 60_000);
+  setInterval(() => cleanupStaleRooms(io), 60_000);
 
 
   setInterval(() => {
@@ -3219,7 +3248,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       cleanupPlayerRoom(socket);
 
 
-      cleanupStaleRooms();
+      cleanupStaleRooms(io);
 
       for (const [existingCode, existingRoom] of rooms) {
         if (existingRoom.hostId === data.userId && !existingRoom.guestId && !existingRoom.gameState && existingRoom.hostSocket !== socket.id) {
@@ -3375,6 +3404,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
       if (room.finalized) {
+        socket.emit('spectate:error', { message: 'Game has ended', errorKey: 'spectate.errorEnded' });
+        return;
+      }
+      if (room.player1DisconnectedAt && room.player2DisconnectedAt) {
         socket.emit('spectate:error', { message: 'Game has ended', errorKey: 'spectate.errorEnded' });
         return;
       }
