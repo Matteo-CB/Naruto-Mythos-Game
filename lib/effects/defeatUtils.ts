@@ -7,14 +7,14 @@ import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 
 
 
-export function sortTargetsGemmaLast<T extends { card: { number: number }; stack: { number: number }[] }>(
+export function sortTargetsGemmaLast<T extends { card: { number: number; set?: string }; stack: { number: number; set?: string }[] }>(
   targets: T[],
 ): T[] {
   return [...targets].sort((a, b) => {
     const aTopCard = a.stack?.length > 0 ? a.stack[a.stack?.length - 1] : a.card;
     const bTopCard = b.stack?.length > 0 ? b.stack[b.stack?.length - 1] : b.card;
-    const aIsGemma = aTopCard.number === 49;
-    const bIsGemma = bTopCard.number === 49;
+    const aIsGemma = (aTopCard.set === 'KS' && aTopCard.number === 49);
+    const bIsGemma = (bTopCard.set === 'KS' && bTopCard.number === 49);
     if (aIsGemma && !bIsGemma) return 1;  // Gemma goes last
     if (!aIsGemma && bIsGemma) return -1;
     return 0;
@@ -202,6 +202,7 @@ function removeCharacterFromPlay(
   const sidePlayer: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
 
   const allCards = defeated.stack?.length > 0 ? [...defeated.stack] : [defeated.card];
+  const attachedCards = defeated.attachments ?? [];
   if (sidePlayer === owner && allCards.length > 0 && EffectEngine.hasTsunade004Active(state, owner)) {
     const topCard = allCards[allCards.length - 1];
     const underCards = allCards.slice(0, -1);
@@ -225,6 +226,12 @@ function removeCharacterFromPlay(
   } else {
     ownerState.charactersInPlay = Math.max(0, ownerState.charactersInPlay - 1);
     result = { ...result, [owner]: ownerState };
+  }
+
+  for (const att of attachedCards) {
+    const attOwnerState = { ...result[att.owner] };
+    attOwnerState.discardPile = [...attOwnerState.discardPile, att.card as (typeof attOwnerState.discardPile)[number]];
+    result = { ...result, [att.owner]: attOwnerState };
   }
 
   return result;

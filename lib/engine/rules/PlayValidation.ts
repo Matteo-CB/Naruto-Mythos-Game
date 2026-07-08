@@ -47,7 +47,7 @@ export function validatePlayCharacter(
   }
 
   
-  if (card.number === 40) {
+  if ((card.set === 'KS' && card.number === 40)) {
     const hasTentenRestriction = (card.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('currently winning'),
     );
@@ -117,7 +117,7 @@ export function validateRevealCharacter(
   for (const oc of opponentChars) {
     if (oc.isHidden) continue;
     const ocTop = oc.stack?.length > 0 ? oc.stack[oc.stack?.length - 1] : oc.card;
-    if (ocTop.number === 111 || ocTop.number === 150) {
+    if ((ocTop.set === 'KS' && ocTop.number === 111) || (ocTop.set === 'KS' && ocTop.number === 150)) {
       const hasRestriction = (ocTop.effects ?? []).some(
         (e: { type: string; description: string }) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('cannot play characters while hidden'),
       );
@@ -131,7 +131,7 @@ export function validateRevealCharacter(
   const charTopCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
   
-  if (charTopCard.number === 40) {
+  if ((charTopCard.set === 'KS' && charTopCard.number === 40)) {
     const hasTentenRestriction = (charTopCard.effects ?? []).some(
       (e: { type: string; description: string }) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('currently winning'),
     );

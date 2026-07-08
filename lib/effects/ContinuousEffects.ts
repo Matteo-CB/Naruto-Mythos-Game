@@ -30,7 +30,7 @@ export function calculateContinuousChakraBonus(
     if (!effect.description.includes('[⧗]')) continue;
 
     
-    if (topCard.id === 'KS-025-C' || topCard.number === 25) {
+    if (topCard.id === 'KS-025-C' || (topCard.set === 'KS' && topCard.number === 25)) {
       const allMissionChars = [...friendlyChars, ...enemyChars];
       const hasAkamaru = allMissionChars.some(
         (c) => {
@@ -43,7 +43,7 @@ export function calculateContinuousChakraBonus(
     }
 
     
-    if (topCard.id === 'KS-044-C' || topCard.number === 44) {
+    if (topCard.id === 'KS-044-C' || (topCard.set === 'KS' && topCard.number === 44)) {
       const hasOtherLeaf = friendlyChars.some(
         (c) => {
           if (c.instanceId === char.instanceId || c.isHidden) return false;
@@ -55,26 +55,26 @@ export function calculateContinuousChakraBonus(
     }
 
     
-    if (topCard.id === 'KS-064-C' || topCard.number === 64) {
+    if (topCard.id === 'KS-064-C' || (topCard.set === 'KS' && topCard.number === 64)) {
       const soundFourMissions = countMissionsWithKeyword(state, player, 'Sound Four', char.instanceId);
       bonus += soundFourMissions;
     }
 
     
-    if (topCard.id === 'KS-077-C' || topCard.number === 77) {
+    if (topCard.id === 'KS-077-C' || (topCard.set === 'KS' && topCard.number === 77)) {
       const hasNonHiddenEnemy = enemyChars.some((c) => !c.isHidden);
       if (hasNonHiddenEnemy) bonus += 1;
     }
 
     
-    if (topCard.id === 'KS-005-C' || topCard.number === 5) {
+    if (topCard.id === 'KS-005-C' || (topCard.set === 'KS' && topCard.number === 5)) {
       if (effect.description.toLowerCase().includes('chakra') && effect.description.includes('+')) {
         bonus += 1;
       }
     }
 
     
-    if (topCard.id === 'KS-012-UC' || topCard.number === 12) {
+    if (topCard.id === 'KS-012-UC' || (topCard.set === 'KS' && topCard.number === 12)) {
       if (effect.description.toLowerCase().includes('chakra') && effect.description.includes('+')) {
         bonus += 1;
       }
@@ -134,6 +134,18 @@ export function calculateContinuousPowerModifier(
   char: CharacterInPlay,
 ): number {
 
+  let attachmentPower = 0;
+  if (!char.isHidden && char.attachments && char.attachments.length > 0) {
+    const attTop = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const doublesFood = attTop.id?.startsWith('SS-128') &&
+      (attTop.effects ?? []).some((e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('Food'));
+    for (const att of char.attachments) {
+      let p = att.card.power ?? 0;
+      if (p !== 0 && doublesFood && (att.card.keywords ?? []).includes('Food')) p *= 2;
+      attachmentPower += p;
+    }
+  }
+
   if (!char.isHidden) {
     const mission_zc = state.activeMissions[missionIndex];
     if (mission_zc) {
@@ -174,7 +186,7 @@ export function calculateContinuousPowerModifier(
       if (friendly.isHidden || friendly.instanceId === char.instanceId) continue;
       const fTop = friendly.stack?.length > 0 ? friendly.stack[friendly.stack?.length - 1] : friendly.card;
       
-      if (fTop.number === 35) {
+      if ((fTop.set === 'KS' && fTop.number === 35)) {
         const hasEffect = (fTop.effects ?? []).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('+2 Power'),
         );
@@ -182,7 +194,7 @@ export function calculateContinuousPowerModifier(
       }
 
       
-      if (fTop.number === 145) {
+      if ((fTop.set === 'KS' && fTop.number === 145)) {
         const hasEffect = (fTop.effects ?? []).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('+1 Power'),
         );
@@ -199,12 +211,12 @@ export function calculateContinuousPowerModifier(
       for (const effect of eTop.effects ?? []) {
         if (!effect.description.includes('[⧗]')) continue;
 
-        if ((eTop.number === 128 && (effect.type === 'UPGRADE' || effect.type === 'MAIN')) || eTop.number === 152) {
+        if (((eTop.set === 'KS' && eTop.number === 128) && (effect.type === 'UPGRADE' || effect.type === 'MAIN')) || (eTop.set === 'KS' && eTop.number === 152)) {
           hiddenBonus -= 1;
         }
 
 
-        if (eTop.number === 146 && effect.type === 'MAIN' && effect.description.includes('-1 Power')) {
+        if ((eTop.set === 'KS' && eTop.number === 146) && effect.type === 'MAIN' && effect.description.includes('-1 Power')) {
           if (state.edgeHolder === ownerOfEnemyChars) hiddenBonus -= 1;
         }
       }
@@ -233,7 +245,7 @@ export function calculateContinuousPowerModifier(
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
       
-      if (topCard.number === 15 && effect.description.includes('Other Team 7')) {
+      if ((topCard.set === 'KS' && topCard.number === 15) && effect.description.includes('Other Team 7')) {
         const charTop = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if ((charTop.keywords ?? []).includes('Team 7')) {
           modifier += 1;
@@ -241,7 +253,7 @@ export function calculateContinuousPowerModifier(
       }
 
       
-      if (topCard.number === 42 && effect.description.includes('Other Team Guy')) {
+      if ((topCard.set === 'KS' && topCard.number === 42) && effect.description.includes('Other Team Guy')) {
         const charTop = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if ((charTop.keywords ?? []).includes('Team Guy')) {
           modifier += 1;
@@ -259,7 +271,7 @@ export function calculateContinuousPowerModifier(
       if (!effect.description.includes('[⧗]')) continue;
 
       
-      if ((enemyTopCard.number === 128 && (effect.type === 'UPGRADE' || effect.type === 'MAIN')) || enemyTopCard.number === 152) {
+      if (((enemyTopCard.set === 'KS' && enemyTopCard.number === 128) && (effect.type === 'UPGRADE' || effect.type === 'MAIN')) || (enemyTopCard.set === 'KS' && enemyTopCard.number === 152)) {
         modifier -= 1;
       }
 
@@ -279,7 +291,7 @@ export function calculateContinuousPowerModifier(
     if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
     
-    if (selfTopCard.number === 13 && effect.description.includes('-1 Power for every other')) {
+    if ((selfTopCard.set === 'KS' && selfTopCard.number === 13) && effect.description.includes('-1 Power for every other')) {
       const otherNonHidden = friendlyChars.filter(
         (c) => c.instanceId !== char.instanceId && !c.isHidden,
       );
@@ -287,21 +299,21 @@ export function calculateContinuousPowerModifier(
     }
 
 
-    if (selfTopCard.number === 79 && effect.description.includes('Edge')) {
+    if ((selfTopCard.set === 'KS' && selfTopCard.number === 79) && effect.description.includes('Edge')) {
       if (state.edgeHolder === player) {
         modifier += 2;
       }
     }
 
 
-    if (selfTopCard.number === 147 && effect.description.includes('Edge') && effect.description.includes('+3 Power')) {
+    if ((selfTopCard.set === 'KS' && selfTopCard.number === 147) && effect.description.includes('Edge') && effect.description.includes('+3 Power')) {
       if (state.edgeHolder === player) {
         modifier += 3;
       }
     }
 
     
-    if (selfTopCard.number === 84 && effect.description.includes('Gaara')) {
+    if ((selfTopCard.set === 'KS' && selfTopCard.number === 84) && effect.description.includes('Gaara')) {
       const hasGaara = friendlyChars.some(
         (c) => {
           if (c.instanceId === char.instanceId || c.isHidden) return false;
@@ -313,7 +325,7 @@ export function calculateContinuousPowerModifier(
     }
 
     
-    if (selfTopCard.number === 101 && (effect.description.includes('Tsunade') || effect.description.includes('Shizune'))) {
+    if ((selfTopCard.set === 'KS' && selfTopCard.number === 101) && (effect.description.includes('Tsunade') || effect.description.includes('Shizune'))) {
       const hasTsunadeOrShizune = friendlyChars.some(
         (c) => {
           if (c.instanceId === char.instanceId || c.isHidden) return false;
@@ -373,7 +385,7 @@ export function calculateContinuousPowerModifier(
     }
   }
 
-  return modifier;
+  return modifier + attachmentPower;
 }
 
 
@@ -397,7 +409,7 @@ export function isRempartZeroed(
   for (const enemy of enemyChars) {
     if (enemy.isHidden) continue;
     const enemyTopCard = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
-    if (enemyTopCard.number === 67) {
+    if ((enemyTopCard.set === 'KS' && enemyTopCard.number === 67)) {
       const hasRempartEffect = (enemyTopCard.effects ?? []).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
       );
@@ -435,7 +447,7 @@ export function shouldRetainPowerTokens(char: CharacterInPlay): boolean {
   const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
   
-  if (topCard.number === 39 || topCard.number === 43) {
+  if ((topCard.set === 'KS' && topCard.number === 39) || (topCard.set === 'KS' && topCard.number === 43)) {
     const hasRetention = (topCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('doesn\'t lose Power tokens'),
     );
@@ -469,7 +481,7 @@ export function isProtectedFromEnemyHide(
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
     
-    if (topCard.number === 115) {
+    if ((topCard.set === 'KS' && topCard.number === 115)) {
       const hasProtection = (topCard.effects ?? []).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('cannot be hidden by enemy effects'),
       );
@@ -544,7 +556,7 @@ export function isMovementBlockedByKurenai(
   for (const ch of allChars) {
     if (ch.isHidden) continue;
     const chTop = ch.stack?.length > 0 ? ch.stack[ch.stack?.length - 1] : ch.card;
-    if (chTop.number === 35 || (chTop.set === 'SS' && chTop.number === 147)) {
+    if ((chTop.set === 'KS' && chTop.number === 35) || (chTop.set === 'SS' && chTop.number === 147)) {
       const hasRestriction = (chTop.effects ?? []).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
           (e.description.includes('cannot move') || e.description.includes("can't be moved")),
@@ -625,7 +637,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
     const justPlayed = mission[km056Side].find((c: CharacterInPlay) => c.instanceId === playedInstanceId);
     if (justPlayed && !justPlayed.isHidden) {
       const jpTop = justPlayed.stack?.length > 0 ? justPlayed.stack[justPlayed.stack.length - 1] : justPlayed.card;
-      if (jpTop.number === 128 || jpTop.number === 152 || jpTop.number === 127) {
+      if ((jpTop.set === 'KS' && jpTop.number === 128) || (jpTop.set === 'KS' && jpTop.number === 152) || (jpTop.set === 'KS' && jpTop.number === 127)) {
         for (const enemyChar of opponentChars) {
           if (enemyChar.isHidden) continue;
           const eTop = enemyChar.stack?.length > 0 ? enemyChar.stack[enemyChar.stack.length - 1] : enemyChar.card;
@@ -667,7 +679,7 @@ export function applyRempartTokenRemoval(state: GameState): GameState {
       let sideChanged = false;
       const nextChars = sideChars.map((c) => {
         const top = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-        if (top.number === 67 && c.rempartLockedTargetId !== undefined) {
+        if ((top.set === 'KS' && top.number === 67) && c.rempartLockedTargetId !== undefined) {
           sideChanged = true;
           return { ...c, rempartLockedTargetId: undefined };
         }
@@ -696,7 +708,7 @@ export function applyRempartTokenRemoval(state: GameState): GameState {
       const rempartChar = missions[mIdx][friendlySide].find((c) => {
         if (c.isHidden) return false;
         const top = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-        return top.number === 67 && (top.effects ?? []).some(
+        return (top.set === 'KS' && top.number === 67) && (top.effects ?? []).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
         );
       });

@@ -4,7 +4,7 @@ export type PlayerID = 'player1' | 'player2';
 export type GamePhase = 'setup' | 'mulligan' | 'start' | 'action' | 'mission' | 'end' | 'gameOver';
 export type TurnNumber = 1 | 2 | 3 | 4;
 export type MissionRank = 'D' | 'C' | 'B' | 'A';
-export type EffectType = 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE' | 'DUEL';
+export type EffectType = 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE' | 'DUEL' | 'ATTACH';
 export type Rarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'SP' | 'SPV' | 'POP' | 'POPV' | 'CHIBI' | 'CHIBIV' | 'MMS';
 
 
@@ -30,7 +30,8 @@ export interface CardData {
   name_ja?: string;
   title_ja?: string;
   rarity: Rarity;
-  card_type: 'character' | 'mission';
+  card_type: 'character' | 'mission' | 'attachment';
+  attach_to?: 'character' | 'mission';
   has_visual: boolean;
   chakra: number;
   power: number;
@@ -44,6 +45,17 @@ export interface CardData {
 
 export interface CharacterCard extends CardData {
   card_type: 'character';
+}
+
+export interface AttachmentCard extends CardData {
+  card_type: 'attachment';
+  attach_to: 'character' | 'mission';
+}
+
+export interface AttachedCard {
+  instanceId: string;
+  card: CardData;
+  owner: PlayerID;
 }
 
 export interface MissionCard extends CardData {
@@ -70,6 +82,8 @@ export interface CharacterInPlay {
   controllerInstanceId?: string;
   
   rempartLockedTargetId?: string;
+
+  attachments?: AttachedCard[];
 }
 
 export interface ActiveMission {
@@ -80,6 +94,8 @@ export interface ActiveMission {
   player1Characters: CharacterInPlay[];
   player2Characters: CharacterInPlay[];
   wonBy?: PlayerID | 'draw' | null;
+
+  attachments?: AttachedCard[];
 }
 
 
@@ -385,6 +401,7 @@ export interface VisibleCharacter {
   stackSize: number;
   effectivePower: number; // Includes base power + tokens + continuous modifiers
   isLastPlayed: boolean; // Was this character played directly in the current turn by the opponent?
+  attachments?: AttachedCard[];
 }
 
 

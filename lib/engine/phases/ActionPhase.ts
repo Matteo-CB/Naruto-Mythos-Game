@@ -1,9 +1,11 @@
-import type { GameState, GameAction, PlayerID, CharacterInPlay, CharacterCard, PendingAction } from '../types';
+import type { GameState, GameAction, PlayerID, CharacterInPlay, CharacterCard, PendingAction, CardData } from '../types';
 import { HIDDEN_PLAY_COST } from '../types';
 import { deepClone } from '../utils/deepClone';
 import { generateInstanceId } from '../utils/id';
 import { logAction, logContinuousEffectsOnPlay } from '../utils/gameLog';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter, checkFlexibleUpgrade } from '../rules/PlayValidation';
+import { attachCardToMission, attachCardToCharacter, getCharacterAttachTargets } from '../../effects/attachments';
+import { generateInstanceId as generateAttachId } from '../utils/id';
 import { calculateEffectiveCost, hasKurenai034CostReduction } from '../rules/ChakraValidation';
 import { EffectEngine } from '../../effects/EffectEngine';
 import { applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
@@ -105,8 +107,12 @@ function handlePlayCharacter(
 
   const card = playerState.hand[cardIndex];
 
-  
-  
+  if ((card as CardData).card_type === 'attachment') {
+    return handlePlayAttachment(state, player, cardIndex, missionIndex);
+  }
+
+
+
   const missionForUpgradeCheck = state.activeMissions[missionIndex];
   const chars = player === 'player1' ? missionForUpgradeCheck.player1Characters : missionForUpgradeCheck.player2Characters;
 
@@ -306,6 +312,162 @@ function handlePlayHidden(
 }
 
 
+function handlePlayAttachment(
+  state: GameState,
+  player: PlayerID,
+  cardIndex: number,
+  missionIndex: number,
+): GameState {
+  const playerState = state[player];
+  const card = playerState.hand[cardIndex];
+  const effectiveCost = calculateEffectiveCost(state, player, card, missionIndex, false);
+  if (playerState.chakra < effectiveCost) return state;
+
+  const attachTo = card.attach_to ?? 'character';
+  let targets: CharacterInPlay[] = [];
+  if (attachTo === 'character') {
+    targets = getCharacterAttachTargets(state, player, missionIndex);
+    if (targets.length === 0) return state;
+  }
+
+  const ps = { ...playerState };
+  ps.chakra -= effectiveCost;
+  const hand = [...ps.hand];
+  hand.splice(cardIndex, 1);
+  ps.hand = hand;
+
+  let newState: GameState = { ...state, [player]: ps };
+  newState = {
+    ...newState,
+    log: logAction(
+      newState.log, newState.turn, 'action', player,
+      'PLAY_ATTACHMENT',
+      `${player} plays attachment ${card.name_fr} for ${effectiveCost} chakra.`,
+      'game.log.playAttachment',
+      { card: card.name_fr, card_en: card.name_en || card.name_fr, mission: missionIndex + 1, cost: effectiveCost },
+    ),
+  };
+
+  if (attachTo === 'mission') {
+    newState = attachCardToMission(newState, player, card, missionIndex);
+  } else if (targets.length === 1) {
+    newState = attachCardToCharacter(newState, player, card, targets[0].instanceId);
+  } else {
+    const effId = generateAttachId();
+    const actId = generateAttachId();
+    newState = { ...newState, pendingEffects: [...newState.pendingEffects], pendingActions: [...newState.pendingActions] };
+    newState.pendingEffects.push({
+      id: effId,
+      sourceCardId: card.id,
+      sourceInstanceId: '',
+      sourceMissionIndex: missionIndex,
+      effectType: 'ATTACH',
+      effectDescription: JSON.stringify({ card }),
+      targetSelectionType: 'ATTACH_CHOOSE_TARGET',
+      sourcePlayer: player,
+      requiresTargetSelection: true,
+      validTargets: targets.map((c) => c.instanceId),
+      isOptional: false,
+      isMandatory: true,
+      resolved: false,
+      isUpgrade: false,
+    });
+    newState.pendingActions.push({
+      id: actId,
+      type: 'SELECT_TARGET',
+      player,
+      description: `Choose a friendly character to attach ${card.name_fr} to.`,
+      descriptionKey: 'game.effect.desc.attachChooseTarget',
+      descriptionParams: { card: card.name_fr },
+      options: targets.map((c) => c.instanceId),
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effId,
+    });
+  }
+
+  return applyRempartTokenRemoval(newState);
+}
+
+function handleRevealAttachment(
+  state: GameState,
+  player: PlayerID,
+  missionIndex: number,
+  hiddenChar: CharacterInPlay,
+  card: CardData,
+): GameState {
+  const attachTo = card.attach_to ?? 'character';
+  let targets: CharacterInPlay[] = [];
+  if (attachTo === 'character') {
+    targets = getCharacterAttachTargets(state, player, missionIndex).filter((c) => c.instanceId !== hiddenChar.instanceId);
+    if (targets.length === 0) return state;
+  }
+
+  const revealCost = calculateEffectiveCost(state, player, card as never, missionIndex, true);
+  const ps = { ...state[player] };
+  if (ps.chakra < revealCost) return state;
+  ps.chakra -= revealCost;
+
+  const missions = [...state.activeMissions];
+  const mission = { ...missions[missionIndex] };
+  const sideKey: 'player1Characters' | 'player2Characters' = player === 'player1' ? 'player1Characters' : 'player2Characters';
+  mission[sideKey] = mission[sideKey].filter((c) => c.instanceId !== hiddenChar.instanceId);
+  missions[missionIndex] = mission;
+  ps.charactersInPlay = countPlayerCharsInMissions(missions, player);
+
+  let newState: GameState = { ...state, [player]: ps, activeMissions: missions };
+  newState = {
+    ...newState,
+    log: logAction(
+      newState.log, newState.turn, 'action', player,
+      'PLAY_ATTACHMENT',
+      `${player} reveals attachment ${card.name_fr} for ${revealCost} chakra.`,
+      'game.log.playAttachment',
+      { card: card.name_fr, card_en: card.name_en || card.name_fr, mission: missionIndex + 1, cost: revealCost },
+    ),
+  };
+
+  if (attachTo === 'mission') {
+    newState = attachCardToMission(newState, player, card, missionIndex);
+  } else if (targets.length === 1) {
+    newState = attachCardToCharacter(newState, player, card, targets[0].instanceId);
+  } else {
+    const effId = generateAttachId();
+    const actId = generateAttachId();
+    newState = { ...newState, pendingEffects: [...newState.pendingEffects], pendingActions: [...newState.pendingActions] };
+    newState.pendingEffects.push({
+      id: effId,
+      sourceCardId: card.id,
+      sourceInstanceId: '',
+      sourceMissionIndex: missionIndex,
+      effectType: 'ATTACH',
+      effectDescription: JSON.stringify({ card }),
+      targetSelectionType: 'ATTACH_CHOOSE_TARGET',
+      sourcePlayer: player,
+      requiresTargetSelection: true,
+      validTargets: targets.map((c) => c.instanceId),
+      isOptional: false,
+      isMandatory: true,
+      resolved: false,
+      isUpgrade: false,
+    });
+    newState.pendingActions.push({
+      id: actId,
+      type: 'SELECT_TARGET',
+      player,
+      description: `Choose a friendly character to attach ${card.name_fr} to.`,
+      descriptionKey: 'game.effect.desc.attachChooseTarget',
+      descriptionParams: { card: card.name_fr },
+      options: targets.map((c) => c.instanceId),
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effId,
+    });
+  }
+
+  return applyRempartTokenRemoval(newState);
+}
+
 function handleRevealCharacter(
   state: GameState,
   player: PlayerID,
@@ -330,6 +492,10 @@ function handleRevealCharacter(
   if (char.controlledBy !== player) return state;
 
   const charTopCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
+
+  if ((charTopCard as CardData).card_type === 'attachment') {
+    return handleRevealAttachment(state, player, missionIndex, char, charTopCard);
+  }
 
   
   

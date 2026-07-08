@@ -40,7 +40,7 @@ export function calculateEffectiveCost(
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
       
-      if (topCard.number === 34 && effect.description.includes('Team 8') && effect.description.includes('less')) {
+      if ((topCard.set === 'KS' && topCard.number === 34) && effect.description.includes('Team 8') && effect.description.includes('less')) {
         if ((card.keywords ?? []).includes('Team 8') && card.id !== topCard.id) {
           cost = Math.max(1, cost - 1);
         }
@@ -48,7 +48,7 @@ export function calculateEffectiveCost(
 
       
       
-      if (card.number === 96 && topCard.name_fr?.toUpperCase().includes('NARUTO UZUMAKI')) {
+      if ((card.set === 'KS' && card.number === 96) && topCard.name_fr?.toUpperCase().includes('NARUTO UZUMAKI')) {
         
         cost = Math.max(0, cost - 1);
       }
@@ -60,7 +60,7 @@ export function calculateEffectiveCost(
     if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
     
-    if (card.number === 96 && effect.description.includes('Naruto Uzumaki') && effect.description.includes('1 less')) {
+    if ((card.set === 'KS' && card.number === 96) && effect.description.includes('Naruto Uzumaki') && effect.description.includes('1 less')) {
       const hasNaruto = friendlyChars.some(
         (c: any) => {
           if (c.isHidden) return false;
@@ -74,7 +74,7 @@ export function calculateEffectiveCost(
     }
 
     
-    if (card.number === 75 && effect.description.includes('hidden paying 2 less')) {
+    if ((card.set === 'KS' && card.number === 75) && effect.description.includes('hidden paying 2 less')) {
       
       if (isReveal) {
         cost = Math.max(0, cost - 2);
@@ -83,7 +83,7 @@ export function calculateEffectiveCost(
 
     
     
-    if (card.number === 90 && effect.description.includes('Sasuke Uchiha') && effect.description.includes('3 less')) {
+    if ((card.set === 'KS' && card.number === 90) && effect.description.includes('Sasuke Uchiha') && effect.description.includes('3 less')) {
       if (isReveal) {
         
         
@@ -119,7 +119,7 @@ export function calculateEffectiveCost(
 
       
       
-      if (enemyTopCard.number === 125 && effect.description.includes('additional 1 Chakra')) {
+      if ((enemyTopCard.set === 'KS' && enemyTopCard.number === 125) && effect.description.includes('additional 1 Chakra')) {
         cost += 1;
       }
 
@@ -131,7 +131,7 @@ export function calculateEffectiveCost(
   }
 
   
-  if (isReveal && card.number === 33) {
+  if (isReveal && (card.set === 'KS' && card.number === 33)) {
     const hasEnemyJutsu = enemyChars?.some((c: any) => {
       if (c.isHidden) return false;
       const cTop = getTopCard(c);
@@ -175,7 +175,7 @@ export function hasKurenai034CostReduction(
     if (!topCard) continue;
     for (const effect of topCard.effects ?? []) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
-      if (topCard.number === 34 && effect.description.includes('Team 8') && effect.description.includes('less')) {
+      if ((topCard.set === 'KS' && topCard.number === 34) && effect.description.includes('Team 8') && effect.description.includes('less')) {
         if ((card.keywords ?? []).includes('Team 8') && card.id !== topCard.id) {
           return true;
         }

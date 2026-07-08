@@ -2,7 +2,7 @@
 
 import { memo, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import type { CharacterCard, MissionCard, Rarity } from '@/lib/engine/types';
+import type { CardData, CharacterCard, MissionCard, Rarity } from '@/lib/engine/types';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import CardBack from './CardBack';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
@@ -28,7 +28,7 @@ const RARITY_COLORS: Record<Rarity, string> = {
 };
 
 export interface CardFaceProps {
-  card: CharacterCard | MissionCard;
+  card: CardData;
   powerTokens?: number;
   className?: string;
   showEffects?: boolean;
@@ -51,7 +51,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
     <div
       className={`relative overflow-hidden rounded-lg select-none ${className}`}
       style={{
-        aspectRatio: card.card_type === 'mission' ? '3.5 / 2.5' : '2.5 / 3.5',
+        aspectRatio: (card.card_type === 'mission' || (card.card_type === 'attachment' && card.attach_to === 'mission')) ? '3.5 / 2.5' : '2.5 / 3.5',
         backgroundColor: '#141414',
       }}
     >
@@ -179,7 +179,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         />
       )}
 
-      {card.card_type === 'character' && card.chakra !== undefined && (
+      {(card.card_type === 'character' || card.card_type === 'attachment') && card.chakra !== undefined && (
         <div
           style={{
             position: 'absolute',

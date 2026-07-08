@@ -1775,6 +1775,7 @@ export class GameEngine {
             stackSize: c.stack?.length ?? 0,
             effectivePower: power,
             isLastPlayed: lastPlayedIds.has(c.instanceId),
+            attachments: c.attachments,
           };
         });
 

@@ -894,7 +894,10 @@
         "defeatFailed": "[SCORE] {card}: Se impidió la derrota.",
         "selfDefeat": "[SCORE] {card}: Se derrotó a sí mismo.",
         "bonusPoint": "[SCORE] {card}: Ganó {amount} punto(s) de Misión de bonus."
-      }
+      },
+      "playAttachment": "Juega el accesorio {card} por {cost} chakra.",
+      "attachToMission": "{card} se une a la misión {mission}.",
+      "attachToCharacter": "{card} se une a {target}."
     },
     "end": {
       "victory": "Victoria",
@@ -1498,7 +1501,12 @@
         "ss126ConfirmDuel": "DUEL Orochimaru: ¿Jugar un personaje de la Aldea del Sonido en cualquier sitio, pagando 3 menos?",
         "ss000ConfirmDuel": "DUEL Zabuza Momochi: ¿Repetir el efecto MAIN?",
         "ss134ConfirmUpgradeModifier": "UPGRADE DUEL: ¿En su lugar, derrotarlo si tiene al menos 5 de Poder?",
-        "ss134ChooseTarget": "DUEL Itachi Uchiha: Elige cuál de los personajes enemigos más fuertes derrotar."
+        "ss134ChooseTarget": "DUEL Itachi Uchiha: Elige cuál de los personajes enemigos más fuertes derrotar.",
+        "attachChooseTarget": "Elige un personaje aliado al que unir {card}.",
+        "ss128ConfirmDuel": "DUEL Jirobo: ¿Derrotar a un personaje enemigo en esta misión con Poder 8 o más?",
+        "ss128Defeat": "Choji Akimichi: Elige un personaje enemigo con Poder 8 o más para derrotar.",
+        "ss108ConfirmScore": "SCORE Estadio del Examen: ¿Un personaje aliado activa un efecto DUEL instantáneo ignorando sus requisitos?",
+        "ss108ChooseCharacter": "Estadio del Examen: Elige un personaje aliado para activar su efecto DUEL."
       }
     },
     "anim": {
@@ -1603,7 +1611,8 @@
     "lockedTooltip": "Bloqueada. ¿Cómo desbloquearla?",
     "lockedBannerTitle": "Bloqueada",
     "lockedBannerDescription": "Desbloquéala con un sobre de variantes o una recompensa directa.",
-    "lockedToastMessage": "Esta carta está bloqueada. Consíguela en un sobre de variantes, en las Recompensas o en un torneo."
+    "lockedToastMessage": "Esta carta está bloqueada. Consíguela en un sobre de variantes, en las Recompensas o en un torneo.",
+    "attachments": "Accesorios"
   },
   "deckBuilder": {
     "title": "Constructor de mazos",
@@ -2182,7 +2191,8 @@
       "UPGRADE": "UPGRADE",
       "AMBUSH": "AMBUSH",
       "SCORE": "SCORE",
-      "DUEL": "DUEL"
+      "DUEL": "DUEL",
+      "ATTACH": "ATTACH"
     },
     "noImage": "Sin imagen",
     "hidden": "Oculta",

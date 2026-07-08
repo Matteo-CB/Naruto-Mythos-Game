@@ -21,7 +21,7 @@ export function triggerOnDefeatEffects(
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
         
-        if (topCard.number === 3 && controllingPlayer === defeatedCharOwner) {
+        if ((topCard.set === 'KS' && topCard.number === 3) && controllingPlayer === defeatedCharOwner) {
           const hasEffect = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
           );
@@ -46,7 +46,7 @@ export function triggerOnDefeatEffects(
         }
 
         
-        if (topCard.number === 136) {
+        if ((topCard.set === 'KS' && topCard.number === 136)) {
           const hasEffect = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
           );

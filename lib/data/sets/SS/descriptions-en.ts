@@ -30,4 +30,17 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "[↯] Search your deck for up to 2 Ninja Hound characters, reveal and draw them, then shuffle your deck. Play any number of Ninja Hound characters anywhere, paying 1 less.",
     "[↯] Zabuza Momochi: Repeat the MAIN effect.",
   ],
+  "SS-128-R": [
+    "[⧗] Double the Power of Food attachments on this character.",
+    "[↯] Jirobo: Defeat an enemy character in this mission with Power 8 or more.",
+  ],
+  "SS-082-C": [
+    "Attach to a friendly non-hidden character.",
+    "[↯] If this character has no Power tokens, POWERUP 3.",
+  ],
+  "SS-108-C": [
+    "Attach to a mission.",
+    "[↯] A friendly character activates an instant [↯] DUEL effect, ignoring requirements.",
+  ],
+
 };

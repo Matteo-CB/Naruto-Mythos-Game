@@ -129,6 +129,7 @@ export function EffectChoiceSelector() {
                       | 'card.effectTypes.AMBUSH'
                       | 'card.effectTypes.SCORE'
                       | 'card.effectTypes.DUEL'
+                      | 'card.effectTypes.ATTACH'
                     )}
                   </div>
 

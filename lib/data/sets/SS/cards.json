@@ -297,6 +297,110 @@
       "old_id": "SS-L",
       "image_url": "/images/cards/SS/legendary/SS-000-L.webp",
       "image_file": "images/cards/SS/legendary/SS-000-L.webp"
+    },
+    "SS-128-R": {
+      "id": "SS-128-R",
+      "cardId": "SS-128-R",
+      "rarity": "R",
+      "number": "128",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "CHOJI AKIMICHI",
+      "name_fr": "CHÔJI AKIMICHI",
+      "name_es": "CHOJI AKIMICHI",
+      "name_ja": "秋道チョウジ",
+      "title_en": "You're going to go down hard.",
+      "title_fr": "Tu vas tomber de haut.",
+      "title_es": "Vas a caer con fuerza.",
+      "title_ja": "「お前は派手に倒れることになるぞ。」",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team 10"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Double the Power of Food attachments on this character."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Jirobo: Defeat an enemy character in this mission with Power 8 or more."
+        }
+      ],
+      "image_file": "images/cards/SS/rare/SS-128-R.webp"
+    },
+    "SS-082-C": {
+      "id": "SS-082-C",
+      "cardId": "SS-082-C",
+      "rarity": "C",
+      "number": "82",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "CURRY OF LIFE",
+      "name_fr": "CURRY DE LA VIE",
+      "name_es": "CURRY DE LA VIDA",
+      "name_ja": "命のカレー",
+      "title_en": "",
+      "title_fr": "",
+      "title_es": "",
+      "title_ja": "",
+      "has_visual": true,
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Food"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] If this character has no Power tokens, POWERUP 3."
+        }
+      ],
+      "image_file": "images/cards/SS/attachment/SS-082-C.webp"
+    },
+    "SS-108-C": {
+      "id": "SS-108-C",
+      "cardId": "SS-108-C",
+      "rarity": "C",
+      "number": "108",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "mission",
+      "name_en": "EXAM STADIUM",
+      "name_fr": "STADE D'EXAMEN",
+      "name_es": "ESTADIO DEL EXAMEN",
+      "name_ja": "試験スタジアム",
+      "title_en": "",
+      "title_fr": "",
+      "title_es": "",
+      "title_ja": "",
+      "has_visual": true,
+      "chakra": 1,
+      "power": 0,
+      "keywords": [
+        "Location"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a mission."
+        },
+        {
+          "type": "SCORE",
+          "description": "[↯] A friendly character activates an instant [↯] DUEL effect, ignoring requirements."
+        }
+      ],
+      "image_file": "images/cards/SS/attachment/SS-108-C.webp"
     }
   }
 }

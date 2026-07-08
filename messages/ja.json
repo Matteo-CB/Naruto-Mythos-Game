@@ -893,7 +893,10 @@
         "defeatFailed": "[SCORE] {card}：撃破が阻止されました。",
         "selfDefeat": "[SCORE] {card}：自身を撃破しました。",
         "bonusPoint": "[SCORE] {card}：ボーナスのミッションポイントを {amount} 点得ました。"
-      }
+      },
+      "playAttachment": "アタッチメント{card}をチャクラ{cost}でプレイ。",
+      "attachToMission": "{card}がミッション{mission}に付けられた。",
+      "attachToCharacter": "{card}が{target}に付けられた。"
     },
     "end": {
       "victory": "勝利",
@@ -1497,7 +1500,12 @@
         "ss126ConfirmDuel": "DUEL 大蛇丸：音隠れの里キャラクターを1体、3少ないコストでどこにでも出しますか？",
         "ss000ConfirmDuel": "DUEL 桃地再不斬：MAIN効果を繰り返しますか？",
         "ss134ConfirmUpgradeModifier": "UPGRADE DUEL：代わりに、パワー5以上ならそれを撃破しますか？",
-        "ss134ChooseTarget": "DUEL うちはイタチ：撃破する最も強い敵キャラクターを選んでください。"
+        "ss134ChooseTarget": "DUEL うちはイタチ：撃破する最も強い敵キャラクターを選んでください。",
+        "attachChooseTarget": "{card}を付ける味方キャラクターを選んでください。",
+        "ss128ConfirmDuel": "DUEL 次郎坊：このミッションのパワー8以上の敵キャラクターを撃破しますか？",
+        "ss128Defeat": "秋道チョウジ：撃破するパワー8以上の敵キャラクターを選んでください。",
+        "ss108ConfirmScore": "SCORE 試験スタジアム：味方キャラクター1体が条件を無視して即時DUEL効果を発動しますか？",
+        "ss108ChooseCharacter": "試験スタジアム：DUEL効果を発動する味方キャラクターを選んでください。"
       }
     },
     "anim": {
@@ -1602,7 +1610,8 @@
     "lockedTooltip": "ロック中。解除方法は？",
     "lockedBannerTitle": "ロック中",
     "lockedBannerDescription": "バリアントブースターや直接報酬で解除できます。",
-    "lockedToastMessage": "このカードはロックされています。バリアントブースター、報酬、またはトーナメントで入手してください。"
+    "lockedToastMessage": "このカードはロックされています。バリアントブースター、報酬、またはトーナメントで入手してください。",
+    "attachments": "アタッチメント"
   },
   "deckBuilder": {
     "title": "デッキビルダー",
@@ -2181,7 +2190,8 @@
       "UPGRADE": "UPGRADE",
       "AMBUSH": "AMBUSH",
       "SCORE": "SCORE",
-      "DUEL": "DUEL"
+      "DUEL": "DUEL",
+      "ATTACH": "ATTACH"
     },
     "noImage": "画像なし",
     "hidden": "伏せ",

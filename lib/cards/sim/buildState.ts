@@ -1,6 +1,6 @@
 import type { GameState, PlayerID, PlayerState, CharacterInPlay, CharacterCard, MissionCard, ActiveMission } from '@/lib/engine/types';
 import { generateGameId, generateInstanceId } from '@/lib/engine/utils/id';
-import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
+import { getCharacterById, getMissionById, getCardById } from '@/lib/data/cardIndex';
 
 const MISSION_IDS = ['KS-001-MMS', 'KS-002-MMS', 'KS-003-MMS', 'KS-004-MMS'];
 
@@ -69,7 +69,7 @@ export function buildSimState(opts: BuildSimOpts = {}): GameState {
   }
 
   const hand1 = (opts.hand1 ?? [])
-    .map((id) => getCharacterById(id))
+    .map((id) => getCharacterById(id) ?? (getCardById(id) as unknown as CharacterCard))
     .filter((c): c is CharacterCard => !!c);
 
   return {

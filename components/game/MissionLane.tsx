@@ -251,6 +251,31 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </>
       )}
 
+      {!isHidden && (character.attachments?.length ?? 0) > 0 && (
+        <div
+          className="absolute bottom-0.5 left-0.5 z-10 flex flex-col gap-0.5"
+          onClick={(e) => { e.stopPropagation(); pinCard(character.attachments![0].card as never); }}
+          title={character.attachments!.map((a) => getCardName(a.card, locale as 'en' | 'fr')).join(', ')}
+          style={{ cursor: 'pointer' }}
+        >
+          {character.attachments!.slice(0, 2).map((att) => (
+            <div
+              key={att.instanceId}
+              style={{
+                width: dims.isMobile ? '20px' : '16px',
+                height: dims.isMobile ? '26px' : '21px',
+                backgroundImage: att.card.image_file ? `url('${normalizeImagePath(att.card.image_file)}')` : undefined,
+                backgroundColor: '#141414',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                borderRadius: '2px',
+                boxShadow: '0 0 8px rgba(196, 163, 90, 0.45)',
+              }}
+            />
+          ))}
+        </div>
+      )}
+
       {!isHidden && (
         <div
           className={`absolute bottom-0.5 right-0.5 flex items-center justify-center font-bold tabular-nums${character.powerTokens > 0 ? ' power-glow' : ''}`}
@@ -555,6 +580,29 @@ function MissionCardDisplay({
         </motion.div>
       )}
     </div>
+
+    {(mission.attachments?.length ?? 0) > 0 && (
+      <div className="flex gap-1 justify-center" style={{ width: '100%', maxWidth: dims.missionMaxW + 'px', marginTop: '2px' }}>
+        {mission.attachments!.map((att) => (
+          <div
+            key={att.instanceId}
+            onClick={(e) => { e.stopPropagation(); pinCard(att.card as never); }}
+            title={getCardName(att.card, locale as 'en' | 'fr')}
+            style={{
+              width: '36%',
+              aspectRatio: '3.5 / 1.1',
+              borderRadius: '3px',
+              backgroundImage: att.card.image_file ? `url('${normalizeImagePath(att.card.image_file)}')` : undefined,
+              backgroundColor: '#141414',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center 30%',
+              boxShadow: att.owner === myPlayer ? '0 0 8px rgba(196, 163, 90, 0.5)' : '0 0 8px rgba(179, 62, 62, 0.5)',
+              cursor: 'pointer',
+            }}
+          />
+        ))}
+      </div>
+    )}
     </>
   );
 }

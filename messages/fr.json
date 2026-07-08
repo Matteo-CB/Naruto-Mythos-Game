@@ -895,7 +895,10 @@
         "defeatFailed": "[SCORE] {card} : La défaite a été empêchée.",
         "selfDefeat": "[SCORE] {card} : Se défait lui-même.",
         "bonusPoint": "[SCORE] {card} : Gagne {amount} point(s) de Mission bonus."
-      }
+      },
+      "playAttachment": "Joue l'attachement {card} pour {cost} chakra.",
+      "attachToMission": "{card} est attaché à la mission {mission}.",
+      "attachToCharacter": "{card} est attaché à {target}."
     },
     "end": {
       "victory": "Victoire",
@@ -1499,7 +1502,12 @@
         "ss126ConfirmDuel": "DUEL Orochimaru : Jouer un personnage Village du Son n'importe où, en payant 3 de moins ?",
         "ss000ConfirmDuel": "DUEL Zabuza Momochi : Répéter l'effet MAIN ?",
         "ss134ConfirmUpgradeModifier": "UPGRADE DUEL : À la place, le vaincre s'il a au moins 5 Puissance ?",
-        "ss134ChooseTarget": "DUEL Itachi Uchiwa : Choisissez lequel des personnages ennemis les plus forts vaincre."
+        "ss134ChooseTarget": "DUEL Itachi Uchiwa : Choisissez lequel des personnages ennemis les plus forts vaincre.",
+        "attachChooseTarget": "Choisissez un personnage allié auquel attacher {card}.",
+        "ss128ConfirmDuel": "DUEL Jirobo : Vaincre un personnage ennemi de cette mission avec 8 Puissance ou plus ?",
+        "ss128Defeat": "Chôji Akimichi : Choisissez un personnage ennemi avec 8 Puissance ou plus à vaincre.",
+        "ss108ConfirmScore": "SCORE Stade d'Examen : Un personnage allié active un effet DUEL instantané en ignorant ses conditions ?",
+        "ss108ChooseCharacter": "Stade d'Examen : Choisissez un personnage allié pour activer son effet DUEL."
       }
     },
     "anim": {
@@ -1604,7 +1612,8 @@
     "lockedTooltip": "Verrouillée. Comment débloquer ?",
     "lockedBannerTitle": "Verrouillée",
     "lockedBannerDescription": "Débloque via un booster variantes ou une récompense directe.",
-    "lockedToastMessage": "Cette carte est verrouillée. Obtiens-la dans un booster variantes, les Récompenses ou un tournoi."
+    "lockedToastMessage": "Cette carte est verrouillée. Obtiens-la dans un booster variantes, les Récompenses ou un tournoi.",
+    "attachments": "Attachements"
   },
   "deckBuilder": {
     "title": "Constructeur de Deck",
@@ -2183,7 +2192,8 @@
       "UPGRADE": "UPGRADE",
       "AMBUSH": "AMBUSH",
       "SCORE": "SCORE",
-      "DUEL": "DUEL"
+      "DUEL": "DUEL",
+      "ATTACH": "ATTACH"
     },
     "noImage": "Pas d'image",
     "hidden": "Caché",

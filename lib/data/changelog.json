@@ -15,7 +15,11 @@
         "Kurenai Yuhi améliorée : le duel se confirme d'abord, puis une seconde fenêtre propose d'appliquer ou non son effet UPGRADE qui abaisse le seuil à 5.",
         "Kakashi Légendaire : la fenêtre du duel dit maintenant DUEL Zabuza Momochi : Répéter l'effet MAIN, et la confirmation s'affiche aussi quand le deck n'a plus de Chien Ninja mais qu'il en reste en main.",
         "La défausse imposée par la mission Trouver le traître ne peut plus être passée : le choix de la carte est obligatoire.",
-        "Les effets DUEL se déclenchent maintenant aussi quand on révèle une carte cachée, comme pour un personnage joué normalement."
+        "Les effets DUEL se déclenchent maintenant aussi quand on révèle une carte cachée, comme pour un personnage joué normalement.",
+        "Trois nouvelles cartes du set 2 : Chôji Akimichi (rare 128) et les deux premières cartes attachement, Curry de la Vie et Stade d'Examen.",
+        "Nouvelle mécanique attachement : ces cartes se jouent comme des personnages et se fixent à un personnage allié ou à une mission, visibles directement sur le plateau.",
+        "Les attachements ont leur propre section dans la collection et leur page de carte avec simulation complète, mais ne sont pas encore jouables en deck.",
+        "Un personnage du set 2 ne déclenche plus par erreur les effets d'une carte du set 1 portant le même numéro."
       ],
       "changes_en": [
         "Heaven Curse Mark Sasuke no longer gains chakra when defeated by the same effect that defeats another character.",
@@ -26,7 +30,11 @@
         "Upgraded Kurenai Yuhi: the duel confirms first, then a second window asks whether to apply her UPGRADE effect that lowers the threshold to 5.",
         "Legendary Kakashi: the duel window now says DUEL Zabuza Momochi: Repeat the MAIN effect, and the confirmation also shows when the deck has no Ninja Hound left but some remain in hand.",
         "The discard forced by the Find the Traitor mission can no longer be skipped: choosing the card is mandatory.",
-        "DUEL effects now also trigger when revealing a hidden card, just like a normally played character."
+        "DUEL effects now also trigger when revealing a hidden card, just like a normally played character.",
+        "Three new set 2 cards: Choji Akimichi (rare 128) and the first two attachment cards, Curry of Life and Exam Stadium.",
+        "New attachment mechanic: these cards are played like characters and attach to a friendly character or a mission, visible right on the board.",
+        "Attachments have their own section in the collection and their card page with a full simulation, but cannot be put in decks yet.",
+        "A set 2 character no longer wrongly triggers the effects of a set 1 card sharing the same number."
       ],
       "changes_es": [
         "Sasuke Marca Maldita del Cielo ya no gana chakra cuando es derrotado por el mismo efecto que derrota a otro personaje.",
@@ -37,7 +45,11 @@
         "Kurenai Yuhi mejorada: el duelo se confirma primero, y luego una segunda ventana pregunta si aplicar su efecto UPGRADE que baja el umbral a 5.",
         "Kakashi Legendario: la ventana del duelo ahora dice DUEL Zabuza Momochi: Repetir el efecto MAIN, y la confirmación también aparece cuando el mazo no tiene Perros Ninja pero quedan en la mano.",
         "El descarte impuesto por la misión Encontrar al traidor ya no se puede omitir: elegir la carta es obligatorio.",
-        "Los efectos DUEL ahora también se activan al revelar una carta oculta, igual que con un personaje jugado normalmente."
+        "Los efectos DUEL ahora también se activan al revelar una carta oculta, igual que con un personaje jugado normalmente.",
+        "Tres nuevas cartas del set 2: Choji Akimichi (rara 128) y las dos primeras cartas de accesorio, Curry de la Vida y Estadio del Examen.",
+        "Nueva mecánica de accesorios: estas cartas se juegan como personajes y se unen a un personaje aliado o a una misión, visibles directamente en el tablero.",
+        "Los accesorios tienen su propia sección en la colección y su página de carta con simulación completa, pero aún no se pueden poner en mazos.",
+        "Un personaje del set 2 ya no activa por error los efectos de una carta del set 1 con el mismo número."
       ],
       "changes_ja": [
         "天の呪印サスケが、他のキャラクターを撃破する同じ効果で撃破されたときにチャクラを得なくなりました。",
@@ -48,7 +60,11 @@
         "強化された夕日紅：まずデュエルを確認し、その後2つ目のウィンドウで条件を5に下げるUPGRADE効果を適用するか選べます。",
         "伝説のカカシ：デュエルのウィンドウにDUEL 桃地再不斬：MAIN効果を繰り返すと表示され、山札に忍犬がなくても手札に残っていれば確認が表示されるようになりました。",
         "ミッション「裏切り者を探せ」で強制される捨て札はスキップできなくなりました。カードの選択は必須です。",
-        "伏せたカードを公開したときも、通常どおりプレイしたキャラクターと同じようにDUEL効果が発動するようになりました。"
+        "伏せたカードを公開したときも、通常どおりプレイしたキャラクターと同じようにDUEL効果が発動するようになりました。",
+        "第2弾の新カード3枚：秋道チョウジ（レア128）と、初のアタッチメントカード2枚「命のカレー」「試験スタジアム」。",
+        "新メカニズム「アタッチメント」：キャラクターと同じようにプレイし、味方キャラクターやミッションに付けられ、盤面に直接表示されます。",
+        "アタッチメントはコレクションに専用セクションがあり、カードページで完全なシミュレーションを見られますが、まだデッキには入れられません。",
+        "第2弾のキャラクターが、同じ番号を持つ第1弾カードの効果を誤って発動することがなくなりました。"
       ]
     },
     {

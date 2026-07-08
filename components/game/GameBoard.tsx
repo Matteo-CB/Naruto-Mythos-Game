@@ -50,6 +50,8 @@ const effectTypeColorMap: Record<string, string> = {
   AMBUSH: "#b33e3e",
   UPGRADE: "#3e8b3e",
   SCORE: "#6a6abb",
+  DUEL: "#b37e3e",
+  ATTACH: "#5A7ABB",
 };
 
 const rankColorMap: Record<string, string> = {
@@ -351,7 +353,8 @@ function CardPreviewContent({
                         | "card.effectTypes.UPGRADE"
                         | "card.effectTypes.AMBUSH"
                         | "card.effectTypes.SCORE"
-                        | "card.effectTypes.DUEL",
+                        | "card.effectTypes.DUEL"
+                        | "card.effectTypes.ATTACH",
                     )}
                   </span>
                   <span

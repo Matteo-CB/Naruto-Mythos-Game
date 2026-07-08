@@ -79,7 +79,7 @@ export default function CollectionPage() {
     setCurrentPage(1);
   }, [filterRarity, filterGroup, filterSet, filterVariantsOnly, filterTradeableOnly, searchQuery]);
 
-  const characterCards = useMemo(() => filteredCards.filter((c) => c.card_type !== 'mission'), [filteredCards]);
+  const characterCards = useMemo(() => filteredCards.filter((c) => c.card_type === 'character'), [filteredCards]);
   const totalCharPages = Math.max(1, Math.ceil(characterCards.length / CARDS_PER_PAGE));
   const paginatedChars = useMemo(() => {
     const start = (currentPage - 1) * CARDS_PER_PAGE;
@@ -332,6 +332,66 @@ export default function CollectionPage() {
                       )}
                     </Link>
                     {isBanned && <BanBadge label={t('collection.bannedPlaceholder')} />}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCard(card)}
+                      className="absolute top-1 left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full opacity-70 hover:opacity-100 transition-opacity"
+                      style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: '#c4a35a' }}
+                      aria-label={t('collection.quickPreview')}
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                      </svg>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        {filteredCards.some((c) => c.card_type === 'attachment') && (
+          <>
+            <div className="mt-8 mb-4 flex items-center gap-3">
+              <div className="flex-1 h-px bg-[#262626]" />
+              <span className="text-sm font-bold text-[#888888] uppercase tracking-wider">{t('collection.attachments')}</span>
+              <div className="flex-1 h-px bg-[#262626]" />
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 items-start">
+              {filteredCards.filter((c) => c.card_type === 'attachment').map((card) => {
+                const imgPath = getImagePath(card);
+                const landscape = card.attach_to === 'mission';
+                return (
+                  <div
+                    key={card.id}
+                    className="relative bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
+                    style={{ aspectRatio: landscape ? '3.5 / 2.5' : '2.5 / 3.5' }}
+                  >
+                    <Link
+                      href={`/cards/${cardIdToSlug(card.id)}`}
+                      className="block w-full h-full"
+                      aria-label={getCardName(card, locale)}
+                    >
+                      {imgPath ? (
+                        <img
+                          src={imgPath}
+                          alt={getCardName(card, locale)}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                          width={200}
+                          height={landscape ? 140 : 280}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center p-1">
+                          <div className="w-10 h-7 bg-[#1a1a1a] mb-1" />
+                          <span className="text-[8px] text-[#555] text-center leading-tight">
+                            {getCardName(card, locale)}
+                          </span>
+                        </div>
+                      )}
+                    </Link>
                     <button
                       type="button"
                       onClick={() => setSelectedCard(card)}

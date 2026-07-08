@@ -889,7 +889,10 @@
         "defeatFailed": "[SCORE] {card}: Defeat was prevented.",
         "selfDefeat": "[SCORE] {card}: Defeated self.",
         "bonusPoint": "[SCORE] {card}: Gained {amount} bonus Mission point(s)."
-      }
+      },
+      "playAttachment": "Plays the attachment {card} for {cost} chakra.",
+      "attachToMission": "{card} is attached to mission {mission}.",
+      "attachToCharacter": "{card} is attached to {target}."
     },
     "end": {
       "victory": "Victory",
@@ -1493,7 +1496,12 @@
         "ss126ConfirmDuel": "DUEL Orochimaru: Play a Sound Village character anywhere, paying 3 less?",
         "ss000ConfirmDuel": "DUEL Zabuza Momochi: Repeat the MAIN effect?",
         "ss134ConfirmUpgradeModifier": "UPGRADE DUEL: Instead, defeat them if they have at least 5 Power?",
-        "ss134ChooseTarget": "DUEL Itachi Uchiha: Choose which strongest enemy character to defeat."
+        "ss134ChooseTarget": "DUEL Itachi Uchiha: Choose which strongest enemy character to defeat.",
+        "attachChooseTarget": "Choose a friendly character to attach {card} to.",
+        "ss128ConfirmDuel": "DUEL Jirobo: Defeat an enemy character in this mission with Power 8 or more?",
+        "ss128Defeat": "Choji Akimichi: Choose an enemy character with Power 8 or more to defeat.",
+        "ss108ConfirmScore": "SCORE Exam Stadium: A friendly character activates an instant DUEL effect, ignoring requirements?",
+        "ss108ChooseCharacter": "Exam Stadium: Choose a friendly character to activate its DUEL effect."
       }
     },
     "anim": {
@@ -1598,7 +1606,8 @@
     "lockedTooltip": "Locked. How to unlock?",
     "lockedBannerTitle": "Locked",
     "lockedBannerDescription": "Unlock via a variant booster or a direct reward.",
-    "lockedToastMessage": "This card is locked. Get it from a variant booster, the Rewards or a tournament."
+    "lockedToastMessage": "This card is locked. Get it from a variant booster, the Rewards or a tournament.",
+    "attachments": "Attachments"
   },
   "deckBuilder": {
     "title": "Deck Builder",
@@ -2177,7 +2186,8 @@
       "UPGRADE": "UPGRADE",
       "AMBUSH": "AMBUSH",
       "SCORE": "SCORE",
-      "DUEL": "DUEL"
+      "DUEL": "DUEL",
+      "ATTACH": "ATTACH"
     },
     "noImage": "No image",
     "hidden": "Hidden",

@@ -297,7 +297,111 @@ function ss112DuelHandler(ctx: EffectContext): EffectResult {
 }
 
 
+function choji128MainHandler(ctx: EffectContext): EffectResult {
+  const state = ctx.state;
+  const log = logAction(
+    state.log, state.turn, state.phase, ctx.sourcePlayer,
+    'EFFECT_CONTINUOUS',
+    'Choji Akimichi (SS-128): Doubles the Power of Food attachments on this character (continuous).',
+    'game.log.effect.continuous',
+    { card: 'CHÔJI AKIMICHI', id: 'SS-128-R' },
+  );
+  return { state: { ...state, log } };
+}
+
+function choji128DuelHandler(ctx: EffectContext): EffectResult {
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+  const enemySide = sideFor(sourcePlayer, 'enemy');
+  const enemyPlayer: PlayerID = sourcePlayer === 'player1' ? 'player2' : 'player1';
+  const mission = state.activeMissions[sourceMissionIndex];
+  if (!mission) return { state };
+
+  const validTargets = mission[enemySide]
+    .filter((c) => !c.isHidden && getEffectivePower(state, c, enemyPlayer) >= 8)
+    .map((c) => c.instanceId);
+
+  if (validTargets.length === 0) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Choji Akimichi (SS-128): No enemy with Power 8 or more in this mission.',
+      'game.log.effect.noTarget', { card: 'CHÔJI AKIMICHI', id: 'SS-128-R' }) } };
+  }
+
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'SS128_CONFIRM_DUEL',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({}),
+    descriptionKey: 'game.effect.desc.ss128ConfirmDuel',
+  };
+}
+
+function curry082MainHandler(ctx: EffectContext): EffectResult {
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+  const host = sourceCard;
+  if ((host.powerTokens ?? 0) > 0) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Curry of Life (SS-082): The character already has Power tokens, no POWERUP.',
+      'game.log.effect.noTarget', { card: 'CURRY DE LA VIE', id: 'SS-082-C' }) } };
+  }
+  const friendlySide = sideFor(sourcePlayer, 'friendly');
+  const missions = [...state.activeMissions];
+  const mission = { ...missions[sourceMissionIndex] };
+  const chars = [...mission[friendlySide]];
+  const idx = chars.findIndex((c) => c.instanceId === host.instanceId);
+  if (idx === -1) return { state };
+  chars[idx] = { ...chars[idx], powerTokens: chars[idx].powerTokens + 3 };
+  mission[friendlySide] = chars;
+  missions[sourceMissionIndex] = mission;
+  const hostTop = topOf(chars[idx]);
+  const log = logAction(
+    state.log, state.turn, state.phase, sourcePlayer,
+    'EFFECT_POWERUP',
+    `Curry of Life (SS-082): POWERUP 3 on ${hostTop.name_fr}.`,
+    'game.log.effect.powerup',
+    { card: 'CURRY DE LA VIE', id: 'SS-082-C', amount: 3, target: hostTop.name_fr },
+  );
+  return { state: { ...state, activeMissions: missions, log } };
+}
+
+function stadium108ScoreHandler(ctx: EffectContext): EffectResult {
+  const { state, sourcePlayer } = ctx;
+  const friendlySide = sideFor(sourcePlayer, 'friendly');
+
+  const candidates: string[] = [];
+  for (const m of state.activeMissions) {
+    for (const c of m[friendlySide]) {
+      if (c.isHidden) continue;
+      const top = topOf(c);
+      if ((top.effects ?? []).some((e) => e.type === 'DUEL' && !e.description.includes('[⧗]'))) {
+        candidates.push(c.instanceId);
+      }
+    }
+  }
+
+  if (candidates.length === 0) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Exam Stadium (SS-108): No friendly character with an instant DUEL effect.',
+      'game.log.effect.noTarget', { card: "STADE D'EXAMEN", id: 'SS-108-C' }) } };
+  }
+
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'SS108_CONFIRM_SCORE',
+    validTargets: ['SS-108-C'],
+    isOptional: true,
+    description: JSON.stringify({}),
+    descriptionKey: 'game.effect.desc.ss108ConfirmScore',
+  };
+}
+
 export function registerSet2Handlers(): void {
+  registerEffect('SS-128-R', 'MAIN', choji128MainHandler);
+  registerEffect('SS-128-R', 'DUEL', choji128DuelHandler);
+  registerEffect('SS-082-C', 'MAIN', curry082MainHandler);
+  registerEffect('SS-108-C', 'SCORE', stadium108ScoreHandler);
   registerEffect('SS-112-SPV', 'UPGRADE', ss112UpgradeHandler);
   registerEffect('SS-112-SPV', 'DUEL', ss112DuelHandler);
   registerEffect('SS-147-POPV', 'DUEL', ss147DuelHandler);

@@ -1,4 +1,4 @@
-import type { CardData, CharacterCard, MissionCard, Rarity } from '../engine/types';
+import type { CardData, CharacterCard, MissionCard, AttachmentCard, Rarity } from '../engine/types';
 import { allCardData as rawData } from './sets';
 
 
@@ -10,7 +10,8 @@ interface RawJsonCard {
   rarity: string;
   number: string;
   set: string;
-  card_type: 'character' | 'mission';
+  card_type: 'character' | 'mission' | 'attachment';
+  attach_to?: 'character' | 'mission';
   name_en: string;
   name_fr: string;
   name_ja?: string;
@@ -56,13 +57,14 @@ function normalizeCard(raw: RawJsonCard): CardData {
     title_es: raw.title_es || undefined,
     rarity: raw.rarity as Rarity,
     card_type: raw.card_type,
+    attach_to: raw.attach_to || undefined,
     has_visual: raw.has_visual || !!raw.image_file,
     chakra: typeof raw.chakra === 'number' ? raw.chakra : 0,
     power: typeof raw.power === 'number' ? raw.power : 0,
     keywords: raw.keywords || [],
     group: raw.card_type === 'mission' ? '' : (raw.group || 'Independent'),
     effects: (raw.effects || []).map(e => ({
-      type: e.type as 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE',
+      type: e.type as 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE' | 'DUEL' | 'ATTACH',
       description: e.description,
     })),
     image_file: normalizeImagePath(raw.image_file) || undefined,
@@ -93,6 +95,7 @@ const rawCardList = Object.values(rawCards);
 let _allCards: CardData[] | null = null;
 let _characters: CharacterCard[] | null = null;
 let _missions: MissionCard[] | null = null;
+let _attachments: AttachmentCard[] | null = null;
 let _playableCharacters: CharacterCard[] | null = null;
 let _playableMissions: MissionCard[] | null = null;
 let _oldIdToNewId: Map<string, string> | null = null;
@@ -130,6 +133,15 @@ export function getAllCharacters(): CharacterCard[] {
       .map(normalizeCharacterCard);
   }
   return _characters;
+}
+
+export function getAllAttachments(): AttachmentCard[] {
+  if (!_attachments) {
+    _attachments = rawCardList
+      .filter((c) => c.card_type === 'attachment')
+      .map((c) => ({ ...normalizeCard(c), card_type: 'attachment', attach_to: c.attach_to ?? 'character' }) as AttachmentCard);
+  }
+  return _attachments;
 }
 
 export function getAllMissions(): MissionCard[] {

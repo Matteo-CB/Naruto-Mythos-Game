@@ -110,6 +110,43 @@ const FACTORIES: Record<string, Factory> = {
   'KS-110-R': (id) => ({ build: () => board({ hand: [id], e0: [{ id: 'KS-005-C', iid: 'sim-weak' }, { id: 'KS-086-C', iid: 'sim-strong' }] }), play: P1(FRESH) }),
   'KS-113-R': (id) => ({ build: () => board({ hand: [id], p1m0: ['KS-027-C', 'KS-009-C'] }), play: P1(FRESH) }),
   'KS-138-S': (id) => ({ build: () => board({ hand: [id], upgBase: { id: 'KS-063-UC', iid: 'sim-upg-base' } }), play: P1(upgrade('sim-upg-base')) }),
+  'SS-082-C': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['KS-009-C'] }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
+  'SS-108-C': (id) => ({
+    build: () => board({
+      hand: [id],
+      p1m0: [{ id: 'SS-120-CHIBIV', iid: 'sim-kiba' }],
+      e0: [{ id: 'KS-005-C', iid: 'sim-weak' }],
+      missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+    }),
+    play: P1(FRESH),
+    followups: [
+      { player: 'player2', action: PASS_ACTION },
+      P1(PASS_ACTION),
+    ],
+    noMinimize: true,
+  }),
+  'SS-128-R': (id) => ({
+    build: () => board({
+      hand: [id, 'SS-082-C'],
+      p1m0: ['KS-057-C'],
+      e0: [{ id: 'KS-136-S', iid: 'sim-big' }],
+    }),
+    play: P1(FRESH),
+    followups: [
+      { player: 'player2', action: PASS_ACTION },
+      P1(FRESH),
+    ],
+    choose: (state, pending) => {
+      const opts = pending.options ?? [];
+      if (pending.descriptionKey === 'game.effect.desc.attachChooseTarget') return [opts[opts.length - 1]];
+      return opts.slice(0, Math.max(1, pending.minSelections ?? 1));
+    },
+    noMinimize: true,
+  }),
   'SS-000-L': (id) => ({
     build: () => {
       const st = board({ hand: [id], chakra: 20 });

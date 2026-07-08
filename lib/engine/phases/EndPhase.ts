@@ -33,7 +33,7 @@ export function scanEndOfRoundInteractiveEffects(state: GameState): EndOfRoundEf
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
         
-        if (topCard.number === 103 && !processedGS.has(char.instanceId)) {
+        if ((topCard.set === 'KS' && topCard.number === 103) && !processedGS.has(char.instanceId)) {
           const hasEffect = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
               e.description.toLowerCase().includes('hide a character'),
@@ -48,7 +48,7 @@ export function scanEndOfRoundInteractiveEffects(state: GameState): EndOfRoundEf
         }
 
         
-        if ((topCard.number === 117 || topCard.number === 151) && !processedRL.has(char.instanceId)) {
+        if (((topCard.set === 'KS' && topCard.number === 117) || (topCard.set === 'KS' && topCard.number === 151)) && !processedRL.has(char.instanceId)) {
           const hasEffect = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
               (e.description.includes('move this character') || e.description.includes('must move')),
@@ -63,7 +63,7 @@ export function scanEndOfRoundInteractiveEffects(state: GameState): EndOfRoundEf
         }
 
         
-        if (topCard.number === 28 && !processedAK.has(char.instanceId)) {
+        if ((topCard.set === 'KS' && topCard.number === 28) && !processedAK.has(char.instanceId)) {
           const hasEffect = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
           );
@@ -136,10 +136,10 @@ export function processChosenEndOfRoundEffect(state: GameState, chosenInstanceId
         if (char.instanceId !== chosenInstanceId) continue;
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
-        if (topCard.number === 103) {
+        if ((topCard.set === 'KS' && topCard.number === 103)) {
           return handleGiantSpider103EndOfRound(newState, chosenInstanceId);
         }
-        if (topCard.number === 117 || topCard.number === 151) {
+        if ((topCard.set === 'KS' && topCard.number === 117) || (topCard.set === 'KS' && topCard.number === 151)) {
           newState = handleRockLee117Move(newState, chosenInstanceId);
           
           const movedIds = new Set<string>(newState.endPhaseMovedIds ?? []);
@@ -156,7 +156,7 @@ export function processChosenEndOfRoundEffect(state: GameState, chosenInstanceId
           }
           return newState;
         }
-        if (topCard.number === 28) {
+        if ((topCard.set === 'KS' && topCard.number === 28)) {
           return handleAkamaru028Return(newState, chosenInstanceId);
         }
       }
@@ -759,6 +759,12 @@ export function returnCharacterToHand(state: GameState, instanceId: string, play
         }
         ps.charactersInPlay = Math.max(0, ps.charactersInPlay - 1);
         newState[owner] = ps;
+
+        for (const att of char.attachments ?? []) {
+          const attOwnerState = { ...newState[att.owner] };
+          attOwnerState.discardPile = [...attOwnerState.discardPile, att.card as (typeof attOwnerState.discardPile)[number]];
+          newState[att.owner] = attOwnerState;
+        }
 
         newState.activeMissions = missions;
         return newState;

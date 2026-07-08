@@ -30,4 +30,17 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     "[↯] Cherchez jusqu'à 2 personnages Chien Ninja dans votre deck, révélez-les et piochez-les, puis mélangez votre deck. Jouez autant de personnages Chien Ninja que vous voulez n'importe où, en payant 1 de moins.",
     "[↯] Zabuza Momochi : Répétez l'effet MAIN.",
   ],
+  "SS-128-R": [
+    "[⧗] Double la Puissance des attachements Nourriture sur ce personnage.",
+    "[↯] Jirobo : Vainquez un personnage ennemi dans cette mission avec 8 Puissance ou plus.",
+  ],
+  "SS-082-C": [
+    "Attachez à un personnage allié non caché.",
+    "[↯] Si ce personnage n'a aucun jeton de Puissance, POWERUP 3.",
+  ],
+  "SS-108-C": [
+    "Attachez à une mission.",
+    "[↯] Un personnage allié active un effet DUEL instantané [↯], en ignorant ses conditions.",
+  ],
+
 };

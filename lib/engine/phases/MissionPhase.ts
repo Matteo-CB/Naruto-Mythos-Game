@@ -277,6 +277,18 @@ function collectScoreEffectSources(
   }
 
   
+  for (const att of mission.attachments ?? []) {
+    if (att.owner !== player) continue;
+    if (processed.includes(att.instanceId)) continue;
+    const attScore = (att.card.effects ?? []).find((e) => e.type === 'SCORE');
+    if (!attScore) continue;
+    sources.push({
+      cardId: att.card.id,
+      instanceId: att.instanceId,
+      label: `${att.card.name_fr} - ${attScore.description}`,
+    });
+  }
+
   const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   for (const char of chars) {
     if (char.isHidden) continue;

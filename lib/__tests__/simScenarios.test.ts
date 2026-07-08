@@ -49,6 +49,33 @@ describe('card effect simulations (verified through the real engine)', () => {
     }
   });
 
+  it('attachment cards and Choji SS-128 have simulations that STRICTLY execute their effects', () => {
+    for (const id of ['SS-082-C', 'SS-108-C', 'SS-128-R']) {
+      expect(hasScenario(id), `${id} hasScenario`).toBe(true);
+      const scenario = getScenario(id, 0);
+      expect(scenario, `${id} scenario`).toBeTruthy();
+      const states = runScenario(scenario!);
+      const last = states[states.length - 1];
+      expect(last.pendingActions.length, `${id} pending drain`).toBe(0);
+
+      if (id === 'SS-082-C') {
+        const host = last.activeMissions[0].player1Characters.find((c) => (c.attachments?.length ?? 0) > 0);
+        expect(host, 'curry attached').toBeTruthy();
+        expect(host!.powerTokens).toBe(3);
+      }
+      if (id === 'SS-108-C') {
+        expect(states.some((s) => (s.activeMissions[0].attachments?.length ?? 0) > 0), 'stadium attached').toBe(true);
+        expect(states.some((s) => s.activeMissions[0].player2Characters.some((c) => c.instanceId === 'sim-weak' && c.isHidden)), 'forced duel hid enemy').toBe(true);
+      }
+      if (id === 'SS-128-R') {
+        expect(states.some((s) => s.activeMissions.every((m) => !m.player2Characters.some((c) => c.instanceId === 'sim-big'))), 'choji duel defeated 8+ enemy').toBe(true);
+        const choji = last.activeMissions[0].player1Characters.find((c) => c.card.id === 'SS-128-R');
+        expect(choji && (choji.attachments?.length ?? 0) > 0, 'curry attached to choji in followup').toBe(true);
+        expect(calc(last, choji!)).toBe(11);
+      }
+    }
+  });
+
   it('EVERY mission card with an effect has a simulation, and each one STRICTLY executes it', () => {
     const missionIds = getAllCards()
       .filter((c) => c.card_type === 'mission' && (c.effects ?? []).length > 0)

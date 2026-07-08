@@ -33,4 +33,17 @@ export const effectDescriptionsEs: Record<string, string[]> = {
     "[↯] Busca hasta 2 personajes Perro Ninja en tu mazo, revélalos y róbalos, luego baraja tu mazo. Juega cualquier número de personajes Perro Ninja en cualquier sitio, pagando 1 menos.",
     "[↯] Zabuza Momochi: Repite el efecto MAIN.",
   ],
+  "SS-128-R": [
+    "[⧗] Duplica el Poder de los accesorios de Comida en este personaje.",
+    "[↯] Jirobo: Derrota a un personaje enemigo en esta misión con Poder 8 o más.",
+  ],
+  "SS-082-C": [
+    "Une a un personaje aliado no oculto.",
+    "[↯] Si este personaje no tiene contadores de Poder, POWERUP 3.",
+  ],
+  "SS-108-C": [
+    "Une a una misión.",
+    "[↯] Un personaje aliado activa un efecto DUEL instantáneo [↯], ignorando sus requisitos.",
+  ],
+
 };

@@ -1,4 +1,4 @@
-﻿import type { GameState, PlayerID, CharacterInPlay, EffectType, PendingEffect, PendingAction } from '../engine/types';
+﻿import type { GameState, PlayerID, CharacterInPlay, EffectType, PendingEffect, PendingAction, CardData } from '../engine/types';
 import type { EffectContext, EffectResult } from './EffectTypes';
 import { getEffectHandler } from './EffectRegistry';
 import { deepClone } from '../engine/utils/deepClone';
@@ -10,6 +10,7 @@ import { hasResolvableInstantDuel } from './duelUtils';
 import { postMoveHide as choji018PostMoveHide } from './handlers/KS/uncommon/choji018';
 import { buildPlayLessTargets, type PlayLessCategory } from './handlers/shared/playLess';
 import { ss000DeckHounds, ss000FinalizeSearch, ss000HoundChoicePayload, SS000_NINJA_HOUND } from './handlers/SS/ss000Search';
+import { attachCardToCharacter } from './attachments';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
@@ -4726,7 +4727,7 @@ export class EffectEngine {
             for (const ch of sideChars) {
               if (ch.isHidden) continue;
               const fTopCard = ch.stack?.length > 0 ? ch.stack[ch.stack?.length - 1] : ch.card;
-              if (fTopCard.number === 49) {
+              if ((fTopCard.set === 'KS' && fTopCard.number === 49)) {
                 const hasSacrifice = (fTopCard.effects ?? []).some(
                   (e: any) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
                     e.description.includes('Leaf Village') && e.description.includes('defeat this character instead'),
@@ -5786,6 +5787,139 @@ export class EffectEngine {
         newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
           'EFFECT_DEFEAT', 'Kurenai Yuhi (SS-134): Defeated the strongest enemy character.',
           'game.log.effect.defeat', { card: 'KURENAI YUHI', id: 'SS-134-R', target: ss134cName });
+        break;
+      }
+
+      case 'ATTACH_CHOOSE_TARGET': {
+        let attCard: CardData | null = null;
+        try { attCard = JSON.parse(pendingEffect.effectDescription).card ?? null; } catch { /* ignore */ }
+        if (attCard) {
+          newState = attachCardToCharacter(newState, pendingEffect.sourcePlayer, attCard, targetId);
+        }
+        break;
+      }
+
+      case 'SS128_CONFIRM_DUEL': {
+        const s128Player = pendingEffect.sourcePlayer;
+        const s128EnemyPlayer: PlayerID = s128Player === 'player1' ? 'player2' : 'player1';
+        const s128EnemySide: 'player1Characters' | 'player2Characters' = s128Player === 'player1' ? 'player2Characters' : 'player1Characters';
+        const s128Mission = newState.activeMissions[pendingEffect.sourceMissionIndex];
+        const s128Targets: string[] = s128Mission
+          ? s128Mission[s128EnemySide]
+              .filter((c: CharacterInPlay) => !c.isHidden && getEffectivePower(newState, c, s128EnemyPlayer) >= 8)
+              .map((c: CharacterInPlay) => c.instanceId)
+          : [];
+        if (s128Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, s128Player,
+            'EFFECT_NO_TARGET', 'Choji Akimichi (SS-128): No enemy with Power 8 or more (state changed).',
+            'game.log.effect.noTarget', { card: 'CHÔJI AKIMICHI', id: 'SS-128-R' });
+          break;
+        }
+        const s128EffId = generateInstanceId();
+        const s128ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: s128EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({}), targetSelectionType: 'SS128_DEFEAT',
+          sourcePlayer: s128Player, requiresTargetSelection: true,
+          validTargets: s128Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: s128ActId, type: 'SELECT_TARGET' as PendingAction['type'], player: s128Player,
+          description: 'Choji Akimichi (SS-128): Choose an enemy character with Power 8 or more to defeat.',
+          descriptionKey: 'game.effect.desc.ss128Defeat',
+          options: s128Targets, minSelections: 1, maxSelections: 1, sourceEffectId: s128EffId,
+        }];
+        break;
+      }
+
+      case 'SS128_DEFEAT': {
+        const s128dFound = EffectEngine.findCharByInstanceId(newState, targetId);
+        const s128dName = s128dFound ? (s128dFound.character.stack?.length > 0 ? s128dFound.character.stack[s128dFound.character.stack.length - 1] : s128dFound.character.card).name_fr : '';
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', 'Choji Akimichi (SS-128): Defeated an enemy with Power 8 or more.',
+          'game.log.effect.defeat', { card: 'CHÔJI AKIMICHI', id: 'SS-128-R', target: s128dName });
+        break;
+      }
+
+      case 'SS108_CONFIRM_SCORE': {
+        const s108Player = pendingEffect.sourcePlayer;
+        const s108Side: 'player1Characters' | 'player2Characters' = s108Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const s108Candidates: string[] = [];
+        for (const m of newState.activeMissions) {
+          for (const c of m[s108Side]) {
+            if (c.isHidden) continue;
+            const top = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            if ((top.effects ?? []).some((e: { type: string; description: string }) => e.type === 'DUEL' && !e.description.includes('[⧗]'))) {
+              s108Candidates.push(c.instanceId);
+            }
+          }
+        }
+        if (s108Candidates.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, s108Player,
+            'EFFECT_NO_TARGET', 'Exam Stadium (SS-108): No friendly character with an instant DUEL effect (state changed).',
+            'game.log.effect.noTarget', { card: "STADE D'EXAMEN", id: 'SS-108-C' });
+          break;
+        }
+        const s108EffId = generateInstanceId();
+        const s108ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: s108EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({}), targetSelectionType: 'SS108_CHOOSE_CHARACTER',
+          sourcePlayer: s108Player, requiresTargetSelection: true,
+          validTargets: s108Candidates, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: s108ActId, type: 'SELECT_TARGET' as PendingAction['type'], player: s108Player,
+          description: 'Exam Stadium (SS-108): Choose a friendly character to activate its DUEL effect, ignoring requirements.',
+          descriptionKey: 'game.effect.desc.ss108ChooseCharacter',
+          options: s108Candidates, minSelections: 1, maxSelections: 1, sourceEffectId: s108EffId,
+        }];
+        break;
+      }
+
+      case 'SS108_CHOOSE_CHARACTER': {
+        const s108cFound = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!s108cFound) break;
+        const s108cTop = s108cFound.character.stack?.length > 0 ? s108cFound.character.stack[s108cFound.character.stack.length - 1] : s108cFound.character.card;
+        const s108cHandler = getEffectHandler(s108cTop.id, 'DUEL');
+        if (!s108cHandler) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Exam Stadium (SS-108): This character has no usable DUEL effect.',
+            'game.log.effect.noTarget', { card: "STADE D'EXAMEN", id: 'SS-108-C' });
+          break;
+        }
+        try {
+          const s108Ctx: EffectContext = {
+            state: newState,
+            sourcePlayer: pendingEffect.sourcePlayer,
+            sourceCard: s108cFound.character,
+            sourceMissionIndex: s108cFound.missionIndex,
+            triggerType: 'DUEL',
+            isUpgrade: false,
+          };
+          const s108Result = s108cHandler(s108Ctx);
+          if (s108Result.requiresTargetSelection && s108Result.validTargets && s108Result.validTargets.length > 0) {
+            newState = EffectEngine.createPendingTargetSelection(
+              s108Result.state, pendingEffect.sourcePlayer, s108cFound.character, s108cFound.missionIndex, 'DUEL', false,
+              s108Result, [],
+            );
+          } else {
+            newState = s108Result.state;
+          }
+        } catch { /* duel activation error must not corrupt scoring */ }
         break;
       }
 
@@ -15898,7 +16032,7 @@ export class EffectEngine {
 
     
     const movedTopCard = movedChar.stack?.length > 0 ? movedChar.stack[movedChar.stack?.length - 1] : movedChar.card;
-    if (movedTopCard.number === 100 && !movedChar.isHidden) {
+    if ((movedTopCard.set === 'KS' && movedTopCard.number === 100) && !movedChar.isHidden) {
       const hasNHEffect = (movedTopCard.effects ?? []).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('moves to a different mission'),
       );
@@ -17067,7 +17201,7 @@ export class EffectEngine {
       for (const char of chars) {
         if (char.isHidden) continue;
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-        if (topCard.number === 4 && topCard.rarity === 'UC') {
+        if ((topCard.set === 'KS' && topCard.number === 4) && topCard.rarity === 'UC') {
           const hasEffect = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('hand instead'),
           );
@@ -17098,7 +17232,7 @@ export class EffectEngine {
       const topCard = charResult.character.stack?.length > 0
         ? charResult.character.stack[charResult.character.stack?.length - 1]
         : charResult.character.card;
-      if (topCard.number === 56) {
+      if ((topCard.set === 'KS' && topCard.number === 56)) {
         const hasProtection = (topCard.effects ?? []).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('chakra'),
         );
@@ -17153,7 +17287,7 @@ export class EffectEngine {
       for (const friendly of friendlyChars) {
         if (friendly.isHidden || friendly.instanceId === charResult.character.instanceId) continue;
         const fTopCard = friendly.stack?.length > 0 ? friendly.stack[friendly.stack?.length - 1] : friendly.card;
-        if (fTopCard.number === 49) {
+        if ((fTopCard.set === 'KS' && fTopCard.number === 49)) {
           const hasSacrifice = (fTopCard.effects ?? []).some(
             (e) =>
               e.type === 'MAIN' &&
@@ -19715,7 +19849,7 @@ export class EffectEngine {
       const topCard = charResult.character.stack?.length > 0
         ? charResult.character.stack[charResult.character.stack?.length - 1]
         : charResult.character.card;
-      if (topCard.number === 75 && !charResult.character.isHidden) {
+      if ((topCard.set === 'KS' && topCard.number === 75) && !charResult.character.isHidden) {
         const hasMoveProtection = (topCard.effects ?? []).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('moved or defeated'),
         );
@@ -19740,7 +19874,7 @@ export class EffectEngine {
       for (const ch of allCharsInMission) {
         if (ch.isHidden) continue;
         const chTop = ch.stack?.length > 0 ? ch.stack[ch.stack?.length - 1] : ch.card;
-        if (chTop.number === 35 || (chTop.set === 'SS' && chTop.number === 147)) {
+        if ((chTop.set === 'KS' && chTop.number === 35) || (chTop.set === 'SS' && chTop.number === 147)) {
           const hasRestriction = (chTop.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && (e.description.includes('cannot move') || e.description.includes("can't be moved")),
           );
@@ -19777,7 +19911,7 @@ export class EffectEngine {
     
     const movedChar = { ...charResult.character, missionIndex: destMissionIndex };
     const movedTop = movedChar.stack?.length > 0 ? movedChar.stack[movedChar.stack?.length - 1] : movedChar.card;
-    if (movedTop.number === 67 && movedChar.rempartLockedTargetId) {
+    if ((movedTop.set === 'KS' && movedTop.number === 67) && movedChar.rempartLockedTargetId) {
       movedChar.rempartLockedTargetId = undefined;
     }
     destMission[friendlySide] = [...destMission[friendlySide], movedChar];
@@ -20094,7 +20228,7 @@ export class EffectEngine {
     const topCard = targetChar.stack?.length > 0 ? targetChar.stack[targetChar.stack?.length - 1] : targetChar.card;
 
     
-    if (topCard.number === 48) {
+    if ((topCard.set === 'KS' && topCard.number === 48)) {
       const hasReplacement = (topCard.effects ?? []).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('defeated') && e.description.includes('hide'),
       );
@@ -20104,7 +20238,7 @@ export class EffectEngine {
     }
 
     
-    if (topCard.number === 75 && isEnemyEffect) {
+    if ((topCard.set === 'KS' && topCard.number === 75) && isEnemyEffect) {
       const hasReplacement = (topCard.effects ?? []).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('defeated by enemy') && e.description.includes('hide'),
       );
@@ -20128,7 +20262,7 @@ export class EffectEngine {
         if (friendly.isHidden || friendly.instanceId === targetChar.instanceId) continue;
         const fTopCard = friendly.stack?.length > 0 ? friendly.stack[friendly.stack?.length - 1] : friendly.card;
 
-        if (fTopCard.number === 49) {
+        if ((fTopCard.set === 'KS' && fTopCard.number === 49)) {
           const hasSacrifice = (fTopCard.effects ?? []).some(
             (e) =>
               e.type === 'MAIN' &&

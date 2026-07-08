@@ -37,6 +37,7 @@ const EFFECT_TYPE_COLORS: Record<string, string> = {
   AMBUSH: '#f97316',
   SCORE: '#eab308',
   DUEL: '#ef4444',
+  ATTACH: '#5A7ABB',
 };
 
 const RARITY_COLORS: Record<Rarity, string> = {
@@ -72,7 +73,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
   const usage = useCardUsage(cardId);
   const [simEffect, setSimEffect] = useState<number | null>(null);
 
-  const card = getCardById(cardId) as (CharacterCard | MissionCard) | undefined;
+  const card = getCardById(cardId) as CardData | undefined;
   if (!card) return null;
 
   const name = getCardName(card, locale);
@@ -85,6 +86,8 @@ export function CardPageClient({ cardId }: { cardId: string }) {
   const locked = isLockedVariantCard(card);
   const isCharacter = card.card_type === 'character';
   const isMission = card.card_type === 'mission';
+  const isAttachment = card.card_type === 'attachment';
+  const isLandscape = isMission || (isAttachment && card.attach_to === 'mission');
 
   const localizedEffects = getCardEffectDescriptions(card.id, locale);
   const effects = card.effects.map((eff, i) => ({
@@ -148,12 +151,12 @@ export function CardPageClient({ cardId }: { cardId: string }) {
         </nav>
 
         <div className="flex flex-col md:flex-row gap-6 md:gap-10">
-          <div className={`w-full ${isMission ? 'max-w-[440px]' : 'max-w-[300px]'} mx-auto md:mx-0 shrink-0`}>
+          <div className={`w-full ${isLandscape ? 'max-w-[440px]' : 'max-w-[300px]'} mx-auto md:mx-0 shrink-0`}>
             <div className="relative">
               {hasImage && fine ? (
-                <HoloCard src={imgSrc!} alt={`${name} ${card.number}`} rarity={holoRarity(card.rarity)} width={isMission ? 440 : 300} height={isMission ? 322 : 420} />
+                <HoloCard src={imgSrc!} alt={`${name} ${card.number}`} rarity={holoRarity(card.rarity)} width={isLandscape ? 440 : 300} height={isLandscape ? 322 : 420} />
               ) : (
-                <div className="w-full" style={{ maxWidth: isMission ? 440 : 300 }}>
+                <div className="w-full" style={{ maxWidth: isLandscape ? 440 : 300 }}>
                   <CardFace card={card} />
                 </div>
               )}
@@ -180,7 +183,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
               <span className="px-3 py-1.5 rounded text-sm" style={{ backgroundColor: '#ffffff0a', color: '#d0d0d0' }}>
                 {t('set')}: {setName}
               </span>
-              {isCharacter && (
+              {(isCharacter || isAttachment) && (
                 <>
                   <span className="px-3 py-1.5 rounded text-sm" style={{ backgroundColor: '#ffffff0a', color: '#d0d0d0' }}>
                     {t('chakra')}: {card.chakra}
@@ -192,7 +195,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
               )}
             </div>
 
-            {card.group && isCharacter && (
+            {card.group && !isMission && (
               <p className="mt-4 text-sm text-[#b9b9b9]">
                 <span className="text-[#8a8a8a] uppercase tracking-wider text-xs">{t('group')} : </span>
                 {getCardGroup(card.group, tCardMeta)}
