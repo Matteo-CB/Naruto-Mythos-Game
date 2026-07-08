@@ -404,6 +404,25 @@ p, .font-body {
 }
 .animate-pulse-subtle { animation: pulseBorderSubtle 2s ease-in-out infinite; }
 
+@keyframes fxShakeSoft {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  20%      { transform: translate3d(-3px, 2px, 0); }
+  40%      { transform: translate3d(3px, -2px, 0); }
+  60%      { transform: translate3d(-2px, -1px, 0); }
+  80%      { transform: translate3d(2px, 1px, 0); }
+}
+@keyframes fxShakeHard {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  15%      { transform: translate3d(-6px, 4px, 0); }
+  30%      { transform: translate3d(6px, -4px, 0); }
+  45%      { transform: translate3d(-5px, -2px, 0); }
+  60%      { transform: translate3d(5px, 3px, 0); }
+  75%      { transform: translate3d(-3px, 2px, 0); }
+  90%      { transform: translate3d(2px, -1px, 0); }
+}
+.fx-shake-soft { animation: fxShakeSoft 0.3s ease-out; }
+.fx-shake-hard { animation: fxShakeHard 0.42s ease-out; }
+
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -180,7 +180,7 @@ export function GameLog() {
                   </span>
                 </div>
               ) : (
-                log.map((entry, i) => (
+                log.slice(-120).map((entry, i) => (
                   <LogEntry key={`${entry.timestamp}-${i}`} entry={entry} formatPhase={formatPhase} playerDisplayNames={playerDisplayNames} locale={locale} isMobile={dims.isMobile} />
                 ))
               )}

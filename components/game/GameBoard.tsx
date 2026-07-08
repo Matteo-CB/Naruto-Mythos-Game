@@ -18,6 +18,7 @@ import { MulliganDialog } from "./MulliganDialog";
 import { GameEndScreen } from "./GameEndScreen";
 import { GameLog } from "./GameLog";
 import { AnimationController } from "./AnimationController";
+import { FXLayer } from "./FXLayer";
 import { TargetSelector } from "./TargetSelector";
 import { HandCardSelector } from "./HandCardSelector";
 import { EffectChoiceSelector } from "./EffectChoiceSelector";
@@ -26,6 +27,7 @@ import { GameScaleProvider, useGameScale } from "./GameScaleContext";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
+import { preloadCardImages } from "@/lib/utils/imagePreload";
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from "@/lib/utils/cardLocale";
 import { SandboxToolbar } from "./SandboxToolbar";
 import { EdgeCoinFlip } from "./EdgeCoinFlip";
@@ -989,6 +991,21 @@ function GameBoardInner() {
 
   useEffect(() => { fetchSettings(); }, [fetchSettings]);
 
+  useEffect(() => {
+    if (!visibleState) return;
+    const files: Array<string | undefined | null> = [];
+    for (const c of visibleState.myState.hand) files.push(c.image_file);
+    for (const m of visibleState.activeMissions) {
+      files.push(m.card.image_file);
+      for (const ch of [...m.player1Characters, ...m.player2Characters]) {
+        if (!ch.isHidden || ch.wasRevealedAtLeastOnce) files.push(ch.card?.image_file);
+        for (const att of ch.attachments ?? []) files.push(att.card.image_file);
+      }
+      for (const att of m.attachments ?? []) files.push(att.card.image_file);
+    }
+    preloadCardImages(files);
+  }, [visibleState]);
+
   const prevTurnRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -1047,6 +1064,7 @@ function GameBoardInner() {
 
   return (
     <div
+      id="game-board-root"
       className="flex overflow-hidden no-select"
       style={{
         width: 'var(--game-board-w, 100vw)',
@@ -1172,6 +1190,7 @@ function GameBoardInner() {
       <GameLog />
       <GameChat />
       <AnimationController />
+      <FXLayer />
       {!isReplayMode && (
         <>
           <TargetSelector />

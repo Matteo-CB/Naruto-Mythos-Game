@@ -7,6 +7,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useGameScale } from './GameScaleContext';
 import { playSound, setVolume, setMuted } from '@/lib/sound/SoundManager';
+import { emitFx, shakeScreen, FX_GOLD, FX_RED, FX_BLUE, FX_WHITE, FX_SMOKE } from '@/lib/fx/fxBus';
 
 type AnimationType =
   | 'card-play'
@@ -64,6 +65,59 @@ interface AnimationEvent {
   timestamp: number;
 }
 
+function emitFxForAnimation(type: AnimationType, data: Record<string, unknown>) {
+  const cy = typeof window !== 'undefined' ? window.innerHeight / 2 : 0;
+  switch (type) {
+    case 'card-play':
+      if (data.hidden === true) {
+        emitFx({ kind: 'smoke', color: FX_SMOKE, count: 16 });
+      } else {
+        emitFx({ kind: 'ring', color: FX_GOLD, count: 30 });
+        emitFx({ kind: 'sparksUp', color: FX_GOLD, count: 14, y: cy + 90 });
+      }
+      break;
+    case 'card-reveal':
+      emitFx({ kind: 'flash', color: FX_WHITE, scale: 1.15 });
+      emitFx({ kind: 'smoke', color: FX_SMOKE, count: 10 });
+      break;
+    case 'card-defeat':
+      emitFx({ kind: 'embers', color: FX_RED, count: 34, scale: 1.1 });
+      emitFx({ kind: 'burst', color: '#8a2f20', count: 16 });
+      shakeScreen('hard');
+      break;
+    case 'card-hide':
+      emitFx({ kind: 'smoke', color: FX_SMOKE, count: 18, scale: 1.1 });
+      break;
+    case 'card-move':
+      emitFx({ kind: 'burst', color: FX_BLUE, count: 12, scale: 0.7 });
+      break;
+    case 'card-upgrade':
+      emitFx({ kind: 'spiral', color: FX_GOLD, count: 24 });
+      emitFx({ kind: 'flash', color: FX_GOLD, scale: 0.9, count: 10 });
+      break;
+    case 'power-token':
+      emitFx({ kind: 'sparksUp', color: FX_GOLD, count: 18 });
+      break;
+    case 'chakra-gain':
+      emitFx({ kind: 'spiral', color: FX_BLUE, count: 20 });
+      break;
+    case 'mission-score':
+      emitFx({ kind: 'flash', color: FX_GOLD, scale: 1.3, count: 22 });
+      emitFx({ kind: 'ring', color: FX_GOLD, count: 36, scale: 1.2 });
+      shakeScreen('soft');
+      break;
+    case 'edge-transfer':
+      emitFx({ kind: 'burst', color: FX_GOLD, count: 14, scale: 0.8 });
+      break;
+    case 'turn-transition':
+      emitFx({ kind: 'storm', color: FX_GOLD, count: 40 });
+      break;
+    case 'game-end':
+      emitFx({ kind: 'storm', color: FX_GOLD, count: 120 });
+      break;
+  }
+}
+
 function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
   const t = useTranslations();
   const dims = useGameScale();
@@ -84,7 +138,7 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
       <div className="flex flex-col items-center gap-3">
         
         <motion.div
-          className="overflow-hidden"
+          className="overflow-hidden relative"
           style={{
             width: dims.animHand.w + 'px',
             height: dims.animHand.h + 'px',
@@ -92,9 +146,10 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
               ? '0 8px 40px rgba(0, 0, 0, 0.8)'
               : '0 8px 40px rgba(196, 163, 90, 0.4), 0 0 20px rgba(196, 163, 90, 0.2)',
             border: isHidden ? '2px solid #333333' : '2px solid rgba(196, 163, 90, 0.5)',
+            transformPerspective: 900,
           }}
-          initial={{ y: 200, scale: 0.6, opacity: 0 }}
-          animate={{ y: 0, scale: 1, opacity: 1 }}
+          initial={{ y: 200, scale: 0.6, opacity: 0, rotateY: -32, rotateX: 8 }}
+          animate={{ y: 0, scale: 1, opacity: 1, rotateY: 0, rotateX: 0 }}
           exit={{ y: -60, scale: 0.85, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 160, damping: 16 }}
         >
@@ -128,6 +183,20 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
                 draggable={false}
               />
             </div>
+          )}
+          {!isHidden && (
+            <motion.div
+              className="absolute top-0 bottom-0 pointer-events-none"
+              style={{
+                width: '34%',
+                backgroundColor: 'rgba(255, 250, 235, 0.22)',
+                filter: 'blur(10px)',
+                transform: 'skewX(-18deg)',
+              }}
+              initial={{ left: '-45%' }}
+              animate={{ left: '130%' }}
+              transition={{ delay: 0.32, duration: 0.5, ease: 'easeInOut' }}
+            />
           )}
         </motion.div>
 
@@ -237,6 +306,19 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
               draggable={false}
             />
           </div>
+          <motion.div
+            className="absolute top-0 bottom-0 pointer-events-none"
+            style={{
+              width: '34%',
+              backgroundColor: 'rgba(255, 250, 235, 0.25)',
+              filter: 'blur(10px)',
+              transform: 'skewX(-18deg)',
+              backfaceVisibility: 'hidden',
+            }}
+            initial={{ left: '-45%' }}
+            animate={{ left: '130%' }}
+            transition={{ delay: 0.55, duration: 0.5, ease: 'easeInOut' }}
+          />
         </motion.div>
 
         <motion.div
@@ -974,6 +1056,9 @@ export function AnimationController() {
   useEffect(() => {
     if (!currentAnim) return;
     const type = currentAnim.type as AnimationType;
+    if (animationsEnabled) {
+      emitFxForAnimation(type, currentAnim.data);
+    }
     switch (type) {
       case 'turn-transition':
         playSound('newTurn');
