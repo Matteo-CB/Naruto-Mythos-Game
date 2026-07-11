@@ -10,6 +10,8 @@ import { CHAT_EMOTES, CHAT_MAX_LENGTH, CHAT_COOLDOWN_MS } from '@/lib/chat/const
 import { Z_APP_MODAL } from '@/lib/ui/zIndex';
 import { BlockPlayerPopup } from '@/components/chat/BlockPlayerPopup';
 import { ReportPlayerPopup, type ReportableMessage } from '@/components/chat/ReportPlayerPopup';
+import { useDmStore } from '@/stores/dmStore';
+import { useSession } from 'next-auth/react';
 
 const EMOTE_BY_CODE = new Map(CHAT_EMOTES.map((e) => [e.code, e]));
 
@@ -47,6 +49,7 @@ function renderMessage(text: string) {
 export function GameChat() {
   const t = useTranslations();
   const dims = useGameScale();
+  const { data: session } = useSession();
   const isOnlineGame = useGameStore((s) => s.isOnlineGame);
   const chatMessages = useSocketStore((s) => s.chatMessages);
   const unreadCount = useSocketStore((s) => s.unreadChatCount);
@@ -200,6 +203,18 @@ export function GameChat() {
                       style={{ color: '#c4a35a', background: 'none', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
                     >
                       {friendAction.label}
+                    </button>
+                  )}
+                  {chatFriendStatus === 'friends' && session?.user?.id && (
+                    <button
+                      onClick={() => {
+                        setMenuOpen(false);
+                        useDmStore.getState().openThread(session.user.id, chatOpponent);
+                      }}
+                      className="text-left px-3 py-2 text-[11px] cursor-pointer"
+                      style={{ color: '#c4a35a', background: 'none', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                    >
+                      {t('chat.menu.privateMessage')}
                     </button>
                   )}
                   <button

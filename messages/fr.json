@@ -588,7 +588,8 @@
     "battlepass": "Récompenses",
     "battlepassBadgeTooltip": "{count} carte(s) à réclamer",
     "quests": "Quêtes",
-    "questsBadgeTooltip": "{count} récompense(s) à réclamer"
+    "questsBadgeTooltip": "{count} récompense(s) à réclamer",
+    "socialBadgeTooltip": "{count} messages ou demandes en attente"
   },
   "settings": {
     "title": "Options",
@@ -2284,7 +2285,8 @@
       "empty": "Aucun ami pour le moment. Recherchez des joueurs !",
       "remove": "Retirer",
       "invite": "Inviter en match",
-      "viewProfile": "Voir le profil"
+      "viewProfile": "Voir le profil",
+      "message": "Message"
     },
     "requests": {
       "incoming": "Demandes reçues",
@@ -2301,7 +2303,8 @@
       "removeFriend": "Retirer des amis",
       "requestSent": "Demande envoyée",
       "acceptRequest": "Accepter la demande",
-      "alreadyFriends": "Amis"
+      "alreadyFriends": "Amis",
+      "message": "Message"
     },
     "notifications": {
       "requestReceived": "Demande d'ami de {name}",
@@ -3084,7 +3087,8 @@
       "requestSent": "Demande envoyée",
       "acceptRequest": "Accepter la demande d'ami",
       "block": "Bloquer ce joueur",
-      "report": "Signaler"
+      "report": "Signaler",
+      "privateMessage": "Message privé"
     }
   },
   "moderation": {
@@ -3433,5 +3437,17 @@
     "submit": "Envoyer le signalement",
     "quotaReached": "Tu as atteint la limite de signalements pour aujourd'hui.",
     "alreadyReported": "Tu as déjà signalé ce joueur. Notre équipe examine ta demande."
+  },
+  "dm": {
+    "title": "Messages",
+    "back": "Retour",
+    "emptyList": "Aucune conversation. Ajoute des amis pour discuter.",
+    "placeholder": "Écris à {player}...",
+    "lockedNotFriends": "Vous n'êtes plus amis. Redevenez amis pour reprendre la conversation.",
+    "lockedDisabled": "Cette conversation est désactivée.",
+    "removeFriend": "Retirer des amis",
+    "notFriends": "Vous devez être amis pour vous écrire.",
+    "disabled": "Cette conversation est désactivée.",
+    "retention": "Les messages privés sont conservés 30 jours."
   }
 }

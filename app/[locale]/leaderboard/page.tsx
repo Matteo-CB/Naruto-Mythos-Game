@@ -13,6 +13,7 @@ import { RANK_TIERS, PLACEMENT_MATCHES_REQUIRED, getRankTier } from '@/component
 import { UserBadges } from '@/components/badges/UserBadges';
 import { LeaguesModal } from '@/components/LeaguesModal';
 import { FriendsSection } from '@/components/social/FriendsSection';
+import { useSocialBadge } from '@/lib/hooks/useSocialBadge';
 import Image from 'next/image';
 
 type HubTab = 'leaderboard' | 'friends';
@@ -217,6 +218,7 @@ function SkeletonGrid() {
 export default function LeaderboardPage() {
   const t = useTranslations('leaderboard');
   const tf = useTranslations('friends');
+  const { total: socialBadgeTotal } = useSocialBadge();
   const tc = useTranslations('common');
   const tp = useTranslations('profile');
   useTrackOnMount('ui.leaderboard.opened');
@@ -378,7 +380,7 @@ export default function LeaderboardPage() {
           <button
             type="button"
             onClick={() => switchHubTab('friends')}
-            className="font-display text-[11px] uppercase tracking-widest px-5 py-2 transition-colors"
+            className="font-display text-[11px] uppercase tracking-widest px-5 py-2 transition-colors inline-flex items-center gap-2"
             style={{
               color: hubTab === 'friends' ? '#0a0a0a' : '#c4a35a',
               backgroundColor: hubTab === 'friends' ? '#c4a35a' : 'transparent',
@@ -388,6 +390,22 @@ export default function LeaderboardPage() {
             }}
           >
             {tf('title')}
+            {socialBadgeTotal > 0 && (
+              <span
+                className="inline-flex items-center justify-center font-bold tabular-nums"
+                style={{
+                  fontSize: '9px',
+                  minWidth: 16,
+                  height: 16,
+                  padding: '0 4px',
+                  borderRadius: 9999,
+                  backgroundColor: hubTab === 'friends' ? '#0a0a0a' : '#c4a35a',
+                  color: hubTab === 'friends' ? '#c4a35a' : '#0a0a0a',
+                }}
+              >
+                {socialBadgeTotal > 99 ? '99+' : socialBadgeTotal}
+              </span>
+            )}
           </button>
         </motion.div>
 

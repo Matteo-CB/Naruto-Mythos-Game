@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { emitToUser } from '@/lib/socket/io';
+import { refreshChatLock } from '@/lib/socket/chatLockBridge';
 
 export async function DELETE(
   _request: NextRequest,
@@ -41,6 +42,7 @@ export async function DELETE(
 
     await prisma.friendship.delete({ where: { id } });
 
+    refreshChatLock(userId, otherUserId);
     emitToUser(otherUserId, 'friend:removed', { friendshipId: id });
 
     return NextResponse.json({ success: true });

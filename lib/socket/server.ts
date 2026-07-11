@@ -2,7 +2,7 @@ import type { Server as SocketIOServer, Socket } from 'socket.io';
 import { decode } from 'next-auth/jwt';
 import { GameEngine } from '@/lib/engine/GameEngine';
 import type { GameState, GameAction, CharacterCard, MissionCard, PlayerConfig, GameConfig, PlayerID } from '@/lib/engine/types';
-import { registerUserSocket, removeSocketFromAll } from '@/lib/socket/io';
+import { registerUserSocket, removeSocketFromAll, emitToUser } from '@/lib/socket/io';
 import { prisma } from '@/lib/db/prisma';
 import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
 import { calculateEloChanges, calculatePerformanceBonus, type PerformanceBonus } from '@/lib/elo/elo';
@@ -28,6 +28,7 @@ import { maskProfanity } from '@/lib/chat/wordFilter';
 import { getPairChatState } from '@/lib/chat/pairState';
 import { getModerationFlags } from '@/lib/moderation/sanctions';
 import { setChatLockRefresher } from '@/lib/socket/chatLockBridge';
+import { sendDm, getUnreadDmCount, markThreadRead } from '@/lib/dm/dmService';
 
 ensureQuestPersistenceListener();
 
@@ -1886,6 +1887,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       registerUserSocket(data.userId, socket.id);
       (socket.data as { userId?: string }).userId = data.userId;
+      getUnreadDmCount(data.userId)
+        .then((total) => socket.emit('dm:unread-count', { total }))
+        .catch(() => {});
       if (data.username && typeof data.username === 'string' && data.username.length <= 50) {
         userNames.set(data.userId, data.username);
       }
@@ -3741,6 +3745,51 @@ export function setupSocketHandlers(io: SocketIOServer) {
         if (room.guestSocket) io.to(room.guestSocket).emit('chat:message', chatMsg);
         io.to(`spec:${roomCode}`).emit('chat:message', chatMsg);
       }
+    });
+
+    socket.on('dm:send', async (data: { toUserId: string; body: string }) => {
+      const userId = (socket.data as { userId?: string }).userId;
+      if (!userId || !data || typeof data.toUserId !== 'string') return;
+      const now = Date.now();
+      if (isOnChatCooldown(chatLastSentAt.get(userId), now)) {
+        socket.emit('chat:error', { message: 'Wait a moment', errorKey: 'chat.cooldown' });
+        return;
+      }
+      try {
+        const result = await sendDm(userId, data.toUserId, data.body);
+        if (!result.ok) {
+          socket.emit('chat:error', { message: 'Message not delivered', errorKey: result.errorKey });
+          return;
+        }
+        chatLastSentAt.set(userId, now);
+        const payload = {
+          id: result.message.id,
+          threadKey: result.message.threadKey,
+          senderId: result.message.senderId,
+          receiverId: result.message.receiverId,
+          body: result.message.body,
+          createdAt: result.message.createdAt.getTime(),
+        };
+        socket.emit('dm:message', payload);
+        if (!result.echoOnly) {
+          emitToUser(data.toUserId, 'dm:message', payload);
+          getUnreadDmCount(data.toUserId)
+            .then((total) => emitToUser(data.toUserId, 'dm:unread-count', { total }))
+            .catch(() => {});
+        }
+      } catch {
+        socket.emit('chat:error', { message: 'Message not delivered', errorKey: 'chat.sendError' });
+      }
+    });
+
+    socket.on('dm:read', async (data: { threadKey: string }) => {
+      const userId = (socket.data as { userId?: string }).userId;
+      if (!userId || !data || typeof data.threadKey !== 'string') return;
+      try {
+        await markThreadRead(userId, data.threadKey);
+        const total = await getUnreadDmCount(userId);
+        emitToUser(userId, 'dm:unread-count', { total });
+      } catch { /* ignore read errors */ }
     });
 
     socket.on('chat:lock-get', async () => {

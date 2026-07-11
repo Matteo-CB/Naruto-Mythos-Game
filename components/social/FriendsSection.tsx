@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSession } from 'next-auth/react';
+import { useDmStore } from '@/stores/dmStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 import { UserSearchDropdown } from '@/components/social/UserSearchDropdown';
@@ -71,6 +72,7 @@ function FriendCard({
   onInvite,
   onRemove,
   onTrade,
+  onMessage,
   tradeLabel,
   t,
   tStats,
@@ -83,6 +85,7 @@ function FriendCard({
   onInvite: () => void;
   onRemove: () => void;
   onTrade: () => void;
+  onMessage: () => void;
   tradeLabel: string;
   t: ReturnType<typeof useTranslations>;
   tStats: ReturnType<typeof useTranslations>;
@@ -239,6 +242,14 @@ function FriendCard({
                   style={{ color: '#c4a35a', backgroundColor: 'rgba(196, 163, 90, 0.08)', borderRadius: 9999 }}
                 >
                   {tradeLabel}
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.94 }}
+                  onClick={onMessage}
+                  className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[#c4a35a]"
+                  style={{ color: '#8fae6b', backgroundColor: 'rgba(143, 174, 107, 0.08)', borderRadius: 9999 }}
+                >
+                  {t('list.message')}
                 </motion.button>
                 <Link
                   href={`/profile/${encodeURIComponent(friend.username)}` as '/'}
@@ -607,6 +618,9 @@ export function FriendsSection() {
                       onToggle={() => setExpandedId(expandedId === f.id ? null : f.id)}
                       onInvite={() => sendMatchInvite(f.id)}
                       onTrade={() => handleTrade(f.id)}
+                      onMessage={() => {
+                        if (session?.user?.id) useDmStore.getState().openThread(session.user.id, { userId: f.id, username: f.username });
+                      }}
                       tradeLabel={tTrade('invite')}
                       onRemove={() => {
                         removeFriend(f.friendshipId);

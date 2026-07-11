@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { useDmStore } from '@/stores/dmStore';
+import { useSession } from 'next-auth/react';
 import { useSocialStore } from '@/stores/socialStore';
 
 type FriendshipStatus = 'loading' | 'none' | 'pending_sent' | 'pending_received' | 'accepted';
@@ -14,6 +16,8 @@ interface FriendshipButtonProps {
 
 export function FriendshipButton({ userId, username }: FriendshipButtonProps) {
   const t = useTranslations('friends');
+  const { data: session } = useSession();
+  const sessionUserId = session?.user?.id ?? null;
   const sendFriendRequest = useSocialStore((s) => s.sendFriendRequest);
   const acceptFriendRequest = useSocialStore((s) => s.acceptFriendRequest);
   const removeFriend = useSocialStore((s) => s.removeFriend);
@@ -155,6 +159,22 @@ export function FriendshipButton({ userId, username }: FriendshipButtonProps) {
       >
         {t('actions.alreadyFriends')}
       </span>
+      <motion.button
+        whileHover={{ scale: 1.04 }}
+        whileTap={{ scale: 0.96 }}
+        onClick={() => {
+          if (sessionUserId) useDmStore.getState().openThread(sessionUserId, { userId, username });
+        }}
+        className="h-9 px-4 text-xs font-bold uppercase tracking-wider cursor-pointer"
+        style={{
+          backgroundColor: 'rgba(196, 163, 90, 0.1)',
+          border: '1px solid rgba(196, 163, 90, 0.35)',
+          borderRadius: 4,
+          color: '#c4a35a',
+        }}
+      >
+        {t('actions.message')}
+      </motion.button>
       {!showRemove ? (
         <motion.button
           whileHover={{ scale: 1.1 }}

@@ -582,7 +582,8 @@
     "battlepass": "Rewards",
     "battlepassBadgeTooltip": "{count} card(s) to claim",
     "quests": "Quests",
-    "questsBadgeTooltip": "{count} reward(s) to claim"
+    "questsBadgeTooltip": "{count} reward(s) to claim",
+    "socialBadgeTooltip": "{count} messages or pending requests"
   },
   "settings": {
     "title": "Options",
@@ -2278,7 +2279,8 @@
       "empty": "No friends yet. Search for players to add!",
       "remove": "Remove",
       "invite": "Invite to Match",
-      "viewProfile": "View Profile"
+      "viewProfile": "View Profile",
+      "message": "Message"
     },
     "requests": {
       "incoming": "Incoming Requests",
@@ -2295,7 +2297,8 @@
       "removeFriend": "Remove Friend",
       "requestSent": "Request Sent",
       "acceptRequest": "Accept Request",
-      "alreadyFriends": "Friends"
+      "alreadyFriends": "Friends",
+      "message": "Message"
     },
     "notifications": {
       "requestReceived": "Friend request from {name}",
@@ -3078,7 +3081,8 @@
       "requestSent": "Request sent",
       "acceptRequest": "Accept friend request",
       "block": "Block this player",
-      "report": "Report"
+      "report": "Report",
+      "privateMessage": "Private message"
     }
   },
   "moderation": {
@@ -3427,5 +3431,17 @@
     "submit": "Send report",
     "quotaReached": "You have reached the report limit for today.",
     "alreadyReported": "You already reported this player. Our team is reviewing your request."
+  },
+  "dm": {
+    "title": "Messages",
+    "back": "Back",
+    "emptyList": "No conversations. Add friends to chat.",
+    "placeholder": "Write to {player}...",
+    "lockedNotFriends": "You are no longer friends. Become friends again to resume the conversation.",
+    "lockedDisabled": "This conversation is disabled.",
+    "removeFriend": "Remove friend",
+    "notFriends": "You must be friends to write to each other.",
+    "disabled": "This conversation is disabled.",
+    "retention": "Private messages are kept for 30 days."
   }
 }

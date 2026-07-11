@@ -15,6 +15,7 @@ import { HomeMenuButton } from '@/components/HomeMenuButton';
 import { useBoosterBadge } from '@/lib/hooks/useBoosterBadge';
 import { useBattlepassBadge } from '@/lib/hooks/useBattlepassBadge';
 import { useQuestBadge } from '@/lib/hooks/useQuestBadge';
+import { useSocialBadge } from '@/lib/hooks/useSocialBadge';
 import { MenuBadge } from '@/components/notifications/MenuBadge';
 import '@/styles/holo-evolving.css';
 
@@ -114,6 +115,7 @@ export default function Home() {
   const { totalUnopened: totalUnopenedBoosters } = useBoosterBadge();
   const { showBadge: showBattlepassBadge, cardClaimableTiers: bpClaimable } = useBattlepassBadge();
   const { showBadge: showQuestBadge, unclaimedStandardCount, dailyClaimable } = useQuestBadge();
+  const { total: socialBadgeTotal } = useSocialBadge();
 
   useEffect(() => {
     if (!session?.user) return;
@@ -260,7 +262,9 @@ export default function Home() {
                     innerClassName={isBp ? 'holo-evolving holo-evolving--subtle' : ''}
                     innerStyle={isBp ? { ['--foil' as string]: '#f472b6' } : undefined}
                     rightSlot={
-                      isBp && (totalUnopenedBoosters > 0 || showBattlepassBadge || showQuestBadge)
+                      btn.key === 'leaderboard' && socialBadgeTotal > 0
+                        ? <MenuBadge accent="gold" count={socialBadgeTotal} tooltip={t('socialBadgeTooltip', { count: socialBadgeTotal })} />
+                        : isBp && (totalUnopenedBoosters > 0 || showBattlepassBadge || showQuestBadge)
                         ? <MenuBadge
                             accent="pink"
                             count={

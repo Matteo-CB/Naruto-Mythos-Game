@@ -183,6 +183,8 @@ interface SocketStore {
   chatFriendStatus: 'none' | 'pending_out' | 'pending_in' | 'friends' | null;
   chatFriendshipId: string | null;
   requestChatLockState: () => void;
+  sendDm: (toUserId: string, body: string) => void;
+  markDmRead: (threadKey: string) => void;
   sendChatMessage: (message: string, isEmote: boolean) => void;
   setChatOpen: (open: boolean) => void;
 
@@ -745,10 +747,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('friend:request-received', (data) => {
         useSocialStore.getState().handleFriendRequestReceived(data);
+        import('@/stores/dmStore').then(({ useDmStore }) => useDmStore.getState().refreshBadge()).catch(() => {});
       });
 
       socket.on('friend:request-accepted', (data) => {
         useSocialStore.getState().handleFriendRequestAccepted(data);
+        import('@/stores/dmStore').then(({ useDmStore }) => useDmStore.getState().refreshBadge()).catch(() => {});
       });
 
       socket.on('friend:removed', (data) => {
@@ -850,6 +854,18 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('chat:error', (data: { message: string; errorKey?: string }) => {
         set({ error: data.message, errorKey: data.errorKey ?? null });
+      });
+
+      socket.on('dm:message', (msg: { id: string; threadKey: string; senderId: string; receiverId: string; body: string; createdAt: number }) => {
+        import('@/stores/dmStore').then(({ useDmStore }) => {
+          useDmStore.getState().receiveMessage(msg);
+        }).catch(() => {});
+      });
+
+      socket.on('dm:unread-count', (data: { total: number }) => {
+        import('@/stores/dmStore').then(({ useDmStore }) => {
+          useDmStore.getState().setUnreadDms(data.total ?? 0);
+        }).catch(() => {});
       });
 
       socket.on('chat:lock-state', (data: { state: 'open' | 'off' | 'friends_only'; opponent: { userId: string; username: string }; friendStatus: 'none' | 'pending_out' | 'pending_in' | 'friends'; friendshipId: string | null }) => {
@@ -1137,6 +1153,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
   requestChatLockState: () => {
     get().socket?.emit('chat:lock-get');
+  },
+
+  sendDm: (toUserId: string, body: string) => {
+    get().socket?.emit('dm:send', { toUserId, body });
+  },
+
+  markDmRead: (threadKey: string) => {
+    get().socket?.emit('dm:read', { threadKey });
   },
 
   sendChatMessage: (message: string, isEmote: boolean) => {

@@ -586,7 +586,8 @@
     "battlepass": "報酬",
     "battlepassBadgeTooltip": "受け取り可能なカード {count} 枚",
     "quests": "クエスト",
-    "questsBadgeTooltip": "受け取り可能な報酬 {count} 件"
+    "questsBadgeTooltip": "受け取り可能な報酬 {count} 件",
+    "socialBadgeTooltip": "未読メッセージ・申請 {count}件"
   },
   "settings": {
     "title": "オプション",
@@ -2282,7 +2283,8 @@
       "empty": "まだフレンドがいません。プレイヤーを検索して追加しましょう！",
       "remove": "削除",
       "invite": "対戦に招待",
-      "viewProfile": "プロフィールを見る"
+      "viewProfile": "プロフィールを見る",
+      "message": "メッセージ"
     },
     "requests": {
       "incoming": "受信した申請",
@@ -2299,7 +2301,8 @@
       "removeFriend": "フレンド削除",
       "requestSent": "申請を送信しました",
       "acceptRequest": "申請を承認",
-      "alreadyFriends": "フレンド"
+      "alreadyFriends": "フレンド",
+      "message": "メッセージ"
     },
     "notifications": {
       "requestReceived": "{name} からフレンド申請",
@@ -3082,7 +3085,8 @@
       "requestSent": "申請済み",
       "acceptRequest": "フレンド申請を承認",
       "block": "このプレイヤーをブロック",
-      "report": "通報"
+      "report": "通報",
+      "privateMessage": "プライベートメッセージ"
     }
   },
   "moderation": {
@@ -3431,5 +3435,17 @@
     "submit": "通報を送信",
     "quotaReached": "本日の通報上限に達しました。",
     "alreadyReported": "このプレイヤーは既に通報済みです。運営チームが確認中です。"
+  },
+  "dm": {
+    "title": "メッセージ",
+    "back": "戻る",
+    "emptyList": "会話がありません。フレンドを追加して会話しましょう。",
+    "placeholder": "{player}にメッセージ...",
+    "lockedNotFriends": "フレンドではなくなりました。再びフレンドになると会話を再開できます。",
+    "lockedDisabled": "この会話は無効になっています。",
+    "removeFriend": "フレンドを解除",
+    "notFriends": "メッセージを送るにはフレンドである必要があります。",
+    "disabled": "この会話は無効になっています。",
+    "retention": "プライベートメッセージは30日間保存されます。"
   }
 }

@@ -587,7 +587,8 @@
     "battlepass": "Recompensas",
     "battlepassBadgeTooltip": "{count} carta(s) por reclamar",
     "quests": "Misiones",
-    "questsBadgeTooltip": "{count} recompensa(s) por reclamar"
+    "questsBadgeTooltip": "{count} recompensa(s) por reclamar",
+    "socialBadgeTooltip": "{count} mensajes o solicitudes pendientes"
   },
   "settings": {
     "title": "Opciones",
@@ -2283,7 +2284,8 @@
       "empty": "Aún no tienes amigos. ¡Busca jugadores para añadirlos!",
       "remove": "Quitar",
       "invite": "Invitar a una partida",
-      "viewProfile": "Ver perfil"
+      "viewProfile": "Ver perfil",
+      "message": "Mensaje"
     },
     "requests": {
       "incoming": "Solicitudes recibidas",
@@ -2300,7 +2302,8 @@
       "removeFriend": "Quitar amigo",
       "requestSent": "Solicitud enviada",
       "acceptRequest": "Aceptar solicitud",
-      "alreadyFriends": "Amigos"
+      "alreadyFriends": "Amigos",
+      "message": "Mensaje"
     },
     "notifications": {
       "requestReceived": "Solicitud de amistad de {name}",
@@ -3083,7 +3086,8 @@
       "requestSent": "Solicitud enviada",
       "acceptRequest": "Aceptar solicitud de amistad",
       "block": "Bloquear a este jugador",
-      "report": "Denunciar"
+      "report": "Denunciar",
+      "privateMessage": "Mensaje privado"
     }
   },
   "moderation": {
@@ -3432,5 +3436,17 @@
     "submit": "Enviar denuncia",
     "quotaReached": "Has alcanzado el límite de denuncias por hoy.",
     "alreadyReported": "Ya has denunciado a este jugador. Nuestro equipo está revisando tu solicitud."
+  },
+  "dm": {
+    "title": "Mensajes",
+    "back": "Volver",
+    "emptyList": "No hay conversaciones. Agrega amigos para chatear.",
+    "placeholder": "Escribe a {player}...",
+    "lockedNotFriends": "Ya no sois amigos. Volved a ser amigos para retomar la conversación.",
+    "lockedDisabled": "Esta conversación está desactivada.",
+    "removeFriend": "Eliminar amigo",
+    "notFriends": "Debéis ser amigos para escribiros.",
+    "disabled": "Esta conversación está desactivada.",
+    "retention": "Los mensajes privados se conservan 30 días."
   }
 }
