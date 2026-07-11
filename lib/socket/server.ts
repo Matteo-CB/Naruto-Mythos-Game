@@ -23,6 +23,11 @@ import { emitQuestEvent } from '@/lib/quests/hooks';
 import { emitDrawDiffEvents, emitTokenDiffEvents } from '@/lib/quests/engineEmit';
 import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
 import type { GameMode } from '@/lib/quests/hooks';
+import { validateChatMessage, isOnChatCooldown, decideChatDelivery } from '@/lib/chat/chatDelivery';
+import { maskProfanity } from '@/lib/chat/wordFilter';
+import { getPairChatState } from '@/lib/chat/pairState';
+import { getModerationFlags } from '@/lib/moderation/sanctions';
+import { setChatLockRefresher } from '@/lib/socket/chatLockBridge';
 
 ensureQuestPersistenceListener();
 
@@ -646,6 +651,7 @@ export const rooms = new Map<string, RoomData>();
 const playerRooms = new Map<string, string>(); // socketId -> roomCode
 const userNames = new Map<string, string>(); // userId -> username (populated on auth:register)
 const chatRateLimit = new Map<string, number[]>(); // userId -> recent message timestamps
+const chatLastSentAt = new Map<string, number>();
 const CHAT_RATE_WINDOW_MS = 10_000;
 const CHAT_RATE_MAX = 8;
 const MATCHMAKING_ROOM_TTL_MS = 5 * 60 * 1000; // 5 min stale room cleanup
@@ -764,6 +770,41 @@ function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: 
 
 function broadcastRoomList(io: SocketIOServer): void {
   io.to('lobby').emit('room:list-update', getPublicRoomList());
+}
+
+async function emitChatLockStateToRoom(io: SocketIOServer, room: RoomData): Promise<void> {
+  if (!room.guestId) return;
+  try {
+    const pairForHost = await getPairChatState(room.hostId, room.guestId);
+    if (room.hostSocket) {
+      io.to(room.hostSocket).emit('chat:lock-state', {
+        state: pairForHost.publicState,
+        opponent: { userId: room.guestId, username: room.guestName ?? 'Player 2' },
+        friendStatus: pairForHost.friendStatusForA,
+        friendshipId: pairForHost.friendshipId,
+      });
+    }
+    if (room.guestSocket) {
+      io.to(room.guestSocket).emit('chat:lock-state', {
+        state: pairForHost.publicState,
+        opponent: { userId: room.hostId, username: room.hostName ?? 'Player 1' },
+        friendStatus: pairForHost.friendStatusForB,
+        friendshipId: pairForHost.friendshipId,
+      });
+    }
+  } catch { /* ignore lock state errors */ }
+}
+
+function refreshChatLockForUsers(io: SocketIOServer, userIdA: string, userIdB?: string): void {
+  for (const room of rooms.values()) {
+    if (!room.guestId) continue;
+    const ids = [room.hostId, room.guestId];
+    const touchesA = ids.includes(userIdA);
+    const touchesB = userIdB ? ids.includes(userIdB) : true;
+    if (touchesA && touchesB) {
+      void emitChatLockStateToRoom(io, room);
+    }
+  }
 }
 
 function broadcastActiveGames(io: SocketIOServer): void {
@@ -1808,6 +1849,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
       console.error('[Tournament] Scheduled check error:', err);
     }
   }, 30_000);
+
+  setChatLockRefresher((userIdA, userIdB) => refreshChatLockForUsers(io, userIdA, userIdB));
 
   io.on('connection', (socket: Socket) => {
     console.log(`Player connected: ${socket.id}`);
@@ -3564,10 +3607,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
     socket.on('chat:send', async (data: { message: string; isEmote: boolean }) => {
       if (!data || typeof data !== 'object') return;
-      const raw = typeof data.message === 'string' ? data.message : '';
-      const sanitized = raw.replace(/[\x00-\x08\x0B-\x1F\x7F]/g, '').replace(/\s+/g, ' ').trim();
-      if (!sanitized || sanitized.length > 200) return;
-      const trimmed = sanitized;
+      const isEmote = data.isEmote === true;
+      const validation = validateChatMessage(data.message, isEmote);
+      if (!validation.ok) {
+        socket.emit('chat:error', { message: 'Invalid message', errorKey: validation.errorKey });
+        return;
+      }
+      const trimmed = validation.text;
 
       let roomCode = playerRooms.get(socket.id);
       let isSpectator = false;
@@ -3579,7 +3625,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(roomCode);
       if (!room) return;
 
-      
       let userId = '';
       let username = '';
       if (isSpectator) {
@@ -3595,6 +3640,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (!userId) return;
 
       const now = Date.now();
+      if (isOnChatCooldown(chatLastSentAt.get(userId), now)) {
+        socket.emit('chat:error', { message: 'Wait a moment', errorKey: 'chat.cooldown' });
+        return;
+      }
       const recent = chatRateLimit.get(userId) ?? [];
       const windowStart = now - CHAT_RATE_WINDOW_MS;
       const fresh = recent.filter(t => t > windowStart);
@@ -3610,55 +3659,82 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
       }
 
+      let muted = false;
+      let shadowMuted = false;
       try {
-        const user = await prisma.user.findUnique({
-          where: { id: userId },
-          select: { chatBanned: true, chatBanUntil: true },
-        });
-        if (user?.chatBanned) {
-          if (!user.chatBanUntil || user.chatBanUntil > new Date()) {
-            socket.emit('chat:error', { message: 'You are banned from chat', errorKey: 'chat.chatBanned' });
-            return;
+        const flags = await getModerationFlags(userId);
+        muted = flags.muted;
+        shadowMuted = flags.shadowMuted;
+        if (!muted) {
+          const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { chatBanned: true, chatBanUntil: true },
+          });
+          if (user?.chatBanned) {
+            if (!user.chatBanUntil || user.chatBanUntil > new Date()) {
+              muted = true;
+            } else {
+              await prisma.user.update({ where: { id: userId }, data: { chatBanned: false, chatBanUntil: null } });
+            }
           }
-          
-          await prisma.user.update({ where: { id: userId }, data: { chatBanned: false, chatBanUntil: null } });
         }
-      } catch { /* ignore ban check errors */ }
+      } catch { /* ignore moderation lookup errors */ }
 
+      let playersLockState: import('@/lib/chat/chatRules').ChatLockState = 'open';
+      if (!isSpectator && room.guestId) {
+        try {
+          const pair = await getPairChatState(room.hostId, room.guestId);
+          playersLockState = pair.lockState;
+        } catch { /* ignore pair lookup errors */ }
+      }
+
+      const decision = decideChatDelivery({ isSpectator, muted, shadowMuted, playersLockState });
+      if (decision.action === 'reject') {
+        socket.emit('chat:error', { message: 'Message not delivered', errorKey: decision.errorKey });
+        return;
+      }
+
+      const masked = maskProfanity(trimmed);
       const chatMsg = {
         id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         userId, username,
-        message: trimmed,
-        isEmote: data.isEmote,
+        message: masked,
+        isEmote,
         isSpectator,
         timestamp: Date.now(),
       };
 
-      room.chatMessages.push(chatMsg);
+      chatLastSentAt.set(userId, now);
+      if (chatLastSentAt.size > 5000) {
+        for (const [uid, ts] of chatLastSentAt) {
+          if (now - ts > 60_000) chatLastSentAt.delete(uid);
+        }
+      }
 
+      if (decision.action === 'echo_only') {
+        socket.emit('chat:message', chatMsg);
+        return;
+      }
+
+      room.chatMessages.push(chatMsg);
       if (room.chatMessages.length > 100) room.chatMessages = room.chatMessages.slice(-100);
 
-      if (userId && !data.isEmote) {
+      if (userId && !isEmote) {
         emitQuestEvent('social.chat.message.sent', userId);
       }
 
-      
       prisma.chatMessage.create({
         data: {
           roomCode, userId, username,
-          message: chatMsg.message,
-          isEmote: chatMsg.isEmote,
+          message: trimmed,
+          isEmote,
           isSpectator,
         },
       }).catch(() => {});
 
-      
       import('@/lib/db/chatCleanup').then(m => m.cleanupOldChatMessages()).catch(() => {});
 
-      
-      
-      
-      if (isSpectator) {
+      if (decision.recipients === 'spectators_only') {
         io.to(`spec:${roomCode}`).emit('chat:message', chatMsg);
       } else {
         if (room.hostSocket) io.to(room.hostSocket).emit('chat:message', chatMsg);
@@ -3667,7 +3743,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
     });
 
-    
+    socket.on('chat:lock-get', async () => {
+      const mapped = playerRooms.get(socket.id);
+      if (!mapped || mapped.startsWith('spec:')) return;
+      const room = rooms.get(mapped);
+      if (!room || !room.guestId) return;
+      await emitChatLockStateToRoom(io, room);
+    });
 
     socket.on('games:list', () => {
       socket.join('games-watchers');

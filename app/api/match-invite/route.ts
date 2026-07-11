@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { emitToUser } from '@/lib/socket/io';
 import { emitQuestEvent } from '@/lib/quests/hooks';
 import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
+import { isBlockedEither } from '@/lib/social/blocks';
 
 ensureQuestPersistenceListener();
 
@@ -61,6 +62,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Cannot invite yourself' },
         { status: 400 },
+      );
+    }
+
+    if (await isBlockedEither(userId, receiverId)) {
+      return NextResponse.json(
+        { error: 'Unable to send the invitation', errorKey: 'social.requestUnavailable' },
+        { status: 403 },
       );
     }
 

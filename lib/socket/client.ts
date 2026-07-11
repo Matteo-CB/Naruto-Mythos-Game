@@ -178,6 +178,11 @@ interface SocketStore {
   chatMessages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }>;
   unreadChatCount: number;
   chatOpen: boolean;
+  chatLockState: 'open' | 'off' | 'friends_only' | null;
+  chatOpponent: { userId: string; username: string } | null;
+  chatFriendStatus: 'none' | 'pending_out' | 'pending_in' | 'friends' | null;
+  chatFriendshipId: string | null;
+  requestChatLockState: () => void;
   sendChatMessage: (message: string, isEmote: boolean) => void;
   setChatOpen: (open: boolean) => void;
 
@@ -238,6 +243,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   chatMessages: [],
   unreadChatCount: 0,
   chatOpen: false,
+  chatLockState: null,
+  chatOpponent: null,
+  chatFriendStatus: null,
+  chatFriendshipId: null,
   opponentDisconnected: false,
   opponentForfeitAt: null,
   pendingReconnect: null,
@@ -843,6 +852,15 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ error: data.message, errorKey: data.errorKey ?? null });
       });
 
+      socket.on('chat:lock-state', (data: { state: 'open' | 'off' | 'friends_only'; opponent: { userId: string; username: string }; friendStatus: 'none' | 'pending_out' | 'pending_in' | 'friends'; friendshipId: string | null }) => {
+        set({
+          chatLockState: data.state,
+          chatOpponent: data.opponent ?? null,
+          chatFriendStatus: data.friendStatus ?? 'none',
+          chatFriendshipId: data.friendshipId ?? null,
+        });
+      });
+
       
 
       socket.on('games:list-update', (data: { games: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean; isEvolving?: boolean; holoHue?: number | null; isAnonymous?: boolean; phase?: string }> }) => {
@@ -908,7 +926,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     const { socket, connected } = get();
     if (socket && connected) {
       console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}${sealedBoosterCount ? ` boosters: ${sealedBoosterCount}` : ''}${sealedSetChoice ? ` set: ${sealedSetChoice}` : ''}${isAnonymous ? ' (anonymous)' : ''}${isEvolving ? ' (evolving)' : ''}`);
-      set({ isSealedRoom: isSealed, rematchState: 'none', chatMessages: [], unreadChatCount: 0 });
+      set({ isSealedRoom: isSealed, rematchState: 'none', chatMessages: [], unreadChatCount: 0, chatLockState: null, chatOpponent: null, chatFriendStatus: null, chatFriendshipId: null });
       socket.emit('room:create', { userId, isPrivate, isRanked, isSealed, gameMode, hostName, sealedBoosterCount, sealedSetChoice, isAnonymous, isEvolving });
     } else {
       console.error('[Socket] Cannot create room: not connected');
@@ -921,7 +939,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     if (socket && connected) {
       console.log('[Socket] Emitting room:join', code);
       socket.emit('room:join', { code, userId });
-      set({ roomCode: code, playerRole: 'player2', chatMessages: [], unreadChatCount: 0 });
+      set({ roomCode: code, playerRole: 'player2', chatMessages: [], unreadChatCount: 0, chatLockState: null, chatOpponent: null, chatFriendStatus: null, chatFriendshipId: null });
     } else {
       console.error('[Socket] Cannot join room: not connected');
       set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
@@ -1053,7 +1071,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
     console.log(`[Socket] Joining spectate for room ${roomCode}`);
     socket.emit('spectate:join', { roomCode, userId, username });
-    set({ spectatingRoomCode: roomCode, isSpectating: true, chatMessages: [], unreadChatCount: 0 });
+    set({ spectatingRoomCode: roomCode, isSpectating: true, chatMessages: [], unreadChatCount: 0, chatLockState: null, chatOpponent: null, chatFriendStatus: null, chatFriendshipId: null });
   },
 
   requestSpectateState: () => {
@@ -1073,7 +1091,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       visibleState: null, playerNames: null, gameStarted: false,
       chessClock: null,
       currentRoomIsEvolving: false, currentRoomHoloHue: null,
-      chatMessages: [], unreadChatCount: 0,
+      chatMessages: [], unreadChatCount: 0, chatLockState: null, chatOpponent: null, chatFriendStatus: null, chatFriendshipId: null,
     });
   },
 
@@ -1116,6 +1134,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   },
 
   
+
+  requestChatLockState: () => {
+    get().socket?.emit('chat:lock-get');
+  },
 
   sendChatMessage: (message: string, isEmote: boolean) => {
     const { socket, connected } = get();

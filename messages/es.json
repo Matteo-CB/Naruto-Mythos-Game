@@ -549,7 +549,8 @@
       "reconnecting": "Reconectando",
       "offline": "Sin conexión",
       "retry": "Reintentar"
-    }
+    },
+    "ok": "OK"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -3066,7 +3067,24 @@
     "chatBanned": "Tienes prohibido el chat",
     "unread": "{count} nuevos",
     "noMessages": "Aún no hay mensajes",
-    "rateLimit": "Estás enviando mensajes demasiado rápido. Ve más despacio, por favor."
+    "rateLimit": "Estás enviando mensajes demasiado rápido. Ve más despacio, por favor.",
+    "inputPlaceholder": "Escribe un mensaje...",
+    "cooldownShort": "Espera un momento...",
+    "tooLong": "140 caracteres como máximo.",
+    "emptyMessage": "El mensaje está vacío.",
+    "invalidEmote": "Emote no disponible.",
+    "muted": "Tu chat está suspendido.",
+    "locked": "El chat está desactivado para esta partida.",
+    "lockedOff": "El chat está desactivado para esta partida.",
+    "lockedFriendsOnly": "{player} solo acepta mensajes de sus amigos. Agrégalo como amigo para chatear.",
+    "sendError": "El mensaje no se pudo enviar.",
+    "menu": {
+      "addFriend": "Agregar amigo",
+      "requestSent": "Solicitud enviada",
+      "acceptRequest": "Aceptar solicitud de amistad",
+      "block": "Bloquear a este jugador",
+      "report": "Denunciar"
+    }
   },
   "moderation": {
     "reports": "Denuncias",
@@ -3391,5 +3409,28 @@
     "noResults": "Ningún país encontrado",
     "label": "Bandera del país",
     "hint": "Se muestra junto a tu nombre en la clasificación y en tu perfil."
+  },
+  "social": {
+    "requestUnavailable": "No se pudo enviar la solicitud.",
+    "block": {
+      "confirmTitle": "¿Bloquear a {player}?",
+      "confirmBody": "Ya no podrá escribirte, agregarte como amigo ni invitarte a una partida. Si estaba entre tus amigos, será eliminado. Puedes desbloquearlo en cualquier momento en las Opciones.",
+      "confirm": "Bloquear",
+      "doneTitle": "Jugador bloqueado"
+    }
+  },
+  "report": {
+    "title": "Denunciar a {player}",
+    "sentTitle": "Denuncia enviada",
+    "sentBody": "Nuestro equipo la revisará. Gracias por ayudar a mantener una comunidad agradable.",
+    "reasonLabel": "Explica lo que pasó (obligatorio)",
+    "reasonPlaceholder": "Describe el problema: insultos, acoso, trampas...",
+    "reasonTooShort": "Describe el problema en unas palabras (10 caracteres como mínimo).",
+    "reasonTooLong": "Descripción demasiado larga.",
+    "attachLabel": "Adjuntar un mensaje (recomendado)",
+    "attachNone": "No hay mensajes recientes de este jugador.",
+    "submit": "Enviar denuncia",
+    "quotaReached": "Has alcanzado el límite de denuncias por hoy.",
+    "alreadyReported": "Ya has denunciado a este jugador. Nuestro equipo está revisando tu solicitud."
   }
 }

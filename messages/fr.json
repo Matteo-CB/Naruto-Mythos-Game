@@ -550,7 +550,8 @@
       "reconnecting": "Reconnexion",
       "offline": "Hors-ligne",
       "retry": "Réessayer"
-    }
+    },
+    "ok": "OK"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -3067,7 +3068,24 @@
     "chatBanned": "Vous êtes banni du chat",
     "unread": "{count} nouveau(x)",
     "noMessages": "Aucun message",
-    "rateLimit": "Vous envoyez des messages trop vite. Ralentissez s'il vous plaît."
+    "rateLimit": "Vous envoyez des messages trop vite. Ralentissez s'il vous plaît.",
+    "inputPlaceholder": "Écris un message...",
+    "cooldownShort": "Attends un instant...",
+    "tooLong": "140 caractères maximum.",
+    "emptyMessage": "Le message est vide.",
+    "invalidEmote": "Émote non disponible.",
+    "muted": "Ton chat est suspendu.",
+    "locked": "Le chat est désactivé pour cette partie.",
+    "lockedOff": "Le chat est désactivé pour cette partie.",
+    "lockedFriendsOnly": "{player} n'accepte que les messages de ses amis. Ajoute-le en ami pour discuter.",
+    "sendError": "Le message n'a pas pu être envoyé.",
+    "menu": {
+      "addFriend": "Ajouter en ami",
+      "requestSent": "Demande envoyée",
+      "acceptRequest": "Accepter la demande d'ami",
+      "block": "Bloquer ce joueur",
+      "report": "Signaler"
+    }
   },
   "moderation": {
     "reports": "Signalements",
@@ -3392,5 +3410,28 @@
     "noResults": "Aucun pays trouvé",
     "label": "Drapeau du pays",
     "hint": "Affiché à côté de votre pseudo dans le classement et sur votre profil."
+  },
+  "social": {
+    "requestUnavailable": "Impossible d'envoyer la demande.",
+    "block": {
+      "confirmTitle": "Bloquer {player} ?",
+      "confirmBody": "Il ne pourra plus t'écrire, t'ajouter en ami ni t'inviter en match. S'il était dans tes amis, il en sera retiré. Tu peux le débloquer à tout moment dans les Options.",
+      "confirm": "Bloquer",
+      "doneTitle": "Joueur bloqué"
+    }
+  },
+  "report": {
+    "title": "Signaler {player}",
+    "sentTitle": "Signalement envoyé",
+    "sentBody": "Notre équipe va l'examiner. Merci d'aider à garder la communauté agréable.",
+    "reasonLabel": "Explique ce qui s'est passé (obligatoire)",
+    "reasonPlaceholder": "Décris le problème : insultes, harcèlement, triche...",
+    "reasonTooShort": "Décris le problème en quelques mots (10 caractères minimum).",
+    "reasonTooLong": "Description trop longue.",
+    "attachLabel": "Joindre un message (recommandé)",
+    "attachNone": "Aucun message récent de ce joueur.",
+    "submit": "Envoyer le signalement",
+    "quotaReached": "Tu as atteint la limite de signalements pour aujourd'hui.",
+    "alreadyReported": "Tu as déjà signalé ce joueur. Notre équipe examine ta demande."
   }
 }

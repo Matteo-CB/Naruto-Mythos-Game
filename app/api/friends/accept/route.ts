@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { emitToUser } from '@/lib/socket/io';
 import { emitQuestEvent } from '@/lib/quests/hooks';
 import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
+import { refreshChatLock } from '@/lib/socket/chatLockBridge';
 
 ensureQuestPersistenceListener();
 
@@ -73,6 +74,7 @@ export async function POST(request: NextRequest) {
     emitQuestEvent('social.friend.added', userId);
     emitQuestEvent('social.friend.added', friendship.senderId);
 
+    refreshChatLock(userId, friendship.senderId);
     emitToUser(friendship.senderId, 'friend:request-accepted', {
       friendshipId: friendship.id,
       friend: {

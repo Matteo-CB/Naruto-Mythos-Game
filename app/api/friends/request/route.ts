@@ -4,6 +4,8 @@ import { prisma } from '@/lib/db/prisma';
 import { emitToUser } from '@/lib/socket/io';
 import { emitQuestEvent } from '@/lib/quests/hooks';
 import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
+import { isBlockedEither } from '@/lib/social/blocks';
+import { refreshChatLock } from '@/lib/socket/chatLockBridge';
 
 ensureQuestPersistenceListener();
 
@@ -68,6 +70,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (await isBlockedEither(userId, receiverId)) {
+      return NextResponse.json(
+        { error: 'Unable to send the request', errorKey: 'social.requestUnavailable' },
+        { status: 403 },
+      );
+    }
+
     
     const existing = await prisma.friendship.findFirst({
       where: {
@@ -105,6 +114,7 @@ export async function POST(request: NextRequest) {
         emitQuestEvent('social.friend.added', userId);
         emitQuestEvent('social.friend.added', receiverId);
 
+        refreshChatLock(userId, receiverId);
         emitToUser(receiverId, 'friend:request-accepted', {
           friendshipId: friendship.id,
           friend: {
@@ -149,6 +159,7 @@ export async function POST(request: NextRequest) {
 
     emitQuestEvent('social.friend.request.sent', userId);
 
+    refreshChatLock(userId, receiverId);
     emitToUser(receiverId, 'friend:request-received', {
       friendshipId: friendship.id,
       sender: {

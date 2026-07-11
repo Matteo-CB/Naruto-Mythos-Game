@@ -544,7 +544,8 @@
       "reconnecting": "Reconnecting",
       "offline": "Offline",
       "retry": "Retry"
-    }
+    },
+    "ok": "OK"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -3061,7 +3062,24 @@
     "chatBanned": "You are banned from chat",
     "unread": "{count} new",
     "noMessages": "No messages yet",
-    "rateLimit": "You are sending messages too fast. Please slow down."
+    "rateLimit": "You are sending messages too fast. Please slow down.",
+    "inputPlaceholder": "Write a message...",
+    "cooldownShort": "Wait a moment...",
+    "tooLong": "140 characters maximum.",
+    "emptyMessage": "The message is empty.",
+    "invalidEmote": "Emote not available.",
+    "muted": "Your chat is suspended.",
+    "locked": "Chat is disabled for this game.",
+    "lockedOff": "Chat is disabled for this game.",
+    "lockedFriendsOnly": "{player} only accepts messages from friends. Add them as a friend to chat.",
+    "sendError": "The message could not be sent.",
+    "menu": {
+      "addFriend": "Add friend",
+      "requestSent": "Request sent",
+      "acceptRequest": "Accept friend request",
+      "block": "Block this player",
+      "report": "Report"
+    }
   },
   "moderation": {
     "reports": "Reports",
@@ -3386,5 +3404,28 @@
     "noResults": "No country found",
     "label": "Country flag",
     "hint": "Shown next to your name in the leaderboard and on your profile."
+  },
+  "social": {
+    "requestUnavailable": "Unable to send the request.",
+    "block": {
+      "confirmTitle": "Block {player}?",
+      "confirmBody": "They will no longer be able to write to you, add you as a friend or invite you to a match. If they were in your friends, they will be removed. You can unblock them anytime in the Options.",
+      "confirm": "Block",
+      "doneTitle": "Player blocked"
+    }
+  },
+  "report": {
+    "title": "Report {player}",
+    "sentTitle": "Report sent",
+    "sentBody": "Our team will review it. Thank you for helping keep the community welcoming.",
+    "reasonLabel": "Explain what happened (required)",
+    "reasonPlaceholder": "Describe the problem: insults, harassment, cheating...",
+    "reasonTooShort": "Describe the problem in a few words (10 characters minimum).",
+    "reasonTooLong": "Description too long.",
+    "attachLabel": "Attach a message (recommended)",
+    "attachNone": "No recent message from this player.",
+    "submit": "Send report",
+    "quotaReached": "You have reached the report limit for today.",
+    "alreadyReported": "You already reported this player. Our team is reviewing your request."
   }
 }

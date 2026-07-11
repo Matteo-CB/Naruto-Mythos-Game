@@ -548,7 +548,8 @@
       "reconnecting": "再接続中",
       "offline": "オフライン",
       "retry": "再試行"
-    }
+    },
+    "ok": "OK"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -3065,7 +3066,24 @@
     "chatBanned": "チャットが禁止されています",
     "unread": "新着 {count} 件",
     "noMessages": "まだメッセージがありません",
-    "rateLimit": "メッセージの送信が速すぎます。少しゆっくりにしてください。"
+    "rateLimit": "メッセージの送信が速すぎます。少しゆっくりにしてください。",
+    "inputPlaceholder": "メッセージを入力...",
+    "cooldownShort": "少しお待ちください...",
+    "tooLong": "最大140文字です。",
+    "emptyMessage": "メッセージが空です。",
+    "invalidEmote": "このエモートは使用できません。",
+    "muted": "チャットが停止されています。",
+    "locked": "この対戦ではチャットが無効です。",
+    "lockedOff": "この対戦ではチャットが無効です。",
+    "lockedFriendsOnly": "{player}はフレンドからのメッセージのみ受け付けています。フレンドに追加して会話しましょう。",
+    "sendError": "メッセージを送信できませんでした。",
+    "menu": {
+      "addFriend": "フレンドに追加",
+      "requestSent": "申請済み",
+      "acceptRequest": "フレンド申請を承認",
+      "block": "このプレイヤーをブロック",
+      "report": "通報"
+    }
   },
   "moderation": {
     "reports": "報告",
@@ -3390,5 +3408,28 @@
     "noResults": "国が見つかりません",
     "label": "国旗",
     "hint": "ランキングとプロフィールで名前の横に表示されます。"
+  },
+  "social": {
+    "requestUnavailable": "申請を送信できませんでした。",
+    "block": {
+      "confirmTitle": "{player}をブロックしますか？",
+      "confirmBody": "相手はあなたにメッセージを送ったり、フレンド申請や対戦の招待をしたりできなくなります。フレンドだった場合は解除されます。オプションからいつでもブロックを解除できます。",
+      "confirm": "ブロック",
+      "doneTitle": "ブロックしました"
+    }
+  },
+  "report": {
+    "title": "{player}を通報",
+    "sentTitle": "通報を送信しました",
+    "sentBody": "運営チームが内容を確認します。コミュニティを守るご協力ありがとうございます。",
+    "reasonLabel": "何があったか説明してください（必須）",
+    "reasonPlaceholder": "問題を記入：暴言、嫌がらせ、チートなど...",
+    "reasonTooShort": "問題を簡単に説明してください（10文字以上）。",
+    "reasonTooLong": "説明が長すぎます。",
+    "attachLabel": "メッセージを添付（推奨）",
+    "attachNone": "このプレイヤーの最近のメッセージはありません。",
+    "submit": "通報を送信",
+    "quotaReached": "本日の通報上限に達しました。",
+    "alreadyReported": "このプレイヤーは既に通報済みです。運営チームが確認中です。"
   }
 }
