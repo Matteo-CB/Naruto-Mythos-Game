@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isSuspended } from '@/lib/moderation/sanctions';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
@@ -14,6 +15,10 @@ export async function POST(req: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized', errorKey: 'tournament.error.unauthorized' }, { status: 401 });
+    }
+
+    if (await isSuspended(session.user.id)) {
+      return NextResponse.json({ error: 'Account suspended', errorKey: 'game.error.suspended' }, { status: 403 });
     }
 
     const userId = session.user.id;

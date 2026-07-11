@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
 import { getSocketIO } from '@/lib/socket/server';
 import { generateSealedPool, type SealedSetChoice } from '@/lib/sealed/boosterGenerator';
+import { isSuspended } from '@/lib/moderation/sanctions';
 
 
 export async function POST(
@@ -14,6 +15,10 @@ export async function POST(
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized', errorKey: 'tournament.error.unauthorized' }, { status: 401 });
+    }
+
+    if (await isSuspended(session.user.id)) {
+      return NextResponse.json({ error: 'Account suspended', errorKey: 'game.error.suspended' }, { status: 403 });
     }
 
     const { id } = await params;
