@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "date": "2026-07-11",
+      "title_fr": "Choix UPGRADE clarifiés, coûts de révélation corrigés et salons scellés plus lisibles",
+      "title_en": "Clearer UPGRADE choices, corrected reveal costs and clearer sealed rooms",
+      "title_es": "Elecciones de UPGRADE más claras, costes de revelación corregidos y salas selladas más legibles",
+      "title_ja": "UPGRADE選択の明確化、公開コストの修正、シールドルームの改善",
+      "changes_fr": [
+        "Quand une carte améliorée propose un effet UPGRADE optionnel, deux boutons clairs permettent de choisir entre appliquer l'UPGRADE ou garder l'effet MAIN seul, par exemple Naruto Rasengan peut cacher au lieu de vaincre.",
+        "Les révélations forcées par Dosu Kinuta utilisent le vrai coût de la carte : les réductions comme celle de Shino Aburame face à un Jutsu ennemi s'appliquent avant le surcoût de 2.",
+        "Les salons scellés affichent maintenant une étiquette avec le set choisi ou Aléatoire à côté de l'étiquette Scellé."
+      ],
+      "changes_en": [
+        "When an upgraded card offers an optional UPGRADE effect, two clear buttons let you apply the UPGRADE or keep the MAIN effect only, for example Naruto Rasengan can hide instead of defeat.",
+        "Reveals forced by Dosu Kinuta use the card's true cost: reductions like Shino Aburame's against an enemy Jutsu apply before the 2 extra chakra.",
+        "Sealed rooms now show a tag with the chosen set or Random next to the Sealed tag."
+      ],
+      "changes_es": [
+        "Cuando una carta mejorada ofrece un efecto UPGRADE opcional, dos botones claros permiten aplicar el UPGRADE o mantener solo el efecto MAIN, por ejemplo Naruto Rasengan puede ocultar en vez de derrotar.",
+        "Las revelaciones forzadas por Dosu Kinuta usan el coste real de la carta: las reducciones como la de Shino Aburame frente a un Jutsu enemigo se aplican antes del sobrecoste de 2.",
+        "Las salas selladas ahora muestran una etiqueta con el set elegido o Aleatorio junto a la etiqueta Sellado."
+      ],
+      "changes_ja": [
+        "強化したカードの任意のUPGRADE効果に、UPGRADEを適用するかMAIN効果のみを使うかを選べる2つのボタンが付きました。例えばナルトの螺旋丸は撃破の代わりに隠すことを選べます。",
+        "ドスに強制された公開はカードの本当のコストで支払います。敵の術がいる時のシノの軽減が、追加の2チャクラの前に適用されます。",
+        "シールド戦のルームに、選んだセット名またはランダムのタグが表示されるようになりました。"
+      ]
+    },
+    {
       "date": "2026-07-08",
       "title_fr": "Effets simultanés corrigés et option pour couper les sons",
       "title_en": "Simultaneous effects fixed and a sound off option",
@@ -23,10 +50,7 @@
         "Les parties fantômes dont les deux joueurs sont partis disparaissent de la liste des parties en direct et ne peuvent plus être regardées.",
         "Les cartes jouées et révélées entrent désormais en 3D avec un reflet de lumière qui balaie la carte.",
         "Les images des cartes se préchargent pendant la partie : les animations s'affichent sans temps de chargement.",
-        "Le journal de partie reste fluide même dans les très longues parties.",
-        "Quand une carte améliorée propose un effet UPGRADE optionnel, deux boutons clairs permettent de choisir entre appliquer l'UPGRADE ou garder l'effet MAIN seul, par exemple Naruto Rasengan peut cacher au lieu de vaincre.",
-        "Les révélations forcées par Dosu Kinuta utilisent le vrai coût de la carte : les réductions comme celle de Shino Aburame face à un Jutsu ennemi s'appliquent avant le surcoût de 2.",
-        "Les salons scellés affichent maintenant une étiquette avec le set choisi ou Aléatoire à côté de l'étiquette Scellé."
+        "Le journal de partie reste fluide même dans les très longues parties."
       ],
       "changes_en": [
         "Heaven Curse Mark Sasuke no longer gains chakra when defeated by the same effect that defeats another character.",
@@ -45,10 +69,7 @@
         "Ghost games whose both players left disappear from the live games list and can no longer be spectated.",
         "Played and revealed cards now enter in 3D with a light reflection sweeping across the card.",
         "Card images preload during the game so animations show up with no loading delay.",
-        "The game log stays smooth even in very long games.",
-        "When an upgraded card offers an optional UPGRADE effect, two clear buttons let you apply the UPGRADE or keep the MAIN effect only, for example Naruto Rasengan can hide instead of defeat.",
-        "Reveals forced by Dosu Kinuta use the card's true cost: reductions like Shino Aburame's against an enemy Jutsu apply before the 2 extra chakra.",
-        "Sealed rooms now show a tag with the chosen set or Random next to the Sealed tag."
+        "The game log stays smooth even in very long games."
       ],
       "changes_es": [
         "Sasuke Marca Maldita del Cielo ya no gana chakra cuando es derrotado por el mismo efecto que derrota a otro personaje.",
@@ -67,10 +88,7 @@
         "Las partidas fantasma cuyos dos jugadores se fueron desaparecen de la lista de partidas en vivo y ya no se pueden observar.",
         "Las cartas jugadas y reveladas ahora entran en 3D con un reflejo de luz que recorre la carta.",
         "Las imágenes de las cartas se precargan durante la partida: las animaciones aparecen sin tiempos de carga.",
-        "El registro de la partida se mantiene fluido incluso en partidas muy largas.",
-        "Cuando una carta mejorada ofrece un efecto UPGRADE opcional, dos botones claros permiten aplicar el UPGRADE o mantener solo el efecto MAIN, por ejemplo Naruto Rasengan puede ocultar en vez de derrotar.",
-        "Las revelaciones forzadas por Dosu Kinuta usan el coste real de la carta: las reducciones como la de Shino Aburame frente a un Jutsu enemigo se aplican antes del sobrecoste de 2.",
-        "Las salas selladas ahora muestran una etiqueta con el set elegido o Aleatorio junto a la etiqueta Sellado."
+        "El registro de la partida se mantiene fluido incluso en partidas muy largas."
       ],
       "changes_ja": [
         "天の呪印サスケが、他のキャラクターを撃破する同じ効果で撃破されたときにチャクラを得なくなりました。",
@@ -89,10 +107,7 @@
         "両方のプレイヤーが退出したゴーストゲームは、ライブ観戦リストから消え、観戦できなくなりました。",
         "カードのプレイと公開が3D演出になり、光の反射がカードの上を走ります。",
         "対戦中にカード画像を先読みするため、演出が読み込み待ちなしで表示されます。",
-        "非常に長い対戦でもログが軽快に動きます。",
-        "強化したカードの任意のUPGRADE効果に、UPGRADEを適用するかMAIN効果のみを使うかを選べる2つのボタンが付きました。例えばナルトの螺旋丸は撃破の代わりに隠すことを選べます。",
-        "ドスに強制された公開はカードの本当のコストで支払います。敵の術がいる時のシノの軽減が、追加の2チャクラの前に適用されます。",
-        "シールド戦のルームに、選んだセット名またはランダムのタグが表示されるようになりました。"
+        "非常に長い対戦でもログが軽快に動きます。"
       ]
     },
     {
