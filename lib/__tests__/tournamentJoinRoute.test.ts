@@ -16,6 +16,10 @@ vi.mock('@/lib/db/prisma', () => {
   return { prisma: m };
 });
 
+vi.mock('@/lib/moderation/sanctions', () => ({
+  isSuspended: vi.fn(async () => false),
+}));
+
 vi.mock('@/lib/auth/authOptions', () => ({
   auth: vi.fn(),
 }));
