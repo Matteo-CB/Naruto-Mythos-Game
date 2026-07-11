@@ -182,6 +182,8 @@ interface SocketStore {
   chatOpponent: { userId: string; username: string } | null;
   chatFriendStatus: 'none' | 'pending_out' | 'pending_in' | 'friends' | null;
   chatFriendshipId: string | null;
+  chatSelfMuted: boolean;
+  chatSelfMutedUntilTs: number | null;
   requestChatLockState: () => void;
   sendDm: (toUserId: string, body: string) => void;
   markDmRead: (threadKey: string) => void;
@@ -249,6 +251,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   chatOpponent: null,
   chatFriendStatus: null,
   chatFriendshipId: null,
+  chatSelfMuted: false,
+  chatSelfMutedUntilTs: null,
   opponentDisconnected: false,
   opponentForfeitAt: null,
   pendingReconnect: null,
@@ -880,12 +884,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         }).catch(() => {});
       });
 
-      socket.on('chat:lock-state', (data: { state: 'open' | 'off' | 'friends_only'; opponent: { userId: string; username: string }; friendStatus: 'none' | 'pending_out' | 'pending_in' | 'friends'; friendshipId: string | null }) => {
+      socket.on('chat:lock-state', (data: { state: 'open' | 'off' | 'friends_only'; opponent: { userId: string; username: string }; friendStatus: 'none' | 'pending_out' | 'pending_in' | 'friends'; friendshipId: string | null; muted?: boolean; mutedUntilTs?: number | null }) => {
         set({
           chatLockState: data.state,
           chatOpponent: data.opponent ?? null,
           chatFriendStatus: data.friendStatus ?? 'none',
           chatFriendshipId: data.friendshipId ?? null,
+          chatSelfMuted: data.muted === true,
+          chatSelfMutedUntilTs: data.mutedUntilTs ?? null,
         });
       });
 

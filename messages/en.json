@@ -1576,7 +1576,9 @@
       "sealedGenFailed": "Failed to generate sealed boosters.",
       "notYourTurn": "Not your turn.",
       "invalidAction": "Invalid action.",
-      "upgradeNameConflict": "Cannot upgrade: would create duplicate {name} on this mission."
+      "upgradeNameConflict": "Cannot upgrade: would create duplicate {name} on this mission.",
+      "suspended": "Your account is suspended.",
+      "rankedBanned": "Ranked mode is closed to you for now."
     },
     "opponentDisconnected": "Opponent disconnected. They have {time} to reconnect or the game is forfeit.",
     "opponentDisconnectedShort": "Opponent disconnected. Their chess clock continues to run.",
@@ -3094,7 +3096,8 @@
       "block": "Block this player",
       "report": "Report",
       "privateMessage": "Private message"
-    }
+    },
+    "mutedUntil": "Your chat is suspended until {date}."
   },
   "moderation": {
     "reports": "Reports",
@@ -3156,7 +3159,8 @@
     "errorPrivate": "This is a private game.",
     "errorLimit": "Spectator limit reached for this room.",
     "errorNotSubscribed": "You are not subscribed to this room.",
-    "errorEnded": "This game has ended."
+    "errorEnded": "This game has ended.",
+    "errorBanned": "You cannot watch games for now."
   },
   "deckStats": {
     "title": "Deck stats (last 90 days)",
@@ -3487,6 +3491,51 @@
       "suspensionPermanent": "Your account is permanently suspended. Reason: {reason}.",
       "spectateBan": "You can no longer watch other players' games until {date}. Reason: {reason}.",
       "spectateBanPermanent": "You can no longer watch other players' games. Reason: {reason}."
+    },
+    "nameResetButton": "Confirm new username"
+  },
+  "adminModeration": {
+    "searchPlaceholder": "Search a player...",
+    "search": "Search",
+    "sanctionType": "Sanction",
+    "duration": "Duration",
+    "reasonPlaceholder": "Reason (required)...",
+    "apply": "Apply",
+    "applied": "Sanction applied.",
+    "linkedToReport": "Linked to report",
+    "eloAdjustHint": "The actual ELO adjustment happens in the players tab, this entry records the decision in the file.",
+    "history": "History",
+    "cleanRecord": "Clean record.",
+    "revoked": "revoked",
+    "revoke": "Revoke",
+    "lastMessages": "Last messages",
+    "deleteMessage": "Del.",
+    "reportsAgainst": "Reports received",
+    "reportsBy": "filed",
+    "noReports": "No reports.",
+    "openFile": "Player file",
+    "dismiss": "Dismiss",
+    "status": {
+      "pending": "Pending",
+      "resolved": "Resolved",
+      "dismissed": "Dismissed"
+    },
+    "context": {
+      "game_chat": "Game chat",
+      "dm": "Private message",
+      "profile": "Profile"
+    },
+    "types": {
+      "warn": "Warning",
+      "warn_severe": "Final warning",
+      "mute_chat": "Chat mute",
+      "shadow_mute": "Shadow mute",
+      "ranked_ban": "Ranked ban",
+      "suspension": "Account suspension",
+      "spectate_ban": "Spectate ban",
+      "name_reset": "Username reset",
+      "message_delete": "Message deleted",
+      "elo_adjust": "ELO adjustment"
     }
   }
 }

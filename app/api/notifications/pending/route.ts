@@ -9,7 +9,7 @@ export async function GET() {
   }
   const userId = session.user.id;
   const [user, notifications] = await Promise.all([
-    prisma.user.findUnique({ where: { id: userId }, select: { chatIntroSeenAt: true } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { chatIntroSeenAt: true, usernameResetRequired: true } }),
     prisma.playerNotification.findMany({
       where: { userId, seenAt: null },
       orderBy: { createdAt: 'asc' },
@@ -18,6 +18,7 @@ export async function GET() {
   ]);
   return NextResponse.json({
     chatIntroSeen: user?.chatIntroSeenAt != null,
+    usernameResetRequired: user?.usernameResetRequired === true,
     notifications: notifications.map((n) => ({
       id: n.id,
       kind: n.kind,

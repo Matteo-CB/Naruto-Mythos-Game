@@ -1580,7 +1580,9 @@
       "sealedGenFailed": "シールドブースターの生成に失敗しました。",
       "notYourTurn": "あなたのターンではありません。",
       "invalidAction": "無効な操作です。",
-      "upgradeNameConflict": "アップグレードできません：このミッションに {name} の重複が生じます。"
+      "upgradeNameConflict": "アップグレードできません：このミッションに {name} の重複が生じます。",
+      "suspended": "アカウントが停止されています。",
+      "rankedBanned": "現在ランク戦は利用できません。"
     },
     "opponentDisconnected": "相手が切断しました。{time} 以内に再接続しないと敗北です。",
     "opponentDisconnectedShort": "相手が切断しました。持ち時間は動き続けます。",
@@ -3098,7 +3100,8 @@
       "block": "このプレイヤーをブロック",
       "report": "通報",
       "privateMessage": "プライベートメッセージ"
-    }
+    },
+    "mutedUntil": "チャットが{date}まで停止されています。"
   },
   "moderation": {
     "reports": "報告",
@@ -3160,7 +3163,8 @@
     "errorPrivate": "これはプライベート対戦です。",
     "errorLimit": "このルームの観戦者数の上限に達しました。",
     "errorNotSubscribed": "このルームを購読していません。",
-    "errorEnded": "この対戦は終了しました。"
+    "errorEnded": "この対戦は終了しました。",
+    "errorBanned": "現在観戦できません。"
   },
   "deckStats": {
     "title": "デッキ統計（過去90日）",
@@ -3491,6 +3495,51 @@
       "suspensionPermanent": "アカウントが無期限に停止されています。理由：{reason}。",
       "spectateBan": "{date}まで他のプレイヤーの対戦を観戦できません。理由：{reason}。",
       "spectateBanPermanent": "他のプレイヤーの対戦を観戦できません。理由：{reason}。"
+    },
+    "nameResetButton": "新しいユーザー名を確定"
+  },
+  "adminModeration": {
+    "searchPlaceholder": "プレイヤーを検索...",
+    "search": "検索",
+    "sanctionType": "処罰",
+    "duration": "期間",
+    "reasonPlaceholder": "理由（必須）...",
+    "apply": "適用",
+    "applied": "処罰を適用しました。",
+    "linkedToReport": "通報に紐付け",
+    "eloAdjustHint": "実際のELO調整はプレイヤータブで行います。この項目は決定を記録します。",
+    "history": "履歴",
+    "cleanRecord": "記録なし。",
+    "revoked": "解除済み",
+    "revoke": "解除",
+    "lastMessages": "最近のメッセージ",
+    "deleteMessage": "削除",
+    "reportsAgainst": "受けた通報",
+    "reportsBy": "行った通報",
+    "noReports": "通報はありません。",
+    "openFile": "プレイヤー記録",
+    "dismiss": "却下",
+    "status": {
+      "pending": "未処理",
+      "resolved": "処理済み",
+      "dismissed": "却下"
+    },
+    "context": {
+      "game_chat": "対戦チャット",
+      "dm": "プライベートメッセージ",
+      "profile": "プロフィール"
+    },
+    "types": {
+      "warn": "警告",
+      "warn_severe": "最終警告",
+      "mute_chat": "チャットミュート",
+      "shadow_mute": "シャドウミュート",
+      "ranked_ban": "ランク戦禁止",
+      "suspension": "アカウント停止",
+      "spectate_ban": "観戦禁止",
+      "name_reset": "ユーザー名リセット",
+      "message_delete": "メッセージ削除",
+      "elo_adjust": "ELO調整"
     }
   }
 }

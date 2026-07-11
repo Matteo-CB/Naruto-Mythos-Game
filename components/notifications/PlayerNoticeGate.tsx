@@ -21,6 +21,10 @@ export function PlayerNoticeGate() {
   const { data: session } = useSession();
   const bcp47 = useLocaleBcp47();
   const [introNeeded, setIntroNeeded] = useState(false);
+  const [nameResetNeeded, setNameResetNeeded] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [nameBusy, setNameBusy] = useState(false);
   const [notices, setNotices] = useState<PendingNotice[]>([]);
   const [fetched, setFetched] = useState(false);
 
@@ -34,6 +38,7 @@ export function PlayerNoticeGate() {
       .then((data) => {
         if (cancelled || !data) return;
         setIntroNeeded(data.chatIntroSeen === false);
+        setNameResetNeeded(data.usernameResetRequired === true);
         setNotices(data.notifications ?? []);
         setFetched(true);
       })
@@ -65,7 +70,59 @@ export function PlayerNoticeGate() {
     }).catch(() => {});
   }, []);
 
+  const submitNewName = async () => {
+    if (nameBusy || newName.trim().length === 0) return;
+    setNameBusy(true);
+    setNameError(null);
+    try {
+      const res = await fetch('/api/user/username', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: newName.trim() }),
+      });
+      if (res.ok) {
+        window.location.reload();
+        return;
+      }
+      const data = await res.json().catch(() => ({}));
+      setNameError(typeof data?.errorKey === 'string' ? data.errorKey : 'chat.sendError');
+    } catch {
+      setNameError('chat.sendError');
+    }
+    setNameBusy(false);
+  };
+
   if (!userId) return null;
+
+  if (nameResetNeeded) {
+    return (
+      <PopupOverlay>
+        <PopupCornerFrame accentColor="rgba(179, 62, 62, 0.45)" maxWidth="440px">
+          <PopupTitle accentColor="#b33e3e" size="md">{t('notify.nameResetTitle')}</PopupTitle>
+          <p className="mb-4 text-center text-xs leading-relaxed" style={{ color: '#c8c8c8' }}>
+            {t('notify.nameResetBody')}
+          </p>
+          <input
+            type="text"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value.slice(0, 20))}
+            onKeyDown={(e) => { if (e.key === 'Enter') submitNewName(); }}
+            maxLength={20}
+            className="w-full mb-2 px-3 py-2 text-[13px] outline-none text-center"
+            style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid #262626', color: '#e0e0e0' }}
+          />
+          {nameError && (
+            <p className="text-center text-[11px] mb-3" style={{ color: '#b33e3e' }}>{t(nameError)}</p>
+          )}
+          <div className="flex justify-center">
+            <PopupActionButton onClick={submitNewName} accentColor="#b33e3e" disabled={nameBusy || newName.trim().length < 3}>
+              {t('notify.nameResetButton')}
+            </PopupActionButton>
+          </div>
+        </PopupCornerFrame>
+      </PopupOverlay>
+    );
+  }
 
   if (introNeeded) {
     return (

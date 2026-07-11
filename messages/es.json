@@ -1581,7 +1581,9 @@
       "sealedGenFailed": "No se han podido generar los sobres sellados.",
       "notYourTurn": "No es tu turno.",
       "invalidAction": "Acción no válida.",
-      "upgradeNameConflict": "No se puede mejorar: crearía un {name} duplicado en esta misión."
+      "upgradeNameConflict": "No se puede mejorar: crearía un {name} duplicado en esta misión.",
+      "suspended": "Tu cuenta está suspendida.",
+      "rankedBanned": "El modo clasificatorio está cerrado para ti por ahora."
     },
     "opponentDisconnected": "El rival se ha desconectado. Tiene {time} para reconectarse o pierde la partida.",
     "opponentDisconnectedShort": "El rival se ha desconectado. Su reloj de partida sigue corriendo.",
@@ -3099,7 +3101,8 @@
       "block": "Bloquear a este jugador",
       "report": "Denunciar",
       "privateMessage": "Mensaje privado"
-    }
+    },
+    "mutedUntil": "Tu chat está suspendido hasta el {date}."
   },
   "moderation": {
     "reports": "Denuncias",
@@ -3161,7 +3164,8 @@
     "errorPrivate": "Esta es una partida privada.",
     "errorLimit": "Se ha alcanzado el límite de espectadores de esta sala.",
     "errorNotSubscribed": "No estás suscrito a esta sala.",
-    "errorEnded": "Esta partida ha terminado."
+    "errorEnded": "Esta partida ha terminado.",
+    "errorBanned": "No puedes ver partidas por ahora."
   },
   "deckStats": {
     "title": "Estadísticas del mazo (últimos 90 días)",
@@ -3492,6 +3496,51 @@
       "suspensionPermanent": "Tu cuenta está suspendida definitivamente. Motivo: {reason}.",
       "spectateBan": "Ya no puedes ver las partidas de otros jugadores hasta el {date}. Motivo: {reason}.",
       "spectateBanPermanent": "Ya no puedes ver las partidas de otros jugadores. Motivo: {reason}."
+    },
+    "nameResetButton": "Confirmar nuevo nombre"
+  },
+  "adminModeration": {
+    "searchPlaceholder": "Buscar un jugador...",
+    "search": "Buscar",
+    "sanctionType": "Sanción",
+    "duration": "Duración",
+    "reasonPlaceholder": "Motivo (obligatorio)...",
+    "apply": "Aplicar",
+    "applied": "Sanción aplicada.",
+    "linkedToReport": "Vinculado a la denuncia",
+    "eloAdjustHint": "El ajuste real de ELO se hace en la pestaña de jugadores, esta entrada registra la decisión en el expediente.",
+    "history": "Historial",
+    "cleanRecord": "Expediente limpio.",
+    "revoked": "levantada",
+    "revoke": "Levantar",
+    "lastMessages": "Últimos mensajes",
+    "deleteMessage": "Elim.",
+    "reportsAgainst": "Denuncias recibidas",
+    "reportsBy": "emitidas",
+    "noReports": "Sin denuncias.",
+    "openFile": "Expediente",
+    "dismiss": "Archivar",
+    "status": {
+      "pending": "Pendientes",
+      "resolved": "Resueltas",
+      "dismissed": "Archivadas"
+    },
+    "context": {
+      "game_chat": "Chat de partida",
+      "dm": "Mensaje privado",
+      "profile": "Perfil"
+    },
+    "types": {
+      "warn": "Advertencia",
+      "warn_severe": "Última advertencia",
+      "mute_chat": "Silencio de chat",
+      "shadow_mute": "Shadow-mute",
+      "ranked_ban": "Baneo clasificatorio",
+      "suspension": "Suspensión de cuenta",
+      "spectate_ban": "Prohibición de espectar",
+      "name_reset": "Reinicio del nombre",
+      "message_delete": "Mensaje eliminado",
+      "elo_adjust": "Ajuste de ELO"
     }
   }
 }

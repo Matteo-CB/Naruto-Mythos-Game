@@ -12,6 +12,7 @@ import { BlockPlayerPopup } from '@/components/chat/BlockPlayerPopup';
 import { ReportPlayerPopup, type ReportableMessage } from '@/components/chat/ReportPlayerPopup';
 import { useDmStore } from '@/stores/dmStore';
 import { useSession } from 'next-auth/react';
+import { useLocaleBcp47 } from '@/lib/i18n/useLocaleMeta';
 
 const EMOTE_BY_CODE = new Map(CHAT_EMOTES.map((e) => [e.code, e]));
 
@@ -50,6 +51,7 @@ export function GameChat() {
   const t = useTranslations();
   const dims = useGameScale();
   const { data: session } = useSession();
+  const bcp47 = useLocaleBcp47();
   const isOnlineGame = useGameStore((s) => s.isOnlineGame);
   const chatMessages = useSocketStore((s) => s.chatMessages);
   const unreadCount = useSocketStore((s) => s.unreadChatCount);
@@ -63,6 +65,8 @@ export function GameChat() {
   const chatFriendshipId = useSocketStore((s) => s.chatFriendshipId);
   const requestChatLockState = useSocketStore((s) => s.requestChatLockState);
   const roomCode = useSocketStore((s) => s.roomCode);
+  const chatSelfMuted = useSocketStore((s) => s.chatSelfMuted);
+  const chatSelfMutedUntilTs = useSocketStore((s) => s.chatSelfMutedUntilTs);
 
   const [input, setInput] = useState('');
   const [cooldown, setCooldown] = useState(false);
@@ -127,7 +131,7 @@ export function GameChat() {
 
   if (!isOnlineGame) return null;
 
-  const isLockedForPlayer = !isSpectating && (chatLockState === 'off' || chatLockState === 'friends_only');
+  const isLockedForPlayer = !isSpectating && (chatSelfMuted || chatLockState === 'off' || chatLockState === 'friends_only');
   const opponentMessages: ReportableMessage[] = chatOpponent
     ? chatMessages.filter((m) => m.userId === chatOpponent.userId && !m.isEmote).map((m) => ({ text: m.message, at: m.timestamp }))
     : [];
@@ -289,11 +293,15 @@ export function GameChat() {
       {isLockedForPlayer ? (
         <div className="px-3 py-3 shrink-0 flex flex-col items-center gap-2" style={{ borderTop: '1px solid rgba(196,163,90,0.08)' }}>
           <span className="text-center" style={{ fontSize: dims.isMobile ? '12px' : '10px', color: '#888' }}>
-            {chatLockState === 'friends_only'
+            {chatSelfMuted
+              ? (chatSelfMutedUntilTs
+                  ? t('chat.mutedUntil', { date: new Intl.DateTimeFormat(bcp47, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(chatSelfMutedUntilTs)) })
+                  : t('chat.muted'))
+              : chatLockState === 'friends_only'
               ? t('chat.lockedFriendsOnly', { player: chatOpponent?.username ?? '' })
               : t('chat.lockedOff')}
           </span>
-          {chatLockState === 'friends_only' && friendAction && (
+          {!chatSelfMuted && chatLockState === 'friends_only' && friendAction && (
             <button
               onClick={() => friendAction.onClick?.()}
               disabled={!friendAction.onClick || friendBusy}

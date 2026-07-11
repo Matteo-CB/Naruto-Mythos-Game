@@ -26,7 +26,7 @@ import type { GameMode } from '@/lib/quests/hooks';
 import { validateChatMessage, isOnChatCooldown, decideChatDelivery } from '@/lib/chat/chatDelivery';
 import { maskProfanity } from '@/lib/chat/wordFilter';
 import { getPairChatState } from '@/lib/chat/pairState';
-import { getModerationFlags } from '@/lib/moderation/sanctions';
+import { getModerationFlags, isSuspended, isRankedBanned, isSpectateBanned } from '@/lib/moderation/sanctions';
 import { setChatLockRefresher } from '@/lib/socket/chatLockBridge';
 import { sendDm, getUnreadDmCount, markThreadRead } from '@/lib/dm/dmService';
 
@@ -776,13 +776,19 @@ function broadcastRoomList(io: SocketIOServer): void {
 async function emitChatLockStateToRoom(io: SocketIOServer, room: RoomData): Promise<void> {
   if (!room.guestId) return;
   try {
-    const pairForHost = await getPairChatState(room.hostId, room.guestId);
+    const [pairForHost, hostFlags, guestFlags] = await Promise.all([
+      getPairChatState(room.hostId, room.guestId),
+      getModerationFlags(room.hostId),
+      getModerationFlags(room.guestId),
+    ]);
     if (room.hostSocket) {
       io.to(room.hostSocket).emit('chat:lock-state', {
         state: pairForHost.publicState,
         opponent: { userId: room.guestId, username: room.guestName ?? 'Player 2' },
         friendStatus: pairForHost.friendStatusForA,
         friendshipId: pairForHost.friendshipId,
+        muted: hostFlags.muted,
+        mutedUntilTs: hostFlags.mutedUntil ? hostFlags.mutedUntil.getTime() : null,
       });
     }
     if (room.guestSocket) {
@@ -791,6 +797,8 @@ async function emitChatLockStateToRoom(io: SocketIOServer, room: RoomData): Prom
         opponent: { userId: room.hostId, username: room.hostName ?? 'Player 1' },
         friendStatus: pairForHost.friendStatusForB,
         friendshipId: pairForHost.friendshipId,
+        muted: guestFlags.muted,
+        mutedUntilTs: guestFlags.mutedUntil ? guestFlags.mutedUntil.getTime() : null,
       });
     }
   } catch { /* ignore lock state errors */ }
@@ -2110,6 +2118,15 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
+      if (await isSuspended(data.userId)) {
+        socket.emit('room:error', { message: 'Account suspended', errorKey: 'game.error.suspended' });
+        return;
+      }
+      const createIsRanked = data.isRanked === true || data.gameMode === 'ranked' || data.gameMode === 'evolving' || data.isEvolving === true;
+      if (createIsRanked && (await isRankedBanned(data.userId))) {
+        socket.emit('room:error', { message: 'Ranked mode is closed to you', errorKey: 'game.error.rankedBanned' });
+        return;
+      }
       if (await isUserGameBanned(data.userId)) {
         socket.emit('room:error', { message: 'You are banned from playing online games', errorKey: 'game.error.gameBanned' });
         return;
@@ -2233,6 +2250,15 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
+      if (await isSuspended(data.userId)) {
+        socket.emit('room:error', { message: 'Account suspended', errorKey: 'game.error.suspended' });
+        return;
+      }
+      const joinRoomRef = rooms.get(data.code);
+      if (joinRoomRef && (joinRoomRef.isRanked === true || joinRoomRef.isEvolving === true) && (await isRankedBanned(data.userId))) {
+        socket.emit('room:error', { message: 'Ranked mode is closed to you', errorKey: 'game.error.rankedBanned' });
+        return;
+      }
       if (await isUserGameBanned(data.userId)) {
         socket.emit('room:error', { message: 'You are banned from playing online games', errorKey: 'game.error.gameBanned' });
         return;
@@ -3272,6 +3298,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
+      if (await isSuspended(data.userId)) {
+        socket.emit('game:error', { message: 'Account suspended', errorKey: 'game.error.suspended' });
+        return;
+      }
+      if ((data.isRanked === true || data.isEvolving === true) && (await isRankedBanned(data.userId))) {
+        socket.emit('game:error', { message: 'Ranked mode is closed to you', errorKey: 'game.error.rankedBanned' });
+        return;
+      }
       if (await isUserGameBanned(data.userId)) {
         socket.emit('game:error', { message: 'You are banned from playing online games', errorKey: 'game.error.gameBanned' });
         return;
@@ -3441,11 +3475,16 @@ export function setupSocketHandlers(io: SocketIOServer) {
     
     
 
-    socket.on('spectate:join', (data: { roomCode: string; userId: string; username: string }) => {
+    socket.on('spectate:join', async (data: { roomCode: string; userId: string; username: string }) => {
       const authedUserId = (socket.data as { userId?: string }).userId;
       if (!authedUserId || authedUserId !== data.userId) {
         console.warn(`[Socket] spectate:join rejected: socket auth mismatch (claim=${data.userId}, auth=${authedUserId ?? 'null'})`);
         socket.emit('spectate:error', { message: 'Authentication mismatch', errorKey: 'spectate.errorAuth' });
+        return;
+      }
+
+      if (await isSpectateBanned(data.userId)) {
+        socket.emit('spectate:error', { message: 'Spectating is closed to you', errorKey: 'spectate.errorBanned' });
         return;
       }
 

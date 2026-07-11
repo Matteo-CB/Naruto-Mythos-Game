@@ -14,8 +14,10 @@ export async function PATCH(request: NextRequest) {
     }
 
     const userId = session.user.id;
+    const me = await prisma.user.findUnique({ where: { id: userId }, select: { usernameResetRequired: true } });
+    const forcedReset = me?.usernameResetRequired === true;
     const lastChange = usernameChangeAt.get(userId);
-    if (lastChange && Date.now() - lastChange < USERNAME_COOLDOWN_MS) {
+    if (!forcedReset && lastChange && Date.now() - lastChange < USERNAME_COOLDOWN_MS) {
       const hoursLeft = Math.ceil((USERNAME_COOLDOWN_MS - (Date.now() - lastChange)) / (60 * 60 * 1000));
       return NextResponse.json(
         { error: `Username can only be changed once per day (${hoursLeft}h left)`, errorKey: 'settings.usernameCooldown' },
@@ -50,7 +52,7 @@ export async function PATCH(request: NextRequest) {
 
     await prisma.user.update({
       where: { id: userId },
-      data: { username: newUsername },
+      data: { username: newUsername, usernameResetRequired: false },
     });
 
     usernameChangeAt.set(userId, Date.now());

@@ -1582,7 +1582,9 @@
       "sealedGenFailed": "Échec de la génération des boosters scellés.",
       "notYourTurn": "Ce n'est pas votre tour.",
       "invalidAction": "Action invalide.",
-      "upgradeNameConflict": "Impossible d'upgrader : créerait un doublon de {name} sur cette mission."
+      "upgradeNameConflict": "Impossible d'upgrader : créerait un doublon de {name} sur cette mission.",
+      "suspended": "Ton compte est suspendu.",
+      "rankedBanned": "Le mode classé t'est fermé pour le moment."
     },
     "opponentDisconnected": "Adversaire déconnecté. Il a {time} pour se reconnecter ou la partie est forfait.",
     "opponentDisconnectedShort": "Adversaire déconnecté. Son chrono continue de tourner.",
@@ -3100,7 +3102,8 @@
       "block": "Bloquer ce joueur",
       "report": "Signaler",
       "privateMessage": "Message privé"
-    }
+    },
+    "mutedUntil": "Ton chat est suspendu jusqu'au {date}."
   },
   "moderation": {
     "reports": "Signalements",
@@ -3162,7 +3165,8 @@
     "errorPrivate": "Cette partie est privée.",
     "errorLimit": "Limite de spectateurs atteinte pour cette partie.",
     "errorNotSubscribed": "Vous n'êtes pas inscrit dans cette partie.",
-    "errorEnded": "Cette partie est terminée."
+    "errorEnded": "Cette partie est terminée.",
+    "errorBanned": "Tu ne peux pas regarder de parties pour le moment."
   },
   "deckStats": {
     "title": "Stats des decks (90 derniers jours)",
@@ -3493,6 +3497,51 @@
       "suspensionPermanent": "Ton compte est définitivement suspendu. Motif : {reason}.",
       "spectateBan": "Tu ne peux plus regarder les parties des autres joueurs jusqu'au {date}. Motif : {reason}.",
       "spectateBanPermanent": "Tu ne peux plus regarder les parties des autres joueurs. Motif : {reason}."
+    },
+    "nameResetButton": "Valider le nouveau pseudo"
+  },
+  "adminModeration": {
+    "searchPlaceholder": "Chercher un joueur...",
+    "search": "Chercher",
+    "sanctionType": "Sanction",
+    "duration": "Durée",
+    "reasonPlaceholder": "Raison (obligatoire)...",
+    "apply": "Appliquer",
+    "applied": "Sanction appliquée.",
+    "linkedToReport": "Lié au signalement",
+    "eloAdjustHint": "L'ajustement ELO réel se fait dans l'onglet joueurs, cette entrée trace la décision dans le dossier.",
+    "history": "Historique",
+    "cleanRecord": "Casier vierge.",
+    "revoked": "levée",
+    "revoke": "Lever",
+    "lastMessages": "Derniers messages",
+    "deleteMessage": "Suppr.",
+    "reportsAgainst": "Signalements reçus",
+    "reportsBy": "émis",
+    "noReports": "Aucun signalement.",
+    "openFile": "Dossier joueur",
+    "dismiss": "Sans suite",
+    "status": {
+      "pending": "En attente",
+      "resolved": "Traités",
+      "dismissed": "Sans suite"
+    },
+    "context": {
+      "game_chat": "Chat de partie",
+      "dm": "Message privé",
+      "profile": "Profil"
+    },
+    "types": {
+      "warn": "Avertissement",
+      "warn_severe": "Dernier avertissement",
+      "mute_chat": "Mute chat",
+      "shadow_mute": "Shadow-mute",
+      "ranked_ban": "Ban classé",
+      "suspension": "Suspension de compte",
+      "spectate_ban": "Interdiction de spectate",
+      "name_reset": "Reset du pseudo",
+      "message_delete": "Message supprimé",
+      "elo_adjust": "Ajustement ELO"
     }
   }
 }
