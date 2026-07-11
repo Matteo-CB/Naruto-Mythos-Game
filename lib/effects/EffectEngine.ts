@@ -6327,7 +6327,7 @@ export class EffectEngine {
           const d069mTopCard = d069mCharResult.character.stack?.length > 0
             ? d069mCharResult.character.stack[d069mCharResult.character.stack?.length - 1]
             : d069mCharResult.character.card;
-          const d069mFullRevealCost = (d069mTopCard.chakra ?? 0) + 2;
+          const d069mFullRevealCost = calculateEffectiveCost(newState, d069mOpponent, d069mTopCard, d069mCharResult.missionIndex, true) + 2;
           
           const d069mOppSide: 'player1Characters' | 'player2Characters' =
             d069mOpponent === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -6344,7 +6344,7 @@ export class EffectEngine {
             const d069mOldTop = d069mUpgradeTarget.stack?.length > 0
               ? d069mUpgradeTarget.stack[d069mUpgradeTarget.stack?.length - 1]
               : d069mUpgradeTarget.card;
-            d069mRevealCost = Math.max(0, (d069mTopCard.chakra ?? 0) - (d069mOldTop.chakra ?? 0)) + 2;
+            d069mRevealCost = Math.max(0, (d069mFullRevealCost - 2) - (d069mOldTop.chakra ?? 0)) + 2;
           }
           const d069mCanAfford = newState[d069mOpponent].chakra >= d069mRevealCost;
           const d069mLocked = isHiddenRevealBlocked(newState, d069mCharResult.missionIndex, d069mOpponent);
@@ -14969,7 +14969,7 @@ export class EffectEngine {
         const topCard_dosu = charResult_dosu.character.stack?.length > 0
           ? charResult_dosu.character.stack[charResult_dosu.character.stack?.length - 1]
           : charResult_dosu.character.card;
-        const fullRevealCost_dosu = (topCard_dosu.chakra ?? 0) + 2;
+        const fullRevealCost_dosu = calculateEffectiveCost(newState, opponentPlayer_dosu, topCard_dosu, charResult_dosu.missionIndex, true) + 2;
         
         const dosuOppSide: 'player1Characters' | 'player2Characters' =
           opponentPlayer_dosu === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -14986,7 +14986,7 @@ export class EffectEngine {
           const dosuOldTop = dosuUpgradeTarget.stack?.length > 0
             ? dosuUpgradeTarget.stack[dosuUpgradeTarget.stack?.length - 1]
             : dosuUpgradeTarget.card;
-          revealCost_dosu = Math.max(0, (topCard_dosu.chakra ?? 0) - (dosuOldTop.chakra ?? 0)) + 2;
+          revealCost_dosu = Math.max(0, (fullRevealCost_dosu - 2) - (dosuOldTop.chakra ?? 0)) + 2;
         }
         const canAfford_dosu = newState[opponentPlayer_dosu].chakra >= revealCost_dosu;
         const revealLocked_dosu = isHiddenRevealBlocked(newState, charResult_dosu.missionIndex, opponentPlayer_dosu);
@@ -15078,8 +15078,9 @@ export class EffectEngine {
           const oldTop_dosu69 = upgradeTarget_dosu69.stack?.length > 0
             ? upgradeTarget_dosu69.stack[upgradeTarget_dosu69.stack?.length - 1]
             : upgradeTarget_dosu69.card;
-          const upgradeDiff = Math.max(0, (charTopCard_dosu69.chakra ?? 0) - (oldTop_dosu69.chakra ?? 0));
-          actualCost_dosu69 = upgradeDiff + 2; // Dosu penalty (+2) applies on top of upgrade cost difference
+          const fullEff_dosu69 = calculateEffectiveCost(newState, opponent_dosu69, charTopCard_dosu69, mIdx_dosu69, true);
+          const upgradeDiff = Math.max(0, fullEff_dosu69 - (oldTop_dosu69.chakra ?? 0));
+          actualCost_dosu69 = upgradeDiff + 2;
         }
 
         

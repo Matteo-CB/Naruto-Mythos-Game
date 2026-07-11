@@ -73,6 +73,7 @@ interface PublicRoom {
   holoHue: number | null;
   isRanked: boolean;
   isAnonymous: boolean;
+  sealedSetChoice: string | null;
 }
 
 interface SocketStore {
@@ -636,6 +637,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           holoHue: typeof r.holoHue === 'number' ? r.holoHue : null,
           isRanked: r.isRanked === true,
           isAnonymous: r.isAnonymous === true,
+          sealedSetChoice: typeof r.sealedSetChoice === 'string' ? r.sealedSetChoice : null,
         }));
         set({ publicRooms: normalized });
       });

@@ -1502,7 +1502,9 @@
         "ss128Defeat": "Choji Akimichi: Choose an enemy character with Power 8 or more to defeat.",
         "ss108ConfirmScore": "SCORE Exam Stadium: A friendly character activates an instant DUEL effect, ignoring requirements?",
         "ss108ChooseCharacter": "Exam Stadium: Choose a friendly character to activate its DUEL effect."
-      }
+      },
+      "upgradeModifierConfirm": "Apply the UPGRADE effect",
+      "upgradeModifierDecline": "Keep the MAIN effect only"
     },
     "anim": {
       "cardPlayedHidden": "Card Played Hidden",

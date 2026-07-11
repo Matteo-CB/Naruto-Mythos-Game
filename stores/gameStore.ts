@@ -72,6 +72,7 @@ interface PendingTargetSelection {
   onSelect: (targetId: string) => void;
   onDecline?: () => void; // for optional effects
   declineLabelKey?: string; // i18n key for the decline button label (overrides default 'game.board.skip')
+  confirmLabelKey?: string;
   
   isMultiSelect?: boolean;
   minSelections?: number;
@@ -850,6 +851,11 @@ function buildPendingTargetSelectionUI(
   } else if (tst === 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT') {
     declineLabelKey = 'game.effect.dosu069Defeat';
   }
+  let confirmLabelKey: string | undefined;
+  if (tst.endsWith('_CONFIRM_UPGRADE_MODIFIER')) {
+    confirmLabelKey = 'game.effect.upgradeModifierConfirm';
+    declineLabelKey = 'game.effect.upgradeModifierDecline';
+  }
 
   return {
     validTargets: pendingAction.options,
@@ -872,6 +878,7 @@ function buildPendingTargetSelectionUI(
           ? undefined
           : ((pendingEffect?.isOptional || pendingEffect?.rootOptional) ? onDecline : undefined)),
     declineLabelKey: isMultiSelectChoose ? 'game.board.skip' : declineLabelKey,
+    confirmLabelKey,
     isMultiSelect: isMultiSelectChoose || undefined,
     minSelections: isMultiSelectChoose ? (pendingAction.minSelections ?? 0) : (tst === 'ORDERED_DEFEAT' ? pendingAction.minSelections : undefined),
     maxSelections: isMultiSelectChoose ? (pendingAction.maxSelections ?? 1) : pendingAction.maxSelections,

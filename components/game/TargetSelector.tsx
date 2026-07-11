@@ -1625,11 +1625,11 @@ export function TargetSelector() {
 
             <div className="flex items-center justify-center gap-6">
               <PopupActionButton onClick={() => handleSelect(confirmTarget)}>
-                {t('game.board.confirm')}
+                {pendingTargetSelection.confirmLabelKey ? t(pendingTargetSelection.confirmLabelKey) : t('game.board.confirm')}
               </PopupActionButton>
               {canDecline && (
                 <PopupDismissLink onClick={handleDecline}>
-                  {t('game.board.skip')}
+                  {declineLabelKey ? t(declineLabelKey) : t('game.board.skip')}
                 </PopupDismissLink>
               )}
             </div>

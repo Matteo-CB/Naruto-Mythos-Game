@@ -725,8 +725,8 @@ function cleanupPlayerRoom(socket: Socket): void {
 }
 
 
-function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: string; createdAt: number; isEvolving: boolean; holoHue: number | null; isRanked: boolean; isAnonymous: boolean }> {
-  const list: Array<{ code: string; hostName: string; gameMode: string; createdAt: number; isEvolving: boolean; holoHue: number | null; isRanked: boolean; isAnonymous: boolean }> = [];
+function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: string; createdAt: number; isEvolving: boolean; holoHue: number | null; isRanked: boolean; isAnonymous: boolean; sealedSetChoice: string | null }> {
+  const list: Array<{ code: string; hostName: string; gameMode: string; createdAt: number; isEvolving: boolean; holoHue: number | null; isRanked: boolean; isAnonymous: boolean; sealedSetChoice: string | null }> = [];
   const staleRoomCodes: string[] = [];
   for (const [code, room] of rooms) {
     if (room.isPrivate) continue;
@@ -749,6 +749,7 @@ function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: 
       holoHue: room.holoHue ?? null,
       isRanked: room.isRanked === true,
       isAnonymous: room.isAnonymous === true,
+      sealedSetChoice: room.gameMode === 'sealed' ? (room.sealedSetChoice ?? 'random') : null,
     });
   }
   

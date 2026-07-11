@@ -1506,7 +1506,9 @@
         "ss128Defeat": "秋道チョウジ：撃破するパワー8以上の敵キャラクターを選んでください。",
         "ss108ConfirmScore": "SCORE 試験スタジアム：味方キャラクター1体が条件を無視して即時DUEL効果を発動しますか？",
         "ss108ChooseCharacter": "試験スタジアム：DUEL効果を発動する味方キャラクターを選んでください。"
-      }
+      },
+      "upgradeModifierConfirm": "UPGRADE効果を適用",
+      "upgradeModifierDecline": "MAIN効果のみを使用"
     },
     "anim": {
       "cardPlayedHidden": "カードを伏せて出した",

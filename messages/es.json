@@ -1507,7 +1507,9 @@
         "ss128Defeat": "Choji Akimichi: Elige un personaje enemigo con Poder 8 o más para derrotar.",
         "ss108ConfirmScore": "SCORE Estadio del Examen: ¿Un personaje aliado activa un efecto DUEL instantáneo ignorando sus requisitos?",
         "ss108ChooseCharacter": "Estadio del Examen: Elige un personaje aliado para activar su efecto DUEL."
-      }
+      },
+      "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
+      "upgradeModifierDecline": "Mantener solo el efecto MAIN"
     },
     "anim": {
       "cardPlayedHidden": "Carta jugada oculta",

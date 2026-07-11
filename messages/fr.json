@@ -1508,7 +1508,9 @@
         "ss128Defeat": "Chôji Akimichi : Choisissez un personnage ennemi avec 8 Puissance ou plus à vaincre.",
         "ss108ConfirmScore": "SCORE Stade d'Examen : Un personnage allié active un effet DUEL instantané en ignorant ses conditions ?",
         "ss108ChooseCharacter": "Stade d'Examen : Choisissez un personnage allié pour activer son effet DUEL."
-      }
+      },
+      "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
+      "upgradeModifierDecline": "Garder l'effet MAIN seul"
     },
     "anim": {
       "cardPlayedHidden": "Carte jouée face cachée",

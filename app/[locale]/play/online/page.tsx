@@ -912,6 +912,7 @@ function RoomColumn({
                 holoHue={room.holoHue}
                 isRanked={room.isRanked}
                 isAnonymous={room.isAnonymous}
+                sealedSetChoice={room.sealedSetChoice}
                 onJoin={() => onJoin(room.code)}
               />
             ))}

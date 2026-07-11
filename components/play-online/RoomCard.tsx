@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { getSetName } from '@/lib/data/sets/registry';
 import { HoloSurface } from '@/components/HoloSurface';
 import { holoFromHue } from '@/lib/utils/holoColor';
 
@@ -14,6 +15,7 @@ interface RoomCardProps {
   holoHue: number | null;
   isRanked: boolean;
   isAnonymous: boolean;
+  sealedSetChoice?: string | null;
   onJoin: () => void;
 }
 
@@ -25,9 +27,17 @@ export function RoomCard({
   holoHue,
   isRanked,
   isAnonymous,
+  sealedSetChoice,
   onJoin,
 }: RoomCardProps) {
   const t = useTranslations();
+  const locale = useLocale();
+
+  const sealedSetLabel = gameMode === 'sealed'
+    ? (!sealedSetChoice || sealedSetChoice === 'random'
+        ? t('online.sealed.setRandom')
+        : getSetName(sealedSetChoice, locale))
+    : null;
 
   const anonymousDisplay = hostName === '__anonymous__';
   const displayName = anonymousDisplay ? t('online.anonymous.name') : hostName;
@@ -56,6 +66,7 @@ export function RoomCard({
         </span>
         <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
           <ChipText label={t(`online.mode.${isRanked ? 'ranked' : gameMode}`)} accent={isRanked ? '#b33e3e' : '#c4a35a'} />
+          {sealedSetLabel && <ChipText label={sealedSetLabel} accent="#8fae6b" />}
           {isAnonymous && <ChipText label={t('online.badge.anonymous')} accent="#888" />}
           {isEvolving && <EvoBadge holoHue={holoHue} />}
           <span className="text-[9px]" style={{ color: '#444', marginLeft: 4 }}>
