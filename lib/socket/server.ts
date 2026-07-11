@@ -1985,6 +1985,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
 
       registerUserSocket(userId, socket.id);
+      getUnreadDmCount(userId)
+        .then((total) => socket.emit('dm:unread-count', { total }))
+        .catch(() => {});
 
 
       if (room.gameState && !room.finalized) {

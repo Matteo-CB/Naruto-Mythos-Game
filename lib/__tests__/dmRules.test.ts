@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { decideDmPermission, threadKeyContains, otherUserIdFromThreadKey } from '@/lib/dm/dmRules';
+import { decideDmPermission, threadKeyContains, otherUserIdFromThreadKey, summarizeThreads } from '@/lib/dm/dmRules';
 import { dmThreadKey } from '@/lib/chat/constants';
 
 describe('dmThreadKey', () => {
@@ -47,5 +47,34 @@ describe('decideDmPermission', () => {
   it('mute wins over block and friendship checks', () => {
     expect(decideDmPermission({ areFriends: false, blockedEither: true, muted: true, suspended: false, shadowMuted: false }))
       .toEqual({ ok: false, errorKey: 'chat.muted' });
+  });
+});
+
+describe('summarizeThreads (unread counter)', () => {
+  function msg(threadKey: string, senderId: string, receiverId: string, read: boolean, ageMs: number) {
+    return { threadKey, senderId, receiverId, readAt: read ? new Date(1000) : null, createdAt: new Date(100000 - ageMs) };
+  }
+
+  it('counts only unread messages addressed to me, keeps the newest as last', () => {
+    const me = 'me';
+    const messages = [
+      msg('a:me', 'a', me, false, 0),
+      msg('a:me', 'a', me, false, 10),
+      msg('a:me', me, 'a', false, 20),
+      msg('a:me', 'a', me, true, 30),
+      msg('b:me', me, 'b', false, 5),
+    ];
+    const out = summarizeThreads(messages, me);
+    const threadA = out.find((t) => t.threadKey === 'a:me')!;
+    const threadB = out.find((t) => t.threadKey === 'b:me')!;
+    expect(threadA.unread).toBe(2);
+    expect(threadA.last).toBe(messages[0]);
+    expect(threadB.unread).toBe(0);
+    expect(threadB.last).toBe(messages[4]);
+  });
+
+  it('my own sent messages never count as unread', () => {
+    const out = summarizeThreads([msg('a:me', 'me', 'a', false, 0)], 'me');
+    expect(out[0].unread).toBe(0);
   });
 });

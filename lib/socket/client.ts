@@ -854,6 +854,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('chat:error', (data: { message: string; errorKey?: string }) => {
         set({ error: data.message, errorKey: data.errorKey ?? null });
+        if (data.errorKey && (data.errorKey.startsWith('dm.') || data.errorKey === 'chat.muted')) {
+          import('@/stores/dmStore').then(({ useDmStore }) => {
+            const dm = useDmStore.getState();
+            if (dm.isOpen && dm.view === 'thread') dm.loadMessages();
+          }).catch(() => {});
+        }
       });
 
       socket.on('dm:message', (msg: { id: string; threadKey: string; senderId: string; receiverId: string; body: string; createdAt: number }) => {

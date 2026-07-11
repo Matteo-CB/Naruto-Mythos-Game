@@ -3,7 +3,7 @@ import { dmThreadKey, DM_MAX_LENGTH } from '@/lib/chat/constants';
 import { sanitizeChatText } from '@/lib/chat/chatDelivery';
 import { maskProfanity } from '@/lib/chat/wordFilter';
 import { getModerationFlags } from '@/lib/moderation/sanctions';
-import { decideDmPermission, otherUserIdFromThreadKey, type DmPermission } from './dmRules';
+import { decideDmPermission, otherUserIdFromThreadKey, summarizeThreads, type DmPermission } from './dmRules';
 
 export interface DmMessageView {
   id: string;
@@ -145,15 +145,8 @@ export async function listThreads(userId: string): Promise<DmThreadView[]> {
     take: 400,
   });
 
-  const byThread = new Map<string, { last: typeof messages[number]; unread: number }>();
-  for (const m of messages) {
-    const entry = byThread.get(m.threadKey);
-    if (!entry) {
-      byThread.set(m.threadKey, { last: m, unread: m.receiverId === userId && !m.readAt ? 1 : 0 });
-    } else if (m.receiverId === userId && !m.readAt) {
-      entry.unread++;
-    }
-  }
+  const summaries = summarizeThreads(messages, userId);
+  const byThread = new Map(summaries.map((sm) => [sm.threadKey, sm]));
 
   const partnerIds = [...byThread.keys()]
     .map((k) => otherUserIdFromThreadKey(k, userId))
