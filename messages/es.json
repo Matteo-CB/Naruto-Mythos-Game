@@ -641,7 +641,18 @@
     "hideVariantsHint": "Cuando está activado, las cartas Rare Art, Mythos, Secreta y variantes especiales se ocultan por defecto en el creador de mazos.",
     "sound": "Efectos de sonido",
     "soundOn": "Los sonidos están activados.",
-    "soundOff": "Todos los sonidos están desactivados."
+    "soundOff": "Todos los sonidos están desactivados.",
+    "chatSection": "Chat y mensajes",
+    "chatVisibilityLabel": "¿Quién puede escribirte?",
+    "chatVisibility": {
+      "everyone": "Todo el mundo",
+      "friends": "Solo mis amigos",
+      "off": "Nadie (chat desactivado)"
+    },
+    "chatVisibilityHint": "Se aplica al chat de partida y a los mensajes privados. Los mensajes privados siguen siendo solo para amigos.",
+    "blockedPlayers": "Jugadores bloqueados",
+    "blockedEmpty": "No has bloqueado a nadie.",
+    "unblock": "Desbloquear"
   },
   "game": {
     "turn": "Turno {turn}",
@@ -3448,5 +3459,39 @@
     "notFriends": "Debéis ser amigos para escribiros.",
     "disabled": "Esta conversación está desactivada.",
     "retention": "Los mensajes privados se conservan 30 días."
+  },
+  "chatIntro": {
+    "title": "El chat llega al simulador",
+    "intro": "Ahora puedes escribir mensajes reales durante tus partidas en línea y hablar en privado con tus amigos.",
+    "featuresTitle": "Lo que puedes hacer",
+    "features0": "Escribir libremente en el chat de partida, con 5 emotes rápidos.",
+    "features1": "Enviar mensajes privados a tus amigos desde la página de Amigos, un perfil o una partida.",
+    "features2": "Agregar a un jugador como amigo directamente durante una partida.",
+    "features3": "Elegir quién puede escribirte en las Opciones: todo el mundo, tus amigos o nadie.",
+    "features4": "Bloquear a un jugador: ya no podrá escribirte, agregarte como amigo ni invitarte a una partida.",
+    "features5": "Denunciar un mensaje o a un jugador: nuestro equipo revisa cada denuncia.",
+    "respect": "Respeta a los demás jugadores. Los insultos, el acoso y las trampas denunciadas conllevan sanciones: advertencia, chat cortado o incluso suspensión de la cuenta.",
+    "outro": "Diviértete, y que gane el mejor ninja.",
+    "button": "Entendido"
+  },
+  "notify": {
+    "warnTitle": "Advertencia",
+    "warnBody": "Un moderador te ha enviado una advertencia: {reason}. Respeta a los demás jugadores. En caso de reincidencia se aplicarán sanciones más severas.",
+    "warnSevereTitle": "Última advertencia",
+    "warnSevereBody": "Esta es tu última advertencia: {reason}. La próxima infracción supondrá una suspensión del chat o de la cuenta.",
+    "sanctionTitle": "Sanción",
+    "victimTitle": "Denuncia tramitada",
+    "victimBody": "Tu denuncia ha sido revisada y el jugador implicado ha sido sancionado. Gracias por ayudar a mantener una comunidad agradable.",
+    "nameResetTitle": "Cambia tu nombre de usuario",
+    "nameResetBody": "Tu nombre de usuario no respeta las reglas de la comunidad. Elige uno nuevo para seguir jugando.",
+    "sanction": {
+      "muteTimed": "Tu chat está suspendido hasta el {date}. Motivo: {reason}.",
+      "mutePermanent": "Tu chat está suspendido definitivamente. Motivo: {reason}.",
+      "rankedBan": "El modo clasificatorio está cerrado para ti hasta el {date}. Motivo: {reason}.",
+      "suspensionTimed": "Tu cuenta está suspendida hasta el {date}. Motivo: {reason}.",
+      "suspensionPermanent": "Tu cuenta está suspendida definitivamente. Motivo: {reason}.",
+      "spectateBan": "Ya no puedes ver las partidas de otros jugadores hasta el {date}. Motivo: {reason}.",
+      "spectateBanPermanent": "Ya no puedes ver las partidas de otros jugadores. Motivo: {reason}."
+    }
   }
 }

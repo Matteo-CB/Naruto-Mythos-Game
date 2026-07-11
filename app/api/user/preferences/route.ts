@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { COUNTRY_CODES } from '@/lib/data/countries';
+import { refreshChatLock } from '@/lib/socket/chatLockBridge';
+import { normalizeChatVisibility } from '@/lib/chat/chatRules';
 
 export async function GET() {
   try {
@@ -12,7 +14,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, countryCode: true },
+      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, countryCode: true, chatVisibility: true },
     });
 
     return NextResponse.json({
@@ -22,6 +24,7 @@ export async function GET() {
       allowSpectatorHand: user?.allowSpectatorHand ?? false,
       hideDeckBuilderVariants: user?.hideDeckBuilderVariants ?? false,
       countryCode: user?.countryCode ?? null,
+      chatVisibility: normalizeChatVisibility(user?.chatVisibility),
     });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -58,6 +61,9 @@ export async function PATCH(request: NextRequest) {
     } else if (typeof body.countryCode === 'string' && COUNTRY_CODES.has(body.countryCode)) {
       update.countryCode = body.countryCode;
     }
+    if (typeof body.chatVisibility === 'string' && ['everyone', 'friends', 'off'].includes(body.chatVisibility)) {
+      update.chatVisibility = body.chatVisibility;
+    }
 
     if (Object.keys(update).length === 0) {
       return NextResponse.json({ error: 'No valid fields' }, { status: 400 });
@@ -67,6 +73,10 @@ export async function PATCH(request: NextRequest) {
       where: { id: session.user.id },
       data: update,
     });
+
+    if (typeof update.chatVisibility === 'string') {
+      refreshChatLock(session.user.id);
+    }
 
     return NextResponse.json({ success: true, ...update });
   } catch {

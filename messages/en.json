@@ -636,7 +636,18 @@
     "hideVariantsHint": "When on, Rare Art, Mythos, Secret and special variant cards are hidden by default in the deck builder.",
     "sound": "Sound effects",
     "soundOn": "Sounds are on.",
-    "soundOff": "All sounds are off."
+    "soundOff": "All sounds are off.",
+    "chatSection": "Chat and messages",
+    "chatVisibilityLabel": "Who can write to you?",
+    "chatVisibility": {
+      "everyone": "Everyone",
+      "friends": "My friends only",
+      "off": "Nobody (chat disabled)"
+    },
+    "chatVisibilityHint": "Applies to the game chat and private messages. Private messages remain friends-only.",
+    "blockedPlayers": "Blocked players",
+    "blockedEmpty": "You have not blocked anyone.",
+    "unblock": "Unblock"
   },
   "game": {
     "turn": "Turn {turn}",
@@ -3443,5 +3454,39 @@
     "notFriends": "You must be friends to write to each other.",
     "disabled": "This conversation is disabled.",
     "retention": "Private messages are kept for 30 days."
+  },
+  "chatIntro": {
+    "title": "Chat is here",
+    "intro": "You can now write real messages during your online games, and chat privately with your friends.",
+    "featuresTitle": "What you can do",
+    "features0": "Write freely in the game chat, with 5 quick emotes.",
+    "features1": "Send private messages to your friends from the Friends page, a profile or a game.",
+    "features2": "Add a player as a friend directly during a game.",
+    "features3": "Choose who can write to you in the Options: everyone, your friends, or nobody.",
+    "features4": "Block a player: they can no longer write to you, add you as a friend or invite you to a match.",
+    "features5": "Report a message or a player: our team reviews every report.",
+    "respect": "Respect other players. Insults, harassment and reported cheating lead to sanctions: warning, chat removal, or even account suspension.",
+    "outro": "Have fun, and may the best ninja win.",
+    "button": "Got it"
+  },
+  "notify": {
+    "warnTitle": "Warning",
+    "warnBody": "A moderator has issued you a warning: {reason}. Please respect other players. Further offenses will lead to heavier sanctions.",
+    "warnSevereTitle": "Final warning",
+    "warnSevereBody": "This is your final warning: {reason}. The next offense will result in a chat or account suspension.",
+    "sanctionTitle": "Sanction",
+    "victimTitle": "Report handled",
+    "victimBody": "Your report has been reviewed and the player involved has been sanctioned. Thank you for helping keep the community welcoming.",
+    "nameResetTitle": "Change your username",
+    "nameResetBody": "Your username does not follow the community rules. Choose a new one to keep playing.",
+    "sanction": {
+      "muteTimed": "Your chat is suspended until {date}. Reason: {reason}.",
+      "mutePermanent": "Your chat is permanently suspended. Reason: {reason}.",
+      "rankedBan": "Ranked mode is closed to you until {date}. Reason: {reason}.",
+      "suspensionTimed": "Your account is suspended until {date}. Reason: {reason}.",
+      "suspensionPermanent": "Your account is permanently suspended. Reason: {reason}.",
+      "spectateBan": "You can no longer watch other players' games until {date}. Reason: {reason}.",
+      "spectateBanPermanent": "You can no longer watch other players' games. Reason: {reason}."
+    }
   }
 }

@@ -10,6 +10,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { FriendshipButton } from '@/components/social/FriendshipButton';
+import { ProfileModerationActions } from '@/components/social/ProfileModerationActions';
 import { getRankTier, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
 import { CountryFlag } from '@/components/CountryFlag';
@@ -320,7 +321,10 @@ export default function ProfilePage({
           className="flex items-center justify-end gap-2 mb-7"
         >
           {session?.user?.id && profile.id !== session.user.id && (
-            <FriendshipButton userId={profile.id} username={profile.username} />
+            <>
+              <FriendshipButton userId={profile.id} username={profile.username} />
+              <ProfileModerationActions userId={profile.id} username={profile.username} />
+            </>
           )}
           <LanguageSwitcher />
           <Link

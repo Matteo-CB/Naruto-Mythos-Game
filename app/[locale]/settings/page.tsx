@@ -7,6 +7,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { FlagPicker } from '@/components/FlagPicker';
+import { ChatSettingsSection } from '@/components/settings/ChatSettingsSection';
 import { useEffect, useState, useCallback } from 'react';
 
 const DELETE_ACCOUNT_PHRASE = 'DELETE MY ACCOUNT';
@@ -409,6 +410,8 @@ export default function SettingsPage() {
             </p>
           </div>
         </div>
+
+        <ChatSettingsSection />
 
         {backgrounds.length > 0 && (
           <div

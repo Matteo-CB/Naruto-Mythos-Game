@@ -6,8 +6,11 @@ interface BackgroundOption {
   url: string;
 }
 
+export type ChatVisibilitySetting = 'everyone' | 'friends' | 'off';
+
 interface SettingsState {
   animationsEnabled: boolean;
+  chatVisibility: ChatVisibilitySetting;
   soundEnabled: boolean;
   soundVolume: number;
   allowSpectatorHand: boolean;
@@ -25,6 +28,7 @@ interface SettingsState {
   setHideDeckBuilderVariants: (v: boolean) => Promise<void>;
   setCountryCode: (code: string | null) => Promise<void>;
   setGameBackground: (id: string, url: string) => Promise<void>;
+  setChatVisibility: (v: ChatVisibilitySetting) => Promise<void>;
 }
 
 const DEFAULT_BG_URL = '/images/backgrounds/1.webp';
@@ -60,6 +64,7 @@ function getLocalSound(): { enabled: boolean; volume: number } {
 
 export const useSettingsStore = create<SettingsState>()((set, get) => ({
   animationsEnabled: true,
+  chatVisibility: 'everyone',
   soundEnabled: getLocalSound().enabled,
   soundVolume: getLocalSound().volume,
   allowSpectatorHand: false,
@@ -94,6 +99,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
 
       set({
         animationsEnabled: prefs.animationsEnabled ?? true,
+        chatVisibility: (['everyone', 'friends', 'off'].includes(prefs.chatVisibility) ? prefs.chatVisibility : 'everyone') as ChatVisibilitySetting,
         soundEnabled: prefs.soundsEnabled ?? get().soundEnabled,
         allowSpectatorHand: prefs.allowSpectatorHand ?? false,
         hideDeckBuilderVariants: prefs.hideDeckBuilderVariants ?? false,
@@ -186,6 +192,21 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       if (!res.ok) throw new Error('Failed to save');
     } catch {
       set({ countryCode: prev });
+    }
+  },
+
+  setChatVisibility: async (v: ChatVisibilitySetting) => {
+    const prev = get().chatVisibility;
+    set({ chatVisibility: v });
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chatVisibility: v }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+    } catch {
+      set({ chatVisibility: prev });
     }
   },
 

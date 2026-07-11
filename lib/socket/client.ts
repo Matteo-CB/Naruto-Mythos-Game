@@ -846,6 +846,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ chatMessages: data.messages ?? [] });
       });
 
+      socket.on('notify:popup', (data: { id: string; kind: string; payload: unknown; createdAt: number }) => {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('notify:popup', { detail: data }));
+        }
+      });
+
       socket.on('daily-quest:rotated', () => {
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new Event('daily-quest:rotated'));
