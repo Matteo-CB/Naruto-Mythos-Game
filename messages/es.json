@@ -3497,7 +3497,8 @@
       "spectateBan": "Ya no puedes ver las partidas de otros jugadores hasta el {date}. Motivo: {reason}.",
       "spectateBanPermanent": "Ya no puedes ver las partidas de otros jugadores. Motivo: {reason}."
     },
-    "nameResetButton": "Confirmar nuevo nombre"
+    "nameResetButton": "Confirmar nuevo nombre",
+    "suspendedTitle": "Cuenta suspendida"
   },
   "adminModeration": {
     "searchPlaceholder": "Buscar un jugador...",

@@ -22,6 +22,7 @@ export function PlayerNoticeGate() {
   const bcp47 = useLocaleBcp47();
   const [introNeeded, setIntroNeeded] = useState(false);
   const [nameResetNeeded, setNameResetNeeded] = useState(false);
+  const [suspension, setSuspension] = useState<{ untilTs: number | null; reason: string } | null>(null);
   const [newName, setNewName] = useState('');
   const [nameError, setNameError] = useState<string | null>(null);
   const [nameBusy, setNameBusy] = useState(false);
@@ -39,6 +40,7 @@ export function PlayerNoticeGate() {
         if (cancelled || !data) return;
         setIntroNeeded(data.chatIntroSeen === false);
         setNameResetNeeded(data.usernameResetRequired === true);
+        setSuspension(data.suspended === true ? { untilTs: data.suspendedUntilTs ?? null, reason: data.suspensionReason ?? '' } : null);
         setNotices(data.notifications ?? []);
         setFetched(true);
       })
@@ -93,6 +95,25 @@ export function PlayerNoticeGate() {
   };
 
   if (!userId) return null;
+
+  if (suspension) {
+    const suspBody = suspension.untilTs
+      ? t('notify.sanction.suspensionTimed', {
+          date: new Intl.DateTimeFormat(bcp47, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(suspension.untilTs)),
+          reason: suspension.reason,
+        })
+      : t('notify.sanction.suspensionPermanent', { reason: suspension.reason });
+    return (
+      <PopupOverlay>
+        <PopupCornerFrame accentColor="rgba(179, 62, 62, 0.45)" maxWidth="460px">
+          <PopupTitle accentColor="#b33e3e" size="md">{t('notify.suspendedTitle')}</PopupTitle>
+          <p className="mb-5 text-center text-xs leading-relaxed" style={{ color: '#c8c8c8' }}>
+            {suspBody}
+          </p>
+        </PopupCornerFrame>
+      </PopupOverlay>
+    );
+  }
 
   if (nameResetNeeded) {
     return (

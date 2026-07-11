@@ -3492,7 +3492,8 @@
       "spectateBan": "You can no longer watch other players' games until {date}. Reason: {reason}.",
       "spectateBanPermanent": "You can no longer watch other players' games. Reason: {reason}."
     },
-    "nameResetButton": "Confirm new username"
+    "nameResetButton": "Confirm new username",
+    "suspendedTitle": "Account suspended"
   },
   "adminModeration": {
     "searchPlaceholder": "Search a player...",

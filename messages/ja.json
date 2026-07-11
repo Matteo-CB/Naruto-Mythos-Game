@@ -3496,7 +3496,8 @@
       "spectateBan": "{date}まで他のプレイヤーの対戦を観戦できません。理由：{reason}。",
       "spectateBanPermanent": "他のプレイヤーの対戦を観戦できません。理由：{reason}。"
     },
-    "nameResetButton": "新しいユーザー名を確定"
+    "nameResetButton": "新しいユーザー名を確定",
+    "suspendedTitle": "アカウント停止中"
   },
   "adminModeration": {
     "searchPlaceholder": "プレイヤーを検索...",

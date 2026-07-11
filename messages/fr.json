@@ -3498,7 +3498,8 @@
       "spectateBan": "Tu ne peux plus regarder les parties des autres joueurs jusqu'au {date}. Motif : {reason}.",
       "spectateBanPermanent": "Tu ne peux plus regarder les parties des autres joueurs. Motif : {reason}."
     },
-    "nameResetButton": "Valider le nouveau pseudo"
+    "nameResetButton": "Valider le nouveau pseudo",
+    "suspendedTitle": "Compte suspendu"
   },
   "adminModeration": {
     "searchPlaceholder": "Chercher un joueur...",
