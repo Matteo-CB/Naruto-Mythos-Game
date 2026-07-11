@@ -3663,7 +3663,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       let shadowMuted = false;
       try {
         const flags = await getModerationFlags(userId);
-        muted = flags.muted;
+        muted = flags.muted || flags.suspended;
         shadowMuted = flags.shadowMuted;
         if (!muted) {
           const user = await prisma.user.findUnique({
