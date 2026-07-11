@@ -2070,7 +2070,10 @@
     "eloRangeTop": "{min}+",
     "unranked": "Sin clasificar",
     "placementProgress": "Colocación: {current}/{total}",
-    "searchPlaceholder": "Buscar jugador..."
+    "searchPlaceholder": "Buscar jugador...",
+    "countryFilterLabel": "País",
+    "countryAll": "Todos los países",
+    "countryNone": "Sin país"
   },
   "profile": {
     "title": "Perfil del jugador",

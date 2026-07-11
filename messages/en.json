@@ -2065,7 +2065,10 @@
     "eloRangeTop": "{min}+",
     "unranked": "Unranked",
     "placementProgress": "Placement: {current}/{total}",
-    "searchPlaceholder": "Search player..."
+    "searchPlaceholder": "Search player...",
+    "countryFilterLabel": "Country",
+    "countryAll": "All countries",
+    "countryNone": "No country"
   },
   "profile": {
     "title": "Player Profile",

@@ -2071,7 +2071,10 @@
     "eloRangeTop": "{min}+",
     "unranked": "Non classé",
     "placementProgress": "Placement : {current}/{total}",
-    "searchPlaceholder": "Rechercher un joueur..."
+    "searchPlaceholder": "Rechercher un joueur...",
+    "countryFilterLabel": "Pays",
+    "countryAll": "Tous les pays",
+    "countryNone": "Sans pays"
   },
   "profile": {
     "title": "Profil du Joueur",

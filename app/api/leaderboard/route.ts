@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { LEAGUE_TIERS } from '@/lib/tournament/leagueUtils';
+import { COUNTRY_CODES } from '@/lib/data/countries';
 
 const PLACEMENT_MATCHES = 5;
 
@@ -12,6 +13,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')?.trim() || '';
     const league = searchParams.get('league')?.trim() || '';
     const type = searchParams.get('type')?.trim() === 'evolving' ? 'evolving' : 'ranked';
+    const countryParam = searchParams.get('country')?.trim() || '';
+    const country = countryParam === 'none' || COUNTRY_CODES.has(countryParam) ? countryParam : '';
     const isEvolving = type === 'evolving';
     const eloField = isEvolving ? 'evolvingElo' : 'elo';
 
@@ -19,6 +22,12 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       conditions.push({ username: { contains: search, mode: 'insensitive' as const } });
+    }
+
+    if (country === 'none') {
+      conditions.push({ countryCode: null });
+    } else if (country) {
+      conditions.push({ countryCode: country });
     }
 
     if (isEvolving) {
@@ -83,6 +92,8 @@ export async function GET(request: NextRequest) {
         { draws: { lt: PLACEMENT_MATCHES } },
       ];
       if (search) unrankedConditions.push({ username: { contains: search, mode: 'insensitive' as const } });
+      if (country === 'none') unrankedConditions.push({ countryCode: null });
+      else if (country) unrankedConditions.push({ countryCode: country });
       const allUsers = await prisma.user.findMany({
         where: { AND: unrankedConditions },
         select: { id: true, username: true, countryCode: true, elo: true, evolvingElo: true, wins: true, losses: true, draws: true, evolvingWins: true, evolvingLosses: true, evolvingDraws: true, role: true, badgePrefs: true, consecutiveWins: true, consecutiveLosses: true, tournamentWins: true },
@@ -102,7 +113,17 @@ export async function GET(request: NextRequest) {
       users = users.slice(offset, offset + limit);
     }
 
-    const response = NextResponse.json({ users, total, limit, offset, type });
+    const distinctCountries = await prisma.user.findMany({
+      where: { countryCode: { not: null } },
+      distinct: ['countryCode'],
+      select: { countryCode: true },
+    });
+    const countries = distinctCountries
+      .map((u) => u.countryCode)
+      .filter((c): c is string => typeof c === 'string' && c.length > 0)
+      .sort();
+
+    const response = NextResponse.json({ users, total, limit, offset, type, countries });
     response.headers.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60');
     return response;
   } catch {

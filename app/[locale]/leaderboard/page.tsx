@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { CountryFlag } from '@/components/CountryFlag';
+import { useLocaleBcp47 } from '@/lib/i18n/useLocaleMeta';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { RANK_TIERS, PLACEMENT_MATCHES_REQUIRED, getRankTier } from '@/components/EloBadge';
@@ -236,6 +237,8 @@ export default function LeaderboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [leagueFilter, setLeagueFilter] = useState('');
+  const [countryFilter, setCountryFilter] = useState('');
+  const [availableCountries, setAvailableCountries] = useState<string[]>([]);
   const [selfUsername, setSelfUsername] = useState<string | null>(null);
   const [boardType, setBoardType] = useState<LeaderboardType>(() => {
     if (typeof window === 'undefined') return 'ranked';
@@ -274,7 +277,7 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearch, leagueFilter]);
+  }, [debouncedSearch, leagueFilter, countryFilter]);
 
   useEffect(() => {
     fetch('/api/settings')
@@ -292,16 +295,18 @@ export default function LeaderboardPage() {
     const offset = (currentPage - 1) * PLAYERS_PER_PAGE;
     const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : '';
     const leagueParam = boardType === 'evolving' || !leagueFilter ? '' : `&league=${encodeURIComponent(leagueFilter)}`;
+    const countryParam = countryFilter ? `&country=${encodeURIComponent(countryFilter)}` : '';
     const typeParam = boardType === 'evolving' ? `&type=evolving` : '';
-    fetch(`/api/leaderboard?limit=${PLAYERS_PER_PAGE}&offset=${offset}${searchParam}${leagueParam}${typeParam}`)
+    fetch(`/api/leaderboard?limit=${PLAYERS_PER_PAGE}&offset=${offset}${searchParam}${leagueParam}${countryParam}${typeParam}`)
       .then((res) => res.json())
       .then((data) => {
         setUsers(data.users || []);
         setTotalPlayers(data.total || 0);
+        setAvailableCountries(data.countries || []);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [currentPage, debouncedSearch, leagueFilter, boardType]);
+  }, [currentPage, debouncedSearch, leagueFilter, countryFilter, boardType]);
 
   const handleClearSearch = useCallback(() => {
     setSearchQuery('');
@@ -310,7 +315,12 @@ export default function LeaderboardPage() {
 
   const totalPages = Math.max(1, Math.ceil(totalPlayers / PLAYERS_PER_PAGE));
   const totalCount = useCountUp(totalPlayers, 600);
-  const pageKey = useMemo(() => `${currentPage}-${debouncedSearch}-${leagueFilter}`, [currentPage, debouncedSearch, leagueFilter]);
+  const bcp47 = useLocaleBcp47();
+  const countryDisplayNames = useMemo(() => {
+    try { return new Intl.DisplayNames([bcp47], { type: 'region' }); } catch { return null; }
+  }, [bcp47]);
+
+  const pageKey = useMemo(() => `${currentPage}-${debouncedSearch}-${leagueFilter}-${countryFilter}`, [currentPage, debouncedSearch, leagueFilter, countryFilter]);
 
   return (
     <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
@@ -504,6 +514,32 @@ export default function LeaderboardPage() {
             />
           </motion.div>
         )}
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="flex items-center gap-2 mb-5 flex-wrap"
+        >
+          <span className="font-display text-[10px] uppercase tracking-widest" style={{ color: '#666' }}>
+            {t('countryFilterLabel')}
+          </span>
+          <select
+            value={countryFilter}
+            onChange={(e) => setCountryFilter(e.target.value)}
+            className="px-3 py-2 text-[12px] cursor-pointer"
+            style={{ backgroundColor: '#14141a', color: countryFilter ? '#c4a35a' : '#999', border: '1px solid #262626', outline: 'none' }}
+          >
+            <option value="">{t('countryAll')}</option>
+            {availableCountries.map((code) => (
+              <option key={code} value={code}>
+                {countryDisplayNames?.of(code) ?? code}
+              </option>
+            ))}
+            <option value="none">{t('countryNone')}</option>
+          </select>
+          {countryFilter && countryFilter !== 'none' && <CountryFlag code={countryFilter} size={18} />}
+        </motion.div>
 
         <section>
           {!loading && totalPlayers > 0 && (

@@ -2,29 +2,73 @@
   "entries": [
     {
       "date": "2026-07-11",
-      "title_fr": "Choix UPGRADE clarifiés, coûts de révélation corrigés et salons scellés plus lisibles",
-      "title_en": "Clearer UPGRADE choices, corrected reveal costs and clearer sealed rooms",
-      "title_es": "Elecciones de UPGRADE más claras, costes de revelación corregidos y salas selladas más legibles",
-      "title_ja": "UPGRADE選択の明確化、公開コストの修正、シールドルームの改善",
+      "title_fr": "Le chat arrive : messages libres, messages privés, blocage et signalement",
+      "title_en": "Chat is here: free messages, private messages, blocking and reporting",
+      "title_es": "Llega el chat: mensajes libres, mensajes privados, bloqueo y denuncias",
+      "title_ja": "チャット登場：自由なメッセージ、プライベートメッセージ、ブロックと通報",
       "changes_fr": [
         "Quand une carte améliorée propose un effet UPGRADE optionnel, deux boutons clairs permettent de choisir entre appliquer l'UPGRADE ou garder l'effet MAIN seul, par exemple Naruto Rasengan peut cacher au lieu de vaincre.",
         "Les révélations forcées par Dosu Kinuta utilisent le vrai coût de la carte : les réductions comme celle de Shino Aburame face à un Jutsu ennemi s'appliquent avant le surcoût de 2.",
-        "Les salons scellés affichent maintenant une étiquette avec le set choisi ou Aléatoire à côté de l'étiquette Scellé."
+        "Les salons scellés affichent maintenant une étiquette avec le set choisi ou Aléatoire à côté de l'étiquette Scellé.",
+        "Le chat de partie est réécrit : écris librement tes messages (140 caractères) avec 5 émotes rapides.",
+        "Nouveau réglage dans les Options : choisis qui peut t’écrire, tout le monde, tes amis ou personne.",
+        "Tu peux bloquer un joueur : il ne peut plus t’écrire, t’ajouter en ami ni t’inviter en match, et tu le débloques dans les Options.",
+        "Signale un message ou un joueur avec la cause et le message joint : notre équipe examine chaque signalement.",
+        "Messages privés entre amis depuis la page Amis, un profil ou une partie, conservés 30 jours.",
+        "Tu peux ajouter un joueur en ami directement pendant une partie, depuis le chat.",
+        "Un compteur sur le bouton Classement affiche tes messages non lus et tes demandes d’amis.",
+        "Le chat est enfin lisible sur mobile : il s’ouvre en plein écran.",
+        "Les spectateurs discutent entre eux : les joueurs ne voient plus leurs messages.",
+        "La modération est renforcée : avertissements, chat coupé, exclusion du classé ou suspension selon la gravité.",
+        "Nouveau filtre par pays dans le classement, avec une option pour les joueurs sans pays."
       ],
       "changes_en": [
         "When an upgraded card offers an optional UPGRADE effect, two clear buttons let you apply the UPGRADE or keep the MAIN effect only, for example Naruto Rasengan can hide instead of defeat.",
         "Reveals forced by Dosu Kinuta use the card's true cost: reductions like Shino Aburame's against an enemy Jutsu apply before the 2 extra chakra.",
-        "Sealed rooms now show a tag with the chosen set or Random next to the Sealed tag."
+        "Sealed rooms now show a tag with the chosen set or Random next to the Sealed tag.",
+        "The game chat is rewritten: type your own messages freely (140 characters) with 5 quick emotes.",
+        "New setting in the Options: choose who can write to you, everyone, your friends or nobody.",
+        "You can block a player: they can no longer write to you, add you as a friend or invite you to a match, and you unblock them in the Options.",
+        "Report a message or a player with the cause and the attached message: our team reviews every report.",
+        "Private messages between friends from the Friends page, a profile or a game, kept for 30 days.",
+        "You can add a player as a friend directly during a game, from the chat.",
+        "A counter on the Leaderboard button shows your unread messages and friend requests.",
+        "The chat is finally readable on mobile: it opens fullscreen.",
+        "Spectators chat among themselves: players no longer see their messages.",
+        "Moderation is reinforced: warnings, chat removal, ranked exclusion or suspension depending on severity.",
+        "New country filter on the leaderboard, with an option for players without a country."
       ],
       "changes_es": [
         "Cuando una carta mejorada ofrece un efecto UPGRADE opcional, dos botones claros permiten aplicar el UPGRADE o mantener solo el efecto MAIN, por ejemplo Naruto Rasengan puede ocultar en vez de derrotar.",
         "Las revelaciones forzadas por Dosu Kinuta usan el coste real de la carta: las reducciones como la de Shino Aburame frente a un Jutsu enemigo se aplican antes del sobrecoste de 2.",
-        "Las salas selladas ahora muestran una etiqueta con el set elegido o Aleatorio junto a la etiqueta Sellado."
+        "Las salas selladas ahora muestran una etiqueta con el set elegido o Aleatorio junto a la etiqueta Sellado.",
+        "El chat de partida está reescrito: escribe tus mensajes libremente (140 caracteres) con 5 emotes rápidos.",
+        "Nuevo ajuste en las Opciones: elige quién puede escribirte, todo el mundo, tus amigos o nadie.",
+        "Puedes bloquear a un jugador: ya no puede escribirte, agregarte como amigo ni invitarte a una partida, y lo desbloqueas en las Opciones.",
+        "Denuncia un mensaje o a un jugador con la causa y el mensaje adjunto: nuestro equipo revisa cada denuncia.",
+        "Mensajes privados entre amigos desde la página de Amigos, un perfil o una partida, conservados 30 días.",
+        "Puedes agregar a un jugador como amigo directamente durante una partida, desde el chat.",
+        "Un contador en el botón de Clasificación muestra tus mensajes no leídos y solicitudes de amistad.",
+        "El chat por fin se lee bien en el móvil: se abre a pantalla completa.",
+        "Los espectadores hablan entre ellos: los jugadores ya no ven sus mensajes.",
+        "La moderación se refuerza: advertencias, chat cortado, exclusión del clasificatorio o suspensión según la gravedad.",
+        "Nuevo filtro por país en la clasificación, con una opción para jugadores sin país."
       ],
       "changes_ja": [
         "強化したカードの任意のUPGRADE効果に、UPGRADEを適用するかMAIN効果のみを使うかを選べる2つのボタンが付きました。例えばナルトの螺旋丸は撃破の代わりに隠すことを選べます。",
         "ドスに強制された公開はカードの本当のコストで支払います。敵の術がいる時のシノの軽減が、追加の2チャクラの前に適用されます。",
-        "シールド戦のルームに、選んだセット名またはランダムのタグが表示されるようになりました。"
+        "シールド戦のルームに、選んだセット名またはランダムのタグが表示されるようになりました。",
+        "対戦チャットを一新：140文字まで自由に入力でき、5つのクイックエモートが使えます。",
+        "オプションに新設定：誰があなたにメッセージを送れるか（全員・フレンド・誰も）を選べます。",
+        "プレイヤーをブロック可能：メッセージ、フレンド申請、対戦の招待ができなくなり、オプションから解除できます。",
+        "理由とメッセージを添えてプレイヤーを通報：運営チームがすべての通報を確認します。",
+        "フレンド同士のプライベートメッセージ：フレンドページ、プロフィール、対戦中から。30日間保存されます。",
+        "対戦中にチャットから直接フレンド追加ができます。",
+        "ランキングボタンに未読メッセージとフレンド申請の数が表示されます。",
+        "モバイルでチャットがついに読みやすく：全画面で開きます。",
+        "観戦者同士で会話：プレイヤーには観戦者のメッセージが見えなくなりました。",
+        "モデレーションを強化：重大度に応じて警告、チャット停止、ランク戦除外、アカウント停止を適用します。",
+        "ランキングに国別フィルターを追加。国未設定のプレイヤーも絞り込めます。"
       ]
     },
     {

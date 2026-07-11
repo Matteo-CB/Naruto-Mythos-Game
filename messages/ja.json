@@ -2069,7 +2069,10 @@
     "eloRangeTop": "{min}+",
     "unranked": "ランクなし",
     "placementProgress": "配置：{current}/{total}",
-    "searchPlaceholder": "プレイヤーを検索..."
+    "searchPlaceholder": "プレイヤーを検索...",
+    "countryFilterLabel": "国",
+    "countryAll": "すべての国",
+    "countryNone": "国未設定"
   },
   "profile": {
     "title": "プレイヤープロフィール",
