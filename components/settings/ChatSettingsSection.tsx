@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSettingsStore, type ChatVisibilitySetting } from '@/stores/settingsStore';
+import { useLocaleBcp47 } from '@/lib/i18n/useLocaleMeta';
 
 interface BlockedEntry {
   userId: string;
@@ -15,6 +16,7 @@ const VISIBILITY_OPTIONS: ChatVisibilitySetting[] = ['everyone', 'friends', 'off
 export function ChatSettingsSection() {
   const t = useTranslations('settings');
   const { chatVisibility, setChatVisibility, isLoaded } = useSettingsStore();
+  const bcp47 = useLocaleBcp47();
   const [blocked, setBlocked] = useState<BlockedEntry[]>([]);
   const [blockedLoaded, setBlockedLoaded] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -105,9 +107,14 @@ export function ChatSettingsSection() {
                 className="flex items-center justify-between gap-3 py-2"
                 style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
               >
-                <span className="text-[13px] truncate" style={{ color: '#e0e0e0' }}>
-                  {b.username}
-                </span>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[13px] truncate" style={{ color: '#e0e0e0' }}>
+                    {b.username}
+                  </span>
+                  <span className="text-[10px]" style={{ color: '#555' }}>
+                    {new Intl.DateTimeFormat(bcp47, { dateStyle: 'medium' }).format(new Date(b.blockedAt))}
+                  </span>
+                </div>
                 <button
                   type="button"
                   disabled={busyId === b.userId}
