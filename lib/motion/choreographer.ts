@@ -9,6 +9,7 @@ import { CARD_BACK_URL } from './flightLayer';
 import { flyCard, skipAllFlights, registerActiveTimeline, arcPoint as arcPointPublic } from './flightLayer';
 import { motionMs } from './speed';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { playVfx, vfxForLanding } from './flipbook';
 
 export interface MotionEventData {
   player?: string;
@@ -24,6 +25,8 @@ export interface MotionEventData {
   hasAmbush?: boolean;
   delta?: number;
   to?: PlayerSideId;
+  rarity?: string;
+  isSummon?: boolean;
   points?: number;
   powerMe?: number;
   powerOpp?: number;
@@ -139,6 +142,8 @@ export async function playCardFlight(
   }
   landingSquash(target.element, Math.max(180, durationMs * 0.35));
   landingRing(target.rect);
+  const vfx = vfxForLanding({ hidden: data.hidden, rarity: data.rarity, isSummon: data.isSummon });
+  if (vfx) void playVfx(vfx, target.element.getBoundingClientRect(), { isMobile: isMobileViewport() });
 }
 
 function innerOf(el: HTMLElement): HTMLElement {
@@ -277,6 +282,7 @@ export async function playDefeatFlight(data: MotionEventData): Promise<void> {
   const flashTl = gsap.timeline({ onComplete: () => flash.remove() });
   flashTl.to(flash, { opacity: 1, duration: 0.1 }).to(flash, { opacity: 0, duration: 0.2 });
   registerActiveTimeline(flashTl);
+  void playVfx('slash-defeat', fromRect, { isMobile: isMobileViewport() });
 
   await flyCard({
     fromRect,
@@ -366,6 +372,9 @@ export async function playTokenDelta(data: MotionEventData): Promise<void> {
   ].join(';');
   document.body.appendChild(label);
   punch(el, 1.12);
+  if (data.delta >= 2) {
+    void playVfx('ring-powerup', { left: rect.left, top: rect.top, width: rect.width, height: rect.height }, { isMobile: isMobileViewport() });
+  }
   await new Promise<void>((resolve) => {
     const tl = gsap.timeline({ onComplete: () => { label.remove(); resolve(); } });
     tl.fromTo(label, { y: 6, opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1.1, y: -10, duration: 0.18, ease: 'power2.out' })
@@ -447,6 +456,7 @@ export async function playMissionScore(data: MotionEventData): Promise<void> {
 
   vignette(durationMs);
   punch(missionEl, 1.14);
+  void playVfx('victory-mission', { left: missionRect.left, top: missionRect.top, width: missionRect.width, height: missionRect.height }, { isMobile: isMobileViewport() });
 
   const glow = overlayAt(
     { left: missionRect.left, top: missionRect.top, width: missionRect.width, height: missionRect.height },

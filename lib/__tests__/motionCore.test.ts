@@ -5,6 +5,8 @@ import {
 } from '@/lib/motion/boardRegistry';
 import { computeMotionMs, BASE_DURATIONS_MS, FAST_MULTIPLIER } from '@/lib/motion/speed';
 import { arcPoint } from '@/lib/motion/flightLayer';
+import { frameSource, vfxForLanding } from '@/lib/motion/flipbook';
+import { VFX_MANIFEST } from '@/lib/motion/vfxManifest';
 
 describe('anchor id builders', () => {
   it('produce stable unique ids', () => {
@@ -68,5 +70,38 @@ describe('arcPoint (flight trajectory)', () => {
       expect(p.x).toBeGreaterThanOrEqual(prevX);
       prevX = p.x;
     }
+  });
+});
+
+describe('flipbook', () => {
+  it('frameSource maps frames to the sheet grid', () => {
+    const sheet = { cols: 6, size: 192 };
+    expect(frameSource(sheet, 0)).toEqual({ sx: 0, sy: 0 });
+    expect(frameSource(sheet, 5)).toEqual({ sx: 5 * 192, sy: 0 });
+    expect(frameSource(sheet, 6)).toEqual({ sx: 0, sy: 192 });
+    expect(frameSource(sheet, 29)).toEqual({ sx: 5 * 192, sy: 4 * 192 });
+  });
+
+  it('every manifest entry is coherent', () => {
+    for (const meta of Object.values(VFX_MANIFEST)) {
+      expect(meta.frames).toBeGreaterThan(0);
+      expect(meta.cols).toBeGreaterThan(0);
+      expect(meta.size).toBeGreaterThan(0);
+      expect(meta.fps).toBe(30);
+    }
+    expect(Object.keys(VFX_MANIFEST).sort()).toEqual([
+      'burst-legendary', 'kawarimi', 'ring-powerup', 'seal-summon', 'slash-defeat', 'victory-mission',
+    ]);
+  });
+
+  it('vfxForLanding picks the right effect', () => {
+    expect(vfxForLanding({ hidden: true })).toBe('kawarimi');
+    expect(vfxForLanding({ hidden: true, rarity: 'L' })).toBe('kawarimi');
+    for (const rarity of ['S', 'SV', 'M', 'MV', 'L']) {
+      expect(vfxForLanding({ rarity })).toBe('burst-legendary');
+    }
+    expect(vfxForLanding({ rarity: 'C', isSummon: true })).toBe('seal-summon');
+    expect(vfxForLanding({ rarity: 'R' })).toBe(null);
+    expect(vfxForLanding({})).toBe(null);
   });
 });
