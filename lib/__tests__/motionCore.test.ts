@@ -73,26 +73,27 @@ describe('arcPoint (flight trajectory)', () => {
 });
 
 describe('rarity VFX profiles', () => {
-  it('tiers grow with rarity, every known rarity is mapped', () => {
+  it('premium variants outrank their base rarities exactly as decided', () => {
+    for (const base of ['S', 'M', 'SP', 'POP', 'CHIBI']) {
+      expect(rarityTier(base)).toBe(2);
+    }
+    for (const premium of ['SV', 'MV', 'L', 'SPV', 'POPV', 'CHIBIV']) {
+      expect(rarityTier(premium)).toBe(3);
+    }
     expect(rarityTier('C')).toBe(0);
     expect(rarityTier('UC')).toBe(0);
     expect(rarityTier('R')).toBe(1);
     expect(rarityTier('RA')).toBe(1);
-    expect(rarityTier('S')).toBe(2);
-    expect(rarityTier('SV')).toBe(2);
-    expect(rarityTier('M')).toBe(3);
-    expect(rarityTier('MV')).toBe(3);
-    expect(rarityTier('L')).toBe(4);
   });
 
-  it('unknown rarities fall back safely, V-suffixed ones rank higher', () => {
+  it('unknown rarities fall back safely, V-suffixed ones are premium', () => {
     expect(rarityTier(undefined)).toBe(1);
     expect(rarityTier('FUTURE')).toBe(1);
-    expect(rarityTier('FUTUREV')).toBe(2);
+    expect(rarityTier('FUTUREV')).toBe(3);
   });
 
   it('scale, intensity and duration strictly increase across tiers', () => {
-    const tiers = ['C', 'R', 'S', 'M', 'L'];
+    const tiers = ['C', 'R', 'S', 'L'];
     for (let i = 1; i < tiers.length; i++) {
       const prev = rarityVfxProfile(tiers[i - 1]);
       const cur = rarityVfxProfile(tiers[i]);
@@ -102,10 +103,19 @@ describe('rarity VFX profiles', () => {
     }
   });
 
+  it('families keep their own colors at both tiers', () => {
+    expect(rarityVfxProfile('S').color).toEqual(rarityVfxProfile('SV').color);
+    expect(rarityVfxProfile('M').color).toEqual(rarityVfxProfile('MV').color);
+    expect(rarityVfxProfile('SP').color).toEqual(rarityVfxProfile('SPV').color);
+    expect(rarityVfxProfile('S').color).not.toEqual(rarityVfxProfile('M').color);
+    expect(rarityVfxProfile('SP').color).not.toEqual(rarityVfxProfile('S').color);
+    expect(rarityVfxProfile('CHIBI').color).not.toEqual(rarityVfxProfile('POP').color);
+  });
+
   it('common effects stay genuinely small', () => {
     expect(rarityVfxProfile('C').scale).toBeLessThan(0.7);
     expect(rarityVfxProfile('UC').scale).toBeLessThan(0.7);
     expect(rarityVfxProfile('L').scale).toBeGreaterThan(2);
-    expect(Object.keys(RARITY_TIERS).length).toBeGreaterThanOrEqual(10);
+    expect(Object.keys(RARITY_TIERS).length).toBeGreaterThanOrEqual(12);
   });
 });

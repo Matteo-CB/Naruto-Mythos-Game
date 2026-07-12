@@ -169,6 +169,17 @@ export async function playCardFlight(
         durationMs: profile.durationMs,
       });
     }
+    if (profile.tier >= 2) {
+      if (profile.tier >= 3) vignette(profile.durationMs + 500);
+      void playGlVfx('aura', landRect, {
+        color: profile.color,
+        secondary: profile.secondary,
+        intensity: profile.tier >= 3 ? profile.intensity * 1.05 : profile.intensity * 0.8,
+        scale: profile.tier >= 3 ? profile.scale * 1.15 : profile.scale * 0.95,
+        durationMs: profile.tier >= 3 ? 1250 : 900,
+      });
+      punch(target.element, profile.tier >= 3 ? 1.24 : 1.16);
+    }
   }
 }
 
@@ -329,29 +340,20 @@ export async function playUpgradeMerge(data: MotionEventData): Promise<void> {
   if (durationMs <= 0) return;
   const el = slotElement(data);
   if (!el) return;
-  const snapshot = getPreUpdateSnapshot();
-
-  let fromRect: AnchorRect | null = null;
-  if (data.side === 'me') {
-    if (typeof data.cardIndex === 'number') {
-      fromRect = snapshot.get(anchorHandCard(data.cardIndex)) ?? null;
-    }
-    if (!fromRect) fromRect = resolveAnchor(anchorHandCard(0));
-  } else {
-    fromRect = snapshot.get(anchorOpponentHand()) ?? resolveAnchor(anchorOpponentHand());
-  }
-  if (!fromRect) return;
 
   const live = el.getBoundingClientRect();
-  if (data.side !== 'me') {
-    fromRect = cardRectCenteredIn(fromRect, { left: live.left, top: live.top, width: live.width, height: live.height });
-  }
-  await flyCard({
-    fromRect,
-    toRect: { left: live.left, top: live.top, width: live.width, height: live.height },
-    imageUrl: data.cardImage ? normalizeImagePath(data.cardImage) : null,
-    durationMs,
-    isMobile: isMobileViewport(),
+  await new Promise<void>((resolve) => {
+    const tl = gsap.timeline({ onComplete: resolve });
+    tl.to({}, { duration: Math.min(0.15, durationMs / 2000) });
+    registerActiveTimeline(tl);
+  });
+  const profile = rarityVfxProfile(data.rarity);
+  void playGlVfx('burst', { left: live.left, top: live.top, width: live.width, height: live.height }, {
+    color: profile.color,
+    secondary: profile.secondary,
+    intensity: Math.min(profile.intensity, 0.8),
+    scale: Math.min(profile.scale, 1.1),
+    durationMs: 450,
   });
   punch(el, 1.22);
 }

@@ -1,6 +1,6 @@
 import type { AnchorRect } from './boardRegistry';
 
-export type VfxKind = 'burst' | 'seal' | 'slash' | 'ring' | 'victory' | 'kawarimi';
+export type VfxKind = 'burst' | 'seal' | 'slash' | 'ring' | 'victory' | 'kawarimi' | 'aura';
 
 export interface VfxColor {
   r: number;
@@ -19,13 +19,12 @@ export interface VfxOptions {
 export const RARITY_TIERS: Record<string, number> = {
   C: 0, UC: 0,
   R: 1, RA: 1,
-  S: 2, SV: 2,
-  M: 3, MV: 3,
-  L: 4,
-  SP: 2, SPV: 2, POP: 1, POPV: 2, CHIBI: 1, CHIBIV: 2,
+  S: 2, M: 2, SP: 2, POP: 2, CHIBI: 2,
+  SV: 3, MV: 3, L: 3, SPV: 3, POPV: 3, CHIBIV: 3,
 };
 
 export interface RarityVfxProfile {
+  tier: number;
   scale: number;
   intensity: number;
   durationMs: number;
@@ -40,24 +39,48 @@ const RED: VfxColor = { r: 0.88, g: 0.32, b: 0.26 };
 const INK: VfxColor = { r: 0.16, g: 0.17, b: 0.22 };
 const TEAL: VfxColor = { r: 0.35, g: 0.78, b: 0.75 };
 
-const TIER_PROFILES: RarityVfxProfile[] = [
-  { scale: 0.55, intensity: 0.4, durationMs: 420, color: WHITE, secondary: GOLD },
-  { scale: 0.95, intensity: 0.65, durationMs: 520, color: GOLD, secondary: WHITE },
-  { scale: 1.6, intensity: 0.95, durationMs: 700, color: BLUE, secondary: WHITE },
-  { scale: 2.1, intensity: 1.1, durationMs: 800, color: RED, secondary: GOLD },
-  { scale: 2.6, intensity: 1.25, durationMs: 900, color: GOLD, secondary: WHITE },
+const VIOLET: VfxColor = { r: 0.66, g: 0.48, b: 0.92 };
+const PINK: VfxColor = { r: 0.94, g: 0.5, b: 0.66 };
+
+const TIER_BASE: Array<Omit<RarityVfxProfile, 'color' | 'secondary' | 'tier'>> = [
+  { scale: 0.55, intensity: 0.4, durationMs: 420 },
+  { scale: 0.95, intensity: 0.65, durationMs: 520 },
+  { scale: 1.8, intensity: 1.05, durationMs: 850 },
+  { scale: 2.5, intensity: 1.25, durationMs: 1000 },
 ];
+
+const FAMILY_COLORS: Array<{ prefix: string; color: VfxColor; secondary: VfxColor }> = [
+  { prefix: 'L', color: GOLD, secondary: WHITE },
+  { prefix: 'SP', color: VIOLET, secondary: WHITE },
+  { prefix: 'S', color: BLUE, secondary: WHITE },
+  { prefix: 'M', color: RED, secondary: GOLD },
+  { prefix: 'POP', color: TEAL, secondary: WHITE },
+  { prefix: 'CHIBI', color: PINK, secondary: WHITE },
+  { prefix: 'R', color: GOLD, secondary: WHITE },
+];
+
+function familyColors(rarity: string): { color: VfxColor; secondary: VfxColor } {
+  const sorted = [...FAMILY_COLORS].sort((a, b) => b.prefix.length - a.prefix.length);
+  for (const fam of sorted) {
+    if (rarity.startsWith(fam.prefix)) return { color: fam.color, secondary: fam.secondary };
+  }
+  return { color: WHITE, secondary: GOLD };
+}
 
 export function rarityTier(rarity: string | undefined): number {
   if (!rarity) return 1;
   const tier = RARITY_TIERS[rarity];
   if (typeof tier === 'number') return tier;
-  if (rarity.endsWith('V')) return 2;
+  if (rarity.endsWith('V')) return 3;
   return 1;
 }
 
 export function rarityVfxProfile(rarity: string | undefined): RarityVfxProfile {
-  return TIER_PROFILES[Math.min(rarityTier(rarity), TIER_PROFILES.length - 1)];
+  const tier = Math.min(rarityTier(rarity), TIER_BASE.length - 1);
+  const base = TIER_BASE[tier];
+  const colors = rarity ? familyColors(rarity) : { color: WHITE, secondary: GOLD };
+  if (tier === 0) return { tier, ...base, color: WHITE, secondary: GOLD };
+  return { tier, ...base, ...colors };
 }
 
 export const VFX_PRESETS = {
@@ -246,6 +269,29 @@ void main() {
 }
 `;
 
+const FRAG_AURA = COMMON + `
+void main() {
+  float r = length(v_uv);
+  float a = atan(v_uv.y, v_uv.x);
+  float appear = easeOut(min(u_t * 2.2, 1.0));
+  float fade = 1.0 - smoothstep(0.55, 1.0, u_t);
+  float rot = u_t * 1.4 + u_seed * 6.28;
+
+  float rays = pow(abs(sin((a + rot) * 4.0)), 3.0) * smoothstep(0.95 * appear, 0.1, r) * 0.5;
+  float rays2 = pow(abs(sin((a - rot * 0.6) * 6.0 + 1.7)), 8.0) * smoothstep(0.8 * appear, 0.15, r) * 0.6;
+
+  float halo = exp(-pow((r - 0.55 * appear) * 5.0, 2.0)) * (0.65 + 0.35 * sin(u_t * 11.0 + u_seed));
+  float shimmer = fbm(vec2(a * 2.2 + rot, r * 5.0 - u_t * 2.5)) * exp(-r * 1.8) * 0.55;
+
+  vec2 sp = vec2(fract(a / 6.28318 * 7.0 + u_seed), fract(r * 3.0 - u_t * 1.2));
+  float sparkles = step(0.92, hash(floor(vec2(a * 5.0 + u_seed * 20.0, r * 8.0 - u_t * 6.0)))) * smoothstep(0.9, 0.2, r) * fade;
+
+  vec3 col = u_color * (rays + rays2 + halo) * 1.25 + u_color2 * (shimmer + sparkles * 1.5);
+  float alpha = clamp((rays + rays2 + halo + shimmer + sparkles) * u_intensity * fade, 0.0, 1.0);
+  gl_FragColor = vec4(col * alpha * u_intensity, alpha);
+}
+`;
+
 const FRAG_KAWARIMI = COMMON + `
 vec2 swirl(vec2 uv, float strength) {
   float r = length(uv);
@@ -276,6 +322,7 @@ const FRAGS: Record<VfxKind, string> = {
   ring: FRAG_RING,
   victory: FRAG_VICTORY,
   kawarimi: FRAG_KAWARIMI,
+  aura: FRAG_AURA,
 };
 
 interface EffectInstance {
