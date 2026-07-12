@@ -11,28 +11,28 @@
         "Poser une carte de la main vers le plateau est plus fluide : trajectoire plus douce et atterrissage sans rebond.",
         "La pose d'une carte de la main vers le plateau est plus rapide.",
         "Les fenêtres d'effet attendent la fin des animations de pose, de défaite et de révélation avant de s'afficher.",
-        "Quand un effet fait vaincre ou cacher plusieurs personnages, chacun joue son animation l'un après l'autre."
+        "Quand un effet vainc plusieurs personnages d'un coup, ils restent sur le terrain et partent à la défausse un par un, chacun avec son animation."
       ],
       "changes_en": [
         "The mission win and loss animation is removed: the score updates without a visual effect.",
         "Playing a card from hand to the board is smoother: softer path and a landing without bounce.",
         "Playing a card from hand to the board is faster.",
         "Effect windows now wait for play, defeat and reveal animations to finish before appearing.",
-        "When an effect defeats or hides several characters, each one plays its animation one after the other."
+        "When an effect defeats several characters at once, they stay on the board and leave for the discard pile one by one, each with its own animation."
       ],
       "changes_es": [
         "Se elimina la animación al ganar o perder una misión: la puntuación se actualiza sin efecto visual.",
         "Jugar una carta de la mano al tablero es más fluido: trayectoria más suave y aterrizaje sin rebote.",
         "Jugar una carta de la mano al tablero es más rápido.",
         "Las ventanas de efecto ahora esperan a que terminen las animaciones de juego, derrota y revelación antes de aparecer.",
-        "Cuando un efecto derrota u oculta a varios personajes, cada uno reproduce su animación uno tras otro."
+        "Cuando un efecto derrota a varios personajes a la vez, permanecen en el tablero y van al descarte uno por uno, cada uno con su animación."
       ],
       "changes_ja": [
         "ミッションの勝敗アニメーションを削除しました。スコアは演出なしで更新されます。",
         "手札から盤面へのカードプレイがより滑らかになりました。軌道が柔らかくなり、着地のバウンドがなくなりました。",
         "手札から盤面へのカードプレイが速くなりました。",
         "エフェクトウィンドウは、プレイ・撃破・公開のアニメーションが終わってから表示されるようになりました。",
-        "効果で複数のキャラクターを撃破または隠す場合、1体ずつ順番にアニメーションが再生されます。"
+        "効果で複数のキャラクターを同時に撃破した場合、盤面に残ったまま1体ずつアニメーションと共に捨て札へ送られます。"
       ]
     },
     {

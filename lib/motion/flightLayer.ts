@@ -65,6 +65,33 @@ export interface FlyCardOptions {
 
 export const CARD_BACK_URL = '/images/card-back.webp';
 
+const defeatPlaceholders = new Map<string, { el: HTMLDivElement; timer: ReturnType<typeof setTimeout> }>();
+
+export function spawnDefeatPlaceholder(instanceId: string, rect: AnchorRect, imageUrl: string | null): void {
+  if (typeof document === 'undefined') return;
+  consumeDefeatPlaceholder(instanceId);
+  const el = document.createElement('div');
+  el.style.cssText = `position:fixed;pointer-events:none;z-index:44;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;border-radius:6px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.4);`;
+  const img = document.createElement('img');
+  img.src = imageUrl ?? CARD_BACK_URL;
+  img.draggable = false;
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+  el.appendChild(img);
+  document.body.appendChild(el);
+  const timer = setTimeout(() => consumeDefeatPlaceholder(instanceId), 12_000);
+  defeatPlaceholders.set(instanceId, { el, timer });
+}
+
+export function consumeDefeatPlaceholder(instanceId: string): AnchorRect | null {
+  const entry = defeatPlaceholders.get(instanceId);
+  if (!entry) return null;
+  defeatPlaceholders.delete(instanceId);
+  clearTimeout(entry.timer);
+  const rect = entry.el.getBoundingClientRect();
+  entry.el.remove();
+  return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+}
+
 export function flyCard(opts: FlyCardOptions): Promise<void> {
   return new Promise((resolve) => {
     if (typeof document === 'undefined' || opts.durationMs <= 0) {

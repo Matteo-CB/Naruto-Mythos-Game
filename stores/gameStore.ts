@@ -11,6 +11,7 @@ import { emitAiGameSummaryHooks } from '@/lib/quests/aiGameSummary';
 import { emitDrawDiffEvents, emitTokenDiffEvents } from '@/lib/quests/engineEmit';
 import { stashPreUpdateSnapshot } from '@/lib/motion/boardRegistry';
 import { snapFromGameState, snapFromVisible, buildMotionEventsFromSnaps } from '@/lib/motion/motionDiff';
+import { holdDefeatedCardInPlace, type MotionEventData } from '@/lib/motion/choreographer';
 import { useSocketStore } from '@/lib/socket/client';
 import { validatePlayCharacter, validatePlayHidden, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
@@ -1830,7 +1831,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   addAnimation: (event) => {
-    if (typeof window !== 'undefined') stashPreUpdateSnapshot();
+    if (typeof window !== 'undefined') {
+      stashPreUpdateSnapshot();
+      if (event.type === 'card-defeat') {
+        holdDefeatedCardInPlace(event.data as MotionEventData);
+      }
+    }
     const id = `anim-${++animationIdCounter}`;
     const now = Date.now();
     const animEvent: AnimationEvent = {

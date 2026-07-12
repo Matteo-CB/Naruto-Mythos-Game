@@ -5,7 +5,7 @@ import {
   type AnchorRect, type PlayerSideId,
 } from './boardRegistry';
 import { CARD_BACK_URL } from './flightLayer';
-import { flyCard, skipAllFlights, registerActiveTimeline } from './flightLayer';
+import { flyCard, skipAllFlights, registerActiveTimeline, spawnDefeatPlaceholder, consumeDefeatPlaceholder } from './flightLayer';
 import { motionMs } from './speed';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { playGlVfx, rarityVfxProfile, VFX_PRESETS } from './vfxgl';
@@ -285,12 +285,30 @@ export async function playRelocate(data: MotionEventData): Promise<void> {
   punch(el, 1.08);
 }
 
+export function holdDefeatedCardInPlace(data: MotionEventData): void {
+  if (typeof document === 'undefined') return;
+  if (motionMs('defeat') <= 0) return;
+  if (typeof data.missionIndex !== 'number' || !data.side || !data.instanceId) return;
+  const anchor = anchorSlot(data.missionIndex, data.side, data.instanceId);
+  const rect = getPreUpdateSnapshot().get(anchor) ?? resolveAnchor(anchor);
+  if (!rect) return;
+  spawnDefeatPlaceholder(
+    data.instanceId,
+    rect,
+    data.cardImage ? normalizeImagePath(data.cardImage) : null,
+  );
+}
+
 export async function playDefeatFlight(data: MotionEventData): Promise<void> {
   const durationMs = motionMs('defeat');
-  if (durationMs <= 0) return;
+  if (durationMs <= 0) {
+    if (data.instanceId) consumeDefeatPlaceholder(data.instanceId);
+    return;
+  }
   if (typeof data.missionIndex !== 'number' || !data.side || !data.instanceId) return;
   const snapshot = getPreUpdateSnapshot();
-  const fromRect = snapshot.get(anchorSlot(data.missionIndex, data.side, data.instanceId));
+  const placeholderRect = consumeDefeatPlaceholder(data.instanceId);
+  const fromRect = placeholderRect ?? snapshot.get(anchorSlot(data.missionIndex, data.side, data.instanceId));
   const toRect = resolveAnchor(anchorDiscard(data.discardSide ?? data.side));
   if (!fromRect || !toRect) return;
 

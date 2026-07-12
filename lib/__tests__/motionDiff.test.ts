@@ -71,6 +71,18 @@ describe('buildMotionEventsFromSnaps', () => {
     expect(buildMotionEventsFromSnaps(prev, nextBounce)).toEqual([]);
   });
 
+  it('emits one defeat event per card when several die simultaneously', () => {
+    const prev = snap([
+      char('a', { side: 'opp', missionIndex: 0 }),
+      char('b', { side: 'opp', missionIndex: 2 }),
+      char('c', { side: 'opp', missionIndex: 2, isHidden: true }),
+    ]);
+    const next = snap([], { discard: { me: 0, opp: 3 } });
+    const events = buildMotionEventsFromSnaps(prev, next);
+    expect(events.map((e) => e.type)).toEqual(['card-defeat', 'card-defeat', 'card-defeat']);
+    expect(events.map((e) => e.data.instanceId).sort()).toEqual(['a', 'b', 'c']);
+  });
+
   it('hidden defeated cards fly as card backs', () => {
     const prev = snap([char('a', { isHidden: true })]);
     const next = snap([], { discard: { me: 1, opp: 0 } });
