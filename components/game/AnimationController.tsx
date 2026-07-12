@@ -7,7 +7,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useGameScale } from './GameScaleContext';
 import { playSound, setVolume, setMuted } from '@/lib/sound/SoundManager';
-import { playCardFlight, playRevealInPlace, playHideInPlace, playRelocate, playDefeatFlight, playUpgradeMerge, playEdgeTransfer, playTokenDelta, installSkipListener, type MotionEventData } from '@/lib/motion/choreographer';
+import { playCardFlight, playRevealInPlace, playHideInPlace, playRelocate, playDefeatFlight, playUpgradeMerge, playEdgeTransfer, playTokenDelta, playMissionScore, playGameEndCinematic, installSkipListener, type MotionEventData } from '@/lib/motion/choreographer';
 
 type AnimationType =
   | 'card-play'
@@ -66,86 +66,6 @@ interface AnimationEvent {
   timestamp: number;
 }
 
-function MissionScoreAnimation({ data }: { data: Record<string, unknown> }) {
-  const t = useTranslations();
-  const missionName = (data.missionName as string) || 'Mission';
-  const points = (data.points as number) || 0;
-  const winner = (data.winner as string) || '';
-
-  return (
-    <motion.div
-      key="mission-score"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}
-    >
-      <motion.div
-        className="flex flex-col items-center gap-3 px-10 py-8"
-        style={{
-          backgroundColor: 'rgba(10, 10, 10, 0.95)',
-          border: '2px solid #c4a35a',
-          boxShadow: '0 0 40px rgba(196, 163, 90, 0.3)',
-        }}
-        initial={{ scale: 0.6, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 150, damping: 14, delay: 0.1 }}
-      >
-        <motion.span
-          className="text-sm font-medium uppercase tracking-wider"
-          style={{ color: '#c4a35a' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          {t('game.anim.missionWon')}
-        </motion.span>
-        <motion.span
-          className="text-xl font-bold"
-          style={{ color: '#e0e0e0' }}
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          {missionName}
-        </motion.span>
-        <motion.div
-          className="flex items-center gap-2"
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4, type: 'spring' }}
-        >
-          <span
-            className="text-3xl font-bold tabular-nums"
-            style={{ color: '#c4a35a' }}
-          >
-            +{points}
-          </span>
-          <span
-            className="text-xs uppercase"
-            style={{ color: '#888888' }}
-          >
-            {t('game.anim.points')}
-          </span>
-        </motion.div>
-        {winner && (
-          <motion.span
-            className="text-xs"
-            style={{ color: '#555555' }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            {winner}
-          </motion.span>
-        )}
-      </motion.div>
-    </motion.div>
-  );
-}
-
 function TurnTransitionAnimation({ data }: { data: Record<string, unknown> }) {
   const t = useTranslations();
   const turn = (data.turn as number) || 1;
@@ -181,8 +101,6 @@ function TurnTransitionAnimation({ data }: { data: Record<string, unknown> }) {
 }
 function renderAnimation(anim: AnimationEvent) {
   switch (anim.type) {
-    case 'mission-score':
-      return <MissionScoreAnimation key={anim.id} data={anim.data} />;
     case 'turn-transition':
       return <TurnTransitionAnimation key={anim.id} data={anim.data} />;
     case 'game-end':
@@ -193,7 +111,7 @@ function renderAnimation(anim: AnimationEvent) {
   }
 }
 
-const MOTION_TYPES: ReadonlySet<string> = new Set(['card-play', 'card-reveal', 'card-hide', 'card-relocate', 'card-defeat', 'card-upgrade', 'edge-transfer', 'power-token']);
+const MOTION_TYPES: ReadonlySet<string> = new Set(['card-play', 'card-reveal', 'card-hide', 'card-relocate', 'card-defeat', 'card-upgrade', 'edge-transfer', 'power-token', 'mission-score', 'game-end']);
 
 export function AnimationController() {
   const animationQueue = useGameStore((s) => s.animationQueue);
@@ -263,6 +181,8 @@ export function AnimationController() {
         : type === 'card-defeat' ? playDefeatFlight(data)
         : type === 'card-upgrade' ? playUpgradeMerge(data)
         : type === 'edge-transfer' ? playEdgeTransfer()
+        : type === 'mission-score' ? playMissionScore(data)
+        : type === 'game-end' ? playGameEndCinematic(data, { isMyWin: data.winner ? data.winner === humanPlayer : null })
         : playTokenDelta(data);
       let done = false;
       const finish = () => {

@@ -21,6 +21,7 @@ function snap(chars: MotionCharSnap[], over: Partial<Omit<MotionSnap, 'chars'>> 
     discard: { me: 0, opp: 0 },
     edgeHolder: 'me',
     myHandCardIds: [],
+    missions: [],
     ...over,
   };
 }
@@ -120,5 +121,37 @@ describe('findRemovedHandIndex', () => {
     expect(findRemovedHandIndex(['a', 'b', 'c'], ['a', 'b'])).toBe(2);
     expect(findRemovedHandIndex(['a', 'b'], ['a', 'b'])).toBeUndefined();
     expect(findRemovedHandIndex(['a'], ['a', 'b'])).toBeUndefined();
+  });
+});
+
+describe('mission scoring detection', () => {
+  const mission = (wonBy: 'me' | 'opp' | 'draw' | null, value = 4, powerMe = 6, powerOpp = 3) =>
+    ({ wonBy, value, powerMe, powerOpp });
+
+  it('emits mission-score when a mission gains a winner, before other events', () => {
+    const prev = snap([char('victim')], { missions: [mission(null)] });
+    const next = snap([], { missions: [mission('me')], discard: { me: 0, opp: 1 } });
+    const events = buildMotionEventsFromSnaps(prev, next);
+    expect(events[0]).toEqual({
+      type: 'mission-score',
+      data: { missionIndex: 0, side: 'me', points: 4, powerMe: 6, powerOpp: 3 },
+    });
+    expect(events[1].type).toBe('card-defeat');
+  });
+
+  it('ignores draws and resets to null', () => {
+    const prev = snap([], { missions: [mission('me'), mission(null)] });
+    const next = snap([], { missions: [mission(null), mission('draw')] });
+    expect(buildMotionEventsFromSnaps(prev, next)).toEqual([]);
+  });
+
+  it('scores multiple missions in index order', () => {
+    const prev = snap([], { missions: [mission(null), mission(null)] });
+    const next = snap([], { missions: [mission('me', 2), mission('opp', 5)] });
+    const events = buildMotionEventsFromSnaps(prev, next);
+    expect(events.map((e) => [e.type, e.data.missionIndex, e.data.side])).toEqual([
+      ['mission-score', 0, 'me'],
+      ['mission-score', 1, 'opp'],
+    ]);
   });
 });

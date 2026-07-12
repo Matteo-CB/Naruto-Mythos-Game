@@ -1,4 +1,5 @@
 import type { GameState, PlayerID, VisibleGameState } from '@/lib/engine/types';
+import { getEffectivePower } from '@/lib/effects/powerUtils';
 
 export type MotionSide = 'me' | 'opp';
 
@@ -13,15 +14,23 @@ export interface MotionCharSnap {
   hasAmbush: boolean;
 }
 
+export interface MotionMissionSnap {
+  wonBy: MotionSide | 'draw' | null;
+  value: number;
+  powerMe: number;
+  powerOpp: number;
+}
+
 export interface MotionSnap {
   chars: Map<string, MotionCharSnap>;
   discard: { me: number; opp: number };
   edgeHolder: MotionSide | null;
   myHandCardIds: string[];
+  missions: MotionMissionSnap[];
 }
 
 export interface MotionDiffEvent {
-  type: 'card-reveal' | 'card-hide' | 'card-relocate' | 'card-defeat' | 'card-upgrade' | 'edge-transfer' | 'power-token';
+  type: 'card-reveal' | 'card-hide' | 'card-relocate' | 'card-defeat' | 'card-upgrade' | 'edge-transfer' | 'power-token' | 'mission-score';
   data: Record<string, unknown>;
 }
 
@@ -54,11 +63,31 @@ export function snapFromGameState(state: GameState, me: PlayerID): MotionSnap {
     }
   }
   const opp: PlayerID = me === 'player1' ? 'player2' : 'player1';
+  const missions: MotionMissionSnap[] = state.activeMissions.map((m) => {
+    let powerMe = 0;
+    let powerOpp = 0;
+    for (const sideKey of ['player1Characters', 'player2Characters'] as const) {
+      const owner: PlayerID = sideKey === 'player1Characters' ? 'player1' : 'player2';
+      for (const c of m[sideKey]) {
+        let pw = 0;
+        try { pw = getEffectivePower(state, c, owner); } catch { pw = 0; }
+        if (owner === me) powerMe += pw;
+        else powerOpp += pw;
+      }
+    }
+    return {
+      wonBy: m.wonBy ? (m.wonBy === 'draw' ? 'draw' : (m.wonBy === me ? 'me' : 'opp')) : null,
+      value: m.basePoints + m.rankBonus,
+      powerMe,
+      powerOpp,
+    };
+  });
   return {
     chars,
     discard: { me: state[me].discardPile.length, opp: state[opp].discardPile.length },
     edgeHolder: state.edgeHolder ? (state.edgeHolder === me ? 'me' : 'opp') : null,
     myHandCardIds: state[me].hand.map((c) => c.id),
+    missions,
   };
 }
 
@@ -85,11 +114,30 @@ export function snapFromVisible(v: VisibleGameState): MotionSnap {
       }
     }
   }
+  const missions: MotionMissionSnap[] = v.activeMissions.map((m) => {
+    let powerMe = 0;
+    let powerOpp = 0;
+    for (const sideKey of ['player1Characters', 'player2Characters'] as const) {
+      const owner: PlayerID = sideKey === 'player1Characters' ? 'player1' : 'player2';
+      for (const c of m[sideKey]) {
+        const pw = typeof c.effectivePower === 'number' ? c.effectivePower : 0;
+        if (owner === me) powerMe += pw;
+        else powerOpp += pw;
+      }
+    }
+    return {
+      wonBy: m.wonBy ? (m.wonBy === 'draw' ? 'draw' : (m.wonBy === me ? 'me' : 'opp')) : null,
+      value: m.basePoints + m.rankBonus,
+      powerMe,
+      powerOpp,
+    };
+  });
   return {
     chars,
     discard: { me: v.myState.discardPile.length, opp: v.opponentState.discardPileSize },
     edgeHolder: v.edgeHolder ? (v.edgeHolder === me ? 'me' : 'opp') : null,
     myHandCardIds: v.myState.hand.map((c) => c.id),
+    missions,
   };
 }
 
@@ -105,6 +153,24 @@ const MAX_EVENTS_PER_DIFF = 8;
 
 export function buildMotionEventsFromSnaps(prev: MotionSnap, next: MotionSnap): MotionDiffEvent[] {
   const events: MotionDiffEvent[] = [];
+
+  for (let i = 0; i < next.missions.length; i++) {
+    const prevM = prev.missions[i];
+    const nextM = next.missions[i];
+    if (!prevM || !nextM) continue;
+    if (prevM.wonBy !== nextM.wonBy && (nextM.wonBy === 'me' || nextM.wonBy === 'opp')) {
+      events.push({
+        type: 'mission-score',
+        data: {
+          missionIndex: i,
+          side: nextM.wonBy,
+          points: nextM.value,
+          powerMe: nextM.powerMe,
+          powerOpp: nextM.powerOpp,
+        },
+      });
+    }
+  }
   const removedHandIndex = findRemovedHandIndex(prev.myHandCardIds, next.myHandCardIds);
   const discardGrewMe = next.discard.me > prev.discard.me;
   const discardGrewOpp = next.discard.opp > prev.discard.opp;
@@ -201,8 +267,8 @@ export function buildMotionEventsFromSnaps(prev: MotionSnap, next: MotionSnap): 
 
   if (events.length > MAX_EVENTS_PER_DIFF) {
     const priority: Record<MotionDiffEvent['type'], number> = {
-      'card-defeat': 0, 'card-reveal': 1, 'card-relocate': 2, 'card-upgrade': 3,
-      'card-hide': 4, 'edge-transfer': 5, 'power-token': 6,
+      'mission-score': 0, 'card-defeat': 1, 'card-reveal': 2, 'card-relocate': 3, 'card-upgrade': 4,
+      'card-hide': 5, 'edge-transfer': 6, 'power-token': 7,
     };
     events.sort((a, b) => priority[a.type] - priority[b.type]);
     return events.slice(0, MAX_EVENTS_PER_DIFF);

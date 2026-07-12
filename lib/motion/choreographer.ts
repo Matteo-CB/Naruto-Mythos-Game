@@ -1,11 +1,12 @@
 import { gsap } from 'gsap';
 import {
   anchorHandCard, anchorOpponentHand, anchorSlot, anchorDiscard, anchorEdge,
+  anchorMission, anchorScore,
   resolveAnchor, resolveAnchorElement, findNewSlotAnchor, getPreUpdateSnapshot,
   type AnchorRect, type PlayerSideId,
 } from './boardRegistry';
 import { CARD_BACK_URL } from './flightLayer';
-import { flyCard, skipAllFlights, registerActiveTimeline } from './flightLayer';
+import { flyCard, skipAllFlights, registerActiveTimeline, arcPoint as arcPointPublic } from './flightLayer';
 import { motionMs } from './speed';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 
@@ -23,6 +24,10 @@ export interface MotionEventData {
   hasAmbush?: boolean;
   delta?: number;
   to?: PlayerSideId;
+  points?: number;
+  powerMe?: number;
+  powerOpp?: number;
+  winner?: string;
 }
 
 let skipListenerInstalled = false;
@@ -365,6 +370,151 @@ export async function playTokenDelta(data: MotionEventData): Promise<void> {
     const tl = gsap.timeline({ onComplete: () => { label.remove(); resolve(); } });
     tl.fromTo(label, { y: 6, opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1.1, y: -10, duration: 0.18, ease: 'power2.out' })
       .to(label, { y: -26, opacity: 0, duration: Math.max(0.25, durationMs / 1000 - 0.18), ease: 'power1.in' });
+    registerActiveTimeline(tl);
+  });
+}
+
+function countUpLabel(rect: AnchorRect, value: number, color: string, offsetY: number, durationS: number): Promise<void> {
+  return new Promise((resolve) => {
+    const label = document.createElement('div');
+    label.textContent = '0';
+    label.style.cssText = [
+      'position:fixed', 'pointer-events:none', 'z-index:46',
+      `left:${rect.left + rect.width / 2 - 30}px`,
+      `top:${rect.top + offsetY}px`,
+      'width:60px', 'text-align:center',
+      'font-weight:800', 'font-size:20px',
+      `color:${color}`,
+      'text-shadow:0 2px 10px rgba(0,0,0,0.95)',
+    ].join(';');
+    document.body.appendChild(label);
+    const state = { v: 0 };
+    const tl = gsap.timeline({ onComplete: () => { label.remove(); resolve(); } });
+    tl.fromTo(label, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.15 })
+      .to(state, {
+        v: value,
+        duration: durationS,
+        ease: 'power1.out',
+        onUpdate: () => { label.textContent = String(Math.round(state.v)); },
+      }, 0.1)
+      .to(label, { opacity: 0, duration: 0.2 }, `+=${0.25}`);
+    registerActiveTimeline(tl);
+  });
+}
+
+function flyLabelAlongArc(text: string, fromRect: AnchorRect, toRect: AnchorRect, color: string, durationS: number): Promise<void> {
+  return new Promise((resolve) => {
+    const label = document.createElement('div');
+    label.textContent = text;
+    label.style.cssText = [
+      'position:fixed', 'pointer-events:none', 'z-index:47',
+      'left:0', 'top:0', 'width:64px', 'text-align:center',
+      'font-weight:800', 'font-size:22px',
+      `color:${color}`,
+      'text-shadow:0 2px 12px rgba(0,0,0,0.95), 0 0 18px rgba(196,163,90,0.4)',
+      'will-change:transform',
+    ].join(';');
+    document.body.appendChild(label);
+    const from: AnchorRect = { left: fromRect.left + fromRect.width / 2 - 32, top: fromRect.top + fromRect.height / 2 - 14, width: 64, height: 28 };
+    const to: AnchorRect = { left: toRect.left + toRect.width / 2 - 32, top: toRect.top + toRect.height / 2 - 14, width: 64, height: 28 };
+    const state = { t: 0 };
+    const arcHeight = Math.max(40, Math.abs(to.top - from.top) * 0.3);
+    const tl = gsap.timeline({ onComplete: () => { label.remove(); resolve(); } });
+    tl.to(state, {
+      t: 1,
+      duration: durationS,
+      ease: 'power2.inOut',
+      onUpdate: () => {
+        const point = arcPointPublic(from, to, arcHeight, state.t);
+        label.style.transform = `translate3d(${point.x - from.left}px, ${point.y - from.top}px, 0)`;
+        label.style.left = `${from.left}px`;
+        label.style.top = `${from.top}px`;
+      },
+    });
+    registerActiveTimeline(tl);
+  });
+}
+
+export async function playMissionScore(data: MotionEventData): Promise<void> {
+  const durationMs = motionMs('missionScore');
+  if (durationMs <= 0) return;
+  if (typeof data.missionIndex !== 'number' || (data.side !== 'me' && data.side !== 'opp')) return;
+
+  const missionEl = resolveAnchorElement(anchorMission(data.missionIndex));
+  if (!missionEl) return;
+  const missionRect = missionEl.getBoundingClientRect();
+  const winnerColor = data.side === 'me' ? '#e6c36a' : '#d97676';
+
+  vignette(durationMs);
+  punch(missionEl, 1.14);
+
+  const glow = overlayAt(
+    { left: missionRect.left, top: missionRect.top, width: missionRect.width, height: missionRect.height },
+    `box-shadow:0 0 30px ${data.side === 'me' ? 'rgba(196,163,90,0.75)' : 'rgba(179,62,62,0.75)'}, inset 0 0 20px ${data.side === 'me' ? 'rgba(196,163,90,0.35)' : 'rgba(179,62,62,0.35)'};opacity:0;`,
+  );
+  const glowTl = gsap.timeline({ onComplete: () => glow.remove() });
+  glowTl.to(glow, { opacity: 1, duration: 0.2 })
+    .to(glow, { opacity: 0, duration: 0.4 }, Math.max(0.3, durationMs / 1000 - 0.4));
+  registerActiveTimeline(glowTl);
+
+  const countS = Math.max(0.3, (durationMs * 0.35) / 1000);
+  await Promise.all([
+    typeof data.powerMe === 'number' && data.powerMe > 0
+      ? countUpLabel({ left: missionRect.left, top: missionRect.top, width: missionRect.width, height: missionRect.height }, data.powerMe, '#e6c36a', missionRect.height + 6, countS)
+      : Promise.resolve(),
+    typeof data.powerOpp === 'number' && data.powerOpp > 0
+      ? countUpLabel({ left: missionRect.left, top: missionRect.top, width: missionRect.width, height: missionRect.height }, data.powerOpp, '#d97676', -34, countS)
+      : Promise.resolve(),
+  ]);
+
+  const scoreEl = resolveAnchorElement(anchorScore(data.side));
+  const scoreRect = scoreEl?.getBoundingClientRect();
+  if (scoreRect && typeof data.points === 'number' && data.points > 0) {
+    await flyLabelAlongArc(
+      `+${data.points}`,
+      { left: missionRect.left, top: missionRect.top, width: missionRect.width, height: missionRect.height },
+      { left: scoreRect.left, top: scoreRect.top, width: scoreRect.width, height: scoreRect.height },
+      winnerColor,
+      Math.max(0.35, (durationMs * 0.3) / 1000),
+    );
+    if (scoreEl) punch(scoreEl, 1.25);
+  }
+}
+
+export async function playGameEndCinematic(data: MotionEventData, perspective: { isMyWin: boolean | null }): Promise<void> {
+  if (typeof document === 'undefined') return;
+  const durationMs = motionMs('missionScore');
+  if (durationMs <= 0) return;
+
+  const dim = document.createElement('div');
+  dim.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:42;background-color:rgba(2,2,6,0.55);opacity:0;';
+  document.body.appendChild(dim);
+  const dimTl = gsap.timeline({ onComplete: () => dim.remove() });
+  dimTl.to(dim, { opacity: 1, duration: 0.35 }).to(dim, { opacity: 0, duration: 0.4 }, 1.0);
+  registerActiveTimeline(dimTl);
+
+  if (perspective.isMyWin === null) return;
+  const loserSide: PlayerSideId = perspective.isMyWin ? 'opp' : 'me';
+  const els = document.querySelectorAll(`[data-anchor^="slot:"]`);
+  const losers: HTMLElement[] = [];
+  els.forEach((el) => {
+    const id = el.getAttribute('data-anchor') ?? '';
+    if (id.split(':')[2] === loserSide) losers.push(el as HTMLElement);
+  });
+  if (losers.length === 0) return;
+
+  await new Promise<void>((resolve) => {
+    const tl = gsap.timeline({ onComplete: resolve });
+    losers.forEach((el, i) => {
+      const dir = i % 2 === 0 ? 1 : -1;
+      tl.to(innerOf(el), {
+        rotation: dir * (8 + (i % 3) * 5),
+        y: 18,
+        opacity: 0.45,
+        duration: 0.55,
+        ease: 'power2.in',
+      }, i * 0.06);
+    });
     registerActiveTimeline(tl);
   });
 }
