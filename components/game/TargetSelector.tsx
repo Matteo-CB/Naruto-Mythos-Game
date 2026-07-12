@@ -688,6 +688,7 @@ export function TargetSelector() {
   const [multiSelectChoices, setMultiSelectChoices] = useState<Set<string>>(new Set());
 
   const queuedOrderRef = useRef<string[]>([]);
+  const animQueueBusy = useGameStore((s) => s.animationQueue.length > 0);
 
   useEffect(() => {
     if (!pendingTargetSelection || queuedOrderRef.current.length === 0) return;
@@ -698,7 +699,8 @@ export function TargetSelector() {
       queuedOrderRef.current = [];
       return;
     }
-    
+    if (animQueueBusy) return;
+
     const vt = new Set(pendingTargetSelection.validTargets);
     let nextTarget: string | null = null;
     while (queuedOrderRef.current.length > 0) {
@@ -709,13 +711,13 @@ export function TargetSelector() {
       }
     }
     if (nextTarget) {
-      
-      const timer = setTimeout(() => selectTarget(nextTarget!), 80);
+
+      const timer = setTimeout(() => selectTarget(nextTarget!), 120);
       return () => clearTimeout(timer);
     }
-    
+
     queuedOrderRef.current = [];
-  }, [pendingTargetSelection, selectTarget]);
+  }, [pendingTargetSelection, animQueueBusy, selectTarget]);
 
   if (!pendingTargetSelection || !visibleState) return null;
 
@@ -736,6 +738,9 @@ export function TargetSelector() {
   const eTst = pendingTargetSelection.engineTargetSelectionType ?? '';
   const isHideOrder = eTst.includes('CHOOSE_HIDE_TARGET') || eTst === 'KYUBI134_CHOOSE_HIDE_TARGETS';
   const isDefeatOrder = eTst.includes('CHOOSE_DEFEAT_TARGET');
+  if ((isHideOrder || isDefeatOrder) && queuedOrderRef.current.length > 0) {
+    return null;
+  }
   const maxSel = pendingTargetSelection.maxSelections;
   const isMultiTargetEffect = maxSel === undefined || maxSel >= validTargets.length;
   if ((isHideOrder || isDefeatOrder) && validTargets.length > 1 && isMultiTargetEffect && visibleState && queuedOrderRef.current.length === 0) {

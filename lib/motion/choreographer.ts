@@ -68,6 +68,14 @@ function landingSquash(element: HTMLElement, durationMs: number): void {
   registerActiveTimeline(tl);
 }
 
+function entranceHold(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    const tl = gsap.timeline({ onComplete: resolve });
+    tl.to({}, { duration: ms / 1000 });
+    registerActiveTimeline(tl);
+  });
+}
+
 
 export async function playCardFlight(
   data: MotionEventData,
@@ -148,6 +156,7 @@ export async function playCardFlight(
         durationMs: profile.tier >= 3 ? 1000 : 750,
       });
       punch(target.element, profile.tier >= 3 ? 1.16 : 1.1);
+      await entranceHold(profile.tier >= 3 ? 650 : 450);
     }
   }
 }

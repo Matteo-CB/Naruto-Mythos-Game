@@ -11,8 +11,6 @@ import { emitAiGameSummaryHooks } from '@/lib/quests/aiGameSummary';
 import { emitDrawDiffEvents, emitTokenDiffEvents } from '@/lib/quests/engineEmit';
 import { stashPreUpdateSnapshot } from '@/lib/motion/boardRegistry';
 import { snapFromGameState, snapFromVisible, buildMotionEventsFromSnaps } from '@/lib/motion/motionDiff';
-import { rarityTier } from '@/lib/motion/vfxgl';
-import { motionMs } from '@/lib/motion/speed';
 import { useSocketStore } from '@/lib/socket/client';
 import { validatePlayCharacter, validatePlayHidden, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
@@ -1840,13 +1838,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       id,
       timestamp: now,
     };
-    if (typeof window !== 'undefined' && event.type === 'card-play' && !event.data.hidden) {
-      const tier = rarityTier(event.data.rarity as string | undefined);
-      const flightMs = motionMs('play');
-      if (tier >= 2 && flightMs > 0) {
-        useUIStore.getState().setPopupHoldUntil(now + flightMs + (tier >= 3 ? 650 : 450));
-      }
-    }
     set((state) => ({
       
       animationQueue: [

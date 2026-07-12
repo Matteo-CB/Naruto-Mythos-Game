@@ -4,19 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { useUIStore } from '@/stores/uiStore';
+import { useGameStore } from '@/stores/gameStore';
+
+const ENTRANCE_HOLD_TYPES: ReadonlySet<string> = new Set(['card-play', 'card-defeat', 'card-hide', 'card-reveal', 'card-upgrade']);
 
 export function useEntranceHold(enabled: boolean): boolean {
-  const holdUntil = useUIStore((s) => s.popupHoldUntil);
-  const [, setTick] = useState(0);
-  const remaining = enabled ? holdUntil - Date.now() : 0;
-  const holding = remaining > 0;
-  useEffect(() => {
-    if (!holding) return;
-    const timer = setTimeout(() => setTick((t) => t + 1), remaining + 30);
-    return () => clearTimeout(timer);
-  }, [holding, holdUntil]); // eslint-disable-line react-hooks/exhaustive-deps
-  return holding;
+  return useGameStore((s) => enabled && s.animationQueue.some((a) => ENTRANCE_HOLD_TYPES.has(a.type)));
 }
 
 function useIsCompactPopup(): boolean {
