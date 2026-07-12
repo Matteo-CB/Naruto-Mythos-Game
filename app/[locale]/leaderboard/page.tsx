@@ -8,6 +8,7 @@ import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { CountryFlag } from '@/components/CountryFlag';
 import { useLocaleBcp47 } from '@/lib/i18n/useLocaleMeta';
+import { COUNTRIES } from '@/lib/data/countries';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { RANK_TIERS, PLACEMENT_MATCHES_REQUIRED, getRankTier } from '@/components/EloBadge';
@@ -316,9 +317,21 @@ export default function LeaderboardPage() {
   const totalPages = Math.max(1, Math.ceil(totalPlayers / PLAYERS_PER_PAGE));
   const totalCount = useCountUp(totalPlayers, 600);
   const bcp47 = useLocaleBcp47();
-  const countryDisplayNames = useMemo(() => {
-    try { return new Intl.DisplayNames([bcp47], { type: 'region' }); } catch { return null; }
-  }, [bcp47]);
+  const countryOptions = useMemo(() => {
+    let dn: Intl.DisplayNames | null = null;
+    try { dn = new Intl.DisplayNames([bcp47], { type: 'region' }); } catch { dn = null; }
+    const nameByCode = new Map(COUNTRIES.map((c) => [c.code, c.name]));
+    return availableCountries
+      .map((code) => {
+        let name = nameByCode.get(code) ?? code.toUpperCase();
+        try {
+          const n = dn?.of(code.toUpperCase());
+          if (n && n.toUpperCase() !== code.toUpperCase()) name = n;
+        } catch { name = nameByCode.get(code) ?? code.toUpperCase(); }
+        return { code, name };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name, bcp47));
+  }, [availableCountries, bcp47]);
 
   const pageKey = useMemo(() => `${currentPage}-${debouncedSearch}-${leagueFilter}-${countryFilter}`, [currentPage, debouncedSearch, leagueFilter, countryFilter]);
 
@@ -531,9 +544,9 @@ export default function LeaderboardPage() {
             style={{ backgroundColor: '#14141a', color: countryFilter ? '#c4a35a' : '#999', border: '1px solid #262626', outline: 'none' }}
           >
             <option value="">{t('countryAll')}</option>
-            {availableCountries.map((code) => (
-              <option key={code} value={code}>
-                {countryDisplayNames?.of(code) ?? code}
+            {countryOptions.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.name}
               </option>
             ))}
             <option value="none">{t('countryNone')}</option>
