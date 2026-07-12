@@ -80,7 +80,7 @@ export function OpponentHand({ handSize }: OpponentHandProps) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-1.5">
+    <div data-anchor="hand:opp" className="flex flex-col items-center gap-1.5">
 
       <span
         className="text-[11px] tabular-nums"

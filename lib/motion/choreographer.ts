@@ -82,16 +82,21 @@ export async function playCardFlight(
   const side: PlayerSideId = perspective.isMyAction ? 'me' : 'opp';
 
   let fromRect: AnchorRect | null = null;
-  if (perspective.isMyAction && typeof data.cardIndex === 'number') {
-    fromRect = snapshot.get(anchorHandCard(data.cardIndex)) ?? null;
-  }
-  if (!fromRect) {
+  if (perspective.isMyAction) {
+    if (typeof data.cardIndex === 'number') {
+      fromRect = snapshot.get(anchorHandCard(data.cardIndex)) ?? null;
+    }
+    if (!fromRect) fromRect = resolveAnchor(anchorHandCard(0));
+    if (!fromRect && typeof window !== 'undefined') {
+      fromRect = { left: window.innerWidth / 2 - 40, top: window.innerHeight - 60, width: 80, height: 112 };
+    }
+  } else {
     fromRect = snapshot.get(anchorOpponentHand())
       ?? resolveAnchor(anchorOpponentHand())
       ?? null;
-  }
-  if (!fromRect && typeof data.cardIndex === 'number') {
-    fromRect = resolveAnchor(anchorHandCard(0));
+    if (!fromRect && typeof window !== 'undefined') {
+      fromRect = { left: window.innerWidth / 2 - 40, top: -60, width: 80, height: 112 };
+    }
   }
 
   const missionIndex = data.missionIndex ?? 0;
@@ -274,10 +279,12 @@ export async function playUpgradeMerge(data: MotionEventData): Promise<void> {
   const snapshot = getPreUpdateSnapshot();
 
   let fromRect: AnchorRect | null = null;
-  if (data.side === 'me' && typeof data.cardIndex === 'number') {
-    fromRect = snapshot.get(anchorHandCard(data.cardIndex)) ?? null;
-  }
-  if (!fromRect) {
+  if (data.side === 'me') {
+    if (typeof data.cardIndex === 'number') {
+      fromRect = snapshot.get(anchorHandCard(data.cardIndex)) ?? null;
+    }
+    if (!fromRect) fromRect = resolveAnchor(anchorHandCard(0));
+  } else {
     fromRect = snapshot.get(anchorOpponentHand()) ?? resolveAnchor(anchorOpponentHand());
   }
   if (!fromRect) return;
