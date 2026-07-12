@@ -1,6 +1,6 @@
 import { gsap } from 'gsap';
 import {
-  anchorHandCard, anchorOpponentHand, anchorDeck, resolveAnchor,
+  anchorHandCard, anchorOpponentHand, resolveAnchor,
   findNewSlotAnchor, getPreUpdateSnapshot,
   type AnchorRect, type PlayerSideId,
 } from './boardRegistry';
@@ -107,46 +107,4 @@ export async function playCardFlight(
   }
   landingSquash(target.element, Math.max(180, durationMs * 0.35));
   landingRing(target.rect);
-}
-
-export async function playDrawFlight(
-  data: MotionEventData,
-  perspective: { isMyAction: boolean },
-): Promise<void> {
-  const durationMs = motionMs('draw');
-  if (durationMs <= 0) return;
-
-  const count = Math.min(data.count ?? 1, 5);
-  const side: PlayerSideId = perspective.isMyAction ? 'me' : 'opp';
-  const fromRect = resolveAnchor(anchorDeck(side));
-  if (!fromRect) return;
-
-  const mobile = isMobileViewport();
-  const flights: Promise<void>[] = [];
-  for (let k = 0; k < count; k++) {
-    let toRect: AnchorRect | null = null;
-    if (perspective.isMyAction) {
-      const idx = data.newIndexes?.[k];
-      if (typeof idx === 'number') toRect = resolveAnchor(anchorHandCard(idx));
-      if (!toRect) toRect = resolveAnchor(anchorHandCard(0));
-    } else {
-      toRect = resolveAnchor(anchorOpponentHand());
-    }
-    if (!toRect) continue;
-
-    const flight = new Promise<void>((res) => {
-      setTimeout(() => {
-        flyCard({
-          fromRect,
-          toRect: toRect as AnchorRect,
-          imageUrl: null,
-          durationMs,
-          flipInFlight: false,
-          isMobile: mobile,
-        }).then(res);
-      }, k * Math.min(110, durationMs * 0.3));
-    });
-    flights.push(flight);
-  }
-  await Promise.all(flights);
 }

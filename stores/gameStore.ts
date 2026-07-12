@@ -35,7 +35,7 @@ interface AnimationEvent {
   id: string;
   type: 'card-play' | 'card-reveal' | 'card-defeat' | 'card-hide' | 'card-move' |
         'card-upgrade' | 'power-token' | 'chakra-gain' | 'mission-score' |
-        'edge-transfer' | 'turn-transition' | 'card-deal' | 'card-draw' | 'game-end';
+        'edge-transfer' | 'turn-transition' | 'card-deal' | 'game-end';
   data: Record<string, unknown>;
   timestamp: number;
 }
@@ -172,7 +172,6 @@ function buildOnlineMotionEvents(
   const events: Array<Omit<AnimationEvent, 'id' | 'timestamp'>> = [];
   if (!prev || prev.gameId !== next.gameId) return events;
   const me = next.myPlayer;
-  const opp = me === 'player1' ? 'player2' : 'player1';
 
   let newChars = 0;
   for (let mi = 0; mi < next.activeMissions.length; mi++) {
@@ -209,41 +208,8 @@ function buildOnlineMotionEvents(
     }
   }
 
-  const oldMyHand = prev.myState.hand.length;
-  const newMyHand = next.myState.hand.length;
-  if (newMyHand > oldMyHand) {
-    const grew = newMyHand - oldMyHand;
-    const count = Math.min(grew, 5);
-    const newIndexes: number[] = [];
-    for (let i = oldMyHand; i < oldMyHand + count; i++) newIndexes.push(i);
-    events.push({ type: 'card-draw', data: { player: me, count, newIndexes } });
-  }
-  const oldOppHand = prev.opponentState.handSize;
-  const newOppHand = next.opponentState.handSize;
-  if (newOppHand > oldOppHand) {
-    events.push({ type: 'card-draw', data: { player: opp, count: Math.min(newOppHand - oldOppHand, 5) } });
-  }
   return events;
 }
-
-function buildDrawAnimationEvents(
-  oldState: GameState,
-  newState: GameState,
-): Array<Omit<AnimationEvent, 'id' | 'timestamp'>> {
-  const events: Array<Omit<AnimationEvent, 'id' | 'timestamp'>> = [];
-  for (const pid of ['player1', 'player2'] as PlayerID[]) {
-    const oldLen = oldState[pid].hand.length;
-    const newLen = newState[pid].hand.length;
-    if (newLen > oldLen) {
-      const count = Math.min(newLen - oldLen, 5);
-      const newIndexes: number[] = [];
-      for (let i = oldLen; i < oldLen + count; i++) newIndexes.push(i);
-      events.push({ type: 'card-draw', data: { player: pid, count, newIndexes } });
-    }
-  }
-  return events;
-}
-
 
 let aiWatchdogTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -1349,9 +1315,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let newState: GameState;
     try {
       newState = GameEngine.applyAction(gameState, humanPlayer, action);
-      for (const drawEvt of buildDrawAnimationEvents(gameState, newState)) {
-        addAnimation(drawEvt);
-      }
       if (get().isAIGame) {
         emitDrawDiffEvents(gameState, newState);
         emitTokenDiffEvents(gameState, newState);
@@ -1931,9 +1894,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     for (const anim of aiAnimations) {
       addAnimation(anim);
-    }
-    for (const drawEvt of buildDrawAnimationEvents(stateBeforeAI, currentState)) {
-      addAnimation(drawEvt);
     }
 
     const visible = GameEngine.getVisibleState(currentState, humanPlayer);

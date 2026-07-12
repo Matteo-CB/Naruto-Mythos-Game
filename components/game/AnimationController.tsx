@@ -7,7 +7,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useGameScale } from './GameScaleContext';
 import { playSound, setVolume, setMuted } from '@/lib/sound/SoundManager';
-import { playCardFlight, playDrawFlight, installSkipListener, type MotionEventData } from '@/lib/motion/choreographer';
+import { playCardFlight, installSkipListener, type MotionEventData } from '@/lib/motion/choreographer';
 
 type AnimationType =
   | 'card-play'
@@ -22,7 +22,6 @@ type AnimationType =
   | 'edge-transfer'
   | 'turn-transition'
   | 'card-deal'
-  | 'card-draw'
   | 'game-end';
 
 function getAnimationDuration(type: AnimationType): number {
@@ -763,7 +762,7 @@ function renderAnimation(anim: AnimationEvent) {
   }
 }
 
-const MOTION_TYPES: ReadonlySet<string> = new Set(['card-play', 'card-draw']);
+const MOTION_TYPES: ReadonlySet<string> = new Set(['card-play']);
 
 export function AnimationController() {
   const animationQueue = useGameStore((s) => s.animationQueue);
@@ -825,9 +824,7 @@ export function AnimationController() {
     if (MOTION_TYPES.has(type)) {
       const data = currentAnim.data as MotionEventData;
       const isMyAction = data.player === humanPlayer;
-      const run = type === 'card-play'
-        ? playCardFlight(data, { isMyAction })
-        : playDrawFlight(data, { isMyAction });
+      const run = playCardFlight(data, { isMyAction });
       let done = false;
       const finish = () => {
         if (done) return;
@@ -836,7 +833,6 @@ export function AnimationController() {
       };
       run.then(finish).catch(finish);
       const safety = setTimeout(finish, 4000);
-      if (type === 'card-draw') playSound('mulligan');
       return () => clearTimeout(safety);
     }
     switch (type) {
