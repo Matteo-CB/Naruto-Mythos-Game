@@ -182,10 +182,10 @@ function overlayAt(rect: AnchorRect, css: string): HTMLDivElement {
   return div;
 }
 
-function vignette(totalMs: number): void {
+function vignette(totalMs: number, strength = 0.5): void {
   if (typeof document === 'undefined') return;
   const div = document.createElement('div');
-  div.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:42;background-color:rgba(2,2,6,0.5);opacity:0;';
+  div.style.cssText = `position:fixed;inset:0;pointer-events:none;z-index:42;background-color:rgba(2,2,6,${strength});opacity:0;`;
   document.body.appendChild(div);
   const tl = gsap.timeline({ onComplete: () => div.remove() });
   tl.to(div, { opacity: 1, duration: 0.15, ease: 'power1.out' })
@@ -465,13 +465,13 @@ export async function playMissionScore(data: MotionEventData): Promise<void> {
   const missionRect = missionEl.getBoundingClientRect();
   const winnerColor = data.side === 'me' ? '#e6c36a' : '#d97676';
 
-  vignette(durationMs);
-  punch(missionEl, 1.14);
+  vignette(durationMs, 0.3);
+  punch(missionEl, 1.07);
   void playGlVfx('victory', { left: missionRect.left, top: missionRect.top, width: missionRect.width, height: missionRect.height }, { ...VFX_PRESETS.victory });
 
   const glow = overlayAt(
     { left: missionRect.left, top: missionRect.top, width: missionRect.width, height: missionRect.height },
-    `box-shadow:0 0 30px ${data.side === 'me' ? 'rgba(196,163,90,0.75)' : 'rgba(179,62,62,0.75)'}, inset 0 0 20px ${data.side === 'me' ? 'rgba(196,163,90,0.35)' : 'rgba(179,62,62,0.35)'};opacity:0;`,
+    `box-shadow:0 0 16px ${data.side === 'me' ? 'rgba(196,163,90,0.5)' : 'rgba(179,62,62,0.5)'}, inset 0 0 10px ${data.side === 'me' ? 'rgba(196,163,90,0.22)' : 'rgba(179,62,62,0.22)'};opacity:0;`,
   );
   const glowTl = gsap.timeline({ onComplete: () => glow.remove() });
   glowTl.to(glow, { opacity: 1, duration: 0.2 })

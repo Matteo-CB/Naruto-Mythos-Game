@@ -86,7 +86,7 @@ export function rarityVfxProfile(rarity: string | undefined): RarityVfxProfile {
 export const VFX_PRESETS = {
   slash: { color: RED, secondary: WHITE, intensity: 0.85, scale: 1.05, durationMs: 500 },
   ring: { color: GOLD, secondary: WHITE, intensity: 0.65, scale: 0.95, durationMs: 550 },
-  victory: { color: GOLD, secondary: WHITE, intensity: 0.8, scale: 1.35, durationMs: 850 },
+  victory: { color: GOLD, secondary: WHITE, intensity: 0.6, scale: 0.8, durationMs: 750 },
   kawarimi: { color: INK, secondary: TEAL, intensity: 0.7, scale: 0.85, durationMs: 550 },
   sealChakra: { color: TEAL, secondary: GOLD, intensity: 0.8, scale: 1.15, durationMs: 750 },
 } as const;
