@@ -653,7 +653,9 @@
     "chatVisibilityHint": "S'applique au chat de partie et aux messages privés. Les messages privés restent réservés aux amis.",
     "blockedPlayers": "Joueurs bloqués",
     "blockedEmpty": "Tu n'as bloqué personne.",
-    "unblock": "Débloquer"
+    "unblock": "Débloquer",
+    "fastAnimations": "Animations rapides",
+    "fastAnimationsHint": "Toutes les animations du jeu durent deux fois moins longtemps."
   },
   "game": {
     "turn": "Tour {turn}",

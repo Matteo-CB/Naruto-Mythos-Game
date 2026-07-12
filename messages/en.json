@@ -647,7 +647,9 @@
     "chatVisibilityHint": "Applies to the game chat and private messages. Private messages remain friends-only.",
     "blockedPlayers": "Blocked players",
     "blockedEmpty": "You have not blocked anyone.",
-    "unblock": "Unblock"
+    "unblock": "Unblock",
+    "fastAnimations": "Fast animations",
+    "fastAnimationsHint": "All game animations last half as long."
   },
   "game": {
     "turn": "Turn {turn}",

@@ -178,6 +178,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       onContextMenu={handleContextMenu}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      data-anchor={`slot:${missionIndex}:${isOwn ? 'me' : 'opp'}:${character.instanceId}`}
       className="relative no-select"
       style={{
         width: dims.missionCard.w + 'px',
@@ -479,6 +480,7 @@ function MissionCardDisplay({
     )}
 
     <div
+      data-anchor={`mission:${index}`}
       className="relative mission-aspect no-select"
       style={{
         width: '100%',

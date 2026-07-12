@@ -9,6 +9,7 @@ import { trackAiResult } from '@/lib/hooks/trackAiResult';
 import { startQuestBuffer, drainQuestBuffer } from '@/lib/quests/clientBuffer';
 import { emitAiGameSummaryHooks } from '@/lib/quests/aiGameSummary';
 import { emitDrawDiffEvents, emitTokenDiffEvents } from '@/lib/quests/engineEmit';
+import { stashPreUpdateSnapshot } from '@/lib/motion/boardRegistry';
 import { useSocketStore } from '@/lib/socket/client';
 import { validatePlayCharacter, validatePlayHidden, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
@@ -34,7 +35,7 @@ interface AnimationEvent {
   id: string;
   type: 'card-play' | 'card-reveal' | 'card-defeat' | 'card-hide' | 'card-move' |
         'card-upgrade' | 'power-token' | 'chakra-gain' | 'mission-score' |
-        'edge-transfer' | 'turn-transition' | 'card-deal' | 'game-end';
+        'edge-transfer' | 'turn-transition' | 'card-deal' | 'card-draw' | 'game-end';
   data: Record<string, unknown>;
   timestamp: number;
 }
@@ -164,6 +165,85 @@ interface GameStore {
 
 let animationIdCounter = 0;
 
+function buildOnlineMotionEvents(
+  prev: VisibleGameState | null,
+  next: VisibleGameState,
+): Array<Omit<AnimationEvent, 'id' | 'timestamp'>> {
+  const events: Array<Omit<AnimationEvent, 'id' | 'timestamp'>> = [];
+  if (!prev || prev.gameId !== next.gameId) return events;
+  const me = next.myPlayer;
+  const opp = me === 'player1' ? 'player2' : 'player1';
+
+  let newChars = 0;
+  for (let mi = 0; mi < next.activeMissions.length; mi++) {
+    const prevMission = prev.activeMissions[mi];
+    if (!prevMission) continue;
+    for (const sideKey of ['player1Characters', 'player2Characters'] as const) {
+      const prevIds = new Set(prevMission[sideKey].map((c) => c.instanceId));
+      for (const c of next.activeMissions[mi][sideKey]) {
+        if (prevIds.has(c.instanceId)) continue;
+        newChars++;
+        if (newChars > 3) return events.filter((e) => e.type !== 'card-play');
+        const owner = sideKey === 'player1Characters' ? 'player1' : 'player2';
+        const isMine = owner === me;
+        let cardIndex: number | undefined;
+        if (isMine) {
+          const nextIds = new Set(next.myState.hand.map((h, i) => `${h.id}:${i}`));
+          for (let i = 0; i < prev.myState.hand.length; i++) {
+            if (!nextIds.has(`${prev.myState.hand[i].id}:${i}`)) { cardIndex = i; break; }
+          }
+        }
+        const img = c.card?.image_file?.replace(/\\/g, '/');
+        events.push({
+          type: 'card-play',
+          data: {
+            cardName: c.card?.name_fr ?? 'Hidden Card',
+            cardImage: img ? (img.startsWith('/') ? img : `/${img}`) : null,
+            hidden: c.isHidden === true,
+            player: owner,
+            cardIndex,
+            missionIndex: mi,
+          },
+        });
+      }
+    }
+  }
+
+  const oldMyHand = prev.myState.hand.length;
+  const newMyHand = next.myState.hand.length;
+  if (newMyHand > oldMyHand) {
+    const grew = newMyHand - oldMyHand;
+    const count = Math.min(grew, 5);
+    const newIndexes: number[] = [];
+    for (let i = oldMyHand; i < oldMyHand + count; i++) newIndexes.push(i);
+    events.push({ type: 'card-draw', data: { player: me, count, newIndexes } });
+  }
+  const oldOppHand = prev.opponentState.handSize;
+  const newOppHand = next.opponentState.handSize;
+  if (newOppHand > oldOppHand) {
+    events.push({ type: 'card-draw', data: { player: opp, count: Math.min(newOppHand - oldOppHand, 5) } });
+  }
+  return events;
+}
+
+function buildDrawAnimationEvents(
+  oldState: GameState,
+  newState: GameState,
+): Array<Omit<AnimationEvent, 'id' | 'timestamp'>> {
+  const events: Array<Omit<AnimationEvent, 'id' | 'timestamp'>> = [];
+  for (const pid of ['player1', 'player2'] as PlayerID[]) {
+    const oldLen = oldState[pid].hand.length;
+    const newLen = newState[pid].hand.length;
+    if (newLen > oldLen) {
+      const count = Math.min(newLen - oldLen, 5);
+      const newIndexes: number[] = [];
+      for (let i = oldLen; i < oldLen + count; i++) newIndexes.push(i);
+      events.push({ type: 'card-draw', data: { player: pid, count, newIndexes } });
+    }
+  }
+  return events;
+}
+
 
 let aiWatchdogTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -189,6 +269,8 @@ function getAnimationForAction(
           missionRank,
           hidden: false,
           player,
+          cardIndex: action.cardIndex,
+          missionIndex: action.missionIndex,
         },
       };
     }
@@ -204,6 +286,8 @@ function getAnimationForAction(
           missionRank,
           hidden: true,
           player,
+          cardIndex: action.cardIndex,
+          missionIndex: action.missionIndex,
         },
       };
     }
@@ -298,6 +382,8 @@ function getAnimationForAIAction(
           missionRank,
           hidden: false,
           player: aiPlayer,
+          cardIndex: action.cardIndex,
+          missionIndex: action.missionIndex,
         },
       };
     }
@@ -313,6 +399,8 @@ function getAnimationForAIAction(
           missionRank,
           hidden: true,
           player: aiPlayer,
+          cardIndex: action.cardIndex,
+          missionIndex: action.missionIndex,
         },
       };
     }
@@ -944,6 +1032,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   updateOnlineState: (visibleState: VisibleGameState) => {
     const humanPlayer = get().humanPlayer;
+    if (!useUIStore.getState().coinFlipComplete || get().isReplayMode) {
+      void 0;
+    } else {
+      for (const evt of buildOnlineMotionEvents(get().visibleState, visibleState)) {
+        get().addAnimation(evt);
+      }
+    }
     const pendingForMe = visibleState.pendingActions.filter((a) => a.player === humanPlayer);
 
     if (pendingForMe.length > 0) {
@@ -1254,6 +1349,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let newState: GameState;
     try {
       newState = GameEngine.applyAction(gameState, humanPlayer, action);
+      for (const drawEvt of buildDrawAnimationEvents(gameState, newState)) {
+        addAnimation(drawEvt);
+      }
       if (get().isAIGame) {
         emitDrawDiffEvents(gameState, newState);
         emitTokenDiffEvents(gameState, newState);
@@ -1834,6 +1932,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     for (const anim of aiAnimations) {
       addAnimation(anim);
     }
+    for (const drawEvt of buildDrawAnimationEvents(stateBeforeAI, currentState)) {
+      addAnimation(drawEvt);
+    }
 
     const visible = GameEngine.getVisibleState(currentState, humanPlayer);
 
@@ -2021,6 +2122,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   addAnimation: (event) => {
+    if (typeof window !== 'undefined') stashPreUpdateSnapshot();
     const id = `anim-${++animationIdCounter}`;
     const now = Date.now();
     const animEvent: AnimationEvent = {

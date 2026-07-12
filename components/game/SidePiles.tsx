@@ -203,13 +203,13 @@ export function OpponentSidePiles() {
           borderRight: '1px solid rgba(179, 62, 62, 0.1)',
         }}
       >
-        <DeckPile count={deckCount} accentColor="#b33e3e" />
-        <DiscardPile
+        <div data-anchor="deck:opp"><DeckPile count={deckCount} accentColor="#b33e3e" /></div>
+        <div data-anchor="discard:opp"><DiscardPile
           count={discardCount}
           accentColor="#b33e3e"
           onClick={() => discardCount > 0 && setShowDiscard(true)}
           topCardImage={normalizeImagePath(opponentTopDiscard?.image_file) ?? undefined}
-        />
+        /></div>
       </aside>
 
       <AnimatePresence>
@@ -250,13 +250,13 @@ export function PlayerSidePiles() {
           borderLeft: '1px solid rgba(196, 163, 90, 0.1)',
         }}
       >
-        <DeckPile count={deckCount} accentColor="#c4a35a" />
-        <DiscardPile
+        <div data-anchor="deck:me"><DeckPile count={deckCount} accentColor="#c4a35a" /></div>
+        <div data-anchor="discard:me"><DiscardPile
           count={discardCount}
           accentColor="#c4a35a"
           onClick={() => setShowDiscard(true)}
           topCardImage={normalizeImagePath(playerTopDiscard?.image_file) ?? undefined}
-        />
+        /></div>
       </aside>
 
       <AnimatePresence>

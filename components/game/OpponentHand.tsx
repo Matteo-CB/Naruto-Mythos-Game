@@ -60,7 +60,7 @@ export function OpponentHand({ handSize }: OpponentHandProps) {
 
   if (dims.isMobile) {
     return (
-      <div className="flex items-center justify-center gap-3">
+      <div data-anchor="hand:opp" className="flex items-center justify-center gap-3">
         <div
           className="relative flex items-center justify-center"
           style={{ height: dims.opponentContainerH + 'px', minWidth: dims.opponentMinW + 'px' }}

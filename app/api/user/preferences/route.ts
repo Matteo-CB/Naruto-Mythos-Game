@@ -14,7 +14,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, countryCode: true, chatVisibility: true },
+      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, countryCode: true, chatVisibility: true, fastAnimations: true },
     });
 
     return NextResponse.json({
@@ -25,6 +25,7 @@ export async function GET() {
       hideDeckBuilderVariants: user?.hideDeckBuilderVariants ?? false,
       countryCode: user?.countryCode ?? null,
       chatVisibility: normalizeChatVisibility(user?.chatVisibility),
+      fastAnimations: user?.fastAnimations ?? false,
     });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -63,6 +64,9 @@ export async function PATCH(request: NextRequest) {
     }
     if (typeof body.chatVisibility === 'string' && ['everyone', 'friends', 'off'].includes(body.chatVisibility)) {
       update.chatVisibility = body.chatVisibility;
+    }
+    if (typeof body.fastAnimations === 'boolean') {
+      update.fastAnimations = body.fastAnimations;
     }
 
     if (Object.keys(update).length === 0) {

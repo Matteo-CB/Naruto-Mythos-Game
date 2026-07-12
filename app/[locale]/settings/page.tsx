@@ -39,6 +39,7 @@ export default function SettingsPage() {
     animationsEnabled, gameBackground, isLoaded, availableBackgrounds,
     fetchFromServer, setAnimationsEnabled, setGameBackground,
     hideDeckBuilderVariants, setHideDeckBuilderVariants,
+    fastAnimations, setFastAnimations,
     countryCode, setCountryCode,
     soundEnabled, setSoundEnabled,
   } = useSettingsStore();
@@ -363,6 +364,39 @@ export default function SettingsPage() {
             style={{ color: '#555555' }}
           >
             {soundEnabled ? t('soundOn') : t('soundOff')}
+          </p>
+
+          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+
+          <div className="flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+              {t('fastAnimations')}
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={fastAnimations}
+              disabled={!isLoaded}
+              onClick={() => setFastAnimations(!fastAnimations)}
+              className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden"
+              style={{
+                backgroundColor: fastAnimations ? '#c4a35a' : '#333333',
+                cursor: isLoaded ? 'pointer' : 'default',
+                opacity: isLoaded ? 1 : 0.5,
+              }}
+            >
+              <span
+                className="absolute top-0.5 h-5 w-5 rounded-full"
+                style={{
+                  backgroundColor: '#0a0a0a',
+                  left: fastAnimations ? '22px' : '2px',
+                  transition: 'left 150ms ease',
+                }}
+              />
+            </button>
+          </div>
+          <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+            {t('fastAnimationsHint')}
           </p>
 
           <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />

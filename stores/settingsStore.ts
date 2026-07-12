@@ -10,6 +10,7 @@ export type ChatVisibilitySetting = 'everyone' | 'friends' | 'off';
 
 interface SettingsState {
   animationsEnabled: boolean;
+  fastAnimations: boolean;
   chatVisibility: ChatVisibilitySetting;
   soundEnabled: boolean;
   soundVolume: number;
@@ -29,6 +30,7 @@ interface SettingsState {
   setCountryCode: (code: string | null) => Promise<void>;
   setGameBackground: (id: string, url: string) => Promise<void>;
   setChatVisibility: (v: ChatVisibilitySetting) => Promise<void>;
+  setFastAnimations: (v: boolean) => Promise<void>;
 }
 
 const DEFAULT_BG_URL = '/images/backgrounds/1.webp';
@@ -64,6 +66,7 @@ function getLocalSound(): { enabled: boolean; volume: number } {
 
 export const useSettingsStore = create<SettingsState>()((set, get) => ({
   animationsEnabled: true,
+  fastAnimations: false,
   chatVisibility: 'everyone',
   soundEnabled: getLocalSound().enabled,
   soundVolume: getLocalSound().volume,
@@ -99,6 +102,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
 
       set({
         animationsEnabled: prefs.animationsEnabled ?? true,
+        fastAnimations: prefs.fastAnimations ?? false,
         chatVisibility: (['everyone', 'friends', 'off'].includes(prefs.chatVisibility) ? prefs.chatVisibility : 'everyone') as ChatVisibilitySetting,
         soundEnabled: prefs.soundsEnabled ?? get().soundEnabled,
         allowSpectatorHand: prefs.allowSpectatorHand ?? false,
@@ -192,6 +196,21 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       if (!res.ok) throw new Error('Failed to save');
     } catch {
       set({ countryCode: prev });
+    }
+  },
+
+  setFastAnimations: async (v: boolean) => {
+    const prev = get().fastAnimations;
+    set({ fastAnimations: v });
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fastAnimations: v }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+    } catch {
+      set({ fastAnimations: prev });
     }
   },
 

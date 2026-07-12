@@ -652,7 +652,9 @@
     "chatVisibilityHint": "Se aplica al chat de partida y a los mensajes privados. Los mensajes privados siguen siendo solo para amigos.",
     "blockedPlayers": "Jugadores bloqueados",
     "blockedEmpty": "No has bloqueado a nadie.",
-    "unblock": "Desbloquear"
+    "unblock": "Desbloquear",
+    "fastAnimations": "Animaciones rápidas",
+    "fastAnimationsHint": "Todas las animaciones del juego duran la mitad."
   },
   "game": {
     "turn": "Turno {turn}",

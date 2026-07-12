@@ -123,6 +123,7 @@ const HandCard = React.memo(function HandCard({
 
   return (
     <motion.div
+      data-anchor={`hand:me:${originalIndex}`}
       initial={{ y: 100, opacity: 0, rotate: 0 }}
       animate={animateProps}
       whileHover={hoverProps}

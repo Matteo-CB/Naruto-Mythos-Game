@@ -7,6 +7,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useGameScale } from './GameScaleContext';
 import { playSound, setVolume, setMuted } from '@/lib/sound/SoundManager';
+import { playCardFlight, playDrawFlight, installSkipListener, type MotionEventData } from '@/lib/motion/choreographer';
 
 type AnimationType =
   | 'card-play'
@@ -21,6 +22,7 @@ type AnimationType =
   | 'edge-transfer'
   | 'turn-transition'
   | 'card-deal'
+  | 'card-draw'
   | 'game-end';
 
 function getAnimationDuration(type: AnimationType): number {
@@ -62,121 +64,6 @@ interface AnimationEvent {
   type: AnimationType;
   data: Record<string, unknown>;
   timestamp: number;
-}
-
-function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
-  const t = useTranslations();
-  const dims = useGameScale();
-  const cardName = (data.cardName as string) || 'Card';
-  const isHidden = data.hidden === true;
-  const missionRank = (data.missionRank as string) || '';
-  const cardImage = data.cardImage as string | null;
-
-  return (
-    <motion.div
-      key="card-play"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.15 }}
-      className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
-    >
-      <div className="flex flex-col items-center gap-3">
-        
-        <motion.div
-          className="overflow-hidden relative"
-          style={{
-            width: dims.animHand.w + 'px',
-            height: dims.animHand.h + 'px',
-            boxShadow: isHidden
-              ? '0 8px 40px rgba(0, 0, 0, 0.8)'
-              : '0 8px 40px rgba(196, 163, 90, 0.4), 0 0 20px rgba(196, 163, 90, 0.2)',
-            border: isHidden ? '2px solid #333333' : '2px solid rgba(196, 163, 90, 0.5)',
-            transformPerspective: 900,
-          }}
-          initial={{ y: 200, scale: 0.6, opacity: 0, rotateY: -32, rotateX: 8 }}
-          animate={{ y: 0, scale: 1, opacity: 1, rotateY: 0, rotateX: 0 }}
-          exit={{ y: -60, scale: 0.85, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 160, damping: 16 }}
-        >
-          {isHidden ? (
-            <img
-              src="/images/card-back.webp"
-              alt={t('a11y.hiddenCard')}
-              className="w-full h-full"
-              style={{ objectFit: 'cover' }}
-              draggable={false}
-            />
-          ) : cardImage ? (
-            <img
-              src={cardImage}
-              alt={cardName}
-              className="w-full h-full"
-              style={{ objectFit: 'cover', opacity: 0, transition: 'opacity 0.12s ease' }}
-              draggable={false}
-              onLoad={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '1'; }}
-            />
-          ) : (
-            <div
-              className="w-full h-full flex items-center justify-center"
-              style={{ backgroundColor: '#1a1a20' }}
-            >
-              <img
-                src="/images/card-back.webp"
-                alt={cardName}
-                className="w-full h-full"
-                style={{ objectFit: 'cover', opacity: 0.5 }}
-                draggable={false}
-              />
-            </div>
-          )}
-          {!isHidden && (
-            <motion.div
-              className="absolute top-0 bottom-0 pointer-events-none"
-              style={{
-                width: '34%',
-                backgroundColor: 'rgba(255, 250, 235, 0.22)',
-                filter: 'blur(10px)',
-                transform: 'skewX(-18deg)',
-              }}
-              initial={{ left: '-45%' }}
-              animate={{ left: '130%' }}
-              transition={{ delay: 0.32, duration: 0.5, ease: 'easeInOut' }}
-            />
-          )}
-        </motion.div>
-
-        <motion.div
-          className="flex flex-col items-center gap-1 px-6 py-2"
-          style={{
-            backgroundColor: 'rgba(10, 10, 10, 0.9)',
-            border: '1px solid #333333',
-          }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <span
-            className="text-[10px] font-medium uppercase tracking-wider"
-            style={{ color: '#888888' }}
-          >
-            {isHidden ? t('game.anim.cardPlayedHidden') : t('game.anim.cardPlayed')}
-          </span>
-          <span
-            className="text-sm font-bold"
-            style={{ color: isHidden ? '#888888' : '#c4a35a' }}
-          >
-            {isHidden ? '???' : cardName}
-          </span>
-          {missionRank && (
-            <span className="text-[10px]" style={{ color: '#555555' }}>
-              {t('game.board.missionRank', { rank: missionRank })}
-            </span>
-          )}
-        </motion.div>
-      </div>
-    </motion.div>
-  );
 }
 
 function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
@@ -846,78 +733,8 @@ function TurnTransitionAnimation({ data }: { data: Record<string, unknown> }) {
   );
 }
 
-function CardDealAnimation({ data }: { data: Record<string, unknown> }) {
-  const t = useTranslations();
-  const dims = useGameScale();
-  const count = (data.count as number) || 1;
-
-  return (
-    <motion.div
-      key="card-deal"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.15 }}
-      className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
-    >
-      <div className="flex flex-col items-center gap-3">
-        
-        <div className="flex items-center gap-1.5">
-          {Array.from({ length: Math.min(count, 5) }).map((_, i) => (
-            <motion.div
-              key={i}
-              className=""
-              style={{
-                width: dims.animDeck.w + 'px',
-                height: dims.animDeck.h + 'px',
-                backgroundColor: '#1a1a20',
-                border: '1px solid #333333',
-                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.5)',
-              }}
-              initial={{ y: -80, opacity: 0, rotate: -10 + i * 5 }}
-              animate={{ y: 0, opacity: 1, rotate: 0 }}
-              transition={{
-                delay: i * 0.08,
-                type: 'spring',
-                stiffness: 200,
-                damping: 16,
-              }}
-            />
-          ))}
-        </div>
-
-        <motion.div
-          className="flex items-center gap-2 px-4 py-1.5"
-          style={{
-            backgroundColor: 'rgba(10, 10, 10, 0.9)',
-            border: '1px solid #333333',
-          }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <span
-            className="text-[10px] font-medium uppercase tracking-wider"
-            style={{ color: '#888888' }}
-          >
-            {t('game.anim.cardsDrawn')}
-          </span>
-          <span
-            className="text-lg font-bold tabular-nums"
-            style={{ color: '#e0e0e0' }}
-          >
-            +{count}
-          </span>
-        </motion.div>
-      </div>
-    </motion.div>
-  );
-}
-
 function renderAnimation(anim: AnimationEvent) {
   switch (anim.type) {
-    case 'card-play':
-      return <CardPlayAnimation key={anim.id} data={anim.data} />;
     case 'card-reveal':
       return <CardRevealAnimation key={anim.id} data={anim.data} />;
     case 'card-defeat':
@@ -938,8 +755,6 @@ function renderAnimation(anim: AnimationEvent) {
       return <EdgeTransferAnimation key={anim.id} data={anim.data} />;
     case 'turn-transition':
       return <TurnTransitionAnimation key={anim.id} data={anim.data} />;
-    case 'card-deal':
-      return <CardDealAnimation key={anim.id} data={anim.data} />;
     case 'game-end':
       
       return null;
@@ -948,10 +763,15 @@ function renderAnimation(anim: AnimationEvent) {
   }
 }
 
+const MOTION_TYPES: ReadonlySet<string> = new Set(['card-play', 'card-draw']);
+
 export function AnimationController() {
   const animationQueue = useGameStore((s) => s.animationQueue);
   const completeAnimation = useGameStore((s) => s.completeAnimation);
   const setAnimating = useGameStore((s) => s.setAnimating);
+  const humanPlayer = useGameStore((s) => s.humanPlayer);
+
+  useEffect(() => installSkipListener(), []);
   const animationsEnabled = useSettingsStore((s) => s.animationsEnabled);
   const soundEnabled = useSettingsStore((s) => s.soundEnabled);
   const soundVolume = useSettingsStore((s) => s.soundVolume);
@@ -1002,6 +822,23 @@ export function AnimationController() {
   useEffect(() => {
     if (!currentAnim) return;
     const type = currentAnim.type as AnimationType;
+    if (MOTION_TYPES.has(type)) {
+      const data = currentAnim.data as MotionEventData;
+      const isMyAction = data.player === humanPlayer;
+      const run = type === 'card-play'
+        ? playCardFlight(data, { isMyAction })
+        : playDrawFlight(data, { isMyAction });
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        completeAnimation(currentAnim.id);
+      };
+      run.then(finish).catch(finish);
+      const safety = setTimeout(finish, 4000);
+      if (type === 'card-draw') playSound('mulligan');
+      return () => clearTimeout(safety);
+    }
     switch (type) {
       case 'turn-transition':
         playSound('newTurn');
@@ -1019,6 +856,7 @@ export function AnimationController() {
 
   useEffect(() => {
     if (!currentAnim) return;
+    if (MOTION_TYPES.has(currentAnim.type)) return;
     const duration = animationsEnabled ? getAnimationDuration(currentAnim.type as AnimationType) : 0;
     const timer = setTimeout(() => {
       completeAnimation(currentAnim.id);

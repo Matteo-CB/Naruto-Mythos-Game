@@ -651,7 +651,9 @@
     "chatVisibilityHint": "対戦チャットとプライベートメッセージに適用されます。プライベートメッセージは引き続きフレンド限定です。",
     "blockedPlayers": "ブロックしたプレイヤー",
     "blockedEmpty": "誰もブロックしていません。",
-    "unblock": "ブロック解除"
+    "unblock": "ブロック解除",
+    "fastAnimations": "高速アニメーション",
+    "fastAnimationsHint": "ゲーム内のすべてのアニメーションが半分の時間になります。"
   },
   "game": {
     "turn": "ターン {turn}",

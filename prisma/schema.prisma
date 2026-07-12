@@ -61,6 +61,7 @@ model User {
   hideDeckBuilderVariants Boolean              @default(false)
   countryCode             String?
   chatVisibility          String               @default("everyone")
+  fastAnimations          Boolean              @default(false)
   chatIntroSeenAt         DateTime?
   usernameResetRequired   Boolean              @default(false)
 

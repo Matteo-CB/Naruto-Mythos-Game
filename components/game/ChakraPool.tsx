@@ -21,7 +21,7 @@ export function ChakraPool({ amount, label, isOpponent = false }: ChakraPoolProp
   }, [amount, displayAmount]);
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div data-anchor={isOpponent ? 'chakra:opp' : 'chakra:me'} className="flex flex-col items-center gap-1">
       <span className="flex items-center gap-1 text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
         <img src="/images/icons/chakra-swirl.svg" alt="" draggable={false} style={{ width: 12, height: 12, opacity: 0.55 }} />
         {label}

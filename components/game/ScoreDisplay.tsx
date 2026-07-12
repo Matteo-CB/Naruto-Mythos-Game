@@ -28,7 +28,7 @@ export function ScoreDisplay({
           {t('game.board.missionPoints')}
         </span>
         <div className="flex items-center justify-between gap-4">
-          <ScoreEntry label={playerLabel} score={playerScore} color="#c4a35a" />
+          <div data-anchor="score:me"><ScoreEntry label={playerLabel} score={playerScore} color="#c4a35a" /></div>
           <div
             style={{
               width: '1px',
@@ -36,7 +36,7 @@ export function ScoreDisplay({
               backgroundColor: 'rgba(255, 255, 255, 0.08)',
             }}
           />
-          <ScoreEntry label={opponentLabel} score={opponentScore} color="#b33e3e" />
+          <div data-anchor="score:opp"><ScoreEntry label={opponentLabel} score={opponentScore} color="#b33e3e" /></div>
         </div>
       </div>
     </PanelFrame>

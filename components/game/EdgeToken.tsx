@@ -17,7 +17,7 @@ export function EdgeToken({ holder, myPlayer, lockedFor = null }: EdgeTokenProps
   const isLocked = lockedFor != null && lockedFor === holder;
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div data-anchor="edge" className="flex flex-col items-center gap-1">
       <span
         className="text-xs uppercase tracking-wider"
         style={{ color: '#888888' }}
