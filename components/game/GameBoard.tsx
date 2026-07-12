@@ -101,20 +101,28 @@ function CardPreviewContent({
       
       {imagePath ? (
         <div
-          className="w-full shrink-0 flex items-center justify-center relative"
+          className="w-full shrink-0 flex items-center justify-center"
           style={{
             backgroundColor: "#0a0a0c",
             height: isCharacter ? "200px" : "140px",
           }}
         >
-          <img
-            src={imagePath}
-            alt={getCardName(card, locale as 'en' | 'fr')}
-            draggable={false}
-            className="w-full h-full"
-            style={{ objectFit: "contain" }}
-          />
-          {card.isHolo && <HoloFoilOverlay intensity="preview" />}
+          <div
+            className="relative overflow-hidden"
+            style={{
+              height: "100%",
+              aspectRatio: isCharacter ? "800 / 1100" : "1100 / 800",
+              maxWidth: "100%",
+            }}
+          >
+            <img
+              src={imagePath}
+              alt={getCardName(card, locale as 'en' | 'fr')}
+              draggable={false}
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+            />
+            {card.isHolo && <HoloFoilOverlay intensity="preview" />}
+          </div>
         </div>
       ) : (
         <div
@@ -817,7 +825,7 @@ function FullscreenCardDetail() {
           </button>
 
           <div
-            className="shrink-0 flex items-center justify-center relative"
+            className="shrink-0 flex items-center justify-center"
             style={{
               width: isMission ? "min(50%, 320px)" : "min(32%, 200px)",
               height: "100%",
@@ -827,16 +835,22 @@ function FullscreenCardDetail() {
             }}
           >
             {imagePath ? (
-              <>
+              <div
+                className="relative overflow-hidden"
+                style={{
+                  width: "100%",
+                  aspectRatio: isCharacter ? "800 / 1100" : "1100 / 800",
+                  maxHeight: "100%",
+                }}
+              >
                 <img
                   src={imagePath}
                   alt={getCardName(card, locale as "en" | "fr")}
                   draggable={false}
-                  className="max-w-full max-h-full"
-                  style={{ objectFit: "contain" }}
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
                 />
                 {card.isHolo && <HoloFoilOverlay intensity="preview" />}
-              </>
+              </div>
             ) : (
               <span className="text-[10px]" style={{ color: "#555555" }}>
                 {t("card.noImage")}
@@ -901,20 +915,28 @@ function FullscreenCardDetail() {
 
           {imagePath ? (
             <div
-              className="w-full shrink-0 flex items-center justify-center relative"
+              className="w-full shrink-0 flex items-center justify-center"
               style={{
                 backgroundColor: "#0a0a0c",
                 height: isCharacter ? "320px" : "240px",
               }}
             >
-              <img
-                src={imagePath}
-                alt={getCardName(card, locale as 'en' | 'fr')}
-                draggable={false}
-                className="w-full h-full"
-                style={{ objectFit: "contain" }}
-              />
-              {card.isHolo && <HoloFoilOverlay intensity="preview" />}
+              <div
+                className="relative overflow-hidden"
+                style={{
+                  height: "100%",
+                  aspectRatio: isCharacter ? "800 / 1100" : "1100 / 800",
+                  maxWidth: "100%",
+                }}
+              >
+                <img
+                  src={imagePath}
+                  alt={getCardName(card, locale as 'en' | 'fr')}
+                  draggable={false}
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                />
+                {card.isHolo && <HoloFoilOverlay intensity="preview" />}
+              </div>
             </div>
           ) : (
             <div
