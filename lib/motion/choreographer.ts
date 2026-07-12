@@ -72,24 +72,6 @@ function landingSquash(element: HTMLElement, durationMs: number): void {
   registerActiveTimeline(tl);
 }
 
-function landingRing(rect: AnchorRect): void {
-  if (typeof document === 'undefined') return;
-  const ring = document.createElement('div');
-  const size = Math.max(rect.width, rect.height);
-  ring.style.cssText = [
-    'position:fixed', 'pointer-events:none', 'z-index:44',
-    `left:${rect.left + rect.width / 2 - size / 2}px`,
-    `top:${rect.top + rect.height / 2 - size / 2}px`,
-    `width:${size}px`, `height:${size}px`,
-    'border-radius:9999px',
-    'box-shadow:0 0 18px rgba(196,163,90,0.5), inset 0 0 12px rgba(196,163,90,0.35)',
-    'opacity:0.8', 'transform:scale(0.6)',
-  ].join(';');
-  document.body.appendChild(ring);
-  const tl = gsap.timeline({ onComplete: () => ring.remove() });
-  tl.to(ring, { scale: 1.5, opacity: 0, duration: 0.4, ease: 'power2.out' });
-  registerActiveTimeline(tl);
-}
 
 export async function playCardFlight(
   data: MotionEventData,
@@ -147,7 +129,6 @@ export async function playCardFlight(
     target.element.style.visibility = '';
   }
   landingSquash(target.element, Math.max(180, durationMs * 0.35));
-  landingRing(target.rect);
   const landRect = target.element.getBoundingClientRect();
   if (data.hidden) {
     void playGlVfx('kawarimi', landRect, { ...VFX_PRESETS.kawarimi });
@@ -157,9 +138,9 @@ export async function playCardFlight(
       void playGlVfx('seal', landRect, {
         color: VFX_PRESETS.sealChakra.color,
         secondary: VFX_PRESETS.sealChakra.secondary,
-        intensity: Math.max(profile.intensity, 0.8),
-        scale: Math.max(profile.scale, 1.4),
-        durationMs: Math.max(profile.durationMs, 750),
+        intensity: Math.max(profile.intensity, 0.6),
+        scale: Math.max(profile.scale, 0.95),
+        durationMs: Math.max(profile.durationMs, 650),
       });
     } else {
       void playGlVfx('burst', landRect, {
@@ -171,15 +152,15 @@ export async function playCardFlight(
       });
     }
     if (profile.tier >= 2) {
-      if (profile.tier >= 3) vignette(profile.durationMs + 500);
+      if (profile.tier >= 3) vignette(profile.durationMs + 350);
       void playGlVfx('aura', landRect, {
         color: profile.color,
         secondary: profile.secondary,
-        intensity: profile.tier >= 3 ? profile.intensity * 1.05 : profile.intensity * 0.8,
-        scale: profile.tier >= 3 ? profile.scale * 1.15 : profile.scale * 0.95,
-        durationMs: profile.tier >= 3 ? 1250 : 900,
+        intensity: profile.tier >= 3 ? profile.intensity : profile.intensity * 0.75,
+        scale: profile.tier >= 3 ? profile.scale * 1.1 : profile.scale * 0.9,
+        durationMs: profile.tier >= 3 ? 1000 : 750,
       });
-      punch(target.element, profile.tier >= 3 ? 1.24 : 1.16);
+      punch(target.element, profile.tier >= 3 ? 1.16 : 1.1);
     }
   }
 }

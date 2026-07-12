@@ -112,10 +112,12 @@ describe('rarity VFX profiles', () => {
     expect(rarityVfxProfile('CHIBI').color).not.toEqual(rarityVfxProfile('POP').color);
   });
 
-  it('common effects stay genuinely small', () => {
-    expect(rarityVfxProfile('C').scale).toBeLessThan(0.7);
-    expect(rarityVfxProfile('UC').scale).toBeLessThan(0.7);
-    expect(rarityVfxProfile('L').scale).toBeGreaterThan(2);
+  it('common effects stay genuinely small, premium stays contained', () => {
+    expect(rarityVfxProfile('C').scale).toBeLessThan(0.45);
+    expect(rarityVfxProfile('UC').scale).toBeLessThan(0.45);
+    expect(rarityVfxProfile('L').scale).toBeGreaterThan(1);
+    expect(rarityVfxProfile('L').scale).toBeLessThan(1.5);
+    expect(rarityVfxProfile('L').scale / rarityVfxProfile('C').scale).toBeGreaterThan(2.5);
     expect(Object.keys(RARITY_TIERS).length).toBeGreaterThanOrEqual(12);
   });
 });

@@ -43,10 +43,10 @@ const VIOLET: VfxColor = { r: 0.66, g: 0.48, b: 0.92 };
 const PINK: VfxColor = { r: 0.94, g: 0.5, b: 0.66 };
 
 const TIER_BASE: Array<Omit<RarityVfxProfile, 'color' | 'secondary' | 'tier'>> = [
-  { scale: 0.55, intensity: 0.4, durationMs: 420 },
-  { scale: 0.95, intensity: 0.65, durationMs: 520 },
-  { scale: 1.8, intensity: 1.05, durationMs: 850 },
-  { scale: 2.5, intensity: 1.25, durationMs: 1000 },
+  { scale: 0.35, intensity: 0.25, durationMs: 340 },
+  { scale: 0.55, intensity: 0.38, durationMs: 420 },
+  { scale: 0.85, intensity: 0.55, durationMs: 550 },
+  { scale: 1.15, intensity: 0.7, durationMs: 700 },
 ];
 
 const FAMILY_COLORS: Array<{ prefix: string; color: VfxColor; secondary: VfxColor }> = [
@@ -84,11 +84,11 @@ export function rarityVfxProfile(rarity: string | undefined): RarityVfxProfile {
 }
 
 export const VFX_PRESETS = {
-  slash: { color: RED, secondary: WHITE, intensity: 1, scale: 1.35, durationMs: 550 },
-  ring: { color: GOLD, secondary: WHITE, intensity: 0.9, scale: 1.2, durationMs: 600 },
-  victory: { color: GOLD, secondary: WHITE, intensity: 1.15, scale: 2.0, durationMs: 950 },
-  kawarimi: { color: INK, secondary: TEAL, intensity: 0.85, scale: 1.05, durationMs: 600 },
-  sealChakra: { color: TEAL, secondary: GOLD, intensity: 1.05, scale: 1.9, durationMs: 850 },
+  slash: { color: RED, secondary: WHITE, intensity: 0.85, scale: 1.05, durationMs: 500 },
+  ring: { color: GOLD, secondary: WHITE, intensity: 0.65, scale: 0.95, durationMs: 550 },
+  victory: { color: GOLD, secondary: WHITE, intensity: 0.8, scale: 1.35, durationMs: 850 },
+  kawarimi: { color: INK, secondary: TEAL, intensity: 0.7, scale: 0.85, durationMs: 550 },
+  sealChakra: { color: TEAL, secondary: GOLD, intensity: 0.8, scale: 1.15, durationMs: 750 },
 } as const;
 
 const VERT = `
@@ -143,20 +143,26 @@ float easeOut(float t) { return 1.0 - pow(1.0 - t, 3.0); }
 const FRAG_BURST = COMMON + `
 void main() {
   float r = length(v_uv);
-  float a = atan(v_uv.y, v_uv.x);
-  float grow = easeOut(min(u_t * 1.4, 1.0));
-  float fade = 1.0 - smoothstep(0.55, 1.0, u_t);
+  float grow = easeOut(min(u_t * 1.5, 1.0));
+  float fadeIn = smoothstep(0.0, 0.08, u_t);
+  float fade = (1.0 - smoothstep(0.45, 1.0, u_t)) * fadeIn;
 
-  float rays = pow(abs(sin(a * 9.0 + u_seed * 6.28)), 18.0) * smoothstep(grow * 1.05, grow * 0.25, r);
-  rays += 0.6 * pow(abs(sin(a * 5.0 - u_seed * 4.0)), 24.0) * smoothstep(grow * 0.9, grow * 0.2, r);
+  float core = exp(-r * r * 16.0) * (1.0 - easeOut(u_t) * 0.75);
 
-  float core = exp(-r * r * 14.0 / max(grow, 0.05)) * (1.2 - u_t);
-  float wave = exp(-pow((r - grow * 0.85) * 9.0, 2.0)) * 0.9;
-  float sparkleField = step(0.985, noise(v_uv * 14.0 + u_seed * 9.0)) * smoothstep(grow, grow * 0.4, r) * fade;
+  float ringR = grow * 0.72;
+  float ring = exp(-pow((r - ringR) * 22.0, 2.0)) * (1.0 - grow * 0.45);
+  float ring2 = exp(-pow((r - ringR * 0.62) * 30.0, 2.0)) * (1.0 - grow) * 0.5;
 
-  vec3 col = u_color * (rays * 1.3 + wave) + u_color2 * (core * 1.6 + sparkleField * 1.4);
-  float alpha = clamp((rays + core + wave + sparkleField) * u_intensity * fade, 0.0, 1.0);
-  gl_FragColor = vec4(col * alpha * u_intensity, alpha);
+  float haze = exp(-r * 3.2) * 0.22 * (1.0 - u_t * 0.6);
+
+  float sparkles = 0.0;
+  if (u_intensity > 0.45) {
+    sparkles = step(0.993, noise(v_uv * 10.0 + u_seed * 7.0)) * smoothstep(ringR, ringR * 0.3, r) * fade * 0.8;
+  }
+
+  vec3 col = u_color * (ring + ring2 + haze) + u_color2 * (core * 0.9 + sparkles);
+  float alpha = clamp((core * 0.8 + ring + ring2 + haze + sparkles) * u_intensity * fade, 0.0, 0.85);
+  gl_FragColor = vec4(col * alpha, alpha);
 }
 `;
 
@@ -273,22 +279,21 @@ const FRAG_AURA = COMMON + `
 void main() {
   float r = length(v_uv);
   float a = atan(v_uv.y, v_uv.x);
-  float appear = easeOut(min(u_t * 2.2, 1.0));
-  float fade = 1.0 - smoothstep(0.55, 1.0, u_t);
-  float rot = u_t * 1.4 + u_seed * 6.28;
+  float appear = easeOut(min(u_t * 2.0, 1.0));
+  float envelope = smoothstep(0.0, 0.12, u_t) * (1.0 - smoothstep(0.55, 1.0, u_t));
+  float rot = u_t * 0.5 + u_seed * 6.28;
 
-  float rays = pow(abs(sin((a + rot) * 4.0)), 3.0) * smoothstep(0.95 * appear, 0.1, r) * 0.5;
-  float rays2 = pow(abs(sin((a - rot * 0.6) * 6.0 + 1.7)), 8.0) * smoothstep(0.8 * appear, 0.15, r) * 0.6;
+  float breath = 0.92 + 0.08 * sin(u_t * 7.0 + u_seed);
+  float rim = exp(-pow((r - 0.5 * appear * breath) * 9.0, 2.0)) * 0.75;
+  float rim2 = exp(-pow((r - 0.64 * appear) * 14.0, 2.0)) * 0.35;
 
-  float halo = exp(-pow((r - 0.55 * appear) * 5.0, 2.0)) * (0.65 + 0.35 * sin(u_t * 11.0 + u_seed));
-  float shimmer = fbm(vec2(a * 2.2 + rot, r * 5.0 - u_t * 2.5)) * exp(-r * 1.8) * 0.55;
+  float rays = pow(abs(sin((a + rot) * 3.0)), 2.0) * smoothstep(0.85, 0.2, r) * 0.16;
 
-  vec2 sp = vec2(fract(a / 6.28318 * 7.0 + u_seed), fract(r * 3.0 - u_t * 1.2));
-  float sparkles = step(0.92, hash(floor(vec2(a * 5.0 + u_seed * 20.0, r * 8.0 - u_t * 6.0)))) * smoothstep(0.9, 0.2, r) * fade;
+  float shimmer = fbm(vec2(a * 1.6 + rot, r * 4.0 - u_t * 1.4)) * exp(-r * 2.4) * 0.2;
 
-  vec3 col = u_color * (rays + rays2 + halo) * 1.25 + u_color2 * (shimmer + sparkles * 1.5);
-  float alpha = clamp((rays + rays2 + halo + shimmer + sparkles) * u_intensity * fade, 0.0, 1.0);
-  gl_FragColor = vec4(col * alpha * u_intensity, alpha);
+  vec3 col = u_color * (rim + rays) + u_color2 * (rim2 + shimmer);
+  float alpha = clamp((rim + rim2 + rays + shimmer) * u_intensity * envelope, 0.0, 0.6);
+  gl_FragColor = vec4(col * alpha, alpha);
 }
 `;
 
@@ -477,7 +482,7 @@ export function playGlVfx(kind: VfxKind, rect: AnchorRect, opts: VfxOptions): Pr
       kind,
       centerX: rect.left + rect.width / 2,
       centerY: rect.top + rect.height / 2,
-      sizePx: Math.max(70, base * 2.1 * opts.scale),
+      sizePx: Math.max(60, base * 1.5 * opts.scale),
       start: performance.now(),
       durationMs: opts.durationMs,
       color: opts.color,
