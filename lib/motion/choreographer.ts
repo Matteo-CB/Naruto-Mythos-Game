@@ -38,6 +38,17 @@ export function installSkipListener(): () => void {
   };
 }
 
+function cardRectCenteredIn(container: AnchorRect, sizeRef: AnchorRect): AnchorRect {
+  const width = sizeRef.width;
+  const height = sizeRef.height;
+  return {
+    left: container.left + container.width / 2 - width / 2,
+    top: container.top + container.height / 2 - height / 2,
+    width,
+    height,
+  };
+}
+
 function isMobileViewport(): boolean {
   if (typeof window === 'undefined') return false;
   return window.innerWidth < 768 || window.innerHeight < 500;
@@ -102,6 +113,10 @@ export async function playCardFlight(
   const missionIndex = data.missionIndex ?? 0;
   const target = findNewSlotAnchor(missionIndex, side, snapshot);
   if (!fromRect || !target) return;
+
+  if (!perspective.isMyAction) {
+    fromRect = cardRectCenteredIn(fromRect, target.rect);
+  }
 
   const imageUrl = data.hidden ? null : (data.cardImage ? normalizeImagePath(data.cardImage) : null);
 
@@ -290,6 +305,9 @@ export async function playUpgradeMerge(data: MotionEventData): Promise<void> {
   if (!fromRect) return;
 
   const live = el.getBoundingClientRect();
+  if (data.side !== 'me') {
+    fromRect = cardRectCenteredIn(fromRect, { left: live.left, top: live.top, width: live.width, height: live.height });
+  }
   await flyCard({
     fromRect,
     toRect: { left: live.left, top: live.top, width: live.width, height: live.height },
