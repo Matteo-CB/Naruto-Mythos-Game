@@ -5,8 +5,7 @@ import {
 } from '@/lib/motion/boardRegistry';
 import { computeMotionMs, BASE_DURATIONS_MS, FAST_MULTIPLIER } from '@/lib/motion/speed';
 import { arcPoint } from '@/lib/motion/flightLayer';
-import { frameSource, vfxForLanding } from '@/lib/motion/flipbook';
-import { VFX_MANIFEST } from '@/lib/motion/vfxManifest';
+import { rarityTier, rarityVfxProfile, RARITY_TIERS } from '@/lib/motion/vfxgl';
 
 describe('anchor id builders', () => {
   it('produce stable unique ids', () => {
@@ -73,35 +72,40 @@ describe('arcPoint (flight trajectory)', () => {
   });
 });
 
-describe('flipbook', () => {
-  it('frameSource maps frames to the sheet grid', () => {
-    const sheet = { cols: 6, size: 192 };
-    expect(frameSource(sheet, 0)).toEqual({ sx: 0, sy: 0 });
-    expect(frameSource(sheet, 5)).toEqual({ sx: 5 * 192, sy: 0 });
-    expect(frameSource(sheet, 6)).toEqual({ sx: 0, sy: 192 });
-    expect(frameSource(sheet, 29)).toEqual({ sx: 5 * 192, sy: 4 * 192 });
+describe('rarity VFX profiles', () => {
+  it('tiers grow with rarity, every known rarity is mapped', () => {
+    expect(rarityTier('C')).toBe(0);
+    expect(rarityTier('UC')).toBe(0);
+    expect(rarityTier('R')).toBe(1);
+    expect(rarityTier('RA')).toBe(1);
+    expect(rarityTier('S')).toBe(2);
+    expect(rarityTier('SV')).toBe(2);
+    expect(rarityTier('M')).toBe(3);
+    expect(rarityTier('MV')).toBe(3);
+    expect(rarityTier('L')).toBe(4);
   });
 
-  it('every manifest entry is coherent', () => {
-    for (const meta of Object.values(VFX_MANIFEST)) {
-      expect(meta.frames).toBeGreaterThan(0);
-      expect(meta.cols).toBeGreaterThan(0);
-      expect(meta.size).toBeGreaterThan(0);
-      expect(meta.fps).toBe(30);
-    }
-    expect(Object.keys(VFX_MANIFEST).sort()).toEqual([
-      'burst-legendary', 'kawarimi', 'ring-powerup', 'seal-summon', 'slash-defeat', 'victory-mission',
-    ]);
+  it('unknown rarities fall back safely, V-suffixed ones rank higher', () => {
+    expect(rarityTier(undefined)).toBe(1);
+    expect(rarityTier('FUTURE')).toBe(1);
+    expect(rarityTier('FUTUREV')).toBe(2);
   });
 
-  it('vfxForLanding picks the right effect', () => {
-    expect(vfxForLanding({ hidden: true })).toBe('kawarimi');
-    expect(vfxForLanding({ hidden: true, rarity: 'L' })).toBe('kawarimi');
-    for (const rarity of ['S', 'SV', 'M', 'MV', 'L']) {
-      expect(vfxForLanding({ rarity })).toBe('burst-legendary');
+  it('scale, intensity and duration strictly increase across tiers', () => {
+    const tiers = ['C', 'R', 'S', 'M', 'L'];
+    for (let i = 1; i < tiers.length; i++) {
+      const prev = rarityVfxProfile(tiers[i - 1]);
+      const cur = rarityVfxProfile(tiers[i]);
+      expect(cur.scale).toBeGreaterThan(prev.scale);
+      expect(cur.intensity).toBeGreaterThan(prev.intensity);
+      expect(cur.durationMs).toBeGreaterThanOrEqual(prev.durationMs);
     }
-    expect(vfxForLanding({ rarity: 'C', isSummon: true })).toBe('seal-summon');
-    expect(vfxForLanding({ rarity: 'R' })).toBe(null);
-    expect(vfxForLanding({})).toBe(null);
+  });
+
+  it('common effects stay genuinely small', () => {
+    expect(rarityVfxProfile('C').scale).toBeLessThan(0.7);
+    expect(rarityVfxProfile('UC').scale).toBeLessThan(0.7);
+    expect(rarityVfxProfile('L').scale).toBeGreaterThan(2);
+    expect(Object.keys(RARITY_TIERS).length).toBeGreaterThanOrEqual(10);
   });
 });

@@ -1,6 +1,6 @@
 import { gsap } from 'gsap';
 import {
-  anchorHandCard, anchorOpponentHand, anchorSlot, anchorDiscard, anchorEdge,
+  anchorHandCard, anchorOpponentHand, anchorSlot, anchorDeck, anchorDiscard, anchorEdge,
   anchorMission, anchorScore,
   resolveAnchor, resolveAnchorElement, findNewSlotAnchor, getPreUpdateSnapshot,
   type AnchorRect, type PlayerSideId,
@@ -9,7 +9,7 @@ import { CARD_BACK_URL } from './flightLayer';
 import { flyCard, skipAllFlights, registerActiveTimeline, arcPoint as arcPointPublic } from './flightLayer';
 import { motionMs } from './speed';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
-import { playVfx, vfxForLanding } from './flipbook';
+import { playGlVfx, rarityVfxProfile, VFX_PRESETS } from './vfxgl';
 
 export interface MotionEventData {
   player?: string;
@@ -27,6 +27,7 @@ export interface MotionEventData {
   to?: PlayerSideId;
   rarity?: string;
   isSummon?: boolean;
+  origin?: 'hand' | 'deck' | 'discard';
   points?: number;
   powerMe?: number;
   powerOpp?: number;
@@ -100,29 +101,33 @@ export async function playCardFlight(
   const snapshot = getPreUpdateSnapshot();
   const side: PlayerSideId = perspective.isMyAction ? 'me' : 'opp';
 
+  const origin = data.origin ?? 'hand';
   let fromRect: AnchorRect | null = null;
-  if (perspective.isMyAction) {
+  if (origin === 'deck') {
+    fromRect = snapshot.get(anchorDeck(side)) ?? resolveAnchor(anchorDeck(side));
+  } else if (origin === 'discard') {
+    fromRect = snapshot.get(anchorDiscard(side)) ?? resolveAnchor(anchorDiscard(side));
+  } else if (perspective.isMyAction) {
     if (typeof data.cardIndex === 'number') {
       fromRect = snapshot.get(anchorHandCard(data.cardIndex)) ?? null;
     }
     if (!fromRect) fromRect = resolveAnchor(anchorHandCard(0));
-    if (!fromRect && typeof window !== 'undefined') {
-      fromRect = { left: window.innerWidth / 2 - 40, top: window.innerHeight - 60, width: 80, height: 112 };
-    }
   } else {
     fromRect = snapshot.get(anchorOpponentHand())
       ?? resolveAnchor(anchorOpponentHand())
       ?? null;
-    if (!fromRect && typeof window !== 'undefined') {
-      fromRect = { left: window.innerWidth / 2 - 40, top: -60, width: 80, height: 112 };
-    }
+  }
+  if (!fromRect && typeof window !== 'undefined') {
+    fromRect = perspective.isMyAction
+      ? { left: window.innerWidth / 2 - 40, top: window.innerHeight - 60, width: 80, height: 112 }
+      : { left: window.innerWidth / 2 - 40, top: -60, width: 80, height: 112 };
   }
 
   const missionIndex = data.missionIndex ?? 0;
   const target = findNewSlotAnchor(missionIndex, side, snapshot);
   if (!fromRect || !target) return;
 
-  if (!perspective.isMyAction) {
+  if (!perspective.isMyAction || origin !== 'hand') {
     fromRect = cardRectCenteredIn(fromRect, target.rect);
   }
 
@@ -142,8 +147,29 @@ export async function playCardFlight(
   }
   landingSquash(target.element, Math.max(180, durationMs * 0.35));
   landingRing(target.rect);
-  const vfx = vfxForLanding({ hidden: data.hidden, rarity: data.rarity, isSummon: data.isSummon });
-  if (vfx) void playVfx(vfx, target.element.getBoundingClientRect(), { isMobile: isMobileViewport() });
+  const landRect = target.element.getBoundingClientRect();
+  if (data.hidden) {
+    void playGlVfx('kawarimi', landRect, { ...VFX_PRESETS.kawarimi });
+  } else {
+    const profile = rarityVfxProfile(data.rarity);
+    if (data.isSummon) {
+      void playGlVfx('seal', landRect, {
+        color: VFX_PRESETS.sealChakra.color,
+        secondary: VFX_PRESETS.sealChakra.secondary,
+        intensity: Math.max(profile.intensity, 0.8),
+        scale: Math.max(profile.scale, 1.4),
+        durationMs: Math.max(profile.durationMs, 750),
+      });
+    } else {
+      void playGlVfx('burst', landRect, {
+        color: profile.color,
+        secondary: profile.secondary,
+        intensity: profile.intensity,
+        scale: profile.scale,
+        durationMs: profile.durationMs,
+      });
+    }
+  }
 }
 
 function innerOf(el: HTMLElement): HTMLElement {
@@ -230,6 +256,7 @@ export async function playHideInPlace(data: MotionEventData): Promise<void> {
   const rect = el.getBoundingClientRect();
   const face = data.cardImage ? normalizeImagePath(data.cardImage) : null;
 
+  void playGlVfx('kawarimi', rect, { ...VFX_PRESETS.kawarimi });
   el.style.visibility = 'hidden';
   if (face) await flipCloneAway(rect, face, (durationMs * 0.4) / 1000);
   el.style.visibility = '';
@@ -282,7 +309,7 @@ export async function playDefeatFlight(data: MotionEventData): Promise<void> {
   const flashTl = gsap.timeline({ onComplete: () => flash.remove() });
   flashTl.to(flash, { opacity: 1, duration: 0.1 }).to(flash, { opacity: 0, duration: 0.2 });
   registerActiveTimeline(flashTl);
-  void playVfx('slash-defeat', fromRect, { isMobile: isMobileViewport() });
+  void playGlVfx('slash', fromRect, { ...VFX_PRESETS.slash });
 
   await flyCard({
     fromRect,
@@ -373,7 +400,7 @@ export async function playTokenDelta(data: MotionEventData): Promise<void> {
   document.body.appendChild(label);
   punch(el, 1.12);
   if (data.delta >= 2) {
-    void playVfx('ring-powerup', { left: rect.left, top: rect.top, width: rect.width, height: rect.height }, { isMobile: isMobileViewport() });
+    void playGlVfx('ring', { left: rect.left, top: rect.top, width: rect.width, height: rect.height }, { ...VFX_PRESETS.ring });
   }
   await new Promise<void>((resolve) => {
     const tl = gsap.timeline({ onComplete: () => { label.remove(); resolve(); } });
@@ -456,7 +483,7 @@ export async function playMissionScore(data: MotionEventData): Promise<void> {
 
   vignette(durationMs);
   punch(missionEl, 1.14);
-  void playVfx('victory-mission', { left: missionRect.left, top: missionRect.top, width: missionRect.width, height: missionRect.height }, { isMobile: isMobileViewport() });
+  void playGlVfx('victory', { left: missionRect.left, top: missionRect.top, width: missionRect.width, height: missionRect.height }, { ...VFX_PRESETS.victory });
 
   const glow = overlayAt(
     { left: missionRect.left, top: missionRect.top, width: missionRect.width, height: missionRect.height },

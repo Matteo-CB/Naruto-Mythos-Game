@@ -166,190 +166,12 @@ interface GameStore {
 
 let animationIdCounter = 0;
 
-function buildOnlineMotionEvents(
-  prev: VisibleGameState | null,
-  next: VisibleGameState,
-): Array<Omit<AnimationEvent, 'id' | 'timestamp'>> {
-  const events: Array<Omit<AnimationEvent, 'id' | 'timestamp'>> = [];
-  if (!prev || prev.gameId !== next.gameId) return events;
-  const me = next.myPlayer;
-
-  let newChars = 0;
-  for (let mi = 0; mi < next.activeMissions.length; mi++) {
-    const prevMission = prev.activeMissions[mi];
-    if (!prevMission) continue;
-    for (const sideKey of ['player1Characters', 'player2Characters'] as const) {
-      const prevIds = new Set(prevMission[sideKey].map((c) => c.instanceId));
-      for (const c of next.activeMissions[mi][sideKey]) {
-        if (prevIds.has(c.instanceId)) continue;
-        newChars++;
-        if (newChars > 3) return events.filter((e) => e.type !== 'card-play');
-        const owner = sideKey === 'player1Characters' ? 'player1' : 'player2';
-        const isMine = owner === me;
-        let cardIndex: number | undefined;
-        if (isMine) {
-          const nextIds = new Set(next.myState.hand.map((h, i) => `${h.id}:${i}`));
-          for (let i = 0; i < prev.myState.hand.length; i++) {
-            if (!nextIds.has(`${prev.myState.hand[i].id}:${i}`)) { cardIndex = i; break; }
-          }
-        }
-        const img = c.card?.image_file?.replace(/\\/g, '/');
-        events.push({
-          type: 'card-play',
-          data: {
-            cardName: c.card?.name_fr ?? 'Hidden Card',
-            cardImage: img ? (img.startsWith('/') ? img : `/${img}`) : null,
-            hidden: c.isHidden === true,
-            rarity: c.card?.rarity,
-            isSummon: ((c.card?.keywords as string[] | undefined) ?? []).includes('Summon'),
-            player: owner,
-            cardIndex,
-            missionIndex: mi,
-          },
-        });
-      }
-    }
-  }
-
-  return events;
-}
 
 let aiWatchdogTimer: ReturnType<typeof setTimeout> | null = null;
 
 
-function getAnimationForAction(
-  action: GameAction,
-  gameState: GameState,
-  player: PlayerID,
-): Omit<AnimationEvent, 'id' | 'timestamp'> | null {
-  const playerState = gameState[player];
-
-  switch (action.type) {
-    case 'PLAY_CHARACTER': {
-      const card = playerState.hand[action.cardIndex];
-      const mission = gameState.activeMissions[action.missionIndex];
-      const missionRank = mission?.rank || '';
-      const imgPath = card?.image_file?.replace(/\\/g, '/');
-      return {
-        type: 'card-play',
-        data: {
-          cardName: card?.name_fr || 'Card',
-          cardImage: imgPath ? (imgPath.startsWith('/') ? imgPath : `/${imgPath}`) : null,
-          missionRank,
-          hidden: false,
-          rarity: card?.rarity,
-          isSummon: (card?.keywords ?? []).includes('Summon'),
-          player,
-          cardIndex: action.cardIndex,
-          missionIndex: action.missionIndex,
-        },
-      };
-    }
-
-    case 'PLAY_HIDDEN': {
-      const mission = gameState.activeMissions[action.missionIndex];
-      const missionRank = mission?.rank || '';
-      return {
-        type: 'card-play',
-        data: {
-          cardName: 'Hidden Card',
-          cardImage: null,
-          missionRank,
-          hidden: true,
-          player,
-          cardIndex: action.cardIndex,
-          missionIndex: action.missionIndex,
-        },
-      };
-    }
-
-    case 'REVEAL_CHARACTER':
-      return null;
-
-    case 'UPGRADE_CHARACTER':
-      return null;
-
-    case 'PASS':
-      
-      return null;
-
-    case 'MULLIGAN':
-      
-      return null;
-
-    case 'SELECT_TARGET':
-      
-      return null;
-
-    case 'DECLINE_OPTIONAL_EFFECT':
-      
-      return null;
-
-    default:
-      return null;
-  }
-}
 
 
-function getAnimationForAIAction(
-  action: GameAction,
-  gameState: GameState,
-  aiPlayer: PlayerID,
-): Omit<AnimationEvent, 'id' | 'timestamp'> | null {
-  const aiState = gameState[aiPlayer];
-
-  switch (action.type) {
-    case 'PLAY_CHARACTER': {
-      const card = aiState.hand[action.cardIndex];
-      const mission = gameState.activeMissions[action.missionIndex];
-      const missionRank = mission?.rank || '';
-      const imgPath = card?.image_file?.replace(/\\/g, '/');
-      return {
-        type: 'card-play',
-        data: {
-          cardName: card?.name_fr || 'Card',
-          cardImage: imgPath ? (imgPath.startsWith('/') ? imgPath : `/${imgPath}`) : null,
-          missionRank,
-          hidden: false,
-          rarity: card?.rarity,
-          isSummon: (card?.keywords ?? []).includes('Summon'),
-          player: aiPlayer,
-          cardIndex: action.cardIndex,
-          missionIndex: action.missionIndex,
-        },
-      };
-    }
-
-    case 'PLAY_HIDDEN': {
-      const mission = gameState.activeMissions[action.missionIndex];
-      const missionRank = mission?.rank || '';
-      return {
-        type: 'card-play',
-        data: {
-          cardName: 'Hidden Card',
-          cardImage: null,
-          missionRank,
-          hidden: true,
-          player: aiPlayer,
-          cardIndex: action.cardIndex,
-          missionIndex: action.missionIndex,
-        },
-      };
-    }
-
-    case 'REVEAL_CHARACTER':
-      return null;
-
-    case 'UPGRADE_CHARACTER':
-      return null;
-
-    case 'PASS':
-      return null;
-
-    default:
-      return null;
-  }
-}
 
 
 interface PendingSelectionDataSource {
@@ -930,9 +752,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       void 0;
     } else {
       const prevVisible = get().visibleState;
-      for (const evt of buildOnlineMotionEvents(prevVisible, visibleState)) {
-        get().addAnimation(evt);
-      }
       if (prevVisible && prevVisible.gameId === visibleState.gameId) {
         for (const evt of buildMotionEventsFromSnaps(snapFromVisible(prevVisible), snapFromVisible(visibleState))) {
           get().addAnimation(evt);
@@ -1241,11 +1060,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ isProcessing: true });
 
     
-    const animEvent = getAnimationForAction(action, gameState, humanPlayer);
-    if (animEvent) {
-      addAnimation(animEvent);
-    }
-
     let newState: GameState;
     try {
       newState = GameEngine.applyAction(gameState, humanPlayer, action);
@@ -1543,7 +1357,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     if (isAIGame && aiPlayer) {
       
-      const delay = animEvent ? 1000 : 500;
+      const delay = action.type === 'PLAY_CHARACTER' || action.type === 'PLAY_HIDDEN' || action.type === 'REVEAL_CHARACTER' || action.type === 'UPGRADE_CHARACTER' ? 1000 : 500;
       setTimeout(() => {
         void get().processAITurn();
       }, delay);
@@ -1582,7 +1396,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const stateBeforeAI = gameState;
     let iterations = 0;
     const maxIterations = 20; // Safety limit
-    const aiAnimations: Array<Omit<AnimationEvent, 'id' | 'timestamp'>> = [];
 
     try {
       while (iterations < maxIterations) {
@@ -1745,11 +1558,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
 
         
-        const animEvent = getAnimationForAIAction(aiAction, currentState, aiPlayer.player);
-        if (animEvent) {
-          aiAnimations.push(animEvent);
-        }
-
         const stateBeforeAction = currentState;
         currentState = GameEngine.applyAction(currentState, aiPlayer.player, aiAction);
 
@@ -1760,8 +1568,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
             '| pendingEffects:', currentState.pendingEffects.length,
             '| pendingActions:', currentState.pendingActions.length);
           
-          if (animEvent) aiAnimations.pop();
-          
           if (currentState.pendingEffects.length > 0 && currentState.pendingActions.length === 0) {
             console.warn('[gameStore] Cleaning orphaned pendingEffects after rejected action');
             currentState = { ...currentState, pendingEffects: [] };
@@ -1771,9 +1577,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
 
         if (currentState.phase === 'gameOver') {
-          
-          for (const anim of aiAnimations) {
-            addAnimation(anim);
+          for (const evt of buildMotionEventsFromSnaps(snapFromGameState(stateBeforeAI, humanPlayer), snapFromGameState(currentState, humanPlayer))) {
+            addAnimation(evt);
           }
           addAnimation({
             type: 'game-end',
@@ -1832,9 +1637,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     emitDrawDiffEvents(stateBeforeAI, currentState);
     emitTokenDiffEvents(stateBeforeAI, currentState);
 
-    for (const anim of aiAnimations) {
-      addAnimation(anim);
-    }
     for (const evt of buildMotionEventsFromSnaps(snapFromGameState(stateBeforeAI, humanPlayer), snapFromGameState(currentState, humanPlayer))) {
       addAnimation(evt);
     }
@@ -1983,8 +1785,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     
     if (currentState.phase === 'gameOver') {
-      for (const anim of aiAnimations) {
-        addAnimation(anim);
+      for (const evt of buildMotionEventsFromSnaps(snapFromGameState(stateBeforeAI, humanPlayer), snapFromGameState(currentState, humanPlayer))) {
+        addAnimation(evt);
       }
       addAnimation({
         type: 'game-end',

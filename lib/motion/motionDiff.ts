@@ -12,6 +12,8 @@ export interface MotionCharSnap {
   powerTokens: number;
   stackSize: number;
   hasAmbush: boolean;
+  rarity?: string;
+  isSummon?: boolean;
 }
 
 export interface MotionMissionSnap {
@@ -26,11 +28,12 @@ export interface MotionSnap {
   discard: { me: number; opp: number };
   edgeHolder: MotionSide | null;
   myHandCardIds: string[];
+  oppHandLen: number;
   missions: MotionMissionSnap[];
 }
 
 export interface MotionDiffEvent {
-  type: 'card-reveal' | 'card-hide' | 'card-relocate' | 'card-defeat' | 'card-upgrade' | 'edge-transfer' | 'power-token' | 'mission-score';
+  type: 'card-play' | 'card-reveal' | 'card-hide' | 'card-relocate' | 'card-defeat' | 'card-upgrade' | 'edge-transfer' | 'power-token' | 'mission-score';
   data: Record<string, unknown>;
 }
 
@@ -58,6 +61,8 @@ export function snapFromGameState(state: GameState, me: PlayerID): MotionSnap {
           powerTokens: c.powerTokens,
           stackSize: c.stack?.length ?? 1,
           hasAmbush: (top?.effects ?? []).some((e) => e.type === 'AMBUSH'),
+          rarity: top?.rarity,
+          isSummon: ((top?.keywords as string[] | undefined) ?? []).includes('Summon'),
         });
       }
     }
@@ -87,6 +92,7 @@ export function snapFromGameState(state: GameState, me: PlayerID): MotionSnap {
     discard: { me: state[me].discardPile.length, opp: state[opp].discardPile.length },
     edgeHolder: state.edgeHolder ? (state.edgeHolder === me ? 'me' : 'opp') : null,
     myHandCardIds: state[me].hand.map((c) => c.id),
+    oppHandLen: state[opp].hand.length,
     missions,
   };
 }
@@ -110,6 +116,8 @@ export function snapFromVisible(v: VisibleGameState): MotionSnap {
           powerTokens: c.powerTokens,
           stackSize: c.stackSize > 0 ? c.stackSize : 1,
           hasAmbush: (top?.effects ?? []).some((e) => e.type === 'AMBUSH'),
+          rarity: top?.rarity,
+          isSummon: ((top?.keywords as string[] | undefined) ?? []).includes('Summon'),
         });
       }
     }
@@ -137,6 +145,7 @@ export function snapFromVisible(v: VisibleGameState): MotionSnap {
     discard: { me: v.myState.discardPile.length, opp: v.opponentState.discardPileSize },
     edgeHolder: v.edgeHolder ? (v.edgeHolder === me ? 'me' : 'opp') : null,
     myHandCardIds: v.myState.hand.map((c) => c.id),
+    oppHandLen: v.opponentState.handSize,
     missions,
   };
 }
@@ -174,6 +183,34 @@ export function buildMotionEventsFromSnaps(prev: MotionSnap, next: MotionSnap): 
   const removedHandIndex = findRemovedHandIndex(prev.myHandCardIds, next.myHandCardIds);
   const discardGrewMe = next.discard.me > prev.discard.me;
   const discardGrewOpp = next.discard.opp > prev.discard.opp;
+  const myHandShrank = next.myHandCardIds.length < prev.myHandCardIds.length;
+  const oppHandShrank = next.oppHandLen < prev.oppHandLen;
+  const myDiscardShrank = next.discard.me < prev.discard.me;
+  const oppDiscardShrank = next.discard.opp < prev.discard.opp;
+
+  let newCharCount = 0;
+  for (const [id, nextChar] of next.chars) {
+    if (prev.chars.has(id)) continue;
+    newCharCount++;
+    if (newCharCount > 3) break;
+    const origin = nextChar.side === 'me'
+      ? (myHandShrank ? 'hand' : myDiscardShrank ? 'discard' : 'deck')
+      : (oppHandShrank ? 'hand' : oppDiscardShrank ? 'discard' : 'deck');
+    events.push({
+      type: 'card-play',
+      data: {
+        instanceId: id,
+        missionIndex: nextChar.missionIndex,
+        side: nextChar.side,
+        cardImage: nextChar.isHidden ? null : nextChar.imageFile,
+        hidden: nextChar.isHidden,
+        rarity: nextChar.isHidden ? undefined : nextChar.rarity,
+        isSummon: nextChar.isHidden ? undefined : nextChar.isSummon,
+        origin,
+        cardIndex: nextChar.side === 'me' && origin === 'hand' ? removedHandIndex : undefined,
+      },
+    });
+  }
 
   for (const [id, prevChar] of prev.chars) {
     const nextChar = next.chars.get(id);
@@ -267,8 +304,8 @@ export function buildMotionEventsFromSnaps(prev: MotionSnap, next: MotionSnap): 
 
   if (events.length > MAX_EVENTS_PER_DIFF) {
     const priority: Record<MotionDiffEvent['type'], number> = {
-      'mission-score': 0, 'card-defeat': 1, 'card-reveal': 2, 'card-relocate': 3, 'card-upgrade': 4,
-      'card-hide': 5, 'edge-transfer': 6, 'power-token': 7,
+      'mission-score': 0, 'card-play': 1, 'card-defeat': 2, 'card-reveal': 3, 'card-relocate': 4, 'card-upgrade': 5,
+      'card-hide': 6, 'edge-transfer': 7, 'power-token': 8,
     };
     events.sort((a, b) => priority[a.type] - priority[b.type]);
     return events.slice(0, MAX_EVENTS_PER_DIFF);

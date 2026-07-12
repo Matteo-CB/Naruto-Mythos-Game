@@ -27,7 +27,7 @@ import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
 import { preloadCardImages } from "@/lib/utils/imagePreload";
-import { preloadVfx } from "@/lib/motion/flipbook";
+import { warmupVfxGl } from "@/lib/motion/vfxgl";
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from "@/lib/utils/cardLocale";
 import { SandboxToolbar } from "./SandboxToolbar";
 import { EdgeCoinFlip } from "./EdgeCoinFlip";
@@ -991,7 +991,7 @@ function GameBoardInner() {
 
   useEffect(() => { fetchSettings(); }, [fetchSettings]);
 
-  useEffect(() => { preloadVfx(); }, []);
+  useEffect(() => { warmupVfxGl(); }, []);
 
   useEffect(() => {
     if (!visibleState) return;

@@ -21,6 +21,7 @@ function snap(chars: MotionCharSnap[], over: Partial<Omit<MotionSnap, 'chars'>> 
     discard: { me: 0, opp: 0 },
     edgeHolder: 'me',
     myHandCardIds: [],
+    oppHandLen: 0,
     missions: [],
     ...over,
   };
@@ -96,10 +97,38 @@ describe('buildMotionEventsFromSnaps', () => {
     expect(events).toContainEqual({ type: 'edge-transfer', data: { to: 'opp' } });
   });
 
-  it('ignores newly played characters (handled by the play pipeline)', () => {
-    const prev = snap([]);
-    const next = snap([char('new1')]);
-    expect(buildMotionEventsFromSnaps(prev, next)).toEqual([]);
+  it('emits card-play for new characters with the flight origin', () => {
+    const fromHand = buildMotionEventsFromSnaps(
+      snap([], { myHandCardIds: ['x', 'y'] }),
+      snap([char('new1', { rarity: 'L', isSummon: false })], { myHandCardIds: ['y'] }),
+    );
+    expect(fromHand).toEqual([{
+      type: 'card-play',
+      data: {
+        instanceId: 'new1', missionIndex: 0, side: 'me', cardImage: '/img/new1.webp',
+        hidden: false, rarity: 'L', isSummon: false, origin: 'hand', cardIndex: 0,
+      },
+    }]);
+
+    const fromDeck = buildMotionEventsFromSnaps(
+      snap([], { myHandCardIds: ['x'] }),
+      snap([char('summon1', { isSummon: true, rarity: 'R' })], { myHandCardIds: ['x'] }),
+    );
+    expect(fromDeck[0].data).toMatchObject({ origin: 'deck', isSummon: true, cardIndex: undefined });
+
+    const oppFromDiscard = buildMotionEventsFromSnaps(
+      snap([], { discard: { me: 0, opp: 2 }, oppHandLen: 4 }),
+      snap([char('back1', { side: 'opp' })], { discard: { me: 0, opp: 1 }, oppHandLen: 4 }),
+    );
+    expect(oppFromDiscard[0].data).toMatchObject({ side: 'opp', origin: 'discard' });
+  });
+
+  it('hidden plays hide rarity and image', () => {
+    const events = buildMotionEventsFromSnaps(
+      snap([], { oppHandLen: 5 }),
+      snap([char('h1', { side: 'opp', isHidden: true, rarity: 'L' })], { oppHandLen: 4 }),
+    );
+    expect(events[0].data).toMatchObject({ hidden: true, cardImage: null, rarity: undefined, origin: 'hand' });
   });
 
   it('caps event bursts and keeps the most important ones', () => {
