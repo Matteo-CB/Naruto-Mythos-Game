@@ -10,6 +10,7 @@ import { startQuestBuffer, drainQuestBuffer } from '@/lib/quests/clientBuffer';
 import { emitAiGameSummaryHooks } from '@/lib/quests/aiGameSummary';
 import { emitDrawDiffEvents, emitTokenDiffEvents } from '@/lib/quests/engineEmit';
 import { stashPreUpdateSnapshot } from '@/lib/motion/boardRegistry';
+import { snapFromGameState, snapFromVisible, buildMotionEventsFromSnaps } from '@/lib/motion/motionDiff';
 import { useSocketStore } from '@/lib/socket/client';
 import { validatePlayCharacter, validatePlayHidden, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
@@ -33,7 +34,7 @@ function getCardsJsonFallback(): Record<string, unknown> {
 
 interface AnimationEvent {
   id: string;
-  type: 'card-play' | 'card-reveal' | 'card-defeat' | 'card-hide' | 'card-move' |
+  type: 'card-play' | 'card-reveal' | 'card-defeat' | 'card-hide' | 'card-move' | 'card-relocate' |
         'card-upgrade' | 'power-token' | 'chakra-gain' | 'mission-score' |
         'edge-transfer' | 'turn-transition' | 'card-deal' | 'game-end';
   data: Record<string, unknown>;
@@ -258,52 +259,11 @@ function getAnimationForAction(
       };
     }
 
-    case 'REVEAL_CHARACTER': {
-      
-      const mission = gameState.activeMissions[action.missionIndex];
-      if (mission) {
-        const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
-        const char = chars.find(c => c.instanceId === action.characterInstanceId);
-        if (char) {
-          const imgPath = char.card.image_file?.replace(/\\/g, '/');
-          return {
-            type: 'card-reveal',
-            data: {
-              cardName: char.card.name_fr,
-              cardImage: imgPath ? (imgPath.startsWith('/') ? imgPath : `/${imgPath}`) : null,
-              player,
-            },
-          };
-        }
-      }
-      return {
-        type: 'card-reveal',
-        data: { cardName: 'Card', cardImage: null, player },
-      };
-    }
+    case 'REVEAL_CHARACTER':
+      return null;
 
-    case 'UPGRADE_CHARACTER': {
-      const card = playerState.hand[action.cardIndex];
-      const mission = gameState.activeMissions[action.missionIndex];
-      let previousName = '';
-      if (mission) {
-        const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
-        const target = chars.find(c => c.instanceId === action.targetInstanceId);
-        if (target) {
-          previousName = target.card.name_fr;
-        }
-      }
-      const imgPath = card?.image_file?.replace(/\\/g, '/');
-      return {
-        type: 'card-upgrade',
-        data: {
-          cardName: card?.name_fr || 'Card',
-          cardImage: imgPath ? (imgPath.startsWith('/') ? imgPath : `/${imgPath}`) : null,
-          previousName,
-          player,
-        },
-      };
-    }
+    case 'UPGRADE_CHARACTER':
+      return null;
 
     case 'PASS':
       
@@ -371,49 +331,11 @@ function getAnimationForAIAction(
       };
     }
 
-    case 'REVEAL_CHARACTER': {
-      const mission = gameState.activeMissions[action.missionIndex];
-      if (mission) {
-        const chars = aiPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
-        const char = chars.find(c => c.instanceId === action.characterInstanceId);
-        if (char) {
-          const imgPath = char.card.image_file?.replace(/\\/g, '/');
-          return {
-            type: 'card-reveal',
-            data: {
-              cardName: char.card.name_fr,
-              cardImage: imgPath ? (imgPath.startsWith('/') ? imgPath : `/${imgPath}`) : null,
-              player: aiPlayer,
-            },
-          };
-        }
-      }
-      return {
-        type: 'card-reveal',
-        data: { cardName: 'Card', cardImage: null, player: aiPlayer },
-      };
-    }
+    case 'REVEAL_CHARACTER':
+      return null;
 
-    case 'UPGRADE_CHARACTER': {
-      const card = aiState.hand[action.cardIndex];
-      const mission = gameState.activeMissions[action.missionIndex];
-      let previousName = '';
-      if (mission) {
-        const chars = aiPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
-        const target = chars.find(c => c.instanceId === action.targetInstanceId);
-        if (target) previousName = target.card.name_fr;
-      }
-      const imgPath = card?.image_file?.replace(/\\/g, '/');
-      return {
-        type: 'card-upgrade',
-        data: {
-          cardName: card?.name_fr || 'Card',
-          cardImage: imgPath ? (imgPath.startsWith('/') ? imgPath : `/${imgPath}`) : null,
-          previousName,
-          player: aiPlayer,
-        },
-      };
-    }
+    case 'UPGRADE_CHARACTER':
+      return null;
 
     case 'PASS':
       return null;
@@ -1001,8 +923,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!useUIStore.getState().coinFlipComplete || get().isReplayMode) {
       void 0;
     } else {
-      for (const evt of buildOnlineMotionEvents(get().visibleState, visibleState)) {
+      const prevVisible = get().visibleState;
+      for (const evt of buildOnlineMotionEvents(prevVisible, visibleState)) {
         get().addAnimation(evt);
+      }
+      if (prevVisible && prevVisible.gameId === visibleState.gameId) {
+        for (const evt of buildMotionEventsFromSnaps(snapFromVisible(prevVisible), snapFromVisible(visibleState))) {
+          get().addAnimation(evt);
+        }
       }
     }
     const pendingForMe = visibleState.pendingActions.filter((a) => a.player === humanPlayer);
@@ -1315,6 +1243,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let newState: GameState;
     try {
       newState = GameEngine.applyAction(gameState, humanPlayer, action);
+      for (const evt of buildMotionEventsFromSnaps(snapFromGameState(gameState, humanPlayer), snapFromGameState(newState, humanPlayer))) {
+        addAnimation(evt);
+      }
       if (get().isAIGame) {
         emitDrawDiffEvents(gameState, newState);
         emitTokenDiffEvents(gameState, newState);
@@ -1429,6 +1360,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!currentGs || !currentGs.missionScoringComplete) return;
         const hp = get().humanPlayer;
         const advanced = GameEngine.applyAction(currentGs, hp, { type: 'ADVANCE_PHASE' });
+        for (const evt of buildMotionEventsFromSnaps(snapFromGameState(currentGs, hp), snapFromGameState(advanced, hp))) {
+          get().addAnimation(evt);
+        }
         const vis = GameEngine.getVisibleState(advanced, hp);
         set({ gameState: advanced, visibleState: vis });
         if (advanced.phase === 'gameOver') {
@@ -1895,6 +1829,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     for (const anim of aiAnimations) {
       addAnimation(anim);
     }
+    for (const evt of buildMotionEventsFromSnaps(snapFromGameState(stateBeforeAI, humanPlayer), snapFromGameState(currentState, humanPlayer))) {
+      addAnimation(evt);
+    }
 
     const visible = GameEngine.getVisibleState(currentState, humanPlayer);
 
@@ -1910,6 +1847,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!currentGs || !currentGs.missionScoringComplete) return;
         const hp = get().humanPlayer;
         const advanced = GameEngine.applyAction(currentGs, hp, { type: 'ADVANCE_PHASE' });
+        for (const evt of buildMotionEventsFromSnaps(snapFromGameState(currentGs, hp), snapFromGameState(advanced, hp))) {
+          get().addAnimation(evt);
+        }
         const vis = GameEngine.getVisibleState(advanced, hp);
         set({ gameState: advanced, visibleState: vis });
         if (advanced.phase === 'gameOver') {
