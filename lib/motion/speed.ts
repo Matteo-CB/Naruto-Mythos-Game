@@ -16,8 +16,8 @@ export type MotionEventType =
 
 export const BASE_DURATIONS_MS: Record<MotionEventType, number> = {
   draw: 350,
-  play: 550,
-  playHidden: 450,
+  play: 400,
+  playHidden: 340,
   reveal: 800,
   upgrade: 600,
   move: 500,

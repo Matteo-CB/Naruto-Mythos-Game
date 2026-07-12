@@ -360,7 +360,7 @@ function OrderedDefeatPopup({
   const rankColors: Record<string, string> = { D: '#3e8b3e', C: '#c4a35a', B: '#b37e3e', A: '#b33e3e' };
 
   return (
-    <PopupOverlay>
+    <PopupOverlay holdForEntrance>
         <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.25)" maxWidth="90vw" padding="16px 12px" backgroundColor="rgba(4, 4, 8, 0.95)" fitContent>
           <PopupMinimizeX onClick={minimizeEffectPopup} />
           <PopupTitle accentColor="#c4a35a" size="lg">
@@ -881,7 +881,7 @@ export function TargetSelector() {
   if (pendingTargetSelection.selectionType === 'DRAW_CARD') {
     const deckCount = pendingTargetSelection.deckSize ?? 0;
     return (
-        <PopupOverlay>
+        <PopupOverlay holdForEntrance>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.4)" maxWidth="420px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
             <PopupTitle accentColor="#c4a35a" size="lg">
@@ -968,7 +968,7 @@ export function TargetSelector() {
     const confirmLabelKey = isDefeat ? 'game.effect.confirmDefeatBtn' : 'game.effect.confirmHideBtn';
 
     return (
-        <PopupOverlay>
+        <PopupOverlay holdForEntrance>
           <PopupCornerFrame accentColor={`${accentColor}66`} maxWidth="400px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
             <PopupTitle accentColor={accentColor} size="lg">
@@ -1086,7 +1086,7 @@ export function TargetSelector() {
     };
 
     return (
-        <PopupOverlay>
+        <PopupOverlay holdForEntrance>
           <PopupCornerFrame accentColor="rgba(138, 92, 246, 0.4)" maxWidth="740px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
             <PopupTitle accentColor="#8b5cf6" size="lg">
@@ -1193,7 +1193,7 @@ export function TargetSelector() {
     const resultColor = '#c4a35a';
 
     return (
-        <PopupOverlay>
+        <PopupOverlay holdForEntrance>
           <PopupCornerFrame accentColor="rgba(138, 92, 246, 0.4)" maxWidth="740px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
             <PopupTitle accentColor="#8b5cf6" size="lg">
@@ -1283,7 +1283,7 @@ export function TargetSelector() {
     const resultColor = hasCustomKeys ? '#c4a35a' : (revealedCard.canSteal ? '#c4a35a' : '#b33e3e');
 
     return (
-        <PopupOverlay>
+        <PopupOverlay holdForEntrance>
           <PopupCornerFrame accentColor={`${resultColor}55`} maxWidth="420px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
             <PopupTitle accentColor="#8b5cf6" size="lg">
@@ -1360,7 +1360,7 @@ export function TargetSelector() {
     }
 
     return (
-        <PopupOverlay>
+        <PopupOverlay holdForEntrance>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="520px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
             <PopupTitle accentColor="#c4a35a" size="lg">
@@ -1595,7 +1595,7 @@ export function TargetSelector() {
     }
 
     return (
-        <PopupOverlay>
+        <PopupOverlay holdForEntrance>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="440px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
             <PopupTitle accentColor="#c4a35a" size="md">
@@ -1644,7 +1644,7 @@ export function TargetSelector() {
   const popupMaxWidth = isMissionOnlyTargeting ? '90vw' : '85vw';
 
   return (
-    <PopupOverlay>
+    <PopupOverlay holdForEntrance>
         <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.25)" maxWidth={popupMaxWidth} padding="20px 16px" backgroundColor="rgba(4, 4, 8, 0.95)" fitContent={isMissionOnlyTargeting}>
           <PopupMinimizeX onClick={minimizeEffectPopup} />
           <PopupTitle accentColor="#c4a35a" size="lg">

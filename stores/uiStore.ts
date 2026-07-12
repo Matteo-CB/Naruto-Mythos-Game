@@ -56,6 +56,9 @@ interface UIStore {
   minimizeEffectPopup: () => void;
   restoreEffectPopup: () => void;
 
+  popupHoldUntil: number;
+  setPopupHoldUntil: (ts: number) => void;
+
 
   gameEndMinimized: boolean;
   minimizeGameEnd: () => void;
@@ -148,6 +151,9 @@ export const useUIStore = create<UIStore>((set) => ({
   effectPopupMinimized: false,
   minimizeEffectPopup: () => set({ effectPopupMinimized: true }),
   restoreEffectPopup: () => set({ effectPopupMinimized: false }),
+
+  popupHoldUntil: 0,
+  setPopupHoldUntil: (ts) => set((state) => (ts > state.popupHoldUntil ? { popupHoldUntil: ts } : state)),
 
   gameEndMinimized: false,
   minimizeGameEnd: () => set({ gameEndMinimized: true }),

@@ -217,7 +217,7 @@ export function HandCardSelector() {
 
   return (
     <AnimatePresence>
-      <PopupOverlay>
+      <PopupOverlay holdForEntrance>
         <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="720px">
           <PopupMinimizeX onClick={minimizeEffectPopup} />
 

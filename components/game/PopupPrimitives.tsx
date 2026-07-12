@@ -4,6 +4,20 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { useUIStore } from '@/stores/uiStore';
+
+export function useEntranceHold(enabled: boolean): boolean {
+  const holdUntil = useUIStore((s) => s.popupHoldUntil);
+  const [, setTick] = useState(0);
+  const remaining = enabled ? holdUntil - Date.now() : 0;
+  const holding = remaining > 0;
+  useEffect(() => {
+    if (!holding) return;
+    const timer = setTimeout(() => setTick((t) => t + 1), remaining + 30);
+    return () => clearTimeout(timer);
+  }, [holding, holdUntil]); // eslint-disable-line react-hooks/exhaustive-deps
+  return holding;
+}
 
 function useIsCompactPopup(): boolean {
   const [compact, setCompact] = useState(false);
@@ -61,13 +75,17 @@ export function useNeedsScroll(): {
 export function PopupOverlay({
   children,
   onClickBg,
+  holdForEntrance = false,
 }: {
   children: React.ReactNode;
   onClickBg?: () => void;
+  holdForEntrance?: boolean;
 }) {
   const compact = useIsCompactPopup();
+  const holding = useEntranceHold(holdForEntrance);
 
   if (typeof document === 'undefined') return null;
+  if (holding) return null;
 
   const overlay = (
     <motion.div

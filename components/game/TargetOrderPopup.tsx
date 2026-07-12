@@ -121,7 +121,7 @@ export function TargetOrderPopup({
 
   return (
     <AnimatePresence>
-      <PopupOverlay>
+      <PopupOverlay holdForEntrance>
         <PopupCornerFrame accentColor={`${accentColor}55`} maxWidth="600px" padding="24px 20px">
           <PopupMinimizeX onClick={minimizeEffectPopup} />
 

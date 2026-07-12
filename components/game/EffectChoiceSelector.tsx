@@ -75,7 +75,7 @@ export function EffectChoiceSelector() {
 
   return (
     <AnimatePresence>
-      <PopupOverlay>
+      <PopupOverlay holdForEntrance>
         <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.3)" maxWidth="560px">
           <PopupMinimizeX onClick={minimizeEffectPopup} />
 
