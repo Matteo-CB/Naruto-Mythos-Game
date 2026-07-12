@@ -113,10 +113,10 @@ describe('rarity VFX profiles', () => {
   });
 
   it('common effects stay genuinely small, premium stays contained', () => {
-    expect(rarityVfxProfile('C').scale).toBeLessThan(0.45);
-    expect(rarityVfxProfile('UC').scale).toBeLessThan(0.45);
-    expect(rarityVfxProfile('L').scale).toBeGreaterThan(1);
-    expect(rarityVfxProfile('L').scale).toBeLessThan(1.5);
+    expect(rarityVfxProfile('C').scale).toBeLessThan(0.55);
+    expect(rarityVfxProfile('UC').scale).toBeLessThan(0.55);
+    expect(rarityVfxProfile('L').scale).toBeGreaterThan(1.2);
+    expect(rarityVfxProfile('L').scale).toBeLessThanOrEqual(1.6);
     expect(rarityVfxProfile('L').scale / rarityVfxProfile('C').scale).toBeGreaterThan(2.5);
     expect(Object.keys(RARITY_TIERS).length).toBeGreaterThanOrEqual(12);
   });

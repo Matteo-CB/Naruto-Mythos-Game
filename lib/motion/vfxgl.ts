@@ -43,10 +43,10 @@ const VIOLET: VfxColor = { r: 0.66, g: 0.48, b: 0.92 };
 const PINK: VfxColor = { r: 0.94, g: 0.5, b: 0.66 };
 
 const TIER_BASE: Array<Omit<RarityVfxProfile, 'color' | 'secondary' | 'tier'>> = [
-  { scale: 0.35, intensity: 0.25, durationMs: 340 },
-  { scale: 0.55, intensity: 0.38, durationMs: 420 },
-  { scale: 0.85, intensity: 0.55, durationMs: 550 },
-  { scale: 1.15, intensity: 0.7, durationMs: 700 },
+  { scale: 0.45, intensity: 0.3, durationMs: 400 },
+  { scale: 0.7, intensity: 0.45, durationMs: 500 },
+  { scale: 1.1, intensity: 0.62, durationMs: 650 },
+  { scale: 1.5, intensity: 0.78, durationMs: 850 },
 ];
 
 const FAMILY_COLORS: Array<{ prefix: string; color: VfxColor; secondary: VfxColor }> = [
@@ -113,6 +113,7 @@ uniform vec3 u_color;
 uniform vec3 u_color2;
 uniform float u_intensity;
 uniform float u_seed;
+uniform vec2 u_card;
 
 float hash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7)) + u_seed * 17.0) * 43758.5453);
@@ -141,27 +142,43 @@ float easeOut(float t) { return 1.0 - pow(1.0 - t, 3.0); }
 `;
 
 const FRAG_BURST = COMMON + `
+float roundBox(vec2 p, vec2 b, float rad) {
+  vec2 q = abs(p) - b + rad;
+  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - rad;
+}
 void main() {
   float r = length(v_uv);
-  float grow = easeOut(min(u_t * 1.5, 1.0));
-  float fadeIn = smoothstep(0.0, 0.08, u_t);
-  float fade = (1.0 - smoothstep(0.45, 1.0, u_t)) * fadeIn;
+  float a = atan(v_uv.y, v_uv.x);
 
-  float core = exp(-r * r * 16.0) * (1.0 - easeOut(u_t) * 0.75);
+  float flash = exp(-u_t * 16.0);
+  float core = exp(-r * r * 20.0) * flash * 2.2;
+  float streak = exp(-pow(v_uv.y * 26.0, 2.0)) * exp(-pow(v_uv.x * 2.4, 2.0)) * exp(-u_t * 9.0) * 1.6;
 
-  float ringR = grow * 0.72;
-  float ring = exp(-pow((r - ringR) * 22.0, 2.0)) * (1.0 - grow * 0.45);
-  float ring2 = exp(-pow((r - ringR * 0.62) * 30.0, 2.0)) * (1.0 - grow) * 0.5;
+  float grow = 1.0 - pow(1.0 - min(u_t * 1.35, 1.0), 2.6);
+  float wobble = (fbm(vec2(a * 1.6 + u_seed * 8.0, u_seed * 3.0)) - 0.5) * 0.16;
+  float ringR = grow * 0.68 + wobble;
+  float ringSoft = exp(-pow((r - ringR) * 15.0, 2.0));
+  float ringBreak = 0.55 + 0.45 * fbm(vec2(a * 2.4 - u_seed * 5.0, r * 3.0));
+  float ring = ringSoft * ringBreak * (1.0 - grow * 0.75);
 
-  float haze = exp(-r * 3.2) * 0.22 * (1.0 - u_t * 0.6);
+  float ground = exp(-pow((v_uv.y - u_card.y * 0.92) * 9.0, 2.0)) * exp(-pow(v_uv.x * 2.0, 2.0)) * exp(-u_t * 6.5) * 0.9;
 
-  float sparkles = 0.0;
-  if (u_intensity > 0.45) {
-    sparkles = step(0.993, noise(v_uv * 10.0 + u_seed * 7.0)) * smoothstep(ringR, ringR * 0.3, r) * fade * 0.8;
+  float ember = 0.0;
+  for (int i = 0; i < 5; i++) {
+    float fi = float(i);
+    float h1 = hash(vec2(fi * 3.7, u_seed * 11.0));
+    float h2 = hash(vec2(u_seed * 7.0, fi * 5.1));
+    float et = clamp((u_t - 0.12 - h1 * 0.2) * 1.4, 0.0, 1.0);
+    if (et <= 0.0) continue;
+    vec2 pos = vec2((h1 - 0.5) * 0.9 + sin(u_t * 4.0 + fi) * 0.05, 0.25 - et * (0.7 + h2 * 0.5));
+    float d = length(v_uv - pos);
+    ember += exp(-d * d * 320.0) * (1.0 - et) * 1.2;
   }
 
-  vec3 col = u_color * (ring + ring2 + haze) + u_color2 * (core * 0.9 + sparkles);
-  float alpha = clamp((core * 0.8 + ring + ring2 + haze + sparkles) * u_intensity * fade, 0.0, 0.85);
+  float envelope = 1.0 - smoothstep(0.62, 1.0, u_t);
+  vec3 hot = vec3(1.0, 0.98, 0.92);
+  vec3 col = hot * (core + streak) + u_color * (ring * 1.15 + ground) + mix(u_color, u_color2, 0.4) * ember;
+  float alpha = clamp((core + streak * 0.8 + ring + ground * 0.7 + ember) * u_intensity * envelope, 0.0, 0.9);
   gl_FragColor = vec4(col * alpha, alpha);
 }
 `;
@@ -276,23 +293,35 @@ void main() {
 `;
 
 const FRAG_AURA = COMMON + `
+float roundBox(vec2 p, vec2 b, float rad) {
+  vec2 q = abs(p) - b + rad;
+  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - rad;
+}
 void main() {
-  float r = length(v_uv);
-  float a = atan(v_uv.y, v_uv.x);
-  float appear = easeOut(min(u_t * 2.0, 1.0));
-  float envelope = smoothstep(0.0, 0.12, u_t) * (1.0 - smoothstep(0.55, 1.0, u_t));
-  float rot = u_t * 0.5 + u_seed * 6.28;
+  float appear = 1.0 - pow(1.0 - min(u_t * 2.2, 1.0), 3.0);
+  float envelope = smoothstep(0.0, 0.1, u_t) * (1.0 - smoothstep(0.6, 1.0, u_t));
 
-  float breath = 0.92 + 0.08 * sin(u_t * 7.0 + u_seed);
-  float rim = exp(-pow((r - 0.5 * appear * breath) * 9.0, 2.0)) * 0.75;
-  float rim2 = exp(-pow((r - 0.64 * appear) * 14.0, 2.0)) * 0.35;
+  float sdf = roundBox(v_uv, u_card * appear, 0.07);
+  float breath = 1.0 + 0.25 * sin(u_t * 6.0 + u_seed * 6.28);
+  float rim = exp(-pow(sdf * 16.0, 2.0)) * 0.9;
+  float rimWide = exp(-pow(max(sdf, 0.0) * 5.0 / breath, 1.4)) * 0.32;
 
-  float rays = pow(abs(sin((a + rot) * 3.0)), 2.0) * smoothstep(0.85, 0.2, r) * 0.16;
+  float rayMask = smoothstep(0.1, -0.5, v_uv.y) * step(abs(v_uv.x), u_card.x * 1.05);
+  float rays = pow(fbm(vec2(v_uv.x * 5.0 + u_seed * 9.0, u_t * 0.7)), 2.2) * rayMask * smoothstep(-1.1, -0.2, v_uv.y) * 1.1;
 
-  float shimmer = fbm(vec2(a * 1.6 + rot, r * 4.0 - u_t * 1.4)) * exp(-r * 2.4) * 0.2;
+  float motes = 0.0;
+  for (int i = 0; i < 4; i++) {
+    float fi = float(i);
+    float h1 = hash(vec2(fi * 2.3, u_seed * 13.0));
+    float h2 = hash(vec2(u_seed * 5.0, fi * 7.7));
+    float mt = fract(u_t * (0.5 + h2 * 0.4) + h1);
+    vec2 pos = vec2((h1 - 0.5) * 1.5 * u_card.x, u_card.y * 0.8 - mt * 1.3);
+    float d = length((v_uv - pos) * vec2(1.0, 0.9));
+    motes += exp(-d * d * 480.0) * smoothstep(1.0, 0.75, mt) * smoothstep(0.0, 0.15, mt);
+  }
 
-  vec3 col = u_color * (rim + rays) + u_color2 * (rim2 + shimmer);
-  float alpha = clamp((rim + rim2 + rays + shimmer) * u_intensity * envelope, 0.0, 0.6);
+  vec3 col = u_color * (rim + rays * 0.85) + u_color2 * (rimWide + motes * 1.3);
+  float alpha = clamp((rim + rimWide + rays * 0.7 + motes) * u_intensity * envelope, 0.0, 0.62);
   gl_FragColor = vec4(col * alpha, alpha);
 }
 `;
@@ -335,6 +364,8 @@ interface EffectInstance {
   centerX: number;
   centerY: number;
   sizePx: number;
+  cardHalfX: number;
+  cardHalfY: number;
   start: number;
   durationMs: number;
   color: VfxColor;
@@ -463,6 +494,7 @@ function frame(now: number): void {
     gl.uniform3f(gl.getUniformLocation(program, 'u_color2'), inst.secondary.r, inst.secondary.g, inst.secondary.b);
     gl.uniform1f(gl.getUniformLocation(program, 'u_intensity'), inst.intensity);
     gl.uniform1f(gl.getUniformLocation(program, 'u_seed'), inst.seed);
+    gl.uniform2f(gl.getUniformLocation(program, 'u_card'), inst.cardHalfX, inst.cardHalfY);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
@@ -478,11 +510,14 @@ export function playGlVfx(kind: VfxKind, rect: AnchorRect, opts: VfxOptions): Pr
     const state = ensureGl();
     if (!state || opts.durationMs <= 0) { resolve(); return; }
     const base = Math.max(rect.width, rect.height);
+    const sizePx = Math.max(60, base * 1.7 * opts.scale);
     instances.push({
       kind,
       centerX: rect.left + rect.width / 2,
       centerY: rect.top + rect.height / 2,
-      sizePx: Math.max(60, base * 1.5 * opts.scale),
+      sizePx,
+      cardHalfX: Math.min(rect.width / sizePx, 0.95),
+      cardHalfY: Math.min(rect.height / sizePx, 0.95),
       start: performance.now(),
       durationMs: opts.durationMs,
       color: opts.color,
