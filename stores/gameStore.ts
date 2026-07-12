@@ -35,7 +35,7 @@ function getCardsJsonFallback(): Record<string, unknown> {
 interface AnimationEvent {
   id: string;
   type: 'card-play' | 'card-reveal' | 'card-defeat' | 'card-hide' | 'card-move' | 'card-relocate' |
-        'card-upgrade' | 'power-token' | 'chakra-gain' | 'mission-score' |
+        'card-upgrade' | 'power-token' | 'chakra-gain' |
         'edge-transfer' | 'turn-transition' | 'card-deal' | 'game-end';
   data: Record<string, unknown>;
   timestamp: number;

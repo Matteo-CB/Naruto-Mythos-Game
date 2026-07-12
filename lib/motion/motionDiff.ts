@@ -33,7 +33,7 @@ export interface MotionSnap {
 }
 
 export interface MotionDiffEvent {
-  type: 'card-play' | 'card-reveal' | 'card-hide' | 'card-relocate' | 'card-defeat' | 'card-upgrade' | 'edge-transfer' | 'power-token' | 'mission-score';
+  type: 'card-play' | 'card-reveal' | 'card-hide' | 'card-relocate' | 'card-defeat' | 'card-upgrade' | 'edge-transfer' | 'power-token';
   data: Record<string, unknown>;
 }
 
@@ -163,23 +163,6 @@ const MAX_EVENTS_PER_DIFF = 8;
 export function buildMotionEventsFromSnaps(prev: MotionSnap, next: MotionSnap): MotionDiffEvent[] {
   const events: MotionDiffEvent[] = [];
 
-  for (let i = 0; i < next.missions.length; i++) {
-    const prevM = prev.missions[i];
-    const nextM = next.missions[i];
-    if (!prevM || !nextM) continue;
-    if (prevM.wonBy !== nextM.wonBy && (nextM.wonBy === 'me' || nextM.wonBy === 'opp')) {
-      events.push({
-        type: 'mission-score',
-        data: {
-          missionIndex: i,
-          side: nextM.wonBy,
-          points: nextM.value,
-          powerMe: nextM.powerMe,
-          powerOpp: nextM.powerOpp,
-        },
-      });
-    }
-  }
   const removedHandIndex = findRemovedHandIndex(prev.myHandCardIds, next.myHandCardIds);
   const discardGrewMe = next.discard.me > prev.discard.me;
   const discardGrewOpp = next.discard.opp > prev.discard.opp;
@@ -304,7 +287,7 @@ export function buildMotionEventsFromSnaps(prev: MotionSnap, next: MotionSnap): 
 
   if (events.length > MAX_EVENTS_PER_DIFF) {
     const priority: Record<MotionDiffEvent['type'], number> = {
-      'mission-score': 0, 'card-play': 1, 'card-defeat': 2, 'card-reveal': 3, 'card-relocate': 4, 'card-upgrade': 5,
+      'card-play': 1, 'card-defeat': 2, 'card-reveal': 3, 'card-relocate': 4, 'card-upgrade': 5,
       'card-hide': 6, 'edge-transfer': 7, 'power-token': 8,
     };
     events.sort((a, b) => priority[a.type] - priority[b.type]);

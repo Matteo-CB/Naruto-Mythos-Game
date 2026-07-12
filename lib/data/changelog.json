@@ -1,6 +1,29 @@
 {
   "entries": [
     {
+      "date": "2026-07-13",
+      "title_fr": "Animations du plateau affinées",
+      "title_en": "Board animations refined",
+      "title_es": "Animaciones del tablero refinadas",
+      "title_ja": "盤面アニメーションの調整",
+      "changes_fr": [
+        "L'animation de gain ou de perte d'une mission est retirée : le score se met à jour sans effet visuel.",
+        "Poser une carte de la main vers le plateau est plus fluide : trajectoire plus douce et atterrissage sans rebond."
+      ],
+      "changes_en": [
+        "The mission win and loss animation is removed: the score updates without a visual effect.",
+        "Playing a card from hand to the board is smoother: softer path and a landing without bounce."
+      ],
+      "changes_es": [
+        "Se elimina la animación al ganar o perder una misión: la puntuación se actualiza sin efecto visual.",
+        "Jugar una carta de la mano al tablero es más fluido: trayectoria más suave y aterrizaje sin rebote."
+      ],
+      "changes_ja": [
+        "ミッションの勝敗アニメーションを削除しました。スコアは演出なしで更新されます。",
+        "手札から盤面へのカードプレイがより滑らかになりました。軌道が柔らかくなり、着地のバウンドがなくなりました。"
+      ]
+    },
+    {
       "date": "2026-07-12",
       "title_fr": "Cartes holographiques : collectionne et équipe les holos",
       "title_en": "Holographic cards: collect and equip holos",

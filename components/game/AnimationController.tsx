@@ -7,7 +7,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useGameScale } from './GameScaleContext';
 import { playSound, setVolume, setMuted } from '@/lib/sound/SoundManager';
-import { playCardFlight, playRevealInPlace, playHideInPlace, playRelocate, playDefeatFlight, playUpgradeMerge, playEdgeTransfer, playTokenDelta, playMissionScore, playGameEndCinematic, installSkipListener, type MotionEventData } from '@/lib/motion/choreographer';
+import { playCardFlight, playRevealInPlace, playHideInPlace, playRelocate, playDefeatFlight, playUpgradeMerge, playEdgeTransfer, playTokenDelta, playGameEndCinematic, installSkipListener, type MotionEventData } from '@/lib/motion/choreographer';
 
 type AnimationType =
   | 'card-play'
@@ -19,7 +19,6 @@ type AnimationType =
   | 'card-upgrade'
   | 'power-token'
   | 'chakra-gain'
-  | 'mission-score'
   | 'edge-transfer'
   | 'turn-transition'
   | 'card-deal'
@@ -43,8 +42,6 @@ function getAnimationDuration(type: AnimationType): number {
       return 800;
     case 'chakra-gain':
       return 800;
-    case 'mission-score':
-      return 1200;
     case 'edge-transfer':
       return 900;
     case 'turn-transition':
@@ -111,7 +108,7 @@ function renderAnimation(anim: AnimationEvent) {
   }
 }
 
-const MOTION_TYPES: ReadonlySet<string> = new Set(['card-play', 'card-reveal', 'card-hide', 'card-relocate', 'card-defeat', 'card-upgrade', 'edge-transfer', 'power-token', 'mission-score', 'game-end']);
+const MOTION_TYPES: ReadonlySet<string> = new Set(['card-play', 'card-reveal', 'card-hide', 'card-relocate', 'card-defeat', 'card-upgrade', 'edge-transfer', 'power-token', 'game-end']);
 
 export function AnimationController() {
   const animationQueue = useGameStore((s) => s.animationQueue);
@@ -181,7 +178,6 @@ export function AnimationController() {
         : type === 'card-defeat' ? playDefeatFlight(data)
         : type === 'card-upgrade' ? playUpgradeMerge(data)
         : type === 'edge-transfer' ? playEdgeTransfer()
-        : type === 'mission-score' ? playMissionScore(data)
         : type === 'game-end' ? playGameEndCinematic(data, { isMyWin: data.winner ? data.winner === humanPlayer : null })
         : playTokenDelta(data);
       let done = false;

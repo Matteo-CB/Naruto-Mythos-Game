@@ -60,6 +60,7 @@ export interface FlyCardOptions {
   arcHeight?: number;
   flipInFlight?: boolean;
   isMobile?: boolean;
+  ease?: string;
 }
 
 export const CARD_BACK_URL = '/images/card-back.webp';
@@ -106,16 +107,16 @@ export function flyCard(opts: FlyCardOptions): Promise<void> {
     tl.to(state, {
       t: 1,
       duration: dur,
-      ease: 'power2.inOut',
+      ease: opts.ease ?? 'power2.inOut',
       onUpdate: () => {
         const t = state.t;
         const p = arcPoint(fromRect, toRect, arcHeight, t);
         const s = 1 + (Math.min(scaleX, scaleY) - 1) * t;
         const lift = Math.sin(t * Math.PI);
         const rotY = opts.flipInFlight
-          ? 180 * t + (goingRight ? -10 : 10) * lift
-          : (goingRight ? -18 : 18) * lift;
-        const rotX = 10 * lift;
+          ? 180 * t + (goingRight ? -8 : 8) * lift
+          : (goingRight ? -12 : 12) * lift;
+        const rotX = 6 * lift;
         clone.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) scale(${s}) perspective(700px) rotateY(${rotY}deg) rotateX(${rotX}deg)`;
         clone.style.boxShadow = `0 ${6 + 22 * lift}px ${24 + 30 * lift}px rgba(0,0,0,${0.55 - 0.2 * lift})`;
         if (opts.flipInFlight && t >= 0.5 && !flipped) {
