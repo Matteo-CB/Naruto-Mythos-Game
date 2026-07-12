@@ -99,7 +99,8 @@ export async function playCardFlight(
   if (durationMs <= 0) return;
 
   const snapshot = getPreUpdateSnapshot();
-  const side: PlayerSideId = perspective.isMyAction ? 'me' : 'opp';
+  const side: PlayerSideId = data.side ?? (perspective.isMyAction ? 'me' : 'opp');
+  const mine = side === 'me';
 
   const origin = data.origin ?? 'hand';
   let fromRect: AnchorRect | null = null;
@@ -107,7 +108,7 @@ export async function playCardFlight(
     fromRect = snapshot.get(anchorDeck(side)) ?? resolveAnchor(anchorDeck(side));
   } else if (origin === 'discard') {
     fromRect = snapshot.get(anchorDiscard(side)) ?? resolveAnchor(anchorDiscard(side));
-  } else if (perspective.isMyAction) {
+  } else if (mine) {
     if (typeof data.cardIndex === 'number') {
       fromRect = snapshot.get(anchorHandCard(data.cardIndex)) ?? null;
     }
@@ -118,7 +119,7 @@ export async function playCardFlight(
       ?? null;
   }
   if (!fromRect && typeof window !== 'undefined') {
-    fromRect = perspective.isMyAction
+    fromRect = mine
       ? { left: window.innerWidth / 2 - 40, top: window.innerHeight - 60, width: 80, height: 112 }
       : { left: window.innerWidth / 2 - 40, top: -60, width: 80, height: 112 };
   }
@@ -127,7 +128,7 @@ export async function playCardFlight(
   const target = findNewSlotAnchor(missionIndex, side, snapshot);
   if (!fromRect || !target) return;
 
-  if (!perspective.isMyAction || origin !== 'hand') {
+  if (!mine || origin !== 'hand') {
     fromRect = cardRectCenteredIn(fromRect, target.rect);
   }
 
