@@ -1003,7 +1003,8 @@
       "minimize": "最小化",
       "restoreEffect": "保留中の効果",
       "edge": "主導権",
-      "edgeLocked": "固定"
+      "edgeLocked": "固定",
+      "handPeeked": "相手があなたの手札を見ています"
     },
     "handLabel": "手札",
     "effect": {

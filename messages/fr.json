@@ -1005,7 +1005,8 @@
       "minimize": "Réduire",
       "restoreEffect": "Effet en attente",
       "edge": "Edge",
-      "edgeLocked": "Verrouillé"
+      "edgeLocked": "Verrouillé",
+      "handPeeked": "L'adversaire regarde ta main"
     },
     "handLabel": "Main",
     "effect": {

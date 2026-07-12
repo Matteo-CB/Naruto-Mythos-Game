@@ -999,7 +999,8 @@
       "minimize": "Minimize",
       "restoreEffect": "Pending Effect",
       "edge": "Edge",
-      "edgeLocked": "Locked"
+      "edgeLocked": "Locked",
+      "handPeeked": "Your opponent is looking at your hand"
     },
     "handLabel": "Hand",
     "effect": {

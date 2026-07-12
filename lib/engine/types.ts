@@ -363,6 +363,7 @@ export interface VisibleGameState {
   missionDeckSize: number;
   log: GameLogEntry[];
   pendingEffects: PendingEffect[];
+  handPeekActive?: boolean;
   pendingActions: PendingAction[];
   effectOrderResolved?: boolean;
   forfeitedBy?: PlayerID;

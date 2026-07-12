@@ -1729,6 +1729,12 @@ export class GameEngine {
   }
 
   
+  private static readonly HAND_PEEK_TYPES = new Set([
+    'ITACHI091_HAND_REVEAL',
+    'SASUKE014_HAND_REVEAL',
+    'SASUKE014_UPGRADE_HAND_REVEAL',
+  ]);
+
   static getVisibleState(state: GameState, player: PlayerID): VisibleGameState {
     const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
     const myState = state[player];
@@ -1805,6 +1811,11 @@ export class GameEngine {
         (e) => e.sourcePlayer === player || e.selectingPlayer === player || !e.requiresTargetSelection,
       ),
       pendingActions: state.pendingActions.filter((a) => a.player === player),
+      handPeekActive: state.pendingEffects.some(
+        (e) => e.targetSelectionType != null
+          && GameEngine.HAND_PEEK_TYPES.has(e.targetSelectionType)
+          && e.sourcePlayer !== player,
+      ),
       effectOrderResolved: (state as any).effectOrderResolved ?? false,
       forfeitedBy: state.forfeitedBy,
     };

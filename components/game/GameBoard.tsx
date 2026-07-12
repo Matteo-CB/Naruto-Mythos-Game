@@ -1162,7 +1162,7 @@ function GameBoardInner() {
         </section>
 
         <section
-          className="shrink-0 flex items-end justify-center"
+          className="relative shrink-0 flex items-end justify-center"
           style={{
             borderTop: "1px solid rgba(255, 255, 255, 0.04)",
             height: dims.playerHandH + "px",
@@ -1170,6 +1170,28 @@ function GameBoardInner() {
             paddingBottom: dims.isMobile ? '2px' : '0',
           }}
         >
+          {!isSpectating && visibleState.handPeekActive && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="absolute left-1/2 pointer-events-none"
+              style={{ x: '-50%', top: 6, zIndex: 30 }}
+            >
+              <motion.span
+                animate={{ opacity: [0.75, 1, 0.75] }}
+                transition={{ repeat: Infinity, duration: 1.4 }}
+                className="uppercase font-bold tracking-widest px-4 py-1.5 whitespace-nowrap"
+                style={{
+                  fontSize: dims.isMobile ? '12px' : '10px',
+                  color: '#d97676',
+                  backgroundColor: 'rgba(179, 62, 62, 0.14)',
+                  boxShadow: '0 0 14px rgba(179, 62, 62, 0.35)',
+                }}
+              >
+                {t('game.board.handPeeked')}
+              </motion.span>
+            </motion.div>
+          )}
           {isSpectating
             ? <OpponentHand handSize={(myState as any).handSize ?? myState.hand.length} />
             : <PlayerHand hand={myState.hand} chakra={myState.chakra} />

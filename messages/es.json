@@ -1004,7 +1004,8 @@
       "minimize": "Minimizar",
       "restoreEffect": "Efecto pendiente",
       "edge": "Ventaja",
-      "edgeLocked": "Bloqueada"
+      "edgeLocked": "Bloqueada",
+      "handPeeked": "Tu oponente está mirando tu mano"
     },
     "handLabel": "Mano",
     "effect": {

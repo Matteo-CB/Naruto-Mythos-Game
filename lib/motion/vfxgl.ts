@@ -1,6 +1,6 @@
 import type { AnchorRect } from './boardRegistry';
 
-export type VfxKind = 'burst' | 'seal' | 'slash' | 'ring' | 'victory' | 'kawarimi' | 'aura';
+export type VfxKind = 'burst' | 'slash' | 'ring' | 'victory' | 'kawarimi' | 'aura';
 
 export interface VfxColor {
   r: number;
@@ -88,7 +88,6 @@ export const VFX_PRESETS = {
   ring: { color: GOLD, secondary: WHITE, intensity: 0.65, scale: 0.95, durationMs: 550 },
   victory: { color: GOLD, secondary: WHITE, intensity: 0.6, scale: 0.8, durationMs: 750 },
   kawarimi: { color: INK, secondary: TEAL, intensity: 0.7, scale: 0.85, durationMs: 550 },
-  sealChakra: { color: TEAL, secondary: GOLD, intensity: 0.8, scale: 1.15, durationMs: 750 },
 } as const;
 
 const VERT = `
@@ -180,33 +179,6 @@ void main() {
   vec3 col = hot * (core + streak) + u_color * (ring * 1.15 + ground) + mix(u_color, u_color2, 0.4) * ember;
   float alpha = clamp((core + streak * 0.8 + ring + ground * 0.7 + ember) * u_intensity * envelope, 0.0, 0.9);
   gl_FragColor = vec4(col * alpha, alpha);
-}
-`;
-
-const FRAG_SEAL = COMMON + `
-void main() {
-  float r = length(v_uv);
-  float a = atan(v_uv.y, v_uv.x);
-  float grow = easeOut(min(u_t * 1.5, 1.0));
-  float fade = 1.0 - smoothstep(0.62, 1.0, u_t);
-  float rot = u_t * 2.4 + u_seed;
-
-  float ring1 = exp(-pow((r - 0.78 * grow) * 26.0, 2.0));
-  float ring2 = exp(-pow((r - 0.52 * grow) * 30.0, 2.0));
-  float drawMask = smoothstep(0.0, 0.15, fract((a + 3.14159) / 6.28318 - u_t * 1.6) < u_t * 1.8 ? 1.0 : 0.0);
-
-  float runeBand = smoothstep(0.60 * grow, 0.62 * grow, r) * smoothstep(0.74 * grow, 0.72 * grow, r);
-  float runes = runeBand * step(0.5, fract((a + rot) * 2.86)) * step(fract((a + rot) * 8.59), 0.62);
-
-  float spokesAngle = fract((a - rot * 0.7) * 0.955);
-  float spokes = smoothstep(0.03, 0.0, abs(spokesAngle - 0.5) - 0.012) * smoothstep(0.52 * grow, 0.2 * grow, abs(r - 0.36 * grow));
-
-  float glow = exp(-r * 2.2) * 0.35 * (0.6 + 0.4 * sin(u_t * 9.0));
-  float energy = fbm(v_uv * 3.0 + vec2(0.0, -u_t * 2.2)) * exp(-r * 2.6) * smoothstep(0.0, 0.35, u_t) * 0.8;
-
-  vec3 col = u_color * (ring1 + ring2 + energy) * 1.25 + u_color2 * (runes * 1.35 + spokes + glow);
-  float alpha = clamp((ring1 + ring2 + runes + spokes + glow + energy) * u_intensity * fade * max(drawMask, 0.35), 0.0, 1.0);
-  gl_FragColor = vec4(col * alpha * u_intensity, alpha);
 }
 `;
 
@@ -351,7 +323,6 @@ void main() {
 
 const FRAGS: Record<VfxKind, string> = {
   burst: FRAG_BURST,
-  seal: FRAG_SEAL,
   slash: FRAG_SLASH,
   ring: FRAG_RING,
   victory: FRAG_VICTORY,

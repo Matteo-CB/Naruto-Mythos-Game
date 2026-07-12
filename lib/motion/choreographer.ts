@@ -134,23 +134,13 @@ export async function playCardFlight(
     void playGlVfx('kawarimi', landRect, { ...VFX_PRESETS.kawarimi });
   } else {
     const profile = rarityVfxProfile(data.rarity);
-    if (data.isSummon) {
-      void playGlVfx('seal', landRect, {
-        color: VFX_PRESETS.sealChakra.color,
-        secondary: VFX_PRESETS.sealChakra.secondary,
-        intensity: Math.max(profile.intensity, 0.6),
-        scale: Math.max(profile.scale, 0.95),
-        durationMs: Math.max(profile.durationMs, 650),
-      });
-    } else {
-      void playGlVfx('burst', landRect, {
-        color: profile.color,
-        secondary: profile.secondary,
-        intensity: profile.intensity,
-        scale: profile.scale,
-        durationMs: profile.durationMs,
-      });
-    }
+    void playGlVfx('burst', landRect, {
+      color: profile.color,
+      secondary: profile.secondary,
+      intensity: profile.intensity,
+      scale: profile.scale,
+      durationMs: profile.durationMs,
+    });
     if (profile.tier >= 2) {
       if (profile.tier >= 3) vignette(profile.durationMs + 350);
       void playGlVfx('aura', landRect, {
