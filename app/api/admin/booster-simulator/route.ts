@@ -6,9 +6,10 @@ import { rollVariantBooster, type RollMode } from '@/lib/variants/rollBooster';
 import {
   VARIANT_PACK_PROBABILITIES,
   VARIANT_PACK_SIZE,
-  VARIANT_RARITIES,
-  type VariantRarity,
+  VARIANT_RARITY_ROLL_ORDER,
+  type PackSlotKind,
 } from '@/lib/variants/constants';
+import type { CardData } from '@/lib/engine/types';
 import { isSetAvailable } from '@/lib/data/sets/registry';
 
 type Mode = RollMode;
@@ -20,11 +21,20 @@ interface SimResult {
   mode: Mode;
   count: number;
   totalSlots: number;
-  perRarityCounts: Record<VariantRarity, number>;
-  perRarityExpected: Record<VariantRarity, number>;
-  perRarityDeviationPct: Record<VariantRarity, number>;
-  perCardCounts: Array<{ cardId: string; count: number; rarity: VariantRarity }>;
+  perRarityCounts: Record<PackSlotKind, number>;
+  perRarityExpected: Record<PackSlotKind, number>;
+  perRarityDeviationPct: Record<PackSlotKind, number>;
+  perCardCounts: Array<{ cardId: string; count: number; rarity: PackSlotKind }>;
   sampleBoosterCardIds: string[];
+}
+
+function slotKindOf(card: CardData): PackSlotKind {
+  if (card.isHolo) return card.rarity === 'C' ? 'HOLO_C' : 'HOLO_UC';
+  return card.rarity as PackSlotKind;
+}
+
+function emptyKindRecord(): Record<PackSlotKind, number> {
+  return { RA: 0, MV: 0, SV: 0, L: 0, HOLO_C: 0, HOLO_UC: 0 };
 }
 
 export async function POST(req: NextRequest) {
@@ -56,48 +66,42 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid count', errorKey: 'admin.booster.invalidCount' }, { status: 400 });
   }
 
-  const perRarityCounts: Record<VariantRarity, number> = { RA: 0, MV: 0, SV: 0, L: 0 };
-  const perCardMap = new Map<string, { count: number; rarity: VariantRarity }>();
+  const perRarityCounts = emptyKindRecord();
+  const perCardMap = new Map<string, { count: number; rarity: PackSlotKind }>();
   let sampleBoosterCardIds: string[] = [];
 
   for (let i = 0; i < count; i++) {
     const slots = rollVariantBooster(setId, { mode });
     if (i === 0) sampleBoosterCardIds = slots.map((s) => s.id);
     for (const card of slots) {
-      const r = card.rarity as VariantRarity;
-      if (perRarityCounts[r] !== undefined) perRarityCounts[r] += 1;
+      const k = slotKindOf(card);
+      if (perRarityCounts[k] !== undefined) perRarityCounts[k] += 1;
       const e = perCardMap.get(card.id);
       if (e) e.count += 1;
-      else perCardMap.set(card.id, { count: 1, rarity: r });
+      else perCardMap.set(card.id, { count: 1, rarity: k });
     }
   }
 
   const totalSlots = count * VARIANT_PACK_SIZE;
 
-  let perRarityExpected: Record<VariantRarity, number>;
+  const perRarityExpected = emptyKindRecord();
   if (mode === 'normal') {
-    perRarityExpected = {
-      L: totalSlots * VARIANT_PACK_PROBABILITIES.L,
-      SV: totalSlots * VARIANT_PACK_PROBABILITIES.SV,
-      MV: totalSlots * VARIANT_PACK_PROBABILITIES.MV,
-      RA: totalSlots * VARIANT_PACK_PROBABILITIES.RA,
-    };
+    for (const k of VARIANT_RARITY_ROLL_ORDER) {
+      perRarityExpected[k] = totalSlots * VARIANT_PACK_PROBABILITIES[k];
+    }
   } else {
-    const forcedRarity: VariantRarity = mode === 'forceL' ? 'L' : 'SV';
+    const forcedRarity: PackSlotKind = mode === 'forceL' ? 'L' : 'SV';
     const remainingSlots = totalSlots - count;
-    perRarityExpected = {
-      L: count * (forcedRarity === 'L' ? 1 : 0) + remainingSlots * VARIANT_PACK_PROBABILITIES.L,
-      SV: count * (forcedRarity === 'SV' ? 1 : 0) + remainingSlots * VARIANT_PACK_PROBABILITIES.SV,
-      MV: remainingSlots * VARIANT_PACK_PROBABILITIES.MV,
-      RA: remainingSlots * VARIANT_PACK_PROBABILITIES.RA,
-    };
+    for (const k of VARIANT_RARITY_ROLL_ORDER) {
+      perRarityExpected[k] = (k === forcedRarity ? count : 0) + remainingSlots * VARIANT_PACK_PROBABILITIES[k];
+    }
   }
 
-  const perRarityDeviationPct: Record<VariantRarity, number> = { RA: 0, MV: 0, SV: 0, L: 0 };
-  for (const r of VARIANT_RARITIES) {
-    const exp = perRarityExpected[r];
+  const perRarityDeviationPct = emptyKindRecord();
+  for (const k of VARIANT_RARITY_ROLL_ORDER) {
+    const exp = perRarityExpected[k];
     if (exp > 0) {
-      perRarityDeviationPct[r] = ((perRarityCounts[r] - exp) / exp) * 100;
+      perRarityDeviationPct[k] = ((perRarityCounts[k] - exp) / exp) * 100;
     }
   }
 

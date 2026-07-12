@@ -41,6 +41,7 @@ export interface CardData {
   image_file?: string;
   is_rare_art?: boolean;
   data_complete?: boolean;
+  isHolo?: boolean;
 }
 
 export interface CharacterCard extends CardData {

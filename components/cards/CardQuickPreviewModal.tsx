@@ -9,6 +9,7 @@ import { useBannedCards } from '@/lib/hooks/useBannedCards';
 import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 import { isLockedVariantCard } from '@/lib/variants/isVariant';
 import { VariantLockedBanner } from '@/components/cards/VariantLockedBanner';
+import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { cardIdToSlug } from '@/lib/cards/slug';
 import { Z_APP_MODAL } from '@/lib/ui/zIndex';
 import type { CardData, MissionCard, Rarity } from '@/lib/engine/types';
@@ -52,13 +53,16 @@ export function CardQuickPreviewModal({ card, onClose }: { card: CardData; onClo
         <div className={isMission ? 'flex flex-col gap-4' : 'flex gap-4'}>
           <div className={`relative ${isMission ? 'w-full' : 'w-40 shrink-0'}`}>
             {imgPath ? (
-              <img
-                src={imgPath}
-                alt={getCardName(card, locale)}
-                className={`w-full ${isMission ? 'mission-aspect' : 'card-aspect'} object-cover`}
-                loading="eager"
-                decoding="async"
-              />
+              <>
+                <img
+                  src={imgPath}
+                  alt={getCardName(card, locale)}
+                  className={`w-full ${isMission ? 'mission-aspect' : 'card-aspect'} object-cover`}
+                  loading="eager"
+                  decoding="async"
+                />
+                {card.isHolo && <HoloFoilOverlay intensity="preview" />}
+              </>
             ) : (
               <div className={`w-full ${isMission ? 'mission-aspect' : 'card-aspect'} bg-[#1a1a1a] flex items-center justify-center`}>
                 <span className="text-xs text-[#555]">{t('card.noImage')}</span>

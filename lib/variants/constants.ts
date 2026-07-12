@@ -9,23 +9,22 @@ export const LOCKED_VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L', 'POPV', 'CHIBIV']
 
 export const FORCE_UNLOCKED_CARD_IDS: ReadonlySet<string> = new Set([]);
 
-export const VARIANT_PACK_SIZE = 4;
+export const VARIANT_PACK_SIZE = 8;
 
-export interface VariantPackProbabilities {
-  L: number;
-  SV: number;
-  MV: number;
-  RA: number;
-}
+export type PackSlotKind = VariantRarity | 'HOLO_C' | 'HOLO_UC';
+
+export type VariantPackProbabilities = Record<PackSlotKind, number>;
 
 export const VARIANT_PACK_PROBABILITIES: VariantPackProbabilities = {
-  L: 1 / 100,
-  SV: 1 / 400,
-  MV: 1 / 15,
-  RA: 1 - 1 / 100 - 1 / 400 - 1 / 15,
+  L: 1 / 200,
+  SV: 1 / 1000,
+  MV: 1 / 35,
+  HOLO_C: 0.55,
+  HOLO_UC: 0.25,
+  RA: 1 - 1 / 200 - 1 / 1000 - 1 / 35 - 0.55 - 0.25,
 };
 
-export const VARIANT_RARITY_ROLL_ORDER: VariantRarity[] = ['SV', 'L', 'MV', 'RA'];
+export const VARIANT_RARITY_ROLL_ORDER: PackSlotKind[] = ['SV', 'L', 'MV', 'RA', 'HOLO_UC', 'HOLO_C'];
 
 export const BOOSTER_EXCLUDED_VARIANTS: ReadonlySet<string> = new Set([
   'KS-107-MV',

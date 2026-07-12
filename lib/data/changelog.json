@@ -1,6 +1,45 @@
 {
   "entries": [
     {
+      "date": "2026-07-12",
+      "title_fr": "Cartes holographiques : collectionne et équipe les holos",
+      "title_en": "Holographic cards: collect and equip holos",
+      "title_es": "Cartas holográficas: colecciona y equipa holos",
+      "title_ja": "ホロカード登場：集めて装備しよう",
+      "changes_fr": [
+        "Nouveau : chaque carte Commune et Peu commune existe en version holographique à collectionner.",
+        "Les boosters variantes passent à 8 cartes, avec des holos fréquentes et des Rare Art plus rares.",
+        "Dans le créateur de deck, un bouton H équipe la version holo d'une carte que tu possèdes.",
+        "Les cartes holo brillent en jeu, dans ta main comme sur le terrain, et ton adversaire les voit aussi.",
+        "Nouveau filtre Holo dans la Collection pour voir les holos que tu possèdes.",
+        "Les holos en double donnent de l'XP et peuvent s'échanger entre joueurs."
+      ],
+      "changes_en": [
+        "New: every Common and Uncommon card now has a collectible holographic version.",
+        "Variant boosters now contain 8 cards, with frequent holos and rarer Rare Arts.",
+        "In the deck builder, an H button equips the holo version of a card you own.",
+        "Holo cards shine in game, in your hand and on the board, and your opponent sees them too.",
+        "New Holo filter in the Collection to see the holos you own.",
+        "Duplicate holos grant XP and can be traded between players."
+      ],
+      "changes_es": [
+        "Nuevo: cada carta Común y Poco común tiene ahora una versión holográfica coleccionable.",
+        "Los sobres de variantes ahora contienen 8 cartas, con holos frecuentes y Raras Ilustración más raras.",
+        "En el creador de mazos, un botón H equipa la versión holo de una carta que posees.",
+        "Las cartas holo brillan en la partida, en tu mano y en el tablero, y tu rival también las ve.",
+        "Nuevo filtro Holo en la Colección para ver los holos que posees.",
+        "Los holos repetidos dan XP y pueden intercambiarse entre jugadores."
+      ],
+      "changes_ja": [
+        "新登場：すべてのコモンとアンコモンにコレクション可能なホロ版が追加されました。",
+        "バリアントブースターは8枚入りになり、ホロは出やすく、レアアートはより希少になりました。",
+        "デッキビルダーのHボタンで、所持しているカードのホロ版を装備できます。",
+        "ホロカードは手札でも盤面でも輝き、対戦相手にも見えます。",
+        "コレクションに新しいホロフィルターが追加され、所持ホロを確認できます。",
+        "ホロの重複はXPになり、プレイヤー間でトレードできます。"
+      ]
+    },
+    {
       "date": "2026-07-11",
       "title_fr": "Le chat arrive : messages libres, messages privés, blocage et signalement",
       "title_en": "Chat is here: free messages, private messages, blocking and reporting",

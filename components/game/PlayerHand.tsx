@@ -8,6 +8,7 @@ import { useUIStore } from '@/stores/uiStore';
 import type { CharacterCard } from '@/lib/engine/types';
 
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
 
@@ -164,10 +165,13 @@ const HandCard = React.memo(function HandCard({
     >
       
       {imagePath ? (
-        <div
-          className="w-full h-full bg-cover bg-center"
-          style={{ backgroundImage: `url('${imagePath}')` }}
-        />
+        <>
+          <div
+            className="w-full h-full bg-cover bg-center"
+            style={{ backgroundImage: `url('${imagePath}')` }}
+          />
+          {card.isHolo && <HoloFoilOverlay />}
+        </>
       ) : (
         <div
           className="w-full h-full flex items-center justify-center"

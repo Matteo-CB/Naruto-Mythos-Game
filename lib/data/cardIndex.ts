@@ -1,5 +1,6 @@
 import type { CardData, CharacterCard, MissionCard } from '../engine/types';
 import { getAllCards, getAllCharacters, getAllMissions, getPlayableCharacters, getPlayableMissions } from './cardLoader';
+import { isHoloId, holoBaseId, isHoloEligibleCard, decorateHoloCard } from '../holo/holoId';
 
 
 let _byId: Map<string, CardData> | null = null;
@@ -105,18 +106,44 @@ function buildRarityMap(): Map<string, CardData[]> {
   return map;
 }
 
+const _holoCardCache = new Map<string, CardData>();
+const _holoCharCache = new Map<string, CharacterCard>();
+
 export function getCardById(id: string): CardData | undefined {
   if (!_byId) _byId = buildIdMap();
-  
+
   const result = _byId.get(id);
   if (result) return result;
+  if (isHoloId(id)) {
+    const cached = _holoCardCache.get(id);
+    if (cached) return cached;
+    const base = getCardById(holoBaseId(id));
+    if (base && isHoloEligibleCard(base)) {
+      const holo = decorateHoloCard(base);
+      _holoCardCache.set(id, holo);
+      return holo;
+    }
+    return undefined;
+  }
   if (!_byOldId) _byOldId = buildOldIdMap();
   return _byOldId.get(id);
 }
 
 export function getCharacterById(id: string): CharacterCard | undefined {
   if (!_charById) _charById = buildCharIdMap();
-  return _charById.get(id);
+  const result = _charById.get(id);
+  if (result) return result;
+  if (isHoloId(id)) {
+    const cached = _holoCharCache.get(id);
+    if (cached) return cached;
+    const base = _charById.get(holoBaseId(id));
+    if (base && isHoloEligibleCard(base)) {
+      const holo = decorateHoloCard(base);
+      _holoCharCache.set(id, holo);
+      return holo;
+    }
+  }
+  return undefined;
 }
 
 export function getMissionById(id: string): MissionCard | undefined {

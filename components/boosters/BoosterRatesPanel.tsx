@@ -5,21 +5,26 @@ import { useTranslations, useLocale } from 'next-intl';
 import { getCardById } from '@/lib/data/cardIndex';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
-import { VARIANT_PACK_PROBABILITIES, type VariantRarity } from '@/lib/variants/constants';
+import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
+import { VARIANT_PACK_PROBABILITIES, type PackSlotKind } from '@/lib/variants/constants';
 
 const PANEL_CLIP = 'polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px)';
 const TILE_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
 
-const RARITY_ORDER: VariantRarity[] = ['RA', 'MV', 'SV', 'L'];
+const SLOT_ORDER: PackSlotKind[] = ['HOLO_C', 'HOLO_UC', 'RA', 'MV', 'SV', 'L'];
 
-const RARITY_COLOR: Record<VariantRarity, string> = {
+const SLOT_COLOR: Record<PackSlotKind, string> = {
+  HOLO_C: '#a8e6ff',
+  HOLO_UC: '#7fd4a8',
   RA: '#c4a35a',
   MV: '#5fa3df',
   SV: '#9b59b6',
   L: '#d97676',
 };
 
-const EXAMPLE_CARD: Record<VariantRarity, string> = {
+const EXAMPLE_CARD: Record<PackSlotKind, string> = {
+  HOLO_C: 'KS-001-C',
+  HOLO_UC: 'KS-056-UC',
   RA: 'KS-104-RA',
   MV: 'KS-111-MV',
   SV: 'KS-140-SV',
@@ -55,28 +60,32 @@ export function BoosterRatesPanel() {
         {t('ratesSubtitle')}
       </p>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {RARITY_ORDER.map((r) => {
-          const color = RARITY_COLOR[r];
-          const card = getCardById(EXAMPLE_CARD[r]);
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {SLOT_ORDER.map((k) => {
+          const color = SLOT_COLOR[k];
+          const isHoloSlot = k === 'HOLO_C' || k === 'HOLO_UC';
+          const card = getCardById(EXAMPLE_CARD[k]);
           const img = card ? normalizeImagePath(card.image_file) : null;
-          const p = VARIANT_PACK_PROBABILITIES[r];
+          const p = VARIANT_PACK_PROBABILITIES[k];
           return (
             <div
-              key={r}
+              key={k}
               className="flex flex-col items-center text-center gap-2 px-2 py-4"
               style={{ backgroundColor: '#0a090d', clipPath: TILE_CLIP }}
             >
               {img && (
-                <img
-                  src={img}
-                  alt={card ? getCardName(card, locale) : r}
-                  draggable={false}
-                  style={{ width: 72, height: 100, objectFit: 'cover', boxShadow: `0 0 16px ${color}40` }}
-                />
+                <div className="relative" style={{ width: 72, height: 100 }}>
+                  <img
+                    src={img}
+                    alt={card ? getCardName(card, locale) : k}
+                    draggable={false}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', boxShadow: `0 0 16px ${color}40` }}
+                  />
+                  {isHoloSlot && <HoloFoilOverlay intensity="strong" />}
+                </div>
               )}
               <span className="font-display text-[10px] uppercase leading-none" style={{ color, letterSpacing: '0.14em' }}>
-                {t(`animation.finale.${r}`)}
+                {t(`animation.finale.${k}`)}
               </span>
               <span className="font-display text-lg tabular-nums leading-none" style={{ color: '#f4f1e8' }}>
                 {formatPct(p)}

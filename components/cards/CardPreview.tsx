@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import type { CharacterCard, MissionCard, CardEffect, Rarity } from '@/lib/engine/types';
 import CardBack from './CardBack';
+import { HoloFoilOverlay } from './HoloFoilOverlay';
 
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
@@ -93,16 +94,19 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
               {banned ? (
                 <CardBack />
               ) : card.has_visual && imageSrc ? (
-                <img
-                  src={imageSrc}
-                  alt={getCardName(card, locale as 'en' | 'fr')}
-                  draggable={false}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                  }}
-                />
+                <>
+                  <img
+                    src={imageSrc}
+                    alt={getCardName(card, locale as 'en' | 'fr')}
+                    draggable={false}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                  />
+                  {card.isHolo && <HoloFoilOverlay intensity="preview" />}
+                </>
               ) : (
                 <div
                   style={{

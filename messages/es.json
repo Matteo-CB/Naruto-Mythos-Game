@@ -238,7 +238,8 @@
       "CHIBI": "Chibi",
       "CHIBIV": "Variante Chibi",
       "MMS": "Misión"
-    }
+    },
+    "holo": "Holo"
   },
   "email": {
     "donationThankYou": {
@@ -1632,7 +1633,9 @@
     "lockedBannerTitle": "Bloqueada",
     "lockedBannerDescription": "Desbloquéala con un sobre de variantes o una recompensa directa.",
     "lockedToastMessage": "Esta carta está bloqueada. Consíguela en un sobre de variantes, en las Recompensas o en un torneo.",
-    "attachments": "Accesorios"
+    "attachments": "Accesorios",
+    "holosOnly": "Holo",
+    "holoBadge": "Holo"
   },
   "deckBuilder": {
     "title": "Constructor de mazos",
@@ -1824,7 +1827,9 @@
       "protect": "Proteger",
       "continuous": "Continuo",
       "score": "Puntuar"
-    }
+    },
+    "holoToggle": "Versión holo",
+    "holoLockedToast": "Esta carta holo está bloqueada. Consíguela en un sobre de variantes o mediante un intercambio."
   },
   "discord": {
     "linkDiscord": "Vincular Discord",
@@ -3419,7 +3424,9 @@
         "RA": "Rara Ilustración",
         "MV": "Variante Mythos",
         "SV": "Variante Secreta",
-        "L": "Legendaria"
+        "L": "Legendaria",
+        "HOLO_C": "Común Holo",
+        "HOLO_UC": "Poco común Holo"
       }
     },
     "recovery": {

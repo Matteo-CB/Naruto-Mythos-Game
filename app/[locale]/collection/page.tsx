@@ -15,11 +15,13 @@ import { getCardName, getCardGroup, getRarityLabel } from '@/lib/utils/cardLocal
 import { ALL_SET_IDS, SET_REGISTRY, getSetName } from '@/lib/data/sets/registry';
 import type { CharacterCard, MissionCard, CardData, Rarity } from '@/lib/engine/types';
 import { isVariantCard, isLockedVariantCard } from '@/lib/variants/isVariant';
+import { holoIdFor, isHoloEligibleCard } from '@/lib/holo/holoId';
 import { filterCollectionCards } from '@/lib/collection/filter';
 import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 import { useTrackOnMount } from '@/lib/hooks/useTrackUi';
 import { LockedCardWrapper } from '@/components/cards/LockedCardWrapper';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
+import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 
 type AnyCard = CardData;
 
@@ -34,6 +36,7 @@ export default function CollectionPage() {
   const [filterGroup, setFilterGroup] = useState<string>('all');
   const [filterSet, setFilterSet] = useState<string>('all');
   const [filterVariantsOnly, setFilterVariantsOnly] = useState(false);
+  const [filterHolosOnly, setFilterHolosOnly] = useState(false);
   const [filterTradeableOnly, setFilterTradeableOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
@@ -61,7 +64,7 @@ export default function CollectionPage() {
 
   const filteredCards = useMemo(
     () => {
-      const base = filterCollectionCards(allCards, {
+      let base = filterCollectionCards(allCards, {
         variantsOnly: filterVariantsOnly,
         rarity: filterRarity,
         group: filterGroup,
@@ -69,15 +72,18 @@ export default function CollectionPage() {
         searchQuery,
         locale: locale as 'en' | 'fr',
       });
+      if (filterHolosOnly) {
+        base = base.filter((c) => isHoloEligibleCard(c) && unlockedVariantIds.has(holoIdFor(c.id)));
+      }
       if (!filterTradeableOnly) return base;
-      return base.filter((c) => (variantInventory.get(c.id) ?? 0) >= 2);
+      return base.filter((c) => (variantInventory.get(filterHolosOnly ? holoIdFor(c.id) : c.id) ?? 0) >= 2);
     },
-    [allCards, filterRarity, filterGroup, filterSet, filterVariantsOnly, filterTradeableOnly, variantInventory, searchQuery, locale],
+    [allCards, filterRarity, filterGroup, filterSet, filterVariantsOnly, filterHolosOnly, filterTradeableOnly, unlockedVariantIds, variantInventory, searchQuery, locale],
   );
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [filterRarity, filterGroup, filterSet, filterVariantsOnly, filterTradeableOnly, searchQuery]);
+  }, [filterRarity, filterGroup, filterSet, filterVariantsOnly, filterHolosOnly, filterTradeableOnly, searchQuery]);
 
   const characterCards = useMemo(() => filteredCards.filter((c) => c.card_type === 'character'), [filteredCards]);
   const totalCharPages = Math.max(1, Math.ceil(characterCards.length / CARDS_PER_PAGE));
@@ -168,6 +174,19 @@ export default function CollectionPage() {
           </button>
           <button
             type="button"
+            onClick={() => setFilterHolosOnly((v) => !v)}
+            aria-pressed={filterHolosOnly}
+            className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
+            style={{
+              backgroundColor: filterHolosOnly ? '#a8e6ff1f' : '#141414',
+              color: filterHolosOnly ? '#a8e6ff' : '#888888',
+              boxShadow: filterHolosOnly ? '0 0 12px #a8e6ff33' : 'none',
+            }}
+          >
+            {t('collection.holosOnly')}
+          </button>
+          <button
+            type="button"
             onClick={() => setFilterTradeableOnly((v) => !v)}
             aria-pressed={filterTradeableOnly}
             className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
@@ -197,6 +216,7 @@ export default function CollectionPage() {
             const imgPath = getImagePath(card);
             const variant = isVariantCard(card);
             const locked = isLockedVariantCard(card) && !unlockedVariantIds.has(card.id);
+            const holoOwned = isHoloEligibleCard(card) && unlockedVariantIds.has(holoIdFor(card.id));
             const inner = (
               <>
                 {imgPath ? (
@@ -218,6 +238,7 @@ export default function CollectionPage() {
                   </div>
                 )}
                 {variant && !locked && <VariantHoloOverlay intensity="subtle" />}
+                {filterHolosOnly && holoOwned && imgPath && <HoloFoilOverlay intensity="strong" />}
               </>
             );
             return (
@@ -250,9 +271,25 @@ export default function CollectionPage() {
                     x{variantInventory.get(card.id)}
                   </span>
                 )}
+                {holoOwned && !filterHolosOnly && (
+                  <span
+                    className="absolute bottom-1 left-1 z-10 px-1.5 py-0.5 text-[9px] font-bold uppercase"
+                    style={{ backgroundColor: '#a8e6ff26', color: '#a8e6ff', letterSpacing: '0.1em' }}
+                  >
+                    {t('collection.holoBadge')}
+                  </span>
+                )}
+                {filterHolosOnly && holoOwned && (variantInventory.get(holoIdFor(card.id)) ?? 0) >= 2 && (
+                  <span
+                    className="absolute bottom-1 right-1 z-10 px-1.5 py-0.5 text-[9px] font-bold"
+                    style={{ backgroundColor: '#a8e6ff26', color: '#a8e6ff', fontVariantNumeric: 'tabular-nums' }}
+                  >
+                    x{variantInventory.get(holoIdFor(card.id))}
+                  </span>
+                )}
                 <button
                   type="button"
-                  onClick={() => setSelectedCard(card)}
+                  onClick={() => setSelectedCard(filterHolosOnly && holoOwned ? { ...card, isHolo: true } : card)}
                   className="absolute top-1 left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full opacity-70 hover:opacity-100 transition-opacity"
                   style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: '#c4a35a' }}
                   aria-label={t('collection.quickPreview')}

@@ -33,7 +33,7 @@ export function BoosterOpenAnimation({ cards, duplicateCardIds, onClose, setLabe
       .map((c, i) => ({
         ...c,
         sealedInstanceId: `${c.cardId}-${i}`,
-        isHolo: c.rarity === 'M' || c.rarity === 'MV' || c.rarity === 'S' || c.rarity === 'SV' || c.rarity === 'L',
+        isHolo: c.isHolo === true || c.rarity === 'M' || c.rarity === 'MV' || c.rarity === 'S' || c.rarity === 'SV' || c.rarity === 'L',
       }));
   }, [cards]);
 

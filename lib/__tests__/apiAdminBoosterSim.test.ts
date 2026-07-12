@@ -66,7 +66,10 @@ describe('POST /api/admin/booster-simulator', () => {
     expect(body.perRarityCounts).toHaveProperty('MV');
     expect(body.perRarityCounts).toHaveProperty('SV');
     expect(body.perRarityCounts).toHaveProperty('L');
-    expect(body.perRarityExpected.RA).toBeGreaterThan(20);
+    expect(body.perRarityCounts).toHaveProperty('HOLO_C');
+    expect(body.perRarityCounts).toHaveProperty('HOLO_UC');
+    expect(body.perRarityExpected.RA).toBeGreaterThan(10);
+    expect(body.perRarityExpected.HOLO_C).toBeGreaterThan(40);
     expect(body.sampleBoosterCardIds.length).toBeGreaterThan(0);
   });
 

@@ -238,7 +238,8 @@
       "CHIBI": "Chibi",
       "CHIBIV": "Chibi Variant",
       "MMS": "Mission"
-    }
+    },
+    "holo": "Holo"
   },
   "email": {
     "donationThankYou": {
@@ -1627,7 +1628,9 @@
     "lockedBannerTitle": "Locked",
     "lockedBannerDescription": "Unlock via a variant booster or a direct reward.",
     "lockedToastMessage": "This card is locked. Get it from a variant booster, the Rewards or a tournament.",
-    "attachments": "Attachments"
+    "attachments": "Attachments",
+    "holosOnly": "Holo",
+    "holoBadge": "Holo"
   },
   "deckBuilder": {
     "title": "Deck Builder",
@@ -1819,7 +1822,9 @@
       "protect": "Protect",
       "continuous": "Continuous",
       "score": "Score"
-    }
+    },
+    "holoToggle": "Holo version",
+    "holoLockedToast": "This holo card is locked. Get it from a variant booster or a trade."
   },
   "discord": {
     "linkDiscord": "Link Discord",
@@ -3414,7 +3419,9 @@
         "RA": "Rare Art",
         "MV": "Mythos Variant",
         "SV": "Secret Variant",
-        "L": "Legendary"
+        "L": "Legendary",
+        "HOLO_C": "Holo Common",
+        "HOLO_UC": "Holo Uncommon"
       }
     },
     "recovery": {

@@ -12,6 +12,8 @@ import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useUnlockedVariants } from "@/lib/hooks/useUnlockedVariants";
 import { isVariantCard, isLockedVariantCard } from "@/lib/variants/isVariant";
+import { holoIdFor, isHoloId, holoBaseId } from "@/lib/holo/holoId";
+import { HoloFoilOverlay } from "@/components/cards/HoloFoilOverlay";
 import { useTrackOnMount, trackUiHook } from "@/lib/hooks/useTrackUi";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
@@ -395,14 +397,18 @@ const CatalogMission = memo(function CatalogMission({
 });
 
 const DeckCard = memo(function DeckCard({
-  card, idx, onRemove, onHover,
+  card, idx, onRemove, onHover, onToggleHolo, holoAvailable, holoLabel,
 }: {
   card: CharacterCard;
   idx: number;
   onRemove: (idx: number) => void;
   onHover: (card: CharacterCard | MissionCard) => void;
+  onToggleHolo?: (idx: number) => void;
+  holoAvailable?: boolean;
+  holoLabel?: string;
 }) {
   const imgPath = normalizeImagePath(card.image_file);
+  const showHoloButton = !!onToggleHolo && (holoAvailable || card.isHolo);
   return (
     <div
       onClick={() => onRemove(idx)}
@@ -418,10 +424,32 @@ const DeckCard = memo(function DeckCard({
       ) : (
         <div className="w-full h-full" style={{ backgroundColor: '#111' }} />
       )}
+      {card.isHolo && imgPath && <HoloFoilOverlay />}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none"
         style={{ backgroundColor: 'rgba(179,62,62,0.4)', transition: 'opacity 80ms' }}>
         <span className="text-sm font-bold" style={{ color: '#fff' }}>x</span>
       </div>
+      {showHoloButton && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onToggleHolo!(idx); }}
+          aria-label={holoLabel}
+          aria-pressed={!!card.isHolo}
+          title={holoLabel}
+          className="absolute top-0 right-0 z-10 flex items-center justify-center font-bold uppercase"
+          style={{
+            width: '16px',
+            height: '16px',
+            fontSize: '9px',
+            letterSpacing: '0.02em',
+            backgroundColor: card.isHolo ? 'rgba(196,163,90,0.92)' : 'rgba(10,10,10,0.8)',
+            color: card.isHolo ? '#0a0a0a' : '#c4a35a',
+            boxShadow: card.isHolo ? '0 0 8px rgba(196,163,90,0.5)' : 'none',
+          }}
+        >
+          H
+        </button>
+      )}
     </div>
   );
 });
@@ -472,6 +500,8 @@ export default function DeckBuilderPage() {
   const setDeckName = useDeckBuilderStore((s) => s.setDeckName);
   const addChar = useDeckBuilderStore((s) => s.addChar);
   const removeChar = useDeckBuilderStore((s) => s.removeChar);
+  const toggleCharHolo = useDeckBuilderStore((s) => s.toggleCharHolo);
+  const canUseHolo = useDeckBuilderStore((s) => s.canUseHolo);
   const removeLockedVariants = useDeckBuilderStore((s) => s.removeLockedVariants);
   const addMission = useDeckBuilderStore((s) => s.addMission);
   const removeMission = useDeckBuilderStore((s) => s.removeMission);
@@ -572,6 +602,11 @@ export default function DeckBuilderPage() {
     for (const c of deckChars) {
       if (isLockedVariantCard(c) && !unlockedVariantIds.has(c.id) && !seen.has(c.id)) {
         seen.add(c.id);
+        result.push(c);
+        continue;
+      }
+      if (c.isHolo && !unlockedVariantIds.has(holoIdFor(c.id)) && !seen.has(holoIdFor(c.id))) {
+        seen.add(holoIdFor(c.id));
         result.push(c);
       }
     }
@@ -750,20 +785,23 @@ export default function DeckBuilderPage() {
       return { num: parseInt(m[1], 10), variantIdx: parseInt(m[2], 10) };
     };
     const chars: CharacterCard[] = []; const missions: MissionCard[] = []; const notFound: string[] = [];
+    const withHolo = (pick: CharacterCard, wantHolo: boolean): CharacterCard =>
+      wantHolo && canUseHolo(pick) ? { ...pick, isHolo: true } : pick;
     for (const part of cardParts) {
       const match = part.match(/^(.+)--(\d+)$/);
       if (!match) { setImportMessage({ type: "error", text: t("deckBuilder.importError") }); return; }
-      const rawCardId = match[1]; const qty = parseInt(match[2], 10);
+      const wantHolo = isHoloId(match[1]);
+      const rawCardId = holoBaseId(match[1]); const qty = parseInt(match[2], 10);
 
       const variantParsed = parseVariantFormat(rawCardId);
       if (variantParsed) {
         const candidates = charByNumber.get(variantParsed.num);
         const mByNum = missionByNumber.get(variantParsed.num);
         if (candidates && candidates.length > 0) {
-          
+
           const idx = Math.max(0, variantParsed.variantIdx - 1);
           const pick = idx < candidates.length ? candidates[idx] : candidates[0];
-          for (let i = 0; i < qty; i++) chars.push(pick);
+          for (let i = 0; i < qty; i++) chars.push(withHolo(pick, wantHolo));
           continue;
         }
         if (mByNum) { for (let i = 0; i < qty; i++) missions.push(mByNum); continue; }
@@ -775,7 +813,7 @@ export default function DeckBuilderPage() {
       const mission = missionByCardId.get(cardId);
       if (mission) { for (let i = 0; i < qty; i++) missions.push(mission); continue; }
       const char = charByCardId.get(cardId);
-      if (char) { for (let i = 0; i < qty; i++) chars.push(char); continue; }
+      if (char) { for (let i = 0; i < qty; i++) chars.push(withHolo(char, wantHolo)); continue; }
       const numMatch = cardId.match(/^KS-(\d+)/);
       if (numMatch) {
         const num = parseInt(numMatch[1], 10);
@@ -788,7 +826,7 @@ export default function DeckBuilderPage() {
           const exact = candidates.find((c) => c.cardId === cardId);
           const byRarity = candidates.find((c) => c.rarity === wantRarity);
           const pick = exact || byRarity || candidates[0];
-          for (let i = 0; i < qty; i++) chars.push(pick);
+          for (let i = 0; i < qty; i++) chars.push(withHolo(pick, wantHolo));
           continue;
         }
       }
@@ -804,11 +842,11 @@ export default function DeckBuilderPage() {
       setImportMessage({ type: "success", text: t("deckBuilder.importSuccess", { name: deckNameFromCode || "Deck", chars: chars.length, missions: missions.length }) });
     }
     setImportCode("");
-  }, [importCode, allChars, allMissions, clearDeck, setDeckName, addChar, addMission, t]);
+  }, [importCode, allChars, allMissions, clearDeck, setDeckName, addChar, addMission, canUseHolo, t]);
 
   const exportCode = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const c of deckChars) { const id = c.cardId || c.id; counts.set(id, (counts.get(id) || 0) + 1); }
+    for (const c of deckChars) { const id = (c.isHolo ? holoIdFor(c.cardId || c.id) : (c.cardId || c.id)); counts.set(id, (counts.get(id) || 0) + 1); }
     for (const m of deckMissions) { const id = m.cardId || m.id; counts.set(id, (counts.get(id) || 0) + 1); }
     const p: string[] = [];
     for (const [id, qty] of counts) p.push(`${id}--${qty}`);
@@ -1245,6 +1283,9 @@ export default function DeckBuilderPage() {
                   idx={i}
                   onRemove={handleRemoveChar}
                   onHover={handlePreview}
+                  onToggleHolo={toggleCharHolo}
+                  holoAvailable={canUseHolo(card)}
+                  holoLabel={t('deckBuilder.holoToggle')}
                 />
               );
             }
@@ -1276,7 +1317,15 @@ export default function DeckBuilderPage() {
                 <div className="flex gap-1 overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#333 transparent' }}>
                   {cards.map(({ card, idx }) => (
                     <div key={`${card.id}-${idx}`} className="flex-shrink-0" style={{ width: '60px' }}>
-                      <DeckCard card={card} idx={idx} onRemove={handleRemoveChar} onHover={handlePreview} />
+                      <DeckCard
+                        card={card}
+                        idx={idx}
+                        onRemove={handleRemoveChar}
+                        onHover={handlePreview}
+                        onToggleHolo={toggleCharHolo}
+                        holoAvailable={canUseHolo(card)}
+                        holoLabel={t('deckBuilder.holoToggle')}
+                      />
                     </div>
                   ))}
                 </div>

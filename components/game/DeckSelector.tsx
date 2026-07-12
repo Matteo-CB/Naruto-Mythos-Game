@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { resolveCardId } from '@/lib/data/cardLoader';
+import { isHoloId, holoBaseId } from '@/lib/holo/holoId';
 import { isLockedVariant } from '@/lib/variants/constants';
 import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
@@ -106,9 +107,10 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
 
     const characters: CharacterCard[] = [];
     for (const id of deck.cardIds) {
-      const resolved = resolveCardId(id);
+      const holo = isHoloId(id);
+      const resolved = resolveCardId(holoBaseId(id));
       const card = charMap.get(resolved);
-      if (card) characters.push(card);
+      if (card) characters.push(holo ? { ...card, isHolo: true } : card);
     }
 
     const missions: MissionCard[] = [];

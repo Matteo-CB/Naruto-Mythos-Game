@@ -7,6 +7,7 @@ import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getRarityLabel, getCardName } from '@/lib/utils/cardLocale';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
+import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 
 interface CardRevealProps {
   card: BoosterCard;
@@ -51,7 +52,10 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
   const hasFlippedRef = useRef(false);
   const hasCalledRevealedRef = useRef(false);
   const imagePath = normalizeImagePath(card.image_file);
-  const rarityInfo = getRarityGlow(card.rarity);
+  const isFoilHolo = card.isHolo === true && (card.rarity === 'C' || card.rarity === 'UC') && !card.isTemporaryVariant;
+  const rarityInfo = isFoilHolo
+    ? { color: '#a8e6ff', intensity: '0 0 14px #a8e6ff, 0 0 28px #c9a8ff' }
+    : getRarityGlow(card.rarity);
   const highRarity = isHighRarity(card.rarity);
   const isMission = card.card_type === 'mission';
   const cardWidth = isMission ? '168px' : '120px';
@@ -159,7 +163,8 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             </div>
           )}
 
-          {card.isHolo && !card.isTemporaryVariant && (
+          {isFoilHolo && isFlipped && <HoloFoilOverlay intensity="strong" />}
+          {card.isHolo && !isFoilHolo && !card.isTemporaryVariant && (
             <motion.div
               className="absolute inset-0 pointer-events-none"
               animate={{ opacity: [0.05, 0.2, 0.05] }}
@@ -201,6 +206,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             style={{ color: rarityInfo.color }}
           >
             {getRarityLabel(card.rarity, tCardMeta)}
+            {isFoilHolo ? ` ${tCardMeta.has('holo') ? tCardMeta('holo') : 'Holo'}` : ''}
           </span>
         </motion.div>
       )}

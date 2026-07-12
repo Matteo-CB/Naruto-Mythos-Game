@@ -18,6 +18,9 @@ import { createChessClock, arm as armChessClock, disarm as disarmChessClock, res
 import { computeEvolvingMpBonus } from '@/lib/evolving/mpBonus';
 import { computeDeckEvolvingPoints, isEvolvingCompatible } from '@/lib/evolving/computePoints';
 import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
+import { getOwnedVariantIds } from '@/lib/variants/inventory';
+import { isAdmin } from '@/lib/auth/admins';
+import { isHoloId, holoBaseId, holoIdFor, isHoloEligibleCard } from '@/lib/holo/holoId';
 import { isStaticRankedBanned } from '@/lib/data/rankedBans';
 import { emitQuestEvent } from '@/lib/quests/hooks';
 import { emitDrawDiffEvents, emitTokenDiffEvents } from '@/lib/quests/engineEmit';
@@ -2583,7 +2586,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
           const banReason = (id: string): string | null => banned.get(id) ?? (isStaticRankedBanned(id) ? 'set2Unreleased' : null);
           const foundBanned: Array<{ cardId: string; reason: string | null }> = [];
           for (const c of data.characters) {
-            if (c && typeof c.id === 'string' && isBanned(c.id)) foundBanned.push({ cardId: c.id, reason: banReason(c.id) });
+            if (!c || typeof c.id !== 'string') continue;
+            const checkId = holoBaseId(c.id);
+            if (isBanned(checkId)) foundBanned.push({ cardId: checkId, reason: banReason(checkId) });
           }
           for (const m of data.missions) {
             if (m && typeof m.id === 'string' && isBanned(m.id)) foundBanned.push({ cardId: m.id, reason: banReason(m.id) });
@@ -2606,12 +2611,44 @@ export function setupSocketHandlers(io: SocketIOServer) {
           socket.emit('room:error', { message: 'Invalid card in deck', errorKey: 'game.error.invalidDeck' });
           return;
         }
-        const canon = getCharacterById(c.id);
+        const wantsHolo = c.isHolo === true || isHoloId(c.id);
+        const canon = getCharacterById(holoBaseId(c.id));
         if (!canon) {
           socket.emit('room:error', { message: `Unknown card ${c.id}`, errorKey: 'game.error.invalidDeck' });
           return;
         }
-        resolvedChars.push(canon);
+        if (wantsHolo && isHoloEligibleCard(canon)) {
+          resolvedChars.push({ ...canon, isHolo: true });
+        } else {
+          resolvedChars.push(canon);
+        }
+      }
+      if (resolvedChars.some((c) => c.isHolo)) {
+        const holoOwnerId = socket.id === room.hostSocket ? room.hostId : (socket.id === room.guestSocket ? room.guestId : null);
+        let holoAllowAll = false;
+        let ownedHoloIds = new Set<string>();
+        if (holoOwnerId) {
+          try {
+            const holoUser = await prisma.user.findUnique({
+              where: { id: holoOwnerId },
+              select: { username: true, email: true },
+            });
+            if (holoUser && isAdmin({ username: holoUser.username, email: holoUser.email })) {
+              holoAllowAll = true;
+            } else {
+              ownedHoloIds = await getOwnedVariantIds(holoOwnerId);
+            }
+          } catch (err) {
+            console.error('[Socket] Holo ownership check error:', err);
+          }
+        }
+        if (!holoAllowAll) {
+          for (let i = 0; i < resolvedChars.length; i++) {
+            if (resolvedChars[i].isHolo && !ownedHoloIds.has(holoIdFor(resolvedChars[i].id))) {
+              resolvedChars[i] = { ...resolvedChars[i], isHolo: false };
+            }
+          }
+        }
       }
       const resolvedMissions: MissionCard[] = [];
       for (const m of data.missions) {

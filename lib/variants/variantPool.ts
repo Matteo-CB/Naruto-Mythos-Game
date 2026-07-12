@@ -1,14 +1,31 @@
 import type { CardData } from '@/lib/engine/types';
 import { getAllCards } from '@/lib/data/cardLoader';
+import { isHoloEligibleCard } from '@/lib/holo/holoId';
 import { isVariantCard, parseCardId, stripVariantSuffix } from './isVariant';
 import { BOOSTER_EXCLUDED_VARIANTS, VARIANT_RARITIES, type VariantRarity } from './constants';
 
 const eligibleSetCache = new Map<string, CardData[]>();
 const eligibleByRarityCache = new Map<string, Record<VariantRarity, CardData[]>>();
+const holoPoolCache = new Map<string, Record<'HOLO_C' | 'HOLO_UC', CardData[]>>();
 
 export function clearVariantPoolCache(): void {
   eligibleSetCache.clear();
   eligibleByRarityCache.clear();
+  holoPoolCache.clear();
+}
+
+export function holoEligibleForSet(setId: string): Record<'HOLO_C' | 'HOLO_UC', CardData[]> {
+  const cached = holoPoolCache.get(setId);
+  if (cached) return cached;
+  const out: Record<'HOLO_C' | 'HOLO_UC', CardData[]> = { HOLO_C: [], HOLO_UC: [] };
+  for (const card of getAllCards()) {
+    if (card.set !== setId) continue;
+    if (!isHoloEligibleCard(card)) continue;
+    if (card.rarity === 'C') out.HOLO_C.push(card);
+    else if (card.rarity === 'UC') out.HOLO_UC.push(card);
+  }
+  holoPoolCache.set(setId, out);
+  return out;
 }
 
 export function allVariantCards(): CardData[] {

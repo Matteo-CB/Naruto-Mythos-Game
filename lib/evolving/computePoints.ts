@@ -1,11 +1,13 @@
 import { EVOLVING_CARDS } from './cardCosts';
 import { EVOLVING_ALLOWED_SETS, EVOLVING_MAX_POINTS } from './constants';
+import { holoBaseId } from '@/lib/holo/holoId';
 
 export function extractSetFromCardId(cardId: string): string {
   if (typeof cardId !== 'string') return '';
-  const idx = cardId.indexOf('-');
+  const base = holoBaseId(cardId);
+  const idx = base.indexOf('-');
   if (idx === -1) return '';
-  return cardId.slice(0, idx);
+  return base.slice(0, idx);
 }
 
 function cardNumber(cardId: string): string {
@@ -18,7 +20,8 @@ export function computeDeckEvolvingPoints(cardIds: readonly string[]): number {
   const counts = new Map<string, number>();
   for (const id of cardIds) {
     if (typeof id !== 'string') continue;
-    counts.set(id, (counts.get(id) ?? 0) + 1);
+    const baseId = holoBaseId(id);
+    counts.set(baseId, (counts.get(baseId) ?? 0) + 1);
   }
   let total = 0;
   const flatPaidNumbers = new Set<string>();

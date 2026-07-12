@@ -238,7 +238,8 @@
       "CHIBI": "チビ",
       "CHIBIV": "チビバリアント",
       "MMS": "ミッション"
-    }
+    },
+    "holo": "ホロ"
   },
   "email": {
     "donationThankYou": {
@@ -1631,7 +1632,9 @@
     "lockedBannerTitle": "ロック中",
     "lockedBannerDescription": "バリアントブースターや直接報酬で解除できます。",
     "lockedToastMessage": "このカードはロックされています。バリアントブースター、報酬、またはトーナメントで入手してください。",
-    "attachments": "アタッチメント"
+    "attachments": "アタッチメント",
+    "holosOnly": "ホロ",
+    "holoBadge": "ホロ"
   },
   "deckBuilder": {
     "title": "デッキビルダー",
@@ -1823,7 +1826,9 @@
       "protect": "守る",
       "continuous": "継続",
       "score": "スコア"
-    }
+    },
+    "holoToggle": "ホロ版",
+    "holoLockedToast": "このホロカードはロックされています。バリアントブースターまたはトレードで入手してください。"
   },
   "discord": {
     "linkDiscord": "Discordを連携",
@@ -3418,7 +3423,9 @@
         "RA": "レアアート",
         "MV": "ミトスバリアント",
         "SV": "シークレットバリアント",
-        "L": "レジェンダリー"
+        "L": "レジェンダリー",
+        "HOLO_C": "ホロ コモン",
+        "HOLO_UC": "ホロ アンコモン"
       }
     },
     "recovery": {

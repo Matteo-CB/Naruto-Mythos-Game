@@ -7,6 +7,7 @@ import { resolveCardId } from '@/lib/data/cardLoader';
 import { compareBySetOrder } from '@/lib/cards/order';
 import { computeDeckEvolvingPoints, isEvolvingCompatible } from '@/lib/evolving/computePoints';
 import { isLockedVariantCard } from '@/lib/variants/isVariant';
+import { isHoloId, holoBaseId, holoIdFor, isHoloEligibleCard } from '@/lib/holo/holoId';
 import { useToastStore } from '@/stores/toastStore';
 
 interface SavedDeck {
@@ -54,6 +55,8 @@ interface DeckBuilderStore {
   setDeckName: (name: string) => void;
   addChar: (card: CharacterCard) => void;
   removeChar: (index: number) => void;
+  toggleCharHolo: (index: number) => void;
+  canUseHolo: (card: CharacterCard) => boolean;
   removeLockedVariants: () => number;
   addMission: (card: MissionCard) => void;
   removeMission: (index: number) => void;
@@ -189,12 +192,51 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
     set({ deckChars: updated, isDirty: true });
   },
 
+  canUseHolo: (card: CharacterCard): boolean => {
+    if (!isHoloEligibleCard(card)) return false;
+    return get().unlockedVariantIds.has(holoIdFor(card.id));
+  },
+
+  toggleCharHolo: (index: number) => {
+    const { deckChars } = get();
+    const card = deckChars[index];
+    if (!card) return;
+    if (card.isHolo) {
+      const updated = [...deckChars];
+      updated[index] = { ...card, isHolo: false };
+      set({ deckChars: updated, isDirty: true });
+      return;
+    }
+    if (!isHoloEligibleCard(card)) return;
+    if (!get().canUseHolo(card)) {
+      useToastStore.getState().showToast({
+        type: 'info',
+        messageKey: 'deckBuilder.holoLockedToast',
+        dedupeKey: `holo-locked-${card.id}`,
+        durationMs: 3500,
+      });
+      return;
+    }
+    const updated = [...deckChars];
+    updated[index] = { ...card, isHolo: true };
+    set({ deckChars: updated, isDirty: true });
+  },
+
   removeLockedVariants: () => {
     const { deckChars, unlockedVariantIds } = get();
-    const kept = deckChars.filter((c) => !(isLockedVariantCard(c) && !unlockedVariantIds.has(c.id)));
+    let downgraded = 0;
+    const kept = deckChars
+      .filter((c) => !(isLockedVariantCard(c) && !unlockedVariantIds.has(c.id)))
+      .map((c) => {
+        if (c.isHolo && !unlockedVariantIds.has(holoIdFor(c.id))) {
+          downgraded++;
+          return { ...c, isHolo: false };
+        }
+        return c;
+      });
     const removed = deckChars.length - kept.length;
-    if (removed > 0) set({ deckChars: kept, isDirty: true });
-    return removed;
+    if (removed > 0 || downgraded > 0) set({ deckChars: kept, isDirty: true });
+    return removed + downgraded;
   },
 
   addMission: (card: MissionCard) => {
@@ -267,7 +309,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
     const { deckName, deckChars, deckMissions, loadedDeckId } = get();
 
     const name = deckName.trim() || 'Untitled Deck';
-    const cardIds = deckChars.map((c) => c.id);
+    const cardIds = deckChars.map((c) => (c.isHolo ? holoIdFor(c.id) : c.id));
     const missionIds = deckMissions.map((m) => m.id);
 
     set({ isSaving: true });
@@ -371,9 +413,10 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
 
       const resolvedChars: CharacterCard[] = [];
       for (const id of cardIds) {
-        const resolved = resolveCardId(id);
+        const holo = isHoloId(id);
+        const resolved = resolveCardId(holoBaseId(id));
         const card = charMap.get(resolved);
-        if (card) resolvedChars.push(card);
+        if (card) resolvedChars.push(holo ? { ...card, isHolo: true } : card);
       }
 
       const resolvedMissions: MissionCard[] = [];

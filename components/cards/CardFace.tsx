@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import type { CardData, CharacterCard, MissionCard, Rarity } from '@/lib/engine/types';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import CardBack from './CardBack';
+import { HoloFoilOverlay } from './HoloFoilOverlay';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
 
@@ -164,6 +165,8 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
           </div>
         </div>
       )}
+
+      {hasImage && card.isHolo && <HoloFoilOverlay />}
 
       {hasImage && (
         <div

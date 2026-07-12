@@ -26,6 +26,7 @@ import { GameScaleProvider, useGameScale } from "./GameScaleContext";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
+import { HoloFoilOverlay } from "@/components/cards/HoloFoilOverlay";
 import { preloadCardImages } from "@/lib/utils/imagePreload";
 import { warmupVfxGl } from "@/lib/motion/vfxgl";
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from "@/lib/utils/cardLocale";
@@ -100,7 +101,7 @@ function CardPreviewContent({
       
       {imagePath ? (
         <div
-          className="w-full shrink-0 flex items-center justify-center"
+          className="w-full shrink-0 flex items-center justify-center relative"
           style={{
             backgroundColor: "#0a0a0c",
             height: isCharacter ? "200px" : "140px",
@@ -113,6 +114,7 @@ function CardPreviewContent({
             className="w-full h-full"
             style={{ objectFit: "contain" }}
           />
+          {card.isHolo && <HoloFoilOverlay intensity="preview" />}
         </div>
       ) : (
         <div
@@ -815,7 +817,7 @@ function FullscreenCardDetail() {
           </button>
 
           <div
-            className="shrink-0 flex items-center justify-center"
+            className="shrink-0 flex items-center justify-center relative"
             style={{
               width: isMission ? "min(50%, 320px)" : "min(32%, 200px)",
               height: "100%",
@@ -825,13 +827,16 @@ function FullscreenCardDetail() {
             }}
           >
             {imagePath ? (
-              <img
-                src={imagePath}
-                alt={getCardName(card, locale as "en" | "fr")}
-                draggable={false}
-                className="max-w-full max-h-full"
-                style={{ objectFit: "contain" }}
-              />
+              <>
+                <img
+                  src={imagePath}
+                  alt={getCardName(card, locale as "en" | "fr")}
+                  draggable={false}
+                  className="max-w-full max-h-full"
+                  style={{ objectFit: "contain" }}
+                />
+                {card.isHolo && <HoloFoilOverlay intensity="preview" />}
+              </>
             ) : (
               <span className="text-[10px]" style={{ color: "#555555" }}>
                 {t("card.noImage")}
@@ -896,7 +901,7 @@ function FullscreenCardDetail() {
 
           {imagePath ? (
             <div
-              className="w-full shrink-0 flex items-center justify-center"
+              className="w-full shrink-0 flex items-center justify-center relative"
               style={{
                 backgroundColor: "#0a0a0c",
                 height: isCharacter ? "320px" : "240px",
@@ -909,6 +914,7 @@ function FullscreenCardDetail() {
                 className="w-full h-full"
                 style={{ objectFit: "contain" }}
               />
+              {card.isHolo && <HoloFoilOverlay intensity="preview" />}
             </div>
           ) : (
             <div

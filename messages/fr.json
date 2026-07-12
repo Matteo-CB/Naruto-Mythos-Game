@@ -238,7 +238,8 @@
       "CHIBI": "Chibi",
       "CHIBIV": "Chibi Variante",
       "MMS": "Mission"
-    }
+    },
+    "holo": "Holo"
   },
   "email": {
     "donationThankYou": {
@@ -1633,7 +1634,9 @@
     "lockedBannerTitle": "Verrouillée",
     "lockedBannerDescription": "Débloque via un booster variantes ou une récompense directe.",
     "lockedToastMessage": "Cette carte est verrouillée. Obtiens-la dans un booster variantes, les Récompenses ou un tournoi.",
-    "attachments": "Attachements"
+    "attachments": "Attachements",
+    "holosOnly": "Holo",
+    "holoBadge": "Holo"
   },
   "deckBuilder": {
     "title": "Constructeur de Deck",
@@ -1825,7 +1828,9 @@
       "protect": "Protection",
       "continuous": "Continu",
       "score": "Score"
-    }
+    },
+    "holoToggle": "Version holo",
+    "holoLockedToast": "Cette carte holo est verrouillée. Obtiens-la dans un booster variantes ou par un échange."
   },
   "discord": {
     "linkDiscord": "Lier Discord",
@@ -3420,7 +3425,9 @@
         "RA": "Rare Art",
         "MV": "Mythos Variante",
         "SV": "Secret Variante",
-        "L": "Légendaire"
+        "L": "Légendaire",
+        "HOLO_C": "Commune Holo",
+        "HOLO_UC": "Peu commune Holo"
       }
     },
     "recovery": {

@@ -3,9 +3,11 @@ import {
   VARIANT_PACK_PROBABILITIES,
   VARIANT_PACK_SIZE,
   VARIANT_RARITY_ROLL_ORDER,
+  type PackSlotKind,
   type VariantRarity,
 } from './constants';
-import { eligibleVariantsForSetByRarity } from './variantPool';
+import { eligibleVariantsForSetByRarity, holoEligibleForSet } from './variantPool';
+import { decorateHoloCard } from '@/lib/holo/holoId';
 import { pickUniform, systemRng, type Rng } from './rng';
 
 export type RollMode = 'normal' | 'forceL' | 'forceSV';
@@ -15,26 +17,31 @@ export interface RollOptions {
   mode?: RollMode;
 }
 
-function rollRarity(rng: Rng): VariantRarity {
+function rollSlotKind(rng: Rng): PackSlotKind {
   const r = rng.next();
   let cumulative = 0;
-  for (const rarity of VARIANT_RARITY_ROLL_ORDER) {
-    cumulative += VARIANT_PACK_PROBABILITIES[rarity];
-    if (r < cumulative) return rarity;
+  for (const kind of VARIANT_RARITY_ROLL_ORDER) {
+    cumulative += VARIANT_PACK_PROBABILITIES[kind];
+    if (r < cumulative) return kind;
   }
-  return 'RA';
+  return 'HOLO_C';
 }
 
 function rollSlot(
   pools: Record<VariantRarity, CardData[]>,
+  holoPools: Record<'HOLO_C' | 'HOLO_UC', CardData[]>,
   rng: Rng,
-  forcedRarity: VariantRarity | null,
+  forcedKind: PackSlotKind | null,
 ): CardData | null {
-  const rarity = forcedRarity ?? rollRarity(rng);
-  const order: VariantRarity[] = [rarity, 'MV', 'RA', 'L', 'SV'];
-  for (const r of order) {
-    if (pools[r].length > 0) {
-      return pickUniform(pools[r], rng);
+  const kind = forcedKind ?? rollSlotKind(rng);
+  const order: PackSlotKind[] = [kind, 'HOLO_C', 'HOLO_UC', 'RA', 'MV', 'L', 'SV'];
+  for (const k of order) {
+    if (k === 'HOLO_C' || k === 'HOLO_UC') {
+      if (holoPools[k].length > 0) {
+        return decorateHoloCard(pickUniform(holoPools[k], rng));
+      }
+    } else if (pools[k].length > 0) {
+      return pickUniform(pools[k], rng);
     }
   }
   return null;
@@ -44,15 +51,16 @@ export function rollVariantBooster(setId: string, opts: RollOptions = {}): CardD
   const rng = opts.rng ?? systemRng;
   const mode = opts.mode ?? 'normal';
   const pools = eligibleVariantsForSetByRarity(setId);
+  const holoPools = holoEligibleForSet(setId);
 
   const slots: CardData[] = [];
   for (let i = 0; i < VARIANT_PACK_SIZE; i++) {
-    let forced: VariantRarity | null = null;
+    let forced: PackSlotKind | null = null;
     if (i === 0) {
       if (mode === 'forceL') forced = 'L';
       else if (mode === 'forceSV') forced = 'SV';
     }
-    const card = rollSlot(pools, rng, forced);
+    const card = rollSlot(pools, holoPools, rng, forced);
     if (card) slots.push(card);
   }
   return slots;

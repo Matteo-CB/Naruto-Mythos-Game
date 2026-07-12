@@ -5,6 +5,8 @@ import { isAdmin } from '@/lib/auth/admins';
 import { allVariantCards } from '@/lib/variants/variantPool';
 import { getVariantInventory } from '@/lib/variants/inventory';
 import { getForceUnlockedCardIds } from '@/lib/variants/forceUnlock';
+import { getAllCards } from '@/lib/data/cardLoader';
+import { isHoloEligibleCard, holoIdFor } from '@/lib/holo/holoId';
 
 export async function GET() {
   const session = await auth();
@@ -25,6 +27,9 @@ export async function GET() {
   if (isAdmin({ username: user.username, email: user.email })) {
     const all: Record<string, number> = {};
     for (const c of allVariantCards()) all[c.cardId] = 99;
+    for (const c of getAllCards()) {
+      if (isHoloEligibleCard(c)) all[holoIdFor(c.cardId)] = 99;
+    }
     return NextResponse.json({ inventory: all, unlockedCardIds: Object.keys(all), admin: true });
   }
 

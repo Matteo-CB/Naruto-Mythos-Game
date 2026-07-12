@@ -3,6 +3,7 @@ import type { CardData } from '@/lib/engine/types';
 import { rollVariantBooster, type RollMode } from '@/lib/variants/rollBooster';
 import { incrementVariant, getOwnedVariantIds } from '@/lib/variants/inventory';
 import { DUPLICATE_XP_BY_RARITY, isVariantRarity, type VariantRarity } from '@/lib/variants/constants';
+import { holoDuplicateXp } from '@/lib/holo/holoId';
 import { awardXp } from '@/lib/battlepass/awardXp';
 
 export class NoBoosterError extends Error {
@@ -59,7 +60,9 @@ export async function openBooster(
   for (const card of cards) {
     if (existing.has(card.cardId)) {
       duplicateCardIds.push(card.cardId);
-      if (isVariantRarity(card.rarity)) {
+      if (card.isHolo) {
+        duplicateXpAwarded += holoDuplicateXp(card.rarity);
+      } else if (isVariantRarity(card.rarity)) {
         duplicateXpAwarded += DUPLICATE_XP_BY_RARITY[card.rarity as VariantRarity] ?? 0;
       }
     } else {

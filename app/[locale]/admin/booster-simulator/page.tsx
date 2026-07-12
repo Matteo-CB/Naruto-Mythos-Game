@@ -16,9 +16,9 @@ import { getAvailableSetIds, SET_REGISTRY } from '@/lib/data/sets/registry';
 import type { CardData } from '@/lib/engine/types';
 
 type Mode = 'normal' | 'forceL' | 'forceSV';
-type Rarity = 'RA' | 'MV' | 'SV' | 'L';
+type Rarity = 'RA' | 'MV' | 'SV' | 'L' | 'HOLO_C' | 'HOLO_UC';
 
-const RARITIES: Rarity[] = ['L', 'SV', 'MV', 'RA'];
+const RARITIES: Rarity[] = ['L', 'SV', 'MV', 'RA', 'HOLO_UC', 'HOLO_C'];
 const COUNTS = [1, 10, 100, 1000, 10000] as const;
 const ACCENT = '#c4a35a';
 

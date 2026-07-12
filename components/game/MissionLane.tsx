@@ -13,6 +13,7 @@ import type {
 } from '@/lib/engine/types';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
 
@@ -232,13 +233,16 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
           )}
         </>
       ) : (
-        
+
         <>
           {imagePath ? (
-            <div
-              className="w-full h-full bg-cover bg-center"
-              style={{ backgroundImage: `url('${imagePath}')`, imageRendering: 'crisp-edges' }}
-            />
+            <>
+              <div
+                className="w-full h-full bg-cover bg-center"
+                style={{ backgroundImage: `url('${imagePath}')`, imageRendering: 'crisp-edges' }}
+              />
+              {character.card?.isHolo && <HoloFoilOverlay />}
+            </>
           ) : (
             <div
               className="w-full h-full flex items-center justify-center"

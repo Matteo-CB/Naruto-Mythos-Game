@@ -17,6 +17,7 @@ function mockCard(id: string, rarity: Rarity, set = 'KS'): CardData {
     rarity,
     card_type: 'character',
     has_visual: true,
+    image_file: `${id}.webp`,
     chakra: 1,
     power: 1,
     keywords: [],
@@ -48,6 +49,8 @@ const EXCLUDED = [
   mockCard('KS-133_2-MV', 'MV'),
 ];
 const SS_VARIANTS = [mockCard('SS-001-RA', 'RA', 'SS')];
+const HOLO_C_POOL = Array.from({ length: 10 }, (_, i) => mockCard(`KS-${String(i + 1).padStart(3, '0')}-C`, 'C'));
+const HOLO_UC_POOL = Array.from({ length: 8 }, (_, i) => mockCard(`KS-${String(56 + i).padStart(3, '0')}-UC`, 'UC'));
 
 vi.mock('@/lib/data/cardLoader', () => ({
   getAllCards: () =>
@@ -58,28 +61,39 @@ vi.mock('@/lib/data/cardLoader', () => ({
       ...L_POOL,
       ...EXCLUDED,
       ...SS_VARIANTS,
-      mockCard('KS-001-C', 'C'),
+      ...HOLO_C_POOL,
+      ...HOLO_UC_POOL,
       mockCard('KS-130-R', 'R'),
     ],
 }));
+
+function slotKind(card: CardData): 'RA' | 'MV' | 'SV' | 'L' | 'HOLO_C' | 'HOLO_UC' {
+  if (card.isHolo) return card.rarity === 'C' ? 'HOLO_C' : 'HOLO_UC';
+  return card.rarity as 'RA' | 'MV' | 'SV' | 'L';
+}
 
 describe('rollVariantBooster', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('returns 3 cards per booster', () => {
+  it('returns VARIANT_PACK_SIZE cards per booster', () => {
     const rng = mulberry32(42);
     const pack = rollVariantBooster('KS', { rng });
     expect(pack).toHaveLength(VARIANT_PACK_SIZE);
   });
 
-  it('only rolls variant rarities', () => {
+  it('only rolls variant rarities or holo commons and uncommons', () => {
     const rng = mulberry32(1234);
     for (let i = 0; i < 100; i++) {
       const pack = rollVariantBooster('KS', { rng });
       for (const card of pack) {
-        expect(['RA', 'MV', 'SV', 'L']).toContain(card.rarity);
+        if (card.isHolo) {
+          expect(['C', 'UC']).toContain(card.rarity);
+          expect(card.cardId.endsWith('_H')).toBe(true);
+        } else {
+          expect(['RA', 'MV', 'SV', 'L']).toContain(card.rarity);
+        }
       }
     }
   });
@@ -122,14 +136,13 @@ describe('rollVariantBooster', () => {
 
   it('probabilities converge to spec over 1M full rollVariantBooster calls', () => {
     const rng = mulberry32(20240525);
-    const counts = { RA: 0, MV: 0, SV: 0, L: 0 };
+    const counts = { RA: 0, MV: 0, SV: 0, L: 0, HOLO_C: 0, HOLO_UC: 0 };
     const N = 1_000_000;
     let totalSlots = 0;
     for (let i = 0; i < N; i++) {
       const pack = rollVariantBooster('KS', { rng });
       for (const card of pack) {
-        const r = card.rarity as 'RA' | 'MV' | 'SV' | 'L';
-        counts[r]++;
+        counts[slotKind(card)]++;
         totalSlots++;
       }
     }
@@ -138,24 +151,30 @@ describe('rollVariantBooster', () => {
     const mv = counts.MV / totalSlots;
     const sv = counts.SV / totalSlots;
     const l = counts.L / totalSlots;
+    const hc = counts.HOLO_C / totalSlots;
+    const huc = counts.HOLO_UC / totalSlots;
 
     expect(totalSlots).toBeGreaterThan(N * 2);
     expect(Math.abs(ra - VARIANT_PACK_PROBABILITIES.RA)).toBeLessThan(0.005);
     expect(Math.abs(mv - VARIANT_PACK_PROBABILITIES.MV)).toBeLessThan(0.003);
     expect(Math.abs(l - VARIANT_PACK_PROBABILITIES.L)).toBeLessThan(0.002);
     expect(Math.abs(sv - VARIANT_PACK_PROBABILITIES.SV)).toBeLessThan(0.001);
+    expect(Math.abs(hc - VARIANT_PACK_PROBABILITIES.HOLO_C)).toBeLessThan(0.005);
+    expect(Math.abs(huc - VARIANT_PACK_PROBABILITIES.HOLO_UC)).toBeLessThan(0.005);
   }, 60_000);
 
-  it('over 1M rolls, every rarity appears at least once', () => {
+  it('over many rolls, every slot kind appears at least once', () => {
     const rng = mulberry32(2024);
     const seen = new Set<string>();
-    for (let i = 0; i < 50_000 && seen.size < 4; i++) {
+    for (let i = 0; i < 50_000 && seen.size < 6; i++) {
       const pack = rollVariantBooster('KS', { rng });
-      for (const c of pack) seen.add(c.rarity);
+      for (const c of pack) seen.add(slotKind(c));
     }
     expect(seen.has('RA')).toBe(true);
     expect(seen.has('MV')).toBe(true);
     expect(seen.has('L')).toBe(true);
     expect(seen.has('SV')).toBe(true);
+    expect(seen.has('HOLO_C')).toBe(true);
+    expect(seen.has('HOLO_UC')).toBe(true);
   }, 30_000);
 });

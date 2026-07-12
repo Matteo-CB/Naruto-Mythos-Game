@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import type { CardData } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { useLocale } from 'next-intl';
 
 interface TradeCardTileProps {
@@ -39,13 +40,16 @@ export function TradeCardTile({ card, count, onClick, disabled, size = 'md', dim
       aria-label={getCardName(card, locale)}
     >
       {img ? (
-        <img
-          src={img}
-          alt={getCardName(card, locale)}
-          draggable={false}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          loading="lazy"
-        />
+        <>
+          <img
+            src={img}
+            alt={getCardName(card, locale)}
+            draggable={false}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            loading="lazy"
+          />
+          {card.isHolo && <HoloFoilOverlay />}
+        </>
       ) : (
         <div className="w-full h-full flex items-center justify-center px-1">
           <span className="text-[8px] text-center" style={{ color: '#888' }}>{getCardName(card, locale)}</span>
