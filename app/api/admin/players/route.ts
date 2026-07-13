@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
+import { requireModerator } from '@/lib/auth/adminGuard';
 
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
@@ -12,7 +13,7 @@ async function isAdmin(): Promise<boolean> {
 
 
 export async function GET(request: NextRequest) {
-  if (!(await isAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!(await requireModerator())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { searchParams } = new URL(request.url);
   const search = searchParams.get('search') || '';
@@ -69,8 +70,20 @@ export async function POST(request: NextRequest) {
 
     case 'set-role': {
       const { role } = body;
-      if (!['user', 'tester', 'admin'].includes(role)) return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
+      if (!['user', 'tester', 'admin', 'moderator'].includes(role)) return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
       await prisma.user.update({ where: { id: userId }, data: { role } });
+      const session = await auth();
+      if (session?.user?.id) {
+        await prisma.adminAction.create({
+          data: {
+            actorId: session.user.id,
+            actorName: session.user.name ?? 'admin',
+            action: 'set-role',
+            targetId: userId,
+            payload: { role },
+          },
+        }).catch(() => {});
+      }
       return NextResponse.json({ success: true });
     }
 

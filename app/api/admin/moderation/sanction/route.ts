@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
-import { requireAdmin } from '@/lib/auth/adminGuard';
+import { requireModerator } from '@/lib/auth/adminGuard';
 import { applySanction, isValidSanctionDuration, type SanctionType, SANCTION_DURATIONS } from '@/lib/moderation/sanctions';
 import { notifyUser } from '@/lib/moderation/notify';
 import { refreshChatLock } from '@/lib/socket/chatLockBridge';
@@ -8,7 +8,7 @@ import { refreshChatLock } from '@/lib/socket/chatLockBridge';
 const NOTIFIABLE_STATEFUL: ReadonlySet<string> = new Set(['mute_chat', 'ranked_ban', 'suspension', 'spectate_ban']);
 
 export async function POST(request: NextRequest) {
-  const admin = await requireAdmin();
+  const admin = await requireModerator();
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const body = await request.json();

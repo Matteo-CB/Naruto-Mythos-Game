@@ -2479,7 +2479,9 @@
       "close": "Cerrar",
       "noGames": "No se han encontrado partidas.",
       "deleteConfirm": "¿Eliminar + restaurar ELO?",
-      "delete": "Eliminar"
+      "delete": "Eliminar",
+      "makeModerator": "Nombrar moderador",
+      "removeModerator": "Quitar moderador"
     }
   },
   "badges": {
@@ -3555,6 +3557,54 @@
       "name_reset": "Reinicio del nombre",
       "message_delete": "Mensaje eliminado",
       "elo_adjust": "Ajuste de ELO"
+    }
+  },
+  "surveys": {
+    "buttonLabel": "Encuestas",
+    "title": "Encuestas",
+    "subtitle": "Da tu opinión y ayuda a dar forma al juego.",
+    "empty": "No hay encuestas por ahora. Vuelve pronto.",
+    "statusOpen": "Abierta",
+    "statusClosed": "Cerrada",
+    "participants": "{count} participantes",
+    "multipleHint": "se permiten varias respuestas",
+    "vote": "Votar",
+    "voted": "Voto registrado",
+    "finalVoteNote": "Tu voto es definitivo.",
+    "signInToVote": "Inicia sesión para votar",
+    "myAnswer": "Tu respuesta:",
+    "textAnswersPrivate": "Las respuestas escritas solo son visibles para el equipo.",
+    "textPlaceholder": "Tu respuesta (opcional)",
+    "closedSection": "Encuestas cerradas",
+    "create": "Crear una encuesta",
+    "cancel": "Cancelar",
+    "formTitle": "Título de la encuesta",
+    "formDescription": "Descripción (opcional)",
+    "questionLabel": "Pregunta {number}",
+    "questionText": "Texto de la pregunta",
+    "typeSingle": "Opción única",
+    "typeMultiple": "Opción múltiple",
+    "typeText": "Texto libre",
+    "optionPlaceholder": "Opción {number}",
+    "addOption": "Añadir una opción",
+    "removeOption": "Quitar esta opción",
+    "addQuestion": "Añadir una pregunta",
+    "removeQuestion": "Quitar",
+    "publish": "Publicar",
+    "closeSurvey": "Cerrar",
+    "reopenSurvey": "Reabrir",
+    "deleteSurvey": "Eliminar",
+    "confirmDelete": "Confirmar eliminación",
+    "viewVoters": "Votantes",
+    "votersTitle": "Quién votó qué",
+    "noVotes": "Sin votos",
+    "error": {
+      "invalid": "Solicitud no válida. Revisa el formulario.",
+      "titleRequired": "Se requiere un título.",
+      "invalidQuestions": "Revisa las preguntas: cada pregunta de opción necesita al menos 2 opciones.",
+      "invalidAnswers": "Responde a todas las preguntas de opción antes de votar.",
+      "closed": "Esta encuesta está cerrada.",
+      "alreadyVoted": "Ya has votado en esta encuesta."
     }
   }
 }

@@ -2474,7 +2474,9 @@
       "close": "Close",
       "noGames": "No games found.",
       "deleteConfirm": "Delete + restore ELO?",
-      "delete": "Delete"
+      "delete": "Delete",
+      "makeModerator": "Make moderator",
+      "removeModerator": "Remove moderator"
     }
   },
   "badges": {
@@ -3550,6 +3552,54 @@
       "name_reset": "Username reset",
       "message_delete": "Message deleted",
       "elo_adjust": "ELO adjustment"
+    }
+  },
+  "surveys": {
+    "buttonLabel": "Surveys",
+    "title": "Surveys",
+    "subtitle": "Give your opinion and help shape the game.",
+    "empty": "No surveys yet. Come back soon.",
+    "statusOpen": "Open",
+    "statusClosed": "Closed",
+    "participants": "{count} participants",
+    "multipleHint": "several answers allowed",
+    "vote": "Vote",
+    "voted": "Vote recorded",
+    "finalVoteNote": "Your vote is final.",
+    "signInToVote": "Sign in to vote",
+    "myAnswer": "Your answer:",
+    "textAnswersPrivate": "Text answers are only visible to the team.",
+    "textPlaceholder": "Your answer (optional)",
+    "closedSection": "Closed surveys",
+    "create": "Create a survey",
+    "cancel": "Cancel",
+    "formTitle": "Survey title",
+    "formDescription": "Description (optional)",
+    "questionLabel": "Question {number}",
+    "questionText": "Question text",
+    "typeSingle": "Single choice",
+    "typeMultiple": "Multiple choice",
+    "typeText": "Free text",
+    "optionPlaceholder": "Option {number}",
+    "addOption": "Add an option",
+    "removeOption": "Remove this option",
+    "addQuestion": "Add a question",
+    "removeQuestion": "Remove",
+    "publish": "Publish",
+    "closeSurvey": "Close",
+    "reopenSurvey": "Reopen",
+    "deleteSurvey": "Delete",
+    "confirmDelete": "Confirm deletion",
+    "viewVoters": "Voters",
+    "votersTitle": "Who voted what",
+    "noVotes": "No votes",
+    "error": {
+      "invalid": "Invalid request. Check the form.",
+      "titleRequired": "A title is required.",
+      "invalidQuestions": "Check the questions: each choice question needs at least 2 options.",
+      "invalidAnswers": "Answer every choice question before voting.",
+      "closed": "This survey is closed.",
+      "alreadyVoted": "You have already voted on this survey."
     }
   }
 }

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from '@/lib/i18n/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { routing } from '@/lib/i18n/routing';
 import { ChangelogButton } from './ChangelogButton';
+import { SurveysButton } from './SurveysButton';
 
 type AppLocale = (typeof routing.locales)[number];
 const ACCENT = '#c4a35a';
@@ -37,6 +38,7 @@ export function LanguageSwitcher() {
 
   return (
     <nav className="flex items-center gap-2" aria-label={t('topMenu')}>
+      <SurveysButton />
       <ChangelogButton />
       <span className="text-xs" style={{ color: '#333333' }} aria-hidden="true">|</span>
       <div ref={ref} className="relative">

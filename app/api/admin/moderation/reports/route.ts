@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
-import { requireAdmin } from '@/lib/auth/adminGuard';
+import { requireModerator } from '@/lib/auth/adminGuard';
 
 export async function GET(request: NextRequest) {
-  const admin = await requireAdmin();
+  const admin = await requireModerator();
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const statusParam = request.nextUrl.searchParams.get('status');

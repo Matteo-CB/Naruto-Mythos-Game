@@ -11,28 +11,40 @@
         "Poser une carte de la main vers le plateau est plus fluide : trajectoire plus douce et atterrissage sans rebond.",
         "La pose d'une carte de la main vers le plateau est plus rapide.",
         "Les fenêtres d'effet attendent la fin des animations de pose, de défaite et de révélation avant de s'afficher.",
-        "Quand un effet vainc plusieurs personnages d'un coup, ils restent sur le terrain et partent à la défausse un par un, chacun avec son animation."
+        "Quand un effet vainc plusieurs personnages d'un coup, ils restent sur le terrain et partent à la défausse un par un, chacun avec son animation.",
+        "Nouvelle page Sondages : vote sur les questions de l'équipe et découvre les résultats après ton vote.",
+        "Un bouton Sondages apparaît en haut à droite, avec un point doré quand un nouveau sondage est ouvert.",
+        "L'équipe peut nommer des modérateurs chargés de traiter les signalements et d'appliquer les sanctions."
       ],
       "changes_en": [
         "The mission win and loss animation is removed: the score updates without a visual effect.",
         "Playing a card from hand to the board is smoother: softer path and a landing without bounce.",
         "Playing a card from hand to the board is faster.",
         "Effect windows now wait for play, defeat and reveal animations to finish before appearing.",
-        "When an effect defeats several characters at once, they stay on the board and leave for the discard pile one by one, each with its own animation."
+        "When an effect defeats several characters at once, they stay on the board and leave for the discard pile one by one, each with its own animation.",
+        "New Surveys page: vote on the team's questions and see the results after voting.",
+        "A Surveys button appears in the top right, with a gold dot when a new survey is open.",
+        "The team can appoint moderators who handle reports and apply sanctions."
       ],
       "changes_es": [
         "Se elimina la animación al ganar o perder una misión: la puntuación se actualiza sin efecto visual.",
         "Jugar una carta de la mano al tablero es más fluido: trayectoria más suave y aterrizaje sin rebote.",
         "Jugar una carta de la mano al tablero es más rápido.",
         "Las ventanas de efecto ahora esperan a que terminen las animaciones de juego, derrota y revelación antes de aparecer.",
-        "Cuando un efecto derrota a varios personajes a la vez, permanecen en el tablero y van al descarte uno por uno, cada uno con su animación."
+        "Cuando un efecto derrota a varios personajes a la vez, permanecen en el tablero y van al descarte uno por uno, cada uno con su animación.",
+        "Nueva página de Encuestas: vota las preguntas del equipo y ve los resultados tras votar.",
+        "Un botón de Encuestas aparece arriba a la derecha, con un punto dorado cuando hay una encuesta nueva.",
+        "El equipo puede nombrar moderadores que gestionan las denuncias y aplican las sanciones."
       ],
       "changes_ja": [
         "ミッションの勝敗アニメーションを削除しました。スコアは演出なしで更新されます。",
         "手札から盤面へのカードプレイがより滑らかになりました。軌道が柔らかくなり、着地のバウンドがなくなりました。",
         "手札から盤面へのカードプレイが速くなりました。",
         "エフェクトウィンドウは、プレイ・撃破・公開のアニメーションが終わってから表示されるようになりました。",
-        "効果で複数のキャラクターを同時に撃破した場合、盤面に残ったまま1体ずつアニメーションと共に捨て札へ送られます。"
+        "効果で複数のキャラクターを同時に撃破した場合、盤面に残ったまま1体ずつアニメーションと共に捨て札へ送られます。",
+        "新しいアンケートページ：運営の質問に投票し、投票後に結果を見ることができます。",
+        "右上にアンケートボタンが追加され、新しいアンケートがあると金色の点が表示されます。",
+        "運営はモデレーターを任命でき、通報の対応と制裁の適用を任せられます。"
       ]
     },
     {

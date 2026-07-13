@@ -69,6 +69,17 @@ export default function AdminPage() {
   const [eloEditValue, setEloEditValue] = useState('');
 
   const isAdmin = session?.user?.email === ADMIN_EMAIL || ADMIN_USERNAMES.includes(session?.user?.name ?? '');
+  const [moderatorAccess, setModeratorAccess] = useState<'loading' | 'no' | 'yes'>('loading');
+
+  useEffect(() => {
+    if (isAdmin) { setModeratorAccess('no'); return; }
+    if (session === undefined) return;
+    if (!session?.user?.id) { setModeratorAccess('no'); return; }
+    fetch('/api/admin/moderation/access', { credentials: 'include' })
+      .then((res) => (res.ok ? res.json() : { moderator: false, admin: false }))
+      .then((data) => setModeratorAccess(data.moderator && !data.admin ? 'yes' : 'no'))
+      .catch(() => setModeratorAccess('no'));
+  }, [isAdmin, session]);
 
   const allCards = useMemo(() => {
     const chars = getPlayableCharacters();
@@ -134,6 +145,22 @@ export default function AdminPage() {
     } catch { /* ignore */ } finally { setPlayerActionLoading(false); setEloEditId(null); }
   };
 
+  const handleToggleModerator = async (userId: string, currentRole: string) => {
+    setPlayerActionLoading(true);
+    try {
+      const newRole = currentRole === 'moderator' ? 'user' : 'moderator';
+      const res = await fetch('/api/admin/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'set-role', userId, role: newRole }),
+      });
+      if (res.ok) {
+        addResult({ success: true, message: `Role set to ${newRole}.` });
+        fetchPlayers(playerSearch);
+      }
+    } catch { /* ignore */ } finally { setPlayerActionLoading(false); }
+  };
+
   const handleDeleteGame = async (gameId: string) => {
     setPlayerActionLoading(true);
     try {
@@ -172,6 +199,36 @@ export default function AdminPage() {
   }, [isAdmin]);
 
   if (!isAdmin) {
+    if (moderatorAccess === 'loading') {
+      return (
+        <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
+          <p style={{ color: '#555' }}>...</p>
+        </main>
+      );
+    }
+    if (moderatorAccess === 'yes') {
+      return (
+        <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+          <CloudBackground />
+          <div className="max-w-6xl mx-auto relative z-10 flex-1 px-4 py-8 w-full">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-2xl font-bold" style={{ color: '#c4a35a' }}>
+                {tc('moderation.reports')}
+              </h1>
+              <Link
+                href="/"
+                className="px-4 py-2 text-sm rounded"
+                style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+              >
+                {t('home')}
+              </Link>
+            </div>
+            <ModerationTab />
+          </div>
+          <Footer />
+        </main>
+      );
+    }
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
         <p style={{ color: '#b33e3e' }}>{t('unauthorized')}</p>
@@ -645,6 +702,19 @@ export default function AdminPage() {
                         style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888' }}
                       >
                         {t('players.games')}
+                      </button>
+
+                      <button
+                        onClick={() => handleToggleModerator(p.id, p.role)}
+                        disabled={playerActionLoading}
+                        className="px-2 py-1 text-[10px] cursor-pointer"
+                        style={{
+                          backgroundColor: p.role === 'moderator' ? '#c4a35a1f' : '#141414',
+                          border: '1px solid #262626',
+                          color: p.role === 'moderator' ? '#c4a35a' : '#888',
+                        }}
+                      >
+                        {p.role === 'moderator' ? t('players.removeModerator') : t('players.makeModerator')}
                       </button>
 
                       {confirmResetId === p.id ? (

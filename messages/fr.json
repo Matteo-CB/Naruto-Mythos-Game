@@ -2480,7 +2480,9 @@
       "close": "Fermer",
       "noGames": "Aucune partie trouvée.",
       "deleteConfirm": "Supprimer et restaurer l'ELO ?",
-      "delete": "Supprimer"
+      "delete": "Supprimer",
+      "makeModerator": "Nommer modérateur",
+      "removeModerator": "Retirer modérateur"
     }
   },
   "badges": {
@@ -3556,6 +3558,54 @@
       "name_reset": "Reset du pseudo",
       "message_delete": "Message supprimé",
       "elo_adjust": "Ajustement ELO"
+    }
+  },
+  "surveys": {
+    "buttonLabel": "Sondages",
+    "title": "Sondages",
+    "subtitle": "Donne ton avis et aide à façonner le jeu.",
+    "empty": "Aucun sondage pour le moment. Reviens bientôt.",
+    "statusOpen": "Ouvert",
+    "statusClosed": "Clôturé",
+    "participants": "{count} participants",
+    "multipleHint": "plusieurs réponses possibles",
+    "vote": "Voter",
+    "voted": "Vote enregistré",
+    "finalVoteNote": "Ton vote est définitif.",
+    "signInToVote": "Connecte-toi pour voter",
+    "myAnswer": "Ta réponse :",
+    "textAnswersPrivate": "Les réponses écrites ne sont visibles que par l’équipe.",
+    "textPlaceholder": "Ta réponse (facultatif)",
+    "closedSection": "Sondages clôturés",
+    "create": "Créer un sondage",
+    "cancel": "Annuler",
+    "formTitle": "Titre du sondage",
+    "formDescription": "Description (facultatif)",
+    "questionLabel": "Question {number}",
+    "questionText": "Texte de la question",
+    "typeSingle": "Choix unique",
+    "typeMultiple": "Choix multiple",
+    "typeText": "Texte libre",
+    "optionPlaceholder": "Option {number}",
+    "addOption": "Ajouter une option",
+    "removeOption": "Retirer cette option",
+    "addQuestion": "Ajouter une question",
+    "removeQuestion": "Retirer",
+    "publish": "Publier",
+    "closeSurvey": "Clôturer",
+    "reopenSurvey": "Rouvrir",
+    "deleteSurvey": "Supprimer",
+    "confirmDelete": "Confirmer la suppression",
+    "viewVoters": "Votants",
+    "votersTitle": "Qui a voté quoi",
+    "noVotes": "Aucun vote",
+    "error": {
+      "invalid": "Requête invalide. Vérifie le formulaire.",
+      "titleRequired": "Un titre est requis.",
+      "invalidQuestions": "Vérifie les questions : chaque question à choix doit avoir au moins 2 options.",
+      "invalidAnswers": "Réponds à toutes les questions à choix avant de voter.",
+      "closed": "Ce sondage est clôturé.",
+      "alreadyVoted": "Tu as déjà voté à ce sondage."
     }
   }
 }

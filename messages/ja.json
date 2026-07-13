@@ -2478,7 +2478,9 @@
       "close": "閉じる",
       "noGames": "対戦が見つかりません。",
       "deleteConfirm": "削除 + ELO復元？",
-      "delete": "削除"
+      "delete": "削除",
+      "makeModerator": "モデレーターに任命",
+      "removeModerator": "モデレーターを解除"
     }
   },
   "badges": {
@@ -3554,6 +3556,54 @@
       "name_reset": "ユーザー名リセット",
       "message_delete": "メッセージ削除",
       "elo_adjust": "ELO調整"
+    }
+  },
+  "surveys": {
+    "buttonLabel": "アンケート",
+    "title": "アンケート",
+    "subtitle": "意見を伝えてゲーム作りに参加しよう。",
+    "empty": "まだアンケートはありません。また来てください。",
+    "statusOpen": "受付中",
+    "statusClosed": "終了",
+    "participants": "{count}人が回答",
+    "multipleHint": "複数回答可",
+    "vote": "投票する",
+    "voted": "投票済み",
+    "finalVoteNote": "投票は変更できません。",
+    "signInToVote": "ログインして投票する",
+    "myAnswer": "あなたの回答：",
+    "textAnswersPrivate": "記述回答は運営のみが確認できます。",
+    "textPlaceholder": "あなたの回答（任意）",
+    "closedSection": "終了したアンケート",
+    "create": "アンケートを作成",
+    "cancel": "キャンセル",
+    "formTitle": "アンケートのタイトル",
+    "formDescription": "説明（任意）",
+    "questionLabel": "質問 {number}",
+    "questionText": "質問文",
+    "typeSingle": "単一選択",
+    "typeMultiple": "複数選択",
+    "typeText": "自由記述",
+    "optionPlaceholder": "選択肢 {number}",
+    "addOption": "選択肢を追加",
+    "removeOption": "この選択肢を削除",
+    "addQuestion": "質問を追加",
+    "removeQuestion": "削除",
+    "publish": "公開する",
+    "closeSurvey": "締め切る",
+    "reopenSurvey": "再開する",
+    "deleteSurvey": "削除",
+    "confirmDelete": "削除を確定",
+    "viewVoters": "投票者",
+    "votersTitle": "投票内容の一覧",
+    "noVotes": "投票なし",
+    "error": {
+      "invalid": "無効なリクエストです。フォームを確認してください。",
+      "titleRequired": "タイトルが必要です。",
+      "invalidQuestions": "質問を確認してください。選択式の質問には2つ以上の選択肢が必要です。",
+      "invalidAnswers": "投票する前にすべての選択式の質問に回答してください。",
+      "closed": "このアンケートは終了しました。",
+      "alreadyVoted": "このアンケートには既に投票済みです。"
     }
   }
 }

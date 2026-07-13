@@ -726,3 +726,30 @@ model CardUsageDayTotal {
   decks Int    @default(0)
   games Int    @default(0)
 }
+
+model Survey {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  description   String?
+  status        String    @default("open")
+  createdBy     String
+  createdAt     DateTime  @default(now())
+  closedAt      DateTime?
+  questions     Json
+  responseCount Int       @default(0)
+
+  @@index([status, createdAt])
+  @@index([createdAt])
+}
+
+model SurveyResponse {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  surveyId  String
+  userId    String
+  username  String
+  answers   Json
+  createdAt DateTime @default(now())
+
+  @@unique([surveyId, userId])
+  @@index([surveyId])
+}

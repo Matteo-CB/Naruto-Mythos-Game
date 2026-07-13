@@ -13,6 +13,7 @@ vi.mock('@/lib/db/prisma', () => {
 
 vi.mock('@/lib/auth/adminGuard', () => ({
   requireAdmin: vi.fn(),
+  requireModerator: vi.fn(),
 }));
 
 vi.mock('@/lib/socket/io', () => ({
@@ -24,14 +25,14 @@ vi.mock('@/lib/socket/chatLockBridge', () => ({
 }));
 
 import { prisma } from '@/lib/db/prisma';
-import { requireAdmin } from '@/lib/auth/adminGuard';
+import { requireModerator } from '@/lib/auth/adminGuard';
 import { POST as sanctionPOST } from '../../app/api/admin/moderation/sanction/route';
 import { POST as resolvePOST } from '../../app/api/admin/moderation/resolve/route';
 import { POST as revokePOST } from '../../app/api/admin/moderation/revoke/route';
 import { NextRequest } from 'next/server';
 
 const p = prisma as unknown as Record<string, Record<string, ReturnType<typeof vi.fn>>>;
-const admin = requireAdmin as unknown as ReturnType<typeof vi.fn>;
+const admin = requireModerator as unknown as ReturnType<typeof vi.fn>;
 
 function req(body: unknown): NextRequest {
   return new NextRequest('http://localhost/api/admin/moderation/x', {
@@ -43,7 +44,7 @@ function req(body: unknown): NextRequest {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  admin.mockResolvedValue({ userId: 'admin1', username: 'Kutxyt' });
+  admin.mockResolvedValue({ userId: 'admin1', username: 'Kutxyt', isAdmin: true });
   p.user.findUnique.mockResolvedValue({ id: 'target1', username: 'Bad Guy' });
   p.user.update.mockResolvedValue({});
   p.sanction.create.mockResolvedValue({ id: 'sanc1', userId: 'target1', expiresAt: new Date(4200), createdAt: new Date() });
@@ -52,10 +53,16 @@ beforeEach(() => {
 });
 
 describe('POST /api/admin/moderation/sanction', () => {
-  it('rejects non-admins', async () => {
+  it('rejects users who are neither admin nor moderator', async () => {
     admin.mockResolvedValue(null);
     const res = await sanctionPOST(req({ userId: 'target1', type: 'warn', reason: 'insultes', durationMs: null }));
     expect(res.status).toBe(403);
+  });
+
+  it('accepts a moderator who is not an admin', async () => {
+    admin.mockResolvedValue({ userId: 'mod1', username: 'ModGuy', isAdmin: false });
+    const res = await sanctionPOST(req({ userId: 'target1', type: 'warn', reason: 'insultes', durationMs: null }));
+    expect(res.status).toBe(201);
   });
 
   it('rejects invalid durations for the type', async () => {
