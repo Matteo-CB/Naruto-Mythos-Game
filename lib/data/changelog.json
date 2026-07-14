@@ -1,6 +1,29 @@
 {
   "entries": [
     {
+      "date": "2026-07-15",
+      "title_fr": "Animations encore plus fluides et pose plus directe",
+      "title_en": "Even smoother animations and a more direct card play",
+      "title_es": "Animaciones aún más fluidas y jugada más directa",
+      "title_ja": "アニメーションをさらに滑らかに、カードプレイをより直線的に",
+      "changes_fr": [
+        "Les animations consomment encore moins de ressources, notamment sur tablette et mobile.",
+        "La carte vole de la main au plateau en ligne quasi droite, plus vite qu'avant."
+      ],
+      "changes_en": [
+        "Animations use even fewer resources, especially on tablets and phones.",
+        "The card flies from hand to board in a nearly straight line, faster than before."
+      ],
+      "changes_es": [
+        "Las animaciones consumen aún menos recursos, sobre todo en tabletas y móviles.",
+        "La carta vuela de la mano al tablero en línea casi recta, más rápido que antes."
+      ],
+      "changes_ja": [
+        "アニメーションの負荷がさらに軽くなりました。特にタブレットとスマホで効果があります。",
+        "カードは手札から盤面へほぼ一直線に、以前より速く飛ぶようになりました。"
+      ]
+    },
+    {
       "date": "2026-07-14",
       "title_fr": "Sondages plus visibles et accueil mobile aéré",
       "title_en": "More visible surveys and a cleaner mobile home",

@@ -346,10 +346,16 @@ interface EffectInstance {
   resolve: () => void;
 }
 
+interface ProgramInfo {
+  program: WebGLProgram;
+  attrPos: number;
+  u: Record<string, WebGLUniformLocation | null>;
+}
+
 interface GlState {
   canvas: HTMLCanvasElement;
   gl: WebGLRenderingContext;
-  programs: Map<VfxKind, WebGLProgram>;
+  programs: Map<VfxKind, ProgramInfo>;
   buffer: WebGLBuffer;
   dpr: number;
 }
@@ -409,10 +415,14 @@ function ensureGl(): GlState | null {
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
-  const programs = new Map<VfxKind, WebGLProgram>();
+  const programs = new Map<VfxKind, ProgramInfo>();
+  const UNIFORM_NAMES = ['u_center', 'u_size', 'u_resolution', 'u_t', 'u_color', 'u_color2', 'u_intensity', 'u_seed', 'u_card'];
   for (const [kind, frag] of Object.entries(FRAGS) as Array<[VfxKind, string]>) {
     const program = link(gl, frag);
-    if (program) programs.set(kind, program);
+    if (!program) continue;
+    const u: Record<string, WebGLUniformLocation | null> = {};
+    for (const name of UNIFORM_NAMES) u[name] = gl.getUniformLocation(program, name);
+    programs.set(kind, { program, attrPos: gl.getAttribLocation(program, 'a_pos'), u });
   }
 
   glState = { canvas, gl, programs, buffer, dpr };
@@ -448,24 +458,23 @@ function frame(now: number): void {
   }
 
   for (const inst of instances) {
-    const program = state.programs.get(inst.kind);
-    if (!program) continue;
-    gl.useProgram(program);
+    const info = state.programs.get(inst.kind);
+    if (!info) continue;
+    gl.useProgram(info.program);
     gl.bindBuffer(gl.ARRAY_BUFFER, state.buffer);
-    const loc = gl.getAttribLocation(program, 'a_pos');
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(info.attrPos);
+    gl.vertexAttribPointer(info.attrPos, 2, gl.FLOAT, false, 0, 0);
 
     const t = Math.min((now - inst.start) / inst.durationMs, 1);
-    gl.uniform2f(gl.getUniformLocation(program, 'u_center'), inst.centerX * state.dpr, inst.centerY * state.dpr);
-    gl.uniform2f(gl.getUniformLocation(program, 'u_size'), inst.sizePx * state.dpr, inst.sizePx * state.dpr);
-    gl.uniform2f(gl.getUniformLocation(program, 'u_resolution'), state.canvas.width, state.canvas.height);
-    gl.uniform1f(gl.getUniformLocation(program, 'u_t'), t);
-    gl.uniform3f(gl.getUniformLocation(program, 'u_color'), inst.color.r, inst.color.g, inst.color.b);
-    gl.uniform3f(gl.getUniformLocation(program, 'u_color2'), inst.secondary.r, inst.secondary.g, inst.secondary.b);
-    gl.uniform1f(gl.getUniformLocation(program, 'u_intensity'), inst.intensity);
-    gl.uniform1f(gl.getUniformLocation(program, 'u_seed'), inst.seed);
-    gl.uniform2f(gl.getUniformLocation(program, 'u_card'), inst.cardHalfX, inst.cardHalfY);
+    gl.uniform2f(info.u.u_center, inst.centerX * state.dpr, inst.centerY * state.dpr);
+    gl.uniform2f(info.u.u_size, inst.sizePx * state.dpr, inst.sizePx * state.dpr);
+    gl.uniform2f(info.u.u_resolution, state.canvas.width, state.canvas.height);
+    gl.uniform1f(info.u.u_t, t);
+    gl.uniform3f(info.u.u_color, inst.color.r, inst.color.g, inst.color.b);
+    gl.uniform3f(info.u.u_color2, inst.secondary.r, inst.secondary.g, inst.secondary.b);
+    gl.uniform1f(info.u.u_intensity, inst.intensity);
+    gl.uniform1f(info.u.u_seed, inst.seed);
+    gl.uniform2f(info.u.u_card, inst.cardHalfX, inst.cardHalfY);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 

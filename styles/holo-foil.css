@@ -16,6 +16,7 @@
   pointer-events: none;
   border-radius: inherit;
   z-index: 2;
+  contain: layout paint;
 }
 
 .holo-foil__rainbow {

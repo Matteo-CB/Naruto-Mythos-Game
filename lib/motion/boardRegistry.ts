@@ -90,9 +90,13 @@ export function findNewSlotAnchor(
 }
 
 let lastSnapshot: BoardSnapshot = new Map();
+let snapshotFresh = false;
 
 export function stashPreUpdateSnapshot(): void {
+  if (snapshotFresh) return;
   lastSnapshot = captureBoardSnapshot();
+  snapshotFresh = true;
+  queueMicrotask(() => { snapshotFresh = false; });
 }
 
 export function getPreUpdateSnapshot(): BoardSnapshot {
