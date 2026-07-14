@@ -40,14 +40,14 @@ interface PulseSpec {
 function pulseAnimForRemaining(remainingMs: number): PulseSpec | null {
   if (remainingMs <= HARD_RED_AT_MS) {
     return {
-      animate: { scale: [1, 1.08, 1], opacity: [0.85, 1, 0.85] },
-      transition: { duration: 0.5, repeat: Infinity, ease: 'easeInOut' },
+      animate: { scale: [1, 1.18, 1], opacity: [0.8, 1, 0.8] },
+      transition: { duration: 0.45, repeat: Infinity, ease: 'easeInOut' },
     };
   }
   if (remainingMs <= RED_AT_MS) {
     return {
-      animate: { scale: [1, 1.04, 1], opacity: [0.9, 1, 0.9] },
-      transition: { duration: 0.8, repeat: Infinity, ease: 'easeInOut' },
+      animate: { scale: [1, 1.1, 1], opacity: [0.85, 1, 0.85] },
+      transition: { duration: 0.7, repeat: Infinity, ease: 'easeInOut' },
     };
   }
   if (remainingMs <= ORANGE_AT_MS) {
@@ -57,6 +57,19 @@ function pulseAnimForRemaining(remainingMs: number): PulseSpec | null {
     };
   }
   return null;
+}
+
+function lowTimeEmphasis(remainingMs: number): { glow: string; bg: string | null; sizeBoost: number } {
+  if (remainingMs <= HARD_RED_AT_MS) {
+    return { glow: '0 0 20px rgba(179,62,62,0.7), 0 0 6px rgba(179,62,62,0.5)', bg: 'rgba(179,62,62,0.2)', sizeBoost: 5 };
+  }
+  if (remainingMs <= RED_AT_MS) {
+    return { glow: '0 0 14px rgba(179,62,62,0.5)', bg: 'rgba(179,62,62,0.14)', sizeBoost: 3 };
+  }
+  if (remainingMs <= ORANGE_AT_MS) {
+    return { glow: 'none', bg: 'rgba(204,122,48,0.12)', sizeBoost: 0 };
+  }
+  return { glow: 'none', bg: null, sizeBoost: 0 };
 }
 
 export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player, isOpponent }: ChessClockDisplayProps) {
@@ -116,7 +129,7 @@ export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player,
       }
       if (!playedWarningSoundRef.current) {
         playedWarningSoundRef.current = true;
-        playSound('clockWarning');
+        playSound('roomJoin');
       }
       return;
     }
@@ -137,14 +150,16 @@ export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player,
   const idleWarningUsed = chessClock[player].idleWarningUsed;
   const color = colorForRemaining(remaining, isOpponent);
   const pulse = pulseAnimForRemaining(remaining);
+  const emphasis = lowTimeEmphasis(remaining);
 
   const padX = isMobile ? 6 : 8;
   const padY = isMobile ? 2 : 3;
-  const fontSize = isMobile ? 13 : 14;
+  const fontSize = (isMobile ? 13 : 14) + emphasis.sizeBoost;
   const minW = isMobile ? 56 : 68;
 
   const containerStyle: React.CSSProperties = {
-    backgroundColor: isActive ? 'rgba(196, 163, 90, 0.10)' : 'transparent',
+    backgroundColor: emphasis.bg ?? (isActive ? 'rgba(196, 163, 90, 0.10)' : 'transparent'),
+    boxShadow: emphasis.glow,
     padding: `${padY}px ${padX}px`,
     minWidth: minW,
     display: 'flex',

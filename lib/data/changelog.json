@@ -9,22 +9,34 @@
       "changes_fr": [
         "La fenêtre d'annonce du chat ne s'affiche plus à la connexion.",
         "Le point doré du bouton Sondages reste affiché tant qu'un sondage ouvert attend ta réponse.",
-        "Sur téléphone, la barre du haut (Sondages, MAJ, langue) a maintenant son propre espace au-dessus du titre de l'accueil."
+        "Sur téléphone, la barre du haut (Sondages, MAJ, langue) a maintenant son propre espace au-dessus du titre de l'accueil.",
+        "Les illustrations de Naruto Uzumaki Jutsu du Multiclonage 108 et de Neji Hyûga promo 112 sont remplacées par les versions actuelles.",
+        "Le chrono de partie devient beaucoup plus visible quand il est bas : fond rouge, halo lumineux et chiffres agrandis qui pulsent.",
+        "Un son d'alerte retentit quand ton chrono passe sous les 30 secondes, le même que lorsqu'un joueur rejoint le salon."
       ],
       "changes_en": [
         "The chat announcement window no longer appears when signing in.",
         "The gold dot on the Surveys button now stays visible while an open survey is waiting for your answer.",
-        "On phones, the top bar (Surveys, News, language) now has its own space above the home title."
+        "On phones, the top bar (Surveys, News, language) now has its own space above the home title.",
+        "The artworks of Naruto Uzumaki Shadow Clone Jutsu 108 and promo Neji Hyuga 112 are replaced with the current versions.",
+        "The game clock becomes much more visible when low: red background, glowing halo and larger pulsing digits.",
+        "An alert sound plays when your clock drops below 30 seconds, the same one as when a player joins the room."
       ],
       "changes_es": [
         "La ventana de anuncio del chat ya no aparece al iniciar sesión.",
         "El punto dorado del botón Encuestas permanece visible mientras una encuesta abierta espera tu respuesta.",
-        "En el móvil, la barra superior (Encuestas, Novedades, idioma) tiene ahora su propio espacio sobre el título de inicio."
+        "En el móvil, la barra superior (Encuestas, Novedades, idioma) tiene ahora su propio espacio sobre el título de inicio.",
+        "Las ilustraciones de Naruto Uzumaki Jutsu Clones de Sombra 108 y del Neji Hyuga promocional 112 se reemplazan por las versiones actuales.",
+        "El reloj de partida es mucho más visible cuando queda poco tiempo: fondo rojo, halo luminoso y cifras más grandes que pulsan.",
+        "Suena una alerta cuando tu reloj baja de 30 segundos, la misma que cuando un jugador entra a la sala."
       ],
       "changes_ja": [
         "ログイン時のチャットのお知らせウィンドウは表示されなくなりました。",
         "未回答のアンケートがある間、アンケートボタンの金色の点が表示され続けるようになりました。",
-        "スマホでは、上部バー（アンケート・更新情報・言語）がホームタイトルの上に専用のスペースを持つようになりました。"
+        "スマホでは、上部バー（アンケート・更新情報・言語）がホームタイトルの上に専用のスペースを持つようになりました。",
+        "うずまきナルト 影分身の術 108 とプロモの日向ネジ 112 のイラストを最新版に差し替えました。",
+        "残り時間が少なくなると対局時計がより目立つようになりました。赤い背景、光る輪郭、拍動する大きな数字で表示されます。",
+        "残り30秒を切ると、プレイヤーがルームに参加したときと同じ通知音が鳴ります。"
       ]
     },
     {

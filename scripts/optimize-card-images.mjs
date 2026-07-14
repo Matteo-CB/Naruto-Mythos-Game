@@ -2,7 +2,7 @@ import sharp from 'sharp';
 import { readdirSync, statSync, readFileSync } from 'fs';
 import { join } from 'path';
 
-const ROOT = 'public/images/cards/KS';
+const ROOT = 'public/images/cards';
 const MAX_W = 800;
 const MAX_H = 1100;
 const QUALITY = 78;
@@ -12,7 +12,12 @@ const dryRun = process.argv.includes('--dry');
 const single = process.argv.find(a => a.startsWith('--only='));
 const onlyFile = single ? single.slice('--only='.length) : null;
 
-const dirs = readdirSync(ROOT).filter(d => statSync(join(ROOT, d)).isDirectory());
+const dirs = [];
+for (const set of readdirSync(ROOT).filter(d => statSync(join(ROOT, d)).isDirectory())) {
+  for (const sub of readdirSync(join(ROOT, set)).filter(d => statSync(join(ROOT, set, d)).isDirectory())) {
+    dirs.push(join(set, sub));
+  }
+}
 
 let totalBefore = 0;
 let totalAfter = 0;
