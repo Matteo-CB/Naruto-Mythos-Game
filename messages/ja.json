@@ -67,7 +67,8 @@
     "demoOpponent": "相手",
     "simSpectatorHint": "他のプレイヤーがこのターンをプレイしています",
     "simDone": "ターン終了",
-    "startSim": "シミュレーションを開始"
+    "startSim": "シミュレーションを開始",
+    "rotateCta": "全画面で表示"
   },
   "seoPages": {
     "collection": {
@@ -1828,7 +1829,9 @@
       "score": "スコア"
     },
     "holoToggle": "ホロ版",
-    "holoLockedToast": "このホロカードはロックされています。バリアントブースターまたはトレードで入手してください。"
+    "holoLockedToast": "このホロカードはロックされています。バリアントブースターまたはトレードで入手してください。",
+    "duplicateDeck": "コピー",
+    "copySuffix": "（コピー）"
   },
   "discord": {
     "linkDiscord": "Discordを連携",

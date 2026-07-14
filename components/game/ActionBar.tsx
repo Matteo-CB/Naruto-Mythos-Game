@@ -91,6 +91,7 @@ export function ActionBar() {
     const myChars = myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
     return myChars.filter(c => {
       if (c.controlledBy !== myPlayer) return false;
+      if (c.controlledBy !== c.originalOwner) return false;
       if (c.isHidden) return false;
       
       const charCard = c.topCard ?? c.card;

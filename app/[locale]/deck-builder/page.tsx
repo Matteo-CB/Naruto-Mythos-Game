@@ -510,6 +510,7 @@ export default function DeckBuilderPage() {
   const isDirty = useDeckBuilderStore((s) => s.isDirty);
   const loadSavedDecks = useDeckBuilderStore((s) => s.loadSavedDecks);
   const loadDeck = useDeckBuilderStore((s) => s.loadDeck);
+  const duplicateDeck = useDeckBuilderStore((s) => s.duplicateDeck);
   const deleteDeck = useDeckBuilderStore((s) => s.deleteDeck);
   const canAddChar = useDeckBuilderStore((s) => s.canAddChar);
   const canAddMission = useDeckBuilderStore((s) => s.canAddMission);
@@ -749,6 +750,13 @@ export default function DeckBuilderPage() {
       setSaveError(localizeApiError(err, "deckBuilder.failedToLoad"));
     }
   }, [loadDeck, availableChars, availableMissions, localizeApiError]);
+
+  const handleDuplicateDeck = useCallback(async (deckId: string) => {
+    setSaveError(null);
+    try { await duplicateDeck(deckId, availableChars, availableMissions, t("deckBuilder.copySuffix")); } catch (err: unknown) {
+      setSaveError(localizeApiError(err, "deckBuilder.failedToLoad"));
+    }
+  }, [duplicateDeck, availableChars, availableMissions, localizeApiError, t]);
 
   const handleDeleteDeck = useCallback(async (deckId: string) => {
     setSaveError(null);
@@ -1962,6 +1970,9 @@ export default function DeckBuilderPage() {
                       <div className="flex items-center gap-1.5 flex-shrink-0">
                         <AngularButton onClick={() => { handleLoadDeck(deck.id); setShowSavedDecks(false); }} variant={isActive ? 'primary' : 'secondary'} accentColor="#3e8b3e" size="sm">
                           {t("deckBuilder.editDeck")}
+                        </AngularButton>
+                        <AngularButton onClick={() => { handleDuplicateDeck(deck.id); setShowSavedDecks(false); }} variant="secondary" accentColor="#c4a35a" size="sm">
+                          {t("deckBuilder.duplicateDeck")}
                         </AngularButton>
                         <AngularButton onClick={() => setConfirmDeleteId(deck.id)} variant="danger" size="sm">
                           {t("deckBuilder.deleteDeck")}

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import GameBoard from '@/components/game/GameBoard';
+import { requestFullscreenAndLandscape } from '@/components/LandscapeBlocker';
 import { GameScaleProvider } from '@/components/game/GameScaleContext';
 import { ScaledGameRoot } from '@/components/game/ScaledGameRoot';
 import { useGameStore } from '@/stores/gameStore';
@@ -277,6 +278,14 @@ export function SimulationGame({ cardId, effectIndex, onClose }: { cardId: strin
           />
           <p className="text-lg font-bold">{t('cardPage.rotateDeviceTitle')}</p>
           <p className="text-sm text-[#9a9a9a] max-w-xs">{t('cardPage.rotateDeviceDesc')}</p>
+          <button
+            type="button"
+            onClick={() => { void requestFullscreenAndLandscape(); }}
+            className="px-8 py-3 text-sm font-bold uppercase tracking-[0.14em] cursor-pointer"
+            style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+          >
+            {t('cardPage.rotateCta')}
+          </button>
           <div className="mt-2">{closeBtn}</div>
         </div>
       </div>

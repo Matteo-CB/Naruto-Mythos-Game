@@ -67,7 +67,8 @@
     "demoOpponent": "Opponent",
     "simSpectatorHint": "Someone else is playing this turn",
     "simDone": "Turn complete",
-    "startSim": "Start the simulation"
+    "startSim": "Start the simulation",
+    "rotateCta": "Go fullscreen"
   },
   "seoPages": {
     "collection": {
@@ -1824,7 +1825,9 @@
       "score": "Score"
     },
     "holoToggle": "Holo version",
-    "holoLockedToast": "This holo card is locked. Get it from a variant booster or a trade."
+    "holoLockedToast": "This holo card is locked. Get it from a variant booster or a trade.",
+    "duplicateDeck": "Copy",
+    "copySuffix": "(copy)"
   },
   "discord": {
     "linkDiscord": "Link Discord",

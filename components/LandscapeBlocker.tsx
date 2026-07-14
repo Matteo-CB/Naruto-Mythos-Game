@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 
-async function requestFullscreenAndLandscape() {
+export async function requestFullscreenAndLandscape() {
   const el = document.documentElement;
   try {
     if (el.requestFullscreen) {

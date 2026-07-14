@@ -78,6 +78,7 @@ interface DeckBuilderStore {
   saveDeck: () => Promise<void>;
   loadSavedDecks: () => Promise<void>;
   loadDeck: (deckId: string, allChars: CharacterCard[], allMissions: MissionCard[]) => Promise<void>;
+  duplicateDeck: (deckId: string, allChars: CharacterCard[], allMissions: MissionCard[], copySuffix: string) => Promise<void>;
   deleteDeck: (deckId: string) => Promise<void>;
 }
 
@@ -436,6 +437,21 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
     } finally {
       set({ isLoading: false });
     }
+  },
+
+  duplicateDeck: async (
+    deckId: string,
+    allChars: CharacterCard[],
+    allMissions: MissionCard[],
+    copySuffix: string,
+  ) => {
+    await get().loadDeck(deckId, allChars, allMissions);
+    const { deckName } = get();
+    set({
+      loadedDeckId: null,
+      deckName: `${deckName} ${copySuffix}`.slice(0, 100),
+      isDirty: true,
+    });
   },
 
   deleteDeck: async (deckId: string) => {

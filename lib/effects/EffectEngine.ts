@@ -4596,6 +4596,7 @@ export class EffectEngine {
           
           const canUpgrade = mChars.some((c: CharacterInPlay) => {
             if (c.isHidden) return false;
+            if (c.controlledBy !== c.originalOwner) return false;
             const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             const isSameName = cTop.name_fr.toUpperCase() === kb053mTopCard.name_fr.toUpperCase()
               && (kb053mTopCard.chakra ?? 0) > (cTop.chakra ?? 0);

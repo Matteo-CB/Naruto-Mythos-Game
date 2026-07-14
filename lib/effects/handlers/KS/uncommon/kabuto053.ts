@@ -105,6 +105,7 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     let hasUpgradeTarget = false;
     for (const c of chars) {
       if (c.isHidden) continue;
+      if (c.controlledBy !== c.originalOwner) continue;
       const tc = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       const isSameName = tc.name_fr.toUpperCase() === topCard.name_fr.toUpperCase()
         && (topCard.chakra ?? 0) > (tc.chakra ?? 0);

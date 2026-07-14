@@ -67,7 +67,8 @@
     "demoOpponent": "Rival",
     "simSpectatorHint": "Otra persona juega este turno",
     "simDone": "Turno completado",
-    "startSim": "Iniciar la simulación"
+    "startSim": "Iniciar la simulación",
+    "rotateCta": "Pantalla completa"
   },
   "seoPages": {
     "collection": {
@@ -1829,7 +1830,9 @@
       "score": "Puntuar"
     },
     "holoToggle": "Versión holo",
-    "holoLockedToast": "Esta carta holo está bloqueada. Consíguela en un sobre de variantes o mediante un intercambio."
+    "holoLockedToast": "Esta carta holo está bloqueada. Consíguela en un sobre de variantes o mediante un intercambio.",
+    "duplicateDeck": "Copiar",
+    "copySuffix": "(copia)"
   },
   "discord": {
     "linkDiscord": "Vincular Discord",

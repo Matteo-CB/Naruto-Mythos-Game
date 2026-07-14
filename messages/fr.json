@@ -67,7 +67,8 @@
     "demoOpponent": "Adversaire",
     "simSpectatorHint": "Quelqu'un joue ce tour",
     "simDone": "Tour terminé",
-    "startSim": "Lancer la simulation"
+    "startSim": "Lancer la simulation",
+    "rotateCta": "Passer en plein écran"
   },
   "seoPages": {
     "collection": {
@@ -1830,7 +1831,9 @@
       "score": "Score"
     },
     "holoToggle": "Version holo",
-    "holoLockedToast": "Cette carte holo est verrouillée. Obtiens-la dans un booster variantes ou par un échange."
+    "holoLockedToast": "Cette carte holo est verrouillée. Obtiens-la dans un booster variantes ou par un échange.",
+    "duplicateDeck": "Copier",
+    "copySuffix": "(copie)"
   },
   "discord": {
     "linkDiscord": "Lier Discord",
