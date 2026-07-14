@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
-import { hasNewSurveys } from '@/lib/surveys/seen';
+import { getSurveysBadge } from '@/lib/surveys/badgeCache';
 
 export function SurveysButton() {
   const t = useTranslations('surveys');
@@ -11,17 +11,9 @@ export function SurveysButton() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/surveys/latest', { credentials: 'include' })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (cancelled || !data) return;
-        if (typeof data.unansweredCount === 'number') {
-          setHasNew(data.unansweredCount > 0);
-        } else {
-          setHasNew(hasNewSurveys(typeof data.latestOpenAt === 'string' ? data.latestOpenAt : null));
-        }
-      })
-      .catch(() => {});
+    getSurveysBadge().then((v) => {
+      if (!cancelled) setHasNew(v);
+    });
     return () => {
       cancelled = true;
     };

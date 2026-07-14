@@ -27,19 +27,31 @@ export async function GET() {
     : [];
   const myBySurvey = new Map(myResponses.map((r) => [r.surveyId, r.answers as SurveyAnswers]));
 
+  const resultSurveyIds = surveys
+    .filter((s) => (s.status === 'closed' || myBySurvey.has(s.id)) && s.responseCount > 0)
+    .map((s) => s.id);
+  const allResponses = resultSurveyIds.length > 0
+    ? await prisma.surveyResponse.findMany({
+        where: { surveyId: { in: resultSurveyIds } },
+        select: { surveyId: true, answers: true },
+      })
+    : [];
+  const responsesBySurvey = new Map<string, SurveyAnswers[]>();
+  for (const r of allResponses) {
+    const list = responsesBySurvey.get(r.surveyId) ?? [];
+    list.push(r.answers as SurveyAnswers);
+    responsesBySurvey.set(r.surveyId, list);
+  }
+
   const out = [];
   for (const s of surveys) {
     const questions = (s.questions ?? []) as unknown as SurveyQuestion[];
     const myAnswers = myBySurvey.get(s.id) ?? null;
-    const canSeeResults = s.status === 'closed' || myAnswers !== null;
 
     let results: Record<string, Record<string, number>> | null = null;
-    if (canSeeResults && s.responseCount > 0) {
-      const responses = await prisma.surveyResponse.findMany({
-        where: { surveyId: s.id },
-        select: { answers: true },
-      });
-      results = aggregateResults(questions, responses.map((r) => r.answers as SurveyAnswers));
+    const grouped = responsesBySurvey.get(s.id);
+    if (grouped) {
+      results = aggregateResults(questions, grouped);
     }
 
     out.push({

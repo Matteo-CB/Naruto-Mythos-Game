@@ -10,6 +10,7 @@ import { Footer } from '@/components/Footer';
 import { isAdmin as isAdminUser } from '@/lib/auth/admins';
 import { SURVEY_LIMITS, type SurveyQuestion, type SurveyAnswers } from '@/lib/surveys/validation';
 import { markSurveysSeen } from '@/lib/surveys/seen';
+import { clearSurveysBadgeCache } from '@/lib/surveys/badgeCache';
 
 const ACCENT = '#c4a35a';
 
@@ -596,6 +597,7 @@ export default function SurveysPage() {
   const loggedIn = !!session?.user?.id;
 
   const load = useCallback(() => {
+    clearSurveysBadgeCache();
     fetch('/api/surveys', { credentials: 'include' })
       .then((res) => (res.ok ? res.json() : { surveys: [] }))
       .then((data) => setSurveys(Array.isArray(data.surveys) ? data.surveys : []))
