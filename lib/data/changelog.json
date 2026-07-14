@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "date": "2026-07-14",
+      "title_fr": "Sondages plus visibles et accueil mobile aéré",
+      "title_en": "More visible surveys and a cleaner mobile home",
+      "title_es": "Encuestas más visibles e inicio móvil más limpio",
+      "title_ja": "アンケートの通知改善とモバイルホームの調整",
+      "changes_fr": [
+        "La fenêtre d'annonce du chat ne s'affiche plus à la connexion.",
+        "Le point doré du bouton Sondages reste affiché tant qu'un sondage ouvert attend ta réponse.",
+        "Sur téléphone, la barre du haut (Sondages, MAJ, langue) a maintenant son propre espace au-dessus du titre de l'accueil."
+      ],
+      "changes_en": [
+        "The chat announcement window no longer appears when signing in.",
+        "The gold dot on the Surveys button now stays visible while an open survey is waiting for your answer.",
+        "On phones, the top bar (Surveys, News, language) now has its own space above the home title."
+      ],
+      "changes_es": [
+        "La ventana de anuncio del chat ya no aparece al iniciar sesión.",
+        "El punto dorado del botón Encuestas permanece visible mientras una encuesta abierta espera tu respuesta.",
+        "En el móvil, la barra superior (Encuestas, Novedades, idioma) tiene ahora su propio espacio sobre el título de inicio."
+      ],
+      "changes_ja": [
+        "ログイン時のチャットのお知らせウィンドウは表示されなくなりました。",
+        "未回答のアンケートがある間、アンケートボタンの金色の点が表示され続けるようになりました。",
+        "スマホでは、上部バー（アンケート・更新情報・言語）がホームタイトルの上に専用のスペースを持つようになりました。"
+      ]
+    },
+    {
       "date": "2026-07-13",
       "title_fr": "Animations du plateau affinées",
       "title_en": "Board animations refined",

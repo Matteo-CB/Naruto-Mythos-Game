@@ -184,12 +184,12 @@ export default function Home() {
       <CloudBackground />
 
       
-      <div className="absolute top-3 right-4 z-50 sm:top-4 sm:right-6">
+      <div className="relative z-50 flex justify-end px-4 pt-4 pb-1 sm:absolute sm:top-4 sm:right-6 sm:p-0 sm:block">
         <LanguageSwitcher />
       </div>
 
-      
-      <div className="relative z-10 flex flex-1 items-center justify-center px-4 py-6 sm:px-8 sm:py-0">
+
+      <div className="relative z-10 flex flex-1 items-center justify-center px-4 pt-4 pb-6 sm:px-8 sm:py-0">
         <div className="flex w-full max-w-5xl flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
 
           

@@ -11,11 +11,15 @@ export function SurveysButton() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/surveys/latest')
+    fetch('/api/surveys/latest', { credentials: 'include' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (cancelled || !data) return;
-        setHasNew(hasNewSurveys(typeof data.latestOpenAt === 'string' ? data.latestOpenAt : null));
+        if (typeof data.unansweredCount === 'number') {
+          setHasNew(data.unansweredCount > 0);
+        } else {
+          setHasNew(hasNewSurveys(typeof data.latestOpenAt === 'string' ? data.latestOpenAt : null));
+        }
       })
       .catch(() => {});
     return () => {

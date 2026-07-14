@@ -14,13 +14,10 @@ interface PendingNotice {
   createdAt: number;
 }
 
-const INTRO_FEATURE_KEYS = ['features0', 'features1', 'features2', 'features3', 'features4', 'features5'] as const;
-
 export function PlayerNoticeGate() {
   const t = useTranslations();
   const { data: session } = useSession();
   const bcp47 = useLocaleBcp47();
-  const [introNeeded, setIntroNeeded] = useState(false);
   const [nameResetNeeded, setNameResetNeeded] = useState(false);
   const [suspension, setSuspension] = useState<{ untilTs: number | null; reason: string } | null>(null);
   const [newName, setNewName] = useState('');
@@ -38,7 +35,6 @@ export function PlayerNoticeGate() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (cancelled || !data) return;
-        setIntroNeeded(data.chatIntroSeen === false);
         setNameResetNeeded(data.usernameResetRequired === true);
         setSuspension(data.suspended === true ? { untilTs: data.suspendedUntilTs ?? null, reason: data.suspensionReason ?? '' } : null);
         setNotices(data.notifications ?? []);
@@ -56,11 +52,6 @@ export function PlayerNoticeGate() {
     };
     window.addEventListener('notify:popup', onLive);
     return () => window.removeEventListener('notify:popup', onLive);
-  }, []);
-
-  const closeIntro = useCallback(() => {
-    setIntroNeeded(false);
-    fetch('/api/user/chat-intro-seen', { method: 'POST' }).catch(() => {});
   }, []);
 
   const closeNotice = useCallback((id: string) => {
@@ -139,35 +130,6 @@ export function PlayerNoticeGate() {
             <PopupActionButton onClick={submitNewName} accentColor="#b33e3e" disabled={nameBusy || newName.trim().length < 3}>
               {t('notify.nameResetButton')}
             </PopupActionButton>
-          </div>
-        </PopupCornerFrame>
-      </PopupOverlay>
-    );
-  }
-
-  if (introNeeded) {
-    return (
-      <PopupOverlay>
-        <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.45)" maxWidth="520px">
-          <PopupTitle accentColor="#c4a35a" size="lg">{t('chatIntro.title')}</PopupTitle>
-          <div className="mb-4 text-xs leading-relaxed" style={{ color: '#c8c8c8' }}>
-            <p className="mb-3">{t('chatIntro.intro')}</p>
-            <p className="mb-1.5 font-bold uppercase text-[10px] tracking-wider" style={{ color: '#888' }}>
-              {t('chatIntro.featuresTitle')}
-            </p>
-            <ul className="mb-3 flex flex-col gap-1">
-              {INTRO_FEATURE_KEYS.map((k) => (
-                <li key={k} className="flex gap-2">
-                  <span style={{ color: '#c4a35a' }}>&#x25AA;</span>
-                  <span>{t(`chatIntro.${k}`)}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="mb-2" style={{ color: '#e6d5ac' }}>{t('chatIntro.respect')}</p>
-            <p style={{ color: '#888' }}>{t('chatIntro.outro')}</p>
-          </div>
-          <div className="flex justify-center">
-            <PopupActionButton onClick={closeIntro}>{t('chatIntro.button')}</PopupActionButton>
           </div>
         </PopupCornerFrame>
       </PopupOverlay>
