@@ -68,6 +68,10 @@ function requestFromWorker(ai: AIPlayer, state: GameState): Promise<GameAction |
   });
 }
 
+export function warmupAIWorker(): void {
+  ensureWorker();
+}
+
 export async function getAIActionOffThread(ai: AIPlayer, state: GameState): Promise<GameAction | null> {
   const fromWorker = await requestFromWorker(ai, state);
   if (fromWorker !== undefined) return fromWorker;

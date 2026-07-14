@@ -4,7 +4,7 @@ import { create } from 'zustand';
 import type { GameState, GameAction, PlayerID, VisibleGameState, GameConfig, CharacterInPlay } from '@/lib/engine/types';
 import { GameEngine } from '@/lib/engine/GameEngine';
 import { AIPlayer, type AIDifficulty } from '@/lib/ai/AIPlayer';
-import { getAIActionOffThread } from '@/lib/ai/aiWorkerClient';
+import { getAIActionOffThread, warmupAIWorker } from '@/lib/ai/aiWorkerClient';
 import { aiSelectTarget } from '@/lib/ai/targetSelection';
 import { trackAiResult } from '@/lib/hooks/trackAiResult';
 import { startQuestBuffer, drainQuestBuffer } from '@/lib/quests/clientBuffer';
@@ -822,6 +822,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => {
+    warmupAIWorker();
     startQuestBuffer();
     useSocketStore.setState({ isSpectating: false, spectatingRoomCode: null, spectatorCount: 0 });
 

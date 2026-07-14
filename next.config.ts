@@ -5,6 +5,7 @@ const withNextIntl = createNextIntlPlugin("./lib/i18n/request.ts");
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  reactStrictMode: false,
   typescript: { ignoreBuildErrors: true },
   images: {
     formats: ["image/avif", "image/webp"],
