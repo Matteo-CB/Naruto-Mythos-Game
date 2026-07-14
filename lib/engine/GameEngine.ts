@@ -1735,7 +1735,11 @@ export class GameEngine {
     'SASUKE014_UPGRADE_HAND_REVEAL',
   ]);
 
-  static getVisibleState(state: GameState, player: PlayerID): VisibleGameState {
+  static getVisibleStateForTransport(state: GameState, player: PlayerID): VisibleGameState {
+    return GameEngine.getVisibleState(state, player, true);
+  }
+
+  static getVisibleState(state: GameState, player: PlayerID, skipClone = false): VisibleGameState {
     const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
     const myState = state[player];
     const oppState = state[otherPlayer];
@@ -1802,7 +1806,7 @@ export class GameEngine {
       edgeLockedFor: state.edgeLockedFor ?? null,
       firstPasser: state.firstPasser,
       myPlayer: player,
-      myState: deepClone(myState),
+      myState: skipClone ? myState : deepClone(myState),
       opponentState: opponentVisible,
       activeMissions: visibleMissions,
       missionDeckSize: state.missionDeck.length,

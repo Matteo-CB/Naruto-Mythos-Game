@@ -3,7 +3,14 @@ import { getAllCards } from '@/lib/data/cardLoader';
 import { usageGroupKey } from '@/lib/cards/usageLive';
 import type { CharacterCard, MissionCard, GameLogEntry, PlayerState } from '@/lib/engine/types';
 
-const BATCH_SIZE = 400;
+const BATCH_SIZE = 50;
+const MAX_PAGES = 40;
+const YIELD_EVERY_GAMES = 10;
+const MAX_LOG_ENTRIES = 2500;
+
+function yieldLoop(): Promise<void> {
+  return new Promise((resolve) => setImmediate(resolve));
+}
 
 export interface GroupCounters {
   gamesSeen: number;
@@ -84,7 +91,8 @@ export function extractGameCounters(
     }
   }
 
-  for (const entry of payload.log ?? []) {
+  const logEntries = (payload.log ?? []).slice(0, MAX_LOG_ENTRIES);
+  for (const entry of logEntries) {
     if (entry.action !== 'PLAY_CHARACTER' && entry.action !== 'REVEAL_CHARACTER' && entry.action !== 'UPGRADE_CHARACTER') continue;
     const params = entry.messageParams;
     const name = typeof params?.card === 'string' ? params.card : null;
@@ -106,11 +114,12 @@ export async function accumulateCardGameStats(): Promise<{ processed: number }> 
   let processed = 0;
   let lastAt = since;
 
-  for (let page = 0; page < 20; page++) {
+  for (let page = 0; page < MAX_PAGES; page++) {
     const games = await prisma.game.findMany({
       where: {
         status: 'completed',
         isAiGame: false,
+        eloChange: { not: null },
         completedAt: { gt: lastAt },
       },
       select: {
@@ -126,6 +135,7 @@ export async function accumulateCardGameStats(): Promise<{ processed: number }> 
     if (games.length === 0) break;
 
     const counters = new Map<string, GroupCounters>();
+    let sinceYield = 0;
     for (const game of games) {
       const payload = game.gameState as unknown as SavedGamePayload | null;
       if (!payload || typeof payload !== 'object') continue;
@@ -135,6 +145,10 @@ export async function accumulateCardGameStats(): Promise<{ processed: number }> 
       try {
         extractGameCounters(payload, winnerSide, counters);
       } catch { /* skip malformed games */ }
+      if (++sinceYield >= YIELD_EVERY_GAMES) {
+        sinceYield = 0;
+        await yieldLoop();
+      }
     }
 
     for (const [groupKey, c] of counters) {

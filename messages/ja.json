@@ -78,7 +78,7 @@
     "playsPerGameLabel": "1戦あたりのプレイ回数",
     "timesRevealedLabel": "奇襲公開の回数",
     "timesUpgradedLabel": "強化として出された回数",
-    "gameStatsBasis": "プレイヤー同士のオンライン対戦の完了データに基づく"
+    "gameStatsBasis": "プレイヤー同士のオンラインランク戦の完了データに基づく"
   },
   "seoPages": {
     "collection": {

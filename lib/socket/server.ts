@@ -1709,8 +1709,8 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
     player2: room.guestName ?? 'Player 2',
   };
   try {
-    const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
-    const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
+    const p1State = GameEngine.getVisibleStateForTransport(room.gameState, 'player1');
+    const p2State = GameEngine.getVisibleStateForTransport(room.gameState, 'player2');
 
     if (room.hostSocket) {
       io.to(room.hostSocket).emit('game:state-update', {
@@ -1988,7 +1988,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         io.to(opponentSock).emit('game:opponent-reconnected');
         if (room.gameState && !room.finalized) {
           const oppRole: PlayerID = isHost ? 'player2' : 'player1';
-          const oppVisible = GameEngine.getVisibleState(room.gameState, oppRole);
+          const oppVisible = GameEngine.getVisibleStateForTransport(room.gameState, oppRole);
           const oppClock = buildChessClockBroadcast(room.chessClock, Date.now());
           const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
           io.to(opponentSock).emit('game:state-update', { visibleState: packVisibleState(oppVisible), playerRole: oppRole, playerNames, chessClock: oppClock });
@@ -2007,7 +2007,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         startChessClockTickLoop(room, io);
         const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
         const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
-        const visibleState = GameEngine.getVisibleState(room.gameState, player);
+        const visibleState = GameEngine.getVisibleStateForTransport(room.gameState, player);
 
         socket.emit('game:started');
         socket.emit('game:state-update', { visibleState: packVisibleState(visibleState), playerRole: player, playerNames, chessClock });
@@ -2085,8 +2085,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
           startChessClockTickLoop(room, io);
           const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
 
-          const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
-          const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
+          const p1State = GameEngine.getVisibleStateForTransport(room.gameState, 'player1');
+          const p2State = GameEngine.getVisibleStateForTransport(room.gameState, 'player2');
 
           if (room.hostSocket) {
             io.to(room.hostSocket).emit('game:state-update', {
@@ -2309,7 +2309,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             syncChessClock(room);
             startChessClockTickLoop(room, io);
             const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
-            const visible = GameEngine.getVisibleState(room.gameState, 'player1');
+            const visible = GameEngine.getVisibleStateForTransport(room.gameState, 'player1');
             const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
             socket.emit('game:state-update', { visibleState: packVisibleState(visible), playerRole: 'player1', playerNames, chessClock });
             socket.emit('game:started');
@@ -2426,8 +2426,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
             syncChessClock(room);
             startChessClockTickLoop(room, io);
             const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
-            const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
-            const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
+            const p1State = GameEngine.getVisibleStateForTransport(room.gameState, 'player1');
+            const p2State = GameEngine.getVisibleStateForTransport(room.gameState, 'player2');
             const playerNames = { player1: hostName, player2: guestName };
             io.to(room.hostSocket!).emit('game:state-update', { visibleState: packVisibleState(p1State), playerRole: 'player1', playerNames, chessClock });
             io.to(room.guestSocket!).emit('game:state-update', { visibleState: packVisibleState(p2State), playerRole: 'player2', playerNames, chessClock });
@@ -2831,8 +2831,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
         startChessClockTickLoop(room, io);
         const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
 
-        const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
-        const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
+        const p1State = GameEngine.getVisibleStateForTransport(room.gameState, 'player1');
+        const p2State = GameEngine.getVisibleStateForTransport(room.gameState, 'player2');
         console.log(`[Socket] P1 visible: hand=${p1State.myState.hand.length}, phase=${p1State.phase}`);
         console.log(`[Socket] P2 visible: hand=${p2State.myState.hand.length}, phase=${p2State.phase}`);
 
@@ -2920,7 +2920,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       startChessClockTickLoop(room, io);
       const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
       const player = socket.id === room.hostSocket ? 'player1' : 'player2';
-      const visibleState = GameEngine.getVisibleState(room.gameState, player);
+      const visibleState = GameEngine.getVisibleStateForTransport(room.gameState, player);
       const playerNames = {
         player1: room.hostName ?? 'Player 1',
         player2: room.guestName ?? 'Player 2',
@@ -3565,7 +3565,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         syncChessClock(room);
         startChessClockTickLoop(room, io);
         const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
-        const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
+        const p1State = GameEngine.getVisibleStateForTransport(room.gameState, 'player1');
         const specMs = p1State.activeMissions.map((m: any) => ({
           ...m,
           player1Characters: m.player1Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
@@ -3632,7 +3632,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         syncChessClock(room);
         startChessClockTickLoop(room, io);
         const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
-        const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
+        const p1State = GameEngine.getVisibleStateForTransport(room.gameState, 'player1');
         const specMs = p1State.activeMissions.map((m: any) => ({
           ...m,
           player1Characters: m.player1Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),

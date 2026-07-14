@@ -78,7 +78,7 @@
     "playsPerGameLabel": "Plays per game",
     "timesRevealedLabel": "Ambush reveals",
     "timesUpgradedLabel": "Played as upgrade",
-    "gameStatsBasis": "Based on completed online player-vs-player games"
+    "gameStatsBasis": "Based on completed online ranked games between players"
   },
   "seoPages": {
     "collection": {
