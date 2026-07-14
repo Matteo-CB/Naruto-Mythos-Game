@@ -1,6 +1,49 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { computeCardUsage } from '@/lib/cards/usageCompute';
+import { getAllCards } from '@/lib/data/cardLoader';
+import { usageGroupKey } from '@/lib/cards/usageLive';
+
+interface GameStatsEntry {
+  gamesSeen: number;
+  gamesWon: number;
+  timesPlayed: number;
+  timesRevealed: number;
+  timesUpgraded: number;
+  copiesSum: number;
+  copyDecks: number;
+}
+
+async function loadGameStatsByCardId(): Promise<Record<string, GameStatsEntry>> {
+  const rows = await prisma.cardGameStat.findMany({
+    select: {
+      groupKey: true,
+      gamesSeen: true,
+      gamesWon: true,
+      timesPlayed: true,
+      timesRevealed: true,
+      timesUpgraded: true,
+      copiesSum: true,
+      copyDecks: true,
+    },
+  });
+  const byGroup = new Map(rows.map((r) => [r.groupKey, r]));
+  const out: Record<string, GameStatsEntry> = {};
+  for (const c of getAllCards()) {
+    const r = byGroup.get(usageGroupKey(c));
+    if (!r) continue;
+    out[c.id] = {
+      gamesSeen: r.gamesSeen,
+      gamesWon: r.gamesWon,
+      timesPlayed: r.timesPlayed,
+      timesRevealed: r.timesRevealed,
+      timesUpgraded: r.timesUpgraded,
+      copiesSum: r.copiesSum,
+      copyDecks: r.copyDecks,
+    };
+  }
+  return out;
+}
 
 async function bootstrap() {
   const result = await computeCardUsage();
@@ -27,12 +70,14 @@ export async function GET() {
       prisma.cardUsageMeta.findUnique({ where: { key: 'singleton' } }),
     ]);
 
+    const gameStats = await loadGameStatsByCardId().catch(() => ({} as Record<string, GameStatsEntry>));
+
     if (stats.length === 0) {
       const result = await bootstrap();
       const cards: Record<string, { count: number; rate: number; tier: string }> = {};
       for (const c of result.cards) cards[c.cardId] = { count: c.count, rate: c.rate, tier: c.tier };
       return NextResponse.json(
-        { totalDecks: result.totalDecks, activePlayers: result.activePlayers, computedAt: new Date().toISOString(), cards },
+        { totalDecks: result.totalDecks, activePlayers: result.activePlayers, computedAt: new Date().toISOString(), cards, gameStats },
         { headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' } },
       );
     }
@@ -46,6 +91,7 @@ export async function GET() {
         activePlayers: meta?.activePlayers ?? 0,
         computedAt: meta?.computedAt ?? null,
         cards,
+        gameStats,
       },
       { headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' } },
     );

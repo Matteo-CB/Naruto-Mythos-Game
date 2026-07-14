@@ -264,6 +264,52 @@ export function CardPageClient({ cardId }: { cardId: string }) {
               );
             })()}
 
+            {usage?.gameStats && (() => {
+              const gs = usage.gameStats;
+              if (gs.gamesSeen <= 0) return null;
+              const MIN_SAMPLE = 20;
+              const isCharacter = card.card_type === 'character';
+              const winPct = Math.round((gs.gamesWon / gs.gamesSeen) * 1000) / 10;
+              const avgCopies = gs.copyDecks > 0 ? Math.round((gs.copiesSum / gs.copyDecks) * 10) / 10 : 0;
+              const playsPerGame = gs.gamesSeen > 0 ? Math.round((gs.timesPlayed / gs.gamesSeen) * 100) / 100 : 0;
+              const winColor = winPct >= 52 ? '#7fd4a8' : winPct <= 48 ? '#d97676' : '#e8e8e8';
+              const stat = (label: string, value: string, color?: string) => (
+                <div className="flex flex-col gap-0.5 min-w-0">
+                  <span className="text-[10px] uppercase tracking-wider text-[#7a7a7a] truncate">{label}</span>
+                  <span className="text-base font-bold" style={{ color: color ?? '#e8e8e8' }}>{value}</span>
+                </div>
+              );
+              return (
+                <div className="mt-6">
+                  <h2 className="text-sm uppercase tracking-wider text-[#8a8a8a] mb-3">{t('gameStatsTitle')}</h2>
+                  <div className="rounded-lg p-4" style={{ backgroundColor: '#ffffff08', boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}>
+                    {gs.gamesSeen >= MIN_SAMPLE ? (
+                      <div className="flex items-baseline gap-2 mb-2">
+                        <span className="text-3xl font-bold" style={{ color: winColor }}>{winPct}%</span>
+                        <span className="text-xs text-[#8a8a8a]">{t('winRateLabel')}</span>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-[#b9b9b9] mb-2">{t('winRateCollecting', { count: gs.gamesSeen, min: MIN_SAMPLE })}</p>
+                    )}
+                    {gs.gamesSeen >= MIN_SAMPLE && (
+                      <div className="relative h-2.5 rounded-full overflow-hidden mb-4" style={{ backgroundColor: '#ffffff12' }}>
+                        <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${Math.max(1.5, Math.min(100, winPct))}%`, backgroundColor: winColor }} />
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                      {stat(t('gamesSeenLabel'), String(gs.gamesSeen))}
+                      {avgCopies > 0 && isCharacter && stat(t('avgCopiesLabel'), String(avgCopies))}
+                      {isCharacter && stat(t('timesPlayedLabel'), String(gs.timesPlayed))}
+                      {isCharacter && gs.timesPlayed > 0 && stat(t('playsPerGameLabel'), String(playsPerGame))}
+                      {isCharacter && gs.timesRevealed > 0 && stat(t('timesRevealedLabel'), String(gs.timesRevealed))}
+                      {isCharacter && gs.timesUpgraded > 0 && stat(t('timesUpgradedLabel'), String(gs.timesUpgraded))}
+                    </div>
+                    <p className="mt-3 text-[10px] leading-relaxed text-[#6f6f6f]">{t('gameStatsBasis')} · {t('updatedDaily')}</p>
+                  </div>
+                </div>
+              );
+            })()}
+
             {effects.length > 0 && (
               <div className="mt-6">
                 <h2 className="text-sm uppercase tracking-wider text-[#8a8a8a] mb-3">{t('effects')}</h2>

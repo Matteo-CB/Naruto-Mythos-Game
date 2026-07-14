@@ -3,18 +3,30 @@
 import { useEffect, useState } from 'react';
 import type { UsageTier } from '@/lib/cards/usageTiers';
 
+export interface CardGameStats {
+  gamesSeen: number;
+  gamesWon: number;
+  timesPlayed: number;
+  timesRevealed: number;
+  timesUpgraded: number;
+  copiesSum: number;
+  copyDecks: number;
+}
+
 export interface CardUsage {
   count: number;
   rate: number;
   tier: UsageTier;
   totalDecks: number;
   activePlayers: number;
+  gameStats: CardGameStats | null;
 }
 
 interface UsagePayload {
   totalDecks: number;
   activePlayers: number;
   cards: Record<string, { count: number; rate: number; tier: string }>;
+  gameStats?: Record<string, CardGameStats>;
 }
 
 let cache: UsagePayload | null = null;
@@ -49,6 +61,7 @@ export function useCardUsage(cardId: string): CardUsage | null {
         tier: (entry?.tier as UsageTier) ?? 'NU',
         totalDecks: data.totalDecks ?? 0,
         activePlayers: data.activePlayers ?? 0,
+        gameStats: data.gameStats?.[cardId] ?? null,
       });
     });
     return () => { alive = false; };

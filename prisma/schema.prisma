@@ -753,3 +753,22 @@ model SurveyResponse {
   @@unique([surveyId, userId])
   @@index([surveyId])
 }
+
+model CardGameStat {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  groupKey      String   @unique
+  gamesSeen     Int      @default(0)
+  gamesWon      Int      @default(0)
+  timesPlayed   Int      @default(0)
+  timesRevealed Int      @default(0)
+  timesUpgraded Int      @default(0)
+  copiesSum     Int      @default(0)
+  copyDecks     Int      @default(0)
+  updatedAt     DateTime @updatedAt
+}
+
+model CardStatsCursor {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  key        String   @unique @default("singleton")
+  lastGameAt DateTime @default(now())
+}

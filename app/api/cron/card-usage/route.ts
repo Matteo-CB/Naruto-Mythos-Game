@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { computeCardUsage } from '@/lib/cards/usageCompute';
+import { accumulateCardGameStats } from '@/lib/cards/gameStatsCompute';
 
 const HOURLY_PHASE_MS = 24 * 60 * 60 * 1000;
 const DAILY_MIN_GAP_MS = 22 * 60 * 60 * 1000;
@@ -27,10 +28,16 @@ async function handle(request: NextRequest) {
     const firstDataAt = meta?.firstDataAt?.getTime() ?? null;
     const inHourlyPhase = firstDataAt == null || now - firstDataAt < HOURLY_PHASE_MS;
 
+    let gameStatsProcessed = 0;
+    try {
+      const gs = await accumulateCardGameStats();
+      gameStatsProcessed = gs.processed;
+    } catch { /* best-effort, retried next tick */ }
+
     if (!inHourlyPhase) {
       const lastComputedAt = meta?.computedAt?.getTime() ?? 0;
       if (now - lastComputedAt < DAILY_MIN_GAP_MS) {
-        return NextResponse.json({ ok: true, skipped: true, phase: 'daily' });
+        return NextResponse.json({ ok: true, skipped: true, phase: 'daily', gameStatsProcessed });
       }
     }
 

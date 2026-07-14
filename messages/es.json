@@ -68,7 +68,17 @@
     "simSpectatorHint": "Otra persona juega este turno",
     "simDone": "Turno completado",
     "startSim": "Iniciar la simulación",
-    "rotateCta": "Pantalla completa"
+    "rotateCta": "Pantalla completa",
+    "gameStatsTitle": "Estadísticas de partidas",
+    "winRateLabel": "de victorias cuando está en un mazo",
+    "winRateCollecting": "Tasa de victorias disponible tras {min} partidas ({count} registradas por ahora).",
+    "gamesSeenLabel": "Partidas con esta carta",
+    "avgCopiesLabel": "Copias medias por mazo",
+    "timesPlayedLabel": "Veces jugada en el tablero",
+    "playsPerGameLabel": "Jugadas por partida",
+    "timesRevealedLabel": "Revelaciones de emboscada",
+    "timesUpgradedLabel": "Jugada como mejora",
+    "gameStatsBasis": "Basado en partidas en línea terminadas entre jugadores"
   },
   "seoPages": {
     "collection": {

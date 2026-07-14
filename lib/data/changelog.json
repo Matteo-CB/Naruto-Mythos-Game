@@ -12,7 +12,8 @@
         "L'IA réfléchit maintenant en arrière-plan : l'écran ne se fige plus pendant son tour.",
         "Le fond animé des menus consomme beaucoup moins de ressources.",
         "Le chrono des parties en ligne se met à jour plus efficacement.",
-        "Les parties en ligne échangent des données beaucoup plus légères : chaque coup arrive nettement plus vite, surtout sur mobile."
+        "Les parties en ligne échangent des données beaucoup plus légères : chaque coup arrive nettement plus vite, surtout sur mobile.",
+        "Les pages de cartes gagnent des statistiques de parties : taux de victoire, parties disputées, poses sur le terrain, révélations en embuscade, améliorations jouées et copies moyennes par deck."
       ],
       "changes_en": [
         "Animations use even fewer resources, especially on tablets and phones.",
@@ -20,7 +21,8 @@
         "The AI now thinks in the background: the screen no longer freezes during its turn.",
         "The animated menu background uses far fewer resources.",
         "The online game clock updates more efficiently.",
-        "Online games exchange much lighter data: every move arrives noticeably faster, especially on mobile."
+        "Online games exchange much lighter data: every move arrives noticeably faster, especially on mobile.",
+        "Card pages gain match statistics: win rate, games played, board plays, ambush reveals, upgrades played and average copies per deck."
       ],
       "changes_es": [
         "Las animaciones consumen aún menos recursos, sobre todo en tabletas y móviles.",
@@ -28,7 +30,8 @@
         "La IA ahora piensa en segundo plano: la pantalla ya no se congela durante su turno.",
         "El fondo animado de los menús consume muchos menos recursos.",
         "El reloj de las partidas en línea se actualiza de forma más eficiente.",
-        "Las partidas en línea intercambian datos mucho más ligeros: cada jugada llega bastante más rápido, sobre todo en el móvil."
+        "Las partidas en línea intercambian datos mucho más ligeros: cada jugada llega bastante más rápido, sobre todo en el móvil.",
+        "Las páginas de cartas ganan estadísticas de partidas: tasa de victorias, partidas disputadas, jugadas en el tablero, revelaciones de emboscada, mejoras jugadas y copias medias por mazo."
       ],
       "changes_ja": [
         "アニメーションの負荷がさらに軽くなりました。特にタブレットとスマホで効果があります。",
@@ -36,7 +39,8 @@
         "AIはバックグラウンドで思考するようになり、AIのターン中に画面が固まらなくなりました。",
         "メニューのアニメーション背景の負荷が大幅に軽減されました。",
         "オンライン対戦の時計がより効率的に更新されるようになりました。",
-        "オンライン対戦の通信データが大幅に軽量化され、特にモバイルで各アクションの反映が速くなりました。"
+        "オンライン対戦の通信データが大幅に軽量化され、特にモバイルで各アクションの反映が速くなりました。",
+        "カードページに対戦統計が追加されました：勝率、対戦数、盤面に出された回数、奇襲公開、強化としてのプレイ、デッキ平均採用枚数。"
       ]
     },
     {

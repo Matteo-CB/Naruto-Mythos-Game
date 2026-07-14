@@ -68,7 +68,17 @@
     "simSpectatorHint": "Quelqu'un joue ce tour",
     "simDone": "Tour terminé",
     "startSim": "Lancer la simulation",
-    "rotateCta": "Passer en plein écran"
+    "rotateCta": "Passer en plein écran",
+    "gameStatsTitle": "Statistiques de parties",
+    "winRateLabel": "de victoires quand elle est dans un deck",
+    "winRateCollecting": "Taux de victoire disponible après {min} parties ({count} enregistrées pour le moment).",
+    "gamesSeenLabel": "Parties avec cette carte",
+    "avgCopiesLabel": "Copies moyennes par deck",
+    "timesPlayedLabel": "Poses sur le terrain",
+    "playsPerGameLabel": "Poses par partie",
+    "timesRevealedLabel": "Révélations embuscade",
+    "timesUpgradedLabel": "Jouée en amélioration",
+    "gameStatsBasis": "Basé sur les parties en ligne terminées entre joueurs"
   },
   "seoPages": {
     "collection": {

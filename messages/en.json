@@ -68,7 +68,17 @@
     "simSpectatorHint": "Someone else is playing this turn",
     "simDone": "Turn complete",
     "startSim": "Start the simulation",
-    "rotateCta": "Go fullscreen"
+    "rotateCta": "Go fullscreen",
+    "gameStatsTitle": "Match statistics",
+    "winRateLabel": "win rate when in a deck",
+    "winRateCollecting": "Win rate available after {min} games ({count} recorded so far).",
+    "gamesSeenLabel": "Games with this card",
+    "avgCopiesLabel": "Avg copies per deck",
+    "timesPlayedLabel": "Times played on board",
+    "playsPerGameLabel": "Plays per game",
+    "timesRevealedLabel": "Ambush reveals",
+    "timesUpgradedLabel": "Played as upgrade",
+    "gameStatsBasis": "Based on completed online player-vs-player games"
   },
   "seoPages": {
     "collection": {
