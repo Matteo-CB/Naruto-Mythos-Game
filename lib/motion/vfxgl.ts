@@ -397,7 +397,7 @@ function ensureGl(): GlState | null {
   if (!gl) return null;
   document.body.appendChild(canvas);
 
-  const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 1.75);
+  const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 1280 ? 1.1 : 1.5);
   canvas.width = Math.floor(window.innerWidth * dpr);
   canvas.height = Math.floor(window.innerHeight * dpr);
 

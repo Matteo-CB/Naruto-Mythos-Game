@@ -134,19 +134,17 @@ export async function playCardFlight(
     target.element.style.visibility = '';
   }
   landingSquash(target.element, Math.max(180, durationMs * 0.35));
-  const landRect = target.element.getBoundingClientRect();
-  if (data.hidden) {
-    void playGlVfx('kawarimi', landRect, { ...VFX_PRESETS.kawarimi });
-  } else {
+  if (!data.hidden) {
     const profile = rarityVfxProfile(data.rarity);
-    void playGlVfx('burst', landRect, {
-      color: profile.color,
-      secondary: profile.secondary,
-      intensity: profile.intensity,
-      scale: profile.scale,
-      durationMs: profile.durationMs,
-    });
     if (profile.tier >= 2) {
+      const landRect = target.element.getBoundingClientRect();
+      void playGlVfx('burst', landRect, {
+        color: profile.color,
+        secondary: profile.secondary,
+        intensity: profile.intensity,
+        scale: profile.scale,
+        durationMs: profile.durationMs,
+      });
       if (profile.tier >= 3) vignette(profile.durationMs + 350);
       void playGlVfx('aura', landRect, {
         color: profile.color,
@@ -344,13 +342,15 @@ export async function playUpgradeMerge(data: MotionEventData): Promise<void> {
     registerActiveTimeline(tl);
   });
   const profile = rarityVfxProfile(data.rarity);
-  void playGlVfx('burst', { left: live.left, top: live.top, width: live.width, height: live.height }, {
-    color: profile.color,
-    secondary: profile.secondary,
-    intensity: Math.min(profile.intensity, 0.8),
-    scale: Math.min(profile.scale, 1.1),
-    durationMs: 450,
-  });
+  if (profile.tier >= 2) {
+    void playGlVfx('burst', { left: live.left, top: live.top, width: live.width, height: live.height }, {
+      color: profile.color,
+      secondary: profile.secondary,
+      intensity: Math.min(profile.intensity, 0.8),
+      scale: Math.min(profile.scale, 1.1),
+      durationMs: 450,
+    });
+  }
   punch(el, 1.22);
 }
 

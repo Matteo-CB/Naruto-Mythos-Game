@@ -117,7 +117,7 @@ export function flyCard(opts: FlyCardOptions): Promise<void> {
     activeFlights++;
 
     const dur = opts.durationMs / 1000;
-    const arcHeight = opts.arcHeight ?? Math.max(50, Math.abs(toRect.top - fromRect.top) * 0.35);
+    const arcHeight = opts.arcHeight ?? Math.max(22, Math.abs(toRect.top - fromRect.top) * 0.16);
     const scaleX = toRect.width / fromRect.width;
     const scaleY = toRect.height / fromRect.height;
     const goingRight = toRect.left >= fromRect.left;
@@ -145,7 +145,6 @@ export function flyCard(opts: FlyCardOptions): Promise<void> {
           : (goingRight ? -12 : 12) * lift;
         const rotX = 6 * lift;
         clone.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) scale(${s}) perspective(700px) rotateY(${rotY}deg) rotateX(${rotX}deg)`;
-        clone.style.boxShadow = `0 ${6 + 22 * lift}px ${24 + 30 * lift}px rgba(0,0,0,${0.55 - 0.2 * lift})`;
         if (opts.flipInFlight && t >= 0.5 && !flipped) {
           flipped = true;
           img.src = opts.imageUrl ?? CARD_BACK_URL;
