@@ -35,8 +35,7 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
             left: '-8%',
             width: '116%',
             height: '116%',
-            filter: 'blur(2px) saturate(0.8) brightness(0.45)',
-            willChange: 'transform',
+            overflow: 'hidden',
           }}
         >
           <motion.div
@@ -45,6 +44,7 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
               backgroundImage: `url(${image})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
+              filter: 'blur(2px) saturate(0.8) brightness(0.45)',
               willChange: 'transform',
             }}
             animate={{

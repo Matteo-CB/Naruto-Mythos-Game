@@ -89,7 +89,15 @@ export const ChessClockDisplay = React.memo(function ChessClockDisplay({ player,
       return;
     }
     const update = () => {
-      setRemaining(computeChessClockRemainingMs(chessClock, player));
+      const ms = computeChessClockRemainingMs(chessClock, player);
+      setRemaining((prev) => {
+        const sameSecond = Math.ceil(ms / 1000) === Math.ceil(prev / 1000);
+        const sameTier =
+          (ms <= HARD_RED_AT_MS) === (prev <= HARD_RED_AT_MS) &&
+          (ms <= RED_AT_MS) === (prev <= RED_AT_MS) &&
+          (ms <= ORANGE_AT_MS) === (prev <= ORANGE_AT_MS);
+        return sameSecond && sameTier ? prev : ms;
+      });
     };
     update();
     const id = setInterval(update, TICK_INTERVAL_MS);

@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import type { GameState, GameAction, PlayerID, VisibleGameState, GameConfig, CharacterInPlay } from '@/lib/engine/types';
 import { GameEngine } from '@/lib/engine/GameEngine';
 import { AIPlayer, type AIDifficulty } from '@/lib/ai/AIPlayer';
+import { getAIActionOffThread } from '@/lib/ai/aiWorkerClient';
 import { aiSelectTarget } from '@/lib/ai/targetSelection';
 import { trackAiResult } from '@/lib/hooks/trackAiResult';
 import { startQuestBuffer, drainQuestBuffer } from '@/lib/quests/clientBuffer';
@@ -1546,7 +1547,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (humanActions.length > 0 && currentState.activePlayer === humanPlayer) break;
         }
 
-        const aiAction = await aiPlayer.getActionAsync(currentState);
+        const aiAction = await getAIActionOffThread(aiPlayer, currentState);
         if (!aiAction) {
           
           if (currentState.phase === 'action' && currentState.activePlayer === aiPlayer.player && !currentState[aiPlayer.player].hasPassed) {
