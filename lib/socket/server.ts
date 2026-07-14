@@ -21,6 +21,7 @@ import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
 import { getOwnedVariantIds } from '@/lib/variants/inventory';
 import { isAdmin } from '@/lib/auth/admins';
 import { isHoloId, holoBaseId, holoIdFor, isHoloEligibleCard } from '@/lib/holo/holoId';
+import { packVisibleState } from '@/lib/socket/statePack';
 import { isStaticRankedBanned } from '@/lib/data/rankedBans';
 import { emitQuestEvent } from '@/lib/quests/hooks';
 import { emitDrawDiffEvents, emitTokenDiffEvents } from '@/lib/quests/engineEmit';
@@ -1713,7 +1714,7 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
 
     if (room.hostSocket) {
       io.to(room.hostSocket).emit('game:state-update', {
-        visibleState: p1State,
+        visibleState: packVisibleState(p1State),
         playerRole: 'player1',
         playerNames,
         chessClock,
@@ -1721,7 +1722,7 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
     }
     if (room.guestSocket) {
       io.to(room.guestSocket).emit('game:state-update', {
-        visibleState: p2State,
+        visibleState: packVisibleState(p2State),
         playerRole: 'player2',
         playerNames,
         chessClock,
@@ -1760,7 +1761,7 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
         },
       };
       io.to(`spec:${room.code}`).emit('spectate:state-update', {
-        visibleState: spectatorState,
+        visibleState: packVisibleState(spectatorState),
         playerNames,
         spectatorCount: room.spectators.size,
         roomCode: room.code,
@@ -1990,7 +1991,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           const oppVisible = GameEngine.getVisibleState(room.gameState, oppRole);
           const oppClock = buildChessClockBroadcast(room.chessClock, Date.now());
           const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
-          io.to(opponentSock).emit('game:state-update', { visibleState: oppVisible, playerRole: oppRole, playerNames, chessClock: oppClock });
+          io.to(opponentSock).emit('game:state-update', { visibleState: packVisibleState(oppVisible), playerRole: oppRole, playerNames, chessClock: oppClock });
         }
       }
 
@@ -2009,7 +2010,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         const visibleState = GameEngine.getVisibleState(room.gameState, player);
 
         socket.emit('game:started');
-        socket.emit('game:state-update', { visibleState, playerRole: player, playerNames, chessClock });
+        socket.emit('game:state-update', { visibleState: packVisibleState(visibleState), playerRole: player, playerNames, chessClock });
         socket.emit('chat:history', { messages: room.chatMessages.slice(-50) });
 
         if (room.gameState.phase === 'mulligan' && room.mulliganDeadline && room.chessClockMulliganTimer) {
@@ -2089,7 +2090,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
           if (room.hostSocket) {
             io.to(room.hostSocket).emit('game:state-update', {
-              visibleState: p1State,
+              visibleState: packVisibleState(p1State),
               playerRole: 'player1',
               playerNames: { player1: hostName, player2: guestName },
               chessClock,
@@ -2097,7 +2098,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           }
           if (room.guestSocket) {
             io.to(room.guestSocket).emit('game:state-update', {
-              visibleState: p2State,
+              visibleState: packVisibleState(p2State),
               playerRole: 'player2',
               playerNames: { player1: hostName, player2: guestName },
               chessClock,
@@ -2310,7 +2311,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
             const visible = GameEngine.getVisibleState(room.gameState, 'player1');
             const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
-            socket.emit('game:state-update', { visibleState: visible, playerRole: 'player1', playerNames, chessClock });
+            socket.emit('game:state-update', { visibleState: packVisibleState(visible), playerRole: 'player1', playerNames, chessClock });
             socket.emit('game:started');
           } else if (room.hostDeck && room.guestDeck && room.guestSocket) {
 
@@ -2428,8 +2429,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
             const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
             const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
             const playerNames = { player1: hostName, player2: guestName };
-            io.to(room.hostSocket!).emit('game:state-update', { visibleState: p1State, playerRole: 'player1', playerNames, chessClock });
-            io.to(room.guestSocket!).emit('game:state-update', { visibleState: p2State, playerRole: 'player2', playerNames, chessClock });
+            io.to(room.hostSocket!).emit('game:state-update', { visibleState: packVisibleState(p1State), playerRole: 'player1', playerNames, chessClock });
+            io.to(room.guestSocket!).emit('game:state-update', { visibleState: packVisibleState(p2State), playerRole: 'player2', playerNames, chessClock });
             io.to(data.code).emit('game:started');
             console.log(`[Socket] Tournament game auto-started in room ${data.code}`);
 
@@ -2837,7 +2838,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
         if (room.hostSocket) {
           io.to(room.hostSocket).emit('game:state-update', {
-            visibleState: p1State,
+            visibleState: packVisibleState(p1State),
             playerRole: 'player1',
             playerNames: { player1: hostName, player2: guestName },
             chessClock,
@@ -2848,7 +2849,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
         if (room.guestSocket) {
           io.to(room.guestSocket).emit('game:state-update', {
-            visibleState: p2State,
+            visibleState: packVisibleState(p2State),
             playerRole: 'player2',
             playerNames: { player1: hostName, player2: guestName },
             chessClock,
@@ -2924,7 +2925,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         player1: room.hostName ?? 'Player 1',
         player2: room.guestName ?? 'Player 2',
       };
-      socket.emit('game:state-update', { visibleState, playerRole: player, playerNames, chessClock });
+      socket.emit('game:state-update', { visibleState: packVisibleState(visibleState), playerRole: player, playerNames, chessClock });
       console.log(`[Socket] Resync state sent to ${player} in room ${code}`);
     });
 
@@ -3580,7 +3581,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         };
         const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
         socket.emit('spectate:state-update', {
-          visibleState: spectatorState,
+          visibleState: packVisibleState(spectatorState),
           playerNames,
           spectatorCount: room.spectators.size,
           roomCode: data.roomCode,
@@ -3647,7 +3648,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         };
         const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
         socket.emit('spectate:state-update', {
-          visibleState: spectatorState,
+          visibleState: packVisibleState(spectatorState),
           playerNames,
           spectatorCount: room.spectators.size,
           roomCode: data.roomCode,

@@ -3,6 +3,7 @@
 import { io, Socket } from 'socket.io-client';
 import { create } from 'zustand';
 import type { VisibleGameState, GameAction } from '@/lib/engine/types';
+import { unpackVisibleState, type PackedVisibleState } from '@/lib/socket/statePack';
 import { useSocialStore } from '@/stores/socialStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -504,15 +505,16 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.on(
         'game:state-update',
         (data: {
-          visibleState: VisibleGameState;
+          visibleState: VisibleGameState | PackedVisibleState;
           playerRole: 'player1' | 'player2';
           playerNames?: { player1: string; player2: string };
           chessClock?: ChessClockBroadcast;
         }) => {
-          console.log('[Socket] State update received, phase:', data.visibleState?.phase,
-            'hand size:', data.visibleState?.myState?.hand?.length ?? 0);
+          const unpacked = unpackVisibleState(data.visibleState);
+          console.log('[Socket] State update received, phase:', unpacked?.phase,
+            'hand size:', unpacked?.myState?.hand?.length ?? 0);
           const update: Partial<SocketStore> = {
-            visibleState: data.visibleState,
+            visibleState: unpacked,
             playerRole: data.playerRole,
             _lastStateUpdate: Date.now(),
           };
@@ -799,7 +801,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       
 
       socket.on('spectate:state-update', (data: {
-        visibleState: VisibleGameState;
+        visibleState: VisibleGameState | PackedVisibleState;
         playerNames: { player1: string; player2: string };
         spectatorCount: number;
         roomCode?: string;
@@ -812,7 +814,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         if (!current.isSpectating && !current.spectatingRoomCode) return;
         if (data.roomCode && current.spectatingRoomCode && data.roomCode !== current.spectatingRoomCode) return;
         const update: Partial<SocketStore> = {
-          visibleState: data.visibleState,
+          visibleState: unpackVisibleState(data.visibleState),
           playerNames: data.playerNames,
           spectatorCount: data.spectatorCount,
           isSpectating: true,
