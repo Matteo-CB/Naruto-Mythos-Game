@@ -271,7 +271,6 @@ export function CardPageClient({ cardId }: { cardId: string }) {
               const isCharacter = card.card_type === 'character';
               const winPct = Math.round((gs.gamesWon / gs.gamesSeen) * 1000) / 10;
               const avgCopies = gs.copyDecks > 0 ? Math.round((gs.copiesSum / gs.copyDecks) * 10) / 10 : 0;
-              const playsPerGame = gs.gamesSeen > 0 ? Math.round((gs.timesPlayed / gs.gamesSeen) * 100) / 100 : 0;
               const winColor = winPct >= 52 ? '#7fd4a8' : winPct <= 48 ? '#d97676' : '#e8e8e8';
               const stat = (label: string, value: string, color?: string) => (
                 <div className="flex flex-col gap-0.5 min-w-0">
@@ -299,10 +298,6 @@ export function CardPageClient({ cardId }: { cardId: string }) {
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                       {stat(t('gamesSeenLabel'), String(gs.gamesSeen))}
                       {avgCopies > 0 && isCharacter && stat(t('avgCopiesLabel'), String(avgCopies))}
-                      {isCharacter && stat(t('timesPlayedLabel'), String(gs.timesPlayed))}
-                      {isCharacter && gs.timesPlayed > 0 && stat(t('playsPerGameLabel'), String(playsPerGame))}
-                      {isCharacter && gs.timesRevealed > 0 && stat(t('timesRevealedLabel'), String(gs.timesRevealed))}
-                      {isCharacter && gs.timesUpgraded > 0 && stat(t('timesUpgradedLabel'), String(gs.timesUpgraded))}
                     </div>
                     <p className="mt-3 text-[10px] leading-relaxed text-[#6f6f6f]">{t('gameStatsBasis')} · {t('updatedDaily')}</p>
                   </div>

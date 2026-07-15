@@ -74,10 +74,6 @@
     "winRateCollecting": "勝率は{min}戦以降に表示されます（現在{count}戦を記録済み）。",
     "gamesSeenLabel": "このカードを含む対戦数",
     "avgCopiesLabel": "デッキ平均採用枚数",
-    "timesPlayedLabel": "盤面に出された回数",
-    "playsPerGameLabel": "1戦あたりのプレイ回数",
-    "timesRevealedLabel": "奇襲公開の回数",
-    "timesUpgradedLabel": "強化として出された回数",
     "gameStatsBasis": "プレイヤー同士のオンラインランク戦の完了データに基づく"
   },
   "seoPages": {

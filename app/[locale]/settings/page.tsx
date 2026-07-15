@@ -469,11 +469,12 @@ export default function SettingsPage() {
               {t('gameBackground')}
             </span>
 
-            <div className="hidden lg:grid lg:gap-6" style={{ gridTemplateColumns: 'minmax(0, 1fr) 360px' }}>
+            <div className="hidden lg:flex lg:flex-col lg:gap-6">
               <div
-                className="relative overflow-hidden"
+                className="relative mx-auto w-full overflow-hidden"
                 style={{
                   aspectRatio: '16/9',
+                  maxWidth: 860,
                   backgroundColor: '#0a0a0a',
                   boxShadow: '0 24px 60px rgba(0,0,0,0.55), 0 0 48px rgba(196,163,90,0.10)',
                 }}
@@ -528,36 +529,42 @@ export default function SettingsPage() {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 content-start gap-3 overflow-y-auto pr-1" style={{ maxHeight: 480 }}>
+              <div className="grid grid-cols-3 gap-5 xl:grid-cols-4">
                 <button
                   type="button"
                   disabled={!isLoaded}
                   onClick={() => setGameBackground('random', '')}
-                  className="relative flex items-center justify-center overflow-hidden transition-all"
+                  className="flex flex-col gap-2 text-left transition-all"
                   style={{
-                    aspectRatio: '16/9',
-                    backgroundColor: 'rgba(196, 163, 90, 0.06)',
-                    boxShadow: gameBackground === 'random' ? '0 0 16px rgba(196, 163, 90, 0.45)' : 'none',
-                    opacity: !isLoaded ? 0.5 : gameBackground === 'random' ? 1 : 0.7,
+                    opacity: !isLoaded ? 0.5 : gameBackground === 'random' ? 1 : 0.72,
                     cursor: isLoaded ? 'pointer' : 'default',
                   }}
                   onMouseEnter={(e) => { if (isLoaded) (e.currentTarget as HTMLElement).style.opacity = '1'; }}
-                  onMouseLeave={(e) => { if (isLoaded && gameBackground !== 'random') (e.currentTarget as HTMLElement).style.opacity = '0.7'; }}
+                  onMouseLeave={(e) => { if (isLoaded && gameBackground !== 'random') (e.currentTarget as HTMLElement).style.opacity = '0.72'; }}
                 >
-                  <div className="flex flex-col items-center gap-1">
+                  <span
+                    className="relative flex w-full items-center justify-center overflow-hidden"
+                    style={{
+                      aspectRatio: '16/9',
+                      backgroundColor: 'rgba(196, 163, 90, 0.06)',
+                      boxShadow: gameBackground === 'random' ? '0 0 22px rgba(196, 163, 90, 0.5)' : '0 6px 18px rgba(0,0,0,0.45)',
+                      transform: gameBackground === 'random' ? 'scale(1.02)' : 'scale(1)',
+                      transition: 'box-shadow 200ms ease, transform 200ms ease',
+                    }}
+                  >
                     <span
-                      className="text-xl font-bold"
+                      className="text-3xl font-bold"
                       style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", letterSpacing: '0.1em' }}
                     >
                       ?
                     </span>
-                    <span
-                      className="text-[9px] font-bold uppercase tracking-[0.25em]"
-                      style={{ color: gameBackground === 'random' ? '#c4a35a' : '#888888' }}
-                    >
-                      {t('gameBackgroundRandom')}
-                    </span>
-                  </div>
+                  </span>
+                  <span
+                    className="text-[10px] font-bold uppercase tracking-[0.25em] text-center"
+                    style={{ color: gameBackground === 'random' ? '#c4a35a' : '#888888' }}
+                  >
+                    {t('gameBackgroundRandom')}
+                  </span>
                 </button>
                 {backgrounds.map((bg) => {
                   const isSelected = gameBackground === bg.id;
@@ -567,23 +574,37 @@ export default function SettingsPage() {
                       type="button"
                       disabled={!isLoaded}
                       onClick={() => setGameBackground(bg.id, bg.url)}
-                      className="relative overflow-hidden transition-all"
+                      className="flex flex-col gap-2 text-left transition-all"
                       style={{
-                        aspectRatio: '16/9',
-                        boxShadow: isSelected ? '0 0 16px rgba(196, 163, 90, 0.45)' : 'none',
-                        opacity: !isLoaded ? 0.5 : isSelected ? 1 : 0.7,
+                        opacity: !isLoaded ? 0.5 : isSelected ? 1 : 0.72,
                         cursor: isLoaded ? 'pointer' : 'default',
                       }}
                       onMouseEnter={(e) => { if (isLoaded) (e.currentTarget as HTMLElement).style.opacity = '1'; }}
-                      onMouseLeave={(e) => { if (isLoaded && !isSelected) (e.currentTarget as HTMLElement).style.opacity = '0.7'; }}
+                      onMouseLeave={(e) => { if (isLoaded && !isSelected) (e.currentTarget as HTMLElement).style.opacity = '0.72'; }}
                     >
-                      <img src={bg.url} alt={bg.name} className="h-full w-full object-cover" loading="lazy" draggable={false} />
-                      {isSelected && (
-                        <div
-                          className="absolute inset-0 pointer-events-none"
-                          style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)' }}
-                        />
-                      )}
+                      <span
+                        className="relative block w-full overflow-hidden"
+                        style={{
+                          aspectRatio: '16/9',
+                          boxShadow: isSelected ? '0 0 22px rgba(196, 163, 90, 0.5)' : '0 6px 18px rgba(0,0,0,0.45)',
+                          transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                          transition: 'box-shadow 200ms ease, transform 200ms ease',
+                        }}
+                      >
+                        <img src={bg.url} alt={bg.name} className="h-full w-full object-cover" loading="lazy" draggable={false} />
+                        {isSelected && (
+                          <span
+                            className="absolute inset-0 pointer-events-none"
+                            style={{ backgroundColor: 'rgba(196, 163, 90, 0.14)' }}
+                          />
+                        )}
+                      </span>
+                      <span
+                        className="truncate text-center text-[10px] font-bold uppercase tracking-[0.25em]"
+                        style={{ color: isSelected ? '#c4a35a' : '#888888' }}
+                      >
+                        {bg.name}
+                      </span>
                     </button>
                   );
                 })}

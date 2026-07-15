@@ -243,7 +243,6 @@ export async function playHideInPlace(data: MotionEventData): Promise<void> {
   const rect = el.getBoundingClientRect();
   const face = data.cardImage ? normalizeImagePath(data.cardImage) : null;
 
-  void playGlVfx('kawarimi', rect, { ...VFX_PRESETS.kawarimi });
   el.style.visibility = 'hidden';
   if (face) await flipCloneAway(rect, face, (durationMs * 0.4) / 1000);
   el.style.visibility = '';

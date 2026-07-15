@@ -74,10 +74,6 @@
     "winRateCollecting": "Win rate available after {min} games ({count} recorded so far).",
     "gamesSeenLabel": "Games with this card",
     "avgCopiesLabel": "Avg copies per deck",
-    "timesPlayedLabel": "Times played on board",
-    "playsPerGameLabel": "Plays per game",
-    "timesRevealedLabel": "Ambush reveals",
-    "timesUpgradedLabel": "Played as upgrade",
     "gameStatsBasis": "Based on completed online ranked games between players"
   },
   "seoPages": {

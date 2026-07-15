@@ -74,10 +74,6 @@
     "winRateCollecting": "Tasa de victorias disponible tras {min} partidas ({count} registradas por ahora).",
     "gamesSeenLabel": "Partidas con esta carta",
     "avgCopiesLabel": "Copias medias por mazo",
-    "timesPlayedLabel": "Veces jugada en el tablero",
-    "playsPerGameLabel": "Jugadas por partida",
-    "timesRevealedLabel": "Revelaciones de emboscada",
-    "timesUpgradedLabel": "Jugada como mejora",
     "gameStatsBasis": "Basado en partidas clasificatorias en línea terminadas entre jugadores"
   },
   "seoPages": {

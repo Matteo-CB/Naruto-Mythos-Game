@@ -1,6 +1,6 @@
 import type { AnchorRect } from './boardRegistry';
 
-export type VfxKind = 'burst' | 'slash' | 'ring' | 'victory' | 'kawarimi' | 'aura';
+export type VfxKind = 'burst' | 'slash' | 'ring' | 'victory' | 'aura';
 
 export interface VfxColor {
   r: number;
@@ -36,7 +36,6 @@ const GOLD: VfxColor = { r: 0.93, g: 0.78, b: 0.42 };
 const WHITE: VfxColor = { r: 0.98, g: 0.95, b: 0.88 };
 const BLUE: VfxColor = { r: 0.42, g: 0.62, b: 0.98 };
 const RED: VfxColor = { r: 0.88, g: 0.32, b: 0.26 };
-const INK: VfxColor = { r: 0.16, g: 0.17, b: 0.22 };
 const TEAL: VfxColor = { r: 0.35, g: 0.78, b: 0.75 };
 
 const VIOLET: VfxColor = { r: 0.66, g: 0.48, b: 0.92 };
@@ -87,7 +86,6 @@ export const VFX_PRESETS = {
   slash: { color: RED, secondary: WHITE, intensity: 0.85, scale: 1.05, durationMs: 500 },
   ring: { color: GOLD, secondary: WHITE, intensity: 0.65, scale: 0.95, durationMs: 550 },
   victory: { color: GOLD, secondary: WHITE, intensity: 0.6, scale: 0.8, durationMs: 750 },
-  kawarimi: { color: INK, secondary: TEAL, intensity: 0.7, scale: 0.85, durationMs: 550 },
 } as const;
 
 const VERT = `
@@ -298,35 +296,11 @@ void main() {
 }
 `;
 
-const FRAG_KAWARIMI = COMMON + `
-vec2 swirl(vec2 uv, float strength) {
-  float r = length(uv);
-  float a = atan(uv.y, uv.x) + strength * (1.0 - r);
-  return vec2(cos(a), sin(a)) * r;
-}
-void main() {
-  float fade = 1.0 - smoothstep(0.5, 1.0, u_t);
-  float grow = easeOut(min(u_t * 1.6, 1.0));
-  vec2 uv = swirl(v_uv, 3.4 * (1.0 - u_t * 0.4) + u_seed * 0.5);
-  float r = length(v_uv);
-
-  float body = fbm(uv * 2.6 + vec2(u_seed * 5.0, -u_t * 1.4));
-  float cloud = smoothstep(0.9 * grow, 0.25 * grow, r) * smoothstep(0.28, 0.75, body);
-  float rim = exp(-pow((r - grow * 0.72) * 6.0, 2.0)) * smoothstep(0.4, 0.8, body) * 0.8;
-  float flash = exp(-r * r * 9.0) * (1.0 - min(u_t * 2.4, 1.0)) * 0.8;
-
-  vec3 col = u_color * cloud * 0.95 + u_color2 * (rim * 1.1) + vec3(0.95, 0.93, 0.85) * flash;
-  float alpha = clamp((cloud * 0.9 + rim + flash) * u_intensity * fade, 0.0, 1.0);
-  gl_FragColor = vec4(col * alpha, alpha);
-}
-`;
-
 const FRAGS: Record<VfxKind, string> = {
   burst: FRAG_BURST,
   slash: FRAG_SLASH,
   ring: FRAG_RING,
   victory: FRAG_VICTORY,
-  kawarimi: FRAG_KAWARIMI,
   aura: FRAG_AURA,
 };
 

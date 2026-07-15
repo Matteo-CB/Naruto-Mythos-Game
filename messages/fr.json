@@ -74,10 +74,6 @@
     "winRateCollecting": "Taux de victoire disponible après {min} parties ({count} enregistrées pour le moment).",
     "gamesSeenLabel": "Parties avec cette carte",
     "avgCopiesLabel": "Copies moyennes par deck",
-    "timesPlayedLabel": "Poses sur le terrain",
-    "playsPerGameLabel": "Poses par partie",
-    "timesRevealedLabel": "Révélations embuscade",
-    "timesUpgradedLabel": "Jouée en amélioration",
     "gameStatsBasis": "Basé sur les parties classées en ligne terminées entre joueurs"
   },
   "seoPages": {
