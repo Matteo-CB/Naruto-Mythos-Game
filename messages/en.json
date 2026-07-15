@@ -637,7 +637,7 @@
       }
     },
     "hideVariants": "Hide variants in the deck builder",
-    "hideVariantsHint": "When on, Rare Art, Mythos, Secret and special variant cards are hidden by default in the deck builder.",
+    "hideVariantsHint": "When on, variant cards are hidden by default in the deck builder.",
     "sound": "Sound effects",
     "soundOn": "Sounds are on.",
     "soundOff": "All sounds are off.",
