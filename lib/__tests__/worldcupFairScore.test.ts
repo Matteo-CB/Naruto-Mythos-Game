@@ -1,81 +1,134 @@
 import { describe, it, expect } from 'vitest';
-import { fairScore, buildCountryStandings, FAIR_PRIOR_GAMES, TOP_PLAYERS_CAP, type CountryUser } from '@/lib/worldcup/fairScore';
+import {
+  playerFairScore,
+  countryFairScore,
+  buildCountryStandings,
+  PLAYER_PRIOR_GAMES,
+  MIN_RANKED_PLAYERS,
+  TOP_PLAYERS_CAP,
+  WORLDCUP_MIN_ELO,
+  type CountryUser,
+} from '@/lib/worldcup/fairScore';
 import { extractFactionCounts } from '@/lib/cards/gameStatsCompute';
 import { getCardById } from '@/lib/data/cardIndex';
 import type { CharacterCard } from '@/lib/engine/types';
 
-describe('fairScore', () => {
-  it('returns 0.5 with no games', () => {
-    expect(fairScore(0, 0)).toBe(0.5);
-  });
-
+describe('playerFairScore', () => {
   it('shrinks small samples toward 50%', () => {
-    expect(fairScore(9, 10)).toBeCloseTo((9 + FAIR_PRIOR_GAMES * 0.5) / (10 + FAIR_PRIOR_GAMES));
-    expect(fairScore(9, 10)).toBeLessThan(0.9);
-    expect(fairScore(9, 10)).toBeGreaterThan(0.5);
-  });
-
-  it('a 2-0 country does not outrank a steady 60% country with volume', () => {
-    expect(fairScore(2, 2)).toBeLessThan(fairScore(60, 100));
-  });
-
-  it('a truly dominant small country can still outrank a mediocre big one', () => {
-    expect(fairScore(18, 20)).toBeGreaterThan(fairScore(260, 500));
+    expect(playerFairScore(9, 10)).toBeCloseTo((9 + PLAYER_PRIOR_GAMES * 0.5) / (10 + PLAYER_PRIOR_GAMES));
+    expect(playerFairScore(9, 10)).toBeLessThan(0.9);
+    expect(playerFairScore(9, 10)).toBeGreaterThan(0.5);
   });
 });
 
+describe('countryFairScore', () => {
+  it('pulls a country with few players strongly toward 50%', () => {
+    expect(countryFairScore([0.9])).toBeLessThan(0.6);
+    expect(countryFairScore([0.9])).toBeGreaterThan(0.5);
+  });
+
+  it('the phantom-player dilution fades as real players accumulate', () => {
+    expect(countryFairScore(Array(2).fill(0.7))).toBeLessThan(countryFairScore(Array(6).fill(0.7)));
+    expect(countryFairScore(Array(6).fill(0.7))).toBeLessThan(countryFairScore(Array(20).fill(0.7)));
+  });
+});
+
+function makeCountry(
+  users: Map<string, CountryUser>,
+  results: Array<{ userId: string; result: string }>,
+  cc: string,
+  playerCount: number,
+  winsPer: number,
+  lossesPer: number,
+): void {
+  for (let i = 0; i < playerCount; i++) {
+    const id = `${cc}${i}`;
+    users.set(id, { username: `${cc}_${i}`, elo: 1300 + i, countryCode: cc });
+    for (let w = 0; w < winsPer; w++) results.push({ userId: id, result: 'win' });
+    for (let l = 0; l < lossesPer; l++) results.push({ userId: id, result: 'loss' });
+  }
+}
+
 describe('buildCountryStandings', () => {
-  const users = new Map<string, CountryUser>([
-    ['u1', { username: 'Alice', elo: 1200, countryCode: 'fr' }],
-    ['u2', { username: 'Bob', elo: 1000, countryCode: 'fr' }],
-    ['u3', { username: 'Carol', elo: 1400, countryCode: 'jp' }],
-    ['u4', { username: 'Dave', elo: 900, countryCode: null }],
-  ]);
-
-  const results = [
-    { userId: 'u1', result: 'win' },
-    { userId: 'u1', result: 'win' },
-    { userId: 'u1', result: 'loss' },
-    { userId: 'u2', result: 'loss' },
-    { userId: 'u3', result: 'win' },
-    { userId: 'u4', result: 'win' },
-    { userId: 'missing', result: 'win' },
-  ];
-
-  it('aggregates per country and skips players without a flag', () => {
+  it('a one-player country is not ranked and sorts below ranked countries', () => {
+    const users = new Map<string, CountryUser>();
+    const results: Array<{ userId: string; result: string }> = [];
+    makeCountry(users, results, 'ps', 1, 30, 5);
+    makeCountry(users, results, 'it', 12, 15, 10);
     const standings = buildCountryStandings(results, users);
-    expect(standings).toHaveLength(2);
-    const fr = standings.find((s) => s.countryCode === 'fr')!;
+    const ps = standings.find((s) => s.countryCode === 'ps')!;
+    const it = standings.find((s) => s.countryCode === 'it')!;
+    expect(ps.ranked).toBe(false);
+    expect(it.ranked).toBe(true);
+    expect(standings[0].countryCode).toBe('it');
+    expect(standings[standings.length - 1].countryCode).toBe('ps');
+  });
+
+  it('requires MIN_RANKED_PLAYERS active players to be ranked', () => {
+    const users = new Map<string, CountryUser>();
+    const results: Array<{ userId: string; result: string }> = [];
+    makeCountry(users, results, 'de', MIN_RANKED_PLAYERS, 3, 3);
+    makeCountry(users, results, 'be', MIN_RANKED_PLAYERS - 1, 3, 3);
+    const standings = buildCountryStandings(results, users);
+    expect(standings.find((s) => s.countryCode === 'de')!.ranked).toBe(true);
+    expect(standings.find((s) => s.countryCode === 'be')!.ranked).toBe(false);
+  });
+
+  it('aggregates games, wins, losses and averages per country', () => {
+    const users = new Map<string, CountryUser>([
+      ['u1', { username: 'Alice', elo: 1400, countryCode: 'fr' }],
+      ['u2', { username: 'Bob', elo: 1250, countryCode: 'fr' }],
+      ['u3', { username: 'Dave', elo: 1900, countryCode: null }],
+    ]);
+    const results = [
+      { userId: 'u1', result: 'win' },
+      { userId: 'u1', result: 'win' },
+      { userId: 'u1', result: 'loss' },
+      { userId: 'u2', result: 'loss' },
+      { userId: 'u3', result: 'win' },
+      { userId: 'missing', result: 'win' },
+    ];
+    const standings = buildCountryStandings(results, users);
+    expect(standings).toHaveLength(1);
+    const fr = standings[0];
     expect(fr.players).toBe(2);
     expect(fr.games).toBe(4);
     expect(fr.wins).toBe(2);
     expect(fr.losses).toBe(2);
     expect(fr.winRate).toBeCloseTo(0.5);
-    expect(fr.avgElo).toBe(1100);
+    expect(fr.avgElo).toBe(1325);
     expect(fr.topPlayers[0].username).toBe('Alice');
     expect(fr.topPlayers[0].wins7d).toBe(2);
     expect(fr.topPlayers[0].games7d).toBe(3);
   });
 
-  it('sorts by fair score first', () => {
-    const standings = buildCountryStandings(results, users);
-    const jp = standings.find((s) => s.countryCode === 'jp')!;
-    const fr = standings.find((s) => s.countryCode === 'fr')!;
-    expect(jp.score).toBeGreaterThan(fr.score);
-    expect(standings[0].countryCode).toBe('jp');
-  });
-
   it('caps top players per country', () => {
-    const manyUsers = new Map<string, CountryUser>();
-    const manyResults: Array<{ userId: string; result: string }> = [];
-    for (let i = 0; i < TOP_PLAYERS_CAP + 4; i++) {
-      manyUsers.set(`p${i}`, { username: `P${i}`, elo: 1000 + i, countryCode: 'de' });
-      manyResults.push({ userId: `p${i}`, result: 'win' });
-    }
-    const standings = buildCountryStandings(manyResults, manyUsers);
+    const users = new Map<string, CountryUser>();
+    const results: Array<{ userId: string; result: string }> = [];
+    makeCountry(users, results, 'jp', TOP_PLAYERS_CAP + 4, 1, 0);
+    const standings = buildCountryStandings(results, users);
     expect(standings[0].players).toBe(TOP_PLAYERS_CAP + 4);
     expect(standings[0].topPlayers).toHaveLength(TOP_PLAYERS_CAP);
-    expect(standings[0].topPlayers[0].elo).toBe(1000 + TOP_PLAYERS_CAP + 3);
+    expect(standings[0].topPlayers[0].elo).toBe(1300 + TOP_PLAYERS_CAP + 3);
+  });
+});
+
+describe('legendary sannin gate', () => {
+  it('players below the Legendary Sannin ELO never count for their country', () => {
+    const users = new Map<string, CountryUser>();
+    const results: Array<{ userId: string; result: string }> = [];
+    makeCountry(users, results, 'br', MIN_RANKED_PLAYERS + 2, 10, 2);
+    for (let i = 0; i < MIN_RANKED_PLAYERS + 2; i++) {
+      users.set(`low${i}`, { username: `Low${i}`, elo: WORLDCUP_MIN_ELO - 1, countryCode: 'ca' });
+      results.push({ userId: `low${i}`, result: 'win' });
+    }
+    users.set('mix', { username: 'Mix', elo: WORLDCUP_MIN_ELO - 50, countryCode: 'br' });
+    results.push({ userId: 'mix', result: 'win' });
+    const standings = buildCountryStandings(results, users);
+    expect(standings.find((s) => s.countryCode === 'ca')).toBeUndefined();
+    const br = standings.find((s) => s.countryCode === 'br')!;
+    expect(br.players).toBe(MIN_RANKED_PLAYERS + 2);
+    expect(br.topPlayers.every((p) => p.username !== 'Mix')).toBe(true);
   });
 });
 

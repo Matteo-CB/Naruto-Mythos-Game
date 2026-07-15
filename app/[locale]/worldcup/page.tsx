@@ -12,6 +12,7 @@ import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { useLocaleBcp47 } from '@/lib/i18n/useLocaleMeta';
 import { COUNTRIES } from '@/lib/data/countries';
 import { getCardGroup } from '@/lib/utils/cardLocale';
+import { MIN_RANKED_PLAYERS, WORLDCUP_MIN_ELO } from '@/lib/worldcup/fairScore';
 
 const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
 const MEDAL_COLORS = ['#c4a35a', '#a8a9ad', '#a06b42'];
@@ -25,6 +26,7 @@ interface CountryPlayer {
 
 interface CountryRow {
   countryCode: string;
+  ranked: boolean;
   players: number;
   games: number;
   wins: number;
@@ -147,112 +149,16 @@ export default function WorldcupPage() {
   }, []);
 
   const standings = data?.standings ?? [];
-  const podium = standings.slice(0, 3);
+  const rankedRows = standings.filter((r) => r.ranked);
+  const unrankedRows = standings.filter((r) => !r.ranked);
+  const podium = rankedRows.slice(0, 3);
   const podiumOrder = podium.length === 3 ? [podium[1], podium[0], podium[2]] : podium;
   const podiumRanks = podium.length === 3 ? [2, 1, 3] : podium.map((_, i) => i + 1);
 
-  return (
-    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
-      <CloudBackground />
-      <div className="w-full max-w-5xl mx-auto relative z-10 flex-1 px-4 sm:px-8 py-6 sm:py-10">
-
-        <motion.header
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: 'easeOut' }}
-          className="mb-6 sm:mb-8"
-        >
-          <div className="flex items-end justify-between gap-3 flex-wrap">
-            <h1
-              className="font-display text-3xl sm:text-5xl tracking-wider uppercase leading-none"
-              style={{ color: '#f2efe7', letterSpacing: '0.08em', textShadow: '0 0 22px rgba(196, 163, 90, 0.18)' }}
-            >
-              {t('title')}
-            </h1>
-            <div className="flex items-center gap-1.5">
-              <LanguageSwitcher />
-              <Link
-                href="/"
-                className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
-                style={{ color: '#888' }}
-              >
-                {tc('back')}
-              </Link>
-            </div>
-          </div>
-          <p className="text-[11px] mt-3" style={{ color: '#555' }}>
-            {t('subtitle', { days: data?.windowDays ?? 7 })}
-          </p>
-        </motion.header>
-
-        {loading ? (
-          <div className="flex justify-center py-20">
-            <motion.span
-              className="font-display text-sm uppercase tracking-widest"
-              style={{ color: '#c4a35a' }}
-              animate={{ opacity: [0.35, 1, 0.35] }}
-              transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              {tc('loading')}
-            </motion.span>
-          </div>
-        ) : standings.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col items-center gap-3 py-20 text-center"
-          >
-            <span className="font-display text-base uppercase tracking-widest" style={{ color: '#c4a35a' }}>
-              {t('emptyTitle')}
-            </span>
-            <p className="text-xs max-w-md" style={{ color: '#777' }}>
-              {t('emptyText')}
-            </p>
-          </motion.div>
-        ) : (
-          <>
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.05 }}
-              className="flex gap-2 sm:gap-3 mb-6"
-            >
-              <StatBlock label={t('totalCountries')} value={data?.totals.countries ?? 0} />
-              <StatBlock label={t('totalPlayers')} value={data?.totals.players ?? 0} />
-              <StatBlock label={t('totalGames')} value={data?.totals.games ?? 0} />
-            </motion.div>
-
-            {podium.length > 0 && (
-              <div className="flex items-end gap-2 sm:gap-4 mb-8">
-                {podiumOrder.map((row, i) => (
-                  <PodiumCard
-                    key={row.countryCode}
-                    row={row}
-                    rank={podiumRanks[i]}
-                    countryName={countryName(row.countryCode)}
-                    delay={0.1 + i * 0.08}
-                  />
-                ))}
-              </div>
-            )}
-
-            <div
-              className="hidden sm:grid items-center gap-3 px-5 pb-2 text-[9px] uppercase tracking-[0.2em]"
-              style={{ color: '#555', gridTemplateColumns: '2.25rem 1fr 7rem 4.5rem 5rem 4rem' }}
-            >
-              <span />
-              <span>{t('colCountry')}</span>
-              <span className="text-right">{t('scoreLabel')}</span>
-              <span className="text-right">{t('colWinRate')}</span>
-              <span className="text-right">{t('colRecord')}</span>
-              <span className="text-right">{t('colPlayers')}</span>
-            </div>
-
-            <div>
-              {standings.map((row, index) => {
-                const isOpen = expanded === row.countryCode;
-                const altBg = index % 2 === 0 ? '#0c0b10' : '#0a0a0d';
-                return (
+  const renderCountryRow = (row: CountryRow, rank: number | null, index: number) => {
+    const isOpen = expanded === row.countryCode;
+    const altBg = index % 2 === 0 ? '#0c0b10' : '#0a0a0d';
+    return (
                   <motion.div
                     key={row.countryCode}
                     initial={{ opacity: 0, x: -8 }}
@@ -269,9 +175,9 @@ export default function WorldcupPage() {
                       <span className="grid items-center gap-2 sm:gap-3 grid-cols-[2rem_auto_minmax(0,1fr)_auto] sm:grid-cols-[2.25rem_minmax(0,1fr)_7rem_4.5rem_5rem_4rem]">
                         <span
                           className="font-display text-base sm:text-lg tabular-nums text-center"
-                          style={{ color: index < 3 ? MEDAL_COLORS[index] : '#666' }}
+                          style={{ color: rank !== null && rank <= 3 ? MEDAL_COLORS[rank - 1] : '#666' }}
                         >
-                          {index + 1}
+                          {rank ?? '-'}
                         </span>
                         <span className="flex items-center gap-2 min-w-0">
                           <CountryFlag code={row.countryCode} size={22} />
@@ -374,9 +280,120 @@ export default function WorldcupPage() {
                       )}
                     </AnimatePresence>
                   </motion.div>
-                );
-              })}
+    );
+  };
+
+  return (
+    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
+      <CloudBackground />
+      <div className="w-full max-w-5xl mx-auto relative z-10 flex-1 px-4 sm:px-8 py-6 sm:py-10">
+
+        <motion.header
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
+          className="mb-6 sm:mb-8"
+        >
+          <div className="flex items-end justify-between gap-3 flex-wrap">
+            <h1
+              className="font-display text-3xl sm:text-5xl tracking-wider uppercase leading-none"
+              style={{ color: '#f2efe7', letterSpacing: '0.08em', textShadow: '0 0 22px rgba(196, 163, 90, 0.18)' }}
+            >
+              {t('title')}
+            </h1>
+            <div className="flex items-center gap-1.5">
+              <LanguageSwitcher />
+              <Link
+                href="/"
+                className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
+                style={{ color: '#888' }}
+              >
+                {tc('back')}
+              </Link>
             </div>
+          </div>
+          <p className="text-[11px] mt-3" style={{ color: '#555' }}>
+            {t('subtitle', { days: data?.windowDays ?? 7 })}
+          </p>
+        </motion.header>
+
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <motion.span
+              className="font-display text-sm uppercase tracking-widest"
+              style={{ color: '#c4a35a' }}
+              animate={{ opacity: [0.35, 1, 0.35] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              {tc('loading')}
+            </motion.span>
+          </div>
+        ) : standings.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center gap-3 py-20 text-center"
+          >
+            <span className="font-display text-base uppercase tracking-widest" style={{ color: '#c4a35a' }}>
+              {t('emptyTitle')}
+            </span>
+            <p className="text-xs max-w-md" style={{ color: '#777' }}>
+              {t('emptyText')}
+            </p>
+          </motion.div>
+        ) : (
+          <>
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.05 }}
+              className="flex gap-2 sm:gap-3 mb-6"
+            >
+              <StatBlock label={t('totalCountries')} value={data?.totals.countries ?? 0} />
+              <StatBlock label={t('totalPlayers')} value={data?.totals.players ?? 0} />
+              <StatBlock label={t('totalGames')} value={data?.totals.games ?? 0} />
+            </motion.div>
+
+            {podium.length > 0 && (
+              <div className="flex items-end gap-2 sm:gap-4 mb-8">
+                {podiumOrder.map((row, i) => (
+                  <PodiumCard
+                    key={row.countryCode}
+                    row={row}
+                    rank={podiumRanks[i]}
+                    countryName={countryName(row.countryCode)}
+                    delay={0.1 + i * 0.08}
+                  />
+                ))}
+              </div>
+            )}
+
+            <div
+              className="hidden sm:grid items-center gap-3 px-5 pb-2 text-[9px] uppercase tracking-[0.2em]"
+              style={{ color: '#555', gridTemplateColumns: '2.25rem 1fr 7rem 4.5rem 5rem 4rem' }}
+            >
+              <span />
+              <span>{t('colCountry')}</span>
+              <span className="text-right">{t('scoreLabel')}</span>
+              <span className="text-right">{t('colWinRate')}</span>
+              <span className="text-right">{t('colRecord')}</span>
+              <span className="text-right">{t('colPlayers')}</span>
+            </div>
+
+            <div>
+              {rankedRows.map((row, index) => renderCountryRow(row, index + 1, index))}
+            </div>
+
+            {unrankedRows.length > 0 && (
+              <div className="mt-8">
+                <div className="px-1 pb-2 text-[10px] uppercase tracking-[0.25em]" style={{ color: '#8a7b55' }}>
+                  {t('unrankedTitle', { min: MIN_RANKED_PLAYERS })}
+                </div>
+                <div style={{ opacity: 0.72 }}>
+                  {unrankedRows.map((row, index) => renderCountryRow(row, null, rankedRows.length + index))}
+                </div>
+              </div>
+            )}
 
             <motion.div
               initial={{ opacity: 0 }}
@@ -385,15 +402,23 @@ export default function WorldcupPage() {
               className="mt-8 px-5 py-4"
               style={{ backgroundColor: 'rgba(17, 17, 17, 0.7)', clipPath: ROW_CLIP }}
             >
-              <div className="text-[10px] uppercase tracking-[0.25em] mb-2" style={{ color: '#c4a35a' }}>
-                {t('methodTitle')}
+              <div className="text-[10px] uppercase tracking-[0.25em] mb-3" style={{ color: '#c4a35a' }}>
+                {t('rulesTitle')}
               </div>
-              <p className="text-[11px] leading-relaxed" style={{ color: '#888' }}>
-                {t('methodText')}
-              </p>
-              <p className="text-[11px] leading-relaxed mt-1.5" style={{ color: '#666' }}>
-                {t('flagNote')}
-              </p>
+              <ol className="flex flex-col gap-2">
+                {([
+                  t('rule1'),
+                  t('rule2'),
+                  t('rule3', { elo: WORLDCUP_MIN_ELO }),
+                  t('rule4', { min: MIN_RANKED_PLAYERS }),
+                  t('rule5'),
+                ]).map((rule, i) => (
+                  <li key={i} className="flex gap-2.5 text-[11px] leading-relaxed" style={{ color: '#999' }}>
+                    <span className="font-display shrink-0 tabular-nums" style={{ color: '#c4a35a' }}>{i + 1}.</span>
+                    <span>{rule}</span>
+                  </li>
+                ))}
+              </ol>
             </motion.div>
           </>
         )}

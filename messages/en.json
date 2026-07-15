@@ -3528,10 +3528,14 @@
     "detailAvgElo": "Average ELO",
     "detailTopGroup": "Most played group",
     "topPlayersTitle": "Top players of the country",
-    "methodTitle": "How the ranking works",
-    "methodText": "The fair score starts from the country's win rate over the last 7 days and pulls it toward 50% when the country has few games. A country with few players must truly dominate to climb, and a big country gains no advantage from volume alone. Ties are broken by number of games.",
-    "flagNote": "Only players who picked a flag in their options are counted for their country.",
     "emptyTitle": "No games yet",
-    "emptyText": "No ranked games were played in the last 7 days. Play ranked games with a flag selected in your options to put your country on the board."
+    "emptyText": "No ranked games were played in the last 7 days. Play ranked games with a flag selected in your options to put your country on the board.",
+    "unrankedTitle": "Not ranked: fewer than {min} counted players",
+    "rulesTitle": "Ranking rules",
+    "rule1": "Only ranked games from the last 7 days count.",
+    "rule2": "Only players who picked a flag in their options are counted for their country.",
+    "rule3": "You must be at least Legendary Sannin ({elo} ELO or more) to count in your country's ranking.",
+    "rule4": "A country enters the ranking with at least {min} counted players; below that it appears in the not-ranked section.",
+    "rule5": "Fair score: each player gets a level (their 7-day win rate, pulled toward 50% when they played few games); the country score is the average of its players' levels, completed with neutral phantom players. Ties are broken by number of games."
   }
 }

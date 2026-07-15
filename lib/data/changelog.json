@@ -7,7 +7,7 @@
       "title_es": "Copa del mundo, nuevas estadísticas y animaciones más fluidas",
       "title_ja": "ワールドカップ、新しい統計、より滑らかなアニメーション",
       "changes_fr": [
-        "Nouvelle page Coupe du monde : un classement des pays basé sur les parties classées des 7 derniers jours, avec un score équitable quel que soit le nombre de joueurs.",
+        "Nouvelle page Coupe du monde : un classement des pays sur les parties classées des 7 derniers jours ; seuls les joueurs Sannin Légendaire ou plus comptent, et un pays doit en avoir au moins 6 pour être classé.",
         "La Coupe du monde affiche pour chaque pays son podium, ses meilleurs joueurs, son taux de victoire et son groupe de cartes le plus joué.",
         "La page TopDeck est retirée du site.",
         "La page Options s'adapte mieux aux grands écrans, avec un grand aperçu du décor de jeu sélectionné.",
@@ -23,7 +23,7 @@
         "Les pseudos des joueurs sont cliquables partout (historique, tournois, salons, chat, spectateurs, replays, amis) et ouvrent le profil, dans un nouvel onglet pendant une partie."
       ],
       "changes_en": [
-        "New World Cup page: a country ranking based on ranked games from the last 7 days, with a fair score no matter how many players a country has.",
+        "New World Cup page: a country ranking over ranked games from the last 7 days; only Legendary Sannin players and above count, and a country needs at least 6 of them to be ranked.",
         "The World Cup shows each country's podium, top players, win rate and most played card group.",
         "The TopDeck page has been removed from the site.",
         "The Options page adapts better to large screens, with a big preview of the selected game background.",
@@ -39,7 +39,7 @@
         "Player names are clickable everywhere (history, tournaments, rooms, chat, spectators, replays, friends) and open the profile, in a new tab during a game."
       ],
       "changes_es": [
-        "Nueva página Copa del mundo: una clasificación de países basada en las partidas clasificatorias de los últimos 7 días, con una puntuación justa sin importar cuántos jugadores tenga un país.",
+        "Nueva página Copa del mundo: una clasificación de países sobre las partidas clasificatorias de los últimos 7 días; solo cuentan los jugadores Sannin Legendario o superior, y un país necesita al menos 6 para clasificarse.",
         "La Copa del mundo muestra el podio de cada país, sus mejores jugadores, su tasa de victorias y su grupo de cartas más jugado.",
         "La página TopDeck se ha retirado del sitio.",
         "La página Opciones se adapta mejor a pantallas grandes, con una gran vista previa del fondo de juego seleccionado.",
@@ -55,7 +55,7 @@
         "Los nombres de los jugadores se pueden pulsar en todas partes (historial, torneos, salas, chat, espectadores, repeticiones, amigos) y abren el perfil, en una pestaña nueva durante una partida."
       ],
       "changes_ja": [
-        "新ページ「ワールドカップ」が登場:過去7日間のランク戦にもとづく国別ランキングで、人数の少ない国も公平に競えるフェアスコアを採用しています。",
+        "新ページ「ワールドカップ」:過去7日間のランク戦にもとづく国別ランキング。伝説の三忍以上のプレイヤーだけが集計され、6人以上いる国がランキングに入ります。",
         "ワールドカップでは各国の表彰台、トッププレイヤー、勝率、最も使われた勢力を確認できます。",
         "TopDeckのページはサイトから削除されました。",
         "オプション画面が大画面により適したレイアウトになり、選択中の対戦背景を大きくプレビューできます。",
