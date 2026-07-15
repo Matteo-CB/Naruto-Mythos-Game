@@ -33,6 +33,9 @@ export async function cleanupOldChatMessages(): Promise<void> {
     if (notifResult.count > 0) {
       console.log(`[ChatCleanup] Deleted ${notifResult.count} seen notifications older than 30 days`);
     }
+
+    const { cleanupOldScans } = await import('@/lib/moderation/autoScan');
+    await cleanupOldScans();
   } catch (err) {
     console.error('[ChatCleanup] Error:', err);
   }

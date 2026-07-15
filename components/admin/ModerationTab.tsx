@@ -57,6 +57,25 @@ export function ModerationTab() {
   const [sDuration, setSDuration] = useState<number | null>(null);
   const [sReason, setSReason] = useState('');
 
+  interface AutoScan {
+    id: string;
+    userId: string;
+    username: string;
+    message: string;
+    topCategory: string;
+    topScore: number;
+    action: string;
+    createdAt: string;
+  }
+  const [scans, setScans] = useState<AutoScan[]>([]);
+
+  useEffect(() => {
+    fetch('/api/admin/moderation/auto-scans', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : { scans: [] }))
+      .then((data) => setScans(data.scans ?? []))
+      .catch(() => {});
+  }, []);
+
   const loadReports = useCallback((status: 'pending' | 'resolved' | 'dismissed') => {
     setLoading(true);
     fetch(`/api/admin/moderation/reports?status=${status}`, { credentials: 'include' })
@@ -375,6 +394,46 @@ export function ModerationTab() {
           ))}
         </div>
       )}
+
+      <div className="flex flex-col gap-2">
+        <p className="text-[11px] uppercase font-bold mt-2" style={{ color: '#c4a35a' }}>
+          {t('autoScansTitle')}
+        </p>
+        {scans.length === 0 ? (
+          <p className="text-[12px] p-4" style={{ ...panelStyle, color: '#555' }}>{t('autoScansEmpty')}</p>
+        ) : (
+          scans.map((s) => (
+            <div key={s.id} className="flex flex-col gap-1.5 p-4" style={panelStyle}>
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <span className="text-[12px]">
+                  <span
+                    className="font-bold cursor-pointer"
+                    style={{ color: '#c4a35a' }}
+                    onClick={() => openFile(s.userId, null)}
+                  >
+                    {s.username}
+                  </span>
+                  <span
+                    className="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase"
+                    style={{
+                      backgroundColor: s.action === 'removed' ? 'rgba(179,62,62,0.14)' : 'rgba(196,163,90,0.12)',
+                      color: s.action === 'removed' ? '#d98080' : '#c4a35a',
+                    }}
+                  >
+                    {s.action === 'removed' ? t('autoActionRemoved') : t('autoActionFlagged')}
+                  </span>
+                </span>
+                <span className="text-[10px]" style={{ color: '#666' }}>
+                  {s.topCategory} {Math.round(s.topScore * 100)}% · {new Date(s.createdAt).toLocaleString()}
+                </span>
+              </div>
+              <p className="text-[11px] px-2 py-1.5" style={{ backgroundColor: 'rgba(179,62,62,0.06)', color: '#d0a0a0', overflowWrap: 'anywhere' }}>
+                {s.message}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }

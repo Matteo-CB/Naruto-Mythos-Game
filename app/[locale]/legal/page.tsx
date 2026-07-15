@@ -137,6 +137,10 @@ export default function LegalPage() {
             <TextBlock text={t('dataSharingText')} />
           </Section>
 
+          <Section title={t('chatModeration')}>
+            <TextBlock text={t('chatModerationText')} />
+          </Section>
+
           <Section title={t('cookies')}>
             <TextBlock text={t('cookiesText')} />
           </Section>

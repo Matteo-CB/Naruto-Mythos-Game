@@ -2296,7 +2296,9 @@
     "userRightsText": "In accordance with the General Data Protection Regulation (GDPR), you have the following rights:\n- Right to access your personal data\n- Right to rectify your data\n- Right to erasure of your data\n- Right to data portability\n- Right to object to processing\n\nTo exercise these rights, contact us at: contact@metalya.fr",
     "contact": "Contact",
     "contactText": "For any questions regarding the protection of your data or legal notices:\n\nHiddenLab\nEmail: contact@metalya.fr\nWebsite:",
-    "lastUpdated": "Last updated: {date}"
+    "lastUpdated": "Last updated: {date}",
+    "chatModeration": "Automatic chat moderation",
+    "chatModerationText": "Chat messages are automatically analyzed by a moderation service (OpenAI moderation API) to detect insults, hate speech and harassment in any language. Only the text of the message is sent, never your email or account details. Messages detected as abusive can be removed automatically and reviewed by the moderation team. Analysis records are kept for 30 days."
   },
   "friends": {
     "title": "Friends",
@@ -3039,7 +3041,8 @@
       "report": "Report",
       "privateMessage": "Private message"
     },
-    "mutedUntil": "Your chat is suspended until {date}."
+    "mutedUntil": "Your chat is suspended until {date}.",
+    "removedByModeration": "Message removed by moderation"
   },
   "moderation": {
     "reports": "Reports",
@@ -3481,7 +3484,11 @@
       "name_reset": "Username reset",
       "message_delete": "Message deleted",
       "elo_adjust": "ELO adjustment"
-    }
+    },
+    "autoScansTitle": "Automatic detections (AI)",
+    "autoScansEmpty": "No automatic detection yet",
+    "autoActionRemoved": "Removed",
+    "autoActionFlagged": "Flagged"
   },
   "surveys": {
     "buttonLabel": "Surveys",

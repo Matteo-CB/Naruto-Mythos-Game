@@ -2301,7 +2301,9 @@
     "userRightsText": "De acuerdo con el Reglamento General de Protección de Datos (RGPD), tienes los siguientes derechos:\n- Derecho de acceso a tus datos personales\n- Derecho de rectificación de tus datos\n- Derecho de supresión de tus datos\n- Derecho a la portabilidad de los datos\n- Derecho de oposición al tratamiento\n\nPara ejercer estos derechos, contáctanos en: contact@metalya.fr",
     "contact": "Contacto",
     "contactText": "Para cualquier duda sobre la protección de tus datos o los avisos legales:\n\nHiddenLab\nCorreo: contact@metalya.fr\nSitio web:",
-    "lastUpdated": "Última actualización: {date}"
+    "lastUpdated": "Última actualización: {date}",
+    "chatModeration": "Moderación automática del chat",
+    "chatModerationText": "Los mensajes del chat se analizan automáticamente mediante un servicio de moderación (API de moderación de OpenAI) para detectar insultos, discurso de odio y acoso en cualquier idioma. Solo se envía el texto del mensaje, nunca tu correo ni los datos de tu cuenta. Los mensajes detectados como abusivos pueden eliminarse automáticamente y son revisados por el equipo de moderación. Los registros de análisis se conservan 30 días."
   },
   "friends": {
     "title": "Amigos",
@@ -3044,7 +3046,8 @@
       "report": "Denunciar",
       "privateMessage": "Mensaje privado"
     },
-    "mutedUntil": "Tu chat está suspendido hasta el {date}."
+    "mutedUntil": "Tu chat está suspendido hasta el {date}.",
+    "removedByModeration": "Mensaje eliminado por la moderación"
   },
   "moderation": {
     "reports": "Denuncias",
@@ -3486,7 +3489,11 @@
       "name_reset": "Reinicio del nombre",
       "message_delete": "Mensaje eliminado",
       "elo_adjust": "Ajuste de ELO"
-    }
+    },
+    "autoScansTitle": "Detecciones automáticas (IA)",
+    "autoScansEmpty": "Ninguna detección automática por el momento",
+    "autoActionRemoved": "Eliminado",
+    "autoActionFlagged": "Señalado"
   },
   "surveys": {
     "buttonLabel": "Encuestas",

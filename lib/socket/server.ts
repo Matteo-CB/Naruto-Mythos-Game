@@ -32,6 +32,7 @@ import { validateChatMessage, isOnChatCooldown, decideChatDelivery } from '@/lib
 import { maskProfanity } from '@/lib/chat/wordFilter';
 import { getPairChatState } from '@/lib/chat/pairState';
 import { getModerationFlags, isSuspended, isRankedBanned, isSpectateBanned } from '@/lib/moderation/sanctions';
+import { initChatAutoScan, enqueueChatScan } from '@/lib/moderation/autoScan';
 import { setChatLockRefresher } from '@/lib/socket/chatLockBridge';
 import { sendDm, getUnreadDmCount, markThreadRead } from '@/lib/dm/dmService';
 
@@ -217,7 +218,7 @@ export interface RoomData {
   hostAllowSpectatorHand: boolean;
   guestAllowSpectatorHand: boolean;
   
-  chatMessages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }>;
+  chatMessages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number; removedByModeration?: boolean }>;
   chatLastCleanup: number;
 
   chessClock: ChessClockState;
@@ -1808,6 +1809,20 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
 
 export function setupSocketHandlers(io: SocketIOServer) {
   ioInstance = io;
+
+  initChatAutoScan((roomCode, messageId) => {
+    const room = rooms.get(roomCode);
+    if (room) {
+      const msg = room.chatMessages.find((m) => m.id === messageId);
+      if (msg) {
+        msg.message = '';
+        msg.removedByModeration = true;
+      }
+      if (room.hostSocket) io.to(room.hostSocket).emit('chat:message-removed', { id: messageId });
+      if (room.guestSocket) io.to(room.guestSocket).emit('chat:message-removed', { id: messageId });
+    }
+    io.to(`spec:${roomCode}`).emit('chat:message-removed', { id: messageId });
+  });
 
   if (!process.env.TOURNOI_WINNER_WEBHOOK) {
     console.warn('[Boot] TOURNOI_WINNER_WEBHOOK not set, tournament results will not be announced on Discord');
@@ -3840,6 +3855,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
         },
       }).catch(() => {});
 
+      if (!isEmote) {
+        enqueueChatScan({ messageId: chatMsg.id, roomCode, userId, username, message: trimmed });
+      }
+
       import('@/lib/db/chatCleanup').then(m => m.cleanupOldChatMessages()).catch(() => {});
 
       if (decision.recipients === 'spectators_only') {
@@ -3876,6 +3895,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
         };
         socket.emit('dm:message', payload);
         if (!result.echoOnly) {
+          enqueueChatScan({
+            messageId: result.message.id,
+            roomCode: `dm:${result.message.threadKey}`,
+            userId,
+            username: '',
+            message: result.message.body,
+            channel: 'dm',
+          });
           emitToUser(data.toUserId, 'dm:message', payload);
           getUnreadDmCount(data.toUserId)
             .then((total) => emitToUser(data.toUserId, 'dm:unread-count', { total }))

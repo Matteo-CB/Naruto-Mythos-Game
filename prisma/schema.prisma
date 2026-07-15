@@ -636,6 +636,24 @@ model TradeLog {
   @@index([receiverId, executedAt])
 }
 
+model ChatModerationScan {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  messageId   String
+  roomCode    String
+  userId      String
+  username    String
+  message     String
+  provider    String
+  categories  Json
+  topCategory String
+  topScore    Float
+  action      String
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId, createdAt])
+}
+
 model EmailVerification {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   email      String   @unique

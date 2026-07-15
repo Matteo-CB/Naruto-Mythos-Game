@@ -176,7 +176,7 @@ interface SocketStore {
   leaveSpectating: () => void;
 
   
-  chatMessages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }>;
+  chatMessages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number; removedByModeration?: boolean }>;
   unreadChatCount: number;
   chatOpen: boolean;
   chatLockState: 'open' | 'off' | 'friends_only' | null;
@@ -850,6 +850,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('chat:history', (data: { messages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }> }) => {
         set({ chatMessages: data.messages ?? [] });
+      });
+
+      socket.on('chat:message-removed', (data: { id: string }) => {
+        set((state) => ({
+          chatMessages: state.chatMessages.map((m) =>
+            m.id === data.id ? { ...m, message: '', removedByModeration: true } : m,
+          ),
+        }));
       });
 
       socket.on('notify:popup', (data: { id: string; kind: string; payload: unknown; createdAt: number }) => {

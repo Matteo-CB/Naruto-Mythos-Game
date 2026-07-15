@@ -2300,7 +2300,9 @@
     "userRightsText": "一般データ保護規則（GDPR）に基づき、あなたには以下の権利があります：\n- 個人データへのアクセス権\n- データの訂正権\n- データの消去権\n- データポータビリティの権利\n- 処理への異議申し立て権\n\nこれらの権利を行使するには、contact@metalya.fr までご連絡ください。",
     "contact": "連絡先",
     "contactText": "データ保護や法的通知に関するご質問は：\n\nHiddenLab\nメール：contact@metalya.fr\nウェブサイト：",
-    "lastUpdated": "最終更新：{date}"
+    "lastUpdated": "最終更新：{date}",
+    "chatModeration": "チャットの自動モデレーション",
+    "chatModerationText": "チャットのメッセージは、あらゆる言語の侮辱、ヘイトスピーチ、ハラスメントを検出するため、モデレーションサービス(OpenAIモデレーションAPI)によって自動的に分析されます。送信されるのはメッセージの本文のみで、メールアドレスやアカウント情報が送られることはありません。不適切と判定されたメッセージは自動的に削除されることがあり、モデレーションチームが確認します。分析記録は30日間保存されます。"
   },
   "friends": {
     "title": "フレンド",
@@ -3043,7 +3045,8 @@
       "report": "通報",
       "privateMessage": "プライベートメッセージ"
     },
-    "mutedUntil": "チャットが{date}まで停止されています。"
+    "mutedUntil": "チャットが{date}まで停止されています。",
+    "removedByModeration": "モデレーションにより削除されたメッセージ"
   },
   "moderation": {
     "reports": "報告",
@@ -3485,7 +3488,11 @@
       "name_reset": "ユーザー名リセット",
       "message_delete": "メッセージ削除",
       "elo_adjust": "ELO調整"
-    }
+    },
+    "autoScansTitle": "自動検出(AI)",
+    "autoScansEmpty": "自動検出はまだありません",
+    "autoActionRemoved": "削除済み",
+    "autoActionFlagged": "要確認"
   },
   "surveys": {
     "buttonLabel": "アンケート",

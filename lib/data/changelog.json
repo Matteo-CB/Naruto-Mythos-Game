@@ -7,6 +7,7 @@
       "title_es": "Copa del mundo, nuevas estadísticas y animaciones más fluidas",
       "title_ja": "ワールドカップ、新しい統計、より滑らかなアニメーション",
       "changes_fr": [
+        "Une IA de modération analyse désormais les messages du chat dans toutes les langues : les insultes graves, le racisme et le harcèlement sont supprimés automatiquement et transmis aux modérateurs.",
         "La création de compte demande désormais un code de vérification à 6 chiffres envoyé par email.",
         "Le choix de l'ordre des cartes envoyées à la défausse (Sakura secrète par exemple) est de nouveau respecté en partie en ligne.",
         "Des parties classées truquées contre des comptes jetables ont été annulées, l'ELO concerné a été retiré et ces comptes sont bannis définitivement des parties classées.",
@@ -27,6 +28,7 @@
         "Les pseudos des joueurs sont cliquables partout (historique, tournois, salons, chat, spectateurs, replays, amis) et ouvrent le profil, dans un nouvel onglet pendant une partie."
       ],
       "changes_en": [
+        "A moderation AI now analyzes chat messages in every language: serious insults, racism and harassment are removed automatically and sent to the moderators.",
         "Creating an account now requires a 6-digit verification code sent by email.",
         "The order you choose for cards sent to the discard pile (secret Sakura for example) is respected again in online games.",
         "Rigged ranked games against throwaway accounts were cancelled, the ELO involved was removed and those accounts are permanently banned from ranked play.",
@@ -47,6 +49,7 @@
         "Player names are clickable everywhere (history, tournaments, rooms, chat, spectators, replays, friends) and open the profile, in a new tab during a game."
       ],
       "changes_es": [
+        "Una IA de moderación analiza ahora los mensajes del chat en todos los idiomas: los insultos graves, el racismo y el acoso se eliminan automáticamente y se envían a los moderadores.",
         "Crear una cuenta ahora requiere un código de verificación de 6 dígitos enviado por correo.",
         "El orden que eliges para las cartas enviadas a la pila de descarte (Sakura secreta por ejemplo) vuelve a respetarse en las partidas en línea.",
         "Se anularon partidas clasificatorias amañadas contra cuentas desechables, se retiró el ELO implicado y esas cuentas quedan expulsadas definitivamente de las partidas clasificatorias.",
@@ -67,6 +70,7 @@
         "Los nombres de los jugadores se pueden pulsar en todas partes (historial, torneos, salas, chat, espectadores, repeticiones, amigos) y abren el perfil, en una pestaña nueva durante una partida."
       ],
       "changes_ja": [
+        "モデレーションAIがあらゆる言語のチャットメッセージを分析するようになりました。悪質な侮辱、差別発言、ハラスメントは自動的に削除され、モデレーターに報告されます。",
         "アカウント作成時に、メールで届く6桁の確認コードの入力が必要になりました。",
         "捨て札に送るカードの順番の選択(シークレットのサクラなど)がオンライン対戦で再び正しく反映されるようになりました。",
         "使い捨てアカウント相手の不正なランク戦を取り消し、関連するELOを削除、該当アカウントはランク戦から永久に追放しました。",
