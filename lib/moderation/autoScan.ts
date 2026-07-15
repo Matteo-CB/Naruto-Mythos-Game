@@ -85,22 +85,46 @@ export function decideScanAction(scores: Record<string, number>): ScanDecision {
   return { action, topCategory, topScore };
 }
 
-const MAX_QUEUE = 500;
+const MAX_QUEUE = 2000;
 const BATCH_MAX = 10;
-const SCAN_INTERVAL_MS = 2000;
+const FALLBACK_INTERVAL_MS = 2000;
+const DRAIN_DEBOUNCE_MS = 25;
 const API_TIMEOUT_MS = 5000;
 const SCAN_RETENTION_DAYS = 30;
+const MAX_CONCURRENT_BATCHES = 6;
+const RATE_LIMIT_PER_MIN = 200;
+const RATE_WINDOW_MS = 60_000;
+
+const THROTTLE_BACKOFF_MS = 60_000;
 
 const queue: QueuedEntry[] = [];
 let removalHandler: ((roomCode: string, messageId: string) => void) | null = null;
-let workerTimer: ReturnType<typeof setInterval> | null = null;
+let fallbackTimer: ReturnType<typeof setInterval> | null = null;
 let disabledLogged = false;
-let scanning = false;
+let activeBatches = 0;
+let drainScheduled = false;
+let pausedUntil = 0;
+let throttleLogged = false;
+const requestTimes: number[] = [];
+
+function rateBudgetLeft(): boolean {
+  const cutoff = Date.now() - RATE_WINDOW_MS;
+  while (requestTimes.length > 0 && requestTimes[0] < cutoff) requestTimes.shift();
+  return requestTimes.length < RATE_LIMIT_PER_MIN;
+}
+
+function scheduleDrain(): void {
+  if (drainScheduled || !process.env.OPENAI_API_KEY) return;
+  drainScheduled = true;
+  setTimeout(() => { drainScheduled = false; drain(); }, DRAIN_DEBOUNCE_MS);
+}
 
 export function enqueueChatScan(entry: ChatScanEntry): void {
   if (!process.env.OPENAI_API_KEY) return;
+  if (Date.now() < pausedUntil && queue.length >= MAX_QUEUE) return;
   if (queue.length >= MAX_QUEUE) queue.shift();
   queue.push({ ...entry, retried: false });
+  scheduleDrain();
 }
 
 export function chatScanQueueSize(): number {
@@ -124,10 +148,19 @@ async function callModerationApi(texts: string[]): Promise<Array<Record<string, 
       body: JSON.stringify({ model: 'omni-moderation-latest', input: texts }),
       signal: AbortSignal.timeout(API_TIMEOUT_MS),
     });
+    if (res.status === 429) {
+      pausedUntil = Date.now() + THROTTLE_BACKOFF_MS;
+      if (!throttleLogged) {
+        console.warn('[autoScan] moderation API 429 (account quota is zero: add credit once to unlock the free moderation tier), backing off');
+        throttleLogged = true;
+      }
+      return null;
+    }
     if (!res.ok) {
       console.warn(`[autoScan] moderation API HTTP ${res.status}`);
       return null;
     }
+    throttleLogged = false;
     const data = (await res.json()) as ModerationApiResult;
     if (!Array.isArray(data.results) || data.results.length !== texts.length) return null;
     return data.results.map((r) => r.category_scores ?? {});
@@ -162,34 +195,48 @@ async function persistScan(entry: ChatScanEntry, decision: ScanDecision, scores:
   }
 }
 
-async function processBatch(): Promise<void> {
-  if (scanning || queue.length === 0) return;
-  scanning = true;
-  try {
+async function runBatch(batch: QueuedEntry[]): Promise<void> {
+  const scoresList = await callModerationApi(batch.map((b) => b.message));
+  if (!scoresList) {
+    for (const entry of batch) {
+      if (!entry.retried && queue.length < MAX_QUEUE) {
+        queue.push({ ...entry, retried: true });
+      }
+    }
+    return;
+  }
+  const persists: Array<Promise<void>> = [];
+  for (let i = 0; i < batch.length; i++) {
+    const entry = batch[i];
+    const decision = decideScanAction(scoresList[i]);
+    if (decision.action === 'none') continue;
+    if (decision.action === 'removed' && entry.channel === 'dm') {
+      decision.action = 'flagged';
+    }
+    if (decision.action === 'removed' && removalHandler) {
+      try { removalHandler(entry.roomCode, entry.messageId); } catch { /* never break the worker */ }
+    }
+    persists.push(persistScan(entry, decision, scoresList[i]));
+  }
+  await Promise.allSettled(persists);
+}
+
+function drain(): void {
+  if (Date.now() < pausedUntil) {
+    setTimeout(scheduleDrain, pausedUntil - Date.now() + 50);
+    return;
+  }
+  while (queue.length > 0 && activeBatches < MAX_CONCURRENT_BATCHES && rateBudgetLeft()) {
     const batch = queue.splice(0, BATCH_MAX);
-    const scoresList = await callModerationApi(batch.map((b) => b.message));
-    if (!scoresList) {
-      for (const entry of batch) {
-        if (!entry.retried && queue.length < MAX_QUEUE) {
-          queue.push({ ...entry, retried: true });
-        }
-      }
-      return;
-    }
-    for (let i = 0; i < batch.length; i++) {
-      const entry = batch[i];
-      const decision = decideScanAction(scoresList[i]);
-      if (decision.action === 'none') continue;
-      if (decision.action === 'removed' && entry.channel === 'dm') {
-        decision.action = 'flagged';
-      }
-      if (decision.action === 'removed' && removalHandler) {
-        try { removalHandler(entry.roomCode, entry.messageId); } catch { /* never break the worker */ }
-      }
-      await persistScan(entry, decision, scoresList[i]);
-    }
-  } finally {
-    scanning = false;
+    requestTimes.push(Date.now());
+    activeBatches++;
+    void runBatch(batch).catch(() => { /* never break the worker */ }).finally(() => {
+      activeBatches--;
+      if (queue.length > 0) scheduleDrain();
+    });
+  }
+  if (queue.length > 0 && activeBatches < MAX_CONCURRENT_BATCHES && !rateBudgetLeft()) {
+    setTimeout(scheduleDrain, 1000);
   }
 }
 
@@ -202,9 +249,9 @@ export function initChatAutoScan(onRemove: (roomCode: string, messageId: string)
     }
     return;
   }
-  if (workerTimer) return;
-  workerTimer = setInterval(() => { void processBatch(); }, SCAN_INTERVAL_MS);
-  console.log('[autoScan] AI chat moderation worker started');
+  if (fallbackTimer) return;
+  fallbackTimer = setInterval(() => { if (queue.length > 0) drain(); }, FALLBACK_INTERVAL_MS);
+  console.log('[autoScan] AI chat moderation worker started (concurrent, immediate drain)');
 }
 
 export async function cleanupOldScans(): Promise<void> {
