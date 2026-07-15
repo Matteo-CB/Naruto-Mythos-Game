@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TournamentMatch } from '@/stores/tournamentStore';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 
 interface Props {
   matches: TournamentMatch[];
@@ -178,7 +179,8 @@ export function LiveMatchesPanel({ matches, currentRound, totalRounds, userId, f
 
 function PlayerName({ name, highlight, won }: { name?: string | null; highlight?: boolean; won?: boolean }) {
   return (
-    <span
+    <PlayerNameLink
+      username={name}
       style={{
         color: won ? '#c4a35a' : highlight ? '#e0e0e0' : '#bbb',
         fontWeight: won || highlight ? 700 : 400,
@@ -187,6 +189,6 @@ function PlayerName({ name, highlight, won }: { name?: string | null; highlight?
       }}
     >
       {name ?? '?'}
-    </span>
+    </PlayerNameLink>
   );
 }

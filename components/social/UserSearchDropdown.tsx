@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSocialStore } from '@/stores/socialStore';
 import { FriendshipButton } from './FriendshipButton';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 
 interface UserSearchDropdownProps {
   namespace?: string;
@@ -140,12 +141,11 @@ export function UserSearchDropdown({ namespace }: UserSearchDropdownProps) {
                 }}
               >
                 <div className="flex items-center gap-3">
-                  <span
+                  <PlayerNameLink
+                    username={user.username}
                     className="text-sm font-medium"
                     style={{ color: '#e0e0e0' }}
-                  >
-                    {user.username}
-                  </span>
+                  />
                   <span
                     className="text-xs px-2 py-0.5"
                     style={{

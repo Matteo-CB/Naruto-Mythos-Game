@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { useTranslations } from 'next-intl';
 import { useSocialStore } from '@/stores/socialStore';
 
@@ -120,12 +121,11 @@ function RequestRow({
       style={{ backgroundColor: altBg, clipPath: ROW_CLIP }}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
-        <span
+        <PlayerNameLink
+          username={username}
           className="font-display text-sm sm:text-base truncate"
           style={{ color: '#e8e6df', letterSpacing: '0.03em' }}
-        >
-          {username}
-        </span>
+        />
         <span className="font-display text-sm tabular-nums shrink-0" style={{ color: '#c4a35a' }}>
           {elo}
         </span>

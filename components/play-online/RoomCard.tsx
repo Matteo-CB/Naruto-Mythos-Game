@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { useTranslations, useLocale } from 'next-intl';
 import { getSetName } from '@/lib/data/sets/registry';
 import { HoloSurface } from '@/components/HoloSurface';
@@ -55,7 +56,9 @@ export function RoomCard({
       }}
     >
       <div className="flex flex-col min-w-0 flex-1">
-        <span
+        <PlayerNameLink
+          username={hostName}
+          disabled={anonymousDisplay}
           className="text-[12px] font-medium truncate"
           style={{
             color: anonymousDisplay ? '#888' : '#e8e8e8',
@@ -63,7 +66,7 @@ export function RoomCard({
           }}
         >
           {displayName}
-        </span>
+        </PlayerNameLink>
         <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
           <ChipText label={t(`online.mode.${isRanked ? 'ranked' : gameMode}`)} accent={isRanked ? '#b33e3e' : '#c4a35a'} />
           {sealedSetLabel && <ChipText label={sealedSetLabel} accent="#8fae6b" />}

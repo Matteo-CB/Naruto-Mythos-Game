@@ -7,6 +7,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { ChessClockDisplay } from '@/components/game/ChessClockDisplay';
 import { useGameScale } from './GameScaleContext';
 import { CountryFlag } from '@/components/CountryFlag';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { usePlayerFlag } from '@/lib/hooks/usePlayerFlags';
 
 export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
@@ -30,6 +31,7 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
   const hasEdge = edgeHolder === opponentPlayer;
   const isOpponentTurn = activePlayer === opponentPlayer;
   const opponentName = opponentPlayer === 'player1' ? playerDisplayNames.player1 : playerDisplayNames.player2;
+  const isOnlineGame = useGameStore((s) => s.isOnlineGame);
 
   return (
     <div
@@ -41,7 +43,7 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
 
       <span className="font-semibold shrink-0 flex items-center gap-1.5" style={{ fontSize: dims.isMobile ? '14px' : '12px', color: '#b33e3e' }}>
         <CountryFlag code={flagCode} size={dims.isMobile ? 16 : 14} />
-        {opponentName}
+        <PlayerNameLink username={opponentName} newTab disabled={!isOnlineGame} />
       </span>
 
       <div className="flex items-center gap-1 shrink-0" title={t('game.edge')}>

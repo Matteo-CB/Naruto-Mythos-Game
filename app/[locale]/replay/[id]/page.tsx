@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef, useCallback, use } from 'react';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
@@ -155,9 +156,7 @@ function ScoreOverlay({
             style={{ backgroundColor: 'rgba(10, 10, 18, 0.88)' }}
           >
             <div className="flex flex-col items-center gap-1">
-              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: p1Won ? '#c4a35a' : '#777' }}>
-                {playerNames.player1}
-              </span>
+              <PlayerNameLink username={playerNames.player1} className="text-xs font-bold uppercase tracking-wider" style={{ color: p1Won ? '#c4a35a' : '#777' }} />
               <span
                 className="text-3xl font-bold tabular-nums"
                 style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
@@ -169,9 +168,7 @@ function ScoreOverlay({
             <span className="text-sm" style={{ color: '#444' }}>-</span>
 
             <div className="flex flex-col items-center gap-1">
-              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: p2Won ? '#b33e3e' : '#777' }}>
-                {playerNames.player2}
-              </span>
+              <PlayerNameLink username={playerNames.player2} className="text-xs font-bold uppercase tracking-wider" style={{ color: p2Won ? '#b33e3e' : '#777' }} />
               <span
                 className="text-3xl font-bold tabular-nums"
                 style={{ color: '#b33e3e', fontFamily: "'NJNaruto', Arial, sans-serif" }}
@@ -193,9 +190,7 @@ function ScoreOverlay({
       >
         
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: p1Won ? '#c4a35a' : '#777' }}>
-            {playerNames.player1}
-          </span>
+          <PlayerNameLink username={playerNames.player1} className="text-[10px] font-bold uppercase tracking-wider" style={{ color: p1Won ? '#c4a35a' : '#777' }} />
           <span
             className="text-lg font-bold tabular-nums"
             style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
@@ -213,9 +208,7 @@ function ScoreOverlay({
           >
             {game.player2Score}
           </span>
-          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: p2Won ? '#b33e3e' : '#777' }}>
-            {playerNames.player2}
-          </span>
+          <PlayerNameLink username={playerNames.player2} className="text-[10px] font-bold uppercase tracking-wider" style={{ color: p2Won ? '#b33e3e' : '#777' }} />
         </div>
       </div>
     </PanelFrame>

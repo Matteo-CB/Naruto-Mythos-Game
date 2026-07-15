@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { useState, useMemo, useEffect } from 'react';
 import type { TournamentMatch } from '@/stores/tournamentStore';
 
@@ -128,9 +129,7 @@ export function SwissStandings({
                   >
                     #{i + 1}
                   </span>
-                  <span className="text-xs mt-0.5" style={{ color: '#e0e0e0' }}>
-                    {s.username}
-                  </span>
+                  <PlayerNameLink username={s.username} className="text-xs mt-0.5" style={{ color: '#e0e0e0' }} />
                   <span className="text-[10px] mt-0.5" style={{ color: '#888' }}>
                     {s.wins}-{s.losses}{s.draws > 0 ? `-${s.draws}` : ''}
                   </span>
@@ -229,14 +228,13 @@ export function SwissStandings({
                       {s.rank}
                     </td>
                     <td className="px-3 py-2" style={{ color: '#e0e0e0' }}>
-                      <span
+                      <PlayerNameLink
+                        username={s.username}
                         style={{
                           color: isWinner ? GOLD : '#e0e0e0',
                           fontWeight: isWinner ? 700 : 400,
                         }}
-                      >
-                        {s.username}
-                      </span>
+                      />
                       {s.hadBye && (
                         <span
                           className="ml-2 text-[9px] uppercase tracking-wider"

@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { useDmStore } from '@/stores/dmStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 import { UserSearchDropdown } from '@/components/social/UserSearchDropdown';
 import { FriendRequestsList } from '@/components/social/FriendRequestsList';
@@ -134,12 +135,11 @@ function FriendCard({
 
         <div className="flex flex-col min-w-0 flex-1">
           <div className="flex items-center gap-1.5 max-w-full">
-            <span
+            <PlayerNameLink
+              username={friend.username}
               className="font-display text-sm sm:text-base truncate"
               style={{ color: '#e8e6df', letterSpacing: '0.03em' }}
-            >
-              {friend.username}
-            </span>
+            />
             {friend.isRival && (
               <span
                 className="font-display text-[8px] uppercase px-1.5 py-0.5 tracking-widest shrink-0"

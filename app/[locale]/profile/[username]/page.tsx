@@ -21,6 +21,7 @@ import '@/styles/holo-menu.css';
 import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
 import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
 import { isSealedModeKey, sealedSetFromModeKey } from '@/lib/stats/modeKey';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { getSetName } from '@/lib/data/sets/registry';
 
 type ProfileStatsMode = 'ranked' | 'evolving' | 'casual' | 'sealed' | 'all';
@@ -204,9 +205,12 @@ function GameRow({
         {resultLabel}
       </span>
 
-      <span className="font-display text-sm truncate flex-1 min-w-0" style={{ color: '#e8e6df' }}>
-        {opponent}
-      </span>
+      <PlayerNameLink
+        username={opponent}
+        disabled={game.isAiGame}
+        className="font-display text-sm truncate flex-1 min-w-0"
+        style={{ color: '#e8e6df' }}
+      />
 
       <span className="font-inter-force text-xs tabular-nums shrink-0" style={{ color: '#777' }}>
         {myScore}-{oppScore}

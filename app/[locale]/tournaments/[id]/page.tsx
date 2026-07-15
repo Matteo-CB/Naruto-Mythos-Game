@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { BracketTree } from '@/components/tournament/BracketTree';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { SwissStandings } from '@/components/tournament/SwissStandings';
 import type { SwissStandingEntry } from '@/components/tournament/SwissStandings';
 import { TournamentAdmin } from '@/components/tournament/TournamentAdmin';
@@ -556,7 +557,7 @@ export default function TournamentDetailPage() {
                   {tour.participants.map((p) => (
                     <div key={p.id} className="flex items-center gap-2 px-2 py-1 text-sm" style={{ color: '#e0e0e0' }}>
                       <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#c4a35a' }} />
-                      {p.username}
+                      <PlayerNameLink username={p.username} />
                     </div>
                   ))}
                 </div>

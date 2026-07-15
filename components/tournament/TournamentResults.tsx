@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { Link } from '@/lib/i18n/navigation';
 import type { TournamentData } from '@/stores/tournamentStore';
 import { buildTournamentResultsView, type ResultMatchEntry } from '@/lib/tournament/resultsView';
@@ -68,7 +69,7 @@ export function TournamentResults({ tournament }: Props) {
           className="text-2xl font-bold tracking-wide"
           style={{ color: '#c4a35a', textShadow: '0 0 20px rgba(196, 163, 90, 0.3)' }}
         >
-          {view.champion.username}
+          <PlayerNameLink username={view.champion.username} />
         </motion.span>
       </motion.div>
 
@@ -91,9 +92,7 @@ export function TournamentResults({ tournament }: Props) {
                   <span className="font-display text-sm font-bold tabular-nums" style={{ color: placeColor(entry.place) }}>
                     #{entry.place}
                   </span>
-                  <span className="text-sm" style={{ color: entry.place === 1 ? '#c4a35a' : '#aaa' }}>
-                    {entry.username}
-                  </span>
+                  <PlayerNameLink username={entry.username} className="text-sm" style={{ color: entry.place === 1 ? '#c4a35a' : '#aaa' }} />
                 </div>
               </motion.div>
             ))}

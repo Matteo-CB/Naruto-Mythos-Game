@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import type { TournamentMatch } from '@/stores/tournamentStore';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 
 interface Props {
   match: TournamentMatch;
@@ -69,9 +70,9 @@ export function BracketMatch({ match, index }: Props) {
           fontWeight: match.winnerId === match.player1Id ? 700 : 400,
         }}
       >
-        <span className="truncate max-w-[120px]">
+        <PlayerNameLink username={match.player1Username} className="truncate max-w-[120px]">
           {match.player1Username || (match.isBye ? '' : t('tbd'))}
-        </span>
+        </PlayerNameLink>
         {match.winnerId === match.player1Id && <span style={{ color: '#c4a35a' }}>W</span>}
       </div>
 
@@ -82,9 +83,9 @@ export function BracketMatch({ match, index }: Props) {
           fontWeight: match.winnerId === match.player2Id ? 700 : 400,
         }}
       >
-        <span className="truncate max-w-[120px]">
+        <PlayerNameLink username={match.player2Username} className="truncate max-w-[120px]">
           {match.player2Username || (match.isBye ? t('bye') : t('tbd'))}
-        </span>
+        </PlayerNameLink>
         {match.winnerId === match.player2Id && <span style={{ color: '#c4a35a' }}>W</span>}
       </div>
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { useRouter } from '@/lib/i18n/navigation';
 import { useSocketStore } from '@/lib/socket/client';
 import { useGameStore } from '@/stores/gameStore';
@@ -99,7 +100,7 @@ export function LiveGamesSection({ filter = 'all' }: Props) {
                 style={{ borderBottom: '1px solid #1e1e1e' }}>
                 <div className="flex flex-col gap-0.5">
                   <span className="text-xs font-medium" style={{ color: '#e0e0e0' }}>
-                    {game.player1Name} <span style={{ color: '#555' }}>{t('spectator.vs')}</span> {game.player2Name}
+                    <PlayerNameLink username={game.player1Name} disabled={game.player1Name === '__anonymous__'} /> <span style={{ color: '#555' }}>{t('spectator.vs')}</span> <PlayerNameLink username={game.player2Name} disabled={game.player2Name === '__anonymous__'} />
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="text-[9px]" style={{ color: '#888' }}>

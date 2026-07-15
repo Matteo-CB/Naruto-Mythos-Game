@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { useRouter } from '@/lib/i18n/navigation';
 import { useSocketStore } from '@/lib/socket/client';
 import { useGameStore } from '@/stores/gameStore';
@@ -142,19 +143,23 @@ function LiveGameCard({ game, loading, onSpectate }: { game: LiveGame; loading: 
         onClick={onSpectate}
       >
         <div className="flex items-center justify-between gap-2 min-w-0">
-          <span
+          <PlayerNameLink
+            username={game.player1Name}
+            disabled={anon}
             className="text-[11px] font-medium truncate flex-1"
             style={{ color: '#e8e8e8' }}
           >
             {p1}
-          </span>
+          </PlayerNameLink>
           <span className="text-[9px]" style={{ color: '#444' }}>{t('spectator.vs')}</span>
-          <span
+          <PlayerNameLink
+            username={game.player2Name}
+            disabled={anon}
             className="text-[11px] font-medium truncate flex-1 text-right"
             style={{ color: '#e8e8e8' }}
           >
             {p2}
-          </span>
+          </PlayerNameLink>
         </div>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">

@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useSocketStore } from '@/lib/socket/client';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { useGameScale } from './GameScaleContext';
 import { HoloSurface } from '@/components/HoloSurface';
 
@@ -43,9 +44,9 @@ export function SpectatorBanner() {
 
       {playerNames && (
         <span className="text-[11px] truncate min-w-0 max-w-[50vw] sm:max-w-none" style={{ color: '#e0e0e0' }}>
-          {playerNames.player1}
+          <PlayerNameLink username={playerNames.player1} newTab />
           <span className="mx-1.5 text-[9px]" style={{ color: '#555' }}>{t('vs')}</span>
-          {playerNames.player2}
+          <PlayerNameLink username={playerNames.player2} newTab />
         </span>
       )}
 

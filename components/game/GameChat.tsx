@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { useSocketStore } from '@/lib/socket/client';
 import { useGameStore } from '@/stores/gameStore';
+import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { useGameScale } from './GameScaleContext';
 import { CHAT_EMOTES, CHAT_MAX_LENGTH, CHAT_COOLDOWN_MS } from '@/lib/chat/constants';
 import { Z_APP_MODAL } from '@/lib/ui/zIndex';
@@ -268,7 +269,7 @@ export function GameChat() {
                     color: isSystem ? '#c4a35a' : '#e0e0e0',
                     fontFamily: 'var(--font-display)',
                   }}>
-                    {isSystem ? t('chat.systemTag') : msg.username}
+                    {isSystem ? t('chat.systemTag') : <PlayerNameLink username={msg.username} newTab />}
                   </span>
                   <span style={{ fontSize, color: isSystem ? 'rgba(196,163,90,0.6)' : '#aaa', overflowWrap: 'anywhere' }}>
                     {msg.isEmote ? renderMessage(msg.message) : msg.message}
