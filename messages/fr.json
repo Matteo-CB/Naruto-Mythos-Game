@@ -169,20 +169,15 @@
       "description": "Tous les résultats des tournois communautaires Naruto Mythos TCG : vainqueurs, classements finaux et historique des éditions passées du simulateur en ligne.",
       "ogAlt": "Naruto Mythos TCG, résultats de tournois"
     },
-    "topdeck": {
-      "title": "Tournois officiels en boutique | Naruto Mythos TCG",
-      "description": "Suivez les vrais tournois du jeu de cartes Naruto Mythos joués en boutique dans le monde entier : événements à venir, résultats, classements et decklists. Données fournies par TopDeck.gg.",
-      "ogAlt": "Naruto Mythos TCG, tournois en boutique"
-    },
-    "topdeckPlayers": {
-      "title": "Joueurs des tournois en boutique | Naruto Mythos TCG",
-      "description": "Recherchez un joueur des tournois réels Naruto Mythos et consultez son historique : tournois joués, classements et statistiques agrégées. Données fournies par TopDeck.gg.",
-      "ogAlt": "Naruto Mythos TCG, joueurs de tournois"
-    },
     "helpUs": {
       "title": "Soutenir le projet | Naruto Mythos TCG",
       "description": "Soutenez le développement du simulateur gratuit Naruto Mythos TCG : un projet de fans, sans publicité, maintenu bénévolement. Découvrez comment aider le projet à grandir.",
       "ogAlt": "Naruto Mythos TCG, soutenir le projet"
+    },
+    "worldcup": {
+      "title": "Coupe du monde : classement des pays | Naruto Mythos TCG",
+      "description": "La Coupe du monde Naruto Mythos TCG : un classement des pays construit sur les parties classées des 7 derniers jours. Score équitable qui équilibre petites et grandes communautés, taux de victoire, meilleurs joueurs par pays et groupe de cartes le plus joué de chaque nation.",
+      "ogAlt": "Classement des pays de la Coupe du monde Naruto Mythos TCG"
     }
   },
   "cardMeta": {
@@ -601,7 +596,8 @@
     "battlepassBadgeTooltip": "{count} carte(s) à réclamer",
     "quests": "Quêtes",
     "questsBadgeTooltip": "{count} récompense(s) à réclamer",
-    "socialBadgeTooltip": "{count} messages ou demandes en attente"
+    "socialBadgeTooltip": "{count} messages ou demandes en attente",
+    "worldcup": "Coupe du monde"
   },
   "settings": {
     "title": "Options",
@@ -2284,11 +2280,7 @@
     "dataDuration": "Durée de conservation",
     "dataDurationText": "Vos données sont conservées tant que votre compte est actif. Les replays de parties sont supprimés automatiquement après 7 jours. Vous pouvez demander la suppression de votre compte et de toutes vos données à tout moment.",
     "dataSharing": "Partage des données",
-    "dataSharingText": "Nous ne vendons, ne louons ni ne partageons vos données personnelles avec des tiers à des fins commerciales. Les seuls partages effectués sont :\n- IONOS (hébergement du serveur VPS)\n- MongoDB Atlas (stockage des données)\n- Discord (si vous liez votre compte, uniquement votre identifiant Discord)\n- TopDeck.gg (uniquement pour interroger leurs API publiques afin d'afficher les tournois ; aucune donnée personnelle ne leur est transmise)",
-    "topdeckData": "Données TopDeck.gg",
-    "topdeckDataText": "L'onglet TopDeck affiche des tournois et événements Naruto Mythos issus de la plateforme tierce TopDeck.gg. Ces données sont :\n- Récupérées via l'API publique TopDeck.gg (tournois terminés avec classements) et son Event Hub (événements à venir).\n- Mises en cache sur notre serveur pour limiter les appels à TopDeck.gg.\n- Affichées avec la mention obligatoire « Données fournies par TopDeck.gg » et un lien vers la page d'origine pour l'inscription ou la consultation des résultats.\nTopDeck.gg est responsable de l'exactitude de ses propres données. Pour toute question concernant un tournoi affiché, merci de contacter directement TopDeck.gg ou l'organisateur de l'événement.",
-    "geolocation": "Géolocalisation",
-    "geolocationText": "Sur la page TopDeck, l'application demande votre position géographique (via l'API standard de votre navigateur) afin de trier les événements par distance. Cette autorisation est strictement facultative :\n- Vous pouvez accepter ou refuser à tout moment ; le refus n'empêche pas l'utilisation du site, les événements seront simplement triés par date.\n- Votre position est envoyée à notre serveur uniquement le temps d'une requête, pour calculer les distances, et n'est jamais conservée ni partagée avec un tiers.\n- L'autorisation est gérée par votre navigateur ; pour la révoquer, utilisez les paramètres de votre navigateur.",
+    "dataSharingText": "Nous ne vendons, ne louons ni ne partageons vos données personnelles avec des tiers à des fins commerciales. Le seul partage concerne :\n- IONOS (hébergement du serveur VPS)\n- MongoDB Atlas (stockage des données)\n- Discord (si vous liez votre compte, uniquement votre identifiant Discord)",
     "cookies": "Cookies",
     "cookiesText": "Ce site utilise uniquement des cookies techniques essentiels au fonctionnement du service (session d'authentification). Aucun cookie publicitaire ou de suivi n'est utilisé.",
     "userRights": "Vos droits",
@@ -2585,105 +2577,6 @@
     "holo": "HOLO",
     "cardBack": "Dos de carte",
     "boosterPack": "Paquet Booster"
-  },
-  "topdeck": {
-    "title": "TopDeck",
-    "subtitle": "Les tournois de jeux de cartes du monde entier",
-    "searchPlaceholder": "Rechercher un tournoi, une ville...",
-    "status": {
-      "all": "Tous",
-      "upcoming": "À venir",
-      "ongoing": "En cours",
-      "completed": "Terminés",
-      "unknown": "Inconnu"
-    },
-    "filters": {
-      "game": "Jeu",
-      "format": "Format",
-      "country": "Pays",
-      "allGames": "Tous les jeux",
-      "allFormats": "Tous les formats",
-      "allCountries": "Tous les pays",
-      "minParticipants": "Joueurs min.",
-      "more": "Plus de filtres",
-      "fewer": "Moins de filtres",
-      "clear": "Effacer les filtres"
-    },
-    "sort": {
-      "label": "Trier",
-      "recent": "Plus récents",
-      "oldest": "Plus anciens",
-      "biggest": "Plus grands"
-    },
-    "card": {
-      "players": "joueurs",
-      "topCut": "Top {count}",
-      "swiss": "{count} rondes",
-      "register": "S'inscrire sur TopDeck",
-      "viewDetails": "Voir les détails",
-      "noLocation": "Lieu non précisé",
-      "date": "Date"
-    },
-    "count": "{count} tournoi",
-    "countPlural": "{count} tournois",
-    "empty": {
-      "title": "Aucun tournoi trouvé",
-      "hint": "Essayez d'élargir vos filtres ou de chercher un autre jeu."
-    },
-    "loadError": "Impossible de charger les tournois. Veuillez réessayer.",
-    "detail": {
-      "standings": "Classement",
-      "pairings": "Appariements",
-      "decklists": "Decklists",
-      "rank": "Rang",
-      "player": "Joueur",
-      "points": "Points",
-      "winRate": "Taux de victoire",
-      "oppWinRate": "Taux adverse",
-      "round": "Ronde {n}",
-      "table": "Table",
-      "topCut": "Top cut",
-      "swiss": "Suisse",
-      "winner": "Vainqueur",
-      "draw": "Égalité",
-      "pending": "En cours",
-      "noStandings": "Le classement n'est pas encore disponible pour ce tournoi.",
-      "noPairings": "Les appariements ne sont pas disponibles pour ce tournoi.",
-      "noDecklists": "Aucune decklist n'a été partagée pour ce tournoi.",
-      "viewDecklist": "Voir la decklist",
-      "searchPlayer": "Rechercher un joueur...",
-      "bracket": "Phase finale",
-      "cards": "{count} cartes",
-      "registerOnTopdeck": "S'inscrire sur TopDeck",
-      "viewOnTopdeck": "Voir sur TopDeck",
-      "notFound": "Ce tournoi n'est pas encore dans notre index.",
-      "backToList": "Tous les tournois"
-    },
-    "players": {
-      "title": "Joueurs",
-      "navLink": "Joueurs",
-      "searchPlaceholder": "Rechercher un joueur par nom...",
-      "hint": "Tapez au moins 2 caractères pour chercher.",
-      "tournamentsPlayed": "Tournois",
-      "bestFinish": "Meilleur classement",
-      "wins": "Victoires",
-      "top8s": "Top 8",
-      "avgWinRate": "Taux de victoire moyen",
-      "history": "Historique",
-      "noResults": "Aucun joueur trouvé.",
-      "notFound": "Ce joueur n'est pas encore dans notre index.",
-      "backToPlayers": "Recherche de joueurs"
-    },
-    "proximity": {
-      "enable": "Trier près de moi",
-      "sortedNear": "Triés par distance, puis par date",
-      "sortedDate": "Triés par date",
-      "locating": "Localisation...",
-      "radius": "Rayon",
-      "radiusAll": "Tous",
-      "radiusKm": "{km} km"
-    },
-    "attribution": "Données fournies par TopDeck.gg"
   },
   "tournament": {
     "title": "Tournois",
@@ -3628,5 +3521,27 @@
       "closed": "Ce sondage est clôturé.",
       "alreadyVoted": "Tu as déjà voté à ce sondage."
     }
+  },
+  "worldcup": {
+    "title": "Coupe du monde",
+    "subtitle": "Classement des pays selon les parties classées des {days} derniers jours",
+    "totalCountries": "Pays",
+    "totalPlayers": "Joueurs",
+    "totalGames": "Parties",
+    "scoreLabel": "Score équitable",
+    "colCountry": "Pays",
+    "colWinRate": "Taux de victoire",
+    "colRecord": "V / D",
+    "colPlayers": "Joueurs",
+    "recordLine": "{wins}V - {losses}D",
+    "detailGames": "Parties",
+    "detailAvgElo": "ELO moyen",
+    "detailTopGroup": "Groupe le plus joué",
+    "topPlayersTitle": "Meilleurs joueurs du pays",
+    "methodTitle": "Comment fonctionne le classement",
+    "methodText": "Le score équitable part du taux de victoire du pays sur les 7 derniers jours et le ramène vers 50% quand le pays a peu de parties. Un pays avec peu de joueurs doit vraiment dominer pour monter, et un grand pays ne gagne aucun avantage par son seul volume. Les égalités se départagent au nombre de parties.",
+    "flagNote": "Seuls les joueurs ayant choisi un drapeau dans leurs options sont comptés pour leur pays.",
+    "emptyTitle": "Aucune partie pour le moment",
+    "emptyText": "Aucune partie classée n'a été jouée ces 7 derniers jours. Jouez des parties classées avec un drapeau choisi dans vos options pour placer votre pays au classement."
   }
 }

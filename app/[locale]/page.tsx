@@ -285,11 +285,10 @@ export default function Home() {
               })}
 
               <HomeMenuButton
-                href="/topdeck"
-                label="TopDeck"
+                href="/worldcup"
+                label={t('worldcup')}
                 variant="muted"
                 delay={1.26}
-                image={{ src: '/images/topdeck-logo.webp', height: 22 }}
               />
 
               <HomeMenuButton

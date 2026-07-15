@@ -137,14 +137,6 @@ export default function LegalPage() {
             <TextBlock text={t('dataSharingText')} />
           </Section>
 
-          <Section title={t('topdeckData')}>
-            <TextBlock text={t('topdeckDataText')} />
-          </Section>
-
-          <Section title={t('geolocation')}>
-            <TextBlock text={t('geolocationText')} />
-          </Section>
-
           <Section title={t('cookies')}>
             <TextBlock text={t('cookiesText')} />
           </Section>

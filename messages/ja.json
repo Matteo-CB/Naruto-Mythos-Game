@@ -169,20 +169,15 @@
       "description": "Naruto Mythos TCGコミュニティトーナメントの全結果：優勝者、最終順位、オンラインシミュレーターの過去大会の履歴。",
       "ogAlt": "Naruto Mythos TCG、トーナメント結果"
     },
-    "topdeck": {
-      "title": "公式店舗トーナメント | Naruto Mythos TCG",
-      "description": "世界中の店舗でプレイされているナルト ミトス カードゲームのリアル大会を追いかけよう：今後のイベント、結果、順位、デッキリスト。データ提供：TopDeck.gg。",
-      "ogAlt": "Naruto Mythos TCG、店舗トーナメント"
-    },
-    "topdeckPlayers": {
-      "title": "店舗トーナメントのプレイヤー | Naruto Mythos TCG",
-      "description": "ナルト ミトスのリアル大会のプレイヤーを検索して履歴を見よう：参加大会、順位、集計統計。データ提供：TopDeck.gg。",
-      "ogAlt": "Naruto Mythos TCG、大会プレイヤー"
-    },
     "helpUs": {
       "title": "プロジェクトを支援 | Naruto Mythos TCG",
       "description": "無料のNaruto Mythos TCGシミュレーターの開発を支援しよう：広告なし、ボランティアで運営されるファンプロジェクト。プロジェクトの成長を助ける方法を見てみよう。",
       "ogAlt": "Naruto Mythos TCG、プロジェクト支援"
+    },
+    "worldcup": {
+      "title": "ワールドカップ:国別ランキング | Naruto Mythos TCG",
+      "description": "Naruto Mythos TCGのワールドカップ:過去7日間のランク戦にもとづく国別ランキング。小さなコミュニティと大きなコミュニティを公平に比較するフェアスコア、勝率、国ごとのトッププレイヤー、各国で最も使われた勢力を表示します。",
+      "ogAlt": "Naruto Mythos TCG ワールドカップ国別ランキング"
     }
   },
   "cardMeta": {
@@ -599,7 +594,8 @@
     "battlepassBadgeTooltip": "受け取り可能なカード {count} 枚",
     "quests": "クエスト",
     "questsBadgeTooltip": "受け取り可能な報酬 {count} 件",
-    "socialBadgeTooltip": "未読メッセージ・申請 {count}件"
+    "socialBadgeTooltip": "未読メッセージ・申請 {count}件",
+    "worldcup": "ワールドカップ"
   },
   "settings": {
     "title": "オプション",
@@ -2282,11 +2278,7 @@
     "dataDuration": "データの保存期間",
     "dataDurationText": "あなたのデータはアカウントが有効な間、保存されます。対戦リプレイは7日後に自動削除されます。いつでもアカウントと全データの削除を請求できます。",
     "dataSharing": "データの共有",
-    "dataSharingText": "私たちは、商業目的であなたの個人データを第三者に販売・貸与・共有しません。唯一の共有先は以下です：\n- IONOS（VPSサーバーのホスティング）\n- MongoDB Atlas（データ保存）\n- Discord（連携した場合、Discord IDのみ）\n- TopDeck.gg（トーナメント表示のため公開APIを照会するのみ、個人データは送信しません）",
-    "topdeckData": "TopDeck.gg のデータ",
-    "topdeckDataText": "TopDeckタブは、外部プラットフォームTopDeck.ggから取得したナルト ミトスのトーナメントとイベントを表示します。このデータは：\n- TopDeck.ggの公開API（結果付きの終了トーナメント）とEvent Hub（今後のイベント）から取得されます。\n- TopDeck.ggへのリクエストを最小限にするため、当社サーバーでキャッシュされます。\n- 必須のクレジット「Data provided by TopDeck.gg」と、登録や詳細のための元ページへのリンクとともに表示されます。\nTopDeck.ggは自社データの正確性について責任を負います。特定のトーナメントに関する質問は、TopDeck.ggまたはイベント主催者に直接お問い合わせください。",
-    "geolocation": "位置情報",
-    "geolocationText": "TopDeckページでは、イベントを距離順に並べるため、アプリが（標準のブラウザAPIを介して）位置情報を要求します。この許可は完全に任意です：\n- いつでも許可・拒否できます。拒否してもサイトの利用は妨げられず、イベントは日付順に並びます。\n- あなたの位置は、距離計算のためリクエストの間だけ当社サーバーに送信され、保存も第三者との共有もされません。\n- 許可はブラウザが管理します。取り消すにはブラウザ設定を使用してください。",
+    "dataSharingText": "当サイトは、商業目的で個人データを第三者に販売、貸与、共有することはありません。共有先は以下のみです。\n- IONOS(VPSサーバーのホスティング)\n- MongoDB Atlas(データの保存)\n- Discord(アカウントを連携した場合、DiscordのIDのみ)",
     "cookies": "クッキー",
     "cookiesText": "本サイトは、サービスの動作に必要な必須の技術的クッキー（認証セッション）のみを使用します。広告や追跡のクッキーは使用しません。",
     "userRights": "あなたの権利",
@@ -2583,105 +2575,6 @@
     "holo": "ホロ",
     "cardBack": "カードの裏面",
     "boosterPack": "ブースターパック"
-  },
-  "topdeck": {
-    "title": "TopDeck",
-    "subtitle": "世界中のカードゲームトーナメント",
-    "searchPlaceholder": "トーナメント、都市を検索...",
-    "status": {
-      "all": "すべて",
-      "upcoming": "予定",
-      "ongoing": "進行中",
-      "completed": "終了",
-      "unknown": "不明"
-    },
-    "filters": {
-      "game": "ゲーム",
-      "format": "フォーマット",
-      "country": "国",
-      "allGames": "すべてのゲーム",
-      "allFormats": "すべてのフォーマット",
-      "allCountries": "すべての国",
-      "minParticipants": "最少プレイヤー数",
-      "more": "絞り込みを追加",
-      "fewer": "絞り込みを減らす",
-      "clear": "絞り込みをクリア"
-    },
-    "sort": {
-      "label": "並べ替え",
-      "recent": "新しい順",
-      "oldest": "古い順",
-      "biggest": "規模が大きい順"
-    },
-    "card": {
-      "players": "人",
-      "topCut": "トップ {count}",
-      "swiss": "{count} ラウンド",
-      "register": "TopDeckで登録",
-      "viewDetails": "詳細を見る",
-      "noLocation": "場所未指定",
-      "date": "日付"
-    },
-    "count": "{count} トーナメント",
-    "countPlural": "{count} トーナメント",
-    "empty": {
-      "title": "トーナメントが見つかりません",
-      "hint": "絞り込みを広げるか、別のゲームで検索してみてください。"
-    },
-    "loadError": "トーナメントを読み込めませんでした。もう一度お試しください。",
-    "detail": {
-      "standings": "順位",
-      "pairings": "対戦組み合わせ",
-      "decklists": "デッキリスト",
-      "rank": "順位",
-      "player": "プレイヤー",
-      "points": "ポイント",
-      "winRate": "勝率",
-      "oppWinRate": "相手の勝率",
-      "round": "ラウンド {n}",
-      "table": "卓",
-      "topCut": "決勝トーナメント",
-      "swiss": "スイス",
-      "winner": "勝者",
-      "draw": "引き分け",
-      "pending": "進行中",
-      "noStandings": "このトーナメントの順位はまだありません。",
-      "noPairings": "このトーナメントの対戦組み合わせはありません。",
-      "noDecklists": "このトーナメントで共有されたデッキリストはありません。",
-      "viewDecklist": "デッキリストを見る",
-      "searchPlayer": "プレイヤーを検索...",
-      "bracket": "トーナメント表",
-      "cards": "{count} 枚",
-      "registerOnTopdeck": "TopDeckで登録",
-      "viewOnTopdeck": "TopDeckで見る",
-      "notFound": "このトーナメントはまだ当社のインデックスにありません。",
-      "backToList": "すべてのトーナメント"
-    },
-    "players": {
-      "title": "プレイヤー",
-      "navLink": "プレイヤー",
-      "searchPlaceholder": "名前でプレイヤーを検索...",
-      "hint": "検索するには2文字以上入力してください。",
-      "tournamentsPlayed": "トーナメント",
-      "bestFinish": "最高成績",
-      "wins": "勝ち",
-      "top8s": "トップ8",
-      "avgWinRate": "平均勝率",
-      "history": "履歴",
-      "noResults": "プレイヤーが見つかりません。",
-      "notFound": "このプレイヤーはまだ当社のインデックスにありません。",
-      "backToPlayers": "プレイヤー検索"
-    },
-    "proximity": {
-      "enable": "近くで並べ替え",
-      "sortedNear": "距離順、次に日付順",
-      "sortedDate": "日付順",
-      "locating": "位置を取得中...",
-      "radius": "半径",
-      "radiusAll": "すべて",
-      "radiusKm": "{km} km"
-    },
-    "attribution": "Data provided by TopDeck.gg"
   },
   "tournament": {
     "title": "トーナメント",
@@ -3626,5 +3519,27 @@
       "closed": "このアンケートは終了しました。",
       "alreadyVoted": "このアンケートには既に投票済みです。"
     }
+  },
+  "worldcup": {
+    "title": "ワールドカップ",
+    "subtitle": "過去{days}日間のランク戦にもとづく国別ランキング",
+    "totalCountries": "国",
+    "totalPlayers": "プレイヤー",
+    "totalGames": "試合",
+    "scoreLabel": "フェアスコア",
+    "colCountry": "国",
+    "colWinRate": "勝率",
+    "colRecord": "勝 / 敗",
+    "colPlayers": "プレイヤー",
+    "recordLine": "{wins}勝{losses}敗",
+    "detailGames": "試合数",
+    "detailAvgElo": "平均ELO",
+    "detailTopGroup": "最も使われた勢力",
+    "topPlayersTitle": "この国のトッププレイヤー",
+    "methodTitle": "ランキングの仕組み",
+    "methodText": "フェアスコアは過去7日間の国の勝率をもとに、試合数が少ない国ほど50%に近づけて補正します。プレイヤーが少ない国は本当に勝ち続けないと上位に入れず、大きな国も数だけでは有利になりません。同点の場合は試合数で順位が決まります。",
+    "flagNote": "オプションで国旗を選んだプレイヤーのみが自国のスコアに反映されます。",
+    "emptyTitle": "まだ試合がありません",
+    "emptyText": "過去7日間にランク戦が行われていません。オプションで国旗を選んでランク戦をプレイすると、自分の国がランキングに登場します。"
   }
 }

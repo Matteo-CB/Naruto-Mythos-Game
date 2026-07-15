@@ -3,7 +3,7 @@ import { buildPageMetadata } from '@/lib/seo/pageMetadata';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  return buildPageMetadata(locale, '/topdeck/players', 'topdeckPlayers');
+  return buildPageMetadata(locale, '/worldcup', 'worldcup');
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {

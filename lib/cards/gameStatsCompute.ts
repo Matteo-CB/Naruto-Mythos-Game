@@ -32,19 +32,36 @@ interface SavedGamePayload {
 
 let groupById: Map<string, string> | null = null;
 let groupByNameTitle: Map<string, string> | null = null;
+let factionById: Map<string, string> | null = null;
 
-function ensureMaps(): { byId: Map<string, string>; byNameTitle: Map<string, string> } {
-  if (!groupById || !groupByNameTitle) {
+function ensureMaps(): { byId: Map<string, string>; byNameTitle: Map<string, string>; factions: Map<string, string> } {
+  if (!groupById || !groupByNameTitle || !factionById) {
     groupById = new Map();
     groupByNameTitle = new Map();
+    factionById = new Map();
     for (const c of getAllCards()) {
       const g = usageGroupKey(c);
       groupById.set(c.id, g);
       const key = `${c.name_fr.toUpperCase()}|${(c.title_fr ?? '').toUpperCase()}`;
       if (!groupByNameTitle.has(key)) groupByNameTitle.set(key, g);
+      const faction = (c as unknown as Record<string, unknown>).group;
+      if (typeof faction === 'string' && faction) factionById.set(c.id, faction);
     }
   }
-  return { byId: groupById, byNameTitle: groupByNameTitle };
+  return { byId: groupById, byNameTitle: groupByNameTitle, factions: factionById };
+}
+
+export function extractFactionCounts(
+  payload: SavedGamePayload,
+  side: 'player1' | 'player2',
+): Map<string, number> {
+  const { factions } = ensureMaps();
+  const counts = new Map<string, number>();
+  for (const card of playerDeckCards(payload.initialState?.[side])) {
+    const f = factions.get(card.id);
+    if (f) counts.set(f, (counts.get(f) ?? 0) + 1);
+  }
+  return counts;
 }
 
 function bump(map: Map<string, GroupCounters>, group: string): GroupCounters {
@@ -107,9 +124,20 @@ export function extractGameCounters(
   }
 }
 
+const COUNTRY_STAT_RETENTION_DAYS = 10;
+
+function dayKey(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
 export async function accumulateCardGameStats(): Promise<{ processed: number }> {
   const cursor = await prisma.cardStatsCursor.findUnique({ where: { key: 'singleton' } });
   const since = cursor?.lastGameAt ?? new Date(0);
+
+  const pruneBefore = dayKey(new Date(Date.now() - COUNTRY_STAT_RETENTION_DAYS * 86400000));
+  try {
+    await prisma.countryGroupStat.deleteMany({ where: { day: { lt: pruneBefore } } });
+  } catch { /* pruning is best-effort */ }
 
   let processed = 0;
   let lastAt = since;
@@ -134,7 +162,24 @@ export async function accumulateCardGameStats(): Promise<{ processed: number }> 
     });
     if (games.length === 0) break;
 
+    const playerIds = new Set<string>();
+    for (const game of games) {
+      if (game.player1Id) playerIds.add(game.player1Id);
+      if (game.player2Id) playerIds.add(game.player2Id);
+    }
+    const countryByUser = new Map<string, string>();
+    if (playerIds.size > 0) {
+      const players = await prisma.user.findMany({
+        where: { id: { in: [...playerIds] } },
+        select: { id: true, countryCode: true },
+      });
+      for (const p of players) {
+        if (p.countryCode) countryByUser.set(p.id, p.countryCode);
+      }
+    }
+
     const counters = new Map<string, GroupCounters>();
+    const countryCounters = new Map<string, number>();
     let sinceYield = 0;
     for (const game of games) {
       const payload = game.gameState as unknown as SavedGamePayload | null;
@@ -144,6 +189,18 @@ export async function accumulateCardGameStats(): Promise<{ processed: number }> 
         : null;
       try {
         extractGameCounters(payload, winnerSide, counters);
+        const day = game.completedAt ? dayKey(game.completedAt) : null;
+        if (day) {
+          for (const side of ['player1', 'player2'] as const) {
+            const uid = side === 'player1' ? game.player1Id : game.player2Id;
+            const cc = uid ? countryByUser.get(uid) : undefined;
+            if (!cc) continue;
+            for (const [faction, n] of extractFactionCounts(payload, side)) {
+              const key = `${cc}|${faction}|${day}`;
+              countryCounters.set(key, (countryCounters.get(key) ?? 0) + n);
+            }
+          }
+        }
       } catch { /* skip malformed games */ }
       if (++sinceYield >= YIELD_EVERY_GAMES) {
         sinceYield = 0;
@@ -164,6 +221,15 @@ export async function accumulateCardGameStats(): Promise<{ processed: number }> 
           copiesSum: { increment: c.copiesSum },
           copyDecks: { increment: c.copyDecks },
         },
+      });
+    }
+
+    for (const [key, n] of countryCounters) {
+      const [countryCode, group, day] = key.split('|');
+      await prisma.countryGroupStat.upsert({
+        where: { countryCode_group_day: { countryCode, group, day } },
+        create: { countryCode, group, day, count: n },
+        update: { count: { increment: n } },
       });
     }
 

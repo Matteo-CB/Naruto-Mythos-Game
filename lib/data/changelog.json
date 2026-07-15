@@ -2,11 +2,15 @@
   "entries": [
     {
       "date": "2026-07-15",
-      "title_fr": "Animations encore plus fluides et pose plus directe",
-      "title_en": "Even smoother animations and a more direct card play",
-      "title_es": "Animaciones aún más fluidas y jugada más directa",
-      "title_ja": "アニメーションをさらに滑らかに、カードプレイをより直線的に",
+      "title_fr": "Coupe du monde, nouvelles statistiques et animations plus fluides",
+      "title_en": "World Cup, new statistics and smoother animations",
+      "title_es": "Copa del mundo, nuevas estadísticas y animaciones más fluidas",
+      "title_ja": "ワールドカップ、新しい統計、より滑らかなアニメーション",
       "changes_fr": [
+        "Nouvelle page Coupe du monde : un classement des pays basé sur les parties classées des 7 derniers jours, avec un score équitable quel que soit le nombre de joueurs.",
+        "La Coupe du monde affiche pour chaque pays son podium, ses meilleurs joueurs, son taux de victoire et son groupe de cartes le plus joué.",
+        "La page TopDeck est retirée du site.",
+        "La page Options s'adapte mieux aux grands écrans, avec un grand aperçu du décor de jeu sélectionné.",
         "Les animations consomment encore moins de ressources, notamment sur tablette et mobile.",
         "La carte vole de la main au plateau en ligne quasi droite, plus vite qu'avant.",
         "L'IA réfléchit maintenant en arrière-plan : l'écran ne se fige plus pendant son tour.",
@@ -18,6 +22,10 @@
         "Les pseudos des joueurs sont cliquables partout (historique, tournois, salons, chat, spectateurs, replays, amis) et ouvrent le profil, dans un nouvel onglet pendant une partie."
       ],
       "changes_en": [
+        "New World Cup page: a country ranking based on ranked games from the last 7 days, with a fair score no matter how many players a country has.",
+        "The World Cup shows each country's podium, top players, win rate and most played card group.",
+        "The TopDeck page has been removed from the site.",
+        "The Options page adapts better to large screens, with a big preview of the selected game background.",
         "Animations use even fewer resources, especially on tablets and phones.",
         "The card flies from hand to board in a nearly straight line, faster than before.",
         "The AI now thinks in the background: the screen no longer freezes during its turn.",
@@ -29,6 +37,10 @@
         "Player names are clickable everywhere (history, tournaments, rooms, chat, spectators, replays, friends) and open the profile, in a new tab during a game."
       ],
       "changes_es": [
+        "Nueva página Copa del mundo: una clasificación de países basada en las partidas clasificatorias de los últimos 7 días, con una puntuación justa sin importar cuántos jugadores tenga un país.",
+        "La Copa del mundo muestra el podio de cada país, sus mejores jugadores, su tasa de victorias y su grupo de cartas más jugado.",
+        "La página TopDeck se ha retirado del sitio.",
+        "La página Opciones se adapta mejor a pantallas grandes, con una gran vista previa del fondo de juego seleccionado.",
         "Las animaciones consumen aún menos recursos, sobre todo en tabletas y móviles.",
         "La carta vuela de la mano al tablero en línea casi recta, más rápido que antes.",
         "La IA ahora piensa en segundo plano: la pantalla ya no se congela durante su turno.",
@@ -40,6 +52,10 @@
         "Los nombres de los jugadores se pueden pulsar en todas partes (historial, torneos, salas, chat, espectadores, repeticiones, amigos) y abren el perfil, en una pestaña nueva durante una partida."
       ],
       "changes_ja": [
+        "新ページ「ワールドカップ」が登場:過去7日間のランク戦にもとづく国別ランキングで、人数の少ない国も公平に競えるフェアスコアを採用しています。",
+        "ワールドカップでは各国の表彰台、トッププレイヤー、勝率、最も使われた勢力を確認できます。",
+        "TopDeckのページはサイトから削除されました。",
+        "オプション画面が大画面により適したレイアウトになり、選択中の対戦背景を大きくプレビューできます。",
         "アニメーションの負荷がさらに軽くなりました。特にタブレットとスマホで効果があります。",
         "カードは手札から盤面へほぼ一直線に、以前より速く飛ぶようになりました。",
         "AIはバックグラウンドで思考するようになり、AIのターン中に画面が固まらなくなりました。",

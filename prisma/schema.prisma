@@ -635,61 +635,15 @@ model TradeLog {
   @@index([receiverId, executedAt])
 }
 
-model TopdeckTournament {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
-  tid             String    @unique
-  name            String
-  game            String
-  format          String
-  startDate       DateTime?
-  endDate         DateTime?
-  status          String
-  city            String?
-  state           String?
-  country         String?
-  locationName    String?
-  location        Json?
-  participants    Int       @default(0)
-  topCut          Int?
-  swissNum        Int?
-  standings       Json?
-  rounds          Json?
-  hasDetail       Boolean   @default(false)
-  raw             Json?
-  fetchedAt       DateTime
-  detailFetchedAt DateTime?
+model CountryGroupStat {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  countryCode String
+  group       String
+  day         String
+  count       Int    @default(0)
 
-  @@index([status, startDate])
-  @@index([game, format, startDate])
-  @@index([city])
-  @@index([state])
-  @@index([country])
-}
-
-model TopdeckPollerState {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  key         String   @unique
-  value       Json
-  heartbeatAt DateTime
-}
-
-model TopdeckPlayerResult {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  playerKey      String
-  playerName     String
-  playerId       String?
-  tid            String
-  tournamentName String
-  game           String
-  format         String
-  startDate      DateTime?
-  standing       Int?
-  points         Float?
-  winRate        Float?
-
-  @@unique([tid, playerKey])
-  @@index([playerKey])
-  @@index([playerName])
+  @@unique([countryCode, group, day])
+  @@index([day])
 }
 
 model CardUsageStat {

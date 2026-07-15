@@ -8,6 +8,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { FlagPicker } from '@/components/FlagPicker';
 import { ChatSettingsSection } from '@/components/settings/ChatSettingsSection';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useCallback } from 'react';
 
 const DELETE_ACCOUNT_PHRASE = 'DELETE MY ACCOUNT';
@@ -36,7 +37,7 @@ export default function SettingsPage() {
   const locale = useLocale();
   const tMeta = useTranslations('_meta');
   const {
-    animationsEnabled, gameBackground, isLoaded, availableBackgrounds,
+    animationsEnabled, gameBackground, gameBackgroundUrl, isLoaded, availableBackgrounds,
     fetchFromServer, setAnimationsEnabled, setGameBackground,
     hideDeckBuilderVariants, setHideDeckBuilderVariants,
     fastAnimations, setFastAnimations,
@@ -177,17 +178,19 @@ export default function SettingsPage() {
       <DecorativeIcons animated={animationsEnabled} />
 
       <div
-        className="relative z-10 w-full max-w-md px-4 py-8"
+        className="relative z-10 w-full max-w-md px-4 py-8 lg:max-w-6xl lg:px-8"
         style={{ zIndex: 1 }}
       >
-        
+
         <h1
-          className="mb-8 text-center text-base font-semibold uppercase tracking-[0.25em]"
+          className="mb-8 text-center text-base font-semibold uppercase tracking-[0.25em] lg:mb-10 lg:text-lg"
           style={{ color: '#c4a35a' }}
         >
           {t('title')}
         </h1>
 
+        <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
+        <div className="min-w-0">
         <div
           className="flex flex-col gap-3 p-5"
           style={{
@@ -444,12 +447,16 @@ export default function SettingsPage() {
             </p>
           </div>
         </div>
+        </div>
 
-        <ChatSettingsSection />
+        <div className="min-w-0 lg:[&>div]:mt-0">
+          <ChatSettingsSection />
+        </div>
+        </div>
 
         {backgrounds.length > 0 && (
           <div
-            className="mt-4 flex flex-col gap-4 p-5"
+            className="mt-4 flex flex-col gap-4 p-5 lg:mt-6 lg:p-6"
             style={{
               backgroundColor: '#111111',
               border: '1px solid #262626',
@@ -462,7 +469,128 @@ export default function SettingsPage() {
               {t('gameBackground')}
             </span>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="hidden lg:grid lg:gap-6" style={{ gridTemplateColumns: 'minmax(0, 1fr) 360px' }}>
+              <div
+                className="relative overflow-hidden"
+                style={{
+                  aspectRatio: '16/9',
+                  backgroundColor: '#0a0a0a',
+                  boxShadow: '0 24px 60px rgba(0,0,0,0.55), 0 0 48px rgba(196,163,90,0.10)',
+                }}
+              >
+                <AnimatePresence>
+                  {gameBackground === 'random' ? (
+                    <motion.div
+                      key="preview-random"
+                      className="absolute inset-0 flex flex-col items-center justify-center gap-3"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.35 }}
+                      style={{ backgroundColor: 'rgba(196, 163, 90, 0.05)' }}
+                    >
+                      <span
+                        className="text-6xl font-bold"
+                        style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", letterSpacing: '0.1em' }}
+                      >
+                        ?
+                      </span>
+                      <span className="text-xs font-bold uppercase tracking-[0.35em]" style={{ color: '#c4a35a' }}>
+                        {t('gameBackgroundRandom')}
+                      </span>
+                    </motion.div>
+                  ) : (
+                    <motion.img
+                      key={`preview-${gameBackground}`}
+                      src={backgrounds.find((bg) => bg.id === gameBackground)?.url ?? gameBackgroundUrl}
+                      alt={backgrounds.find((bg) => bg.id === gameBackground)?.name ?? t('gameBackground')}
+                      className="absolute inset-0 h-full w-full object-cover"
+                      initial={{ opacity: 0, scale: 1.04 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.45, ease: 'easeOut' }}
+                      draggable={false}
+                    />
+                  )}
+                </AnimatePresence>
+                {gameBackground !== 'random' && (
+                  <div
+                    className="absolute inset-x-0 bottom-0 flex items-center justify-between px-5 py-3"
+                    style={{ backgroundColor: 'rgba(10, 10, 10, 0.72)' }}
+                  >
+                    <span className="text-xs font-bold uppercase tracking-[0.25em]" style={{ color: '#c4a35a' }}>
+                      {backgrounds.find((bg) => bg.id === gameBackground)?.name ?? ''}
+                    </span>
+                    <span className="text-[10px] font-medium uppercase tracking-[0.3em]" style={{ color: '#888888' }}>
+                      {t('selected')}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 content-start gap-3 overflow-y-auto pr-1" style={{ maxHeight: 480 }}>
+                <button
+                  type="button"
+                  disabled={!isLoaded}
+                  onClick={() => setGameBackground('random', '')}
+                  className="relative flex items-center justify-center overflow-hidden transition-all"
+                  style={{
+                    aspectRatio: '16/9',
+                    backgroundColor: 'rgba(196, 163, 90, 0.06)',
+                    boxShadow: gameBackground === 'random' ? '0 0 16px rgba(196, 163, 90, 0.45)' : 'none',
+                    opacity: !isLoaded ? 0.5 : gameBackground === 'random' ? 1 : 0.7,
+                    cursor: isLoaded ? 'pointer' : 'default',
+                  }}
+                  onMouseEnter={(e) => { if (isLoaded) (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+                  onMouseLeave={(e) => { if (isLoaded && gameBackground !== 'random') (e.currentTarget as HTMLElement).style.opacity = '0.7'; }}
+                >
+                  <div className="flex flex-col items-center gap-1">
+                    <span
+                      className="text-xl font-bold"
+                      style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", letterSpacing: '0.1em' }}
+                    >
+                      ?
+                    </span>
+                    <span
+                      className="text-[9px] font-bold uppercase tracking-[0.25em]"
+                      style={{ color: gameBackground === 'random' ? '#c4a35a' : '#888888' }}
+                    >
+                      {t('gameBackgroundRandom')}
+                    </span>
+                  </div>
+                </button>
+                {backgrounds.map((bg) => {
+                  const isSelected = gameBackground === bg.id;
+                  return (
+                    <button
+                      key={`desktop-${bg.id}`}
+                      type="button"
+                      disabled={!isLoaded}
+                      onClick={() => setGameBackground(bg.id, bg.url)}
+                      className="relative overflow-hidden transition-all"
+                      style={{
+                        aspectRatio: '16/9',
+                        boxShadow: isSelected ? '0 0 16px rgba(196, 163, 90, 0.45)' : 'none',
+                        opacity: !isLoaded ? 0.5 : isSelected ? 1 : 0.7,
+                        cursor: isLoaded ? 'pointer' : 'default',
+                      }}
+                      onMouseEnter={(e) => { if (isLoaded) (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+                      onMouseLeave={(e) => { if (isLoaded && !isSelected) (e.currentTarget as HTMLElement).style.opacity = '0.7'; }}
+                    >
+                      <img src={bg.url} alt={bg.name} className="h-full w-full object-cover" loading="lazy" draggable={false} />
+                      {isSelected && (
+                        <div
+                          className="absolute inset-0 pointer-events-none"
+                          style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)' }}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 lg:hidden">
               {(() => {
                 const isRandomSelected = gameBackground === 'random';
                 return (
@@ -552,7 +680,7 @@ export default function SettingsPage() {
         )}
 
         <div
-          className="mt-4 flex flex-col gap-4 p-5"
+          className="mt-4 flex flex-col gap-4 p-5 lg:mt-6 lg:max-w-2xl"
           style={{
             backgroundColor: '#111111',
             }}
