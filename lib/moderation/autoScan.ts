@@ -22,26 +22,29 @@ export interface ScanDecision {
 }
 
 export const REMOVE_THRESHOLDS: Record<string, number> = {
-  'hate': 0.8,
-  'hate/threatening': 0.6,
-  'harassment': 0.9,
-  'harassment/threatening': 0.7,
-  'sexual/minors': 0.5,
-  'self-harm/instructions': 0.6,
-  'violence/graphic': 0.9,
+  'hate': 0.45,
+  'hate/threatening': 0.35,
+  'harassment': 0.8,
+  'harassment/threatening': 0.4,
+  'sexual': 0.8,
+  'sexual/minors': 0.2,
+  'self-harm': 0.75,
+  'self-harm/intent': 0.6,
+  'self-harm/instructions': 0.5,
+  'violence': 0.7,
+  'violence/graphic': 0.8,
+  'illicit/violent': 0.65,
 };
 
 export const FLAG_THRESHOLDS: Record<string, number> = {
-  'hate': 0.5,
-  'hate/threatening': 0.35,
-  'harassment': 0.6,
-  'harassment/threatening': 0.4,
-  'sexual': 0.85,
-  'sexual/minors': 0.25,
-  'self-harm': 0.7,
-  'self-harm/instructions': 0.4,
-  'violence': 0.85,
-  'violence/graphic': 0.7,
+  'hate': 0.22,
+  'hate/threatening': 0.2,
+  'harassment': 0.5,
+  'harassment/threatening': 0.22,
+  'sexual': 0.55,
+  'self-harm': 0.45,
+  'violence': 0.45,
+  'illicit': 0.6,
 };
 
 export function decideScanAction(scores: Record<string, number>): ScanDecision {

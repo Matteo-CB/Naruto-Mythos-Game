@@ -9,6 +9,18 @@ describe('decideScanAction', () => {
     expect(d.topScore).toBe(0.95);
   });
 
+  it('removes a real insult that used to slip through (sale fils de pute ~ 0.84)', () => {
+    const d = decideScanAction({ harassment: 0.84, 'harassment/threatening': 0.0, hate: 0.01 });
+    expect(d.action).toBe('removed');
+    expect(d.topCategory).toBe('harassment');
+  });
+
+  it('removes a racist line via the hate axis (nigger ~ hate 0.57)', () => {
+    const d = decideScanAction({ hate: 0.57, harassment: 0.46 });
+    expect(d.action).toBe('removed');
+    expect(d.topCategory).toBe('hate');
+  });
+
   it('removes threatening harassment above its lower threshold', () => {
     const d = decideScanAction({ 'harassment/threatening': 0.75 });
     expect(d.action).toBe('removed');
