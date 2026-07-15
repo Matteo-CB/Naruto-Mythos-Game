@@ -2127,7 +2127,15 @@
     "statsLosses": "Losses",
     "statsWinrate": "Winrate",
     "playerNotFound": "Player not found.",
-    "statsTitle": "Statistics"
+    "statsTitle": "Statistics",
+    "mode_ranked": "Ranked",
+    "mode_evolving": "Evolving",
+    "mode_casual": "Casual",
+    "mode_sealed": "Sealed",
+    "mode_all": "All modes",
+    "sealedNoGames": "No sealed games recorded yet",
+    "sealedRandomSet": "Random set",
+    "sealedGamesCount": "{count} games"
   },
   "replay": {
     "title": "Match Recap",

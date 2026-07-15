@@ -20,7 +20,57 @@ import Image from 'next/image';
 import '@/styles/holo-menu.css';
 import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
 import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
-import { LeaderboardModeSwitch, type LeaderboardMode } from '@/components/play-online/LeaderboardModeSwitch';
+import { isSealedModeKey, sealedSetFromModeKey } from '@/lib/stats/modeKey';
+import { getSetName } from '@/lib/data/sets/registry';
+
+type ProfileStatsMode = 'ranked' | 'evolving' | 'casual' | 'sealed' | 'all';
+
+const PROFILE_MODES: ProfileStatsMode[] = ['ranked', 'evolving', 'casual', 'sealed', 'all'];
+
+function ProfileModeSwitch({ value, onChange }: { value: ProfileStatsMode; onChange: (m: ProfileStatsMode) => void }) {
+  const t = useTranslations('profile');
+  return (
+    <div
+      className="relative inline-flex items-center flex-wrap"
+      style={{ backgroundColor: 'rgba(8, 8, 14, 0.6)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.05)' }}
+    >
+      {PROFILE_MODES.map((mode) => {
+        const active = value === mode;
+        return (
+          <button
+            key={mode}
+            type="button"
+            onClick={() => onChange(mode)}
+            className="relative px-2.5 py-1.5 font-bold uppercase text-[9px] cursor-pointer no-select"
+            style={{
+              letterSpacing: '0.14em',
+              color: active ? '#e8e8e8' : '#5a5a5a',
+              transition: 'color 0.2s',
+              background: 'transparent',
+              minHeight: 32,
+            }}
+          >
+            {active && (
+              <motion.span
+                layoutId="profile-mode-pill"
+                className="absolute inset-0"
+                style={{
+                  backgroundColor: 'rgba(196, 163, 90, 0.18)',
+                  boxShadow: 'inset 0 -2px 0 #c4a35a',
+                  pointerEvents: 'none',
+                }}
+                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+              />
+            )}
+            <span className="relative" style={{ zIndex: 1 }}>
+              {t(`mode_${mode}`)}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 interface ProfileData {
   id: string;
@@ -36,6 +86,7 @@ interface ProfileData {
   badgePrefs?: string[];
   discordUsername: string | null;
   createdAt: string;
+  modeStats?: Record<string, { games: number; wins: number; losses: number }>;
   decks: Array<{ id: string; name: string; createdAt: string; evolvingPoints?: number; evolvingCompatible?: boolean }>;
   recentGames: Array<{
     id: string;
@@ -260,23 +311,46 @@ export default function ProfilePage({
 
   const isOwner = session?.user?.id === profile?.id;
 
-  const [profileMode, setProfileMode] = useState<LeaderboardMode>('ranked');
+  const [profileMode, setProfileMode] = useState<ProfileStatsMode>('ranked');
 
   const rankedTotal = profile ? profile.wins + profile.losses : 0;
   const evoTotal = profile ? (profile.evolvingWins ?? 0) + (profile.evolvingLosses ?? 0) : 0;
 
-  const displayedWins = profileMode === 'evolving' ? (profile?.evolvingWins ?? 0) : (profile?.wins ?? 0);
-  const displayedLosses = profileMode === 'evolving' ? (profile?.evolvingLosses ?? 0) : (profile?.losses ?? 0);
-  const displayedElo = profileMode === 'evolving' ? (profile?.evolvingElo ?? 500) : (profile?.elo ?? 0);
-  const displayedTotal = profileMode === 'evolving' ? evoTotal : rankedTotal;
+  const modeStatsMap = profile?.modeStats ?? {};
+  const casualStats = modeStatsMap['casual'] ?? { games: 0, wins: 0, losses: 0 };
+  const sealedEntries = Object.entries(modeStatsMap)
+    .filter(([k]) => isSealedModeKey(k))
+    .sort((a, b) => b[1].games - a[1].games);
+  const sealedTotals = sealedEntries.reduce(
+    (acc, [, v]) => ({ games: acc.games + v.games, wins: acc.wins + v.wins, losses: acc.losses + v.losses }),
+    { games: 0, wins: 0, losses: 0 },
+  );
+  const allWins = (profile?.wins ?? 0) + (profile?.evolvingWins ?? 0) + casualStats.wins + sealedTotals.wins;
+  const allLosses = (profile?.losses ?? 0) + (profile?.evolvingLosses ?? 0) + casualStats.losses + sealedTotals.losses;
+
+  const displayedWins =
+    profileMode === 'evolving' ? (profile?.evolvingWins ?? 0)
+    : profileMode === 'casual' ? casualStats.wins
+    : profileMode === 'sealed' ? sealedTotals.wins
+    : profileMode === 'all' ? allWins
+    : (profile?.wins ?? 0);
+  const displayedLosses =
+    profileMode === 'evolving' ? (profile?.evolvingLosses ?? 0)
+    : profileMode === 'casual' ? casualStats.losses
+    : profileMode === 'sealed' ? sealedTotals.losses
+    : profileMode === 'all' ? allLosses
+    : (profile?.losses ?? 0);
+  const eloMode: 'ranked' | 'evolving' = profileMode === 'evolving' ? 'evolving' : 'ranked';
+  const displayedElo = eloMode === 'evolving' ? (profile?.evolvingElo ?? 500) : (profile?.elo ?? 0);
+  const displayedTotal = displayedWins + displayedLosses;
 
   const placed = rankedTotal >= PLACEMENT_MATCHES_REQUIRED;
   const evoPlaced = evoTotal >= PLACEMENT_MATCHES_REQUIRED;
   const winRate = displayedTotal > 0 ? Math.round((displayedWins / displayedTotal) * 100) : 0;
   const tier = profile ? getRankTier(profile.elo) : null;
   const evoTier = profile ? getRankTier(profile.evolvingElo ?? 500) : null;
-  const displayedTier = profileMode === 'evolving' ? evoTier : tier;
-  const displayedPlaced = profileMode === 'evolving' ? evoPlaced : placed;
+  const displayedTier = eloMode === 'evolving' ? evoTier : tier;
+  const displayedPlaced = eloMode === 'evolving' ? evoPlaced : placed;
   const eloCount = useCountUp(displayedElo, 900);
   const accentColor = leaguesEnabled && displayedPlaced && displayedTier ? displayedTier.color : '#c4a35a';
 
@@ -466,7 +540,7 @@ export default function ProfilePage({
           <span className="font-display text-[11px] uppercase" style={{ color: '#666', letterSpacing: '0.28em' }}>
             {t('statsTitle')}
           </span>
-          <LeaderboardModeSwitch value={profileMode} onChange={setProfileMode} layoutId="profile-mode-pill" size="sm" />
+          <ProfileModeSwitch value={profileMode} onChange={setProfileMode} />
         </div>
 
         <motion.div
@@ -485,6 +559,46 @@ export default function ProfilePage({
             delay={0.2}
           />
         </motion.div>
+
+        {profileMode === 'sealed' && (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.18 }}
+            className="mb-7 -mt-4 flex flex-col gap-1.5"
+          >
+            {sealedEntries.length === 0 ? (
+              <p className="font-display text-xs py-3 text-center uppercase tracking-widest" style={{ color: '#444' }}>
+                {t('sealedNoGames')}
+              </p>
+            ) : (
+              sealedEntries.map(([modeKey, v]) => {
+                const setId = sealedSetFromModeKey(modeKey);
+                const label = setId === 'random' ? t('sealedRandomSet') : getSetName(setId, locale);
+                const rate = v.games > 0 ? Math.round((v.wins / v.games) * 100) : 0;
+                return (
+                  <div
+                    key={modeKey}
+                    className="px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap"
+                    style={{ backgroundColor: '#0d0c10', clipPath: STAT_CLIP }}
+                  >
+                    <span className="font-display text-sm truncate" style={{ color: '#e8e6df' }}>{label}</span>
+                    <div className="flex items-center gap-4 shrink-0">
+                      <span className="font-inter-force text-[11px] tabular-nums" style={{ color: '#888' }}>
+                        {t('sealedGamesCount', { count: v.games })}
+                      </span>
+                      <span className="font-display text-sm tabular-nums" style={{ color: '#5fb05f' }}>{v.wins}</span>
+                      <span className="font-display text-sm tabular-nums" style={{ color: '#d97676' }}>{v.losses}</span>
+                      <span className="font-display text-sm tabular-nums w-11 text-right" style={{ color: rate >= 60 ? '#5fb05f' : rate >= 40 ? '#c4a35a' : '#d97676' }}>
+                        {rate}%
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </motion.div>
+        )}
 
         {isOwner && (profile.role === 'admin' || leaguesEnabled) && (
           <motion.div
@@ -639,9 +753,11 @@ export default function ProfilePage({
           </section>
         )}
 
-        <section className="mb-7">
-          <EloHistoryChart key={profileMode} username={profile.username} eloType={profileMode} />
-        </section>
+        {(profileMode === 'ranked' || profileMode === 'evolving') && (
+          <section className="mb-7">
+            <EloHistoryChart key={profileMode} username={profile.username} eloType={profileMode} />
+          </section>
+        )}
 
         <section>
           <SectionTitle label={t('recentGames')} count={profile.totalGames} />

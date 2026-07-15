@@ -2133,7 +2133,15 @@
     "statsLosses": "Défaites",
     "statsWinrate": "Ratio",
     "playerNotFound": "Joueur introuvable.",
-    "statsTitle": "Statistiques"
+    "statsTitle": "Statistiques",
+    "mode_ranked": "Classé",
+    "mode_evolving": "Evolving",
+    "mode_casual": "Casual",
+    "mode_sealed": "Scellé",
+    "mode_all": "Tous modes",
+    "sealedNoGames": "Aucune partie scellée enregistrée pour le moment",
+    "sealedRandomSet": "Set aléatoire",
+    "sealedGamesCount": "{count} parties"
   },
   "replay": {
     "title": "Récapitulatif",

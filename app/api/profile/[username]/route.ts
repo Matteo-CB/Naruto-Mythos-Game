@@ -237,6 +237,13 @@ export async function GET(
       }).catch(() => {});
     }
 
+    const modeStatRows = await prisma.userModeStat.findMany({
+      where: { userId: user.id },
+      select: { mode: true, games: true, wins: true, losses: true },
+    }).catch(() => [] as Array<{ mode: string; games: number; wins: number; losses: number }>);
+    const modeStats: Record<string, { games: number; wins: number; losses: number }> = {};
+    for (const r of modeStatRows) modeStats[r.mode] = { games: r.games, wins: r.wins, losses: r.losses };
+
     const { decks: _omit, ...userWithoutDecks } = user;
     void _omit;
     return NextResponse.json({
@@ -248,6 +255,7 @@ export async function GET(
       perPage,
       consecutiveWinsRanked,
       consecutiveWinsEvolving,
+      modeStats,
     });
   } catch (err) {
     console.error('[profile] error:', err);

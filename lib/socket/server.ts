@@ -22,6 +22,7 @@ import { getOwnedVariantIds } from '@/lib/variants/inventory';
 import { isAdmin } from '@/lib/auth/admins';
 import { isHoloId, holoBaseId, holoIdFor, isHoloEligibleCard } from '@/lib/holo/holoId';
 import { packVisibleState } from '@/lib/socket/statePack';
+import { unrankedModeKey } from '@/lib/stats/modeKey';
 import { isStaticRankedBanned } from '@/lib/data/rankedBans';
 import { emitQuestEvent } from '@/lib/quests/hooks';
 import { emitDrawDiffEvents, emitTokenDiffEvents } from '@/lib/quests/engineEmit';
@@ -1016,6 +1017,29 @@ async function finalizeGameEnd(
     isEvolving
       ? ((u.evolvingWins ?? 0) + (u.evolvingLosses ?? 0) + (u.evolvingDraws ?? 0))
       : (u.wins + u.losses + u.draws);
+
+  if (!room.isRanked && (winner === 'player1' || winner === 'player2')) {
+    const modeKey = unrankedModeKey(room);
+    const sides: Array<[string | null | undefined, 'player1' | 'player2']> = [
+      [room.hostId, 'player1'],
+      [room.guestId, 'player2'],
+    ];
+    for (const [uid, side] of sides) {
+      if (!uid) continue;
+      const won = winner === side;
+      prisma.userModeStat.upsert({
+        where: { userId_mode: { userId: uid, mode: modeKey } },
+        create: { userId: uid, mode: modeKey, games: 1, wins: won ? 1 : 0, losses: won ? 0 : 1 },
+        update: {
+          games: { increment: 1 },
+          wins: { increment: won ? 1 : 0 },
+          losses: { increment: won ? 0 : 1 },
+        },
+      }).catch((err) => {
+        console.error('[Socket] userModeStat upsert error:', err instanceof Error ? err.message : err);
+      });
+    }
+  }
 
   try {
     if (room.isRanked && room.hostId && room.guestId) {

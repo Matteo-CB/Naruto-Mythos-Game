@@ -2131,7 +2131,15 @@
     "statsLosses": "負け",
     "statsWinrate": "勝率",
     "playerNotFound": "プレイヤーが見つかりません。",
-    "statsTitle": "統計"
+    "statsTitle": "統計",
+    "mode_ranked": "ランク戦",
+    "mode_evolving": "Evolving",
+    "mode_casual": "カジュアル",
+    "mode_sealed": "シールド",
+    "mode_all": "全モード",
+    "sealedNoGames": "シールド戦の記録はまだありません",
+    "sealedRandomSet": "ランダムセット",
+    "sealedGamesCount": "{count}戦"
   },
   "replay": {
     "title": "対戦の振り返り",

@@ -2132,7 +2132,15 @@
     "statsLosses": "Derrotas",
     "statsWinrate": "% de victorias",
     "playerNotFound": "Jugador no encontrado.",
-    "statsTitle": "Estadísticas"
+    "statsTitle": "Estadísticas",
+    "mode_ranked": "Clasificatoria",
+    "mode_evolving": "Evolving",
+    "mode_casual": "Casual",
+    "mode_sealed": "Sellado",
+    "mode_all": "Todos los modos",
+    "sealedNoGames": "Aún no hay partidas de sellado registradas",
+    "sealedRandomSet": "Set aleatorio",
+    "sealedGamesCount": "{count} partidas"
   },
   "replay": {
     "title": "Resumen de la partida",
