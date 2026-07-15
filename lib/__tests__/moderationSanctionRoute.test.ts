@@ -66,9 +66,14 @@ describe('POST /api/admin/moderation/sanction', () => {
   });
 
   it('rejects invalid durations for the type', async () => {
-    const res = await sanctionPOST(req({ userId: 'target1', type: 'ranked_ban', reason: 'triche', durationMs: null }));
+    const res = await sanctionPOST(req({ userId: 'target1', type: 'ranked_ban', reason: 'triche', durationMs: 2 * 24 * 60 * 60 * 1000 }));
     expect(res.status).toBe(400);
     expect(p.sanction.create).not.toHaveBeenCalled();
+  });
+
+  it('accepts a permanent ranked ban', async () => {
+    const res = await sanctionPOST(req({ userId: 'target1', type: 'ranked_ban', reason: 'triche elo', durationMs: null }));
+    expect(res.status).toBe(201);
   });
 
   it('warn notifies the offender only', async () => {

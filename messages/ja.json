@@ -263,6 +263,13 @@
       "button": "パスワードを再設定",
       "expiry": "このリンクは1時間で失効します。",
       "ignore": "心当たりがない場合は、このメールを無視してください。"
+    },
+    "verifyCode": {
+      "subject": "{code} はNaruto Mythosの確認コードです",
+      "greeting": "こんにちは。",
+      "intro": "Naruto Mythos TCGのアカウント作成を完了するための確認コードはこちらです。",
+      "expiry": "このコードの有効期限は15分です。",
+      "ignore": "アカウントを作成していない場合は、このメールを無視してください。"
     }
   },
   "rootLayout": {
@@ -590,8 +597,7 @@
     "battlepassBadgeTooltip": "受け取り可能なカード {count} 枚",
     "quests": "クエスト",
     "questsBadgeTooltip": "受け取り可能な報酬 {count} 件",
-    "socialBadgeTooltip": "未読メッセージ・申請 {count}件",
-    "worldcup": "ワールドカップ"
+    "socialBadgeTooltip": "未読メッセージ・申請 {count}件"
   },
   "settings": {
     "title": "オプション",
@@ -2221,9 +2227,22 @@
       "loginRequired": "先にログインしてください。",
       "userNotFound": "ユーザーが見つかりません。",
       "serverError": "サーバーエラーです。もう一度お試しください。",
-      "notAuthenticated": "ログインが必要です。"
+      "notAuthenticated": "ログインが必要です。",
+      "codeInvalid": "コードが正しくありません。",
+      "codeExpired": "このコードは期限切れです。新しいコードを取得してください。",
+      "tooManyAttempts": "試行回数が多すぎます。新しいコードを取得してください。",
+      "resendCooldown": "新しいコードを取得するまで少しお待ちください。",
+      "tooManySends": "このメールアドレスへの送信回数が上限に達しました。しばらくしてからお試しください。"
     },
-    "optional": "任意"
+    "optional": "任意",
+    "verifyTitle": "メールアドレスの確認",
+    "verifySent": "{email} に6桁のコードを送信しました。受信トレイと迷惑メールフォルダを確認してください。",
+    "verifyCodeLabel": "確認コード",
+    "verifyButton": "確認する",
+    "verifying": "確認中...",
+    "resendCode": "コードを再送信",
+    "resendIn": "{seconds}秒後に再送信できます",
+    "resendDone": "新しいコードを送信しました。"
   },
   "card": {
     "effectTypes": {

@@ -118,6 +118,27 @@ describe('statePack round-trip', () => {
     expect(restored.turn).toBe(2);
   });
 
+  it('preserves per-instance discard fields through the round-trip', () => {
+    const original = buildState();
+    original.myState.discardPile = [
+      { ...card('KS-003-C'), instanceId: 'KS-003-C-discard-0' } as CharacterCard,
+      { ...card('KS-003-C'), instanceId: 'KS-003-C-discard-1' } as CharacterCard,
+    ];
+    original.opponentState.discardPile = [
+      { ...card('KS-005-C'), instanceId: 'abc-stack-1', wasHiddenBeforeDefeat: true } as CharacterCard,
+    ];
+    const restored = unpackVisibleState(JSON.parse(JSON.stringify(packVisibleState(original))) as PackedVisibleState);
+
+    expect(restored.myState.discardPile.map((c) => (c as { instanceId?: string }).instanceId)).toEqual([
+      'KS-003-C-discard-0',
+      'KS-003-C-discard-1',
+    ]);
+    const oppCard = restored.opponentState.discardPile[0] as { instanceId?: string; wasHiddenBeforeDefeat?: boolean; name_fr?: string };
+    expect(oppCard.instanceId).toBe('abc-stack-1');
+    expect(oppCard.wasHiddenBeforeDefeat).toBe(true);
+    expect(oppCard.name_fr).toBe(card('KS-005-C').name_fr);
+  });
+
   it('shrinks the wire payload massively', () => {
     const original = buildState();
     const rawSize = JSON.stringify(original).length;

@@ -86,7 +86,8 @@ describe('isValidSanctionDuration', () => {
     expect(isValidSanctionDuration('mute_chat', null)).toBe(true);
     expect(isValidSanctionDuration('mute_chat', 2 * HOUR_MS)).toBe(false);
     expect(isValidSanctionDuration('ranked_ban', DAY_MS)).toBe(true);
-    expect(isValidSanctionDuration('ranked_ban', null)).toBe(false);
+    expect(isValidSanctionDuration('ranked_ban', null)).toBe(true);
+    expect(isValidSanctionDuration('ranked_ban', 2 * DAY_MS)).toBe(false);
     expect(isValidSanctionDuration('warn', null)).toBe(true);
     expect(isValidSanctionDuration('warn', HOUR_MS)).toBe(false);
     expect(isValidSanctionDuration('suspension', 30 * DAY_MS)).toBe(true);

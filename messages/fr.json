@@ -263,6 +263,13 @@
       "button": "Réinitialiser",
       "expiry": "Ce lien expire dans 1 heure.",
       "ignore": "Si vous n'avez pas fait cette demande, ignorez cet email."
+    },
+    "verifyCode": {
+      "subject": "{code} est ton code de vérification Naruto Mythos",
+      "greeting": "Bonjour,",
+      "intro": "Voici ton code de vérification pour terminer la création de ton compte Naruto Mythos TCG :",
+      "expiry": "Ce code expire dans 15 minutes.",
+      "ignore": "Si tu n'as pas créé de compte, tu peux ignorer cet email."
     }
   },
   "rootLayout": {
@@ -592,8 +599,7 @@
     "battlepassBadgeTooltip": "{count} carte(s) à réclamer",
     "quests": "Quêtes",
     "questsBadgeTooltip": "{count} récompense(s) à réclamer",
-    "socialBadgeTooltip": "{count} messages ou demandes en attente",
-    "worldcup": "Coupe du monde"
+    "socialBadgeTooltip": "{count} messages ou demandes en attente"
   },
   "settings": {
     "title": "Options",
@@ -2223,9 +2229,22 @@
       "loginRequired": "Connecte-toi d'abord.",
       "userNotFound": "Utilisateur introuvable.",
       "serverError": "Erreur serveur. Veuillez réessayer.",
-      "notAuthenticated": "Vous devez être connecté."
+      "notAuthenticated": "Vous devez être connecté.",
+      "codeInvalid": "Code invalide.",
+      "codeExpired": "Ce code a expiré, demande un nouveau code.",
+      "tooManyAttempts": "Trop d'essais, demande un nouveau code.",
+      "resendCooldown": "Attends un instant avant de demander un nouveau code.",
+      "tooManySends": "Trop de codes envoyés pour cet email, réessaie plus tard."
     },
-    "optional": "facultatif"
+    "optional": "facultatif",
+    "verifyTitle": "Vérifie ton email",
+    "verifySent": "Un code à 6 chiffres a été envoyé à {email}. Vérifie ta boîte de réception et tes spams.",
+    "verifyCodeLabel": "Code de vérification",
+    "verifyButton": "Vérifier",
+    "verifying": "Vérification...",
+    "resendCode": "Renvoyer le code",
+    "resendIn": "Renvoyer dans {seconds}s",
+    "resendDone": "Un nouveau code a été envoyé."
   },
   "card": {
     "effectTypes": {

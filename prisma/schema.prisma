@@ -27,6 +27,7 @@ model User {
   resetToken              String?
   resetTokenExpiry        DateTime?
   emailBase               String?
+  emailVerifiedAt         DateTime?
   createdAt               DateTime             @default(now())
   decks                   Deck[]
   gamesAsPlayer1          Game[]               @relation("Player1")
@@ -633,6 +634,17 @@ model TradeLog {
 
   @@index([senderId, executedAt])
   @@index([receiverId, executedAt])
+}
+
+model EmailVerification {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  email      String   @unique
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int      @default(0)
+  sentCount  Int      @default(1)
+  lastSentAt DateTime @default(now())
+  createdAt  DateTime @default(now())
 }
 
 model CountryGroupStat {

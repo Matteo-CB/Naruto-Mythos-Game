@@ -7,6 +7,10 @@
       "title_es": "Copa del mundo, nuevas estadísticas y animaciones más fluidas",
       "title_ja": "ワールドカップ、新しい統計、より滑らかなアニメーション",
       "changes_fr": [
+        "La création de compte demande désormais un code de vérification à 6 chiffres envoyé par email.",
+        "Le choix de l'ordre des cartes envoyées à la défausse (Sakura secrète par exemple) est de nouveau respecté en partie en ligne.",
+        "Des parties classées truquées contre des comptes jetables ont été annulées, l'ELO concerné a été retiré et ces comptes sont bannis définitivement des parties classées.",
+        "Le bouton Coupe du monde est retiré du menu d'accueil, la page reste accessible.",
         "Nouvelle page Coupe du monde : un classement des pays sur les parties classées des 7 derniers jours ; seuls les joueurs Sannin Légendaire ou plus comptent, et un pays doit en avoir au moins 6 pour être classé.",
         "La Coupe du monde affiche pour chaque pays son podium, ses meilleurs joueurs, son taux de victoire et son groupe de cartes le plus joué.",
         "La page TopDeck est retirée du site.",
@@ -23,6 +27,10 @@
         "Les pseudos des joueurs sont cliquables partout (historique, tournois, salons, chat, spectateurs, replays, amis) et ouvrent le profil, dans un nouvel onglet pendant une partie."
       ],
       "changes_en": [
+        "Creating an account now requires a 6-digit verification code sent by email.",
+        "The order you choose for cards sent to the discard pile (secret Sakura for example) is respected again in online games.",
+        "Rigged ranked games against throwaway accounts were cancelled, the ELO involved was removed and those accounts are permanently banned from ranked play.",
+        "The World Cup button was removed from the home menu, the page remains accessible.",
         "New World Cup page: a country ranking over ranked games from the last 7 days; only Legendary Sannin players and above count, and a country needs at least 6 of them to be ranked.",
         "The World Cup shows each country's podium, top players, win rate and most played card group.",
         "The TopDeck page has been removed from the site.",
@@ -39,6 +47,10 @@
         "Player names are clickable everywhere (history, tournaments, rooms, chat, spectators, replays, friends) and open the profile, in a new tab during a game."
       ],
       "changes_es": [
+        "Crear una cuenta ahora requiere un código de verificación de 6 dígitos enviado por correo.",
+        "El orden que eliges para las cartas enviadas a la pila de descarte (Sakura secreta por ejemplo) vuelve a respetarse en las partidas en línea.",
+        "Se anularon partidas clasificatorias amañadas contra cuentas desechables, se retiró el ELO implicado y esas cuentas quedan expulsadas definitivamente de las partidas clasificatorias.",
+        "El botón Copa del mundo se ha retirado del menú de inicio, la página sigue accesible.",
         "Nueva página Copa del mundo: una clasificación de países sobre las partidas clasificatorias de los últimos 7 días; solo cuentan los jugadores Sannin Legendario o superior, y un país necesita al menos 6 para clasificarse.",
         "La Copa del mundo muestra el podio de cada país, sus mejores jugadores, su tasa de victorias y su grupo de cartas más jugado.",
         "La página TopDeck se ha retirado del sitio.",
@@ -55,6 +67,10 @@
         "Los nombres de los jugadores se pueden pulsar en todas partes (historial, torneos, salas, chat, espectadores, repeticiones, amigos) y abren el perfil, en una pestaña nueva durante una partida."
       ],
       "changes_ja": [
+        "アカウント作成時に、メールで届く6桁の確認コードの入力が必要になりました。",
+        "捨て札に送るカードの順番の選択(シークレットのサクラなど)がオンライン対戦で再び正しく反映されるようになりました。",
+        "使い捨てアカウント相手の不正なランク戦を取り消し、関連するELOを削除、該当アカウントはランク戦から永久に追放しました。",
+        "ホームメニューからワールドカップのボタンを削除しました。ページには引き続きアクセスできます。",
         "新ページ「ワールドカップ」:過去7日間のランク戦にもとづく国別ランキング。伝説の三忍以上のプレイヤーだけが集計され、6人以上いる国がランキングに入ります。",
         "ワールドカップでは各国の表彰台、トッププレイヤー、勝率、最も使われた勢力を確認できます。",
         "TopDeckのページはサイトから削除されました。",

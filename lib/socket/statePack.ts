@@ -14,9 +14,16 @@ import { getCardById } from '@/lib/data/cardIndex';
 interface CardRef {
   __c: string;
   h?: 1;
+  i?: string;
+  w?: 1;
 }
 
 type MaybePacked<T> = T | CardRef;
+
+interface InstanceFields {
+  instanceId?: string;
+  wasHiddenBeforeDefeat?: boolean;
+}
 
 function isCardRef(v: unknown): v is CardRef {
   return !!v && typeof v === 'object' && typeof (v as CardRef).__c === 'string';
@@ -26,14 +33,24 @@ function packCard<T extends CardData>(card: T | undefined | null): MaybePacked<T
   if (!card) return card;
   const id = card.cardId ?? card.id;
   if (!id || !getCardById(id)) return card;
-  return card.isHolo ? { __c: id, h: 1 } : { __c: id };
+  const ref: CardRef = { __c: id };
+  if (card.isHolo) ref.h = 1;
+  const inst = card as InstanceFields;
+  if (typeof inst.instanceId === 'string' && inst.instanceId) ref.i = inst.instanceId;
+  if (inst.wasHiddenBeforeDefeat) ref.w = 1;
+  return ref;
 }
 
 function unpackCard<T extends CardData>(value: MaybePacked<T> | undefined | null): T | undefined | null {
   if (!isCardRef(value)) return value as T | undefined | null;
   const card = getCardById(value.__c) as T | undefined;
   if (!card) return value as unknown as T;
-  return value.h ? { ...card, isHolo: true } : card;
+  if (!value.h && !value.i && !value.w) return card;
+  const out = { ...card } as T & InstanceFields;
+  if (value.h) out.isHolo = true;
+  if (value.i) out.instanceId = value.i;
+  if (value.w) out.wasHiddenBeforeDefeat = true;
+  return out;
 }
 
 function packCards<T extends CardData>(cards: T[] | undefined): Array<MaybePacked<T>> | undefined {

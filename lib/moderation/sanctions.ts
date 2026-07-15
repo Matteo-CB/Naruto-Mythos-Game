@@ -20,7 +20,7 @@ export const SANCTION_DURATIONS: Record<SanctionType, ReadonlyArray<number | nul
   warn_severe: [],
   mute_chat: [HOUR_MS, DAY_MS, 7 * DAY_MS, null],
   shadow_mute: [HOUR_MS, DAY_MS, 7 * DAY_MS, null],
-  ranked_ban: [DAY_MS, 7 * DAY_MS],
+  ranked_ban: [DAY_MS, 7 * DAY_MS, null],
   suspension: [DAY_MS, 7 * DAY_MS, 30 * DAY_MS, null],
   spectate_ban: [DAY_MS, 7 * DAY_MS, null],
   name_reset: [],

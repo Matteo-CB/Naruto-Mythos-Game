@@ -30,6 +30,10 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
+        if ((result as { code?: string }).code === 'email_unverified') {
+          router.push(`/register?verify=${encodeURIComponent(email)}` as '/register');
+          return;
+        }
         setError(t('auth.invalidCredentials'));
       } else {
         router.push('/');

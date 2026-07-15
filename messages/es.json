@@ -263,6 +263,13 @@
       "button": "Restablecer contraseña",
       "expiry": "Este enlace caduca en 1 hora.",
       "ignore": "Si no lo has solicitado, ignora este correo."
+    },
+    "verifyCode": {
+      "subject": "{code} es tu código de verificación de Naruto Mythos",
+      "greeting": "Hola:",
+      "intro": "Aquí tienes tu código de verificación para terminar de crear tu cuenta de Naruto Mythos TCG:",
+      "expiry": "Este código caduca en 15 minutos.",
+      "ignore": "Si no has creado ninguna cuenta, puedes ignorar este correo."
     }
   },
   "rootLayout": {
@@ -591,8 +598,7 @@
     "battlepassBadgeTooltip": "{count} carta(s) por reclamar",
     "quests": "Misiones",
     "questsBadgeTooltip": "{count} recompensa(s) por reclamar",
-    "socialBadgeTooltip": "{count} mensajes o solicitudes pendientes",
-    "worldcup": "Copa del mundo"
+    "socialBadgeTooltip": "{count} mensajes o solicitudes pendientes"
   },
   "settings": {
     "title": "Opciones",
@@ -2222,9 +2228,22 @@
       "loginRequired": "Inicia sesión primero.",
       "userNotFound": "Usuario no encontrado.",
       "serverError": "Error del servidor. Inténtalo de nuevo.",
-      "notAuthenticated": "Debes iniciar sesión."
+      "notAuthenticated": "Debes iniciar sesión.",
+      "codeInvalid": "Código no válido.",
+      "codeExpired": "Este código ha caducado, solicita uno nuevo.",
+      "tooManyAttempts": "Demasiados intentos, solicita un nuevo código.",
+      "resendCooldown": "Espera un momento antes de solicitar un nuevo código.",
+      "tooManySends": "Se han enviado demasiados códigos a este correo, inténtalo más tarde."
     },
-    "optional": "opcional"
+    "optional": "opcional",
+    "verifyTitle": "Verifica tu correo",
+    "verifySent": "Se ha enviado un código de 6 dígitos a {email}. Revisa tu bandeja de entrada y la carpeta de spam.",
+    "verifyCodeLabel": "Código de verificación",
+    "verifyButton": "Verificar",
+    "verifying": "Verificando...",
+    "resendCode": "Reenviar el código",
+    "resendIn": "Reenviar en {seconds}s",
+    "resendDone": "Se ha enviado un nuevo código."
   },
   "card": {
     "effectTypes": {

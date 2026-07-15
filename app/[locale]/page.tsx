@@ -285,17 +285,10 @@ export default function Home() {
               })}
 
               <HomeMenuButton
-                href="/worldcup"
-                label={t('worldcup')}
-                variant="muted"
-                delay={1.26}
-              />
-
-              <HomeMenuButton
                 href="/play/sealed"
                 label={t('sealed')}
                 variant="primary"
-                delay={1.32}
+                delay={1.26}
               />
             </motion.nav>
 

@@ -263,6 +263,13 @@
       "button": "Reset Password",
       "expiry": "This link expires in 1 hour.",
       "ignore": "If you did not request this, ignore this email."
+    },
+    "verifyCode": {
+      "subject": "{code} is your Naruto Mythos verification code",
+      "greeting": "Hello,",
+      "intro": "Here is your verification code to finish creating your Naruto Mythos TCG account:",
+      "expiry": "This code expires in 15 minutes.",
+      "ignore": "If you did not create an account, you can safely ignore this email."
     }
   },
   "rootLayout": {
@@ -586,8 +593,7 @@
     "battlepassBadgeTooltip": "{count} card(s) to claim",
     "quests": "Quests",
     "questsBadgeTooltip": "{count} reward(s) to claim",
-    "socialBadgeTooltip": "{count} messages or pending requests",
-    "worldcup": "World Cup"
+    "socialBadgeTooltip": "{count} messages or pending requests"
   },
   "settings": {
     "title": "Options",
@@ -2217,9 +2223,22 @@
       "loginRequired": "Sign in first.",
       "userNotFound": "User not found.",
       "serverError": "Server error. Please try again.",
-      "notAuthenticated": "You must be signed in."
+      "notAuthenticated": "You must be signed in.",
+      "codeInvalid": "Invalid code.",
+      "codeExpired": "This code has expired, request a new one.",
+      "tooManyAttempts": "Too many attempts, request a new code.",
+      "resendCooldown": "Please wait a moment before requesting a new code.",
+      "tooManySends": "Too many codes were sent to this email, try again later."
     },
-    "optional": "optional"
+    "optional": "optional",
+    "verifyTitle": "Verify your email",
+    "verifySent": "A 6-digit code was sent to {email}. Check your inbox and your spam folder.",
+    "verifyCodeLabel": "Verification code",
+    "verifyButton": "Verify",
+    "verifying": "Verifying...",
+    "resendCode": "Resend the code",
+    "resendIn": "Resend in {seconds}s",
+    "resendDone": "A new code has been sent."
   },
   "card": {
     "effectTypes": {

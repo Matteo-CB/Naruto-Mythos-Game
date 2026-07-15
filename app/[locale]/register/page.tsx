@@ -1,18 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { signIn as nextAuthSignIn } from 'next-auth/react';
 import { useRouter, Link } from '@/lib/i18n/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { Footer } from '@/components/Footer';
 import { FlagPicker } from '@/components/FlagPicker';
 
-export default function RegisterPage() {
+function RegisterInner() {
   const router = useRouter();
   const t = useTranslations();
+  const locale = useLocale();
+  const searchParams = useSearchParams();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,6 +23,81 @@ export default function RegisterPage() {
   const [countryCode, setCountryCode] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState<'form' | 'code'>('form');
+  const [codeInput, setCodeInput] = useState('');
+  const [info, setInfo] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    const verifyEmail = searchParams.get('verify');
+    if (verifyEmail) {
+      setEmail(verifyEmail);
+      setStep('code');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const id = setInterval(() => setResendCooldown((s) => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(id);
+  }, [resendCooldown]);
+
+  const handleVerify = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setInfo('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code: codeInput }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(typeof data?.errorKey === 'string' ? t(data.errorKey) : t('auth.error.codeInvalid'));
+        return;
+      }
+      if (password) {
+        const result = await nextAuthSignIn('credentials', { email, password, redirect: false });
+        if (result?.error) {
+          router.push('/login');
+        } else {
+          router.push('/');
+          router.refresh();
+        }
+      } else {
+        router.push('/login');
+      }
+    } catch {
+      setError(t('common.error'));
+    } finally {
+      setLoading(false);
+    }
+  }, [email, codeInput, password, router, t]);
+
+  const handleResend = useCallback(async () => {
+    if (resendCooldown > 0) return;
+    setError('');
+    setInfo('');
+    try {
+      const res = await fetch('/api/auth/verify-email/resend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, locale }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(typeof data?.errorKey === 'string' ? t(data.errorKey) : t('common.error'));
+        return;
+      }
+      setInfo(t('auth.resendDone'));
+      setResendCooldown(60);
+    } catch {
+      setError(t('common.error'));
+    }
+  }, [email, locale, resendCooldown, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +124,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password, countryCode }),
+        body: JSON.stringify({ username, email, password, countryCode, locale }),
       });
 
       const data = await res.json();
@@ -61,18 +139,9 @@ export default function RegisterPage() {
         return;
       }
 
-      const result = await nextAuthSignIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError(t('auth.signInFailed'));
-      } else {
-        router.push('/');
-        router.refresh();
-      }
+      setStep('code');
+      setInfo('');
+      setResendCooldown(60);
     } catch {
       setError(t('common.error'));
     } finally {
@@ -101,9 +170,81 @@ export default function RegisterPage() {
           className="text-2xl font-bold text-center mb-8 tracking-wider uppercase"
           style={{ color: '#c4a35a' }}
         >
-          {t('common.register')}
+          {step === 'code' ? t('auth.verifyTitle') : t('common.register')}
         </h1>
 
+        {step === 'code' ? (
+        <form onSubmit={handleVerify} className="flex flex-col gap-4">
+          <p className="text-sm leading-relaxed" style={{ color: '#c0c0c0' }}>
+            {t('auth.verifySent', { email })}
+          </p>
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor="verifyCode"
+              className="text-xs uppercase tracking-wider"
+              style={{ color: '#888888' }}
+            >
+              {t('auth.verifyCodeLabel')}
+            </label>
+            <input
+              id="verifyCode"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              value={codeInput}
+              onChange={(e) => setCodeInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              required
+              className="rounded px-3 py-2 text-center text-2xl outline-none"
+              style={{
+                backgroundColor: '#0a0a0a',
+                border: '1px solid #262626',
+                color: '#e0e0e0',
+                letterSpacing: '0.5em',
+                fontFamily: 'monospace',
+              }}
+            />
+          </div>
+
+          {error && (
+            <p className="text-xs" style={{ color: '#b33e3e' }}>
+              {error}
+            </p>
+          )}
+          {info && (
+            <p className="text-xs" style={{ color: '#c4a35a' }}>
+              {info}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading || codeInput.length !== 6}
+            className="mt-2 rounded py-2.5 text-sm font-bold uppercase tracking-wider transition-colors"
+            style={{
+              backgroundColor: loading || codeInput.length !== 6 ? '#333333' : '#c4a35a',
+              color: loading || codeInput.length !== 6 ? '#777777' : '#0a0a0a',
+              cursor: loading || codeInput.length !== 6 ? 'default' : 'pointer',
+            }}
+          >
+            {loading ? t('auth.verifying') : t('auth.verifyButton')}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={resendCooldown > 0}
+            className="text-xs uppercase tracking-wider py-1"
+            style={{
+              backgroundColor: 'transparent',
+              color: resendCooldown > 0 ? '#555555' : '#c4a35a',
+              cursor: resendCooldown > 0 ? 'default' : 'pointer',
+            }}
+          >
+            {resendCooldown > 0 ? t('auth.resendIn', { seconds: resendCooldown }) : t('auth.resendCode')}
+          </button>
+        </form>
+        ) : (
+        <>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <label
@@ -250,6 +391,8 @@ export default function RegisterPage() {
           </svg>
           {t('auth.signUpWithDiscord')}
         </button>
+        </>
+        )}
 
         <p
           className="mt-6 text-center text-xs"
@@ -278,5 +421,13 @@ export default function RegisterPage() {
       </div>
       <Footer />
     </main>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterInner />
+    </Suspense>
   );
 }
