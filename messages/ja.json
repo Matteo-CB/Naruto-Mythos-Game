@@ -3492,7 +3492,13 @@
     "autoScansTitle": "自動検出(AI)",
     "autoScansEmpty": "自動検出はまだありません",
     "autoActionRemoved": "削除済み",
-    "autoActionFlagged": "要確認"
+    "autoActionFlagged": "要確認",
+    "autoActionBlocked": "送信前にブロック",
+    "autoHandle": "対応済みにする",
+    "autoStatusPending": "未対応",
+    "autoStatusHandled": "対応済み",
+    "autoHandledBy": "{name} が対応",
+    "linkedToScan": "AI検出に紐付け:対応済みになります"
   },
   "surveys": {
     "buttonLabel": "アンケート",

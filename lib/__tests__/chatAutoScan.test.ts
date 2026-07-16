@@ -1,5 +1,12 @@
-import { describe, it, expect } from 'vitest';
-import { decideScanAction, REMOVE_THRESHOLDS, FLAG_THRESHOLDS } from '@/lib/moderation/autoScan';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { decideScanAction, holdScanMessage, REMOVE_THRESHOLDS, FLAG_THRESHOLDS } from '@/lib/moderation/autoScan';
+
+vi.mock('@/lib/db/prisma', () => ({
+  prisma: {
+    chatModerationScan: { create: vi.fn().mockResolvedValue({}) },
+    user: { findUnique: vi.fn().mockResolvedValue({ username: 'Testeur' }) },
+  },
+}));
 
 describe('decideScanAction', () => {
   it('removes clear hate speech', () => {
@@ -57,5 +64,53 @@ describe('decideScanAction', () => {
         expect(removeAt).toBeGreaterThanOrEqual(flagAt);
       }
     }
+  });
+});
+
+describe('holdScanMessage', () => {
+  const entry = { messageId: 'm1', roomCode: 'ABC123', userId: 'u1', username: 'Testeur', message: 'test' };
+  const originalFetch = global.fetch;
+
+  beforeEach(() => {
+    process.env.OPENAI_API_KEY = 'test-key';
+  });
+
+  afterEach(() => {
+    delete process.env.OPENAI_API_KEY;
+    global.fetch = originalFetch;
+    vi.restoreAllMocks();
+  });
+
+  function mockApi(scores: Record<string, number>): void {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ results: [{ category_scores: scores }] }),
+    } as unknown as Response);
+  }
+
+  it('blocks a toxic message before delivery', async () => {
+    mockApi({ harassment: 0.95, hate: 0.1 });
+    expect(await holdScanMessage(entry)).toBe('blocked');
+  });
+
+  it('flags a gray-zone message without blocking it', async () => {
+    mockApi({ harassment: 0.6 });
+    expect(await holdScanMessage(entry)).toBe('flagged');
+  });
+
+  it('lets a clean message through', async () => {
+    mockApi({ harassment: 0.05, hate: 0.01 });
+    expect(await holdScanMessage(entry)).toBe('none');
+  });
+
+  it('returns unavailable without an API key', async () => {
+    delete process.env.OPENAI_API_KEY;
+    expect(await holdScanMessage(entry)).toBe('unavailable');
+  });
+
+  it('returns unavailable when the API fails so delivery is never blocked', async () => {
+    global.fetch = vi.fn().mockRejectedValue(new Error('network down'));
+    expect(await holdScanMessage(entry)).toBe('unavailable');
   });
 });

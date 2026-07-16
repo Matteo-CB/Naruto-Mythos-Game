@@ -3493,7 +3493,13 @@
     "autoScansTitle": "Detecciones automáticas (IA)",
     "autoScansEmpty": "Ninguna detección automática por el momento",
     "autoActionRemoved": "Eliminado",
-    "autoActionFlagged": "Señalado"
+    "autoActionFlagged": "Señalado",
+    "autoActionBlocked": "Bloqueado antes del envío",
+    "autoHandle": "Marcar tratado",
+    "autoStatusPending": "Por tratar",
+    "autoStatusHandled": "Tratadas",
+    "autoHandledBy": "Tratado por {name}",
+    "linkedToScan": "Vinculado a la detección de IA: se marcará como tratada"
   },
   "surveys": {
     "buttonLabel": "Encuestas",

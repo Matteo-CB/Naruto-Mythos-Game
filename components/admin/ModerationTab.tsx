@@ -65,16 +65,34 @@ export function ModerationTab() {
     topCategory: string;
     topScore: number;
     action: string;
+    status?: string | null;
+    handledByName?: string | null;
     createdAt: string;
   }
   const [scans, setScans] = useState<AutoScan[]>([]);
+  const [scanFilter, setScanFilter] = useState<'pending' | 'handled'>('pending');
+  const [fileScanId, setFileScanId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch('/api/admin/moderation/auto-scans', { credentials: 'include' })
+  const loadScans = useCallback((filter: 'pending' | 'handled') => {
+    fetch(`/api/admin/moderation/auto-scans?status=${filter}`, { credentials: 'include' })
       .then((r) => (r.ok ? r.json() : { scans: [] }))
       .then((data) => setScans(data.scans ?? []))
       .catch(() => {});
   }, []);
+
+  useEffect(() => { loadScans(scanFilter); }, [scanFilter, loadScans]);
+
+  const resolveScan = useCallback(async (scanId: string) => {
+    try {
+      await fetch('/api/admin/moderation/auto-scans/resolve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ scanId }),
+      });
+    } catch { }
+    loadScans(scanFilter);
+  }, [loadScans, scanFilter]);
 
   const loadReports = useCallback((status: 'pending' | 'resolved' | 'dismissed') => {
     setLoading(true);
@@ -86,9 +104,10 @@ export function ModerationTab() {
 
   useEffect(() => { loadReports(statusFilter); }, [statusFilter, loadReports]);
 
-  const openFile = useCallback(async (userId: string, reportId: string | null) => {
+  const openFile = useCallback(async (userId: string, reportId: string | null, scanId: string | null = null) => {
     setFeedback(null);
     setFileReportId(reportId);
+    setFileScanId(scanId);
     try {
       const res = await fetch(`/api/admin/moderation/player/${encodeURIComponent(userId)}`, { credentials: 'include' });
       if (res.ok) setFile(await res.json());
@@ -126,6 +145,10 @@ export function ModerationTab() {
       if (res.ok) {
         setFeedback(t('applied'));
         setSReason('');
+        if (fileScanId) {
+          await resolveScan(fileScanId);
+          setFileScanId(null);
+        }
         await openFile(file.user.id, null);
         loadReports(statusFilter);
       } else {
@@ -217,7 +240,7 @@ export function ModerationTab() {
             <span className="text-sm font-bold" style={{ color: '#c4a35a' }}>
               {file.user.username} <span style={{ color: '#666' }}>ELO {file.user.elo}</span>
             </span>
-            <button onClick={() => { setFile(null); setFileReportId(null); }} className="px-3 py-1 text-[11px] cursor-pointer" style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: '#888', border: 'none' }}>
+            <button onClick={() => { setFile(null); setFileReportId(null); setFileScanId(null); }} className="px-3 py-1 text-[11px] cursor-pointer" style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: '#888', border: 'none' }}>
               X
             </button>
           </div>
@@ -268,6 +291,9 @@ export function ModerationTab() {
             </button>
             {fileReportId && (
               <span className="text-[10px]" style={{ color: '#c4a35a' }}>{t('linkedToReport')}</span>
+            )}
+            {fileScanId && (
+              <span className="text-[10px]" style={{ color: '#c4a35a' }}>{t('linkedToScan')}</span>
             )}
           </div>
           {sType === 'elo_adjust' && (
@@ -396,9 +422,25 @@ export function ModerationTab() {
       )}
 
       <div className="flex flex-col gap-2">
-        <p className="text-[11px] uppercase font-bold mt-2" style={{ color: '#c4a35a' }}>
-          {t('autoScansTitle')}
-        </p>
+        <div className="flex items-center gap-3 mt-2 flex-wrap">
+          <p className="text-[11px] uppercase font-bold" style={{ color: '#c4a35a' }}>
+            {t('autoScansTitle')}
+          </p>
+          {(['pending', 'handled'] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setScanFilter(f)}
+              className="px-3 py-1.5 text-[10px] font-bold uppercase cursor-pointer"
+              style={{
+                backgroundColor: scanFilter === f ? '#c4a35a' : 'rgba(255,255,255,0.03)',
+                color: scanFilter === f ? '#0a0a0a' : '#888',
+                border: 'none',
+              }}
+            >
+              {f === 'pending' ? t('autoStatusPending') : t('autoStatusHandled')}
+            </button>
+          ))}
+        </div>
         {scans.length === 0 ? (
           <p className="text-[12px] p-4" style={{ ...panelStyle, color: '#555' }}>{t('autoScansEmpty')}</p>
         ) : (
@@ -409,19 +451,24 @@ export function ModerationTab() {
                   <span
                     className="font-bold cursor-pointer"
                     style={{ color: '#c4a35a' }}
-                    onClick={() => openFile(s.userId, null)}
+                    onClick={() => openFile(s.userId, null, s.id)}
                   >
                     {s.username}
                   </span>
                   <span
                     className="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase"
                     style={{
-                      backgroundColor: s.action === 'removed' ? 'rgba(179,62,62,0.14)' : 'rgba(196,163,90,0.12)',
-                      color: s.action === 'removed' ? '#d98080' : '#c4a35a',
+                      backgroundColor: s.action === 'flagged' ? 'rgba(196,163,90,0.12)' : 'rgba(179,62,62,0.14)',
+                      color: s.action === 'flagged' ? '#c4a35a' : '#d98080',
                     }}
                   >
-                    {s.action === 'removed' ? t('autoActionRemoved') : t('autoActionFlagged')}
+                    {s.action === 'blocked' ? t('autoActionBlocked') : s.action === 'removed' ? t('autoActionRemoved') : t('autoActionFlagged')}
                   </span>
+                  {s.status === 'handled' && s.handledByName && (
+                    <span className="ml-2 text-[10px]" style={{ color: '#666' }}>
+                      {t('autoHandledBy', { name: s.handledByName })}
+                    </span>
+                  )}
                 </span>
                 <span className="text-[10px]" style={{ color: '#666' }}>
                   {s.topCategory} {Math.round(s.topScore * 100)}% · {new Date(s.createdAt).toLocaleString()}
@@ -430,6 +477,25 @@ export function ModerationTab() {
               <p className="text-[11px] px-2 py-1.5" style={{ backgroundColor: 'rgba(179,62,62,0.06)', color: '#d0a0a0', overflowWrap: 'anywhere' }}>
                 {s.message}
               </p>
+              {s.status !== 'handled' && (
+                <div className="flex items-center gap-2 mt-1">
+                  <button
+                    onClick={() => openFile(s.userId, null, s.id)}
+                    className="px-3 py-1.5 text-[10px] font-bold uppercase cursor-pointer"
+                    style={{ backgroundColor: '#c4a35a', color: '#0a0a0a', border: 'none' }}
+                  >
+                    {t('openFile')}
+                  </button>
+                  <button
+                    onClick={() => resolveScan(s.id)}
+                    disabled={busy}
+                    className="px-3 py-1.5 text-[10px] font-bold uppercase cursor-pointer disabled:opacity-40"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: '#888', border: 'none' }}
+                  >
+                    {t('autoHandle')}
+                  </button>
+                </div>
+              )}
             </div>
           ))
         )}

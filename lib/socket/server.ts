@@ -32,7 +32,7 @@ import { validateChatMessage, isOnChatCooldown, decideChatDelivery } from '@/lib
 import { maskProfanity } from '@/lib/chat/wordFilter';
 import { getPairChatState } from '@/lib/chat/pairState';
 import { getModerationFlags, isSuspended, isRankedBanned, isSpectateBanned } from '@/lib/moderation/sanctions';
-import { initChatAutoScan, enqueueChatScan } from '@/lib/moderation/autoScan';
+import { initChatAutoScan, enqueueChatScan, holdScanMessage, type HoldVerdict } from '@/lib/moderation/autoScan';
 import { setChatLockRefresher } from '@/lib/socket/chatLockBridge';
 import { sendDm, getUnreadDmCount, markThreadRead } from '@/lib/dm/dmService';
 
@@ -3839,12 +3839,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-      room.chatMessages.push(chatMsg);
-      if (room.chatMessages.length > 100) room.chatMessages = room.chatMessages.slice(-100);
-
-      if (userId && !isEmote) {
-        emitQuestEvent('social.chat.message.sent', userId);
-      }
+      socket.emit('chat:message', chatMsg);
 
       prisma.chatMessage.create({
         data: {
@@ -3855,18 +3850,37 @@ export function setupSocketHandlers(io: SocketIOServer) {
         },
       }).catch(() => {});
 
+      import('@/lib/db/chatCleanup').then(m => m.cleanupOldChatMessages()).catch(() => {});
+
+      let holdVerdict: HoldVerdict = 'none';
       if (!isEmote) {
+        holdVerdict = await holdScanMessage({ messageId: chatMsg.id, roomCode, userId, username, message: trimmed });
+      }
+
+      if (holdVerdict === 'blocked') {
+        room.chatMessages.push({ ...chatMsg, message: '', removedByModeration: true });
+        if (room.chatMessages.length > 100) room.chatMessages = room.chatMessages.slice(-100);
+        socket.emit('chat:message-removed', { id: chatMsg.id });
+        return;
+      }
+
+      room.chatMessages.push(chatMsg);
+      if (room.chatMessages.length > 100) room.chatMessages = room.chatMessages.slice(-100);
+
+      if (userId && !isEmote) {
+        emitQuestEvent('social.chat.message.sent', userId);
+      }
+
+      if (!isEmote && holdVerdict === 'unavailable') {
         enqueueChatScan({ messageId: chatMsg.id, roomCode, userId, username, message: trimmed });
       }
 
-      import('@/lib/db/chatCleanup').then(m => m.cleanupOldChatMessages()).catch(() => {});
-
       if (decision.recipients === 'spectators_only') {
-        io.to(`spec:${roomCode}`).emit('chat:message', chatMsg);
+        io.to(`spec:${roomCode}`).except(socket.id).emit('chat:message', chatMsg);
       } else {
-        if (room.hostSocket) io.to(room.hostSocket).emit('chat:message', chatMsg);
-        if (room.guestSocket) io.to(room.guestSocket).emit('chat:message', chatMsg);
-        io.to(`spec:${roomCode}`).emit('chat:message', chatMsg);
+        if (room.hostSocket && room.hostSocket !== socket.id) io.to(room.hostSocket).emit('chat:message', chatMsg);
+        if (room.guestSocket && room.guestSocket !== socket.id) io.to(room.guestSocket).emit('chat:message', chatMsg);
+        io.to(`spec:${roomCode}`).except(socket.id).emit('chat:message', chatMsg);
       }
     });
 

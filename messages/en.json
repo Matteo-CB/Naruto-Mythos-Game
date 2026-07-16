@@ -3488,7 +3488,13 @@
     "autoScansTitle": "Automatic detections (AI)",
     "autoScansEmpty": "No automatic detection yet",
     "autoActionRemoved": "Removed",
-    "autoActionFlagged": "Flagged"
+    "autoActionFlagged": "Flagged",
+    "autoActionBlocked": "Blocked before delivery",
+    "autoHandle": "Mark handled",
+    "autoStatusPending": "To handle",
+    "autoStatusHandled": "Handled",
+    "autoHandledBy": "Handled by {name}",
+    "linkedToScan": "Linked to the AI detection: it will be marked handled"
   },
   "surveys": {
     "buttonLabel": "Surveys",

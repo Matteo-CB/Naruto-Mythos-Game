@@ -13,7 +13,9 @@ interface QueuedEntry extends ChatScanEntry {
   retried: boolean;
 }
 
-export type ScanAction = 'removed' | 'flagged' | 'none';
+export type ScanAction = 'blocked' | 'removed' | 'flagged' | 'none';
+
+export type HoldVerdict = 'blocked' | 'flagged' | 'none' | 'unavailable';
 
 export interface ScanDecision {
   action: ScanAction;
@@ -138,7 +140,7 @@ interface ModerationApiResult {
   results?: Array<{ category_scores?: Record<string, number> }>;
 }
 
-async function callModerationApi(texts: string[]): Promise<Array<Record<string, number>> | null> {
+async function callModerationApi(texts: string[], timeoutMs: number = API_TIMEOUT_MS): Promise<Array<Record<string, number>> | null> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
   try {
@@ -149,7 +151,7 @@ async function callModerationApi(texts: string[]): Promise<Array<Record<string, 
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({ model: 'omni-moderation-latest', input: texts }),
-      signal: AbortSignal.timeout(API_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     if (res.status === 429) {
       pausedUntil = Date.now() + THROTTLE_BACKOFF_MS;
@@ -196,6 +198,20 @@ async function persistScan(entry: ChatScanEntry, decision: ScanDecision, scores:
   } catch (e) {
     console.warn('[autoScan] persist failed:', e instanceof Error ? e.message : e);
   }
+}
+
+const HOLD_TIMEOUT_MS = 900;
+
+export async function holdScanMessage(entry: ChatScanEntry): Promise<HoldVerdict> {
+  if (!process.env.OPENAI_API_KEY || Date.now() < pausedUntil || !rateBudgetLeft()) return 'unavailable';
+  requestTimes.push(Date.now());
+  const scoresList = await callModerationApi([entry.message], HOLD_TIMEOUT_MS);
+  if (!scoresList) return 'unavailable';
+  const decision = decideScanAction(scoresList[0]);
+  if (decision.action === 'none') return 'none';
+  const finalAction: ScanAction = decision.action === 'removed' ? 'blocked' : 'flagged';
+  void persistScan(entry, { ...decision, action: finalAction }, scoresList[0]);
+  return finalAction;
 }
 
 async function runBatch(batch: QueuedEntry[]): Promise<void> {
