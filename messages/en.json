@@ -593,7 +593,8 @@
     "battlepassBadgeTooltip": "{count} card(s) to claim",
     "quests": "Quests",
     "questsBadgeTooltip": "{count} reward(s) to claim",
-    "socialBadgeTooltip": "{count} messages or pending requests"
+    "socialBadgeTooltip": "{count} messages or pending requests",
+    "worldcup": "World Cup"
   },
   "settings": {
     "title": "Options",
@@ -2587,7 +2588,9 @@
     "deckSaveError": "Failed to save deck",
     "holo": "HOLO",
     "cardBack": "Card back",
-    "boosterPack": "Booster Pack"
+    "boosterPack": "Booster Pack",
+    "continueToNextBooster": "Tap to open the next booster",
+    "continueToFinish": "Tap to finish opening"
   },
   "tournament": {
     "title": "Tournaments",

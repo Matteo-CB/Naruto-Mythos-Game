@@ -599,7 +599,8 @@
     "battlepassBadgeTooltip": "{count} carte(s) à réclamer",
     "quests": "Quêtes",
     "questsBadgeTooltip": "{count} récompense(s) à réclamer",
-    "socialBadgeTooltip": "{count} messages ou demandes en attente"
+    "socialBadgeTooltip": "{count} messages ou demandes en attente",
+    "worldcup": "Coupe du monde"
   },
   "settings": {
     "title": "Options",
@@ -2593,7 +2594,9 @@
     "deckSaveError": "Erreur lors de la sauvegarde",
     "holo": "HOLO",
     "cardBack": "Dos de carte",
-    "boosterPack": "Paquet Booster"
+    "boosterPack": "Paquet Booster",
+    "continueToNextBooster": "Touchez pour ouvrir le prochain booster",
+    "continueToFinish": "Touchez pour terminer l'ouverture"
   },
   "tournament": {
     "title": "Tournois",

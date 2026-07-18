@@ -57,10 +57,11 @@ export async function verifyEmailCode(email: string, code: string): Promise<Veri
     return row.attempts + 1 >= MAX_ATTEMPTS ? 'too_many_attempts' : 'invalid';
   }
 
-  await prisma.user.updateMany({
-    where: { email, emailVerifiedAt: null },
+  const updated = await prisma.user.updateMany({
+    where: { email },
     data: { emailVerifiedAt: new Date() },
   });
+  if (updated.count === 0) return 'not_found';
   await prisma.emailVerification.delete({ where: { email } }).catch(() => {});
   return 'ok';
 }

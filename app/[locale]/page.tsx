@@ -290,6 +290,13 @@ export default function Home() {
                 variant="primary"
                 delay={1.26}
               />
+
+              <HomeMenuButton
+                href="/worldcup"
+                label={t('worldcup')}
+                variant="muted"
+                delay={1.32}
+              />
             </motion.nav>
 
             

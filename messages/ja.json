@@ -597,7 +597,8 @@
     "battlepassBadgeTooltip": "受け取り可能なカード {count} 枚",
     "quests": "クエスト",
     "questsBadgeTooltip": "受け取り可能な報酬 {count} 件",
-    "socialBadgeTooltip": "未読メッセージ・申請 {count}件"
+    "socialBadgeTooltip": "未読メッセージ・申請 {count}件",
+    "worldcup": "ワールドカップ"
   },
   "settings": {
     "title": "オプション",
@@ -2591,7 +2592,9 @@
     "deckSaveError": "デッキの保存に失敗しました",
     "holo": "ホロ",
     "cardBack": "カードの裏面",
-    "boosterPack": "ブースターパック"
+    "boosterPack": "ブースターパック",
+    "continueToNextBooster": "タップして次のブースターを開ける",
+    "continueToFinish": "タップして開封を終える"
   },
   "tournament": {
     "title": "トーナメント",

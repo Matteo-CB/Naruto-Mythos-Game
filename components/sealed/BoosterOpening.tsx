@@ -12,7 +12,7 @@ interface BoosterOpeningProps {
   onComplete: (allCards: BoosterCard[]) => void;
 }
 
-type Stage = 'ready' | 'shaking' | 'opening' | 'revealing' | 'collected';
+type Stage = 'ready' | 'shaking' | 'opening' | 'revealing' | 'reviewing' | 'collected';
 
 export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
   const t = useTranslations('sealed');
@@ -50,35 +50,38 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
   }, [stage]);
 
   const handleCardRevealed = useCallback(() => {
-    
+
     if (isTransitioningRef.current) return;
 
     revealedCountRef.current += 1;
 
     if (revealedCountRef.current >= sortedCards.length) {
-      
       isTransitioningRef.current = true;
-
       setTimeout(() => {
-        const newCollected = [...collectedCardsRef.current, ...sortedCards];
-        collectedCardsRef.current = newCollected;
-        setCollectedCards(newCollected);
-        setStage('collected');
-
-        setTimeout(() => {
-          if (currentIndex + 1 < totalBoosters) {
-            setCurrentIndex((prev) => prev + 1);
-            revealedCountRef.current = 0;
-            isTransitioningRef.current = false;
-            setStage('ready');
-          } else {
-            
-            onComplete(newCollected);
-          }
-        }, 600);
-      }, 400);
+        setStage('reviewing');
+      }, 500);
     }
-  }, [sortedCards, currentIndex, totalBoosters, onComplete]);
+  }, [sortedCards.length]);
+
+  const handleContinue = useCallback(() => {
+    if (stage !== 'reviewing') return;
+
+    const newCollected = [...collectedCardsRef.current, ...sortedCards];
+    collectedCardsRef.current = newCollected;
+    setCollectedCards(newCollected);
+    setStage('collected');
+
+    setTimeout(() => {
+      if (currentIndex + 1 < totalBoosters) {
+        setCurrentIndex((prev) => prev + 1);
+        revealedCountRef.current = 0;
+        isTransitioningRef.current = false;
+        setStage('ready');
+      } else {
+        onComplete(newCollected);
+      }
+    }, 600);
+  }, [stage, sortedCards, currentIndex, totalBoosters, onComplete]);
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
@@ -172,24 +175,44 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
           </motion.div>
         )}
 
-        {stage === 'revealing' && (
+        {(stage === 'revealing' || stage === 'reviewing') && (
           <motion.div
             key={`reveal-${currentIndex}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className="flex flex-wrap justify-center gap-3 max-w-xl px-4"
+            className="flex flex-col items-center gap-4 px-4"
           >
-            {sortedCards.map((card, i) => (
-              <CardReveal
-                key={`${currentIndex}-${card.sealedInstanceId}`}
-                card={card}
-                index={i}
-                onRevealed={handleCardRevealed}
-                autoReveal
-                delay={i * 300 + 200}
-              />
-            ))}
+            <div className="flex flex-wrap justify-center gap-3 max-w-xl">
+              {sortedCards.map((card, i) => (
+                <CardReveal
+                  key={`${currentIndex}-${card.sealedInstanceId}`}
+                  card={card}
+                  index={i}
+                  onRevealed={handleCardRevealed}
+                  autoReveal
+                  delay={i * 300 + 200}
+                />
+              ))}
+            </div>
+
+            {stage === 'reviewing' && (
+              <motion.button
+                type="button"
+                onClick={handleContinue}
+                className="mt-2 px-8 py-3 text-sm font-bold uppercase tracking-wider cursor-pointer"
+                style={{
+                  backgroundColor: 'rgba(196, 163, 90, 0.12)',
+                  border: '1px solid #c4a35a',
+                  color: '#c4a35a',
+                }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: [0.7, 1, 0.7], y: 0 }}
+                transition={{ opacity: { duration: 1.6, repeat: Infinity }, y: { duration: 0.3 } }}
+              >
+                {currentIndex + 1 < totalBoosters ? t('continueToNextBooster') : t('continueToFinish')}
+              </motion.button>
+            )}
           </motion.div>
         )}
 
