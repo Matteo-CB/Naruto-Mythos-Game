@@ -3591,6 +3591,12 @@
     "factActivity": "Activité",
     "rule6": "Une nouvelle Coupe du monde recommence tous les 3 mois, remise à zéro. Les égalités se départagent au nombre de parties.",
     "championTitle": "Champion du monde {month}",
-    "reigningNation": "Nation championne du monde {month}"
+    "reigningNation": "Nation championne du monde {month}",
+    "lastChampionLabel": "Champion en titre {month}",
+    "worldMapTitle": "Vue du monde",
+    "comparatorTitle": "Comparateur de pays",
+    "progressionTitle": "Progression de la saison",
+    "progressionCollecting": "Les données de progression apparaîtront au fil de la saison.",
+    "activityTitle": "Activité par heure (UTC)"
   }
 }

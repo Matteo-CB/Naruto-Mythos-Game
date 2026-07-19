@@ -3589,6 +3589,12 @@
     "factActivity": "活動量",
     "rule6": "3か月ごとに新しいワールドカップがゼロから始まります。同率の場合は試合数で決まります。",
     "championTitle": "ワールドチャンピオン {month}",
-    "reigningNation": "現ワールドカップ王者国 {month}"
+    "reigningNation": "現ワールドカップ王者国 {month}",
+    "lastChampionLabel": "現チャンピオン {month}",
+    "worldMapTitle": "ワールドビュー",
+    "comparatorTitle": "国の比較",
+    "progressionTitle": "シーズンの推移",
+    "progressionCollecting": "推移データはシーズンの経過とともに表示されます。",
+    "activityTitle": "時間帯別の活動(UTC)"
   }
 }

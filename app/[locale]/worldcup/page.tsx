@@ -13,6 +13,10 @@ import { useLocaleBcp47 } from '@/lib/i18n/useLocaleMeta';
 import { COUNTRIES } from '@/lib/data/countries';
 import { getCardGroup } from '@/lib/utils/cardLocale';
 import { MIN_RANKED_PLAYERS, WORLDCUP_MIN_ELO, TEAM_SIZE, MIN_PLAYER_GAMES } from '@/lib/worldcup/fairScore';
+import { WorldcupBanner } from '@/components/worldcup/WorldcupBanner';
+import { WorldcupWorldMap } from '@/components/worldcup/WorldcupWorldMap';
+import { WorldcupComparator } from '@/components/worldcup/WorldcupComparator';
+import { WorldcupProgression } from '@/components/worldcup/WorldcupProgression';
 
 const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
 const MEDAL_COLORS = ['#c4a35a', '#a8a9ad', '#a06b42'];
@@ -49,9 +53,16 @@ interface CountryRow {
   topPlayers: CountryPlayer[];
   topGroup: string | null;
   topGroupShare: number;
+  hourly: number[] | null;
 }
 
 type WorldcupWindow = '24h' | '7d' | '30d' | 'season';
+
+interface WorldcupChampion {
+  countryCode: string;
+  endMonth: string;
+  podium: Array<{ rank: number; countryCode: string; score: number; players: { username: string }[] }> | null;
+}
 
 interface WorldcupPayload {
   standings: CountryRow[];
@@ -59,6 +70,7 @@ interface WorldcupPayload {
   window: WorldcupWindow;
   seasonStart: string | null;
   seasonEnd: string | null;
+  champion: WorldcupChampion | null;
 }
 
 function useCountryName(bcp47: string): (code: string) => string {
@@ -292,6 +304,31 @@ export default function WorldcupPage() {
                                 </span>
                               ))}
                             </div>
+                            {row.hourly && row.hourly.some((h) => h > 0) && (
+                              <div className="mb-3">
+                                <div className="text-[9px] uppercase tracking-[0.2em] mb-1" style={{ color: '#555' }}>
+                                  {t('activityTitle')}
+                                </div>
+                                <div className="flex items-end gap-0.5 h-8">
+                                  {row.hourly.map((h, hr) => {
+                                    const max = Math.max(...row.hourly!);
+                                    const pct = max > 0 ? (h / max) * 100 : 0;
+                                    const peak = h === max && h > 0;
+                                    return (
+                                      <span
+                                        key={hr}
+                                        title={`${hr}h UTC · ${h}`}
+                                        className="flex-1"
+                                        style={{ height: `${Math.max(3, pct)}%`, backgroundColor: peak ? '#c4a35a' : 'rgba(196,163,90,0.3)' }}
+                                      />
+                                    );
+                                  })}
+                                </div>
+                                <div className="flex justify-between text-[8px] tabular-nums mt-0.5" style={{ color: '#555' }}>
+                                  <span>0h</span><span>6h</span><span>12h</span><span>18h</span><span>23h</span>
+                                </div>
+                              </div>
+                            )}
                             <div className="text-[9px] uppercase tracking-[0.2em] mb-1.5" style={{ color: '#555' }}>
                               {t('topPlayersTitle')}
                             </div>
@@ -404,6 +441,10 @@ export default function WorldcupPage() {
           </motion.div>
         ) : (
           <>
+            {data?.champion && (
+              <WorldcupBanner champion={data.champion} countryName={countryName} />
+            )}
+
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -414,6 +455,8 @@ export default function WorldcupPage() {
               <StatBlock label={t('totalPlayers')} value={data?.totals.players ?? 0} />
               <StatBlock label={t('totalGames')} value={data?.totals.games ?? 0} />
             </motion.div>
+
+            <WorldcupWorldMap rows={standings} countryName={countryName} />
 
             {podium.length > 0 && (
               <div className="flex items-end gap-2 sm:gap-4 mb-8">
@@ -454,6 +497,10 @@ export default function WorldcupPage() {
                 </div>
               </div>
             )}
+
+            <WorldcupComparator rows={standings} countryName={countryName} tCardMeta={tCardMeta} />
+
+            {window === 'season' && <WorldcupProgression countryName={countryName} />}
 
             <motion.div
               initial={{ opacity: 0 }}

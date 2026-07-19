@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     const results = await prisma.eloHistory.findMany({
       where: { createdAt: { gte: since }, isRanked: true, eloType: 'ranked' },
-      select: { userId: true, result: true, opponentElo: true, isForfeit: true },
+      select: { userId: true, result: true, opponentElo: true, isForfeit: true, createdAt: true },
     });
 
     const userIds = [...new Set(results.map((r) => r.userId))];
@@ -43,6 +43,29 @@ export async function GET(request: NextRequest) {
       results.map((r) => ({ userId: r.userId, result: r.result, opponentElo: r.opponentElo, isForfeit: r.isForfeit === true })),
       userMap,
     );
+
+    const teamUserCountry = new Map<string, string>();
+    for (const s of standings) {
+      if (!s.ranked) continue;
+      for (const p of s.topPlayers) teamUserCountry.set(p.userId, s.countryCode);
+    }
+    const hourly = new Map<string, number[]>();
+    for (const r of results) {
+      const cc = teamUserCountry.get(r.userId);
+      if (!cc) continue;
+      let buckets = hourly.get(cc);
+      if (!buckets) { buckets = new Array(24).fill(0); hourly.set(cc, buckets); }
+      buckets[r.createdAt.getUTCHours()] += 1;
+    }
+
+    const lastSeason = await prisma.worldcupSeason.findFirst({
+      where: { status: 'finalized' },
+      orderBy: { finalizedAt: 'desc' },
+      select: { championCode: true, endMonth: true, podium: true },
+    }).catch(() => null);
+    const champion = lastSeason?.championCode
+      ? { countryCode: lastSeason.championCode, endMonth: lastSeason.endMonth, podium: lastSeason.podium ?? null }
+      : null;
 
     const groupRows = await prisma.countryGroupStat.findMany({
       where: { day: { gte: sinceDay } },
@@ -78,6 +101,7 @@ export async function GET(request: NextRequest) {
         score: Math.round(s.score * 10) / 10,
         topGroup,
         topGroupShare: totalCount > 0 ? Math.round((topCount / totalCount) * 100) : 0,
+        hourly: hourly.get(s.countryCode) ?? null,
       };
     });
 
@@ -91,6 +115,7 @@ export async function GET(request: NextRequest) {
         window: label,
         seasonStart: startMonth,
         seasonEnd: endMonth,
+        champion,
         generatedAt: new Date().toISOString(),
       },
       {

@@ -13,7 +13,9 @@
         "En scellé, l'ouverture des boosters attend maintenant que tu cliques pour passer au booster suivant, sans limite de temps.",
         "Le bouton Coupe du monde est de retour dans le menu d'accueil.",
         "La Coupe du monde a un vrai système de score : taux de victoire des 6 meilleurs joueurs du pays, force des adversaires battus, niveau de l'équipe, activité, et malus pour les abandons.",
-        "Une nouvelle Coupe du monde recommence tous les 3 mois, et tu peux voir le classement sur 24h, 7 jours, 30 jours ou la saison."
+        "Une nouvelle Coupe du monde recommence tous les 3 mois, et tu peux voir le classement sur 24h, 7 jours, 30 jours ou la saison.",
+        "À la fin de chaque saison de 3 mois, les joueurs des 3 pays du podium gagnent des cartes, des boosters et de l'XP, et l'équipe championne reçoit le titre Champion du monde.",
+        "La Coupe du monde s'enrichit : bannière du champion en titre, vue du monde par pays, comparateur de pays, courbe de progression de la saison et activité par heure."
       ],
       "changes_en": [
         "On phones and tablets, animations are turned off for a much smoother and faster experience.",
@@ -22,7 +24,9 @@
         "In sealed, opening boosters now waits for a click before moving to the next booster, with no time limit.",
         "The World Cup button is back in the home menu.",
         "The World Cup now has a real scoring system: win rate of the country's 6 best players, strength of beaten opponents, team level, activity, and a penalty for forfeits.",
-        "A new World Cup restarts every 3 months, and you can view the ranking over 24h, 7 days, 30 days or the season."
+        "A new World Cup restarts every 3 months, and you can view the ranking over 24h, 7 days, 30 days or the season.",
+        "At the end of each 3-month season, the podium countries' players earn cards, boosters and XP, and the winning team receives the World Champion title.",
+        "The World Cup gains visuals: reigning champion banner, world overview by country, country comparator, season progression chart and activity by hour."
       ],
       "changes_es": [
         "En teléfonos y tabletas, las animaciones se desactivan para una experiencia mucho más fluida y rápida.",
@@ -31,7 +35,9 @@
         "En sellado, abrir sobres ahora espera un clic antes de pasar al siguiente sobre, sin límite de tiempo.",
         "El botón Copa del mundo vuelve a estar en el menú de inicio.",
         "La Copa del mundo tiene un sistema de puntuación real: tasa de victorias de los 6 mejores jugadores del país, fuerza de los rivales vencidos, nivel del equipo, actividad y penalización por abandonos.",
-        "Una nueva Copa del mundo comienza cada 3 meses, y puedes ver la clasificación en 24h, 7 días, 30 días o la temporada."
+        "Una nueva Copa del mundo comienza cada 3 meses, y puedes ver la clasificación en 24h, 7 días, 30 días o la temporada.",
+        "Al final de cada temporada de 3 meses, los jugadores de los países del podio ganan cartas, sobres y XP, y el equipo campeón recibe el título de Campeón del mundo.",
+        "La Copa del mundo gana elementos visuales: banner del campeón vigente, vista del mundo por país, comparador de países, gráfico de progresión y actividad por hora."
       ],
       "changes_ja": [
         "スマートフォンとタブレットでは、より滑らかで高速な体験のためにアニメーションを無効にしました。",
@@ -40,7 +46,9 @@
         "シールドでブースターを開封する際、次のブースターに進む前にクリックを待つようになりました(時間制限なし)。",
         "ワールドカップのボタンがホームメニューに戻りました。",
         "ワールドカップに本格的なスコアシステムを導入:各国の上位6名の勝率、撃破した相手の強さ、チームのレベル、活動量、そして放棄によるペナルティ。",
-        "3か月ごとに新しいワールドカップが始まり、24時間・7日・30日・シーズンでランキングを見られます。"
+        "3か月ごとに新しいワールドカップが始まり、24時間・7日・30日・シーズンでランキングを見られます。",
+        "3か月ごとのシーズン終了時、表彰台の3か国のプレイヤーはカード・ブースター・XPを獲得し、優勝チームはワールドチャンピオンの称号を得ます。",
+        "ワールドカップに新要素:現チャンピオンのバナー、国別ワールドビュー、国の比較、シーズン推移グラフ、時間帯別の活動。"
       ]
     },
     {

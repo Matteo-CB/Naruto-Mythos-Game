@@ -3585,6 +3585,12 @@
     "factActivity": "Activity",
     "rule6": "A new World Cup restarts every 3 months, reset to zero. Ties are broken by number of games.",
     "championTitle": "World Champion {month}",
-    "reigningNation": "Reigning World Cup nation {month}"
+    "reigningNation": "Reigning World Cup nation {month}",
+    "lastChampionLabel": "Reigning champion {month}",
+    "worldMapTitle": "World overview",
+    "comparatorTitle": "Country comparator",
+    "progressionTitle": "Season progression",
+    "progressionCollecting": "Progression data will appear as the season goes on.",
+    "activityTitle": "Activity by hour (UTC)"
   }
 }
