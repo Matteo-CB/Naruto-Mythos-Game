@@ -3570,7 +3570,7 @@
     "emptyText": "No se ha jugado ninguna partida clasificatoria en los últimos 7 días. Juega partidas clasificatorias con una bandera elegida en tus opciones para situar a tu país en la clasificación.",
     "unrankedTitle": "Fuera de la clasificación: equipo de menos de {min} jugadores elegibles",
     "rulesTitle": "Reglas de la clasificación",
-    "rule1": "Solo cuentan las partidas clasificatorias de los últimos 7 días.",
+    "rule1": "Solo cuentan las partidas clasificatorias, en el período elegido: 24h, 7 días, 30 días o la temporada de 3 meses.",
     "rule2": "Solo se cuentan para su país los jugadores que eligieron una bandera en sus opciones.",
     "rule3": "Solo se cuentan los jugadores de al menos Sannin Legendario ({elo} ELO o más).",
     "rule4": "Cada país está representado por sus {team} mejores jugadores (mayor ELO), siempre que hayan jugado al menos {games} partidas clasificatorias en el período.",

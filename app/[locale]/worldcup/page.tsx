@@ -166,16 +166,33 @@ export default function WorldcupPage() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    fetch(`/api/worldcup?window=${window}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d: WorldcupPayload | null) => {
-        if (cancelled) return;
-        setData(d && Array.isArray(d.standings) ? d : null);
-        setLoading(false);
-      })
-      .catch(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
+    let timer: ReturnType<typeof setInterval> | null = null;
+
+    const load = (showSpinner: boolean) => {
+      if (showSpinner) setLoading(true);
+      fetch(`/api/worldcup?window=${window}`, { cache: 'no-store' })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d: WorldcupPayload | null) => {
+          if (cancelled) return;
+          if (d && Array.isArray(d.standings)) setData(d);
+          if (showSpinner) setLoading(false);
+        })
+        .catch(() => { if (!cancelled && showSpinner) setLoading(false); });
+    };
+
+    load(true);
+    timer = setInterval(() => {
+      if (typeof document === 'undefined' || !document.hidden) load(false);
+    }, 90000);
+
+    const onVisible = () => { if (!document.hidden) load(false); };
+    document.addEventListener('visibilitychange', onVisible);
+
+    return () => {
+      cancelled = true;
+      if (timer) clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [window]);
 
   const seasonLabel = useMemo(() => {

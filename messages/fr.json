@@ -3571,7 +3571,7 @@
     "emptyText": "Aucune partie classée n'a été jouée ces 7 derniers jours. Jouez des parties classées avec un drapeau choisi dans vos options pour placer votre pays au classement.",
     "unrankedTitle": "Hors classement : équipe de moins de {min} joueurs éligibles",
     "rulesTitle": "Règles du classement",
-    "rule1": "Seules les parties classées des 7 derniers jours comptent.",
+    "rule1": "Seules les parties classées comptent, sur la période choisie : 24h, 7 jours, 30 jours ou la saison de 3 mois.",
     "rule2": "Seuls les joueurs ayant choisi un drapeau dans leurs options sont comptés pour leur pays.",
     "rule3": "Seuls les joueurs au moins Sannin Légendaire ({elo} ELO ou plus) sont pris en compte.",
     "rule4": "Chaque pays est représenté par ses {team} meilleurs joueurs (les plus haut ELO), à condition d'avoir joué au moins {games} parties classées sur la période.",

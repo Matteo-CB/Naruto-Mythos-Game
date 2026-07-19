@@ -3565,7 +3565,7 @@
     "emptyText": "No ranked games were played in the last 7 days. Play ranked games with a flag selected in your options to put your country on the board.",
     "unrankedTitle": "Not ranked: team of fewer than {min} eligible players",
     "rulesTitle": "Ranking rules",
-    "rule1": "Only ranked games from the last 7 days count.",
+    "rule1": "Only ranked games count, over the chosen period: 24h, 7 days, 30 days or the 3-month season.",
     "rule2": "Only players who picked a flag in their options are counted for their country.",
     "rule3": "Only players at Legendary Sannin ({elo} ELO or more) are counted.",
     "rule4": "Each country is represented by its {team} best players (highest ELO), provided they played at least {games} ranked games in the period.",

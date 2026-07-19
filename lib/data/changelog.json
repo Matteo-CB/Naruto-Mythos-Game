@@ -16,7 +16,8 @@
         "Une nouvelle Coupe du monde recommence tous les 3 mois, et tu peux voir le classement sur 24h, 7 jours, 30 jours ou la saison.",
         "À la fin de chaque saison de 3 mois, les joueurs des 3 pays du podium gagnent des cartes, des boosters et de l'XP, et l'équipe championne reçoit le titre Champion du monde.",
         "La Coupe du monde s'enrichit : bannière du champion en titre, une vraie carte du monde coloriée par le score de chaque pays, comparateur de pays, courbe de progression de la saison et activité par heure.",
-        "Prise de contrôle avec Ino : tu peux désormais voler un personnage du même nom qu'un des tiens, il part alors à la défausse (règle officielle)."
+        "Prise de contrôle avec Ino : tu peux désormais voler un personnage du même nom qu'un des tiens, il part alors à la défausse (règle officielle).",
+        "La page Coupe du monde se met à jour toute seule et change automatiquement de saison et de dates tous les 3 mois."
       ],
       "changes_en": [
         "On phones and tablets, animations are turned off for a much smoother and faster experience.",
@@ -28,7 +29,8 @@
         "A new World Cup restarts every 3 months, and you can view the ranking over 24h, 7 days, 30 days or the season.",
         "At the end of each 3-month season, the podium countries' players earn cards, boosters and XP, and the winning team receives the World Champion title.",
         "The World Cup gains visuals: reigning champion banner, a real world map colored by each country’s score, country comparator, season progression chart and activity by hour.",
-        "Take control with Ino: you can now steal a character with the same name as one of yours; it then goes to the discard pile (official rule)."
+        "Take control with Ino: you can now steal a character with the same name as one of yours; it then goes to the discard pile (official rule).",
+        "The World Cup page refreshes on its own and automatically rolls over to the new season and dates every 3 months."
       ],
       "changes_es": [
         "En teléfonos y tabletas, las animaciones se desactivan para una experiencia mucho más fluida y rápida.",
@@ -40,7 +42,8 @@
         "Una nueva Copa del mundo comienza cada 3 meses, y puedes ver la clasificación en 24h, 7 días, 30 días o la temporada.",
         "Al final de cada temporada de 3 meses, los jugadores de los países del podio ganan cartas, sobres y XP, y el equipo campeón recibe el título de Campeón del mundo.",
         "La Copa del mundo gana elementos visuales: banner del campeón vigente, un mapa del mundo real coloreado según la puntuación de cada país, comparador de países, gráfico de progresión y actividad por hora.",
-        "Tomar el control con Ino: ahora puedes robar un personaje con el mismo nombre que uno tuyo; entonces va a la pila de descarte (regla oficial)."
+        "Tomar el control con Ino: ahora puedes robar un personaje con el mismo nombre que uno tuyo; entonces va a la pila de descarte (regla oficial).",
+        "La página de la Copa del mundo se actualiza sola y cambia automáticamente de temporada y fechas cada 3 meses."
       ],
       "changes_ja": [
         "スマートフォンとタブレットでは、より滑らかで高速な体験のためにアニメーションを無効にしました。",
@@ -52,7 +55,8 @@
         "3か月ごとに新しいワールドカップが始まり、24時間・7日・30日・シーズンでランキングを見られます。",
         "3か月ごとのシーズン終了時、表彰台の3か国のプレイヤーはカード・ブースター・XPを獲得し、優勝チームはワールドチャンピオンの称号を得ます。",
         "ワールドカップに新要素:現チャンピオンのバナー、各国のスコアで色分けされた本物の世界地図、国の比較、シーズン推移グラフ、時間帯別の活動。",
-        "イノのコントロール奪取:自分と同名のキャラクターも奪えるようになりました。その場合、奪ったキャラクターは捨て札に置かれます(公式ルール)。"
+        "イノのコントロール奪取:自分と同名のキャラクターも奪えるようになりました。その場合、奪ったキャラクターは捨て札に置かれます(公式ルール)。",
+        "ワールドカップのページは自動で更新され、3か月ごとにシーズンと日付が自動的に切り替わります。"
       ]
     },
     {
