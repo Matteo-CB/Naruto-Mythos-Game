@@ -144,6 +144,7 @@ model EloHistory {
   opponentScore    Int // mission points scored by the opponent
   isRanked         Boolean  @default(true)
   eloType          String   @default("ranked")
+  isForfeit        Boolean  @default(false)
   createdAt        DateTime @default(now())
 
   @@index([userId, createdAt])

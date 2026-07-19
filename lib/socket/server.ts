@@ -1092,6 +1092,7 @@ async function finalizeGameEnd(
             opponentScore: survivorIsP1 ? p2Score : p1Score,
             isRanked: true,
             eloType,
+            isForfeit: isForfeitEnd,
           },
         }).catch((err) => {
           console.warn('[Socket] EloHistory write failed (one-side):', err instanceof Error ? err.message : err);
@@ -1216,6 +1217,7 @@ async function finalizeGameEnd(
               opponentScore: p2Score,
               isRanked: true,
               eloType,
+              isForfeit: isForfeitEnd,
             },
           }).catch((err) => { console.warn('[Socket] EloHistory write 1 failed:', err instanceof Error ? err.message : err); return null; }),
           prisma.eloHistory.create({
@@ -1232,6 +1234,7 @@ async function finalizeGameEnd(
               opponentScore: p1Score,
               isRanked: true,
               eloType,
+              isForfeit: isForfeitEnd,
             },
           }).catch((err) => { console.warn('[Socket] EloHistory write 2 failed:', err instanceof Error ? err.message : err); return null; }),
         ]);
@@ -1285,7 +1288,7 @@ async function finalizeGameEnd(
               userId: room.hostId!, opponentId: room.guestId!, opponentUsername: p2Retry.username, opponentElo: p2RetryOldElo,
               oldElo: p1RetryOldElo, newElo: retryChanges.player1NewElo, delta: retryChanges.player1Delta,
               result: winner === 'player1' ? 'win' : 'loss', myScore: p1Score, opponentScore: p2Score, isRanked: true,
-              eloType,
+              eloType, isForfeit: isForfeitEnd,
             },
           }).catch((e) => console.warn(`[Socket] EloHistory write 1 (${label}) failed:`, e instanceof Error ? e.message : e));
           prisma.eloHistory.create({
@@ -1293,7 +1296,7 @@ async function finalizeGameEnd(
               userId: room.guestId!, opponentId: room.hostId!, opponentUsername: p1Retry.username, opponentElo: p1RetryOldElo,
               oldElo: p2RetryOldElo, newElo: retryChanges.player2NewElo, delta: retryChanges.player2Delta,
               result: winner === 'player2' ? 'win' : 'loss', myScore: p2Score, opponentScore: p1Score, isRanked: true,
-              eloType,
+              eloType, isForfeit: isForfeitEnd,
             },
           }).catch((e) => console.warn(`[Socket] EloHistory write 2 (${label}) failed:`, e instanceof Error ? e.message : e));
           return true;

@@ -12,7 +12,8 @@
         "Un bug empêchait certains nouveaux comptes de valider leur code de vérification par email, les bloquant dans une boucle infinie. C'est corrigé.",
         "En scellé, l'ouverture des boosters attend maintenant que tu cliques pour passer au booster suivant, sans limite de temps.",
         "Le bouton Coupe du monde est de retour dans le menu d'accueil.",
-        "La Coupe du monde classe désormais chaque pays sur ses 6 meilleurs joueurs."
+        "La Coupe du monde a un vrai système de score : taux de victoire des 6 meilleurs joueurs du pays, force des adversaires battus, niveau de l'équipe, activité, et malus pour les abandons.",
+        "Une nouvelle Coupe du monde recommence tous les 3 mois, et tu peux voir le classement sur 24h, 7 jours, 30 jours ou la saison."
       ],
       "changes_en": [
         "On phones and tablets, animations are turned off for a much smoother and faster experience.",
@@ -20,7 +21,8 @@
         "A bug prevented some new accounts from validating their email verification code, trapping them in an infinite loop. This is fixed.",
         "In sealed, opening boosters now waits for a click before moving to the next booster, with no time limit.",
         "The World Cup button is back in the home menu.",
-        "The World Cup now ranks each country by its 6 best players."
+        "The World Cup now has a real scoring system: win rate of the country's 6 best players, strength of beaten opponents, team level, activity, and a penalty for forfeits.",
+        "A new World Cup restarts every 3 months, and you can view the ranking over 24h, 7 days, 30 days or the season."
       ],
       "changes_es": [
         "En teléfonos y tabletas, las animaciones se desactivan para una experiencia mucho más fluida y rápida.",
@@ -28,7 +30,8 @@
         "Un error impedía que algunas cuentas nuevas validaran su código de verificación por correo, atrapándolas en un bucle infinito. Esto está corregido.",
         "En sellado, abrir sobres ahora espera un clic antes de pasar al siguiente sobre, sin límite de tiempo.",
         "El botón Copa del mundo vuelve a estar en el menú de inicio.",
-        "La Copa del mundo ahora clasifica a cada país por sus 6 mejores jugadores."
+        "La Copa del mundo tiene un sistema de puntuación real: tasa de victorias de los 6 mejores jugadores del país, fuerza de los rivales vencidos, nivel del equipo, actividad y penalización por abandonos.",
+        "Una nueva Copa del mundo comienza cada 3 meses, y puedes ver la clasificación en 24h, 7 días, 30 días o la temporada."
       ],
       "changes_ja": [
         "スマートフォンとタブレットでは、より滑らかで高速な体験のためにアニメーションを無効にしました。",
@@ -36,7 +39,8 @@
         "一部の新規アカウントでメール確認コードが検証できず、無限ループに陥るバグがありました。修正済みです。",
         "シールドでブースターを開封する際、次のブースターに進む前にクリックを待つようになりました(時間制限なし)。",
         "ワールドカップのボタンがホームメニューに戻りました。",
-        "ワールドカップは各国を上位6名のプレイヤーで順位付けするようになりました。"
+        "ワールドカップに本格的なスコアシステムを導入:各国の上位6名の勝率、撃破した相手の強さ、チームのレベル、活動量、そして放棄によるペナルティ。",
+        "3か月ごとに新しいワールドカップが始まり、24時間・7日・30日・シーズンでランキングを見られます。"
       ]
     },
     {

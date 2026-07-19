@@ -12,7 +12,7 @@ import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { useLocaleBcp47 } from '@/lib/i18n/useLocaleMeta';
 import { COUNTRIES } from '@/lib/data/countries';
 import { getCardGroup } from '@/lib/utils/cardLocale';
-import { MIN_RANKED_PLAYERS, WORLDCUP_MIN_ELO, TEAM_SIZE } from '@/lib/worldcup/fairScore';
+import { MIN_RANKED_PLAYERS, WORLDCUP_MIN_ELO, TEAM_SIZE, MIN_PLAYER_GAMES } from '@/lib/worldcup/fairScore';
 
 const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
 const MEDAL_COLORS = ['#c4a35a', '#a8a9ad', '#a06b42'];
@@ -20,29 +20,45 @@ const MEDAL_COLORS = ['#c4a35a', '#a8a9ad', '#a06b42'];
 interface CountryPlayer {
   username: string;
   elo: number;
-  wins7d: number;
-  games7d: number;
+  wins: number;
+  games: number;
+}
+
+interface ScoreBreakdown {
+  winRate: number;
+  strengthFactor: number;
+  eloFactor: number;
+  activityFactor: number;
+  forfeitRate: number;
 }
 
 interface CountryRow {
   countryCode: string;
   ranked: boolean;
   players: number;
+  teamSize: number;
   games: number;
   wins: number;
   losses: number;
   winRate: number;
   score: number;
   avgElo: number;
+  avgOpponentElo: number;
+  forfeitLosses: number;
+  breakdown: ScoreBreakdown;
   topPlayers: CountryPlayer[];
   topGroup: string | null;
   topGroupShare: number;
 }
 
+type WorldcupWindow = '24h' | '7d' | '30d' | 'season';
+
 interface WorldcupPayload {
   standings: CountryRow[];
   totals: { countries: number; players: number; games: number };
-  windowDays: number;
+  window: WorldcupWindow;
+  seasonStart: string | null;
+  seasonEnd: string | null;
 }
 
 function useCountryName(bcp47: string): (code: string) => string {
@@ -112,13 +128,13 @@ function PodiumCard({
         {countryName}
       </span>
       <span className="font-display text-lg tabular-nums" style={{ color: medal }}>
-        {row.winRate.toFixed(1)}%
+        {row.score.toFixed(1)}
       </span>
       <span className="text-[9px] uppercase tracking-[0.2em]" style={{ color: '#666' }}>
-        {t('colWinRate')}
+        {t('colScore')}
       </span>
       <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>
-        {t('recordLine', { wins: row.wins, losses: row.losses })}
+        {row.winRate.toFixed(1)}% · {t('recordLine', { wins: row.wins, losses: row.losses })}
       </span>
     </motion.div>
   );
@@ -134,10 +150,12 @@ export default function WorldcupPage() {
   const [data, setData] = useState<WorldcupPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [window, setWindow] = useState<WorldcupWindow>('season');
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/worldcup')
+    setLoading(true);
+    fetch(`/api/worldcup?window=${window}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d: WorldcupPayload | null) => {
         if (cancelled) return;
@@ -146,7 +164,20 @@ export default function WorldcupPage() {
       })
       .catch(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, []);
+  }, [window]);
+
+  const seasonLabel = useMemo(() => {
+    if (!data?.seasonStart || !data?.seasonEnd) return '';
+    try {
+      const [y1, m1] = data.seasonStart.split('-').map(Number);
+      const [y2, m2] = data.seasonEnd.split('-').map(Number);
+      const monthFmt = new Intl.DateTimeFormat(bcp47, { month: 'long' });
+      const fullFmt = new Intl.DateTimeFormat(bcp47, { month: 'long', year: 'numeric' });
+      const start = monthFmt.format(new Date(Date.UTC(y1, m1 - 1, 1)));
+      const end = fullFmt.format(new Date(Date.UTC(y2, m2 - 1, 1)));
+      return `${start} - ${end}`;
+    } catch { return ''; }
+  }, [data?.seasonStart, data?.seasonEnd, bcp47]);
 
   const standings = data?.standings ?? [];
   const rankedRows = standings.filter((r) => r.ranked);
@@ -210,12 +241,12 @@ export default function WorldcupPage() {
                               transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
                             />
                           </span>
-                          <span className="font-display text-sm sm:text-base tabular-nums" style={{ color: row.winRate >= 50 ? '#8fbf8f' : '#c48f8f' }}>
-                            {row.winRate.toFixed(1)}%
+                          <span className="font-display text-sm sm:text-base tabular-nums" style={{ color: '#c4a35a' }}>
+                            {row.score.toFixed(1)}
                           </span>
                         </span>
-                        <span className="hidden sm:block text-right text-xs tabular-nums" style={{ color: '#999' }}>
-                          {t('recordLine', { wins: row.wins, losses: row.losses })}
+                        <span className="hidden sm:block text-right text-xs tabular-nums" style={{ color: row.winRate >= 50 ? '#8fbf8f' : '#c48f8f' }}>
+                          {row.winRate.toFixed(1)}%
                         </span>
                         <span className="hidden sm:block text-right text-xs tabular-nums" style={{ color: '#999' }}>
                           {row.players}
@@ -233,17 +264,33 @@ export default function WorldcupPage() {
                           className="overflow-hidden"
                         >
                           <div className="px-4 sm:px-6 pb-4 pt-1">
-                            <div className="flex flex-wrap gap-x-6 gap-y-1.5 mb-3 text-[10px] uppercase tracking-widest" style={{ color: '#777' }}>
+                            <div className="flex flex-wrap gap-x-6 gap-y-1.5 mb-2 text-[10px] uppercase tracking-widest" style={{ color: '#777' }}>
+                              <span className="sm:hidden">{t('colScore')}: <span className="tabular-nums" style={{ color: '#c4a35a' }}>{row.score.toFixed(1)}</span></span>
                               <span>{t('detailGames')}: <span className="tabular-nums" style={{ color: '#c4a35a' }}>{row.games}</span></span>
                               <span>{t('detailAvgElo')}: <span className="tabular-nums" style={{ color: '#c4a35a' }}>{row.avgElo}</span></span>
+                              <span>{t('detailBeatenElo')}: <span className="tabular-nums" style={{ color: '#c4a35a' }}>{row.avgOpponentElo}</span></span>
                               <span className="sm:hidden">{t('colWinRate')}: <span className="tabular-nums" style={{ color: row.winRate >= 50 ? '#8fbf8f' : '#c48f8f' }}>{row.winRate.toFixed(1)}%</span></span>
-                              <span className="sm:hidden">{t('colPlayers')}: <span className="tabular-nums" style={{ color: '#c4a35a' }}>{row.players}</span></span>
+                              {row.forfeitLosses > 0 && (
+                                <span>{t('detailForfeits')}: <span className="tabular-nums" style={{ color: '#c48f8f' }}>{row.forfeitLosses}</span></span>
+                              )}
                               {row.topGroup && (
                                 <span>
                                   {t('detailTopGroup')}: <span style={{ color: '#c4a35a' }}>{getCardGroup(row.topGroup, tCardMeta)}</span>
                                   <span className="tabular-nums" style={{ color: '#666' }}> ({row.topGroupShare}%)</span>
                                 </span>
                               )}
+                            </div>
+                            <div className="mb-3 flex flex-wrap gap-1.5">
+                              {([
+                                { label: t('factWinRate'), pct: row.breakdown.winRate * 100 },
+                                { label: t('factStrength'), pct: row.breakdown.strengthFactor * 100 },
+                                { label: t('factElo'), pct: row.breakdown.eloFactor * 100 },
+                                { label: t('factActivity'), pct: row.breakdown.activityFactor * 100 },
+                              ]).map((f) => (
+                                <span key={f.label} className="text-[9px] uppercase tracking-widest px-2 py-1" style={{ backgroundColor: 'rgba(196,163,90,0.08)', color: '#9a8a5f' }}>
+                                  {f.label} <span className="tabular-nums" style={{ color: '#c4a35a' }}>{Math.round(f.pct)}%</span>
+                                </span>
+                              ))}
                             </div>
                             <div className="text-[9px] uppercase tracking-[0.2em] mb-1.5" style={{ color: '#555' }}>
                               {t('topPlayersTitle')}
@@ -264,7 +311,7 @@ export default function WorldcupPage() {
                                     style={{ color: '#e0e0e0' }}
                                   />
                                   <span className="text-[10px] tabular-nums" style={{ color: '#999' }}>
-                                    {t('recordLine', { wins: p.wins7d, losses: p.games7d - p.wins7d })}
+                                    {t('recordLine', { wins: p.wins, losses: p.games - p.wins })}
                                   </span>
                                   <span className="font-display text-xs tabular-nums" style={{ color: '#c4a35a' }}>
                                     {p.elo}
@@ -310,8 +357,25 @@ export default function WorldcupPage() {
             </div>
           </div>
           <p className="text-[11px] mt-3" style={{ color: '#555' }}>
-            {t('subtitle', { days: data?.windowDays ?? 7 })}
+            {window === 'season' && seasonLabel ? t('subtitleSeason', { period: seasonLabel }) : t('subtitleWindow')}
           </p>
+
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            {(['season', '30d', '7d', '24h'] as const).map((w) => (
+              <button
+                key={w}
+                type="button"
+                onClick={() => setWindow(w)}
+                className="font-display px-3 py-1.5 text-[10px] uppercase tracking-widest cursor-pointer transition-colors"
+                style={{
+                  backgroundColor: window === w ? '#c4a35a' : 'rgba(255,255,255,0.03)',
+                  color: window === w ? '#0a0a0a' : '#888',
+                }}
+              >
+                {t(`window_${w}`)}
+              </button>
+            ))}
+          </div>
         </motion.header>
 
         {loading ? (
@@ -371,8 +435,8 @@ export default function WorldcupPage() {
             >
               <span />
               <span>{t('colCountry')}</span>
+              <span className="text-right">{t('colScore')}</span>
               <span className="text-right">{t('colWinRate')}</span>
-              <span className="text-right">{t('colRecord')}</span>
               <span className="text-right">{t('colPlayers')}</span>
             </div>
 
@@ -406,8 +470,9 @@ export default function WorldcupPage() {
                   t('rule1'),
                   t('rule2'),
                   t('rule3', { elo: WORLDCUP_MIN_ELO }),
-                  t('rule4', { team: TEAM_SIZE }),
+                  t('rule4', { team: TEAM_SIZE, games: MIN_PLAYER_GAMES }),
                   t('rule5', { team: TEAM_SIZE }),
+                  t('rule6'),
                 ]).map((rule, i) => (
                   <li key={i} className="flex gap-2.5 text-[11px] leading-relaxed" style={{ color: '#999' }}>
                     <span className="font-display shrink-0 tabular-nums" style={{ color: '#c4a35a' }}>{i + 1}.</span>

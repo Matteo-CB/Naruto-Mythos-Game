@@ -1,19 +1,42 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { buildCountryStandings, type CountryUser } from '@/lib/worldcup/fairScore';
 
 export const dynamic = 'force-dynamic';
 
-const WINDOW_DAYS = 7;
+export type WorldcupWindow = '24h' | '7d' | '30d' | 'season';
 
-export async function GET() {
+export function seasonBounds(now: Date): { start: Date; startMonth: string; endMonth: string } {
+  const year = now.getUTCFullYear();
+  const quarterStartMonth = Math.floor(now.getUTCMonth() / 3) * 3;
+  const start = new Date(Date.UTC(year, quarterStartMonth, 1));
+  const endMonthDate = new Date(Date.UTC(year, quarterStartMonth + 2, 1));
+  return {
+    start,
+    startMonth: start.toISOString().slice(0, 7),
+    endMonth: endMonthDate.toISOString().slice(0, 7),
+  };
+}
+
+function resolveSince(window: WorldcupWindow): { since: Date; label: WorldcupWindow; startMonth: string | null; endMonth: string | null } {
+  const now = new Date();
+  if (window === '24h') return { since: new Date(now.getTime() - 86400000), label: '24h', startMonth: null, endMonth: null };
+  if (window === '7d') return { since: new Date(now.getTime() - 7 * 86400000), label: '7d', startMonth: null, endMonth: null };
+  if (window === '30d') return { since: new Date(now.getTime() - 30 * 86400000), label: '30d', startMonth: null, endMonth: null };
+  const s = seasonBounds(now);
+  return { since: s.start, label: 'season', startMonth: s.startMonth, endMonth: s.endMonth };
+}
+
+export async function GET(request: NextRequest) {
   try {
-    const since = new Date(Date.now() - WINDOW_DAYS * 86400000);
+    const raw = request.nextUrl.searchParams.get('window');
+    const window: WorldcupWindow = raw === '24h' || raw === '7d' || raw === '30d' ? raw : 'season';
+    const { since, label, startMonth, endMonth } = resolveSince(window);
     const sinceDay = since.toISOString().slice(0, 10);
 
     const results = await prisma.eloHistory.findMany({
       where: { createdAt: { gte: since }, isRanked: true, eloType: 'ranked' },
-      select: { userId: true, result: true },
+      select: { userId: true, result: true, opponentElo: true, isForfeit: true },
     });
 
     const userIds = [...new Set(results.map((r) => r.userId))];
@@ -27,7 +50,10 @@ export async function GET() {
       users.map((u) => [u.id, { username: u.username, elo: u.elo, countryCode: u.countryCode ?? null }]),
     );
 
-    const standings = buildCountryStandings(results, userMap);
+    const standings = buildCountryStandings(
+      results.map((r) => ({ userId: r.userId, result: r.result, opponentElo: r.opponentElo, isForfeit: r.isForfeit === true })),
+      userMap,
+    );
 
     const groupRows = await prisma.countryGroupStat.findMany({
       where: { day: { gte: sinceDay } },
@@ -60,7 +86,7 @@ export async function GET() {
       return {
         ...s,
         winRate: Math.round(s.winRate * 1000) / 10,
-        score: Math.round(s.score * 1000) / 10,
+        score: Math.round(s.score * 10) / 10,
         topGroup,
         topGroupShare: totalCount > 0 ? Math.round((topCount / totalCount) * 100) : 0,
       };
@@ -73,7 +99,9 @@ export async function GET() {
       {
         standings: payload,
         totals: { countries: standings.length, players: totalPlayers, games: totalGames },
-        windowDays: WINDOW_DAYS,
+        window: label,
+        seasonStart: startMonth,
+        seasonEnd: endMonth,
         generatedAt: new Date().toISOString(),
       },
       {
