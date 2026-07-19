@@ -31,6 +31,7 @@ export interface CountryUser {
 }
 
 export interface CountryPlayerEntry {
+  userId: string;
   username: string;
   elo: number;
   wins: number;
@@ -181,6 +182,7 @@ export function buildCountryStandings(
       score,
       breakdown,
       topPlayers: team.map((u) => ({
+        userId: u.userId,
         username: users.get(u.userId)?.username ?? '',
         elo: u.elo,
         wins: u.wins,

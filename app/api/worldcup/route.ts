@@ -1,29 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { buildCountryStandings, type CountryUser } from '@/lib/worldcup/fairScore';
+import { seasonBoundsForDate } from '@/lib/worldcup/season';
 
 export const dynamic = 'force-dynamic';
 
 export type WorldcupWindow = '24h' | '7d' | '30d' | 'season';
-
-export function seasonBounds(now: Date): { start: Date; startMonth: string; endMonth: string } {
-  const year = now.getUTCFullYear();
-  const quarterStartMonth = Math.floor(now.getUTCMonth() / 3) * 3;
-  const start = new Date(Date.UTC(year, quarterStartMonth, 1));
-  const endMonthDate = new Date(Date.UTC(year, quarterStartMonth + 2, 1));
-  return {
-    start,
-    startMonth: start.toISOString().slice(0, 7),
-    endMonth: endMonthDate.toISOString().slice(0, 7),
-  };
-}
 
 function resolveSince(window: WorldcupWindow): { since: Date; label: WorldcupWindow; startMonth: string | null; endMonth: string | null } {
   const now = new Date();
   if (window === '24h') return { since: new Date(now.getTime() - 86400000), label: '24h', startMonth: null, endMonth: null };
   if (window === '7d') return { since: new Date(now.getTime() - 7 * 86400000), label: '7d', startMonth: null, endMonth: null };
   if (window === '30d') return { since: new Date(now.getTime() - 30 * 86400000), label: '30d', startMonth: null, endMonth: null };
-  const s = seasonBounds(now);
+  const s = seasonBoundsForDate(now);
   return { since: s.start, label: 'season', startMonth: s.startMonth, endMonth: s.endMonth };
 }
 

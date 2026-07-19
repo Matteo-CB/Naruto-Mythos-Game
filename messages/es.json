@@ -3588,6 +3588,8 @@
     "factStrength": "Rivales",
     "factElo": "Nivel",
     "factActivity": "Actividad",
-    "rule6": "Una nueva Copa del mundo comienza cada 3 meses, reiniciada a cero. Los empates se deciden por número de partidas."
+    "rule6": "Una nueva Copa del mundo comienza cada 3 meses, reiniciada a cero. Los empates se deciden por número de partidas.",
+    "championTitle": "Campeón del mundo {month}",
+    "reigningNation": "Nación campeona del mundo {month}"
   }
 }

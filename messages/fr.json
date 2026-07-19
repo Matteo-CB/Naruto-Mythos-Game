@@ -3589,6 +3589,8 @@
     "factStrength": "Adversité",
     "factElo": "Niveau",
     "factActivity": "Activité",
-    "rule6": "Une nouvelle Coupe du monde recommence tous les 3 mois, remise à zéro. Les égalités se départagent au nombre de parties."
+    "rule6": "Une nouvelle Coupe du monde recommence tous les 3 mois, remise à zéro. Les égalités se départagent au nombre de parties.",
+    "championTitle": "Champion du monde {month}",
+    "reigningNation": "Nation championne du monde {month}"
   }
 }

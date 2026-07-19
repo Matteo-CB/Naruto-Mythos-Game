@@ -3583,6 +3583,8 @@
     "factStrength": "Opposition",
     "factElo": "Level",
     "factActivity": "Activity",
-    "rule6": "A new World Cup restarts every 3 months, reset to zero. Ties are broken by number of games."
+    "rule6": "A new World Cup restarts every 3 months, reset to zero. Ties are broken by number of games.",
+    "championTitle": "World Champion {month}",
+    "reigningNation": "Reigning World Cup nation {month}"
   }
 }
