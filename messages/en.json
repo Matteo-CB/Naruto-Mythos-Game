@@ -660,7 +660,8 @@
     "blockedEmpty": "You have not blocked anyone.",
     "unblock": "Unblock",
     "fastAnimations": "Fast animations",
-    "fastAnimationsHint": "All game animations last half as long."
+    "fastAnimationsHint": "All game animations last half as long.",
+    "animationsTouchDisabled": "Animations are automatically disabled on phones and tablets for smooth performance."
   },
   "game": {
     "turn": "Turn {turn}",

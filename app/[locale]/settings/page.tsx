@@ -4,6 +4,7 @@ import { signOut, useSession } from 'next-auth/react';
 import { useRouter, Link } from '@/lib/i18n/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { isTouchPrimaryDevice } from '@/lib/utils/device';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { FlagPicker } from '@/components/FlagPicker';
@@ -37,13 +38,15 @@ export default function SettingsPage() {
   const locale = useLocale();
   const tMeta = useTranslations('_meta');
   const {
-    animationsEnabled, gameBackground, gameBackgroundUrl, isLoaded, availableBackgrounds,
+    animationsPref, gameBackground, gameBackgroundUrl, isLoaded, availableBackgrounds,
     fetchFromServer, setAnimationsEnabled, setGameBackground,
     hideDeckBuilderVariants, setHideDeckBuilderVariants,
     fastAnimations, setFastAnimations,
     countryCode, setCountryCode,
     soundEnabled, setSoundEnabled,
   } = useSettingsStore();
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  useEffect(() => { setIsTouchDevice(isTouchPrimaryDevice()); }, []);
   const tFlag = useTranslations('flag');
   const backgrounds = availableBackgrounds;
 
@@ -174,8 +177,8 @@ export default function SettingsPage() {
       className="relative flex min-h-screen flex-col items-center justify-center"
       style={{ backgroundColor: '#0a0a0a' }}
     >
-      <CloudBackground animated={animationsEnabled} />
-      <DecorativeIcons animated={animationsEnabled} />
+      <CloudBackground animated={animationsPref && !isTouchDevice} />
+      <DecorativeIcons animated={animationsPref && !isTouchDevice} />
 
       <div
         className="relative z-10 w-full max-w-md px-4 py-8 lg:max-w-6xl lg:px-8"
@@ -305,21 +308,21 @@ export default function SettingsPage() {
             <button
               type="button"
               role="switch"
-              aria-checked={animationsEnabled}
-              disabled={!isLoaded}
-              onClick={() => setAnimationsEnabled(!animationsEnabled)}
-              className="relative h-6 w-11 flex-shrink-0 rounded-full transition-colors overflow-hidden"
+              aria-checked={animationsPref}
+              disabled={!isLoaded || isTouchDevice}
+              onClick={() => setAnimationsEnabled(!animationsPref)}
+              className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden"
               style={{
-                backgroundColor: animationsEnabled ? '#c4a35a' : '#333333',
-                cursor: isLoaded ? 'pointer' : 'default',
-                opacity: isLoaded ? 1 : 0.5,
+                backgroundColor: animationsPref ? '#c4a35a' : '#333333',
+                cursor: isLoaded && !isTouchDevice ? 'pointer' : 'default',
+                opacity: isLoaded && !isTouchDevice ? 1 : 0.5,
               }}
             >
               <span
                 className="absolute top-0.5 h-5 w-5 rounded-full"
                 style={{
                   backgroundColor: '#0a0a0a',
-                  left: animationsEnabled ? '22px' : '2px',
+                  left: animationsPref ? '22px' : '2px',
                   transition: 'left 150ms ease',
                 }}
               />
@@ -332,7 +335,7 @@ export default function SettingsPage() {
             className="text-xs tracking-wide"
             style={{ color: '#555555' }}
           >
-            {!isLoaded ? t('loading') : animationsEnabled ? t('animationsOn') : t('animationsOff')}
+            {!isLoaded ? t('loading') : isTouchDevice ? t('animationsTouchDisabled') : animationsPref ? t('animationsOn') : t('animationsOff')}
           </p>
 
           <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />

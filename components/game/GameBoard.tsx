@@ -35,6 +35,7 @@ import { EdgeCoinFlip } from "./EdgeCoinFlip";
 import { useSocketStore } from "@/lib/socket/client";
 import { GameChat } from "./GameChat";
 import { SpectatorBanner } from "./SpectatorBanner";
+import { Z_APP_MODAL, Z_GAME_OVERLAY } from "@/lib/ui/zIndex";
 
 const rarityColorMap: Record<string, string> = {
   C: "#888888",
@@ -793,8 +794,8 @@ function FullscreenCardDetail() {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.15 }}
-        className="fixed inset-0 z-300 flex items-center justify-center"
-        style={{ backgroundColor: "rgba(0, 0, 0, 0.88)", padding: "12px" }}
+        className="fixed inset-0 flex items-center justify-center"
+        style={{ backgroundColor: "rgba(0, 0, 0, 0.88)", padding: "12px", zIndex: Z_APP_MODAL }}
         onClick={handleClose}
       >
         <motion.div
@@ -875,8 +876,8 @@ function FullscreenCardDetail() {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-300 flex items-center justify-center"
-        style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+        className="fixed inset-0 flex items-center justify-center"
+        style={{ backgroundColor: "rgba(0, 0, 0, 0.85)", zIndex: Z_APP_MODAL }}
         onClick={handleClose}
       >
         <motion.div
@@ -984,11 +985,13 @@ function MaintenanceNotification() {
       initial={{ opacity: 0, x: 40 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3 }}
-      className="fixed top-14 right-3 z-300 flex items-start gap-2 px-4 py-3"
+      className="fixed top-14 right-3 flex items-start gap-2 px-4 py-3"
       style={{
         maxWidth: '340px',
         backgroundColor: 'rgba(40, 30, 10, 0.92)',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+        zIndex: Z_GAME_OVERLAY,
+        pointerEvents: 'none',
       }}
     >
       <span className="text-[9px] leading-relaxed" style={{ color: '#c4a35a', fontFamily: 'Inter, sans-serif' }}>

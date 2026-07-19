@@ -50,6 +50,7 @@ export const IdleWarningToast = React.memo(function IdleWarningToast() {
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 9000,
+            pointerEvents: 'none',
             backgroundColor: 'rgba(179, 62, 62, 0.18)',
             padding: '10px 16px',
             color: '#e0e0e0',

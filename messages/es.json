@@ -665,7 +665,8 @@
     "blockedEmpty": "No has bloqueado a nadie.",
     "unblock": "Desbloquear",
     "fastAnimations": "Animaciones rápidas",
-    "fastAnimationsHint": "Todas las animaciones del juego duran la mitad."
+    "fastAnimationsHint": "Todas las animaciones del juego duran la mitad.",
+    "animationsTouchDisabled": "Las animaciones se desactivan automáticamente en teléfonos y tabletas para un rendimiento fluido."
   },
   "game": {
     "turn": "Turno {turn}",

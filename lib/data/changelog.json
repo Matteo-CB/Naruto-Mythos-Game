@@ -7,21 +7,29 @@
       "title_es": "Corrección del bucle de verificación de correo",
       "title_ja": "メール確認のループを修正",
       "changes_fr": [
+        "Sur téléphone et tablette, les animations sont désactivées pour une expérience beaucoup plus fluide et rapide.",
+        "Corrigé : sur mobile, on pouvait rester bloqué sur le détail d'une carte car la croix ne répondait pas. On peut toujours fermer maintenant.",
         "Un bug empêchait certains nouveaux comptes de valider leur code de vérification par email, les bloquant dans une boucle infinie. C'est corrigé.",
         "En scellé, l'ouverture des boosters attend maintenant que tu cliques pour passer au booster suivant, sans limite de temps.",
         "Le bouton Coupe du monde est de retour dans le menu d'accueil."
       ],
       "changes_en": [
+        "On phones and tablets, animations are turned off for a much smoother and faster experience.",
+        "Fixed: on mobile you could get stuck on a card's details because the close button did nothing. You can always close it now.",
         "A bug prevented some new accounts from validating their email verification code, trapping them in an infinite loop. This is fixed.",
         "In sealed, opening boosters now waits for a click before moving to the next booster, with no time limit.",
         "The World Cup button is back in the home menu."
       ],
       "changes_es": [
+        "En teléfonos y tabletas, las animaciones se desactivan para una experiencia mucho más fluida y rápida.",
+        "Corregido: en móvil podías quedarte bloqueado en los detalles de una carta porque la cruz no respondía. Ahora siempre se puede cerrar.",
         "Un error impedía que algunas cuentas nuevas validaran su código de verificación por correo, atrapándolas en un bucle infinito. Esto está corregido.",
         "En sellado, abrir sobres ahora espera un clic antes de pasar al siguiente sobre, sin límite de tiempo.",
         "El botón Copa del mundo vuelve a estar en el menú de inicio."
       ],
       "changes_ja": [
+        "スマートフォンとタブレットでは、より滑らかで高速な体験のためにアニメーションを無効にしました。",
+        "修正:モバイルでカード詳細の閉じるボタンが反応せず画面から抜け出せなくなることがありました。常に閉じられるようになりました。",
         "一部の新規アカウントでメール確認コードが検証できず、無限ループに陥るバグがありました。修正済みです。",
         "シールドでブースターを開封する際、次のブースターに進む前にクリックを待つようになりました(時間制限なし)。",
         "ワールドカップのボタンがホームメニューに戻りました。"

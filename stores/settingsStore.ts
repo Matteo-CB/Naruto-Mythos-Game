@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { isTouchPrimaryDevice } from '@/lib/utils/device';
 
 interface BackgroundOption {
   id: string;
@@ -6,10 +7,15 @@ interface BackgroundOption {
   url: string;
 }
 
+function effectiveAnimations(pref: boolean): boolean {
+  return pref && !isTouchPrimaryDevice();
+}
+
 export type ChatVisibilitySetting = 'everyone' | 'friends' | 'off';
 
 interface SettingsState {
   animationsEnabled: boolean;
+  animationsPref: boolean;
   fastAnimations: boolean;
   chatVisibility: ChatVisibilitySetting;
   soundEnabled: boolean;
@@ -65,7 +71,8 @@ function getLocalSound(): { enabled: boolean; volume: number } {
 }
 
 export const useSettingsStore = create<SettingsState>()((set, get) => ({
-  animationsEnabled: true,
+  animationsEnabled: effectiveAnimations(true),
+  animationsPref: true,
   fastAnimations: false,
   chatVisibility: 'everyone',
   soundEnabled: getLocalSound().enabled,
@@ -100,8 +107,10 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
 
       cacheBackgrounds(backgrounds);
 
+      const animPref = prefs.animationsEnabled ?? true;
       set({
-        animationsEnabled: prefs.animationsEnabled ?? true,
+        animationsPref: animPref,
+        animationsEnabled: effectiveAnimations(animPref),
         fastAnimations: prefs.fastAnimations ?? false,
         chatVisibility: (['everyone', 'friends', 'off'].includes(prefs.chatVisibility) ? prefs.chatVisibility : 'everyone') as ChatVisibilitySetting,
         soundEnabled: prefs.soundsEnabled ?? get().soundEnabled,
@@ -122,8 +131,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   },
 
   setAnimationsEnabled: async (v: boolean) => {
-    const prev = get().animationsEnabled;
-    set({ animationsEnabled: v });
+    const prevPref = get().animationsPref;
+    set({ animationsPref: v, animationsEnabled: effectiveAnimations(v) });
     try {
       const res = await fetch('/api/user/preferences', {
         method: 'PATCH',
@@ -132,7 +141,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       });
       if (!res.ok) throw new Error('Failed to save');
     } catch {
-      set({ animationsEnabled: prev });
+      set({ animationsPref: prevPref, animationsEnabled: effectiveAnimations(prevPref) });
     }
   },
 
