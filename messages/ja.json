@@ -3595,6 +3595,7 @@
     "comparatorTitle": "国の比較",
     "progressionTitle": "シーズンの推移",
     "progressionCollecting": "推移データはシーズンの経過とともに表示されます。",
-    "activityTitle": "時間帯別の活動(UTC)"
+    "activityTitle": "時間帯別の活動(UTC)",
+    "worldMapHint": "国にカーソルを合わせるかタップ"
   }
 }

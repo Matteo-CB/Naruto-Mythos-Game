@@ -3596,6 +3596,7 @@
     "comparatorTitle": "Comparador de países",
     "progressionTitle": "Progresión de la temporada",
     "progressionCollecting": "Los datos de progresión aparecerán a lo largo de la temporada.",
-    "activityTitle": "Actividad por hora (UTC)"
+    "activityTitle": "Actividad por hora (UTC)",
+    "worldMapHint": "Pasa el ratón o toca un país"
   }
 }

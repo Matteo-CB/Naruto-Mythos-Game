@@ -456,7 +456,11 @@ export default function WorldcupPage() {
               <StatBlock label={t('totalGames')} value={data?.totals.games ?? 0} />
             </motion.div>
 
-            <WorldcupWorldMap rows={standings} countryName={countryName} />
+            <WorldcupWorldMap
+              rows={standings}
+              countryName={countryName}
+              onSelect={(code) => setExpanded((cur) => (cur === code ? null : code))}
+            />
 
             {podium.length > 0 && (
               <div className="flex items-end gap-2 sm:gap-4 mb-8">
