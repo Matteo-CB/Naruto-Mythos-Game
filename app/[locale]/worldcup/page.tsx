@@ -12,7 +12,7 @@ import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { useLocaleBcp47 } from '@/lib/i18n/useLocaleMeta';
 import { COUNTRIES } from '@/lib/data/countries';
 import { getCardGroup } from '@/lib/utils/cardLocale';
-import { MIN_RANKED_PLAYERS, WORLDCUP_MIN_ELO } from '@/lib/worldcup/fairScore';
+import { MIN_RANKED_PLAYERS, WORLDCUP_MIN_ELO, TEAM_SIZE } from '@/lib/worldcup/fairScore';
 
 const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
 const MEDAL_COLORS = ['#c4a35a', '#a8a9ad', '#a06b42'];
@@ -112,10 +112,10 @@ function PodiumCard({
         {countryName}
       </span>
       <span className="font-display text-lg tabular-nums" style={{ color: medal }}>
-        {row.score.toFixed(1)}
+        {row.winRate.toFixed(1)}%
       </span>
       <span className="text-[9px] uppercase tracking-[0.2em]" style={{ color: '#666' }}>
-        {t('scoreLabel')}
+        {t('colWinRate')}
       </span>
       <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>
         {t('recordLine', { wins: row.wins, losses: row.losses })}
@@ -172,7 +172,7 @@ export default function WorldcupPage() {
                       onClick={() => setExpanded(isOpen ? null : row.countryCode)}
                       className="block w-full px-3 sm:px-5 py-2.5 cursor-pointer text-left"
                     >
-                      <span className="grid items-center gap-2 sm:gap-3 grid-cols-[2rem_auto_minmax(0,1fr)_auto] sm:grid-cols-[2.25rem_minmax(0,1fr)_7rem_4.5rem_5rem_4rem]">
+                      <span className="grid items-center gap-2 sm:gap-3 grid-cols-[2rem_auto_minmax(0,1fr)_auto] sm:grid-cols-[2.25rem_minmax(0,1fr)_7rem_5rem_4rem]">
                         <span
                           className="font-display text-base sm:text-lg tabular-nums text-center"
                           style={{ color: rank !== null && rank <= 3 ? MEDAL_COLORS[rank - 1] : '#666' }}
@@ -210,12 +210,9 @@ export default function WorldcupPage() {
                               transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
                             />
                           </span>
-                          <span className="font-display text-sm sm:text-base tabular-nums" style={{ color: '#c4a35a' }}>
-                            {row.score.toFixed(1)}
+                          <span className="font-display text-sm sm:text-base tabular-nums" style={{ color: row.winRate >= 50 ? '#8fbf8f' : '#c48f8f' }}>
+                            {row.winRate.toFixed(1)}%
                           </span>
-                        </span>
-                        <span className="hidden sm:block text-right text-xs tabular-nums" style={{ color: row.winRate >= 50 ? '#8fbf8f' : '#c48f8f' }}>
-                          {row.winRate.toFixed(1)}%
                         </span>
                         <span className="hidden sm:block text-right text-xs tabular-nums" style={{ color: '#999' }}>
                           {t('recordLine', { wins: row.wins, losses: row.losses })}
@@ -370,11 +367,10 @@ export default function WorldcupPage() {
 
             <div
               className="hidden sm:grid items-center gap-3 px-5 pb-2 text-[9px] uppercase tracking-[0.2em]"
-              style={{ color: '#555', gridTemplateColumns: '2.25rem 1fr 7rem 4.5rem 5rem 4rem' }}
+              style={{ color: '#555', gridTemplateColumns: '2.25rem 1fr 7rem 5rem 4rem' }}
             >
               <span />
               <span>{t('colCountry')}</span>
-              <span className="text-right">{t('scoreLabel')}</span>
               <span className="text-right">{t('colWinRate')}</span>
               <span className="text-right">{t('colRecord')}</span>
               <span className="text-right">{t('colPlayers')}</span>
@@ -410,8 +406,8 @@ export default function WorldcupPage() {
                   t('rule1'),
                   t('rule2'),
                   t('rule3', { elo: WORLDCUP_MIN_ELO }),
-                  t('rule4', { min: MIN_RANKED_PLAYERS }),
-                  t('rule5'),
+                  t('rule4', { team: TEAM_SIZE }),
+                  t('rule5', { team: TEAM_SIZE }),
                 ]).map((rule, i) => (
                   <li key={i} className="flex gap-2.5 text-[11px] leading-relaxed" style={{ color: '#999' }}>
                     <span className="font-display shrink-0 tabular-nums" style={{ color: '#c4a35a' }}>{i + 1}.</span>

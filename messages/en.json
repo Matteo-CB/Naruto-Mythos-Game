@@ -3554,7 +3554,6 @@
     "totalCountries": "Countries",
     "totalPlayers": "Players",
     "totalGames": "Games",
-    "scoreLabel": "Fair score",
     "colCountry": "Country",
     "colWinRate": "Win rate",
     "colRecord": "W / L",
@@ -3566,12 +3565,12 @@
     "topPlayersTitle": "Top players of the country",
     "emptyTitle": "No games yet",
     "emptyText": "No ranked games were played in the last 7 days. Play ranked games with a flag selected in your options to put your country on the board.",
-    "unrankedTitle": "Not ranked: fewer than {min} counted players",
+    "unrankedTitle": "Not ranked: fewer than {min} eligible players",
     "rulesTitle": "Ranking rules",
     "rule1": "Only ranked games from the last 7 days count.",
     "rule2": "Only players who picked a flag in their options are counted for their country.",
-    "rule3": "You must be at least Legendary Sannin ({elo} ELO or more) to count in your country's ranking.",
-    "rule4": "A country enters the ranking with at least {min} counted players; below that it appears in the not-ranked section.",
-    "rule5": "Fair score: each player gets a level (their 7-day win rate, pulled toward 50% when they played few games); the country score is the average of its players' levels, completed with neutral phantom players. Ties are broken by number of games."
+    "rule3": "Only players at Legendary Sannin ({elo} ELO or more) are counted.",
+    "rule4": "Each country is represented by its {team} best players (highest ELO). Only their results count.",
+    "rule5": "Countries are ranked by the win rate of those {team} players over the 7 days. A country needs {team} eligible players to enter the ranking, otherwise it shows as not ranked. Ties are broken by number of games."
   }
 }

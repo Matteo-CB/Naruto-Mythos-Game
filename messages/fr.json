@@ -3560,7 +3560,6 @@
     "totalCountries": "Pays",
     "totalPlayers": "Joueurs",
     "totalGames": "Parties",
-    "scoreLabel": "Score équitable",
     "colCountry": "Pays",
     "colWinRate": "Taux de victoire",
     "colRecord": "V / D",
@@ -3572,12 +3571,12 @@
     "topPlayersTitle": "Meilleurs joueurs du pays",
     "emptyTitle": "Aucune partie pour le moment",
     "emptyText": "Aucune partie classée n'a été jouée ces 7 derniers jours. Jouez des parties classées avec un drapeau choisi dans vos options pour placer votre pays au classement.",
-    "unrankedTitle": "Hors classement : moins de {min} joueurs comptés",
+    "unrankedTitle": "Hors classement : moins de {min} joueurs éligibles",
     "rulesTitle": "Règles du classement",
     "rule1": "Seules les parties classées des 7 derniers jours comptent.",
     "rule2": "Seuls les joueurs ayant choisi un drapeau dans leurs options sont comptés pour leur pays.",
-    "rule3": "Il faut être au moins Sannin Légendaire ({elo} ELO ou plus) pour compter dans le classement de son pays.",
-    "rule4": "Un pays entre au classement avec au moins {min} joueurs comptés ; en dessous, il apparaît hors classement.",
-    "rule5": "Score équitable : chaque joueur reçoit un niveau (son taux de victoire sur 7 jours, ramené vers 50% s'il a peu de parties) ; le score du pays est la moyenne des niveaux de ses joueurs, complétée par des joueurs fictifs neutres. Les égalités se départagent au nombre de parties."
+    "rule3": "Seuls les joueurs au moins Sannin Légendaire ({elo} ELO ou plus) sont pris en compte.",
+    "rule4": "Chaque pays est représenté par ses {team} meilleurs joueurs (les plus haut ELO). Seuls leurs résultats comptent.",
+    "rule5": "Les pays sont classés par le taux de victoire de ces {team} joueurs sur les 7 jours. Il faut {team} joueurs éligibles pour entrer au classement, sinon le pays apparaît hors classement. Les égalités se départagent au nombre de parties."
   }
 }

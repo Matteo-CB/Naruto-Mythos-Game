@@ -1,17 +1,6 @@
-export const PLAYER_PRIOR_GAMES = 10;
-export const COUNTRY_PRIOR_PLAYERS = 4;
-export const MIN_RANKED_PLAYERS = 6;
-export const TOP_PLAYERS_CAP = 8;
+export const TEAM_SIZE = 6;
+export const MIN_RANKED_PLAYERS = TEAM_SIZE;
 export const WORLDCUP_MIN_ELO = 1200;
-
-export function playerFairScore(wins: number, games: number): number {
-  return (wins + PLAYER_PRIOR_GAMES * 0.5) / (games + PLAYER_PRIOR_GAMES);
-}
-
-export function countryFairScore(playerScores: number[]): number {
-  const sum = playerScores.reduce((s, v) => s + v, 0);
-  return (sum + COUNTRY_PRIOR_PLAYERS * 0.5) / (playerScores.length + COUNTRY_PRIOR_PLAYERS);
-}
 
 export interface RankedResultRow {
   userId: string;
@@ -35,6 +24,7 @@ export interface CountryStanding {
   countryCode: string;
   ranked: boolean;
   players: number;
+  teamSize: number;
   games: number;
   wins: number;
   losses: number;
@@ -61,42 +51,42 @@ export function buildCountryStandings(
     if (row.result === 'win') agg.wins += 1;
   }
 
-  const perCountry = new Map<string, { users: Array<{ userId: string; wins: number; games: number }> }>();
+  const perCountry = new Map<string, Array<{ userId: string; wins: number; games: number; elo: number }>>();
   for (const [userId, agg] of perUser) {
-    const cc = users.get(userId)!.countryCode!;
+    const u = users.get(userId)!;
+    const cc = u.countryCode!;
     let entry = perCountry.get(cc);
     if (!entry) {
-      entry = { users: [] };
+      entry = [];
       perCountry.set(cc, entry);
     }
-    entry.users.push({ userId, wins: agg.wins, games: agg.games });
+    entry.push({ userId, wins: agg.wins, games: agg.games, elo: u.elo });
   }
 
   const standings: CountryStanding[] = [];
-  for (const [cc, entry] of perCountry) {
-    const games = entry.users.reduce((s, u) => s + u.games, 0);
-    const wins = entry.users.reduce((s, u) => s + u.wins, 0);
+  for (const [cc, all] of perCountry) {
+    const team = [...all]
+      .sort((a, b) => b.elo - a.elo || b.games - a.games)
+      .slice(0, TEAM_SIZE);
+    const games = team.reduce((s, u) => s + u.games, 0);
     if (games === 0) continue;
-    const eloSum = entry.users.reduce((s, u) => s + (users.get(u.userId)?.elo ?? 0), 0);
-    const playerScores = entry.users.map((u) => playerFairScore(u.wins, u.games));
-    const sortedPlayers = [...entry.users].sort((a, b) => {
-      const ea = users.get(a.userId)?.elo ?? 0;
-      const eb = users.get(b.userId)?.elo ?? 0;
-      return eb - ea || b.games - a.games;
-    });
+    const wins = team.reduce((s, u) => s + u.wins, 0);
+    const eloSum = team.reduce((s, u) => s + u.elo, 0);
+    const winRate = wins / games;
     standings.push({
       countryCode: cc,
-      ranked: entry.users.length >= MIN_RANKED_PLAYERS,
-      players: entry.users.length,
+      ranked: team.length >= MIN_RANKED_PLAYERS,
+      players: all.length,
+      teamSize: team.length,
       games,
       wins,
       losses: games - wins,
-      winRate: wins / games,
-      score: countryFairScore(playerScores),
-      avgElo: Math.round(eloSum / entry.users.length),
-      topPlayers: sortedPlayers.slice(0, TOP_PLAYERS_CAP).map((u) => ({
+      winRate,
+      score: winRate,
+      avgElo: Math.round(eloSum / team.length),
+      topPlayers: team.map((u) => ({
         username: users.get(u.userId)?.username ?? '',
-        elo: users.get(u.userId)?.elo ?? 0,
+        elo: u.elo,
         wins7d: u.wins,
         games7d: u.games,
       })),
@@ -105,7 +95,7 @@ export function buildCountryStandings(
 
   standings.sort((a, b) => {
     if (a.ranked !== b.ranked) return a.ranked ? -1 : 1;
-    return b.score - a.score || b.games - a.games || b.players - a.players;
+    return b.score - a.score || b.games - a.games || b.avgElo - a.avgElo;
   });
   return standings;
 }
