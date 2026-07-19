@@ -3068,19 +3068,12 @@ export class EffectEngine {
         if (!mission020) break;
         const enemySide020: 'player1Characters' | 'player2Characters' =
           pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
-        const friendlySide020: 'player1Characters' | 'player2Characters' =
-          pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-        const friendlyNames020 = new Set(
-          mission020[friendlySide020].filter((c: CharacterInPlay) => !c.isHidden).map((c: CharacterInPlay) => c.card.name_fr.toUpperCase())
-        );
 
         const i020Targets: string[] = [];
         for (const char of mission020[enemySide020]) {
           const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           const effectiveCost = char.isHidden ? 0 : topCard.chakra;
-          console.log(`[EffectEngine] INO020_CONFIRM_MAIN: enemy ${char.instanceId} isHidden=${char.isHidden} cost=${effectiveCost} name=${char.card.name_fr}`);
           if (effectiveCost <= 2) {
-            if (!char.isHidden && friendlyNames020.has(char.card.name_fr.toUpperCase())) continue;
             i020Targets.push(char.instanceId);
           }
         }
@@ -3124,17 +3117,11 @@ export class EffectEngine {
         if (!mission020u) break;
         const enemySide020u: 'player1Characters' | 'player2Characters' =
           pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
-        const friendlySide020u: 'player1Characters' | 'player2Characters' =
-          pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-        const friendlyNames020u = new Set(
-          mission020u[friendlySide020u].filter((c: CharacterInPlay) => !c.isHidden).map((c: CharacterInPlay) => c.card.name_fr.toUpperCase())
-        );
         const i020uTargets: string[] = [];
         for (const char of mission020u[enemySide020u]) {
           const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           const effectiveCost = char.isHidden ? 0 : topCard.chakra;
           if (effectiveCost <= 3) {
-            if (!char.isHidden && friendlyNames020u.has(char.card.name_fr.toUpperCase())) continue;
             i020uTargets.push(char.instanceId);
           }
         }

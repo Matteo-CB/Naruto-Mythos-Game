@@ -9,28 +9,15 @@ function handleIno020Main(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySide = opponentPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-  const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
   const enemyChars = mission[enemySide];
-  const friendlyChars = mission[friendlySide];
 
   const costLimit = isUpgrade ? 3 : 2;
 
-  
-  const friendlyNames = new Set<string>();
-  for (const fc of friendlyChars) {
-    if (!fc.isHidden) friendlyNames.add(fc.card.name_fr.toUpperCase());
-  }
-
-  
-  
   const validTargets: string[] = [];
   for (const char of enemyChars) {
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     const effectiveCost = char.isHidden ? 0 : topCard.chakra;
     if (effectiveCost <= costLimit) {
-      if (!char.isHidden && friendlyNames.has(char.card.name_fr.toUpperCase())) {
-        continue;
-      }
       validTargets.push(char.instanceId);
     }
   }

@@ -66,16 +66,32 @@ describe('Ino 020 (UC) - Take Control', () => {
     expect(ns.activeMissions[0].player1Characters.find(c => c.instanceId === 'et')?.controlledBy).toBe('player1');
   });
 
-  it('handler pre-filters same-name targets (returns CONFIRM)', () => {
-    const enemyIno = mockChar({ instanceId: 'ei', card: mockCard({ id: 'KS-019-C', name_fr: 'INO YAMANAKA', chakra: 2, power: 1 }), controlledBy: 'player2', originalOwner: 'player2' });
-    const enemyOther = mockChar({ instanceId: 'eo', card: mockCard({ id: 'KS-046-C', name_fr: 'EBISU', chakra: 1, power: 1 }), controlledBy: 'player2', originalOwner: 'player2' });
-    const myIno = mockChar({ instanceId: 'ino1', card: ino020 });
-    const state = makeState({ activeMissions: [mockMission({ player1Characters: [myIno], player2Characters: [enemyIno, enemyOther] }), mockMission({ rank: 'C', rankBonus: 2 })] });
-    const handler = getEffectHandler('KS-020-UC', 'MAIN');
-    const result = handler!({ state, sourcePlayer: 'player1', sourceCard: myIno, sourceMissionIndex: 0, triggerType: 'MAIN', isUpgrade: true });
-    
-    expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('INO020_CONFIRM_MAIN');
+  it('allows stealing a same-name enemy, which is then discarded to its owner (No Repetition, designer ruling 2026-07-19)', () => {
+    const friendlyEbisu = mockChar({ instanceId: 'fe', card: mockCard({ id: 'KS-046-C', name_fr: 'EBISU', chakra: 1, power: 1 }), controlledBy: 'player1', originalOwner: 'player1' });
+    const enemyEbisu = mockChar({ instanceId: 'ee', card: mockCard({ id: 'KS-046-C', name_fr: 'EBISU', chakra: 2, power: 1 }), controlledBy: 'player2', originalOwner: 'player2' });
+    const i19 = mockChar({ instanceId: 'i19', card: ino019 });
+    const state = makeState({
+      player1: makePlayer({ hand: [ino020], charactersInPlay: 2 }),
+      player2: makePlayer({ id: 'player2' as PlayerID, userId: 'u2', isAI: true, aiDifficulty: 'easy', charactersInPlay: 1 }),
+      activeMissions: [mockMission({ player1Characters: [i19, friendlyEbisu], player2Characters: [enemyEbisu] }), mockMission({ rank: 'C', rankBonus: 2 })],
+    });
+
+    const afterUpgrade = GameEngine.applyAction(state, 'player1', { type: 'UPGRADE_CHARACTER', cardIndex: 0, missionIndex: 0, targetInstanceId: 'i19' });
+    const confirmPa = afterUpgrade.pendingActions[0];
+    const afterConfirm = GameEngine.applyAction(afterUpgrade, 'player1', { type: 'SELECT_TARGET', pendingActionId: confirmPa.id, selectedTargets: [confirmPa.options[0]] });
+    const upgradePa = afterConfirm.pendingActions[0];
+    const afterUpgradeConfirm = GameEngine.applyAction(afterConfirm, 'player1', { type: 'SELECT_TARGET', pendingActionId: upgradePa.id, selectedTargets: [upgradePa.options[0]] });
+
+    const selectPa = afterUpgradeConfirm.pendingActions[0];
+    expect(selectPa.options).toContain('ee');
+
+    const p2DiscardBefore = afterUpgradeConfirm.player2.discardPile.length;
+    const afterSteal = GameEngine.applyAction(afterUpgradeConfirm, 'player1', { type: 'SELECT_TARGET', pendingActionId: selectPa.id, selectedTargets: ['ee'] });
+
+    expect(afterSteal.activeMissions[0].player1Characters.some((c) => c.instanceId === 'ee')).toBe(false);
+    expect(afterSteal.activeMissions[0].player2Characters.some((c) => c.instanceId === 'ee')).toBe(false);
+    expect(afterSteal.player2.discardPile.length).toBe(p2DiscardBefore + 1);
+    expect(afterSteal.player2.discardPile[afterSteal.player2.discardPile.length - 1].name_fr).toBe('EBISU');
   });
 
   it('full integration: upgrade 019->020, confirm then select cost-3 target', () => {
