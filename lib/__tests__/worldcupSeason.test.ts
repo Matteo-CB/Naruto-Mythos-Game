@@ -60,7 +60,7 @@ function standing(code: string, ranked: boolean, score: number, players: string[
     avgOpponentElo: 1700,
     forfeitLosses: 0,
     score,
-    breakdown: { winRate: 0.66, strengthFactor: 0.5, eloFactor: 0.5, activityFactor: 0.5, forfeitRate: 0 },
+    breakdown: { winRate: 0.66, strengthFactor: 0.5, activityFactor: 0.5, forfeitRate: 0 },
     topPlayers: players.map((u, i) => ({ userId: `${code}-${i}`, username: u, elo: 1800, wins: 7, games: 10 })),
   };
 }

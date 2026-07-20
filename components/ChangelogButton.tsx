@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocale, useTranslations } from 'next-intl';
 import { AnimatePresence, motion } from 'framer-motion';
 import changelog from '@/lib/data/changelog.json';
 import { Z_APP_MODAL } from '@/lib/ui/zIndex';
+
+type Category = 'fix' | 'feature';
 
 type Entry = {
   date: string;
@@ -13,8 +15,28 @@ type Entry = {
   title_en: string;
   changes_fr: string[];
   changes_en: string[];
-  [key: string]: string | string[];
+  [key: string]: string | string[] | undefined;
 };
+
+type TabKey = 'all' | Category;
+
+const TABS: TabKey[] = ['all', 'feature', 'fix'];
+
+const TAB_LABEL_KEY: Record<TabKey, string> = {
+  all: 'tabAll',
+  feature: 'tabFeature',
+  fix: 'tabFix',
+};
+
+const CATEGORY_STYLE: Record<Category, { color: string; bg: string }> = {
+  fix: { color: '#d98d8d', bg: 'rgba(217,141,141,0.13)' },
+  feature: { color: '#c4a35a', bg: 'rgba(196,163,90,0.13)' },
+};
+
+interface ChangeItem {
+  text: string;
+  category: Category;
+}
 
 function localizedTitle(entry: Entry, locale: string): string {
   const v = entry[`title_${locale}`];
@@ -22,10 +44,11 @@ function localizedTitle(entry: Entry, locale: string): string {
   return entry.title_en || entry.title_fr;
 }
 
-function localizedChanges(entry: Entry, locale: string): string[] {
-  const v = entry[`changes_${locale}`];
-  if (Array.isArray(v) && v.length) return v;
-  return entry.changes_en ?? entry.changes_fr;
+function localizedChanges(entry: Entry, locale: string): ChangeItem[] {
+  const raw = entry[`changes_${locale}`];
+  const arr = (Array.isArray(raw) && raw.length ? raw : (entry.changes_en ?? entry.changes_fr)) as string[];
+  const cats = (Array.isArray(entry.categories) ? entry.categories : []) as Category[];
+  return arr.map((text, i) => ({ text, category: cats[i] ?? 'fix' }));
 }
 
 const STORAGE_KEY = 'naruto-mythos-changelog-lastseen';
@@ -50,12 +73,13 @@ export function ChangelogButton() {
   const [open, setOpen] = useState(false);
   const [hasNew, setHasNew] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabKey>('all');
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const entries = (changelog.entries ?? []) as Entry[];
+  const entries = useMemo(() => (changelog.entries ?? []) as Entry[], []);
   const latestDate = entries[0]?.date ?? '';
 
   useEffect(() => {
@@ -63,16 +87,28 @@ export function ChangelogButton() {
       const seen = localStorage.getItem(STORAGE_KEY);
       setHasNew(seen !== latestDate && latestDate !== '');
     } catch {
-      
+
     }
   }, [latestDate]);
 
+  const visibleEntries = useMemo(() => {
+    return entries
+      .map((entry) => ({
+        entry,
+        items: localizedChanges(entry, locale).filter(
+          (it) => activeTab === 'all' || it.category === activeTab,
+        ),
+      }))
+      .filter((x) => x.items.length > 0);
+  }, [entries, locale, activeTab]);
+
   function openModal() {
+    setActiveTab('all');
     setOpen(true);
     try {
       localStorage.setItem(STORAGE_KEY, latestDate);
     } catch {
-      
+
     }
     setHasNew(false);
   }
@@ -148,19 +184,45 @@ export function ChangelogButton() {
                 </button>
               </header>
 
+              <div
+                className="flex flex-wrap gap-1.5 border-b px-5 py-2.5"
+                style={{ borderColor: '#2a2a2a' }}
+                role="tablist"
+              >
+                {TABS.map((tab) => {
+                  const active = activeTab === tab;
+                  return (
+                    <button
+                      key={tab}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setActiveTab(tab)}
+                      className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest transition-colors"
+                      style={
+                        active
+                          ? { color: '#c4a35a', backgroundColor: 'rgba(196,163,90,0.12)' }
+                          : { color: '#777777', backgroundColor: 'transparent' }
+                      }
+                    >
+                      {t(TAB_LABEL_KEY[tab])}
+                    </button>
+                  );
+                })}
+              </div>
+
               <div className="overflow-y-auto px-5 py-5">
-                {entries.length === 0 ? (
+                {visibleEntries.length === 0 ? (
                   <p className="text-sm" style={{ color: '#777777' }}>
-                    {t('empty')}
+                    {entries.length === 0 ? t('empty') : t('emptyTab')}
                   </p>
                 ) : (
                   <ul className="flex flex-col gap-6">
-                    {entries.map((entry, idx) => {
+                    {visibleEntries.map(({ entry, items }) => {
                       const title = localizedTitle(entry, locale);
-                      const items = localizedChanges(entry, locale);
-                      const isLatest = idx === 0;
+                      const isLatest = entry.date === latestDate;
                       return (
-                        <li key={`${entry.date}-${idx}`}>
+                        <li key={entry.date}>
                           <div className="mb-2 flex items-center gap-3">
                             <span
                               className="text-xs font-bold uppercase tracking-widest"
@@ -187,14 +249,22 @@ export function ChangelogButton() {
                             {title}
                           </h3>
                           <ul className="flex flex-col gap-1.5">
-                            {items.map((line, i) => (
+                            {items.map((item, i) => (
                               <li
                                 key={i}
-                                className="flex gap-2 text-sm leading-relaxed"
+                                className="flex items-start gap-2 text-sm leading-relaxed"
                                 style={{ color: '#bbbbbb' }}
                               >
-                                <span style={{ color: '#c4a35a' }} aria-hidden="true">•</span>
-                                <span className="font-body">{line}</span>
+                                <span
+                                  className="mt-0.5 shrink-0 rounded-sm px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest"
+                                  style={{
+                                    color: CATEGORY_STYLE[item.category].color,
+                                    backgroundColor: CATEGORY_STYLE[item.category].bg,
+                                  }}
+                                >
+                                  {t(TAB_LABEL_KEY[item.category])}
+                                </span>
+                                <span className="font-body">{item.text}</span>
                               </li>
                             ))}
                           </ul>

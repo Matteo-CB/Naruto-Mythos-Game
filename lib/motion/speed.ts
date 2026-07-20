@@ -1,4 +1,5 @@
 import { useSettingsStore } from '@/stores/settingsStore';
+import { isTouchPrimaryDevice } from '@/lib/utils/device';
 
 export type MotionEventType =
   | 'draw'
@@ -45,7 +46,7 @@ export function motionMs(type: MotionEventType): number {
   const s = useSettingsStore.getState();
   const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
   return computeMotionMs(type, {
-    animationsEnabled: s.animationsEnabled && !reduced,
+    animationsEnabled: s.animationsEnabled && !reduced && !isTouchPrimaryDevice(),
     fastAnimations: s.fastAnimations,
   });
 }

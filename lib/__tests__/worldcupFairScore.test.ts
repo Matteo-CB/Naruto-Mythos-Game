@@ -49,10 +49,10 @@ describe('computeCountryScore', () => {
     expect(strong.score).toBeGreaterThan(weak.score);
   });
 
-  it('a higher team ELO raises the score at equal win rate', () => {
+  it('the selected players own ELO does not affect the score', () => {
     const low = computeCountryScore({ games: 60, wins: 36, avgElo: 1400, avgOpponentEloOnWins: 1500, forfeitLosses: 0 });
     const high = computeCountryScore({ games: 60, wins: 36, avgElo: 2600, avgOpponentEloOnWins: 1500, forfeitLosses: 0 });
-    expect(high.score).toBeGreaterThan(low.score);
+    expect(high.score).toBe(low.score);
   });
 
   it('forfeits lower the score', () => {
@@ -103,7 +103,7 @@ describe('buildCountrystandings (team of 6, combined score)', () => {
     expect(jp.topPlayers[0].elo).toBe(1500 + (TEAM_SIZE + 3) - 1);
   });
 
-  it('players below Legendary Sannin ELO never count', () => {
+  it('players below the minimum ELO (Elite Jonin) never count', () => {
     const users = new Map<string, CountryUser>();
     const results: RankedResultRow[] = [];
     for (let i = 0; i < TEAM_SIZE; i++) {

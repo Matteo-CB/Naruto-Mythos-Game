@@ -290,6 +290,10 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     'Regardez les 3 cartes du dessus de votre deck. Jouez un personnage n\'importe ou et defaussez les autres cartes.',
     'MAIN effect : A la place, jouez la carte en payant 4 de moins.',
   ],
+  'KS-135-SV': [
+    'Regardez les 3 cartes du dessus de votre deck. Jouez un personnage n\'importe où et défaussez les autres cartes.',
+    'MAIN effect : À la place, jouez la carte en payant 4 de moins.',
+  ],
 
   
   'KS-136-S': [

@@ -7,6 +7,7 @@ import {
   BATTLEPASS_TIER_5_CARD,
   BATTLEPASS_TIER_25_CARD,
   BATTLEPASS_TIER_50_CARD,
+  WORLDCUP_CHAMPION_CARD,
   DUPLICATE_XP_BY_RARITY,
   isVariantRarity,
 } from '@/lib/variants/constants';
@@ -35,14 +36,15 @@ describe('variants constants', () => {
     expect(VARIANT_PACK_PROBABILITIES.HOLO_UC).toBeLessThan(VARIANT_PACK_PROBABILITIES.HOLO_C);
   });
 
-  it('excludes every tournament prize MV + 3 battlepass MVs', () => {
-    expect(BOOSTER_EXCLUDED_VARIANTS.size).toBe(TOURNAMENT_PRIZE_CARD_IDS.length + 3);
+  it('excludes every tournament prize MV + 3 battlepass MVs + the world champion card', () => {
+    expect(BOOSTER_EXCLUDED_VARIANTS.size).toBe(TOURNAMENT_PRIZE_CARD_IDS.length + 3 + 1);
     for (const id of TOURNAMENT_PRIZE_CARD_IDS) {
       expect(BOOSTER_EXCLUDED_VARIANTS.has(id)).toBe(true);
     }
     expect(BOOSTER_EXCLUDED_VARIANTS.has(BATTLEPASS_TIER_5_CARD)).toBe(true);
     expect(BOOSTER_EXCLUDED_VARIANTS.has(BATTLEPASS_TIER_25_CARD)).toBe(true);
     expect(BOOSTER_EXCLUDED_VARIANTS.has(BATTLEPASS_TIER_50_CARD)).toBe(true);
+    expect(BOOSTER_EXCLUDED_VARIANTS.has(WORLDCUP_CHAMPION_CARD)).toBe(true);
   });
 
   it('duplicate XP scales with rarity', () => {

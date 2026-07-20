@@ -1,19 +1,16 @@
 export const TEAM_SIZE = 6;
 export const MIN_RANKED_PLAYERS = TEAM_SIZE;
-export const WORLDCUP_MIN_ELO = 1200;
+export const WORLDCUP_MIN_ELO = 1000;
 export const MIN_PLAYER_GAMES = 10;
 
 export const SCORE_WEIGHTS = {
   winRate: 0.5,
-  strength: 0.2,
-  elo: 0.2,
+  strength: 0.4,
   activity: 0.1,
 } as const;
 
 export const STRENGTH_ELO_MIN = 1200;
 export const STRENGTH_ELO_MAX = 2500;
-export const TEAM_ELO_MIN = 1200;
-export const TEAM_ELO_MAX = 3000;
 export const ACTIVITY_GAMES_MAX = 300;
 export const FORFEIT_PENALTY = 15;
 
@@ -41,7 +38,6 @@ export interface CountryPlayerEntry {
 export interface ScoreBreakdown {
   winRate: number;
   strengthFactor: number;
-  eloFactor: number;
   activityFactor: number;
   forfeitRate: number;
 }
@@ -83,21 +79,19 @@ interface TeamStats {
 export function computeCountryScore(t: TeamStats): { score: number; breakdown: ScoreBreakdown } {
   const winRate = t.games > 0 ? t.wins / t.games : 0;
   const strengthFactor = normalize(t.avgOpponentEloOnWins, STRENGTH_ELO_MIN, STRENGTH_ELO_MAX);
-  const eloFactor = normalize(t.avgElo, TEAM_ELO_MIN, TEAM_ELO_MAX);
   const activityFactor = normalize(t.games, TEAM_SIZE * MIN_PLAYER_GAMES, ACTIVITY_GAMES_MAX);
   const forfeitRate = t.games > 0 ? t.forfeitLosses / t.games : 0;
 
   const base = 100 * (
     SCORE_WEIGHTS.winRate * winRate
     + SCORE_WEIGHTS.strength * strengthFactor
-    + SCORE_WEIGHTS.elo * eloFactor
     + SCORE_WEIGHTS.activity * activityFactor
   );
   const score = Math.max(0, Math.min(100, base - FORFEIT_PENALTY * forfeitRate));
 
   return {
     score,
-    breakdown: { winRate, strengthFactor, eloFactor, activityFactor, forfeitRate },
+    breakdown: { winRate, strengthFactor, activityFactor, forfeitRate },
   };
 }
 
@@ -193,7 +187,7 @@ export function buildCountryStandings(
 
   standings.sort((a, b) => {
     if (a.ranked !== b.ranked) return a.ranked ? -1 : 1;
-    return b.score - a.score || b.games - a.games || b.avgElo - a.avgElo;
+    return b.score - a.score || b.games - a.games || b.avgOpponentElo - a.avgOpponentElo;
   });
   return standings;
 }

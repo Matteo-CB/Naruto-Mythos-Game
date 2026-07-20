@@ -61,6 +61,7 @@ import {
   sweepOrphanTournamentMatches,
   fireAbsenceTimerCallback,
   getConnectedUserIdsInTournament,
+  MAX_GRACE_CYCLES,
 } from '../socket/tournamentHandlers';
 
 const p = prisma as never as {
@@ -481,10 +482,10 @@ describe('fireAbsenceTimerCallback (grace-period defense against mass-forfeit)',
     }));
   });
 
-  it('on retry=true: skips connection check entirely, forfeits per matchReadyPlayers state', async () => {
+  it('connected but unconfirmed players are only forfeited after the grace is exhausted', async () => {
     const io = fakeIoWithConnectedUsers('t1', ['p1', 'p2']);
     p.tournamentMatch.findUnique.mockResolvedValue({
-      id: 'm1', tournamentId: 't1', status: 'ready',
+      id: 'mgrace', tournamentId: 't1', status: 'ready',
       player1Id: 'p1', player2Id: 'p2', round: 1, matchIndex: 0, bracket: null, roomCode: null,
     });
     p.tournament.findUnique.mockImplementation(async (args: { include?: { participants?: unknown } }) => {
@@ -495,11 +496,15 @@ describe('fireAbsenceTimerCallback (grace-period defense against mass-forfeit)',
     });
     p.tournamentMatch.update.mockResolvedValue({});
     p.tournamentParticipant.updateMany.mockResolvedValue({ count: 2 });
-    p.tournamentMatch.findMany.mockResolvedValue([{ id: 'm1', status: 'forfeit', round: 1 }]);
+    p.tournamentMatch.findMany.mockResolvedValue([{ id: 'mgrace', status: 'forfeit', round: 1 }]);
 
-    await fireAbsenceTimerCallback(io as never, 't1', 'm1', 'p1', 'p2', null, true);
+    for (let i = 0; i < MAX_GRACE_CYCLES; i++) {
+      await fireAbsenceTimerCallback(io as never, 't1', 'mgrace', 'p1', 'p2', null, true);
+    }
+    expect(io.emissions.filter(e => e.event === 'tournament:please-confirm-ready')).toHaveLength(MAX_GRACE_CYCLES);
+    expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
 
-    expect(io.emissions.some(e => e.event === 'tournament:please-confirm-ready')).toBe(false);
+    await fireAbsenceTimerCallback(io as never, 't1', 'mgrace', 'p1', 'p2', null, true);
     expect(p.tournamentParticipant.updateMany).toHaveBeenCalled();
   });
 

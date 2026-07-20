@@ -661,7 +661,7 @@
     "unblock": "Unblock",
     "fastAnimations": "Fast animations",
     "fastAnimationsHint": "All game animations last half as long.",
-    "animationsTouchDisabled": "Animations are automatically disabled on phones and tablets for smooth performance."
+    "animationsTouchDisabled": "On touch screens, only in-game card animations are reduced. Other animations follow this setting."
   },
   "game": {
     "turn": "Turn {turn}",
@@ -2594,6 +2594,10 @@
     "continueToFinish": "Tap to finish opening"
   },
   "tournament": {
+    "launchMatch": "Launch the match",
+    "launchHint": "Click to launch your match. As long as you stay here, you will not be marked absent.",
+    "matchStarting": "Your match is starting, entering automatically...",
+    "enterMatch": "Enter the match",
     "title": "Tournaments",
     "countLabel": "tournaments",
     "create": "Create Tournament",
@@ -3095,6 +3099,10 @@
     "understood": "Understood"
   },
   "changelog": {
+    "tabAll": "All",
+    "tabFix": "Fixes",
+    "tabFeature": "New",
+    "emptyTab": "No changes in this category.",
     "buttonLabel": "News",
     "modalTitle": "What's New",
     "modalSubtitle": "Patch notes",
@@ -3549,6 +3557,12 @@
     }
   },
   "worldcup": {
+    "rewardsTitle": "Rewards",
+    "rewardChampionCardTitle": "World champion exclusive card",
+    "rewardChampionCardDesc": "Sakura Haruno, The Leaf Medical Corps: a golden Secret card that can never be pulled from a booster. Only members of the world champion team can earn it.",
+    "rewardChampion": "Champion team: the exclusive golden card, 3 variant boosters and XP.",
+    "rewardPodium": "2nd and 3rd podium countries: variant boosters and XP.",
+    "rewardParticipation": "Other players from qualified countries: team XP.",
     "title": "World Cup",
     "totalCountries": "Countries",
     "totalPlayers": "Players",
@@ -3567,9 +3581,9 @@
     "rulesTitle": "Ranking rules",
     "rule1": "Only ranked games count, over the chosen period: 24h, 7 days, 30 days or the 3-month season.",
     "rule2": "Only players who picked a flag in their options are counted for their country.",
-    "rule3": "Only players at Legendary Sannin ({elo} ELO or more) are counted.",
+    "rule3": "Only players at least Elite Jonin ({elo} ELO or more) are counted.",
     "rule4": "Each country is represented by its {team} best players (highest ELO), provided they played at least {games} ranked games in the period.",
-    "rule5": "A country's score combines those {team} players' win rate, the strength of the opponents they beat, their average ELO and their activity. Forfeits count negatively.",
+    "rule5": "The score combines these {team} players' win rate, the strength of beaten opponents and activity. Only the opponents' ELO counts, not the team's own. Forfeits weigh negatively.",
     "subtitleSeason": "Current season: {period}. A new World Cup every 3 months.",
     "subtitleWindow": "Country ranking over the chosen period.",
     "window_season": "Season (3 months)",

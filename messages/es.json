@@ -666,7 +666,7 @@
     "unblock": "Desbloquear",
     "fastAnimations": "Animaciones rápidas",
     "fastAnimationsHint": "Todas las animaciones del juego duran la mitad.",
-    "animationsTouchDisabled": "Las animaciones se desactivan automáticamente en teléfonos y tabletas para un rendimiento fluido."
+    "animationsTouchDisabled": "En pantallas táctiles, solo se reducen las animaciones de cartas en juego. Las demás animaciones siguen este ajuste."
   },
   "game": {
     "turn": "Turno {turn}",
@@ -2599,6 +2599,10 @@
     "continueToFinish": "Toca para terminar la apertura"
   },
   "tournament": {
+    "launchMatch": "Iniciar la partida",
+    "launchHint": "Haz clic para iniciar tu partida. Mientras te quedes aquí, no se te marcará como ausente.",
+    "matchStarting": "Tu partida está comenzando, entrando automáticamente...",
+    "enterMatch": "Entrar en la partida",
     "title": "Torneos",
     "countLabel": "torneos",
     "create": "Crear torneo",
@@ -3100,6 +3104,10 @@
     "understood": "Entendido"
   },
   "changelog": {
+    "tabAll": "Todo",
+    "tabFix": "Correcciones",
+    "tabFeature": "Novedades",
+    "emptyTab": "No hay cambios en esta categoría.",
     "buttonLabel": "Novedades",
     "modalTitle": "Novedades",
     "modalSubtitle": "Notas de la actualización",
@@ -3554,6 +3562,12 @@
     }
   },
   "worldcup": {
+    "rewardsTitle": "Recompensas",
+    "rewardChampionCardTitle": "Carta exclusiva del campeón del mundo",
+    "rewardChampionCardDesc": "Sakura Haruno, El Cuerpo Médico de la Hoja: una carta Secreta dorada que nunca aparece en los sobres. Solo los miembros del equipo campeón del mundo pueden conseguirla.",
+    "rewardChampion": "Equipo campeón: la carta dorada exclusiva, 3 sobres de variantes y XP.",
+    "rewardPodium": "Países 2.º y 3.º del podio: sobres de variantes y XP.",
+    "rewardParticipation": "Otros jugadores de los países clasificados: XP de equipo.",
     "title": "Copa del mundo",
     "totalCountries": "Países",
     "totalPlayers": "Jugadores",
@@ -3572,9 +3586,9 @@
     "rulesTitle": "Reglas de la clasificación",
     "rule1": "Solo cuentan las partidas clasificatorias, en el período elegido: 24h, 7 días, 30 días o la temporada de 3 meses.",
     "rule2": "Solo se cuentan para su país los jugadores que eligieron una bandera en sus opciones.",
-    "rule3": "Solo se cuentan los jugadores de al menos Sannin Legendario ({elo} ELO o más).",
+    "rule3": "Solo se cuentan los jugadores de al menos Jonin de Élite ({elo} ELO o más).",
     "rule4": "Cada país está representado por sus {team} mejores jugadores (mayor ELO), siempre que hayan jugado al menos {games} partidas clasificatorias en el período.",
-    "rule5": "La puntuación de un país combina la tasa de victorias de esos {team} jugadores, la fuerza de los rivales vencidos, su ELO medio y su actividad. Los abandonos cuentan negativamente.",
+    "rule5": "La puntuación combina el porcentaje de victorias de estos {team} jugadores, la fuerza de los rivales vencidos y la actividad. Solo cuenta el ELO de los rivales, no el del propio equipo. Los abandonos penalizan.",
     "subtitleSeason": "Temporada actual: {period}. Una nueva Copa del mundo cada 3 meses.",
     "subtitleWindow": "Clasificación de países en el período elegido.",
     "window_season": "Temporada (3 meses)",

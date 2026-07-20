@@ -665,7 +665,7 @@
     "unblock": "ブロック解除",
     "fastAnimations": "高速アニメーション",
     "fastAnimationsHint": "ゲーム内のすべてのアニメーションが半分の時間になります。",
-    "animationsTouchDisabled": "スマートフォンとタブレットでは、動作を滑らかに保つためにアニメーションが自動的に無効になります。"
+    "animationsTouchDisabled": "タッチ画面では、ゲーム中のカード演出のみが抑えられます。その他のアニメーションはこの設定に従います。"
   },
   "game": {
     "turn": "ターン {turn}",
@@ -2598,6 +2598,10 @@
     "continueToFinish": "タップして開封を終える"
   },
   "tournament": {
+    "launchMatch": "試合を開始",
+    "launchHint": "クリックして試合を開始します。このページにいる限り、不在にはなりません。",
+    "matchStarting": "試合が始まります。自動的に入場します...",
+    "enterMatch": "試合に入る",
     "title": "トーナメント",
     "countLabel": "トーナメント",
     "create": "トーナメント作成",
@@ -3099,6 +3103,10 @@
     "understood": "了解"
   },
   "changelog": {
+    "tabAll": "すべて",
+    "tabFix": "修正",
+    "tabFeature": "新機能",
+    "emptyTab": "このカテゴリーに変更はありません。",
     "buttonLabel": "お知らせ",
     "modalTitle": "更新情報",
     "modalSubtitle": "パッチノート",
@@ -3553,6 +3561,12 @@
     }
   },
   "worldcup": {
+    "rewardsTitle": "報酬",
+    "rewardChampionCardTitle": "世界チャンピオン限定カード",
+    "rewardChampionCardDesc": "春野サクラ「木ノ葉の医療班」：ブースターからは絶対に手に入らない金色のシークレットカード。世界チャンピオンチームのメンバーだけが入手できます。",
+    "rewardChampion": "チャンピオンチーム：限定の金色カード、バリアントブースター3個、XP。",
+    "rewardPodium": "表彰台2位・3位の国：バリアントブースターとXP。",
+    "rewardParticipation": "予選通過国のその他の選手：チームXP。",
     "title": "ワールドカップ",
     "totalCountries": "国",
     "totalPlayers": "プレイヤー",
@@ -3571,9 +3585,9 @@
     "rulesTitle": "ランキングのルール",
     "rule1": "対象は選択した期間(24時間・7日・30日・3か月のシーズン)のランク戦のみです。",
     "rule2": "オプションで国旗を選んだプレイヤーのみが自国に集計されます。",
-    "rule3": "伝説の三忍({elo} ELO以上)のプレイヤーのみが対象です。",
+    "rule3": "上忍エリート({elo} ELO以上)のプレイヤーのみが対象です。",
     "rule4": "各国は、期間中に{games}戦以上のランク戦をプレイした上位{team}名(最高ELO)のプレイヤーで代表されます。",
-    "rule5": "国のスコアは、その{team}名の勝率、撃破した相手の強さ、平均ELO、活動量を組み合わせたものです。放棄はマイナスに働きます。",
+    "rule5": "スコアは、その{team}人の勝率、倒した相手の強さ、活動量を組み合わせます。自チームのELOではなく、相手のELOだけが影響します。放棄はマイナスに働きます。",
     "subtitleSeason": "現在のシーズン:{period}。3か月ごとに新しいワールドカップが始まります。",
     "subtitleWindow": "選択した期間の国別ランキング。",
     "window_season": "シーズン(3か月)",

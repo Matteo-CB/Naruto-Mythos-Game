@@ -655,6 +655,10 @@ export const effectDescriptionsEs: Record<string, string[]> = {
     'Mira las 3 cartas superiores de tu mazo. Juega un personaje en cualquier sitio y descarta las demás cartas.',
     'efecto: En su lugar, juega la carta pagando 4 menos.',
   ],
+  'KS-135-SV': [
+    'Mira las 3 cartas superiores de tu mazo. Juega un personaje en cualquier sitio y descarta las demás cartas.',
+    'efecto: En su lugar, juega la carta pagando 4 menos.',
+  ],
 
   'KS-136-S': [
     '[⧗] Cuando un personaje es derrotado, gana 1 de Chakra.',

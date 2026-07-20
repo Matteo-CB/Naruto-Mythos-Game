@@ -4862,6 +4862,44 @@
       "data_complete": true,
       "old_id": "135/130"
     },
+    "KS-135-SV": {
+      "id": "KS-135-SV",
+      "rarity": "SV",
+      "number": "135",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SAKURA HARUNO",
+      "name_ja": "春野サクラ",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "The Leaf Medical Corps",
+      "title_en": "The Leaf Medical Corps",
+      "title_ja": "木ノ葉の医療班",
+      "title_es": "El Cuerpo Médico de la Hoja",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 4,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, play the card paying 4 less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret_v/KS-135-SV.webp",
+      "rarity_display": "Secret V",
+      "image_file": "images/cards/KS/secret_v/KS-135-SV.webp",
+      "data_complete": true,
+      "old_id": "135/130"
+    },
     "KS-136-S": {
       "id": "KS-136-S",
       "rarity": "S",
@@ -7698,7 +7736,8 @@
       "title_en": "Legendary Sannin",
       "title_ja": "伝説の三忍",
       "title_es": "Sannin Legendario",
-      "has_visual": false,
+      "has_visual": true,
+      "image_file": "images/cards/KS/mythos_v/KS-104_2-MV.webp",
       "chakra": 5,
       "power": 6,
       "keywords": [
@@ -7736,7 +7775,8 @@
       "title_en": "Summoning Jutsu",
       "title_ja": "口寄せの術",
       "title_es": "Jutsu de Invocación",
-      "has_visual": false,
+      "has_visual": true,
+      "image_file": "images/cards/KS/mythos_v/KS-105-MV.webp",
       "chakra": 6,
       "power": 6,
       "keywords": [
@@ -7775,7 +7815,8 @@
       "title_en": "Chidori",
       "title_ja": "千鳥",
       "title_es": "Chidori",
-      "has_visual": false,
+      "has_visual": true,
+      "image_file": "images/cards/KS/mythos_v/KS-107_2-MV.webp",
       "chakra": 5,
       "power": 6,
       "keywords": [
@@ -7895,7 +7936,8 @@
       "title_en": "Medical Ninja",
       "title_ja": "医療忍者",
       "title_es": "Ninja Médico",
-      "has_visual": false,
+      "has_visual": true,
+      "image_file": "images/cards/KS/mythos_v/KS-109-MV.webp",
       "chakra": 4,
       "power": 3,
       "keywords": [
@@ -7933,7 +7975,8 @@
       "title_en": "Stay out of my way.",
       "title_ja": "邪魔をするな",
       "title_es": "No te interpongas en mi camino.",
-      "has_visual": false,
+      "has_visual": true,
+      "image_file": "images/cards/KS/mythos_v/KS-126-MV.webp",
       "chakra": 7,
       "power": 7,
       "keywords": [
@@ -7971,7 +8014,8 @@
       "title_en": "Tsukuyomi",
       "title_ja": "月読",
       "title_es": "Tsukuyomi",
-      "has_visual": false,
+      "has_visual": true,
+      "image_file": "images/cards/KS/mythos_v/KS-128_2-MV.webp",
       "chakra": 6,
       "power": 6,
       "keywords": [

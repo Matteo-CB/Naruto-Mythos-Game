@@ -52,7 +52,7 @@ vi.mock('@/lib/tournament/absenceManager', () => {
 
 import { prisma } from '@/lib/db/prisma';
 import { auth } from '@/lib/auth/authOptions';
-import { fireAbsenceTimerCallback } from '../socket/tournamentHandlers';
+import { fireAbsenceTimerCallback, MAX_GRACE_CYCLES } from '../socket/tournamentHandlers';
 import { buildTournamentResultsView } from '../tournament/resultsView';
 import { POST as adminPOST } from '../../app/api/tournaments/[id]/admin/route';
 import type { TournamentData } from '@/stores/tournamentStore';
@@ -145,10 +145,10 @@ describe('Tournament forfeit recovery E2E (Fix #5: combined defense)', () => {
       }));
     });
 
-    it('after grace expires (retried=true), forfeit fires per matchReadyPlayers state', async () => {
+    it('connected players get bounded grace, then forfeit only once the grace is exhausted', async () => {
       const io = makeIo('t1', ['Trafalgar', 'mak52554']);
       p.tournamentMatch.findUnique.mockResolvedValue({
-        id: 'r3m1', tournamentId: 't1', status: 'ready',
+        id: 'r3m1g', tournamentId: 't1', status: 'ready',
         player1Id: 'Trafalgar', player2Id: 'mak52554',
         player1Username: 'Trafalgar', player2Username: 'mak52554',
         round: 3, matchIndex: 1, bracket: null, roomCode: null,
@@ -161,11 +161,15 @@ describe('Tournament forfeit recovery E2E (Fix #5: combined defense)', () => {
       });
       p.tournamentMatch.update.mockResolvedValue({});
       p.tournamentParticipant.updateMany.mockResolvedValue({ count: 2 });
-      p.tournamentMatch.findMany.mockResolvedValue([{ id: 'r3m1', status: 'forfeit', round: 3 }]);
+      p.tournamentMatch.findMany.mockResolvedValue([{ id: 'r3m1g', status: 'forfeit', round: 3 }]);
 
-      await fireAbsenceTimerCallback(io as never, 't1', 'r3m1', 'Trafalgar', 'mak52554', null, true);
+      for (let i = 0; i < MAX_GRACE_CYCLES; i++) {
+        await fireAbsenceTimerCallback(io as never, 't1', 'r3m1g', 'Trafalgar', 'mak52554', null, true);
+      }
+      expect(io.emissions.filter((e) => e.event === 'tournament:please-confirm-ready')).toHaveLength(MAX_GRACE_CYCLES);
+      expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
 
-      expect(io.emissions.some((e) => e.event === 'tournament:please-confirm-ready')).toBe(false);
+      await fireAbsenceTimerCallback(io as never, 't1', 'r3m1g', 'Trafalgar', 'mak52554', null, true);
       expect(p.tournamentParticipant.updateMany).toHaveBeenCalledWith(expect.objectContaining({
         where: expect.objectContaining({ userId: { in: ['Trafalgar', 'mak52554'] } }),
         data: expect.objectContaining({ eliminated: true }),

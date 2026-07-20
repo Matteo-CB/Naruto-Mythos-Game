@@ -17,6 +17,10 @@ import { WorldcupBanner } from '@/components/worldcup/WorldcupBanner';
 import { WorldcupWorldMap } from '@/components/worldcup/WorldcupWorldMap';
 import { WorldcupComparator } from '@/components/worldcup/WorldcupComparator';
 import { WorldcupProgression } from '@/components/worldcup/WorldcupProgression';
+import { HoloCard } from '@/components/HoloCard';
+import { WORLDCUP_CHAMPION_CARD } from '@/lib/variants/constants';
+import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getCardById } from '@/lib/data/cardIndex';
 
 const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
 const MEDAL_COLORS = ['#c4a35a', '#a8a9ad', '#a06b42'];
@@ -31,7 +35,6 @@ interface CountryPlayer {
 interface ScoreBreakdown {
   winRate: number;
   strengthFactor: number;
-  eloFactor: number;
   activityFactor: number;
   forfeitRate: number;
 }
@@ -313,7 +316,6 @@ export default function WorldcupPage() {
                               {([
                                 { label: t('factWinRate'), pct: row.breakdown.winRate * 100 },
                                 { label: t('factStrength'), pct: row.breakdown.strengthFactor * 100 },
-                                { label: t('factElo'), pct: row.breakdown.eloFactor * 100 },
                                 { label: t('factActivity'), pct: row.breakdown.activityFactor * 100 },
                               ]).map((f) => (
                                 <span key={f.label} className="text-[9px] uppercase tracking-widest px-2 py-1" style={{ backgroundColor: 'rgba(196,163,90,0.08)', color: '#9a8a5f' }}>
@@ -522,6 +524,42 @@ export default function WorldcupPage() {
             <WorldcupComparator rows={standings} countryName={countryName} tCardMeta={tCardMeta} />
 
             {window === 'season' && <WorldcupProgression countryName={countryName} />}
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.25 }}
+              className="mt-8 px-5 py-5"
+              style={{ backgroundColor: 'rgba(17, 17, 17, 0.7)', clipPath: ROW_CLIP }}
+            >
+              <div className="text-[10px] uppercase tracking-[0.25em] mb-4" style={{ color: '#c4a35a' }}>
+                {t('rewardsTitle')}
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                <div className="mx-auto sm:mx-0 shrink-0">
+                  <HoloCard
+                    src={normalizeImagePath(getCardById(WORLDCUP_CHAMPION_CARD)?.image_file) ?? '/images/cards/KS/secret_v/KS-135-SV.webp'}
+                    alt="Sakura Haruno"
+                    width={200}
+                    height={280}
+                    rarity="special"
+                  />
+                </div>
+                <div className="flex flex-col gap-2.5">
+                  <div className="font-display text-base uppercase tracking-wide" style={{ color: '#e8c877' }}>
+                    {t('rewardChampionCardTitle')}
+                  </div>
+                  <p className="text-[12px] leading-relaxed" style={{ color: '#bbb' }}>
+                    {t('rewardChampionCardDesc')}
+                  </p>
+                  <div className="flex flex-col gap-2 mt-1">
+                    {[t('rewardChampion'), t('rewardPodium'), t('rewardParticipation')].map((line, i) => (
+                      <div key={i} className="text-[11px] leading-relaxed" style={{ color: '#999' }}>{line}</div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
 
             <motion.div
               initial={{ opacity: 0 }}

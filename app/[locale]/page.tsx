@@ -21,10 +21,7 @@ import '@/styles/holo-evolving.css';
 
 
 const FEATURED_CARDS = [
-  { src: '/images/cards/SS/sp_v/SS-122-SPV.webp', alt: 'Minato Namikaze', rarity: 'special' as const },
-  { src: '/images/cards/SS/rare/SS-121-R.webp', alt: 'Naruto Uzumaki', rarity: 'rare' as const },
-  { src: '/images/cards/SS/legendary/SS-000-L.webp', alt: 'Kakashi Hatake', rarity: 'legendary' as const },
-  { src: '/images/cards/SS/pop_v/SS-147-POPV.webp', alt: 'Naruto Uzumaki', rarity: 'special' as const },
+  { src: '/images/cards/KS/secret_v/KS-135-SV.webp', alt: 'Sakura Haruno', rarity: 'special' as const },
 ];
 
 

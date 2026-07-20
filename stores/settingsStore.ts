@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { isTouchPrimaryDevice } from '@/lib/utils/device';
 
 interface BackgroundOption {
   id: string;
@@ -8,7 +7,7 @@ interface BackgroundOption {
 }
 
 function effectiveAnimations(pref: boolean): boolean {
-  return pref && !isTouchPrimaryDevice();
+  return pref;
 }
 
 export type ChatVisibilitySetting = 'everyone' | 'friends' | 'off';

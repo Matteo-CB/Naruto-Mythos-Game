@@ -3,7 +3,7 @@ import type { CountryStanding } from './fairScore';
 import { incrementVariant, isVariantOwned } from '@/lib/variants/inventory';
 import { grantBoosters } from '@/lib/boosters/openBooster';
 import { awardXp } from '@/lib/battlepass/awardXp';
-import { TOURNAMENT_PRIZE_CARD_IDS } from '@/lib/variants/constants';
+import { TOURNAMENT_PRIZE_CARD_IDS, WORLDCUP_CHAMPION_CARD } from '@/lib/variants/constants';
 import { BATTLEPASS_SEASON_SET_ID } from '@/lib/battlepass/constants';
 import { withUserLock } from '@/lib/quests/userLock';
 
@@ -52,7 +52,7 @@ async function grantPodiumPlayerReward(userId: string, rank: number, seasonKey: 
     await grantBoosters(userId, BATTLEPASS_SEASON_SET_ID, boostersForRank(rank)).catch(() => {});
     await awardXp(userId, xpForRank(rank)).catch(() => {});
     if (rank === 1) {
-      for (const cardId of TOURNAMENT_PRIZE_CARD_IDS) {
+      for (const cardId of [...TOURNAMENT_PRIZE_CARD_IDS, WORLDCUP_CHAMPION_CARD]) {
         const owned = await isVariantOwned(userId, cardId).catch(() => false);
         if (!owned) await incrementVariant(userId, cardId).catch(() => {});
       }

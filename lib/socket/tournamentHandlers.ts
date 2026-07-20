@@ -141,6 +141,24 @@ export function getConnectedUserIdsInTournament(io: Server, tournamentId: string
   return connected;
 }
 
+export function getOnlineUserIds(io: Server): Set<string> {
+  const online = new Set<string>();
+  try {
+    const allSockets = (io as unknown as { sockets: { sockets: Map<string, { data?: { userId?: string } }> } }).sockets?.sockets;
+    if (!allSockets) return online;
+    for (const [, sock] of allSockets) {
+      const userId = sock.data?.userId;
+      if (userId) online.add(userId);
+    }
+  } catch (err) {
+    console.error('[Tournament] getOnlineUserIds error:', err);
+  }
+  return online;
+}
+
+const matchGraceCycles = new Map<string, number>();
+export const MAX_GRACE_CYCLES = 4;
+
 export async function fireAbsenceTimerCallback(
   io: Server,
   tournamentId: string,
@@ -162,32 +180,40 @@ export async function fireAbsenceTimerCallback(
     absent2 = !ready?.has(p2);
   }
 
-  if (!retried && (absent1 || absent2)) {
-    const connected = getConnectedUserIdsInTournament(io, tournamentId);
-    if (absent1 && connected.has(p1)) absent1 = false;
-    if (absent2 && connected.has(p2)) absent2 = false;
+  const online = getOnlineUserIds(io);
+  const offlineAbsent1 = absent1 && !online.has(p1);
+  const offlineAbsent2 = absent2 && !!p2 && !online.has(p2);
+  const onlineAbsent1 = absent1 && online.has(p1);
+  const onlineAbsent2 = absent2 && !!p2 && online.has(p2);
+  const cycles = matchGraceCycles.get(matchId) ?? 0;
 
-    if (!absent1 && !absent2) {
-      console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} all players have live sockets, granting ${ABSENCE_GRACE_RETRY_MS / 1000}s grace period`);
-      io.to(`tournament:${tournamentId}`).emit('tournament:please-confirm-ready', { matchId });
-      const newDeadline = new Date(Date.now() + ABSENCE_GRACE_RETRY_MS);
-      scheduleAbsenceTimerWithDeadline(matchId, newDeadline, async () => {
-        await fireAbsenceTimerCallback(io, tournamentId, matchId, p1, p2, null, true);
+  if (!offlineAbsent1 && !offlineAbsent2 && (onlineAbsent1 || onlineAbsent2) && cycles < MAX_GRACE_CYCLES) {
+    matchGraceCycles.set(matchId, cycles + 1);
+    console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} has an online but unconfirmed player, grace cycle ${cycles + 1}/${MAX_GRACE_CYCLES}`);
+    io.to(`tournament:${tournamentId}`).emit('tournament:please-confirm-ready', { matchId, tournamentId });
+    const newDeadline = new Date(Date.now() + ABSENCE_GRACE_RETRY_MS);
+    scheduleAbsenceTimerWithDeadline(matchId, newDeadline, async () => {
+      await fireAbsenceTimerCallback(io, tournamentId, matchId, p1, p2, knownAbsentPlayerId, true);
+    });
+    try {
+      await prisma.tournamentMatch.update({
+        where: { id: matchId },
+        data: { absenceDeadline: newDeadline },
       });
-      try {
-        await prisma.tournamentMatch.update({
-          where: { id: matchId },
-          data: { absenceDeadline: newDeadline },
-        });
-      } catch (err) {
-        console.error(`[Tournament] fireAbsenceTimerCallback: failed to persist grace deadline for ${matchId}:`, err);
-      }
-      io.to(`tournament:${tournamentId}`).emit('tournament:absence-timer', {
-        matchId, playerId: null, deadline: newDeadline.toISOString(),
-      });
-      return;
+    } catch (err) {
+      console.error(`[Tournament] fireAbsenceTimerCallback: failed to persist grace deadline for ${matchId}:`, err);
     }
+    io.to(`tournament:${tournamentId}`).emit('tournament:absence-timer', {
+      matchId, playerId: knownAbsentPlayerId, deadline: newDeadline.toISOString(),
+    });
+    return;
   }
+
+  matchGraceCycles.delete(matchId);
+
+  const capReached = cycles >= MAX_GRACE_CYCLES;
+  const forfeit1 = offlineAbsent1 || (capReached && onlineAbsent1);
+  const forfeit2 = offlineAbsent2 || (capReached && onlineAbsent2);
 
   let isSwiss = false;
   try {
@@ -199,7 +225,7 @@ export async function fireAbsenceTimerCallback(
     console.error(`[Tournament] fireAbsenceTimerCallback: format lookup failed for ${tournamentId}:`, err);
   }
 
-  if (absent1 && absent2) {
+  if (forfeit1 && forfeit2) {
     if (isSwiss) {
       await handleSwissDoubleAbsence(io, tournamentId, matchId);
     } else {
@@ -207,12 +233,12 @@ export async function fireAbsenceTimerCallback(
       if (p2) await markParticipantAbsence(tournamentId, p2);
       await handleMatchForfeit(io, tournamentId, matchId, p1);
     }
-  } else if (absent1 || absent2) {
-    const forfeitId = absent1 ? p1 : p2;
+  } else if (forfeit1 || forfeit2) {
+    const forfeitId = forfeit1 ? p1 : p2;
     if (forfeitId) await markParticipantAbsence(tournamentId, forfeitId);
     await handleMatchForfeit(io, tournamentId, matchId, forfeitId);
   } else {
-    console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} no absent player at fire time, no-op`);
+    console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} no forfeitable absent player at fire time, no-op`);
   }
   matchReadyPlayers.delete(matchId);
 }
@@ -299,6 +325,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
       if (bothReady) {
         ready.add(otherPlayerId);
         clearAbsenceTimer(matchId);
+        matchGraceCycles.delete(matchId);
         matchReadyPlayers.delete(matchId);
         const roomCode = match.roomCode || `T-${matchId.slice(-6)}`;
 
