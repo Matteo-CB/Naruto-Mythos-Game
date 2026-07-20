@@ -3563,8 +3563,8 @@
   "worldcup": {
     "rewardsTitle": "報酬",
     "rewardChampionCardTitle": "世界チャンピオン限定カード",
-    "rewardChampionCardDesc": "春野サクラ「木ノ葉の医療班」：ブースターからは絶対に手に入らない金色のシークレットカード。世界チャンピオンチームのメンバーだけが入手できます。",
-    "rewardChampion": "チャンピオンチーム：限定の金色カード、バリアントブースター3個、XP。",
+    "rewardChampionCardDesc": "春野サクラ「木ノ葉の医療班」：ブースターからは絶対に手に入らないシークレットカード。世界チャンピオンチームのメンバーだけが入手できます。",
+    "rewardChampion": "チャンピオンチーム：限定カード、バリアントブースター3個、XP。",
     "rewardPodium": "表彰台2位・3位の国：バリアントブースターとXP。",
     "rewardParticipation": "予選通過国のその他の選手：チームXP。",
     "title": "ワールドカップ",

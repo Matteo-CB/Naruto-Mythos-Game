@@ -3564,8 +3564,8 @@
   "worldcup": {
     "rewardsTitle": "Recompensas",
     "rewardChampionCardTitle": "Carta exclusiva del campeón del mundo",
-    "rewardChampionCardDesc": "Sakura Haruno, El Cuerpo Médico de la Hoja: una carta Secreta dorada que nunca aparece en los sobres. Solo los miembros del equipo campeón del mundo pueden conseguirla.",
-    "rewardChampion": "Equipo campeón: la carta dorada exclusiva, 3 sobres de variantes y XP.",
+    "rewardChampionCardDesc": "Sakura Haruno, El Cuerpo Médico de la Hoja: una carta Secreta que nunca aparece en los sobres. Solo los miembros del equipo campeón del mundo pueden conseguirla.",
+    "rewardChampion": "Equipo campeón: la carta exclusiva, 3 sobres de variantes y XP.",
     "rewardPodium": "Países 2.º y 3.º del podio: sobres de variantes y XP.",
     "rewardParticipation": "Otros jugadores de los países clasificados: XP de equipo.",
     "title": "Copa del mundo",

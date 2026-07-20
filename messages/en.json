@@ -3559,8 +3559,8 @@
   "worldcup": {
     "rewardsTitle": "Rewards",
     "rewardChampionCardTitle": "World champion exclusive card",
-    "rewardChampionCardDesc": "Sakura Haruno, The Leaf Medical Corps: a golden Secret card that can never be pulled from a booster. Only members of the world champion team can earn it.",
-    "rewardChampion": "Champion team: the exclusive golden card, 3 variant boosters and XP.",
+    "rewardChampionCardDesc": "Sakura Haruno, The Leaf Medical Corps: a Secret card that can never be pulled from a booster. Only members of the world champion team can earn it.",
+    "rewardChampion": "Champion team: the exclusive card, 3 variant boosters and XP.",
     "rewardPodium": "2nd and 3rd podium countries: variant boosters and XP.",
     "rewardParticipation": "Other players from qualified countries: team XP.",
     "title": "World Cup",
