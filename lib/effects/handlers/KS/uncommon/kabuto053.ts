@@ -1,7 +1,6 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeCheck';
 import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
 
 
@@ -77,48 +76,13 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
 
   const reducedCost = Math.max(0, (topCard.chakra ?? 0) - 3);
   const canAffordFresh = playerState.chakra >= reducedCost;
-  const canUpgradeCheck = canAffordAsUpgrade(state, sourcePlayer, topCard as { name_fr: string; chakra: number }, 3);
-  if (!canAffordFresh && !canUpgradeCheck) {
-    return {
-      state: {
-        ...state,
-        log: logAction(
-          state.log, state.turn, state.phase, sourcePlayer,
-          'EFFECT_NO_TARGET',
-          `Kabuto Yakushi (053): Cannot afford ${topCard.name_fr} (cost ${reducedCost}).`,
-          'game.log.effect.noTarget',
-          { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' },
-        ),
-      },
-    };
-  }
 
-  
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  let hasValidMission = false;
+  const validMissions: string[] = [];
   for (let mi = 0; mi < state.activeMissions.length; mi++) {
-    const mission = state.activeMissions[mi];
-    const chars = mission[friendlySide];
-
-    let hasUpgradeTarget = false;
-    for (const c of chars) {
-      if (c.isHidden) continue;
-      if (c.controlledBy !== c.originalOwner) continue;
-      const tc = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-      const isSameName = tc.name_fr.toUpperCase() === topCard.name_fr.toUpperCase()
-        && (topCard.chakra ?? 0) > (tc.chakra ?? 0);
-      const isFlex = checkFlexibleUpgrade(topCard as any, tc)
-        && (topCard.chakra ?? 0) > (tc.chakra ?? 0);
-      if (isSameName || isFlex) {
-        const upgradeCost = Math.max(0, ((topCard.chakra ?? 0) - (tc.chakra ?? 0)) - 3);
-        if (playerState.chakra >= upgradeCost) {
-          hasUpgradeTarget = true;
-          break;
-        }
-      }
-    }
+    const chars = state.activeMissions[mi][friendlySide];
 
     const hasNameConflict = chars.some((c) => {
       if (c.isHidden) return false;
@@ -126,20 +90,32 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
       return tc.name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
     });
 
+    const hasUpgradeTarget = chars.some((c) => {
+      if (c.isHidden) return false;
+      if (c.controlledBy !== c.originalOwner) return false;
+      const tc = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+      const isSameName = tc.name_fr.toUpperCase() === topCard.name_fr.toUpperCase()
+        && (topCard.chakra ?? 0) > (tc.chakra ?? 0);
+      const isFlex = checkFlexibleUpgrade(topCard as any, tc)
+        && (topCard.chakra ?? 0) > (tc.chakra ?? 0);
+      if (!isSameName && !isFlex) return false;
+      const upgradeCost = Math.max(0, ((topCard.chakra ?? 0) - (tc.chakra ?? 0)) - 3);
+      return playerState.chakra >= upgradeCost;
+    });
+
     if (hasUpgradeTarget || (!hasNameConflict && canAffordFresh)) {
-      hasValidMission = true;
-      break;
+      validMissions.push(String(mi));
     }
   }
 
-  if (!hasValidMission) {
+  if (validMissions.length === 0) {
     return {
       state: {
         ...state,
         log: logAction(
           state.log, state.turn, state.phase, sourcePlayer,
           'EFFECT_NO_TARGET',
-          `Kabuto Yakushi (053): No valid mission for ${topCard.name_fr}.`,
+          `Kabuto Yakushi (053): No valid mission to play ${topCard.name_fr} from discard.`,
           'game.log.effect.noTarget',
           { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' },
         ),
@@ -147,15 +123,16 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     };
   }
 
-  
+
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KABUTO053_CONFIRM_MAIN',
-    validTargets: [sourceCard.instanceId],
-    isOptional: false,
-    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
-    descriptionKey: 'game.effect.desc.kabuto053ConfirmMain',
+    targetSelectionType: 'KABUTO053_CHOOSE_MISSION',
+    validTargets: validMissions,
+    isOptional: true,
+    description: JSON.stringify({ reducedCost }),
+    descriptionKey: 'game.effect.desc.kabuto053ChooseMission',
+    descriptionParams: { cardName: topCard.name_fr, cost: String(reducedCost) },
   };
 }
 
