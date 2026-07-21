@@ -157,7 +157,13 @@ export function getOnlineUserIds(io: Server): Set<string> {
 }
 
 const matchGraceCycles = new Map<string, number>();
-export const MAX_GRACE_CYCLES = 4;
+export const MAX_GRACE_CYCLES = 8;
+
+export function clearTournamentMatchTimers(matchId: string): void {
+  clearAbsenceTimer(matchId);
+  matchGraceCycles.delete(matchId);
+  matchReadyPlayers.delete(matchId);
+}
 
 export async function fireAbsenceTimerCallback(
   io: Server,

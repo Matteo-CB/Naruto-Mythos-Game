@@ -297,8 +297,10 @@ export async function POST(
           data: { status: 'completed', winnerId, winnerUsername, completedAt: new Date() },
         });
 
-
-
+        {
+          const { clearTournamentMatchTimers } = await import('@/lib/socket/tournamentHandlers');
+          clearTournamentMatchTimers(matchId);
+        }
 
         if (loserId && tournament.format === 'elimination') {
           await prisma.tournamentParticipant.updateMany({

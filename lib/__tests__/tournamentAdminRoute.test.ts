@@ -43,6 +43,7 @@ vi.mock('@/lib/socket/tournamentHandlers', () => ({
   cleanupTournamentMapsExternal: vi.fn(),
   cleanupTournamentMapsByIds: vi.fn(),
   fireAbsenceTimerCallback: vi.fn(),
+  clearTournamentMatchTimers: vi.fn(),
 }));
 
 vi.mock('@/lib/tournament/swissEngine', () => ({

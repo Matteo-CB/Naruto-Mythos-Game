@@ -8,7 +8,6 @@ export const DAILY_TOURNAMENT_TZ = 'Europe/Paris';
 export const DAILY_TOURNAMENT_REG_HOUR = 17;
 export const DAILY_TOURNAMENT_START_HOUR = 21;
 export const DAILY_TOURNAMENT_MAX_PLAYERS = 16;
-export const DAILY_TOURNAMENT_TYPE = 'daily_auto';
 export const DAILY_TOURNAMENT_NAME = 'Tournoi du soir';
 
 export function parisDateParts(base: Date = new Date()): { year: number; month: number; day: number; hour: number } {
@@ -63,7 +62,7 @@ export async function createDailyTournamentIfNeeded(now: Date = new Date()): Pro
   const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
 
   const existing = await prisma.tournament.findFirst({
-    where: { type: DAILY_TOURNAMENT_TYPE, scheduledStartAt: { gte: dayStart, lt: dayEnd } },
+    where: { name: DAILY_TOURNAMENT_NAME, scheduledStartAt: { gte: dayStart, lt: dayEnd } },
     select: { id: true },
   });
   if (existing) return { created: false, reason: 'already_exists', tournamentId: existing.id };
@@ -84,7 +83,7 @@ export async function createDailyTournamentIfNeeded(now: Date = new Date()): Pro
   const tournament = await prisma.tournament.create({
     data: {
       name: DAILY_TOURNAMENT_NAME,
-      type: DAILY_TOURNAMENT_TYPE,
+      type: 'simulator',
       format: 'elimination',
       status: 'registration',
       gameMode: 'classic',
