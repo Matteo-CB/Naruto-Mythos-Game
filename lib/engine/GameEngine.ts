@@ -21,6 +21,7 @@ import {
   TOTAL_TURNS,
 } from './types';
 import { deepClone } from './utils/deepClone';
+import { normalizeHoloCardForGame } from '../holo/holoId';
 import { shuffle } from './utils/shuffle';
 import { generateGameId, generateInstanceId, resetIdCounter } from './utils/id';
 import { logSystem, logAction } from './utils/gameLog';
@@ -76,8 +77,8 @@ export class GameEngine {
     }
 
     
-    const p1Deck = shuffle([...config.player1.deck]);
-    const p2Deck = shuffle([...config.player2.deck]);
+    const p1Deck = shuffle(config.player1.deck.map(normalizeHoloCardForGame));
+    const p2Deck = shuffle(config.player2.deck.map(normalizeHoloCardForGame));
 
     
     const p1Hand = p1Deck.splice(0, INITIAL_HAND_SIZE);

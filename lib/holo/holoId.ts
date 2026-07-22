@@ -37,3 +37,9 @@ export function decorateHoloCard<T extends CardData>(base: T): T {
   const hid = holoIdFor(base.cardId || base.id);
   return { ...base, id: hid, cardId: hid, isHolo: true };
 }
+
+export function normalizeHoloCardForGame<T extends CardData>(card: T): T {
+  if (!isHoloId(card.id) && !isHoloId(card.cardId ?? '')) return card;
+  const base = holoBaseId(card.id);
+  return { ...card, id: base, cardId: holoBaseId(card.cardId ?? card.id), isHolo: true };
+}

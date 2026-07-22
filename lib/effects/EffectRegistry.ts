@@ -1,5 +1,6 @@
 import type { EffectType } from '../engine/types';
 import type { EffectHandler } from './EffectTypes';
+import { isHoloId, holoBaseId } from '../holo/holoId';
 
 
 const registry: Map<string, Map<EffectType, EffectHandler>> = new Map();
@@ -14,11 +15,17 @@ export function registerEffect(cardId: string, effectType: EffectType, handler: 
 
 
 export function getEffectHandler(cardId: string, effectType: EffectType): EffectHandler | undefined {
-  
+
   const cardHandlers = registry.get(cardId);
   if (cardHandlers) {
     const handler = cardHandlers.get(effectType);
     if (handler) return handler;
+  }
+
+
+  if (isHoloId(cardId)) {
+    const holoBaseHandler = getEffectHandler(holoBaseId(cardId), effectType);
+    if (holoBaseHandler) return holoBaseHandler;
   }
 
   
