@@ -70,6 +70,9 @@ function MulliganCard({
       }}
       whileHover={{ y: -4 }}
       onClick={(e) => { e.stopPropagation(); onSelect(); }}
+      data-gp="true"
+      role="button"
+      tabIndex={-1}
       className="relative card-aspect no-select"
       style={{
         width: dims.mulliganCard.w + 'px',

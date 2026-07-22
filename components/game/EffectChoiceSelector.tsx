@@ -104,6 +104,9 @@ export function EffectChoiceSelector() {
                   }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleSelect(choice.effectType, choice.description)}
+                  data-gp="true"
+                  role="button"
+                  tabIndex={-1}
                   className="relative flex items-start gap-4 px-5 py-4 text-left cursor-pointer no-select"
                   style={{
                     backgroundColor: style.bg,

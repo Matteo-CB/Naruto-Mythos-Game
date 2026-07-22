@@ -487,6 +487,9 @@ const OrderedDefeatCard = React.memo(function OrderedDefeatCard({ character, isV
       whileHover={isValid ? { scale: 1.08, y: -3 } : {}}
       whileTap={isValid ? { scale: 0.95 } : {}}
       onClick={isValid ? onClick : undefined}
+      data-gp={isValid ? 'true' : undefined}
+      role="button"
+      tabIndex={-1}
       className="relative no-select"
       style={{
         width: '65px', height: '91px', cursor: isValid ? 'pointer' : 'default',
@@ -569,6 +572,9 @@ const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missi
     <div
       className="flex flex-col items-center gap-2 px-2"
       onClick={isMissionTarget ? handleMissionClick : undefined}
+      data-gp={isMissionTarget ? 'true' : undefined}
+      role={isMissionTarget ? 'button' : undefined}
+      tabIndex={isMissionTarget ? -1 : undefined}
       style={{
         opacity: hasValidTargets ? 1 : 0.4,
         minWidth: '120px',

@@ -171,6 +171,9 @@ export function TargetOrderPopup({
                   whileHover={{ scale: 1.06, y: -3 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => toggleTarget(target.instanceId)}
+                  data-gp="true"
+                  role="button"
+                  tabIndex={-1}
                   className="relative cursor-pointer no-select"
                   style={{
                     width: '100px',

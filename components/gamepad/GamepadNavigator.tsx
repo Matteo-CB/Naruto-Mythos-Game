@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { usePathname } from '@/lib/i18n/navigation';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { readGamepads, GP, emptySnapshot, type InputSnapshot } from '@/lib/gamepad/mapping';
-import { collectFocusables, isElementInViewport, type Focusable } from '@/lib/gamepad/focusables';
+import { collectFocusables, getTopModalScope, isElementInViewport, type Focusable } from '@/lib/gamepad/focusables';
 import { pickInDirection, pickNearest, type Direction, type FocusRect } from '@/lib/gamepad/spatial';
 import { GamepadHelpOverlay } from './GamepadHelpOverlay';
 
@@ -76,6 +76,10 @@ export function GamepadNavigator() {
   helpOpenRef.current = helpOpen;
   const enabledRef = useRef(enabled);
   enabledRef.current = enabled;
+  const ringVisibleRef = useRef(false);
+  ringVisibleRef.current = ringVisible;
+  const lastScopeRef = useRef<HTMLElement | null>(null);
+  const preScopeFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -110,20 +114,28 @@ export function GamepadNavigator() {
   const move = useCallback((dir: Direction) => {
     const items = focusablesNow();
     if (items.length === 0) return;
-    const cur = currentRect();
-    if (!cur) { focusInitial(); return; }
+    const inScope = focusedRef.current ? items.some((f) => f.el === focusedRef.current) : false;
+    const cur = inScope ? currentRect() : null;
+    if (!cur) {
+      const target = pickNearest({ x: window.innerWidth / 2, y: window.innerHeight * 0.4 }, items);
+      setFocused(target ? target.el : items[0].el);
+      return;
+    }
     const others = items.filter((f) => f.el !== focusedRef.current);
     const next = pickInDirection(cur, others, dir);
     if (next) setFocused(next.el);
-  }, [focusablesNow, currentRect, focusInitial, setFocused]);
+  }, [focusablesNow, currentRect, setFocused]);
 
   const goBack = useCallback(() => {
-    const layer = document.querySelector<HTMLElement>('[data-gp-layer],[role="dialog"],[aria-modal="true"]');
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
-    if (layer) {
-      const closeBtn = layer.querySelector<HTMLElement>('[data-gp-back],[aria-label="Close"],[aria-label="Fermer"]');
-      if (closeBtn) closeBtn.click();
+    const scope = getTopModalScope();
+    if (scope) {
+      const closeBtn = scope.querySelector<HTMLElement>('[data-gp-back],[aria-label="Close"],[aria-label="Fermer"]');
+      if (closeBtn) { closeBtn.click(); return; }
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
+      scope.click();
+      return;
     }
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
   }, []);
 
   useEffect(() => {
@@ -145,7 +157,39 @@ export function GamepadNavigator() {
   useEffect(() => {
     setFocused(null);
     heldDirRef.current = { dir: null, nextAt: 0 };
+    lastScopeRef.current = null;
+    preScopeFocusRef.current = null;
   }, [pathname, setFocused]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    let timer = 0;
+    const evaluate = () => {
+      if (!enabledRef.current || !ringVisibleRef.current) return;
+      const scope = getTopModalScope();
+      if (scope === lastScopeRef.current) return;
+      if (scope) {
+        preScopeFocusRef.current = focusedRef.current && focusedRef.current.isConnected ? focusedRef.current : null;
+        const items = collectFocusables();
+        if (items.length > 0) {
+          const first = pickNearest({ x: window.innerWidth / 2, y: window.innerHeight / 2 }, items);
+          setFocused(first ? first.el : items[0].el);
+        }
+      } else {
+        const prev = preScopeFocusRef.current;
+        if (prev && prev.isConnected) setFocused(prev);
+        else focusInitial();
+        preScopeFocusRef.current = null;
+      }
+      lastScopeRef.current = scope;
+    };
+    const obs = new MutationObserver(() => {
+      if (timer) return;
+      timer = window.setTimeout(() => { timer = 0; evaluate(); }, 80);
+    });
+    obs.observe(document.body, { childList: true, subtree: true });
+    return () => { obs.disconnect(); if (timer) window.clearTimeout(timer); };
+  }, [mounted, focusInitial, setFocused]);
 
   useEffect(() => {
     const onPointer = () => { setRingVisible(false); };
