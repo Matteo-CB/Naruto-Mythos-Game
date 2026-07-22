@@ -183,6 +183,9 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       data-anchor={`slot:${missionIndex}:${isOwn ? 'me' : 'opp'}:${character.instanceId}`}
+      data-gp="true"
+      role="button"
+      tabIndex={-1}
       className="relative no-select"
       style={{
         width: dims.missionCard.w + 'px',
@@ -774,6 +777,9 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
       initial={false}
       animate={{ opacity: 1, y: 0 }}
       onClick={handleClick}
+      data-gp="true"
+      role="button"
+      tabIndex={-1}
       className="flex flex-col items-center gap-0.5 px-1 py-0.5 h-full"
       style={{
         minWidth: dims.emptyLaneMinW + 'px',

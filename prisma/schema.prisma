@@ -61,6 +61,7 @@ model User {
   stripeCustomerId        String?
   hideDeckBuilderVariants Boolean              @default(false)
   manualPowerMode         Boolean              @default(false)
+  gamepadEnabled          Boolean              @default(true)
   countryCode             String?
   chatVisibility          String               @default("everyone")
   fastAnimations          Boolean              @default(false)

@@ -60,6 +60,9 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
       whileHover={isValidTarget ? { scale: 1.08 } : {}}
       whileTap={isValidTarget ? { scale: 0.95 } : {}}
       onClick={handleClick}
+      data-gp={isValidTarget ? 'true' : undefined}
+      role="button"
+      tabIndex={-1}
       className="relative no-select"
       style={{
         width: dims.targetCard.w + 'px',

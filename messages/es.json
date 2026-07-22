@@ -601,6 +601,19 @@
     "socialBadgeTooltip": "{count} mensajes o solicitudes pendientes",
     "worldcup": "Copa del mundo"
   },
+  "gamepad": {
+    "title": "Mando",
+    "close": "Cerrar",
+    "hint": "La selección dorada sigue lo que puedes activar. Puedes usar el ratón o la pantalla táctil en cualquier momento.",
+    "action": {
+      "select": "Seleccionar",
+      "back": "Atrás, cerrar",
+      "move": "Moverse",
+      "page": "Página anterior, siguiente",
+      "scroll": "Desplazar",
+      "help": "Esta ayuda"
+    }
+  },
   "manualMode": {
     "clickToGuess": "Haz clic para adivinar el valor",
     "hasModifier": "Hay un powerup activo aquí",
@@ -658,6 +671,8 @@
     "hideVariantsHint": "Cuando está activado, las cartas variantes se ocultan por defecto en el creador de mazos.",
     "manualPowerMode": "Modo de cálculo manual",
     "manualPowerModeHint": "Oculta la fuerza y el coste de las cartas, tu chakra y la puntuación, para practicar el cálculo de la fuerza tú mismo como en el juego físico.",
+    "gamepad": "Mando",
+    "gamepadHint": "Navega y juega a todo el simulador con un mando. La selección dorada aparece cuando conectas un mando. Pulsa Start para ver los botones.",
     "sound": "Efectos de sonido",
     "soundOn": "Los sonidos están activados.",
     "soundOff": "Todos los sonidos están desactivados.",

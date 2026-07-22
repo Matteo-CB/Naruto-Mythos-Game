@@ -14,6 +14,7 @@ import { ReconnectPrompt } from '@/components/ReconnectPrompt';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { BreadcrumbJsonLd } from '@/components/Breadcrumbs';
 import { AnimationProvider } from '@/components/AnimationProvider';
+import { GamepadNavigator } from '@/components/gamepad/GamepadNavigator';
 import type { Metadata } from 'next';
 
 const SITE_URL = 'https://narutomythosgame.com';
@@ -176,6 +177,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <ToastContainer />
         <ConnectionStatusIndicator />
         <ReconnectPrompt />
+        <GamepadNavigator />
       </NextIntlClientProvider>
     </SessionProvider>
   );

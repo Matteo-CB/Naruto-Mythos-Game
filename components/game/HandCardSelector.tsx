@@ -74,6 +74,9 @@ function HandCard({
       whileHover={disabled ? undefined : { scale: 1.06, y: -6, rotate: 1 }}
       whileTap={disabled ? undefined : { scale: 0.95 }}
       onClick={() => { if (!disabled) onSelect(cardInfo.targetId ?? String(index)); }}
+      data-gp={disabled ? undefined : 'true'}
+      role="button"
+      tabIndex={-1}
       className="relative no-select"
       style={{
         width: dims.handSelectorCard.w + 'px',

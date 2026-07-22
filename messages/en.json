@@ -596,6 +596,19 @@
     "socialBadgeTooltip": "{count} messages or pending requests",
     "worldcup": "World Cup"
   },
+  "gamepad": {
+    "title": "Controller",
+    "close": "Close",
+    "hint": "The gold selection follows what you can activate. You can use the mouse or touch at any time.",
+    "action": {
+      "select": "Select",
+      "back": "Back, close",
+      "move": "Move",
+      "page": "Page up, down",
+      "scroll": "Scroll",
+      "help": "This help"
+    }
+  },
   "manualMode": {
     "clickToGuess": "Click to guess the value",
     "hasModifier": "A powerup is active here",
@@ -653,6 +666,8 @@
     "hideVariantsHint": "When on, variant cards are hidden by default in the deck builder.",
     "manualPowerMode": "Manual power mode",
     "manualPowerModeHint": "Hides card power and cost, your chakra and the score, so you can practise working out power yourself like in a physical game.",
+    "gamepad": "Controller",
+    "gamepadHint": "Navigate and play the whole simulator with a controller. The gold selection appears when a controller is connected. Press Start to see the buttons.",
     "sound": "Sound effects",
     "soundOn": "Sounds are on.",
     "soundOff": "All sounds are off.",

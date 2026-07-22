@@ -8,21 +8,25 @@
       "title_ja": "プロフィールからデッキを閲覧・書き出し",
       "changes_fr": [
         "Depuis ton profil, tu peux ouvrir tes decks en entier, les copier et les exporter en image.",
-        "Les cartes brillantes (holo) déclenchent désormais leur effet en jeu, exactement comme les cartes normales."
+        "Les cartes brillantes (holo) déclenchent désormais leur effet en jeu, exactement comme les cartes normales.",
+        "Tout le simulateur se joue à la manette : navigue dans les menus et joue tes parties avec une manette branchée. Appuie sur Start pour voir les touches."
       ],
       "changes_en": [
         "From your profile you can now open your decks in full, copy them and export them as an image.",
-        "Shiny (holo) cards now trigger their effect in game, exactly like normal cards."
+        "Shiny (holo) cards now trigger their effect in game, exactly like normal cards.",
+        "The whole simulator can be played with a controller: navigate the menus and play your games with a connected controller. Press Start to see the buttons."
       ],
       "changes_es": [
         "Desde tu perfil ahora puedes abrir tus mazos completos, copiarlos y exportarlos como imagen.",
-        "Las cartas brillantes (holo) ahora activan su efecto en la partida, igual que las cartas normales."
+        "Las cartas brillantes (holo) ahora activan su efecto en la partida, igual que las cartas normales.",
+        "Todo el simulador se puede jugar con mando: navega por los menús y juega tus partidas con un mando conectado. Pulsa Start para ver los botones."
       ],
       "changes_ja": [
         "プロフィールから自分のデッキを丸ごと開いて、コピーや画像への書き出しができるようになりました。",
-        "光る（ホロ）カードも通常カードとまったく同じく、ゲーム中に効果が発動するようになりました。"
+        "光る（ホロ）カードも通常カードとまったく同じく、ゲーム中に効果が発動するようになりました。",
+        "シミュレーター全体をコントローラーでプレイ可能に：接続したコントローラーでメニュー操作も対戦もできます。Startでボタン一覧を表示。"
       ],
-      "categories": ["feature", "fix"]
+      "categories": ["feature", "fix", "feature"]
     },
     {
       "date": "2026-07-22",

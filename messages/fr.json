@@ -602,6 +602,19 @@
     "socialBadgeTooltip": "{count} messages ou demandes en attente",
     "worldcup": "Coupe du monde"
   },
+  "gamepad": {
+    "title": "Manette",
+    "close": "Fermer",
+    "hint": "La sélection dorée suit ce que tu peux valider. Tu peux utiliser la souris ou l'écran tactile à tout moment.",
+    "action": {
+      "select": "Valider",
+      "back": "Retour, fermer",
+      "move": "Se déplacer",
+      "page": "Page précédente, suivante",
+      "scroll": "Faire défiler",
+      "help": "Cette aide"
+    }
+  },
   "manualMode": {
     "clickToGuess": "Clique pour deviner la valeur",
     "hasModifier": "Un powerup est actif ici",
@@ -659,6 +672,8 @@
     "hideVariantsHint": "Quand activé, les cartes variantes sont masquées par défaut dans le deck builder.",
     "manualPowerMode": "Mode calcul manuel",
     "manualPowerModeHint": "Cache la puissance et le coût des cartes, ton chakra et le score, pour t'entraîner à calculer la puissance toi-même comme en vrai.",
+    "gamepad": "Manette",
+    "gamepadHint": "Navigue et joue à tout le simulateur à la manette. La sélection dorée apparaît quand une manette est branchée. Appuie sur Start pour voir les touches.",
     "sound": "Effets sonores",
     "soundOn": "Les sons sont activés.",
     "soundOff": "Tous les sons sont désactivés.",

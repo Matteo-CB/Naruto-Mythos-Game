@@ -22,6 +22,7 @@ interface SettingsState {
   allowSpectatorHand: boolean;
   hideDeckBuilderVariants: boolean;
   manualPowerMode: boolean;
+  gamepadEnabled: boolean;
   countryCode: string | null;
   gameBackground: string; // background DB id or "default"
   gameBackgroundUrl: string; // resolved URL for the background image
@@ -34,6 +35,7 @@ interface SettingsState {
   setAllowSpectatorHand: (v: boolean) => Promise<void>;
   setHideDeckBuilderVariants: (v: boolean) => Promise<void>;
   setManualPowerMode: (v: boolean) => Promise<void>;
+  setGamepadEnabled: (v: boolean) => Promise<void>;
   setCountryCode: (code: string | null) => Promise<void>;
   setGameBackground: (id: string, url: string) => Promise<void>;
   setChatVisibility: (v: ChatVisibilitySetting) => Promise<void>;
@@ -81,6 +83,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   allowSpectatorHand: false,
   hideDeckBuilderVariants: false,
   manualPowerMode: false,
+  gamepadEnabled: true,
   countryCode: null,
   gameBackground: 'default',
   gameBackgroundUrl: DEFAULT_BG_URL,
@@ -119,6 +122,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         allowSpectatorHand: prefs.allowSpectatorHand ?? false,
         hideDeckBuilderVariants: prefs.hideDeckBuilderVariants ?? false,
         manualPowerMode: prefs.manualPowerMode ?? false,
+        gamepadEnabled: prefs.gamepadEnabled ?? true,
         countryCode: prefs.countryCode ?? null,
         gameBackground: bgId,
         gameBackgroundUrl: bgUrl,
@@ -208,6 +212,21 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       if (!res.ok) throw new Error('Failed to save');
     } catch {
       set({ manualPowerMode: prev });
+    }
+  },
+
+  setGamepadEnabled: async (v: boolean) => {
+    const prev = get().gamepadEnabled;
+    set({ gamepadEnabled: v });
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gamepadEnabled: v }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+    } catch {
+      set({ gamepadEnabled: prev });
     }
   },
 

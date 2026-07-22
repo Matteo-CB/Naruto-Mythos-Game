@@ -14,7 +14,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, manualPowerMode: true, countryCode: true, chatVisibility: true, fastAnimations: true },
+      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, manualPowerMode: true, gamepadEnabled: true, countryCode: true, chatVisibility: true, fastAnimations: true },
     });
 
     return NextResponse.json({
@@ -24,6 +24,7 @@ export async function GET() {
       allowSpectatorHand: user?.allowSpectatorHand ?? false,
       hideDeckBuilderVariants: user?.hideDeckBuilderVariants ?? false,
       manualPowerMode: user?.manualPowerMode ?? false,
+      gamepadEnabled: user?.gamepadEnabled ?? true,
       countryCode: user?.countryCode ?? null,
       chatVisibility: normalizeChatVisibility(user?.chatVisibility),
       fastAnimations: user?.fastAnimations ?? false,
@@ -60,6 +61,9 @@ export async function PATCH(request: NextRequest) {
     }
     if (typeof body.manualPowerMode === 'boolean') {
       update.manualPowerMode = body.manualPowerMode;
+    }
+    if (typeof body.gamepadEnabled === 'boolean') {
+      update.gamepadEnabled = body.gamepadEnabled;
     }
     if (body.countryCode === null) {
       update.countryCode = null;
