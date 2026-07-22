@@ -601,6 +601,12 @@
     "socialBadgeTooltip": "{count} mensajes o solicitudes pendientes",
     "worldcup": "Copa del mundo"
   },
+  "manualMode": {
+    "clickToGuess": "Haz clic para adivinar el valor",
+    "hasModifier": "Hay un powerup activo aquí",
+    "yourGuess": "Tu respuesta",
+    "check": "Comprobar"
+  },
   "settings": {
     "title": "Opciones",
     "subscription": {

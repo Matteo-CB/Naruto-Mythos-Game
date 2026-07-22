@@ -9,10 +9,13 @@ import { useGameScale } from './GameScaleContext';
 import { CountryFlag } from '@/components/CountryFlag';
 import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { usePlayerFlag } from '@/lib/hooks/usePlayerFlags';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { ManualGuess } from './ManualGuess';
 
 export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
   const t = useTranslations();
   const dims = useGameScale();
+  const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const visibleState = useGameStore((s) => s.visibleState);
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
   const oppPlayerId = visibleState ? (visibleState.myPlayer === 'player1' ? 'player2' : 'player1') : null;
@@ -78,16 +81,16 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
 
       <div className="flex-1" />
 
-      <StatPill label={t('game.chakra')} value={opponentState.chakra} color="#b33e3e" isMobile={dims.isMobile} />
+      <StatPill label={t('game.chakra')} value={opponentState.chakra} color="#b33e3e" isMobile={dims.isMobile} manual={manualPowerMode} />
 
-      <StatPill label={t('game.score')} value={opponentState.missionPoints} color="#e0e0e0" accent="#b33e3e" isMobile={dims.isMobile} />
+      <StatPill label={t('game.score')} value={opponentState.missionPoints} color="#e0e0e0" accent="#b33e3e" isMobile={dims.isMobile} manual={manualPowerMode} />
 
       <ChessClockDisplay player={opponentPlayer} isOpponent={true} />
     </div>
   );
 });
 
-function StatPill({ label, value, color, isMobile }: { label: string; value: number; color: string; accent?: string; isMobile?: boolean }) {
+function StatPill({ label, value, color, isMobile, manual }: { label: string; value: number; color: string; accent?: string; isMobile?: boolean; manual?: boolean }) {
   return (
     <div className="flex items-baseline gap-1.5 sm:gap-2 px-1.5 sm:px-2 shrink-0">
       <span
@@ -114,7 +117,7 @@ function StatPill({ label, value, color, isMobile }: { label: string; value: num
           textShadow: `0 1px 3px rgba(0,0,0,0.8), 0 0 10px ${color}55`,
         }}
       >
-        {value}
+        {manual ? <ManualGuess actual={value} color={color} /> : value}
       </motion.span>
     </div>
   );

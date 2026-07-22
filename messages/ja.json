@@ -600,6 +600,12 @@
     "socialBadgeTooltip": "未読メッセージ・申請 {count}件",
     "worldcup": "ワールドカップ"
   },
+  "manualMode": {
+    "clickToGuess": "クリックして値を予想",
+    "hasModifier": "パワーアップが有効です",
+    "yourGuess": "予想を入力",
+    "check": "確認"
+  },
   "settings": {
     "title": "オプション",
     "subscription": {

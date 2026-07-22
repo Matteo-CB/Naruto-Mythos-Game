@@ -9,10 +9,13 @@ import { useGameScale } from './GameScaleContext';
 import { CountryFlag } from '@/components/CountryFlag';
 import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { usePlayerFlag } from '@/lib/hooks/usePlayerFlags';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { ManualGuess } from './ManualGuess';
 
 export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
   const t = useTranslations();
   const dims = useGameScale();
+  const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const visibleState = useGameStore((s) => s.visibleState);
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
   const myPlayerId = visibleState?.myPlayer;
@@ -92,16 +95,16 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
 
       <div className="flex-1" />
 
-      <StatPill label={t('game.chakra')} value={myState.chakra} color="#c4a35a" isMobile={dims.isMobile} />
+      <StatPill label={t('game.chakra')} value={myState.chakra} color="#c4a35a" isMobile={dims.isMobile} manual={manualPowerMode} />
 
-      <StatPill label={t('game.score')} value={myState.missionPoints} color="#e0e0e0" accent="#c4a35a" isMobile={dims.isMobile} />
+      <StatPill label={t('game.score')} value={myState.missionPoints} color="#e0e0e0" accent="#c4a35a" isMobile={dims.isMobile} manual={manualPowerMode} />
 
       <ChessClockDisplay player={myPlayer} isOpponent={false} />
     </div>
   );
 });
 
-function StatPill({ label, value, color, isMobile }: { label: string; value: number; color: string; accent?: string; isMobile?: boolean }) {
+function StatPill({ label, value, color, isMobile, manual }: { label: string; value: number; color: string; accent?: string; isMobile?: boolean; manual?: boolean }) {
   return (
     <div className="flex items-baseline gap-1.5 sm:gap-2 px-1.5 sm:px-2 shrink-0">
       <span
@@ -128,7 +131,7 @@ function StatPill({ label, value, color, isMobile }: { label: string; value: num
           textShadow: `0 1px 3px rgba(0,0,0,0.8), 0 0 10px ${color}55`,
         }}
       >
-        {value}
+        {manual ? <ManualGuess actual={value} color={color} /> : value}
       </motion.span>
     </div>
   );

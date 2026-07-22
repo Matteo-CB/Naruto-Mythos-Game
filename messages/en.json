@@ -596,6 +596,12 @@
     "socialBadgeTooltip": "{count} messages or pending requests",
     "worldcup": "World Cup"
   },
+  "manualMode": {
+    "clickToGuess": "Click to guess the value",
+    "hasModifier": "A powerup is active here",
+    "yourGuess": "Your guess",
+    "check": "Check"
+  },
   "settings": {
     "title": "Options",
     "subscription": {

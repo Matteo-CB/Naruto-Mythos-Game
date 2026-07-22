@@ -602,6 +602,12 @@
     "socialBadgeTooltip": "{count} messages ou demandes en attente",
     "worldcup": "Coupe du monde"
   },
+  "manualMode": {
+    "clickToGuess": "Clique pour deviner la valeur",
+    "hasModifier": "Un powerup est actif ici",
+    "yourGuess": "Ta réponse",
+    "check": "Vérifier"
+  },
   "settings": {
     "title": "Options",
     "subscription": {

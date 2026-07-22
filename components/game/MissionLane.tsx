@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { ManualGuess } from './ManualGuess';
 import type {
   VisibleMission,
   VisibleCharacter,
@@ -298,11 +299,13 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
             fontFamily: "'NJNaruto', Arial, sans-serif",
           }}
         >
-          {manualPowerMode ? '?' : totalPower}
+          {manualPowerMode
+            ? <ManualGuess actual={totalPower} hasModifier={character.powerTokens > 0} color={character.powerTokens > 0 ? '#f0d890' : '#e0e0e0'} />
+            : totalPower}
         </div>
       )}
 
-      {character.powerTokens > 0 && (
+      {!manualPowerMode && character.powerTokens > 0 && (
         <div
           className="absolute top-0.5 right-0.5 flex flex-col items-end gap-0.5"
           style={{ pointerEvents: 'none' }}
