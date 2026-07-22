@@ -6,6 +6,8 @@ import { useTranslations, useLocale } from 'next-intl';
 import { localizeMessageParams } from '@/lib/i18n/localizeMessageParams';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { ManualGuess } from './ManualGuess';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
@@ -54,6 +56,7 @@ function HandCard({
   idx: number;
 }) {
   const t = useTranslations();
+  const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const locale = useLocale();
   const dims = useGameScale();
   const zoomCard = useUIStore((s) => s.zoomCard);
@@ -115,7 +118,7 @@ function HandCard({
             border: '1px solid rgba(196, 163, 90, 0.5)',
           }}
         >
-          {card.chakra}
+          {manualPowerMode ? <ManualGuess actual={card.chakra} color="#c4a35a" /> : card.chakra}
         </div>
       )}
 
@@ -127,7 +130,7 @@ function HandCard({
             color: '#e0e0e0',
           }}
         >
-          {card.power}
+          {manualPowerMode ? <ManualGuess actual={card.power} color="#e0e0e0" /> : card.power}
         </div>
       )}
 

@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { ManualGuess } from './ManualGuess';
 import type { CharacterCard } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
@@ -53,6 +55,7 @@ function MulliganCard({
 }) {
   const locale = useLocale();
   const dims = useGameScale();
+  const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const imagePath = normalizeImagePath(card.image_file);
 
   return (
@@ -114,7 +117,7 @@ function MulliganCard({
           className="text-[11px] font-bold tabular-nums"
           style={{ color: '#c4a35a' }}
         >
-          {card.power}
+          {manualPowerMode ? <ManualGuess actual={card.power} color="#c4a35a" /> : card.power}
         </span>
       </div>
 
@@ -126,7 +129,7 @@ function MulliganCard({
           border: '1px solid rgba(196, 163, 90, 0.5)',
         }}
       >
-        {card.chakra}
+        {manualPowerMode ? <ManualGuess actual={card.chakra} color="#c4a35a" /> : card.chakra}
       </div>
 
       <div

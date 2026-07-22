@@ -7,6 +7,8 @@ import { localizeMessageParams } from '@/lib/i18n/localizeMessageParams';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useUIStore } from '@/stores/uiStore';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { ManualGuess } from './ManualGuess';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import {
   PopupOverlay,
@@ -61,6 +63,7 @@ export function TargetOrderPopup({
   canDecline,
 }: TargetOrderPopupProps) {
   const t = useTranslations();
+  const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const locale = useLocale() as 'en' | 'fr';
   const zoomCard = useUIStore((s) => s.zoomCard);
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
@@ -294,7 +297,11 @@ export function TargetOrderPopup({
                     </span>
                     {target.power != null && !target.isHidden && (
                       <span className="text-[7px] tabular-nums" style={{ color: '#666' }}>
-                        P:{target.power} C:{target.chakra ?? 0}
+                        {manualPowerMode ? (
+                          <>P:<ManualGuess actual={target.power} color="#888" /> C:<ManualGuess actual={target.chakra ?? 0} color="#888" /></>
+                        ) : (
+                          <>P:{target.power} C:{target.chakra ?? 0}</>
+                        )}
                       </span>
                     )}
                   </div>

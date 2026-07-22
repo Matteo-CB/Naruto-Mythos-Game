@@ -351,7 +351,9 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
             fontFamily: "'NJNaruto', Arial, sans-serif",
           }}
         >
-          {character.card.chakra}
+          {manualPowerMode
+            ? <ManualGuess actual={character.card.chakra} color="#0a0a0a" />
+            : character.card.chakra}
         </div>
       )}
 
@@ -713,6 +715,7 @@ interface MissionLaneProps {
 export const MissionLane = React.memo(function MissionLane({ mission, missionIndex }: MissionLaneProps) {
   const t = useTranslations();
   const dims = useGameScale();
+  const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const visibleState = useGameStore((s) => s.visibleState);
   const isProcessing = useGameStore((s) => s.isProcessing);
   const selectedCardIndex = useUIStore((s) => s.selectedCardIndex);
@@ -808,7 +811,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
               className="font-bold tabular-nums"
               style={{ fontSize: dims.isMobile ? '15px' : '10px', lineHeight: 1.1, color: '#b33e3e', fontFamily: "'NJNaruto', Arial, sans-serif" }}
             >
-              {oppPower}
+              {manualPowerMode ? <ManualGuess actual={oppPower} color="#b33e3e" /> : oppPower}
             </span>
           </div>
         )}
@@ -840,7 +843,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
               className="font-bold tabular-nums"
               style={{ fontSize: dims.isMobile ? '15px' : '10px', lineHeight: 1.1, color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
             >
-              {myPower}
+              {manualPowerMode ? <ManualGuess actual={myPower} color="#c4a35a" /> : myPower}
             </span>
           </div>
         )}

@@ -11,6 +11,8 @@ import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { ManualGuess } from './ManualGuess';
 
 interface PlayerHandProps {
   hand: CharacterCard[];
@@ -84,6 +86,7 @@ const HandCard = React.memo(function HandCard({
 }: HandCardProps) {
   const locale = useLocale();
   const dims = useGameScale();
+  const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
 
   const midpoint = (total - 1) / 2;
   const offset = displayIndex - midpoint;
@@ -199,7 +202,7 @@ const HandCard = React.memo(function HandCard({
           className="font-bold tabular-nums"
           style={{ fontSize: dims.isMobile ? '13px' : '10px', color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
         >
-          {card.power}
+          {manualPowerMode ? <ManualGuess actual={card.power ?? 0} color="#c4a35a" /> : card.power}
         </span>
       </div>
 
@@ -217,7 +220,7 @@ const HandCard = React.memo(function HandCard({
           fontFamily: "'NJNaruto', Arial, sans-serif",
         }}
       >
-        {card.chakra}
+        {manualPowerMode ? <ManualGuess actual={card.chakra} color="#0a0a0a" /> : card.chakra}
       </div>
 
       {!canAfford && (

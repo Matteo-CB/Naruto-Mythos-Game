@@ -6,6 +6,8 @@ import { useTranslations, useLocale } from 'next-intl';
 import { localizeMessageParams, resolveNameToLocale } from '@/lib/i18n/localizeMessageParams';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { ManualGuess } from './ManualGuess';
 import type { VisibleCharacter, VisibleMission, MissionRank, CharacterCard, MissionCard } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
@@ -34,6 +36,7 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
   const t = useTranslations();
   const locale = useLocale();
   const dims = useGameScale();
+  const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const zoomCard = useUIStore((s) => s.zoomCard);
   const isHidden = character.isHidden;
   const canSeeCard = (character.isOwn || character.wasRevealedAtLeastOnce) && character.card;
@@ -152,7 +155,9 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
             color: character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0',
           }}
         >
-          {totalPower}
+          {manualPowerMode
+            ? <ManualGuess actual={totalPower} hasModifier={character.powerTokens > 0} color={character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0'} />
+            : totalPower}
         </div>
       )}
 
@@ -467,6 +472,7 @@ const OrderedDefeatCard = React.memo(function OrderedDefeatCard({ character, isV
 }) {
   const t = useTranslations();
   const locale = useLocale();
+  const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const isHidden = character.isHidden;
   const canSeeCard = character.isOwn || !isHidden || character.wasRevealedAtLeastOnce;
   const topCard = character.topCard ?? character.card;
@@ -507,7 +513,9 @@ const OrderedDefeatCard = React.memo(function OrderedDefeatCard({ character, isV
       {!isHidden && topCard && (
         <div className="absolute bottom-0.5 right-0.5 px-1 text-[9px] font-bold tabular-nums"
           style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0' }}>
-          {character.effectivePower}
+          {manualPowerMode
+            ? <ManualGuess actual={character.effectivePower} hasModifier={character.powerTokens > 0} color={character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0'} />
+            : character.effectivePower}
         </div>
       )}
     </motion.div>
@@ -525,6 +533,7 @@ interface TargetMissionLaneProps {
 const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPlayer }: TargetMissionLaneProps) {
   const t = useTranslations();
   const locale = useLocale();
+  const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const rankColors: Record<MissionRank, string> = {
     D: '#3e8b3e',
     C: '#c4a35a',
@@ -594,16 +603,16 @@ const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missi
       >
         <span
           className="text-[10px] font-bold tabular-nums"
-          style={{ color: myPower > oppPower ? '#4aff6b' : myPower < oppPower ? '#ff6b6b' : '#888888' }}
+          style={{ color: manualPowerMode ? '#c4a35a' : myPower > oppPower ? '#4aff6b' : myPower < oppPower ? '#ff6b6b' : '#888888' }}
         >
-          {myPower}
+          {manualPowerMode ? <ManualGuess actual={myPower} color="#c4a35a" /> : myPower}
         </span>
         <span className="text-[9px]" style={{ color: '#555555' }}>vs</span>
         <span
           className="text-[10px] font-bold tabular-nums"
-          style={{ color: oppPower > myPower ? '#ff6b6b' : oppPower < myPower ? '#4aff6b' : '#888888' }}
+          style={{ color: manualPowerMode ? '#b33e3e' : oppPower > myPower ? '#ff6b6b' : oppPower < myPower ? '#4aff6b' : '#888888' }}
         >
-          {oppPower}
+          {manualPowerMode ? <ManualGuess actual={oppPower} color="#b33e3e" /> : oppPower}
         </span>
       </div>
 
