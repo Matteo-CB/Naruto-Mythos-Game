@@ -12466,7 +12466,6 @@ export class EffectEngine {
         const i140Opponent: PlayerID = i140Player === 'player1' ? 'player2' : 'player1';
         const i140OpponentState = newState[i140Opponent];
         const i140IsUpgrade = pendingEffect.isUpgrade;
-        console.log(`[EffectEngine] ITACHI140_CONFIRM_MAIN: isUpgrade=${i140IsUpgrade} desc=${pendingEffect.effectDescription}`);
 
         const i140HandSize = i140OpponentState.hand.length;
         if (i140HandSize === 0) {
