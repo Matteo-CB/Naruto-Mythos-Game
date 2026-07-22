@@ -2110,6 +2110,8 @@
     "stats": "統計",
     "recentGames": "最近の対戦",
     "decks": "デッキ",
+    "viewDeck": "デッキを見る",
+    "deckOf": "{name} のデッキ",
     "noGames": "まだ対戦がありません",
     "replay": "リプレイ",
     "loadMore": "もっと読み込む",

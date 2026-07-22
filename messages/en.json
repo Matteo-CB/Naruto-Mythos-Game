@@ -2106,6 +2106,8 @@
     "stats": "Statistics",
     "recentGames": "Recent Games",
     "decks": "Decks",
+    "viewDeck": "View deck",
+    "deckOf": "{name}'s deck",
     "noGames": "No games played yet",
     "replay": "Replay",
     "loadMore": "Load more",

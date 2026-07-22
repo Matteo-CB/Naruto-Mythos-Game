@@ -2111,6 +2111,8 @@
     "stats": "Estadísticas",
     "recentGames": "Partidas recientes",
     "decks": "Mazos",
+    "viewDeck": "Ver el mazo",
+    "deckOf": "Mazo de {name}",
     "noGames": "Aún no ha jugado ninguna partida",
     "replay": "Repetición",
     "loadMore": "Cargar más",

@@ -1,6 +1,26 @@
 {
   "entries": [
     {
+      "date": "2026-07-23",
+      "title_fr": "Voir et exporter tes decks depuis ton profil",
+      "title_en": "View and export your decks from your profile",
+      "title_es": "Ver y exportar tus mazos desde tu perfil",
+      "title_ja": "プロフィールからデッキを閲覧・書き出し",
+      "changes_fr": [
+        "Depuis ton profil, tu peux ouvrir tes decks en entier, les copier et les exporter en image."
+      ],
+      "changes_en": [
+        "From your profile you can now open your decks in full, copy them and export them as an image."
+      ],
+      "changes_es": [
+        "Desde tu perfil ahora puedes abrir tus mazos completos, copiarlos y exportarlos como imagen."
+      ],
+      "changes_ja": [
+        "プロフィールから自分のデッキを丸ごと開いて、コピーや画像への書き出しができるようになりました。"
+      ],
+      "categories": ["feature"]
+    },
+    {
       "date": "2026-07-22",
       "title_fr": "Mode manuel : calcule tout toi-même",
       "title_en": "Manual mode: work it all out yourself",

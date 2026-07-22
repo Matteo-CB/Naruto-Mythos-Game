@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
+import { auth } from '@/lib/auth/authOptions';
+import { isAdmin } from '@/lib/auth/admins';
 import { cleanupOldGames } from '@/lib/db/gameCleanup';
 import { deckUsesOnlyAllowedSets } from '@/lib/evolving/computePoints';
 import { EVOLVING_MAX_POINTS } from '@/lib/evolving/constants';
@@ -53,6 +55,11 @@ export async function GET(
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const viewerSession = await auth();
+    const viewerId = viewerSession?.user?.id ?? null;
+    const viewerIsAdmin = isAdmin({ username: viewerSession?.user?.name, email: viewerSession?.user?.email });
+    const canViewDeckContents = !!viewerId && (viewerId === user.id || viewerIsAdmin);
 
     const limit = page * perPage;
 
@@ -227,6 +234,7 @@ export async function GET(
         createdAt: d.createdAt,
         evolvingPoints: d.evolvingPoints,
         evolvingCompatible: compatible,
+        ...(canViewDeckContents ? { cardIds: d.cardIds, missionIds: d.missionIds } : {}),
       };
     });
 
@@ -267,6 +275,7 @@ export async function GET(
     return NextResponse.json({
       ...userWithoutDecks,
       decks,
+      canViewDeckContents,
       recentGames,
       totalGames,
       page,

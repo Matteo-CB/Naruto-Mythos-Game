@@ -24,6 +24,9 @@ import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
 import { isSealedModeKey, sealedSetFromModeKey } from '@/lib/stats/modeKey';
 import { PlayerNameLink } from '@/components/social/PlayerNameLink';
 import { getSetName } from '@/lib/data/sets/registry';
+import dynamic from 'next/dynamic';
+
+const DeckViewerModal = dynamic(() => import('@/components/profile/DeckViewerModal'), { ssr: false });
 
 type ProfileStatsMode = 'ranked' | 'evolving' | 'casual' | 'sealed' | 'all';
 
@@ -91,7 +94,8 @@ interface ProfileData {
   worldcupTitles?: Array<{ month: string; countryCode: string }>;
   reigningChampionMonth?: string | null;
   modeStats?: Record<string, { games: number; wins: number; losses: number }>;
-  decks: Array<{ id: string; name: string; createdAt: string; evolvingPoints?: number; evolvingCompatible?: boolean }>;
+  decks: Array<{ id: string; name: string; createdAt: string; evolvingPoints?: number; evolvingCompatible?: boolean; cardIds?: string[]; missionIds?: string[] }>;
+  canViewDeckContents?: boolean;
   recentGames: Array<{
     id: string;
     player1: { username: string } | null;
@@ -267,6 +271,7 @@ export default function ProfilePage({
   const [leaguesEnabled, setLeaguesEnabled] = useState(false);
   const [unlinking, setUnlinking] = useState(false);
   const [badgePrefsLocal, setBadgePrefsLocal] = useState<string[]>([]);
+  const [openDeck, setOpenDeck] = useState<{ id: string; name: string; cardIds: string[]; missionIds: string[] } | null>(null);
   const tb = useTranslations('badges');
 
   useEffect(() => {
@@ -684,7 +689,10 @@ export default function ProfilePage({
             <section className="mb-7">
               <SectionTitle label={t('decks')} count={profile.decks.length} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {profile.decks.map((deck) => (
+                {profile.decks.map((deck) => {
+                  const canView = !!profile.canViewDeckContents && Array.isArray(deck.cardIds);
+                  const openViewer = () => setOpenDeck({ id: deck.id, name: deck.name, cardIds: deck.cardIds ?? [], missionIds: deck.missionIds ?? [] });
+                  return (
                   <EvolvingDeckHolo
                     key={deck.id}
                     points={deck.evolvingPoints ?? 0}
@@ -693,8 +701,12 @@ export default function ProfilePage({
                     style={{ clipPath: STAT_CLIP }}
                   >
                   <div
-                    className="px-4 py-3 flex items-center justify-between"
-                    style={{ backgroundColor: '#0d0c10', clipPath: STAT_CLIP }}
+                    role={canView ? 'button' : undefined}
+                    tabIndex={canView ? 0 : undefined}
+                    onClick={canView ? openViewer : undefined}
+                    onKeyDown={canView ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openViewer(); } } : undefined}
+                    className="px-4 py-3 flex items-center justify-between transition-colors"
+                    style={{ backgroundColor: '#0d0c10', clipPath: STAT_CLIP, cursor: canView ? 'pointer' : 'default' }}
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="font-display text-sm truncate" style={{ color: '#e8e6df' }}>
@@ -704,12 +716,20 @@ export default function ProfilePage({
                         <EvolvingDeckBadge points={deck.evolvingPoints} />
                       )}
                     </div>
-                    <span className="font-inter-force text-[10px] shrink-0 ml-3" style={{ color: '#555' }}>
-                      {new Date(deck.createdAt).toLocaleDateString(locale)}
-                    </span>
+                    <div className="flex items-center gap-3 shrink-0 ml-3">
+                      {canView && (
+                        <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#c4a35a' }}>
+                          {t('viewDeck')}
+                        </span>
+                      )}
+                      <span className="font-inter-force text-[10px]" style={{ color: '#555' }}>
+                        {new Date(deck.createdAt).toLocaleDateString(locale)}
+                      </span>
+                    </div>
                   </div>
                   </EvolvingDeckHolo>
-                ))}
+                  );
+                })}
               </div>
             </section>
           </>
@@ -817,6 +837,16 @@ export default function ProfilePage({
           )}
         </section>
       </div>
+
+      {openDeck && (
+        <DeckViewerModal
+          deck={openDeck}
+          ownerName={profile.username}
+          isAdminView={!isOwner}
+          onClose={() => setOpenDeck(null)}
+        />
+      )}
+
       <Footer />
     </main>
   );
