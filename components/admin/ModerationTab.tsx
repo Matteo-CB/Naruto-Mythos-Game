@@ -452,6 +452,9 @@ export function ModerationTab() {
                     className="font-bold cursor-pointer"
                     style={{ color: '#c4a35a' }}
                     onClick={() => openFile(s.userId, null, s.id)}
+                    data-gp="true"
+                    role="button"
+                    tabIndex={-1}
                   >
                     {s.username}
                   </span>

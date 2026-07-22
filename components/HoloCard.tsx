@@ -95,6 +95,9 @@ export function HoloCard({
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onClick={handleClick}
+          data-gp="true"
+          role="button"
+          tabIndex={-1}
         >
           <div className="holo-card__front">
             <img

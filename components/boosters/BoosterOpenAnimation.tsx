@@ -140,6 +140,9 @@ export function BoosterOpenAnimation({ cards, duplicateCardIds, onClose, setLabe
               scale: { duration: stage === 'shaking' ? 0.6 : 1 },
             }}
             onClick={handleBoosterTap}
+            data-gp="true"
+            role="button"
+            tabIndex={-1}
           >
             <img
               src={boosterImage || '/images/booster-unknown.webp'}

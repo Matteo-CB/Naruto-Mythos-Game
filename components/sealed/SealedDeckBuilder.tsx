@@ -335,8 +335,8 @@ export function SealedDeckBuilder({
             className="flex items-center gap-1 px-2 py-0.5 rounded shrink-0 cursor-pointer"
             style={{ backgroundColor: '#1a1a1a', border: '1px solid #e67e2240' }}
           >
-            <span className="text-[9px]" style={{ color: '#e0e0e0' }} onClick={() => setPreviewCard(m)}>{getCardName(m, locale)}</span>
-            <span className="text-[9px]" style={{ color: '#b33e3e' }} onClick={() => removeMission(i)}>x</span>
+            <span className="text-[9px]" style={{ color: '#e0e0e0' }} onClick={() => setPreviewCard(m)} data-gp="true" role="button" tabIndex={-1}>{getCardName(m, locale)}</span>
+            <span className="text-[9px]" style={{ color: '#b33e3e' }} onClick={() => removeMission(i)} data-gp="true" role="button" tabIndex={-1}>x</span>
           </span>
         ))}
 
@@ -360,8 +360,8 @@ export function SealedDeckBuilder({
                 style={{ backgroundColor: '#1a1a1a', border: `1px solid ${(rarityColors[c.rarity] ?? '#888')}30` }}
               >
                 <span className="text-[9px]" style={{ color: '#5865F2' }}>{c.chakra}</span>
-                <span className="text-[9px]" style={{ color: '#e0e0e0' }} onClick={() => setPreviewCard(c)}>{getCardName(c, locale)}</span>
-                <span className="text-[9px]" style={{ color: '#b33e3e' }} onClick={() => removeChar(originalIndex)}>x</span>
+                <span className="text-[9px]" style={{ color: '#e0e0e0' }} onClick={() => setPreviewCard(c)} data-gp="true" role="button" tabIndex={-1}>{getCardName(c, locale)}</span>
+                <span className="text-[9px]" style={{ color: '#b33e3e' }} onClick={() => removeChar(originalIndex)} data-gp="true" role="button" tabIndex={-1}>x</span>
               </span>
             );
           })}
@@ -442,6 +442,9 @@ export function SealedDeckBuilder({
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => { if (canAdd) addMission(m); }}
+                    data-gp="true"
+                    role="button"
+                    tabIndex={-1}
                     className="relative cursor-pointer rounded overflow-hidden"
                     style={{
                       width: '140px',
@@ -498,6 +501,9 @@ export function SealedDeckBuilder({
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => addChar(card)}
+                    data-gp="true"
+                    role="button"
+                    tabIndex={-1}
                     className="relative cursor-pointer rounded overflow-hidden"
                     style={{
                       aspectRatio: '5/7',

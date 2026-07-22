@@ -91,6 +91,9 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
       className="relative cursor-pointer"
       style={{ perspective: '1000px', width: cardWidth, height: cardHeight }}
       onClick={handleFlip}
+      data-gp="true"
+      role="button"
+      tabIndex={-1}
     >
       
       <motion.div

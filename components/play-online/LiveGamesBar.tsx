@@ -141,6 +141,9 @@ function LiveGameCard({ game, loading, onSpectate }: { game: LiveGame; loading: 
       <div
         className="flex flex-col gap-1.5 px-3 py-2 flex-1 min-w-0 cursor-pointer"
         onClick={onSpectate}
+        data-gp="true"
+        role="button"
+        tabIndex={-1}
       >
         <div className="flex items-center justify-between gap-2 min-w-0">
           <PlayerNameLink

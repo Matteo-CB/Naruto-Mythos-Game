@@ -145,6 +145,9 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
               scale: { duration: stage === 'shaking' ? 0.6 : 1 },
             }}
             onClick={handleBoosterTap}
+            data-gp="true"
+            role="button"
+            tabIndex={-1}
           >
             
             <img

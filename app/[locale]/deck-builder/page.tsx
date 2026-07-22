@@ -413,6 +413,9 @@ const DeckCard = memo(function DeckCard({
     <div
       onClick={() => onRemove(idx)}
       onMouseEnter={() => onHover(card)}
+      data-gp="true"
+      role="button"
+      tabIndex={-1}
       className="relative overflow-hidden group cursor-pointer w-full"
       style={{
         aspectRatio: '5/7',
@@ -1193,6 +1196,9 @@ export default function DeckBuilderPage() {
                 }}
                 onClick={() => m && removeMission(i)}
                 onMouseEnter={() => m && setPreviewCard(m)}
+                data-gp={m ? 'true' : undefined}
+                role="button"
+                tabIndex={-1}
               >
                 {m ? (
                   <>
