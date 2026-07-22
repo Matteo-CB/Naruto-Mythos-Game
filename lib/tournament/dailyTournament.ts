@@ -8,7 +8,7 @@ export const DAILY_TOURNAMENT_TZ = 'Europe/Paris';
 export const DAILY_TOURNAMENT_REG_HOUR = 17;
 export const DAILY_TOURNAMENT_START_HOUR = 21;
 export const DAILY_TOURNAMENT_MAX_PLAYERS = 16;
-export const DAILY_TOURNAMENT_NAME = 'Tournoi du soir';
+export const DAILY_TOURNAMENT_NAME = 'Daily Tournament';
 
 export function parisDateParts(base: Date = new Date()): { year: number; month: number; day: number; hour: number } {
   const dtf = new Intl.DateTimeFormat('en-US', {
@@ -84,7 +84,7 @@ export async function createDailyTournamentIfNeeded(now: Date = new Date()): Pro
     data: {
       name: DAILY_TOURNAMENT_NAME,
       type: 'simulator',
-      format: 'elimination',
+      format: 'swiss',
       status: 'registration',
       gameMode: 'classic',
       maxPlayers: DAILY_TOURNAMENT_MAX_PLAYERS,
