@@ -21,6 +21,7 @@ interface SettingsState {
   soundVolume: number;
   allowSpectatorHand: boolean;
   hideDeckBuilderVariants: boolean;
+  manualPowerMode: boolean;
   countryCode: string | null;
   gameBackground: string; // background DB id or "default"
   gameBackgroundUrl: string; // resolved URL for the background image
@@ -32,6 +33,7 @@ interface SettingsState {
   setSoundVolume: (v: number) => void;
   setAllowSpectatorHand: (v: boolean) => Promise<void>;
   setHideDeckBuilderVariants: (v: boolean) => Promise<void>;
+  setManualPowerMode: (v: boolean) => Promise<void>;
   setCountryCode: (code: string | null) => Promise<void>;
   setGameBackground: (id: string, url: string) => Promise<void>;
   setChatVisibility: (v: ChatVisibilitySetting) => Promise<void>;
@@ -78,6 +80,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   soundVolume: getLocalSound().volume,
   allowSpectatorHand: false,
   hideDeckBuilderVariants: false,
+  manualPowerMode: false,
   countryCode: null,
   gameBackground: 'default',
   gameBackgroundUrl: DEFAULT_BG_URL,
@@ -115,6 +118,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         soundEnabled: prefs.soundsEnabled ?? get().soundEnabled,
         allowSpectatorHand: prefs.allowSpectatorHand ?? false,
         hideDeckBuilderVariants: prefs.hideDeckBuilderVariants ?? false,
+        manualPowerMode: prefs.manualPowerMode ?? false,
         countryCode: prefs.countryCode ?? null,
         gameBackground: bgId,
         gameBackgroundUrl: bgUrl,
@@ -189,6 +193,21 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       if (!res.ok) throw new Error('Failed to save');
     } catch {
       set({ hideDeckBuilderVariants: prev });
+    }
+  },
+
+  setManualPowerMode: async (v: boolean) => {
+    const prev = get().manualPowerMode;
+    set({ manualPowerMode: v });
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ manualPowerMode: v }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+    } catch {
+      set({ manualPowerMode: prev });
     }
   },
 

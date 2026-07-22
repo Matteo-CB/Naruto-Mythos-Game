@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
+import { useSettingsStore } from '@/stores/settingsStore';
 import type {
   VisibleMission,
   VisibleCharacter,
@@ -96,6 +97,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   const imagePath = hasCardData ? normalizeImagePath(character.card?.image_file) : null;
 
   const totalPower = character.effectivePower;
+  const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
 
   const handleMouseEnter = (e: React.MouseEvent) => {
     
@@ -296,7 +298,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
             fontFamily: "'NJNaruto', Arial, sans-serif",
           }}
         >
-          {totalPower}
+          {manualPowerMode ? '?' : totalPower}
         </div>
       )}
 

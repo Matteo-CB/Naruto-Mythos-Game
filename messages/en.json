@@ -645,6 +645,8 @@
     },
     "hideVariants": "Hide variants in the deck builder",
     "hideVariantsHint": "When on, variant cards are hidden by default in the deck builder.",
+    "manualPowerMode": "Manual power mode",
+    "manualPowerModeHint": "Hides card power and cost, your chakra and the score, so you can practise working out power yourself like in a physical game.",
     "sound": "Sound effects",
     "soundOn": "Sounds are on.",
     "soundOff": "All sounds are off.",

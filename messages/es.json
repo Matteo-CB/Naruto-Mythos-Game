@@ -650,6 +650,8 @@
     },
     "hideVariants": "Ocultar variantes en el creador de mazos",
     "hideVariantsHint": "Cuando está activado, las cartas variantes se ocultan por defecto en el creador de mazos.",
+    "manualPowerMode": "Modo de cálculo manual",
+    "manualPowerModeHint": "Oculta la fuerza y el coste de las cartas, tu chakra y la puntuación, para practicar el cálculo de la fuerza tú mismo como en el juego físico.",
     "sound": "Efectos de sonido",
     "soundOn": "Los sonidos están activados.",
     "soundOff": "Todos los sonidos están desactivados.",

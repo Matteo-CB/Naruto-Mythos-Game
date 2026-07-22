@@ -41,6 +41,7 @@ export default function SettingsPage() {
     animationsPref, gameBackground, gameBackgroundUrl, isLoaded, availableBackgrounds,
     fetchFromServer, setAnimationsEnabled, setGameBackground,
     hideDeckBuilderVariants, setHideDeckBuilderVariants,
+    manualPowerMode, setManualPowerMode,
     fastAnimations, setFastAnimations,
     countryCode, setCountryCode,
     soundEnabled, setSoundEnabled,
@@ -442,6 +443,39 @@ export default function SettingsPage() {
           </div>
           <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
             {t('hideVariantsHint')}
+          </p>
+
+          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+
+          <div className="flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+              {t('manualPowerMode')}
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={manualPowerMode}
+              disabled={!isLoaded}
+              onClick={() => setManualPowerMode(!manualPowerMode)}
+              className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden"
+              style={{
+                backgroundColor: manualPowerMode ? '#c4a35a' : '#333333',
+                cursor: isLoaded ? 'pointer' : 'default',
+                opacity: isLoaded ? 1 : 0.5,
+              }}
+            >
+              <span
+                className="absolute top-0.5 h-5 w-5 rounded-full"
+                style={{
+                  backgroundColor: '#0a0a0a',
+                  left: manualPowerMode ? '22px' : '2px',
+                  transition: 'left 150ms ease',
+                }}
+              />
+            </button>
+          </div>
+          <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+            {t('manualPowerModeHint')}
           </p>
 
           <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />

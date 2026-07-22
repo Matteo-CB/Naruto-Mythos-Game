@@ -651,6 +651,8 @@
     },
     "hideVariants": "Masquer les variantes dans le deck builder",
     "hideVariantsHint": "Quand activé, les cartes variantes sont masquées par défaut dans le deck builder.",
+    "manualPowerMode": "Mode calcul manuel",
+    "manualPowerModeHint": "Cache la puissance et le coût des cartes, ton chakra et le score, pour t'entraîner à calculer la puissance toi-même comme en vrai.",
     "sound": "Effets sonores",
     "soundOn": "Les sons sont activés.",
     "soundOff": "Tous les sons sont désactivés.",

@@ -60,6 +60,7 @@ model User {
   dailyQuestProgresses    DailyQuestProgress[]
   stripeCustomerId        String?
   hideDeckBuilderVariants Boolean              @default(false)
+  manualPowerMode         Boolean              @default(false)
   countryCode             String?
   chatVisibility          String               @default("everyone")
   fastAnimations          Boolean              @default(false)
