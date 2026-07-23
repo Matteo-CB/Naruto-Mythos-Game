@@ -1,0 +1,17 @@
+{
+  "_meta": {
+    "name": "Português",
+    "bcp47": "pt-BR",
+    "ogLocale": "pt_BR",
+    "dir": "ltr"
+  },
+  "languages": {
+    "en": "English",
+    "fr": "Français",
+    "es": "Español",
+    "ja": "日本語",
+    "pt": "Português",
+    "it": "Italiano",
+    "pl": "Polski"
+  }
+}
