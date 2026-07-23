@@ -22,6 +22,12 @@ export interface RawCardData {
   title_es?: string;
   name_ja?: string;
   title_ja?: string;
+  name_pt?: string;
+  title_pt?: string;
+  name_it?: string;
+  title_it?: string;
+  name_pl?: string;
+  title_pl?: string;
   has_visual: boolean;
   chakra: number | '';
   power: number | '';
