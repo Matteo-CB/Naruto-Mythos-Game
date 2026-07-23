@@ -86,7 +86,10 @@ export async function POST(req: NextRequest) {
         : 'swiss';
 
     if (!isAdmin(session)) {
-      return NextResponse.json({ error: 'Only admins can create tournaments', errorKey: 'tournament.error.adminOnly' }, { status: 403 });
+      const dbUser = await prisma.user.findUnique({ where: { id: session.user.id }, select: { role: true } });
+      if (dbUser?.role !== 'tournament_organizer') {
+        return NextResponse.json({ error: 'Only admins or tournament organizers can create tournaments', errorKey: 'tournament.error.adminOnly' }, { status: 403 });
+      }
     }
 
     if (format === 'elimination' || format === 'double_elimination') {

@@ -161,6 +161,22 @@ export default function AdminPage() {
     } catch { /* ignore */ } finally { setPlayerActionLoading(false); }
   };
 
+  const handleToggleOrganizer = async (userId: string, currentRole: string) => {
+    setPlayerActionLoading(true);
+    try {
+      const newRole = currentRole === 'tournament_organizer' ? 'user' : 'tournament_organizer';
+      const res = await fetch('/api/admin/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'set-role', userId, role: newRole }),
+      });
+      if (res.ok) {
+        addResult({ success: true, message: `Role set to ${newRole}.` });
+        fetchPlayers(playerSearch);
+      }
+    } catch { /* ignore */ } finally { setPlayerActionLoading(false); }
+  };
+
   const handleDeleteGame = async (gameId: string) => {
     setPlayerActionLoading(true);
     try {
@@ -715,6 +731,19 @@ export default function AdminPage() {
                         }}
                       >
                         {p.role === 'moderator' ? t('players.removeModerator') : t('players.makeModerator')}
+                      </button>
+
+                      <button
+                        onClick={() => handleToggleOrganizer(p.id, p.role)}
+                        disabled={playerActionLoading}
+                        className="px-2 py-1 text-[10px] cursor-pointer"
+                        style={{
+                          backgroundColor: p.role === 'tournament_organizer' ? '#c4a35a1f' : '#141414',
+                          border: '1px solid #262626',
+                          color: p.role === 'tournament_organizer' ? '#c4a35a' : '#888',
+                        }}
+                      >
+                        {p.role === 'tournament_organizer' ? t('players.removeOrganizer') : t('players.makeOrganizer')}
                       </button>
 
                       {confirmResetId === p.id ? (

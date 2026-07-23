@@ -2540,7 +2540,9 @@
       "deleteConfirm": "削除 + ELO復元？",
       "delete": "削除",
       "makeModerator": "モデレーターに任命",
-      "removeModerator": "モデレーターを解除"
+      "removeModerator": "モデレーターを解除",
+      "makeOrganizer": "主催者にする",
+      "removeOrganizer": "主催者を解除"
     }
   },
   "badges": {

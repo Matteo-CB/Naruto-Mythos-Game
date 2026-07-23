@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { isAdmin as isAdminUser } from '@/lib/auth/admins';
 
 export async function GET() {
   const session = await auth();
@@ -67,8 +68,17 @@ export async function GET() {
 
   const tournamentAvailable = tournamentStatus === 'none' && openTournamentCount > 0;
 
+  const isAdmin = isAdminUser({ username: session.user.name, email: session.user.email });
+  const isTester = user.role === 'tester';
+  const isOrganizer = user.role === 'tournament_organizer';
+
   return NextResponse.json({
     role: user.role,
+    isAdmin,
+    isTester,
+    isOrganizer,
+    canSeeUnrevealed: isAdmin || isTester,
+    canCreateTournaments: isAdmin || isOrganizer,
     tournamentStatus,
     tournamentNeedsDeck,
     tournamentAvailable,

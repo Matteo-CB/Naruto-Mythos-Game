@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     case 'set-role': {
       const { role } = body;
-      if (!['user', 'tester', 'admin', 'moderator'].includes(role)) return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
+      if (!['user', 'tester', 'admin', 'moderator', 'tournament_organizer'].includes(role)) return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
       await prisma.user.update({ where: { id: userId }, data: { role } });
       const session = await auth();
       if (session?.user?.id) {

@@ -2536,7 +2536,9 @@
       "deleteConfirm": "Delete + restore ELO?",
       "delete": "Delete",
       "makeModerator": "Make moderator",
-      "removeModerator": "Remove moderator"
+      "removeModerator": "Remove moderator",
+      "makeOrganizer": "Make organizer",
+      "removeOrganizer": "Remove organizer"
     }
   },
   "badges": {

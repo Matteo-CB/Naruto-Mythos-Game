@@ -2075,7 +2075,9 @@
       "deleteConfirm": "Usunąć + przywrócić ELO?",
       "delete": "Usuń",
       "makeModerator": "Uczyń moderatorem",
-      "removeModerator": "Usuń moderatora"
+      "removeModerator": "Usuń moderatora",
+      "makeOrganizer": "Uczyń organizatorem",
+      "removeOrganizer": "Usuń organizatora"
     }
   },
   "adminCards": {

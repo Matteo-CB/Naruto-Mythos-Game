@@ -2541,7 +2541,9 @@
       "deleteConfirm": "¿Eliminar + restaurar ELO?",
       "delete": "Eliminar",
       "makeModerator": "Nombrar moderador",
-      "removeModerator": "Quitar moderador"
+      "removeModerator": "Quitar moderador",
+      "makeOrganizer": "Hacer organizador",
+      "removeOrganizer": "Quitar organizador"
     }
   },
   "badges": {

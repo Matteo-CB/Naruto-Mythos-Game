@@ -2542,7 +2542,9 @@
       "deleteConfirm": "Supprimer et restaurer l'ELO ?",
       "delete": "Supprimer",
       "makeModerator": "Nommer modérateur",
-      "removeModerator": "Retirer modérateur"
+      "removeModerator": "Retirer modérateur",
+      "makeOrganizer": "Nommer organisateur",
+      "removeOrganizer": "Retirer organisateur"
     }
   },
   "badges": {

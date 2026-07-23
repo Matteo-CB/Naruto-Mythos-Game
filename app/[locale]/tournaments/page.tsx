@@ -10,6 +10,7 @@ import { Footer } from '@/components/Footer';
 import { TournamentCard } from '@/components/tournament/TournamentCard';
 import { CreateTournamentForm } from '@/components/tournament/CreateTournamentForm';
 import { useTournamentStore } from '@/stores/tournamentStore';
+import { useViewerPrivilege } from '@/lib/hooks/useViewerPrivilege';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
@@ -38,9 +39,11 @@ export default function TournamentsPage() {
     clearError,
   } = useTournamentStore();
 
+  const privilege = useViewerPrivilege();
   const isAdmin =
     ADMIN_EMAILS.includes(session?.user?.email ?? '') ||
     ADMIN_USERNAMES.includes(session?.user?.name ?? '');
+  const canCreate = isAdmin || privilege.canCreateTournaments;
 
   useEffect(() => {
     if (status === 'unauthenticated') router.replace('/login');
@@ -76,7 +79,7 @@ export default function TournamentsPage() {
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'simulator', label: t('title') },
-    ...(isAdmin ? [{ key: 'create' as Tab, label: t('create') }] : []),
+    ...(canCreate ? [{ key: 'create' as Tab, label: t('create') }] : []),
   ];
 
   return (
@@ -201,7 +204,7 @@ export default function TournamentsPage() {
             transition={{ duration: 0.25 }}
           >
             {activeTab === 'create' ? (
-              <CreateTournamentForm isAdmin={isAdmin} />
+              <CreateTournamentForm isAdmin={canCreate} />
             ) : loading ? (
               <p className="font-display text-sm uppercase tracking-widest text-center py-10" style={{ color: '#555' }}>{tc('loading')}</p>
             ) : simulatorTournaments.length === 0 ? (
