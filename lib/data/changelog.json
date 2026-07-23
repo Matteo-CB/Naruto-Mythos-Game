@@ -2606,6 +2606,9 @@
       "title_fr": "Le mode evolving rejoint Jouer en ligne",
       "title_en": "Evolving mode joins Play Online",
       "title_ja": "エボルビングモードがオンライン対戦に統合",
+      "title_pt": "O modo Evolving se junta ao Jogar Online",
+      "title_it": "La modalità Evolving si unisce a Gioca Online",
+      "title_pl": "Tryb Evolving dołącza do Graj Online",
       "title_es": "El modo evolving llega a Jugar en línea",
       "changes_fr": [
         "Le mode evolving est intégré directement dans la page Jouer en ligne, plus besoin d'une page séparée.",
@@ -2631,6 +2634,30 @@
         "統計は現在の連勝記録を表示するようになり、引き分け（ゲームには存在しません）を含めなくなりました。",
         "ネットワークに問題があるときのみ右上に小さな接続インジケーターが表示され、実際はネットワークが原因なのに古い大きな「禁止デッキ」エラーが誤って出ることはなくなりました。"
       ],
+      "changes_pt": [
+        "O modo Evolving agora faz parte da página Jogar Online, sem mais uma página separada.",
+        "Você pode ativar o evolving ao criar uma sala, tanto no casual quanto no ranqueado, e um visual holográfico único de cada sala destaca as partidas evolving.",
+        "A classificação alterna entre Ranqueado e Evolving com um toque, e suas estatísticas seguem a visão que você escolhe.",
+        "As salas Evolving só podem ser acessadas com um deck evolving, com uma mensagem clara e não bloqueante se você não tiver um.",
+        "Suas estatísticas agora mostram sua melhor sequência de vitórias atual e não incluem mais empates (que não podem acontecer no jogo).",
+        "Um pequeno indicador de conexão agora aparece no canto superior direito apenas quando a rede está com problemas, e o antigo erro grande de 'deck banido' não aparece mais por engano quando o problema é na verdade a rede."
+      ],
+      "changes_it": [
+        "La modalità Evolving ora fa parte della pagina Gioca Online, niente più una pagina separata.",
+        "Puoi attivare l'evolving quando crei una stanza, sia nel casual che nelle classificate, e un look olografico unico per ogni stanza mette in risalto le partite evolving.",
+        "La classifica passa tra Classificato ed Evolving con un tocco, e le tue statistiche seguono la vista che scegli.",
+        "Le stanze Evolving possono essere raggiunte solo con un mazzo evolving, con un messaggio chiaro e non bloccante se non ne hai uno.",
+        "Le tue statistiche ora mostrano la tua migliore serie di vittorie attuale e non includono più i pareggi (che non possono accadere nel gioco).",
+        "Un piccolo indicatore di connessione ora appare in alto a destra solo quando la rete fa i capricci, e il vecchio grande errore 'mazzo bandito' non compare più per sbaglio quando il problema è in realtà la rete."
+      ],
+      "changes_pl": [
+        "Tryb Evolving jest teraz częścią strony Graj Online, koniec z osobną stroną.",
+        "Możesz włączyć evolving przy tworzeniu pokoju, zarówno w towarzyskich, jak i rankingowych, a unikalny dla każdego pokoju holograficzny wygląd wyróżnia gry evolving.",
+        "Ranking przełącza się między Rankingowym a Evolving jednym dotknięciem, a twoje statystyki podążają za wybranym widokiem.",
+        "Do pokoi Evolving można dołączyć tylko z talią evolving, z wyraźnym, nieblokującym komunikatem, jeśli jej nie masz.",
+        "Twoje statystyki pokazują teraz twoją aktualną najlepszą serię zwycięstw i nie zawierają już remisów (które nie mogą wystąpić w grze).",
+        "Mały wskaźnik połączenia pojawia się teraz w prawym górnym rogu tylko wtedy, gdy sieć szwankuje, a stary duży błąd 'zbanowana talia' nie wyskakuje już błędnie, gdy problemem jest w rzeczywistości sieć."
+      ],
       "changes_es": [
         "El modo evolving está integrado directamente en la página Jugar en línea, ya no hace falta una página aparte.",
         "Puedes activar el evolving al crear una sala, tanto en casual como en clasificatorio, y un aspecto holográfico propio de cada sala distingue las partidas evolving.",
@@ -2646,6 +2673,9 @@
       "title_fr": "Intégration Discord : rôles, annonces, salon inscription",
       "title_en": "Discord integration: roles, announcements, signup channel",
       "title_ja": "Discord連携：ロール、告知、登録チャンネル",
+      "title_pt": "Integração com o Discord: cargos, anúncios, canal de inscrição",
+      "title_it": "Integrazione Discord: ruoli, annunci, canale di iscrizione",
+      "title_pl": "Integracja z Discordem: role, ogłoszenia, kanał zapisów",
       "title_es": "Integración de Discord: roles, anuncios, canal de inscripción",
       "changes_fr": [
         "Discord : les rôles de vainqueur de tournoi sont désormais en anglais (Tournament Winner X). Les rôles existants sont renommés automatiquement sans perdre tes attributions.",
@@ -2668,6 +2698,27 @@
         "Discord：登録チャンネルの告知メッセージにトロフィーの絵文字でリアクションすると、トーナメント通知に登録できるようになりました。リアクションを外すと解除されます。",
         "エボルビングの統計がプロフィールとランキングでランクの統計から分離されました。過去の対戦は自動で回収され、エボルビングランキングはエボルビングの勝ち/負け/引き分けのみ表示します。"
       ],
+      "changes_pt": [
+        "Discord: os cargos de vencedor de torneio agora estão em inglês (Tournament Winner X). Os cargos existentes são renomeados automaticamente sem perder nenhuma atribuição de cargo.",
+        "Bug corrigido: o anúncio de vencedor de torneio no Discord nem sempre disparava. O webhook agora lê sua variável de ambiente a cada chamada e registra um motivo claro se a postagem falhar.",
+        "Discord: cada novo torneio agora publica um anúncio detalhado no canal de planejamento com formato, modo de jogo, máximo de jogadores, horário de início (exibido no fuso de cada leitor), uma contagem regressiva, quaisquer restrições e uma menção ao cargo Tournament.",
+        "Discord: agora você pode se inscrever para notificações de torneio reagindo com o emoji do troféu na mensagem de inscrição. Remova a reação para cancelar.",
+        "As estatísticas Evolving agora estão totalmente separadas das estatísticas ranqueadas nos perfis e nas classificações. As partidas passadas são recuperadas automaticamente e a classificação Evolving mostra apenas vitórias / derrotas / empates Evolving."
+      ],
+      "changes_it": [
+        "Discord: i ruoli di vincitore di torneo ora sono in inglese (Tournament Winner X). I ruoli esistenti vengono rinominati automaticamente senza perdere alcuna assegnazione.",
+        "Bug corretto: l'annuncio del vincitore del torneo su Discord non sempre partiva. Il webhook ora legge la sua variabile d'ambiente a ogni chiamata e registra un motivo chiaro se la pubblicazione fallisce.",
+        "Discord: ogni nuovo torneo ora pubblica un annuncio dettagliato nel canale di pianificazione con formato, modalità di gioco, giocatori massimi, orario di inizio (mostrato nel fuso di ogni lettore), un conto alla rovescia, eventuali restrizioni e un ping al ruolo Tournament.",
+        "Discord: ora puoi iscriverti alle notifiche dei tornei reagendo con l'emoji del trofeo sul messaggio di iscrizione. Rimuovi la reazione per annullare.",
+        "Le statistiche Evolving ora sono completamente separate da quelle classificate su profili e classifiche. Le partite passate vengono recuperate automaticamente e la classifica Evolving mostra solo vittorie / sconfitte / pareggi Evolving."
+      ],
+      "changes_pl": [
+        "Discord: role zwycięzcy turnieju są teraz po angielsku (Tournament Winner X). Istniejące role są zmieniane automatycznie bez utraty żadnych przypisań.",
+        "Naprawiony błąd: ogłoszenie zwycięzcy turnieju na Discordzie nie zawsze się uruchamiało. Webhook odczytuje teraz swoją zmienną środowiskową przy każdym wywołaniu i zapisuje wyraźny powód, jeśli publikacja się nie powiedzie.",
+        "Discord: każdy nowy turniej publikuje teraz szczegółowe ogłoszenie na kanale planowania z formatem, trybem gry, maksymalną liczbą graczy, czasem startu (wyświetlanym w strefie czasowej każdego odbiorcy), odliczaniem, ewentualnymi ograniczeniami i pingiem roli Tournament.",
+        "Discord: możesz teraz zapisać się na powiadomienia o turniejach, reagując emotką trofeum na wiadomości zapisów. Usuń reakcję, aby zrezygnować.",
+        "Statystyki Evolving są teraz całkowicie oddzielone od statystyk rankingowych na profilach i w rankingach. Przeszłe gry są odzyskiwane automatycznie, a ranking Evolving pokazuje tylko wygrane / przegrane / remisy Evolving."
+      ],
       "changes_es": [
         "Discord: los roles de ganador de torneo ahora están en inglés (Tournament Winner X). Los roles existentes se renombran automáticamente sin perder tus asignaciones.",
         "Error corregido: el anuncio del ganador de torneo en Discord no siempre se enviaba. El webhook ahora lee su variable de entorno en cada llamada y explica claramente en los registros si el envío falla.",
@@ -2682,6 +2733,9 @@
       "title_fr": "Précisions de règles : doublons de nom, Rashomon, et personnages upgradés",
       "title_en": "Rule clarifications: name duplicates, Rashomon, and upgraded characters",
       "title_ja": "ルールの明確化：同名の重複、羅生門、アップグレードされたキャラクター",
+      "title_pt": "Esclarecimentos de regras: nomes duplicados, Rashomon e personagens evoluídos",
+      "title_it": "Chiarimenti sulle regole: nomi duplicati, Rashomon e personaggi evoluti",
+      "title_pl": "Wyjaśnienia zasad: duplikaty nazw, Rashomon i ulepszone postacie",
       "title_es": "Aclaraciones de reglas: duplicados de nombre, Rashomon y personajes mejorados",
       "changes_fr": [
         "Précision règle : si un effet crée un doublon de nom visible sur ton côté d'une mission, la nouvelle carte qui arrive est défaussée chez son propriétaire sans déclencher d'effet de défaite.",
@@ -2743,6 +2797,66 @@
         "バグ修正：奈良シカマル（コスト3）が前のターンに表にされた・出されたキャラクターを数えませんでした。それらすべてが移動効果の対象になりました。",
         "バグ修正：エボルビングの再戦が全デッキを表示する通常のデッキ選択を開いていました。エボルビングロビーに戻り、エボルビングデッキのみを提示するようになりました。"
       ],
+      "changes_pt": [
+        "Esclarecimento de regra: se um efeito cria uma duplicata de mesmo nome do seu lado de uma missão, a carta que acabou de chegar é descartada para o seu dono sem efeitos de derrota.",
+        "Esclarecimento de regra: jogar, revelar ou mover um personagem para uma duplicata de mesmo nome é bloqueado antes de o chakra ser pago.",
+        "Esclarecimento de regra: os efeitos estáticos (auras, condições de missão como 4+ de Poder) leem o valor base de um personagem (poder impresso + fichas de poder), não seu poder modificado.",
+        "Esclarecimento de regra Rashomon: define seu alvo em exatamente 0 de Poder, ignorando todos os outros modificadores positivos ou negativos. Escolhe o alvo com o maior poder base e o mantém até a situação mudar.",
+        "Esclarecimento de regra: quando um personagem evoluído volta para a mão (por exemplo pela missão Traga de Volta ou por Tsunade 004), só a carta do topo volta para a mão. As cartas de baixo vão para a pilha de descarte do dono.",
+        "Construtor de decks: novo botão Ordenar por Nome ao lado de Ordenar por Custo, ordena os personagens por nome e depois por custo. Disponível também no celular.",
+        "Construtor de decks no celular: o Evolving Mode agora está acessível (contador de pontos, botão LIGA/DESLIGA e lista das cartas Evolving com seu custo).",
+        "Classificação Evolving: os jogadores que nunca jogaram uma partida Evolving não aparecem mais no ranking.",
+        "Bug corrigido: quando você recusava sacrificar Gemma 049 para proteger um personagem, os outros gatilhos de derrota (Tsunade 003, Sasuke 136) não disparavam. Agora eles disparam corretamente.",
+        "Lobby Evolving: as partidas Evolving em andamento agora aparecem na lista como no Jogar Online. Você pode entrar em qualquer uma delas como espectador.",
+        "Bug corrigido: quando o adversário ficava inativo no mulligan, a partida era cancelada mas o jogador ficava preso na tela de jogo. A partida agora fecha de forma limpa e você volta ao lobby com um clique.",
+        "Bug corrigido: Kiba Inuzuka 113 (variante Mythos) sempre ocultava o Akamaru mais à esquerda em vez de deixar você escolher. Agora você pode escolher qual Akamaru ocultar, como na versão Rara.",
+        "Tela de fim de jogo: quando o adversário abandona, uma linha explícita agora confirma que você vence a partida.",
+        "A animação de revelação do baralho de missões no início da partida foi removida. O mulligan agora começa diretamente.",
+        "Página inicial: o piscar no celular e no tablet foi corrigido. A animação lenta de fundo agora só é ativada em telas maiores.",
+        "Pequena correção: o X de fechar na janela 'Aguardando o adversário' depois do mulligan foi removido, ele não servia para nada.",
+        "Bug corrigido: Shikamaru Nara (custo 3) não contava os personagens revelados ou jogados na rodada anterior. Agora todos são alvos válidos para o efeito de movimento dele.",
+        "Bug corrigido: a revanche de uma partida Evolving abria a seleção de deck normal, mostrando todos os seus decks. Agora ela volta ao lobby Evolving e só oferece seus decks Evolving."
+      ],
+      "changes_it": [
+        "Chiarimento sulle regole: se un effetto crea un duplicato con lo stesso nome dalla tua parte di una missione, la carta appena arrivata viene scartata al suo proprietario senza effetti di sconfitta.",
+        "Chiarimento sulle regole: giocare, rivelare o spostare un personaggio in un duplicato con lo stesso nome è bloccato prima che il chakra venga pagato.",
+        "Chiarimento sulle regole: gli effetti statici (aure, condizioni di missione come 4+ Potenza) leggono il valore base di un personaggio (potenza stampata + token potenza), non la sua potenza modificata.",
+        "Chiarimento sulle regole Rashomon: imposta il suo bersaglio a esattamente 0 Potenza, ignorando ogni altro modificatore positivo o negativo. Sceglie il bersaglio con la potenza base più alta e lo mantiene finché la situazione non cambia.",
+        "Chiarimento sulle regole: quando un personaggio evoluto torna in mano (ad esempio con la missione Riportalo Indietro o Tsunade 004), solo la carta in cima torna in mano. Le carte sottostanti vanno nella pila degli scarti del proprietario.",
+        "Costruttore di mazzi: nuovo pulsante Ordina per Nome accanto a Ordina per Costo, ordina i personaggi per nome e poi per costo. Disponibile anche su mobile.",
+        "Costruttore di mazzi su mobile: l'Evolving Mode ora è accessibile (contatore di punti, interruttore ON/OFF e lista delle carte Evolving con il loro costo).",
+        "Classifica Evolving: i giocatori che non hanno mai giocato una partita Evolving non appaiono più nel ranking.",
+        "Bug corretto: quando rifiutavi di sacrificare Gemma 049 per proteggere un personaggio, gli altri inneschi di sconfitta (Tsunade 003, Sasuke 136) non scattavano. Ora scattano correttamente.",
+        "Lobby Evolving: le partite Evolving in corso ora appaiono nella lista come in Gioca Online. Puoi entrare in una qualsiasi di esse come spettatore.",
+        "Bug corretto: quando l'avversario restava inattivo al mulligan, la partita veniva annullata ma il giocatore restava bloccato sulla schermata di gioco. La partita ora si chiude in modo pulito e torni alla lobby con un clic.",
+        "Bug corretto: Kiba Inuzuka 113 (variante Mythos) nascondeva sempre l'Akamaru più a sinistra invece di lasciarti scegliere. Ora puoi scegliere quale Akamaru nascondere, come con la versione Rara.",
+        "Schermata di fine partita: quando l'avversario abbandona, una riga esplicita ora conferma che vinci la partita.",
+        "L'animazione di rivelazione del mazzo delle missioni all'inizio della partita è stata rimossa. Il mulligan ora inizia direttamente.",
+        "Pagina iniziale: lo sfarfallio su telefono e tablet è stato corretto. L'animazione lenta di sfondo ora è attiva solo su schermi più grandi.",
+        "Piccola correzione: la X di chiusura sulla finestra 'In attesa dell'avversario' dopo il mulligan è stata rimossa, non serviva a nulla.",
+        "Bug corretto: Shikamaru Nara (costo 3) non contava i personaggi rivelati o giocati nel turno precedente. Ora sono tutti bersagli validi per il suo effetto di spostamento.",
+        "Bug corretto: la rivincita da una partita Evolving apriva la selezione del mazzo normale, mostrando tutti i tuoi mazzi. Ora torna alla lobby Evolving e offre solo i tuoi mazzi Evolving."
+      ],
+      "changes_pl": [
+        "Wyjaśnienie zasady: jeśli efekt tworzy duplikat o tej samej nazwie po twojej stronie misji, nowo przybyła karta jest odrzucana do jej właściciela bez efektów pokonania.",
+        "Wyjaśnienie zasady: zagranie, odkrycie lub przeniesienie postaci w duplikat o tej samej nazwie jest blokowane, zanim zapłacona zostanie czakra.",
+        "Wyjaśnienie zasady: efekty statyczne (aury, warunki misji jak 4+ Siły) odczytują wartość bazową postaci (nadrukowana siła + żetony siły), a nie jej zmodyfikowaną siłę.",
+        "Wyjaśnienie zasady Rashomon: ustawia swój cel na dokładnie 0 Siły, ignorując każdy inny dodatni lub ujemny modyfikator. Wybiera cel o najwyższej sile bazowej i utrzymuje go, dopóki sytuacja się nie zmieni.",
+        "Wyjaśnienie zasady: gdy ulepszona postać wraca do ręki (na przykład przez misję Przywróć To lub Tsunade 004), tylko wierzchnia karta wraca do ręki. Karty pod spodem trafiają na stos odrzuconych właściciela.",
+        "Kreator talii: nowy przycisk Sortuj po Nazwie obok Sortuj po Koszcie, sortuje postacie według nazwy, a potem kosztu. Dostępny także na telefonie.",
+        "Kreator talii na telefonie: Evolving Mode jest teraz dostępny (licznik punktów, przełącznik WŁ./WYŁ. i lista kart Evolving z ich kosztem).",
+        "Ranking Evolving: gracze, którzy nigdy nie zagrali gry Evolving, nie pojawiają się już w rankingu.",
+        "Naprawiony błąd: gdy odmawiałeś poświęcenia Gemmy 049, aby ochronić postać, inne wyzwalacze pokonania (Tsunade 003, Sasuke 136) nie uruchamiały się. Teraz uruchamiają się poprawnie.",
+        "Lobby Evolving: trwające gry Evolving pojawiają się teraz na liście jak w Graj Online. Możesz dołączyć do dowolnej z nich jako obserwator.",
+        "Naprawiony błąd: gdy przeciwnik pozostawał bezczynny przy mulliganie, gra była anulowana, ale gracz utykał na ekranie gry. Gra zamyka się teraz czysto i wracasz do lobby jednym kliknięciem.",
+        "Naprawiony błąd: Kiba Inuzuka 113 (wariant Mythos) zawsze ukrywał skrajnie lewego Akamaru zamiast pozwolić ci wybrać. Teraz możesz wybrać, którego Akamaru ukryć, jak w wersji Rzadkiej.",
+        "Ekran końca gry: gdy przeciwnik się poddaje, wyraźny wiersz potwierdza teraz, że wygrywasz mecz.",
+        "Animacja odkrycia talii misji na początku meczu została usunięta. Mulligan zaczyna się teraz bezpośrednio.",
+        "Strona główna: migotanie na telefonie i tablecie zostało naprawione. Wolna animacja tła jest teraz włączona tylko na większych ekranach.",
+        "Drobna poprawka: krzyżyk zamykający w oknie 'Oczekiwanie na przeciwnika' po mulliganie został usunięty, do niczego nie służył.",
+        "Naprawiony błąd: Shikamaru Nara (koszt 3) nie liczył postaci odkrytych lub zagranych w poprzedniej rundzie. Teraz wszystkie są prawidłowymi celami jego efektu przenoszenia.",
+        "Naprawiony błąd: rewanż z gry Evolving otwierał normalny wybór talii, pokazując wszystkie twoje talie. Teraz wraca do lobby Evolving i oferuje tylko twoje talie Evolving."
+      ],
       "changes_es": [
         "Aclaración de regla: si un efecto crea un duplicado de nombre visible en tu lado de una misión, la nueva carta que llega se descarta con su propietario sin activar ningún efecto de derrota.",
         "Aclaración de regla: jugar, revelar o mover a un personaje hacia un duplicado de nombre se bloquea antes de pagar el chakra.",
@@ -2770,6 +2884,9 @@
       "title_fr": "Evolving Mode et nouvelle règle d'upgrade",
       "title_en": "Evolving Mode and new upgrade rule",
       "title_ja": "エボルビングモードと新しいアップグレードルール",
+      "title_pt": "Evolving Mode e nova regra de evolução",
+      "title_it": "Evolving Mode e nuova regola di evoluzione",
+      "title_pl": "Evolving Mode i nowa zasada ulepszania",
       "title_es": "Modo Evolving y nueva regla de mejora",
       "changes_fr": [
         "Nouveau mode Evolving Mode : chaque joueur a 5 points à dépenser sur une liste de 13 personnages à 1 ou 2 points. Le joueur avec moins de points commence la partie avec une avance en points de mission égale à la différence.",
@@ -2804,6 +2921,39 @@
         "バグ修正：クイズのランキングが読み込まれなくなっていましたが、復活しました。",
         "バグ修正：エボルビングルームの「ランダムデッキ」ボタンが時々フォーマット外のカードを引いていました。モードのルールに従うようになりました。"
       ],
+      "changes_pt": [
+        "Novo Evolving Mode: cada jogador tem 5 pontos para gastar em uma lista de 13 personagens que custam 1 ou 2 pontos cada. O jogador com menos pontos começa a partida com uma vantagem de Pontos de Missão igual à diferença.",
+        "Os decks compatíveis com o Evolving agora mostram um efeito cintilante cuja cor depende do número de pontos usados.",
+        "Nova classificação Evolving, separada da normal, disponível na página de Classificação por meio de um botão.",
+        "Novo lobby online dedicado ao Evolving Mode com os 5 melhores jogadores e a lista de salas disponíveis.",
+        "Agora você pode criar torneios em formato Evolving, com os decks não compatíveis rejeitados automaticamente.",
+        "No seu perfil, suas estatísticas Evolving (ELO, vitórias, derrotas) são mostradas ao lado das suas estatísticas normais.",
+        "Mudança de regra: um personagem que você controla mas não possui (roubado do adversário) não pode mais ser evoluído.",
+        "Bug corrigido: a classificação do quiz não carregava mais, ela voltou.",
+        "Bug corrigido: o botão Deck Aleatório em uma sala Evolving às vezes escolhia cartas fora do formato, agora ele respeita as regras do modo."
+      ],
+      "changes_it": [
+        "Nuovo Evolving Mode: ogni giocatore ha 5 punti da spendere su una lista di 13 personaggi che costano 1 o 2 punti ciascuno. Il giocatore con meno punti inizia la partita con un vantaggio di Punti Missione pari alla differenza.",
+        "I mazzi compatibili con l'Evolving ora mostrano un effetto scintillante il cui colore dipende dal numero di punti usati.",
+        "Nuova classifica Evolving, separata da quella normale, disponibile nella pagina Classifica tramite un interruttore.",
+        "Nuova lobby online dedicata all'Evolving Mode con i migliori 5 giocatori e la lista delle stanze disponibili.",
+        "Ora puoi creare tornei in formato Evolving, con i mazzi non compatibili rifiutati automaticamente.",
+        "Sul tuo profilo, le tue statistiche Evolving (ELO, vittorie, sconfitte) sono mostrate accanto alle tue statistiche normali.",
+        "Cambio di regola: un personaggio che controlli ma non possiedi (rubato all'avversario) non può più essere evoluto.",
+        "Bug corretto: la classifica del quiz non si caricava più, è tornata.",
+        "Bug corretto: il pulsante Mazzo Casuale in una stanza Evolving a volte sceglieva carte fuori dal formato, ora rispetta le regole della modalità."
+      ],
+      "changes_pl": [
+        "Nowy Evolving Mode: każdy gracz ma 5 punktów do wydania na liście 13 postaci kosztujących 1 lub 2 punkty każda. Gracz z mniejszą liczbą punktów zaczyna mecz z przewagą Punktów Misji równą różnicy.",
+        "Talie zgodne z Evolving pokazują teraz migoczący efekt, którego kolor zależy od liczby użytych punktów.",
+        "Nowy ranking Evolving, oddzielny od zwykłego, dostępny na stronie Rankingu za pomocą przełącznika.",
+        "Nowe lobby online poświęcone Evolving Mode z 5 najlepszymi graczami i listą dostępnych pokoi.",
+        "Możesz teraz tworzyć turnieje w formacie Evolving, z automatycznym odrzucaniem niezgodnych talii.",
+        "Na twoim profilu statystyki Evolving (ELO, wygrane, przegrane) są pokazywane obok twoich zwykłych statystyk.",
+        "Zmiana zasady: postaci, którą kontrolujesz, ale nie posiadasz (ukradzionej przeciwnikowi), nie można już ulepszyć.",
+        "Naprawiony błąd: ranking quizu przestał się wczytywać, wrócił.",
+        "Naprawiony błąd: przycisk Losowa Talia w pokoju Evolving czasami wybierał karty spoza formatu, teraz przestrzega zasad trybu."
+      ],
       "changes_es": [
         "Nuevo Modo Evolving: cada jugador tiene 5 puntos para gastar en una lista de 13 personajes de 1 o 2 puntos. El jugador con menos puntos empieza la partida con una ventaja en puntos de misión igual a la diferencia.",
         "Los mazos compatibles con Evolving se marcan con un efecto brillante cuyo color cambia según el número de puntos usados.",
@@ -2822,6 +2972,9 @@
       "title_fr": "Nouveau système de chrono en parties en ligne",
       "title_en": "New game clock in online matches",
       "title_ja": "オンライン対戦の新しい時計システム",
+      "title_pt": "Novo relógio de jogo nas partidas online",
+      "title_it": "Nuovo orologio di gioco nelle partite online",
+      "title_pl": "Nowy zegar gry w meczach online",
       "title_es": "Nuevo sistema de reloj en partidas en línea",
       "changes_fr": [
         "Nouveau chrono en parties en ligne uniquement : chaque joueur a 15 minutes au total, son chrono ne tourne que quand c'est à lui de jouer.",
@@ -2859,6 +3012,42 @@
         "両方の時計が常に盤面に表示され、1分未満でオレンジ、30秒未満で赤になり、10秒未満で音の警報が鳴ります。",
         "AI対戦とホットシートには時計がなく、これらのモードは何も変わりません。"
       ],
+      "changes_pt": [
+        "Novo relógio de jogo apenas nas partidas online: cada jogador tem 15 minutos no total, correndo só enquanto é a sua vez.",
+        "Quando seu relógio chega a zero, derrota instantânea, igual a uma desistência normal.",
+        "Se você ficar inativo 3 minutos durante uma escolha, o jogo passa ou pula automaticamente por você (essa rede de segurança só dispara uma vez por partida).",
+        "Um segundo período de inatividade de 3 minutos faz você perder a partida diretamente.",
+        "No mulligan, se ninguém decidir por 1 minuto, a partida é cancelada sem impacto na sua classificação.",
+        "O cronômetro de 60 segundos por ação e as antigas regras de desconexão (desistência após 3 desconexões, período de tolerância) são substituídos por esse relógio total.",
+        "Se você se desconectar durante uma partida, seu relógio continua correndo; você precisa voltar antes que ele chegue a zero.",
+        "Bug corrigido: as partidas não travam mais depois de uma reconexão, o servidor sempre controla o tempo.",
+        "Os dois relógios ficam visíveis o tempo todo no tabuleiro, ficando laranja abaixo de 1 minuto e depois vermelho abaixo de 30 segundos, com um alarme sonoro abaixo de 10 segundos.",
+        "Sem relógio nas partidas contra IA ou hotseat, nada muda para esses modos."
+      ],
+      "changes_it": [
+        "Nuovo orologio di gioco solo nelle partite online: ogni giocatore ha 15 minuti totali, che scorrono solo mentre è il suo turno di muovere.",
+        "Quando il tuo orologio arriva a zero, sconfitta immediata, come una normale rinuncia.",
+        "Se resti inattivo 3 minuti durante una scelta, il gioco passa o salta automaticamente per te (questa rete di sicurezza scatta solo una volta per partita).",
+        "Un secondo periodo di inattività di 3 minuti ti fa perdere la partita direttamente.",
+        "Al mulligan, se nessuno decide per 1 minuto, la partita viene annullata senza impatto sulla tua classifica.",
+        "Il timer di 60 secondi per azione e le vecchie regole di disconnessione (rinuncia dopo 3 disconnessioni, periodo di tolleranza) sono sostituiti da questo orologio totale.",
+        "Se ti disconnetti durante una partita, il tuo orologio continua a scorrere; devi tornare prima che arrivi a zero.",
+        "Bug corretto: le partite non si bloccano più dopo una riconnessione, il server controlla sempre il tempo.",
+        "Entrambi gli orologi sono sempre visibili sul tavolo, diventando arancioni sotto 1 minuto e poi rossi sotto i 30 secondi, con un allarme sonoro sotto i 10 secondi.",
+        "Nessun orologio nelle partite contro l'IA o hotseat, nulla cambia per quelle modalità."
+      ],
+      "changes_pl": [
+        "Nowy zegar gry tylko w meczach online: każdy gracz ma łącznie 15 minut, które biegną tylko wtedy, gdy jest jego ruch.",
+        "Gdy twój zegar dojdzie do zera, natychmiastowa porażka, tak jak zwykły walkower.",
+        "Jeśli będziesz bezczynny 3 minuty podczas wyboru, gra automatycznie pasuje lub pomija za ciebie (ta siatka bezpieczeństwa uruchamia się tylko raz na mecz).",
+        "Drugi 3-minutowy okres bezczynności sprawia, że przegrywasz mecz bezpośrednio.",
+        "Przy mulliganie, jeśli nikt nie zdecyduje przez 1 minutę, mecz jest anulowany bez wpływu na twój ranking.",
+        "60-sekundowy licznik na akcję i stare zasady rozłączeń (walkower po 3 rozłączeniach, okres tolerancji) są zastąpione przez ten całkowity zegar.",
+        "Jeśli rozłączysz się podczas meczu, twój zegar nadal biegnie; musisz wrócić, zanim dojdzie do zera.",
+        "Naprawiony błąd: mecze nie zawieszają się już po ponownym połączeniu, serwer zawsze zarządza czasem.",
+        "Oba zegary są cały czas widoczne na planszy, robią się pomarańczowe poniżej 1 minuty, a potem czerwone poniżej 30 sekund, z alarmem dźwiękowym poniżej 10 sekund.",
+        "Brak zegara w grach przeciwko SI lub hotseat, nic się nie zmienia dla tych trybów."
+      ],
       "changes_es": [
         "Nuevo reloj en partidas en línea únicamente: cada jugador tiene 15 minutos en total, su reloj solo corre cuando le toca jugar.",
         "Cuando tu reloj llega a cero, derrota inmediata, como una rendición clásica.",
@@ -2878,6 +3067,9 @@
       "title_fr": "Connexion en ligne et tournois",
       "title_en": "Online connection and tournaments",
       "title_ja": "オンライン接続とトーナメント",
+      "title_pt": "Conexão online e torneios",
+      "title_it": "Connessione online e tornei",
+      "title_pl": "Połączenie online i turnieje",
       "title_es": "Conexión en línea y torneos",
       "changes_fr": [
         "Page tournoi : un panneau au-dessus du bracket montre en direct l'état de chaque match du round en cours (en attente, en partie, terminé), avec le temps écoulé et le compte à rebours d'absence pour chaque match.",
@@ -2909,6 +3101,36 @@
         "クイズをモバイル対応：質問、ボタン、グリッドがスマホ画面に合わせてスケールし、狭い画面での見切れがなくなりました。",
         "クイズ：名前だけを表示していた質問（例：複数バージョンがある「ナルト」）に、カードのタイトルまたは番号を含めるようにし、正解が常に選択可能になりました。"
       ],
+      "changes_pt": [
+        "Página de torneio: um painel ao vivo acima da chave mostra o estado de cada partida da rodada atual (aguardando, jogando, terminada), com o tempo decorrido e a contagem regressiva de ausência por partida.",
+        "Cada célula da chave também mostra sua própria pequena contagem regressiva de ausência quando um jogador corre o risco de desistir.",
+        "Torneios: agora você pode sair de um torneio em andamento; sua partida ativa é perdida por desistência de forma limpa e a próxima rodada continua normalmente.",
+        "Trabalho de preparação para a próxima expansão Shinobi Shiren: coleção, construtor de decks, sealed e criação de torneios agora oferecem um seletor de set (Konoha Shido, Shinobi Shiren ou aleatório), com Shinobi Shiren marcado como em breve até suas cartas chegarem.",
+        "No celular, seu baralho e sua pilha de descarte (e os do adversário) voltam a ficar visíveis nas laterais do tabuleiro, com a contagem de cartas e um toque para abrir o conteúdo do descarte.",
+        "Redesenho completo do construtor de decks no celular: nova barra superior com menu de ações, abas Catálogo e Meu Deck maiores, linha de busca fixa, células de carta maiores para facilitar o toque, botão Salvar de largura total embaixo e uma folha de detalhes de carta em tela cheia.",
+        "Quiz no celular: as perguntas, botões e grades agora se ajustam às telas de celular, sem mais transbordamento em telas estreitas.",
+        "Quiz: as perguntas que só mostravam um primeiro nome (por exemplo \"Naruto\" quando existem várias versões) agora incluem o título ou o número da carta, e a resposta correta é sempre selecionável."
+      ],
+      "changes_it": [
+        "Pagina torneo: un pannello dal vivo sopra il tabellone mostra lo stato di ogni partita del turno attuale (in attesa, in corso, finita), con il tempo trascorso e il conto alla rovescia di assenza per partita.",
+        "Ogni cella del tabellone mostra anche il suo piccolo conto alla rovescia di assenza quando un giocatore rischia la rinuncia.",
+        "Tornei: ora puoi lasciare un torneo in corso; la tua partita attiva viene persa a tavolino in modo pulito e il turno successivo continua normalmente.",
+        "Lavoro di preparazione per la prossima espansione Shinobi Shiren: collezione, costruttore di mazzi, sealed e creazione tornei ora offrono un selettore di set (Konoha Shido, Shinobi Shiren o casuale), con Shinobi Shiren segnato come prossimamente finché le sue carte non arrivano.",
+        "Su mobile, il tuo mazzo e la tua pila degli scarti (e quelli dell'avversario) sono di nuovo visibili ai lati del tavolo, con il conteggio delle carte e un tocco per aprire il contenuto degli scarti.",
+        "Riprogettazione mobile completa del costruttore di mazzi: nuova barra in alto con menu azioni, schede Catalogo e Il mio mazzo più grandi, riga di ricerca fissa, celle carta più grandi per un tocco più facile, pulsante Salva a larghezza piena in basso e una scheda dettagli carta a schermo intero.",
+        "Quiz su mobile: domande, pulsanti e griglie ora si adattano agli schermi dei telefoni, niente più overflow su display stretti.",
+        "Quiz: le domande che mostravano solo un nome (ad esempio \"Naruto\" quando esistono più versioni) ora includono il titolo o il numero della carta, e la risposta corretta è sempre selezionabile."
+      ],
+      "changes_pl": [
+        "Strona turnieju: panel na żywo nad drabinką pokazuje stan każdego meczu w bieżącej rundzie (oczekiwanie, w toku, zakończony), z upływającym czasem i odliczaniem nieobecności dla każdego meczu.",
+        "Każda komórka drabinki pokazuje też własne małe odliczanie nieobecności, gdy graczowi grozi walkower.",
+        "Turnieje: możesz teraz opuścić trwający turniej; twój aktywny mecz jest oddawany walkowerem czysto, a kolejna runda toczy się normalnie.",
+        "Prace przygotowawcze do nadchodzącego dodatku Shinobi Shiren: kolekcja, kreator talii, sealed i tworzenie turniejów oferują teraz wybór setu (Konoha Shido, Shinobi Shiren lub losowy), z Shinobi Shiren oznaczonym jako wkrótce, dopóki jego karty się nie pojawią.",
+        "Na telefonie twoja talia i stos odrzuconych (oraz przeciwnika) są znów widoczne po bokach planszy, z liczbą kart i dotknięciem, aby otworzyć zawartość stosu odrzuconych.",
+        "Pełne przeprojektowanie kreatora talii na telefonie: nowy górny pasek z menu akcji, większe zakładki Katalog i Moja Talia, przyklejony wiersz wyszukiwania, większe komórki kart dla łatwiejszego dotykania, przycisk Zapisz na pełną szerokość na dole i pełnoekranowy arkusz szczegółów karty.",
+        "Quiz na telefonie: pytania, przyciski i siatki dopasowują się teraz do ekranów telefonów, koniec z wychodzeniem poza wąskie wyświetlacze.",
+        "Quiz: pytania, które pokazywały tylko imię (np. \"Naruto\", gdy istnieje kilka wersji), zawierają teraz tytuł lub numer karty, a poprawną odpowiedź zawsze da się wybrać."
+      ],
       "changes_es": [
         "Página de torneo: un panel encima del cuadro muestra en directo el estado de cada partido de la ronda en curso (en espera, en partida, finalizado), con el tiempo transcurrido y la cuenta atrás de ausencia de cada partido.",
         "Cada casilla del cuadro también muestra su propio mini reloj de ausencia cuando un jugador arriesga la rendición.",
@@ -2926,6 +3148,9 @@
       "title_fr": "Mobile, profil et corrections",
       "title_en": "Mobile, profile and fixes",
       "title_ja": "モバイル、プロフィール、修正",
+      "title_pt": "Celular, perfil e correções",
+      "title_it": "Mobile, profilo e correzioni",
+      "title_pl": "Telefon, profil i poprawki",
       "title_es": "Móvil, perfil y correcciones",
       "changes_fr": [
         "Sur téléphone, le terrain garde maintenant des proportions strictes et tout est dimensionné par rapport à l'écran, comme dans un jeu à résolution fixe.",
@@ -2996,6 +3221,75 @@
         "スマホの対戦中、カード詳細ウィンドウが下の小さなパネルではなく、画像とテキストを横並びで全画面表示するようになりました。",
         "スマホで、対戦中のすべてのウィンドウ（マリガン、対象選択、効果選択など）が400〜560ピクセルに制限されず、画面のほぼ全幅に広がり、テキストがずっと読みやすくなりました。"
       ],
+      "changes_pt": [
+        "No celular, o tabuleiro agora mantém proporções estritas e tudo é dimensionado em relação à tela, como um jogo de resolução fixa.",
+        "Perfil: a seção Estatísticas de Decks agora só mostra os decks jogados nos últimos 90 dias.",
+        "Redesenho completo das páginas de classificação, perfil e Amigos em uma nova direção visual.",
+        "A página de Amigos agora mostra o retrospecto de confronto direto contra cada amigo, uma etiqueta Rival para o adversário que você mais enfrenta, sequências ativas e vitórias em torneios em linha, e um feed de atividade de 7 dias.",
+        "Muitas entradas do registro de jogo e janelas de efeito foram corrigidas: movimentos, bloqueios, efeitos de Kabuto/Itachi/Gaara/Sasuke/Baki/Jirobo/Kin/Dosu/Tayuya/Ino/Hiruzen agora exibem o texto correto com os nomes certos dos personagens.",
+        "As artes das cartas agora têm cerca de metade do peso, deixando o site mais rápido em geral, especialmente no início de uma partida e no celular.",
+        "O fundo animado de nuvens, vários efeitos de brilho e a seleção de alvos usam muito menos recursos: as páginas ficam mais fluidas e a bateria dura mais durante uma partida.",
+        "As animações agora pausam quando você muda para outra aba, então nada continua rodando em segundo plano sem motivo.",
+        "O construtor de decks agora só desenha as cartas que estão visíveis, então rolar por toda a coleção fica muito mais fluido.",
+        "As janelas de seleção de alvo em jogo abrem e fecham mais rápido, sem travamentos.",
+        "O site agora mantém na memória os recursos que já baixou: suas próximas visitas carregam quase instantaneamente.",
+        "Torneios: um jogador ausente no início da sua partida agora é desclassificado automaticamente depois do cronômetro, e o torneio segue em frente em vez de travar (incluindo a primeira rodada, todos os formatos).",
+        "Painel de administração de torneios: os menus suspensos agora podem realmente ser usados sem fechar imediatamente.",
+        "Torneios: a desistência manual do admin agora elimina corretamente o jogador no suíço, então ele não é mais emparelhado na próxima rodada.",
+        "Torneios: depois de um reinício do servidor, os cronômetros de ausência em andamento retomam corretamente, inclusive na primeira rodada.",
+        "Torneios suíços: quando resta apenas um jogador ativo, o torneio termina imediatamente com esse jogador como vencedor em vez de travar.",
+        "Em jogo, o registro e as animações não são mais redesenhados a cada ação e só reagem quando algo realmente muda, aliviando perceptivelmente a carga do celular e deixando o jogo mais fluido.",
+        "Página inicial: a atualização automática para quando você muda de aba, economizando bateria e dados.",
+        "Shikamaru Nara (022): a emboscada dele agora encontra o inimigo jogado durante a rodada anterior quando Shikamaru é revelado no início de uma nova rodada, não só dentro da mesma rodada.",
+        "No celular em jogo, a janela de detalhes da carta agora ocupa a tela inteira com a imagem e o texto lado a lado, em vez de um pequeno painel espremido embaixo.",
+        "No celular, todas as janelas em jogo (mulligan, seleção de alvo, escolhas de efeito, etc.) agora ocupam quase toda a largura da tela em vez de serem limitadas a 400-560 pixels, com um texto muito mais legível."
+      ],
+      "changes_it": [
+        "Su telefono, il tavolo ora mantiene proporzioni rigorose e tutto è dimensionato in base allo schermo, come un gioco a risoluzione fissa.",
+        "Profilo: la sezione Statistiche Mazzi ora mostra solo i mazzi giocati negli ultimi 90 giorni.",
+        "Riprogettazione completa delle pagine classifica, profilo e Amici in una nuova direzione visiva.",
+        "La pagina Amici ora mostra i record testa a testa contro ogni amico, un'etichetta Rivale per l'avversario che affronti di più, le serie attive e le vittorie nei tornei in linea, e un feed di attività di 7 giorni.",
+        "Molte voci del registro di gioco e finestre di effetto sono state corrette: movimenti, blocchi, effetti di Kabuto/Itachi/Gaara/Sasuke/Baki/Jirobo/Kin/Dosu/Tayuya/Ino/Hiruzen ora mostrano il testo corretto con i nomi giusti dei personaggi.",
+        "Le illustrazioni delle carte ora pesano circa la metà, rendendo il sito più veloce ovunque, soprattutto all'inizio di una partita e su mobile.",
+        "Lo sfondo animato di nuvole, diversi effetti di bagliore e la selezione dei bersagli usano molte meno risorse: le pagine sono più fluide e la batteria dura di più durante una partita.",
+        "Le animazioni ora si mettono in pausa quando passi a un'altra scheda, così niente continua a girare in background senza motivo.",
+        "Il costruttore di mazzi ora disegna solo le carte visibili, quindi scorrere l'intera collezione è molto più fluido.",
+        "Le finestre di selezione bersaglio in gioco si aprono e chiudono più velocemente, senza lag.",
+        "Il sito ora tiene in memoria le risorse già scaricate: le tue prossime visite si caricano quasi all'istante.",
+        "Tornei: un giocatore assente all'inizio della sua partita ora viene squalificato automaticamente dopo il timer, e il torneo va avanti invece di bloccarsi (primo turno incluso, tutti i formati).",
+        "Pannello di amministrazione tornei: i menu a tendina ora possono davvero essere usati senza chiudersi subito.",
+        "Tornei: la rinuncia manuale dell'admin ora elimina correttamente il giocatore nello svizzero, così non viene più abbinato nel turno successivo.",
+        "Tornei: dopo un riavvio del server, i timer di assenza in corso riprendono correttamente, anche per il primo turno.",
+        "Tornei svizzeri: quando resta un solo giocatore attivo, il torneo termina subito con quel giocatore come vincitore invece di bloccarsi.",
+        "In gioco, il registro e le animazioni non vengono più ridisegnati a ogni azione e reagiscono solo quando qualcosa cambia davvero, alleggerendo sensibilmente il carico del telefono e rendendo il gioco più fluido.",
+        "Pagina iniziale: l'aggiornamento automatico si ferma quando cambi scheda, risparmiando batteria e dati.",
+        "Shikamaru Nara (022): la sua imboscata ora trova il nemico giocato nel turno precedente quando Shikamaru viene rivelato all'inizio di un nuovo turno, non solo all'interno dello stesso turno.",
+        "Su telefono in gioco, la finestra dei dettagli della carta ora occupa tutto lo schermo con l'immagine e il testo affiancati, invece di un piccolo pannello schiacciato in basso.",
+        "Su telefono, tutte le finestre in gioco (mulligan, selezione bersaglio, scelte di effetto, ecc.) ora occupano quasi tutta la larghezza dello schermo invece di essere limitate a 400-560 pixel, con testo molto più leggibile."
+      ],
+      "changes_pl": [
+        "Na telefonie plansza zachowuje teraz ścisłe proporcje, a wszystko jest skalowane względem ekranu, jak gra o stałej rozdzielczości.",
+        "Profil: sekcja Statystyki Talii pokazuje teraz tylko talie grane w ciągu ostatnich 90 dni.",
+        "Pełne przeprojektowanie stron rankingu, profilu i Znajomych w nowym kierunku wizualnym.",
+        "Strona Znajomych pokazuje teraz bilans bezpośrednich starć z każdym znajomym, etykietę Rywal dla najczęściej granego przeciwnika, aktywne serie i wygrane turniejowe w linii oraz 7-dniowy kanał aktywności.",
+        "Wiele wpisów dziennika gry i okien efektów zostało naprawionych: ruchy, blokady, efekty Kabuto/Itachi/Gaara/Sasuke/Baki/Jirobo/Kin/Dosu/Tayuya/Ino/Hiruzen wyświetlają teraz poprawny tekst z właściwymi nazwami postaci.",
+        "Grafiki kart ważą teraz około połowy mniej, przez co strona jest szybsza wszędzie, zwłaszcza na początku gry i na telefonie.",
+        "Animowane tło chmur, kilka efektów poświaty i wybór celów zużywają znacznie mniej zasobów: strony są płynniejsze, a bateria dłużej wytrzymuje podczas gry.",
+        "Animacje wstrzymują się teraz, gdy przełączasz się na inną kartę, więc nic nie działa w tle bez powodu.",
+        "Kreator talii rysuje teraz tylko widoczne karty, więc przewijanie całej kolekcji jest znacznie płynniejsze.",
+        "Okna wyboru celu w grze otwierają się i zamykają szybciej, bez opóźnień.",
+        "Strona przechowuje teraz w pamięci już pobrane zasoby: twoje kolejne wizyty wczytują się niemal natychmiast.",
+        "Turnieje: gracz nieobecny na początku swojego meczu jest teraz automatycznie dyskwalifikowany po upływie licznika, a turniej idzie dalej zamiast utknąć (włącznie z pierwszą rundą, wszystkie formaty).",
+        "Panel administracyjny turniejów: menu rozwijane można teraz faktycznie używać bez natychmiastowego zamykania.",
+        "Turnieje: ręczny walkower nadany przez admina eliminuje teraz poprawnie gracza w systemie szwajcarskim, więc nie jest już parowany w kolejnej rundzie.",
+        "Turnieje: po restarcie serwera trwające liczniki nieobecności wznawiają się poprawnie, także w pierwszej rundzie.",
+        "Turnieje szwajcarskie: gdy zostaje tylko jeden aktywny gracz, turniej kończy się natychmiast z tym graczem jako zwycięzcą, zamiast utknąć.",
+        "W grze dziennik i animacje nie są już przerysowywane przy każdej akcji i reagują tylko wtedy, gdy coś się faktycznie zmienia, zauważalnie odciążając telefon i wygładzając rozgrywkę.",
+        "Strona główna: automatyczne odświeżanie zatrzymuje się, gdy przełączasz karty, oszczędzając baterię i transfer.",
+        "Shikamaru Nara (022): jego zasadzka znajduje teraz wroga zagranego w poprzedniej rundzie, gdy Shikamaru zostaje odkryty na początku nowej rundy, a nie tylko w tej samej rundzie.",
+        "Na telefonie w grze okno szczegółów karty zajmuje teraz cały ekran z obrazem i tekstem obok siebie, zamiast małego panelu ściśniętego na dole.",
+        "Na telefonie wszystkie okna w grze (mulligan, wybór celu, wybory efektów itd.) zajmują teraz niemal całą szerokość ekranu zamiast być ograniczone do 400-560 pikseli, z dużo czytelniejszym tekstem."
+      ],
       "changes_es": [
         "En el teléfono, el terreno ahora mantiene proporciones estrictas y todo se dimensiona respecto a la pantalla, como en un juego de resolución fija.",
         "Perfil: la sección Estadísticas de los mazos ahora solo muestra los mazos jugados en los últimos 90 días.",
@@ -3026,6 +3320,9 @@
       "title_fr": "Page de Personnalisation, suppression de compte, alerte tournoi et corrections",
       "title_en": "Customization page, account deletion, tournament alert and fixes",
       "title_ja": "カスタマイズページ、アカウント削除、トーナメント通知、修正",
+      "title_pt": "Página de personalização, exclusão de conta, alerta de torneio e correções",
+      "title_it": "Pagina di personalizzazione, eliminazione dell'account, avviso torneo e correzioni",
+      "title_pl": "Strona personalizacji, usuwanie konta, alert turniejowy i poprawki",
       "title_es": "Página de Personalización, eliminación de cuenta, alerta de torneo y correcciones",
       "changes_fr": [
         "Sakura Haruno (012) : la défausse obligatoire après la pioche ne peut plus être ignorée.",
@@ -3066,6 +3363,45 @@
         "AIは各対戦でランキングの最近の強いデッキの1つをランダムに選んでプレイするようになりました。",
         "奈良シカマル（022）：ラウンドの最初のアクションで表にされても、相手のカードを正しく見つけるようになりました。"
       ],
+      "changes_pt": [
+        "Sakura Haruno (012): o descarte obrigatório depois de comprar não pode mais ser ignorado.",
+        "Em qualquer efeito opcional, depois de clicar em Ativar você ainda pode voltar atrás enquanto nada irreversível tiver acontecido (cartas como Temari (121) costumavam prender você).",
+        "Agora você pode minimizar as janelas em jogo para ver o tabuleiro (mulligan, ordem de alvos, tela de fim de jogo).",
+        "Botão Excluir minha conta adicionado em Personalização, com uma frase para digitar como confirmação.",
+        "O botão Torneios mostra uma contagem regressiva elegante até o próximo torneio começar.",
+        "O menu agora detecta um torneio aberto mesmo que você ainda não tenha entrado (antes, nada era mostrado).",
+        "Estatísticas por deck mantidas por 90 dias: taxa de vitórias, mudança de ELO, última vez jogado.",
+        "O perfil ganha um novo painel Estatísticas de Decks com um pequeno gráfico de progressão.",
+        "Revisão completa da IA: níveis Fácil, Médio, Difícil e Impossível (Difícil com o dobro de chakra por rodada).",
+        "A IA agora joga com um dos decks recentes mais fortes da classificação, escolhido ao acaso a cada partida.",
+        "Shikamaru Nara (022): a emboscada dele agora encontra corretamente o personagem inimigo mesmo quando ele é revelado como a primeira ação da rodada."
+      ],
+      "changes_it": [
+        "Sakura Haruno (012): lo scarto obbligatorio dopo aver pescato non può più essere saltato.",
+        "Su qualsiasi effetto opzionale, dopo aver cliccato Attiva puoi ancora tornare indietro finché non è successo nulla di irreversibile (carte come Temari (121) prima ti bloccavano).",
+        "Ora puoi ridurre a icona le finestre in gioco per vedere il tavolo (mulligan, ordine dei bersagli, schermata di fine partita).",
+        "Pulsante Elimina il mio account aggiunto in Personalizzazione, con una frase da digitare come conferma.",
+        "Il pulsante Tornei mostra un elegante conto alla rovescia fino all'inizio del prossimo torneo.",
+        "Il menu ora rileva un torneo aperto anche se non ti sei ancora iscritto (prima, non veniva mostrato nulla).",
+        "Statistiche per mazzo conservate per 90 giorni: percentuale di vittorie, variazione di ELO, ultima giocata.",
+        "Il profilo guadagna un nuovo pannello Statistiche Mazzi con un piccolo grafico di progressione.",
+        "Revisione completa dell'IA: livelli Facile, Medio, Difficile e Impossibile (Difficile con doppio chakra per turno).",
+        "L'IA ora gioca con uno dei mazzi recenti più forti della classifica, scelto a caso a ogni partita.",
+        "Shikamaru Nara (022): la sua imboscata ora trova correttamente il personaggio nemico anche quando viene rivelato come prima azione del turno."
+      ],
+      "changes_pl": [
+        "Sakura Haruno (012): obowiązkowego odrzucenia po dobraniu nie można już pominąć.",
+        "Przy każdym opcjonalnym efekcie, po kliknięciu Aktywuj możesz się jeszcze wycofać, dopóki nie stało się nic nieodwracalnego (karty takie jak Temari (121) wcześniej cię blokowały).",
+        "Możesz teraz minimalizować okna w grze, aby zobaczyć planszę (mulligan, kolejność celów, ekran końca gry).",
+        "Przycisk Usuń moje konto dodany w Personalizacji, z frazą do wpisania w celu potwierdzenia.",
+        "Przycisk Turnieje pokazuje elegancki licznik do rozpoczęcia następnego turnieju.",
+        "Menu wykrywa teraz otwarty turniej, nawet jeśli jeszcze do niego nie dołączyłeś (wcześniej nic nie było pokazywane).",
+        "Statystyki na talię przechowywane przez 90 dni: wskaźnik zwycięstw, zmiana ELO, ostatnia gra.",
+        "Profil zyskuje nowy panel Statystyki Talii z małym wykresem postępu.",
+        "Pełna przebudowa SI: poziomy Łatwy, Średni, Trudny i Niemożliwy (Trudny z podwójną czakrą na rundę).",
+        "SI gra teraz jedną z najsilniejszych ostatnich talii z rankingu, losowaną w każdej grze.",
+        "Shikamaru Nara (022): jego zasadzka poprawnie znajduje teraz wrogą postać, nawet gdy zostaje odkryty jako pierwsza akcja rundy."
+      ],
       "changes_es": [
         "Sakura Haruno (012): el descarte obligatorio tras robar ya no se puede omitir.",
         "En todos los efectos opcionales, tras hacer clic en Activar aún puedes echarte atrás mientras no haya ocurrido nada irreversible (antes, algunas cartas como Temari (121) bloqueaban la vuelta atrás).",
@@ -3086,6 +3422,9 @@
       "title_fr": "Audit en ligne : sécurité, vitesse, traductions",
       "title_en": "Online audit: security, speed, translations",
       "title_ja": "オンライン監査：セキュリティ、速度、翻訳",
+      "title_pt": "Auditoria online: segurança, velocidade, traduções",
+      "title_it": "Audit online: sicurezza, velocità, traduzioni",
+      "title_pl": "Audyt online: bezpieczeństwo, szybkość, tłumaczenia",
       "title_es": "Auditoría en línea: seguridad, velocidad, traducciones",
       "changes_fr": [
         "Plusieurs failles de triche colmatées (vol d'ELO, lien Discord détourné, decks falsifiables).",
@@ -3114,6 +3453,33 @@
         "フランス語訳で欠けていた多くのアクセントを修正。",
         "FRモードで英語のままだった複数のエラーメッセージを修正。"
       ],
+      "changes_pt": [
+        "Vários exploits de trapaça corrigidos (roubo de ELO, abuso de vinculação do Discord, adulteração de deck).",
+        "Limites de spam adicionados no chat, convites, cadastro, recuperação de senha e tentativas de login.",
+        "Um banimento de jogos online também bloqueia entrar em um torneio ou em um jogo privado.",
+        "A maioria das páginas está mais rápida, especialmente Torneios e Classificação.",
+        "As datas agora aparecem no idioma do jogador (antes ficavam em inglês no modo FR).",
+        "Muitos acentos faltando nas traduções em francês: corrigido.",
+        "Várias mensagens de erro estavam presas em inglês no modo FR: corrigido."
+      ],
+      "changes_it": [
+        "Diversi exploit per barare corretti (furto di ELO, abuso del collegamento Discord, manomissione dei mazzi).",
+        "Limiti anti-spam aggiunti su chat, inviti, registrazione, recupero password e tentativi di accesso.",
+        "Un ban dai giochi online blocca anche l'accesso a un torneo o a una partita privata.",
+        "La maggior parte delle pagine è più veloce, soprattutto Tornei e Classifica.",
+        "Le date ora appaiono nella lingua del giocatore (prima restavano in inglese in modalità FR).",
+        "Molti accenti mancanti nelle traduzioni francesi: corretti.",
+        "Diversi messaggi di errore restavano in inglese in modalità FR: corretti."
+      ],
+      "changes_pl": [
+        "Naprawiono kilka exploitów do oszukiwania (kradzież ELO, nadużycie łączenia Discorda, manipulacja talią).",
+        "Dodano limity spamu na czacie, zaproszeniach, rejestracji, odzyskiwaniu hasła i próbach logowania.",
+        "Ban na gry online blokuje też dołączanie do turnieju lub gry prywatnej.",
+        "Większość stron jest szybsza, zwłaszcza Turnieje i Ranking.",
+        "Daty wyświetlają się teraz w języku gracza (wcześniej pozostawały po angielsku w trybie FR).",
+        "Wiele brakujących akcentów we francuskich tłumaczeniach: naprawione.",
+        "Kilka komunikatów błędów pozostawało po angielsku w trybie FR: naprawione."
+      ],
       "changes_es": [
         "Varias brechas de trampas tapadas (robo de ELO, vínculo de Discord desviado, mazos falsificables).",
         "Límites anti-spam añadidos en el chat, las invitaciones, el registro, la contraseña olvidada y los intentos de inicio de sesión.",
@@ -3130,6 +3496,9 @@
       "title_fr": "Tournois : audit complet et stabilisation",
       "title_en": "Tournaments: full audit and stabilization",
       "title_ja": "トーナメント：全面監査と安定化",
+      "title_pt": "Torneios: auditoria completa e estabilização",
+      "title_it": "Tornei: audit completo e stabilizzazione",
+      "title_pl": "Turnieje: pełny audyt i stabilizacja",
       "title_es": "Torneos: auditoría completa y estabilización",
       "changes_fr": [
         "Beaucoup de bugs de tournoi corrigés (forfaits, resets, disqualifications).",
@@ -3155,6 +3524,30 @@
         "トーナメントの参加コードが総当たりで推測できなくなりました。",
         "トーナメント対戦中は、カジュアルでマッチングされたり、決闘に招待されたりしなくなりました。"
       ],
+      "changes_pt": [
+        "Muitos bugs de torneio corrigidos (desistências, reinícios, desclassificações).",
+        "O modo sealed agora funciona nos torneios.",
+        "Formato de eliminação dupla disponível.",
+        "Os torneios privados são realmente privados (não aparecem mais na lista pública).",
+        "Os códigos de entrada em torneios não podem mais ser quebrados por força bruta.",
+        "Você não pode mais ser pareado no casual nem convidado para um duelo enquanto está em uma partida de torneio."
+      ],
+      "changes_it": [
+        "Molti bug dei tornei corretti (rinunce, reset, squalifiche).",
+        "La modalità sealed ora funziona nei tornei.",
+        "Formato a doppia eliminazione disponibile.",
+        "I tornei privati sono davvero privati (non più nella lista pubblica).",
+        "I codici di accesso ai tornei non possono più essere forzati con il brute force.",
+        "Non puoi più essere abbinato nel casual o invitato a un duello mentre sei in una partita di torneo."
+      ],
+      "changes_pl": [
+        "Naprawiono wiele błędów turniejowych (walkowery, resety, dyskwalifikacje).",
+        "Tryb sealed działa teraz w turniejach.",
+        "Dostępny format podwójnej eliminacji.",
+        "Prywatne turnieje są naprawdę prywatne (już nie na liście publicznej).",
+        "Kodów dołączenia do turnieju nie można już złamać metodą brute-force.",
+        "Nie możesz już zostać sparowany w towarzyskich ani zaproszony na pojedynek podczas meczu turniejowego."
+      ],
       "changes_es": [
         "Muchos errores de torneo corregidos (rendiciones, reinicios, descalificaciones).",
         "El modo sellado ahora funciona en torneo.",
@@ -3170,6 +3563,9 @@
       "title_fr": "Prise de contrôle, timers raccourcis, Sakura/Kakashi et performance",
       "title_en": "Take control, shorter timers, Sakura/Kakashi and performance",
       "title_ja": "コントロール奪取、タイマー短縮、サクラ/カカシ、パフォーマンス",
+      "title_pt": "Assumir controle, cronômetros mais curtos, Sakura/Kakashi e desempenho",
+      "title_it": "Prendere il controllo, timer più brevi, Sakura/Kakashi e prestazioni",
+      "title_pl": "Przejmowanie kontroli, krótsze liczniki, Sakura/Kakashi i wydajność",
       "title_es": "Toma de control, temporizadores acortados, Sakura/Kakashi y rendimiento",
       "changes_fr": [
         "Personnage volé déjà upgrade : revient bien à son propriétaire si le contrôleur quitte le jeu.",
@@ -3201,6 +3597,36 @@
         "リプレイがずっと軽くなり、対戦終了と読み込みが速くなりました。",
         "MSS 05（取り戻せ）：コントロールされたキャラクターが正しく本来の持ち主に戻ります。"
       ],
+      "changes_pt": [
+        "Personagem roubado já evoluído: volta ao seu dono se o controlador sai de jogo.",
+        "Cronômetro de Mulligan + Vantagem reduzido de 90 para 60 segundos.",
+        "Cronômetro de escolhas na pontuação de missão reduzido de 2 minutos para 1 minuto.",
+        "Tolerância de reconexão reduzida de 2 minutos para 1 minuto.",
+        "Sakura Secreta (135): chega do loop que continuava pedindo para descartar.",
+        "Kakashi (016, 148) não pode mais copiar outro Kakashi.",
+        "Replays muito menores, fim de jogo e carregamento muito mais rápidos.",
+        "MSS 05 (Traga de Volta): um personagem controlado agora volta ao seu verdadeiro dono."
+      ],
+      "changes_it": [
+        "Personaggio rubato già evoluto: torna al suo proprietario se il controllore esce di gioco.",
+        "Timer di Mulligan + Vantaggio ridotto da 90 a 60 secondi.",
+        "Timer delle scelte nel punteggio delle missioni ridotto da 2 minuti a 1 minuto.",
+        "Tolleranza di riconnessione ridotta da 2 minuti a 1 minuto.",
+        "Sakura Segreta (135): niente più il ciclo che continuava a chiedere di scartare.",
+        "Kakashi (016, 148) non può più copiare un altro Kakashi.",
+        "Replay molto più piccoli, fine partita e caricamento molto più veloci.",
+        "MSS 05 (Riportalo Indietro): un personaggio controllato ora torna al suo vero proprietario."
+      ],
+      "changes_pl": [
+        "Ukradziona postać już ulepszona: wraca do właściciela, jeśli kontroler opuszcza grę.",
+        "Licznik Mulligan + Przewaga skrócony z 90 do 60 sekund.",
+        "Licznik wyborów przy punktacji misji skrócony z 2 minut do 1 minuty.",
+        "Tolerancja ponownego połączenia skrócona z 2 minut do 1 minuty.",
+        "Sakura Sekretna (135): koniec z pętlą, która wciąż prosiła o odrzucenie.",
+        "Kakashi (016, 148) nie może już kopiować innego Kakashiego.",
+        "Powtórki znacznie mniejsze, koniec gry i ładowanie znacznie szybsze.",
+        "MSS 05 (Przywróć To): kontrolowana postać wraca teraz do swojego prawdziwego właściciela."
+      ],
       "changes_es": [
         "Personaje robado ya mejorado: vuelve correctamente a su propietario si quien lo controla abandona el juego.",
         "Mulligan + Ventaja: temporizador acortado de 90 a 60 segundos.",
@@ -3218,6 +3644,9 @@
       "title_fr": "ELO rééquilibré",
       "title_en": "ELO rebalanced",
       "title_ja": "ELOの再調整",
+      "title_pt": "ELO reequilibrado",
+      "title_it": "ELO riequilibrato",
+      "title_pl": "Zrównoważone ELO",
       "title_es": "ELO reequilibrado",
       "changes_fr": [
         "Moins de farm sur les bas-ELO, gains plus généreux pour les écarts moyens (jusqu'à +12/+13 au lieu de +10).",
@@ -3234,6 +3663,21 @@
         "非常に大きな差では最大 -32 の損失もあり得ます（1500以上下の相手に負けた場合）。",
         "ELOが近い対戦（差 < 200）は変わりません。"
       ],
+      "changes_pt": [
+        "Menos farm de jogadores de ELO baixo, ganhos mais generosos em diferenças médias (até +12/+13 em vez de +10).",
+        "As perdas podem chegar a -32 em diferenças muito grandes (perder para alguém 1500+ abaixo de você).",
+        "As partidas com ELO próximo (diferença < 200) permanecem inalteradas."
+      ],
+      "changes_it": [
+        "Meno farming di giocatori a ELO basso, guadagni più generosi sui divari medi (fino a +12/+13 invece di +10).",
+        "Le perdite possono arrivare a -32 per divari molto grandi (perdere contro qualcuno 1500+ sotto di te).",
+        "Le partite con ELO vicino (divario < 200) restano invariate."
+      ],
+      "changes_pl": [
+        "Mniej farmienia graczy o niskim ELO, hojniejsze zyski przy średnich różnicach (do +12/+13 zamiast +10).",
+        "Straty mogą sięgać -32 przy bardzo dużych różnicach (przegrana z kimś o 1500+ niżej).",
+        "Mecze o zbliżonym ELO (różnica < 200) pozostają bez zmian."
+      ],
       "changes_es": [
         "Menos farmeo de jugadores de bajo ELO, ganancias más generosas para las diferencias medias (hasta +12/+13 en lugar de +10).",
         "Pérdidas posibles de hasta -32 en diferencias muy grandes (perder contra un rival 1500+ por debajo).",
@@ -3246,6 +3690,9 @@
       "title_fr": "Profils de tous les joueurs accessibles",
       "title_en": "All player profiles accessible",
       "title_ja": "すべてのプレイヤーのプロフィールにアクセス可能",
+      "title_pt": "Todos os perfis de jogadores acessíveis",
+      "title_it": "Tutti i profili dei giocatori accessibili",
+      "title_pl": "Wszystkie profile graczy dostępne",
       "title_es": "Perfiles de todos los jugadores accesibles",
       "changes_fr": [
         "Plus d'erreur Joueur introuvable : les profils s'ouvrent désormais pour tout le monde."
@@ -3255,6 +3702,15 @@
       ],
       "changes_ja": [
         "「プレイヤーが見つかりません」のエラーがなくなりました：プロフィールが全員に開くようになりました。"
+      ],
+      "changes_pt": [
+        "Chega do erro 'Jogador não encontrado': os perfis agora abrem para todos."
+      ],
+      "changes_it": [
+        "Niente più l'errore 'Giocatore non trovato': i profili ora si aprono per tutti."
+      ],
+      "changes_pl": [
+        "Koniec z błędem 'Nie znaleziono gracza': profile otwierają się teraz dla wszystkich."
       ],
       "changes_es": [
         "Se acabó el error Jugador no encontrado: los perfiles ahora se abren para todo el mundo."
@@ -3266,6 +3722,9 @@
       "title_fr": "Tournois solides, sauvegardes fiables, forfait propre",
       "title_en": "Solid tournaments, reliable saves, clean forfeit",
       "title_ja": "堅牢なトーナメント、確実な保存、きれいな不戦敗",
+      "title_pt": "Torneios sólidos, salvamentos confiáveis, desistência limpa",
+      "title_it": "Tornei solidi, salvataggi affidabili, rinuncia pulita",
+      "title_pl": "Solidne turnieje, niezawodne zapisy, czysty walkower",
       "title_es": "Torneos sólidos, guardados fiables, rendición limpia",
       "changes_fr": [
         "Sakura Secret (135) : une carte forcée qui ne peut être jouée part bien à la défausse.",
@@ -3297,6 +3756,36 @@
         "「投了」を複数回クリックしても複数の敗北が作られなくなりました。",
         "対戦終了画面が、完全な保存を待たずに早く表示されます。"
       ],
+      "changes_pt": [
+        "Sakura Secreta (135): uma carta forçada que não pode ser jogada vai para a pilha de descarte.",
+        "Torneios: cronômetro de 5 minutos antes da partida, desistência automática se um jogador não entrar.",
+        "Torneios: cronômetro de mulligan de 90 segundos, desistência automática se ficar inativo.",
+        "Chega de solicitação de seleção de deck em um torneio (já travado na inscrição).",
+        "Muito mais partidas agora são salvas e geram um replay.",
+        "As entradas do histórico de ELO abrem o replay diretamente.",
+        "Clicar em Desistir várias vezes não cria mais várias derrotas.",
+        "A tela de fim de jogo aparece mais cedo, sem esperar o salvamento completo."
+      ],
+      "changes_it": [
+        "Sakura Segreta (135): una carta forzata che non può essere giocata va nella pila degli scarti.",
+        "Tornei: timer di 5 minuti prima della partita, rinuncia automatica se un giocatore non si presenta.",
+        "Tornei: timer di mulligan di 90 secondi, rinuncia automatica se inattivo.",
+        "Niente più richiesta di selezione del mazzo in un torneo (già bloccato all'iscrizione).",
+        "Molte più partite ora vengono salvate e producono un replay.",
+        "Le voci della cronologia ELO aprono il loro replay direttamente.",
+        "Cliccare Rinuncia più volte non crea più sconfitte multiple.",
+        "La schermata di fine partita appare prima, senza aspettare il salvataggio completo."
+      ],
+      "changes_pl": [
+        "Sakura Sekretna (135): wymuszona karta, której nie można zagrać, trafia na stos odrzuconych.",
+        "Turnieje: 5-minutowy licznik przed meczem, automatyczny walkower, jeśli gracz nie dołączy.",
+        "Turnieje: 90-sekundowy licznik mulliganu, automatyczny walkower przy bezczynności.",
+        "Koniec z prośbą o wybór talii w turnieju (już zablokowana przy zapisie).",
+        "Znacznie więcej gier jest teraz zapisywanych i tworzy powtórkę.",
+        "Wpisy historii ELO otwierają swoją powtórkę bezpośrednio.",
+        "Wielokrotne kliknięcie Poddaj się nie tworzy już wielu porażek.",
+        "Ekran końca gry pojawia się wcześniej, bez czekania na pełny zapis."
+      ],
       "changes_es": [
         "Sakura Secreta (135): una carta forzada que no se puede jugar va correctamente al descarte.",
         "Torneos: temporizador de 5 minutos antes de un partido, rendición automática si un jugador no se une.",
@@ -3314,6 +3803,9 @@
       "title_fr": "Notation des missions, popups d'effet, replays fidèles",
       "title_en": "Mission scoring, effect popups, faithful replays",
       "title_ja": "ミッション判定、効果ウィンドウ、忠実なリプレイ",
+      "title_pt": "Pontuação de missão, janelas de efeito, replays fiéis",
+      "title_it": "Punteggio delle missioni, finestre di effetto, replay fedeli",
+      "title_pl": "Punktacja misji, okna efektów, wierne powtórki",
       "title_es": "Puntuación de misiones, ventanas de efecto, repeticiones fieles",
       "changes_fr": [
         "La notation des missions ne bloque plus la fin de partie.",
@@ -3339,6 +3831,30 @@
         "マリガンがリプレイに含まれるようになりました。",
         "大蛇丸 変わり身（051）：そのターンの残りのミッションが正しく判定されます。"
       ],
+      "changes_pt": [
+        "A pontuação de missão não bloqueia mais o fim de jogo.",
+        "Janelas de efeito: só rolam se necessário, o botão Confirmar sempre acessível.",
+        "Contador de alvos de Gaara (120) corrigido.",
+        "Os replays correspondem à partida real (chega de personagens duplicados ou estados estranhos).",
+        "O mulligan agora está incluído no replay.",
+        "Orochimaru Substituição (051): as missões restantes do turno são pontuadas."
+      ],
+      "changes_it": [
+        "Il punteggio delle missioni non blocca più la fine della partita.",
+        "Finestre di effetto: scorrono solo se necessario, il pulsante Conferma sempre raggiungibile.",
+        "Contatore dei bersagli di Gaara (120) corretto.",
+        "I replay corrispondono alla partita reale (niente più personaggi duplicati o stati strani).",
+        "Il mulligan ora è incluso nel replay.",
+        "Orochimaru Sostituzione (051): le missioni rimanenti del turno vengono conteggiate."
+      ],
+      "changes_pl": [
+        "Punktacja misji nie blokuje już końca gry.",
+        "Okna efektów: przewijają się tylko w razie potrzeby, przycisk Potwierdź zawsze dostępny.",
+        "Licznik celów Gaary (120) naprawiony.",
+        "Powtórki odpowiadają rzeczywistej grze (koniec ze zduplikowanymi postaciami lub dziwnymi stanami).",
+        "Mulligan jest teraz uwzględniony w powtórce.",
+        "Orochimaru Zamiana (051): pozostałe misje tury są punktowane."
+      ],
       "changes_es": [
         "La puntuación de las misiones ya no bloquea el fin de la partida.",
         "Ventanas de efecto: desplazamiento solo si es necesario, botón Confirmar siempre visible.",
@@ -3354,6 +3870,9 @@
       "title_fr": "Règles officielles, animation d'avant-match, plusieurs cartes corrigées",
       "title_en": "Official rules, pre-match animation, several card fixes",
       "title_ja": "公式ルール、対戦前アニメーション、複数カードの修正",
+      "title_pt": "Regras oficiais, animação pré-partida, várias correções de cartas",
+      "title_it": "Regole ufficiali, animazione pre-partita, diverse correzioni di carte",
+      "title_pl": "Oficjalne zasady, animacja przedmeczowa, kilka poprawek kart",
       "title_es": "Reglas oficiales, animación de antes del partido, varias cartas corregidas",
       "changes_fr": [
         "Classé : la première mission révélée vient toujours du joueur avec l'Edge (règle officielle).",
@@ -3391,6 +3910,42 @@
         "薬師カブト（054）が、選ばせずに対象となるキャラクターを一度にすべて伏せるようになりました。",
         "ランキング上位の見えない -16 の上限がなくなりました：上位は最大 -25 失い、弱いプレイヤーは上位を倒して最大 +25 得られます。"
       ],
+      "changes_pt": [
+        "Ranqueado: a primeira missão revelada sempre vem de quem tem a Vantagem (regra oficial).",
+        "Casual: as missões escolhidas ao acaso são embaralhadas como antes.",
+        "Nova animação pré-partida que mostra o baralho de missões sendo montado, com um botão Pular (Esc, Espaço ou Enter).",
+        "Gemma (049) não devolve mais o turno ao atacante depois do seu sacrifício.",
+        "Itachi Secreta (140) não devolve mais o turno ao seu jogador depois de o adversário reorganizar o descarte.",
+        "Partidas contra uma conta excluída: ELO e estatísticas agora aplicados (partidas recentes corrigidas retroativamente).",
+        "Os efeitos UPGRADE ligados ao AMBUSH não são mais ativados ao jogar a carta diretamente como evolução da mão (Sasuke 014, Kidomaru 124).",
+        "Shikamaru (022) agora vê todos os personagens jogados pelo adversário, incluindo jogadas encadeadas.",
+        "Kabuto Yakushi (054) agora oculta todos os personagens elegíveis de uma vez, sem escolha manual.",
+        "Chega do limite invisível de -16 no topo da tabela: um jogador do topo pode perder até -25, e um jogador mais fraco pode ganhar até +25 ao vencer um deles."
+      ],
+      "changes_it": [
+        "Classificato: la prima missione rivelata proviene sempre da chi detiene il Vantaggio (regola ufficiale).",
+        "Casual: le missioni scelte a caso vengono mischiate come prima.",
+        "Nuova animazione pre-partita che mostra il mazzo delle missioni mentre viene costruito, con un pulsante Salta (Esc, Spazio o Invio).",
+        "Gemma (049) non restituisce più il turno all'attaccante dopo il suo sacrificio.",
+        "Itachi Segreta (140) non restituisce più il turno al suo giocatore dopo che l'avversario riordina i suoi scarti.",
+        "Partite contro un account eliminato: ELO e statistiche ora applicati (partite recenti corrette retroattivamente).",
+        "Gli effetti UPGRADE legati all'AMBUSH non si attivano più giocando la carta direttamente come evoluzione dalla mano (Sasuke 014, Kidomaru 124).",
+        "Shikamaru (022) ora vede ogni personaggio giocato dall'avversario, incluse le giocate concatenate.",
+        "Kabuto Yakushi (054) ora nasconde tutti i personaggi idonei in una volta, senza selezione manuale.",
+        "Niente più il limite invisibile di -16 in cima alla classifica: un giocatore di vertice può perdere fino a -25, e un giocatore più debole può guadagnare fino a +25 battendone uno."
+      ],
+      "changes_pl": [
+        "Rankingowe: pierwsza odkryta misja zawsze pochodzi od posiadacza Przewagi (oficjalna zasada).",
+        "Towarzyskie: losowo wybrane misje są tasowane jak wcześniej.",
+        "Nowa animacja przedmeczowa pokazująca budowanie talii misji, z przyciskiem Pomiń (Esc, Spacja lub Enter).",
+        "Gemma (049) nie oddaje już tury atakującemu po swoim poświęceniu.",
+        "Itachi Sekretna (140) nie oddaje już tury swojemu graczowi po tym, jak przeciwnik uporządkuje swój stos odrzuconych.",
+        "Gry przeciwko usuniętemu kontu: ELO i statystyki są teraz stosowane (ostatnie gry poprawione wstecznie).",
+        "Efekty UPGRADE powiązane z AMBUSH nie aktywują się już przy zagraniu karty bezpośrednio jako ulepszenie z ręki (Sasuke 014, Kidomaru 124).",
+        "Shikamaru (022) widzi teraz każdą postać zagraną przez przeciwnika, w tym połączone zagrania.",
+        "Kabuto Yakushi (054) ukrywa teraz wszystkie kwalifikujące się postacie naraz, bez ręcznego wyboru.",
+        "Koniec z niewidzialnym limitem -16 na szczycie drabinki: czołowy gracz może stracić do -25, a słabszy gracz może zyskać do +25, pokonując go."
+      ],
       "changes_es": [
         "Clasificatorio: la primera misión revelada siempre viene del jugador con la Ventaja (regla oficial).",
         "Casual: las misiones sacadas al azar se barajan como antes.",
@@ -3410,6 +3965,9 @@
       "title_fr": "Comptes en double fusionnés, effets de Neji et Hinata fiables",
       "title_en": "Duplicate accounts merged, Neji and Hinata effects reliable",
       "title_ja": "重複アカウントの統合、日向ネジとヒナタの効果を確実に",
+      "title_pt": "Contas duplicadas mescladas, efeitos de Neji e Hinata confiáveis",
+      "title_it": "Account duplicati uniti, effetti di Neji e Hinata affidabili",
+      "title_pl": "Zduplikowane konta scalone, efekty Nejiego i Hinaty niezawodne",
       "title_es": "Cuentas duplicadas fusionadas, efectos de Neji y Hinata fiables",
       "changes_fr": [
         "21 comptes en double fusionnés : Discord et email pointent vers le même compte.",
@@ -3426,6 +3984,21 @@
         "アドレスが一致する場合、Discordログインが既存のメールアカウントに紐づきます。",
         "日向ネジ（037）POWERUP 1 と日向ヒナタ（031）チャクラ +1 が、キャラクターがどんな方法で場に出ても発動します。"
       ],
+      "changes_pt": [
+        "21 contas duplicadas mescladas: Discord e e-mail agora levam à mesma conta.",
+        "O login do Discord é vinculado à sua conta de e-mail existente se o endereço corresponder.",
+        "O POWERUP 1 de Neji (037) e o +1 Chakra de Hinata (031) são ativados quando um personagem entra em jogo de qualquer forma."
+      ],
+      "changes_it": [
+        "21 account duplicati uniti: Discord ed email ora portano allo stesso account.",
+        "L'accesso con Discord viene collegato al tuo account email esistente se l'indirizzo corrisponde.",
+        "Il POWERUP 1 di Neji (037) e il +1 Chakra di Hinata (031) si attivano quando un personaggio entra in gioco in qualsiasi modo."
+      ],
+      "changes_pl": [
+        "21 zduplikowanych kont scalonych: Discord i e-mail prowadzą teraz do tego samego konta.",
+        "Logowanie przez Discord jest łączone z twoim istniejącym kontem e-mail, jeśli adres się zgadza.",
+        "POWERUP 1 Nejiego (037) i +1 Czakra Hinaty (031) aktywują się, gdy postać wchodzi do gry w dowolny sposób."
+      ],
       "changes_es": [
         "21 cuentas duplicadas fusionadas: Discord y correo apuntan a la misma cuenta.",
         "Inicio de sesión de Discord vinculado a tu cuenta de correo existente si la dirección coincide.",
@@ -3438,6 +4011,9 @@
       "title_fr": "Pseudos nettoyés, plusieurs cartes corrigées",
       "title_en": "Usernames cleaned up, several card fixes",
       "title_ja": "ユーザー名の整理、複数カードの修正",
+      "title_pt": "Nomes de usuário limpos, várias correções de cartas",
+      "title_it": "Nomi utente ripuliti, diverse correzioni di carte",
+      "title_pl": "Nazwy użytkowników uporządkowane, kilka poprawek kart",
       "title_es": "Nombres de usuario limpiados, varias cartas corregidas",
       "changes_fr": [
         "126 pseudos nettoyés automatiquement, caractères spéciaux désormais bloqués (lettres, chiffres, tirets et underscores uniquement).",
@@ -3466,6 +4042,33 @@
         "コントロールされたキャラクターは、コントロール元が離れると本来の持ち主に戻ります。奪ってアップグレードしたカードはあなたのものです。",
         "奈良シカマル（111）が、自来也・ヒルゼン・カンクロウに強制されたものを含め、自分のミッションのすべての表化を本当にブロックします。"
       ],
+      "changes_pt": [
+        "126 nomes de usuário limpos automaticamente, caracteres especiais agora bloqueados (só letras, dígitos, hifens e sublinhados).",
+        "Shino (033) + Kurenai (034): combo de custo 0 quando um Jutsu inimigo está na missão.",
+        "Shikamaru (022) realmente tem como alvo todos os personagens jogados pelo adversário, incluindo jogadas encadeadas.",
+        "Choji (018): o movimento usa o poder real (incluindo bônus contínuos).",
+        "Naruto (133) Rasengan: seleção de alvos mais clara, mais tolerante quanto à ordem de clique.",
+        "Os personagens controlados voltam ao seu dono quando o controlador sai. Uma carta roubada que você evolui continua sua.",
+        "Shikamaru (111) realmente bloqueia toda revelação na sua missão, incluindo as forçadas por Jiraiya, Hiruzen ou Kankuro."
+      ],
+      "changes_it": [
+        "126 nomi utente ripuliti automaticamente, caratteri speciali ora bloccati (solo lettere, cifre, trattini e trattini bassi).",
+        "Shino (033) + Kurenai (034): combo a costo 0 quando un Jutsu nemico è nella missione.",
+        "Shikamaru (022) prende davvero di mira ogni personaggio giocato dall'avversario, giocate concatenate incluse.",
+        "Choji (018): lo spostamento usa la potenza reale (inclusi i bonus continui).",
+        "Naruto (133) Rasengan: selezione dei bersagli più chiara, più tollerante sull'ordine dei clic.",
+        "I personaggi controllati tornano al loro proprietario quando il controllore se ne va. Una carta rubata che evolvi resta tua.",
+        "Shikamaru (111) blocca davvero ogni rivelazione sulla sua missione, incluse quelle forzate da Jiraiya, Hiruzen o Kankuro."
+      ],
+      "changes_pl": [
+        "126 nazw użytkowników uporządkowanych automatycznie, znaki specjalne teraz zablokowane (tylko litery, cyfry, myślniki i podkreślenia).",
+        "Shino (033) + Kurenai (034): combo za koszt 0, gdy wrogie Jutsu jest na misji.",
+        "Shikamaru (022) naprawdę bierze za cel każdą postać zagraną przez przeciwnika, wliczając połączone zagrania.",
+        "Choji (018): ruch używa rzeczywistej siły (wliczając ciągłe bonusy).",
+        "Naruto (133) Rasengan: czytelniejszy wybór celów, bardziej wybaczający pod względem kolejności klikania.",
+        "Kontrolowane postacie wracają do właściciela, gdy kontroler odchodzi. Ukradziona karta, którą ulepszysz, pozostaje twoja.",
+        "Shikamaru (111) naprawdę blokuje każde odkrycie na swojej misji, w tym te wymuszone przez Jiraiyę, Hiruzena lub Kankuro."
+      ],
       "changes_es": [
         "126 nombres de usuario limpiados automáticamente, caracteres especiales ahora bloqueados (solo letras, números, guiones y guiones bajos).",
         "Shino (033) + Kurenai (034): combo coste 0 cuando hay un Jutsu enemigo en la misión.",
@@ -3482,6 +4085,9 @@
       "title_fr": "Ajustement du système ELO",
       "title_en": "ELO system tuning",
       "title_ja": "ELOシステムの調整",
+      "title_pt": "Ajuste do sistema de ELO",
+      "title_it": "Messa a punto del sistema ELO",
+      "title_pl": "Strojenie systemu ELO",
       "title_es": "Ajuste del sistema ELO",
       "changes_fr": [
         "Vous gagnez au moins 10 points ELO à chaque victoire, même contre un adversaire plus faible.",
@@ -3498,6 +4104,21 @@
         "1回の敗北で25ELOより多く失うことはなくなりました。",
         "対戦終了時に表示される増減が、プロフィールに適用される変動と正確に一致します。"
       ],
+      "changes_pt": [
+        "Você ganha pelo menos 10 pontos de ELO em cada vitória, mesmo contra um adversário mais fraco.",
+        "Você não pode mais perder mais de 25 pontos de ELO em uma única derrota.",
+        "O ganho ou a perda mostrada no fim da partida corresponde exatamente ao que é aplicado ao seu perfil."
+      ],
+      "changes_it": [
+        "Guadagni almeno 10 punti ELO a ogni vittoria, anche contro un avversario più debole.",
+        "Non puoi più perdere più di 25 punti ELO in una singola sconfitta.",
+        "Il guadagno o la perdita mostrata alla fine della partita corrisponde esattamente a ciò che viene applicato al tuo profilo."
+      ],
+      "changes_pl": [
+        "Zyskujesz co najmniej 10 punktów ELO za każdą wygraną, nawet przeciwko słabszemu przeciwnikowi.",
+        "Nie możesz już stracić więcej niż 25 punktów ELO w jednej porażce.",
+        "Zysk lub strata pokazana na końcu gry odpowiada dokładnie temu, co jest stosowane do twojego profilu."
+      ],
       "changes_es": [
         "Ganas al menos 10 puntos de ELO en cada victoria, incluso contra un rival más débil.",
         "Ya no puedes perder más de 25 puntos de ELO en una sola derrota.",
@@ -3510,6 +4131,9 @@
       "title_fr": "Historique ELO public et plusieurs ajustements de règles",
       "title_en": "Public ELO history and several rule adjustments",
       "title_ja": "ELO履歴の公開と複数のルール調整",
+      "title_pt": "Histórico de ELO público e vários ajustes de regras",
+      "title_it": "Cronologia ELO pubblica e diversi aggiustamenti alle regole",
+      "title_pl": "Publiczna historia ELO i kilka korekt zasad",
       "title_es": "Historial de ELO público y varios ajustes de reglas",
       "changes_fr": [
         "Courbe d'ELO sur 14 jours visible sur ton profil avec les adversaires rencontrés.",
@@ -3550,6 +4174,45 @@
         "月光ハヤテ（048）と不知火ゲンマ（049）が同名禁止に従います。",
         "コントロールされたキャラクターは、場を離れると本来の持ち主に戻ります。"
       ],
+      "changes_pt": [
+        "Curva de ELO de 14 dias no seu perfil com os adversários que você enfrentou.",
+        "As partidas jogadas são mantidas por 72 horas para você poder assistir aos replays.",
+        "Detecção automática de suspeitos de farm de ELO (IPs compartilhados, contas criadas juntas, desistências curtas).",
+        "Sasuke (136) deve derrotar um personagem quando possível.",
+        "Sakon (062) copia corretamente a emboscada de Kidomaru.",
+        "Itachi (140) pode assumir o controle de qualquer personagem.",
+        "Tayuya (125) só tem como alvo cartas na mão.",
+        "Jirobo (122) conta a si mesmo no seu efeito.",
+        "Shino (115) não pode mais ser copiado.",
+        "Hayate (048) e Gemma (049) respeitam a regra de não repetição.",
+        "Os personagens controlados voltam ao seu dono quando saem de jogo."
+      ],
+      "changes_it": [
+        "Curva ELO di 14 giorni sul tuo profilo con gli avversari che hai affrontato.",
+        "Le partite giocate vengono conservate per 72 ore così puoi guardare i replay.",
+        "Rilevamento automatico dei sospetti di farming di ELO (IP condivisi, account creati insieme, rinunce rapide).",
+        "Sasuke (136) deve sconfiggere un personaggio quando possibile.",
+        "Sakon (062) copia correttamente l'imboscata di Kidomaru.",
+        "Itachi (140) può prendere il controllo di qualsiasi personaggio.",
+        "Tayuya (125) prende di mira solo le carte in mano.",
+        "Jirobo (122) conta se stesso nel suo effetto.",
+        "Shino (115) non può più essere copiato.",
+        "Hayate (048) e Gemma (049) rispettano la regola di non ripetizione.",
+        "I personaggi controllati tornano al loro proprietario quando escono di gioco."
+      ],
+      "changes_pl": [
+        "14-dniowa krzywa ELO na twoim profilu z przeciwnikami, z którymi grałeś.",
+        "Rozegrane gry są przechowywane przez 72 godziny, abyś mógł obejrzeć powtórki.",
+        "Automatyczne wykrywanie podejrzanych o farmienie ELO (współdzielone IP, konta tworzone razem, szybkie walkowery).",
+        "Sasuke (136) musi pokonać postać, gdy jest to możliwe.",
+        "Sakon (062) poprawnie kopiuje zasadzkę Kidomaru.",
+        "Itachi (140) może przejąć kontrolę nad dowolną postacią.",
+        "Tayuya (125) bierze za cel tylko karty w ręce.",
+        "Jirobo (122) liczy siebie w swoim efekcie.",
+        "Shino (115) nie może już zostać skopiowany.",
+        "Hayate (048) i Gemma (049) przestrzegają zasady braku powtórzeń.",
+        "Kontrolowane postacie wracają do właściciela, gdy opuszczają grę."
+      ],
       "changes_es": [
         "Curva de ELO de 14 días visible en tu perfil con los rivales enfrentados.",
         "Partidas conservadas 72 horas para volver a ver las repeticiones.",
@@ -3570,6 +4233,9 @@
       "title_fr": "Confort de jeu et anti-troll",
       "title_en": "Quality of life and anti-trolling",
       "title_ja": "プレイの快適さと荒らし対策",
+      "title_pt": "Qualidade de vida e antitrollagem",
+      "title_it": "Qualità della vita e anti-trolling",
+      "title_pl": "Udogodnienia i przeciwdziałanie trollowaniu",
       "title_es": "Comodidad de juego y anti-troll",
       "changes_fr": [
         "Bouton Annuler disponible sur tous les effets optionnels.",
@@ -3595,6 +4261,30 @@
         "再戦ボタンがすべてのモードで動作します。",
         "負のパワーが存在します。ミッションに勝つには合計で最低1パワーが必要です。"
       ],
+      "changes_pt": [
+        "Botão Cancelar em cada efeito opcional.",
+        "As setas de ordenação da mão mostram Esquerda e Direita em vez de caracteres ilegíveis.",
+        "Desistência automática após 3 desconexões na mesma partida.",
+        "O cronômetro de desconexão começa corretamente quando um adversário sai.",
+        "O botão Revanche funciona em todos os modos.",
+        "O poder negativo existe. Você ainda precisa de pelo menos 1 de poder total para vencer uma missão."
+      ],
+      "changes_it": [
+        "Pulsante Annulla su ogni effetto opzionale.",
+        "Le frecce di ordinamento della mano mostrano Sinistra e Destra invece di caratteri illeggibili.",
+        "Rinuncia automatica dopo 3 disconnessioni nella stessa partita.",
+        "Il timer di disconnessione parte correttamente quando un avversario se ne va.",
+        "Il pulsante Rivincita funziona in ogni modalità.",
+        "La potenza negativa esiste. Ti serve comunque almeno 1 di potenza totale per vincere una missione."
+      ],
+      "changes_pl": [
+        "Przycisk Anuluj przy każdym opcjonalnym efekcie.",
+        "Strzałki sortowania ręki pokazują W lewo i W prawo zamiast nieczytelnych znaków.",
+        "Automatyczny walkower po 3 rozłączeniach w tej samej grze.",
+        "Licznik rozłączenia startuje poprawnie, gdy przeciwnik odchodzi.",
+        "Przycisk Rewanż działa w każdym trybie.",
+        "Ujemna siła istnieje. Wciąż potrzebujesz co najmniej 1 łącznej siły, aby wygrać misję."
+      ],
       "changes_es": [
         "Botón Cancelar disponible en todos los efectos opcionales.",
         "Las flechas de ordenación en la mano muestran Izquierda y Derecha en lugar de caracteres ilegibles.",
@@ -3610,6 +4300,9 @@
       "title_fr": "Support mobile",
       "title_en": "Mobile support",
       "title_ja": "モバイル対応",
+      "title_pt": "Suporte para celular",
+      "title_it": "Supporto mobile",
+      "title_pl": "Obsługa telefonu",
       "title_es": "Soporte móvil",
       "changes_fr": [
         "Plateau retravaillé pour les téléphones : 4 cartes par mission visibles avant scroll.",
@@ -3625,6 +4318,21 @@
         "スマホ向けに盤面を改良：スクロール前にミッションごとに4枚が見えます。",
         "手札のカードとミッションの枠を縮小して場所を確保。",
         "モバイルで並べ替えボタンを非表示。"
+      ],
+      "changes_pt": [
+        "Tabuleiro reformulado para celulares: 4 cartas por missão visíveis antes de rolar.",
+        "As cartas da mão e os espaços de missão foram reduzidos para deixar mais espaço.",
+        "Botões de ordenação ocultos no celular."
+      ],
+      "changes_it": [
+        "Tavolo rielaborato per i telefoni: 4 carte per missione visibili prima di scorrere.",
+        "Le carte in mano e gli spazi delle missioni sono stati ridotti per lasciare più spazio.",
+        "Pulsanti di ordinamento nascosti su mobile."
+      ],
+      "changes_pl": [
+        "Plansza przerobiona pod telefony: 4 karty na misję widoczne przed przewijaniem.",
+        "Karty w ręce i sloty misji zmniejszone, aby zostawić więcej miejsca.",
+        "Przyciski sortowania ukryte na telefonie."
       ],
       "changes_es": [
         "Tablero rediseñado para teléfonos: 4 cartas por misión visibles antes de desplazar.",
