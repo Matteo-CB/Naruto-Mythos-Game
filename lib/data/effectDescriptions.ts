@@ -1,4 +1,4 @@
-import { allEffectDescriptionsEn, allEffectDescriptionsFr, allEffectDescriptionsEs, allEffectDescriptionsJa } from './sets';
+import { allEffectDescriptionsEn, allEffectDescriptionsFr, allEffectDescriptionsEs, allEffectDescriptionsJa, allEffectDescriptionsPt, allEffectDescriptionsIt, allEffectDescriptionsPl } from './sets';
 
 type DescMap = Record<string, string[]>;
 
@@ -7,6 +7,9 @@ const LOCALE_MAPS: Record<string, DescMap> = {
   fr: allEffectDescriptionsFr,
   es: allEffectDescriptionsEs,
   ja: allEffectDescriptionsJa,
+  pt: allEffectDescriptionsPt,
+  it: allEffectDescriptionsIt,
+  pl: allEffectDescriptionsPl,
 };
 
 function pick(map: DescMap | undefined, cardId: string, raFallbackId: string | undefined): string[] | undefined {

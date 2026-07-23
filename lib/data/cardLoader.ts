@@ -16,10 +16,16 @@ interface RawJsonCard {
   name_fr: string;
   name_ja?: string;
   name_es?: string;
+  name_pt?: string;
+  name_it?: string;
+  name_pl?: string;
   title_fr: string;
   title_en: string;
   title_ja?: string;
   title_es?: string;
+  title_pt?: string;
+  title_it?: string;
+  title_pl?: string;
   has_visual: boolean;
   chakra: number | '';
   power: number | '';
@@ -55,6 +61,12 @@ function normalizeCard(raw: RawJsonCard): CardData {
     title_ja: raw.title_ja || undefined,
     name_es: raw.name_es || undefined,
     title_es: raw.title_es || undefined,
+    name_pt: raw.name_pt || undefined,
+    title_pt: raw.title_pt || undefined,
+    name_it: raw.name_it || undefined,
+    title_it: raw.title_it || undefined,
+    name_pl: raw.name_pl || undefined,
+    title_pl: raw.title_pl || undefined,
     rarity: raw.rarity as Rarity,
     card_type: raw.card_type,
     attach_to: raw.attach_to || undefined,
