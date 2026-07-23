@@ -1,4 +1,4 @@
-export type SetStatus = 'available' | 'coming_soon';
+export type SetStatus = 'available' | 'revealing' | 'coming_soon';
 
 export interface SetDescriptor {
   id: string;
@@ -60,6 +60,26 @@ export function getAvailableSetIds(): string[] {
 }
 
 export function isSetAvailable(setId: string): boolean {
+  return SET_REGISTRY[setId]?.status === 'available';
+}
+
+// A set that is currently being revealed: its cards are playable in constructed/casual
+// but are automatically banned in ranked, and individual cards are hidden until revealed.
+export function isSetRevealing(setId: string): boolean {
+  return SET_REGISTRY[setId]?.status === 'revealing';
+}
+
+// Sets whose cards can be used in constructed (casual) decks: released + revealing.
+export function getPlayableSetIds(): string[] {
+  return ALL_SET_IDS.filter((id) => {
+    const s = SET_REGISTRY[id].status;
+    return s === 'available' || s === 'revealing';
+  });
+}
+
+// Sets whose cards are legal in RANKED play: released ('available') only.
+// Cards from a revealing set are auto-banned in ranked.
+export function isSetRankedLegal(setId: string): boolean {
   return SET_REGISTRY[setId]?.status === 'available';
 }
 
