@@ -13,5 +13,50 @@
     "pt": "Português",
     "it": "Italiano",
     "pl": "Polski"
+  },
+  "cardMeta": {
+    "group": {
+      "Leaf Village": "Villaggio della Foglia",
+      "Sand Village": "Villaggio della Sabbia",
+      "Sound Village": "Villaggio del Suono",
+      "Akatsuki": "Akatsuki",
+      "Independent": "Indipendente"
+    },
+    "keyword": {
+      "Team 7": "Squadra 7",
+      "Team 8": "Squadra 8",
+      "Team 10": "Squadra 10",
+      "Team Guy": "Squadra Guy",
+      "Team Baki": "Squadra Baki",
+      "Sannin": "Sannin",
+      "Summon": "Evocazione",
+      "Hokage": "Hokage",
+      "Rogue Ninja": "Ninja Rinnegato",
+      "Sound Four": "Quartetto del Suono",
+      "Sound Ninja": "Ninja del Suono",
+      "Kekkei Genkai": "Kekkei Genkai",
+      "Taijutsu": "Taijutsu",
+      "Jutsu": "Jutsu",
+      "Weapon": "Arma",
+      "Tailed Beast": "Cercoterio",
+      "Ninja Hound": "Cane Ninja",
+      "Ninja Pig": "Maiale Ninja",
+      "Special Jonin": "Jonin Speciale"
+    },
+    "rarity": {
+      "C": "Comune", "UC": "Non Comune", "R": "Rara", "RA": "Arte Rara",
+      "S": "Segreta", "SV": "Segreta V", "M": "Mythos", "MV": "Mythos V",
+      "L": "Leggendaria", "SP": "Speciale", "SPV": "Speciale V",
+      "POP": "Pop", "POPV": "Pop V", "CHIBI": "Chibi", "CHIBIV": "Chibi V",
+      "MMS": "Missione"
+    },
+    "raritySuffix": {
+      "C": "Comune", "UC": "Non Comune", "R": "Rara", "RA": "Arte Rara",
+      "S": "Segreta", "SV": "Variante Segreta", "M": "Mythos", "MV": "Variante Mythos",
+      "L": "Leggendaria", "SP": "Speciale", "SPV": "Variante Speciale",
+      "POP": "Pop", "POPV": "Variante Pop", "CHIBI": "Chibi", "CHIBIV": "Variante Chibi",
+      "MMS": "Missione"
+    },
+    "holo": "Holo"
   }
 }

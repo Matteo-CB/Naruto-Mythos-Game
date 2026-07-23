@@ -13,5 +13,50 @@
     "pt": "Português",
     "it": "Italiano",
     "pl": "Polski"
+  },
+  "cardMeta": {
+    "group": {
+      "Leaf Village": "Vila da Folha",
+      "Sand Village": "Vila da Areia",
+      "Sound Village": "Vila do Som",
+      "Akatsuki": "Akatsuki",
+      "Independent": "Independente"
+    },
+    "keyword": {
+      "Team 7": "Time 7",
+      "Team 8": "Time 8",
+      "Team 10": "Time 10",
+      "Team Guy": "Time Guy",
+      "Team Baki": "Time Baki",
+      "Sannin": "Sannin",
+      "Summon": "Invocação",
+      "Hokage": "Hokage",
+      "Rogue Ninja": "Ninja Renegado",
+      "Sound Four": "Quarteto do Som",
+      "Sound Ninja": "Ninja do Som",
+      "Kekkei Genkai": "Kekkei Genkai",
+      "Taijutsu": "Taijutsu",
+      "Jutsu": "Jutsu",
+      "Weapon": "Arma",
+      "Tailed Beast": "Fera com Cauda",
+      "Ninja Hound": "Cão Ninja",
+      "Ninja Pig": "Porco Ninja",
+      "Special Jonin": "Jonin Especial"
+    },
+    "rarity": {
+      "C": "Comum", "UC": "Incomum", "R": "Rara", "RA": "Arte Rara",
+      "S": "Secreta", "SV": "Secreta V", "M": "Mythos", "MV": "Mythos V",
+      "L": "Lendária", "SP": "Especial", "SPV": "Especial V",
+      "POP": "Pop", "POPV": "Pop V", "CHIBI": "Chibi", "CHIBIV": "Chibi V",
+      "MMS": "Missão"
+    },
+    "raritySuffix": {
+      "C": "Comum", "UC": "Incomum", "R": "Rara", "RA": "Arte Rara",
+      "S": "Secreta", "SV": "Variante Secreta", "M": "Mythos", "MV": "Variante Mythos",
+      "L": "Lendária", "SP": "Especial", "SPV": "Variante Especial",
+      "POP": "Pop", "POPV": "Variante Pop", "CHIBI": "Chibi", "CHIBIV": "Variante Chibi",
+      "MMS": "Missão"
+    },
+    "holo": "Holo"
   }
 }
