@@ -58,5 +58,163 @@
       "MMS": "Missione"
     },
     "holo": "Holo"
+  },
+  "common": {
+    "back": "Indietro",
+    "cancel": "Annulla",
+    "confirm": "Conferma",
+    "save": "Salva",
+    "delete": "Elimina",
+    "loading": "Caricamento...",
+    "error": "Si è verificato un errore",
+    "signIn": "Accedi",
+    "signOut": "Esci",
+    "register": "Registrati",
+    "language": "Lingua",
+    "legal": "Note legali",
+    "createdBy": "Creato da",
+    "previous": "Precedente",
+    "next": "Successivo",
+    "page": "Pagina",
+    "rotateDevice": "Ruota il dispositivo in modalità orizzontale per giocare",
+    "fullscreen": "Schermo intero",
+    "play": "Gioca",
+    "close": "Chiudi",
+    "all": "Tutti",
+    "maintenanceBanner": "Manutenzione del server in arrivo. Nessuna nuova partita può iniziare dopo la tua partita attuale. Il sito tornerà tra pochi minuti.",
+    "home": "Home",
+    "comingSoon": "Prossimamente",
+    "menu": "Menu",
+    "dismiss": "Ignora",
+    "connection": {
+      "reconnecting": "Riconnessione",
+      "offline": "Offline",
+      "retry": "Riprova"
+    },
+    "ok": "OK"
+  },
+  "flag": {
+    "none": "Nessuna bandiera",
+    "search": "Cerca un paese...",
+    "noResults": "Nessun paese trovato",
+    "label": "Bandiera del paese",
+    "hint": "Mostrata accanto al tuo nome nella classifica e sul tuo profilo."
+  },
+  "breadcrumbs": {
+    "root": "Naruto Mythos TCG",
+    "page": {
+      "collection": "Collezione di Carte",
+      "deck-builder": "Costruttore di Mazzi",
+      "leaderboard": "Classifica ELO",
+      "login": "Accedi",
+      "register": "Crea Account",
+      "legal": "Note Legali",
+      "friends": "Amici"
+    },
+    "play": {
+      "ai": "Gioca contro l'IA",
+      "online": "Gioca Online"
+    }
+  },
+  "rootMeta": {
+    "titleDefault": "Naruto Mythos TCG - Gioco di Carte Online",
+    "titleTemplate": "%s | Naruto Mythos TCG",
+    "description": "Gioca gratis al Naruto Mythos Trading Card Game online. Affronta un'IA intelligente su 4 livelli di difficoltà o sfida altri giocatori nel multiplayer in tempo reale. Costruisci il tuo mazzo strategico con 186 carte uniche ispirate a Naruto Shippuden, colleziona carte rare e scala la classifica competitiva ELO. Gioco di carte collezionabili gratuito con costruttore di mazzi e sistema di matchmaking.",
+    "ogTitle": "Naruto Mythos TCG - Gioco di Carte Naruto Online e Gratis",
+    "ogDescription": "Gioco di carte di Naruto Shippuden online e gratis. 186 carte uniche, IA intelligente, multiplayer in tempo reale, costruttore di mazzi e classifica ELO. Gioca ora, senza download.",
+    "ogImageAlt": "Naruto Mythos TCG - Gioco di Carte Collezionabili",
+    "twitterTitle": "Naruto Mythos TCG - Gioco di Carte Naruto Gratis",
+    "twitterDescription": "Gioco di carte di Naruto Shippuden gratis. 186 carte, IA su 4 livelli, multiplayer in tempo reale, costruttore di mazzi e classifica ELO. Gioca ora nel browser.",
+    "keywords": [
+      "Naruto", "TCG", "Gioco di Carte Collezionabili", "gioco di carte", "Naruto Mythos", "Naruto Mythos TCG", "carta Naruto", "gioco online", "gioco online gratis", "costruttore di mazzi", "ELO", "classifica ELO", "multiplayer", "gioco di carte anime", "gioco di carte collezionabili", "gioco di carte Naruto online", "gioco di carte Naruto gratis", "giocare al gioco di carte Naruto", "Naruto Shippuden", "gioco di carte Naruto Shippuden", "gioco di carte strategico", "gioco di carte Naruto online gratis", "Naruto TCG online gratis", "Naruto trading card game online", "gioco di carte anime gratis", "gioco di carte ninja", "gioco Naruto gratis", "Sasuke", "Kakashi", "Sakura", "Itachi", "Gaara", "CCG", "giocare a Naruto online", "gioco di carte multiplayer", "gioco di carte competitivo", "gioco di carte classificato", "costruire mazzo Naruto", "gioco di carte online gratis", "gioco di carte browser", "gioco per fan di Naruto"
+    ]
+  },
+  "a11y": {
+    "hiddenCard": "Carta nascosta",
+    "cardBack": "Retro della carta",
+    "topMenu": "Menu superiore",
+    "language": "Lingua",
+    "english": "English",
+    "french": "Français",
+    "mainNavigation": "Navigazione principale"
+  },
+  "notify": {
+    "warnTitle": "Avviso",
+    "warnBody": "Un moderatore ti ha inviato un avviso: {reason}. Rispetta gli altri giocatori. Ulteriori infrazioni porteranno a sanzioni più severe.",
+    "warnSevereTitle": "Avviso finale",
+    "warnSevereBody": "Questo è il tuo avviso finale: {reason}. La prossima infrazione comporterà la sospensione della chat o dell'account.",
+    "sanctionTitle": "Sanzione",
+    "victimTitle": "Segnalazione gestita",
+    "victimBody": "La tua segnalazione è stata esaminata e il giocatore coinvolto è stato sanzionato. Grazie per aiutarci a mantenere la comunità accogliente.",
+    "nameResetTitle": "Cambia il tuo nome utente",
+    "nameResetBody": "Il tuo nome utente non rispetta le regole della comunità. Scegline uno nuovo per continuare a giocare.",
+    "sanction": {
+      "muteTimed": "La tua chat è sospesa fino al {date}. Motivo: {reason}.",
+      "mutePermanent": "La tua chat è sospesa permanentemente. Motivo: {reason}.",
+      "rankedBan": "La modalità classificata ti è preclusa fino al {date}. Motivo: {reason}.",
+      "suspensionTimed": "Il tuo account è sospeso fino al {date}. Motivo: {reason}.",
+      "suspensionPermanent": "Il tuo account è sospeso permanentemente. Motivo: {reason}.",
+      "spectateBan": "Non puoi più guardare le partite degli altri giocatori fino al {date}. Motivo: {reason}.",
+      "spectateBanPermanent": "Non puoi più guardare le partite degli altri giocatori. Motivo: {reason}."
+    },
+    "nameResetButton": "Conferma nuovo nome utente",
+    "suspendedTitle": "Account sospeso"
+  },
+  "maintenance": {
+    "title": "NARUTO MYTHOS",
+    "subtitle": "Trading Card Game",
+    "message": "Il simulatore è in manutenzione. L'aggiornamento richiede circa 5 minuti.",
+    "timerLabel": "Tempo trascorso",
+    "statusOffline": "Server offline"
+  },
+  "errorPage": {
+    "title": "Qualcosa è andato storto",
+    "defaultMessage": "Si è verificato un errore imprevisto.",
+    "tryAgain": "Riprova",
+    "home": "Home"
+  },
+  "legal": {
+    "back": "Indietro",
+    "title": "Note Legali e Privacy",
+    "legalNotice": "Note Legali",
+    "editor": "Editore del Sito",
+    "editorText": "HiddenLab\nSIRET: 980 715 809 00011\nDirettore della Pubblicazione: HiddenLab\nContatto: contact@metalya.fr",
+    "hosting": "Hosting",
+    "hostingText": "Questo sito è ospitato su un server VPS privato fornito da IONOS SE, Elgendorfer Str. 57, 56410 Montabaur, Germania.",
+    "intellectual": "Proprietà Intellettuale",
+    "intellectualText": "L'intero sito è soggetto alla legislazione francese e internazionale sul diritto d'autore e sulla proprietà intellettuale. Tutti i diritti di riproduzione sono riservati, inclusi i documenti scaricabili e le rappresentazioni iconografiche e fotografiche.\n\nNaruto e tutti i personaggi, i nomi e gli elementi correlati sono marchi di Masashi Kishimoto, Shueisha, Studio Pierrot e dei rispettivi proprietari. I design delle carte e le meccaniche di gioco si basano sul Naruto Mythos Trading Card Game, proprietà di Cicaboom Srl.\n\nQuesto simulatore è un progetto senza scopo di lucro creato a fini educativi e di intrattenimento. Non è affiliato né approvato da Cicaboom, Shueisha o qualsiasi altro titolare dei diritti.",
+    "privacyPolicy": "Informativa sulla Privacy",
+    "privacyIntro": "La protezione dei tuoi dati personali è importante per noi. Questa informativa spiega quali dati raccogliamo, come li utilizziamo e quali sono i tuoi diritti.",
+    "dataCollected": "Dati Raccolti",
+    "dataCollectedText": "Quando ti registri e utilizzi il sito, raccogliamo i seguenti dati:\n- Nome utente (scelto da te)\n- Indirizzo email\n- Password (memorizzata in forma cifrata, mai in chiaro)\n- Statistiche di gioco (ELO, vittorie, sconfitte, pareggi)\n- Mazzi creati e salvati\n- Cronologia delle partite\n- ID Discord (se colleghi volontariamente il tuo account)",
+    "dataPurpose": "Finalità del Trattamento",
+    "dataPurposeText": "I tuoi dati sono utilizzati esclusivamente per:\n- Creare e gestire il tuo account giocatore\n- Gestire il sistema di classifica (ELO)\n- Salvare i tuoi mazzi e i replay delle partite\n- Matchmaking online e gestione delle stanze di gioco\n- Integrazione opzionale con Discord (notifiche di rango)\n- Moderazione della chat di gioco",
+    "dataStorage": "Archiviazione e Sicurezza",
+    "dataStorageText": "I tuoi dati sono archiviati in un database MongoDB ospitato su server sicuri. Le password sono cifrate con bcrypt. Le comunicazioni sono cifrate tramite HTTPS. Nessun dato di pagamento viene raccolto (il servizio è del tutto gratuito).",
+    "dataDuration": "Conservazione dei Dati",
+    "dataDurationText": "I tuoi dati sono conservati finché il tuo account è attivo. I replay delle partite vengono eliminati automaticamente dopo 7 giorni. Puoi richiedere la cancellazione del tuo account e di tutti i tuoi dati in qualsiasi momento.",
+    "dataSharing": "Condivisione dei Dati",
+    "dataSharingText": "Non vendiamo, affittiamo né condividiamo i tuoi dati personali con terzi per scopi commerciali. L'unica condivisione avviene con:\n- IONOS (hosting del server VPS)\n- MongoDB Atlas (archiviazione dati)\n- Discord (se colleghi il tuo account, solo il tuo ID Discord)",
+    "cookies": "Cookie",
+    "cookiesText": "Questo sito utilizza solo cookie tecnici essenziali necessari al funzionamento del servizio (sessione di autenticazione). Non vengono utilizzati cookie pubblicitari o di tracciamento.",
+    "userRights": "I Tuoi Diritti",
+    "userRightsText": "In conformità con il Regolamento Generale sulla Protezione dei Dati (GDPR), hai i seguenti diritti:\n- Diritto di accesso ai tuoi dati personali\n- Diritto di rettifica dei tuoi dati\n- Diritto alla cancellazione dei tuoi dati\n- Diritto alla portabilità dei dati\n- Diritto di opporti al trattamento\n\nPer esercitare questi diritti, contattaci all'indirizzo: contact@metalya.fr",
+    "contact": "Contatto",
+    "contactText": "Per qualsiasi domanda sulla protezione dei tuoi dati o sulle note legali:\n\nHiddenLab\nEmail: contact@metalya.fr\nSito web:",
+    "lastUpdated": "Ultimo aggiornamento: {date}",
+    "chatModeration": "Moderazione automatica della chat",
+    "chatModerationText": "I messaggi della chat vengono analizzati automaticamente da un servizio di moderazione (API di moderazione di OpenAI) per rilevare insulti, incitamento all'odio e molestie in qualsiasi lingua. Viene inviato solo il testo del messaggio, mai la tua email o i dati dell'account. I messaggi rilevati come offensivi possono essere rimossi automaticamente e revisionati dal team di moderazione. I registri di analisi sono conservati per 30 giorni."
+  },
+  "deckStats": {
+    "title": "Statistiche del mazzo (ultimi 90 giorni)",
+    "winrate": "Percentuale di vittorie",
+    "noGamesYet": "Ancora nessuna partita online con questo mazzo.",
+    "games": "{n} partite",
+    "never": "Mai giocato",
+    "justNow": "Appena giocato",
+    "minutesAgo": "{n}min fa",
+    "hoursAgo": "{n}h fa",
+    "daysAgo": "{n}g fa",
+    "weeksAgo": "{n}sett fa"
   }
 }

@@ -58,5 +58,163 @@
       "MMS": "Misja"
     },
     "holo": "Holo"
+  },
+  "common": {
+    "back": "Wstecz",
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "save": "Zapisz",
+    "delete": "Usuń",
+    "loading": "Ładowanie...",
+    "error": "Wystąpił błąd",
+    "signIn": "Zaloguj się",
+    "signOut": "Wyloguj się",
+    "register": "Zarejestruj się",
+    "language": "Język",
+    "legal": "Nota prawna",
+    "createdBy": "Stworzone przez",
+    "previous": "Poprzednia",
+    "next": "Następna",
+    "page": "Strona",
+    "rotateDevice": "Obróć urządzenie do trybu poziomego, aby zagrać",
+    "fullscreen": "Pełny ekran",
+    "play": "Graj",
+    "close": "Zamknij",
+    "all": "Wszystkie",
+    "maintenanceBanner": "Nadchodzi konserwacja serwera. Po bieżącej partii nie można rozpocząć nowych gier. Strona wróci za kilka minut.",
+    "home": "Strona główna",
+    "comingSoon": "Wkrótce",
+    "menu": "Menu",
+    "dismiss": "Odrzuć",
+    "connection": {
+      "reconnecting": "Ponowne łączenie",
+      "offline": "Offline",
+      "retry": "Ponów"
+    },
+    "ok": "OK"
+  },
+  "flag": {
+    "none": "Brak flagi",
+    "search": "Szukaj kraju...",
+    "noResults": "Nie znaleziono kraju",
+    "label": "Flaga kraju",
+    "hint": "Wyświetlana obok Twojej nazwy w rankingu i na profilu."
+  },
+  "breadcrumbs": {
+    "root": "Naruto Mythos TCG",
+    "page": {
+      "collection": "Kolekcja Kart",
+      "deck-builder": "Kreator Talii",
+      "leaderboard": "Ranking ELO",
+      "login": "Zaloguj się",
+      "register": "Utwórz Konto",
+      "legal": "Nota Prawna",
+      "friends": "Znajomi"
+    },
+    "play": {
+      "ai": "Graj z SI",
+      "online": "Graj Online"
+    }
+  },
+  "rootMeta": {
+    "titleDefault": "Naruto Mythos TCG - Gra Karciana Online",
+    "titleTemplate": "%s | Naruto Mythos TCG",
+    "description": "Zagraj za darmo w Naruto Mythos Trading Card Game online. Zmierz się z inteligentną SI na 4 poziomach trudności lub rzuć wyzwanie innym graczom w trybie multiplayer w czasie rzeczywistym. Zbuduj strategiczną talię ze 186 unikalnych kart inspirowanych Naruto Shippuden, kolekcjonuj rzadkie karty i wspinaj się w rywalizacyjnym rankingu ELO. Darmowa kolekcjonerska gra karciana z kreatorem talii i systemem doboru graczy.",
+    "ogTitle": "Naruto Mythos TCG - Darmowa Gra Karciana Naruto Online",
+    "ogDescription": "Darmowa gra karciana Naruto Shippuden online. 186 unikalnych kart, inteligentna SI, multiplayer w czasie rzeczywistym, kreator talii i ranking ELO. Zagraj teraz, bez pobierania.",
+    "ogImageAlt": "Naruto Mythos TCG - Kolekcjonerska Gra Karciana",
+    "twitterTitle": "Naruto Mythos TCG - Darmowa Gra Karciana Naruto",
+    "twitterDescription": "Darmowa gra karciana Naruto Shippuden. 186 kart, SI na 4 poziomach, multiplayer w czasie rzeczywistym, kreator talii i ranking ELO. Zagraj teraz w przeglądarce.",
+    "keywords": [
+      "Naruto", "TCG", "Kolekcjonerska Gra Karciana", "gra karciana", "Naruto Mythos", "Naruto Mythos TCG", "karta Naruto", "gra online", "darmowa gra online", "kreator talii", "ELO", "ranking ELO", "multiplayer", "anime gra karciana", "kolekcjonerska gra karciana", "gra karciana Naruto online", "gra karciana Naruto za darmo", "zagraj w grę karcianą Naruto", "Naruto Shippuden", "gra karciana Naruto Shippuden", "strategiczna gra karciana", "gra karciana Naruto online za darmo", "Naruto TCG online za darmo", "Naruto trading card game online", "darmowa anime gra karciana", "gra karciana ninja", "darmowa gra Naruto", "Sasuke", "Kakashi", "Sakura", "Itachi", "Gaara", "CCG", "graj w Naruto online", "multiplayer gra karciana", "rywalizacyjna gra karciana", "rankingowa gra karciana", "zbuduj talię Naruto", "darmowa gra karciana online", "gra karciana w przeglądarce", "gra fanowska Naruto"
+    ]
+  },
+  "a11y": {
+    "hiddenCard": "Ukryta karta",
+    "cardBack": "Rewers karty",
+    "topMenu": "Górne menu",
+    "language": "Język",
+    "english": "English",
+    "french": "Français",
+    "mainNavigation": "Nawigacja główna"
+  },
+  "notify": {
+    "warnTitle": "Ostrzeżenie",
+    "warnBody": "Moderator udzielił Ci ostrzeżenia: {reason}. Szanuj innych graczy. Kolejne naruszenia doprowadzą do surowszych sankcji.",
+    "warnSevereTitle": "Ostatnie ostrzeżenie",
+    "warnSevereBody": "To jest Twoje ostatnie ostrzeżenie: {reason}. Kolejne naruszenie spowoduje zawieszenie czatu lub konta.",
+    "sanctionTitle": "Sankcja",
+    "victimTitle": "Zgłoszenie rozpatrzone",
+    "victimBody": "Twoje zgłoszenie zostało rozpatrzone, a zamieszany gracz został ukarany. Dziękujemy za pomoc w utrzymaniu przyjaznej społeczności.",
+    "nameResetTitle": "Zmień swoją nazwę użytkownika",
+    "nameResetBody": "Twoja nazwa użytkownika nie przestrzega zasad społeczności. Wybierz nową, aby kontynuować grę.",
+    "sanction": {
+      "muteTimed": "Twój czat jest zawieszony do {date}. Powód: {reason}.",
+      "mutePermanent": "Twój czat jest zawieszony na stałe. Powód: {reason}.",
+      "rankedBan": "Tryb rankingowy jest dla Ciebie zamknięty do {date}. Powód: {reason}.",
+      "suspensionTimed": "Twoje konto jest zawieszone do {date}. Powód: {reason}.",
+      "suspensionPermanent": "Twoje konto jest zawieszone na stałe. Powód: {reason}.",
+      "spectateBan": "Nie możesz już oglądać gier innych graczy do {date}. Powód: {reason}.",
+      "spectateBanPermanent": "Nie możesz już oglądać gier innych graczy. Powód: {reason}."
+    },
+    "nameResetButton": "Potwierdź nową nazwę użytkownika",
+    "suspendedTitle": "Konto zawieszone"
+  },
+  "maintenance": {
+    "title": "NARUTO MYTHOS",
+    "subtitle": "Trading Card Game",
+    "message": "Symulator jest w trakcie konserwacji. Aktualizacja trwa około 5 minut.",
+    "timerLabel": "Czas, który upłynął",
+    "statusOffline": "Serwer offline"
+  },
+  "errorPage": {
+    "title": "Coś poszło nie tak",
+    "defaultMessage": "Wystąpił nieoczekiwany błąd.",
+    "tryAgain": "Spróbuj ponownie",
+    "home": "Strona główna"
+  },
+  "legal": {
+    "back": "Wstecz",
+    "title": "Nota Prawna i Prywatność",
+    "legalNotice": "Nota Prawna",
+    "editor": "Wydawca Strony",
+    "editorText": "HiddenLab\nSIRET: 980 715 809 00011\nDyrektor Publikacji: HiddenLab\nKontakt: contact@metalya.fr",
+    "hosting": "Hosting",
+    "hostingText": "Ta strona jest hostowana na prywatnym serwerze VPS dostarczanym przez IONOS SE, Elgendorfer Str. 57, 56410 Montabaur, Niemcy.",
+    "intellectual": "Własność Intelektualna",
+    "intellectualText": "Cała strona podlega francuskiemu i międzynarodowemu prawu autorskiemu oraz prawu własności intelektualnej. Wszelkie prawa do reprodukcji są zastrzeżone, w tym dokumenty do pobrania oraz przedstawienia ikonograficzne i fotograficzne.\n\nNaruto oraz wszystkie powiązane postacie, nazwy i elementy są znakami towarowymi Masashiego Kishimoto, Shueishy, Studia Pierrot i ich odpowiednich właścicieli. Projekty kart i mechaniki gry są oparte na Naruto Mythos Trading Card Game, będącej własnością Cicaboom Srl.\n\nTen symulator to niekomercyjny projekt stworzony w celach edukacyjnych i rozrywkowych. Nie jest powiązany ani wspierany przez Cicaboom, Shueishę ani żadnego innego właściciela praw.",
+    "privacyPolicy": "Polityka Prywatności",
+    "privacyIntro": "Ochrona Twoich danych osobowych jest dla nas ważna. Ta polityka wyjaśnia, jakie dane zbieramy, jak je wykorzystujemy i jakie masz prawa.",
+    "dataCollected": "Zbierane Dane",
+    "dataCollectedText": "Gdy się rejestrujesz i korzystasz ze strony, zbieramy następujące dane:\n- Nazwa użytkownika (wybrana przez Ciebie)\n- Adres e-mail\n- Hasło (przechowywane w postaci zaszyfrowanej, nigdy jako zwykły tekst)\n- Statystyki gry (ELO, wygrane, przegrane, remisy)\n- Utworzone i zapisane talie\n- Historia gier\n- ID Discord (jeśli dobrowolnie połączysz swoje konto)",
+    "dataPurpose": "Cel Przetwarzania",
+    "dataPurposeText": "Twoje dane są wykorzystywane wyłącznie do:\n- Tworzenia i zarządzania Twoim kontem gracza\n- Obsługi systemu rankingowego (ELO)\n- Zapisywania Twoich talii i powtórek gier\n- Doboru graczy online i zarządzania pokojami gier\n- Opcjonalnej integracji z Discord (powiadomienia o randze)\n- Moderacji czatu w grze",
+    "dataStorage": "Przechowywanie i Bezpieczeństwo",
+    "dataStorageText": "Twoje dane są przechowywane w bazie danych MongoDB hostowanej na bezpiecznych serwerach. Hasła są szyfrowane za pomocą bcrypt. Komunikacja jest szyfrowana przez HTTPS. Nie zbieramy żadnych danych płatniczych (usługa jest całkowicie darmowa).",
+    "dataDuration": "Przechowywanie Danych",
+    "dataDurationText": "Twoje dane są przechowywane tak długo, jak Twoje konto jest aktywne. Powtórki gier są automatycznie usuwane po 7 dniach. W każdej chwili możesz zażądać usunięcia swojego konta i wszystkich danych.",
+    "dataSharing": "Udostępnianie Danych",
+    "dataSharingText": "Nie sprzedajemy, nie wynajmujemy ani nie udostępniamy Twoich danych osobowych stronom trzecim w celach komercyjnych. Jedyne udostępnianie odbywa się z:\n- IONOS (hosting serwera VPS)\n- MongoDB Atlas (przechowywanie danych)\n- Discord (jeśli połączysz swoje konto, tylko Twoje ID Discord)",
+    "cookies": "Pliki cookie",
+    "cookiesText": "Ta strona używa wyłącznie niezbędnych technicznych plików cookie wymaganych do działania usługi (sesja uwierzytelniania). Nie są używane żadne reklamowe ani śledzące pliki cookie.",
+    "userRights": "Twoje Prawa",
+    "userRightsText": "Zgodnie z Ogólnym Rozporządzeniem o Ochronie Danych (RODO) przysługują Ci następujące prawa:\n- Prawo dostępu do swoich danych osobowych\n- Prawo do sprostowania danych\n- Prawo do usunięcia danych\n- Prawo do przenoszenia danych\n- Prawo do sprzeciwu wobec przetwarzania\n\nAby skorzystać z tych praw, skontaktuj się z nami: contact@metalya.fr",
+    "contact": "Kontakt",
+    "contactText": "W przypadku pytań dotyczących ochrony Twoich danych lub noty prawnej:\n\nHiddenLab\nE-mail: contact@metalya.fr\nStrona internetowa:",
+    "lastUpdated": "Ostatnia aktualizacja: {date}",
+    "chatModeration": "Automatyczna moderacja czatu",
+    "chatModerationText": "Wiadomości na czacie są automatycznie analizowane przez usługę moderacji (API moderacji OpenAI) w celu wykrycia obelg, mowy nienawiści i nękania w dowolnym języku. Wysyłany jest tylko tekst wiadomości, nigdy Twój e-mail ani dane konta. Wiadomości wykryte jako obraźliwe mogą zostać automatycznie usunięte i sprawdzone przez zespół moderacji. Zapisy analizy są przechowywane przez 30 dni."
+  },
+  "deckStats": {
+    "title": "Statystyki talii (ostatnie 90 dni)",
+    "winrate": "Wskaźnik zwycięstw",
+    "noGamesYet": "Brak jeszcze gier online z tą talią.",
+    "games": "{n} gier",
+    "never": "Nigdy nie zagrano",
+    "justNow": "Właśnie zagrano",
+    "minutesAgo": "{n}min temu",
+    "hoursAgo": "{n}godz. temu",
+    "daysAgo": "{n}dni temu",
+    "weeksAgo": "{n}tyg. temu"
   }
 }
