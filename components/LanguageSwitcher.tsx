@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { routing } from '@/lib/i18n/routing';
 import { ChangelogButton } from './ChangelogButton';
 import { SurveysButton } from './SurveysButton';
+import { LinkDiscordButton } from './LinkDiscordButton';
 
 type AppLocale = (typeof routing.locales)[number];
 const ACCENT = '#c4a35a';
@@ -37,7 +38,8 @@ export function LanguageSwitcher() {
   }, [open]);
 
   return (
-    <nav className="flex items-center gap-2" aria-label={t('topMenu')}>
+    <nav className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1" aria-label={t('topMenu')}>
+      <LinkDiscordButton />
       <SurveysButton />
       <ChangelogButton />
       <span className="text-xs" style={{ color: '#333333' }} aria-hidden="true">|</span>

@@ -14,7 +14,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, manualPowerMode: true, gamepadEnabled: true, countryCode: true, chatVisibility: true, fastAnimations: true },
+      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, manualPowerMode: true, gamepadEnabled: true, countryCode: true, chatVisibility: true, fastAnimations: true, allowNonFriendMessages: true, privateProfile: true },
     });
 
     return NextResponse.json({
@@ -28,6 +28,8 @@ export async function GET() {
       countryCode: user?.countryCode ?? null,
       chatVisibility: normalizeChatVisibility(user?.chatVisibility),
       fastAnimations: user?.fastAnimations ?? false,
+      allowNonFriendMessages: user?.allowNonFriendMessages ?? true,
+      privateProfile: user?.privateProfile ?? false,
     });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -75,6 +77,12 @@ export async function PATCH(request: NextRequest) {
     }
     if (typeof body.fastAnimations === 'boolean') {
       update.fastAnimations = body.fastAnimations;
+    }
+    if (typeof body.allowNonFriendMessages === 'boolean') {
+      update.allowNonFriendMessages = body.allowNonFriendMessages;
+    }
+    if (typeof body.privateProfile === 'boolean') {
+      update.privateProfile = body.privateProfile;
     }
 
     if (Object.keys(update).length === 0) {

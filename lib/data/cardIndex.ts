@@ -1,5 +1,5 @@
 import type { CardData, CharacterCard, MissionCard } from '../engine/types';
-import { getAllCards, getAllCharacters, getAllMissions, getPlayableCharacters, getPlayableMissions } from './cardLoader';
+import { getAllCards, getAllCharacters, getAllMissions, getPlayableCharacters, getPlayableMissions, augmentRawCards } from './cardLoader';
 import { isHoloId, holoBaseId, isHoloEligibleCard, decorateHoloCard } from '../holo/holoId';
 
 
@@ -108,6 +108,24 @@ function buildRarityMap(): Map<string, CardData[]> {
 
 const _holoCardCache = new Map<string, CardData>();
 const _holoCharCache = new Map<string, CharacterCard>();
+
+export function resetCardIndexCaches(): void {
+  _byId = null;
+  _byOldId = null;
+  _charById = null;
+  _missionById = null;
+  _byName = null;
+  _byGroup = null;
+  _byKeyword = null;
+  _byRarity = null;
+  _holoCardCache.clear();
+  _holoCharCache.clear();
+}
+
+export function augmentCardIndex(cards: Record<string, unknown> | unknown[]): void {
+  augmentRawCards(cards as Record<string, unknown>);
+  resetCardIndexCaches();
+}
 
 export function getCardById(id: string): CardData | undefined {
   if (!_byId) _byId = buildIdMap();

@@ -15,6 +15,7 @@ import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { BreadcrumbJsonLd } from '@/components/Breadcrumbs';
 import { AnimationProvider } from '@/components/AnimationProvider';
 import { GamepadNavigator } from '@/components/gamepad/GamepadNavigator';
+import RevealingCardsLoader from '@/components/RevealingCardsLoader';
 import type { Metadata } from 'next';
 
 const SITE_URL = 'https://narutomythosgame.com';
@@ -169,6 +170,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <GoogleAnalytics />
           <BreadcrumbJsonLd />
         </Suspense>
+        <RevealingCardsLoader />
         <AnimationProvider>{children}</AnimationProvider>
         <NotificationContainer />
         <DMPanel />

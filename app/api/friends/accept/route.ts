@@ -5,6 +5,7 @@ import { emitToUser } from '@/lib/socket/io';
 import { emitQuestEvent } from '@/lib/quests/hooks';
 import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
 import { refreshChatLock } from '@/lib/socket/chatLockBridge';
+import { ensureMutualFollowForFriends } from '@/lib/social/followSync';
 
 ensureQuestPersistenceListener();
 
@@ -69,6 +70,8 @@ export async function POST(request: NextRequest) {
         receiver: { select: { id: true, username: true, elo: true } },
       },
     });
+
+    await ensureMutualFollowForFriends(friendship.senderId, friendship.receiverId);
 
     emitQuestEvent('social.friend.request.accepted', userId);
     emitQuestEvent('social.friend.added', userId);

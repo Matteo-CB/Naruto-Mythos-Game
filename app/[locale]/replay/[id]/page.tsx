@@ -128,6 +128,54 @@ function ShareButton({ gameId }: { gameId: string }) {
   );
 }
 
+function ShareMomentButton({ currentStep }: { currentStep: number }) {
+  const t = useTranslations('feed');
+  const [copied, setCopied] = useState(false);
+
+  const copy = async () => {
+    const url = `${window.location.origin}${window.location.pathname}?action=${currentStep}`;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = url; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  return (
+    <button
+      onClick={copy}
+      className="px-3 py-1 text-[10px] font-medium tracking-wider uppercase transition-colors cursor-pointer"
+      style={{
+        transform: 'skewX(-3deg)',
+        backgroundColor: copied ? 'rgba(62,139,62,0.15)' : 'rgba(10, 10, 18, 0.88)',
+        color: copied ? '#4a9e4a' : '#c4a35a',
+        backdropFilter: 'blur(12px)',
+      }}
+    >
+      <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
+        {copied ? t('shareLinkCopied') : t('shareMoment')}
+      </span>
+    </button>
+  );
+}
+
+function PostReplayButton({ gameId, currentStep }: { gameId: string; currentStep: number }) {
+  const t = useTranslations('feed');
+  return (
+    <Link
+      href={`/feed?replay=${gameId}&action=${currentStep}` as '/'}
+      className="px-3 py-1 text-[10px] font-medium tracking-wider uppercase transition-colors cursor-pointer"
+      style={{ transform: 'skewX(-3deg)', backgroundColor: 'rgba(196,163,90,0.15)', color: '#c4a35a', backdropFilter: 'blur(12px)' }}
+    >
+      <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>{t('postToFeed')}</span>
+    </Link>
+  );
+}
+
 function ScoreOverlay({
   game,
   playerNames,
@@ -981,6 +1029,19 @@ function VisualReplay({
     }
   }, [states.length]);
 
+  const deepLinkApplied = useRef(false);
+  useEffect(() => {
+    if (deepLinkApplied.current || states.length === 0) return;
+    deepLinkApplied.current = true;
+    try {
+      const param = new URLSearchParams(window.location.search).get('action');
+      if (param != null) {
+        const n = parseInt(param, 10);
+        if (Number.isFinite(n)) setCurrentStep(Math.max(0, Math.min(states.length - 1, n)));
+      }
+    } catch { /* ignore */ }
+  }, [states.length]);
+
   const currentState = states[currentStep];
   if (!currentState) return null;
 
@@ -1018,6 +1079,8 @@ function VisualReplay({
           <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>{tr('back')}</span>
         </Link>
         <ShareButton gameId={game.id} />
+        <ShareMomentButton currentStep={currentStep} />
+        <PostReplayButton gameId={game.id} currentStep={currentStep} />
         <button
           onClick={() => setShowLog(!showLog)}
           className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider cursor-pointer"

@@ -46,6 +46,8 @@ export default function SettingsPage() {
     fastAnimations, setFastAnimations,
     countryCode, setCountryCode,
     soundEnabled, setSoundEnabled,
+    allowNonFriendMessages, setAllowNonFriendMessages,
+    privateProfile, setPrivateProfile,
   } = useSettingsStore();
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   useEffect(() => { setIsTouchDevice(isTouchPrimaryDevice()); }, []);
@@ -526,8 +528,58 @@ export default function SettingsPage() {
         </div>
         </div>
 
-        <div className="min-w-0 lg:[&>div]:mt-0">
+        <div className="min-w-0 flex flex-col gap-4 lg:gap-6 lg:[&>div]:mt-0">
           <ChatSettingsSection />
+
+          <div className="flex flex-col gap-4 p-5 lg:p-6" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
+            <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+              {t('socialSectionTitle')}
+            </span>
+
+            <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+
+            <div className="flex items-center justify-between gap-4">
+              <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+                {t('allowNonFriendMessages')}
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={allowNonFriendMessages}
+                disabled={!isLoaded}
+                onClick={() => setAllowNonFriendMessages(!allowNonFriendMessages)}
+                className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden"
+                style={{ backgroundColor: allowNonFriendMessages ? '#c4a35a' : '#333333', cursor: isLoaded ? 'pointer' : 'default', opacity: isLoaded ? 1 : 0.5 }}
+              >
+                <span className="absolute top-0.5 h-5 w-5 rounded-full" style={{ backgroundColor: '#0a0a0a', left: allowNonFriendMessages ? '22px' : '2px', transition: 'left 150ms ease' }} />
+              </button>
+            </div>
+            <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+              {t('allowNonFriendMessagesHint')}
+            </p>
+
+            <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+
+            <div className="flex items-center justify-between gap-4">
+              <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+                {t('privateProfile')}
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={privateProfile}
+                disabled={!isLoaded}
+                onClick={() => setPrivateProfile(!privateProfile)}
+                className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden"
+                style={{ backgroundColor: privateProfile ? '#c4a35a' : '#333333', cursor: isLoaded ? 'pointer' : 'default', opacity: isLoaded ? 1 : 0.5 }}
+              >
+                <span className="absolute top-0.5 h-5 w-5 rounded-full" style={{ backgroundColor: '#0a0a0a', left: privateProfile ? '22px' : '2px', transition: 'left 150ms ease' }} />
+              </button>
+            </div>
+            <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+              {t('privateProfileHint')}
+            </p>
+          </div>
         </div>
         </div>
 

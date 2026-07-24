@@ -1,11 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+vi.mock('@/lib/db/prisma', () => ({ prisma: { post: { findMany: vi.fn().mockResolvedValue([]) } } }));
+
 import sitemap from '@/app/sitemap';
 import { routing } from '@/lib/i18n/routing';
 import { ORDERED_CARD_IDS } from '@/lib/cards/order';
 import { cardIdToSlug, slugToCardId } from '@/lib/cards/slug';
 
 const SITE_URL = 'https://narutomythosgame.com';
-const entries = sitemap();
+const entries = await sitemap();
 const urls = entries.map((e) => e.url);
 
 describe('sitemap includes localized card pages (Phase A2)', () => {
@@ -34,8 +37,8 @@ describe('sitemap includes localized card pages (Phase A2)', () => {
     }
   });
 
-  it('includes the two newly added cards', () => {
-    expect(urls).toContain(`${SITE_URL}/fr/cards/${cardIdToSlug('SS-112-SPV')}`);
+  it('includes released cards but excludes not-yet-released (revealing) set cards', () => {
     expect(urls).toContain(`${SITE_URL}/en/cards/${cardIdToSlug('KS-108_4-MV')}`);
+    expect(urls).not.toContain(`${SITE_URL}/fr/cards/${cardIdToSlug('SS-112-SPV')}`);
   });
 });

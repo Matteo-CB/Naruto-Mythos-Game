@@ -1,14 +1,10 @@
-import NextAuth, { CredentialsSignin } from 'next-auth';
+import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Discord from 'next-auth/providers/discord';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/db/prisma';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
-
-class EmailNotVerifiedError extends CredentialsSignin {
-  code = 'email_unverified';
-}
 
 const useSecureCookies = process.env.NEXTAUTH_URL?.startsWith('https://') ?? false;
 
@@ -93,10 +89,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           for (const [k, ts] of loginAttempts) {
             if (ts.length === 0 || ts[ts.length - 1] < windowStart) loginAttempts.delete(k);
           }
-        }
-
-        if (!(user as { emailVerifiedAt?: Date | null }).emailVerifiedAt) {
-          throw new EmailNotVerifiedError();
         }
 
         return {

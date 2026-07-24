@@ -801,6 +801,7 @@ export default function RewardsHubPage() {
                               perBoosterLabel={tBoosters('cardsPerBooster', { count: VARIANT_PACK_SIZE })}
                               openLabel={tBoosters('openCta')}
                               comingSoonLabel={tBoosters('comingSoonCta')}
+                              revealingLabel={tCommon('revealing')}
                               onOpen={() => handleOpenBooster(entry.setId)}
                               disabled={opening !== null}
                             />

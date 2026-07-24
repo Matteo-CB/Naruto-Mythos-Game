@@ -1,6 +1,6 @@
 import type { CardData } from '@/lib/engine/types';
 import { getAllCards } from '@/lib/data/cardLoader';
-import { ORDERED_CARD_IDS } from '@/lib/cards/order';
+import { compareBySetOrder } from '@/lib/cards/order';
 
 const BASE_RARITIES = new Set(['C', 'UC', 'R', 'S', 'M', 'MMS']);
 
@@ -26,12 +26,8 @@ let slugToId: Map<string, string> | null = null;
 function build(): void {
   idToSlug = new Map();
   slugToId = new Map();
-  const byId = new Map(getAllCards().map((c) => [c.id, c]));
 
-  for (const id of ORDERED_CARD_IDS) {
-    const card = byId.get(id);
-    if (!card) continue;
-
+  for (const card of getAllCards().slice().sort(compareBySetOrder)) {
     const preferred = preferredSlug(card);
     let slug = preferred;
     let n = 2;
@@ -40,9 +36,14 @@ function build(): void {
       n++;
     }
 
-    idToSlug.set(id, slug);
-    slugToId.set(slug, id);
+    idToSlug.set(card.id, slug);
+    slugToId.set(slug, card.id);
   }
+}
+
+export function resetSlugCache(): void {
+  idToSlug = null;
+  slugToId = null;
 }
 
 export function cardIdToSlug(id: string): string {

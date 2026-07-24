@@ -1,6 +1,72 @@
 {
   "entries": [
     {
+      "date": "2026-07-24",
+      "title_fr": "Réseaux sociaux, calendrier des tournois et connexion simplifiée",
+      "title_en": "Social hub, tournament schedule and simpler sign-in",
+      "title_es": "Comunidad, calendario de torneos e inicio de sesión más simple",
+      "title_ja": "コミュニティ、トーナメント日程、ログインの簡略化",
+      "title_pt": "Comunidade, calendário de torneios e login simplificado",
+      "title_it": "Community, calendario dei tornei e accesso semplificato",
+      "title_pl": "Społeczność, harmonogram turniejów i prostsze logowanie",
+      "changes_fr": [
+        "Nouvelle page Réseaux sociaux : les serveurs Discord de la communauté et le fil au même endroit.",
+        "Un bouton pour lier ton compte Discord apparaît en haut de l'écran tant que ce n'est pas fait.",
+        "Le calendrier des tournois s'ouvre dans une fenêtre et affiche les horaires selon ton fuseau horaire.",
+        "Le code de vérification n'est demandé qu'à l'inscription, plus à chaque connexion.",
+        "La liste des decks à charger ne déborde plus sur téléphone."
+      ],
+      "changes_en": [
+        "New Social hub: the community Discord servers and the feed in one place.",
+        "A button to link your Discord account now shows at the top of the screen until it is done.",
+        "The tournament schedule opens in a window and shows times in your own time zone.",
+        "The verification code is only asked at sign-up, no longer on every login.",
+        "The list of decks to load no longer overflows on phones."
+      ],
+      "changes_es": [
+        "Nueva página Comunidad: los servidores de Discord de la comunidad y el muro en un solo lugar.",
+        "Un botón para vincular tu cuenta de Discord aparece arriba mientras no lo hayas hecho.",
+        "El calendario de torneos se abre en una ventana y muestra los horarios en tu zona horaria.",
+        "El código de verificación solo se pide al registrarse, ya no en cada inicio de sesión.",
+        "La lista de mazos para cargar ya no se desborda en el móvil."
+      ],
+      "changes_ja": [
+        "新しいコミュニティページ：コミュニティのDiscordサーバーとフィードを一か所にまとめました。",
+        "Discordアカウントを連携していない場合、画面上部に連携ボタンが表示されます。",
+        "トーナメントの日程がウィンドウで開き、あなたのタイムゾーンで時刻を表示します。",
+        "認証コードは登録時のみ求められ、毎回のログインでは不要になりました。",
+        "読み込むデッキの一覧がスマートフォンではみ出さないようになりました。"
+      ],
+      "changes_pt": [
+        "Nova página Comunidade: os servidores de Discord da comunidade e o mural num só lugar.",
+        "Um botão para ligar a tua conta de Discord aparece no topo enquanto não o fizeres.",
+        "O calendário de torneios abre numa janela e mostra os horários no teu fuso horário.",
+        "O código de verificação só é pedido no registo, já não em cada início de sessão.",
+        "A lista de baralhos para carregar já não transborda no telemóvel."
+      ],
+      "changes_it": [
+        "Nuova pagina Community: i server Discord della community e la bacheca in un unico posto.",
+        "Un pulsante per collegare il tuo account Discord appare in alto finché non lo fai.",
+        "Il calendario dei tornei si apre in una finestra e mostra gli orari nel tuo fuso orario.",
+        "Il codice di verifica viene chiesto solo alla registrazione, non più a ogni accesso.",
+        "L'elenco dei mazzi da caricare non trabocca più sul telefono."
+      ],
+      "changes_pl": [
+        "Nowa strona Społeczność: serwery Discord społeczności i tablica w jednym miejscu.",
+        "Przycisk do połączenia konta Discord pojawia się na górze, dopóki tego nie zrobisz.",
+        "Harmonogram turniejów otwiera się w oknie i pokazuje godziny w Twojej strefie czasowej.",
+        "Kod weryfikacyjny jest wymagany tylko przy rejestracji, już nie przy każdym logowaniu.",
+        "Lista talii do wczytania nie wychodzi już poza ekran na telefonie."
+      ],
+      "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix"
+      ]
+    },
+    {
       "date": "2026-07-23",
       "title_fr": "Voir et exporter tes decks depuis ton profil",
       "title_en": "View and export your decks from your profile",
@@ -13,45 +79,58 @@
         "Depuis ton profil, tu peux ouvrir tes decks en entier, les copier et les exporter en image.",
         "Les cartes brillantes (holo) déclenchent désormais leur effet en jeu, exactement comme les cartes normales.",
         "Tout le simulateur se joue à la manette : navigue dans les menus et joue tes parties avec une manette branchée. Appuie sur Start pour voir les touches.",
-        "Cinq nouveaux fonds d'écran Naruto sont disponibles dans les options."
+        "Cinq nouveaux fonds d'écran Naruto sont disponibles dans les options.",
+        "Le bouton pour rejoindre le serveur Discord depuis un tournoi fonctionne à nouveau."
       ],
       "changes_en": [
         "From your profile you can now open your decks in full, copy them and export them as an image.",
         "Shiny (holo) cards now trigger their effect in game, exactly like normal cards.",
         "The whole simulator can be played with a controller: navigate the menus and play your games with a connected controller. Press Start to see the buttons.",
-        "Five new Naruto backgrounds are available in the options."
+        "Five new Naruto backgrounds are available in the options.",
+        "The button to join the Discord server from a tournament works again."
       ],
       "changes_es": [
         "Desde tu perfil ahora puedes abrir tus mazos completos, copiarlos y exportarlos como imagen.",
         "Las cartas brillantes (holo) ahora activan su efecto en la partida, igual que las cartas normales.",
         "Todo el simulador se puede jugar con mando: navega por los menús y juega tus partidas con un mando conectado. Pulsa Start para ver los botones.",
-        "Cinco nuevos fondos de Naruto están disponibles en las opciones."
+        "Cinco nuevos fondos de Naruto están disponibles en las opciones.",
+        "El botón para unirse al servidor de Discord desde un torneo vuelve a funcionar."
       ],
       "changes_ja": [
         "プロフィールから自分のデッキを丸ごと開いて、コピーや画像への書き出しができるようになりました。",
         "光る（ホロ）カードも通常カードとまったく同じく、ゲーム中に効果が発動するようになりました。",
         "シミュレーター全体をコントローラーでプレイ可能に：接続したコントローラーでメニュー操作も対戦もできます。Startでボタン一覧を表示。",
-        "オプションに新しいナルトの背景が5つ追加されました。"
+        "オプションに新しいナルトの背景が5つ追加されました。",
+        "トーナメントからDiscordサーバーに参加するボタンが再び使えるようになりました。"
       ],
       "changes_pt": [
         "Pelo seu perfil, agora você pode abrir seus decks por completo, copiá-los e exportá-los como imagem.",
         "As cartas brilhantes (holo) agora ativam seu efeito em jogo, exatamente como as cartas normais.",
         "Todo o simulador pode ser jogado com controle: navegue pelos menus e jogue suas partidas com um controle conectado. Aperte Start para ver os botões.",
-        "Cinco novos fundos de Naruto estão disponíveis nas opções."
+        "Cinco novos fundos de Naruto estão disponíveis nas opções.",
+        "O botão para entrar no servidor do Discord a partir de um torneio funciona novamente."
       ],
       "changes_it": [
         "Dal tuo profilo ora puoi aprire i tuoi mazzi per intero, copiarli ed esportarli come immagine.",
         "Le carte brillanti (holo) ora attivano il loro effetto in gioco, esattamente come le carte normali.",
         "L'intero simulatore si può giocare con un controller: naviga nei menu e gioca le partite con un controller collegato. Premi Start per vedere i pulsanti.",
-        "Cinque nuovi sfondi di Naruto sono disponibili nelle opzioni."
+        "Cinque nuovi sfondi di Naruto sono disponibili nelle opzioni.",
+        "Il pulsante per unirti al server Discord da un torneo funziona di nuovo."
       ],
       "changes_pl": [
         "Z profilu możesz teraz otworzyć swoje talie w całości, skopiować je i wyeksportować jako obraz.",
         "Błyszczące karty (holo) teraz aktywują swój efekt w grze, dokładnie jak zwykłe karty.",
         "Całym symulatorem można grać padem: poruszaj się po menu i graj mecze podłączonym padem. Naciśnij Start, aby zobaczyć przyciski.",
-        "Pięć nowych teł Naruto jest dostępnych w opcjach."
+        "Pięć nowych teł Naruto jest dostępnych w opcjach.",
+        "Przycisk dołączania do serwera Discord z turnieju znów działa."
       ],
-      "categories": ["feature", "fix", "feature", "feature"]
+      "categories": [
+        "feature",
+        "fix",
+        "feature",
+        "feature",
+        "fix"
+      ]
     },
     {
       "date": "2026-07-22",
@@ -97,7 +176,11 @@
         "Kliknij ukrytą wartość, aby wpisać odpowiedź; jeśli jest poprawna, zostaje potwierdzona, w przeciwnym razie pokazywana jest prawdziwa wartość.",
         "Złota kropka oznacza kartę z aktywnym bonusem do siły, nie zdradzając sumy, zarówno dla twoich kart, jak i przeciwnika."
       ],
-      "categories": ["feature", "feature", "feature"]
+      "categories": [
+        "feature",
+        "feature",
+        "feature"
+      ]
     },
     {
       "date": "2026-07-20",
@@ -178,7 +261,16 @@
         "Turnieje: dopóki pozostajesz na stronie turnieju, nie możesz już zostać oznaczony jako nieobecny przed swoim meczem, a wyraźny przycisk Rozpocznij mecz uruchamia twoją grę (z automatycznym wejściem, gdy się zaczyna).",
         "Automatyczny turniej rozpoczyna się teraz każdego wieczoru o 21:00 (16 graczy, zapisy od 17:00), z kartą-nagrodą losowaną spośród kart zwycięzców turniejów."
       ],
-      "categories": ["feature", "feature", "feature", "fix", "feature", "feature", "fix", "feature"]
+      "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "feature",
+        "feature",
+        "fix",
+        "feature"
+      ]
     },
     {
       "date": "2026-07-18",
@@ -273,7 +365,18 @@
         "Przejmowanie kontroli za pomocą Ino: możesz teraz ukraść postać o tej samej nazwie co jedna z twoich; trafia ona wtedy na stos odrzuconych (oficjalna zasada).",
         "Strona Pucharu Świata odświeża się sama i automatycznie przechodzi do nowego sezonu i nowych dat co 3 miesiące."
       ],
-      "categories": ["fix", "fix", "fix", "feature", "feature", "feature", "feature", "feature", "fix", "feature"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "feature"
+      ]
     },
     {
       "date": "2026-07-15",
@@ -431,7 +534,27 @@
         "Profil zyskuje trzy nowe zakładki statystyk: Towarzyskie, Sealed (z podziałem na sety) i Wszystkie tryby, obok Rankingowych i Evolving.",
         "Nazwy graczy są klikalne wszędzie (historia, turnieje, pokoje, czat, obserwatorzy, powtórki, znajomi) i otwierają profil, w nowej karcie podczas gry."
       ],
-      "categories": ["feature", "feature", "fix", "fix", "feature", "feature", "feature", "feature", "feature", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "feature", "feature", "feature"]
+      "categories": [
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "feature"
+      ]
     },
     {
       "date": "2026-07-14",
@@ -519,7 +642,17 @@
         "Efekty świetlne przy lądowaniu są zarezerwowane dla Sekretnych, Mythos i wszystkich rzadkich wariantów: pozostałe karty lądują zwyczajnie.",
         "Lot karty z ręki na planszę jest bardziej bezpośredni i nieco szybszy."
       ],
-      "categories": ["fix", "fix", "fix", "feature", "fix", "feature", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "fix",
+        "feature",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-07-13",
@@ -621,7 +754,19 @@
         "Nowy przycisk Kopiuj w Moich taliach: otwiera kopię talii gotową do edycji i zapisania.",
         "Na telefonie symulacja karty oferuje teraz przycisk, który automatycznie przełącza na pełny ekran w poziomie."
       ],
-      "categories": ["fix", "fix", "fix", "fix", "fix", "feature", "feature", "feature", "fix", "feature", "feature"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "feature",
+        "feature"
+      ]
     },
     {
       "date": "2026-07-12",
@@ -688,7 +833,14 @@
         "Nowy filtr Holo w Kolekcji, aby zobaczyć posiadane holo.",
         "Zduplikowane holo dają XP i można je wymieniać między graczami."
       ],
-      "categories": ["feature", "feature", "feature", "feature", "feature", "feature"]
+      "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature"
+      ]
     },
     {
       "date": "2026-07-11",
@@ -811,7 +963,22 @@
         "Moderacja została wzmocniona: ostrzeżenia, usunięcie z czatu, wykluczenie z rankingowych lub zawieszenie w zależności od wagi przewinienia.",
         "Nowy filtr kraju w rankingu, z opcją dla graczy bez kraju."
       ],
-      "categories": ["fix", "fix", "feature", "feature", "feature", "feature", "feature", "feature", "feature", "feature", "fix", "fix", "feature", "feature"]
+      "categories": [
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "feature",
+        "feature"
+      ]
     },
     {
       "date": "2026-07-08",
@@ -955,7 +1122,25 @@
         "Obrazy kart są wczytywane z wyprzedzeniem podczas gry, aby animacje pojawiały się bez opóźnienia ładowania.",
         "Dziennik gry pozostaje płynny nawet w bardzo długich meczach."
       ],
-      "categories": ["fix", "fix", "fix", "feature", "fix", "fix", "fix", "fix", "fix", "feature", "feature", "feature", "fix", "fix", "feature", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "feature",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-07-06",
@@ -1099,7 +1284,25 @@
         "Ulepszona Kurenai Yuhi: potwierdzenie pojedynku wyraźnie pokazuje próg obniżony do 5 przez jej efekt UPGRADE.",
         "Słowo DUEL wyświetla się teraz poprawnie na kartach zamiast tekstu technicznego."
       ],
-      "categories": ["feature", "feature", "fix", "fix", "fix", "fix", "fix", "feature", "fix", "feature", "fix", "feature", "feature", "feature", "fix", "fix", "fix"]
+      "categories": [
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "fix",
+        "feature",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-07-05",
@@ -1271,7 +1474,29 @@
         "La simulación de Itachi Uchiha (140) ahora muestra correctamente la nueva mano robada tras reordenar la pila de descartes.",
         "Los porcentajes de uso ya no mezclan una carta de misión con el personaje que comparte el mismo número."
       ],
-      "categories": ["fix", "fix", "fix", "fix", "fix", "feature", "fix", "feature", "fix", "fix", "fix", "fix", "fix", "feature", "fix", "fix", "fix", "fix", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "fix",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-07-04",
@@ -1324,7 +1549,12 @@
         "El aumento de Poder de Hiruzen Sarutobi ahora aparece en el registro de partida.",
         "Los efectos continuos (como el de Shikamaru) ahora aparecen en el registro al colocar la carta."
       ],
-      "categories": ["feature", "feature", "fix", "fix"]
+      "categories": [
+        "feature",
+        "feature",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-07-03",
@@ -1370,7 +1600,11 @@
         "Un efecto que copia una carta ya no puede copiar su efecto UPGRADE, solo su efecto principal.",
         "Un sonido te avisa cuando un jugador entra en la sala que has creado."
       ],
-      "categories": ["fix", "fix", "feature"]
+      "categories": [
+        "fix",
+        "fix",
+        "feature"
+      ]
     },
     {
       "date": "2026-07-02",
@@ -1416,7 +1650,11 @@
         "El simulador también está disponible en japonés, con nombres de personajes y técnicas oficiales.",
         "Elige tu idioma arriba a la derecha. Los nuevos jugadores llegan en su propio idioma según su país, con inglés por defecto cuando el idioma no está disponible."
       ],
-      "categories": ["feature", "feature", "feature"]
+      "categories": [
+        "feature",
+        "feature",
+        "feature"
+      ]
     },
     {
       "date": "2026-07-01",
@@ -1469,7 +1707,12 @@
         "Un personaje ya no puede moverse a una misión donde ya hay un personaje del mismo nombre en tu lado (Itachi, Naruto, Kakashi).",
         "Sasuke Uchiwa Sharingan 014: cuando lo mejoras, se te pregunta si quieres descartar una carta para descartar una del rival antes de ver su mano, ya no después."
       ],
-      "categories": ["fix", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-06-13",
@@ -1536,7 +1779,14 @@
         "El carrusel de cartas de la página de inicio muestra más cartas, incluidos Minato y el Equipo 7 original.",
         "Cuando el rival se desconecta al final de la partida mientras va perdiendo, ahora se declara su rendición y ganas la partida. Antes, la partida podía anularse sin ganador si el jugador desconectado aún iba por delante en el marcador de las rondas anteriores."
       ],
-      "categories": ["feature", "fix", "fix", "feature", "feature", "fix"]
+      "categories": [
+        "feature",
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "fix"
+      ]
     },
     {
       "date": "2026-06-12",
@@ -1589,7 +1839,12 @@
         "Ganar una partida clasificatoria vuelve a dar el ELO completo con los bonus, incluso contra el mismo rival varias veces seguidas. Antes, tras varias partidas seguidas contra la misma persona, la victoria podía mostrar un bonus pero dar 0 de ELO.",
         "La misión diaria ahora se reclama únicamente en su propio recuadro. Ya no aparece duplicada en la lista de misiones y se ha quitado el antiguo mensaje «Obtenida desde la lista principal»."
       ],
-      "categories": ["fix", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-06-09",
@@ -1649,7 +1904,13 @@
         "Ya no hace falta verificar tu correo para jugar en clasificatorio: la verificación se ha eliminado por completo.",
         "Ya no hace falta jugar 5 partidas casuales antes del clasificatorio: puedes jugar en clasificatorio desde tu primera partida."
       ],
-      "categories": ["feature", "fix", "feature", "feature", "feature"]
+      "categories": [
+        "feature",
+        "fix",
+        "feature",
+        "feature",
+        "feature"
+      ]
     },
     {
       "date": "2026-06-08",
@@ -1709,7 +1970,13 @@
         "Pérdida máxima de ELO en una derrota subida de 24 a 32. Consecuencia: alimentar una cuenta secundaria hace perder mucho más al que la alimenta cuando se detecta la cuenta secundaria.",
         "Bonus de rendimiento ligeramente reducidos: la diferencia de puntuación ahora da +2/+5/+7/+9 (en lugar de +3/+6/+9/+12), el bonus de presión empieza en 5 cartas rivales y sube hasta +6 (en lugar de 7 cartas hasta +8), el bonus de victoria por abandono pasa de +5 a +3. El máximo combinado por victoria pasa de +20 a +15."
       ],
-      "categories": ["fix", "fix", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-06-03",
@@ -1741,7 +2008,9 @@
       "changes_es": [
         "Todos los torneos (finalizados, cancelados o bloqueados) ahora se eliminan automáticamente 24 horas después. Los torneos programados en el futuro no se ven afectados."
       ],
-      "categories": ["fix"]
+      "categories": [
+        "fix"
+      ]
     },
     {
       "date": "2026-06-01",
@@ -1829,7 +2098,17 @@
         "Nueva Secreta Variante: Orochimaru 138 «Reanimación» se añade y está disponible en los sobres de variantes.",
         "Sobres de variantes: las cartas repetidas ahora te dan XP de Battlepass (10 por una Rara Ilustración, 50 por una Mythos V, 200 por una Secreta V, 1000 por una Legendaria). Antes, las repetidas no hacían nada."
       ],
-      "categories": ["fix", "fix", "feature", "fix", "fix", "feature", "feature", "feature", "feature"]
+      "categories": [
+        "fix",
+        "fix",
+        "feature",
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "feature"
+      ]
     },
     {
       "date": "2026-05-30",
@@ -1973,7 +2252,25 @@
         "Página de un torneo: la carta de recompensa ahora indica claramente que es cosmética solo para el simulador y que no se gana en la vida real.",
         "Página Recompensas: un recordatorio aclara que todo es totalmente gratis, sin compras ni pagos."
       ],
-      "categories": ["fix", "feature", "feature", "feature", "fix", "feature", "feature", "feature", "fix", "fix", "feature", "fix", "fix", "fix", "fix", "feature", "feature"]
+      "categories": [
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "feature"
+      ]
     },
     {
       "date": "2026-05-29",
@@ -2040,7 +2337,14 @@
         "Partida en línea: un jugador desconectado ahora se rinde tras 2 minutos, y el banner de desconexión muestra la cuenta atrás.",
         "Mientras un rival está desconectado, ya no se te penaliza por tu inactividad (pero tu tiempo sigue corriendo en tu turno)."
       ],
-      "categories": ["fix", "feature", "feature", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-28",
@@ -2226,7 +2530,31 @@
         "Recompensas, Sobres y Misiones ahora están agrupados en una sola página con 3 pestañas. Banner de XP y nivel siempre visible arriba, cada pestaña muestra un contador de elementos por reclamar.",
         "Clasificación y Amigos ahora están en la misma página con dos pestañas. Todas las funciones de Amigos (búsqueda, solicitudes, actividad, estadísticas cara a cara, invitaciones) se conservan."
       ],
-      "categories": ["feature", "feature", "feature", "feature", "feature", "feature", "feature", "feature", "fix", "feature", "feature", "feature", "feature", "feature", "feature", "feature", "fix", "fix", "fix", "feature", "feature", "feature", "feature"]
+      "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "feature"
+      ]
     },
     {
       "date": "2026-05-25",
@@ -2300,7 +2628,15 @@
         "Nueva página Recompensas en el menú de inicio: 50 niveles de recompensas para la Temporada Konoha Shido. Cada nivel da un sobre de variantes, salvo los niveles 25 y 50 que desbloquean cartas Naruto Mythos V exclusivas. A partir del nivel 50, cada 500 XP adicionales te dan un sobre de variantes de bonus.",
         "Recompensas: los sobres llegan automáticamente a tu inventario en cuanto alcanzas un nivel. Las cartas de los niveles 25 y 50 tienen un botón Reclamar con animación, como abrir un sobre. Un punto dorado aparece en el botón Recompensas cuando subes de nivel."
       ],
-      "categories": ["feature", "feature", "feature", "feature", "feature", "feature", "feature"]
+      "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature"
+      ]
     },
     {
       "date": "2026-05-24",
@@ -2360,7 +2696,13 @@
         "Administración: aparece un botón Eliminar torneo en cada torneo finalizado de la página de resultados, para limpiar las partidas antiguas.",
         "Nuevas variantes: Naruto Uzumaki Mythos V (Jutsu de Clones de Sombra) y Sasuke Uchiwa Legendaria (Marca Maldita del Cielo). Mismos efectos que sus cartas base, solo un nuevo título y una nueva ilustración."
       ],
-      "categories": ["fix", "fix", "fix", "feature", "feature"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "feature"
+      ]
     },
     {
       "date": "2026-05-23",
@@ -2441,7 +2783,16 @@
         "Error corregido: un personaje oculto robado por Ino podía revelarse para apilarse sobre un personaje del mismo nombre de su captor, lo que transfería definitivamente la carta robada. La revelación ahora se bloquea cuando crearía un duplicado.",
         "Menú Torneos: la lista pasa a ser un área desplazable a partir de 5 torneos mostrados, el resto de la página ya no se sale de la pantalla."
       ],
-      "categories": ["fix", "fix", "fix", "fix", "feature", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-19",
@@ -2599,7 +2950,27 @@
         "Error corregido: cuando una carta que juega a un personaje con reducción de coste (Jiraiya 105 y 132, Tayuya 125, Kabuto 053, etc.) se usaba en una misión con una Tayuya 125 enemiga, el sobrecoste de Tayuya no se aplicaba. El cálculo ahora tiene en cuenta todos los efectos continuos de coste.",
         "Error corregido: Ichibi a 7 de chakra derrotaba automáticamente a todos los personajes ocultos enemigos de todas las misiones, sin pedir elegir. Ahora eliges una misión concreta, y el efecto sigue siendo opcional como estaba previsto."
       ],
-      "categories": ["feature", "fix", "fix", "fix", "fix", "fix", "feature", "feature", "fix", "fix", "fix", "fix", "fix", "fix", "feature", "fix", "feature", "fix", "fix"]
+      "categories": [
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "fix",
+        "feature",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-18",
@@ -2666,7 +3037,14 @@
         "Tus estadísticas ahora muestran tu racha de victorias en curso más larga y ya no incluyen los empates (que no existen en el juego).",
         "Un pequeño indicador de conexión aparece arriba a la derecha solo si hay un problema de red, y el antiguo gran error 'mazo prohibido' ya no aparece por error cuando el problema es en realidad la red."
       ],
-      "categories": ["feature", "feature", "feature", "fix", "feature", "fix"]
+      "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "feature",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-16",
@@ -2726,7 +3104,13 @@
         "Discord: ahora puedes inscribirte a las notificaciones de torneos reaccionando con el emoji del trofeo en el mensaje de anuncio del canal de inscripción. Quita la reacción para dejar de recibir menciones.",
         "Las estadísticas Evolving ahora están separadas de las clasificatorias en los perfiles y las clasificaciones. Las partidas antiguas se recuperan automáticamente y la clasificación Evolving solo muestra victorias / derrotas / empates Evolving."
       ],
-      "categories": ["feature", "fix", "feature", "feature", "feature"]
+      "categories": [
+        "feature",
+        "fix",
+        "feature",
+        "feature",
+        "feature"
+      ]
     },
     {
       "date": "2026-05-15",
@@ -2877,7 +3261,26 @@
         "Error corregido: Shikamaru Nara (coste 3) no tenía en cuenta a los personajes revelados o jugados en el turno anterior. Todos esos personajes ahora cuentan para su efecto de movimiento.",
         "Error corregido: la revancha en Evolving llevaba a la selección de mazo normal, que mostraba todos tus mazos. Ahora te lleva a la sala Evolving y solo te ofrece tus mazos Evolving."
       ],
-      "categories": ["fix", "fix", "fix", "fix", "fix", "feature", "feature", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-14",
@@ -2965,7 +3368,17 @@
         "Error corregido: la clasificación del quiz ya no se cargaba, ha vuelto.",
         "Error corregido: el botón Mazo Aleatorio en una sala Evolving a veces sacaba cartas fuera de formato, ahora respeta las reglas del modo."
       ],
-      "categories": ["feature", "feature", "feature", "feature", "feature", "feature", "fix", "fix", "fix"]
+      "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-13",
@@ -3060,7 +3473,18 @@
         "Los dos relojes se muestran en todo momento en el tablero, pasan a naranja por debajo de 1 minuto y luego a rojo por debajo de 30 segundos, con una alarma sonora por debajo de 10 segundos.",
         "Sin reloj en las partidas contra la IA ni en hotseat, nada cambia para esos modos."
       ],
-      "categories": ["feature", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "feature", "fix"]
+      "categories": [
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-12",
@@ -3141,7 +3565,16 @@
         "Quiz adaptado a móvil: preguntas, botones y cuadrículas redimensionados para mostrarse correctamente en el teléfono, sin ningún desbordamiento en las pantallas estrechas.",
         "Quiz: las preguntas que solo mostraban un nombre (por ejemplo \"Naruto\" cuando existen varias versiones) ahora incluyen el título o el número de la carta, y la respuesta correcta siempre es seleccionable."
       ],
-      "categories": ["feature", "feature", "feature", "feature", "fix", "feature", "fix", "fix"]
+      "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "feature",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-11",
@@ -3313,7 +3746,29 @@
         "En el teléfono en partida, la ventana de detalle de una carta ahora ocupa toda la pantalla con la imagen y el texto uno al lado del otro, en lugar de un pequeño panel aplastado abajo.",
         "En el teléfono, todas las ventanas en partida (mulligan, elección de objetivos, elección de efectos, etc.) ahora ocupan casi todo el ancho de la pantalla en lugar de estar limitadas a 400-560 píxeles, y el texto es mucho más legible."
       ],
-      "categories": ["fix", "feature", "feature", "feature", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-10",
@@ -3415,7 +3870,19 @@
         "La IA ahora juega con uno de los mejores mazos recientes de la clasificación, elegido al azar en cada partida.",
         "Shikamaru Nara (022): su emboscada ahora encuentra bien la carta rival incluso cuando se revela como primera acción de la ronda."
       ],
-      "categories": ["fix", "fix", "feature", "feature", "feature", "feature", "feature", "feature", "feature", "feature", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-09",
@@ -3489,7 +3956,15 @@
         "Faltaban muchos acentos en las traducciones francesas: corregidos.",
         "Varios mensajes de error se quedaban en inglés en modo FR: corregidos."
       ],
-      "categories": ["fix", "fix", "fix", "fix", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-08",
@@ -3556,7 +4031,14 @@
         "El código de torneo ya no se puede adivinar por fuerza bruta.",
         "Ya no puedes ser emparejado en casual ni invitado a un duelo durante un partido de torneo."
       ],
-      "categories": ["fix", "feature", "feature", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-05",
@@ -3637,7 +4119,16 @@
         "Repeticiones mucho más ligeras, fin de partida y carga más rápidos.",
         "MSS 05 (Traer de vuelta): un personaje controlado vuelve correctamente a su propietario."
       ],
-      "categories": ["fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-04",
@@ -3683,7 +4174,11 @@
         "Pérdidas posibles de hasta -32 en diferencias muy grandes (perder contra un rival 1500+ por debajo).",
         "Las partidas con ELO cercano (diferencia < 200) no cambian."
       ],
-      "categories": ["fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-05-02",
@@ -3715,7 +4210,9 @@
       "changes_es": [
         "Se acabó el error Jugador no encontrado: los perfiles ahora se abren para todo el mundo."
       ],
-      "categories": ["fix"]
+      "categories": [
+        "fix"
+      ]
     },
     {
       "date": "2026-05-01",
@@ -3796,7 +4293,16 @@
         "Hacer clic varias veces en Abandonar ya no crea varias derrotas.",
         "Pantalla de fin de partida mostrada antes, sin esperar el guardado completo."
       ],
-      "categories": ["fix", "fix", "fix", "fix", "feature", "feature", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-04-30",
@@ -3863,7 +4369,14 @@
         "Mulligan incluido en la repetición.",
         "Orochimaru Sustitución (051): las misiones siguientes del turno se puntúan correctamente."
       ],
-      "categories": ["fix", "fix", "fix", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-04-29",
@@ -3958,7 +4471,18 @@
         "Kabuto Yakushi (054) ahora oculta a todos los personajes elegibles de una vez, sin elección.",
         "Se acabó el techo invisible de -16 en lo alto de la clasificación: un top puede perder hasta -25, y un jugador flojo ganar hasta +25 al vencer a un top."
       ],
-      "categories": ["fix", "fix", "feature", "fix", "fix", "fix", "fix", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-04-25",
@@ -4004,7 +4528,11 @@
         "Inicio de sesión de Discord vinculado a tu cuenta de correo existente si la dirección coincide.",
         "Neji (037) POWERUP 1 y Hinata (031) +1 de Chakra se activan cuando un personaje entra en juego de cualquier forma."
       ],
-      "categories": ["fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-04-24",
@@ -4078,7 +4606,15 @@
         "Personajes controlados: vuelven a su propietario original cuando quien los controla abandona. Una carta robada que mejoras sigue siendo tuya.",
         "Shikamaru (111) bloquea de verdad todas las revelaciones en su misión, incluso las forzadas por Jiraiya, Hiruzen o Kankuro."
       ],
-      "categories": ["fix", "fix", "fix", "fix", "fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-04-23",
@@ -4124,7 +4660,11 @@
         "Ya no puedes perder más de 25 puntos de ELO en una sola derrota.",
         "La ganancia o la pérdida mostrada al final de la partida corresponde exactamente al cambio aplicado en tu perfil."
       ],
-      "categories": ["fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-04-22",
@@ -4226,7 +4766,19 @@
         "Hayate (048) y Gemma (049) respetan la no repetición.",
         "Los personajes controlados vuelven a su propietario original cuando abandonan el juego."
       ],
-      "categories": ["feature", "fix", "feature", "fix", "fix", "fix", "fix", "fix", "fix", "fix", "fix"]
+      "categories": [
+        "feature",
+        "fix",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-04-20",
@@ -4293,7 +4845,14 @@
         "El botón de revancha funciona en todos los modos.",
         "Los poderes negativos existen. Siempre hace falta al menos 1 de poder para ganar una misión."
       ],
-      "categories": ["feature", "fix", "fix", "fix", "fix", "fix"]
+      "categories": [
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
     },
     {
       "date": "2026-04-15",
@@ -4339,7 +4898,11 @@
         "Cartas en la mano y espacios de misión reducidos para ganar sitio.",
         "Botones de ordenación ocultos en móvil."
       ],
-      "categories": ["fix", "fix", "fix"]
+      "categories": [
+        "fix",
+        "fix",
+        "fix"
+      ]
     }
   ]
 }

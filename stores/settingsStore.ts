@@ -17,6 +17,8 @@ interface SettingsState {
   animationsPref: boolean;
   fastAnimations: boolean;
   chatVisibility: ChatVisibilitySetting;
+  allowNonFriendMessages: boolean;
+  privateProfile: boolean;
   soundEnabled: boolean;
   soundVolume: number;
   allowSpectatorHand: boolean;
@@ -40,6 +42,8 @@ interface SettingsState {
   setGameBackground: (id: string, url: string) => Promise<void>;
   setChatVisibility: (v: ChatVisibilitySetting) => Promise<void>;
   setFastAnimations: (v: boolean) => Promise<void>;
+  setAllowNonFriendMessages: (v: boolean) => Promise<void>;
+  setPrivateProfile: (v: boolean) => Promise<void>;
 }
 
 const DEFAULT_BG_URL = '/images/backgrounds/1.webp';
@@ -77,6 +81,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   animationsEnabled: effectiveAnimations(true),
   animationsPref: true,
   fastAnimations: false,
+  allowNonFriendMessages: true,
+  privateProfile: false,
   chatVisibility: 'everyone',
   soundEnabled: getLocalSound().enabled,
   soundVolume: getLocalSound().volume,
@@ -117,6 +123,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         animationsPref: animPref,
         animationsEnabled: effectiveAnimations(animPref),
         fastAnimations: prefs.fastAnimations ?? false,
+        allowNonFriendMessages: prefs.allowNonFriendMessages ?? true,
+        privateProfile: prefs.privateProfile ?? false,
         chatVisibility: (['everyone', 'friends', 'off'].includes(prefs.chatVisibility) ? prefs.chatVisibility : 'everyone') as ChatVisibilitySetting,
         soundEnabled: prefs.soundsEnabled ?? get().soundEnabled,
         allowSpectatorHand: prefs.allowSpectatorHand ?? false,
@@ -272,6 +280,36 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       if (!res.ok) throw new Error('Failed to save');
     } catch {
       set({ chatVisibility: prev });
+    }
+  },
+
+  setAllowNonFriendMessages: async (v: boolean) => {
+    const prev = get().allowNonFriendMessages;
+    set({ allowNonFriendMessages: v });
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ allowNonFriendMessages: v }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+    } catch {
+      set({ allowNonFriendMessages: prev });
+    }
+  },
+
+  setPrivateProfile: async (v: boolean) => {
+    const prev = get().privateProfile;
+    set({ privateProfile: v });
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ privateProfile: v }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+    } catch {
+      set({ privateProfile: prev });
     }
   },
 

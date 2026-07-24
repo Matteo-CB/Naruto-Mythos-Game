@@ -159,6 +159,40 @@ export async function PUT(
   }
 }
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { id } = await params;
+    const body = await request.json().catch(() => ({}));
+
+    const existing = await prisma.deck.findUnique({ where: { id }, select: { userId: true } });
+    if (!existing || existing.userId !== session.user.id) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+
+    if (typeof body.isPublic !== 'boolean') {
+      return NextResponse.json({ error: 'isPublic must be a boolean' }, { status: 400 });
+    }
+
+    const deck = await prisma.deck.update({
+      where: { id },
+      data: { isPublic: body.isPublic },
+      select: { id: true, isPublic: true },
+    });
+
+    return NextResponse.json({ success: true, deck });
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

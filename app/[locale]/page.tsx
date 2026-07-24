@@ -21,9 +21,9 @@ import '@/styles/holo-evolving.css';
 
 
 const FEATURED_CARDS = [
-  { src: '/images/cards/SS/sp_v/SS-112-SPV.webp', alt: 'Neji Hyuga', rarity: 'special' as const },
-  { src: '/images/cards/SS/sp_v/SS-122-SPV.webp', alt: 'Minato Namikaze', rarity: 'special' as const },
-  { src: '/images/cards/SS/sp_v/SS-126-SPV.webp', alt: 'Sasuke Uchiha', rarity: 'special' as const },
+  { src: '/api/card-image/SS-112-SPV', alt: 'Neji Hyuga', rarity: 'special' as const },
+  { src: '/api/card-image/SS-122-SPV', alt: 'Minato Namikaze', rarity: 'special' as const },
+  { src: '/api/card-image/SS-126-SPV', alt: 'Sasuke Uchiha', rarity: 'special' as const },
 ];
 
 
@@ -83,7 +83,6 @@ const accountButtons = [
 
 export default function Home() {
   const t = useTranslations('home');
-  const td = useTranslations('discord');
   const ta = useTranslations('a11y');
   const { data: session, update: updateSession } = useSession();
   const [mounted, setMounted] = useState(false);
@@ -316,19 +315,42 @@ export default function Home() {
             >
               {session ? (
                 <>
-                  {session?.user?.email === 'matteo.biyikli3224@gmail.com' && (
+                  <div className="flex basis-full gap-2.5">
+                    {session?.user?.email === 'matteo.biyikli3224@gmail.com' && (
+                      <Link
+                        href="/admin"
+                        className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
+                        style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid #ef4444',
+                          color: '#ef4444',
+                        }}
+                        onMouseEnter={(e) => {
+                          const target = e.currentTarget as HTMLElement;
+                          target.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
+                          target.style.boxShadow = '0 0 16px rgba(239, 68, 68, 0.12)';
+                        }}
+                        onMouseLeave={(e) => {
+                          const target = e.currentTarget as HTMLElement;
+                          target.style.backgroundColor = 'transparent';
+                          target.style.boxShadow = 'none';
+                        }}
+                      >
+                        {t('admin')}
+                      </Link>
+                    )}
                     <Link
-                      href="/admin"
-                      className="flex h-9 basis-full items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
+                      href="/social"
+                      className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                       style={{
                         backgroundColor: 'transparent',
-                        border: '1px solid #ef4444',
-                        color: '#ef4444',
+                        border: '1px solid #5b4a8a',
+                        color: '#b39ddb',
                       }}
                       onMouseEnter={(e) => {
                         const target = e.currentTarget as HTMLElement;
-                        target.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
-                        target.style.boxShadow = '0 0 16px rgba(239, 68, 68, 0.12)';
+                        target.style.backgroundColor = 'rgba(157, 124, 216, 0.08)';
+                        target.style.boxShadow = '0 0 16px rgba(157, 124, 216, 0.14)';
                       }}
                       onMouseLeave={(e) => {
                         const target = e.currentTarget as HTMLElement;
@@ -336,35 +358,9 @@ export default function Home() {
                         target.style.boxShadow = 'none';
                       }}
                     >
-                      {t('admin')}
+                      {t('social')}
                     </Link>
-                  )}
-                  {!(session.user as Record<string, unknown>)?.discordId && (
-                    <a
-                      href="/api/user/link-discord"
-                      className="flex h-9 basis-full items-center justify-center gap-1.5 text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: '1px solid #5865F2',
-                        color: '#5865F2',
-                      }}
-                      onMouseEnter={(e) => {
-                        const target = e.currentTarget as HTMLElement;
-                        target.style.backgroundColor = 'rgba(88, 101, 242, 0.08)';
-                        target.style.boxShadow = '0 0 16px rgba(88, 101, 242, 0.12)';
-                      }}
-                      onMouseLeave={(e) => {
-                        const target = e.currentTarget as HTMLElement;
-                        target.style.backgroundColor = 'transparent';
-                        target.style.boxShadow = 'none';
-                      }}
-                    >
-                      <svg width="14" height="11" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M60.1 4.9A58.5 58.5 0 0045.4.2a.2.2 0 00-.2.1 40.8 40.8 0 00-1.8 3.7 54 54 0 00-16.2 0A37.3 37.3 0 0025.4.3a.2.2 0 00-.2-.1 58.4 58.4 0 00-14.7 4.6.2.2 0 00-.1.1C1.5 18.7-.9 32.2.3 45.5v.1a58.8 58.8 0 0017.9 9.1.2.2 0 00.3-.1 42 42 0 003.6-5.9.2.2 0 00-.1-.3 38.8 38.8 0 01-5.5-2.7.2.2 0 01 0-.4l1.1-.9a.2.2 0 01.2 0 42 42 0 0035.8 0 .2.2 0 01.2 0l1.1.9a.2.2 0 010 .4 36.4 36.4 0 01-5.5 2.7.2.2 0 00-.1.3 47.2 47.2 0 003.6 5.9.2.2 0 00.3.1A58.6 58.6 0 0070.7 45.6v-.1c1.4-15-2.3-28-9.8-39.5a.2.2 0 00-.1-.1zM23.7 37.3c-3.4 0-6.2-3.1-6.2-7s2.7-7 6.2-7 6.3 3.2 6.2 7-2.8 7-6.2 7zm22.9 0c-3.4 0-6.2-3.1-6.2-7s2.7-7 6.2-7 6.3 3.2 6.2 7-2.8 7-6.2 7z" fill="#5865F2"/>
-                      </svg>
-                      {td('linkDiscord')}
-                    </a>
-                  )}
+                  </div>
                   <Link
                     href={`/profile/${encodeURIComponent(session.user?.name ?? '')}`}
                     className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
@@ -407,29 +403,6 @@ export default function Home() {
                   >
                     {t('customization')}
                   </Link>
-                  <button
-                    onClick={() => signOut({ callbackUrl: '/' })}
-                    className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all cursor-pointer sm:h-10 sm:text-sm"
-                    style={{
-                      backgroundColor: 'transparent',
-                      border: '1px solid #333333',
-                      color: '#888888',
-                    }}
-                    onMouseEnter={(e) => {
-                      const target = e.currentTarget as HTMLElement;
-                      target.style.borderColor = '#ef4444';
-                      target.style.color = '#ef4444';
-                      target.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
-                    }}
-                    onMouseLeave={(e) => {
-                      const target = e.currentTarget as HTMLElement;
-                      target.style.borderColor = '#333333';
-                      target.style.color = '#888888';
-                      target.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    {t('signOut')}
-                  </button>
                 </>
               ) : (
                 accountButtons.map((btn) => (
@@ -462,38 +435,38 @@ export default function Home() {
             </motion.div>
 
             
-            <motion.div
-              className="mt-2.5 w-full sm:mt-3"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 1.6 }}
-            >
-              <a
-                href="https://discord.gg/BBXVUsU3hn"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-full items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
-                style={{
-                  backgroundColor: 'transparent',
-                  border: '1px solid #444444',
-                  color: '#999999',
-                }}
-                onMouseEnter={(e) => {
-                  const target = e.currentTarget as HTMLElement;
-                  target.style.borderColor = '#7289da';
-                  target.style.color = '#7289da';
-                  target.style.backgroundColor = 'rgba(114, 137, 218, 0.05)';
-                }}
-                onMouseLeave={(e) => {
-                  const target = e.currentTarget as HTMLElement;
-                  target.style.borderColor = '#444444';
-                  target.style.color = '#999999';
-                  target.style.backgroundColor = 'transparent';
-                }}
+            {session && (
+              <motion.div
+                className="mt-2.5 w-full sm:mt-3"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 1.65 }}
               >
-                {t('discord')}
-              </a>
-            </motion.div>
+                <button
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  className="flex h-9 w-full items-center justify-center text-xs font-medium tracking-wide transition-all cursor-pointer sm:h-10 sm:text-sm"
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '1px solid #333333',
+                    color: '#888888',
+                  }}
+                  onMouseEnter={(e) => {
+                    const target = e.currentTarget as HTMLElement;
+                    target.style.borderColor = '#ef4444';
+                    target.style.color = '#ef4444';
+                    target.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    const target = e.currentTarget as HTMLElement;
+                    target.style.borderColor = '#333333';
+                    target.style.color = '#888888';
+                    target.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  {t('signOut')}
+                </button>
+              </motion.div>
+            )}
 
             
             <motion.p

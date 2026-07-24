@@ -39,9 +39,9 @@ describe('pickDailyPrizeCardId', () => {
 });
 
 describe('daily tournament config', () => {
-  it('registration at 17h, start at 21h, 16 slots', () => {
+  it('registration at 17h, start at 21h, 32 slots', () => {
     expect(DAILY_TOURNAMENT_REG_HOUR).toBe(17);
     expect(DAILY_TOURNAMENT_START_HOUR).toBe(21);
-    expect(DAILY_TOURNAMENT_MAX_PLAYERS).toBe(16);
+    expect(DAILY_TOURNAMENT_MAX_PLAYERS).toBe(32);
   });
 });

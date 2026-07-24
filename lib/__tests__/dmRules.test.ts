@@ -21,18 +21,26 @@ describe('dmThreadKey', () => {
 });
 
 describe('decideDmPermission', () => {
-  const base = { areFriends: true, blockedEither: false, muted: false, suspended: false, shadowMuted: false };
+  const base = { areFriends: true, receiverAllowsNonFriends: false, blockedEither: false, muted: false, suspended: false, shadowMuted: false };
 
   it('friends can DM', () => {
     expect(decideDmPermission(base)).toEqual({ ok: true, echoOnly: false });
   });
 
-  it('non-friends cannot DM', () => {
+  it('non-friends cannot DM when the receiver disallows non-friend messages', () => {
     expect(decideDmPermission({ ...base, areFriends: false })).toEqual({ ok: false, errorKey: 'dm.notFriends' });
+  });
+
+  it('non-friends CAN DM when the receiver allows non-friend messages', () => {
+    expect(decideDmPermission({ ...base, areFriends: false, receiverAllowsNonFriends: true })).toEqual({ ok: true, echoOnly: false });
   });
 
   it('a block in either direction locks the DM even between friends', () => {
     expect(decideDmPermission({ ...base, blockedEither: true })).toEqual({ ok: false, errorKey: 'dm.disabled' });
+  });
+
+  it('a block locks the DM even when the receiver allows non-friends', () => {
+    expect(decideDmPermission({ ...base, areFriends: false, receiverAllowsNonFriends: true, blockedEither: true })).toEqual({ ok: false, errorKey: 'dm.disabled' });
   });
 
   it('muted or suspended senders cannot DM', () => {
@@ -45,7 +53,7 @@ describe('decideDmPermission', () => {
   });
 
   it('mute wins over block and friendship checks', () => {
-    expect(decideDmPermission({ areFriends: false, blockedEither: true, muted: true, suspended: false, shadowMuted: false }))
+    expect(decideDmPermission({ areFriends: false, receiverAllowsNonFriends: false, blockedEither: true, muted: true, suspended: false, shadowMuted: false }))
       .toEqual({ ok: false, errorKey: 'chat.muted' });
   });
 });

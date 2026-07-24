@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getAllCards } from '@/lib/data/cardLoader';
-import { getSetNumber } from '@/lib/data/sets/registry';
+import { getSetNumber, isSetAvailable } from '@/lib/data/sets/registry';
 import { ORDERED_CARD_IDS, getAdjacentCardIds } from '@/lib/cards/order';
 import { slugify, cardIdToSlug, slugToCardId } from '@/lib/cards/slug';
 import type { CardData } from '@/lib/engine/types';
@@ -51,10 +51,13 @@ describe('card slug map', () => {
   });
 });
 
+const RELEASED_CARDS = CARDS.filter((c) => isSetAvailable(c.set));
+
 describe('global card ordering', () => {
-  it('lists every card exactly once', () => {
-    expect(ORDERED_CARD_IDS.length).toBe(CARDS.length);
-    expect(new Set(ORDERED_CARD_IDS).size).toBe(CARDS.length);
+  it('lists every released card exactly once (not-yet-released sets are excluded)', () => {
+    expect(ORDERED_CARD_IDS.length).toBe(RELEASED_CARDS.length);
+    expect(new Set(ORDERED_CARD_IDS).size).toBe(RELEASED_CARDS.length);
+    expect(ORDERED_CARD_IDS.every((id) => isSetAvailable(BY_ID.get(id)!.set))).toBe(true);
   });
 
   it('groups cards by set number, ascending', () => {

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { validateDeckForTournament } from '@/lib/tournament/deckValidation';
+import { getHiddenCardIds } from '@/lib/cards/reveal';
+import { holoBaseId } from '@/lib/holo/holoId';
 import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
 import { getSocketIO } from '@/lib/socket/server';
 
@@ -62,6 +64,19 @@ export async function POST(
         { error: 'Deck contains locked variant cards', errorKey: 'deckBuilder.error.variantLocked', lockedCardIds: variantCheck.lockedCardIds },
         { status: 400 },
       );
+    }
+
+    // Unrevealed cards are never allowed in a tournament, even when the ban list is off
+    // (e.g. the Monday all-cards tournament). Revealed revealing-set cards remain allowed.
+    const hidden = await getHiddenCardIds();
+    if (hidden.size > 0) {
+      const hiddenInDeck = [...deck.cardIds, ...deck.missionIds].some((id) => hidden.has(holoBaseId(id)));
+      if (hiddenInDeck) {
+        return NextResponse.json(
+          { error: 'Deck contains unrevealed cards', errorKey: 'tournament.error.unrevealedCards' },
+          { status: 400 },
+        );
+      }
     }
 
 

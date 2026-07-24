@@ -3,11 +3,21 @@ import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
 import { sendTournamentCreated } from '@/lib/discord/tournamentCreatedWebhook';
 import { TOURNAMENT_PRIZE_CARD_IDS } from '@/lib/variants/constants';
 import { ADMIN_USERNAMES, ADMIN_EMAILS } from '@/lib/auth/admins';
+import {
+  AUTO_TOURNAMENT_MAX_PLAYERS,
+  AUTO_TOURNAMENT_REG_HOUR,
+  AUTO_TOURNAMENT_START_HOUR,
+  AUTO_SEALED_BOOSTER_COUNT,
+  AUTO_TOURNAMENT_NAMES,
+  AUTO_TOURNAMENT_NAME_SET,
+  specForWeekday,
+} from '@/lib/tournament/weeklySchedule';
+import { getLatestAvailableSetId } from '@/lib/data/sets/registry';
 
 export const DAILY_TOURNAMENT_TZ = 'Europe/Paris';
-export const DAILY_TOURNAMENT_REG_HOUR = 17;
-export const DAILY_TOURNAMENT_START_HOUR = 21;
-export const DAILY_TOURNAMENT_MAX_PLAYERS = 16;
+export const DAILY_TOURNAMENT_REG_HOUR = AUTO_TOURNAMENT_REG_HOUR;
+export const DAILY_TOURNAMENT_START_HOUR = AUTO_TOURNAMENT_START_HOUR;
+export const DAILY_TOURNAMENT_MAX_PLAYERS = AUTO_TOURNAMENT_MAX_PLAYERS;
 export const DAILY_TOURNAMENT_NAME = 'Daily Tournament';
 
 export function parisDateParts(base: Date = new Date()): { year: number; month: number; day: number; hour: number } {
@@ -44,7 +54,7 @@ export function pickDailyPrizeCardId(rng: () => number = Math.random): string {
 
 export interface DailyTournamentResult {
   created: boolean;
-  reason?: 'outside_window' | 'already_exists' | 'no_admin';
+  reason?: 'outside_window' | 'already_exists' | 'no_admin' | 'no_schedule';
   tournamentId?: string;
   prizeCardId?: string;
   scheduledStartAt?: string;
@@ -57,12 +67,19 @@ export async function createDailyTournamentIfNeeded(now: Date = new Date()): Pro
     return { created: false, reason: 'outside_window' };
   }
 
+  const weekday = new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay();
+  const spec = specForWeekday(weekday);
+  if (!spec) return { created: false, reason: 'no_schedule' };
+
   const scheduledStartAt = parisWallToUtc(p.year, p.month, p.day, DAILY_TOURNAMENT_START_HOUR, 0);
   const dayStart = parisWallToUtc(p.year, p.month, p.day, 0, 0);
   const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
 
   const existing = await prisma.tournament.findFirst({
-    where: { name: DAILY_TOURNAMENT_NAME, scheduledStartAt: { gte: dayStart, lt: dayEnd } },
+    where: {
+      name: { in: [DAILY_TOURNAMENT_NAME, ...AUTO_TOURNAMENT_NAME_SET] },
+      scheduledStartAt: { gte: dayStart, lt: dayEnd },
+    },
     select: { id: true },
   });
   if (existing) return { created: false, reason: 'already_exists', tournamentId: existing.id };
@@ -79,21 +96,24 @@ export async function createDailyTournamentIfNeeded(now: Date = new Date()): Pro
   if (!admin) return { created: false, reason: 'no_admin' };
 
   const prizeCardId = pickDailyPrizeCardId();
+  const isSealed = spec.gameMode === 'sealed';
 
   const tournament = await prisma.tournament.create({
     data: {
-      name: DAILY_TOURNAMENT_NAME,
+      name: AUTO_TOURNAMENT_NAMES[spec.kind],
       type: 'simulator',
-      format: 'swiss',
+      format: spec.format,
       status: 'registration',
-      gameMode: 'classic',
-      maxPlayers: DAILY_TOURNAMENT_MAX_PLAYERS,
+      gameMode: spec.gameMode,
+      maxPlayers: AUTO_TOURNAMENT_MAX_PLAYERS,
       isPublic: true,
       joinCode: generateJoinCode(),
       creatorId: admin.id,
       creatorUsername: admin.username,
       requiresDiscord: true,
-      useBanList: true,
+      useBanList: spec.useBanList,
+      sealedBoosterCount: isSealed ? AUTO_SEALED_BOOSTER_COUNT : null,
+      sealedSetChoice: isSealed ? (getLatestAvailableSetId() ?? 'random') : null,
       scheduledStartAt,
     },
   });

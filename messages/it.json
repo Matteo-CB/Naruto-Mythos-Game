@@ -113,7 +113,8 @@
       "offline": "Offline",
       "retry": "Riprova"
     },
-    "ok": "OK"
+    "ok": "OK",
+    "revealing": "In rivelazione"
   },
   "flag": {
     "none": "Nessuna bandiera",
@@ -316,7 +317,8 @@
     "quests": "Missioni",
     "questsBadgeTooltip": "{count} ricompensa/e da riscuotere",
     "socialBadgeTooltip": "{count} messaggi o richieste in sospeso",
-    "worldcup": "Coppa del Mondo"
+    "worldcup": "Coppa del Mondo",
+    "social": "Social"
   },
   "settings": {
     "title": "Opzioni",
@@ -387,7 +389,12 @@
     "unblock": "Sblocca",
     "fastAnimations": "Animazioni veloci",
     "fastAnimationsHint": "Tutte le animazioni di gioco durano la metà del tempo.",
-    "animationsTouchDisabled": "Sugli schermi touch, solo le animazioni delle carte in gioco sono ridotte. Le altre animazioni seguono questa impostazione."
+    "animationsTouchDisabled": "Sugli schermi touch, solo le animazioni delle carte in gioco sono ridotte. Le altre animazioni seguono questa impostazione.",
+    "allowNonFriendMessages": "Messaggi dai non amici",
+    "allowNonFriendMessagesHint": "Permetti ai giocatori che non sono tuoi amici di inviarti messaggi privati.",
+    "privateProfile": "Profilo privato",
+    "privateProfileHint": "Nascondi i tuoi post a tutti tranne agli amici. Non possono seguirti, solo inviarti una richiesta di amicizia.",
+    "socialSectionTitle": "Social e privacy"
   },
   "auth": {
     "signIn": "Accedi",
@@ -569,13 +576,17 @@
     "badgePrefsDesc": "Scegli quali distintivi mostrare accanto al tuo nome."
   },
   "social": {
-    "requestUnavailable": "Impossibile inviare la richiesta.",
-    "block": {
-      "confirmTitle": "Bloccare {player}?",
-      "confirmBody": "Non potrà più scriverti, aggiungerti come amico o invitarti a una partita. Se era tra i tuoi amici, verrà rimosso. Puoi sbloccarlo in qualsiasi momento nelle Opzioni.",
-      "confirm": "Blocca",
-      "doneTitle": "Giocatore bloccato"
-    }
+    "title": "Community",
+    "subtitle": "Unisciti alla community di Naruto Mythos",
+    "feedTitle": "Bacheca della community",
+    "feedDescription": "Condividi i tuoi mazzi e i replay, segui i giocatori e chiacchiera con tutta la community.",
+    "feedCta": "Apri la bacheca",
+    "discordTitle": "Server Discord",
+    "discordSubtitle": "I server Discord della community di Naruto Mythos.",
+    "join": "Unisciti",
+    "emptyTitle": "Server in arrivo",
+    "emptyText": "I server Discord della community saranno aggiunti qui molto presto.",
+    "close": "Chiudi"
   },
   "discord": {
     "linkDiscord": "Collega Discord",
@@ -774,7 +785,11 @@
     "mode_all": "Tutte le modalità",
     "sealedNoGames": "Nessuna partita sealed registrata ancora",
     "sealedRandomSet": "Set casuale",
-    "sealedGamesCount": "{count} partite"
+    "sealedGamesCount": "{count} partite",
+    "deckPublic": "Pubblico",
+    "deckPrivate": "Privato",
+    "deckPublicHint": "Visibile a tutti",
+    "deckPrivateHint": "Visibile solo a te"
   },
   "friends": {
     "title": "Amici",
@@ -1791,7 +1806,9 @@
     "holoToggle": "Versione holo",
     "holoLockedToast": "Questa carta holo è bloccata. Ottienila da un booster di varianti o da uno scambio.",
     "duplicateDeck": "Copia",
-    "copySuffix": "(copia)"
+    "copySuffix": "(copia)",
+    "showUnrevealed": "Mostra non rivelate",
+    "containsUnrevealed": "Contiene non rivelate"
   },
   "seoPages": {
     "collection": {
@@ -1892,6 +1909,20 @@
       "title": "Coppa del Mondo: Classifica dei Paesi | Naruto Mythos TCG",
       "description": "La Coppa del Mondo del Naruto Mythos TCG: una classifica dei paesi costruita dalle partite classificate degli ultimi 7 giorni. Punteggio equo che bilancia comunità piccole e grandi, percentuali di vittoria, migliori giocatori per paese e il gruppo di carte più giocato di ogni nazione.",
       "ogAlt": "Classifica dei paesi della Coppa del Mondo del Naruto Mythos TCG"
+    },
+    "feed": {
+      "title": "Feed - Naruto Mythos TCG",
+      "description": "Condividi i tuoi mazzi e i replay delle partite, segui i giocatori e discuti nel feed della community del gioco di carte Naruto Mythos."
+    },
+    "postDetail": {
+      "title": "{author}: {snippet} - Naruto Mythos TCG",
+      "description": "{author} nel feed di Naruto Mythos TCG: {snippet}",
+      "fallbackSnippet": "un post"
+    },
+    "social": {
+      "title": "Community - Naruto Mythos TCG",
+      "description": "Unisciti alla bacheca della community e ai server Discord di Naruto Mythos: mazzi, replay, giocatori e discussioni.",
+      "ogAlt": "Community di Naruto Mythos TCG"
     }
   },
   "worldcup": {
@@ -2675,7 +2706,8 @@
       "invalidPrize": "Carta premio non valida.",
       "invalidSetChoice": "Scelta del set non valida.",
       "setUnavailable": "Questo set non è ancora disponibile.",
-      "alreadyFinished": "Questo torneo è già terminato."
+      "alreadyFinished": "Questo torneo è già terminato.",
+      "unrevealedCards": "Il tuo mazzo contiene carte non rivelate, che non sono permesse."
     },
     "deckError": {
       "tooFewCards": "Il mazzo deve avere almeno {min} carte (ne ha {count}).",
@@ -3638,5 +3670,145 @@
       "abandon": "Abbandona"
     },
     "edgeToken": "Token Vantaggio"
+  },
+  "adminReveal": {
+    "title": "Gestione rivelazione carte",
+    "subtitle": "Rivela o nascondi le carte dei set attualmente in fase di rivelazione. Le carte nascoste restano invisibili a tutti i giocatori tranne amministratori e tester, ovunque nel gioco.",
+    "unauthorized": "Accesso negato.",
+    "back": "Torna all'amministrazione",
+    "revealAll": "Rivela tutto",
+    "hideAll": "Nascondi tutto",
+    "statusRevealed": "Rivelata",
+    "statusHidden": "Nascosta",
+    "countLabel": "{revealed} / {total} rivelate",
+    "loading": "Caricamento...",
+    "empty": "Nessuna carta di un set in rivelazione.",
+    "setStatusTitle": "Stato dei set",
+    "setStatusSubtitle": "Imposta ogni set su Uscito, In rivelazione o Prossimamente. Le carte in rivelazione sono giocabili ma bandite in classificata e nascoste fino alla rivelazione; quelle prossime sono nascoste a tutti.",
+    "obtentionTitle": "Ottenimento varianti",
+    "obtentionSubtitle": "Scegli come ottenere ogni variante: dalle buste, riservata a tornei e battlepass, o bloccata (solo concessione admin).",
+    "statusAvailable": "Uscito",
+    "statusRevealing": "In rivelazione",
+    "statusComingSoon": "Prossimamente",
+    "modeBooster": "Buste",
+    "modeReserved": "Riservata",
+    "modeLocked": "Bloccata"
+  },
+  "feed": {
+    "title": "Feed",
+    "tabAll": "Tutto",
+    "tabFollowing": "Seguiti",
+    "tabFriends": "Amici",
+    "composerPlaceholder": "Che si dice?",
+    "replyPlaceholder": "Scrivi una risposta...",
+    "post": "Pubblica",
+    "reply": "Rispondi",
+    "attachDeck": "Aggiungi un mazzo",
+    "removeDeck": "Rimuovi il mazzo",
+    "addGif": "GIF",
+    "removeGif": "Rimuovi il GIF",
+    "like": "Mi piace",
+    "repost": "Ripubblica",
+    "quote": "Cita",
+    "pin": "Fissa",
+    "unpin": "Rimuovi dai fissati",
+    "pinned": "Fissato",
+    "deleteAction": "Elimina",
+    "cards": "{count} carte",
+    "missions": "{count} missioni",
+    "viewThread": "Vedi discussione",
+    "loadMore": "Vedi altro",
+    "empty": "Ancora nessun post.",
+    "emptyFollowing": "I post delle persone che segui appariranno qui.",
+    "loginToPost": "Accedi per pubblicare.",
+    "messages": "Messaggi",
+    "gifSearch": "Cerca su Tenor",
+    "viaTenor": "Via Tenor",
+    "repostedBy": "{user} ha ripubblicato",
+    "replyingTo": "In risposta a {user}",
+    "deleteConfirm": "Eliminare questo post?",
+    "yourDeck": "Il tuo mazzo",
+    "chooseDeck": "Scegli un mazzo",
+    "noDecks": "Non hai mazzi salvati.",
+    "tooLong": "Messaggio troppo lungo.",
+    "empty2": "Aggiungi del testo, un mazzo o un GIF.",
+    "deckNotYours": "Puoi pubblicare solo il tuo mazzo.",
+    "parentGone": "Questo post non esiste più.",
+    "blockedToxic": "Questo messaggio è stato bloccato dalla moderazione.",
+    "home": "Home",
+    "loading": "Caricamento...",
+    "attachReplay": "Aggiungi un replay",
+    "removeReplay": "Rimuovi il replay",
+    "chooseReplay": "Scegli un replay",
+    "noReplays": "Non hai replay.",
+    "replayLabel": "Replay",
+    "replayMoment": "Momento del replay",
+    "vsAi": "vs IA",
+    "watchReplay": "Guarda il replay",
+    "watchMoment": "Guarda questo momento",
+    "replayExpired": "Replay non più disponibile",
+    "close": "Chiudi",
+    "noGifs": "Nessun GIF trovato.",
+    "more": "Altro",
+    "report": "Segnala",
+    "reported": "Segnalato",
+    "shareMoment": "Condividi questo momento",
+    "shareLinkCopied": "Link copiato",
+    "posts": "Post",
+    "error": {
+      "tooLong": "Messaggio troppo lungo.",
+      "deckNotYours": "Puoi pubblicare solo il tuo mazzo.",
+      "replayNotYours": "Puoi condividere solo le tue partite.",
+      "parentGone": "Questo post non esiste più.",
+      "empty": "Aggiungi testo, un mazzo, un replay o un GIF.",
+      "blocked": "Questo messaggio è stato bloccato dalla moderazione.",
+      "generic": "Qualcosa è andato storto."
+    },
+    "postToFeed": "Pubblica nel feed"
+  },
+  "adminPostModeration": {
+    "title": "Moderazione post e messaggi",
+    "subtitle": "Segnalazioni su post e messaggi privati, più le rilevazioni IA sui post. I post tossici sono già bloccati prima della pubblicazione; questa è la coda di revisione.",
+    "back": "Torna all'amministrazione",
+    "unauthorized": "Accesso negato.",
+    "loading": "Caricamento...",
+    "reports": "Segnalazioni",
+    "aiScans": "Rilevazioni IA",
+    "noReports": "Nessuna segnalazione in sospeso.",
+    "noScans": "Nessuna rilevazione in sospeso.",
+    "resolve": "Risolvi",
+    "deletePost": "Elimina post",
+    "reportedBy": "segnalato da",
+    "by": "di",
+    "reason": "Motivo",
+    "noText": "nessun testo",
+    "typePost": "Post",
+    "typeMessage": "Messaggio"
+  },
+  "tournamentCalendar": {
+    "title": "Calendario settimanale",
+    "subtitle": "Tornei automatici, ogni settimana",
+    "noTournament": "Nessun torneo",
+    "registrationOpen": "Iscrizioni aperte",
+    "view": "Vedi",
+    "kind": {
+      "classic": "Classico",
+      "open": "Aperto, tutte le carte",
+      "elimination": "Eliminazione diretta",
+      "sealed": "Sealed"
+    },
+    "rules": {
+      "formatSwiss": "Formato svizzero",
+      "formatElim": "Eliminazione diretta",
+      "slots": "{count} posti",
+      "sealed": "Sealed, {count} buste",
+      "allCards": "Tutte le carte permesse, senza restrizioni",
+      "banList": "Lista di ban standard",
+      "times": "Iscrizioni {reg}, inizio {start}",
+      "discord": "Discord obbligatorio"
+    },
+    "today": "Oggi",
+    "button": "Calendario",
+    "close": "Chiudi"
   }
 }

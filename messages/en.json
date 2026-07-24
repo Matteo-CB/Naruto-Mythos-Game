@@ -177,6 +177,20 @@
       "title": "World Cup: Country Rankings | Naruto Mythos TCG",
       "description": "The Naruto Mythos TCG World Cup: a country ranking built from ranked games of the last 7 days. Fair score that balances small and large communities, win rates, top players per country and the most played card group of each nation.",
       "ogAlt": "Naruto Mythos TCG World Cup country rankings"
+    },
+    "feed": {
+      "title": "Feed - Naruto Mythos TCG",
+      "description": "Share your decks and game replays, follow players and discuss the Naruto Mythos card game community feed."
+    },
+    "postDetail": {
+      "title": "{author}: {snippet} - Naruto Mythos TCG",
+      "description": "{author} on the Naruto Mythos TCG feed: {snippet}",
+      "fallbackSnippet": "a post"
+    },
+    "social": {
+      "title": "Social - Naruto Mythos TCG",
+      "description": "Join the community feed and the Naruto Mythos Discord servers: decks, replays, players and discussions.",
+      "ogAlt": "Naruto Mythos TCG social hub"
     }
   },
   "cardMeta": {
@@ -558,7 +572,8 @@
       "offline": "Offline",
       "retry": "Retry"
     },
-    "ok": "OK"
+    "ok": "OK",
+    "revealing": "Revealing"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -597,7 +612,8 @@
     "quests": "Quests",
     "questsBadgeTooltip": "{count} reward(s) to claim",
     "socialBadgeTooltip": "{count} messages or pending requests",
-    "worldcup": "World Cup"
+    "worldcup": "World Cup",
+    "social": "Social"
   },
   "gamepad": {
     "title": "Controller",
@@ -687,7 +703,12 @@
     "unblock": "Unblock",
     "fastAnimations": "Fast animations",
     "fastAnimationsHint": "All game animations last half as long.",
-    "animationsTouchDisabled": "On touch screens, only in-game card animations are reduced. Other animations follow this setting."
+    "animationsTouchDisabled": "On touch screens, only in-game card animations are reduced. Other animations follow this setting.",
+    "allowNonFriendMessages": "Messages from non-friends",
+    "allowNonFriendMessagesHint": "Allow players who are not your friends to send you private messages.",
+    "privateProfile": "Private profile",
+    "privateProfileHint": "Hide your posts from everyone except your friends. People cannot follow you, only send a friend request.",
+    "socialSectionTitle": "Social & privacy"
   },
   "game": {
     "turn": "Turn {turn}",
@@ -1863,7 +1884,9 @@
     "holoToggle": "Holo version",
     "holoLockedToast": "This holo card is locked. Get it from a variant booster or a trade.",
     "duplicateDeck": "Copy",
-    "copySuffix": "(copy)"
+    "copySuffix": "(copy)",
+    "showUnrevealed": "Show unrevealed",
+    "containsUnrevealed": "Contains unrevealed"
   },
   "discord": {
     "linkDiscord": "Link Discord",
@@ -2163,7 +2186,11 @@
     "mode_all": "All modes",
     "sealedNoGames": "No sealed games recorded yet",
     "sealedRandomSet": "Random set",
-    "sealedGamesCount": "{count} games"
+    "sealedGamesCount": "{count} games",
+    "deckPublic": "Public",
+    "deckPrivate": "Private",
+    "deckPublicHint": "Visible to everyone",
+    "deckPrivateHint": "Visible only to you"
   },
   "replay": {
     "title": "Match Recap",
@@ -2930,7 +2957,8 @@
       "invalidPrize": "Invalid prize card.",
       "invalidSetChoice": "Invalid set choice.",
       "setUnavailable": "This set is not available yet.",
-      "alreadyFinished": "This tournament is already finished."
+      "alreadyFinished": "This tournament is already finished.",
+      "unrevealedCards": "Your deck contains unrevealed cards, which are not allowed."
     },
     "deckError": {
       "tooFewCards": "Deck must have at least {min} cards (has {count}).",
@@ -3414,13 +3442,17 @@
     "hint": "Shown next to your name in the leaderboard and on your profile."
   },
   "social": {
-    "requestUnavailable": "Unable to send the request.",
-    "block": {
-      "confirmTitle": "Block {player}?",
-      "confirmBody": "They will no longer be able to write to you, add you as a friend or invite you to a match. If they were in your friends, they will be removed. You can unblock them anytime in the Options.",
-      "confirm": "Block",
-      "doneTitle": "Player blocked"
-    }
+    "title": "Social hub",
+    "subtitle": "Join the Naruto Mythos community",
+    "feedTitle": "Community feed",
+    "feedDescription": "Share your decks and replays, follow players and chat with the whole community.",
+    "feedCta": "Open the feed",
+    "discordTitle": "Discord servers",
+    "discordSubtitle": "The Naruto Mythos community Discord servers.",
+    "join": "Join",
+    "emptyTitle": "Servers coming soon",
+    "emptyText": "The community Discord servers will be added here very soon.",
+    "close": "Close"
   },
   "report": {
     "title": "Report {player}",
@@ -3637,5 +3669,145 @@
     "progressionCollecting": "Progression data will appear as the season goes on.",
     "activityTitle": "Activity by hour (UTC)",
     "worldMapHint": "Hover or tap a country"
+  },
+  "adminReveal": {
+    "title": "Card reveal management",
+    "subtitle": "Reveal or hide cards from sets that are currently being revealed. Hidden cards stay invisible to every player except admins and testers, everywhere in the game.",
+    "unauthorized": "Access denied.",
+    "back": "Back to admin",
+    "revealAll": "Reveal all",
+    "hideAll": "Hide all",
+    "statusRevealed": "Revealed",
+    "statusHidden": "Hidden",
+    "countLabel": "{revealed} / {total} revealed",
+    "loading": "Loading...",
+    "empty": "No cards from a revealing set.",
+    "setStatusTitle": "Set status",
+    "setStatusSubtitle": "Set each set to Released, Revealing, or Coming soon. Revealing cards are playable but banned in ranked and hidden until revealed; coming soon cards are hidden from everyone.",
+    "obtentionTitle": "Variant obtention",
+    "obtentionSubtitle": "Choose how each variant can be obtained: from boosters, reserved for tournaments and the battlepass, or locked (admin grant only).",
+    "statusAvailable": "Released",
+    "statusRevealing": "Revealing",
+    "statusComingSoon": "Coming soon",
+    "modeBooster": "Boosters",
+    "modeReserved": "Reserved",
+    "modeLocked": "Locked"
+  },
+  "feed": {
+    "title": "Feed",
+    "tabAll": "All",
+    "tabFollowing": "Following",
+    "tabFriends": "Friends",
+    "composerPlaceholder": "What's new?",
+    "replyPlaceholder": "Write a reply...",
+    "post": "Post",
+    "reply": "Reply",
+    "attachDeck": "Add a deck",
+    "removeDeck": "Remove deck",
+    "addGif": "GIF",
+    "removeGif": "Remove GIF",
+    "like": "Like",
+    "repost": "Repost",
+    "quote": "Quote",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "pinned": "Pinned",
+    "deleteAction": "Delete",
+    "cards": "{count} cards",
+    "missions": "{count} missions",
+    "viewThread": "View thread",
+    "loadMore": "Load more",
+    "empty": "No posts yet.",
+    "emptyFollowing": "Posts from people you follow will appear here.",
+    "loginToPost": "Sign in to post.",
+    "messages": "Messages",
+    "gifSearch": "Search Tenor",
+    "viaTenor": "Via Tenor",
+    "repostedBy": "{user} reposted",
+    "replyingTo": "Replying to {user}",
+    "deleteConfirm": "Delete this post?",
+    "yourDeck": "Your deck",
+    "chooseDeck": "Choose a deck",
+    "noDecks": "You have no saved decks.",
+    "tooLong": "Message too long.",
+    "empty2": "Add some text, a deck or a GIF.",
+    "deckNotYours": "You can only post your own deck.",
+    "parentGone": "This post no longer exists.",
+    "blockedToxic": "This message was blocked by moderation.",
+    "home": "Home",
+    "loading": "Loading...",
+    "attachReplay": "Add a replay",
+    "removeReplay": "Remove replay",
+    "chooseReplay": "Choose a replay",
+    "noReplays": "You have no replays.",
+    "replayLabel": "Replay",
+    "replayMoment": "Replay moment",
+    "vsAi": "vs AI",
+    "watchReplay": "Watch replay",
+    "watchMoment": "Watch this moment",
+    "replayExpired": "Replay no longer available",
+    "close": "Close",
+    "noGifs": "No GIFs found.",
+    "more": "More",
+    "report": "Report",
+    "reported": "Reported",
+    "shareMoment": "Share this moment",
+    "shareLinkCopied": "Link copied",
+    "posts": "Posts",
+    "error": {
+      "tooLong": "Message too long.",
+      "deckNotYours": "You can only post your own deck.",
+      "replayNotYours": "You can only share your own games.",
+      "parentGone": "This post no longer exists.",
+      "empty": "Add some text, a deck, a replay or a GIF.",
+      "blocked": "This message was blocked by moderation.",
+      "generic": "Something went wrong."
+    },
+    "postToFeed": "Post to feed"
+  },
+  "adminPostModeration": {
+    "title": "Post & message moderation",
+    "subtitle": "Reports on posts and private messages, plus AI detections on posts. Toxic posts are already blocked before publishing; this is the review queue.",
+    "back": "Back to admin",
+    "unauthorized": "Access denied.",
+    "loading": "Loading...",
+    "reports": "Reports",
+    "aiScans": "AI detections",
+    "noReports": "No pending reports.",
+    "noScans": "No pending detections.",
+    "resolve": "Resolve",
+    "deletePost": "Delete post",
+    "reportedBy": "reported by",
+    "by": "by",
+    "reason": "Reason",
+    "noText": "no text",
+    "typePost": "Post",
+    "typeMessage": "Message"
+  },
+  "tournamentCalendar": {
+    "title": "Weekly schedule",
+    "subtitle": "Automatic tournaments, every week",
+    "noTournament": "No tournament",
+    "registrationOpen": "Registration open",
+    "view": "View",
+    "kind": {
+      "classic": "Classic",
+      "open": "Open, all cards",
+      "elimination": "Direct elimination",
+      "sealed": "Sealed"
+    },
+    "rules": {
+      "formatSwiss": "Swiss format",
+      "formatElim": "Single elimination",
+      "slots": "{count} slots",
+      "sealed": "Sealed, {count} boosters",
+      "allCards": "All cards allowed, no restriction",
+      "banList": "Standard ban list",
+      "times": "Registration {reg}, start {start}",
+      "discord": "Discord required"
+    },
+    "today": "Today",
+    "button": "Schedule",
+    "close": "Close"
   }
 }

@@ -113,7 +113,8 @@
       "offline": "Offline",
       "retry": "Ponów"
     },
-    "ok": "OK"
+    "ok": "OK",
+    "revealing": "W trakcie ujawniania"
   },
   "flag": {
     "none": "Brak flagi",
@@ -316,7 +317,8 @@
     "quests": "Zadania",
     "questsBadgeTooltip": "{count} nagród(y) do odebrania",
     "socialBadgeTooltip": "{count} wiadomości lub oczekujących próśb",
-    "worldcup": "Puchar Świata"
+    "worldcup": "Puchar Świata",
+    "social": "Społeczność"
   },
   "settings": {
     "title": "Opcje",
@@ -387,7 +389,12 @@
     "unblock": "Odblokuj",
     "fastAnimations": "Szybkie animacje",
     "fastAnimationsHint": "Wszystkie animacje w grze trwają o połowę krócej.",
-    "animationsTouchDisabled": "Na ekranach dotykowych ograniczone są tylko animacje kart w grze. Pozostałe animacje podlegają temu ustawieniu."
+    "animationsTouchDisabled": "Na ekranach dotykowych ograniczone są tylko animacje kart w grze. Pozostałe animacje podlegają temu ustawieniu.",
+    "allowNonFriendMessages": "Wiadomości od nie-znajomych",
+    "allowNonFriendMessagesHint": "Zezwól graczom, którzy nie są twoimi znajomymi, na wysyłanie prywatnych wiadomości.",
+    "privateProfile": "Profil prywatny",
+    "privateProfileHint": "Ukryj swoje posty przed wszystkimi oprócz znajomych. Nie można cię obserwować, tylko wysłać zaproszenie do znajomych.",
+    "socialSectionTitle": "Społeczność i prywatność"
   },
   "auth": {
     "signIn": "Zaloguj się",
@@ -569,13 +576,17 @@
     "badgePrefsDesc": "Wybierz, które odznaki wyświetlać obok twojej nazwy."
   },
   "social": {
-    "requestUnavailable": "Nie można wysłać prośby.",
-    "block": {
-      "confirmTitle": "Zablokować {player}?",
-      "confirmBody": "Ta osoba nie będzie mogła już do ciebie pisać, dodać cię do znajomych ani zaprosić do meczu. Jeśli była wśród twoich znajomych, zostanie usunięta. Możesz ją odblokować w każdej chwili w Opcjach.",
-      "confirm": "Zablokuj",
-      "doneTitle": "Gracz zablokowany"
-    }
+    "title": "Społeczność",
+    "subtitle": "Dołącz do społeczności Naruto Mythos",
+    "feedTitle": "Tablica społeczności",
+    "feedDescription": "Udostępniaj swoje talie i powtórki, obserwuj graczy i rozmawiaj z całą społecznością.",
+    "feedCta": "Otwórz tablicę",
+    "discordTitle": "Serwery Discord",
+    "discordSubtitle": "Serwery Discord społeczności Naruto Mythos.",
+    "join": "Dołącz",
+    "emptyTitle": "Serwery już wkrótce",
+    "emptyText": "Serwery Discord społeczności zostaną tu wkrótce dodane.",
+    "close": "Zamknij"
   },
   "discord": {
     "linkDiscord": "Połącz Discord",
@@ -774,7 +785,11 @@
     "mode_all": "Wszystkie tryby",
     "sealedNoGames": "Brak jeszcze zapisanych gier sealed",
     "sealedRandomSet": "Losowy set",
-    "sealedGamesCount": "{count} gier"
+    "sealedGamesCount": "{count} gier",
+    "deckPublic": "Publiczny",
+    "deckPrivate": "Prywatny",
+    "deckPublicHint": "Widoczny dla wszystkich",
+    "deckPrivateHint": "Widoczny tylko dla ciebie"
   },
   "friends": {
     "title": "Znajomi",
@@ -1791,7 +1806,9 @@
     "holoToggle": "Wersja holo",
     "holoLockedToast": "Ta karta holo jest zablokowana. Zdobądź ją z boostera wariantów lub w wymianie.",
     "duplicateDeck": "Kopiuj",
-    "copySuffix": "(kopia)"
+    "copySuffix": "(kopia)",
+    "showUnrevealed": "Pokaż nieujawnione",
+    "containsUnrevealed": "Zawiera nieujawnione"
   },
   "seoPages": {
     "collection": {
@@ -1892,6 +1909,20 @@
       "title": "Puchar Świata: Ranking Krajów | Naruto Mythos TCG",
       "description": "Puchar Świata Naruto Mythos TCG: ranking krajów zbudowany na podstawie gier rankingowych z ostatnich 7 dni. Uczciwy wynik równoważący małe i duże społeczności, wskaźniki zwycięstw, najlepsi gracze na kraj i najczęściej grana grupa kart każdego narodu.",
       "ogAlt": "Ranking krajów Pucharu Świata Naruto Mythos TCG"
+    },
+    "feed": {
+      "title": "Tablica - Naruto Mythos TCG",
+      "description": "Udostępniaj swoje talie i powtórki gier, obserwuj graczy i rozmawiaj na tablicy społeczności gry karcianej Naruto Mythos."
+    },
+    "postDetail": {
+      "title": "{author}: {snippet} - Naruto Mythos TCG",
+      "description": "{author} na tablicy Naruto Mythos TCG: {snippet}",
+      "fallbackSnippet": "post"
+    },
+    "social": {
+      "title": "Społeczność - Naruto Mythos TCG",
+      "description": "Dołącz do tablicy społeczności i serwerów Discord Naruto Mythos: talie, powtórki, gracze i dyskusje.",
+      "ogAlt": "Społeczność Naruto Mythos TCG"
     }
   },
   "worldcup": {
@@ -2675,7 +2706,8 @@
       "invalidPrize": "Nieprawidłowa karta nagrody.",
       "invalidSetChoice": "Nieprawidłowy wybór setu.",
       "setUnavailable": "Ten set nie jest jeszcze dostępny.",
-      "alreadyFinished": "Ten turniej już się zakończył."
+      "alreadyFinished": "Ten turniej już się zakończył.",
+      "unrevealedCards": "Twoja talia zawiera nieujawnione karty, które są niedozwolone."
     },
     "deckError": {
       "tooFewCards": "Talia musi mieć co najmniej {min} kart (ma {count}).",
@@ -3638,5 +3670,145 @@
       "abandon": "Porzuć"
     },
     "edgeToken": "Żeton Przewagi"
+  },
+  "adminReveal": {
+    "title": "Zarządzanie ujawnianiem kart",
+    "subtitle": "Ujawnij lub ukryj karty z zestawów, które są obecnie ujawniane. Ukryte karty pozostają niewidoczne dla wszystkich graczy poza administratorami i testerami, w całej grze.",
+    "unauthorized": "Odmowa dostępu.",
+    "back": "Powrót do administracji",
+    "revealAll": "Ujawnij wszystko",
+    "hideAll": "Ukryj wszystko",
+    "statusRevealed": "Ujawniona",
+    "statusHidden": "Ukryta",
+    "countLabel": "{revealed} / {total} ujawnionych",
+    "loading": "Ładowanie...",
+    "empty": "Brak kart z ujawnianego zestawu.",
+    "setStatusTitle": "Status zestawów",
+    "setStatusSubtitle": "Ustaw każdy zestaw na Wydany, W trakcie ujawniania lub Wkrótce. Karty ujawniane są grywalne, ale zbanowane w rankingu i ukryte do ujawnienia; karty wkrótce są ukryte dla wszystkich.",
+    "obtentionTitle": "Zdobywanie wariantów",
+    "obtentionSubtitle": "Wybierz, jak można zdobyć każdy wariant: z boosterów, zarezerwowany na turnieje i battlepass, lub zablokowany (tylko przyznanie przez administratora).",
+    "statusAvailable": "Wydany",
+    "statusRevealing": "W trakcie ujawniania",
+    "statusComingSoon": "Wkrótce",
+    "modeBooster": "Boostery",
+    "modeReserved": "Zarezerwowany",
+    "modeLocked": "Zablokowany"
+  },
+  "feed": {
+    "title": "Tablica",
+    "tabAll": "Wszystko",
+    "tabFollowing": "Obserwowani",
+    "tabFriends": "Znajomi",
+    "composerPlaceholder": "Co słychać?",
+    "replyPlaceholder": "Napisz odpowiedź...",
+    "post": "Opublikuj",
+    "reply": "Odpowiedz",
+    "attachDeck": "Dodaj talię",
+    "removeDeck": "Usuń talię",
+    "addGif": "GIF",
+    "removeGif": "Usuń GIF",
+    "like": "Lubię",
+    "repost": "Udostępnij",
+    "quote": "Cytuj",
+    "pin": "Przypnij",
+    "unpin": "Odepnij",
+    "pinned": "Przypięte",
+    "deleteAction": "Usuń",
+    "cards": "Karty: {count}",
+    "missions": "Misje: {count}",
+    "viewThread": "Zobacz wątek",
+    "loadMore": "Zobacz więcej",
+    "empty": "Brak postów.",
+    "emptyFollowing": "Posty osób, które obserwujesz, pojawią się tutaj.",
+    "loginToPost": "Zaloguj się, aby publikować.",
+    "messages": "Wiadomości",
+    "gifSearch": "Szukaj w Tenor",
+    "viaTenor": "Via Tenor",
+    "repostedBy": "{user} udostępnił(a)",
+    "replyingTo": "W odpowiedzi do {user}",
+    "deleteConfirm": "Usunąć ten post?",
+    "yourDeck": "Twoja talia",
+    "chooseDeck": "Wybierz talię",
+    "noDecks": "Nie masz zapisanych talii.",
+    "tooLong": "Wiadomość zbyt długa.",
+    "empty2": "Dodaj tekst, talię lub GIF.",
+    "deckNotYours": "Możesz publikować tylko własną talię.",
+    "parentGone": "Ten post już nie istnieje.",
+    "blockedToxic": "Ta wiadomość została zablokowana przez moderację.",
+    "home": "Główna",
+    "loading": "Ładowanie...",
+    "attachReplay": "Dodaj powtórkę",
+    "removeReplay": "Usuń powtórkę",
+    "chooseReplay": "Wybierz powtórkę",
+    "noReplays": "Nie masz powtórek.",
+    "replayLabel": "Powtórka",
+    "replayMoment": "Moment powtórki",
+    "vsAi": "vs SI",
+    "watchReplay": "Zobacz powtórkę",
+    "watchMoment": "Zobacz ten moment",
+    "replayExpired": "Powtórka niedostępna",
+    "close": "Zamknij",
+    "noGifs": "Nie znaleziono GIF-ów.",
+    "more": "Więcej",
+    "report": "Zgłoś",
+    "reported": "Zgłoszono",
+    "shareMoment": "Udostępnij ten moment",
+    "shareLinkCopied": "Skopiowano link",
+    "posts": "Posty",
+    "error": {
+      "tooLong": "Wiadomość zbyt długa.",
+      "deckNotYours": "Możesz publikować tylko własną talię.",
+      "replayNotYours": "Możesz udostępniać tylko własne gry.",
+      "parentGone": "Ten post już nie istnieje.",
+      "empty": "Dodaj tekst, talię, powtórkę lub GIF.",
+      "blocked": "Ta wiadomość została zablokowana przez moderację.",
+      "generic": "Coś poszło nie tak."
+    },
+    "postToFeed": "Opublikuj na tablicy"
+  },
+  "adminPostModeration": {
+    "title": "Moderacja postów i wiadomości",
+    "subtitle": "Zgłoszenia postów i wiadomości prywatnych oraz wykrycia AI w postach. Toksyczne posty są już blokowane przed publikacją; to jest kolejka do przeglądu.",
+    "back": "Powrót do administracji",
+    "unauthorized": "Odmowa dostępu.",
+    "loading": "Ładowanie...",
+    "reports": "Zgłoszenia",
+    "aiScans": "Wykrycia AI",
+    "noReports": "Brak oczekujących zgłoszeń.",
+    "noScans": "Brak oczekujących wykryć.",
+    "resolve": "Rozwiąż",
+    "deletePost": "Usuń post",
+    "reportedBy": "zgłoszone przez",
+    "by": "przez",
+    "reason": "Powód",
+    "noText": "brak tekstu",
+    "typePost": "Post",
+    "typeMessage": "Wiadomość"
+  },
+  "tournamentCalendar": {
+    "title": "Harmonogram tygodniowy",
+    "subtitle": "Automatyczne turnieje, co tydzień",
+    "noTournament": "Brak turnieju",
+    "registrationOpen": "Zapisy otwarte",
+    "view": "Zobacz",
+    "kind": {
+      "classic": "Klasyczny",
+      "open": "Otwarty, wszystkie karty",
+      "elimination": "Eliminacja bezpośrednia",
+      "sealed": "Sealed"
+    },
+    "rules": {
+      "formatSwiss": "Format szwajcarski",
+      "formatElim": "Eliminacja bezpośrednia",
+      "slots": "Miejsca: {count}",
+      "sealed": "Sealed, boostery: {count}",
+      "allCards": "Wszystkie karty dozwolone, bez ograniczeń",
+      "banList": "Standardowa lista banów",
+      "times": "Zapisy {reg}, start {start}",
+      "discord": "Wymagany Discord"
+    },
+    "today": "Dziś",
+    "button": "Kalendarz",
+    "close": "Zamknij"
   }
 }

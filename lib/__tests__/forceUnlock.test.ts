@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { isForceUnlockedCard, getForceUnlockedCardIds } from '@/lib/variants/forceUnlock';
 
-describe('force-unlock for pre-release (coming_soon) sets', () => {
-  it('unlocks every Set 2 (SS) card, variants included, while the set is coming_soon', () => {
+describe('force-unlock for not-yet-released (coming_soon / revealing) sets', () => {
+  it('unlocks every Set 2 (SS) card, variants included, while the set is being revealed', () => {
     expect(isForceUnlockedCard('SS-112-SPV')).toBe(true);
     expect(isForceUnlockedCard('SS-122-SPV')).toBe(true);
     expect(isForceUnlockedCard('SS-126-SPV')).toBe(true);

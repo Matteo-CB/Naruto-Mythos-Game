@@ -101,7 +101,29 @@ function normalizeMissionCard(raw: RawJsonCard): MissionCard {
 
 
 const rawCards = (rawData as { cards: Record<string, RawJsonCard> }).cards;
-const rawCardList = Object.values(rawCards);
+const rawCardList: RawJsonCard[] = Object.values(rawCards);
+const rawIds = new Set<string>(rawCardList.map((c) => c.id));
+
+export function augmentRawCards(cards: Record<string, unknown> | RawJsonCard[]): void {
+  const list = Array.isArray(cards) ? cards : (Object.values(cards) as RawJsonCard[]);
+  let added = false;
+  for (const raw of list) {
+    if (raw && typeof raw.id === 'string' && !rawIds.has(raw.id)) {
+      rawCardList.push(raw);
+      rawIds.add(raw.id);
+      added = true;
+    }
+  }
+  if (added) {
+    _allCards = null;
+    _characters = null;
+    _missions = null;
+    _attachments = null;
+    _playableCharacters = null;
+    _playableMissions = null;
+    _oldIdToNewId = null;
+  }
+}
 
 
 let _allCards: CardData[] | null = null;

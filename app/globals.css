@@ -107,13 +107,13 @@ body {
 
 h1, h2, h3, h4, h5, h6,
 button, label, a, nav,
-span, small,
-select, option,
-th, td,
 .font-display {
   font-family: 'NJNaruto', Arial, sans-serif;
 }
 
+span, small,
+select, option,
+th, td,
 input, textarea, div, p {
   font-family: 'Nevanta', system-ui, sans-serif;
 }

@@ -17,6 +17,7 @@ interface BoosterSetTileProps {
   perBoosterLabel: string;
   openLabel: string;
   comingSoonLabel: string;
+  revealingLabel?: string;
   onOpen: () => void;
   disabled?: boolean;
 }
@@ -28,16 +29,19 @@ export function BoosterSetTile({
   perBoosterLabel,
   openLabel,
   comingSoonLabel,
+  revealingLabel,
   onOpen,
   disabled,
 }: BoosterSetTileProps) {
   const reduceMotion = useReducedMotion();
   const [hovering, setHovering] = useState(false);
-  const isComingSoon = entry.status === 'coming_soon';
-  const canOpen = !isComingSoon && entry.count > 0 && !disabled;
+  const isRevealing = entry.status === 'revealing';
+  const isLocked = entry.status !== 'available';
+  const lockedLabel = isRevealing ? (revealingLabel ?? comingSoonLabel) : comingSoonLabel;
+  const canOpen = !isLocked && entry.count > 0 && !disabled;
   const name = getSetName(entry.setId, locale);
   const subtitle = perBoosterLabel;
-  const tilt = !reduceMotion && hovering && !isComingSoon ? 4 : 0;
+  const tilt = !reduceMotion && hovering && !isLocked ? 4 : 0;
   const setNumber = getSetNumber(entry.setId);
   const setNumberLabel = setNumber != null ? `N° ${String(setNumber).padStart(2, '0')}` : null;
 
@@ -58,7 +62,7 @@ export function BoosterSetTile({
       {setNumberLabel && (
         <div
           className="font-display absolute text-[10px] uppercase tracking-[0.25em] pointer-events-none"
-          style={{ top: 10, left: 14, color: isComingSoon ? '#5a5a5a' : '#c4a35a', opacity: isComingSoon ? 0.7 : 0.92 }}
+          style={{ top: 10, left: 14, color: isLocked ? '#5a5a5a' : '#c4a35a', opacity: isLocked ? 0.7 : 0.92 }}
         >
           {setNumberLabel}
         </div>
@@ -69,7 +73,7 @@ export function BoosterSetTile({
             src={entry.boosterImage || BOOSTER_FALLBACK_IMAGE}
             onError={handleBoosterError}
             alt={name}
-            style={{ maxWidth: 220, maxHeight: 280, opacity: isComingSoon ? 0.4 : 1 }}
+            style={{ maxWidth: 220, maxHeight: 280, opacity: isLocked ? 0.4 : 1 }}
             loading="lazy"
             decoding="async"
           />
@@ -78,7 +82,7 @@ export function BoosterSetTile({
             src={entry.boosterImage || BOOSTER_FALLBACK_IMAGE}
             onError={handleBoosterError}
             alt={name}
-            style={{ maxWidth: 220, maxHeight: 280, opacity: isComingSoon ? 0.4 : 1, transformStyle: 'preserve-3d' }}
+            style={{ maxWidth: 220, maxHeight: 280, opacity: isLocked ? 0.4 : 1, transformStyle: 'preserve-3d' }}
             loading="lazy"
             decoding="async"
             animate={{ y: [0, -4, 0], rotateY: tilt }}
@@ -122,7 +126,7 @@ export function BoosterSetTile({
           boxShadow: canOpen ? '0 0 12px #c4a35a33' : 'none',
         }}
       >
-        {isComingSoon ? comingSoonLabel : openLabel}
+        {isLocked ? lockedLabel : openLabel}
       </button>
     </div>
   );

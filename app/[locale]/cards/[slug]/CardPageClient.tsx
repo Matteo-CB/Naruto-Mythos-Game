@@ -11,6 +11,7 @@ const SimulationGame = dynamic(
   { ssr: false },
 );
 import { getCardById, getCardsByName } from '@/lib/data/cardIndex';
+import { useRevealingStore } from '@/stores/revealingStore';
 import { getAdjacentCardIds, compareBySetOrder } from '@/lib/cards/order';
 import { cardIdToSlug } from '@/lib/cards/slug';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
@@ -72,7 +73,9 @@ export function CardPageClient({ cardId }: { cardId: string }) {
   const fine = useIsFinePointer();
   const usage = useCardUsage(cardId);
   const [simEffect, setSimEffect] = useState<number | null>(null);
+  const revealingVersion = useRevealingStore((s) => s.version);
 
+  void revealingVersion;
   const card = getCardById(cardId) as CardData | undefined;
   if (!card) return null;
 

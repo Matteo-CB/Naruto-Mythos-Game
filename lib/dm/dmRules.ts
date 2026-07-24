@@ -4,6 +4,7 @@ export type DmPermission =
 
 export function decideDmPermission(input: {
   areFriends: boolean;
+  receiverAllowsNonFriends: boolean;
   blockedEither: boolean;
   muted: boolean;
   suspended: boolean;
@@ -11,7 +12,7 @@ export function decideDmPermission(input: {
 }): DmPermission {
   if (input.muted || input.suspended) return { ok: false, errorKey: 'chat.muted' };
   if (input.blockedEither) return { ok: false, errorKey: 'dm.disabled' };
-  if (!input.areFriends) return { ok: false, errorKey: 'dm.notFriends' };
+  if (!input.areFriends && !input.receiverAllowsNonFriends) return { ok: false, errorKey: 'dm.notFriends' };
   return { ok: true, echoOnly: input.shadowMuted };
 }
 

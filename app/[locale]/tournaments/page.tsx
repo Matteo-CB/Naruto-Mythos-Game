@@ -9,6 +9,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { TournamentCard } from '@/components/tournament/TournamentCard';
 import { CreateTournamentForm } from '@/components/tournament/CreateTournamentForm';
+import { WeeklyTournamentCalendar } from '@/components/tournament/WeeklyTournamentCalendar';
 import { useTournamentStore } from '@/stores/tournamentStore';
 import { useViewerPrivilege } from '@/lib/hooks/useViewerPrivilege';
 
@@ -193,6 +194,12 @@ export default function TournamentsPage() {
           >
             {error}
           </motion.div>
+        )}
+
+        {activeTab !== 'create' && (
+          <div className="mb-4 flex justify-end">
+            <WeeklyTournamentCalendar tournaments={simulatorTournaments as unknown as Parameters<typeof WeeklyTournamentCalendar>[0]['tournaments']} />
+          </div>
         )}
 
         <AnimatePresence mode="wait">

@@ -25,7 +25,7 @@ export interface DmThreadView {
 export type DmLockReason = 'not_friends' | 'disabled' | null;
 
 export async function getDmPermission(senderId: string, receiverId: string): Promise<DmPermission> {
-  const [friendship, blocks, flags] = await Promise.all([
+  const [friendship, blocks, flags, receiver] = await Promise.all([
     prisma.friendship.findFirst({
       where: {
         status: 'accepted',
@@ -46,9 +46,11 @@ export async function getDmPermission(senderId: string, receiverId: string): Pro
       select: { id: true },
     }),
     getModerationFlags(senderId),
+    prisma.user.findUnique({ where: { id: receiverId }, select: { allowNonFriendMessages: true } }),
   ]);
   return decideDmPermission({
     areFriends: friendship !== null,
+    receiverAllowsNonFriends: receiver?.allowNonFriendMessages !== false,
     blockedEither: blocks !== null,
     muted: flags.muted,
     suspended: flags.suspended,
@@ -57,7 +59,7 @@ export async function getDmPermission(senderId: string, receiverId: string): Pro
 }
 
 export async function getDmLockReason(userIdA: string, userIdB: string): Promise<{ locked: DmLockReason; friendshipId: string | null }> {
-  const [friendship, blocks] = await Promise.all([
+  const [friendship, blocks, other] = await Promise.all([
     prisma.friendship.findFirst({
       where: {
         status: 'accepted',
@@ -77,10 +79,11 @@ export async function getDmLockReason(userIdA: string, userIdB: string): Promise
       },
       select: { id: true },
     }),
+    prisma.user.findUnique({ where: { id: userIdB }, select: { allowNonFriendMessages: true } }),
   ]);
   if (blocks) return { locked: 'disabled', friendshipId: null };
-  if (!friendship) return { locked: 'not_friends', friendshipId: null };
-  return { locked: null, friendshipId: friendship.id };
+  if (!friendship && other?.allowNonFriendMessages === false) return { locked: 'not_friends', friendshipId: null };
+  return { locked: null, friendshipId: friendship?.id ?? null };
 }
 
 export type SendDmResult =

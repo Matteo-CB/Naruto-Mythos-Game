@@ -12,6 +12,12 @@ const LOCALE_MAPS: Record<string, DescMap> = {
   pl: allEffectDescriptionsPl,
 };
 
+export function augmentEffectDescriptions(byLocale: Record<string, DescMap>): void {
+  for (const [locale, map] of Object.entries(byLocale)) {
+    if (LOCALE_MAPS[locale]) Object.assign(LOCALE_MAPS[locale], map);
+  }
+}
+
 function pick(map: DescMap | undefined, cardId: string, raFallbackId: string | undefined): string[] | undefined {
   if (!map) return undefined;
   return map[cardId] ?? (raFallbackId ? map[raFallbackId] : undefined);

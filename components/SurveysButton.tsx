@@ -22,7 +22,7 @@ export function SurveysButton() {
   return (
     <Link
       href="/surveys"
-      className="relative px-2 py-1 text-xs font-bold uppercase tracking-wider transition-colors"
+      className="font-display relative px-2 py-1 text-xs font-bold uppercase tracking-wider transition-colors"
       style={{ color: hasNew ? '#c4a35a' : '#888888' }}
       aria-label={t('buttonLabel')}
     >

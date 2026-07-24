@@ -177,6 +177,20 @@
       "title": "ワールドカップ:国別ランキング | Naruto Mythos TCG",
       "description": "Naruto Mythos TCGのワールドカップ:過去7日間のランク戦にもとづく国別ランキング。小さなコミュニティと大きなコミュニティを公平に比較するフェアスコア、勝率、国ごとのトッププレイヤー、各国で最も使われた勢力を表示します。",
       "ogAlt": "Naruto Mythos TCG ワールドカップ国別ランキング"
+    },
+    "feed": {
+      "title": "フィード - Naruto Mythos TCG",
+      "description": "デッキや対戦リプレイを共有し、プレイヤーをフォローして、Naruto Mythosカードゲームのコミュニティフィードで交流しよう。"
+    },
+    "postDetail": {
+      "title": "{author}: {snippet} - Naruto Mythos TCG",
+      "description": "Naruto Mythos TCGフィードの{author}: {snippet}",
+      "fallbackSnippet": "投稿"
+    },
+    "social": {
+      "title": "コミュニティ - Naruto Mythos TCG",
+      "description": "コミュニティフィードと Naruto Mythos の Discord サーバーに参加しよう。デッキ、リプレイ、プレイヤー、交流。",
+      "ogAlt": "Naruto Mythos TCG コミュニティ"
     }
   },
   "cardMeta": {
@@ -562,7 +576,8 @@
       "offline": "オフライン",
       "retry": "再試行"
     },
-    "ok": "OK"
+    "ok": "OK",
+    "revealing": "公開中"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -601,7 +616,8 @@
     "quests": "クエスト",
     "questsBadgeTooltip": "受け取り可能な報酬 {count} 件",
     "socialBadgeTooltip": "未読メッセージ・申請 {count}件",
-    "worldcup": "ワールドカップ"
+    "worldcup": "ワールドカップ",
+    "social": "コミュニティ"
   },
   "gamepad": {
     "title": "コントローラー",
@@ -691,7 +707,12 @@
     "unblock": "ブロック解除",
     "fastAnimations": "高速アニメーション",
     "fastAnimationsHint": "ゲーム内のすべてのアニメーションが半分の時間になります。",
-    "animationsTouchDisabled": "タッチ画面では、ゲーム中のカード演出のみが抑えられます。その他のアニメーションはこの設定に従います。"
+    "animationsTouchDisabled": "タッチ画面では、ゲーム中のカード演出のみが抑えられます。その他のアニメーションはこの設定に従います。",
+    "allowNonFriendMessages": "友達以外からのメッセージ",
+    "allowNonFriendMessagesHint": "フレンドでないプレイヤーからのダイレクトメッセージを許可します。",
+    "privateProfile": "非公開プロフィール",
+    "privateProfileHint": "友達以外には投稿を非表示にします。フォローはできず、フレンド申請のみ可能です。",
+    "socialSectionTitle": "ソーシャルとプライバシー"
   },
   "game": {
     "turn": "ターン {turn}",
@@ -1867,7 +1888,9 @@
     "holoToggle": "ホロ版",
     "holoLockedToast": "このホロカードはロックされています。バリアントブースターまたはトレードで入手してください。",
     "duplicateDeck": "コピー",
-    "copySuffix": "（コピー）"
+    "copySuffix": "（コピー）",
+    "showUnrevealed": "非公開を表示",
+    "containsUnrevealed": "非公開カードを含む"
   },
   "discord": {
     "linkDiscord": "Discordを連携",
@@ -2167,7 +2190,11 @@
     "mode_all": "全モード",
     "sealedNoGames": "シールド戦の記録はまだありません",
     "sealedRandomSet": "ランダムセット",
-    "sealedGamesCount": "{count}戦"
+    "sealedGamesCount": "{count}戦",
+    "deckPublic": "公開",
+    "deckPrivate": "非公開",
+    "deckPublicHint": "全員に表示",
+    "deckPrivateHint": "自分だけに表示"
   },
   "replay": {
     "title": "対戦の振り返り",
@@ -2934,7 +2961,8 @@
       "invalidPrize": "無効な賞品カードです。",
       "invalidSetChoice": "無効なセットの選択です。",
       "setUnavailable": "このセットはまだ利用できません。",
-      "alreadyFinished": "このトーナメントはすでに終了しています。"
+      "alreadyFinished": "このトーナメントはすでに終了しています。",
+      "unrevealedCards": "デッキに未公開のカードが含まれており、使用できません。"
     },
     "deckError": {
       "tooFewCards": "デッキはカードが最低 {min} 枚必要です（現在 {count} 枚）。",
@@ -3418,13 +3446,17 @@
     "hint": "ランキングとプロフィールで名前の横に表示されます。"
   },
   "social": {
-    "requestUnavailable": "申請を送信できませんでした。",
-    "block": {
-      "confirmTitle": "{player}をブロックしますか？",
-      "confirmBody": "相手はあなたにメッセージを送ったり、フレンド申請や対戦の招待をしたりできなくなります。フレンドだった場合は解除されます。オプションからいつでもブロックを解除できます。",
-      "confirm": "ブロック",
-      "doneTitle": "ブロックしました"
-    }
+    "title": "コミュニティ",
+    "subtitle": "Naruto Mythos のコミュニティに参加しよう",
+    "feedTitle": "コミュニティフィード",
+    "feedDescription": "デッキやリプレイを共有し、プレイヤーをフォローして、コミュニティと交流しよう。",
+    "feedCta": "フィードを開く",
+    "discordTitle": "Discord サーバー",
+    "discordSubtitle": "Naruto Mythos コミュニティの Discord サーバー。",
+    "join": "参加する",
+    "emptyTitle": "サーバーは近日公開",
+    "emptyText": "コミュニティの Discord サーバーはまもなくここに追加されます。",
+    "close": "閉じる"
   },
   "report": {
     "title": "{player}を通報",
@@ -3641,5 +3673,145 @@
     "progressionCollecting": "推移データはシーズンの経過とともに表示されます。",
     "activityTitle": "時間帯別の活動(UTC)",
     "worldMapHint": "国にカーソルを合わせるかタップ"
+  },
+  "adminReveal": {
+    "title": "カード公開の管理",
+    "subtitle": "公開中のセットのカードを公開または非公開にします。非公開のカードは、管理者とテスター以外のすべてのプレイヤーに、ゲーム内のどこでも表示されません。",
+    "unauthorized": "アクセスが拒否されました。",
+    "back": "管理に戻る",
+    "revealAll": "すべて公開",
+    "hideAll": "すべて非公開",
+    "statusRevealed": "公開",
+    "statusHidden": "非公開",
+    "countLabel": "{revealed} / {total} 公開",
+    "loading": "読み込み中...",
+    "empty": "公開中のセットのカードはありません。",
+    "setStatusTitle": "セットの状態",
+    "setStatusSubtitle": "各セットをリリース済み、公開中、近日公開のいずれかに設定します。公開中のカードは使用できますがランク戦では禁止され、公開されるまで非表示です。近日公開のカードは全員に非表示です。",
+    "obtentionTitle": "バリアントの入手方法",
+    "obtentionSubtitle": "各バリアントの入手方法を選択します：ブースター、トーナメントとバトルパス専用、またはロック（管理者付与のみ）。",
+    "statusAvailable": "リリース済み",
+    "statusRevealing": "公開中",
+    "statusComingSoon": "近日公開",
+    "modeBooster": "ブースター",
+    "modeReserved": "予約",
+    "modeLocked": "ロック"
+  },
+  "feed": {
+    "title": "フィード",
+    "tabAll": "すべて",
+    "tabFollowing": "フォロー中",
+    "tabFriends": "友達",
+    "composerPlaceholder": "いまどうしてる？",
+    "replyPlaceholder": "返信を書く...",
+    "post": "投稿",
+    "reply": "返信",
+    "attachDeck": "デッキを追加",
+    "removeDeck": "デッキを外す",
+    "addGif": "GIF",
+    "removeGif": "GIFを外す",
+    "like": "いいね",
+    "repost": "リポスト",
+    "quote": "引用",
+    "pin": "固定",
+    "unpin": "固定を解除",
+    "pinned": "固定済み",
+    "deleteAction": "削除",
+    "cards": "{count}枚",
+    "missions": "ミッション{count}",
+    "viewThread": "スレッドを見る",
+    "loadMore": "もっと見る",
+    "empty": "まだ投稿はありません。",
+    "emptyFollowing": "フォローしている人の投稿がここに表示されます。",
+    "loginToPost": "投稿するにはログインしてください。",
+    "messages": "メッセージ",
+    "gifSearch": "Tenorで検索",
+    "viaTenor": "Via Tenor",
+    "repostedBy": "{user}がリポストしました",
+    "replyingTo": "{user}への返信",
+    "deleteConfirm": "この投稿を削除しますか？",
+    "yourDeck": "あなたのデッキ",
+    "chooseDeck": "デッキを選択",
+    "noDecks": "保存されたデッキがありません。",
+    "tooLong": "メッセージが長すぎます。",
+    "empty2": "テキスト、デッキ、GIFのいずれかを追加してください。",
+    "deckNotYours": "自分のデッキのみ投稿できます。",
+    "parentGone": "この投稿は存在しません。",
+    "blockedToxic": "このメッセージはモデレーションによりブロックされました。",
+    "home": "ホーム",
+    "loading": "読み込み中...",
+    "attachReplay": "リプレイを追加",
+    "removeReplay": "リプレイを外す",
+    "chooseReplay": "リプレイを選択",
+    "noReplays": "リプレイがありません。",
+    "replayLabel": "リプレイ",
+    "replayMoment": "リプレイの瞬間",
+    "vsAi": "対AI",
+    "watchReplay": "リプレイを見る",
+    "watchMoment": "この瞬間を見る",
+    "replayExpired": "リプレイは利用できません",
+    "close": "閉じる",
+    "noGifs": "GIFが見つかりません。",
+    "more": "その他",
+    "report": "報告",
+    "reported": "報告済み",
+    "shareMoment": "この瞬間を共有",
+    "shareLinkCopied": "リンクをコピーしました",
+    "posts": "投稿",
+    "error": {
+      "tooLong": "メッセージが長すぎます。",
+      "deckNotYours": "自分のデッキのみ投稿できます。",
+      "replayNotYours": "自分の対戦のみ共有できます。",
+      "parentGone": "この投稿は存在しません。",
+      "empty": "テキスト、デッキ、リプレイ、GIFのいずれかを追加してください。",
+      "blocked": "このメッセージはモデレーションによりブロックされました。",
+      "generic": "エラーが発生しました。"
+    },
+    "postToFeed": "フィードに投稿"
+  },
+  "adminPostModeration": {
+    "title": "投稿とメッセージのモデレーション",
+    "subtitle": "投稿と非公開メッセージへの報告、および投稿へのAI検出です。有害な投稿は公開前にすでにブロックされています。これは確認用のキューです。",
+    "back": "管理に戻る",
+    "unauthorized": "アクセスが拒否されました。",
+    "loading": "読み込み中...",
+    "reports": "報告",
+    "aiScans": "AI検出",
+    "noReports": "保留中の報告はありません。",
+    "noScans": "保留中の検出はありません。",
+    "resolve": "対応済み",
+    "deletePost": "投稿を削除",
+    "reportedBy": "報告者",
+    "by": "投稿者",
+    "reason": "理由",
+    "noText": "テキストなし",
+    "typePost": "投稿",
+    "typeMessage": "メッセージ"
+  },
+  "tournamentCalendar": {
+    "title": "週間スケジュール",
+    "subtitle": "毎週の自動トーナメント",
+    "noTournament": "トーナメントなし",
+    "registrationOpen": "登録受付中",
+    "view": "表示",
+    "kind": {
+      "classic": "クラシック",
+      "open": "オープン（全カード）",
+      "elimination": "ダイレクト敗退",
+      "sealed": "シールド"
+    },
+    "rules": {
+      "formatSwiss": "スイス形式",
+      "formatElim": "シングルエリミネーション",
+      "slots": "{count}枠",
+      "sealed": "シールド、ブースター{count}個",
+      "allCards": "全カード使用可、制限なし",
+      "banList": "標準禁止リスト",
+      "times": "登録 {reg}、開始 {start}",
+      "discord": "Discord必須"
+    },
+    "today": "今日",
+    "button": "カレンダー",
+    "close": "閉じる"
   }
 }

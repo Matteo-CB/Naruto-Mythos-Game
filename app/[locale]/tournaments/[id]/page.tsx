@@ -603,7 +603,7 @@ export default function TournamentDetailPage() {
                               {t('discordLinkAccount')}
                             </Link>
                           ) : (
-                            <a href="https://discord.gg/narutomythos" target="_blank" rel="noopener noreferrer"
+                            <a href="https://discord.com/invite/BBXVUsU3hn" target="_blank" rel="noopener noreferrer"
                               className="w-full px-4 py-2 text-xs font-medium uppercase tracking-wider text-center transition-colors block"
                               style={{ backgroundColor: 'rgba(88, 101, 242, 0.15)', border: '1px solid rgba(88, 101, 242, 0.4)', color: '#5865F2' }}>
                               {t('discordJoinServer')}

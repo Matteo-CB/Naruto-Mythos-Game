@@ -272,11 +272,11 @@ export function GameChat() {
                     {isSystem ? t('chat.systemTag') : <PlayerNameLink username={msg.username} newTab />}
                   </span>
                   {msg.removedByModeration ? (
-                    <span style={{ fontSize, color: '#666', fontStyle: 'italic' }}>
+                    <span className="font-body-force" style={{ fontSize, color: '#666', fontStyle: 'italic' }}>
                       {t('chat.removedByModeration')}
                     </span>
                   ) : (
-                    <span style={{ fontSize, color: isSystem ? 'rgba(196,163,90,0.6)' : '#aaa', overflowWrap: 'anywhere' }}>
+                    <span className="font-body-force" style={{ fontSize, color: isSystem ? 'rgba(196,163,90,0.6)' : '#aaa', overflowWrap: 'anywhere' }}>
                       {msg.isEmote ? renderMessage(msg.message) : msg.message}
                     </span>
                   )}

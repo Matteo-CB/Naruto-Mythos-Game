@@ -26,7 +26,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
   const [name, setName] = useState('');
   const [format, setFormat] = useState<'swiss' | 'elimination' | 'double_elimination'>('swiss');
   const [gameMode, setGameMode] = useState<'classic' | 'sealed' | 'restricted' | 'evolving'>('classic');
-  const [maxPlayers, setMaxPlayers] = useState(8);
+  const [maxPlayers, setMaxPlayers] = useState(32);
   const [isPublic, setIsPublic] = useState(true);
   const [useBanList, setUseBanList] = useState(true);
   const [sealedBoosters, setSealedBoosters] = useState<4 | 5 | 6>(5);

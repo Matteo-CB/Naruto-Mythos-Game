@@ -4,7 +4,8 @@ import { parseCardId } from '@/lib/variants/isVariant';
 import { FORCE_UNLOCKED_CARD_IDS } from '@/lib/variants/constants';
 
 function isPreReleaseSet(setId: string): boolean {
-  return SET_REGISTRY[setId]?.status === 'coming_soon';
+  const status = SET_REGISTRY[setId]?.status;
+  return status === 'coming_soon' || status === 'revealing';
 }
 
 export function isForceUnlockedCard(cardId: string): boolean {

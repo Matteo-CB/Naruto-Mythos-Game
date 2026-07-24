@@ -185,7 +185,7 @@ export function ChangelogButton() {
               </header>
 
               <div
-                className="flex flex-wrap gap-1.5 border-b px-5 py-2.5"
+                className="flex flex-wrap gap-1.5 border-b px-5 py-3"
                 style={{ borderColor: '#2a2a2a' }}
                 role="tablist"
               >
@@ -198,7 +198,7 @@ export function ChangelogButton() {
                       role="tab"
                       aria-selected={active}
                       onClick={() => setActiveTab(tab)}
-                      className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest transition-colors"
+                      className="font-display px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest transition-colors"
                       style={
                         active
                           ? { color: '#c4a35a', backgroundColor: 'rgba(196,163,90,0.12)' }
@@ -211,7 +211,7 @@ export function ChangelogButton() {
                 })}
               </div>
 
-              <div className="overflow-y-auto px-5 py-5">
+              <div className="overflow-y-auto px-5 pt-7 pb-6">
                 {visibleEntries.length === 0 ? (
                   <p className="text-sm" style={{ color: '#777777' }}>
                     {entries.length === 0 ? t('empty') : t('emptyTab')}
@@ -256,7 +256,7 @@ export function ChangelogButton() {
                                 style={{ color: '#bbbbbb' }}
                               >
                                 <span
-                                  className="mt-0.5 shrink-0 rounded-sm px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest"
+                                  className="font-display mt-0.5 shrink-0 rounded-sm px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest"
                                   style={{
                                     color: CATEGORY_STYLE[item.category].color,
                                     backgroundColor: CATEGORY_STYLE[item.category].bg,
@@ -285,7 +285,7 @@ export function ChangelogButton() {
       <button
         type="button"
         onClick={openModal}
-        className="relative px-2 py-1 text-xs font-bold uppercase tracking-wider transition-colors"
+        className="font-display relative px-2 py-1 text-xs font-bold uppercase tracking-wider transition-colors"
         style={{
           color: hasNew ? '#c4a35a' : '#888888',
         }}

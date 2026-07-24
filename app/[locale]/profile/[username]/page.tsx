@@ -17,6 +17,10 @@ import { CountryFlag } from '@/components/CountryFlag';
 import { WorldcupChampionBadge } from '@/components/worldcup/WorldcupChampionBadge';
 import { EloHistoryChart } from '@/components/EloHistoryChart';
 import { DeckStatsPanel } from '@/components/profile/DeckStatsPanel';
+import { DeckPublicToggle } from '@/components/profile/DeckPublicToggle';
+import { PostDeckButton } from '@/components/social/PostDeckButton';
+import { FollowButton } from '@/components/social/FollowButton';
+import { ProfilePostsSection } from '@/components/profile/ProfilePostsSection';
 import Image from 'next/image';
 import '@/styles/holo-menu.css';
 import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
@@ -94,8 +98,13 @@ interface ProfileData {
   worldcupTitles?: Array<{ month: string; countryCode: string }>;
   reigningChampionMonth?: string | null;
   modeStats?: Record<string, { games: number; wins: number; losses: number }>;
-  decks: Array<{ id: string; name: string; createdAt: string; evolvingPoints?: number; evolvingCompatible?: boolean; cardIds?: string[]; missionIds?: string[] }>;
+  decks: Array<{ id: string; name: string; createdAt: string; evolvingPoints?: number; evolvingCompatible?: boolean; isPublic?: boolean; cardIds?: string[]; missionIds?: string[] }>;
   canViewDeckContents?: boolean;
+  followerCount?: number;
+  followingCount?: number;
+  viewerFollowing?: boolean;
+  isPrivate?: boolean;
+  viewerIsFriend?: boolean;
   recentGames: Array<{
     id: string;
     player1: { username: string } | null;
@@ -260,6 +269,7 @@ export default function ProfilePage({
   const t = useTranslations('profile');
   const tc = useTranslations('common');
   const td = useTranslations('discord');
+  const tSocial = useTranslations('social');
   const locale = useLocale();
   useTrackOnMount('ui.profile.opened');
   const { data: session, update: updateSession } = useSession();
@@ -408,6 +418,9 @@ export default function ProfilePage({
         >
           {session?.user?.id && profile.id !== session.user.id && (
             <>
+              {!(profile.isPrivate && !profile.viewerIsFriend) && (
+                <FollowButton targetId={profile.id} initialFollowing={profile.viewerFollowing === true} />
+              )}
               <FriendshipButton userId={profile.id} username={profile.username} />
               <ProfileModerationActions userId={profile.id} username={profile.username} />
             </>
@@ -681,6 +694,17 @@ export default function ProfilePage({
           </motion.div>
         )}
 
+        {(typeof profile.followerCount === 'number' || typeof profile.followingCount === 'number') && (
+          <div className="flex items-center gap-5 mb-6 px-1">
+            <span className="text-sm" style={{ color: '#9a9a9f' }}>
+              <span className="font-display tabular-nums" style={{ color: '#e8e6df' }}>{profile.followerCount ?? 0}</span> <span className="text-[11px] uppercase tracking-wider" style={{ color: '#6a6a70' }}>{tSocial('followers')}</span>
+            </span>
+            <span className="text-sm" style={{ color: '#9a9a9f' }}>
+              <span className="font-display tabular-nums" style={{ color: '#e8e6df' }}>{profile.followingCount ?? 0}</span> <span className="text-[11px] uppercase tracking-wider" style={{ color: '#6a6a70' }}>{tSocial('followingLabel')}</span>
+            </span>
+          </div>
+        )}
+
         {profile.decks.length > 0 && (
           <>
             {isOwner && (
@@ -690,7 +714,7 @@ export default function ProfilePage({
               <SectionTitle label={t('decks')} count={profile.decks.length} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {profile.decks.map((deck) => {
-                  const canView = !!profile.canViewDeckContents && Array.isArray(deck.cardIds);
+                  const canView = Array.isArray(deck.cardIds);
                   const openViewer = () => setOpenDeck({ id: deck.id, name: deck.name, cardIds: deck.cardIds ?? [], missionIds: deck.missionIds ?? [] });
                   return (
                   <EvolvingDeckHolo
@@ -717,6 +741,12 @@ export default function ProfilePage({
                       )}
                     </div>
                     <div className="flex items-center gap-3 shrink-0 ml-3">
+                      {isOwner && (
+                        <>
+                          <PostDeckButton deckId={deck.id} />
+                          <DeckPublicToggle deckId={deck.id} initialPublic={deck.isPublic === true} />
+                        </>
+                      )}
                       {canView && (
                         <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#c4a35a' }}>
                           {t('viewDeck')}
@@ -734,6 +764,8 @@ export default function ProfilePage({
             </section>
           </>
         )}
+
+        <ProfilePostsSection userId={profile.id} />
 
         {(typeof profile.evolvingElo === 'number' || (profile.evolvingWins ?? 0) > 0 || (profile.evolvingLosses ?? 0) > 0) && (
           <section className="mb-6">

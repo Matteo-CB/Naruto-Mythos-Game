@@ -1,6 +1,6 @@
 import type { CardData } from '@/lib/engine/types';
 import { getAllCards } from '@/lib/data/cardLoader';
-import { getSetNumber } from '@/lib/data/sets/registry';
+import { getSetNumber, isSetAvailable } from '@/lib/data/sets/registry';
 
 const RARITY_ORDER = [
   'C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L',
@@ -42,6 +42,7 @@ function compareCards(a: CardData, b: CardData): number {
 }
 
 export const ORDERED_CARD_IDS: string[] = getAllCards()
+  .filter((c) => isSetAvailable(c.set))
   .slice()
   .sort(compareCards)
   .map((c) => c.id);

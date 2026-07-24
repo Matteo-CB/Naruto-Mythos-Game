@@ -20,6 +20,7 @@ import { holoIdFor, isHoloEligibleCard } from '@/lib/holo/holoId';
 import { filterCollectionCards } from '@/lib/collection/filter';
 import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 import { useTrackOnMount } from '@/lib/hooks/useTrackUi';
+import { useRevealingStore } from '@/stores/revealingStore';
 import { LockedCardWrapper } from '@/components/cards/LockedCardWrapper';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
@@ -47,13 +48,15 @@ export default function CollectionPage() {
   const { unlockedIds: unlockedVariantIds, inventory: variantInventory } = useUnlockedVariants();
   useTrackOnMount('ui.collection.opened');
 
+  const revealingVersion = useRevealingStore((s) => s.version);
+
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
       const cards = mod.getAllCards().filter((c) => c.id !== WORLDCUP_CHAMPION_CARD);
       setAllCards(cards);
       setCardsLoading(false);
     });
-  }, []);
+  }, [revealingVersion]);
 
   const groups = useMemo(() => {
     const groupSet = new Set<string>();
@@ -156,7 +159,11 @@ export default function CollectionPage() {
             {ALL_SET_IDS.map((sid) => {
               const desc = SET_REGISTRY[sid];
               const name = getSetName(sid, locale);
-              const suffix = desc.status === 'coming_soon' ? ' (' + t('common.comingSoon') + ')' : '';
+              const suffix = desc.status === 'coming_soon'
+                ? ' (' + t('common.comingSoon') + ')'
+                : desc.status === 'revealing'
+                  ? ' (' + t('common.revealing') + ')'
+                  : '';
               return <option key={sid} value={sid}>{name + suffix}</option>;
             })}
           </select>

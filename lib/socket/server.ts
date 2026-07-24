@@ -1,7 +1,7 @@
 import type { Server as SocketIOServer, Socket } from 'socket.io';
 import { decode } from 'next-auth/jwt';
 import { GameEngine } from '@/lib/engine/GameEngine';
-import type { GameState, GameAction, CharacterCard, MissionCard, PlayerConfig, GameConfig, PlayerID } from '@/lib/engine/types';
+import type { GameState, GameAction, CharacterCard, MissionCard, PlayerConfig, GameConfig, PlayerID, VisibleGameState } from '@/lib/engine/types';
 import { registerUserSocket, removeSocketFromAll, emitToUser } from '@/lib/socket/io';
 import { prisma } from '@/lib/db/prisma';
 import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
@@ -22,6 +22,8 @@ import { getOwnedVariantIds } from '@/lib/variants/inventory';
 import { isAdmin } from '@/lib/auth/admins';
 import { isHoloId, holoBaseId, holoIdFor, isHoloEligibleCard } from '@/lib/holo/holoId';
 import { packVisibleState } from '@/lib/socket/statePack';
+import { sanitizeUnrevealedForViewer, stateHasUnrevealed } from '@/lib/socket/sanitizeUnrevealed';
+import { getHiddenCardIds } from '@/lib/cards/reveal';
 import { unrankedModeKey } from '@/lib/stats/modeKey';
 import { isStaticRankedBanned } from '@/lib/data/rankedBans';
 import { emitQuestEvent } from '@/lib/quests/hooks';
@@ -229,6 +231,12 @@ export interface RoomData {
   player2DisconnectedAt?: number | null;
   lastApplyActionAt?: number;
   stalemateNoticeAt?: number | null;
+
+  hostPrivileged?: boolean;
+  guestPrivileged?: boolean;
+  hiddenIdsSnapshot?: Set<string>;
+  revealMetaAt?: number;
+  revealMetaLoading?: boolean;
 }
 
 function clearChessClockTimers(room: RoomData): void {
@@ -1725,8 +1733,56 @@ export async function handleMulliganIdleTimeout(
   }, 5_000);
 }
 
+const EMPTY_HIDDEN_IDS: Set<string> = new Set();
+const REVEAL_META_TTL_MS = 30_000;
+
+async function computePlayerPrivilege(userId: string | null, username: string | undefined): Promise<boolean> {
+  if (!userId) return false;
+  if (isAdmin({ username: username ?? null })) return true;
+  try {
+    const dbUser = await prisma.user.findUnique({ where: { id: userId }, select: { role: true, email: true, username: true } });
+    if (!dbUser) return false;
+    if (isAdmin({ username: dbUser.username, email: dbUser.email })) return true;
+    return dbUser.role === 'tester';
+  } catch {
+    return false;
+  }
+}
+
+function ensureRevealMeta(room: RoomData): void {
+  const now = Date.now();
+  if (room.revealMetaLoading) return;
+  if (room.revealMetaAt && now - room.revealMetaAt < REVEAL_META_TTL_MS) return;
+  room.revealMetaLoading = true;
+  Promise.all([
+    getHiddenCardIds(),
+    computePlayerPrivilege(room.hostId, room.hostName),
+    computePlayerPrivilege(room.guestId, room.guestName),
+  ])
+    .then(([hidden, hostPriv, guestPriv]) => {
+      room.hiddenIdsSnapshot = hidden;
+      room.hostPrivileged = hostPriv;
+      room.guestPrivileged = guestPriv;
+      room.revealMetaAt = Date.now();
+    })
+    .catch(() => {})
+    .finally(() => {
+      room.revealMetaLoading = false;
+    });
+}
+
+function stateForViewer(state: VisibleGameState, privileged: boolean, hiddenIds: Set<string>): VisibleGameState {
+  if (privileged) return state;
+  if (!stateHasUnrevealed(state, hiddenIds)) return state;
+  return sanitizeUnrevealedForViewer(state, hiddenIds);
+}
+
 function broadcastState(room: RoomData, io: SocketIOServer): void {
   if (!room.gameState) return;
+  ensureRevealMeta(room);
+  const hiddenIds = room.hiddenIdsSnapshot ?? EMPTY_HIDDEN_IDS;
+  const hostPrivileged = room.hostPrivileged ?? false;
+  const guestPrivileged = room.guestPrivileged ?? false;
 
   syncChessClock(room);
   startChessClockTickLoop(room, io);
@@ -1742,7 +1798,7 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
 
     if (room.hostSocket) {
       io.to(room.hostSocket).emit('game:state-update', {
-        visibleState: packVisibleState(p1State),
+        visibleState: packVisibleState(stateForViewer(p1State, hostPrivileged, hiddenIds)),
         playerRole: 'player1',
         playerNames,
         chessClock,
@@ -1750,7 +1806,7 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
     }
     if (room.guestSocket) {
       io.to(room.guestSocket).emit('game:state-update', {
-        visibleState: packVisibleState(p2State),
+        visibleState: packVisibleState(stateForViewer(p2State, guestPrivileged, hiddenIds)),
         playerRole: 'player2',
         playerNames,
         chessClock,
@@ -1789,7 +1845,7 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
         },
       };
       io.to(`spec:${room.code}`).emit('spectate:state-update', {
-        visibleState: packVisibleState(spectatorState),
+        visibleState: packVisibleState(stateForViewer(spectatorState, false, hiddenIds)),
         playerNames,
         spectatorCount: room.spectators.size,
         roomCode: room.code,

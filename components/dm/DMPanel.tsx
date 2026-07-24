@@ -194,7 +194,7 @@ export function DMPanel() {
                     {th.partner.username}
                   </span>
                   {th.lastMessage && (
-                    <span className="text-[11px] truncate" style={{ color: '#777' }}>
+                    <span className="font-body-force text-[11px] truncate" style={{ color: '#777' }}>
                       {th.lastMessage.body}
                     </span>
                   )}
@@ -224,7 +224,7 @@ export function DMPanel() {
                 return (
                   <div key={m.id} className={`mb-2 flex ${mine ? 'justify-end' : 'justify-start'}`}>
                     <div
-                      className="max-w-[80%] px-3 py-1.5 text-[12px] leading-snug"
+                      className="font-body-force max-w-[80%] px-3 py-1.5 text-[12px] leading-snug"
                       style={{
                         backgroundColor: mine ? 'rgba(196,163,90,0.12)' : 'rgba(255,255,255,0.04)',
                         color: mine ? '#e6d5ac' : '#ccc',

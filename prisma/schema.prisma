@@ -65,6 +65,8 @@ model User {
   countryCode             String?
   chatVisibility          String               @default("everyone")
   fastAnimations          Boolean              @default(false)
+  allowNonFriendMessages  Boolean              @default(true)
+  privateProfile          Boolean              @default(false)
   chatIntroSeenAt         DateTime?
   usernameResetRequired   Boolean              @default(false)
 
@@ -182,11 +184,74 @@ model Deck {
   sortOrder          Int      @default(0)
   evolvingPoints     Int      @default(0)
   evolvingCompatible Boolean  @default(false)
+  isPublic           Boolean  @default(false)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
   @@index([userId, evolvingPoints])
   @@index([userId, evolvingCompatible])
+}
+
+model Follow {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  followerId  String   @db.ObjectId
+  followingId String   @db.ObjectId
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@index([followingId])
+  @@index([followerId])
+}
+
+model Post {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  authorId            String   @db.ObjectId
+  body                String   @default("")
+  deckSnapshot        Json?
+  replaySnapshot      Json?
+  gifUrl              String?
+  parentId            String?  @db.ObjectId
+  repostOfId          String?  @db.ObjectId
+  pinned              Boolean  @default(false)
+  replyCount          Int      @default(0)
+  likeCount           Int      @default(0)
+  repostCount         Int      @default(0)
+  removedByModeration Boolean  @default(false)
+  createdAt           DateTime @default(now())
+
+  @@index([authorId, createdAt])
+  @@index([parentId, createdAt])
+  @@index([createdAt])
+}
+
+model PostLike {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String   @db.ObjectId
+  userId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+  @@index([userId])
+}
+
+model PostReport {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  targetType   String   @default("post")
+  postId       String?  @db.ObjectId
+  messageId    String?  @db.ObjectId
+  reporterId   String   @db.ObjectId
+  reporterName String
+  authorId     String?  @db.ObjectId
+  authorName   String?
+  content      String   @default("")
+  reason       String?
+  status       String   @default("pending")
+  handledByName String?
+  handledAt    DateTime?
+  createdAt    DateTime @default(now())
+
+  @@index([status, createdAt])
+  @@index([createdAt])
 }
 
 model DeckStats {
@@ -275,11 +340,22 @@ model BannedCard {
 }
 
 model SiteSettings {
-  id             String  @id @default(auto()) @map("_id") @db.ObjectId
-  key            String  @unique
-  leaguesEnabled Boolean @default(false)
-  sealedEnabled  Boolean @default(false) @map("draftEnabled")
-  discordRoleIds Json?
+  id                     String  @id @default(auto()) @map("_id") @db.ObjectId
+  key                    String  @unique
+  leaguesEnabled         Boolean @default(false)
+  sealedEnabled          Boolean @default(false) @map("draftEnabled")
+  discordRoleIds         Json?
+  setStatusOverrides     Json?
+  variantObtentionConfig Json?
+}
+
+// A card from a "revealing" set that an admin has explicitly HIDDEN (not yet revealed).
+// Revealing-set cards are PUBLIC by default; only cards listed here stay hidden from every
+// non-admin/non-tester surface (collection, deck builder, game, images, tournaments).
+model HiddenCard {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  cardId    String   @unique
+  hiddenAt  DateTime @default(now())
 }
 
 model Tournament {

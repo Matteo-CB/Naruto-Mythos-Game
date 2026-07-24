@@ -2,7 +2,8 @@ import type { CardData } from '@/lib/engine/types';
 import { getAllCards } from '@/lib/data/cardLoader';
 import { isHoloEligibleCard } from '@/lib/holo/holoId';
 import { isVariantCard, parseCardId, stripVariantSuffix } from './isVariant';
-import { BOOSTER_EXCLUDED_VARIANTS, VARIANT_RARITIES, type VariantRarity } from './constants';
+import { VARIANT_RARITIES, type VariantRarity } from './constants';
+import { isBoosterObtainableVariant } from './obtention';
 
 const eligibleSetCache = new Map<string, CardData[]>();
 const eligibleByRarityCache = new Map<string, Record<VariantRarity, CardData[]>>();
@@ -36,7 +37,7 @@ export function eligibleVariantsForSet(setId: string): CardData[] {
   const cached = eligibleSetCache.get(setId);
   if (cached) return cached;
   const list = allVariantCards().filter(
-    (card) => card.set === setId && !BOOSTER_EXCLUDED_VARIANTS.has(card.cardId),
+    (card) => card.set === setId && isBoosterObtainableVariant(card.cardId),
   );
   eligibleSetCache.set(setId, list);
   return list;

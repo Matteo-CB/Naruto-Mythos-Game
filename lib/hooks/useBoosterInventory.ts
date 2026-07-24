@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 export interface BoosterInventoryEntry {
   setId: string;
   count: number;
-  status: 'available' | 'coming_soon';
+  status: 'available' | 'coming_soon' | 'revealing';
   nameEn: string;
   nameFr: string;
   boosterImage: string;

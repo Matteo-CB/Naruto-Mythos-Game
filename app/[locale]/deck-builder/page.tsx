@@ -30,6 +30,7 @@ import { EvolvingCostMeter } from "@/components/deckBuilder/EvolvingCostMeter";
 import { EvolvingBuilderHelper } from "@/components/deckBuilder/EvolvingBuilderHelper";
 import { EvolvingDeckHolo } from "@/components/evolving/EvolvingDeckHolo";
 import { EvolvingDeckBadge } from "@/components/evolving/EvolvingDeckBadge";
+import { useRevealingStore } from "@/stores/revealingStore";
 
 const RARITY_COLORS: Record<string, string> = {
   C: '#888888', UC: '#3e8b3e', R: '#c4a35a', RA: '#c4a35a',
@@ -469,6 +470,11 @@ export default function DeckBuilderPage() {
   const [allChars, setAllChars] = useState<CharacterCard[]>([]);
   const [allMissions, setAllMissions] = useState<MissionCard[]>([]);
 
+  const revealingVersion = useRevealingStore((s) => s.version);
+  const revealingPrivileged = useRevealingStore((s) => s.privileged);
+  const unrevealedIds = useRevealingStore((s) => s.unrevealedIds);
+  const [showUnrevealed, setShowUnrevealed] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearch = useDeferredValue(searchQuery);
   const [sortBy, setSortBy] = useState<SortField>('number');
@@ -546,7 +552,7 @@ export default function DeckBuilderPage() {
       setAllChars(mod.getAllCharacters());
       setAllMissions(mod.getAllMissions());
     });
-  }, []);
+  }, [revealingVersion]);
 
   useEffect(() => { loadSavedDecks(); }, [loadSavedDecks]);
 
@@ -578,6 +584,7 @@ export default function DeckBuilderPage() {
   const filteredChars = useMemo(() => {
     let chars = [...availableChars];
     if (!showAltArt) chars = chars.filter((c) => !['RA', 'MV', 'SV', 'L'].includes(c.rarity));
+    if (!showUnrevealed) chars = chars.filter((c) => !unrevealedIds.has(c.id));
     if (deferredSearch) {
       chars = chars.filter((c) => matchesSearchFilter(c, parsedSearch, loc));
     }
@@ -593,9 +600,17 @@ export default function DeckBuilderPage() {
       if (cmp === 0) cmp = compareBySetOrder(a, b);
       return sortOrder === 'desc' ? -cmp : cmp;
     });
-  }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showAltArt]);
+  }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showAltArt, showUnrevealed, unrevealedIds]);
 
-  const filteredMissions = useMemo(() => [...availableMissions], [availableMissions]);
+  const filteredMissions = useMemo(
+    () => (showUnrevealed ? [...availableMissions] : availableMissions.filter((m) => !unrevealedIds.has(m.id))),
+    [availableMissions, showUnrevealed, unrevealedIds],
+  );
+
+  const deckHasUnrevealed = useMemo(
+    () => deckChars.some((c) => unrevealedIds.has(c.id)) || deckMissions.some((m) => unrevealedIds.has(m.id)),
+    [deckChars, deckMissions, unrevealedIds],
+  );
 
   const validation = useMemo(() => validateDeck(deckChars, deckMissions), [deckChars, deckMissions]);
 
@@ -1401,6 +1416,11 @@ export default function DeckBuilderPage() {
                   backgroundColor: 'rgba(62, 139, 62, 0.15)', color: '#3e8b3e',
                 }}>{t("deckBuilder.currentlyEditing")}</span>
               )}
+              {deckHasUnrevealed && (
+                <span className="text-[8px] uppercase px-1.5 py-0.5" style={{
+                  backgroundColor: 'rgba(196,163,90,0.15)', color: '#c4a35a',
+                }}>{t("deckBuilder.containsUnrevealed")}</span>
+              )}
             </div>
           </div>
 
@@ -1447,6 +1467,12 @@ export default function DeckBuilderPage() {
             <AngularButton onClick={() => setShowSavedDecks(true)} variant="secondary" size="sm">{t("deckBuilder.loadDeck")}</AngularButton>
             <AngularButton onClick={() => setShowImportModal(true)} variant="secondary" size="sm">{t("deckBuilder.importButton")}</AngularButton>
             <AngularButton onClick={() => setShowExportModal(true)} variant="muted" disabled={deckChars.length === 0} size="sm">{t("deckBuilder.exportButton")}</AngularButton>
+            {loadedDeckId && (
+              <Link href={`/feed?deck=${loadedDeckId}` as '/'} className="text-center text-[10px] uppercase font-bold py-1.5 px-3 no-select inline-block"
+                style={{ backgroundColor: 'rgba(196,163,90,0.14)', color: '#c4a35a', letterSpacing: '0.1em', transform: 'skewX(-3deg)' }}>
+                {t("feed.postToFeed")}
+              </Link>
+            )}
             <Link href="/deck-builder/manage" className="text-center text-[10px] uppercase font-bold py-1.5 px-3 no-select inline-block"
               style={{
                 backgroundColor: 'rgba(196,163,90,0.08)', color: '#c4a35a', letterSpacing: '0.1em', transform: 'skewX(-3deg)',
@@ -1547,7 +1573,7 @@ export default function DeckBuilderPage() {
             </div>
           </div>
 
-          <div className="px-3 pb-1 flex-shrink-0">
+          <div className="px-3 pb-1 flex-shrink-0 flex items-center gap-1.5 flex-wrap">
             <button
               onClick={() => setHideVariants(!hideVariants)}
               className="text-[9px] uppercase font-bold px-2 py-1"
@@ -1558,6 +1584,18 @@ export default function DeckBuilderPage() {
             >
               {showAltArt ? t("deckBuilder.hideAlt") : t("deckBuilder.showAlt")}
             </button>
+            {revealingPrivileged && (
+              <button
+                onClick={() => setShowUnrevealed((v) => !v)}
+                className="text-[9px] uppercase font-bold px-2 py-1"
+                style={{
+                  backgroundColor: showUnrevealed ? 'rgba(196,163,90,0.1)' : 'rgba(136,136,136,0.08)',
+                  color: showUnrevealed ? '#c4a35a' : '#555',
+                }}
+              >
+                {t("deckBuilder.showUnrevealed")}
+              </button>
+            )}
           </div>
 
           <VirtualCardGrid
@@ -1947,7 +1985,7 @@ export default function DeckBuilderPage() {
                 const isConfirming = confirmDeleteId === deck.id;
                 return (
                   <EvolvingDeckHolo key={deck.id} points={deck.evolvingPoints ?? 0} enabled={deck.evolvingCompatible === true} intensity="subtle">
-                  <div className="flex items-center gap-3 px-3 py-2" style={{
+                  <div className="flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:gap-3" style={{
                     backgroundColor: 'rgba(255,255,255,0.02)',
                   }}>
                     <div className="flex-1 min-w-0">
@@ -1965,7 +2003,7 @@ export default function DeckBuilderPage() {
                       </span>
                     </div>
                     {isConfirming ? (
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <div className="flex flex-wrap items-center gap-1.5 sm:shrink-0">
                         <span className="text-[10px]" style={{ color: '#b33e3e' }}>{t("deckBuilder.confirmDelete", { name: deck.name })}</span>
                         <PopupActionButton accentColor="#b33e3e" onClick={() => { handleDeleteDeck(deck.id); setConfirmDeleteId(null); }}>
                           {t("common.confirm")}
@@ -1973,7 +2011,7 @@ export default function DeckBuilderPage() {
                         <PopupDismissLink onClick={() => setConfirmDeleteId(null)}>{t("common.cancel")}</PopupDismissLink>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <div className="flex flex-wrap items-center gap-1.5 sm:shrink-0">
                         <AngularButton onClick={() => { handleLoadDeck(deck.id); setShowSavedDecks(false); }} variant={isActive ? 'primary' : 'secondary'} accentColor="#3e8b3e" size="sm">
                           {t("deckBuilder.editDeck")}
                         </AngularButton>

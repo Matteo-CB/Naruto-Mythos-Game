@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { isAdmin } from '@/lib/auth/admins';
 import { cleanupOldGames } from '@/lib/db/gameCleanup';
 import { deckUsesOnlyAllowedSets } from '@/lib/evolving/computePoints';
+import { getFollowState } from '@/lib/social/followSync';
 import { EVOLVING_MAX_POINTS } from '@/lib/evolving/constants';
 
 let lastCleanup = 0;
@@ -44,9 +45,10 @@ export async function GET(
         role: true,
         badgePrefs: true,
         discordUsername: true,
+        privateProfile: true,
         createdAt: true,
         decks: {
-          select: { id: true, name: true, createdAt: true, evolvingPoints: true, evolvingCompatible: true, cardIds: true, missionIds: true },
+          select: { id: true, name: true, createdAt: true, evolvingPoints: true, evolvingCompatible: true, isPublic: true, cardIds: true, missionIds: true },
           orderBy: { updatedAt: 'desc' },
         },
       },
@@ -234,7 +236,8 @@ export async function GET(
         createdAt: d.createdAt,
         evolvingPoints: d.evolvingPoints,
         evolvingCompatible: compatible,
-        ...(canViewDeckContents ? { cardIds: d.cardIds, missionIds: d.missionIds } : {}),
+        isPublic: d.isPublic,
+        ...((canViewDeckContents || d.isPublic) ? { cardIds: d.cardIds, missionIds: d.missionIds } : {}),
       };
     });
 
@@ -272,8 +275,15 @@ export async function GET(
 
     const { decks: _omit, ...userWithoutDecks } = user;
     void _omit;
+    const follow = await getFollowState(viewerId, user.id);
+    const viewerIsFriend = !!viewerId && viewerId !== user.id && !!(await prisma.friendship.findFirst({
+      where: { status: 'accepted', OR: [{ senderId: viewerId, receiverId: user.id }, { senderId: user.id, receiverId: viewerId }] },
+      select: { id: true },
+    }));
     return NextResponse.json({
       ...userWithoutDecks,
+      isPrivate: user.privateProfile === true,
+      viewerIsFriend,
       decks,
       canViewDeckContents,
       recentGames,
@@ -285,6 +295,9 @@ export async function GET(
       modeStats,
       worldcupTitles: worldcupTitles.map((tt) => ({ month: tt.seasonLabel, countryCode: tt.countryCode })),
       reigningChampionMonth,
+      followerCount: follow.followerCount,
+      followingCount: follow.followingCount,
+      viewerFollowing: follow.following,
     });
   } catch (err) {
     console.error('[profile] error:', err);

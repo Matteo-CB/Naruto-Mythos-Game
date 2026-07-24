@@ -29,7 +29,7 @@ export const SET_REGISTRY: Record<string, SetDescriptor> = {
     nameEn: 'Shinobi Shiren',
     nameFr: 'Shinobi Shiren',
     nameJa: '忍びの試練',
-    status: 'coming_soon',
+    status: 'revealing',
     boosterImage: '/images/booster-SS.webp',
   },
   AK: {
@@ -42,6 +42,32 @@ export const SET_REGISTRY: Record<string, SetDescriptor> = {
     boosterImage: '/images/booster-unknown.webp',
   },
 };
+
+const statusOverrides: Record<string, SetStatus> = {};
+
+function isValidStatus(s: unknown): s is SetStatus {
+  return s === 'available' || s === 'revealing' || s === 'coming_soon';
+}
+
+// Runtime, admin-controlled status overrides. Loaded from the DB on the server and delivered
+// to the client so a set can be moved between coming_soon / revealing / available without a
+// redeploy. The static SET_REGISTRY status is the default when no override exists.
+export function applySetStatusOverrides(overrides: Record<string, unknown> | null | undefined): void {
+  for (const k of Object.keys(statusOverrides)) delete statusOverrides[k];
+  if (overrides) {
+    for (const [setId, status] of Object.entries(overrides)) {
+      if (SET_REGISTRY[setId] && isValidStatus(status)) statusOverrides[setId] = status;
+    }
+  }
+}
+
+export function getSetStatusOverrides(): Record<string, SetStatus> {
+  return { ...statusOverrides };
+}
+
+export function getSetStatus(setId: string): SetStatus | undefined {
+  return statusOverrides[setId] ?? SET_REGISTRY[setId]?.status;
+}
 
 export function getSetNumber(setId: string): number | null {
   return SET_REGISTRY[setId]?.number ?? null;
@@ -56,23 +82,31 @@ export const BOOSTER_FALLBACK_IMAGE = '/images/booster-unknown.webp';
 export const ALL_SET_IDS = Object.keys(SET_REGISTRY);
 
 export function getAvailableSetIds(): string[] {
-  return ALL_SET_IDS.filter((id) => SET_REGISTRY[id].status === 'available');
+  return ALL_SET_IDS.filter((id) => getSetStatus(id) === 'available');
+}
+
+// The most recently released set (highest set number among available sets). Sealed tournaments
+// use this so they automatically follow the newest set once it becomes available.
+export function getLatestAvailableSetId(): string | null {
+  const ids = getAvailableSetIds();
+  if (ids.length === 0) return null;
+  return ids.reduce((latest, id) => ((getSetNumber(id) ?? 0) > (getSetNumber(latest) ?? 0) ? id : latest));
 }
 
 export function isSetAvailable(setId: string): boolean {
-  return SET_REGISTRY[setId]?.status === 'available';
+  return getSetStatus(setId) === 'available';
 }
 
 // A set that is currently being revealed: its cards are playable in constructed/casual
 // but are automatically banned in ranked, and individual cards are hidden until revealed.
 export function isSetRevealing(setId: string): boolean {
-  return SET_REGISTRY[setId]?.status === 'revealing';
+  return getSetStatus(setId) === 'revealing';
 }
 
 // Sets whose cards can be used in constructed (casual) decks: released + revealing.
 export function getPlayableSetIds(): string[] {
   return ALL_SET_IDS.filter((id) => {
-    const s = SET_REGISTRY[id].status;
+    const s = getSetStatus(id);
     return s === 'available' || s === 'revealing';
   });
 }
@@ -80,7 +114,7 @@ export function getPlayableSetIds(): string[] {
 // Sets whose cards are legal in RANKED play: released ('available') only.
 // Cards from a revealing set are auto-banned in ranked.
 export function isSetRankedLegal(setId: string): boolean {
-  return SET_REGISTRY[setId]?.status === 'available';
+  return getSetStatus(setId) === 'available';
 }
 
 export function getSet(setId: string): SetDescriptor | undefined {

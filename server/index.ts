@@ -5,6 +5,11 @@ import { Server as SocketIOServer } from 'socket.io';
 import { setupSocketHandlers, startMaintenanceDrain } from '@/lib/socket/server';
 import { setIO } from '@/lib/socket/io';
 import { isMaintenanceActive } from '@/lib/socket/maintenance';
+import { ensureServerCards } from '@/lib/data/serverCards';
+import { ensureSetConfigLoaded } from '@/lib/data/setConfigServer';
+
+ensureServerCards();
+void ensureSetConfigLoaded();
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = process.env.HOSTNAME || 'localhost';

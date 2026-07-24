@@ -4,15 +4,18 @@ import { ORDERED_CARD_IDS } from "@/lib/cards/order";
 import { cardIdToSlug } from "@/lib/cards/slug";
 import { getCardById } from "@/lib/data/cardIndex";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
+import { prisma } from "@/lib/db/prisma";
 
 const SITE_URL = "https://narutomythosgame.com";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const locales = [...routing.locales];
   const now = new Date();
 
   const staticPages = [
     { path: "", priority: 1.0, changeFrequency: "weekly" as const },
+    { path: "/feed", priority: 0.8, changeFrequency: "daily" as const },
+    { path: "/social", priority: 0.7, changeFrequency: "weekly" as const },
     { path: "/play", priority: 0.9, changeFrequency: "monthly" as const },
     { path: "/play/ai", priority: 0.9, changeFrequency: "monthly" as const },
     { path: "/play/online", priority: 0.9, changeFrequency: "monthly" as const },
@@ -78,6 +81,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
         images: img ? [`${SITE_URL}${img.split("?")[0]}`] : undefined,
       });
     }
+  }
+
+  try {
+    const posts = await prisma.post.findMany({
+      where: { parentId: null, removedByModeration: false },
+      orderBy: { createdAt: "desc" },
+      take: 2000,
+      select: { id: true, createdAt: true },
+    });
+    for (const post of posts) {
+      const path = `/feed/${post.id}`;
+      for (const locale of locales) {
+        entries.push({
+          url: `${SITE_URL}/${locale}${path}`,
+          lastModified: post.createdAt,
+          changeFrequency: "weekly",
+          priority: 0.4,
+          alternates: {
+            languages: {
+              ...Object.fromEntries(locales.map((l) => [l, `${SITE_URL}/${l}${path}`])),
+              "x-default": `${SITE_URL}/en${path}`,
+            },
+          },
+        });
+      }
+    }
+  } catch {
+    /* DB unavailable (e.g. at build time): ship the static + card entries only */
   }
 
   return entries;
