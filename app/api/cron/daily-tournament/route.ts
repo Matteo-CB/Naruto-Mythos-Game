@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDailyTournamentIfNeeded } from '@/lib/tournament/dailyTournament';
+import { createNwlFridayTournamentIfNeeded } from '@/lib/tournament/nwlFridayTournament';
+import { retryPendingNwlPrizes } from '@/lib/tournament/nwlPrize';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,8 +19,12 @@ function authorized(request: NextRequest): boolean {
 async function handle(request: NextRequest) {
   if (!authorized(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
-    const result = await createDailyTournamentIfNeeded();
-    return NextResponse.json(result);
+    const [daily, nwl, nwlPrizeRetry] = await Promise.all([
+      createDailyTournamentIfNeeded(),
+      createNwlFridayTournamentIfNeeded(),
+      retryPendingNwlPrizes(new Date()),
+    ]);
+    return NextResponse.json({ daily, nwl, nwlPrizeRetry });
   } catch (err) {
     console.error('[Cron] daily-tournament error:', err instanceof Error ? err.message : err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });

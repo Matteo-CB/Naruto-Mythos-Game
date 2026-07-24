@@ -4,6 +4,7 @@ import { computeSwissRoundCount, generateSwissRound1 } from '@/lib/tournament/sw
 import type { SwissPlayer } from '@/lib/tournament/swissEngine';
 import { validateDeckForTournament } from '@/lib/tournament/deckValidation';
 import { logMatchEvent } from '@/lib/tournament/matchEventLog';
+import { NWL_PARTNER_KEY } from '@/lib/tournament/nwlPartner';
 
 export type StartResult =
   | { ok: true }
@@ -130,13 +131,24 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
     }
   }
   if (tournament.format === 'elimination') {
-    const valid = [4, 8, 16, 32];
-    if (!valid.includes(tournament.participants.length)) {
-      return {
-        ok: false,
-        status: 400,
-        error: `Single elimination requires exactly 4, 8, 16, or 32 valid participants (currently ${tournament.participants.length})`,
-      };
+    const n = tournament.participants.length;
+    if (tournament.partner === NWL_PARTNER_KEY) {
+      if (n < 4) {
+        return {
+          ok: false,
+          status: 400,
+          error: `Single elimination requires at least 4 valid participants (currently ${n})`,
+        };
+      }
+    } else {
+      const valid = [4, 8, 16, 32];
+      if (!valid.includes(n)) {
+        return {
+          ok: false,
+          status: 400,
+          error: `Single elimination requires exactly 4, 8, 16, or 32 valid participants (currently ${n})`,
+        };
+      }
     }
   }
 

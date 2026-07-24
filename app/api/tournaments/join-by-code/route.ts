@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isSuspended } from '@/lib/moderation/sanctions';
+import { NWL_PARTNER_KEY, checkNwlMembership, NWL_INVITE_URL } from '@/lib/tournament/nwlPartner';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
@@ -90,6 +91,19 @@ export async function POST(req: NextRequest) {
 
     if (tournament.requiresDiscord && !user?.discordId) {
       return NextResponse.json({ error: 'Link your Discord account first', errorKey: 'tournament.error.linkDiscord' }, { status: 403 });
+    }
+
+    if (tournament.partner === NWL_PARTNER_KEY) {
+      if (!user?.discordId) {
+        return NextResponse.json({ error: 'Link your Discord account first', errorKey: 'tournament.error.linkDiscord' }, { status: 403 });
+      }
+      const membership = await checkNwlMembership(user.discordId);
+      if (membership === 'not_member') {
+        return NextResponse.json({ error: 'Join the New World Loot Discord server first', errorKey: 'tournament.error.nwlNotMember', inviteUrl: NWL_INVITE_URL }, { status: 403 });
+      }
+      if (membership === 'unavailable') {
+        return NextResponse.json({ error: 'Membership check temporarily unavailable, please try again in a moment', errorKey: 'tournament.error.nwlCheckUnavailable' }, { status: 503 });
+      }
     }
 
     const activeBan = await prisma.userBan.findFirst({

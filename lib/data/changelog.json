@@ -17,7 +17,11 @@
         "La liste des decks à charger ne déborde plus sur téléphone.",
         "Dans le fil, clique sur un deck partagé pour le voir en entier, le copier et l'utiliser dans le deck builder.",
         "Copier un deck partagé remplace automatiquement une variante que tu ne possèdes pas par sa carte de base.",
-        "Un deck contenant une carte pas encore révélée ne peut pas être partagé dans le fil."
+        "Un deck contenant une carte pas encore révélée ne peut pas être partagé dans le fil.",
+        "Les posts que tu publies apparaissent maintenant correctement dans le fil.",
+        "Le haut de la page fil est plus clair et bien adapté au téléphone.",
+        "Nouveau tournoi New World Loot chaque vendredi soir en élimination directe : le top 3 gagne le rôle Chunin sur le Discord New World Loot.",
+        "L'effet de Kabuto qui rejoue une carte de la défausse te demande maintenant de confirmer avant de l'activer."
       ],
       "changes_en": [
         "New Social hub: the community Discord servers and the feed in one place.",
@@ -27,7 +31,11 @@
         "The list of decks to load no longer overflows on phones.",
         "In the feed, click a shared deck to view it in full, copy it and use it in the deck builder.",
         "Copying a shared deck automatically replaces a variant you do not own with its base card.",
-        "A deck with a card that is not revealed yet cannot be shared in the feed."
+        "A deck with a card that is not revealed yet cannot be shared in the feed.",
+        "The posts you publish now show up correctly in the feed.",
+        "The top of the feed page is cleaner and fits phones properly.",
+        "New New World Loot tournament every Friday night in single elimination: the top 3 earn the Chunin role on the New World Loot Discord.",
+        "Kabuto's effect that replays a card from the discard now asks you to confirm before it activates."
       ],
       "changes_es": [
         "Nueva página Comunidad: los servidores de Discord de la comunidad y el muro en un solo lugar.",
@@ -37,7 +45,9 @@
         "La lista de mazos para cargar ya no se desborda en el móvil.",
         "En el muro, haz clic en un mazo compartido para verlo completo, copiarlo y usarlo en el creador de mazos.",
         "Copiar un mazo compartido reemplaza automáticamente una variante que no tienes por su carta base.",
-        "Un mazo con una carta aún no revelada no se puede compartir en el muro."
+        "Un mazo con una carta aún no revelada no se puede compartir en el muro.",
+        "Las publicaciones que compartes ahora aparecen correctamente en el muro.",
+        "La parte superior del muro es más clara y se adapta bien al móvil."
       ],
       "changes_ja": [
         "新しいコミュニティページ：コミュニティのDiscordサーバーとフィードを一か所にまとめました。",
@@ -47,7 +57,9 @@
         "読み込むデッキの一覧がスマートフォンではみ出さないようになりました。",
         "フィードで共有されたデッキをクリックすると、全体を表示・コピーし、デッキビルダーで使えます。",
         "共有デッキをコピーすると、持っていないバリアントは自動的に基本カードに置き換えられます。",
-        "未公開のカードを含むデッキはフィードで共有できません。"
+        "未公開のカードを含むデッキはフィードで共有できません。",
+        "投稿した内容がフィードに正しく表示されるようになりました。",
+        "フィードページの上部が見やすくなり、スマートフォンに最適化されました。"
       ],
       "changes_pt": [
         "Nova página Comunidade: os servidores de Discord da comunidade e o mural num só lugar.",
@@ -57,7 +69,9 @@
         "A lista de baralhos para carregar já não transborda no telemóvel.",
         "No mural, clica num baralho partilhado para o ver por inteiro, copiá-lo e usá-lo no criador de baralhos.",
         "Copiar um baralho partilhado substitui automaticamente uma variante que não tens pela carta base.",
-        "Um baralho com uma carta ainda não revelada não pode ser partilhado no mural."
+        "Um baralho com uma carta ainda não revelada não pode ser partilhado no mural.",
+        "As publicações que partilhas aparecem agora corretamente no mural.",
+        "O topo do mural está mais claro e adapta-se bem ao telemóvel."
       ],
       "changes_it": [
         "Nuova pagina Community: i server Discord della community e la bacheca in un unico posto.",
@@ -67,7 +81,9 @@
         "L'elenco dei mazzi da caricare non trabocca più sul telefono.",
         "Nella bacheca, clicca su un mazzo condiviso per vederlo per intero, copiarlo e usarlo nel costruttore di mazzi.",
         "Copiare un mazzo condiviso sostituisce automaticamente una variante che non possiedi con la sua carta base.",
-        "Un mazzo con una carta non ancora rivelata non può essere condiviso nella bacheca."
+        "Un mazzo con una carta non ancora rivelata non può essere condiviso nella bacheca.",
+        "I post che pubblichi ora appaiono correttamente nella bacheca.",
+        "La parte superiore della bacheca è più chiara e ben adattata al telefono."
       ],
       "changes_pl": [
         "Nowa strona Społeczność: serwery Discord społeczności i tablica w jednym miejscu.",
@@ -77,7 +93,9 @@
         "Lista talii do wczytania nie wychodzi już poza ekran na telefonie.",
         "Na tablicy kliknij udostępnioną talię, aby zobaczyć ją w całości, skopiować i użyć w kreatorze talii.",
         "Skopiowanie udostępnionej talii automatycznie zastępuje wariant, którego nie masz, kartą podstawową.",
-        "Talii z jeszcze nieujawnioną kartą nie można udostępnić na tablicy."
+        "Talii z jeszcze nieujawnioną kartą nie można udostępnić na tablicy.",
+        "Publikowane posty pojawiają się teraz poprawnie na tablicy.",
+        "Górna część tablicy jest czytelniejsza i lepiej dopasowana do telefonu."
       ],
       "categories": [
         "feature",
@@ -87,6 +105,10 @@
         "fix",
         "feature",
         "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
         "fix"
       ]
     },

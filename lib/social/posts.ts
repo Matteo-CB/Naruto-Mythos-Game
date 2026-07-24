@@ -216,7 +216,7 @@ export async function serializePosts(posts: RawPost[], viewerId: string | null):
 }
 
 export async function getFeed(viewerId: string | null, filter: FeedFilter, cursor: string | null): Promise<{ posts: PostView[]; nextCursor: string | null }> {
-  const where: Record<string, unknown> = { parentId: null };
+  const where: Record<string, unknown> = { OR: [{ parentId: null }, { parentId: { isSet: false } }] };
   if (cursor) where.createdAt = { lt: new Date(cursor) };
 
   if ((filter === 'following' || filter === 'friends') && viewerId) {
@@ -257,7 +257,7 @@ export async function getThread(viewerId: string | null, postId: string): Promis
 export async function getUserPosts(viewerId: string | null, userId: string): Promise<PostView[]> {
   if (!(await canViewerSeePostsOf(viewerId, userId))) return [];
   const rows = await prisma.post.findMany({
-    where: { authorId: userId, parentId: null },
+    where: { authorId: userId, OR: [{ parentId: null }, { parentId: { isSet: false } }] },
     orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }],
     take: 40,
   });

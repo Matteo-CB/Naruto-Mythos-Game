@@ -2964,7 +2964,9 @@
       "invalidSetChoice": "Elección de colección no válida.",
       "setUnavailable": "Esta colección aún no está disponible.",
       "alreadyFinished": "Este torneo ya ha finalizado.",
-      "unrevealedCards": "Tu mazo contiene cartas no reveladas, que no están permitidas."
+      "unrevealedCards": "Tu mazo contiene cartas no reveladas, que no están permitidas.",
+      "nwlCheckUnavailable": "La verificación de pertenencia no está disponible por el momento. Inténtalo de nuevo en un momento.",
+      "nwlNotMember": "Únete primero al servidor de Discord de New World Loot."
     },
     "deckError": {
       "tooFewCards": "El mazo debe tener al menos {min} cartas (tiene {count}).",
@@ -2983,7 +2985,10 @@
       "tooManyOfRarity": "Demasiadas cartas {rarity}: {count} (máx.: {max}).",
       "evolvingSetNotAllowed": "La carta {cardId} es de la colección {set}, que no está permitida en el modo Evolving.",
       "evolvingOverBudget": "El mazo usa {points} puntos Evolving (máx. {max})."
-    }
+    },
+    "nwlPosterAlt": "Friday Free Genin Tournament de New World Loot",
+    "nwlRequirement": "Torneo asociado de New World Loot. Para inscribirte debes haber vinculado tu cuenta de Discord y ser miembro del servidor de New World Loot. El top 3 recibe el rol Chunin.",
+    "nwlJoinServer": "Unirse al servidor de New World Loot"
   },
   "playHub": {
     "title": "Jugar",

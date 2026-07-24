@@ -4549,7 +4549,6 @@ export class EffectEngine {
       }
 
       case 'KABUTO053_CONFIRM_MAIN': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.hidden.with.source', { sourceName: 'KABUTO YAKUSHI' });
         const kb053mPlayer = pendingEffect.sourcePlayer;
         const kb053mPs = newState[kb053mPlayer];
 

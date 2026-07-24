@@ -59,15 +59,15 @@ export function FeedClient() {
     <main className="min-h-screen relative" style={{ backgroundColor: '#0a0a0a', color: '#e8e8e8' }}>
       <CloudBackground />
       <div className="relative z-10 mx-auto" style={{ maxWidth: 620 }}>
-        <header className="sticky top-0 z-20 px-4 py-3 flex items-center justify-between" style={{ backgroundColor: 'rgba(10,10,10,0.86)', backdropFilter: 'blur(8px)', borderBottom: '1px solid #17171a' }}>
-          <div className="flex items-center gap-3">
-            <Link href="/" className="font-display text-[11px] uppercase tracking-widest" style={{ color: '#c4a35a' }}>‹ {t('home')}</Link>
-            <h1 className="font-display text-lg uppercase tracking-[0.14em]" style={{ color: '#e8e6df' }}>{t('title')}</h1>
+        <header className="sticky top-0 z-20 flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5 sm:px-4 sm:py-3" style={{ backgroundColor: 'rgba(10,10,10,0.86)', backdropFilter: 'blur(8px)', borderBottom: '1px solid #17171a' }}>
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <Link href="/" aria-label={t('home')} className="font-display shrink-0 text-xl leading-none" style={{ color: '#c4a35a' }}>‹</Link>
+            <h1 className="font-display truncate text-base uppercase tracking-[0.12em] sm:text-lg sm:tracking-[0.14em]" style={{ color: '#e8e6df' }}>{t('title')}</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
             {session?.user?.id && (
               <button type="button" onClick={() => useDmStore.getState().openList(session.user!.id)}
-                className="font-display text-[10px] uppercase tracking-widest px-3 py-1.5" style={{ backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a' }}>
+                className="font-display whitespace-nowrap px-2.5 py-1.5 text-[10px] uppercase tracking-widest sm:px-3" style={{ backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a' }}>
                 {t('messages')}
               </button>
             )}

@@ -127,12 +127,11 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KABUTO053_CHOOSE_MISSION',
-    validTargets: validMissions,
+    targetSelectionType: 'KABUTO053_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
     isOptional: true,
-    description: JSON.stringify({ reducedCost }),
-    descriptionKey: 'game.effect.desc.kabuto053ChooseMission',
-    descriptionParams: { cardName: topCard.name_fr, cost: String(reducedCost) },
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId, reducedCost }),
+    descriptionKey: 'game.effect.desc.kabuto053ConfirmMain',
   };
 }
 

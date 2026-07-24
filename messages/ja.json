@@ -2963,7 +2963,9 @@
       "invalidSetChoice": "無効なセットの選択です。",
       "setUnavailable": "このセットはまだ利用できません。",
       "alreadyFinished": "このトーナメントはすでに終了しています。",
-      "unrevealedCards": "デッキに未公開のカードが含まれており、使用できません。"
+      "unrevealedCards": "デッキに未公開のカードが含まれており、使用できません。",
+      "nwlCheckUnavailable": "メンバーシップの確認が一時的に利用できません。少し待ってからもう一度お試しください。",
+      "nwlNotMember": "先に New World Loot の Discord サーバーに参加してください。"
     },
     "deckError": {
       "tooFewCards": "デッキはカードが最低 {min} 枚必要です（現在 {count} 枚）。",
@@ -2982,7 +2984,10 @@
       "tooManyOfRarity": "{rarity} のカードが多すぎます：{count}（最大：{max}）。",
       "evolvingSetNotAllowed": "カード {cardId} はセット {set} のもので、エボルビングモードでは許可されていません。",
       "evolvingOverBudget": "デッキはエボルビングポイントを {points} 使っています（最大 {max}）。"
-    }
+    },
+    "nwlPosterAlt": "New World Loot による Friday Free Genin Tournament",
+    "nwlRequirement": "New World Loot 提携トーナメント。参加するには Discord アカウントを連携し、New World Loot サーバーのメンバーである必要があります。上位3名は Chunin ロールを獲得します。",
+    "nwlJoinServer": "New World Loot サーバーに参加する"
   },
   "playHub": {
     "title": "プレイ",

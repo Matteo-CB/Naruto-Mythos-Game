@@ -210,7 +210,12 @@ export default function TournamentDetailPage() {
       setDiscordPopupType('not-linked');
       return;
     }
-    
+
+    if ((activeTournament as { partner?: string | null } | null)?.partner === 'nwl') {
+      doJoin();
+      return;
+    }
+
     try {
       const res = await fetch('/api/discord/check-member');
       const data = await res.json();
@@ -219,10 +224,10 @@ export default function TournamentDetailPage() {
         return;
       }
     } catch {
-      
+
     }
     doJoin();
-  }, [hasDiscordLinked, doJoin]);
+  }, [hasDiscordLinked, doJoin, activeTournament]);
 
   const handleLeave = useCallback(async () => { if (!tournamentId) return; clearError(); try { await leaveTournament(tournamentId); fetchTournament(tournamentId); } catch { /* err in store */ } }, [tournamentId, leaveTournament, fetchTournament, clearError]);
 
@@ -361,6 +366,30 @@ export default function TournamentDetailPage() {
             </div>
           )}
         </motion.div>
+
+        {(tour as { partner?: string | null }).partner === 'nwl' && (
+          <div className="mb-6 flex flex-col items-center gap-4 sm:flex-row sm:items-start">
+            {}
+            <img
+              src="/images/tournaments/nwl-friday.webp"
+              alt={t('nwlPosterAlt')}
+              className="w-full max-w-xs shrink-0"
+              style={{ boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}
+            />
+            <div className="flex-1">
+              <p className="text-sm leading-relaxed" style={{ color: '#c9c7c0' }}>{t('nwlRequirement')}</p>
+              <a
+                href="https://discord.gg/JR5HG4VUP"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-display mt-3 inline-flex items-center px-4 py-2 text-[11px] uppercase tracking-widest"
+                style={{ color: '#7f9cf5', backgroundColor: 'rgba(88,101,242,0.14)' }}
+              >
+                {t('nwlJoinServer')}
+              </a>
+            </div>
+          </div>
+        )}
 
         {tour.status === 'registration' && tour.scheduledStartAt && (
           <ScheduledCountdown deadline={tour.scheduledStartAt} />

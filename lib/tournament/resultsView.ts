@@ -117,6 +117,24 @@ function buildEliminationPodium(t: TournamentData, entries: ResultMatchEntry[]):
   return podium;
 }
 
+export function buildEliminationPrizeUserIds(tournament: TournamentData): { userId: string; place: 1 | 2 | 3 }[] {
+  if (!tournament.winnerId) return [];
+  const entries = buildEntries(tournament.matches ?? []);
+  const result: { userId: string; place: 1 | 2 | 3 }[] = [{ userId: tournament.winnerId, place: 1 }];
+  const finalEntry = entries.find(
+    (e) => e.bracket === 'main' && (e.outcome === 'win_played' || e.outcome === 'win_forfeit') && e.winnerId === tournament.winnerId,
+  );
+  if (finalEntry?.loserId) result.push({ userId: finalEntry.loserId, place: 2 });
+  const semiRound = finalEntry ? finalEntry.round - 1 : null;
+  if (semiRound !== null && semiRound >= 1) {
+    const semiLosers = entries.filter(
+      (e) => e.round === semiRound && (e.outcome === 'win_played' || e.outcome === 'win_forfeit') && e.loserId && e.loserId !== tournament.winnerId,
+    );
+    for (const s of semiLosers) if (s.loserId) result.push({ userId: s.loserId, place: 3 });
+  }
+  return result;
+}
+
 export function buildTournamentResultsView(tournament: TournamentData): TournamentResultsView {
   const format = (tournament.format ?? 'unknown') as TournamentResultsView['format'];
   const entries = buildEntries(tournament.matches ?? []);

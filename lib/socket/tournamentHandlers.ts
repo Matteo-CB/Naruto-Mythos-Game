@@ -12,6 +12,7 @@ import { rooms, type RoomData } from '@/lib/socket/server';
 import { createChessClock } from '@/lib/timing/chessClock';
 import { finalizeAndScheduleRoomDeletion } from '@/lib/tournament/matchRoomCleanup';
 import { logMatchEvent } from '@/lib/tournament/matchEventLog';
+import { awardNwlPrizeIfNeeded } from '@/lib/tournament/nwlPrize';
 import {
   computeStandings,
   generateSwissPairings,
@@ -1300,6 +1301,8 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
     });
     logMatchEvent({ type: 'tournament.completed', tournamentId, winnerId, format: 'elimination' });
     io?.to(`tournament:${tournamentId}`).emit('tournament:completed', { winnerId, winnerUsername });
+
+    awardNwlPrizeIfNeeded(tournamentId).catch(() => {});
 
     try {
       const meta = await prisma.tournament.findUnique({

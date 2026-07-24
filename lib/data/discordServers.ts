@@ -24,9 +24,9 @@ export const DISCORD_SERVERS: DiscordServerEntry[] = [
   {
     id: 'naruto-mythos-polska',
     name: 'Naruto Mythos TCG Polska',
-    description: 'Serwer zrzeszający polskich graczy Naruto Mythos TCG!',
-    logo: '/images/social/naruto-mythos-polska.webp',
-    inviteUrl: 'https://discord.com/invite/vnrjq9SfzK',
+    description: '',
+    logo: '/images/social/naruto-mythos-polska-official.webp',
+    inviteUrl: 'https://discord.gg/PwRjQyK5K',
   },
   {
     id: 'naruto-mythos-sud-est-france',

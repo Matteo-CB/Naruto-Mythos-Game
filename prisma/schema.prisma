@@ -394,6 +394,9 @@ model Tournament {
   maxChakraCost      Int? // max individual card chakra cost
   restrictionNote    String? // free-text note shown to players
   prizeCardId        String? // Phase 6: tournament winner prize card (KS-108-MV / KS-120-MV / KS-128-MV / KS-137-MV)
+  partner            String?
+  partnerPrizeAwarded Boolean                @default(false)
+  partnerAnnounced   Boolean                @default(false)
   scheduledStartAt   DateTime?
   matchTimeLimitMs   Int                     @default(1800000)
   joinTimeLimitMs    Int                     @default(300000)
