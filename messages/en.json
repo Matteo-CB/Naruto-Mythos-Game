@@ -1886,7 +1886,8 @@
     "duplicateDeck": "Copy",
     "copySuffix": "(copy)",
     "showUnrevealed": "Show unrevealed",
-    "containsUnrevealed": "Contains unrevealed"
+    "containsUnrevealed": "Contains unrevealed",
+    "useDeck": "Use this deck"
   },
   "discord": {
     "linkDiscord": "Link Discord",

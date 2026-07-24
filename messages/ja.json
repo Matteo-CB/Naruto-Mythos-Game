@@ -1890,7 +1890,8 @@
     "duplicateDeck": "コピー",
     "copySuffix": "（コピー）",
     "showUnrevealed": "非公開を表示",
-    "containsUnrevealed": "非公開カードを含む"
+    "containsUnrevealed": "非公開カードを含む",
+    "useDeck": "このデッキを使う"
   },
   "discord": {
     "linkDiscord": "Discordを連携",

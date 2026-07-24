@@ -14,56 +14,64 @@
         "Un bouton pour lier ton compte Discord apparaît en haut de l'écran tant que ce n'est pas fait.",
         "Le calendrier des tournois s'ouvre dans une fenêtre et affiche les horaires selon ton fuseau horaire.",
         "Le code de vérification n'est demandé qu'à l'inscription, plus à chaque connexion.",
-        "La liste des decks à charger ne déborde plus sur téléphone."
+        "La liste des decks à charger ne déborde plus sur téléphone.",
+        "Dans le fil, clique sur un deck partagé pour le voir en entier, le copier et l'utiliser dans le deck builder."
       ],
       "changes_en": [
         "New Social hub: the community Discord servers and the feed in one place.",
         "A button to link your Discord account now shows at the top of the screen until it is done.",
         "The tournament schedule opens in a window and shows times in your own time zone.",
         "The verification code is only asked at sign-up, no longer on every login.",
-        "The list of decks to load no longer overflows on phones."
+        "The list of decks to load no longer overflows on phones.",
+        "In the feed, click a shared deck to view it in full, copy it and use it in the deck builder."
       ],
       "changes_es": [
         "Nueva página Comunidad: los servidores de Discord de la comunidad y el muro en un solo lugar.",
         "Un botón para vincular tu cuenta de Discord aparece arriba mientras no lo hayas hecho.",
         "El calendario de torneos se abre en una ventana y muestra los horarios en tu zona horaria.",
         "El código de verificación solo se pide al registrarse, ya no en cada inicio de sesión.",
-        "La lista de mazos para cargar ya no se desborda en el móvil."
+        "La lista de mazos para cargar ya no se desborda en el móvil.",
+        "En el muro, haz clic en un mazo compartido para verlo completo, copiarlo y usarlo en el creador de mazos."
       ],
       "changes_ja": [
         "新しいコミュニティページ：コミュニティのDiscordサーバーとフィードを一か所にまとめました。",
         "Discordアカウントを連携していない場合、画面上部に連携ボタンが表示されます。",
         "トーナメントの日程がウィンドウで開き、あなたのタイムゾーンで時刻を表示します。",
         "認証コードは登録時のみ求められ、毎回のログインでは不要になりました。",
-        "読み込むデッキの一覧がスマートフォンではみ出さないようになりました。"
+        "読み込むデッキの一覧がスマートフォンではみ出さないようになりました。",
+        "フィードで共有されたデッキをクリックすると、全体を表示・コピーし、デッキビルダーで使えます。"
       ],
       "changes_pt": [
         "Nova página Comunidade: os servidores de Discord da comunidade e o mural num só lugar.",
         "Um botão para ligar a tua conta de Discord aparece no topo enquanto não o fizeres.",
         "O calendário de torneios abre numa janela e mostra os horários no teu fuso horário.",
         "O código de verificação só é pedido no registo, já não em cada início de sessão.",
-        "A lista de baralhos para carregar já não transborda no telemóvel."
+        "A lista de baralhos para carregar já não transborda no telemóvel.",
+        "No mural, clica num baralho partilhado para o ver por inteiro, copiá-lo e usá-lo no criador de baralhos."
       ],
       "changes_it": [
         "Nuova pagina Community: i server Discord della community e la bacheca in un unico posto.",
         "Un pulsante per collegare il tuo account Discord appare in alto finché non lo fai.",
         "Il calendario dei tornei si apre in una finestra e mostra gli orari nel tuo fuso orario.",
         "Il codice di verifica viene chiesto solo alla registrazione, non più a ogni accesso.",
-        "L'elenco dei mazzi da caricare non trabocca più sul telefono."
+        "L'elenco dei mazzi da caricare non trabocca più sul telefono.",
+        "Nella bacheca, clicca su un mazzo condiviso per vederlo per intero, copiarlo e usarlo nel costruttore di mazzi."
       ],
       "changes_pl": [
         "Nowa strona Społeczność: serwery Discord społeczności i tablica w jednym miejscu.",
         "Przycisk do połączenia konta Discord pojawia się na górze, dopóki tego nie zrobisz.",
         "Harmonogram turniejów otwiera się w oknie i pokazuje godziny w Twojej strefie czasowej.",
         "Kod weryfikacyjny jest wymagany tylko przy rejestracji, już nie przy każdym logowaniu.",
-        "Lista talii do wczytania nie wychodzi już poza ekran na telefonie."
+        "Lista talii do wczytania nie wychodzi już poza ekran na telefonie.",
+        "Na tablicy kliknij udostępnioną talię, aby zobaczyć ją w całości, skopiować i użyć w kreatorze talii."
       ],
       "categories": [
         "feature",
         "feature",
         "feature",
         "fix",
-        "fix"
+        "fix",
+        "feature"
       ]
     },
     {

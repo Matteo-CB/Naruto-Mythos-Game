@@ -10,6 +10,7 @@ import { getCardName } from '@/lib/utils/cardLocale';
 import { exportDeckAsImage } from '@/lib/utils/exportDeckImage';
 import { trackUiHook } from '@/lib/hooks/useTrackUi';
 import { Z_APP_MODAL } from '@/lib/ui/zIndex';
+import { useRouter } from '@/lib/i18n/navigation';
 
 interface Props {
   deck: { id: string; name: string; cardIds: string[]; missionIds: string[] };
@@ -26,6 +27,7 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, onClose 
   const tm = useTranslations('deckManager');
   const tc = useTranslations('common');
   const locale = useLocale();
+  const router = useRouter();
   const [exporting, setExporting] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -81,19 +83,28 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, onClose 
     }
   };
 
-  const handleCopy = () => {
+  const buildDeckCode = () => {
     const counts = new Map<string, number>();
     for (const id of deck.cardIds) counts.set(id, (counts.get(id) ?? 0) + 1);
     for (const id of deck.missionIds) counts.set(id, (counts.get(id) ?? 0) + 1);
     const parts: string[] = [];
     for (const [id, qty] of counts) parts.push(`${id}--${qty}`);
     parts.push((deck.name || 'Deck').replace(/\s+/g, '_'));
-    const code = parts.join('|');
-    navigator.clipboard.writeText(code).then(() => {
+    return parts.join('|');
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(buildDeckCode()).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       trackUiHook('deck.exported');
     }).catch(() => {});
+  };
+
+  const handleUseDeck = () => {
+    try { sessionStorage.setItem('importDeckCode', buildDeckCode()); } catch { /* ignore */ }
+    onClose();
+    router.push('/deck-builder' as '/');
   };
 
   const content = (
@@ -179,6 +190,13 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, onClose 
 
         <div className="flex flex-wrap items-center justify-end gap-2 px-5 py-3 shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           <button
+            onClick={handleUseDeck}
+            className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors"
+            style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+          >
+            {tb('useDeck')}
+          </button>
+          <button
             onClick={handleCopy}
             className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors"
             style={{ backgroundColor: 'rgba(255,255,255,0.04)', color: copied ? '#5fb05f' : '#ccc' }}
@@ -188,8 +206,8 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, onClose 
           <button
             onClick={handleExportImage}
             disabled={exporting}
-            className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer disabled:opacity-40"
-            style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+            className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors disabled:opacity-40"
+            style={{ backgroundColor: 'rgba(255,255,255,0.04)', color: '#ccc' }}
           >
             {exporting ? tc('loading') : tb('exportAsImage')}
           </button>

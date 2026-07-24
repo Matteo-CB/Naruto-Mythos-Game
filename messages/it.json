@@ -1808,7 +1808,8 @@
     "duplicateDeck": "Copia",
     "copySuffix": "(copia)",
     "showUnrevealed": "Mostra non rivelate",
-    "containsUnrevealed": "Contiene non rivelate"
+    "containsUnrevealed": "Contiene non rivelate",
+    "useDeck": "Usa questo mazzo"
   },
   "seoPages": {
     "collection": {

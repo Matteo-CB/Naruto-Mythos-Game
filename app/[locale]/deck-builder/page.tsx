@@ -783,8 +783,8 @@ export default function DeckBuilderPage() {
     }
   }, [deleteDeck, localizeApiError]);
 
-  const handleImport = useCallback(() => {
-    const code = importCode.trim();
+  const handleImport = useCallback((codeArg?: string) => {
+    const code = (codeArg ?? importCode).trim();
     if (!code) return;
     const parts = code.split("|");
     if (parts.length < 2) { setImportMessage({ type: "error", text: t("deckBuilder.importError") }); return; }
@@ -869,6 +869,20 @@ export default function DeckBuilderPage() {
     }
     setImportCode("");
   }, [importCode, allChars, allMissions, clearDeck, setDeckName, addChar, addMission, canUseHolo, t]);
+
+  const importedFromSessionRef = useRef(false);
+  useEffect(() => {
+    if (importedFromSessionRef.current) return;
+    if (allChars.length === 0 || allMissions.length === 0) return;
+    try {
+      const code = sessionStorage.getItem('importDeckCode');
+      if (code) {
+        sessionStorage.removeItem('importDeckCode');
+        importedFromSessionRef.current = true;
+        handleImport(code);
+      }
+    } catch { /* SSR / privacy */ }
+  }, [allChars, allMissions, handleImport]);
 
   const exportCode = useMemo(() => {
     const counts = new Map<string, number>();
@@ -2059,7 +2073,7 @@ export default function DeckBuilderPage() {
                 className="flex-1 px-3 py-1.5 text-xs font-mono focus:outline-none"
                 style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
               />
-              <PopupActionButton accentColor="#3e8b3e" onClick={handleImport} disabled={!importCode.trim()}>
+              <PopupActionButton accentColor="#3e8b3e" onClick={() => handleImport()} disabled={!importCode.trim()}>
                 {t("deckBuilder.importButton")}
               </PopupActionButton>
             </div>

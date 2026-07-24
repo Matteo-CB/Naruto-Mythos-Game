@@ -1892,7 +1892,8 @@
     "duplicateDeck": "Copier",
     "copySuffix": "(copie)",
     "showUnrevealed": "Cartes non révélées",
-    "containsUnrevealed": "Contient des cartes non révélées"
+    "containsUnrevealed": "Contient des cartes non révélées",
+    "useDeck": "Utiliser ce deck"
   },
   "discord": {
     "linkDiscord": "Lier Discord",

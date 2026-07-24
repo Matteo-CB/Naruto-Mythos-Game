@@ -1808,7 +1808,8 @@
     "duplicateDeck": "Kopiuj",
     "copySuffix": "(kopia)",
     "showUnrevealed": "Pokaż nieujawnione",
-    "containsUnrevealed": "Zawiera nieujawnione"
+    "containsUnrevealed": "Zawiera nieujawnione",
+    "useDeck": "Użyj tej talii"
   },
   "seoPages": {
     "collection": {

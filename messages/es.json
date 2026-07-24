@@ -1891,7 +1891,8 @@
     "duplicateDeck": "Copiar",
     "copySuffix": "(copia)",
     "showUnrevealed": "Mostrar no reveladas",
-    "containsUnrevealed": "Contiene no reveladas"
+    "containsUnrevealed": "Contiene no reveladas",
+    "useDeck": "Usar este mazo"
   },
   "discord": {
     "linkDiscord": "Vincular Discord",
