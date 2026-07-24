@@ -3763,7 +3763,8 @@
       "parentGone": "Esta publicação não existe mais.",
       "empty": "Adicione texto, um deck, um replay ou um GIF.",
       "blocked": "Esta mensagem foi bloqueada pela moderação.",
-      "generic": "Algo deu errado."
+      "generic": "Algo deu errado.",
+      "deckHasUnrevealed": "Este baralho contém uma carta ainda não revelada, não podes partilhá-lo."
     },
     "postToFeed": "Publicar no feed"
   },

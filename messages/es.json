@@ -3767,7 +3767,8 @@
       "parentGone": "Esta publicación ya no existe.",
       "empty": "Añade texto, un mazo, una repetición o un GIF.",
       "blocked": "Este mensaje fue bloqueado por la moderación.",
-      "generic": "Algo salió mal."
+      "generic": "Algo salió mal.",
+      "deckHasUnrevealed": "Este mazo contiene una carta aún no revelada, no puedes compartirlo."
     },
     "postToFeed": "Publicar en el muro"
   },

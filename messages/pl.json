@@ -3763,7 +3763,8 @@
       "parentGone": "Ten post już nie istnieje.",
       "empty": "Dodaj tekst, talię, powtórkę lub GIF.",
       "blocked": "Ta wiadomość została zablokowana przez moderację.",
-      "generic": "Coś poszło nie tak."
+      "generic": "Coś poszło nie tak.",
+      "deckHasUnrevealed": "Ta talia zawiera jeszcze nieujawnioną kartę, nie możesz jej udostępnić."
     },
     "postToFeed": "Opublikuj na tablicy"
   },

@@ -3763,7 +3763,8 @@
       "parentGone": "Questo post non esiste più.",
       "empty": "Aggiungi testo, un mazzo, un replay o un GIF.",
       "blocked": "Questo messaggio è stato bloccato dalla moderazione.",
-      "generic": "Qualcosa è andato storto."
+      "generic": "Qualcosa è andato storto.",
+      "deckHasUnrevealed": "Questo mazzo contiene una carta non ancora rivelata, non puoi condividerlo."
     },
     "postToFeed": "Pubblica nel feed"
   },

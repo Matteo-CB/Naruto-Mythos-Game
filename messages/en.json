@@ -3762,7 +3762,8 @@
       "parentGone": "This post no longer exists.",
       "empty": "Add some text, a deck, a replay or a GIF.",
       "blocked": "This message was blocked by moderation.",
-      "generic": "Something went wrong."
+      "generic": "Something went wrong.",
+      "deckHasUnrevealed": "This deck contains a card that is not revealed yet, you cannot share it."
     },
     "postToFeed": "Post to feed"
   },

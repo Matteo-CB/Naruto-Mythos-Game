@@ -15,7 +15,9 @@
         "Le calendrier des tournois s'ouvre dans une fenêtre et affiche les horaires selon ton fuseau horaire.",
         "Le code de vérification n'est demandé qu'à l'inscription, plus à chaque connexion.",
         "La liste des decks à charger ne déborde plus sur téléphone.",
-        "Dans le fil, clique sur un deck partagé pour le voir en entier, le copier et l'utiliser dans le deck builder."
+        "Dans le fil, clique sur un deck partagé pour le voir en entier, le copier et l'utiliser dans le deck builder.",
+        "Copier un deck partagé remplace automatiquement une variante que tu ne possèdes pas par sa carte de base.",
+        "Un deck contenant une carte pas encore révélée ne peut pas être partagé dans le fil."
       ],
       "changes_en": [
         "New Social hub: the community Discord servers and the feed in one place.",
@@ -23,7 +25,9 @@
         "The tournament schedule opens in a window and shows times in your own time zone.",
         "The verification code is only asked at sign-up, no longer on every login.",
         "The list of decks to load no longer overflows on phones.",
-        "In the feed, click a shared deck to view it in full, copy it and use it in the deck builder."
+        "In the feed, click a shared deck to view it in full, copy it and use it in the deck builder.",
+        "Copying a shared deck automatically replaces a variant you do not own with its base card.",
+        "A deck with a card that is not revealed yet cannot be shared in the feed."
       ],
       "changes_es": [
         "Nueva página Comunidad: los servidores de Discord de la comunidad y el muro en un solo lugar.",
@@ -31,7 +35,9 @@
         "El calendario de torneos se abre en una ventana y muestra los horarios en tu zona horaria.",
         "El código de verificación solo se pide al registrarse, ya no en cada inicio de sesión.",
         "La lista de mazos para cargar ya no se desborda en el móvil.",
-        "En el muro, haz clic en un mazo compartido para verlo completo, copiarlo y usarlo en el creador de mazos."
+        "En el muro, haz clic en un mazo compartido para verlo completo, copiarlo y usarlo en el creador de mazos.",
+        "Copiar un mazo compartido reemplaza automáticamente una variante que no tienes por su carta base.",
+        "Un mazo con una carta aún no revelada no se puede compartir en el muro."
       ],
       "changes_ja": [
         "新しいコミュニティページ：コミュニティのDiscordサーバーとフィードを一か所にまとめました。",
@@ -39,7 +45,9 @@
         "トーナメントの日程がウィンドウで開き、あなたのタイムゾーンで時刻を表示します。",
         "認証コードは登録時のみ求められ、毎回のログインでは不要になりました。",
         "読み込むデッキの一覧がスマートフォンではみ出さないようになりました。",
-        "フィードで共有されたデッキをクリックすると、全体を表示・コピーし、デッキビルダーで使えます。"
+        "フィードで共有されたデッキをクリックすると、全体を表示・コピーし、デッキビルダーで使えます。",
+        "共有デッキをコピーすると、持っていないバリアントは自動的に基本カードに置き換えられます。",
+        "未公開のカードを含むデッキはフィードで共有できません。"
       ],
       "changes_pt": [
         "Nova página Comunidade: os servidores de Discord da comunidade e o mural num só lugar.",
@@ -47,7 +55,9 @@
         "O calendário de torneios abre numa janela e mostra os horários no teu fuso horário.",
         "O código de verificação só é pedido no registo, já não em cada início de sessão.",
         "A lista de baralhos para carregar já não transborda no telemóvel.",
-        "No mural, clica num baralho partilhado para o ver por inteiro, copiá-lo e usá-lo no criador de baralhos."
+        "No mural, clica num baralho partilhado para o ver por inteiro, copiá-lo e usá-lo no criador de baralhos.",
+        "Copiar um baralho partilhado substitui automaticamente uma variante que não tens pela carta base.",
+        "Um baralho com uma carta ainda não revelada não pode ser partilhado no mural."
       ],
       "changes_it": [
         "Nuova pagina Community: i server Discord della community e la bacheca in un unico posto.",
@@ -55,7 +65,9 @@
         "Il calendario dei tornei si apre in una finestra e mostra gli orari nel tuo fuso orario.",
         "Il codice di verifica viene chiesto solo alla registrazione, non più a ogni accesso.",
         "L'elenco dei mazzi da caricare non trabocca più sul telefono.",
-        "Nella bacheca, clicca su un mazzo condiviso per vederlo per intero, copiarlo e usarlo nel costruttore di mazzi."
+        "Nella bacheca, clicca su un mazzo condiviso per vederlo per intero, copiarlo e usarlo nel costruttore di mazzi.",
+        "Copiare un mazzo condiviso sostituisce automaticamente una variante che non possiedi con la sua carta base.",
+        "Un mazzo con una carta non ancora rivelata non può essere condiviso nella bacheca."
       ],
       "changes_pl": [
         "Nowa strona Społeczność: serwery Discord społeczności i tablica w jednym miejscu.",
@@ -63,7 +75,9 @@
         "Harmonogram turniejów otwiera się w oknie i pokazuje godziny w Twojej strefie czasowej.",
         "Kod weryfikacyjny jest wymagany tylko przy rejestracji, już nie przy każdym logowaniu.",
         "Lista talii do wczytania nie wychodzi już poza ekran na telefonie.",
-        "Na tablicy kliknij udostępnioną talię, aby zobaczyć ją w całości, skopiować i użyć w kreatorze talii."
+        "Na tablicy kliknij udostępnioną talię, aby zobaczyć ją w całości, skopiować i użyć w kreatorze talii.",
+        "Skopiowanie udostępnionej talii automatycznie zastępuje wariant, którego nie masz, kartą podstawową.",
+        "Talii z jeszcze nieujawnioną kartą nie można udostępnić na tablicy."
       ],
       "categories": [
         "feature",
@@ -71,7 +85,9 @@
         "feature",
         "fix",
         "fix",
-        "feature"
+        "feature",
+        "fix",
+        "fix"
       ]
     },
     {

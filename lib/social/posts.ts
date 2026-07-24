@@ -2,6 +2,9 @@ import { prisma } from '@/lib/db/prisma';
 import { holdScanMessage } from '@/lib/moderation/autoScan';
 import { getFollowingIds } from '@/lib/social/followSync';
 import { getHiddenAuthorIds, canViewerSeePostsOf } from '@/lib/social/privacy';
+import { getHiddenCardIds, isCardPublicSync } from '@/lib/cards/reveal';
+import { getCardById } from '@/lib/data/cardIndex';
+import { holoBaseId } from '@/lib/holo/holoId';
 import type { DeckSnapshot, ReplaySnapshot, PostView, FeedFilter } from '@/lib/social/types';
 
 export const POST_MAX_LENGTH = 500;
@@ -71,6 +74,12 @@ export async function createPost(authorId: string, input: CreatePostInput): Prom
   if (deckId) {
     deckSnapshot = await snapshotDeck(authorId, deckId);
     if (!deckSnapshot) return { ok: false, errorKey: 'feed.error.deckNotYours', status: 400 };
+    const hidden = await getHiddenCardIds();
+    const allDeckIds = [...deckSnapshot.cardIds, ...deckSnapshot.missionIds];
+    const hasUnrevealed = allDeckIds.some(
+      (id) => getCardById(holoBaseId(id)) != null && !isCardPublicSync(id, hidden),
+    );
+    if (hasUnrevealed) return { ok: false, errorKey: 'feed.error.deckHasUnrevealed', status: 400 };
   }
 
   const replayGameId = typeof input.replayGameId === 'string' ? input.replayGameId : null;

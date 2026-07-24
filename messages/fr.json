@@ -3768,7 +3768,8 @@
       "parentGone": "Ce post n'existe plus.",
       "empty": "Ajoute du texte, un deck, un replay ou un GIF.",
       "blocked": "Ce message a été bloqué par la modération.",
-      "generic": "Une erreur est survenue."
+      "generic": "Une erreur est survenue.",
+      "deckHasUnrevealed": "Ce deck contient une carte pas encore révélée, tu ne peux pas le partager."
     },
     "postToFeed": "Publier dans le fil"
   },

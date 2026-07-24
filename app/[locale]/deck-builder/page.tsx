@@ -11,7 +11,7 @@ import { compareBySetOrder } from "@/lib/cards/order";
 import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useUnlockedVariants } from "@/lib/hooks/useUnlockedVariants";
-import { isVariantCard, isLockedVariantCard } from "@/lib/variants/isVariant";
+import { isVariantCard, isLockedVariantCard, baseCardIdFor } from "@/lib/variants/isVariant";
 import { holoIdFor, isHoloId, holoBaseId } from "@/lib/holo/holoId";
 import { HoloFoilOverlay } from "@/components/cards/HoloFoilOverlay";
 import { useTrackOnMount, trackUiHook } from "@/lib/hooks/useTrackUi";
@@ -860,7 +860,14 @@ export default function DeckBuilderPage() {
     }
     clearDeck();
     if (deckNameFromCode) setDeckName(deckNameFromCode);
-    for (const c of chars) addChar(c);
+    const substituteBase = (card: CharacterCard): CharacterCard => {
+      if (isLockedVariantCard(card) && !unlockedVariantIds.has(card.id)) {
+        const base = charByCardId.get(baseCardIdFor(card.cardId || card.id));
+        if (base) return base;
+      }
+      return card;
+    };
+    for (const c of chars) addChar(substituteBase(c));
     for (const m of missions) addMission(m);
     if (notFound.length > 0) {
       setImportMessage({ type: "error", text: t("deckBuilder.importNotFound", { count: notFound.length, ids: notFound.join(", ") }) });
@@ -868,7 +875,7 @@ export default function DeckBuilderPage() {
       setImportMessage({ type: "success", text: t("deckBuilder.importSuccess", { name: deckNameFromCode || "Deck", chars: chars.length, missions: missions.length }) });
     }
     setImportCode("");
-  }, [importCode, allChars, allMissions, clearDeck, setDeckName, addChar, addMission, canUseHolo, t]);
+  }, [importCode, allChars, allMissions, clearDeck, setDeckName, addChar, addMission, canUseHolo, t, unlockedVariantIds]);
 
   const importedFromSessionRef = useRef(false);
   useEffect(() => {
