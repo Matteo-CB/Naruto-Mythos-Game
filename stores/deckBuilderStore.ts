@@ -8,6 +8,7 @@ import { compareBySetOrder } from '@/lib/cards/order';
 import { computeDeckEvolvingPoints, isEvolvingCompatible } from '@/lib/evolving/computePoints';
 import { isLockedVariantCard } from '@/lib/variants/isVariant';
 import { isHoloId, holoBaseId, holoIdFor, isHoloEligibleCard } from '@/lib/holo/holoId';
+import { cardVersionKey } from '@/lib/cards/versionKey';
 import { useToastStore } from '@/stores/toastStore';
 
 interface SavedDeck {
@@ -86,11 +87,7 @@ export type { AddCheckResult };
 
 
 function normalizeVersionId(id: string): string {
-  
-  const match = id.match(/^(KS-\d+)/);
-  if (match) return match[1];
-  
-  return id.replace(/\s*A$/, '').trim();
+  return cardVersionKey(id);
 }
 
 export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({

@@ -11,17 +11,21 @@ import { exportDeckAsImage } from '@/lib/utils/exportDeckImage';
 import { trackUiHook } from '@/lib/hooks/useTrackUi';
 import { Z_APP_MODAL } from '@/lib/ui/zIndex';
 import { useRouter } from '@/lib/i18n/navigation';
+import { PostDeckButton } from '@/components/social/PostDeckButton';
+import { DeckPublicToggle } from '@/components/profile/DeckPublicToggle';
 
 interface Props {
   deck: { id: string; name: string; cardIds: string[]; missionIds: string[] };
   ownerName?: string;
   isAdminView?: boolean;
+  isOwner?: boolean;
+  deckIsPublic?: boolean;
   onClose: () => void;
 }
 
 const CARD_CLIP = 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)';
 
-export default function DeckViewerModal({ deck, ownerName, isAdminView, onClose }: Props) {
+export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner, deckIsPublic, onClose }: Props) {
   const t = useTranslations('profile');
   const tb = useTranslations('deckBuilder');
   const tm = useTranslations('deckManager');
@@ -189,6 +193,12 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, onClose 
         </div>
 
         <div className="flex flex-wrap items-center justify-end gap-2 px-5 py-3 shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          {isOwner && (
+            <div className="flex flex-wrap items-center gap-2 mr-auto">
+              <PostDeckButton deckId={deck.id} />
+              <DeckPublicToggle deckId={deck.id} initialPublic={deckIsPublic === true} />
+            </div>
+          )}
           <button
             onClick={handleUseDeck}
             className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors"

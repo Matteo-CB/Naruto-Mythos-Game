@@ -815,9 +815,19 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
           <div className="shrink-0 flex justify-center py-0.5">
             <span
               className="font-bold tabular-nums"
-              style={{ fontSize: dims.isMobile ? '15px' : '10px', lineHeight: 1.1, color: '#b33e3e', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+              style={{
+                fontSize: dims.isMobile ? '15px' : '10px',
+                lineHeight: 1.1,
+                color: '#ff9b9b',
+                fontFamily: "'NJNaruto', Arial, sans-serif",
+                backgroundColor: 'rgba(8, 6, 6, 0.88)',
+                padding: dims.isMobile ? '1px 8px' : '1px 6px',
+                minWidth: dims.isMobile ? 26 : 20,
+                textAlign: 'center',
+                boxShadow: '0 0 10px rgba(179, 62, 62, 0.35)',
+              }}
             >
-              {manualPowerMode ? <ManualGuess actual={oppPower} color="#b33e3e" /> : oppPower}
+              {manualPowerMode ? <ManualGuess actual={oppPower} color="#ff9b9b" /> : oppPower}
             </span>
           </div>
         )}
@@ -847,9 +857,19 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
           <div className="shrink-0 flex justify-center py-0.5">
             <span
               className="font-bold tabular-nums"
-              style={{ fontSize: dims.isMobile ? '15px' : '10px', lineHeight: 1.1, color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+              style={{
+                fontSize: dims.isMobile ? '15px' : '10px',
+                lineHeight: 1.1,
+                color: '#f0d890',
+                fontFamily: "'NJNaruto', Arial, sans-serif",
+                backgroundColor: 'rgba(8, 6, 6, 0.88)',
+                padding: dims.isMobile ? '1px 8px' : '1px 6px',
+                minWidth: dims.isMobile ? 26 : 20,
+                textAlign: 'center',
+                boxShadow: '0 0 10px rgba(196, 163, 90, 0.35)',
+              }}
             >
-              {manualPowerMode ? <ManualGuess actual={myPower} color="#c4a35a" /> : myPower}
+              {manualPowerMode ? <ManualGuess actual={myPower} color="#f0d890" /> : myPower}
             </span>
           </div>
         )}

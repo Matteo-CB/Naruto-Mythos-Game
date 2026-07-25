@@ -108,14 +108,14 @@ export async function sendTournamentCreated(t: TournamentLike): Promise<void> {
 
   fields.push({
     name: 'How to join',
-    value: 'Open Naruto Mythos TCG, head to the Tournaments page, and hit Join on this tournament. You need a linked Discord account.',
+    value: 'Open Naruto Mythos TCG, go to the Tournaments page, and join this tournament from there. Link your Discord account in your profile so your result and any role reward reach you on this server.',
   });
 
   const embed = {
     title: `New tournament: ${t.name}`,
     description: t.scheduledStartAt
-      ? 'A new tournament is open for sign-ups. Hit the join button in the app to register before the deck submission window closes.'
-      : 'A new tournament is open for sign-ups. Hit the join button in the app to register. Start time will be announced soon.',
+      ? 'Sign-ups are open. Join from the app to take a seat, then submit your deck before the deck submission window closes.'
+      : 'Sign-ups are open. Join from the app to take a seat. Start time will be announced soon.',
     color: 0xc4a35a,
     fields,
     footer: { text: `Created by ${t.creatorUsername}` },

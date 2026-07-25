@@ -20,25 +20,29 @@ const OFFLINE_KEYS = new Set([
 
 const RECONNECTING_REVEAL_DELAY_MS = 2500;
 
-type Status = 'hidden' | 'reconnecting' | 'offline';
+const RESYNC_LABEL_KEY = 'resyncing';
+
+type Status = 'hidden' | 'reconnecting' | 'resyncing' | 'offline';
 
 export function ConnectionStatusIndicator() {
   const t = useTranslations('common.connection');
   const { data: session } = useSession();
   const socket = useSocketStore((s) => s.socket);
   const connected = useSocketStore((s) => s.connected);
+  const connectionPhase = useSocketStore((s) => s.connectionPhase);
   const errorKey = useSocketStore((s) => s.errorKey);
   const connect = useSocketStore((s) => s.connect);
+  const rejoinMatch = useSocketStore((s) => s.rejoinMatch);
   const clearError = useSocketStore((s) => s.clearError);
 
   const derivedStatus: Status = useMemo(() => {
     if (!session?.user?.id) return 'hidden';
-    if (connected) return 'hidden';
+    if (connected) return connectionPhase === 'resyncing' ? 'resyncing' : 'hidden';
     if (errorKey && OFFLINE_KEYS.has(errorKey)) return 'offline';
     if (errorKey && CONNECTION_ERROR_KEYS.has(errorKey)) return 'reconnecting';
     if (socket !== null) return 'reconnecting';
     return 'hidden';
-  }, [session?.user?.id, socket, connected, errorKey]);
+  }, [session?.user?.id, socket, connected, connectionPhase, errorKey]);
 
   const [status, setStatus] = useState<Status>('hidden');
   const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -48,7 +52,7 @@ export function ConnectionStatusIndicator() {
       clearTimeout(revealTimerRef.current);
       revealTimerRef.current = null;
     }
-    if (derivedStatus === 'hidden' || derivedStatus === 'offline') {
+    if (derivedStatus === 'hidden' || derivedStatus === 'offline' || derivedStatus === 'resyncing') {
       setStatus(derivedStatus);
       return;
     }
@@ -67,11 +71,21 @@ export function ConnectionStatusIndicator() {
   const onRetry = useCallback(() => {
     if (!session?.user?.id) return;
     clearError();
-    connect(session.user.id, session.user.name ?? undefined).catch(() => {});
-  }, [session?.user?.id, session?.user?.name, connect, clearError]);
+    if (connected) {
+      rejoinMatch();
+      return;
+    }
+    connect(session.user.id, session.user.name ?? undefined)
+      .then(() => rejoinMatch())
+      .catch(() => {});
+  }, [session?.user?.id, session?.user?.name, connected, connect, clearError, rejoinMatch]);
 
   const color = status === 'offline' ? '#b33e3e' : '#c4a35a';
-  const label = status === 'offline' ? t('offline') : t('reconnecting');
+  const label = status === 'offline'
+    ? t('offline')
+    : status === 'resyncing' && t.has(RESYNC_LABEL_KEY)
+      ? t(RESYNC_LABEL_KEY)
+      : t('reconnecting');
 
   return (
     <div className="fixed top-3 right-3 z-50 pointer-events-none">
@@ -97,7 +111,7 @@ export function ConnectionStatusIndicator() {
             >
               {label}
             </span>
-            {status === 'offline' && (
+            {(status === 'offline' || status === 'resyncing') && (
               <button
                 type="button"
                 onClick={onRetry}

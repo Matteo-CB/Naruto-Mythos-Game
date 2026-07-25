@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 
-export const SEALED_BUILD_WINDOW_MS = 15 * 60 * 1000;
+import { SEALED_BUILD_WINDOW_MS } from '@/lib/tournament/sealedRegistration';
+
+export { SEALED_BUILD_WINDOW_MS };
 
 export async function GET(
   _req: NextRequest,

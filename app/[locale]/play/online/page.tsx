@@ -21,7 +21,7 @@ import { useMemo } from 'react';
 import { randomHoloHue } from '@/lib/utils/holoColor';
 import { useToastStore } from '@/stores/toastStore';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
-import { ALL_SET_IDS, SET_REGISTRY, isSetAvailable, getSetName } from '@/lib/data/sets/registry';
+import { ALL_SET_IDS, SET_REGISTRY, isSetSealedReady, getSetName } from '@/lib/data/sets/registry';
 import { useLocale } from 'next-intl';
 
 type GameMode = 'casual' | 'ranked';
@@ -37,6 +37,18 @@ const EVOLVING_TOGGLE_STORAGE_KEY = 'naruto-mythos-evolving-toggle';
 const SEALED_TOGGLE_STORAGE_KEY = 'naruto-mythos-sealed-toggle';
 const SEALED_DEFAULT_BOOSTER_COUNT: 4 | 5 | 6 = 5;
 const SEALED_DEFAULT_SET_CHOICE = 'KS';
+const JOIN_RETRY_INTERVAL_MS = 4000;
+const JOIN_MAX_ATTEMPTS = 10;
+const JOIN_NON_RETRYABLE_ERRORS = new Set([
+  'game.error.youAreHost',
+  'game.error.roomFull',
+  'game.error.suspended',
+  'game.error.rankedBanned',
+  'game.error.gameBanned',
+  'game.error.tournamentBusy',
+  'game.error.maintenanceNoNewGames',
+  'room.error.evolvingNoDeck',
+]);
 
 export default function PlayOnlinePage() {
   const t = useTranslations();
@@ -159,7 +171,9 @@ export default function PlayOnlinePage() {
 
   useEffect(() => {
     return () => {
-      if (!useSocketStore.getState().gameStarted) {
+      const st = useSocketStore.getState();
+      if (st.tournamentMatchRoom) return;
+      if (!st.gameStarted) {
         disconnect();
       }
     };
@@ -217,16 +231,17 @@ export default function PlayOnlinePage() {
   const playerNames = useSocketStore((s) => s.playerNames);
   const gameInitRef = useRef(false);
   useEffect(() => {
-    if (gameStarted && visibleState && playerRole && !gameInitRef.current) {
-      gameInitRef.current = true;
-      const myName = session?.user?.name ?? undefined;
-      const oppName = playerNames
-        ? (playerRole === 'player1' ? playerNames.player2 : playerNames.player1)
-        : undefined;
-      startOnlineGame(visibleState, playerRole, myName, oppName);
-      router.push('/game');
-    }
-  }, [gameStarted, visibleState, playerRole, startOnlineGame, router, session, playerNames]);
+    if (gameInitRef.current) return;
+    if (!gameStarted || !visibleState || !playerRole) return;
+    const roomParam = searchParams.get('room');
+    if (roomParam && roomCode !== roomParam) return;
+    if (!playerNames) return;
+    gameInitRef.current = true;
+    const myName = session?.user?.name ?? undefined;
+    const oppName = playerRole === 'player1' ? playerNames.player2 : playerNames.player1;
+    startOnlineGame(visibleState, playerRole, myName, oppName);
+    router.push('/game');
+  }, [gameStarted, visibleState, playerRole, startOnlineGame, router, session, playerNames, searchParams, roomCode]);
 
   useEffect(() => {
     const roomParam = searchParams.get('room');
@@ -238,12 +253,44 @@ export default function PlayOnlinePage() {
     }
   }, [searchParams, session, connected, connect]);
 
+  const joinedCodeRef = useRef<string | null>(null);
+  const joinAttemptsRef = useRef(0);
+  const joinState = useSocketStore((s) => s.joinState);
   useEffect(() => {
     const roomParam = searchParams.get('room');
-    if (roomParam && connected && session?.user?.id && !roomCode) {
-      joinRoom(roomParam, session.user.id);
+    if (!roomParam) {
+      joinedCodeRef.current = null;
+      joinAttemptsRef.current = 0;
+      return;
     }
+    if (!connected || !session?.user?.id) return;
+    if (joinedCodeRef.current === roomParam) return;
+    if (roomCode && roomCode !== roomParam) {
+      useSocketStore.getState().leaveMatchContext();
+      gameInitRef.current = false;
+    }
+    joinedCodeRef.current = roomParam;
+    joinAttemptsRef.current = 1;
+    joinRoom(roomParam, session.user.id);
   }, [searchParams, connected, session, roomCode, joinRoom]);
+
+  useEffect(() => {
+    const roomParam = searchParams.get('room');
+    if (!roomParam) return;
+    if (!connected || !session?.user?.id) return;
+    if (joinState === 'joined' || gameStarted) return;
+    const id = setInterval(() => {
+      const st = useSocketStore.getState();
+      if (st.joinState === 'joined' || st.gameStarted) return;
+      if (!st.connected || !session?.user?.id) return;
+      if (joinAttemptsRef.current >= JOIN_MAX_ATTEMPTS) return;
+      if (st.errorKey && JOIN_NON_RETRYABLE_ERRORS.has(st.errorKey)) return;
+      joinAttemptsRef.current += 1;
+      console.warn('[PlayOnline] Still not seated in', roomParam, 'retrying room:join, attempt', joinAttemptsRef.current);
+      st.joinRoom(roomParam, session.user.id);
+    }, JOIN_RETRY_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [searchParams, connected, session, joinState, gameStarted]);
 
   if (!session?.user) {
     return (
@@ -1102,7 +1149,7 @@ function SealedToggleBlock({
           {ALL_SET_IDS.map((sid) => {
             const desc = SET_REGISTRY[sid];
             const name = getSetName(sid, locale);
-            const available = isSetAvailable(sid);
+            const available = isSetSealedReady(sid);
             const selectable = checked && available;
             const isSelected = setChoice === sid;
             return (

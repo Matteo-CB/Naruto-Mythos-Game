@@ -397,6 +397,7 @@ model Tournament {
   partner            String?
   partnerPrizeAwarded Boolean                @default(false)
   partnerAnnounced   Boolean                @default(false)
+  chuninResetAt      DateTime?
   scheduledStartAt   DateTime?
   matchTimeLimitMs   Int                     @default(1800000)
   joinTimeLimitMs    Int                     @default(300000)
@@ -430,6 +431,19 @@ model TournamentParticipant {
   joinedAt        DateTime   @default(now())
 
   @@unique([tournamentId, userId])
+}
+
+model SealedPoolClaim {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  tournamentId String   @db.ObjectId
+  userId       String   @db.ObjectId
+  pool         Json
+  joinCount    Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([tournamentId, userId])
+  @@index([tournamentId])
 }
 
 model TournamentMatch {

@@ -355,10 +355,12 @@ function createScoreOrderChoice(
   newState.pendingActions = [...newState.pendingActions, pendingAction];
 
   
+  const previousProgress = newState.missionScoringProgress;
+  const sameMissionRank = previousProgress?.currentRankIndex === rankIndex && previousProgress?.winner === player;
   newState.missionScoringProgress = {
     currentRankIndex: rankIndex,
-    missionCardScoreDone: false,
-    processedCharacterIds: [],
+    missionCardScoreDone: sameMissionRank ? (previousProgress?.missionCardScoreDone ?? false) : false,
+    processedCharacterIds: sameMissionRank ? [...(previousProgress?.processedCharacterIds ?? [])] : [],
     winner: player,
     pendingScoreEffects: pendingSources,
   };

@@ -989,6 +989,8 @@
       "youLostOnClock": "You ran out of time",
       "opponentLostByIdle": "Opponent stayed inactive too long",
       "youLostByIdle": "You stayed inactive too long",
+      "opponentLostByDisconnect": "Your opponent lost the connection",
+      "youLostByDisconnect": "You lost the connection",
       "cancelledMulliganIdle": "Game cancelled: inactivity at mulligan",
       "cancelledStalemate": "Game cancelled: the game stalled and no action was recorded. No ELO change for either player.",
       "cancelledGeneric": "Game cancelled",
@@ -1651,7 +1653,8 @@
       "rejoin": "Rejoin Game",
       "abandon": "Abandon"
     },
-    "edgeToken": "Edge Token"
+    "edgeToken": "Edge Token",
+    "edgeLocked": "Locked"
   },
   "collection": {
     "title": "Card Collection",
@@ -1887,7 +1890,8 @@
     "copySuffix": "(copy)",
     "showUnrevealed": "Show unrevealed",
     "containsUnrevealed": "Contains unrevealed",
-    "useDeck": "Use this deck"
+    "useDeck": "Use this deck",
+    "cardDetail": "Card detail"
   },
   "discord": {
     "linkDiscord": "Link Discord",
@@ -2649,7 +2653,9 @@
     "cardBack": "Card back",
     "boosterPack": "Booster Pack",
     "continueToNextBooster": "Tap to open the next booster",
-    "continueToFinish": "Tap to finish opening"
+    "continueToFinish": "Tap to finish opening",
+    "timeJustNow": "just now",
+    "timeMinutesAgo": "{minutes} min ago"
   },
   "tournament": {
     "launchMatch": "Launch the match",
@@ -2949,7 +2955,7 @@
       "nameTooLong": "Name must be at most 80 characters.",
       "restrictionTooLong": "Restriction note must be at most 500 characters.",
       "invalidGameMode": "Invalid game mode.",
-      "invalidBoosterCount": "Sealed booster count must be an integer between 1 and 12.",
+      "invalidBoosterCount": "Sealed booster count must be 4, 5 or 6.",
       "invalidLeagueKeys": "Invalid league tier keys.",
       "cannotLeaveStarted": "Cannot leave after the tournament has started.",
       "creatorCannotLeave": "Creator cannot leave. Cancel the tournament instead.",
@@ -2961,7 +2967,14 @@
       "alreadyFinished": "This tournament is already finished.",
       "unrevealedCards": "Your deck contains unrevealed cards, which are not allowed.",
       "nwlCheckUnavailable": "The membership check is temporarily unavailable. Please try again in a moment.",
-      "nwlNotMember": "Join the New World Loot Discord server first."
+      "nwlNotMember": "Join the New World Loot Discord server first.",
+      "sealedDeckLocked": "Your sealed deck is already locked in for this tournament.",
+      "sealedDeckTooSmall": "Your sealed deck needs at least 30 character cards.",
+      "sealedMissionCount": "Your sealed deck needs exactly 3 missions.",
+      "sealedCardNotInPool": "That card is not in your sealed pool.",
+      "sealedRejoinLimit": "You have already used all your registrations for this sealed tournament. Your boosters cannot be opened again.",
+      "tooManyOpenTournaments": "You already have too many tournaments open. Finish or cancel one first.",
+      "sealedCardBanned": "One of these cards is banned in this tournament. Build your deck without it."
     },
     "deckError": {
       "tooFewCards": "Deck must have at least {min} cards (has {count}).",
@@ -2983,7 +2996,11 @@
     },
     "nwlPosterAlt": "Friday Free Genin Tournament by New World Loot",
     "nwlRequirement": "New World Loot partner tournament. To register you must have linked your Discord account and be a member of the New World Loot server. The top 3 receive the Chunin role.",
-    "nwlJoinServer": "Join the New World Loot server"
+    "nwlJoinServer": "Join the New World Loot server",
+    "thirdPlaceMatch": "Third place match",
+    "sealedBuildToRegister": "Build your sealed deck to confirm your registration.",
+    "sealedRegistrationPending": "Registration incomplete: build your deck",
+    "privateOnlyNotice": "Your tournament is private: share its join code with the players you want."
   },
   "playHub": {
     "title": "Play",
@@ -3458,7 +3475,18 @@
     "join": "Join",
     "emptyTitle": "Servers coming soon",
     "emptyText": "The community Discord servers will be added here very soon.",
-    "close": "Close"
+    "close": "Close",
+    "follow": "Follow",
+    "following": "Following",
+    "unfollow": "Unfollow",
+    "followers": "followers",
+    "followingLabel": "following",
+    "block": {
+      "confirmTitle": "Block {player}?",
+      "confirmBody": "You will no longer see their messages, and they will not be able to contact you.",
+      "confirm": "Block",
+      "doneTitle": "Player blocked"
+    }
   },
   "report": {
     "title": "Report {player}",
@@ -3801,7 +3829,8 @@
       "classic": "Classic",
       "open": "Open, all cards",
       "elimination": "Direct elimination",
-      "sealed": "Sealed"
+      "sealed": "Sealed",
+      "partner": "Partner tournament"
     },
     "rules": {
       "formatSwiss": "Swiss format",
@@ -3811,10 +3840,17 @@
       "allCards": "All cards allowed, no restriction",
       "banList": "Standard ban list",
       "times": "Registration {reg}, start {start}",
-      "discord": "Discord required"
+      "discord": "Discord required",
+      "partnerBy": "Hosted by {partner}",
+      "regLabel": "Registration",
+      "startLabel": "Start"
     },
     "today": "Today",
     "button": "Schedule",
-    "close": "Close"
+    "close": "Close",
+    "prev": "Previous day",
+    "next": "Next day",
+    "restDay": "Rest day, no scheduled tournament",
+    "localTimeNote": "Times are shown in your local time zone."
   }
 }

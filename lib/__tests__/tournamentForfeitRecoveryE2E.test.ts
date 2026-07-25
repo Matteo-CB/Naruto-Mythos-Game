@@ -53,6 +53,7 @@ vi.mock('@/lib/tournament/absenceManager', () => {
 import { prisma } from '@/lib/db/prisma';
 import { auth } from '@/lib/auth/authOptions';
 import { fireAbsenceTimerCallback, MAX_GRACE_CYCLES } from '../socket/tournamentHandlers';
+import { MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE } from '../tournament/absenceDecision';
 import { buildTournamentResultsView } from '../tournament/resultsView';
 import { POST as adminPOST } from '../../app/api/tournaments/[id]/admin/route';
 import type { TournamentData } from '@/stores/tournamentStore';
@@ -119,10 +120,10 @@ describe('Tournament forfeit recovery E2E (Fix #5: combined defense)', () => {
       expect(forfeitEmits).toHaveLength(0);
     });
 
-    it('only 1 player connected in match → forfeit fires for the disconnected one only', async () => {
+    it('only 1 player connected in match → the offline one is asked to confirm first, then forfeited alone', async () => {
       const io = makeIo('t1', ['Trafalgar']);
       p.tournamentMatch.findUnique.mockResolvedValue({
-        id: 'r3m1', tournamentId: 't1', status: 'ready',
+        id: 'r3m1solo', tournamentId: 't1', status: 'ready',
         player1Id: 'Trafalgar', player2Id: 'mak52554',
         player1Username: 'Trafalgar', player2Username: 'mak52554',
         round: 3, matchIndex: 1, bracket: null, roomCode: null,
@@ -137,9 +138,17 @@ describe('Tournament forfeit recovery E2E (Fix #5: combined defense)', () => {
       p.tournamentParticipant.updateMany.mockResolvedValue({ count: 1 });
       p.tournamentMatch.findMany.mockResolvedValue([]);
 
-      await fireAbsenceTimerCallback(io as never, 't1', 'r3m1', 'Trafalgar', 'mak52554', null, false);
+      await fireAbsenceTimerCallback(io as never, 't1', 'r3m1solo', 'Trafalgar', 'mak52554', null, false);
 
-      expect(io.emissions.some((e) => e.event === 'tournament:please-confirm-ready')).toBe(false);
+      expect(io.emissions.some((e) => e.event === 'tournament:please-confirm-ready')).toBe(true);
+      expect(p.tournamentMatch.update).not.toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ status: 'forfeit' }),
+      }));
+
+      for (let i = 0; i < MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE; i += 1) {
+        await fireAbsenceTimerCallback(io as never, 't1', 'r3m1solo', 'Trafalgar', 'mak52554', null, true);
+      }
+
       expect(p.tournamentMatch.update).toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({ status: 'forfeit', winnerId: 'Trafalgar' }),
       }));
@@ -327,14 +336,29 @@ describe('Tournament forfeit recovery E2E (Fix #5: combined defense)', () => {
 
       await fireAbsenceTimerCallback(io as never, 't1', 'm1', 'p1', 'p2', null, false);
       await fireAbsenceTimerCallback(io as never, 't1', 'm2', 'p3', 'p4', null, false);
-      await fireAbsenceTimerCallback(io as never, 't1', 'm3', 'p5', 'p6', null, false);
+      for (let i = 0; i <= MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE; i += 1) {
+        await fireAbsenceTimerCallback(io as never, 't1', 'm3', 'p5', 'p6', null, i > 0);
+      }
 
-      expect(io.emissions.filter((e) => e.event === 'tournament:please-confirm-ready')).toHaveLength(2);
+      const confirms = io.emissions.filter((e) => e.event === 'tournament:please-confirm-ready');
+      expect(confirms.some((e) => (e.data as { matchId: string }).matchId === 'm1')).toBe(true);
+      expect(confirms.some((e) => (e.data as { matchId: string }).matchId === 'm2')).toBe(true);
 
       expect(p.tournamentParticipant.updateMany).toHaveBeenCalledWith(expect.objectContaining({
         where: expect.objectContaining({ userId: { in: ['p5', 'p6'] } }),
         data: expect.objectContaining({ eliminated: true }),
       }));
+      const forfeitedIds = p.tournamentParticipant.updateMany.mock.calls
+        .flatMap((call: unknown[]) => {
+          const where = (call[0] as { where?: { userId?: unknown } })?.where;
+          const userId = where?.userId as { in?: string[] } | string | undefined;
+          if (typeof userId === 'string') return [userId];
+          return userId?.in ?? [];
+        });
+      expect(forfeitedIds).not.toContain('p1');
+      expect(forfeitedIds).not.toContain('p2');
+      expect(forfeitedIds).not.toContain('p3');
+      expect(forfeitedIds).not.toContain('p4');
     });
   });
 });

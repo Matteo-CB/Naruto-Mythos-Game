@@ -17,8 +17,6 @@ import { CountryFlag } from '@/components/CountryFlag';
 import { WorldcupChampionBadge } from '@/components/worldcup/WorldcupChampionBadge';
 import { EloHistoryChart } from '@/components/EloHistoryChart';
 import { DeckStatsPanel } from '@/components/profile/DeckStatsPanel';
-import { DeckPublicToggle } from '@/components/profile/DeckPublicToggle';
-import { PostDeckButton } from '@/components/social/PostDeckButton';
 import { FollowButton } from '@/components/social/FollowButton';
 import { ProfilePostsSection } from '@/components/profile/ProfilePostsSection';
 import Image from 'next/image';
@@ -281,7 +279,7 @@ export default function ProfilePage({
   const [leaguesEnabled, setLeaguesEnabled] = useState(false);
   const [unlinking, setUnlinking] = useState(false);
   const [badgePrefsLocal, setBadgePrefsLocal] = useState<string[]>([]);
-  const [openDeck, setOpenDeck] = useState<{ id: string; name: string; cardIds: string[]; missionIds: string[] } | null>(null);
+  const [openDeck, setOpenDeck] = useState<{ id: string; name: string; cardIds: string[]; missionIds: string[]; isPublic?: boolean } | null>(null);
   const tb = useTranslations('badges');
 
   useEffect(() => {
@@ -715,7 +713,7 @@ export default function ProfilePage({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {profile.decks.map((deck) => {
                   const canView = Array.isArray(deck.cardIds);
-                  const openViewer = () => setOpenDeck({ id: deck.id, name: deck.name, cardIds: deck.cardIds ?? [], missionIds: deck.missionIds ?? [] });
+                  const openViewer = () => setOpenDeck({ id: deck.id, name: deck.name, cardIds: deck.cardIds ?? [], missionIds: deck.missionIds ?? [], isPublic: deck.isPublic === true });
                   return (
                   <EvolvingDeckHolo
                     key={deck.id}
@@ -741,12 +739,6 @@ export default function ProfilePage({
                       )}
                     </div>
                     <div className="flex items-center gap-3 shrink-0 ml-3">
-                      {isOwner && (
-                        <>
-                          <PostDeckButton deckId={deck.id} />
-                          <DeckPublicToggle deckId={deck.id} initialPublic={deck.isPublic === true} />
-                        </>
-                      )}
                       {canView && (
                         <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#c4a35a' }}>
                           {t('viewDeck')}
@@ -875,6 +867,8 @@ export default function ProfilePage({
           deck={openDeck}
           ownerName={profile.username}
           isAdminView={!isOwner}
+          isOwner={isOwner}
+          deckIsPublic={openDeck.isPublic === true}
           onClose={() => setOpenDeck(null)}
         />
       )}

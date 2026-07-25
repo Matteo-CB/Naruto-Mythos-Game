@@ -1,7 +1,6 @@
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { BoosterCard, SealedPool } from './boosterGenerator';
 import { separateSealedPool } from './boosterGenerator';
-import { validateDeck } from '@/lib/engine/rules/DeckValidation';
 import { MIN_DECK_SIZE, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
 
 
@@ -113,9 +112,21 @@ export function buildAISealedDeck(pool: SealedPool): {
     }
   }
 
-  const selectedMissions = uniqueMissions
+  const selectedMissionCards: BoosterCard[] = uniqueMissions
     .slice(0, MISSION_CARDS_PER_PLAYER)
-    .map(m => m.card as unknown as MissionCard);
+    .map(m => m.card);
+
+  if (selectedMissionCards.length < MISSION_CARDS_PER_PLAYER) {
+    const usedInstanceIds = new Set(selectedMissionCards.map(m => m.sealedInstanceId));
+    for (const m of scoredMissions) {
+      if (selectedMissionCards.length >= MISSION_CARDS_PER_PLAYER) break;
+      if (usedInstanceIds.has(m.card.sealedInstanceId)) continue;
+      usedInstanceIds.add(m.card.sealedInstanceId);
+      selectedMissionCards.push(m.card);
+    }
+  }
+
+  const selectedMissions = selectedMissionCards as unknown as MissionCard[];
 
   
   
@@ -131,51 +142,10 @@ export function buildAISealedDeck(pool: SealedPool): {
     .sort((a, b) => b.score - a.score);
 
   
-  const versionCounts = new Map<string, number>();
   const selectedChars: CharacterCard[] = [];
-
   for (const sc of scoredChars) {
-    if (selectedChars.length >= MIN_DECK_SIZE + 3) break; // Pick a few extra for robustness
-
-    const baseVersion = sc.card.id.replace(/^(KS-\d+).*$/, '$1');
-    const count = versionCounts.get(baseVersion) ?? 0;
-    if (count >= 2) continue; // Max 2 copies
-
-    versionCounts.set(baseVersion, count + 1);
+    if (selectedChars.length >= MIN_DECK_SIZE + 3) break;
     selectedChars.push(sc.card as unknown as CharacterCard);
-  }
-
-  
-  if (selectedChars.length < MIN_DECK_SIZE) {
-    for (const sc of scoredChars) {
-      if (selectedChars.length >= MIN_DECK_SIZE) break;
-      const alreadyIn = selectedChars.some(c => (c as unknown as BoosterCard).sealedInstanceId === sc.card.sealedInstanceId);
-      if (alreadyIn) continue;
-
-      const baseVersion = sc.card.id.replace(/^(KS-\d+).*$/, '$1');
-      const count = versionCounts.get(baseVersion) ?? 0;
-      if (count >= 2) continue;
-
-      versionCounts.set(baseVersion, count + 1);
-      selectedChars.push(sc.card as unknown as CharacterCard);
-    }
-  }
-
-  
-  const result = validateDeck(selectedChars, selectedMissions);
-  if (!result.valid) {
-    
-    const fallbackChars: CharacterCard[] = [];
-    const fbVersions = new Map<string, number>();
-    for (const c of characters) {
-      if (fallbackChars.length >= MIN_DECK_SIZE) break;
-      const bv = c.id.replace(/^(KS-\d+).*$/, '$1');
-      const cnt = fbVersions.get(bv) ?? 0;
-      if (cnt >= 2) continue;
-      fbVersions.set(bv, cnt + 1);
-      fallbackChars.push(c as unknown as CharacterCard);
-    }
-    return { characters: fallbackChars, missions: selectedMissions };
   }
 
   return { characters: selectedChars, missions: selectedMissions };

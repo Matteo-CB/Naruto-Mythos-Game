@@ -23,6 +23,7 @@ import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
 import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
 import { useTournamentStore } from '@/stores/tournamentStore';
 import { useSocketStore } from '@/lib/socket/client';
+import { selectCurrentMatchForUser } from '@/lib/tournament/matchSelection';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { TournamentMatch, TournamentData } from '@/stores/tournamentStore';
 import { computeStandings } from '@/lib/tournament/swissEngine';
@@ -94,7 +95,11 @@ export default function TournamentDetailPage() {
   const isAdmin = ADMIN_EMAILS.includes(session?.user?.email ?? '') || ADMIN_USERNAMES.includes(session?.user?.name ?? '');
   const isCreator = activeTournament?.creatorId === userId;
   const isParticipant = activeTournament?.participants.some((p) => p.userId === userId);
-  const myMatch: TournamentMatch | undefined = activeTournament?.matches.find((m) => (m.player1Id === userId || m.player2Id === userId) && (m.status === 'pending' || m.status === 'ready' || m.status === 'in_progress'));
+  const myMatch: TournamentMatch | undefined = selectCurrentMatchForUser(
+    (activeTournament?.matches ?? []) as unknown as Array<{ id: string; round: number; matchIndex: number; status: string; roomCode?: string | null; player1Id?: string | null; player2Id?: string | null; isBye?: boolean }>,
+    userId,
+    activeTournament?.currentRound,
+  ) as unknown as TournamentMatch | undefined;
   const myAbsenceDeadline = myMatch?.absenceDeadline ? myMatch.absenceDeadline : null;
 
   useEffect(() => { if (status === 'unauthenticated') router.replace('/login'); }, [status, router]);
@@ -106,9 +111,16 @@ export default function TournamentDetailPage() {
 
   useEffect(() => {
     if (session?.user?.id && !connected) {
-      connect(session.user.id);
+      connect(session.user.id, session.user.name ?? undefined);
     }
   }, [session, connected, connect]);
+
+  useEffect(() => {
+    const st = useSocketStore.getState();
+    if (st.gameEnded || st.gameCancelled) {
+      st.leaveMatchContext();
+    }
+  }, []);
 
   useEffect(() => {
     if (!socket || !tournamentId) return;
@@ -194,6 +206,10 @@ export default function TournamentDetailPage() {
     try {
       const code = activeTournament && !activeTournament.isPublic ? joinCodeInput.trim() : undefined;
       await joinTournament(tournamentId, code);
+      if (activeTournament?.gameMode === 'sealed') {
+        router.push(('/tournaments/' + tournamentId + '/sealed-build') as '/');
+        return;
+      }
       fetchTournament(tournamentId);
     } catch (err) {
       const errorKey = (err as Error & { errorKey?: string })?.errorKey;
@@ -203,7 +219,7 @@ export default function TournamentDetailPage() {
       }
       setJoinError(err instanceof Error ? err.message : t('admin.error'));
     }
-  }, [tournamentId, joinTournament, fetchTournament, clearError, joinCodeInput, activeTournament, t, tRoot]);
+  }, [tournamentId, joinTournament, fetchTournament, clearError, joinCodeInput, activeTournament, t, tRoot, router]);
 
   const handleJoin = useCallback(async () => {
     if (!hasDiscordLinked) {
@@ -237,7 +253,7 @@ export default function TournamentDetailPage() {
 
   useEffect(() => {
     if (!socket || !tournamentId || !userId || !myMatchId) return;
-    if (myMatchRoom) return;
+    if (myMatchRoom && myMatchStatus === 'in_progress') return;
     if (myMatchStatus !== 'ready' && myMatchStatus !== 'pending') return;
     const emitReady = () => socket.emit('tournament:ready', { tournamentId, matchId: myMatchId, userId });
     emitReady();
@@ -248,7 +264,12 @@ export default function TournamentDetailPage() {
   useEffect(() => {
     if (!myMatchRoom || myMatchStatus !== 'in_progress') return;
     const code = myMatchRoom;
-    const id = setTimeout(() => { router.push(('/play/online?room=' + code) as '/'); }, 1800);
+    const id = setTimeout(() => {
+      const st = useSocketStore.getState();
+      if (st.roomCode === code && st.gameStarted) return;
+      if (st.roomCode && st.roomCode !== code) st.leaveMatchContext();
+      router.push(('/play/online?room=' + code) as '/');
+    }, 1200);
     return () => clearTimeout(id);
   }, [myMatchRoom, myMatchStatus, router]);
 
@@ -342,6 +363,61 @@ export default function TournamentDetailPage() {
   const needsSealedBuild = isParticipant && tour.gameMode === 'sealed' && tour.status === 'registration' && !mySealedDeck;
   const needsDeck = isParticipant && tour.gameMode !== 'sealed' && tour.status === 'registration';
   const hasRestrictions = tour.gameMode === 'restricted' || (tour as any).bannedCardIds?.length > 0;
+
+  const myMatchPanel = myMatch ? (
+    <div
+      className="mb-6 p-5"
+      style={{
+        backgroundColor: '#151515',
+        boxShadow: myMatch.roomCode
+          ? '0 12px 32px rgba(0,0,0,0.45), 0 0 26px rgba(74,158,255,0.35)'
+          : (myMatch.status === 'ready' || myMatch.status === 'in_progress')
+            ? '0 12px 32px rgba(0,0,0,0.45), 0 0 22px rgba(196,163,90,0.30)'
+            : '0 12px 32px rgba(0,0,0,0.4)',
+      }}
+    >
+      <h2 className="text-xs font-bold uppercase tracking-[0.25em] mb-3" style={{ color: myMatch.roomCode ? '#4a9eff' : '#c4a35a' }}>
+        {t('yourMatchReady')}
+      </h2>
+      <p className="text-base font-bold text-center mb-4" style={{ color: '#e8e8e8' }}>
+        {myMatch.player1Username ?? t('tbd')} <span style={{ color: '#666' }}>vs</span> {myMatch.player2Username ?? t('tbd')}
+      </p>
+
+      {myAbsenceDeadline && !myMatch.roomCode && (
+        <div className="mb-4">
+          <AbsenceTimer deadline={myAbsenceDeadline} onExpired={() => fetchTournament(tournamentId)} />
+        </div>
+      )}
+
+      {myMatch.roomCode ? (
+        <div className="flex flex-col items-center gap-3">
+          <p className="text-sm font-medium" style={{ color: '#4a9eff' }}>{t('matchStarting')}</p>
+          <Link
+            href={('/play/online?room=' + myMatch.roomCode) as '/'}
+            onClick={handlePlayMatch}
+            className="block w-full text-center py-4 text-base font-black uppercase tracking-widest"
+            style={{ backgroundColor: '#4a9eff', color: '#0a0a0a' }}>
+            {t('enterMatch')}
+          </Link>
+        </div>
+      ) : (myMatch.status === 'ready' || myMatch.status === 'in_progress') ? (
+        <div className="flex flex-col items-center gap-2">
+          <motion.button
+            onClick={handlePlayMatch}
+            whileHover={{ scale: 1.015 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full py-4 text-base font-black uppercase tracking-widest cursor-pointer"
+            style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}>
+            {t('launchMatch')}
+          </motion.button>
+          <p className="text-xs text-center" style={{ color: '#c4a35a' }}>{t('launchHint')}</p>
+          <p className="text-[11px] text-center" style={{ color: '#777' }}>{t('waitingBothReady')}</p>
+        </div>
+      ) : (
+        <p className="text-sm text-center" style={{ color: '#888888' }}>{t('waitingOpponent')}</p>
+      )}
+    </div>
+  ) : null;
 
   return (
     <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
@@ -712,60 +788,7 @@ export default function TournamentDetailPage() {
               userId={userId}
               format={tour.format}
             />
-            {myMatch && (
-              <div
-                className="mb-6 p-5"
-                style={{
-                  backgroundColor: '#151515',
-                  boxShadow: myMatch.roomCode
-                    ? '0 12px 32px rgba(0,0,0,0.45), 0 0 26px rgba(74,158,255,0.35)'
-                    : (myMatch.status === 'ready' || myMatch.status === 'in_progress')
-                      ? '0 12px 32px rgba(0,0,0,0.45), 0 0 22px rgba(196,163,90,0.30)'
-                      : '0 12px 32px rgba(0,0,0,0.4)',
-                }}
-              >
-                <h2 className="text-xs font-bold uppercase tracking-[0.25em] mb-3" style={{ color: myMatch.roomCode ? '#4a9eff' : '#c4a35a' }}>
-                  {t('yourMatchReady')}
-                </h2>
-                <p className="text-base font-bold text-center mb-4" style={{ color: '#e8e8e8' }}>
-                  {myMatch.player1Username ?? t('tbd')} <span style={{ color: '#666' }}>vs</span> {myMatch.player2Username ?? t('tbd')}
-                </p>
-
-                {myAbsenceDeadline && !myMatch.roomCode && (
-                  <div className="mb-4">
-                    <AbsenceTimer deadline={myAbsenceDeadline} onExpired={() => fetchTournament(tournamentId)} />
-                  </div>
-                )}
-
-                {myMatch.roomCode ? (
-                  <div className="flex flex-col items-center gap-3">
-                    <p className="text-sm font-medium" style={{ color: '#4a9eff' }}>{t('matchStarting')}</p>
-                    <Link
-                      href={('/play/online?room=' + myMatch.roomCode) as '/'}
-                      onClick={handlePlayMatch}
-                      className="block w-full text-center py-4 text-base font-black uppercase tracking-widest"
-                      style={{ backgroundColor: '#4a9eff', color: '#0a0a0a' }}>
-                      {t('enterMatch')}
-                    </Link>
-                  </div>
-                ) : (myMatch.status === 'ready' || myMatch.status === 'in_progress') ? (
-                  <div className="flex flex-col items-center gap-2">
-                    <motion.button
-                      onClick={handlePlayMatch}
-                      whileHover={{ scale: 1.015 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full py-4 text-base font-black uppercase tracking-widest cursor-pointer"
-                      style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}>
-                      {t('launchMatch')}
-                    </motion.button>
-                    <p className="text-xs text-center" style={{ color: '#c4a35a' }}>{t('launchHint')}</p>
-                    <p className="text-[11px] text-center" style={{ color: '#777' }}>{t('waitingBothReady')}</p>
-                  </div>
-                ) : (
-                  <p className="text-sm text-center" style={{ color: '#888888' }}>{t('waitingOpponent')}</p>
-                )}
-              </div>
-            )}
+            {myMatchPanel}
             <div className="p-4 overflow-x-auto" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
               <h2 className="text-sm font-medium uppercase tracking-wider mb-4" style={{ color: '#c4a35a' }}>{isSwiss ? t('swissStandings') : t('bracket')}</h2>
               {isSwiss ? (
@@ -795,6 +818,7 @@ export default function TournamentDetailPage() {
 
         {tour.status === 'completed' && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
+            {myMatchPanel}
             <TournamentResults tournament={tour} />
             <div className="mt-6 p-4 overflow-x-auto" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
               <h2 className="text-sm font-medium uppercase tracking-wider mb-4" style={{ color: '#c4a35a' }}>{isSwiss ? t('swissStandings') : t('bracket')}</h2>

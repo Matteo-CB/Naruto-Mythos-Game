@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/lib/db/prisma', () => {
   const m = {
-    tournament: { findUnique: vi.fn(), update: vi.fn(), delete: vi.fn(), create: vi.fn(), findMany: vi.fn() },
+    tournament: { findUnique: vi.fn(), update: vi.fn(), delete: vi.fn(), create: vi.fn(), findMany: vi.fn(), count: vi.fn() },
     tournamentParticipant: {
       findFirst: vi.fn(), findUnique: vi.fn(), findMany: vi.fn(),
       update: vi.fn(), updateMany: vi.fn(),
@@ -68,7 +68,7 @@ import { GET as listGET, POST as createPOST } from '../../app/api/tournaments/ro
 import { GET as matchesListGET } from '../../app/api/tournaments/[id]/matches/route';
 
 const p = prisma as never as {
-  tournament: { findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn>; delete: ReturnType<typeof vi.fn>; findMany: ReturnType<typeof vi.fn> };
+  tournament: { findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn>; delete: ReturnType<typeof vi.fn>; findMany: ReturnType<typeof vi.fn>; count: ReturnType<typeof vi.fn>; create: ReturnType<typeof vi.fn> };
   tournamentParticipant: {
     findFirst: ReturnType<typeof vi.fn>; findUnique: ReturnType<typeof vi.fn>; findMany: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn>;
@@ -455,10 +455,14 @@ describe('POST /api/tournaments (create)', () => {
     const res = await createPOST(req({ name: 'T', maxPlayers: 8 }) as never);
     expect(res.status).toBe(401);
   });
-  it('rejects non-admin', async () => {
+  it('lets a normal player create a tournament, but forces it private', async () => {
     authMock.mockResolvedValue({ user: { id: 'random', email: 'x@y.z', name: 'Random' } });
-    const res = await createPOST(req({ name: 'T', maxPlayers: 8 }) as never);
-    expect(res.status).toBe(403);
+    p.tournament.count.mockResolvedValue(0);
+    p.user.findUnique.mockResolvedValue({ username: 'Random', role: 'player' });
+    p.tournament.create.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({ id: 't1', ...data }));
+    const res = await createPOST(req({ name: 'T', maxPlayers: 8, isPublic: true }) as never);
+    expect(res.status).toBe(201);
+    expect(p.tournament.create.mock.calls[0][0].data.isPublic).toBe(false);
   });
   it('rejects elimination format with non-power-of-2 players', async () => {
     authMock.mockResolvedValue({ user: { id: 'admin', email: 'matteo.biyikli3224@gmail.com', name: 'Kutxyt' } });

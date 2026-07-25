@@ -1,22 +1,31 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
-import { Z_APP_MODAL } from '@/lib/ui/zIndex';
 import {
   WEEKLY_SCHEDULE,
   KIND_COLORS,
-  AUTO_TOURNAMENT_MAX_PLAYERS,
   AUTO_TOURNAMENT_REG_HOUR,
-  AUTO_TOURNAMENT_START_HOUR,
   AUTO_SEALED_BOOSTER_COUNT,
+  NWL_PARTNER_NAME,
   inferTournamentKind,
+  startHourForSpec,
+  maxPlayersForSpec,
+  nextWeeklyOccurrences,
   type TourneyKind,
   type WeeklyDaySpec,
 } from '@/lib/tournament/weeklySchedule';
+
+interface DayCard {
+  scheduleWeekday: number;
+  spec: WeeklyDaySpec;
+  dayLabel: string;
+  reg: string;
+  start: string;
+  isToday: boolean;
+}
 
 interface TournamentLite {
   id: string;
@@ -24,14 +33,18 @@ interface TournamentLite {
   format?: string | null;
   gameMode?: string | null;
   useBanList?: boolean | null;
+  partner?: string | null;
   status?: string | null;
   scheduledStartAt?: string | null;
   maxPlayers?: number | null;
 }
 
 const DISPLAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
-const LEGEND_KINDS: TourneyKind[] = ['classic', 'open', 'elimination', 'sealed'];
+const LEGEND_KINDS: TourneyKind[] = ['classic', 'open', 'elimination', 'sealed', 'partner'];
+const PARTNER_NAMES: Record<string, string> = { nwl: NWL_PARTNER_NAME };
 const WD_SHORT: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+const CARD_CLIP = 'polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)';
+const FALLBACK_GAP = 16;
 
 function parisWeekday(d: Date): number {
   try {
@@ -41,34 +54,14 @@ function parisWeekday(d: Date): number {
   }
 }
 
-function parisDateParts(base: Date): { year: number; month: number; day: number } {
-  const dtf = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' });
-  const map: Record<string, string> = {};
-  for (const p of dtf.formatToParts(base)) map[p.type] = p.value;
-  return { year: +map.year, month: +map.month, day: +map.day };
-}
-
-function parisWallToUtc(year: number, month: number, day: number, hour: number): Date {
-  const guess = Date.UTC(year, month - 1, day, hour, 0, 0);
-  const dtf = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'Europe/Paris', hour12: false,
-    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
-  });
-  const map: Record<string, string> = {};
-  for (const p of dtf.formatToParts(new Date(guess))) map[p.type] = p.value;
-  let h = parseInt(map.hour, 10);
-  if (h === 24) h = 0;
-  const asUtc = Date.UTC(+map.year, +map.month - 1, +map.day, h, +map.minute, +map.second);
-  return new Date(guess - (asUtc - guess));
-}
-
 function ruleChips(spec: WeeklyDaySpec, t: ReturnType<typeof useTranslations>): string[] {
   const chips: string[] = [];
   chips.push(spec.format === 'elimination' ? t('rules.formatElim') : t('rules.formatSwiss'));
-  chips.push(t('rules.slots', { count: AUTO_TOURNAMENT_MAX_PLAYERS }));
+  chips.push(t('rules.slots', { count: maxPlayersForSpec(spec) }));
   if (spec.gameMode === 'sealed') chips.push(t('rules.sealed', { count: AUTO_SEALED_BOOSTER_COUNT }));
   else if (!spec.useBanList) chips.push(t('rules.allCards'));
   else chips.push(t('rules.banList'));
+  if (spec.partner) chips.push(t('rules.partnerBy', { partner: PARTNER_NAMES[spec.partner] ?? spec.partner }));
   chips.push(t('rules.discord'));
   return chips;
 }
@@ -76,40 +69,93 @@ function ruleChips(spec: WeeklyDaySpec, t: ReturnType<typeof useTranslations>): 
 export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: TournamentLite[] }) {
   const t = useTranslations('tournamentCalendar');
   const locale = useLocale();
-  const [open, setOpen] = useState(false);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const todayRef = useRef<HTMLDivElement>(null);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const update = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanLeft(el.scrollLeft > 4);
+    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    update();
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', update, { passive: true });
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null;
+    if (ro) ro.observe(el);
+    return () => {
+      el.removeEventListener('scroll', update);
+      if (ro) ro.disconnect();
+    };
+  }, [update]);
 
   useEffect(() => { setMounted(true); }, []);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open]);
+  const scrollDir = (dir: 1 | -1) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const card = el.firstElementChild as HTMLElement | null;
+    const step = card ? card.offsetWidth + FALLBACK_GAP : el.clientWidth * 0.8;
+    el.scrollBy({ left: dir * step, behavior: 'smooth' });
+  };
 
-  const weekdayName = useMemo(() => {
-    const fmt = new Intl.DateTimeFormat(locale, { weekday: 'long' });
-    return (wd: number) => {
-      const s = fmt.format(new Date(Date.UTC(2024, 0, 7 + wd)));
-      return s.charAt(0).toUpperCase() + s.slice(1);
-    };
-  }, [locale]);
-
-  const todayWd = useMemo(() => parisWeekday(new Date()), []);
-
-  const localTimes = useMemo(() => {
+  const timeFormats = useMemo(() => {
     try {
-      const p = parisDateParts(new Date());
-      const reg = parisWallToUtc(p.year, p.month, p.day, AUTO_TOURNAMENT_REG_HOUR);
-      const start = parisWallToUtc(p.year, p.month, p.day, AUTO_TOURNAMENT_START_HOUR);
-      const plain = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
-      const withZone = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
-      return { reg: plain.format(reg), start: withZone.format(start) };
+      return {
+        plain: new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }),
+        withZone: new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }),
+        weekday: new Intl.DateTimeFormat(locale, { weekday: 'long' }),
+        dayKey: new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+      };
     } catch {
-      return { reg: `${AUTO_TOURNAMENT_REG_HOUR}:00`, start: `${AUTO_TOURNAMENT_START_HOUR}:00` };
+      return null;
     }
   }, [locale]);
+
+  const dayCards = useMemo<DayCard[]>(() => {
+    const capitalize = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+
+    if (!mounted || !timeFormats) {
+      const fallbackWeekday = (wd: number) => {
+        try {
+          const fmt = new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' });
+          return capitalize(fmt.format(new Date(Date.UTC(2024, 0, 7 + wd))));
+        } catch {
+          return '';
+        }
+      };
+      return DISPLAY_ORDER.flatMap((wd) => {
+        const spec = WEEKLY_SCHEDULE[wd];
+        if (!spec) return [];
+        return [{
+          scheduleWeekday: wd,
+          spec,
+          dayLabel: fallbackWeekday(wd),
+          reg: `${AUTO_TOURNAMENT_REG_HOUR}:00`,
+          start: `${startHourForSpec(spec)}:00`,
+          isToday: false,
+        }];
+      });
+    }
+
+    const now = new Date();
+    const todayKey = timeFormats.dayKey.format(now);
+    return nextWeeklyOccurrences(now).map((occurrence) => ({
+      scheduleWeekday: occurrence.scheduleWeekday,
+      spec: occurrence.spec,
+      dayLabel: capitalize(timeFormats.weekday.format(occurrence.startAt)),
+      reg: timeFormats.plain.format(occurrence.regAt),
+      start: timeFormats.withZone.format(occurrence.startAt),
+      isToday: timeFormats.dayKey.format(occurrence.startAt) === todayKey,
+    }));
+  }, [mounted, timeFormats, locale]);
 
   const byDay = useMemo(() => {
     const map = new Map<number, TournamentLite[]>();
@@ -124,117 +170,190 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
     return map;
   }, [tournaments]);
 
-  const modal = (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          key="cal-overlay"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
-          className="fixed inset-0 flex items-center justify-center p-4"
-          style={{ backgroundColor: 'rgba(0,0,0,0.78)', zIndex: Z_APP_MODAL }}
-          onClick={() => setOpen(false)}
-          role="dialog" aria-modal="true"
-        >
-          <motion.div
-            key="cal-panel"
-            initial={{ opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: 0.98 }} transition={{ duration: 0.18, ease: 'easeOut' }}
-            onClick={(e) => e.stopPropagation()}
-            className="relative flex max-h-[86vh] w-full max-w-2xl flex-col overflow-hidden"
-            style={{ backgroundColor: '#111111', boxShadow: '0 24px 70px rgba(0,0,0,0.6)' }}
-          >
-            <header className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #232323' }}>
-              <div className="flex items-baseline gap-3 min-w-0">
-                <h2 className="text-lg font-black uppercase tracking-wider truncate" style={{ color: '#c4a35a' }}>{t('title')}</h2>
-                <span className="font-display hidden sm:inline text-[11px] uppercase tracking-widest" style={{ color: '#555' }}>{t('subtitle')}</span>
-              </div>
-              <button type="button" onClick={() => setOpen(false)} className="text-[11px] font-bold uppercase tracking-widest shrink-0" style={{ color: '#888' }}>{t('close')}</button>
-            </header>
+  useEffect(() => {
+    if (!mounted) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const card = todayRef.current;
+    el.scrollLeft = card
+      ? Math.max(0, card.offsetLeft - Math.max(0, (el.clientWidth - card.offsetWidth) / 2))
+      : 0;
+    update();
+  }, [mounted, dayCards, update]);
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-5 py-3" style={{ borderBottom: '1px solid #1c1c1c' }}>
-              {LEGEND_KINDS.map((k) => (
-                <span key={k} className="flex items-center gap-1.5 text-[11px]" style={{ color: '#9a9a9f' }}>
-                  <span className="inline-block h-2.5 w-2.5" style={{ backgroundColor: KIND_COLORS[k] }} />
-                  {t(`kind.${k}` as `kind.${TourneyKind}`)}
-                </span>
-              ))}
-            </div>
-
-            <div className="overflow-y-auto px-5 py-4">
-              <div className="flex flex-col gap-2.5">
-                {DISPLAY_ORDER.map((wd) => {
-                  const spec = WEEKLY_SCHEDULE[wd];
-                  const live = byDay.get(wd) ?? [];
-                  const color = spec ? KIND_COLORS[spec.kind] : '#4a4a4e';
-                  const isToday = wd === todayWd;
-                  return (
-                    <div
-                      key={wd}
-                      className="flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center"
-                      style={{
-                        backgroundColor: isToday ? '#17161c' : '#0c0b0f',
-                        boxShadow: isToday ? `0 0 20px ${color}18` : undefined,
-                      }}
-                    >
-                      <div className="flex items-center gap-2.5 sm:w-44 sm:shrink-0">
-                        <span className="font-display text-sm uppercase tracking-widest" style={{ color: isToday ? '#e8e6df' : '#c9c7c0' }}>{weekdayName(wd)}</span>
-                        {isToday && (
-                          <span className="font-display text-[9px] uppercase tracking-widest px-1.5 py-0.5" style={{ backgroundColor: `${color}22`, color }}>{t('today')}</span>
-                        )}
-                      </div>
-
-                      {!spec ? (
-                        <span className="text-[13px]" style={{ color: '#55555c' }}>{t('noTournament')}</span>
-                      ) : (
-                        <div className="flex-1 flex flex-col gap-2">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-display text-[11px] uppercase tracking-wider px-2.5 py-1" style={{ backgroundColor: `${color}22`, color }}>
-                              {t(`kind.${spec.kind}` as `kind.${TourneyKind}`)}
-                            </span>
-                            {ruleChips(spec, t).map((c, i) => (
-                              <span key={i} className="text-[11px] px-2 py-1" style={{ backgroundColor: 'rgba(255,255,255,0.045)', color: '#a7a7ac' }}>{c}</span>
-                            ))}
-                          </div>
-                          <span className="text-[11px]" style={{ color: '#6a6a70' }}>
-                            {t('rules.times', { reg: localTimes.reg, start: localTimes.start })}
-                          </span>
-                        </div>
-                      )}
-
-                      {spec && live.length > 0 && (
-                        <div className="flex flex-wrap gap-2 sm:shrink-0">
-                          {live.map((tr) => {
-                            const c = KIND_COLORS[inferTournamentKind(tr)];
-                            return (
-                              <Link key={tr.id} href={`/tournaments/${tr.id}` as '/'} onClick={() => setOpen(false)}
-                                className="text-[10px] uppercase tracking-widest px-3 py-1.5" style={{ backgroundColor: `${c}1f`, color: c }}>
-                                {tr.status === 'registration' ? t('registrationOpen') : t('view')}
-                              </Link>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+  const arrowStyle = {
+    backgroundColor: 'rgba(13,12,16,0.92)',
+    color: '#c4a35a',
+    borderRadius: 9999,
+    boxShadow: '0 4px 14px rgba(0,0,0,0.55)',
+  } as const;
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="text-[11px] font-bold uppercase tracking-widest px-4 py-2 transition-colors"
-        style={{ backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a' }}
-      >
-        {t('button')}
-      </button>
-      {mounted ? createPortal(modal, document.body) : null}
-    </>
+    <section className="w-full">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-2.5">
+        <h2 className="font-display text-base sm:text-lg uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+          {t('title')}
+        </h2>
+        <span className="font-display text-[9px] sm:text-[10px] uppercase tracking-[0.25em]" style={{ color: '#5b5b62' }}>
+          {t('subtitle')}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1.5 mb-3">
+        {LEGEND_KINDS.map((k) => (
+          <span
+            key={k}
+            className="font-display text-[9px] sm:text-[10px] uppercase tracking-widest px-2 py-1"
+            style={{ backgroundColor: `${KIND_COLORS[k]}1f`, color: KIND_COLORS[k] }}
+          >
+            {t(`kind.${k}` as `kind.${TourneyKind}`)}
+          </span>
+        ))}
+      </div>
+
+      <div className="relative">
+        {canLeft && (
+          <button
+            type="button"
+            onClick={() => scrollDir(-1)}
+            aria-label={t('prev')}
+            className="font-display absolute left-1 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 hidden sm:flex items-center justify-center cursor-pointer text-base transition-colors hover:text-[#ffd966]"
+            style={arrowStyle}
+          >
+            &lt;
+          </button>
+        )}
+        {canRight && (
+          <button
+            type="button"
+            onClick={() => scrollDir(1)}
+            aria-label={t('next')}
+            className="font-display absolute right-1 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 hidden sm:flex items-center justify-center cursor-pointer text-base transition-colors hover:text-[#ffd966]"
+            style={arrowStyle}
+          >
+            &gt;
+          </button>
+        )}
+
+        <div
+          ref={scrollRef}
+          className="relative flex flex-col sm:flex-row items-stretch gap-2.5 sm:gap-4 sm:overflow-x-auto sm:snap-x sm:snap-mandatory scroll-smooth no-scrollbar pb-2"
+        >
+          {dayCards.map((card) => {
+            const { spec, isToday } = card;
+            const live = byDay.get(card.scheduleWeekday) ?? [];
+            const color = KIND_COLORS[spec.kind];
+            const times = { reg: card.reg, start: card.start };
+
+            return (
+              <div
+                key={card.scheduleWeekday}
+                ref={isToday ? todayRef : undefined}
+                className="w-full sm:shrink-0 sm:w-[244px] sm:snap-start"
+              >
+                <div
+                  className="relative flex h-full flex-col overflow-hidden"
+                  style={{
+                    backgroundColor: isToday ? '#16151b' : '#0d0c11',
+                    clipPath: CARD_CLIP,
+                  }}
+                >
+                  {isToday && (
+                    <motion.span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0"
+                      style={{ backgroundColor: `${color}12` }}
+                      animate={{ opacity: [0.3, 1, 0.3] }}
+                      transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+                  )}
+
+                  <div className="relative flex h-full flex-col gap-2.5 px-3.5 py-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span
+                        className="font-display truncate text-[13px] sm:text-sm uppercase tracking-widest"
+                        style={{ color: isToday ? '#f2efe7' : '#c9c7c0' }}
+                      >
+                        {card.dayLabel}
+                      </span>
+                      {isToday && (
+                        <span
+                          className="font-display shrink-0 text-[8px] uppercase tracking-widest px-1.5 py-0.5"
+                          style={{ backgroundColor: `${color}26`, color }}
+                        >
+                          {t('today')}
+                        </span>
+                      )}
+                    </div>
+
+                    <span aria-hidden="true" className="block w-full" style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.06)' }} />
+
+                    <span
+                      className="font-display self-start text-[10px] uppercase tracking-wider px-2 py-1"
+                      style={{ backgroundColor: `${color}1f`, color }}
+                    >
+                      {t(`kind.${spec.kind}` as `kind.${TourneyKind}`)}
+                    </span>
+
+                    <div className="flex flex-wrap gap-1">
+                      {ruleChips(spec, t).map((chip, i) => (
+                        <span
+                          key={i}
+                          className="text-[10px] leading-tight px-1.5 py-1"
+                          style={{ backgroundColor: 'rgba(255,255,255,0.045)', color: '#9b9ba1' }}
+                        >
+                          {chip}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="mt-auto flex flex-col gap-1 pt-1">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#61616a' }}>
+                          {t('rules.regLabel')}
+                        </span>
+                        <span className="text-[11px] tabular-nums" style={{ color: '#a9a7a2' }}>
+                          {times.reg}
+                        </span>
+                      </div>
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#61616a' }}>
+                          {t('rules.startLabel')}
+                        </span>
+                        <span className="text-[11px] tabular-nums" style={{ color: isToday ? '#f0eee7' : '#cfcdc6' }}>
+                          {times.start}
+                        </span>
+                      </div>
+                    </div>
+
+                    {live.length > 0 && (
+                      <div className="flex flex-col gap-1.5">
+                        {live.map((tr) => {
+                          const c = KIND_COLORS[inferTournamentKind(tr)];
+                          return (
+                            <Link
+                              key={tr.id}
+                              href={`/tournaments/${tr.id}` as '/'}
+                              className="font-display block text-center text-[9px] uppercase tracking-widest px-2 py-1.5 transition-opacity hover:opacity-80"
+                              style={{ backgroundColor: `${c}1f`, color: c }}
+                            >
+                              {tr.status === 'registration' ? t('registrationOpen') : t('view')}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <p className="mt-2 text-[10px] sm:text-[11px]" style={{ color: '#55555c' }}>
+        {t('localTimeNote')}
+      </p>
+    </section>
   );
 }

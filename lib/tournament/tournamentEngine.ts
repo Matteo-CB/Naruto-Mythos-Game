@@ -10,7 +10,11 @@ export interface BracketSlot {
   username: string | null;
 }
 
+export const MAIN_BRACKET = 'main';
+export const THIRD_PLACE_BRACKET = 'third';
+
 export interface BracketMatch {
+  bracket?: string;
   round: number;
   matchIndex: number;
   player1: BracketSlot;
@@ -24,6 +28,7 @@ export interface BracketMatch {
 export interface BracketResult {
   matches: BracketMatch[];
   totalRounds: number;
+  thirdPlaceMatch: BracketMatch | null;
 }
 
 
@@ -52,6 +57,7 @@ export function generateBracket(participants: Participant[]): BracketResult {
     const winner = isBye ? (p1 || p2) : null;
 
     matches.push({
+      bracket: MAIN_BRACKET,
       round: 1,
       matchIndex: i / 2,
       player1: { participantId: p1?.userId ?? null, username: p1?.username ?? null },
@@ -68,6 +74,7 @@ export function generateBracket(participants: Participant[]): BracketResult {
     const matchCount = size / Math.pow(2, round);
     for (let i = 0; i < matchCount; i++) {
       matches.push({
+        bracket: MAIN_BRACKET,
         round,
         matchIndex: i,
         player1: { participantId: null, username: null },
@@ -88,7 +95,23 @@ export function generateBracket(participants: Participant[]): BracketResult {
     }
   }
 
-  return { matches, totalRounds };
+  return { matches, totalRounds, thirdPlaceMatch: buildThirdPlaceMatch(size, totalRounds) };
+}
+
+
+export function buildThirdPlaceMatch(size: number, totalRounds: number): BracketMatch | null {
+  if (size < 4 || totalRounds < 2) return null;
+  return {
+    bracket: THIRD_PLACE_BRACKET,
+    round: totalRounds,
+    matchIndex: 0,
+    player1: { participantId: null, username: null },
+    player2: { participantId: null, username: null },
+    winnerId: null,
+    winnerUsername: null,
+    isBye: false,
+    status: 'pending',
+  };
 }
 
 
@@ -123,7 +146,7 @@ function propagateWinner(matches: BracketMatch[], completed: BracketMatch): Brac
   const isTopSlot = completed.matchIndex % 2 === 0;
 
   const nextMatch = matches.find(
-    m => m.round === nextRound && m.matchIndex === nextMatchIndex,
+    m => (m.bracket ?? MAIN_BRACKET) === MAIN_BRACKET && m.round === nextRound && m.matchIndex === nextMatchIndex,
   );
   if (!nextMatch) return null; // final was just completed
 

@@ -49,6 +49,8 @@ const GameBoard = dynamic(
   },
 );
 
+const RESYNC_LABEL_KEY = 'connection.resyncing';
+
 function OpponentDisconnectBanner() {
   const t = useTranslations('game');
   const forfeitAt = useSocketStore((s) => s.opponentForfeitAt);
@@ -70,7 +72,7 @@ function OpponentDisconnectBanner() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-50 text-center py-2.5 text-xs font-medium tabular-nums"
+      className="fixed top-0 left-0 right-0 z-50 text-center py-2.5 text-xs font-medium tabular-nums pointer-events-none"
       style={{ backgroundColor: 'rgba(196, 163, 90, 0.95)', color: '#0a0a0a' }}
     >
       {label}
@@ -100,8 +102,23 @@ export default function GamePage() {
   const socketErrorParams = useSocketStore((s) => s.errorParams);
   const socketClearError = useSocketStore((s) => s.clearError);
   const isSpectating = useSocketStore((s) => s.isSpectating);
+  const socketPlayerRole = useSocketStore((s) => s.playerRole);
+  const socketPlayerNames = useSocketStore((s) => s.playerNames);
+  const connectionPhase = useSocketStore((s) => s.connectionPhase);
+  const startOnlineGame = useGameStore((s) => s.startOnlineGame);
 
   const hasActiveGame = gameState || (isOnlineGame && visibleState) || isSpectating;
+
+  const adoptedOnlineGameRef = useRef(false);
+  useEffect(() => {
+    if (isOnlineGame || isSpectating || gameState) return;
+    if (adoptedOnlineGameRef.current) return;
+    if (!socketGameStarted || !socketVisibleState || !socketPlayerRole || !socketPlayerNames) return;
+    adoptedOnlineGameRef.current = true;
+    const myName = socketPlayerRole === 'player1' ? socketPlayerNames.player1 : socketPlayerNames.player2;
+    const oppName = socketPlayerRole === 'player1' ? socketPlayerNames.player2 : socketPlayerNames.player1;
+    startOnlineGame(socketVisibleState, socketPlayerRole, myName, oppName);
+  }, [isOnlineGame, isSpectating, gameState, socketGameStarted, socketVisibleState, socketPlayerRole, socketPlayerNames, startOnlineGame]);
 
   const acknowledgeGameCancelled = useCallback(() => {
     useSocketStore.setState({ gameCancelled: null });
@@ -275,6 +292,13 @@ export default function GamePage() {
   }, [isOnlineGame, socketError, socketErrorKey, socketErrorParams, socketClearError]);
 
   const showConnectionLost = isOnlineGame && !socketConnected && hasActiveGame;
+  const showResyncing = isOnlineGame && socketConnected && !!hasActiveGame && connectionPhase === 'resyncing';
+  const rejoinErrorSuffix = socketErrorKey && socketErrorKey.startsWith('game.error.rejoin')
+    ? socketErrorKey.replace('game.', '')
+    : null;
+  const resyncLabel = rejoinErrorSuffix && tGame.has(rejoinErrorSuffix)
+    ? tGame(rejoinErrorSuffix)
+    : t.has(RESYNC_LABEL_KEY) ? t(RESYNC_LABEL_KEY) : t('connection.reconnecting');
   const opponentDisconnected = useSocketStore((s) => s.opponentDisconnected);
 
   if (!hasActiveGame) {
@@ -309,13 +333,26 @@ export default function GamePage() {
       <BanNotification />
       {showConnectionLost && (
         <div
-          className="fixed top-0 left-0 right-0 z-50 text-center py-2 text-xs font-medium"
+          className="fixed top-0 left-0 right-0 z-50 text-center py-2 text-xs font-medium pointer-events-none"
           style={{
             backgroundColor: 'rgba(179, 62, 62, 0.9)',
             color: '#e0e0e0',
           }}
         >
-          {socketErrorKey ? tGame(socketErrorKey.replace('game.', '')) : socketError || tGame('error.connectionLost')}
+          {socketErrorKey && tGame.has(socketErrorKey.replace('game.', ''))
+            ? tGame(socketErrorKey.replace('game.', ''))
+            : socketError || tGame('error.connectionLost')}
+        </div>
+      )}
+      {showResyncing && !showConnectionLost && (
+        <div
+          className="fixed top-0 left-0 right-0 z-50 text-center py-2 text-xs font-medium pointer-events-none"
+          style={{
+            backgroundColor: 'rgba(196, 163, 90, 0.9)',
+            color: '#0a0a0a',
+          }}
+        >
+          {resyncLabel}
         </div>
       )}
       {isOnlineGame && opponentDisconnected && (

@@ -27,6 +27,8 @@ vi.mock('@/lib/db/prisma', () => ({
 
 vi.mock('@/lib/socket/tournamentHandlers', () => ({
   handleSwissDoubleAbsence: vi.fn(async () => {}),
+  reopenTournamentMatch: vi.fn(async () => {}),
+  handleMatchForfeit: vi.fn(async () => {}),
 }));
 
 type EmitRecord = { room: string; event: string; payload: any };
@@ -86,12 +88,14 @@ describe('Phase 12 — tournament mulligan-idle delegation', () => {
     vi.clearAllMocks();
   });
 
-  it('Swiss tournament mulligan-idle delegates to handleSwissDoubleAbsence', async () => {
+  it('Swiss tournament mulligan-idle delegates to handleSwissDoubleAbsence when neither player answered', async () => {
     const { io } = makeIoMock();
     const tournamentHandlers = await import('@/lib/socket/tournamentHandlers');
     const room = makeRoom({
       tournamentId: 'tour-swiss',
       tournamentMatchId: 'match-001',
+      hostId: 'u-host',
+      guestId: 'u-guest',
     });
     await handleMulliganIdleTimeout(room, room.code, io);
     expect(tournamentHandlers.handleSwissDoubleAbsence).toHaveBeenCalledWith(
@@ -101,24 +105,47 @@ describe('Phase 12 — tournament mulligan-idle delegation', () => {
     );
   });
 
-  it('Elimination tournament mulligan-idle marks match as forfeit (no winner)', async () => {
-    const { io, emits } = makeIoMock();
-    const { prisma } = await import('@/lib/db/prisma');
+  it('Swiss tournament mulligan-idle forfeits only the player who did not answer', async () => {
+    const { io } = makeIoMock();
+    const tournamentHandlers = await import('@/lib/socket/tournamentHandlers');
+    const room = makeRoom({
+      tournamentId: 'tour-swiss',
+      tournamentMatchId: 'match-004',
+      hostId: 'u-host',
+      guestId: 'u-guest',
+      gameState: makeState({
+        player1: { hasMulliganed: true } as never,
+        player2: { hasMulliganed: false } as never,
+      }),
+    });
+    await handleMulliganIdleTimeout(room, room.code, io);
+    expect(tournamentHandlers.handleSwissDoubleAbsence).not.toHaveBeenCalled();
+    expect(tournamentHandlers.handleMatchForfeit).toHaveBeenCalledWith(
+      io,
+      'tour-swiss',
+      'match-004',
+      'u-guest',
+    );
+  });
+
+  it('Elimination tournament mulligan-idle reopens the match instead of killing the bracket', async () => {
+    const { io } = makeIoMock();
     const tournamentHandlers = await import('@/lib/socket/tournamentHandlers');
     const room = makeRoom({
       tournamentId: 'tour-elim',
       tournamentMatchId: 'match-002',
+      hostId: 'u-host',
+      guestId: 'u-guest',
     });
     await handleMulliganIdleTimeout(room, room.code, io);
     expect(tournamentHandlers.handleSwissDoubleAbsence).not.toHaveBeenCalled();
-    expect(prisma.tournamentMatch.update).toHaveBeenCalledWith(expect.objectContaining({
-      where: { id: 'match-002' },
-      data: expect.objectContaining({ status: 'forfeit', winnerId: null }),
-    }));
-    const tournamentEmit = emits.find((e) => e.event === 'tournament:player-forfeited');
-    expect(tournamentEmit).toBeDefined();
-    expect(tournamentEmit!.payload.doubleForfeit).toBe(true);
-    expect(tournamentEmit!.payload.winnerId).toBe(null);
+    expect(tournamentHandlers.reopenTournamentMatch).toHaveBeenCalledWith(
+      io,
+      'tour-elim',
+      'match-002',
+      'u-host',
+      'u-guest',
+    );
   });
 
   it('non-tournament mulligan-idle does not touch tournament tables', async () => {

@@ -91,14 +91,33 @@ describe('whoseInputIsAwaited', () => {
     expect(whoseInputIsAwaited(s)).toBe('player2');
   });
 
-  it('returns pending forced resolver above all other priorities', () => {
+  it('returns pending forced resolver above all other priorities while it still owes an input', () => {
     const s = makeState({
       phase: 'action',
       activePlayer: 'player1',
       pendingForcedResolver: 'player2',
-      pendingActions: [makePendingAction('player1')],
+      pendingActions: [makePendingAction('player1'), makePendingAction('player2', { id: 'pa-2' })],
     });
     expect(whoseInputIsAwaited(s)).toBe('player2');
+  });
+
+  it('ignores a stale forced resolver that has nothing left to answer', () => {
+    const s = makeState({
+      phase: 'action',
+      activePlayer: 'player1',
+      pendingForcedResolver: 'player2',
+    });
+    expect(whoseInputIsAwaited(s)).toBe('player1');
+  });
+
+  it('ignores a stale forced resolver and falls back to the real pending action owner', () => {
+    const s = makeState({
+      phase: 'action',
+      activePlayer: 'player2',
+      pendingForcedResolver: 'player2',
+      pendingActions: [makePendingAction('player1')],
+    });
+    expect(whoseInputIsAwaited(s)).toBe('player1');
   });
 
   it('returns first pending action player in action phase', () => {
@@ -187,12 +206,20 @@ describe('whoseInputIsAwaited', () => {
   });
 
   it('returns pendingForcedResolver during start phase (not just action)', () => {
-    const s = makeState({ phase: 'start', pendingForcedResolver: 'player2' });
+    const s = makeState({
+      phase: 'start',
+      pendingForcedResolver: 'player2',
+      pendingActions: [makePendingAction('player1'), makePendingAction('player2', { id: 'pa-2' })],
+    });
     expect(whoseInputIsAwaited(s)).toBe('player2');
   });
 
   it('returns pendingForcedResolver during end phase', () => {
-    const s = makeState({ phase: 'end', pendingForcedResolver: 'player2' });
+    const s = makeState({
+      phase: 'end',
+      pendingForcedResolver: 'player2',
+      pendingActions: [makePendingAction('player1'), makePendingAction('player2', { id: 'pa-2' })],
+    });
     expect(whoseInputIsAwaited(s)).toBe('player2');
   });
 
@@ -200,6 +227,7 @@ describe('whoseInputIsAwaited', () => {
     const s = makeState({
       phase: 'mission',
       pendingForcedResolver: 'player1',
+      pendingEffects: [makePendingEffect(undefined, { sourcePlayer: 'player1' })],
       missionScoringProgress: {
         currentRankIndex: 0,
         missionCardScoreDone: false,
@@ -208,6 +236,15 @@ describe('whoseInputIsAwaited', () => {
       },
     });
     expect(whoseInputIsAwaited(s)).toBe('player1');
+  });
+
+  it('keeps the end phase awaited while an orphan pending effect blocks it, so the idle handler can unstick it', () => {
+    const s = makeState({
+      phase: 'end',
+      activePlayer: 'player1',
+      pendingEffects: [makePendingEffect(undefined, { sourcePlayer: 'player2', requiresTargetSelection: true })],
+    });
+    expect(whoseInputIsAwaited(s)).toBe('player2');
   });
 });
 

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
 import { getSocketIO } from '@/lib/socket/server';
 import { generateSealedPool, type SealedSetChoice } from '@/lib/sealed/boosterGenerator';
+import { SEALED_BUILD_RESERVATION_MS, SEALED_MAX_JOIN_ATTEMPTS, canJoinSealedAgain } from '@/lib/tournament/sealedRegistration';
 import { isSuspended } from '@/lib/moderation/sanctions';
 import { NWL_PARTNER_KEY, checkNwlMembership, NWL_INVITE_URL } from '@/lib/tournament/nwlPartner';
 
@@ -36,7 +37,18 @@ export async function POST(
     if (tournament.status !== 'registration') {
       return NextResponse.json({ error: 'Registration is closed', errorKey: 'tournament.error.registrationClosed' }, { status: 400 });
     }
-    if (tournament._count.participants >= tournament.maxPlayers) {
+    let occupiedSeats = tournament._count.participants;
+    if (tournament.gameMode === 'sealed') {
+      const cutoff = new Date(Date.now() - SEALED_BUILD_RESERVATION_MS);
+      const released = await prisma.tournamentParticipant.deleteMany({
+        where: { tournamentId: id, deckValid: false, joinedAt: { lt: cutoff }, userId: { not: session.user.id } },
+      });
+      if (released.count > 0) {
+        occupiedSeats -= released.count;
+        console.log(`[API] Sealed tournament ${id}: released ${released.count} seat(s) whose sealed deck was never confirmed`);
+      }
+    }
+    if (occupiedSeats >= tournament.maxPlayers) {
       return NextResponse.json({ error: 'Tournament is full', errorKey: 'tournament.error.tournamentFull' }, { status: 400 });
     }
 
@@ -121,13 +133,42 @@ export async function POST(
     try {
       let sealedPoolData: { boosters: unknown; allCards: unknown } | null = null;
       if (tournament.gameMode === 'sealed') {
-        try {
-          const count = (tournament.sealedBoosterCount ?? 5) as 4 | 5 | 6;
-          const choice: SealedSetChoice = (tournament.sealedSetChoice ?? 'random') as SealedSetChoice;
-          sealedPoolData = generateSealedPool(count, choice);
-        } catch (poolErr) {
-          console.error('[API] Sealed pool generation failed on join:', poolErr);
-          return NextResponse.json({ error: 'Failed to generate sealed pool', errorKey: 'tournament.error.serverError' }, { status: 500 });
+        const claim = await prisma.sealedPoolClaim.findUnique({
+          where: { tournamentId_userId: { tournamentId: id, userId: session.user.id } },
+          select: { pool: true, joinCount: true },
+        });
+
+        if (claim) {
+          if (!canJoinSealedAgain(claim.joinCount)) {
+            return NextResponse.json(
+              { error: 'You have already used all your registrations for this sealed tournament', errorKey: 'tournament.error.sealedRejoinLimit' },
+              { status: 403 },
+            );
+          }
+          const reserved = await prisma.sealedPoolClaim.updateMany({
+            where: { tournamentId: id, userId: session.user.id, joinCount: { lt: SEALED_MAX_JOIN_ATTEMPTS } },
+            data: { joinCount: { increment: 1 } },
+          });
+          if (reserved.count === 0) {
+            return NextResponse.json(
+              { error: 'You have already used all your registrations for this sealed tournament', errorKey: 'tournament.error.sealedRejoinLimit' },
+              { status: 403 },
+            );
+          }
+          sealedPoolData = claim.pool as unknown as { boosters: unknown; allCards: unknown };
+          console.log(`[API] Sealed tournament ${id}: ${session.user.id} rejoined, restoring the original pool (attempt ${claim.joinCount + 1}/${SEALED_MAX_JOIN_ATTEMPTS})`);
+        } else {
+          try {
+            const count = (tournament.sealedBoosterCount ?? 5) as 4 | 5 | 6;
+            const choice: SealedSetChoice = (tournament.sealedSetChoice ?? 'random') as SealedSetChoice;
+            sealedPoolData = generateSealedPool(count, choice);
+          } catch (poolErr) {
+            console.error('[API] Sealed pool generation failed on join:', poolErr);
+            return NextResponse.json({ error: 'Failed to generate sealed pool', errorKey: 'tournament.error.serverError' }, { status: 500 });
+          }
+          await prisma.sealedPoolClaim.create({
+            data: { tournamentId: id, userId: session.user.id, pool: sealedPoolData as never },
+          });
         }
       }
 
@@ -156,7 +197,14 @@ export async function POST(
       }
       const io = getSocketIO();
       if (io) io.to(`tournament:${id}`).emit('tournament:refresh');
-      return NextResponse.json({ participant }, { status: 201 });
+      const requiresSealedBuild = tournament.gameMode === 'sealed';
+      return NextResponse.json({
+        participant,
+        requiresSealedBuild,
+        ...(requiresSealedBuild
+          ? { sealedBuildDeadline: new Date(Date.now() + SEALED_BUILD_RESERVATION_MS).toISOString() }
+          : {}),
+      }, { status: 201 });
     } catch (createErr) {
       const msg = createErr instanceof Error ? createErr.message : '';
       if (msg.includes('Unique constraint') || msg.includes('duplicate key')) {

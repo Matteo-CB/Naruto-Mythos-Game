@@ -97,8 +97,9 @@ describe('Holo cards resolve effects exactly like their base card', () => {
 
     const result = EffectEngine.resolvePlayEffects(state, 'player1', kabutoChar, 0, false);
 
-    const choseMission = result.pendingEffects.find((e) => e.targetSelectionType === 'KABUTO053_CHOOSE_MISSION');
+    const askedPlayer = result.pendingEffects.find((e) =>
+      e.targetSelectionType === 'KABUTO053_CONFIRM_MAIN' || e.targetSelectionType === 'KABUTO053_CHOOSE_MISSION');
     const playedFromDiscard = result.player1.discardPile.length === 0;
-    expect(Boolean(choseMission) || playedFromDiscard).toBe(true);
+    expect(Boolean(askedPlayer) || playedFromDiscard).toBe(true);
   });
 });

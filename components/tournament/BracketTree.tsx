@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { BracketMatch } from './BracketMatch';
+import { THIRD_PLACE_BRACKET } from '@/lib/tournament/tournamentEngine';
 import type { TournamentMatch } from '@/stores/tournamentStore';
 import { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 
@@ -20,17 +21,27 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
   const containerRef = useRef<HTMLDivElement>(null);
   const [lines, setLines] = useState<Array<{ x1: number; y1: number; x2: number; y2: number; isWinnerPath: boolean }>>([]);
 
+  const mainMatches = useMemo(
+    () => matches.filter(m => m.bracket !== THIRD_PLACE_BRACKET),
+    [matches],
+  );
+
+  const thirdPlaceMatch = useMemo(
+    () => matches.find(m => m.bracket === THIRD_PLACE_BRACKET) ?? null,
+    [matches],
+  );
+
   const roundGroups = useMemo(() => {
     const groups: TournamentMatch[][] = [];
     for (let r = 1; r <= totalRounds; r++) {
       groups.push(
-        matches
+        mainMatches
           .filter(m => m.round === r)
           .sort((a, b) => a.matchIndex - b.matchIndex),
       );
     }
     return groups;
-  }, [matches, totalRounds]);
+  }, [mainMatches, totalRounds]);
 
   const getRoundLabel = useCallback((round: number) => {
     if (round === totalRounds) return t('final');
@@ -46,14 +57,14 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
     const newLines: typeof lines = [];
 
     for (let r = 1; r < totalRounds; r++) {
-      const roundMatches = matches.filter(m => m.round === r).sort((a, b) => a.matchIndex - b.matchIndex);
+      const roundMatches = mainMatches.filter(m => m.round === r).sort((a, b) => a.matchIndex - b.matchIndex);
 
       for (let i = 0; i < roundMatches.length; i += 2) {
         const m1 = roundMatches[i];
         const m2 = roundMatches[i + 1];
         if (!m1 || !m2) continue;
 
-        const nextMatch = matches.find(m => m.round === r + 1 && m.matchIndex === Math.floor(i / 2));
+        const nextMatch = mainMatches.find(m => m.round === r + 1 && m.matchIndex === Math.floor(i / 2));
         if (!nextMatch) continue;
 
         const el1 = Array.from(matchElements).find(el => el.getAttribute('data-match-id') === m1.id);
@@ -85,7 +96,7 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
       }
     }
     setLines(newLines);
-  }, [matches, totalRounds]);
+  }, [mainMatches, totalRounds]);
 
   return (
     <div className="relative" ref={containerRef}>
@@ -133,6 +144,28 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
             </div>
           </div>
         ))}
+
+        {thirdPlaceMatch && (
+          <div className="flex flex-col items-center flex-shrink-0">
+            <div
+              className="text-[10px] font-bold uppercase tracking-widest mb-4 text-center"
+              style={{ color: '#8a7a4e' }}
+            >
+              {t('thirdPlaceMatch')}
+            </div>
+            <div className="flex flex-col justify-center flex-1">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35 }}
+                className="p-2"
+                style={{ backgroundColor: 'rgba(196, 163, 90, 0.06)' }}
+              >
+                <BracketMatch match={thirdPlaceMatch} index={0} />
+              </motion.div>
+            </div>
+          </div>
+        )}
 
         {winnerId && (
           <div className="flex flex-col items-center justify-center flex-shrink-0 ml-4">

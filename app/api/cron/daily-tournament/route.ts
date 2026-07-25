@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDailyTournamentIfNeeded } from '@/lib/tournament/dailyTournament';
-import { createNwlFridayTournamentIfNeeded } from '@/lib/tournament/nwlFridayTournament';
+import { createNwlFridayTournamentIfNeeded, resetNwlChuninIfMonday } from '@/lib/tournament/nwlFridayTournament';
 import { retryPendingNwlPrizes } from '@/lib/tournament/nwlPrize';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +24,8 @@ async function handle(request: NextRequest) {
       createNwlFridayTournamentIfNeeded(),
       retryPendingNwlPrizes(new Date()),
     ]);
-    return NextResponse.json({ daily, nwl, nwlPrizeRetry });
+    const chuninReset = await resetNwlChuninIfMonday(new Date());
+    return NextResponse.json({ daily, nwl, nwlPrizeRetry, chuninReset });
   } catch (err) {
     console.error('[Cron] daily-tournament error:', err instanceof Error ? err.message : err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });

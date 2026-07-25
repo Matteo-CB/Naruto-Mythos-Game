@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
-import { MIN_DECK_SIZE, MAX_COPIES_PER_VERSION, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
+import { MIN_DECK_SIZE, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
@@ -22,11 +22,6 @@ interface SealedDeckBuilderProps {
 }
 
 type FilterRarity = 'all' | 'C' | 'UC' | 'R' | 'RA' | 'S' | 'M' | 'MMS';
-
-function getVersionKey(card: BoosterCard): string {
-  const match = card.id.match(/^(KS-\d+)/);
-  return match ? match[1] : card.id.replace(/\s*A$/, '').trim();
-}
 
 export function SealedDeckBuilder({
   pool,
@@ -63,8 +58,7 @@ export function SealedDeckBuilder({
   const poolAvailability = useMemo(() => {
     const counts = new Map<string, number>();
     for (const c of characters) {
-      const key = getVersionKey(c);
-      counts.set(key, (counts.get(key) ?? 0) + 1);
+      counts.set(c.id, (counts.get(c.id) ?? 0) + 1);
     }
     return counts;
   }, [characters]);
@@ -72,8 +66,7 @@ export function SealedDeckBuilder({
   const catalogChars = useMemo(() => {
     const seen = new Map<string, BoosterCard>();
     for (const c of characters) {
-      const key = getVersionKey(c);
-      if (!seen.has(key)) seen.set(key, c);
+      if (!seen.has(c.id)) seen.set(c.id, c);
     }
     return Array.from(seen.values());
   }, [characters]);
@@ -126,17 +119,24 @@ export function SealedDeckBuilder({
       });
   }, [catalogChars, filterRarity, filterGroup, searchText, locale]);
 
-  const deckVersionCounts = useMemo(() => {
+  const deckCardCounts = useMemo(() => {
     const counts = new Map<string, number>();
     for (const c of deckChars) {
-      const key = getVersionKey(c);
-      counts.set(key, (counts.get(key) ?? 0) + 1);
+      counts.set(c.id, (counts.get(c.id) ?? 0) + 1);
     }
     return counts;
   }, [deckChars]);
 
   const deckMissionInstanceIds = useMemo(() => {
     return new Set(deckMissions.map((m) => m.sealedInstanceId));
+  }, [deckMissions]);
+
+  const deckMissionCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const m of deckMissions) {
+      counts.set(m.id, (counts.get(m.id) ?? 0) + 1);
+    }
+    return counts;
   }, [deckMissions]);
 
   const errors = useMemo(() => {
@@ -147,28 +147,29 @@ export function SealedDeckBuilder({
     if (deckMissions.length !== MISSION_CARDS_PER_PLAYER) {
       errs.push(t('validation.missions', { count: deckMissions.length, required: MISSION_CARDS_PER_PLAYER }));
     }
-    
+
     return errs;
-  }, [deckChars, deckMissions, deckVersionCounts, t]);
+  }, [deckChars, deckMissions, t]);
 
   const isValid = errors.length === 0 && deckChars.length >= MIN_DECK_SIZE && deckMissions.length === MISSION_CARDS_PER_PLAYER;
 
   const canAddChar = useCallback(
     (card: BoosterCard) => {
-      const key = getVersionKey(card);
-      const inDeck = deckVersionCounts.get(key) ?? 0;
-      const inPool = poolAvailability.get(key) ?? 0;
+      const inDeck = deckCardCounts.get(card.id) ?? 0;
+      const inPool = poolAvailability.get(card.id) ?? 0;
       return inDeck < inPool;
     },
-    [deckVersionCounts, poolAvailability],
+    [deckCardCounts, poolAvailability],
   );
 
   const canAddMission = useCallback(
     (card: BoosterCard) => {
       if (deckMissions.length >= MISSION_CARDS_PER_PLAYER) return false;
-      return !deckMissionInstanceIds.has(card.sealedInstanceId);
+      const inDeck = deckMissionCounts.get(card.id) ?? 0;
+      const inPool = missionAvailability.get(card.id) ?? 0;
+      return inDeck < inPool;
     },
-    [deckMissions.length, deckMissionInstanceIds],
+    [deckMissions.length, deckMissionCounts, missionAvailability],
   );
 
   const addChar = useCallback(
@@ -190,9 +191,13 @@ export function SealedDeckBuilder({
   const addMission = useCallback(
     (card: BoosterCard) => {
       if (!canAddMission(card)) return;
-      setDeckMissions((prev) => [...prev, card]);
+      setDeckMissions((prev) => {
+        const used = new Set(prev.map((m) => m.sealedInstanceId));
+        const freeCopy = missions.find((m) => m.id === card.id && !used.has(m.sealedInstanceId));
+        return freeCopy ? [...prev, freeCopy] : prev;
+      });
     },
-    [canAddMission],
+    [canAddMission, missions],
   );
 
   const removeMission = useCallback((index: number) => {
@@ -204,17 +209,7 @@ export function SealedDeckBuilder({
   }, []);
 
   const selectAll = useCallback(() => {
-    const chars: BoosterCard[] = [];
-    const counts = new Map<string, number>();
-    for (const c of characters) {
-      const key = getVersionKey(c);
-      const count = counts.get(key) ?? 0;
-      
-      chars.push(c);
-      counts.set(key, count + 1);
-    }
-    setDeckChars(chars);
-
+    setDeckChars([...characters]);
     setDeckMissions(missions.slice(0, MISSION_CARDS_PER_PLAYER));
   }, [characters, missions]);
 
@@ -433,7 +428,9 @@ export function SealedDeckBuilder({
             </h3>
             <div className="flex gap-2 flex-wrap">
               {catalogMissions.map((m) => {
-                const inDeck = deckMissionInstanceIds.has(m.sealedInstanceId);
+                const copiesInDeck = deckMissionCounts.get(m.id) ?? 0;
+                const copiesInPool = missionAvailability.get(m.id) ?? 0;
+                const inDeck = copiesInDeck > 0;
                 const canAdd = canAddMission(m);
                 const imgPath = normalizeImagePath(m.image_file);
                 return (
@@ -463,11 +460,11 @@ export function SealedDeckBuilder({
                     <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
                       <span className="text-[8px] truncate" style={{ color: '#e0e0e0' }}>{getCardName(m, locale)}</span>
                     </div>
-                    {inDeck && (
-                      <div className="absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#e67e22' }}>
-                        <span className="text-[10px] font-bold" style={{ color: '#0a0a0a' }}>+</span>
-                      </div>
-                    )}
+                    <div className="absolute top-1 right-1 px-1 py-0.5 rounded" style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}>
+                      <span className="text-[9px] font-bold" style={{ color: inDeck ? '#e67e22' : '#666' }}>
+                        {copiesInDeck}/{copiesInPool}
+                      </span>
+                    </div>
                     
                     <button
                       className="absolute top-1 left-1 px-1.5 py-0.5 rounded cursor-pointer"
@@ -488,16 +485,15 @@ export function SealedDeckBuilder({
             </h3>
             <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))' }}>
               {filteredCatalog.map((card) => {
-                const key = getVersionKey(card);
-                const inDeck = deckVersionCounts.get(key) ?? 0;
-                const inPool = poolAvailability.get(key) ?? 0;
+                const inDeck = deckCardCounts.get(card.id) ?? 0;
+                const inPool = poolAvailability.get(card.id) ?? 0;
                 const canAdd = canAddChar(card);
                 const imgPath = normalizeImagePath(card.image_file);
                 const rarityColor = rarityColors[card.rarity] ?? '#888';
 
                 return (
                   <motion.div
-                    key={key}
+                    key={card.id}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => addChar(card)}

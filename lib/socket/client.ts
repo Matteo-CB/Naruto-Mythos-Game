@@ -8,8 +8,66 @@ import { useSocialStore } from '@/stores/socialStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { playSound, setVolume, setMuted } from '@/lib/sound/SoundManager';
+import {
+  decideRejoinRetry,
+  deriveConnectionPhase,
+  rejoinFailureErrorKey,
+  shouldAttemptRejoin,
+  REJOIN_ACK_TIMEOUT_MS,
+  type ConnectionPhase,
+  type RejoinFailureReason,
+} from '@/lib/socket/rejoinRetry';
 
 const CONNECT_TIMEOUT_MS = 10000;
+
+const MATCH_CONTEXT_STORAGE_KEY = 'nmtcg-match-context';
+
+export interface StoredMatchContext {
+  roomCode: string;
+  playerRole: 'player1' | 'player2';
+  userId: string;
+}
+
+export function readStoredMatchContext(): StoredMatchContext | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.sessionStorage.getItem(MATCH_CONTEXT_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<StoredMatchContext>;
+    if (typeof parsed?.roomCode !== 'string' || !parsed.roomCode) return null;
+    if (parsed.playerRole !== 'player1' && parsed.playerRole !== 'player2') return null;
+    if (typeof parsed.userId !== 'string' || !parsed.userId) return null;
+    return { roomCode: parsed.roomCode, playerRole: parsed.playerRole, userId: parsed.userId };
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredMatchContext(ctx: StoredMatchContext | null): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (!ctx) window.sessionStorage.removeItem(MATCH_CONTEXT_STORAGE_KEY);
+    else window.sessionStorage.setItem(MATCH_CONTEXT_STORAGE_KEY, JSON.stringify(ctx));
+  } catch {
+    void 0;
+  }
+}
+
+let rejoinRetryTimer: ReturnType<typeof setTimeout> | null = null;
+let rejoinAckTimer: ReturnType<typeof setTimeout> | null = null;
+let rejoinAttempt = 0;
+let rejoinSuppressed = false;
+
+function clearRejoinTimers(): void {
+  if (rejoinRetryTimer) {
+    clearTimeout(rejoinRetryTimer);
+    rejoinRetryTimer = null;
+  }
+  if (rejoinAckTimer) {
+    clearTimeout(rejoinAckTimer);
+    rejoinAckTimer = null;
+  }
+}
 
 export interface ChessClockBroadcast {
   player1: { remainingMs: number; idleWarningUsed: boolean };
@@ -43,7 +101,9 @@ export function computeChessClockIdleMs(
   return Math.max(0, now - state.idleStartedAt);
 }
 
-export function buildGameCancelledStateReset(reason: 'mulligan-idle' | 'stalemate', roomCode: string) {
+export type GameCancelledReason = 'mulligan-idle' | 'stalemate' | 'unavailable';
+
+export function buildGameCancelledStateReset(reason: GameCancelledReason, roomCode: string) {
   return {
     gameCancelled: { reason, roomCode },
     gameEnded: false,
@@ -54,6 +114,7 @@ export function buildGameCancelledStateReset(reason: 'mulligan-idle' | 'stalemat
     gameStarted: false,
     roomCode: null,
     playerRole: null,
+    seatBound: false,
     opponentJoined: false,
     opponentDisconnected: false,
     opponentForfeitAt: null,
@@ -63,6 +124,57 @@ export function buildGameCancelledStateReset(reason: 'mulligan-idle' | 'stalemat
     rematchRoomCode: null,
     pendingReconnect: null,
   };
+}
+
+export function buildMatchContextReset() {
+  return {
+    roomCode: null,
+    playerRole: null,
+    seatBound: false,
+    joinState: 'idle' as const,
+    opponentJoined: false,
+    opponentDisconnected: false,
+    opponentForfeitAt: null,
+    gameStarted: false,
+    gameEnded: false,
+    gameResult: null,
+    gameCancelled: null,
+    visibleState: null,
+    playerNames: null,
+    chessClock: null,
+    currentRoomGameMode: null,
+    currentRoomIsEvolving: false,
+    currentRoomHoloHue: null,
+    tournamentMatchRoom: false,
+    currentTournamentId: null,
+    isSealedRoom: false,
+    sealedBoosters: null,
+    sealedAllCards: null,
+    sealedDeckSubmitted: false,
+    sealedOpponentReady: false,
+    sealedDeadline: null,
+    opponentChangingDeck: false,
+    rematchState: 'none' as const,
+    rematchRoomCode: null,
+    pendingReconnect: null,
+    chatMessages: [],
+    unreadChatCount: 0,
+    chatLockState: null,
+    chatOpponent: null,
+    chatFriendStatus: null,
+    chatFriendshipId: null,
+    _lastStateUpdate: 0,
+  };
+}
+
+export function shouldEnterMatchRoom(
+  currentRoomCode: string | null,
+  gameStarted: boolean,
+  targetRoomCode: string,
+): boolean {
+  if (!targetRoomCode) return false;
+  if (currentRoomCode === targetRoomCode && gameStarted) return false;
+  return true;
 }
 
 interface PublicRoom {
@@ -80,6 +192,8 @@ interface PublicRoom {
 interface SocketStore {
   socket: Socket | null;
   connected: boolean;
+  seatBound: boolean;
+  connectionPhase: ConnectionPhase;
   userId: string | null;
   userName: string | null;
   roomCode: string | null;
@@ -105,7 +219,7 @@ interface SocketStore {
     eloDelta?: number | null;
     newElo?: number;
     totalGames?: number;
-    winReason?: 'score' | 'forfeit' | 'timeout' | 'clock' | 'idle';
+    winReason?: 'score' | 'forfeit' | 'timeout' | 'clock' | 'idle' | 'disconnect';
     gameId?: string | null;
     replayData?: unknown;
     tournamentId?: string | null;
@@ -120,7 +234,7 @@ interface SocketStore {
       isForfeit: boolean;
     } | null;
   } | null;
-  gameCancelled: { reason: 'mulligan-idle' | 'stalemate'; roomCode: string } | null;
+  gameCancelled: { reason: GameCancelledReason; roomCode: string } | null;
   chessClock: ChessClockBroadcast | null;
   playerNames: { player1: string; player2: string } | null;
 
@@ -137,6 +251,7 @@ interface SocketStore {
   
   isSealedRoom: boolean;
   tournamentMatchRoom: boolean;
+  currentTournamentId: string | null;
   sealedBoosters: unknown[] | null;
   sealedAllCards: unknown[] | null;
   sealedDeckSubmitted: boolean;
@@ -149,6 +264,7 @@ interface SocketStore {
 
   connect: (userId?: string, username?: string) => Promise<void>;
   disconnect: () => void;
+  rejoinMatch: () => void;
   createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean, isEvolving?: boolean) => void;
   joinRoom: (code: string, userId: string) => void;
   selectDeck: (characters: unknown[], missions: unknown[], deckId?: string) => void;
@@ -200,6 +316,14 @@ interface SocketStore {
   dismissReconnect: () => void;
   acceptReconnect: () => void;
 
+  joinState: 'idle' | 'joining' | 'joined' | 'failed';
+  pendingMatchEntry: { tournamentId: string; matchId: string | null; roomCode: string; seat: 'player1' | 'player2' } | null;
+  pendingMatchExit: string | null;
+  leaveMatchContext: () => void;
+  clearPendingMatchEntry: () => void;
+  clearPendingMatchExit: () => void;
+  acknowledgeMatchEntry: (roomCode: string) => void;
+
   
   activeGames: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean; isEvolving: boolean; holoHue: number | null; isAnonymous: boolean; phase: string }>;
   requestActiveGames: () => void;
@@ -208,6 +332,8 @@ interface SocketStore {
 export const useSocketStore = create<SocketStore>((set, get) => ({
   socket: null,
   connected: false,
+  seatBound: false,
+  connectionPhase: 'online',
   userId: null,
   userName: null,
   roomCode: null,
@@ -230,6 +356,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   chessClock: null,
   isSealedRoom: false,
   tournamentMatchRoom: false,
+  currentTournamentId: null,
   publicRooms: [],
   maintenanceWarning: false,
   rematchState: 'none',
@@ -257,6 +384,9 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   opponentDisconnected: false,
   opponentForfeitAt: null,
   pendingReconnect: null,
+  joinState: 'idle',
+  pendingMatchEntry: null,
+  pendingMatchExit: null,
   activeGames: (() => {
     try {
       const cached = typeof window !== 'undefined' ? localStorage.getItem('nmtcg-active-games') : null;
@@ -279,18 +409,24 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
   connect: (userId?: string, username?: string) => {
     return new Promise((resolve, reject) => {
-      
+
       const existing = get().socket;
       if (existing?.connected) {
         resolve();
         return;
       }
 
-      
+      const sameUser = !userId || get().userId === null || get().userId === userId;
+      if (existing && existing.active && sameUser) {
+        console.log('[Socket] Existing socket is still reconnecting, letting it finish instead of rebuilding');
+        resolve();
+        return;
+      }
+
       if (existing) {
         existing.removeAllListeners();
         existing.disconnect();
-        set({ socket: null, connected: false });
+        set({ socket: null, connected: false, seatBound: false });
       }
 
       const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || '';
@@ -322,8 +458,16 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         const wasFirstConnect = firstConnect;
         firstConnect = false;
         console.log('[Socket] Connected:', socket.id, wasFirstConnect ? '(initial)' : '(reconnect)');
-        set({ connected: true, userId: userId || null, userName: username || null, error: null, errorKey: null });
+        rejoinSuppressed = false;
+        rejoinAttempt = 0;
+        clearRejoinTimers();
+        set({ connected: true, seatBound: false, userId: userId || null, userName: username || null, error: null, errorKey: null });
 
+        const stored = readStoredMatchContext();
+        if (stored && !get().roomCode && stored.userId === (userId || get().userId)) {
+          console.log('[Socket] Restoring match context from this session:', stored.roomCode);
+          set({ roomCode: stored.roomCode, playerRole: stored.playerRole });
+        }
 
         if (userId) {
           socket.emit('auth:register', { userId, username });
@@ -332,24 +476,44 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
         socket.emit('games:list');
 
-
-        const rc = get().roomCode;
-        const uid = get().userId;
-        if (!wasFirstConnect && rc && uid) {
-          console.log('[Socket] Re-joining room', rc, 'after reconnect (socket.IO v4 fires connect, not reconnect, on transport restore)');
-          socket.emit('game:rejoin', { roomCode: rc, userId: uid });
-        }
+        requestRejoinIfNeeded();
+        syncConnectionPhase();
 
         if (wasFirstConnect) resolve();
       });
 
       socket.on('disconnect', (reason) => {
         console.log('[Socket] Disconnected, reason:', reason);
-        set({ connected: false, opponentDisconnected: false, opponentForfeitAt: null });
+        clearRejoinTimers();
+        set({ connected: false, seatBound: false, opponentDisconnected: false, opponentForfeitAt: null });
+        syncConnectionPhase();
 
         if (reason === 'io server disconnect') {
           set({ error: 'Disconnected by server.', errorKey: 'game.error.connectionLost' });
         }
+      });
+
+      socket.on('game:rejoin-ok', (data: { roomCode: string; playerRole: 'player1' | 'player2' }) => {
+        console.log('[Socket] Rejoin accepted for room', data?.roomCode, 'as', data?.playerRole);
+        if (data?.roomCode) {
+          set({ roomCode: data.roomCode, playerRole: data.playerRole });
+          persistMatchContext();
+        }
+        markSeatBound();
+      });
+
+      socket.on('game:rejoin-failed', (data: { roomCode: string | null; reason: RejoinFailureReason }) => {
+        console.warn('[Socket] Rejoin refused for room', data?.roomCode, 'reason:', data?.reason);
+        handleRejoinFailure(data?.reason ?? 'no-response');
+      });
+
+      socket.on('game:rejoin-required', (data: { roomCode: string }) => {
+        console.warn('[Socket] Server asked this client to rejoin room', data?.roomCode);
+        if (data?.roomCode && !get().roomCode) {
+          set({ roomCode: data.roomCode });
+        }
+        set({ seatBound: false });
+        requestRejoinIfNeeded(true);
       });
 
 
@@ -383,11 +547,51 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({
           roomCode: data.code,
           playerRole: data.playerRole,
+          joinState: 'joined',
           tournamentMatchRoom: !!data.tournamentId,
+          currentTournamentId: data.tournamentId ?? null,
           currentRoomGameMode: data.gameMode ?? null,
           currentRoomIsEvolving: data.isEvolving === true,
           currentRoomHoloHue: typeof data.holoHue === 'number' ? data.holoHue : null,
         });
+        markSeatBound();
+        persistMatchContext();
+        if (data.tournamentId) {
+          set({ pendingMatchEntry: null });
+          get().socket?.emit('match:enter-ack', { roomCode: data.code });
+        }
+      });
+
+      socket.on('match:enter', (data: { tournamentId: string; matchId: string | null; roomCode: string; seat: 'player1' | 'player2' }) => {
+        if (!data || typeof data.roomCode !== 'string') return;
+        if (!shouldEnterMatchRoom(get().roomCode, get().gameStarted, data.roomCode)) {
+          if (get().roomCode === data.roomCode && !get().seatBound) {
+            console.log('[Socket] Already in match room', data.roomCode, 'but the seat is not bound, rejoining');
+            requestRejoinIfNeeded(true);
+          }
+          return;
+        }
+        console.log('[Socket] Match entry requested for room', data.roomCode);
+        set({ pendingMatchEntry: data });
+      });
+
+      socket.on('tournament:player-forfeited', () => {
+        const st = get();
+        if (!st.tournamentMatchRoom) return;
+        if (st.gameStarted) return;
+        const tid = st.currentTournamentId;
+        console.log('[Socket] Tournament match closed before the game started, returning to the bracket');
+        const resyncPre = st._resyncTimer;
+        if (resyncPre) clearInterval(resyncPre);
+        set({ ...buildMatchContextReset(), _resyncTimer: null, pendingMatchExit: tid } as Partial<SocketStore> as SocketStore);
+      });
+
+      socket.on('room:superseded', (data: { code: string }) => {
+        console.warn('[Socket] This socket was superseded in room', data?.code, 'automatic rejoin is paused until the player asks for it');
+        clearRejoinTimers();
+        rejoinSuppressed = true;
+        set({ seatBound: false });
+        syncConnectionPhase();
       });
 
       socket.on('room:player-joined', (data?: { gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving'; isEvolving?: boolean; holoHue?: number | null }) => {
@@ -430,16 +634,25 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.on('room:rejoined', (data: { code: string; isSealed: boolean; playerRole: 'player1' | 'player2' }) => {
         console.log('[Socket] Rejoined room:', data.code, 'sealed:', data.isSealed, 'role:', data.playerRole);
         set({ roomCode: data.code, playerRole: data.playerRole, isSealedRoom: data.isSealed });
+        markSeatBound();
+        persistMatchContext();
       });
 
       socket.on('room:error', (data: { message: string; errorKey?: string; bannedCards?: Array<{ cardId: string; reason: string | null }> }) => {
         console.error('[Socket] Room error:', data.message);
+        if (data.errorKey && IDENTITY_ERROR_KEYS.has(data.errorKey)) {
+          set({ error: data.message, errorKey: data.errorKey });
+          return;
+        }
         if (!get().gameStarted) {
           set({
             error: data.message,
             errorKey: data.errorKey ?? null,
             bannedCardsError: data.bannedCards ?? null,
           });
+          if (get().joinState === 'joining') {
+            set({ joinState: 'failed', roomCode: null, playerRole: null });
+          }
         }
       });
 
@@ -476,24 +689,31 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('game:started', () => {
         console.log('[Socket] Game started');
-        set({ gameStarted: true, _lastStateUpdate: Date.now(), opponentDisconnected: false, opponentForfeitAt: null });
+        const alreadyStarted = get().gameStarted;
+        set(alreadyStarted
+          ? { gameStarted: true, _lastStateUpdate: Date.now() }
+          : { gameStarted: true, _lastStateUpdate: Date.now(), opponentDisconnected: false, opponentForfeitAt: null });
+        markSeatBound();
+        persistMatchContext();
 
-        
-        
-        
         const existingTimer = get()._resyncTimer;
         if (existingTimer) clearInterval(existingTimer);
         const resyncTimer = setInterval(() => {
           const s = get();
-          if (!s.socket || !s.connected || s.gameEnded || !s.gameStarted) {
+          if (!s.socket || s.gameEnded || !s.gameStarted) {
             clearInterval(resyncTimer);
             set({ _resyncTimer: null });
+            return;
+          }
+          if (!s.connected) return;
+          if (!s.seatBound) {
+            requestRejoinIfNeeded();
             return;
           }
           const elapsed = Date.now() - (s._lastStateUpdate || 0);
           if (elapsed > 15000 && s._lastStateUpdate > 0) {
             console.warn('[Socket] No state update for 15s - requesting resync');
-            s.socket.emit('game:request-state');
+            s.socket.emit('game:request-state', { roomCode: s.roomCode ?? undefined });
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             set({ _lastStateUpdate: Date.now() } as any); // Reset to avoid spamming
           }
@@ -525,6 +745,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
             update.chessClock = data.chessClock;
           }
           set(update as SocketStore);
+          if (!get().isSpectating) {
+            markSeatBound();
+            persistMatchContext();
+          }
         },
       );
 
@@ -547,7 +771,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           isRanked?: boolean;
           isEvolving?: boolean;
           eloDelta?: number | null;
-          winReason?: 'score' | 'forfeit' | 'timeout' | 'clock' | 'idle';
+          winReason?: 'score' | 'forfeit' | 'timeout' | 'clock' | 'idle' | 'disconnect';
           gameId?: string | null;
           replayData?: unknown;
           tournamentId?: string | null;
@@ -565,7 +789,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           console.log('[Socket] Game ended, winner:', data.winner, 'reason:', data.winReason, 'gameId:', data.gameId, 'tournament:', data.tournamentId ?? 'none');
           const resyncT = get()._resyncTimer;
           if (resyncT) { clearInterval(resyncT); }
+          clearRejoinTimers();
+          writeStoredMatchContext(null);
           set({ gameEnded: true, gameResult: data, chessClock: null, _resyncTimer: null, opponentDisconnected: false, opponentForfeitAt: null });
+          syncConnectionPhase();
         },
       );
 
@@ -591,7 +818,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
             winner,
             player1Score: 0, player2Score: 0,
             winReason: 'forfeit' as const,
-            tournamentId: null,
+            tournamentId: get().currentTournamentId,
           } as never,
                   _resyncTimer: null,
         });
@@ -607,7 +834,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
             winner: null,
             player1Score: 0, player2Score: 0,
             winReason: 'forfeit' as const,
-            tournamentId: null,
+            tournamentId: get().currentTournamentId,
           } as never,
                   _resyncTimer: null,
         });
@@ -617,7 +844,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         console.log('[Socket] Game cancelled:', data.reason, 'roomCode:', data.roomCode);
         const resyncT = get()._resyncTimer;
         if (resyncT) clearInterval(resyncT);
+        clearRejoinTimers();
+        writeStoredMatchContext(null);
         set(buildGameCancelledStateReset(data.reason, data.roomCode));
+        syncConnectionPhase();
       });
 
       socket.on('tournament:cancelled', (data: { reason: string; tournamentId?: string }) => {
@@ -633,7 +863,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
             winner: null,
             player1Score: 0, player2Score: 0,
             winReason: 'forfeit' as const,
-            tournamentId: null,
+            tournamentId: get().currentTournamentId,
           } as never,
                   _resyncTimer: null,
         });
@@ -718,11 +948,23 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('game:active-game', (data: { roomCode: string; playerRole: 'player1' | 'player2' }) => {
         console.log('[Socket] Active game found:', data.roomCode, 'as', data.playerRole);
-        
+
         const current = get();
-        if (current.roomCode !== data.roomCode) {
-          set({ pendingReconnect: data });
+        if (current.roomCode === data.roomCode) {
+          if (!current.seatBound) {
+            console.log('[Socket] Seat is not bound in the room we already hold, rejoining');
+            requestRejoinIfNeeded(true);
+          }
+          return;
         }
+        const stored = readStoredMatchContext();
+        if (!current.roomCode && stored && stored.roomCode === data.roomCode) {
+          console.log('[Socket] Reclaiming the seat of this session automatically');
+          set({ roomCode: data.roomCode, playerRole: data.playerRole, seatBound: false });
+          requestRejoinIfNeeded(true);
+          return;
+        }
+        set({ pendingReconnect: data });
       });
 
       
@@ -924,15 +1166,23 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     });
   },
 
+  rejoinMatch: () => {
+    requestRejoinIfNeeded(true);
+  },
+
   disconnect: () => {
     const { socket, _resyncTimer } = get();
     if (_resyncTimer) clearInterval(_resyncTimer);
+    clearRejoinTimers();
+    writeStoredMatchContext(null);
     if (socket) {
       socket.removeAllListeners();
       socket.disconnect();
       set({
         socket: null,
         connected: false,
+        seatBound: false,
+        connectionPhase: 'online',
         userId: null,
         userName: null,
         roomCode: null,
@@ -955,6 +1205,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         rematchState: 'none',
         isSealedRoom: false,
         tournamentMatchRoom: false,
+        currentTournamentId: null,
         sealedBoosters: null,
         sealedAllCards: null,
         sealedDeckSubmitted: false,
@@ -982,12 +1233,35 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     const { socket, connected } = get();
     if (socket && connected) {
       console.log('[Socket] Emitting room:join', code);
+      if (get().roomCode !== code) {
+        const staleTimer = get()._resyncTimer;
+        if (staleTimer) clearInterval(staleTimer);
+        set({ ...buildMatchContextReset(), _resyncTimer: null } as Partial<SocketStore> as SocketStore);
+      }
       socket.emit('room:join', { code, userId });
-      set({ roomCode: code, playerRole: 'player2', chatMessages: [], unreadChatCount: 0, chatLockState: null, chatOpponent: null, chatFriendStatus: null, chatFriendshipId: null });
+      set({ roomCode: code, joinState: 'joining', chatMessages: [], unreadChatCount: 0, chatLockState: null, chatOpponent: null, chatFriendStatus: null, chatFriendshipId: null });
     } else {
       console.error('[Socket] Cannot join room: not connected');
-      set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
+      set({ joinState: 'failed', error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
     }
+  },
+
+  leaveMatchContext: () => {
+    const { _resyncTimer } = get();
+    if (_resyncTimer) clearInterval(_resyncTimer);
+    clearRejoinTimers();
+    writeStoredMatchContext(null);
+    set({ ...buildMatchContextReset(), _resyncTimer: null } as Partial<SocketStore> as SocketStore);
+    syncConnectionPhase();
+  },
+
+  clearPendingMatchEntry: () => set({ pendingMatchEntry: null }),
+
+  clearPendingMatchExit: () => set({ pendingMatchExit: null }),
+
+  acknowledgeMatchEntry: (roomCode: string) => {
+    const { socket, connected } = get();
+    if (socket && connected) socket.emit('match:enter-ack', { roomCode });
   },
 
   selectDeck: (characters, missions, deckId) => {
@@ -1097,10 +1371,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   clearError: () => set({ error: null, errorKey: null, errorParams: null, bannedCardsError: null }),
 
   forfeit: (reason: 'abandon' | 'timeout') => {
-    const { socket, connected } = get();
+    const { socket, connected, roomCode, userId } = get();
     if (socket && connected) {
       console.log('[Socket] Emitting action:forfeit, reason:', reason);
-      socket.emit('action:forfeit', { reason });
+      socket.emit('action:forfeit', { reason, roomCode: roomCode ?? undefined, userId: userId ?? undefined });
     }
   },
 
@@ -1163,17 +1437,15 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   acceptReconnect: () => {
     const { socket, connected, pendingReconnect } = get();
     if (socket && connected && pendingReconnect) {
-      socket.emit('game:rejoin', { roomCode: pendingReconnect.roomCode, userId: get().userId });
-      
-      
       set({
         roomCode: pendingReconnect.roomCode,
         playerRole: pendingReconnect.playerRole,
-        gameStarted: true,
+        seatBound: false,
         pendingReconnect: null,
         opponentDisconnected: false,
         opponentForfeitAt: null,
       });
+      requestRejoinIfNeeded(true);
     }
   },
 
@@ -1225,3 +1497,102 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 }));
+
+const IDENTITY_ERROR_KEYS = new Set([
+  'game.error.authMismatch',
+  'game.error.connectionLost',
+  'game.error.rejoinFailed',
+  'game.error.rejoinRoomGone',
+]);
+
+function syncConnectionPhase(): void {
+  const s = useSocketStore.getState();
+  const phase = deriveConnectionPhase({
+    transportConnected: s.connected,
+    hasMatchContext: !!s.roomCode && s.gameStarted && !s.gameEnded,
+    seatBound: s.seatBound,
+  });
+  if (phase !== s.connectionPhase) useSocketStore.setState({ connectionPhase: phase });
+}
+
+function markSeatBound(): void {
+  clearRejoinTimers();
+  rejoinAttempt = 0;
+  if (!useSocketStore.getState().seatBound) {
+    useSocketStore.setState({ seatBound: true });
+  }
+  syncConnectionPhase();
+}
+
+function persistMatchContext(): void {
+  const s = useSocketStore.getState();
+  if (!s.roomCode || !s.playerRole || !s.userId) return;
+  writeStoredMatchContext({ roomCode: s.roomCode, playerRole: s.playerRole, userId: s.userId });
+}
+
+export function requestRejoinIfNeeded(force = false): void {
+  const s = useSocketStore.getState();
+  if (!s.socket) return;
+  if (rejoinSuppressed && !force) return;
+  if (force) rejoinSuppressed = false;
+  if (!force && !shouldAttemptRejoin({
+    transportConnected: s.connected,
+    roomCode: s.roomCode,
+    userId: s.userId,
+    seatBound: s.seatBound,
+    gameEnded: s.gameEnded,
+  })) {
+    return;
+  }
+  if (!s.connected || !s.roomCode || !s.userId) return;
+  if (rejoinAckTimer) return;
+
+  console.log('[Socket] Requesting seat rejoin for room', s.roomCode, 'attempt', rejoinAttempt + 1);
+  syncConnectionPhase();
+  s.socket.emit('game:rejoin', { roomCode: s.roomCode, userId: s.userId });
+  rejoinAckTimer = setTimeout(() => {
+    rejoinAckTimer = null;
+    if (useSocketStore.getState().seatBound) return;
+    handleRejoinFailure('no-response');
+  }, REJOIN_ACK_TIMEOUT_MS);
+}
+
+function releaseUnrecoverableMatch(): void {
+  const s = useSocketStore.getState();
+  if (!s.gameStarted || s.gameEnded || s.gameCancelled) return;
+  const lostRoomCode = s.roomCode;
+  if (!lostRoomCode) return;
+  console.warn('[Socket] The seat cannot be recovered, releasing the match so the player is not stuck on a dead board');
+  if (s._resyncTimer) clearInterval(s._resyncTimer);
+  useSocketStore.setState(buildGameCancelledStateReset('unavailable', lostRoomCode));
+  syncConnectionPhase();
+}
+
+function handleRejoinFailure(reason: RejoinFailureReason): void {
+  if (rejoinAckTimer) {
+    clearTimeout(rejoinAckTimer);
+    rejoinAckTimer = null;
+  }
+  const plan = decideRejoinRetry(rejoinAttempt, reason);
+  useSocketStore.setState({
+    seatBound: false,
+    errorKey: rejoinFailureErrorKey(reason),
+  });
+  syncConnectionPhase();
+
+  if (plan.kind === 'stop') {
+    console.warn('[Socket] Giving up on the rejoin, reason:', reason);
+    clearRejoinTimers();
+    writeStoredMatchContext(null);
+    rejoinAttempt = 0;
+    releaseUnrecoverableMatch();
+    return;
+  }
+
+  rejoinAttempt += 1;
+  if (rejoinRetryTimer) clearTimeout(rejoinRetryTimer);
+  rejoinRetryTimer = setTimeout(() => {
+    rejoinRetryTimer = null;
+    requestRejoinIfNeeded(true);
+  }, plan.delayMs);
+}

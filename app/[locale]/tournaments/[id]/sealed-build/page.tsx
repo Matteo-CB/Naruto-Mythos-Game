@@ -24,6 +24,7 @@ interface PoolResponse {
 export default function TournamentSealedBuildPage() {
   const t = useTranslations('tournament');
   const tc = useTranslations('common');
+  const tRoot = useTranslations();
   const params = useParams<{ id: string }>();
   const tournamentId = params?.id;
   const router = useRouter();
@@ -50,7 +51,8 @@ export default function TournamentSealedBuildPage() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data?.error ?? 'Failed to submit');
+        const key = typeof data?.errorKey === 'string' ? data.errorKey : null;
+        setError(key && tRoot.has(key) ? tRoot(key) : tc('error'));
         setStep('building');
         return;
       }

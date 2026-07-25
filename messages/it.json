@@ -586,7 +586,18 @@
     "join": "Unisciti",
     "emptyTitle": "Server in arrivo",
     "emptyText": "I server Discord della community saranno aggiunti qui molto presto.",
-    "close": "Chiudi"
+    "close": "Chiudi",
+    "follow": "Segui",
+    "following": "Segui già",
+    "unfollow": "Smetti di seguire",
+    "followers": "follower",
+    "followingLabel": "seguiti",
+    "block": {
+      "confirmTitle": "Bloccare {player}?",
+      "confirmBody": "Non vedrai più i suoi messaggi e non potrà più contattarti.",
+      "confirm": "Blocca",
+      "doneTitle": "Giocatore bloccato"
+    }
   },
   "discord": {
     "linkDiscord": "Collega Discord",
@@ -912,7 +923,9 @@
     "cardBack": "Retro della carta",
     "boosterPack": "Bustina Booster",
     "continueToNextBooster": "Tocca per aprire il prossimo booster",
-    "continueToFinish": "Tocca per finire di aprire"
+    "continueToFinish": "Tocca per finire di aprire",
+    "timeJustNow": "proprio ora",
+    "timeMinutesAgo": "{minutes} min fa"
   },
   "online": {
     "title": "Gioca Online",
@@ -1809,7 +1822,8 @@
     "copySuffix": "(copia)",
     "showUnrevealed": "Mostra non rivelate",
     "containsUnrevealed": "Contiene non rivelate",
-    "useDeck": "Usa questo mazzo"
+    "useDeck": "Usa questo mazzo",
+    "cardDetail": "Dettaglio della carta"
   },
   "seoPages": {
     "collection": {
@@ -2698,7 +2712,7 @@
       "nameTooLong": "Il nome deve avere al massimo 80 caratteri.",
       "restrictionTooLong": "La nota di restrizione deve avere al massimo 500 caratteri.",
       "invalidGameMode": "Modalità di gioco non valida.",
-      "invalidBoosterCount": "Il numero di booster sealed deve essere un intero tra 1 e 12.",
+      "invalidBoosterCount": "Il numero di booster sealed deve essere 4, 5 o 6.",
       "invalidLeagueKeys": "Chiavi di livello lega non valide.",
       "cannotLeaveStarted": "Non puoi uscire dopo l'inizio del torneo.",
       "creatorCannotLeave": "Il creatore non può uscire. Annulla invece il torneo.",
@@ -2710,7 +2724,14 @@
       "alreadyFinished": "Questo torneo è già terminato.",
       "unrevealedCards": "Il tuo mazzo contiene carte non rivelate, che non sono permesse.",
       "nwlCheckUnavailable": "La verifica di iscrizione è temporaneamente non disponibile. Riprova tra un momento.",
-      "nwlNotMember": "Unisciti prima al server Discord di New World Loot."
+      "nwlNotMember": "Unisciti prima al server Discord di New World Loot.",
+      "sealedDeckLocked": "Il tuo mazzo sealed è già confermato per questo torneo.",
+      "sealedDeckTooSmall": "Il tuo mazzo sealed richiede almeno 30 personaggi.",
+      "sealedMissionCount": "Il tuo mazzo sealed richiede esattamente 3 missioni.",
+      "sealedCardNotInPool": "Quella carta non fa parte del tuo pool sealed.",
+      "sealedRejoinLimit": "Hai già usato tutte le tue iscrizioni a questo torneo sealed. Le tue buste non possono essere riaperte.",
+      "tooManyOpenTournaments": "Hai già troppi tornei aperti. Concludine o annullane uno prima.",
+      "sealedCardBanned": "Una di queste carte è bandita in questo torneo. Costruisci il mazzo senza di essa."
     },
     "deckError": {
       "tooFewCards": "Il mazzo deve avere almeno {min} carte (ne ha {count}).",
@@ -2732,7 +2753,11 @@
     },
     "nwlPosterAlt": "Friday Free Genin Tournament di New World Loot",
     "nwlRequirement": "Torneo partner di New World Loot. Per iscriverti devi aver collegato il tuo account Discord ed essere membro del server di New World Loot. I primi 3 ricevono il ruolo Chunin.",
-    "nwlJoinServer": "Unisciti al server di New World Loot"
+    "nwlJoinServer": "Unisciti al server di New World Loot",
+    "thirdPlaceMatch": "Finale per il terzo posto",
+    "sealedBuildToRegister": "Costruisci il tuo mazzo sealed per confermare l’iscrizione.",
+    "sealedRegistrationPending": "Iscrizione incompleta: costruisci il tuo mazzo",
+    "privateOnlyNotice": "Il tuo torneo è privato: condividi il codice di accesso con i giocatori che vuoi."
   },
   "game": {
     "turn": "Turno {turn}",
@@ -3013,6 +3038,8 @@
       "youLostOnClock": "Hai esaurito il tempo",
       "opponentLostByIdle": "L'avversario è rimasto inattivo troppo a lungo",
       "youLostByIdle": "Sei rimasto inattivo troppo a lungo",
+      "opponentLostByDisconnect": "L'avversario ha perso la connessione",
+      "youLostByDisconnect": "Hai perso la connessione",
       "cancelledMulliganIdle": "Partita annullata: inattività al mulligan",
       "cancelledStalemate": "Partita annullata: la partita si è bloccata e nessuna azione è stata registrata. Nessuna variazione di ELO per entrambi i giocatori.",
       "cancelledGeneric": "Partita annullata",
@@ -3675,7 +3702,8 @@
       "rejoin": "Rientra nella Partita",
       "abandon": "Abbandona"
     },
-    "edgeToken": "Token Vantaggio"
+    "edgeToken": "Token Vantaggio",
+    "edgeLocked": "Bloccato"
   },
   "adminReveal": {
     "title": "Gestione rivelazione carte",
@@ -3802,7 +3830,8 @@
       "classic": "Classico",
       "open": "Aperto, tutte le carte",
       "elimination": "Eliminazione diretta",
-      "sealed": "Sealed"
+      "sealed": "Sealed",
+      "partner": "Torneo partner"
     },
     "rules": {
       "formatSwiss": "Formato svizzero",
@@ -3812,10 +3841,17 @@
       "allCards": "Tutte le carte permesse, senza restrizioni",
       "banList": "Lista di ban standard",
       "times": "Iscrizioni {reg}, inizio {start}",
-      "discord": "Discord obbligatorio"
+      "discord": "Discord obbligatorio",
+      "partnerBy": "Organizzato da {partner}",
+      "regLabel": "Iscrizioni",
+      "startLabel": "Inizio"
     },
     "today": "Oggi",
     "button": "Calendario",
-    "close": "Chiudi"
+    "close": "Chiudi",
+    "prev": "Giorno precedente",
+    "next": "Giorno successivo",
+    "restDay": "Giorno di riposo, nessun torneo in programma",
+    "localTimeNote": "Gli orari sono mostrati nel tuo fuso orario."
   }
 }

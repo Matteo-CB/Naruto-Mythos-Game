@@ -323,9 +323,28 @@ describe('onChessClockTick', () => {
 
   it('forfeits a player disconnected for 2 minutes (flat, regardless of whose turn)', () => {
     const { io } = makeIoMock();
-    const room = makeRoom({ player1DisconnectedAt: 1000 });
+    const room = makeRoom({ player1DisconnectedAt: 1000, hostSocket: '' });
     withFixedNow(1000 + CHESS_CLOCK_DISCONNECT_FORFEIT_MS, () => onChessClockTick(room, io));
     expect(room.gameState?.forfeitedBy === 'player1' || room.gameState?.phase === 'gameOver' || room.finalized).toBe(true);
+  });
+
+  it('does NOT forfeit for disconnect when the seat socket is bound again (stale stamp)', () => {
+    const { io } = makeIoMock();
+    const room = makeRoom({ player1DisconnectedAt: 1000, hostSocket: 'host-sock-new' });
+    withFixedNow(1000 + CHESS_CLOCK_DISCONNECT_FORFEIT_MS, () => onChessClockTick(room, io));
+    expect(room.gameState?.forfeitedBy).toBeFalsy();
+    expect(room.player1DisconnectedAt).toBeNull();
+  });
+
+  it('does NOT forfeit for disconnect when the seat acted after the disconnect stamp', () => {
+    const { io } = makeIoMock();
+    const room = makeRoom({
+      player2DisconnectedAt: 1000,
+      guestSocket: null,
+      lastSeatInputAt: { player1: 0, player2: 5000 },
+    });
+    withFixedNow(1000 + CHESS_CLOCK_DISCONNECT_FORFEIT_MS, () => onChessClockTick(room, io));
+    expect(room.gameState?.forfeitedBy).toBeFalsy();
   });
 
   it('does NOT forfeit the connected active player for idle while the opponent is disconnected', () => {

@@ -55,6 +55,7 @@ export async function POST(
             deckId: existing.deckId,
             deckValid: existing.deckValid,
             sealedPool: existing.sealedPool ?? undefined,
+            sealedDeck: existing.sealedDeck ?? undefined,
           },
         }).catch(() => {});
         return NextResponse.json({ error: 'Tournament started before your leave was processed', errorKey: 'tournament.error.startedDuringLeave' }, { status: 400 });

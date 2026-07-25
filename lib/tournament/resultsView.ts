@@ -1,4 +1,5 @@
 import type { TournamentData, TournamentMatch } from '@/stores/tournamentStore';
+import { THIRD_PLACE_BRACKET } from '@/lib/tournament/tournamentEngine';
 
 export type MatchOutcomeKind =
   | 'win_played'
@@ -93,6 +94,10 @@ function buildSwissPodium(t: TournamentData): PodiumEntry[] {
   }));
 }
 
+function findThirdPlaceEntry(entries: ResultMatchEntry[]): ResultMatchEntry | undefined {
+  return entries.find((e) => e.bracket === THIRD_PLACE_BRACKET);
+}
+
 function buildEliminationPodium(t: TournamentData, entries: ResultMatchEntry[]): PodiumEntry[] {
   if (!t.winnerId || !t.winnerUsername) return [];
   const podium: PodiumEntry[] = [
@@ -102,6 +107,14 @@ function buildEliminationPodium(t: TournamentData, entries: ResultMatchEntry[]):
   const finalEntry = entries.find((e) => e.bracket === 'main' && (e.outcome === 'win_played' || e.outcome === 'win_forfeit') && e.winnerId === t.winnerId);
   if (finalEntry && finalEntry.loserId && finalEntry.loserUsername) {
     podium.push({ userId: finalEntry.loserId, username: finalEntry.loserUsername, place: 2 });
+  }
+
+  const thirdPlaceEntry = findThirdPlaceEntry(entries);
+  if (thirdPlaceEntry) {
+    if (thirdPlaceEntry.winnerId && thirdPlaceEntry.winnerUsername) {
+      podium.push({ userId: thirdPlaceEntry.winnerId, username: thirdPlaceEntry.winnerUsername, place: 3 });
+    }
+    return podium;
   }
 
   const semiRound = finalEntry ? finalEntry.round - 1 : null;
@@ -125,6 +138,11 @@ export function buildEliminationPrizeUserIds(tournament: TournamentData): { user
     (e) => e.bracket === 'main' && (e.outcome === 'win_played' || e.outcome === 'win_forfeit') && e.winnerId === tournament.winnerId,
   );
   if (finalEntry?.loserId) result.push({ userId: finalEntry.loserId, place: 2 });
+  const thirdPlaceEntry = findThirdPlaceEntry(entries);
+  if (thirdPlaceEntry) {
+    if (thirdPlaceEntry.winnerId) result.push({ userId: thirdPlaceEntry.winnerId, place: 3 });
+    return result;
+  }
   const semiRound = finalEntry ? finalEntry.round - 1 : null;
   if (semiRound !== null && semiRound >= 1) {
     const semiLosers = entries.filter(

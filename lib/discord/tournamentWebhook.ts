@@ -22,6 +22,10 @@ async function getDiscordMention(userId: string): Promise<string> {
   return '';
 }
 
+function presentFinisher(username: string, mention: string): string {
+  return mention ? `**${username}** (${mention})` : `**${username}**`;
+}
+
 
 export async function sendTournamentResults(
   tournamentName: string,
@@ -54,21 +58,39 @@ export async function sendTournamentResults(
   const finalistMention = finalist ? await getDiscordMention(finalist.userId) : '';
   const thirdMention = thirdPlace ? await getDiscordMention(thirdPlace.userId) : '';
 
-  const winnerDisplay = winnerMention ? `${winnerMention} (${winner.username})` : `**${winner.username}**`;
-  const finalistDisplay = finalist
-    ? (finalistMention ? `${finalistMention} (${finalist.username})` : finalist.username)
-    : '';
-  const thirdDisplay = thirdPlace
-    ? (thirdMention ? `${thirdMention} (${thirdPlace.username})` : thirdPlace.username)
-    : '';
+  const winnerDisplay = presentFinisher(winner.username, winnerMention);
+  const finalistDisplay = finalist ? presentFinisher(finalist.username, finalistMention) : '';
+  const thirdDisplay = thirdPlace ? presentFinisher(thirdPlace.username, thirdMention) : '';
 
-  let description = `**${tournamentName}** is over!\n\n`;
-  description += `1st ${winnerDisplay}\n`;
-  if (finalistDisplay) description += `2nd ${finalistDisplay}\n`;
-  if (thirdDisplay) description += `3rd ${thirdDisplay}\n`;
-  description += `\n${totalParticipants} participants`;
+  const fieldPhrase = totalParticipants >= 2 ? ` in a field of ${totalParticipants} players` : '';
+  const paragraphs: string[] = [];
+  paragraphs.push(`**${tournamentName}** is over, and it has a champion.`);
+
+  let championParagraph = `Congratulations to ${winnerDisplay}, who took 1st place${fieldPhrase} and walks away with the title.`;
   if (newRoleName) {
-    description += `\n\n${winner.username} earned the role **${newRoleName}**`;
+    championParagraph += ` This run also earns ${winner.username} the **${newRoleName}** role.`;
+  }
+  paragraphs.push(championParagraph);
+
+  if (finalistDisplay && thirdDisplay) {
+    paragraphs.push(`${finalistDisplay} finished as runner-up, and ${thirdDisplay} completed the podium.`);
+  } else if (finalistDisplay) {
+    paragraphs.push(`${finalistDisplay} finished as runner-up.`);
+  } else if (thirdDisplay) {
+    paragraphs.push(`${thirdDisplay} completed the podium.`);
+  }
+
+  paragraphs.push('Well played to everyone who took part.');
+
+  const description = paragraphs.join('\n\n');
+
+  const fields: Array<{ name: string; value: string; inline?: boolean }> = [
+    { name: '1st place', value: `**${winner.username}**`, inline: true },
+  ];
+  if (finalist) fields.push({ name: '2nd place', value: `**${finalist.username}**`, inline: true });
+  if (thirdPlace) fields.push({ name: '3rd place', value: `**${thirdPlace.username}**`, inline: true });
+  if (totalParticipants > 0) {
+    fields.push({ name: 'Players', value: String(totalParticipants), inline: true });
   }
 
   try {
@@ -80,6 +102,8 @@ export async function sendTournamentResults(
           title: `Tournament Results`,
           description,
           color: 0xc4a35a,
+          fields,
+          footer: { text: tournamentName },
           timestamp: new Date().toISOString(),
         }],
       }),

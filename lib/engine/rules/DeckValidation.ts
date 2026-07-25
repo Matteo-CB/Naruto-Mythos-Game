@@ -1,5 +1,6 @@
 import type { CharacterCard, MissionCard } from '../types';
 import { MIN_DECK_SIZE, MAX_COPIES_PER_VERSION, MISSION_CARDS_PER_PLAYER } from '../types';
+import { cardVersionKey } from '@/lib/cards/versionKey';
 
 export interface DeckValidationResult {
   valid: boolean;
@@ -28,8 +29,7 @@ export function validateDeck(
   
   const versionCounts = new Map<string, number>();
   for (const card of characterCards) {
-    const match = card.id.match(/^(KS-\d+)/);
-    const baseVersion = match ? match[1] : card.id.replace(/\s*A$/, '').trim();
+    const baseVersion = cardVersionKey(card.id);
     const count = (versionCounts.get(baseVersion) ?? 0) + 1;
     versionCounts.set(baseVersion, count);
   }

@@ -198,11 +198,12 @@ export class GameEngine {
           break;
         }
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
-          
+          if (GameEngine.isStalePendingReference(state, action)) return state;
+
           newState = GameEngine.handlePendingAction(newState, player, action);
-          
-          
-          
+
+
+
           if (newState.pendingDiscardReorder && newState.pendingEffects.length === 0 && newState.pendingActions.length === 0) {
             const pdr = newState.pendingDiscardReorder;
             newState.pendingDiscardReorder = undefined;
@@ -257,21 +258,14 @@ export class GameEngine {
 
           if (newState.phase === 'action' &&
               newState.pendingEffects.length === 0 &&
-              newState.pendingActions.length === 0 &&
-              !newState.player1.hasPassed &&
-              !newState.player2.hasPassed) {
-            
-            
-            
-            
-            if (newState.pendingForcedResolver) {
-              newState.activePlayer = newState.pendingForcedResolver;
-              newState.pendingForcedResolver = undefined;
-            } else {
-              
-              
-              
-              
+              newState.pendingActions.length === 0) {
+            const forcedResolver = newState.pendingForcedResolver;
+            newState.pendingForcedResolver = undefined;
+
+            const bothStillActive = !newState.player1.hasPassed && !newState.player2.hasPassed;
+            if (forcedResolver) {
+              if (bothStillActive) newState.activePlayer = forcedResolver;
+            } else if (bothStillActive) {
               const resolvedAction = state.pendingActions.find((p) => {
                 if (action.type === 'SELECT_TARGET') return p.id === action.pendingActionId;
                 if (action.type === 'DECLINE_OPTIONAL_EFFECT') {
@@ -494,6 +488,7 @@ export class GameEngine {
   static transitionToStartPhase(state: GameState): GameState {
     let newState = deepClone(state);
     newState.phase = 'start';
+    newState.pendingForcedResolver = undefined;
     newState.turnMissionRevealed = false;
     newState.player1.hasPassed = false;
     newState.player2.hasPassed = false;
@@ -514,8 +509,9 @@ export class GameEngine {
   static transitionToMissionPhase(state: GameState): GameState {
     let newState = deepClone(state);
     newState.phase = 'mission';
+    newState.pendingForcedResolver = undefined;
 
-    
+
     
     newState.activeMissions = newState.activeMissions.map(m => ({ ...m, wonBy: null }));
 
@@ -537,6 +533,7 @@ export class GameEngine {
   static transitionToEndPhase(state: GameState): GameState {
     let newState = deepClone(state);
     newState.phase = 'end';
+    newState.pendingForcedResolver = undefined;
     newState.missionScoringProgress = undefined;
 
     
@@ -599,15 +596,39 @@ export class GameEngine {
   }
 
   
+  static isStalePendingReference(state: GameState, action: GameAction): boolean {
+    if (action.type === 'SELECT_TARGET') {
+      if (!action.pendingActionId) return false;
+      return !state.pendingActions.some((p) => p.id === action.pendingActionId);
+    }
+    if (action.type === 'DECLINE_OPTIONAL_EFFECT') {
+      if (!action.pendingEffectId) return false;
+      return !state.pendingEffects.some((e) => e.id === action.pendingEffectId);
+    }
+    return false;
+  }
+
+
+  static resolveEffectDecider(state: GameState, effectId: string): PlayerID | null {
+    const backingAction = state.pendingActions.find((a) => a.sourceEffectId === effectId);
+    if (backingAction) return backingAction.player;
+    const effect = state.pendingEffects.find((e) => e.id === effectId);
+    if (!effect) return null;
+    return effect.selectingPlayer ?? effect.sourcePlayer ?? null;
+  }
+
+
   static handleReorderEffects(state: GameState, player: PlayerID, selectedEffectId: string): GameState {
     const newState = deepClone(state);
     const effectIdx = newState.pendingEffects.findIndex((e) => e.id === selectedEffectId);
     if (effectIdx === -1) return state;
 
-    const effect = newState.pendingEffects[effectIdx];
-    if (effect.sourcePlayer !== player) return state;
+    const decider = GameEngine.resolveEffectDecider(newState, selectedEffectId);
+    if (decider !== player) return state;
 
-    
+    const effect = newState.pendingEffects[effectIdx];
+
+
     newState.pendingEffects.splice(effectIdx, 1);
     newState.pendingEffects.unshift(effect);
 
@@ -1813,7 +1834,10 @@ export class GameEngine {
       missionDeckSize: state.missionDeck.length,
       log: state.log,
       pendingEffects: state.pendingEffects.filter(
-        (e) => e.sourcePlayer === player || e.selectingPlayer === player || !e.requiresTargetSelection,
+        (e) => e.sourcePlayer === player
+          || e.selectingPlayer === player
+          || !e.requiresTargetSelection
+          || state.pendingActions.some((a) => a.player === player && a.sourceEffectId === e.id),
       ),
       pendingActions: state.pendingActions.filter((a) => a.player === player),
       handPeekActive: state.pendingEffects.some(

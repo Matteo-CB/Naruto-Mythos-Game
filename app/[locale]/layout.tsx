@@ -11,6 +11,7 @@ import { TradeInviteToast } from '@/components/social/TradeInviteToast';
 import { ToastContainer } from '@/components/ui/Toast';
 import { ConnectionStatusIndicator } from '@/components/ConnectionStatusIndicator';
 import { ReconnectPrompt } from '@/components/ReconnectPrompt';
+import { MatchEntryGate } from '@/components/tournament/MatchEntryGate';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { BreadcrumbJsonLd } from '@/components/Breadcrumbs';
 import { AnimationProvider } from '@/components/AnimationProvider';
@@ -179,6 +180,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <ToastContainer />
         <ConnectionStatusIndicator />
         <ReconnectPrompt />
+        <MatchEntryGate />
         <GamepadNavigator />
       </NextIntlClientProvider>
     </SessionProvider>

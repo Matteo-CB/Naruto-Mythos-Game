@@ -17,18 +17,18 @@ export function ReconnectPrompt() {
   const handleReconnect = () => {
     acceptReconnect();
 
+    let attempts = 0;
     const checkState = () => {
       const ss = useSocketStore.getState();
-      if (ss.visibleState || ss.gameStarted) {
+      if (ss.seatBound && ss.visibleState && ss.gameStarted) {
         router.push('/game' as '/');
-      } else {
-        setTimeout(checkState, 200);
+        return;
       }
+      attempts += 1;
+      if (attempts > 60) return;
+      setTimeout(checkState, 250);
     };
-    
-    setTimeout(checkState, 300);
-    
-    setTimeout(() => router.push('/game' as '/'), 3000);
+    setTimeout(checkState, 250);
   };
 
   const handleAbandon = () => {

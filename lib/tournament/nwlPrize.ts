@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { NWL_PARTNER_KEY, grantNwlPodiumRoles, announceNwlPodium, type NwlPodiumEntry } from '@/lib/tournament/nwlPartner';
 import { buildEliminationPrizeUserIds } from '@/lib/tournament/resultsView';
+import { MAIN_BRACKET, THIRD_PLACE_BRACKET } from '@/lib/tournament/tournamentEngine';
 import type { TournamentData } from '@/stores/tournamentStore';
 
 export async function awardNwlPrizeIfNeeded(tournamentId: string): Promise<void> {
@@ -12,6 +13,17 @@ export async function awardNwlPrizeIfNeeded(tournamentId: string): Promise<void>
     if (!tournament || tournament.partner !== NWL_PARTNER_KEY) return;
     if (tournament.status !== 'completed' || !tournament.winnerId) return;
     if (tournament.partnerPrizeAwarded) return;
+
+    const thirdPlaceMatch = tournament.matches.find((m) => (m.bracket ?? MAIN_BRACKET) === THIRD_PLACE_BRACKET);
+    const thirdPlacePending = !!thirdPlaceMatch
+      && thirdPlaceMatch.status !== 'completed'
+      && thirdPlaceMatch.status !== 'forfeit'
+      && !!thirdPlaceMatch.player1Id
+      && !!thirdPlaceMatch.player2Id;
+    if (thirdPlacePending) {
+      console.log(`[NWL] third place match still open for ${tournamentId}, prize award deferred until it is resolved`);
+      return;
+    }
 
     const prizeIds = buildEliminationPrizeUserIds(tournament as unknown as TournamentData);
     if (prizeIds.length === 0) return;

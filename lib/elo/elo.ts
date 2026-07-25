@@ -47,7 +47,7 @@ export interface PerformanceBonusInput {
   loserScore: number;
   loserBoardCount: number;
   isForfeit: boolean;
-  winReason?: 'score' | 'forfeit' | 'timeout' | 'clock' | 'idle';
+  winReason?: 'score' | 'forfeit' | 'timeout' | 'clock' | 'idle' | 'disconnect';
 }
 
 export interface PerformanceBonus {

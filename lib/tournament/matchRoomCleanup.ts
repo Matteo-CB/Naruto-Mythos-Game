@@ -5,6 +5,14 @@ export function clearAllMatchRoomTimers(room: RoomData): void {
     clearTimeout(room.tournamentJoinTimer);
     room.tournamentJoinTimer = null;
   }
+  if (room.tournamentInviteTimer) {
+    clearInterval(room.tournamentInviteTimer);
+    room.tournamentInviteTimer = null;
+  }
+  if (room.tournamentGameTimer) {
+    clearTimeout(room.tournamentGameTimer);
+    room.tournamentGameTimer = null;
+  }
   if (room.sealedTimer) {
     clearTimeout(room.sealedTimer);
     room.sealedTimer = null;

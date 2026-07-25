@@ -2188,3 +2188,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 }));
+
+useGameStore.subscribe((state, prevState) => {
+  if (state.pendingTargetSelection !== null) return;
+  if (prevState.pendingTargetSelection === null) return;
+  if (!useUIStore.getState().effectPopupMinimized) return;
+  useUIStore.getState().restoreEffectPopup();
+});

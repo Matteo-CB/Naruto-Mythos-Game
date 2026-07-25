@@ -8,6 +8,7 @@ export interface SetDescriptor {
   nameEs?: string;
   nameJa?: string;
   status: SetStatus;
+  sealedReady?: boolean;
   boosterImage: string;
   releaseDate?: string;
 }
@@ -20,6 +21,7 @@ export const SET_REGISTRY: Record<string, SetDescriptor> = {
     nameFr: 'Konoha Shido',
     nameJa: '木ノ葉指導',
     status: 'available',
+    sealedReady: true,
     boosterImage: '/images/booster-KS.webp',
     releaseDate: '2025-09-15',
   },
@@ -85,10 +87,22 @@ export function getAvailableSetIds(): string[] {
   return ALL_SET_IDS.filter((id) => getSetStatus(id) === 'available');
 }
 
-// The most recently released set (highest set number among available sets). Sealed tournaments
-// use this so they automatically follow the newest set once it becomes available.
 export function getLatestAvailableSetId(): string | null {
   const ids = getAvailableSetIds();
+  if (ids.length === 0) return null;
+  return ids.reduce((latest, id) => ((getSetNumber(id) ?? 0) > (getSetNumber(latest) ?? 0) ? id : latest));
+}
+
+export function isSetSealedReady(setId: string): boolean {
+  return isSetAvailable(setId) && SET_REGISTRY[setId]?.sealedReady === true;
+}
+
+export function getSealedSetIds(): string[] {
+  return ALL_SET_IDS.filter((id) => isSetSealedReady(id));
+}
+
+export function getLatestSealedSetId(): string | null {
+  const ids = getSealedSetIds();
   if (ids.length === 0) return null;
   return ids.reduce((latest, id) => ((getSetNumber(id) ?? 0) > (getSetNumber(latest) ?? 0) ? id : latest));
 }

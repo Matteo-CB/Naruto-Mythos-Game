@@ -1,6 +1,7 @@
 import { getCardById } from '@/lib/data/cardIndex';
 import { checkEvolvingCompatibility } from '@/lib/evolving/computePoints';
 import { EVOLVING_MAX_POINTS } from '@/lib/evolving/constants';
+import { cardVersionKey } from '@/lib/cards/versionKey';
 
 export interface DeckData {
   cardIds: string[];
@@ -115,7 +116,7 @@ export function validateDeckForTournament(deck: DeckData, tournament: Tournament
       const card = getCardById(cardId);
       if (!card) continue;
 
-      const versionKey = card.number ? `n:${card.number}` : `id:${cardId}`;
+      const versionKey = cardVersionKey(cardId);
       copyCounts[versionKey] = (copyCounts[versionKey] ?? 0) + 1;
       if (copyCounts[versionKey] > maxCopies) {
         push(

@@ -16,7 +16,7 @@ import { useSocketStore } from '@/lib/socket/client';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { AIDifficulty } from '@/lib/ai/AIPlayer';
 import type { BoosterCard, BoosterPack, SealedPool, SealedSetChoice } from '@/lib/sealed/boosterGenerator';
-import { ALL_SET_IDS, SET_REGISTRY, isSetAvailable, getSetName } from '@/lib/data/sets/registry';
+import { ALL_SET_IDS, SET_REGISTRY, isSetSealedReady, getSetName } from '@/lib/data/sets/registry';
 
 type SealedStep =
   | 'loading'
@@ -277,6 +277,7 @@ export default function SealedPage() {
             }
 
             const config: GameConfig = {
+              gameMode: 'sealed',
               player1: {
                 userId: 'local-player',
                 isAI: false,
@@ -751,7 +752,7 @@ function SealedSetPicker({ value, onChange }: { value: SealedSetChoice; onChange
   for (const sid of ALL_SET_IDS) {
     const desc = SET_REGISTRY[sid];
     const name = getSetName(sid, locale);
-    const available = isSetAvailable(sid);
+    const available = isSetSealedReady(sid);
     choices.push({
       id: sid,
       label: name,

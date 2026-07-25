@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useTournamentStore, type CreateTournamentInput } from '@/stores/tournamentStore';
 import { useRouter } from '@/lib/i18n/navigation';
 import { RANK_TIERS } from '@/components/EloBadge';
-import { ALL_SET_IDS, SET_REGISTRY, isSetAvailable, getSetName } from '@/lib/data/sets/registry';
+import { ALL_SET_IDS, SET_REGISTRY, isSetSealedReady, getSetName } from '@/lib/data/sets/registry';
 import { TOURNAMENT_PRIZE_CARD_IDS } from '@/lib/variants/constants';
 import { getCardById } from '@/lib/data/cardIndex';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
@@ -13,9 +13,10 @@ import Image from 'next/image';
 
 interface Props {
   isAdmin: boolean;
+  canCreatePublic?: boolean;
 }
 
-export function CreateTournamentForm({ isAdmin }: Props) {
+export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props) {
   const t = useTranslations('tournament');
   const tRoot = useTranslations();
   const tCardMeta = useTranslations('cardMeta');
@@ -27,7 +28,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
   const [format, setFormat] = useState<'swiss' | 'elimination' | 'double_elimination'>('swiss');
   const [gameMode, setGameMode] = useState<'classic' | 'sealed' | 'restricted' | 'evolving'>('classic');
   const [maxPlayers, setMaxPlayers] = useState(32);
-  const [isPublic, setIsPublic] = useState(true);
+  const [isPublic, setIsPublic] = useState(canCreatePublic);
   const [useBanList, setUseBanList] = useState(true);
   const [sealedBoosters, setSealedBoosters] = useState<4 | 5 | 6>(5);
   const [sealedSetChoice, setSealedSetChoice] = useState<string>('random');
@@ -237,7 +238,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
               {ALL_SET_IDS.map((sid) => {
                 const desc = SET_REGISTRY[sid];
                 const name = getSetName(sid, locale);
-                const available = isSetAvailable(sid);
+                const available = isSetSealedReady(sid);
                 const cur = sealedSetChoice;
                 return (
                   <button
@@ -401,10 +402,16 @@ export function CreateTournamentForm({ isAdmin }: Props) {
 
       <div className="flex flex-col gap-1">
         <label style={labelStyle}>{t('visibility')}</label>
-        <div className="flex gap-2">
-          <ToggleBtn val="true" cur={String(isPublic)} onClick={() => setIsPublic(true)}>{t('public')}</ToggleBtn>
-          <ToggleBtn val="false" cur={String(isPublic)} onClick={() => setIsPublic(false)}>{t('private')}</ToggleBtn>
-        </div>
+        {canCreatePublic ? (
+          <div className="flex gap-2">
+            <ToggleBtn val="true" cur={String(isPublic)} onClick={() => setIsPublic(true)}>{t('public')}</ToggleBtn>
+            <ToggleBtn val="false" cur={String(isPublic)} onClick={() => setIsPublic(false)}>{t('private')}</ToggleBtn>
+          </div>
+        ) : (
+          <span className="text-[11px] leading-snug" style={{ color: '#9b9ba1' }}>
+            {t('privateOnlyNotice')}
+          </span>
+        )}
       </div>
 
       <div className="flex items-center justify-between">

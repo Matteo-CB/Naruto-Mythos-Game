@@ -993,6 +993,8 @@
       "youLostOnClock": "あなたが時間切れになりました",
       "opponentLostByIdle": "相手が無操作の時間が長すぎました",
       "youLostByIdle": "無操作の時間が長すぎました",
+      "opponentLostByDisconnect": "相手の接続が切断されました",
+      "youLostByDisconnect": "接続が切断されました",
       "cancelledMulliganIdle": "対戦中止：マリガンでの無操作",
       "cancelledStalemate": "対戦中止：対戦が停滞し、操作が記録されませんでした。両プレイヤーともELOの変動はありません。",
       "cancelledGeneric": "対戦中止",
@@ -1655,7 +1657,8 @@
       "rejoin": "対戦に再参加",
       "abandon": "投了"
     },
-    "edgeToken": "主導権トークン"
+    "edgeToken": "主導権トークン",
+    "edgeLocked": "固定"
   },
   "collection": {
     "title": "カードコレクション",
@@ -1891,7 +1894,8 @@
     "copySuffix": "（コピー）",
     "showUnrevealed": "非公開を表示",
     "containsUnrevealed": "非公開カードを含む",
-    "useDeck": "このデッキを使う"
+    "useDeck": "このデッキを使う",
+    "cardDetail": "カード詳細"
   },
   "discord": {
     "linkDiscord": "Discordを連携",
@@ -2653,7 +2657,9 @@
     "cardBack": "カードの裏面",
     "boosterPack": "ブースターパック",
     "continueToNextBooster": "タップして次のブースターを開ける",
-    "continueToFinish": "タップして開封を終える"
+    "continueToFinish": "タップして開封を終える",
+    "timeJustNow": "たった今",
+    "timeMinutesAgo": "{minutes} 分前"
   },
   "tournament": {
     "launchMatch": "試合を開始",
@@ -2953,7 +2959,7 @@
       "nameTooLong": "名前は80文字以下にしてください。",
       "restrictionTooLong": "制限の注記は500文字以下にしてください。",
       "invalidGameMode": "無効なゲームモードです。",
-      "invalidBoosterCount": "シールドのブースター数は1〜12の整数にしてください。",
+      "invalidBoosterCount": "シールドのブースター数は4、5、6のいずれかにしてください。",
       "invalidLeagueKeys": "無効なリーグ段階キーです。",
       "cannotLeaveStarted": "トーナメント開始後は退出できません。",
       "creatorCannotLeave": "作成者は退出できません。代わりにトーナメントを中止してください。",
@@ -2965,7 +2971,14 @@
       "alreadyFinished": "このトーナメントはすでに終了しています。",
       "unrevealedCards": "デッキに未公開のカードが含まれており、使用できません。",
       "nwlCheckUnavailable": "メンバーシップの確認が一時的に利用できません。少し待ってからもう一度お試しください。",
-      "nwlNotMember": "先に New World Loot の Discord サーバーに参加してください。"
+      "nwlNotMember": "先に New World Loot の Discord サーバーに参加してください。",
+      "sealedDeckLocked": "このトーナメントのシールドデッキはすでに確定しています。",
+      "sealedDeckTooSmall": "シールドデッキにはキャラクターカードが30枚以上必要です。",
+      "sealedMissionCount": "シールドデッキにはミッションがちょうど3枚必要です。",
+      "sealedCardNotInPool": "そのカードはあなたのシールドプールにありません。",
+      "sealedRejoinLimit": "このシールド大会のエントリー回数はすでに上限に達しています。ブースターを開け直すことはできません。",
+      "tooManyOpenTournaments": "進行中の大会が多すぎます。まず一つ終了するか中止してください。",
+      "sealedCardBanned": "このカードはこの大会で禁止されています。そのカードを外してデッキを組んでください。"
     },
     "deckError": {
       "tooFewCards": "デッキはカードが最低 {min} 枚必要です（現在 {count} 枚）。",
@@ -2987,7 +3000,11 @@
     },
     "nwlPosterAlt": "New World Loot による Friday Free Genin Tournament",
     "nwlRequirement": "New World Loot 提携トーナメント。参加するには Discord アカウントを連携し、New World Loot サーバーのメンバーである必要があります。上位3名は Chunin ロールを獲得します。",
-    "nwlJoinServer": "New World Loot サーバーに参加する"
+    "nwlJoinServer": "New World Loot サーバーに参加する",
+    "thirdPlaceMatch": "3位決定戦",
+    "sealedBuildToRegister": "シールドデッキを組んでエントリーを確定してください。",
+    "sealedRegistrationPending": "エントリー未完了：デッキを組んでください",
+    "privateOnlyNotice": "あなたの大会は非公開です。参加コードを招きたいプレイヤーに共有してください。"
   },
   "playHub": {
     "title": "プレイ",
@@ -3462,7 +3479,18 @@
     "join": "参加する",
     "emptyTitle": "サーバーは近日公開",
     "emptyText": "コミュニティの Discord サーバーはまもなくここに追加されます。",
-    "close": "閉じる"
+    "close": "閉じる",
+    "follow": "フォロー",
+    "following": "フォロー中",
+    "unfollow": "フォロー解除",
+    "followers": "フォロワー",
+    "followingLabel": "フォロー中",
+    "block": {
+      "confirmTitle": "{player} をブロックしますか？",
+      "confirmBody": "相手のメッセージが表示されなくなり、相手からの連絡もできなくなります。",
+      "confirm": "ブロック",
+      "doneTitle": "プレイヤーをブロックしました"
+    }
   },
   "report": {
     "title": "{player}を通報",
@@ -3805,7 +3833,8 @@
       "classic": "クラシック",
       "open": "オープン（全カード）",
       "elimination": "ダイレクト敗退",
-      "sealed": "シールド"
+      "sealed": "シールド",
+      "partner": "パートナー大会"
     },
     "rules": {
       "formatSwiss": "スイス形式",
@@ -3815,10 +3844,17 @@
       "allCards": "全カード使用可、制限なし",
       "banList": "標準禁止リスト",
       "times": "登録 {reg}、開始 {start}",
-      "discord": "Discord必須"
+      "discord": "Discord必須",
+      "partnerBy": "{partner} 主催",
+      "regLabel": "エントリー",
+      "startLabel": "開始"
     },
     "today": "今日",
     "button": "カレンダー",
-    "close": "閉じる"
+    "close": "閉じる",
+    "prev": "前の日",
+    "next": "次の日",
+    "restDay": "休息日、予定されている大会はありません",
+    "localTimeNote": "時刻はお使いの環境のタイムゾーンで表示されます。"
   }
 }

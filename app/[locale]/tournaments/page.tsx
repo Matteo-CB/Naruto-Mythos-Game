@@ -44,7 +44,8 @@ export default function TournamentsPage() {
   const isAdmin =
     ADMIN_EMAILS.includes(session?.user?.email ?? '') ||
     ADMIN_USERNAMES.includes(session?.user?.name ?? '');
-  const canCreate = isAdmin || privilege.canCreateTournaments;
+  const canCreatePublic = isAdmin || privilege.canCreateTournaments;
+  const canCreate = !!session?.user;
 
   useEffect(() => {
     if (status === 'unauthenticated') router.replace('/login');
@@ -125,6 +126,18 @@ export default function TournamentsPage() {
           </Link>
         </motion.header>
 
+        {activeTab !== 'create' && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.1 }}
+            className="relative overflow-hidden p-4 sm:p-5 mb-6"
+            style={{ backgroundColor: '#0b0a0e', clipPath: PANEL_CLIP }}
+          >
+            <WeeklyTournamentCalendar tournaments={simulatorTournaments as unknown as Parameters<typeof WeeklyTournamentCalendar>[0]['tournaments']} />
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -196,12 +209,6 @@ export default function TournamentsPage() {
           </motion.div>
         )}
 
-        {activeTab !== 'create' && (
-          <div className="mb-4 flex justify-end">
-            <WeeklyTournamentCalendar tournaments={simulatorTournaments as unknown as Parameters<typeof WeeklyTournamentCalendar>[0]['tournaments']} />
-          </div>
-        )}
-
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -211,7 +218,7 @@ export default function TournamentsPage() {
             transition={{ duration: 0.25 }}
           >
             {activeTab === 'create' ? (
-              <CreateTournamentForm isAdmin={canCreate} />
+              <CreateTournamentForm isAdmin={canCreate} canCreatePublic={canCreatePublic} />
             ) : loading ? (
               <p className="font-display text-sm uppercase tracking-widest text-center py-10" style={{ color: '#555' }}>{tc('loading')}</p>
             ) : simulatorTournaments.length === 0 ? (

@@ -103,7 +103,11 @@ describe('handleChessClockIdleLimit', () => {
   let winnerSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    applySpy = vi.spyOn(GameEngine, 'applyAction').mockImplementation((state: any) => state);
+    applySpy = vi.spyOn(GameEngine, 'applyAction').mockImplementation((state: any, player: any, action: any) => (
+      action?.type === 'FORFEIT'
+        ? { ...state, phase: 'gameOver', forfeitedBy: player }
+        : { ...state, log: [...(state.log ?? []), { applied: action?.type }] }
+    ));
     winnerSpy = vi.spyOn(GameEngine, 'getWinner').mockReturnValue(null);
   });
 
@@ -123,7 +127,7 @@ describe('handleChessClockIdleLimit', () => {
     expect((call[2] as GameAction).type).toBe('FORFEIT');
   });
 
-  it('mandatory pendingAction (mandatory source effect) -> FORFEIT', () => {
+  it('mandatory pendingAction (mandatory source effect) -> first idle only consumes the warning', () => {
     const { io } = makeIoMock();
     const pe = makePendingEffect('player1', { isOptional: false, isMandatory: true, rootOptional: false });
     const pa = makePendingAction('player1', { sourceEffectId: pe.id });
@@ -131,9 +135,21 @@ describe('handleChessClockIdleLimit', () => {
       gameState: makeState({ pendingActions: [pa], pendingEffects: [pe] }),
     });
     handleChessClockIdleLimit(room, 'player1', io);
+    expect(applySpy).not.toHaveBeenCalled();
+    expect(room.chessClock.player1.idleWarningUsed).toBe(true);
+  });
+
+  it('mandatory pendingAction (mandatory source effect) -> FORFEIT on the second idle', () => {
+    const { io } = makeIoMock();
+    const pe = makePendingEffect('player1', { isOptional: false, isMandatory: true, rootOptional: false });
+    const pa = makePendingAction('player1', { sourceEffectId: pe.id });
+    const room = makeRoom({
+      gameState: makeState({ pendingActions: [pa], pendingEffects: [pe] }),
+    });
+    room.chessClock = { ...room.chessClock, player1: { ...room.chessClock.player1, idleWarningUsed: true } };
+    handleChessClockIdleLimit(room, 'player1', io);
     expect(applySpy).toHaveBeenCalled();
     expect((applySpy.mock.calls[0][2] as GameAction).type).toBe('FORFEIT');
-    expect(room.chessClock.player1.idleWarningUsed).toBe(false);
   });
 
   it('optional pendingAction (isOptional source effect) -> DECLINE_OPTIONAL_EFFECT + warning consumed', () => {
@@ -176,16 +192,27 @@ describe('handleChessClockIdleLimit', () => {
     expect(room.chessClock.player1.idleWarningUsed).toBe(true);
   });
 
-  it('mandatory pendingEffect (no action) -> FORFEIT', () => {
+  it('mandatory pendingEffect (no action) -> first idle only consumes the warning', () => {
     const { io } = makeIoMock();
     const pe = makePendingEffect('player1', { isOptional: false, isMandatory: true });
     const room = makeRoom({
       gameState: makeState({ pendingEffects: [pe] }),
     });
     handleChessClockIdleLimit(room, 'player1', io);
+    expect(applySpy).not.toHaveBeenCalled();
+    expect(room.chessClock.player1.idleWarningUsed).toBe(true);
+  });
+
+  it('mandatory pendingEffect (no action) -> FORFEIT on the second idle', () => {
+    const { io } = makeIoMock();
+    const pe = makePendingEffect('player1', { isOptional: false, isMandatory: true });
+    const room = makeRoom({
+      gameState: makeState({ pendingEffects: [pe] }),
+    });
+    room.chessClock = { ...room.chessClock, player1: { ...room.chessClock.player1, idleWarningUsed: true } };
+    handleChessClockIdleLimit(room, 'player1', io);
     expect(applySpy).toHaveBeenCalled();
     expect((applySpy.mock.calls[0][2] as GameAction).type).toBe('FORFEIT');
-    expect(room.chessClock.player1.idleWarningUsed).toBe(false);
   });
 
   it('action phase (no pending input) -> PASS + warning consumed', () => {
@@ -199,7 +226,7 @@ describe('handleChessClockIdleLimit', () => {
     expect(room.chessClock.player1.idleWarningUsed).toBe(true);
   });
 
-  it('action phase but pendingForcedResolver set -> falls through to unhandled FORFEIT', () => {
+  it('action phase with a stale pendingForcedResolver -> clears it and auto-passes instead of freezing', () => {
     const { io } = makeIoMock();
     const room = makeRoom({
       gameState: makeState({
@@ -209,18 +236,39 @@ describe('handleChessClockIdleLimit', () => {
       }),
     });
     handleChessClockIdleLimit(room, 'player1', io);
+    expect(room.gameState?.pendingForcedResolver).toBeUndefined();
     expect(applySpy).toHaveBeenCalled();
-    expect((applySpy.mock.calls[0][2] as GameAction).type).toBe('FORFEIT');
+    expect((applySpy.mock.calls[0][2] as GameAction).type).toBe('PASS');
+    expect(room.finalized).toBe(false);
   });
 
-  it('mission phase with no pending input for player -> FORFEIT (unhandled)', () => {
+  it('action phase with a live pendingForcedResolver -> keeps it and never forfeits', () => {
+    const { io } = makeIoMock();
+    const room = makeRoom({
+      gameState: makeState({
+        phase: 'action',
+        activePlayer: 'player1',
+        pendingForcedResolver: 'player1',
+        pendingEffects: [makePendingEffect('player1')],
+        pendingActions: [makePendingAction('player1')],
+      }),
+    });
+    handleChessClockIdleLimit(room, 'player1', io);
+    expect(room.gameState?.pendingForcedResolver).toBe('player1');
+    expect(applySpy).not.toHaveBeenCalled();
+    expect(room.finalized).toBe(false);
+  });
+
+  it('mission phase with no pending input for player -> force-advances instead of forfeiting, even after a warning', () => {
     const { io } = makeIoMock();
     const room = makeRoom({
       gameState: makeState({ phase: 'mission' }),
     });
+    room.chessClock = { ...room.chessClock, player1: { ...room.chessClock.player1, idleWarningUsed: true } };
     handleChessClockIdleLimit(room, 'player1', io);
-    expect(applySpy).toHaveBeenCalled();
-    expect((applySpy.mock.calls[0][2] as GameAction).type).toBe('FORFEIT');
+    expect(applySpy).toHaveBeenCalledTimes(1);
+    expect(applySpy.mock.calls[0][2]).toEqual({ type: 'ADVANCE_PHASE' });
+    expect(room.finalized).toBe(false);
   });
 
   it('no-op if gameState is null', () => {
@@ -237,7 +285,7 @@ describe('handleChessClockIdleLimit', () => {
     expect(applySpy).not.toHaveBeenCalled();
   });
 
-  it('applyAction throwing during auto-decline falls back to FORFEIT (warning NOT consumed)', () => {
+  it('applyAction throwing during auto-decline never forfeits, it consumes the warning and keeps the game alive', () => {
     const { io } = makeIoMock();
     let callCount = 0;
     applySpy.mockImplementation((state: any, _player: any, action: any) => {
@@ -250,9 +298,10 @@ describe('handleChessClockIdleLimit', () => {
     const pe = makePendingEffect('player1', { isOptional: true, isMandatory: false });
     const room = makeRoom({ gameState: makeState({ pendingEffects: [pe] }) });
     handleChessClockIdleLimit(room, 'player1', io);
-    expect(applySpy).toHaveBeenCalledTimes(2);
-    expect((applySpy.mock.calls[1][2] as GameAction).type).toBe('FORFEIT');
-    expect(room.chessClock.player1.idleWarningUsed).toBe(false);
+    expect(applySpy).toHaveBeenCalledTimes(1);
+    const forfeited = applySpy.mock.calls.some((c: unknown[]) => (c[2] as GameAction).type === 'FORFEIT');
+    expect(forfeited).toBe(false);
+    expect(room.chessClock.player1.idleWarningUsed).toBe(true);
   });
 
   it('auto-action that ends the game triggers finalizeGameEnd via getWinner', () => {
@@ -287,7 +336,11 @@ describe('handleChessClockExpiry (extended union for Phase 4)', () => {
   let getWinnerSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    applySpy = vi.spyOn(GameEngine, 'applyAction').mockImplementation((state: any) => state);
+    applySpy = vi.spyOn(GameEngine, 'applyAction').mockImplementation((state: any, player: any, action: any) => (
+      action?.type === 'FORFEIT'
+        ? { ...state, phase: 'gameOver', forfeitedBy: player }
+        : { ...state, log: [...(state.log ?? []), { applied: action?.type }] }
+    ));
     getWinnerSpy = vi.spyOn(GameEngine, 'getWinner').mockReturnValue('player2');
   });
 

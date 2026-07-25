@@ -5,6 +5,8 @@ import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
 import { validateLeagueKeys } from '@/lib/tournament/leagueUtils';
 import { sendTournamentCreated } from '@/lib/discord/tournamentCreatedWebhook';
 
+export const MAX_OPEN_TOURNAMENTS_PER_PLAYER = 3;
+
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
@@ -85,10 +87,21 @@ export async function POST(req: NextRequest) {
         ? 'double_elimination'
         : 'swiss';
 
-    if (!isAdmin(session)) {
+    let canCreatePublic = isAdmin(session);
+    if (!canCreatePublic) {
       const dbUser = await prisma.user.findUnique({ where: { id: session.user.id }, select: { role: true } });
-      if (dbUser?.role !== 'tournament_organizer') {
-        return NextResponse.json({ error: 'Only admins or tournament organizers can create tournaments', errorKey: 'tournament.error.adminOnly' }, { status: 403 });
+      canCreatePublic = dbUser?.role === 'tournament_organizer';
+    }
+
+    if (!canCreatePublic) {
+      const openTournaments = await prisma.tournament.count({
+        where: { creatorId: session.user.id, status: { in: ['registration', 'in_progress'] } },
+      });
+      if (openTournaments >= MAX_OPEN_TOURNAMENTS_PER_PLAYER) {
+        return NextResponse.json(
+          { error: 'You already have too many tournaments open', errorKey: 'tournament.error.tooManyOpenTournaments' },
+          { status: 429 },
+        );
       }
     }
 
@@ -125,16 +138,16 @@ export async function POST(req: NextRequest) {
     }
     if (resolvedGameMode === 'sealed') {
       const count = sealedBoosterCount ?? 5;
-      if (typeof count !== 'number' || !Number.isInteger(count) || count < 1 || count > 12) {
-        return NextResponse.json({ error: 'Sealed booster count must be an integer between 1 and 12', errorKey: 'tournament.error.invalidBoosterCount' }, { status: 400 });
+      if (typeof count !== 'number' || !Number.isInteger(count) || count < 4 || count > 6) {
+        return NextResponse.json({ error: 'Sealed booster count must be 4, 5 or 6', errorKey: 'tournament.error.invalidBoosterCount' }, { status: 400 });
       }
       if (sealedSetChoice !== undefined) {
         if (typeof sealedSetChoice !== 'string' || sealedSetChoice.length > 16) {
           return NextResponse.json({ error: 'Invalid sealedSetChoice', errorKey: 'tournament.error.invalidSetChoice' }, { status: 400 });
         }
         if (sealedSetChoice !== 'random') {
-          const { isSetAvailable } = await import('@/lib/data/sets/registry');
-          if (!isSetAvailable(sealedSetChoice)) {
+          const { isSetSealedReady } = await import('@/lib/data/sets/registry');
+          if (!isSetSealedReady(sealedSetChoice)) {
             return NextResponse.json({ error: 'Set is not available', errorKey: 'tournament.error.setUnavailable' }, { status: 400 });
           }
         }
@@ -163,7 +176,7 @@ export async function POST(req: NextRequest) {
         status: 'registration',
         gameMode: resolvedGameMode,
         maxPlayers,
-        isPublic: isPublic !== false,
+        isPublic: canCreatePublic ? isPublic !== false : false,
         joinCode: generateJoinCode(),
         creatorId: session.user.id,
         creatorUsername: user?.username || 'Unknown',

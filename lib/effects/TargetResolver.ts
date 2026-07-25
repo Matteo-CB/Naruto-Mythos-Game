@@ -134,9 +134,8 @@ function matchesTargetCriteria(
   const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
   
-  const isEnemyTarget = targetType === 'enemy_character' || targetType === 'enemy_hidden';
   const effectivePower = getEffectivePower(state, char, charPlayer);
-  const effectiveCost = (char.isHidden && isEnemyTarget) ? 0 : topCard.chakra;
+  const effectiveCost = char.isHidden ? 0 : topCard.chakra;
 
   
   if (filters?.maxPower !== undefined && effectivePower > filters.maxPower) return false;
@@ -147,7 +146,7 @@ function matchesTargetCriteria(
 
   
   
-  if (char.isHidden && isEnemyTarget) {
+  if (char.isHidden) {
     if (filters?.group || filters?.keyword) return false;
   } else {
     if (filters?.group && topCard.group !== filters.group) return false;

@@ -46,6 +46,23 @@ export function removeSocketFromAll(socketId: string): { userId: string; isLastS
   return null;
 }
 
+export function isUserConnected(userId: string): boolean {
+  const sockets = userSockets.get(userId);
+  if (!sockets || sockets.size === 0) return false;
+  const io = ioInstance;
+  if (!io) return sockets.size > 0;
+  for (const socketId of sockets) {
+    const sock = io.sockets.sockets.get(socketId);
+    if (sock && sock.connected) return true;
+  }
+  return false;
+}
+
+export function getUserSocketIds(userId: string): string[] {
+  const sockets = userSockets.get(userId);
+  return sockets ? Array.from(sockets) : [];
+}
+
 export function emitToUser(userId: string, event: string, data: unknown) {
   const io = ioInstance;
   if (!io) return;

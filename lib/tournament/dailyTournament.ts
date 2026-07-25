@@ -12,7 +12,7 @@ import {
   AUTO_TOURNAMENT_NAME_SET,
   specForWeekday,
 } from '@/lib/tournament/weeklySchedule';
-import { getLatestAvailableSetId } from '@/lib/data/sets/registry';
+import { getLatestSealedSetId } from '@/lib/data/sets/registry';
 
 export const DAILY_TOURNAMENT_TZ = 'Europe/Paris';
 export const DAILY_TOURNAMENT_REG_HOUR = AUTO_TOURNAMENT_REG_HOUR;
@@ -113,7 +113,7 @@ export async function createDailyTournamentIfNeeded(now: Date = new Date()): Pro
       requiresDiscord: true,
       useBanList: spec.useBanList,
       sealedBoosterCount: isSealed ? AUTO_SEALED_BOOSTER_COUNT : null,
-      sealedSetChoice: isSealed ? (getLatestAvailableSetId() ?? 'random') : null,
+      sealedSetChoice: isSealed ? (getLatestSealedSetId() ?? 'random') : null,
       scheduledStartAt,
     },
   });

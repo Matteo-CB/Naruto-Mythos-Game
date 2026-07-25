@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db/prisma';
-import { generateBracket } from '@/lib/tournament/tournamentEngine';
+import { generateBracket, MAIN_BRACKET } from '@/lib/tournament/tournamentEngine';
 import { computeSwissRoundCount, generateSwissRound1 } from '@/lib/tournament/swissEngine';
 import type { SwissPlayer } from '@/lib/tournament/swissEngine';
 import { validateDeckForTournament } from '@/lib/tournament/deckValidation';
@@ -46,36 +46,22 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
   tournament.participants = tournament.participants.filter(p => !p.eliminated);
 
   if (tournament.gameMode === 'sealed') {
-    const { generateSealedPool } = await import('@/lib/sealed/boosterGenerator');
-    const { buildAISealedDeck } = await import('@/lib/sealed/aiSealedDeckBuilder');
-    const count = tournament.sealedBoosterCount ?? 5;
-    const choice = (tournament as { sealedSetChoice?: string }).sealedSetChoice ?? 'random';
+    const builtIds = new Set<string>();
     for (const p of tournament.participants) {
-      let pool = p.sealedPool as { boosters: unknown; allCards: unknown } | null;
-      if (!pool) {
-        pool = generateSealedPool(count, choice as never);
-        await prisma.tournamentParticipant.update({
-          where: { id: p.id },
-          data: { sealedPool: pool as never },
-        });
+      const deck = p.sealedDeck as { cardIds?: unknown; missionIds?: unknown } | null;
+      const hasDeck = !!deck && Array.isArray(deck.cardIds) && Array.isArray(deck.missionIds)
+        && deck.cardIds.length >= 30 && deck.missionIds.length === 3;
+      if (hasDeck && p.deckValid) {
+        builtIds.add(p.id);
+        continue;
       }
-      if (!p.sealedDeck) {
-        try {
-          const aiDeck = buildAISealedDeck(pool as never);
-          await prisma.tournamentParticipant.update({
-            where: { id: p.id },
-            data: {
-              sealedDeck: {
-                cardIds: aiDeck.characters.map((c) => c.id),
-                missionIds: aiDeck.missions.map((m) => m.id),
-              } as never,
-            },
-          });
-        } catch (err) {
-          console.error(`[startLogic] Auto-build failed for participant ${p.id}:`, err);
-        }
-      }
+      await prisma.tournamentParticipant.update({
+        where: { id: p.id },
+        data: { eliminated: true, eliminatedRound: 0, deckValid: false },
+      });
+      console.log(`[startLogic] Sealed tournament ${tournamentId}: ${p.username} never confirmed a sealed deck, removed from the bracket`);
     }
+    tournament.participants = tournament.participants.filter((p) => builtIds.has(p.id));
   }
 
   if (tournament.gameMode !== 'sealed') {
@@ -132,23 +118,13 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
   }
   if (tournament.format === 'elimination') {
     const n = tournament.participants.length;
-    if (tournament.partner === NWL_PARTNER_KEY) {
-      if (n < 4) {
-        return {
-          ok: false,
-          status: 400,
-          error: `Single elimination requires at least 4 valid participants (currently ${n})`,
-        };
-      }
-    } else {
-      const valid = [4, 8, 16, 32];
-      if (!valid.includes(n)) {
-        return {
-          ok: false,
-          status: 400,
-          error: `Single elimination requires exactly 4, 8, 16, or 32 valid participants (currently ${n})`,
-        };
-      }
+    const minimum = tournament.partner === NWL_PARTNER_KEY ? 4 : 2;
+    if (n < minimum) {
+      return {
+        ok: false,
+        status: 400,
+        error: `Single elimination requires at least ${minimum} valid participants (currently ${n})`,
+      };
     }
   }
 
@@ -264,13 +240,14 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
     });
   } else {
     const participants = orderedParticipants.map(p => ({ userId: p.userId, username: p.username }));
-    const { matches, totalRounds } = generateBracket(participants);
+    const { matches, totalRounds, thirdPlaceMatch } = generateBracket(participants);
+    const persistedMatches = thirdPlaceMatch ? [...matches, thirdPlaceMatch] : matches;
 
-    for (const m of matches) {
+    for (const m of persistedMatches) {
       await prisma.tournamentMatch.create({
         data: {
           tournamentId,
-          bracket: 'main',
+          bracket: m.bracket ?? MAIN_BRACKET,
           round: m.round,
           matchIndex: m.matchIndex,
           player1Id: m.player1.participantId,

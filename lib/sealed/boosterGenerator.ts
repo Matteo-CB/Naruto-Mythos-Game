@@ -1,5 +1,5 @@
 import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoader';
-import { getAvailableSetIds } from '@/lib/data/sets/registry';
+import { getSealedSetIds } from '@/lib/data/sets/registry';
 import type { CharacterCard, MissionCard, CardData } from '@/lib/engine/types';
 import { isVariantRarity } from '@/lib/variants/constants';
 
@@ -34,9 +34,10 @@ function pickRandomN<T>(arr: T[], n: number): T[] {
 }
 
 let _instanceCounter = 0;
+const _instancePrefix = `${Date.now()}${Math.floor(Math.random() * 1_000_000)}`;
 function nextInstanceId(): string {
   _instanceCounter++;
-  return `sealed-${Date.now()}-${_instanceCounter}`;
+  return `sealed-${_instancePrefix}-${_instanceCounter}`;
 }
 
 function toBoosterCard(card: CardData, isHolo = false): BoosterCard {
@@ -73,7 +74,13 @@ function bucketsHaveEnough(b: RarityBuckets): boolean {
 
 export function generateBooster(boosterIndex: number, setId?: string, buckets?: RarityBuckets): BoosterPack {
   const resolvedSetId = setId ?? resolveSetChoice('random');
-  const b = buckets ?? buildRarityBuckets(resolvedSetId);
+  let b = buckets;
+  if (!b) {
+    b = buildRarityBuckets(resolvedSetId);
+    if (!bucketsHaveEnough(b)) {
+      throw new Error(`Set "${resolvedSetId}" does not have enough cards to generate a booster`);
+    }
+  }
   const { commons, uncommons, rares, rareArts, secrets, legendaries, missions: allMissions } = b;
 
   const cards: BoosterCard[] = [];
@@ -87,20 +94,20 @@ export function generateBooster(boosterIndex: number, setId?: string, buckets?: 
   cards.push(toBoosterCard(pickRandom(rares)));
 
   const holoRoll = Math.random();
-  if (holoRoll < 0.2 && rareArts.length > 0) {
-    cards.push(toBoosterCard(pickRandom(rareArts), true));
-  } else if (holoRoll < 0.6) {
-    cards.push(toBoosterCard(pickRandom(commons), true));
-  } else {
-    cards.push(toBoosterCard(pickRandom(uncommons), true));
-  }
-
   const specialRoll = Math.random();
+  let holoCard: CardData;
   if (specialRoll < 0.00125 && legendaries.length > 0) {
-    cards[cards.length - 1] = toBoosterCard(pickRandom(legendaries), true);
+    holoCard = pickRandom(legendaries);
   } else if (specialRoll < 0.10 && secrets.length > 0) {
-    cards[cards.length - 1] = toBoosterCard(pickRandom(secrets), true);
+    holoCard = pickRandom(secrets);
+  } else if (holoRoll < 0.2 && rareArts.length > 0) {
+    holoCard = pickRandom(rareArts);
+  } else if (holoRoll < 0.6) {
+    holoCard = pickRandom(commons);
+  } else {
+    holoCard = pickRandom(uncommons);
   }
+  cards.push(toBoosterCard(holoCard, true));
 
   cards.push(toBoosterCard(pickRandom(allMissions)));
 
@@ -108,7 +115,7 @@ export function generateBooster(boosterIndex: number, setId?: string, buckets?: 
 }
 
 function resolveSetChoice(choice: SealedSetChoice): string {
-  const available = getAvailableSetIds();
+  const available = getSealedSetIds();
   if (available.length === 0) throw new Error('No sealed-ready sets are available');
   if (choice === 'random') return available[Math.floor(Math.random() * available.length)];
   if (available.includes(choice)) return choice;
@@ -116,7 +123,9 @@ function resolveSetChoice(choice: SealedSetChoice): string {
 }
 
 export function generateSealedPool(boosterCount: number = 6, setChoice: SealedSetChoice = 'random'): SealedPool {
-  _instanceCounter = 0;
+  if (typeof boosterCount !== 'number' || !Number.isInteger(boosterCount) || boosterCount < 1) {
+    throw new Error(`Invalid sealed booster count: ${boosterCount}`);
+  }
   const boosters: BoosterPack[] = [];
   const allCards: BoosterCard[] = [];
   const temporaryVariants: string[] = [];

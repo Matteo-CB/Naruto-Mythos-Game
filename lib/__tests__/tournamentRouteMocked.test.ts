@@ -107,7 +107,7 @@ describe('executeTournamentStart with mocked Prisma', () => {
     }
   });
 
-  it('returns 400 for elimination with non-power-of-2 count', async () => {
+  it('starts an elimination tournament with a non-power-of-2 count, using byes', async () => {
     p.tournament.findUnique.mockResolvedValue({
       id: 't1', status: 'registration', format: 'elimination',
       gameMode: 'classic', useBanList: false, bannedCardIds: [],
@@ -121,8 +121,7 @@ describe('executeTournamentStart with mocked Prisma', () => {
       cardIds: Array(30).fill('KS-001-C'), missionIds: ['KS-001-MMS', 'KS-002-MMS', 'KS-003-MMS'],
     }));
     const result = await executeTournamentStart('t1');
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toMatch(/4, 8, 16, or 32/);
+    expect(result.ok).toBe(true);
   });
 
   it('filters eliminated participants before count check', async () => {

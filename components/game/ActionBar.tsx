@@ -37,6 +37,7 @@ export function ActionBar() {
   const socketForfeit = useSocketStore((s) => s.forfeit);
 
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
+  const pendingTargetSelection = useGameStore((s) => s.pendingTargetSelection);
 
   useEffect(() => {
     setConfirmingPass(false);
@@ -54,7 +55,7 @@ export function ActionBar() {
   const isMyTurn = activePlayer === myPlayer && !isProcessing;
   const isActionPhase = phase === 'action';
   const hasPassed = myState.hasPassed;
-  const actionsBlocked = effectPopupMinimized;
+  const actionsBlocked = effectPopupMinimized && pendingTargetSelection !== null;
 
   const hasCardSelected = selectedCardIndex !== null;
   const hasMissionSelected = selectedMissionIndex !== null;
@@ -371,7 +372,9 @@ export function ActionBar() {
               className="font-medium px-2 py-0.5"
               style={{ fontSize: dims.isMobile ? '14px' : '12px', color: '#ff6b6b', backgroundColor: 'rgba(179, 62, 62, 0.15)' }}
             >
-              {actionErrorKey ? t(actionErrorKey, localizeMessageParams(actionErrorParams ?? {}, locale) ?? {}) : actionError}
+              {actionErrorKey && t.has(actionErrorKey)
+                ? t(actionErrorKey, localizeMessageParams(actionErrorParams ?? {}, locale) ?? {})
+                : actionError}
             </motion.span>
           )}
 

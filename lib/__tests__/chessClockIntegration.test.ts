@@ -111,7 +111,11 @@ describe('Phase 14 — chess clock integration scenarios', () => {
   let winnerSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    applySpy = vi.spyOn(GameEngine, 'applyAction').mockImplementation((state: any) => state);
+    applySpy = vi.spyOn(GameEngine, 'applyAction').mockImplementation((state: any, player: any, action: any) => (
+      action?.type === 'FORFEIT'
+        ? { ...state, phase: 'gameOver', forfeitedBy: player }
+        : { ...state, log: [...(state.log ?? []), { applied: action?.type }] }
+    ));
     winnerSpy = vi.spyOn(GameEngine, 'getWinner').mockReturnValue(null);
   });
 
@@ -157,7 +161,7 @@ describe('Phase 14 — chess clock integration scenarios', () => {
     expect(room.chessClock.player1.idleWarningUsed).toBe(true);
   });
 
-  it('Scenario 4: idle 3 min on mandatory pending action -> instant FORFEIT (warning NOT consumed)', () => {
+  it('Scenario 4: first idle on a mandatory pending action -> warning consumed, no defeat', () => {
     const { io } = makeIoMock();
     const pe = makePendingEffect('player1', { isOptional: false, isMandatory: true, rootOptional: false });
     const pa = makePendingAction('player1', { sourceEffectId: pe.id });
@@ -166,9 +170,12 @@ describe('Phase 14 — chess clock integration scenarios', () => {
       gameState: makeState({ pendingActions: [pa], pendingEffects: [pe] }),
     });
     handleChessClockIdleLimit(room, 'player1', io);
+    expect(applySpy).not.toHaveBeenCalled();
+    expect(room.chessClock.player1.idleWarningUsed).toBe(true);
+
+    handleChessClockIdleLimit(room, 'player1', io);
     const action = applySpy.mock.calls[0][2] as GameAction;
     expect(action.type).toBe('FORFEIT');
-    expect(room.chessClock.player1.idleWarningUsed).toBe(false);
   });
 
   it('Scenario 5: 2nd idle (warning already used) anywhere -> instant FORFEIT', () => {

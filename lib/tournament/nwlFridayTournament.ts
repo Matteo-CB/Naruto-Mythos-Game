@@ -2,7 +2,7 @@ import { prisma } from '@/lib/db/prisma';
 import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
 import { ADMIN_USERNAMES, ADMIN_EMAILS } from '@/lib/auth/admins';
 import { parisDateParts, parisWallToUtc } from '@/lib/tournament/dailyTournament';
-import { NWL_PARTNER_KEY, NWL_TOURNAMENT_NAME, NWL_MAX_PLAYERS, NWL_START_HOUR } from '@/lib/tournament/nwlPartner';
+import { NWL_PARTNER_KEY, NWL_TOURNAMENT_NAME, NWL_MAX_PLAYERS, NWL_START_HOUR, NWL_TOURNAMENT_RULES_NOTE, NWL_CHUNIN_RESET_WEEKDAY, revokeAllNwlChuninRoles } from '@/lib/tournament/nwlPartner';
 
 export const NWL_REG_OPEN_HOUR = 17;
 export const NWL_FRIDAY_WEEKDAY = 5;
@@ -12,6 +12,32 @@ export interface NwlFridayResult {
   reason?: 'not_friday' | 'outside_window' | 'already_exists' | 'no_admin';
   tournamentId?: string;
   scheduledStartAt?: string;
+}
+
+export async function resetNwlChuninIfMonday(now: Date = new Date()): Promise<{ ran: boolean; revoked?: number }> {
+  const p = parisDateParts(now);
+  const weekday = new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay();
+  if (weekday !== NWL_CHUNIN_RESET_WEEKDAY) return { ran: false };
+
+  const dayStart = parisWallToUtc(p.year, p.month, p.day, 0, 0);
+  const already = await prisma.tournament.findFirst({
+    where: { partner: NWL_PARTNER_KEY, chuninResetAt: { gte: dayStart } },
+    select: { id: true },
+  });
+  if (already) return { ran: false };
+
+  const result = await revokeAllNwlChuninRoles();
+  if (!result) return { ran: false };
+
+  const latest = await prisma.tournament.findFirst({
+    where: { partner: NWL_PARTNER_KEY },
+    orderBy: { createdAt: 'desc' },
+    select: { id: true },
+  });
+  if (latest) {
+    await prisma.tournament.update({ where: { id: latest.id }, data: { chuninResetAt: now } });
+  }
+  return { ran: true, revoked: result.revoked };
 }
 
 export async function createNwlFridayTournamentIfNeeded(now: Date = new Date()): Promise<NwlFridayResult> {
@@ -50,6 +76,7 @@ export async function createNwlFridayTournamentIfNeeded(now: Date = new Date()):
       creatorUsername: admin.username,
       requiresDiscord: true,
       useBanList: true,
+      restrictionNote: NWL_TOURNAMENT_RULES_NOTE,
       partner: NWL_PARTNER_KEY,
       scheduledStartAt,
     },

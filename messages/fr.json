@@ -995,6 +995,8 @@
       "youLostOnClock": "Vous avez épuisé votre chrono",
       "opponentLostByIdle": "L'adversaire est resté inactif trop longtemps",
       "youLostByIdle": "Vous êtes resté inactif trop longtemps",
+      "opponentLostByDisconnect": "Votre adversaire a perdu la connexion",
+      "youLostByDisconnect": "Vous avez perdu la connexion",
       "cancelledMulliganIdle": "Partie annulée : inactivité au mulligan",
       "cancelledStalemate": "Partie annulée : la partie était bloquée et plus aucune action n'a été enregistrée. Aucun changement d'ELO pour personne.",
       "cancelledGeneric": "Partie annulée",
@@ -1657,7 +1659,8 @@
       "rejoin": "Rejoindre",
       "abandon": "Abandonner"
     },
-    "edgeToken": "Jeton Edge"
+    "edgeToken": "Jeton Edge",
+    "edgeLocked": "Verrouillé"
   },
   "collection": {
     "title": "Collection de Cartes",
@@ -1893,7 +1896,8 @@
     "copySuffix": "(copie)",
     "showUnrevealed": "Cartes non révélées",
     "containsUnrevealed": "Contient des cartes non révélées",
-    "useDeck": "Utiliser ce deck"
+    "useDeck": "Utiliser ce deck",
+    "cardDetail": "Détail de la carte"
   },
   "discord": {
     "linkDiscord": "Lier Discord",
@@ -2655,7 +2659,9 @@
     "cardBack": "Dos de carte",
     "boosterPack": "Paquet Booster",
     "continueToNextBooster": "Touchez pour ouvrir le prochain booster",
-    "continueToFinish": "Touchez pour terminer l'ouverture"
+    "continueToFinish": "Touchez pour terminer l'ouverture",
+    "timeJustNow": "à l'instant",
+    "timeMinutesAgo": "il y a {minutes} min"
   },
   "tournament": {
     "launchMatch": "Lancer le match",
@@ -2955,7 +2961,7 @@
       "nameTooLong": "Le nom doit faire au plus 80 caractères.",
       "restrictionTooLong": "La note de restriction doit faire au plus 500 caractères.",
       "invalidGameMode": "Mode de jeu invalide.",
-      "invalidBoosterCount": "Le nombre de boosters scellés doit être un entier entre 1 et 12.",
+      "invalidBoosterCount": "Le nombre de boosters scellés doit être 4, 5 ou 6.",
       "invalidLeagueKeys": "Clés de palier de ligue invalides.",
       "cannotLeaveStarted": "Impossible de quitter après le début du tournoi.",
       "creatorCannotLeave": "Le créateur ne peut pas quitter. Annulez le tournoi à la place.",
@@ -2967,7 +2973,14 @@
       "alreadyFinished": "Ce tournoi est déjà terminé.",
       "unrevealedCards": "Ton deck contient des cartes non révélées, qui ne sont pas autorisées.",
       "nwlCheckUnavailable": "La vérification d'appartenance est momentanément indisponible. Réessaie dans un instant.",
-      "nwlNotMember": "Rejoins d'abord le serveur Discord New World Loot."
+      "nwlNotMember": "Rejoins d'abord le serveur Discord New World Loot.",
+      "sealedDeckLocked": "Ton deck scellé est déjà validé pour ce tournoi.",
+      "sealedDeckTooSmall": "Ton deck scellé doit contenir au moins 30 personnages.",
+      "sealedMissionCount": "Ton deck scellé doit contenir exactement 3 missions.",
+      "sealedCardNotInPool": "Cette carte ne fait pas partie de ton pool scellé.",
+      "sealedRejoinLimit": "Tu as déjà utilisé toutes tes inscriptions à ce tournoi scellé. Tes boosters ne peuvent pas être réouverts.",
+      "tooManyOpenTournaments": "Tu as déjà trop de tournois en cours. Termine ou annule-en un d’abord.",
+      "sealedCardBanned": "Une de ces cartes est bannie dans ce tournoi. Construis ton deck sans elle."
     },
     "deckError": {
       "tooFewCards": "Le deck doit contenir au moins {min} cartes (en a {count}).",
@@ -2989,7 +3002,11 @@
     },
     "nwlPosterAlt": "Friday Free Genin Tournament par New World Loot",
     "nwlRequirement": "Tournoi partenaire New World Loot. Pour t'inscrire, tu dois avoir lié ton compte Discord et être membre du serveur New World Loot. Le top 3 reçoit le rôle Chunin.",
-    "nwlJoinServer": "Rejoindre le serveur New World Loot"
+    "nwlJoinServer": "Rejoindre le serveur New World Loot",
+    "thirdPlaceMatch": "Match pour la 3e place",
+    "sealedBuildToRegister": "Construis ton deck scellé pour confirmer ton inscription.",
+    "sealedRegistrationPending": "Inscription incomplète : construis ton deck",
+    "privateOnlyNotice": "Ton tournoi est privé : partage son code d’accès aux joueurs de ton choix."
   },
   "playHub": {
     "title": "Jouer",
@@ -3464,7 +3481,18 @@
     "join": "Rejoindre",
     "emptyTitle": "Serveurs bientôt disponibles",
     "emptyText": "Les serveurs Discord de la communauté seront ajoutés ici très bientôt.",
-    "close": "Fermer"
+    "close": "Fermer",
+    "follow": "Suivre",
+    "following": "Suivi",
+    "unfollow": "Ne plus suivre",
+    "followers": "abonnés",
+    "followingLabel": "abonnements",
+    "block": {
+      "confirmTitle": "Bloquer {player} ?",
+      "confirmBody": "Tu ne verras plus ses messages, et il ne pourra plus te contacter.",
+      "confirm": "Bloquer",
+      "doneTitle": "Joueur bloqué"
+    }
   },
   "report": {
     "title": "Signaler {player}",
@@ -3807,7 +3835,8 @@
       "classic": "Classique",
       "open": "Ouvert, toutes les cartes",
       "elimination": "Élimination directe",
-      "sealed": "Scellé"
+      "sealed": "Scellé",
+      "partner": "Tournoi partenaire"
     },
     "rules": {
       "formatSwiss": "Format suisse",
@@ -3817,10 +3846,17 @@
       "allCards": "Toutes les cartes autorisées, sans restriction",
       "banList": "Liste de bannissement standard",
       "times": "Inscriptions {reg}, début {start}",
-      "discord": "Discord requis"
+      "discord": "Discord requis",
+      "partnerBy": "Organisé par {partner}",
+      "regLabel": "Inscriptions",
+      "startLabel": "Début"
     },
     "today": "Aujourd'hui",
     "button": "Calendrier",
-    "close": "Fermer"
+    "close": "Fermer",
+    "prev": "Jour précédent",
+    "next": "Jour suivant",
+    "restDay": "Jour de repos, aucun tournoi prévu",
+    "localTimeNote": "Les horaires sont affichés dans ton fuseau horaire."
   }
 }
