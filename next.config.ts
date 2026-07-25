@@ -3,10 +3,15 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./lib/i18n/request.ts");
 
+const buildCpus = Number.parseInt(process.env.NEXT_BUILD_CPUS ?? "1", 10);
+
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: false,
   typescript: { ignoreBuildErrors: true },
+  ...(Number.isFinite(buildCpus) && buildCpus > 0
+    ? { experimental: { cpus: buildCpus } }
+    : {}),
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200],
