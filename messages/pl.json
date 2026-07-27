@@ -144,10 +144,10 @@
     "titleTemplate": "%s | Naruto Mythos TCG",
     "description": "Zagraj za darmo w Naruto Mythos Trading Card Game online. Zmierz się z inteligentną SI na 4 poziomach trudności lub rzuć wyzwanie innym graczom w trybie multiplayer w czasie rzeczywistym. Zbuduj strategiczną talię ze 186 unikalnych kart inspirowanych Naruto Shippuden, kolekcjonuj rzadkie karty i wspinaj się w rywalizacyjnym rankingu ELO. Darmowa kolekcjonerska gra karciana z kreatorem talii i systemem doboru graczy.",
     "ogTitle": "Naruto Mythos TCG - Darmowa Gra Karciana Naruto Online",
-    "ogDescription": "Darmowa gra karciana Naruto Shippuden online. 186 unikalnych kart, inteligentna SI, multiplayer w czasie rzeczywistym, kreator talii i ranking ELO. Zagraj teraz, bez pobierania.",
+    "ogDescription": "Darmowa gra karciana Naruto Shippuden online. {cardCount} unikalnych kart, inteligentna SI, multiplayer w czasie rzeczywistym, kreator talii i ranking ELO. Zagraj teraz, bez pobierania.",
     "ogImageAlt": "Naruto Mythos TCG - Kolekcjonerska Gra Karciana",
     "twitterTitle": "Naruto Mythos TCG - Darmowa Gra Karciana Naruto",
-    "twitterDescription": "Darmowa gra karciana Naruto Shippuden. 186 kart, SI na 4 poziomach, multiplayer w czasie rzeczywistym, kreator talii i ranking ELO. Zagraj teraz w przeglądarce.",
+    "twitterDescription": "Darmowa gra karciana Naruto Shippuden. {cardCount} kart, SI na 4 poziomach, multiplayer w czasie rzeczywistym, kreator talii i ranking ELO. Zagraj teraz w przeglądarce.",
     "keywords": [
       "Naruto",
       "TCG",
@@ -1843,8 +1843,8 @@
   },
   "seoPages": {
     "collection": {
-      "title": "Kolekcja Kart Naruto - Wszystkie 186 Kart | Naruto Mythos TCG",
-      "description": "Poznaj pełną kolekcję wszystkich 186 kart Naruto Mythos TCG. Przeglądaj karty Pospolite, Niepospolite, Rzadkie, Rzadką Grafikę, Sekretne i Mythos. Filtruj według rzadkości, wioski (Liść, Piasek, Dźwięk, Akatsuki), słowa kluczowego (Sannin, Drużyna 7, Przywołanie) i typu postaci. Zobacz oficjalną grafikę kart, koszt czakry i siłę oraz szczegółowe opisy efektów każdej karty. Odkryj kultowe postacie, takie jak Naruto Uzumaki, Sasuke Uchiha, Kakashi Hatake, Itachi, Gaara, Sakura Haruno, Jiraiya, Orochimaru i Tsunade w tej darmowej encyklopedii kart Naruto Shippuden.",
+      "title": "Kolekcja Kart Naruto - Wszystkie {cardCount} Kart | Naruto Mythos TCG",
+      "description": "Poznaj pełną kolekcję wszystkich {cardCount} kart Naruto Mythos TCG. Przeglądaj karty Pospolite, Niepospolite, Rzadkie, Rzadką Grafikę, Sekretne i Mythos. Filtruj według rzadkości, wioski (Liść, Piasek, Dźwięk, Akatsuki), słowa kluczowego (Sannin, Drużyna 7, Przywołanie) i typu postaci. Zobacz oficjalną grafikę kart, koszt czakry i siłę oraz szczegółowe opisy efektów każdej karty. Odkryj kultowe postacie, takie jak Naruto Uzumaki, Sasuke Uchiha, Kakashi Hatake, Itachi, Gaara, Sakura Haruno, Jiraiya, Orochimaru i Tsunade w tej darmowej encyklopedii kart Naruto Shippuden.",
       "ogAlt": "Kolekcja Kart Naruto Mythos TCG"
     },
     "cardDetail": {
@@ -1854,7 +1854,7 @@
     },
     "deckBuilder": {
       "title": "Kreator Talii Naruto - Stwórz Swoją Strategię | Naruto Mythos TCG",
-      "description": "Zbuduj idealną talię w Naruto Mythos TCG dzięki naszemu interaktywnemu kreatorowi talii. Wybieraj spośród 66 ilustrowanych grywalnych kart, wybierz 3 karty misji i sprawdź swój skład (minimum 30 kart postaci, maksymalnie 2 kopie na wersję). Przeciągaj lub klikaj, aby dodawać karty, filtruj według rzadkości i wioski oraz podglądaj każdą kartę w czasie rzeczywistym. Zapisuj talie online i wczytuj je, aby grać przeciwko SI lub w trybie multiplayer. Twórz strategie z kartami Wioski Liścia, Wioski Piasku, Akatsuki i nie tylko.",
+      "description": "Zbuduj idealną talię w Naruto Mythos TCG dzięki naszemu interaktywnemu kreatorowi talii. Wybieraj spośród {characterCount} ilustrowanych grywalnych kart, wybierz 3 karty misji i sprawdź swój skład (minimum 30 kart postaci, maksymalnie 2 kopie na wersję). Przeciągaj lub klikaj, aby dodawać karty, filtruj według rzadkości i wioski oraz podglądaj każdą kartę w czasie rzeczywistym. Zapisuj talie online i wczytuj je, aby grać przeciwko SI lub w trybie multiplayer. Twórz strategie z kartami Wioski Liścia, Wioski Piasku, Akatsuki i nie tylko.",
       "ogAlt": "Kreator Talii Naruto Mythos TCG"
     },
     "leaderboard": {
@@ -1895,7 +1895,7 @@
     },
     "playSealed": {
       "title": "Tryb Sealed - Otwieraj Boostery | Naruto Mythos TCG",
-      "description": "Otwórz 6 boosterów, zbuduj talię i zmierz się z przeciwnikiem w trybie Sealed Naruto Mythos TCG."
+      "description": "Otwórz {boosterCount} boosterów, zbuduj talię i zmierz się z przeciwnikiem w trybie Sealed Naruto Mythos TCG."
     },
     "profile": {
       "title": "Profil gracza {name} - Statystyki i Ranking | Naruto Mythos TCG",

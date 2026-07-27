@@ -144,10 +144,10 @@
     "titleTemplate": "%s | Naruto Mythos TCG",
     "description": "Jogue o Naruto Mythos Trading Card Game online de graça. Enfrente uma IA inteligente em 4 níveis de dificuldade ou desafie outros jogadores em multiplayer em tempo real. Monte seu deck estratégico com 186 cartas únicas inspiradas em Naruto Shippuden, colecione cartas raras e suba no ranking competitivo de ELO. Jogo de cartas colecionáveis gratuito com construtor de decks e sistema de matchmaking.",
     "ogTitle": "Naruto Mythos TCG - Jogo de Cartas Naruto Online e Grátis",
-    "ogDescription": "Jogo de cartas de Naruto Shippuden online e grátis. 186 cartas únicas, IA inteligente, multiplayer em tempo real, construtor de decks e ranking ELO. Jogue agora, sem download.",
+    "ogDescription": "Jogo de cartas de Naruto Shippuden online e grátis. {cardCount} cartas únicas, IA inteligente, multiplayer em tempo real, construtor de decks e ranking ELO. Jogue agora, sem download.",
     "ogImageAlt": "Naruto Mythos TCG - Jogo de Cartas Colecionáveis",
     "twitterTitle": "Naruto Mythos TCG - Jogo de Cartas Naruto Grátis",
-    "twitterDescription": "Jogo de cartas de Naruto Shippuden grátis. 186 cartas, IA em 4 níveis, multiplayer em tempo real, construtor de decks e ranking ELO. Jogue agora no navegador.",
+    "twitterDescription": "Jogo de cartas de Naruto Shippuden grátis. {cardCount} cartas, IA em 4 níveis, multiplayer em tempo real, construtor de decks e ranking ELO. Jogue agora no navegador.",
     "keywords": [
       "Naruto",
       "TCG",
@@ -1843,8 +1843,8 @@
   },
   "seoPages": {
     "collection": {
-      "title": "Coleção de Cartas Naruto - Todas as 186 Cartas | Naruto Mythos TCG",
-      "description": "Explore a coleção completa de todas as 186 cartas do Naruto Mythos TCG. Navegue por cartas Comuns, Incomuns, Raras, Arte Rara, Secretas e Mythos. Filtre por raridade, vila (Folha, Areia, Som, Akatsuki), palavra-chave (Sannin, Time 7, Invocação) e tipo de personagem. Veja a arte oficial das cartas, o custo de chakra e o poder, e descrições detalhadas dos efeitos de cada carta. Descubra personagens icônicos como Naruto Uzumaki, Sasuke Uchiha, Kakashi Hatake, Itachi, Gaara, Sakura Haruno, Jiraiya, Orochimaru e Tsunade nesta enciclopédia gratuita de cartas de Naruto Shippuden.",
+      "title": "Coleção de Cartas Naruto - Todas as {cardCount} Cartas | Naruto Mythos TCG",
+      "description": "Explore a coleção completa de todas as {cardCount} cartas do Naruto Mythos TCG. Navegue por cartas Comuns, Incomuns, Raras, Arte Rara, Secretas e Mythos. Filtre por raridade, vila (Folha, Areia, Som, Akatsuki), palavra-chave (Sannin, Time 7, Invocação) e tipo de personagem. Veja a arte oficial das cartas, o custo de chakra e o poder, e descrições detalhadas dos efeitos de cada carta. Descubra personagens icônicos como Naruto Uzumaki, Sasuke Uchiha, Kakashi Hatake, Itachi, Gaara, Sakura Haruno, Jiraiya, Orochimaru e Tsunade nesta enciclopédia gratuita de cartas de Naruto Shippuden.",
       "ogAlt": "Coleção de Cartas do Naruto Mythos TCG"
     },
     "cardDetail": {
@@ -1854,7 +1854,7 @@
     },
     "deckBuilder": {
       "title": "Construtor de Decks Naruto - Crie Sua Estratégia | Naruto Mythos TCG",
-      "description": "Monte o deck perfeito no Naruto Mythos TCG com nosso construtor de decks interativo. Escolha entre 66 cartas jogáveis ilustradas, selecione 3 cartas de missão e valide sua composição (mínimo de 30 cartas de personagem, máximo de 2 cópias por versão). Arraste e solte ou clique para adicionar cartas, filtre por raridade e vila, e visualize cada carta em tempo real. Salve seus decks online e carregue-os para jogar contra a IA ou no multiplayer. Crie estratégias com cartas da Vila da Folha, Vila da Areia, Akatsuki e muito mais.",
+      "description": "Monte o deck perfeito no Naruto Mythos TCG com nosso construtor de decks interativo. Escolha entre {characterCount} cartas jogáveis ilustradas, selecione 3 cartas de missão e valide sua composição (mínimo de 30 cartas de personagem, máximo de 2 cópias por versão). Arraste e solte ou clique para adicionar cartas, filtre por raridade e vila, e visualize cada carta em tempo real. Salve seus decks online e carregue-os para jogar contra a IA ou no multiplayer. Crie estratégias com cartas da Vila da Folha, Vila da Areia, Akatsuki e muito mais.",
       "ogAlt": "Construtor de Decks do Naruto Mythos TCG"
     },
     "leaderboard": {
@@ -1895,7 +1895,7 @@
     },
     "playSealed": {
       "title": "Modo Sealed - Abra Boosters | Naruto Mythos TCG",
-      "description": "Abra 6 boosters, monte um deck e enfrente um oponente no modo Sealed do Naruto Mythos TCG."
+      "description": "Abra {boosterCount} boosters, monte um deck e enfrente um oponente no modo Sealed do Naruto Mythos TCG."
     },
     "profile": {
       "title": "Perfil de {name} - Estatísticas e Ranking | Naruto Mythos TCG",

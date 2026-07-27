@@ -6,9 +6,10 @@ import { createTranslator } from "next-intl";
 import { routing } from "@/lib/i18n/routing";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 import "./globals.css";
+import { getSiteFacts } from '@/lib/seo/siteFacts';
 
 type RootMessages = Record<string, unknown> & { _meta?: { ogLocale?: string }; rootMeta?: { keywords?: string[] } };
-type StringTranslator = (key: string) => string;
+type StringTranslator = (key: string, values?: Record<string, string | number>) => string;
 
 async function loadRootMessages(locale: string): Promise<RootMessages> {
   return (await import(`@/messages/${locale}.json`)).default as RootMessages;
@@ -50,6 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const messages = await loadRootMessages(locale);
   const t = rootTranslator(locale, messages, "rootMeta");
   const ogLocale = messages._meta?.ogLocale ?? "en_US";
+  const { cardCount } = getSiteFacts();
   const keywords = messages.rootMeta?.keywords ?? [];
 
   const languages: Record<string, string> = {};
@@ -92,7 +94,7 @@ export async function generateMetadata(): Promise<Metadata> {
       url: SITE_URL,
       siteName: "Naruto Mythos TCG",
       title: t("ogTitle"),
-      description: t("ogDescription"),
+      description: t("ogDescription", { cardCount }),
       images: [
         {
           url: `${SITE_URL}/images/og-image.webp?v=2`,
@@ -106,7 +108,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: t("twitterTitle"),
-      description: t("twitterDescription"),
+      description: t("twitterDescription", { cardCount }),
       images: [`${SITE_URL}/images/og-image.webp?v=2`],
     },
     icons: {

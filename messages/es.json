@@ -81,8 +81,8 @@
   },
   "seoPages": {
     "collection": {
-      "title": "Colección de cartas de Naruto - Las 186 cartas | Naruto Mythos TCG",
-      "description": "Explora la colección completa de las 186 cartas de Naruto Mythos TCG. Descubre cartas de rareza Común, Poco común, Rara, Rara Ilustración, Secreta y Mythos. Filtra por rareza, aldea (Konoha, Suna, Oto, Akatsuki), palabra clave (Sannin, Equipo 7, Invocación) y tipo de personaje. Consulta la ilustración oficial de cada carta, su coste de chakra y su poder, y descripciones detalladas de sus efectos. Descubre personajes icónicos como Naruto Uzumaki, Sasuke Uchiha, Kakashi Hatake, Itachi, Gaara, Sakura Haruno, Jiraiya, Orochimaru y Tsunade en esta enciclopedia gratuita de cartas de Naruto Shippuden.",
+      "title": "Colección de cartas de Naruto - Las {cardCount} cartas | Naruto Mythos TCG",
+      "description": "Explora la colección completa de las {cardCount} cartas de Naruto Mythos TCG. Descubre cartas de rareza Común, Poco común, Rara, Rara Ilustración, Secreta y Mythos. Filtra por rareza, aldea (Konoha, Suna, Oto, Akatsuki), palabra clave (Sannin, Equipo 7, Invocación) y tipo de personaje. Consulta la ilustración oficial de cada carta, su coste de chakra y su poder, y descripciones detalladas de sus efectos. Descubre personajes icónicos como Naruto Uzumaki, Sasuke Uchiha, Kakashi Hatake, Itachi, Gaara, Sakura Haruno, Jiraiya, Orochimaru y Tsunade en esta enciclopedia gratuita de cartas de Naruto Shippuden.",
       "ogAlt": "Colección de cartas de Naruto Mythos TCG"
     },
     "cardDetail": {
@@ -92,7 +92,7 @@
     },
     "deckBuilder": {
       "title": "Constructor de mazos de Naruto - Crea tu estrategia | Naruto Mythos TCG",
-      "description": "Construye el mazo perfecto en Naruto Mythos TCG con nuestro constructor de mazos interactivo. Elige entre 66 cartas jugables ilustradas, selecciona 3 cartas de misión y valida tu composición (mínimo 30 cartas de personaje, máximo 2 copias por versión). Arrastra y suelta o haz clic para añadir cartas, filtra por rareza y aldea, y previsualiza cada carta en tiempo real. Guarda tus mazos en línea y cárgalos para jugar contra la IA o en multijugador. Diseña estrategias con cartas de Konoha, Suna, Akatsuki y muchas más.",
+      "description": "Construye el mazo perfecto en Naruto Mythos TCG con nuestro constructor de mazos interactivo. Elige entre {characterCount} cartas jugables ilustradas, selecciona 3 cartas de misión y valida tu composición (mínimo 30 cartas de personaje, máximo 2 copias por versión). Arrastra y suelta o haz clic para añadir cartas, filtra por rareza y aldea, y previsualiza cada carta en tiempo real. Guarda tus mazos en línea y cárgalos para jugar contra la IA o en multijugador. Diseña estrategias con cartas de Konoha, Suna, Akatsuki y muchas más.",
       "ogAlt": "Constructor de mazos de Naruto Mythos TCG"
     },
     "leaderboard": {
@@ -132,7 +132,7 @@
     },
     "playSealed": {
       "title": "Modo Sellado - Abre sobres | Naruto Mythos TCG",
-      "description": "Abre 6 sobres, construye un mazo y enfréntate a un rival en el modo Sellado de Naruto Mythos TCG."
+      "description": "Abre {boosterCount} sobres, construye un mazo y enfréntate a un rival en el modo Sellado de Naruto Mythos TCG."
     },
     "profile": {
       "title": "Perfil de {name} - Estadísticas y ranking | Naruto Mythos TCG",
@@ -298,10 +298,10 @@
     "titleTemplate": "%s | Naruto Mythos TCG",
     "description": "Juega gratis en línea al juego de cartas Naruto Mythos. Enfréntate a una IA inteligente en 4 niveles de dificultad o reta a otros jugadores en multijugador en tiempo real. Construye tu mazo estratégico con 186 cartas únicas inspiradas en Naruto Shippuden, colecciona cartas raras y escala en el ranking competitivo ELO. Juego de cartas coleccionables gratuito con constructor de mazos y sistema de emparejamiento.",
     "ogTitle": "Naruto Mythos TCG - Juego de cartas de Naruto gratis en línea",
-    "ogDescription": "Juego de cartas de Naruto Shippuden gratis en línea. 186 cartas únicas, IA inteligente, multijugador en tiempo real, constructor de mazos y ranking ELO. Juega ya, sin descargas.",
+    "ogDescription": "Juego de cartas de Naruto Shippuden gratis en línea. {cardCount} cartas únicas, IA inteligente, multijugador en tiempo real, constructor de mazos y ranking ELO. Juega ya, sin descargas.",
     "ogImageAlt": "Naruto Mythos TCG - Juego de cartas coleccionables",
     "twitterTitle": "Naruto Mythos TCG - Juego de cartas de Naruto gratis",
-    "twitterDescription": "Juego de cartas de Naruto Shippuden gratis. 186 cartas, IA en 4 niveles, multijugador en tiempo real, constructor de mazos y ranking ELO. Juega ya en tu navegador.",
+    "twitterDescription": "Juego de cartas de Naruto Shippuden gratis. {cardCount} cartas, IA en 4 niveles, multijugador en tiempo real, constructor de mazos y ranking ELO. Juega ya en tu navegador.",
     "keywords": [
       "Naruto",
       "TCG",

@@ -81,8 +81,8 @@
   },
   "seoPages": {
     "collection": {
-      "title": "Naruto Card Collection - All 186 Cards | Naruto Mythos TCG",
-      "description": "Explore the complete collection of all 186 Naruto Mythos TCG cards. Browse Common, Uncommon, Rare, Rare Art, Secret, and Mythos rarity cards. Filter by rarity, village (Leaf, Sand, Sound, Akatsuki), keyword (Sannin, Team 7, Summon), and character type. View official card artwork, chakra cost and power stats, and detailed effect descriptions for every card. Discover iconic characters like Naruto Uzumaki, Sasuke Uchiha, Kakashi Hatake, Itachi, Gaara, Sakura Haruno, Jiraiya, Orochimaru, and Tsunade in this free Naruto Shippuden card encyclopedia.",
+      "title": "Naruto Card Collection - All {cardCount} Cards | Naruto Mythos TCG",
+      "description": "Explore the complete collection of all {cardCount} Naruto Mythos TCG cards. Browse Common, Uncommon, Rare, Rare Art, Secret, and Mythos rarity cards. Filter by rarity, village (Leaf, Sand, Sound, Akatsuki), keyword (Sannin, Team 7, Summon), and character type. View official card artwork, chakra cost and power stats, and detailed effect descriptions for every card. Discover iconic characters like Naruto Uzumaki, Sasuke Uchiha, Kakashi Hatake, Itachi, Gaara, Sakura Haruno, Jiraiya, Orochimaru, and Tsunade in this free Naruto Shippuden card encyclopedia.",
       "ogAlt": "Naruto Mythos TCG Card Collection"
     },
     "cardDetail": {
@@ -92,7 +92,7 @@
     },
     "deckBuilder": {
       "title": "Naruto Deck Builder - Create Your Strategy | Naruto Mythos TCG",
-      "description": "Build the perfect deck in Naruto Mythos TCG with our interactive deck builder. Choose from 66 illustrated playable cards, select 3 mission cards, and validate your composition (minimum 30 character cards, maximum 2 copies per version). Drag-and-drop or click to add cards, filter by rarity and village, and preview every card in real-time. Save your decks online and load them to play against AI or in multiplayer. Craft strategies with Leaf Village, Sand Village, Akatsuki, and more cards.",
+      "description": "Build the perfect deck in Naruto Mythos TCG with our interactive deck builder. Choose from {characterCount} illustrated playable cards, select 3 mission cards, and validate your composition (minimum 30 character cards, maximum 2 copies per version). Drag-and-drop or click to add cards, filter by rarity and village, and preview every card in real-time. Save your decks online and load them to play against AI or in multiplayer. Craft strategies with Leaf Village, Sand Village, Akatsuki, and more cards.",
       "ogAlt": "Naruto Mythos TCG Deck Builder"
     },
     "leaderboard": {
@@ -132,7 +132,7 @@
     },
     "playSealed": {
       "title": "Sealed Mode - Open Boosters | Naruto Mythos TCG",
-      "description": "Open 6 boosters, build a deck and battle an opponent in the Naruto Mythos TCG Sealed mode."
+      "description": "Open {boosterCount} boosters, build a deck and battle an opponent in the Naruto Mythos TCG Sealed mode."
     },
     "profile": {
       "title": "{name}'s Profile - Stats and Ranking | Naruto Mythos TCG",
@@ -298,10 +298,10 @@
     "titleTemplate": "%s | Naruto Mythos TCG",
     "description": "Play the Naruto Mythos Trading Card Game online for free. Face a smart AI across 4 difficulty levels or challenge other players in real-time multiplayer. Build your strategic deck from 186 unique cards inspired by Naruto Shippuden, collect rare cards, and climb the competitive ELO ranking. Free collectible card game with a deck builder and matchmaking system.",
     "ogTitle": "Naruto Mythos TCG - Free Online Naruto Card Game",
-    "ogDescription": "Free Naruto Shippuden card game online. 186 unique cards, smart AI, real-time multiplayer, deck builder and ELO ranking. Play now, no download.",
+    "ogDescription": "Free Naruto Shippuden card game online. {cardCount} unique cards, smart AI, real-time multiplayer, deck builder and ELO ranking. Play now, no download.",
     "ogImageAlt": "Naruto Mythos TCG - Trading Card Game",
     "twitterTitle": "Naruto Mythos TCG - Free Naruto Card Game",
-    "twitterDescription": "Free Naruto Shippuden card game. 186 cards, AI across 4 levels, real-time multiplayer, deck builder and ELO ranking. Play now in your browser.",
+    "twitterDescription": "Free Naruto Shippuden card game. {cardCount} cards, AI across 4 levels, real-time multiplayer, deck builder and ELO ranking. Play now in your browser.",
     "keywords": [
       "Naruto",
       "TCG",

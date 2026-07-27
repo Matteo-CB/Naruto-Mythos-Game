@@ -144,10 +144,10 @@
     "titleTemplate": "%s | Naruto Mythos TCG",
     "description": "Gioca gratis al Naruto Mythos Trading Card Game online. Affronta un'IA intelligente su 4 livelli di difficoltà o sfida altri giocatori nel multiplayer in tempo reale. Costruisci il tuo mazzo strategico con 186 carte uniche ispirate a Naruto Shippuden, colleziona carte rare e scala la classifica competitiva ELO. Gioco di carte collezionabili gratuito con costruttore di mazzi e sistema di matchmaking.",
     "ogTitle": "Naruto Mythos TCG - Gioco di Carte Naruto Online e Gratis",
-    "ogDescription": "Gioco di carte di Naruto Shippuden online e gratis. 186 carte uniche, IA intelligente, multiplayer in tempo reale, costruttore di mazzi e classifica ELO. Gioca ora, senza download.",
+    "ogDescription": "Gioco di carte di Naruto Shippuden online e gratis. {cardCount} carte uniche, IA intelligente, multiplayer in tempo reale, costruttore di mazzi e classifica ELO. Gioca ora, senza download.",
     "ogImageAlt": "Naruto Mythos TCG - Gioco di Carte Collezionabili",
     "twitterTitle": "Naruto Mythos TCG - Gioco di Carte Naruto Gratis",
-    "twitterDescription": "Gioco di carte di Naruto Shippuden gratis. 186 carte, IA su 4 livelli, multiplayer in tempo reale, costruttore di mazzi e classifica ELO. Gioca ora nel browser.",
+    "twitterDescription": "Gioco di carte di Naruto Shippuden gratis. {cardCount} carte, IA su 4 livelli, multiplayer in tempo reale, costruttore di mazzi e classifica ELO. Gioca ora nel browser.",
     "keywords": [
       "Naruto",
       "TCG",
@@ -1843,8 +1843,8 @@
   },
   "seoPages": {
     "collection": {
-      "title": "Collezione di Carte Naruto - Tutte le 186 Carte | Naruto Mythos TCG",
-      "description": "Esplora la collezione completa di tutte le 186 carte del Naruto Mythos TCG. Sfoglia carte Comuni, Non Comuni, Rare, Arte Rara, Segrete e Mythos. Filtra per rarità, villaggio (Foglia, Sabbia, Suono, Akatsuki), parola chiave (Sannin, Squadra 7, Evocazione) e tipo di personaggio. Guarda l'artwork ufficiale delle carte, il costo del chakra e la potenza, e descrizioni dettagliate degli effetti di ogni carta. Scopri personaggi iconici come Naruto Uzumaki, Sasuke Uchiha, Kakashi Hatake, Itachi, Gaara, Sakura Haruno, Jiraiya, Orochimaru e Tsunade in questa enciclopedia gratuita di carte di Naruto Shippuden.",
+      "title": "Collezione di Carte Naruto - Tutte le {cardCount} Carte | Naruto Mythos TCG",
+      "description": "Esplora la collezione completa di tutte le {cardCount} carte del Naruto Mythos TCG. Sfoglia carte Comuni, Non Comuni, Rare, Arte Rara, Segrete e Mythos. Filtra per rarità, villaggio (Foglia, Sabbia, Suono, Akatsuki), parola chiave (Sannin, Squadra 7, Evocazione) e tipo di personaggio. Guarda l'artwork ufficiale delle carte, il costo del chakra e la potenza, e descrizioni dettagliate degli effetti di ogni carta. Scopri personaggi iconici come Naruto Uzumaki, Sasuke Uchiha, Kakashi Hatake, Itachi, Gaara, Sakura Haruno, Jiraiya, Orochimaru e Tsunade in questa enciclopedia gratuita di carte di Naruto Shippuden.",
       "ogAlt": "Collezione di Carte del Naruto Mythos TCG"
     },
     "cardDetail": {
@@ -1854,7 +1854,7 @@
     },
     "deckBuilder": {
       "title": "Costruttore di Mazzi Naruto - Crea la Tua Strategia | Naruto Mythos TCG",
-      "description": "Costruisci il mazzo perfetto nel Naruto Mythos TCG con il nostro costruttore di mazzi interattivo. Scegli tra 66 carte giocabili illustrate, seleziona 3 carte missione e convalida la tua composizione (minimo 30 carte personaggio, massimo 2 copie per versione). Trascina o clicca per aggiungere carte, filtra per rarità e villaggio, e visualizza ogni carta in tempo reale. Salva i tuoi mazzi online e caricali per giocare contro l'IA o in multiplayer. Crea strategie con carte del Villaggio della Foglia, del Villaggio della Sabbia, dell'Akatsuki e molto altro.",
+      "description": "Costruisci il mazzo perfetto nel Naruto Mythos TCG con il nostro costruttore di mazzi interattivo. Scegli tra {characterCount} carte giocabili illustrate, seleziona 3 carte missione e convalida la tua composizione (minimo 30 carte personaggio, massimo 2 copie per versione). Trascina o clicca per aggiungere carte, filtra per rarità e villaggio, e visualizza ogni carta in tempo reale. Salva i tuoi mazzi online e caricali per giocare contro l'IA o in multiplayer. Crea strategie con carte del Villaggio della Foglia, del Villaggio della Sabbia, dell'Akatsuki e molto altro.",
       "ogAlt": "Costruttore di Mazzi del Naruto Mythos TCG"
     },
     "leaderboard": {
@@ -1895,7 +1895,7 @@
     },
     "playSealed": {
       "title": "Modalità Sealed - Apri Booster | Naruto Mythos TCG",
-      "description": "Apri 6 booster, costruisci un mazzo e affronta un avversario nella modalità Sealed del Naruto Mythos TCG."
+      "description": "Apri {boosterCount} booster, costruisci un mazzo e affronta un avversario nella modalità Sealed del Naruto Mythos TCG."
     },
     "profile": {
       "title": "Profilo di {name} - Statistiche e Classifica | Naruto Mythos TCG",
