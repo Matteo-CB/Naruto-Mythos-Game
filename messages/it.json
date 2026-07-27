@@ -3920,9 +3920,6 @@
     "perDayChart": "Partite al giorno",
     "today": "Oggi",
     "todayHint": "Da mezzanotte",
-    "activeDays": "Giorni con partite",
-    "evolving": "Partite Evolutivo",
-    "evolvingHint": "Comprese nel totale",
     "busiestDay": "Giorno più attivo",
     "busiestDayValue": "{day} con {games} partite",
     "note": "Contano solo le partite online. I numeri si aggiornano più volte all’ora."

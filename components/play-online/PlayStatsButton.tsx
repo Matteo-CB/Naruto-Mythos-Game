@@ -39,7 +39,7 @@ function StatTile({ label, value, hint }: { label: string; value: string; hint?:
   );
 }
 
-function DayBars({ rows, label }: { rows: DailyPlayRow[]; label: string }) {
+function DayBars({ rows, label, showDates }: { rows: DailyPlayRow[]; label: string; showDates: boolean }) {
   const locale = useLocale();
   const max = rows.reduce((m, r) => Math.max(m, r.games), 0);
   const dayFmt = (() => {
@@ -70,9 +70,11 @@ function DayBars({ rows, label }: { rows: DailyPlayRow[]; label: string }) {
                 transition={{ duration: 0.4, ease: 'easeOut' }}
                 style={{ backgroundColor: row.games > 0 ? '#c4a35a' : '#2a2a2e', display: 'block' }}
               />
-              <span className="text-[8px] tabular-nums" style={{ color: '#5a5a61' }}>
-                {dayFmt ? dayFmt.format(new Date(`${row.day}T00:00:00.000Z`)) : row.day.slice(5)}
-              </span>
+              {showDates && (
+                <span className="text-[9px] tabular-nums" style={{ color: '#5a5a61' }}>
+                  {dayFmt ? dayFmt.format(new Date(`${row.day}T00:00:00.000Z`)) : row.day.slice(5)}
+                </span>
+              )}
             </div>
           );
         })}
@@ -120,6 +122,22 @@ export function PlayStatsButton() {
     }
   })();
   const fmt = (n: number) => (numberFmt ? numberFmt.format(n) : String(n));
+
+  const longDayFmt = (() => {
+    try {
+      return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', timeZone: 'UTC' });
+    } catch {
+      return null;
+    }
+  })();
+  const formatLongDay = (day: string) => {
+    if (!longDayFmt) return day;
+    try {
+      return longDayFmt.format(new Date(`${day}T00:00:00.000Z`));
+    } catch {
+      return day;
+    }
+  };
 
   const modal = (
     <AnimatePresence>
@@ -215,12 +233,10 @@ export function PlayStatsButton() {
                     <StatTile label={t('perDay')} value={fmt(period.averagePerDay)} />
                   </div>
 
-                  <DayBars rows={rows} label={t('perDayChart')} />
+                  <DayBars rows={rows} label={t('perDayChart')} showDates={range === 'week'} />
 
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-2">
                     <StatTile label={t('today')} value={fmt(data?.today?.games ?? 0)} hint={t('todayHint')} />
-                    <StatTile label={t('activeDays')} value={`${fmt(period.activeDays)} / ${fmt(period.days)}`} />
-                    <StatTile label={t('evolving')} value={fmt(period.evolving)} hint={t('evolvingHint')} />
                   </div>
 
                   {period.busiestDay && (
@@ -230,7 +246,7 @@ export function PlayStatsButton() {
                       </span>
                       <p className="mt-1 text-sm" style={{ color: '#d9d7d0' }}>
                         {t('busiestDayValue', {
-                          day: period.busiestDay.day,
+                          day: formatLongDay(period.busiestDay.day),
                           games: period.busiestDay.games,
                         })}
                       </p>

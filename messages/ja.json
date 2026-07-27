@@ -3923,9 +3923,6 @@
     "perDayChart": "1日あたりの対戦数",
     "today": "今日",
     "todayHint": "0時から",
-    "activeDays": "対戦があった日数",
-    "evolving": "エボルビングの対戦",
-    "evolvingHint": "合計に含まれます",
     "busiestDay": "最も活発だった日",
     "busiestDayValue": "{day}、{games}戦",
     "note": "オンライン対戦のみが対象です。数値は1時間に数回更新されます。"

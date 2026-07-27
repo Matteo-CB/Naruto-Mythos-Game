@@ -3919,9 +3919,6 @@
     "perDayChart": "Games per day",
     "today": "Today",
     "todayHint": "Since midnight",
-    "activeDays": "Days with games",
-    "evolving": "Evolving games",
-    "evolvingHint": "Included in the total",
     "busiestDay": "Busiest day",
     "busiestDayValue": "{day} with {games} games",
     "note": "Only online games count. Figures refresh a few times per hour."

@@ -3,6 +3,7 @@ import { getAllCards } from '@/lib/data/cardLoader';
 import { usageGroupKey } from '@/lib/cards/usageLive';
 import type { CharacterCard, MissionCard, GameLogEntry, PlayerState } from '@/lib/engine/types';
 import { DAILY_PLAY_RETENTION_DAYS, deckSignature } from '@/lib/stats/dailyPlay';
+import { getReplayPayload } from '@/lib/db/replayCompression';
 
 const BATCH_SIZE = 50;
 const MAX_PAGES = 40;
@@ -164,6 +165,7 @@ export async function accumulateCardGameStats(): Promise<{ processed: number }> 
         player1Id: true,
         player2Id: true,
         gameState: true,
+        gameStateGz: true,
         completedAt: true,
         isEvolving: true,
       },
@@ -193,7 +195,7 @@ export async function accumulateCardGameStats(): Promise<{ processed: number }> 
     const dailyPlay = new Map<string, { games: number; evolving: number; players: Set<string>; decks: Set<string> }>();
     let sinceYield = 0;
     for (const game of games) {
-      const payload = game.gameState as unknown as SavedGamePayload | null;
+      const payload = getReplayPayload<SavedGamePayload>(game);
       if (!payload || typeof payload !== 'object') continue;
       const winnerSide = game.winnerId
         ? (game.winnerId === game.player1Id ? 'player1' : game.winnerId === game.player2Id ? 'player2' : null)

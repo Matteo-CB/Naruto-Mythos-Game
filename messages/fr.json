@@ -3925,9 +3925,6 @@
     "perDayChart": "Parties par jour",
     "today": "Aujourd'hui",
     "todayHint": "Depuis minuit",
-    "activeDays": "Jours avec des parties",
-    "evolving": "Parties Évolutif",
-    "evolvingHint": "Comprises dans le total",
     "busiestDay": "Jour le plus actif",
     "busiestDayValue": "{day} avec {games} parties",
     "note": "Seules les parties en ligne comptent. Les chiffres se mettent à jour plusieurs fois par heure."
