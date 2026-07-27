@@ -20,6 +20,15 @@ function preferredSlug(card: CardData): string {
   return `${base}-${card.number}${suffix}`;
 }
 
+const RETIRED_SLUGS: Record<string, string> = {
+  'doki-66': 'KS-066-UC',
+  'gama-bunta-94': 'KS-094-C',
+  'gamakitchi-96': 'KS-096-C',
+  'kyodaigumo-103': 'KS-103-UC',
+  'nine-tails-129': 'KS-129-R',
+  'nine-tails-129-ra': 'KS-129-RA',
+};
+
 let idToSlug: Map<string, string> | null = null;
 let slugToId: Map<string, string> | null = null;
 
@@ -38,6 +47,10 @@ function build(): void {
 
     idToSlug.set(card.id, slug);
     slugToId.set(slug, card.id);
+  }
+
+  for (const [retired, id] of Object.entries(RETIRED_SLUGS)) {
+    if (!slugToId.has(retired) && idToSlug.has(id)) slugToId.set(retired, id);
   }
 }
 
