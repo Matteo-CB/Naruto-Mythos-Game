@@ -886,11 +886,11 @@ export const effectDescriptionsEs: Record<string, string[]> = {
 
   'KS-115-R': [
     '[⧗] Los personajes aliados en esta misión no pueden ser ocultados por efectos enemigos.',
-    'Mueve un personaje aliado en esta misión.',
+    'Mueve un personaje aliado de otra misión a esta misión.',
   ],
   'KS-115-RA': [
     '[⧗] Los personajes aliados en esta misión no pueden ser ocultados por efectos enemigos.',
-    'Mueve un personaje aliado en esta misión.',
+    'Mueve un personaje aliado de otra misión a esta misión.',
   ],
 
   'KS-127-R': [

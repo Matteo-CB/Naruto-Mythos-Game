@@ -1110,11 +1110,11 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   
   'KS-115-R': [
     '[⧗] Les personnages alliés dans cette mission ne peuvent pas être cachés par des effets ennemis.',
-    'Deplacez un personnage allie dans cette mission.',
+    "Déplacez un personnage allié d'une autre mission vers cette mission.",
   ],
   'KS-115-RA': [
     '[⧗] Les personnages alliés dans cette mission ne peuvent pas être cachés par des effets ennemis.',
-    'Deplacez un personnage allie dans cette mission.',
+    "Déplacez un personnage allié d'une autre mission vers cette mission.",
   ],
 
   

@@ -1307,7 +1307,7 @@
         "jiraiya132ConfirmUpgrade": "UPGRADE : L'adversaire doit choisir des personnages à vaincre jusqu'à n'avoir que 2 personnages assignés à cette mission.",
         "hinata114ConfirmMain": "MAIN : POWERUP 2. POWERUP 1 un autre personnage.",
         "hinata114ConfirmUpgrade": "UPGRADE : Retirez tous les jetons de Puissance d'un personnage ennemi en jeu.",
-        "shino115ConfirmAmbush": "EMBUSCADE : Déplacez un personnage allié de cette mission vers une autre mission.",
+        "shino115ConfirmAmbush": "EMBUSCADE : Déplacez un personnage allié d'une autre mission vers cette mission.",
         "neji116ConfirmMain": "MAIN : Vaincre un personnage dans cette mission avec exactement Puissance 4.",
         "neji116ConfirmUpgrade": "UPGRADE : Vaincre un personnage avec exactement Puissance 6 dans cette mission.",
         "rockLee117ConfirmUpgrade": "UPGRADE : Révélez et défaussez la carte du dessus de votre deck : POWERUP X où X est le coût de la carte défaussée.",

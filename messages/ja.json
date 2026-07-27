@@ -1305,7 +1305,7 @@
         "jiraiya132ConfirmUpgrade": "UPGRADE：相手は、このミッションに割り当てたキャラクターが2体以下になるまで撃破するキャラクターを選ばなければならない。",
         "hinata114ConfirmMain": "MAIN：POWERUP 2。他のキャラクターに POWERUP 1。",
         "hinata114ConfirmUpgrade": "UPGRADE：場の敵キャラクターからパワートークンをすべて取り除く。",
-        "shino115ConfirmAmbush": "AMBUSH：このミッションの味方キャラクターを別のミッションへ移動させる。",
+        "shino115ConfirmAmbush": "AMBUSH：他のミッションから味方キャラクター1体をこのミッションへ移動させる。",
         "neji116ConfirmMain": "MAIN：このミッションのちょうどパワー4のキャラクターを撃破する。",
         "neji116ConfirmUpgrade": "UPGRADE：このミッションのちょうどパワー6のキャラクターを撃破する。",
         "rockLee117ConfirmUpgrade": "UPGRADE：山札の一番上を公開して捨てる：POWERUP X、X は捨てたカードのコスト。",

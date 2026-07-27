@@ -1101,11 +1101,11 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   
   'KS-115-R': [
     '[⧗] Friendly characters in this mission cannot be hidden by enemy effects.',
-    'Move one friendly character in this mission.',
+    'Move one friendly character from another mission into this mission.',
   ],
   'KS-115-RA': [
     '[⧗] Friendly characters in this mission cannot be hidden by enemy effects.',
-    'Move one friendly character in this mission.',
+    'Move one friendly character from another mission into this mission.',
   ],
 
   

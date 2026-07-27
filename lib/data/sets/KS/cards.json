@@ -4435,7 +4435,7 @@
         {
           "type": "AMBUSH",
           "description": "Move one friendly character in this mission.",
-          "description_fr": "Déplacez un personnage allié dans cette mission vers une autre mission."
+          "description_fr": "Déplacez un personnage allié d'une autre mission vers cette mission."
         }
       ],
       "image_url": "/images/cards/KS/rare/KS-115-R.webp",
@@ -7046,7 +7046,7 @@
         {
           "type": "AMBUSH",
           "description": "Move one friendly character in this mission.",
-          "description_fr": "Déplacez un personnage allié dans cette mission vers une autre mission."
+          "description_fr": "Déplacez un personnage allié d'une autre mission vers cette mission."
         }
       ],
       "image_url": "/images/cards/KS/rare_art/KS-115-RA.webp",

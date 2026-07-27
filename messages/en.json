@@ -1301,7 +1301,7 @@
         "jiraiya132ConfirmUpgrade": "UPGRADE: The opponent must choose characters to be defeated until they only have up to 2 assigned in this mission.",
         "hinata114ConfirmMain": "MAIN: POWERUP 2. POWERUP 1 another character.",
         "hinata114ConfirmUpgrade": "UPGRADE: Remove all Power tokens from an enemy character in play.",
-        "shino115ConfirmAmbush": "AMBUSH: Move a friendly character in this mission to another mission.",
+        "shino115ConfirmAmbush": "AMBUSH: Move a friendly character from another mission into this mission.",
         "neji116ConfirmMain": "MAIN: Defeat a character in this mission with exactly Power 4.",
         "neji116ConfirmUpgrade": "UPGRADE: Defeat a character with exactly Power 6 in this mission.",
         "rockLee117ConfirmUpgrade": "UPGRADE: Reveal and discard the top card of your deck: POWERUP X where X is the cost of the discarded card.",
