@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
 import { Z_APP_MODAL } from '@/lib/ui/zIndex';
@@ -186,6 +187,13 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
     update();
   }, [mounted, dayCards, update]);
 
+  useEffect(() => {
+    if (openDay === null) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpenDay(null); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [openDay]);
+
   const detail = (() => {
     if (openDay === null) return null;
     const card = dayCards.find((c) => c.scheduleWeekday === openDay);
@@ -199,6 +207,128 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
     borderRadius: 9999,
     boxShadow: '0 4px 14px rgba(0,0,0,0.55)',
   } as const;
+
+  const detailModal = (
+    <AnimatePresence>
+      {detail && (
+        <motion.div
+          key="calendar-detail-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0,0,0,0.75)', zIndex: Z_APP_MODAL }}
+          onClick={() => setOpenDay(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <motion.div
+            key="calendar-detail-panel"
+            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.98 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden"
+            style={{ backgroundColor: '#111114', border: '1px solid #26262c', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}
+          >
+            <header className="flex items-center justify-between gap-3 px-4 py-3" style={{ borderBottom: '1px solid #1c1c20' }}>
+              <div className="flex min-w-0 flex-col gap-1">
+                <span className="font-display truncate text-base uppercase tracking-widest" style={{ color: '#e8e6df' }}>
+                  {detail.card.dayLabel}
+                </span>
+                <span
+                  className="font-display self-start text-[9px] uppercase tracking-wider px-1.5 py-0.5"
+                  style={{ backgroundColor: KIND_COLORS[detail.spec.kind] + '1f', color: KIND_COLORS[detail.spec.kind] }}
+                >
+                  {t(`kind.${detail.spec.kind}` as `kind.${TourneyKind}`)}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpenDay(null)}
+                className="shrink-0 px-2 py-1 text-[11px] uppercase tracking-widest"
+                style={{ color: '#888', background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                {t('close')}
+              </button>
+            </header>
+
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#61616a' }}>
+                    {t('rules.regLabel')}
+                  </span>
+                  <span className="text-xs tabular-nums" style={{ color: '#cfcdc6' }}>{detail.card.reg}</span>
+                </div>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#61616a' }}>
+                    {t('rules.startLabel')}
+                  </span>
+                  <span className="text-xs tabular-nums" style={{ color: '#f0eee7' }}>{detail.card.start}</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <span className="font-display text-[9px] uppercase tracking-[0.22em]" style={{ color: '#6d6d74' }}>
+                  {t('detailsRules')}
+                </span>
+                <div className="flex flex-wrap gap-1">
+                  {ruleChips(detail.spec, t).map((chip, i) => (
+                    <span
+                      key={i}
+                      className="text-[10px] leading-tight px-1.5 py-1"
+                      style={{ backgroundColor: 'rgba(255,255,255,0.045)', color: '#9b9ba1' }}
+                    >
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {detail.spec.partner === 'nwl' && (
+                <div className="flex flex-col gap-1.5 px-3 py-3" style={{ backgroundColor: '#161619' }}>
+                  <span className="font-display text-[9px] uppercase tracking-[0.22em]" style={{ color: KIND_COLORS[detail.spec.kind] }}>
+                    {t('rules.rewardsLabel')}
+                  </span>
+                  <span className="text-[11px] leading-relaxed" style={{ color: '#cfcdc6' }}>
+                    {t('rules.nwlPrize', {
+                      credit: NWL_FIRST_PLACE_STORE_CREDIT_GBP,
+                      paypal: NWL_FIRST_PLACE_PAYPAL_GBP,
+                    })}
+                  </span>
+                  <span className="text-[11px] leading-relaxed" style={{ color: '#cfcdc6' }}>
+                    {t('rules.nwlChunin', { places: NWL_CHUNIN_PODIUM_PLACES })}
+                  </span>
+                </div>
+              )}
+
+              {detail.live.length > 0 && (
+                <div className="flex flex-col gap-1.5">
+                  {detail.live.map((tr) => {
+                    const c = KIND_COLORS[inferTournamentKind(tr)];
+                    return (
+                      <Link
+                        key={tr.id}
+                        href={`/tournaments/${tr.id}` as '/'}
+                        onClick={() => setOpenDay(null)}
+                        className="font-display block text-center text-[10px] uppercase tracking-widest px-2 py-2 transition-opacity hover:opacity-80"
+                        style={{ backgroundColor: c + '1f', color: c }}
+                      >
+                        {tr.status === 'registration' ? t('registrationOpen') : t('view')}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   return (
     <section className="w-full">
@@ -339,125 +469,8 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
         {t('localTimeNote')}
       </p>
 
-      <AnimatePresence>
-        {detail && (
-          <motion.div
-            key="calendar-detail-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 flex items-center justify-center p-4"
-            style={{ backgroundColor: 'rgba(0,0,0,0.75)', zIndex: Z_APP_MODAL }}
-            onClick={() => setOpenDay(null)}
-            role="dialog"
-            aria-modal="true"
-          >
-            <motion.div
-              key="calendar-detail-panel"
-              initial={{ opacity: 0, y: 12, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 12, scale: 0.98 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden"
-              style={{ backgroundColor: '#111114', border: '1px solid #26262c', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}
-            >
-              <header className="flex items-center justify-between gap-3 px-4 py-3" style={{ borderBottom: '1px solid #1c1c20' }}>
-                <div className="flex min-w-0 flex-col gap-1">
-                  <span className="font-display truncate text-base uppercase tracking-widest" style={{ color: '#e8e6df' }}>
-                    {detail.card.dayLabel}
-                  </span>
-                  <span
-                    className="font-display self-start text-[9px] uppercase tracking-wider px-1.5 py-0.5"
-                    style={{ backgroundColor: KIND_COLORS[detail.spec.kind] + '1f', color: KIND_COLORS[detail.spec.kind] }}
-                  >
-                    {t(`kind.${detail.spec.kind}` as `kind.${TourneyKind}`)}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setOpenDay(null)}
-                  className="shrink-0 px-2 py-1 text-[11px] uppercase tracking-widest"
-                  style={{ color: '#888', background: 'none', border: 'none', cursor: 'pointer' }}
-                >
-                  {t('close')}
-                </button>
-              </header>
+      {mounted && createPortal(detailModal, document.body)}
 
-              <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#61616a' }}>
-                      {t('rules.regLabel')}
-                    </span>
-                    <span className="text-xs tabular-nums" style={{ color: '#cfcdc6' }}>{detail.card.reg}</span>
-                  </div>
-                  <div className="flex items-baseline justify-between gap-3">
-                    <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#61616a' }}>
-                      {t('rules.startLabel')}
-                    </span>
-                    <span className="text-xs tabular-nums" style={{ color: '#f0eee7' }}>{detail.card.start}</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <span className="font-display text-[9px] uppercase tracking-[0.22em]" style={{ color: '#6d6d74' }}>
-                    {t('detailsRules')}
-                  </span>
-                  <div className="flex flex-wrap gap-1">
-                    {ruleChips(detail.spec, t).map((chip, i) => (
-                      <span
-                        key={i}
-                        className="text-[10px] leading-tight px-1.5 py-1"
-                        style={{ backgroundColor: 'rgba(255,255,255,0.045)', color: '#9b9ba1' }}
-                      >
-                        {chip}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {detail.spec.partner === 'nwl' && (
-                  <div className="flex flex-col gap-1.5 px-3 py-3" style={{ backgroundColor: '#161619' }}>
-                    <span className="font-display text-[9px] uppercase tracking-[0.22em]" style={{ color: KIND_COLORS[detail.spec.kind] }}>
-                      {t('rules.rewardsLabel')}
-                    </span>
-                    <span className="text-[11px] leading-relaxed" style={{ color: '#cfcdc6' }}>
-                      {t('rules.nwlPrize', {
-                        credit: NWL_FIRST_PLACE_STORE_CREDIT_GBP,
-                        paypal: NWL_FIRST_PLACE_PAYPAL_GBP,
-                      })}
-                    </span>
-                    <span className="text-[11px] leading-relaxed" style={{ color: '#cfcdc6' }}>
-                      {t('rules.nwlChunin', { places: NWL_CHUNIN_PODIUM_PLACES })}
-                    </span>
-                  </div>
-                )}
-
-                {detail.live.length > 0 && (
-                  <div className="flex flex-col gap-1.5">
-                    {detail.live.map((tr) => {
-                      const c = KIND_COLORS[inferTournamentKind(tr)];
-                      return (
-                        <Link
-                          key={tr.id}
-                          href={`/tournaments/${tr.id}` as '/'}
-                          onClick={() => setOpenDay(null)}
-                          className="font-display block text-center text-[10px] uppercase tracking-widest px-2 py-2 transition-opacity hover:opacity-80"
-                          style={{ backgroundColor: c + '1f', color: c }}
-                        >
-                          {tr.status === 'registration' ? t('registrationOpen') : t('view')}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
     </section>
   );
