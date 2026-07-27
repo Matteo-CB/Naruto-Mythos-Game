@@ -2773,7 +2773,8 @@
     "thirdPlaceMatch": "Finale per il terzo posto",
     "sealedBuildToRegister": "Costruisci il tuo mazzo sealed per confermare l’iscrizione.",
     "sealedRegistrationPending": "Iscrizione incompleta: costruisci il tuo mazzo",
-    "privateOnlyNotice": "Il tuo torneo è privato: condividi il codice di accesso con i giocatori che vuoi."
+    "privateOnlyNotice": "Il tuo torneo è privato: condividi il codice di accesso con i giocatori che vuoi.",
+    "deleteTournamentConfirmAction": "Conferma l’eliminazione"
   },
   "game": {
     "turn": "Turno {turn}",
@@ -3864,8 +3865,8 @@
       "regLabel": "Iscrizioni",
       "startLabel": "Inizio",
       "rewardsLabel": "Ricompense",
-      "nwlPrize": "1º: {credit} sterline di credito negozio o {paypal} sterline via PayPal",
-      "nwlChunin": "Top {places}: ruolo Chunin, valido solo per il prossimo torneo Chunin"
+      "nwlPrize": "1º: £{credit} di credito negozio o £{paypal} via PayPal",
+      "nwlChunin": "Top {places}: ruolo Chunin. Dà accesso al torneo Chunin del giorno dopo, con ricompense più grandi. Dettagli sul Discord di New World Loot. Il ruolo viene rimosso ogni lunedì, quindi vale solo per quel torneo."
     },
     "today": "Oggi",
     "button": "Calendario",
@@ -3875,7 +3876,19 @@
     "restDay": "Giorno di riposo, nessun torneo in programma",
     "localTimeNote": "Gli orari sono mostrati nel tuo fuso orario.",
     "openDetails": "Vedi i dettagli di questo torneo",
-    "detailsRules": "Regole"
+    "detailsRules": "Regole",
+    "detail": {
+      "formatSwiss": "Formato svizzero. Tutti giocano ogni turno, nessuno viene eliminato. Vince il miglior bilancio.",
+      "formatElim": "Eliminazione diretta. Una sconfitta e sei fuori. Se i giocatori non sono una potenza di due, le teste di serie passano il primo turno.",
+      "slots": "{count} posti al massimo, in ordine di iscrizione.",
+      "sealed": "Sealed. Apri {count} booster all’iscrizione e costruisci il mazzo solo con quelle carte.",
+      "banList": "Lista bandite standard. Le carte bandite non si possono giocare.",
+      "allCards": "Nessuna lista bandite. Tutte le carte sono ammesse.",
+      "discord": "Serve un account Discord collegato per partecipare.",
+      "partner": "Organizzato con {partner}.",
+      "schedule": "Le iscrizioni aprono alle {reg}. Il torneo inizia alle {start}.",
+      "presence": "Sii sul sito quando inizia la tua partita. Chi non si presenta è dichiarato assente e perde quella partita."
+    }
   },
   "adminFeatured": {
     "title": "Carte holo del menu",

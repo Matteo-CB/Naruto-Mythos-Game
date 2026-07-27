@@ -3020,7 +3020,8 @@
     "thirdPlaceMatch": "3位決定戦",
     "sealedBuildToRegister": "シールドデッキを組んでエントリーを確定してください。",
     "sealedRegistrationPending": "エントリー未完了：デッキを組んでください",
-    "privateOnlyNotice": "あなたの大会は非公開です。参加コードを招きたいプレイヤーに共有してください。"
+    "privateOnlyNotice": "あなたの大会は非公開です。参加コードを招きたいプレイヤーに共有してください。",
+    "deleteTournamentConfirmAction": "削除を確定する"
   },
   "playHub": {
     "title": "プレイ",
@@ -3867,8 +3868,8 @@
       "regLabel": "エントリー",
       "startLabel": "開始",
       "rewardsLabel": "報酬",
-      "nwlPrize": "1位：ストアクレジット{credit}ポンド、またはPayPalで{paypal}ポンド",
-      "nwlChunin": "上位{places}名：中忍ロール。次回の中忍トーナメントのみ有効"
+      "nwlPrize": "1位：ストアクレジット£{credit}、またはPayPalで£{paypal}",
+      "nwlChunin": "上位{places}名：中忍ロール。翌日に開催される中忍トーナメントに参加でき、報酬はさらに大きくなります。詳細はNew World LootのDiscordへ。ロールは毎週月曜に削除されるため、その大会限りです。"
     },
     "today": "今日",
     "button": "カレンダー",
@@ -3878,7 +3879,19 @@
     "restDay": "休息日、予定されている大会はありません",
     "localTimeNote": "時刻はお使いの環境のタイムゾーンで表示されます。",
     "openDetails": "この大会の詳細を見る",
-    "detailsRules": "ルール"
+    "detailsRules": "ルール",
+    "detail": {
+      "formatSwiss": "スイス形式。全員が毎ラウンド対戦し、脱落はありません。成績が最も良い人が優勝します。",
+      "formatElim": "シングルエリミネーション。1敗で敗退です。参加人数が2の累乗でない場合、上位シードは初戦が不戦勝になります。",
+      "slots": "最大{count}名。先着順です。",
+      "sealed": "シールド。登録時にブースターを{count}パック開封し、そのカードだけでデッキを組みます。",
+      "banList": "標準の禁止リストあり。禁止カードは使用できません。",
+      "allCards": "禁止リストなし。すべてのカードが使用できます。",
+      "discord": "参加にはDiscordアカウントの連携が必要です。",
+      "partner": "{partner}との共催です。",
+      "schedule": "登録は{reg}に開始。大会は{start}に開始します。",
+      "presence": "自分の対戦が始まる時間にサイトにいてください。現れない場合は不在と判定され、その対戦は不戦敗になります。"
+    }
   },
   "adminFeatured": {
     "title": "メニューのホロカード",

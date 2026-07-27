@@ -59,16 +59,21 @@ function parisWeekday(d: Date): number {
   }
 }
 
-function ruleChips(spec: WeeklyDaySpec, t: ReturnType<typeof useTranslations>): string[] {
-  const chips: string[] = [];
-  chips.push(spec.format === 'elimination' ? t('rules.formatElim') : t('rules.formatSwiss'));
-  chips.push(t('rules.slots', { count: maxPlayersForSpec(spec) }));
-  if (spec.gameMode === 'sealed') chips.push(t('rules.sealed', { count: AUTO_SEALED_BOOSTER_COUNT }));
-  else if (!spec.useBanList) chips.push(t('rules.allCards'));
-  else chips.push(t('rules.banList'));
-  if (spec.partner) chips.push(t('rules.partnerBy', { partner: PARTNER_NAMES[spec.partner] ?? spec.partner }));
-  chips.push(t('rules.discord'));
-  return chips;
+function detailLines(
+  spec: WeeklyDaySpec,
+  card: DayCard,
+  t: ReturnType<typeof useTranslations>,
+): string[] {
+  const lines: string[] = [];
+  lines.push(spec.format === 'elimination' ? t('detail.formatElim') : t('detail.formatSwiss'));
+  lines.push(t('detail.slots', { count: maxPlayersForSpec(spec) }));
+  if (spec.gameMode === 'sealed') lines.push(t('detail.sealed', { count: AUTO_SEALED_BOOSTER_COUNT }));
+  lines.push(spec.useBanList ? t('detail.banList') : t('detail.allCards'));
+  lines.push(t('detail.schedule', { reg: card.reg, start: card.start }));
+  lines.push(t('detail.presence'));
+  lines.push(t('detail.discord'));
+  if (spec.partner) lines.push(t('detail.partner', { partner: PARTNER_NAMES[spec.partner] ?? spec.partner }));
+  return lines;
 }
 
 export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: TournamentLite[] }) {
@@ -256,36 +261,22 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
             </header>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#61616a' }}>
-                    {t('rules.regLabel')}
-                  </span>
-                  <span className="text-xs tabular-nums" style={{ color: '#cfcdc6' }}>{detail.card.reg}</span>
-                </div>
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#61616a' }}>
-                    {t('rules.startLabel')}
-                  </span>
-                  <span className="text-xs tabular-nums" style={{ color: '#f0eee7' }}>{detail.card.start}</span>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-2">
                 <span className="font-display text-[9px] uppercase tracking-[0.22em]" style={{ color: '#6d6d74' }}>
                   {t('detailsRules')}
                 </span>
-                <div className="flex flex-wrap gap-1">
-                  {ruleChips(detail.spec, t).map((chip, i) => (
-                    <span
-                      key={i}
-                      className="text-[10px] leading-tight px-1.5 py-1"
-                      style={{ backgroundColor: 'rgba(255,255,255,0.045)', color: '#9b9ba1' }}
-                    >
-                      {chip}
-                    </span>
+                <ul className="flex flex-col gap-2">
+                  {detailLines(detail.spec, detail.card, t).map((line, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span aria-hidden="true" className="shrink-0" style={{ color: KIND_COLORS[detail.spec.kind] }}>
+                        &bull;
+                      </span>
+                      <span className="text-[11px] leading-relaxed" style={{ color: '#b9b7b1' }}>
+                        {line}
+                      </span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
 
               {detail.spec.partner === 'nwl' && (

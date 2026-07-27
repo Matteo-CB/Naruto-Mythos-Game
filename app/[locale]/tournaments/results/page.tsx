@@ -37,9 +37,16 @@ export default function TournamentResultsPage() {
   useEffect(() => {
     if (!session?.user) return;
     setLoading(true);
-    fetch('/api/tournaments?status=completed')
-      .then((res) => res.json())
-      .then((data) => { setResults(data.tournaments || []); setLoading(false); })
+    Promise.all([
+      fetch('/api/tournaments?status=completed').then((res) => res.json()).catch(() => ({})),
+      fetch('/api/tournaments?status=cancelled').then((res) => res.json()).catch(() => ({})),
+    ])
+      .then(([done, cancelled]) => {
+        const merged = [...(done.tournaments || []), ...(cancelled.tournaments || [])];
+        merged.sort((a, b) => String(b.completedAt ?? b.createdAt ?? '').localeCompare(String(a.completedAt ?? a.createdAt ?? '')));
+        setResults(merged);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, [session]);
 

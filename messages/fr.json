@@ -3022,7 +3022,8 @@
     "thirdPlaceMatch": "Match pour la 3e place",
     "sealedBuildToRegister": "Construis ton deck scellé pour confirmer ton inscription.",
     "sealedRegistrationPending": "Inscription incomplète : construis ton deck",
-    "privateOnlyNotice": "Ton tournoi est privé : partage son code d’accès aux joueurs de ton choix."
+    "privateOnlyNotice": "Ton tournoi est privé : partage son code d’accès aux joueurs de ton choix.",
+    "deleteTournamentConfirmAction": "Confirmer la suppression"
   },
   "playHub": {
     "title": "Jouer",
@@ -3869,8 +3870,8 @@
       "regLabel": "Inscriptions",
       "startLabel": "Début",
       "rewardsLabel": "Récompenses",
-      "nwlPrize": "1er : {credit} livres en bon d’achat ou {paypal} livres PayPal",
-      "nwlChunin": "Top {places} : rôle Chunin, valable pour le prochain tournoi Chunin uniquement"
+      "nwlPrize": "1er : {credit} £ en bon d’achat ou {paypal} £ par PayPal",
+      "nwlChunin": "Top {places} : rôle Chunin. Il donne accès au tournoi Chunin du lendemain, où les récompenses sont plus grosses. Détails sur le Discord New World Loot. Le rôle est retiré chaque lundi, il ne vaut donc que pour ce tournoi."
     },
     "today": "Aujourd'hui",
     "button": "Calendrier",
@@ -3880,7 +3881,19 @@
     "restDay": "Jour de repos, aucun tournoi prévu",
     "localTimeNote": "Les horaires sont affichés dans ton fuseau horaire.",
     "openDetails": "Voir le détail de ce tournoi",
-    "detailsRules": "Règles"
+    "detailsRules": "Règles",
+    "detail": {
+      "formatSwiss": "Format suisse. Tout le monde joue chaque ronde, personne n’est éliminé. Le meilleur bilan l’emporte.",
+      "formatElim": "Élimination directe. Une défaite et c’est fini. Si le nombre de joueurs n’est pas une puissance de deux, les mieux classés passent un tour au premier round.",
+      "slots": "{count} places maximum, attribuées par ordre d’inscription.",
+      "sealed": "Scellé. Tu ouvres {count} boosters à l’inscription et tu construis ton deck uniquement avec ces cartes.",
+      "banList": "Liste de bannissement standard. Les cartes bannies ne peuvent pas être jouées.",
+      "allCards": "Aucune liste de bannissement. Toutes les cartes sont autorisées.",
+      "discord": "Un compte Discord lié est obligatoire pour participer.",
+      "partner": "Organisé avec {partner}.",
+      "schedule": "Les inscriptions ouvrent à {reg}. Le tournoi démarre à {start}.",
+      "presence": "Sois sur le site au lancement de ton match. Un joueur qui ne se présente jamais est déclaré absent et perd ce match."
+    }
   },
   "adminFeatured": {
     "title": "Cartes holo du menu",

@@ -2773,7 +2773,8 @@
     "thirdPlaceMatch": "Disputa pelo terceiro lugar",
     "sealedBuildToRegister": "Constrói o teu deck selado para confirmar a inscrição.",
     "sealedRegistrationPending": "Inscrição incompleta: constrói o teu deck",
-    "privateOnlyNotice": "O teu torneio é privado: partilha o código de entrada com os jogadores que quiseres."
+    "privateOnlyNotice": "O teu torneio é privado: partilha o código de entrada com os jogadores que quiseres.",
+    "deleteTournamentConfirmAction": "Confirmar a exclusão"
   },
   "game": {
     "turn": "Turno {turn}",
@@ -3864,8 +3865,8 @@
       "regLabel": "Inscrições",
       "startLabel": "Início",
       "rewardsLabel": "Recompensas",
-      "nwlPrize": "1.º: {credit} libras em crédito na loja ou {paypal} libras via PayPal",
-      "nwlChunin": "Top {places}: cargo Chunin, válido apenas para o próximo torneio Chunin"
+      "nwlPrize": "1.º: £{credit} em crédito na loja ou £{paypal} via PayPal",
+      "nwlChunin": "Top {places}: cargo Chunin. Dá acesso ao torneio Chunin do dia seguinte, com recompensas maiores. Detalhes no Discord da New World Loot. O cargo é removido toda segunda-feira, então vale só para esse torneio."
     },
     "today": "Hoje",
     "button": "Calendário",
@@ -3875,7 +3876,19 @@
     "restDay": "Dia de descanso, sem torneio agendado",
     "localTimeNote": "Os horários são apresentados no teu fuso horário.",
     "openDetails": "Ver os detalhes deste torneio",
-    "detailsRules": "Regras"
+    "detailsRules": "Regras",
+    "detail": {
+      "formatSwiss": "Formato suíço. Todos jogam todas as rodadas, ninguém é eliminado. Vence o melhor aproveitamento.",
+      "formatElim": "Eliminação simples. Uma derrota e você está fora. Se o número de jogadores não for potência de dois, os melhores classificados passam direto na primeira rodada.",
+      "slots": "{count} vagas no máximo, por ordem de inscrição.",
+      "sealed": "Sealed. Você abre {count} boosters ao se inscrever e monta o deck só com essas cartas.",
+      "banList": "Lista de banidas padrão. Cartas banidas não podem ser jogadas.",
+      "allCards": "Sem lista de banidas. Todas as cartas são permitidas.",
+      "discord": "É preciso ter uma conta do Discord vinculada para participar.",
+      "partner": "Organizado com {partner}.",
+      "schedule": "As inscrições abrem às {reg}. O torneio começa às {start}.",
+      "presence": "Esteja no site quando sua partida começar. Quem não aparece é declarado ausente e perde a partida."
+    }
   },
   "adminFeatured": {
     "title": "Cartas holo do menu",

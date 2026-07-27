@@ -15,6 +15,8 @@
         "fix",
         "fix",
         "feature",
+        "feature",
+        "fix",
         "feature"
       ],
       "changes_fr": [
@@ -28,7 +30,9 @@
         "Les titres anglais des cartes ont tous été revérifiés sur la carte imprimée et corrigés.",
         "Cinq cartes portaient un mauvais nom anglais, dont Gamabunta, Gamakichi et l’Araignée Géante.",
         "Le calendrier des tournois est plus compact et chaque jour se clique pour voir tout le détail.",
-        "Les récompenses du tournoi New World Loot sont expliquées dans le calendrier et sur Discord."
+        "Les récompenses du tournoi New World Loot sont expliquées dans le calendrier et sur Discord.",
+        "Les cartes Mission et les cartes qui s’attachent à une mission s’affichent enfin en grand et à l’horizontale.",
+        "Le détail d’un jour du calendrier explique maintenant toutes les règles du tournoi, simplement."
       ],
       "changes_en": [
         "You can pick your own colour and your opponent colour, and the board uses them in your games.",
@@ -41,7 +45,9 @@
         "Every English card title was re-checked against the printed card and corrected.",
         "Five cards had the wrong English name, including Gamabunta, Gamakichi and the Giant Spider.",
         "The tournament calendar is more compact and each day opens full details when clicked.",
-        "The New World Loot tournament rewards are now explained in the calendar and on Discord."
+        "The New World Loot tournament rewards are now explained in the calendar and on Discord.",
+        "Mission cards and cards that attach to a mission finally show large and horizontal.",
+        "A calendar day now explains every rule of that tournament in plain words."
       ]
     },
     {

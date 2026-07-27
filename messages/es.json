@@ -3021,7 +3021,8 @@
     "thirdPlaceMatch": "Partido por el tercer puesto",
     "sealedBuildToRegister": "Construye tu mazo sellado para confirmar tu inscripción.",
     "sealedRegistrationPending": "Inscripción incompleta: construye tu mazo",
-    "privateOnlyNotice": "Tu torneo es privado: comparte su código de acceso con los jugadores que quieras."
+    "privateOnlyNotice": "Tu torneo es privado: comparte su código de acceso con los jugadores que quieras.",
+    "deleteTournamentConfirmAction": "Confirmar la eliminación"
   },
   "playHub": {
     "title": "Jugar",
@@ -3868,8 +3869,8 @@
       "regLabel": "Inscripciones",
       "startLabel": "Inicio",
       "rewardsLabel": "Recompensas",
-      "nwlPrize": "1.º: {credit} libras en saldo de tienda o {paypal} libras por PayPal",
-      "nwlChunin": "Top {places}: rol Chunin, válido solo para el siguiente torneo Chunin"
+      "nwlPrize": "1.º: {credit} £ en saldo de tienda o {paypal} £ por PayPal",
+      "nwlChunin": "Top {places}: rol Chunin. Da acceso al torneo Chunin del día siguiente, con recompensas mayores. Detalles en el Discord de New World Loot. El rol se retira cada lunes, así que solo vale para ese torneo."
     },
     "today": "Hoy",
     "button": "Calendario",
@@ -3879,7 +3880,19 @@
     "restDay": "Día de descanso, sin torneo programado",
     "localTimeNote": "Los horarios se muestran en tu zona horaria.",
     "openDetails": "Ver los detalles de este torneo",
-    "detailsRules": "Reglas"
+    "detailsRules": "Reglas",
+    "detail": {
+      "formatSwiss": "Formato suizo. Todos juegan cada ronda, nadie queda eliminado. Gana el mejor balance.",
+      "formatElim": "Eliminación directa. Una derrota y estás fuera. Si el número de jugadores no es potencia de dos, los mejores clasificados pasan de ronda al inicio.",
+      "slots": "{count} plazas máximo, por orden de inscripción.",
+      "sealed": "Sellado. Abres {count} sobres al inscribirte y construyes tu mazo solo con esas cartas.",
+      "banList": "Lista de prohibidas estándar. Las cartas prohibidas no se pueden jugar.",
+      "allCards": "Sin lista de prohibidas. Todas las cartas están permitidas.",
+      "discord": "Se necesita una cuenta de Discord vinculada para participar.",
+      "partner": "Organizado con {partner}.",
+      "schedule": "Las inscripciones abren a las {reg}. El torneo empieza a las {start}.",
+      "presence": "Estate en la web cuando empiece tu partida. Quien no aparece es declarado ausente y pierde esa partida."
+    }
   },
   "adminFeatured": {
     "title": "Cartas holo del menú",

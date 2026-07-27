@@ -3016,7 +3016,8 @@
     "thirdPlaceMatch": "Third place match",
     "sealedBuildToRegister": "Build your sealed deck to confirm your registration.",
     "sealedRegistrationPending": "Registration incomplete: build your deck",
-    "privateOnlyNotice": "Your tournament is private: share its join code with the players you want."
+    "privateOnlyNotice": "Your tournament is private: share its join code with the players you want.",
+    "deleteTournamentConfirmAction": "Confirm the deletion"
   },
   "playHub": {
     "title": "Play",
@@ -3863,8 +3864,8 @@
       "regLabel": "Registration",
       "startLabel": "Start",
       "rewardsLabel": "Rewards",
-      "nwlPrize": "1st: {credit} pounds store credit or {paypal} pounds PayPal",
-      "nwlChunin": "Top {places}: Chunin role, valid for the next Chunin tournament only"
+      "nwlPrize": "1st: £{credit} store credit or £{paypal} by PayPal",
+      "nwlChunin": "Top {places}: Chunin role. It opens the Chunin tournament held the next day, where the rewards are bigger. Details on the New World Loot Discord. The role is removed every Monday, so it counts for that tournament only."
     },
     "today": "Today",
     "button": "Schedule",
@@ -3874,7 +3875,19 @@
     "restDay": "Rest day, no scheduled tournament",
     "localTimeNote": "Times are shown in your local time zone.",
     "openDetails": "See the details of this tournament",
-    "detailsRules": "Rules"
+    "detailsRules": "Rules",
+    "detail": {
+      "formatSwiss": "Swiss format. Everyone plays every round, nobody is eliminated. The best record wins.",
+      "formatElim": "Single elimination. One loss and you are out. If the field is not a power of two, the best seeds get a bye in the first round.",
+      "slots": "{count} places maximum, taken in order of registration.",
+      "sealed": "Sealed. You open {count} boosters when you register and build your deck from those cards only.",
+      "banList": "Standard ban list. Banned cards cannot be played.",
+      "allCards": "No ban list. Every card is allowed.",
+      "discord": "A linked Discord account is required to take part.",
+      "partner": "Organised with {partner}.",
+      "schedule": "Registration opens at {reg}. The tournament starts at {start}.",
+      "presence": "Be on the site when your match starts. A player who never shows up is declared absent and forfeits that match."
+    }
   },
   "adminFeatured": {
     "title": "Menu holo cards",

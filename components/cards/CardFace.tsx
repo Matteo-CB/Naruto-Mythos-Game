@@ -8,6 +8,7 @@ import CardBack from './CardBack';
 import { HoloFoilOverlay } from './HoloFoilOverlay';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
+import { cardAspectRatio } from '@/lib/cards/orientation';
 
 const RARITY_COLORS: Record<Rarity, string> = {
   C: '#6b7280',       // gray
@@ -52,7 +53,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
     <div
       className={`relative overflow-hidden rounded-lg select-none ${className}`}
       style={{
-        aspectRatio: (card.card_type === 'mission' || (card.card_type === 'attachment' && card.attach_to === 'mission')) ? '3.5 / 2.5' : '2.5 / 3.5',
+        aspectRatio: cardAspectRatio(card),
         backgroundColor: '#141414',
       }}
     >

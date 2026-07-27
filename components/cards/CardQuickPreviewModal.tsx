@@ -13,6 +13,7 @@ import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { cardIdToSlug } from '@/lib/cards/slug';
 import { Z_APP_MODAL } from '@/lib/ui/zIndex';
 import type { CardData, MissionCard, Rarity } from '@/lib/engine/types';
+import { isLandscapeCard } from '@/lib/cards/orientation';
 
 const RARITY_COLORS: Record<Rarity, string> = {
   C: '#888888', UC: '#4a9e4a', R: '#4a7ab5', RA: '#8a5ab5',
@@ -32,7 +33,7 @@ export function CardQuickPreviewModal({ card, onClose }: { card: CardData; onClo
   const { bannedIds } = useBannedCards();
   const { unlockedIds } = useUnlockedVariants();
 
-  const isMission = card.card_type === 'mission';
+  const isMission = isLandscapeCard(card);
   const imgPath = normalizeImagePath(card.image_file);
   const isBanned = bannedIds.has(card.id);
   const locked = isLockedVariantCard(card) && !unlockedIds.has(card.id);

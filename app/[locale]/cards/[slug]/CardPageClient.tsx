@@ -30,6 +30,7 @@ import { useIsFinePointer } from '@/lib/hooks/useIsFinePointer';
 import { useCardUsage } from '@/lib/hooks/useCardUsage';
 import type { CardData, CharacterCard, MissionCard, Rarity } from '@/lib/engine/types';
 import { holoRarity } from '@/lib/cards/holoRarity';
+import { isLandscapeCard } from '@/lib/cards/orientation';
 
 const GOLD = '#c4a35a';
 
@@ -82,7 +83,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
   const isCharacter = card.card_type === 'character';
   const isMission = card.card_type === 'mission';
   const isAttachment = card.card_type === 'attachment';
-  const isLandscape = isMission || (isAttachment && card.attach_to === 'mission');
+  const isLandscape = isLandscapeCard(card);
 
   const localizedEffects = getCardEffectDescriptions(card.id, locale);
   const effects = card.effects.map((eff, i) => ({

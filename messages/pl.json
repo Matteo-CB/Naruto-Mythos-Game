@@ -2773,7 +2773,8 @@
     "thirdPlaceMatch": "Mecz o trzecie miejsce",
     "sealedBuildToRegister": "Zbuduj talię sealed, aby potwierdzić zapis.",
     "sealedRegistrationPending": "Zapis niekompletny: zbuduj talię",
-    "privateOnlyNotice": "Twój turniej jest prywatny: udostępnij kod dostępu wybranym graczom."
+    "privateOnlyNotice": "Twój turniej jest prywatny: udostępnij kod dostępu wybranym graczom.",
+    "deleteTournamentConfirmAction": "Potwierdź usunięcie"
   },
   "game": {
     "turn": "Tura {turn}",
@@ -3864,8 +3865,8 @@
       "regLabel": "Zapisy",
       "startLabel": "Start",
       "rewardsLabel": "Nagrody",
-      "nwlPrize": "1. miejsce: {credit} funtów kredytu w sklepie lub {paypal} funtów przez PayPal",
-      "nwlChunin": "Top {places}: ranga Chunin, ważna tylko na następny turniej Chunin"
+      "nwlPrize": "1. miejsce: £{credit} kredytu w sklepie lub £{paypal} przez PayPal",
+      "nwlChunin": "Top {places}: ranga Chunin. Daje wstęp na turniej Chunin następnego dnia, gdzie nagrody są większe. Szczegóły na Discordzie New World Loot. Ranga znika w każdy poniedziałek, więc liczy się tylko na ten turniej."
     },
     "today": "Dziś",
     "button": "Kalendarz",
@@ -3875,7 +3876,19 @@
     "restDay": "Dzień przerwy, brak zaplanowanego turnieju",
     "localTimeNote": "Godziny są podane w Twojej strefie czasowej.",
     "openDetails": "Zobacz szczegóły tego turnieju",
-    "detailsRules": "Zasady"
+    "detailsRules": "Zasady",
+    "detail": {
+      "formatSwiss": "Format szwajcarski. Każdy gra w każdej rundzie, nikt nie odpada. Wygrywa najlepszy bilans.",
+      "formatElim": "Pojedyncza eliminacja. Jedna porażka i odpadasz. Jeśli liczba graczy nie jest potęgą dwójki, najwyżej rozstawieni mają wolny los w pierwszej rundzie.",
+      "slots": "Maksymalnie {count} miejsc, według kolejności zapisów.",
+      "sealed": "Sealed. Przy zapisie otwierasz {count} boosterów i budujesz talię tylko z tych kart.",
+      "banList": "Standardowa lista zakazanych. Zakazanych kart nie można grać.",
+      "allCards": "Brak listy zakazanych. Wszystkie karty są dozwolone.",
+      "discord": "Do udziału potrzebne jest połączone konto Discord.",
+      "partner": "Organizowany z {partner}.",
+      "schedule": "Zapisy otwierają się o {reg}. Turniej startuje o {start}.",
+      "presence": "Bądź na stronie, gdy zaczyna się twój mecz. Kto się nie pojawi, zostaje uznany za nieobecnego i przegrywa ten mecz."
+    }
   },
   "adminFeatured": {
     "title": "Karty holo w menu",

@@ -24,6 +24,7 @@ import { useRevealingStore } from '@/stores/revealingStore';
 import { LockedCardWrapper } from '@/components/cards/LockedCardWrapper';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
+import { isLandscapeCard, cardAspectRatio } from '@/lib/cards/orientation';
 
 type AnyCard = CardData;
 
@@ -343,7 +344,7 @@ export default function CollectionPage() {
               <span className="text-sm font-bold text-[#888888] uppercase tracking-wider">{t('collection.missions')}</span>
               <div className="flex-1 h-px bg-[#262626]" />
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredCards.filter((c) => c.card_type === 'mission').map((card) => {
                 const isBanned = bannedIds.has(card.id);
                 const imgPath = getImagePath(card);
@@ -406,12 +407,12 @@ export default function CollectionPage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 items-start">
               {filteredCards.filter((c) => c.card_type === 'attachment').map((card) => {
                 const imgPath = getImagePath(card);
-                const landscape = card.attach_to === 'mission';
+                const landscape = isLandscapeCard(card);
                 return (
                   <div
                     key={card.id}
                     className="relative bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
-                    style={{ aspectRatio: landscape ? '3.5 / 2.5' : '2.5 / 3.5' }}
+                    style={{ aspectRatio: cardAspectRatio(card) }}
                   >
                     <Link
                       href={`/cards/${cardIdToSlug(card.id)}`}

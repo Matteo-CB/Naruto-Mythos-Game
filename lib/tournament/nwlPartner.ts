@@ -105,9 +105,9 @@ export const NWL_CHUNIN_RESET_WEEKDAY = 1;
 
 export const NWL_TOURNAMENT_RULES_NOTE = [
   'New World Loot weekly Friday tournament. Single elimination, standard ban list.',
-  `Rewards. First place wins ${NWL_FIRST_PLACE_STORE_CREDIT_GBP} pounds of store credit, or ${NWL_FIRST_PLACE_PAYPAL_GBP} pounds paid by PayPal if you prefer, offered by New World Loot.`,
-  `The first ${NWL_CHUNIN_PODIUM_PLACES} players also earn the Chunin role, which opens the Chunin tournament and its bigger rewards, organised separately on the New World Loot server.`,
-  'The Chunin role counts for the next Chunin tournament only: it is removed every Monday, so it has to be earned again each week.',
+  `Rewards. First place wins £${NWL_FIRST_PLACE_STORE_CREDIT_GBP} of store credit, or £${NWL_FIRST_PLACE_PAYPAL_GBP} paid by PayPal if you prefer, offered by New World Loot.`,
+  `The first ${NWL_CHUNIN_PODIUM_PLACES} players also earn the Chunin role. It lets you enter the Chunin tournament held the next day, where the rewards are bigger. Details on the New World Loot Discord server.`,
+  'The Chunin role counts for that next Chunin tournament only: it is removed every Monday, so it has to be earned again each week.',
   `To receive the Chunin role you must link your Discord account and be a member of the New World Loot server: ${NWL_DISCORD_INVITE}`,
 ].join(' ');
 
@@ -223,10 +223,10 @@ export async function announceNwlPodium(entries: NwlPodiumEntry[]): Promise<bool
   );
   lines.push('');
   lines.push(
-    `Rewards: first place wins ${NWL_FIRST_PLACE_STORE_CREDIT_GBP} pounds of store credit, or ${NWL_FIRST_PLACE_PAYPAL_GBP} pounds by PayPal if preferred, offered by New World Loot.`,
+    `Rewards: first place wins £${NWL_FIRST_PLACE_STORE_CREDIT_GBP} of store credit, or £${NWL_FIRST_PLACE_PAYPAL_GBP} by PayPal if preferred, offered by New World Loot.`,
   );
   lines.push(
-    'The Chunin role opens the Chunin tournament and its bigger rewards. It counts for the next one only, as it is removed every Monday.',
+    'The Chunin role lets you enter the Chunin tournament held the next day, where the rewards are bigger. Details on this server. It counts for that one only, as the role is removed every Monday.',
   );
 
   const res = await nwlApi(`/channels/${NWL_TAG_CHANNEL_ID}/messages`, {

@@ -55,6 +55,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
   const router = useRouter();
   const { activeTournament, startTournament, forfeitMatch, fetchTournament } = useTournamentStore();
   const [deleting, setDeleting] = useState(false);
+  const [deleteArmed, setDeleteArmed] = useState(false);
   const [startingTournament, setStartingTournament] = useState(false);
   const [forfeitMatchId, setForfeitMatchId] = useState('');
   const [forfeitPlayerId, setForfeitPlayerId] = useState('');
@@ -302,9 +303,12 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         {expandedSection === 'delete' && (
           <div className="flex flex-col gap-2 mt-2">
             <p className="text-[10px]" style={{ color: '#cc4444' }}>{t('deleteTournamentWarning')}</p>
+            {deleteArmed && (
+              <p className="text-[10px]" style={{ color: '#cc4444' }}>{t('deleteTournamentConfirm')}</p>
+            )}
             <ActionBtn
               onClick={async () => {
-                if (!confirm(t('deleteTournamentConfirm'))) return;
+                if (!deleteArmed) { setDeleteArmed(true); return; }
                 setDeleting(true);
                 try {
                   const res = await fetch(`/api/tournaments/${tournamentId}`, { method: 'DELETE' });
@@ -324,7 +328,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
               color="#cc4444"
               disabled={deleting}
             >
-              {deleting ? '...' : t('deleteTournament')}
+              {deleting ? '...' : deleteArmed ? t('deleteTournamentConfirmAction') : t('deleteTournament')}
             </ActionBtn>
           </div>
         )}
