@@ -199,7 +199,8 @@
     "language": "Język",
     "english": "English",
     "french": "Français",
-    "mainNavigation": "Nawigacja główna"
+    "mainNavigation": "Nawigacja główna",
+    "featuredCard": "Wyróżniona karta"
   },
   "notify": {
     "warnTitle": "Ostrzeżenie",
@@ -394,7 +395,22 @@
     "allowNonFriendMessagesHint": "Zezwól graczom, którzy nie są twoimi znajomymi, na wysyłanie prywatnych wiadomości.",
     "privateProfile": "Profil prywatny",
     "privateProfileHint": "Ukryj swoje posty przed wszystkimi oprócz znajomych. Nie można cię obserwować, tylko wysłać zaproszenie do znajomych.",
-    "socialSectionTitle": "Społeczność i prywatność"
+    "socialSectionTitle": "Społeczność i prywatność",
+    "boardColors": "Kolory planszy",
+    "boardColorsHint": "Wybierz kolory oznaczające \"ciebie\" i \"przeciwnika\" na planszy. Podgląd poniżej to prawdziwa plansza.",
+    "boardColorsMe": "Ty",
+    "boardColorsOpponent": "Przeciwnik",
+    "boardColorsPrimary": "Kolor główny",
+    "boardColorsBright": "Kolor sumy mocy",
+    "boardColorsAdvanced": "Kolory zaawansowane",
+    "boardColorsReset": "Domyślny",
+    "boardColorsResetAll": "Zresetuj wszystko",
+    "boardColorsPreviewLabel": "Podgląd na żywo",
+    "boardColorsInvalidHex": "Wpisz kolor w formacie #c4a35a.",
+    "boardColorsLowContrast": "Ten kolor jest bardzo ciemny na planszy i może być trudny do odczytania.",
+    "boardColorsDefaultsHint": "Domyślnie: {me} dla ciebie, {opponent} dla przeciwnika.",
+    "boardPreviewYou": "Ty",
+    "boardPreviewOpponent": "Przeciwnik"
   },
   "auth": {
     "signIn": "Zaloguj się",
@@ -3683,6 +3699,7 @@
       "deckBanned": "Twoja talia zawiera zbanowane karty. Usuń je, aby grać w tym trybie.",
       "authMismatch": "Niezgodność uwierzytelniania.",
       "tournamentBusy": "Jesteś w meczu turniejowym ({roomCode}). Najpierw go zakończ.",
+      "tournamentDeckMissing": "Nie udało się wczytać Twojej zapisanej talii. Zostań tutaj, organizator został powiadomiony.",
       "roomNotFound": "Nie znaleziono pokoju.",
       "youAreHost": "Jesteś gospodarzem tego pokoju.",
       "roomFull": "Pokój jest pełny.",
@@ -3799,7 +3816,8 @@
       "generic": "Coś poszło nie tak.",
       "deckHasUnrevealed": "Ta talia zawiera jeszcze nieujawnioną kartę, nie możesz jej udostępnić."
     },
-    "postToFeed": "Opublikuj na tablicy"
+    "postToFeed": "Opublikuj na tablicy",
+    "privateNotice": "Twój profil jest prywatny, więc ten post zobaczą tylko znajomi."
   },
   "adminPostModeration": {
     "title": "Moderacja postów i wiadomości",
@@ -3853,5 +3871,60 @@
     "next": "Następny dzień",
     "restDay": "Dzień przerwy, brak zaplanowanego turnieju",
     "localTimeNote": "Godziny są podane w Twojej strefie czasowej."
+  },
+  "adminFeatured": {
+    "title": "Karty holo w menu",
+    "subtitle": "Wybierz karty pokazywane jako holo w menu głównym. Można wybrać tylko karty już ujawnione.",
+    "back": "Powrót do administracji",
+    "unauthorized": "Odmowa dostępu.",
+    "loading": "Wczytywanie...",
+    "empty": "Żadna karta nie pasuje do tego wyszukiwania.",
+    "searchPlaceholder": "Szukaj karty",
+    "setFilterAll": "Wszystkie dodatki",
+    "selectionTitle": "Wybór do menu",
+    "selectionEmpty": "Nie wybrano żadnej karty. Menu pokaże karty domyślne.",
+    "count": "{selected} / {max}",
+    "remove": "Usuń",
+    "moveUp": "W górę",
+    "moveDown": "W dół",
+    "save": "Zapisz",
+    "saving": "Zapisywanie...",
+    "saved": "Karty menu zapisane.",
+    "saveFailed": "Nie udało się zapisać kart menu.",
+    "notRevealed": "Jeszcze nieujawniona",
+    "previewTitle": "Podgląd",
+    "unavailableCard": "Karta niedostępna",
+    "error": {
+      "not_public": "Ta karta nie została jeszcze ujawniona.",
+      "unknown_card": "Ta karta nie istnieje.",
+      "not_a_character": "W menu można pokazać tylko karty postaci.",
+      "no_image": "Ta karta nie ma ilustracji.",
+      "holo_id": "Wersje holo nie mogą być pokazywane w menu.",
+      "too_many": "Wybrano za dużo kart.",
+      "invalid": "Nieprawidłowy wybór."
+    }
+  },
+  "playStats": {
+    "buttonLabel": "Statystyki",
+    "modalTitle": "Aktywność online",
+    "modalSubtitle": "Dane na żywo",
+    "close": "Zamknij",
+    "loading": "Wczytywanie...",
+    "unavailable": "Statystyki są w tej chwili niedostępne.",
+    "rangeWeek": "7 dni",
+    "rangeMonth": "30 dni",
+    "games": "Rozegrane partie",
+    "players": "Gracze",
+    "decks": "Użyte talie",
+    "perDay": "Partie dziennie",
+    "perDayChart": "Partie dziennie",
+    "today": "Dzisiaj",
+    "todayHint": "Od północy",
+    "activeDays": "Dni z partiami",
+    "evolving": "Partie Evolving",
+    "evolvingHint": "Wliczone w sumę",
+    "busiestDay": "Najaktywniejszy dzień",
+    "busiestDayValue": "{day}, {games} partii",
+    "note": "Liczą się tylko partie online. Dane odświeżają się kilka razy na godzinę."
   }
 }

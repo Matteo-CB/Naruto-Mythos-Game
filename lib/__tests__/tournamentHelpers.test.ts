@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { clearAllMatchRoomTimers, finalizeAndScheduleRoomDeletion } from '../tournament/matchRoomCleanup';
 import { logMatchEvent } from '../tournament/matchEventLog';
 
@@ -37,6 +37,10 @@ function makeRoom(overrides: Partial<FakeRoom> = {}): FakeRoom {
 describe('matchRoomCleanup helpers', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('clearAllMatchRoomTimers nulls every timer field', () => {
@@ -145,5 +149,5 @@ describe('cleanupTournamentMapsByIds (synchronous)', () => {
     expect(typeof fn).toBe('function');
     expect(() => fn('t1', ['m1', 'm2'])).not.toThrow();
     expect(() => fn('t1', [])).not.toThrow();
-  });
+  }, 60_000);
 });

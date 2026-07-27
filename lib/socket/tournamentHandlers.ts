@@ -9,7 +9,7 @@ import { startAbsenceTimer, clearAbsenceTimer, scheduleAbsenceTimerWithDeadline,
 import { assignTournamentWinnerRole } from '@/lib/discord/tournamentRoles';
 import { sendTournamentResults } from '@/lib/discord/tournamentWebhook';
 import { pickDoubleAbsenceLoser } from '@/lib/tournament/matchRulings';
-import { rooms, maybeStartTournamentGame, clearTournamentInviteTimer, isUserInAnotherLiveGame, type RoomData } from '@/lib/socket/server';
+import { rooms, maybeStartTournamentGame, reconcileTournamentRoomSeats, isSeatSocketAlive, clearTournamentInviteTimer, isUserInAnotherLiveGame, type RoomData } from '@/lib/socket/server';
 import { emitToUser, isUserConnected } from '@/lib/socket/io';
 import { decideAbsenceOutcome, decideJoinCheckOutcome, type JoinCheckSeat } from '@/lib/tournament/absenceDecision';
 import { createChessClock } from '@/lib/timing/chessClock';
@@ -108,6 +108,7 @@ export function cleanupTournamentMapsByIds(tournamentId: string, matchIds: reado
   for (const matchId of matchIds) {
     matchReadyPlayers.delete(matchId);
     matchReadyLocks.delete(matchId);
+    matchNoContestCount.delete(matchId);
   }
   for (const [key] of swissRoundLocks) {
     if (key.startsWith(tournamentId)) swissRoundLocks.delete(key);
@@ -162,6 +163,8 @@ export function getOnlineUserIds(io: Server): Set<string> {
 }
 
 const matchGraceCycles = new Map<string, number>();
+const matchNoContestCount = new Map<string, number>();
+export const NO_CONTEST_ESCALATION_THRESHOLD = 3;
 export const MAX_GRACE_CYCLES = 8;
 
 export const MATCH_ENTRY_INVITE_INTERVAL_MS = 5_000;
@@ -194,15 +197,13 @@ export function startMatchEntryInvites(
       stop();
       return;
     }
-    if (!r.hostSocket && r.hostId && !isUserInAnotherLiveGame(r.hostId, matchId)) {
+    if (r.hostId && !isUserInAnotherLiveGame(r.hostId, matchId)) {
       emitToUser(r.hostId, 'match:enter', { tournamentId, matchId, roomCode, seat: 'player1' });
     }
-    if (!r.guestSocket && r.guestId && !isUserInAnotherLiveGame(r.guestId, matchId)) {
+    if (r.guestId && !isUserInAnotherLiveGame(r.guestId, matchId)) {
       emitToUser(r.guestId, 'match:enter', { tournamentId, matchId, roomCode, seat: 'player2' });
     }
-    if (r.hostSocket && r.guestSocket) {
-      void maybeStartTournamentGame(r, roomCode, io);
-    }
+    void reconcileTournamentRoomSeats(r, roomCode, io);
   };
 
   handle = setInterval(sendInvites, MATCH_ENTRY_INVITE_INTERVAL_MS);
@@ -210,9 +211,90 @@ export function startMatchEntryInvites(
   sendInvites();
 }
 
+export const TOURNAMENT_LAUNCH_TICK_MS = 10_000;
+export const TOURNAMENT_READY_PING_MS = 30_000;
+
+const lastReadyPingAt = new Map<string, number>();
+
+export async function reconcileTournamentLaunches(io: Server): Promise<void> {
+  let pending: Array<{
+    id: string;
+    tournamentId: string;
+    roomCode: string | null;
+    player1Id: string | null;
+    player2Id: string | null;
+  }>;
+  try {
+    const running = await prisma.tournament.findMany({
+      where: { status: 'in_progress' },
+      select: { id: true },
+    });
+    if (running.length === 0) {
+      lastReadyPingAt.clear();
+      return;
+    }
+    pending = await prisma.tournamentMatch.findMany({
+      where: {
+        status: { in: ['ready', 'in_progress'] },
+        isBye: false,
+        tournamentId: { in: running.map((t) => t.id) },
+      },
+      select: { id: true, tournamentId: true, roomCode: true, player1Id: true, player2Id: true },
+    });
+  } catch (err) {
+    console.error('[Tournament] reconcileTournamentLaunches lookup failed:', err);
+    return;
+  }
+
+  const liveMatchIds = new Set(pending.map((m) => m.id));
+  for (const key of lastReadyPingAt.keys()) {
+    if (!liveMatchIds.has(key)) lastReadyPingAt.delete(key);
+  }
+
+  const now = Date.now();
+  for (const m of pending) {
+    if (!m.player1Id || !m.player2Id) continue;
+    const room = m.roomCode ? rooms.get(m.roomCode) : null;
+
+    if (room) {
+      if (room.finalized) continue;
+      if (room.gameState) continue;
+      if (!room.tournamentInviteTimer) {
+        startMatchEntryInvites(io, m.roomCode!, m.tournamentId, m.id);
+      }
+      try {
+        await reconcileTournamentRoomSeats(room, m.roomCode!, io);
+      } catch (err) {
+        console.error(`[Tournament] reconcile failed for match ${m.id}:`, err);
+      }
+      continue;
+    }
+
+    const lastPing = lastReadyPingAt.get(m.id) ?? 0;
+    if (now - lastPing < TOURNAMENT_READY_PING_MS) continue;
+    let pinged = false;
+    for (const userId of [m.player1Id, m.player2Id]) {
+      if (isUserInAnotherLiveGame(userId, m.id)) continue;
+      if (!isUserConnected(userId)) continue;
+      emitToUser(userId, 'tournament:please-confirm-ready', { matchId: m.id, tournamentId: m.tournamentId });
+      pinged = true;
+    }
+    if (pinged) lastReadyPingAt.set(m.id, now);
+  }
+}
+
+export function startTournamentLaunchReconciler(io: Server): ReturnType<typeof setInterval> {
+  return setInterval(() => {
+    reconcileTournamentLaunches(io).catch((err) => {
+      console.error('[Tournament] launch reconciler tick failed:', err);
+    });
+  }, TOURNAMENT_LAUNCH_TICK_MS);
+}
+
 export function clearTournamentMatchTimers(matchId: string): void {
   clearAbsenceTimer(matchId);
   matchGraceCycles.delete(matchId);
+  matchNoContestCount.delete(matchId);
   matchReadyPlayers.delete(matchId);
 }
 
@@ -225,12 +307,16 @@ function isMatchGameLive(roomCode: string | null | undefined): boolean {
   return room.gameState.phase !== 'gameOver';
 }
 
-function seatBoundInMatchRoom(roomCode: string | null | undefined, userId: string | null): boolean {
+function seatBoundInMatchRoom(
+  io: Server,
+  roomCode: string | null | undefined,
+  userId: string | null,
+): boolean {
   if (!roomCode || !userId) return false;
   const room = rooms.get(roomCode);
   if (!room) return false;
-  if (room.hostId === userId) return !!room.hostSocket;
-  if (room.guestId === userId) return !!room.guestSocket;
+  if (room.hostId === userId) return isSeatSocketAlive(room, 'player1', io);
+  if (room.guestId === userId) return isSeatSocketAlive(room, 'player2', io);
   return false;
 }
 
@@ -248,19 +334,37 @@ export async function fireAbsenceTimerCallback(
   const cycles = matchGraceCycles.get(matchId) ?? 0;
 
   let currentRoomCode: string | null = null;
+  let tournamentIdForPresence = tournamentId;
   try {
     const m = await prisma.tournamentMatch.findUnique({
       where: { id: matchId },
-      select: { roomCode: true, status: true },
+      select: { roomCode: true, status: true, tournamentId: true },
     });
     if (m && (m.status === 'completed' || m.status === 'forfeit')) {
       console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} already resolved (${m.status}), no-op`);
       return;
     }
     currentRoomCode = m?.roomCode ?? null;
+    if (m?.tournamentId) tournamentIdForPresence = m.tournamentId;
   } catch (err) {
     console.error(`[Tournament] fireAbsenceTimerCallback: match lookup failed for ${matchId}:`, err);
   }
+
+  if (currentRoomCode) {
+    const liveRoom = rooms.get(currentRoomCode);
+    if (liveRoom && !liveRoom.finalized && !liveRoom.gameState) {
+      await reconcileTournamentRoomSeats(liveRoom, currentRoomCode, io);
+      if (liveRoom.gameState) {
+        console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} launched during reconciliation, no forfeit`);
+        matchGraceCycles.delete(matchId);
+        return;
+      }
+    }
+  }
+
+  const watching = getConnectedUserIdsInTournament(io, tournamentIdForPresence);
+  const reachableP1 = online.has(p1) || isUserConnected(p1) || watching.has(p1);
+  const reachableP2 = !!p2 && (online.has(p2) || isUserConnected(p2) || watching.has(p2));
 
   const outcome = decideAbsenceOutcome({
     p1,
@@ -269,10 +373,10 @@ export async function fireAbsenceTimerCallback(
     readySetPresent: !!ready,
     readyP1: !!ready?.has(p1),
     readyP2: !!p2 && !!ready?.has(p2),
-    seatBoundP1: seatBoundInMatchRoom(currentRoomCode, p1),
-    seatBoundP2: seatBoundInMatchRoom(currentRoomCode, p2 || null),
-    onlineP1: online.has(p1) || isUserConnected(p1),
-    onlineP2: !!p2 && (online.has(p2) || isUserConnected(p2)),
+    seatBoundP1: seatBoundInMatchRoom(io, currentRoomCode, p1),
+    seatBoundP2: seatBoundInMatchRoom(io, currentRoomCode, p2 || null),
+    onlineP1: reachableP1,
+    onlineP2: reachableP2,
     gameLive: isMatchGameLive(currentRoomCode),
     cycles,
     maxCycles: MAX_GRACE_CYCLES,
@@ -280,6 +384,26 @@ export async function fireAbsenceTimerCallback(
 
   if (outcome.kind === 'noop') {
     console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} no forfeit (${outcome.reason})`);
+    return;
+  }
+
+  if (outcome.kind === 'no-contest') {
+    matchGraceCycles.delete(matchId);
+    const stalls = (matchNoContestCount.get(matchId) ?? 0) + 1;
+    matchNoContestCount.set(matchId, stalls);
+    const detail = `match ${matchId} could not be launched while ${outcome.players.join(', ')} stayed online, reopening it instead of forfeiting anyone (stall ${stalls})`;
+    if (stalls >= NO_CONTEST_ESCALATION_THRESHOLD) {
+      console.error(`[Tournament] CRITICAL: ${detail}. This match needs an organizer to resolve it manually from the admin panel.`);
+    } else {
+      console.log(`[Tournament] fireAbsenceTimerCallback: ${detail}`);
+    }
+    logMatchEvent({
+      type: stalls >= NO_CONTEST_ESCALATION_THRESHOLD ? 'match.launch.stalled' : 'match.launch.no-contest',
+      tournamentId,
+      matchId,
+      forfeitedPlayerId: null,
+    });
+    await reopenTournamentMatch(io, tournamentId, matchId, p1, p2 || null);
     return;
   }
 
@@ -378,8 +502,11 @@ async function runTournamentJoinCheck(
   if (r.finalized) return;
   if (r.gameState) return;
 
-  const hostJoined = !!r.hostSocket || r.hostEverJoined === true;
-  const guestJoined = !!r.guestSocket || r.guestEverJoined === true;
+  await reconcileTournamentRoomSeats(r, roomCode, io);
+  if (r.gameState || r.finalized) return;
+
+  const hostJoined = isSeatSocketAlive(r, 'player1', io);
+  const guestJoined = isSeatSocketAlive(r, 'player2', io);
   const seatUserId = (seat: JoinCheckSeat): string | null =>
     seat === 'player1' ? (r.hostId ?? null) : (r.guestId ?? null);
 
@@ -393,7 +520,12 @@ async function runTournamentJoinCheck(
   });
 
   if (outcome.kind === 'start') {
-    await maybeStartTournamentGame(r, roomCode, io);
+    const started = await maybeStartTournamentGame(r, roomCode, io);
+    if (!started && !r.gameState && !r.finalized) {
+      console.log(`[Tournament] Match ${matchId}: both seats look bound but the game did not start, re-checking in ${TOURNAMENT_JOIN_RECHECK_MS}ms`);
+      startMatchEntryInvites(io, roomCode, tournamentId, matchId);
+      scheduleTournamentJoinCheck(io, roomCode, tournamentId, matchId, attempt, TOURNAMENT_JOIN_RECHECK_MS);
+    }
     return;
   }
 
@@ -412,6 +544,7 @@ async function runTournamentJoinCheck(
     if (outcome.reason === 'connected') {
       console.log(`[Tournament] Match ${matchId}: player(s) have not bound a seat but are connected, keeping the match open instead of forfeiting`);
       startMatchEntryInvites(io, roomCode, tournamentId, matchId);
+      scheduleTournamentJoinCheck(io, roomCode, tournamentId, matchId, attempt, TOURNAMENT_JOIN_RECHECK_MS);
       return;
     }
     console.log(`[Tournament] Match ${matchId}: no seat bound and player(s) offline (sample ${attempt + 1}/${TOURNAMENT_JOIN_MAX_RECHECKS + 1}), re-checking in ${TOURNAMENT_JOIN_RECHECK_MS}ms before deciding`);
@@ -419,10 +552,17 @@ async function runTournamentJoinCheck(
     return;
   }
 
+  const watchingBracket = getConnectedUserIdsInTournament(io, tournamentId);
   const missing = outcome.seats
     .map(seatUserId)
-    .filter((id): id is string => !!id);
-  if (missing.length === 0) return;
+    .filter((id): id is string => !!id)
+    .filter((id) => !isUserConnected(id) && !watchingBracket.has(id));
+  if (missing.length === 0) {
+    console.log(`[Tournament] Match ${matchId}: no seat bound but every player is reachable, keeping the match open instead of forfeiting`);
+    startMatchEntryInvites(io, roomCode, tournamentId, matchId);
+    scheduleTournamentJoinCheck(io, roomCode, tournamentId, matchId, attempt, TOURNAMENT_JOIN_RECHECK_MS);
+    return;
+  }
 
   if (missing.length === 2) {
     const t = await prisma.tournament.findUnique({
@@ -490,10 +630,31 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
       }
 
       if (match.status !== 'ready' && match.status !== 'pending' && match.status !== 'in_progress') return;
+
+      if (!matchReadyPlayers.has(matchId)) matchReadyPlayers.set(matchId, new Set());
+      const ready = matchReadyPlayers.get(matchId)!;
+      ready.add(userId);
+
       if (match.roomCode) {
         const existingRoom = rooms.get(match.roomCode);
-        if (existingRoom && !existingRoom.finalized) return;
+        if (existingRoom && !existingRoom.finalized) {
+          const seat: 'player1' | 'player2' | null = existingRoom.hostId === userId
+            ? 'player1'
+            : existingRoom.guestId === userId
+              ? 'player2'
+              : null;
+          if (seat && !isUserInAnotherLiveGame(userId, matchId)) {
+            emitToUser(userId, 'match:enter', { tournamentId, matchId, roomCode: match.roomCode, seat });
+          }
+          startMatchEntryInvites(io, match.roomCode, tournamentId, matchId);
+          await reconcileTournamentRoomSeats(existingRoom, match.roomCode, io);
+          return;
+        }
         if (existingRoom && existingRoom.finalized) {
+          if (existingRoom.gameState) {
+            console.log(`[Tournament] tournament:ready ignored for match ${matchId}: its game already ended, waiting for the result to be written`);
+            return;
+          }
           clearTournamentInviteTimer(existingRoom);
           clearAllMatchRoomTimers(existingRoom);
           rooms.delete(match.roomCode);
@@ -502,10 +663,6 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
 
       const otherPlayerId = match.player1Id === userId ? match.player2Id : match.player1Id;
       if (!otherPlayerId || !match.player1Id || !match.player2Id) return;
-
-      if (!matchReadyPlayers.has(matchId)) matchReadyPlayers.set(matchId, new Set());
-      const ready = matchReadyPlayers.get(matchId)!;
-      ready.add(userId);
 
 
 
@@ -812,9 +969,9 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
 
       const liveRoom = m.roomCode ? rooms.get(m.roomCode) : null;
       if (liveRoom && !liveRoom.gameState && !liveRoom.finalized) {
-        if (liveRoom.hostSocket && liveRoom.guestSocket) {
-          console.log(`[Tournament] Match ${m.id}: both seats bound but no game, retrying auto-start`);
-          await maybeStartTournamentGame(liveRoom, m.roomCode!, io);
+        const started = await reconcileTournamentRoomSeats(liveRoom, m.roomCode!, io);
+        if (started || liveRoom.gameState) {
+          console.log(`[Tournament] Match ${m.id}: launched by the orphan sweep reconciliation`);
           continue;
         }
         if (ageMs >= PREGAME_STUCK_TIMEOUT_MS) {
@@ -1297,6 +1454,7 @@ export async function handleSwissMatchEnd(
               podium,
               tournament.participants.length,
               assignedRoleName,
+              tournament.isPublic,
             );
           } catch (err) {
             console.error('[Tournament] Discord webhook error:', err);
@@ -1470,6 +1628,7 @@ export async function handleSwissMatchEnd(
           podium,
           tournament.participants.length,
           newRoleName,
+          tournament.isPublic,
         );
       } catch (err) {
         console.error('[Tournament] Webhook error:', err);
@@ -1745,7 +1904,7 @@ async function sendEliminationResults(tournamentId: string, newRoleName: string 
       ...(finalistId && finalistUsername ? [{ userId: finalistId, username: finalistUsername, place: 2 as const }] : []),
       ...(thirdPlace?.userId && thirdPlace.username ? [{ userId: thirdPlace.userId, username: thirdPlace.username, place: 3 as const }] : []),
     ];
-    await sendTournamentResults(tournament.name, podium, tournament._count.participants, newRoleName);
+    await sendTournamentResults(tournament.name, podium, tournament._count.participants, newRoleName, tournament.isPublic);
   } catch (err) {
     eliminationResultsAnnounced.delete(tournamentId);
     console.error('[Tournament] Webhook error:', err);
@@ -2114,7 +2273,7 @@ async function finalizeDoubleElim(
     });
     if (t) {
       const podium = [{ userId: winnerId, username: winnerUsername ?? 'Unknown', place: 1 as const }];
-      await sendTournamentResults(t.name, podium, t._count.participants, newRoleName);
+      await sendTournamentResults(t.name, podium, t._count.participants, newRoleName, t.isPublic);
     }
   } catch (err) {
     console.error('[Tournament] Webhook error:', err);

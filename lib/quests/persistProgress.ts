@@ -4,6 +4,12 @@ import type { QuestEventPayload, GameMode } from './hooks';
 import type { Quest } from './questData';
 import { formatDateUTC } from './dailySelector';
 import { ensureDailyQuestForDate } from './dailyAssignment';
+import { withUserLock } from './userLock';
+
+function isUniqueViolation(err: unknown): boolean {
+  if (typeof err !== 'object' || err === null) return false;
+  return (err as { code?: string }).code === 'P2002';
+}
 
 interface ScopedAccumulator {
   scopeKey: string;
@@ -71,22 +77,24 @@ export async function persistQuestProgress(
   const matches = matchQuestsForEvent(hook, payload);
   if (matches.length === 0) return [];
 
-  const persisted: PersistedProgress[] = [];
+  return withUserLock(userId, async () => {
+    const persisted: PersistedProgress[] = [];
 
-  for (const { quest, delta } of matches) {
-    const updated = await upsertQuestProgress(userId, quest, delta, payload);
-    if (updated) persisted.push(updated);
-  }
+    for (const { quest, delta } of matches) {
+      const updated = await upsertQuestProgress(userId, quest, delta, payload);
+      if (updated) persisted.push(updated);
+    }
 
-  if (hook === 'daily_quest.completed') return persisted;
+    if (hook === 'daily_quest.completed') return persisted;
 
-  const dailyMatch = await matchTodayDaily(hook, payload);
-  if (dailyMatch) {
-    const dailyUpdated = await upsertDailyQuestProgress(userId, dailyMatch.quest, dailyMatch.delta, payload);
-    if (dailyUpdated) persisted.push(dailyUpdated);
-  }
+    const dailyMatch = await matchTodayDaily(hook, payload);
+    if (dailyMatch) {
+      const dailyUpdated = await upsertDailyQuestProgress(userId, dailyMatch.quest, dailyMatch.delta, payload);
+      if (dailyUpdated) persisted.push(dailyUpdated);
+    }
 
-  return persisted;
+    return persisted;
+  });
 }
 
 async function upsertQuestProgress(
@@ -129,17 +137,22 @@ async function upsertQuestProgress(
   const completed = newProgress >= quest.target;
 
   if (!existing) {
-    await prisma.questProgress.create({
-      data: {
-        userId,
-        questId: quest.id,
-        progress: newProgress,
-        target: quest.target,
-        completed,
-        completedAt: completed ? new Date() : null,
-      },
-    });
-    return { questId: quest.id, newProgress, completedNow: completed };
+    try {
+      await prisma.questProgress.create({
+        data: {
+          userId,
+          questId: quest.id,
+          progress: newProgress,
+          target: quest.target,
+          completed,
+          completedAt: completed ? new Date() : null,
+        },
+      });
+      return { questId: quest.id, newProgress, completedNow: completed };
+    } catch (err) {
+      if (!isUniqueViolation(err)) throw err;
+      return mergeQuestProgressAfterRace(userId, quest, delta, isScoped, newProgress);
+    }
   }
 
   const completedNow = completed && !existing.completed;
@@ -152,6 +165,68 @@ async function upsertQuestProgress(
     },
   });
   return { questId: quest.id, newProgress, completedNow };
+}
+
+async function mergeQuestProgressAfterRace(
+  userId: string,
+  quest: Quest,
+  delta: number,
+  isScoped: boolean,
+  attemptedProgress: number,
+): Promise<PersistedProgress | null> {
+  const row = await prisma.questProgress.findUnique({
+    where: { userId_questId: { userId, questId: quest.id } },
+  });
+  if (!row) return null;
+  if (row.claimed) return null;
+  const merged = Math.min(
+    isScoped ? Math.max(row.progress, attemptedProgress) : row.progress + delta,
+    quest.target,
+  );
+  const completed = merged >= quest.target;
+  const completedNow = completed && !row.completed;
+  await prisma.questProgress.update({
+    where: { userId_questId: { userId, questId: quest.id } },
+    data: {
+      progress: merged,
+      completed: completed ? true : row.completed,
+      completedAt: completedNow ? new Date() : row.completedAt,
+    },
+  });
+  return { questId: quest.id, newProgress: merged, completedNow };
+}
+
+async function mergeDailyQuestProgressAfterRace(
+  userId: string,
+  date: string,
+  quest: Quest,
+  delta: number,
+  isScoped: boolean,
+  attemptedProgress: number,
+): Promise<PersistedProgress | null> {
+  const row = await prisma.dailyQuestProgress.findUnique({
+    where: { userId_date: { userId, date } },
+  });
+  if (!row) return null;
+  if (row.claimed) return null;
+  if (row.questId !== quest.id) {
+    return { questId: `daily:${quest.id}`, newProgress: row.progress, completedNow: false };
+  }
+  const merged = Math.min(
+    isScoped ? Math.max(row.progress, attemptedProgress) : row.progress + delta,
+    quest.target,
+  );
+  const completed = merged >= quest.target;
+  const completedNow = completed && !row.completed;
+  await prisma.dailyQuestProgress.update({
+    where: { userId_date: { userId, date } },
+    data: {
+      progress: merged,
+      completed: completed ? true : row.completed,
+      completedAt: completedNow ? new Date() : row.completedAt,
+    },
+  });
+  return { questId: `daily:${quest.id}`, newProgress: merged, completedNow };
 }
 
 async function matchTodayDaily(
@@ -220,18 +295,23 @@ async function upsertDailyQuestProgress(
   const completed = newProgress >= quest.target;
 
   if (!existing) {
-    await prisma.dailyQuestProgress.create({
-      data: {
-        userId,
-        date,
-        questId: quest.id,
-        progress: newProgress,
-        target: quest.target,
-        completed,
-        completedAt: completed ? new Date() : null,
-      },
-    });
-    return { questId: `daily:${quest.id}`, newProgress, completedNow: completed };
+    try {
+      await prisma.dailyQuestProgress.create({
+        data: {
+          userId,
+          date,
+          questId: quest.id,
+          progress: newProgress,
+          target: quest.target,
+          completed,
+          completedAt: completed ? new Date() : null,
+        },
+      });
+      return { questId: `daily:${quest.id}`, newProgress, completedNow: completed };
+    } catch (err) {
+      if (!isUniqueViolation(err)) throw err;
+      return mergeDailyQuestProgressAfterRace(userId, date, quest, delta, isScoped, newProgress);
+    }
   }
 
   const completedNow = completed && !existing.completed;

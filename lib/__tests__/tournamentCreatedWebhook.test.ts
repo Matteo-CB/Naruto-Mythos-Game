@@ -16,6 +16,7 @@ function makeFetchMock() {
 function baseTournament(overrides: Record<string, unknown> = {}) {
   return {
     name: 'Test Cup',
+    isPublic: true,
     format: 'swiss',
     gameMode: 'classic',
     maxPlayers: 16,

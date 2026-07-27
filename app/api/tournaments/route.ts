@@ -177,6 +177,7 @@ export async function POST(req: NextRequest) {
         gameMode: resolvedGameMode,
         maxPlayers,
         isPublic: canCreatePublic ? isPublic !== false : false,
+        awardsPrizes: canCreatePublic,
         joinCode: generateJoinCode(),
         creatorId: session.user.id,
         creatorUsername: user?.username || 'Unknown',
@@ -203,7 +204,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (typeof prizeCardId === 'string' && prizeCardId.length > 0) {
+    if (canCreatePublic && typeof prizeCardId === 'string' && prizeCardId.length > 0) {
       try {
         await prisma.$runCommandRaw({
           update: 'Tournament',

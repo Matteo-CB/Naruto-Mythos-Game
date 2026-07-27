@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { validateStoredBoardPalette, type StoredBoardPalette } from '@/lib/game/boardPalette';
 
 interface BackgroundOption {
   id: string;
@@ -28,6 +29,7 @@ interface SettingsState {
   countryCode: string | null;
   gameBackground: string; // background DB id or "default"
   gameBackgroundUrl: string; // resolved URL for the background image
+  boardPalette: StoredBoardPalette | null;
   availableBackgrounds: BackgroundOption[];
   isLoaded: boolean;
   fetchFromServer: () => Promise<void>;
@@ -40,6 +42,7 @@ interface SettingsState {
   setGamepadEnabled: (v: boolean) => Promise<void>;
   setCountryCode: (code: string | null) => Promise<void>;
   setGameBackground: (id: string, url: string) => Promise<void>;
+  setBoardPalette: (next: StoredBoardPalette | null) => void;
   setChatVisibility: (v: ChatVisibilitySetting) => Promise<void>;
   setFastAnimations: (v: boolean) => Promise<void>;
   setAllowNonFriendMessages: (v: boolean) => Promise<void>;
@@ -68,6 +71,16 @@ function cacheBackgrounds(backgrounds: BackgroundOption[]): void {
   } catch { /* ignore */ }
 }
 
+function readBoardPalette(raw: unknown): StoredBoardPalette | null {
+  const check = validateStoredBoardPalette(raw ?? null);
+  return check.ok ? check.value : null;
+}
+
+const BOARD_PALETTE_SAVE_DELAY_MS = 500;
+
+let boardPaletteSaveTimer: ReturnType<typeof setTimeout> | null = null;
+let lastPersistedBoardPalette: StoredBoardPalette | null = null;
+
 function getLocalSound(): { enabled: boolean; volume: number } {
   try {
     if (typeof window === 'undefined') return { enabled: true, volume: 0.5 };
@@ -93,6 +106,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   countryCode: null,
   gameBackground: 'default',
   gameBackgroundUrl: DEFAULT_BG_URL,
+  boardPalette: null,
   availableBackgrounds: getCachedBackgrounds(),
   isLoaded: false,
 
@@ -134,9 +148,11 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         countryCode: prefs.countryCode ?? null,
         gameBackground: bgId,
         gameBackgroundUrl: bgUrl,
+        boardPalette: readBoardPalette(prefs.boardPalette),
         availableBackgrounds: backgrounds,
         isLoaded: true,
       });
+      lastPersistedBoardPalette = get().boardPalette;
       const soundOn = get().soundEnabled;
       try { localStorage.setItem('nmtcg-sound-enabled', String(soundOn)); } catch { /* ignore */ }
       import('@/lib/sound/SoundManager').then(m => m.setMuted(!soundOn)).catch(() => {});
@@ -311,6 +327,27 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
     } catch {
       set({ privateProfile: prev });
     }
+  },
+
+  setBoardPalette: (next: StoredBoardPalette | null) => {
+    const sanitized = readBoardPalette(next);
+    set({ boardPalette: sanitized });
+    if (boardPaletteSaveTimer) clearTimeout(boardPaletteSaveTimer);
+    boardPaletteSaveTimer = setTimeout(() => {
+      boardPaletteSaveTimer = null;
+      fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ boardPalette: sanitized }),
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error('Failed to save');
+          lastPersistedBoardPalette = sanitized;
+        })
+        .catch(() => {
+          set({ boardPalette: lastPersistedBoardPalette });
+        });
+    }, BOARD_PALETTE_SAVE_DELAY_MS);
   },
 
   setGameBackground: async (id: string, url: string) => {

@@ -199,7 +199,8 @@
     "language": "Idioma",
     "english": "English",
     "french": "Français",
-    "mainNavigation": "Navegação principal"
+    "mainNavigation": "Navegação principal",
+    "featuredCard": "Carta em destaque"
   },
   "notify": {
     "warnTitle": "Aviso",
@@ -394,7 +395,22 @@
     "allowNonFriendMessagesHint": "Permitir que jogadores que não são seus amigos enviem mensagens privadas.",
     "privateProfile": "Perfil privado",
     "privateProfileHint": "Oculte suas publicações de todos, exceto seus amigos. Não podem te seguir, apenas enviar um pedido de amizade.",
-    "socialSectionTitle": "Social e privacidade"
+    "socialSectionTitle": "Social e privacidade",
+    "boardColors": "Cores do tabuleiro",
+    "boardColorsHint": "Escolha as cores que significam \"você\" e \"o seu adversário\" no tabuleiro. A pré-visualização abaixo é o tabuleiro real.",
+    "boardColorsMe": "Você",
+    "boardColorsOpponent": "Adversário",
+    "boardColorsPrimary": "Cor principal",
+    "boardColorsBright": "Cor do total de poder",
+    "boardColorsAdvanced": "Cores avançadas",
+    "boardColorsReset": "Padrão",
+    "boardColorsResetAll": "Repor tudo",
+    "boardColorsPreviewLabel": "Pré-visualização ao vivo",
+    "boardColorsInvalidHex": "Introduza uma cor como #c4a35a.",
+    "boardColorsLowContrast": "Esta cor fica muito escura no tabuleiro e pode ser difícil de ler.",
+    "boardColorsDefaultsHint": "Padrão: {me} para você, {opponent} para o adversário.",
+    "boardPreviewYou": "Você",
+    "boardPreviewOpponent": "Adversário"
   },
   "auth": {
     "signIn": "Entrar",
@@ -3683,6 +3699,7 @@
       "deckBanned": "Seu deck contém cartas banidas. Remova-as para jogar neste modo.",
       "authMismatch": "Incompatibilidade de autenticação.",
       "tournamentBusy": "Você está em uma partida de torneio ({roomCode}). Termine-a primeiro.",
+      "tournamentDeckMissing": "Não foi possível carregar o seu deck inscrito. Fique aqui, o organizador foi avisado.",
       "roomNotFound": "Sala não encontrada.",
       "youAreHost": "Você é o anfitrião desta sala.",
       "roomFull": "A sala está cheia.",
@@ -3799,7 +3816,8 @@
       "generic": "Algo deu errado.",
       "deckHasUnrevealed": "Este baralho contém uma carta ainda não revelada, não podes partilhá-lo."
     },
-    "postToFeed": "Publicar no feed"
+    "postToFeed": "Publicar no feed",
+    "privateNotice": "Seu perfil é privado, então esta publicação só ficará visível para os seus amigos."
   },
   "adminPostModeration": {
     "title": "Moderação de publicações e mensagens",
@@ -3853,5 +3871,60 @@
     "next": "Dia seguinte",
     "restDay": "Dia de descanso, sem torneio agendado",
     "localTimeNote": "Os horários são apresentados no teu fuso horário."
+  },
+  "adminFeatured": {
+    "title": "Cartas holo do menu",
+    "subtitle": "Escolha as cartas mostradas em holo no menu principal. Só é possível escolher cartas já reveladas.",
+    "back": "Voltar à administração",
+    "unauthorized": "Acesso negado.",
+    "loading": "A carregar...",
+    "empty": "Nenhuma carta corresponde a esta pesquisa.",
+    "searchPlaceholder": "Procurar uma carta",
+    "setFilterAll": "Todos os sets",
+    "selectionTitle": "Seleção do menu",
+    "selectionEmpty": "Nenhuma carta selecionada. O menu usa as cartas predefinidas.",
+    "count": "{selected} / {max}",
+    "remove": "Remover",
+    "moveUp": "Subir",
+    "moveDown": "Descer",
+    "save": "Guardar",
+    "saving": "A guardar...",
+    "saved": "Cartas do menu guardadas.",
+    "saveFailed": "Não foi possível guardar as cartas do menu.",
+    "notRevealed": "Ainda não revelada",
+    "previewTitle": "Pré-visualização",
+    "unavailableCard": "Carta indisponível",
+    "error": {
+      "not_public": "Esta carta ainda não foi revelada.",
+      "unknown_card": "Esta carta não existe.",
+      "not_a_character": "Só as cartas de personagem podem aparecer no menu.",
+      "no_image": "Esta carta não tem ilustração.",
+      "holo_id": "As versões holo não podem aparecer no menu.",
+      "too_many": "Demasiadas cartas selecionadas.",
+      "invalid": "Seleção inválida."
+    }
+  },
+  "playStats": {
+    "buttonLabel": "Estatísticas",
+    "modalTitle": "Atividade online",
+    "modalSubtitle": "Números ao vivo",
+    "close": "Fechar",
+    "loading": "Carregando...",
+    "unavailable": "As estatísticas não estão disponíveis no momento.",
+    "rangeWeek": "7 dias",
+    "rangeMonth": "30 dias",
+    "games": "Partidas jogadas",
+    "players": "Jogadores",
+    "decks": "Decks usados",
+    "perDay": "Partidas por dia",
+    "perDayChart": "Partidas por dia",
+    "today": "Hoje",
+    "todayHint": "Desde a meia-noite",
+    "activeDays": "Dias com partidas",
+    "evolving": "Partidas Evolutivo",
+    "evolvingHint": "Incluídas no total",
+    "busiestDay": "Dia mais movimentado",
+    "busiestDayValue": "{day} com {games} partidas",
+    "note": "Só contam as partidas online. Os números são atualizados várias vezes por hora."
   }
 }

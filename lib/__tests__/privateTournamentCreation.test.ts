@@ -109,3 +109,34 @@ describe('privileged creators keep the public option', () => {
     expect(res.status).toBe(201);
   });
 });
+
+describe('a tournament created by a normal player never awards tournament prizes', () => {
+  it('marks the tournament as not awarding prizes', async () => {
+    await POST(request(baseBody));
+    expect(create.mock.calls[0][0].data.awardsPrizes).toBe(false);
+  });
+
+  it('refuses to attach a tournament winner card to it', async () => {
+    await POST(request({ ...baseBody, prizeCardId: 'KS-108-MV' }));
+    expect(runCommandRaw).not.toHaveBeenCalled();
+  });
+
+  it('still creates the tournament when a winner card was requested, just without the prize', async () => {
+    const res = await POST(request({ ...baseBody, prizeCardId: 'KS-108-MV' }));
+    expect(res.status).toBe(201);
+    expect(create.mock.calls[0][0].data.awardsPrizes).toBe(false);
+  });
+
+  it('lets an admin tournament award prizes and keep its winner card', async () => {
+    authMock.mockResolvedValue({ user: { id: 'admin1', email: 'matteo.biyikli3224@gmail.com', name: 'Kutxyt' } });
+    await POST(request({ ...baseBody, prizeCardId: 'KS-108-MV' }));
+    expect(create.mock.calls[0][0].data.awardsPrizes).toBe(true);
+    expect(runCommandRaw).toHaveBeenCalled();
+  });
+
+  it('lets a tournament organizer award prizes too', async () => {
+    userFindUnique.mockResolvedValue({ username: 'Org', role: 'tournament_organizer' });
+    await POST(request(baseBody));
+    expect(create.mock.calls[0][0].data.awardsPrizes).toBe(true);
+  });
+});

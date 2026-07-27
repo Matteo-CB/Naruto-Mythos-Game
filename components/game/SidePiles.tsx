@@ -7,6 +7,8 @@ import { useGameStore } from '@/stores/gameStore';
 import { DiscardPileViewer } from './DiscardPileViewer';
 import { useGameScale } from './GameScaleContext';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { useBoardPalette } from './BoardPaletteContext';
+import { withAlpha } from '@/lib/game/boardPalette';
 
 function DeckPile({ count, accentColor }: { count: number; accentColor: string }) {
   const t = useTranslations();
@@ -48,11 +50,11 @@ function DeckPile({ count, accentColor }: { count: number; accentColor: string }
             bottom: 0,
             left: 0,
             border: count > 0
-              ? `1.5px solid ${accentColor}40`
+              ? `1.5px solid ${withAlpha(accentColor, 0.25)}`
               : '1.5px solid #2a2a32',
             opacity: count > 0 ? 1 : 0.3,
             boxShadow: count > 0
-              ? `0 4px 12px rgba(0,0,0,0.5), 0 0 8px ${accentColor}15`
+              ? `0 4px 12px rgba(0,0,0,0.5), 0 0 8px ${withAlpha(accentColor, 0.08)}`
               : 'none',
           }}
         >
@@ -123,7 +125,7 @@ function DiscardPile({
               bottom: i * 2,
               left: (stackLayers - 1 - i) * 1.5,
               backgroundColor: '#15151a',
-              border: `1px solid ${accentColor}25`,
+              border: `1px solid ${withAlpha(accentColor, 0.15)}`,
             }}
           />
         ))}
@@ -136,7 +138,7 @@ function DiscardPile({
               height: CARD_H,
               bottom: 0,
               left: 0,
-              border: `1.5px solid ${accentColor}50`,
+              border: `1.5px solid ${withAlpha(accentColor, 0.31)}`,
               boxShadow: `0 4px 12px rgba(0,0,0,0.5)`,
             }}
           >
@@ -183,6 +185,7 @@ export function OpponentSidePiles() {
   const t = useTranslations();
   const visibleState = useGameStore((s) => s.visibleState);
   const dims = useGameScale();
+  const opponent = useBoardPalette().opponent;
   const [showDiscard, setShowDiscard] = useState(false);
   if (!visibleState) return null;
 
@@ -200,13 +203,14 @@ export function OpponentSidePiles() {
         style={{
           width: dims.sidePileW + 'px',
           backgroundColor: 'rgba(8, 8, 12, 0.6)',
-          borderRight: '1px solid rgba(179, 62, 62, 0.1)',
+          borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+          boxShadow: `0 0 20px ${opponent.tint(0.1)}`,
         }}
       >
-        <div data-anchor="deck:opp"><DeckPile count={deckCount} accentColor="#b33e3e" /></div>
+        <div data-anchor="deck:opp"><DeckPile count={deckCount} accentColor={opponent.primary} /></div>
         <div data-anchor="discard:opp"><DiscardPile
           count={discardCount}
-          accentColor="#b33e3e"
+          accentColor={opponent.primary}
           onClick={() => discardCount > 0 && setShowDiscard(true)}
           topCardImage={normalizeImagePath(opponentTopDiscard?.image_file) ?? undefined}
         /></div>
@@ -229,6 +233,7 @@ export function PlayerSidePiles() {
   const t = useTranslations();
   const visibleState = useGameStore((s) => s.visibleState);
   const dims = useGameScale();
+  const me = useBoardPalette().me;
   const [showDiscard, setShowDiscard] = useState(false);
 
   if (!visibleState) return null;
@@ -247,13 +252,14 @@ export function PlayerSidePiles() {
         style={{
           width: dims.sidePileW + 'px',
           backgroundColor: 'rgba(8, 8, 12, 0.6)',
-          borderLeft: '1px solid rgba(196, 163, 90, 0.1)',
+          borderLeft: '1px solid rgba(255, 255, 255, 0.05)',
+          boxShadow: `0 0 20px ${me.tint(0.1)}`,
         }}
       >
-        <div data-anchor="deck:me"><DeckPile count={deckCount} accentColor="#c4a35a" /></div>
+        <div data-anchor="deck:me"><DeckPile count={deckCount} accentColor={me.primary} /></div>
         <div data-anchor="discard:me"><DiscardPile
           count={discardCount}
-          accentColor="#c4a35a"
+          accentColor={me.primary}
           onClick={() => setShowDiscard(true)}
           topCardImage={normalizeImagePath(playerTopDiscard?.image_file) ?? undefined}
         /></div>

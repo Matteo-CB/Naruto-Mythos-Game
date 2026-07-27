@@ -19,11 +19,13 @@ import {
   PopupMinimizePill,
   SectionDivider,
 } from './PopupPrimitives';
+import { useBoardPalette } from './BoardPaletteContext';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
 export function GameEndScreen() {
   const t = useTranslations();
+  const palette = useBoardPalette();
   const router = useRouter();
   const { data: session } = useSession();
   const gameOver = useGameStore((s) => s.gameOver);
@@ -168,24 +170,24 @@ export function GameEndScreen() {
       else if (winReason === 'idle') headingText = t('game.end.youLostByIdle');
       else if (winReason === 'timeout') headingText = t('game.end.youTimedOut');
       else headingText = t('game.end.youAbandoned');
-      headingColor = '#b33e3e';
+      headingColor = palette.opponent.primary;
     } else {
       if (winReason === 'clock') headingText = t('game.end.opponentLostOnClock');
       else if (winReason === 'disconnect') headingText = tOr('game.end.opponentLostByDisconnect', 'game.end.opponentAbandoned');
       else if (winReason === 'idle') headingText = t('game.end.opponentLostByIdle');
       else if (winReason === 'timeout') headingText = t('game.end.opponentTimedOut');
       else headingText = t('game.end.opponentAbandoned');
-      headingColor = '#c4a35a';
+      headingColor = palette.me.primary;
     }
   } else if (isDraw) {
     headingText = t('game.end.draw');
     headingColor = '#888888';
   } else if (playerWon) {
     headingText = t('game.end.victory');
-    headingColor = '#c4a35a';
+    headingColor = palette.me.primary;
   } else {
     headingText = t('game.end.defeat');
-    headingColor = '#b33e3e';
+    headingColor = palette.opponent.primary;
   }
 
   if (gameEndMinimized) {
@@ -217,7 +219,7 @@ export function GameEndScreen() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               className="text-center text-xs mb-4"
-              style={{ color: '#c4a35a', letterSpacing: '0.08em' }}
+              style={{ color: palette.me.primary, letterSpacing: '0.08em' }}
             >
               {t('game.end.opponentForfeitSubtitle')}
             </motion.div>
@@ -248,7 +250,7 @@ export function GameEndScreen() {
               </span>
               <motion.span
                 className="text-4xl font-bold tabular-nums"
-                style={{ color: '#c4a35a' }}
+                style={{ color: palette.me.primary }}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 1.0, type: 'spring', stiffness: 200 }}
@@ -274,7 +276,7 @@ export function GameEndScreen() {
               </span>
               <motion.span
                 className="text-4xl font-bold tabular-nums"
-                style={{ color: '#b33e3e' }}
+                style={{ color: palette.opponent.primary }}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 1.2, type: 'spring', stiffness: 200 }}

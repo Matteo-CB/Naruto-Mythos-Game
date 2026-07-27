@@ -1,6 +1,79 @@
 {
   "entries": [
     {
+      "date": "2026-07-27",
+      "title_fr": "Couleurs du plateau personnalisables et calendrier plus compact",
+      "title_en": "Custom board colours and a more compact calendar",
+      "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "feature",
+        "fix"
+      ],
+      "changes_fr": [
+        "Tu peux choisir ta couleur et celle de ton adversaire, et le plateau prend ces couleurs en partie.",
+        "Un aperçu du plateau dans les options montre tes couleurs en direct pendant que tu les changes.",
+        "Le fond de plateau se choisit dans ce même aperçu et se voit tout de suite.",
+        "Le calendrier des tournois défile à l’horizontale et prend moins de place, surtout sur téléphone.",
+        "Un bouton Stats sur la page Jeu en ligne montre les parties jouées, les joueurs et les decks utilisés.",
+        "Le fil prévient avant de publier quand ton profil privé limite ton post à tes amis."
+      ],
+      "changes_en": [
+        "You can pick your own colour and your opponent colour, and the board uses them in your games.",
+        "A board preview in the options shows your colours live while you change them.",
+        "The board background is picked in that same preview and shows up straight away.",
+        "The tournament calendar now scrolls sideways and takes less room, especially on a phone.",
+        "A Stats button on the online play page shows games played, players and decks used.",
+        "The feed now warns before posting when your private profile limits the post to your friends."
+      ]
+    },
+    {
+      "date": "2026-07-26",
+      "title_fr": "Les matchs de tournoi se lancent seuls, et un joueur présent ne perd plus par forfait",
+      "title_en": "Tournament matches launch on their own, and a player who is present is never forfeited",
+      "changes_fr": [
+        "Ton match de tournoi se lance tout seul dès que ton adversaire et toi êtes en ligne.",
+        "Un joueur qui attend sur la page du tournoi ne peut plus perdre son match par forfait.",
+        "Quand un match n'arrive vraiment pas à démarrer, il est relancé au lieu d'être donné à l'un des deux joueurs.",
+        "Le jeu te replace dans ton match tout seul, même si tu changes de page ou que ta connexion saute.",
+        "Tu continues de suivre l'avancement du tournoi pendant que tu patientes dans ta salle de match.",
+        "Si ton deck de tournoi devient introuvable, tu es prévenu avant toute décision au lieu d'être éliminé aussitôt.",
+        "Partager un replay ou un deck qui n'est plus disponible affiche maintenant un message au lieu de ne rien faire.",
+        "Les profils privés n'apparaissent plus dans les onglets Abonnements et Amis du fil.",
+        "Les quêtes comptent chaque action, même quand plusieurs se déclenchent en même temps.",
+        "Les tournois privés créés par les joueurs ne sont plus annoncés sur Discord.",
+        "Seuls les tournois officiels permettent de gagner les cartes réservées aux vainqueurs."
+      ],
+      "changes_en": [
+        "Your tournament match now starts on its own as soon as you and your opponent are online.",
+        "A player waiting on the tournament page can no longer lose their match by forfeit.",
+        "When a match really cannot start, it is restarted instead of being handed to one of the two players.",
+        "The game puts you back into your match on its own, even if you change page or your connection drops.",
+        "You keep following the tournament progress while you wait in your match room.",
+        "If your tournament deck goes missing you are warned before any decision instead of being knocked out at once.",
+        "Sharing a replay or a deck that is no longer available now shows a message instead of doing nothing.",
+        "Private profiles no longer show up in the Following and Friends tabs of the feed.",
+        "Quests now count every action, even when several of them happen at the same time.",
+        "Private tournaments created by players are no longer announced on Discord.",
+        "Only official tournaments can award the cards reserved for winners."
+      ],
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ]
+    },
+    {
       "date": "2026-07-25",
       "title_fr": "Calendrier des tournois plus clair, match pour la 3e place et lancement automatique des matchs",
       "title_en": "Clearer tournament calendar, a third place match and automatic match launch",

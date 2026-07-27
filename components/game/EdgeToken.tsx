@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import type { PlayerID } from '@/lib/engine/types';
+import { useBoardPalette } from './BoardPaletteContext';
 
 interface EdgeTokenProps {
   holder: PlayerID;
@@ -12,8 +13,9 @@ interface EdgeTokenProps {
 
 export function EdgeToken({ holder, myPlayer, lockedFor = null }: EdgeTokenProps) {
   const t = useTranslations();
+  const palette = useBoardPalette();
   const isPlayerHolding = holder === myPlayer;
-  const accentColor = isPlayerHolding ? '#c4a35a' : '#b33e3e';
+  const accentColor = isPlayerHolding ? palette.me.primary : palette.opponent.primary;
   const isLocked = lockedFor != null && lockedFor === holder;
 
   return (

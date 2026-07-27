@@ -8,6 +8,7 @@ import { useUIStore } from '@/stores/uiStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useTrainingStore } from '@/stores/trainingStore';
 import { useSocketStore } from '@/lib/socket/client';
+import { useBoardPalette } from './BoardPaletteContext';
 
 const TOKEN_SIZE = 150;
 const SPIN_DURATION_MS = 2800;
@@ -86,6 +87,7 @@ type Phase = 'idle' | 'animating' | 'result' | 'waiting' | 'done';
 
 export function EdgeCoinFlip() {
   const t = useTranslations();
+  const palette = useBoardPalette();
   const visibleState = useGameStore((s) => s.visibleState);
   const isSandboxMode = useGameStore((s) => s.isSandboxMode);
   const isHotseatGame = useGameStore((s) => s.isHotseatGame);
@@ -111,8 +113,9 @@ export function EdgeCoinFlip() {
 
   const landAngle = playerHasEdge ? 0 : 180;
   const totalDeg = 360 * REVOLUTIONS + landAngle;
-  const accentColor = playerHasEdge ? '#c4a35a' : '#b33e3e';
-  const accentRgb = playerHasEdge ? '196,163,90' : '179,62,62';
+  const accentSide = playerHasEdge ? palette.me : palette.opponent;
+  const accentColor = accentSide.primary;
+  const accentRgb = accentSide.rgb;
 
   const animate = useCallback((timestamp: number) => {
     if (!startTimeRef.current) startTimeRef.current = timestamp;

@@ -94,6 +94,7 @@ interface GameStore {
   isSandboxMode: boolean;
   isSimMode: boolean;
   isReplayMode: boolean;
+  isBoardPreview: boolean;
   hotseatSwitchPending: boolean;
   hotseatNextPlayer: PlayerID | null;
   isOnlineGame: boolean;
@@ -701,6 +702,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   isSandboxMode: false,
   isSimMode: false,
   isReplayMode: false,
+  isBoardPreview: false,
   hotseatSwitchPending: false,
   hotseatNextPlayer: null,
   isOnlineGame: false,
@@ -1925,6 +1927,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isSandboxMode: false,
       isSimMode: false,
       isReplayMode: false,
+      isBoardPreview: false,
       hotseatSwitchPending: false,
       hotseatNextPlayer: null,
       isOnlineGame: false,

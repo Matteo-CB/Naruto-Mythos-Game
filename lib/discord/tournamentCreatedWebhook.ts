@@ -1,5 +1,6 @@
 interface TournamentLike {
   name: string;
+  isPublic?: boolean;
   format: string;
   gameMode: string;
   maxPlayers: number;
@@ -82,6 +83,10 @@ export function buildRestrictionSummary(t: TournamentLike): string | null {
 }
 
 export async function sendTournamentCreated(t: TournamentLike): Promise<void> {
+  if (t.isPublic !== true) {
+    console.log(`[TournamentCreatedWebhook] "${t.name}" is private, no Discord announcement`);
+    return;
+  }
   const webhookUrl = process.env.TOURNAMENT_PLANNING_WEBHOOK;
   if (!webhookUrl) {
     console.warn('[TournamentCreatedWebhook] TOURNAMENT_PLANNING_WEBHOOK not set, skipping announcement');

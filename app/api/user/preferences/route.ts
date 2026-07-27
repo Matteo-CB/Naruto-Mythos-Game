@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { COUNTRY_CODES } from '@/lib/data/countries';
 import { refreshChatLock } from '@/lib/socket/chatLockBridge';
 import { normalizeChatVisibility } from '@/lib/chat/chatRules';
+import { validateStoredBoardPalette } from '@/lib/game/boardPalette';
 
 export async function GET() {
   try {
@@ -14,7 +16,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, manualPowerMode: true, gamepadEnabled: true, countryCode: true, chatVisibility: true, fastAnimations: true, allowNonFriendMessages: true, privateProfile: true },
+      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, manualPowerMode: true, gamepadEnabled: true, countryCode: true, chatVisibility: true, fastAnimations: true, allowNonFriendMessages: true, privateProfile: true, boardPalette: true },
     });
 
     return NextResponse.json({
@@ -30,6 +32,7 @@ export async function GET() {
       fastAnimations: user?.fastAnimations ?? false,
       allowNonFriendMessages: user?.allowNonFriendMessages ?? true,
       privateProfile: user?.privateProfile ?? false,
+      boardPalette: user?.boardPalette ?? null,
     });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -84,6 +87,13 @@ export async function PATCH(request: NextRequest) {
     if (typeof body.privateProfile === 'boolean') {
       update.privateProfile = body.privateProfile;
     }
+    if (body.boardPalette !== undefined) {
+      const check = validateStoredBoardPalette(body.boardPalette);
+      if (!check.ok) {
+        return NextResponse.json({ error: 'Invalid board palette' }, { status: 400 });
+      }
+      update.boardPalette = check.value === null ? Prisma.DbNull : check.value;
+    }
 
     if (Object.keys(update).length === 0) {
       return NextResponse.json({ error: 'No valid fields' }, { status: 400 });
@@ -98,7 +108,12 @@ export async function PATCH(request: NextRequest) {
       refreshChatLock(session.user.id);
     }
 
-    return NextResponse.json({ success: true, ...update });
+    const echo = { ...update };
+    if ('boardPalette' in echo) {
+      echo.boardPalette = echo.boardPalette === Prisma.DbNull ? null : echo.boardPalette;
+    }
+
+    return NextResponse.json({ success: true, ...echo });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

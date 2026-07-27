@@ -14,6 +14,7 @@ import { DeckSelector } from '@/components/game/DeckSelector';
 import { useSocketStore } from '@/lib/socket/client';
 import { useGameStore } from '@/stores/gameStore';
 import { LiveGamesBar } from '@/components/play-online/LiveGamesBar';
+import { PlayStatsButton } from '@/components/play-online/PlayStatsButton';
 import { RoomCard } from '@/components/play-online/RoomCard';
 import { HoloSurface } from '@/components/HoloSurface';
 import { useHasEvolvingDeck } from '@/components/play-online/useHasEvolvingDeck';
@@ -39,6 +40,7 @@ const SEALED_DEFAULT_BOOSTER_COUNT: 4 | 5 | 6 = 5;
 const SEALED_DEFAULT_SET_CHOICE = 'KS';
 const JOIN_RETRY_INTERVAL_MS = 4000;
 const JOIN_MAX_ATTEMPTS = 10;
+const JOIN_SLOW_RETRY_EVERY = 5;
 const JOIN_NON_RETRYABLE_ERRORS = new Set([
   'game.error.youAreHost',
   'game.error.roomFull',
@@ -256,6 +258,7 @@ export default function PlayOnlinePage() {
   const joinedCodeRef = useRef<string | null>(null);
   const joinAttemptsRef = useRef(0);
   const joinState = useSocketStore((s) => s.joinState);
+  const seatBound = useSocketStore((s) => s.seatBound);
   useEffect(() => {
     const roomParam = searchParams.get('room');
     if (!roomParam) {
@@ -278,19 +281,22 @@ export default function PlayOnlinePage() {
     const roomParam = searchParams.get('room');
     if (!roomParam) return;
     if (!connected || !session?.user?.id) return;
-    if (joinState === 'joined' || gameStarted) return;
+    if (gameStarted) return;
+    if (seatBound && roomCode === roomParam) return;
     const id = setInterval(() => {
       const st = useSocketStore.getState();
-      if (st.joinState === 'joined' || st.gameStarted) return;
+      if (st.gameStarted) return;
       if (!st.connected || !session?.user?.id) return;
-      if (joinAttemptsRef.current >= JOIN_MAX_ATTEMPTS) return;
+      if (st.seatBound && st.roomCode === roomParam) return;
       if (st.errorKey && JOIN_NON_RETRYABLE_ERRORS.has(st.errorKey)) return;
       joinAttemptsRef.current += 1;
+      const interval = joinAttemptsRef.current > JOIN_MAX_ATTEMPTS ? JOIN_SLOW_RETRY_EVERY : 1;
+      if (joinAttemptsRef.current % interval !== 0) return;
       console.warn('[PlayOnline] Still not seated in', roomParam, 'retrying room:join, attempt', joinAttemptsRef.current);
       st.joinRoom(roomParam, session.user.id);
     }, JOIN_RETRY_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [searchParams, connected, session, joinState, gameStarted]);
+  }, [searchParams, connected, session, joinState, gameStarted, seatBound, roomCode]);
 
   if (!session?.user) {
     return (
@@ -479,6 +485,7 @@ export default function PlayOnlinePage() {
             >
               {t('online.signedInAs', { name: session.user.name })}
             </p>
+            <PlayStatsButton />
           </motion.header>
 
           {bannedCardsError && bannedCardsError.length > 0 && (

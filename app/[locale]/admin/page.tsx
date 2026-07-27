@@ -478,6 +478,18 @@ export default function AdminPage() {
             </div>
 
             <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{tc('adminFeatured.title')}</h2>
+              <p className="text-xs mb-4" style={{ color: '#555555' }}>{tc('adminFeatured.subtitle')}</p>
+              <Link
+                href="/admin/featured"
+                className="inline-block px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
+                style={{ backgroundColor: '#1a1a2e', color: '#c4a35a', border: '1px solid #c4a35a' }}
+              >
+                {tc('adminFeatured.title')}
+              </Link>
+            </div>
+
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
               <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{tc('adminPostModeration.title')}</h2>
               <p className="text-xs mb-4" style={{ color: '#555555' }}>{tc('adminPostModeration.subtitle')}</p>
               <Link

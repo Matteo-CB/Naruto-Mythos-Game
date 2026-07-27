@@ -32,7 +32,12 @@ export async function sendTournamentResults(
   podium: PodiumEntry[],
   totalParticipants: number,
   newRoleName: string | null,
+  isPublic?: boolean,
 ): Promise<void> {
+  if (isPublic !== true) {
+    console.log(`[TournamentWebhook] "${tournamentName}" is private, no Discord results announcement`);
+    return;
+  }
   const webhookUrl = process.env.TOURNOI_WINNER_WEBHOOK;
   if (!webhookUrl) {
     console.warn('[TournamentWebhook] TOURNOI_WINNER_WEBHOOK not set, skipping results announcement');

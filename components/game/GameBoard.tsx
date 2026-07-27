@@ -36,6 +36,7 @@ import { useSocketStore } from "@/lib/socket/client";
 import { GameChat } from "./GameChat";
 import { SpectatorBanner } from "./SpectatorBanner";
 import { Z_APP_MODAL, Z_GAME_OVERLAY } from "@/lib/ui/zIndex";
+import { useBoardPalette } from "./BoardPaletteContext";
 
 const rarityColorMap: Record<string, string> = {
   C: "#888888",
@@ -1011,16 +1012,21 @@ function GameBoardInner() {
   const visibleState = useGameStore((s) => s.visibleState);
   const gameOver = useGameStore((s) => s.gameOver);
   const isReplayMode = useGameStore((s) => s.isReplayMode);
+  const isBoardPreview = useGameStore((s) => s.isBoardPreview);
   const isProcessing = useGameStore((s) => s.isProcessing);
   const addAnimation = useGameStore((s) => s.addAnimation);
   const pinnedCard = useUIStore((s) => s.pinnedCard);
   const unpinCard = useUIStore((s) => s.unpinCard);
   const showFullscreenCard = useUIStore((s) => s.showFullscreenCard);
   const gameBackgroundUrl = useSettingsStore((s) => s.gameBackgroundUrl);
+  const boardPalette = useBoardPalette();
   const fetchSettings = useSettingsStore((s) => s.fetchFromServer);
   const isSpectating = useSocketStore((s) => s.isSpectating);
 
-  useEffect(() => { fetchSettings(); }, [fetchSettings]);
+  useEffect(() => {
+    if (isBoardPreview) return;
+    fetchSettings();
+  }, [fetchSettings, isBoardPreview]);
 
   useEffect(() => { warmupVfxGl(); }, []);
 
@@ -1042,6 +1048,7 @@ function GameBoardInner() {
   const prevTurnRef = useRef<number | null>(null);
 
   useEffect(() => {
+    if (isBoardPreview) return;
     const html = document.documentElement;
     const body = document.body;
     const prevHtmlOverflow = html.style.overflow;
@@ -1055,7 +1062,7 @@ function GameBoardInner() {
       body.style.overflow = prevBodyOverflow;
       body.style.minHeight = prevMinHeight;
     };
-  }, []);
+  }, [isBoardPreview]);
 
   useEffect(() => {
     const currentTurn = visibleState?.turn;
@@ -1214,9 +1221,9 @@ function GameBoardInner() {
                 className="uppercase font-bold tracking-widest px-4 py-1.5 whitespace-nowrap"
                 style={{
                   fontSize: dims.isMobile ? '12px' : '10px',
-                  color: '#d97676',
-                  backgroundColor: 'rgba(179, 62, 62, 0.14)',
-                  boxShadow: '0 0 14px rgba(179, 62, 62, 0.35)',
+                  color: boardPalette.opponent.bright,
+                  backgroundColor: boardPalette.opponent.tint(0.14),
+                  boxShadow: `0 0 14px ${boardPalette.opponent.tint(0.35)}`,
                 }}
               >
                 {t('game.board.handPeeked')}

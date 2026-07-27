@@ -11,16 +11,24 @@ let loadedAt = 0;
 let loading: Promise<void> | null = null;
 const TTL_MS = 30_000;
 
-function apply(settings: { setStatusOverrides?: unknown; variantObtentionConfig?: unknown } | null): void {
+let featuredMenuCardIds: string[] = [];
+
+function apply(settings: { setStatusOverrides?: unknown; variantObtentionConfig?: unknown; featuredMenuCards?: unknown } | null): void {
   applySetStatusOverrides((settings?.setStatusOverrides ?? null) as Record<string, unknown> | null);
   applyVariantObtentionOverrides((settings?.variantObtentionConfig ?? null) as Record<string, unknown> | null);
+  const featured = settings?.featuredMenuCards;
+  featuredMenuCardIds = Array.isArray(featured) ? featured.filter((v): v is string => typeof v === 'string') : [];
   clearVariantPoolCache();
+}
+
+export function getFeaturedMenuCardIds(): string[] {
+  return [...featuredMenuCardIds];
 }
 
 async function load(): Promise<void> {
   const settings = await prisma.siteSettings.findUnique({
     where: { key: 'global' },
-    select: { setStatusOverrides: true, variantObtentionConfig: true },
+    select: { setStatusOverrides: true, variantObtentionConfig: true, featuredMenuCards: true },
   });
   apply(settings);
   loadedAt = Date.now();

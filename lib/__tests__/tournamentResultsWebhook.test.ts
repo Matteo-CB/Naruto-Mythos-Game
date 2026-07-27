@@ -50,7 +50,7 @@ describe('sendTournamentResults: regression-proof contract', () => {
     const fetchMock = makeFetchMock();
     global.fetch = fetchMock;
 
-    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 8, 'Tournament Winner 1');
+    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 8, 'Tournament Winner 1', true);
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('TOURNOI_WINNER_WEBHOOK not set'));
@@ -61,7 +61,7 @@ describe('sendTournamentResults: regression-proof contract', () => {
     const fetchMock = makeFetchMock();
     global.fetch = fetchMock;
 
-    await sendTournamentResults('Test Cup', [], 0, null);
+    await sendTournamentResults('Test Cup', [], 0, null, true);
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Empty podium'));
@@ -72,7 +72,7 @@ describe('sendTournamentResults: regression-proof contract', () => {
     const fetchMock = makeFetchMock();
     global.fetch = fetchMock;
 
-    await sendTournamentResults('Test Cup', [{ userId: 'u2', username: 'Bob', place: 2 }], 4, null);
+    await sendTournamentResults('Test Cup', [{ userId: 'u2', username: 'Bob', place: 2 }], 4, null, true);
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('No 1st place'));
@@ -91,6 +91,7 @@ describe('sendTournamentResults: regression-proof contract', () => {
       ],
       8,
       'Tournament Winner 1',
+      true,
     );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -112,7 +113,7 @@ describe('sendTournamentResults: regression-proof contract', () => {
       text: async () => 'invalid token',
     })) as unknown as typeof fetch;
 
-    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 4, null);
+    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 4, null, true);
 
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('CRITICAL'));
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('401'));
@@ -126,7 +127,7 @@ describe('sendTournamentResults: regression-proof contract', () => {
       text: async () => 'unknown webhook',
     })) as unknown as typeof fetch;
 
-    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 4, null);
+    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 4, null, true);
 
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('CRITICAL'));
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('404'));
@@ -140,7 +141,7 @@ describe('sendTournamentResults: regression-proof contract', () => {
       text: async () => 'server error',
     })) as unknown as typeof fetch;
 
-    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 4, null);
+    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 4, null, true);
 
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to send'));
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('500'));
@@ -153,7 +154,7 @@ describe('sendTournamentResults: regression-proof contract', () => {
       throw new Error('Network unreachable');
     }) as unknown as typeof fetch;
 
-    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 4, null);
+    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 4, null, true);
 
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('Network error'), expect.any(String));
   });
@@ -163,11 +164,11 @@ describe('sendTournamentResults: regression-proof contract', () => {
     const fetchMock = makeFetchMock();
     global.fetch = fetchMock;
 
-    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 4, null);
+    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 4, null, true);
     expect(fetchMock).not.toHaveBeenCalled();
 
     process.env.TOURNOI_WINNER_WEBHOOK = 'https://discord.com/api/webhooks/fake/token';
-    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 4, null);
+    await sendTournamentResults('Test Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 4, null, true);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
@@ -176,7 +177,7 @@ describe('sendTournamentResults: regression-proof contract', () => {
     const fetchMock = makeFetchMock();
     global.fetch = fetchMock;
 
-    await sendTournamentResults('Solo Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 2, null);
+    await sendTournamentResults('Solo Cup', [{ userId: 'u1', username: 'Alice', place: 1 }], 2, null, true);
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const body = JSON.parse((fetchMock as unknown as ReturnType<typeof vi.fn>).mock.calls[0][1].body as string);

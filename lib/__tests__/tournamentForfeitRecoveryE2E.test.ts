@@ -154,7 +154,7 @@ describe('Tournament forfeit recovery E2E (Fix #5: combined defense)', () => {
       }));
     });
 
-    it('connected players get bounded grace, then forfeit only once the grace is exhausted', async () => {
+    it('connected players get bounded grace, then the match is reopened instead of forfeited', async () => {
       const io = makeIo('t1', ['Trafalgar', 'mak52554']);
       p.tournamentMatch.findUnique.mockResolvedValue({
         id: 'r3m1g', tournamentId: 't1', status: 'ready',
@@ -179,9 +179,11 @@ describe('Tournament forfeit recovery E2E (Fix #5: combined defense)', () => {
       expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
 
       await fireAbsenceTimerCallback(io as never, 't1', 'r3m1g', 'Trafalgar', 'mak52554', null, true);
-      expect(p.tournamentParticipant.updateMany).toHaveBeenCalledWith(expect.objectContaining({
-        where: expect.objectContaining({ userId: { in: ['Trafalgar', 'mak52554'] } }),
-        data: expect.objectContaining({ eliminated: true }),
+      expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
+      expect(io.emissions.some((e) => e.event === 'tournament:player-forfeited')).toBe(false);
+      expect(p.tournamentMatch.update).toHaveBeenCalledWith(expect.objectContaining({
+        where: { id: 'r3m1g' },
+        data: expect.objectContaining({ status: 'ready', roomCode: null }),
       }));
     });
   });

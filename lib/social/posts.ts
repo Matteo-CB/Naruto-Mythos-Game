@@ -235,7 +235,7 @@ export async function getFeed(viewerId: string | null, filter: FeedFilter, curso
   }
 
   const raw = await prisma.post.findMany({ where: where as never, orderBy: { createdAt: 'desc' }, take: 40 });
-  const hidden = filter === 'all' ? await getHiddenAuthorIds(viewerId, raw.map((p) => p.authorId)) : new Set<string>();
+  const hidden = await getHiddenAuthorIds(viewerId, raw.map((p) => p.authorId));
   const visible = raw.filter((p) => !hidden.has(p.authorId));
   const hasMore = visible.length > 20 || raw.length >= 40;
   const page = visible.slice(0, 20);

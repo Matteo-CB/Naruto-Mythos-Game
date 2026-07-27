@@ -712,7 +712,22 @@
     "allowNonFriendMessagesHint": "フレンドでないプレイヤーからのダイレクトメッセージを許可します。",
     "privateProfile": "非公開プロフィール",
     "privateProfileHint": "友達以外には投稿を非表示にします。フォローはできず、フレンド申請のみ可能です。",
-    "socialSectionTitle": "ソーシャルとプライバシー"
+    "socialSectionTitle": "ソーシャルとプライバシー",
+    "boardColors": "ボードの色",
+    "boardColorsHint": "ボード上で「自分」と「相手」を表す色を選べます。下のプレビューは実際のボードです。",
+    "boardColorsMe": "自分",
+    "boardColorsOpponent": "相手",
+    "boardColorsPrimary": "メインの色",
+    "boardColorsBright": "合計パワーの色",
+    "boardColorsAdvanced": "詳細な色",
+    "boardColorsReset": "初期値",
+    "boardColorsResetAll": "すべてリセット",
+    "boardColorsPreviewLabel": "ライブプレビュー",
+    "boardColorsInvalidHex": "#c4a35a のような色を入力してください。",
+    "boardColorsLowContrast": "この色はボード上でとても暗く、読みにくい場合があります。",
+    "boardColorsDefaultsHint": "初期値: 自分は {me}、相手は {opponent}。",
+    "boardPreviewYou": "自分",
+    "boardPreviewOpponent": "相手"
   },
   "game": {
     "turn": "ターン {turn}",
@@ -1638,6 +1653,7 @@
       "deckBanned": "デッキに禁止カードが含まれています。このモードでプレイするには取り除いてください。",
       "authMismatch": "認証が一致しません。",
       "tournamentBusy": "トーナメント対戦中です（{roomCode}）。先にそれを終わらせてください。",
+      "tournamentDeckMissing": "登録したデッキを読み込めませんでした。このままお待ちください。主催者に通知されました。",
       "roomNotFound": "ルームが見つかりません。",
       "youAreHost": "あなたはこのルームのホストです。",
       "roomFull": "ルームが満員です。",
@@ -3257,7 +3273,8 @@
     "language": "言語",
     "english": "English",
     "french": "Français",
-    "mainNavigation": "メインナビゲーション"
+    "mainNavigation": "メインナビゲーション",
+    "featuredCard": "注目のカード"
   },
   "training": {
     "title": "トレーニングモード",
@@ -3802,7 +3819,8 @@
       "generic": "エラーが発生しました。",
       "deckHasUnrevealed": "このデッキには未公開のカードが含まれているため、共有できません。"
     },
-    "postToFeed": "フィードに投稿"
+    "postToFeed": "フィードに投稿",
+    "privateNotice": "プロフィールが非公開のため、この投稿はフレンドにのみ表示されます。"
   },
   "adminPostModeration": {
     "title": "投稿とメッセージのモデレーション",
@@ -3856,5 +3874,60 @@
     "next": "次の日",
     "restDay": "休息日、予定されている大会はありません",
     "localTimeNote": "時刻はお使いの環境のタイムゾーンで表示されます。"
+  },
+  "adminFeatured": {
+    "title": "メニューのホロカード",
+    "subtitle": "メインメニューにホロカードとして表示するカードを選びます。公開済みのカードのみ選択できます。",
+    "back": "管理に戻る",
+    "unauthorized": "アクセスが拒否されました。",
+    "loading": "読み込み中...",
+    "empty": "該当するカードがありません。",
+    "searchPlaceholder": "カードを検索",
+    "setFilterAll": "すべてのセット",
+    "selectionTitle": "メニューの選択",
+    "selectionEmpty": "カードが選ばれていません。メニューは初期カードを表示します。",
+    "count": "{selected} / {max}",
+    "remove": "削除",
+    "moveUp": "上へ",
+    "moveDown": "下へ",
+    "save": "保存",
+    "saving": "保存中...",
+    "saved": "メニューのカードを保存しました。",
+    "saveFailed": "メニューのカードを保存できませんでした。",
+    "notRevealed": "未公開",
+    "previewTitle": "プレビュー",
+    "unavailableCard": "カードを表示できません",
+    "error": {
+      "not_public": "このカードはまだ公開されていません。",
+      "unknown_card": "このカードは存在しません。",
+      "not_a_character": "メニューに表示できるのはキャラクターカードのみです。",
+      "no_image": "このカードにはイラストがありません。",
+      "holo_id": "ホロ版はメニューに表示できません。",
+      "too_many": "カードを選びすぎています。",
+      "invalid": "選択が正しくありません。"
+    }
+  },
+  "playStats": {
+    "buttonLabel": "統計",
+    "modalTitle": "オンラインの活動",
+    "modalSubtitle": "最新の数値",
+    "close": "閉じる",
+    "loading": "読み込み中...",
+    "unavailable": "現在、統計を表示できません。",
+    "rangeWeek": "7日間",
+    "rangeMonth": "30日間",
+    "games": "対戦数",
+    "players": "プレイヤー数",
+    "decks": "使用デッキ数",
+    "perDay": "1日あたりの対戦数",
+    "perDayChart": "1日あたりの対戦数",
+    "today": "今日",
+    "todayHint": "0時から",
+    "activeDays": "対戦があった日数",
+    "evolving": "エボルビングの対戦",
+    "evolvingHint": "合計に含まれます",
+    "busiestDay": "最も活発だった日",
+    "busiestDayValue": "{day}、{games}戦",
+    "note": "オンライン対戦のみが対象です。数値は1時間に数回更新されます。"
   }
 }

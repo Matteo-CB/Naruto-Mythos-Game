@@ -714,7 +714,22 @@
     "allowNonFriendMessagesHint": "Autoriser les joueurs qui ne sont pas tes amis à t'envoyer des messages privés.",
     "privateProfile": "Profil privé",
     "privateProfileHint": "Cache tes posts à tout le monde sauf tes amis. On ne peut pas te suivre, seulement t'envoyer une demande d'ami.",
-    "socialSectionTitle": "Social et confidentialité"
+    "socialSectionTitle": "Social et confidentialité",
+    "boardColors": "Couleurs du plateau",
+    "boardColorsHint": "Choisissez les couleurs qui signifient « vous » et « votre adversaire » sur le plateau. L’aperçu ci-dessous est le vrai plateau.",
+    "boardColorsMe": "Vous",
+    "boardColorsOpponent": "Adversaire",
+    "boardColorsPrimary": "Couleur principale",
+    "boardColorsBright": "Couleur du total de puissance",
+    "boardColorsAdvanced": "Couleurs avancées",
+    "boardColorsReset": "Par défaut",
+    "boardColorsResetAll": "Tout réinitialiser",
+    "boardColorsPreviewLabel": "Aperçu en direct",
+    "boardColorsInvalidHex": "Saisissez une couleur du type #c4a35a.",
+    "boardColorsLowContrast": "Cette couleur est très sombre sur le plateau et peut être difficile à lire.",
+    "boardColorsDefaultsHint": "Par défaut : {me} pour vous, {opponent} pour l’adversaire.",
+    "boardPreviewYou": "Vous",
+    "boardPreviewOpponent": "Adversaire"
   },
   "game": {
     "turn": "Tour {turn}",
@@ -1640,6 +1655,7 @@
       "deckBanned": "Votre deck contient des cartes bannies. Retirez-les pour jouer dans ce mode.",
       "authMismatch": "Erreur d'authentification.",
       "tournamentBusy": "Vous êtes dans un match de tournoi ({roomCode}). Terminez-le d'abord.",
+      "tournamentDeckMissing": "Votre deck inscrit n'a pas pu être chargé. Restez ici, l'organisateur est prévenu.",
       "roomNotFound": "Salle introuvable.",
       "youAreHost": "Vous êtes l'hôte de cette salle.",
       "roomFull": "La salle est pleine.",
@@ -3259,7 +3275,8 @@
     "language": "Langue",
     "english": "Anglais",
     "french": "Français",
-    "mainNavigation": "Navigation principale"
+    "mainNavigation": "Navigation principale",
+    "featuredCard": "Carte à la une"
   },
   "training": {
     "title": "Mode entraînement",
@@ -3804,7 +3821,8 @@
       "generic": "Une erreur est survenue.",
       "deckHasUnrevealed": "Ce deck contient une carte pas encore révélée, tu ne peux pas le partager."
     },
-    "postToFeed": "Publier dans le fil"
+    "postToFeed": "Publier dans le fil",
+    "privateNotice": "Ton profil est privé, ce post ne sera visible que par tes amis."
   },
   "adminPostModeration": {
     "title": "Modération des posts et messages",
@@ -3858,5 +3876,60 @@
     "next": "Jour suivant",
     "restDay": "Jour de repos, aucun tournoi prévu",
     "localTimeNote": "Les horaires sont affichés dans ton fuseau horaire."
+  },
+  "adminFeatured": {
+    "title": "Cartes holo du menu",
+    "subtitle": "Choisissez les cartes affichées en holo sur le menu principal. Seules les cartes révélées peuvent être sélectionnées.",
+    "back": "Retour à l'administration",
+    "unauthorized": "Accès refusé.",
+    "loading": "Chargement...",
+    "empty": "Aucune carte ne correspond à cette recherche.",
+    "searchPlaceholder": "Rechercher une carte",
+    "setFilterAll": "Tous les sets",
+    "selectionTitle": "Sélection du menu",
+    "selectionEmpty": "Aucune carte sélectionnée. Le menu utilise les cartes par défaut.",
+    "count": "{selected} / {max}",
+    "remove": "Retirer",
+    "moveUp": "Monter",
+    "moveDown": "Descendre",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "saved": "Cartes du menu enregistrées.",
+    "saveFailed": "Impossible d'enregistrer les cartes du menu.",
+    "notRevealed": "Pas encore révélée",
+    "previewTitle": "Aperçu",
+    "unavailableCard": "Carte indisponible",
+    "error": {
+      "not_public": "Cette carte n'est pas encore révélée.",
+      "unknown_card": "Cette carte n'existe pas.",
+      "not_a_character": "Seules les cartes personnage peuvent être affichées sur le menu.",
+      "no_image": "Cette carte n'a pas d'illustration.",
+      "holo_id": "Les versions holo ne peuvent pas être affichées sur le menu.",
+      "too_many": "Trop de cartes sélectionnées.",
+      "invalid": "Sélection invalide."
+    }
+  },
+  "playStats": {
+    "buttonLabel": "Stats",
+    "modalTitle": "Activité en ligne",
+    "modalSubtitle": "Chiffres en direct",
+    "close": "Fermer",
+    "loading": "Chargement...",
+    "unavailable": "Les statistiques ne sont pas disponibles pour le moment.",
+    "rangeWeek": "7 jours",
+    "rangeMonth": "30 jours",
+    "games": "Parties jouées",
+    "players": "Joueurs",
+    "decks": "Decks utilisés",
+    "perDay": "Parties par jour",
+    "perDayChart": "Parties par jour",
+    "today": "Aujourd'hui",
+    "todayHint": "Depuis minuit",
+    "activeDays": "Jours avec des parties",
+    "evolving": "Parties Évolutif",
+    "evolvingHint": "Comprises dans le total",
+    "busiestDay": "Jour le plus actif",
+    "busiestDayValue": "{day} avec {games} parties",
+    "note": "Seules les parties en ligne comptent. Les chiffres se mettent à jour plusieurs fois par heure."
   }
 }

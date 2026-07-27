@@ -110,9 +110,11 @@ export default function TournamentDetailPage() {
   }, [tournamentId, session?.user?.id]);
 
   useEffect(() => {
-    if (session?.user?.id && !connected) {
-      connect(session.user.id, session.user.name ?? undefined);
-    }
+    if (!session?.user?.id) return;
+    if (connected) return;
+    const existing = useSocketStore.getState().socket;
+    if (existing && existing.active) return;
+    connect(session.user.id, session.user.name ?? undefined);
   }, [session, connected, connect]);
 
   useEffect(() => {

@@ -69,6 +69,7 @@ model User {
   privateProfile          Boolean              @default(false)
   chatIntroSeenAt         DateTime?
   usernameResetRequired   Boolean              @default(false)
+  boardPalette            Json?
 
   @@index([elo])
   @@index([createdAt])
@@ -235,20 +236,20 @@ model PostLike {
 }
 
 model PostReport {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  targetType   String   @default("post")
-  postId       String?  @db.ObjectId
-  messageId    String?  @db.ObjectId
-  reporterId   String   @db.ObjectId
-  reporterName String
-  authorId     String?  @db.ObjectId
-  authorName   String?
-  content      String   @default("")
-  reason       String?
-  status       String   @default("pending")
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  targetType    String    @default("post")
+  postId        String?   @db.ObjectId
+  messageId     String?   @db.ObjectId
+  reporterId    String    @db.ObjectId
+  reporterName  String
+  authorId      String?   @db.ObjectId
+  authorName    String?
+  content       String    @default("")
+  reason        String?
+  status        String    @default("pending")
   handledByName String?
-  handledAt    DateTime?
-  createdAt    DateTime @default(now())
+  handledAt     DateTime?
+  createdAt     DateTime  @default(now())
 
   @@index([status, createdAt])
   @@index([createdAt])
@@ -347,67 +348,69 @@ model SiteSettings {
   discordRoleIds         Json?
   setStatusOverrides     Json?
   variantObtentionConfig Json?
+  featuredMenuCards      Json?
 }
 
 // A card from a "revealing" set that an admin has explicitly HIDDEN (not yet revealed).
 // Revealing-set cards are PUBLIC by default; only cards listed here stay hidden from every
 // non-admin/non-tester surface (collection, deck builder, game, images, tournaments).
 model HiddenCard {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  cardId    String   @unique
-  hiddenAt  DateTime @default(now())
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  cardId   String   @unique
+  hiddenAt DateTime @default(now())
 }
 
 model Tournament {
-  id                 String                  @id @default(auto()) @map("_id") @db.ObjectId
-  name               String
-  type               String                  @default("simulator")
-  format             String                  @default("swiss")
-  status             String
-  gameMode           String
-  maxPlayers         Int
-  currentRound       Int                     @default(0)
-  totalRounds        Int                     @default(0)
-  isPublic           Boolean                 @default(true)
-  joinCode           String?                 @unique
-  creatorId          String                  @db.ObjectId
-  creatorUsername    String
-  requiresDiscord    Boolean                 @default(true)
-  useBanList         Boolean                 @default(true)
-  sealedBoosterCount Int?
-  sealedSetChoice    String?
-  discordRoleReward  String?
-  discordRoleBadge   String?
-  bannedCardIds      String[]                @default([])
-  allowedLeagues     String[]                @default([])
+  id                  String                  @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+  type                String                  @default("simulator")
+  format              String                  @default("swiss")
+  status              String
+  gameMode            String
+  maxPlayers          Int
+  currentRound        Int                     @default(0)
+  totalRounds         Int                     @default(0)
+  isPublic            Boolean                 @default(true)
+  joinCode            String?                 @unique
+  creatorId           String                  @db.ObjectId
+  creatorUsername     String
+  requiresDiscord     Boolean                 @default(true)
+  useBanList          Boolean                 @default(true)
+  sealedBoosterCount  Int?
+  sealedSetChoice     String?
+  discordRoleReward   String?
+  discordRoleBadge    String?
+  bannedCardIds       String[]                @default([])
+  allowedLeagues      String[]                @default([])
   // Restricted mode constraints (gameMode = "restricted")
-  allowedGroups      String[]                @default([]) // e.g. ["Leaf Village","Sand Village"] — empty = all allowed
-  bannedGroups       String[]                @default([]) // e.g. ["Akatsuki"]
-  allowedKeywords    String[]                @default([]) // e.g. ["Team 7"] — empty = all allowed
-  bannedKeywords     String[]                @default([]) // e.g. ["Summon","Rogue Ninja"]
-  allowedRarities    String[]                @default([]) // e.g. ["C","UC","R"] — empty = all allowed
-  bannedRarities     String[]                @default([]) // e.g. ["S","M"]
-  maxPerRarity       Json? // e.g. {"R":4,"S":2} — max cards per rarity
-  maxCopiesPerCard   Int? // override default 2 copies limit
-  minDeckSize        Int? // override default 30
-  maxDeckSize        Int? // optional max deck size
-  maxChakraCost      Int? // max individual card chakra cost
-  restrictionNote    String? // free-text note shown to players
-  prizeCardId        String? // Phase 6: tournament winner prize card (KS-108-MV / KS-120-MV / KS-128-MV / KS-137-MV)
-  partner            String?
-  partnerPrizeAwarded Boolean                @default(false)
-  partnerAnnounced   Boolean                @default(false)
-  chuninResetAt      DateTime?
-  scheduledStartAt   DateTime?
-  matchTimeLimitMs   Int                     @default(1800000)
-  joinTimeLimitMs    Int                     @default(300000)
-  startedAt          DateTime?
-  completedAt        DateTime?
-  winnerId           String?                 @db.ObjectId
-  winnerUsername     String?
-  createdAt          DateTime                @default(now())
-  participants       TournamentParticipant[]
-  matches            TournamentMatch[]
+  allowedGroups       String[]                @default([]) // e.g. ["Leaf Village","Sand Village"] — empty = all allowed
+  bannedGroups        String[]                @default([]) // e.g. ["Akatsuki"]
+  allowedKeywords     String[]                @default([]) // e.g. ["Team 7"] — empty = all allowed
+  bannedKeywords      String[]                @default([]) // e.g. ["Summon","Rogue Ninja"]
+  allowedRarities     String[]                @default([]) // e.g. ["C","UC","R"] — empty = all allowed
+  bannedRarities      String[]                @default([]) // e.g. ["S","M"]
+  maxPerRarity        Json? // e.g. {"R":4,"S":2} — max cards per rarity
+  maxCopiesPerCard    Int? // override default 2 copies limit
+  minDeckSize         Int? // override default 30
+  maxDeckSize         Int? // optional max deck size
+  maxChakraCost       Int? // max individual card chakra cost
+  restrictionNote     String? // free-text note shown to players
+  prizeCardId         String? // Phase 6: tournament winner prize card (KS-108-MV / KS-120-MV / KS-128-MV / KS-137-MV)
+  partner             String?
+  partnerPrizeAwarded Boolean                 @default(false)
+  partnerAnnounced    Boolean                 @default(false)
+  awardsPrizes        Boolean                 @default(true)
+  chuninResetAt       DateTime?
+  scheduledStartAt    DateTime?
+  matchTimeLimitMs    Int                     @default(1800000)
+  joinTimeLimitMs     Int                     @default(300000)
+  startedAt           DateTime?
+  completedAt         DateTime?
+  winnerId            String?                 @db.ObjectId
+  winnerUsername      String?
+  createdAt           DateTime                @default(now())
+  participants        TournamentParticipant[]
+  matches             TournamentMatch[]
 
   @@index([status, createdAt])
   @@index([status, scheduledStartAt])
@@ -804,7 +807,7 @@ model WorldcupTitle {
 
 model WorldcupTeamMember {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId @unique
+  userId      String   @unique @db.ObjectId
   countryCode String
   updatedAt   DateTime @updatedAt
 
@@ -914,4 +917,14 @@ model UserModeStat {
 
   @@unique([userId, mode])
   @@index([userId])
+}
+
+model DailyPlayStat {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  day       String   @unique
+  games     Int      @default(0)
+  evolving  Int      @default(0)
+  playerIds String[] @default([])
+  deckKeys  String[] @default([])
+  updatedAt DateTime @updatedAt
 }

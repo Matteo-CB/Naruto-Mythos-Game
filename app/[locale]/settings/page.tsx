@@ -9,6 +9,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { FlagPicker } from '@/components/FlagPicker';
 import { ChatSettingsSection } from '@/components/settings/ChatSettingsSection';
+import { BoardColorsSection } from '@/components/settings/BoardColorsSection';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useCallback } from 'react';
 
@@ -38,8 +39,8 @@ export default function SettingsPage() {
   const locale = useLocale();
   const tMeta = useTranslations('_meta');
   const {
-    animationsPref, gameBackground, gameBackgroundUrl, isLoaded, availableBackgrounds,
-    fetchFromServer, setAnimationsEnabled, setGameBackground,
+    animationsPref, isLoaded,
+    fetchFromServer, setAnimationsEnabled,
     hideDeckBuilderVariants, setHideDeckBuilderVariants,
     manualPowerMode, setManualPowerMode,
     gamepadEnabled, setGamepadEnabled,
@@ -52,7 +53,6 @@ export default function SettingsPage() {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   useEffect(() => { setIsTouchDevice(isTouchPrimaryDevice()); }, []);
   const tFlag = useTranslations('flag');
-  const backgrounds = availableBackgrounds;
 
   const [usernameInput, setUsernameInput] = useState('');
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -583,251 +583,7 @@ export default function SettingsPage() {
         </div>
         </div>
 
-        {backgrounds.length > 0 && (
-          <div
-            className="mt-4 flex flex-col gap-4 p-5 lg:mt-6 lg:p-6"
-            style={{
-              backgroundColor: '#111111',
-              border: '1px solid #262626',
-            }}
-          >
-            <span
-              className="text-sm font-medium tracking-wide"
-              style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}
-            >
-              {t('gameBackground')}
-            </span>
-
-            <div className="hidden lg:flex lg:flex-col lg:gap-6">
-              <div
-                className="relative mx-auto w-full overflow-hidden"
-                style={{
-                  aspectRatio: '16/9',
-                  maxWidth: 860,
-                  backgroundColor: '#0a0a0a',
-                  boxShadow: '0 24px 60px rgba(0,0,0,0.55), 0 0 48px rgba(196,163,90,0.10)',
-                }}
-              >
-                <AnimatePresence>
-                  {gameBackground === 'random' ? (
-                    <motion.div
-                      key="preview-random"
-                      className="absolute inset-0 flex flex-col items-center justify-center gap-3"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.35 }}
-                      style={{ backgroundColor: 'rgba(196, 163, 90, 0.05)' }}
-                    >
-                      <span
-                        className="text-6xl font-bold"
-                        style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", letterSpacing: '0.1em' }}
-                      >
-                        ?
-                      </span>
-                      <span className="text-xs font-bold uppercase tracking-[0.35em]" style={{ color: '#c4a35a' }}>
-                        {t('gameBackgroundRandom')}
-                      </span>
-                    </motion.div>
-                  ) : (
-                    <motion.img
-                      key={`preview-${gameBackground}`}
-                      src={backgrounds.find((bg) => bg.id === gameBackground)?.url ?? gameBackgroundUrl}
-                      alt={backgrounds.find((bg) => bg.id === gameBackground)?.name ?? t('gameBackground')}
-                      className="absolute inset-0 h-full w-full object-cover"
-                      initial={{ opacity: 0, scale: 1.04 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.45, ease: 'easeOut' }}
-                      draggable={false}
-                    />
-                  )}
-                </AnimatePresence>
-                {gameBackground !== 'random' && (
-                  <div
-                    className="absolute inset-x-0 bottom-0 flex items-center justify-between px-5 py-3"
-                    style={{ backgroundColor: 'rgba(10, 10, 10, 0.72)' }}
-                  >
-                    <span className="text-xs font-bold uppercase tracking-[0.25em]" style={{ color: '#c4a35a' }}>
-                      {backgrounds.find((bg) => bg.id === gameBackground)?.name ?? ''}
-                    </span>
-                    <span className="text-[10px] font-medium uppercase tracking-[0.3em]" style={{ color: '#888888' }}>
-                      {t('selected')}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="grid grid-cols-3 gap-5 xl:grid-cols-4">
-                <button
-                  type="button"
-                  disabled={!isLoaded}
-                  onClick={() => setGameBackground('random', '')}
-                  className="flex flex-col gap-2 text-left transition-all"
-                  style={{
-                    opacity: !isLoaded ? 0.5 : gameBackground === 'random' ? 1 : 0.72,
-                    cursor: isLoaded ? 'pointer' : 'default',
-                  }}
-                  onMouseEnter={(e) => { if (isLoaded) (e.currentTarget as HTMLElement).style.opacity = '1'; }}
-                  onMouseLeave={(e) => { if (isLoaded && gameBackground !== 'random') (e.currentTarget as HTMLElement).style.opacity = '0.72'; }}
-                >
-                  <span
-                    className="relative flex w-full items-center justify-center overflow-hidden"
-                    style={{
-                      aspectRatio: '16/9',
-                      backgroundColor: 'rgba(196, 163, 90, 0.06)',
-                      boxShadow: gameBackground === 'random' ? '0 0 22px rgba(196, 163, 90, 0.5)' : '0 6px 18px rgba(0,0,0,0.45)',
-                      transform: gameBackground === 'random' ? 'scale(1.02)' : 'scale(1)',
-                      transition: 'box-shadow 200ms ease, transform 200ms ease',
-                    }}
-                  >
-                    <span
-                      className="text-3xl font-bold"
-                      style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", letterSpacing: '0.1em' }}
-                    >
-                      ?
-                    </span>
-                  </span>
-                  <span
-                    className="text-[10px] font-bold uppercase tracking-[0.25em] text-center"
-                    style={{ color: gameBackground === 'random' ? '#c4a35a' : '#888888' }}
-                  >
-                    {t('gameBackgroundRandom')}
-                  </span>
-                </button>
-                {backgrounds.map((bg) => {
-                  const isSelected = gameBackground === bg.id;
-                  return (
-                    <button
-                      key={`desktop-${bg.id}`}
-                      type="button"
-                      disabled={!isLoaded}
-                      onClick={() => setGameBackground(bg.id, bg.url)}
-                      className="flex flex-col gap-2 text-left transition-all"
-                      style={{
-                        opacity: !isLoaded ? 0.5 : isSelected ? 1 : 0.72,
-                        cursor: isLoaded ? 'pointer' : 'default',
-                      }}
-                      onMouseEnter={(e) => { if (isLoaded) (e.currentTarget as HTMLElement).style.opacity = '1'; }}
-                      onMouseLeave={(e) => { if (isLoaded && !isSelected) (e.currentTarget as HTMLElement).style.opacity = '0.72'; }}
-                    >
-                      <span
-                        className="relative block w-full overflow-hidden"
-                        style={{
-                          aspectRatio: '16/9',
-                          boxShadow: isSelected ? '0 0 22px rgba(196, 163, 90, 0.5)' : '0 6px 18px rgba(0,0,0,0.45)',
-                          transform: isSelected ? 'scale(1.02)' : 'scale(1)',
-                          transition: 'box-shadow 200ms ease, transform 200ms ease',
-                        }}
-                      >
-                        <img src={bg.url} alt={bg.name} className="h-full w-full object-cover" loading="lazy" draggable={false} />
-                        {isSelected && (
-                          <span
-                            className="absolute inset-0 pointer-events-none"
-                            style={{ backgroundColor: 'rgba(196, 163, 90, 0.14)' }}
-                          />
-                        )}
-                      </span>
-                      <span
-                        className="truncate text-center text-[10px] font-bold uppercase tracking-[0.25em]"
-                        style={{ color: isSelected ? '#c4a35a' : '#888888' }}
-                      >
-                        {bg.name}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 lg:hidden">
-              {(() => {
-                const isRandomSelected = gameBackground === 'random';
-                return (
-                  <button
-                    type="button"
-                    disabled={!isLoaded || backgrounds.length === 0}
-                    onClick={() => setGameBackground('random', '')}
-                    className="relative overflow-hidden transition-all flex items-center justify-center"
-                    style={{
-                      aspectRatio: '16/9',
-                      border: isRandomSelected ? '2px solid #c4a35a' : '2px solid #333333',
-                      backgroundColor: 'rgba(196, 163, 90, 0.06)',
-                      opacity: isLoaded && backgrounds.length > 0 ? 1 : 0.5,
-                      cursor: isLoaded && backgrounds.length > 0 ? 'pointer' : 'default',
-                    }}
-                  >
-                    <div className="flex flex-col items-center gap-1.5">
-                      <span
-                        className="text-2xl font-bold tracking-wider"
-                        style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", letterSpacing: '0.1em' }}
-                      >
-                        ?
-                      </span>
-                      <span
-                        className="text-[10px] font-bold uppercase tracking-[0.3em]"
-                        style={{ color: isRandomSelected ? '#c4a35a' : '#888' }}
-                      >
-                        {t('gameBackgroundRandom')}
-                      </span>
-                    </div>
-                    {isRandomSelected && (
-                      <div
-                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                        style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)' }}
-                      >
-                        <span
-                          className="text-xs font-bold uppercase tracking-wider"
-                          style={{ color: '#c4a35a' }}
-                        >
-                          {t('selected')}
-                        </span>
-                      </div>
-                    )}
-                  </button>
-                );
-              })()}
-              {backgrounds.map((bg) => {
-                const isSelected = gameBackground === bg.id;
-                return (
-                  <button
-                    key={bg.id}
-                    type="button"
-                    disabled={!isLoaded}
-                    onClick={() => setGameBackground(bg.id, bg.url)}
-                    className="relative overflow-hidden transition-all"
-                    style={{
-                      aspectRatio: '16/9',
-                      border: isSelected ? '2px solid #c4a35a' : '2px solid #333333',
-                      opacity: isLoaded ? 1 : 0.5,
-                      cursor: isLoaded ? 'pointer' : 'default',
-                    }}
-                  >
-                    <img
-                      src={bg.url}
-                      alt={bg.name}
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                    {isSelected && (
-                      <div
-                        className="absolute inset-0 flex items-center justify-center"
-                        style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)' }}
-                      >
-                        <span
-                          className="text-xs font-bold uppercase tracking-wider"
-                          style={{ color: '#c4a35a' }}
-                        >
-                          {t('selected')}
-                        </span>
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        <BoardColorsSection />
 
         <div
           className="mt-4 flex flex-col gap-4 p-5 lg:mt-6 lg:max-w-2xl"

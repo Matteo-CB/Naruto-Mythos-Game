@@ -171,11 +171,11 @@ describe('tournament absence decision', () => {
     expect(out).toEqual({ kind: 'grace' });
   });
 
-  it('forfeits an identified connected player only once the grace cap is reached', () => {
+  it('never forfeits an identified connected player, even once the grace cap is reached', () => {
     const out = decideAbsenceOutcome(evidence({
       knownAbsentPlayerId: 'p2', onlineP1: true, onlineP2: true, cycles: 8,
     }));
-    expect(out).toEqual({ kind: 'forfeit', players: ['p2'] });
+    expect(out).toEqual({ kind: 'no-contest', reason: 'launch-stalled', players: ['p2'] });
   });
 
   it('treats a player whose seat is bound in the match room as present', () => {

@@ -25,6 +25,7 @@ import {
   useNeedsScroll,
 } from './PopupPrimitives';
 import { TargetOrderPopup } from './TargetOrderPopup';
+import { useBoardPalette } from './BoardPaletteContext';
 
 interface TargetCharacterProps {
   character: VisibleCharacter;
@@ -539,6 +540,7 @@ interface TargetMissionLaneProps {
 const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPlayer }: TargetMissionLaneProps) {
   const t = useTranslations();
   const locale = useLocale();
+  const palette = useBoardPalette();
   const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const rankColors: Record<MissionRank, string> = {
     D: '#3e8b3e',
@@ -612,16 +614,16 @@ const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missi
       >
         <span
           className="text-[10px] font-bold tabular-nums"
-          style={{ color: manualPowerMode ? '#c4a35a' : myPower > oppPower ? '#4aff6b' : myPower < oppPower ? '#ff6b6b' : '#888888' }}
+          style={{ color: manualPowerMode ? palette.me.primary : myPower > oppPower ? '#4aff6b' : myPower < oppPower ? '#ff6b6b' : '#888888' }}
         >
-          {manualPowerMode ? <ManualGuess actual={myPower} color="#c4a35a" /> : myPower}
+          {manualPowerMode ? <ManualGuess actual={myPower} color={palette.me.primary} /> : myPower}
         </span>
         <span className="text-[9px]" style={{ color: '#555555' }}>vs</span>
         <span
           className="text-[10px] font-bold tabular-nums"
-          style={{ color: manualPowerMode ? '#b33e3e' : oppPower > myPower ? '#ff6b6b' : oppPower < myPower ? '#4aff6b' : '#888888' }}
+          style={{ color: manualPowerMode ? palette.opponent.primary : oppPower > myPower ? '#ff6b6b' : oppPower < myPower ? '#4aff6b' : '#888888' }}
         >
-          {manualPowerMode ? <ManualGuess actual={oppPower} color="#b33e3e" /> : oppPower}
+          {manualPowerMode ? <ManualGuess actual={oppPower} color={palette.opponent.primary} /> : oppPower}
         </span>
       </div>
 

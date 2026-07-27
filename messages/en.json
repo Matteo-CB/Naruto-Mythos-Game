@@ -708,7 +708,22 @@
     "allowNonFriendMessagesHint": "Allow players who are not your friends to send you private messages.",
     "privateProfile": "Private profile",
     "privateProfileHint": "Hide your posts from everyone except your friends. People cannot follow you, only send a friend request.",
-    "socialSectionTitle": "Social & privacy"
+    "socialSectionTitle": "Social & privacy",
+    "boardColors": "Board Colors",
+    "boardColorsHint": "Pick the colors that mean \"you\" and \"your opponent\" on the game board. The preview below is the real board.",
+    "boardColorsMe": "You",
+    "boardColorsOpponent": "Opponent",
+    "boardColorsPrimary": "Main color",
+    "boardColorsBright": "Power total color",
+    "boardColorsAdvanced": "Advanced colors",
+    "boardColorsReset": "Default",
+    "boardColorsResetAll": "Reset everything",
+    "boardColorsPreviewLabel": "Live preview",
+    "boardColorsInvalidHex": "Enter a color like #c4a35a.",
+    "boardColorsLowContrast": "This color is very dark on the board and may be hard to read.",
+    "boardColorsDefaultsHint": "Defaults: {me} for you, {opponent} for the opponent.",
+    "boardPreviewYou": "You",
+    "boardPreviewOpponent": "Opponent"
   },
   "game": {
     "turn": "Turn {turn}",
@@ -1634,6 +1649,7 @@
       "deckBanned": "Your deck contains banned cards. Remove them to play in this mode.",
       "authMismatch": "Authentication mismatch.",
       "tournamentBusy": "You are in a tournament match ({roomCode}). Finish it first.",
+      "tournamentDeckMissing": "Your registered deck could not be loaded. Stay here, the organizer has been notified.",
       "roomNotFound": "Room not found.",
       "youAreHost": "You are the host of this room.",
       "roomFull": "Room is full.",
@@ -3253,7 +3269,8 @@
     "language": "Language",
     "english": "English",
     "french": "Français",
-    "mainNavigation": "Main navigation"
+    "mainNavigation": "Main navigation",
+    "featuredCard": "Featured card"
   },
   "training": {
     "title": "Training Mode",
@@ -3798,7 +3815,8 @@
       "generic": "Something went wrong.",
       "deckHasUnrevealed": "This deck contains a card that is not revealed yet, you cannot share it."
     },
-    "postToFeed": "Post to feed"
+    "postToFeed": "Post to feed",
+    "privateNotice": "Your profile is private, so this post will only be visible to your friends."
   },
   "adminPostModeration": {
     "title": "Post & message moderation",
@@ -3852,5 +3870,60 @@
     "next": "Next day",
     "restDay": "Rest day, no scheduled tournament",
     "localTimeNote": "Times are shown in your local time zone."
+  },
+  "adminFeatured": {
+    "title": "Menu holo cards",
+    "subtitle": "Choose the cards shown as holo cards on the main menu. Only revealed cards can be picked.",
+    "back": "Back to admin",
+    "unauthorized": "Access denied.",
+    "loading": "Loading...",
+    "empty": "No card matches this search.",
+    "searchPlaceholder": "Search for a card",
+    "setFilterAll": "All sets",
+    "selectionTitle": "Menu selection",
+    "selectionEmpty": "No card selected. The menu falls back to the default cards.",
+    "count": "{selected} / {max}",
+    "remove": "Remove",
+    "moveUp": "Up",
+    "moveDown": "Down",
+    "save": "Save",
+    "saving": "Saving...",
+    "saved": "Menu cards saved.",
+    "saveFailed": "Could not save the menu cards.",
+    "notRevealed": "Not revealed yet",
+    "previewTitle": "Preview",
+    "unavailableCard": "Card unavailable",
+    "error": {
+      "not_public": "This card is not revealed yet.",
+      "unknown_card": "This card does not exist.",
+      "not_a_character": "Only character cards can be shown on the menu.",
+      "no_image": "This card has no artwork.",
+      "holo_id": "Holo versions cannot be shown on the menu.",
+      "too_many": "Too many cards selected.",
+      "invalid": "Invalid selection."
+    }
+  },
+  "playStats": {
+    "buttonLabel": "Stats",
+    "modalTitle": "Online activity",
+    "modalSubtitle": "Live figures",
+    "close": "Close",
+    "loading": "Loading...",
+    "unavailable": "Stats are not available right now.",
+    "rangeWeek": "7 days",
+    "rangeMonth": "30 days",
+    "games": "Games played",
+    "players": "Players",
+    "decks": "Decks used",
+    "perDay": "Games per day",
+    "perDayChart": "Games per day",
+    "today": "Today",
+    "todayHint": "Since midnight",
+    "activeDays": "Days with games",
+    "evolving": "Evolving games",
+    "evolvingHint": "Included in the total",
+    "busiestDay": "Busiest day",
+    "busiestDayValue": "{day} with {games} games",
+    "note": "Only online games count. Figures refresh a few times per hour."
   }
 }

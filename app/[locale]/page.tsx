@@ -1,11 +1,11 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { HoloCard } from '@/components/HoloCard';
 import { Footer } from '@/components/Footer';
@@ -17,14 +17,11 @@ import { useBattlepassBadge } from '@/lib/hooks/useBattlepassBadge';
 import { useQuestBadge } from '@/lib/hooks/useQuestBadge';
 import { useSocialBadge } from '@/lib/hooks/useSocialBadge';
 import { MenuBadge } from '@/components/notifications/MenuBadge';
+import { useRevealingStore } from '@/stores/revealingStore';
+import { getCardById } from '@/lib/data/cardIndex';
+import { formatCardLabelShort } from '@/lib/variants/cardLabel';
+import type { FeaturedMenuCard } from '@/lib/cards/featuredMenu';
 import '@/styles/holo-evolving.css';
-
-
-const FEATURED_CARDS = [
-  { src: '/api/card-image/SS-112-SPV', alt: 'Neji Hyuga', rarity: 'special' as const },
-  { src: '/api/card-image/SS-122-SPV', alt: 'Minato Namikaze', rarity: 'special' as const },
-  { src: '/api/card-image/SS-126-SPV', alt: 'Sasuke Uchiha', rarity: 'special' as const },
-];
 
 
 const cloudPositions = [
@@ -84,11 +81,33 @@ const accountButtons = [
 export default function Home() {
   const t = useTranslations('home');
   const ta = useTranslations('a11y');
+  const locale = useLocale();
   const { data: session, update: updateSession } = useSession();
   const [mounted, setMounted] = useState(false);
-  const [featuredCard] = useState(() =>
-    FEATURED_CARDS[Math.floor(Math.random() * FEATURED_CARDS.length)]
-  );
+  const [featuredCards, setFeaturedCards] = useState<FeaturedMenuCard[]>([]);
+  const [featuredSeed] = useState(() => Math.random());
+  const cardIndexVersion = useRevealingStore((s) => s.version);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/featured-cards')
+      .then((res) => (res.ok ? res.json() : { cards: [] }))
+      .then((data) => {
+        if (!cancelled) setFeaturedCards(Array.isArray(data?.cards) ? data.cards : []);
+      })
+      .catch(() => { if (!cancelled) setFeaturedCards([]); });
+    return () => { cancelled = true; };
+  }, []);
+
+  const featuredCard = featuredCards.length > 0
+    ? featuredCards[Math.floor(featuredSeed * featuredCards.length) % featuredCards.length]
+    : null;
+
+  const featuredAlt = useMemo(() => {
+    if (!featuredCard) return ta('featuredCard');
+    const card = getCardById(featuredCard.id);
+    return card ? formatCardLabelShort(card, locale) : ta('featuredCard');
+  }, [featuredCard, locale, ta, cardIndexVersion]);
 
   const [sessionRefreshed, setSessionRefreshed] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -511,13 +530,22 @@ export default function Home() {
               }}
             />
 
-            <HoloCard
-              src={featuredCard.src}
-              alt={featuredCard.alt}
-              width={320}
-              height={448}
-              rarity={featuredCard.rarity}
-            />
+            {featuredCard && (
+              <motion.div
+                key={featuredCard.id}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+              >
+                <HoloCard
+                  src={featuredCard.src}
+                  alt={featuredAlt}
+                  width={320}
+                  height={448}
+                  rarity={featuredCard.rarity}
+                />
+              </motion.div>
+            )}
           </motion.div>
 
         </div>

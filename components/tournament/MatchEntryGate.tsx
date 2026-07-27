@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { usePathname, useRouter } from '@/lib/i18n/navigation';
-import { useSocketStore } from '@/lib/socket/client';
+import { useSocketStore, requestRejoinIfNeeded } from '@/lib/socket/client';
 
 export function MatchEntryGate() {
   const { data: session } = useSession();
@@ -61,6 +61,12 @@ export function MatchEntryGate() {
     acknowledgeMatchEntry(target);
 
     if (alreadyThere) {
+      const st = useSocketStore.getState();
+      if (st.roomCode === target && !st.seatBound && !st.gameStarted) {
+        requestRejoinIfNeeded(true);
+      } else if (st.roomCode !== target && st.socket && st.userId) {
+        st.joinRoom(target, st.userId);
+      }
       clearPendingMatchEntry();
       return;
     }

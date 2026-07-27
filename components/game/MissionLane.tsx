@@ -18,6 +18,7 @@ import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
+import { useBoardPalette } from './BoardPaletteContext';
 
 interface CharacterSlotProps {
   character: VisibleCharacter;
@@ -30,6 +31,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   const t = useTranslations();
   const locale = useLocale();
   const dims = useGameScale();
+  const me = useBoardPalette().me;
   const selectTarget = useUIStore((s) => s.selectTarget);
   const selectedTargetId = useUIStore((s) => s.selectedTargetId);
   const showPreview = useUIStore((s) => s.showPreview);
@@ -193,13 +195,13 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         borderRadius: '6px',
         cursor: isRevealable ? 'pointer' : (!isUnknownHiddenEnemy && character.card ? 'pointer' : 'default'),
         border: isSelected
-          ? '2px solid #c4a35a'
+          ? `2px solid ${me.primary}`
           : isLastPlayed
             ? '2px solid rgba(255, 255, 255, 0.7)'
             : '1px solid rgba(255, 255, 255, 0.08)',
         overflow: 'hidden',
         boxShadow: isSelected
-          ? '0 0 16px rgba(196, 163, 90, 0.4), 0 4px 12px rgba(0, 0, 0, 0.5)'
+          ? `0 0 16px ${me.tint(0.4)}, 0 4px 12px rgba(0, 0, 0, 0.5)`
           : isLastPlayed
             ? '0 0 12px rgba(255, 255, 255, 0.4), 0 0 4px rgba(255, 255, 255, 0.2), 0 2px 8px rgba(0, 0, 0, 0.4)'
             : '0 2px 8px rgba(0, 0, 0, 0.4)',
@@ -426,6 +428,7 @@ function MissionCardDisplay({
   const t = useTranslations();
   const locale = useLocale();
   const dims = useGameScale();
+  const palette = useBoardPalette();
   const showPreview = useUIStore((s) => s.showPreview);
   const hidePreview = useUIStore((s) => s.hidePreview);
   const pinCard = useUIStore((s) => s.pinCard);
@@ -588,7 +591,7 @@ function MissionCardDisplay({
             style={{
               fontSize: dims.isMobile ? '16px' : '14px',
               backgroundColor: 'rgba(0, 0, 0, 0.85)',
-              color: mission.wonBy === 'draw' ? '#888888' : mission.wonBy === myPlayer ? '#c4a35a' : '#b33e3e',
+              color: mission.wonBy === 'draw' ? '#888888' : mission.wonBy === myPlayer ? palette.me.primary : palette.opponent.primary,
             }}
           >
             {mission.wonBy === 'draw' ? t('game.board.draw') : mission.wonBy === myPlayer ? t('game.board.won') : t('game.board.lost')}
@@ -612,7 +615,7 @@ function MissionCardDisplay({
               backgroundColor: '#141414',
               backgroundSize: 'cover',
               backgroundPosition: 'center 30%',
-              boxShadow: att.owner === myPlayer ? '0 0 8px rgba(196, 163, 90, 0.5)' : '0 0 8px rgba(179, 62, 62, 0.5)',
+              boxShadow: att.owner === myPlayer ? `0 0 8px ${palette.me.tint(0.5)}` : `0 0 8px ${palette.opponent.tint(0.5)}`,
               cursor: 'pointer',
             }}
           />
@@ -718,6 +721,7 @@ interface MissionLaneProps {
 export const MissionLane = React.memo(function MissionLane({ mission, missionIndex }: MissionLaneProps) {
   const t = useTranslations();
   const dims = useGameScale();
+  const palette = useBoardPalette();
   const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const visibleState = useGameStore((s) => s.visibleState);
   const isProcessing = useGameStore((s) => s.isProcessing);
@@ -818,16 +822,16 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
               style={{
                 fontSize: dims.isMobile ? '15px' : '10px',
                 lineHeight: 1.1,
-                color: '#ff9b9b',
+                color: palette.opponent.bright,
                 fontFamily: "'NJNaruto', Arial, sans-serif",
                 backgroundColor: 'rgba(8, 6, 6, 0.88)',
                 padding: dims.isMobile ? '1px 8px' : '1px 6px',
                 minWidth: dims.isMobile ? 26 : 20,
                 textAlign: 'center',
-                boxShadow: '0 0 10px rgba(179, 62, 62, 0.35)',
+                boxShadow: `0 0 10px ${palette.opponent.tint(0.35)}`,
               }}
             >
-              {manualPowerMode ? <ManualGuess actual={oppPower} color="#ff9b9b" /> : oppPower}
+              {manualPowerMode ? <ManualGuess actual={oppPower} color={palette.opponent.bright} /> : oppPower}
             </span>
           </div>
         )}
@@ -839,9 +843,9 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
           <div
             className="absolute inset-0 -m-1.5"
             style={{
-              border: '2px solid #c4a35a',
+              border: `2px solid ${palette.me.primary}`,
               borderRadius: '8px',
-              boxShadow: '0 0 16px rgba(196, 163, 90, 0.4)',
+              boxShadow: `0 0 16px ${palette.me.tint(0.4)}`,
               pointerEvents: 'none',
             }}
           />
@@ -860,16 +864,16 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
               style={{
                 fontSize: dims.isMobile ? '15px' : '10px',
                 lineHeight: 1.1,
-                color: '#f0d890',
+                color: palette.me.bright,
                 fontFamily: "'NJNaruto', Arial, sans-serif",
                 backgroundColor: 'rgba(8, 6, 6, 0.88)',
                 padding: dims.isMobile ? '1px 8px' : '1px 6px',
                 minWidth: dims.isMobile ? 26 : 20,
                 textAlign: 'center',
-                boxShadow: '0 0 10px rgba(196, 163, 90, 0.35)',
+                boxShadow: `0 0 10px ${palette.me.tint(0.35)}`,
               }}
             >
-              {manualPowerMode ? <ManualGuess actual={myPower} color="#f0d890" /> : myPower}
+              {manualPowerMode ? <ManualGuess actual={myPower} color={palette.me.bright} /> : myPower}
             </span>
           </div>
         )}

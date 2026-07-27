@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { PanelFrame } from './PopupPrimitives';
+import { useBoardPalette } from './BoardPaletteContext';
 
 interface ScoreDisplayProps {
   playerScore: number;
@@ -18,8 +19,9 @@ export function ScoreDisplay({
   opponentLabel,
 }: ScoreDisplayProps) {
   const t = useTranslations();
+  const palette = useBoardPalette();
   return (
-    <PanelFrame accentColor="rgba(196, 163, 90, 0.25)" padding="10px 12px">
+    <PanelFrame accentColor={palette.me.tint(0.25)} padding="10px 12px">
       <div className="flex flex-col gap-2">
         <span
           className="text-xs uppercase tracking-wider text-center"
@@ -28,7 +30,7 @@ export function ScoreDisplay({
           {t('game.board.missionPoints')}
         </span>
         <div className="flex items-center justify-between gap-4">
-          <div data-anchor="score:me"><ScoreEntry label={playerLabel} score={playerScore} color="#c4a35a" /></div>
+          <div data-anchor="score:me"><ScoreEntry label={playerLabel} score={playerScore} color={palette.me.primary} /></div>
           <div
             style={{
               width: '1px',
@@ -36,7 +38,7 @@ export function ScoreDisplay({
               backgroundColor: 'rgba(255, 255, 255, 0.08)',
             }}
           />
-          <div data-anchor="score:opp"><ScoreEntry label={opponentLabel} score={opponentScore} color="#b33e3e" /></div>
+          <div data-anchor="score:opp"><ScoreEntry label={opponentLabel} score={opponentScore} color={palette.opponent.primary} /></div>
         </div>
       </div>
     </PanelFrame>

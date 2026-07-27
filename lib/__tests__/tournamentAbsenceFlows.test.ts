@@ -482,7 +482,7 @@ describe('fireAbsenceTimerCallback (grace-period defense against mass-forfeit)',
     }));
   });
 
-  it('connected but unconfirmed players are only forfeited after the grace is exhausted', async () => {
+  it('connected but unconfirmed players are never forfeited, the match is reopened once the grace is exhausted', async () => {
     const io = fakeIoWithConnectedUsers('t1', ['p1', 'p2']);
     p.tournamentMatch.findUnique.mockResolvedValue({
       id: 'mgrace', tournamentId: 't1', status: 'ready',
@@ -505,7 +505,12 @@ describe('fireAbsenceTimerCallback (grace-period defense against mass-forfeit)',
     expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
 
     await fireAbsenceTimerCallback(io as never, 't1', 'mgrace', 'p1', 'p2', null, true);
-    expect(p.tournamentParticipant.updateMany).toHaveBeenCalled();
+    expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
+    expect(io.emissions.some(e => e.event === 'tournament:player-forfeited')).toBe(false);
+    expect(p.tournamentMatch.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'mgrace' },
+      data: expect.objectContaining({ status: 'ready', roomCode: null }),
+    }));
   });
 
   it('with knownAbsentPlayerId set and that player NOT connected, forfeits only that player', async () => {

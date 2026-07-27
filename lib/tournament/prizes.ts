@@ -27,7 +27,7 @@ export async function acquirePrizeAwardLock(tournamentId: string): Promise<boole
   try {
     const result = await prisma.$runCommandRaw({
       findAndModify: 'Tournament',
-      query: { _id: { $oid: tournamentId }, prizeAwarded: { $ne: true } },
+      query: { _id: { $oid: tournamentId }, prizeAwarded: { $ne: true }, awardsPrizes: { $ne: false } },
       update: { $set: { prizeAwarded: true, prizeAwardedAt: { $date: new Date().toISOString() } } },
       new: false,
     }) as { value?: { _id?: unknown } | null };

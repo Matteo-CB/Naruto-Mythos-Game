@@ -509,7 +509,9 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('game:rejoin-required', (data: { roomCode: string }) => {
         console.warn('[Socket] Server asked this client to rejoin room', data?.roomCode);
-        if (data?.roomCode && !get().roomCode) {
+        if (data?.roomCode && get().roomCode !== data.roomCode && !get().gameStarted) {
+          set({ roomCode: data.roomCode });
+        } else if (data?.roomCode && !get().roomCode) {
           set({ roomCode: data.roomCode });
         }
         set({ seatBound: false });
@@ -631,9 +633,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ opponentChangingDeck: false });
       });
 
-      socket.on('room:rejoined', (data: { code: string; isSealed: boolean; playerRole: 'player1' | 'player2' }) => {
-        console.log('[Socket] Rejoined room:', data.code, 'sealed:', data.isSealed, 'role:', data.playerRole);
-        set({ roomCode: data.code, playerRole: data.playerRole, isSealedRoom: data.isSealed });
+      socket.on('room:rejoined', (data: { code: string; isSealed: boolean; playerRole: 'player1' | 'player2'; tournamentId?: string | null }) => {
+        console.log('[Socket] Rejoined room:', data.code, 'sealed:', data.isSealed, 'role:', data.playerRole, 'tournament:', data.tournamentId ?? 'none');
+        set({
+          roomCode: data.code,
+          playerRole: data.playerRole,
+          isSealedRoom: data.isSealed,
+          ...(data.tournamentId ? { tournamentMatchRoom: true, currentTournamentId: data.tournamentId } : {}),
+        });
         markSeatBound();
         persistMatchContext();
       });

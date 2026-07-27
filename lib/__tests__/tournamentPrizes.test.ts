@@ -193,6 +193,26 @@ describe('acquirePrizeAwardLock', () => {
     const r = await acquirePrizeAwardLock('any');
     expect(r).toBe(false);
   });
+
+  it('filters on awardsPrizes so a player-created tournament can never award prizes', async () => {
+    runCommandRaw.mockResolvedValue({ value: { _id: 'x' } });
+    await acquirePrizeAwardLock('507f1f77bcf86cd799439011');
+    expect(runCommandRaw).toHaveBeenCalledWith(expect.objectContaining({
+      query: expect.objectContaining({ awardsPrizes: { $ne: false } }),
+    }));
+  });
+
+  it('does not acquire the lock when the tournament has awardsPrizes false (no match)', async () => {
+    runCommandRaw.mockResolvedValue({ value: null });
+    const r = await acquirePrizeAwardLock('507f1f77bcf86cd799439011');
+    expect(r).toBe(false);
+  });
+
+  it('still acquires the lock when awardsPrizes is absent (legacy admin tournaments)', async () => {
+    runCommandRaw.mockResolvedValue({ value: { _id: 'legacy' } });
+    const r = await acquirePrizeAwardLock('507f1f77bcf86cd799439011');
+    expect(r).toBe(true);
+  });
 });
 
 describe('readTournamentPrizeCardId', () => {

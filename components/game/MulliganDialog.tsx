@@ -23,6 +23,7 @@ import {
   PopupMinimizePill,
   PanelFrame,
 } from './PopupPrimitives';
+import { useBoardPalette } from './BoardPaletteContext';
 
 const effectTypeColors: Record<string, string> = {
   MAIN: '#c4a35a',
@@ -285,6 +286,7 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
 export function MulliganDialog() {
   const t = useTranslations();
   const dims = useGameScale();
+  const palette = useBoardPalette();
   const visibleState = useGameStore((s) => s.visibleState);
   const performAction = useGameStore((s) => s.performAction);
   const isProcessing = useGameStore((s) => s.isProcessing);
@@ -369,10 +371,10 @@ export function MulliganDialog() {
             <span
               className="font-body text-xs text-center px-3 py-1.5"
               style={{
-                color: visibleState.edgeHolder === visibleState.myPlayer ? '#c4a35a' : '#b33e3e',
+                color: visibleState.edgeHolder === visibleState.myPlayer ? palette.me.primary : palette.opponent.primary,
                 backgroundColor: visibleState.edgeHolder === visibleState.myPlayer
-                  ? 'rgba(196, 163, 90, 0.08)'
-                  : 'rgba(179, 62, 62, 0.08)',
+                  ? palette.me.tint(0.08)
+                  : palette.opponent.tint(0.08),
                 }}
             >
               {visibleState.edgeHolder === visibleState.myPlayer

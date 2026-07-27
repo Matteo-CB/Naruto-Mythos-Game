@@ -43,8 +43,8 @@ const DISPLAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
 const LEGEND_KINDS: TourneyKind[] = ['classic', 'open', 'elimination', 'sealed', 'partner'];
 const PARTNER_NAMES: Record<string, string> = { nwl: NWL_PARTNER_NAME };
 const WD_SHORT: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-const CARD_CLIP = 'polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)';
-const FALLBACK_GAP = 16;
+const CARD_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
+const FALLBACK_GAP = 12;
 
 function parisWeekday(d: Date): number {
   try {
@@ -237,7 +237,8 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
 
         <div
           ref={scrollRef}
-          className="relative flex flex-col sm:flex-row items-stretch gap-2.5 sm:gap-4 sm:overflow-x-auto sm:snap-x sm:snap-mandatory scroll-smooth no-scrollbar pb-2"
+          className="relative flex flex-row items-stretch gap-2 sm:gap-3 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar pb-2"
+          style={{ WebkitOverflowScrolling: 'touch', overscrollBehaviorX: 'contain' }}
         >
           {dayCards.map((card) => {
             const { spec, isToday } = card;
@@ -249,7 +250,7 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
               <div
                 key={card.scheduleWeekday}
                 ref={isToday ? todayRef : undefined}
-                className="w-full sm:shrink-0 sm:w-[244px] sm:snap-start"
+                className="shrink-0 w-43 sm:w-52 snap-start"
               >
                 <div
                   className="relative flex h-full flex-col overflow-hidden"
@@ -268,10 +269,10 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
                     />
                   )}
 
-                  <div className="relative flex h-full flex-col gap-2.5 px-3.5 py-3">
+                  <div className="relative flex h-full flex-col gap-2 px-2.5 py-2.5 sm:px-3 sm:py-3">
                     <div className="flex items-center justify-between gap-2">
                       <span
-                        className="font-display truncate text-[13px] sm:text-sm uppercase tracking-widest"
+                        className="font-display truncate text-[11px] sm:text-[13px] uppercase tracking-widest"
                         style={{ color: isToday ? '#f2efe7' : '#c9c7c0' }}
                       >
                         {card.dayLabel}
@@ -289,7 +290,7 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
                     <span aria-hidden="true" className="block w-full" style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.06)' }} />
 
                     <span
-                      className="font-display self-start text-[10px] uppercase tracking-wider px-2 py-1"
+                      className="font-display self-start text-[9px] sm:text-[10px] uppercase tracking-wider px-1.5 py-0.5 sm:px-2 sm:py-1"
                       style={{ backgroundColor: `${color}1f`, color }}
                     >
                       {t(`kind.${spec.kind}` as `kind.${TourneyKind}`)}
@@ -299,7 +300,7 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
                       {ruleChips(spec, t).map((chip, i) => (
                         <span
                           key={i}
-                          className="text-[10px] leading-tight px-1.5 py-1"
+                          className="text-[9px] sm:text-[10px] leading-tight px-1 py-0.5 sm:px-1.5 sm:py-1"
                           style={{ backgroundColor: 'rgba(255,255,255,0.045)', color: '#9b9ba1' }}
                         >
                           {chip}
@@ -312,7 +313,7 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
                         <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#61616a' }}>
                           {t('rules.regLabel')}
                         </span>
-                        <span className="text-[11px] tabular-nums" style={{ color: '#a9a7a2' }}>
+                        <span className="text-[10px] sm:text-[11px] tabular-nums" style={{ color: '#a9a7a2' }}>
                           {times.reg}
                         </span>
                       </div>
@@ -334,7 +335,7 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
                             <Link
                               key={tr.id}
                               href={`/tournaments/${tr.id}` as '/'}
-                              className="font-display block text-center text-[9px] uppercase tracking-widest px-2 py-1.5 transition-opacity hover:opacity-80"
+                              className="font-display block text-center text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 py-1 sm:px-2 sm:py-1.5 transition-opacity hover:opacity-80"
                               style={{ backgroundColor: `${c}1f`, color: c }}
                             >
                               {tr.status === 'registration' ? t('registrationOpen') : t('view')}

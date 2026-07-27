@@ -13,6 +13,7 @@ import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { ManualGuess } from './ManualGuess';
+import { useBoardPalette } from './BoardPaletteContext';
 
 interface PlayerHandProps {
   hand: CharacterCard[];
@@ -86,6 +87,7 @@ const HandCard = React.memo(function HandCard({
 }: HandCardProps) {
   const locale = useLocale();
   const dims = useGameScale();
+  const me = useBoardPalette().me;
   const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
 
   const midpoint = (total - 1) / 2;
@@ -155,7 +157,7 @@ const HandCard = React.memo(function HandCard({
         height: dims.handCard.h + 'px',
         borderRadius: '6px',
         border: isSelected
-          ? '2px solid #c4a35a'
+          ? `2px solid ${me.primary}`
           : canAfford
             ? '1px solid rgba(255, 255, 255, 0.1)'
             : '1px solid rgba(179, 62, 62, 0.3)',
@@ -164,7 +166,7 @@ const HandCard = React.memo(function HandCard({
         transform: `translateY(${arcY}px)`,
         opacity: canAfford ? 1 : 0.55,
         boxShadow: isSelected
-          ? '0 0 20px rgba(196, 163, 90, 0.4), 0 8px 24px rgba(0, 0, 0, 0.6)'
+          ? `0 0 20px ${me.tint(0.4)}, 0 8px 24px rgba(0, 0, 0, 0.6)`
           : '0 4px 16px rgba(0, 0, 0, 0.5)',
         cursor: 'pointer',
       }}
@@ -203,9 +205,9 @@ const HandCard = React.memo(function HandCard({
         </span>
         <span
           className="font-bold tabular-nums"
-          style={{ fontSize: dims.isMobile ? '13px' : '10px', color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+          style={{ fontSize: dims.isMobile ? '13px' : '10px', color: me.primary, fontFamily: "'NJNaruto', Arial, sans-serif" }}
         >
-          {manualPowerMode ? <ManualGuess actual={card.power ?? 0} color="#c4a35a" /> : card.power}
+          {manualPowerMode ? <ManualGuess actual={card.power ?? 0} color={me.primary} /> : card.power}
         </span>
       </div>
 

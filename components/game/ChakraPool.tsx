@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { useBoardPalette } from './BoardPaletteContext';
 
 interface ChakraPoolProps {
   amount: number;
@@ -10,6 +11,8 @@ interface ChakraPoolProps {
 }
 
 export function ChakraPool({ amount, label, isOpponent = false }: ChakraPoolProps) {
+  const palette = useBoardPalette();
+  const side = isOpponent ? palette.opponent : palette.me;
   const [displayAmount, setDisplayAmount] = useState(amount);
   const [isIncreasing, setIsIncreasing] = useState(false);
   const [floatDelta, setFloatDelta] = useState<{ value: number; key: number } | null>(null);
@@ -62,13 +65,13 @@ export function ChakraPool({ amount, label, isOpponent = false }: ChakraPoolProp
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           className="flex items-center justify-center px-3 py-1.5"
           style={{
-            backgroundColor: 'rgba(196, 163, 90, 0.08)',
+            backgroundColor: side.tint(0.08),
             minWidth: '52px',
           }}
         >
           <motion.span
             className="text-xl font-bold tabular-nums"
-            style={{ color: isOpponent ? '#b33e3e' : '#c4a35a' }}
+            style={{ color: side.primary }}
             animate={
               amount !== displayAmount
                 ? { scale: [1, 1.2, 1] }

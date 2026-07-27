@@ -7,6 +7,7 @@ import { ScoreDisplay } from './ScoreDisplay';
 import { EdgeToken } from './EdgeToken';
 import { PanelFrame, SectionDivider, StatValue } from './PopupPrimitives';
 import type { GamePhase } from '@/lib/engine/types';
+import { useBoardPalette } from './BoardPaletteContext';
 
 const phaseTranslationKeys: Record<string, string> = {
   setup: 'game.phase.start',
@@ -29,6 +30,7 @@ function InfoRow({ label, value, valueColor = '#e0e0e0' }: { label: string; valu
 
 export function GameInfo() {
   const t = useTranslations();
+  const palette = useBoardPalette();
   const visibleState = useGameStore((s) => s.visibleState);
 
   if (!visibleState) return null;
@@ -98,7 +100,7 @@ export function GameInfo() {
             </span>
             <span
               className="text-xs font-semibold"
-              style={{ color: isMyTurn ? '#c4a35a' : '#b33e3e' }}
+              style={{ color: isMyTurn ? palette.me.primary : palette.opponent.primary }}
             >
               {isMyTurn ? t('game.yourTurn') : t('game.opponentTurn')}
             </span>
@@ -127,8 +129,8 @@ export function GameInfo() {
           >
             {t('game.chakra')}
           </span>
-          <InfoRow label={t('game.you')} value={myState.chakra} valueColor="#c4a35a" />
-          <InfoRow label={t('game.opponent')} value={opponentState.chakra} valueColor="#b33e3e" />
+          <InfoRow label={t('game.you')} value={myState.chakra} valueColor={palette.me.primary} />
+          <InfoRow label={t('game.opponent')} value={opponentState.chakra} valueColor={palette.opponent.primary} />
         </div>
       </PanelFrame>
 
@@ -141,8 +143,8 @@ export function GameInfo() {
         >
           {t('game.deck')}
         </span>
-        <InfoRow label={t('game.you')} value={myState.deck.length} valueColor="#c4a35a" />
-        <InfoRow label={t('game.opponent')} value={opponentState.deckSize} valueColor="#b33e3e" />
+        <InfoRow label={t('game.you')} value={myState.deck.length} valueColor={palette.me.primary} />
+        <InfoRow label={t('game.opponent')} value={opponentState.deckSize} valueColor={palette.opponent.primary} />
         <InfoRow label={t('game.board.missionDeck')} value={missionDeckSize} valueColor="#888888" />
       </div>
 

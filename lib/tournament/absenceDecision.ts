@@ -17,6 +17,7 @@ export interface AbsenceEvidence {
 export type AbsenceOutcome =
   | { kind: 'noop'; reason: 'game-live' | 'no-forfeitable' | 'unknown-evidence' }
   | { kind: 'grace' }
+  | { kind: 'no-contest'; reason: 'launch-stalled'; players: string[] }
   | { kind: 'forfeit'; players: string[] };
 
 export const MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE = 2;
@@ -68,6 +69,8 @@ export function decideAbsenceOutcome(ev: AbsenceEvidence): AbsenceOutcome {
 
   if (ev.seatBoundP1) absent1 = false;
   if (ev.seatBoundP2) absent2 = false;
+  if (ev.readyP1) absent1 = false;
+  if (ev.readyP2) absent2 = false;
 
   const offlineAbsent1 = absent1 && !ev.onlineP1;
   const offlineAbsent2 = absent2 && !ev.onlineP2;
@@ -81,8 +84,15 @@ export function decideAbsenceOutcome(ev: AbsenceEvidence): AbsenceOutcome {
     return { kind: 'grace' };
   }
 
-  const forfeit1 = offlineAbsent1 || (capReached && onlineAbsent1);
-  const forfeit2 = offlineAbsent2 || (capReached && onlineAbsent2);
+  if (capReached && !offlineAbsent1 && !offlineAbsent2 && (onlineAbsent1 || onlineAbsent2)) {
+    const stalled: string[] = [];
+    if (onlineAbsent1) stalled.push(ev.p1);
+    if (onlineAbsent2 && ev.p2) stalled.push(ev.p2);
+    return { kind: 'no-contest', reason: 'launch-stalled', players: stalled };
+  }
+
+  const forfeit1 = offlineAbsent1;
+  const forfeit2 = offlineAbsent2;
 
   if (!forfeit1 && !forfeit2) {
     return { kind: 'noop', reason: evidenceKnown ? 'no-forfeitable' : 'unknown-evidence' };

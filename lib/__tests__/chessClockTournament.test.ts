@@ -43,6 +43,14 @@ function makeIoMock(): { io: any; emits: EmitRecord[] } {
   return { io, emits };
 }
 
+function makeIoMockWithRegistry(liveSocketIds: string[]): { io: any; emits: EmitRecord[] } {
+  const { io, emits } = makeIoMock();
+  const registry = new Map<string, { id: string; connected: boolean }>();
+  for (const id of liveSocketIds) registry.set(id, { id, connected: true });
+  io.sockets = { sockets: registry };
+  return { io, emits };
+}
+
 function makeState(overrides: Partial<GameState> = {}): GameState {
   return {
     gameId: 'g-tour',
@@ -96,6 +104,8 @@ describe('Phase 12 — tournament mulligan-idle delegation', () => {
       tournamentMatchId: 'match-001',
       hostId: 'u-host',
       guestId: 'u-guest',
+      hostSocket: '',
+      guestSocket: null,
     });
     await handleMulliganIdleTimeout(room, room.code, io);
     expect(tournamentHandlers.handleSwissDoubleAbsence).toHaveBeenCalledWith(
@@ -113,6 +123,8 @@ describe('Phase 12 — tournament mulligan-idle delegation', () => {
       tournamentMatchId: 'match-004',
       hostId: 'u-host',
       guestId: 'u-guest',
+      hostSocket: 'host-sock',
+      guestSocket: null,
       gameState: makeState({
         player1: { hasMulliganed: true } as never,
         player2: { hasMulliganed: false } as never,
@@ -124,6 +136,62 @@ describe('Phase 12 — tournament mulligan-idle delegation', () => {
       io,
       'tour-swiss',
       'match-004',
+      'u-guest',
+    );
+  });
+
+  it('Swiss tournament mulligan-idle forfeits a player whose seat socket holds the board and never answered', async () => {
+    const { io } = makeIoMockWithRegistry(['host-sock', 'guest-sock']);
+    const tournamentHandlers = await import('@/lib/socket/tournamentHandlers');
+    const room = makeRoom({
+      tournamentId: 'tour-swiss',
+      tournamentMatchId: 'match-005',
+      hostId: 'u-host',
+      guestId: 'u-guest',
+      hostSocket: 'host-sock',
+      guestSocket: 'guest-sock',
+      gameState: makeState({
+        player1: { hasMulliganed: true } as never,
+        player2: { hasMulliganed: false } as never,
+      }),
+    });
+    await handleMulliganIdleTimeout(room, room.code, io);
+    expect(tournamentHandlers.reopenTournamentMatch).not.toHaveBeenCalled();
+    expect(tournamentHandlers.handleSwissDoubleAbsence).not.toHaveBeenCalled();
+    expect(tournamentHandlers.handleMatchForfeit).toHaveBeenCalledWith(
+      io,
+      'tour-swiss',
+      'match-005',
+      'u-guest',
+    );
+  });
+
+  it('Swiss tournament mulligan-idle reopens when the missing player lost their seat socket but is still online', async () => {
+    const { io } = makeIoMockWithRegistry(['host-sock']);
+    const { registerUserSocket, unregisterUserSocket } = await import('@/lib/socket/io');
+    registerUserSocket('u-guest', 'other-tab-sock');
+    const tournamentHandlers = await import('@/lib/socket/tournamentHandlers');
+    const room = makeRoom({
+      tournamentId: 'tour-swiss',
+      tournamentMatchId: 'match-006',
+      hostId: 'u-host',
+      guestId: 'u-guest',
+      hostSocket: 'host-sock',
+      guestSocket: 'dead-guest-sock',
+      gameState: makeState({
+        player1: { hasMulliganed: true } as never,
+        player2: { hasMulliganed: false } as never,
+      }),
+    });
+    await handleMulliganIdleTimeout(room, room.code, io);
+    unregisterUserSocket('u-guest', 'other-tab-sock');
+    expect(tournamentHandlers.handleMatchForfeit).not.toHaveBeenCalled();
+    expect(tournamentHandlers.handleSwissDoubleAbsence).not.toHaveBeenCalled();
+    expect(tournamentHandlers.reopenTournamentMatch).toHaveBeenCalledWith(
+      io,
+      'tour-swiss',
+      'match-006',
+      'u-host',
       'u-guest',
     );
   });

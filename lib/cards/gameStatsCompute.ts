@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db/prisma';
 import { getAllCards } from '@/lib/data/cardLoader';
 import { usageGroupKey } from '@/lib/cards/usageLive';
 import type { CharacterCard, MissionCard, GameLogEntry, PlayerState } from '@/lib/engine/types';
+import { DAILY_PLAY_RETENTION_DAYS, deckSignature } from '@/lib/stats/dailyPlay';
 
 const BATCH_SIZE = 50;
 const MAX_PAGES = 40;
@@ -139,6 +140,14 @@ export async function accumulateCardGameStats(): Promise<{ processed: number }> 
     await prisma.countryGroupStat.deleteMany({ where: { day: { lt: pruneBefore } } });
   } catch { /* pruning is best-effort */ }
 
+  const prunePlayBefore = dayKey(new Date(Date.now() - DAILY_PLAY_RETENTION_DAYS * 86400000));
+  try {
+    await prisma.$runCommandRaw({
+      delete: 'DailyPlayStat',
+      deletes: [{ q: { day: { $lt: prunePlayBefore } }, limit: 0 }],
+    });
+  } catch { /* pruning is best-effort */ }
+
   let processed = 0;
   let lastAt = since;
 
@@ -156,6 +165,7 @@ export async function accumulateCardGameStats(): Promise<{ processed: number }> 
         player2Id: true,
         gameState: true,
         completedAt: true,
+        isEvolving: true,
       },
       orderBy: { completedAt: 'asc' },
       take: BATCH_SIZE,
@@ -180,6 +190,7 @@ export async function accumulateCardGameStats(): Promise<{ processed: number }> 
 
     const counters = new Map<string, GroupCounters>();
     const countryCounters = new Map<string, number>();
+    const dailyPlay = new Map<string, { games: number; evolving: number; players: Set<string>; decks: Set<string> }>();
     let sinceYield = 0;
     for (const game of games) {
       const payload = game.gameState as unknown as SavedGamePayload | null;
@@ -191,6 +202,20 @@ export async function accumulateCardGameStats(): Promise<{ processed: number }> 
         extractGameCounters(payload, winnerSide, counters);
         const day = game.completedAt ? dayKey(game.completedAt) : null;
         if (day) {
+          let bucket = dailyPlay.get(day);
+          if (!bucket) {
+            bucket = { games: 0, evolving: 0, players: new Set(), decks: new Set() };
+            dailyPlay.set(day, bucket);
+          }
+          bucket.games += 1;
+          if (game.isEvolving) bucket.evolving += 1;
+          if (game.player1Id) bucket.players.add(game.player1Id);
+          if (game.player2Id) bucket.players.add(game.player2Id);
+          for (const side of ['player1', 'player2'] as const) {
+            const sig = deckSignature(playerDeckCards(payload.initialState?.[side]).map((c) => c.id));
+            if (sig) bucket.decks.add(sig);
+          }
+
           for (const side of ['player1', 'player2'] as const) {
             const uid = side === 'player1' ? game.player1Id : game.player2Id;
             const cc = uid ? countryByUser.get(uid) : undefined;
@@ -231,6 +256,25 @@ export async function accumulateCardGameStats(): Promise<{ processed: number }> 
         create: { countryCode, group, day, count: n },
         update: { count: { increment: n } },
       });
+    }
+
+    for (const [day, bucket] of dailyPlay) {
+      try {
+        await prisma.$runCommandRaw({
+          update: 'DailyPlayStat',
+          updates: [{
+            q: { day },
+            u: {
+              $inc: { games: bucket.games, evolving: bucket.evolving },
+              $addToSet: { playerIds: { $each: [...bucket.players] }, deckKeys: { $each: [...bucket.decks] } },
+              $currentDate: { updatedAt: true },
+            },
+            upsert: true,
+          }],
+        });
+      } catch (err) {
+        console.error('[Stats] DailyPlayStat upsert failed for', day, err instanceof Error ? err.message : err);
+      }
     }
 
     processed += games.length;

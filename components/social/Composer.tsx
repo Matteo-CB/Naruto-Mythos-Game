@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
+import { useSettingsStore } from '@/stores/settingsStore';
 import { motion } from 'framer-motion';
 import { Z_APP_MODAL } from '@/lib/ui/zIndex';
 import { DeckEmbed } from './DeckEmbed';
@@ -43,6 +44,9 @@ export function Composer({ onPosted, parentId, prefillReplay, prefillDeck, autoF
 }) {
   const t = useTranslations('feed');
   const { data: session } = useSession();
+  const privateProfile = useSettingsStore((st) => st.privateProfile);
+  const settingsLoaded = useSettingsStore((st) => st.isLoaded);
+  const fetchSettings = useSettingsStore((st) => st.fetchFromServer);
   const [body, setBody] = useState('');
   const [deck, setDeck] = useState<DeckSnapshot | null>(null);
   const [replay, setReplay] = useState<ReplaySnapshot | null>(null);
@@ -61,16 +65,21 @@ export function Composer({ onPosted, parentId, prefillReplay, prefillDeck, autoF
     fetch('/api/tenor/search?q=').then((r) => r.json()).then((d) => setGifEnabled(!d.disabled)).catch(() => setGifEnabled(false));
   }, []);
 
+  useEffect(() => {
+    if (!settingsLoaded) fetchSettings().catch(() => {});
+  }, [settingsLoaded, fetchSettings]);
+
   const prefillReplayGameId = prefillReplay?.gameId;
   const prefillReplayAction = prefillReplay?.actionIndex;
   useEffect(() => {
     if (prefillReplayGameId) {
-      fetch('/api/user/replays').then((r) => r.json()).then((d) => {
+      fetch('/api/user/replays?gameId=' + encodeURIComponent(prefillReplayGameId)).then((r) => r.json()).then((d) => {
         const found = (d.replays ?? []).find((rp: ReplayRow) => rp.gameId === prefillReplayGameId);
         if (found) setReplay({ ...found, actionIndex: prefillReplayAction });
-      }).catch(() => {});
+        else setError(t('replayExpired'));
+      }).catch(() => setError(t('replayExpired')));
     }
-  }, [prefillReplayGameId, prefillReplayAction]);
+  }, [prefillReplayGameId, prefillReplayAction, t]);
 
   const prefillDeckId = prefillDeck?.deckId;
   useEffect(() => {
@@ -79,9 +88,10 @@ export function Composer({ onPosted, parentId, prefillReplay, prefillDeck, autoF
         const list: DeckRow[] = Array.isArray(d.decks) ? d.decks : Array.isArray(d) ? d : [];
         const found = list.find((dk) => dk.id === prefillDeckId);
         if (found) setDeck({ deckId: found.id, name: found.name, cardIds: found.cardIds, missionIds: found.missionIds });
-      }).catch(() => {});
+        else setError(t('error.deckNotYours'));
+      }).catch(() => setError(t('error.deckNotYours')));
     }
-  }, [prefillDeckId]);
+  }, [prefillDeckId, t]);
 
   const openDecks = useCallback(() => {
     setShowDecks(true);
@@ -114,6 +124,7 @@ export function Composer({ onPosted, parentId, prefillReplay, prefillDeck, autoF
         const map: Record<string, string> = {
           'feed.error.tooLong': 'error.tooLong',
           'feed.error.deckNotYours': 'error.deckNotYours',
+          'feed.error.deckHasUnrevealed': 'error.deckHasUnrevealed',
           'feed.error.replayNotYours': 'error.replayNotYours',
           'feed.error.parentGone': 'error.parentGone',
           'feed.error.empty': 'error.empty',
@@ -150,6 +161,12 @@ export function Composer({ onPosted, parentId, prefillReplay, prefillDeck, autoF
           {}
           <img src={gifUrl} alt="" style={{ width: '100%', display: 'block' }} />
           <RemoveBtn onClick={() => setGifUrl(null)} label={t('removeGif')} />
+        </div>
+      )}
+
+      {privateProfile && (
+        <div className="mt-2 text-[11px] px-2 py-1" style={{ backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a' }}>
+          {t('privateNotice')}
         </div>
       )}
 

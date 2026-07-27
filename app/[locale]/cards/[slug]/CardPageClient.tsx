@@ -29,6 +29,7 @@ import { Footer } from '@/components/Footer';
 import { useIsFinePointer } from '@/lib/hooks/useIsFinePointer';
 import { useCardUsage } from '@/lib/hooks/useCardUsage';
 import type { CardData, CharacterCard, MissionCard, Rarity } from '@/lib/engine/types';
+import { holoRarity } from '@/lib/cards/holoRarity';
 
 const GOLD = '#c4a35a';
 
@@ -47,15 +48,6 @@ const RARITY_COLORS: Record<Rarity, string> = {
   SP: '#06b6d4', SPV: '#06b6d4', POP: '#e84393', POPV: '#e84393',
   CHIBI: '#10b981', CHIBIV: '#10b981', MMS: '#5a8ab5',
 };
-
-function holoRarity(rarity: Rarity): 'common' | 'rare' | 'secret' | 'mythos' | 'legendary' | 'special' {
-  if (rarity === 'C' || rarity === 'UC') return 'common';
-  if (rarity === 'R' || rarity === 'RA' || rarity === 'MMS') return 'rare';
-  if (rarity === 'S' || rarity === 'SV') return 'secret';
-  if (rarity === 'M' || rarity === 'MV') return 'mythos';
-  if (rarity === 'L') return 'legendary';
-  return 'special';
-}
 
 function Chevron({ dir }: { dir: 'left' | 'right' }) {
   return (

@@ -10,6 +10,7 @@ import { useSocketStore } from '@/lib/socket/client';
 import type { GameLogEntry, GamePhase } from '@/lib/engine/types';
 import { localizeMessageParams as localizeParams } from '@/lib/i18n/localizeMessageParams';
 import { useGameScale } from './GameScaleContext';
+import { useBoardPalette } from './BoardPaletteContext';
 
 const EMPTY_LOG: GameLogEntry[] = [];
 
@@ -30,15 +31,17 @@ function formatTimestamp(ts: number): string {
   return `${mins}:${secs}`;
 }
 
-const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDisplayNames, locale, isMobile }: {
+const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDisplayNames, locale, isMobile, myPlayer }: {
   entry: GameLogEntry;
   formatPhase: (phase: GamePhase) => string;
   playerDisplayNames: { player1: string; player2: string };
   locale: string;
   isMobile: boolean;
+  myPlayer: 'player1' | 'player2';
 }) {
   const t = useTranslations();
-  const playerColor = entry.player === 'player1' ? '#c4a35a' : '#b33e3e';
+  const palette = useBoardPalette();
+  const playerColor = entry.player === myPlayer ? palette.me.primary : palette.opponent.primary;
   const displayName = entry.player ? playerDisplayNames[entry.player] : null;
 
   return (
@@ -87,6 +90,7 @@ export function GameLog() {
   const locale = useLocale();
   const dims = useGameScale();
   const log = useGameStore((s) => s.visibleState?.log ?? EMPTY_LOG);
+  const myPlayer = useGameStore((s) => s.visibleState?.myPlayer ?? 'player1');
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
   const showGameLog = useUIStore((s) => s.showGameLog);
   const toggleGameLog = useUIStore((s) => s.toggleGameLog);
@@ -181,7 +185,7 @@ export function GameLog() {
                 </div>
               ) : (
                 log.slice(-120).map((entry, i) => (
-                  <LogEntry key={`${entry.timestamp}-${i}`} entry={entry} formatPhase={formatPhase} playerDisplayNames={playerDisplayNames} locale={locale} isMobile={dims.isMobile} />
+                  <LogEntry key={`${entry.timestamp}-${i}`} entry={entry} formatPhase={formatPhase} playerDisplayNames={playerDisplayNames} locale={locale} isMobile={dims.isMobile} myPlayer={myPlayer} />
                 ))
               )}
             </div>
