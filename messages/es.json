@@ -3866,7 +3866,10 @@
       "discord": "Discord obligatorio",
       "partnerBy": "Organizado por {partner}",
       "regLabel": "Inscripciones",
-      "startLabel": "Inicio"
+      "startLabel": "Inicio",
+      "rewardsLabel": "Recompensas",
+      "nwlPrize": "1.º: {credit} libras en saldo de tienda o {paypal} libras por PayPal",
+      "nwlChunin": "Top {places}: rol Chunin, válido solo para el siguiente torneo Chunin"
     },
     "today": "Hoy",
     "button": "Calendario",
@@ -3874,7 +3877,9 @@
     "prev": "Día anterior",
     "next": "Día siguiente",
     "restDay": "Día de descanso, sin torneo programado",
-    "localTimeNote": "Los horarios se muestran en tu zona horaria."
+    "localTimeNote": "Los horarios se muestran en tu zona horaria.",
+    "openDetails": "Ver los detalles de este torneo",
+    "detailsRules": "Reglas"
   },
   "adminFeatured": {
     "title": "Cartas holo del menú",

@@ -3865,7 +3865,10 @@
       "discord": "Discord必須",
       "partnerBy": "{partner} 主催",
       "regLabel": "エントリー",
-      "startLabel": "開始"
+      "startLabel": "開始",
+      "rewardsLabel": "報酬",
+      "nwlPrize": "1位：ストアクレジット{credit}ポンド、またはPayPalで{paypal}ポンド",
+      "nwlChunin": "上位{places}名：中忍ロール。次回の中忍トーナメントのみ有効"
     },
     "today": "今日",
     "button": "カレンダー",
@@ -3873,7 +3876,9 @@
     "prev": "前の日",
     "next": "次の日",
     "restDay": "休息日、予定されている大会はありません",
-    "localTimeNote": "時刻はお使いの環境のタイムゾーンで表示されます。"
+    "localTimeNote": "時刻はお使いの環境のタイムゾーンで表示されます。",
+    "openDetails": "この大会の詳細を見る",
+    "detailsRules": "ルール"
   },
   "adminFeatured": {
     "title": "メニューのホロカード",

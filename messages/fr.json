@@ -3867,7 +3867,10 @@
       "discord": "Discord requis",
       "partnerBy": "Organisé par {partner}",
       "regLabel": "Inscriptions",
-      "startLabel": "Début"
+      "startLabel": "Début",
+      "rewardsLabel": "Récompenses",
+      "nwlPrize": "1er : {credit} livres en bon d’achat ou {paypal} livres PayPal",
+      "nwlChunin": "Top {places} : rôle Chunin, valable pour le prochain tournoi Chunin uniquement"
     },
     "today": "Aujourd'hui",
     "button": "Calendrier",
@@ -3875,7 +3878,9 @@
     "prev": "Jour précédent",
     "next": "Jour suivant",
     "restDay": "Jour de repos, aucun tournoi prévu",
-    "localTimeNote": "Les horaires sont affichés dans ton fuseau horaire."
+    "localTimeNote": "Les horaires sont affichés dans ton fuseau horaire.",
+    "openDetails": "Voir le détail de ce tournoi",
+    "detailsRules": "Règles"
   },
   "adminFeatured": {
     "title": "Cartes holo du menu",

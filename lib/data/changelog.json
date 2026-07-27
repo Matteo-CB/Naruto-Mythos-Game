@@ -13,7 +13,9 @@
         "fix",
         "fix",
         "fix",
-        "fix"
+        "fix",
+        "feature",
+        "feature"
       ],
       "changes_fr": [
         "Tu peux choisir ta couleur et celle de ton adversaire, et le plateau prend ces couleurs en partie.",
@@ -24,7 +26,9 @@
         "Le fil prévient avant de publier quand ton profil privé limite ton post à tes amis.",
         "Le texte de Shino Aburame 115 annonçait l'inverse de son effet : son embuscade amène un allié d'une autre mission vers la sienne.",
         "Les titres anglais des cartes ont tous été revérifiés sur la carte imprimée et corrigés.",
-        "Cinq cartes portaient un mauvais nom anglais, dont Gamabunta, Gamakichi et l’Araignée Géante."
+        "Cinq cartes portaient un mauvais nom anglais, dont Gamabunta, Gamakichi et l’Araignée Géante.",
+        "Le calendrier des tournois est plus compact et chaque jour se clique pour voir tout le détail.",
+        "Les récompenses du tournoi New World Loot sont expliquées dans le calendrier et sur Discord."
       ],
       "changes_en": [
         "You can pick your own colour and your opponent colour, and the board uses them in your games.",
@@ -35,7 +39,9 @@
         "The feed now warns before posting when your private profile limits the post to your friends.",
         "Shino Aburame 115 had its text backwards: his ambush brings an ally from another mission into his own.",
         "Every English card title was re-checked against the printed card and corrected.",
-        "Five cards had the wrong English name, including Gamabunta, Gamakichi and the Giant Spider."
+        "Five cards had the wrong English name, including Gamabunta, Gamakichi and the Giant Spider.",
+        "The tournament calendar is more compact and each day opens full details when clicked.",
+        "The New World Loot tournament rewards are now explained in the calendar and on Discord."
       ]
     },
     {

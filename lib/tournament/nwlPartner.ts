@@ -1,3 +1,10 @@
+import {
+  NWL_FIRST_PLACE_STORE_CREDIT_GBP,
+  NWL_FIRST_PLACE_PAYPAL_GBP,
+  NWL_CHUNIN_PODIUM_PLACES,
+  NWL_DISCORD_INVITE,
+} from '@/lib/tournament/weeklySchedule';
+
 const DISCORD_API = 'https://discord.com/api/v10';
 
 export const NWL_PARTNER_KEY = 'nwl';
@@ -98,10 +105,10 @@ export const NWL_CHUNIN_RESET_WEEKDAY = 1;
 
 export const NWL_TOURNAMENT_RULES_NOTE = [
   'New World Loot weekly Friday tournament. Single elimination, standard ban list.',
-  'First place: 20 pounds store credit or 10 pounds PayPal, provided by New World Loot.',
-  'The top 3 players earn the Chunin role, which gives access to the Chunin tournament and its bigger rewards, organised separately on the New World Loot server.',
-  'The Chunin role is valid for the next Chunin tournament only: it is removed every Monday, so it has to be earned again.',
-  'To receive the Chunin role you must link your Discord account and be a member of the New World Loot server: discord.gg/JR5HG4VUP',
+  `Rewards. First place wins ${NWL_FIRST_PLACE_STORE_CREDIT_GBP} pounds of store credit, or ${NWL_FIRST_PLACE_PAYPAL_GBP} pounds paid by PayPal if you prefer, offered by New World Loot.`,
+  `The first ${NWL_CHUNIN_PODIUM_PLACES} players also earn the Chunin role, which opens the Chunin tournament and its bigger rewards, organised separately on the New World Loot server.`,
+  'The Chunin role counts for the next Chunin tournament only: it is removed every Monday, so it has to be earned again each week.',
+  `To receive the Chunin role you must link your Discord account and be a member of the New World Loot server: ${NWL_DISCORD_INVITE}`,
 ].join(' ');
 
 export async function listNwlChuninHolders(): Promise<string[] | null> {
@@ -213,6 +220,13 @@ export async function announceNwlPodium(entries: NwlPodiumEntry[]): Promise<bool
     entries.length > 1
       ? 'Each of you has received the Chunin role on this server. Well played.'
       : 'The Chunin role has been added to your profile on this server. Well played.',
+  );
+  lines.push('');
+  lines.push(
+    `Rewards: first place wins ${NWL_FIRST_PLACE_STORE_CREDIT_GBP} pounds of store credit, or ${NWL_FIRST_PLACE_PAYPAL_GBP} pounds by PayPal if preferred, offered by New World Loot.`,
+  );
+  lines.push(
+    'The Chunin role opens the Chunin tournament and its bigger rewards. It counts for the next one only, as it is removed every Monday.',
   );
 
   const res = await nwlApi(`/channels/${NWL_TAG_CHANNEL_ID}/messages`, {

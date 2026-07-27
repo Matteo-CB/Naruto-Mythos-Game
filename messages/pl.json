@@ -3862,7 +3862,10 @@
       "discord": "Wymagany Discord",
       "partnerBy": "Organizowany przez {partner}",
       "regLabel": "Zapisy",
-      "startLabel": "Start"
+      "startLabel": "Start",
+      "rewardsLabel": "Nagrody",
+      "nwlPrize": "1. miejsce: {credit} funtów kredytu w sklepie lub {paypal} funtów przez PayPal",
+      "nwlChunin": "Top {places}: ranga Chunin, ważna tylko na następny turniej Chunin"
     },
     "today": "Dziś",
     "button": "Kalendarz",
@@ -3870,7 +3873,9 @@
     "prev": "Poprzedni dzień",
     "next": "Następny dzień",
     "restDay": "Dzień przerwy, brak zaplanowanego turnieju",
-    "localTimeNote": "Godziny są podane w Twojej strefie czasowej."
+    "localTimeNote": "Godziny są podane w Twojej strefie czasowej.",
+    "openDetails": "Zobacz szczegóły tego turnieju",
+    "detailsRules": "Zasady"
   },
   "adminFeatured": {
     "title": "Karty holo w menu",

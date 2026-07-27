@@ -3861,7 +3861,10 @@
       "discord": "Discord required",
       "partnerBy": "Hosted by {partner}",
       "regLabel": "Registration",
-      "startLabel": "Start"
+      "startLabel": "Start",
+      "rewardsLabel": "Rewards",
+      "nwlPrize": "1st: {credit} pounds store credit or {paypal} pounds PayPal",
+      "nwlChunin": "Top {places}: Chunin role, valid for the next Chunin tournament only"
     },
     "today": "Today",
     "button": "Schedule",
@@ -3869,7 +3872,9 @@
     "prev": "Previous day",
     "next": "Next day",
     "restDay": "Rest day, no scheduled tournament",
-    "localTimeNote": "Times are shown in your local time zone."
+    "localTimeNote": "Times are shown in your local time zone.",
+    "openDetails": "See the details of this tournament",
+    "detailsRules": "Rules"
   },
   "adminFeatured": {
     "title": "Menu holo cards",
