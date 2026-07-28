@@ -376,7 +376,7 @@ const CatalogMission = memo(function CatalogMission({
   onAdd: (card: MissionCard) => void;
   onHover: (card: CharacterCard | MissionCard) => void;
 }) {
-  const imgPath = portraitImagePath(card);
+  const imgPath = normalizeImagePath(card.image_file);
   return (
     <button
       onClick={() => { onAdd(card); onHover(card); }}
