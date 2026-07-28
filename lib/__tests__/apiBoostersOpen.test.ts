@@ -85,7 +85,7 @@ describe('POST /api/boosters/open', () => {
 
   it('returns 400 when set is coming_soon', async () => {
     fakeAuth.mockResolvedValue({ user: { id: 'u1' } });
-    const res = await POST(makeRequest({ setId: 'SS' }) as never);
+    const res = await POST(makeRequest({ setId: 'AK' }) as never);
     expect(res.status).toBe(400);
   });
 

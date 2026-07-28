@@ -20,8 +20,9 @@ describe('sealed only ever uses a set that is explicitly sealed ready', () => {
     expect(getLatestSealedSetId()).toBe('KS');
   });
 
-  it('a set being revealed is never sealed ready', () => {
-    expect(SET_REGISTRY.SS.status).toBe('revealing');
+  it('an available set is not sealed ready unless it says so', () => {
+    expect(SET_REGISTRY.SS.status).toBe('available');
+    expect(SET_REGISTRY.SS.sealedReady).not.toBe(true);
     expect(isSetSealedReady('SS')).toBe(false);
     expect(isSetSealedReady('AK')).toBe(false);
   });

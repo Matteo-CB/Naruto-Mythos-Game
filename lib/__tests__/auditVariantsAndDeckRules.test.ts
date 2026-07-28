@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
+import { applySetStatusOverrides } from '@/lib/data/sets/registry';
 import type { CardData, CharacterCard, CharacterInPlay, EffectType, Rarity } from '@/lib/engine/types';
 
 const fakeUserFindUnique = vi.fn();
@@ -1075,8 +1076,20 @@ describe('static ranked ban list', () => {
   });
 
   it('bans every card of a not yet released set', () => {
+    applySetStatusOverrides({ SS: 'coming_soon' });
     expect(isStaticRankedBanned('SS-082-C')).toBe(true);
     expect(isStaticRankedBanned('SS-128-R')).toBe(true);
+    applySetStatusOverrides(null);
+  });
+
+  it('keeps the explicitly banned set 2 promos out of ranked', () => {
+    expect(isStaticRankedBanned('SS-000-L')).toBe(true);
+    expect(isStaticRankedBanned('SS-147-POPV')).toBe(true);
+  });
+
+  it('lets the released set 2 cards into ranked', () => {
+    expect(isStaticRankedBanned('SS-046-UC')).toBe(false);
+    expect(isStaticRankedBanned('SS-085-UC')).toBe(false);
   });
 
   it('does not ban released cards', () => {

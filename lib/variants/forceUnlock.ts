@@ -1,10 +1,10 @@
 import { getAllCards } from '@/lib/data/cardLoader';
-import { SET_REGISTRY } from '@/lib/data/sets/registry';
+import { getSetStatus } from '@/lib/data/sets/registry';
 import { parseCardId } from '@/lib/variants/isVariant';
 import { FORCE_UNLOCKED_CARD_IDS } from '@/lib/variants/constants';
 
 function isPreReleaseSet(setId: string): boolean {
-  const status = SET_REGISTRY[setId]?.status;
+  const status = getSetStatus(setId);
   return status === 'coming_soon' || status === 'revealing';
 }
 

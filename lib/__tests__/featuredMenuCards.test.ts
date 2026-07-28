@@ -32,7 +32,7 @@ const MISSION_CARD = 'KS-001-MMS';
 describe('featured menu card filtering', () => {
   beforeEach(() => {
     ensureServerCards();
-    applySetStatusOverrides(null);
+    applySetStatusOverrides({ SS: 'revealing' });
   });
 
   afterEach(() => {
@@ -73,7 +73,7 @@ describe('featured menu card filtering', () => {
 describe('resolveFeaturedMenuCards', () => {
   beforeEach(() => {
     ensureServerCards();
-    applySetStatusOverrides(null);
+    applySetStatusOverrides({ SS: 'revealing' });
   });
 
   afterEach(() => {
@@ -152,7 +152,9 @@ describe('the fallback default menu cards can never leak an unrevealed card', ()
   });
 
   it('would drop a default taken from a set that is still revealing', () => {
+    applySetStatusOverrides({ SS: 'revealing' });
     const ids = resolveFeaturedMenuCards([REVEALING_CHARACTER], new Set([REVEALING_CHARACTER])).map((c) => c.id);
     expect(ids).toEqual([]);
+    applySetStatusOverrides(null);
   });
 });

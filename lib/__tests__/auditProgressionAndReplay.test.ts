@@ -682,6 +682,9 @@ function visibleState(overrides: Partial<VisibleGameState> = {}): VisibleGameSta
 }
 
 describe('card reveal gating never exposes an unrevealed card', () => {
+  beforeEach(() => {
+    applySetStatusOverrides({ SS: 'revealing' });
+  });
   afterEach(() => {
     applySetStatusOverrides({});
   });
@@ -789,12 +792,13 @@ describe('card reveal gating never exposes an unrevealed card', () => {
 });
 
 describe('the runtime card API never delivers an unrevealed card to a normal player', () => {
+
   beforeEach(async () => {
     dbMocks.hiddenCardFindMany.mockReset();
     dbMocks.siteSettingsFindUnique.mockReset();
     dbMocks.userFindUnique.mockReset();
     dbMocks.auth.mockReset();
-    dbMocks.siteSettingsFindUnique.mockResolvedValue(null);
+    dbMocks.siteSettingsFindUnique.mockResolvedValue({ setStatusOverrides: { SS: 'revealing' } });
     invalidateRevealCache();
     await reloadSetConfig();
   });
@@ -855,6 +859,14 @@ describe('the runtime card API never delivers an unrevealed card to a normal pla
 });
 
 describe('a deck containing an unrevealed card cannot be shared in the feed', () => {
+  beforeEach(() => {
+    applySetStatusOverrides({ SS: 'revealing' });
+  });
+  afterEach(() => {
+    applySetStatusOverrides({});
+  });
+
+
   beforeEach(() => {
     dbMocks.deckFindUnique.mockReset();
     dbMocks.hiddenCardFindMany.mockReset();

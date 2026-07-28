@@ -635,6 +635,12 @@ export default function DeckBuilderPage() {
     [deckChars, deckMissions, unrevealedIds],
   );
 
+  const realCharCount = useMemo(
+    () => deckChars.filter((c) => (c as { card_type?: string }).card_type !== 'attachment').length,
+    [deckChars],
+  );
+  const attachmentCount = deckChars.length - realCharCount;
+
   const validation = useMemo(() => validateDeck(deckChars, deckMissions), [deckChars, deckMissions]);
 
   const lockedVariantsInDeck = useMemo(() => {
@@ -1454,9 +1460,14 @@ export default function DeckBuilderPage() {
               }}
             />
             <div className="flex items-center gap-2 text-[10px] flex-shrink-0">
-              <span style={{ color: deckChars.length >= 30 ? '#3e8b3e' : '#b33e3e' }}>
-                {t("deckBuilder.characters", { count: deckChars.length })}
+              <span style={{ color: realCharCount >= 30 ? '#3e8b3e' : '#b33e3e' }}>
+                {t("deckBuilder.characters", { count: realCharCount })}
               </span>
+              {attachmentCount > 0 && (
+                <span style={{ color: '#8a8a8a' }}>
+                  +{attachmentCount} {t("collection.attachments")}
+                </span>
+              )}
               <span style={{ color: deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e' }}>
                 {t("deckBuilder.missions", { count: deckMissions.length })}
               </span>
@@ -1740,9 +1751,9 @@ export default function DeckBuilderPage() {
           borderBottom: '1px solid rgba(255,255,255,0.04)',
         }}>
           <span className="text-[10px] tabular-nums font-bold px-1.5 py-0.5 flex-shrink-0" style={{
-            backgroundColor: deckChars.length >= 30 ? 'rgba(62,139,62,0.12)' : 'rgba(179,62,62,0.1)',
-            color: deckChars.length >= 30 ? '#3e8b3e' : '#b33e3e',
-          }}>{deckChars.length}/30</span>
+            backgroundColor: realCharCount >= 30 ? 'rgba(62,139,62,0.12)' : 'rgba(179,62,62,0.1)',
+            color: realCharCount >= 30 ? '#3e8b3e' : '#b33e3e',
+          }}>{realCharCount}/30{attachmentCount > 0 ? ` +${attachmentCount}` : ''}</span>
           <span className="text-[10px] tabular-nums font-bold px-1.5 py-0.5 flex-shrink-0" style={{
             backgroundColor: deckMissions.length === 3 ? 'rgba(62,139,62,0.12)' : 'rgba(179,62,62,0.1)',
             color: deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e',

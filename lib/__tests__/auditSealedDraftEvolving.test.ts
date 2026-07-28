@@ -299,16 +299,16 @@ describe('sealed set choice — random resolves against AVAILABLE sets only', ()
     applySetStatusOverrides(null);
   });
 
-  it('KS is available, SS is revealing, AK is coming soon', () => {
+  it('KS and SS are available, AK is coming soon', () => {
     expect(getSetStatus('KS')).toBe('available');
-    expect(getSetStatus('SS')).toBe('revealing');
+    expect(getSetStatus('SS')).toBe('available');
     expect(getSetStatus('AK')).toBe('coming_soon');
   });
 
   it('getAvailableSetIds excludes revealing and coming-soon sets', () => {
     const available = getAvailableSetIds();
     expect(available).toContain('KS');
-    expect(available).not.toContain('SS');
+    expect(available).toContain('SS');
     expect(available).not.toContain('AK');
     expect(available.every((id) => ALL_SET_IDS.includes(id))).toBe(true);
   });
@@ -357,7 +357,7 @@ describe('sealed set choice — random resolves against AVAILABLE sets only', ()
   });
 
   it('a pool with no available set at all is refused outright', () => {
-    applySetStatusOverrides({ KS: 'coming_soon' });
+    applySetStatusOverrides({ KS: 'coming_soon', SS: 'coming_soon' });
     expect(getAvailableSetIds().length).toBe(0);
     expect(() => generateSealedPool(1, 'random')).toThrow(/No sealed-ready sets are available/);
   });
@@ -368,10 +368,10 @@ describe('sealed set choice — random resolves against AVAILABLE sets only', ()
   });
 
   it('clearing the overrides restores the shipped statuses', () => {
-    applySetStatusOverrides({ SS: 'available' });
+    applySetStatusOverrides({ SS: 'revealing' });
     applySetStatusOverrides(null);
-    expect(getSetStatus('SS')).toBe('revealing');
-    expect(getAvailableSetIds()).not.toContain('SS');
+    expect(getSetStatus('SS')).toBe('available');
+    expect(getAvailableSetIds()).toContain('SS');
   });
 });
 

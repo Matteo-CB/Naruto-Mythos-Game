@@ -1,15 +1,22 @@
 import { describe, it, expect } from 'vitest';
 import { isForceUnlockedCard, getForceUnlockedCardIds } from '@/lib/variants/forceUnlock';
+import { applySetStatusOverrides } from '@/lib/data/sets/registry';
 
 describe('force-unlock for not-yet-released (coming_soon / revealing) sets', () => {
-  it('unlocks every Set 2 (SS) card, variants included, while the set is being revealed', () => {
+  it('keeps the Set 2 promo variants unlocked now that the set is released', () => {
     expect(isForceUnlockedCard('SS-112-SPV')).toBe(true);
     expect(isForceUnlockedCard('SS-122-SPV')).toBe(true);
     expect(isForceUnlockedCard('SS-126-SPV')).toBe(true);
     expect(isForceUnlockedCard('SS-120-CHIBIV')).toBe(true);
     expect(isForceUnlockedCard('SS-147-POPV')).toBe(true);
     expect(isForceUnlockedCard('SS-000-L')).toBe(true);
+  });
+
+  it('unlocks every card of a set that is still being revealed', () => {
+    applySetStatusOverrides({ SS: 'revealing' });
     expect(isForceUnlockedCard('SS-121-R')).toBe(true);
+    expect(isForceUnlockedCard('SS-046-UC')).toBe(true);
+    applySetStatusOverrides(null);
   });
 
   it('does NOT force-unlock locked variants from an available set (KS)', () => {

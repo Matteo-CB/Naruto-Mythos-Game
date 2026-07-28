@@ -31,7 +31,7 @@ export const SET_REGISTRY: Record<string, SetDescriptor> = {
     nameEn: 'Shinobi Shiren',
     nameFr: 'Shinobi Shiren',
     nameJa: '忍びの試練',
-    status: 'revealing',
+    status: 'available',
     boosterImage: '/images/booster-SS.webp',
   },
   AK: {

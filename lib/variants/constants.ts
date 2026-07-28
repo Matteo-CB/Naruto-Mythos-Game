@@ -7,7 +7,14 @@ export const SPECIAL_VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L', 'SP', 'SPV', 'PO
 
 export const LOCKED_VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L', 'SPV', 'POPV', 'CHIBIV'] as const;
 
-export const FORCE_UNLOCKED_CARD_IDS: ReadonlySet<string> = new Set([]);
+export const FORCE_UNLOCKED_CARD_IDS: ReadonlySet<string> = new Set([
+  'SS-112-SPV',
+  'SS-122-SPV',
+  'SS-126-SPV',
+  'SS-120-CHIBIV',
+  'SS-147-POPV',
+  'SS-000-L',
+]);
 
 export const VARIANT_PACK_SIZE = 8;
 

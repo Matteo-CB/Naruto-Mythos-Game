@@ -37,8 +37,8 @@ describe('sitemap includes localized card pages (Phase A2)', () => {
     }
   });
 
-  it('includes released cards but excludes not-yet-released (revealing) set cards', () => {
+  it('includes released cards, set 2 included', () => {
     expect(urls).toContain(`${SITE_URL}/en/cards/${cardIdToSlug('KS-108_4-MV')}`);
-    expect(urls).not.toContain(`${SITE_URL}/fr/cards/${cardIdToSlug('SS-112-SPV')}`);
+    expect(urls).toContain(`${SITE_URL}/fr/cards/${cardIdToSlug('SS-112-SPV')}`);
   });
 });
