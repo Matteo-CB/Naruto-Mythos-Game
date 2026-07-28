@@ -1,4 +1,5 @@
-import type { GameState, PlayerID, CharacterInPlay } from '../engine/types';
+import type { GameState, PlayerID, CharacterInPlay, PendingAction } from '../engine/types';
+import { generateInstanceId } from '../engine/utils/id';
 import { logAction } from '../engine/utils/gameLog';
 
 
@@ -581,6 +582,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
   
 
   let newState = { ...state };
+  newState = triggerCrow089Relocation(newState, playingPlayer, playedInstanceId);
   const opponent: PlayerID = playingPlayer === 'player1' ? 'player2' : 'player1';
   const mission = newState.activeMissions[missionIndex];
   const opponentChars = opponent === 'player1' ? mission.player1Characters : mission.player2Characters;
@@ -774,4 +776,73 @@ export function applyRempartTokenRemoval(state: GameState): GameState {
   }
 
   return newState;
+}
+
+
+function triggerCrow089Relocation(state: GameState, playingPlayer: PlayerID, playedInstanceId?: string): GameState {
+  if (!playedInstanceId) return state;
+  const side: 'player1Characters' | 'player2Characters' = playingPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+
+  let played: CharacterInPlay | null = null;
+  for (const m of state.activeMissions) {
+    const found = m[side].find((c) => c.instanceId === playedInstanceId);
+    if (found) { played = found; break; }
+  }
+  if (!played || played.isHidden) return state;
+  const playedTop = played.stack?.length > 0 ? played.stack[played.stack.length - 1] : played.card;
+  if (!(playedTop.name_en ?? '').toUpperCase().startsWith('KANKURO')) return state;
+
+  let host: CharacterInPlay | null = null;
+  let hostMission = 0;
+  for (let mi = 0; mi < state.activeMissions.length; mi++) {
+    for (const c of state.activeMissions[mi][side]) {
+      if ((c.attachments ?? []).some((a) => a.card.id === 'SS-089-UC')) { host = c; hostMission = mi; break; }
+    }
+    if (host) break;
+  }
+  if (!host) return state;
+
+  const targets: string[] = [];
+  for (const m of state.activeMissions) {
+    for (const c of m[side]) {
+      if (c.isHidden) continue;
+      if (c.instanceId === host.instanceId) continue;
+      if ((c.card as { card_type?: string }).card_type === 'attachment') continue;
+      targets.push(c.instanceId);
+    }
+  }
+  if (targets.length === 0) return state;
+
+  const effId = generateInstanceId();
+  const actId = generateInstanceId();
+  return {
+    ...state,
+    pendingEffects: [...state.pendingEffects, {
+      id: effId,
+      sourceCardId: 'SS-089-UC',
+      sourceInstanceId: host.instanceId,
+      sourceMissionIndex: hostMission,
+      effectType: 'MAIN',
+      effectDescription: '',
+      targetSelectionType: 'SS089_MOVE_ATTACHMENT',
+      sourcePlayer: playingPlayer,
+      requiresTargetSelection: true,
+      validTargets: targets,
+      isOptional: true,
+      isMandatory: false,
+      resolved: false,
+      isUpgrade: false,
+    }],
+    pendingActions: [...state.pendingActions, {
+      id: actId,
+      type: 'SELECT_TARGET' as PendingAction['type'],
+      player: playingPlayer,
+      description: 'Crow (SS-089): Move this attachment to a friendly character?',
+      descriptionKey: 'game.effect.desc.ss089MoveAttachment',
+      options: targets,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effId,
+    }],
+  };
 }

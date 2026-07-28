@@ -1,6 +1,8 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
+import { effectTypeLabel } from '@/lib/cards/effectTypeLabel';
+import { hasCombatStats } from '@/lib/cards/orientation';
 import { Link } from '@/lib/i18n/navigation';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
@@ -62,7 +64,7 @@ export function CardQuickPreviewModal({ card, onClose }: { card: CardData; onClo
                   loading="eager"
                   decoding="async"
                 />
-                {card.isHolo && <HoloFoilOverlay intensity="preview" />}
+                {card.isHolo && <HoloFoilOverlay intensity="preview" imageUrl={imgPath} />}
               </>
             ) : (
               <div className={`w-full ${isMission ? 'mission-aspect' : 'card-aspect'} bg-[#1a1a1a] flex items-center justify-center`}>
@@ -89,7 +91,7 @@ export function CardQuickPreviewModal({ card, onClose }: { card: CardData; onClo
               <span style={{ color: RARITY_COLORS[card.rarity] }}>{getRarityLabel(card.rarity, tCardMeta)}</span>
             </div>
 
-            {card.card_type === 'character' && (
+            {hasCombatStats(card) && (
               <div className="flex gap-4 mb-3 text-sm">
                 <span className="text-[#888888]">{t('collection.details.cost')}: <span className="text-[#e0e0e0]">{card.chakra}</span></span>
                 <span className="text-[#888888]">{t('collection.details.power')}: <span className="text-[#e0e0e0]">{card.power}</span></span>
@@ -121,7 +123,7 @@ export function CardQuickPreviewModal({ card, onClose }: { card: CardData; onClo
                   return (
                     <div key={i} className="text-xs">
                       <span className="font-bold mr-1" style={{ color: EFFECT_TYPE_TEXT_COLOR[effect.type] ?? '#888888' }}>
-                        [{effect.type}]
+                        [{effectTypeLabel(effect.type)}]
                       </span>
                       <span className="font-body text-[#aaa]">{description}</span>
                     </div>

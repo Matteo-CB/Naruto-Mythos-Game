@@ -3,6 +3,7 @@ import { BASE_CHAKRA_PER_TURN, CARDS_DRAWN_PER_TURN, TURN_TO_RANK, RANK_BONUS } 
 import { logSystem, logAction } from '../utils/gameLog';
 import { calculateContinuousChakraBonus, calculateMissionChakraBonus } from '../../effects/ContinuousEffects';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
+import { resetFirstStrikeForRound } from '../rules/firstStrike';
 
 
 export function executeStartPhase(state: GameState): GameState {
@@ -15,7 +16,8 @@ export function executeStartPhase(state: GameState): GameState {
   
   newState.turnPlayedIds = [];
 
-  
+  newState = resetFirstStrikeForRound(newState);
+
   newState = revealMissionCard(newState);
 
   

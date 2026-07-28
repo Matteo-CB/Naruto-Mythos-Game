@@ -11,3 +11,7 @@ export function isLandscapeCard(card: Pick<CardData, 'card_type'> & { attach_to?
 export function cardAspectRatio(card: Pick<CardData, 'card_type'> & { attach_to?: string | null }): string {
   return isLandscapeCard(card) ? LANDSCAPE_ASPECT : PORTRAIT_ASPECT;
 }
+
+export function hasCombatStats(card: Pick<CardData, 'card_type'>): boolean {
+  return card.card_type === 'character' || card.card_type === 'attachment';
+}

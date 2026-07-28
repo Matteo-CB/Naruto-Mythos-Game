@@ -115,6 +115,41 @@ const FACTORIES: Record<string, Factory> = {
     play: P1(FRESH),
     noMinimize: true,
   }),
+  'SS-046-UC': (id) => ({
+    build: () => {
+      const st = board({ hand: [id] });
+      st.player1.deck = ['KS-009-C', 'KS-010-C', 'SS-051-UC']
+        .map((x) => getCharacterById(x)!).filter(Boolean);
+      return st;
+    },
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
+  'SS-049-C': (id) => ({
+    build: () => board({
+      p1m0: [{ id, iid: 'sim-fs-temari' }, { id: 'KS-009-C', iid: 'sim-fs-ally' }],
+      e0: [{ id: 'KS-005-C', iid: 'sim-fs-enemy' }],
+    }),
+    play: P1({ type: 'USE_FIRST_STRIKE', characterInstanceId: 'sim-fs-temari' }),
+    noMinimize: true,
+  }),
+  'SS-051-UC': (id) => ({
+    build: () => board({ hand: [id, 'SS-046-UC'] }),
+    play: P1(FRESH),
+    followups: [
+      { player: 'player2', action: PASS_ACTION },
+      P1({ type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 1, hidden: false }),
+    ],
+    noMinimize: true,
+  }),
+  'SS-114-R': (id) => ({
+    build: () => board({
+      hand: [id, 'SS-046-UC'],
+      e0: [{ id: 'KS-005-C', iid: 'sim-cheap-enemy' }],
+    }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
   'SS-108-C': (id) => ({
     build: () => board({
       hand: [id],

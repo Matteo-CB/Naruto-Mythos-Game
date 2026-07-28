@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { getCardById } from '@/lib/data/cardIndex';
 import { getCardGroup } from '@/lib/utils/cardLocale';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath , portraitImagePath } from '@/lib/utils/imagePath';
 import type { DeckSnapshot } from '@/lib/social/types';
 
 const DeckViewerModal = dynamic(() => import('@/components/profile/DeckViewerModal'), { ssr: false });
@@ -71,7 +71,7 @@ export function DeckEmbed({ deck, onOpen }: { deck: DeckSnapshot; onOpen?: () =>
         {headline.length > 0 && (
           <div className="relative flex items-end gap-0 px-3 pt-3" style={{ height: 92 }}>
             {headline.map((card, i) => {
-              const src = normalizeImagePath(card.image_file);
+              const src = portraitImagePath(card);
               return (
                 <div
                   key={card.id + i}

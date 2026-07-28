@@ -119,6 +119,7 @@ export function augmentRawCards(cards: Record<string, unknown> | RawJsonCard[]):
     _characters = null;
     _missions = null;
     _attachments = null;
+    _playableAttachments = null;
     _playableCharacters = null;
     _playableMissions = null;
     _oldIdToNewId = null;
@@ -130,6 +131,7 @@ let _allCards: CardData[] | null = null;
 let _characters: CharacterCard[] | null = null;
 let _missions: MissionCard[] | null = null;
 let _attachments: AttachmentCard[] | null = null;
+let _playableAttachments: AttachmentCard[] | null = null;
 let _playableCharacters: CharacterCard[] | null = null;
 let _playableMissions: MissionCard[] | null = null;
 let _oldIdToNewId: Map<string, string> | null = null;
@@ -192,6 +194,13 @@ export function getPlayableCharacters(): CharacterCard[] {
     _playableCharacters = getAllCharacters().filter((c) => c.has_visual || c.data_complete);
   }
   return _playableCharacters;
+}
+
+export function getPlayableAttachments(): AttachmentCard[] {
+  if (!_playableAttachments) {
+    _playableAttachments = getAllAttachments().filter((c) => c.has_visual || c.data_complete);
+  }
+  return _playableAttachments;
 }
 
 export function getPlayableMissions(): MissionCard[] {

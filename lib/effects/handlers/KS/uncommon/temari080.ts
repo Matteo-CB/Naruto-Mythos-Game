@@ -1,4 +1,5 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
+import { characterHasGroup } from '@/lib/effects/groupUtils';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
@@ -27,7 +28,7 @@ function handleTemari080Main(ctx: EffectContext): EffectResult {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (char.isHidden) continue; // Hidden characters can't be identified by group
       const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-      if (topCard.group !== 'Sand Village') continue;
+      if (!characterHasGroup(char, 'Sand Village')) continue;
 
       
       const charName = topCard.name_fr;

@@ -1,14 +1,17 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
+import { holoMaskStyle } from './HoloFoilOverlay';
 
 type Intensity = 'subtle' | 'strong';
 
 interface VariantHoloOverlayProps {
   intensity?: Intensity;
+  imageUrl?: string | null;
+  maskSize?: 'cover' | 'contain';
 }
 
-export function VariantHoloOverlay({ intensity = 'subtle' }: VariantHoloOverlayProps) {
+export function VariantHoloOverlay({ intensity = 'subtle', imageUrl, maskSize = 'cover' }: VariantHoloOverlayProps) {
   const reduceMotion = useReducedMotion();
   const alpha = intensity === 'strong' ? 0.14 : 0.08;
   const bandColor = `rgba(255,255,255,${alpha})`;
@@ -21,6 +24,7 @@ export function VariantHoloOverlay({ intensity = 'subtle' }: VariantHoloOverlayP
         style={{
           backgroundColor: `rgba(255,255,255,${alpha * 0.5})`,
           mixBlendMode: 'screen',
+          ...holoMaskStyle(imageUrl, maskSize),
         }}
       />
     );
@@ -30,7 +34,7 @@ export function VariantHoloOverlay({ intensity = 'subtle' }: VariantHoloOverlayP
     <div
       aria-hidden
       className="pointer-events-none absolute inset-0 overflow-hidden"
-      style={{ mixBlendMode: 'screen' }}
+      style={{ mixBlendMode: 'screen', ...holoMaskStyle(imageUrl, maskSize) }}
     >
       <motion.div
         initial={{ x: '-120%' }}

@@ -249,7 +249,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
                 className="w-full h-full bg-cover bg-center"
                 style={{ backgroundImage: `url('${imagePath}')`, imageRendering: 'crisp-edges' }}
               />
-              {character.card?.isHolo && <HoloFoilOverlay />}
+              {character.card?.isHolo && <HoloFoilOverlay imageUrl={imagePath} />}
             </>
           ) : (
             <div
@@ -275,14 +275,14 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
             <div
               key={att.instanceId}
               style={{
-                width: dims.isMobile ? '20px' : '16px',
-                height: dims.isMobile ? '26px' : '21px',
+                width: dims.isMobile ? '28px' : '23px',
+                height: dims.isMobile ? '37px' : '31px',
                 backgroundImage: att.card.image_file ? `url('${normalizeImagePath(att.card.image_file)}')` : undefined,
                 backgroundColor: '#141414',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 borderRadius: '2px',
-                boxShadow: '0 0 8px rgba(196, 163, 90, 0.45)',
+                boxShadow: '0 0 10px rgba(196, 163, 90, 0.65), 0 1px 3px rgba(0,0,0,0.6)',
               }}
             />
           ))}
@@ -579,6 +579,30 @@ function MissionCardDisplay({
         {totalPoints} {t('game.board.pts')}
       </div>
 
+      {(mission.attachments?.length ?? 0) > 0 && (
+        <div className="absolute z-10 flex gap-1" style={{ bottom: '4px', left: '50%', transform: 'translateX(-50%)' }}>
+          {mission.attachments!.map((att) => (
+            <div
+              key={att.instanceId}
+              onClick={(e) => { e.stopPropagation(); pinCard(att.card as never); }}
+              title={getCardName(att.card, locale as 'en' | 'fr')}
+              style={{
+                width: dims.isMobile ? '62px' : '52px',
+                aspectRatio: '3.5 / 2.5',
+                borderRadius: '3px',
+                backgroundImage: att.card.image_file ? `url('${normalizeImagePath(att.card.image_file)}')` : undefined,
+                backgroundColor: '#141414',
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                boxShadow: `0 2px 8px rgba(0,0,0,0.75), 0 0 10px ${att.owner === myPlayer ? palette.me.tint(0.6) : palette.opponent.tint(0.6)}`,
+                cursor: 'pointer',
+              }}
+            />
+          ))}
+        </div>
+      )}
+
       {mission.wonBy && (
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
@@ -600,28 +624,6 @@ function MissionCardDisplay({
       )}
     </div>
 
-    {(mission.attachments?.length ?? 0) > 0 && (
-      <div className="flex gap-1 justify-center" style={{ width: '100%', maxWidth: dims.missionMaxW + 'px', marginTop: '2px' }}>
-        {mission.attachments!.map((att) => (
-          <div
-            key={att.instanceId}
-            onClick={(e) => { e.stopPropagation(); pinCard(att.card as never); }}
-            title={getCardName(att.card, locale as 'en' | 'fr')}
-            style={{
-              width: '36%',
-              aspectRatio: '3.5 / 1.1',
-              borderRadius: '3px',
-              backgroundImage: att.card.image_file ? `url('${normalizeImagePath(att.card.image_file)}')` : undefined,
-              backgroundColor: '#141414',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center 30%',
-              boxShadow: att.owner === myPlayer ? `0 0 8px ${palette.me.tint(0.5)}` : `0 0 8px ${palette.opponent.tint(0.5)}`,
-              cursor: 'pointer',
-            }}
-          />
-        ))}
-      </div>
-    )}
     </>
   );
 }

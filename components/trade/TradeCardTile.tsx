@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import type { CardData } from '@/lib/engine/types';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath , portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { useLocale } from 'next-intl';
@@ -18,7 +18,7 @@ interface TradeCardTileProps {
 
 export function TradeCardTile({ card, count, onClick, disabled, size = 'md', dimmed }: TradeCardTileProps) {
   const locale = useLocale() as 'en' | 'fr';
-  const img = normalizeImagePath(card.image_file);
+  const img = portraitImagePath(card);
   const w = size === 'sm' ? 60 : 72;
   const h = size === 'sm' ? 84 : 100;
 
@@ -48,7 +48,7 @@ export function TradeCardTile({ card, count, onClick, disabled, size = 'md', dim
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             loading="lazy"
           />
-          {card.isHolo && <HoloFoilOverlay />}
+          {card.isHolo && <HoloFoilOverlay imageUrl={img} />}
         </>
       ) : (
         <div className="w-full h-full flex items-center justify-center px-1">

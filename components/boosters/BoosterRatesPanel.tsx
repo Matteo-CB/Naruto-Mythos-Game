@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { getCardById } from '@/lib/data/cardIndex';
 import { getCardName } from '@/lib/utils/cardLocale';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { VARIANT_PACK_PROBABILITIES, type PackSlotKind } from '@/lib/variants/constants';
 
@@ -65,7 +65,7 @@ export function BoosterRatesPanel() {
           const color = SLOT_COLOR[k];
           const isHoloSlot = k === 'HOLO_C' || k === 'HOLO_UC';
           const card = getCardById(EXAMPLE_CARD[k]);
-          const img = card ? normalizeImagePath(card.image_file) : null;
+          const img = card ? portraitImagePath(card) : null;
           const p = VARIANT_PACK_PROBABILITIES[k];
           return (
             <div
@@ -74,14 +74,14 @@ export function BoosterRatesPanel() {
               style={{ backgroundColor: '#0a090d', clipPath: TILE_CLIP }}
             >
               {img && (
-                <div className="relative" style={{ width: 72, height: 100 }}>
+                <div className="relative overflow-hidden" style={{ width: 72, height: 100 }}>
                   <img
                     src={img}
                     alt={card ? getCardName(card, locale) : k}
                     draggable={false}
                     style={{ width: '100%', height: '100%', objectFit: 'cover', boxShadow: `0 0 16px ${color}40` }}
                   />
-                  {isHoloSlot && <HoloFoilOverlay intensity="strong" />}
+                  {isHoloSlot && <HoloFoilOverlay intensity="strong" imageUrl={img} />}
                 </div>
               )}
               <span className="font-display text-[10px] uppercase leading-none" style={{ color, letterSpacing: '0.14em' }}>

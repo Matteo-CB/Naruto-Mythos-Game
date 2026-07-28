@@ -46,4 +46,48 @@ export const effectDescriptionsEs: Record<string, string[]> = {
     "[↯] Un personaje aliado activa un efecto DUEL instantáneo [↯], ignorando sus requisitos.",
   ],
 
+  "SS-046-UC": [
+    "[↯] Revela cartas de la parte superior de tu mazo hasta encontrar un personaje de la Aldea de la Arena. Róbalo y luego baraja las cartas reveladas en tu mazo.",
+  ],
+  "SS-047-UC": [
+    "[⧗] Puedes jugar este personaje como mejora sobre un Gaara.",
+    "[↯] Derrota a un personaje enemigo con 3 de Poder o menos.",
+  ],
+  "SS-049-C": [
+    "[↯] Mueve un personaje desde esta misión.",
+  ],
+  "SS-051-UC": [
+    "[⧗] Los personajes aliados de la Aldea de la Arena cuestan 1 menos para jugarse en cualquier lugar.",
+  ],
+  "SS-078-UC": [
+    "[↯] Kimimaro: Derrota a un personaje enemigo con coste 2 o menos.",
+    "[⧗] Cuando derrotes a un personaje enemigo no oculto, puedes pagar 1 Chakra para robar 1 carta.",
+  ],
+  "SS-114-R": [
+    "[↯] Descarta un Gaara de tu mano. Oculta a un personaje enemigo en esta misión con coste igual o inferior al de la carta descartada.",
+    "Rock Lee, efecto MAIN: En su lugar, derrótalo.",
+  ],
+  "SS-117-R": [
+    "[⧗] Cada vez que muevas uno o más personajes enemigos, gana 1 Chakra.",
+    "[↯] Shino Aburame: Mueve un personaje enemigo a esta misión.",
+  ],
+  "SS-119-R": [
+    "[↯] Mueve un personaje enemigo desde esta misión.",
+    "[↯] Shikamaru Nara: Roba una carta y gana el Edge.",
+  ],
+  "SS-085-UC": [
+    "Une a un personaje aliado de la Aldea de la Arena.",
+    "[↯] Mueve desde esta misión a un personaje enemigo con menos Poder que este personaje.",
+  ],
+  "SS-089-UC": [
+    "Une a un personaje aliado no oculto.",
+    "[⧗] Cuando juegues un Kankuro, puedes mover este anexo a un personaje aliado.",
+  ],
+  "SS-092-C": [
+    "Une a un personaje aliado no oculto. Este personaje también se considera un personaje de la Aldea de la Arena.",
+  ],
+  "SS-099-UC": [
+    "Une a un personaje aliado no oculto.",
+    "[↯] Oculta en esta misión a un personaje Jutsu enemigo con menos Poder que este personaje.",
+  ],
 };

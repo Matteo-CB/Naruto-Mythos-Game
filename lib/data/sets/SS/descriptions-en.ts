@@ -43,4 +43,48 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "[↯] A friendly character activates an instant [↯] DUEL effect, ignoring requirements.",
   ],
 
+  "SS-046-UC": [
+    "[↯] Reveal cards from the top of your deck until you find a Sand Village character. Draw it, then shuffle the revealed cards into your deck.",
+  ],
+  "SS-047-UC": [
+    "[⧗] You can play this character as an upgrade over Gaara.",
+    "[↯] Defeat an enemy character with Power 3 or less.",
+  ],
+  "SS-049-C": [
+    "[↯] Move a character from this mission.",
+  ],
+  "SS-051-UC": [
+    "[⧗] Friendly Sand Village characters cost 1 less to play anywhere.",
+  ],
+  "SS-078-UC": [
+    "[↯] Kimimaro: Defeat an enemy character with cost 2 or less.",
+    "[⧗] When you defeat a non-hidden enemy character, you may pay 1 Chakra to draw 1 card.",
+  ],
+  "SS-114-R": [
+    "[↯] Discard a Gaara from your hand. Hide an enemy character in this mission with cost equal to or lower than the discarded card cost.",
+    "Rock Lee, MAIN effect: Instead, defeat them.",
+  ],
+  "SS-117-R": [
+    "[⧗] Whenever you move one or more enemy characters, gain 1 Chakra.",
+    "[↯] Shino Aburame: Move an enemy character to this mission.",
+  ],
+  "SS-119-R": [
+    "[↯] Move an enemy character from this mission.",
+    "[↯] Shikamaru Nara: Draw a card and gain the Edge.",
+  ],
+  "SS-085-UC": [
+    "Attach to a friendly Sand Village character.",
+    "[↯] Move an enemy character with less Power than this character from this mission.",
+  ],
+  "SS-089-UC": [
+    "Attach to a friendly non-hidden character.",
+    "[⧗] When you play a Kankuro, you may move this attachment to a friendly character.",
+  ],
+  "SS-092-C": [
+    "Attach to a friendly non-hidden character. This character is also considered a Sand Village character.",
+  ],
+  "SS-099-UC": [
+    "Attach to a friendly non-hidden character.",
+    "[↯] Hide an enemy Jutsu character in this mission with less Power than this character.",
+  ],
 };

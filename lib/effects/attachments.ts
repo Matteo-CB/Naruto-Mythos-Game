@@ -3,17 +3,37 @@ import { generateInstanceId } from '@/lib/engine/utils/id';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectHandler } from '@/lib/effects/EffectRegistry';
 import type { EffectContext } from '@/lib/effects/EffectTypes';
+import { characterHasGroup } from '@/lib/effects/groupUtils';
 
 export function isAttachmentCard(card: Pick<CardData, 'card_type'> | null | undefined): boolean {
   return card?.card_type === 'attachment';
 }
 
-export function getCharacterAttachTargets(state: GameState, player: PlayerID, missionIndex: number): CharacterInPlay[] {
+function requiredAttachGroup(card?: CardData | null): string | null {
+  for (const effect of card?.effects ?? []) {
+    if (effect.type !== 'ATTACH') continue;
+    const m = (effect.description ?? '').match(/Attach to a friendly\s+(.+?)\s+character/i);
+    if (m) {
+      const g = m[1].trim();
+      if (g.toLowerCase() !== 'non-hidden') return g;
+    }
+  }
+  return null;
+}
+
+export function getCharacterAttachTargets(
+  state: GameState,
+  player: PlayerID,
+  missionIndex: number,
+  attachmentCard?: CardData | null,
+): CharacterInPlay[] {
   const mission = state.activeMissions[missionIndex];
   if (!mission) return [];
   const side = player === 'player1' ? 'player1Characters' : 'player2Characters';
+  const needGroup = requiredAttachGroup(attachmentCard);
   return mission[side].filter(
-    (c) => !c.isHidden && c.controlledBy === player && (c.card as CardData).card_type !== 'attachment',
+    (c) => !c.isHidden && c.controlledBy === player && (c.card as CardData).card_type !== 'attachment'
+      && (!needGroup || characterHasGroup(c, needGroup)),
   );
 }
 
@@ -99,7 +119,45 @@ export function attachCardToCharacter(state: GameState, player: PlayerID, card: 
       };
       const result = handler(ctx);
       newState = result.state;
-    } catch { /* attachment effect error must not corrupt the play */ }
+
+      if (result.requiresTargetSelection && result.targetSelectionType && result.validTargets && result.validTargets.length > 0) {
+        const effId = generateInstanceId();
+        const actId = generateInstanceId();
+        newState = {
+          ...newState,
+          pendingEffects: [...newState.pendingEffects, {
+            id: effId,
+            sourceCardId: card.id,
+            sourceInstanceId: host.instanceId,
+            sourceMissionIndex: hostMissionIndex,
+            effectType: 'MAIN',
+            effectDescription: result.description ?? '',
+            targetSelectionType: result.targetSelectionType,
+            sourcePlayer: player,
+            requiresTargetSelection: true,
+            validTargets: result.validTargets,
+            isOptional: result.isOptional ?? false,
+            isMandatory: !(result.isOptional ?? false),
+            resolved: false,
+            isUpgrade: false,
+          }],
+          pendingActions: [...newState.pendingActions, {
+            id: actId,
+            type: 'SELECT_TARGET',
+            player,
+            description: result.description ?? '',
+            descriptionKey: result.descriptionKey,
+            descriptionParams: result.descriptionParams,
+            options: result.validTargets,
+            minSelections: 1,
+            maxSelections: 1,
+            sourceEffectId: effId,
+          }],
+        };
+      }
+    } catch (err) {
+      console.error(`[attachments] MAIN handler error for ${card.id}:`, err);
+    }
   }
   return newState;
 }

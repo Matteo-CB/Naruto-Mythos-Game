@@ -7,6 +7,7 @@ import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { MIN_DECK_SIZE, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { isLandscapeCard } from '@/lib/cards/orientation';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
@@ -542,7 +543,7 @@ export function SealedDeckBuilder({
 
                     {card.isTemporaryVariant && (
                       <>
-                        <VariantHoloOverlay intensity="subtle" />
+                        <VariantHoloOverlay intensity="subtle" imageUrl={imgPath} />
                         <div className="absolute top-1 left-1 z-10" title={t('temporaryVariantTooltip')}>
                           <span
                             className="font-display text-[9px] px-1 py-0.5 tracking-widest uppercase"
@@ -600,8 +601,8 @@ export function SealedDeckBuilder({
                 <div
                   className="relative rounded overflow-hidden mb-3 mx-auto"
                   style={{
-                    width: previewCard.card_type === 'mission' ? '100%' : '140px',
-                    aspectRatio: previewCard.card_type === 'mission' ? '3.5/2.5' : '5/7',
+                    width: isLandscapeCard(previewCard) ? '100%' : '140px',
+                    aspectRatio: isLandscapeCard(previewCard) ? '3.5/2.5' : '5/7',
                   }}
                 >
                   {normalizeImagePath(previewCard.image_file) ? (
@@ -733,8 +734,8 @@ export function SealedDeckBuilder({
                 <div
                   className="relative rounded overflow-hidden shrink-0"
                   style={{
-                    width: previewCard.card_type === 'mission' ? '140px' : '90px',
-                    aspectRatio: previewCard.card_type === 'mission' ? '3.5/2.5' : '5/7',
+                    width: isLandscapeCard(previewCard) ? '140px' : '90px',
+                    aspectRatio: isLandscapeCard(previewCard) ? '3.5/2.5' : '5/7',
                   }}
                 >
                   {normalizeImagePath(previewCard.image_file) ? (

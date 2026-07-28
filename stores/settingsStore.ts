@@ -30,6 +30,8 @@ interface SettingsState {
   gameBackground: string; // background DB id or "default"
   gameBackgroundUrl: string; // resolved URL for the background image
   boardPalette: StoredBoardPalette | null;
+  deckListLimit: number;
+  favoriteDeckIds: string[];
   availableBackgrounds: BackgroundOption[];
   isLoaded: boolean;
   fetchFromServer: () => Promise<void>;
@@ -47,7 +49,14 @@ interface SettingsState {
   setFastAnimations: (v: boolean) => Promise<void>;
   setAllowNonFriendMessages: (v: boolean) => Promise<void>;
   setPrivateProfile: (v: boolean) => Promise<void>;
+  setDeckListLimit: (v: number) => Promise<void>;
+  setFavoriteDeckIds: (ids: string[]) => Promise<void>;
+  toggleFavoriteDeck: (id: string) => Promise<void>;
 }
+
+export const DECK_LIST_LIMIT_MIN = 3;
+export const DECK_LIST_LIMIT_MAX = 200;
+export const MAX_FAVORITE_DECKS = 3;
 
 const DEFAULT_BG_URL = '/images/backgrounds/1.webp';
 
@@ -107,6 +116,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   gameBackground: 'default',
   gameBackgroundUrl: DEFAULT_BG_URL,
   boardPalette: null,
+  deckListLimit: 20,
+  favoriteDeckIds: [],
   availableBackgrounds: getCachedBackgrounds(),
   isLoaded: false,
 
@@ -149,6 +160,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         gameBackground: bgId,
         gameBackgroundUrl: bgUrl,
         boardPalette: readBoardPalette(prefs.boardPalette),
+        deckListLimit: typeof prefs.deckListLimit === 'number' ? prefs.deckListLimit : 20,
+        favoriteDeckIds: Array.isArray(prefs.favoriteDeckIds) ? prefs.favoriteDeckIds.slice(0, MAX_FAVORITE_DECKS) : [],
         availableBackgrounds: backgrounds,
         isLoaded: true,
       });
@@ -327,6 +340,50 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
     } catch {
       set({ privateProfile: prev });
     }
+  },
+
+  setDeckListLimit: async (v: number) => {
+    const clamped = Math.max(DECK_LIST_LIMIT_MIN, Math.min(DECK_LIST_LIMIT_MAX, Math.round(v)));
+    const prev = get().deckListLimit;
+    set({ deckListLimit: clamped });
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deckListLimit: clamped }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+    } catch {
+      set({ deckListLimit: prev });
+    }
+  },
+
+  setFavoriteDeckIds: async (ids: string[]) => {
+    const next = ids.filter((id, i) => typeof id === 'string' && ids.indexOf(id) === i).slice(0, MAX_FAVORITE_DECKS);
+    const prev = get().favoriteDeckIds;
+    set({ favoriteDeckIds: next });
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ favoriteDeckIds: next }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+    } catch {
+      set({ favoriteDeckIds: prev });
+    }
+  },
+
+  toggleFavoriteDeck: async (id: string) => {
+    const current = get().favoriteDeckIds;
+    let next: string[];
+    if (current.includes(id)) {
+      next = current.filter((x) => x !== id);
+    } else {
+      if (current.length >= MAX_FAVORITE_DECKS) return;
+      next = [...current, id];
+    }
+    await get().setFavoriteDeckIds(next);
   },
 
   setBoardPalette: (next: StoredBoardPalette | null) => {

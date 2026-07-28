@@ -41,7 +41,11 @@
       "Tailed Beast": "Fera com Cauda",
       "Ninja Hound": "Cão Ninja",
       "Ninja Pig": "Porco Ninja",
-      "Special Jonin": "Jonin Especial"
+      "Special Jonin": "Jonin Especial",
+      "Puppet": "Marionete",
+      "Armor": "Armadura",
+      "Food": "Comida",
+      "Location": "Local"
     },
     "rarity": {
       "C": "Comum",
@@ -410,7 +414,16 @@
     "boardColorsLowContrast": "Esta cor fica muito escura no tabuleiro e pode ser difícil de ler.",
     "boardColorsDefaultsHint": "Padrão: {me} para você, {opponent} para o adversário.",
     "boardPreviewYou": "Você",
-    "boardPreviewOpponent": "Adversário"
+    "boardPreviewOpponent": "Adversário",
+    "deckPrefs": "Decks",
+    "deckListLimit": "Decks exibidos antes de recolher",
+    "deckListLimitHint": "Quantos decks o seletor mostra antes de um botão \"ver mais\". Os favoritos aparecem sempre no topo.",
+    "deckListLimitLess": "Menos",
+    "deckListLimitMore": "Mais",
+    "favoriteDecks": "Decks favoritos",
+    "favoriteDecksHint": "Escolha até 3 decks. Eles aparecem sempre primeiro no seletor.",
+    "deckPrefsNoDecks": "Você ainda não tem decks salvos.",
+    "unfavorite": "Remover dos favoritos"
   },
   "auth": {
     "signIn": "Entrar",
@@ -764,7 +777,9 @@
     "lockedToastMessage": "Esta carta está bloqueada. Obtenha-a em um booster de variantes, nas Recompensas ou em um torneio.",
     "attachments": "Anexos",
     "holosOnly": "Holo",
-    "holoBadge": "Holo"
+    "holoBadge": "Holo",
+    "characterAttachments": "Anexos de personagem",
+    "missionAttachments": "Anexos de missão"
   },
   "profile": {
     "title": "Perfil do Jogador",
@@ -1228,7 +1243,8 @@
       "AMBUSH": "AMBUSH",
       "SCORE": "SCORE",
       "DUEL": "DUEL",
-      "ATTACH": "ATTACH"
+      "ATTACH": "ATTACH",
+      "FIRST_STRIKE": "FIRST STRIKE"
     },
     "noImage": "Sem imagem",
     "hidden": "Oculta",
@@ -1538,7 +1554,10 @@
     "rename": "Renomear",
     "cards": "cartas",
     "saving": "Salvando ordem...",
-    "createFirst": "Criar um Deck"
+    "createFirst": "Criar um Deck",
+    "favorite": "Adicionar aos favoritos",
+    "unfavorite": "Remover dos favoritos",
+    "favoriteFull": "Você já tem {max} decks favoritos"
   },
   "admin": {
     "booster": {
@@ -1775,7 +1794,11 @@
       "example6": "Cartas que têm APENAS a palavra-chave Invocação",
       "statsHeader": "Atributos",
       "propertiesHeader": "Propriedades",
-      "effectsHeader": "Efeitos"
+      "effectsHeader": "Efeitos",
+      "edLabel": "Texto DUEL",
+      "edDesc": "Buscar apenas no texto dos efeitos DUEL",
+      "efLabel": "Texto FIRST STRIKE",
+      "efDesc": "Buscar apenas no texto dos efeitos First Strike (ainda sem cartas)"
     },
     "sort": "Ordenar",
     "error": {
@@ -1839,7 +1862,8 @@
     "showUnrevealed": "Mostrar não reveladas",
     "containsUnrevealed": "Contém não reveladas",
     "useDeck": "Usar este baralho",
-    "cardDetail": "Detalhe da carta"
+    "cardDetail": "Detalhe da carta",
+    "otherDecks": "Outros decks"
   },
   "seoPages": {
     "collection": {
@@ -3015,7 +3039,13 @@
         "ss000Search": "Kakashi Hatake (SS-000): procurou no baralho, comprou {count} Cão Ninja, depois embaralhou.",
         "ss112RemoveTokens": "Neji Hyuga (SS-112): removeu todas as fichas de Poder de um personagem inimigo.",
         "kakashi148Locked": "{card} ({id}): o adversário travou a Vantagem nesta rodada, ela não pode ser tomada.",
-        "ss000Reveal": "Kakashi Hatake revela e compra {target}."
+        "ss000Reveal": "Kakashi Hatake revela e compra {target}.",
+        "ss046Draw": "{card}: revelou {count} carta(s) e comprou {target}.",
+        "ss119Duel": "{card}: comprou uma carta e tomou o Edge.",
+        "ss099Hide": "{card}: ocultou um personagem Jutsu inimigo mais fraco.",
+        "ss078Draw": "{card}: pagou 1 Chakra para comprar 1 carta.",
+        "ss089Move": "{card}: o anexo foi movido para {target}.",
+        "ss117Chakra": "{card}: ganhou 1 Chakra por mover personagens inimigos."
       },
       "score": {
         "draw": "[SCORE] {card}: Comprou {count} carta(s).",
@@ -3032,7 +3062,8 @@
       },
       "playAttachment": "Joga o acessório {card} por {cost} chakra.",
       "attachToMission": "{card} está anexado à missão {mission}.",
-      "attachToCharacter": "{card} está anexado a {target}."
+      "attachToCharacter": "{card} está anexado a {target}.",
+      "useFirstStrike": "FIRST STRIKE: {card} ataca antes de a rodada começar."
     },
     "end": {
       "victory": "Vitória",
@@ -3363,7 +3394,7 @@
         "temari121ConfirmUpgrade": "UPGRADE: Mova qualquer personagem em jogo.",
         "jirobo122ConfirmMain": "MAIN: POWERUP X onde X é o número de personagens nesta missão.",
         "jirobo122ConfirmUpgrade": "UPGRADE: Derrote um personagem inimigo com Poder 1 ou menos nesta missão.",
-        "tsunade104ConfirmUpgrade": "UPGRADE: Gaste qualquer quantidade de Chakra adicional. POWERUP X.",
+        "tsunade104ConfirmUpgrade": "UPGRADE: POWERUP X, onde X é o Chakra adicional gasto no MAIN. Não é preciso pagar Chakra de novo.",
         "jiraiya007ChooseSummon": "Escolha um personagem de Invocação para jogar da sua mão ou revele um oculto (pagando 1 a menos).",
         "kabuto052PlaceHidden": "Escolha uma missão para colocar a carta roubada oculta.",
         "kabuto052ChooseMission": "Escolha uma missão para colocar a carta roubada oculta.",
@@ -3513,7 +3544,7 @@
         "tayuya125PlaySound": "Escolha um personagem da Vila do Som para jogar da sua mão ou revele um oculto (pagando 2 a menos).",
         "temari121MoveFriendly": "Escolha um personagem aliado para mover para outra missão.",
         "temari121MoveAny": "Escolha qualquer personagem em jogo para mover para outra missão.",
-        "shino115MoveFriendly": "Shino Aburame (115) AMBUSH: Escolha um personagem aliado nesta missão para mover para outra missão.",
+        "shino115MoveFriendly": "Shino Aburame (115) AMBUSH: Escolha um personagem aliado em outra missão para mover para esta missão.",
         "sakon127Hide": "Sakon (127) AMBUSH: Escolha um personagem inimigo com Poder 5 ou menos para ocultar.",
         "tenten118DefeatHidden": "Selecione um personagem oculto nesta missão para derrotar.",
         "ukon124bHide": "Escolha um personagem inimigo com Poder 5 ou menos para ocultar.",
@@ -3644,7 +3675,21 @@
         "ss128ConfirmDuel": "DUEL Jirobo: Derrotar um personagem inimigo nesta missão com Poder 8 ou mais?",
         "ss128Defeat": "Choji Akimichi: Escolha um personagem inimigo com Poder 8 ou mais para derrotar.",
         "ss108ConfirmScore": "SCORE Estádio do Exame: Um personagem aliado ativa um efeito DUEL instantâneo, ignorando os requisitos?",
-        "ss108ChooseCharacter": "Estádio do Exame: Escolha um personagem aliado para ativar seu efeito DUEL."
+        "ss108ChooseCharacter": "Estádio do Exame: Escolha um personagem aliado para ativar seu efeito DUEL.",
+        "ss049FirstStrikeChar": "FIRST STRIKE: Escolha um personagem para mover desta missão.",
+        "ss046ConfirmMain": "Revelar cartas do topo do seu baralho até encontrar um personagem da Vila da Areia, comprá-lo e então embaralhar as reveladas de volta?",
+        "ss047Defeat": "Escolha um personagem inimigo com 3 de Poder ou menos para derrotar.",
+        "ss078DuelDefeat": "Escolha um personagem inimigo com custo 2 ou menos para derrotar.",
+        "ss114ChooseDiscard": "Escolha um Gaara para descartar da sua mão.",
+        "ss114ChooseHide": "Escolha um personagem inimigo para ocultar (custo igual ou inferior ao da carta descartada).",
+        "ss114ChooseDefeat": "Rock Lee está presente: escolha em vez disso um personagem inimigo para derrotar (custo igual ou inferior ao da carta descartada).",
+        "ss117DuelMove": "Escolha um personagem inimigo para mover para esta missão.",
+        "ss119MoveChar": "Escolha um personagem inimigo para mover desta missão.",
+        "ss119DuelConfirm": "Comprar uma carta e tomar o Edge?",
+        "ss085MoveChar": "Escolha um personagem inimigo mais fraco para mover desta missão.",
+        "ss099Hide": "Escolha um personagem Jutsu inimigo mais fraco nesta missão para ocultar.",
+        "ss078ConfirmDraw": "Pagar 1 Chakra para comprar 1 carta?",
+        "ss089MoveAttachment": "Mover este anexo para um personagem aliado?"
       },
       "upgradeModifierConfirm": "Aplicar o efeito UPGRADE",
       "upgradeModifierDecline": "Manter apenas o efeito MAIN"
@@ -3941,5 +3986,16 @@
     "busiestDay": "Dia mais movimentado",
     "busiestDayValue": "{day} com {games} partidas",
     "note": "Só contam as partidas online. Os números são atualizados várias vezes por hora."
+  },
+  "firstStrike": {
+    "title": "FIRST STRIKE",
+    "subtitle": "Disponível antes da sua primeira ação",
+    "body": "Você pode atacar primeiro nesta rodada. Usar consome todo o seu turno, e então o oponente joga.",
+    "use": "Atacar",
+    "skip": "Jogar normalmente",
+    "choose": "Escolha qual personagem ataca",
+    "badge": "FIRST STRIKE",
+    "used": "Já usado nesta rodada",
+    "opponentUsed": "Seu oponente usou FIRST STRIKE"
   }
 }

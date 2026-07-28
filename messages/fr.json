@@ -118,7 +118,8 @@
     },
     "register": {
       "title": "Créer un Compte Gratuit - Inscription | Naruto Mythos TCG",
-      "description": "Créez votre compte Naruto Mythos TCG gratuitement en quelques secondes. Accédez au multijoueur en ligne, sauvegardez vos decks, participez aux matchs classés ELO, ajoutez des amis et grimpez le classement mondial. Inscription rapide et gratuite pour commencer à jouer au jeu de cartes Naruto Shippuden en ligne."
+      "description": "Créez votre compte Naruto Mythos TCG gratuitement en quelques secondes. Accédez au multijoueur en ligne, sauvegardez vos decks, participez aux matchs classés ELO, ajoutez des amis et grimpez le classement mondial. Inscription rapide et gratuite pour commencer à jouer au jeu de cartes Naruto Shippuden en ligne.",
+      "ogAlt": "Créer un compte - Naruto Mythos TCG"
     },
     "playAi": {
       "title": "Jouer contre l'IA - 4 Niveaux de Difficulté | Naruto Mythos TCG",
@@ -220,7 +221,11 @@
       "Tailed Beast": "Bijû",
       "Ninja Hound": "Chien Ninja",
       "Ninja Pig": "Cochon Ninja",
-      "Special Jonin": "Jônin Spécial"
+      "Special Jonin": "Jônin Spécial",
+      "Puppet": "Marionnette",
+      "Armor": "Armure",
+      "Food": "Nourriture",
+      "Location": "Lieu"
     },
     "rarity": {
       "C": "Commune",
@@ -729,7 +734,16 @@
     "boardColorsLowContrast": "Cette couleur est très sombre sur le plateau et peut être difficile à lire.",
     "boardColorsDefaultsHint": "Par défaut : {me} pour vous, {opponent} pour l’adversaire.",
     "boardPreviewYou": "Vous",
-    "boardPreviewOpponent": "Adversaire"
+    "boardPreviewOpponent": "Adversaire",
+    "deckPrefs": "Decks",
+    "deckListLimit": "Decks affichés avant repli",
+    "deckListLimitHint": "Nombre de decks montrés avant un bouton « voir plus ». Les favoris sont toujours affichés en tête.",
+    "deckListLimitLess": "Moins",
+    "deckListLimitMore": "Plus",
+    "favoriteDecks": "Decks favoris",
+    "favoriteDecksHint": "Choisis jusqu’à 3 decks. Ils sont toujours affichés en premier dans le sélecteur.",
+    "deckPrefsNoDecks": "Tu n’as pas encore de deck enregistré.",
+    "unfavorite": "Retirer des favoris"
   },
   "game": {
     "turn": "Tour {turn}",
@@ -970,7 +984,13 @@
         "ss000Search": "Kakashi Hatake (SS-000) : a cherché dans le deck, pioché {count} Chien Ninja, puis mélangé.",
         "ss112RemoveTokens": "Neji Hyûga (SS-112) : a retiré tous les jetons de Puissance d'un personnage ennemi.",
         "kakashi148Locked": "{card} ({id}) : l'adversaire a verrouillé le Bonus ce tour, il ne peut pas être pris.",
-        "ss000Reveal": "Kakashi Hatake révèle et pioche {target}."
+        "ss000Reveal": "Kakashi Hatake révèle et pioche {target}.",
+        "ss046Draw": "{card} : {count} carte(s) révélée(s), {target} piochée.",
+        "ss119Duel": "{card} : une carte piochée et l’Edge pris.",
+        "ss099Hide": "{card} : un personnage Jutsu ennemi plus faible a été caché.",
+        "ss078Draw": "{card} : 1 Chakra payé pour piocher 1 carte.",
+        "ss089Move": "{card} : l’attachement a été déplacé sur {target}.",
+        "ss117Chakra": "{card} : 1 Chakra gagné pour avoir déplacé des personnages ennemis."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -987,7 +1007,8 @@
       },
       "playAttachment": "Joue l'attachement {card} pour {cost} chakra.",
       "attachToMission": "{card} est attaché à la mission {mission}.",
-      "attachToCharacter": "{card} est attaché à {target}."
+      "attachToCharacter": "{card} est attaché à {target}.",
+      "useFirstStrike": "FIRST STRIKE : {card} frappe avant le début de la manche."
     },
     "end": {
       "victory": "Victoire",
@@ -1318,7 +1339,7 @@
         "temari121ConfirmUpgrade": "UPGRADE : Déplacez n'importe quel personnage en jeu.",
         "jirobo122ConfirmMain": "MAIN : POWERUP X où X est le nombre de personnages dans cette mission.",
         "jirobo122ConfirmUpgrade": "UPGRADE : Vaincre un personnage ennemi avec Puissance 1 ou moins dans cette mission.",
-        "tsunade104ConfirmUpgrade": "UPGRADE : Dépensez un montant additionnel de Chakra. POWERUP X.",
+        "tsunade104ConfirmUpgrade": "UPGRADE : POWERUP X, où X est le Chakra supplémentaire dépensé au MAIN. Aucun Chakra à repayer.",
         "jiraiya007ChooseSummon": "Choisissez une Invocation à jouer depuis votre main ou à révéler parmi vos cachés (1 de moins).",
         "kabuto052PlaceHidden": "Choisissez une mission pour y placer la carte volée face cachée.",
         "kabuto052ChooseMission": "Choisissez une mission pour y placer la carte volée face cachée.",
@@ -1468,7 +1489,7 @@
         "tayuya125PlaySound": "Choisissez un personnage Village du Son à jouer depuis votre main ou à révéler parmi vos cachés (2 de moins).",
         "temari121MoveFriendly": "Choisissez un personnage allié à déplacer vers une autre mission.",
         "temari121MoveAny": "Choisissez un personnage en jeu à déplacer vers une autre mission.",
-        "shino115MoveFriendly": "Shino Aburame (115) AMBUSH : Choisissez un personnage allié dans cette mission à déplacer.",
+        "shino115MoveFriendly": "Shino Aburame (115) AMBUSH : Choisissez un personnage allié dans une autre mission à déplacer vers cette mission.",
         "sakon127Hide": "Sakon (127) AMBUSH : Choisissez un personnage ennemi avec Puissance 5 ou moins à cacher.",
         "tenten118DefeatHidden": "Sélectionnez un personnage caché dans cette mission à vaincre.",
         "ukon124bHide": "Choisissez un personnage ennemi avec Puissance 5 ou moins à cacher.",
@@ -1599,7 +1620,21 @@
         "ss128ConfirmDuel": "DUEL Jirobo : Vaincre un personnage ennemi de cette mission avec 8 Puissance ou plus ?",
         "ss128Defeat": "Chôji Akimichi : Choisissez un personnage ennemi avec 8 Puissance ou plus à vaincre.",
         "ss108ConfirmScore": "SCORE Stade d'Examen : Un personnage allié active un effet DUEL instantané en ignorant ses conditions ?",
-        "ss108ChooseCharacter": "Stade d'Examen : Choisissez un personnage allié pour activer son effet DUEL."
+        "ss108ChooseCharacter": "Stade d'Examen : Choisissez un personnage allié pour activer son effet DUEL.",
+        "ss049FirstStrikeChar": "FIRST STRIKE : Choisissez un personnage à déplacer depuis cette mission.",
+        "ss046ConfirmMain": "Révéler des cartes du dessus de votre deck jusqu’à trouver un personnage Village du Sable, le piocher, puis remélanger les cartes révélées ?",
+        "ss047Defeat": "Choisissez un personnage ennemi ayant une Puissance de 3 ou moins à vaincre.",
+        "ss078DuelDefeat": "Choisissez un personnage ennemi dont le coût est de 2 ou moins à vaincre.",
+        "ss114ChooseDiscard": "Choisissez un Gaara à défausser de votre main.",
+        "ss114ChooseHide": "Choisissez un personnage ennemi à cacher (coût inférieur ou égal à la carte défaussée).",
+        "ss114ChooseDefeat": "Rock Lee est présent : choisissez plutôt un personnage ennemi à vaincre (coût inférieur ou égal à la carte défaussée).",
+        "ss117DuelMove": "Choisissez un personnage ennemi à déplacer vers cette mission.",
+        "ss119MoveChar": "Choisissez un personnage ennemi à déplacer depuis cette mission.",
+        "ss119DuelConfirm": "Piocher une carte et prendre l’Edge ?",
+        "ss085MoveChar": "Choisissez un personnage ennemi plus faible à déplacer depuis cette mission.",
+        "ss099Hide": "Choisissez un personnage Jutsu ennemi plus faible dans cette mission à cacher.",
+        "ss078ConfirmDraw": "Payer 1 Chakra pour piocher 1 carte ?",
+        "ss089MoveAttachment": "Déplacer cet attachement sur un personnage allié ?"
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul"
@@ -1713,7 +1748,9 @@
     "lockedToastMessage": "Cette carte est verrouillée. Obtiens-la dans un booster variantes, les Récompenses ou un tournoi.",
     "attachments": "Attachements",
     "holosOnly": "Holo",
-    "holoBadge": "Holo"
+    "holoBadge": "Holo",
+    "characterAttachments": "Attachements de personnage",
+    "missionAttachments": "Attachements de mission"
   },
   "deckBuilder": {
     "title": "Constructeur de Deck",
@@ -1849,7 +1886,11 @@
       "example6": "Cartes ayant UNIQUEMENT le mot-clé Summon",
       "statsHeader": "Stats",
       "propertiesHeader": "Propriétés",
-      "effectsHeader": "Effets"
+      "effectsHeader": "Effets",
+      "edLabel": "Texte DUEL",
+      "edDesc": "Rechercher dans le texte des effets DUEL uniquement",
+      "efLabel": "Texte FIRST STRIKE",
+      "efDesc": "Rechercher dans le texte des effets First Strike uniquement (aucune carte pour le moment)"
     },
     "sort": "Trier",
     "error": {
@@ -1913,7 +1954,8 @@
     "showUnrevealed": "Cartes non révélées",
     "containsUnrevealed": "Contient des cartes non révélées",
     "useDeck": "Utiliser ce deck",
-    "cardDetail": "Détail de la carte"
+    "cardDetail": "Détail de la carte",
+    "otherDecks": "Autres decks"
   },
   "discord": {
     "linkDiscord": "Lier Discord",
@@ -1964,7 +2006,10 @@
     "rename": "Renommer",
     "cards": "cartes",
     "saving": "Sauvegarde de l'ordre...",
-    "createFirst": "Créer un Deck"
+    "createFirst": "Créer un Deck",
+    "favorite": "Ajouter aux favoris",
+    "unfavorite": "Retirer des favoris",
+    "favoriteFull": "Tu as déjà {max} decks favoris"
   },
   "playAI": {
     "title": "Jouer contre l'IA",
@@ -2331,7 +2376,8 @@
       "AMBUSH": "AMBUSH",
       "SCORE": "SCORE",
       "DUEL": "DUEL",
-      "ATTACH": "ATTACH"
+      "ATTACH": "ATTACH",
+      "FIRST_STRIKE": "FIRST STRIKE"
     },
     "noImage": "Pas d'image",
     "hidden": "Caché",
@@ -3946,5 +3992,16 @@
     "busiestDay": "Jour le plus actif",
     "busiestDayValue": "{day} avec {games} parties",
     "note": "Seules les parties en ligne comptent. Les chiffres se mettent à jour plusieurs fois par heure."
+  },
+  "firstStrike": {
+    "title": "FIRST STRIKE",
+    "subtitle": "Disponible avant ta première action",
+    "body": "Tu peux frapper en premier cette manche. L’utiliser prend tout ton tour, puis ton adversaire joue.",
+    "use": "Frapper",
+    "skip": "Jouer normalement",
+    "choose": "Choisis le personnage qui frappe",
+    "badge": "FIRST STRIKE",
+    "used": "Déjà utilisé cette manche",
+    "opponentUsed": "Ton adversaire a utilisé FIRST STRIKE"
   }
 }

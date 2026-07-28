@@ -7,7 +7,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import type { CharacterCard } from '@/lib/engine/types';
 
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { portraitImagePath } from '@/lib/utils/imagePath';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
@@ -96,7 +96,7 @@ const HandCard = React.memo(function HandCard({
   const translateX = offset * dims.handFanSpacing;
   const arcY = Math.abs(offset) * dims.handFanArc;
 
-  const imagePath = normalizeImagePath(card.image_file);
+  const imagePath = portraitImagePath(card);
 
   const animateProps = useMemo(
     () => ({
@@ -178,7 +178,7 @@ const HandCard = React.memo(function HandCard({
             className="w-full h-full bg-cover bg-center"
             style={{ backgroundImage: `url('${imagePath}')` }}
           />
-          {card.isHolo && <HoloFoilOverlay />}
+          {card.isHolo && <HoloFoilOverlay imageUrl={imagePath} />}
         </>
       ) : (
         <div

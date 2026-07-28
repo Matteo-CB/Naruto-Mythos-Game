@@ -41,7 +41,11 @@
       "Tailed Beast": "Ogoniasta Bestia",
       "Ninja Hound": "Pies Ninja",
       "Ninja Pig": "Świnia Ninja",
-      "Special Jonin": "Specjalny Jonin"
+      "Special Jonin": "Specjalny Jonin",
+      "Puppet": "Marionetka",
+      "Armor": "Zbroja",
+      "Food": "Jedzenie",
+      "Location": "Lokacja"
     },
     "rarity": {
       "C": "Pospolita",
@@ -410,7 +414,16 @@
     "boardColorsLowContrast": "Ten kolor jest bardzo ciemny na planszy i może być trudny do odczytania.",
     "boardColorsDefaultsHint": "Domyślnie: {me} dla ciebie, {opponent} dla przeciwnika.",
     "boardPreviewYou": "Ty",
-    "boardPreviewOpponent": "Przeciwnik"
+    "boardPreviewOpponent": "Przeciwnik",
+    "deckPrefs": "Talie",
+    "deckListLimit": "Talie pokazywane przed zwinięciem",
+    "deckListLimitHint": "Ile talii pokazuje wybór talii przed przyciskiem \"pokaż więcej\". Ulubione są zawsze na górze.",
+    "deckListLimitLess": "Mniej",
+    "deckListLimitMore": "Więcej",
+    "favoriteDecks": "Ulubione talie",
+    "favoriteDecksHint": "Wybierz do 3 talii. Zawsze pojawiają się pierwsze w wyborze talii.",
+    "deckPrefsNoDecks": "Nie masz jeszcze zapisanych talii.",
+    "unfavorite": "Usuń z ulubionych"
   },
   "auth": {
     "signIn": "Zaloguj się",
@@ -764,7 +777,9 @@
     "lockedToastMessage": "Ta karta jest zablokowana. Zdobądź ją z boostera wariantów, z Nagród lub w turnieju.",
     "attachments": "Załączniki",
     "holosOnly": "Holo",
-    "holoBadge": "Holo"
+    "holoBadge": "Holo",
+    "characterAttachments": "Dołączenia postaci",
+    "missionAttachments": "Dołączenia misji"
   },
   "profile": {
     "title": "Profil Gracza",
@@ -1228,7 +1243,8 @@
       "AMBUSH": "AMBUSH",
       "SCORE": "SCORE",
       "DUEL": "DUEL",
-      "ATTACH": "ATTACH"
+      "ATTACH": "ATTACH",
+      "FIRST_STRIKE": "FIRST STRIKE"
     },
     "noImage": "Brak obrazu",
     "hidden": "Ukryta",
@@ -1538,7 +1554,10 @@
     "rename": "Zmień nazwę",
     "cards": "kart",
     "saving": "Zapisywanie kolejności...",
-    "createFirst": "Utwórz Talię"
+    "createFirst": "Utwórz Talię",
+    "favorite": "Dodaj do ulubionych",
+    "unfavorite": "Usuń z ulubionych",
+    "favoriteFull": "Masz już {max} ulubione talie"
   },
   "admin": {
     "booster": {
@@ -1775,7 +1794,11 @@
       "example6": "Karty, które mają TYLKO słowo kluczowe Przywołanie",
       "statsHeader": "Statystyki",
       "propertiesHeader": "Właściwości",
-      "effectsHeader": "Efekty"
+      "effectsHeader": "Efekty",
+      "edLabel": "Tekst DUEL",
+      "edDesc": "Szukaj tylko w tekście efektów DUEL",
+      "efLabel": "Tekst FIRST STRIKE",
+      "efDesc": "Szukaj tylko w tekście efektów First Strike (na razie brak kart)"
     },
     "sort": "Sortuj",
     "error": {
@@ -1839,7 +1862,8 @@
     "showUnrevealed": "Pokaż nieujawnione",
     "containsUnrevealed": "Zawiera nieujawnione",
     "useDeck": "Użyj tej talii",
-    "cardDetail": "Szczegóły karty"
+    "cardDetail": "Szczegóły karty",
+    "otherDecks": "Inne talie"
   },
   "seoPages": {
     "collection": {
@@ -1881,7 +1905,7 @@
     "register": {
       "title": "Utwórz Darmowe Konto - Zarejestruj się | Naruto Mythos TCG",
       "description": "Utwórz darmowe konto Naruto Mythos TCG w kilka sekund. Uzyskaj dostęp do trybu multiplayer online, zapisuj talie, rywalizuj w rankingowych meczach ELO, dodawaj znajomych i wspinaj się w globalnym rankingu. Szybka i darmowa rejestracja, aby zacząć grać w grę karcianą Naruto Shippuden online.",
-      "ogAlt": "Utwórz Konto - Naruto Mythos TCG"
+      "ogAlt": "Załóż konto - Naruto Mythos TCG"
     },
     "playAi": {
       "title": "Graj z SI - 4 Poziomy Trudności | Naruto Mythos TCG",
@@ -3015,7 +3039,13 @@
         "ss000Search": "Kakashi Hatake (SS-000): przeszukał talię, dobrał {count} Psa Ninja, potem przetasował.",
         "ss112RemoveTokens": "Neji Hyuga (SS-112): usunął wszystkie żetony Siły z wrogiej postaci.",
         "kakashi148Locked": "{card} ({id}): przeciwnik zablokował Przewagę w tej rundzie, nie można jej zabrać.",
-        "ss000Reveal": "Kakashi Hatake odkrywa i dobiera {target}."
+        "ss000Reveal": "Kakashi Hatake odkrywa i dobiera {target}.",
+        "ss046Draw": "{card}: odkryto {count} kart(y) i dobrano {target}.",
+        "ss119Duel": "{card}: dobrano kartę i zabrano Edge.",
+        "ss099Hide": "{card}: ukryto słabszą wrogą postać Jutsu.",
+        "ss078Draw": "{card}: zapłacono 1 Czakry, aby dobrać 1 kartę.",
+        "ss089Move": "{card}: dołączenie przeniesiono na {target}.",
+        "ss117Chakra": "{card}: zyskano 1 Czakry za przeniesienie wrogich postaci."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3032,7 +3062,8 @@
       },
       "playAttachment": "Gra dodatek {card} za {cost} czakry.",
       "attachToMission": "{card} jest dołączony do misji {mission}.",
-      "attachToCharacter": "{card} jest dołączony do {target}."
+      "attachToCharacter": "{card} jest dołączony do {target}.",
+      "useFirstStrike": "FIRST STRIKE: {card} uderza przed rozpoczęciem rundy."
     },
     "end": {
       "victory": "Zwycięstwo",
@@ -3363,7 +3394,7 @@
         "temari121ConfirmUpgrade": "UPGRADE: Przenieś dowolną postać w grze.",
         "jirobo122ConfirmMain": "MAIN: POWERUP X, gdzie X to liczba postaci na tej misji.",
         "jirobo122ConfirmUpgrade": "UPGRADE: Pokonaj wrogą postać o Sile 1 lub mniej na tej misji.",
-        "tsunade104ConfirmUpgrade": "UPGRADE: Wydaj dowolną ilość dodatkowej Czakry. POWERUP X.",
+        "tsunade104ConfirmUpgrade": "UPGRADE: POWERUP X, gdzie X to dodatkowa Czakra wydana w MAIN. Nie płacisz Czakry ponownie.",
         "jiraiya007ChooseSummon": "Wybierz postać Przywołania do zagrania z ręki lub odkryj ukrytą (płacąc o 1 mniej).",
         "kabuto052PlaceHidden": "Wybierz misję, na której umieścić ukradzioną kartę zakrytą.",
         "kabuto052ChooseMission": "Wybierz misję, na której umieścić ukradzioną kartę zakrytą.",
@@ -3513,7 +3544,7 @@
         "tayuya125PlaySound": "Wybierz postać Wioski Dźwięku do zagrania z ręki lub odkryj ukrytą (płacąc o 2 mniej).",
         "temari121MoveFriendly": "Wybierz sojuszniczą postać do przeniesienia na inną misję.",
         "temari121MoveAny": "Wybierz dowolną postać w grze do przeniesienia na inną misję.",
-        "shino115MoveFriendly": "Shino Aburame (115) AMBUSH: Wybierz sojuszniczą postać na tej misji do przeniesienia na inną misję.",
+        "shino115MoveFriendly": "Shino Aburame (115) AMBUSH: Wybierz sojuszniczą postać na innej misji do przeniesienia na tę misję.",
         "sakon127Hide": "Sakon (127) AMBUSH: Wybierz wrogą postać o Sile 5 lub mniej do ukrycia.",
         "tenten118DefeatHidden": "Wybierz ukrytą postać na tej misji do pokonania.",
         "ukon124bHide": "Wybierz wrogą postać o Sile 5 lub mniej do ukrycia.",
@@ -3644,7 +3675,21 @@
         "ss128ConfirmDuel": "DUEL Jirobo: Pokonać wrogą postać na tej misji o Sile 8 lub więcej?",
         "ss128Defeat": "Choji Akimichi: Wybierz wrogą postać o Sile 8 lub więcej do pokonania.",
         "ss108ConfirmScore": "SCORE Stadion Egzaminacyjny: Sojusznicza postać aktywuje natychmiastowy efekt DUEL, ignorując wymagania?",
-        "ss108ChooseCharacter": "Stadion Egzaminacyjny: Wybierz sojuszniczą postać, aby aktywować jej efekt DUEL."
+        "ss108ChooseCharacter": "Stadion Egzaminacyjny: Wybierz sojuszniczą postać, aby aktywować jej efekt DUEL.",
+        "ss049FirstStrikeChar": "FIRST STRIKE: Wybierz postać do przeniesienia z tej misji.",
+        "ss046ConfirmMain": "Odkryć karty z wierzchu talii, aż znajdziesz postać z Wioski Piasku, dobrać ją, a potem wtasować odkryte karty?",
+        "ss047Defeat": "Wybierz wrogą postać z Siłą 3 lub mniejszą do pokonania.",
+        "ss078DuelDefeat": "Wybierz wrogą postać o koszcie 2 lub mniejszym do pokonania.",
+        "ss114ChooseDiscard": "Wybierz Gaarę do odrzucenia z ręki.",
+        "ss114ChooseHide": "Wybierz wrogą postać do ukrycia (koszt równy lub niższy od odrzuconej karty).",
+        "ss114ChooseDefeat": "Rock Lee jest obecny: wybierz zamiast tego wrogą postać do pokonania (koszt równy lub niższy od odrzuconej karty).",
+        "ss117DuelMove": "Wybierz wrogą postać do przeniesienia na tę misję.",
+        "ss119MoveChar": "Wybierz wrogą postać do przeniesienia z tej misji.",
+        "ss119DuelConfirm": "Dobrać kartę i zabrać Edge?",
+        "ss085MoveChar": "Wybierz słabszą wrogą postać do przeniesienia z tej misji.",
+        "ss099Hide": "Wybierz słabszą wrogą postać Jutsu na tej misji do ukrycia.",
+        "ss078ConfirmDraw": "Zapłacić 1 Czakry, aby dobrać 1 kartę?",
+        "ss089MoveAttachment": "Przenieść to dołączenie na sojuszniczą postać?"
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN"
@@ -3941,5 +3986,16 @@
     "busiestDay": "Najaktywniejszy dzień",
     "busiestDayValue": "{day}, {games} partii",
     "note": "Liczą się tylko partie online. Dane odświeżają się kilka razy na godzinę."
+  },
+  "firstStrike": {
+    "title": "FIRST STRIKE",
+    "subtitle": "Dostępne przed twoją pierwszą akcją",
+    "body": "Możesz uderzyć pierwszy w tej rundzie. Użycie zajmuje całą twoją turę, potem gra przeciwnik.",
+    "use": "Uderz",
+    "skip": "Zagraj normalnie",
+    "choose": "Wybierz, która postać uderza",
+    "badge": "FIRST STRIKE",
+    "used": "Już użyte w tej rundzie",
+    "opponentUsed": "Przeciwnik użył FIRST STRIKE"
   }
 }

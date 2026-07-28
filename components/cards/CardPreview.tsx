@@ -1,12 +1,14 @@
 'use client';
 
 import { memo, useMemo } from 'react';
+import { effectTypeLabel } from '@/lib/cards/effectTypeLabel';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import type { CharacterCard, MissionCard, CardEffect, Rarity } from '@/lib/engine/types';
 import CardBack from './CardBack';
 import { HoloFoilOverlay } from './HoloFoilOverlay';
+import { isLandscapeCard, hasCombatStats } from '@/lib/cards/orientation';
 
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
@@ -86,7 +88,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
               style={{
                 position: 'relative',
                 width: '100%',
-                aspectRatio: card.card_type === 'mission' ? '3.5 / 2.5' : '2.5 / 2',
+                aspectRatio: isLandscapeCard(card) ? '3.5 / 2.5' : '2.5 / 2',
                 backgroundColor: '#1a1a1a',
                 overflow: 'hidden',
               }}
@@ -105,7 +107,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                       objectFit: 'cover',
                     }}
                   />
-                  {card.isHolo && <HoloFoilOverlay intensity="preview" />}
+                  {card.isHolo && <HoloFoilOverlay intensity="preview" imageUrl={imageSrc} />}
                 </>
               ) : (
                 <div
@@ -190,10 +192,10 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                   flexWrap: 'wrap',
                 }}
               >
-                {card.card_type === 'character' && card.chakra !== undefined && (
+                {hasCombatStats(card) && card.chakra !== undefined && (
                   <StatBadge label={t('game.chakra')} value={String(card.chakra)} color="#2d5a8e" />
                 )}
-                {card.card_type === 'character' && (
+                {hasCombatStats(card) && (
                   <StatBadge
                     label={t('game.power')}
                     value={String((card.power ?? 0) + powerTokens)}
@@ -262,7 +264,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                           marginRight: '6px',
                         }}
                       >
-                        {effect.type}
+                        {effectTypeLabel(effect.type)}
                       </span>
                       <span
                         className="font-body"

@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import type { CardData, CharacterCard, MissionCard } from '@/lib/engine/types';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath , portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useUIStore } from '@/stores/uiStore';
 import { PopupOverlay, PopupCornerFrame, PopupMinimizeX } from './PopupPrimitives';
@@ -68,7 +68,7 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
               ) : (
                 <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))' }}>
                   {[...cards].reverse().map((card, i) => {
-                    const imagePath = normalizeImagePath(card.image_file);
+                    const imagePath = portraitImagePath(card);
 
                     return (
                       <motion.div
@@ -85,15 +85,17 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
                       >
                         <div className="relative w-full">
                           {imagePath ? (
-                            <img
-                              src={imagePath}
-                              alt={getCardName(card, locale as 'en' | 'fr')}
-                              draggable={false}
-                              className="w-full"
-                              style={{ aspectRatio: '5/7', objectFit: 'cover' }}
-                              loading="lazy"
-                              decoding="async"
-                            />
+                            <div className="relative w-full" style={{ aspectRatio: '5/7', overflow: 'hidden' }}>
+                              <img
+                                src={imagePath}
+                                alt={getCardName(card, locale as 'en' | 'fr')}
+                                draggable={false}
+                                className="absolute inset-0 h-full w-full"
+                                style={{ objectFit: 'cover' }}
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            </div>
                           ) : (
                             <div
                               className="w-full flex items-center justify-center"

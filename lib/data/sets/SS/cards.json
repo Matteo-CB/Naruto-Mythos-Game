@@ -428,6 +428,452 @@
         }
       ],
       "image_file": "images/cards/SS/attachment/SS-108-C.webp"
+    },
+    "SS-046-UC": {
+      "id": "SS-046-UC",
+      "cardId": "SS-046-UC",
+      "rarity": "UC",
+      "number": "46",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "name_es": "GAARA",
+      "name_ja": "我愛羅",
+      "title_en": "Sand Village Tactics",
+      "title_fr": "Tactiques du Village du Sable",
+      "title_es": "Tácticas de la Aldea de la Arena",
+      "title_ja": "砂隠れの戦術",
+      "title_pt": "Táticas da Vila da Areia",
+      "title_it": "Tattiche del Villaggio della Sabbia",
+      "title_pl": "Taktyka Wioski Piasku",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team Baki"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Reveal cards from the top of your deck until you find a Sand Village character. Draw it, then shuffle the revealed cards into your deck."
+        }
+      ],
+      "image_file": "images/cards/SS/uncommon/SS-046-UC.webp"
+    },
+    "SS-047-UC": {
+      "id": "SS-047-UC",
+      "cardId": "SS-047-UC",
+      "rarity": "UC",
+      "number": "47",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ONE-TAIL",
+      "name_fr": "ICHIBI",
+      "name_es": "ONE-TAIL",
+      "name_ja": "一尾",
+      "title_en": "The Perfect Possession",
+      "title_fr": "La Possession parfaite",
+      "title_es": "La posesión perfecta",
+      "title_ja": "完全なる憑依",
+      "title_pt": "A Possessão Perfeita",
+      "title_it": "La Possessione Perfetta",
+      "title_pl": "Doskonałe Opętanie",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Tailed Beast"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can play this character as an upgrade over Gaara."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Defeat an enemy character with Power 3 or less."
+        }
+      ],
+      "image_file": "images/cards/SS/uncommon/SS-047-UC.webp"
+    },
+    "SS-049-C": {
+      "id": "SS-049-C",
+      "cardId": "SS-049-C",
+      "rarity": "C",
+      "number": "49",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TEMARI",
+      "name_fr": "TEMARI",
+      "name_es": "TEMARI",
+      "name_ja": "テマリ",
+      "title_en": "Powerful Blow",
+      "title_fr": "Coup Puissant",
+      "title_es": "Golpe Poderoso",
+      "title_ja": "強打",
+      "title_pt": "Golpe Poderoso",
+      "title_it": "Colpo Potente",
+      "title_pl": "Potężny Cios",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Team Baki"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "FIRST_STRIKE",
+          "description": "[↯] FIRST STRIKE Move a character from this mission."
+        }
+      ],
+      "image_file": "images/cards/SS/common/SS-049-C.webp"
+    },
+    "SS-051-UC": {
+      "id": "SS-051-UC",
+      "cardId": "SS-051-UC",
+      "rarity": "UC",
+      "number": "51",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "RASA",
+      "name_fr": "RASA",
+      "name_es": "RASA",
+      "name_ja": "ラサ",
+      "title_en": "Gaara's Father",
+      "title_fr": "Le Père de Gaara",
+      "title_es": "El padre de Gaara",
+      "title_ja": "我愛羅の父",
+      "title_pt": "O Pai de Gaara",
+      "title_it": "Il Padre di Gaara",
+      "title_pl": "Ojciec Gaary",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 1,
+      "keywords": [],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Friendly Sand Village characters cost 1 less to play anywhere."
+        }
+      ],
+      "image_file": "images/cards/SS/uncommon/SS-051-UC.webp"
+    },
+    "SS-078-UC": {
+      "id": "SS-078-UC",
+      "cardId": "SS-078-UC",
+      "rarity": "UC",
+      "number": "78",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "name_es": "GAARA",
+      "name_ja": "我愛羅",
+      "title_en": "Giant Sand Burial",
+      "title_fr": "Grande Sépulture de Sable",
+      "title_es": "Gran Sepultura de Arena",
+      "title_ja": "大砂葬",
+      "title_pt": "Grande Sepultamento de Areia",
+      "title_it": "Grande Sepoltura di Sabbia",
+      "title_pl": "Wielki Piaskowy Pogrzeb",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kimimaro: Defeat an enemy character with cost 2 or less."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] When you defeat a non-hidden enemy character, you may pay 1 Chakra to draw 1 card."
+        }
+      ],
+      "image_file": "images/cards/SS/uncommon/SS-078-UC.webp"
+    },
+    "SS-114-R": {
+      "id": "SS-114-R",
+      "cardId": "SS-114-R",
+      "rarity": "R",
+      "number": "114",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "name_es": "GAARA",
+      "name_ja": "我愛羅",
+      "title_en": "\"Well, is that all?\"",
+      "title_fr": "C’est tout ce que tu sais faire ?",
+      "title_es": "¿Eso es todo?",
+      "title_ja": "「それだけか？」",
+      "title_pt": "É só isso?",
+      "title_it": "È tutto qui?",
+      "title_pl": "To wszystko?",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Discard a Gaara from your hand. Hide an enemy character in this mission with cost equal to or lower than the discarded card cost."
+        },
+        {
+          "type": "DUEL",
+          "description": "DUEL Rock Lee MAIN effect: Instead, defeat them."
+        }
+      ],
+      "image_file": "images/cards/SS/rare/SS-114-R.webp"
+    },
+    "SS-117-R": {
+      "id": "SS-117-R",
+      "cardId": "SS-117-R",
+      "rarity": "R",
+      "number": "117",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KANKURO",
+      "name_fr": "KANKURÔ",
+      "name_es": "KANKURO",
+      "name_ja": "カンクロウ",
+      "title_en": "\"You’re in for a real treat.\"",
+      "title_fr": "Tu vas être servi.",
+      "title_es": "Te espera un buen espectáculo.",
+      "title_ja": "「いいものを見せてやる」",
+      "title_pt": "Você vai ter uma bela surpresa.",
+      "title_it": "Ti aspetta una bella sorpresa.",
+      "title_pl": "Czeka cię niezła uczta.",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Whenever you move one or more enemy characters, gain 1 Chakra."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Shino Aburame: Move an enemy character to this mission."
+        }
+      ],
+      "image_file": "images/cards/SS/rare/SS-117-R.webp"
+    },
+    "SS-119-R": {
+      "id": "SS-119-R",
+      "cardId": "SS-119-R",
+      "rarity": "R",
+      "number": "119",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TEMARI",
+      "name_fr": "TEMARI",
+      "name_es": "TEMARI",
+      "name_ja": "テマリ",
+      "title_en": "\"You can’t hide forever.\"",
+      "title_fr": "Tu ne peux pas te cacher éternellement.",
+      "title_es": "No puedes esconderte para siempre.",
+      "title_ja": "「いつまでも隠れてはいられない」",
+      "title_pt": "Você não pode se esconder para sempre.",
+      "title_it": "Non puoi nasconderti per sempre.",
+      "title_pl": "Nie możesz ukrywać się wiecznie.",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Move an enemy character from this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Shikamaru Nara: Draw a card and gain the Edge."
+        }
+      ],
+      "image_file": "images/cards/SS/rare/SS-119-R.webp"
+    },
+    "SS-085-UC": {
+      "id": "SS-085-UC",
+      "cardId": "SS-085-UC",
+      "rarity": "UC",
+      "number": "85",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "GIANT FAN",
+      "name_fr": "ÉVENTAIL GÉANT",
+      "name_es": "ABANICO GIGANTE",
+      "name_ja": "大鉄扇",
+      "name_pt": "LEQUE GIGANTE",
+      "name_it": "VENTAGLIO GIGANTE",
+      "name_pl": "GIGANTYCZNY WACHLARZ",
+      "title_en": "",
+      "title_fr": "",
+      "title_es": "",
+      "title_ja": "",
+      "title_pt": "",
+      "title_it": "",
+      "title_pl": "",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 2,
+      "keywords": [
+        "Weapon"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly Sand Village character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Move an enemy character with less Power than this character from this mission."
+        }
+      ],
+      "image_file": "images/cards/SS/attachment/SS-085-UC.webp"
+    },
+    "SS-089-UC": {
+      "id": "SS-089-UC",
+      "cardId": "SS-089-UC",
+      "rarity": "UC",
+      "number": "89",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "CROW",
+      "name_fr": "CORBEAU",
+      "name_es": "CUERVO",
+      "name_ja": "烏",
+      "name_pt": "CORVO",
+      "name_it": "CORVO",
+      "name_pl": "KRUK",
+      "title_en": "",
+      "title_fr": "",
+      "title_es": "",
+      "title_ja": "",
+      "title_pt": "",
+      "title_it": "",
+      "title_pl": "",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 2,
+      "keywords": [
+        "Puppet"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] When you play a Kankuro, you may move this attachment to a friendly character."
+        }
+      ],
+      "image_file": "images/cards/SS/attachment/SS-089-UC.webp"
+    },
+    "SS-092-C": {
+      "id": "SS-092-C",
+      "cardId": "SS-092-C",
+      "rarity": "C",
+      "number": "92",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "SAND VILLAGE HEADBAND",
+      "name_fr": "BANDEAU DU VILLAGE DU SABLE",
+      "name_es": "BANDANA DE LA ALDEA DE LA ARENA",
+      "name_ja": "砂隠れの額当て",
+      "name_pt": "BANDANA DA VILA DA AREIA",
+      "name_it": "FASCIA DEL VILLAGGIO DELLA SABBIA",
+      "name_pl": "OPASKA WIOSKI PIASKU",
+      "title_en": "",
+      "title_fr": "",
+      "title_es": "",
+      "title_ja": "",
+      "title_pt": "",
+      "title_it": "",
+      "title_pl": "",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 1,
+      "keywords": [
+        "Armor"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden character. This character is also considered a Sand Village character."
+        }
+      ],
+      "image_file": "images/cards/SS/attachment/SS-092-C.webp"
+    },
+    "SS-099-UC": {
+      "id": "SS-099-UC",
+      "cardId": "SS-099-UC",
+      "rarity": "UC",
+      "number": "99",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "BLADE OF THE THUNDER GOD",
+      "name_fr": "SABRE DU DIEU DE LA FOUDRE",
+      "name_es": "ESPADA DEL DIOS DEL TRUENO",
+      "name_ja": "雷神の剣",
+      "name_pt": "LÂMINA DO DEUS DO TROVÃO",
+      "name_it": "LAMA DEL DIO DEL TUONO",
+      "name_pl": "OSTRZE BOGA PIORUNÓW",
+      "title_en": "",
+      "title_fr": "",
+      "title_es": "",
+      "title_ja": "",
+      "title_pt": "",
+      "title_it": "",
+      "title_pl": "",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Weapon"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Hide an enemy Jutsu character in this mission with less Power than this character."
+        }
+      ],
+      "image_file": "images/cards/SS/attachment/SS-099-UC.webp"
     }
   }
 }

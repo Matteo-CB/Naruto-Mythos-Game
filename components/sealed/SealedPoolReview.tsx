@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { isLandscapeCard } from '@/lib/cards/orientation';
 import { getCardName, getRarityLabel } from '@/lib/utils/cardLocale';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 
@@ -131,7 +132,7 @@ function PoolCard({ card, index, locale }: { card: BoosterCard; index: number; l
   const t = useTranslations('sealed');
   const imgPath = normalizeImagePath(card.image_file);
   const rarityColor = RARITY_COLORS[card.rarity] ?? '#888';
-  const isMission = card.card_type === 'mission';
+  const isMission = isLandscapeCard(card);
   const cardName = getCardName(card, locale);
 
   return (
@@ -167,7 +168,7 @@ function PoolCard({ card, index, locale }: { card: BoosterCard; index: number; l
       )}
       {card.isTemporaryVariant && (
         <>
-          <VariantHoloOverlay intensity="subtle" />
+          <VariantHoloOverlay intensity="subtle" imageUrl={imgPath} />
           <div className="absolute top-0.5 left-0.5 z-10" title={t('temporaryVariantTooltip')}>
             <span
               className="font-display text-[7px] px-0.5 tracking-widest uppercase"

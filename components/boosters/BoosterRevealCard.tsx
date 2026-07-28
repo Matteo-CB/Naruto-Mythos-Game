@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { getCardName } from '@/lib/utils/cardLocale';
 import type { CardData } from '@/lib/engine/types';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath , portraitImagePath } from '@/lib/utils/imagePath';
 
 type Rarity = 'RA' | 'MV' | 'SV' | 'L';
 
@@ -41,7 +41,7 @@ export function BoosterRevealCard({
   const tSuffix = useTranslations('cardMeta.raritySuffix');
   const [flipped, setFlipped] = useState(instantReveal);
   const [zooming, setZooming] = useState(false);
-  const imgPath = normalizeImagePath(card.image_file);
+  const imgPath = portraitImagePath(card);
   const rarity = card.rarity as Rarity;
   const accent = RARITY_COLOR[rarity] ?? '#e8e8e8';
 
@@ -117,7 +117,7 @@ export function BoosterRevealCard({
               {getCardName(card, locale)}
             </div>
           )}
-          {flipped && <VariantHoloOverlay intensity="subtle" />}
+          {flipped && <VariantHoloOverlay intensity="subtle" imageUrl={imgPath} />}
         </div>
       </motion.div>
 

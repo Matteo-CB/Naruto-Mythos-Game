@@ -42,4 +42,48 @@ export const effectDescriptionsPt: Record<string, string[]> = {
     "Anexe a uma missão.",
     "[↯] Um personagem aliado ativa um efeito [↯] DUEL instantâneo, ignorando os requisitos.",
   ],
+  "SS-046-UC": [
+    "[↯] Revele cartas do topo do seu baralho até encontrar um personagem da Vila da Areia. Compre-o e então embaralhe as cartas reveladas no seu baralho.",
+  ],
+  "SS-047-UC": [
+    "[⧗] Você pode jogar este personagem como evolução sobre um Gaara.",
+    "[↯] Derrote um personagem inimigo com 3 de Poder ou menos.",
+  ],
+  "SS-049-C": [
+    "[↯] Mova um personagem desta missão.",
+  ],
+  "SS-051-UC": [
+    "[⧗] Personagens aliados da Vila da Areia custam 1 a menos para serem jogados em qualquer lugar.",
+  ],
+  "SS-078-UC": [
+    "[↯] Kimimaro: Derrote um personagem inimigo com custo 2 ou menos.",
+    "[⧗] Quando você derrotar um personagem inimigo não-oculto, pode pagar 1 Chakra para comprar 1 carta.",
+  ],
+  "SS-114-R": [
+    "[↯] Descarte um Gaara da sua mão. Oculte um personagem inimigo nesta missão com custo igual ou inferior ao da carta descartada.",
+    "Rock Lee, efeito MAIN: Em vez disso, derrote-o.",
+  ],
+  "SS-117-R": [
+    "[⧗] Sempre que você mover um ou mais personagens inimigos, ganhe 1 Chakra.",
+    "[↯] Shino Aburame: Mova um personagem inimigo para esta missão.",
+  ],
+  "SS-119-R": [
+    "[↯] Mova um personagem inimigo desta missão.",
+    "[↯] Shikamaru Nara: Compre uma carta e ganhe o Edge.",
+  ],
+  "SS-085-UC": [
+    "Anexe a um personagem aliado da Vila da Areia.",
+    "[↯] Mova desta missão um personagem inimigo com menos Poder que este personagem.",
+  ],
+  "SS-089-UC": [
+    "Anexe a um personagem aliado não-oculto.",
+    "[⧗] Quando você jogar um Kankuro, pode mover este anexo para um personagem aliado.",
+  ],
+  "SS-092-C": [
+    "Anexe a um personagem aliado não-oculto. Este personagem também é considerado um personagem da Vila da Areia.",
+  ],
+  "SS-099-UC": [
+    "Anexe a um personagem aliado não-oculto.",
+    "[↯] Oculte nesta missão um personagem Jutsu inimigo com menos Poder que este personagem.",
+  ],
 };

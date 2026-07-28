@@ -118,7 +118,8 @@
     },
     "register": {
       "title": "無料アカウント作成 - 登録 | ナルト ミトス TCG",
-      "description": "ナルト ミトス TCGのアカウントを数秒で無料作成。オンライン対戦、デッキ保存、ELOランク対戦、フレンド追加、世界ランキングへの挑戦ができます。すぐに始められる無料登録で、ナルト疾風伝のカードゲームをオンラインで楽しもう。"
+      "description": "ナルト ミトス TCGのアカウントを数秒で無料作成。オンライン対戦、デッキ保存、ELOランク対戦、フレンド追加、世界ランキングへの挑戦ができます。すぐに始められる無料登録で、ナルト疾風伝のカードゲームをオンラインで楽しもう。",
+      "ogAlt": "アカウント作成 - Naruto Mythos TCG"
     },
     "playAi": {
       "title": "AIと対戦 - 難易度4段階 | ナルト ミトス TCG",
@@ -220,7 +221,11 @@
       "Tailed Beast": "尾獣",
       "Ninja Hound": "忍犬",
       "Ninja Pig": "忍豚",
-      "Special Jonin": "特別上忍"
+      "Special Jonin": "特別上忍",
+      "Puppet": "傀儡",
+      "Armor": "防具",
+      "Food": "食料",
+      "Location": "場所"
     },
     "rarity": {
       "C": "コモン",
@@ -727,7 +732,16 @@
     "boardColorsLowContrast": "この色はボード上でとても暗く、読みにくい場合があります。",
     "boardColorsDefaultsHint": "初期値: 自分は {me}、相手は {opponent}。",
     "boardPreviewYou": "自分",
-    "boardPreviewOpponent": "相手"
+    "boardPreviewOpponent": "相手",
+    "deckPrefs": "デッキ",
+    "deckListLimit": "折りたたむ前に表示するデッキ数",
+    "deckListLimitHint": "デッキ選択で「もっと見る」の前に表示するデッキ数。お気に入りは常に上部に表示されます。",
+    "deckListLimitLess": "減らす",
+    "deckListLimitMore": "増やす",
+    "favoriteDecks": "お気に入りデッキ",
+    "favoriteDecksHint": "最大3つのデッキを選べます。デッキ選択で常に先頭に表示されます。",
+    "deckPrefsNoDecks": "保存済みのデッキがまだありません。",
+    "unfavorite": "お気に入りから外す"
   },
   "game": {
     "turn": "ターン {turn}",
@@ -968,7 +982,13 @@
         "ss000Search": "はたけカカシ（SS-000）：山札を探して忍犬を{count}体引き、シャッフルした。",
         "ss112RemoveTokens": "日向ネジ（SS-112）：敵キャラクターのパワートークンをすべて取り除いた。",
         "kakashi148Locked": "{card}（{id}）：相手がこのラウンド主導権をロックしており、奪えません。",
-        "ss000Reveal": "はたけカカシが{target}を公開して引いた。"
+        "ss000Reveal": "はたけカカシが{target}を公開して引いた。",
+        "ss046Draw": "{card}：{count}枚公開し、{target}を引いた。",
+        "ss119Duel": "{card}：カードを1枚引き、Edgeを得た。",
+        "ss099Hide": "{card}：より弱い敵の術キャラクターを伏せた。",
+        "ss078Draw": "{card}：チャクラを1支払いカードを1枚引いた。",
+        "ss089Move": "{card}：装備が{target}に移動した。",
+        "ss117Chakra": "{card}：敵キャラクターを移動させてチャクラを1得た。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -985,7 +1005,8 @@
       },
       "playAttachment": "アタッチメント{card}をチャクラ{cost}でプレイ。",
       "attachToMission": "{card}がミッション{mission}に付けられた。",
-      "attachToCharacter": "{card}が{target}に付けられた。"
+      "attachToCharacter": "{card}が{target}に付けられた。",
+      "useFirstStrike": "FIRST STRIKE：{card}がラウンド開始前に先制する。"
     },
     "end": {
       "victory": "勝利",
@@ -1316,7 +1337,7 @@
         "temari121ConfirmUpgrade": "UPGRADE：場のキャラクターを移動させる。",
         "jirobo122ConfirmMain": "MAIN：POWERUP X、X はこのミッションのキャラクターの数。",
         "jirobo122ConfirmUpgrade": "UPGRADE：このミッションのパワー1以下の敵キャラクターを撃破する。",
-        "tsunade104ConfirmUpgrade": "UPGRADE：追加のチャクラを好きなだけ支払う。POWERUP X。",
+        "tsunade104ConfirmUpgrade": "UPGRADE：POWERUP X。XはMAINで支払った追加チャクラの量。チャクラの再支払いは不要。",
         "jiraiya007ChooseSummon": "手札から出す口寄せキャラクターを選ぶか、伏せキャラクターを表にする（コスト1減）。",
         "kabuto052PlaceHidden": "奪ったカードを伏せて置くミッションを選んでください。",
         "kabuto052ChooseMission": "奪ったカードを伏せて置くミッションを選んでください。",
@@ -1466,7 +1487,7 @@
         "tayuya125PlaySound": "手札から出す音隠れの里のキャラクターを選ぶか、伏せキャラクターを表にする（コスト2減）。",
         "temari121MoveFriendly": "別のミッションへ移動させる味方キャラクターを選んでください。",
         "temari121MoveAny": "別のミッションへ移動させる場のキャラクターを選んでください。",
-        "shino115MoveFriendly": "油女シノ（115）AMBUSH：別のミッションへ移動させるこのミッションの味方キャラクターを選んでください。",
+        "shino115MoveFriendly": "油女シノ（115）AMBUSH：このミッションへ移動させる、別のミッションにいる味方キャラクターを選んでください。",
         "sakon127Hide": "左近（127）AMBUSH：伏せるパワー5以下の敵キャラクターを選んでください。",
         "tenten118DefeatHidden": "撃破するこのミッションの伏せキャラクターを選んでください。",
         "ukon124bHide": "伏せるパワー5以下の敵キャラクターを選んでください。",
@@ -1597,7 +1618,21 @@
         "ss128ConfirmDuel": "DUEL 次郎坊：このミッションのパワー8以上の敵キャラクターを撃破しますか？",
         "ss128Defeat": "秋道チョウジ：撃破するパワー8以上の敵キャラクターを選んでください。",
         "ss108ConfirmScore": "SCORE 試験スタジアム：味方キャラクター1体が条件を無視して即時DUEL効果を発動しますか？",
-        "ss108ChooseCharacter": "試験スタジアム：DUEL効果を発動する味方キャラクターを選んでください。"
+        "ss108ChooseCharacter": "試験スタジアム：DUEL効果を発動する味方キャラクターを選んでください。",
+        "ss049FirstStrikeChar": "FIRST STRIKE：このミッションから移動させるキャラクターを選ぶ。",
+        "ss046ConfirmMain": "砂隠れのキャラクターが出るまで山札の上を公開し、それを引いて残りをシャッフルしますか？",
+        "ss047Defeat": "倒す敵キャラクター（パワー3以下）を選ぶ。",
+        "ss078DuelDefeat": "倒す敵キャラクター（コスト2以下）を選ぶ。",
+        "ss114ChooseDiscard": "手札から捨てる我愛羅を選ぶ。",
+        "ss114ChooseHide": "伏せる敵キャラクター（捨てたカードのコスト以下）を選ぶ。",
+        "ss114ChooseDefeat": "ロック・リーがいる：代わりに倒す敵キャラクター（捨てたカードのコスト以下）を選ぶ。",
+        "ss117DuelMove": "このミッションに移動させる敵キャラクターを選ぶ。",
+        "ss119MoveChar": "このミッションから移動させる敵キャラクターを選ぶ。",
+        "ss119DuelConfirm": "カードを1枚引き、Edgeを得ますか？",
+        "ss085MoveChar": "このミッションから移動させる、より弱い敵キャラクターを選ぶ。",
+        "ss099Hide": "このミッションで伏せる、より弱い敵の術キャラクターを選ぶ。",
+        "ss078ConfirmDraw": "チャクラを1支払ってカードを1枚引きますか？",
+        "ss089MoveAttachment": "この装備を味方キャラクターに移しますか？"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用"
@@ -1711,7 +1746,9 @@
     "lockedToastMessage": "このカードはロックされています。バリアントブースター、報酬、またはトーナメントで入手してください。",
     "attachments": "アタッチメント",
     "holosOnly": "ホロ",
-    "holoBadge": "ホロ"
+    "holoBadge": "ホロ",
+    "characterAttachments": "キャラクター装備",
+    "missionAttachments": "ミッション装備"
   },
   "deckBuilder": {
     "title": "デッキビルダー",
@@ -1847,7 +1884,11 @@
       "example6": "口寄せキーワードだけを持つカード",
       "statsHeader": "ステータス",
       "propertiesHeader": "プロパティ",
-      "effectsHeader": "効果"
+      "effectsHeader": "効果",
+      "edLabel": "DUELテキスト",
+      "edDesc": "DUEL効果のテキストのみを検索",
+      "efLabel": "FIRST STRIKEテキスト",
+      "efDesc": "First Strike効果のテキストのみを検索（対象カードはまだなし）"
     },
     "sort": "並べ替え",
     "error": {
@@ -1911,7 +1952,8 @@
     "showUnrevealed": "非公開を表示",
     "containsUnrevealed": "非公開カードを含む",
     "useDeck": "このデッキを使う",
-    "cardDetail": "カード詳細"
+    "cardDetail": "カード詳細",
+    "otherDecks": "その他のデッキ"
   },
   "discord": {
     "linkDiscord": "Discordを連携",
@@ -1962,7 +2004,10 @@
     "rename": "名前変更",
     "cards": "枚",
     "saving": "順序を保存中...",
-    "createFirst": "デッキを作成"
+    "createFirst": "デッキを作成",
+    "favorite": "お気に入りに追加",
+    "unfavorite": "お気に入りから外す",
+    "favoriteFull": "お気に入りデッキはすでに{max}個です"
   },
   "playAI": {
     "title": "AIと対戦",
@@ -2329,7 +2374,8 @@
       "AMBUSH": "AMBUSH",
       "SCORE": "SCORE",
       "DUEL": "DUEL",
-      "ATTACH": "ATTACH"
+      "ATTACH": "ATTACH",
+      "FIRST_STRIKE": "FIRST STRIKE"
     },
     "noImage": "画像なし",
     "hidden": "伏せ",
@@ -3944,5 +3990,16 @@
     "busiestDay": "最も活発だった日",
     "busiestDayValue": "{day}、{games}戦",
     "note": "オンライン対戦のみが対象です。数値は1時間に数回更新されます。"
+  },
+  "firstStrike": {
+    "title": "FIRST STRIKE",
+    "subtitle": "最初の行動の前に使用可能",
+    "body": "このラウンドで先制できる。使用すると自分の手番を消費し、次に相手が行動する。",
+    "use": "先制する",
+    "skip": "通常どおり行動",
+    "choose": "先制するキャラクターを選ぶ",
+    "badge": "FIRST STRIKE",
+    "used": "このラウンドは使用済み",
+    "opponentUsed": "相手がFIRST STRIKEを使用した"
   }
 }

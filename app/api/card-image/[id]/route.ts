@@ -12,6 +12,7 @@ import { holoBaseId } from '@/lib/holo/holoId';
 export const dynamic = 'force-dynamic';
 
 const PRIVATE_ROOT = path.join(process.cwd(), 'lib', 'data', 'private-cards');
+const PUBLIC_ROOT = path.join(process.cwd(), 'public', 'images', 'cards');
 
 // Serves revealing-set card images that live outside public/. A revealed (public) card image
 // is served to anyone; an unrevealed one is served only to admins and testers. Regular players
@@ -44,9 +45,11 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const rel = card.image_file.replace(/^\/?images\/cards\//, '');
   const filePath = path.join(PRIVATE_ROOT, rel);
   if (!filePath.startsWith(PRIVATE_ROOT)) return new NextResponse(null, { status: 404 });
+  const publicPath = path.join(PUBLIC_ROOT, rel);
+  if (!publicPath.startsWith(PUBLIC_ROOT)) return new NextResponse(null, { status: 404 });
 
   try {
-    const buf = await readFile(filePath);
+    const buf = await readFile(filePath).catch(() => readFile(publicPath));
     const body = new Uint8Array(buf);
     return new NextResponse(body, {
       status: 200,

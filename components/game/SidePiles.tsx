@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { DiscardPileViewer } from './DiscardPileViewer';
 import { useGameScale } from './GameScaleContext';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 import { useBoardPalette } from './BoardPaletteContext';
 import { withAlpha } from '@/lib/game/boardPalette';
 
@@ -140,13 +140,17 @@ function DiscardPile({
               left: 0,
               border: `1.5px solid ${withAlpha(accentColor, 0.31)}`,
               boxShadow: `0 4px 12px rgba(0,0,0,0.5)`,
+              overflow: 'hidden',
             }}
           >
             <img
               src={topCardImage || '/images/card-back.webp'}
               alt={t('game.discard')}
               className="w-full h-full"
-              style={{ objectFit: 'cover', filter: topCardImage ? 'none' : 'brightness(0.4) sepia(0.3)' }}
+              style={{
+                objectFit: 'cover',
+                filter: topCardImage ? 'none' : 'brightness(0.4) sepia(0.3)',
+              }}
               draggable={false}
             />
           </div>
@@ -212,7 +216,7 @@ export function OpponentSidePiles() {
           count={discardCount}
           accentColor={opponent.primary}
           onClick={() => discardCount > 0 && setShowDiscard(true)}
-          topCardImage={normalizeImagePath(opponentTopDiscard?.image_file) ?? undefined}
+          topCardImage={portraitImagePath(opponentTopDiscard) ?? undefined}
         /></div>
       </aside>
 
@@ -261,7 +265,7 @@ export function PlayerSidePiles() {
           count={discardCount}
           accentColor={me.primary}
           onClick={() => setShowDiscard(true)}
-          topCardImage={normalizeImagePath(playerTopDiscard?.image_file) ?? undefined}
+          topCardImage={portraitImagePath(playerTopDiscard) ?? undefined}
         /></div>
       </aside>
 

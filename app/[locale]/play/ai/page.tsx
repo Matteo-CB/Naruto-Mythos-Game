@@ -40,7 +40,7 @@ export default function PlayAIPage() {
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
-      const characters = mod.getPlayableCharacters();
+      const characters = [...mod.getPlayableCharacters(), ...(mod.getPlayableAttachments() as unknown as ReturnType<typeof mod.getPlayableCharacters>)];
       const missions = mod.getPlayableMissions();
       setCards({ characters, missions });
     });

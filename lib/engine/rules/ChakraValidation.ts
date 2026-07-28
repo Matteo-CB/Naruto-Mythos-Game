@@ -55,11 +55,28 @@ export function calculateEffectiveCost(
     }
   }
 
-  
+  if (card.group === 'Sand Village') {
+    const friendlySideKey = player === 'player1' ? 'player1Characters' : 'player2Characters';
+    let hasRasa = false;
+    for (const m of state.activeMissions ?? []) {
+      for (const c of (m?.[friendlySideKey] ?? [])) {
+        if (c.isHidden) continue;
+        const cTop = getTopCard(c);
+        if (!cTop) continue;
+        if (String(cTop.set) !== 'SS' || String(cTop.number) !== '51') continue;
+        if (cTop.id === card.id) continue;
+        hasRasa = true;
+        break;
+      }
+      if (hasRasa) break;
+    }
+    if (hasRasa) cost = Math.max(0, cost - 1);
+  }
+
   for (const effect of card.effects ?? []) {
     if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
-    
+
     if ((card.set === 'KS' && card.number === 96) && effect.description.includes('Naruto Uzumaki') && effect.description.includes('1 less')) {
       const hasNaruto = friendlyChars.some(
         (c: any) => {

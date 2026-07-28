@@ -118,7 +118,8 @@
     },
     "register": {
       "title": "Crear cuenta gratis - Registro | Naruto Mythos TCG",
-      "description": "Crea tu cuenta de Naruto Mythos TCG gratis en segundos. Accede al multijugador en línea, guarda tus mazos, compite en partidas clasificatorias ELO, añade amigos y escala en la clasificación mundial. Registro rápido y gratuito para empezar a jugar al juego de cartas de Naruto Shippuden en línea."
+      "description": "Crea tu cuenta de Naruto Mythos TCG gratis en segundos. Accede al multijugador en línea, guarda tus mazos, compite en partidas clasificatorias ELO, añade amigos y escala en la clasificación mundial. Registro rápido y gratuito para empezar a jugar al juego de cartas de Naruto Shippuden en línea.",
+      "ogAlt": "Crear una cuenta - Naruto Mythos TCG"
     },
     "playAi": {
       "title": "Jugar contra la IA - 4 niveles de dificultad | Naruto Mythos TCG",
@@ -220,7 +221,11 @@
       "Tailed Beast": "Bestia con Cola",
       "Ninja Hound": "Perro Ninja",
       "Ninja Pig": "Cerdo Ninja",
-      "Special Jonin": "Jonin Especial"
+      "Special Jonin": "Jonin Especial",
+      "Puppet": "Marioneta",
+      "Armor": "Armadura",
+      "Food": "Comida",
+      "Location": "Lugar"
     },
     "rarity": {
       "C": "Común",
@@ -728,7 +733,16 @@
     "boardColorsLowContrast": "Este color es muy oscuro en el tablero y puede costar leerlo.",
     "boardColorsDefaultsHint": "Por defecto: {me} para ti, {opponent} para el rival.",
     "boardPreviewYou": "Tú",
-    "boardPreviewOpponent": "Rival"
+    "boardPreviewOpponent": "Rival",
+    "deckPrefs": "Mazos",
+    "deckListLimit": "Mazos mostrados antes de plegar",
+    "deckListLimitHint": "Cuántos mazos muestra el selector antes de un botón \"ver más\". Los favoritos siempre se muestran arriba.",
+    "deckListLimitLess": "Menos",
+    "deckListLimitMore": "Más",
+    "favoriteDecks": "Mazos favoritos",
+    "favoriteDecksHint": "Elige hasta 3 mazos. Siempre aparecen primero en el selector.",
+    "deckPrefsNoDecks": "Aún no tienes mazos guardados.",
+    "unfavorite": "Quitar de favoritos"
   },
   "game": {
     "turn": "Turno {turn}",
@@ -969,7 +983,13 @@
         "ss000Search": "Kakashi Hatake (SS-000): buscó en el mazo, robó {count} Perro Ninja, luego barajó.",
         "ss112RemoveTokens": "Neji Hyuga (SS-112): retiró todos los contadores de Poder de un personaje enemigo.",
         "kakashi148Locked": "{card} ({id}): el oponente bloqueó la Ventaja esta ronda, no se puede tomar.",
-        "ss000Reveal": "Kakashi Hatake revela y roba {target}."
+        "ss000Reveal": "Kakashi Hatake revela y roba {target}.",
+        "ss046Draw": "{card}: {count} carta(s) reveladas y {target} robada.",
+        "ss119Duel": "{card}: robó una carta y tomó el Edge.",
+        "ss099Hide": "{card}: ocultó a un personaje Jutsu enemigo más débil.",
+        "ss078Draw": "{card}: pagó 1 Chakra para robar 1 carta.",
+        "ss089Move": "{card}: el anexo se movió a {target}.",
+        "ss117Chakra": "{card}: ganó 1 Chakra por mover personajes enemigos."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",
@@ -986,7 +1006,8 @@
       },
       "playAttachment": "Juega el accesorio {card} por {cost} chakra.",
       "attachToMission": "{card} se une a la misión {mission}.",
-      "attachToCharacter": "{card} se une a {target}."
+      "attachToCharacter": "{card} se une a {target}.",
+      "useFirstStrike": "FIRST STRIKE: {card} golpea antes de que empiece la ronda."
     },
     "end": {
       "victory": "Victoria",
@@ -1317,7 +1338,7 @@
         "temari121ConfirmUpgrade": "UPGRADE: Mueve a cualquier personaje en juego.",
         "jirobo122ConfirmMain": "MAIN: POWERUP X donde X es el número de personajes en esta misión.",
         "jirobo122ConfirmUpgrade": "UPGRADE: Derrota a un personaje enemigo con Poder 1 o menos en esta misión.",
-        "tsunade104ConfirmUpgrade": "UPGRADE: Gasta cualquier cantidad de chakra adicional. POWERUP X.",
+        "tsunade104ConfirmUpgrade": "UPGRADE: POWERUP X, donde X es el Chakra adicional gastado en el MAIN. No hay que pagar Chakra de nuevo.",
         "jiraiya007ChooseSummon": "Elige un personaje de Invocación para jugar desde tu mano o revela uno oculto (pagando 1 menos).",
         "kabuto052PlaceHidden": "Elige una misión donde colocar oculta la carta robada.",
         "kabuto052ChooseMission": "Elige una misión donde colocar oculta la carta robada.",
@@ -1467,7 +1488,7 @@
         "tayuya125PlaySound": "Elige un personaje de la Aldea del Sonido para jugar desde tu mano o revela uno oculto (pagando 2 menos).",
         "temari121MoveFriendly": "Elige un personaje aliado para mover a otra misión.",
         "temari121MoveAny": "Elige a cualquier personaje en juego para mover a otra misión.",
-        "shino115MoveFriendly": "Shino Aburame (115) AMBUSH: Elige un personaje aliado en esta misión para mover a otra misión.",
+        "shino115MoveFriendly": "Shino Aburame (115) AMBUSH: Elige un personaje aliado en otra misión para moverlo a esta misión.",
         "sakon127Hide": "Sakon (127) AMBUSH: Elige un personaje enemigo con Poder 5 o menos para ocultar.",
         "tenten118DefeatHidden": "Selecciona un personaje oculto en esta misión para derrotar.",
         "ukon124bHide": "Elige un personaje enemigo con Poder 5 o menos para ocultar.",
@@ -1598,7 +1619,21 @@
         "ss128ConfirmDuel": "DUEL Jirobo: ¿Derrotar a un personaje enemigo en esta misión con Poder 8 o más?",
         "ss128Defeat": "Choji Akimichi: Elige un personaje enemigo con Poder 8 o más para derrotar.",
         "ss108ConfirmScore": "SCORE Estadio del Examen: ¿Un personaje aliado activa un efecto DUEL instantáneo ignorando sus requisitos?",
-        "ss108ChooseCharacter": "Estadio del Examen: Elige un personaje aliado para activar su efecto DUEL."
+        "ss108ChooseCharacter": "Estadio del Examen: Elige un personaje aliado para activar su efecto DUEL.",
+        "ss049FirstStrikeChar": "FIRST STRIKE: Elige un personaje para mover desde esta misión.",
+        "ss046ConfirmMain": "¿Revelar cartas de tu mazo hasta encontrar un personaje de la Aldea de la Arena, robarlo y barajar de nuevo las reveladas?",
+        "ss047Defeat": "Elige un personaje enemigo con 3 de Poder o menos para derrotarlo.",
+        "ss078DuelDefeat": "Elige un personaje enemigo con coste 2 o menos para derrotarlo.",
+        "ss114ChooseDiscard": "Elige un Gaara para descartar de tu mano.",
+        "ss114ChooseHide": "Elige un personaje enemigo para ocultar (coste igual o inferior al de la carta descartada).",
+        "ss114ChooseDefeat": "Rock Lee está presente: elige en su lugar un personaje enemigo para derrotar (coste igual o inferior al de la carta descartada).",
+        "ss117DuelMove": "Elige un personaje enemigo para mover a esta misión.",
+        "ss119MoveChar": "Elige un personaje enemigo para mover desde esta misión.",
+        "ss119DuelConfirm": "¿Robar una carta y tomar el Edge?",
+        "ss085MoveChar": "Elige un personaje enemigo más débil para mover desde esta misión.",
+        "ss099Hide": "Elige un personaje Jutsu enemigo más débil en esta misión para ocultarlo.",
+        "ss078ConfirmDraw": "¿Pagar 1 Chakra para robar 1 carta?",
+        "ss089MoveAttachment": "¿Mover este anexo a un personaje aliado?"
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN"
@@ -1712,7 +1747,9 @@
     "lockedToastMessage": "Esta carta está bloqueada. Consíguela en un sobre de variantes, en las Recompensas o en un torneo.",
     "attachments": "Accesorios",
     "holosOnly": "Holo",
-    "holoBadge": "Holo"
+    "holoBadge": "Holo",
+    "characterAttachments": "Anexos de personaje",
+    "missionAttachments": "Anexos de misión"
   },
   "deckBuilder": {
     "title": "Constructor de mazos",
@@ -1848,7 +1885,11 @@
       "example6": "Cartas que SOLO tienen la palabra clave Invocación",
       "statsHeader": "Estadísticas",
       "propertiesHeader": "Propiedades",
-      "effectsHeader": "Efectos"
+      "effectsHeader": "Efectos",
+      "edLabel": "Texto DUEL",
+      "edDesc": "Buscar solo en el texto de los efectos DUEL",
+      "efLabel": "Texto FIRST STRIKE",
+      "efDesc": "Buscar solo en el texto de los efectos First Strike (aún sin cartas)"
     },
     "sort": "Ordenar",
     "error": {
@@ -1912,7 +1953,8 @@
     "showUnrevealed": "Mostrar no reveladas",
     "containsUnrevealed": "Contiene no reveladas",
     "useDeck": "Usar este mazo",
-    "cardDetail": "Detalle de la carta"
+    "cardDetail": "Detalle de la carta",
+    "otherDecks": "Otros mazos"
   },
   "discord": {
     "linkDiscord": "Vincular Discord",
@@ -1963,7 +2005,10 @@
     "rename": "Renombrar",
     "cards": "cartas",
     "saving": "Guardando el orden...",
-    "createFirst": "Crear un mazo"
+    "createFirst": "Crear un mazo",
+    "favorite": "Añadir a favoritos",
+    "unfavorite": "Quitar de favoritos",
+    "favoriteFull": "Ya tienes {max} mazos favoritos"
   },
   "playAI": {
     "title": "Jugar contra la IA",
@@ -2330,7 +2375,8 @@
       "AMBUSH": "AMBUSH",
       "SCORE": "SCORE",
       "DUEL": "DUEL",
-      "ATTACH": "ATTACH"
+      "ATTACH": "ATTACH",
+      "FIRST_STRIKE": "FIRST STRIKE"
     },
     "noImage": "Sin imagen",
     "hidden": "Oculta",
@@ -3945,5 +3991,16 @@
     "busiestDay": "Día más activo",
     "busiestDayValue": "{day} con {games} partidas",
     "note": "Solo cuentan las partidas en línea. Las cifras se actualizan varias veces por hora."
+  },
+  "firstStrike": {
+    "title": "FIRST STRIKE",
+    "subtitle": "Disponible antes de tu primera acción",
+    "body": "Puedes golpear primero esta ronda. Usarlo consume todo tu turno y luego juega tu rival.",
+    "use": "Golpear",
+    "skip": "Jugar normalmente",
+    "choose": "Elige qué personaje golpea",
+    "badge": "FIRST STRIKE",
+    "used": "Ya usado esta ronda",
+    "opponentUsed": "Tu rival usó FIRST STRIKE"
   }
 }

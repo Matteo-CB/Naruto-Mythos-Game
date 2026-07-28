@@ -320,9 +320,17 @@ export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: Charact
   if (newCard.name_fr.toUpperCase() === targetCard.name_fr.toUpperCase()) return false;
 
   const newCardNumber = typeof newCard.number === 'string' ? parseInt(newCard.number, 10) : newCard.number;
+  const newCardSet = String(newCard.set ?? 'KS');
+  const isKS = newCardSet === 'KS';
 
+  if (newCardSet === 'SS' && newCardNumber === 47) {
+    const hasFlexible = (newCard.effects ?? []).some(
+      (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'),
+    );
+    if (hasFlexible) return targetCard.name_fr.toUpperCase() === 'GAARA';
+  }
 
-  if (newCardNumber === 51 || newCardNumber === 138) {
+  if (isKS && (newCardNumber === 51 || newCardNumber === 138)) {
     const hasFlexible = (newCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('upgrade'),
     );
@@ -334,7 +342,7 @@ export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: Charact
   }
 
 
-  if (newCardNumber === 29) {
+  if (isKS && newCardNumber === 29) {
     const hasFlexible = (newCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('Kiba Inuzuka'),
     );
@@ -345,12 +353,12 @@ export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: Charact
 
 
 
-  if (newCardNumber === 76) {
+  if (isKS && newCardNumber === 76) {
     return targetCard.name_fr.toUpperCase() === 'GAARA';
   }
 
 
-  if (newCardNumber === 129) {
+  if (isKS && newCardNumber === 129) {
     const hasFlexible = (newCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('Naruto Uzumaki'),
     );
@@ -360,7 +368,7 @@ export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: Charact
   }
 
 
-  if (newCardNumber === 63 || newCardNumber === 124 || newCardNumber === 127) {
+  if (isKS && (newCardNumber === 63 || newCardNumber === 124 || newCardNumber === 127)) {
     const hasFlexible = (newCard.effects ?? []).some(
       (e) => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'),
     );

@@ -46,7 +46,7 @@ export default function TrainingPage() {
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
       setCards({
-        characters: mod.getPlayableCharacters(),
+        characters: [...mod.getPlayableCharacters(), ...(mod.getPlayableAttachments() as unknown as ReturnType<typeof mod.getPlayableCharacters>)],
         missions: mod.getPlayableMissions(),
       });
     });

@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { useTranslations, useLocale } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath , portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { exportDeckAsImage } from '@/lib/utils/exportDeckImage';
 import { trackUiHook } from '@/lib/hooks/useTrackUi';
@@ -150,9 +150,9 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
             style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(64px, 1fr))' }}
           >
             {characters.map(({ card, qty }) => (
-              <div key={card.id} className="relative" style={{ aspectRatio: '5/7', clipPath: CARD_CLIP, backgroundColor: '#050508' }} title={getCardName(card, locale)}>
+              <div key={card.id} className="relative overflow-hidden" style={{ aspectRatio: '5/7', clipPath: CARD_CLIP, backgroundColor: '#050508' }} title={getCardName(card, locale)}>
                 {card.image_file
-                  ? <img src={normalizeImagePath(card.image_file) ?? undefined} alt={getCardName(card, locale)} className="w-full h-full object-cover" draggable={false} />
+                  ? <img src={portraitImagePath(card) ?? undefined} alt={getCardName(card, locale)} className="w-full h-full object-cover" draggable={false} />
                   : <div className="w-full h-full flex items-center justify-center text-[8px] text-center px-1" style={{ color: '#777' }}>{getCardName(card, locale)}</div>}
                 {qty > 1 && (
                   <span
@@ -175,7 +175,7 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
                 {missions.map(({ card, qty }) => (
                   <div key={card.id} className="relative" style={{ aspectRatio: '7/5', clipPath: CARD_CLIP, backgroundColor: '#050508' }} title={getCardName(card, locale)}>
                     {card.image_file
-                      ? <img src={normalizeImagePath(card.image_file) ?? undefined} alt={getCardName(card, locale)} className="w-full h-full object-cover" draggable={false} />
+                      ? <img src={portraitImagePath(card) ?? undefined} alt={getCardName(card, locale)} className="w-full h-full object-cover" draggable={false} />
                       : <div className="w-full h-full flex items-center justify-center text-[9px] text-center px-1" style={{ color: '#777' }}>{getCardName(card, locale)}</div>}
                     {qty > 1 && (
                       <span

@@ -41,7 +41,11 @@
       "Tailed Beast": "Cercoterio",
       "Ninja Hound": "Cane Ninja",
       "Ninja Pig": "Maiale Ninja",
-      "Special Jonin": "Jonin Speciale"
+      "Special Jonin": "Jonin Speciale",
+      "Puppet": "Marionetta",
+      "Armor": "Armatura",
+      "Food": "Cibo",
+      "Location": "Luogo"
     },
     "rarity": {
       "C": "Comune",
@@ -410,7 +414,16 @@
     "boardColorsLowContrast": "Questo colore è molto scuro sul tabellone e potrebbe risultare poco leggibile.",
     "boardColorsDefaultsHint": "Predefiniti: {me} per te, {opponent} per l’avversario.",
     "boardPreviewYou": "Tu",
-    "boardPreviewOpponent": "Avversario"
+    "boardPreviewOpponent": "Avversario",
+    "deckPrefs": "Mazzi",
+    "deckListLimit": "Mazzi mostrati prima di comprimere",
+    "deckListLimitHint": "Quanti mazzi mostra il selettore prima di un pulsante \"mostra altro\". I preferiti sono sempre in cima.",
+    "deckListLimitLess": "Meno",
+    "deckListLimitMore": "Più",
+    "favoriteDecks": "Mazzi preferiti",
+    "favoriteDecksHint": "Scegli fino a 3 mazzi. Appaiono sempre per primi nel selettore.",
+    "deckPrefsNoDecks": "Non hai ancora mazzi salvati.",
+    "unfavorite": "Rimuovi dai preferiti"
   },
   "auth": {
     "signIn": "Accedi",
@@ -764,7 +777,9 @@
     "lockedToastMessage": "Questa carta è bloccata. Ottienila da un booster di varianti, dalle Ricompense o da un torneo.",
     "attachments": "Allegati",
     "holosOnly": "Holo",
-    "holoBadge": "Holo"
+    "holoBadge": "Holo",
+    "characterAttachments": "Accessori personaggio",
+    "missionAttachments": "Accessori missione"
   },
   "profile": {
     "title": "Profilo Giocatore",
@@ -1228,7 +1243,8 @@
       "AMBUSH": "AMBUSH",
       "SCORE": "SCORE",
       "DUEL": "DUEL",
-      "ATTACH": "ATTACH"
+      "ATTACH": "ATTACH",
+      "FIRST_STRIKE": "FIRST STRIKE"
     },
     "noImage": "Nessuna immagine",
     "hidden": "Nascosta",
@@ -1538,7 +1554,10 @@
     "rename": "Rinomina",
     "cards": "carte",
     "saving": "Salvataggio ordine...",
-    "createFirst": "Crea un Mazzo"
+    "createFirst": "Crea un Mazzo",
+    "favorite": "Aggiungi ai preferiti",
+    "unfavorite": "Rimuovi dai preferiti",
+    "favoriteFull": "Hai già {max} mazzi preferiti"
   },
   "admin": {
     "booster": {
@@ -1775,7 +1794,11 @@
       "example6": "Carte che hanno SOLO la parola chiave Evocazione",
       "statsHeader": "Statistiche",
       "propertiesHeader": "Proprietà",
-      "effectsHeader": "Effetti"
+      "effectsHeader": "Effetti",
+      "edLabel": "Testo DUEL",
+      "edDesc": "Cerca solo nel testo degli effetti DUEL",
+      "efLabel": "Testo FIRST STRIKE",
+      "efDesc": "Cerca solo nel testo degli effetti First Strike (ancora nessuna carta)"
     },
     "sort": "Ordina",
     "error": {
@@ -1839,7 +1862,8 @@
     "showUnrevealed": "Mostra non rivelate",
     "containsUnrevealed": "Contiene non rivelate",
     "useDeck": "Usa questo mazzo",
-    "cardDetail": "Dettaglio della carta"
+    "cardDetail": "Dettaglio della carta",
+    "otherDecks": "Altri mazzi"
   },
   "seoPages": {
     "collection": {
@@ -1881,7 +1905,7 @@
     "register": {
       "title": "Crea Account Gratis - Registrati | Naruto Mythos TCG",
       "description": "Crea il tuo account Naruto Mythos TCG gratis in pochi secondi. Accedi al multiplayer online, salva i tuoi mazzi, competi nelle partite classificate ELO, aggiungi amici e scala la classifica globale. Registrazione rapida e gratuita per iniziare a giocare al gioco di carte di Naruto Shippuden online.",
-      "ogAlt": "Crea Account - Naruto Mythos TCG"
+      "ogAlt": "Crea un account - Naruto Mythos TCG"
     },
     "playAi": {
       "title": "Gioca contro l'IA - 4 Livelli di Difficoltà | Naruto Mythos TCG",
@@ -3015,7 +3039,13 @@
         "ss000Search": "Kakashi Hatake (SS-000): ha cercato nel mazzo, pescato {count} Cane Ninja, poi mischiato.",
         "ss112RemoveTokens": "Neji Hyuga (SS-112): ha rimosso tutti i token Potenza da un personaggio nemico.",
         "kakashi148Locked": "{card} ({id}): l'avversario ha bloccato il Vantaggio questo turno, non può essere preso.",
-        "ss000Reveal": "Kakashi Hatake rivela e pesca {target}."
+        "ss000Reveal": "Kakashi Hatake rivela e pesca {target}.",
+        "ss046Draw": "{card}: rivelate {count} carte e pescata {target}.",
+        "ss119Duel": "{card}: ha pescato una carta e preso l’Edge.",
+        "ss099Hide": "{card}: ha nascosto un personaggio Jutsu nemico più debole.",
+        "ss078Draw": "{card}: ha pagato 1 Chakra per pescare 1 carta.",
+        "ss089Move": "{card}: il collegamento è stato spostato su {target}.",
+        "ss117Chakra": "{card}: ha guadagnato 1 Chakra per aver spostato personaggi nemici."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3032,7 +3062,8 @@
       },
       "playAttachment": "Gioca l'accessorio {card} per {cost} chakra.",
       "attachToMission": "{card} è collegato alla missione {mission}.",
-      "attachToCharacter": "{card} è collegato a {target}."
+      "attachToCharacter": "{card} è collegato a {target}.",
+      "useFirstStrike": "FIRST STRIKE: {card} colpisce prima che il round inizi."
     },
     "end": {
       "victory": "Vittoria",
@@ -3363,7 +3394,7 @@
         "temari121ConfirmUpgrade": "UPGRADE: Sposta un personaggio qualsiasi in gioco.",
         "jirobo122ConfirmMain": "MAIN: POWERUP X dove X è il numero di personaggi in questa missione.",
         "jirobo122ConfirmUpgrade": "UPGRADE: Sconfiggi un personaggio nemico con Potenza 1 o meno in questa missione.",
-        "tsunade104ConfirmUpgrade": "UPGRADE: Spendi una quantità qualsiasi di Chakra aggiuntivo. POWERUP X.",
+        "tsunade104ConfirmUpgrade": "UPGRADE: POWERUP X, dove X è il Chakra aggiuntivo speso nel MAIN. Nessun Chakra da pagare di nuovo.",
         "jiraiya007ChooseSummon": "Scegli un personaggio Evocazione da giocare dalla mano o rivelane uno nascosto (pagando 1 in meno).",
         "kabuto052PlaceHidden": "Scegli una missione su cui piazzare la carta rubata coperta.",
         "kabuto052ChooseMission": "Scegli una missione su cui piazzare la carta rubata coperta.",
@@ -3513,7 +3544,7 @@
         "tayuya125PlaySound": "Scegli un personaggio del Villaggio del Suono da giocare dalla mano o rivelane uno nascosto (pagando 2 in meno).",
         "temari121MoveFriendly": "Scegli un personaggio alleato da spostare su un'altra missione.",
         "temari121MoveAny": "Scegli un personaggio qualsiasi in gioco da spostare su un'altra missione.",
-        "shino115MoveFriendly": "Shino Aburame (115) AMBUSH: Scegli un personaggio alleato in questa missione da spostare su un'altra missione.",
+        "shino115MoveFriendly": "Shino Aburame (115) AMBUSH: Scegli un personaggio alleato in un'altra missione da spostare in questa missione.",
         "sakon127Hide": "Sakon (127) AMBUSH: Scegli un personaggio nemico con Potenza 5 o meno da nascondere.",
         "tenten118DefeatHidden": "Seleziona un personaggio nascosto in questa missione da sconfiggere.",
         "ukon124bHide": "Scegli un personaggio nemico con Potenza 5 o meno da nascondere.",
@@ -3644,7 +3675,21 @@
         "ss128ConfirmDuel": "DUEL Jirobo: Sconfiggere un personaggio nemico in questa missione con Potenza 8 o più?",
         "ss128Defeat": "Choji Akimichi: Scegli un personaggio nemico con Potenza 8 o più da sconfiggere.",
         "ss108ConfirmScore": "SCORE Stadio dell'Esame: Un personaggio alleato attiva un effetto DUEL istantaneo, ignorando i requisiti?",
-        "ss108ChooseCharacter": "Stadio dell'Esame: Scegli un personaggio alleato per attivare il suo effetto DUEL."
+        "ss108ChooseCharacter": "Stadio dell'Esame: Scegli un personaggio alleato per attivare il suo effetto DUEL.",
+        "ss049FirstStrikeChar": "FIRST STRIKE: Scegli un personaggio da spostare da questa missione.",
+        "ss046ConfirmMain": "Rivelare carte dalla cima del mazzo finché non trovi un personaggio del Villaggio della Sabbia, pescarlo e rimescolare le rivelate?",
+        "ss047Defeat": "Scegli un personaggio nemico con Potenza 3 o inferiore da sconfiggere.",
+        "ss078DuelDefeat": "Scegli un personaggio nemico con costo 2 o inferiore da sconfiggere.",
+        "ss114ChooseDiscard": "Scegli un Gaara da scartare dalla tua mano.",
+        "ss114ChooseHide": "Scegli un personaggio nemico da nascondere (costo pari o inferiore alla carta scartata).",
+        "ss114ChooseDefeat": "Rock Lee è presente: scegli invece un personaggio nemico da sconfiggere (costo pari o inferiore alla carta scartata).",
+        "ss117DuelMove": "Scegli un personaggio nemico da spostare in questa missione.",
+        "ss119MoveChar": "Scegli un personaggio nemico da spostare da questa missione.",
+        "ss119DuelConfirm": "Pescare una carta e prendere l’Edge?",
+        "ss085MoveChar": "Scegli un personaggio nemico più debole da spostare da questa missione.",
+        "ss099Hide": "Scegli un personaggio Jutsu nemico più debole in questa missione da nascondere.",
+        "ss078ConfirmDraw": "Pagare 1 Chakra per pescare 1 carta?",
+        "ss089MoveAttachment": "Spostare questo collegamento su un personaggio alleato?"
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN"
@@ -3941,5 +3986,16 @@
     "busiestDay": "Giorno più attivo",
     "busiestDayValue": "{day} con {games} partite",
     "note": "Contano solo le partite online. I numeri si aggiornano più volte all’ora."
+  },
+  "firstStrike": {
+    "title": "FIRST STRIKE",
+    "subtitle": "Disponibile prima della tua prima azione",
+    "body": "Puoi colpire per primo in questo round. Usarlo consuma tutto il tuo turno, poi gioca il tuo avversario.",
+    "use": "Colpisci",
+    "skip": "Gioca normalmente",
+    "choose": "Scegli quale personaggio colpisce",
+    "badge": "FIRST STRIKE",
+    "used": "Già usato in questo round",
+    "opponentUsed": "Il tuo avversario ha usato FIRST STRIKE"
   }
 }

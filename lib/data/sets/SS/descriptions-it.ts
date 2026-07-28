@@ -42,4 +42,48 @@ export const effectDescriptionsIt: Record<string, string[]> = {
     "Collega a una missione.",
     "[↯] Un personaggio alleato attiva un effetto [↯] DUEL istantaneo, ignorando i requisiti.",
   ],
+  "SS-046-UC": [
+    "[↯] Rivela carte dalla cima del tuo mazzo finché non trovi un personaggio del Villaggio della Sabbia. Pescalo, poi rimescola le carte rivelate nel tuo mazzo.",
+  ],
+  "SS-047-UC": [
+    "[⧗] Puoi giocare questo personaggio come evoluzione su un Gaara.",
+    "[↯] Sconfiggi un personaggio nemico con Potenza 3 o inferiore.",
+  ],
+  "SS-049-C": [
+    "[↯] Sposta un personaggio da questa missione.",
+  ],
+  "SS-051-UC": [
+    "[⧗] I personaggi alleati del Villaggio della Sabbia costano 1 in meno da giocare ovunque.",
+  ],
+  "SS-078-UC": [
+    "[↯] Kimimaro: Sconfiggi un personaggio nemico con costo 2 o inferiore.",
+    "[⧗] Quando sconfiggi un personaggio nemico non nascosto, puoi pagare 1 Chakra per pescare 1 carta.",
+  ],
+  "SS-114-R": [
+    "[↯] Scarta un Gaara dalla tua mano. Nascondi un personaggio nemico in questa missione con costo pari o inferiore a quello della carta scartata.",
+    "Rock Lee, effetto MAIN: Invece, sconfiggilo.",
+  ],
+  "SS-117-R": [
+    "[⧗] Ogni volta che sposti uno o più personaggi nemici, guadagni 1 Chakra.",
+    "[↯] Shino Aburame: Sposta un personaggio nemico in questa missione.",
+  ],
+  "SS-119-R": [
+    "[↯] Sposta un personaggio nemico da questa missione.",
+    "[↯] Shikamaru Nara: Pesca una carta e guadagna l’Edge.",
+  ],
+  "SS-085-UC": [
+    "Collega a un personaggio alleato del Villaggio della Sabbia.",
+    "[↯] Sposta da questa missione un personaggio nemico con Potenza inferiore a questo personaggio.",
+  ],
+  "SS-089-UC": [
+    "Collega a un personaggio alleato non nascosto.",
+    "[⧗] Quando giochi un Kankuro, puoi spostare questo collegamento su un personaggio alleato.",
+  ],
+  "SS-092-C": [
+    "Collega a un personaggio alleato non nascosto. Questo personaggio è considerato anche un personaggio del Villaggio della Sabbia.",
+  ],
+  "SS-099-UC": [
+    "Collega a un personaggio alleato non nascosto.",
+    "[↯] Nascondi in questa missione un personaggio Jutsu nemico con Potenza inferiore a questo personaggio.",
+  ],
 };

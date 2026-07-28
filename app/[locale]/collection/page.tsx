@@ -99,6 +99,58 @@ export default function CollectionPage() {
 
   const getImagePath = (card: AnyCard): string | null => normalizeImagePath(card.image_file);
 
+  const characterAttachments = filteredCards.filter((c) => c.card_type === 'attachment' && !isLandscapeCard(c));
+  const missionAttachments = filteredCards.filter((c) => c.card_type === 'attachment' && isLandscapeCard(c));
+
+  const renderAttachmentTile = (card: AnyCard) => {
+    const imgPath = getImagePath(card);
+    const landscape = isLandscapeCard(card);
+    return (
+      <div
+        key={card.id}
+        className="relative bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
+        style={{ aspectRatio: cardAspectRatio(card) }}
+      >
+        <Link
+          href={`/cards/${cardIdToSlug(card.id)}`}
+          className="block w-full h-full"
+          aria-label={getCardName(card, locale)}
+        >
+          {imgPath ? (
+            <img
+              src={imgPath}
+              alt={getCardName(card, locale)}
+              className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+              width={200}
+              height={landscape ? 140 : 280}
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center p-1">
+              <div className="w-10 h-7 bg-[#1a1a1a] mb-1" />
+              <span className="text-[8px] text-[#555] text-center leading-tight">
+                {getCardName(card, locale)}
+              </span>
+            </div>
+          )}
+        </Link>
+        <button
+          type="button"
+          onClick={() => setSelectedCard(card)}
+          className="absolute top-1 left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full opacity-70 hover:opacity-100 transition-opacity"
+          style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: '#c4a35a' }}
+          aria-label={t('collection.quickPreview')}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </button>
+      </div>
+    );
+  };
+
   return (
     <main id="main-content" className="min-h-screen relative bg-[#0a0a0a] flex flex-col">
       <CloudBackground />
@@ -246,8 +298,8 @@ export default function CollectionPage() {
                     </span>
                   </div>
                 )}
-                {variant && !locked && <VariantHoloOverlay intensity="subtle" />}
-                {filterHolosOnly && holoOwned && imgPath && <HoloFoilOverlay intensity="strong" />}
+                {variant && !locked && <VariantHoloOverlay intensity="subtle" imageUrl={imgPath} />}
+                {filterHolosOnly && holoOwned && imgPath && <HoloFoilOverlay intensity="strong" imageUrl={imgPath} />}
               </>
             );
             return (
@@ -278,14 +330,6 @@ export default function CollectionPage() {
                     style={{ backgroundColor: '#c4a35a33', color: '#c4a35a', fontVariantNumeric: 'tabular-nums' }}
                   >
                     x{variantInventory.get(card.id)}
-                  </span>
-                )}
-                {holoOwned && !filterHolosOnly && (
-                  <span
-                    className="absolute bottom-1 left-1 z-10 px-1.5 py-0.5 text-[9px] font-bold uppercase"
-                    style={{ backgroundColor: '#a8e6ff26', color: '#a8e6ff', letterSpacing: '0.1em' }}
-                  >
-                    {t('collection.holoBadge')}
                   </span>
                 )}
                 {filterHolosOnly && holoOwned && (variantInventory.get(holoIdFor(card.id)) ?? 0) >= 2 && (
@@ -397,62 +441,28 @@ export default function CollectionPage() {
           </>
         )}
 
-        {filteredCards.some((c) => c.card_type === 'attachment') && (
+        {characterAttachments.length > 0 && (
           <>
             <div className="mt-8 mb-4 flex items-center gap-3">
               <div className="flex-1 h-px bg-[#262626]" />
-              <span className="text-sm font-bold text-[#888888] uppercase tracking-wider">{t('collection.attachments')}</span>
+              <span className="text-sm font-bold text-[#888888] uppercase tracking-wider">{t('collection.characterAttachments')}</span>
               <div className="flex-1 h-px bg-[#262626]" />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 items-start">
-              {filteredCards.filter((c) => c.card_type === 'attachment').map((card) => {
-                const imgPath = getImagePath(card);
-                const landscape = isLandscapeCard(card);
-                return (
-                  <div
-                    key={card.id}
-                    className="relative bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
-                    style={{ aspectRatio: cardAspectRatio(card) }}
-                  >
-                    <Link
-                      href={`/cards/${cardIdToSlug(card.id)}`}
-                      className="block w-full h-full"
-                      aria-label={getCardName(card, locale)}
-                    >
-                      {imgPath ? (
-                        <img
-                          src={imgPath}
-                          alt={getCardName(card, locale)}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                          decoding="async"
-                          width={200}
-                          height={landscape ? 140 : 280}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center p-1">
-                          <div className="w-10 h-7 bg-[#1a1a1a] mb-1" />
-                          <span className="text-[8px] text-[#555] text-center leading-tight">
-                            {getCardName(card, locale)}
-                          </span>
-                        </div>
-                      )}
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedCard(card)}
-                      className="absolute top-1 left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full opacity-70 hover:opacity-100 transition-opacity"
-                      style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: '#c4a35a' }}
-                      aria-label={t('collection.quickPreview')}
-                    >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <circle cx="11" cy="11" r="7" />
-                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                      </svg>
-                    </button>
-                  </div>
-                );
-              })}
+              {characterAttachments.map((card) => renderAttachmentTile(card))}
+            </div>
+          </>
+        )}
+
+        {missionAttachments.length > 0 && (
+          <>
+            <div className="mt-8 mb-4 flex items-center gap-3">
+              <div className="flex-1 h-px bg-[#262626]" />
+              <span className="text-sm font-bold text-[#888888] uppercase tracking-wider">{t('collection.missionAttachments')}</span>
+              <div className="flex-1 h-px bg-[#262626]" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
+              {missionAttachments.map((card) => renderAttachmentTile(card))}
             </div>
           </>
         )}

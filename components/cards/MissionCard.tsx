@@ -1,6 +1,7 @@
 'use client';
 
 import { memo, useMemo } from 'react';
+import { effectTypeLabel } from '@/lib/cards/effectTypeLabel';
 import { useTranslations, useLocale } from 'next-intl';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import type { MissionCard, MissionRank, PlayerID, CardEffect } from '@/lib/engine/types';
@@ -256,7 +257,7 @@ function MissionCardInner({
                   marginRight: '4px',
                 }}
               >
-                {effect.type}
+                {effectTypeLabel(effect.type)}
               </span>
               <span
                 className="font-body"

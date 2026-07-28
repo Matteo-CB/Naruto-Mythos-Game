@@ -8,7 +8,7 @@ import { useUIStore } from '@/stores/uiStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { ManualGuess } from './ManualGuess';
 import type { CharacterCard } from '@/lib/engine/types';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath , portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import { playSound } from '@/lib/sound/SoundManager';
@@ -57,7 +57,7 @@ function MulliganCard({
   const locale = useLocale();
   const dims = useGameScale();
   const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
-  const imagePath = normalizeImagePath(card.image_file);
+  const imagePath = portraitImagePath(card);
 
   return (
     <motion.div

@@ -10,6 +10,7 @@ import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
 import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
 import { Link } from '@/lib/i18n/navigation';
+import { useSettingsStore } from '@/stores/settingsStore';
 
 interface SavedDeck {
   id: string;
@@ -33,19 +34,33 @@ interface DeckSelectorProps {
   evolvingOnly?: boolean;
 }
 
-const INITIAL_DECK_LIMIT = 20;
 const LOAD_MORE_STEP = 30;
 
 export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnly = false }: DeckSelectorProps) {
   const t = useTranslations();
   const { unlockedIds } = useUnlockedVariants();
+  const deckListLimit = useSettingsStore((s) => s.deckListLimit);
+  const favoriteDeckIds = useSettingsStore((s) => s.favoriteDeckIds);
+  const settingsLoaded = useSettingsStore((s) => s.isLoaded);
+  const fetchSettings = useSettingsStore((s) => s.fetchFromServer);
   const [savedDecks, setSavedDecks] = useState<SavedDeck[]>([]);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [visibleCount, setVisibleCount] = useState(INITIAL_DECK_LIMIT);
+  const [visibleCount, setVisibleCount] = useState(deckListLimit);
 
-  const visibleDecks = savedDecks.slice(0, visibleCount);
-  const hiddenCount = Math.max(0, savedDecks.length - visibleCount);
+  useEffect(() => {
+    if (!settingsLoaded) fetchSettings().catch(() => {});
+  }, [settingsLoaded, fetchSettings]);
+
+  useEffect(() => { setVisibleCount(deckListLimit); }, [deckListLimit]);
+
+  const favoriteSet = new Set(favoriteDeckIds);
+  const favoriteDecks = favoriteDeckIds
+    .map((id) => savedDecks.find((d) => d.id === id))
+    .filter((d): d is SavedDeck => d !== undefined);
+  const otherDecks = savedDecks.filter((d) => !favoriteSet.has(d.id));
+  const visibleOtherDecks = otherDecks.slice(0, visibleCount);
+  const hiddenCount = Math.max(0, otherDecks.length - visibleCount);
 
   useEffect(() => {
     const url = evolvingOnly ? '/api/decks?evolving=true' : '/api/decks';
@@ -127,6 +142,42 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
     onSelect({ characters, missions, id: deck.id });
   };
 
+  const renderDeckButton = (deck: SavedDeck, isFavorite: boolean) => (
+    <EvolvingDeckHolo
+      key={deck.id}
+      points={deck.evolvingPoints ?? 0}
+      enabled={deck.evolvingCompatible === true}
+      intensity="subtle"
+      className="overflow-hidden"
+    >
+      <button
+        onClick={() => {
+          setSelectedDeckId(deck.id);
+          resolveAndSelect(deck.id);
+        }}
+        className="flex flex-col items-start p-3 transition-colors text-left w-full no-select"
+        style={{
+          backgroundColor: selectedDeckId === deck.id ? 'rgba(26, 26, 26, 0.95)' : 'rgba(20, 20, 20, 0.85)',
+          color: selectedDeckId === deck.id ? '#e8e8e8' : '#888',
+          boxShadow: selectedDeckId === deck.id ? 'inset 0 -2px 0 #c4a35a' : 'inset 0 -2px 0 transparent',
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
+        <div className="flex items-center gap-2 flex-wrap">
+          {isFavorite && (
+            <span aria-hidden="true" style={{ color: '#c4a35a', fontSize: 12, lineHeight: 1 }}>&#9733;</span>
+          )}
+          <span className="text-sm font-medium">{deck.name}</span>
+          {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints ?? 0} />}
+        </div>
+        <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>
+          {deck.cardIds.length} {t('deckBuilder.characters', { count: deck.cardIds.length })} + {deck.missionIds.length} missions
+        </span>
+      </button>
+    </EvolvingDeckHolo>
+  );
+
   return (
     <div className="flex flex-col gap-3 w-full">
       <p className="text-xs uppercase" style={{ color: '#888', letterSpacing: '0.18em' }}>
@@ -179,38 +230,20 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
         )
       )}
 
-      {visibleDecks.map((deck) => (
-        <EvolvingDeckHolo
-          key={deck.id}
-          points={deck.evolvingPoints ?? 0}
-          enabled={deck.evolvingCompatible === true}
-          intensity="subtle"
-          className="overflow-hidden"
-        >
-          <button
-            onClick={() => {
-              setSelectedDeckId(deck.id);
-              resolveAndSelect(deck.id);
-            }}
-            className="flex flex-col items-start p-3 transition-colors text-left w-full no-select"
-            style={{
-              backgroundColor: selectedDeckId === deck.id ? 'rgba(26, 26, 26, 0.95)' : 'rgba(20, 20, 20, 0.85)',
-              color: selectedDeckId === deck.id ? '#e8e8e8' : '#888',
-              boxShadow: selectedDeckId === deck.id ? 'inset 0 -2px 0 #c4a35a' : 'inset 0 -2px 0 transparent',
-              position: 'relative',
-              zIndex: 1,
-            }}
-          >
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-medium">{deck.name}</span>
-              {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints ?? 0} />}
+      {favoriteDecks.length > 0 && (
+        <>
+          {favoriteDecks.map((deck) => renderDeckButton(deck, true))}
+          {otherDecks.length > 0 && (
+            <div className="flex items-center gap-2 pt-1" aria-hidden="true">
+              <span className="flex-1 h-px" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }} />
+              <span className="text-[9px] uppercase tracking-[0.2em]" style={{ color: '#555' }}>{t('deckBuilder.otherDecks')}</span>
+              <span className="flex-1 h-px" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }} />
             </div>
-            <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>
-              {deck.cardIds.length} {t('deckBuilder.characters', { count: deck.cardIds.length })} + {deck.missionIds.length} missions
-            </span>
-          </button>
-        </EvolvingDeckHolo>
-      ))}
+          )}
+        </>
+      )}
+
+      {visibleOtherDecks.map((deck) => renderDeckButton(deck, false))}
 
       {hiddenCount > 0 && (
         <button

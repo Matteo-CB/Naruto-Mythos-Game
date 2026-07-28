@@ -1,6 +1,8 @@
 'use client';
 
 import { memo, useMemo } from 'react';
+import { effectTypeLabel } from '@/lib/cards/effectTypeLabel';
+import { hasCombatStats } from '@/lib/cards/orientation';
 import { useLocale, useTranslations } from 'next-intl';
 import type { CardData, CharacterCard, MissionCard, Rarity } from '@/lib/engine/types';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
@@ -46,7 +48,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
   }
   const imageSrc = useMemo(() => normalizeImagePath(card.image_file), [card.image_file]);
   const rarityColor = RARITY_COLORS[card.rarity] || '#6b7280';
-  const totalPower = card.card_type === 'character' ? (card.power ?? 0) + powerTokens : 0;
+  const totalPower = hasCombatStats(card) ? (card.power ?? 0) + powerTokens : 0;
   const hasImage = card.has_visual && imageSrc;
 
   return (
@@ -167,7 +169,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      {hasImage && card.isHolo && <HoloFoilOverlay />}
+      {hasImage && card.isHolo && <HoloFoilOverlay imageUrl={imageSrc} />}
 
       {hasImage && (
         <div
@@ -221,7 +223,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      {card.card_type === 'character' && (
+      {hasCombatStats(card) && (
         <div
           style={{
             position: 'absolute',
@@ -289,7 +291,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
             position: 'absolute',
             bottom: '8%',
             left: '6%',
-            right: card.card_type === 'character' ? '26%' : '6%',
+            right: hasCombatStats(card) ? '26%' : '6%',
           }}
         >
           <div
@@ -363,7 +365,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
                   textTransform: 'uppercase',
                 }}
               >
-                {effect.type}
+                {effectTypeLabel(effect.type)}
               </span>
               <div
                 style={{

@@ -1,4 +1,5 @@
 import type { GameState, PlayerID, CharacterInPlay } from '../engine/types';
+import { characterHasGroup } from '@/lib/effects/groupUtils';
 import { getEffectivePower } from './powerUtils';
 
 
@@ -149,7 +150,7 @@ function matchesTargetCriteria(
   if (char.isHidden) {
     if (filters?.group || filters?.keyword) return false;
   } else {
-    if (filters?.group && topCard.group !== filters.group) return false;
+    if (filters?.group && !characterHasGroup(char, filters.group)) return false;
     if (filters?.keyword && !(topCard.keywords ?? []).includes(filters.keyword)) return false;
   }
 

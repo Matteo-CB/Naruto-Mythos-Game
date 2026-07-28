@@ -4,7 +4,9 @@ export type PlayerID = 'player1' | 'player2';
 export type GamePhase = 'setup' | 'mulligan' | 'start' | 'action' | 'mission' | 'end' | 'gameOver';
 export type TurnNumber = 1 | 2 | 3 | 4;
 export type MissionRank = 'D' | 'C' | 'B' | 'A';
-export type EffectType = 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE' | 'DUEL' | 'ATTACH';
+export type EffectType = 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE' | 'DUEL' | 'ATTACH' | 'FIRST_STRIKE';
+
+export type FirstStrikeStatus = 'available' | 'used' | 'expired';
 export type Rarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'SP' | 'SPV' | 'POP' | 'POPV' | 'CHIBI' | 'CHIBIV' | 'MMS';
 
 
@@ -171,7 +173,9 @@ export interface GameState {
   pendingEffects: PendingEffect[];
   pendingActions: PendingAction[];
   turnMissionRevealed: boolean;
-  
+
+  firstStrike?: { player1: FirstStrikeStatus; player2: FirstStrikeStatus };
+
   missionScoringProgress?: MissionScoringProgress;
   
   endPhaseMovedIds?: string[];
@@ -320,6 +324,8 @@ export type GameAction =
   | { type: 'REVEAL_CHARACTER'; missionIndex: number; characterInstanceId: string; upgradeTargetInstanceId?: string }
   | { type: 'UPGRADE_CHARACTER'; cardIndex: number; missionIndex: number; targetInstanceId: string }
   | { type: 'PASS' }
+  | { type: 'USE_FIRST_STRIKE'; characterInstanceId: string }
+  | { type: 'DECLINE_FIRST_STRIKE' }
   | { type: 'MULLIGAN'; doMulligan: boolean }
   | { type: 'SELECT_TARGET'; pendingActionId: string; selectedTargets: string[] }
   | { type: 'DECLINE_OPTIONAL_EFFECT'; pendingEffectId: string }
@@ -374,6 +380,7 @@ export interface VisibleGameState {
   pendingActions: PendingAction[];
   effectOrderResolved?: boolean;
   forfeitedBy?: PlayerID;
+  firstStrike?: { player1: FirstStrikeStatus; player2: FirstStrikeStatus };
 }
 
 export interface VisibleOpponentState {

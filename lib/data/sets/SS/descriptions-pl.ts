@@ -42,4 +42,48 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "Dołącz do misji.",
     "[↯] Sojusznicza postać aktywuje natychmiastowy efekt [↯] DUEL, ignorując wymagania.",
   ],
+  "SS-046-UC": [
+    "[↯] Odkrywaj karty z wierzchu swojej talii, aż znajdziesz postać z Wioski Piasku. Dobierz ją, a następnie wtasuj odkryte karty do swojej talii.",
+  ],
+  "SS-047-UC": [
+    "[⧗] Możesz zagrać tę postać jako ulepszenie na Gaarę.",
+    "[↯] Pokonaj wrogą postać z Siłą 3 lub mniejszą.",
+  ],
+  "SS-049-C": [
+    "[↯] Przenieś postać z tej misji.",
+  ],
+  "SS-051-UC": [
+    "[⧗] Sojusznicze postacie z Wioski Piasku kosztują 1 mniej przy zagrywaniu w dowolnym miejscu.",
+  ],
+  "SS-078-UC": [
+    "[↯] Kimimaro: Pokonaj wrogą postać o koszcie 2 lub mniejszym.",
+    "[⧗] Gdy pokonasz nieukrytą wrogą postać, możesz zapłacić 1 Czakry, aby dobrać 1 kartę.",
+  ],
+  "SS-114-R": [
+    "[↯] Odrzuć Gaarę ze swojej ręki. Ukryj wrogą postać na tej misji o koszcie równym lub niższym od kosztu odrzuconej karty.",
+    "Rock Lee, efekt MAIN: Zamiast tego pokonaj ją.",
+  ],
+  "SS-117-R": [
+    "[⧗] Za każdym razem, gdy przeniesiesz jedną lub więcej wrogich postaci, zyskaj 1 Czakry.",
+    "[↯] Shino Aburame: Przenieś wrogą postać na tę misję.",
+  ],
+  "SS-119-R": [
+    "[↯] Przenieś wrogą postać z tej misji.",
+    "[↯] Shikamaru Nara: Dobierz kartę i zyskaj Edge.",
+  ],
+  "SS-085-UC": [
+    "Dołącz do sojuszniczej postaci z Wioski Piasku.",
+    "[↯] Przenieś z tej misji wrogą postać o Sile mniejszej niż ta postać.",
+  ],
+  "SS-089-UC": [
+    "Dołącz do sojuszniczej nieukrytej postaci.",
+    "[⧗] Gdy zagrasz Kankuro, możesz przenieść to dołączenie na sojuszniczą postać.",
+  ],
+  "SS-092-C": [
+    "Dołącz do sojuszniczej nieukrytej postaci. Ta postać jest uznawana również za postać z Wioski Piasku.",
+  ],
+  "SS-099-UC": [
+    "Dołącz do sojuszniczej nieukrytej postaci.",
+    "[↯] Ukryj na tej misji wrogą postać Jutsu o Sile mniejszej niż ta postać.",
+  ],
 };

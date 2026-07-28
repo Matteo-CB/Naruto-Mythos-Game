@@ -6,7 +6,11 @@ import { generateInstanceId } from '../engine/utils/id';
 import { moveOrochimaru051 } from '../engine/phases/MissionPhase';
 import { logAction } from '../engine/utils/gameLog';
 import { triggerOnDefeatEffects } from './onDefeatTriggers';
-import { hasResolvableInstantDuel } from './duelUtils';
+import { hasResolvableInstantDuel, isDuelConditionMet } from './duelUtils';
+import { shuffle } from '@/lib/engine/utils/shuffle';
+
+type GameStateWithMoveGrant = GameState & { _ss117ChakraGranted?: Partial<Record<PlayerID, boolean>> };
+import { characterHasGroup } from './groupUtils';
 import { postMoveHide as choji018PostMoveHide } from './handlers/KS/uncommon/choji018';
 import { buildPlayLessTargets, type PlayLessCategory } from './handlers/shared/playLess';
 import { ss000DeckHounds, ss000FinalizeSearch, ss000HoundChoicePayload, SS000_NINJA_HOUND } from './handlers/SS/ss000Search';
@@ -239,7 +243,45 @@ export class EffectEngine {
     return newState;
   }
 
-  
+  static resolveFirstStrikeEffect(
+    state: GameState,
+    player: PlayerID,
+    character: CharacterInPlay,
+    missionIndex: number,
+  ): GameState {
+    let newState = deepClone(state);
+    const topCard = character.stack?.length > 0 ? character.stack[character.stack.length - 1] : character.card;
+    if (!topCard) return newState;
+
+    const handler = getEffectHandler(topCard.id, 'FIRST_STRIKE' as EffectType);
+    if (!handler) return newState;
+
+    if (player === 'player1') newState.player1EffectsUsed = true;
+    else newState.player2EffectsUsed = true;
+
+    try {
+      const ctx: EffectContext = {
+        state: newState,
+        sourcePlayer: player,
+        sourceCard: character,
+        sourceMissionIndex: missionIndex,
+        triggerType: 'FIRST_STRIKE' as EffectType,
+        isUpgrade: false,
+      };
+      const result = handler(ctx);
+      if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+        return EffectEngine.createPendingTargetSelection(
+          result.state, player, character, missionIndex, 'FIRST_STRIKE' as EffectType, false, result, [],
+        );
+      }
+      newState = result.state;
+    } catch (err) {
+      console.error(`[EffectEngine] FIRST_STRIKE handler error for ${topCard.id}:`, err);
+    }
+    return newState;
+  }
+
+
   static resolveRevealUpgradeEffects(
     state: GameState,
     player: PlayerID,
@@ -662,7 +704,8 @@ export class EffectEngine {
       tst === 'NARUTO141_CHOOSE_DISCARD' ||
       tst === 'SASUKE142_CHOOSE_DISCARD' ||
       tst === 'KIN073_CHOOSE_DISCARD' ||
-      tst === 'KABUTO053_CHOOSE_DISCARD'
+      tst === 'KABUTO053_CHOOSE_DISCARD' ||
+      tst === 'SS114_CHOOSE_DISCARD'
     ) {
       actionType = 'DISCARD_CARD';
     } else if (
@@ -6930,7 +6973,7 @@ export class EffectEngine {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-            if (topCard.group !== 'Sand Village') continue;
+            if (!characterHasGroup(char, 'Sand Village')) continue;
             
             const charName = topCard.name_fr;
             const hasValidDest = newState.activeMissions.some((m, i) => {
@@ -7230,8 +7273,7 @@ export class EffectEngine {
         const r083HasAlly = r083Mission[r083Side].some((char: CharacterInPlay) => {
           if (char.instanceId === pendingEffect.sourceInstanceId) return false;
           if (char.isHidden) return false;
-          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-          return topCard.group === 'Sand Village';
+          return characterHasGroup(char, 'Sand Village');
         });
 
         if (!r083HasAlly) {
@@ -8755,7 +8797,7 @@ export class EffectEngine {
           newState.pendingActions.push({
             id: s115ActId, type: 'SELECT_TARGET' as PendingAction['type'],
             player: s115Player,
-            description: 'Shino Aburame (115) AMBUSH: Choose a friendly character to move to this mission.',
+            description: 'Shino Aburame (115) AMBUSH: Choose a friendly character in another mission to move to this mission.',
             descriptionKey: 'game.effect.desc.shino115MoveFriendly',
             options: s115Targets, minSelections: 1, maxSelections: 1,
             sourceEffectId: s115EffId,
@@ -10591,6 +10633,301 @@ export class EffectEngine {
         newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer, 'EFFECT',
           'Neji Hyuga (SS-112): Removed all Power tokens from an enemy character.',
           'game.log.effect.ss112RemoveTokens', { card: 'NEJI HYÛGA', id: 'SS-112-SPV' });
+        break;
+      }
+
+      case 'SS046_CONFIRM_MAIN': {
+        const s046P = pendingEffect.sourcePlayer;
+        const s046Deck = [...newState[s046P].deck];
+        const s046Revealed: CardData[] = [];
+        let s046Drawn: CardData | null = null;
+        while (s046Deck.length > 0) {
+          const top = s046Deck.shift()!;
+          if (top.group === 'Sand Village') { s046Drawn = top; break; }
+          s046Revealed.push(top);
+        }
+        if (!s046Drawn) break;
+        const s046Rest = shuffle([...s046Deck, ...s046Revealed]);
+        newState = {
+          ...newState,
+          [s046P]: { ...newState[s046P], deck: s046Rest, hand: [...newState[s046P].hand, s046Drawn] },
+        };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, s046P,
+          'EFFECT_DRAW', `Gaara (SS-046): Revealed ${s046Revealed.length} card(s) and drew ${s046Drawn.name_fr}.`,
+          'game.log.effect.ss046Draw', { card: 'GAARA', id: 'SS-046-UC', target: s046Drawn.name_fr, count: s046Revealed.length });
+        break;
+      }
+
+      case 'SS078_CONFIRM_DRAW': {
+        const s078P = pendingEffect.sourcePlayer;
+        const s078Ps = newState[s078P];
+        if (s078Ps.chakra < 1 || s078Ps.deck.length === 0) break;
+        const s078Deck = [...s078Ps.deck];
+        const s078Card = s078Deck.shift()!;
+        newState = {
+          ...newState,
+          [s078P]: { ...s078Ps, chakra: s078Ps.chakra - 1, deck: s078Deck, hand: [...s078Ps.hand, s078Card] },
+        };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, s078P,
+          'EFFECT_DRAW', 'Gaara (SS-078): Paid 1 Chakra to draw 1 card.',
+          'game.log.effect.ss078Draw', { card: 'GAARA', id: 'SS-078-UC' });
+        break;
+      }
+
+      case 'SS089_MOVE_ATTACHMENT': {
+        const s089P = pendingEffect.sourcePlayer;
+        const s089Host = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId ?? '');
+        const s089Dest = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!s089Host || !s089Dest) break;
+        const s089Att = (s089Host.character.attachments ?? []).find((a) => a.card.id === 'SS-089-UC');
+        if (!s089Att) break;
+        newState.activeMissions = newState.activeMissions.map((m) => ({
+          ...m,
+          player1Characters: m.player1Characters.map((c) => {
+            if (c.instanceId === s089Host.character.instanceId) return { ...c, attachments: (c.attachments ?? []).filter((a) => a.instanceId !== s089Att.instanceId) };
+            if (c.instanceId === targetId) return { ...c, attachments: [...(c.attachments ?? []), s089Att] };
+            return c;
+          }),
+          player2Characters: m.player2Characters.map((c) => {
+            if (c.instanceId === s089Host.character.instanceId) return { ...c, attachments: (c.attachments ?? []).filter((a) => a.instanceId !== s089Att.instanceId) };
+            if (c.instanceId === targetId) return { ...c, attachments: [...(c.attachments ?? []), s089Att] };
+            return c;
+          }),
+        }));
+        const s089Name = (s089Dest.character.stack?.length > 0 ? s089Dest.character.stack[s089Dest.character.stack.length - 1] : s089Dest.character.card).name_fr;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, s089P,
+          'ATTACH_CARD', `Crow (SS-089): Moved the attachment to ${s089Name}.`,
+          'game.log.effect.ss089Move', { card: 'CORBEAU', id: 'SS-089-UC', target: s089Name });
+        break;
+      }
+
+      case 'SS047_DEFEAT': {
+        const s047F = EffectEngine.findCharByInstanceId(newState, targetId);
+        const s047Name = s047F ? (s047F.character.stack?.length > 0 ? s047F.character.stack[s047F.character.stack.length - 1] : s047F.character.card).name_fr : '';
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', 'One-Tail (SS-047): Defeated an enemy with Power 3 or less.',
+          'game.log.effect.defeat', { card: 'ONE-TAIL', id: 'SS-047-UC', target: s047Name });
+        break;
+      }
+
+      case 'SS078_DUEL_DEFEAT': {
+        const s078F = EffectEngine.findCharByInstanceId(newState, targetId);
+        const s078Name = s078F ? (s078F.character.stack?.length > 0 ? s078F.character.stack[s078F.character.stack.length - 1] : s078F.character.card).name_fr : '';
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', 'Gaara (SS-078): Defeated an enemy with cost 2 or less.',
+          'game.log.effect.defeat', { card: 'GAARA', id: 'SS-078-UC', target: s078Name });
+        break;
+      }
+
+      case 'SS114_CHOOSE_DISCARD': {
+        const s114P = pendingEffect.sourcePlayer;
+        const s114Idx = parseInt(targetId, 10);
+        const s114Hand = [...newState[s114P].hand];
+        if (isNaN(s114Idx) || s114Idx < 0 || s114Idx >= s114Hand.length) break;
+        const s114Card = s114Hand[s114Idx];
+        s114Hand.splice(s114Idx, 1);
+        newState = {
+          ...newState,
+          [s114P]: { ...newState[s114P], hand: s114Hand, discardPile: [...newState[s114P].discardPile, s114Card] },
+        };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, s114P,
+          'EFFECT_DISCARD', `Gaara (SS-114): Discarded ${s114Card.name_fr} (cost ${s114Card.chakra}).`,
+          'game.log.effect.discardCard', { card: 'GAARA', id: 'SS-114-R', target: s114Card.name_fr });
+
+        const s114Mi = pendingEffect.sourceMissionIndex;
+        const s114EnemySide: 'player1Characters' | 'player2Characters' = s114P === 'player1' ? 'player2Characters' : 'player1Characters';
+        const s114Mission = newState.activeMissions[s114Mi];
+        const s114Targets = (s114Mission?.[s114EnemySide] ?? [])
+          .filter((c) => {
+            const t = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            return (c.isHidden ? 0 : (t.chakra ?? 0)) <= (s114Card.chakra ?? 0);
+          })
+          .map((c) => c.instanceId);
+        if (s114Targets.length === 0) break;
+
+        const s114UseDefeat = isDuelConditionMet(newState, s114Mi, 'DUEL Rock Lee:');
+        const s114EffId = generateInstanceId();
+        const s114ActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: s114EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: s114Mi, effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ useDefeat: s114UseDefeat }),
+          targetSelectionType: 'SS114_CHOOSE_HIDE',
+          sourcePlayer: s114P, requiresTargetSelection: true,
+          validTargets: s114Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: s114ActId, type: 'SELECT_TARGET' as PendingAction['type'], player: s114P,
+          description: s114UseDefeat
+            ? 'Gaara (SS-114): Defeat an enemy character with cost equal to or lower than the discarded card.'
+            : 'Gaara (SS-114): Hide an enemy character with cost equal to or lower than the discarded card.',
+          descriptionKey: s114UseDefeat ? 'game.effect.desc.ss114ChooseDefeat' : 'game.effect.desc.ss114ChooseHide',
+          options: s114Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: s114EffId,
+        });
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'SS114_CHOOSE_HIDE': {
+        let s114hParsed: { useDefeat?: boolean } = {};
+        try { s114hParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const s114hF = EffectEngine.findCharByInstanceId(newState, targetId);
+        const s114hName = s114hF ? (s114hF.character.stack?.length > 0 ? s114hF.character.stack[s114hF.character.stack.length - 1] : s114hF.character.card).name_fr : '';
+        if (s114hParsed.useDefeat) {
+          newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DEFEAT', 'Gaara (SS-114) DUEL Rock Lee: Defeated the target instead of hiding it.',
+            'game.log.effect.defeat', { card: 'GAARA', id: 'SS-114-R', target: s114hName });
+        } else {
+          newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        }
+        break;
+      }
+
+      case 'SS117_DUEL_MOVE': {
+        const s117F = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!s117F) break;
+        newState = EffectEngine.moveCharToMissionDirectPublic(
+          newState, targetId, pendingEffect.sourceMissionIndex, s117F.player, 'Kankuro', 'SS-117-R', pendingEffect.sourcePlayer,
+        );
+        break;
+      }
+
+      case 'SS119_DUEL_CONFIRM': {
+        const s119P = pendingEffect.sourcePlayer;
+        const s119Deck = [...newState[s119P].deck];
+        if (s119Deck.length > 0) {
+          const s119Card = s119Deck.shift()!;
+          newState = { ...newState, [s119P]: { ...newState[s119P], deck: s119Deck, hand: [...newState[s119P].hand, s119Card] } };
+        }
+        newState.edgeHolder = s119P;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, s119P,
+          'EFFECT', 'Temari (SS-119) DUEL: Drew a card and took the Edge.',
+          'game.log.effect.ss119Duel', { card: 'TEMARI', id: 'SS-119-R' });
+        break;
+      }
+
+      case 'SS099_HIDE': {
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_HIDE', 'Blade of the Thunder God (SS-099): Hid a weaker enemy Jutsu character.',
+          'game.log.effect.ss099Hide', { card: 'BLADE OF THE THUNDER GOD', id: 'SS-099-UC' });
+        break;
+      }
+
+      case 'SS119_MOVE_CHAR':
+      case 'SS085_MOVE_CHAR': {
+        const isFan = pendingEffect.targetSelectionType === 'SS085_MOVE_CHAR';
+        const srcName = isFan ? 'Giant Fan' : 'Temari';
+        const srcId = isFan ? 'SS-085-UC' : 'SS-119-R';
+        const mvF = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!mvF) break;
+        const mvDests: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (i === mvF.missionIndex) continue;
+          if (EffectEngine.validateNameUniquenessForMove(newState, mvF.character, i, mvF.player)) mvDests.push(String(i));
+        }
+        if (mvDests.length === 0) break;
+        if (mvDests.length === 1) {
+          newState = EffectEngine.moveCharToMissionDirectPublic(
+            newState, targetId, parseInt(mvDests[0], 10), mvF.player, srcName, srcId, pendingEffect.sourcePlayer,
+          );
+          break;
+        }
+        const mvEffId = generateInstanceId();
+        const mvActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: mvEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ charInstanceId: targetId, srcName, srcId }),
+          targetSelectionType: 'SS_MOVE_DEST',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: mvDests, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: mvActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Choose a mission to move the character to.',
+          descriptionKey: 'game.effect.desc.chooseMissionMove',
+          options: mvDests, minSelections: 1, maxSelections: 1,
+          sourceEffectId: mvEffId,
+        });
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'SS_MOVE_DEST': {
+        const mvdDest = parseInt(targetId, 10);
+        if (isNaN(mvdDest)) break;
+        let mvdParsed: { charInstanceId?: string; srcName?: string; srcId?: string } = {};
+        try { mvdParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const mvdF = EffectEngine.findCharByInstanceId(newState, mvdParsed.charInstanceId ?? '');
+        if (!mvdF) break;
+        newState = EffectEngine.moveCharToMissionDirectPublic(
+          newState, mvdF.character.instanceId, mvdDest, mvdF.player,
+          mvdParsed.srcName ?? 'Temari', mvdParsed.srcId ?? 'SS-119-R', pendingEffect.sourcePlayer,
+        );
+        break;
+      }
+
+      case 'SS049_FS_CHAR': {
+        const ss049Found = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!ss049Found) break;
+        const ss049Dests: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (i === ss049Found.missionIndex) continue;
+          if (EffectEngine.validateNameUniquenessForMove(newState, ss049Found.character, i, ss049Found.player)) ss049Dests.push(String(i));
+        }
+        if (ss049Dests.length === 0) break;
+        if (ss049Dests.length === 1) {
+          newState = EffectEngine.moveCharToMissionDirectPublic(
+            newState, targetId, parseInt(ss049Dests[0], 10), ss049Found.player, 'Temari', 'SS-049-C', pendingEffect.sourcePlayer,
+          );
+          break;
+        }
+        const ss049EffId = generateInstanceId();
+        const ss049ActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: ss049EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ charInstanceId: targetId }),
+          targetSelectionType: 'SS049_FS_DEST',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: ss049Dests, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        });
+        newState.pendingActions.push({
+          id: ss049ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Temari (049) FIRST STRIKE: Choose a mission to move the character to.',
+          descriptionKey: 'game.effect.desc.chooseMissionMove',
+          options: ss049Dests, minSelections: 1, maxSelections: 1,
+          sourceEffectId: ss049EffId,
+        });
+        break;
+      }
+      case 'SS049_FS_DEST': {
+        const ss049dDest = parseInt(targetId, 10);
+        if (isNaN(ss049dDest)) break;
+        let ss049dParsed: { charInstanceId?: string } = {};
+        try { ss049dParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const ss049dFound = EffectEngine.findCharByInstanceId(newState, ss049dParsed.charInstanceId ?? '');
+        if (!ss049dFound) break;
+        newState = EffectEngine.moveCharToMissionDirectPublic(
+          newState, ss049dFound.character.instanceId, ss049dDest, ss049dFound.player, 'Temari', 'SS-049-C', pendingEffect.sourcePlayer,
+        );
         break;
       }
 
@@ -19915,17 +20252,58 @@ export class EffectEngine {
       { card: effectCardName, id: effectCardId, target: movedCharName, from: String(charResult.missionIndex + 1), to: String(destMissionIndex + 1) },
     );
 
-    
     state = checkNinjaHoundsTrigger(state, movedChar, destMissionIndex, charOwner);
 
-    
-    
+
+
     state = checkChoji018PostMoveTrigger(state, movedChar, destMissionIndex, effectInitiator ?? charOwner, charResult.player);
 
-    
+    state = EffectEngine.checkKankuro117MoveTrigger(state, effectInitiator ?? charOwner, charResult.player);
+
     state = applyRempartTokenRemoval(state);
 
     return state;
+  }
+
+  static resetKankuro117MoveGrant(state: GameState): GameState {
+    if (!(state as GameStateWithMoveGrant)._ss117ChakraGranted) return state;
+    const next = { ...state } as GameStateWithMoveGrant;
+    delete next._ss117ChakraGranted;
+    return next;
+  }
+
+  private static checkKankuro117MoveTrigger(
+    state: GameState,
+    mover: PlayerID,
+    movedCharOwner: PlayerID,
+  ): GameState {
+    if (movedCharOwner === mover) return state;
+    const flags = (state as GameStateWithMoveGrant)._ss117ChakraGranted ?? {};
+    if (flags[mover]) return state;
+
+    const side: 'player1Characters' | 'player2Characters' = mover === 'player1' ? 'player1Characters' : 'player2Characters';
+    let hasKankuro117 = false;
+    for (const mission of state.activeMissions) {
+      for (const char of mission[side]) {
+        if (char.isHidden) continue;
+        if (char.controlledBy !== mover) continue;
+        const top = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        if (String(top.set) === 'SS' && String(top.number) === '117') { hasKankuro117 = true; break; }
+      }
+      if (hasKankuro117) break;
+    }
+    if (!hasKankuro117) return state;
+
+    const ps = { ...state[mover], chakra: state[mover].chakra + 1 };
+    const next = {
+      ...state,
+      [mover]: ps,
+      log: logAction(state.log, state.turn, state.phase, mover, 'EFFECT_CHAKRA',
+        'Kankuro (SS-117): Gained 1 Chakra for moving one or more enemy characters.',
+        'game.log.effect.ss117Chakra', { card: 'KANKURÔ', id: 'SS-117-R' }),
+    } as GameStateWithMoveGrant;
+    next._ss117ChakraGranted = { ...flags, [mover]: true };
+    return next;
   }
 
   

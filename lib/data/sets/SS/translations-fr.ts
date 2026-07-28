@@ -43,4 +43,48 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     "[↯] Un personnage allié active un effet DUEL instantané [↯], en ignorant ses conditions.",
   ],
 
+  "SS-046-UC": [
+    "[↯] Révélez des cartes du dessus de votre deck jusqu’à trouver un personnage Village du Sable. Piochez-le, puis mélangez les cartes révélées dans votre deck.",
+  ],
+  "SS-047-UC": [
+    "[⧗] Vous pouvez jouer ce personnage en amélioration sur un Gaara.",
+    "[↯] Vainquez un personnage ennemi ayant une Puissance de 3 ou moins.",
+  ],
+  "SS-049-C": [
+    "[↯] Déplacez un personnage depuis cette mission.",
+  ],
+  "SS-051-UC": [
+    "[⧗] Les personnages Village du Sable alliés coûtent 1 de moins à jouer n’importe où.",
+  ],
+  "SS-078-UC": [
+    "[↯] Kimimaro : Vainquez un personnage ennemi dont le coût est de 2 ou moins.",
+    "[⧗] Quand vous vainquez un personnage ennemi non caché, vous pouvez payer 1 Chakra pour piocher 1 carte.",
+  ],
+  "SS-114-R": [
+    "[↯] Défaussez un Gaara de votre main. Cachez un personnage ennemi dans cette mission dont le coût est inférieur ou égal au coût de la carte défaussée.",
+    "Rock Lee, effet MAIN : À la place, vainquez-le.",
+  ],
+  "SS-117-R": [
+    "[⧗] Chaque fois que vous déplacez un ou plusieurs personnages ennemis, gagnez 1 Chakra.",
+    "[↯] Shino Aburame : Déplacez un personnage ennemi vers cette mission.",
+  ],
+  "SS-119-R": [
+    "[↯] Déplacez un personnage ennemi depuis cette mission.",
+    "[↯] Shikamaru Nara : Piochez une carte et gagnez l’Edge.",
+  ],
+  "SS-085-UC": [
+    "Attachez à un personnage Village du Sable allié.",
+    "[↯] Déplacez depuis cette mission un personnage ennemi ayant moins de Puissance que ce personnage.",
+  ],
+  "SS-089-UC": [
+    "Attachez à un personnage allié non caché.",
+    "[⧗] Quand vous jouez un Kankurô, vous pouvez déplacer cet attachement sur un personnage allié.",
+  ],
+  "SS-092-C": [
+    "Attachez à un personnage allié non caché. Ce personnage est également considéré comme un personnage Village du Sable.",
+  ],
+  "SS-099-UC": [
+    "Attachez à un personnage allié non caché.",
+    "[↯] Cachez dans cette mission un personnage Jutsu ennemi ayant moins de Puissance que ce personnage.",
+  ],
 };

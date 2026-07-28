@@ -1,4 +1,5 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
+import { characterHasGroup } from '@/lib/effects/groupUtils';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
@@ -14,8 +15,7 @@ function handleRasa083Score(ctx: EffectContext): EffectResult {
   const hasOtherSandVillage = friendlyChars.some((char) => {
     if (char.instanceId === sourceCard.instanceId) return false;
     if (char.isHidden) return false;
-    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-    return topCard.group === 'Sand Village';
+    return characterHasGroup(char, 'Sand Village');
   });
 
   if (!hasOtherSandVillage) {

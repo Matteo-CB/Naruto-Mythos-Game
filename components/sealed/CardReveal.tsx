@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { isLandscapeCard } from '@/lib/cards/orientation';
 import { getRarityLabel, getCardName } from '@/lib/utils/cardLocale';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
@@ -57,7 +58,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
     ? { color: '#a8e6ff', intensity: '0 0 14px #a8e6ff, 0 0 28px #c9a8ff' }
     : getRarityGlow(card.rarity);
   const highRarity = isHighRarity(card.rarity);
-  const isMission = card.card_type === 'mission';
+  const isMission = isLandscapeCard(card);
   const cardWidth = isMission ? '168px' : '120px';
   const cardHeight = isMission ? '120px' : '168px';
 
@@ -166,7 +167,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             </div>
           )}
 
-          {isFoilHolo && isFlipped && <HoloFoilOverlay intensity="strong" />}
+          {isFoilHolo && isFlipped && <HoloFoilOverlay intensity="strong" imageUrl={imagePath} />}
           {card.isHolo && !isFoilHolo && !card.isTemporaryVariant && (
             <motion.div
               className="absolute inset-0 pointer-events-none"
@@ -179,7 +180,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             />
           )}
           {card.isTemporaryVariant && isFlipped && (
-            <VariantHoloOverlay intensity="strong" />
+            <VariantHoloOverlay intensity="strong" imageUrl={imagePath} />
           )}
         </div>
       </motion.div>

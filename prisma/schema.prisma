@@ -70,6 +70,8 @@ model User {
   chatIntroSeenAt         DateTime?
   usernameResetRequired   Boolean              @default(false)
   boardPalette            Json?
+  deckListLimit           Int                  @default(20)
+  favoriteDeckIds         String[]             @default([])
 
   @@index([elo])
   @@index([createdAt])

@@ -26,7 +26,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "POWERUP 2 another friendly Leaf Village character.",
+          "description": "[↯] POWERUP 2 another friendly Leaf Village character.",
           "description_fr": ""
         }
       ],
@@ -62,7 +62,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Play a Leaf Village character anywhere paying 1 less.",
+          "description": "[↯] Play a Leaf Village character anywhere paying 1 less.",
           "description_fr": ""
         },
         {
@@ -145,7 +145,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Choose one character in your discard pile and put them into your hand.",
+          "description": "[↯] Choose one character in your discard pile and put them into your hand.",
           "description_fr": "Choisissez un personnage dans votre défausse et ajoutez-le à votre main."
         }
       ],
@@ -215,12 +215,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Move an enemy character with Power 3 or less in play.",
+          "description": "[↯] Move an enemy character with Power 3 or less in play.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Gain 2 Chakra.",
+          "description": "[↯] Gain 2 Chakra.",
           "description_fr": ""
         }
       ],
@@ -256,7 +256,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Play a Summon character anywhere, paying 1 less.",
+          "description": "[↯] Play a Summon character anywhere, paying 1 less.",
           "description_fr": ""
         }
       ],
@@ -293,12 +293,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Play a Summon character anywhere, paying 2 less.",
+          "description": "[↯] Play a Summon character anywhere, paying 2 less.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Hide an enemy character with cost 3 or less in this mission.",
+          "description": "[↯] Hide an enemy character with cost 3 or less in this mission.",
           "description_fr": ""
         }
       ],
@@ -401,7 +401,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "If there's another Team 7 character in this mission, draw a card.",
+          "description": "[↯] If there's another Team 7 character in this mission, draw a card.",
           "description_fr": ""
         }
       ],
@@ -442,7 +442,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Draw 1 card. If you do so, you must discard 1 card.",
+          "description": "[↯] Draw 1 card. If you do so, you must discard 1 card.",
           "description_fr": ""
         }
       ],
@@ -592,7 +592,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Copy a non-upgrade instant effect ([↯]) of an enemy character with cost 4 or less in play.",
+          "description": "[↯] Copy a non-upgrade instant effect ([↯]) of an enemy character with cost 4 or less in play.",
           "description_fr": ""
         },
         {
@@ -634,7 +634,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Powerup 3",
+          "description": "[↯] Powerup 3",
           "description_fr": ""
         }
       ],
@@ -676,7 +676,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Move this character.",
+          "description": "[↯] Move this character.",
           "description_fr": ""
         }
       ],
@@ -712,7 +712,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "If there's another Team 10 character in this mission, POWERUP 1.",
+          "description": "[↯] If there's another Team 10 character in this mission, POWERUP 1.",
           "description_fr": ""
         }
       ],
@@ -749,7 +749,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Take control of an enemy character with cost 2 or less in this mission.",
+          "description": "[↯] Take control of an enemy character with cost 2 or less in this mission.",
           "description_fr": ""
         },
         {
@@ -790,7 +790,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "If you have the Edge, draw a card.",
+          "description": "[↯] If you have the Edge, draw a card.",
           "description_fr": ""
         }
       ],
@@ -863,7 +863,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Move another Team 10 character from this mission.",
+          "description": "[↯] Move another Team 10 character from this mission.",
           "description_fr": ""
         }
       ],
@@ -972,12 +972,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide the non-hidden enemy character with the lowest cost in this mission.",
+          "description": "[↯] Hide the non-hidden enemy character with the lowest cost in this mission.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Look at the 3 top cards of your deck, reveal and draw any Akamaru characters, then put back the other cards.",
+          "description": "[↯] Look at the 3 top cards of your deck, reveal and draw any Akamaru characters, then put back the other cards.",
           "description_fr": ""
         }
       ],
@@ -1097,7 +1097,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Hide the non-hidden enemy character with the lowest cost in this mission.",
+          "description": "[↯] Hide the non-hidden enemy character with the lowest cost in this mission.",
           "description_fr": ""
         }
       ],
@@ -1134,7 +1134,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Remove up to 2 Power tokens from an enemy character in play.",
+          "description": "[↯] Remove up to 2 Power tokens from an enemy character in play.",
           "description_fr": ""
         }
       ],
@@ -1207,7 +1207,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Each player draws a card.",
+          "description": "[↯] Each player draws a card.",
           "description_fr": ""
         }
       ],
@@ -1249,7 +1249,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Move this character.",
+          "description": "[↯] Move this character.",
           "description_fr": ""
         }
       ],
@@ -1327,7 +1327,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Defeat an enemy character with Power 1 or less in this mission.",
+          "description": "[↯] Defeat an enemy character with Power 1 or less in this mission.",
           "description_fr": ""
         }
       ],
@@ -1364,7 +1364,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Remove up to 2 Power tokens from an enemy character in play.",
+          "description": "[↯] Remove up to 2 Power tokens from an enemy character in play.",
           "description_fr": ""
         }
       ],
@@ -1406,7 +1406,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Remove all Power tokens from an enemy character in this mission.",
+          "description": "[↯] Remove all Power tokens from an enemy character in this mission.",
           "description_fr": ""
         }
       ],
@@ -1484,7 +1484,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP 2.",
+          "description": "[↯] POWERUP 2.",
           "description_fr": ""
         }
       ],
@@ -1556,12 +1556,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Defeat a hidden character in this mission.",
+          "description": "[↯] Defeat a hidden character in this mission.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP 1 another Leaf Village character in play.",
+          "description": "[↯] POWERUP 1 another Leaf Village character in play.",
           "description_fr": ""
         }
       ],
@@ -1639,7 +1639,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP 3.",
+          "description": "[↯] POWERUP 3.",
           "description_fr": ""
         }
       ],
@@ -1712,7 +1712,7 @@
       "effects": [
         {
           "type": "AMBUSH",
-          "description": "Defeat a hidden enemy character in play.",
+          "description": "[↯] Defeat a hidden enemy character in play.",
           "description_fr": ""
         }
       ],
@@ -1748,7 +1748,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "If there is a friendly non-hidden character with less Power than this character in this mission, draw a card.",
+          "description": "[↯] If there is a friendly non-hidden character with less Power than this character in this mission, draw a card.",
           "description_fr": ""
         }
       ],
@@ -1782,7 +1782,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Move a Naruto Uzumaki character in play.",
+          "description": "[↯] Move a Naruto Uzumaki character in play.",
           "description_fr": ""
         }
       ],
@@ -1932,7 +1932,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Defeat a hidden enemy character in play.",
+          "description": "[↯] Defeat a hidden enemy character in play.",
           "description_fr": ""
         }
       ],
@@ -1968,7 +1968,7 @@
       "effects": [
         {
           "type": "AMBUSH",
-          "description": "Draw the top card of the opponent's deck and put it hidden in any mission under your control.",
+          "description": "[↯] Draw the top card of the opponent's deck and put it hidden in any mission under your control.",
           "description_fr": ""
         }
       ],
@@ -2004,12 +2004,12 @@
       "effects": [
         {
           "type": "UPGRADE",
-          "description": "Discard a card.",
+          "description": "[↯] Discard a card.",
           "description_fr": "Defaussez une carte."
         },
         {
           "type": "MAIN",
-          "description": "Play a character from your discard pile anywhere paying 3 less.",
+          "description": "[↯] Play a character from your discard pile anywhere paying 3 less.",
           "description_fr": "Jouez un personnage de votre defausse n'importe ou en payant 3 de moins."
         }
       ],
@@ -2045,12 +2045,12 @@
       "effects": [
         {
           "type": "UPGRADE",
-          "description": "POWERUP 1.",
+          "description": "[↯] POWERUP 1.",
           "description_fr": ""
         },
         {
           "type": "MAIN",
-          "description": "Hide all other characters in this mission with less Power than this character.",
+          "description": "[↯] Hide all other characters in this mission with less Power than this character.",
           "description_fr": ""
         }
       ],
@@ -2127,7 +2127,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Discard a card to hide a character in play with cost 4 or less.",
+          "description": "[↯] Discard a card to hide a character in play with cost 4 or less.",
           "description_fr": ""
         }
       ],
@@ -2163,7 +2163,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "POWERUP X. X is the number of missions where you have at least one friendly Sound Four character.",
+          "description": "[↯] POWERUP X. X is the number of missions where you have at least one friendly Sound Four character.",
           "description_fr": ""
         }
       ],
@@ -2200,7 +2200,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "POWERUP 1 to all other friendly Sound Four characters in this mission.",
+          "description": "[↯] POWERUP 1 to all other friendly Sound Four characters in this mission.",
           "description_fr": ""
         },
         {
@@ -2241,7 +2241,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Move X friendly character(s). X is the number of missions where you have at least one friendly Sound Four character.",
+          "description": "[↯] Move X friendly character(s). X is the number of missions where you have at least one friendly Sound Four character.",
           "description_fr": ""
         }
       ],
@@ -2278,7 +2278,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Move a character from this mission.",
+          "description": "[↯] Move a character from this mission.",
           "description_fr": ""
         },
         {
@@ -2319,7 +2319,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Draw X card(s). X is the number of missions where you have at least one friendly Sound Four character.",
+          "description": "[↯] Draw X card(s). X is the number of missions where you have at least one friendly Sound Four character.",
           "description_fr": ""
         }
       ],
@@ -2466,12 +2466,12 @@
       "effects": [
         {
           "type": "AMBUSH",
-          "description": "POWERUP 2 a friendly Sound Village character in play.",
+          "description": "[↯] POWERUP 2 a friendly Sound Village character in play.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Look at the 3 top cards of your deck, reveal and draw any Summon characters, then put back the other cards.",
+          "description": "[↯] Look at the 3 top cards of your deck, reveal and draw any Summon characters, then put back the other cards.",
           "description_fr": ""
         }
       ],
@@ -2507,7 +2507,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "If you have a Sound Four character in this mission, steal 1 Chakra from the opponent.",
+          "description": "[↯] If you have a Sound Four character in this mission, steal 1 Chakra from the opponent.",
           "description_fr": ""
         },
         {
@@ -2589,7 +2589,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Look at a hidden character in play.",
+          "description": "[↯] Look at a hidden character in play.",
           "description_fr": ""
         },
         {
@@ -2631,12 +2631,12 @@
       "effects": [
         {
           "type": "UPGRADE",
-          "description": "Look at a hidden character in play.",
+          "description": "[↯] Look at a hidden character in play.",
           "description_fr": ""
         },
         {
           "type": "MAIN",
-          "description": "Choose a hidden enemy character in play. Opponent must either play them paying 2 more, or defeat them.",
+          "description": "[↯] Choose a hidden enemy character in play. Opponent must either play them paying 2 more, or defeat them.",
           "description_fr": ""
         }
       ],
@@ -2672,7 +2672,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Opponent gains 1 Chakra.",
+          "description": "[↯] Opponent gains 1 Chakra.",
           "description_fr": ""
         }
       ],
@@ -2708,12 +2708,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "If you have less non-hidden characters than the opponent in this mission, move an enemy character from this mission.",
+          "description": "[↯] If you have less non-hidden characters than the opponent in this mission, move an enemy character from this mission.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP 2.",
+          "description": "[↯] POWERUP 2.",
           "description_fr": ""
         }
       ],
@@ -2749,7 +2749,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Opponent draws a card.",
+          "description": "[↯] Opponent draws a card.",
           "description_fr": ""
         }
       ],
@@ -2786,12 +2786,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Discard a card to hide an enemy character with Power 4 or less.",
+          "description": "[↯] Discard a card to hide an enemy character with Power 4 or less.",
           "description_fr": "Défaussez une carte pour cacher un personnage ennemi avec une Puissance de 4 ou moins."
         },
         {
           "type": "UPGRADE",
-          "description": "Put the top card of your deck as a hidden character in this mission.",
+          "description": "[↯] Put the top card of your deck as a hidden character in this mission.",
           "description_fr": "Placez la carte du dessus de votre deck comme personnage caché dans cette mission."
         }
       ],
@@ -2827,7 +2827,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "POWERUP X where X is the number of friendly hidden characters in this mission.",
+          "description": "[↯] POWERUP X where X is the number of friendly hidden characters in this mission.",
           "description_fr": ""
         }
       ],
@@ -2988,7 +2988,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Play a friendly character while hidden, paying 1 less.",
+          "description": "[↯] Play a friendly character while hidden, paying 1 less.",
           "description_fr": ""
         }
       ],
@@ -3061,12 +3061,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Move another friendly Sand Village character.",
+          "description": "[↯] Move another friendly Sand Village character.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Move this character.",
+          "description": "[↯] Move this character.",
           "description_fr": ""
         }
       ],
@@ -3138,12 +3138,12 @@
       "effects": [
         {
           "type": "SCORE",
-          "description": "[!] Defeat a hidden character in play.",
+          "description": "[↯] [!] Defeat a hidden character in play.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Defeat an enemy character with Power 1 or less in this mission.",
+          "description": "[↯] Defeat an enemy character with Power 1 or less in this mission.",
           "description_fr": ""
         }
       ],
@@ -3314,7 +3314,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "If there's only one non-hidden enemy character in this mission, hide them.",
+          "description": "[↯] If there's only one non-hidden enemy character in this mission, hide them.",
           "description_fr": ""
         },
         {
@@ -3355,7 +3355,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Draw 1 card. If you do, you must put 1 card from your hand on top of your deck.",
+          "description": "[↯] Draw 1 card. If you do, you must put 1 card from your hand on top of your deck.",
           "description_fr": ""
         }
       ],
@@ -3392,7 +3392,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Discard the top card of your opponent's deck. POWERUP X where X is the cost of the discarded card.",
+          "description": "[↯] Discard the top card of your opponent's deck. POWERUP X where X is the cost of the discarded card.",
           "description_fr": ""
         },
         {
@@ -3470,7 +3470,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Look at the opponent's hand.",
+          "description": "[↯] Look at the opponent's hand.",
           "description_fr": ""
         },
         {
@@ -3548,7 +3548,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Remove up to 2 Power tokens from an enemy character in play and put them on this character.",
+          "description": "[↯] Remove up to 2 Power tokens from an enemy character in play and put them on this character.",
           "description_fr": ""
         },
         {
@@ -3625,7 +3625,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "If there's a friendly character in this mission, draw a card.",
+          "description": "[↯] If there's a friendly character in this mission, draw a card.",
           "description_fr": ""
         },
         {
@@ -3743,7 +3743,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "If there is a friendly Tsunade in play, POWERUP 2.",
+          "description": "[↯] If there is a friendly Tsunade in play, POWERUP 2.",
           "description_fr": ""
         },
         {
@@ -3969,12 +3969,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.",
+          "description": "[↯] Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP X.",
+          "description": "[↯] POWERUP X.",
           "description_fr": ""
         }
       ],
@@ -4011,12 +4011,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Play a Summon character anywhere, paying 3 less.",
+          "description": "[↯] Play a Summon character anywhere, paying 3 less.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Move any enemy character from this mission.",
+          "description": "[↯] Move any enemy character from this mission.",
           "description_fr": ""
         }
       ],
@@ -4053,7 +4053,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Discard the top card of an upgraded enemy character in play.",
+          "description": "[↯] Discard the top card of an upgraded enemy character in play.",
           "description_fr": ""
         },
         {
@@ -4095,12 +4095,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "You must move all other non-hidden friendly characters from this mission, if able.",
+          "description": "[↯] You must move all other non-hidden friendly characters from this mission, if able.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP X where X is the number of the characters moved this way.",
+          "description": "[↯] POWERUP X where X is the number of the characters moved this way.",
           "description_fr": ""
         }
       ],
@@ -4137,7 +4137,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description": "[↯] Hide an enemy character with Power 3 or less in this mission.",
           "description_fr": ""
         },
         {
@@ -4178,7 +4178,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost.",
+          "description": "[↯] Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost.",
           "description_fr": ""
         },
         {
@@ -4220,7 +4220,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "If there are 2 or more enemy characters in this mission, move the weakest non-hidden enemy character.",
+          "description": "[↯] If there are 2 or more enemy characters in this mission, move the weakest non-hidden enemy character.",
           "description_fr": ""
         },
         {
@@ -4267,7 +4267,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description": "[↯] Hide an enemy character with Power 3 or less in this mission.",
           "description_fr": ""
         }
       ],
@@ -4303,7 +4303,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Discard a card from your hand. POWERUP X where X is the cost of the discarded card in this way.",
+          "description": "[↯] Discard a card from your hand. POWERUP X where X is the cost of the discarded card in this way.",
           "description_fr": ""
         },
         {
@@ -4345,7 +4345,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide a friendly Akamaru character. If you do, hide another character in this mission.",
+          "description": "[↯] Hide a friendly Akamaru character. If you do, hide another character in this mission.",
           "description_fr": ""
         },
         {
@@ -4387,12 +4387,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "POWERUP 2. POWERUP 1 another character.",
+          "description": "[↯] POWERUP 2. POWERUP 1 another character.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Remove all Power tokens from an enemy character in play.",
+          "description": "[↯] Remove all Power tokens from an enemy character in play.",
           "description_fr": ""
         }
       ],
@@ -4434,7 +4434,7 @@
         },
         {
           "type": "AMBUSH",
-          "description": "Move one friendly character in this mission.",
+          "description": "[↯] Move one friendly character in this mission.",
           "description_fr": "Déplacez un personnage allié d'une autre mission vers cette mission."
         }
       ],
@@ -4471,12 +4471,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Defeat a character with exactly Power 4 in this mission.",
+          "description": "[↯] Defeat a character with exactly Power 4 in this mission.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Defeat a character with exactly Power 6 in this mission.",
+          "description": "[↯] Defeat a character with exactly Power 6 in this mission.",
           "description_fr": ""
         }
       ],
@@ -4518,7 +4518,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Discard the top card of your deck: POWERUP X where X is the cost of the discarded card.",
+          "description": "[↯] Discard the top card of your deck: POWERUP X where X is the cost of the discarded card.",
           "description_fr": ""
         }
       ],
@@ -4592,12 +4592,12 @@
       "effects": [
         {
           "type": "UPGRADE",
-          "description": "Move any character in play.",
+          "description": "[↯] Move any character in play.",
           "description_fr": ""
         },
         {
           "type": "MAIN",
-          "description": "Defeat an enemy character with Power 3 or less in this mission.",
+          "description": "[↯] Defeat an enemy character with Power 3 or less in this mission.",
           "description_fr": ""
         }
       ],
@@ -4634,7 +4634,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Defeat up to 1 enemy character with Power 1 or less in every mission.",
+          "description": "[↯] Defeat up to 1 enemy character with Power 1 or less in every mission.",
           "description_fr": ""
         },
         {
@@ -4676,12 +4676,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Move any friendly character in play.",
+          "description": "[↯] Move any friendly character in play.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Move any character in play.",
+          "description": "[↯] Move any character in play.",
           "description_fr": ""
         }
       ],
@@ -4718,12 +4718,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "POWERUP X where X is the number of characters in this mission.",
+          "description": "[↯] POWERUP X where X is the number of characters in this mission.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Defeat an enemy character with Power 1 or less in this mission.",
+          "description": "[↯] Defeat an enemy character with Power 1 or less in this mission.",
           "description_fr": ""
         }
       ],
@@ -4759,12 +4759,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "At the end of the round, you must defeat this character if you have no cards in hand.",
+          "description": "[⧗] At the end of the round, you must defeat this character if you have no cards in hand.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Discard a card to defeat a character in play with cost 5 or less.",
+          "description": "[↯] Discard a card to defeat a character in play with cost 5 or less.",
           "description_fr": ""
         }
       ],
@@ -4801,7 +4801,7 @@
       "effects": [
         {
           "type": "AMBUSH",
-          "description": "Defeat an enemy character with Power 3 or less in another mission.",
+          "description": "[↯] Defeat an enemy character with Power 3 or less in another mission.",
           "description_fr": ""
         },
         {
@@ -4848,7 +4848,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Play a Sound Village character, paying 2 less.",
+          "description": "[↯] Play a Sound Village character, paying 2 less.",
           "description_fr": ""
         }
       ],
@@ -4884,12 +4884,12 @@
       "effects": [
         {
           "type": "SCORE",
-          "description": "Defeat the weakest non-hidden enemy character in play.",
+          "description": "[↯] Defeat the weakest non-hidden enemy character in play.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP 3.",
+          "description": "[↯] POWERUP 3.",
           "description_fr": ""
         }
       ],
@@ -4931,7 +4931,7 @@
         },
         {
           "type": "AMBUSH",
-          "description": "Hide an enemy character in this mission with Power 5 or less.",
+          "description": "[↯] Hide an enemy character in this mission with Power 5 or less.",
           "description_fr": "Cachez un personnage ennemi dans cette mission avec une Puissance de 5 ou moins."
         }
       ],
@@ -4973,7 +4973,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Move a friendly character in play.",
+          "description": "[↯] Move a friendly character in play.",
           "description_fr": ""
         }
       ],
@@ -5056,7 +5056,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Choose a mission and defeat all hidden enemy characters assigned to it.",
+          "description": "[↯] Choose a mission and defeat all hidden enemy characters assigned to it.",
           "description_fr": ""
         }
       ],
@@ -5093,7 +5093,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "POWERUP 1 every friendly Leaf Village character in play.",
+          "description": "[↯] POWERUP 1 every friendly Leaf Village character in play.",
           "description_fr": ""
         }
       ],
@@ -5130,12 +5130,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Play a Summon character anywhere, paying 5 less.",
+          "description": "[↯] Play a Summon character anywhere, paying 5 less.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "The opponent must choose characters to be defeated until they only have up to 2 assigned in this mission.",
+          "description": "[↯] The opponent must choose characters to be defeated until they only have up to 2 assigned in this mission.",
           "description_fr": ""
         }
       ],
@@ -5172,7 +5172,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.",
+          "description": "[↯] Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.",
           "description_fr": ""
         },
         {
@@ -5217,7 +5217,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Hide any number of non-hidden characters in play with total Power of 6 or less."
+          "description": "[↯] Hide any number of non-hidden characters in play with total Power of 6 or less."
         }
       ],
       "image_url": "",
@@ -5252,7 +5252,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.",
+          "description": "[↯] Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.",
           "description_fr": ""
         },
         {
@@ -5293,7 +5293,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.",
+          "description": "[↯] Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.",
           "description_fr": ""
         },
         {
@@ -5340,7 +5340,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.",
+          "description": "[↯] You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.",
           "description_fr": ""
         }
       ],
@@ -5377,12 +5377,12 @@
       "effects": [
         {
           "type": "UPGRADE",
-          "description": "Move this character.",
+          "description": "[↯] Move this character.",
           "description_fr": ""
         },
         {
           "type": "MAIN",
-          "description": "Hide an upgraded character in this mission.",
+          "description": "[↯] Hide an upgraded character in this mission.",
           "description_fr": ""
         }
       ],
@@ -5424,7 +5424,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Gain 2 Mission points if the character you upgraded from had Power 6 or more.",
+          "description": "[↯] Gain 2 Mission points if the character you upgraded from had Power 6 or more.",
           "description_fr": ""
         }
       ],
@@ -5461,7 +5461,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Defeat an enemy character with a cost less than the number of friendly hidden characters in play.",
+          "description": "[↯] Defeat an enemy character with a cost less than the number of friendly hidden characters in play.",
           "description_fr": ""
         },
         {
@@ -5503,7 +5503,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "The opponent discards their entire hand, then draws the same number of cards discarded in this way.",
+          "description": "[↯] The opponent discards their entire hand, then draws the same number of cards discarded in this way.",
           "description_fr": ""
         },
         {
@@ -5544,7 +5544,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Discard a card. If you do, hide an enemy character with Power 4 or less in this mission.",
+          "description": "[↯] Discard a card. If you do, hide an enemy character with Power 4 or less in this mission.",
           "description_fr": ""
         }
       ],
@@ -5580,7 +5580,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Discard a card. If you do, POWERUP X+1 where X is the number of enemy characters in this mission.",
+          "description": "[↯] Discard a card. If you do, POWERUP X+1 where X is the number of enemy characters in this mission.",
           "description_fr": ""
         }
       ],
@@ -5616,7 +5616,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Move a friendly character to this mission.",
+          "description": "[↯] Move a friendly character to this mission.",
           "description_fr": ""
         },
         {
@@ -5657,7 +5657,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Steal 1 Chakra from the opponent pool.",
+          "description": "[↯] Steal 1 Chakra from the opponent pool.",
           "description_fr": ""
         }
       ],
@@ -6197,7 +6197,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.",
+          "description": "[↯] Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.",
           "description_fr": ""
         },
         {
@@ -6239,7 +6239,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide a friendly Akamaru character. If you do, hide another character in this mission."
+          "description": "[↯] Hide a friendly Akamaru character. If you do, hide another character in this mission."
         },
         {
           "type": "UPGRADE",
@@ -6284,7 +6284,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Hide an enemy character with Power 3 or less in this mission."
+          "description": "[↯] Hide an enemy character with Power 3 or less in this mission."
         }
       ],
       "image_url": "",
@@ -6325,7 +6325,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Discard the top card of your deck: POWERUP X where X is the cost of the discarded card."
+          "description": "[↯] Discard the top card of your deck: POWERUP X where X is the cost of the discarded card."
         }
       ],
       "image_url": "",
@@ -6366,7 +6366,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Move a friendly character in play."
+          "description": "[↯] Move a friendly character in play."
         }
       ],
       "image_url": "/images/cards/KS/mythos_v/KS-128-MV.webp",
@@ -6403,7 +6403,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Defeat up to 1 enemy character with Power 1 or less in every mission."
+          "description": "[↯] Defeat up to 1 enemy character with Power 1 or less in every mission."
         },
         {
           "type": "UPGRADE",
@@ -6444,12 +6444,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "You must move all other non-hidden friendly characters from this mission, if able.",
+          "description": "[↯] You must move all other non-hidden friendly characters from this mission, if able.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP X where X is the number of the characters moved this way.",
+          "description": "[↯] POWERUP X where X is the number of the characters moved this way.",
           "description_fr": ""
         }
       ],
@@ -6486,7 +6486,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description": "[↯] Hide an enemy character with Power 3 or less in this mission.",
           "description_fr": ""
         },
         {
@@ -6528,7 +6528,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description": "[↯] Hide an enemy character with Power 3 or less in this mission.",
           "description_fr": ""
         },
         {
@@ -6569,12 +6569,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.",
+          "description": "[↯] Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP X.",
+          "description": "[↯] POWERUP X.",
           "description_fr": ""
         }
       ],
@@ -6612,12 +6612,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Play a Summon character anywhere, paying 3 less.",
+          "description": "[↯] Play a Summon character anywhere, paying 3 less.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Move any enemy character from this mission.",
+          "description": "[↯] Move any enemy character from this mission.",
           "description_fr": ""
         }
       ],
@@ -6655,7 +6655,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Discard the top card of an upgraded enemy character in play.",
+          "description": "[↯] Discard the top card of an upgraded enemy character in play.",
           "description_fr": ""
         },
         {
@@ -6698,12 +6698,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "You must move all other non-hidden friendly characters from this mission, if able.",
+          "description": "[↯] You must move all other non-hidden friendly characters from this mission, if able.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP X where X is the number of the characters moved this way.",
+          "description": "[↯] POWERUP X where X is the number of the characters moved this way.",
           "description_fr": ""
         }
       ],
@@ -6741,7 +6741,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description": "[↯] Hide an enemy character with Power 3 or less in this mission.",
           "description_fr": ""
         },
         {
@@ -6783,7 +6783,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost.",
+          "description": "[↯] Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost.",
           "description_fr": ""
         },
         {
@@ -6826,7 +6826,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "If there are 2 or more enemy characters in this mission, move the weakest non-hidden enemy character.",
+          "description": "[↯] If there are 2 or more enemy characters in this mission, move the weakest non-hidden enemy character.",
           "description_fr": ""
         },
         {
@@ -6874,7 +6874,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description": "[↯] Hide an enemy character with Power 3 or less in this mission.",
           "description_fr": ""
         }
       ],
@@ -6911,7 +6911,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Discard a card from your hand. POWERUP X where X is the cost of the discarded card in this way.",
+          "description": "[↯] Discard a card from your hand. POWERUP X where X is the cost of the discarded card in this way.",
           "description_fr": ""
         },
         {
@@ -6954,7 +6954,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide a friendly Akamaru character. If you do, hide another character in this mission.",
+          "description": "[↯] Hide a friendly Akamaru character. If you do, hide another character in this mission.",
           "description_fr": ""
         },
         {
@@ -6997,12 +6997,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "POWERUP 2. POWERUP 1 another character.",
+          "description": "[↯] POWERUP 2. POWERUP 1 another character.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Remove all Power tokens from an enemy character in play.",
+          "description": "[↯] Remove all Power tokens from an enemy character in play.",
           "description_fr": ""
         }
       ],
@@ -7045,7 +7045,7 @@
         },
         {
           "type": "AMBUSH",
-          "description": "Move one friendly character in this mission.",
+          "description": "[↯] Move one friendly character in this mission.",
           "description_fr": "Déplacez un personnage allié d'une autre mission vers cette mission."
         }
       ],
@@ -7083,12 +7083,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Defeat a character with exactly Power 4 in this mission.",
+          "description": "[↯] Defeat a character with exactly Power 4 in this mission.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Defeat a character with exactly Power 6 in this mission.",
+          "description": "[↯] Defeat a character with exactly Power 6 in this mission.",
           "description_fr": ""
         }
       ],
@@ -7131,7 +7131,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Discard the top card of your deck: POWERUP X where X is the cost of the discarded card.",
+          "description": "[↯] Discard the top card of your deck: POWERUP X where X is the cost of the discarded card.",
           "description_fr": ""
         }
       ],
@@ -7207,12 +7207,12 @@
       "effects": [
         {
           "type": "UPGRADE",
-          "description": "Move any character in play.",
+          "description": "[↯] Move any character in play.",
           "description_fr": ""
         },
         {
           "type": "MAIN",
-          "description": "Defeat an enemy character with Power 3 or less in this mission.",
+          "description": "[↯] Defeat an enemy character with Power 3 or less in this mission.",
           "description_fr": ""
         }
       ],
@@ -7250,7 +7250,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Defeat up to 1 enemy character with Power 1 or less in every mission.",
+          "description": "[↯] Defeat up to 1 enemy character with Power 1 or less in every mission.",
           "description_fr": ""
         },
         {
@@ -7293,12 +7293,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Move any friendly character in play.",
+          "description": "[↯] Move any friendly character in play.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Move any character in play.",
+          "description": "[↯] Move any character in play.",
           "description_fr": ""
         }
       ],
@@ -7336,12 +7336,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "POWERUP X where X is the number of characters in this mission.",
+          "description": "[↯] POWERUP X where X is the number of characters in this mission.",
           "description_fr": "POWERUP X ou X est le nombre de personnages dans cette mission."
         },
         {
           "type": "UPGRADE",
-          "description": "Defeat an enemy character with Power 1 or less in this mission.",
+          "description": "[↯] Defeat an enemy character with Power 1 or less in this mission.",
           "description_fr": "Vaincre un personnage ennemi avec une Puissance de 1 ou moins dans cette mission."
         }
       ],
@@ -7378,12 +7378,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "At the end of the round, you must defeat this character if you have no cards in hand.",
+          "description": "[⧗] At the end of the round, you must defeat this character if you have no cards in hand.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Discard a card to defeat a character in play with cost 5 or less.",
+          "description": "[↯] Discard a card to defeat a character in play with cost 5 or less.",
           "description_fr": ""
         }
       ],
@@ -7421,7 +7421,7 @@
       "effects": [
         {
           "type": "AMBUSH",
-          "description": "Defeat an enemy character with Power 3 or less in another mission.",
+          "description": "[↯] Defeat an enemy character with Power 3 or less in another mission.",
           "description_fr": "Vaincre un personnage ennemi avec une Puissance de 3 ou moins dans une autre mission."
         },
         {
@@ -7469,7 +7469,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Play a Sound Village character, paying 2 less.",
+          "description": "[↯] Play a Sound Village character, paying 2 less.",
           "description_fr": ""
         }
       ],
@@ -7506,12 +7506,12 @@
       "effects": [
         {
           "type": "SCORE",
-          "description": "Defeat the weakest non-hidden enemy character in play.",
+          "description": "[↯] Defeat the weakest non-hidden enemy character in play.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP 3.",
+          "description": "[↯] POWERUP 3.",
           "description_fr": ""
         }
       ],
@@ -7554,7 +7554,7 @@
         },
         {
           "type": "AMBUSH",
-          "description": "Hide an enemy character in this mission with Power 5 or less.",
+          "description": "[↯] Hide an enemy character in this mission with Power 5 or less.",
           "description_fr": "Cachez un personnage ennemi dans cette mission avec une Puissance de 5 ou moins."
         }
       ],
@@ -7597,7 +7597,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Move a friendly character in play.",
+          "description": "[↯] Move a friendly character in play.",
           "description_fr": ""
         }
       ],
@@ -7682,7 +7682,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Choose a mission and defeat all hidden enemy characters assigned to it.",
+          "description": "[↯] Choose a mission and defeat all hidden enemy characters assigned to it.",
           "description_fr": ""
         }
       ],
@@ -7720,7 +7720,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "POWERUP 1 every friendly Leaf Village character in play.",
+          "description": "[↯] POWERUP 1 every friendly Leaf Village character in play.",
           "description_fr": ""
         }
       ],
@@ -7757,7 +7757,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.",
+          "description": "[↯] Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.",
           "description_fr": ""
         },
         {
@@ -7799,7 +7799,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play."
+          "description": "[↯] Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play."
         },
         {
           "type": "UPGRADE",
@@ -7844,7 +7844,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.",
+          "description": "[↯] You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.",
           "description_fr": ""
         }
       ],
@@ -7881,12 +7881,12 @@
       "effects": [
         {
           "type": "UPGRADE",
-          "description": "Move this character.",
+          "description": "[↯] Move this character.",
           "description_fr": ""
         },
         {
           "type": "MAIN",
-          "description": "Hide an upgraded character in this mission.",
+          "description": "[↯] Hide an upgraded character in this mission.",
           "description_fr": ""
         }
       ],
@@ -7923,12 +7923,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Play a Summon character anywhere, paying 5 less.",
+          "description": "[↯] Play a Summon character anywhere, paying 5 less.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "The opponent must choose characters to be defeated until they only have up to 2 assigned in this mission.",
+          "description": "[↯] The opponent must choose characters to be defeated until they only have up to 2 assigned in this mission.",
           "description_fr": ""
         }
       ],
@@ -7965,7 +7965,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Defeat an enemy character with a cost less than the number of friendly hidden characters in play.",
+          "description": "[↯] Defeat an enemy character with a cost less than the number of friendly hidden characters in play.",
           "description_fr": ""
         },
         {
@@ -8007,7 +8007,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "The opponent discards their entire hand, then draws the same number of cards discarded in this way.",
+          "description": "[↯] The opponent discards their entire hand, then draws the same number of cards discarded in this way.",
           "description_fr": ""
         },
         {
@@ -8054,7 +8054,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Gain 2 Mission points if the character you upgraded from had Power 6 or more.",
+          "description": "[↯] Gain 2 Mission points if the character you upgraded from had Power 6 or more.",
           "description_fr": ""
         }
       ],
@@ -8096,7 +8096,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Discard the top card of your deck: POWERUP X where X is the cost of the discarded card.",
+          "description": "[↯] Discard the top card of your deck: POWERUP X where X is the cost of the discarded card.",
           "description_fr": ""
         }
       ],
@@ -8132,7 +8132,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.",
+          "description": "[↯] Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.",
           "description_fr": ""
         },
         {
@@ -8179,7 +8179,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.",
+          "description": "[↯] You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.",
           "description_fr": ""
         }
       ],
@@ -8221,7 +8221,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.",
+          "description": "[↯] You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.",
           "description_fr": ""
         }
       ],
@@ -8258,12 +8258,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.",
+          "description": "[↯] Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP X.",
+          "description": "[↯] POWERUP X.",
           "description_fr": ""
         }
       ],
@@ -8300,12 +8300,12 @@
       "effects": [
         {
           "type": "UPGRADE",
-          "description": "Move this character.",
+          "description": "[↯] Move this character.",
           "description_fr": ""
         },
         {
           "type": "MAIN",
-          "description": "Hide an upgraded character in this mission.",
+          "description": "[↯] Hide an upgraded character in this mission.",
           "description_fr": ""
         }
       ],
@@ -8343,7 +8343,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play."
+          "description": "[↯] Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play."
         },
         {
           "type": "UPGRADE",
@@ -8383,12 +8383,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.",
+          "description": "[↯] Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP X.",
+          "description": "[↯] POWERUP X.",
           "description_fr": ""
         }
       ],
@@ -8426,12 +8426,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Play a Summon character anywhere, paying 3 less.",
+          "description": "[↯] Play a Summon character anywhere, paying 3 less.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Move any enemy character from this mission.",
+          "description": "[↯] Move any enemy character from this mission.",
           "description_fr": ""
         }
       ],
@@ -8469,12 +8469,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "You must move all other non-hidden friendly characters from this mission, if able.",
+          "description": "[↯] You must move all other non-hidden friendly characters from this mission, if able.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP X where X is the number of the characters moved this way.",
+          "description": "[↯] POWERUP X where X is the number of the characters moved this way.",
           "description_fr": ""
         }
       ],
@@ -8511,7 +8511,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description": "[↯] Hide an enemy character with Power 3 or less in this mission.",
           "description_fr": ""
         },
         {
@@ -8555,7 +8555,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description": "[↯] Hide an enemy character with Power 3 or less in this mission.",
           "description_fr": ""
         },
         {
@@ -8598,7 +8598,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost.",
+          "description": "[↯] Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost.",
           "description_fr": ""
         },
         {
@@ -8640,12 +8640,12 @@
       "effects": [
         {
           "type": "SCORE",
-          "description": "Defeat the weakest non-hidden enemy character in play.",
+          "description": "[↯] Defeat the weakest non-hidden enemy character in play.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP 3.",
+          "description": "[↯] POWERUP 3.",
           "description_fr": ""
         }
       ],
@@ -8688,7 +8688,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Move a friendly character in play.",
+          "description": "[↯] Move a friendly character in play.",
           "description_fr": ""
         }
       ],

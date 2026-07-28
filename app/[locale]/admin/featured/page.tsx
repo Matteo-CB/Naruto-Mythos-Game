@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { getCardById } from '@/lib/data/cardIndex';
 import { useSession } from 'next-auth/react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
@@ -11,7 +12,7 @@ import { useRevealingStore } from '@/stores/revealingStore';
 import { useToastStore } from '@/stores/toastStore';
 import { getAllCards } from '@/lib/data/cardIndex';
 import { formatCardLabelShort } from '@/lib/variants/cardLabel';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 import { isHoloId } from '@/lib/holo/holoId';
 import { holoRarity, type HoloRarity } from '@/lib/cards/holoRarity';
 import { ALL_SET_IDS, getSetName } from '@/lib/data/sets/registry';
@@ -207,12 +208,18 @@ export default function AdminFeaturedPage() {
                         opacity: card.locked ? 0.45 : 1,
                       }}
                     >
-                      <img
-                        src={card.src}
-                        alt=""
-                        loading="lazy"
-                        style={{ width: '100%', aspectRatio: '800 / 1100', objectFit: 'cover', backgroundColor: '#000' }}
-                      />
+                      <div
+                        className="relative w-full overflow-hidden"
+                        style={{ aspectRatio: '800 / 1100', backgroundColor: '#000' }}
+                      >
+                        <img
+                          src={portraitImagePath(getCardById(card.id)) ?? card.src}
+                          alt=""
+                          loading="lazy"
+                          className="absolute inset-0 h-full w-full"
+                          style={{ objectFit: 'cover' }}
+                        />
+                      </div>
                       <span
                         className="text-[11px] leading-tight"
                         style={{ color: isSelected ? '#c4a35a' : '#bbbbbb' }}

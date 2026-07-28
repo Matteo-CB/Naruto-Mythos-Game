@@ -10,6 +10,7 @@ import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { FlagPicker } from '@/components/FlagPicker';
 import { ChatSettingsSection } from '@/components/settings/ChatSettingsSection';
 import { BoardColorsSection } from '@/components/settings/BoardColorsSection';
+import { DeckPreferencesSection } from '@/components/settings/DeckPreferencesSection';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useCallback } from 'react';
 
@@ -584,6 +585,8 @@ export default function SettingsPage() {
         </div>
 
         <BoardColorsSection />
+
+        <DeckPreferencesSection />
 
         <div
           className="mt-4 flex flex-col gap-4 p-5 lg:mt-6 lg:max-w-2xl"

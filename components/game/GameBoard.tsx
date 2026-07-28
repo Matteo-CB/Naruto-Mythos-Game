@@ -13,6 +13,7 @@ import { OpponentHand } from "./OpponentHand";
 import { PlayerStatsBar } from "./PlayerStatsBar";
 import { OpponentStatsBar } from "./OpponentStatsBar";
 import { MissionLane } from "./MissionLane";
+import { FirstStrikePrompt } from './FirstStrikePrompt';
 import { ActionBar } from "./ActionBar";
 import { MulliganDialog } from "./MulliganDialog";
 import { GameEndScreen } from "./GameEndScreen";
@@ -26,6 +27,7 @@ import { GameScaleProvider, useGameScale } from "./GameScaleContext";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
+import { isLandscapeCard, hasCombatStats } from "@/lib/cards/orientation";
 import { HoloFoilOverlay } from "@/components/cards/HoloFoilOverlay";
 import { preloadCardImages } from "@/lib/utils/imagePreload";
 import { warmupVfxGl } from "@/lib/motion/vfxgl";
@@ -106,14 +108,14 @@ function CardPreviewContent({
           className="w-full shrink-0 flex items-center justify-center"
           style={{
             backgroundColor: "#0a0a0c",
-            height: isCharacter ? "200px" : "140px",
+            height: isLandscapeCard(card) ? "140px" : "200px",
           }}
         >
           <div
             className="relative overflow-hidden"
             style={{
               height: "100%",
-              aspectRatio: isCharacter ? "800 / 1100" : "1100 / 800",
+              aspectRatio: isLandscapeCard(card) ? "1100 / 800" : "800 / 1100",
               maxWidth: "100%",
             }}
           >
@@ -123,7 +125,7 @@ function CardPreviewContent({
               draggable={false}
               style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
             />
-            {card.isHolo && <HoloFoilOverlay intensity="preview" />}
+            {card.isHolo && <HoloFoilOverlay intensity="preview" imageUrl={imagePath} />}
           </div>
         </div>
       ) : (
@@ -131,7 +133,7 @@ function CardPreviewContent({
           className="w-full shrink-0 flex items-center justify-center"
           style={{
             backgroundColor: "#1a1a1a",
-            height: isCharacter ? "200px" : "140px",
+            height: isLandscapeCard(card) ? "140px" : "200px",
           }}
         >
           <span className="text-xs" style={{ color: "#555555" }}>
@@ -263,7 +265,7 @@ function CardPreviewContent({
           </div>
         )}
 
-        {isCharacter && (
+        {hasCombatStats(card) && (
           <div
             className="flex items-center gap-4 p-2 mt-0.5"
             style={{
@@ -630,7 +632,7 @@ function FullscreenCardDetail() {
         )}
       </div>
 
-      {isCharacter && (
+      {hasCombatStats(card) && (
         <div
           className={`flex items-center gap-6 p-3`}
           style={{
@@ -841,7 +843,7 @@ function FullscreenCardDetail() {
                 className="relative overflow-hidden"
                 style={{
                   width: "100%",
-                  aspectRatio: isCharacter ? "800 / 1100" : "1100 / 800",
+                  aspectRatio: isLandscapeCard(card) ? "1100 / 800" : "800 / 1100",
                   maxHeight: "100%",
                 }}
               >
@@ -851,7 +853,7 @@ function FullscreenCardDetail() {
                   draggable={false}
                   style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
                 />
-                {card.isHolo && <HoloFoilOverlay intensity="preview" />}
+                {card.isHolo && <HoloFoilOverlay intensity="preview" imageUrl={imagePath} />}
               </div>
             ) : (
               <span className="text-[10px]" style={{ color: "#555555" }}>
@@ -920,14 +922,14 @@ function FullscreenCardDetail() {
               className="w-full shrink-0 flex items-center justify-center"
               style={{
                 backgroundColor: "#0a0a0c",
-                height: isCharacter ? "320px" : "240px",
+                height: isLandscapeCard(card) ? "240px" : "320px",
               }}
             >
               <div
                 className="relative overflow-hidden"
                 style={{
                   height: "100%",
-                  aspectRatio: isCharacter ? "800 / 1100" : "1100 / 800",
+                  aspectRatio: isLandscapeCard(card) ? "1100 / 800" : "800 / 1100",
                   maxWidth: "100%",
                 }}
               >
@@ -937,7 +939,7 @@ function FullscreenCardDetail() {
                   draggable={false}
                   style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
                 />
-                {card.isHolo && <HoloFoilOverlay intensity="preview" />}
+                {card.isHolo && <HoloFoilOverlay intensity="preview" imageUrl={imagePath} />}
               </div>
             </div>
           ) : (
@@ -945,7 +947,7 @@ function FullscreenCardDetail() {
               className="w-full shrink-0 flex items-center justify-center"
               style={{
                 backgroundColor: "#1a1a1a",
-                height: isCharacter ? "320px" : "240px",
+                height: isLandscapeCard(card) ? "240px" : "320px",
               }}
             >
               <span className="text-sm" style={{ color: "#555555" }}>
@@ -1193,7 +1195,8 @@ function GameBoardInner() {
           </div>
 
           {!isSpectating && (
-            <div className="shrink-0 flex justify-center py-0.5 relative" style={{ pointerEvents: 'auto', zIndex: 60 }}>
+            <div className="shrink-0 flex flex-col items-center gap-1 py-0.5 relative" style={{ pointerEvents: 'auto', zIndex: 60 }}>
+              <FirstStrikePrompt />
               <ActionBar />
             </div>
           )}

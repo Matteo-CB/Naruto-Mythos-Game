@@ -1,4 +1,5 @@
-import type { GameState, PlayerID, CharacterInPlay } from '../engine/types';
+import type { GameState, PlayerID, CharacterInPlay, PendingAction } from '../engine/types';
+import { generateInstanceId } from '../engine/utils/id';
 import { logAction } from '../engine/utils/gameLog';
 
 
@@ -73,5 +74,67 @@ export function triggerOnDefeatEffects(
     }
   }
 
+  newState = queueGaara078Draw(newState, defeatedChar, defeatedCharOwner);
+
   return newState;
+}
+
+
+function queueGaara078Draw(
+  state: GameState,
+  defeatedChar: CharacterInPlay,
+  defeatedCharOwner: PlayerID,
+): GameState {
+  if (defeatedChar.isHidden) return state;
+
+  const beneficiary: PlayerID = defeatedCharOwner === 'player1' ? 'player2' : 'player1';
+  if (state[beneficiary].chakra < 1) return state;
+  if (state[beneficiary].deck.length === 0) return state;
+
+  const side: 'player1Characters' | 'player2Characters' = beneficiary === 'player1' ? 'player1Characters' : 'player2Characters';
+  let source: CharacterInPlay | null = null;
+  let sourceMission = 0;
+  for (let mi = 0; mi < state.activeMissions.length; mi++) {
+    for (const char of state.activeMissions[mi][side]) {
+      if (char.isHidden) continue;
+      if (char.controlledBy !== beneficiary) continue;
+      const top = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      if (String(top.set) === 'SS' && String(top.number) === '78') { source = char; sourceMission = mi; break; }
+    }
+    if (source) break;
+  }
+  if (!source) return state;
+
+  const effId = generateInstanceId();
+  const actId = generateInstanceId();
+  return {
+    ...state,
+    pendingEffects: [...state.pendingEffects, {
+      id: effId,
+      sourceCardId: 'SS-078-UC',
+      sourceInstanceId: source.instanceId,
+      sourceMissionIndex: sourceMission,
+      effectType: 'MAIN',
+      effectDescription: '',
+      targetSelectionType: 'SS078_CONFIRM_DRAW',
+      sourcePlayer: beneficiary,
+      requiresTargetSelection: true,
+      validTargets: [source.instanceId],
+      isOptional: true,
+      isMandatory: false,
+      resolved: false,
+      isUpgrade: false,
+    }],
+    pendingActions: [...state.pendingActions, {
+      id: actId,
+      type: 'SELECT_TARGET' as PendingAction['type'],
+      player: beneficiary,
+      description: 'Gaara (SS-078): Pay 1 Chakra to draw 1 card?',
+      descriptionKey: 'game.effect.desc.ss078ConfirmDraw',
+      options: [source.instanceId],
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effId,
+    }],
+  };
 }

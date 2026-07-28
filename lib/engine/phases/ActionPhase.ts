@@ -10,6 +10,7 @@ import { calculateEffectiveCost, hasKurenai034CostReduction } from '../rules/Cha
 import { EffectEngine } from '../../effects/EffectEngine';
 import { applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
+import { canUseFirstStrike, expireFirstStrike, getFirstStrikeCandidates, withFirstStrikeStatus } from '../rules/firstStrike';
 
 
 export function executeAction(state: GameState, player: PlayerID, action: GameAction): GameState {
@@ -39,6 +40,8 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
 
   
   
+  newState = EffectEngine.resetKankuro117MoveGrant(newState);
+
   const beforeAction = newState;
 
   switch (action.type) {
@@ -58,9 +61,16 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
       newState = handleUpgradeCharacter(newState, player, action.cardIndex, action.missionIndex, action.targetInstanceId);
       if (newState === beforeAction) return state;
       break;
+    case 'USE_FIRST_STRIKE':
+      newState = handleUseFirstStrike(newState, player, action.characterInstanceId);
+      if (newState === beforeAction) return state;
+      break;
+    case 'DECLINE_FIRST_STRIKE':
+      if (newState.pendingEffects.length > 0 || newState.pendingActions.length > 0) return state;
+      return expireFirstStrike(newState, player);
     case 'PASS':
-      
-      
+
+
       if (newState.pendingEffects.length > 0 || newState.pendingActions.length > 0) {
         return state;
       }
@@ -74,10 +84,14 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
       return state;
   }
 
-  
+  if (action.type === 'PLAY_CHARACTER' || action.type === 'PLAY_HIDDEN' || action.type === 'REVEAL_CHARACTER'
+    || action.type === 'UPGRADE_CHARACTER' || action.type === 'PASS') {
+    newState = expireFirstStrike(newState, player);
+  }
+
   if (newState.player1.hasPassed && newState.player2.hasPassed) {
-    
-    
+
+
     newState.phase = 'mission' as GameState['phase'];
     return newState;
   }
@@ -312,6 +326,40 @@ function handlePlayHidden(
 }
 
 
+function handleUseFirstStrike(
+  state: GameState,
+  player: PlayerID,
+  characterInstanceId: string,
+): GameState {
+  if (!canUseFirstStrike(state, player)) return state;
+
+  const candidate = getFirstStrikeCandidates(state, player).find((c) => c.instanceId === characterInstanceId);
+  if (!candidate) return state;
+
+  const mission = state.activeMissions[candidate.missionIndex];
+  if (!mission) return state;
+  const side = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+  const character = side.find((c) => c.instanceId === characterInstanceId);
+  if (!character) return state;
+
+  const topCard = character.stack?.length > 0 ? character.stack[character.stack.length - 1] : character.card;
+
+  let newState = withFirstStrikeStatus(state, player, 'used');
+  newState = {
+    ...newState,
+    log: logAction(
+      newState.log, newState.turn, 'action', player,
+      'EFFECT',
+      `${player} uses FIRST STRIKE with ${topCard.name_fr}.`,
+      'game.log.useFirstStrike',
+      { card: topCard.name_fr, card_en: topCard.name_en || topCard.name_fr, id: topCard.id, mission: candidate.missionIndex + 1 },
+    ),
+  };
+
+  newState = EffectEngine.resolveFirstStrikeEffect(newState, player, character, candidate.missionIndex);
+  return applyRempartTokenRemoval(newState);
+}
+
 function handlePlayAttachment(
   state: GameState,
   player: PlayerID,
@@ -326,7 +374,7 @@ function handlePlayAttachment(
   const attachTo = card.attach_to ?? 'character';
   let targets: CharacterInPlay[] = [];
   if (attachTo === 'character') {
-    targets = getCharacterAttachTargets(state, player, missionIndex);
+    targets = getCharacterAttachTargets(state, player, missionIndex, card);
     if (targets.length === 0) return state;
   }
 
@@ -399,7 +447,7 @@ function handleRevealAttachment(
   const attachTo = card.attach_to ?? 'character';
   let targets: CharacterInPlay[] = [];
   if (attachTo === 'character') {
-    targets = getCharacterAttachTargets(state, player, missionIndex).filter((c) => c.instanceId !== hiddenChar.instanceId);
+    targets = getCharacterAttachTargets(state, player, missionIndex, card).filter((c) => c.instanceId !== hiddenChar.instanceId);
     if (targets.length === 0) return state;
   }
 
@@ -829,10 +877,14 @@ export function getValidActionsForPlayer(state: GameState, player: PlayerID): Ga
   const otherPassed = state[otherPlayer].hasPassed;
   if (!otherPassed && state.activePlayer !== player) return [];
 
-  
   actions.push({ type: 'PASS' });
 
-  
+  if (canUseFirstStrike(state, player)) {
+    for (const candidate of getFirstStrikeCandidates(state, player)) {
+      actions.push({ type: 'USE_FIRST_STRIKE', characterInstanceId: candidate.instanceId });
+    }
+  }
+
   for (let cardIdx = 0; cardIdx < ps.hand.length; cardIdx++) {
     const card = ps.hand[cardIdx];
 

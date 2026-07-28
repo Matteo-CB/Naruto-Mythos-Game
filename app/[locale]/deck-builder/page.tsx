@@ -14,9 +14,12 @@ import { useUnlockedVariants } from "@/lib/hooks/useUnlockedVariants";
 import { isVariantCard, isLockedVariantCard, baseCardIdFor } from "@/lib/variants/isVariant";
 import { holoIdFor, isHoloId, holoBaseId } from "@/lib/holo/holoId";
 import { HoloFoilOverlay } from "@/components/cards/HoloFoilOverlay";
+import { CloudBackground } from "@/components/CloudBackground";
+import { isLandscapeCard, hasCombatStats } from "@/lib/cards/orientation";
+import { ORDERED_SET_IDS, SET_REGISTRY } from "@/lib/data/sets/registry";
 import { useTrackOnMount, trackUiHook } from "@/lib/hooks/useTrackUi";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
-import { normalizeImagePath } from "@/lib/utils/imagePath";
+import { normalizeImagePath, portraitImagePath } from "@/lib/utils/imagePath";
 import {
   getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel,
 } from "@/lib/utils/cardLocale";
@@ -94,6 +97,8 @@ interface SearchFilter {
   effectMainContinuousText: Array<{ value: string; negated: boolean }>;
   effectUpgradeText: Array<{ value: string; negated: boolean }>;
   effectAmbushText: Array<{ value: string; negated: boolean }>;
+  effectDuelText: Array<{ value: string; negated: boolean }>;
+  effectFirstStrikeText: Array<{ value: string; negated: boolean }>;
   effectScoreText: Array<{ value: string; negated: boolean }>;
   nameVersions: Array<{ value: string; negated: boolean }>;
   effectFunctions: Array<{ value: string; negated: boolean }>;
@@ -104,7 +109,8 @@ function emptyFilter(): SearchFilter {
     nameQueries: [], chakra: [], power: [], keywords: [], groups: [],
     rarities: [], sets: [], effects: [], effectText: [],
     effectMainText: [], effectMainInstantText: [], effectMainContinuousText: [],
-    effectUpgradeText: [], effectAmbushText: [], effectScoreText: [], nameVersions: [],
+    effectUpgradeText: [], effectAmbushText: [], effectDuelText: [], effectFirstStrikeText: [],
+    effectScoreText: [], nameVersions: [],
     effectFunctions: [],
   };
 }
@@ -166,6 +172,8 @@ function parseSearchQuery(raw: string): SearchFilter {
         case 'emc': filter.effectMainContinuousText.push({ value: normalizeStr(val), negated }); break;
         case 'eup': filter.effectUpgradeText.push({ value: normalizeStr(val), negated }); break;
         case 'ea': filter.effectAmbushText.push({ value: normalizeStr(val), negated }); break;
+        case 'ed': filter.effectDuelText.push({ value: normalizeStr(val), negated }); break;
+        case 'ef': filter.effectFirstStrikeText.push({ value: normalizeStr(val), negated }); break;
         case 'es': filter.effectScoreText.push({ value: normalizeStr(val), negated }); break;
         case 'f': filter.effectFunctions.push({ value: normalizeStr(val), negated }); break;
       }
@@ -285,6 +293,8 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
   if (!matchEffText(filter.effectMainContinuousText, (e) => e.type === 'MAIN' && e.description.includes('[⧗]'))) return false;
   if (!matchEffText(filter.effectUpgradeText, (e) => e.type === 'UPGRADE')) return false;
   if (!matchEffText(filter.effectAmbushText, (e) => e.type === 'AMBUSH')) return false;
+  if (!matchEffText(filter.effectDuelText, (e) => e.type === 'DUEL')) return false;
+  if (!matchEffText(filter.effectFirstStrikeText, (e) => String(e.type) === 'FIRST_STRIKE' || normalizeStr(e.description).includes('first strike'))) return false;
   if (!matchEffText(filter.effectScoreText, (e) => e.type === 'SCORE')) return false;
   
   if (filter.effectFunctions.length > 0) {
@@ -320,7 +330,7 @@ const CatalogCard = memo(function CatalogCard({
   onAdd: (card: CharacterCard) => void;
   onHover: (card: CharacterCard | MissionCard) => void;
 }) {
-  const imgPath = normalizeImagePath(card.image_file);
+  const imgPath = portraitImagePath(card);
   return (
     <button
       onClick={() => { onAdd(card); onHover(card); }}
@@ -366,7 +376,7 @@ const CatalogMission = memo(function CatalogMission({
   onAdd: (card: MissionCard) => void;
   onHover: (card: CharacterCard | MissionCard) => void;
 }) {
-  const imgPath = normalizeImagePath(card.image_file);
+  const imgPath = portraitImagePath(card);
   return (
     <button
       onClick={() => { onAdd(card); onHover(card); }}
@@ -428,7 +438,7 @@ const DeckCard = memo(function DeckCard({
       ) : (
         <div className="w-full h-full" style={{ backgroundColor: '#111' }} />
       )}
-      {card.isHolo && imgPath && <HoloFoilOverlay />}
+      {card.isHolo && imgPath && <HoloFoilOverlay imageUrl={imgPath} />}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none"
         style={{ backgroundColor: 'rgba(179,62,62,0.4)', transition: 'opacity 80ms' }}>
         <span className="text-sm font-bold" style={{ color: '#fff' }}>x</span>
@@ -474,6 +484,7 @@ export default function DeckBuilderPage() {
   const revealingPrivileged = useRevealingStore((s) => s.privileged);
   const unrevealedIds = useRevealingStore((s) => s.unrevealedIds);
   const [showUnrevealed, setShowUnrevealed] = useState(false);
+  const [quickSet, setQuickSet] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearch = useDeferredValue(searchQuery);
@@ -547,7 +558,7 @@ export default function DeckBuilderPage() {
 
   useEffect(() => {
     import("@/lib/data/cardLoader").then((mod) => {
-      setAvailableChars(mod.getPlayableCharacters());
+      setAvailableChars([...mod.getPlayableCharacters(), ...(mod.getPlayableAttachments() as unknown as CharacterCard[])]);
       setAvailableMissions(mod.getPlayableMissions());
       setAllChars(mod.getAllCharacters());
       setAllMissions(mod.getAllMissions());
@@ -581,8 +592,20 @@ export default function DeckBuilderPage() {
 
   const parsedSearch = useMemo(() => parseSearchQuery(deferredSearch), [deferredSearch]);
 
+  const setsWithCards = useMemo(() => {
+    const present = new Set<string>();
+    for (const c of availableChars) if (c.set) present.add(c.set);
+    for (const m of availableMissions) if (m.set) present.add(m.set);
+    return ORDERED_SET_IDS.filter((id) => present.has(id));
+  }, [availableChars, availableMissions]);
+
+  useEffect(() => {
+    if (quickSet && !setsWithCards.includes(quickSet)) setQuickSet(null);
+  }, [setsWithCards, quickSet]);
+
   const filteredChars = useMemo(() => {
     let chars = [...availableChars];
+    if (quickSet) chars = chars.filter((c) => c.set === quickSet);
     if (!showAltArt) chars = chars.filter((c) => !['RA', 'MV', 'SV', 'L'].includes(c.rarity));
     if (!showUnrevealed) chars = chars.filter((c) => !unrevealedIds.has(c.id));
     if (deferredSearch) {
@@ -600,11 +623,11 @@ export default function DeckBuilderPage() {
       if (cmp === 0) cmp = compareBySetOrder(a, b);
       return sortOrder === 'desc' ? -cmp : cmp;
     });
-  }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showAltArt, showUnrevealed, unrevealedIds]);
+  }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showAltArt, showUnrevealed, unrevealedIds, quickSet]);
 
   const filteredMissions = useMemo(
-    () => (showUnrevealed ? [...availableMissions] : availableMissions.filter((m) => !unrevealedIds.has(m.id))),
-    [availableMissions, showUnrevealed, unrevealedIds],
+    () => (showUnrevealed ? [...availableMissions] : availableMissions.filter((m) => !unrevealedIds.has(m.id))).filter((m) => !quickSet || m.set === quickSet),
+    [availableMissions, showUnrevealed, unrevealedIds, quickSet],
   );
 
   const deckHasUnrevealed = useMemo(
@@ -949,7 +972,9 @@ export default function DeckBuilderPage() {
       );
     }
     const card = previewCard;
-    const isChar = card.card_type !== 'mission';
+    const isChar = hasCombatStats(card);
+    const isWide = isLandscapeCard(card);
+    const isAttachment = (card as { card_type?: string }).card_type === 'attachment';
     const charCard = card as CharacterCard;
     const imgPath = normalizeImagePath(card.image_file);
     const rarColor = RARITY_COLORS[card.rarity] ?? '#888';
@@ -959,8 +984,8 @@ export default function DeckBuilderPage() {
         
         <div className="relative overflow-hidden mx-auto mb-3" style={{
           width: '100%',
-          maxWidth: isChar ? '180px' : '100%',
-          aspectRatio: isChar ? '5/7' : '7/5',
+          maxWidth: isWide ? '100%' : '180px',
+          aspectRatio: isWide ? '7/5' : '5/7',
           backgroundColor: '#0a0a0a',
         }}>
           {imgPath ? (
@@ -974,9 +999,11 @@ export default function DeckBuilderPage() {
 
         <div className="flex items-center gap-2 mb-1">
           <span className="text-[10px] uppercase font-bold px-1.5 py-0.5" style={{
-            backgroundColor: isChar ? 'rgba(255,255,255,0.04)' : 'rgba(196,163,90,0.12)',
-            color: isChar ? '#999' : '#c4a35a',
-          }}>{isChar ? t("deckBuilder.characterCards") : t("deckBuilder.missionCards")}</span>
+            backgroundColor: isWide ? 'rgba(196,163,90,0.12)' : 'rgba(255,255,255,0.04)',
+            color: isWide ? '#c4a35a' : '#999',
+          }}>{(card as { card_type?: string }).card_type === 'mission'
+            ? t("deckBuilder.missionCards")
+            : isAttachment ? t("collection.attachments") : t("deckBuilder.characterCards")}</span>
           <span className="text-[10px] uppercase font-bold px-1.5 py-0.5" style={{
             backgroundColor: `${rarColor}12`, color: rarColor,
           }}>{getRarityLabel(card.rarity, tCardMeta)}</span>
@@ -1068,6 +1095,8 @@ export default function DeckBuilderPage() {
     { key: 'emc', label: t('deckBuilder.search.emcLabel'), desc: t('deckBuilder.search.emcDesc'), ops: [':'], examples: ['emc:power', 'emc:chakra'] },
     { key: 'eup', label: t('deckBuilder.search.eupLabel'), desc: t('deckBuilder.search.eupDesc'), ops: [':'], examples: ['eup:move', 'eup:play'] },
     { key: 'ea', label: t('deckBuilder.search.eaLabel'), desc: t('deckBuilder.search.eaDesc'), ops: [':'], examples: ['ea:move', 'ea:look'] },
+    { key: 'ed', label: t('deckBuilder.search.edLabel'), desc: t('deckBuilder.search.edDesc'), ops: [':'], examples: ['ed:defeat', 'ed:play'] },
+    { key: 'ef', label: t('deckBuilder.search.efLabel'), desc: t('deckBuilder.search.efDesc'), ops: [':'], examples: ['ef:power'] },
     { key: 'es', label: t('deckBuilder.search.esLabel'), desc: t('deckBuilder.search.esDesc'), ops: [':'], examples: ['es:draw', 'es:chakra'] },
   ];
 
@@ -1174,7 +1203,7 @@ export default function DeckBuilderPage() {
                   {t('deckBuilder.search.effectsHeader')}
                 </span>
                 {effectFilters.map((f, i) => {
-                  const keyColors: Record<string, string> = { e: '#c4a35a', em: '#c4a35a', emi: '#c4a35a', emc: '#888', eup: '#3e8b3e', ea: '#b33e3e', es: '#6a6abb' };
+                  const keyColors: Record<string, string> = { e: '#c4a35a', em: '#c4a35a', emi: '#c4a35a', emc: '#888', eup: '#3e8b3e', ea: '#b33e3e', ed: '#c46a3e', ef: '#4a9eff', es: '#6a6abb' };
                   return renderFilterRow(f, i, keyColors[f.key] ?? '#b33e3e');
                 })}
               </div>
@@ -1389,6 +1418,7 @@ export default function DeckBuilderPage() {
 
   return (
     <main id="main-content" className="relative" style={{ backgroundColor: '#0a0a0a', height: '100vh', overflow: 'hidden' }}>
+      <CloudBackground />
 
       <div className="hidden lg:flex relative z-10" style={{ height: '100vh' }}>
 
@@ -1594,6 +1624,38 @@ export default function DeckBuilderPage() {
             </div>
           </div>
 
+{setsWithCards.length > 1 && (
+            <div className="px-3 pb-1.5 shrink-0 flex items-center gap-1 flex-wrap">
+              <button
+                onClick={() => setQuickSet(null)}
+                aria-pressed={quickSet === null}
+                className="text-[9px] uppercase font-bold px-2 py-1 transition-colors"
+                style={{
+                  backgroundColor: quickSet === null ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
+                  color: quickSet === null ? '#c4a35a' : '#6d6d74',
+                  border: 'none', cursor: 'pointer', letterSpacing: '0.08em',
+                }}
+              >
+                {t('collection.allSets')}
+              </button>
+              {setsWithCards.map((sid) => (
+                <button
+                  key={sid}
+                  onClick={() => setQuickSet(quickSet === sid ? null : sid)}
+                  aria-pressed={quickSet === sid}
+                  title={SET_REGISTRY[sid]?.nameEn ?? sid}
+                  className="text-[9px] uppercase font-bold px-2 py-1 transition-colors"
+                  style={{
+                    backgroundColor: quickSet === sid ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
+                    color: quickSet === sid ? '#c4a35a' : '#6d6d74',
+                    border: 'none', cursor: 'pointer', letterSpacing: '0.08em',
+                  }}
+                >
+                  {sid}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="px-3 pb-1 flex-shrink-0 flex items-center gap-1.5 flex-wrap">
             <button
               onClick={() => setHideVariants(!hideVariants)}
@@ -1789,6 +1851,38 @@ export default function DeckBuilderPage() {
                     )}
                   </div>
                 </div>
+                {setsWithCards.length > 1 && (
+                  <div className="flex items-center gap-1 flex-wrap mt-1.5">
+                    <button
+                      onClick={() => setQuickSet(null)}
+                      aria-pressed={quickSet === null}
+                      className="text-[9px] uppercase font-bold px-2 py-0.5 transition-colors"
+                      style={{
+                        backgroundColor: quickSet === null ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
+                        color: quickSet === null ? '#c4a35a' : '#6d6d74',
+                        border: 'none', cursor: 'pointer', letterSpacing: '0.08em',
+                      }}
+                    >
+                      {t('collection.allSets')}
+                    </button>
+                    {setsWithCards.map((sid) => (
+                      <button
+                        key={sid}
+                        onClick={() => setQuickSet(quickSet === sid ? null : sid)}
+                        aria-pressed={quickSet === sid}
+                        title={SET_REGISTRY[sid]?.nameEn ?? sid}
+                        className="text-[9px] uppercase font-bold px-2 py-0.5 transition-colors"
+                        style={{
+                          backgroundColor: quickSet === sid ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
+                          color: quickSet === sid ? '#c4a35a' : '#6d6d74',
+                          border: 'none', cursor: 'pointer', letterSpacing: '0.08em',
+                        }}
+                      >
+                        {sid}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <div className="flex items-center gap-2 mt-1.5">
                   <span className="text-[9px]" style={{ color: '#666' }}>
                     {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}

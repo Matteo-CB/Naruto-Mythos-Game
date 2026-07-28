@@ -118,7 +118,8 @@
     },
     "register": {
       "title": "Create Free Account - Register | Naruto Mythos TCG",
-      "description": "Create your Naruto Mythos TCG account for free in seconds. Access online multiplayer, save your decks, compete in ELO ranked matches, add friends, and climb the global leaderboard. Quick and free registration to start playing the Naruto Shippuden card game online."
+      "description": "Create your Naruto Mythos TCG account for free in seconds. Access online multiplayer, save your decks, compete in ELO ranked matches, add friends, and climb the global leaderboard. Quick and free registration to start playing the Naruto Shippuden card game online.",
+      "ogAlt": "Create an account - Naruto Mythos TCG"
     },
     "playAi": {
       "title": "Play vs AI - 4 Difficulty Levels | Naruto Mythos TCG",
@@ -220,7 +221,11 @@
       "Tailed Beast": "Tailed Beast",
       "Ninja Hound": "Ninja Hound",
       "Ninja Pig": "Ninja Pig",
-      "Special Jonin": "Special Jonin"
+      "Special Jonin": "Special Jonin",
+      "Puppet": "Puppet",
+      "Armor": "Armor",
+      "Food": "Food",
+      "Location": "Location"
     },
     "rarity": {
       "C": "Common",
@@ -723,7 +728,16 @@
     "boardColorsLowContrast": "This color is very dark on the board and may be hard to read.",
     "boardColorsDefaultsHint": "Defaults: {me} for you, {opponent} for the opponent.",
     "boardPreviewYou": "You",
-    "boardPreviewOpponent": "Opponent"
+    "boardPreviewOpponent": "Opponent",
+    "deckPrefs": "Decks",
+    "deckListLimit": "Decks shown before collapsing",
+    "deckListLimitHint": "How many decks the deck picker shows before a \"show more\" button. Favorites are always shown on top.",
+    "deckListLimitLess": "Fewer",
+    "deckListLimitMore": "More",
+    "favoriteDecks": "Favorite decks",
+    "favoriteDecksHint": "Pick up to 3 decks. They are always shown first in the deck picker.",
+    "deckPrefsNoDecks": "You have no saved decks yet.",
+    "unfavorite": "Remove from favorites"
   },
   "game": {
     "turn": "Turn {turn}",
@@ -964,7 +978,13 @@
         "ss000Search": "Kakashi Hatake (SS-000): searched the deck, drew {count} Ninja Hound, then shuffled.",
         "ss112RemoveTokens": "Neji Hyuga (SS-112): removed all Power tokens from an enemy character.",
         "kakashi148Locked": "{card} ({id}): the opponent locked the Edge this round, it cannot be taken.",
-        "ss000Reveal": "Kakashi Hatake reveals and draws {target}."
+        "ss000Reveal": "Kakashi Hatake reveals and draws {target}.",
+        "ss046Draw": "{card}: revealed {count} card(s) and drew {target}.",
+        "ss119Duel": "{card}: drew a card and took the Edge.",
+        "ss099Hide": "{card}: hid a weaker enemy Jutsu character.",
+        "ss078Draw": "{card}: paid 1 Chakra to draw 1 card.",
+        "ss089Move": "{card}: the attachment moved to {target}.",
+        "ss117Chakra": "{card}: gained 1 Chakra for moving enemy characters."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -981,7 +1001,8 @@
       },
       "playAttachment": "Plays the attachment {card} for {cost} chakra.",
       "attachToMission": "{card} is attached to mission {mission}.",
-      "attachToCharacter": "{card} is attached to {target}."
+      "attachToCharacter": "{card} is attached to {target}.",
+      "useFirstStrike": "FIRST STRIKE: {card} strikes before the round begins."
     },
     "end": {
       "victory": "Victory",
@@ -1312,7 +1333,7 @@
         "temari121ConfirmUpgrade": "UPGRADE: Move any character in play.",
         "jirobo122ConfirmMain": "MAIN: POWERUP X where X is the number of characters in this mission.",
         "jirobo122ConfirmUpgrade": "UPGRADE: Defeat an enemy character with Power 1 or less in this mission.",
-        "tsunade104ConfirmUpgrade": "UPGRADE: Spend any amount of additional Chakra. POWERUP X.",
+        "tsunade104ConfirmUpgrade": "UPGRADE: POWERUP X, where X is the extra Chakra spent on the MAIN. No Chakra to pay again.",
         "jiraiya007ChooseSummon": "Choose a Summon character to play from your hand or reveal a hidden one (paying 1 less).",
         "kabuto052PlaceHidden": "Choose a mission to place the stolen card hidden.",
         "kabuto052ChooseMission": "Choose a mission to place the stolen card hidden.",
@@ -1462,7 +1483,7 @@
         "tayuya125PlaySound": "Choose a Sound Village character to play from your hand or reveal a hidden one (paying 2 less).",
         "temari121MoveFriendly": "Choose a friendly character to move to another mission.",
         "temari121MoveAny": "Choose any character in play to move to another mission.",
-        "shino115MoveFriendly": "Shino Aburame (115) AMBUSH: Choose a friendly character in this mission to move to another mission.",
+        "shino115MoveFriendly": "Shino Aburame (115) AMBUSH: Choose a friendly character in another mission to move to this mission.",
         "sakon127Hide": "Sakon (127) AMBUSH: Choose an enemy character with Power 5 or less to hide.",
         "tenten118DefeatHidden": "Select a hidden character in this mission to defeat.",
         "ukon124bHide": "Choose an enemy character with Power 5 or less to hide.",
@@ -1593,7 +1614,21 @@
         "ss128ConfirmDuel": "DUEL Jirobo: Defeat an enemy character in this mission with Power 8 or more?",
         "ss128Defeat": "Choji Akimichi: Choose an enemy character with Power 8 or more to defeat.",
         "ss108ConfirmScore": "SCORE Exam Stadium: A friendly character activates an instant DUEL effect, ignoring requirements?",
-        "ss108ChooseCharacter": "Exam Stadium: Choose a friendly character to activate its DUEL effect."
+        "ss108ChooseCharacter": "Exam Stadium: Choose a friendly character to activate its DUEL effect.",
+        "ss049FirstStrikeChar": "FIRST STRIKE: Choose a character to move from this mission.",
+        "ss046ConfirmMain": "Reveal cards from the top of your deck until you find a Sand Village character, draw it, then shuffle the revealed cards back?",
+        "ss047Defeat": "Choose an enemy character with Power 3 or less to defeat.",
+        "ss078DuelDefeat": "Choose an enemy character with cost 2 or less to defeat.",
+        "ss114ChooseDiscard": "Choose a Gaara to discard from your hand.",
+        "ss114ChooseHide": "Choose an enemy character to hide (cost equal to or lower than the discarded card).",
+        "ss114ChooseDefeat": "Rock Lee is here: choose an enemy character to defeat instead (cost equal to or lower than the discarded card).",
+        "ss117DuelMove": "Choose an enemy character to move to this mission.",
+        "ss119MoveChar": "Choose an enemy character to move from this mission.",
+        "ss119DuelConfirm": "Draw a card and take the Edge?",
+        "ss085MoveChar": "Choose a weaker enemy character to move from this mission.",
+        "ss099Hide": "Choose a weaker enemy Jutsu character in this mission to hide.",
+        "ss078ConfirmDraw": "Pay 1 Chakra to draw 1 card?",
+        "ss089MoveAttachment": "Move this attachment to a friendly character?"
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only"
@@ -1707,7 +1742,9 @@
     "lockedToastMessage": "This card is locked. Get it from a variant booster, the Rewards or a tournament.",
     "attachments": "Attachments",
     "holosOnly": "Holo",
-    "holoBadge": "Holo"
+    "holoBadge": "Holo",
+    "characterAttachments": "Character Attachments",
+    "missionAttachments": "Mission Attachments"
   },
   "deckBuilder": {
     "title": "Deck Builder",
@@ -1843,7 +1880,11 @@
       "example6": "Cards that ONLY have the Summon keyword",
       "statsHeader": "Stats",
       "propertiesHeader": "Properties",
-      "effectsHeader": "Effects"
+      "effectsHeader": "Effects",
+      "edLabel": "DUEL Text",
+      "edDesc": "Search in DUEL effect text only",
+      "efLabel": "FIRST STRIKE Text",
+      "efDesc": "Search in First Strike effect text only (no cards yet)"
     },
     "sort": "Sort",
     "error": {
@@ -1907,7 +1948,8 @@
     "showUnrevealed": "Show unrevealed",
     "containsUnrevealed": "Contains unrevealed",
     "useDeck": "Use this deck",
-    "cardDetail": "Card detail"
+    "cardDetail": "Card detail",
+    "otherDecks": "Other decks"
   },
   "discord": {
     "linkDiscord": "Link Discord",
@@ -1958,7 +2000,10 @@
     "rename": "Rename",
     "cards": "cards",
     "saving": "Saving order...",
-    "createFirst": "Create a Deck"
+    "createFirst": "Create a Deck",
+    "favorite": "Add to favorites",
+    "unfavorite": "Remove from favorites",
+    "favoriteFull": "You already have {max} favorite decks"
   },
   "playAI": {
     "title": "Play vs AI",
@@ -2325,7 +2370,8 @@
       "AMBUSH": "AMBUSH",
       "SCORE": "SCORE",
       "DUEL": "DUEL",
-      "ATTACH": "ATTACH"
+      "ATTACH": "ATTACH",
+      "FIRST_STRIKE": "FIRST STRIKE"
     },
     "noImage": "No image",
     "hidden": "Hidden",
@@ -3940,5 +3986,16 @@
     "busiestDay": "Busiest day",
     "busiestDayValue": "{day} with {games} games",
     "note": "Only online games count. Figures refresh a few times per hour."
+  },
+  "firstStrike": {
+    "title": "FIRST STRIKE",
+    "subtitle": "Available before your first action",
+    "body": "You may strike first this round. Using it takes your whole turn, then your opponent plays.",
+    "use": "Strike",
+    "skip": "Play normally",
+    "choose": "Choose which character strikes",
+    "badge": "FIRST STRIKE",
+    "used": "Already used this round",
+    "opponentUsed": "Your opponent used FIRST STRIKE"
   }
 }

@@ -10,6 +10,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
 import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
+import { useSettingsStore, MAX_FAVORITE_DECKS } from '@/stores/settingsStore';
 
 interface DeckItem {
   id: string;
@@ -24,6 +25,11 @@ interface DeckItem {
 
 export default function ManageDecksPage() {
   const t = useTranslations();
+  const favoriteDeckIds = useSettingsStore((s) => s.favoriteDeckIds);
+  const toggleFavoriteDeck = useSettingsStore((s) => s.toggleFavoriteDeck);
+  const settingsLoaded = useSettingsStore((s) => s.isLoaded);
+  const fetchSettings = useSettingsStore((s) => s.fetchFromServer);
+  useEffect(() => { if (!settingsLoaded) fetchSettings().catch(() => {}); }, [settingsLoaded, fetchSettings]);
   const { data: session } = useSession();
   const [decks, setDecks] = useState<DeckItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -339,6 +345,28 @@ export default function ManageDecksPage() {
                           </>
                         ) : (
                           <>
+                            {(() => {
+                              const isFav = favoriteDeckIds.includes(deck.id);
+                              const atCap = favoriteDeckIds.length >= MAX_FAVORITE_DECKS && !isFav;
+                              return (
+                                <button
+                                  onClick={() => { if (!atCap) toggleFavoriteDeck(deck.id); }}
+                                  disabled={atCap}
+                                  title={isFav ? t('deckManager.unfavorite') : atCap ? t('deckManager.favoriteFull', { max: MAX_FAVORITE_DECKS }) : t('deckManager.favorite')}
+                                  aria-label={isFav ? t('deckManager.unfavorite') : t('deckManager.favorite')}
+                                  aria-pressed={isFav}
+                                  className="px-2 py-1 text-[12px] leading-none transition-colors"
+                                  style={{
+                                    backgroundColor: isFav ? 'rgba(196,163,90,0.14)' : '#141414',
+                                    border: '1px solid ' + (isFav ? 'rgba(196,163,90,0.4)' : '#262626'),
+                                    color: isFav ? '#c4a35a' : atCap ? '#3a3a3a' : '#888',
+                                    cursor: atCap ? 'default' : 'pointer',
+                                  }}
+                                >
+                                  {isFav ? '★' : '☆'}
+                                </button>
+                              );
+                            })()}
                             <button
                               onClick={() => { setRenamingId(deck.id); setRenameValue(deck.name); }}
                               className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888] hover:text-[#e0e0e0] hover:border-[#444] transition-colors"

@@ -8,7 +8,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { ManualGuess } from './ManualGuess';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath , portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
@@ -62,7 +62,7 @@ function HandCard({
   const zoomCard = useUIStore((s) => s.zoomCard);
   const { card, index } = cardInfo;
 
-  const imagePath = normalizeImagePath(card.image_file);
+  const imagePath = portraitImagePath(card);
   const disabled = cardInfo.isPlayable === false;
 
   return (
