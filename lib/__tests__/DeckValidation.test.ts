@@ -21,6 +21,19 @@ describe('Deck Validation', () => {
     expect(result.errors.some((e) => e.includes('at least 30'))).toBe(true);
   });
 
+  it('should accept a 30 card deck that contains attachments', () => {
+    const deck = createTestDeck(28);
+    deck.push(
+      mockCharacter({ id: 'SS-082-C', name_fr: 'Attache A', card_type: 'attachment' } as never),
+      mockCharacter({ id: 'SS-108-C', name_fr: 'Attache B', card_type: 'attachment' } as never),
+    );
+    const missions = [mockMission(), mockMission({ id: 'KS-002-MMS' }), mockMission({ id: 'KS-003-MMS' })];
+
+    const result = validateDeck(deck, missions);
+    expect(result.errors).toEqual([]);
+    expect(result.valid).toBe(true);
+  });
+
   it('should reject a deck without exactly 3 missions', () => {
     const deck = createTestDeck(30);
     const missions = [mockMission(), mockMission({ id: 'KS-002-MMS' })]; // Only 2

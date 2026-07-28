@@ -635,11 +635,12 @@ export default function DeckBuilderPage() {
     [deckChars, deckMissions, unrevealedIds],
   );
 
-  const realCharCount = useMemo(
-    () => deckChars.filter((c) => (c as { card_type?: string }).card_type !== 'attachment').length,
+  const attachmentCount = useMemo(
+    () => deckChars.filter((c) => (c as { card_type?: string }).card_type === 'attachment').length,
     [deckChars],
   );
-  const attachmentCount = deckChars.length - realCharCount;
+  const realCharCount = deckChars.length - attachmentCount;
+  const deckCardCount = deckChars.length;
 
   const validation = useMemo(() => validateDeck(deckChars, deckMissions), [deckChars, deckMissions]);
 
@@ -1460,7 +1461,7 @@ export default function DeckBuilderPage() {
               }}
             />
             <div className="flex items-center gap-2 text-[10px] flex-shrink-0">
-              <span style={{ color: realCharCount >= 30 ? '#3e8b3e' : '#b33e3e' }}>
+              <span style={{ color: deckCardCount >= 30 ? '#3e8b3e' : '#b33e3e' }}>
                 {t("deckBuilder.characters", { count: realCharCount })}
               </span>
               {attachmentCount > 0 && (
@@ -1751,9 +1752,9 @@ export default function DeckBuilderPage() {
           borderBottom: '1px solid rgba(255,255,255,0.04)',
         }}>
           <span className="text-[10px] tabular-nums font-bold px-1.5 py-0.5 flex-shrink-0" style={{
-            backgroundColor: realCharCount >= 30 ? 'rgba(62,139,62,0.12)' : 'rgba(179,62,62,0.1)',
-            color: realCharCount >= 30 ? '#3e8b3e' : '#b33e3e',
-          }}>{realCharCount}/30{attachmentCount > 0 ? ` +${attachmentCount}` : ''}</span>
+            backgroundColor: deckCardCount >= 30 ? 'rgba(62,139,62,0.12)' : 'rgba(179,62,62,0.1)',
+            color: deckCardCount >= 30 ? '#3e8b3e' : '#b33e3e',
+          }}>{deckCardCount}/30{attachmentCount > 0 ? ` (${realCharCount}+${attachmentCount})` : ''}</span>
           <span className="text-[10px] tabular-nums font-bold px-1.5 py-0.5 flex-shrink-0" style={{
             backgroundColor: deckMissions.length === 3 ? 'rgba(62,139,62,0.12)' : 'rgba(179,62,62,0.1)',
             color: deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e',

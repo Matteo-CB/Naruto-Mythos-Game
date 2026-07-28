@@ -15,9 +15,8 @@ export function validateDeck(
   const errors: string[] = [];
 
   
-  const realCharacterCount = characterCards.filter((c) => (c as { card_type?: string }).card_type !== 'attachment').length;
-  if (realCharacterCount < MIN_DECK_SIZE) {
-    errors.push(`Deck needs at least ${MIN_DECK_SIZE} character cards (has ${realCharacterCount}).`);
+  if (characterCards.length < MIN_DECK_SIZE) {
+    errors.push(`Deck needs at least ${MIN_DECK_SIZE} cards (has ${characterCards.length}).`);
   }
 
   
