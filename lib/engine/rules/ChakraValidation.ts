@@ -57,7 +57,7 @@ export function calculateEffectiveCost(
 
   if (card.group === 'Sand Village') {
     const friendlySideKey = player === 'player1' ? 'player1Characters' : 'player2Characters';
-    let hasRasa = false;
+    let rasaCount = 0;
     for (const m of state.activeMissions ?? []) {
       for (const c of (m?.[friendlySideKey] ?? [])) {
         if (c.isHidden) continue;
@@ -65,12 +65,10 @@ export function calculateEffectiveCost(
         if (!cTop) continue;
         if (String(cTop.set) !== 'SS' || String(cTop.number) !== '51') continue;
         if (cTop.id === card.id) continue;
-        hasRasa = true;
-        break;
+        rasaCount++;
       }
-      if (hasRasa) break;
     }
-    if (hasRasa) cost = Math.max(0, cost - 1);
+    if (rasaCount > 0) cost = Math.max(0, cost - rasaCount);
   }
 
   for (const effect of card.effects ?? []) {

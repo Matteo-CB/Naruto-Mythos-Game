@@ -32,13 +32,13 @@ import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 
 function findUpgradeTargetIdx(
   chars: CharacterInPlay[],
-  card: { name_fr: string; chakra: number; number?: number | string; effects?: Array<{ type: string; description: string }> },
+  card: { name_fr: string; chakra: number; set?: string; number?: number | string; effects?: Array<{ type: string; description: string }> },
   excludeInstanceId?: string,
 ): number {
 
 
   const cardNumber = typeof card.number === 'string' ? parseInt(card.number, 10) : card.number;
-  const hasFlexibleRestriction = (cardNumber === 51 || cardNumber === 138) &&
+  const hasFlexibleRestriction = String(card.set ?? 'KS') === 'KS' && (cardNumber === 51 || cardNumber === 138) &&
     (card.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'));
 
 
@@ -20282,26 +20282,25 @@ export class EffectEngine {
     if (flags[mover]) return state;
 
     const side: 'player1Characters' | 'player2Characters' = mover === 'player1' ? 'player1Characters' : 'player2Characters';
-    let hasKankuro117 = false;
+    let kankuro117Count = 0;
     for (const mission of state.activeMissions) {
       for (const char of mission[side]) {
         if (char.isHidden) continue;
         if (char.controlledBy !== mover) continue;
         const top = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-        if (String(top.set) === 'SS' && String(top.number) === '117') { hasKankuro117 = true; break; }
+        if (String(top.set) === 'SS' && String(top.number) === '117') kankuro117Count += 1;
       }
-      if (hasKankuro117) break;
     }
-    if (!hasKankuro117) return state;
+    if (kankuro117Count === 0) return state;
 
-    const ps = { ...state[mover], chakra: state[mover].chakra + 1 };
-    const next = {
-      ...state,
-      [mover]: ps,
-      log: logAction(state.log, state.turn, state.phase, mover, 'EFFECT_CHAKRA',
+    let log = state.log;
+    for (let i = 0; i < kankuro117Count; i++) {
+      log = logAction(log, state.turn, state.phase, mover, 'EFFECT_CHAKRA',
         'Kankuro (SS-117): Gained 1 Chakra for moving one or more enemy characters.',
-        'game.log.effect.ss117Chakra', { card: 'KANKURÔ', id: 'SS-117-R' }),
-    } as GameStateWithMoveGrant;
+        'game.log.effect.ss117Chakra', { card: 'KANKURÔ', id: 'SS-117-R' });
+    }
+    const ps = { ...state[mover], chakra: state[mover].chakra + kankuro117Count };
+    const next = { ...state, [mover]: ps, log } as GameStateWithMoveGrant;
     next._ss117ChakraGranted = { ...flags, [mover]: true };
     return next;
   }

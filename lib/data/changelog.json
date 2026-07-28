@@ -22,7 +22,11 @@
         "fix",
         "fix",
         "fix",
-        "feature"
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
       ],
       "changes_fr": [
         "Douze nouvelles cartes du set 2 arrivent, autour du Village du Sable.",
@@ -42,7 +46,11 @@
         "Le reflet holographique s’arrête au bord de la carte et ne déborde plus sur le vide autour.",
         "Chaque effet affiche désormais son symbole : sablier pour un effet permanent, éclair pour un effet immédiat.",
         "Les deux effets d’Itachi Amaterasu 128 étaient inversés dans six langues, c’est corrigé.",
-        "Des boutons sous la recherche du deck builder filtrent les cartes par set en un clic."
+        "Des boutons sous la recherche du deck builder filtrent les cartes par set en un clic.",
+        "Ichibi peut monter sur Gaara directement depuis la main, sans devoir le jouer caché avant.",
+        "Plusieurs Rasa en jeu réduisent chacun le coût de tes personnages du Sable.",
+        "Chaque Kankuro en jeu rapporte son propre Chakra quand tu déplaces des ennemis.",
+        "Chaque Gaara en jeu propose sa propre pioche quand tu bats un ennemi."
       ],
       "changes_en": [
         "Twelve new set 2 cards arrive, built around the Sand Village.",
@@ -62,7 +70,11 @@
         "The holo shine now stops at the card edge instead of spilling onto the empty space around it.",
         "Every effect now shows its symbol: hourglass for a lasting effect, lightning for an immediate one.",
         "Itachi Amaterasu 128 had its two effects swapped in six languages, now fixed.",
-        "Buttons under the deck builder search filter cards by set in one click."
+        "Buttons under the deck builder search filter cards by set in one click.",
+        "One-Tail can upgrade onto Gaara straight from your hand, no need to play it hidden first.",
+        "Several Rasa in play now each reduce the cost of your Sand Village characters.",
+        "Each Kankuro in play gives its own Chakra when you move enemy characters.",
+        "Each Gaara in play offers its own draw when you defeat an enemy."
       ]
     },
     {

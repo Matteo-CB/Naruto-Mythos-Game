@@ -92,29 +92,28 @@ function queueGaara078Draw(
   if (state[beneficiary].deck.length === 0) return state;
 
   const side: 'player1Characters' | 'player2Characters' = beneficiary === 'player1' ? 'player1Characters' : 'player2Characters';
-  let source: CharacterInPlay | null = null;
-  let sourceMission = 0;
+  const sources: { char: CharacterInPlay; missionIndex: number }[] = [];
   for (let mi = 0; mi < state.activeMissions.length; mi++) {
     for (const char of state.activeMissions[mi][side]) {
       if (char.isHidden) continue;
       if (char.controlledBy !== beneficiary) continue;
       const top = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-      if (String(top.set) === 'SS' && String(top.number) === '78') { source = char; sourceMission = mi; break; }
+      if (String(top.set) === 'SS' && String(top.number) === '78') sources.push({ char, missionIndex: mi });
     }
-    if (source) break;
   }
-  if (!source) return state;
+  if (sources.length === 0) return state;
 
-  const effId = generateInstanceId();
-  const actId = generateInstanceId();
-  return {
-    ...state,
-    pendingEffects: [...state.pendingEffects, {
+  const newEffects = [];
+  const newActions = [];
+  for (const { char: source, missionIndex: sourceMission } of sources) {
+    const effId = generateInstanceId();
+    const actId = generateInstanceId();
+    newEffects.push({
       id: effId,
       sourceCardId: 'SS-078-UC',
       sourceInstanceId: source.instanceId,
       sourceMissionIndex: sourceMission,
-      effectType: 'MAIN',
+      effectType: 'MAIN' as const,
       effectDescription: '',
       targetSelectionType: 'SS078_CONFIRM_DRAW',
       sourcePlayer: beneficiary,
@@ -124,8 +123,8 @@ function queueGaara078Draw(
       isMandatory: false,
       resolved: false,
       isUpgrade: false,
-    }],
-    pendingActions: [...state.pendingActions, {
+    });
+    newActions.push({
       id: actId,
       type: 'SELECT_TARGET' as PendingAction['type'],
       player: beneficiary,
@@ -135,6 +134,13 @@ function queueGaara078Draw(
       minSelections: 1,
       maxSelections: 1,
       sourceEffectId: effId,
-    }],
+    });
+  }
+
+  return {
+    ...state,
+    pendingEffects: [...state.pendingEffects, ...newEffects],
+    pendingActions: [...state.pendingActions, ...newActions],
   };
 }
+

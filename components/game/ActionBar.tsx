@@ -10,7 +10,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useSocketStore } from '@/lib/socket/client';
 import { calculateEffectiveCost, hasKurenai034CostReduction } from '@/lib/engine/rules/ChakraValidation';
-import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
+import { checkFlexibleUpgrade, isUpgradeNameLegal } from '@/lib/engine/rules/PlayValidation';
 import { useGameScale } from './GameScaleContext';
 
 export function ActionBar() {
@@ -97,41 +97,9 @@ export function ActionBar() {
       
       const charCard = c.topCard ?? c.card;
       if (!charCard) return false;
-      let sameNameMatch = charCard.name_fr.toUpperCase() === selectedCard.name_fr.toUpperCase();
-      
-      const hasFlexRestriction = (selectedCard.number === 51 || selectedCard.number === 138)
-        && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('upgrade'));
-      const isFlexible = hasFlexRestriction
-        && !(charCard.keywords ?? []).includes('Summon')
-        && !charCard.name_fr.toUpperCase().includes('OROCHIMARU');
-      
-      if (hasFlexRestriction && (
-        (charCard.keywords ?? []).includes('Summon') || charCard.name_fr.toUpperCase().includes('OROCHIMARU')
-      )) {
-        sameNameMatch = false;
-      }
-      
-      const isAkamaruUpgrade = selectedCard.number === 29
-        && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('Kiba Inuzuka'))
-        && charCard.name_fr.toUpperCase().includes('KIBA INUZUKA');
-      
-      const isIchibiUpgrade = selectedCard.number === 76
-        && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]'))
-        && charCard.name_fr.toUpperCase() === 'GAARA';
-      
-      const isUkonUpgrade = (selectedCard.number === 63 || selectedCard.number === 124)
-        && (selectedCard.effects ?? []).some(e => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'))
-        && (charCard.group ?? '').toLowerCase().includes('sound');
-      
-      const isKyubiUpgrade = selectedCard.number === 129
-        && charCard.name_fr.toUpperCase().includes('NARUTO');
-      
-      const isSakonUpgrade = selectedCard.number === 127
-        && (selectedCard.effects ?? []).some(e => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'))
-        && (charCard.group ?? '').toLowerCase().includes('sound');
-
-      const isFlexUpgrade = isFlexible || isAkamaruUpgrade || isIchibiUpgrade || isUkonUpgrade || isKyubiUpgrade || isSakonUpgrade;
-      const nameOk = sameNameMatch || isFlexUpgrade;
+      const sameNameMatch = charCard.name_fr.toUpperCase() === selectedCard.name_fr.toUpperCase();
+      const isFlexUpgrade = checkFlexibleUpgrade(selectedCard as any, charCard as any);
+      const nameOk = isUpgradeNameLegal(selectedCard as any, charCard as any);
       if (!nameOk || charCard.chakra >= selectedCard.chakra) return false;
 
       if (!sameNameMatch && isFlexUpgrade) {

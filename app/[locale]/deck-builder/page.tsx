@@ -560,7 +560,7 @@ export default function DeckBuilderPage() {
     import("@/lib/data/cardLoader").then((mod) => {
       setAvailableChars([...mod.getPlayableCharacters(), ...(mod.getPlayableAttachments() as unknown as CharacterCard[])]);
       setAvailableMissions(mod.getPlayableMissions());
-      setAllChars(mod.getAllCharacters());
+      setAllChars([...mod.getAllCharacters(), ...(mod.getAllAttachments() as unknown as CharacterCard[])]);
       setAllMissions(mod.getAllMissions());
     });
   }, [revealingVersion]);

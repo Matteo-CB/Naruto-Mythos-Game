@@ -1,5 +1,5 @@
 import type { CardData, CharacterCard, MissionCard } from '../engine/types';
-import { getAllCards, getAllCharacters, getAllMissions, getPlayableCharacters, getPlayableMissions, augmentRawCards } from './cardLoader';
+import { getAllCards, getAllCharacters, getAllAttachments, getAllMissions, getPlayableCharacters, getPlayableMissions, augmentRawCards } from './cardLoader';
 import { isHoloId, holoBaseId, isHoloEligibleCard, decorateHoloCard } from '../holo/holoId';
 
 
@@ -50,6 +50,9 @@ function buildCharIdMap(): Map<string, CharacterCard> {
   const map = new Map<string, CharacterCard>();
   for (const card of getAllCharacters()) {
     map.set(card.id, card);
+  }
+  for (const card of getAllAttachments()) {
+    map.set(card.id, card as unknown as CharacterCard);
   }
   return map;
 }

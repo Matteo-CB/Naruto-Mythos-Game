@@ -289,7 +289,7 @@ export function validateUpgradeCharacter(
   
   
   const newCardNumberValidate = typeof newCard.number === 'string' ? parseInt(newCard.number, 10) : newCard.number;
-  if ((newCardNumberValidate === 51 || newCardNumberValidate === 138) &&
+  if (String(newCard.set ?? 'KS') === 'KS' && (newCardNumberValidate === 51 || newCardNumberValidate === 138) &&
     (newCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'))) {
     const isSummon = (topCard.keywords ?? []).includes('Summon');
     const isOrochimaru = topCard.name_fr.toUpperCase().includes('OROCHIMARU');
@@ -312,6 +312,23 @@ export function validateUpgradeCharacter(
   }
 
   return { valid: true };
+}
+
+
+export function isUpgradeNameLegal(newCard: CharacterCard, targetTopCard: CharacterCard): boolean {
+  const numberVal = typeof newCard.number === 'string' ? parseInt(newCard.number, 10) : newCard.number;
+  const isKS = String(newCard.set ?? 'KS') === 'KS';
+  const hasSummonRestriction = isKS && (numberVal === 51 || numberVal === 138)
+    && (newCard.effects ?? []).some(
+      (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'),
+    );
+  if (hasSummonRestriction) {
+    const isSummon = (targetTopCard.keywords ?? []).includes('Summon');
+    const isOrochimaru = targetTopCard.name_fr.toUpperCase().includes('OROCHIMARU');
+    if (isSummon || isOrochimaru) return false;
+  }
+  if (newCard.name_fr.toUpperCase() === targetTopCard.name_fr.toUpperCase()) return true;
+  return checkFlexibleUpgrade(newCard, targetTopCard);
 }
 
 
