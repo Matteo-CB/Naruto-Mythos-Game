@@ -988,7 +988,8 @@
         "ss099Hide": "{card}：より弱い敵の術キャラクターを伏せた。",
         "ss078Draw": "{card}：チャクラを1支払いカードを1枚引いた。",
         "ss089Move": "{card}：装備が{target}に移動した。",
-        "ss117Chakra": "{card}：敵キャラクターを移動させてチャクラを1得た。"
+        "ss117Chakra": "{card}：敵キャラクターを移動させてチャクラを1得た。",
+        "ss046DrawNames": "{card}：{revealed} を公開し、{target} を引いた。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1006,7 +1007,8 @@
       "playAttachment": "アタッチメント{card}をチャクラ{cost}でプレイ。",
       "attachToMission": "{card}がミッション{mission}に付けられた。",
       "attachToCharacter": "{card}が{target}に付けられた。",
-      "useFirstStrike": "FIRST STRIKE：{card}がラウンド開始前に先制する。"
+      "useFirstStrike": "FIRST STRIKE：{card}がこのラウンドで先制する。",
+      "attachmentDiscarded": "{card}は装着条件を満たさなくなったため捨てられた。"
     },
     "end": {
       "victory": "勝利",
@@ -1101,7 +1103,8 @@
       "restoreEffect": "保留中の効果",
       "edge": "主導権",
       "edgeLocked": "固定",
-      "handPeeked": "相手があなたの手札を見ています"
+      "handPeeked": "相手があなたの手札を見ています",
+      "goBack": "戻る"
     },
     "handLabel": "手札",
     "effect": {
@@ -1314,7 +1317,7 @@
         "choji112ConfirmUpgrade": "UPGRADE：MAIN効果を繰り返す。もう1枚捨てて POWERUP。",
         "kimimaro123ConfirmUpgrade": "UPGRADE：カードを1枚捨て、コスト5以下のキャラクターを撃破する。",
         "kidomaru124ConfirmAmbush": "AMBUSH：別のミッションのパワー3以下の敵を撃破する。",
-        "kidomaru124ConfirmUpgradeModifier": "UPGRADE 修正：パワー制限が5以下になる。",
+        "kidomaru124ConfirmUpgradeModifier": "UPGRADE：パワー制限が5以下になる。",
         "tayuya125ConfirmUpgrade": "UPGRADE：音隠れの里のキャラクターを、コストを2少なくして出す。",
         "orochimaru126ConfirmScore": "SCORE：場の最も弱い敵キャラクターを撃破する。",
         "orochimaru126ConfirmUpgrade": "UPGRADE：POWERUP 3（自身）。",
@@ -1546,7 +1549,7 @@
         "sasuke146GiveEdge": "サスケ（146）：主導権トークンを得ます。",
         "akamaru029ChooseHide": "赤丸（029）：伏せる敵キャラクター（コスト {cost}）を選んでください。",
         "kimimaro123AutoDiscardDefeat": "君麻呂（123）UPGRADE：最後のカードが捨てられます。コスト5以下のキャラクターを撃破するために選んでください。",
-        "narutoLegendaryConfirmMain": "ナルト（レジェンダリー）MAIN：このミッションのパワー5以下の敵と、場のパワー2以下の別の敵を伏せる。",
+        "narutoLegendaryConfirmMain": "MAIN：このミッションのパワー5以下の敵と、場のパワー2以下の別の敵を伏せる。",
         "narutoLegendaryConfirmUpgradeModifier": "ナルト（レジェンダリー）：UPGRADE を適用しますか？両方を伏せる代わりに撃破する。",
         "narutoLegendaryDefeatTarget1": "ナルト（レジェンダリー）：このミッションで撃破するパワー5以下の敵キャラクターを選んでください。",
         "narutoLegendaryHideTarget1": "ナルト（レジェンダリー）：このミッションで伏せるパワー5以下の敵キャラクターを選んでください。",
@@ -1617,10 +1620,10 @@
         "attachChooseTarget": "{card}を付ける味方キャラクターを選んでください。",
         "ss128ConfirmDuel": "DUEL 次郎坊：このミッションのパワー8以上の敵キャラクターを撃破しますか？",
         "ss128Defeat": "秋道チョウジ：撃破するパワー8以上の敵キャラクターを選んでください。",
-        "ss108ConfirmScore": "SCORE 試験スタジアム：味方キャラクター1体が条件を無視して即時DUEL効果を発動しますか？",
+        "ss108ConfirmScore": "SCORE：味方キャラクター1体が条件を無視して即時DUEL効果を発動しますか？",
         "ss108ChooseCharacter": "試験スタジアム：DUEL効果を発動する味方キャラクターを選んでください。",
         "ss049FirstStrikeChar": "FIRST STRIKE：このミッションから移動させるキャラクターを選ぶ。",
-        "ss046ConfirmMain": "砂隠れのキャラクターが出るまで山札の上を公開し、それを引いて残りをシャッフルしますか？",
+        "ss046ConfirmMain": "MAIN：砂隠れのキャラクターが出るまで山札の上を公開し、それを引いて残りをシャッフルしますか？",
         "ss047Defeat": "倒す敵キャラクター（パワー3以下）を選ぶ。",
         "ss078DuelDefeat": "倒す敵キャラクター（コスト2以下）を選ぶ。",
         "ss114ChooseDiscard": "手札から捨てる我愛羅を選ぶ。",
@@ -1825,7 +1828,10 @@
       "chakraCost": "チャクラコスト",
       "power": "パワー",
       "clear": "絞り込みをクリア",
-      "resultsCount": "{count} 枚"
+      "resultsCount": "{count} 枚",
+      "allTypes": "すべてのタイプ",
+      "typeCharacters": "キャラクター",
+      "typeAttachments": "アタッチメント"
     },
     "search": {
       "helpButton": "? 詳細検索",
@@ -1888,7 +1894,9 @@
       "edLabel": "DUELテキスト",
       "edDesc": "DUEL効果のテキストのみを検索",
       "efLabel": "FIRST STRIKEテキスト",
-      "efDesc": "First Strike効果のテキストのみを検索（対象カードはまだなし）"
+      "efDesc": "First Strike効果のテキストのみを検索（対象カードはまだなし）",
+      "eatLabel": "ATTACH効果",
+      "eatDesc": "アタッチメントのATTACH行を検索します。例えば何に装着するか。"
     },
     "sort": "並べ替え",
     "error": {
@@ -2297,7 +2305,9 @@
     "linkCopied": "リンクをコピーしました",
     "winner": "勝者",
     "switchPerspective": "{player} として見る",
-    "replayComplete": "リプレイ完了"
+    "replayComplete": "リプレイ完了",
+    "hideControls": "UIを隠す",
+    "showControls": "UIを表示"
   },
   "room": {
     "error": {
@@ -3969,7 +3979,9 @@
       "holo_id": "ホロ版はメニューに表示できません。",
       "too_many": "カードを選びすぎています。",
       "invalid": "選択が正しくありません。"
-    }
+    },
+    "rarityFilterAll": "すべてのレアリティ",
+    "selectedOnly": "選択済みのみ"
   },
   "playStats": {
     "buttonLabel": "統計",

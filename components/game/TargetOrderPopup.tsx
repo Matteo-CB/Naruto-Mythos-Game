@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { localizeMessageParams } from '@/lib/i18n/localizeMessageParams';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useUIStore } from '@/stores/uiStore';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -161,7 +161,7 @@ export function TargetOrderPopup({
             {targets.map((target) => {
               const orderIndex = orderedIds.indexOf(target.instanceId);
               const isSelected = orderIndex >= 0;
-              const imagePath = normalizeImagePath(target.image_file);
+              const imagePath = portraitImagePath(target);
               const displayName = getCardName(target, locale);
               const missionColor = rankColorMap[target.missionRank ?? ''] ?? '#888';
 

@@ -14,6 +14,12 @@ import type {
   MissionRank,
 } from '@/lib/engine/types';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
+
+function boardKeyOf(char: VisibleCharacter): string {
+  const face = char.topCard ?? char.card;
+  return `${char.instanceId}-${face?.id ?? 'hidden'}`;
+}
+
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { getCardName } from '@/lib/utils/cardLocale';
@@ -264,30 +270,44 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </>
       )}
 
-      {!isHidden && (character.attachments?.length ?? 0) > 0 && (
-        <div
-          className="absolute bottom-0.5 left-0.5 z-10 flex flex-col gap-0.5"
-          onClick={(e) => { e.stopPropagation(); pinCard(character.attachments![0].card as never); }}
-          title={character.attachments!.map((a) => getCardName(a.card, locale as 'en' | 'fr')).join(', ')}
-          style={{ cursor: 'pointer' }}
-        >
-          {character.attachments!.slice(0, 2).map((att) => (
+      {!isHidden && (character.attachments ?? []).map((att) => {
+        const mine = att.owner === myPlayer;
+        return (
+          <div
+            key={att.instanceId}
+            onClick={(e) => { e.stopPropagation(); pinCard(att.card as never); }}
+            title={getCardName(att.card, locale as 'en' | 'fr')}
+            style={{
+              position: 'absolute',
+              top: '6%',
+              [mine ? 'right' : 'left']: 0,
+              width: '22%',
+              height: '88%',
+              cursor: 'pointer',
+              zIndex: 5,
+              overflow: 'hidden',
+              backgroundColor: '#141414',
+              boxShadow: mine
+                ? '-2px 0 8px rgba(0,0,0,0.65), 0 0 10px rgba(196,163,90,0.45)'
+                : '2px 0 8px rgba(0,0,0,0.65), 0 0 10px rgba(179,62,62,0.45)',
+            }}
+          >
             <div
-              key={att.instanceId}
               style={{
-                width: dims.isMobile ? '28px' : '23px',
-                height: dims.isMobile ? '37px' : '31px',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                width: '340%',
+                height: '29%',
+                transform: `translate(-50%, -50%) rotate(${mine ? 90 : -90}deg)`,
                 backgroundImage: att.card.image_file ? `url('${normalizeImagePath(att.card.image_file)}')` : undefined,
-                backgroundColor: '#141414',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                borderRadius: '2px',
-                boxShadow: '0 0 10px rgba(196, 163, 90, 0.65), 0 1px 3px rgba(0,0,0,0.6)',
               }}
             />
-          ))}
-        </div>
-      )}
+          </div>
+        );
+      })}
 
       {!isHidden && (
         <div
@@ -807,7 +827,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
           <div className="flex flex-wrap gap-0.5 justify-center content-end min-h-full">
             {oppChars.map((char) => (
               <CharacterSlot
-                key={char.instanceId}
+                key={boardKeyOf(char)}
                 character={char}
                 isOwn={false}
                 missionIndex={missionIndex}
@@ -886,7 +906,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
           <div className="flex flex-wrap gap-0.5 justify-center content-start min-h-full">
             {myChars.map((char) => (
               <CharacterSlot
-                key={char.instanceId}
+                key={boardKeyOf(char)}
                 character={char}
                 isOwn={true}
                 missionIndex={missionIndex}

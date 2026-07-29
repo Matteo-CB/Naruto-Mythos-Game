@@ -10,6 +10,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { ManualGuess } from './ManualGuess';
 import type { VisibleCharacter, VisibleMission, MissionRank, CharacterCard, MissionCard } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { isLandscapeCard } from '@/lib/cards/orientation';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
 import {
@@ -198,7 +199,7 @@ type ConstraintMode = 'free' | 'one-per-mission' | 'all-in-mission' | 'naruto133
 
 function OrderedDefeatPopup({
   missions, validTargets, myPlayer, description, descriptionKey, descriptionParams,
-  onConfirm, onDecline, canDecline, minSelections, constraintMode, sourceMissionIndex, targetGroups: targetGroupsProp,
+  onConfirm, onDecline, canDecline, onRewind, minSelections, constraintMode, sourceMissionIndex, targetGroups: targetGroupsProp,
 }: {
   missions: VisibleMission[];
   validTargets: string[];
@@ -213,6 +214,7 @@ function OrderedDefeatPopup({
   onConfirm: (orderedIds: string[]) => void;
   onDecline?: () => void;
   canDecline?: boolean;
+  onRewind?: () => void;
 }) {
   const t = useTranslations();
   const locale = useLocale();
@@ -453,6 +455,9 @@ function OrderedDefeatPopup({
           )}
 
           <div className="flex justify-center gap-3">
+            {onRewind && (
+              <PopupDismissLink onClick={onRewind}>{t('game.board.goBack')}</PopupDismissLink>
+            )}
             {canConfirm && (
               <PopupActionButton accentColor="#c4a35a" onClick={() => onConfirm(orderedIds)}>
                 {t('game.board.confirm')}
@@ -834,6 +839,7 @@ export function TargetSelector() {
         onConfirm={(orderedIds) => handleSelect(JSON.stringify(orderedIds))}
         onDecline={canDecline ? handleDecline : undefined}
         canDecline={canDecline}
+        onRewind={pendingTargetSelection.canRewind ? () => handleSelect('__rewind') : undefined}
         minSelections={pendingTargetSelection?.minSelections}
         constraintMode={odConstraint}
         sourceMissionIndex={odSourceMission}
@@ -1619,6 +1625,16 @@ export function TargetSelector() {
       }
     }
 
+    let confirmIsLandscape = false;
+    if (!confirmImage) {
+      const sourceCard = pendingTargetSelection.confirmCardData;
+      if (sourceCard?.image_file) {
+        confirmIsLandscape = isLandscapeCard(sourceCard as unknown as Parameters<typeof isLandscapeCard>[0]);
+        confirmImage = normalizeImagePath(sourceCard.image_file);
+        if (!confirmName) confirmName = getCardName(sourceCard as never, locale as 'en' | 'fr');
+      }
+    }
+
     return (
         <PopupOverlay holdForEntrance>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="440px">
@@ -1634,8 +1650,8 @@ export function TargetSelector() {
                 transition={{ type: 'spring', stiffness: 150, damping: 14, delay: 0.15 }}
                 className="relative mb-6 mx-auto"
                 style={{
-                  width: (confirmTarget?.includes('-MMS')) ? '200px' : '120px',
-                  height: (confirmTarget?.includes('-MMS')) ? '143px' : '168px',
+                  width: (confirmIsLandscape || confirmTarget?.includes('-MMS')) ? '200px' : '120px',
+                  height: (confirmIsLandscape || confirmTarget?.includes('-MMS')) ? '143px' : '168px',
                   overflow: 'hidden',
                   border: '2px solid rgba(196, 163, 90, 0.5)',
                   boxShadow: '0 0 20px rgba(196, 163, 90, 0.15), 0 8px 24px rgba(0, 0, 0, 0.5)',
@@ -1746,13 +1762,18 @@ export function TargetSelector() {
             ))}
           </motion.div>
 
-          {canDecline && (
-            <div className="flex justify-center mt-2">
+          <div className="flex justify-center gap-4 mt-2">
+            {pendingTargetSelection.canRewind && (
+              <PopupDismissLink onClick={() => handleSelect('__rewind')}>
+                {t('game.board.goBack')}
+              </PopupDismissLink>
+            )}
+            {canDecline && (
               <PopupDismissLink onClick={handleDecline}>
                 {declineLabelKey ? t(declineLabelKey) : t('game.board.skip')}
               </PopupDismissLink>
-            </div>
-          )}
+            )}
+          </div>
         </PopupCornerFrame>
       </PopupOverlay>
   );

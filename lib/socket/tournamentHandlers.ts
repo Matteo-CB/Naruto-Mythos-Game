@@ -871,9 +871,19 @@ export async function reopenTournamentMatch(
   try {
     const existing = await prisma.tournamentMatch.findUnique({
       where: { id: matchId },
-      select: { roomCode: true },
+      select: { roomCode: true, gameId: true, status: true },
     });
     previousRoomCode = existing?.roomCode ?? null;
+
+    if (existing?.gameId || existing?.status === 'completed') {
+      console.warn(`[Tournament] reopenTournamentMatch: refusing to reopen ${matchId}, a game already exists (${existing.gameId ?? existing.status}).`);
+      return;
+    }
+    const liveRoom = previousRoomCode ? rooms.get(previousRoomCode) : null;
+    if (liveRoom?.gameState && !liveRoom.finalized) {
+      console.warn(`[Tournament] reopenTournamentMatch: refusing to reopen ${matchId}, its game is running in room ${previousRoomCode}.`);
+      return;
+    }
   } catch {
     previousRoomCode = null;
   }

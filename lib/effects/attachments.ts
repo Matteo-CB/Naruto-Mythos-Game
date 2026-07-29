@@ -14,11 +14,31 @@ function requiredAttachGroup(card?: CardData | null): string | null {
     if (effect.type !== 'ATTACH') continue;
     const m = (effect.description ?? '').match(/Attach to a friendly\s+(.+?)\s+character/i);
     if (m) {
-      const g = m[1].trim();
-      if (g.toLowerCase() !== 'non-hidden') return g;
+      const g = m[1].trim().replace(/^non-hidden\s+/i, '').trim();
+      if (g && g.toLowerCase() !== 'non-hidden') return g;
     }
   }
   return null;
+}
+
+export function attachesToEnemy(card?: CardData | null): boolean {
+  return (card?.effects ?? []).some(
+    (e) => e.type === 'ATTACH' && /attach to an enemy/i.test(e.description ?? ''),
+  );
+}
+
+function attachTexts(card?: CardData | null): string[] {
+  return (card?.effects ?? [])
+    .filter((e) => e.type === 'ATTACH')
+    .map((e) => e.description ?? '');
+}
+
+export function requiresNonHiddenHost(card?: CardData | null): boolean {
+  return attachTexts(card).some((text) => /non-hidden/i.test(text));
+}
+
+export function requiresHiddenHost(card?: CardData | null): boolean {
+  return attachTexts(card).some((text) => /hidden/i.test(text) && !/non-hidden/i.test(text));
 }
 
 export function getCharacterAttachTargets(
@@ -29,21 +49,88 @@ export function getCharacterAttachTargets(
 ): CharacterInPlay[] {
   const mission = state.activeMissions[missionIndex];
   if (!mission) return [];
-  const side = player === 'player1' ? 'player1Characters' : 'player2Characters';
+  const wantsEnemy = attachesToEnemy(attachmentCard);
+  const hostOwner: PlayerID = wantsEnemy
+    ? (player === 'player1' ? 'player2' : 'player1')
+    : player;
+  const side = hostOwner === 'player1' ? 'player1Characters' : 'player2Characters';
   const needGroup = requiredAttachGroup(attachmentCard);
+  const wantsHiddenHost = requiresHiddenHost(attachmentCard);
   return mission[side].filter(
-    (c) => !c.isHidden && c.controlledBy === player && (c.card as CardData).card_type !== 'attachment'
+    (c) => c.isHidden === wantsHiddenHost && c.controlledBy === hostOwner
+      && (c.card as CardData).card_type !== 'attachment'
       && (!needGroup || characterHasGroup(c, needGroup)),
   );
 }
 
+export function discardAttachments(state: GameState, attachments: AttachedCard[]): GameState {
+  if (attachments.length === 0) return state;
+  let next = state;
+  for (const att of attachments) {
+    const owner = att.owner;
+    next = {
+      ...next,
+      [owner]: { ...next[owner], discardPile: [...next[owner].discardPile, att.card] },
+      log: logAction(
+        next.log, next.turn, next.phase, owner,
+        'DISCARD_ATTACHMENT',
+        `${att.card.name_fr} was discarded because its attach condition no longer holds.`,
+        'game.log.attachmentDiscarded',
+        { card: att.card.name_fr, card_en: att.card.name_en ?? att.card.name_fr, id: att.card.id },
+      ),
+    };
+  }
+  return next;
+}
+
+function attachConditionHolds(host: CharacterInPlay, attachment: CardData): boolean {
+  if (requiresNonHiddenHost(attachment) && host.isHidden) return false;
+  if (requiresHiddenHost(attachment) && !host.isHidden) return false;
+  const group = requiredAttachGroup(attachment);
+  if (group && !characterHasGroup(host, group)) return false;
+  return true;
+}
+
+export function enforceAttachmentConditions(state: GameState): GameState {
+  const dropped: AttachedCard[] = [];
+  const missions = state.activeMissions.map((mission) => {
+    let missionChanged = false;
+    const next = { ...mission };
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      let sideChanged = false;
+      const chars = mission[side].map((char) => {
+        const held = char.attachments ?? [];
+        if (held.length === 0) return char;
+        const kept = held.filter((att) => attachConditionHolds(char, att.card));
+        if (kept.length === held.length) return char;
+        for (const att of held) if (!kept.includes(att)) dropped.push(att);
+        sideChanged = true;
+        return { ...char, attachments: kept };
+      });
+      if (sideChanged) { next[side] = chars; missionChanged = true; }
+    }
+    return missionChanged ? next : mission;
+  });
+
+  if (dropped.length === 0) return state;
+  return discardAttachments({ ...state, activeMissions: missions }, dropped);
+}
+
+export function missionAlreadyHasPlayerAttachment(state: GameState, player: PlayerID, missionIndex: number): boolean {
+  const mission = state.activeMissions[missionIndex];
+  if (!mission) return false;
+  return (mission.attachments ?? []).some((a) => a.owner === player);
+}
+
 export function attachCardToMission(state: GameState, player: PlayerID, card: CardData, missionIndex: number): GameState {
-  const missions = [...state.activeMissions];
+  const previous = (state.activeMissions[missionIndex]?.attachments ?? []).filter((a) => a.owner === player);
+  const base = discardAttachments(state, previous);
+  const missions = [...base.activeMissions];
   const mission = { ...missions[missionIndex] };
   const att: AttachedCard = { instanceId: generateInstanceId(), card, owner: player };
-  mission.attachments = [...(mission.attachments ?? []), att];
+  mission.attachments = [...(mission.attachments ?? []).filter((a) => a.owner !== player), att];
   missions[missionIndex] = mission;
-  let newState: GameState = { ...state, activeMissions: missions };
+  let newState: GameState = { ...base, activeMissions: missions };
   newState = {
     ...newState,
     log: logAction(
@@ -86,18 +173,21 @@ export function attachCardToCharacter(state: GameState, player: PlayerID, card: 
   const mission = { ...missions[hostMissionIndex] };
   const chars = [...mission[hostSide]];
   const host = { ...chars[hostIdx] };
+  const held = host.attachments ?? [];
+  const replaced = held.filter((a) => a.owner === player);
   const att: AttachedCard = { instanceId: generateInstanceId(), card, owner: player };
-  host.attachments = [...(host.attachments ?? []), att];
+  host.attachments = [...held.filter((a) => a.owner !== player), att];
   chars[hostIdx] = host;
   mission[hostSide] = chars;
   missions[hostMissionIndex] = mission;
 
   const hostTop = host.stack?.length > 0 ? host.stack[host.stack.length - 1] : host.card;
+  const afterReplacement = discardAttachments(state, replaced);
   let newState: GameState = {
-    ...state,
+    ...afterReplacement,
     activeMissions: missions,
     log: logAction(
-      state.log, state.turn, state.phase, player,
+      afterReplacement.log, state.turn, state.phase, player,
       'ATTACH_CARD',
       `Attached ${card.name_fr} to ${hostTop.name_fr}.`,
       'game.log.attachToCharacter',

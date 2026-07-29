@@ -1,4 +1,5 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
+import { confirmFirst } from './confirmFirst';
 import type { CharacterInPlay } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
@@ -59,7 +60,7 @@ function minato122MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  return {
+  return confirmFirst({
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'MINATO122_SELECT',
@@ -67,7 +68,7 @@ function minato122MainHandler(ctx: EffectContext): EffectResult {
     isOptional: true,
     description: JSON.stringify({ sourceMissionIndex, discardTargets, moveTargets }),
     descriptionKey: 'game.effect.desc.minato122Select',
-  };
+  }, ctx.sourceCard.instanceId, 'MINATO122_CONFIRM_MAIN');
 }
 
 export function registerMinato122Handlers(): void {

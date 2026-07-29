@@ -127,7 +127,8 @@ describe('Sakura 135 - Bring it Back full flow', () => {
 
     const reorderPending = state.pendingEffects.find((e) => e.targetSelectionType === 'REORDER_DISCARD');
     expect(reorderPending).toBeDefined();
-    expect(reorderPending!.validTargets!.length).toBe(2);
+    expect(reorderPending!.validTargets!.filter((t) => t !== '__rewind').length, 'the two cards to order').toBe(2);
+    expect(reorderPending!.validTargets, 'plus the go back option').toContain('__rewind');
 
     const choosePendingStillThere = state.pendingEffects.find((e) => e.targetSelectionType === 'SAKURA135_CHOOSE_CARD');
     expect(choosePendingStillThere).toBeUndefined();

@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import type { CharacterCard, MissionCard, VisibleCharacter } from '@/lib/engine/types';
 
@@ -265,8 +265,11 @@ function AllCardsModal({
 
   const allCards = useMemo(() => {
     try {
-      const { getAllCharacters } = require('@/lib/data/cardIndex');
-      return getAllCharacters() as CharacterCard[];
+      const { getAllCharacters, getAllAttachments } = require('@/lib/data/cardLoader');
+      return [
+        ...(getAllCharacters() as CharacterCard[]),
+        ...(getAllAttachments() as unknown as CharacterCard[]),
+      ];
     } catch {
       return [] as CharacterCard[];
     }
@@ -343,7 +346,7 @@ function AllCardsModal({
                 >
                   {card.image_file ? (
                     <img
-                      src={normalizeImagePath(card.image_file) || undefined}
+                      src={portraitImagePath(card) || undefined}
                       alt={getCardName(card, locale as 'en' | 'fr')}
                       className="w-full h-full"
                       style={{ objectFit: 'cover' }}
@@ -414,7 +417,7 @@ function BoardCharactersModal({
 
   const renderChar = (char: VisibleCharacter, missionIdx: number) => {
     if (!char.card) return null;
-    const imgPath = normalizeImagePath(char.card.image_file);
+    const imgPath = portraitImagePath(char.card);
     return (
       <button
         key={char.instanceId}
@@ -594,7 +597,7 @@ function MoveCharacterModal({
                   <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
                     {allChars.map((char) => {
                       if (!char.card) return null;
-                      const imgPath = normalizeImagePath(char.card.image_file);
+                      const imgPath = portraitImagePath(char.card);
                       return (
                         <button key={char.instanceId}
                           onClick={() => setSelected({ missionIdx: mi, instanceId: char.instanceId, name: getCardName(char.card!, locale as 'en' | 'fr') })}
@@ -641,7 +644,7 @@ function DeckCardItem({
   const t = useTranslations();
   const locale = useLocale();
   const zoomCard = useUIStore((s) => s.zoomCard);
-  const imagePath = normalizeImagePath(card.image_file);
+  const imagePath = portraitImagePath(card);
 
   return (
     <button

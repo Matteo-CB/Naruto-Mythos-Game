@@ -7,7 +7,7 @@ import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import CardFace from '@/components/cards/CardFace';
-import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoader';
+import { getPlayableCharacters, getPlayableAttachments, getPlayableMissions } from '@/lib/data/cardLoader';
 import { getCardName } from '@/lib/utils/cardLocale';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
@@ -24,6 +24,8 @@ export default function AdminCardsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterMode>('all');
+  const [filterSet, setFilterSet] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState<'character' | 'attachment' | 'mission' | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [banReasonCardId, setBanReasonCardId] = useState<string | null>(null);
   const [banReason, setBanReason] = useState('');
@@ -31,8 +33,15 @@ export default function AdminCardsPage() {
 
   const allCards = useMemo(() => {
     const chars = getPlayableCharacters();
+    const attachments = getPlayableAttachments() as unknown as CharacterCard[];
     const missions = getPlayableMissions();
-    return [...chars, ...missions] as (CharacterCard | MissionCard)[];
+    return [...chars, ...attachments, ...missions] as (CharacterCard | MissionCard)[];
+  }, []);
+
+  const availableSets = useMemo(() => {
+    const ids = new Set<string>();
+    for (const card of allCards) if (card.set) ids.add(card.set);
+    return [...ids].sort();
   }, []);
 
   useEffect(() => {
@@ -135,6 +144,8 @@ export default function AdminCardsPage() {
     
     if (filter === 'banned' && !bannedIds.has(card.id)) return false;
     if (filter === 'authorized' && bannedIds.has(card.id)) return false;
+    if (filterSet && card.set !== filterSet) return false;
+    if (typeFilter && ((card as { card_type?: string }).card_type ?? 'character') !== typeFilter) return false;
     return true;
   });
 
@@ -197,6 +208,55 @@ export default function AdminCardsPage() {
                 {t(`adminCards.filter.${f}`)}
               </button>
             ))}
+          </div>
+
+          <div className="flex flex-wrap gap-1.5">
+            {([null, 'character', 'attachment', 'mission'] as const).map((type) => {
+              const active = typeFilter === type;
+              const label = type === null
+                ? t('deckBuilder.filters.allTypes')
+                : type === 'character'
+                  ? t('deckBuilder.filters.typeCharacters')
+                  : type === 'attachment'
+                    ? t('deckBuilder.filters.typeAttachments')
+                    : t('collection.missions');
+              return (
+                <button
+                  key={type ?? 'all'}
+                  onClick={() => setTypeFilter(type)}
+                  aria-pressed={active}
+                  className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors"
+                  style={{
+                    backgroundColor: active ? 'rgba(196,163,90,0.16)' : '#0a0a0a',
+                    color: active ? '#c4a35a' : '#555555',
+                    border: 'none', cursor: 'pointer',
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex flex-wrap gap-1.5">
+            {([null, ...availableSets] as const).map((sid) => {
+              const active = filterSet === sid;
+              return (
+                <button
+                  key={sid ?? 'all'}
+                  onClick={() => setFilterSet(sid)}
+                  aria-pressed={active}
+                  className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors"
+                  style={{
+                    backgroundColor: active ? 'rgba(196,163,90,0.16)' : '#0a0a0a',
+                    color: active ? '#c4a35a' : '#555555',
+                    border: 'none', cursor: 'pointer',
+                  }}
+                >
+                  {sid ?? t('collection.allSets')}
+                </button>
+              );
+            })}
           </div>
 
           

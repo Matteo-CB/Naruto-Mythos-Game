@@ -139,8 +139,12 @@ describe('Minato Namikaze SS-122-SPV (Special Variant)', () => {
 
     const result = handler!({ state, sourcePlayer: 'player1', sourceCard: minato, sourceMissionIndex: 0, triggerType: 'MAIN', isUpgrade: false });
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('MINATO122_SELECT');
-    expect(result.validTargets).toContain('shukaku');
-    expect(result.validTargets).toContain('kurama');
+    expect(result.targetSelectionType).toBe('MINATO122_CONFIRM_MAIN');
+    expect(result.validTargets).toEqual([minato.instanceId]);
+
+    const relayed = JSON.parse(result.description as string) as { nextType: string; targets: string[] };
+    expect(relayed.nextType).toBe('MINATO122_SELECT');
+    expect(relayed.targets).toContain('shukaku');
+    expect(relayed.targets).toContain('kurama');
   });
 });

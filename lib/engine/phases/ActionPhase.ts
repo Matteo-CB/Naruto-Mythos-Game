@@ -10,7 +10,7 @@ import { calculateEffectiveCost, hasKurenai034CostReduction } from '../rules/Cha
 import { EffectEngine } from '../../effects/EffectEngine';
 import { applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
-import { canUseFirstStrike, expireFirstStrike, getFirstStrikeCandidates, withFirstStrikeStatus } from '../rules/firstStrike';
+import { expireFirstStrike, canUseFirstStrike, getFirstStrikeCandidates, getFirstStrikeStatus, withFirstStrikeStatus } from '../rules/firstStrike';
 
 
 export function executeAction(state: GameState, player: PlayerID, action: GameAction): GameState {
@@ -66,8 +66,8 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
       if (newState === beforeAction) return state;
       break;
     case 'DECLINE_FIRST_STRIKE':
-      if (newState.pendingEffects.length > 0 || newState.pendingActions.length > 0) return state;
-      return expireFirstStrike(newState, player);
+      if (getFirstStrikeStatus(newState, player) !== 'available') return state;
+      return withFirstStrikeStatus(newState, player, 'expired');
     case 'PASS':
 
 
@@ -326,39 +326,6 @@ function handlePlayHidden(
 }
 
 
-function handleUseFirstStrike(
-  state: GameState,
-  player: PlayerID,
-  characterInstanceId: string,
-): GameState {
-  if (!canUseFirstStrike(state, player)) return state;
-
-  const candidate = getFirstStrikeCandidates(state, player).find((c) => c.instanceId === characterInstanceId);
-  if (!candidate) return state;
-
-  const mission = state.activeMissions[candidate.missionIndex];
-  if (!mission) return state;
-  const side = player === 'player1' ? mission.player1Characters : mission.player2Characters;
-  const character = side.find((c) => c.instanceId === characterInstanceId);
-  if (!character) return state;
-
-  const topCard = character.stack?.length > 0 ? character.stack[character.stack.length - 1] : character.card;
-
-  let newState = withFirstStrikeStatus(state, player, 'used');
-  newState = {
-    ...newState,
-    log: logAction(
-      newState.log, newState.turn, 'action', player,
-      'EFFECT',
-      `${player} uses FIRST STRIKE with ${topCard.name_fr}.`,
-      'game.log.useFirstStrike',
-      { card: topCard.name_fr, card_en: topCard.name_en || topCard.name_fr, id: topCard.id, mission: candidate.missionIndex + 1 },
-    ),
-  };
-
-  newState = EffectEngine.resolveFirstStrikeEffect(newState, player, character, candidate.missionIndex);
-  return applyRempartTokenRemoval(newState);
-}
 
 function handlePlayAttachment(
   state: GameState,
@@ -824,6 +791,35 @@ function handleUpgradeCharacter(
 }
 
 
+function handleUseFirstStrike(state: GameState, player: PlayerID, characterInstanceId: string): GameState {
+  if (!canUseFirstStrike(state, player)) return state;
+
+  const candidate = getFirstStrikeCandidates(state, player).find((c) => c.instanceId === characterInstanceId);
+  if (!candidate) return state;
+
+  const mission = state.activeMissions[candidate.missionIndex];
+  const side = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+  const character = side.find((c) => c.instanceId === characterInstanceId);
+  if (!character) return state;
+
+  const topCard = character.stack?.length > 0 ? character.stack[character.stack.length - 1] : character.card;
+
+  let newState = withFirstStrikeStatus(state, player, 'used');
+  newState = {
+    ...newState,
+    log: logAction(
+      newState.log, newState.turn, newState.phase, player,
+      'USE_FIRST_STRIKE',
+      `FIRST STRIKE: ${topCard.name_fr} strikes before the round begins.`,
+      'game.log.useFirstStrike',
+      { card: topCard.name_fr, card_en: topCard.name_en ?? topCard.name_fr, id: topCard.id },
+    ),
+  };
+
+  newState = EffectEngine.resolveFirstStrikeEffect(newState, player, character, candidate.missionIndex);
+  return applyRempartTokenRemoval(newState);
+}
+
 function handlePass(state: GameState, player: PlayerID): GameState {
   const ps = { ...state[player] };
   ps.hasPassed = true;
@@ -884,6 +880,7 @@ export function getValidActionsForPlayer(state: GameState, player: PlayerID): Ga
       actions.push({ type: 'USE_FIRST_STRIKE', characterInstanceId: candidate.instanceId });
     }
   }
+
 
   for (let cardIdx = 0; cardIdx < ps.hand.length; cardIdx++) {
     const card = ps.hand[cardIdx];

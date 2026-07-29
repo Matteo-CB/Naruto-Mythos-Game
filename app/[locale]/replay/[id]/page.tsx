@@ -544,6 +544,7 @@ function VisualReplay({
   const locale = useLocale() as 'en' | 'fr';
   const [currentStep, setCurrentStep] = useState(0);
   const [showLog, setShowLog] = useState(false);
+  const [chromeHidden, setChromeHidden] = useState(false);
   const [controlsHot, setControlsHot] = useState(true);
   const [viewAs, setViewAs] = useState<PlayerID>(defaultViewAs ?? 'player1');
 
@@ -1065,6 +1066,28 @@ function VisualReplay({
         style={{ backgroundColor: backgroundUrl ? 'rgba(0, 0, 0, 0.35)' : 'transparent' }}
       />
 
+      <button
+        type="button"
+        onClick={() => setChromeHidden((v) => !v)}
+        aria-pressed={chromeHidden}
+        title={chromeHidden ? tr('showControls') : tr('hideControls')}
+        className="absolute z-40 px-3 py-1 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+        style={{
+          top: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+          right: 8,
+          transform: 'skewX(-3deg)',
+          backgroundColor: chromeHidden ? 'rgba(196,163,90,0.18)' : 'rgba(10, 10, 18, 0.88)',
+          backdropFilter: 'blur(12px)',
+          color: chromeHidden ? '#c4a35a' : '#888',
+          border: 'none',
+        }}
+      >
+        <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
+          {chromeHidden ? tr('showControls') : tr('hideControls')}
+        </span>
+      </button>
+
+      {!chromeHidden && (
       <div className="absolute top-2 left-2 z-30 flex items-center gap-1.5">
         <Link
           href="/"
@@ -1108,6 +1131,7 @@ function VisualReplay({
           </span>
         </button>
       </div>
+      )}
 
       {currentStep >= states.length - 1 && (
         <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
@@ -1121,6 +1145,7 @@ function VisualReplay({
         <ReplayGameHost state={currentState} viewAs={viewAs} playerNames={playerNames} />
       </div>
 
+      {!chromeHidden && (
       <div
         className="absolute inset-x-0 z-20 flex justify-center pointer-events-none"
         style={{
@@ -1140,6 +1165,7 @@ function VisualReplay({
           actionLabel={actionLabel}
         />
       </div>
+      )}
 
       <AnimatePresence>
         {showLog && <TextTimeline log={log} playerNames={playerNames} onClose={() => setShowLog(false)} currentStep={currentStep} states={states} />}

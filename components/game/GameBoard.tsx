@@ -13,7 +13,6 @@ import { OpponentHand } from "./OpponentHand";
 import { PlayerStatsBar } from "./PlayerStatsBar";
 import { OpponentStatsBar } from "./OpponentStatsBar";
 import { MissionLane } from "./MissionLane";
-import { FirstStrikePrompt } from './FirstStrikePrompt';
 import { ActionBar } from "./ActionBar";
 import { MulliganDialog } from "./MulliganDialog";
 import { GameEndScreen } from "./GameEndScreen";
@@ -22,6 +21,7 @@ import { AnimationController } from "./AnimationController";
 import { TargetSelector } from "./TargetSelector";
 import { HandCardSelector } from "./HandCardSelector";
 import { EffectChoiceSelector } from "./EffectChoiceSelector";
+import { FirstStrikePrompt } from "./FirstStrikePrompt";
 import { OpponentSidePiles, PlayerSidePiles } from "./SidePiles";
 import { GameScaleProvider, useGameScale } from "./GameScaleContext";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
@@ -1196,7 +1196,6 @@ function GameBoardInner() {
 
           {!isSpectating && (
             <div className="shrink-0 flex flex-col items-center gap-1 py-0.5 relative" style={{ pointerEvents: 'auto', zIndex: 60 }}>
-              <FirstStrikePrompt />
               <ActionBar />
             </div>
           )}
@@ -1259,6 +1258,7 @@ function GameBoardInner() {
           <TargetSelector />
           <HandCardSelector />
           <EffectChoiceSelector />
+          <FirstStrikePrompt />
         </>
       )}
 

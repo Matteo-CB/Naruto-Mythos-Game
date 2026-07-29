@@ -1456,7 +1456,9 @@
     "linkCopied": "Skopiowano Link",
     "winner": "Zwycięzca",
     "switchPerspective": "Zobacz jako {player}",
-    "replayComplete": "Powtórka Zakończona"
+    "replayComplete": "Powtórka Zakończona",
+    "hideControls": "Ukryj",
+    "showControls": "Pokaż"
   },
   "eloHistory": {
     "loading": "Wczytywanie historii ELO…",
@@ -1735,7 +1737,10 @@
       "chakraCost": "Koszt Czakry",
       "power": "Siła",
       "clear": "Wyczyść Filtry",
-      "resultsCount": "{count} kart"
+      "resultsCount": "{count} kart",
+      "allTypes": "Wszystkie Typy",
+      "typeCharacters": "Postacie",
+      "typeAttachments": "Załączniki"
     },
     "search": {
       "helpButton": "? Wyszukiwanie Zaawansowane",
@@ -1798,7 +1803,9 @@
       "edLabel": "Tekst DUEL",
       "edDesc": "Szukaj tylko w tekście efektów DUEL",
       "efLabel": "Tekst FIRST STRIKE",
-      "efDesc": "Szukaj tylko w tekście efektów First Strike (na razie brak kart)"
+      "efDesc": "Szukaj tylko w tekście efektów First Strike (na razie brak kart)",
+      "eatLabel": "Efekt ATTACH",
+      "eatDesc": "Szuka w linii ATTACH załącznika, na przykład do czego się dołącza."
     },
     "sort": "Sortuj",
     "error": {
@@ -3045,7 +3052,8 @@
         "ss099Hide": "{card}: ukryto słabszą wrogą postać Jutsu.",
         "ss078Draw": "{card}: zapłacono 1 Czakry, aby dobrać 1 kartę.",
         "ss089Move": "{card}: dołączenie przeniesiono na {target}.",
-        "ss117Chakra": "{card}: zyskano 1 Czakry za przeniesienie wrogich postaci."
+        "ss117Chakra": "{card}: zyskano 1 Czakry za przeniesienie wrogich postaci.",
+        "ss046DrawNames": "{card}: odkrywa {revealed}, a następnie dobiera {target}."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3063,7 +3071,8 @@
       "playAttachment": "Gra dodatek {card} za {cost} czakry.",
       "attachToMission": "{card} jest dołączony do misji {mission}.",
       "attachToCharacter": "{card} jest dołączony do {target}.",
-      "useFirstStrike": "FIRST STRIKE: {card} uderza przed rozpoczęciem rundy."
+      "useFirstStrike": "FIRST STRIKE: {card} uderza jako pierwszy w tej rundzie.",
+      "attachmentDiscarded": "{card} została odrzucona: jej warunek załącznika nie jest już spełniony."
     },
     "end": {
       "victory": "Zwycięstwo",
@@ -3158,7 +3167,8 @@
       "restoreEffect": "Oczekujący Efekt",
       "edge": "Przewaga",
       "edgeLocked": "Zablokowana",
-      "handPeeked": "Twój przeciwnik ogląda twoją rękę"
+      "handPeeked": "Twój przeciwnik ogląda twoją rękę",
+      "goBack": "Wróć"
     },
     "handLabel": "Ręka",
     "effect": {
@@ -3603,7 +3613,7 @@
         "sasuke146GiveEdge": "Sasuke (146): Zyskaj żeton Przewagi.",
         "akamaru029ChooseHide": "Akamaru (029): Wybierz, którą wrogą postać (koszt {cost}) ukryć.",
         "kimimaro123AutoDiscardDefeat": "Kimimaro (123) UPGRADE: Twoja ostatnia karta zostanie odrzucona. Wybierz postać o koszcie 5 lub mniej do pokonania.",
-        "narutoLegendaryConfirmMain": "Naruto (Legendarny) MAIN: Ukryj wroga o Sile 5 lub mniej na tej misji ORAZ innego o Sile 2 lub mniej w grze.",
+        "narutoLegendaryConfirmMain": "MAIN: Ukryj wroga o Sile 5 lub mniej na tej misji ORAZ innego o Sile 2 lub mniej w grze.",
         "narutoLegendaryConfirmUpgradeModifier": "Naruto (Legendarny): Zastosować UPGRADE? Pokonaj oba cele zamiast je ukrywać.",
         "narutoLegendaryDefeatTarget1": "Naruto (Legendarny): Wybierz wrogą postać o Sile 5 lub mniej do pokonania na tej misji.",
         "narutoLegendaryHideTarget1": "Naruto (Legendarny): Wybierz wrogą postać o Sile 5 lub mniej do ukrycia na tej misji.",
@@ -3674,10 +3684,10 @@
         "attachChooseTarget": "Wybierz sojuszniczą postać, do której dołączyć {card}.",
         "ss128ConfirmDuel": "DUEL Jirobo: Pokonać wrogą postać na tej misji o Sile 8 lub więcej?",
         "ss128Defeat": "Choji Akimichi: Wybierz wrogą postać o Sile 8 lub więcej do pokonania.",
-        "ss108ConfirmScore": "SCORE Stadion Egzaminacyjny: Sojusznicza postać aktywuje natychmiastowy efekt DUEL, ignorując wymagania?",
+        "ss108ConfirmScore": "SCORE: Sojusznicza postać aktywuje natychmiastowy efekt DUEL, ignorując wymagania?",
         "ss108ChooseCharacter": "Stadion Egzaminacyjny: Wybierz sojuszniczą postać, aby aktywować jej efekt DUEL.",
         "ss049FirstStrikeChar": "FIRST STRIKE: Wybierz postać do przeniesienia z tej misji.",
-        "ss046ConfirmMain": "Odkryć karty z wierzchu talii, aż znajdziesz postać z Wioski Piasku, dobrać ją, a potem wtasować odkryte karty?",
+        "ss046ConfirmMain": "MAIN: Odkryć karty z wierzchu talii, aż znajdziesz postać z Wioski Piasku, dobrać ją, a potem wtasować odkryte karty?",
         "ss047Defeat": "Wybierz wrogą postać z Siłą 3 lub mniejszą do pokonania.",
         "ss078DuelDefeat": "Wybierz wrogą postać o koszcie 2 lub mniejszym do pokonania.",
         "ss114ChooseDiscard": "Wybierz Gaarę do odrzucenia z ręki.",
@@ -3965,7 +3975,9 @@
       "holo_id": "Wersje holo nie mogą być pokazywane w menu.",
       "too_many": "Wybrano za dużo kart.",
       "invalid": "Nieprawidłowy wybór."
-    }
+    },
+    "rarityFilterAll": "Wszystkie rzadkości",
+    "selectedOnly": "Tylko wybrane"
   },
   "playStats": {
     "buttonLabel": "Statystyki",

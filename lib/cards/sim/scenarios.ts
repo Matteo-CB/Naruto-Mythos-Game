@@ -1,5 +1,5 @@
 import type { GameState, PendingAction, PlayerID, GameAction, GameLogEntry, CharacterInPlay } from '@/lib/engine/types';
-import { buildGeneratedScenario } from '@/lib/cards/sim/generate';
+import { buildGeneratedScenario, buildScenarioForEffect, revealScenarioFor } from '@/lib/cards/sim/generate';
 import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import { getCharacterById } from '@/lib/data/cardIndex';
 import { phase810KindForEffect, phase810Scenario } from '@/lib/cards/sim/phase810';
@@ -125,10 +125,25 @@ const FACTORIES: Record<string, Factory> = {
     play: P1(FRESH),
     noMinimize: true,
   }),
+  'KS-111-R': (id) => ({
+    build: () => board({
+      p1m0: [{ id, iid: 'sim-shika' }],
+      e0: [{ id: 'KS-052-C', iid: 'sim-shika-locked', hidden: true }],
+      e1: [{ id: 'KS-005-C', iid: 'sim-shika-free', hidden: true }],
+      p2chakra: 20,
+    }),
+    play: P1(PASS_ACTION),
+    followups: [
+      { player: 'player2', action: { type: 'REVEAL_CHARACTER', missionIndex: 0, characterInstanceId: 'sim-shika-locked' } },
+      { player: 'player2', action: { type: 'REVEAL_CHARACTER', missionIndex: 1, characterInstanceId: 'sim-shika-free' } },
+    ],
+    noMinimize: true,
+  }),
   'SS-049-C': (id) => ({
     build: () => board({
       p1m0: [{ id, iid: 'sim-fs-temari' }, { id: 'KS-009-C', iid: 'sim-fs-ally' }],
       e0: [{ id: 'KS-005-C', iid: 'sim-fs-enemy' }],
+      edge: 'player2',
     }),
     play: P1({ type: 'USE_FIRST_STRIKE', characterInstanceId: 'sim-fs-temari' }),
     noMinimize: true,
@@ -283,9 +298,21 @@ function buildScenario(cardId: string, effectIndex: number): { scenario: SimScen
   const eff = card?.effects?.[effectIndex];
   if (card && eff?.type === 'UPGRADE' && firesUpgrade(card)) return { scenario: upgradeScenario(card), kind: null };
   const base = curatedBaseFor(cardId);
-  if (base) return { scenario: FACTORIES[base](cardId), kind: null };
+  if (base) {
+    const curated = FACTORIES[base](cardId);
+    const curatedReveals = curated.play.action.type === 'REVEAL_CHARACTER';
+    if (eff?.type !== 'AMBUSH' || curatedReveals) return { scenario: curated, kind: null };
+  }
   const p810 = phase810KindForEffect(cardId, effectIndex);
   if (p810) return { scenario: phase810Scenario(cardId, p810), kind: p810 };
+  if (eff?.type) {
+    const perEffect = buildScenarioForEffect(cardId, eff.type);
+    if (perEffect) return { scenario: perEffect, kind: null };
+    if (eff.type === 'AMBUSH') {
+      const revealOnly = revealScenarioFor(cardId);
+      if (revealOnly) return { scenario: revealOnly, kind: null };
+    }
+  }
   return { scenario: buildGeneratedScenario(cardId) ?? undefined, kind: null };
 }
 

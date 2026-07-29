@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Link } from "@/lib/i18n/navigation";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
+import { parseSearchQuery, normalizeStr, type SearchFilter } from "@/lib/deckSearch/parseSearchQuery";
 import { validateDeck } from "@/lib/engine/rules/DeckValidation";
 import { compareBySetOrder } from "@/lib/cards/order";
 import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
@@ -44,7 +45,6 @@ const EFFECT_TYPE_COLORS: Record<string, string> = {
   MAIN: '#c4a35a', UPGRADE: '#3e8b3e', AMBUSH: '#b33e3e', SCORE: '#6a6abb',
 };
 type SortField = 'number' | 'name' | 'chakra' | 'power' | 'rarity';
-const normalizeStr = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 type EffectFunction = 'defeat' | 'hide' | 'draw' | 'move' | 'powerup' | 'chakra' | 'control' | 'play' | 'protect' | 'continuous' | 'score';
 
@@ -74,128 +74,6 @@ function classifyCardEffects(card: { effects?: Array<{ description: string }> })
   return Array.from(fns);
 }
 
-interface KeywordFilter {
-  terms: string[];  // all must match (AND)
-  exclusive: boolean; // true = card must have ONLY these keywords
-  negated: boolean;
-}
-
-interface NumFilter { op: '=' | '>' | '>=' | '<' | '<='; val: number; negated: boolean }
-
-interface SearchFilter {
-  nameQueries: Array<{ text: string; negated: boolean }>; // OR segments via /
-  chakra: NumFilter[];
-  power: NumFilter[];
-  keywords: KeywordFilter[];
-  groups: Array<{ value: string; negated: boolean }>;
-  rarities: Array<{ value: string; negated: boolean }>;
-  sets: Array<{ value: string; negated: boolean }>;
-  effects: Array<{ value: string; negated: boolean }>;
-  effectText: Array<{ value: string; negated: boolean }>;
-  effectMainText: Array<{ value: string; negated: boolean }>;
-  effectMainInstantText: Array<{ value: string; negated: boolean }>;
-  effectMainContinuousText: Array<{ value: string; negated: boolean }>;
-  effectUpgradeText: Array<{ value: string; negated: boolean }>;
-  effectAmbushText: Array<{ value: string; negated: boolean }>;
-  effectDuelText: Array<{ value: string; negated: boolean }>;
-  effectFirstStrikeText: Array<{ value: string; negated: boolean }>;
-  effectScoreText: Array<{ value: string; negated: boolean }>;
-  nameVersions: Array<{ value: string; negated: boolean }>;
-  effectFunctions: Array<{ value: string; negated: boolean }>;
-}
-
-function emptyFilter(): SearchFilter {
-  return {
-    nameQueries: [], chakra: [], power: [], keywords: [], groups: [],
-    rarities: [], sets: [], effects: [], effectText: [],
-    effectMainText: [], effectMainInstantText: [], effectMainContinuousText: [],
-    effectUpgradeText: [], effectAmbushText: [], effectDuelText: [], effectFirstStrikeText: [],
-    effectScoreText: [], nameVersions: [],
-    effectFunctions: [],
-  };
-}
-
-function parseSearchQuery(raw: string): SearchFilter {
-  const filter = emptyFilter();
-  
-  let normalized = raw.replace(/,\s*/g, ' ');
-  
-  normalized = normalized.replace(/(\w+):?\[([^\]]+)\](\+\S+)?/g, (_, key, content, suffix) => `${key}:"${content}${suffix ?? ''}"`);
-
-  const tokenRegex = /(-)?(eup|emi|emc|em|ea|es|nv|[cpkgresf])(:|=|>=|<=|>|<)("([^"]+)"|(\S+))/gi;
-  let remaining = normalized;
-
-  let match: RegExpExecArray | null;
-  while ((match = tokenRegex.exec(normalized)) !== null) {
-    const negated = match[1] === '-';
-    const key = match[2].toLowerCase();
-    const op = match[3] === ':' ? '=' : match[3];
-    const value = match[5] ?? match[6];
-    remaining = remaining.replace(match[0], '');
-
-    const values = value.split('/').map((v) => v.trim()).filter(Boolean);
-
-    for (const val of values) {
-      switch (key) {
-        case 'c': {
-          const num = parseInt(val, 10);
-          if (!isNaN(num)) filter.chakra.push({ op: op as NumFilter['op'], val: num, negated });
-          break;
-        }
-        case 'p': {
-          const num = parseInt(val, 10);
-          if (!isNaN(num)) filter.power.push({ op: op as NumFilter['op'], val: num, negated });
-          break;
-        }
-        case 'k': {
-          const exclusive = val.startsWith('!');
-          const cleanVal = exclusive ? val.slice(1) : val;
-          const terms = cleanVal.split('+').map((t) => normalizeStr(t.trim())).filter(Boolean);
-          if (terms.length > 0) filter.keywords.push({ terms, exclusive, negated });
-          break;
-        }
-        case 'g': filter.groups.push({ value: normalizeStr(val), negated }); break;
-        case 'r': filter.rarities.push({ value: val.toUpperCase(), negated }); break;
-        case 's': filter.sets.push({ value: val.toUpperCase(), negated }); break;
-        case 'nv': filter.nameVersions.push({ value: normalizeStr(val), negated }); break;
-        case 'e': {
-          const upper = val.toUpperCase();
-          if (['MAIN', 'UPGRADE', 'AMBUSH', 'SCORE'].includes(upper)) {
-            filter.effects.push({ value: upper, negated });
-          } else {
-            filter.effectText.push({ value: normalizeStr(val), negated });
-          }
-          break;
-        }
-        case 'em': filter.effectMainText.push({ value: normalizeStr(val), negated }); break;
-        case 'emi': filter.effectMainInstantText.push({ value: normalizeStr(val), negated }); break;
-        case 'emc': filter.effectMainContinuousText.push({ value: normalizeStr(val), negated }); break;
-        case 'eup': filter.effectUpgradeText.push({ value: normalizeStr(val), negated }); break;
-        case 'ea': filter.effectAmbushText.push({ value: normalizeStr(val), negated }); break;
-        case 'ed': filter.effectDuelText.push({ value: normalizeStr(val), negated }); break;
-        case 'ef': filter.effectFirstStrikeText.push({ value: normalizeStr(val), negated }); break;
-        case 'es': filter.effectScoreText.push({ value: normalizeStr(val), negated }); break;
-        case 'f': filter.effectFunctions.push({ value: normalizeStr(val), negated }); break;
-      }
-    }
-  }
-
-  const leftover = remaining.trim();
-  if (leftover) {
-    
-    const segments = leftover.split(/\s*\/\s*/);
-    for (const seg of segments) {
-      const trimmed = seg.trim();
-      if (!trimmed) continue;
-      if (trimmed.startsWith('-') && trimmed.length > 1) {
-        filter.nameQueries.push({ text: normalizeStr(trimmed.slice(1)), negated: true });
-      } else {
-        filter.nameQueries.push({ text: normalizeStr(trimmed), negated: false });
-      }
-    }
-  }
-  return filter;
-}
 
 function compareOp(actual: number, op: string, target: number): boolean {
   switch (op) {
@@ -293,6 +171,7 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
   if (!matchEffText(filter.effectMainContinuousText, (e) => e.type === 'MAIN' && e.description.includes('[⧗]'))) return false;
   if (!matchEffText(filter.effectUpgradeText, (e) => e.type === 'UPGRADE')) return false;
   if (!matchEffText(filter.effectAmbushText, (e) => e.type === 'AMBUSH')) return false;
+  if (!matchEffText(filter.effectAttachText, (e) => e.type === 'ATTACH')) return false;
   if (!matchEffText(filter.effectDuelText, (e) => e.type === 'DUEL')) return false;
   if (!matchEffText(filter.effectFirstStrikeText, (e) => String(e.type) === 'FIRST_STRIKE' || normalizeStr(e.description).includes('first strike'))) return false;
   if (!matchEffText(filter.effectScoreText, (e) => e.type === 'SCORE')) return false;
@@ -485,6 +364,7 @@ export default function DeckBuilderPage() {
   const unrevealedIds = useRevealingStore((s) => s.unrevealedIds);
   const [showUnrevealed, setShowUnrevealed] = useState(false);
   const [quickSet, setQuickSet] = useState<string | null>(null);
+  const [quickType, setQuickType] = useState<'character' | 'attachment' | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearch = useDeferredValue(searchQuery);
@@ -606,6 +486,9 @@ export default function DeckBuilderPage() {
   const filteredChars = useMemo(() => {
     let chars = [...availableChars];
     if (quickSet) chars = chars.filter((c) => c.set === quickSet);
+    if (quickType) {
+      chars = chars.filter((c) => ((c as { card_type?: string }).card_type ?? 'character') === quickType);
+    }
     if (!showAltArt) chars = chars.filter((c) => !['RA', 'MV', 'SV', 'L'].includes(c.rarity));
     if (!showUnrevealed) chars = chars.filter((c) => !unrevealedIds.has(c.id));
     if (deferredSearch) {
@@ -623,7 +506,7 @@ export default function DeckBuilderPage() {
       if (cmp === 0) cmp = compareBySetOrder(a, b);
       return sortOrder === 'desc' ? -cmp : cmp;
     });
-  }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showAltArt, showUnrevealed, unrevealedIds, quickSet]);
+  }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showAltArt, showUnrevealed, unrevealedIds, quickSet, quickType]);
 
   const filteredMissions = useMemo(
     () => (showUnrevealed ? [...availableMissions] : availableMissions.filter((m) => !unrevealedIds.has(m.id))).filter((m) => !quickSet || m.set === quickSet),
@@ -1102,6 +985,7 @@ export default function DeckBuilderPage() {
     { key: 'emc', label: t('deckBuilder.search.emcLabel'), desc: t('deckBuilder.search.emcDesc'), ops: [':'], examples: ['emc:power', 'emc:chakra'] },
     { key: 'eup', label: t('deckBuilder.search.eupLabel'), desc: t('deckBuilder.search.eupDesc'), ops: [':'], examples: ['eup:move', 'eup:play'] },
     { key: 'ea', label: t('deckBuilder.search.eaLabel'), desc: t('deckBuilder.search.eaDesc'), ops: [':'], examples: ['ea:move', 'ea:look'] },
+    { key: 'eat', label: t('deckBuilder.search.eatLabel'), desc: t('deckBuilder.search.eatDesc'), ops: [':'], examples: ['eat:mission', 'eat:character'] },
     { key: 'ed', label: t('deckBuilder.search.edLabel'), desc: t('deckBuilder.search.edDesc'), ops: [':'], examples: ['ed:defeat', 'ed:play'] },
     { key: 'ef', label: t('deckBuilder.search.efLabel'), desc: t('deckBuilder.search.efDesc'), ops: [':'], examples: ['ef:power'] },
     { key: 'es', label: t('deckBuilder.search.esLabel'), desc: t('deckBuilder.search.esDesc'), ops: [':'], examples: ['es:draw', 'es:chakra'] },
@@ -1210,7 +1094,7 @@ export default function DeckBuilderPage() {
                   {t('deckBuilder.search.effectsHeader')}
                 </span>
                 {effectFilters.map((f, i) => {
-                  const keyColors: Record<string, string> = { e: '#c4a35a', em: '#c4a35a', emi: '#c4a35a', emc: '#888', eup: '#3e8b3e', ea: '#b33e3e', ed: '#c46a3e', ef: '#4a9eff', es: '#6a6abb' };
+                  const keyColors: Record<string, string> = { e: '#c4a35a', em: '#c4a35a', emi: '#c4a35a', emc: '#888', eup: '#3e8b3e', ea: '#b33e3e', eat: '#7a9e5a', ed: '#c46a3e', ef: '#4a9eff', es: '#6a6abb' };
                   return renderFilterRow(f, i, keyColors[f.key] ?? '#b33e3e');
                 })}
               </div>
@@ -1668,6 +1552,31 @@ export default function DeckBuilderPage() {
               ))}
             </div>
           )}
+          <div className="px-3 pb-1.5 shrink-0 flex items-center gap-1 flex-wrap">
+            {([null, 'character', 'attachment'] as const).map((type) => {
+              const active = quickType === type;
+              const label = type === null
+                ? t('deckBuilder.filters.allTypes')
+                : type === 'character'
+                  ? t('deckBuilder.filters.typeCharacters')
+                  : t('deckBuilder.filters.typeAttachments');
+              return (
+                <button
+                  key={type ?? 'all'}
+                  onClick={() => setQuickType(type)}
+                  aria-pressed={active}
+                  className="text-[9px] uppercase font-bold px-2 py-1 transition-colors"
+                  style={{
+                    backgroundColor: active ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
+                    color: active ? '#c4a35a' : '#6d6d74',
+                    border: 'none', cursor: 'pointer', letterSpacing: '0.08em',
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
           <div className="px-3 pb-1 flex-shrink-0 flex items-center gap-1.5 flex-wrap">
             <button
               onClick={() => setHideVariants(!hideVariants)}

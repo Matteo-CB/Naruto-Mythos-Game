@@ -79,7 +79,7 @@ function grantChakra(state: GameState, player: PlayerID): GameState {
   let charCount = 0;
   for (const mission of state.activeMissions) {
     const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
-    charCount += chars.filter((c) => (c.card as { card_type: string }).card_type !== 'attachment').length;
+    charCount += chars.length;
   }
 
 

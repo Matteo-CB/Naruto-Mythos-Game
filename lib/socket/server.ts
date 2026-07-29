@@ -18,7 +18,7 @@ import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
 import { calculateEloChanges, calculatePerformanceBonus, type PerformanceBonus } from '@/lib/elo/elo';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
 import { sendRankUpNotification } from '@/lib/discord/rankUpWebhook';
-import { registerTournamentHandlers, handleTournamentMatchEnd, rehydrateAbsenceTimers, sweepOrphanTournamentMatches, startTournamentLaunchReconciler } from '@/lib/socket/tournamentHandlers';
+import { registerTournamentHandlers, handleTournamentMatchEnd, rehydrateAbsenceTimers, sweepOrphanTournamentMatches, startTournamentLaunchReconciler, clearTournamentMatchTimers } from '@/lib/socket/tournamentHandlers';
 import { registerTradeHandlers } from '@/lib/socket/tradeHandlers';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
@@ -1636,6 +1636,10 @@ export async function maybeStartTournamentGame(
     io.to(room.hostSocket).emit('game:started');
     io.to(room.guestSocket).emit('game:started');
     console.log(`[Socket] Tournament game auto-started in room ${code}`);
+
+    if (room.tournamentMatchId) {
+      clearTournamentMatchTimers(room.tournamentMatchId);
+    }
 
     if (room.gameState.phase === 'mulligan') {
       armMulliganIdleTimer(room, code, io);
@@ -4033,7 +4037,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
 
         
-        const isPlayAction = ['PLAY_CHARACTER', 'PLAY_HIDDEN', 'UPGRADE_CHARACTER', 'REVEAL_CHARACTER'].includes(data.action.type);
+        const isPlayAction = ['PLAY_CHARACTER', 'PLAY_HIDDEN', 'UPGRADE_CHARACTER', 'REVEAL_CHARACTER', 'USE_FIRST_STRIKE'].includes(data.action.type);
         const isTargetAction = data.action.type === 'SELECT_TARGET';
 
         

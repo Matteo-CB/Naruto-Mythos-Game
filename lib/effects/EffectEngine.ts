@@ -9,6 +9,8 @@ import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { hasResolvableInstantDuel, isDuelConditionMet } from './duelUtils';
 import { shuffle } from '@/lib/engine/utils/shuffle';
 
+export const REWIND_TARGET = '__rewind';
+
 type GameStateWithMoveGrant = GameState & { _ss117ChakraGranted?: Partial<Record<PlayerID, boolean>> };
 import { characterHasGroup } from './groupUtils';
 import { postMoveHide as choji018PostMoveHide } from './handlers/KS/uncommon/choji018';
@@ -22,6 +24,7 @@ import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEne
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 import { getEffectivePower } from './powerUtils';
 import { checkFlexibleUpgrade } from '../engine/rules/PlayValidation';
+import { grantEdge } from '../engine/rules/edge';
 import { calculateEffectiveCost } from '../engine/rules/ChakraValidation';
 import { canAffordAsUpgrade } from './handlers/KS/shared/upgradeCheck';
 import { moveCharTo, getValidMissions, applyUpgradePowerup } from './handlers/KS/rare/sasuke107';
@@ -202,6 +205,7 @@ export class EffectEngine {
       orderedTypes.push('DUEL');
     }
 
+
     for (let i = 0; i < orderedTypes.length; i++) {
       const effectType = orderedTypes[i];
 
@@ -308,6 +312,7 @@ export class EffectEngine {
     if (!orderedTypes.includes('DUEL') && hasResolvableInstantDuel(newState, missionIndex, topCard.effects)) {
       orderedTypes.push('DUEL');
     }
+
 
     for (let i = 0; i < orderedTypes.length; i++) {
       const effectType = orderedTypes[i];
@@ -955,7 +960,7 @@ export class EffectEngine {
       case 'ITACHI091_HAND_REVEAL': {
         
         let parsed091: { isUpgrade?: boolean } = {};
-        try { parsed091 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { parsed091 = JSON.parse(pendingEffect.effectDescription); } catch {}
         if (parsed091.isUpgrade) {
           const opp091 = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
           const oppHand091 = newState[opp091].hand;
@@ -1088,7 +1093,7 @@ export class EffectEngine {
       case 'SASUKE014_HAND_REVEAL': {
 
         let s014hrMeta: { applyModifier?: boolean } = {};
-        try { s014hrMeta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { s014hrMeta = JSON.parse(pendingEffect.effectDescription); } catch {}
         if (!s014hrMeta.applyModifier) break;
 
         const s014hrOpp = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
@@ -1198,7 +1203,7 @@ export class EffectEngine {
         const nlEnemySide: 'player1Characters' | 'player2Characters' =
           nlPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         let nlParsed: { missionIndex?: number; useDefeat?: boolean } = {};
-        try { nlParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { nlParsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const nlMI = nlParsed.missionIndex ?? pendingEffect.sourceMissionIndex;
         const nlUseDefeat = nlParsed.useDefeat ?? false;
         const nlMission = newState.activeMissions[nlMI];
@@ -1314,7 +1319,7 @@ export class EffectEngine {
         const nlmEnemySide: 'player1Characters' | 'player2Characters' =
           nlmPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         let nlmParsed: { missionIndex?: number } = {};
-        try { nlmParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { nlmParsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const nlmMI = nlmParsed.missionIndex ?? pendingEffect.sourceMissionIndex;
         const nlmMission = newState.activeMissions[nlmMI];
         if (!nlmMission) break;
@@ -1392,7 +1397,7 @@ export class EffectEngine {
       case 'NARUTO_LEGENDARY_CHOOSE_TARGET1': {
         
         let nlParsedT1: { missionIndex?: number; useDefeat?: boolean } = {};
-        try { nlParsedT1 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { nlParsedT1 = JSON.parse(pendingEffect.effectDescription); } catch {}
         const nlUseDefeatT1 = nlParsedT1.useDefeat ?? false;
         const nlPlayerT1 = pendingEffect.sourcePlayer;
         const nlOpponentT1: PlayerID = nlPlayerT1 === 'player1' ? 'player2' : 'player1';
@@ -1455,7 +1460,7 @@ export class EffectEngine {
 
       case 'NARUTO_LEGENDARY_CHOOSE_TARGET2': {
         let nlParsedT2: { useDefeat?: boolean } = {};
-        try { nlParsedT2 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { nlParsedT2 = JSON.parse(pendingEffect.effectDescription); } catch {}
         if (nlParsedT2.useDefeat) {
           newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
         } else {
@@ -1895,6 +1900,8 @@ export class EffectEngine {
       case 'SAKURA135_CHOOSE_CARD':
         newState = EffectEngine.sakura135ChooseCard(newState, pendingEffect, targetId);
         break;
+      case 'SAKURA135_BACK':
+        return EffectEngine.restoreRewindPoint(newState);
       case 'SAKURA135_CHOOSE_MISSION':
         newState = EffectEngine.sakura135ChooseMission(newState, pendingEffect, targetId);
         break;
@@ -1998,7 +2005,7 @@ export class EffectEngine {
 
         
         let g139DefeatParsed: { useHideSameName?: boolean } = {};
-        try { g139DefeatParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { g139DefeatParsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const g139UseHide = g139DefeatParsed.useHideSameName ?? false;
 
         if (g139UseHide && gaara139DefeatedName) {
@@ -2137,7 +2144,7 @@ export class EffectEngine {
       case 'KIBA149_CHOOSE_DEFEAT_TARGET':
       case 'SASUKE136_CHOOSE_ENEMY': {
         let s136FriendlyId: string | null = null;
-        try { s136FriendlyId = JSON.parse(pendingEffect.effectDescription).friendlyId ?? null; } catch { /* ignore */ }
+        try { s136FriendlyId = JSON.parse(pendingEffect.effectDescription).friendlyId ?? null; } catch {}
         newState = EffectEngine.defeatBothForSasuke136(newState, pendingEffect.sourcePlayer, s136FriendlyId, targetId);
         break;
       }
@@ -2235,7 +2242,7 @@ export class EffectEngine {
         const isK149 = pendingEffect.targetSelectionType === 'KIBA149_CONFIRM_MAIN';
         const cardLabel = isK149 ? 'KS-113-MV' : 'KS-113-R';
         let confirmData: { sourceMissionIndex: number; sourceCardInstanceId: string; isUpgrade: string } | null = null;
-        try { confirmData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { confirmData = JSON.parse(pendingEffect.effectDescription); } catch {}
         if (!confirmData) break;
 
         const isUpgradeMode = confirmData.isUpgrade === 'true';
@@ -2357,7 +2364,7 @@ export class EffectEngine {
       case 'HIRUZEN002_CONFIRM_UPGRADE': {
         
         let h002UpgMeta: { playedCharId?: string } = {};
-        try { h002UpgMeta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { h002UpgMeta = JSON.parse(pendingEffect.effectDescription); } catch {}
         const h002PlayedId = h002UpgMeta.playedCharId;
         if (!h002PlayedId) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
@@ -2579,7 +2586,7 @@ export class EffectEngine {
       case 'JIRAIYA008_CONFIRM_UPGRADE': {
         
         let j008uData: { sourceMissionIndex?: number } | null = null;
-        try { j008uData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { j008uData = JSON.parse(pendingEffect.effectDescription); } catch {}
         const j008uMIdx = j008uData?.sourceMissionIndex ?? pendingEffect.sourceMissionIndex;
         const j008uEnemySide = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         const j008uMission = newState.activeMissions[j008uMIdx];
@@ -2625,7 +2632,7 @@ export class EffectEngine {
       case 'NARUTO010_CONFIRM_AMBUSH': {
         
         let n010Data: { sourceMissionIndex?: number } | null = null;
-        try { n010Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { n010Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const n010MIdx = n010Data?.sourceMissionIndex ?? pendingEffect.sourceMissionIndex;
         const n010FriendlySide = pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
@@ -2799,7 +2806,7 @@ export class EffectEngine {
         emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'ambush.activated.with.source', { sourceName: 'SASUKE UCHIWA' });
 
         let s014Meta: { isUpgrade?: boolean; modifierDecided?: boolean; applyModifier?: boolean } = {};
-        try { s014Meta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { s014Meta = JSON.parse(pendingEffect.effectDescription); } catch {}
         const s014Opponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
         const oppHand014 = newState[s014Opponent].hand;
         const ownHand014 = newState[pendingEffect.sourcePlayer].hand;
@@ -2881,7 +2888,7 @@ export class EffectEngine {
         emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.with.source', { sourceName: 'KAKASHI HATAKE' });
         
         let k016Meta: { isUpgrade?: boolean } = {};
-        try { k016Meta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { k016Meta = JSON.parse(pendingEffect.effectDescription); } catch {}
 
         if (k016Meta.isUpgrade) {
           
@@ -3074,7 +3081,7 @@ export class EffectEngine {
         emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.controlled.with.source', { sourceName: 'INO YAMANAKA' });
         
         let i020Meta: { isUpgrade?: boolean } = {};
-        try { i020Meta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { i020Meta = JSON.parse(pendingEffect.effectDescription); } catch {}
 
         if (i020Meta.isUpgrade) {
           
@@ -5763,7 +5770,7 @@ export class EffectEngine {
 
       case 'SS147_CONFIRM_MAIN': {
         let ss147Amt = 0;
-        try { ss147Amt = JSON.parse(pendingEffect.effectDescription).amount ?? 0; } catch { /* ignore */ }
+        try { ss147Amt = JSON.parse(pendingEffect.effectDescription).amount ?? 0; } catch {}
         if (ss147Amt > 0 && pendingEffect.sourceInstanceId) {
           newState = EffectEngine.applyPowerupToTarget(newState, pendingEffect.sourceInstanceId, ss147Amt);
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
@@ -5775,7 +5782,7 @@ export class EffectEngine {
 
       case 'SS134_CONFIRM_MAIN': {
         let ss134Upgraded = false;
-        try { ss134Upgraded = !!JSON.parse(pendingEffect.effectDescription).isUpgraded; } catch { /* ignore */ }
+        try { ss134Upgraded = !!JSON.parse(pendingEffect.effectDescription).isUpgraded; } catch {}
         if (!ss134Upgraded) {
           newState = EffectEngine.kurenai134Resolve(newState, pendingEffect, 6);
           break;
@@ -5822,10 +5829,55 @@ export class EffectEngine {
 
       case 'ATTACH_CHOOSE_TARGET': {
         let attCard: CardData | null = null;
-        try { attCard = JSON.parse(pendingEffect.effectDescription).card ?? null; } catch { /* ignore */ }
+        try { attCard = JSON.parse(pendingEffect.effectDescription).card ?? null; } catch {}
         if (attCard) {
           newState = attachCardToCharacter(newState, pendingEffect.sourcePlayer, attCard, targetId);
         }
+        break;
+      }
+
+      case 'SS047_CONFIRM_UPGRADE':
+      case 'SS078_CONFIRM_DUEL':
+      case 'SS117_CONFIRM_DUEL':
+      case 'SS119_CONFIRM_MAIN':
+      case 'SS085_CONFIRM_MAIN':
+      case 'SS099_CONFIRM_MAIN':
+      case 'MINATO122_CONFIRM_MAIN': {
+        let relay: { nextType?: string; targets?: string[]; nextKey?: string; nextText?: string } = {};
+        try { relay = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const relayTargets = relay.targets ?? [];
+        if (!relay.nextType || relayTargets.length === 0) break;
+        const relayEffId = generateInstanceId();
+        const relayActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: relayEffId,
+          sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: relay.nextText ?? '',
+          targetSelectionType: relay.nextType,
+          sourcePlayer: pendingEffect.sourcePlayer,
+          requiresTargetSelection: true,
+          validTargets: relayTargets,
+          isOptional: false,
+          isMandatory: true,
+          resolved: false,
+          isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: relayActId,
+          type: 'SELECT_TARGET',
+          player: pendingEffect.sourcePlayer,
+          description: relay.nextText ?? '',
+          descriptionKey: relay.nextKey,
+          options: relayTargets,
+          minSelections: 1,
+          maxSelections: 1,
+          sourceEffectId: relayEffId,
+        }];
         break;
       }
 
@@ -6010,7 +6062,7 @@ export class EffectEngine {
         const ssuTargets: string[] = [];
         if (ssuMission) {
           for (const c of ssuMission[ssuEnemySide]) {
-            if (!c.isHidden && (c.powerTokens ?? 0) > 0) ssuTargets.push(c.instanceId);
+            if ((c.powerTokens ?? 0) > 0) ssuTargets.push(c.instanceId);
           }
         }
         if (ssuTargets.length === 0) {
@@ -6598,7 +6650,7 @@ export class EffectEngine {
         const k073Opponent = k073Player === 'player1' ? 'player2' : 'player1';
         const k073Ps = newState[k073Player];
         let k073Data: { missionIndex?: number } = {};
-        try { k073Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { k073Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const k073MI = k073Data.missionIndex ?? pendingEffect.sourceMissionIndex;
 
         if (k073Ps.hand.length === 0) {
@@ -7208,7 +7260,7 @@ export class EffectEngine {
         const b082uEnemy = b082uPlayer === 'player1' ? 'player2' : 'player1';
         const b082uEnemySide = b082uEnemy === 'player1' ? 'player1Characters' : 'player2Characters';
         let b082uData: { missionIndex?: number } = {};
-        try { b082uData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { b082uData = JSON.parse(pendingEffect.effectDescription); } catch {}
         const b082uMI = b082uData.missionIndex ?? pendingEffect.sourceMissionIndex;
         const b082uMission = newState.activeMissions[b082uMI];
         if (!b082uMission) break;
@@ -7264,7 +7316,7 @@ export class EffectEngine {
         
         const r083Player = pendingEffect.sourcePlayer;
         let r083Data: { missionIndex?: number } = {};
-        try { r083Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { r083Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const r083MI = r083Data.missionIndex ?? pendingEffect.sourceMissionIndex;
         const r083Mission = newState.activeMissions[r083MI];
         if (!r083Mission) break;
@@ -7651,7 +7703,7 @@ export class EffectEngine {
         
         const j105uPlayer = pendingEffect.sourcePlayer;
         let j105uData: { missionIndex?: number } = {};
-        try { j105uData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { j105uData = JSON.parse(pendingEffect.effectDescription); } catch {}
         const j105uMI = j105uData.missionIndex ?? pendingEffect.sourceMissionIndex;
         const j105uMission = newState.activeMissions[j105uMI];
         if (!j105uMission) break;
@@ -7737,7 +7789,7 @@ export class EffectEngine {
         const s111Player = pendingEffect.sourcePlayer;
         const s111Opponent = s111Player === 'player1' ? 'player2' : 'player1';
         let s111Data: { missionIndex?: number } = {};
-        try { s111Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { s111Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const s111MI = s111Data.missionIndex ?? pendingEffect.sourceMissionIndex;
         const s111Mission = newState.activeMissions[s111MI];
         if (!s111Mission) break;
@@ -7845,7 +7897,7 @@ export class EffectEngine {
         
         const s107Player = pendingEffect.sourcePlayer;
         let s107Data: { movedCount?: number; sasukeInstanceId?: string; sourceMissionIndex?: number } = {};
-        try { s107Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { s107Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const s107MovedCount = s107Data.movedCount ?? 0;
         const s107SasukeId = s107Data.sasukeInstanceId ?? pendingEffect.sourceInstanceId;
         if (s107MovedCount > 0) {
@@ -7869,7 +7921,7 @@ export class EffectEngine {
           sasukeInstanceId?: string;
           sourceMissionIndex?: number;
         } = {};
-        try { ctm107Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { ctm107Data = JSON.parse(pendingEffect.effectDescription); } catch {}
 
         const ctm107Remaining = (ctm107Data.remainingCharIds ?? []).filter(id => id !== targetId);
         const ctm107MovedCount = ctm107Data.movedCount ?? 0;
@@ -8228,7 +8280,7 @@ export class EffectEngine {
           sourceMissionIndex?: number;
           remainingCharIds?: string[];
         } = {};
-        try { am107Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { am107Data = JSON.parse(pendingEffect.effectDescription); } catch {}
 
         const am107CharId = am107Data.movedCharInstanceId ?? '';
         const am107Dest = am107Data.destMissionIndex ?? 0;
@@ -8344,7 +8396,7 @@ export class EffectEngine {
       case 'KIDOMARU124_CONFIRM_AMBUSH': {
         
         let k124Data: { wasUpgraded?: boolean; powerLimit?: number; sourceMissionIndex?: number } = {};
-        try { k124Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { k124Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const k124Upgraded = k124Data.wasUpgraded ?? false;
         const k124Player = pendingEffect.sourcePlayer;
 
@@ -8430,7 +8482,7 @@ export class EffectEngine {
         
         const k124uPlayer = pendingEffect.sourcePlayer;
         let k124uData: { sourceMissionIndex?: number } = {};
-        try { k124uData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { k124uData = JSON.parse(pendingEffect.effectDescription); } catch {}
         const k124uLimit = 5;
         const k124uEnemySide: 'player1Characters' | 'player2Characters' =
           k124uPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
@@ -8598,7 +8650,7 @@ export class EffectEngine {
         const s127EnemySide: 'player1Characters' | 'player2Characters' =
           s127Player === 'player1' ? 'player2Characters' : 'player1Characters';
         let s127Data: { sourceMissionIndex?: number } = {};
-        try { s127Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { s127Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const s127MIdx = s127Data.sourceMissionIndex ?? pendingEffect.sourceMissionIndex;
         const s127Mission = newState.activeMissions[s127MIdx];
         const s127Targets = s127Mission ? s127Mission[s127EnemySide]
@@ -9277,7 +9329,7 @@ export class EffectEngine {
         const g120EnemySide: 'player1Characters' | 'player2Characters' =
           g120Player === 'player1' ? 'player2Characters' : 'player1Characters';
         let g120Desc: { isUpgrade?: boolean } = {};
-        try { g120Desc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { g120Desc = JSON.parse(pendingEffect.effectDescription); } catch {}
 
         
         const g120AllTargets: string[] = [];
@@ -9550,7 +9602,7 @@ export class EffectEngine {
       case 'JIRAIYA132_CONFIRM_UPGRADE': {
         
         let j132uData: { missionIndex?: number; sourcePlayer?: string } = {};
-        try { j132uData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { j132uData = JSON.parse(pendingEffect.effectDescription); } catch {}
         const j132uMIdx = j132uData.missionIndex ?? pendingEffect.sourceMissionIndex;
         const j132uSourcePlayer = (j132uData.sourcePlayer ?? pendingEffect.sourcePlayer) as PlayerID;
         const j132uOpponent = j132uSourcePlayer === 'player1' ? 'player2' : 'player1';
@@ -9954,7 +10006,7 @@ export class EffectEngine {
         const n108Player = pendingEffect.sourcePlayer;
         const n108Opponent = n108Player === 'player1' ? 'player2' : 'player1';
         let n108Data: { missionIndex?: number } = {};
-        try { n108Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { n108Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const n108MI = n108Data.missionIndex ?? pendingEffect.sourceMissionIndex;
         const n108Mission = newState.activeMissions[n108MI];
         if (!n108Mission) break;
@@ -10026,7 +10078,7 @@ export class EffectEngine {
         const n108uPlayer = pendingEffect.sourcePlayer;
         const n108uOpponent = n108uPlayer === 'player1' ? 'player2' : 'player1';
         let n108uData: { missionIndex?: number } = {};
-        try { n108uData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { n108uData = JSON.parse(pendingEffect.effectDescription); } catch {}
         const n108uMI = n108uData.missionIndex ?? pendingEffect.sourceMissionIndex;
         const n108uMission = newState.activeMissions[n108uMI];
         if (!n108uMission) break;
@@ -10205,7 +10257,7 @@ export class EffectEngine {
         const i110Player = pendingEffect.sourcePlayer;
         const i110Opponent = i110Player === 'player1' ? 'player2' : 'player1';
         let i110Data: { missionIndex?: number } = {};
-        try { i110Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { i110Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const i110MI = i110Data.missionIndex ?? pendingEffect.sourceMissionIndex;
         const i110Mission = newState.activeMissions[i110MI];
         if (!i110Mission) break;
@@ -10313,7 +10365,7 @@ export class EffectEngine {
         const i110uPlayer = pendingEffect.sourcePlayer;
         const i110uOpponent = i110uPlayer === 'player1' ? 'player2' : 'player1';
         let i110uData: { missionIndex?: number } = {};
-        try { i110uData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { i110uData = JSON.parse(pendingEffect.effectDescription); } catch {}
         const i110uMI = i110uData.missionIndex ?? pendingEffect.sourceMissionIndex;
         const i110uMission = newState.activeMissions[i110uMI];
         if (!i110uMission) break;
@@ -10367,7 +10419,7 @@ export class EffectEngine {
         const z087Player = pendingEffect.sourcePlayer;
         const z087Opponent = z087Player === 'player1' ? 'player2' : 'player1';
         let z087Data: { missionIndex?: number } = {};
-        try { z087Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { z087Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const z087MI = z087Data.missionIndex ?? pendingEffect.sourceMissionIndex;
         const z087Mission = newState.activeMissions[z087MI];
         if (!z087Mission) break;
@@ -10426,7 +10478,7 @@ export class EffectEngine {
         
         const z087mPlayer = pendingEffect.sourcePlayer;
         let z087mData: { targetInstanceId?: string; missionIndex?: number } = {};
-        try { z087mData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { z087mData = JSON.parse(pendingEffect.effectDescription); } catch {}
         const z087mTargetId = z087mData.targetInstanceId;
         if (!z087mTargetId) break;
 
@@ -10443,7 +10495,7 @@ export class EffectEngine {
         const h089Player = pendingEffect.sourcePlayer;
         const h089Opponent = h089Player === 'player1' ? 'player2' : 'player1';
         let h089Data: { missionIndex?: number } = {};
-        try { h089Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { h089Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const h089MI = h089Data.missionIndex ?? pendingEffect.sourceMissionIndex;
 
         if (pendingEffect.isUpgrade) {
@@ -10496,7 +10548,7 @@ export class EffectEngine {
         
         const h089uPlayer = pendingEffect.sourcePlayer;
         let h089uData: { missionIndex?: number } = {};
-        try { h089uData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { h089uData = JSON.parse(pendingEffect.effectDescription); } catch {}
         const h089uMI = h089uData.missionIndex ?? pendingEffect.sourceMissionIndex;
 
         if (newState[h089uPlayer].deck.length === 0) {
@@ -10525,7 +10577,7 @@ export class EffectEngine {
         let k113Data: { sourceMissionIndex: number } | null = null;
         try {
           k113Data = JSON.parse(pendingEffect.effectDescription);
-        } catch { /* ignore */ }
+        } catch {}
         if (!k113Data) break;
 
         const srcMI = k113Data.sourceMissionIndex;
@@ -10600,7 +10652,7 @@ export class EffectEngine {
       case 'KIBA113_HIDE_TARGET':
       case 'KIBA149_CHOOSE_HIDE_TARGET': {
         let kibaPairFriendly: string | null = null;
-        try { kibaPairFriendly = JSON.parse(pendingEffect.effectDescription).friendlyId ?? null; } catch { /* ignore */ }
+        try { kibaPairFriendly = JSON.parse(pendingEffect.effectDescription).friendlyId ?? null; } catch {}
         newState = EffectEngine.hideSimultaneously(newState, [kibaPairFriendly, targetId], pendingEffect.sourcePlayer);
         break;
       }
@@ -10643,7 +10695,7 @@ export class EffectEngine {
         let s046Drawn: CardData | null = null;
         while (s046Deck.length > 0) {
           const top = s046Deck.shift()!;
-          if (top.group === 'Sand Village') { s046Drawn = top; break; }
+          if (top.card_type === 'character' && top.group === 'Sand Village') { s046Drawn = top; break; }
           s046Revealed.push(top);
         }
         if (!s046Drawn) break;
@@ -10652,9 +10704,12 @@ export class EffectEngine {
           ...newState,
           [s046P]: { ...newState[s046P], deck: s046Rest, hand: [...newState[s046P].hand, s046Drawn] },
         };
+        const s046RevealedNames = s046Revealed.length > 0
+          ? s046Revealed.map((c) => c.name_fr).join(', ')
+          : '-';
         newState.log = logAction(newState.log, newState.turn, newState.phase, s046P,
-          'EFFECT_DRAW', `Gaara (SS-046): Revealed ${s046Revealed.length} card(s) and drew ${s046Drawn.name_fr}.`,
-          'game.log.effect.ss046Draw', { card: 'GAARA', id: 'SS-046-UC', target: s046Drawn.name_fr, count: s046Revealed.length });
+          'EFFECT_DRAW', `Gaara (SS-046): Revealed ${s046RevealedNames} and drew ${s046Drawn.name_fr}.`,
+          'game.log.effect.ss046DrawNames', { card: 'GAARA', id: 'SS-046-UC', target: s046Drawn.name_fr, revealed: s046RevealedNames, count: s046Revealed.length });
         break;
       }
 
@@ -10739,15 +10794,15 @@ export class EffectEngine {
         const s114Mi = pendingEffect.sourceMissionIndex;
         const s114EnemySide: 'player1Characters' | 'player2Characters' = s114P === 'player1' ? 'player2Characters' : 'player1Characters';
         const s114Mission = newState.activeMissions[s114Mi];
+        const s114UseDefeat = isDuelConditionMet(newState, s114Mi, 'DUEL Rock Lee:');
         const s114Targets = (s114Mission?.[s114EnemySide] ?? [])
           .filter((c) => {
+            if (c.isHidden && !s114UseDefeat) return false;
             const t = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
             return (c.isHidden ? 0 : (t.chakra ?? 0)) <= (s114Card.chakra ?? 0);
           })
           .map((c) => c.instanceId);
         if (s114Targets.length === 0) break;
-
-        const s114UseDefeat = isDuelConditionMet(newState, s114Mi, 'DUEL Rock Lee:');
         const s114EffId = generateInstanceId();
         const s114ActId = generateInstanceId();
         newState.pendingEffects.push({
@@ -10776,7 +10831,7 @@ export class EffectEngine {
 
       case 'SS114_CHOOSE_HIDE': {
         let s114hParsed: { useDefeat?: boolean } = {};
-        try { s114hParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { s114hParsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const s114hF = EffectEngine.findCharByInstanceId(newState, targetId);
         const s114hName = s114hF ? (s114hF.character.stack?.length > 0 ? s114hF.character.stack[s114hF.character.stack.length - 1] : s114hF.character.card).name_fr : '';
         if (s114hParsed.useDefeat) {
@@ -10799,14 +10854,14 @@ export class EffectEngine {
         break;
       }
 
-      case 'SS119_DUEL_CONFIRM': {
+      case 'SS119_CONFIRM_DUEL': {
         const s119P = pendingEffect.sourcePlayer;
         const s119Deck = [...newState[s119P].deck];
         if (s119Deck.length > 0) {
           const s119Card = s119Deck.shift()!;
           newState = { ...newState, [s119P]: { ...newState[s119P], deck: s119Deck, hand: [...newState[s119P].hand, s119Card] } };
         }
-        newState.edgeHolder = s119P;
+        newState = grantEdge(newState, s119P);
         newState.log = logAction(newState.log, newState.turn, newState.phase, s119P,
           'EFFECT', 'Temari (SS-119) DUEL: Drew a card and took the Edge.',
           'game.log.effect.ss119Duel', { card: 'TEMARI', id: 'SS-119-R' });
@@ -10870,7 +10925,7 @@ export class EffectEngine {
         const mvdDest = parseInt(targetId, 10);
         if (isNaN(mvdDest)) break;
         let mvdParsed: { charInstanceId?: string; srcName?: string; srcId?: string } = {};
-        try { mvdParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { mvdParsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const mvdF = EffectEngine.findCharByInstanceId(newState, mvdParsed.charInstanceId ?? '');
         if (!mvdF) break;
         newState = EffectEngine.moveCharToMissionDirectPublic(
@@ -10922,7 +10977,7 @@ export class EffectEngine {
         const ss049dDest = parseInt(targetId, 10);
         if (isNaN(ss049dDest)) break;
         let ss049dParsed: { charInstanceId?: string } = {};
-        try { ss049dParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { ss049dParsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const ss049dFound = EffectEngine.findCharByInstanceId(newState, ss049dParsed.charInstanceId ?? '');
         if (!ss049dFound) break;
         newState = EffectEngine.moveCharToMissionDirectPublic(
@@ -10935,7 +10990,7 @@ export class EffectEngine {
         const ss121Dest = parseInt(targetId, 10);
         if (isNaN(ss121Dest) || ss121Dest < 0 || ss121Dest >= newState.activeMissions.length) break;
         let ss121Src: { sourceInstanceId?: string } = {};
-        try { ss121Src = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { ss121Src = JSON.parse(pendingEffect.effectDescription); } catch {}
         const ss121Found = EffectEngine.findCharByInstanceId(newState, ss121Src.sourceInstanceId ?? pendingEffect.sourceInstanceId ?? '');
         if (!ss121Found) break;
         const ss121Char = ss121Found.character;
@@ -10986,7 +11041,7 @@ export class EffectEngine {
       case 'NARUTO133_CHOOSE_TARGET2': {
         
         let parsed133t2: { useDefeat?: boolean; target1Id?: string; discardSizeBefore?: number } = {};
-        try { parsed133t2 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { parsed133t2 = JSON.parse(pendingEffect.effectDescription); } catch {}
         if (parsed133t2.useDefeat) {
           newState = EffectEngine.defeatSimultaneously(newState, [parsed133t2.target1Id, targetId], pendingEffect.sourcePlayer);
         } else {
@@ -11113,7 +11168,7 @@ export class EffectEngine {
         const destMissionIdx = parseInt(targetId, 10);
         if (!isNaN(destMissionIdx)) {
           let moveCharId = '';
-          try { moveCharId = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+          try { moveCharId = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch {}
           if (moveCharId) {
             const moveCharRes = EffectEngine.findCharByInstanceId(newState, moveCharId);
             if (moveCharRes) {
@@ -11153,7 +11208,7 @@ export class EffectEngine {
         newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         
         let k103Data: { giantSpiderInstanceId?: string } = {};
-        try { k103Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { k103Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         if (k103Data.giantSpiderInstanceId && targetId !== k103Data.giantSpiderInstanceId) {
           newState = returnCharacterToHand(newState, k103Data.giantSpiderInstanceId, pendingEffect.sourcePlayer);
           newState.log = logAction(
@@ -11193,7 +11248,7 @@ export class EffectEngine {
           sasukeInstanceId?: string;
           sourceMissionIndex?: number;
         } = {};
-        try { parsed107 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { parsed107 = JSON.parse(pendingEffect.effectDescription); } catch {}
 
         const charId107 = parsed107.charInstanceId ?? '';
         const remaining107 = parsed107.remainingCharIds ?? [];
@@ -11410,7 +11465,7 @@ export class EffectEngine {
         const destMission = parseInt(targetId, 10);
         if (!isNaN(destMission)) {
           let charInstanceId = '';
-          try { charInstanceId = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+          try { charInstanceId = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch {}
           if (charInstanceId) {
             const charRes = EffectEngine.findCharByInstanceId(newState, charInstanceId);
             if (charRes) {
@@ -11479,7 +11534,7 @@ export class EffectEngine {
         const destMission_sh = parseInt(targetId, 10);
         if (!isNaN(destMission_sh)) {
           let charInstanceId_sh = '';
-          try { charInstanceId_sh = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+          try { charInstanceId_sh = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch {}
           if (charInstanceId_sh) {
             const charRes_sh = EffectEngine.findCharByInstanceId(newState, charInstanceId_sh);
             if (charRes_sh) {
@@ -11580,7 +11635,7 @@ export class EffectEngine {
         const m122DestMission = parseInt(targetId, 10);
         if (!isNaN(m122DestMission)) {
           let m122CharId = '';
-          try { m122CharId = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+          try { m122CharId = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch {}
           if (m122CharId) {
             const m122CharRes = EffectEngine.findCharByInstanceId(newState, m122CharId);
             if (m122CharRes) {
@@ -11647,7 +11702,7 @@ export class EffectEngine {
         const destMission_z = parseInt(targetId, 10);
         if (!isNaN(destMission_z)) {
           let charInstanceId_z = '';
-          try { charInstanceId_z = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+          try { charInstanceId_z = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch {}
           if (charInstanceId_z) {
             const charRes_z = EffectEngine.findCharByInstanceId(newState, charInstanceId_z);
             if (charRes_z) {
@@ -11739,7 +11794,7 @@ export class EffectEngine {
         const ino110Dest = parseInt(targetId, 10);
         if (!isNaN(ino110Dest)) {
           let ino110CharId = '';
-          try { ino110CharId = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+          try { ino110CharId = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch {}
           if (ino110CharId) {
             const ino110CharRes = EffectEngine.findCharByInstanceId(newState, ino110CharId);
             if (ino110CharRes) {
@@ -12017,7 +12072,7 @@ export class EffectEngine {
         const n133EnemySide: 'player1Characters' | 'player2Characters' =
           n133Player === 'player1' ? 'player2Characters' : 'player1Characters';
         let n133Parsed: { missionIndex?: number; useDefeat?: boolean } = {};
-        try { n133Parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { n133Parsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const n133MI = n133Parsed.missionIndex ?? pendingEffect.sourceMissionIndex;
         const n133UseDefeat = n133Parsed.useDefeat ?? false;
         const n133Mission = newState.activeMissions[n133MI];
@@ -12126,7 +12181,7 @@ export class EffectEngine {
         const n133mEnemySide: 'player1Characters' | 'player2Characters' =
           n133mPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         let n133mParsed: { missionIndex?: number } = {};
-        try { n133mParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { n133mParsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const n133mMI = n133mParsed.missionIndex ?? pendingEffect.sourceMissionIndex;
         const n133mMission = newState.activeMissions[n133mMI];
         if (!n133mMission) break;
@@ -12251,7 +12306,7 @@ export class EffectEngine {
         const s135Player = pendingEffect.sourcePlayer;
         const s135PlayerState = newState[s135Player];
         let s135Parsed: { costReduction?: number } = {};
-        try { s135Parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { s135Parsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const s135CostReduction = s135Parsed.costReduction ?? 0;
 
         
@@ -12291,11 +12346,12 @@ export class EffectEngine {
           break;
         }
 
-        
+        const s135RewindPoint = EffectEngine.captureRewindPoint(newState);
+
         const s135Deck = [...s135PlayerState.deck];
         const s135Top3 = s135Deck.splice(0, Math.min(3, s135Deck.length));
 
-        
+
         newState = {
           ...newState,
           [s135Player]: {
@@ -12346,6 +12402,7 @@ export class EffectEngine {
             .filter((i) => s135PlayableIndexSet.has(i))
             .map((i) => String(i));
 
+          newState.rewindPoint = s135RewindPoint;
           newState.pendingEffects.push({
             id: s135EffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
@@ -12396,6 +12453,8 @@ export class EffectEngine {
         }
 
         
+        const s135mRewindPoint = EffectEngine.captureRewindPoint(newState);
+
         const s135mDeck = [...s135mPlayerState.deck];
         const s135mTop3 = s135mDeck.splice(0, Math.min(3, s135mDeck.length));
 
@@ -12443,6 +12502,7 @@ export class EffectEngine {
             .filter((i) => s135mPlayableIndexSet.has(i))
             .map((i) => String(i));
 
+          newState.rewindPoint = s135mRewindPoint;
           newState.pendingEffects.push({
             id: s135mEffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
@@ -12480,7 +12540,7 @@ export class EffectEngine {
       case 'KAKASHI137_CONFIRM_MAIN': {
         const k137Player = pendingEffect.sourcePlayer;
         let k137Parsed: { missionIndex?: number } = {};
-        try { k137Parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { k137Parsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const k137MI = k137Parsed.missionIndex ?? pendingEffect.sourceMissionIndex;
         const k137Mission = newState.activeMissions[k137MI];
         if (!k137Mission) break;
@@ -12538,7 +12598,7 @@ export class EffectEngine {
         const k137uFriendlySide: 'player1Characters' | 'player2Characters' =
           k137uPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
         let k137uParsed: { missionIndex?: number } = {};
-        try { k137uParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { k137uParsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const k137uMI = k137uParsed.missionIndex ?? pendingEffect.sourceMissionIndex;
 
         
@@ -12605,7 +12665,7 @@ export class EffectEngine {
       case 'OROCHIMARU138_CONFIRM_UPGRADE': {
         const o138Player = pendingEffect.sourcePlayer;
         let o138Parsed: { previousCardName?: string; previousCardPower?: number } = {};
-        try { o138Parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { o138Parsed = JSON.parse(pendingEffect.effectDescription); } catch {}
 
         
         newState = {
@@ -12629,7 +12689,7 @@ export class EffectEngine {
         const g139FriendlySide: 'player1Characters' | 'player2Characters' =
           g139Player === 'player1' ? 'player1Characters' : 'player2Characters';
         let g139Parsed: { useHideSameName?: boolean } = {};
-        try { g139Parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { g139Parsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const g139UseHideSameName = g139Parsed.useHideSameName ?? false;
 
         
@@ -12911,7 +12971,7 @@ export class EffectEngine {
         
         const i140cPlayer = pendingEffect.sourcePlayer;
         let i140cData: { i140HandSize?: number } = {};
-        try { i140cData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { i140cData = JSON.parse(pendingEffect.effectDescription); } catch {}
         const i140cHandSize = i140cData.i140HandSize ?? 0;
 
         const i140cDefeatTargets: string[] = [];
@@ -13048,7 +13108,7 @@ export class EffectEngine {
         const i143FriendlySide: 'player1Characters' | 'player2Characters' =
           i143Player === 'player1' ? 'player1Characters' : 'player2Characters';
         let i143Parsed: { sourceMissionIndex?: number } = {};
-        try { i143Parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { i143Parsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const i143MI = i143Parsed.sourceMissionIndex ?? pendingEffect.sourceMissionIndex;
         const i143DestChars = newState.activeMissions[i143MI][i143FriendlySide];
 
@@ -13109,7 +13169,7 @@ export class EffectEngine {
         const i143aEnemySide: 'player1Characters' | 'player2Characters' =
           i143aPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         let i143aParsed: { sourceMissionIndex?: number } = {};
-        try { i143aParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { i143aParsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const i143aMI = i143aParsed.sourceMissionIndex ?? pendingEffect.sourceMissionIndex;
         const i143aDestChars = newState.activeMissions[i143aMI][i143aEnemySide];
 
@@ -13202,7 +13262,7 @@ export class EffectEngine {
         
         {
           const s146Opponent: PlayerID = s146Player === 'player1' ? 'player2' : 'player1';
-          newState = { ...newState, edgeHolder: s146Opponent };
+          newState = grantEdge(newState, s146Opponent);
           newState.log = logAction(
             newState.log, newState.turn, newState.phase, s146Player,
             'EFFECT_EDGE',
@@ -13305,7 +13365,7 @@ export class EffectEngine {
       case 'SASUKE146_GIVE_EDGE': {
         
         const opponentId146: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-        newState = { ...newState, edgeHolder: opponentId146 };
+        newState = grantEdge(newState, opponentId146);
         newState.log = logAction(
           newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
           'EFFECT_EDGE',
@@ -13315,7 +13375,7 @@ export class EffectEngine {
         );
         
         let parsedSasuke146: { sourceMissionIndex?: number } = {};
-        try { parsedSasuke146 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { parsedSasuke146 = JSON.parse(pendingEffect.effectDescription); } catch {}
         const mIdx146 = parsedSasuke146.sourceMissionIndex ?? pendingEffect.sourceMissionIndex;
         const friendlySide146: 'player1Characters' | 'player2Characters' =
           pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -13529,7 +13589,7 @@ export class EffectEngine {
 
       case 'PLAY_LESS_CATEGORY': {
         let plc: { costReduction?: number; category?: PlayLessCategory; sourceName?: string; sourceId?: string; repeatable?: boolean; descriptionKey?: string } = {};
-        try { plc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { plc = JSON.parse(pendingEffect.effectDescription); } catch {}
         const plcReduction = plc.costReduction ?? 0;
         if (targetId && targetId !== 'DONE') {
           if (targetId.startsWith('HIDDEN_')) {
@@ -13569,7 +13629,7 @@ export class EffectEngine {
 
       case 'SS000_CHOOSE_HOUNDS': {
         let ssMeta: { remaining?: number; drawn?: number } = {};
-        try { ssMeta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { ssMeta = JSON.parse(pendingEffect.effectDescription); } catch {}
         const ssPlayer = pendingEffect.sourcePlayer;
         const ssIdx = targetId.startsWith('DECK_') ? parseInt(targetId.slice(5), 10) : NaN;
         const ssPS = { ...newState[ssPlayer] };
@@ -13785,7 +13845,7 @@ export class EffectEngine {
         try { odList = JSON.parse(targetId); } catch { odList = [targetId]; }
         const odCount = odList.length;
         let odParsed: { isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number; useDefeat?: boolean; constraintMode?: string } = {};
-        try { odParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { odParsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         
         const odUseDefeat = odParsed.useDefeat !== false; // default true (Gaara, Ichibi always defeat)
         
@@ -13832,13 +13892,17 @@ export class EffectEngine {
       case 'REORDER_DISCARD': {
 
 
+        if (targetId === REWIND_TARGET) {
+          newState = EffectEngine.restoreRewindPoint(newState);
+          return newState;
+        }
         let reorderList: string[] = [];
         try { reorderList = JSON.parse(targetId); } catch {
 
           reorderList = [targetId];
         }
         let parsedReorder: { count?: number; discardOwner?: string; sakura135Chain?: boolean; costReduction?: number } = {};
-        try { parsedReorder = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { parsedReorder = JSON.parse(pendingEffect.effectDescription); } catch {}
         const reorderCount = parsedReorder.count ?? reorderList.length;
 
 
@@ -13946,7 +14010,7 @@ export class EffectEngine {
             cardName_gen = desc.cardName ?? '';
             cardId_gen = desc.cardId ?? '';
             costReduction_gen = desc.costReduction ?? 0;
-          } catch { /* ignore */ }
+          } catch {}
           newState = EffectEngine.genericPlaceOnMission(
             newState, pendingEffect.sourcePlayer, missionIdx_gen, cost_gen,
             cardName_gen, cardId_gen, costReduction_gen,
@@ -13959,7 +14023,7 @@ export class EffectEngine {
       
       case 'REVEAL_HIDDEN_UPGRADE_OR_FRESH': {
         let rhMeta: { hiddenInstanceId?: string; costReduction?: number; powerUpBonus?: number } = {};
-        try { rhMeta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { rhMeta = JSON.parse(pendingEffect.effectDescription); } catch {}
         const rhInstanceId = rhMeta.hiddenInstanceId ?? '';
         const rhReduction = rhMeta.costReduction ?? 0;
         const rhPowerUp = rhMeta.powerUpBonus ?? 0;
@@ -14035,7 +14099,7 @@ export class EffectEngine {
 
       case 'EFFECT_PLAY_UPGRADE_OR_FRESH': {
         let meta_upch: { cardName?: string; cardId?: string; costReduction?: number; missionIndex?: number } = {};
-        try { meta_upch = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { meta_upch = JSON.parse(pendingEffect.effectDescription); } catch {}
         const mi_upch = meta_upch.missionIndex ?? pendingEffect.sourceMissionIndex;
         if (targetId === 'FRESH') {
           
@@ -14057,7 +14121,7 @@ export class EffectEngine {
       
       case 'HIRUZEN002_UPGRADE_OR_FRESH': {
         let meta_h002: { cardIndex?: number; missionIndex?: number } = {};
-        try { meta_h002 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { meta_h002 = JSON.parse(pendingEffect.effectDescription); } catch {}
         const mi_h002 = meta_h002.missionIndex ?? pendingEffect.sourceMissionIndex;
         const ci_h002 = meta_h002.cardIndex ?? 0;
         const player_h002 = pendingEffect.sourcePlayer;
@@ -14291,7 +14355,7 @@ export class EffectEngine {
       case 'GEMMA049_SACRIFICE_CHOICE': {
 
         let g049Data: { targetInstanceId?: string; sacrificeInstanceId?: string; effectSource?: string } = {};
-        try { g049Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { g049Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const gemmaId = g049Data.sacrificeInstanceId ?? targetId;
         const gemmaResult = EffectEngine.findCharByInstanceId(newState, gemmaId);
         emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.sacrificed.with', { sourceName: 'GEMMA SHIRANUI' });
@@ -14313,7 +14377,7 @@ export class EffectEngine {
       case 'GEMMA049_SACRIFICE_HIDE_CHOICE': {
         
         let g049HideData: { targetInstanceId?: string; sacrificeInstanceId?: string; effectSource?: string; batchRemainingTargets?: string[]; batchSourcePlayer?: string } = {};
-        try { g049HideData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { g049HideData = JSON.parse(pendingEffect.effectDescription); } catch {}
         const gemmaHideId = g049HideData.sacrificeInstanceId ?? targetId;
         const gemmaHideResult = EffectEngine.findCharByInstanceId(newState, gemmaHideId);
         newState = EffectEngine.defeatCharacterDirect(newState, gemmaHideId);
@@ -14342,7 +14406,7 @@ export class EffectEngine {
           batchAllTargets?: string[]; batchLVTargets?: string[];
           batchSourcePlayer?: string;
         } = {};
-        try { g049ChooseData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { g049ChooseData = JSON.parse(pendingEffect.effectDescription); } catch {}
         const batchAll = g049ChooseData.batchAllTargets ?? [];
         const batchSourceP = (g049ChooseData.batchSourcePlayer ?? (pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1')) as PlayerID;
         const protectedCharId = targetId; // The char the player chose to protect
@@ -14652,7 +14716,7 @@ export class EffectEngine {
       case 'KIN073_CHOOSE_DISCARD': {
         
         let parsed_k73d: { missionIndex?: number } = {};
-        try { parsed_k73d = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { parsed_k73d = JSON.parse(pendingEffect.effectDescription); } catch {}
         const k73MissionIdx = typeof parsed_k73d.missionIndex === 'number'
           ? parsed_k73d.missionIndex
           : pendingEffect.sourceMissionIndex;
@@ -14880,7 +14944,7 @@ export class EffectEngine {
         const destMission_mv2 = parseInt(targetId, 10);
         if (!isNaN(destMission_mv2)) {
           let charInstanceId_mv2 = '';
-          try { charInstanceId_mv2 = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+          try { charInstanceId_mv2 = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch {}
           if (charInstanceId_mv2) {
             const charRes_mv2 = EffectEngine.findCharByInstanceId(newState, charInstanceId_mv2);
             if (charRes_mv2) {
@@ -15080,7 +15144,7 @@ export class EffectEngine {
       
       case 'KANKURO078_REVEAL_UPGRADE_OR_FRESH': {
         let meta_k78r: { hiddenInstanceId?: string; missionIndex?: number } = {};
-        try { meta_k78r = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { meta_k78r = JSON.parse(pendingEffect.effectDescription); } catch {}
         const hiddenId_k78r = meta_k78r.hiddenInstanceId;
         const mIdx_k78r = meta_k78r.missionIndex ?? pendingEffect.sourceMissionIndex;
         if (!hiddenId_k78r) break;
@@ -15247,7 +15311,7 @@ export class EffectEngine {
         const mIdx_kh = parseInt(targetId, 10);
         if (!isNaN(mIdx_kh)) {
           let handIndex_kh = 0;
-          try { handIndex_kh = parseInt(JSON.parse(pendingEffect.effectDescription).handIndex ?? '0', 10); } catch { /* ignore */ }
+          try { handIndex_kh = parseInt(JSON.parse(pendingEffect.effectDescription).handIndex ?? '0', 10); } catch {}
           const ps_kh = { ...newState[pendingEffect.sourcePlayer] };
           if (handIndex_kh >= 0 && handIndex_kh < ps_kh.hand.length) {
             const hand_kh = [...ps_kh.hand];
@@ -15370,7 +15434,7 @@ export class EffectEngine {
       case 'DOSU069_OPPONENT_CHOICE': {
         
         let parsed_dosu69: { targetInstanceId?: string; revealCost?: number; sourcePlayer?: string } = {};
-        try { parsed_dosu69 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { parsed_dosu69 = JSON.parse(pendingEffect.effectDescription); } catch {}
         const targetInst_dosu69 = parsed_dosu69.targetInstanceId ?? targetId;
         const revCost_dosu69 = parsed_dosu69.revealCost ?? 0;
         const opponent_dosu69 = pendingEffect.selectingPlayer ?? (pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1');
@@ -15579,7 +15643,7 @@ export class EffectEngine {
       
       case 'COPY_EFFECT_CHOSEN': {
         let parsedCopy: { charInstanceId?: string; cardId?: string; cardName?: string } = {};
-        try { parsedCopy = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { parsedCopy = JSON.parse(pendingEffect.effectDescription); } catch {}
         const chosenEffectType = targetId.split('::')[0] as EffectType;
 
         if (!parsedCopy.cardId || !chosenEffectType) break;
@@ -15604,7 +15668,7 @@ export class EffectEngine {
       
       case 'KABUTO053_CHOOSE_MISSION': {
         let parsed_kb3: { discardIndex?: number; reducedCost?: number } = {};
-        try { parsed_kb3 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { parsed_kb3 = JSON.parse(pendingEffect.effectDescription); } catch {}
         const missionIdx_kb3 = parseInt(targetId, 10);
         const cost_kb3 = parsed_kb3.reducedCost ?? 0;
         const discardIdx_kb3 = parsed_kb3.discardIndex;
@@ -15757,7 +15821,7 @@ export class EffectEngine {
       
       case 'HIRUZEN002_CHOOSE_MISSION': {
         let parsed: { cardIndex: number; isUpgrade?: boolean } = { cardIndex: -1 };
-        try { parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { parsed = JSON.parse(pendingEffect.effectDescription); } catch {}
         const missionIdx = parseInt(targetId, 10);
         newState = EffectEngine.hiruzen002PlaceCard(newState, pendingEffect, parsed.cardIndex, missionIdx);
         break;
@@ -15767,7 +15831,7 @@ export class EffectEngine {
         
         
         let jirDesc: { missionIndex?: number; sourcePlayer?: string; defeatedIds?: string[] } = {};
-        try { jirDesc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { jirDesc = JSON.parse(pendingEffect.effectDescription); } catch {}
 
         const missionIdx_j = jirDesc.missionIndex ?? pendingEffect.sourceMissionIndex;
         const jirSourcePlayer = (jirDesc.sourcePlayer ?? pendingEffect.sourcePlayer) as PlayerID;
@@ -15847,7 +15911,7 @@ export class EffectEngine {
       case 'GAARA120_CHOOSE_DEFEAT': {
         
         let gaaraDesc: { defeatedCount?: number; nextMissionIndex?: number; isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number; missionIndex?: number; pendingIds?: string[] } = {};
-        try { gaaraDesc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { gaaraDesc = JSON.parse(pendingEffect.effectDescription); } catch {}
 
         const missionIdx_g = gaaraDesc.missionIndex ?? 0;
         let defeatedCount_g = gaaraDesc.defeatedCount ?? 0;
@@ -15988,7 +16052,7 @@ export class EffectEngine {
       case 'GAARA120_CONFIRM_UPGRADE': {
         
         let g120uDesc: { defeatedCount?: number } = {};
-        try { g120uDesc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        try { g120uDesc = JSON.parse(pendingEffect.effectDescription); } catch {}
         const g120uCount = g120uDesc.defeatedCount ?? 0;
         if (g120uCount > 0 && pendingEffect.sourceInstanceId) {
           const g120uPlayer = pendingEffect.sourcePlayer;
@@ -16071,7 +16135,7 @@ export class EffectEngine {
         const amountRemove = parseInt(targetId, 10);
         if (!isNaN(amountRemove) && amountRemove > 0) {
           let parsedRemoveInfo: { targetInstanceId?: string } = {};
-          try { parsedRemoveInfo = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+          try { parsedRemoveInfo = JSON.parse(pendingEffect.effectDescription); } catch {}
           const removeTargetId = parsedRemoveInfo.targetInstanceId;
           if (removeTargetId) {
             newState = EffectEngine.removeTokensFromTarget(newState, removeTargetId, amountRemove);
@@ -16093,7 +16157,7 @@ export class EffectEngine {
         const amountSteal = parseInt(targetId, 10);
         if (!isNaN(amountSteal) && amountSteal > 0) {
           let parsedStealInfo: { targetInstanceId?: string; sourceInstanceId?: string } = {};
-          try { parsedStealInfo = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+          try { parsedStealInfo = JSON.parse(pendingEffect.effectDescription); } catch {}
           const stealFromId = parsedStealInfo.targetInstanceId;
           const stealToId = parsedStealInfo.sourceInstanceId ?? pendingEffect.sourceInstanceId;
           if (stealFromId) {
@@ -16878,7 +16942,7 @@ export class EffectEngine {
       sourcePlayer: effectSourcePlayer,
       selectingPlayer: chooser !== effectSourcePlayer ? chooser : undefined,
       requiresTargetSelection: true,
-      validTargets: cardInstanceIds,
+      validTargets: chainData?.sakura135Chain ? [...cardInstanceIds, REWIND_TARGET] : cardInstanceIds,
       isOptional: false,
       isMandatory: true,
       resolved: false,
@@ -17240,7 +17304,7 @@ export class EffectEngine {
     try {
       const parsed = JSON.parse(pending.effectDescription);
       if (parsed.missionIndex !== undefined) missionIdx = parsed.missionIndex;
-    } catch { /* ignore */ }
+    } catch {}
 
     const mission = newState.activeMissions[missionIdx];
     if (!mission) return EffectEngine.defeatBothForSasuke136(newState, pending.sourcePlayer, targetId, null);
@@ -17304,7 +17368,7 @@ export class EffectEngine {
   
   static naruto133ApplyTarget1(state: GameState, pending: PendingEffect, targetId: string): GameState {
     let parsed: { missionIndex?: number; useDefeat?: boolean } = {};
-    try { parsed = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
+    try { parsed = JSON.parse(pending.effectDescription); } catch {}
     const useDefeat = parsed.useDefeat ?? false;
 
     
@@ -17398,7 +17462,7 @@ export class EffectEngine {
   
   static naruto108ApplyHide(state: GameState, pending: PendingEffect, targetId: string): GameState {
     let parsed: { isUpgrade?: boolean } = {};
-    try { parsed = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
+    try { parsed = JSON.parse(pending.effectDescription); } catch {}
     const isUpgrade = parsed.isUpgrade ?? false;
 
     
@@ -17445,7 +17509,7 @@ export class EffectEngine {
   
   static kyubi134ApplyHide(state: GameState, pending: PendingEffect, targetId: string): GameState {
     let parsed: { remainingPower?: number; hiddenIds?: string[]; powerSnapshot?: Record<string, number> } = {};
-    try { parsed = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
+    try { parsed = JSON.parse(pending.effectDescription); } catch {}
     let remainingPower = parsed.remainingPower ?? 6;
     const hiddenIds = parsed.hiddenIds ?? [];
     const powerSnapshot = parsed.powerSnapshot ?? {};
@@ -19093,7 +19157,7 @@ export class EffectEngine {
       const parsed = JSON.parse(pending.effectDescription);
       charId = parsed.charId ?? '';
       fromMissionIndex = parsed.fromMissionIndex ?? -1;
-    } catch { /* ignore */ }
+    } catch {}
 
     if (!charId || fromMissionIndex === -1) return state;
 
@@ -19166,7 +19230,7 @@ export class EffectEngine {
     try {
       const desc = JSON.parse(pending.effectDescription);
       costReduction = desc.costReduction ?? 0;
-    } catch { /* ignore */ }
+    } catch {}
     return EffectEngine.genericPlaceOnMission(newState, player, missionIndex, 0, 'Jiraya', pending.sourceCardId ?? '', costReduction);
   }
 
@@ -19240,7 +19304,7 @@ export class EffectEngine {
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
     let charInstanceId = '';
-    try { charInstanceId = JSON.parse(pending.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+    try { charInstanceId = JSON.parse(pending.effectDescription).charInstanceId ?? ''; } catch {}
     if (!charInstanceId) return state;
     return EffectEngine.moveCharToMissionDirect(newState, charInstanceId, destMission, player, 'Asuma Sarutobi', 'KS-023-C');
   }
@@ -19313,7 +19377,7 @@ export class EffectEngine {
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
     let charInstanceId = '';
-    try { charInstanceId = JSON.parse(pending.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+    try { charInstanceId = JSON.parse(pending.effectDescription).charInstanceId ?? ''; } catch {}
     if (!charInstanceId) return state;
     return EffectEngine.moveCharToMissionDirect(newState, charInstanceId, destMission, player, 'Iruka Umino', 'KS-047-C');
   }
@@ -19339,7 +19403,7 @@ export class EffectEngine {
       movesRemaining = desc.movesRemaining ?? 1;
       snapshotTargets = Array.isArray(desc.snapshotTargets) ? desc.snapshotTargets : [];
       movedIds = Array.isArray(desc.movedIds) ? desc.movedIds : [];
-    } catch { /* ignore */ }
+    } catch {}
 
 
     const validMissions: string[] = [];
@@ -19418,7 +19482,7 @@ export class EffectEngine {
       movesRemaining = desc.movesRemaining ?? 1;
       snapshotTargets = Array.isArray(desc.snapshotTargets) ? desc.snapshotTargets : [];
       movedIds = Array.isArray(desc.movedIds) ? desc.movedIds : [];
-    } catch { /* ignore */ }
+    } catch {}
 
     if (!charInstanceId) return state;
 
@@ -19598,7 +19662,7 @@ export class EffectEngine {
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
     let costReduction = 0;
-    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; } catch { /* ignore */ }
+    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; } catch {}
     return EffectEngine.genericPlaceOnMission(newState, player, missionIndex, 0, 'SAKURA HARUNO', 'KS-109-R', costReduction);
   }
 
@@ -19623,7 +19687,7 @@ export class EffectEngine {
       const parsed = JSON.parse(pending.effectDescription);
       costReduction = parsed.costReduction ?? 0;
       storedCards = parsed.storedCards ?? [];
-    } catch { /* ignore */ }
+    } catch {}
 
     
     
@@ -19634,7 +19698,7 @@ export class EffectEngine {
     if (drawnCards.length === 0) {
 
       let topCardsInfo: any[] = [];
-      try { topCardsInfo = JSON.parse(pending.effectDescription).topCards ?? []; } catch { /* ignore */ }
+      try { topCardsInfo = JSON.parse(pending.effectDescription).topCards ?? []; } catch {}
       const numDrawn = topCardsInfo.length;
       if (numDrawn > 0) {
         drawnCards = ps.discardPile.splice(ps.discardPile.length - numDrawn, numDrawn);
@@ -19666,6 +19730,23 @@ export class EffectEngine {
   }
 
   
+  static captureRewindPoint(state: GameState): GameState {
+    const snapshot = deepClone({ ...state, rewindPoint: undefined }) as GameState;
+    delete snapshot.rewindPoint;
+    return snapshot;
+  }
+
+  static restoreRewindPoint(state: GameState): GameState {
+    const snapshot = state.rewindPoint;
+    if (!snapshot) return state;
+    const restored = deepClone(snapshot) as GameState;
+    delete restored.rewindPoint;
+    restored.log = state.log;
+    restored.actionHistory = state.actionHistory;
+    restored.instanceSeq = Math.max(state.instanceSeq ?? 0, restored.instanceSeq ?? 0);
+    return restored;
+  }
+
   static sakura135ContinuePlacement(
     state: GameState, player: PlayerID, chosenCard: any, costReduction: number,
     pending: PendingEffect,
@@ -19730,7 +19811,7 @@ export class EffectEngine {
       targetSelectionType: 'SAKURA135_CHOOSE_MISSION',
       sourcePlayer: player,
       requiresTargetSelection: true,
-      validTargets: validMissions,
+      validTargets: [...validMissions, REWIND_TARGET],
       isOptional: false,
       isMandatory: true,
       resolved: false,
@@ -19754,12 +19835,13 @@ export class EffectEngine {
 
   
   static sakura135ChooseMission(state: GameState, pending: PendingEffect, targetId: string): GameState {
+    if (targetId === REWIND_TARGET) return EffectEngine.restoreRewindPoint(state);
     const missionIndex = parseInt(targetId, 10);
     if (isNaN(missionIndex)) return state;
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
     let costReduction = 0;
-    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; } catch { /* ignore */ }
+    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; } catch {}
     
     
     
@@ -20744,7 +20826,7 @@ export class EffectEngine {
   static kiba113QueueAkamaruChoice(state: GameState, pending: PendingEffect, useDefeat: boolean): GameState {
     let newState = { ...state };
     let confData: { sourceMissionIndex: number; sourceCardInstanceId: string } | null = null;
-    try { confData = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
+    try { confData = JSON.parse(pending.effectDescription); } catch {}
     if (!confData) return newState;
 
     const friendlySide: 'player1Characters' | 'player2Characters' =
@@ -20820,7 +20902,7 @@ export class EffectEngine {
   static kiba149ExecuteStep1(state: GameState, pending: PendingEffect, useDefeat: boolean): GameState {
     let newState = { ...state };
     let confData: { sourceMissionIndex: number; sourceCardInstanceId: string } | null = null;
-    try { confData = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
+    try { confData = JSON.parse(pending.effectDescription); } catch {}
     if (!confData) return newState;
 
     const friendlySide: 'player1Characters' | 'player2Characters' =
@@ -20897,7 +20979,7 @@ export class EffectEngine {
   ): GameState {
     let newState = { ...state };
     let confData: { sourceMissionIndex: number } | null = null;
-    try { confData = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
+    try { confData = JSON.parse(pending.effectDescription); } catch {}
     if (!confData) return newState;
 
     const friendlySide: 'player1Characters' | 'player2Characters' =

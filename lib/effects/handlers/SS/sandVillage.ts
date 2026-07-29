@@ -1,4 +1,6 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
+import { isDuelConditionMet } from '@/lib/effects/duelUtils';
+import { confirmFirst } from './confirmFirst';
 import type { CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
@@ -23,7 +25,7 @@ function costOf(char: CharacterInPlay): number {
 function ss046Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const deck = state[sourcePlayer].deck;
-  const hasSand = deck.some((c) => c.group === 'Sand Village');
+  const hasSand = deck.some((c) => c.card_type === 'character' && c.group === 'Sand Village');
   if (!hasSand) {
     return noTarget(state, sourcePlayer, 'Gaara (SS-046): No Sand Village character left in the deck.', 'GAARA', 'SS-046-UC');
   }
@@ -51,7 +53,7 @@ function ss047Upgrade(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return noTarget(state, sourcePlayer, 'One-Tail (SS-047) UPGRADE: No enemy with Power 3 or less.', 'ONE-TAIL', 'SS-047-UC');
   }
-  return {
+  return confirmFirst({
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'SS047_DEFEAT',
@@ -59,7 +61,7 @@ function ss047Upgrade(ctx: EffectContext): EffectResult {
     isOptional: true,
     description: 'One-Tail (SS-047) UPGRADE: Defeat an enemy character with Power 3 or less.',
     descriptionKey: 'game.effect.desc.ss047Defeat',
-  };
+  }, ctx.sourceCard.instanceId, 'SS047_CONFIRM_UPGRADE');
 }
 
 
@@ -69,14 +71,14 @@ function ss078Duel(ctx: EffectContext): EffectResult {
   const validTargets: string[] = [];
   for (const mission of state.activeMissions) {
     for (const char of mission[enemySide]) {
-      if (char.isHidden) continue;
-      if (costOf(char) <= 2) validTargets.push(char.instanceId);
+      const cost = char.isHidden ? 0 : costOf(char);
+      if (cost <= 2) validTargets.push(char.instanceId);
     }
   }
   if (validTargets.length === 0) {
     return noTarget(state, sourcePlayer, 'Gaara (SS-078) DUEL: No enemy with cost 2 or less.', 'GAARA', 'SS-078-UC');
   }
-  return {
+  return confirmFirst({
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'SS078_DUEL_DEFEAT',
@@ -84,7 +86,7 @@ function ss078Duel(ctx: EffectContext): EffectResult {
     isOptional: true,
     description: 'Gaara (SS-078) DUEL: Defeat an enemy character with cost 2 or less.',
     descriptionKey: 'game.effect.desc.ss078DuelDefeat',
-  };
+  }, ctx.sourceCard.instanceId, 'SS078_CONFIRM_DUEL');
 }
 
 
@@ -99,7 +101,13 @@ function ss114Main(ctx: EffectContext): EffectResult {
     return noTarget(state, sourcePlayer, 'Gaara (SS-114) MAIN: No Gaara in hand to discard.', 'GAARA', 'SS-114-R');
   }
   const mission = state.activeMissions[sourceMissionIndex];
-  if (!mission || mission[sideKey(enemyOf(sourcePlayer))].length === 0) {
+  if (!mission) {
+    return noTarget(state, sourcePlayer, 'Gaara (SS-114) MAIN: No enemy character in this mission.', 'GAARA', 'SS-114-R');
+  }
+  const willDefeat = isDuelConditionMet(state, sourceMissionIndex, 'DUEL Rock Lee:');
+  const reachableEnemies = mission[sideKey(enemyOf(sourcePlayer))]
+    .filter((c) => willDefeat || !c.isHidden);
+  if (reachableEnemies.length === 0) {
     return noTarget(state, sourcePlayer, 'Gaara (SS-114) MAIN: No enemy character in this mission.', 'GAARA', 'SS-114-R');
   }
   return {
@@ -142,7 +150,7 @@ function ss117Duel(ctx: EffectContext): EffectResult {
   if (reachable.length === 0) {
     return noTarget(state, sourcePlayer, 'Kankuro (SS-117) DUEL: No enemy character can be moved here.', 'KANKURO', 'SS-117-R');
   }
-  return {
+  return confirmFirst({
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'SS117_DUEL_MOVE',
@@ -150,7 +158,7 @@ function ss117Duel(ctx: EffectContext): EffectResult {
     isOptional: true,
     description: 'Kankuro (SS-117) DUEL: Move an enemy character to this mission.',
     descriptionKey: 'game.effect.desc.ss117DuelMove',
-  };
+  }, ctx.sourceCard.instanceId, 'SS117_CONFIRM_DUEL');
 }
 
 
@@ -163,7 +171,7 @@ function ss119Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return noTarget(state, sourcePlayer, 'Temari (SS-119) MAIN: No enemy character can be moved from this mission.', 'TEMARI', 'SS-119-R');
   }
-  return {
+  return confirmFirst({
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'SS119_MOVE_CHAR',
@@ -171,7 +179,7 @@ function ss119Main(ctx: EffectContext): EffectResult {
     isOptional: true,
     description: 'Temari (SS-119) MAIN: Move an enemy character from this mission.',
     descriptionKey: 'game.effect.desc.ss119MoveChar',
-  };
+  }, ctx.sourceCard.instanceId, 'SS119_CONFIRM_MAIN');
 }
 
 function ss119Duel(ctx: EffectContext): EffectResult {
@@ -179,7 +187,7 @@ function ss119Duel(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SS119_DUEL_CONFIRM',
+    targetSelectionType: 'SS119_CONFIRM_DUEL',
     validTargets: [sourceCard.instanceId],
     isOptional: true,
     description: 'Temari (SS-119) DUEL: Draw a card and gain the Edge.',
@@ -201,7 +209,7 @@ function ss085Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return noTarget(state, sourcePlayer, 'Giant Fan (SS-085): No weaker enemy can be moved from this mission.', 'GIANT FAN', 'SS-085-UC');
   }
-  return {
+  return confirmFirst({
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'SS085_MOVE_CHAR',
@@ -209,7 +217,7 @@ function ss085Main(ctx: EffectContext): EffectResult {
     isOptional: true,
     description: 'Giant Fan (SS-085): Move a weaker enemy character from this mission.',
     descriptionKey: 'game.effect.desc.ss085MoveChar',
-  };
+  }, sourceCard.instanceId, 'SS085_CONFIRM_MAIN');
 }
 
 
@@ -230,7 +238,7 @@ function ss099Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return noTarget(state, sourcePlayer, 'Blade of the Thunder God (SS-099): No weaker enemy Jutsu character here.', 'BLADE OF THE THUNDER GOD', 'SS-099-UC');
   }
-  return {
+  return confirmFirst({
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'SS099_HIDE',
@@ -238,7 +246,7 @@ function ss099Main(ctx: EffectContext): EffectResult {
     isOptional: true,
     description: 'Blade of the Thunder God (SS-099): Hide a weaker enemy Jutsu character in this mission.',
     descriptionKey: 'game.effect.desc.ss099Hide',
-  };
+  }, sourceCard.instanceId, 'SS099_CONFIRM_MAIN');
 }
 
 

@@ -28,6 +28,36 @@ import { isLandscapeCard, cardAspectRatio } from '@/lib/cards/orientation';
 
 type AnyCard = CardData;
 
+function StatBadges({ card, costLabel, powerLabel }: { card: AnyCard; costLabel: string; powerLabel: string }) {
+  const { chakra, power } = card as CharacterCard;
+  const hasCost = typeof chakra === 'number' && Number.isFinite(chakra);
+  const hasPower = typeof power === 'number' && Number.isFinite(power);
+  if (!hasCost && !hasPower) return null;
+  const base = 'absolute z-10 px-1.5 py-0.5 text-[10px] font-bold leading-none';
+  return (
+    <>
+      {hasCost && (
+        <span
+          className={`${base} top-1 right-1`}
+          style={{ backgroundColor: 'rgba(10,10,10,0.78)', color: '#c4a35a', fontVariantNumeric: 'tabular-nums' }}
+          title={`${costLabel} ${chakra}`}
+        >
+          {chakra}
+        </span>
+      )}
+      {hasPower && (
+        <span
+          className={`${base} bottom-1 left-1`}
+          style={{ backgroundColor: 'rgba(10,10,10,0.78)', color: '#e8e8e8', fontVariantNumeric: 'tabular-nums' }}
+          title={`${powerLabel} ${power}`}
+        >
+          {power}
+        </span>
+      )}
+    </>
+  );
+}
+
 const RARITY_ORDER: Rarity[] = ['C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L', 'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV', 'MMS'];
 export default function CollectionPage() {
   const t = useTranslations();
@@ -135,6 +165,7 @@ export default function CollectionPage() {
             </div>
           )}
         </Link>
+        <StatBadges card={card} costLabel={t('collection.details.cost')} powerLabel={t('collection.details.power')} />
         <button
           type="button"
           onClick={() => setSelectedCard(card)}
@@ -323,6 +354,7 @@ export default function CollectionPage() {
                     inner
                   )}
                 </Link>
+                <StatBadges card={card} costLabel={t('collection.details.cost')} powerLabel={t('collection.details.power')} />
                 {isBanned && <BanBadge label={t('collection.bannedPlaceholder')} />}
                 {variant && !locked && (variantInventory.get(card.id) ?? 0) >= 2 && (
                   <span
@@ -421,7 +453,8 @@ export default function CollectionPage() {
                         </div>
                       )}
                     </Link>
-                    {isBanned && <BanBadge label={t('collection.bannedPlaceholder')} />}
+                    <StatBadges card={card} costLabel={t('collection.details.cost')} powerLabel={t('collection.details.power')} />
+                {isBanned && <BanBadge label={t('collection.bannedPlaceholder')} />}
                     <button
                       type="button"
                       onClick={() => setSelectedCard(card)}

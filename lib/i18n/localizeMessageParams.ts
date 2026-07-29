@@ -23,6 +23,22 @@ function getNameMap(): Map<string, CardData> {
 
 const NAME_PARAM_KEYS = ['card', 'target', 'name', 'oldCard', 'source'];
 
+const NAME_LIST_PARAM_KEYS = ['revealed'];
+
+function localizeNameList(value: string, locale: string): string | null {
+  const parts = value.split(',').map((p) => p.trim());
+  if (parts.length === 0 || parts.some((p) => !p)) return null;
+
+  const map = getNameMap();
+  const localized = parts.map((p) => {
+    const card = map.get(p.toUpperCase());
+    return card ? getCardName(card, locale) : null;
+  });
+
+  if (localized.some((p) => p === null)) return null;
+  return localized.join(', ');
+}
+
 export function localizeMessageParams(
   params: Record<string, string | number> | undefined,
   locale: string,
@@ -57,6 +73,13 @@ export function localizeMessageParams(
     if (typeof v !== 'string' || !v) continue;
     const card = map.get(v.toUpperCase());
     if (card) result[key] = getCardName(card, locale);
+  }
+
+  for (const key of NAME_LIST_PARAM_KEYS) {
+    const v = result[key];
+    if (typeof v !== 'string' || !v) continue;
+    const localized = localizeNameList(v, locale);
+    if (localized) result[key] = localized;
   }
 
   if ('title' in result) {

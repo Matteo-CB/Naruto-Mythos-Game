@@ -989,7 +989,8 @@
         "ss099Hide": "{card}: ocultó a un personaje Jutsu enemigo más débil.",
         "ss078Draw": "{card}: pagó 1 Chakra para robar 1 carta.",
         "ss089Move": "{card}: el anexo se movió a {target}.",
-        "ss117Chakra": "{card}: ganó 1 Chakra por mover personajes enemigos."
+        "ss117Chakra": "{card}: ganó 1 Chakra por mover personajes enemigos.",
+        "ss046DrawNames": "{card}: revela {revealed} y luego roba {target}."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",
@@ -1007,7 +1008,8 @@
       "playAttachment": "Juega el accesorio {card} por {cost} chakra.",
       "attachToMission": "{card} se une a la misión {mission}.",
       "attachToCharacter": "{card} se une a {target}.",
-      "useFirstStrike": "FIRST STRIKE: {card} golpea antes de que empiece la ronda."
+      "useFirstStrike": "FIRST STRIKE: {card} golpea primero en esta ronda.",
+      "attachmentDiscarded": "{card} fue descartada: su condición de equipo ya no se cumple."
     },
     "end": {
       "victory": "Victoria",
@@ -1102,7 +1104,8 @@
       "restoreEffect": "Efecto pendiente",
       "edge": "Ventaja",
       "edgeLocked": "Bloqueada",
-      "handPeeked": "Tu oponente está mirando tu mano"
+      "handPeeked": "Tu oponente está mirando tu mano",
+      "goBack": "Volver"
     },
     "handLabel": "Mano",
     "effect": {
@@ -1547,7 +1550,7 @@
         "sasuke146GiveEdge": "Sasuke (146): Gana la ficha de Ventaja.",
         "akamaru029ChooseHide": "Akamaru (029): Elige qué personaje enemigo (coste {cost}) ocultar.",
         "kimimaro123AutoDiscardDefeat": "Kimimaro (123) UPGRADE: Tu última carta se descartará. Elige un personaje con coste 5 o menos para derrotar.",
-        "narutoLegendaryConfirmMain": "Naruto (Legendaria) MAIN: Oculta a un enemigo con Poder 5 o menos en esta misión Y a otro con Poder 2 o menos en juego.",
+        "narutoLegendaryConfirmMain": "MAIN: Oculta a un enemigo con Poder 5 o menos en esta misión Y a otro con Poder 2 o menos en juego.",
         "narutoLegendaryConfirmUpgradeModifier": "Naruto (Legendaria): ¿Aplicar UPGRADE? Derrota a ambos objetivos en lugar de ocultarlos.",
         "narutoLegendaryDefeatTarget1": "Naruto (Legendaria): Elige un personaje enemigo con Poder 5 o menos para derrotar en esta misión.",
         "narutoLegendaryHideTarget1": "Naruto (Legendaria): Elige un personaje enemigo con Poder 5 o menos para ocultar en esta misión.",
@@ -1618,10 +1621,10 @@
         "attachChooseTarget": "Elige un personaje aliado al que unir {card}.",
         "ss128ConfirmDuel": "DUEL Jirobo: ¿Derrotar a un personaje enemigo en esta misión con Poder 8 o más?",
         "ss128Defeat": "Choji Akimichi: Elige un personaje enemigo con Poder 8 o más para derrotar.",
-        "ss108ConfirmScore": "SCORE Estadio del Examen: ¿Un personaje aliado activa un efecto DUEL instantáneo ignorando sus requisitos?",
+        "ss108ConfirmScore": "SCORE: ¿Un personaje aliado activa un efecto DUEL instantáneo ignorando sus requisitos?",
         "ss108ChooseCharacter": "Estadio del Examen: Elige un personaje aliado para activar su efecto DUEL.",
         "ss049FirstStrikeChar": "FIRST STRIKE: Elige un personaje para mover desde esta misión.",
-        "ss046ConfirmMain": "¿Revelar cartas de tu mazo hasta encontrar un personaje de la Aldea de la Arena, robarlo y barajar de nuevo las reveladas?",
+        "ss046ConfirmMain": "MAIN: ¿Revelar cartas de tu mazo hasta encontrar un personaje de la Aldea de la Arena, robarlo y barajar de nuevo las reveladas?",
         "ss047Defeat": "Elige un personaje enemigo con 3 de Poder o menos para derrotarlo.",
         "ss078DuelDefeat": "Elige un personaje enemigo con coste 2 o menos para derrotarlo.",
         "ss114ChooseDiscard": "Elige un Gaara para descartar de tu mano.",
@@ -1826,7 +1829,10 @@
       "chakraCost": "Coste de chakra",
       "power": "Poder",
       "clear": "Limpiar filtros",
-      "resultsCount": "{count} cartas"
+      "resultsCount": "{count} cartas",
+      "allTypes": "Todos los Tipos",
+      "typeCharacters": "Personajes",
+      "typeAttachments": "Accesorios"
     },
     "search": {
       "helpButton": "? Búsqueda avanzada",
@@ -1889,7 +1895,9 @@
       "edLabel": "Texto DUEL",
       "edDesc": "Buscar solo en el texto de los efectos DUEL",
       "efLabel": "Texto FIRST STRIKE",
-      "efDesc": "Buscar solo en el texto de los efectos First Strike (aún sin cartas)"
+      "efDesc": "Buscar solo en el texto de los efectos First Strike (aún sin cartas)",
+      "eatLabel": "Efecto ATTACH",
+      "eatDesc": "Busca dentro de la línea ATTACH de un accesorio, por ejemplo a qué se equipa."
     },
     "sort": "Ordenar",
     "error": {
@@ -2298,7 +2306,9 @@
     "linkCopied": "Enlace copiado",
     "winner": "Ganador",
     "switchPerspective": "Ver como {player}",
-    "replayComplete": "Repetición completada"
+    "replayComplete": "Repetición completada",
+    "hideControls": "Ocultar",
+    "showControls": "Mostrar"
   },
   "room": {
     "error": {
@@ -3970,7 +3980,9 @@
       "holo_id": "Las versiones holo no pueden mostrarse en el menú.",
       "too_many": "Demasiadas cartas seleccionadas.",
       "invalid": "Selección no válida."
-    }
+    },
+    "rarityFilterAll": "Todas las rarezas",
+    "selectedOnly": "Solo seleccionadas"
   },
   "playStats": {
     "buttonLabel": "Estadísticas",

@@ -21,6 +21,7 @@ import { resetIdCounter } from '@/lib/engine/utils/id';
 import { useTrainingStore } from '@/stores/trainingStore';
 import { useUIStore } from '@/stores/uiStore';
 import { getCharacterById, getCardById } from '@/lib/data/cardIndex';
+import { REWIND_TARGET } from '@/lib/effects/EffectEngine';
 import { lookupCardByName } from '@/lib/i18n/localizeMessageParams';
 import { playSound } from '@/lib/sound/SoundManager';
 
@@ -53,6 +54,7 @@ interface PendingTargetSelection {
   effectChoices?: Array<{ effectType: string; description: string; cardId?: string; effectIndex?: number }>; // for effect copy choice (Kakashi/Sakon)
   handCards?: Array<{ index: number; card: { name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra?: number; power?: number; image_file?: string; missionLabel?: string; id?: string; cardId?: string; number?: number; rarity?: string; keywords?: string[]; group?: string; effects?: Array<{ type: string; description: string }>; card_type?: string }; targetId?: string; isPlayable?: boolean }>; // for hand selection
   revealedCard?: { name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
+  canRewind?: boolean;
   revealedCards?: Array<{
     id?: string; name_fr: string; name_en?: string; name_ja?: string; name_es?: string;
     title_fr?: string; title_en?: string; title_ja?: string; title_es?: string;
@@ -199,6 +201,8 @@ interface PendingActionData {
 
 interface PendingEffectData {
   id: string;
+  sourceCardId?: string;
+  validTargets?: string[];
   targetSelectionType?: string;
   effectDescription: string;
   isOptional?: boolean;
@@ -634,6 +638,19 @@ function buildPendingTargetSelectionUI(
     } catch { /* ignore */ }
   }
 
+  if (!confirmCardData && isEffectConfirm && pendingEffect?.sourceCardId) {
+    const sourceCard = getCardById(pendingEffect.sourceCardId);
+    if (sourceCard) {
+      confirmCardData = {
+        name_fr: sourceCard.name_fr,
+        name_en: sourceCard.name_en,
+        image_file: sourceCard.image_file,
+        chakra: sourceCard.chakra,
+        power: sourceCard.power,
+      };
+    }
+  }
+
   
   const selectionType: PendingTargetSelection['selectionType'] = isInfoReveal
     ? 'INFO_REVEAL'
@@ -665,6 +682,7 @@ function buildPendingTargetSelectionUI(
   }
 
   return {
+    canRewind: (pendingEffect?.validTargets ?? []).includes(REWIND_TARGET),
     validTargets: pendingAction.options,
     description: pendingAction.description,
     descriptionKey: pendingAction.descriptionKey,

@@ -1456,7 +1456,9 @@
     "linkCopied": "Link Copiado",
     "winner": "Vencedor",
     "switchPerspective": "Ver como {player}",
-    "replayComplete": "Replay Concluído"
+    "replayComplete": "Replay Concluído",
+    "hideControls": "Ocultar",
+    "showControls": "Mostrar"
   },
   "eloHistory": {
     "loading": "Carregando histórico de ELO…",
@@ -1735,7 +1737,10 @@
       "chakraCost": "Custo de Chakra",
       "power": "Poder",
       "clear": "Limpar Filtros",
-      "resultsCount": "{count} cartas"
+      "resultsCount": "{count} cartas",
+      "allTypes": "Todos os Tipos",
+      "typeCharacters": "Personagens",
+      "typeAttachments": "Anexos"
     },
     "search": {
       "helpButton": "? Busca Avançada",
@@ -1798,7 +1803,9 @@
       "edLabel": "Texto DUEL",
       "edDesc": "Buscar apenas no texto dos efeitos DUEL",
       "efLabel": "Texto FIRST STRIKE",
-      "efDesc": "Buscar apenas no texto dos efeitos First Strike (ainda sem cartas)"
+      "efDesc": "Buscar apenas no texto dos efeitos First Strike (ainda sem cartas)",
+      "eatLabel": "Efeito ATTACH",
+      "eatDesc": "Busca dentro da linha ATTACH de um anexo, por exemplo a que ele se anexa."
     },
     "sort": "Ordenar",
     "error": {
@@ -3045,7 +3052,8 @@
         "ss099Hide": "{card}: ocultou um personagem Jutsu inimigo mais fraco.",
         "ss078Draw": "{card}: pagou 1 Chakra para comprar 1 carta.",
         "ss089Move": "{card}: o anexo foi movido para {target}.",
-        "ss117Chakra": "{card}: ganhou 1 Chakra por mover personagens inimigos."
+        "ss117Chakra": "{card}: ganhou 1 Chakra por mover personagens inimigos.",
+        "ss046DrawNames": "{card}: revelou {revealed} e depois comprou {target}."
       },
       "score": {
         "draw": "[SCORE] {card}: Comprou {count} carta(s).",
@@ -3063,7 +3071,8 @@
       "playAttachment": "Joga o acessório {card} por {cost} chakra.",
       "attachToMission": "{card} está anexado à missão {mission}.",
       "attachToCharacter": "{card} está anexado a {target}.",
-      "useFirstStrike": "FIRST STRIKE: {card} ataca antes de a rodada começar."
+      "useFirstStrike": "FIRST STRIKE: {card} ataca primeiro nesta rodada.",
+      "attachmentDiscarded": "{card} foi descartada: sua condição de anexo não é mais válida."
     },
     "end": {
       "victory": "Vitória",
@@ -3158,7 +3167,8 @@
       "restoreEffect": "Efeito Pendente",
       "edge": "Vantagem",
       "edgeLocked": "Travada",
-      "handPeeked": "Seu adversário está olhando sua mão"
+      "handPeeked": "Seu adversário está olhando sua mão",
+      "goBack": "Voltar"
     },
     "handLabel": "Mão",
     "effect": {
@@ -3603,7 +3613,7 @@
         "sasuke146GiveEdge": "Sasuke (146): Ganhe a ficha de Vantagem.",
         "akamaru029ChooseHide": "Akamaru (029): Escolha qual personagem inimigo (custo {cost}) ocultar.",
         "kimimaro123AutoDiscardDefeat": "Kimimaro (123) UPGRADE: Sua última carta será descartada. Escolha um personagem com custo 5 ou menos para derrotar.",
-        "narutoLegendaryConfirmMain": "Naruto (Lendário) MAIN: Oculte um inimigo com Poder 5 ou menos nesta missão E outro com Poder 2 ou menos em jogo.",
+        "narutoLegendaryConfirmMain": "MAIN: Oculte um inimigo com Poder 5 ou menos nesta missão E outro com Poder 2 ou menos em jogo.",
         "narutoLegendaryConfirmUpgradeModifier": "Naruto (Lendário): Aplicar UPGRADE? Derrote ambos os alvos em vez de ocultá-los.",
         "narutoLegendaryDefeatTarget1": "Naruto (Lendário): Escolha um personagem inimigo com Poder 5 ou menos para derrotar nesta missão.",
         "narutoLegendaryHideTarget1": "Naruto (Lendário): Escolha um personagem inimigo com Poder 5 ou menos para ocultar nesta missão.",
@@ -3674,10 +3684,10 @@
         "attachChooseTarget": "Escolha um personagem aliado para anexar {card}.",
         "ss128ConfirmDuel": "DUEL Jirobo: Derrotar um personagem inimigo nesta missão com Poder 8 ou mais?",
         "ss128Defeat": "Choji Akimichi: Escolha um personagem inimigo com Poder 8 ou mais para derrotar.",
-        "ss108ConfirmScore": "SCORE Estádio do Exame: Um personagem aliado ativa um efeito DUEL instantâneo, ignorando os requisitos?",
+        "ss108ConfirmScore": "SCORE: Um personagem aliado ativa um efeito DUEL instantâneo, ignorando os requisitos?",
         "ss108ChooseCharacter": "Estádio do Exame: Escolha um personagem aliado para ativar seu efeito DUEL.",
         "ss049FirstStrikeChar": "FIRST STRIKE: Escolha um personagem para mover desta missão.",
-        "ss046ConfirmMain": "Revelar cartas do topo do seu baralho até encontrar um personagem da Vila da Areia, comprá-lo e então embaralhar as reveladas de volta?",
+        "ss046ConfirmMain": "MAIN: Revelar cartas do topo do seu baralho até encontrar um personagem da Vila da Areia, comprá-lo e então embaralhar as reveladas de volta?",
         "ss047Defeat": "Escolha um personagem inimigo com 3 de Poder ou menos para derrotar.",
         "ss078DuelDefeat": "Escolha um personagem inimigo com custo 2 ou menos para derrotar.",
         "ss114ChooseDiscard": "Escolha um Gaara para descartar da sua mão.",
@@ -3965,7 +3975,9 @@
       "holo_id": "As versões holo não podem aparecer no menu.",
       "too_many": "Demasiadas cartas selecionadas.",
       "invalid": "Seleção inválida."
-    }
+    },
+    "rarityFilterAll": "Todas as raridades",
+    "selectedOnly": "Apenas selecionadas"
   },
   "playStats": {
     "buttonLabel": "Estatísticas",

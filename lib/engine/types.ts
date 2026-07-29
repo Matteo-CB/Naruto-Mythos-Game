@@ -221,6 +221,8 @@ export interface GameState {
   playCostIncrease?: { player1: number; player2: number };
   
   actionHistory?: Array<{ player: PlayerID; action: GameAction; createdIds?: string[] }>;
+  instanceSeq?: number;
+  rewindPoint?: GameState;
   
   pendingForcedResolver?: PlayerID;
   

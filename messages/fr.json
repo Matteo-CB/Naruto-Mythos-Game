@@ -990,7 +990,8 @@
         "ss099Hide": "{card} : un personnage Jutsu ennemi plus faible a été caché.",
         "ss078Draw": "{card} : 1 Chakra payé pour piocher 1 carte.",
         "ss089Move": "{card} : l’attachement a été déplacé sur {target}.",
-        "ss117Chakra": "{card} : 1 Chakra gagné pour avoir déplacé des personnages ennemis."
+        "ss117Chakra": "{card} : 1 Chakra gagné pour avoir déplacé des personnages ennemis.",
+        "ss046DrawNames": "{card} : {revealed} révélée(s), puis {target} piochée."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1008,7 +1009,8 @@
       "playAttachment": "Joue l'attachement {card} pour {cost} chakra.",
       "attachToMission": "{card} est attaché à la mission {mission}.",
       "attachToCharacter": "{card} est attaché à {target}.",
-      "useFirstStrike": "FIRST STRIKE : {card} frappe avant le début de la manche."
+      "useFirstStrike": "FIRST STRIKE : {card} frappe en premier cette manche.",
+      "attachmentDiscarded": "{card} est défaussée : sa condition d attache n est plus remplie."
     },
     "end": {
       "victory": "Victoire",
@@ -1103,7 +1105,8 @@
       "restoreEffect": "Effet en attente",
       "edge": "Edge",
       "edgeLocked": "Verrouillé",
-      "handPeeked": "L'adversaire regarde ta main"
+      "handPeeked": "L'adversaire regarde ta main",
+      "goBack": "Revenir"
     },
     "handLabel": "Main",
     "effect": {
@@ -1548,7 +1551,7 @@
         "sasuke146GiveEdge": "Sasuke (146) : Prenez le jeton Edge.",
         "akamaru029ChooseHide": "Akamaru (029) : Choisissez quel personnage ennemi (coût {cost}) cacher.",
         "kimimaro123AutoDiscardDefeat": "Kimimaro (123) UPGRADE : Votre dernière carte sera défaussée. Choisissez un personnage de coût 5 ou moins à vaincre.",
-        "narutoLegendaryConfirmMain": "Naruto (Légendaire) MAIN : Cache un ennemi de Puissance 5 ou moins dans cette mission ET un autre de Puissance 2 ou moins en jeu.",
+        "narutoLegendaryConfirmMain": "MAIN: Cache un ennemi de Puissance 5 ou moins dans cette mission ET un autre de Puissance 2 ou moins en jeu.",
         "narutoLegendaryConfirmUpgradeModifier": "Naruto (Légendaire) : Appliquer l'UPGRADE ? Vaincre les deux cibles au lieu de les cacher.",
         "narutoLegendaryDefeatTarget1": "Naruto (Légendaire) : Choisissez un personnage ennemi de Puissance 5 ou moins à vaincre sur cette mission.",
         "narutoLegendaryHideTarget1": "Naruto (Légendaire) : Choisissez un personnage ennemi de Puissance 5 ou moins à cacher sur cette mission.",
@@ -1619,10 +1622,10 @@
         "attachChooseTarget": "Choisissez un personnage allié auquel attacher {card}.",
         "ss128ConfirmDuel": "DUEL Jirobo : Vaincre un personnage ennemi de cette mission avec 8 Puissance ou plus ?",
         "ss128Defeat": "Chôji Akimichi : Choisissez un personnage ennemi avec 8 Puissance ou plus à vaincre.",
-        "ss108ConfirmScore": "SCORE Stade d'Examen : Un personnage allié active un effet DUEL instantané en ignorant ses conditions ?",
+        "ss108ConfirmScore": "SCORE: Un personnage allié active un effet DUEL instantané en ignorant ses conditions ?",
         "ss108ChooseCharacter": "Stade d'Examen : Choisissez un personnage allié pour activer son effet DUEL.",
         "ss049FirstStrikeChar": "FIRST STRIKE : Choisissez un personnage à déplacer depuis cette mission.",
-        "ss046ConfirmMain": "Révéler des cartes du dessus de votre deck jusqu’à trouver un personnage Village du Sable, le piocher, puis remélanger les cartes révélées ?",
+        "ss046ConfirmMain": "MAIN : Révéler des cartes du dessus de votre deck jusqu’à trouver un personnage Village du Sable, le piocher, puis remélanger les cartes révélées ?",
         "ss047Defeat": "Choisissez un personnage ennemi ayant une Puissance de 3 ou moins à vaincre.",
         "ss078DuelDefeat": "Choisissez un personnage ennemi dont le coût est de 2 ou moins à vaincre.",
         "ss114ChooseDiscard": "Choisissez un Gaara à défausser de votre main.",
@@ -1827,7 +1830,10 @@
       "chakraCost": "Coût en Chakra",
       "power": "Puissance",
       "clear": "Effacer les filtres",
-      "resultsCount": "{count} cartes"
+      "resultsCount": "{count} cartes",
+      "allTypes": "Tous les Types",
+      "typeCharacters": "Personnages",
+      "typeAttachments": "Attachements"
     },
     "search": {
       "helpButton": "? Recherche avancée",
@@ -1890,7 +1896,9 @@
       "edLabel": "Texte DUEL",
       "edDesc": "Rechercher dans le texte des effets DUEL uniquement",
       "efLabel": "Texte FIRST STRIKE",
-      "efDesc": "Rechercher dans le texte des effets First Strike uniquement (aucune carte pour le moment)"
+      "efDesc": "Rechercher dans le texte des effets First Strike uniquement (aucune carte pour le moment)",
+      "eatLabel": "Effet ATTACH",
+      "eatDesc": "Cherche dans la ligne ATTACH d un attachement, par exemple ce à quoi il s attache."
     },
     "sort": "Trier",
     "error": {
@@ -2299,7 +2307,9 @@
     "linkCopied": "Lien copié",
     "winner": "Vainqueur",
     "switchPerspective": "Voir comme {player}",
-    "replayComplete": "Replay terminé"
+    "replayComplete": "Replay terminé",
+    "hideControls": "Masquer",
+    "showControls": "Afficher"
   },
   "room": {
     "error": {
@@ -3971,7 +3981,9 @@
       "holo_id": "Les versions holo ne peuvent pas être affichées sur le menu.",
       "too_many": "Trop de cartes sélectionnées.",
       "invalid": "Sélection invalide."
-    }
+    },
+    "rarityFilterAll": "Toutes les raretés",
+    "selectedOnly": "Sélectionnées"
   },
   "playStats": {
     "buttonLabel": "Stats",

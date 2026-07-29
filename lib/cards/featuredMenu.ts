@@ -1,7 +1,7 @@
 import { getServerCardById, isExtraSetCard } from '@/lib/data/serverCards';
 import { isCardPublicSync } from '@/lib/cards/reveal';
 import { isHoloId } from '@/lib/holo/holoId';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 import { holoRarity, type HoloRarity } from '@/lib/cards/holoRarity';
 
 export const FEATURED_MENU_MAX = 6;
@@ -21,7 +21,8 @@ export function checkFeaturableCardId(id: string, hiddenIds: Set<string>): Featu
   if (isHoloId(id)) return 'holo_id';
   const card = getServerCardById(id);
   if (!card) return 'unknown_card';
-  if (card.card_type !== 'character') return 'not_a_character';
+  const featurableTypes = ['character', 'attachment', 'mission'];
+  if (!featurableTypes.includes(String(card.card_type))) return 'not_a_character';
   if (!card.image_file) return 'no_image';
   if (!isCardPublicSync(id, hiddenIds)) return 'not_public';
   return null;
@@ -43,7 +44,7 @@ export function resolveFeaturedMenuCards(ids: unknown, hiddenIds: Set<string>): 
     if (!isFeaturableCardId(id, hiddenIds)) continue;
     const card = getServerCardById(id);
     if (!card) continue;
-    const src = isExtraSetCard(id) ? `/api/card-image/${id}` : normalizeImagePath(card.image_file);
+    const src = isExtraSetCard(id) ? `/api/card-image/${id}` : portraitImagePath(card);
     if (!src) continue;
     out.push({ id, src, rarity: holoRarity(card.rarity) });
     if (out.length >= FEATURED_MENU_MAX) break;

@@ -1,7 +1,9 @@
 import type { GameState, CharacterInPlay, CharacterCard, GameAction, PlayerID } from '@/lib/engine/types';
+import { calculateCharacterPower } from '@/lib/engine/phases/PowerCalculation';
 import { getCharacterById, getCardsByName } from '@/lib/data/cardIndex';
 import { getAllCards } from '@/lib/data/cardLoader';
 import { parseDuelCharacterName } from '@/lib/effects/duelUtils';
+import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
 import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import { runScenario } from '@/lib/cards/sim/runScenario';
 import type { SimScenario } from '@/lib/cards/sim/scenarios';
@@ -12,11 +14,11 @@ const HAND_EXTRA = ['KS-094-C', 'KS-052-C'];
 const PLACED_IDS = [
   'sim-duel', 'sim-ally1', 'sim-fh', 'sim-ally2',
   'sim-enemy-weak', 'sim-enemy-strong', 'sim-enemy-hidden', 'sim-enemy-far', 'sim-enemy-far2',
-  'sim-demo-hidden', 'sim-upg-base',
+  'sim-demo-hidden', 'sim-upg-base', 'sim-attach-host', 'sim-enemy-req', 'sim-ally-req',
 ];
 const SOURCE_IDS = new Set(['sim-demo-hidden', 'sim-upg-base']);
 
-type PlayMode = 'fresh' | 'fresh1' | 'reveal' | 'upgrade';
+type PlayMode = 'fresh' | 'fresh1' | 'reveal' | 'upgrade' | 'firstStrike';
 
 function nameOf(cardId: string): string {
   return (getCharacterById(cardId)?.name_fr ?? '').toUpperCase();
@@ -57,8 +59,78 @@ function cheaperSameName(card: CharacterCard): CharacterCard | null {
   return (same[0] as CharacterCard) ?? null;
 }
 
+function flexibleUpgradeBase(card: CharacterCard): CharacterCard | null {
+  let best: CharacterCard | null = null;
+  for (const candidate of getAllCards()) {
+    if (candidate.card_type !== 'character') continue;
+    if ((candidate.chakra ?? 99) >= (card.chakra ?? 0)) continue;
+    if ((candidate.name_fr ?? '').toUpperCase() === (card.name_fr ?? '').toUpperCase()) continue;
+    if ((candidate.keywords ?? []).includes('Summon')) continue;
+    if ((candidate.name_fr ?? '').toUpperCase().includes('OROCHIMARU')) continue;
+    if (!checkFlexibleUpgrade(card, candidate as CharacterCard)) continue;
+    if (!best || (candidate.power ?? 0) > (best.power ?? 0)) best = candidate as CharacterCard;
+  }
+  return best;
+}
+
 function chars(ids: string[]): CharacterCard[] {
   return ids.map((id) => getCharacterById(id)).filter((c): c is CharacterCard => !!c);
+}
+
+function attachHostFor(card: CharacterCard): string | null {
+  if ((card as { card_type?: string }).card_type !== 'attachment') return null;
+  if ((card as { attach_to?: string }).attach_to === 'mission') return null;
+
+  let needGroup: string | null = null;
+  for (const effect of card.effects ?? []) {
+    if (effect.type !== 'ATTACH') continue;
+    const match = /Attach to a friendly\s+(.+?)\s+character/i.exec(effect.description ?? '');
+    if (match && match[1].toLowerCase() !== 'non-hidden') needGroup = match[1].trim();
+  }
+
+  for (const candidate of getAllCards()) {
+    if (candidate.card_type !== 'character') continue;
+    if ((candidate.chakra ?? 99) > 3) continue;
+    if (needGroup && candidate.group !== needGroup) continue;
+    if ((candidate.name_fr ?? '').toUpperCase() === (card.name_fr ?? '').toUpperCase()) continue;
+    return candidate.id;
+  }
+  return null;
+}
+
+function requirementAllyFor(card: CharacterCard): string | null {
+  for (const effect of card.effects ?? []) {
+    const match = /friendly\s+([A-Za-z][A-Za-z ]{1,18}?)\s+character/i.exec(effect.description ?? '');
+    if (!match) continue;
+    const wanted = match[1].trim().toLowerCase();
+    if (wanted === 'non-hidden' || wanted === 'hidden') continue;
+    for (const candidate of getAllCards()) {
+      if (candidate.card_type !== 'character') continue;
+      if ((candidate.chakra ?? 99) > 4) continue;
+      if ((candidate.name_fr ?? '').toUpperCase() === (card.name_fr ?? '').toUpperCase()) continue;
+      const keywords = (candidate.keywords ?? []).map((k) => k.toLowerCase());
+      const group = (candidate.group ?? '').toLowerCase();
+      if (keywords.includes(wanted) || group === wanted) return candidate.id;
+    }
+  }
+  return null;
+}
+
+function requirementEnemyFor(card: CharacterCard): string | null {
+  for (const effect of card.effects ?? []) {
+    const match = /enemy\s+([A-Za-z][A-Za-z ]{1,18}?)\s+character/i.exec(effect.description ?? '');
+    if (!match) continue;
+    const wanted = match[1].trim().toLowerCase();
+    if (wanted === 'non-hidden' || wanted === 'hidden') continue;
+    for (const candidate of getAllCards()) {
+      if (candidate.card_type !== 'character') continue;
+      if ((candidate.chakra ?? 99) > 4) continue;
+      const keywords = (candidate.keywords ?? []).map((k) => k.toLowerCase());
+      const group = (candidate.group ?? '').toLowerCase();
+      if (keywords.includes(wanted) || group === wanted) return candidate.id;
+    }
+  }
+  return null;
 }
 
 function buildBoard(card: CharacterCard, mode: PlayMode, edge: PlayerID): GameState {
@@ -75,6 +147,12 @@ function buildBoard(card: CharacterCard, mode: PlayMode, edge: PlayerID): GameSt
 
   const partner = duelPartnerId(card);
   if (partner) addF(partner, 'sim-duel');
+
+  const host = attachHostFor(card);
+  if (host) addF(host, 'sim-attach-host');
+
+  const reqAlly = requirementAllyFor(card);
+  if (reqAlly) addF(reqAlly, 'sim-ally-req');
   addF('KS-011-C', 'sim-ally1');
   addF('KS-096-C', 'sim-fh', { hidden: true });
 
@@ -85,16 +163,20 @@ function buildBoard(card: CharacterCard, mode: PlayMode, edge: PlayerID): GameSt
     enemies.push(simChar(id, { owner: 'player2', instanceId, hidden: opts.hidden, powerTokens: opts.tokens }));
     usedE.add(nameOf(id));
   };
+  const reqEnemy = requirementEnemyFor(card);
+  if (reqEnemy) addE(reqEnemy, 'sim-enemy-req');
   addE('KS-005-C', 'sim-enemy-weak');
   addE('KS-086-C', 'sim-enemy-strong', { tokens: 1 });
   addE('KS-052-C', 'sim-enemy-hidden', { hidden: true });
 
   const handExtra = HAND_EXTRA.filter((id) => nameOf(id) !== demoName);
-  const hand1 = mode === 'reveal' ? [...handExtra] : [cardId, ...handExtra];
+  const alreadyInPlay = mode === 'reveal' || mode === 'firstStrike';
+  const hand1 = alreadyInPlay ? [...handExtra] : [cardId, ...handExtra];
 
   if (mode === 'reveal') friendly.push(simChar(cardId, { owner: 'player1', instanceId: 'sim-demo-hidden', hidden: true }));
+  if (mode === 'firstStrike') friendly.push(simChar(cardId, { owner: 'player1', instanceId: 'sim-demo-striker' }));
   if (mode === 'upgrade') {
-    const base = cheaperSameName(card);
+    const base = cheaperSameName(card) ?? flexibleUpgradeBase(card);
     if (base) friendly.push(simChar(base.id, { owner: 'player1', instanceId: 'sim-upg-base' }));
   }
 
@@ -116,8 +198,9 @@ function playActionFor(card: CharacterCard, mode: PlayMode): { player: PlayerID;
   if (mode === 'fresh') return { player: 'player1', action: { type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false } };
   if (mode === 'fresh1') return { player: 'player1', action: { type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 1, hidden: false } };
   if (mode === 'reveal') return { player: 'player1', action: { type: 'REVEAL_CHARACTER', missionIndex: 0, characterInstanceId: 'sim-demo-hidden' } };
+  if (mode === 'firstStrike') return { player: 'player1', action: { type: 'USE_FIRST_STRIKE', characterInstanceId: 'sim-demo-striker' } };
   if (mode === 'upgrade') {
-    if (!cheaperSameName(card)) return null;
+    if (!cheaperSameName(card) && !flexibleUpgradeBase(card)) return null;
     return { player: 'player1', action: { type: 'UPGRADE_CHARACTER', cardIndex: 0, missionIndex: 0, targetInstanceId: 'sim-upg-base' } };
   }
   return null;
@@ -127,6 +210,18 @@ function scenarioForMode(card: CharacterCard, mode: PlayMode, edge: PlayerID): S
   const play = playActionFor(card, mode);
   if (!play) return null;
   return { build: () => buildBoard(card, mode, edge), play };
+}
+
+function scenarioUntilScoring(card: CharacterCard, mode: PlayMode, edge: PlayerID): SimScenario | null {
+  const base = scenarioForMode(card, mode, edge);
+  if (!base) return null;
+  return {
+    ...base,
+    followups: [
+      { player: 'player2', action: { type: 'PASS' } as GameAction },
+      { player: 'player1', action: { type: 'PASS' } as GameAction },
+    ],
+  };
 }
 
 function snapshot(state: GameState): Map<string, string> {
@@ -142,11 +237,36 @@ function part(snap: string | undefined, i: number): string {
   return snap ? (snap.split(':')[i] ?? '') : '';
 }
 
+function powerBoard(state: GameState): Map<string, number> {
+  const m = new Map<string, number>();
+  for (const mi of state.activeMissions) {
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const owner: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+      for (const c of mi[side]) {
+        let p = 0;
+        try { p = calculateCharacterPower(state, c, owner); } catch { p = 0; }
+        m.set(c.instanceId, p);
+      }
+    }
+  }
+  return m;
+}
+
+function auraChangesAPower(first: GameState, last: GameState): boolean {
+  const before = powerBoard(first);
+  const after = powerBoard(last);
+  for (const [id, value] of after) {
+    if (!before.has(id)) continue;
+    if (before.get(id) !== value) return true;
+  }
+  return false;
+}
+
 const ANNOUNCE_ACTIONS = new Set(['EFFECT_CONTINUOUS', 'EFFECT_SCORE_ANNOUNCE']);
 
 interface FireDetail { real: boolean; loose: boolean; announce: boolean }
 
-function firesDetail(scenario: SimScenario, mode: PlayMode): FireDetail {
+function firesDetail(scenario: SimScenario, mode: PlayMode, allowAuraDelta = false): FireDetail {
   let states: GameState[];
   try {
     states = runScenario(scenario);
@@ -177,6 +297,7 @@ function firesDetail(scenario: SimScenario, mode: PlayMode): FireDetail {
     }
   }
   if (extra > expectedExtra) real = true;
+  if (!real && allowAuraDelta && auraChangesAPower(first, last)) real = true;
 
   // loose = some board/resource delta (may be the effect or incidental) — coverage fallback only
   let loose = real;
@@ -309,6 +430,51 @@ export function buildGeneratedScenario(cardId: string): SimScenario | null {
   const chosen = looseFallback ?? announceFallback;
   scenarioCache.set(cardId, chosen);
   return chosen;
+}
+
+const MODES_FOR_EFFECT: Record<string, PlayMode[]> = {
+  MAIN: ['fresh', 'fresh1', 'reveal', 'upgrade'],
+  AMBUSH: ['reveal'],
+  UPGRADE: ['upgrade'],
+  FIRST_STRIKE: ['firstStrike'],
+  DUEL: ['fresh', 'fresh1', 'upgrade', 'reveal'],
+  SCORE: ['fresh', 'fresh1', 'upgrade', 'reveal'],
+};
+
+export function revealScenarioFor(cardId: string): SimScenario | null {
+  const card = getCharacterById(cardId);
+  if (!card) return null;
+  for (const edge of EDGES) {
+    const scenario = scenarioForMode(card, 'reveal', edge);
+    if (scenario) return scenario;
+  }
+  return null;
+}
+
+export function buildScenarioForEffect(cardId: string, effectType: string): SimScenario | null {
+  const card = getCharacterById(cardId);
+  if (!card) return null;
+  if (!(card.effects ?? []).some((e) => e.type === effectType)) return null;
+
+  const modes = MODES_FOR_EFFECT[effectType] ?? MODES;
+  let looseFallback: SimScenario | null = null;
+  let announceFallback: SimScenario | null = null;
+
+  const wantsScoring = effectType === 'SCORE';
+  const isContinuous = (card.effects ?? []).some((e) => e.type === effectType && e.description.includes('[⧗]'));
+  for (const edge of EDGES) {
+    for (const mode of modes) {
+      const scenario = wantsScoring
+        ? scenarioUntilScoring(card, mode, edge)
+        : scenarioForMode(card, mode, edge);
+      if (!scenario) continue;
+      const d = firesDetail(scenario, mode, isContinuous);
+      if (d.real) return scenario;
+      if (d.loose && !looseFallback) looseFallback = scenario;
+      if (d.announce && !announceFallback) announceFallback = scenario;
+    }
+  }
+  return looseFallback ?? announceFallback;
 }
 
 export function generatedScenarioFires(cardId: string): boolean {

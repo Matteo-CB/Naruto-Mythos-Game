@@ -23,7 +23,8 @@ import {
 import { deepClone } from './utils/deepClone';
 import { normalizeHoloCardForGame } from '../holo/holoId';
 import { shuffle } from './utils/shuffle';
-import { generateGameId, generateInstanceId, resetIdCounter } from './utils/id';
+import { generateGameId, generateInstanceId, resetIdCounter, seedIdCounterFromState, getIdCounter } from './utils/id';
+import { enforceAttachmentConditions } from '../effects/attachments';
 import { logSystem, logAction } from './utils/gameLog';
 import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
@@ -146,6 +147,7 @@ export class GameEngine {
 
     return {
       ...state,
+      instanceSeq: getIdCounter(),
       log: logSystem(state.log, 1, 'setup', 'GAME_START', `Game created. ${startingPlayer} has the Edge token.`,
         'game.log.gameStart', { player: startingPlayer }),
     };
@@ -153,6 +155,22 @@ export class GameEngine {
 
   
   static applyAction(state: GameState, player: PlayerID, action: GameAction): GameState {
+    seedIdCounterFromState(state);
+    const inner = GameEngine.applyActionInner(state, player, action);
+    if (!inner || inner === state) return inner;
+
+    let result = enforceAttachmentConditions(inner);
+    if (result === inner) result = { ...inner };
+    result.instanceSeq = Math.max(getIdCounter(), state.instanceSeq ?? 0, result.instanceSeq ?? 0);
+
+    if (result.rewindPoint && result.pendingEffects.length === 0 && result.pendingActions.length === 0) {
+      result.rewindPoint = undefined;
+    }
+
+    return result;
+  }
+
+  private static applyActionInner(state: GameState, player: PlayerID, action: GameAction): GameState {
 
     const prevCharIds = collectCharInstanceIds(state);
 

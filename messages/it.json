@@ -1456,7 +1456,9 @@
     "linkCopied": "Link Copiato",
     "winner": "Vincitore",
     "switchPerspective": "Vedi come {player}",
-    "replayComplete": "Replay Completato"
+    "replayComplete": "Replay Completato",
+    "hideControls": "Nascondi",
+    "showControls": "Mostra"
   },
   "eloHistory": {
     "loading": "Caricamento cronologia ELO…",
@@ -1735,7 +1737,10 @@
       "chakraCost": "Costo Chakra",
       "power": "Potenza",
       "clear": "Cancella Filtri",
-      "resultsCount": "{count} carte"
+      "resultsCount": "{count} carte",
+      "allTypes": "Tutti i Tipi",
+      "typeCharacters": "Personaggi",
+      "typeAttachments": "Allegati"
     },
     "search": {
       "helpButton": "? Ricerca Avanzata",
@@ -1798,7 +1803,9 @@
       "edLabel": "Testo DUEL",
       "edDesc": "Cerca solo nel testo degli effetti DUEL",
       "efLabel": "Testo FIRST STRIKE",
-      "efDesc": "Cerca solo nel testo degli effetti First Strike (ancora nessuna carta)"
+      "efDesc": "Cerca solo nel testo degli effetti First Strike (ancora nessuna carta)",
+      "eatLabel": "Effetto ATTACH",
+      "eatDesc": "Cerca nella riga ATTACH di un allegato, per esempio a cosa si allega."
     },
     "sort": "Ordina",
     "error": {
@@ -3045,7 +3052,8 @@
         "ss099Hide": "{card}: ha nascosto un personaggio Jutsu nemico più debole.",
         "ss078Draw": "{card}: ha pagato 1 Chakra per pescare 1 carta.",
         "ss089Move": "{card}: il collegamento è stato spostato su {target}.",
-        "ss117Chakra": "{card}: ha guadagnato 1 Chakra per aver spostato personaggi nemici."
+        "ss117Chakra": "{card}: ha guadagnato 1 Chakra per aver spostato personaggi nemici.",
+        "ss046DrawNames": "{card}: rivela {revealed} e poi pesca {target}."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3063,7 +3071,8 @@
       "playAttachment": "Gioca l'accessorio {card} per {cost} chakra.",
       "attachToMission": "{card} è collegato alla missione {mission}.",
       "attachToCharacter": "{card} è collegato a {target}.",
-      "useFirstStrike": "FIRST STRIKE: {card} colpisce prima che il round inizi."
+      "useFirstStrike": "FIRST STRIKE: {card} colpisce per primo in questo round.",
+      "attachmentDiscarded": "{card} è stata scartata: la sua condizione di allegato non è più valida."
     },
     "end": {
       "victory": "Vittoria",
@@ -3158,7 +3167,8 @@
       "restoreEffect": "Effetto in Sospeso",
       "edge": "Vantaggio",
       "edgeLocked": "Bloccato",
-      "handPeeked": "Il tuo avversario sta guardando la tua mano"
+      "handPeeked": "Il tuo avversario sta guardando la tua mano",
+      "goBack": "Indietro"
     },
     "handLabel": "Mano",
     "effect": {
@@ -3603,7 +3613,7 @@
         "sasuke146GiveEdge": "Sasuke (146): Ottieni il token Vantaggio.",
         "akamaru029ChooseHide": "Akamaru (029): Scegli quale personaggio nemico (costo {cost}) nascondere.",
         "kimimaro123AutoDiscardDefeat": "Kimimaro (123) UPGRADE: La tua ultima carta verrà scartata. Scegli un personaggio con costo 5 o meno da sconfiggere.",
-        "narutoLegendaryConfirmMain": "Naruto (Leggendario) MAIN: Nascondi un nemico con Potenza 5 o meno in questa missione E un altro con Potenza 2 o meno in gioco.",
+        "narutoLegendaryConfirmMain": "MAIN: Nascondi un nemico con Potenza 5 o meno in questa missione E un altro con Potenza 2 o meno in gioco.",
         "narutoLegendaryConfirmUpgradeModifier": "Naruto (Leggendario): Applicare UPGRADE? Sconfiggi entrambi i bersagli invece di nasconderli.",
         "narutoLegendaryDefeatTarget1": "Naruto (Leggendario): Scegli un personaggio nemico con Potenza 5 o meno da sconfiggere in questa missione.",
         "narutoLegendaryHideTarget1": "Naruto (Leggendario): Scegli un personaggio nemico con Potenza 5 o meno da nascondere in questa missione.",
@@ -3674,10 +3684,10 @@
         "attachChooseTarget": "Scegli un personaggio alleato a cui collegare {card}.",
         "ss128ConfirmDuel": "DUEL Jirobo: Sconfiggere un personaggio nemico in questa missione con Potenza 8 o più?",
         "ss128Defeat": "Choji Akimichi: Scegli un personaggio nemico con Potenza 8 o più da sconfiggere.",
-        "ss108ConfirmScore": "SCORE Stadio dell'Esame: Un personaggio alleato attiva un effetto DUEL istantaneo, ignorando i requisiti?",
+        "ss108ConfirmScore": "SCORE: Un personaggio alleato attiva un effetto DUEL istantaneo, ignorando i requisiti?",
         "ss108ChooseCharacter": "Stadio dell'Esame: Scegli un personaggio alleato per attivare il suo effetto DUEL.",
         "ss049FirstStrikeChar": "FIRST STRIKE: Scegli un personaggio da spostare da questa missione.",
-        "ss046ConfirmMain": "Rivelare carte dalla cima del mazzo finché non trovi un personaggio del Villaggio della Sabbia, pescarlo e rimescolare le rivelate?",
+        "ss046ConfirmMain": "MAIN: Rivelare carte dalla cima del mazzo finché non trovi un personaggio del Villaggio della Sabbia, pescarlo e rimescolare le rivelate?",
         "ss047Defeat": "Scegli un personaggio nemico con Potenza 3 o inferiore da sconfiggere.",
         "ss078DuelDefeat": "Scegli un personaggio nemico con costo 2 o inferiore da sconfiggere.",
         "ss114ChooseDiscard": "Scegli un Gaara da scartare dalla tua mano.",
@@ -3965,7 +3975,9 @@
       "holo_id": "Le versioni holo non possono essere mostrate nel menu.",
       "too_many": "Troppe carte selezionate.",
       "invalid": "Selezione non valida."
-    }
+    },
+    "rarityFilterAll": "Tutte le rarità",
+    "selectedOnly": "Solo selezionate"
   },
   "playStats": {
     "buttonLabel": "Statistiche",

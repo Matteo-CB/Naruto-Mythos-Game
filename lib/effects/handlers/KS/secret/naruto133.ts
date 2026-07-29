@@ -118,4 +118,5 @@ export function registerNaruto133Handlers(): void {
   registerEffect("KS-133-S", "UPGRADE", (ctx) => ({ state: ctx.state }));
   registerEffect("KS-133-MV", "MAIN", naruto133MainHandler);
   registerEffect("KS-133_2-MV", "MAIN", naruto133MainHandler);
+  registerEffect("KS-133_2-MV", "UPGRADE", (ctx) => ({ state: ctx.state }));
 }

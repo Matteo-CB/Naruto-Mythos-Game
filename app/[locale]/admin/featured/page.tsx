@@ -45,6 +45,8 @@ export default function AdminFeaturedPage() {
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
   const [setFilter, setSetFilter] = useState('');
+  const [rarityFilter, setRarityFilter] = useState('');
+  const [selectedOnly, setSelectedOnly] = useState(false);
 
   const isAdmin = checkIsAdmin({ username: session?.user?.name, email: session?.user?.email });
 
@@ -68,12 +70,13 @@ export default function AdminFeaturedPage() {
   const allPickerCards = useMemo<PickerCard[]>(() => {
     void cardIndexVersion;
     return (getAllCards() as CardData[])
-      .filter((c) => c.card_type === 'character' && !!c.image_file && !isHoloId(c.id))
+      .filter((c) => !!c.image_file && !isHoloId(c.id)
+        && (c.card_type === 'character' || c.card_type === 'attachment' || c.card_type === 'mission'))
       .map((c) => ({
         id: c.id,
         set: c.set,
         label: formatCardLabelShort(c, locale),
-        src: normalizeImagePath(c.image_file) ?? '',
+        src: portraitImagePath(c) ?? '',
         rarity: holoRarity(c.rarity),
         locked: unrevealedIds.has(c.id),
       }))
@@ -90,10 +93,18 @@ export default function AdminFeaturedPage() {
     const needle = search.trim().toLowerCase();
     return allPickerCards.filter((c) => {
       if (setFilter && c.set !== setFilter) return false;
+      if (rarityFilter && c.rarity !== rarityFilter) return false;
+      if (selectedOnly && !selected.includes(c.id)) return false;
       if (!needle) return true;
       return c.label.toLowerCase().includes(needle);
     });
-  }, [allPickerCards, search, setFilter]);
+  }, [allPickerCards, search, setFilter, rarityFilter, selectedOnly, selected]);
+
+  const availableRarities = useMemo(() => {
+    const seen = new Set<string>();
+    for (const c of allPickerCards) if (c.rarity) seen.add(c.rarity);
+    return [...seen].sort();
+  }, [allPickerCards]);
 
   const add = (id: string) => {
     setSelected((prev) => (prev.includes(id) || prev.length >= max ? prev : [...prev, id]));
@@ -182,6 +193,31 @@ export default function AdminFeaturedPage() {
                   <option key={id} value={id}>{getSetName(id, locale)}</option>
                 ))}
               </select>
+              <select
+                value={rarityFilter}
+                onChange={(e) => setRarityFilter(e.target.value)}
+                aria-label={t('rarityFilterAll')}
+                className="px-3 py-2 text-[13px]"
+                style={{ backgroundColor: '#0d0d0d', border: '1px solid #333333', color: '#e0e0e0', outline: 'none' }}
+              >
+                <option value="">{t('rarityFilterAll')}</option>
+                {availableRarities.map((r) => (
+                  <option key={r} value={r}>{r}</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => setSelectedOnly((v) => !v)}
+                aria-pressed={selectedOnly}
+                className="px-3 py-2 text-[13px] font-bold uppercase tracking-wider"
+                style={{
+                  backgroundColor: selectedOnly ? 'rgba(196,163,90,0.16)' : '#0d0d0d',
+                  color: selectedOnly ? '#c4a35a' : '#9a9a9a',
+                  border: '1px solid #333333', cursor: 'pointer',
+                }}
+              >
+                {t('selectedOnly')}
+              </button>
             </div>
 
             {loading ? (

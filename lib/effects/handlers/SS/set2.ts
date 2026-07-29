@@ -236,7 +236,6 @@ function ss112UpgradeHandler(ctx: EffectContext): EffectResult {
 
   const validTargets: string[] = [];
   for (const c of mission[enemySide]) {
-    if (c.isHidden) continue;
     if ((c.powerTokens ?? 0) > 0) validTargets.push(c.instanceId);
   }
 

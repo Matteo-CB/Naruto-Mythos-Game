@@ -984,7 +984,8 @@
         "ss099Hide": "{card}: hid a weaker enemy Jutsu character.",
         "ss078Draw": "{card}: paid 1 Chakra to draw 1 card.",
         "ss089Move": "{card}: the attachment moved to {target}.",
-        "ss117Chakra": "{card}: gained 1 Chakra for moving enemy characters."
+        "ss117Chakra": "{card}: gained 1 Chakra for moving enemy characters.",
+        "ss046DrawNames": "{card}: revealed {revealed} then drew {target}."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -1002,7 +1003,8 @@
       "playAttachment": "Plays the attachment {card} for {cost} chakra.",
       "attachToMission": "{card} is attached to mission {mission}.",
       "attachToCharacter": "{card} is attached to {target}.",
-      "useFirstStrike": "FIRST STRIKE: {card} strikes before the round begins."
+      "useFirstStrike": "FIRST STRIKE: {card} strikes first this round.",
+      "attachmentDiscarded": "{card} was discarded: its attach condition no longer holds."
     },
     "end": {
       "victory": "Victory",
@@ -1097,7 +1099,8 @@
       "restoreEffect": "Pending Effect",
       "edge": "Edge",
       "edgeLocked": "Locked",
-      "handPeeked": "Your opponent is looking at your hand"
+      "handPeeked": "Your opponent is looking at your hand",
+      "goBack": "Go back"
     },
     "handLabel": "Hand",
     "effect": {
@@ -1310,7 +1313,7 @@
         "choji112ConfirmUpgrade": "UPGRADE: Repeat MAIN effect. Discard another card for POWERUP.",
         "kimimaro123ConfirmUpgrade": "UPGRADE: Discard a card to defeat a character with cost 5 or less.",
         "kidomaru124ConfirmAmbush": "AMBUSH: Defeat an enemy with Power 3 or less in another mission.",
-        "kidomaru124ConfirmUpgradeModifier": "UPGRADE modifier: Power limit becomes 5 or less.",
+        "kidomaru124ConfirmUpgradeModifier": "UPGRADE: Power limit becomes 5 or less.",
         "tayuya125ConfirmUpgrade": "UPGRADE: Play a Sound Village character, paying 2 less.",
         "orochimaru126ConfirmScore": "SCORE: Defeat the weakest enemy character in play.",
         "orochimaru126ConfirmUpgrade": "UPGRADE: POWERUP 3 (self).",
@@ -1542,7 +1545,7 @@
         "sasuke146GiveEdge": "Sasuke (146): Gain the Edge token.",
         "akamaru029ChooseHide": "Akamaru (029): Choose which enemy character (cost {cost}) to hide.",
         "kimimaro123AutoDiscardDefeat": "Kimimaro (123) UPGRADE: Your last card will be discarded. Choose a character with cost 5 or less to defeat.",
-        "narutoLegendaryConfirmMain": "Naruto (Legendary) MAIN: Hide an enemy with Power 5 or less in this mission AND another with Power 2 or less in play.",
+        "narutoLegendaryConfirmMain": "MAIN: Hide an enemy with Power 5 or less in this mission AND another with Power 2 or less in play.",
         "narutoLegendaryConfirmUpgradeModifier": "Naruto (Legendary): Apply UPGRADE? Defeat both targets instead of hiding them.",
         "narutoLegendaryDefeatTarget1": "Naruto (Legendary): Choose an enemy character with Power 5 or less to defeat in this mission.",
         "narutoLegendaryHideTarget1": "Naruto (Legendary): Choose an enemy character with Power 5 or less to hide in this mission.",
@@ -1613,10 +1616,10 @@
         "attachChooseTarget": "Choose a friendly character to attach {card} to.",
         "ss128ConfirmDuel": "DUEL Jirobo: Defeat an enemy character in this mission with Power 8 or more?",
         "ss128Defeat": "Choji Akimichi: Choose an enemy character with Power 8 or more to defeat.",
-        "ss108ConfirmScore": "SCORE Exam Stadium: A friendly character activates an instant DUEL effect, ignoring requirements?",
+        "ss108ConfirmScore": "SCORE: A friendly character activates an instant DUEL effect, ignoring requirements?",
         "ss108ChooseCharacter": "Exam Stadium: Choose a friendly character to activate its DUEL effect.",
         "ss049FirstStrikeChar": "FIRST STRIKE: Choose a character to move from this mission.",
-        "ss046ConfirmMain": "Reveal cards from the top of your deck until you find a Sand Village character, draw it, then shuffle the revealed cards back?",
+        "ss046ConfirmMain": "MAIN: Reveal cards from the top of your deck until you find a Sand Village character, draw it, then shuffle the revealed cards back?",
         "ss047Defeat": "Choose an enemy character with Power 3 or less to defeat.",
         "ss078DuelDefeat": "Choose an enemy character with cost 2 or less to defeat.",
         "ss114ChooseDiscard": "Choose a Gaara to discard from your hand.",
@@ -1821,7 +1824,10 @@
       "chakraCost": "Chakra Cost",
       "power": "Power",
       "clear": "Clear Filters",
-      "resultsCount": "{count} cards"
+      "resultsCount": "{count} cards",
+      "allTypes": "All Types",
+      "typeCharacters": "Characters",
+      "typeAttachments": "Attachments"
     },
     "search": {
       "helpButton": "? Advanced Search",
@@ -1884,7 +1890,9 @@
       "edLabel": "DUEL Text",
       "edDesc": "Search in DUEL effect text only",
       "efLabel": "FIRST STRIKE Text",
-      "efDesc": "Search in First Strike effect text only (no cards yet)"
+      "efDesc": "Search in First Strike effect text only (no cards yet)",
+      "eatLabel": "ATTACH effect",
+      "eatDesc": "Search inside the ATTACH line of an attachment, for example what it attaches to."
     },
     "sort": "Sort",
     "error": {
@@ -2293,7 +2301,9 @@
     "linkCopied": "Link Copied",
     "winner": "Winner",
     "switchPerspective": "View as {player}",
-    "replayComplete": "Replay Complete"
+    "replayComplete": "Replay Complete",
+    "hideControls": "Hide UI",
+    "showControls": "Show UI"
   },
   "room": {
     "error": {
@@ -3965,7 +3975,9 @@
       "holo_id": "Holo versions cannot be shown on the menu.",
       "too_many": "Too many cards selected.",
       "invalid": "Invalid selection."
-    }
+    },
+    "rarityFilterAll": "All rarities",
+    "selectedOnly": "Selected only"
   },
   "playStats": {
     "buttonLabel": "Stats",

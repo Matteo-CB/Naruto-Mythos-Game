@@ -128,6 +128,20 @@ function countMissionsWithKeyword(state: GameState, player: PlayerID, keyword: s
 
 
 
+export function attachedPowerOf(char: CharacterInPlay): number {
+  if (char.isHidden || !char.attachments || char.attachments.length === 0) return 0;
+  const hostTop = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  const doublesFood = hostTop.id?.startsWith('SS-128')
+    && (hostTop.effects ?? []).some((e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('Food'));
+  let total = 0;
+  for (const att of char.attachments) {
+    let p = att.card.power ?? 0;
+    if (p !== 0 && doublesFood && (att.card.keywords ?? []).includes('Food')) p *= 2;
+    total += p;
+  }
+  return total;
+}
+
 export function calculateContinuousPowerModifier(
   state: GameState,
   player: PlayerID,
@@ -135,17 +149,7 @@ export function calculateContinuousPowerModifier(
   char: CharacterInPlay,
 ): number {
 
-  let attachmentPower = 0;
-  if (!char.isHidden && char.attachments && char.attachments.length > 0) {
-    const attTop = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-    const doublesFood = attTop.id?.startsWith('SS-128') &&
-      (attTop.effects ?? []).some((e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('Food'));
-    for (const att of char.attachments) {
-      let p = att.card.power ?? 0;
-      if (p !== 0 && doublesFood && (att.card.keywords ?? []).includes('Food')) p *= 2;
-      attachmentPower += p;
-    }
-  }
+  const attachmentPower = attachedPowerOf(char);
 
   if (!char.isHidden) {
     const mission_zc = state.activeMissions[missionIndex];
@@ -166,7 +170,7 @@ export function calculateContinuousPowerModifier(
           for (const f of friendlyChars_zc) {
             if (f.isHidden) continue;
             const fTop = f.stack?.length > 0 ? f.stack[f.stack.length - 1] : f.card;
-            const basePower = (fTop.power ?? 0) + f.powerTokens;
+            const basePower = (fTop.power ?? 0) + f.powerTokens + attachedPowerOf(f);
             if (basePower > maxPower_zc) { maxPower_zc = basePower; targetId_zc = f.instanceId; }
           }
         }
@@ -379,7 +383,7 @@ export function calculateContinuousPowerModifier(
 
     if (mEffect.description.includes('4 Power or more') && mEffect.description.includes('+1 Power')) {
       const selfTop = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-      const corePower = (selfTop.power ?? 0) + char.powerTokens;
+      const corePower = (selfTop.power ?? 0) + char.powerTokens + attachmentPower;
       if (corePower >= 4) {
         modifier += 1;
       }
@@ -808,6 +812,7 @@ function triggerCrow089Relocation(state: GameState, playingPlayer: PlayerID, pla
       if (c.isHidden) continue;
       if (c.instanceId === host.instanceId) continue;
       if ((c.card as { card_type?: string }).card_type === 'attachment') continue;
+      if ((c.attachments?.length ?? 0) > 0) continue;
       targets.push(c.instanceId);
     }
   }

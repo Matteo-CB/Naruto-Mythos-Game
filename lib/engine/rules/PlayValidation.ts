@@ -77,9 +77,6 @@ export function validatePlayHidden(
     return { valid: false, reason: `Not enough chakra to play hidden (need ${HIDDEN_PLAY_COST}).`, reasonKey: 'game.error.notEnoughChakraHidden', reasonParams: { need: HIDDEN_PLAY_COST } };
   }
 
-  
-  
-
   return { valid: true };
 }
 

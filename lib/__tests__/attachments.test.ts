@@ -50,7 +50,7 @@ describe('attachments (new set 2 mechanic)', () => {
     expect(getEffectivePower(s, choji, 'player1')).toBe(11);
   });
 
-  it('attachments do not generate start-of-turn chakra, characters do', () => {
+  it('a face down attachment generates start-of-turn chakra, being treated as a character', () => {
     const st = buildSimState({ p1: [simChar('KS-009-C', { owner: 'player1', instanceId: 'naruto' })], p2: [], missions: 2, missionIds: ['KS-002-MMS', 'KS-009-MMS'], chakra1: 10 });
     st.player1.hand = [att('SS-082-C')];
     let s = GameEngine.applyAction(st, 'player1', { type: 'PLAY_HIDDEN', cardIndex: 0, missionIndex: 0 });
@@ -62,7 +62,7 @@ describe('attachments (new set 2 mechanic)', () => {
       s = GameEngine.applyAction(s, 'player1', { type: 'ADVANCE_PHASE' });
     }
     expect(s.turn).toBe(3);
-    expect(s.player1.chakra).toBe(6);
+    expect(s.player1.chakra, 'one character plus one face down attachment').toBe(7);
   });
 
   it('hidden attachment reveals into an attach, leaving no pseudo character behind', () => {

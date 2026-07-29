@@ -8,7 +8,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { getCardById } from '@/lib/data/cardIndex';
 import { getCardName } from '@/lib/utils/cardLocale';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
@@ -32,7 +32,7 @@ function CardRow({ ids }: { ids: string[] }) {
     <div className="flex flex-wrap gap-1">
       {ids.map((id, i) => {
         const card = getCardById(id);
-        const img = card ? normalizeImagePath(card.image_file) : null;
+        const img = card ? portraitImagePath(card) : null;
         return img ? (
           <img key={`${id}-${i}`} src={img} alt={card ? getCardName(card, locale) : id} title={card ? getCardName(card, locale) : id}
             style={{ width: 32, height: 45, objectFit: 'cover' }} draggable={false} />

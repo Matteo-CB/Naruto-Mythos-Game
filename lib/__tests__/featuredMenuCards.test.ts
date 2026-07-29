@@ -57,8 +57,8 @@ describe('featured menu card filtering', () => {
     expect(checkFeaturableCardId(RELEASED_CHARACTER, NONE)).toBeNull();
   });
 
-  it('rejects mission cards, holo ids and unknown ids', () => {
-    expect(checkFeaturableCardId(MISSION_CARD, NONE)).toBe('not_a_character');
+  it('accepts mission cards, and rejects holo ids and unknown ids', () => {
+    expect(checkFeaturableCardId(MISSION_CARD, NONE), 'missions can be featured too').toBe(null);
     expect(checkFeaturableCardId(`${RELEASED_CHARACTER}_H`, NONE)).toBe('holo_id');
     expect(checkFeaturableCardId('KS-999-ZZ', NONE)).toBe('unknown_card');
     expect(checkFeaturableCardId('', NONE)).toBe('unknown_card');
@@ -66,7 +66,7 @@ describe('featured menu card filtering', () => {
 
   it('exposes a boolean helper consistent with the detailed check', () => {
     expect(isFeaturableCardId(RELEASED_CHARACTER, NONE)).toBe(true);
-    expect(isFeaturableCardId(MISSION_CARD, NONE)).toBe(false);
+    expect(isFeaturableCardId(MISSION_CARD, NONE), 'missions are featurable').toBe(true);
   });
 });
 
