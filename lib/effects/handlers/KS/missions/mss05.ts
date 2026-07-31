@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
+import { discardAttachmentsOnLeave } from '@/lib/effects/attachments';
 
 
 
@@ -112,13 +113,13 @@ function applyMss05ReturnToHand(
   );
 
   return {
-    state: {
+    state: discardAttachmentsOnLeave({
       ...state,
       activeMissions: missions,
       [owner]: ownerState,
       ...(controller !== owner ? { [controller]: controllerState } : {}),
       log,
-    },
+    }, currentTarget),
   };
 }
 

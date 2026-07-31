@@ -1,6 +1,44 @@
 {
   "entries": [
     {
+      "date": "2026-07-31",
+      "title_fr": "Les attachements se comportent enfin correctement",
+      "title_en": "Attachments finally behave properly",
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ],
+      "changes_fr": [
+        "Les fenêtres d effet des cartes du set 2 affichent à nouveau le mot clé de l effet, comme MAIN ou DUEL.",
+        "Un attachement part à la défausse quand le personnage qui le portait quitte le terrain, au lieu de disparaître.",
+        "La fenêtre d un effet d attachement montre l attachement lui même et non le personnage qui le porte.",
+        "Le Curry de la Vie demande votre accord avant d ajouter ses jetons de Puissance.",
+        "Un effet DUEL ne se déclenche plus si le personnage requis a quitté la mission entre temps.",
+        "Gaara rare du set 2 demande votre accord avant de lancer son effet principal.",
+        "Avec Rock Lee, Gaara rare vous laisse choisir de vaincre plutôt que cacher, au lieu de le faire tout seul.",
+        "Le Corbeau ouvre une vraie fenêtre de choix montrant sa carte avant de changer de personnage.",
+        "Rasa réduit aussi le coût d un autre Rasa allié, comme tout personnage du Village du Sable."
+      ],
+      "changes_en": [
+        "Effect windows on set 2 cards show the effect keyword again, such as MAIN or DUEL.",
+        "An attachment goes to the discard pile when the character carrying it leaves the board, instead of vanishing.",
+        "An attachment effect window now shows the attachment itself rather than the character carrying it.",
+        "Curry of Life asks for your confirmation before adding its Power tokens.",
+        "A DUEL effect no longer triggers if the required character left the mission in the meantime.",
+        "Set 2 rare Gaara asks for your confirmation before starting its main effect.",
+        "With Rock Lee, rare Gaara lets you choose to defeat rather than hide, instead of doing it on its own.",
+        "Crow opens a proper choice window showing its own card before moving to another character.",
+        "Rasa also discounts another friendly Rasa, like any other Sand Village character."
+      ]
+    },
+    {
       "date": "2026-07-29",
       "title_fr": "Fin des cartes fantômes sur le plateau",
       "title_en": "No more ghost cards on the board",

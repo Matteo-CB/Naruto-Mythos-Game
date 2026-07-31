@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
+import { GameEngine } from '@/lib/engine/GameEngine';
 import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import { getEffectHandler } from '@/lib/effects/EffectRegistry';
 import { getCardById } from '@/lib/data/cardIndex';
@@ -41,7 +42,7 @@ const CASES: Case[] = [
   { cardId: 'SS-047-UC', effect: 'UPGRADE', expected: 'board', build: () => baseBoard([], ['SS-047-UC'], ['KS-005-C']) },
   { cardId: 'SS-049-C', effect: 'FIRST_STRIKE', expected: 'board', build: () => baseBoard([], ['SS-049-C'], ['KS-005-C']) },
   { cardId: 'SS-078-UC', effect: 'DUEL', expected: 'board', build: () => baseBoard([], ['SS-078-UC'], ['KS-005-C']) },
-  { cardId: 'SS-114-R', effect: 'MAIN', expected: 'hand', build: () => baseBoard(['SS-046-UC'], ['SS-114-R'], ['KS-005-C']) },
+  { cardId: 'SS-114-R', effect: 'MAIN', expected: 'confirm', build: () => baseBoard(['SS-046-UC'], ['SS-114-R'], ['KS-005-C']) },
   { cardId: 'SS-117-R', effect: 'DUEL', expected: 'board', build: () => baseBoard([], ['SS-117-R'], []) },
   { cardId: 'SS-119-R', effect: 'MAIN', expected: 'board', build: () => baseBoard([], ['SS-119-R'], ['KS-005-C']) },
   { cardId: 'SS-119-R', effect: 'DUEL', expected: 'confirm', build: () => baseBoard([], ['SS-119-R'], []) },
@@ -96,7 +97,7 @@ describe('set 2 selection popups match the nature of their options', () => {
     });
   }
 
-  it('Gaara SS-114 discard opens the hand, not the board', () => {
+  it('Gaara SS-114 confirms first, then its discard opens the hand and not the board', () => {
     const handler = getEffectHandler('SS-114-R', 'MAIN')!;
     const state = baseBoard(['SS-046-UC'], ['SS-114-R'], ['KS-005-C']);
     const source = state.activeMissions[0].player1Characters[0];
@@ -105,12 +106,21 @@ describe('set 2 selection popups match the nature of their options', () => {
       sourceMissionIndex: 0, triggerType: 'MAIN', isUpgrade: false,
     });
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.validTargets).toEqual(['0']);
+    expect(result.targetSelectionType).toBe('SS114_CONFIRM_MAIN');
+    expect(result.validTargets).toEqual([source.instanceId]);
 
-    const next = EffectEngine.createPendingTargetSelection(
+    const opened = EffectEngine.createPendingTargetSelection(
       result.state, 'player1', source, 0, 'MAIN', false, result, [],
     );
-    const action = next.pendingActions[next.pendingActions.length - 1];
+    const confirmAction = opened.pendingActions[opened.pendingActions.length - 1];
+    const confirmed = GameEngine.applyAction(opened, 'player1', {
+      type: 'SELECT_TARGET', pendingActionId: confirmAction.id, selectedTargets: [confirmAction.options[0]],
+    });
+
+    const action = confirmed.pendingActions[confirmed.pendingActions.length - 1];
+    const effect = confirmed.pendingEffects.find((e) => e.id === action.sourceEffectId);
+    expect(effect?.targetSelectionType).toBe('SS114_CHOOSE_DISCARD');
+    expect(action.options).toEqual(['0']);
     expect(action.type).toBe('DISCARD_CARD');
   });
 

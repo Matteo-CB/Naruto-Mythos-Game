@@ -87,6 +87,10 @@ export function effectiveRevealCost(
   return Math.max(0, effective - costReduction);
 }
 
+export function isPlayableCharacter(card: { card_type?: string }): boolean {
+  return card.card_type === undefined || card.card_type === 'character';
+}
+
 export function findAffordableInHandByPredicate(
   state: GameState,
   player: PlayerID,
@@ -97,6 +101,7 @@ export function findAffordableInHandByPredicate(
   const indices: number[] = [];
   for (let i = 0; i < ps.hand.length; i++) {
     const card = ps.hand[i];
+    if (!isPlayableCharacter(card)) continue;
     if (!predicate(card)) continue;
     if (canAffordFromHand(state, player, card, costReduction)) {
       indices.push(i);

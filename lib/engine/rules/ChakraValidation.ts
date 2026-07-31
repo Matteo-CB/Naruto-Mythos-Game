@@ -9,6 +9,11 @@ function getTopCard(char: any): CharacterCard | undefined {
 }
 
 
+export function isCharacterCard(card: CharacterCard): boolean {
+  const type = (card as unknown as { card_type?: string }).card_type;
+  return type === undefined || type === 'character';
+}
+
 export function calculateEffectiveCost(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   state: GameState | any,
@@ -41,7 +46,7 @@ export function calculateEffectiveCost(
 
       
       if ((topCard.set === 'KS' && topCard.number === 34) && effect.description.includes('Team 8') && effect.description.includes('less')) {
-        if ((card.keywords ?? []).includes('Team 8') && card.id !== topCard.id) {
+        if ((card.keywords ?? []).includes('Team 8') && card.id !== topCard.id && isCharacterCard(card)) {
           cost = Math.max(1, cost - 1);
         }
       }
@@ -55,7 +60,7 @@ export function calculateEffectiveCost(
     }
   }
 
-  if (card.group === 'Sand Village') {
+  if (card.group === 'Sand Village' && isCharacterCard(card)) {
     const friendlySideKey = player === 'player1' ? 'player1Characters' : 'player2Characters';
     let rasaCount = 0;
     for (const m of state.activeMissions ?? []) {
@@ -64,7 +69,6 @@ export function calculateEffectiveCost(
         const cTop = getTopCard(c);
         if (!cTop) continue;
         if (String(cTop.set) !== 'SS' || String(cTop.number) !== '51') continue;
-        if (cTop.id === card.id) continue;
         rasaCount++;
       }
     }

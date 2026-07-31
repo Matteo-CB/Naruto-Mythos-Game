@@ -21,7 +21,6 @@ import { AnimationController } from "./AnimationController";
 import { TargetSelector } from "./TargetSelector";
 import { HandCardSelector } from "./HandCardSelector";
 import { EffectChoiceSelector } from "./EffectChoiceSelector";
-import { FirstStrikePrompt } from "./FirstStrikePrompt";
 import { OpponentSidePiles, PlayerSidePiles } from "./SidePiles";
 import { GameScaleProvider, useGameScale } from "./GameScaleContext";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
@@ -1258,7 +1257,6 @@ function GameBoardInner() {
           <TargetSelector />
           <HandCardSelector />
           <EffectChoiceSelector />
-          <FirstStrikePrompt />
         </>
       )}
 

@@ -18,7 +18,7 @@ const PLACED_IDS = [
 ];
 const SOURCE_IDS = new Set(['sim-demo-hidden', 'sim-upg-base']);
 
-type PlayMode = 'fresh' | 'fresh1' | 'reveal' | 'upgrade' | 'firstStrike';
+type PlayMode = 'fresh' | 'fresh1' | 'reveal' | 'upgrade';
 
 function nameOf(cardId: string): string {
   return (getCharacterById(cardId)?.name_fr ?? '').toUpperCase();
@@ -170,11 +170,10 @@ function buildBoard(card: CharacterCard, mode: PlayMode, edge: PlayerID): GameSt
   addE('KS-052-C', 'sim-enemy-hidden', { hidden: true });
 
   const handExtra = HAND_EXTRA.filter((id) => nameOf(id) !== demoName);
-  const alreadyInPlay = mode === 'reveal' || mode === 'firstStrike';
+  const alreadyInPlay = mode === 'reveal';
   const hand1 = alreadyInPlay ? [...handExtra] : [cardId, ...handExtra];
 
   if (mode === 'reveal') friendly.push(simChar(cardId, { owner: 'player1', instanceId: 'sim-demo-hidden', hidden: true }));
-  if (mode === 'firstStrike') friendly.push(simChar(cardId, { owner: 'player1', instanceId: 'sim-demo-striker' }));
   if (mode === 'upgrade') {
     const base = cheaperSameName(card) ?? flexibleUpgradeBase(card);
     if (base) friendly.push(simChar(base.id, { owner: 'player1', instanceId: 'sim-upg-base' }));
@@ -198,7 +197,6 @@ function playActionFor(card: CharacterCard, mode: PlayMode): { player: PlayerID;
   if (mode === 'fresh') return { player: 'player1', action: { type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false } };
   if (mode === 'fresh1') return { player: 'player1', action: { type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 1, hidden: false } };
   if (mode === 'reveal') return { player: 'player1', action: { type: 'REVEAL_CHARACTER', missionIndex: 0, characterInstanceId: 'sim-demo-hidden' } };
-  if (mode === 'firstStrike') return { player: 'player1', action: { type: 'USE_FIRST_STRIKE', characterInstanceId: 'sim-demo-striker' } };
   if (mode === 'upgrade') {
     if (!cheaperSameName(card) && !flexibleUpgradeBase(card)) return null;
     return { player: 'player1', action: { type: 'UPGRADE_CHARACTER', cardIndex: 0, missionIndex: 0, targetInstanceId: 'sim-upg-base' } };
@@ -436,7 +434,7 @@ const MODES_FOR_EFFECT: Record<string, PlayMode[]> = {
   MAIN: ['fresh', 'fresh1', 'reveal', 'upgrade'],
   AMBUSH: ['reveal'],
   UPGRADE: ['upgrade'],
-  FIRST_STRIKE: ['firstStrike'],
+  FIRST_STRIKE: ['fresh', 'fresh1'],
   DUEL: ['fresh', 'fresh1', 'upgrade', 'reveal'],
   SCORE: ['fresh', 'fresh1', 'upgrade', 'reveal'],
 };

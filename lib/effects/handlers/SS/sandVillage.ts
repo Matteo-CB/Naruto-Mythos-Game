@@ -113,11 +113,11 @@ function ss114Main(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SS114_CHOOSE_DISCARD',
-    validTargets: gaaraIndices,
+    targetSelectionType: 'SS114_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
     isOptional: true,
-    description: 'Gaara (SS-114) MAIN: Discard a Gaara from your hand.',
-    descriptionKey: 'game.effect.desc.ss114ChooseDiscard',
+    description: JSON.stringify({}),
+    descriptionKey: 'game.effect.desc.ss114ConfirmMain',
   };
 }
 

@@ -4037,7 +4037,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
 
         
-        const isPlayAction = ['PLAY_CHARACTER', 'PLAY_HIDDEN', 'UPGRADE_CHARACTER', 'REVEAL_CHARACTER', 'USE_FIRST_STRIKE'].includes(data.action.type);
+        const isPlayAction = ['PLAY_CHARACTER', 'PLAY_HIDDEN', 'UPGRADE_CHARACTER', 'REVEAL_CHARACTER'].includes(data.action.type);
         const isTargetAction = data.action.type === 'SELECT_TARGET';
 
         

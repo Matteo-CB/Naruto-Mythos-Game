@@ -8,6 +8,7 @@ import { logAction } from '../engine/utils/gameLog';
 import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { hasResolvableInstantDuel, isDuelConditionMet } from './duelUtils';
 import { shuffle } from '@/lib/engine/utils/shuffle';
+import { isFirstCardPlayedThisRound, withFirstStrikeStatus } from '@/lib/engine/rules/firstStrike';
 
 export const REWIND_TARGET = '__rewind';
 
@@ -16,7 +17,7 @@ import { characterHasGroup } from './groupUtils';
 import { postMoveHide as choji018PostMoveHide } from './handlers/KS/uncommon/choji018';
 import { buildPlayLessTargets, type PlayLessCategory } from './handlers/shared/playLess';
 import { ss000DeckHounds, ss000FinalizeSearch, ss000HoundChoicePayload, SS000_NINJA_HOUND } from './handlers/SS/ss000Search';
-import { attachCardToCharacter } from './attachments';
+import { attachCardToCharacter, discardAttachmentsOnLeave } from './attachments';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
@@ -205,6 +206,17 @@ export class EffectEngine {
       orderedTypes.push('DUEL');
     }
 
+    const hasFirstStrike = (topCard.effects ?? []).some((e) => e.type === 'FIRST_STRIKE');
+    if (
+      hasFirstStrike
+      && !character.isHidden
+      && isFirstCardPlayedThisRound(newState, player)
+      && getEffectHandler(topCard.id, 'FIRST_STRIKE' as EffectType)
+    ) {
+      orderedTypes.push('FIRST_STRIKE' as EffectType);
+      newState = withFirstStrikeStatus(newState, player, 'used');
+    }
+
 
     for (let i = 0; i < orderedTypes.length; i++) {
       const effectType = orderedTypes[i];
@@ -217,6 +229,10 @@ export class EffectEngine {
         const charResult = i > 0 ? EffectEngine.findCharByInstanceId(newState, character.instanceId) : null;
         const currentChar = charResult?.character ?? character;
         const currentMissionIndex = charResult?.missionIndex ?? missionIndex;
+
+        if (effectType === 'DUEL' && !hasResolvableInstantDuel(newState, currentMissionIndex, topCard.effects)) {
+          continue;
+        }
 
         const ctx: EffectContext = {
           state: newState,
@@ -329,6 +345,10 @@ export class EffectEngine {
 
       const handler = getEffectHandler(topCard.id, effectType);
       if (!handler) continue;
+
+      if (effectType === 'DUEL' && !hasResolvableInstantDuel(newState, missionIndex, topCard.effects)) {
+        continue;
+      }
 
       try {
         const ctx: EffectContext = {
@@ -5881,6 +5901,33 @@ export class EffectEngine {
         break;
       }
 
+      case 'SS082_CONFIRM_MAIN': {
+        const s082Player = pendingEffect.sourcePlayer;
+        const s082Side: 'player1Characters' | 'player2Characters' = s082Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const s082Missions = [...newState.activeMissions];
+        const s082Mission = s082Missions[pendingEffect.sourceMissionIndex];
+        if (!s082Mission) break;
+        const s082Chars = [...s082Mission[s082Side]];
+        const s082Idx = s082Chars.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
+        if (s082Idx === -1) break;
+        if ((s082Chars[s082Idx].powerTokens ?? 0) > 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, s082Player,
+            'EFFECT_NO_TARGET', 'Curry of Life (SS-082): The character already has Power tokens, no POWERUP.',
+            'game.log.effect.noTarget', { card: 'CURRY DE LA VIE', id: 'SS-082-C' });
+          break;
+        }
+        s082Chars[s082Idx] = { ...s082Chars[s082Idx], powerTokens: s082Chars[s082Idx].powerTokens + 3 };
+        s082Missions[pendingEffect.sourceMissionIndex] = { ...s082Mission, [s082Side]: s082Chars };
+        newState.activeMissions = s082Missions;
+        const s082Top = s082Chars[s082Idx].stack?.length > 0
+          ? s082Chars[s082Idx].stack[s082Chars[s082Idx].stack.length - 1]
+          : s082Chars[s082Idx].card;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, s082Player,
+          'EFFECT_POWERUP', `Curry of Life (SS-082): POWERUP 3 on ${s082Top.name_fr}.`,
+          'game.log.effect.powerup', { card: 'CURRY DE LA VIE', id: 'SS-082-C', amount: 3, target: s082Top.name_fr });
+        break;
+      }
+
       case 'SS128_CONFIRM_DUEL': {
         const s128Player = pendingEffect.sourcePlayer;
         const s128EnemyPlayer: PlayerID = s128Player === 'player1' ? 'player2' : 'player1';
@@ -10729,6 +10776,44 @@ export class EffectEngine {
         break;
       }
 
+      case 'SS089_CONFIRM_MAIN': {
+        const s089cP = pendingEffect.sourcePlayer;
+        const s089cSide: 'player1Characters' | 'player2Characters' = s089cP === 'player1' ? 'player1Characters' : 'player2Characters';
+        const s089cTargets: string[] = [];
+        for (const m of newState.activeMissions) {
+          for (const c of m[s089cSide]) {
+            if (c.isHidden) continue;
+            if (c.instanceId === pendingEffect.sourceInstanceId) continue;
+            if ((c.card as { card_type?: string }).card_type === 'attachment') continue;
+            if ((c.attachments?.length ?? 0) > 0) continue;
+            s089cTargets.push(c.instanceId);
+          }
+        }
+        if (s089cTargets.length === 0) break;
+        const s089cEffId = generateInstanceId();
+        const s089cActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: s089cEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'SS089_MOVE_ATTACHMENT',
+          sourcePlayer: s089cP, requiresTargetSelection: true,
+          validTargets: s089cTargets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: s089cActId, type: 'SELECT_TARGET' as PendingAction['type'], player: s089cP,
+          description: 'Crow (SS-089): Choose the friendly character to move this attachment to.',
+          descriptionKey: 'game.effect.desc.ss089MoveAttachment',
+          options: s089cTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: s089cEffId,
+        });
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
       case 'SS089_MOVE_ATTACHMENT': {
         const s089P = pendingEffect.sourcePlayer;
         const s089Host = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId ?? '');
@@ -10776,6 +10861,73 @@ export class EffectEngine {
         break;
       }
 
+      case 'SS114_CONFIRM_MAIN':
+      case 'SS114_CONFIRM_DUEL_MODIFIER': {
+        const s114cP = pendingEffect.sourcePlayer;
+        const s114cMi = pendingEffect.sourceMissionIndex;
+        const s114cRockLee = isDuelConditionMet(newState, s114cMi, 'DUEL Rock Lee:');
+
+        if (pendingEffect.targetSelectionType === 'SS114_CONFIRM_MAIN' && s114cRockLee) {
+          const s114mEffId = generateInstanceId();
+          const s114mActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: s114mEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: s114cMi, effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({}),
+            targetSelectionType: 'SS114_CONFIRM_DUEL_MODIFIER',
+            sourcePlayer: s114cP, requiresTargetSelection: true,
+            validTargets: [pendingEffect.sourceInstanceId], isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: s114mActId, type: 'SELECT_TARGET' as PendingAction['type'], player: s114cP,
+            description: 'Gaara (SS-114) DUEL Rock Lee: Defeat the target instead of hiding it?',
+            descriptionKey: 'game.effect.desc.ss114ConfirmDuelModifier',
+            options: [pendingEffect.sourceInstanceId], minSelections: 1, maxSelections: 1,
+            sourceEffectId: s114mEffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
+          break;
+        }
+
+        const s114cUseDefeat = pendingEffect.targetSelectionType === 'SS114_CONFIRM_DUEL_MODIFIER';
+        const s114cHand = newState[s114cP].hand;
+        const s114cGaara: string[] = [];
+        s114cHand.forEach((c, i) => {
+          if ((c.name_en ?? '').toUpperCase() === 'GAARA' || (c.name_fr ?? '').toUpperCase() === 'GAARA') s114cGaara.push(String(i));
+        });
+        if (s114cGaara.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, s114cP,
+            'EFFECT_NO_TARGET', 'Gaara (SS-114) MAIN: No Gaara in hand to discard.',
+            'game.log.effect.noTarget', { card: 'GAARA', id: 'SS-114-R' });
+          break;
+        }
+        const s114cEffId = generateInstanceId();
+        const s114cActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: s114cEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: s114cMi, effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ useDefeat: s114cUseDefeat }),
+          targetSelectionType: 'SS114_CHOOSE_DISCARD',
+          sourcePlayer: s114cP, requiresTargetSelection: true,
+          validTargets: s114cGaara, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: s114cActId, type: 'DISCARD_CARD' as PendingAction['type'], player: s114cP,
+          description: 'Gaara (SS-114) MAIN: Discard a Gaara from your hand.',
+          descriptionKey: 'game.effect.desc.ss114ChooseDiscard',
+          options: s114cGaara, minSelections: 1, maxSelections: 1,
+          sourceEffectId: s114cEffId,
+        });
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
       case 'SS114_CHOOSE_DISCARD': {
         const s114P = pendingEffect.sourcePlayer;
         const s114Idx = parseInt(targetId, 10);
@@ -10794,7 +10946,9 @@ export class EffectEngine {
         const s114Mi = pendingEffect.sourceMissionIndex;
         const s114EnemySide: 'player1Characters' | 'player2Characters' = s114P === 'player1' ? 'player2Characters' : 'player1Characters';
         const s114Mission = newState.activeMissions[s114Mi];
-        const s114UseDefeat = isDuelConditionMet(newState, s114Mi, 'DUEL Rock Lee:');
+        let s114Mode: { useDefeat?: boolean } = {};
+        try { s114Mode = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const s114UseDefeat = s114Mode.useDefeat === true;
         const s114Targets = (s114Mission?.[s114EnemySide] ?? [])
           .filter((c) => {
             if (c.isHidden && !s114UseDefeat) return false;
@@ -16278,6 +16432,12 @@ export class EffectEngine {
         continue;
       }
 
+      if (effectType === 'DUEL') {
+        const nowAt = EffectEngine.findCharByInstanceId(newState, resolvedPending.sourceInstanceId);
+        const duelMissionIndex = nowAt?.missionIndex ?? missionIndex;
+        if (!hasResolvableInstantDuel(newState, duelMissionIndex, topCard.effects)) continue;
+      }
+
       const ctx: EffectContext = {
         state: newState,
         sourcePlayer: resolvedPending.sourcePlayer,
@@ -19082,7 +19242,7 @@ export class EffectEngine {
       { card: 'Ramener', target: topCard.name_fr },
     );
 
-    return stateAfterRestore;
+    return discardAttachmentsOnLeave(stateAfterRestore, removedTarget);
   }
 
   
@@ -20058,6 +20218,13 @@ export class EffectEngine {
         const cardsToDiscard = targetChar.stack?.length > 0 ? [...targetChar.stack] : [targetChar.card];
         ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
         newState[owner] = ownerState;
+        for (const att of targetChar.attachments ?? []) {
+          const attOwner = newState[att.owner];
+          newState[att.owner] = {
+            ...attOwner,
+            discardPile: [...attOwner.discardPile, att.card as (typeof attOwner.discardPile)[number]],
+          };
+        }
         postTransferDiscard = true;
       }
     }

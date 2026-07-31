@@ -326,8 +326,6 @@ export type GameAction =
   | { type: 'REVEAL_CHARACTER'; missionIndex: number; characterInstanceId: string; upgradeTargetInstanceId?: string }
   | { type: 'UPGRADE_CHARACTER'; cardIndex: number; missionIndex: number; targetInstanceId: string }
   | { type: 'PASS' }
-  | { type: 'USE_FIRST_STRIKE'; characterInstanceId: string }
-  | { type: 'DECLINE_FIRST_STRIKE' }
   | { type: 'MULLIGAN'; doMulligan: boolean }
   | { type: 'SELECT_TARGET'; pendingActionId: string; selectedTargets: string[] }
   | { type: 'DECLINE_OPTIONAL_EFFECT'; pendingEffectId: string }

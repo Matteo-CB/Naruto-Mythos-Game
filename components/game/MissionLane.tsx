@@ -37,7 +37,8 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   const t = useTranslations();
   const locale = useLocale();
   const dims = useGameScale();
-  const me = useBoardPalette().me;
+  const palette = useBoardPalette();
+  const me = palette.me;
   const selectTarget = useUIStore((s) => s.selectTarget);
   const selectedTargetId = useUIStore((s) => s.selectedTargetId);
   const showPreview = useUIStore((s) => s.showPreview);
@@ -176,6 +177,39 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </div>
       </>
     )}
+    <div
+      className="relative"
+      style={{ width: dims.missionCard.w + 'px', height: dims.missionCard.h + 'px', flex: '0 0 auto' }}
+    >
+      {!isHidden && (character.attachments ?? []).map((att, attIndex) => {
+        const mine = att.owner === myPlayer;
+        const peek = 26 + attIndex * 9;
+        return (
+          <div
+            key={att.instanceId}
+            onClick={(e) => { e.stopPropagation(); pinCard(att.card as never); }}
+            title={getCardName(att.card, locale as 'en' | 'fr')}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              [mine ? 'right' : 'left']: -peek + '%',
+              width: dims.missionCard.h + 'px',
+              height: dims.missionCard.h * 0.716 + 'px',
+              transform: 'translateY(-50%) rotate(' + (mine ? 90 : -90) + 'deg)',
+              transformOrigin: 'center',
+              backgroundImage: att.card.image_file ? `url('${normalizeImagePath(att.card.image_file)}')` : undefined,
+              backgroundColor: '#141414',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              borderRadius: '4px',
+              boxShadow: `0 2px 10px rgba(0,0,0,0.8), 0 0 8px ${mine ? palette.me.tint(0.55) : palette.opponent.tint(0.55)}`,
+              cursor: 'pointer',
+              zIndex: 0,
+            }}
+          />
+        );
+      })}
+
     <motion.div
       initial={false}
       animate={{
@@ -206,6 +240,8 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
             ? '2px solid rgba(255, 255, 255, 0.7)'
             : '1px solid rgba(255, 255, 255, 0.08)',
         overflow: 'hidden',
+        position: 'relative',
+        zIndex: 1,
         boxShadow: isSelected
           ? `0 0 16px ${me.tint(0.4)}, 0 4px 12px rgba(0, 0, 0, 0.5)`
           : isLastPlayed
@@ -269,45 +305,6 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
           )}
         </>
       )}
-
-      {!isHidden && (character.attachments ?? []).map((att) => {
-        const mine = att.owner === myPlayer;
-        return (
-          <div
-            key={att.instanceId}
-            onClick={(e) => { e.stopPropagation(); pinCard(att.card as never); }}
-            title={getCardName(att.card, locale as 'en' | 'fr')}
-            style={{
-              position: 'absolute',
-              top: '6%',
-              [mine ? 'right' : 'left']: 0,
-              width: '22%',
-              height: '88%',
-              cursor: 'pointer',
-              zIndex: 5,
-              overflow: 'hidden',
-              backgroundColor: '#141414',
-              boxShadow: mine
-                ? '-2px 0 8px rgba(0,0,0,0.65), 0 0 10px rgba(196,163,90,0.45)'
-                : '2px 0 8px rgba(0,0,0,0.65), 0 0 10px rgba(179,62,62,0.45)',
-            }}
-          >
-            <div
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                width: '340%',
-                height: '29%',
-                transform: `translate(-50%, -50%) rotate(${mine ? 90 : -90}deg)`,
-                backgroundImage: att.card.image_file ? `url('${normalizeImagePath(att.card.image_file)}')` : undefined,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            />
-          </div>
-        );
-      })}
 
       {!isHidden && (
         <div
@@ -420,6 +417,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </div>
       )}
     </motion.div>
+    </div>
     </>
   );
 },
@@ -524,7 +522,7 @@ function MissionCardDisplay({
         maxWidth: dims.missionMaxW + 'px',
         border: `2px solid ${rankColors[mission.rank]}`,
         borderRadius: '6px',
-        overflow: 'hidden',
+        overflow: 'visible',
         cursor: 'pointer',
         boxShadow: `0 0 12px ${rankColors[mission.rank]}30, 0 4px 12px rgba(0, 0, 0, 0.5)`,
       }}
@@ -559,6 +557,8 @@ function MissionCardDisplay({
           className="w-full h-full bg-cover bg-center"
           style={{
             backgroundImage: `url('${imagePath}')`,
+            overflow: 'hidden',
+            borderRadius: '4px',
             minHeight: '65px',
             imageRendering: 'crisp-edges',
           }}
@@ -599,29 +599,35 @@ function MissionCardDisplay({
         {totalPoints} {t('game.board.pts')}
       </div>
 
-      {(mission.attachments?.length ?? 0) > 0 && (
-        <div className="absolute z-10 flex gap-1" style={{ bottom: '4px', left: '50%', transform: 'translateX(-50%)' }}>
-          {mission.attachments!.map((att) => (
-            <div
-              key={att.instanceId}
-              onClick={(e) => { e.stopPropagation(); pinCard(att.card as never); }}
-              title={getCardName(att.card, locale as 'en' | 'fr')}
-              style={{
-                width: dims.isMobile ? '62px' : '52px',
-                aspectRatio: '3.5 / 2.5',
-                borderRadius: '3px',
-                backgroundImage: att.card.image_file ? `url('${normalizeImagePath(att.card.image_file)}')` : undefined,
-                backgroundColor: '#141414',
-                backgroundSize: 'contain',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center',
-                boxShadow: `0 2px 8px rgba(0,0,0,0.75), 0 0 10px ${att.owner === myPlayer ? palette.me.tint(0.6) : palette.opponent.tint(0.6)}`,
-                cursor: 'pointer',
-              }}
-            />
-          ))}
-        </div>
-      )}
+      {(mission.attachments ?? []).map((att, attIndex) => {
+        const mine = att.owner === myPlayer;
+        const side = mission.attachments!.filter((o, i) => (o.owner === myPlayer) === mine && i < attIndex).length;
+        const cardHeight = dims.isMobile ? 74 : 62;
+        return (
+          <div
+            key={att.instanceId}
+            onClick={(e) => { e.stopPropagation(); pinCard(att.card as never); }}
+            title={getCardName(att.card, locale as 'en' | 'fr')}
+            style={{
+              position: 'absolute',
+              top: `calc(50% + ${side * 14}px)`,
+              [mine ? 'right' : 'left']: `-${cardHeight * 0.34}px`,
+              width: `${cardHeight}px`,
+              height: `${cardHeight * 0.716}px`,
+              transform: `translateY(-50%) rotate(${mine ? 90 : -90}deg)`,
+              transformOrigin: 'center',
+              backgroundImage: att.card.image_file ? `url('${normalizeImagePath(att.card.image_file)}')` : undefined,
+              backgroundColor: '#141414',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              borderRadius: '4px',
+              boxShadow: `0 2px 10px rgba(0,0,0,0.8), 0 0 8px ${mine ? palette.me.tint(0.55) : palette.opponent.tint(0.55)}`,
+              cursor: 'pointer',
+              zIndex: 0,
+            }}
+          />
+        );
+      })}
 
       {mission.wonBy && (
         <motion.div

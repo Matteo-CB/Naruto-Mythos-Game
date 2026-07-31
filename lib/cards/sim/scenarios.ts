@@ -141,11 +141,11 @@ const FACTORIES: Record<string, Factory> = {
   }),
   'SS-049-C': (id) => ({
     build: () => board({
-      p1m0: [{ id, iid: 'sim-fs-temari' }, { id: 'KS-009-C', iid: 'sim-fs-ally' }],
+      hand: [id],
       e0: [{ id: 'KS-005-C', iid: 'sim-fs-enemy' }],
-      edge: 'player2',
+      edge: 'player1',
     }),
-    play: P1({ type: 'USE_FIRST_STRIKE', characterInstanceId: 'sim-fs-temari' }),
+    play: P1(FRESH),
     noMinimize: true,
   }),
   'SS-051-UC': (id) => ({

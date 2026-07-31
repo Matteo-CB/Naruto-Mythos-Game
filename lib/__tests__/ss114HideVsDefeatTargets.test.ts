@@ -26,20 +26,32 @@ function boardWithGaaraRare(withRockLee: boolean): GameState {
   return state;
 }
 
-function targetsAfterDiscardingGaara(state: GameState): string[] {
-  let s = GameEngine.applyAction(state, 'player1', {
+function answerCurrentPrompt(state: GameState, pick?: string): GameState {
+  const pending = state.pendingActions.find((a) => a.player === 'player1');
+  if (!pending) throw new Error('a prompt should be open');
+  return GameEngine.applyAction(state, 'player1', {
     type: 'SELECT_TARGET',
-    pendingActionId: s0PendingId(state),
-    selectedTargets: ['0'],
+    pendingActionId: pending.id,
+    selectedTargets: [pick ?? pending.options[0]],
   } as never);
-  const pending = s.pendingActions.find((a) => a.player === 'player1');
-  return pending?.options ?? [];
 }
 
-function s0PendingId(state: GameState): string {
+function currentSelectionType(state: GameState): string | undefined {
   const pending = state.pendingActions.find((a) => a.player === 'player1');
-  if (!pending) throw new Error('the discard prompt should be open');
-  return pending.id;
+  if (!pending) return undefined;
+  return state.pendingEffects.find((e) => e.id === pending.sourceEffectId)?.targetSelectionType;
+}
+
+function targetsAfterDiscardingGaara(state: GameState): string[] {
+  let s = state;
+  for (let guard = 0; guard < 6; guard += 1) {
+    const type = currentSelectionType(s);
+    if (type === undefined) return [];
+    if (type === 'SS114_CHOOSE_HIDE') break;
+    s = answerCurrentPrompt(s, type === 'SS114_CHOOSE_DISCARD' ? '0' : undefined);
+  }
+  const pending = s.pendingActions.find((a) => a.player === 'player1');
+  return pending?.options ?? [];
 }
 
 function openTheEffect(withRockLee: boolean): GameState {

@@ -252,10 +252,11 @@ function buildEffectOrderSelection(
           return null;
         })()
       : null;
+    const printedSource = pe?.sourceCardId ? getCardById(pe.sourceCardId) : null;
     return {
       effectId: pe?.id ?? pa.id,
-      sourceCardName: charResult?.name_fr ?? pe?.sourceCardId ?? '???',
-      sourceCardImage: charResult?.image_file ?? undefined,
+      sourceCardName: printedSource?.name_fr ?? charResult?.name_fr ?? pe?.sourceCardId ?? '???',
+      sourceCardImage: printedSource?.image_file ?? charResult?.image_file ?? undefined,
       effectType: pe?.effectType ?? 'MAIN',
       description: pa.description,
       descriptionKey: pa.descriptionKey,

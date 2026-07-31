@@ -345,23 +345,19 @@ function curry082MainHandler(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'CURRY DE LA VIE', id: 'SS-082-C' }) } };
   }
   const friendlySide = sideFor(sourcePlayer, 'friendly');
-  const missions = [...state.activeMissions];
-  const mission = { ...missions[sourceMissionIndex] };
-  const chars = [...mission[friendlySide]];
-  const idx = chars.findIndex((c) => c.instanceId === host.instanceId);
-  if (idx === -1) return { state };
-  chars[idx] = { ...chars[idx], powerTokens: chars[idx].powerTokens + 3 };
-  mission[friendlySide] = chars;
-  missions[sourceMissionIndex] = mission;
-  const hostTop = topOf(chars[idx]);
-  const log = logAction(
-    state.log, state.turn, state.phase, sourcePlayer,
-    'EFFECT_POWERUP',
-    `Curry of Life (SS-082): POWERUP 3 on ${hostTop.name_fr}.`,
-    'game.log.effect.powerup',
-    { card: 'CURRY DE LA VIE', id: 'SS-082-C', amount: 3, target: hostTop.name_fr },
-  );
-  return { state: { ...state, activeMissions: missions, log } };
+  const mission = state.activeMissions[sourceMissionIndex];
+  const stillThere = mission ? mission[friendlySide].some((c) => c.instanceId === host.instanceId) : false;
+  if (!stillThere) return { state };
+
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'SS082_CONFIRM_MAIN',
+    validTargets: [host.instanceId],
+    isOptional: true,
+    description: JSON.stringify({}),
+    descriptionKey: 'game.effect.desc.ss082ConfirmMain',
+  };
 }
 
 function stadium108ScoreHandler(ctx: EffectContext): EffectResult {

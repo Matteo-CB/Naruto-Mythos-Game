@@ -83,12 +83,80 @@ export function discardAttachments(state: GameState, attachments: AttachedCard[]
   return next;
 }
 
+export function discardAttachmentsOnLeave(state: GameState, character: CharacterInPlay | null | undefined): GameState {
+  const attachments = character?.attachments ?? [];
+  if (attachments.length === 0) return state;
+  let next = state;
+  for (const att of attachments) {
+    const owner = att.owner;
+    next = {
+      ...next,
+      [owner]: { ...next[owner], discardPile: [...next[owner].discardPile, att.card] },
+      log: logAction(
+        next.log, next.turn, next.phase, owner,
+        'DISCARD_ATTACHMENT',
+        `${att.card.name_fr} goes to the discard pile: the character carrying it left play.`,
+        'game.log.attachmentHostLeft',
+        { card: att.card.name_fr, card_en: att.card.name_en ?? att.card.name_fr, id: att.card.id },
+      ),
+    };
+  }
+  return next;
+}
+
 function attachConditionHolds(host: CharacterInPlay, attachment: CardData): boolean {
   if (requiresNonHiddenHost(attachment) && host.isHidden) return false;
   if (requiresHiddenHost(attachment) && !host.isHidden) return false;
   const group = requiredAttachGroup(attachment);
   if (group && !characterHasGroup(host, group)) return false;
   return true;
+}
+
+function collectAttachmentsInPlay(state: GameState): Map<string, AttachedCard> {
+  const found = new Map<string, AttachedCard>();
+  for (const mission of state.activeMissions) {
+    for (const att of mission.attachments ?? []) found.set(att.instanceId, att);
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      for (const char of mission[side]) {
+        for (const att of char.attachments ?? []) found.set(att.instanceId, att);
+      }
+    }
+  }
+  return found;
+}
+
+function countFiledCopies(state: GameState, owner: PlayerID, cardId: string): number {
+  const ps = state[owner];
+  let total = 0;
+  for (const zone of [ps.discardPile, ps.hand, ps.deck] as ReadonlyArray<ReadonlyArray<{ id: string }>>) {
+    for (const c of zone) if (c.id === cardId) total += 1;
+  }
+  return total;
+}
+
+export function rescueOrphanedAttachments(before: GameState, after: GameState): GameState {
+  const wasInPlay = collectAttachmentsInPlay(before);
+  if (wasInPlay.size === 0) return after;
+  const stillInPlay = collectAttachmentsInPlay(after);
+
+  const orphans = new Map<string, AttachedCard[]>();
+  for (const [instanceId, att] of wasInPlay) {
+    if (stillInPlay.has(instanceId)) continue;
+    const key = `${att.owner}|${att.card.id}`;
+    orphans.set(key, [...(orphans.get(key) ?? []), att]);
+  }
+  if (orphans.size === 0) return after;
+
+  let next = after;
+  for (const lost of orphans.values()) {
+    const owner = lost[0].owner;
+    const cardId = lost[0].card.id;
+    const filedByTheRemoval = countFiledCopies(after, owner, cardId) - countFiledCopies(before, owner, cardId);
+    const missing = lost.length - Math.max(0, filedByTheRemoval);
+    if (missing <= 0) continue;
+    next = discardAttachmentsOnLeave(next, { attachments: lost.slice(0, missing) } as unknown as CharacterInPlay);
+  }
+  return next;
 }
 
 export function enforceAttachmentConditions(state: GameState): GameState {

@@ -8,6 +8,13 @@ import {
 
 
 
+function hasSoundVillageCandidate(state: EffectContext['state'], player: EffectContext['sourcePlayer']): boolean {
+  const inHand = state[player].hand.some((c) => c.group === 'Sound Village');
+  if (inHand) return true;
+  const side = player === 'player1' ? 'player1Characters' : 'player2Characters';
+  return state.activeMissions.some((mission) => mission[side].some((c) => c.isHidden));
+}
+
 function tayuya125MainHandler(ctx: EffectContext): EffectResult {
 
 
@@ -21,14 +28,17 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
   const hiddenTargets = findHiddenSoundVillageOnBoard(state, sourcePlayer, 2);
 
   if (handTargets.length === 0 && hiddenTargets.length === 0) {
+    const anySoundVillage = hasSoundVillageCandidate(state, sourcePlayer);
     return {
       state: {
         ...state,
         log: logAction(
           state.log, state.turn, state.phase, sourcePlayer,
           'EFFECT_NO_TARGET',
-          'Tayuya (125) UPGRADE: No affordable Sound Village character available (cost reduced by 2).',
-          'game.log.effect.noTarget',
+          anySoundVillage
+            ? 'Tayuya (125) UPGRADE: A Sound Village character is available but its cost cannot be paid, even reduced by 2.'
+            : 'Tayuya (125) UPGRADE: No Sound Village character available.',
+          anySoundVillage ? 'game.log.effect.noChakra' : 'game.log.effect.noTarget',
           { card: 'TAYUYA', id: 'KS-125-R' },
         ),
       },

@@ -24,7 +24,7 @@ import { deepClone } from './utils/deepClone';
 import { normalizeHoloCardForGame } from '../holo/holoId';
 import { shuffle } from './utils/shuffle';
 import { generateGameId, generateInstanceId, resetIdCounter, seedIdCounterFromState, getIdCounter } from './utils/id';
-import { enforceAttachmentConditions } from '../effects/attachments';
+import { enforceAttachmentConditions, rescueOrphanedAttachments } from '../effects/attachments';
 import { logSystem, logAction } from './utils/gameLog';
 import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
@@ -159,7 +159,7 @@ export class GameEngine {
     const inner = GameEngine.applyActionInner(state, player, action);
     if (!inner || inner === state) return inner;
 
-    let result = enforceAttachmentConditions(inner);
+    let result = enforceAttachmentConditions(rescueOrphanedAttachments(state, inner));
     if (result === inner) result = { ...inner };
     result.instanceSeq = Math.max(getIdCounter(), state.instanceSeq ?? 0, result.instanceSeq ?? 0);
 

@@ -11,13 +11,25 @@ function att(id: string): CharacterCard {
   return getCardById(id) as CharacterCard;
 }
 
+function acceptPendingPrompts(state: GameState): GameState {
+  let s = state;
+  for (let guard = 0; guard < 10 && s.pendingActions.length > 0; guard += 1) {
+    const pa = s.pendingActions[0];
+    if (!pa.options || pa.options.length === 0) break;
+    s = GameEngine.applyAction(s, pa.player, { type: 'SELECT_TARGET', pendingActionId: pa.id, selectedTargets: [pa.options[0]] });
+  }
+  return s;
+}
+
 describe('attachments (new set 2 mechanic)', () => {
   beforeAll(() => { initializeRegistry(); });
 
   it('Curry of Life attaches to the friendly character, POWERUP 3 when no tokens, adds its own Power', () => {
     const st = buildSimState({ p1: [simChar('KS-009-C', { owner: 'player1', instanceId: 'naruto' })], p2: [], missions: 2, chakra1: 10 });
     st.player1.hand = [att('SS-082-C')];
-    const s = GameEngine.applyAction(st, 'player1', { type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false });
+    const played = GameEngine.applyAction(st, 'player1', { type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false });
+    expect(played.pendingActions.length, 'Curry of Life must ask before applying its POWERUP').toBe(1);
+    const s = acceptPendingPrompts(played);
     const naruto = s.activeMissions[0].player1Characters.find((c) => c.instanceId === 'naruto')!;
     expect(naruto.attachments?.length).toBe(1);
     expect(naruto.powerTokens).toBe(3);
@@ -45,7 +57,7 @@ describe('attachments (new set 2 mechanic)', () => {
   it('Choji SS-128 doubles Food attachment power on himself', () => {
     const st = buildSimState({ p1: [simChar('SS-128-R', { owner: 'player1', instanceId: 'choji' })], p2: [], missions: 2, chakra1: 10 });
     st.player1.hand = [att('SS-082-C')];
-    const s = GameEngine.applyAction(st, 'player1', { type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false });
+    const s = acceptPendingPrompts(GameEngine.applyAction(st, 'player1', { type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false }));
     const choji = s.activeMissions[0].player1Characters.find((c) => c.instanceId === 'choji')!;
     expect(getEffectivePower(s, choji, 'player1')).toBe(11);
   });
