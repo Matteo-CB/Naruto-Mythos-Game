@@ -875,9 +875,16 @@ export async function reopenTournamentMatch(
     });
     previousRoomCode = existing?.roomCode ?? null;
 
-    if (existing?.gameId || existing?.status === 'completed') {
-      console.warn(`[Tournament] reopenTournamentMatch: refusing to reopen ${matchId}, a game already exists (${existing.gameId ?? existing.status}).`);
+    if (existing?.status === 'completed' || existing?.status === 'forfeit') {
+      console.warn(`[Tournament] reopenTournamentMatch: refusing to reopen ${matchId}, it is already ${existing.status}.`);
       return;
+    }
+    if (existing?.gameId) {
+      const finishedGame = await prisma.game.findUnique({ where: { id: existing.gameId }, select: { status: true } });
+      if (finishedGame && finishedGame.status !== 'cancelled') {
+        console.warn(`[Tournament] reopenTournamentMatch: refusing to reopen ${matchId}, its game ${existing.gameId} still exists (${finishedGame.status}).`);
+        return;
+      }
     }
     const liveRoom = previousRoomCode ? rooms.get(previousRoomCode) : null;
     if (liveRoom?.gameState && !liveRoom.finalized) {
@@ -1825,6 +1832,7 @@ export async function advanceMatchWinner(
   else { updateData.player2Id = winnerId; updateData.player2Username = winnerUsername; }
 
   const updated = await prisma.tournamentMatch.update({ where: { id: nextMatch.id }, data: updateData });
+  clearTournamentMatchTimers(nextMatch.id);
   logMatchEvent({
     type: 'match.advance',
     tournamentId,
@@ -1834,6 +1842,47 @@ export async function advanceMatchWinner(
     matchIndex: nextMatch.matchIndex,
     winnerId,
   });
+
+  if (nextMatch.isBye) {
+    await prisma.tournamentMatch.update({
+      where: { id: nextMatch.id },
+      data: { status: 'completed', winnerId, winnerUsername, completedAt: new Date() },
+    });
+    await prisma.tournamentParticipant.updateMany({
+      where: { tournamentId, userId: winnerId },
+      data: { hasBye: true },
+    });
+    logMatchEvent({
+      type: 'match.advance.bye',
+      tournamentId,
+      matchId: nextMatch.id,
+      bracket: nextMatch.bracket ?? undefined,
+      round: nextMatch.round,
+      matchIndex: nextMatch.matchIndex,
+      winnerId,
+    });
+    io?.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
+      matchId: nextMatch.id,
+      player1Id: winnerId,
+      player1Username: winnerUsername,
+      status: 'completed',
+      winnerId,
+      winnerUsername,
+    });
+    await routeSemifinalLoserToThirdPlace(io, tournamentId, match, winnerId);
+    await advanceMatchWinner(io, tournamentId, {
+      id: nextMatch.id,
+      bracket: nextMatch.bracket,
+      round: nextMatch.round,
+      matchIndex: nextMatch.matchIndex,
+      player1Id: winnerId,
+      player2Id: null,
+      player1Username: winnerUsername,
+      player2Username: null,
+    } as never, winnerId, winnerUsername);
+    return;
+  }
+
   const p1 = isTopSlot ? winnerId : updated.player1Id;
   const p2 = isTopSlot ? updated.player2Id : winnerId;
   if (p1 && p2) {

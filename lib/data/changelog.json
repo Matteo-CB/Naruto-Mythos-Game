@@ -1,6 +1,32 @@
 {
   "entries": [
     {
+      "date": "2026-08-01",
+      "title_fr": "Des tournois où tout le monde joue vraiment",
+      "title_en": "Tournaments where everyone actually plays",
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ],
+      "changes_fr": [
+        "En élimination directe, tout le monde s affronte dès le premier tour : plus de victoires gratuites en série quand le tournoi n est pas plein.",
+        "Quand le nombre de joueurs est impair, un seul joueur est exempté par tour, jamais plus.",
+        "Un match de tournoi ne peut plus rester bloqué en boucle sur la préparation : la partie annulée libère bien la place pour relancer.",
+        "Un joueur qui monte au tour suivant ne peut plus être déclaré forfait par erreur dans la foulée.",
+        "Un inscrit sans deck valide est affiché comme exclu avec la raison, au lieu de disparaître du tournoi sans explication."
+      ],
+      "changes_en": [
+        "In single elimination, everyone plays from round one: no more strings of free wins when the tournament is not full.",
+        "With an odd player count, only one player sits out per round, never more.",
+        "A tournament match can no longer get stuck looping on the setup: the cancelled game properly frees the way for a relaunch.",
+        "A player moving up to the next round can no longer be forfeited by mistake right after.",
+        "A registered player without a valid deck is shown as excluded with the reason, instead of vanishing from the tournament unexplained."
+      ]
+    },
+    {
       "date": "2026-07-31",
       "title_fr": "Les attachements se comportent enfin correctement",
       "title_en": "Attachments finally behave properly",

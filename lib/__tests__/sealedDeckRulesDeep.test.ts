@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/lib/db/prisma', () => ({
   prisma: {
-    tournament: { findUnique: vi.fn(), update: vi.fn() },
+    tournament: { findUnique: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
     tournamentParticipant: {
       findUnique: vi.fn(),
       update: vi.fn(),
@@ -51,7 +51,7 @@ import { MAX_COPIES_PER_VERSION } from '@/lib/engine/types';
 import { POST as PostSealedDeck } from '../../app/api/tournaments/[id]/sealed-deck/route';
 
 const p = prisma as unknown as {
-  tournament: { findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
+  tournament: { findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn> };
   tournamentParticipant: {
     findUnique: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
@@ -150,6 +150,7 @@ function resetAll(): void {
   authMock.mockResolvedValue({ user: { id: 'u1' } });
   p.tournament.findUnique.mockResolvedValue({ gameMode: 'sealed', status: 'registration' });
   p.tournament.update.mockResolvedValue({});
+  p.tournament.updateMany.mockResolvedValue({ count: 1 });
   p.tournamentParticipant.update.mockResolvedValue({});
   p.tournamentParticipant.updateMany.mockResolvedValue({ count: 0 });
   p.tournamentMatch.findFirst.mockResolvedValue(null);

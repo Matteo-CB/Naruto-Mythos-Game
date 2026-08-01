@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/lib/db/prisma', () => {
   const m = {
-    tournament: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn() },
+    tournament: { findUnique: vi.fn(), update: vi.fn(), updateMany: vi.fn(), create: vi.fn() },
     tournamentParticipant: {
       findUnique: vi.fn(),
       findFirst: vi.fn(),
@@ -59,7 +59,7 @@ import { executeTournamentStart } from '../tournament/startLogic';
 type Fn = ReturnType<typeof vi.fn>;
 
 const p = prisma as unknown as {
-  tournament: { findUnique: Fn; update: Fn; create: Fn };
+  tournament: { findUnique: Fn; update: Fn; updateMany: Fn; create: Fn };
   tournamentParticipant: {
     findUnique: Fn; findFirst: Fn; findMany: Fn; create: Fn; update: Fn;
     updateMany: Fn; delete: Fn; deleteMany: Fn; count: Fn;
@@ -166,6 +166,7 @@ beforeEach(() => {
   p.tournamentMatch.deleteMany.mockResolvedValue({ count: 0 });
   p.tournamentMatch.create.mockResolvedValue({});
   p.tournament.update.mockResolvedValue({});
+  p.tournament.updateMany.mockResolvedValue({ count: 1 });
   p.bannedCard.findMany.mockResolvedValue([]);
   p.userBan.findFirst.mockResolvedValue(null);
   p.user.findUnique.mockResolvedValue({

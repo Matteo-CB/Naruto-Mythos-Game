@@ -675,12 +675,18 @@ export default function TournamentDetailPage() {
                 <p className="text-xs" style={{ color: '#666666' }}>{t('registrationOpen')}</p>
               ) : (
                 <div className="space-y-1">
-                  {tour.participants.map((p) => (
-                    <div key={p.id} className="flex items-center gap-2 px-2 py-1 text-sm" style={{ color: '#e0e0e0' }}>
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#c4a35a' }} />
-                      <PlayerNameLink username={p.username} />
-                    </div>
-                  ))}
+                  {tour.participants.map((p) => {
+                    const excludedNoDeck = p.eliminated && (p.eliminatedRound ?? null) === 0;
+                    return (
+                      <div key={p.id} className="flex items-center gap-2 px-2 py-1 text-sm" style={{ color: excludedNoDeck ? '#777777' : '#e0e0e0' }}>
+                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: excludedNoDeck ? '#555555' : '#c4a35a' }} />
+                        <PlayerNameLink username={p.username} />
+                        {excludedNoDeck ? (
+                          <span className="text-xs" style={{ color: '#a33636' }}>{t('excludedNoDeck')}</span>
+                        ) : null}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

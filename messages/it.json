@@ -2805,7 +2805,8 @@
     "sealedBuildToRegister": "Costruisci il tuo mazzo sealed per confermare l’iscrizione.",
     "sealedRegistrationPending": "Iscrizione incompleta: costruisci il tuo mazzo",
     "privateOnlyNotice": "Il tuo torneo è privato: condividi il codice di accesso con i giocatori che vuoi.",
-    "deleteTournamentConfirmAction": "Conferma l’eliminazione"
+    "deleteTournamentConfirmAction": "Conferma l’eliminazione",
+    "excludedNoDeck": "Escluso: nessun mazzo valido"
   },
   "game": {
     "turn": "Turno {turn}",

@@ -11,6 +11,18 @@ export type StartResult =
   | { ok: false; status: number; error: string };
 
 export async function executeTournamentStart(tournamentId: string): Promise<StartResult> {
+  const claimed = await prisma.tournament.updateMany({
+    where: { id: tournamentId, status: 'registration' },
+    data: { status: 'starting' },
+  });
+  if (claimed.count === 0) {
+    const current = await prisma.tournament.findUnique({ where: { id: tournamentId }, select: { status: true } });
+    if (!current) return { ok: false, status: 404, error: 'Tournament not found' };
+    if (current.status !== 'starting') {
+      return { ok: false, status: 400, error: 'Tournament already started or completed' };
+    }
+  }
+
   const tournament = await prisma.tournament.findUnique({
     where: { id: tournamentId },
     include: { participants: true },
@@ -18,9 +30,6 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
 
   if (!tournament) {
     return { ok: false, status: 404, error: 'Tournament not found' };
-  }
-  if (tournament.status !== 'registration') {
-    return { ok: false, status: 400, error: 'Tournament already started or completed' };
   }
 
   const partialMatches = await prisma.tournamentMatch.findFirst({
@@ -98,6 +107,12 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
         where: { id: p.id },
         data: { eliminated: true, eliminatedRound: 0 },
       });
+      logMatchEvent({ type: 'participant.excluded.invalid-deck', tournamentId, forfeitedPlayerId: p.userId });
+      try {
+        const { emitToUser } = await import('@/lib/socket/io');
+        emitToUser(p.userId, 'tournament:excluded', { tournamentId, reason: 'invalid_deck' });
+      } catch { /* socket layer absent in scripts */ }
+      console.warn(`[startLogic] ${tournament.name}: ${p.username} excluded at start, no valid deck selected`);
     }
     tournament.participants = tournament.participants.filter(p => stillValidIds.has(p.id));
   }

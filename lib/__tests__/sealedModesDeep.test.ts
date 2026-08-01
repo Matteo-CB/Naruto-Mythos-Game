@@ -4,7 +4,7 @@ import path from 'node:path';
 
 vi.mock('@/lib/db/prisma', () => {
   const mock = {
-    tournament: { findUnique: vi.fn(), update: vi.fn(), findMany: vi.fn() },
+    tournament: { findUnique: vi.fn(), update: vi.fn(), updateMany: vi.fn(), findMany: vi.fn() },
     tournamentParticipant: {
       findUnique: vi.fn(),
       findFirst: vi.fn(),
@@ -460,6 +460,7 @@ describe('sealed modes: a sealed tournament runs as a Swiss over the confirmed d
     p.tournamentMatch.deleteMany.mockResolvedValue({ count: 0 });
     p.tournamentParticipant.update.mockResolvedValue({});
     p.tournamentParticipant.updateMany.mockResolvedValue({ count: 0 });
+    p.tournament.updateMany.mockResolvedValue({ count: 1 });
     p.tournament.update.mockResolvedValue({});
     p.bannedCard.findMany.mockResolvedValue([]);
   });
@@ -800,7 +801,7 @@ describe('sealed modes: the engine plays a sealed deck exactly like a normal one
 type MockFn = ReturnType<typeof vi.fn>;
 
 const db = prisma as unknown as {
-  tournament: { findUnique: MockFn; update: MockFn };
+  tournament: { findUnique: MockFn; update: MockFn; updateMany: MockFn };
   tournamentParticipant: {
     findUnique: MockFn; findFirst: MockFn; findMany: MockFn; update: MockFn;
     updateMany: MockFn; create: MockFn; delete: MockFn; deleteMany: MockFn; count: MockFn;
@@ -834,6 +835,7 @@ function resetSealedDb(): void {
   db.tournamentParticipant.count.mockResolvedValue(2);
   db.tournamentParticipant.findUnique.mockResolvedValue(null);
   db.tournament.update.mockResolvedValue({});
+  db.tournament.updateMany.mockResolvedValue({ count: 1 });
   db.bannedCard.findMany.mockResolvedValue([]);
   db.user.findUnique.mockResolvedValue({ username: 'Sealed Player', elo: 1000, discordId: 'discord-1', gameBanned: false, gameBanUntil: null });
   db.userBan.findFirst.mockResolvedValue(null);

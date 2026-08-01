@@ -5,6 +5,7 @@ vi.mock('@/lib/db/prisma', () => {
     tournament: {
       findUnique: vi.fn(),
       update: vi.fn(),
+      updateMany: vi.fn(),
       findMany: vi.fn(),
     },
     tournamentParticipant: {
@@ -42,7 +43,7 @@ import { prisma } from '@/lib/db/prisma';
 import { executeTournamentStart } from '../tournament/startLogic';
 
 const p = prisma as unknown as {
-  tournament: { findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn>; findMany: ReturnType<typeof vi.fn> };
+  tournament: { findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn>; findMany: ReturnType<typeof vi.fn> };
   tournamentParticipant: { findFirst: ReturnType<typeof vi.fn>; findMany: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn>; delete: ReturnType<typeof vi.fn>; create: ReturnType<typeof vi.fn>; count: ReturnType<typeof vi.fn>; deleteMany: ReturnType<typeof vi.fn> };
   tournamentMatch: { findFirst: ReturnType<typeof vi.fn>; findMany: ReturnType<typeof vi.fn>; create: ReturnType<typeof vi.fn>; createMany: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn>; deleteMany: ReturnType<typeof vi.fn> };
   bannedCard: { findMany: ReturnType<typeof vi.fn> };
@@ -69,6 +70,7 @@ beforeEach(() => {
   p.tournamentParticipant.update.mockResolvedValue({});
   p.tournamentParticipant.updateMany.mockResolvedValue({ count: 0 });
   p.tournament.update.mockResolvedValue({});
+  p.tournament.updateMany.mockResolvedValue({ count: 1 });
   p.bannedCard.findMany.mockResolvedValue([]);
 });
 
@@ -84,6 +86,7 @@ describe('executeTournamentStart with mocked Prisma', () => {
   });
 
   it('returns 400 when tournament status is not registration', async () => {
+    p.tournament.updateMany.mockResolvedValue({ count: 0 });
     p.tournament.findUnique.mockResolvedValue({
       id: 't1', status: 'in_progress', participants: [], format: 'swiss',
       gameMode: 'classic', useBanList: false, bannedCardIds: [],

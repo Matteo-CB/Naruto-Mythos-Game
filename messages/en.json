@@ -3078,7 +3078,8 @@
     "sealedBuildToRegister": "Build your sealed deck to confirm your registration.",
     "sealedRegistrationPending": "Registration incomplete: build your deck",
     "privateOnlyNotice": "Your tournament is private: share its join code with the players you want.",
-    "deleteTournamentConfirmAction": "Confirm the deletion"
+    "deleteTournamentConfirmAction": "Confirm the deletion",
+    "excludedNoDeck": "Excluded: no valid deck"
   },
   "playHub": {
     "title": "Play",

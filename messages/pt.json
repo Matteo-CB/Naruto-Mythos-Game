@@ -2805,7 +2805,8 @@
     "sealedBuildToRegister": "Constrói o teu deck selado para confirmar a inscrição.",
     "sealedRegistrationPending": "Inscrição incompleta: constrói o teu deck",
     "privateOnlyNotice": "O teu torneio é privado: partilha o código de entrada com os jogadores que quiseres.",
-    "deleteTournamentConfirmAction": "Confirmar a exclusão"
+    "deleteTournamentConfirmAction": "Confirmar a exclusão",
+    "excludedNoDeck": "Excluído: sem baralho válido"
   },
   "game": {
     "turn": "Turno {turn}",

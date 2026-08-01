@@ -2805,7 +2805,8 @@
     "sealedBuildToRegister": "Zbuduj talię sealed, aby potwierdzić zapis.",
     "sealedRegistrationPending": "Zapis niekompletny: zbuduj talię",
     "privateOnlyNotice": "Twój turniej jest prywatny: udostępnij kod dostępu wybranym graczom.",
-    "deleteTournamentConfirmAction": "Potwierdź usunięcie"
+    "deleteTournamentConfirmAction": "Potwierdź usunięcie",
+    "excludedNoDeck": "Wykluczony: brak ważnej talii"
   },
   "game": {
     "turn": "Tura {turn}",

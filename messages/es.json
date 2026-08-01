@@ -3083,7 +3083,8 @@
     "sealedBuildToRegister": "Construye tu mazo sellado para confirmar tu inscripción.",
     "sealedRegistrationPending": "Inscripción incompleta: construye tu mazo",
     "privateOnlyNotice": "Tu torneo es privado: comparte su código de acceso con los jugadores que quieras.",
-    "deleteTournamentConfirmAction": "Confirmar la eliminación"
+    "deleteTournamentConfirmAction": "Confirmar la eliminación",
+    "excludedNoDeck": "Excluido: sin mazo válido"
   },
   "playHub": {
     "title": "Jugar",

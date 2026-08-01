@@ -8,6 +8,7 @@ type MatchEventType =
   | 'match.auto-forfeit.eliminated'
   | 'match.auto-forfeit.eliminated.both'
   | 'match.completed.played'
+  | 'participant.excluded.invalid-deck'
   | 'match.launch.no-contest'
   | 'match.launch.stalled'
   | 'tournament.start.begin'

@@ -2362,7 +2362,7 @@ export async function cancelGameNoElo(
   broadcastActiveGames(io);
 
   setTimeout(() => {
-    if (!rooms.has(code)) return;
+    if (rooms.get(code) !== room) return;
     if (room.hostSocket) playerRooms.delete(room.hostSocket);
     if (room.guestSocket) playerRooms.delete(room.guestSocket);
     for (const [, spec] of room.spectators) playerRooms.delete(spec.socketId);
@@ -2473,7 +2473,7 @@ export async function handleMulliganIdleTimeout(
   broadcastActiveGames(io);
 
   setTimeout(() => {
-    if (!rooms.has(code)) return;
+    if (rooms.get(code) !== room) return;
     if (room.hostSocket) playerRooms.delete(room.hostSocket);
     if (room.guestSocket) playerRooms.delete(room.guestSocket);
     for (const [, spec] of room.spectators) playerRooms.delete(spec.socketId);
@@ -2788,7 +2788,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     try {
       const now = new Date();
       const scheduledTournaments = await prisma.tournament.findMany({
-        where: { status: 'registration', scheduledStartAt: { not: null, lte: now } },
+        where: { status: { in: ['registration', 'starting'] }, scheduledStartAt: { not: null, lte: now } },
         include: { _count: { select: { participants: true } } },
       });
       const { logMatchEvent } = await import('@/lib/tournament/matchEventLog');

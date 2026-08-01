@@ -36,43 +36,66 @@ export interface BracketResult {
 
 
 
+export function roundMatchCounts(playerCount: number): number[] {
+  const counts: number[] = [];
+  let remaining = playerCount;
+  while (remaining > 1) {
+    const matches = Math.ceil(remaining / 2);
+    counts.push(matches);
+    remaining = matches;
+  }
+  return counts.length > 0 ? counts : [1];
+}
+
 export function generateBracket(participants: Participant[]): BracketResult {
-  const size = nextPowerOf2(participants.length);
-  const totalRounds = Math.log2(size);
-
-  
-  const seeded: (Participant | null)[] = [...participants];
-  while (seeded.length < size) seeded.push(null);
-
-  
-  const ordered = standardSeedPairing(seeded);
+  const n = participants.length;
+  const counts = roundMatchCounts(n);
+  const totalRounds = counts.length;
 
   const matches: BracketMatch[] = [];
 
-  
-  for (let i = 0; i < ordered.length; i += 2) {
-    const p1 = ordered[i];
-    const p2 = ordered[i + 1];
-    const isBye = !p1 || !p2;
-    const winner = isBye ? (p1 || p2) : null;
+  const hasOpeningBye = n % 2 === 1;
+  const byePlayer = hasOpeningBye ? participants[0] : null;
+  const paired = hasOpeningBye ? participants.slice(1) : participants;
 
+  const round1Pairs: Array<[Participant, Participant]> = [];
+  for (let i = 0; i < paired.length / 2; i += 1) {
+    round1Pairs.push([paired[i], paired[paired.length - 1 - i]]);
+  }
+
+  round1Pairs.forEach(([p1, p2], index) => {
     matches.push({
       bracket: MAIN_BRACKET,
       round: 1,
-      matchIndex: i / 2,
-      player1: { participantId: p1?.userId ?? null, username: p1?.username ?? null },
-      player2: { participantId: p2?.userId ?? null, username: p2?.username ?? null },
-      winnerId: winner?.userId ?? null,
-      winnerUsername: winner?.username ?? null,
-      isBye,
-      status: isBye ? 'completed' : 'pending',
+      matchIndex: index,
+      player1: { participantId: p1.userId, username: p1.username },
+      player2: { participantId: p2.userId, username: p2.username },
+      winnerId: null,
+      winnerUsername: null,
+      isBye: false,
+      status: 'pending',
+    });
+  });
+
+  if (byePlayer) {
+    matches.push({
+      bracket: MAIN_BRACKET,
+      round: 1,
+      matchIndex: round1Pairs.length,
+      player1: { participantId: byePlayer.userId, username: byePlayer.username },
+      player2: { participantId: null, username: null },
+      winnerId: byePlayer.userId,
+      winnerUsername: byePlayer.username,
+      isBye: true,
+      status: 'completed',
     });
   }
 
-  
-  for (let round = 2; round <= totalRounds; round++) {
-    const matchCount = size / Math.pow(2, round);
-    for (let i = 0; i < matchCount; i++) {
+  for (let round = 2; round <= totalRounds; round += 1) {
+    const matchCount = counts[round - 1];
+    const previousCount = counts[round - 2];
+    for (let i = 0; i < matchCount; i += 1) {
+      const singleFeeder = 2 * i + 1 >= previousCount;
       matches.push({
         bracket: MAIN_BRACKET,
         round,
@@ -81,26 +104,21 @@ export function generateBracket(participants: Participant[]): BracketResult {
         player2: { participantId: null, username: null },
         winnerId: null,
         winnerUsername: null,
-        isBye: false,
+        isBye: singleFeeder,
         status: 'pending',
       });
     }
   }
 
-  
-  const round1 = matches.filter(m => m.round === 1);
-  for (const m of round1) {
-    if (m.isBye && m.winnerId) {
-      propagateWinner(matches, m);
-    }
+  for (const m of matches.filter(entry => entry.round === 1 && entry.isBye && entry.winnerId)) {
+    propagateWinner(matches, m);
   }
 
-  return { matches, totalRounds, thirdPlaceMatch: buildThirdPlaceMatch(size, totalRounds) };
+  return { matches, totalRounds, thirdPlaceMatch: buildThirdPlaceMatch(n, totalRounds) };
 }
 
-
-export function buildThirdPlaceMatch(size: number, totalRounds: number): BracketMatch | null {
-  if (size < 4 || totalRounds < 2) return null;
+export function buildThirdPlaceMatch(playerCount: number, totalRounds: number): BracketMatch | null {
+  if (playerCount < 4 || totalRounds < 2) return null;
   return {
     bracket: THIRD_PLACE_BRACKET,
     round: totalRounds,
@@ -161,13 +179,17 @@ function propagateWinner(matches: BracketMatch[], completed: BracketMatch): Brac
     nextMatch.player2 = winnerSlot;
   }
 
-  
+  if (nextMatch.isBye && nextMatch.player1.participantId && !nextMatch.player2.participantId) {
+    nextMatch.winnerId = nextMatch.player1.participantId;
+    nextMatch.winnerUsername = nextMatch.player1.username;
+    nextMatch.status = 'completed';
+    propagateWinner(matches, nextMatch);
+    return nextMatch;
+  }
+
   if (nextMatch.player1.participantId && nextMatch.player2.participantId) {
     nextMatch.status = 'ready';
   }
-
-  
-  
 
   return nextMatch;
 }

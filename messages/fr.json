@@ -3084,7 +3084,8 @@
     "sealedBuildToRegister": "Construis ton deck scellé pour confirmer ton inscription.",
     "sealedRegistrationPending": "Inscription incomplète : construis ton deck",
     "privateOnlyNotice": "Ton tournoi est privé : partage son code d’accès aux joueurs de ton choix.",
-    "deleteTournamentConfirmAction": "Confirmer la suppression"
+    "deleteTournamentConfirmAction": "Confirmer la suppression",
+    "excludedNoDeck": "Exclu : aucun deck valide"
   },
   "playHub": {
     "title": "Jouer",

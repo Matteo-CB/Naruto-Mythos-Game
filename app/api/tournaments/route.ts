@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
 
     if (!canCreatePublic) {
       const openTournaments = await prisma.tournament.count({
-        where: { creatorId: session.user.id, status: { in: ['registration', 'in_progress'] } },
+        where: { creatorId: session.user.id, status: { in: ['registration', 'starting', 'in_progress'] } },
       });
       if (openTournaments >= MAX_OPEN_TOURNAMENTS_PER_PLAYER) {
         return NextResponse.json(

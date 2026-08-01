@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateBracket, nextPowerOf2, advanceWinner, MAIN_BRACKET, THIRD_PLACE_BRACKET } from '@/lib/tournament/tournamentEngine';
+import { generateBracket, roundMatchCounts, advanceWinner, MAIN_BRACKET, THIRD_PLACE_BRACKET } from '@/lib/tournament/tournamentEngine';
 import type { BracketMatch } from '@/lib/tournament/tournamentEngine';
 
 function participantsOf(n: number) {
@@ -33,12 +33,11 @@ describe('single elimination bracket is sound for every field size from 2 to 32'
   for (let n = 2; n <= 32; n++) {
     it(`${n} players: produces a playable bracket with exactly one champion`, () => {
       const { matches, totalRounds, thirdPlaceMatch } = generateBracket(participantsOf(n));
-      const size = nextPowerOf2(n);
 
-      expect(totalRounds).toBe(Math.log2(size));
+      expect(totalRounds).toBe(roundMatchCounts(n).length);
 
       const round1 = matches.filter((m) => m.round === 1);
-      expect(round1).toHaveLength(size / 2);
+      expect(round1).toHaveLength(Math.ceil(n / 2));
 
       const seated = round1.flatMap((m) => [m.player1.participantId, m.player2.participantId]).filter(Boolean);
       expect(new Set(seated).size).toBe(n);
@@ -54,7 +53,7 @@ describe('single elimination bracket is sound for every field size from 2 to 32'
       expect(champion).toBeTruthy();
       expect(seated).toContain(champion);
 
-      if (size >= 4) {
+      if (n >= 4) {
         expect(thirdPlaceMatch).not.toBeNull();
         expect(thirdPlaceMatch!.bracket).toBe(THIRD_PLACE_BRACKET);
         expect(thirdPlaceMatch!.round).toBe(totalRounds);
@@ -71,11 +70,12 @@ describe('single elimination bracket is sound for every field size from 2 to 32'
     expect(matches.some((m) => m.isBye)).toBe(false);
   });
 
-  it('an odd field gives byes only in round 1 and never leaves an empty later match', () => {
+  it('an odd field carries at most one bye per round and never leaves an empty later match', () => {
     const { matches, totalRounds } = generateBracket(participantsOf(21));
-    const byes = matches.filter((m) => m.isBye);
-    expect(byes.length).toBe(nextPowerOf2(21) - 21);
-    expect(byes.every((m) => m.round === 1)).toBe(true);
+    for (let round = 1; round <= totalRounds; round += 1) {
+      expect(matches.filter((m) => m.round === round && m.isBye).length).toBeLessThanOrEqual(1);
+    }
+    expect(matches.filter((m) => m.round === 1 && m.isBye).length).toBe(1);
     const champion = playOutBracket(matches, totalRounds);
     expect(champion).toBeTruthy();
   });

@@ -71,7 +71,7 @@ describe('any signed-in player can create a tournament, but only a private one',
     await POST(request(baseBody));
     expect(count.mock.calls[0][0].where).toMatchObject({
       creatorId: 'u1',
-      status: { in: ['registration', 'in_progress'] },
+      status: { in: ['registration', 'starting', 'in_progress'] },
     });
   });
 

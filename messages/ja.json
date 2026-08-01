@@ -3082,7 +3082,8 @@
     "sealedBuildToRegister": "シールドデッキを組んでエントリーを確定してください。",
     "sealedRegistrationPending": "エントリー未完了：デッキを組んでください",
     "privateOnlyNotice": "あなたの大会は非公開です。参加コードを招きたいプレイヤーに共有してください。",
-    "deleteTournamentConfirmAction": "削除を確定する"
+    "deleteTournamentConfirmAction": "削除を確定する",
+    "excludedNoDeck": "除外：有効なデッキがありません"
   },
   "playHub": {
     "title": "プレイ",
