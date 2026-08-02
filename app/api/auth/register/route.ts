@@ -4,7 +4,6 @@ import { prisma } from '@/lib/db/prisma';
 import { COUNTRY_CODES } from '@/lib/data/countries';
 import { validateUsername } from '@/lib/auth/usernameValidator';
 import { normalizeEmailBase } from '@/lib/auth/emailBase';
-import { issueVerificationCode } from '@/lib/auth/emailVerification';
 import { routing } from '@/lib/i18n/routing';
 
 const registerRate = new Map<string, number[]>();
@@ -111,6 +110,7 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         emailBase,
         countryCode,
+        emailVerifiedAt: new Date(),
       } as never,
     }) as { id: string; username: string; email: string; elo: number };
 
@@ -118,19 +118,12 @@ export async function POST(request: NextRequest) {
       data: { userId: user.id, setId: 'KS', count: 2 },
     }).catch(() => {});
 
-    const locale = typeof body.locale === 'string' && (routing.locales as readonly string[]).includes(body.locale)
-      ? body.locale
-      : routing.defaultLocale;
-    const codeResult = await issueVerificationCode(email, locale).catch(() => 'mail_failed' as const);
-
     return NextResponse.json(
       {
         id: user.id,
         username: user.username,
         email: user.email,
         elo: user.elo,
-        requiresVerification: true,
-        codeSent: codeResult === 'sent',
       },
       { status: 201 },
     );
