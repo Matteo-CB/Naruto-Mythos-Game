@@ -171,7 +171,7 @@ describe('REORDER_EFFECTS authorises the decider, not the effect owner', () => {
         ...forcedChoiceEffect('player1', undefined as unknown as PlayerID),
         id: 'e-opp',
         sourceInstanceId: 'inst-opp',
-        targetSelectionType: 'ZAKU070_CONFIRM_MAIN',
+        targetSelectionType: 'DOSU068_CONFIRM_MAIN',
       },
     ];
     state.pendingActions = [

@@ -2806,7 +2806,11 @@
     "sealedRegistrationPending": "Inscrição incompleta: constrói o teu deck",
     "privateOnlyNotice": "O teu torneio é privado: partilha o código de entrada com os jogadores que quiseres.",
     "deleteTournamentConfirmAction": "Confirmar a exclusão",
-    "excludedNoDeck": "Excluído: sem baralho válido"
+    "excludedNoDeck": "Excluído: sem baralho válido",
+    "bestOfThree": "Melhor de 3",
+    "bestOfThreeHint": "Cada confronto é jogado em série: o primeiro jogador com 2 vitórias vence a partida.",
+    "seriesScore": "Série {p1}-{p2}",
+    "seriesNextGame": "Jogo ganho. A série continua, prepare-se para o próximo."
   },
   "game": {
     "turn": "Turno {turn}",

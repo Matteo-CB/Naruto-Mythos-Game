@@ -5759,19 +5759,6 @@ export class EffectEngine {
         break;
       }
 
-      case 'ZAKU070_CONFIRM_MAIN': {
-        
-        const z070Player = pendingEffect.sourcePlayer;
-        const z070Opponent = z070Player === 'player1' ? 'player2' : 'player1';
-        const z070OpPs = { ...newState[z070Opponent] };
-        z070OpPs.chakra += 1;
-        newState = { ...newState, [z070Opponent]: z070OpPs };
-        newState.log = logAction(newState.log, newState.turn, newState.phase, z070Player,
-          'EFFECT_CHAKRA', 'Zaku Abumi (070): Opponent gains 1 Chakra.',
-          'game.log.effect.oppGainChakra', { card: 'Zaku Abumi', id: 'KS-070-C', amount: '1' });
-        break;
-      }
-
       case 'KAKASHI148_CONFIRM_MAIN': {
         const k148Player = pendingEffect.sourcePlayer;
         const k148Opp = k148Player === 'player1' ? 'player2' : 'player1';
@@ -6259,28 +6246,6 @@ export class EffectEngine {
           descriptionParams: ss0Payload.descriptionParams,
           options: ss0Payload.validTargets, minSelections: 1, maxSelections: 1, sourceEffectId: ss0EffId,
         }];
-        break;
-      }
-
-      case 'KIN072_CONFIRM_MAIN': {
-        
-        const k072Player = pendingEffect.sourcePlayer;
-        const k072Opponent = k072Player === 'player1' ? 'player2' : 'player1';
-        const k072OpPs = { ...newState[k072Opponent] };
-        if (k072OpPs.deck.length > 0) {
-          const k072Deck = [...k072OpPs.deck];
-          const k072Drawn = k072Deck.shift()!;
-          k072OpPs.deck = k072Deck;
-          k072OpPs.hand = [...k072OpPs.hand, k072Drawn];
-          newState = { ...newState, [k072Opponent]: k072OpPs };
-          newState.log = logAction(newState.log, newState.turn, newState.phase, k072Player,
-            'EFFECT_DRAW', 'Kin Tsuchi (072): Opponent draws 1 card.',
-            'game.log.effect.oppDraw', { card: 'Kin Tsuchi', id: 'KS-072-C', count: '1' });
-        } else {
-          newState.log = logAction(newState.log, newState.turn, newState.phase, k072Player,
-            'EFFECT_NO_TARGET', 'Kin Tsuchi (072): Opponent has no cards to draw.',
-            'game.log.effect.noTarget', { card: 'KIN TSUCHI', id: 'KS-072-C' });
-        }
         break;
       }
 

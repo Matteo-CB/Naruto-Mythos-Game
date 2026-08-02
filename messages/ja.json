@@ -3083,7 +3083,11 @@
     "sealedRegistrationPending": "エントリー未完了：デッキを組んでください",
     "privateOnlyNotice": "あなたの大会は非公開です。参加コードを招きたいプレイヤーに共有してください。",
     "deleteTournamentConfirmAction": "削除を確定する",
-    "excludedNoDeck": "除外：有効なデッキがありません"
+    "excludedNoDeck": "除外：有効なデッキがありません",
+    "bestOfThree": "3本勝負",
+    "bestOfThreeHint": "各対戦はシリーズ形式：先に2勝したプレイヤーがマッチの勝者になります。",
+    "seriesScore": "シリーズ {p1}-{p2}",
+    "seriesNextGame": "1ゲーム勝利。シリーズは続きます。次のゲームに備えてください。"
   },
   "playHub": {
     "title": "プレイ",

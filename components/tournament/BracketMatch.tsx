@@ -89,6 +89,15 @@ export function BracketMatch({ match, index }: Props) {
         {match.winnerId === match.player2Id && <span style={{ color: '#c4a35a' }}>W</span>}
       </div>
 
+      {((match.player1GameWins ?? 0) > 0 || (match.player2GameWins ?? 0) > 0) && (
+        <div
+          className="px-2 py-0.5 text-center text-[10px] font-bold tabular-nums uppercase tracking-wider"
+          style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', color: '#c4a35a' }}
+        >
+          {t('seriesScore', { p1: String(match.player1GameWins ?? 0), p2: String(match.player2GameWins ?? 0) })}
+        </div>
+      )}
+
       {isReady && remaining !== null && remaining > 0 && (
         <div
           className="px-2 py-1 flex items-center justify-center gap-1 text-[10px] tabular-nums"

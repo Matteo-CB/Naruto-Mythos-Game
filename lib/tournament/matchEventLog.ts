@@ -9,6 +9,8 @@ type MatchEventType =
   | 'match.auto-forfeit.eliminated.both'
   | 'match.completed.played'
   | 'participant.excluded.invalid-deck'
+  | 'match.series.game'
+  | 'match.series.continue'
   | 'match.launch.no-contest'
   | 'match.launch.stalled'
   | 'tournament.start.begin'

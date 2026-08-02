@@ -952,11 +952,9 @@ describe('070/130 - Zaku Abumi', () => {
 
     const handler = getEffectHandler('KS-070-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', zaku, 0));
-    
-    expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('ZAKU070_CONFIRM_MAIN');
-    
-    expect(result.state.player2.chakra).toBe(5);
+
+    expect(result.requiresTargetSelection, 'a forced gain leaves the opponent nothing to decide').toBeFalsy();
+    expect(result.state.player2.chakra, 'the chakra is granted immediately').toBe(6);
   });
 });
 
@@ -982,11 +980,10 @@ describe('072/130 - Kin Tsuchi', () => {
 
     const handler = getEffectHandler('KS-072-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kin, 0));
-    
-    expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('KIN072_CONFIRM_MAIN');
-    
-    expect(result.state.player2.hand.length).toBe(0);
+
+    expect(result.requiresTargetSelection, 'a forced draw leaves the opponent nothing to decide').toBeFalsy();
+    expect(result.state.player2.hand.length, 'the card is drawn immediately').toBe(1);
+    expect(result.state.player2.deck.length).toBe(0);
   });
 
   it('should not crash when opponent deck is empty', () => {

@@ -385,6 +385,12 @@ export default function TournamentDetailPage() {
         {myMatch.player1Username ?? t('tbd')} <span style={{ color: '#666' }}>vs</span> {myMatch.player2Username ?? t('tbd')}
       </p>
 
+      {((myMatch.player1GameWins ?? 0) > 0 || (myMatch.player2GameWins ?? 0) > 0) && (
+        <p className="text-center text-xs font-bold uppercase tracking-wider mb-4" style={{ color: '#c4a35a' }}>
+          {t('seriesScore', { p1: String(myMatch.player1GameWins ?? 0), p2: String(myMatch.player2GameWins ?? 0) })}
+        </p>
+      )}
+
       {myAbsenceDeadline && !myMatch.roomCode && (
         <div className="mb-4">
           <AbsenceTimer deadline={myAbsenceDeadline} onExpired={() => fetchTournament(tournamentId)} />

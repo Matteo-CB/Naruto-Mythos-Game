@@ -3085,7 +3085,11 @@
     "sealedRegistrationPending": "Inscription incomplète : construis ton deck",
     "privateOnlyNotice": "Ton tournoi est privé : partage son code d’accès aux joueurs de ton choix.",
     "deleteTournamentConfirmAction": "Confirmer la suppression",
-    "excludedNoDeck": "Exclu : aucun deck valide"
+    "excludedNoDeck": "Exclu : aucun deck valide",
+    "bestOfThree": "Au meilleur des 3",
+    "bestOfThreeHint": "Chaque affrontement se joue en série : le premier joueur à 2 victoires remporte le match.",
+    "seriesScore": "Série {p1}-{p2}",
+    "seriesNextGame": "Manche gagnée. La série continue, préparez-vous pour la prochaine partie."
   },
   "playHub": {
     "title": "Jouer",

@@ -21,6 +21,8 @@ export interface TournamentMatch {
   absentPlayerId: string | null;
   startedAt?: string | null;
   completedAt?: string | null;
+  player1GameWins?: number | null;
+  player2GameWins?: number | null;
 }
 
 export interface TournamentParticipant {
@@ -95,6 +97,7 @@ export interface CreateTournamentInput {
   name: string;
   type: 'simulator';
   format?: 'swiss' | 'elimination' | 'double_elimination';
+  bestOf?: number;
   gameMode: 'classic' | 'sealed' | 'restricted' | 'evolving';
   maxPlayers: number;
   isPublic: boolean;

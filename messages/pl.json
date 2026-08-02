@@ -2806,7 +2806,11 @@
     "sealedRegistrationPending": "Zapis niekompletny: zbuduj talię",
     "privateOnlyNotice": "Twój turniej jest prywatny: udostępnij kod dostępu wybranym graczom.",
     "deleteTournamentConfirmAction": "Potwierdź usunięcie",
-    "excludedNoDeck": "Wykluczony: brak ważnej talii"
+    "excludedNoDeck": "Wykluczony: brak ważnej talii",
+    "bestOfThree": "Do 2 zwycięstw",
+    "bestOfThreeHint": "Każde starcie to seria: mecz wygrywa pierwszy gracz z 2 zwycięstwami.",
+    "seriesScore": "Seria {p1}-{p2}",
+    "seriesNextGame": "Partia wygrana. Seria trwa, przygotuj się do następnej gry."
   },
   "game": {
     "turn": "Tura {turn}",

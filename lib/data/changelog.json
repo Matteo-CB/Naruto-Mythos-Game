@@ -5,13 +5,19 @@
       "title_fr": "Inscription immédiate",
       "title_en": "Instant sign up",
       "categories": [
+        "feature",
+        "fix",
         "feature"
       ],
       "changes_fr": [
-        "La création de compte ne demande plus de code reçu par email : le compte fonctionne immédiatement."
+        "La création de compte ne demande plus de code reçu par email : le compte fonctionne immédiatement.",
+        "Zaku Abumi et Kin Tsuchi appliquent leur effet immédiatement : l adversaire reçoit son chakra ou sa pioche sans avoir à cliquer.",
+        "Nouveau mode au meilleur des 3 pour les tournois : chaque affrontement se rejoue jusqu à 2 victoires, avec le score de la série affiché sur le match."
       ],
       "changes_en": [
-        "Creating an account no longer asks for an email code: the account works right away."
+        "Creating an account no longer asks for an email code: the account works right away.",
+        "Zaku Abumi and Kin Tsuchi apply their effect immediately: the opponent receives the chakra or the draw without having to click.",
+        "New best of 3 mode for tournaments: each pairing is replayed up to 2 wins, with the series score shown on the match."
       ]
     },
     {

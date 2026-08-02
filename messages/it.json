@@ -2806,7 +2806,11 @@
     "sealedRegistrationPending": "Iscrizione incompleta: costruisci il tuo mazzo",
     "privateOnlyNotice": "Il tuo torneo è privato: condividi il codice di accesso con i giocatori che vuoi.",
     "deleteTournamentConfirmAction": "Conferma l’eliminazione",
-    "excludedNoDeck": "Escluso: nessun mazzo valido"
+    "excludedNoDeck": "Escluso: nessun mazzo valido",
+    "bestOfThree": "Al meglio di 3",
+    "bestOfThreeHint": "Ogni scontro si gioca in serie: il primo giocatore a 2 vittorie vince il match.",
+    "seriesScore": "Serie {p1}-{p2}",
+    "seriesNextGame": "Partita vinta. La serie continua, preparati per la prossima."
   },
   "game": {
     "turn": "Turno {turn}",

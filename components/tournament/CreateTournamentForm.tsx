@@ -30,6 +30,7 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
   const [maxPlayers, setMaxPlayers] = useState(32);
   const [isPublic, setIsPublic] = useState(canCreatePublic);
   const [useBanList, setUseBanList] = useState(true);
+  const [bestOfThree, setBestOfThree] = useState(false);
   const [sealedBoosters, setSealedBoosters] = useState<4 | 5 | 6>(5);
   const [sealedSetChoice, setSealedSetChoice] = useState<string>('random');
   const [allowedLeagues, setAllowedLeagues] = useState<string[]>([]);
@@ -83,6 +84,7 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
         maxPlayers,
         isPublic,
         useBanList,
+        bestOf: bestOfThree ? 3 : 1,
         ...(gameMode === 'sealed' ? { sealedBoosterCount: sealedBoosters, sealedSetChoice } : {}),
         ...(allowedLeagues.length > 0 ? { allowedLeagues } : {}),
         ...(scheduledStartAt ? { scheduledStartAt } : {}),
@@ -421,6 +423,19 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
           style={{ backgroundColor: useBanList ? '#c4a35a' : '#333' }}>
           <span className="absolute top-0.5 h-5 w-5 rounded-full"
             style={{ backgroundColor: '#0a0a0a', left: useBanList ? '22px' : '2px', transition: 'left 150ms ease' }} />
+        </button>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col">
+          <span style={labelStyle}>{t('bestOfThree')}</span>
+          <span className="text-xs" style={{ color: '#666' }}>{t('bestOfThreeHint')}</span>
+        </div>
+        <button type="button" role="switch" aria-checked={bestOfThree} onClick={() => setBestOfThree(!bestOfThree)}
+          className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden cursor-pointer"
+          style={{ backgroundColor: bestOfThree ? '#c4a35a' : '#333' }}>
+          <span className="absolute top-0.5 h-5 w-5 rounded-full"
+            style={{ backgroundColor: '#0a0a0a', left: bestOfThree ? '22px' : '2px', transition: 'left 150ms ease' }} />
         </button>
       </div>
 

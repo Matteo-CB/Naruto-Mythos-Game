@@ -488,6 +488,7 @@ export async function POST(
           data: {
             status: newStatus, winnerId: null, winnerUsername: null,
             roomCode: null, gameId: null, completedAt: null, startedAt: null,
+            player1GameWins: 0, player2GameWins: 0,
             absenceDeadline: null, absentPlayerId: null,
           },
         });

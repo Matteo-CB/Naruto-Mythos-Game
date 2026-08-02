@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       name, gameMode, maxPlayers, isPublic,
-      useBanList, sealedBoosterCount, sealedSetChoice,
+      useBanList, sealedBoosterCount, sealedSetChoice, bestOf,
       bannedCardIds, allowedLeagues, scheduledStartAt,
       
       allowedGroups, bannedGroups, allowedKeywords, bannedKeywords,
@@ -183,6 +183,7 @@ export async function POST(req: NextRequest) {
         creatorUsername: user?.username || 'Unknown',
         requiresDiscord: true,
         useBanList: useBanList !== false,
+        bestOf: bestOf === 3 ? 3 : 1,
         sealedBoosterCount: resolvedGameMode === 'sealed' ? (sealedBoosterCount || 5) : null,
         sealedSetChoice: resolvedGameMode === 'sealed' ? (typeof sealedSetChoice === 'string' && sealedSetChoice.length > 0 ? sealedSetChoice : 'random') : null,
         bannedCardIds: Array.isArray(bannedCardIds) ? bannedCardIds : [],

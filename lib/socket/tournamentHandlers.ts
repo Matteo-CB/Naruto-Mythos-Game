@@ -1310,6 +1310,43 @@ export async function startInitialRoundAbsenceTimers(io: Server, tournamentId: s
   }
 }
 
+async function advanceSeriesToNextGame(
+  io: Server,
+  tournamentId: string,
+  match: { id: string; roomCode: string | null; player1Id: string | null; player2Id: string | null },
+  player1GameWins: number,
+  player2GameWins: number,
+): Promise<void> {
+  const matchId = match.id;
+  for (const code of [match.roomCode, `T-${matchId.slice(-6)}`]) {
+    if (!code) continue;
+    const stale = rooms.get(code);
+    if (!stale) continue;
+    clearTournamentInviteTimer(stale);
+    clearAllMatchRoomTimers(stale);
+    rooms.delete(code);
+  }
+
+  await prisma.tournamentMatch.update({
+    where: { id: matchId },
+    data: { status: 'ready', roomCode: null, gameId: null, startedAt: null, absenceDeadline: null, absentPlayerId: null },
+  });
+  matchGraceCycles.delete(matchId);
+  matchReadyPlayers.delete(matchId);
+  matchNoContestCount.delete(matchId);
+
+  logMatchEvent({ type: 'match.series.continue', tournamentId, matchId });
+  io.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
+    matchId, status: 'ready', roomCode: null, player1GameWins, player2GameWins,
+  });
+  io.to(`tournament:${tournamentId}`).emit('tournament:please-confirm-ready', { matchId, tournamentId });
+  if (match.player1Id) emitToUser(match.player1Id, 'tournament:please-confirm-ready', { matchId, tournamentId });
+  if (match.player2Id) emitToUser(match.player2Id, 'tournament:please-confirm-ready', { matchId, tournamentId });
+  if (match.player1Id && match.player2Id) {
+    await armReadyMatchAbsence(io, tournamentId, matchId, match.player1Id, match.player2Id);
+  }
+}
+
 export async function handleTournamentMatchEnd(io: Server, tournamentId: string, matchId: string, winnerId: string, gameId: string | null) {
   try {
     const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
@@ -1320,6 +1357,30 @@ export async function handleTournamentMatchEnd(io: Server, tournamentId: string,
     }
     clearAbsenceTimer(matchId);
     matchReadyPlayers.delete(matchId);
+
+    const seriesMeta = await prisma.tournament.findUnique({ where: { id: tournamentId }, select: { bestOf: true } });
+    const bestOf = seriesMeta?.bestOf ?? 1;
+    if (bestOf > 1 && match.status !== 'in_progress') {
+      console.log(`[Tournament] series game report ignored for ${matchId}: match is ${match.status}, only a running game may score`);
+      return;
+    }
+    if (bestOf > 1 && match.player1Id && match.player2Id && !match.isBye) {
+      const target = Math.floor(bestOf / 2) + 1;
+      const player1GameWins = (match.player1GameWins ?? 0) + (winnerId === match.player1Id ? 1 : 0);
+      const player2GameWins = (match.player2GameWins ?? 0) + (winnerId === match.player2Id ? 1 : 0);
+      await prisma.tournamentMatch.update({
+        where: { id: matchId },
+        data: { player1GameWins, player2GameWins },
+      });
+      logMatchEvent({ type: 'match.series.game', tournamentId, matchId, winnerId });
+
+      if (player1GameWins < target && player2GameWins < target) {
+        console.log(`[Tournament] match ${matchId} series continues at ${player1GameWins}-${player2GameWins} (best of ${bestOf})`);
+        await advanceSeriesToNextGame(io, tournamentId, match, player1GameWins, player2GameWins);
+        return;
+      }
+      console.log(`[Tournament] match ${matchId} series decided ${player1GameWins}-${player2GameWins} (best of ${bestOf})`);
+    }
 
     const winnerUsername = match.player1Id === winnerId ? match.player1Username : match.player2Username;
     const loserId = match.player1Id === winnerId ? match.player2Id : match.player1Id;

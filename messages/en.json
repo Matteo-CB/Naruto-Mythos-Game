@@ -3079,7 +3079,11 @@
     "sealedRegistrationPending": "Registration incomplete: build your deck",
     "privateOnlyNotice": "Your tournament is private: share its join code with the players you want.",
     "deleteTournamentConfirmAction": "Confirm the deletion",
-    "excludedNoDeck": "Excluded: no valid deck"
+    "excludedNoDeck": "Excluded: no valid deck",
+    "bestOfThree": "Best of 3",
+    "bestOfThreeHint": "Each pairing is played as a series: first player to win 2 games takes the match.",
+    "seriesScore": "Series {p1}-{p2}",
+    "seriesNextGame": "Game won. The series continues, get ready for the next game."
   },
   "playHub": {
     "title": "Play",
