@@ -22,7 +22,7 @@ import { TournamentResults } from '@/components/tournament/TournamentResults';
 import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
 import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
 import { useTournamentStore } from '@/stores/tournamentStore';
-import { useSocketStore } from '@/lib/socket/client';
+import { useSocketStore, armReadiedMatch, isMatchReadied } from '@/lib/socket/client';
 import { selectCurrentMatchForUser } from '@/lib/tournament/matchSelection';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { TournamentMatch, TournamentData } from '@/stores/tournamentStore';
@@ -139,7 +139,6 @@ export default function TournamentDetailPage() {
     const onRefresh = () => { fetchTournament(tournamentId); };
     const onPleaseConfirm = (d: { matchId: string }) => {
       if (!userId || !d?.matchId) return;
-      socket.emit('tournament:ready', { tournamentId, matchId: d.matchId, userId });
       fetchTournament(tournamentId);
     };
     const onConnect = () => {
@@ -257,7 +256,10 @@ export default function TournamentDetailPage() {
     if (!socket || !tournamentId || !userId || !myMatchId) return;
     if (myMatchRoom && myMatchStatus === 'in_progress') return;
     if (myMatchStatus !== 'ready' && myMatchStatus !== 'pending') return;
-    const emitReady = () => socket.emit('tournament:ready', { tournamentId, matchId: myMatchId, userId });
+    const emitReady = () => {
+      if (!isMatchReadied(myMatchId)) return;
+      socket.emit('tournament:ready', { tournamentId, matchId: myMatchId, userId });
+    };
     emitReady();
     const id = setInterval(emitReady, 4000);
     return () => clearInterval(id);
@@ -277,6 +279,7 @@ export default function TournamentDetailPage() {
 
   const handlePlayMatch = useCallback(() => {
     if (!socket || !tournamentId || !userId || !myMatch) return;
+    armReadiedMatch(myMatch.id);
     socket.emit('tournament:ready', { tournamentId, matchId: myMatch.id, userId });
     
     setTimeout(() => fetchTournament(tournamentId), 1000);

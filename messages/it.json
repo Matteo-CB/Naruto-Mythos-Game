@@ -63,6 +63,8 @@
       "POPV": "Pop V",
       "CHIBI": "Chibi",
       "CHIBIV": "Chibi V",
+      "SHINOBI": "Shinobi",
+      "SHINOBIV": "Shinobi V",
       "MMS": "Missione"
     },
     "raritySuffix": {
@@ -81,6 +83,8 @@
       "POPV": "Variante Pop",
       "CHIBI": "Chibi",
       "CHIBIV": "Variante Chibi",
+      "SHINOBI": "Shinobi",
+      "SHINOBIV": "Shinobi Variante",
       "MMS": "Missione"
     },
     "holo": "Holo"
@@ -1820,7 +1824,8 @@
       "invalidCardId": "ID carta non valido.",
       "invalidMissionId": "ID missione non valido.",
       "maxDecksReached": "Hai raggiunto il numero massimo di mazzi (50).",
-      "variantLocked": "Questa variante è bloccata. Sbloccala da un booster di varianti, dalle Ricompense o da un torneo."
+      "variantLocked": "Questa variante è bloccata. Sbloccala da un booster di varianti, dalle Ricompense o da un torneo.",
+      "duplicateMissionArtwork": "Un mazzo può contenere una sola illustrazione della stessa missione."
     },
     "hoverToPreview": "Passa il mouse su una carta per vederne i dettagli",
     "sortByCost": "Ordina per Costo",
@@ -2807,10 +2812,15 @@
     "privateOnlyNotice": "Il tuo torneo è privato: condividi il codice di accesso con i giocatori che vuoi.",
     "deleteTournamentConfirmAction": "Conferma l’eliminazione",
     "excludedNoDeck": "Escluso: nessun mazzo valido",
-    "bestOfThree": "Al meglio di 3",
+    "bestOfThree": "BO3",
     "bestOfThreeHint": "Ogni scontro si gioca in serie: il primo giocatore a 2 vittorie vince il match.",
     "seriesScore": "Serie {p1}-{p2}",
-    "seriesNextGame": "Partita vinta. La serie continua, preparati per la prossima."
+    "seriesNextGame": "Partita vinta. La serie continua, preparati per la prossima.",
+    "readyPrompt": {
+      "title": "Il tuo match è pronto",
+      "hint": "Prenditi un momento, la partita inizia quando entrambi i giocatori sono pronti.",
+      "ready": "Pronto"
+    }
   },
   "game": {
     "turn": "Turno {turn}",
@@ -3058,7 +3068,14 @@
         "ss078Draw": "{card}: ha pagato 1 Chakra per pescare 1 carta.",
         "ss089Move": "{card}: il collegamento è stato spostato su {target}.",
         "ss117Chakra": "{card}: ha guadagnato 1 Chakra per aver spostato personaggi nemici.",
-        "ss046DrawNames": "{card}: rivela {revealed} e poi pesca {target}."
+        "ss046DrawNames": "{card}: rivela {revealed} e poi pesca {target}.",
+        "ssMss01Powerup": "{card}: POWERUP 2 su {target}, un nome che nessun altro personaggio ha qui.",
+        "ssMss02Looked": "{card}: è stato guardato un personaggio nascosto ({target}).",
+        "ssMss06Ambush": "{card}: AMBUSH POWERUP 2 su {target}.",
+        "ssMss09ForcedDraw": "{card}: l’avversario deve pescare una carta.",
+        "ssMss10Discarded": "{card}: {target} è stato scartato.",
+        "ss111ReturnHinata": "{card}: {target} torna dagli scarti alla mano.",
+        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} dopo aver sconfitto {defeated}."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3709,7 +3726,13 @@
         "ss099Hide": "MAIN: Scegli un personaggio Jutsu nemico più debole in questa missione da nascondere.",
         "ss078ConfirmDraw": "MAIN: Pagare 1 Chakra per pescare 1 carta?",
         "ss089ConfirmMain": "MAIN: È stato giocato un Kankuro: spostare questo allegato su un altro personaggio alleato?",
-        "ss089MoveAttachment": "MAIN: Scegli il personaggio alleato che riceve questo allegato."
+        "ss089MoveAttachment": "MAIN: Scegli il personaggio alleato che riceve questo allegato.",
+        "ssMss02LookHidden": "Ricognizione: guarda un personaggio nascosto.",
+        "ssMss02MoveHidden": "Ricognizione: puoi spostare quel personaggio in un’altra missione.",
+        "ssMss10DiscardAttachment": "Sabotaggio: scarta un equipaggiamento in gioco.",
+        "ss111ConfirmDuel": "Rimettere in mano la Hinata Hyuga più in alto negli scarti?",
+        "ss111ConfirmMain": "Giocare un personaggio di nome Hyuga ovunque, pagando 3 in meno?",
+        "ss111PlayHyuga": "Gioca un personaggio di nome Hyuga ovunque, pagando {reduction} in meno."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN"
@@ -3783,7 +3806,9 @@
       "title": "Partita Attiva",
       "description": "Hai una partita in corso. Vuoi rientrare o abbandonarla?",
       "rejoin": "Rientra nella Partita",
-      "abandon": "Abbandona"
+      "abandon": "Abbandona",
+      "pillHint": "Una partita ti aspetta, continua a navigare o rientra.",
+      "dismiss": "Nascondi"
     },
     "edgeToken": "Token Vantaggio",
     "edgeLocked": "Bloccato"

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cardVersionKey } from '@/lib/cards/versionKey';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { computeDeckEvolvingPoints, deckUsesOnlyAllowedSets } from '@/lib/evolving/computePoints';
@@ -98,6 +99,18 @@ export async function POST(request: NextRequest) {
       if (typeof id !== 'string' || !ID_RE.test(id)) {
         return NextResponse.json({ error: 'Invalid mission id', errorKey: 'deckBuilder.error.invalidMissionId' }, { status: 400 });
       }
+    }
+
+    const missionVersions = new Set<string>();
+    for (const id of missionIds) {
+      const version = cardVersionKey(id);
+      if (missionVersions.has(version)) {
+        return NextResponse.json(
+          { error: 'Only one artwork of a mission may be in a deck', errorKey: 'deckBuilder.error.duplicateMissionArtwork' },
+          { status: 400 },
+        );
+      }
+      missionVersions.add(version);
     }
 
     const userDeckCount = await prisma.deck.count({ where: { userId: session.user.id } });

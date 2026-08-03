@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       title,
       description,
       url: `${SITE_URL}/${locale}/play/sealed`,
-      images: [{ url: '/images/og-image.webp', width: 1200, height: 630, alt: title }],
+      images: [{ url: '/images/og-image.webp?v=3', width: 1200, height: 630, alt: title }],
     },
   };
 }

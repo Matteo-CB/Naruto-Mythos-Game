@@ -90,4 +90,80 @@ export const effectDescriptionsEs: Record<string, string[]> = {
     "Une a un personaje aliado no oculto.",
     "[↯] Oculta en esta misión a un personaje Jutsu enemigo con menos Poder que este personaje.",
   ],
+  'SS-001-MMS': [
+    "[⧗] Si juegas un personaje con un nombre distinto al de cualquier otro personaje en esta misión, POWERUP 2 a ese personaje.",
+  ],
+  'SS-001_2-MMS': [
+    "[⧗] Si juegas un personaje con un nombre distinto al de cualquier otro personaje en esta misión, POWERUP 2 a ese personaje.",
+  ],
+  'SS-002-MMS': [
+    "[↯] Mira un personaje oculto y luego puedes moverlo.",
+  ],
+  'SS-002_2-MMS': [
+    "[↯] Mira un personaje oculto y luego puedes moverlo.",
+  ],
+  'SS-003-MMS': [
+    "[⧗] Si tienes exactamente un personaje aliado no oculto en esta misión, tiene +4 de Poder.",
+  ],
+  'SS-003_2-MMS': [
+    "[⧗] Si tienes exactamente un personaje aliado no oculto en esta misión, tiene +4 de Poder.",
+  ],
+  'SS-004-MMS': [
+    "[⧗] Puntúa esta misión dos veces (activando de nuevo los efectos SCORE, si los hay).",
+  ],
+  'SS-004_2-MMS': [
+    "[⧗] Puntúa esta misión dos veces (activando de nuevo los efectos SCORE, si los hay).",
+  ],
+  'SS-005-MMS': [
+    "[⧗] Chakra +2 para el jugador que va perdiendo la misión.",
+  ],
+  'SS-005_2-MMS': [
+    "[⧗] Chakra +2 para el jugador que va perdiendo la misión.",
+  ],
+  'SS-006-MMS': [
+    "[⧗] Todos los personajes de esta misión tienen, tras todas sus demás habilidades, \"AMBUSH ⚡ POWERUP 2\".",
+  ],
+  'SS-006_2-MMS': [
+    "[⧗] Todos los personajes de esta misión tienen, tras todas sus demás habilidades, \"AMBUSH ⚡ POWERUP 2\".",
+  ],
+  'SS-007-MMS': [
+    "[⧗] Antes de determinar el Poder en la fase de Evaluación de Misiones, el personaje con el Poder más alto sin empate en esta misión tiene +3 de Poder.",
+  ],
+  'SS-007_2-MMS': [
+    "[⧗] Antes de determinar el Poder en la fase de Evaluación de Misiones, el personaje con el Poder más alto sin empate en esta misión tiene +3 de Poder.",
+  ],
+  'SS-008-MMS': [
+    "[⧗] Si tienes exactamente 3 personajes aliados no ocultos en esta misión, tienes +5 de Poder total en esta misión.",
+  ],
+  'SS-008_2-MMS': [
+    "[⧗] Si tienes exactamente 3 personajes aliados no ocultos en esta misión, tienes +5 de Poder total en esta misión.",
+  ],
+  'SS-009-MMS': [
+    "[↯] El oponente debe robar una carta.",
+  ],
+  'SS-009_2-MMS': [
+    "[↯] El oponente debe robar una carta.",
+  ],
+  'SS-010-MMS': [
+    "[↯] Descarta un equipamiento en juego.",
+  ],
+  'SS-010_2-MMS': [
+    "[↯] Descarta un equipamiento en juego.",
+  ],
+  'SS-111-SHINOBIV': [
+    "[↯] Neji Hyuga: Devuelve a tu mano la Hinata Hyuga más alta de tu pila de descartes.",
+    "[↯] Juega un personaje llamado Hyuga en cualquier lugar, pagando 3 menos.",
+  ],
+  'SS-112-SHINOBIV': [
+    "[↯] Retira todos los contadores de Poder de un personaje enemigo en esta misión.",
+    "[↯] Hinata Hyuga: Oculta a un personaje enemigo sin contadores de Poder en esta misión.",
+  ],
+  'SS-114-SHINOBIV': [
+    "[↯] Descarta un Gaara de tu mano. Oculta a un personaje enemigo en esta misión con coste igual o inferior al de la carta descartada.",
+    "Rock Lee, efecto MAIN: En su lugar, derrótalo.",
+  ],
+  'SS-115-SHINOBIV': [
+    "[⧗] Este personaje no pierde sus contadores de Poder al final de la ronda.",
+    "[⧗] Gaara: Cuando derrotas a un personaje enemigo, POWERUP 2.",
+  ],
 };

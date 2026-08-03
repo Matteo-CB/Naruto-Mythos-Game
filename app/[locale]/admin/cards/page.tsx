@@ -7,7 +7,7 @@ import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import CardFace from '@/components/cards/CardFace';
-import { getPlayableCharacters, getPlayableAttachments, getPlayableMissions } from '@/lib/data/cardLoader';
+import { getBannableCards } from '@/lib/data/bannableCards';
 import { getCardName } from '@/lib/utils/cardLocale';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
@@ -32,10 +32,7 @@ export default function AdminCardsPage() {
   const [bannedReasons, setBannedReasons] = useState<Map<string, string | null>>(new Map());
 
   const allCards = useMemo(() => {
-    const chars = getPlayableCharacters();
-    const attachments = getPlayableAttachments() as unknown as CharacterCard[];
-    const missions = getPlayableMissions();
-    return [...chars, ...attachments, ...missions] as (CharacterCard | MissionCard)[];
+    return getBannableCards();
   }, []);
 
   const availableSets = useMemo(() => {

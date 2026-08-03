@@ -1,6 +1,7 @@
 import type { GameState, PlayerID, ActiveMission, MissionScoringProgress, ScoreEffectSource, PendingEffect, PendingAction } from '../types';
 import { logSystem, logAction } from '../utils/gameLog';
 import { calculateCharacterPower } from './PowerCalculation';
+import { teamTrainingBonus, missionCarries, SS_MISSION_HIGH_PRIORITY } from '../../effects/missions/ssMissions';
 import { generateInstanceId } from '../utils/id';
 import { EffectEngine } from '../../effects/EffectEngine';
 import { isMovementBlockedByKurenai, applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
@@ -171,7 +172,8 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
   if (winner && winner !== 'draw') {
     const basePts = Number.isFinite(mission.basePoints) ? mission.basePoints : 1;
     const rankPts = Number.isFinite(mission.rankBonus) ? mission.rankBonus : 0;
-    const points = basePts + rankPts;
+    const scoreMultiplier = missionCarries(mission, SS_MISSION_HIGH_PRIORITY) ? 2 : 1;
+    const points = (basePts + rankPts) * scoreMultiplier;
     const ps = { ...newState[winner] };
     const prior = Number.isFinite(ps.missionPoints) ? ps.missionPoints : 0;
     ps.missionPoints = prior + points;
@@ -376,6 +378,26 @@ function resolveScoreEffectsWithProgress(
   rankIndex: number,
 ): GameState {
   const sources = collectScoreEffectSources(state, player, missionIndex);
+  const doubled = missionCarries(state.activeMissions[missionIndex], SS_MISSION_HIGH_PRIORITY);
+  if (doubled && sources.length > 0) {
+    const first = resolveScoreEffectsOnce(state, player, missionIndex, rankIndex, sources);
+    if (first.pendingActions.length > 0) return first;
+    const secondSources = collectScoreEffectSources(
+      { ...first, missionScoringProgress: undefined }, player, missionIndex,
+    );
+    if (secondSources.length === 0) return first;
+    return resolveScoreEffectsOnce(first, player, missionIndex, rankIndex, secondSources);
+  }
+  return resolveScoreEffectsOnce(state, player, missionIndex, rankIndex, sources);
+}
+
+function resolveScoreEffectsOnce(
+  state: GameState,
+  player: PlayerID,
+  missionIndex: number,
+  rankIndex: number,
+  sources: ScoreEffectSource[],
+): GameState {
 
   if (sources.length === 0) {
     return state;
@@ -759,5 +781,5 @@ function calculateMissionPower(
     totalPower += calculateCharacterPower(state, char, player);
   }
 
-  return totalPower;
+  return totalPower + teamTrainingBonus(mission, player);
 }

@@ -63,6 +63,8 @@
       "POPV": "Pop V",
       "CHIBI": "Chibi",
       "CHIBIV": "Chibi V",
+      "SHINOBI": "Shinobi",
+      "SHINOBIV": "Shinobi V",
       "MMS": "Missão"
     },
     "raritySuffix": {
@@ -81,6 +83,8 @@
       "POPV": "Variante Pop",
       "CHIBI": "Chibi",
       "CHIBIV": "Variante Chibi",
+      "SHINOBI": "Shinobi",
+      "SHINOBIV": "Shinobi Variante",
       "MMS": "Missão"
     },
     "holo": "Holo"
@@ -1820,7 +1824,8 @@
       "invalidCardId": "ID de carta inválido.",
       "invalidMissionId": "ID de missão inválido.",
       "maxDecksReached": "Você atingiu o número máximo de decks (50).",
-      "variantLocked": "Esta variante está bloqueada. Desbloqueie-a em um booster de variantes, nas Recompensas ou em um torneio."
+      "variantLocked": "Esta variante está bloqueada. Desbloqueie-a em um booster de variantes, nas Recompensas ou em um torneio.",
+      "duplicateMissionArtwork": "Só uma ilustração da mesma missão pode estar num baralho."
     },
     "hoverToPreview": "Passe o mouse sobre uma carta para ver seus detalhes",
     "sortByCost": "Ordenar por Custo",
@@ -2807,10 +2812,15 @@
     "privateOnlyNotice": "O teu torneio é privado: partilha o código de entrada com os jogadores que quiseres.",
     "deleteTournamentConfirmAction": "Confirmar a exclusão",
     "excludedNoDeck": "Excluído: sem baralho válido",
-    "bestOfThree": "Melhor de 3",
+    "bestOfThree": "MD3",
     "bestOfThreeHint": "Cada confronto é jogado em série: o primeiro jogador com 2 vitórias vence a partida.",
     "seriesScore": "Série {p1}-{p2}",
-    "seriesNextGame": "Jogo ganho. A série continua, prepare-se para o próximo."
+    "seriesNextGame": "Jogo ganho. A série continua, prepare-se para o próximo.",
+    "readyPrompt": {
+      "title": "A sua partida está pronta",
+      "hint": "Respire fundo, o jogo começa quando os dois jogadores estiverem prontos.",
+      "ready": "Pronto"
+    }
   },
   "game": {
     "turn": "Turno {turn}",
@@ -3058,7 +3068,14 @@
         "ss078Draw": "{card}: pagou 1 Chakra para comprar 1 carta.",
         "ss089Move": "{card}: o anexo foi movido para {target}.",
         "ss117Chakra": "{card}: ganhou 1 Chakra por mover personagens inimigos.",
-        "ss046DrawNames": "{card}: revelou {revealed} e depois comprou {target}."
+        "ss046DrawNames": "{card}: revelou {revealed} e depois comprou {target}.",
+        "ssMss01Powerup": "{card}: POWERUP 2 em {target}, um nome que mais nenhuma personagem tem aqui.",
+        "ssMss02Looked": "{card}: uma personagem escondida foi vista ({target}).",
+        "ssMss06Ambush": "{card}: AMBUSH POWERUP 2 em {target}.",
+        "ssMss09ForcedDraw": "{card}: o oponente tem de comprar uma carta.",
+        "ssMss10Discarded": "{card}: {target} foi descartado.",
+        "ss111ReturnHinata": "{card}: {target} volta do descarte para a mão.",
+        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} depois de derrotar {defeated}."
       },
       "score": {
         "draw": "[SCORE] {card}: Comprou {count} carta(s).",
@@ -3709,7 +3726,13 @@
         "ss099Hide": "MAIN: Escolha um personagem Jutsu inimigo mais fraco nesta missão para ocultar.",
         "ss078ConfirmDraw": "MAIN: Pagar 1 Chakra para comprar 1 carta?",
         "ss089ConfirmMain": "MAIN: Um Kankuro foi jogado: mover este anexo para outro personagem aliado?",
-        "ss089MoveAttachment": "MAIN: Escolha o personagem aliado que recebe este anexo."
+        "ss089MoveAttachment": "MAIN: Escolha o personagem aliado que recebe este anexo.",
+        "ssMss02LookHidden": "Reconhecimento: vê uma personagem escondida.",
+        "ssMss02MoveHidden": "Reconhecimento: podes mover essa personagem para outra missão.",
+        "ssMss10DiscardAttachment": "Sabotagem: descarta um equipamento em jogo.",
+        "ss111ConfirmDuel": "Devolver à mão a Hinata Hyuga mais acima na tua pilha de descarte?",
+        "ss111ConfirmMain": "Jogar uma personagem chamada Hyuga em qualquer lugar, pagando menos 3?",
+        "ss111PlayHyuga": "Joga uma personagem chamada Hyuga em qualquer lugar, pagando menos {reduction}."
       },
       "upgradeModifierConfirm": "Aplicar o efeito UPGRADE",
       "upgradeModifierDecline": "Manter apenas o efeito MAIN"
@@ -3783,7 +3806,9 @@
       "title": "Jogo Ativo",
       "description": "Você tem um jogo em andamento. Deseja voltar a ele ou abandoná-lo?",
       "rejoin": "Voltar ao Jogo",
-      "abandon": "Abandonar"
+      "abandon": "Abandonar",
+      "pillHint": "Um jogo espera por você, continue navegando ou volte a ele.",
+      "dismiss": "Ocultar"
     },
     "edgeToken": "Ficha de Vantagem",
     "edgeLocked": "Bloqueado"

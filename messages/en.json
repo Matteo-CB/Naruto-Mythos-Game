@@ -243,6 +243,8 @@
       "POPV": "Pop V",
       "CHIBI": "Chibi",
       "CHIBIV": "Chibi V",
+      "SHINOBI": "Shinobi",
+      "SHINOBIV": "Shinobi V",
       "MMS": "Mission"
     },
     "raritySuffix": {
@@ -261,6 +263,8 @@
       "POPV": "Pop Variant",
       "CHIBI": "Chibi",
       "CHIBIV": "Chibi Variant",
+      "SHINOBI": "Shinobi",
+      "SHINOBIV": "Shinobi Variant",
       "MMS": "Mission"
     },
     "holo": "Holo"
@@ -985,7 +989,14 @@
         "ss078Draw": "{card}: paid 1 Chakra to draw 1 card.",
         "ss089Move": "{card}: the attachment moved to {target}.",
         "ss117Chakra": "{card}: gained 1 Chakra for moving enemy characters.",
-        "ss046DrawNames": "{card}: revealed {revealed} then drew {target}."
+        "ss046DrawNames": "{card}: revealed {revealed} then drew {target}.",
+        "ssMss01Powerup": "{card}: POWERUP 2 on {target}, a name no other character holds here.",
+        "ssMss02Looked": "{card}: looked at a hidden character ({target}).",
+        "ssMss06Ambush": "{card}: AMBUSH POWERUP 2 on {target}.",
+        "ssMss09ForcedDraw": "{card}: the opponent must draw a card.",
+        "ssMss10Discarded": "{card}: {target} was discarded.",
+        "ss111ReturnHinata": "{card}: {target} returns from the discard pile to hand.",
+        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} after defeating {defeated}."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -1636,7 +1647,13 @@
         "ss099Hide": "MAIN: Choose a weaker enemy Jutsu character in this mission to hide.",
         "ss078ConfirmDraw": "MAIN: Pay 1 Chakra to draw 1 card?",
         "ss089ConfirmMain": "MAIN: A Kankuro was played: move this attachment to another friendly character?",
-        "ss089MoveAttachment": "MAIN: Choose the friendly character to move this attachment to."
+        "ss089MoveAttachment": "MAIN: Choose the friendly character to move this attachment to.",
+        "ssMss02LookHidden": "Reconnaissance: look at a hidden character.",
+        "ssMss02MoveHidden": "Reconnaissance: you may move that character to another mission.",
+        "ssMss10DiscardAttachment": "Sabotage: discard an attachment in play.",
+        "ss111ConfirmDuel": "Take back the topmost Hinata Hyuga from your discard pile?",
+        "ss111ConfirmMain": "Play a Hyuga-named character anywhere, paying 3 less?",
+        "ss111PlayHyuga": "Play a Hyuga-named character anywhere, paying {reduction} less."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only"
@@ -1710,7 +1727,9 @@
       "title": "Active Game",
       "description": "You have an ongoing game. Would you like to rejoin or abandon it?",
       "rejoin": "Rejoin Game",
-      "abandon": "Abandon"
+      "abandon": "Abandon",
+      "pillHint": "A game is waiting for you, keep browsing or jump back in.",
+      "dismiss": "Hide"
     },
     "edgeToken": "Edge Token",
     "edgeLocked": "Locked"
@@ -1912,7 +1931,8 @@
       "invalidCardId": "Invalid card id.",
       "invalidMissionId": "Invalid mission id.",
       "maxDecksReached": "You have reached the maximum number of decks (50).",
-      "variantLocked": "This variant is locked. Unlock it from a variant booster, the Rewards or a tournament."
+      "variantLocked": "This variant is locked. Unlock it from a variant booster, the Rewards or a tournament.",
+      "duplicateMissionArtwork": "Only one artwork of a mission may be in a deck."
     },
     "hoverToPreview": "Hover over a card to see its details",
     "sortByCost": "Sort by Cost",
@@ -3080,10 +3100,15 @@
     "privateOnlyNotice": "Your tournament is private: share its join code with the players you want.",
     "deleteTournamentConfirmAction": "Confirm the deletion",
     "excludedNoDeck": "Excluded: no valid deck",
-    "bestOfThree": "Best of 3",
+    "bestOfThree": "Best of 3 (BO3)",
     "bestOfThreeHint": "Each pairing is played as a series: first player to win 2 games takes the match.",
     "seriesScore": "Series {p1}-{p2}",
-    "seriesNextGame": "Game won. The series continues, get ready for the next game."
+    "seriesNextGame": "Game won. The series continues, get ready for the next game.",
+    "readyPrompt": {
+      "title": "Your match is ready",
+      "hint": "Take a breath, the game starts when both players are ready.",
+      "ready": "Ready"
+    }
   },
   "playHub": {
     "title": "Play",

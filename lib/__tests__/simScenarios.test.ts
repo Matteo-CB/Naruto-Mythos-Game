@@ -117,6 +117,41 @@ describe('card effect simulations (verified through the real engine)', () => {
           }
           case 'KS-010-MMS':
             return states.some((s) => s.turn === 3 && s.player1.chakra === 7 && s.player2.chakra === 6);
+          case 'SS-001-MMS':
+          case 'SS-001_2-MMS':
+            return states.some((s) => s.activeMissions[0].player1Characters.some((c) => c.card.id === 'KS-086-C' && c.powerTokens >= 2));
+          case 'SS-002-MMS':
+          case 'SS-002_2-MMS':
+            return states.some((s) => s.activeMissions[1].player2Characters.some((c) => c.instanceId === 'sim-hid-enemy'))
+              || states.some((s) => s.log.some((l) => l.messageKey === 'game.log.effect.ssMss02Looked'));
+          case 'SS-003-MMS':
+          case 'SS-003_2-MMS': {
+            const solo = last.activeMissions[0].player1Characters[0];
+            return !!solo && calc(last, solo) >= 5;
+          }
+          case 'SS-004-MMS':
+          case 'SS-004_2-MMS':
+            return states.some((s) => s.player1.missionPoints === 2);
+          case 'SS-005-MMS':
+          case 'SS-005_2-MMS':
+            return states.some((s) => s.turn === 2 && s.player1.chakra >= 8);
+          case 'SS-006-MMS':
+          case 'SS-006_2-MMS':
+            return states.some((s) => s.activeMissions[0].player1Characters.some((c) => c.instanceId === 'sim-hid-ally' && !c.isHidden && c.powerTokens >= 2));
+          case 'SS-007-MMS':
+          case 'SS-007_2-MMS': {
+            const king = last.activeMissions[0].player1Characters.find((c) => c.card.id === 'KS-009-C');
+            return !!king && calc(last, king) >= 4;
+          }
+          case 'SS-008-MMS':
+          case 'SS-008_2-MMS':
+            return states.some((s) => s.player1.missionPoints > 0);
+          case 'SS-009-MMS':
+          case 'SS-009_2-MMS':
+            return states.some((s) => s.log.some((l) => l.messageKey === 'game.log.effect.ssMss09ForcedDraw'));
+          case 'SS-010-MMS':
+          case 'SS-010_2-MMS':
+            return states.some((s) => s.player1.missionPoints > 0);
           default:
             return false;
         }

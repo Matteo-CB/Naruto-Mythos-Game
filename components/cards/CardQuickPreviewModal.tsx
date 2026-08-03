@@ -21,7 +21,7 @@ const RARITY_COLORS: Record<Rarity, string> = {
   C: '#888888', UC: '#4a9e4a', R: '#4a7ab5', RA: '#8a5ab5',
   S: '#c4a35a', SV: '#c4a35a', M: '#b33e3e', MV: '#b33e3e', L: '#c4a35a',
   SP: '#22b8cf', SPV: '#22b8cf', POP: '#cc4f96', POPV: '#cc4f96',
-  CHIBI: '#2f9e8f', CHIBIV: '#2f9e8f', MMS: '#5a8ab5',
+  CHIBI: '#2f9e8f', CHIBIV: '#2f9e8f', SHINOBI: '#d97706', SHINOBIV: '#d97706', MMS: '#5a8ab5',
 };
 
 const EFFECT_TYPE_TEXT_COLOR: Record<string, string> = {

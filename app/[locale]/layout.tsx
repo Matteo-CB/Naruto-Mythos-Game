@@ -112,7 +112,7 @@ export default async function LocaleLayout({ children, params }: Props) {
     name: 'Naruto Mythos TCG',
     description: tSeo('videoGameDescription'),
     url: `${SITE_URL}/${locale}`,
-    image: `${SITE_URL}/images/og-image.webp`,
+    image: `${SITE_URL}/images/og-image.webp?v=3`,
     genre: ['Card Game', 'Strategy Game', 'Collectible Card Game'],
     gamePlatform: ['Web Browser', 'Desktop', 'Mobile'],
     numberOfPlayers: {

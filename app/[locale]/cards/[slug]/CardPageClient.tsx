@@ -47,7 +47,7 @@ const RARITY_COLORS: Record<Rarity, string> = {
   C: '#9ca3af', UC: '#22c55e', R: '#3b82f6', RA: '#a855f7',
   S: '#eab308', SV: '#eab308', M: '#ef4444', MV: '#ef4444', L: '#eab308',
   SP: '#06b6d4', SPV: '#06b6d4', POP: '#e84393', POPV: '#e84393',
-  CHIBI: '#10b981', CHIBIV: '#10b981', MMS: '#5a8ab5',
+  CHIBI: '#10b981', CHIBIV: '#10b981', SHINOBI: '#d97706', SHINOBIV: '#d97706', MMS: '#5a8ab5',
 };
 
 function Chevron({ dir }: { dir: 'left' | 'right' }) {

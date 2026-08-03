@@ -29,6 +29,8 @@ const RARITY_COLORS: Record<Rarity, string> = {
   POPV: '#e84393',
   CHIBI: '#10b981',
   CHIBIV: '#10b981',
+  SHINOBI: '#d97706',
+  SHINOBIV: '#d97706',
   MMS: '#6b7280',
 };
 

@@ -86,4 +86,80 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "Dołącz do sojuszniczej nieukrytej postaci.",
     "[↯] Ukryj na tej misji wrogą postać Jutsu o Sile mniejszej niż ta postać.",
   ],
+  'SS-001-MMS': [
+    "[⧗] Jeśli zagrasz postać o nazwie innej niż każda inna postać w tej misji, POWERUP 2 tę postać.",
+  ],
+  'SS-001_2-MMS': [
+    "[⧗] Jeśli zagrasz postać o nazwie innej niż każda inna postać w tej misji, POWERUP 2 tę postać.",
+  ],
+  'SS-002-MMS': [
+    "[↯] Zobacz zakrytą postać, a następnie możesz ją przenieść.",
+  ],
+  'SS-002_2-MMS': [
+    "[↯] Zobacz zakrytą postać, a następnie możesz ją przenieść.",
+  ],
+  'SS-003-MMS': [
+    "[⧗] Jeśli masz dokładnie jedną odkrytą sojuszniczą postać w tej misji, ma ona +4 Mocy.",
+  ],
+  'SS-003_2-MMS': [
+    "[⧗] Jeśli masz dokładnie jedną odkrytą sojuszniczą postać w tej misji, ma ona +4 Mocy.",
+  ],
+  'SS-004-MMS': [
+    "[⧗] Zalicz tę misję dwa razy (ponownie aktywując efekty SCORE, jeśli są).",
+  ],
+  'SS-004_2-MMS': [
+    "[⧗] Zalicz tę misję dwa razy (ponownie aktywując efekty SCORE, jeśli są).",
+  ],
+  'SS-005-MMS': [
+    "[⧗] Czakra +2 dla gracza, który przegrywa tę misję.",
+  ],
+  'SS-005_2-MMS': [
+    "[⧗] Czakra +2 dla gracza, który przegrywa tę misję.",
+  ],
+  'SS-006-MMS': [
+    "[⧗] Wszystkie postacie w tej misji mają, po wszystkich swoich innych zdolnościach, \"AMBUSH ⚡ POWERUP 2\".",
+  ],
+  'SS-006_2-MMS': [
+    "[⧗] Wszystkie postacie w tej misji mają, po wszystkich swoich innych zdolnościach, \"AMBUSH ⚡ POWERUP 2\".",
+  ],
+  'SS-007-MMS': [
+    "[⧗] Przed ustaleniem Mocy w fazie Oceny Misji postać o najwyższej Mocy bez remisu w tej misji ma +3 Mocy.",
+  ],
+  'SS-007_2-MMS': [
+    "[⧗] Przed ustaleniem Mocy w fazie Oceny Misji postać o najwyższej Mocy bez remisu w tej misji ma +3 Mocy.",
+  ],
+  'SS-008-MMS': [
+    "[⧗] Jeśli masz dokładnie 3 odkryte sojusznicze postacie w tej misji, masz +5 łącznej Mocy w tej misji.",
+  ],
+  'SS-008_2-MMS': [
+    "[⧗] Jeśli masz dokładnie 3 odkryte sojusznicze postacie w tej misji, masz +5 łącznej Mocy w tej misji.",
+  ],
+  'SS-009-MMS': [
+    "[↯] Przeciwnik musi dobrać kartę.",
+  ],
+  'SS-009_2-MMS': [
+    "[↯] Przeciwnik musi dobrać kartę.",
+  ],
+  'SS-010-MMS': [
+    "[↯] Odrzuć jedno wyposażenie na stole.",
+  ],
+  'SS-010_2-MMS': [
+    "[↯] Odrzuć jedno wyposażenie na stole.",
+  ],
+  'SS-111-SHINOBIV': [
+    "[↯] Neji Hyuga: Weź do ręki najwyżej leżącą Hinatę Hyugę ze swojego stosu odrzuconych.",
+    "[↯] Zagraj postać o nazwie Hyuga w dowolnym miejscu, płacąc 3 mniej.",
+  ],
+  'SS-112-SHINOBIV': [
+    "[↯] Usuń wszystkie żetony Siły z wrogiej postaci na tej misji.",
+    "[↯] Hinata Hyuga: Ukryj wrogą postać bez żetonów Siły na tej misji.",
+  ],
+  'SS-114-SHINOBIV': [
+    "[↯] Odrzuć Gaarę ze swojej ręki. Ukryj wrogą postać na tej misji o koszcie równym lub niższym od kosztu odrzuconej karty.",
+    "Rock Lee, efekt MAIN: Zamiast tego pokonaj ją.",
+  ],
+  'SS-115-SHINOBIV': [
+    "[⧗] Ta postać nie traci żetonów Mocy na koniec rundy.",
+    "[⧗] Gaara: Gdy pokonasz wrogą postać, POWERUP 2.",
+  ],
 };

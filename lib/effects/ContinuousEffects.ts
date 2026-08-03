@@ -1,4 +1,5 @@
-import type { GameState, PlayerID, CharacterInPlay, PendingAction } from '../engine/types';
+import type { GameState, PlayerID, CharacterInPlay, PendingAction, ActiveMission } from '../engine/types';
+import { honorableDuelBonus, kingOfTheHillBonus, missionCarries, teamTrainingBonus, playedNameIsUniqueInMission, SS_MISSION_ADVERSE_TERRAIN, SS_MISSION_NEW_FORCES } from './missions/ssMissions';
 import { generateInstanceId } from '../engine/utils/id';
 import { logAction } from '../engine/utils/gameLog';
 
@@ -86,8 +87,25 @@ export function calculateContinuousChakraBonus(
 }
 
 
+function adverseTerrainChakraBonus(
+  state: GameState,
+  mission: ActiveMission,
+  missionIndex: number,
+  player: PlayerID,
+): number {
+  if (!missionCarries(mission, SS_MISSION_ADVERSE_TERRAIN)) return 0;
+  const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
+  const own = missionPowerFor(state, missionIndex, player);
+  const other = missionPowerFor(state, missionIndex, opponent);
+  return own < other ? 2 : 0;
+}
+
 export function calculateMissionChakraBonus(state: GameState, player: PlayerID): number {
   let bonus = 0;
+
+  for (let missionIndex = 0; missionIndex < state.activeMissions.length; missionIndex++) {
+    bonus += adverseTerrainChakraBonus(state, state.activeMissions[missionIndex], missionIndex, player);
+  }
 
   for (const mission of state.activeMissions) {
     for (const effect of mission.card.effects ?? []) {
@@ -372,6 +390,9 @@ export function calculateContinuousPowerModifier(
   
   
   
+  modifier += honorableDuelBonus(mission, player, char);
+  modifier += kingOfTheHillBonus(state, mission, char, attachedPowerOf);
+
   for (const mEffect of mission.card.effects ?? []) {
     if (mEffect.type !== 'MAIN' || !mEffect.description.includes('[⧗]')) continue;
 
@@ -452,9 +473,9 @@ export function shouldRetainPowerTokens(char: CharacterInPlay): boolean {
   const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
   
-  if ((topCard.set === 'KS' && topCard.number === 39) || (topCard.set === 'KS' && topCard.number === 43)) {
+  if ((topCard.set === 'KS' && (topCard.number === 39 || topCard.number === 43)) || (topCard.set === 'SS' && topCard.number === 115)) {
     const hasRetention = (topCard.effects ?? []).some(
-      (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('doesn\'t lose Power tokens'),
+      (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('lose Power tokens'),
     );
     if (hasRetention) {
       return true;
@@ -581,12 +602,53 @@ export function isMovementBlockedByKurenai(
 
 
 
+function applyNewForcesPowerup(
+  state: GameState,
+  player: PlayerID,
+  missionIndex: number,
+  playedInstanceId?: string,
+): GameState {
+  if (!playedInstanceId) return state;
+  const mission = state.activeMissions[missionIndex];
+  if (!missionCarries(mission, SS_MISSION_NEW_FORCES)) return state;
+  if (!playedNameIsUniqueInMission(mission, playedInstanceId)) return state;
+
+  const side: 'player1Characters' | 'player2Characters' =
+    mission.player1Characters.some((c) => c.instanceId === playedInstanceId)
+      ? 'player1Characters'
+      : 'player2Characters';
+
+  const played = mission[side].find((c) => c.instanceId === playedInstanceId);
+  if (!played) return state;
+  const top = played.stack?.length > 0 ? played.stack[played.stack.length - 1] : played.card;
+
+  const missions = state.activeMissions.map((m, idx) => {
+    if (idx !== missionIndex) return m;
+    return {
+      ...m,
+      [side]: m[side].map((c: CharacterInPlay) =>
+        c.instanceId === playedInstanceId ? { ...c, powerTokens: c.powerTokens + 2 } : c,
+      ),
+    };
+  });
+
+  return {
+    ...state,
+    activeMissions: missions,
+    log: logAction(state.log, state.turn, state.phase, player, 'EFFECT_CONTINUOUS',
+      `New Forces (SS-001): POWERUP 2 on ${top.name_fr}, a name no other character holds here.`,
+      'game.log.effect.ssMss01Powerup',
+      { card: 'Renforts', id: 'SS-001-MMS', target: top.name_fr }),
+  };
+}
+
 export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID, missionIndex: number, _isReveal?: boolean, playedInstanceId?: string): GameState {
   
   
 
   let newState = { ...state };
   newState = triggerCrow089Relocation(newState, playingPlayer, playedInstanceId);
+  newState = applyNewForcesPowerup(newState, playingPlayer, missionIndex, playedInstanceId);
   const opponent: PlayerID = playingPlayer === 'player1' ? 'player2' : 'player1';
   const mission = newState.activeMissions[missionIndex];
   const opponentChars = opponent === 'player1' ? mission.player1Characters : mission.player2Characters;
@@ -850,4 +912,17 @@ function triggerCrow089Relocation(state: GameState, playingPlayer: PlayerID, pla
       sourceEffectId: effId,
     }],
   };
+}
+
+export function missionPowerFor(state: GameState, missionIndex: number, player: PlayerID): number {
+  const mission = state.activeMissions[missionIndex];
+  if (!mission) return 0;
+  const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+  let total = 0;
+  for (const char of chars) {
+    const top = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const base = char.isHidden ? 0 : (top?.power ?? 0);
+    total += base + char.powerTokens + calculateContinuousPowerModifier(state, player, missionIndex, char);
+  }
+  return total + teamTrainingBonus(mission, player);
 }

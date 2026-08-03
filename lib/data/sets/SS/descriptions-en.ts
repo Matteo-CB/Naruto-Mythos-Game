@@ -87,4 +87,80 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "Attach to a friendly non-hidden character.",
     "[↯] Hide an enemy Jutsu character in this mission with less Power than this character.",
   ],
+  'SS-001-MMS': [
+    "[⧗] If you play a character with a different name than any other character in this mission, POWERUP 2 that character.",
+  ],
+  'SS-001_2-MMS': [
+    "[⧗] If you play a character with a different name than any other character in this mission, POWERUP 2 that character.",
+  ],
+  'SS-002-MMS': [
+    "[↯] Look at a hidden character and then you may move them.",
+  ],
+  'SS-002_2-MMS': [
+    "[↯] Look at a hidden character and then you may move them.",
+  ],
+  'SS-003-MMS': [
+    "[⧗] If you have exactly one non-hidden friendly character in this mission, they have +4 Power.",
+  ],
+  'SS-003_2-MMS': [
+    "[⧗] If you have exactly one non-hidden friendly character in this mission, they have +4 Power.",
+  ],
+  'SS-004-MMS': [
+    "[⧗] Score this mission twice (activating SCORE effects again, if any).",
+  ],
+  'SS-004_2-MMS': [
+    "[⧗] Score this mission twice (activating SCORE effects again, if any).",
+  ],
+  'SS-005-MMS': [
+    "[⧗] Chakra +2 for the player currently losing the mission.",
+  ],
+  'SS-005_2-MMS': [
+    "[⧗] Chakra +2 for the player currently losing the mission.",
+  ],
+  'SS-006-MMS': [
+    "[⧗] All characters in this mission have, after all their other abilities, \"AMBUSH ⚡ POWERUP 2\".",
+  ],
+  'SS-006_2-MMS': [
+    "[⧗] All characters in this mission have, after all their other abilities, \"AMBUSH ⚡ POWERUP 2\".",
+  ],
+  'SS-007-MMS': [
+    "[⧗] Before determining Power in the Mission Evaluation phase, the character with the unique highest Power in this mission has +3 Power.",
+  ],
+  'SS-007_2-MMS': [
+    "[⧗] Before determining Power in the Mission Evaluation phase, the character with the unique highest Power in this mission has +3 Power.",
+  ],
+  'SS-008-MMS': [
+    "[⧗] If you have exactly 3 non-hidden friendly characters in this mission, you have +5 total Power in this mission.",
+  ],
+  'SS-008_2-MMS': [
+    "[⧗] If you have exactly 3 non-hidden friendly characters in this mission, you have +5 total Power in this mission.",
+  ],
+  'SS-009-MMS': [
+    "[↯] The opponent must draw a card.",
+  ],
+  'SS-009_2-MMS': [
+    "[↯] The opponent must draw a card.",
+  ],
+  'SS-010-MMS': [
+    "[↯] Discard an attachment in play.",
+  ],
+  'SS-010_2-MMS': [
+    "[↯] Discard an attachment in play.",
+  ],
+  'SS-111-SHINOBIV': [
+    "[↯] Neji Hyuga: Return the topmost Hinata Hyuga from your discard pile to your hand.",
+    "[↯] Play a Hyuga-named character anywhere, paying 3 less.",
+  ],
+  'SS-112-SHINOBIV': [
+    "[↯] Remove all Power tokens from an enemy character in this mission.",
+    "[↯] Hinata Hyuga: Hide an enemy character without Power tokens in this mission.",
+  ],
+  'SS-114-SHINOBIV': [
+    "[↯] Discard a Gaara from your hand. Hide an enemy character in this mission with cost equal to or lower than the discarded card cost.",
+    "Rock Lee, MAIN effect: Instead, defeat them.",
+  ],
+  'SS-115-SHINOBIV': [
+    "[⧗] This character doesn't lose Power tokens at the end of the round.",
+    "[⧗] Gaara: When you defeat an enemy character, POWERUP 2.",
+  ],
 };

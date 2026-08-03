@@ -7,7 +7,7 @@ export type MissionRank = 'D' | 'C' | 'B' | 'A';
 export type EffectType = 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE' | 'DUEL' | 'ATTACH' | 'FIRST_STRIKE';
 
 export type FirstStrikeStatus = 'available' | 'used' | 'expired';
-export type Rarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'SP' | 'SPV' | 'POP' | 'POPV' | 'CHIBI' | 'CHIBIV' | 'MMS';
+export type Rarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'SP' | 'SPV' | 'POP' | 'POPV' | 'CHIBI' | 'CHIBIV' | 'SHINOBI' | 'SHINOBIV' | 'MMS';
 
 
 

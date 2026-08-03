@@ -37,6 +37,7 @@ import { sanitizeUnrevealedForViewer, stateHasUnrevealed } from '@/lib/socket/sa
 import { getHiddenCardIds } from '@/lib/cards/reveal';
 import { unrankedModeKey } from '@/lib/stats/modeKey';
 import { isStaticRankedBanned } from '@/lib/data/rankedBans';
+import { cardVersionKey } from '@/lib/cards/versionKey';
 import { emitQuestEvent } from '@/lib/quests/hooks';
 import { emitDrawDiffEvents, emitTokenDiffEvents } from '@/lib/quests/engineEmit';
 import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
@@ -3609,6 +3610,16 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (data.characters.length < 30 || data.characters.length > 200 || data.missions.length !== 3) {
         socket.emit('room:error', { message: 'Invalid deck size', errorKey: 'game.error.invalidDeck' });
         return;
+      }
+      const submittedMissionVersions = new Set<string>();
+      for (const mission of data.missions) {
+        if (!mission || typeof mission.id !== 'string') continue;
+        const version = cardVersionKey(mission.id);
+        if (submittedMissionVersions.has(version)) {
+          socket.emit('room:error', { message: 'Only one artwork of a mission may be in a deck', errorKey: 'deckBuilder.error.duplicateMissionArtwork' });
+          return;
+        }
+        submittedMissionVersions.add(version);
       }
 
       if ((room.isRanked || room.gameMode === 'ranked') && !room.tournamentId) {

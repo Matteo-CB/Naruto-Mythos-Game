@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   languages['x-default'] = `${SITE_URL}/${routing.defaultLocale}/cards/${slug}`;
 
   const img = cardImagePath(card);
-  const image = img ? `${SITE_URL}${img}` : `${SITE_URL}/images/og-image.webp`;
+  const image = img ? `${SITE_URL}${img}` : `${SITE_URL}/images/og-image.webp?v=3`;
 
   return {
     title,

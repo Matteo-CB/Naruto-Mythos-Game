@@ -243,6 +243,8 @@
       "POPV": "Pop V",
       "CHIBI": "Chibi",
       "CHIBIV": "Chibi V",
+      "SHINOBI": "Shinobi",
+      "SHINOBIV": "Shinobi V",
       "MMS": "Mission"
     },
     "raritySuffix": {
@@ -261,6 +263,8 @@
       "POPV": "Pop Variante",
       "CHIBI": "Chibi",
       "CHIBIV": "Chibi Variante",
+      "SHINOBI": "Shinobi",
+      "SHINOBIV": "Shinobi Variante",
       "MMS": "Mission"
     },
     "holo": "Holo"
@@ -991,7 +995,14 @@
         "ss078Draw": "{card} : 1 Chakra payé pour piocher 1 carte.",
         "ss089Move": "{card} : l’attachement a été déplacé sur {target}.",
         "ss117Chakra": "{card} : 1 Chakra gagné pour avoir déplacé des personnages ennemis.",
-        "ss046DrawNames": "{card} : {revealed} révélée(s), puis {target} piochée."
+        "ss046DrawNames": "{card} : {revealed} révélée(s), puis {target} piochée.",
+        "ssMss01Powerup": "{card} : POWERUP 2 sur {target}, un nom qu’aucun autre personnage ne porte ici.",
+        "ssMss02Looked": "{card} : un personnage caché a été regardé ({target}).",
+        "ssMss06Ambush": "{card} : AMBUSH POWERUP 2 sur {target}.",
+        "ssMss09ForcedDraw": "{card} : l’adversaire doit piocher une carte.",
+        "ssMss10Discarded": "{card} : {target} a été défaussé.",
+        "ss111ReturnHinata": "{card} : {target} revient de la défausse à la main.",
+        "ss115PowerupOnDefeat": "{card} : POWERUP {amount} après avoir battu {defeated}."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1642,7 +1653,13 @@
         "ss099Hide": "MAIN : Choisissez un personnage Jutsu ennemi plus faible dans cette mission à cacher.",
         "ss078ConfirmDraw": "MAIN : Payer 1 Chakra pour piocher 1 carte ?",
         "ss089ConfirmMain": "MAIN : Un Kankuro a été joué : déplacer cet attachement sur un autre personnage allié ?",
-        "ss089MoveAttachment": "MAIN : Choisissez le personnage allié qui reçoit cet attachement."
+        "ss089MoveAttachment": "MAIN : Choisissez le personnage allié qui reçoit cet attachement.",
+        "ssMss02LookHidden": "Reconnaissance : regardez un personnage caché.",
+        "ssMss02MoveHidden": "Reconnaissance : vous pouvez déplacer ce personnage vers une autre mission.",
+        "ssMss10DiscardAttachment": "Sabotage : défaussez un équipement en jeu.",
+        "ss111ConfirmDuel": "Reprendre en main la Hinata Hyûga la plus haute de votre défausse ?",
+        "ss111ConfirmMain": "Jouer un personnage nommé Hyûga n’importe où, en payant 3 de moins ?",
+        "ss111PlayHyuga": "Jouez un personnage nommé Hyûga n’importe où, en payant {reduction} de moins."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul"
@@ -1716,7 +1733,9 @@
       "title": "Partie en cours",
       "description": "Vous avez une partie en cours. Voulez-vous la rejoindre ou l'abandonner ?",
       "rejoin": "Rejoindre",
-      "abandon": "Abandonner"
+      "abandon": "Abandonner",
+      "pillHint": "Une partie vous attend, continuez à naviguer ou reprenez-la.",
+      "dismiss": "Masquer"
     },
     "edgeToken": "Jeton Edge",
     "edgeLocked": "Verrouillé"
@@ -1918,7 +1937,8 @@
       "invalidCardId": "ID de carte invalide.",
       "invalidMissionId": "ID de mission invalide.",
       "maxDecksReached": "Vous avez atteint le nombre maximum de decks (50).",
-      "variantLocked": "Cette variante est verrouillée. Débloque-la dans un booster variantes, les Récompenses ou un tournoi."
+      "variantLocked": "Cette variante est verrouillée. Débloque-la dans un booster variantes, les Récompenses ou un tournoi.",
+      "duplicateMissionArtwork": "Une seule illustration d'une même mission peut figurer dans un deck."
     },
     "hoverToPreview": "Survolez une carte pour voir ses détails",
     "sortByCost": "Trier par coût",
@@ -3086,10 +3106,15 @@
     "privateOnlyNotice": "Ton tournoi est privé : partage son code d’accès aux joueurs de ton choix.",
     "deleteTournamentConfirmAction": "Confirmer la suppression",
     "excludedNoDeck": "Exclu : aucun deck valide",
-    "bestOfThree": "Au meilleur des 3",
+    "bestOfThree": "BO3",
     "bestOfThreeHint": "Chaque affrontement se joue en série : le premier joueur à 2 victoires remporte le match.",
     "seriesScore": "Série {p1}-{p2}",
-    "seriesNextGame": "Manche gagnée. La série continue, préparez-vous pour la prochaine partie."
+    "seriesNextGame": "Manche gagnée. La série continue, préparez-vous pour la prochaine partie.",
+    "readyPrompt": {
+      "title": "Votre match est prêt",
+      "hint": "Prenez votre temps, la partie démarre quand les deux joueurs sont prêts.",
+      "ready": "Prêt"
+    }
   },
   "playHub": {
     "title": "Jouer",

@@ -4,7 +4,7 @@ import { getSetNumber, isSetAvailable } from '@/lib/data/sets/registry';
 
 const RARITY_ORDER = [
   'C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L',
-  'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV', 'MMS',
+  'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV', 'SHINOBI', 'SHINOBIV', 'MMS',
 ];
 
 function rarityRank(rarity: string): number {

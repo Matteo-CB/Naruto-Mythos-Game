@@ -8,7 +8,7 @@ import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import CardFace from '@/components/cards/CardFace';
-import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoader';
+import { getBannableCards } from '@/lib/data/bannableCards';
 import { getCardName } from '@/lib/utils/cardLocale';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
@@ -82,9 +82,7 @@ export default function AdminPage() {
   }, [isAdmin, session]);
 
   const allCards = useMemo(() => {
-    const chars = getPlayableCharacters();
-    const missions = getPlayableMissions();
-    return [...chars, ...missions] as (CharacterCard | MissionCard)[];
+    return getBannableCards();
   }, []);
 
   

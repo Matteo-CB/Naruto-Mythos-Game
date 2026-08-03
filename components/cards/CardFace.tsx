@@ -27,7 +27,9 @@ const RARITY_COLORS: Record<Rarity, string> = {
   POP: '#e84393',     // magenta (Pop)
   POPV: '#e84393',    // magenta (Pop Variant)
   CHIBI: '#10b981',   // emerald (Chibi)
-  CHIBIV: '#10b981',  // emerald (Chibi Variant)
+  CHIBIV: '#10b981',
+  SHINOBI: '#d97706',
+  SHINOBIV: '#d97706',  // emerald (Chibi Variant)
   MMS: '#6b7280',     // gray
 };
 

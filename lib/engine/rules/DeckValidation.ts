@@ -48,6 +48,15 @@ export function validateDeck(
   }
 
   
+  const missionVersions = new Set<string>();
+  for (const card of missionCards) {
+    const version = cardVersionKey(card.id);
+    if (missionVersions.has(version)) {
+      errors.push(`Only one artwork of mission ${version} may be in a deck.`);
+    }
+    missionVersions.add(version);
+  }
+
   for (const card of missionCards) {
     if (!card.has_visual && !card.data_complete) {
       errors.push(`Mission ${card.id} (${card.name_fr}) is not playable (no visual).`);

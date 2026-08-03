@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       title,
       description,
       url: `${SITE_URL}/${locale}/deck-builder`,
-      images: [{ url: '/images/og-image.webp', width: 1200, height: 630, alt: t('ogAlt') }],
+      images: [{ url: '/images/og-image.webp?v=3', width: 1200, height: 630, alt: t('ogAlt') }],
     },
     twitter: {
       card: 'summary_large_image',

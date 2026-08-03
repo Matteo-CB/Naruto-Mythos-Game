@@ -243,6 +243,8 @@
       "POPV": "ポップV",
       "CHIBI": "チビ",
       "CHIBIV": "チビV",
+      "SHINOBI": "忍",
+      "SHINOBIV": "忍V",
       "MMS": "ミッション"
     },
     "raritySuffix": {
@@ -261,6 +263,8 @@
       "POPV": "ポップバリアント",
       "CHIBI": "チビ",
       "CHIBIV": "チビバリアント",
+      "SHINOBI": "忍",
+      "SHINOBIV": "忍バリアント",
       "MMS": "ミッション"
     },
     "holo": "ホロ"
@@ -989,7 +993,14 @@
         "ss078Draw": "{card}：チャクラを1支払いカードを1枚引いた。",
         "ss089Move": "{card}：装備が{target}に移動した。",
         "ss117Chakra": "{card}：敵キャラクターを移動させてチャクラを1得た。",
-        "ss046DrawNames": "{card}：{revealed} を公開し、{target} を引いた。"
+        "ss046DrawNames": "{card}：{revealed} を公開し、{target} を引いた。",
+        "ssMss01Powerup": "{card}：ここに同名がいない{target}をPOWERUP 2。",
+        "ssMss02Looked": "{card}：伏せられたキャラクター（{target}）を見た。",
+        "ssMss06Ambush": "{card}：{target}をAMBUSH POWERUP 2。",
+        "ssMss09ForcedDraw": "{card}：相手はカードを1枚引く。",
+        "ssMss10Discarded": "{card}：{target}を捨てた。",
+        "ss111ReturnHinata": "{card}：{target}が捨て札から手札に戻る。",
+        "ss115PowerupOnDefeat": "{card}：{defeated}を撃破してPOWERUP {amount}。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1640,7 +1651,13 @@
         "ss099Hide": "MAIN：このミッションで伏せる、より弱い敵の術キャラクターを選ぶ。",
         "ss078ConfirmDraw": "MAIN：チャクラを1支払ってカードを1枚引きますか？",
         "ss089ConfirmMain": "MAIN：カンクロウが出された。この装備カードを別の味方キャラクターに移しますか？",
-        "ss089MoveAttachment": "MAIN：この装備カードを移す味方キャラクターを選んでください。"
+        "ss089MoveAttachment": "MAIN：この装備カードを移す味方キャラクターを選んでください。",
+        "ssMss02LookHidden": "偵察：伏せられたキャラクター1体を見る。",
+        "ssMss02MoveHidden": "偵察：そのキャラクターを他のミッションへ移動させてもよい。",
+        "ssMss10DiscardAttachment": "妨害工作：場にある装備カード1枚を捨てる。",
+        "ss111ConfirmDuel": "捨て札の一番上の日向ヒナタを手札に戻しますか？",
+        "ss111ConfirmMain": "日向の名を持つキャラクターを、コストを3少なくしてプレイしますか？",
+        "ss111PlayHyuga": "日向の名を持つキャラクターを、コストを{reduction}少なく支払ってプレイする。"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用"
@@ -1714,7 +1731,9 @@
       "title": "進行中の対戦",
       "description": "進行中の対戦があります。再参加しますか、それとも投了しますか？",
       "rejoin": "対戦に再参加",
-      "abandon": "投了"
+      "abandon": "投了",
+      "pillHint": "対戦が待っています。サイトを見て回るか、ゲームに戻れます。",
+      "dismiss": "閉じる"
     },
     "edgeToken": "主導権トークン",
     "edgeLocked": "固定"
@@ -1916,7 +1935,8 @@
       "invalidCardId": "無効なカードIDです。",
       "invalidMissionId": "無効なミッションIDです。",
       "maxDecksReached": "デッキの上限（50）に達しました。",
-      "variantLocked": "このバリアントはロックされています。バリアントブースター、報酬、またはトーナメントで解除してください。"
+      "variantLocked": "このバリアントはロックされています。バリアントブースター、報酬、またはトーナメントで解除してください。",
+      "duplicateMissionArtwork": "同じミッションのイラストは1種類しかデッキに入れられません。"
     },
     "hoverToPreview": "カードにカーソルを合わせると詳細が表示されます",
     "sortByCost": "コスト順",
@@ -3084,10 +3104,15 @@
     "privateOnlyNotice": "あなたの大会は非公開です。参加コードを招きたいプレイヤーに共有してください。",
     "deleteTournamentConfirmAction": "削除を確定する",
     "excludedNoDeck": "除外：有効なデッキがありません",
-    "bestOfThree": "3本勝負",
+    "bestOfThree": "BO3",
     "bestOfThreeHint": "各対戦はシリーズ形式：先に2勝したプレイヤーがマッチの勝者になります。",
     "seriesScore": "シリーズ {p1}-{p2}",
-    "seriesNextGame": "1ゲーム勝利。シリーズは続きます。次のゲームに備えてください。"
+    "seriesNextGame": "1ゲーム勝利。シリーズは続きます。次のゲームに備えてください。",
+    "readyPrompt": {
+      "title": "マッチの準備ができました",
+      "hint": "一息ついてください。両者が準備完了するとゲームが始まります。",
+      "ready": "準備完了"
+    }
   },
   "playHub": {
     "title": "プレイ",

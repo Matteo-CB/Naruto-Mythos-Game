@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { cookies } from "next/headers";
 import { createTranslator } from "next-intl";
@@ -22,12 +22,6 @@ function pickRootLocale(cookieLocale: string | undefined): string {
 function rootTranslator(locale: string, messages: RootMessages, namespace: string): StringTranslator {
   return createTranslator({ locale, messages, namespace }) as unknown as StringTranslator;
 }
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -97,7 +91,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: t("ogDescription", { cardCount }),
       images: [
         {
-          url: `${SITE_URL}/images/og-image.webp?v=2`,
+          url: `${SITE_URL}/images/og-image.webp?v=3`,
           width: 1200,
           height: 630,
           alt: t("ogImageAlt"),
@@ -109,7 +103,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title: t("twitterTitle"),
       description: t("twitterDescription", { cardCount }),
-      images: [`${SITE_URL}/images/og-image.webp?v=2`],
+      images: [`${SITE_URL}/images/og-image.webp?v=3`],
     },
     icons: {
       icon: [
@@ -144,7 +138,7 @@ export default async function RootLayout({
     <html lang={locale} className="dark" suppressHydrationWarning>
       <head>
         <link rel="preload" href="/fonts/njnaruto-accented.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-        <link rel="preload" href="/fonts/geist-regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/poppins-regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
         <link rel="prefetch" href="/images/cards/KS/rare_art/KS-108-RA.webp" />
@@ -153,7 +147,7 @@ export default async function RootLayout({
         <link rel="preload" href="/images/icons/cloud-6.webp" as="image" type="image/webp" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0a] text-[#e0e0e0] min-h-screen`}
+        className={`${geistMono.variable} antialiased bg-[#0a0a0a] text-[#e0e0e0] min-h-screen`}
       >
         {process.env.NODE_ENV !== 'production' && (
           <script

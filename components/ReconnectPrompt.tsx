@@ -36,36 +36,39 @@ export function ReconnectPrompt() {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.8)', zIndex: Z_APP_MODAL }}>
-      <div
-        className="flex flex-col items-center gap-5 px-8 py-6 rounded-xl max-w-sm w-full mx-4 text-center"
-        style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
-      >
-        <div className="w-12 h-px" style={{ backgroundColor: 'rgba(196, 163, 90, 0.4)' }} />
-        <h2 className="text-base font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+    <div
+      className="fixed bottom-4 right-4 flex items-center gap-3 px-4 py-3"
+      style={{
+        zIndex: Z_APP_MODAL - 1,
+        backgroundColor: '#141414',
+        boxShadow: '0 0 14px rgba(196, 163, 90, 0.22), 0 12px 32px rgba(0,0,0,0.5)',
+        animation: 'pulse-soft 2.4s ease-in-out infinite',
+        maxWidth: 'min(92vw, 22rem)',
+      }}
+    >
+      <div className="flex flex-col min-w-0">
+        <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
           {t('reconnect.title')}
-        </h2>
-        <p className="text-xs leading-relaxed" style={{ color: '#aaa' }}>
-          {t('reconnect.description')}
-        </p>
-        <div className="flex gap-3 w-full">
-          <button
-            onClick={handleReconnect}
-            className="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider cursor-pointer"
-            style={{ backgroundColor: '#3e8b3e', color: '#e0e0e0' }}
-          >
-            {t('reconnect.rejoin')}
-          </button>
-          <button
-            onClick={handleAbandon}
-            className="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider cursor-pointer"
-            style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#b33e3e' }}
-          >
-            {t('reconnect.abandon')}
-          </button>
-        </div>
-        <div className="w-12 h-px" style={{ backgroundColor: 'rgba(196, 163, 90, 0.4)' }} />
+        </span>
+        <span className="text-[11px] leading-snug" style={{ color: '#999' }}>
+          {t('reconnect.pillHint')}
+        </span>
       </div>
+      <button
+        onClick={handleReconnect}
+        className="shrink-0 px-3 py-2 text-xs font-bold uppercase tracking-wider cursor-pointer"
+        style={{ backgroundColor: '#3e8b3e', color: '#e0e0e0' }}
+      >
+        {t('reconnect.rejoin')}
+      </button>
+      <button
+        onClick={handleAbandon}
+        aria-label={t('reconnect.dismiss')}
+        className="shrink-0 px-2 py-2 text-xs cursor-pointer"
+        style={{ backgroundColor: 'transparent', color: '#777' }}
+      >
+        ✕
+      </button>
     </div>
   );
 }

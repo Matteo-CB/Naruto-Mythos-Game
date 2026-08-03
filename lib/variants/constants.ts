@@ -3,9 +3,9 @@ import type { Rarity } from '@/lib/engine/types';
 export const VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L'] as const;
 export type VariantRarity = (typeof VARIANT_RARITIES)[number];
 
-export const SPECIAL_VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L', 'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV'] as const;
+export const SPECIAL_VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L', 'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV', 'SHINOBI', 'SHINOBIV'] as const;
 
-export const LOCKED_VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L', 'SPV', 'POPV', 'CHIBIV'] as const;
+export const LOCKED_VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L', 'SPV', 'POPV', 'CHIBIV', 'SHINOBIV'] as const;
 
 export const FORCE_UNLOCKED_CARD_IDS: ReadonlySet<string> = new Set([
   'SS-112-SPV',
@@ -14,6 +14,10 @@ export const FORCE_UNLOCKED_CARD_IDS: ReadonlySet<string> = new Set([
   'SS-120-CHIBIV',
   'SS-147-POPV',
   'SS-000-L',
+  'SS-111-SHINOBIV',
+  'SS-112-SHINOBIV',
+  'SS-114-SHINOBIV',
+  'SS-115-SHINOBIV',
 ]);
 
 export const VARIANT_PACK_SIZE = 8;

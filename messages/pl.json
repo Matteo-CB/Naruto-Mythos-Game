@@ -63,6 +63,8 @@
       "POPV": "Pop V",
       "CHIBI": "Chibi",
       "CHIBIV": "Chibi V",
+      "SHINOBI": "Shinobi",
+      "SHINOBIV": "Shinobi V",
       "MMS": "Misja"
     },
     "raritySuffix": {
@@ -81,6 +83,8 @@
       "POPV": "Wariant Pop",
       "CHIBI": "Chibi",
       "CHIBIV": "Wariant Chibi",
+      "SHINOBI": "Shinobi",
+      "SHINOBIV": "Shinobi Wariant",
       "MMS": "Misja"
     },
     "holo": "Holo"
@@ -1820,7 +1824,8 @@
       "invalidCardId": "Nieprawidłowe ID karty.",
       "invalidMissionId": "Nieprawidłowe ID misji.",
       "maxDecksReached": "Osiągnąłeś maksymalną liczbę talii (50).",
-      "variantLocked": "Ten wariant jest zablokowany. Odblokuj go z boostera wariantów, z Nagród lub w turnieju."
+      "variantLocked": "Ten wariant jest zablokowany. Odblokuj go z boostera wariantów, z Nagród lub w turnieju.",
+      "duplicateMissionArtwork": "Talia może zawierać tylko jedną ilustrację tej samej misji."
     },
     "hoverToPreview": "Najedź na kartę, aby zobaczyć jej szczegóły",
     "sortByCost": "Sortuj po Koszcie",
@@ -2807,10 +2812,15 @@
     "privateOnlyNotice": "Twój turniej jest prywatny: udostępnij kod dostępu wybranym graczom.",
     "deleteTournamentConfirmAction": "Potwierdź usunięcie",
     "excludedNoDeck": "Wykluczony: brak ważnej talii",
-    "bestOfThree": "Do 2 zwycięstw",
+    "bestOfThree": "BO3",
     "bestOfThreeHint": "Każde starcie to seria: mecz wygrywa pierwszy gracz z 2 zwycięstwami.",
     "seriesScore": "Seria {p1}-{p2}",
-    "seriesNextGame": "Partia wygrana. Seria trwa, przygotuj się do następnej gry."
+    "seriesNextGame": "Partia wygrana. Seria trwa, przygotuj się do następnej gry.",
+    "readyPrompt": {
+      "title": "Twój mecz jest gotowy",
+      "hint": "Złap oddech, gra zacznie się, gdy obaj gracze będą gotowi.",
+      "ready": "Gotowy"
+    }
   },
   "game": {
     "turn": "Tura {turn}",
@@ -3058,7 +3068,14 @@
         "ss078Draw": "{card}: zapłacono 1 Czakry, aby dobrać 1 kartę.",
         "ss089Move": "{card}: dołączenie przeniesiono na {target}.",
         "ss117Chakra": "{card}: zyskano 1 Czakry za przeniesienie wrogich postaci.",
-        "ss046DrawNames": "{card}: odkrywa {revealed}, a następnie dobiera {target}."
+        "ss046DrawNames": "{card}: odkrywa {revealed}, a następnie dobiera {target}.",
+        "ssMss01Powerup": "{card}: POWERUP 2 dla {target}, nazwy której nie ma tu żadna inna postać.",
+        "ssMss02Looked": "{card}: obejrzano zakrytą postać ({target}).",
+        "ssMss06Ambush": "{card}: AMBUSH POWERUP 2 dla {target}.",
+        "ssMss09ForcedDraw": "{card}: przeciwnik musi dobrać kartę.",
+        "ssMss10Discarded": "{card}: {target} zostało odrzucone.",
+        "ss111ReturnHinata": "{card}: {target} wraca ze stosu odrzuconych do ręki.",
+        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} po pokonaniu {defeated}."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3709,7 +3726,13 @@
         "ss099Hide": "MAIN: Wybierz słabszą wrogą postać Jutsu na tej misji do ukrycia.",
         "ss078ConfirmDraw": "MAIN: Zapłacić 1 Czakry, aby dobrać 1 kartę?",
         "ss089ConfirmMain": "MAIN: Zagrano Kankuro: przenieść ten dodatek na inną sojuszniczą postać?",
-        "ss089MoveAttachment": "MAIN: Wybierz sojuszniczą postać, która otrzyma ten dodatek."
+        "ss089MoveAttachment": "MAIN: Wybierz sojuszniczą postać, która otrzyma ten dodatek.",
+        "ssMss02LookHidden": "Zwiad: zobacz zakrytą postać.",
+        "ssMss02MoveHidden": "Zwiad: możesz przenieść tę postać do innej misji.",
+        "ssMss10DiscardAttachment": "Sabotaż: odrzuć wyposażenie na stole.",
+        "ss111ConfirmDuel": "Wziąć do ręki najwyżej leżącą Hinatę Hyugę ze stosu odrzuconych?",
+        "ss111ConfirmMain": "Zagrać postać o nazwie Hyuga w dowolnym miejscu, płacąc 3 mniej?",
+        "ss111PlayHyuga": "Zagraj postać o nazwie Hyuga w dowolnym miejscu, płacąc {reduction} mniej."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN"
@@ -3783,7 +3806,9 @@
       "title": "Aktywna Gra",
       "description": "Masz trwającą grę. Chcesz do niej wrócić czy ją porzucić?",
       "rejoin": "Wróć do Gry",
-      "abandon": "Porzuć"
+      "abandon": "Porzuć",
+      "pillHint": "Gra na ciebie czeka, przeglądaj dalej lub wróć do niej.",
+      "dismiss": "Ukryj"
     },
     "edgeToken": "Żeton Przewagi",
     "edgeLocked": "Zablokowany"

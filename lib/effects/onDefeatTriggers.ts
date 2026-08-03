@@ -1,6 +1,7 @@
 import type { GameState, PlayerID, CharacterInPlay, PendingAction } from '../engine/types';
 import { generateInstanceId } from '../engine/utils/id';
 import { logAction } from '../engine/utils/gameLog';
+import { isDuelConditionMet } from './duelUtils';
 
 
 export function triggerOnDefeatEffects(
@@ -46,6 +47,37 @@ export function triggerOnDefeatEffects(
           }
         }
 
+
+        if (topCard.set === 'SS' && topCard.number === 115 && controllingPlayer !== defeatedCharOwner) {
+          const rockLeeDuel = (topCard.effects ?? []).find(
+            (e) => e.type === 'DUEL' && e.description.includes('[⧗]'),
+          );
+          if (rockLeeDuel && isDuelConditionMet(newState, char.missionIndex, rockLeeDuel.description)) {
+            const missions = newState.activeMissions.map((m, idx) => {
+              if (idx !== char.missionIndex) return m;
+              return {
+                ...m,
+                [side]: m[side].map((c: CharacterInPlay) =>
+                  c.instanceId === char.instanceId ? { ...c, powerTokens: c.powerTokens + 2 } : c,
+                ),
+              };
+            });
+            newState = {
+              ...newState,
+              activeMissions: missions,
+              log: logAction(
+                newState.log,
+                newState.turn,
+                newState.phase,
+                controllingPlayer,
+                'EFFECT_ON_DEFEAT',
+                `Rock Lee (SS-115): POWERUP 2 after defeating ${defeatedChar.card.name_fr}.`,
+                'game.log.effect.ss115PowerupOnDefeat',
+                { card: 'ROCK LEE', id: 'SS-115-SHINOBIV', amount: 2, defeated: defeatedChar.card.name_fr },
+              ),
+            };
+          }
+        }
         
         if ((topCard.set === 'KS' && topCard.number === 136)) {
           const hasEffect = (topCard.effects ?? []).some(

@@ -58,7 +58,7 @@ function StatBadges({ card, costLabel, powerLabel }: { card: AnyCard; costLabel:
   );
 }
 
-const RARITY_ORDER: Rarity[] = ['C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L', 'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV', 'MMS'];
+const RARITY_ORDER: Rarity[] = ['C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L', 'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV', 'SHINOBI', 'SHINOBIV', 'MMS'];
 export default function CollectionPage() {
   const t = useTranslations();
   const locale = useLocale();

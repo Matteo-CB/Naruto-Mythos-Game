@@ -6,10 +6,14 @@ import {
   type HiddenCharTarget,
 } from '@/lib/effects/handlers/KS/shared/summonSearch';
 
-export type PlayLessCategory = { kind: 'group' | 'keyword'; value: string };
+export type PlayLessCategory = { kind: 'group' | 'keyword' | 'name'; value: string };
 
 export function predicateForCategory(cat: PlayLessCategory): (card: CardData) => boolean {
   if (cat.kind === 'group') return (c) => (c.group ?? '') === cat.value;
+  if (cat.kind === 'name') {
+    const wanted = cat.value.toUpperCase();
+    return (c) => `${c.name_fr ?? ''} ${c.name_en ?? ''}`.toUpperCase().includes(wanted);
+  }
   return (c) => (c.keywords ?? []).includes(cat.value);
 }
 

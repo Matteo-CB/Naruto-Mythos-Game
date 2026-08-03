@@ -1,4 +1,4 @@
-﻿import type { GameState, PlayerID, CharacterInPlay, EffectType, PendingEffect, PendingAction, CardData } from '../engine/types';
+﻿import type { GameState, PlayerID, CharacterInPlay, CharacterCard, EffectType, PendingEffect, PendingAction, CardData, AttachedCard } from '../engine/types';
 import type { EffectContext, EffectResult } from './EffectTypes';
 import { getEffectHandler } from './EffectRegistry';
 import { deepClone } from '../engine/utils/deepClone';
@@ -17,7 +17,10 @@ import { characterHasGroup } from './groupUtils';
 import { postMoveHide as choji018PostMoveHide } from './handlers/KS/uncommon/choji018';
 import { buildPlayLessTargets, type PlayLessCategory } from './handlers/shared/playLess';
 import { ss000DeckHounds, ss000FinalizeSearch, ss000HoundChoicePayload, SS000_NINJA_HOUND } from './handlers/SS/ss000Search';
-import { attachCardToCharacter, discardAttachmentsOnLeave } from './attachments';
+import { topmostHinataIndexInDiscard } from './handlers/SS/shinobi';
+import { missionCarries, SS_MISSION_LOW_PROFILE } from './missions/ssMissions';
+import { hiddenCharactersInPlay, attachmentsInPlay } from './handlers/SS/missions/ssMissionHandlers';
+import { attachCardToCharacter, discardAttachmentsOnLeave, discardAttachments } from './attachments';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
@@ -150,6 +153,55 @@ function isAmbushLinkedUpgrade(description: string): boolean {
   );
 }
 
+
+function applyLowProfileAmbush(state: GameState, player: PlayerID, instanceId: string): GameState {
+  const located = EffectEngine.findCharByInstanceId(state, instanceId);
+  if (!located) return state;
+  const mission = state.activeMissions[located.missionIndex];
+  if (!missionCarries(mission, SS_MISSION_LOW_PROFILE)) return state;
+  if (located.character.isHidden) return state;
+
+  const side = state.activeMissions[located.missionIndex].player1Characters.some((c) => c.instanceId === instanceId)
+    ? 'player1Characters'
+    : 'player2Characters';
+
+  const missions = state.activeMissions.map((m, idx) => {
+    if (idx !== located.missionIndex) return m;
+    return {
+      ...m,
+      [side]: m[side].map((c: CharacterInPlay) =>
+        c.instanceId === instanceId ? { ...c, powerTokens: c.powerTokens + 2 } : c,
+      ),
+    };
+  });
+
+  const top = located.character.stack?.length > 0
+    ? located.character.stack[located.character.stack.length - 1]
+    : located.character.card;
+
+  return {
+    ...state,
+    activeMissions: missions,
+    log: logAction(state.log, state.turn, state.phase, player, 'EFFECT_CONTINUOUS',
+      `Keep a Low Profile (SS-006): AMBUSH POWERUP 2 on ${top.name_fr}.`,
+      'game.log.effect.ssMss06Ambush',
+      { card: 'Faire profil bas', id: 'SS-006-MMS', target: top.name_fr }),
+  };
+}
+
+function isFirstStrikeArmed(
+  state: GameState,
+  player: PlayerID,
+  character: CharacterInPlay,
+  topCard: CharacterCard | undefined,
+  isOwnPlayAction: boolean,
+): boolean {
+  if (!isOwnPlayAction || !topCard) return false;
+  if (character.isHidden) return false;
+  if (!(topCard.effects ?? []).some((e: { type: string }) => e.type === 'FIRST_STRIKE')) return false;
+  if (!isFirstCardPlayedThisRound(state, player)) return false;
+  return !!getEffectHandler(topCard.id, 'FIRST_STRIKE' as EffectType);
+}
 
 export class EffectEngine {
   
@@ -307,6 +359,7 @@ export class EffectEngine {
     player: PlayerID,
     character: CharacterInPlay,
     missionIndex: number,
+    isOwnPlayAction = false,
   ): GameState {
     let newState = deepClone(state);
     const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;
@@ -315,8 +368,8 @@ export class EffectEngine {
       newState = triggerOnPlayReactions(newState, player, missionIndex, true, character.instanceId);
     }
 
-    
-    
+
+
     const relevantTypes = new Set<string>(['MAIN', 'UPGRADE', 'AMBUSH']);
     const orderedTypes: EffectType[] = [];
     for (const effect of (topCard.effects ?? [])) {
@@ -327,6 +380,11 @@ export class EffectEngine {
 
     if (!orderedTypes.includes('DUEL') && hasResolvableInstantDuel(newState, missionIndex, topCard.effects)) {
       orderedTypes.push('DUEL');
+    }
+
+    if (isFirstStrikeArmed(newState, player, character, topCard, isOwnPlayAction)) {
+      orderedTypes.push('FIRST_STRIKE' as EffectType);
+      newState = withFirstStrikeStatus(newState, player, 'used');
     }
 
 
@@ -389,10 +447,15 @@ export class EffectEngine {
     player: PlayerID,
     character: CharacterInPlay,
     missionIndex: number,
+    isOwnPlayAction = false,
   ): GameState {
     let newState = deepClone(state);
 
     const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;
+
+    const firstStrikeArmed = isFirstStrikeArmed(newState, player, character, topCard, isOwnPlayAction);
+    if (firstStrikeArmed) newState = withFirstStrikeStatus(newState, player, 'used');
+    const firstStrikeTail: EffectType[] = firstStrikeArmed ? ['FIRST_STRIKE' as EffectType] : [];
 
     const hasInstantEffectReveal = (topCard.effects ?? []).some((e) =>
       (e.type === 'MAIN' || e.type === 'AMBUSH' || e.type === 'UPGRADE') && !e.description.includes('[⧗]'),
@@ -436,6 +499,7 @@ export class EffectEngine {
             const hasAmbushEffect = (topCard.effects ?? []).some((e) => e.type === 'AMBUSH');
             if (hasAmbushEffect) remainingEffectTypes.push('AMBUSH');
             if (hasResolvableInstantDuel(result.state, missionIndex, topCard.effects)) remainingEffectTypes.push('DUEL');
+            remainingEffectTypes.push(...firstStrikeTail);
 
 
             newState = EffectEngine.createPendingTargetSelection(
@@ -472,6 +536,7 @@ export class EffectEngine {
 
             const ambushRemaining: EffectType[] = [];
             if (hasResolvableInstantDuel(result.state, missionIndex, topCard.effects)) ambushRemaining.push('DUEL');
+            ambushRemaining.push(...firstStrikeTail);
 
             newState = EffectEngine.createPendingTargetSelection(
               result.state, player, character, missionIndex, 'AMBUSH', false,
@@ -505,7 +570,7 @@ export class EffectEngine {
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
             newState = EffectEngine.createPendingTargetSelection(
               result.state, player, charResult?.character ?? character, charResult?.missionIndex ?? missionIndex, 'DUEL', false,
-              result, [], true,
+              result, [...firstStrikeTail], true,
             );
             return newState;
           }
@@ -515,6 +580,15 @@ export class EffectEngine {
         }
       }
     }
+
+    if (firstStrikeArmed) {
+      const fsChar = EffectEngine.findCharByInstanceId(newState, character.instanceId);
+      if (fsChar) {
+        newState = EffectEngine.resolveFirstStrikeEffect(newState, player, fsChar.character, fsChar.missionIndex);
+      }
+    }
+
+    newState = applyLowProfileAmbush(newState, player, character.instanceId);
 
     return newState;
   }
@@ -6211,6 +6285,226 @@ export class EffectEngine {
           descriptionParams: { reduction: 3 },
           options: ss6.targets, minSelections: 1, maxSelections: 1, sourceEffectId: ss6EffId,
         }];
+        break;
+      }
+
+      case 'SSMSS02_CONFIRM_SCORE': {
+        const m2cPlayer = pendingEffect.sourcePlayer;
+        const m2cHidden = hiddenCharactersInPlay(newState);
+        if (m2cHidden.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, m2cPlayer,
+            'SCORE_NO_TARGET', 'Reconnaissance (SS-002): No hidden character in play (state changed).',
+            'game.log.effect.noTarget', { card: 'Reconnaissance', id: 'SS-002-MMS' });
+          break;
+        }
+        const m2cEffId = generateInstanceId();
+        const m2cActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: m2cEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: 'Reconnaissance (SS-002): look at a hidden character.',
+          targetSelectionType: 'SSMSS02_LOOK_HIDDEN',
+          sourcePlayer: m2cPlayer, requiresTargetSelection: true,
+          validTargets: m2cHidden, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: m2cActId, type: 'SELECT_TARGET' as PendingAction['type'], player: m2cPlayer,
+          description: 'Reconnaissance (SS-002): look at a hidden character.',
+          descriptionKey: 'game.effect.desc.ssMss02LookHidden',
+          options: m2cHidden, minSelections: 1, maxSelections: 1, sourceEffectId: m2cEffId,
+        }];
+        break;
+      }
+
+      case 'SSMSS10_CONFIRM_SCORE': {
+        const m10cPlayer = pendingEffect.sourcePlayer;
+        const m10cAttachments = attachmentsInPlay(newState).map((a) => a.attachmentId);
+        if (m10cAttachments.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, m10cPlayer,
+            'SCORE_NO_TARGET', 'Sabotage (SS-010): No attachment in play (state changed).',
+            'game.log.effect.noTarget', { card: 'Sabotage', id: 'SS-010-MMS' });
+          break;
+        }
+        const m10cEffId = generateInstanceId();
+        const m10cActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: m10cEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: 'Sabotage (SS-010): discard an attachment in play.',
+          targetSelectionType: 'SSMSS10_DISCARD_ATTACHMENT',
+          sourcePlayer: m10cPlayer, requiresTargetSelection: true,
+          validTargets: m10cAttachments, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: m10cActId, type: 'SELECT_TARGET' as PendingAction['type'], player: m10cPlayer,
+          description: 'Sabotage (SS-010): discard an attachment in play.',
+          descriptionKey: 'game.effect.desc.ssMss10DiscardAttachment',
+          options: m10cAttachments, minSelections: 1, maxSelections: 1, sourceEffectId: m10cEffId,
+        }];
+        break;
+      }
+
+      case 'SSMSS02_LOOK_HIDDEN': {
+        const m2Player = pendingEffect.sourcePlayer;
+        if (!targetId) break;
+        const m2Located = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!m2Located) break;
+        const m2Top = m2Located.character.stack?.length > 0
+          ? m2Located.character.stack[m2Located.character.stack.length - 1]
+          : m2Located.character.card;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, m2Player,
+          'SCORE_LOOK_HIDDEN',
+          `Reconnaissance (SS-002): looked at a hidden character (${m2Top.name_fr}).`,
+          'game.log.effect.ssMss02Looked',
+          { card: 'Reconnaissance', id: 'SS-002-MMS', target: m2Top.name_fr });
+
+        const m2Destinations: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (i !== m2Located.missionIndex) m2Destinations.push(String(i));
+        }
+        if (m2Destinations.length === 0) break;
+
+        const m2EffId = generateInstanceId();
+        const m2ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: m2EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: targetId,
+          sourceMissionIndex: m2Located.missionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: 'Reconnaissance (SS-002): you may move the character you looked at.',
+          targetSelectionType: 'SSMSS02_MOVE_HIDDEN',
+          sourcePlayer: m2Player, requiresTargetSelection: true,
+          validTargets: m2Destinations, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: m2ActId, type: 'SELECT_MISSION' as PendingAction['type'], player: m2Player,
+          description: 'Reconnaissance (SS-002): you may move that character to another mission.',
+          descriptionKey: 'game.effect.desc.ssMss02MoveHidden',
+          options: m2Destinations, minSelections: 1, maxSelections: 1, sourceEffectId: m2EffId,
+        }];
+        break;
+      }
+
+      case 'SSMSS02_MOVE_HIDDEN': {
+        if (!targetId) break;
+        const m2mDestination = parseInt(targetId, 10);
+        if (Number.isNaN(m2mDestination)) break;
+        newState = EffectEngine.moveCharToMissionDirectPublic(
+          newState, pendingEffect.sourceInstanceId, m2mDestination,
+          pendingEffect.sourcePlayer, 'Reconnaissance', 'SS-002-MMS',
+        );
+        break;
+      }
+
+      case 'SSMSS10_DISCARD_ATTACHMENT': {
+        const m10Player = pendingEffect.sourcePlayer;
+        if (!targetId) break;
+        let m10Removed: AttachedCard | null = null;
+        const m10Missions = newState.activeMissions.map((mission) => {
+          const strip = (chars: CharacterInPlay[]): CharacterInPlay[] => chars.map((c) => {
+            if (!c.attachments || c.attachments.length === 0) return c;
+            const keep = c.attachments.filter((a) => {
+              if (a.instanceId !== targetId) return true;
+              m10Removed = a;
+              return false;
+            });
+            return keep.length === c.attachments.length ? c : { ...c, attachments: keep };
+          });
+          const missionKeep = (mission.attachments ?? []).filter((a) => {
+            if (a.instanceId !== targetId) return true;
+            m10Removed = a;
+            return false;
+          });
+          return {
+            ...mission,
+            player1Characters: strip(mission.player1Characters),
+            player2Characters: strip(mission.player2Characters),
+            attachments: missionKeep,
+          };
+        });
+        if (!m10Removed) break;
+        newState = { ...newState, activeMissions: m10Missions };
+        newState = discardAttachments(newState, [m10Removed]);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, m10Player,
+          'SCORE_DISCARD_ATTACHMENT',
+          `Sabotage (SS-010): discarded an attachment in play.`,
+          'game.log.effect.ssMss10Discarded',
+          { card: 'Sabotage', id: 'SS-010-MMS', target: (m10Removed as AttachedCard).card.name_fr });
+        break;
+      }
+
+      case 'SS111_CONFIRM_MAIN': {
+        const ss111Player = pendingEffect.sourcePlayer;
+        const ss111Cat: PlayLessCategory = { kind: 'name', value: 'HYUGA' };
+        const ss111 = buildPlayLessTargets(newState, ss111Player, ss111Cat, 3);
+        if (ss111.targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, ss111Player,
+            'EFFECT_NO_TARGET', 'Hinata Hyuga (SS-111): No affordable Hyuga-named character (state changed).',
+            'game.log.effect.noTarget', { card: 'HINATA HYÛGA', id: 'SS-111-SHINOBIV' });
+          break;
+        }
+        const ss111EffId = generateInstanceId();
+        const ss111ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: ss111EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({
+            text: 'Hinata Hyuga (SS-111): Play a Hyuga-named character anywhere, paying 3 less.',
+            hiddenChars: ss111.hiddenChars, costReduction: 3, category: ss111Cat,
+            sourceName: 'HINATA HYÛGA', sourceId: 'SS-111-SHINOBIV', repeatable: false,
+          }),
+          targetSelectionType: 'PLAY_LESS_CATEGORY',
+          sourcePlayer: ss111Player, requiresTargetSelection: true,
+          validTargets: ss111.targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: ss111ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'], player: ss111Player,
+          description: 'Hinata Hyuga (SS-111): Play a Hyuga-named character anywhere, paying 3 less.',
+          descriptionKey: 'game.effect.desc.ss111PlayHyuga',
+          descriptionParams: { reduction: 3 },
+          options: ss111.targets, minSelections: 1, maxSelections: 1, sourceEffectId: ss111EffId,
+        }];
+        break;
+      }
+
+      case 'SS111_CONFIRM_DUEL': {
+        const ss111dPlayer = pendingEffect.sourcePlayer;
+        const ss111dState = { ...newState[ss111dPlayer] };
+        const ss111dPile = [...ss111dState.discardPile];
+        const ss111dIndex = topmostHinataIndexInDiscard(ss111dPile);
+        if (ss111dIndex === -1) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, ss111dPlayer,
+            'EFFECT_NO_TARGET', 'Hinata Hyuga (SS-111): No Hinata Hyuga in the discard pile (state changed).',
+            'game.log.effect.noTarget', { card: 'HINATA HYÛGA', id: 'SS-111-SHINOBIV' });
+          break;
+        }
+        const [ss111dCard] = ss111dPile.splice(ss111dIndex, 1);
+        ss111dState.discardPile = ss111dPile;
+        ss111dState.hand = [...ss111dState.hand, ss111dCard];
+        newState = { ...newState, [ss111dPlayer]: ss111dState };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, ss111dPlayer,
+          'EFFECT_RETURN_TO_HAND',
+          `Hinata Hyuga (SS-111): ${ss111dCard.name_fr} returns from the discard pile to hand.`,
+          'game.log.effect.ss111ReturnHinata',
+          { card: 'HINATA HYÛGA', id: 'SS-111-SHINOBIV', target: ss111dCard.name_fr });
         break;
       }
 

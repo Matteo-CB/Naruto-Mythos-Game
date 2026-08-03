@@ -53,7 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           },
         },
         images: page.path === ""
-          ? [`${SITE_URL}/images/og-image.webp`]
+          ? [`${SITE_URL}/images/og-image.webp?v=3`]
           : undefined,
       });
     }

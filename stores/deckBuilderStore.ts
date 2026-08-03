@@ -160,7 +160,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
     if (deckMissions.length >= MISSION_CARDS_PER_PLAYER) {
       return { allowed: false, reason: `Max ${MISSION_CARDS_PER_PLAYER} missions`, reasonKey: 'deckBuilder.error.maxMissions', reasonParams: { max: MISSION_CARDS_PER_PLAYER } };
     }
-    if (deckMissions.some((m) => m.id === card.id)) {
+    if (deckMissions.some((m) => normalizeVersionId(m.id) === normalizeVersionId(card.id))) {
       return { allowed: false, reason: `${card.name_fr} already in deck`, reasonKey: 'deckBuilder.error.alreadyInDeck', reasonParams: { name: card.name_fr } };
     }
     return { allowed: true };

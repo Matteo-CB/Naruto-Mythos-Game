@@ -1,23 +1,58 @@
 {
   "entries": [
     {
+      "date": "2026-08-03",
+      "title_fr": "Missions du set 2 et cartes Shinobi",
+      "title_en": "Set 2 missions and Shinobi cards",
+      "categories": [
+        "feature",
+        "feature",
+        "fix",
+        "feature",
+        "feature",
+        "feature"
+      ],
+      "changes_fr": [
+        "Les 10 missions du set 2 arrivent, chacune avec deux illustrations au choix, une seule des deux par deck.",
+        "Quatre cartes Shinobi exclusives rejoignent le set 2 : Hinata, Neji, Gaara et Rock Lee des examens Chunin.",
+        "Le FIRST STRIKE se déclenche quand vous révélez la carte en première action, poser une carte cachée ferme la fenêtre pour la manche.",
+        "Les équipements peuvent désormais être bannis en classé.",
+        "Tout le site utilise une nouvelle police d'écriture plus moderne et plus lisible, les grands titres gardent leur style Naruto.",
+        "Nouvelle image d'aperçu quand le site est partagé, avec les cartes SP Variant du set 2 Shinobi Shiren."
+      ],
+      "changes_en": [
+        "The 10 set 2 missions arrive, each with two artworks to choose from, only one of the two per deck.",
+        "Four exclusive Shinobi cards join set 2: Hinata, Neji, Gaara and Rock Lee from the Chunin Exams.",
+        "FIRST STRIKE now triggers when you reveal the card as your first action, playing a card face down closes the window for the round.",
+        "Attachments can now be banned in ranked.",
+        "The whole site uses a new, more modern and readable font, big titles keep their Naruto style.",
+        "New preview image when the site is shared, featuring the SP Variant cards of set 2 Shinobi Shiren."
+      ]
+    },
+    {
       "date": "2026-08-02",
       "title_fr": "Inscription immédiate",
       "title_en": "Instant sign up",
       "categories": [
         "feature",
         "fix",
-        "feature"
+        "feature",
+        "feature",
+        "fix"
       ],
       "changes_fr": [
         "La création de compte ne demande plus de code reçu par email : le compte fonctionne immédiatement.",
-        "Zaku Abumi et Kin Tsuchi appliquent leur effet immédiatement : l adversaire reçoit son chakra ou sa pioche sans avoir à cliquer.",
-        "Nouveau mode au meilleur des 3 pour les tournois : chaque affrontement se rejoue jusqu à 2 victoires, avec le score de la série affiché sur le match."
+        "Zaku Abumi et Kin Tsuchi appliquent leur effet immédiatement : l'adversaire reçoit son chakra ou sa pioche sans avoir à cliquer.",
+        "Nouveau mode BO3 pour les tournois : chaque affrontement se rejoue jusqu'à 2 victoires, avec le score de la série affiché sur le match.",
+        "Entre deux parties de tournoi, une fenêtre de 2 minutes s'ouvre avec un bouton Prêt : la suivante démarre quand les deux joueurs sont prêts, ou à la fin du délai.",
+        "On peut de nouveau naviguer sur tout le site pendant une partie : le rappel devient une petite pastille au lieu d'une fenêtre bloquante."
       ],
       "changes_en": [
         "Creating an account no longer asks for an email code: the account works right away.",
         "Zaku Abumi and Kin Tsuchi apply their effect immediately: the opponent receives the chakra or the draw without having to click.",
-        "New best of 3 mode for tournaments: each pairing is replayed up to 2 wins, with the series score shown on the match."
+        "New best of 3 mode for tournaments: each pairing is replayed up to 2 wins, with the series score shown on the match.",
+        "Between two tournament games, a 2 minute window opens with a Ready button: the next one starts when both players are ready, or when the time runs out.",
+        "You can browse the whole site again during a game: the reminder becomes a small pill instead of a blocking window."
       ]
     },
     {

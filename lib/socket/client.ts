@@ -329,6 +329,11 @@ interface SocketStore {
   requestActiveGames: () => void;
 }
 
+const readiedTournamentMatches = new Set<string>();
+export function armReadiedMatch(matchId: string): void { readiedTournamentMatches.add(matchId); }
+export function isMatchReadied(matchId: string): boolean { return readiedTournamentMatches.has(matchId); }
+export function clearReadiedMatch(matchId: string): void { readiedTournamentMatches.delete(matchId); }
+
 export const useSocketStore = create<SocketStore>((set, get) => ({
   socket: null,
   connected: false,

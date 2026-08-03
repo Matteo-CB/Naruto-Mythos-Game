@@ -1,7 +1,7 @@
 import type { GameState, PendingAction, PlayerID, GameAction, GameLogEntry, CharacterInPlay } from '@/lib/engine/types';
 import { buildGeneratedScenario, buildScenarioForEffect, revealScenarioFor } from '@/lib/cards/sim/generate';
 import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
-import { getCharacterById } from '@/lib/data/cardIndex';
+import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
 import { phase810KindForEffect, phase810Scenario } from '@/lib/cards/sim/phase810';
 import { firesUpgrade, upgradeScenario } from '@/lib/cards/sim/upgradeSim';
 import { minimizeScenario } from '@/lib/cards/sim/minimize';
@@ -179,6 +179,34 @@ const FACTORIES: Record<string, Factory> = {
     ],
     noMinimize: true,
   }),
+  'SS-115-SHINOBIV': (id) => ({
+    build: () => board({
+      hand: [id, 'KS-119-R'],
+      p1m0: ['SS-046-UC'],
+      e0: [{ id: 'KS-005-C', iid: 'sim-lee-prey' }],
+      missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+    }),
+    play: P1(FRESH),
+    followups: [
+      { player: 'player2', action: PASS_ACTION },
+      P1(FRESH),
+    ],
+    noMinimize: true,
+  }),
+  'SS-111-SHINOBIV': (id) => ({
+    build: () => {
+      const st = board({
+        hand: [id, 'KS-036-C'],
+        p1m0: ['KS-116-R'],
+        missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+      });
+      const discarded = getCharacterById('KS-030-C');
+      if (discarded) st.player1.discardPile = [discarded];
+      return st;
+    },
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
   'SS-128-R': (id) => ({
     build: () => board({
       hand: [id, 'SS-082-C'],
@@ -266,10 +294,55 @@ const MISSION_FACTORIES: Record<string, () => SimScenario> = {
     ],
     noMinimize: true,
   }),
+  'SS-001-MMS': () => ({
+    build: () => board({ hand: ['KS-086-C'], p1m0: [VANILLA], missionIds: ['SS-001-MMS', 'KS-006-MMS'] }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
+  'SS-002-MMS': () => scoreMissionScenario('SS-002-MMS', { e0: [{ id: 'KS-005-C', iid: 'sim-hid-enemy', hidden: true }] }),
+  'SS-003-MMS': () => scoreMissionScenario('SS-003-MMS'),
+  'SS-004-MMS': () => scoreMissionScenario('SS-004-MMS'),
+  'SS-005-MMS': () => ({
+    build: () => board({ p1m0: [VANILLA], e0: [{ id: 'KS-136-S', iid: 'sim-strong' }], missionIds: ['SS-005-MMS', 'KS-006-MMS'] }),
+    play: P1(PASS_ACTION),
+    followups: [
+      { player: 'player2', action: PASS_ACTION },
+      P1({ type: 'ADVANCE_PHASE' }),
+      P1({ type: 'ADVANCE_PHASE' }),
+    ],
+    noMinimize: true,
+  }),
+  'SS-006-MMS': () => ({
+    build: () => board({ hidden0: { id: 'KS-005-C', iid: 'sim-hid-ally' }, p1m0: [VANILLA], missionIds: ['SS-006-MMS', 'KS-006-MMS'] }),
+    play: P1({ type: 'REVEAL_CHARACTER', characterInstanceId: 'sim-hid-ally', missionIndex: 0 }),
+    noMinimize: true,
+  }),
+  'SS-007-MMS': () => scoreMissionScenario('SS-007-MMS', { e0: [{ id: 'KS-005-C', iid: 'sim-weak-enemy' }] }),
+  'SS-008-MMS': () => ({
+    build: () => board({
+      p1m0: [VANILLA, { id: 'KS-005-C', iid: 'sim-tt-2' }],
+      hand: ['KS-086-C'],
+      missionIds: ['SS-008-MMS', 'KS-006-MMS'],
+    }),
+    play: P1(FRESH),
+    followups: [
+      { player: 'player2', action: PASS_ACTION },
+      P1(PASS_ACTION),
+    ],
+    noMinimize: true,
+  }),
+  'SS-009-MMS': () => scoreMissionScenario('SS-009-MMS'),
+  'SS-010-MMS': () => scoreMissionScenario('SS-010-MMS', { e0: [{ id: 'KS-005-C', iid: 'sim-att-host' }] }),
 };
 
+function missionFactoryKeyFor(cardId: string): string | undefined {
+  if (MISSION_FACTORIES[cardId]) return cardId;
+  const base = cardId.replace(/_\d+-MMS$/, '-MMS');
+  return MISSION_FACTORIES[base] ? base : undefined;
+}
+
 export function hasMissionScenario(cardId: string): boolean {
-  return !!MISSION_FACTORIES[cardId];
+  return missionFactoryKeyFor(cardId) !== undefined;
 }
 
 // Resolve a variant (RA/MV/SV/L/_2...) to a curated base with the same set+number, since variants share the effect.
@@ -292,8 +365,24 @@ const SKIP_MINIMIZE_KINDS = new Set(['moveblock', 'revealblock', 'hideallyblock'
 const minimizeCache = new Map<string, SimScenario | undefined>();
 
 function buildScenario(cardId: string, effectIndex: number): { scenario: SimScenario | undefined; kind: string | null } {
-  const missionFactory = MISSION_FACTORIES[cardId];
-  if (missionFactory) return { scenario: missionFactory(), kind: null };
+  const missionKey = missionFactoryKeyFor(cardId);
+  if (missionKey) {
+    const scenario = MISSION_FACTORIES[missionKey]();
+    if (missionKey !== cardId) {
+      const original = scenario.build;
+      scenario.build = () => {
+        const built = original();
+        for (const mission of built.activeMissions) {
+          if (mission.card.id === missionKey) {
+            const swapped = getMissionById(cardId);
+            if (swapped) mission.card = swapped;
+          }
+        }
+        return built;
+      };
+    }
+    return { scenario, kind: null };
+  }
   const card = getCharacterById(cardId);
   const eff = card?.effects?.[effectIndex];
   if (card && eff?.type === 'UPGRADE' && firesUpgrade(card)) return { scenario: upgradeScenario(card), kind: null };

@@ -20,7 +20,7 @@ export const RARITY_TIERS: Record<string, number> = {
   C: 0, UC: 0,
   R: 1, RA: 1,
   S: 2, M: 2, SP: 2, POP: 2, CHIBI: 2,
-  SV: 3, MV: 3, L: 3, SPV: 3, POPV: 3, CHIBIV: 3,
+  SV: 3, MV: 3, L: 3, SPV: 3, POPV: 3, CHIBIV: 3, SHINOBIV: 3,
 };
 
 export interface RarityVfxProfile {

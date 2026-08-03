@@ -104,4 +104,53 @@ describe('FIRST STRIKE triggers on the play, never from a prompt', () => {
     expect(getFirstStrikeStatus(after, 'player1')).toBe('used');
     expect(getFirstStrikeStatus(after, 'player2')).toBe('available');
   });
+  it('revealing it as the first action of the round fires its First Strike', () => {
+    const state = withTemariInHand();
+    state.player1.hand = [];
+    state.activeMissions[0].player1Characters.push(
+      simChar(TEMARI, { owner: 'player1', instanceId: 'fs-hidden', hidden: true }),
+    );
+
+    expect(getFirstStrikeStatus(state, 'player1')).toBe('available');
+
+    const after = GameEngine.applyAction(state, 'player1', {
+      type: 'REVEAL_CHARACTER',
+      missionIndex: 0,
+      characterInstanceId: 'fs-hidden',
+    });
+
+    expect(after).not.toBe(state);
+    const fired = after.pendingEffects.length > 0 || after.pendingActions.length > 0 || movedAway(after);
+    expect(fired, 'a reveal opening the round must resolve the First Strike').toBe(true);
+    expect(getFirstStrikeStatus(after, 'player1')).toBe('used');
+  });
+
+  it('a face down play burns the window, so revealing later that round fires nothing', () => {
+    const state = withTemariInHand();
+    state.player1.hand = [getCardById('KS-005-C') as unknown as CharacterCard];
+    state.activeMissions[0].player1Characters.push(
+      simChar(TEMARI, { owner: 'player1', instanceId: 'fs-hidden', hidden: true }),
+    );
+
+    const afterHidden = GameEngine.applyAction(state, 'player1', {
+      type: 'PLAY_HIDDEN',
+      cardIndex: 0,
+      missionIndex: 1,
+    });
+    expect(getFirstStrikeStatus(afterHidden, 'player1')).toBe('expired');
+
+    const board = afterHidden;
+    board.activePlayer = 'player1';
+    board.player2.hasPassed = true;
+
+    const after = GameEngine.applyAction(board, 'player1', {
+      type: 'REVEAL_CHARACTER',
+      missionIndex: 0,
+      characterInstanceId: 'fs-hidden',
+    });
+
+    expect(getFirstStrikeStatus(after, 'player1')).toBe('expired');
+    expect(after.pendingEffects.length, 'no First Strike effect may be pending').toBe(0);
+    expect(movedAway(after), 'the enemy must not have been moved').toBe(false);
+  });
 });

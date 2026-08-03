@@ -86,4 +86,80 @@ export const effectDescriptionsIt: Record<string, string[]> = {
     "Collega a un personaggio alleato non nascosto.",
     "[↯] Nascondi in questa missione un personaggio Jutsu nemico con Potenza inferiore a questo personaggio.",
   ],
+  'SS-001-MMS': [
+    "[⧗] Se giochi un personaggio con un nome diverso da quello di ogni altro personaggio in questa missione, POWERUP 2 quel personaggio.",
+  ],
+  'SS-001_2-MMS': [
+    "[⧗] Se giochi un personaggio con un nome diverso da quello di ogni altro personaggio in questa missione, POWERUP 2 quel personaggio.",
+  ],
+  'SS-002-MMS': [
+    "[↯] Guarda un personaggio nascosto, poi puoi spostarlo.",
+  ],
+  'SS-002_2-MMS': [
+    "[↯] Guarda un personaggio nascosto, poi puoi spostarlo.",
+  ],
+  'SS-003-MMS': [
+    "[⧗] Se hai esattamente un personaggio alleato non nascosto in questa missione, ha +4 Potenza.",
+  ],
+  'SS-003_2-MMS': [
+    "[⧗] Se hai esattamente un personaggio alleato non nascosto in questa missione, ha +4 Potenza.",
+  ],
+  'SS-004-MMS': [
+    "[⧗] Assegna questa missione due volte (riattivando gli effetti SCORE, se presenti).",
+  ],
+  'SS-004_2-MMS': [
+    "[⧗] Assegna questa missione due volte (riattivando gli effetti SCORE, se presenti).",
+  ],
+  'SS-005-MMS': [
+    "[⧗] Chakra +2 per il giocatore che sta perdendo la missione.",
+  ],
+  'SS-005_2-MMS': [
+    "[⧗] Chakra +2 per il giocatore che sta perdendo la missione.",
+  ],
+  'SS-006-MMS': [
+    "[⧗] Tutti i personaggi in questa missione hanno, dopo tutte le loro altre abilità, \"AMBUSH ⚡ POWERUP 2\".",
+  ],
+  'SS-006_2-MMS': [
+    "[⧗] Tutti i personaggi in questa missione hanno, dopo tutte le loro altre abilità, \"AMBUSH ⚡ POWERUP 2\".",
+  ],
+  'SS-007-MMS': [
+    "[⧗] Prima di determinare la Potenza nella fase di Valutazione delle Missioni, il personaggio con la Potenza più alta senza pari merito in questa missione ha +3 Potenza.",
+  ],
+  'SS-007_2-MMS': [
+    "[⧗] Prima di determinare la Potenza nella fase di Valutazione delle Missioni, il personaggio con la Potenza più alta senza pari merito in questa missione ha +3 Potenza.",
+  ],
+  'SS-008-MMS': [
+    "[⧗] Se hai esattamente 3 personaggi alleati non nascosti in questa missione, hai +5 Potenza totale in questa missione.",
+  ],
+  'SS-008_2-MMS': [
+    "[⧗] Se hai esattamente 3 personaggi alleati non nascosti in questa missione, hai +5 Potenza totale in questa missione.",
+  ],
+  'SS-009-MMS': [
+    "[↯] L’avversario deve pescare una carta.",
+  ],
+  'SS-009_2-MMS': [
+    "[↯] L’avversario deve pescare una carta.",
+  ],
+  'SS-010-MMS': [
+    "[↯] Scarta un equipaggiamento in gioco.",
+  ],
+  'SS-010_2-MMS': [
+    "[↯] Scarta un equipaggiamento in gioco.",
+  ],
+  'SS-111-SHINOBIV': [
+    "[↯] Neji Hyuga: Rimetti in mano la Hinata Hyuga più in alto nella tua pila degli scarti.",
+    "[↯] Gioca un personaggio di nome Hyuga ovunque, pagando 3 in meno.",
+  ],
+  'SS-112-SHINOBIV': [
+    "[↯] Rimuovi tutti i token Potenza da un personaggio nemico in questa missione.",
+    "[↯] Hinata Hyuga: Nascondi un personaggio nemico senza token Potenza in questa missione.",
+  ],
+  'SS-114-SHINOBIV': [
+    "[↯] Scarta un Gaara dalla tua mano. Nascondi un personaggio nemico in questa missione con costo pari o inferiore a quello della carta scartata.",
+    "Rock Lee, effetto MAIN: Invece, sconfiggilo.",
+  ],
+  'SS-115-SHINOBIV': [
+    "[⧗] Questo personaggio non perde i suoi segnalini Potenza alla fine del round.",
+    "[⧗] Gaara: Quando sconfiggi un personaggio nemico, POWERUP 2.",
+  ],
 };

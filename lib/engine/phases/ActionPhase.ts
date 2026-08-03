@@ -603,7 +603,7 @@ function handleRevealCharacter(
     const upgradedChar = updatedMissionChars.find((c) => c.instanceId === upgradeTarget.instanceId);
     if (upgradedChar) {
 
-      newState = EffectEngine.resolveRevealUpgradeEffects(newState, player, upgradedChar, missionIndex);
+      newState = EffectEngine.resolveRevealUpgradeEffects(newState, player, upgradedChar, missionIndex, true);
     }
     return newState;
   }
@@ -659,7 +659,7 @@ function handleRevealCharacter(
         targetName: topRevealed.name_fr,
       });
     }
-    newState = EffectEngine.resolveRevealEffects(newState, player, revealedChar, missionIndex);
+    newState = EffectEngine.resolveRevealEffects(newState, player, revealedChar, missionIndex, true);
   }
 
   

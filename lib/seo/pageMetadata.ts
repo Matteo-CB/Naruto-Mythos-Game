@@ -24,7 +24,7 @@ export async function buildPageMetadata(locale: string, path: string, namespace:
       title,
       description,
       url: `${SITE_URL}/${locale}${path}`,
-      images: [{ url: '/images/og-image.webp', width: 1200, height: 630, alt: t('ogAlt') }],
+      images: [{ url: '/images/og-image.webp?v=3', width: 1200, height: 630, alt: t('ogAlt') }],
     },
     twitter: {
       card: 'summary_large_image',

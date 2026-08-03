@@ -1,6 +1,6 @@
 
 
-export type RawRarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'SP' | 'SPV' | 'POP' | 'POPV' | 'CHIBI' | 'CHIBIV' | 'MMS';
+export type RawRarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'SP' | 'SPV' | 'POP' | 'POPV' | 'CHIBI' | 'CHIBIV' | 'SHINOBI' | 'SHINOBIV' | 'MMS';
 
 export interface RawCardEffect {
   type: 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE';
