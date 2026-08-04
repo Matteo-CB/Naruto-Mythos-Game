@@ -275,7 +275,7 @@ function buildEffectOrderSelection(
 }
 
 
-function buildPendingTargetSelectionUI(
+export function buildPendingTargetSelectionUI(
   pendingAction: PendingActionData,
   pendingEffect: PendingEffectData | undefined,
   dataSource: PendingSelectionDataSource,
@@ -452,6 +452,22 @@ function buildPendingTargetSelectionUI(
             : { name_fr: '???' },
         };
       });
+    } else if (tst === 'SSMSS10_DISCARD_ATTACHMENT') {
+      let attachmentInfo: Array<{ attachmentId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number; hostName?: string }> = [];
+      try { attachmentInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').attachments ?? []; } catch { /* ignore */ }
+      const attachmentRanks = dataSource.activeMissions.map((m) => m.rank || '?');
+      handCards = pendingAction.options.map((optStr, optIdx) => {
+        const info = attachmentInfo.find((a) => a.attachmentId === optStr);
+        const rank = info ? (attachmentRanks[info.missionIndex] || `M${info.missionIndex + 1}`) : '?';
+        return {
+          index: optIdx,
+          targetId: optStr,
+          card: info ? {
+            name_fr: info.name_fr, name_en: info.name_en, chakra: info.chakra, power: info.power,
+            image_file: info.image_file, missionLabel: `Mission ${rank}`,
+          } : { name_fr: '???', missionLabel: '?' },
+        };
+      });
     } else if (
       tst === 'TAYUYA125_CHOOSE_SOUND' ||
       tst === 'PLAY_LESS_CATEGORY' ||
@@ -507,6 +523,7 @@ function buildPendingTargetSelectionUI(
   const isOroReveal = tst === 'OROCHIMARU_REVEAL_RESULT';
   const isItachi091Reveal = tst === 'ITACHI091_HAND_REVEAL';
   const isDosuLookReveal = tst === 'DOSU_LOOK_REVEAL';
+  const isReconLookReveal = tst === 'SSMSS02_LOOK_REVEAL';
   const isSasuke014Reveal = tst === 'SASUKE014_HAND_REVEAL' || tst === 'SASUKE014_UPGRADE_HAND_REVEAL';
   const isTayuya065Reveal = tst === 'TAYUYA065_UPGRADE_REVEAL';
   const isKiba026Reveal = tst === 'KIBA026_UPGRADE_REVEAL';
@@ -514,7 +531,7 @@ function buildPendingTargetSelectionUI(
   const isKiba026Choose = tst === 'KIBA026_UPGRADE_CHOOSE';
   const isKabuto052ChooseMission = tst === 'KABUTO_CHOOSE_MISSION';
   const isMultiSelectChoose = isTayuya065Choose || isKiba026Choose;
-  const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal;
+  const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isReconLookReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal;
   const shouldParseRevealedCard = isInfoReveal || isKabuto052ChooseMission;
 
   let revealedCard: PendingTargetSelection['revealedCard'];
@@ -554,6 +571,13 @@ function buildPendingTargetSelectionUI(
           image_file: rd.cardImageFile, canSteal: false,
           revealTitleKey: 'game.effect.dosuLookRevealTitle',
           revealResultKey: 'game.effect.dosuLookRevealResult',
+        };
+      } else if (isReconLookReveal) {
+        revealedCard = {
+          name_fr: rd.cardName, chakra: rd.cardCost, power: rd.cardPower,
+          image_file: rd.cardImageFile, canSteal: false,
+          revealTitleKey: 'game.effect.ssMss02RevealTitle',
+          revealResultKey: 'game.effect.ssMss02RevealResult',
         };
       } else if (isSasuke014Reveal) {
         revealedCard = {

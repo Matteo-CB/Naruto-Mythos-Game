@@ -3,10 +3,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
+import { HoloFoilOverlay, holoMaskStyle } from '@/components/cards/HoloFoilOverlay';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 
 const ENTRANCE_HOLD_TYPES: ReadonlySet<string> = new Set(['card-play', 'card-defeat', 'card-hide', 'card-reveal', 'card-upgrade']);
+
+const KUNAI_MYTHOS_SRC = '/images/icons/kunai-mythos.webp';
 
 export function useEntranceHold(enabled: boolean): boolean {
   return useGameStore((s) => enabled && s.animationQueue.some((a) => ENTRANCE_HOLD_TYPES.has(a.type)));
@@ -209,7 +212,8 @@ export function PopupTitle({
 }) {
   const compact = useIsCompactPopup();
   const fontSizes = { md: '14px', lg: '18px', xl: '22px' };
-  const lineWidths = { md: 100, lg: 160, xl: 200 };
+  const kunaiSizes = { md: 26, lg: 34, xl: 42 };
+  const kunaiSize = compact ? Math.round(kunaiSizes[size] * 0.72) : kunaiSizes[size];
 
   return (
     <div className={`flex flex-col items-center ${compact ? 'gap-1 mb-2' : 'gap-3 mb-5'}`}>
@@ -225,50 +229,30 @@ export function PopupTitle({
       >
         {children}
       </span>
-      
-      <svg
-        width={lineWidths[size]}
-        height="3"
-        viewBox={`0 0 ${lineWidths[size]} 3`}
-        style={{ overflow: 'visible' }}
+
+      <motion.div
+        aria-hidden
+        initial={{ scale: 0, rotate: -140, opacity: 0 }}
+        animate={{ scale: 1, rotate: -90, opacity: 1 }}
+        transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 18 }}
+        style={{ position: 'relative', width: kunaiSize, height: kunaiSize }}
       >
-        <motion.line
-          x1={lineWidths[size] / 2}
-          y1="1.5"
-          x2={lineWidths[size]}
-          y2="1.5"
-          stroke={accentColor}
-          strokeWidth="1"
-          strokeOpacity="0.5"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+        <img
+          src={KUNAI_MYTHOS_SRC}
+          alt=""
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            filter: `drop-shadow(0 0 10px ${accentColor}66)`,
+          }}
         />
-        <motion.line
-          x1={lineWidths[size] / 2}
-          y1="1.5"
-          x2={0}
-          y2="1.5"
-          stroke={accentColor}
-          strokeWidth="1"
-          strokeOpacity="0.5"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+        <div
+          className="kunai-gold-sheen"
+          style={{ ...holoMaskStyle(KUNAI_MYTHOS_SRC, 'contain'), backgroundColor: accentColor }}
         />
-        
-        <motion.rect
-          x={lineWidths[size] / 2 - 2}
-          y="-0.5"
-          width="4"
-          height="4"
-          fill={accentColor}
-          style={{ transformOrigin: 'center', transform: 'rotate(45deg)' }}
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.15, type: 'spring', stiffness: 400 }}
-        />
-      </svg>
+        <HoloFoilOverlay intensity="strong" imageUrl={KUNAI_MYTHOS_SRC} maskSize="contain" />
+      </motion.div>
     </div>
   );
 }

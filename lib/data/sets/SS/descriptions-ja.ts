@@ -151,7 +151,7 @@ export const effectDescriptionsJa: Record<string, string[]> = {
     "[↯] 場にある装備カード1枚を捨てる。",
   ],
   'SS-111-SHINOBIV': [
-    "[↯] 日向ネジ：自分の捨て札の一番上の日向ヒナタ1枚を手札に戻す。",
+    "[↯] DUEL 日向ネジ：自分の捨て札の一番上の日向ヒナタ1枚を手札に戻す。",
     "[↯] 日向の名を持つキャラクター1体を、コストを3少なく支払ってどこにでもプレイする。",
   ],
   'SS-112-SHINOBIV': [
@@ -164,6 +164,6 @@ export const effectDescriptionsJa: Record<string, string[]> = {
   ],
   'SS-115-SHINOBIV': [
     "[⧗] このキャラクターはラウンド終了時にパワーカウンターを失わない。",
-    "[⧗] 我愛羅：敵キャラクターを撃破したとき、POWERUP 2する。",
+    "[⧗] DUEL 我愛羅：敵キャラクターを撃破したとき、POWERUP 2する。",
   ],
 };

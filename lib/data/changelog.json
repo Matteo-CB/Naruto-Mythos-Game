@@ -1,6 +1,50 @@
 {
   "entries": [
     {
+      "date": "2026-08-04",
+      "title_fr": "Missions plus faciles à parcourir",
+      "title_en": "Easier mission browsing",
+      "categories": [
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ],
+      "changes_fr": [
+        "La liste des missions du deck builder se parcourt page par page, avec une recherche et des filtres.",
+        "Quand les variantes sont masquées, les missions en deuxième illustration disparaissent aussi de la liste.",
+        "Sabotage ouvre une vraie liste de cartes : on voit chaque équipement en jeu et on clique celui à défausser.",
+        "Reconnaissance affiche sa carte dans la fenêtre de choix.",
+        "Reconnaissance montre d'abord la carte cachée, puis propose de la déplacer.",
+        "Les fenêtres d'effet affichent un kunai Mythos holographique doré à la place du trait.",
+        "Entraînement d'équipe donne bien ses 5 puissances et le total affiché sur la mission les compte.",
+        "Faire profil bas demande maintenant confirmation pour son AMBUSH, et il se déclenche après tous les autres effets de la carte.",
+        "Temari annonce son FIRST STRIKE dans une fenêtre avant de demander la cible, comme les autres effets.",
+        "Les DUEL de Hinata et de Rock Lee fonctionnent, et celui de Hinata se résout avant son MAIN comme sur la carte.",
+        "Mission prioritaire déclenche bien les effets SCORE une seconde fois, même ceux qui demandent un choix."
+      ],
+      "changes_en": [
+        "The deck builder mission list is now browsed page by page, with a search box and filters.",
+        "When variants are hidden, the second artwork of a mission is hidden from the list too.",
+        "Sabotage now opens a real card list: every attachment in play is shown and clickable.",
+        "Reconnaissance now shows its card in the choice window.",
+        "Reconnaissance now shows the hidden card first, then offers to move it.",
+        "Effect windows now show a golden holographic Mythos kunai instead of the divider line.",
+        "Team Training now really gives its 5 power, and the mission total on the board counts it.",
+        "Keep a Low Profile now asks before its AMBUSH, and it triggers after all the other abilities of the card.",
+        "Temari now announces her FIRST STRIKE in a window before asking for a target, like every other effect.",
+        "Hinata and Rock Lee DUEL effects now work, and Hinata resolves hers before her MAIN, as printed on the card.",
+        "High Priority Mission now really triggers SCORE effects a second time, including those that ask for a choice."
+      ]
+    },
+    {
       "date": "2026-08-03",
       "title_fr": "Missions du set 2 et cartes Shinobi",
       "title_en": "Set 2 missions and Shinobi cards",

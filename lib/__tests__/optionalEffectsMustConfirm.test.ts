@@ -6,7 +6,6 @@ const HANDLER_ROOT = 'lib/effects/handlers';
 
 const ALLOWED_WITHOUT_CONFIRM = new Set<string>([
   'SAKURA011_DRAW',
-  'SS049_FS_CHAR',
   'SS114_CHOOSE_DISCARD',
 ]);
 

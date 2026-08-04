@@ -995,12 +995,13 @@
         "ss117Chakra": "{card}：敵キャラクターを移動させてチャクラを1得た。",
         "ss046DrawNames": "{card}：{revealed} を公開し、{target} を引いた。",
         "ssMss01Powerup": "{card}：ここに同名がいない{target}をPOWERUP 2。",
-        "ssMss02Looked": "{card}：伏せられたキャラクター（{target}）を見た。",
+        "ssMss02Looked": "{card}：伏せられたキャラクターを見た。",
         "ssMss06Ambush": "{card}：{target}をAMBUSH POWERUP 2。",
         "ssMss09ForcedDraw": "{card}：相手はカードを1枚引く。",
         "ssMss10Discarded": "{card}：{target}を捨てた。",
         "ss111ReturnHinata": "{card}：{target}が捨て札から手札に戻る。",
-        "ss115PowerupOnDefeat": "{card}：{defeated}を撃破してPOWERUP {amount}。"
+        "ss115PowerupOnDefeat": "{card}：{defeated}を撃破してPOWERUP {amount}。",
+        "ssMss04SecondScore": "{card}：このミッションはもう一度得点される。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1655,12 +1656,15 @@
         "ssMss02LookHidden": "偵察：伏せられたキャラクター1体を見る。",
         "ssMss02MoveHidden": "偵察：そのキャラクターを他のミッションへ移動させてもよい。",
         "ssMss10DiscardAttachment": "妨害工作：場にある装備カード1枚を捨てる。",
-        "ss111ConfirmDuel": "捨て札の一番上の日向ヒナタを手札に戻しますか？",
-        "ss111ConfirmMain": "日向の名を持つキャラクターを、コストを3少なくしてプレイしますか？",
-        "ss111PlayHyuga": "日向の名を持つキャラクターを、コストを{reduction}少なく支払ってプレイする。"
+        "ss111ConfirmDuel": "DUEL 日向ネジ：捨て札の一番上の日向ヒナタを手札に戻しますか？",
+        "ss111ConfirmMain": "MAIN：日向の名を持つキャラクターを、コストを3少なくしてプレイしますか？",
+        "ss111PlayHyuga": "MAIN：コストを{reduction}少なく支払ってプレイする、日向の名を持つキャラクターを選ぶ。",
+        "ssMss06ConfirmAmbush": "目立たぬように：このキャラクターをAMBUSH POWERUP 2しますか？"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
-      "upgradeModifierDecline": "MAIN効果のみを使用"
+      "upgradeModifierDecline": "MAIN効果のみを使用",
+      "ssMss02RevealTitle": "偵察",
+      "ssMss02RevealResult": "この伏せられたキャラクターを見る。"
     },
     "anim": {
       "cardPlayedHidden": "カードを伏せて出した",
@@ -1986,7 +1990,14 @@
     "containsUnrevealed": "非公開カードを含む",
     "useDeck": "このデッキを使う",
     "cardDetail": "カード詳細",
-    "otherDecks": "その他のデッキ"
+    "otherDecks": "その他のデッキ",
+    "missionSearch": "ミッションを検索",
+    "missionPage": "{total} ページ中 {page}",
+    "missionFilter": {
+      "all": "すべて",
+      "score": "SCORE",
+      "continuous": "継続"
+    }
   },
   "discord": {
     "linkDiscord": "Discordを連携",

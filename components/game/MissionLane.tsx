@@ -780,13 +780,16 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
       ? mission.player2Characters
       : mission.player1Characters;
 
+  const myPowerBonus = myPlayer === 'player1' ? (mission.player1PowerBonus ?? 0) : (mission.player2PowerBonus ?? 0);
+  const oppPowerBonus = myPlayer === 'player1' ? (mission.player2PowerBonus ?? 0) : (mission.player1PowerBonus ?? 0);
+
   const myPower = useMemo(
-    () => myChars.reduce((sum, c) => sum + c.effectivePower, 0),
-    [myChars],
+    () => myChars.reduce((sum, c) => sum + c.effectivePower, 0) + myPowerBonus,
+    [myChars, myPowerBonus],
   );
   const oppPower = useMemo(
-    () => oppChars.reduce((sum, c) => sum + c.effectivePower, 0),
-    [oppChars],
+    () => oppChars.reduce((sum, c) => sum + c.effectivePower, 0) + oppPowerBonus,
+    [oppChars, oppPowerBonus],
   );
 
   const handleClick = () => {

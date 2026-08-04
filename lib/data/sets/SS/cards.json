@@ -1693,7 +1693,7 @@
       "effects": [
         {
           "type": "DUEL",
-          "description": "[↯] Neji Hyuga: Return the topmost Hinata Hyuga from your discard pile to your hand."
+          "description": "[↯] DUEL Neji Hyuga: Return the topmost Hinata Hyuga from your discard pile to your hand."
         },
         {
           "type": "MAIN",
@@ -1825,7 +1825,7 @@
         },
         {
           "type": "DUEL",
-          "description": "[⧗] Gaara: When you defeat an enemy character, POWERUP 2."
+          "description": "[⧗] DUEL Gaara: When you defeat an enemy character, POWERUP 2."
         }
       ],
       "image_file": "images/cards/SS/shinobi_v/SS-115-SHINOBIV.webp",

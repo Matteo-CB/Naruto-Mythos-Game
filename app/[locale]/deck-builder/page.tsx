@@ -25,6 +25,7 @@ import {
   getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel,
 } from "@/lib/utils/cardLocale";
 import { getCardEffectDescription } from "@/lib/data/effectDescriptions";
+import { isAlternateArtwork } from "@/lib/cards/versionKey";
 import { exportDeckAsImage } from "@/lib/utils/exportDeckImage";
 import {
   PopupOverlay, PopupCornerFrame, PopupTitle, PopupActionButton,
@@ -35,6 +36,8 @@ import { EvolvingBuilderHelper } from "@/components/deckBuilder/EvolvingBuilderH
 import { EvolvingDeckHolo } from "@/components/evolving/EvolvingDeckHolo";
 import { EvolvingDeckBadge } from "@/components/evolving/EvolvingDeckBadge";
 import { useRevealingStore } from "@/stores/revealingStore";
+
+const MISSIONS_PER_PAGE = 15;
 
 const RARITY_COLORS: Record<string, string> = {
   C: '#888888', UC: '#3e8b3e', R: '#c4a35a', RA: '#c4a35a',
@@ -364,6 +367,9 @@ export default function DeckBuilderPage() {
   const unrevealedIds = useRevealingStore((s) => s.unrevealedIds);
   const [showUnrevealed, setShowUnrevealed] = useState(false);
   const [quickSet, setQuickSet] = useState<string | null>(null);
+  const [missionSearch, setMissionSearch] = useState('');
+  const [missionEffect, setMissionEffect] = useState<'all' | 'score' | 'continuous'>('all');
+  const [missionPage, setMissionPage] = useState(0);
   const [quickType, setQuickType] = useState<'character' | 'attachment' | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -508,10 +514,34 @@ export default function DeckBuilderPage() {
     });
   }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showAltArt, showUnrevealed, unrevealedIds, quickSet, quickType]);
 
-  const filteredMissions = useMemo(
-    () => (showUnrevealed ? [...availableMissions] : availableMissions.filter((m) => !unrevealedIds.has(m.id))).filter((m) => !quickSet || m.set === quickSet),
-    [availableMissions, showUnrevealed, unrevealedIds, quickSet],
+  const filteredMissions = useMemo(() => {
+    let missions = showUnrevealed ? [...availableMissions] : availableMissions.filter((m) => !unrevealedIds.has(m.id));
+    if (quickSet) missions = missions.filter((m) => m.set === quickSet);
+    if (!showAltArt) missions = missions.filter((m) => !isAlternateArtwork(m.id));
+    if (missionEffect !== 'all') {
+      missions = missions.filter((m) => (m.effects ?? []).some((e) => (
+        missionEffect === 'score' ? e.type === 'SCORE' : e.description.includes('[⧗]')
+      )));
+    }
+    const needle = normalizeStr(missionSearch.trim());
+    if (needle) {
+      missions = missions.filter((m) => {
+        const name = normalizeStr(getCardName(m, loc));
+        if (name.includes(needle)) return true;
+        const texts = (m.effects ?? []).map((e, i) => getCardEffectDescription(m.id, i, loc, e.description));
+        return texts.some((tx) => normalizeStr(tx).includes(needle));
+      });
+    }
+    return missions;
+  }, [availableMissions, showUnrevealed, unrevealedIds, quickSet, showAltArt, missionEffect, missionSearch, loc]);
+
+  const missionPageCount = Math.max(1, Math.ceil(filteredMissions.length / MISSIONS_PER_PAGE));
+  const missionPageSafe = Math.min(missionPage, missionPageCount - 1);
+  const pagedMissions = useMemo(
+    () => filteredMissions.slice(missionPageSafe * MISSIONS_PER_PAGE, missionPageSafe * MISSIONS_PER_PAGE + MISSIONS_PER_PAGE),
+    [filteredMissions, missionPageSafe],
   );
+  useEffect(() => { setMissionPage(0); }, [missionSearch, missionEffect, quickSet, showAltArt, showUnrevealed]);
 
   const deckHasUnrevealed = useMemo(
     () => deckChars.some((c) => unrevealedIds.has(c.id)) || deckMissions.some((m) => unrevealedIds.has(m.id)),
@@ -1438,9 +1468,35 @@ export default function DeckBuilderPage() {
         }}>
           
           <div className="px-3 pt-3 pb-1 flex-shrink-0">
-            <span className="text-[8px] uppercase font-bold block mb-1" style={{ color: '#777' }}>{t("deckBuilder.missionCards")}</span>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[8px] uppercase font-bold" style={{ color: '#777' }}>{t("deckBuilder.missionCards")}</span>
+              <span className="text-[8px]" style={{ color: '#555' }}>{filteredMissions.length}</span>
+            </div>
+            <div className="flex items-center gap-1 mb-1">
+              <input
+                type="text"
+                placeholder={t("deckBuilder.missionSearch")}
+                value={missionSearch}
+                onChange={(e) => setMissionSearch(e.target.value)}
+                className="flex-1 min-w-0 px-2 py-1 text-[10px] focus:outline-none"
+                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
+              />
+              {(['all', 'score', 'continuous'] as const).map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setMissionEffect(key)}
+                  className="font-body text-[9px] font-bold px-2 py-1 cursor-pointer shrink-0 uppercase"
+                  style={{
+                    backgroundColor: missionEffect === key ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
+                    color: missionEffect === key ? '#c4a35a' : '#666',
+                  }}
+                >
+                  {t(`deckBuilder.missionFilter.${key}`)}
+                </button>
+              ))}
+            </div>
             <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
-              {filteredMissions.map((m) => (
+              {pagedMissions.map((m) => (
                 <CatalogMission
                   key={m.id}
                   card={m}
@@ -1451,6 +1507,37 @@ export default function DeckBuilderPage() {
                 />
               ))}
             </div>
+            {missionPageCount > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-1.5">
+                <button
+                  onClick={() => setMissionPage((p) => Math.max(0, p - 1))}
+                  disabled={missionPageSafe === 0}
+                  className="font-body text-[10px] font-bold px-2.5 py-1 cursor-pointer"
+                  style={{
+                    backgroundColor: 'rgba(196,163,90,0.08)',
+                    color: missionPageSafe === 0 ? '#444' : '#c4a35a',
+                    cursor: missionPageSafe === 0 ? 'default' : 'pointer',
+                  }}
+                >
+                  {'‹'}
+                </button>
+                <span className="text-[9px]" style={{ color: '#777' }}>
+                  {t("deckBuilder.missionPage", { page: missionPageSafe + 1, total: missionPageCount })}
+                </span>
+                <button
+                  onClick={() => setMissionPage((p) => Math.min(missionPageCount - 1, p + 1))}
+                  disabled={missionPageSafe >= missionPageCount - 1}
+                  className="font-body text-[10px] font-bold px-2.5 py-1 cursor-pointer"
+                  style={{
+                    backgroundColor: 'rgba(196,163,90,0.08)',
+                    color: missionPageSafe >= missionPageCount - 1 ? '#444' : '#c4a35a',
+                    cursor: missionPageSafe >= missionPageCount - 1 ? 'default' : 'pointer',
+                  }}
+                >
+                  {'›'}
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="h-px mx-3" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }} />
@@ -1819,14 +1906,68 @@ export default function DeckBuilderPage() {
                 </div>
               </div>
 
-              <span className="text-[10px] uppercase font-bold block mb-1.5 mt-1" style={{ color: '#888', letterSpacing: '0.08em' }}>{t("deckBuilder.missionCards")}</span>
-              <div className="grid grid-cols-5 gap-1.5 mb-3">
-                {filteredMissions.map((m) => (
+              <div className="flex items-center justify-between mb-1.5 mt-1">
+                <span className="text-[10px] uppercase font-bold" style={{ color: '#888', letterSpacing: '0.08em' }}>{t("deckBuilder.missionCards")}</span>
+                <span className="text-[9px]" style={{ color: '#555' }}>{filteredMissions.length}</span>
+              </div>
+              <div className="flex items-center gap-1 mb-1.5">
+                <input
+                  type="text"
+                  placeholder={t("deckBuilder.missionSearch")}
+                  value={missionSearch}
+                  onChange={(e) => setMissionSearch(e.target.value)}
+                  className="flex-1 min-w-0 px-2 py-1.5 text-[11px] focus:outline-none"
+                  style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
+                />
+                {(['all', 'score', 'continuous'] as const).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => setMissionEffect(key)}
+                    className="font-body text-[9px] font-bold px-2 py-1.5 cursor-pointer shrink-0 uppercase"
+                    style={{
+                      backgroundColor: missionEffect === key ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
+                      color: missionEffect === key ? '#c4a35a' : '#666',
+                    }}
+                  >
+                    {t(`deckBuilder.missionFilter.${key}`)}
+                  </button>
+                ))}
+              </div>
+              <div className="grid grid-cols-5 gap-1.5">
+                {pagedMissions.map((m) => (
                   <CatalogMission key={m.id} card={m} allowed={missionAllowedMap.get(m.id) ?? true}
                     isBanned={bannedIds.has(m.id)}
                     onAdd={handleAddMission} onHover={handlePreview} />
                 ))}
               </div>
+              {missionPageCount > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-2 mb-1">
+                  <button
+                    onClick={() => setMissionPage((p) => Math.max(0, p - 1))}
+                    className="font-body text-[11px] font-bold px-3 py-1.5"
+                    style={{
+                      backgroundColor: 'rgba(196,163,90,0.08)',
+                      color: missionPageSafe === 0 ? '#444' : '#c4a35a',
+                    }}
+                  >
+                    {'‹'}
+                  </button>
+                  <span className="text-[10px]" style={{ color: '#777' }}>
+                    {t("deckBuilder.missionPage", { page: missionPageSafe + 1, total: missionPageCount })}
+                  </span>
+                  <button
+                    onClick={() => setMissionPage((p) => Math.min(missionPageCount - 1, p + 1))}
+                    className="font-body text-[11px] font-bold px-3 py-1.5"
+                    style={{
+                      backgroundColor: 'rgba(196,163,90,0.08)',
+                      color: missionPageSafe >= missionPageCount - 1 ? '#444' : '#c4a35a',
+                    }}
+                  >
+                    {'›'}
+                  </button>
+                </div>
+              )}
+              <div className="mb-3" />
 
               <div className="h-px my-2" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }} />
 

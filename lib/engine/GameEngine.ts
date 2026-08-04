@@ -32,6 +32,8 @@ import { executeMissionPhase, resumeMissionScoring, resolveChosenScoreEffect } f
 import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleGiantSpider103EndOfRound, returnCharacterToHand, processChosenEndOfRoundEffect, processRemainingEndOfRoundEffects, finalizeEndPhase } from './phases/EndPhase';
 import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
+import { missionSidePowerBonus } from '../effects/missions/ssMissions';
+import { openLowProfileAmbushPrompt } from '../effects/EffectEngine';
 import { isRempartZeroed, canBeHiddenByEnemy } from '../effects/ContinuousEffects';
 import { triggerOnDefeatEffects } from '../effects/onDefeatTriggers';
 import { ss000FinalizeSearch } from '../effects/handlers/SS/ss000Search';
@@ -167,7 +169,18 @@ export class GameEngine {
       result.rewindPoint = undefined;
     }
 
+    result = GameEngine.resolveLowProfileAmbushGrant(result);
+
     return result;
+  }
+
+  private static resolveLowProfileAmbushGrant(state: GameState): GameState {
+    const grant = state.lowProfileAmbush;
+    if (!grant) return state;
+    if (state.pendingActions.length > 0) return state;
+
+    const cleared = { ...state, lowProfileAmbush: null };
+    return openLowProfileAmbushPrompt(cleared, grant.player, grant.instanceId, grant.sourceCardId);
   }
 
   private static applyActionInner(state: GameState, player: PlayerID, action: GameAction): GameState {
@@ -531,7 +544,7 @@ export class GameEngine {
 
 
     
-    newState.activeMissions = newState.activeMissions.map(m => ({ ...m, wonBy: null }));
+    newState.activeMissions = newState.activeMissions.map(m => ({ ...m, wonBy: null, highPriorityPassDone: false }));
 
     
     newState = executeMissionPhase(newState);
@@ -1833,6 +1846,8 @@ export class GameEngine {
         ...mission,
         player1Characters: makeVisible(mission.player1Characters, 'player1'),
         player2Characters: makeVisible(mission.player2Characters, 'player2'),
+        player1PowerBonus: missionSidePowerBonus(mission, 'player1'),
+        player2PowerBonus: missionSidePowerBonus(mission, 'player2'),
       };
     });
 

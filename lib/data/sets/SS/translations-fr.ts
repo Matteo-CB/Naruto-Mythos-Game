@@ -148,7 +148,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     "[↯] Défaussez un équipement en jeu.",
   ],
   'SS-111-SHINOBIV': [
-    "[↯] Neji Hyûga : Reprenez en main la Hinata Hyûga la plus haute de votre pile de défausse.",
+    "[↯] DUEL Neji Hyûga : Reprenez en main la Hinata Hyûga la plus haute de votre pile de défausse.",
     "[↯] Jouez un personnage nommé Hyûga n’importe où, en payant 3 de moins.",
   ],
   'SS-112-SHINOBIV': [
@@ -161,6 +161,6 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   ],
   'SS-115-SHINOBIV': [
     "[⧗] Ce personnage ne perd pas ses jetons de Puissance à la fin de la manche.",
-    "[⧗] Gaara : Quand vous battez un personnage ennemi, POWERUP 2.",
+    "[⧗] DUEL Gaara : Quand vous battez un personnage ennemi, POWERUP 2.",
   ],
 };

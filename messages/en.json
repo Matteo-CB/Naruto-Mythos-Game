@@ -991,12 +991,13 @@
         "ss117Chakra": "{card}: gained 1 Chakra for moving enemy characters.",
         "ss046DrawNames": "{card}: revealed {revealed} then drew {target}.",
         "ssMss01Powerup": "{card}: POWERUP 2 on {target}, a name no other character holds here.",
-        "ssMss02Looked": "{card}: looked at a hidden character ({target}).",
+        "ssMss02Looked": "{card}: a hidden character was looked at.",
         "ssMss06Ambush": "{card}: AMBUSH POWERUP 2 on {target}.",
         "ssMss09ForcedDraw": "{card}: the opponent must draw a card.",
         "ssMss10Discarded": "{card}: {target} was discarded.",
         "ss111ReturnHinata": "{card}: {target} returns from the discard pile to hand.",
-        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} after defeating {defeated}."
+        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} after defeating {defeated}.",
+        "ssMss04SecondScore": "{card}: this mission scores a second time."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -1651,12 +1652,15 @@
         "ssMss02LookHidden": "Reconnaissance: look at a hidden character.",
         "ssMss02MoveHidden": "Reconnaissance: you may move that character to another mission.",
         "ssMss10DiscardAttachment": "Sabotage: discard an attachment in play.",
-        "ss111ConfirmDuel": "Take back the topmost Hinata Hyuga from your discard pile?",
-        "ss111ConfirmMain": "Play a Hyuga-named character anywhere, paying 3 less?",
-        "ss111PlayHyuga": "Play a Hyuga-named character anywhere, paying {reduction} less."
+        "ss111ConfirmDuel": "DUEL Neji Hyuga: take back the topmost Hinata Hyuga from your discard pile?",
+        "ss111ConfirmMain": "MAIN: play a Hyuga-named character anywhere, paying 3 less?",
+        "ss111PlayHyuga": "MAIN: choose a Hyuga-named character to play, paying {reduction} less.",
+        "ssMss06ConfirmAmbush": "Keep a Low Profile: AMBUSH POWERUP 2 on this character?"
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
-      "upgradeModifierDecline": "Keep the MAIN effect only"
+      "upgradeModifierDecline": "Keep the MAIN effect only",
+      "ssMss02RevealTitle": "Reconnaissance",
+      "ssMss02RevealResult": "You look at this hidden character."
     },
     "anim": {
       "cardPlayedHidden": "Card Played Hidden",
@@ -1982,7 +1986,14 @@
     "containsUnrevealed": "Contains unrevealed",
     "useDeck": "Use this deck",
     "cardDetail": "Card detail",
-    "otherDecks": "Other decks"
+    "otherDecks": "Other decks",
+    "missionSearch": "Search a mission",
+    "missionPage": "Page {page} / {total}",
+    "missionFilter": {
+      "all": "All",
+      "score": "Score",
+      "continuous": "Ongoing"
+    }
   },
   "discord": {
     "linkDiscord": "Link Discord",

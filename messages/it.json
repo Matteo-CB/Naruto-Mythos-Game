@@ -1875,7 +1875,14 @@
     "containsUnrevealed": "Contiene non rivelate",
     "useDeck": "Usa questo mazzo",
     "cardDetail": "Dettaglio della carta",
-    "otherDecks": "Altri mazzi"
+    "otherDecks": "Altri mazzi",
+    "missionSearch": "Cerca una missione",
+    "missionPage": "Pagina {page} / {total}",
+    "missionFilter": {
+      "all": "Tutte",
+      "score": "Score",
+      "continuous": "Continuo"
+    }
   },
   "seoPages": {
     "collection": {
@@ -3070,12 +3077,13 @@
         "ss117Chakra": "{card}: ha guadagnato 1 Chakra per aver spostato personaggi nemici.",
         "ss046DrawNames": "{card}: rivela {revealed} e poi pesca {target}.",
         "ssMss01Powerup": "{card}: POWERUP 2 su {target}, un nome che nessun altro personaggio ha qui.",
-        "ssMss02Looked": "{card}: è stato guardato un personaggio nascosto ({target}).",
+        "ssMss02Looked": "{card}: è stato guardato un personaggio nascosto.",
         "ssMss06Ambush": "{card}: AMBUSH POWERUP 2 su {target}.",
         "ssMss09ForcedDraw": "{card}: l’avversario deve pescare una carta.",
         "ssMss10Discarded": "{card}: {target} è stato scartato.",
         "ss111ReturnHinata": "{card}: {target} torna dagli scarti alla mano.",
-        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} dopo aver sconfitto {defeated}."
+        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} dopo aver sconfitto {defeated}.",
+        "ssMss04SecondScore": "{card}: questa missione viene assegnata una seconda volta."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3730,12 +3738,15 @@
         "ssMss02LookHidden": "Ricognizione: guarda un personaggio nascosto.",
         "ssMss02MoveHidden": "Ricognizione: puoi spostare quel personaggio in un’altra missione.",
         "ssMss10DiscardAttachment": "Sabotaggio: scarta un equipaggiamento in gioco.",
-        "ss111ConfirmDuel": "Rimettere in mano la Hinata Hyuga più in alto negli scarti?",
-        "ss111ConfirmMain": "Giocare un personaggio di nome Hyuga ovunque, pagando 3 in meno?",
-        "ss111PlayHyuga": "Gioca un personaggio di nome Hyuga ovunque, pagando {reduction} in meno."
+        "ss111ConfirmDuel": "DUEL Neji Hyuga: rimettere in mano la Hinata Hyuga più in alto negli scarti?",
+        "ss111ConfirmMain": "MAIN: giocare un personaggio di nome Hyuga ovunque, pagando 3 in meno?",
+        "ss111PlayHyuga": "MAIN: scegli un personaggio di nome Hyuga da giocare, pagando {reduction} in meno.",
+        "ssMss06ConfirmAmbush": "Passare inosservati: AMBUSH POWERUP 2 su questo personaggio?"
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
-      "upgradeModifierDecline": "Mantieni solo l'effetto MAIN"
+      "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",
+      "ssMss02RevealTitle": "Ricognizione",
+      "ssMss02RevealResult": "Guardi questo personaggio nascosto."
     },
     "anim": {
       "cardPlayedHidden": "Carta Giocata Coperta",

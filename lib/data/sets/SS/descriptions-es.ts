@@ -151,7 +151,7 @@ export const effectDescriptionsEs: Record<string, string[]> = {
     "[↯] Descarta un equipamiento en juego.",
   ],
   'SS-111-SHINOBIV': [
-    "[↯] Neji Hyuga: Devuelve a tu mano la Hinata Hyuga más alta de tu pila de descartes.",
+    "[↯] DUEL Neji Hyuga: Devuelve a tu mano la Hinata Hyuga más alta de tu pila de descartes.",
     "[↯] Juega un personaje llamado Hyuga en cualquier lugar, pagando 3 menos.",
   ],
   'SS-112-SHINOBIV': [
@@ -164,6 +164,6 @@ export const effectDescriptionsEs: Record<string, string[]> = {
   ],
   'SS-115-SHINOBIV': [
     "[⧗] Este personaje no pierde sus contadores de Poder al final de la ronda.",
-    "[⧗] Gaara: Cuando derrotas a un personaje enemigo, POWERUP 2.",
+    "[⧗] DUEL Gaara: Cuando derrotas a un personaje enemigo, POWERUP 2.",
   ],
 };

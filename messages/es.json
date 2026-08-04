@@ -996,12 +996,13 @@
         "ss117Chakra": "{card}: ganó 1 Chakra por mover personajes enemigos.",
         "ss046DrawNames": "{card}: revela {revealed} y luego roba {target}.",
         "ssMss01Powerup": "{card}: POWERUP 2 a {target}, un nombre que ningún otro personaje tiene aquí.",
-        "ssMss02Looked": "{card}: se ha mirado un personaje oculto ({target}).",
+        "ssMss02Looked": "{card}: se ha mirado un personaje oculto.",
         "ssMss06Ambush": "{card}: AMBUSH POWERUP 2 a {target}.",
         "ssMss09ForcedDraw": "{card}: el oponente debe robar una carta.",
         "ssMss10Discarded": "{card}: {target} ha sido descartado.",
         "ss111ReturnHinata": "{card}: {target} vuelve del descarte a la mano.",
-        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} tras derrotar a {defeated}."
+        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} tras derrotar a {defeated}.",
+        "ssMss04SecondScore": "{card}: esta misión se puntúa por segunda vez."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",
@@ -1656,12 +1657,15 @@
         "ssMss02LookHidden": "Reconocimiento: mira un personaje oculto.",
         "ssMss02MoveHidden": "Reconocimiento: puedes mover ese personaje a otra misión.",
         "ssMss10DiscardAttachment": "Sabotaje: descarta un equipamiento en juego.",
-        "ss111ConfirmDuel": "¿Devolver a tu mano la Hinata Hyuga más alta de tu descarte?",
-        "ss111ConfirmMain": "¿Jugar un personaje llamado Hyuga en cualquier lugar, pagando 3 menos?",
-        "ss111PlayHyuga": "Juega un personaje llamado Hyuga en cualquier lugar, pagando {reduction} menos."
+        "ss111ConfirmDuel": "DUEL Neji Hyuga: ¿devolver a tu mano la Hinata Hyuga más alta de tu descarte?",
+        "ss111ConfirmMain": "MAIN: ¿jugar un personaje llamado Hyuga en cualquier lugar, pagando 3 menos?",
+        "ss111PlayHyuga": "MAIN: elige un personaje llamado Hyuga para jugar, pagando {reduction} menos.",
+        "ssMss06ConfirmAmbush": "Pasar desapercibido: ¿AMBUSH POWERUP 2 a este personaje?"
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
-      "upgradeModifierDecline": "Mantener solo el efecto MAIN"
+      "upgradeModifierDecline": "Mantener solo el efecto MAIN",
+      "ssMss02RevealTitle": "Reconocimiento",
+      "ssMss02RevealResult": "Miras este personaje oculto."
     },
     "anim": {
       "cardPlayedHidden": "Carta jugada oculta",
@@ -1987,7 +1991,14 @@
     "containsUnrevealed": "Contiene no reveladas",
     "useDeck": "Usar este mazo",
     "cardDetail": "Detalle de la carta",
-    "otherDecks": "Otros mazos"
+    "otherDecks": "Otros mazos",
+    "missionSearch": "Buscar una misión",
+    "missionPage": "Página {page} / {total}",
+    "missionFilter": {
+      "all": "Todas",
+      "score": "Score",
+      "continuous": "Continuo"
+    }
   },
   "discord": {
     "linkDiscord": "Vincular Discord",

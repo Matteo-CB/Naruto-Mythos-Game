@@ -147,7 +147,7 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "[↯] Odrzuć jedno wyposażenie na stole.",
   ],
   'SS-111-SHINOBIV': [
-    "[↯] Neji Hyuga: Weź do ręki najwyżej leżącą Hinatę Hyugę ze swojego stosu odrzuconych.",
+    "[↯] DUEL Neji Hyuga: Weź do ręki najwyżej leżącą Hinatę Hyugę ze swojego stosu odrzuconych.",
     "[↯] Zagraj postać o nazwie Hyuga w dowolnym miejscu, płacąc 3 mniej.",
   ],
   'SS-112-SHINOBIV': [
@@ -160,6 +160,6 @@ export const effectDescriptionsPl: Record<string, string[]> = {
   ],
   'SS-115-SHINOBIV': [
     "[⧗] Ta postać nie traci żetonów Mocy na koniec rundy.",
-    "[⧗] Gaara: Gdy pokonasz wrogą postać, POWERUP 2.",
+    "[⧗] DUEL Gaara: Gdy pokonasz wrogą postać, POWERUP 2.",
   ],
 };

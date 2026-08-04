@@ -154,16 +154,64 @@ function isAmbushLinkedUpgrade(description: string): boolean {
 }
 
 
-function applyLowProfileAmbush(state: GameState, player: PlayerID, instanceId: string): GameState {
+function lowProfileAmbushApplies(state: GameState, instanceId: string): boolean {
+  const located = EffectEngine.findCharByInstanceId(state, instanceId);
+  if (!located) return false;
+  if (located.character.isHidden) return false;
+  return missionCarries(state.activeMissions[located.missionIndex], SS_MISSION_LOW_PROFILE);
+}
+
+export function openLowProfileAmbushPrompt(
+  state: GameState,
+  player: PlayerID,
+  instanceId: string,
+  sourceCardId: string,
+): GameState {
+  if (!lowProfileAmbushApplies(state, instanceId)) return state;
   const located = EffectEngine.findCharByInstanceId(state, instanceId);
   if (!located) return state;
-  const mission = state.activeMissions[located.missionIndex];
-  if (!missionCarries(mission, SS_MISSION_LOW_PROFILE)) return state;
-  if (located.character.isHidden) return state;
 
-  const side = state.activeMissions[located.missionIndex].player1Characters.some((c) => c.instanceId === instanceId)
-    ? 'player1Characters'
-    : 'player2Characters';
+  const effectId = generateInstanceId();
+  const actionId = generateInstanceId();
+  const newState = { ...state };
+  newState.pendingEffects = [...newState.pendingEffects, {
+    id: effectId,
+    sourceCardId,
+    sourceInstanceId: instanceId,
+    sourceMissionIndex: located.missionIndex,
+    effectType: 'AMBUSH' as EffectType,
+    effectDescription: JSON.stringify({}),
+    targetSelectionType: 'SSMSS06_CONFIRM_AMBUSH',
+    sourcePlayer: player,
+    requiresTargetSelection: true,
+    validTargets: [instanceId],
+    isOptional: true,
+    isMandatory: false,
+    resolved: false,
+    isUpgrade: false,
+    rootOptional: true,
+  } as PendingEffect];
+  newState.pendingActions = [...newState.pendingActions, {
+    id: actionId,
+    type: 'SELECT_TARGET' as PendingAction['type'],
+    player,
+    description: 'Keep a Low Profile (SS-006): AMBUSH POWERUP 2 on the revealed character?',
+    descriptionKey: 'game.effect.desc.ssMss06ConfirmAmbush',
+    options: [instanceId],
+    minSelections: 1,
+    maxSelections: 1,
+    sourceEffectId: effectId,
+  }];
+  return newState;
+}
+
+export function applyLowProfileAmbushPowerup(state: GameState, player: PlayerID, instanceId: string): GameState {
+  const located = EffectEngine.findCharByInstanceId(state, instanceId);
+  if (!located) return state;
+  const side: 'player1Characters' | 'player2Characters' =
+    state.activeMissions[located.missionIndex].player1Characters.some((c) => c.instanceId === instanceId)
+      ? 'player1Characters'
+      : 'player2Characters';
 
   const missions = state.activeMissions.map((m, idx) => {
     if (idx !== located.missionIndex) return m;
@@ -187,6 +235,25 @@ function applyLowProfileAmbush(state: GameState, player: PlayerID, instanceId: s
       'game.log.effect.ssMss06Ambush',
       { card: 'Faire profil bas', id: 'SS-006-MMS', target: top.name_fr }),
   };
+}
+
+function insertDuelAtPrintedPosition(orderedTypes: EffectType[], topCard: CharacterCard | undefined): void {
+  const printed = topCard?.effects ?? [];
+  const printedIndexOf = (type: EffectType): number => printed.findIndex((e) => e.type === type);
+  const duelPrinted = printedIndexOf('DUEL');
+  if (duelPrinted < 0) {
+    orderedTypes.push('DUEL');
+    return;
+  }
+  let insertAt = orderedTypes.length;
+  for (let i = 0; i < orderedTypes.length; i++) {
+    const otherPrinted = printedIndexOf(orderedTypes[i]);
+    if (otherPrinted >= 0 && otherPrinted > duelPrinted) {
+      insertAt = i;
+      break;
+    }
+  }
+  orderedTypes.splice(insertAt, 0, 'DUEL');
 }
 
 function isFirstStrikeArmed(
@@ -255,7 +322,7 @@ export class EffectEngine {
     }
 
     if (!orderedTypes.includes('DUEL') && hasResolvableInstantDuel(newState, missionIndex, topCard.effects)) {
-      orderedTypes.push('DUEL');
+      insertDuelAtPrintedPosition(orderedTypes, topCard);
     }
 
     const hasFirstStrike = (topCard.effects ?? []).some((e) => e.type === 'FIRST_STRIKE');
@@ -379,7 +446,7 @@ export class EffectEngine {
     }
 
     if (!orderedTypes.includes('DUEL') && hasResolvableInstantDuel(newState, missionIndex, topCard.effects)) {
-      orderedTypes.push('DUEL');
+      insertDuelAtPrintedPosition(orderedTypes, topCard);
     }
 
     if (isFirstStrikeArmed(newState, player, character, topCard, isOwnPlayAction)) {
@@ -453,9 +520,17 @@ export class EffectEngine {
 
     const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;
 
+    if (missionCarries(newState.activeMissions[missionIndex], SS_MISSION_LOW_PROFILE)) {
+      newState = {
+        ...newState,
+        lowProfileAmbush: { player, instanceId: character.instanceId, sourceCardId: topCard.id },
+      };
+    }
+
     const firstStrikeArmed = isFirstStrikeArmed(newState, player, character, topCard, isOwnPlayAction);
     if (firstStrikeArmed) newState = withFirstStrikeStatus(newState, player, 'used');
     const firstStrikeTail: EffectType[] = firstStrikeArmed ? ['FIRST_STRIKE' as EffectType] : [];
+    const revealTail: EffectType[] = [...firstStrikeTail];
 
     const hasInstantEffectReveal = (topCard.effects ?? []).some((e) =>
       (e.type === 'MAIN' || e.type === 'AMBUSH' || e.type === 'UPGRADE') && !e.description.includes('[⧗]'),
@@ -499,7 +574,7 @@ export class EffectEngine {
             const hasAmbushEffect = (topCard.effects ?? []).some((e) => e.type === 'AMBUSH');
             if (hasAmbushEffect) remainingEffectTypes.push('AMBUSH');
             if (hasResolvableInstantDuel(result.state, missionIndex, topCard.effects)) remainingEffectTypes.push('DUEL');
-            remainingEffectTypes.push(...firstStrikeTail);
+            remainingEffectTypes.push(...revealTail);
 
 
             newState = EffectEngine.createPendingTargetSelection(
@@ -536,7 +611,7 @@ export class EffectEngine {
 
             const ambushRemaining: EffectType[] = [];
             if (hasResolvableInstantDuel(result.state, missionIndex, topCard.effects)) ambushRemaining.push('DUEL');
-            ambushRemaining.push(...firstStrikeTail);
+            ambushRemaining.push(...revealTail);
 
             newState = EffectEngine.createPendingTargetSelection(
               result.state, player, character, missionIndex, 'AMBUSH', false,
@@ -570,7 +645,7 @@ export class EffectEngine {
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
             newState = EffectEngine.createPendingTargetSelection(
               result.state, player, charResult?.character ?? character, charResult?.missionIndex ?? missionIndex, 'DUEL', false,
-              result, [...firstStrikeTail], true,
+              result, [...revealTail], true,
             );
             return newState;
           }
@@ -587,8 +662,6 @@ export class EffectEngine {
         newState = EffectEngine.resolveFirstStrikeEffect(newState, player, fsChar.character, fsChar.missionIndex);
       }
     }
-
-    newState = applyLowProfileAmbush(newState, player, character.instanceId);
 
     return newState;
   }
@@ -701,7 +774,7 @@ export class EffectEngine {
         
         newState = EffectEngine.createPendingTargetSelection(
           result.state, player, (character ?? null) as unknown as CharacterInPlay, missionIndex, 'SCORE', false,
-          result, [],
+          result, [], undefined, cardId,
         );
         return { state: newState, pending: true };
       }
@@ -723,6 +796,7 @@ export class EffectEngine {
     result: EffectResult,
     remainingEffectTypes: EffectType[],
     wasRevealed?: boolean,
+    sourcelessCardId?: string,
   ): GameState {
     
     
@@ -759,11 +833,12 @@ export class EffectEngine {
     const topCard = character
       ? (character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card)
       : null;
+    const pendingSourceCardId = topCard?.id ?? sourcelessCardId ?? '';
 
     const isThisOptional = !result.isMandatory;
     const pendingEffect: PendingEffect = {
       id: effectId,
-      sourceCardId: topCard?.id ?? '',
+      sourceCardId: pendingSourceCardId,
       sourceInstanceId: character?.instanceId ?? '',
       sourceMissionIndex: missionIndex,
       effectType,
@@ -5923,6 +5998,7 @@ export class EffectEngine {
       case 'SS119_CONFIRM_MAIN':
       case 'SS085_CONFIRM_MAIN':
       case 'SS099_CONFIRM_MAIN':
+      case 'SS049_CONFIRM_FIRST_STRIKE':
       case 'MINATO122_CONFIRM_MAIN': {
         let relay: { nextType?: string; targets?: string[]; nextKey?: string; nextText?: string } = {};
         try { relay = JSON.parse(pendingEffect.effectDescription); } catch {}
@@ -6323,7 +6399,8 @@ export class EffectEngine {
 
       case 'SSMSS10_CONFIRM_SCORE': {
         const m10cPlayer = pendingEffect.sourcePlayer;
-        const m10cAttachments = attachmentsInPlay(newState).map((a) => a.attachmentId);
+        const m10cList = attachmentsInPlay(newState);
+        const m10cAttachments = m10cList.map((a) => a.attachmentId);
         if (m10cAttachments.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, m10cPlayer,
             'SCORE_NO_TARGET', 'Sabotage (SS-010): No attachment in play (state changed).',
@@ -6337,7 +6414,10 @@ export class EffectEngine {
           sourceInstanceId: pendingEffect.sourceInstanceId,
           sourceMissionIndex: pendingEffect.sourceMissionIndex,
           effectType: pendingEffect.effectType,
-          effectDescription: 'Sabotage (SS-010): discard an attachment in play.',
+          effectDescription: JSON.stringify({
+            text: 'Sabotage (SS-010): discard an attachment in play.',
+            attachments: m10cList,
+          }),
           targetSelectionType: 'SSMSS10_DISCARD_ATTACHMENT',
           sourcePlayer: m10cPlayer, requiresTargetSelection: true,
           validTargets: m10cAttachments, isOptional: false, isMandatory: true,
@@ -6346,11 +6426,18 @@ export class EffectEngine {
         }];
         pendingEffect.remainingEffectTypes = undefined;
         newState.pendingActions = [...newState.pendingActions, {
-          id: m10cActId, type: 'SELECT_TARGET' as PendingAction['type'], player: m10cPlayer,
+          id: m10cActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'], player: m10cPlayer,
           description: 'Sabotage (SS-010): discard an attachment in play.',
           descriptionKey: 'game.effect.desc.ssMss10DiscardAttachment',
           options: m10cAttachments, minSelections: 1, maxSelections: 1, sourceEffectId: m10cEffId,
         }];
+        break;
+      }
+
+      case 'SSMSS06_CONFIRM_AMBUSH': {
+        newState = applyLowProfileAmbushPowerup(
+          newState, pendingEffect.sourcePlayer, pendingEffect.sourceInstanceId,
+        );
         break;
       }
 
@@ -6364,36 +6451,72 @@ export class EffectEngine {
           : m2Located.character.card;
         newState.log = logAction(newState.log, newState.turn, newState.phase, m2Player,
           'SCORE_LOOK_HIDDEN',
-          `Reconnaissance (SS-002): looked at a hidden character (${m2Top.name_fr}).`,
+          'Reconnaissance (SS-002): looked at a hidden character.',
           'game.log.effect.ssMss02Looked',
-          { card: 'Reconnaissance', id: 'SS-002-MMS', target: m2Top.name_fr });
+          { card: 'Reconnaissance', id: 'SS-002-MMS' });
 
-        const m2Destinations: string[] = [];
-        for (let i = 0; i < newState.activeMissions.length; i++) {
-          if (i !== m2Located.missionIndex) m2Destinations.push(String(i));
-        }
-        if (m2Destinations.length === 0) break;
-
-        const m2EffId = generateInstanceId();
-        const m2ActId = generateInstanceId();
+        const m2RevealEffId = generateInstanceId();
+        const m2RevealActId = generateInstanceId();
         newState.pendingEffects = [...newState.pendingEffects, {
-          id: m2EffId, sourceCardId: pendingEffect.sourceCardId,
+          id: m2RevealEffId, sourceCardId: pendingEffect.sourceCardId,
           sourceInstanceId: targetId,
           sourceMissionIndex: m2Located.missionIndex,
           effectType: pendingEffect.effectType,
-          effectDescription: 'Reconnaissance (SS-002): you may move the character you looked at.',
-          targetSelectionType: 'SSMSS02_MOVE_HIDDEN',
+          effectDescription: JSON.stringify({
+            cardName: m2Top.name_fr,
+            cardCost: m2Top.chakra,
+            cardPower: m2Top.power,
+            cardImageFile: m2Top.image_file,
+          }),
+          targetSelectionType: 'SSMSS02_LOOK_REVEAL',
           sourcePlayer: m2Player, requiresTargetSelection: true,
-          validTargets: m2Destinations, isOptional: true, isMandatory: false,
+          validTargets: ['confirm'], isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
           remainingEffectTypes: pendingEffect.remainingEffectTypes,
         }];
         pendingEffect.remainingEffectTypes = undefined;
         newState.pendingActions = [...newState.pendingActions, {
-          id: m2ActId, type: 'SELECT_MISSION' as PendingAction['type'], player: m2Player,
+          id: m2RevealActId, type: 'SELECT_TARGET' as PendingAction['type'], player: m2Player,
+          description: `Reconnaissance (SS-002): you look at ${m2Top.name_fr}.`,
+          descriptionKey: 'game.effect.desc.ssMss02Looked',
+          descriptionParams: { target: m2Top.name_fr, cost: String(m2Top.chakra ?? 0), power: String(m2Top.power ?? 0) },
+          options: ['confirm'], minSelections: 1, maxSelections: 1, sourceEffectId: m2RevealEffId,
+        }];
+        break;
+      }
+
+      case 'SSMSS02_LOOK_REVEAL': {
+        const m2rPlayer = pendingEffect.sourcePlayer;
+        const m2rInstanceId = pendingEffect.sourceInstanceId;
+        const m2rLocated = EffectEngine.findCharByInstanceId(newState, m2rInstanceId);
+        if (!m2rLocated) break;
+
+        const m2rDestinations: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (i !== m2rLocated.missionIndex) m2rDestinations.push(String(i));
+        }
+        if (m2rDestinations.length === 0) break;
+
+        const m2rEffId = generateInstanceId();
+        const m2rActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: m2rEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: m2rInstanceId,
+          sourceMissionIndex: m2rLocated.missionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: 'Reconnaissance (SS-002): you may move the character you looked at.',
+          targetSelectionType: 'SSMSS02_MOVE_HIDDEN',
+          sourcePlayer: m2rPlayer, requiresTargetSelection: true,
+          validTargets: m2rDestinations, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: m2rActId, type: 'SELECT_MISSION' as PendingAction['type'], player: m2rPlayer,
           description: 'Reconnaissance (SS-002): you may move that character to another mission.',
           descriptionKey: 'game.effect.desc.ssMss02MoveHidden',
-          options: m2Destinations, minSelections: 1, maxSelections: 1, sourceEffectId: m2EffId,
+          options: m2rDestinations, minSelections: 1, maxSelections: 1, sourceEffectId: m2rEffId,
         }];
         break;
       }

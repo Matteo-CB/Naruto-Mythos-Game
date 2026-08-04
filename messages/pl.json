@@ -1875,7 +1875,14 @@
     "containsUnrevealed": "Zawiera nieujawnione",
     "useDeck": "Użyj tej talii",
     "cardDetail": "Szczegóły karty",
-    "otherDecks": "Inne talie"
+    "otherDecks": "Inne talie",
+    "missionSearch": "Szukaj misji",
+    "missionPage": "Strona {page} / {total}",
+    "missionFilter": {
+      "all": "Wszystkie",
+      "score": "Score",
+      "continuous": "Ciągłe"
+    }
   },
   "seoPages": {
     "collection": {
@@ -3070,12 +3077,13 @@
         "ss117Chakra": "{card}: zyskano 1 Czakry za przeniesienie wrogich postaci.",
         "ss046DrawNames": "{card}: odkrywa {revealed}, a następnie dobiera {target}.",
         "ssMss01Powerup": "{card}: POWERUP 2 dla {target}, nazwy której nie ma tu żadna inna postać.",
-        "ssMss02Looked": "{card}: obejrzano zakrytą postać ({target}).",
+        "ssMss02Looked": "{card}: obejrzano zakrytą postać.",
         "ssMss06Ambush": "{card}: AMBUSH POWERUP 2 dla {target}.",
         "ssMss09ForcedDraw": "{card}: przeciwnik musi dobrać kartę.",
         "ssMss10Discarded": "{card}: {target} zostało odrzucone.",
         "ss111ReturnHinata": "{card}: {target} wraca ze stosu odrzuconych do ręki.",
-        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} po pokonaniu {defeated}."
+        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} po pokonaniu {defeated}.",
+        "ssMss04SecondScore": "{card}: ta misja jest punktowana po raz drugi."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3730,12 +3738,15 @@
         "ssMss02LookHidden": "Zwiad: zobacz zakrytą postać.",
         "ssMss02MoveHidden": "Zwiad: możesz przenieść tę postać do innej misji.",
         "ssMss10DiscardAttachment": "Sabotaż: odrzuć wyposażenie na stole.",
-        "ss111ConfirmDuel": "Wziąć do ręki najwyżej leżącą Hinatę Hyugę ze stosu odrzuconych?",
-        "ss111ConfirmMain": "Zagrać postać o nazwie Hyuga w dowolnym miejscu, płacąc 3 mniej?",
-        "ss111PlayHyuga": "Zagraj postać o nazwie Hyuga w dowolnym miejscu, płacąc {reduction} mniej."
+        "ss111ConfirmDuel": "DUEL Neji Hyuga: wziąć do ręki najwyżej leżącą Hinatę Hyugę ze stosu odrzuconych?",
+        "ss111ConfirmMain": "MAIN: zagrać postać o nazwie Hyuga w dowolnym miejscu, płacąc 3 mniej?",
+        "ss111PlayHyuga": "MAIN: wybierz postać o nazwie Hyuga do zagrania, płacąc {reduction} mniej.",
+        "ssMss06ConfirmAmbush": "Nie rzucaj się w oczy: AMBUSH POWERUP 2 dla tej postaci?"
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
-      "upgradeModifierDecline": "Zachowaj tylko efekt MAIN"
+      "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",
+      "ssMss02RevealTitle": "Zwiad",
+      "ssMss02RevealResult": "Oglądasz tę zakrytą postać."
     },
     "anim": {
       "cardPlayedHidden": "Karta Zagrana Zakryta",

@@ -3,9 +3,11 @@ import { validateDeck } from '@/lib/engine/rules/DeckValidation';
 import { getAllCards, getCharacterById, getMissionById } from '@/lib/data/cardIndex';
 import { LOCKED_VARIANT_RARITIES, SPECIAL_VARIANT_RARITIES, FORCE_UNLOCKED_CARD_IDS } from '@/lib/variants/constants';
 import { isStaticRankedBanned } from '@/lib/data/rankedBans';
-import { cardVersionKey } from '@/lib/cards/versionKey';
+import { cardVersionKey, isAlternateArtwork } from '@/lib/cards/versionKey';
 import { hasScenario } from '@/lib/cards/sim/keys';
-import type { CharacterCard, MissionCard } from '@/lib/engine/types';
+import type { CharacterCard, GameState, MissionCard } from '@/lib/engine/types';
+import { GameEngine } from '@/lib/engine/GameEngine';
+import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 
 const SHINOBI_IDS = ['SS-111-SHINOBIV', 'SS-112-SHINOBIV', 'SS-114-SHINOBIV', 'SS-115-SHINOBIV'];
 
@@ -117,5 +119,81 @@ describe('the Shinobi variants are a real rarity with real cards', () => {
     for (const id of SHINOBI_IDS) {
       expect(hasScenario(id), `${id} hasScenario`).toBe(true);
     }
+  });
+});
+
+describe('the deck builder mission section', () => {
+  it('hiding variants removes exactly the alternate artworks, never a base mission', () => {
+    const missions = getAllCards().filter((c) => c.card_type === 'mission');
+    const hidden = missions.filter((m) => isAlternateArtwork(m.id));
+    const shown = missions.filter((m) => !isAlternateArtwork(m.id));
+
+    expect(hidden.length, 'the ten SS alternate artworks are the ones hidden').toBe(10);
+    expect(hidden.every((m) => m.id.includes('_2-MMS'))).toBe(true);
+    expect(shown.some((m) => m.id === 'SS-001-MMS'), 'base SS missions stay visible').toBe(true);
+    expect(shown.some((m) => m.id.startsWith('KS-')), 'set 1 missions stay visible').toBe(true);
+  });
+
+  it('a full page of missions fits the fifteen-per-page layout', () => {
+    const playable = getAllCards().filter((c) => c.card_type === 'mission' && !isAlternateArtwork(c.id));
+    const pages = Math.ceil(playable.length / 15);
+    expect(playable.length, 'ten set 1 plus ten set 2 base missions').toBe(20);
+    expect(pages, 'twenty base missions span two pages').toBe(2);
+  });
+});
+
+describe('Team Training gives its +5 to the side that has exactly three', () => {
+  const ALLY = 'KS-009-C';
+
+  function trainingBoard(friendly: Array<{ hidden?: boolean }>): GameState {
+    return buildSimState({
+      missionIds: ['SS-008-MMS', 'KS-006-MMS'],
+      p1: friendly.map((f, i) => simChar(ALLY, { owner: 'player1', instanceId: `ally-${i}`, hidden: f.hidden })),
+    });
+  }
+
+  function shownTotal(state: GameState, player: 'player1' | 'player2'): number {
+    const visible = GameEngine.getVisibleState(state, player);
+    const mission = visible.activeMissions[0];
+    const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+    const bonus = (player === 'player1' ? mission.player1PowerBonus : mission.player2PowerBonus) ?? 0;
+    return chars.reduce((sum, c) => sum + c.effectivePower, 0) + bonus;
+  }
+
+  it('the total the player reads on the board includes the +5', () => {
+    const three = trainingBoard([{}, {}, {}]);
+    const base = three.activeMissions[0].player1Characters
+      .reduce((sum, c) => sum + (c.card.power ?? 0), 0);
+
+    expect(shownTotal(three, 'player1'), 'three characters, so five more power').toBe(base + 5);
+  });
+
+  it('two or four characters get nothing, and hidden ones do not count', () => {
+    expect(GameEngine.getVisibleState(trainingBoard([{}, {}]), 'player1').activeMissions[0].player1PowerBonus ?? 0).toBe(0);
+    expect(GameEngine.getVisibleState(trainingBoard([{}, {}, {}, {}]), 'player1').activeMissions[0].player1PowerBonus ?? 0).toBe(0);
+    expect(
+      GameEngine.getVisibleState(trainingBoard([{}, {}, {}, { hidden: true }]), 'player1').activeMissions[0].player1PowerBonus,
+      'a face-down ally is not one of the three',
+    ).toBe(5);
+    expect(
+      GameEngine.getVisibleState(trainingBoard([{}, {}, { hidden: true }]), 'player1').activeMissions[0].player1PowerBonus,
+      'only two are visible here',
+    ).toBe(0);
+  });
+
+  it('scoring uses the same total the board shows, so the mission is actually won', () => {
+    const state = buildSimState({
+      missionIds: ['SS-008-MMS', 'KS-006-MMS'],
+      p1: [0, 1, 2].map((i) => simChar(ALLY, { owner: 'player1', instanceId: `ally-${i}` })),
+      p2: [simChar(ALLY, { owner: 'player2', instanceId: 'enemy-1', powerTokens: 6 })],
+    });
+
+    const mine = shownTotal(state, 'player1');
+    const theirs = shownTotal(state, 'player2');
+    expect(mine, 'nine printed power plus five').toBe(14);
+    expect(theirs).toBe(9);
+
+    const scored = GameEngine.transitionToMissionPhase(state);
+    expect(scored.activeMissions[0].wonBy, 'the bonus decides the mission').toBe('player1');
   });
 });

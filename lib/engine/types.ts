@@ -105,6 +105,7 @@ export interface ActiveMission {
   wonBy?: PlayerID | 'draw' | null;
 
   attachments?: AttachedCard[];
+  highPriorityPassDone?: boolean;
 }
 
 
@@ -222,6 +223,7 @@ export interface GameState {
   
   actionHistory?: Array<{ player: PlayerID; action: GameAction; createdIds?: string[] }>;
   instanceSeq?: number;
+  lowProfileAmbush?: { player: PlayerID; instanceId: string; sourceCardId: string } | null;
   rewindPoint?: GameState;
   
   pendingForcedResolver?: PlayerID;
@@ -400,6 +402,8 @@ export interface VisibleMission extends Omit<ActiveMission, 'player1Characters' 
   
   player1Characters: VisibleCharacter[];
   player2Characters: VisibleCharacter[];
+  player1PowerBonus?: number;
+  player2PowerBonus?: number;
 }
 
 export interface VisibleCharacter {

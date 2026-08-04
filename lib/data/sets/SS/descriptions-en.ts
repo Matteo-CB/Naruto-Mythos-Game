@@ -148,7 +148,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "[↯] Discard an attachment in play.",
   ],
   'SS-111-SHINOBIV': [
-    "[↯] Neji Hyuga: Return the topmost Hinata Hyuga from your discard pile to your hand.",
+    "[↯] DUEL Neji Hyuga: Return the topmost Hinata Hyuga from your discard pile to your hand.",
     "[↯] Play a Hyuga-named character anywhere, paying 3 less.",
   ],
   'SS-112-SHINOBIV': [
@@ -161,6 +161,6 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   ],
   'SS-115-SHINOBIV': [
     "[⧗] This character doesn't lose Power tokens at the end of the round.",
-    "[⧗] Gaara: When you defeat an enemy character, POWERUP 2.",
+    "[⧗] DUEL Gaara: When you defeat an enemy character, POWERUP 2.",
   ],
 };

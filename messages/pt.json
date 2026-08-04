@@ -1875,7 +1875,14 @@
     "containsUnrevealed": "Contém não reveladas",
     "useDeck": "Usar este baralho",
     "cardDetail": "Detalhe da carta",
-    "otherDecks": "Outros decks"
+    "otherDecks": "Outros decks",
+    "missionSearch": "Procurar uma missão",
+    "missionPage": "Página {page} / {total}",
+    "missionFilter": {
+      "all": "Todas",
+      "score": "Score",
+      "continuous": "Contínuo"
+    }
   },
   "seoPages": {
     "collection": {
@@ -3070,12 +3077,13 @@
         "ss117Chakra": "{card}: ganhou 1 Chakra por mover personagens inimigos.",
         "ss046DrawNames": "{card}: revelou {revealed} e depois comprou {target}.",
         "ssMss01Powerup": "{card}: POWERUP 2 em {target}, um nome que mais nenhuma personagem tem aqui.",
-        "ssMss02Looked": "{card}: uma personagem escondida foi vista ({target}).",
+        "ssMss02Looked": "{card}: uma personagem escondida foi vista.",
         "ssMss06Ambush": "{card}: AMBUSH POWERUP 2 em {target}.",
         "ssMss09ForcedDraw": "{card}: o oponente tem de comprar uma carta.",
         "ssMss10Discarded": "{card}: {target} foi descartado.",
         "ss111ReturnHinata": "{card}: {target} volta do descarte para a mão.",
-        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} depois de derrotar {defeated}."
+        "ss115PowerupOnDefeat": "{card}: POWERUP {amount} depois de derrotar {defeated}.",
+        "ssMss04SecondScore": "{card}: esta missão é pontuada uma segunda vez."
       },
       "score": {
         "draw": "[SCORE] {card}: Comprou {count} carta(s).",
@@ -3730,12 +3738,15 @@
         "ssMss02LookHidden": "Reconhecimento: vê uma personagem escondida.",
         "ssMss02MoveHidden": "Reconhecimento: podes mover essa personagem para outra missão.",
         "ssMss10DiscardAttachment": "Sabotagem: descarta um equipamento em jogo.",
-        "ss111ConfirmDuel": "Devolver à mão a Hinata Hyuga mais acima na tua pilha de descarte?",
-        "ss111ConfirmMain": "Jogar uma personagem chamada Hyuga em qualquer lugar, pagando menos 3?",
-        "ss111PlayHyuga": "Joga uma personagem chamada Hyuga em qualquer lugar, pagando menos {reduction}."
+        "ss111ConfirmDuel": "DUEL Neji Hyuga: devolver à mão a Hinata Hyuga mais acima na pilha de descarte?",
+        "ss111ConfirmMain": "MAIN: jogar uma personagem chamada Hyuga em qualquer lugar, pagando menos 3?",
+        "ss111PlayHyuga": "MAIN: escolhe uma personagem chamada Hyuga para jogar, pagando menos {reduction}.",
+        "ssMss06ConfirmAmbush": "Passar despercebido: AMBUSH POWERUP 2 nesta personagem?"
       },
       "upgradeModifierConfirm": "Aplicar o efeito UPGRADE",
-      "upgradeModifierDecline": "Manter apenas o efeito MAIN"
+      "upgradeModifierDecline": "Manter apenas o efeito MAIN",
+      "ssMss02RevealTitle": "Reconhecimento",
+      "ssMss02RevealResult": "Vês esta personagem escondida."
     },
     "anim": {
       "cardPlayedHidden": "Carta Jogada Oculta",

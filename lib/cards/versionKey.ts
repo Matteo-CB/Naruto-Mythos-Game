@@ -7,3 +7,7 @@ export function cardVersionKey(cardId: string): string {
 export function sameVersion(cardIdA: string, cardIdB: string): boolean {
   return cardVersionKey(cardIdA) === cardVersionKey(cardIdB);
 }
+
+export function isAlternateArtwork(cardId: string): boolean {
+  return /^[A-Za-z]+-\d+_\d+-/.test(cardId);
+}

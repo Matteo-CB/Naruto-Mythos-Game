@@ -997,12 +997,13 @@
         "ss117Chakra": "{card} : 1 Chakra gagné pour avoir déplacé des personnages ennemis.",
         "ss046DrawNames": "{card} : {revealed} révélée(s), puis {target} piochée.",
         "ssMss01Powerup": "{card} : POWERUP 2 sur {target}, un nom qu’aucun autre personnage ne porte ici.",
-        "ssMss02Looked": "{card} : un personnage caché a été regardé ({target}).",
+        "ssMss02Looked": "{card} : un personnage caché a été regardé.",
         "ssMss06Ambush": "{card} : AMBUSH POWERUP 2 sur {target}.",
         "ssMss09ForcedDraw": "{card} : l’adversaire doit piocher une carte.",
         "ssMss10Discarded": "{card} : {target} a été défaussé.",
         "ss111ReturnHinata": "{card} : {target} revient de la défausse à la main.",
-        "ss115PowerupOnDefeat": "{card} : POWERUP {amount} après avoir battu {defeated}."
+        "ss115PowerupOnDefeat": "{card} : POWERUP {amount} après avoir battu {defeated}.",
+        "ssMss04SecondScore": "{card} : cette mission est marquée une seconde fois."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1657,12 +1658,15 @@
         "ssMss02LookHidden": "Reconnaissance : regardez un personnage caché.",
         "ssMss02MoveHidden": "Reconnaissance : vous pouvez déplacer ce personnage vers une autre mission.",
         "ssMss10DiscardAttachment": "Sabotage : défaussez un équipement en jeu.",
-        "ss111ConfirmDuel": "Reprendre en main la Hinata Hyûga la plus haute de votre défausse ?",
-        "ss111ConfirmMain": "Jouer un personnage nommé Hyûga n’importe où, en payant 3 de moins ?",
-        "ss111PlayHyuga": "Jouez un personnage nommé Hyûga n’importe où, en payant {reduction} de moins."
+        "ss111ConfirmDuel": "DUEL Neji Hyûga : reprendre en main la Hinata Hyûga la plus haute de votre défausse ?",
+        "ss111ConfirmMain": "MAIN : jouer un personnage nommé Hyûga n’importe où, en payant 3 de moins ?",
+        "ss111PlayHyuga": "MAIN : choisissez un personnage nommé Hyûga à jouer, en payant {reduction} de moins.",
+        "ssMss06ConfirmAmbush": "Faire profil bas : AMBUSH POWERUP 2 sur ce personnage ?"
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
-      "upgradeModifierDecline": "Garder l'effet MAIN seul"
+      "upgradeModifierDecline": "Garder l'effet MAIN seul",
+      "ssMss02RevealTitle": "Reconnaissance",
+      "ssMss02RevealResult": "Vous regardez ce personnage caché."
     },
     "anim": {
       "cardPlayedHidden": "Carte jouée face cachée",
@@ -1988,7 +1992,14 @@
     "containsUnrevealed": "Contient des cartes non révélées",
     "useDeck": "Utiliser ce deck",
     "cardDetail": "Détail de la carte",
-    "otherDecks": "Autres decks"
+    "otherDecks": "Autres decks",
+    "missionSearch": "Rechercher une mission",
+    "missionPage": "Page {page} / {total}",
+    "missionFilter": {
+      "all": "Toutes",
+      "score": "Score",
+      "continuous": "Continu"
+    }
   },
   "discord": {
     "linkDiscord": "Lier Discord",

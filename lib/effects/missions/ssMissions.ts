@@ -12,7 +12,7 @@ export const SS_MISSION_TEAM_TRAINING = 8;
 export function missionCarries(mission: ActiveMission | undefined, missionNumber: number): boolean {
   if (!mission) return false;
   const card = mission.card;
-  if (card.set !== 'SS' || card.card_type !== 'mission') return false;
+  if (!card || card.set !== 'SS' || card.card_type !== 'mission') return false;
   const number = typeof card.number === 'string' ? parseInt(card.number, 10) : card.number;
   return number === missionNumber;
 }
@@ -91,9 +91,24 @@ export function playedNameIsUniqueInMission(mission: ActiveMission, playedInstan
   if (!played) return false;
   const playedName = visibleName(played);
   if (!playedName) return false;
+
   for (const other of all) {
-    if (other.instanceId === playedInstanceId) continue;
+    if (other.instanceId === playedInstanceId) {
+      if (nameCoveredByThisPlay(other) === playedName) return false;
+      continue;
+    }
     if (visibleName(other) === playedName) return false;
   }
   return true;
+}
+
+function nameCoveredByThisPlay(played: CharacterInPlay): string | null {
+  if (played.isHidden) return null;
+  const stack = played.stack ?? [];
+  if (stack.length < 2) return null;
+  return stack[stack.length - 2]?.name_fr?.toUpperCase() ?? null;
+}
+
+export function missionSidePowerBonus(mission: ActiveMission, player: PlayerID): number {
+  return teamTrainingBonus(mission, player);
 }

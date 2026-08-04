@@ -54,9 +54,19 @@ export function resumeMissionScoring(state: GameState): GameState {
       if (newState.pendingActions.length > 0) {
         return newState;
       }
+
+      newState = startHighPrioritySecondPass(newState, scoreWinner, scoreMissionIdx, scoreRankIdx);
+      if (newState.pendingActions.length > 0) {
+        return newState;
+      }
     } else if (!progress.currentRankComplete) {
       newState = resolveRemainingScoreEffects(newState, progress.winner, missionIdx, progress);
 
+      if (newState.pendingActions.length > 0) {
+        return newState;
+      }
+
+      newState = startHighPrioritySecondPass(newState, progress.winner, missionIdx, progress.currentRankIndex);
       if (newState.pendingActions.length > 0) {
         return newState;
       }
@@ -217,9 +227,19 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
       if (newState.pendingActions.length > 0) {
         return newState;
       }
+
+      newState = startHighPrioritySecondPass(newState, winner, missionIndex, rankIndex);
+      if (newState.pendingActions.length > 0) {
+        return newState;
+      }
     } else {
       newState = resolveScoreEffectsWithProgress(newState, winner, missionIndex, rankIndex);
 
+      if (newState.pendingActions.length > 0) {
+        return newState;
+      }
+
+      newState = startHighPrioritySecondPass(newState, winner, missionIndex, rankIndex);
       if (newState.pendingActions.length > 0) {
         return newState;
       }
@@ -378,17 +398,32 @@ function resolveScoreEffectsWithProgress(
   rankIndex: number,
 ): GameState {
   const sources = collectScoreEffectSources(state, player, missionIndex);
-  const doubled = missionCarries(state.activeMissions[missionIndex], SS_MISSION_HIGH_PRIORITY);
-  if (doubled && sources.length > 0) {
-    const first = resolveScoreEffectsOnce(state, player, missionIndex, rankIndex, sources);
-    if (first.pendingActions.length > 0) return first;
-    const secondSources = collectScoreEffectSources(
-      { ...first, missionScoringProgress: undefined }, player, missionIndex,
-    );
-    if (secondSources.length === 0) return first;
-    return resolveScoreEffectsOnce(first, player, missionIndex, rankIndex, secondSources);
-  }
   return resolveScoreEffectsOnce(state, player, missionIndex, rankIndex, sources);
+}
+
+export function startHighPrioritySecondPass(
+  state: GameState,
+  player: PlayerID,
+  missionIndex: number,
+  rankIndex: number,
+): GameState {
+  const mission = state.activeMissions[missionIndex];
+  if (!missionCarries(mission, SS_MISSION_HIGH_PRIORITY)) return state;
+  if (mission.highPriorityPassDone) return state;
+
+  const missions = [...state.activeMissions];
+  missions[missionIndex] = { ...mission, highPriorityPassDone: true };
+  let newState: GameState = { ...state, activeMissions: missions, missionScoringProgress: undefined };
+
+  const sources = collectScoreEffectSources(newState, player, missionIndex);
+  if (sources.length === 0) return newState;
+
+  newState.log = logAction(newState.log, newState.turn, newState.phase, player, 'SCORE_REPEAT',
+    'High Priority Mission (SS-004): this mission scores a second time.',
+    'game.log.effect.ssMss04SecondScore',
+    { card: 'Mission prioritaire', id: 'SS-004-MMS' });
+
+  return resolveScoreEffectsOnce(newState, player, missionIndex, rankIndex, sources);
 }
 
 function resolveScoreEffectsOnce(

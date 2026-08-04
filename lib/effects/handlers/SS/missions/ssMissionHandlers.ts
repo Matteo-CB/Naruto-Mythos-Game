@@ -1,5 +1,5 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
-import type { GameState, PlayerID } from '@/lib/engine/types';
+import type { GameState, PlayerID, CardData } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
@@ -49,17 +49,48 @@ export function hiddenCharactersInPlay(state: GameState): string[] {
   return ids;
 }
 
-export function attachmentsInPlay(state: GameState): Array<{ attachmentId: string; hostInstanceId: string; missionIndex: number }> {
-  const found: Array<{ attachmentId: string; hostInstanceId: string; missionIndex: number }> = [];
+export interface AttachmentInPlay {
+  attachmentId: string;
+  hostInstanceId: string;
+  missionIndex: number;
+  name_fr: string;
+  name_en?: string;
+  chakra: number;
+  power: number;
+  image_file?: string;
+  hostName?: string;
+}
+
+export function attachmentsInPlay(state: GameState): AttachmentInPlay[] {
+  const found: AttachmentInPlay[] = [];
+
+  const describe = (
+    attachment: { instanceId: string; card: CardData },
+    hostInstanceId: string,
+    missionIndex: number,
+    hostName?: string,
+  ): AttachmentInPlay => ({
+    attachmentId: attachment.instanceId,
+    hostInstanceId,
+    missionIndex,
+    name_fr: attachment.card.name_fr,
+    name_en: attachment.card.name_en,
+    chakra: typeof attachment.card.chakra === 'number' ? attachment.card.chakra : 0,
+    power: typeof attachment.card.power === 'number' ? attachment.card.power : 0,
+    image_file: attachment.card.image_file,
+    hostName,
+  });
+
   for (let i = 0; i < state.activeMissions.length; i++) {
     const mission = state.activeMissions[i];
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+      const top = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       for (const attachment of char.attachments ?? []) {
-        found.push({ attachmentId: attachment.instanceId, hostInstanceId: char.instanceId, missionIndex: i });
+        found.push(describe(attachment, char.instanceId, i, char.isHidden ? undefined : top?.name_fr));
       }
     }
     for (const attachment of mission.attachments ?? []) {
-      found.push({ attachmentId: attachment.instanceId, hostInstanceId: '', missionIndex: i });
+      found.push(describe(attachment, '', i, mission.card?.name_fr));
     }
   }
   return found;

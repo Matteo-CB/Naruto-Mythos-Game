@@ -66,3 +66,18 @@
   .holo-foil__rainbow { animation: none; opacity: 0.16; }
   .holo-foil__sheen { animation: none; opacity: 0; }
 }
+
+@keyframes kunaiGoldBreath {
+  0%   { opacity: 0.18; }
+  50%  { opacity: 0.42; }
+  100% { opacity: 0.18; }
+}
+
+.kunai-gold-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  animation: kunaiGoldBreath 3.2s ease-in-out infinite;
+  z-index: 1;
+}

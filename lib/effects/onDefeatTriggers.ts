@@ -12,7 +12,8 @@ export function triggerOnDefeatEffects(
 ): GameState {
   let newState = state;
 
-  for (const mission of newState.activeMissions) {
+  for (let missionIndex = 0; missionIndex < newState.activeMissions.length; missionIndex++) {
+    const mission = newState.activeMissions[missionIndex];
     for (const side of ['player1Characters', 'player2Characters'] as const) {
       const controllingPlayer: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
 
@@ -52,9 +53,9 @@ export function triggerOnDefeatEffects(
           const rockLeeDuel = (topCard.effects ?? []).find(
             (e) => e.type === 'DUEL' && e.description.includes('[⧗]'),
           );
-          if (rockLeeDuel && isDuelConditionMet(newState, char.missionIndex, rockLeeDuel.description)) {
+          if (rockLeeDuel && isDuelConditionMet(newState, missionIndex, rockLeeDuel.description)) {
             const missions = newState.activeMissions.map((m, idx) => {
-              if (idx !== char.missionIndex) return m;
+              if (idx !== missionIndex) return m;
               return {
                 ...m,
                 [side]: m[side].map((c: CharacterInPlay) =>

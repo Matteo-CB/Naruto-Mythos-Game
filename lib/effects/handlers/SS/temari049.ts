@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { charactersMovableFromMission } from './sandMove';
+import { confirmFirst } from './confirmFirst';
 
 const CARD_ID = 'SS-049-C';
 
@@ -32,7 +33,7 @@ function temari049FirstStrike(ctx: EffectContext): EffectResult {
     };
   }
 
-  return {
+  return confirmFirst({
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'SS049_FS_CHAR',
@@ -40,7 +41,7 @@ function temari049FirstStrike(ctx: EffectContext): EffectResult {
     isOptional: true,
     description: 'Temari (049) FIRST STRIKE: Choose a character to move from this mission.',
     descriptionKey: 'game.effect.desc.ss049FirstStrikeChar',
-  };
+  }, ctx.sourceCard.instanceId, 'SS049_CONFIRM_FIRST_STRIKE');
 }
 
 export function registerTemari049Handlers(): void {

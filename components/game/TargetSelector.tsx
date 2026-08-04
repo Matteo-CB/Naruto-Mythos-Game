@@ -561,8 +561,10 @@ const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missi
 
   const myChars = myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
   const oppChars = myPlayer === 'player1' ? mission.player2Characters : mission.player1Characters;
-  const myPower = myChars.reduce((sum, c) => sum + (c.isHidden ? 0 : c.effectivePower), 0);
-  const oppPower = oppChars.reduce((sum, c) => sum + (c.isHidden && !c.isOwn ? 0 : c.effectivePower), 0);
+  const myPower = myChars.reduce((sum, c) => sum + (c.isHidden ? 0 : c.effectivePower), 0)
+    + (myPlayer === 'player1' ? (mission.player1PowerBonus ?? 0) : (mission.player2PowerBonus ?? 0));
+  const oppPower = oppChars.reduce((sum, c) => sum + (c.isHidden && !c.isOwn ? 0 : c.effectivePower), 0)
+    + (myPlayer === 'player1' ? (mission.player2PowerBonus ?? 0) : (mission.player1PowerBonus ?? 0));
 
   const isMissionTarget = validTargets.includes(String(missionIndex));
 
