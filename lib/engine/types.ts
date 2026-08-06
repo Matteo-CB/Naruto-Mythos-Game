@@ -229,7 +229,9 @@ export interface GameState {
   pendingForcedResolver?: PlayerID;
   
   _hiruzen002PlayedCharId?: string;
-  
+
+  ss001CardsShuffled?: number;
+
   turnPlayedIds?: string[];
 }
 

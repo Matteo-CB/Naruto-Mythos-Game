@@ -45,7 +45,8 @@ function orochimaru138UpgradeHandler(ctx: EffectContext): EffectResult {
   const continuousBonus = calculateContinuousPowerModifier(
     state, ctx.sourcePlayer, ctx.sourceMissionIndex, fakeChar,
   );
-  const effectivePower = (previousCard.power ?? 0) + (ctx.sourceCard.powerTokens ?? 0) + continuousBonus;
+  const tokensBeforeThisPlay = ctx.tokensBeforePlay ?? ctx.sourceCard.powerTokens ?? 0;
+  const effectivePower = (previousCard.power ?? 0) + tokensBeforeThisPlay + continuousBonus;
 
   if (effectivePower < 6) {
     const log = logAction(

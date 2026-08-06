@@ -997,7 +997,18 @@
         "ssMss10Discarded": "{card}: {target} was discarded.",
         "ss111ReturnHinata": "{card}: {target} returns from the discard pile to hand.",
         "ss115PowerupOnDefeat": "{card}: POWERUP {amount} after defeating {defeated}.",
-        "ssMss04SecondScore": "{card}: this mission scores a second time."
+        "ssMss04SecondScore": "{card}: this mission scores a second time.",
+        "ss031Discarded": "{card}: discarded {target}.",
+        "ss031Powerup": "{card}: POWERUP {amount}.",
+        "ss031Chakra": "{card}: gained {amount} Chakra.",
+        "ss031Draw": "{card}: drew {amount} card(s).",
+        "ss001Shuffle": "{card}: shuffled {amount} card(s) back into the deck and gained POWERUP {amount}.",
+        "ss001AllyPowerup": "{card}: POWERUP {amount} on {target}.",
+        "ss001NoBonus": "{card}: no card was shuffled back, no extra POWERUP.",
+        "ss002SummonChakra": "{card}: gained {amount} Chakra for playing a Summon character.",
+        "ss002SummonPowerup": "{card}: POWERUP {amount} on {count} friendly Summon character(s).",
+        "ss002RevealWon": "{card}: declared {amount}, revealed {target}, POWERUP {amount}.",
+        "ss002RevealFailed": "{card}: declared {amount}, revealed {target}, no POWERUP."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -1017,7 +1028,9 @@
       "attachToCharacter": "{card} is attached to {target}.",
       "useFirstStrike": "FIRST STRIKE: {card} strikes first this round.",
       "attachmentDiscarded": "{card} was discarded: its attach condition no longer holds.",
-      "attachmentHostLeft": "{card} goes to the discard pile: the character carrying it left play."
+      "attachmentHostLeft": "{card} goes to the discard pile: the character carrying it left play.",
+      "chakraBonusMission": "{card}: CHAKRA +{bonus} (mission {mission})",
+      "chakraBonusMissionWon": "{card}: CHAKRA +{bonus} (won mission bonus)"
     },
     "end": {
       "victory": "Victory",
@@ -1655,12 +1668,39 @@
         "ss111ConfirmDuel": "DUEL Neji Hyuga: take back the topmost Hinata Hyuga from your discard pile?",
         "ss111ConfirmMain": "MAIN: play a Hyuga-named character anywhere, paying 3 less?",
         "ss111PlayHyuga": "MAIN: choose a Hyuga-named character to play, paying {reduction} less.",
-        "ssMss06ConfirmAmbush": "Keep a Low Profile: AMBUSH POWERUP 2 on this character?"
+        "ssMss06ConfirmAmbush": "Keep a Low Profile: AMBUSH POWERUP 2 on this character?",
+        "ss031ConfirmMain": "MAIN: discard Sound Four cards from your hand for their effects?",
+        "ss031ChooseDiscard": "MAIN: discard one of them for its effect. Jirobo: POWERUP 3. Tayuya: 2 Chakra. Kidomaru: move an ally. Sakon: draw 2.",
+        "ss031MoveCharacter": "Kidomaru discarded: choose a friendly character to move.",
+        "ss001ConfirmMain": "MAIN: shuffle cards from the top of your discard pile back into your deck for POWERUP?",
+        "ss001ChooseCount": "MAIN: choose how many cards to shuffle back (1 to {max}). POWERUP 1 for each.",
+        "ss001ChooseAlly": "UPGRADE: choose the friendly character that gains POWERUP {amount}.",
+        "ss002ConfirmUpgrade": "UPGRADE: play a Summon character paying 3 less, then POWERUP 2 every friendly Summon?",
+        "ss002PlaySummon": "UPGRADE: choose a Summon character to play, paying {reduction} less.",
+        "ss053FirstStrikeHide": "FIRST STRIKE: you must hide a character with cost 2 or less in this mission.",
+        "ss008ConfirmFirstStrike": "FIRST STRIKE: play a Team 7 character paying 2 less, never as an upgrade?",
+        "ss008PlayTeam7": "FIRST STRIKE: choose a Team 7 character to play, paying {reduction} less.",
+        "ss033ConfirmUpgrade": "UPGRADE: POWERUP {amount} from your Sound Four allies in this mission?",
+        "ss006ConfirmAmbush": "AMBUSH: defeat an enemy character here, giving the opponent its cost in Chakra?",
+        "ss006Defeat": "AMBUSH: choose the enemy character to defeat in this mission.",
+        "ss002ConfirmMain": "MAIN: declare a number and gamble on the top card of your deck?",
+        "ss002RevealWin": "You declared {declared} and revealed a card costing {cost}: POWERUP {declared}.",
+        "ss002RevealLose": "You declared {declared} but the revealed card only costs {cost}: no POWERUP.",
+        "ss079ConfirmMain": "MAIN: POWERUP 1 on this character?",
+        "ss081ConfirmMain": "MAIN: draw a card?",
+        "declareNumber": "Declare a number between {min} and {max}. The higher you go, the harder it is to beat."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",
       "ssMss02RevealTitle": "Reconnaissance",
-      "ssMss02RevealResult": "You look at this hidden character."
+      "ssMss02RevealResult": "You look at this hidden character.",
+      "declareNumberTitle": "Declare a number",
+      "declareNumberConfirm": "Declare {value}",
+      "declareNumberPlus": "Increase",
+      "declareNumberMinus": "Decrease",
+      "ss002RevealTitle": "Top of your deck",
+      "ss002RevealWonResult": "Your bet pays off.",
+      "ss002RevealLostResult": "Bad luck this time."
     },
     "anim": {
       "cardPlayedHidden": "Card Played Hidden",
@@ -3082,7 +3122,9 @@
       "sealedCardNotInPool": "That card is not in your sealed pool.",
       "sealedRejoinLimit": "You have already used all your registrations for this sealed tournament. Your boosters cannot be opened again.",
       "tooManyOpenTournaments": "You already have too many tournaments open. Finish or cancel one first.",
-      "sealedCardBanned": "One of these cards is banned in this tournament. Build your deck without it."
+      "sealedCardBanned": "One of these cards is banned in this tournament. Build your deck without it.",
+      "sealedSeatLost": "Your seat was released while you were building, and the tournament is now full. You keep your pool for the next one.",
+      "notParticipant": "You are not registered for this tournament."
     },
     "deckError": {
       "tooFewCards": "Deck must have at least {min} cards (has {count}).",

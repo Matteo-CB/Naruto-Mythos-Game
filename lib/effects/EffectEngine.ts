@@ -19,11 +19,25 @@ import { buildPlayLessTargets, type PlayLessCategory } from './handlers/shared/p
 import { ss000DeckHounds, ss000FinalizeSearch, ss000HoundChoicePayload, SS000_NINJA_HOUND } from './handlers/SS/ss000Search';
 import { topmostHinataIndexInDiscard } from './handlers/SS/shinobi';
 import { missionCarries, SS_MISSION_LOW_PROFILE } from './missions/ssMissions';
+import { discardableSoundFour, soundFourNameOf, friendlyCharactersToMove, KIMIMARO_031_ID, KIMIMARO_031_NAME, type SoundFourName } from './handlers/SS/kimimaro031';
 import { hiddenCharactersInPlay, attachmentsInPlay } from './handlers/SS/missions/ssMissionHandlers';
+import { KAKASHI_008_ID, KAKASHI_008_NAME, KAKASHI_008_CATEGORY, KAKASHI_008_REDUCTION } from './handlers/SS/kakashi008';
+import { JIROBO_033_ID, JIROBO_033_NAME, JIROBO_033_POWERUP, friendlySoundFourCount } from './handlers/SS/jirobo033';
+import { KYUBI_006_ID, KYUBI_006_NAME, costOfDefeated } from './handlers/SS/kyubi006';
+import {
+  TSUNADE_002_ID, TSUNADE_002_NAME, DECLARE_NUMBER_MIN, DECLARE_NUMBER_MAX,
+  clampDeclaredNumber, declarationBeats,
+} from './handlers/SS/tsunade002';
+import { SENBON_ID, SENBON_NAME, SENBON_POWERUP, RAMEN_ID, RAMEN_NAME } from './handlers/SS/senbonRamen';
+import {
+  TSUNADE_GOLD_ID, TSUNADE_GOLD_NAME, JIRAIYA_GOLD_ID, JIRAIYA_GOLD_NAME,
+  JIRAIYA_GOLD_REDUCTION, JIRAIYA_GOLD_POWERUP, SUMMON_KEYWORD,
+  tsunadeGoldShuffleableCount, tsunadeGoldShuffleTopOfDiscard, friendlySummonIds,
+} from './handlers/SS/goldCards';
 import { attachCardToCharacter, discardAttachmentsOnLeave, discardAttachments } from './attachments';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
-import { defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
+import { defeatEnemyCharacter, defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
 import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval, isHiddenRevealBlocked } from './ContinuousEffects';
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 import { getEffectivePower } from './powerUtils';
@@ -109,11 +123,12 @@ function isMissionValidForPlay(
   availableChakra: number,
   costReduction: number,
   excludeInstanceId?: string,
+  noUpgrade = false,
 ): boolean {
   const mission = state.activeMissions[missionIndex];
   if (!mission) return false;
   const chars = mission[friendlySide];
-  const upgradeIdx = findUpgradeTargetIdx(chars, card, excludeInstanceId);
+  const upgradeIdx = noUpgrade ? -1 : findUpgradeTargetIdx(chars, card, excludeInstanceId);
 
   const baseEffectiveCost = calculateEffectiveCost(
     state,
@@ -237,6 +252,23 @@ export function applyLowProfileAmbushPowerup(state: GameState, player: PlayerID,
   };
 }
 
+function mergedAttachments(host: CharacterInPlay, incoming: CharacterInPlay): CharacterInPlay['attachments'] {
+  const merged = [...(host.attachments ?? [])];
+  for (const carried of incoming.attachments ?? []) {
+    if (merged.some((a) => a.owner === carried.owner)) continue;
+    merged.push(carried);
+  }
+  return merged;
+}
+
+function powerupSummonsAfterOf(pending: PendingEffect): number {
+  try {
+    return JSON.parse(pending.effectDescription).powerupSummonsAfter ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
 function insertDuelAtPrintedPosition(orderedTypes: EffectType[], topCard: CharacterCard | undefined): void {
   const printed = topCard?.effects ?? [];
   const printedIndexOf = (type: EffectType): number => printed.findIndex((e) => e.type === type);
@@ -254,6 +286,109 @@ function insertDuelAtPrintedPosition(orderedTypes: EffectType[], topCard: Charac
     }
   }
   orderedTypes.splice(insertAt, 0, 'DUEL');
+}
+
+function ss031QueueDiscardChoice(
+  state: GameState,
+  pendingEffect: PendingEffect,
+  player: PlayerID,
+  used: SoundFourName[],
+  choices: Array<{ handIndex: number }>,
+): GameState {
+  const effectId = generateInstanceId();
+  const actionId = generateInstanceId();
+  const options = choices.map((c) => String(c.handIndex));
+  const next = { ...state };
+  next.pendingEffects = [...next.pendingEffects, {
+    id: effectId,
+    sourceCardId: pendingEffect.sourceCardId,
+    sourceInstanceId: pendingEffect.sourceInstanceId,
+    sourceMissionIndex: pendingEffect.sourceMissionIndex,
+    effectType: pendingEffect.effectType,
+    effectDescription: JSON.stringify({ used }),
+    targetSelectionType: 'SS031_CHOOSE_DISCARD',
+    sourcePlayer: player,
+    requiresTargetSelection: true,
+    validTargets: options,
+    isOptional: true,
+    isMandatory: false,
+    resolved: false,
+    isUpgrade: false,
+    rootOptional: true,
+  } as PendingEffect];
+  next.pendingActions = [...next.pendingActions, {
+    id: actionId,
+    type: 'DISCARD_CARD' as PendingAction['type'],
+    player,
+    description: 'Kimimaro (SS-031): discard one of them for its effect.',
+    descriptionKey: 'game.effect.desc.ss031ChooseDiscard',
+    options,
+    minSelections: 1,
+    maxSelections: 1,
+    sourceEffectId: effectId,
+  }];
+  return next;
+}
+
+function ss031ApplyDiscardReward(
+  state: GameState,
+  pendingEffect: PendingEffect,
+  player: PlayerID,
+  name: SoundFourName,
+): GameState {
+  let next = state;
+
+  if (name === 'JIROBO') {
+    const located = EffectEngine.findCharByInstanceId(next, pendingEffect.sourceInstanceId);
+    if (!located) return next;
+    const side: 'player1Characters' | 'player2Characters' =
+      next.activeMissions[located.missionIndex].player1Characters
+        .some((c) => c.instanceId === pendingEffect.sourceInstanceId)
+        ? 'player1Characters'
+        : 'player2Characters';
+    next = {
+      ...next,
+      activeMissions: next.activeMissions.map((m, idx) => (
+        idx !== located.missionIndex ? m : {
+          ...m,
+          [side]: m[side].map((c: CharacterInPlay) => (
+            c.instanceId === pendingEffect.sourceInstanceId
+              ? { ...c, powerTokens: c.powerTokens + 3 }
+              : c
+          )),
+        }
+      )),
+    };
+    next.log = logAction(next.log, next.turn, next.phase, player, 'EFFECT_POWERUP',
+      'Kimimaro (SS-031): POWERUP 3.',
+      'game.log.effect.ss031Powerup', { card: KIMIMARO_031_NAME, id: KIMIMARO_031_ID, amount: 3 });
+    return next;
+  }
+
+  if (name === 'TAYUYA') {
+    const owner = { ...next[player] };
+    owner.chakra += 2;
+    next = { ...next, [player]: owner };
+    next.log = logAction(next.log, next.turn, next.phase, player, 'EFFECT_CHAKRA',
+      'Kimimaro (SS-031): gained 2 Chakra.',
+      'game.log.effect.ss031Chakra', { card: KIMIMARO_031_NAME, id: KIMIMARO_031_ID, amount: 2 });
+    return next;
+  }
+
+  if (name === 'SAKON') {
+    const owner = { ...next[player] };
+    const deck = [...owner.deck];
+    const drawn = deck.splice(0, 2);
+    owner.deck = deck;
+    owner.hand = [...owner.hand, ...drawn];
+    next = { ...next, [player]: owner };
+    next.log = logAction(next.log, next.turn, next.phase, player, 'EFFECT_DRAW',
+      `Kimimaro (SS-031): drew ${drawn.length} card(s).`,
+      'game.log.effect.ss031Draw', { card: KIMIMARO_031_NAME, id: KIMIMARO_031_ID, amount: drawn.length });
+    return next;
+  }
+
+  return next;
 }
 
 function isFirstStrikeArmed(
@@ -291,6 +426,8 @@ export class EffectEngine {
       if (player === 'player1') newState.player1EffectsUsed = true;
       else newState.player2EffectsUsed = true;
     }
+
+    const tokensBeforePlay = character.powerTokens;
 
     if (!character.isHidden) {
       newState = triggerOnPlayReactions(newState, player, missionIndex, false, character.instanceId);
@@ -360,6 +497,7 @@ export class EffectEngine {
           sourceMissionIndex: currentMissionIndex,
           triggerType: effectType,
           isUpgrade,
+          tokensBeforePlay,
         };
         const result = handler(ctx);
 
@@ -1013,7 +1151,9 @@ export class EffectEngine {
           return state;
         }
       }
-    } else if (pendingEffect.targetSelectionType === 'REORDER_DISCARD' || pendingEffect.targetSelectionType === 'ORDERED_DEFEAT') {
+    } else if (pendingEffect.targetSelectionType === 'REORDER_DISCARD'
+      || pendingEffect.targetSelectionType === 'ORDERED_DEFEAT'
+      || pendingEffect.targetSelectionType === 'DECLARE_NUMBER') {
       
     } else if (pendingEffect.validTargets && pendingEffect.validTargets.length > 0 && !pendingEffect.validTargets.includes(targetId)) {
       console.warn(`[EffectEngine] Invalid target ${targetId} - not in validTargets [${pendingEffect.validTargets.join(', ')}] for ${pendingEffect.targetSelectionType}`);
@@ -5999,6 +6139,7 @@ export class EffectEngine {
       case 'SS085_CONFIRM_MAIN':
       case 'SS099_CONFIRM_MAIN':
       case 'SS049_CONFIRM_FIRST_STRIKE':
+      case 'SS006_CONFIRM_AMBUSH':
       case 'MINATO122_CONFIRM_MAIN': {
         let relay: { nextType?: string; targets?: string[]; nextKey?: string; nextText?: string } = {};
         try { relay = JSON.parse(pendingEffect.effectDescription); } catch {}
@@ -6431,6 +6572,402 @@ export class EffectEngine {
           descriptionKey: 'game.effect.desc.ssMss10DiscardAttachment',
           options: m10cAttachments, minSelections: 1, maxSelections: 1, sourceEffectId: m10cEffId,
         }];
+        break;
+      }
+
+      case 'SS001_CONFIRM_MAIN': {
+        const t1Player = pendingEffect.sourcePlayer;
+        const t1Max = tsunadeGoldShuffleableCount(newState, t1Player);
+        if (t1Max === 0) break;
+
+        const t1Options: string[] = [];
+        for (let i = 1; i <= t1Max; i++) t1Options.push(String(i));
+        const t1EffId = generateInstanceId();
+        const t1ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: t1EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ max: t1Max }),
+          targetSelectionType: 'SS001_CHOOSE_COUNT',
+          sourcePlayer: t1Player, requiresTargetSelection: true,
+          validTargets: t1Options, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade, rootOptional: true,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        } as PendingEffect];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: t1ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'], player: t1Player,
+          description: `Tsunade (SS-001): choose how many cards to shuffle back (1-${t1Max}).`,
+          descriptionKey: 'game.effect.desc.ss001ChooseCount',
+          descriptionParams: { max: t1Max },
+          options: t1Options, minSelections: 1, maxSelections: 1, sourceEffectId: t1EffId,
+        }];
+        break;
+      }
+
+      case 'SS001_CHOOSE_COUNT': {
+        const t1cPlayer = pendingEffect.sourcePlayer;
+        const t1cCount = Math.min(parseInt(targetId, 10), tsunadeGoldShuffleableCount(newState, t1cPlayer));
+        if (Number.isNaN(t1cCount) || t1cCount <= 0) break;
+
+        newState = tsunadeGoldShuffleTopOfDiscard(newState, t1cPlayer, t1cCount);
+        newState = EffectEngine.applyPowerupToTarget(newState, pendingEffect.sourceInstanceId, t1cCount);
+        newState.ss001CardsShuffled = t1cCount;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, t1cPlayer,
+          'EFFECT_POWERUP',
+          `Tsunade (SS-001): shuffled ${t1cCount} card(s) back into the deck and gained POWERUP ${t1cCount}.`,
+          'game.log.effect.ss001Shuffle',
+          { card: TSUNADE_GOLD_NAME, id: TSUNADE_GOLD_ID, amount: t1cCount });
+        break;
+      }
+
+      case 'SS001_CHOOSE_ALLY': {
+        const t1aPlayer = pendingEffect.sourcePlayer;
+        let t1aAmount = 0;
+        try { t1aAmount = JSON.parse(pendingEffect.effectDescription).amount ?? 0; } catch { /* no amount stored */ }
+        if (!targetId || t1aAmount <= 0) break;
+
+        newState = EffectEngine.applyPowerupToTarget(newState, targetId, t1aAmount);
+        const t1aTarget = EffectEngine.findCharByInstanceId(newState, targetId);
+        newState.ss001CardsShuffled = undefined;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, t1aPlayer,
+          'EFFECT_POWERUP',
+          `Tsunade (SS-001) UPGRADE: POWERUP ${t1aAmount} on a friendly character.`,
+          'game.log.effect.ss001AllyPowerup',
+          {
+            card: TSUNADE_GOLD_NAME, id: TSUNADE_GOLD_ID, amount: t1aAmount,
+            target: t1aTarget ? (t1aTarget.character.stack?.length > 0
+              ? t1aTarget.character.stack[t1aTarget.character.stack.length - 1].name_fr
+              : t1aTarget.character.card.name_fr) ?? '' : '',
+          });
+        break;
+      }
+
+      case 'SS002_CONFIRM_UPGRADE': {
+        const j2Player = pendingEffect.sourcePlayer;
+        const j2Targets = buildPlayLessTargets(
+          newState, j2Player, { kind: 'keyword', value: SUMMON_KEYWORD }, JIRAIYA_GOLD_REDUCTION,
+        );
+
+        if (j2Targets.targets.length === 0) {
+          newState = EffectEngine.applyJiraiyaGoldSummonPowerup(newState, j2Player);
+          break;
+        }
+
+        const j2EffId = generateInstanceId();
+        const j2ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: j2EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({
+            text: 'Jiraiya (SS-002) UPGRADE: play a Summon character anywhere, paying 3 less.',
+            hiddenChars: j2Targets.hiddenChars,
+            costReduction: JIRAIYA_GOLD_REDUCTION,
+            category: { kind: 'keyword', value: SUMMON_KEYWORD },
+            sourceName: JIRAIYA_GOLD_NAME,
+            sourceId: JIRAIYA_GOLD_ID,
+            repeatable: false,
+            powerupSummonsAfter: JIRAIYA_GOLD_POWERUP,
+          }),
+          targetSelectionType: 'PLAY_LESS_CATEGORY',
+          sourcePlayer: j2Player, requiresTargetSelection: true,
+          validTargets: j2Targets.targets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade, rootOptional: true,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        } as PendingEffect];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: j2ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'], player: j2Player,
+          description: JSON.stringify({
+            text: 'Jiraiya (SS-002) UPGRADE: play a Summon character anywhere, paying 3 less.',
+            hiddenChars: j2Targets.hiddenChars,
+            costReduction: JIRAIYA_GOLD_REDUCTION,
+          }),
+          descriptionKey: 'game.effect.desc.ss002PlaySummon',
+          descriptionParams: { reduction: JIRAIYA_GOLD_REDUCTION },
+          options: j2Targets.targets, minSelections: 1, maxSelections: 1, sourceEffectId: j2EffId,
+        }];
+        break;
+      }
+
+      case 'SS008_CONFIRM_FIRST_STRIKE': {
+        const k8Player = pendingEffect.sourcePlayer;
+        const k8Targets = buildPlayLessTargets(
+          newState, k8Player, KAKASHI_008_CATEGORY, KAKASHI_008_REDUCTION, true,
+        );
+        if (k8Targets.targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k8Player,
+            'EFFECT_NO_TARGET', 'Kakashi Hatake (SS-008): no Team 7 character can be played fresh anymore.',
+            'game.log.effect.noTarget', { card: KAKASHI_008_NAME, id: KAKASHI_008_ID });
+          break;
+        }
+
+        const k8Payload = JSON.stringify({
+          text: 'Kakashi Hatake (SS-008) FIRST STRIKE: play a Team 7 character, paying 2 less.',
+          hiddenChars: k8Targets.hiddenChars,
+          costReduction: KAKASHI_008_REDUCTION,
+          category: KAKASHI_008_CATEGORY,
+          sourceName: KAKASHI_008_NAME,
+          sourceId: KAKASHI_008_ID,
+          repeatable: false,
+          noUpgrade: true,
+        });
+        const k8EffId = generateInstanceId();
+        const k8ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: k8EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: k8Payload,
+          targetSelectionType: 'PLAY_LESS_CATEGORY',
+          sourcePlayer: k8Player, requiresTargetSelection: true,
+          validTargets: k8Targets.targets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade, rootOptional: true,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        } as PendingEffect];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: k8ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'], player: k8Player,
+          description: k8Payload,
+          descriptionKey: 'game.effect.desc.ss008PlayTeam7',
+          descriptionParams: { reduction: KAKASHI_008_REDUCTION },
+          options: k8Targets.targets, minSelections: 1, maxSelections: 1, sourceEffectId: k8EffId,
+        }];
+        break;
+      }
+
+      case 'SS002_CONFIRM_MAIN': {
+        const t2Player = pendingEffect.sourcePlayer;
+        if (newState[t2Player].deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, t2Player,
+            'EFFECT_NO_TARGET', 'Tsunade (SS-002): the deck is empty, no card to reveal.',
+            'game.log.effect.noTarget', { card: TSUNADE_002_NAME, id: TSUNADE_002_ID });
+          break;
+        }
+        const t2EffId = generateInstanceId();
+        const t2ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: t2EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ min: DECLARE_NUMBER_MIN, max: DECLARE_NUMBER_MAX }),
+          targetSelectionType: 'DECLARE_NUMBER',
+          sourcePlayer: t2Player, requiresTargetSelection: true,
+          validTargets: ['declare'], isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        } as PendingEffect];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: t2ActId, type: 'SELECT_TARGET' as PendingAction['type'], player: t2Player,
+          description: 'Tsunade (SS-002): declare a number.',
+          descriptionKey: 'game.effect.desc.declareNumber',
+          descriptionParams: { min: DECLARE_NUMBER_MIN, max: DECLARE_NUMBER_MAX },
+          options: ['declare'], minSelections: 1, maxSelections: 1, sourceEffectId: t2EffId,
+        }];
+        break;
+      }
+
+      case 'DECLARE_NUMBER': {
+        const dnPlayer = pendingEffect.sourcePlayer;
+        const dnDeclared = clampDeclaredNumber(targetId);
+        const dnTop = newState[dnPlayer].deck[0];
+
+        if (!dnTop) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, dnPlayer,
+            'EFFECT_NO_TARGET', 'Tsunade (SS-002): the deck is empty, no card to reveal.',
+            'game.log.effect.noTarget', { card: TSUNADE_002_NAME, id: TSUNADE_002_ID });
+          break;
+        }
+
+        const dnMatched = declarationBeats(dnTop, dnDeclared);
+        const dnEffId = generateInstanceId();
+        const dnActId = generateInstanceId();
+        const dnPayload = JSON.stringify({
+          declared: dnDeclared,
+          matched: dnMatched,
+          cardId: dnTop.cardId ?? dnTop.id,
+          cardName: dnTop.name_fr,
+          cardCost: dnTop.chakra ?? 0,
+          cardPower: dnTop.power ?? 0,
+          cardImageFile: dnTop.image_file,
+        });
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: dnEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: dnPayload,
+          targetSelectionType: 'SS002_NUMBER_REVEAL',
+          sourcePlayer: dnPlayer, requiresTargetSelection: true,
+          validTargets: ['confirm'], isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        } as PendingEffect];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: dnActId, type: 'SELECT_TARGET' as PendingAction['type'], player: dnPlayer,
+          description: dnPayload,
+          descriptionKey: dnMatched ? 'game.effect.desc.ss002RevealWin' : 'game.effect.desc.ss002RevealLose',
+          descriptionParams: { declared: dnDeclared, cost: dnTop.chakra ?? 0 },
+          options: ['confirm'], minSelections: 1, maxSelections: 1, sourceEffectId: dnEffId,
+        }];
+        break;
+      }
+
+      case 'SS002_NUMBER_REVEAL': {
+        const nrPlayer = pendingEffect.sourcePlayer;
+        let nrMeta: { declared?: number; matched?: boolean; cardName?: string } = {};
+        try { nrMeta = JSON.parse(pendingEffect.effectDescription); } catch { /* no payload */ }
+        const nrDeclared = nrMeta.declared ?? 0;
+
+        if (!nrMeta.matched || nrDeclared <= 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, nrPlayer,
+            'EFFECT', `Tsunade (SS-002): declared ${nrDeclared}, revealed ${nrMeta.cardName ?? ''}, no POWERUP.`,
+            'game.log.effect.ss002RevealFailed',
+            { card: TSUNADE_002_NAME, id: TSUNADE_002_ID, amount: nrDeclared, target: nrMeta.cardName ?? '' });
+          break;
+        }
+
+        newState = EffectEngine.applyPowerupToTarget(newState, pendingEffect.sourceInstanceId, nrDeclared);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, nrPlayer,
+          'EFFECT_POWERUP', `Tsunade (SS-002): declared ${nrDeclared}, revealed ${nrMeta.cardName ?? ''}, POWERUP ${nrDeclared}.`,
+          'game.log.effect.ss002RevealWon',
+          { card: TSUNADE_002_NAME, id: TSUNADE_002_ID, amount: nrDeclared, target: nrMeta.cardName ?? '' });
+        break;
+      }
+
+      case 'SS031_CONFIRM_MAIN': {
+        const k31Player = pendingEffect.sourcePlayer;
+        const k31Choices = discardableSoundFour(newState, k31Player, []);
+        if (k31Choices.length === 0) break;
+        newState = ss031QueueDiscardChoice(newState, pendingEffect, k31Player, [], k31Choices);
+        break;
+      }
+
+      case 'SS031_CHOOSE_DISCARD': {
+        const k31dPlayer = pendingEffect.sourcePlayer;
+        if (!targetId) break;
+        const k31dIndex = parseInt(targetId, 10);
+        if (Number.isNaN(k31dIndex)) break;
+
+        let k31dUsed: SoundFourName[] = [];
+        try { k31dUsed = JSON.parse(pendingEffect.effectDescription).used ?? []; } catch { /* fresh chain */ }
+
+        const k31dOwner = { ...newState[k31dPlayer] };
+        const k31dCard = k31dOwner.hand[k31dIndex];
+        const k31dName = soundFourNameOf(k31dCard);
+        if (!k31dCard || !k31dName) break;
+
+        const k31dHand = [...k31dOwner.hand];
+        k31dHand.splice(k31dIndex, 1);
+        k31dOwner.hand = k31dHand;
+        k31dOwner.discardPile = [...k31dOwner.discardPile, k31dCard];
+        newState = { ...newState, [k31dPlayer]: k31dOwner };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, k31dPlayer,
+          'EFFECT_DISCARD',
+          `Kimimaro (SS-031): discarded ${k31dCard.name_fr}.`,
+          'game.log.effect.ss031Discarded',
+          { card: KIMIMARO_031_NAME, id: KIMIMARO_031_ID, target: k31dCard.name_fr });
+
+        const k31dNextUsed: SoundFourName[] = [...k31dUsed, k31dName];
+
+        if (k31dName === 'KIDOMARU') {
+          const k31dMovable = friendlyCharactersToMove(newState, k31dPlayer);
+          if (k31dMovable.length > 0) {
+            const k31mEffId = generateInstanceId();
+            const k31mActId = generateInstanceId();
+            newState.pendingEffects = [...newState.pendingEffects, {
+              id: k31mEffId, sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: JSON.stringify({ used: k31dNextUsed }),
+              targetSelectionType: 'SS031_MOVE_CHARACTER',
+              sourcePlayer: k31dPlayer, requiresTargetSelection: true,
+              validTargets: k31dMovable, isOptional: false, isMandatory: true,
+              resolved: false, isUpgrade: false,
+            } as PendingEffect];
+            newState.pendingActions = [...newState.pendingActions, {
+              id: k31mActId, type: 'SELECT_TARGET' as PendingAction['type'], player: k31dPlayer,
+              description: 'Kimimaro (SS-031): choose a friendly character to move.',
+              descriptionKey: 'game.effect.desc.ss031MoveCharacter',
+              options: k31dMovable, minSelections: 1, maxSelections: 1, sourceEffectId: k31mEffId,
+            }];
+            break;
+          }
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k31dPlayer,
+            'EFFECT_NO_TARGET', 'Kimimaro (SS-031): no friendly character can move.',
+            'game.log.effect.noTarget', { card: KIMIMARO_031_NAME, id: KIMIMARO_031_ID });
+        } else {
+          newState = ss031ApplyDiscardReward(newState, pendingEffect, k31dPlayer, k31dName);
+        }
+
+        const k31dRemaining = discardableSoundFour(newState, k31dPlayer, k31dNextUsed);
+        if (k31dRemaining.length > 0) {
+          newState = ss031QueueDiscardChoice(newState, pendingEffect, k31dPlayer, k31dNextUsed, k31dRemaining);
+        }
+        break;
+      }
+
+      case 'SS031_MOVE_CHARACTER': {
+        const k31mPlayer = pendingEffect.sourcePlayer;
+        if (!targetId) break;
+        const k31mLocated = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!k31mLocated) break;
+
+        const k31mDests: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (i !== k31mLocated.missionIndex) k31mDests.push(String(i));
+        }
+        if (k31mDests.length === 0) break;
+
+        const k31mdEffId = generateInstanceId();
+        const k31mdActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: k31mdEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: targetId,
+          sourceMissionIndex: k31mLocated.missionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: pendingEffect.effectDescription,
+          targetSelectionType: 'SS031_MOVE_DESTINATION',
+          sourcePlayer: k31mPlayer, requiresTargetSelection: true,
+          validTargets: k31mDests, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        } as PendingEffect];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: k31mdActId, type: 'SELECT_TARGET' as PendingAction['type'], player: k31mPlayer,
+          description: 'Choose a mission to move the character to.',
+          descriptionKey: 'game.effect.desc.chooseMissionMove',
+          options: k31mDests, minSelections: 1, maxSelections: 1, sourceEffectId: k31mdEffId,
+        }];
+        break;
+      }
+
+      case 'SS031_MOVE_DESTINATION': {
+        const k31zPlayer = pendingEffect.sourcePlayer;
+        if (targetId) {
+          const k31zDest = parseInt(targetId, 10);
+          if (!Number.isNaN(k31zDest)) {
+            newState = EffectEngine.moveCharToMissionDirectPublic(
+              newState, pendingEffect.sourceInstanceId, k31zDest,
+              k31zPlayer, KIMIMARO_031_NAME, KIMIMARO_031_ID,
+            );
+          }
+        }
+
+        let k31zUsed: SoundFourName[] = [];
+        try { k31zUsed = JSON.parse(pendingEffect.effectDescription).used ?? []; } catch { /* fresh chain */ }
+        const k31zRemaining = discardableSoundFour(newState, k31zPlayer, k31zUsed);
+        if (k31zRemaining.length > 0) {
+          newState = ss031QueueDiscardChoice(newState, pendingEffect, k31zPlayer, k31zUsed, k31zRemaining);
+        }
         break;
       }
 
@@ -11233,6 +11770,101 @@ export class EffectEngine {
         break;
       }
 
+      case 'SS006_DEFEAT': {
+        const k6Player = pendingEffect.sourcePlayer;
+        const k6Opponent: PlayerID = k6Player === 'player1' ? 'player2' : 'player1';
+        const k6Found = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!k6Found) break;
+
+        const k6Top = k6Found.character.stack?.length > 0
+          ? k6Found.character.stack[k6Found.character.stack.length - 1]
+          : k6Found.character.card;
+        const k6Name = k6Top.name_fr;
+        const k6Cost = costOfDefeated(k6Found.character);
+
+        newState = defeatEnemyCharacter(newState, k6Found.missionIndex, targetId, k6Player);
+
+        const k6StillThere = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (k6StillThere) break;
+
+        newState.log = logAction(newState.log, newState.turn, newState.phase, k6Player,
+          'EFFECT_DEFEAT', `Nine-Tailed Fox (SS-006): defeated ${k6Name}.`,
+          'game.log.effect.defeat', { card: KYUBI_006_NAME, id: KYUBI_006_ID, target: k6Name });
+
+        if (k6Cost > 0) {
+          const k6OppState = { ...newState[k6Opponent] };
+          k6OppState.chakra += k6Cost;
+          newState = { ...newState, [k6Opponent]: k6OppState };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k6Player,
+            'EFFECT_CHAKRA', `Nine-Tailed Fox (SS-006): the opponent gained ${k6Cost} Chakra.`,
+            'game.log.effect.oppGainChakra', { card: KYUBI_006_NAME, id: KYUBI_006_ID, amount: k6Cost });
+        }
+        break;
+      }
+
+      case 'SS053_FS_HIDE': {
+        const i53Player = pendingEffect.sourcePlayer;
+        const i53Found = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!i53Found) break;
+
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, i53Player);
+        break;
+      }
+
+      case 'SS033_CONFIRM_UPGRADE': {
+        const j33Player = pendingEffect.sourcePlayer;
+        const j33Count = friendlySoundFourCount(
+          newState, j33Player, pendingEffect.sourceMissionIndex, pendingEffect.sourceInstanceId,
+        );
+        if (j33Count === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, j33Player,
+            'EFFECT_NO_TARGET', 'Jirobo (SS-033) UPGRADE: no other friendly Sound Four character here anymore.',
+            'game.log.effect.noTarget', { card: JIROBO_033_NAME, id: JIROBO_033_ID });
+          break;
+        }
+        const j33Amount = j33Count * JIROBO_033_POWERUP;
+        newState = EffectEngine.applyPowerupToTarget(newState, pendingEffect.sourceInstanceId, j33Amount);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, j33Player,
+          'EFFECT_POWERUP', `Jirobo (SS-033) UPGRADE: POWERUP ${j33Amount}.`,
+          'game.log.effect.powerupSelf', { card: JIROBO_033_NAME, id: JIROBO_033_ID, amount: j33Amount });
+        break;
+      }
+
+      case 'SS079_CONFIRM_MAIN': {
+        const s79Player = pendingEffect.sourcePlayer;
+        const s79Found = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!s79Found) break;
+        const s79Top = s79Found.character.stack?.length > 0
+          ? s79Found.character.stack[s79Found.character.stack.length - 1]
+          : s79Found.character.card;
+        newState = EffectEngine.applyPowerupToTarget(newState, pendingEffect.sourceInstanceId, SENBON_POWERUP);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, s79Player,
+          'EFFECT_POWERUP', `Senbon (SS-079): POWERUP ${SENBON_POWERUP} on ${s79Top.name_fr}.`,
+          'game.log.effect.powerup',
+          { card: SENBON_NAME, id: SENBON_ID, amount: SENBON_POWERUP, target: s79Top.name_fr });
+        break;
+      }
+
+      case 'SS081_CONFIRM_MAIN': {
+        const s81Player = pendingEffect.sourcePlayer;
+        const s81State = { ...newState[s81Player] };
+        if (s81State.deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, s81Player,
+            'EFFECT_NO_TARGET', 'Ramen (SS-081): the deck is empty, no card to draw.',
+            'game.log.effect.noTarget', { card: RAMEN_NAME, id: RAMEN_ID });
+          break;
+        }
+        const s81Deck = [...s81State.deck];
+        const s81Drawn = s81Deck.shift();
+        s81State.deck = s81Deck;
+        s81State.hand = s81Drawn ? [...s81State.hand, s81Drawn] : s81State.hand;
+        newState = { ...newState, [s81Player]: s81State };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, s81Player,
+          'EFFECT_DRAW', 'Ramen (SS-081): drew 1 card.',
+          'game.log.effect.draw', { card: RAMEN_NAME, id: RAMEN_ID, count: 1 });
+        break;
+      }
+
       case 'SS078_DUEL_DEFEAT': {
         const s078F = EffectEngine.findCharByInstanceId(newState, targetId);
         const s078Name = s078F ? (s078F.character.stack?.length > 0 ? s078F.character.stack[s078F.character.stack.length - 1] : s078F.character.card).name_fr : '';
@@ -14124,21 +14756,30 @@ export class EffectEngine {
       }
 
       case 'PLAY_LESS_CATEGORY': {
-        let plc: { costReduction?: number; category?: PlayLessCategory; sourceName?: string; sourceId?: string; repeatable?: boolean; descriptionKey?: string } = {};
+        let plc: { costReduction?: number; category?: PlayLessCategory; sourceName?: string; sourceId?: string; repeatable?: boolean; descriptionKey?: string; powerupSummonsAfter?: number; noUpgrade?: boolean } = {};
         try { plc = JSON.parse(pendingEffect.effectDescription); } catch {}
         const plcReduction = plc.costReduction ?? 0;
         if (targetId && targetId !== 'DONE') {
           if (targetId.startsWith('HIDDEN_')) {
-            newState = EffectEngine.revealHiddenWithReduction(newState, pendingEffect, targetId.slice(7), plcReduction);
+            newState = EffectEngine.revealHiddenWithReduction(
+              newState, pendingEffect, targetId.slice(7), plcReduction, 0, !!plc.noUpgrade,
+            );
           } else {
             const plcRaw = targetId.startsWith('HAND_') ? targetId.slice(5) : targetId;
             newState = EffectEngine.playCharFromHandWithReduction(
               newState, pendingEffect, plcRaw, plcReduction,
               plc.category?.value ?? '', plc.sourceName ?? '', plc.sourceId ?? '',
+              !!plc.noUpgrade,
             );
           }
+          const awaitsMissionChoice = newState.pendingEffects.some(
+            (e) => e.targetSelectionType === 'GENERIC_CHOOSE_PLAY_MISSION',
+          );
+          if (plc.powerupSummonsAfter && !awaitsMissionChoice) {
+            newState = EffectEngine.applyJiraiyaGoldSummonPowerup(newState, pendingEffect.sourcePlayer);
+          }
           if (plc.repeatable && plc.category) {
-            const reoffer = buildPlayLessTargets(newState, pendingEffect.sourcePlayer, plc.category, plcReduction);
+            const reoffer = buildPlayLessTargets(newState, pendingEffect.sourcePlayer, plc.category, plcReduction, !!plc.noUpgrade);
             if (reoffer.targets.length > 0) {
               const plcEffId = generateInstanceId();
               const plcActId = generateInstanceId();
@@ -14540,17 +15181,22 @@ export class EffectEngine {
           let cardName_gen = '';
           let cardId_gen = '';
           let costReduction_gen = 0;
+          let noUpgrade_gen = false;
           try {
             const desc = JSON.parse(pendingEffect.effectDescription);
             cost_gen = desc.cost ?? 0;
             cardName_gen = desc.cardName ?? '';
             cardId_gen = desc.cardId ?? '';
             costReduction_gen = desc.costReduction ?? 0;
+            noUpgrade_gen = !!desc.noUpgrade;
           } catch {}
           newState = EffectEngine.genericPlaceOnMission(
             newState, pendingEffect.sourcePlayer, missionIdx_gen, cost_gen,
-            cardName_gen, cardId_gen, costReduction_gen,
+            cardName_gen, cardId_gen, costReduction_gen, noUpgrade_gen,
           );
+          if (powerupSummonsAfterOf(pendingEffect)) {
+            newState = EffectEngine.applyJiraiyaGoldSummonPowerup(newState, pendingEffect.sourcePlayer);
+          }
         }
         break;
       }
@@ -14620,6 +15266,7 @@ export class EffectEngine {
                     ...rhChars[actualUpgIdx],
                     card: revealedChar.card,
                     stack: [...rhChars[actualUpgIdx].stack, ...revealedChar.stack],
+                    attachments: mergedAttachments(rhChars[actualUpgIdx], revealedChar),
                     powerTokens: rhChars[actualUpgIdx].powerTokens + revealedChar.powerTokens,
                   };
                   rhMission[rhSide] = rhChars;
@@ -15636,6 +16283,7 @@ export class EffectEngine {
                 ...prev_k78,
                 card: revealedCharData.card,
                 stack: [...prev_k78.stack, ...revealedCharData.stack],
+                attachments: mergedAttachments(prev_k78, revealedCharData),
                 powerTokens: prev_k78.powerTokens + revealedCharData.powerTokens,
                 controllerInstanceId:
                   wasControlled_k78 ||
@@ -15736,6 +16384,7 @@ export class EffectEngine {
               ...prev_k78r,
               card: revealedData_k78r.card,
               stack: [...prev_k78r.stack, ...revealedData_k78r.stack],
+              attachments: mergedAttachments(prev_k78r, revealedData_k78r),
               powerTokens: prev_k78r.powerTokens + revealedData_k78r.powerTokens,
               controllerInstanceId:
                 wasControlled_k78r ||
@@ -16767,6 +17416,9 @@ export class EffectEngine {
         if ((newState as any)._tsunade104ChakraSpent !== undefined) {
           chainData._tsunade104ChakraSpent = (newState as any)._tsunade104ChakraSpent;
         }
+        if (newState.ss001CardsShuffled !== undefined) {
+          chainData.ss001CardsShuffled = newState.ss001CardsShuffled;
+        }
         newState.pendingContinuation = {
           sourceCardId: pendingEffect.sourceCardId,
           sourceInstanceId: pendingEffect.sourceInstanceId,
@@ -16851,6 +17503,30 @@ export class EffectEngine {
   
 
   
+  static applyJiraiyaGoldSummonPowerup(state: GameState, player: PlayerID): GameState {
+    const summons = friendlySummonIds(state, player);
+    if (summons.length === 0) {
+      return {
+        ...state,
+        log: logAction(state.log, state.turn, state.phase, player, 'EFFECT_NO_TARGET',
+          'Jiraiya (SS-002) UPGRADE: no friendly Summon character in play.',
+          'game.log.effect.noTarget', { card: JIRAIYA_GOLD_NAME, id: JIRAIYA_GOLD_ID }),
+      };
+    }
+
+    let newState = state;
+    for (const instanceId of summons) {
+      newState = EffectEngine.applyPowerupToTarget(newState, instanceId, JIRAIYA_GOLD_POWERUP);
+    }
+    return {
+      ...newState,
+      log: logAction(newState.log, newState.turn, newState.phase, player, 'EFFECT_POWERUP',
+        `Jiraiya (SS-002) UPGRADE: POWERUP ${JIRAIYA_GOLD_POWERUP} on ${summons.length} friendly Summon character(s).`,
+        'game.log.effect.ss002SummonPowerup',
+        { card: JIRAIYA_GOLD_NAME, id: JIRAIYA_GOLD_ID, amount: JIRAIYA_GOLD_POWERUP, count: summons.length }),
+    };
+  }
+
   static applyPowerupToTarget(state: GameState, targetId: string, amount: number): GameState {
     const newState = { ...state };
     newState.activeMissions = state.activeMissions.map((mission) => ({
@@ -17583,7 +18259,7 @@ export class EffectEngine {
     };
     
     
-    newState = triggerOnDefeatEffects(newState, charResult.character, charResult.player, simultaneousDefeatIds);
+    newState = triggerOnDefeatEffects(newState, charResult.character, charResult.player, simultaneousDefeatIds, sourcePlayer);
     return newState;
   }
 
@@ -18343,6 +19019,7 @@ export class EffectEngine {
   static playCharFromHandWithReduction(
     state: GameState, pending: PendingEffect, targetId: string,
     costReduction: number, _groupFilter: string, cardName: string, cardId: string,
+    noUpgrade = false,
   ): GameState {
     const handIndex = parseInt(targetId, 10);
     if (isNaN(handIndex)) return state;
@@ -18364,7 +19041,7 @@ export class EffectEngine {
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
-      if (isMissionValidForPlay(newState, player, i, friendlySide, chosenCard, ps.chakra, costReduction)) {
+      if (isMissionValidForPlay(newState, player, i, friendlySide, chosenCard, ps.chakra, costReduction, undefined, noUpgrade)) {
         validMissions.push(String(i));
       }
     }
@@ -18380,7 +19057,7 @@ export class EffectEngine {
     ps.discardPile.push(chosenCard);
 
     if (validMissions.length === 1) {
-      return EffectEngine.genericPlaceOnMission(newState, player, parseInt(validMissions[0], 10), 0, cardName, cardId, costReduction);
+      return EffectEngine.genericPlaceOnMission(newState, player, parseInt(validMissions[0], 10), 0, cardName, cardId, costReduction, noUpgrade);
     }
 
     
@@ -18393,7 +19070,10 @@ export class EffectEngine {
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
-      effectDescription: JSON.stringify({ cost: 0, cardName, cardId, costReduction }),
+      effectDescription: JSON.stringify({
+        cost: 0, cardName, cardId, costReduction, noUpgrade,
+        powerupSummonsAfter: powerupSummonsAfterOf(pending),
+      }),
       targetSelectionType: 'GENERIC_CHOOSE_PLAY_MISSION',
       sourcePlayer: player,
       requiresTargetSelection: true,
@@ -18422,7 +19102,7 @@ export class EffectEngine {
   }
 
   
-  private static genericPlaceOnMission(state: GameState, player: PlayerID, missionIndex: number, cost: number, cardName: string, cardId: string, costReduction: number): GameState {
+  private static genericPlaceOnMission(state: GameState, player: PlayerID, missionIndex: number, cost: number, cardName: string, cardId: string, costReduction: number, noUpgrade = false): GameState {
     const ps = state[player];
     const card = ps.discardPile.pop();
     if (!card) return state;
@@ -18434,7 +19114,7 @@ export class EffectEngine {
     const mission = { ...missions[missionIndex] };
 
     
-    const existingIdx = findUpgradeTargetIdx(mission[friendlySide], card);
+    const existingIdx = noUpgrade ? -1 : findUpgradeTargetIdx(mission[friendlySide], card);
 
     
     const hasNameConflict = mission[friendlySide].some((c: CharacterInPlay) => {
@@ -21006,6 +21686,7 @@ export class EffectEngine {
     instanceId: string,
     costReduction: number,
     powerUpBonus: number = 0,
+    noUpgrade = false,
   ): GameState {
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
@@ -21058,7 +21739,7 @@ export class EffectEngine {
 
     
     const allUpgradeTargets: string[] = [];
-    for (const c of (isControlledCharRhr ? [] : missionRhr[friendlySideRhr])) {
+    for (const c of ((isControlledCharRhr || noUpgrade) ? [] : missionRhr[friendlySideRhr])) {
       if (c.instanceId === instanceId || c.isHidden) continue;
       if (c.controlledBy !== c.originalOwner) continue;
       const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
@@ -21108,15 +21789,17 @@ export class EffectEngine {
     }
 
     
-    const upgradeTargetIdxRhr = isControlledCharRhr ? -1 : findUpgradeTargetIdx(missionRhr[friendlySideRhr], topCard, instanceId);
+    const upgradeTargetIdxRhr = (isControlledCharRhr || noUpgrade) ? -1 : findUpgradeTargetIdx(missionRhr[friendlySideRhr], topCard, instanceId);
     const upgradeTargetRhr = upgradeTargetIdxRhr >= 0 ? missionRhr[friendlySideRhr][upgradeTargetIdxRhr] : null;
+
+    const effectiveRevealPrice = calculateEffectiveCost(newState, player, topCard, mIdx, true);
 
     let cost: number;
     if (upgradeTargetRhr) {
       const existingTC = upgradeTargetRhr.stack?.length > 0 ? upgradeTargetRhr.stack[upgradeTargetRhr.stack?.length - 1] : upgradeTargetRhr.card;
-      cost = Math.max(0, ((topCard.chakra ?? 0) - (existingTC.chakra ?? 0)) - costReduction);
+      cost = Math.max(0, (effectiveRevealPrice - (existingTC.chakra ?? 0)) - costReduction);
     } else {
-      cost = Math.max(0, (topCard.chakra ?? 0) - costReduction);
+      cost = Math.max(0, effectiveRevealPrice - costReduction);
     }
     if (ps.chakra < cost) return state;
     ps.chakra -= cost;
@@ -21146,6 +21829,7 @@ export class EffectEngine {
           ...prev_rhr,
           card: revealedCharData.card,
           stack: [...prev_rhr.stack, ...revealedCharData.stack],
+          attachments: mergedAttachments(prev_rhr, revealedCharData),
           powerTokens: prev_rhr.powerTokens + revealedCharData.powerTokens,
           controllerInstanceId:
             wasControlled_rhr ||

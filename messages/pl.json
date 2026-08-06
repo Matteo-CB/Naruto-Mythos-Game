@@ -2790,7 +2790,9 @@
       "sealedCardNotInPool": "Tej karty nie ma w Twojej puli sealed.",
       "sealedRejoinLimit": "Wykorzystałeś już wszystkie zapisy na ten turniej sealed. Twoich boosterów nie można otworzyć ponownie.",
       "tooManyOpenTournaments": "Masz już zbyt wiele otwartych turniejów. Najpierw zakończ lub anuluj jeden.",
-      "sealedCardBanned": "Jedna z tych kart jest zakazana w tym turnieju. Zbuduj talię bez niej."
+      "sealedCardBanned": "Jedna z tych kart jest zakazana w tym turnieju. Zbuduj talię bez niej.",
+      "sealedSeatLost": "Twoje miejsce zwolniono w trakcie budowania talii, a turniej jest już pełny. Twoja pula zostaje na następny.",
+      "notParticipant": "Nie jesteś zapisany do tego turnieju."
     },
     "deckError": {
       "tooFewCards": "Talia musi mieć co najmniej {min} kart (ma {count}).",
@@ -3083,7 +3085,18 @@
         "ssMss10Discarded": "{card}: {target} zostało odrzucone.",
         "ss111ReturnHinata": "{card}: {target} wraca ze stosu odrzuconych do ręki.",
         "ss115PowerupOnDefeat": "{card}: POWERUP {amount} po pokonaniu {defeated}.",
-        "ssMss04SecondScore": "{card}: ta misja jest punktowana po raz drugi."
+        "ssMss04SecondScore": "{card}: ta misja jest punktowana po raz drugi.",
+        "ss031Discarded": "{card}: odrzucono {target}.",
+        "ss031Powerup": "{card}: POWERUP {amount}.",
+        "ss031Chakra": "{card}: zyskano {amount} Czakry.",
+        "ss031Draw": "{card}: dobrano {amount} kart(y).",
+        "ss001Shuffle": "{card}: {amount} kart(y) wtasowano do talii, POWERUP {amount}.",
+        "ss001AllyPowerup": "{card}: POWERUP {amount} na {target}.",
+        "ss001NoBonus": "{card}: nie wtasowano żadnej karty, brak dodatkowego POWERUP.",
+        "ss002SummonChakra": "{card}: zyskano {amount} Czakry za zagranie Przywołania.",
+        "ss002SummonPowerup": "{card}: POWERUP {amount} na {count} sojuszniczych Przywołaniach.",
+        "ss002RevealWon": "{card}: zadeklarowano {amount}, odkryto {target}, POWERUP {amount}.",
+        "ss002RevealFailed": "{card}: zadeklarowano {amount}, odkryto {target}, brak POWERUP."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3103,7 +3116,9 @@
       "attachToCharacter": "{card} jest dołączony do {target}.",
       "useFirstStrike": "FIRST STRIKE: {card} uderza jako pierwszy w tej rundzie.",
       "attachmentDiscarded": "{card} została odrzucona: jej warunek załącznika nie jest już spełniony.",
-      "attachmentHostLeft": "{card} trafia na stos kart odrzuconych: postać, która ją nosiła, opuściła grę."
+      "attachmentHostLeft": "{card} trafia na stos kart odrzuconych: postać, która ją nosiła, opuściła grę.",
+      "chakraBonusMission": "{card}: CHAKRA +{bonus} (misja {mission})",
+      "chakraBonusMissionWon": "{card}: CHAKRA +{bonus} (premia za wygraną misję)"
     },
     "end": {
       "victory": "Zwycięstwo",
@@ -3741,12 +3756,39 @@
         "ss111ConfirmDuel": "DUEL Neji Hyuga: wziąć do ręki najwyżej leżącą Hinatę Hyugę ze stosu odrzuconych?",
         "ss111ConfirmMain": "MAIN: zagrać postać o nazwie Hyuga w dowolnym miejscu, płacąc 3 mniej?",
         "ss111PlayHyuga": "MAIN: wybierz postać o nazwie Hyuga do zagrania, płacąc {reduction} mniej.",
-        "ssMss06ConfirmAmbush": "Nie rzucaj się w oczy: AMBUSH POWERUP 2 dla tej postaci?"
+        "ssMss06ConfirmAmbush": "Nie rzucaj się w oczy: AMBUSH POWERUP 2 dla tej postaci?",
+        "ss031ConfirmMain": "MAIN: odrzucić karty Czwórki Dźwięku z ręki dla ich efektów?",
+        "ss031ChooseDiscard": "MAIN: odrzuć jedną dla jej efektu. Jirobo: POWERUP 3. Tayuya: 2 Czakry. Kidomaru: przenieś sojusznika. Sakon: dobierz 2.",
+        "ss031MoveCharacter": "Odrzucono Kidomaru: wybierz sojuszniczą postać do przeniesienia.",
+        "ss001ConfirmMain": "MAIN: wtasować karty z wierzchu stosu odrzuconych do talii, aby zyskać POWERUP?",
+        "ss001ChooseCount": "MAIN: wybierz, ile kart wtasować (od 1 do {max}). POWERUP 1 za każdą.",
+        "ss001ChooseAlly": "UPGRADE: wybierz sojuszniczą postać, która otrzyma POWERUP {amount}.",
+        "ss002ConfirmUpgrade": "UPGRADE: zagrać Przywołanie płacąc o 3 mniej, a potem POWERUP 2 każdemu sojuszniczemu Przywołaniu?",
+        "ss002PlaySummon": "UPGRADE: wybierz postać Przywołania do zagrania, płacąc o {reduction} mniej.",
+        "ss053FirstStrikeHide": "FIRST STRIKE: musisz ukryć postać o koszcie 2 lub mniejszym na tej misji.",
+        "ss008ConfirmFirstStrike": "FIRST STRIKE: zagrać postać z Drużyny 7, płacąc o 2 mniej, nigdy jako ulepszenie?",
+        "ss008PlayTeam7": "FIRST STRIKE: wybierz postać z Drużyny 7 do zagrania, płacąc o {reduction} mniej.",
+        "ss033ConfirmUpgrade": "UPGRADE: POWERUP {amount} dzięki sojusznikom z Czwórki Dźwięku na tej misji?",
+        "ss006ConfirmAmbush": "AMBUSH: pokonać tu wrogą postać i dać przeciwnikowi Czakrę równą jej kosztowi?",
+        "ss006Defeat": "AMBUSH: wybierz wrogą postać do pokonania na tej misji.",
+        "ss002ConfirmMain": "MAIN: zadeklarować liczbę i postawić na wierzchnią kartę swojej talii?",
+        "ss002RevealWin": "Zadeklarowano {declared}, odkryto kartę o koszcie {cost}: POWERUP {declared}.",
+        "ss002RevealLose": "Zadeklarowano {declared}, ale odkryta karta kosztuje tylko {cost}: brak POWERUP.",
+        "ss079ConfirmMain": "MAIN: POWERUP 1 na tej postaci?",
+        "ss081ConfirmMain": "MAIN: dobrać kartę?",
+        "declareNumber": "Zadeklaruj liczbę od {min} do {max}. Im wyższa, tym trudniej ją pobić."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",
       "ssMss02RevealTitle": "Zwiad",
-      "ssMss02RevealResult": "Oglądasz tę zakrytą postać."
+      "ssMss02RevealResult": "Oglądasz tę zakrytą postać.",
+      "declareNumberTitle": "Zadeklaruj liczbę",
+      "declareNumberConfirm": "Zadeklaruj {value}",
+      "declareNumberPlus": "Zwiększ",
+      "declareNumberMinus": "Zmniejsz",
+      "ss002RevealTitle": "Wierzch twojej talii",
+      "ss002RevealWonResult": "Twój zakład się opłacił.",
+      "ss002RevealLostResult": "Tym razem pech."
     },
     "anim": {
       "cardPlayedHidden": "Karta Zagrana Zakryta",

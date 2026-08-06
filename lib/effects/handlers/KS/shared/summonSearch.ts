@@ -58,6 +58,47 @@ export function canAffordFromHand(
   return canAffordAsUpgrade(state, player, card, costReduction);
 }
 
+export function canFreshPlayFromHand(
+  state: GameState,
+  player: PlayerID,
+  card: CharacterCard,
+  costReduction: number,
+): boolean {
+  const ps = state[player];
+  for (let i = 0; i < state.activeMissions.length; i++) {
+    const mission = state.activeMissions[i];
+    const friendlySide = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+    const sameNameVisible = friendlySide.some(
+      (c) => !c.isHidden && topCardOf(c).name_fr.toUpperCase() === card.name_fr.toUpperCase(),
+    );
+    if (sameNameVisible) continue;
+    if (ps.chakra >= effectiveFreshPlayCost(state, player, card, i, costReduction)) return true;
+  }
+  return false;
+}
+
+export function freshRevealCost(
+  state: GameState,
+  player: PlayerID,
+  hiddenChar: CharacterInPlay,
+  missionIndex: number,
+  costReduction: number,
+): number | null {
+  const topCard = topCardOf(hiddenChar);
+  const mission = state.activeMissions[missionIndex];
+  if (!mission) return null;
+  const friendlySide = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+
+  const sameNameVisible = friendlySide.some((c) => {
+    if (c.isHidden) return false;
+    if (c.instanceId === hiddenChar.instanceId) return false;
+    return topCardOf(c).name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
+  });
+  if (sameNameVisible) return null;
+
+  return Math.max(0, calculateEffectiveCost(state, player, topCard, missionIndex, true) - costReduction);
+}
+
 export function effectiveRevealCost(
   state: GameState,
   player: PlayerID,
@@ -96,6 +137,7 @@ export function findAffordableInHandByPredicate(
   player: PlayerID,
   predicate: CardPredicate,
   costReduction: number,
+  freshOnly = false,
 ): number[] {
   const ps = state[player];
   const indices: number[] = [];
@@ -103,7 +145,10 @@ export function findAffordableInHandByPredicate(
     const card = ps.hand[i];
     if (!isPlayableCharacter(card)) continue;
     if (!predicate(card)) continue;
-    if (canAffordFromHand(state, player, card, costReduction)) {
+    const affordable = freshOnly
+      ? canFreshPlayFromHand(state, player, card, costReduction)
+      : canAffordFromHand(state, player, card, costReduction);
+    if (affordable) {
       indices.push(i);
     }
   }
@@ -115,6 +160,7 @@ export function findHiddenOnBoardByPredicate(
   player: PlayerID,
   predicate: CardPredicate,
   costReduction: number,
+  freshOnly = false,
 ): HiddenCharTarget[] {
   const ps = state[player];
   const friendlySide = player === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -128,7 +174,9 @@ export function findHiddenOnBoardByPredicate(
       const topCard = topCardOf(char);
       if (!predicate(topCard)) continue;
 
-      const revealCost = effectiveRevealCost(state, player, char, mIdx, costReduction);
+      const revealCost = freshOnly
+        ? freshRevealCost(state, player, char, mIdx, costReduction)
+        : effectiveRevealCost(state, player, char, mIdx, costReduction);
       if (revealCost === null) continue;
 
       if (ps.chakra >= revealCost) {

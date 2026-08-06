@@ -193,6 +193,15 @@ const FACTORIES: Record<string, Factory> = {
     ],
     noMinimize: true,
   }),
+  'SS-031-CHIBIV': (id) => ({
+    build: () => board({
+      hand: [id, 'KS-057-C', 'KS-064-C'],
+      p1m0: ['KS-009-C'],
+      missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+    }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
   'SS-111-SHINOBIV': (id) => ({
     build: () => {
       const st = board({
@@ -221,6 +230,58 @@ const FACTORIES: Record<string, Factory> = {
     choose: (state, pending) => {
       const opts = pending.options ?? [];
       if (pending.descriptionKey === 'game.effect.desc.attachChooseTarget') return [opts[opts.length - 1]];
+      return opts.slice(0, Math.max(1, pending.minSelections ?? 1));
+    },
+    noMinimize: true,
+  }),
+  'SS-008-C': (id) => ({
+    build: () => board({
+      hand: [id, 'KS-013-C'],
+      chakra: 20,
+      missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+    }),
+    play: P1(FRESH),
+    choose: (state, pending) => {
+      const opts = pending.options ?? [];
+      const hand = opts.find((o) => o.startsWith('HAND_'));
+      if (hand) return [hand];
+      return opts.slice(0, Math.max(1, pending.minSelections ?? 1));
+    },
+    noMinimize: true,
+  }),
+  'SS-999-L': (id) => ({
+    build: () => {
+      const st = board({
+        hand: [id],
+        upgBase: { id: 'KS-104-R', iid: 'sim-upg-base' },
+        chakra: 20,
+        missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+      });
+      st.player1.discardPile = ['KS-009-C', 'KS-011-C', 'KS-021-C']
+        .map((x) => getCharacterById(x)!).filter(Boolean);
+      return st;
+    },
+    play: P1(upgrade('sim-upg-base')),
+    choose: (state, pending) => {
+      const opts = pending.options ?? [];
+      if (pending.descriptionKey === 'game.effect.desc.ss001ChooseCount') return [opts[opts.length - 1]];
+      return opts.slice(0, Math.max(1, pending.minSelections ?? 1));
+    },
+    noMinimize: true,
+  }),
+  'SS-998-L': (id) => ({
+    build: () => board({
+      hand: [id, 'KS-096-C'],
+      upgBase: { id: 'KS-007-C', iid: 'sim-upg-base' },
+      p1m1: ['KS-097-C'],
+      chakra: 20,
+      missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+    }),
+    play: P1(upgrade('sim-upg-base')),
+    choose: (state, pending) => {
+      const opts = pending.options ?? [];
+      const hand = opts.find((o) => o.startsWith('HAND_'));
+      if (hand) return [hand];
       return opts.slice(0, Math.max(1, pending.minSelections ?? 1));
     },
     noMinimize: true,

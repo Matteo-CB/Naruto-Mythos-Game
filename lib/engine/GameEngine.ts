@@ -730,6 +730,20 @@ export class GameEngine {
         );
       }
 
+      if (effect.targetSelectionType === 'PLAY_LESS_CATEGORY') {
+        let playLessMeta: { powerupSummonsAfter?: number } = {};
+        try { playLessMeta = JSON.parse(effect.effectDescription); } catch { /* no payload */ }
+        if (playLessMeta.powerupSummonsAfter) {
+          newState.pendingEffects.splice(effectIdx, 1);
+          newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+          newState = EffectEngine.applyJiraiyaGoldSummonPowerup(newState, effect.sourcePlayer);
+          if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+            return EffectEngine.processRemainingEffects(newState, effect);
+          }
+          return newState;
+        }
+      }
+
       if (effect.targetSelectionType === 'SASUKE014_CONFIRM_UPGRADE_MODIFIER') {
         newState.pendingEffects.splice(effectIdx, 1);
         newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);

@@ -163,4 +163,53 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "[⧗] This character doesn't lose Power tokens at the end of the round.",
     "[⧗] DUEL Gaara: When you defeat an enemy character, POWERUP 2.",
   ],
+  "SS-121-MV": [
+    "[⧗] This character has +1 Power for every friendly Naruto Uzumaki in play.",
+    "[↯] Kiba Inuzuka: Move the card at the bottom of this upgrade stack to another mission.",
+  ],
+  "SS-126-R": [
+    "[⧗] This character has +1 Power for every Sound Village character in this mission.",
+    "[↯] Orochimaru: Play a Sound Village character anywhere, paying 3 less.",
+  ],
+  "SS-031-CHIBIV": [
+    "[↯] Discard up to one of each character to: Jirobo: POWERUP 3. Tayuya: Gain 2 Chakra. Kidomaru: Move a friendly character. Sakon: Draw 2 cards.",
+  ],
+  "SS-999-L": [
+    "[↯] Shuffle up to 5 cards from the top of your discard pile into your deck. For each card shuffled, POWERUP 1.",
+    "MAIN effect: In addition, for each card, also POWERUP 1 a friendly character in play.",
+  ],
+  "SS-998-L": [
+    "[⧗] When you play a Summon character, gain 1 Chakra.",
+    "[↯] Play a Summon character anywhere, paying 3 less. POWERUP 2 every friendly Summon character in play.",
+  ],
+  "SS-078-L": [
+    "[↯] Kimimaro: Defeat an enemy character with cost 2 or less.",
+    "[⧗] When you defeat a non-hidden enemy character, you may pay 1 Chakra to draw 1 card.",
+  ],
+  "SS-002-UC": [
+    "[↯] Declare a number. Reveal the top card of your deck. If the cost of that card is equal to or greater than the declared number, POWERUP X, where X is the number declared.",
+  ],
+  "SS-006-UC": [
+    "[↯] Defeat an enemy character in this mission. If you do so, the opponent gains Chakra equal to the cost of the defeated character.",
+  ],
+  "SS-008-C": [
+    "[↯] FIRST STRIKE Play a Team 7 character paying 2 less. You cannot play that character as an upgrade.",
+  ],
+  "SS-016-C": [
+    "[⧗] If there is a friendly Naruto Uzumaki or Team 8 character in this mission, CHAKRA +1.",
+  ],
+  "SS-033-UC": [
+    "[↯] POWERUP 2 for every friendly Sound Four character in this mission.",
+  ],
+  "SS-053-C": [
+    "[↯] FIRST STRIKE You must hide a non-hidden character in this mission with cost 2 or less.",
+  ],
+  "SS-079-C": [
+    "Attach to a friendly character.",
+    "[↯] POWERUP 1.",
+  ],
+  "SS-081-C": [
+    "Attach to a friendly non-hidden character.",
+    "[↯] Draw a card.",
+  ],
 };

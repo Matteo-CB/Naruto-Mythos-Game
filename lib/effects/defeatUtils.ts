@@ -105,7 +105,7 @@ export function defeatCharacterInPlay(
           ),
         };
         
-        newState = triggerOnDefeatEffects(newState, sacrificeInfo.char, targetPlayer);
+        newState = triggerOnDefeatEffects(newState, sacrificeInfo.char, targetPlayer, simultaneousDefeatIds, sourcePlayer);
         return newState;
       }
     }
@@ -145,7 +145,7 @@ export function defeatCharacterInPlay(
 
   
   
-  newState = triggerOnDefeatEffects(newState, targetChar, targetPlayer, simultaneousDefeatIds);
+  newState = triggerOnDefeatEffects(newState, targetChar, targetPlayer, simultaneousDefeatIds, sourcePlayer);
 
   return newState;
 }

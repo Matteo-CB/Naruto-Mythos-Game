@@ -23,7 +23,7 @@ export async function POST(
 
     const tournament = await prisma.tournament.findUnique({
       where: { id },
-      select: { gameMode: true, status: true, bannedCardIds: true, useBanList: true },
+      select: { gameMode: true, status: true, bannedCardIds: true, useBanList: true, maxPlayers: true },
     });
     if (!tournament) {
       return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
@@ -35,12 +35,52 @@ export async function POST(
       return NextResponse.json({ error: 'Registration is closed' }, { status: 400 });
     }
 
-    const participant = await prisma.tournamentParticipant.findUnique({
+    let participant = await prisma.tournamentParticipant.findUnique({
       where: { tournamentId_userId: { tournamentId: id, userId: session.user.id } },
       select: { id: true, sealedPool: true, deckValid: true },
     });
+
     if (!participant) {
-      return NextResponse.json({ error: 'Not a participant' }, { status: 404 });
+      const claim = await prisma.sealedPoolClaim.findUnique({
+        where: { tournamentId_userId: { tournamentId: id, userId: session.user.id } },
+        select: { pool: true },
+      });
+
+      if (!claim) {
+        return NextResponse.json(
+          { error: 'Not a participant', errorKey: 'tournament.error.notParticipant' },
+          { status: 404 },
+        );
+      }
+
+      const seatsTaken = await prisma.tournamentParticipant.count({ where: { tournamentId: id } });
+      if (seatsTaken >= tournament.maxPlayers) {
+        console.warn(
+          `[API] Sealed tournament ${id}: ${session.user.id} finished a deck after their seat was released, and the tournament is full`,
+        );
+        return NextResponse.json(
+          { error: 'Your seat was released while you were building', errorKey: 'tournament.error.sealedSeatLost' },
+          { status: 409 },
+        );
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { username: true },
+      });
+      const restored = await prisma.tournamentParticipant.create({
+        data: {
+          tournamentId: id,
+          userId: session.user.id,
+          username: user?.username || 'Unknown',
+          sealedPool: claim.pool as never,
+        },
+        select: { id: true, sealedPool: true, deckValid: true },
+      });
+      participant = restored;
+      console.log(
+        `[API] Sealed tournament ${id}: ${session.user.id} submitted after their reservation expired, seat restored with the original pool`,
+      );
     }
     if (participant.deckValid) {
       return NextResponse.json(

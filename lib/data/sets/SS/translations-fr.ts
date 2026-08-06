@@ -163,4 +163,53 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     "[⧗] Ce personnage ne perd pas ses jetons de Puissance à la fin de la manche.",
     "[⧗] DUEL Gaara : Quand vous battez un personnage ennemi, POWERUP 2.",
   ],
+  "SS-121-MV": [
+    "[⧗] Ce personnage a +1 Puissance pour chaque Naruto Uzumaki allié en jeu.",
+    "[↯] Kiba Inuzuka : Déplacez la carte au bas de cette pile d'amélioration vers une autre mission.",
+  ],
+  "SS-126-R": [
+    "[⧗] Ce personnage a +1 Puissance pour chaque personnage Village du Son dans cette mission.",
+    "[↯] Orochimaru : Jouez un personnage Village du Son n'importe où en payant 3 de moins.",
+  ],
+  "SS-031-CHIBIV": [
+    "[↯] Défaussez jusqu’à un exemplaire de chacun de ces personnages pour : Jirobo : POWERUP 3. Tayuya : Gagnez 2 Chakra. Kidomaru : Déplacez un personnage allié. Sakon : Piochez 2 cartes.",
+  ],
+  "SS-999-L": [
+    "[↯] Mélangez jusqu’à 5 cartes du dessus de votre pile de défausse dans votre deck. Pour chaque carte mélangée, POWERUP 1.",
+    "effet MAIN : De plus, pour chaque carte, POWERUP 1 également un personnage allié en jeu.",
+  ],
+  "SS-998-L": [
+    "[⧗] Quand vous jouez un personnage Invocation, gagnez 1 Chakra.",
+    "[↯] Jouez un personnage Invocation n’importe où en payant 3 de moins. POWERUP 2 chaque personnage Invocation allié en jeu.",
+  ],
+  "SS-078-L": [
+    "[↯] Kimimaro : Vainquez un personnage ennemi dont le coût est de 2 ou moins.",
+    "[⧗] Quand vous vainquez un personnage ennemi non caché, vous pouvez payer 1 Chakra pour piocher 1 carte.",
+  ],
+  "SS-002-UC": [
+    "[↯] Annoncez un nombre. Révélez la carte du dessus de votre deck. Si le coût de cette carte est supérieur ou égal au nombre annoncé, POWERUP X, où X est le nombre annoncé.",
+  ],
+  "SS-006-UC": [
+    "[↯] Vainquez un personnage ennemi dans cette mission. Si vous le faites, l’adversaire gagne autant de Chakra que le coût du personnage vaincu.",
+  ],
+  "SS-008-C": [
+    "[↯] FIRST STRIKE Jouez un personnage Équipe 7 en payant 2 de moins. Vous ne pouvez pas jouer ce personnage en UPGRADE.",
+  ],
+  "SS-016-C": [
+    "[⧗] S’il y a un personnage Naruto Uzumaki ou Équipe 8 allié dans cette mission, CHAKRA +1.",
+  ],
+  "SS-033-UC": [
+    "[↯] POWERUP 2 pour chaque personnage Quatuor du Son allié dans cette mission.",
+  ],
+  "SS-053-C": [
+    "[↯] FIRST STRIKE Vous devez cacher un personnage non caché dans cette mission dont le coût est de 2 ou moins.",
+  ],
+  "SS-079-C": [
+    "Attachez à un personnage allié.",
+    "[↯] POWERUP 1.",
+  ],
+  "SS-081-C": [
+    "Attachez à un personnage allié non caché.",
+    "[↯] Piochez une carte.",
+  ],
 };

@@ -50,7 +50,7 @@ interface PendingTargetSelection {
   descriptionKey?: string; // i18n key for translated description
   descriptionParams?: Record<string, string | number>; // interpolation params
   playerName?: string; // display name of the player who must choose
-  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT' | 'DRAW_CARD' | 'CONFIRM_HIDE' | 'CONFIRM_DEFEAT' | 'EFFECT_PLAY_UPGRADE_OR_FRESH' | 'EFFECT_CONFIRM' | 'CHOOSE_EFFECT_ORDER' | 'ORDER_DEFEAT_TARGETS' | 'ORDER_HIDE_TARGETS'; // type of selection
+  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT' | 'DRAW_CARD' | 'CONFIRM_HIDE' | 'CONFIRM_DEFEAT' | 'EFFECT_PLAY_UPGRADE_OR_FRESH' | 'EFFECT_CONFIRM' | 'CHOOSE_EFFECT_ORDER' | 'ORDER_DEFEAT_TARGETS' | 'ORDER_HIDE_TARGETS' | 'DECLARE_NUMBER'; // type of selection
   effectChoices?: Array<{ effectType: string; description: string; cardId?: string; effectIndex?: number }>; // for effect copy choice (Kakashi/Sakon)
   handCards?: Array<{ index: number; card: { name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra?: number; power?: number; image_file?: string; missionLabel?: string; id?: string; cardId?: string; number?: number; rarity?: string; keywords?: string[]; group?: string; effects?: Array<{ type: string; description: string }>; card_type?: string }; targetId?: string; isPlayable?: boolean }>; // for hand selection
   revealedCard?: { name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
@@ -66,6 +66,7 @@ interface PendingTargetSelection {
     keywords?: string[]; group?: string; rarity?: string; card_type?: string;
   }>; // for multi-card reveal (Tayuya 065, Kiba 026, Sasuke 014, Itachi 091)
   
+  numberRange?: { min: number; max: number };
   deckSize?: number; // for DRAW_CARD: shows deck size
   confirmCardData?: { name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number }; // for CONFIRM_HIDE / CONFIRM_DEFEAT
   
@@ -383,6 +384,16 @@ export function buildPendingTargetSelectionUI(
         const isPlayable = info?.isPlayable ?? playableOptionSet.has(idx);
         return { index: idx, card: cardData, isPlayable };
       });
+    } else if (tst === 'SS001_CHOOSE_COUNT') {
+      const discard = dataSource.playerDiscard;
+      handCards = pendingAction.options.map((countStr) => {
+        const count = parseInt(countStr, 10);
+        const card = discard[discard.length - count];
+        return {
+          index: count,
+          card: card ? fullCardData(card) : { name_fr: '???' },
+        };
+      });
     } else if (tst === 'TSUNADE104_CHOOSE_CHAKRA') {
       handCards = pendingAction.options.map((amountStr) => {
         const amount = parseInt(amountStr, 10);
@@ -524,6 +535,7 @@ export function buildPendingTargetSelectionUI(
   const isItachi091Reveal = tst === 'ITACHI091_HAND_REVEAL';
   const isDosuLookReveal = tst === 'DOSU_LOOK_REVEAL';
   const isReconLookReveal = tst === 'SSMSS02_LOOK_REVEAL';
+  const isDeclareReveal = tst === 'SS002_NUMBER_REVEAL';
   const isSasuke014Reveal = tst === 'SASUKE014_HAND_REVEAL' || tst === 'SASUKE014_UPGRADE_HAND_REVEAL';
   const isTayuya065Reveal = tst === 'TAYUYA065_UPGRADE_REVEAL';
   const isKiba026Reveal = tst === 'KIBA026_UPGRADE_REVEAL';
@@ -531,7 +543,7 @@ export function buildPendingTargetSelectionUI(
   const isKiba026Choose = tst === 'KIBA026_UPGRADE_CHOOSE';
   const isKabuto052ChooseMission = tst === 'KABUTO_CHOOSE_MISSION';
   const isMultiSelectChoose = isTayuya065Choose || isKiba026Choose;
-  const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isReconLookReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal;
+  const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isReconLookReveal || isDeclareReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal;
   const shouldParseRevealedCard = isInfoReveal || isKabuto052ChooseMission;
 
   let revealedCard: PendingTargetSelection['revealedCard'];
@@ -571,6 +583,13 @@ export function buildPendingTargetSelectionUI(
           image_file: rd.cardImageFile, canSteal: false,
           revealTitleKey: 'game.effect.dosuLookRevealTitle',
           revealResultKey: 'game.effect.dosuLookRevealResult',
+        };
+      } else if (isDeclareReveal) {
+        revealedCard = {
+          name_fr: rd.cardName, chakra: rd.cardCost, power: rd.cardPower,
+          image_file: rd.cardImageFile, canSteal: false,
+          revealTitleKey: 'game.effect.ss002RevealTitle',
+          revealResultKey: rd.matched ? 'game.effect.ss002RevealWonResult' : 'game.effect.ss002RevealLostResult',
         };
       } else if (isReconLookReveal) {
         revealedCard = {
@@ -677,7 +696,19 @@ export function buildPendingTargetSelectionUI(
   }
 
   
-  const selectionType: PendingTargetSelection['selectionType'] = isInfoReveal
+  let numberRange: PendingTargetSelection['numberRange'];
+  if (tst === 'DECLARE_NUMBER') {
+    try {
+      const parsed = JSON.parse(pendingEffect?.effectDescription ?? '{}');
+      numberRange = { min: parsed.min ?? 0, max: parsed.max ?? 999 };
+    } catch {
+      numberRange = { min: 0, max: 999 };
+    }
+  }
+
+  const selectionType: PendingTargetSelection['selectionType'] = tst === 'DECLARE_NUMBER'
+    ? 'DECLARE_NUMBER'
+    : isInfoReveal
     ? 'INFO_REVEAL'
     : isEffectChoice ? 'CHOOSE_EFFECT'
     : isHandSelection ? 'CHOOSE_FROM_HAND'
@@ -717,6 +748,7 @@ export function buildPendingTargetSelectionUI(
     handCards,
     revealedCard,
     revealedCards,
+    numberRange,
     deckSize,
     confirmCardData,
     playerName,

@@ -1,6 +1,47 @@
 {
   "entries": [
     {
+      "date": "2026-08-06",
+      "title_fr": "Trois cartes or et des missions plus nettes",
+      "title_en": "Three gold cards and sharper missions",
+      "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature"
+      ],
+      "changes_fr": [
+        "Tsunade Le Pigeon Légendaire arrive : elle remélange jusqu’à 5 cartes de sa défausse et gagne autant de puissance.",
+        "Jiraiya L’Ermite Pervers arrive : chaque Invocation jouée lui rapporte 1 Chakra, et son UPGRADE en pose une moins chère puis renforce toutes vos Invocations.",
+        "Gaara Pourquoi n’abandonne-t-il pas ? rejoint la collection en version or, avec les mêmes règles que la carte de base.",
+        "Les illustrations des missions du set 2 sont recadrées : plus de bord blanc autour de la carte.",
+        "Les cartes or s’affichent en meilleure qualité.",
+        "Huit cartes du set 2 arrivent : Itachi Uchiwa 053, Kakashi Hatake 008, Jirôbô 033, Hinata Hyûga 016, Kyûbi 006, Tsunade 002, et les équipements Senbon 079 et Râmen 081.",
+        "Tsunade La Joueuse Invétérée 002 ouvre une fenêtre où vous tapez le nombre annoncé, puis révèle la carte du dessus de votre deck sans la déplacer.",
+        "Kakashi Hatake 008 pose un allié Équipe 7 pour 2 Chakra de moins, et cet allié ne peut jamais arriver en UPGRADE.",
+        "Itachi Uchiwa 053 doit cacher un personnage à 2 Chakra ou moins de sa mission, lui compris.",
+        "Le Senbon peut se poser sur un personnage caché, contrairement aux équipements qui exigent une cible non cachée."
+      ],
+      "changes_en": [
+        "Tsunade Legendary Sitting Duck joins the game: she shuffles up to 5 cards from her discard pile back and gains that much Power.",
+        "Jiraiya Pervy Sage joins the game: every Summon you play gives him 1 Chakra, and his UPGRADE plays one cheaper then powers up all your Summons.",
+        "Gaara \"Why won’t he give up?\" joins the collection as a gold card, with the same rules as the base card.",
+        "The set 2 mission artworks are recropped: no more white edge around the card.",
+        "The gold cards are displayed at a higher quality.",
+        "Eight set 2 cards arrive: Itachi Uchiha 053, Kakashi Hatake 008, Jirobo 033, Hinata Hyuga 016, Nine-Tailed Fox 006, Tsunade 002, plus the Senbon 079 and Ramen 081 attachments.",
+        "Tsunade The Gambling Fool 002 opens a window where you type the declared number, then reveals the top card of your deck without moving it.",
+        "Kakashi Hatake 008 puts a Team 7 ally down for 2 Chakra less, and that ally can never arrive as an upgrade.",
+        "Itachi Uchiha 053 must hide a character costing 2 or less in his mission, himself included.",
+        "The Senbon can be attached to a hidden character, unlike attachments that demand a non-hidden target."
+      ]
+    },
+    {
       "date": "2026-08-04",
       "title_fr": "Missions plus faciles à parcourir",
       "title_en": "Easier mission browsing",
@@ -13,6 +54,14 @@
         "feature",
         "fix",
         "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature",
+        "feature",
         "fix",
         "fix",
         "fix"
@@ -28,7 +77,15 @@
         "Faire profil bas demande maintenant confirmation pour son AMBUSH, et il se déclenche après tous les autres effets de la carte.",
         "Temari annonce son FIRST STRIKE dans une fenêtre avant de demander la cible, comme les autres effets.",
         "Les DUEL de Hinata et de Rock Lee fonctionnent, et celui de Hinata se résout avant son MAIN comme sur la carte.",
-        "Mission prioritaire déclenche bien les effets SCORE une seconde fois, même ceux qui demandent un choix."
+        "Mission prioritaire déclenche bien les effets SCORE une seconde fois, même ceux qui demandent un choix.",
+        "Les tournois à élimination arment tous les matchs du premier tour, plus personne ne reste bloqué sur un écran d'attente au démarrage.",
+        "Une partie de tournoi démarre même si un joueur a le jeu en arrière-plan, et elle ne peut plus s'annuler en boucle avant le début.",
+        "Une partie en cours ne peut plus repartir du début si un joueur renvoie un deck depuis un autre onglet.",
+        "Nouvelle carte Kimimaro du set 2 : défaussez un Jirobo, une Tayuya, un Kidomaru ou un Sakon pour déclencher leur effet.",
+        "Naruto et Sasuke du set 2 gagnent une rareté supplémentaire, leurs illustrations arriveront plus tard.",
+        "Gaara du set 2 ne propose plus de piocher quand c'est l'adversaire qui bat une carte, et rien ne se déclenche s'il tombe en même temps.",
+        "Orochimaru secret regarde la puissance du personnage avant l'amélioration : les jetons donnés par la mission ne comptent plus dans son seuil.",
+        "En scellé, un deck terminé après la fin du temps de construction récupère la place au lieu de faire disparaître le joueur du tournoi."
       ],
       "changes_en": [
         "The deck builder mission list is now browsed page by page, with a search box and filters.",
@@ -41,7 +98,15 @@
         "Keep a Low Profile now asks before its AMBUSH, and it triggers after all the other abilities of the card.",
         "Temari now announces her FIRST STRIKE in a window before asking for a target, like every other effect.",
         "Hinata and Rock Lee DUEL effects now work, and Hinata resolves hers before her MAIN, as printed on the card.",
-        "High Priority Mission now really triggers SCORE effects a second time, including those that ask for a choice."
+        "High Priority Mission now really triggers SCORE effects a second time, including those that ask for a choice.",
+        "Elimination tournaments now arm every first-round match, so nobody is left stuck on a waiting screen at the start.",
+        "A tournament game now starts even if a player has the tab in the background, and it can no longer cancel itself over and over before the start.",
+        "A running game can no longer restart from scratch if a player sends a deck again from another tab.",
+        "New set 2 Kimimaro card: discard a Jirobo, Tayuya, Kidomaru or Sakon to trigger their effect.",
+        "The set 2 Naruto and Sasuke gain an extra rarity, their artworks will come later.",
+        "The set 2 Gaara no longer offers a draw when the opponent defeats a card, and nothing triggers if it falls at the same time.",
+        "The secret Orochimaru reads the character power before the upgrade: tokens granted by the mission no longer count toward its threshold.",
+        "In sealed, a deck finished after the build time runs out now takes the seat back instead of dropping the player from the tournament."
       ]
     },
     {

@@ -1003,7 +1003,18 @@
         "ssMss10Discarded": "{card} : {target} a été défaussé.",
         "ss111ReturnHinata": "{card} : {target} revient de la défausse à la main.",
         "ss115PowerupOnDefeat": "{card} : POWERUP {amount} après avoir battu {defeated}.",
-        "ssMss04SecondScore": "{card} : cette mission est marquée une seconde fois."
+        "ssMss04SecondScore": "{card} : cette mission est marquée une seconde fois.",
+        "ss031Discarded": "{card} : {target} défaussé.",
+        "ss031Powerup": "{card} : POWERUP {amount}.",
+        "ss031Chakra": "{card} : {amount} Chakra gagnés.",
+        "ss031Draw": "{card} : {amount} carte(s) piochée(s).",
+        "ss001Shuffle": "{card} : {amount} carte(s) remélangée(s) dans le deck, POWERUP {amount}.",
+        "ss001AllyPowerup": "{card} : POWERUP {amount} sur {target}.",
+        "ss001NoBonus": "{card} : aucune carte remélangée, pas de POWERUP supplémentaire.",
+        "ss002SummonChakra": "{card} : {amount} Chakra gagné(s) en jouant une Invocation.",
+        "ss002SummonPowerup": "{card} : POWERUP {amount} sur {count} Invocation(s) alliée(s).",
+        "ss002RevealWon": "{card} : {amount} annoncé, {target} révélée, POWERUP {amount}.",
+        "ss002RevealFailed": "{card} : {amount} annoncé, {target} révélée, pas de POWERUP."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1023,7 +1034,9 @@
       "attachToCharacter": "{card} est attaché à {target}.",
       "useFirstStrike": "FIRST STRIKE : {card} frappe en premier cette manche.",
       "attachmentDiscarded": "{card} est défaussée : sa condition d attache n est plus remplie.",
-      "attachmentHostLeft": "{card} part à la défausse : le personnage qui la portait a quitté le terrain."
+      "attachmentHostLeft": "{card} part à la défausse : le personnage qui la portait a quitté le terrain.",
+      "chakraBonusMission": "{card} : CHAKRA +{bonus} (mission {mission})",
+      "chakraBonusMissionWon": "{card} : CHAKRA +{bonus} (bonus de mission gagnée)"
     },
     "end": {
       "victory": "Victoire",
@@ -1661,12 +1674,39 @@
         "ss111ConfirmDuel": "DUEL Neji Hyûga : reprendre en main la Hinata Hyûga la plus haute de votre défausse ?",
         "ss111ConfirmMain": "MAIN : jouer un personnage nommé Hyûga n’importe où, en payant 3 de moins ?",
         "ss111PlayHyuga": "MAIN : choisissez un personnage nommé Hyûga à jouer, en payant {reduction} de moins.",
-        "ssMss06ConfirmAmbush": "Faire profil bas : AMBUSH POWERUP 2 sur ce personnage ?"
+        "ssMss06ConfirmAmbush": "Faire profil bas : AMBUSH POWERUP 2 sur ce personnage ?",
+        "ss031ConfirmMain": "MAIN : défausser des cartes du Quatuor du Son de votre main pour leurs effets ?",
+        "ss031ChooseDiscard": "MAIN : défaussez-en une pour son effet. Jirobo : POWERUP 3. Tayuya : 2 Chakra. Kidomaru : déplacez un allié. Sakon : piochez 2.",
+        "ss031MoveCharacter": "Kidomaru défaussé : choisissez un personnage allié à déplacer.",
+        "ss001ConfirmMain": "MAIN : remélanger des cartes du dessus de votre défausse dans votre deck pour un POWERUP ?",
+        "ss001ChooseCount": "MAIN : choisissez combien de cartes remélanger (1 à {max}). POWERUP 1 par carte.",
+        "ss001ChooseAlly": "UPGRADE : choisissez le personnage allié qui reçoit POWERUP {amount}.",
+        "ss002ConfirmUpgrade": "UPGRADE : jouer une Invocation en payant 3 de moins, puis POWERUP 2 chaque Invocation alliée ?",
+        "ss002PlaySummon": "UPGRADE : choisissez un personnage Invocation à jouer, en payant {reduction} de moins.",
+        "ss053FirstStrikeHide": "FIRST STRIKE : vous devez cacher un personnage de coût 2 ou moins dans cette mission.",
+        "ss008ConfirmFirstStrike": "FIRST STRIKE : jouer un personnage Équipe 7 en payant 2 de moins, jamais en UPGRADE ?",
+        "ss008PlayTeam7": "FIRST STRIKE : choisissez un personnage Équipe 7 à jouer, en payant {reduction} de moins.",
+        "ss033ConfirmUpgrade": "UPGRADE : POWERUP {amount} grâce à vos alliés du Quatuor du Son dans cette mission ?",
+        "ss006ConfirmAmbush": "AMBUSH : vaincre un personnage ennemi ici, en donnant son coût en Chakra à l’adversaire ?",
+        "ss006Defeat": "AMBUSH : choisissez le personnage ennemi à vaincre dans cette mission.",
+        "ss002ConfirmMain": "MAIN : annoncer un nombre et parier sur la carte du dessus de votre deck ?",
+        "ss002RevealWin": "Vous avez annoncé {declared} et révélé une carte à {cost} : POWERUP {declared}.",
+        "ss002RevealLose": "Vous avez annoncé {declared} mais la carte révélée ne coûte que {cost} : pas de POWERUP.",
+        "ss079ConfirmMain": "MAIN : POWERUP 1 sur ce personnage ?",
+        "ss081ConfirmMain": "MAIN : piocher une carte ?",
+        "declareNumber": "Annoncez un nombre entre {min} et {max}. Plus il est grand, plus le pari est risqué."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",
       "ssMss02RevealTitle": "Reconnaissance",
-      "ssMss02RevealResult": "Vous regardez ce personnage caché."
+      "ssMss02RevealResult": "Vous regardez ce personnage caché.",
+      "declareNumberTitle": "Annoncez un nombre",
+      "declareNumberConfirm": "Annoncer {value}",
+      "declareNumberPlus": "Augmenter",
+      "declareNumberMinus": "Diminuer",
+      "ss002RevealTitle": "Dessus de votre deck",
+      "ss002RevealWonResult": "Votre pari est gagnant.",
+      "ss002RevealLostResult": "Pas de chance cette fois."
     },
     "anim": {
       "cardPlayedHidden": "Carte jouée face cachée",
@@ -3088,7 +3128,9 @@
       "sealedCardNotInPool": "Cette carte ne fait pas partie de ton pool scellé.",
       "sealedRejoinLimit": "Tu as déjà utilisé toutes tes inscriptions à ce tournoi scellé. Tes boosters ne peuvent pas être réouverts.",
       "tooManyOpenTournaments": "Tu as déjà trop de tournois en cours. Termine ou annule-en un d’abord.",
-      "sealedCardBanned": "Une de ces cartes est bannie dans ce tournoi. Construis ton deck sans elle."
+      "sealedCardBanned": "Une de ces cartes est bannie dans ce tournoi. Construis ton deck sans elle.",
+      "sealedSeatLost": "Votre place a été libérée pendant que vous construisiez, et le tournoi est maintenant complet. Votre pool est conservé pour le prochain.",
+      "notParticipant": "Vous n’êtes pas inscrit à ce tournoi."
     },
     "deckError": {
       "tooFewCards": "Le deck doit contenir au moins {min} cartes (en a {count}).",

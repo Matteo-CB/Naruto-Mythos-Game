@@ -65,7 +65,7 @@ function ss047Upgrade(ctx: EffectContext): EffectResult {
 }
 
 
-function ss078Duel(ctx: EffectContext): EffectResult {
+export function ss078Duel(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
   const enemySide = sideKey(enemyOf(sourcePlayer));
   const validTargets: string[] = [];

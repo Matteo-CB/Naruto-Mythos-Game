@@ -9,6 +9,7 @@ export function triggerOnDefeatEffects(
   defeatedChar: CharacterInPlay,
   defeatedCharOwner: PlayerID,
   simultaneousDefeatIds?: string[],
+  defeatedBy?: PlayerID,
 ): GameState {
   let newState = state;
 
@@ -49,7 +50,7 @@ export function triggerOnDefeatEffects(
         }
 
 
-        if (topCard.set === 'SS' && topCard.number === 115 && controllingPlayer !== defeatedCharOwner) {
+        if (topCard.set === 'SS' && topCard.number === 115 && controllingPlayer !== defeatedCharOwner && defeatedBy === controllingPlayer) {
           const rockLeeDuel = (topCard.effects ?? []).find(
             (e) => e.type === 'DUEL' && e.description.includes('[⧗]'),
           );
@@ -107,7 +108,7 @@ export function triggerOnDefeatEffects(
     }
   }
 
-  newState = queueGaara078Draw(newState, defeatedChar, defeatedCharOwner);
+  newState = queueGaara078Draw(newState, defeatedChar, defeatedCharOwner, simultaneousDefeatIds, defeatedBy);
 
   return newState;
 }
@@ -117,10 +118,15 @@ function queueGaara078Draw(
   state: GameState,
   defeatedChar: CharacterInPlay,
   defeatedCharOwner: PlayerID,
+  simultaneousDefeatIds?: string[],
+  defeatedBy?: PlayerID,
 ): GameState {
   if (defeatedChar.isHidden) return state;
 
-  const beneficiary: PlayerID = defeatedCharOwner === 'player1' ? 'player2' : 'player1';
+  if (!defeatedBy) return state;
+  if (defeatedBy === defeatedCharOwner) return state;
+
+  const beneficiary: PlayerID = defeatedBy;
   if (state[beneficiary].chakra < 1) return state;
   if (state[beneficiary].deck.length === 0) return state;
 
@@ -130,6 +136,8 @@ function queueGaara078Draw(
     for (const char of state.activeMissions[mi][side]) {
       if (char.isHidden) continue;
       if (char.controlledBy !== beneficiary) continue;
+      if (char.instanceId === defeatedChar.instanceId) continue;
+      if (simultaneousDefeatIds && simultaneousDefeatIds.includes(char.instanceId)) continue;
       const top = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (String(top.set) === 'SS' && String(top.number) === '78') sources.push({ char, missionIndex: mi });
     }

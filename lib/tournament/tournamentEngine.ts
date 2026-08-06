@@ -73,7 +73,7 @@ export function generateBracket(participants: Participant[]): BracketResult {
       winnerId: null,
       winnerUsername: null,
       isBye: false,
-      status: 'pending',
+      status: 'ready',
     });
   });
 

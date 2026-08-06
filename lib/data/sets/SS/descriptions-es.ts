@@ -166,4 +166,53 @@ export const effectDescriptionsEs: Record<string, string[]> = {
     "[⧗] Este personaje no pierde sus contadores de Poder al final de la ronda.",
     "[⧗] DUEL Gaara: Cuando derrotas a un personaje enemigo, POWERUP 2.",
   ],
+  "SS-121-MV": [
+    "[⧗] Este personaje tiene +1 de Poder por cada Naruto Uzumaki aliado en juego.",
+    "[↯] Kiba Inuzuka: Mueve la carta del fondo de esta pila de mejora a otra misión.",
+  ],
+  "SS-126-R": [
+    "[⧗] Este personaje tiene +1 de Poder por cada personaje de la Aldea del Sonido en esta misión.",
+    "[↯] Orochimaru: Juega un personaje de la Aldea del Sonido en cualquier sitio, pagando 3 menos.",
+  ],
+  "SS-031-CHIBIV": [
+    "[↯] Descarta hasta uno de cada personaje para: Jirobo: POWERUP 3. Tayuya: Gana 2 Chakra. Kidomaru: Mueve un personaje aliado. Sakon: Roba 2 cartas.",
+  ],
+  "SS-999-L": [
+    "[↯] Baraja hasta 5 cartas de la parte superior de tu pila de descartes en tu mazo. Por cada carta barajada, POWERUP 1.",
+    "efecto MAIN: Además, por cada carta, POWERUP 1 también a un personaje aliado en juego.",
+  ],
+  "SS-998-L": [
+    "[⧗] Cuando juegues un personaje de Invocación, gana 1 Chakra.",
+    "[↯] Juega un personaje de Invocación en cualquier sitio, pagando 3 menos. POWERUP 2 a cada personaje de Invocación aliado en juego.",
+  ],
+  "SS-078-L": [
+    "[↯] Kimimaro: Derrota a un personaje enemigo con coste 2 o menos.",
+    "[⧗] Cuando derrotes a un personaje enemigo no oculto, puedes pagar 1 Chakra para robar 1 carta.",
+  ],
+  "SS-002-UC": [
+    "[↯] Declara un número. Revela la carta superior de tu mazo. Si el coste de esa carta es igual o mayor que el número declarado, POWERUP X, donde X es el número declarado.",
+  ],
+  "SS-006-UC": [
+    "[↯] Derrota a un personaje enemigo en esta misión. Si lo haces, el oponente gana Chakra igual al coste del personaje derrotado.",
+  ],
+  "SS-008-C": [
+    "[↯] FIRST STRIKE Juega un personaje del Equipo 7 pagando 2 menos. No puedes jugar ese personaje como mejora.",
+  ],
+  "SS-016-C": [
+    "[⧗] Si hay un personaje aliado Naruto Uzumaki o del Equipo 8 en esta misión, CHAKRA +1.",
+  ],
+  "SS-033-UC": [
+    "[↯] POWERUP 2 por cada personaje aliado del Cuarteto del Sonido en esta misión.",
+  ],
+  "SS-053-C": [
+    "[↯] FIRST STRIKE Debes ocultar a un personaje no oculto en esta misión con coste 2 o menos.",
+  ],
+  "SS-079-C": [
+    "Adjunta a un personaje aliado.",
+    "[↯] POWERUP 1.",
+  ],
+  "SS-081-C": [
+    "Adjunta a un personaje aliado no oculto.",
+    "[↯] Roba una carta.",
+  ],
 };

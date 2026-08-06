@@ -2790,7 +2790,9 @@
       "sealedCardNotInPool": "Quella carta non fa parte del tuo pool sealed.",
       "sealedRejoinLimit": "Hai già usato tutte le tue iscrizioni a questo torneo sealed. Le tue buste non possono essere riaperte.",
       "tooManyOpenTournaments": "Hai già troppi tornei aperti. Concludine o annullane uno prima.",
-      "sealedCardBanned": "Una di queste carte è bandita in questo torneo. Costruisci il mazzo senza di essa."
+      "sealedCardBanned": "Una di queste carte è bandita in questo torneo. Costruisci il mazzo senza di essa.",
+      "sealedSeatLost": "Il tuo posto è stato liberato mentre costruivi e il torneo è ora al completo. Conservi il tuo pool per il prossimo.",
+      "notParticipant": "Non sei iscritto a questo torneo."
     },
     "deckError": {
       "tooFewCards": "Il mazzo deve avere almeno {min} carte (ne ha {count}).",
@@ -3083,7 +3085,18 @@
         "ssMss10Discarded": "{card}: {target} è stato scartato.",
         "ss111ReturnHinata": "{card}: {target} torna dagli scarti alla mano.",
         "ss115PowerupOnDefeat": "{card}: POWERUP {amount} dopo aver sconfitto {defeated}.",
-        "ssMss04SecondScore": "{card}: questa missione viene assegnata una seconda volta."
+        "ssMss04SecondScore": "{card}: questa missione viene assegnata una seconda volta.",
+        "ss031Discarded": "{card}: {target} scartato.",
+        "ss031Powerup": "{card}: POWERUP {amount}.",
+        "ss031Chakra": "{card}: {amount} Chakra guadagnati.",
+        "ss031Draw": "{card}: {amount} carta/e pescata/e.",
+        "ss001Shuffle": "{card}: {amount} carta/e rimescolata/e nel mazzo, POWERUP {amount}.",
+        "ss001AllyPowerup": "{card}: POWERUP {amount} su {target}.",
+        "ss001NoBonus": "{card}: nessuna carta rimescolata, nessun POWERUP extra.",
+        "ss002SummonChakra": "{card}: {amount} Chakra guadagnato/i giocando un Evocazione.",
+        "ss002SummonPowerup": "{card}: POWERUP {amount} su {count} Evocazione/i alleata/e.",
+        "ss002RevealWon": "{card}: dichiarato {amount}, rivelato {target}, POWERUP {amount}.",
+        "ss002RevealFailed": "{card}: dichiarato {amount}, rivelato {target}, nessun POWERUP."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3103,7 +3116,9 @@
       "attachToCharacter": "{card} è collegato a {target}.",
       "useFirstStrike": "FIRST STRIKE: {card} colpisce per primo in questo round.",
       "attachmentDiscarded": "{card} è stata scartata: la sua condizione di allegato non è più valida.",
-      "attachmentHostLeft": "{card} va nella pila degli scarti: il personaggio che la portava ha lasciato il campo."
+      "attachmentHostLeft": "{card} va nella pila degli scarti: il personaggio che la portava ha lasciato il campo.",
+      "chakraBonusMission": "{card}: CHAKRA +{bonus} (missione {mission})",
+      "chakraBonusMissionWon": "{card}: CHAKRA +{bonus} (bonus missione vinta)"
     },
     "end": {
       "victory": "Vittoria",
@@ -3741,12 +3756,39 @@
         "ss111ConfirmDuel": "DUEL Neji Hyuga: rimettere in mano la Hinata Hyuga più in alto negli scarti?",
         "ss111ConfirmMain": "MAIN: giocare un personaggio di nome Hyuga ovunque, pagando 3 in meno?",
         "ss111PlayHyuga": "MAIN: scegli un personaggio di nome Hyuga da giocare, pagando {reduction} in meno.",
-        "ssMss06ConfirmAmbush": "Passare inosservati: AMBUSH POWERUP 2 su questo personaggio?"
+        "ssMss06ConfirmAmbush": "Passare inosservati: AMBUSH POWERUP 2 su questo personaggio?",
+        "ss031ConfirmMain": "MAIN: scartare carte del Quartetto del Suono dalla tua mano per i loro effetti?",
+        "ss031ChooseDiscard": "MAIN: scartane una per il suo effetto. Jirobo: POWERUP 3. Tayuya: 2 Chakra. Kidomaru: sposta un alleato. Sakon: pesca 2.",
+        "ss031MoveCharacter": "Kidomaru scartato: scegli un personaggio alleato da spostare.",
+        "ss001ConfirmMain": "MAIN: rimescolare carte dalla cima degli scarti nel tuo mazzo per un POWERUP?",
+        "ss001ChooseCount": "MAIN: scegli quante carte rimescolare (da 1 a {max}). POWERUP 1 per ognuna.",
+        "ss001ChooseAlly": "UPGRADE: scegli il personaggio alleato che riceve POWERUP {amount}.",
+        "ss002ConfirmUpgrade": "UPGRADE: giocare un Evocazione pagando 3 in meno e poi POWERUP 2 a ogni Evocazione alleata?",
+        "ss002PlaySummon": "UPGRADE: scegli un personaggio Evocazione da giocare, pagando {reduction} in meno.",
+        "ss053FirstStrikeHide": "FIRST STRIKE: devi nascondere un personaggio con costo 2 o inferiore in questa missione.",
+        "ss008ConfirmFirstStrike": "FIRST STRIKE: giocare un personaggio della Squadra 7 pagando 2 in meno, mai come miglioramento?",
+        "ss008PlayTeam7": "FIRST STRIKE: scegli un personaggio della Squadra 7 da giocare, pagando {reduction} in meno.",
+        "ss033ConfirmUpgrade": "UPGRADE: POWERUP {amount} grazie ai tuoi alleati del Quartetto del Suono in questa missione?",
+        "ss006ConfirmAmbush": "AMBUSH: sconfiggere un personaggio nemico qui, dando il suo costo in Chakra all’avversario?",
+        "ss006Defeat": "AMBUSH: scegli il personaggio nemico da sconfiggere in questa missione.",
+        "ss002ConfirmMain": "MAIN: dichiarare un numero e scommettere sulla carta in cima al tuo mazzo?",
+        "ss002RevealWin": "Hai dichiarato {declared} e rivelato una carta da {cost}: POWERUP {declared}.",
+        "ss002RevealLose": "Hai dichiarato {declared} ma la carta rivelata costa solo {cost}: nessun POWERUP.",
+        "ss079ConfirmMain": "MAIN: POWERUP 1 su questo personaggio?",
+        "ss081ConfirmMain": "MAIN: pescare una carta?",
+        "declareNumber": "Dichiara un numero tra {min} e {max}. Più è alto, più è difficile da battere."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",
       "ssMss02RevealTitle": "Ricognizione",
-      "ssMss02RevealResult": "Guardi questo personaggio nascosto."
+      "ssMss02RevealResult": "Guardi questo personaggio nascosto.",
+      "declareNumberTitle": "Dichiara un numero",
+      "declareNumberConfirm": "Dichiara {value}",
+      "declareNumberPlus": "Aumenta",
+      "declareNumberMinus": "Diminuisci",
+      "ss002RevealTitle": "Cima del tuo mazzo",
+      "ss002RevealWonResult": "La tua scommessa paga.",
+      "ss002RevealLostResult": "Sfortuna questa volta."
     },
     "anim": {
       "cardPlayedHidden": "Carta Giocata Coperta",

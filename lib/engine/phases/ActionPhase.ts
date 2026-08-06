@@ -560,6 +560,12 @@ function handleRevealCharacter(
     upgraded.stack = [...upgraded.stack, ...char.stack];
     upgraded.card = charTopCard;
     upgraded.powerTokens += char.powerTokens; // Transfer power tokens
+    const carriedAttachments = [...(upgraded.attachments ?? [])];
+    for (const carried of char.attachments ?? []) {
+      if (carriedAttachments.some((a) => a.owner === carried.owner)) continue;
+      carriedAttachments.push(carried);
+    }
+    upgraded.attachments = carriedAttachments;
     upgraded.isHidden = false;
     upgraded.wasRevealedAtLeastOnce = true;
 

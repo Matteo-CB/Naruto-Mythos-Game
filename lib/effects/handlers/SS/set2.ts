@@ -407,6 +407,8 @@ export function registerSet2Handlers(): void {
   registerEffect('SS-121-R', 'DUEL', ss121DuelHandler);
   registerEffect('SS-000-L', 'MAIN', ss000SearchAndPlay);
   registerEffect('SS-000-L', 'DUEL', ss000SearchAndPlay);
+  registerEffect('SS-121-MV', 'DUEL', ss121DuelHandler);
+  registerEffect('SS-126-R', 'DUEL', ss126DuelHandler);
   registerEffect('SS-112-SHINOBIV', 'UPGRADE', ss112UpgradeHandler);
   registerEffect('SS-112-SHINOBIV', 'DUEL', ss112DuelHandler);
 }

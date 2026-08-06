@@ -233,6 +233,8 @@ export interface RoomData {
   tournamentMatchId?: string;
   
   coinFlipDone: { player1: boolean; player2: boolean };
+  coinFlipTimer?: NodeJS.Timeout | null;
+  coinFlipResolved?: boolean;
   
   spectators: Map<string, { socketId: string; userId: string; username: string }>;
   
@@ -2295,7 +2297,10 @@ export function armMulliganIdleTimer(
     room.chessClockMulliganTimer = null;
   }
   if (!room.gameState || room.gameState.phase !== 'mulligan') return;
-  if (room.gameState.player1.hasMulliganed && room.gameState.player2.hasMulliganed) return;
+  if (room.gameState.player1.hasMulliganed && room.gameState.player2.hasMulliganed) {
+    if (room.tournamentMatchId) clearMulliganCancels(room.tournamentMatchId);
+    return;
+  }
   if (room.finalized) return;
 
   const deadline = Date.now() + CHESS_CLOCK_MULLIGAN_IDLE_MS;
@@ -2308,6 +2313,57 @@ export function armMulliganIdleTimer(
       console.error('[ChessClock] handleMulliganIdleTimeout error:', err instanceof Error ? err.message : err);
     });
   }, CHESS_CLOCK_MULLIGAN_IDLE_MS);
+}
+
+export const COIN_FLIP_FALLBACK_MS = 15 * 1000;
+export const MAX_MULLIGAN_CANCELS_PER_MATCH = 2;
+
+const mulliganCancelCount = new Map<string, number>();
+
+export function mulliganCancelsFor(matchId: string): number {
+  return mulliganCancelCount.get(matchId) ?? 0;
+}
+
+export function clearMulliganCancels(matchId: string): void {
+  mulliganCancelCount.delete(matchId);
+}
+
+export function resolveCoinFlip(
+  room: RoomData,
+  code: string,
+  io: SocketIOServer,
+  reason: 'both' | 'timeout',
+): void {
+  if (room.coinFlipTimer) {
+    clearTimeout(room.coinFlipTimer);
+    room.coinFlipTimer = null;
+  }
+  if (room.coinFlipResolved) return;
+  room.coinFlipResolved = true;
+
+  if (reason === 'timeout') {
+    console.warn(`[Socket] ${code}: a player never confirmed the coin flip, the server resolves it so the game can start`);
+  } else {
+    console.log(`[Socket] Both players done with coin flip in room ${code}, broadcasting sync`);
+  }
+
+  io.to(code).emit('coin-flip-sync');
+  room.coinFlipDone = { player1: false, player2: false };
+
+  if (room.gameState && room.gameState.phase === 'mulligan' && !room.finalized) {
+    armMulliganIdleTimer(room, code, io);
+  }
+}
+
+export function armCoinFlipFallback(room: RoomData, code: string, io: SocketIOServer): void {
+  if (room.coinFlipTimer) {
+    clearTimeout(room.coinFlipTimer);
+    room.coinFlipTimer = null;
+  }
+  room.coinFlipResolved = false;
+  room.coinFlipTimer = setTimeout(() => {
+    resolveCoinFlip(room, code, io, 'timeout');
+  }, COIN_FLIP_FALLBACK_MS);
 }
 
 function clearMulliganTimer(room: RoomData): void {
@@ -2382,6 +2438,20 @@ export async function handleMulliganIdleTimeout(
 
   const p1Done = room.gameState.player1.hasMulliganed;
   const p2Done = room.gameState.player2.hasMulliganed;
+
+  if (room.tournamentMatchId) {
+    const cancels = mulliganCancelsFor(room.tournamentMatchId);
+    if (cancels >= MAX_MULLIGAN_CANCELS_PER_MATCH) {
+      console.error(
+        `[ChessClock] CRITICAL: match ${room.tournamentMatchId} already lost ${cancels} games to mulligan idle. `
+        + 'Letting this one run instead of cancelling again, the clock and the absence rules decide from here.',
+      );
+      clearMulliganTimer(room);
+      return;
+    }
+    mulliganCancelCount.set(room.tournamentMatchId, cancels + 1);
+  }
+
   console.log(`[ChessClock] ${code}: mulligan idle timeout -> cancelling game (p1Done=${p1Done} p2Done=${p2Done})`);
 
   room.finalized = true;
@@ -3602,6 +3672,16 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(code);
       if (!room) return;
 
+      if (room.gameState && room.gameState.phase !== 'gameOver' && !room.finalized) {
+        const seatOfSender = socket.id === room.hostSocket ? 'player1' : socket.id === room.guestSocket ? 'player2' : null;
+        console.warn(
+          `[Socket] room:select-deck ignored in room ${code}: a game is already running (turn ${room.gameState.turn}, `
+          + `phase ${room.gameState.phase}). Restarting it would wipe the match, resyncing the sender instead.`,
+        );
+        if (seatOfSender) sendSeatState(room, seatOfSender, socket, io);
+        return;
+      }
+
       if (!data || typeof data !== 'object' || !Array.isArray(data.characters) || !Array.isArray(data.missions)) {
         socket.emit('room:error', { message: 'Invalid deck payload', errorKey: 'game.error.invalidDeck' });
         return;
@@ -3908,6 +3988,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         if (room.gameState.phase === 'mulligan') {
           armMulliganIdleTimer(room, code, io);
         }
+        armCoinFlipFallback(room, code, io);
 
         
         if (room.tournamentId && room.tournamentMatchId) {
@@ -3952,10 +4033,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       room.coinFlipDone[player] = true;
       console.log(`[Socket] coin-flip-done from ${player} in room ${code}`, room.coinFlipDone);
       if (room.coinFlipDone.player1 && room.coinFlipDone.player2) {
-        console.log(`[Socket] Both players done with coin flip in room ${code}, broadcasting sync`);
-        io.to(code).emit('coin-flip-sync');
-        
-        room.coinFlipDone = { player1: false, player2: false };
+        resolveCoinFlip(room, code, io, 'both');
       }
     });
 

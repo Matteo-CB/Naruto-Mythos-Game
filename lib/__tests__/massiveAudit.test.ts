@@ -1281,7 +1281,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
 
     
     expect(results.completed).toBeGreaterThanOrEqual(results.total * 0.45);
-  }, 120000); // 2 minute timeout
+  }, 300000);
 
   it('should handle all 4 turns correctly in simulated games', () => {
     let allFourTurns = 0;

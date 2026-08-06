@@ -333,14 +333,15 @@ describe('sealed set choice — random resolves against AVAILABLE sets only', ()
   });
 
   it('an admin status override makes a set selectable, but the card-count guard still protects the pool', () => {
-    const previousSealedReady = SET_REGISTRY.SS.sealedReady;
-    SET_REGISTRY.SS.sealedReady = true;
-    applySetStatusOverrides({ SS: 'available' });
+    const previousSealedReady = SET_REGISTRY.AK.sealedReady;
+    SET_REGISTRY.AK.sealedReady = true;
+    applySetStatusOverrides({ AK: 'available' });
     try {
-      expect(getAvailableSetIds()).toContain('SS');
-      expect(() => generateSealedPool(1, 'SS')).toThrow(/does not have enough cards/);
+      expect(getAvailableSetIds()).toContain('AK');
+      expect(() => generateSealedPool(1, 'AK')).toThrow(/does not have enough cards/);
     } finally {
-      SET_REGISTRY.SS.sealedReady = previousSealedReady;
+      SET_REGISTRY.AK.sealedReady = previousSealedReady;
+      applySetStatusOverrides({});
     }
   });
 

@@ -162,4 +162,53 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "[⧗] Ta postać nie traci żetonów Mocy na koniec rundy.",
     "[⧗] DUEL Gaara: Gdy pokonasz wrogą postać, POWERUP 2.",
   ],
+  "SS-121-MV": [
+    "[⧗] Ta postać ma +1 Siły za każdego sojuszniczego Naruto Uzumaki w grze.",
+    "[↯] Kiba Inuzuka: Przenieś dolną kartę tego stosu ulepszeń na inną misję.",
+  ],
+  "SS-126-R": [
+    "[⧗] Ta postać ma +1 Siły za każdą postać Wioski Dźwięku na tej misji.",
+    "[↯] Orochimaru: Zagraj postać Wioski Dźwięku gdziekolwiek, płacąc o 3 mniej.",
+  ],
+  "SS-031-CHIBIV": [
+    "[↯] Odrzuć maksymalnie po jednej z tych postaci, aby: Jirobo: POWERUP 3. Tayuya: Zyskaj 2 Czakry. Kidomaru: Przenieś sojuszniczą postać. Sakon: Dobierz 2 karty.",
+  ],
+  "SS-999-L": [
+    "[↯] Wtasuj do swojej talii maksymalnie 5 kart z wierzchu swojego stosu kart odrzuconych. Za każdą wtasowaną kartę POWERUP 1.",
+    "efekt MAIN: Dodatkowo, za każdą kartę POWERUP 1 również sojuszniczą postać w grze.",
+  ],
+  "SS-998-L": [
+    "[⧗] Gdy zagrasz postać Przywołania, zyskaj 1 Czakry.",
+    "[↯] Zagraj postać Przywołania gdziekolwiek, płacąc o 3 mniej. POWERUP 2 każdą sojuszniczą postać Przywołania w grze.",
+  ],
+  "SS-078-L": [
+    "[↯] Kimimaro: Pokonaj wrogą postać o koszcie 2 lub mniejszym.",
+    "[⧗] Gdy pokonasz nieukrytą wrogą postać, możesz zapłacić 1 Czakry, aby dobrać 1 kartę.",
+  ],
+  "SS-002-UC": [
+    "[↯] Zadeklaruj liczbę. Odkryj wierzchnią kartę swojej talii. Jeśli koszt tej karty jest równy zadeklarowanej liczbie lub wyższy, POWERUP X, gdzie X to zadeklarowana liczba.",
+  ],
+  "SS-006-UC": [
+    "[↯] Pokonaj wrogą postać na tej misji. Jeśli to zrobisz, przeciwnik zyskuje Czakrę równą kosztowi pokonanej postaci.",
+  ],
+  "SS-008-C": [
+    "[↯] FIRST STRIKE Zagraj postać z Drużyny 7, płacąc o 2 mniej. Nie możesz zagrać tej postaci jako ulepszenia.",
+  ],
+  "SS-016-C": [
+    "[⧗] Jeśli na tej misji jest sojusznicza postać Naruto Uzumaki lub z Drużyny 8, CHAKRA +1.",
+  ],
+  "SS-033-UC": [
+    "[↯] POWERUP 2 za każdą sojuszniczą postać z Czwórki Dźwięku na tej misji.",
+  ],
+  "SS-053-C": [
+    "[↯] FIRST STRIKE Musisz ukryć nieukrytą postać na tej misji o koszcie 2 lub mniejszym.",
+  ],
+  "SS-079-C": [
+    "Dołącz do sojuszniczej postaci.",
+    "[↯] POWERUP 1.",
+  ],
+  "SS-081-C": [
+    "Dołącz do nieukrytej sojuszniczej postaci.",
+    "[↯] Dobierz kartę.",
+  ],
 };

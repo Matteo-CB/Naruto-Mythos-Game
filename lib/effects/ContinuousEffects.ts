@@ -2,6 +2,7 @@ import type { GameState, PlayerID, CharacterInPlay, PendingAction, ActiveMission
 import { honorableDuelBonus, kingOfTheHillBonus, missionCarries, teamTrainingBonus, playedNameIsUniqueInMission, SS_MISSION_ADVERSE_TERRAIN, SS_MISSION_NEW_FORCES } from './missions/ssMissions';
 import { generateInstanceId } from '../engine/utils/id';
 import { logAction } from '../engine/utils/gameLog';
+import { isSummonPlay, jiraiyaGoldSources, JIRAIYA_GOLD_ID, JIRAIYA_GOLD_NAME } from './handlers/SS/goldCards';
 
 
 
@@ -75,11 +76,23 @@ export function calculateContinuousChakraBonus(
       }
     }
 
-    
+
     if (topCard.id === 'KS-012-UC' || (topCard.set === 'KS' && topCard.number === 12)) {
       if (effect.description.toLowerCase().includes('chakra') && effect.description.includes('+')) {
         bonus += 1;
       }
+    }
+
+
+    if (topCard.id === 'SS-016-C' || (topCard.set === 'SS' && topCard.number === 16)) {
+      const hasNarutoOrTeam8 = friendlyChars.some((c) => {
+        if (c.instanceId === char.instanceId || c.isHidden) return false;
+        if (c.controlledBy !== player) return false;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+        if ((cTop.keywords ?? []).includes('Team 8')) return true;
+        return `${cTop.name_fr ?? ''} ${cTop.name_en ?? ''}`.toUpperCase().includes('NARUTO UZUMAKI');
+      });
+      if (hasNarutoOrTeam8) bonus += 1;
     }
   }
 
@@ -642,6 +655,29 @@ function applyNewForcesPowerup(
   };
 }
 
+function applyJiraiyaGoldSummonChakra(
+  state: GameState,
+  playingPlayer: PlayerID,
+  playedInstanceId?: string,
+): GameState {
+  if (!playedInstanceId) return state;
+  if (!isSummonPlay(state, playingPlayer, playedInstanceId)) return state;
+
+  const sources = jiraiyaGoldSources(state, playingPlayer);
+  if (sources.length === 0) return state;
+
+  const owner = { ...state[playingPlayer] };
+  owner.chakra += sources.length;
+  return {
+    ...state,
+    [playingPlayer]: owner,
+    log: logAction(state.log, state.turn, state.phase, playingPlayer, 'EFFECT_CONTINUOUS',
+      `Jiraiya (SS-002): gained ${sources.length} Chakra for playing a Summon character.`,
+      'game.log.effect.ss002SummonChakra',
+      { card: JIRAIYA_GOLD_NAME, id: JIRAIYA_GOLD_ID, amount: sources.length }),
+  };
+}
+
 export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID, missionIndex: number, _isReveal?: boolean, playedInstanceId?: string): GameState {
   
   
@@ -649,6 +685,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
   let newState = { ...state };
   newState = triggerCrow089Relocation(newState, playingPlayer, playedInstanceId);
   newState = applyNewForcesPowerup(newState, playingPlayer, missionIndex, playedInstanceId);
+  newState = applyJiraiyaGoldSummonChakra(newState, playingPlayer, playedInstanceId);
   const opponent: PlayerID = playingPlayer === 'player1' ? 'player2' : 'player1';
   const mission = newState.activeMissions[missionIndex];
   const opponentChars = opponent === 'player1' ? mission.player1Characters : mission.player2Characters;

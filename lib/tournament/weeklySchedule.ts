@@ -11,6 +11,7 @@ export interface WeeklyDaySpec {
   autoCreate?: boolean;
   partner?: string;
   startHour?: number;
+  regHour?: number;
   maxPlayers?: number;
 }
 
@@ -22,6 +23,7 @@ export const AUTO_SEALED_SET_CHOICE = 'random';
 
 export const NWL_PARTNER_NAME = 'New World Loot';
 export const NWL_CALENDAR_START_HOUR = 22;
+export const NWL_CALENDAR_REG_HOUR = 14;
 export const NWL_FIRST_PLACE_STORE_CREDIT_GBP = 20;
 export const NWL_FIRST_PLACE_PAYPAL_GBP = 10;
 export const NWL_CHUNIN_PODIUM_PLACES = 3;
@@ -41,6 +43,7 @@ export const WEEKLY_SCHEDULE: Record<number, WeeklyDaySpec | null> = {
     autoCreate: false,
     partner: 'nwl',
     startHour: NWL_CALENDAR_START_HOUR,
+    regHour: NWL_CALENDAR_REG_HOUR,
     maxPlayers: NWL_CALENDAR_MAX_PLAYERS,
   },
   6: { kind: 'classic', format: 'swiss', gameMode: 'classic', useBanList: true },
@@ -73,6 +76,10 @@ export function specForWeekday(weekday: number): WeeklyDaySpec | null {
 
 export function startHourForSpec(spec: WeeklyDaySpec): number {
   return spec.startHour ?? AUTO_TOURNAMENT_START_HOUR;
+}
+
+export function regHourForSpec(spec: WeeklyDaySpec): number {
+  return spec.regHour ?? AUTO_TOURNAMENT_REG_HOUR;
 }
 
 export function maxPlayersForSpec(spec: WeeklyDaySpec): number {
@@ -137,7 +144,7 @@ export function nextWeeklyOccurrences(now: Date = new Date()): WeeklyOccurrence[
     if (!spec) continue;
 
     let startAt = scheduleWallToUtc(year, month, day, startHourForSpec(spec));
-    let regAt = scheduleWallToUtc(year, month, day, AUTO_TOURNAMENT_REG_HOUR);
+    let regAt = scheduleWallToUtc(year, month, day, regHourForSpec(spec));
 
     if (startAt.getTime() <= now.getTime()) {
       const rolled = new Date(Date.UTC(year, month - 1, day + 7));
@@ -145,7 +152,7 @@ export function nextWeeklyOccurrences(now: Date = new Date()): WeeklyOccurrence[
       const rm = rolled.getUTCMonth() + 1;
       const rd = rolled.getUTCDate();
       startAt = scheduleWallToUtc(ry, rm, rd, startHourForSpec(spec));
-      regAt = scheduleWallToUtc(ry, rm, rd, AUTO_TOURNAMENT_REG_HOUR);
+      regAt = scheduleWallToUtc(ry, rm, rd, regHourForSpec(spec));
     }
 
     occurrences.push({ scheduleWeekday, spec, regAt, startAt });

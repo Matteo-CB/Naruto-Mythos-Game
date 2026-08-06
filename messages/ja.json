@@ -1001,7 +1001,18 @@
         "ssMss10Discarded": "{card}：{target}を捨てた。",
         "ss111ReturnHinata": "{card}：{target}が捨て札から手札に戻る。",
         "ss115PowerupOnDefeat": "{card}：{defeated}を撃破してPOWERUP {amount}。",
-        "ssMss04SecondScore": "{card}：このミッションはもう一度得点される。"
+        "ssMss04SecondScore": "{card}：このミッションはもう一度得点される。",
+        "ss031Discarded": "{card}：{target}を捨てた。",
+        "ss031Powerup": "{card}：POWERUP {amount}。",
+        "ss031Chakra": "{card}：チャクラを{amount}得た。",
+        "ss031Draw": "{card}：カードを{amount}枚引いた。",
+        "ss001Shuffle": "{card}：カード{amount}枚をデッキに混ぜ、POWERUP {amount}。",
+        "ss001AllyPowerup": "{card}：{target}にPOWERUP {amount}。",
+        "ss001NoBonus": "{card}：混ぜたカードがないため、追加のPOWERUPなし。",
+        "ss002SummonChakra": "{card}：口寄せを出してチャクラを{amount}得た。",
+        "ss002SummonPowerup": "{card}：味方の口寄せ{count}体にPOWERUP {amount}。",
+        "ss002RevealWon": "{card}：{amount}を宣言し{target}を公開、POWERUP {amount}。",
+        "ss002RevealFailed": "{card}：{amount}を宣言し{target}を公開、POWERUPなし。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1021,7 +1032,9 @@
       "attachToCharacter": "{card}が{target}に付けられた。",
       "useFirstStrike": "FIRST STRIKE：{card}がこのラウンドで先制する。",
       "attachmentDiscarded": "{card}は装着条件を満たさなくなったため捨てられた。",
-      "attachmentHostLeft": "{card}を捨て札にする。装備していたキャラクターが場を離れたため。"
+      "attachmentHostLeft": "{card}を捨て札にする。装備していたキャラクターが場を離れたため。",
+      "chakraBonusMission": "{card}：CHAKRA +{bonus}（ミッション{mission}）",
+      "chakraBonusMissionWon": "{card}：CHAKRA +{bonus}（獲得ミッションボーナス）"
     },
     "end": {
       "victory": "勝利",
@@ -1659,12 +1672,39 @@
         "ss111ConfirmDuel": "DUEL 日向ネジ：捨て札の一番上の日向ヒナタを手札に戻しますか？",
         "ss111ConfirmMain": "MAIN：日向の名を持つキャラクターを、コストを3少なくしてプレイしますか？",
         "ss111PlayHyuga": "MAIN：コストを{reduction}少なく支払ってプレイする、日向の名を持つキャラクターを選ぶ。",
-        "ssMss06ConfirmAmbush": "目立たぬように：このキャラクターをAMBUSH POWERUP 2しますか？"
+        "ssMss06ConfirmAmbush": "目立たぬように：このキャラクターをAMBUSH POWERUP 2しますか？",
+        "ss031ConfirmMain": "MAIN：手札の音の四人衆を捨てて効果を使いますか？",
+        "ss031ChooseDiscard": "MAIN：1枚捨ててその効果を使う。次郎坊：POWERUP 3。多由也：チャクラ2。鬼童丸：味方1体を移動。左近：2枚ドロー。",
+        "ss031MoveCharacter": "鬼童丸を捨てた：移動させる味方キャラクターを選ぶ。",
+        "ss001ConfirmMain": "MAIN：捨て札の上からカードをデッキに混ぜてPOWERUPしますか？",
+        "ss001ChooseCount": "MAIN：混ぜる枚数を選ぶ（1〜{max}）。1枚につきPOWERUP 1。",
+        "ss001ChooseAlly": "UPGRADE：POWERUP {amount}を受ける味方キャラクターを選ぶ。",
+        "ss002ConfirmUpgrade": "UPGRADE：口寄せをコスト3少なく出し、味方の口寄せすべてにPOWERUP 2しますか？",
+        "ss002PlaySummon": "UPGRADE：コストを{reduction}少なくして出す口寄せキャラクターを選ぶ。",
+        "ss053FirstStrikeHide": "FIRST STRIKE：このミッションでコスト2以下のキャラクター1体を伏せなければならない。",
+        "ss008ConfirmFirstStrike": "FIRST STRIKE：第七班のキャラクターをコスト2少なく出しますか？（UPGRADEでは出せない）",
+        "ss008PlayTeam7": "FIRST STRIKE：コストを{reduction}少なくして出す第七班のキャラクターを選ぶ。",
+        "ss033ConfirmUpgrade": "UPGRADE：このミッションの味方の音の四人衆によりPOWERUP {amount}しますか？",
+        "ss006ConfirmAmbush": "AMBUSH：ここで敵キャラクターを倒し、そのコス分のチャクラを相手に与えますか？",
+        "ss006Defeat": "AMBUSH：このミッションで倒す敵キャラクターを選ぶ。",
+        "ss002ConfirmMain": "MAIN：数字を宣言してデッキの一番上のカードに賭けますか？",
+        "ss002RevealWin": "{declared}を宣言し、コスト{cost}のカードを公開：POWERUP {declared}。",
+        "ss002RevealLose": "{declared}を宣言したが、公開したカードのコストは{cost}：POWERUPなし。",
+        "ss079ConfirmMain": "MAIN：このキャラクターにPOWERUP 1しますか？",
+        "ss081ConfirmMain": "MAIN：カードを1枚引きますか？",
+        "declareNumber": "{min}から{max}までの数字を宣言する。大きいほど当てにくくなる。"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",
       "ssMss02RevealTitle": "偵察",
-      "ssMss02RevealResult": "この伏せられたキャラクターを見る。"
+      "ssMss02RevealResult": "この伏せられたキャラクターを見る。",
+      "declareNumberTitle": "数字を宣言する",
+      "declareNumberConfirm": "{value}を宣言",
+      "declareNumberPlus": "増やす",
+      "declareNumberMinus": "減らす",
+      "ss002RevealTitle": "デッキの一番上",
+      "ss002RevealWonResult": "賭けは成功。",
+      "ss002RevealLostResult": "今回は運がなかった。"
     },
     "anim": {
       "cardPlayedHidden": "カードを伏せて出した",
@@ -3086,7 +3126,9 @@
       "sealedCardNotInPool": "そのカードはあなたのシールドプールにありません。",
       "sealedRejoinLimit": "このシールド大会のエントリー回数はすでに上限に達しています。ブースターを開け直すことはできません。",
       "tooManyOpenTournaments": "進行中の大会が多すぎます。まず一つ終了するか中止してください。",
-      "sealedCardBanned": "このカードはこの大会で禁止されています。そのカードを外してデッキを組んでください。"
+      "sealedCardBanned": "このカードはこの大会で禁止されています。そのカードを外してデッキを組んでください。",
+      "sealedSeatLost": "デッキ構築中に席が解放され、トーナメントは満員になりました。プールは次回まで保持されます。",
+      "notParticipant": "このトーナメントに登録されていません。"
     },
     "deckError": {
       "tooFewCards": "デッキはカードが最低 {min} 枚必要です（現在 {count} 枚）。",

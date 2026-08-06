@@ -112,9 +112,11 @@ function grantChakra(state: GameState, player: PlayerID): GameState {
       'start',
       player,
       'CHAKRA_BONUS',
-      `${source.cardName}: CHAKRA +${source.bonus} (${source.reason})`,
-      'game.log.chakraBonus',
-      { card: source.cardName, bonus: source.bonus, reason: source.reason },
+      `${source.cardName}: CHAKRA +${source.bonus}`,
+      source.missionIndex ? 'game.log.chakraBonusMission' : 'game.log.chakraBonusMissionWon',
+      source.missionIndex
+        ? { card: source.cardName, bonus: source.bonus, mission: source.missionIndex }
+        : { card: source.cardName, bonus: source.bonus },
     );
   }
 
@@ -128,7 +130,7 @@ function grantChakra(state: GameState, player: PlayerID): GameState {
 interface ChakraBonusSource {
   cardName: string;
   bonus: number;
-  reason: string;
+  missionIndex?: number;
 }
 
 
@@ -149,7 +151,7 @@ function calculateChakraBonusDetailed(state: GameState, player: PlayerID): { tot
         sources.push({
           cardName: topCard.name_fr,
           bonus: charBonus,
-          reason: `mission ${missionIndex + 1}`,
+          missionIndex: missionIndex + 1,
         });
       }
     }
@@ -159,7 +161,7 @@ function calculateChakraBonusDetailed(state: GameState, player: PlayerID): { tot
   const missionBonus = calculateMissionChakraBonus(state, player);
   if (missionBonus > 0) {
     total += missionBonus;
-    sources.push({ cardName: 'Mission', bonus: missionBonus, reason: 'won mission bonus' });
+    sources.push({ cardName: 'Mission', bonus: missionBonus });
   }
 
   return { total, sources };

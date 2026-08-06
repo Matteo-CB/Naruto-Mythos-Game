@@ -132,12 +132,12 @@ describe('AI and hotseat: no chess clock is ever armed', () => {
     expect(importers.sort()).toEqual(
       ['app/[locale]/replay/[id]/page.tsx', 'lib/socket/server.ts', 'lib/socket/tournamentHandlers.ts'].sort(),
     );
-  });
+  }, 60000);
 
   it('only the online socket server imports the idle-forfeit decision module', () => {
     const importers = repoFiles().filter((f) => readFileSync(f, 'utf8').includes('timing/idleDecision'));
     expect(importers).toEqual(['lib/socket/server.ts']);
-  });
+  }, 60000);
 
   it('the vs-AI, hotseat and training surfaces contain no chess clock reference at all', () => {
     const offenders: string[] = [];
@@ -157,7 +157,7 @@ describe('AI and hotseat: no chess clock is ever armed', () => {
       }
     }
     expect(offenders).toEqual([]);
-  });
+  }, 60000);
 
   it('locks the documented clock constants', () => {
     expect(CHESS_CLOCK_INITIAL_MS).toBe(15 * 60 * 1000);

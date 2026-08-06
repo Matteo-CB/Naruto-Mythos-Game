@@ -26,6 +26,7 @@ import {
   useNeedsScroll,
 } from './PopupPrimitives';
 import { TargetOrderPopup } from './TargetOrderPopup';
+import { DeclareNumberPopup } from './DeclareNumberPopup';
 import { useBoardPalette } from './BoardPaletteContext';
 
 interface TargetCharacterProps {
@@ -763,6 +764,23 @@ export function TargetSelector() {
   const isInfoReveal = pendingTargetSelection.selectionType === 'INFO_REVEAL';
 
   const eTst = pendingTargetSelection.engineTargetSelectionType ?? '';
+
+  if (pendingTargetSelection.selectionType === 'DECLARE_NUMBER') {
+    const range = pendingTargetSelection.numberRange ?? { min: 0, max: 999 };
+    return (
+      <DeclareNumberPopup
+        min={range.min}
+        max={range.max}
+        description={description}
+        descriptionKey={descriptionKey}
+        descriptionParams={localizeMessageParams(descriptionParams, locale) as Record<string, string | number> | undefined}
+        onConfirm={(value) => handleSelect(String(value))}
+        onDecline={canDecline ? handleDecline : undefined}
+        declineLabelKey={declineLabelKey}
+      />
+    );
+  }
+
   const isHideOrder = eTst.includes('CHOOSE_HIDE_TARGET') || eTst === 'KYUBI134_CHOOSE_HIDE_TARGETS';
   const isDefeatOrder = eTst.includes('CHOOSE_DEFEAT_TARGET');
   if ((isHideOrder || isDefeatOrder) && queuedOrderRef.current.length > 0) {

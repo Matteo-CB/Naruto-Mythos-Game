@@ -1845,6 +1845,539 @@
       "title_it": "Esami Chunin",
       "name_pl": "ROCK LEE",
       "title_pl": "Egzamin na Chunina"
+    },
+    "SS-121-MV": {
+      "id": "SS-121-MV",
+      "cardId": "SS-121-MV",
+      "rarity": "MV",
+      "number": "121",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_ja": "うずまきナルト",
+      "name_fr": "NARUTO UZUMAKI",
+      "name_es": "NARUTO UZUMAKI",
+      "title_en": "\"Don't ever underestimate me!\"",
+      "title_ja": "「オレを甘く見るな！」",
+      "title_fr": "Ne me sous-estime jamais !",
+      "title_es": "¡No me subestimes nunca!",
+      "title_pt": "Nunca me subestime!",
+      "title_it": "Non sottovalutarmi mai!",
+      "title_pl": "Nigdy mnie nie lekceważ!",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every friendly Naruto Uzumaki in play."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kiba Inuzuka: Move the card at the bottom of this upgrade stack to another mission."
+        }
+      ],
+      "rarity_display": "Rare",
+      "data_complete": true,
+      "old_id": "121/140"
+    },
+    "SS-126-R": {
+      "id": "SS-126-R",
+      "cardId": "SS-126-R",
+      "rarity": "R",
+      "number": "126",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_ja": "うちはサスケ",
+      "name_fr": "SASUKE UCHIWA",
+      "name_es": "SASUKE UCHIHA",
+      "title_en": "All I cared was surviving to defeat my brother.",
+      "title_ja": "「兄を倒すために生き延びることだけを考えていた。」",
+      "title_fr": "Tout ce qui m'importait, c'était de survivre pour vaincre mon frère.",
+      "title_es": "Lo único que me importaba era sobrevivir para derrotar a mi hermano.",
+      "title_pt": "Só me importava sobreviver para derrotar meu irmão.",
+      "title_it": "L'unica cosa che m'importava era sopravvivere per sconfiggere mio fratello.",
+      "title_pl": "Zależało mi tylko na przetrwaniu, by pokonać brata.",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every Sound Village character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Orochimaru: Play a Sound Village character anywhere, paying 3 less."
+        }
+      ],
+      "rarity_display": "Special V",
+      "data_complete": true,
+      "old_id": "126/140 V"
+    },
+    "SS-031-CHIBIV": {
+      "id": "SS-031-CHIBIV",
+      "cardId": "SS-031-CHIBIV",
+      "rarity": "CHIBIV",
+      "number": "031",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Discard up to one of each character to: Jirobo: POWERUP 3. Tayuya: Gain 2 Chakra. Kidomaru: Move a friendly character. Sakon: Draw 2 cards."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "KIMIMARO",
+      "title_en": "I am not his pawn",
+      "name_fr": "KIMIMARO",
+      "title_fr": "Je ne suis pas son pion",
+      "name_es": "KIMIMARO",
+      "title_es": "No soy su peón",
+      "name_ja": "君麻呂",
+      "title_ja": "俺は奴の駒ではない",
+      "name_pt": "KIMIMARO",
+      "title_pt": "Não sou o peão dele",
+      "name_it": "KIMIMARO",
+      "title_it": "Non sono la sua pedina",
+      "name_pl": "KIMIMARO",
+      "title_pl": "Nie jestem jego pionkiem"
+    },
+    "SS-999-L": {
+      "id": "SS-999-L",
+      "cardId": "SS-999-L",
+      "rarity": "L",
+      "rarity_display": "Legendary",
+      "number": "999",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Sannin",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Shuffle up to 5 cards from the top of your discard pile into your deck. For each card shuffled, POWERUP 1."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: In addition, for each card, also POWERUP 1 a friendly character in play."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "TSUNADE",
+      "title_en": "Legendary Sitting Duck",
+      "name_fr": "TSUNADE",
+      "title_fr": "Le Pigeon Légendaire",
+      "name_es": "TSUNADE",
+      "title_es": "La Legendaria Perdedora",
+      "name_ja": "綱手",
+      "title_ja": "伝説のカモ",
+      "name_pt": "TSUNADE",
+      "title_pt": "A Lendária Perdedora",
+      "name_it": "TSUNADE",
+      "title_it": "La Leggendaria Perdente",
+      "name_pl": "TSUNADE",
+      "title_pl": "Legendarna Frajerka",
+      "image_file": "images/cards/SS/legendary/SS-999-L.webp",
+      "image_url": "/images/cards/SS/legendary/SS-999-L.webp"
+    },
+    "SS-998-L": {
+      "id": "SS-998-L",
+      "cardId": "SS-998-L",
+      "rarity": "L",
+      "rarity_display": "Legendary",
+      "number": "998",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When you play a Summon character, gain 1 Chakra."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Play a Summon character anywhere, paying 3 less. POWERUP 2 every friendly Summon character in play."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "JIRAIYA",
+      "title_en": "Pervy Sage",
+      "name_fr": "JIRAYA",
+      "title_fr": "L’Ermite Pervers",
+      "name_es": "JIRAIYA",
+      "title_es": "Sabio Pervertido",
+      "name_ja": "自来也",
+      "title_ja": "エロ仙人",
+      "name_pt": "JIRAIYA",
+      "title_pt": "Sábio Tarado",
+      "name_it": "JIRAIYA",
+      "title_it": "Eremita Pervertito",
+      "name_pl": "JIRAIYA",
+      "title_pl": "Zboczony Pustelnik",
+      "image_file": "images/cards/SS/legendary/SS-998-L.webp",
+      "image_url": "/images/cards/SS/legendary/SS-998-L.webp"
+    },
+    "SS-078-L": {
+      "id": "SS-078-L",
+      "cardId": "SS-078-L",
+      "rarity": "L",
+      "number": "78",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "name_es": "GAARA",
+      "name_ja": "我愛羅",
+      "title_en": "\"Why won’t he give up?\"",
+      "title_fr": "Pourquoi n’abandonne-t-il pas ?",
+      "title_es": "¿Por qué no se rinde?",
+      "title_ja": "「なぜあきらめない？」",
+      "title_pt": "Por que ele não desiste?",
+      "title_it": "Perché non si arrende?",
+      "title_pl": "Dlaczego się nie poddaje?",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kimimaro: Defeat an enemy character with cost 2 or less."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] When you defeat a non-hidden enemy character, you may pay 1 Chakra to draw 1 card."
+        }
+      ],
+      "image_file": "images/cards/SS/legendary/SS-078-L.webp",
+      "rarity_display": "Legendary",
+      "image_url": "/images/cards/SS/legendary/SS-078-L.webp"
+    },
+    "SS-002-UC": {
+      "id": "SS-002-UC",
+      "cardId": "SS-002-UC",
+      "rarity": "UC",
+      "number": "2",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": false,
+      "chakra": 4,
+      "power": 5,
+      "keywords": [
+        "Sannin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Declare a number. Reveal the top card of your deck. If the cost of that card is equal to or greater than the declared number, POWERUP X, where X is the number declared."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "TSUNADE",
+      "title_en": "The Gambling Fool",
+      "name_fr": "TSUNADE",
+      "title_fr": "La Joueuse Invétérée",
+      "name_es": "TSUNADE",
+      "title_es": "La Jugadora Empedernida",
+      "name_ja": "綱手",
+      "title_ja": "賭け事狂い",
+      "name_pt": "TSUNADE",
+      "title_pt": "A Jogadora Inveterada",
+      "name_it": "TSUNADE",
+      "title_it": "La Giocatrice Incallita",
+      "name_pl": "TSUNADE",
+      "title_pl": "Nałogowa Hazardzistka"
+    },
+    "SS-006-UC": {
+      "id": "SS-006-UC",
+      "cardId": "SS-006-UC",
+      "rarity": "UC",
+      "number": "6",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Tailed Beast"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Defeat an enemy character in this mission. If you do so, the opponent gains Chakra equal to the cost of the defeated character."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "NINE-TAILED FOX",
+      "title_en": "Breaking the Cage",
+      "name_fr": "KYÛBI",
+      "title_fr": "Briser la Cage",
+      "title_es": "Rompiendo la Jaula",
+      "name_ja": "九尾",
+      "title_ja": "檻を破る",
+      "title_pt": "Quebrando a Jaula",
+      "title_it": "Spezzare la Gabbia",
+      "title_pl": "Rozbijając Klatkę"
+    },
+    "SS-008-C": {
+      "id": "SS-008-C",
+      "cardId": "SS-008-C",
+      "rarity": "C",
+      "number": "8",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": false,
+      "chakra": 3,
+      "power": 2,
+      "keywords": [],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "FIRST_STRIKE",
+          "description": "[↯] FIRST STRIKE Play a Team 7 character paying 2 less. You cannot play that character as an upgrade."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "KAKASHI HATAKE",
+      "title_en": "Believing in the Team",
+      "name_fr": "KAKASHI HATAKE",
+      "title_fr": "Croire en son équipe",
+      "name_es": "KAKASHI HATAKE",
+      "title_es": "Creer en el equipo",
+      "name_ja": "はたけカカシ",
+      "title_ja": "仲間を信じる",
+      "name_pt": "KAKASHI HATAKE",
+      "title_pt": "Acreditar na equipe",
+      "name_it": "KAKASHI HATAKE",
+      "title_it": "Credere nella squadra",
+      "name_pl": "KAKASHI HATAKE",
+      "title_pl": "Wiara w drużynę"
+    },
+    "SS-016-C": {
+      "id": "SS-016-C",
+      "cardId": "SS-016-C",
+      "rarity": "C",
+      "number": "16",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": false,
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Team 8"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If there is a friendly Naruto Uzumaki or Team 8 character in this mission, CHAKRA +1."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "HINATA HYUGA",
+      "title_en": "Chakra Control",
+      "name_fr": "HINATA HYÛGA",
+      "title_fr": "Contrôle du Chakra",
+      "name_es": "HINATA HYUGA",
+      "title_es": "Control del Chakra",
+      "name_ja": "日向ヒナタ",
+      "title_ja": "チャクラコントロール",
+      "name_pt": "HINATA HYUGA",
+      "title_pt": "Controle de Chakra",
+      "name_it": "HINATA HYUGA",
+      "title_it": "Controllo del Chakra",
+      "name_pl": "HINATA HYUGA",
+      "title_pl": "Kontrola Czakry"
+    },
+    "SS-033-UC": {
+      "id": "SS-033-UC",
+      "cardId": "SS-033-UC",
+      "rarity": "UC",
+      "number": "33",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": false,
+      "chakra": 6,
+      "power": 7,
+      "keywords": [
+        "Sound Four"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] POWERUP 2 for every friendly Sound Four character in this mission."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "JIROBO",
+      "title_en": "Cursemark Second State",
+      "name_fr": "JIRÔBÔ",
+      "title_fr": "Marque Maudite Second Stade",
+      "name_es": "JIROBO",
+      "title_es": "Sello Maldito Segundo Estado",
+      "name_ja": "次郎坊",
+      "title_ja": "呪印第二段階",
+      "name_pt": "JIROBO",
+      "title_pt": "Marca Amaldiçoada Segundo Estágio",
+      "name_it": "JIROBO",
+      "title_it": "Marchio Maledetto Secondo Stadio",
+      "name_pl": "JIROBO",
+      "title_pl": "Przeklęta Pieczęć Drugi Stopień"
+    },
+    "SS-053-C": {
+      "id": "SS-053-C",
+      "cardId": "SS-053-C",
+      "rarity": "C",
+      "number": "53",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": false,
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Rogue Ninja"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "FIRST_STRIKE",
+          "description": "[↯] FIRST STRIKE You must hide a non-hidden character in this mission with cost 2 or less."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "ITACHI UCHIHA",
+      "title_en": "Merciless Ninja",
+      "name_fr": "ITACHI UCHIWA",
+      "title_fr": "Ninja Impitoyable",
+      "name_es": "ITACHI UCHIHA",
+      "title_es": "Ninja Despiadado",
+      "name_ja": "うちはイタチ",
+      "title_ja": "無慈悲な忍",
+      "name_pt": "ITACHI UCHIHA",
+      "title_pt": "Ninja Impiedoso",
+      "name_it": "ITACHI UCHIHA",
+      "title_it": "Ninja Spietato",
+      "name_pl": "ITACHI UCHIHA",
+      "title_pl": "Bezlitosny Ninja"
+    },
+    "SS-079-C": {
+      "id": "SS-079-C",
+      "cardId": "SS-079-C",
+      "rarity": "C",
+      "number": "79",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "has_visual": false,
+      "chakra": 0,
+      "power": 1,
+      "keywords": [
+        "Weapon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] POWERUP 1."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "SENBON",
+      "title_en": "",
+      "name_fr": "SENBON",
+      "title_fr": "",
+      "name_es": "SENBON",
+      "title_es": "",
+      "name_ja": "千本",
+      "title_ja": "",
+      "name_pt": "SENBON",
+      "title_pt": "",
+      "name_it": "SENBON",
+      "title_it": "",
+      "name_pl": "SENBON",
+      "title_pl": ""
+    },
+    "SS-081-C": {
+      "id": "SS-081-C",
+      "cardId": "SS-081-C",
+      "rarity": "C",
+      "number": "81",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "has_visual": false,
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Food"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Draw a card."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "RAMEN",
+      "title_en": "",
+      "name_fr": "RÂMEN",
+      "title_fr": "",
+      "name_es": "RAMEN",
+      "title_es": "",
+      "name_ja": "ラーメン",
+      "title_ja": "",
+      "name_pt": "LÁMEN",
+      "title_pt": "",
+      "name_it": "RAMEN",
+      "title_it": "",
+      "name_pl": "RAMEN",
+      "title_pl": ""
     }
   }
 }

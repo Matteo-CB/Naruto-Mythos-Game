@@ -22,6 +22,50 @@ function findPendingEffect(state: GameState, pendingAction: PendingActionInfo): 
 }
 
 
+function bestDeclaredNumber(state: GameState, aiPlayer: PlayerID): number {
+  const deck = state[aiPlayer].deck;
+  if (deck.length === 0) return 0;
+
+  let best = 0;
+  let bestValue = 0;
+  for (let declared = 1; declared <= 10; declared++) {
+    const hits = deck.filter((card) => (card.chakra ?? 0) >= declared).length;
+    const value = declared * (hits / deck.length);
+    if (value > bestValue) {
+      bestValue = value;
+      best = declared;
+    }
+  }
+  return best;
+}
+
+function selectForcedHideTarget(
+  options: string[],
+  state: GameState,
+  aiPlayer: PlayerID,
+  difficulty: AIDifficulty,
+): string {
+  const enemies = options.filter((id) => {
+    const found = findCharacterInState(state, id);
+    return !!found && found.side !== aiPlayer;
+  });
+  if (enemies.length > 0) return selectDefeatTarget(enemies, state, aiPlayer, difficulty);
+
+  let weakest = options[0];
+  let weakestPower = Infinity;
+  for (const id of options) {
+    const found = findCharacterInState(state, id);
+    if (!found) continue;
+    const top = found.char.stack?.length > 0 ? found.char.stack[found.char.stack.length - 1] : found.char.card;
+    const power = (top.power ?? 0) + found.char.powerTokens;
+    if (power < weakestPower) {
+      weakestPower = power;
+      weakest = id;
+    }
+  }
+  return weakest;
+}
+
 export function aiSelectTarget(
   options: string[],
   pendingAction: PendingActionInfo,
@@ -31,6 +75,11 @@ export function aiSelectTarget(
 ): string {
   
   if (options.length === 0) return '';
+
+  if (options.length === 1 && options[0] === 'declare') {
+    return String(bestDeclaredNumber(state, aiPlayer));
+  }
+
   if (options.length === 1) return options[0];
 
   
@@ -53,6 +102,11 @@ export function aiSelectTarget(
       pendingAction.descriptionKey === 'game.effect.desc.chooseTokenAmountRemove' ||
       pendingAction.descriptionKey === 'game.effect.desc.chooseTokenAmountSteal') {
     return options.reduce((max, opt) => parseInt(opt, 10) > parseInt(max, 10) ? opt : max, options[0]);
+  }
+
+  
+  if (tst === 'SS053_FS_HIDE') {
+    return selectForcedHideTarget(options, state, aiPlayer, difficulty);
   }
 
   

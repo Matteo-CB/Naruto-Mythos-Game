@@ -56,8 +56,14 @@ export function getCharacterAttachTargets(
   const side = hostOwner === 'player1' ? 'player1Characters' : 'player2Characters';
   const needGroup = requiredAttachGroup(attachmentCard);
   const wantsHiddenHost = requiresHiddenHost(attachmentCard);
+  const wantsNonHiddenHost = requiresNonHiddenHost(attachmentCard) || !!needGroup;
+  const hostMatchesVisibility = (c: CharacterInPlay): boolean => {
+    if (wantsHiddenHost) return c.isHidden;
+    if (wantsNonHiddenHost) return !c.isHidden;
+    return true;
+  };
   return mission[side].filter(
-    (c) => c.isHidden === wantsHiddenHost && c.controlledBy === hostOwner
+    (c) => hostMatchesVisibility(c) && c.controlledBy === hostOwner
       && (c.card as CardData).card_type !== 'attachment'
       && (!needGroup || characterHasGroup(c, needGroup)),
   );

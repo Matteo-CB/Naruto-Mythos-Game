@@ -4,7 +4,7 @@ import { ADMIN_USERNAMES, ADMIN_EMAILS } from '@/lib/auth/admins';
 import { parisDateParts, parisWallToUtc } from '@/lib/tournament/dailyTournament';
 import { NWL_PARTNER_KEY, NWL_TOURNAMENT_NAME, NWL_MAX_PLAYERS, NWL_START_HOUR, NWL_TOURNAMENT_RULES_NOTE, NWL_CHUNIN_RESET_WEEKDAY, revokeAllNwlChuninRoles } from '@/lib/tournament/nwlPartner';
 
-export const NWL_REG_OPEN_HOUR = 17;
+export const NWL_REG_OPEN_HOUR = 14;
 export const NWL_FRIDAY_WEEKDAY = 5;
 
 export interface NwlFridayResult {

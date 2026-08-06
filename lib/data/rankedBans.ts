@@ -14,6 +14,20 @@ export const STATIC_RANKED_BANNED_CARD_IDS: ReadonlySet<string> = new Set([
   'SS-112-SHINOBIV',
   'SS-114-SHINOBIV',
   'SS-115-SHINOBIV',
+  'SS-121-MV',
+  'SS-126-R',
+  'SS-031-CHIBIV',
+  'SS-999-L',
+  'SS-998-L',
+  'SS-078-L',
+  'SS-002-UC',
+  'SS-006-UC',
+  'SS-008-C',
+  'SS-016-C',
+  'SS-033-UC',
+  'SS-053-C',
+  'SS-079-C',
+  'SS-081-C',
 ]);
 
 // A card is auto-banned from ranked if it is on the explicit list, OR if its set is

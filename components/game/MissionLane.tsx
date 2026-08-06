@@ -21,6 +21,7 @@ function boardKeyOf(char: VisibleCharacter): string {
 }
 
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { AttachmentStrip, CHARACTER_VISIBLE_RATIO, MISSION_VISIBLE_RATIO } from './AttachmentStrip';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
@@ -129,6 +130,16 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     setShowSandboxMenu(true);
   };
 
+  const attachmentRoom = useMemo(() => {
+    const visible = character.attachments ?? [];
+    if (visible.length === 0) return { left: 0, right: 0 };
+    const peek = Math.round(dims.missionCard.h * CHARACTER_VISIBLE_RATIO) + 4;
+    return {
+      right: visible.some((a) => a.owner === myPlayer) ? peek : 0,
+      left: visible.some((a) => a.owner !== myPlayer) ? peek : 0,
+    };
+  }, [character.attachments, dims.missionCard.w, myPlayer]);
+
   return (
     <>
     
@@ -179,33 +190,27 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     )}
     <div
       className="relative"
-      style={{ width: dims.missionCard.w + 'px', height: dims.missionCard.h + 'px', flex: '0 0 auto' }}
+      style={{
+        width: dims.missionCard.w + 'px',
+        height: dims.missionCard.h + 'px',
+        flex: '0 0 auto',
+        marginRight: attachmentRoom.right + 'px',
+        marginLeft: attachmentRoom.left + 'px',
+      }}
     >
-      {!isHidden && (character.attachments ?? []).map((att, attIndex) => {
+      {(character.attachments ?? []).map((att, attIndex) => {
         const mine = att.owner === myPlayer;
-        const peek = 26 + attIndex * 9;
         return (
-          <div
+          <AttachmentStrip
             key={att.instanceId}
-            onClick={(e) => { e.stopPropagation(); pinCard(att.card as never); }}
-            title={getCardName(att.card, locale as 'en' | 'fr')}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              [mine ? 'right' : 'left']: -peek + '%',
-              width: dims.missionCard.h + 'px',
-              height: dims.missionCard.h * 0.716 + 'px',
-              transform: 'translateY(-50%) rotate(' + (mine ? 90 : -90) + 'deg)',
-              transformOrigin: 'center',
-              backgroundImage: att.card.image_file ? `url('${normalizeImagePath(att.card.image_file)}')` : undefined,
-              backgroundColor: '#141414',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              borderRadius: '4px',
-              boxShadow: `0 2px 10px rgba(0,0,0,0.8), 0 0 8px ${mine ? palette.me.tint(0.55) : palette.opponent.tint(0.55)}`,
-              cursor: 'pointer',
-              zIndex: 0,
-            }}
+            card={att.card as never}
+            label={getCardName(att.card, locale as 'en' | 'fr')}
+            mine={mine}
+            index={attIndex}
+            glow={mine ? palette.me.tint(0.55) : palette.opponent.tint(0.55)}
+            onClick={() => pinCard(att.card as never)}
+            onHover={(x, y) => showPreview(att.card as never, { x, y })}
+            onLeave={hidePreview}
           />
         );
       })}
@@ -466,6 +471,17 @@ function MissionCardDisplay({
 
   const imagePath = normalizeImagePath(mission.card.image_file);
 
+  const missionAttachmentRoom = useMemo(() => {
+    const list = mission.attachments ?? [];
+    if (list.length === 0) return { top: 0, bottom: 0 };
+    const cardHeight = dims.missionMaxW * (63 / 88);
+    const strip = Math.round(cardHeight * MISSION_VISIBLE_RATIO) + 4;
+    return {
+      bottom: list.some((a) => a.owner === myPlayer) ? strip : 0,
+      top: list.some((a) => a.owner !== myPlayer) ? strip : 0,
+    };
+  }, [mission.attachments, dims.missionMaxW, myPlayer]);
+
   const totalPoints = mission.basePoints + mission.rankBonus;
 
   const handleMissionContextMenu = (e: React.MouseEvent) => {
@@ -520,6 +536,8 @@ function MissionCardDisplay({
       style={{
         width: '100%',
         maxWidth: dims.missionMaxW + 'px',
+        marginBottom: missionAttachmentRoom.bottom + 'px',
+        marginTop: missionAttachmentRoom.top + 'px',
         border: `2px solid ${rankColors[mission.rank]}`,
         borderRadius: '6px',
         overflow: 'visible',
@@ -552,6 +570,23 @@ function MissionCardDisplay({
       }}
       onMouseLeave={() => hidePreview()}
     >
+      {(mission.attachments ?? []).map((att, attIndex) => {
+        const mine = att.owner === myPlayer;
+        const sideIndex = mission.attachments!.filter((o, i) => (o.owner === myPlayer) === mine && i < attIndex).length;
+        return (
+          <AttachmentStrip
+            key={att.instanceId}
+            card={att.card as never}
+            label={getCardName(att.card, locale as 'en' | 'fr')}
+            mine={mine}
+            index={sideIndex}
+            glow={mine ? palette.me.tint(0.55) : palette.opponent.tint(0.55)}
+            onClick={() => pinCard(att.card as never)}
+            onHover={(x, y) => showPreview(att.card as never, { x, y })}
+            onLeave={hidePreview}
+          />
+        );
+      })}
       {imagePath ? (
         <div
           className="w-full h-full bg-cover bg-center"
@@ -561,12 +596,14 @@ function MissionCardDisplay({
             borderRadius: '4px',
             minHeight: '65px',
             imageRendering: 'crisp-edges',
+            position: 'relative',
+            zIndex: 1,
           }}
         />
       ) : (
         <div
           className="w-full h-full flex items-center justify-center"
-          style={{ backgroundColor: '#1a1a1a', minHeight: '65px' }}
+          style={{ backgroundColor: '#1a1a1a', minHeight: '65px', position: 'relative', zIndex: 1 }}
         >
           <span className="text-[9px] text-center px-1" style={{ color: '#888888' }}>
             {getCardName(mission.card, locale as 'en' | 'fr')}
@@ -599,35 +636,19 @@ function MissionCardDisplay({
         {totalPoints} {t('game.board.pts')}
       </div>
 
-      {(mission.attachments ?? []).map((att, attIndex) => {
-        const mine = att.owner === myPlayer;
-        const side = mission.attachments!.filter((o, i) => (o.owner === myPlayer) === mine && i < attIndex).length;
-        const cardHeight = dims.isMobile ? 74 : 62;
-        return (
-          <div
-            key={att.instanceId}
-            onClick={(e) => { e.stopPropagation(); pinCard(att.card as never); }}
-            title={getCardName(att.card, locale as 'en' | 'fr')}
-            style={{
-              position: 'absolute',
-              top: `calc(50% + ${side * 14}px)`,
-              [mine ? 'right' : 'left']: `-${cardHeight * 0.34}px`,
-              width: `${cardHeight}px`,
-              height: `${cardHeight * 0.716}px`,
-              transform: `translateY(-50%) rotate(${mine ? 90 : -90}deg)`,
-              transformOrigin: 'center',
-              backgroundImage: att.card.image_file ? `url('${normalizeImagePath(att.card.image_file)}')` : undefined,
-              backgroundColor: '#141414',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              borderRadius: '4px',
-              boxShadow: `0 2px 10px rgba(0,0,0,0.8), 0 0 8px ${mine ? palette.me.tint(0.55) : palette.opponent.tint(0.55)}`,
-              cursor: 'pointer',
-              zIndex: 0,
-            }}
-          />
-        );
-      })}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: '-2px',
+          border: `2px solid ${rankColors[mission.rank]}`,
+          borderRadius: '6px',
+          boxShadow: `0 0 12px ${rankColors[mission.rank]}30`,
+          pointerEvents: 'none',
+          zIndex: 2,
+        }}
+      />
+
 
       {mission.wonBy && (
         <motion.div

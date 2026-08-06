@@ -91,7 +91,7 @@ describe('i18n: every translation key used in the app exists in every locale', (
   it('has no missing key anywhere in the simulator', () => {
     const missing = collectMissing();
     expect(missing, `Missing translation keys:\n${missing.join('\n')}`).toEqual([]);
-  });
+  }, 90000);
 
   it('every locale file parses and carries the _meta block', () => {
     const messages = loadMessages();

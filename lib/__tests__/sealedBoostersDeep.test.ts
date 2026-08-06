@@ -549,7 +549,7 @@ describe('malformed and boundary generation input', () => {
 });
 
 describe('a set that cannot fill the ten slots is refused by every public entry point', () => {
-  const SHORT_SET = 'SS';
+  const SHORT_SET = 'AK';
   let previousSealedReady: boolean | undefined;
 
   function openShortSetForSealed(): void {

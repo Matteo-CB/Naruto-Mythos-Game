@@ -22,10 +22,11 @@ export function buildPlayLessTargets(
   player: PlayerID,
   category: PlayLessCategory,
   costReduction: number,
+  noUpgrade = false,
 ): { targets: string[]; hiddenChars: HiddenCharTarget[] } {
   const predicate = predicateForCategory(category);
-  const handIndices = findAffordableInHandByPredicate(state, player, predicate, costReduction);
-  const hiddenChars = findHiddenOnBoardByPredicate(state, player, predicate, costReduction);
+  const handIndices = findAffordableInHandByPredicate(state, player, predicate, costReduction, noUpgrade);
+  const hiddenChars = findHiddenOnBoardByPredicate(state, player, predicate, costReduction, noUpgrade);
   const targets = [
     ...handIndices.map((i) => `HAND_${i}`),
     ...hiddenChars.map((h) => `HIDDEN_${h.instanceId}`),
@@ -41,6 +42,7 @@ export interface PlayLessOptions {
   textFallback: string;
   descriptionKey: string;
   repeatable?: boolean;
+  noUpgrade?: boolean;
 }
 
 export function encodePlayLessDescription(
@@ -55,6 +57,7 @@ export function encodePlayLessDescription(
     sourceName: opts.sourceName,
     sourceId: opts.sourceId,
     repeatable: !!opts.repeatable,
+    noUpgrade: !!opts.noUpgrade,
   });
 }
 
@@ -63,7 +66,9 @@ export function playLessSelectionResult(
   player: PlayerID,
   opts: PlayLessOptions,
 ): EffectResult | null {
-  const { targets, hiddenChars } = buildPlayLessTargets(state, player, opts.category, opts.costReduction);
+  const { targets, hiddenChars } = buildPlayLessTargets(
+    state, player, opts.category, opts.costReduction, !!opts.noUpgrade,
+  );
   if (targets.length === 0) return null;
   return {
     state,

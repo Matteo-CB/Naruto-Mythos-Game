@@ -57,7 +57,7 @@ describe('Gaara SS-078 offers one draw per copy in play', () => {
     }
     state.player1.deck = [getCharacterById('KS-003-C') as CharacterCard, getCharacterById('KS-005-C') as CharacterCard];
 
-    const after = triggerOnDefeatEffects(state, victim, 'player2');
+    const after = triggerOnDefeatEffects(state, victim, 'player2', undefined, 'player1');
     return after.pendingActions.filter((a) => a.descriptionKey === 'game.effect.desc.ss078ConfirmDraw').length;
   }
 

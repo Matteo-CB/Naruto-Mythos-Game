@@ -9,7 +9,7 @@ import { Z_APP_MODAL } from '@/lib/ui/zIndex';
 import {
   WEEKLY_SCHEDULE,
   KIND_COLORS,
-  AUTO_TOURNAMENT_REG_HOUR,
+  regHourForSpec,
   AUTO_SEALED_BOOSTER_COUNT,
   NWL_PARTNER_NAME,
   NWL_FIRST_PLACE_STORE_CREDIT_GBP,
@@ -149,7 +149,7 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
           scheduleWeekday: wd,
           spec,
           dayLabel: fallbackWeekday(wd),
-          reg: `${AUTO_TOURNAMENT_REG_HOUR}:00`,
+          reg: `${regHourForSpec(spec)}:00`,
           start: `${startHourForSpec(spec)}:00`,
           isToday: false,
         }];

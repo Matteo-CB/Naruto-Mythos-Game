@@ -11,6 +11,8 @@ export interface EffectContext {
   wasRevealed?: boolean; // Whether the card was just revealed from hidden
   
   subPlayCostReduction?: number;
+
+  tokensBeforePlay?: number;
 }
 
 

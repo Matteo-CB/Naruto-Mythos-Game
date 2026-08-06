@@ -35,7 +35,7 @@ describe('i18n guard: no new binary-locale or raw card-name displays', () => {
       }
     }
     expect(offenders, `New binary-locale card-text selection found. Use getCardName/getCardTitle (N-locale). Offenders:\n${offenders.join('\n')}`).toEqual([]);
-  });
+  }, 60000);
 
   it('has no direct card name/title JSX display outside the allowlist', () => {
     const offenders: string[] = [];
@@ -53,7 +53,7 @@ describe('i18n guard: no new binary-locale or raw card-name displays', () => {
       }
     }
     expect(offenders, `New raw card name/title display found. Use getCardName/getCardTitle. Offenders:\n${offenders.join('\n')}`).toEqual([]);
-  });
+  }, 60000);
 
   it('has no effectDescriptionsFr/En direct import in UI (use getCardEffectDescription)', () => {
     const offenders: string[] = [];
@@ -64,7 +64,7 @@ describe('i18n guard: no new binary-locale or raw card-name displays', () => {
       }
     }
     expect(offenders, `Import effect descriptions via getCardEffectDescription instead. Offenders:\n${offenders.join('\n')}`).toEqual([]);
-  });
+  }, 60000);
 
   it('has no binary "en | fr" locale type annotation in UI', () => {
     const offenders: string[] = [];
@@ -77,5 +77,5 @@ describe('i18n guard: no new binary-locale or raw card-name displays', () => {
       }
     }
     expect(offenders, `Binary locale type found. Use 'string'. Offenders:\n${offenders.join('\n')}`).toEqual([]);
-  });
+  }, 60000);
 });

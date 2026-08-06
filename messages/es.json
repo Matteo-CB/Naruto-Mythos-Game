@@ -1002,7 +1002,18 @@
         "ssMss10Discarded": "{card}: {target} ha sido descartado.",
         "ss111ReturnHinata": "{card}: {target} vuelve del descarte a la mano.",
         "ss115PowerupOnDefeat": "{card}: POWERUP {amount} tras derrotar a {defeated}.",
-        "ssMss04SecondScore": "{card}: esta misión se puntúa por segunda vez."
+        "ssMss04SecondScore": "{card}: esta misión se puntúa por segunda vez.",
+        "ss031Discarded": "{card}: {target} descartado.",
+        "ss031Powerup": "{card}: POWERUP {amount}.",
+        "ss031Chakra": "{card}: {amount} Chakra ganados.",
+        "ss031Draw": "{card}: {amount} carta(s) robada(s).",
+        "ss001Shuffle": "{card}: {amount} carta(s) barajada(s) en el mazo, POWERUP {amount}.",
+        "ss001AllyPowerup": "{card}: POWERUP {amount} en {target}.",
+        "ss001NoBonus": "{card}: ninguna carta barajada, sin POWERUP adicional.",
+        "ss002SummonChakra": "{card}: {amount} Chakra ganado(s) al jugar una Invocación.",
+        "ss002SummonPowerup": "{card}: POWERUP {amount} en {count} Invocación(es) aliada(s).",
+        "ss002RevealWon": "{card}: declaró {amount}, reveló {target}, POWERUP {amount}.",
+        "ss002RevealFailed": "{card}: declaró {amount}, reveló {target}, sin POWERUP."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",
@@ -1022,7 +1033,9 @@
       "attachToCharacter": "{card} se une a {target}.",
       "useFirstStrike": "FIRST STRIKE: {card} golpea primero en esta ronda.",
       "attachmentDiscarded": "{card} fue descartada: su condición de equipo ya no se cumple.",
-      "attachmentHostLeft": "{card} va a la pila de descartes: el personaje que la llevaba abandonó el juego."
+      "attachmentHostLeft": "{card} va a la pila de descartes: el personaje que la llevaba abandonó el juego.",
+      "chakraBonusMission": "{card}: CHAKRA +{bonus} (misión {mission})",
+      "chakraBonusMissionWon": "{card}: CHAKRA +{bonus} (bono de misión ganada)"
     },
     "end": {
       "victory": "Victoria",
@@ -1660,12 +1673,39 @@
         "ss111ConfirmDuel": "DUEL Neji Hyuga: ¿devolver a tu mano la Hinata Hyuga más alta de tu descarte?",
         "ss111ConfirmMain": "MAIN: ¿jugar un personaje llamado Hyuga en cualquier lugar, pagando 3 menos?",
         "ss111PlayHyuga": "MAIN: elige un personaje llamado Hyuga para jugar, pagando {reduction} menos.",
-        "ssMss06ConfirmAmbush": "Pasar desapercibido: ¿AMBUSH POWERUP 2 a este personaje?"
+        "ssMss06ConfirmAmbush": "Pasar desapercibido: ¿AMBUSH POWERUP 2 a este personaje?",
+        "ss031ConfirmMain": "MAIN: ¿descartar cartas del Cuarteto del Sonido de tu mano por sus efectos?",
+        "ss031ChooseDiscard": "MAIN: descarta una por su efecto. Jirobo: POWERUP 3. Tayuya: 2 Chakra. Kidomaru: mueve un aliado. Sakon: roba 2.",
+        "ss031MoveCharacter": "Kidomaru descartado: elige un personaje aliado para mover.",
+        "ss001ConfirmMain": "MAIN: ¿barajar cartas de la parte superior de tu descarte en tu mazo para un POWERUP?",
+        "ss001ChooseCount": "MAIN: elige cuántas cartas barajar (1 a {max}). POWERUP 1 por cada una.",
+        "ss001ChooseAlly": "UPGRADE: elige el personaje aliado que recibe POWERUP {amount}.",
+        "ss002ConfirmUpgrade": "UPGRADE: ¿jugar una Invocación pagando 3 menos y luego POWERUP 2 a cada Invocación aliada?",
+        "ss002PlaySummon": "UPGRADE: elige un personaje de Invocación para jugar, pagando {reduction} menos.",
+        "ss053FirstStrikeHide": "FIRST STRIKE: debes ocultar a un personaje con coste 2 o menos en esta misión.",
+        "ss008ConfirmFirstStrike": "FIRST STRIKE: ¿jugar un personaje del Equipo 7 pagando 2 menos, nunca como mejora?",
+        "ss008PlayTeam7": "FIRST STRIKE: elige un personaje del Equipo 7 para jugar, pagando {reduction} menos.",
+        "ss033ConfirmUpgrade": "UPGRADE: ¿POWERUP {amount} gracias a tus aliados del Cuarteto del Sonido en esta misión?",
+        "ss006ConfirmAmbush": "AMBUSH: ¿derrotar a un personaje enemigo aquí y dar su coste en Chakra al oponente?",
+        "ss006Defeat": "AMBUSH: elige el personaje enemigo a derrotar en esta misión.",
+        "ss002ConfirmMain": "MAIN: ¿declarar un número y apostar por la carta superior de tu mazo?",
+        "ss002RevealWin": "Declaraste {declared} y revelaste una carta de coste {cost}: POWERUP {declared}.",
+        "ss002RevealLose": "Declaraste {declared} pero la carta revelada solo cuesta {cost}: sin POWERUP.",
+        "ss079ConfirmMain": "MAIN: ¿POWERUP 1 en este personaje?",
+        "ss081ConfirmMain": "MAIN: ¿robar una carta?",
+        "declareNumber": "Declara un número entre {min} y {max}. Cuanto más alto, más difícil de superar."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",
       "ssMss02RevealTitle": "Reconocimiento",
-      "ssMss02RevealResult": "Miras este personaje oculto."
+      "ssMss02RevealResult": "Miras este personaje oculto.",
+      "declareNumberTitle": "Declara un número",
+      "declareNumberConfirm": "Declarar {value}",
+      "declareNumberPlus": "Aumentar",
+      "declareNumberMinus": "Disminuir",
+      "ss002RevealTitle": "Parte superior de tu mazo",
+      "ss002RevealWonResult": "Tu apuesta sale bien.",
+      "ss002RevealLostResult": "Mala suerte esta vez."
     },
     "anim": {
       "cardPlayedHidden": "Carta jugada oculta",
@@ -3087,7 +3127,9 @@
       "sealedCardNotInPool": "Esa carta no está en tu pool sellado.",
       "sealedRejoinLimit": "Ya has usado todas tus inscripciones en este torneo sellado. Tus sobres no se pueden volver a abrir.",
       "tooManyOpenTournaments": "Ya tienes demasiados torneos abiertos. Termina o cancela uno primero.",
-      "sealedCardBanned": "Una de estas cartas está prohibida en este torneo. Construye tu mazo sin ella."
+      "sealedCardBanned": "Una de estas cartas está prohibida en este torneo. Construye tu mazo sin ella.",
+      "sealedSeatLost": "Tu plaza se liberó mientras construías y el torneo ya está completo. Conservas tu pool para el siguiente.",
+      "notParticipant": "No estás inscrito en este torneo."
     },
     "deckError": {
       "tooFewCards": "El mazo debe tener al menos {min} cartas (tiene {count}).",
