@@ -1704,7 +1704,9 @@
       "declareNumberMinus": "減らす",
       "ss002RevealTitle": "デッキの一番上",
       "ss002RevealWonResult": "賭けは成功。",
-      "ss002RevealLostResult": "今回は運がなかった。"
+      "ss002RevealLostResult": "今回は運がなかった。",
+      "chooseCountTitle": "デッキに戻すカード",
+      "chooseCountConfirm": "{value}枚を混ぜる"
     },
     "anim": {
       "cardPlayedHidden": "カードを伏せて出した",

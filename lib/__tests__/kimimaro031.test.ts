@@ -176,3 +176,37 @@ describe('Kimimaro 031 chains its discards, up to one of each', () => {
     ).toBe(false);
   });
 });
+
+describe('Kimimaro SS-031 is never his own friendly character', () => {
+  it('the Kidomaru move never offers Kimimaro himself', () => {
+    const state = board([KIDOMARU]);
+    const played = playKimimaro(state);
+    const confirmed = answer(played);
+    const discarded = answer(confirmed, handIndexOf(confirmed, KIDOMARU));
+
+    const kimimaro = discarded.activeMissions[0].player1Characters
+      .find((c) => c.card.id === KIMIMARO);
+    expect(kimimaro, 'he is in play').toBeTruthy();
+
+    const move = prompt(discarded);
+    expect(move?.descriptionKey).toBe('game.effect.desc.ss031MoveCharacter');
+    expect(move?.options, 'a character is not its own friend').not.toContain(kimimaro!.instanceId);
+    expect(move?.options, 'the real ally is offered').toContain('my-ally');
+  });
+
+  it('with no other friendly character, no move window opens at all', () => {
+    const state = buildSimState({
+      missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+      hand1: [KIMIMARO, KIDOMARU],
+      p1: [],
+      chakra1: 20,
+    });
+    state.player1.deck = Array.from({ length: 8 }, () => getCharacterById(ALLY)!);
+
+    const played = playKimimaro(state);
+    const confirmed = answer(played);
+    const discarded = answer(confirmed, handIndexOf(confirmed, KIDOMARU));
+
+    expect(prompt(discarded), 'nothing to move but himself').toBeFalsy();
+  });
+});

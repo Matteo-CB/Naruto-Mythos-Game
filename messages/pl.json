@@ -3788,7 +3788,9 @@
       "declareNumberMinus": "Zmniejsz",
       "ss002RevealTitle": "Wierzch twojej talii",
       "ss002RevealWonResult": "Twój zakład się opłacił.",
-      "ss002RevealLostResult": "Tym razem pech."
+      "ss002RevealLostResult": "Tym razem pech.",
+      "chooseCountTitle": "Karty do wtasowania",
+      "chooseCountConfirm": "Wtasuj {value} kart(y)"
     },
     "anim": {
       "cardPlayedHidden": "Karta Zagrana Zakryta",

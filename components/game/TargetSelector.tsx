@@ -774,6 +774,7 @@ export function TargetSelector() {
         description={description}
         descriptionKey={descriptionKey}
         descriptionParams={localizeMessageParams(descriptionParams, locale) as Record<string, string | number> | undefined}
+        previewCards={pendingTargetSelection.numberPreviewCards}
         onConfirm={(value) => handleSelect(String(value))}
         onDecline={canDecline ? handleDecline : undefined}
         declineLabelKey={declineLabelKey}

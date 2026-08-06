@@ -6598,7 +6598,7 @@ export class EffectEngine {
         } as PendingEffect];
         pendingEffect.remainingEffectTypes = undefined;
         newState.pendingActions = [...newState.pendingActions, {
-          id: t1ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'], player: t1Player,
+          id: t1ActId, type: 'SELECT_TARGET' as PendingAction['type'], player: t1Player,
           description: `Tsunade (SS-001): choose how many cards to shuffle back (1-${t1Max}).`,
           descriptionKey: 'game.effect.desc.ss001ChooseCount',
           descriptionParams: { max: t1Max },
@@ -6879,7 +6879,7 @@ export class EffectEngine {
         const k31dNextUsed: SoundFourName[] = [...k31dUsed, k31dName];
 
         if (k31dName === 'KIDOMARU') {
-          const k31dMovable = friendlyCharactersToMove(newState, k31dPlayer);
+          const k31dMovable = friendlyCharactersToMove(newState, k31dPlayer, pendingEffect.sourceInstanceId);
           if (k31dMovable.length > 0) {
             const k31mEffId = generateInstanceId();
             const k31mActId = generateInstanceId();

@@ -1705,7 +1705,9 @@
       "declareNumberMinus": "Disminuir",
       "ss002RevealTitle": "Parte superior de tu mazo",
       "ss002RevealWonResult": "Tu apuesta sale bien.",
-      "ss002RevealLostResult": "Mala suerte esta vez."
+      "ss002RevealLostResult": "Mala suerte esta vez.",
+      "chooseCountTitle": "Cartas a barajar",
+      "chooseCountConfirm": "Barajar {value} carta(s)"
     },
     "anim": {
       "cardPlayedHidden": "Carta jugada oculta",

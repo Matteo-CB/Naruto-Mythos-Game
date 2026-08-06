@@ -43,12 +43,19 @@ export function discardableSoundFour(
   return choices;
 }
 
-export function friendlyCharactersToMove(state: GameState, player: PlayerID): string[] {
+export function friendlyCharactersToMove(
+  state: GameState,
+  player: PlayerID,
+  sourceInstanceId?: string,
+): string[] {
   if (state.activeMissions.length < 2) return [];
   const side = player === 'player1' ? 'player1Characters' : 'player2Characters';
   const ids: string[] = [];
   for (const mission of state.activeMissions) {
-    for (const char of mission[side]) ids.push(char.instanceId);
+    for (const char of mission[side]) {
+      if (sourceInstanceId && char.instanceId === sourceInstanceId) continue;
+      ids.push(char.instanceId);
+    }
   }
   return ids;
 }

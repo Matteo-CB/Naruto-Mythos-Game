@@ -3788,7 +3788,9 @@
       "declareNumberMinus": "Diminuir",
       "ss002RevealTitle": "Topo do seu deck",
       "ss002RevealWonResult": "Sua aposta deu certo.",
-      "ss002RevealLostResult": "Sem sorte desta vez."
+      "ss002RevealLostResult": "Sem sorte desta vez.",
+      "chooseCountTitle": "Cartas a embaralhar",
+      "chooseCountConfirm": "Embaralhar {value} carta(s)"
     },
     "anim": {
       "cardPlayedHidden": "Carta Jogada Oculta",

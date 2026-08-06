@@ -105,6 +105,11 @@ export function aiSelectTarget(
   }
 
   
+  if (tst === 'SS001_CHOOSE_COUNT') {
+    return options.reduce((max, opt) => (parseInt(opt, 10) > parseInt(max, 10) ? opt : max), options[0]);
+  }
+
+  
   if (tst === 'SS053_FS_HIDE') {
     return selectForcedHideTarget(options, state, aiPlayer, difficulty);
   }

@@ -14,7 +14,9 @@
         "feature",
         "feature",
         "feature",
-        "feature"
+        "feature",
+        "fix",
+        "fix"
       ],
       "changes_fr": [
         "Tsunade Le Pigeon Légendaire arrive : elle remélange jusqu’à 5 cartes de sa défausse et gagne autant de puissance.",
@@ -26,7 +28,9 @@
         "Tsunade La Joueuse Invétérée 002 ouvre une fenêtre où vous tapez le nombre annoncé, puis révèle la carte du dessus de votre deck sans la déplacer.",
         "Kakashi Hatake 008 pose un allié Équipe 7 pour 2 Chakra de moins, et cet allié ne peut jamais arriver en UPGRADE.",
         "Itachi Uchiwa 053 doit cacher un personnage à 2 Chakra ou moins de sa mission, lui compris.",
-        "Le Senbon peut se poser sur un personnage caché, contrairement aux équipements qui exigent une cible non cachée."
+        "Le Senbon peut se poser sur un personnage caché, contrairement aux équipements qui exigent une cible non cachée.",
+        "Tsunade Le Pigeon Légendaire 999 demande maintenant combien de cartes remélanger, avec l'aperçu des cartes concernées, et donne bien 1 puissance par carte remélangée.",
+        "Kimimaro 031 ne peut plus se déplacer lui-même avec Kidomaru : un personnage n’est pas son propre allié."
       ],
       "changes_en": [
         "Tsunade Legendary Sitting Duck joins the game: she shuffles up to 5 cards from her discard pile back and gains that much Power.",
@@ -38,7 +42,9 @@
         "Tsunade The Gambling Fool 002 opens a window where you type the declared number, then reveals the top card of your deck without moving it.",
         "Kakashi Hatake 008 puts a Team 7 ally down for 2 Chakra less, and that ally can never arrive as an upgrade.",
         "Itachi Uchiha 053 must hide a character costing 2 or less in his mission, himself included.",
-        "The Senbon can be attached to a hidden character, unlike attachments that demand a non-hidden target."
+        "The Senbon can be attached to a hidden character, unlike attachments that demand a non-hidden target.",
+        "Tsunade Legendary Sitting Duck 999 now asks how many cards to shuffle back, previews them, and grants 1 Power per shuffled card.",
+        "Kimimaro 031 can no longer move himself with Kidomaru: a character is not its own ally."
       ]
     },
     {

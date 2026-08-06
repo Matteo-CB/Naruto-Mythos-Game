@@ -1700,7 +1700,9 @@
       "declareNumberMinus": "Decrease",
       "ss002RevealTitle": "Top of your deck",
       "ss002RevealWonResult": "Your bet pays off.",
-      "ss002RevealLostResult": "Bad luck this time."
+      "ss002RevealLostResult": "Bad luck this time.",
+      "chooseCountTitle": "Cards to shuffle back",
+      "chooseCountConfirm": "Shuffle {value} card(s)"
     },
     "anim": {
       "cardPlayedHidden": "Card Played Hidden",

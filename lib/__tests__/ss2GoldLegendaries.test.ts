@@ -5,6 +5,8 @@ import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import { getCardById, getCharacterById } from '@/lib/data/cardIndex';
 import { isForceUnlockedCard } from '@/lib/variants/forceUnlock';
 import { isStaticRankedBanned } from '@/lib/data/rankedBans';
+import { buildPendingTargetSelectionUI } from '@/stores/gameStore';
+import { aiSelectTarget } from '@/lib/ai/targetSelection';
 import type { GameState, PendingAction } from '@/lib/engine/types';
 
 const TSUNADE_GOLD = 'SS-999-L';
@@ -103,6 +105,51 @@ describe('Tsunade SS-999-L shuffles her discard pile back for POWERUP', () => {
     expect(resolved.player1.deck.length, 'and joined the deck').toBe(deckBefore + 3);
     expect(charById(resolved, TSUNADE_GOLD)?.powerTokens, 'POWERUP 1 per card').toBe(3);
     expect(resolved.pendingActions.length, 'nothing left hanging').toBe(0);
+  });
+
+  it('the count window is a number picker, never a card picker', () => {
+    const asked = answer(playFresh(tsunadeBoard(4)));
+    const action = asked.pendingActions[0];
+    const effect = asked.pendingEffects.find((e) => e.id === action.sourceEffectId);
+    const popup = buildPendingTargetSelectionUI(
+      action,
+      effect,
+      {
+        playerHand: asked.player1.hand ?? [],
+        playerDiscard: asked.player1.discardPile ?? [],
+        playerDeckSize: asked.player1.deck?.length ?? 0,
+        activeMissions: asked.activeMissions.map((m) => ({ rank: m.rank })),
+      },
+      'Player 1',
+      () => {},
+      () => {},
+    );
+
+    expect(popup.selectionType, 'picking a card is what made players shuffle only one').toBe('DECLARE_NUMBER');
+    expect(popup.numberRange).toEqual({ min: 1, max: 4 });
+    expect(popup.numberPreviewCards, 'the cards that would leave the pile are shown').toHaveLength(4);
+    expect(popup.numberPreviewCards?.[0].position).toBe(1);
+    expect(popup.handCards, 'no card list that could be mistaken for a card choice').toBeUndefined();
+  });
+
+  it('the POWERUP counts the cards shuffled, never the cost of a card', () => {
+    const before = tsunadeBoard(5);
+    before.player1.discardPile = before.player1.discardPile.map((c, i) =>
+      i === before.player1.discardPile.length - 4 ? getCharacterById('KS-136-S')! : c);
+
+    const resolved = answer(answer(playFresh(before)), '4');
+    const tsunade = charById(resolved, TSUNADE_GOLD)!;
+    const expensive = getCharacterById('KS-136-S')!.chakra ?? 0;
+
+    expect(tsunade.powerTokens, 'four cards shuffled, four tokens').toBe(4);
+    expect(tsunade.powerTokens, 'and not the cost of any card in the pile').not.toBe(expensive);
+    expect(resolved.player1.discardPile.length).toBe(1);
+  });
+
+  it('the AI shuffles as many cards as it can', () => {
+    const asked = answer(playFresh(tsunadeBoard(4)));
+    const action = asked.pendingActions[0];
+    expect(aiSelectTarget(action.options, action, asked, 'player1', 'hard')).toBe('4');
   });
 
   it('an empty discard pile opens no window at all', () => {

@@ -67,6 +67,7 @@ interface PendingTargetSelection {
   }>; // for multi-card reveal (Tayuya 065, Kiba 026, Sasuke 014, Itachi 091)
   
   numberRange?: { min: number; max: number };
+  numberPreviewCards?: Array<{ position: number; card: { name_fr: string; name_en?: string; chakra?: number; power?: number; image_file?: string; id?: string } }>;
   deckSize?: number; // for DRAW_CARD: shows deck size
   confirmCardData?: { name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number }; // for CONFIRM_HIDE / CONFIRM_DEFEAT
   
@@ -384,16 +385,6 @@ export function buildPendingTargetSelectionUI(
         const isPlayable = info?.isPlayable ?? playableOptionSet.has(idx);
         return { index: idx, card: cardData, isPlayable };
       });
-    } else if (tst === 'SS001_CHOOSE_COUNT') {
-      const discard = dataSource.playerDiscard;
-      handCards = pendingAction.options.map((countStr) => {
-        const count = parseInt(countStr, 10);
-        const card = discard[discard.length - count];
-        return {
-          index: count,
-          card: card ? fullCardData(card) : { name_fr: '???' },
-        };
-      });
     } else if (tst === 'TSUNADE104_CHOOSE_CHAKRA') {
       handCards = pendingAction.options.map((amountStr) => {
         const amount = parseInt(amountStr, 10);
@@ -697,6 +688,7 @@ export function buildPendingTargetSelectionUI(
 
   
   let numberRange: PendingTargetSelection['numberRange'];
+  let numberPreviewCards: PendingTargetSelection['numberPreviewCards'];
   if (tst === 'DECLARE_NUMBER') {
     try {
       const parsed = JSON.parse(pendingEffect?.effectDescription ?? '{}');
@@ -705,8 +697,17 @@ export function buildPendingTargetSelectionUI(
       numberRange = { min: 0, max: 999 };
     }
   }
+  if (tst === 'SS001_CHOOSE_COUNT') {
+    const counts = pendingAction.options.map((o) => parseInt(o, 10)).filter((n) => !Number.isNaN(n));
+    numberRange = { min: Math.min(...counts), max: Math.max(...counts) };
+    const discard = dataSource.playerDiscard;
+    numberPreviewCards = counts.map((count) => {
+      const card = discard[discard.length - count];
+      return { position: count, card: card ? fullCardData(card) : { name_fr: '???' } };
+    });
+  }
 
-  const selectionType: PendingTargetSelection['selectionType'] = tst === 'DECLARE_NUMBER'
+  const selectionType: PendingTargetSelection['selectionType'] = (tst === 'DECLARE_NUMBER' || tst === 'SS001_CHOOSE_COUNT')
     ? 'DECLARE_NUMBER'
     : isInfoReveal
     ? 'INFO_REVEAL'
@@ -749,6 +750,7 @@ export function buildPendingTargetSelectionUI(
     revealedCard,
     revealedCards,
     numberRange,
+    numberPreviewCards,
     deckSize,
     confirmCardData,
     playerName,

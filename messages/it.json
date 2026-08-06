@@ -3788,7 +3788,9 @@
       "declareNumberMinus": "Diminuisci",
       "ss002RevealTitle": "Cima del tuo mazzo",
       "ss002RevealWonResult": "La tua scommessa paga.",
-      "ss002RevealLostResult": "Sfortuna questa volta."
+      "ss002RevealLostResult": "Sfortuna questa volta.",
+      "chooseCountTitle": "Carte da rimescolare",
+      "chooseCountConfirm": "Rimescola {value} carta/e"
     },
     "anim": {
       "cardPlayedHidden": "Carta Giocata Coperta",

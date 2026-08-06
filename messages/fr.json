@@ -1706,7 +1706,9 @@
       "declareNumberMinus": "Diminuer",
       "ss002RevealTitle": "Dessus de votre deck",
       "ss002RevealWonResult": "Votre pari est gagnant.",
-      "ss002RevealLostResult": "Pas de chance cette fois."
+      "ss002RevealLostResult": "Pas de chance cette fois.",
+      "chooseCountTitle": "Cartes à remélanger",
+      "chooseCountConfirm": "Remélanger {value} carte(s)"
     },
     "anim": {
       "cardPlayedHidden": "Carte jouée face cachée",
