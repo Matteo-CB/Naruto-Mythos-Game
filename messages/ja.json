@@ -1012,7 +1012,16 @@
         "ss002SummonChakra": "{card}：口寄せを出してチャクラを{amount}得た。",
         "ss002SummonPowerup": "{card}：味方の口寄せ{count}体にPOWERUP {amount}。",
         "ss002RevealWon": "{card}：{amount}を宣言し{target}を公開、POWERUP {amount}。",
-        "ss002RevealFailed": "{card}：{amount}を宣言し{target}を公開、POWERUPなし。"
+        "ss002RevealFailed": "{card}：{amount}を宣言し{target}を公開、POWERUPなし。",
+        "ss123MvTakeBack": "{card}が{target}のコントロールを取り戻した。",
+        "ss123MvTakeBackHidden": "{card}が伏せた忍のコントロールを取り戻した。",
+        "ss137MvReturnHidden": "{card}が味方の伏せた忍を手札に戻した。",
+        "ss137MvDuelDefeat": "{card}：相手が{target}を倒した。",
+        "discardCard": "{card}が{target}を捨てた。",
+        "duplicateNameReveal": "{card}は公開できなかった。同じ名前の忍がすでにいる。",
+        "sakura135NoPlayChooseOrder": "{card}はカードを出さなかった。戻すカードの順番を選んでください。",
+        "ss118Reveal": "{card}が{target}を公開した。",
+        "ss118HideSameName": "{card}が、公開した名前と同じ{target}を伏せた。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1692,7 +1701,16 @@
         "ss002RevealLose": "{declared}を宣言したが、公開したカードのコストは{cost}：POWERUPなし。",
         "ss079ConfirmMain": "MAIN：このキャラクターにPOWERUP 1しますか？",
         "ss081ConfirmMain": "MAIN：カードを1枚引きますか？",
-        "declareNumber": "{min}から{max}までの数字を宣言する。大きいほど当てにくくなる。"
+        "declareNumber": "{min}から{max}までの数字を宣言する。大きいほど当てにくくなる。",
+        "ss005ConfirmMain": "デッキの一番上のカードを、このミッションに伏せた忍として置きますか？",
+        "ss005ConfirmAmbush": "待ち伏せ：デッキの一番上のカードを、もう一度このミッションに伏せた忍として置きますか？",
+        "ss123MvTakeBack": "自分が所有する忍のコントロールを取り戻す。",
+        "ss137MvReturnHidden": "このミッションにいる味方の伏せた忍を1体、手札に戻す。",
+        "ss137MvConfirmDuel": "相手にこのミッションの忍を、自分と同じ数になるまで倒させますか？",
+        "ss137MvOpponentChooseDefeat": "このミッションで倒す自分の忍を選んでください（{count}体多い）。",
+        "ssMss02Looked": "デッキの一番上に戻すカードを1枚選んでください。",
+        "ss118RevealDefeat": "敵の伏せた忍を1体公開し、倒す。",
+        "ss118HideSameName": "公開した忍と同じ名前の敵の忍を1体伏せる。"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",
@@ -3257,7 +3275,19 @@
     "turn": "ターン {turn}",
     "ranked": "ランク",
     "casual": "カジュアル",
-    "evolvingTag": "エボルビング"
+    "evolvingTag": "エボルビング",
+    "loading": "読み込み中",
+    "connecting": "対戦に接続中",
+    "signInToWatch": "この対戦を観戦するにはログインしてください",
+    "errorAuth": "本人確認に失敗しました",
+    "errorNotFound": "この対戦は進行していません",
+    "errorPrivate": "これはプライベート対戦です",
+    "errorLimit": "この対戦の観戦者が多すぎます",
+    "errorNotSubscribed": "この対戦を観戦していません",
+    "errorEnded": "この対戦は終了しました",
+    "errorBanned": "観戦は制限されています",
+    "errorPlayerInTournament": "大会の参加者は他の卓を観戦できません",
+    "errorSignInRequired": "大会の対戦を観戦するにはログインしてください"
   },
   "chat": {
     "title": "チャット",
@@ -3365,7 +3395,9 @@
     "errorLimit": "このルームの観戦者数の上限に達しました。",
     "errorNotSubscribed": "このルームを購読していません。",
     "errorEnded": "この対戦は終了しました。",
-    "errorBanned": "現在観戦できません。"
+    "errorBanned": "現在観戦できません。",
+    "errorPlayerInTournament": "大会の参加者は他の卓を観戦できません",
+    "errorSignInRequired": "大会の対戦を観戦するにはログインしてください"
   },
   "deckStats": {
     "title": "デッキ統計（過去90日）",
@@ -4103,5 +4135,24 @@
     "badge": "FIRST STRIKE",
     "used": "このラウンドは使用済み",
     "opponentUsed": "相手がFIRST STRIKEを使用した"
+  },
+  "tournamentSpectate": {
+    "title": "大会を観戦",
+    "panelTitle": "進行中の対戦",
+    "closePanel": "パネルを閉じる",
+    "openPanel": "観戦する対戦を選ぶ",
+    "selectedCount": "画面に{max}卓中{count}卓",
+    "noLiveMatches": "現在進行中の対戦はありません。",
+    "pickToStart": "右上のパネルから観戦する対戦を選んでください。",
+    "signInRequired": "ログインすると大会を観戦できます。この大会の参加者は他の卓を観戦できません。",
+    "backToTournament": "大会に戻る",
+    "liveCount": "進行中の対戦{count}件",
+    "versus": "対",
+    "roundState": "ラウンド{turn}",
+    "watching": "観戦者{count}人",
+    "removeTile": "この卓を外す",
+    "matchEnded": "対戦終了",
+    "watchLive": "観戦する",
+    "playersCannotWatch": "あなたはこの大会に参加しているため、他の卓を観戦できません。"
   }
 }

@@ -27,7 +27,7 @@ export const NWL_CALENDAR_REG_HOUR = 14;
 export const NWL_FIRST_PLACE_STORE_CREDIT_GBP = 20;
 export const NWL_FIRST_PLACE_PAYPAL_GBP = 10;
 export const NWL_CHUNIN_PODIUM_PLACES = 3;
-export const NWL_DISCORD_INVITE = 'discord.gg/JR5HG4VUP';
+export const NWL_DISCORD_INVITE = 'discord.gg/Wk5MQhkNEw';
 export const NWL_CALENDAR_MAX_PLAYERS = 32;
 
 export const WEEKLY_SCHEDULE: Record<number, WeeklyDaySpec | null> = {

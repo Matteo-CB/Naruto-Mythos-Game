@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
 
 
 function handleAkamaru028Main(ctx: EffectContext): EffectResult {
@@ -63,7 +64,7 @@ function applyPowerupToTarget(
 
   if (idx !== -1) {
     targetName = chars[idx].card.name_fr;
-    chars[idx] = { ...chars[idx], powerTokens: chars[idx].powerTokens + amount };
+    chars[idx] = { ...chars[idx], powerTokens: chars[idx].powerTokens + amplifiedPowerup(newState, chars[idx].instanceId, amount) };
     mission[friendlySide] = chars;
     missions[missionIndex] = mission;
     newState.activeMissions = missions;

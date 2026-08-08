@@ -619,6 +619,7 @@ function MissionCardDisplay({
           color: '#0a0a0a',
           boxShadow: '0 1px 4px rgba(0, 0, 0, 0.4)',
           fontFamily: "'NJNaruto', Arial, sans-serif",
+          zIndex: 3,
         }}
       >
         {mission.rank}
@@ -631,6 +632,7 @@ function MissionCardDisplay({
           backgroundColor: 'rgba(0, 0, 0, 0.85)',
           color: '#c4a35a',
           fontFamily: "'NJNaruto', Arial, sans-serif",
+          zIndex: 3,
         }}
       >
         {totalPoints} {t('game.board.pts')}
@@ -655,7 +657,7 @@ function MissionCardDisplay({
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           className="absolute inset-0 flex items-center justify-center"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', zIndex: 4 }}
         >
           <span
             className="font-bold px-3 py-1"

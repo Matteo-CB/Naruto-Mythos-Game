@@ -212,4 +212,56 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     "Attachez à un personnage allié non caché.",
     "[↯] Piochez une carte.",
   ],
+  "SS-114-MV": [
+    "[↯] Défaussez un Gaara de votre main. Cachez un personnage ennemi dans cette mission dont le coût est inférieur ou égal au coût de la carte défaussée.",
+    "Rock Lee, effet MAIN : À la place, vainquez-le.",
+  ],
+  "SS-126-MV": [
+    "[⧗] Ce personnage a +1 Puissance pour chaque personnage Village du Son dans cette mission.",
+    "[↯] Orochimaru : Jouez un personnage Village du Son n'importe où en payant 3 de moins.",
+  ],
+  "SS-123-MV": [
+    "[⧗] Les POWERUP sur les personnages alliés dans cette mission sont augmentés de 1.",
+    "[↯] Ino Yamanaka : Reprenez le contrôle d’un personnage que vous possédez en jeu.",
+  ],
+  "SS-005-M": [
+    "[↯] Placez la carte du dessus de votre deck comme personnage caché dans cette mission.",
+    "[↯] Répétez l’effet MAIN.",
+  ],
+  "SS-137-MV": [
+    "[↯] Renvoyez un personnage allié caché de cette mission dans votre main.",
+    "[↯] Kurenai Yûhi : L’adversaire choisit et vainc ses personnages dans cette mission jusqu’à en avoir autant que vous.",
+  ],
+  "SS-078-CHIBIV": [
+    "[↯] Kimimaro : Vainquez un personnage ennemi dont le coût est de 2 ou moins.",
+    "[⧗] Quand vous vainquez un personnage ennemi non caché, vous pouvez payer 1 Chakra pour piocher 1 carte.",
+  ],
+  "SS-111-CHIBIV": [
+    "[↯] DUEL Neji Hyûga : Reprenez en main la Hinata Hyûga la plus haute de votre pile de défausse.",
+    "[↯] Jouez un personnage nommé Hyûga n’importe où, en payant 3 de moins.",
+  ],
+  "SS-112-CHIBIV": [
+    "[↯] Retirez tous les jetons de Puissance d'un personnage ennemi dans cette mission.",
+    "[↯] Hinata Hyûga : Cachez un personnage ennemi sans jeton de Puissance dans cette mission.",
+  ],
+  "SS-115-CHIBIV": [
+    "[⧗] Ce personnage ne perd pas ses jetons de Puissance à la fin de la manche.",
+    "[⧗] DUEL Gaara : Quand vous battez un personnage ennemi, POWERUP 2.",
+  ],
+  "SS-121-CHIBIV": [
+    "[⧗] Ce personnage a +1 Puissance pour chaque Naruto Uzumaki allié en jeu.",
+    "[↯] Kiba Inuzuka : Déplacez la carte au bas de cette pile d'amélioration vers une autre mission.",
+  ],
+  "SS-123-CHIBIV": [
+    "[⧗] Les POWERUP sur les personnages alliés dans cette mission sont augmentés de 1.",
+    "[↯] Ino Yamanaka : Reprenez le contrôle d’un personnage que vous possédez en jeu.",
+  ],
+  "SS-126-CHIBIV": [
+    "[⧗] Ce personnage a +1 Puissance pour chaque personnage Village du Son dans cette mission.",
+    "[↯] Orochimaru : Jouez un personnage Village du Son n'importe où en payant 3 de moins.",
+  ],
+  "SS-118-CHIBIV": [
+    "[↯] Révélez et vainquez un personnage ennemi caché en jeu.",
+    "[↯] Temari : Cachez un personnage ennemi en jeu portant le même nom que le personnage révélé.",
+  ],
 };

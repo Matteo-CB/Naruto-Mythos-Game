@@ -212,4 +212,56 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "Attach to a friendly non-hidden character.",
     "[↯] Draw a card.",
   ],
+  "SS-114-MV": [
+    "[↯] Discard a Gaara from your hand. Hide an enemy character in this mission with cost equal to or lower than the discarded card cost.",
+    "Rock Lee, MAIN effect: Instead, defeat them.",
+  ],
+  "SS-126-MV": [
+    "[⧗] This character has +1 Power for every Sound Village character in this mission.",
+    "[↯] Orochimaru: Play a Sound Village character anywhere, paying 3 less.",
+  ],
+  "SS-123-MV": [
+    "[⧗] POWERUPs on friendly characters in this mission are increased by 1.",
+    "[↯] Ino Yamanaka: Take back control of a character you own in play.",
+  ],
+  "SS-005-M": [
+    "[↯] Put the top card of your deck as a hidden character in this mission.",
+    "[↯] Repeat the MAIN effect.",
+  ],
+  "SS-137-MV": [
+    "[↯] Return a friendly hidden character from this mission to your hand.",
+    "[↯] Kurenai Yuhi: The opponent chooses and defeats their characters in this mission until they have the same number as your characters.",
+  ],
+  "SS-078-CHIBIV": [
+    "[↯] Kimimaro: Defeat an enemy character with cost 2 or less.",
+    "[⧗] When you defeat a non-hidden enemy character, you may pay 1 Chakra to draw 1 card.",
+  ],
+  "SS-111-CHIBIV": [
+    "[↯] DUEL Neji Hyuga: Return the topmost Hinata Hyuga from your discard pile to your hand.",
+    "[↯] Play a Hyuga-named character anywhere, paying 3 less.",
+  ],
+  "SS-112-CHIBIV": [
+    "[↯] Remove all Power tokens from an enemy character in this mission.",
+    "[↯] Hinata Hyuga: Hide an enemy character without Power tokens in this mission.",
+  ],
+  "SS-115-CHIBIV": [
+    "[⧗] This character doesn't lose Power tokens at the end of the round.",
+    "[⧗] DUEL Gaara: When you defeat an enemy character, POWERUP 2.",
+  ],
+  "SS-121-CHIBIV": [
+    "[⧗] This character has +1 Power for every friendly Naruto Uzumaki in play.",
+    "[↯] Kiba Inuzuka: Move the card at the bottom of this upgrade stack to another mission.",
+  ],
+  "SS-123-CHIBIV": [
+    "[⧗] POWERUPs on friendly characters in this mission are increased by 1.",
+    "[↯] Ino Yamanaka: Take back control of a character you own in play.",
+  ],
+  "SS-126-CHIBIV": [
+    "[⧗] This character has +1 Power for every Sound Village character in this mission.",
+    "[↯] Orochimaru: Play a Sound Village character anywhere, paying 3 less.",
+  ],
+  "SS-118-CHIBIV": [
+    "[↯] Reveal and defeat an enemy hidden character in play.",
+    "[↯] Temari: Hide an enemy character in play with the same name as the revealed character.",
+  ],
 };

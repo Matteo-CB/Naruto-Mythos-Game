@@ -1,13 +1,15 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTournamentStore, type CreateTournamentInput } from '@/stores/tournamentStore';
 import { useRouter } from '@/lib/i18n/navigation';
 import { RANK_TIERS } from '@/components/EloBadge';
 import { ALL_SET_IDS, SET_REGISTRY, isSetSealedReady, getSetName } from '@/lib/data/sets/registry';
 import { TOURNAMENT_PRIZE_CARD_IDS } from '@/lib/variants/constants';
 import { getCardById } from '@/lib/data/cardIndex';
+import { getAllCards } from '@/lib/data/cardLoader';
+import { facetOptions } from '@/lib/collection/facets';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
 import Image from 'next/image';
 
@@ -15,6 +17,9 @@ interface Props {
   isAdmin: boolean;
   canCreatePublic?: boolean;
 }
+
+const GROUP_ORDER = ['Leaf Village', 'Sand Village', 'Sound Village', 'Akatsuki', 'Independent'];
+const RARITY_ORDER = ['C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L', 'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV', 'SHINOBI', 'SHINOBIV'];
 
 export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props) {
   const t = useTranslations('tournament');
@@ -54,9 +59,24 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
   const [bannedCardIds, setBannedCardIds] = useState('');
   const [prizeCardId, setPrizeCardId] = useState<string>('');
 
-  const ALL_GROUPS = ['Leaf Village', 'Sand Village', 'Sound Village', 'Akatsuki', 'Independent'];
-  const ALL_KEYWORDS = ['Team 7', 'Team 8', 'Team 10', 'Team Gai', 'Team Baki', 'Sannin', 'Jutsu', 'Summon', 'Rogue Ninja', 'Sound Four'];
-  const ALL_RARITIES = ['C', 'UC', 'R', 'RA', 'S', 'M'];
+  const deckLegalCards = useMemo(
+    () => getAllCards().filter((c) => c.card_type !== 'mission'),
+    [],
+  );
+  const noFilter = useMemo(() => ({}), []);
+
+  const ALL_GROUPS = useMemo(
+    () => facetOptions({ cards: deckLegalCards, predicates: noFilter, dimension: 'group', valueOf: (c) => c.group ?? null, order: GROUP_ORDER }),
+    [deckLegalCards, noFilter],
+  );
+  const ALL_KEYWORDS = useMemo(
+    () => facetOptions({ cards: deckLegalCards, predicates: noFilter, dimension: 'keyword', valueOf: (c) => c.keywords ?? null }),
+    [deckLegalCards, noFilter],
+  );
+  const ALL_RARITIES = useMemo(
+    () => facetOptions({ cards: deckLegalCards, predicates: noFilter, dimension: 'rarity', valueOf: (c) => c.rarity ?? null, order: RARITY_ORDER }),
+    [deckLegalCards, noFilter],
+  );
 
   if (!isAdmin) return null;
 

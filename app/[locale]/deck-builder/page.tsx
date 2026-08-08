@@ -18,6 +18,8 @@ import { HoloFoilOverlay } from "@/components/cards/HoloFoilOverlay";
 import { CloudBackground } from "@/components/CloudBackground";
 import { isLandscapeCard, hasCombatStats } from "@/lib/cards/orientation";
 import { ORDERED_SET_IDS, SET_REGISTRY } from "@/lib/data/sets/registry";
+import { facetOptions, isFacetWorthShowing } from "@/lib/collection/facets";
+import { useValidFacetSelection } from "@/lib/collection/useFacets";
 import { useTrackOnMount, trackUiHook } from "@/lib/hooks/useTrackUi";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath, portraitImagePath } from "@/lib/utils/imagePath";
@@ -48,6 +50,32 @@ const EFFECT_TYPE_COLORS: Record<string, string> = {
   MAIN: '#c4a35a', UPGRADE: '#3e8b3e', AMBUSH: '#b33e3e', SCORE: '#6a6abb',
 };
 type SortField = 'number' | 'name' | 'chakra' | 'power' | 'rarity';
+
+const ALT_ART_RARITIES = ['RA', 'MV', 'SV', 'L'];
+const CHAR_TYPE_ORDER = ['character', 'attachment'] as const;
+type QuickTypeValue = 'all' | (typeof CHAR_TYPE_ORDER)[number];
+const MISSION_EFFECT_ORDER = ['score', 'continuous'] as const;
+type MissionEffectValue = 'all' | (typeof MISSION_EFFECT_ORDER)[number];
+
+function cardTypeOf(card: CharacterCard): string {
+  return (card as { card_type?: string }).card_type ?? 'character';
+}
+
+function missionEffectValuesOf(mission: MissionCard): string[] {
+  const effects = mission.effects ?? [];
+  const values: string[] = [];
+  if (effects.some((e) => e.type === 'SCORE')) values.push('score');
+  if (effects.some((e) => e.description.includes('[⧗]'))) values.push('continuous');
+  return values;
+}
+
+function missionMatchesNeedle(mission: MissionCard, needle: string, loc: 'en' | 'fr'): boolean {
+  if (!needle) return true;
+  if (normalizeStr(getCardName(mission, loc)).includes(needle)) return true;
+  return (mission.effects ?? []).some((e, i) => (
+    normalizeStr(getCardEffectDescription(mission.id, i, loc, e.description)).includes(needle)
+  ));
+}
 
 type EffectFunction = 'defeat' | 'hide' | 'draw' | 'move' | 'powerup' | 'chakra' | 'control' | 'play' | 'protect' | 'continuous' | 'score';
 
@@ -489,13 +517,43 @@ export default function DeckBuilderPage() {
     if (quickSet && !setsWithCards.includes(quickSet)) setQuickSet(null);
   }, [setsWithCards, quickSet]);
 
+  const charFacetPredicates = useMemo(() => ({
+    set: (c: CharacterCard) => !quickSet || c.set === quickSet,
+    type: (c: CharacterCard) => !quickType || cardTypeOf(c) === quickType,
+    altArt: (c: CharacterCard) => showAltArt || !ALT_ART_RARITIES.includes(c.rarity),
+    unrevealed: (c: CharacterCard) => showUnrevealed || !unrevealedIds.has(c.id),
+    search: (c: CharacterCard) => !deferredSearch || matchesSearchFilter(c, parsedSearch, loc),
+  }), [quickSet, quickType, showAltArt, showUnrevealed, unrevealedIds, deferredSearch, parsedSearch, loc]);
+
+  const charTypeOptions = useMemo(() => {
+    const present = facetOptions({
+      cards: availableChars,
+      predicates: charFacetPredicates,
+      dimension: 'type',
+      valueOf: cardTypeOf,
+      order: CHAR_TYPE_ORDER,
+    });
+    return CHAR_TYPE_ORDER.filter((value) => present.includes(value));
+  }, [availableChars, charFacetPredicates]);
+
+  const quickTypeSelection: QuickTypeValue = quickType ?? 'all';
+  const applyQuickTypeSelection = useCallback((value: QuickTypeValue) => {
+    setQuickType(value === 'all' ? null : value);
+  }, []);
+  useValidFacetSelection(quickTypeSelection, charTypeOptions, 'all', applyQuickTypeSelection);
+
+  const quickTypeKeys = useMemo<QuickTypeValue[]>(
+    () => (isFacetWorthShowing(charTypeOptions) ? ['all', ...charTypeOptions] : []),
+    [charTypeOptions],
+  );
+
   const filteredChars = useMemo(() => {
     let chars = [...availableChars];
     if (quickSet) chars = chars.filter((c) => c.set === quickSet);
     if (quickType) {
-      chars = chars.filter((c) => ((c as { card_type?: string }).card_type ?? 'character') === quickType);
+      chars = chars.filter((c) => cardTypeOf(c) === quickType);
     }
-    if (!showAltArt) chars = chars.filter((c) => !['RA', 'MV', 'SV', 'L'].includes(c.rarity));
+    if (!showAltArt) chars = chars.filter((c) => !ALT_ART_RARITIES.includes(c.rarity));
     if (!showUnrevealed) chars = chars.filter((c) => !unrevealedIds.has(c.id));
     if (deferredSearch) {
       chars = chars.filter((c) => matchesSearchFilter(c, parsedSearch, loc));
@@ -514,26 +572,46 @@ export default function DeckBuilderPage() {
     });
   }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showAltArt, showUnrevealed, unrevealedIds, quickSet, quickType]);
 
+  const missionNeedle = useMemo(() => normalizeStr(missionSearch.trim()), [missionSearch]);
+
+  const missionFacetPredicates = useMemo(() => ({
+    set: (m: MissionCard) => !quickSet || m.set === quickSet,
+    altArt: (m: MissionCard) => showAltArt || !isAlternateArtwork(m.id),
+    unrevealed: (m: MissionCard) => showUnrevealed || !unrevealedIds.has(m.id),
+    effect: (m: MissionCard) => missionEffect === 'all' || missionEffectValuesOf(m).includes(missionEffect),
+    search: (m: MissionCard) => missionMatchesNeedle(m, missionNeedle, loc),
+  }), [quickSet, showAltArt, showUnrevealed, unrevealedIds, missionEffect, missionNeedle, loc]);
+
+  const missionEffectOptions = useMemo(() => {
+    const present = facetOptions({
+      cards: availableMissions,
+      predicates: missionFacetPredicates,
+      dimension: 'effect',
+      valueOf: missionEffectValuesOf,
+      order: MISSION_EFFECT_ORDER,
+    });
+    return MISSION_EFFECT_ORDER.filter((value) => present.includes(value));
+  }, [availableMissions, missionFacetPredicates]);
+
+  useValidFacetSelection(missionEffect, missionEffectOptions, 'all', setMissionEffect);
+
+  const missionEffectKeys = useMemo<MissionEffectValue[]>(
+    () => (isFacetWorthShowing(missionEffectOptions) ? ['all', ...missionEffectOptions] : []),
+    [missionEffectOptions],
+  );
+
   const filteredMissions = useMemo(() => {
     let missions = showUnrevealed ? [...availableMissions] : availableMissions.filter((m) => !unrevealedIds.has(m.id));
     if (quickSet) missions = missions.filter((m) => m.set === quickSet);
     if (!showAltArt) missions = missions.filter((m) => !isAlternateArtwork(m.id));
     if (missionEffect !== 'all') {
-      missions = missions.filter((m) => (m.effects ?? []).some((e) => (
-        missionEffect === 'score' ? e.type === 'SCORE' : e.description.includes('[⧗]')
-      )));
+      missions = missions.filter((m) => missionEffectValuesOf(m).includes(missionEffect));
     }
-    const needle = normalizeStr(missionSearch.trim());
-    if (needle) {
-      missions = missions.filter((m) => {
-        const name = normalizeStr(getCardName(m, loc));
-        if (name.includes(needle)) return true;
-        const texts = (m.effects ?? []).map((e, i) => getCardEffectDescription(m.id, i, loc, e.description));
-        return texts.some((tx) => normalizeStr(tx).includes(needle));
-      });
+    if (missionNeedle) {
+      missions = missions.filter((m) => missionMatchesNeedle(m, missionNeedle, loc));
     }
     return missions;
-  }, [availableMissions, showUnrevealed, unrevealedIds, quickSet, showAltArt, missionEffect, missionSearch, loc]);
+  }, [availableMissions, showUnrevealed, unrevealedIds, quickSet, showAltArt, missionEffect, missionNeedle, loc]);
 
   const missionPageCount = Math.max(1, Math.ceil(filteredMissions.length / MISSIONS_PER_PAGE));
   const missionPageSafe = Math.min(missionPage, missionPageCount - 1);
@@ -1481,7 +1559,7 @@ export default function DeckBuilderPage() {
                 className="flex-1 min-w-0 px-2 py-1 text-[10px] focus:outline-none"
                 style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
               />
-              {(['all', 'score', 'continuous'] as const).map((key) => (
+              {missionEffectKeys.map((key) => (
                 <button
                   key={key}
                   onClick={() => setMissionEffect(key)}
@@ -1639,31 +1717,33 @@ export default function DeckBuilderPage() {
               ))}
             </div>
           )}
-          <div className="px-3 pb-1.5 shrink-0 flex items-center gap-1 flex-wrap">
-            {([null, 'character', 'attachment'] as const).map((type) => {
-              const active = quickType === type;
-              const label = type === null
-                ? t('deckBuilder.filters.allTypes')
-                : type === 'character'
-                  ? t('deckBuilder.filters.typeCharacters')
-                  : t('deckBuilder.filters.typeAttachments');
-              return (
-                <button
-                  key={type ?? 'all'}
-                  onClick={() => setQuickType(type)}
-                  aria-pressed={active}
-                  className="text-[9px] uppercase font-bold px-2 py-1 transition-colors"
-                  style={{
-                    backgroundColor: active ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
-                    color: active ? '#c4a35a' : '#6d6d74',
-                    border: 'none', cursor: 'pointer', letterSpacing: '0.08em',
-                  }}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+          {quickTypeKeys.length > 0 && (
+            <div className="px-3 pb-1.5 shrink-0 flex items-center gap-1 flex-wrap">
+              {quickTypeKeys.map((type) => {
+                const active = quickTypeSelection === type;
+                const label = type === 'all'
+                  ? t('deckBuilder.filters.allTypes')
+                  : type === 'character'
+                    ? t('deckBuilder.filters.typeCharacters')
+                    : t('deckBuilder.filters.typeAttachments');
+                return (
+                  <button
+                    key={type}
+                    onClick={() => applyQuickTypeSelection(type)}
+                    aria-pressed={active}
+                    className="text-[9px] uppercase font-bold px-2 py-1 transition-colors"
+                    style={{
+                      backgroundColor: active ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
+                      color: active ? '#c4a35a' : '#6d6d74',
+                      border: 'none', cursor: 'pointer', letterSpacing: '0.08em',
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
           <div className="px-3 pb-1 flex-shrink-0 flex items-center gap-1.5 flex-wrap">
             <button
               onClick={() => setHideVariants(!hideVariants)}
@@ -1919,7 +1999,7 @@ export default function DeckBuilderPage() {
                   className="flex-1 min-w-0 px-2 py-1.5 text-[11px] focus:outline-none"
                   style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
                 />
-                {(['all', 'score', 'continuous'] as const).map((key) => (
+                {missionEffectKeys.map((key) => (
                   <button
                     key={key}
                     onClick={() => setMissionEffect(key)}

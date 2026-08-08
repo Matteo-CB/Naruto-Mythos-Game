@@ -89,4 +89,6 @@ export function ss111PlayHyugaSelection(ctx: EffectContext): EffectResult | null
 export function registerShinobiHandlers(): void {
   registerEffect(HINATA_ID, 'DUEL', ss111DuelHandler);
   registerEffect(HINATA_ID, 'MAIN', ss111MainHandler);
+  registerEffect('SS-111-CHIBIV', 'DUEL', ss111DuelHandler);
+  registerEffect('SS-111-CHIBIV', 'MAIN', ss111MainHandler);
 }

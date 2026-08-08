@@ -2,6 +2,7 @@ import type { GameState, PlayerID, CharacterInPlay, PendingAction } from '../eng
 import { generateInstanceId } from '../engine/utils/id';
 import { logAction } from '../engine/utils/gameLog';
 import { isDuelConditionMet } from './duelUtils';
+import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
 
 
 export function triggerOnDefeatEffects(
@@ -60,7 +61,7 @@ export function triggerOnDefeatEffects(
               return {
                 ...m,
                 [side]: m[side].map((c: CharacterInPlay) =>
-                  c.instanceId === char.instanceId ? { ...c, powerTokens: c.powerTokens + 2 } : c,
+                  c.instanceId === char.instanceId ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, 2) } : c,
                 ),
               };
             });

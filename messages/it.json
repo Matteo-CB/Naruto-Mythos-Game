@@ -673,7 +673,9 @@
     "errorLimit": "Limite di spettatori raggiunto per questa stanza.",
     "errorNotSubscribed": "Non sei iscritto a questa stanza.",
     "errorEnded": "Questa partita è terminata.",
-    "errorBanned": "Non puoi guardare le partite per ora."
+    "errorBanned": "Non puoi guardare le partite per ora.",
+    "errorPlayerInTournament": "I giocatori del torneo non possono guardare gli altri tavoli",
+    "errorSignInRequired": "Accedi per guardare le partite del torneo"
   },
   "spectator": {
     "watching": "Guardando",
@@ -688,7 +690,19 @@
     "turn": "Turno {turn}",
     "ranked": "Classificata",
     "casual": "Amichevole",
-    "evolvingTag": "EVOLVING"
+    "evolvingTag": "EVOLVING",
+    "loading": "Caricamento",
+    "connecting": "Connessione alla partita",
+    "signInToWatch": "Accedi per guardare questa partita",
+    "errorAuth": "Verifica dell'identità fallita",
+    "errorNotFound": "Questa partita non è in corso",
+    "errorPrivate": "Questa partita è privata",
+    "errorLimit": "Questa partita ha già troppi spettatori",
+    "errorNotSubscribed": "Non stai guardando questa partita",
+    "errorEnded": "Questa partita è finita",
+    "errorBanned": "La modalità spettatore è chiusa per te",
+    "errorPlayerInTournament": "I giocatori del torneo non possono guardare gli altri tavoli",
+    "errorSignInRequired": "Accedi per guardare le partite del torneo"
   },
   "matchInvite": {
     "title": "Invito alla Partita",
@@ -3096,7 +3110,16 @@
         "ss002SummonChakra": "{card}: {amount} Chakra guadagnato/i giocando un Evocazione.",
         "ss002SummonPowerup": "{card}: POWERUP {amount} su {count} Evocazione/i alleata/e.",
         "ss002RevealWon": "{card}: dichiarato {amount}, rivelato {target}, POWERUP {amount}.",
-        "ss002RevealFailed": "{card}: dichiarato {amount}, rivelato {target}, nessun POWERUP."
+        "ss002RevealFailed": "{card}: dichiarato {amount}, rivelato {target}, nessun POWERUP.",
+        "ss123MvTakeBack": "{card} ha ripreso il controllo di {target}.",
+        "ss123MvTakeBackHidden": "{card} ha ripreso il controllo di un personaggio nascosto.",
+        "ss137MvReturnHidden": "{card} ha riportato in mano un personaggio nascosto alleato.",
+        "ss137MvDuelDefeat": "{card}: l’avversario ha sconfitto {target}.",
+        "discardCard": "{card} ha scartato {target}.",
+        "duplicateNameReveal": "{card} non ha potuto essere rivelato: un personaggio con quel nome è già presente.",
+        "sakura135NoPlayChooseOrder": "{card} non ha giocato nessuna carta, scegli l’ordine delle carte rimesse.",
+        "ss118Reveal": "{card} ha rivelato {target}.",
+        "ss118HideSameName": "{card} ha nascosto {target}, che porta il nome rivelato."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3776,7 +3799,16 @@
         "ss002RevealLose": "Hai dichiarato {declared} ma la carta rivelata costa solo {cost}: nessun POWERUP.",
         "ss079ConfirmMain": "MAIN: POWERUP 1 su questo personaggio?",
         "ss081ConfirmMain": "MAIN: pescare una carta?",
-        "declareNumber": "Dichiara un numero tra {min} e {max}. Più è alto, più è difficile da battere."
+        "declareNumber": "Dichiara un numero tra {min} e {max}. Più è alto, più è difficile da battere.",
+        "ss005ConfirmMain": "Mettere la prima carta del tuo mazzo come personaggio nascosto in questa missione?",
+        "ss005ConfirmAmbush": "IMBOSCATA: mettere di nuovo la prima carta del tuo mazzo come personaggio nascosto in questa missione?",
+        "ss123MvTakeBack": "Riprendi il controllo di un personaggio che ti appartiene.",
+        "ss137MvReturnHidden": "Riporta in mano un personaggio nascosto alleato di questa missione.",
+        "ss137MvConfirmDuel": "Costringere l’avversario a sconfiggere i suoi personaggi in questa missione finché non ne ha quanti te?",
+        "ss137MvOpponentChooseDefeat": "Scegli uno dei tuoi personaggi da sconfiggere in questa missione ({count} di troppo).",
+        "ssMss02Looked": "Scegli una carta da rimettere in cima al tuo mazzo.",
+        "ss118RevealDefeat": "Rivela e sconfiggi un personaggio nemico nascosto.",
+        "ss118HideSameName": "Nascondi un personaggio nemico con lo stesso nome di quello rivelato."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",
@@ -4099,5 +4131,24 @@
     "badge": "FIRST STRIKE",
     "used": "Già usato in questo round",
     "opponentUsed": "Il tuo avversario ha usato FIRST STRIKE"
+  },
+  "tournamentSpectate": {
+    "title": "Guarda il torneo",
+    "panelTitle": "Partite dal vivo",
+    "closePanel": "Chiudi il pannello",
+    "openPanel": "Scegli le partite da guardare",
+    "selectedCount": "{count} di {max} tavoli sullo schermo",
+    "noLiveMatches": "Nessuna partita è in corso in questo momento.",
+    "pickToStart": "Apri il pannello in alto a destra per scegliere le partite.",
+    "signInRequired": "Accedi per guardare il torneo. I giocatori iscritti a questo torneo non possono guardare gli altri tavoli.",
+    "backToTournament": "Torna al torneo",
+    "liveCount": "{count} partita/e dal vivo",
+    "versus": "contro",
+    "roundState": "Round {turn}",
+    "watching": "{count} spettatori",
+    "removeTile": "Rimuovi questo tavolo",
+    "matchEnded": "Partita finita",
+    "watchLive": "Guarda dal vivo",
+    "playersCannotWatch": "Stai partecipando a questo torneo, quindi non puoi guardare gli altri tavoli."
   }
 }

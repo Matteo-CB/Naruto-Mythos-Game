@@ -249,6 +249,44 @@ const FACTORIES: Record<string, Factory> = {
     },
     noMinimize: true,
   }),
+  'SS-118-CHIBIV': (id) => ({
+    build: () => board({
+      hand: [],
+      chakra: 20,
+      hidden0: { id, iid: HID },
+      e0: [
+        { id: 'KS-009-C', iid: 'sim-ghost', hidden: true },
+        { id: 'KS-009-C', iid: 'sim-twin' },
+        { id: 'SS-119-R', iid: 'sim-temari' },
+      ],
+      missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+    }),
+    play: P1(reveal(HID)),
+    choose: (state, pending) => {
+      const opts = pending.options ?? [];
+      const ghost = opts.find((o) => o === 'sim-ghost');
+      if (ghost) return [ghost];
+      const twin = opts.find((o) => o === 'sim-twin');
+      if (twin) return [twin];
+      return opts.slice(0, Math.max(1, pending.minSelections ?? 1));
+    },
+    noMinimize: true,
+  }),
+  'SS-123-MV': (id) => ({
+    build: () => {
+      const stolen = simChar('KS-009-C', { owner: 'player1', instanceId: 'sim-stolen', missionIndex: 0 });
+      stolen.controlledBy = 'player2';
+      stolen.controllerInstanceId = 'sim-ino';
+      return board({
+        hand: [id],
+        chakra: 20,
+        e0: [{ id: 'KS-019-C', iid: 'sim-ino' }],
+        extraP2m0: [stolen],
+      });
+    },
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
   'SS-999-L': (id) => ({
     build: () => {
       const st = board({

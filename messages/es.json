@@ -1013,7 +1013,16 @@
         "ss002SummonChakra": "{card}: {amount} Chakra ganado(s) al jugar una Invocación.",
         "ss002SummonPowerup": "{card}: POWERUP {amount} en {count} Invocación(es) aliada(s).",
         "ss002RevealWon": "{card}: declaró {amount}, reveló {target}, POWERUP {amount}.",
-        "ss002RevealFailed": "{card}: declaró {amount}, reveló {target}, sin POWERUP."
+        "ss002RevealFailed": "{card}: declaró {amount}, reveló {target}, sin POWERUP.",
+        "ss123MvTakeBack": "{card} recuperó el control de {target}.",
+        "ss123MvTakeBackHidden": "{card} recuperó el control de un personaje oculto.",
+        "ss137MvReturnHidden": "{card} devolvió a la mano un personaje oculto aliado.",
+        "ss137MvDuelDefeat": "{card}: el rival derrotó a {target}.",
+        "discardCard": "{card} descartó {target}.",
+        "duplicateNameReveal": "No se pudo revelar {card}: ya hay un personaje con ese nombre.",
+        "sakura135NoPlayChooseOrder": "{card} no jugó ninguna carta, elige el orden de las cartas devueltas.",
+        "ss118Reveal": "{card} reveló a {target}.",
+        "ss118HideSameName": "{card} ocultó a {target}, que lleva el nombre revelado."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",
@@ -1693,7 +1702,16 @@
         "ss002RevealLose": "Declaraste {declared} pero la carta revelada solo cuesta {cost}: sin POWERUP.",
         "ss079ConfirmMain": "MAIN: ¿POWERUP 1 en este personaje?",
         "ss081ConfirmMain": "MAIN: ¿robar una carta?",
-        "declareNumber": "Declara un número entre {min} y {max}. Cuanto más alto, más difícil de superar."
+        "declareNumber": "Declara un número entre {min} y {max}. Cuanto más alto, más difícil de superar.",
+        "ss005ConfirmMain": "¿Colocar la carta superior de tu mazo como personaje oculto en esta misión?",
+        "ss005ConfirmAmbush": "EMBOSCADA: ¿colocar de nuevo la carta superior de tu mazo como personaje oculto en esta misión?",
+        "ss123MvTakeBack": "Recupera el control de un personaje que te pertenece.",
+        "ss137MvReturnHidden": "Devuelve a tu mano un personaje oculto aliado de esta misión.",
+        "ss137MvConfirmDuel": "¿Obligar al rival a derrotar a sus personajes en esta misión hasta tener tantos como tú?",
+        "ss137MvOpponentChooseDefeat": "Elige uno de tus personajes para derrotar en esta misión ({count} de más).",
+        "ssMss02Looked": "Elige una carta para devolver encima de tu mazo.",
+        "ss118RevealDefeat": "Revela y derrota a un personaje enemigo oculto.",
+        "ss118HideSameName": "Oculta a un personaje enemigo con el mismo nombre que el revelado."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",
@@ -3258,7 +3276,19 @@
     "turn": "Turno {turn}",
     "ranked": "Clasificatorio",
     "casual": "Casual",
-    "evolvingTag": "EVOLVING"
+    "evolvingTag": "EVOLVING",
+    "loading": "Cargando",
+    "connecting": "Conectando con la partida",
+    "signInToWatch": "Inicia sesión para ver esta partida",
+    "errorAuth": "Fallo de verificación de identidad",
+    "errorNotFound": "Esta partida no está en curso",
+    "errorPrivate": "Esta partida es privada",
+    "errorLimit": "Esta partida ya tiene demasiados espectadores",
+    "errorNotSubscribed": "No estás viendo esta partida",
+    "errorEnded": "Esta partida ha terminado",
+    "errorBanned": "El modo espectador está cerrado para ti",
+    "errorPlayerInTournament": "Los jugadores del torneo no pueden ver las otras mesas",
+    "errorSignInRequired": "Inicia sesión para ver las partidas del torneo"
   },
   "chat": {
     "title": "Chat",
@@ -3366,7 +3396,9 @@
     "errorLimit": "Se ha alcanzado el límite de espectadores de esta sala.",
     "errorNotSubscribed": "No estás suscrito a esta sala.",
     "errorEnded": "Esta partida ha terminado.",
-    "errorBanned": "No puedes ver partidas por ahora."
+    "errorBanned": "No puedes ver partidas por ahora.",
+    "errorPlayerInTournament": "Los jugadores del torneo no pueden ver las otras mesas",
+    "errorSignInRequired": "Inicia sesión para ver las partidas del torneo"
   },
   "deckStats": {
     "title": "Estadísticas del mazo (últimos 90 días)",
@@ -4104,5 +4136,24 @@
     "badge": "FIRST STRIKE",
     "used": "Ya usado esta ronda",
     "opponentUsed": "Tu rival usó FIRST STRIKE"
+  },
+  "tournamentSpectate": {
+    "title": "Ver el torneo",
+    "panelTitle": "Partidas en directo",
+    "closePanel": "Cerrar el panel",
+    "openPanel": "Elegir las partidas a ver",
+    "selectedCount": "{count} de {max} tableros en pantalla",
+    "noLiveMatches": "No se está jugando ninguna partida ahora mismo.",
+    "pickToStart": "Abre el panel arriba a la derecha para elegir las partidas.",
+    "signInRequired": "Inicia sesión para ver el torneo. Los jugadores inscritos en este torneo no pueden ver las otras mesas.",
+    "backToTournament": "Volver al torneo",
+    "liveCount": "{count} partida(s) en directo",
+    "versus": "contra",
+    "roundState": "Ronda {turn}",
+    "watching": "{count} espectador(es)",
+    "removeTile": "Quitar este tablero",
+    "matchEnded": "Partida terminada",
+    "watchLive": "Ver en directo",
+    "playersCannotWatch": "Participas en este torneo, así que no puedes ver las otras mesas."
   }
 }

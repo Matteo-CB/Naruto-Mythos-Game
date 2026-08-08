@@ -2,7 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import type { CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
-import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
+import { isMovementBlockedByKurenai, amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
 
 
 
@@ -120,7 +120,7 @@ function applyUpgradePowerup(
   if (selfIdx !== -1) {
     chars[selfIdx] = {
       ...chars[selfIdx],
-      powerTokens: chars[selfIdx].powerTokens + movedCount,
+      powerTokens: chars[selfIdx].powerTokens + amplifiedPowerup(state, chars[selfIdx].instanceId, movedCount),
     };
     mission[friendlySide] = chars;
     missions[sourceMissionIndex] = mission;

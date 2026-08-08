@@ -673,7 +673,9 @@
     "errorLimit": "Osiągnięto limit widzów dla tego pokoju.",
     "errorNotSubscribed": "Nie jesteś zapisany do tego pokoju.",
     "errorEnded": "Ta gra się zakończyła.",
-    "errorBanned": "Na razie nie możesz oglądać gier."
+    "errorBanned": "Na razie nie możesz oglądać gier.",
+    "errorPlayerInTournament": "Gracze turnieju nie mogą oglądać innych stołów",
+    "errorSignInRequired": "Zaloguj się, aby oglądać mecze turnieju"
   },
   "spectator": {
     "watching": "Oglądasz",
@@ -688,7 +690,19 @@
     "turn": "Tura {turn}",
     "ranked": "Rankingowa",
     "casual": "Towarzyska",
-    "evolvingTag": "EVOLVING"
+    "evolvingTag": "EVOLVING",
+    "loading": "Wczytywanie",
+    "connecting": "Łączenie z meczem",
+    "signInToWatch": "Zaloguj się, aby oglądać ten mecz",
+    "errorAuth": "Weryfikacja tożsamości nie powiodła się",
+    "errorNotFound": "Ten mecz nie jest w toku",
+    "errorPrivate": "To jest prywatna gra",
+    "errorLimit": "Ten mecz ma już zbyt wielu widzów",
+    "errorNotSubscribed": "Nie oglądasz tego meczu",
+    "errorEnded": "Ten mecz się zakończył",
+    "errorBanned": "Oglądanie jest dla ciebie zamknięte",
+    "errorPlayerInTournament": "Gracze turnieju nie mogą oglądać innych stołów",
+    "errorSignInRequired": "Zaloguj się, aby oglądać mecze turnieju"
   },
   "matchInvite": {
     "title": "Zaproszenie do Meczu",
@@ -3096,7 +3110,16 @@
         "ss002SummonChakra": "{card}: zyskano {amount} Czakry za zagranie Przywołania.",
         "ss002SummonPowerup": "{card}: POWERUP {amount} na {count} sojuszniczych Przywołaniach.",
         "ss002RevealWon": "{card}: zadeklarowano {amount}, odkryto {target}, POWERUP {amount}.",
-        "ss002RevealFailed": "{card}: zadeklarowano {amount}, odkryto {target}, brak POWERUP."
+        "ss002RevealFailed": "{card}: zadeklarowano {amount}, odkryto {target}, brak POWERUP.",
+        "ss123MvTakeBack": "{card} odzyskuje kontrolę nad {target}.",
+        "ss123MvTakeBackHidden": "{card} odzyskuje kontrolę nad zakrytą postacią.",
+        "ss137MvReturnHidden": "{card} zwraca do ręki sojuszniczą zakrytą postać.",
+        "ss137MvDuelDefeat": "{card}: przeciwnik pokonał {target}.",
+        "discardCard": "{card} odrzuca {target}.",
+        "duplicateNameReveal": "Nie można odkryć {card}: postać o tej nazwie już tu jest.",
+        "sakura135NoPlayChooseOrder": "{card} nie zagrał żadnej karty, wybierz kolejność odkładanych kart.",
+        "ss118Reveal": "{card} odkrywa {target}.",
+        "ss118HideSameName": "{card} zakrywa {target}, który nosi odkrytą nazwę."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3776,7 +3799,16 @@
         "ss002RevealLose": "Zadeklarowano {declared}, ale odkryta karta kosztuje tylko {cost}: brak POWERUP.",
         "ss079ConfirmMain": "MAIN: POWERUP 1 na tej postaci?",
         "ss081ConfirmMain": "MAIN: dobrać kartę?",
-        "declareNumber": "Zadeklaruj liczbę od {min} do {max}. Im wyższa, tym trudniej ją pobić."
+        "declareNumber": "Zadeklaruj liczbę od {min} do {max}. Im wyższa, tym trudniej ją pobić.",
+        "ss005ConfirmMain": "Położyć wierzchnią kartę talii jako zakrytą postać w tej misji?",
+        "ss005ConfirmAmbush": "ZASADZKA: położyć ponownie wierzchnią kartę talii jako zakrytą postać w tej misji?",
+        "ss123MvTakeBack": "Odzyskaj kontrolę nad postacią, która należy do ciebie.",
+        "ss137MvReturnHidden": "Zwróć do ręki sojuszniczą zakrytą postać z tej misji.",
+        "ss137MvConfirmDuel": "Zmusić przeciwnika, by pokonywał swoje postacie w tej misji, aż będzie miał ich tyle co ty?",
+        "ss137MvOpponentChooseDefeat": "Wybierz jedną ze swoich postaci do pokonania w tej misji (o {count} za dużo).",
+        "ssMss02Looked": "Wybierz kartę, którą odłożysz na wierzch talii.",
+        "ss118RevealDefeat": "Odkryj i pokonaj zakrytą postać przeciwnika.",
+        "ss118HideSameName": "Zakryj postać przeciwnika o tej samej nazwie co odkryta."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",
@@ -4099,5 +4131,24 @@
     "badge": "FIRST STRIKE",
     "used": "Już użyte w tej rundzie",
     "opponentUsed": "Przeciwnik użył FIRST STRIKE"
+  },
+  "tournamentSpectate": {
+    "title": "Oglądaj turniej",
+    "panelTitle": "Mecze na żywo",
+    "closePanel": "Zamknij panel",
+    "openPanel": "Wybierz mecze do oglądania",
+    "selectedCount": "{count} z {max} stołów na ekranie",
+    "noLiveMatches": "Żaden mecz nie jest teraz rozgrywany.",
+    "pickToStart": "Otwórz panel w prawym górnym rogu, aby wybrać mecze.",
+    "signInRequired": "Zaloguj się, aby oglądać turniej. Gracze zapisani do tego turnieju nie mogą oglądać innych stołów.",
+    "backToTournament": "Powrót do turnieju",
+    "liveCount": "{count} mecz(e) na żywo",
+    "versus": "kontra",
+    "roundState": "Runda {turn}",
+    "watching": "{count} widzów",
+    "removeTile": "Usuń ten stół",
+    "matchEnded": "Mecz zakończony",
+    "watchLive": "Oglądaj na żywo",
+    "playersCannotWatch": "Bierzesz udział w tym turnieju, więc nie możesz oglądać innych stołów."
   }
 }

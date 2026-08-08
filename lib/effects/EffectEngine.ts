@@ -21,6 +21,7 @@ import { topmostHinataIndexInDiscard } from './handlers/SS/shinobi';
 import { missionCarries, SS_MISSION_LOW_PROFILE } from './missions/ssMissions';
 import { discardableSoundFour, soundFourNameOf, friendlyCharactersToMove, KIMIMARO_031_ID, KIMIMARO_031_NAME, type SoundFourName } from './handlers/SS/kimimaro031';
 import { hiddenCharactersInPlay, attachmentsInPlay } from './handlers/SS/missions/ssMissionHandlers';
+import { NARUTO_005_ID, NARUTO_005_NAME } from './handlers/SS/naruto005';
 import { KAKASHI_008_ID, KAKASHI_008_NAME, KAKASHI_008_CATEGORY, KAKASHI_008_REDUCTION } from './handlers/SS/kakashi008';
 import { JIROBO_033_ID, JIROBO_033_NAME, JIROBO_033_POWERUP, friendlySoundFourCount } from './handlers/SS/jirobo033';
 import { KYUBI_006_ID, KYUBI_006_NAME, costOfDefeated } from './handlers/SS/kyubi006';
@@ -38,7 +39,7 @@ import { attachCardToCharacter, discardAttachmentsOnLeave, discardAttachments } 
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatEnemyCharacter, defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
-import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval, isHiddenRevealBlocked } from './ContinuousEffects';
+import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval, isHiddenRevealBlocked, amplifiedPowerup } from './ContinuousEffects';
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 import { getEffectivePower } from './powerUtils';
 import { checkFlexibleUpgrade } from '../engine/rules/PlayValidation';
@@ -233,7 +234,7 @@ export function applyLowProfileAmbushPowerup(state: GameState, player: PlayerID,
     return {
       ...m,
       [side]: m[side].map((c: CharacterInPlay) =>
-        c.instanceId === instanceId ? { ...c, powerTokens: c.powerTokens + 2 } : c,
+        c.instanceId === instanceId ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 2) } : c,
       ),
     };
   });
@@ -353,7 +354,7 @@ function ss031ApplyDiscardReward(
           ...m,
           [side]: m[side].map((c: CharacterInPlay) => (
             c.instanceId === pendingEffect.sourceInstanceId
-              ? { ...c, powerTokens: c.powerTokens + 3 }
+              ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 3) }
               : c
           )),
         }
@@ -2687,7 +2688,7 @@ export class EffectEngine {
           const m_h002u = { ...missions_h002u[h002Res.missionIndex] };
           const side_h002u = h002Res.player === 'player1' ? 'player1Characters' : 'player2Characters';
           m_h002u[side_h002u] = m_h002u[side_h002u].map((c: CharacterInPlay) =>
-            c.instanceId === h002PlayedId ? { ...c, powerTokens: c.powerTokens + 2 } : c
+            c.instanceId === h002PlayedId ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 2) } : c
           );
           missions_h002u[h002Res.missionIndex] = m_h002u;
           newState = { ...newState, activeMissions: missions_h002u };
@@ -3011,7 +3012,7 @@ export class EffectEngine {
           const m017 = { ...missions017[c017Res.missionIndex] };
           const side017 = c017Res.player === 'player1' ? 'player1Characters' : 'player2Characters';
           m017[side017] = m017[side017].map((c: CharacterInPlay) =>
-            c.instanceId === pendingEffect.sourceInstanceId ? { ...c, powerTokens: c.powerTokens + 3 } : c
+            c.instanceId === pendingEffect.sourceInstanceId ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 3) } : c
           );
           missions017[c017Res.missionIndex] = m017;
           newState = { ...newState, activeMissions: missions017 };
@@ -3044,7 +3045,7 @@ export class EffectEngine {
         const m019 = { ...missions019[i019Res.missionIndex] };
         const side019 = i019Res.player === 'player1' ? 'player1Characters' : 'player2Characters';
         m019[side019] = m019[side019].map((c: CharacterInPlay) =>
-          c.instanceId === pendingEffect.sourceInstanceId ? { ...c, powerTokens: c.powerTokens + 1 } : c
+          c.instanceId === pendingEffect.sourceInstanceId ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 1) } : c
         );
         missions019[i019Res.missionIndex] = m019;
         newState = { ...newState, activeMissions: missions019 };
@@ -4367,7 +4368,7 @@ export class EffectEngine {
         const chars_rl038 = [...m_rl038[rl038Side]];
         const idx_rl038 = chars_rl038.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
         if (idx_rl038 !== -1) {
-          chars_rl038[idx_rl038] = { ...chars_rl038[idx_rl038], powerTokens: chars_rl038[idx_rl038].powerTokens + 1 };
+          chars_rl038[idx_rl038] = { ...chars_rl038[idx_rl038], powerTokens: chars_rl038[idx_rl038].powerTokens + amplifiedPowerup(state, chars_rl038[idx_rl038].instanceId, 1) };
           m_rl038[rl038Side] = chars_rl038;
           missions_rl038[rl038MI] = m_rl038;
           newState = { ...newState, activeMissions: missions_rl038 };
@@ -4388,7 +4389,7 @@ export class EffectEngine {
         const chars_rl039 = [...m_rl039[rl039Side]];
         const idx_rl039 = chars_rl039.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
         if (idx_rl039 !== -1) {
-          chars_rl039[idx_rl039] = { ...chars_rl039[idx_rl039], powerTokens: chars_rl039[idx_rl039].powerTokens + 2 };
+          chars_rl039[idx_rl039] = { ...chars_rl039[idx_rl039], powerTokens: chars_rl039[idx_rl039].powerTokens + amplifiedPowerup(state, chars_rl039[idx_rl039].instanceId, 2) };
           m_rl039[rl039Side] = chars_rl039;
           missions_rl039[rl039MI] = m_rl039;
           newState = { ...newState, activeMissions: missions_rl039 };
@@ -4486,7 +4487,7 @@ export class EffectEngine {
             const tt041uM = { ...tt041uMissions[tt041uRes.missionIndex] };
             const tt041uKey = tt041uRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
             tt041uM[tt041uKey] = tt041uM[tt041uKey].map((c: CharacterInPlay) =>
-              c.instanceId === tt041uTargets[0] ? { ...c, powerTokens: c.powerTokens + 1 } : c
+              c.instanceId === tt041uTargets[0] ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 1) } : c
             );
             tt041uMissions[tt041uRes.missionIndex] = tt041uM;
             newState = { ...newState, activeMissions: tt041uMissions };
@@ -4533,7 +4534,7 @@ export class EffectEngine {
         const chars_g043 = [...m_g043[g043Side]];
         const idx_g043 = chars_g043.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
         if (idx_g043 !== -1) {
-          chars_g043[idx_g043] = { ...chars_g043[idx_g043], powerTokens: chars_g043[idx_g043].powerTokens + 3 };
+          chars_g043[idx_g043] = { ...chars_g043[idx_g043], powerTokens: chars_g043[idx_g043].powerTokens + amplifiedPowerup(state, chars_g043[idx_g043].instanceId, 3) };
           m_g043[g043Side] = chars_g043;
           missions_g043[g043MI] = m_g043;
           newState = { ...newState, activeMissions: missions_g043 };
@@ -5006,7 +5007,7 @@ export class EffectEngine {
         const chars_kb054u = [...m_kb054u[kb054uSide]];
         const idx_kb054u = chars_kb054u.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
         if (idx_kb054u !== -1) {
-          chars_kb054u[idx_kb054u] = { ...chars_kb054u[idx_kb054u], powerTokens: chars_kb054u[idx_kb054u].powerTokens + 1 };
+          chars_kb054u[idx_kb054u] = { ...chars_kb054u[idx_kb054u], powerTokens: chars_kb054u[idx_kb054u].powerTokens + amplifiedPowerup(state, chars_kb054u[idx_kb054u].instanceId, 1) };
           m_kb054u[kb054uSide] = chars_kb054u;
           missions_kb054u[kb054uMI] = m_kb054u;
           newState = { ...newState, activeMissions: missions_kb054u };
@@ -5366,7 +5367,7 @@ export class EffectEngine {
         const chars_j057 = [...m_j057[j057Side]];
         const idx_j057 = chars_j057.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
         if (idx_j057 !== -1) {
-          chars_j057[idx_j057] = { ...chars_j057[idx_j057], powerTokens: chars_j057[idx_j057].powerTokens + j057Count };
+          chars_j057[idx_j057] = { ...chars_j057[idx_j057], powerTokens: chars_j057[idx_j057].powerTokens + amplifiedPowerup(state, chars_j057[idx_j057].instanceId, j057Count) };
           m_j057[j057Side] = chars_j057;
           missions_j057[j057MI] = m_j057;
           newState = { ...newState, activeMissions: missions_j057 };
@@ -5409,7 +5410,7 @@ export class EffectEngine {
           const chars = [...m[j058FriendlySide]];
           const idx = chars.findIndex((c: CharacterInPlay) => c.instanceId === t.instanceId);
           if (idx !== -1) {
-            chars[idx] = { ...chars[idx], powerTokens: chars[idx].powerTokens + 1 };
+            chars[idx] = { ...chars[idx], powerTokens: chars[idx].powerTokens + amplifiedPowerup(state, chars[idx].instanceId, 1) };
             m[j058FriendlySide] = chars;
             missions_j058[t.missionIndex] = m;
           }
@@ -5454,7 +5455,7 @@ export class EffectEngine {
           const chars = [...m[j058uFriendlySide]];
           const idx = chars.findIndex((c: CharacterInPlay) => c.instanceId === t.instanceId);
           if (idx !== -1) {
-            chars[idx] = { ...chars[idx], powerTokens: chars[idx].powerTokens + 1 };
+            chars[idx] = { ...chars[idx], powerTokens: chars[idx].powerTokens + amplifiedPowerup(state, chars[idx].instanceId, 1) };
             m[j058uFriendlySide] = chars;
             missions_j058u[t.missionIndex] = m;
           }
@@ -5872,9 +5873,9 @@ export class EffectEngine {
           newState.activeMissions = newState.activeMissions.map((m) => ({
             ...m,
             player1Characters: m.player1Characters.map((c: CharacterInPlay) =>
-              c.instanceId === t065aTargetId ? { ...c, powerTokens: c.powerTokens + 2 } : c),
+              c.instanceId === t065aTargetId ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 2) } : c),
             player2Characters: m.player2Characters.map((c: CharacterInPlay) =>
-              c.instanceId === t065aTargetId ? { ...c, powerTokens: c.powerTokens + 2 } : c),
+              c.instanceId === t065aTargetId ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 2) } : c),
           }));
           const t065aChar = EffectEngine.findCharByInstanceId(newState, t065aTargetId);
           const t065aName = t065aChar ? t065aChar.character.card.name_fr : 'unknown';
@@ -6140,6 +6141,10 @@ export class EffectEngine {
       case 'SS099_CONFIRM_MAIN':
       case 'SS049_CONFIRM_FIRST_STRIKE':
       case 'SS006_CONFIRM_AMBUSH':
+      case 'SS123MV_CONFIRM_DUEL':
+      case 'SS118_CONFIRM_AMBUSH':
+      case 'SS118_CONFIRM_DUEL':
+      case 'SS137MV_CONFIRM_UPGRADE':
       case 'MINATO122_CONFIRM_MAIN': {
         let relay: { nextType?: string; targets?: string[]; nextKey?: string; nextText?: string } = {};
         try { relay = JSON.parse(pendingEffect.effectDescription); } catch {}
@@ -6194,7 +6199,7 @@ export class EffectEngine {
             'game.log.effect.noTarget', { card: 'CURRY DE LA VIE', id: 'SS-082-C' });
           break;
         }
-        s082Chars[s082Idx] = { ...s082Chars[s082Idx], powerTokens: s082Chars[s082Idx].powerTokens + 3 };
+        s082Chars[s082Idx] = { ...s082Chars[s082Idx], powerTokens: s082Chars[s082Idx].powerTokens + amplifiedPowerup(state, s082Chars[s082Idx].instanceId, 3) };
         s082Missions[pendingEffect.sourceMissionIndex] = { ...s082Mission, [s082Side]: s082Chars };
         newState.activeMissions = s082Missions;
         const s082Top = s082Chars[s082Idx].stack?.length > 0
@@ -7599,7 +7604,7 @@ export class EffectEngine {
         const chars_z071u = [...m_z071u[z071uSide]];
         const idx_z071u = chars_z071u.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
         if (idx_z071u !== -1) {
-          chars_z071u[idx_z071u] = { ...chars_z071u[idx_z071u], powerTokens: chars_z071u[idx_z071u].powerTokens + 2 };
+          chars_z071u[idx_z071u] = { ...chars_z071u[idx_z071u], powerTokens: chars_z071u[idx_z071u].powerTokens + amplifiedPowerup(state, chars_z071u[idx_z071u].instanceId, 2) };
           m_z071u[z071uSide] = chars_z071u;
           missions_z071u[z071uMI] = m_z071u;
           newState = { ...newState, activeMissions: missions_z071u };
@@ -7722,6 +7727,52 @@ export class EffectEngine {
         break;
       }
 
+      case 'SS005_CONFIRM_MAIN':
+      case 'SS005_CONFIRM_AMBUSH': {
+        const n5Player = pendingEffect.sourcePlayer;
+        const n5Ps = newState[n5Player];
+
+        if (n5Ps.deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, n5Player,
+            'EFFECT_NO_TARGET', 'Naruto Uzumaki (SS-005): the deck is empty (state changed).',
+            'game.log.effect.noTarget', { card: NARUTO_005_NAME, id: NARUTO_005_ID });
+          break;
+        }
+
+        const n5Mission = pendingEffect.sourceMissionIndex;
+        const n5Deck = [...n5Ps.deck];
+        const n5Card = n5Deck.shift()!;
+        newState = { ...newState, [n5Player]: { ...n5Ps, deck: n5Deck } };
+
+        const n5Side: 'player1Characters' | 'player2Characters' =
+          n5Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const n5Missions = [...newState.activeMissions];
+        const n5MissionCopy = { ...n5Missions[n5Mission] };
+        n5MissionCopy[n5Side] = [...n5MissionCopy[n5Side], {
+          card: n5Card,
+          isHidden: true,
+          powerTokens: 0,
+          stack: [n5Card],
+          controlledBy: n5Player,
+          originalOwner: n5Player,
+          instanceId: generateInstanceId(),
+          wasRevealedAtLeastOnce: false,
+          missionIndex: n5Mission,
+        } as CharacterInPlay];
+        n5Missions[n5Mission] = n5MissionCopy;
+        newState = { ...newState, activeMissions: n5Missions };
+        newState[n5Player] = {
+          ...newState[n5Player],
+          charactersInPlay: EffectEngine.countCharsForPlayer(newState, n5Player),
+        };
+
+        newState.log = logAction(newState.log, newState.turn, newState.phase, n5Player,
+          'EFFECT', 'Naruto Uzumaki (SS-005): placed the top card of the deck as a hidden character.',
+          'game.log.effect.placeHidden',
+          { card: NARUTO_005_NAME, id: NARUTO_005_ID, mission: String(n5Mission + 1) });
+        break;
+      }
+
       case 'KIN073_CONFIRM_UPGRADE': {
         
         const k073uPlayer = pendingEffect.sourcePlayer;
@@ -7791,7 +7842,7 @@ export class EffectEngine {
         const chars_g074 = [...m_g074[g074Side]];
         const idx_g074 = chars_g074.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
         if (idx_g074 !== -1) {
-          chars_g074[idx_g074] = { ...chars_g074[idx_g074], powerTokens: chars_g074[idx_g074].powerTokens + g074HiddenCount };
+          chars_g074[idx_g074] = { ...chars_g074[idx_g074], powerTokens: chars_g074[idx_g074].powerTokens + amplifiedPowerup(state, chars_g074[idx_g074].instanceId, g074HiddenCount) };
           m_g074[g074Side] = chars_g074;
           missions_g074[g074MI] = m_g074;
           newState = { ...newState, activeMissions: missions_g074 };
@@ -8602,7 +8653,7 @@ export class EffectEngine {
             charResult104u.player === 'player1' ? 'player1Characters' : 'player2Characters';
           mission104u[side104u] = mission104u[side104u].map((c: CharacterInPlay) =>
             c.instanceId === pendingEffect.sourceInstanceId
-              ? { ...c, powerTokens: c.powerTokens + mainSpent }
+              ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, mainSpent) }
               : c,
           );
           missions104u[charResult104u.missionIndex] = mission104u;
@@ -9667,7 +9718,7 @@ export class EffectEngine {
             h114CharRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
           h114Mission[h114Side] = h114Mission[h114Side].map((c: CharacterInPlay) =>
             c.instanceId === pendingEffect.sourceInstanceId
-              ? { ...c, powerTokens: c.powerTokens + 2 }
+              ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 2) }
               : c,
           );
           h114Missions[h114CharRes.missionIndex] = h114Mission;
@@ -9953,7 +10004,7 @@ export class EffectEngine {
               rl117CharRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
             rl117Mission[rl117Side] = rl117Mission[rl117Side].map((c: CharacterInPlay) =>
               c.instanceId === pendingEffect.sourceInstanceId
-                ? { ...c, powerTokens: c.powerTokens + rl117Cost }
+                ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, rl117Cost) }
                 : c,
             );
             rl117Missions[rl117CharRes.missionIndex] = rl117Mission;
@@ -10233,7 +10284,7 @@ export class EffectEngine {
           if (j122mSelfIdx !== -1) {
             j122mChars[j122mSelfIdx] = {
               ...j122mChars[j122mSelfIdx],
-              powerTokens: j122mChars[j122mSelfIdx].powerTokens + j122mTotal,
+              powerTokens: j122mChars[j122mSelfIdx].powerTokens + amplifiedPowerup(state, j122mChars[j122mSelfIdx].instanceId, j122mTotal),
             };
             j122mM[j122mFriendly] = j122mChars;
             j122mMissions[j122mMI] = j122mM;
@@ -10499,7 +10550,7 @@ export class EffectEngine {
             if (c.instanceId === pendingEffect.sourceInstanceId) continue;
             const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             if (topCard.group === 'Leaf Village') {
-              chars[j] = { ...c, powerTokens: c.powerTokens + 1 };
+              chars[j] = { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 1) };
               t131Count++;
               changed = true;
             }
@@ -14447,7 +14498,7 @@ export class EffectEngine {
           const s146Chars = [...s146Mission[s146Side]];
           const s146SelfIdx = s146Chars.findIndex((c) => c.instanceId === pendingEffect.sourceInstanceId);
           if (s146SelfIdx !== -1) {
-            s146Chars[s146SelfIdx] = { ...s146Chars[s146SelfIdx], powerTokens: s146Chars[s146SelfIdx].powerTokens + 3 };
+            s146Chars[s146SelfIdx] = { ...s146Chars[s146SelfIdx], powerTokens: s146Chars[s146SelfIdx].powerTokens + amplifiedPowerup(state, s146Chars[s146SelfIdx].instanceId, 3) };
             s146Mission[s146Side] = s146Chars;
             s146Missions[s146MI] = s146Mission;
             newState = {
@@ -14552,7 +14603,7 @@ export class EffectEngine {
         const chars146 = [...mission146[friendlySide146]];
         const selfIdx146 = chars146.findIndex((c) => c.instanceId === pendingEffect.sourceInstanceId);
         if (selfIdx146 !== -1) {
-          chars146[selfIdx146] = { ...chars146[selfIdx146], powerTokens: chars146[selfIdx146].powerTokens + 3 };
+          chars146[selfIdx146] = { ...chars146[selfIdx146], powerTokens: chars146[selfIdx146].powerTokens + amplifiedPowerup(state, chars146[selfIdx146].instanceId, 3) };
           mission146[friendlySide146] = chars146;
           missions146[mIdx146] = mission146;
           newState = {
@@ -15226,7 +15277,7 @@ export class EffectEngine {
               rhPs.chakra -= rhFreshCost;
               rhChar.character.isHidden = false;
               rhChar.character.wasRevealedAtLeastOnce = true;
-              if (rhPowerUp > 0) rhChar.character.powerTokens += rhPowerUp;
+              if (rhPowerUp > 0) rhChar.character.powerTokens += amplifiedPowerup(newState, rhChar.character.instanceId, rhPowerUp);
               
               const rhMission = newState.activeMissions[rhChar.missionIndex];
               const rhSide = rhPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -15251,7 +15302,7 @@ export class EffectEngine {
               
               rhChar.character.isHidden = false;
               rhChar.character.wasRevealedAtLeastOnce = true;
-              if (rhPowerUp > 0) rhChar.character.powerTokens += rhPowerUp;
+              if (rhPowerUp > 0) rhChar.character.powerTokens += amplifiedPowerup(newState, rhChar.character.instanceId, rhPowerUp);
               const rhMIdx = rhChar.missionIndex;
               const rhSide = rhPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
               const rhMission = newState.activeMissions[rhMIdx];
@@ -15642,7 +15693,7 @@ export class EffectEngine {
           const m_ak = { ...missions_ak[akRes.missionIndex] };
           const side_ak = akRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
           m_ak[side_ak] = m_ak[side_ak].map((c: CharacterInPlay) =>
-            c.instanceId === targetId ? { ...c, powerTokens: c.powerTokens + 2 } : c
+            c.instanceId === targetId ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 2) } : c
           );
           missions_ak[akRes.missionIndex] = m_ak;
           newState = { ...newState, activeMissions: missions_ak };
@@ -15656,7 +15707,7 @@ export class EffectEngine {
           const m_tay = { ...missions_tay[tayRes.missionIndex] };
           const side_tay = tayRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
           m_tay[side_tay] = m_tay[side_tay].map((c: CharacterInPlay) =>
-            c.instanceId === targetId ? { ...c, powerTokens: c.powerTokens + 2 } : c
+            c.instanceId === targetId ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 2) } : c
           );
           missions_tay[tayRes.missionIndex] = m_tay;
           newState = { ...newState, activeMissions: missions_tay };
@@ -15670,7 +15721,7 @@ export class EffectEngine {
           const m_tt = { ...missions_tt[ttRes.missionIndex] };
           const side_tt = ttRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
           m_tt[side_tt] = m_tt[side_tt].map((c: CharacterInPlay) =>
-            c.instanceId === targetId ? { ...c, powerTokens: c.powerTokens + 1 } : c
+            c.instanceId === targetId ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 1) } : c
           );
           missions_tt[ttRes.missionIndex] = m_tt;
           newState = { ...newState, activeMissions: missions_tt };
@@ -15733,7 +15784,7 @@ export class EffectEngine {
               const m_as = { ...missions_as[srcRes.missionIndex] };
               const side_as = srcRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
               m_as[side_as] = m_as[side_as].map((c: CharacterInPlay) =>
-                c.instanceId === pendingEffect.sourceInstanceId ? { ...c, powerTokens: c.powerTokens + 3 } : c
+                c.instanceId === pendingEffect.sourceInstanceId ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 3) } : c
               );
               missions_as[srcRes.missionIndex] = m_as;
               newState = { ...newState, activeMissions: missions_as };
@@ -17093,6 +17144,143 @@ export class EffectEngine {
         break;
       }
 
+      case 'SS118_REVEAL_DEFEAT': {
+        const s118Found = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!s118Found) break;
+
+        const s118Top = s118Found.character.stack?.length > 0
+          ? s118Found.character.stack[s118Found.character.stack.length - 1]
+          : s118Found.character.card;
+        const s118Name = s118Top.name_fr ?? s118Top.name_en ?? '';
+        const s118Side: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+
+        newState.activeMissions = newState.activeMissions.map((mission, index) => {
+          if (index !== s118Found.missionIndex) return mission;
+          return {
+            ...mission,
+            [s118Side]: mission[s118Side].map((c: CharacterInPlay) => (
+              c.instanceId === targetId
+                ? { ...c, isHidden: false, wasRevealedAtLeastOnce: true }
+                : c
+            )),
+          };
+        });
+
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_REVEAL',
+          `Shikamaru Nara (SS-118) AMBUSH: revealed ${s118Name}.`,
+          'game.log.effect.ss118Reveal',
+          { card: 'SHIKAMARU NARA', id: 'SS-118-CHIBIV', target: s118Name, target_en: s118Top.name_en ?? s118Name },
+        );
+
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT',
+          `Shikamaru Nara (SS-118) AMBUSH: defeated ${s118Name}.`,
+          'game.log.effect.defeat',
+          { card: 'SHIKAMARU NARA', id: 'SS-118-CHIBIV', target: s118Name, target_en: s118Top.name_en ?? s118Name },
+        );
+
+        const s118SourceSide: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        newState.activeMissions = newState.activeMissions.map((mission) => ({
+          ...mission,
+          [s118SourceSide]: mission[s118SourceSide].map((c: CharacterInPlay) => (
+            c.instanceId === pendingEffect.sourceInstanceId
+              ? { ...c, ss118RevealedName: s118Name }
+              : c
+          )),
+        }));
+        break;
+      }
+
+      case 'SS118_HIDE_SAME_NAME': {
+        const s118HideTarget = EffectEngine.findCharByInstanceId(newState, targetId);
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        if (s118HideTarget) {
+          const s118HideTop = s118HideTarget.character.stack?.length > 0
+            ? s118HideTarget.character.stack[s118HideTarget.character.stack.length - 1]
+            : s118HideTarget.character.card;
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_HIDE',
+            `Shikamaru Nara (SS-118) DUEL: hid ${s118HideTop.name_fr}.`,
+            'game.log.effect.ss118HideSameName',
+            {
+              card: 'SHIKAMARU NARA', id: 'SS-118-CHIBIV',
+              target: s118HideTop.name_fr, target_en: s118HideTop.name_en ?? s118HideTop.name_fr,
+            },
+          );
+        }
+        break;
+      }
+
+      case 'SS123MV_TAKE_BACK': {
+        const backChar = EffectEngine.findCharByInstanceId(newState, targetId);
+        newState = EffectEngine.returnControlToOwner(newState, targetId);
+        if (backChar) {
+          const backTop = backChar.character.stack?.length > 0
+            ? backChar.character.stack[backChar.character.stack.length - 1]
+            : backChar.character.card;
+          const backName = backChar.character.isHidden ? '' : backTop.name_fr;
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT', 'Sakura Haruno (SS-123) DUEL: took back control of a character.',
+            backChar.character.isHidden ? 'game.log.effect.ss123MvTakeBackHidden' : 'game.log.effect.ss123MvTakeBack',
+            { card: 'SAKURA HARUNO', id: 'SS-123-MV', target: backName, target_en: backChar.character.isHidden ? '' : (backTop.name_en || backTop.name_fr) },
+          );
+        }
+        break;
+      }
+
+      case 'SS137MV_RETURN_HIDDEN': {
+        newState = returnCharacterToHand(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_RETURN_TO_HAND',
+          'Itachi Uchiha (SS-137) UPGRADE: returned a friendly hidden character to hand.',
+          'game.log.effect.ss137MvReturnHidden',
+          { card: 'ITACHI UCHIHA', id: 'SS-137-MV' },
+        );
+        break;
+      }
+
+      case 'SS137MV_CONFIRM_DUEL': {
+        let itaDuelData: { missionIndex?: number } = {};
+        try { itaDuelData = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const itaMissionIdx = itaDuelData.missionIndex ?? pendingEffect.sourceMissionIndex;
+        newState = EffectEngine.queueItachi137MvDefeat(newState, pendingEffect, itaMissionIdx);
+        break;
+      }
+
+      case 'SS137MV_OPPONENT_CHOOSE_DEFEAT': {
+        let itaChain: { missionIndex?: number; sourcePlayer?: string } = {};
+        try { itaChain = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const itaChainMission = itaChain.missionIndex ?? pendingEffect.sourceMissionIndex;
+        const itaOwner = (itaChain.sourcePlayer ?? pendingEffect.sourcePlayer) as PlayerID;
+
+        const itaVictim = EffectEngine.findCharByInstanceId(newState, targetId);
+        const itaVictimTop = itaVictim
+          ? (itaVictim.character.stack?.length > 0
+            ? itaVictim.character.stack[itaVictim.character.stack.length - 1]
+            : itaVictim.character.card)
+          : null;
+        newState = EffectEngine.defeatCharacter(newState, targetId, itaOwner);
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, itaOwner,
+          'EFFECT_DEFEAT',
+          `Itachi Uchiha (SS-137) DUEL: opponent defeated one of their characters.`,
+          'game.log.effect.ss137MvDuelDefeat',
+          { card: 'ITACHI UCHIHA', id: 'SS-137-MV', target: itaVictimTop?.name_fr ?? '', target_en: itaVictimTop?.name_en ?? itaVictimTop?.name_fr ?? '' },
+        );
+
+        newState = EffectEngine.queueItachi137MvDefeat(newState, pendingEffect, itaChainMission, itaOwner);
+        break;
+      }
+
       case 'GAARA120_CHOOSE_DEFEAT': {
         
         let gaaraDesc: { defeatedCount?: number; nextMissionIndex?: number; isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number; missionIndex?: number; pendingIds?: string[] } = {};
@@ -17249,7 +17437,7 @@ export class EffectEngine {
             const g120uChars = [...g120uMission[g120uFriendlySide]];
             const g120uIdx = g120uChars.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
             if (g120uIdx !== -1) {
-              g120uChars[g120uIdx] = { ...g120uChars[g120uIdx], powerTokens: g120uChars[g120uIdx].powerTokens + g120uCount };
+              g120uChars[g120uIdx] = { ...g120uChars[g120uIdx], powerTokens: g120uChars[g120uIdx].powerTokens + amplifiedPowerup(state, g120uChars[g120uIdx].instanceId, g120uCount) };
               g120uMission[g120uFriendlySide] = g120uChars;
               const g120uMissions = [...newState.activeMissions];
               g120uMissions[g120uMI] = g120uMission;
@@ -17285,7 +17473,7 @@ export class EffectEngine {
               charResult104.player === 'player1' ? 'player1Characters' : 'player2Characters';
             mission104[side104] = mission104[side104].map((c: CharacterInPlay) =>
               c.instanceId === pendingEffect.sourceInstanceId
-                ? { ...c, powerTokens: c.powerTokens + powerupAmount }
+                ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, powerupAmount) }
                 : c,
             );
             missions104[charResult104.missionIndex] = mission104;
@@ -17527,7 +17715,70 @@ export class EffectEngine {
     };
   }
 
-  static applyPowerupToTarget(state: GameState, targetId: string, amount: number): GameState {
+  static queueItachi137MvDefeat(
+    state: GameState,
+    pendingEffect: PendingEffect,
+    missionIndex: number,
+    sourcePlayerOverride?: PlayerID,
+  ): GameState {
+    const owner = sourcePlayerOverride ?? pendingEffect.sourcePlayer;
+    const opponent: PlayerID = owner === 'player1' ? 'player2' : 'player1';
+    const mission = state.activeMissions[missionIndex];
+    if (!mission) return state;
+
+    const ownSide: 'player1Characters' | 'player2Characters' =
+      owner === 'player1' ? 'player1Characters' : 'player2Characters';
+    const enemySide: 'player1Characters' | 'player2Characters' =
+      owner === 'player1' ? 'player2Characters' : 'player1Characters';
+
+    const surplus = mission[enemySide].length - mission[ownSide].length;
+    if (surplus <= 0) return state;
+
+    const defeatable = mission[enemySide].filter((c: CharacterInPlay) => !isImmuneToEnemyHideOrDefeat(c));
+    if (defeatable.length === 0) return state;
+
+    const newState = { ...state };
+    newState.pendingForcedResolver = opponent;
+
+    const chainData = JSON.stringify({ missionIndex, sourcePlayer: owner });
+    const effectId = generateInstanceId();
+    const actionId = generateInstanceId();
+
+    newState.pendingEffects = [...newState.pendingEffects, {
+      id: effectId,
+      sourceCardId: pendingEffect.sourceCardId,
+      sourceInstanceId: pendingEffect.sourceInstanceId,
+      sourceMissionIndex: pendingEffect.sourceMissionIndex,
+      effectType: pendingEffect.effectType,
+      effectDescription: chainData,
+      targetSelectionType: 'SS137MV_OPPONENT_CHOOSE_DEFEAT',
+      sourcePlayer: owner,
+      requiresTargetSelection: true,
+      validTargets: defeatable.map((c: CharacterInPlay) => c.instanceId),
+      isOptional: false,
+      isMandatory: true,
+      resolved: false,
+      isUpgrade: pendingEffect.isUpgrade,
+    }];
+
+    newState.pendingActions = [...newState.pendingActions, {
+      id: actionId,
+      type: 'SELECT_TARGET' as PendingAction['type'],
+      player: opponent,
+      description: `Itachi Uchiha (SS-137) DUEL: choose one of your characters to defeat in this mission (${surplus} too many).`,
+      descriptionKey: 'game.effect.desc.ss137MvOpponentChooseDefeat',
+      descriptionParams: { count: String(surplus) },
+      options: defeatable.map((c: CharacterInPlay) => c.instanceId),
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effectId,
+    }];
+
+    return newState;
+  }
+
+  static applyPowerupToTarget(state: GameState, targetId: string, rawAmount: number): GameState {
+    const amount = amplifiedPowerup(state, targetId, rawAmount);
     const newState = { ...state };
     newState.activeMissions = state.activeMissions.map((mission) => ({
       ...mission,
@@ -18339,6 +18590,82 @@ export class EffectEngine {
   }
 
   
+  static returnControlToOwner(state: GameState, instanceId: string): GameState {
+    const newState = deepClone(state);
+    
+    let currentMission: (typeof newState.activeMissions)[number] | null = null;
+    let char: CharacterInPlay | null = null;
+    let fromSide: 'player1Characters' | 'player2Characters' | null = null;
+    let idx = -1;
+
+    for (const mission of newState.activeMissions) {
+      for (const side of ['player1Characters', 'player2Characters'] as const) {
+        const i = mission[side].findIndex((c: CharacterInPlay) => c.instanceId === instanceId);
+        if (i >= 0) {
+          currentMission = mission;
+          char = mission[side][i];
+          fromSide = side;
+          idx = i;
+          break;
+        }
+      }
+      if (char) break;
+    }
+
+    if (!currentMission || !char || !fromSide || idx === -1) return state;
+    const foundChar: CharacterInPlay = char;
+    const foundMission = currentMission;
+
+          const toSide = foundChar.originalOwner === 'player1' ? 'player1Characters' : 'player2Characters';
+
+          
+          const topCardCtrl = foundChar.stack?.length > 0 ? foundChar.stack[foundChar.stack?.length - 1] : foundChar.card;
+          const charName = topCardCtrl.name_fr.toUpperCase();
+          const hasSameName = foundMission[toSide].some(
+            (c: CharacterInPlay) => {
+              if (c.isHidden || c.instanceId === foundChar.instanceId) return false;
+              const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+              return cTop.name_fr.toUpperCase() === charName;
+            }
+          );
+          if (hasSameName && !foundChar.isHidden) {
+            
+            
+            
+            const removed = foundMission[fromSide].splice(idx, 1)[0];
+            for (let si = 0; si < removed.stack.length; si++) {
+              const card = removed.stack[si];
+              newState[removed.originalOwner].discardPile.push({ ...card, instanceId: removed.instanceId + (si > 0 ? `-stack-${si}` : '') } as any);
+            }
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, foundChar.originalOwner,
+              'EFFECT', `${topCardCtrl.name_en || topCardCtrl.name_fr} returned to owner but same name already in play, discarded (No Repetition).`,
+              'game.log.effect.controlReturnedConflict',
+              { card: topCardCtrl.name_fr, card_en: topCardCtrl.name_en || topCardCtrl.name_fr, target: topCardCtrl.name_fr, target_en: topCardCtrl.name_en || topCardCtrl.name_fr },
+            );
+          } else {
+            
+            
+            
+            
+            const removed = foundMission[fromSide].splice(idx, 1)[0];
+            removed.controlledBy = removed.originalOwner;
+            removed.controllerInstanceId = undefined;
+            foundMission[toSide].push(removed);
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, foundChar.originalOwner,
+              'EFFECT', `${topCardCtrl.name_en || topCardCtrl.name_fr} returned to original owner (controller left play).`,
+              'game.log.effect.controlReturned',
+              { card: topCardCtrl.name_fr, card_en: topCardCtrl.name_en || topCardCtrl.name_fr },
+            );
+          }
+
+    newState.player1.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player1');
+    newState.player2.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player2');
+
+    return newState;
+  }
+
   static restoreControlOnLeave(state: GameState, controllerInstanceId: string): GameState {
     
     const controlledChars: { instanceId: string; missionIndex: number }[] = [];
@@ -18356,74 +18683,10 @@ export class EffectEngine {
     if (controlledChars.length === 0) return state;
     console.log(`[restoreControlOnLeave] Controller ${controllerInstanceId} leaving, returning ${controlledChars.length} controlled character(s)`);
 
-    let newState = deepClone(state);
+    let newState = state;
 
     for (const { instanceId } of controlledChars) {
-      
-      let currentMission: (typeof newState.activeMissions)[number] | null = null;
-      let char: CharacterInPlay | null = null;
-      let fromSide: 'player1Characters' | 'player2Characters' | null = null;
-      let idx = -1;
-
-      for (const mission of newState.activeMissions) {
-        for (const side of ['player1Characters', 'player2Characters'] as const) {
-          const i = mission[side].findIndex((c: CharacterInPlay) => c.instanceId === instanceId);
-          if (i >= 0) {
-            currentMission = mission;
-            char = mission[side][i];
-            fromSide = side;
-            idx = i;
-            break;
-          }
-        }
-        if (char) break;
-      }
-
-      if (!currentMission || !char || !fromSide || idx === -1) continue;
-
-            const toSide = char.originalOwner === 'player1' ? 'player1Characters' : 'player2Characters';
-
-            
-            const topCardCtrl = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-            const charName = topCardCtrl.name_fr.toUpperCase();
-            const hasSameName = currentMission[toSide].some(
-              (c: CharacterInPlay) => {
-                if (c.isHidden || c.instanceId === char.instanceId) return false;
-                const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-                return cTop.name_fr.toUpperCase() === charName;
-              }
-            );
-            if (hasSameName && !char.isHidden) {
-              
-              
-              
-              const removed = currentMission[fromSide].splice(idx, 1)[0];
-              for (let si = 0; si < removed.stack.length; si++) {
-                const card = removed.stack[si];
-                newState[removed.originalOwner].discardPile.push({ ...card, instanceId: removed.instanceId + (si > 0 ? `-stack-${si}` : '') } as any);
-              }
-              newState.log = logAction(
-                newState.log, newState.turn, newState.phase, char.originalOwner,
-                'EFFECT', `${topCardCtrl.name_en || topCardCtrl.name_fr} returned to owner but same name already in play, discarded (No Repetition).`,
-                'game.log.effect.controlReturnedConflict',
-                { card: topCardCtrl.name_fr, card_en: topCardCtrl.name_en || topCardCtrl.name_fr, target: topCardCtrl.name_fr, target_en: topCardCtrl.name_en || topCardCtrl.name_fr },
-              );
-            } else {
-              
-              
-              
-              
-              const removed = currentMission[fromSide].splice(idx, 1)[0];
-              removed.controlledBy = removed.originalOwner;
-              removed.controllerInstanceId = undefined;
-              currentMission[toSide].push(removed);
-              newState.log = logAction(
-                newState.log, newState.turn, newState.phase, char.originalOwner,
-                'EFFECT', `${topCardCtrl.name_en || topCardCtrl.name_fr} returned to original owner (controller left play).`,
-                'game.log.effect.controlReturned',
-                { card: topCardCtrl.name_fr, card_en: topCardCtrl.name_en || topCardCtrl.name_fr },
-              );
-            }
+      newState = EffectEngine.returnControlToOwner(newState, instanceId);
     }
 
     newState.player1.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player1');
@@ -18703,7 +18966,7 @@ export class EffectEngine {
       if (selfIdx !== -1) {
         friendlyChars[selfIdx] = {
           ...friendlyChars[selfIdx],
-          powerTokens: friendlyChars[selfIdx].powerTokens + targetPower,
+          powerTokens: friendlyChars[selfIdx].powerTokens + amplifiedPowerup(newState, friendlyChars[selfIdx].instanceId, targetPower),
         };
         mission[friendlySideKey] = friendlyChars;
         missions[pending.sourceMissionIndex] = mission;
@@ -19653,7 +19916,7 @@ export class EffectEngine {
         mission[friendlySide] = [...mission[friendlySide]];
         mission[friendlySide][charIdx] = {
           ...mission[friendlySide][charIdx],
-          powerTokens: mission[friendlySide][charIdx].powerTokens + powerupAmount,
+          powerTokens: mission[friendlySide][charIdx].powerTokens + amplifiedPowerup(newState, mission[friendlySide][charIdx].instanceId, powerupAmount),
         };
         newState.activeMissions = [...newState.activeMissions];
         newState.activeMissions[missionIndex] = { ...mission };
@@ -21109,7 +21372,7 @@ export class EffectEngine {
         const chars = [...mission[friendlySide]];
         const selfIdx = chars.findIndex(c => c.instanceId === pending.sourceInstanceId);
         if (selfIdx !== -1) {
-          chars[selfIdx] = { ...chars[selfIdx], powerTokens: chars[selfIdx].powerTokens + discardedCost };
+          chars[selfIdx] = { ...chars[selfIdx], powerTokens: chars[selfIdx].powerTokens + amplifiedPowerup(newState, chars[selfIdx].instanceId, discardedCost) };
           const newMission = { ...mission, [friendlySide]: chars };
           newState.activeMissions = [...newState.activeMissions];
           newState.activeMissions[charResult.missionIndex] = newMission;
@@ -21810,7 +22073,7 @@ export class EffectEngine {
 
     
     if (powerUpBonus > 0) {
-      char.powerTokens += powerUpBonus;
+      char.powerTokens += amplifiedPowerup(state, char.instanceId, powerUpBonus);
     }
 
     

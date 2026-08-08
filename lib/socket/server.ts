@@ -1,7 +1,7 @@
 import type { Server as SocketIOServer, Socket } from 'socket.io';
 import { decode } from 'next-auth/jwt';
 import { GameEngine } from '@/lib/engine/GameEngine';
-import type { GameState, GameAction, CharacterCard, MissionCard, PlayerConfig, GameConfig, PlayerID, VisibleGameState } from '@/lib/engine/types';
+import type { GameState, GameAction, CharacterCard, MissionCard, PlayerConfig, GameConfig, PlayerID, VisibleGameState, VisibleCharacter } from '@/lib/engine/types';
 import { registerUserSocket, removeSocketFromAll, emitToUser, isUserConnected, getUserSocketIds } from '@/lib/socket/io';
 import {
   resolveSeatBySocket,
@@ -31,6 +31,7 @@ import { computeDeckEvolvingPoints, isEvolvingCompatible } from '@/lib/evolving/
 import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
 import { getOwnedVariantIds } from '@/lib/variants/inventory';
 import { isAdmin } from '@/lib/auth/admins';
+import { canSpectateTournament } from '@/lib/tournament/spectatePolicy';
 import { isHoloId, holoBaseId, holoIdFor, isHoloEligibleCard } from '@/lib/holo/holoId';
 import { packVisibleState } from '@/lib/socket/statePack';
 import { sanitizeUnrevealedForViewer, stateHasUnrevealed } from '@/lib/socket/sanitizeUnrevealed';
@@ -1638,6 +1639,7 @@ export async function maybeStartTournamentGame(
     io.to(room.guestSocket).emit('game:state-update', { visibleState: packVisibleState(p2State), playerRole: 'player2', playerNames, chessClock });
     io.to(room.hostSocket).emit('game:started');
     io.to(room.guestSocket).emit('game:started');
+    if (room.tournamentId) broadcastTournamentLiveMatches(io, room.tournamentId);
     console.log(`[Socket] Tournament game auto-started in room ${code}`);
 
     if (room.tournamentMatchId) {
@@ -2125,8 +2127,20 @@ async function finalizeGameEnd(
   if (room.guestSocket) {
     io.to(room.guestSocket).emit('game:ended', guestEndPayload);
   }
+  if (room.spectators.size > 0) {
+    io.to(`spec:${room.code}`).emit('spectate:match-ended', {
+      roomCode: room.code,
+      winner,
+      player1Score: p1Score,
+      player2Score: p2Score,
+      winReason,
+      tournamentId: room.tournamentId ?? null,
+      tournamentMatchId: room.tournamentMatchId ?? null,
+    });
+  }
 
   broadcastActiveGames(io);
+  if (room.tournamentId) broadcastTournamentLiveMatches(io, room.tournamentId);
 
   if (room.hostId && room.guestId && (room.hostDeckId || room.guestDeckId)) {
     const p1Result: 'win' | 'loss' | 'draw' = winner === 'player1' ? 'win' : winner === 'player2' ? 'loss' : 'draw';
@@ -2596,6 +2610,71 @@ function stateForViewer(state: VisibleGameState, privileged: boolean, hiddenIds:
   return sanitizeUnrevealedForViewer(state, hiddenIds);
 }
 
+function tournamentLiveMatches(tournamentId: string): Array<{
+  roomCode: string;
+  matchId: string | null;
+  player1Name: string;
+  player2Name: string;
+  turn: number;
+  phase: string;
+  spectatorCount: number;
+  startedAt: number;
+}> {
+  const live = [];
+  for (const [, room] of rooms) {
+    if (room.tournamentId !== tournamentId) continue;
+    if (!room.gameState || room.finalized) continue;
+    live.push({
+      roomCode: room.code,
+      matchId: room.tournamentMatchId ?? null,
+      player1Name: room.hostName ?? 'Player 1',
+      player2Name: room.guestName ?? 'Player 2',
+      turn: room.gameState.turn,
+      phase: String(room.gameState.phase),
+      spectatorCount: room.spectators.size,
+      startedAt: room.createdAt,
+    });
+  }
+  return live.sort((a, b) => a.startedAt - b.startedAt);
+}
+
+function broadcastTournamentLiveMatches(io: SocketIOServer, tournamentId: string): void {
+  io.to(`tournament:${tournamentId}`).emit('tournament:live-matches', {
+    tournamentId,
+    matches: tournamentLiveMatches(tournamentId),
+  });
+}
+
+function buildSpectatorState(room: RoomData, hiddenIds: Set<string>): VisibleGameState {
+  const p1State = GameEngine.getVisibleStateForTransport(room.gameState!, 'player1');
+  const maskHidden = (chars: VisibleCharacter[]): VisibleCharacter[] => chars.map(
+    (c) => (c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
+  );
+  const spectatorState = {
+    ...p1State,
+    activeMissions: p1State.activeMissions.map((m) => ({
+      ...m,
+      player1Characters: maskHidden(m.player1Characters),
+      player2Characters: maskHidden(m.player2Characters),
+    })),
+    myState: {
+      ...p1State.myState,
+      hand: [],
+      handSize: room.gameState!.player1.hand.length,
+      deck: [],
+      missionCards: [],
+      unusedMission: null,
+      userId: null,
+    },
+    opponentState: {
+      ...p1State.opponentState,
+      hand: [],
+      handSize: room.gameState!.player2.hand.length,
+    },
+  } as VisibleGameState;
+  return stateForViewer(spectatorState, false, hiddenIds);
+}
+
 function broadcastState(room: RoomData, io: SocketIOServer): void {
   if (!room.gameState) return;
   ensureRevealMeta(room);
@@ -2634,37 +2713,8 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
 
     
     if (room.spectators.size > 0) {
-      
-      const specMissions = p1State.activeMissions.map((m: any) => ({
-        ...m,
-        player1Characters: m.player1Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce
-          ? { ...c, card: undefined, topCard: undefined, isOwn: false }
-          : c
-        ),
-        player2Characters: m.player2Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce
-          ? { ...c, card: undefined, topCard: undefined, isOwn: false }
-          : c
-        ),
-      }));
-      
-      const p1HandSize = room.gameState.player1.hand.length;
-      const p2HandSize = room.gameState.player2.hand.length;
-      const spectatorState = {
-        ...p1State,
-        activeMissions: specMissions,
-        myState: {
-          ...p1State.myState,
-          hand: [],
-          handSize: p1HandSize,
-        },
-        opponentState: {
-          ...p1State.opponentState,
-          hand: [],
-          handSize: p2HandSize,
-        },
-      };
       io.to(`spec:${room.code}`).emit('spectate:state-update', {
-        visibleState: packVisibleState(stateForViewer(spectatorState, false, hiddenIds)),
+        visibleState: packVisibleState(buildSpectatorState(room, hiddenIds)),
         playerNames,
         spectatorCount: room.spectators.size,
         roomCode: room.code,
@@ -4612,7 +4662,19 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-      if (room.isPrivate && room.hostId !== authedUserId && room.guestId !== authedUserId) {
+      const isSeatedPlayer = room.hostId === authedUserId || room.guestId === authedUserId;
+
+      if (room.tournamentId) {
+        if (isSeatedPlayer) {
+          socket.emit('spectate:error', { message: 'You are playing this match', errorKey: 'spectate.errorPlayerInTournament' });
+          return;
+        }
+        const verdict = await canSpectateTournament(room.tournamentId, authedUserId);
+        if (!verdict.allowed) {
+          socket.emit('spectate:error', { message: 'Tournament players cannot spectate', errorKey: verdict.errorKey });
+          return;
+        }
+      } else if (room.isPrivate && !isSeatedPlayer) {
         socket.emit('spectate:error', { message: 'This is a private game', errorKey: 'spectate.errorPrivate' });
         return;
       }
@@ -4636,24 +4698,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
       try {
         syncChessClock(room);
         startChessClockTickLoop(room, io);
+        ensureRevealMeta(room);
         const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
-        const p1State = GameEngine.getVisibleStateForTransport(room.gameState, 'player1');
-        const specMs = p1State.activeMissions.map((m: any) => ({
-          ...m,
-          player1Characters: m.player1Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
-          player2Characters: m.player2Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
-        }));
-        const p1HandSize = room.gameState!.player1.hand.length;
-        const p2HandSize = room.gameState!.player2.hand.length;
-        const spectatorState = {
-          ...p1State,
-          activeMissions: specMs,
-          myState: { ...p1State.myState, hand: [], handSize: p1HandSize },
-          opponentState: { ...p1State.opponentState, hand: [], handSize: p2HandSize },
-        };
         const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
         socket.emit('spectate:state-update', {
-          visibleState: packVisibleState(spectatorState),
+          visibleState: packVisibleState(buildSpectatorState(room, room.hiddenIdsSnapshot ?? EMPTY_HIDDEN_IDS)),
           playerNames,
           spectatorCount: room.spectators.size,
           roomCode: data.roomCode,
@@ -4703,24 +4752,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
       try {
         syncChessClock(room);
         startChessClockTickLoop(room, io);
+        ensureRevealMeta(room);
         const chessClock = buildChessClockBroadcast(room.chessClock, Date.now());
-        const p1State = GameEngine.getVisibleStateForTransport(room.gameState, 'player1');
-        const specMs = p1State.activeMissions.map((m: any) => ({
-          ...m,
-          player1Characters: m.player1Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
-          player2Characters: m.player2Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
-        }));
-        const p1HandSize = room.gameState!.player1.hand.length;
-        const p2HandSize = room.gameState!.player2.hand.length;
-        const spectatorState = {
-          ...p1State,
-          activeMissions: specMs,
-          myState: { ...p1State.myState, hand: [], handSize: p1HandSize },
-          opponentState: { ...p1State.opponentState, hand: [], handSize: p2HandSize },
-        };
         const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
         socket.emit('spectate:state-update', {
-          visibleState: packVisibleState(spectatorState),
+          visibleState: packVisibleState(buildSpectatorState(room, room.hiddenIdsSnapshot ?? EMPTY_HIDDEN_IDS)),
           playerNames,
           spectatorCount: room.spectators.size,
           roomCode: data.roomCode,
@@ -4976,6 +5012,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(mapped);
       if (!room || !room.guestId) return;
       await emitChatLockStateToRoom(io, room);
+    });
+
+    socket.on('tournament:live-matches', (data: { tournamentId: string }) => {
+      if (!data?.tournamentId) return;
+      socket.emit('tournament:live-matches', {
+        tournamentId: data.tournamentId,
+        matches: tournamentLiveMatches(data.tournamentId),
+      });
     });
 
     socket.on('games:list', () => {

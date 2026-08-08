@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import type { CharacterInPlay } from '@/lib/engine/types';
+import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
 
 
 
@@ -81,7 +82,7 @@ function guy119bUpgradeHandler(ctx: EffectContext): EffectResult {
 
   chars[selfIdx] = {
     ...chars[selfIdx],
-    powerTokens: chars[selfIdx].powerTokens + 3,
+    powerTokens: chars[selfIdx].powerTokens + amplifiedPowerup(state, chars[selfIdx].instanceId, 3),
   };
   mission[friendlySide] = chars;
   missions[sourceMissionIndex] = mission;

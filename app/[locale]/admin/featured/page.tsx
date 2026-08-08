@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { getCardById } from '@/lib/data/cardIndex';
 import { useSession } from 'next-auth/react';
 import { useTranslations, useLocale } from 'next-intl';
@@ -16,6 +16,8 @@ import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 import { isHoloId } from '@/lib/holo/holoId';
 import { holoRarity, type HoloRarity } from '@/lib/cards/holoRarity';
 import { ALL_SET_IDS, getSetName } from '@/lib/data/sets/registry';
+import { facetOptions, facetPool, isFacetWorthShowing } from '@/lib/collection/facets';
+import { useValidFacetSelection } from '@/lib/collection/useFacets';
 import { isAdmin as checkIsAdmin } from '@/lib/auth/admins';
 import type { CardData } from '@/lib/engine/types';
 
@@ -89,22 +91,46 @@ export default function AdminFeaturedPage() {
     return map;
   }, [allPickerCards]);
 
-  const filtered = useMemo(() => {
-    const needle = search.trim().toLowerCase();
-    return allPickerCards.filter((c) => {
-      if (setFilter && c.set !== setFilter) return false;
-      if (rarityFilter && c.rarity !== rarityFilter) return false;
-      if (selectedOnly && !selected.includes(c.id)) return false;
-      if (!needle) return true;
-      return c.label.toLowerCase().includes(needle);
-    });
-  }, [allPickerCards, search, setFilter, rarityFilter, selectedOnly, selected]);
+  const selectedIds = useMemo(() => new Set(selected), [selected]);
+  const searchNeedle = useMemo(() => search.trim().toLowerCase(), [search]);
 
-  const availableRarities = useMemo(() => {
-    const seen = new Set<string>();
-    for (const c of allPickerCards) if (c.rarity) seen.add(c.rarity);
-    return [...seen].sort();
-  }, [allPickerCards]);
+  const facetPredicates = useMemo(() => ({
+    search: (c: PickerCard) => !searchNeedle || c.label.toLowerCase().includes(searchNeedle),
+    set: (c: PickerCard) => !setFilter || c.set === setFilter,
+    rarity: (c: PickerCard) => !rarityFilter || c.rarity === rarityFilter,
+    selectedOnly: (c: PickerCard) => !selectedOnly || selectedIds.has(c.id),
+  }), [searchNeedle, setFilter, rarityFilter, selectedOnly, selectedIds]);
+
+  const filtered = useMemo(
+    () => allPickerCards.filter((c) => Object.values(facetPredicates).every((match) => match(c))),
+    [allPickerCards, facetPredicates],
+  );
+
+  const setOptions = useMemo(() => facetOptions({
+    cards: allPickerCards,
+    predicates: facetPredicates,
+    dimension: 'set',
+    valueOf: (c) => c.set,
+    order: ALL_SET_IDS,
+  }), [allPickerCards, facetPredicates]);
+
+  const rarityOptions = useMemo(() => facetOptions({
+    cards: allPickerCards,
+    predicates: facetPredicates,
+    dimension: 'rarity',
+    valueOf: (c) => c.rarity,
+  }), [allPickerCards, facetPredicates]);
+
+  const selectedOnlyOptions = useMemo(() => {
+    const pool = facetPool(allPickerCards, facetPredicates, 'selectedOnly');
+    return pool.some((c) => selectedIds.has(c.id)) ? ['off', 'on'] : ['off'];
+  }, [allPickerCards, facetPredicates, selectedIds]);
+
+  const applySelectedOnly = useCallback((value: string) => setSelectedOnly(value === 'on'), []);
+
+  useValidFacetSelection(setFilter, setOptions, '', setSetFilter);
+  useValidFacetSelection(rarityFilter, rarityOptions, '', setRarityFilter);
+  useValidFacetSelection(selectedOnly ? 'on' : 'off', selectedOnlyOptions, 'off', applySelectedOnly);
 
   const add = (id: string) => {
     setSelected((prev) => (prev.includes(id) || prev.length >= max ? prev : [...prev, id]));
@@ -181,43 +207,49 @@ export default function AdminFeaturedPage() {
                 className="min-w-0 flex-1 px-3 py-2 text-[13px]"
                 style={{ backgroundColor: '#0d0d0d', border: '1px solid #333333', color: '#e0e0e0', outline: 'none' }}
               />
-              <select
-                value={setFilter}
-                onChange={(e) => setSetFilter(e.target.value)}
-                aria-label={t('setFilterAll')}
-                className="px-3 py-2 text-[13px]"
-                style={{ backgroundColor: '#0d0d0d', border: '1px solid #333333', color: '#e0e0e0', outline: 'none' }}
-              >
-                <option value="">{t('setFilterAll')}</option>
-                {ALL_SET_IDS.map((id) => (
-                  <option key={id} value={id}>{getSetName(id, locale)}</option>
-                ))}
-              </select>
-              <select
-                value={rarityFilter}
-                onChange={(e) => setRarityFilter(e.target.value)}
-                aria-label={t('rarityFilterAll')}
-                className="px-3 py-2 text-[13px]"
-                style={{ backgroundColor: '#0d0d0d', border: '1px solid #333333', color: '#e0e0e0', outline: 'none' }}
-              >
-                <option value="">{t('rarityFilterAll')}</option>
-                {availableRarities.map((r) => (
-                  <option key={r} value={r}>{r}</option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={() => setSelectedOnly((v) => !v)}
-                aria-pressed={selectedOnly}
-                className="px-3 py-2 text-[13px] font-bold uppercase tracking-wider"
-                style={{
-                  backgroundColor: selectedOnly ? 'rgba(196,163,90,0.16)' : '#0d0d0d',
-                  color: selectedOnly ? '#c4a35a' : '#9a9a9a',
-                  border: '1px solid #333333', cursor: 'pointer',
-                }}
-              >
-                {t('selectedOnly')}
-              </button>
+              {isFacetWorthShowing(setOptions) && (
+                <select
+                  value={setFilter}
+                  onChange={(e) => setSetFilter(e.target.value)}
+                  aria-label={t('setFilterAll')}
+                  className="px-3 py-2 text-[13px]"
+                  style={{ backgroundColor: '#0d0d0d', border: '1px solid #333333', color: '#e0e0e0', outline: 'none' }}
+                >
+                  <option value="">{t('setFilterAll')}</option>
+                  {setOptions.map((id) => (
+                    <option key={id} value={id}>{getSetName(id, locale)}</option>
+                  ))}
+                </select>
+              )}
+              {isFacetWorthShowing(rarityOptions) && (
+                <select
+                  value={rarityFilter}
+                  onChange={(e) => setRarityFilter(e.target.value)}
+                  aria-label={t('rarityFilterAll')}
+                  className="px-3 py-2 text-[13px]"
+                  style={{ backgroundColor: '#0d0d0d', border: '1px solid #333333', color: '#e0e0e0', outline: 'none' }}
+                >
+                  <option value="">{t('rarityFilterAll')}</option>
+                  {rarityOptions.map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+              )}
+              {isFacetWorthShowing(selectedOnlyOptions) && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedOnly((v) => !v)}
+                  aria-pressed={selectedOnly}
+                  className="px-3 py-2 text-[13px] font-bold uppercase tracking-wider"
+                  style={{
+                    backgroundColor: selectedOnly ? 'rgba(196,163,90,0.16)' : '#0d0d0d',
+                    color: selectedOnly ? '#c4a35a' : '#9a9a9a',
+                    border: '1px solid #333333', cursor: 'pointer',
+                  }}
+                >
+                  {t('selectedOnly')}
+                </button>
+              )}
             </div>
 
             {loading ? (

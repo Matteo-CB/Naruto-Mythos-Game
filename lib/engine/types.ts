@@ -91,6 +91,7 @@ export interface CharacterInPlay {
   controllerInstanceId?: string;
   
   rempartLockedTargetId?: string;
+  ss118RevealedName?: string;
 
   attachments?: AttachedCard[];
 }

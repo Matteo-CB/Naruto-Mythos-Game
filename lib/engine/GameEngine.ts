@@ -34,7 +34,7 @@ import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
 import { missionSidePowerBonus } from '../effects/missions/ssMissions';
 import { openLowProfileAmbushPrompt } from '../effects/EffectEngine';
-import { isRempartZeroed, canBeHiddenByEnemy } from '../effects/ContinuousEffects';
+import { isRempartZeroed, canBeHiddenByEnemy, amplifiedPowerup } from '../effects/ContinuousEffects';
 import { triggerOnDefeatEffects } from '../effects/onDefeatTriggers';
 import { ss000FinalizeSearch } from '../effects/handlers/SS/ss000Search';
 import { getEffectivePower } from '../effects/powerUtils';
@@ -840,7 +840,7 @@ export class GameEngine {
           const upgChars = [...upgMission[friendlySide_g]];
           const selfIdx = upgChars.findIndex((c: CharacterInPlay) => c.instanceId === sourceInstanceId);
           if (selfIdx !== -1) {
-            upgChars[selfIdx] = { ...upgChars[selfIdx], powerTokens: upgChars[selfIdx].powerTokens + gFlushedCount };
+            upgChars[selfIdx] = { ...upgChars[selfIdx], powerTokens: upgChars[selfIdx].powerTokens + amplifiedPowerup(newState, upgChars[selfIdx].instanceId, gFlushedCount) };
             upgMission[friendlySide_g] = upgChars;
             upgMissions[sourceMissionIndex] = upgMission;
             newState = { ...newState, activeMissions: upgMissions };

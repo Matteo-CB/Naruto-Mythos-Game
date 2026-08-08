@@ -75,6 +75,7 @@ function ScheduledCountdown({ deadline }: { deadline: string }) {
 
 export default function TournamentDetailPage() {
   const t = useTranslations('tournament');
+  const tSpectate = useTranslations('tournamentSpectate');
   const tc = useTranslations('common');
   const tRoot = useTranslations();
   const locale = useLocale();
@@ -466,7 +467,7 @@ export default function TournamentDetailPage() {
             <div className="flex-1">
               <p className="text-sm leading-relaxed" style={{ color: '#c9c7c0' }}>{t('nwlRequirement')}</p>
               <a
-                href="https://discord.gg/JR5HG4VUP"
+                href="https://discord.gg/Wk5MQhkNEw"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-display mt-3 inline-flex items-center px-4 py-2 text-[11px] uppercase tracking-widest"
@@ -798,6 +799,18 @@ export default function TournamentDetailPage() {
 
         {tour.status === 'in_progress' && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
+            {!isParticipant && (
+              <div className="mb-4 flex justify-end">
+                <Link
+                  href={`/tournaments/${tournamentId}/spectate`}
+                  data-gp="true"
+                  className="px-4 py-2 text-[11px] uppercase tracking-[0.16em]"
+                  style={{ backgroundColor: 'rgba(196,163,90,0.12)', color: '#c4a35a', borderRadius: '3px' }}
+                >
+                  {tSpectate('watchLive')}
+                </Link>
+              </div>
+            )}
             <LiveMatchesPanel
               matches={tour.matches}
               currentRound={tour.currentRound}

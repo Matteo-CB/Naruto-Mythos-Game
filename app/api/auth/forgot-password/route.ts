@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { prisma } from '@/lib/db/prisma';
 import { sendResetEmail } from '@/lib/email/sendResetEmail';
+import { findUserByEmail, normalizeEmail } from '@/lib/auth/findUserByEmail';
 
 const resetRate = new Map<string, number[]>();
 const RESET_WINDOW_MS = 15 * 60 * 1000;
-const RESET_MAX = 3;
+const RESET_MAX = 5;
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,25 +16,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedEmail = normalizeEmail(email);
     const now = Date.now();
     const windowStart = now - RESET_WINDOW_MS;
     const recent = (resetRate.get(normalizedEmail) ?? []).filter((t) => t > windowStart);
     if (recent.length >= RESET_MAX) {
       return NextResponse.json({ success: true });
     }
+
+    const user = await findUserByEmail(email);
+
+    if (!user) {
+      return NextResponse.json({ success: true });
+    }
+
     recent.push(now);
     resetRate.set(normalizedEmail, recent);
     if (resetRate.size > 5000) {
       for (const [k, ts] of resetRate) {
         if (ts.length === 0 || ts[ts.length - 1] < windowStart) resetRate.delete(k);
       }
-    }
-
-    const user = await prisma.user.findUnique({ where: { email } });
-
-    if (!user) {
-      return NextResponse.json({ success: true });
     }
 
     
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
     });
 
     
-    await sendResetEmail(email, rawToken, locale || 'en');
+    await sendResetEmail(user.email, rawToken, locale || 'en');
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -10,9 +10,15 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { BoosterOpenAnimation } from '@/components/boosters/BoosterOpenAnimation';
 import { getCardById } from '@/lib/data/cardIndex';
+import { getAllCards } from '@/lib/data/cardLoader';
 import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
 import { isAdmin as isAdminUser } from '@/lib/auth/admins';
 import { getAvailableSetIds, SET_REGISTRY } from '@/lib/data/sets/registry';
+import { facetOptions, isFacetWorthShowing } from '@/lib/collection/facets';
+import { useValidFacetSelection } from '@/lib/collection/useFacets';
+import { isVariantRarity } from '@/lib/variants/constants';
+import { isBoosterObtainableVariant } from '@/lib/variants/obtention';
+import { isHoloEligibleCard } from '@/lib/holo/holoId';
 import type { CardData } from '@/lib/engine/types';
 
 type Mode = 'normal' | 'forceL' | 'forceSV';
@@ -49,6 +55,35 @@ export default function AdminBoosterSimulatorPage() {
   const [result, setResult] = useState<SimResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sampleCards, setSampleCards] = useState<CardData[] | null>(null);
+
+  const boosterRollPool = useMemo(
+    () =>
+      getAllCards().filter((card) => {
+        if (!availableSets.includes(card.set)) return false;
+        if (isHoloEligibleCard(card)) return true;
+        return isVariantRarity(card.rarity) && isBoosterObtainableVariant(card.cardId ?? card.id);
+      }),
+    [availableSets],
+  );
+
+  const facetPredicates = useMemo(
+    () => ({ set: (card: CardData) => card.set === setId }),
+    [setId],
+  );
+
+  const setOptions = useMemo(
+    () =>
+      facetOptions({
+        cards: boosterRollPool,
+        predicates: facetPredicates,
+        dimension: 'set',
+        valueOf: (card: CardData) => card.set,
+        order: availableSets,
+      }),
+    [boosterRollPool, facetPredicates, availableSets],
+  );
+
+  useValidFacetSelection(setId, setOptions, setOptions[0] ?? setId, setSetId);
 
   const runSim = async () => {
     if (loading) return;
@@ -139,19 +174,21 @@ export default function AdminBoosterSimulatorPage() {
           className="p-4 mb-6 grid gap-4 sm:grid-cols-3"
           style={{ backgroundColor: '#0f0f0f', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}
         >
-          <label className="flex flex-col gap-1.5">
-            <span className="text-[10px] uppercase tracking-widest" style={{ color: '#888' }}>{t('setLabel')}</span>
-            <select
-              value={setId}
-              onChange={(e) => setSetId(e.target.value)}
-              className="px-3 py-2 text-xs"
-              style={{ backgroundColor: '#0a0a0a', color: '#e8e8e8', border: '1px solid #1a1a1a' }}
-            >
-              {availableSets.map((s) => (
-                <option key={s} value={s}>{SET_REGISTRY[s]?.nameEn ?? s}</option>
-              ))}
-            </select>
-          </label>
+          {isFacetWorthShowing(setOptions) && (
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[10px] uppercase tracking-widest" style={{ color: '#888' }}>{t('setLabel')}</span>
+              <select
+                value={setId}
+                onChange={(e) => setSetId(e.target.value)}
+                className="px-3 py-2 text-xs"
+                style={{ backgroundColor: '#0a0a0a', color: '#e8e8e8', border: '1px solid #1a1a1a' }}
+              >
+                {setOptions.map((s) => (
+                  <option key={s} value={s}>{SET_REGISTRY[s]?.nameEn ?? s}</option>
+                ))}
+              </select>
+            </label>
+          )}
 
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] uppercase tracking-widest" style={{ color: '#888' }}>{t('modeLabel')}</span>

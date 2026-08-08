@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
 
 
 
@@ -30,14 +31,14 @@ function applyPowerup1(
     player1Characters: mission.player1Characters.map((c) => {
       if (c.instanceId === targetInstanceId) {
         targetName = c.card.name_fr;
-        return { ...c, powerTokens: c.powerTokens + 1 };
+        return { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 1) };
       }
       return c;
     }),
     player2Characters: mission.player2Characters.map((c) => {
       if (c.instanceId === targetInstanceId) {
         targetName = c.card.name_fr;
-        return { ...c, powerTokens: c.powerTokens + 1 };
+        return { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 1) };
       }
       return c;
     }),

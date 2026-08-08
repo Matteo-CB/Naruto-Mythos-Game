@@ -1,6 +1,178 @@
 {
   "entries": [
     {
+      "date": "2026-08-08",
+      "title_fr": "Huit cartes Chibi, connexion et mot de passe oublié réparés",
+      "title_en": "Eight Chibi cards, sign in and forgotten password fixed",
+      "title_es": "Ocho cartas Chibi, inicio de sesión y contraseña olvidada arreglados",
+      "title_ja": "チビ8枚, ログインとパスワード再設定の修正",
+      "title_pt": "Oito cartas Chibi, login e senha esquecida corrigidos",
+      "title_it": "Otto carte Chibi, accesso e password dimenticata risolti",
+      "title_pl": "Osiem kart Chibi, naprawione logowanie i odzyskiwanie hasła",
+      "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ],
+      "changes_fr": [
+        "Huit cartes Chibi rejoignent le set 2 : Gaara 78, Hinata Hyûga 111, Neji Hyûga 112, Rock Lee 115, Shikamaru Nara 118, Naruto Uzumaki 121, Sakura Haruno 123 et Sasuke Uchiwa 126.",
+        "Shikamaru Nara 118 arrive : en embuscade, il révèle un personnage ennemi caché et le vainc.",
+        "Son duel contre Temari cache ensuite un personnage ennemi portant le nom du personnage révélé.",
+        "Les sept autres Chibi gardent exactement les effets de leur carte de base, seul le titre change.",
+        "Votre adresse email est reconnue avec ou sans majuscules, à la connexion comme pour le mot de passe oublié.",
+        "Le mail de réinitialisation part maintenant même si vous tapez votre adresse différemment de votre inscription.",
+        "Vous pouvez redemander un lien de réinitialisation 5 fois par quart d’heure au lieu de 3.",
+        "Les points d’une mission et sa lettre de rang sont de nouveau visibles sur le plateau, ainsi que le bandeau Gagnée ou Perdue."
+      ],
+      "changes_en": [
+        "Eight Chibi cards join set 2: Gaara 78, Hinata Hyuga 111, Neji Hyuga 112, Rock Lee 115, Shikamaru Nara 118, Naruto Uzumaki 121, Sakura Haruno 123 and Sasuke Uchiha 126.",
+        "Shikamaru Nara 118 arrives: on ambush he reveals an enemy hidden character and defeats it.",
+        "His duel against Temari then hides an enemy character carrying the revealed name.",
+        "The seven other Chibi keep exactly the effects of their base card, only the title changes.",
+        "Your email address is recognised with or without capitals, both to sign in and to reset your password.",
+        "The reset email now goes out even if you type your address differently from how you signed up.",
+        "You can ask for a reset link 5 times per quarter of an hour instead of 3.",
+        "A mission shows its points and its rank letter on the board again, and so does the Won or Lost banner."
+      ],
+      "changes_es": [
+        "Ocho cartas Chibi llegan al set 2: Gaara 78, Hinata Hyuga 111, Neji Hyuga 112, Rock Lee 115, Shikamaru Nara 118, Naruto Uzumaki 121, Sakura Haruno 123 y Sasuke Uchiha 126.",
+        "Llega Shikamaru Nara 118: en emboscada revela a un personaje enemigo oculto y lo derrota.",
+        "Su duelo contra Temari oculta después a un personaje enemigo con el nombre revelado.",
+        "Los otros siete Chibi conservan los efectos de su carta base, solo cambia el título.",
+        "Tu correo se reconoce con o sin mayúsculas, tanto al iniciar sesión como al recuperar la contraseña.",
+        "El correo de recuperación ahora se envía aunque escribas tu dirección distinta a como te registraste.",
+        "Puedes pedir un enlace de recuperación 5 veces por cuarto de hora en vez de 3.",
+        "Una misión vuelve a mostrar sus puntos y su letra de rango en el tablero, igual que el cartel Ganada o Perdida."
+      ],
+      "changes_ja": [
+        "チビ8枚がセット2に加わります：我愛羅78、日向ヒナタ111、日向ネジ112、ロック・リー115、奈良シカマル118、うずまきナルト121、春野サクラ123、うちはサスケ126。",
+        "奈良シカマル118が登場：待ち伏せで敵の伏せた忍を公開し、倒します。",
+        "テマリとのデュエルでは、公開した忍と同じ名前の敵の忍を伏せます。",
+        "他の7枚のチビは元のカードとまったく同じ効果で、タイトルだけが違います。",
+        "メールアドレスは大文字小文字を問わず認識されます。ログインでもパスワード再設定でも同じです。",
+        "登録時と違う書き方で入力しても、再設定メールが届くようになりました。",
+        "再設定リンクの再送は15分あたり3回から5回になりました。",
+        "ミッションのポイントとランクの文字が盤面に再び表示されます。勝利・敗北の表示も同様です。"
+      ],
+      "changes_pt": [
+        "Oito cartas Chibi chegam ao set 2: Gaara 78, Hinata Hyuga 111, Neji Hyuga 112, Rock Lee 115, Shikamaru Nara 118, Naruto Uzumaki 121, Sakura Haruno 123 e Sasuke Uchiha 126.",
+        "Shikamaru Nara 118 chega: na emboscada ele revela um personagem inimigo oculto e o derrota.",
+        "O duelo dele contra Temari oculta em seguida um personagem inimigo com o nome revelado.",
+        "Os outros sete Chibi mantêm os efeitos da carta base, só o título muda.",
+        "Seu email é reconhecido com ou sem maiúsculas, tanto para entrar quanto para recuperar a senha.",
+        "O email de recuperação agora é enviado mesmo se você digitar o endereço diferente do cadastro.",
+        "Você pode pedir um link de recuperação 5 vezes por quinze minutos em vez de 3.",
+        "A missão volta a mostrar seus pontos e a letra do rank no tabuleiro, assim como o aviso Vencida ou Perdida."
+      ],
+      "changes_it": [
+        "Otto carte Chibi arrivano nel set 2: Gaara 78, Hinata Hyuga 111, Neji Hyuga 112, Rock Lee 115, Shikamaru Nara 118, Naruto Uzumaki 121, Sakura Haruno 123 e Sasuke Uchiha 126.",
+        "Arriva Shikamaru Nara 118: in imboscata rivela un personaggio nemico nascosto e lo sconfigge.",
+        "Il suo duello contro Temari nasconde poi un personaggio nemico che porta il nome rivelato.",
+        "Le altre sette Chibi mantengono gli effetti della carta base, cambia solo il titolo.",
+        "La tua email viene riconosciuta con o senza maiuscole, sia per accedere sia per recuperare la password.",
+        "La mail di recupero parte anche se scrivi l’indirizzo in modo diverso da come ti sei registrato.",
+        "Puoi chiedere un link di recupero 5 volte ogni quarto d’ora invece di 3.",
+        "Una missione mostra di nuovo i suoi punti e la lettera del rango sul tavolo, come pure la scritta Vinta o Persa."
+      ],
+      "changes_pl": [
+        "Osiem kart Chibi dołącza do zestawu 2: Gaara 78, Hinata Hyuga 111, Neji Hyuga 112, Rock Lee 115, Shikamaru Nara 118, Naruto Uzumaki 121, Sakura Haruno 123 i Sasuke Uchiha 126.",
+        "Pojawia się Shikamaru Nara 118: w zasadzce odkrywa zakrytą postać przeciwnika i pokonuje ją.",
+        "Jego pojedynek z Temari zakrywa potem postać przeciwnika noszącą odkrytą nazwę.",
+        "Pozostałe siedem Chibi zachowuje efekty karty podstawowej, zmienia się tylko tytuł.",
+        "Twój adres email jest rozpoznawany z wielkimi literami i bez nich, przy logowaniu i przy odzyskiwaniu hasła.",
+        "Mail z linkiem wychodzi teraz nawet wtedy, gdy wpiszesz adres inaczej niż przy rejestracji.",
+        "O link do zmiany hasła możesz poprosić 5 razy na kwadrans zamiast 3.",
+        "Misja znów pokazuje na planszy swoje punkty i literę rangi, tak samo jak napis Wygrana lub Przegrana."
+      ]
+    },
+    {
+      "date": "2026-08-07",
+      "title_fr": "Les cartes Regional Championship",
+      "title_en": "The Regional Championship cards",
+      "title_es": "Las cartas Regional Championship",
+      "title_ja": "リージョナルチャンピオンシップのカード",
+      "title_pt": "As cartas Regional Championship",
+      "title_it": "Le carte Regional Championship",
+      "title_pl": "Karty Regional Championship",
+      "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature"
+      ],
+      "changes_fr": [
+        "Quatre cartes Regional Championship rejoignent le set 2 : Sakura Haruno 123, Gaara 114, Sasuke Uchiwa 126 et Itachi Uchiwa 137.",
+        "Sakura Haruno 123 augmente de 1 chaque POWERUP donné à un allié de sa mission.",
+        "Le duel de Sakura Haruno 123 contre Ino Yamanaka lui rend le contrôle d’un personnage qui lui appartient.",
+        "Itachi Uchiwa 137 renvoie un personnage caché allié de sa mission dans votre main quand il évolue.",
+        "Le duel d’Itachi Uchiwa 137 contre Kurenai Yuhi force l’adversaire à vaincre ses personnages jusqu’à en avoir autant que vous.",
+        "Gaara 114 et Sasuke Uchiwa 126 en version Regional gardent les effets de leur carte de base.",
+        "Naruto Uzumaki 005 arrive : il pose la carte du dessus de votre deck comme personnage caché, et une seconde fois en embuscade."
+      ],
+      "changes_en": [
+        "Four Regional Championship cards join set 2: Sakura Haruno 123, Gaara 114, Sasuke Uchiha 126 and Itachi Uchiha 137.",
+        "Sakura Haruno 123 makes every POWERUP given to an ally in her mission one point stronger.",
+        "Sakura Haruno 123 duelling Ino Yamanaka takes back control of a character she owns.",
+        "Itachi Uchiha 137 returns a friendly hidden character from his mission to your hand when he upgrades.",
+        "Itachi Uchiha 137 duelling Kurenai Yuhi makes the opponent defeat their characters until they have as many as you.",
+        "The Regional versions of Gaara 114 and Sasuke Uchiha 126 keep the effects of their base card.",
+        "Naruto Uzumaki 005 arrives: he puts the top card of your deck down as a hidden character, and a second time on ambush."
+      ],
+      "changes_es": [
+        "Cuatro cartas Regional Championship llegan al set 2: Sakura Haruno 123, Gaara 114, Sasuke Uchiha 126 e Itachi Uchiha 137.",
+        "Sakura Haruno 123 aumenta en 1 cada POWERUP dado a un aliado de su misión.",
+        "El duelo de Sakura Haruno 123 contra Ino Yamanaka le devuelve el control de un personaje que le pertenece.",
+        "Itachi Uchiha 137 devuelve a tu mano un personaje oculto aliado de su misión cuando evoluciona.",
+        "El duelo de Itachi Uchiha 137 contra Kurenai Yuhi obliga al rival a derrotar a sus personajes hasta tener tantos como tú.",
+        "Las versiones Regional de Gaara 114 y Sasuke Uchiha 126 conservan los efectos de su carta base.",
+        "Llega Naruto Uzumaki 005: coloca la carta superior de tu mazo como personaje oculto, y otra vez en emboscada."
+      ],
+      "changes_ja": [
+        "リージョナルチャンピオンシップの4枚がセット2に加わります：春野サクラ123、我愛羅114、うちはサスケ126、うちはイタチ137。",
+        "春野サクラ123は、同じミッションの味方が受けるパワーアップを1増やします。",
+        "春野サクラ123は山中いのとのデュエルで、自分が所有する忍のコントロールを取り戻します。",
+        "うちはイタチ137は進化したとき、同じミッションの味方の伏せた忍を手札に戻します。",
+        "うちはイタチ137は夕日紅とのデュエルで、相手に自分と同じ数になるまで忍を倒させます。",
+        "我愛羅114とうちはサスケ126のリージョナル版は、元のカードと同じ効果です。",
+        "うずまきナルト005が登場：デッキの一番上のカードを伏せた忍として置き、待ち伏せでもう一度置きます。"
+      ],
+      "changes_pt": [
+        "Quatro cartas Regional Championship chegam ao set 2: Sakura Haruno 123, Gaara 114, Sasuke Uchiha 126 e Itachi Uchiha 137.",
+        "Sakura Haruno 123 aumenta em 1 cada POWERUP dado a um aliado da missão dela.",
+        "O duelo de Sakura Haruno 123 contra Ino Yamanaka devolve o controle de um personagem que lhe pertence.",
+        "Itachi Uchiha 137 devolve à sua mão um personagem oculto aliado da missão dele quando evolui.",
+        "O duelo de Itachi Uchiha 137 contra Kurenai Yuhi obriga o oponente a derrotar os personagens dele até ter tantos quanto você.",
+        "As versões Regional de Gaara 114 e Sasuke Uchiha 126 mantêm os efeitos da carta base.",
+        "Naruto Uzumaki 005 chega: ele coloca a carta do topo do seu deck como personagem oculto, e uma segunda vez na emboscada."
+      ],
+      "changes_it": [
+        "Quattro carte Regional Championship arrivano nel set 2: Sakura Haruno 123, Gaara 114, Sasuke Uchiha 126 e Itachi Uchiha 137.",
+        "Sakura Haruno 123 aumenta di 1 ogni POWERUP dato a un alleato della sua missione.",
+        "Il duello di Sakura Haruno 123 contro Ino Yamanaka le restituisce il controllo di un personaggio che le appartiene.",
+        "Itachi Uchiha 137 riporta in mano un personaggio nascosto alleato della sua missione quando evolve.",
+        "Il duello di Itachi Uchiha 137 contro Kurenai Yuhi costringe l’avversario a sconfiggere i suoi personaggi finché non ne ha quanti te.",
+        "Le versioni Regional di Gaara 114 e Sasuke Uchiha 126 mantengono gli effetti della carta base.",
+        "Arriva Naruto Uzumaki 005: mette la prima carta del tuo mazzo come personaggio nascosto, e una seconda volta in imboscata."
+      ],
+      "changes_pl": [
+        "Cztery karty Regional Championship dołączają do zestawu 2: Sakura Haruno 123, Gaara 114, Sasuke Uchiha 126 i Itachi Uchiha 137.",
+        "Sakura Haruno 123 zwiększa o 1 każdy POWERUP dany sojusznikowi w jej misji.",
+        "Pojedynek Sakury Haruno 123 z Ino Yamanaką odzyskuje kontrolę nad postacią, która do niej należy.",
+        "Itachi Uchiha 137 przy ulepszeniu zwraca do ręki sojuszniczą zakrytą postać ze swojej misji.",
+        "Pojedynek Itachiego Uchihy 137 z Kurenai Yuhi zmusza przeciwnika do pokonywania swoich postaci, aż będzie ich miał tyle co ty.",
+        "Wersje Regional Gaary 114 i Sasuke Uchihy 126 zachowują efekty karty podstawowej.",
+        "Pojawia się Naruto Uzumaki 005: kładzie wierzchnią kartę talii jako zakrytą postać, a w zasadzce robi to drugi raz."
+      ]
+    },
+    {
       "date": "2026-08-06",
       "title_fr": "Trois cartes or et des missions plus nettes",
       "title_en": "Three gold cards and sharper missions",
@@ -16,6 +188,14 @@
         "feature",
         "feature",
         "fix",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
@@ -30,7 +210,15 @@
         "Itachi Uchiwa 053 doit cacher un personnage à 2 Chakra ou moins de sa mission, lui compris.",
         "Le Senbon peut se poser sur un personnage caché, contrairement aux équipements qui exigent une cible non cachée.",
         "Tsunade Le Pigeon Légendaire 999 demande maintenant combien de cartes remélanger, avec l'aperçu des cartes concernées, et donne bien 1 puissance par carte remélangée.",
-        "Kimimaro 031 ne peut plus se déplacer lui-même avec Kidomaru : un personnage n’est pas son propre allié."
+        "Kimimaro 031 ne peut plus se déplacer lui-même avec Kidomaru : un personnage n’est pas son propre allié.",
+        "Les matchs de tournoi peuvent enfin être regardés en direct : jusqu’ici aucune table de tournoi n’était accessible aux spectateurs.",
+        "Nouvelle page qui affiche jusqu’à quatre matchs en direct côte à côte, chacun avec le plateau de jeu complet.",
+        "Un panneau s’ouvre par le bouton en haut à droite pour cocher et décocher les matchs affichés.",
+        "Quand un match affiché se termine, sa case enchaîne automatiquement sur un autre match en cours.",
+        "Les joueurs inscrits à un tournoi ne peuvent pas regarder les autres tables de ce tournoi.",
+        "Un spectateur ne reçoit plus l’ordre du deck d’un joueur : seules les informations publiques de la partie lui sont envoyées.",
+        "Les tournois à élimination ne donnent plus de bye après le premier tour : un joueur ne peut plus enchaîner plusieurs tours sans jouer.",
+        "Quand le nombre de joueurs n’est pas une puissance de deux, les byes sont tous placés au premier tour et répartis sur des joueurs différents."
       ],
       "changes_en": [
         "Tsunade Legendary Sitting Duck joins the game: she shuffles up to 5 cards from her discard pile back and gains that much Power.",
@@ -44,7 +232,15 @@
         "Itachi Uchiha 053 must hide a character costing 2 or less in his mission, himself included.",
         "The Senbon can be attached to a hidden character, unlike attachments that demand a non-hidden target.",
         "Tsunade Legendary Sitting Duck 999 now asks how many cards to shuffle back, previews them, and grants 1 Power per shuffled card.",
-        "Kimimaro 031 can no longer move himself with Kidomaru: a character is not its own ally."
+        "Kimimaro 031 can no longer move himself with Kidomaru: a character is not its own ally.",
+        "Tournament matches can finally be watched live: until now no tournament table was open to viewers.",
+        "A new page shows up to four live matches side by side, each with the full game board.",
+        "A panel opens from the button at the top right to tick and untick the matches on screen.",
+        "When a shown match ends, its tile automatically switches to another match in progress.",
+        "Players entered in a tournament cannot watch the other tables of that tournament.",
+        "A viewer no longer receives a player deck order: only public game information is sent.",
+        "Elimination tournaments no longer hand out byes after round 1: a player can no longer skip several rounds in a row.",
+        "When the field is not a power of two, every bye now sits in round 1 and each one goes to a different player."
       ]
     },
     {

@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
 
 
 
@@ -70,7 +71,7 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
       if (selfIdx !== -1) {
         friendlyChars[selfIdx] = {
           ...friendlyChars[selfIdx],
-          powerTokens: friendlyChars[selfIdx].powerTokens + powerupAmount,
+          powerTokens: friendlyChars[selfIdx].powerTokens + amplifiedPowerup(state, friendlyChars[selfIdx].instanceId, powerupAmount),
         };
         mission[friendlySide] = friendlyChars;
         missions[ctx.sourceMissionIndex] = mission;

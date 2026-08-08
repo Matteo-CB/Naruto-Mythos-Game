@@ -76,3 +76,4 @@ nixpacks.toml
 renew-ssl.sh
 renew-ssl-auto.sh
 nginx/
+__pycache__/

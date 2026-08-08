@@ -5,6 +5,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/db/prisma';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
+import { findUserByEmail } from '@/lib/auth/findUserByEmail';
 
 const useSecureCookies = process.env.NEXTAUTH_URL?.startsWith('https://') ?? false;
 
@@ -63,9 +64,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-        });
+        const user = await findUserByEmail(credentials.email as string);
 
         if (!user || !user.password) {
           recent.push(now);
@@ -203,7 +202,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const discordEmail = (profile as { email?: string }).email;
         const emailMatch = discordEmail
-          ? await prisma.user.findUnique({ where: { email: discordEmail } })
+          ? await findUserByEmail(discordEmail)
           : null;
 
         if (emailMatch) {

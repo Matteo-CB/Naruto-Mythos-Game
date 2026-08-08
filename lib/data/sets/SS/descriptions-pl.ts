@@ -211,4 +211,56 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "Dołącz do nieukrytej sojuszniczej postaci.",
     "[↯] Dobierz kartę.",
   ],
+  "SS-114-MV": [
+    "[↯] Odrzuć Gaarę ze swojej ręki. Ukryj wrogą postać na tej misji o koszcie równym lub niższym od kosztu odrzuconej karty.",
+    "Rock Lee, efekt MAIN: Zamiast tego pokonaj ją.",
+  ],
+  "SS-126-MV": [
+    "[⧗] Ta postać ma +1 Siły za każdą postać Wioski Dźwięku na tej misji.",
+    "[↯] Orochimaru: Zagraj postać Wioski Dźwięku gdziekolwiek, płacąc o 3 mniej.",
+  ],
+  "SS-123-MV": [
+    "[⧗] POWERUP na sojuszniczych postaciach na tej misji są zwiększone o 1.",
+    "[↯] Ino Yamanaka: Odzyskaj kontrolę nad postacią, którą posiadasz, w grze.",
+  ],
+  "SS-005-M": [
+    "[↯] Połóż wierzchnią kartę swojej talii jako ukrytą postać na tej misji.",
+    "[↯] Powtórz efekt MAIN.",
+  ],
+  "SS-137-MV": [
+    "[↯] Zwróć ukrytą sojuszniczą postać z tej misji do swojej ręki.",
+    "[↯] Kurenai Yuhi: Przeciwnik wybiera i pokonuje swoje postacie na tej misji, aż będzie ich mieć tyle co ty.",
+  ],
+  "SS-078-CHIBIV": [
+    "[↯] Kimimaro: Pokonaj wrogą postać o koszcie 2 lub mniejszym.",
+    "[⧗] Gdy pokonasz nieukrytą wrogą postać, możesz zapłacić 1 Czakry, aby dobrać 1 kartę.",
+  ],
+  "SS-111-CHIBIV": [
+    "[↯] DUEL Neji Hyuga: Weź do ręki najwyżej leżącą Hinatę Hyugę ze swojego stosu odrzuconych.",
+    "[↯] Zagraj postać o nazwie Hyuga w dowolnym miejscu, płacąc 3 mniej.",
+  ],
+  "SS-112-CHIBIV": [
+    "[↯] Usuń wszystkie żetony Siły z wrogiej postaci na tej misji.",
+    "[↯] Hinata Hyuga: Ukryj wrogą postać bez żetonów Siły na tej misji.",
+  ],
+  "SS-115-CHIBIV": [
+    "[⧗] Ta postać nie traci żetonów Mocy na koniec rundy.",
+    "[⧗] DUEL Gaara: Gdy pokonasz wrogą postać, POWERUP 2.",
+  ],
+  "SS-121-CHIBIV": [
+    "[⧗] Ta postać ma +1 Siły za każdego sojuszniczego Naruto Uzumaki w grze.",
+    "[↯] Kiba Inuzuka: Przenieś dolną kartę tego stosu ulepszeń na inną misję.",
+  ],
+  "SS-123-CHIBIV": [
+    "[⧗] POWERUP na sojuszniczych postaciach na tej misji są zwiększone o 1.",
+    "[↯] Ino Yamanaka: Odzyskaj kontrolę nad postacią, którą posiadasz, w grze.",
+  ],
+  "SS-126-CHIBIV": [
+    "[⧗] Ta postać ma +1 Siły za każdą postać Wioski Dźwięku na tej misji.",
+    "[↯] Orochimaru: Zagraj postać Wioski Dźwięku gdziekolwiek, płacąc o 3 mniej.",
+  ],
+  "SS-118-CHIBIV": [
+    "[↯] Odkryj i pokonaj zakrytą postać przeciwnika w grze.",
+    "[↯] Temari: Zakryj postać przeciwnika w grze o tej samej nazwie co odkryta postać.",
+  ],
 };

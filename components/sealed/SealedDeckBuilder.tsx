@@ -13,6 +13,8 @@ import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
 import { SealedTimer } from './SealedTimer';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
+import { facetOptions, isFacetWorthShowing } from '@/lib/collection/facets';
+import { useValidFacetSelection } from '@/lib/collection/useFacets';
 
 interface SealedDeckBuilderProps {
   pool: BoosterCard[];
@@ -22,7 +24,7 @@ interface SealedDeckBuilderProps {
   onTimeUp?: () => void;
 }
 
-type FilterRarity = 'all' | 'C' | 'UC' | 'R' | 'RA' | 'S' | 'M' | 'MMS';
+const RARITY_ORDER: readonly string[] = ['C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L', 'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV', 'SHINOBI', 'SHINOBIV', 'MMS'];
 
 export function SealedDeckBuilder({
   pool,
@@ -38,7 +40,7 @@ export function SealedDeckBuilder({
   const [deckChars, setDeckChars] = useState<BoosterCard[]>([]);
   const [deckMissions, setDeckMissions] = useState<BoosterCard[]>([]);
 
-  const [filterRarity, setFilterRarity] = useState<FilterRarity>('all');
+  const [filterRarity, setFilterRarity] = useState<string>('all');
   const [filterGroup, setFilterGroup] = useState<string>('all');
   const [searchText, setSearchText] = useState('');
   const [previewCard, setPreviewCard] = useState<BoosterCard | null>(null);
@@ -88,37 +90,69 @@ export function SealedDeckBuilder({
     return Array.from(seen.values());
   }, [missions]);
 
-  const availableGroups = useMemo(() => {
-    const groups = new Set<string>();
-    for (const c of catalogChars) {
-      if (c.group) groups.add(c.group);
-    }
-    return Array.from(groups).sort();
-  }, [catalogChars]);
+  const matchesRarity = useCallback(
+    (c: BoosterCard) => filterRarity === 'all' || c.rarity === filterRarity,
+    [filterRarity],
+  );
+
+  const matchesGroup = useCallback(
+    (c: BoosterCard) => filterGroup === 'all' || c.group === filterGroup,
+    [filterGroup],
+  );
+
+  const matchesSearch = useCallback(
+    (c: BoosterCard) => {
+      if (!searchText) return true;
+      const search = searchText.toLowerCase();
+      return (
+        getCardName(c, locale).toLowerCase().includes(search) ||
+        (c.name_en ?? '').toLowerCase().includes(search) ||
+        c.id.toLowerCase().includes(search)
+      );
+    },
+    [searchText, locale],
+  );
+
+  const catalogPredicates = useMemo(
+    () => ({ rarity: matchesRarity, group: matchesGroup, search: matchesSearch }),
+    [matchesRarity, matchesGroup, matchesSearch],
+  );
+
+  const rarityOptions = useMemo(
+    () =>
+      facetOptions({
+        cards: catalogChars,
+        predicates: catalogPredicates,
+        dimension: 'rarity',
+        valueOf: (c) => c.rarity ?? null,
+        order: RARITY_ORDER,
+      }),
+    [catalogChars, catalogPredicates],
+  );
+
+  const groupOptions = useMemo(
+    () =>
+      facetOptions({
+        cards: catalogChars,
+        predicates: catalogPredicates,
+        dimension: 'group',
+        valueOf: (c) => c.group ?? null,
+      }),
+    [catalogChars, catalogPredicates],
+  );
+
+  useValidFacetSelection(filterRarity, rarityOptions, 'all', setFilterRarity);
+  useValidFacetSelection(filterGroup, groupOptions, 'all', setFilterGroup);
 
   const filteredCatalog = useMemo(() => {
     return catalogChars
-      .filter((c) => {
-        if (filterRarity !== 'all' && c.rarity !== filterRarity) return false;
-        if (filterGroup !== 'all' && c.group !== filterGroup) return false;
-        if (searchText) {
-          const search = searchText.toLowerCase();
-          if (
-            !getCardName(c, locale).toLowerCase().includes(search) &&
-            !(c.name_en ?? '').toLowerCase().includes(search) &&
-            !c.id.toLowerCase().includes(search)
-          ) {
-            return false;
-          }
-        }
-        return true;
-      })
+      .filter((c) => matchesRarity(c) && matchesGroup(c) && matchesSearch(c))
       .sort((a, b) => {
         const costDiff = (a.chakra ?? 0) - (b.chakra ?? 0);
         if (costDiff !== 0) return costDiff;
         return getCardName(a, locale as 'en' | 'fr').localeCompare(getCardName(b, locale as 'en' | 'fr'));
       });
-  }, [catalogChars, filterRarity, filterGroup, searchText, locale]);
+  }, [catalogChars, matchesRarity, matchesGroup, matchesSearch, locale]);
 
   const deckCardCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -240,7 +274,7 @@ export function SealedDeckBuilder({
     }
   }, [isValid, submitted, deckChars, deckMissions, onDeckReady, onTimeUp]);
 
-  const rarityFilters: FilterRarity[] = ['all', 'C', 'UC', 'R', 'RA', 'S', 'M', 'MMS'];
+  const rarityFilters = ['all', ...rarityOptions];
 
   const rarityColors: Record<string, string> = {
     C: '#888888',
@@ -376,23 +410,25 @@ export function SealedDeckBuilder({
               className="px-2 py-1 text-xs rounded w-40"
               style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#e0e0e0', outline: 'none' }}
             />
-            <div className="flex gap-1">
-              {rarityFilters.map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setFilterRarity(r)}
-                  className="px-2 py-1 text-[10px] font-bold uppercase rounded cursor-pointer"
-                  style={{
-                    backgroundColor: filterRarity === r ? (rarityColors[r] ?? '#c4a35a') : '#1a1a1a',
-                    color: filterRarity === r ? '#0a0a0a' : (rarityColors[r] ?? '#888'),
-                    border: `1px solid ${filterRarity === r ? 'transparent' : '#333'}`,
-                  }}
-                >
-                  {r === 'all' ? t('filterAll') : r}
-                </button>
-              ))}
-            </div>
-            {availableGroups.length > 1 && (
+            {isFacetWorthShowing(rarityOptions) && (
+              <div className="flex gap-1">
+                {rarityFilters.map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setFilterRarity(r)}
+                    className="px-2 py-1 text-[10px] font-bold uppercase rounded cursor-pointer"
+                    style={{
+                      backgroundColor: filterRarity === r ? (rarityColors[r] ?? '#c4a35a') : '#1a1a1a',
+                      color: filterRarity === r ? '#0a0a0a' : (rarityColors[r] ?? '#888'),
+                      border: `1px solid ${filterRarity === r ? 'transparent' : '#333'}`,
+                    }}
+                  >
+                    {r === 'all' ? t('filterAll') : r}
+                  </button>
+                ))}
+              </div>
+            )}
+            {isFacetWorthShowing(groupOptions) && (
               <select
                 value={filterGroup}
                 onChange={(e) => setFilterGroup(e.target.value)}
@@ -400,7 +436,7 @@ export function SealedDeckBuilder({
                 style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#e0e0e0', outline: 'none' }}
               >
                 <option value="all">{t('allGroups')}</option>
-                {availableGroups.map((g) => (
+                {groupOptions.map((g) => (
                   <option key={g} value={g}>{getCardGroup(g, tCardMeta)}</option>
                 ))}
               </select>

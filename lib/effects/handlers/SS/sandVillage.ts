@@ -254,8 +254,10 @@ export function registerSandVillageHandlers(): void {
   registerEffect('SS-046-UC', 'MAIN', ss046Main);
   registerEffect('SS-047-UC', 'UPGRADE', ss047Upgrade);
   registerEffect('SS-078-UC', 'DUEL', ss078Duel);
+  registerEffect('SS-078-CHIBIV', 'DUEL', ss078Duel);
   registerEffect('SS-114-R', 'MAIN', ss114Main);
   registerEffect('SS-114-SHINOBIV', 'MAIN', ss114Main);
+  registerEffect('SS-114-MV', 'MAIN', ss114Main);
   registerEffect('SS-117-R', 'DUEL', ss117Duel);
   registerEffect('SS-119-R', 'MAIN', ss119Main);
   registerEffect('SS-119-R', 'DUEL', ss119Duel);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateBracket, roundMatchCounts, advanceWinner, MAIN_BRACKET, THIRD_PLACE_BRACKET } from '@/lib/tournament/tournamentEngine';
+import { generateBracket, roundMatchCounts, advanceWinner, nextPowerOf2, MAIN_BRACKET, THIRD_PLACE_BRACKET } from '@/lib/tournament/tournamentEngine';
 import type { BracketMatch } from '@/lib/tournament/tournamentEngine';
 
 function participantsOf(n: number) {
@@ -37,7 +37,7 @@ describe('single elimination bracket is sound for every field size from 2 to 32'
       expect(totalRounds).toBe(roundMatchCounts(n).length);
 
       const round1 = matches.filter((m) => m.round === 1);
-      expect(round1).toHaveLength(Math.ceil(n / 2));
+      expect(round1, 'the tree is padded to a power of two').toHaveLength(nextPowerOf2(n) / 2);
 
       const seated = round1.flatMap((m) => [m.player1.participantId, m.player2.participantId]).filter(Boolean);
       expect(new Set(seated).size).toBe(n);
@@ -70,12 +70,12 @@ describe('single elimination bracket is sound for every field size from 2 to 32'
     expect(matches.some((m) => m.isBye)).toBe(false);
   });
 
-  it('an odd field carries at most one bye per round and never leaves an empty later match', () => {
+  it('an odd field keeps every bye in round 1 and never leaves an empty later match', () => {
     const { matches, totalRounds } = generateBracket(participantsOf(21));
-    for (let round = 1; round <= totalRounds; round += 1) {
-      expect(matches.filter((m) => m.round === round && m.isBye).length).toBeLessThanOrEqual(1);
+    for (let round = 2; round <= totalRounds; round += 1) {
+      expect(matches.filter((m) => m.round === round && m.isBye).length, `round ${round}`).toBe(0);
     }
-    expect(matches.filter((m) => m.round === 1 && m.isBye).length).toBe(1);
+    expect(matches.filter((m) => m.round === 1 && m.isBye).length).toBe(nextPowerOf2(21) - 21);
     const champion = playOutBracket(matches, totalRounds);
     expect(champion).toBeTruthy();
   });

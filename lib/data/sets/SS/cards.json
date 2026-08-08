@@ -2378,6 +2378,559 @@
       "title_it": "",
       "name_pl": "RAMEN",
       "title_pl": ""
+    },
+    "SS-123-MV": {
+      "id": "SS-123-MV",
+      "cardId": "SS-123-MV",
+      "rarity": "MV",
+      "rarity_display": "Mythos Variant",
+      "number": "123",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] POWERUPs on friendly characters in this mission are increased by 1."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Ino Yamanaka: Take back control of a character you own in play."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "SAKURA HARUNO",
+      "title_en": "I'm training so hard these days I can barely keep my eyes open.",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "Je m’entraîne tellement en ce moment que j’arrive à peine à garder les yeux ouverts.",
+      "name_es": "SAKURA HARUNO",
+      "title_es": "Entreno tanto estos días que apenas puedo mantener los ojos abiertos.",
+      "name_ja": "春野サクラ",
+      "title_ja": "「最近は特訓のしすぎで目を開けているのもやっとだ。」",
+      "name_pt": "SAKURA HARUNO",
+      "title_pt": "Ando treinando tanto que mal consigo manter os olhos abertos.",
+      "name_it": "SAKURA HARUNO",
+      "title_it": "Mi alleno così tanto in questi giorni che riesco a malapena a tenere gli occhi aperti.",
+      "name_pl": "SAKURA HARUNO",
+      "title_pl": "Tak ostro trenuję, że ledwo utrzymuję otwarte oczy.",
+      "image_file": "images/cards/SS/mythos_v/SS-123-MV.webp",
+      "image_url": "/images/cards/SS/mythos_v/SS-123-MV.webp"
+    },
+    "SS-114-MV": {
+      "id": "SS-114-MV",
+      "cardId": "SS-114-MV",
+      "rarity": "MV",
+      "number": "114",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "name_es": "GAARA",
+      "name_ja": "我愛羅",
+      "title_en": "\"Eyes full of hate...\"",
+      "title_fr": "Des yeux remplis de haine...",
+      "title_es": "Ojos llenos de odio...",
+      "title_ja": "「憎しみに満ちた目…」",
+      "title_pt": "Olhos cheios de ódio...",
+      "title_it": "Occhi pieni di odio...",
+      "title_pl": "Oczy pełne nienawiści...",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Discard a Gaara from your hand. Hide an enemy character in this mission with cost equal to or lower than the discarded card cost."
+        },
+        {
+          "type": "DUEL",
+          "description": "DUEL Rock Lee MAIN effect: Instead, defeat them."
+        }
+      ],
+      "image_file": "images/cards/SS/mythos_v/SS-114-MV.webp",
+      "rarity_display": "Mythos Variant",
+      "image_url": "/images/cards/SS/mythos_v/SS-114-MV.webp"
+    },
+    "SS-005-M": {
+      "id": "SS-005-M",
+      "cardId": "SS-005-M",
+      "rarity": "M",
+      "rarity_display": "Mythos",
+      "number": "005",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 1,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Put the top card of your deck as a hidden character in this mission."
+        },
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Repeat the MAIN effect."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "NARUTO UZUMAKI",
+      "title_en": "\"Eyes full of loneliness...\"",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Des yeux remplis de solitude...",
+      "name_es": "NARUTO UZUMAKI",
+      "title_es": "Ojos llenos de soledad...",
+      "name_ja": "うずまきナルト",
+      "title_ja": "「孤独に満ちた目…」",
+      "name_pt": "NARUTO UZUMAKI",
+      "title_pt": "Olhos cheios de solidão...",
+      "name_it": "NARUTO UZUMAKI",
+      "title_it": "Occhi pieni di solitudine...",
+      "name_pl": "NARUTO UZUMAKI",
+      "title_pl": "Oczy pełne samotności...",
+      "image_file": "images/cards/SS/mythos/SS-005-M.webp"
+    },
+    "SS-137-MV": {
+      "id": "SS-137-MV",
+      "cardId": "SS-137-MV",
+      "rarity": "MV",
+      "rarity_display": "Mythos Variant",
+      "number": "137",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Return a friendly hidden character from this mission to your hand."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kurenai Yuhi: The opponent chooses and defeats their characters in this mission until they have the same number as your characters."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "ITACHI UCHIHA",
+      "title_en": "\"You don't have enough hate.\"",
+      "name_fr": "ITACHI UCHIWA",
+      "title_fr": "Tu n’as pas assez de haine.",
+      "name_es": "ITACHI UCHIHA",
+      "title_es": "No tienes suficiente odio.",
+      "name_ja": "うちはイタチ",
+      "title_ja": "「お前には憎しみが足りない。」",
+      "name_pt": "ITACHI UCHIHA",
+      "title_pt": "Você não tem ódio suficiente.",
+      "name_it": "ITACHI UCHIHA",
+      "title_it": "Non hai abbastanza odio.",
+      "name_pl": "ITACHI UCHIHA",
+      "title_pl": "Nie masz dość nienawiści.",
+      "image_file": "images/cards/SS/mythos_v/SS-137-MV.webp",
+      "image_url": "/images/cards/SS/mythos_v/SS-137-MV.webp"
+    },
+    "SS-126-MV": {
+      "id": "SS-126-MV",
+      "cardId": "SS-126-MV",
+      "rarity": "MV",
+      "number": "126",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_ja": "うちはサスケ",
+      "name_fr": "SASUKE UCHIWA",
+      "name_es": "SASUKE UCHIHA",
+      "title_en": "\"I'm able to see...\"",
+      "title_ja": "「見える…」",
+      "title_fr": "Je peux voir...",
+      "title_es": "Puedo ver...",
+      "title_pt": "Consigo ver...",
+      "title_it": "Riesco a vedere...",
+      "title_pl": "Potrafię widzieć...",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every Sound Village character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Orochimaru: Play a Sound Village character anywhere, paying 3 less."
+        }
+      ],
+      "rarity_display": "Mythos Variant",
+      "data_complete": true,
+      "old_id": "126/140 V",
+      "image_file": "images/cards/SS/mythos_v/SS-126-MV.webp",
+      "image_url": "/images/cards/SS/mythos_v/SS-126-MV.webp"
+    },
+    "SS-078-CHIBIV": {
+      "id": "SS-078-CHIBIV",
+      "cardId": "SS-078-CHIBIV",
+      "rarity": "CHIBIV",
+      "number": "78",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "name_es": "GAARA",
+      "name_ja": "我愛羅",
+      "title_en": "You sad little pawn.",
+      "title_fr": "Pauvre petit pion.",
+      "title_es": "Pobre peón insignificante.",
+      "title_ja": "「哀れな駒だな。」",
+      "title_pt": "Pobre peãozinho.",
+      "title_it": "Povero piccolo pedone.",
+      "title_pl": "Biedny mały pionek.",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kimimaro: Defeat an enemy character with cost 2 or less."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] When you defeat a non-hidden enemy character, you may pay 1 Chakra to draw 1 card."
+        }
+      ],
+      "image_file": "images/cards/SS/chibi_v/SS-078-CHIBIV.webp",
+      "rarity_display": "Chibi V",
+      "old_id": "78/140 V",
+      "data_complete": true
+    },
+    "SS-111-CHIBIV": {
+      "id": "SS-111-CHIBIV",
+      "cardId": "SS-111-CHIBIV",
+      "rarity": "CHIBIV",
+      "number": "111",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Neji Hyuga: Return the topmost Hinata Hyuga from your discard pile to your hand."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Play a Hyuga-named character anywhere, paying 3 less."
+        }
+      ],
+      "image_file": "images/cards/SS/chibi_v/SS-111-CHIBIV.webp",
+      "image_url": "/images/cards/SS/shinobi_v/SS-111-SHINOBIV.webp",
+      "data_complete": true,
+      "name_en": "HINATA HYUGA",
+      "title_en": "I won't run away.",
+      "name_fr": "HINATA HYÛGA",
+      "title_fr": "Je ne fuirai pas.",
+      "name_es": "HINATA HYUGA",
+      "title_es": "No voy a huir.",
+      "name_ja": "日向ヒナタ",
+      "title_ja": "「わたしは、逃げません。」",
+      "name_pt": "HINATA HYUGA",
+      "title_pt": "Eu não vou fugir.",
+      "name_it": "HINATA HYUGA",
+      "title_it": "Non scapperò.",
+      "name_pl": "HINATA HYUGA",
+      "title_pl": "Nie ucieknę.",
+      "rarity_display": "Chibi V",
+      "old_id": "111/140 V"
+    },
+    "SS-112-CHIBIV": {
+      "id": "SS-112-CHIBIV",
+      "cardId": "SS-112-CHIBIV",
+      "rarity": "CHIBIV",
+      "number": "112",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team Guy",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Remove all Power tokens from an enemy character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Hinata Hyuga: Hide an enemy character without Power tokens in this mission."
+        }
+      ],
+      "image_file": "images/cards/SS/chibi_v/SS-112-CHIBIV.webp",
+      "image_url": "/images/cards/SS/shinobi_v/SS-112-SHINOBIV.webp",
+      "data_complete": true,
+      "name_en": "NEJI HYUGA",
+      "title_en": "I'm completely out of your league.",
+      "name_fr": "NEJI HYÛGA",
+      "title_fr": "Tu n’es pas de mon niveau.",
+      "name_es": "NEJI HYUGA",
+      "title_es": "No estás a mi altura.",
+      "name_ja": "日向ネジ",
+      "title_ja": "「お前とは格が違う。」",
+      "name_pt": "NEJI HYUGA",
+      "title_pt": "Você não está no meu nível.",
+      "name_it": "NEJI HYUGA",
+      "title_it": "Non sei al mio livello.",
+      "name_pl": "NEJI HYUGA",
+      "title_pl": "Nie jesteś w mojej lidze.",
+      "rarity_display": "Chibi V",
+      "old_id": "112/140 V"
+    },
+    "SS-115-CHIBIV": {
+      "id": "SS-115-CHIBIV",
+      "cardId": "SS-115-CHIBIV",
+      "rarity": "CHIBIV",
+      "number": "115",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 7,
+      "keywords": [
+        "Team Guy"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character doesn't lose Power tokens at the end of the round."
+        },
+        {
+          "type": "DUEL",
+          "description": "[⧗] DUEL Gaara: When you defeat an enemy character, POWERUP 2."
+        }
+      ],
+      "image_file": "images/cards/SS/chibi_v/SS-115-CHIBIV.webp",
+      "image_url": "/images/cards/SS/shinobi_v/SS-115-SHINOBIV.webp",
+      "data_complete": true,
+      "name_en": "ROCK LEE",
+      "title_en": "Okay, you asked for it!",
+      "name_fr": "ROCK LEE",
+      "title_fr": "Très bien, tu l’auras voulu !",
+      "name_es": "ROCK LEE",
+      "title_es": "¡Muy bien, tú lo has querido!",
+      "name_ja": "ロック・リー",
+      "title_ja": "「いいだろう、望み通りだ！」",
+      "name_pt": "ROCK LEE",
+      "title_pt": "Certo, você pediu por isso!",
+      "name_it": "ROCK LEE",
+      "title_it": "Va bene, te la sei cercata!",
+      "name_pl": "ROCK LEE",
+      "title_pl": "Dobrze, sam tego chciałeś!",
+      "rarity_display": "Chibi V",
+      "old_id": "115/140 V"
+    },
+    "SS-118-CHIBIV": {
+      "id": "SS-118-CHIBIV",
+      "cardId": "SS-118-CHIBIV",
+      "rarity": "CHIBIV",
+      "number": "118",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SHIKAMARU NARA",
+      "name_ja": "奈良シカマル",
+      "name_fr": "SHIKAMARU NARA",
+      "name_es": "SHIKAMARU NARA",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Reveal and defeat an enemy hidden character in play."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Temari: Hide an enemy character in play with the same name as the revealed character."
+        }
+      ],
+      "rarity_display": "Chibi V",
+      "data_complete": true,
+      "old_id": "118/140 V",
+      "title_en": "It would just mean more work.",
+      "title_fr": "Ça ferait juste plus de travail.",
+      "title_es": "Solo sería más trabajo.",
+      "title_ja": "「面倒くさいだけだ。」",
+      "title_pt": "Só daria mais trabalho.",
+      "title_it": "Sarebbe solo altro lavoro.",
+      "title_pl": "To by tylko oznaczało więcej roboty.",
+      "image_file": "images/cards/SS/chibi_v/SS-118-CHIBIV.webp"
+    },
+    "SS-121-CHIBIV": {
+      "id": "SS-121-CHIBIV",
+      "cardId": "SS-121-CHIBIV",
+      "rarity": "CHIBIV",
+      "number": "121",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_ja": "うずまきナルト",
+      "name_fr": "NARUTO UZUMAKI",
+      "name_es": "NARUTO UZUMAKI",
+      "title_en": "I won't ever give up.",
+      "title_ja": "「オレは絶対にあきらめねぇ！」",
+      "title_fr": "Je n’abandonnerai jamais.",
+      "title_es": "Nunca me rendiré.",
+      "title_pt": "Eu nunca vou desistir.",
+      "title_it": "Non mi arrenderò mai.",
+      "title_pl": "Nigdy się nie poddam.",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every friendly Naruto Uzumaki in play."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kiba Inuzuka: Move the card at the bottom of this upgrade stack to another mission."
+        }
+      ],
+      "rarity_display": "Chibi V",
+      "data_complete": true,
+      "old_id": "121/140 V",
+      "image_url": "/images/cards/SS/rare/SS-121-R.webp",
+      "image_file": "images/cards/SS/chibi_v/SS-121-CHIBIV.webp"
+    },
+    "SS-123-CHIBIV": {
+      "id": "SS-123-CHIBIV",
+      "cardId": "SS-123-CHIBIV",
+      "rarity": "CHIBIV",
+      "rarity_display": "Chibi V",
+      "number": "123",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] POWERUPs on friendly characters in this mission are increased by 1."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Ino Yamanaka: Take back control of a character you own in play."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "SAKURA HARUNO",
+      "title_en": "It's not meant for you.",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "Ce n’est pas pour toi.",
+      "name_es": "SAKURA HARUNO",
+      "title_es": "No es para ti.",
+      "name_ja": "春野サクラ",
+      "title_ja": "「あなたのためじゃない。」",
+      "name_pt": "SAKURA HARUNO",
+      "title_pt": "Não é para você.",
+      "name_it": "SAKURA HARUNO",
+      "title_it": "Non è per te.",
+      "name_pl": "SAKURA HARUNO",
+      "title_pl": "To nie dla ciebie.",
+      "image_file": "images/cards/SS/chibi_v/SS-123-CHIBIV.webp",
+      "image_url": "/images/cards/SS/mythos_v/SS-123-MV.webp",
+      "old_id": "123/140 V"
+    },
+    "SS-126-CHIBIV": {
+      "id": "SS-126-CHIBIV",
+      "cardId": "SS-126-CHIBIV",
+      "rarity": "CHIBIV",
+      "number": "126",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_ja": "うちはサスケ",
+      "name_fr": "SASUKE UCHIWA",
+      "name_es": "SASUKE UCHIHA",
+      "title_en": "I can see.",
+      "title_ja": "「見える。」",
+      "title_fr": "Je vois tout.",
+      "title_es": "Puedo verlo todo.",
+      "title_pt": "Eu consigo ver.",
+      "title_it": "Riesco a vedere.",
+      "title_pl": "Widzę wszystko.",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every Sound Village character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Orochimaru: Play a Sound Village character anywhere, paying 3 less."
+        }
+      ],
+      "rarity_display": "Chibi V",
+      "data_complete": true,
+      "old_id": "126/140 V",
+      "image_file": "images/cards/SS/chibi_v/SS-126-CHIBIV.webp"
     }
   }
 }

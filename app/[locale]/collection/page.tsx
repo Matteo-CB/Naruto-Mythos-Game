@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
@@ -17,7 +17,9 @@ import type { CharacterCard, MissionCard, CardData, Rarity } from '@/lib/engine/
 import { isVariantCard, isLockedVariantCard } from '@/lib/variants/isVariant';
 import { WORLDCUP_CHAMPION_CARD } from '@/lib/variants/constants';
 import { holoIdFor, isHoloEligibleCard } from '@/lib/holo/holoId';
-import { filterCollectionCards } from '@/lib/collection/filter';
+import { matchesCollectionFilters } from '@/lib/collection/filter';
+import { facetOptions, isFacetWorthShowing } from '@/lib/collection/facets';
+import { useValidFacetSelection } from '@/lib/collection/useFacets';
 import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 import { useTrackOnMount } from '@/lib/hooks/useTrackUi';
 import { useRevealingStore } from '@/stores/revealingStore';
@@ -59,6 +61,9 @@ function StatBadges({ card, costLabel, powerLabel }: { card: AnyCard; costLabel:
 }
 
 const RARITY_ORDER: Rarity[] = ['C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L', 'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV', 'SHINOBI', 'SHINOBIV', 'MMS'];
+const CHIP_ON = 'on';
+const CHIP_OFF = 'off';
+const NO_CHOICE: string[] = [];
 export default function CollectionPage() {
   const t = useTranslations();
   const locale = useLocale();
@@ -89,32 +94,76 @@ export default function CollectionPage() {
     });
   }, [revealingVersion]);
 
-  const groups = useMemo(() => {
-    const groupSet = new Set<string>();
-    allCards.forEach((c) => {
-      if (c.group) groupSet.add(c.group);
-    });
-    return Array.from(groupSet).sort();
-  }, [allCards]);
-
-  const filteredCards = useMemo(
-    () => {
-      let base = filterCollectionCards(allCards, {
-        variantsOnly: filterVariantsOnly,
-        rarity: filterRarity,
-        group: filterGroup,
-        set: filterSet,
-        searchQuery,
-        locale: locale as 'en' | 'fr',
-      });
-      if (filterHolosOnly) {
-        base = base.filter((c) => isHoloEligibleCard(c) && unlockedVariantIds.has(holoIdFor(c.id)));
-      }
-      if (!filterTradeableOnly) return base;
-      return base.filter((c) => (variantInventory.get(filterHolosOnly ? holoIdFor(c.id) : c.id) ?? 0) >= 2);
-    },
-    [allCards, filterRarity, filterGroup, filterSet, filterVariantsOnly, filterHolosOnly, filterTradeableOnly, unlockedVariantIds, variantInventory, searchQuery, locale],
+  const isOwnedHolo = useCallback(
+    (card: AnyCard) => isHoloEligibleCard(card) && unlockedVariantIds.has(holoIdFor(card.id)),
+    [unlockedVariantIds],
   );
+
+  const isTradeable = useCallback(
+    (card: AnyCard) => (variantInventory.get(filterHolosOnly ? holoIdFor(card.id) : card.id) ?? 0) >= 2,
+    [variantInventory, filterHolosOnly],
+  );
+
+  const predicates = useMemo(
+    () => ({
+      search: (c: AnyCard) => matchesCollectionFilters(c, { searchQuery, locale }),
+      rarity: (c: AnyCard) => filterRarity === 'all' || c.rarity === filterRarity,
+      group: (c: AnyCard) => filterGroup === 'all' || c.group === filterGroup,
+      set: (c: AnyCard) => filterSet === 'all' || c.set === filterSet,
+      variantsOnly: (c: AnyCard) => !filterVariantsOnly || isVariantCard(c),
+      holosOnly: (c: AnyCard) => !filterHolosOnly || isOwnedHolo(c),
+      tradeableOnly: (c: AnyCard) => !filterTradeableOnly || isTradeable(c),
+    }),
+    [searchQuery, locale, filterRarity, filterGroup, filterSet, filterVariantsOnly, filterHolosOnly, filterTradeableOnly, isOwnedHolo, isTradeable],
+  );
+
+  const filteredCards = useMemo(() => {
+    const checks = Object.values(predicates);
+    return allCards.filter((c) => checks.every((match) => match(c)));
+  }, [allCards, predicates]);
+
+  const rarityOptions = useMemo(
+    () => facetOptions({ cards: allCards, predicates, dimension: 'rarity', valueOf: (c: AnyCard) => c.rarity ?? null, order: RARITY_ORDER }),
+    [allCards, predicates],
+  );
+  const groupOptions = useMemo(
+    () => facetOptions({ cards: allCards, predicates, dimension: 'group', valueOf: (c: AnyCard) => c.group ?? null }),
+    [allCards, predicates],
+  );
+  const setOptions = useMemo(
+    () => facetOptions({ cards: allCards, predicates, dimension: 'set', valueOf: (c: AnyCard) => c.set ?? null, order: ALL_SET_IDS }),
+    [allCards, predicates],
+  );
+  const variantsChipOptions = useMemo(
+    () => facetOptions({ cards: allCards, predicates, dimension: 'variantsOnly', valueOf: (c: AnyCard) => (isVariantCard(c) ? CHIP_ON : CHIP_OFF) }),
+    [allCards, predicates],
+  );
+  const holosChipOptions = useMemo(
+    () => facetOptions({ cards: allCards, predicates, dimension: 'holosOnly', valueOf: (c: AnyCard) => (isOwnedHolo(c) ? CHIP_ON : CHIP_OFF) }),
+    [allCards, predicates, isOwnedHolo],
+  );
+  const tradeableChipOptions = useMemo(
+    () => facetOptions({ cards: allCards, predicates, dimension: 'tradeableOnly', valueOf: (c: AnyCard) => (isTradeable(c) ? CHIP_ON : CHIP_OFF) }),
+    [allCards, predicates, isTradeable],
+  );
+
+  const showRarityFilter = isFacetWorthShowing(rarityOptions);
+  const showGroupFilter = isFacetWorthShowing(groupOptions);
+  const showSetFilter = isFacetWorthShowing(setOptions);
+  const showVariantsChip = isFacetWorthShowing(variantsChipOptions);
+  const showHolosChip = isFacetWorthShowing(holosChipOptions);
+  const showTradeableChip = isFacetWorthShowing(tradeableChipOptions);
+
+  const setVariantsChip = useCallback((value: string) => setFilterVariantsOnly(value === CHIP_ON), []);
+  const setHolosChip = useCallback((value: string) => setFilterHolosOnly(value === CHIP_ON), []);
+  const setTradeableChip = useCallback((value: string) => setFilterTradeableOnly(value === CHIP_ON), []);
+
+  useValidFacetSelection(filterRarity, showRarityFilter ? rarityOptions : NO_CHOICE, 'all', setFilterRarity);
+  useValidFacetSelection(filterGroup, showGroupFilter ? groupOptions : NO_CHOICE, 'all', setFilterGroup);
+  useValidFacetSelection(filterSet, showSetFilter ? setOptions : NO_CHOICE, 'all', setFilterSet);
+  useValidFacetSelection(filterVariantsOnly ? CHIP_ON : CHIP_OFF, showVariantsChip ? variantsChipOptions : NO_CHOICE, CHIP_OFF, setVariantsChip);
+  useValidFacetSelection(filterHolosOnly ? CHIP_ON : CHIP_OFF, showHolosChip ? holosChipOptions : NO_CHOICE, CHIP_OFF, setHolosChip);
+  useValidFacetSelection(filterTradeableOnly ? CHIP_ON : CHIP_OFF, showTradeableChip ? tradeableChipOptions : NO_CHOICE, CHIP_OFF, setTradeableChip);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -211,85 +260,97 @@ export default function CollectionPage() {
             className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444] w-full sm:w-64"
             aria-label={t('collection.search')}
           />
-          <select
-            value={filterRarity}
-            onChange={(e) => setFilterRarity(e.target.value)}
-            className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm focus:outline-none"
-            aria-label={t('collection.allRarities')}
-          >
-            <option value="all">{t('collection.allRarities')}</option>
-            {RARITY_ORDER.map((r) => (
-              <option key={r} value={r}>{getRarityLabel(r, tCardMeta)}</option>
-            ))}
-          </select>
-          <select
-            value={filterGroup}
-            onChange={(e) => setFilterGroup(e.target.value)}
-            className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm focus:outline-none"
-            aria-label={t('collection.allGroups')}
-          >
-            <option value="all">{t('collection.allGroups')}</option>
-            {groups.map((g) => (
-              <option key={g} value={g}>{getCardGroup(g, tCardMeta)}</option>
-            ))}
-          </select>
-          <select
-            value={filterSet}
-            onChange={(e) => setFilterSet(e.target.value)}
-            className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm focus:outline-none"
-            aria-label={t('collection.allSets')}
-          >
-            <option value="all">{t('collection.allSets')}</option>
-            {ALL_SET_IDS.map((sid) => {
-              const desc = SET_REGISTRY[sid];
-              const name = getSetName(sid, locale);
-              const suffix = desc.status === 'coming_soon'
-                ? ' (' + t('common.comingSoon') + ')'
-                : desc.status === 'revealing'
-                  ? ' (' + t('common.revealing') + ')'
-                  : '';
-              return <option key={sid} value={sid}>{name + suffix}</option>;
-            })}
-          </select>
-          <button
-            type="button"
-            onClick={() => setFilterVariantsOnly((v) => !v)}
-            aria-pressed={filterVariantsOnly}
-            className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
-            style={{
-              backgroundColor: filterVariantsOnly ? '#c4a35a1f' : '#141414',
-              color: filterVariantsOnly ? '#c4a35a' : '#888888',
-              boxShadow: filterVariantsOnly ? '0 0 12px #c4a35a33' : 'none',
-            }}
-          >
-            {t('collection.variantsOnly')}
-          </button>
-          <button
-            type="button"
-            onClick={() => setFilterHolosOnly((v) => !v)}
-            aria-pressed={filterHolosOnly}
-            className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
-            style={{
-              backgroundColor: filterHolosOnly ? '#a8e6ff1f' : '#141414',
-              color: filterHolosOnly ? '#a8e6ff' : '#888888',
-              boxShadow: filterHolosOnly ? '0 0 12px #a8e6ff33' : 'none',
-            }}
-          >
-            {t('collection.holosOnly')}
-          </button>
-          <button
-            type="button"
-            onClick={() => setFilterTradeableOnly((v) => !v)}
-            aria-pressed={filterTradeableOnly}
-            className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
-            style={{
-              backgroundColor: filterTradeableOnly ? '#c4a35a1f' : '#141414',
-              color: filterTradeableOnly ? '#c4a35a' : '#888888',
-              boxShadow: filterTradeableOnly ? '0 0 12px #c4a35a33' : 'none',
-            }}
-          >
-            {t('collection.filterTradeable')}
-          </button>
+          {showRarityFilter && (
+            <select
+              value={filterRarity}
+              onChange={(e) => setFilterRarity(e.target.value)}
+              className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm focus:outline-none"
+              aria-label={t('collection.allRarities')}
+            >
+              <option value="all">{t('collection.allRarities')}</option>
+              {rarityOptions.map((r) => (
+                <option key={r} value={r}>{getRarityLabel(r, tCardMeta)}</option>
+              ))}
+            </select>
+          )}
+          {showGroupFilter && (
+            <select
+              value={filterGroup}
+              onChange={(e) => setFilterGroup(e.target.value)}
+              className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm focus:outline-none"
+              aria-label={t('collection.allGroups')}
+            >
+              <option value="all">{t('collection.allGroups')}</option>
+              {groupOptions.map((g) => (
+                <option key={g} value={g}>{getCardGroup(g, tCardMeta)}</option>
+              ))}
+            </select>
+          )}
+          {showSetFilter && (
+            <select
+              value={filterSet}
+              onChange={(e) => setFilterSet(e.target.value)}
+              className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm focus:outline-none"
+              aria-label={t('collection.allSets')}
+            >
+              <option value="all">{t('collection.allSets')}</option>
+              {setOptions.map((sid) => {
+                const desc = SET_REGISTRY[sid];
+                const name = getSetName(sid, locale);
+                const suffix = desc?.status === 'coming_soon'
+                  ? ' (' + t('common.comingSoon') + ')'
+                  : desc?.status === 'revealing'
+                    ? ' (' + t('common.revealing') + ')'
+                    : '';
+                return <option key={sid} value={sid}>{name + suffix}</option>;
+              })}
+            </select>
+          )}
+          {showVariantsChip && (
+            <button
+              type="button"
+              onClick={() => setFilterVariantsOnly((v) => !v)}
+              aria-pressed={filterVariantsOnly}
+              className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
+              style={{
+                backgroundColor: filterVariantsOnly ? '#c4a35a1f' : '#141414',
+                color: filterVariantsOnly ? '#c4a35a' : '#888888',
+                boxShadow: filterVariantsOnly ? '0 0 12px #c4a35a33' : 'none',
+              }}
+            >
+              {t('collection.variantsOnly')}
+            </button>
+          )}
+          {showHolosChip && (
+            <button
+              type="button"
+              onClick={() => setFilterHolosOnly((v) => !v)}
+              aria-pressed={filterHolosOnly}
+              className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
+              style={{
+                backgroundColor: filterHolosOnly ? '#a8e6ff1f' : '#141414',
+                color: filterHolosOnly ? '#a8e6ff' : '#888888',
+                boxShadow: filterHolosOnly ? '0 0 12px #a8e6ff33' : 'none',
+              }}
+            >
+              {t('collection.holosOnly')}
+            </button>
+          )}
+          {showTradeableChip && (
+            <button
+              type="button"
+              onClick={() => setFilterTradeableOnly((v) => !v)}
+              aria-pressed={filterTradeableOnly}
+              className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
+              style={{
+                backgroundColor: filterTradeableOnly ? '#c4a35a1f' : '#141414',
+                color: filterTradeableOnly ? '#c4a35a' : '#888888',
+                boxShadow: filterTradeableOnly ? '0 0 12px #c4a35a33' : 'none',
+              }}
+            >
+              {t('collection.filterTradeable')}
+            </button>
+          )}
         </div>
 
         <p className="text-xs text-[#555] mb-4">{t('collection.total', { count: filteredCards.length })}</p>

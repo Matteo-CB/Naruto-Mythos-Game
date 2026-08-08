@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
 
 
 function handleHiruzen001Main(ctx: EffectContext): EffectResult {
@@ -50,14 +51,14 @@ function applyPowerup(state: import('@/lib/effects/EffectTypes').EffectContext['
     player1Characters: mission.player1Characters.map((char) => {
       if (char.instanceId === targetInstanceId) {
         targetName = char.card.name_fr;
-        return { ...char, powerTokens: char.powerTokens + amount };
+        return { ...char, powerTokens: char.powerTokens + amplifiedPowerup(newState, char.instanceId, amount) };
       }
       return char;
     }),
     player2Characters: mission.player2Characters.map((char) => {
       if (char.instanceId === targetInstanceId) {
         targetName = char.card.name_fr;
-        return { ...char, powerTokens: char.powerTokens + amount };
+        return { ...char, powerTokens: char.powerTokens + amplifiedPowerup(newState, char.instanceId, amount) };
       }
       return char;
     }),

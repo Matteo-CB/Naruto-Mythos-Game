@@ -1008,7 +1008,16 @@
         "ss002SummonChakra": "{card}: gained {amount} Chakra for playing a Summon character.",
         "ss002SummonPowerup": "{card}: POWERUP {amount} on {count} friendly Summon character(s).",
         "ss002RevealWon": "{card}: declared {amount}, revealed {target}, POWERUP {amount}.",
-        "ss002RevealFailed": "{card}: declared {amount}, revealed {target}, no POWERUP."
+        "ss002RevealFailed": "{card}: declared {amount}, revealed {target}, no POWERUP.",
+        "ss123MvTakeBack": "{card} took back control of {target}.",
+        "ss123MvTakeBackHidden": "{card} took back control of a hidden character.",
+        "ss137MvReturnHidden": "{card} returned a friendly hidden character to hand.",
+        "ss137MvDuelDefeat": "{card}: the opponent defeated {target}.",
+        "discardCard": "{card} discarded {target}.",
+        "duplicateNameReveal": "{card} could not be revealed: a character with that name is already there.",
+        "sakura135NoPlayChooseOrder": "{card} played no card, choose the order of the cards put back.",
+        "ss118Reveal": "{card} revealed {target}.",
+        "ss118HideSameName": "{card} hid {target}, who shares the revealed name."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -1688,7 +1697,16 @@
         "ss002RevealLose": "You declared {declared} but the revealed card only costs {cost}: no POWERUP.",
         "ss079ConfirmMain": "MAIN: POWERUP 1 on this character?",
         "ss081ConfirmMain": "MAIN: draw a card?",
-        "declareNumber": "Declare a number between {min} and {max}. The higher you go, the harder it is to beat."
+        "declareNumber": "Declare a number between {min} and {max}. The higher you go, the harder it is to beat.",
+        "ss005ConfirmMain": "Put the top card of your deck as a hidden character in this mission?",
+        "ss005ConfirmAmbush": "AMBUSH: put the top card of your deck as a hidden character in this mission again?",
+        "ss123MvTakeBack": "Take back control of a character you own.",
+        "ss137MvReturnHidden": "Return a friendly hidden character from this mission to your hand.",
+        "ss137MvConfirmDuel": "Make the opponent defeat their characters in this mission until they have as many as you?",
+        "ss137MvOpponentChooseDefeat": "Choose one of your characters to defeat in this mission ({count} too many).",
+        "ssMss02Looked": "Choose a card to put back on top of your deck.",
+        "ss118RevealDefeat": "Reveal and defeat an enemy hidden character.",
+        "ss118HideSameName": "Hide an enemy character with the same name as the revealed one."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",
@@ -3253,7 +3271,19 @@
     "turn": "Turn {turn}",
     "ranked": "Ranked",
     "casual": "Casual",
-    "evolvingTag": "EVOLVING"
+    "evolvingTag": "EVOLVING",
+    "loading": "Loading",
+    "connecting": "Connecting to the match",
+    "signInToWatch": "Sign in to watch this match",
+    "errorAuth": "Identity check failed",
+    "errorNotFound": "This match is not running",
+    "errorPrivate": "This is a private game",
+    "errorLimit": "This match already has too many viewers",
+    "errorNotSubscribed": "You are not watching this match",
+    "errorEnded": "This match is over",
+    "errorBanned": "Watching is closed to you",
+    "errorPlayerInTournament": "Tournament players cannot watch the other tables",
+    "errorSignInRequired": "Sign in to watch tournament matches"
   },
   "chat": {
     "title": "Chat",
@@ -3361,7 +3391,9 @@
     "errorLimit": "Spectator limit reached for this room.",
     "errorNotSubscribed": "You are not subscribed to this room.",
     "errorEnded": "This game has ended.",
-    "errorBanned": "You cannot watch games for now."
+    "errorBanned": "You cannot watch games for now.",
+    "errorPlayerInTournament": "Tournament players cannot watch the other tables",
+    "errorSignInRequired": "Sign in to watch tournament matches"
   },
   "deckStats": {
     "title": "Deck stats (last 90 days)",
@@ -4099,5 +4131,24 @@
     "badge": "FIRST STRIKE",
     "used": "Already used this round",
     "opponentUsed": "Your opponent used FIRST STRIKE"
+  },
+  "tournamentSpectate": {
+    "title": "Watch the tournament",
+    "panelTitle": "Live matches",
+    "closePanel": "Close the panel",
+    "openPanel": "Choose the matches to watch",
+    "selectedCount": "{count} of {max} boards on screen",
+    "noLiveMatches": "No match is being played right now.",
+    "pickToStart": "Open the panel at the top right to choose the matches to watch.",
+    "signInRequired": "Sign in to watch the tournament. Players taking part in this tournament cannot watch the other tables.",
+    "backToTournament": "Back to the tournament",
+    "liveCount": "{count} live match(es)",
+    "versus": "vs",
+    "roundState": "Round {turn}",
+    "watching": "{count} watching",
+    "removeTile": "Remove this board",
+    "matchEnded": "Match over",
+    "watchLive": "Watch live",
+    "playersCannotWatch": "You are taking part in this tournament, so you cannot watch the other tables."
   }
 }

@@ -4,6 +4,7 @@ import type { CharacterInPlay } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { defeatEnemyCharacter } from '@/lib/effects/defeatUtils';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
+import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
 
 
 
@@ -68,7 +69,7 @@ function applyGaaraUpgradePowerup(
   if (selfIndex !== -1) {
     friendlyChars[selfIndex] = {
       ...friendlyChars[selfIndex],
-      powerTokens: friendlyChars[selfIndex].powerTokens + defeatedCount,
+      powerTokens: friendlyChars[selfIndex].powerTokens + amplifiedPowerup(state, friendlyChars[selfIndex].instanceId, defeatedCount),
     };
     mission[friendlySide] = friendlyChars;
     missions[sourceMissionIndex] = mission;

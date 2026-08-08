@@ -211,4 +211,56 @@ export const effectDescriptionsIt: Record<string, string[]> = {
     "Allega a un personaggio alleato non nascosto.",
     "[↯] Pesca una carta.",
   ],
+  "SS-114-MV": [
+    "[↯] Scarta un Gaara dalla tua mano. Nascondi un personaggio nemico in questa missione con costo pari o inferiore a quello della carta scartata.",
+    "Rock Lee, effetto MAIN: Invece, sconfiggilo.",
+  ],
+  "SS-126-MV": [
+    "[⧗] Questo personaggio ha +1 Potenza per ogni personaggio del Villaggio del Suono in questa missione.",
+    "[↯] Orochimaru: Gioca un personaggio del Villaggio del Suono ovunque, pagando 3 in meno.",
+  ],
+  "SS-123-MV": [
+    "[⧗] I POWERUP sui personaggi alleati in questa missione sono aumentati di 1.",
+    "[↯] Ino Yamanaka: Riprendi il controllo di un personaggio che possiedi in gioco.",
+  ],
+  "SS-005-M": [
+    "[↯] Metti la carta in cima al tuo mazzo come personaggio nascosto in questa missione.",
+    "[↯] Ripeti l’effetto MAIN.",
+  ],
+  "SS-137-MV": [
+    "[↯] Riporta in mano un personaggio alleato nascosto da questa missione.",
+    "[↯] Kurenai Yuhi: L’avversario sceglie e sconfigge i suoi personaggi in questa missione finché non ne ha quanti ne hai tu.",
+  ],
+  "SS-078-CHIBIV": [
+    "[↯] Kimimaro: Sconfiggi un personaggio nemico con costo 2 o inferiore.",
+    "[⧗] Quando sconfiggi un personaggio nemico non nascosto, puoi pagare 1 Chakra per pescare 1 carta.",
+  ],
+  "SS-111-CHIBIV": [
+    "[↯] DUEL Neji Hyuga: Rimetti in mano la Hinata Hyuga più in alto nella tua pila degli scarti.",
+    "[↯] Gioca un personaggio di nome Hyuga ovunque, pagando 3 in meno.",
+  ],
+  "SS-112-CHIBIV": [
+    "[↯] Rimuovi tutti i token Potenza da un personaggio nemico in questa missione.",
+    "[↯] Hinata Hyuga: Nascondi un personaggio nemico senza token Potenza in questa missione.",
+  ],
+  "SS-115-CHIBIV": [
+    "[⧗] Questo personaggio non perde i suoi segnalini Potenza alla fine del round.",
+    "[⧗] DUEL Gaara: Quando sconfiggi un personaggio nemico, POWERUP 2.",
+  ],
+  "SS-121-CHIBIV": [
+    "[⧗] Questo personaggio ha +1 Potenza per ogni Naruto Uzumaki alleato in gioco.",
+    "[↯] Kiba Inuzuka: Sposta la carta in fondo a questa pila di evoluzione su un'altra missione.",
+  ],
+  "SS-123-CHIBIV": [
+    "[⧗] I POWERUP sui personaggi alleati in questa missione sono aumentati di 1.",
+    "[↯] Ino Yamanaka: Riprendi il controllo di un personaggio che possiedi in gioco.",
+  ],
+  "SS-126-CHIBIV": [
+    "[⧗] Questo personaggio ha +1 Potenza per ogni personaggio del Villaggio del Suono in questa missione.",
+    "[↯] Orochimaru: Gioca un personaggio del Villaggio del Suono ovunque, pagando 3 in meno.",
+  ],
+  "SS-118-CHIBIV": [
+    "[↯] Rivela e sconfiggi un personaggio nemico nascosto in gioco.",
+    "[↯] Temari: Nascondi un personaggio nemico in gioco con lo stesso nome del personaggio rivelato.",
+  ],
 };

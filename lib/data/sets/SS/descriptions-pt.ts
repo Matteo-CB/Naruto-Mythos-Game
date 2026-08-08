@@ -211,4 +211,56 @@ export const effectDescriptionsPt: Record<string, string[]> = {
     "Anexe a um personagem aliado não-oculto.",
     "[↯] Compre uma carta.",
   ],
+  "SS-114-MV": [
+    "[↯] Descarte um Gaara da sua mão. Oculte um personagem inimigo nesta missão com custo igual ou inferior ao da carta descartada.",
+    "Rock Lee, efeito MAIN: Em vez disso, derrote-o.",
+  ],
+  "SS-126-MV": [
+    "[⧗] Este personagem tem +1 de Poder para cada personagem da Vila do Som nesta missão.",
+    "[↯] Orochimaru: Jogue um personagem da Vila do Som em qualquer lugar, pagando 3 a menos.",
+  ],
+  "SS-123-MV": [
+    "[⧗] Os POWERUP em personagens aliados nesta missão são aumentados em 1.",
+    "[↯] Ino Yamanaka: Retome o controle de um personagem que você possui em jogo.",
+  ],
+  "SS-005-M": [
+    "[↯] Coloque a carta do topo do seu deck como personagem oculto nesta missão.",
+    "[↯] Repita o efeito MAIN.",
+  ],
+  "SS-137-MV": [
+    "[↯] Devolva um personagem aliado oculto desta missão para a sua mão.",
+    "[↯] Kurenai Yuhi: O oponente escolhe e derrota seus personagens nesta missão até ter o mesmo número que você.",
+  ],
+  "SS-078-CHIBIV": [
+    "[↯] Kimimaro: Derrote um personagem inimigo com custo 2 ou menos.",
+    "[⧗] Quando você derrotar um personagem inimigo não-oculto, pode pagar 1 Chakra para comprar 1 carta.",
+  ],
+  "SS-111-CHIBIV": [
+    "[↯] DUEL Neji Hyuga: Devolve à tua mão a Hinata Hyuga mais acima na tua pilha de descarte.",
+    "[↯] Joga uma personagem chamada Hyuga em qualquer lugar, pagando menos 3.",
+  ],
+  "SS-112-CHIBIV": [
+    "[↯] Remova todas as fichas de Poder de um personagem inimigo nesta missão.",
+    "[↯] Hinata Hyuga: Oculte um personagem inimigo sem fichas de Poder nesta missão.",
+  ],
+  "SS-115-CHIBIV": [
+    "[⧗] Esta personagem não perde os seus contadores de Poder no fim da ronda.",
+    "[⧗] DUEL Gaara: Quando derrotas uma personagem inimiga, POWERUP 2.",
+  ],
+  "SS-121-CHIBIV": [
+    "[⧗] Este personagem tem +1 de Poder para cada Naruto Uzumaki aliado em jogo.",
+    "[↯] Kiba Inuzuka: Mova a carta de baixo desta pilha de evolução para outra missão.",
+  ],
+  "SS-123-CHIBIV": [
+    "[⧗] Os POWERUP em personagens aliados nesta missão são aumentados em 1.",
+    "[↯] Ino Yamanaka: Retome o controle de um personagem que você possui em jogo.",
+  ],
+  "SS-126-CHIBIV": [
+    "[⧗] Este personagem tem +1 de Poder para cada personagem da Vila do Som nesta missão.",
+    "[↯] Orochimaru: Jogue um personagem da Vila do Som em qualquer lugar, pagando 3 a menos.",
+  ],
+  "SS-118-CHIBIV": [
+    "[↯] Revele e derrote um personagem inimigo oculto em jogo.",
+    "[↯] Temari: Oculte um personagem inimigo em jogo com o mesmo nome do personagem revelado.",
+  ],
 };

@@ -640,7 +640,7 @@ function applyNewForcesPowerup(
     return {
       ...m,
       [side]: m[side].map((c: CharacterInPlay) =>
-        c.instanceId === playedInstanceId ? { ...c, powerTokens: c.powerTokens + 2 } : c,
+        c.instanceId === playedInstanceId ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 2) } : c,
       ),
     };
   });
@@ -704,7 +704,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
         const updatedMission = { ...missions[missionIndex] };
         const side = opponent === 'player1' ? 'player1Characters' : 'player2Characters';
         updatedMission[side] = updatedMission[side].map((c: CharacterInPlay) =>
-          c.instanceId === char.instanceId ? { ...c, powerTokens: c.powerTokens + 1 } : c,
+          c.instanceId === char.instanceId ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, 1) } : c,
         );
         missions[missionIndex] = updatedMission;
         newState.activeMissions = missions;
@@ -962,4 +962,42 @@ export function missionPowerFor(state: GameState, missionIndex: number, player: 
     total += base + char.powerTokens + calculateContinuousPowerModifier(state, player, missionIndex, char);
   }
   return total + teamTrainingBonus(mission, player);
+}
+
+export const SAKURA_POWERUP_AMPLIFIER_NUMBER = 123;
+
+function isPowerupAmplifier(card: { set?: string; number?: string | number }): boolean {
+  return card.set === 'SS' && Number(card.number) === SAKURA_POWERUP_AMPLIFIER_NUMBER;
+}
+
+function sideOfPlayer(player: PlayerID): 'player1Characters' | 'player2Characters' {
+  return player === 'player1' ? 'player1Characters' : 'player2Characters';
+}
+
+export function powerupAmplifierBonus(
+  state: GameState,
+  missionIndex: number,
+  controller: PlayerID,
+  targetInstanceId?: string,
+): number {
+  const mission = state.activeMissions[missionIndex];
+  if (!mission) return 0;
+  return mission[sideOfPlayer(controller)].reduce((bonus, char) => {
+    if (char.isHidden) return bonus;
+    if (targetInstanceId && char.instanceId === targetInstanceId) return bonus;
+    const top = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    return isPowerupAmplifier(top) ? bonus + 1 : bonus;
+  }, 0);
+}
+
+export function amplifiedPowerup(state: GameState, targetInstanceId: string, amount: number): number {
+  if (amount <= 0) return amount;
+  for (let missionIndex = 0; missionIndex < state.activeMissions.length; missionIndex++) {
+    const mission = state.activeMissions[missionIndex];
+    for (const player of ['player1', 'player2'] as PlayerID[]) {
+      if (!mission[sideOfPlayer(player)].some((c) => c.instanceId === targetInstanceId)) continue;
+      return amount + powerupAmplifierBonus(state, missionIndex, player, targetInstanceId);
+    }
+  }
+  return amount;
 }

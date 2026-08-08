@@ -1014,7 +1014,16 @@
         "ss002SummonChakra": "{card} : {amount} Chakra gagné(s) en jouant une Invocation.",
         "ss002SummonPowerup": "{card} : POWERUP {amount} sur {count} Invocation(s) alliée(s).",
         "ss002RevealWon": "{card} : {amount} annoncé, {target} révélée, POWERUP {amount}.",
-        "ss002RevealFailed": "{card} : {amount} annoncé, {target} révélée, pas de POWERUP."
+        "ss002RevealFailed": "{card} : {amount} annoncé, {target} révélée, pas de POWERUP.",
+        "ss123MvTakeBack": "{card} a repris le contrôle de {target}.",
+        "ss123MvTakeBackHidden": "{card} a repris le contrôle d’un personnage caché.",
+        "ss137MvReturnHidden": "{card} a renvoyé un personnage caché allié dans sa main.",
+        "ss137MvDuelDefeat": "{card} : l’adversaire a vaincu {target}.",
+        "discardCard": "{card} a défaussé {target}.",
+        "duplicateNameReveal": "{card} n’a pas pu être révélé : un personnage de ce nom est déjà présent.",
+        "sakura135NoPlayChooseOrder": "{card} n’a joué aucune carte, choisissez l’ordre des cartes remises.",
+        "ss118Reveal": "{card} a révélé {target}.",
+        "ss118HideSameName": "{card} a caché {target}, qui porte le nom révélé."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1694,7 +1703,16 @@
         "ss002RevealLose": "Vous avez annoncé {declared} mais la carte révélée ne coûte que {cost} : pas de POWERUP.",
         "ss079ConfirmMain": "MAIN : POWERUP 1 sur ce personnage ?",
         "ss081ConfirmMain": "MAIN : piocher une carte ?",
-        "declareNumber": "Annoncez un nombre entre {min} et {max}. Plus il est grand, plus le pari est risqué."
+        "declareNumber": "Annoncez un nombre entre {min} et {max}. Plus il est grand, plus le pari est risqué.",
+        "ss005ConfirmMain": "Placer la carte du dessus de votre deck comme personnage caché dans cette mission ?",
+        "ss005ConfirmAmbush": "EMBUSCADE : placer à nouveau la carte du dessus de votre deck comme personnage caché dans cette mission ?",
+        "ss123MvTakeBack": "Reprenez le contrôle d’un personnage qui vous appartient.",
+        "ss137MvReturnHidden": "Renvoyez un personnage caché allié de cette mission dans votre main.",
+        "ss137MvConfirmDuel": "Forcer l’adversaire à vaincre ses personnages dans cette mission jusqu’à en avoir autant que vous ?",
+        "ss137MvOpponentChooseDefeat": "Choisissez un de vos personnages à vaincre dans cette mission ({count} de trop).",
+        "ssMss02Looked": "Choisissez une carte à remettre sur le dessus de votre deck.",
+        "ss118RevealDefeat": "Révélez et vainquez un personnage ennemi caché.",
+        "ss118HideSameName": "Cachez un personnage ennemi portant le nom du personnage révélé."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",
@@ -3259,7 +3277,19 @@
     "turn": "Tour {turn}",
     "ranked": "Classée",
     "casual": "Casual",
-    "evolvingTag": "EVOLVING"
+    "evolvingTag": "EVOLVING",
+    "loading": "Chargement",
+    "connecting": "Connexion au match",
+    "signInToWatch": "Connectez-vous pour regarder ce match",
+    "errorAuth": "Vérification d'identité échouée",
+    "errorNotFound": "Ce match n'est pas en cours",
+    "errorPrivate": "Cette partie est privée",
+    "errorLimit": "Ce match a déjà trop de spectateurs",
+    "errorNotSubscribed": "Vous ne regardez pas ce match",
+    "errorEnded": "Ce match est terminé",
+    "errorBanned": "L'accès aux spectateurs vous est fermé",
+    "errorPlayerInTournament": "Les joueurs du tournoi ne peuvent pas regarder les autres tables",
+    "errorSignInRequired": "Connectez-vous pour regarder les matchs du tournoi"
   },
   "chat": {
     "title": "Chat",
@@ -3367,7 +3397,9 @@
     "errorLimit": "Limite de spectateurs atteinte pour cette partie.",
     "errorNotSubscribed": "Vous n'êtes pas inscrit dans cette partie.",
     "errorEnded": "Cette partie est terminée.",
-    "errorBanned": "Tu ne peux pas regarder de parties pour le moment."
+    "errorBanned": "Tu ne peux pas regarder de parties pour le moment.",
+    "errorPlayerInTournament": "Les joueurs du tournoi ne peuvent pas regarder les autres tables",
+    "errorSignInRequired": "Connectez-vous pour regarder les matchs du tournoi"
   },
   "deckStats": {
     "title": "Stats des decks (90 derniers jours)",
@@ -4105,5 +4137,24 @@
     "badge": "FIRST STRIKE",
     "used": "Déjà utilisé cette manche",
     "opponentUsed": "Ton adversaire a utilisé FIRST STRIKE"
+  },
+  "tournamentSpectate": {
+    "title": "Regarder le tournoi",
+    "panelTitle": "Matchs en direct",
+    "closePanel": "Fermer le panneau",
+    "openPanel": "Choisir les matchs à regarder",
+    "selectedCount": "{count} plateau(x) sur {max} à l’écran",
+    "noLiveMatches": "Aucun match n’est joué en ce moment.",
+    "pickToStart": "Ouvrez le panneau en haut à droite pour choisir les matchs à regarder.",
+    "signInRequired": "Connectez-vous pour regarder le tournoi. Les joueurs inscrits à ce tournoi ne peuvent pas regarder les autres tables.",
+    "backToTournament": "Retour au tournoi",
+    "liveCount": "{count} match(s) en direct",
+    "versus": "contre",
+    "roundState": "Manche {turn}",
+    "watching": "{count} spectateur(s)",
+    "removeTile": "Retirer ce plateau",
+    "matchEnded": "Match terminé",
+    "watchLive": "Regarder en direct",
+    "playersCannotWatch": "Vous participez à ce tournoi, vous ne pouvez donc pas regarder les autres tables."
   }
 }

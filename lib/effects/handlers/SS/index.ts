@@ -11,6 +11,9 @@ import { registerJirobo033Handlers } from './jirobo033';
 import { registerKyubi006Handlers } from './kyubi006';
 import { registerTsunade002Handlers } from './tsunade002';
 import { registerSenbonRamenHandlers } from './senbonRamen';
+import { registerNaruto005Handlers } from './naruto005';
+import { registerRegionalChampionshipHandlers } from './regionalChampionship';
+import { registerShikamaru118Handlers } from './shikamaru118';
 import { registerSSMissionHandlers } from './missions/ssMissionHandlers';
 
 export function registerAllSSHandlers(): void {
@@ -27,5 +30,8 @@ export function registerAllSSHandlers(): void {
   registerKyubi006Handlers();
   registerTsunade002Handlers();
   registerSenbonRamenHandlers();
+  registerNaruto005Handlers();
+  registerRegionalChampionshipHandlers();
+  registerShikamaru118Handlers();
   registerSSMissionHandlers();
 }

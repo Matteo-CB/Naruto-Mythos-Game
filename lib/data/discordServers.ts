@@ -40,6 +40,6 @@ export const DISCORD_SERVERS: DiscordServerEntry[] = [
     name: 'New World Server',
     description: 'New World Loot',
     logo: '/images/social/new-world-server.webp',
-    inviteUrl: 'https://discord.gg/JR5HG4VUP',
+    inviteUrl: 'https://discord.gg/Wk5MQhkNEw',
   },
 ];
