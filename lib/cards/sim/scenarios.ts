@@ -249,6 +249,29 @@ const FACTORIES: Record<string, Factory> = {
     },
     noMinimize: true,
   }),
+  'SS-148-SV': (id) => ({
+    build: () => board({
+      hand: [id],
+      chakra: 20,
+      extraP2m0: [upgradedEnemyStack('KS-005-C', 'KS-021-C', 'sim-upgraded-foe')],
+      e0: [{ id: 'KS-009-C', iid: 'sim-naruto' }],
+      missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+    }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
+  'SS-150-SV': (id) => ({
+    build: () => board({
+      hand: [id],
+      upgBase: { id: 'KS-086-C', iid: 'sim-upg-base' },
+      chakra: 20,
+      e0: [{ id: 'KS-015-C', iid: 'sim-kakashi' }],
+      e1: [{ id: 'KS-136-S', iid: 'sim-strong-foe' }],
+      missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+    }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
   'SS-118-CHIBIV': (id) => ({
     build: () => board({
       hand: [],
@@ -324,7 +347,7 @@ const FACTORIES: Record<string, Factory> = {
     },
     noMinimize: true,
   }),
-  'SS-000-L': (id) => ({
+  'SS-149-L': (id) => ({
     build: () => {
       const st = board({ hand: [id], chakra: 20 });
       st.player1.deck = ['KS-099-C', 'KS-100-C', 'KS-021-C'].map((x) => getCharacterById(x)!).filter(Boolean);

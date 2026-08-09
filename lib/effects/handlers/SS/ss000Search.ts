@@ -11,7 +11,7 @@ export const SS000_PLAY_OPTS: PlayLessOptions = {
   category: { kind: 'keyword', value: SS000_NINJA_HOUND },
   costReduction: 1,
   sourceName: 'KAKASHI HATAKE',
-  sourceId: 'SS-000-L',
+  sourceId: 'SS-149-L',
   textFallback: 'Kakashi Hatake (SS-000): Play any number of Ninja Hound characters, paying 1 less.',
   descriptionKey: 'game.effect.desc.ss000PlayHound',
   repeatable: true,
@@ -70,7 +70,7 @@ export function ss000FinalizeSearch(
     [player]: ps,
     log: logAction(state.log, state.turn, state.phase, player, 'EFFECT_DRAW',
       `Kakashi Hatake (SS-000): searched the deck, drew ${drawnCount} Ninja Hound, then shuffled.`,
-      'game.log.effect.ss000Search', { card: 'KAKASHI HATAKE', id: 'SS-000-L', count: drawnCount }),
+      'game.log.effect.ss000Search', { card: 'KAKASHI HATAKE', id: 'SS-149-L', count: drawnCount }),
   };
 
   const { targets, hiddenChars } = buildPlayLessTargets(s, player, SS000_PLAY_OPTS.category, SS000_PLAY_OPTS.costReduction);

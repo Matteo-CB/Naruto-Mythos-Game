@@ -145,9 +145,9 @@ describe('set 2 optional effects always prompt a confirmation first', () => {
     expect(discardPe.rootOptional ?? false).toBe(false);
   });
 
-  it('Kakashi SS-000-L still prompts when the deck has no hound but a hound is playable from hand', () => {
+  it('Kakashi SS-149-L still prompts when the deck has no hound but a hound is playable from hand', () => {
     const st = buildSimState({
-      hand1: ['SS-000-L', 'KS-099-C'],
+      hand1: ['SS-149-L', 'KS-099-C'],
       p1: [],
       p2: [],
       missions: 2,
@@ -180,9 +180,9 @@ describe('set 2 optional effects always prompt a confirmation first', () => {
     expect(s.activeMissions[0].player2Characters.filter((c) => c.isHidden).length).toBe(1);
   });
 
-  it('revealing Kakashi SS-000-L chains MAIN then the Zabuza DUEL repeat', () => {
+  it('revealing Kakashi SS-149-L chains MAIN then the Zabuza DUEL repeat', () => {
     const st = buildSimState({
-      p1: [simChar('SS-000-L', { owner: 'player1', instanceId: 'hidden-kakashi', hidden: true })],
+      p1: [simChar('SS-149-L', { owner: 'player1', instanceId: 'hidden-kakashi', hidden: true })],
       p2: [simChar('KS-086-C', { owner: 'player2', instanceId: 'zabuza-partner' })],
       missions: 2,
       chakra1: 20,

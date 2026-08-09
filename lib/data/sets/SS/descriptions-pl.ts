@@ -26,7 +26,7 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "[⧗] Wrogie postacie nie mogą opuścić tej misji.",
     "[↯] Sasuke Uchiha: POWERUP 1 za każdą nieukrytą wrogą postać w grze.",
   ],
-  "SS-000-L": [
+  "SS-149-L": [
     "[↯] Przeszukaj talię w poszukiwaniu do 2 postaci Psa Ninja, odkryj je i dobierz, potem przetasuj talię. Zagraj dowolną liczbę postaci Psa Ninja gdziekolwiek, płacąc o 1 mniej.",
     "[↯] Zabuza Momochi: Powtórz efekt MAIN.",
   ],
@@ -262,5 +262,37 @@ export const effectDescriptionsPl: Record<string, string[]> = {
   "SS-118-CHIBIV": [
     "[↯] Odkryj i pokonaj zakrytą postać przeciwnika w grze.",
     "[↯] Temari: Zakryj postać przeciwnika w grze o tej samej nazwie co odkryta postać.",
+  ],
+  "SS-147-SV": [
+    "[⧗] Wrogie postacie nie mogą opuścić tej misji.",
+    "[↯] Sasuke Uchiha: POWERUP 1 za każdą nieukrytą wrogą postać w grze.",
+  ],
+  "SS-149-SV": [
+    "[↯] Przeszukaj talię w poszukiwaniu do 2 postaci Psa Ninja, odkryj je i dobierz, potem przetasuj talię. Zagraj dowolną liczbę postaci Psa Ninja gdziekolwiek, płacąc o 1 mniej.",
+    "[↯] Zabuza Momochi: Powtórz efekt MAIN.",
+  ],
+  "SS-148-SV": [
+    "[↯] Naruto Uzumaki: POWERUP 3.",
+    "[↯] Pokonaj ulepszoną postać przeciwnika w tej misji o niższej nadrukowanej Mocy niż ta postać, a następnie musisz przesunąć tę postać, jeśli możesz.",
+  ],
+  "SS-150-SV": [
+    "[↯] Kakashi Hatake: Przesuń najsilniejszą postać przeciwnika w grze do tej misji.",
+    "[↯] POWERUP X, gdzie X to koszt najsilniejszej postaci przeciwnika w tej misji.",
+  ],
+  "SS-147-S": [
+    "[⧗] Wrogie postacie nie mogą opuścić tej misji.",
+    "[↯] Sasuke Uchiha: POWERUP 1 za każdą nieukrytą wrogą postać w grze.",
+  ],
+  "SS-148-S": [
+    "[↯] Naruto Uzumaki: POWERUP 3.",
+    "[↯] Pokonaj ulepszoną postać przeciwnika w tej misji o niższej nadrukowanej Mocy niż ta postać, a następnie musisz przesunąć tę postać, jeśli możesz.",
+  ],
+  "SS-149-S": [
+    "[↯] Przeszukaj talię w poszukiwaniu do 2 postaci Psa Ninja, odkryj je i dobierz, potem przetasuj talię. Zagraj dowolną liczbę postaci Psa Ninja gdziekolwiek, płacąc o 1 mniej.",
+    "[↯] Zabuza Momochi: Powtórz efekt MAIN.",
+  ],
+  "SS-150-S": [
+    "[↯] Kakashi Hatake: Przesuń najsilniejszą postać przeciwnika w grze do tej misji.",
+    "[↯] POWERUP X, gdzie X to koszt najsilniejszej postaci przeciwnika w tej misji.",
   ],
 };

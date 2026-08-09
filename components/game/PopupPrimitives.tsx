@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { HoloFoilOverlay, holoMaskStyle } from '@/components/cards/HoloFoilOverlay';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { resolveNameToLocale } from '@/lib/i18n/localizeMessageParams';
 import { useGameStore } from '@/stores/gameStore';
 
 const ENTRANCE_HOLD_TYPES: ReadonlySet<string> = new Set(['card-play', 'card-defeat', 'card-hide', 'card-reveal', 'card-upgrade']);
@@ -667,4 +668,62 @@ export function PopupTargetCount({
         : t('game.board.validTargets', { count })}
     </span>
   );
+}
+
+export function EffectTagBadge({ tag }: { tag?: { effectType: string; duelPartner?: string } }) {
+  const t = useTranslations();
+  const locale = useLocale();
+  const compact = useIsCompactPopup();
+  if (!tag?.effectType) return null;
+
+  const typeKey = `card.effectTypes.${tag.effectType}`;
+  const label = t.has(typeKey) ? t(typeKey) : tag.effectType.replace('_', ' ');
+  const partner = tag.duelPartner ? resolveNameToLocale(tag.duelPartner, locale) : '';
+
+  return (
+    <span
+      className="uppercase tracking-[0.14em] font-bold"
+      style={{
+        fontSize: compact ? '9px' : '11px',
+        color: '#c4a35a',
+        backgroundColor: 'rgba(196, 163, 90, 0.14)',
+        padding: compact ? '2px 6px' : '3px 9px',
+        borderRadius: '2px',
+      }}
+    >
+      {partner ? `${label} ${partner}` : label}
+    </span>
+  );
+}
+
+export function EffectPromptTitle({
+  tag,
+  children,
+  accentColor = '#c4a35a',
+  size = 'lg',
+}: {
+  tag?: { effectType: string; duelPartner?: string };
+  children: React.ReactNode;
+  accentColor?: string;
+  size?: 'md' | 'lg' | 'xl';
+}) {
+  return (
+    <PopupTitle accentColor={accentColor} size={size}>
+      {tag?.effectType ? (
+        <span className="inline-flex flex-wrap items-center justify-center gap-2">
+          <EffectTagBadge tag={tag} />
+          <span>{children}</span>
+        </span>
+      ) : children}
+    </PopupTitle>
+  );
+}
+
+export function promptTagPrefix(
+  tag: { effectType: string; duelPartner?: string } | undefined,
+  label: string,
+  partner: string,
+): string {
+  if (!tag?.effectType) return '';
+  return partner ? `${label} ${partner}: ` : `${label}: `;
 }

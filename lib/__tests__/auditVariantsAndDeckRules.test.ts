@@ -266,7 +266,7 @@ describe('card id parsing and base card resolution', () => {
 
 describe('force unlocked cards', () => {
   it('force unlocks every card of a not yet released set', () => {
-    expect(isForceUnlockedCard('SS-000-L')).toBe(true);
+    expect(isForceUnlockedCard('SS-149-L')).toBe(true);
     expect(isForceUnlockedCard('SS-147-POPV')).toBe(true);
     expect(isForceUnlockedCard('AK-001-RA')).toBe(true);
   });
@@ -284,7 +284,7 @@ describe('force unlocked cards', () => {
 
   it('lists the not yet released card ids and never a released one', () => {
     const ids = getForceUnlockedCardIds();
-    expect(ids.has('SS-000-L')).toBe(true);
+    expect(ids.has('SS-149-L')).toBe(true);
     expect(ids.has('KS-108-RA')).toBe(false);
     for (const id of ids) {
       expect(id.startsWith('KS-')).toBe(false);
@@ -359,7 +359,7 @@ describe('server side deck variant validation', () => {
 
   it('accepts a locked rarity from a not yet released set without any ownership', async () => {
     expect(isLockedVariantCard(getCardById('SS-147-POPV'))).toBe(true);
-    const res = await validateDeckVariantUnlocks('u1', ['SS-147-POPV', 'SS-000-L']);
+    const res = await validateDeckVariantUnlocks('u1', ['SS-147-POPV', 'SS-149-L']);
     expect(res.ok).toBe(true);
     expect(fakeUserFindUnique).not.toHaveBeenCalled();
   });
@@ -1083,7 +1083,7 @@ describe('static ranked ban list', () => {
   });
 
   it('keeps the explicitly banned set 2 promos out of ranked', () => {
-    expect(isStaticRankedBanned('SS-000-L')).toBe(true);
+    expect(isStaticRankedBanned('SS-149-L')).toBe(true);
     expect(isStaticRankedBanned('SS-147-POPV')).toBe(true);
   });
 

@@ -26,7 +26,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     "[⧗] Les personnages ennemis ne peuvent pas quitter cette mission.",
     "[↯] Sasuke Uchiwa : POWERUP 1 pour chaque personnage ennemi non caché en jeu.",
   ],
-  "SS-000-L": [
+  "SS-149-L": [
     "[↯] Cherchez jusqu'à 2 personnages Chien Ninja dans votre deck, révélez-les et piochez-les, puis mélangez votre deck. Jouez autant de personnages Chien Ninja que vous voulez n'importe où, en payant 1 de moins.",
     "[↯] Zabuza Momochi : Répétez l'effet MAIN.",
   ],
@@ -263,5 +263,37 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   "SS-118-CHIBIV": [
     "[↯] Révélez et vainquez un personnage ennemi caché en jeu.",
     "[↯] Temari : Cachez un personnage ennemi en jeu portant le même nom que le personnage révélé.",
+  ],
+  "SS-147-SV": [
+    "[⧗] Les personnages ennemis ne peuvent pas quitter cette mission.",
+    "[↯] Sasuke Uchiwa : POWERUP 1 pour chaque personnage ennemi non caché en jeu.",
+  ],
+  "SS-149-SV": [
+    "[↯] Cherchez jusqu'à 2 personnages Chien Ninja dans votre deck, révélez-les et piochez-les, puis mélangez votre deck. Jouez autant de personnages Chien Ninja que vous voulez n'importe où, en payant 1 de moins.",
+    "[↯] Zabuza Momochi : Répétez l'effet MAIN.",
+  ],
+  "SS-148-SV": [
+    "[↯] Naruto Uzumaki : POWERUP 3.",
+    "[↯] Vainquez un personnage ennemi amélioré de cette mission dont la Puissance imprimée est inférieure à celle de ce personnage, puis vous devez déplacer ce personnage, si possible.",
+  ],
+  "SS-150-SV": [
+    "[↯] Kakashi Hatake : Déplacez le personnage ennemi le plus fort en jeu vers cette mission.",
+    "[↯] POWERUP X, où X est le coût du personnage ennemi le plus fort de cette mission.",
+  ],
+  "SS-147-S": [
+    "[⧗] Les personnages ennemis ne peuvent pas quitter cette mission.",
+    "[↯] Sasuke Uchiwa : POWERUP 1 pour chaque personnage ennemi non caché en jeu.",
+  ],
+  "SS-148-S": [
+    "[↯] Naruto Uzumaki : POWERUP 3.",
+    "[↯] Vainquez un personnage ennemi amélioré de cette mission dont la Puissance imprimée est inférieure à celle de ce personnage, puis vous devez déplacer ce personnage, si possible.",
+  ],
+  "SS-149-S": [
+    "[↯] Cherchez jusqu'à 2 personnages Chien Ninja dans votre deck, révélez-les et piochez-les, puis mélangez votre deck. Jouez autant de personnages Chien Ninja que vous voulez n'importe où, en payant 1 de moins.",
+    "[↯] Zabuza Momochi : Répétez l'effet MAIN.",
+  ],
+  "SS-150-S": [
+    "[↯] Kakashi Hatake : Déplacez le personnage ennemi le plus fort en jeu vers cette mission.",
+    "[↯] POWERUP X, où X est le coût du personnage ennemi le plus fort de cette mission.",
   ],
 };

@@ -26,7 +26,7 @@ export const effectDescriptionsIt: Record<string, string[]> = {
     "[⧗] I personaggi nemici non possono uscire da questa missione.",
     "[↯] Sasuke Uchiha: POWERUP 1 per ogni personaggio nemico non-nascosto in gioco.",
   ],
-  "SS-000-L": [
+  "SS-149-L": [
     "[↯] Cerca nel tuo mazzo fino a 2 personaggi Cane Ninja, rivelali e pescali, poi mischia il tuo mazzo. Gioca un numero qualsiasi di personaggi Cane Ninja ovunque, pagando 1 in meno.",
     "[↯] Zabuza Momochi: Ripeti l'effetto MAIN.",
   ],
@@ -262,5 +262,37 @@ export const effectDescriptionsIt: Record<string, string[]> = {
   "SS-118-CHIBIV": [
     "[↯] Rivela e sconfiggi un personaggio nemico nascosto in gioco.",
     "[↯] Temari: Nascondi un personaggio nemico in gioco con lo stesso nome del personaggio rivelato.",
+  ],
+  "SS-147-SV": [
+    "[⧗] I personaggi nemici non possono uscire da questa missione.",
+    "[↯] Sasuke Uchiha: POWERUP 1 per ogni personaggio nemico non-nascosto in gioco.",
+  ],
+  "SS-149-SV": [
+    "[↯] Cerca nel tuo mazzo fino a 2 personaggi Cane Ninja, rivelali e pescali, poi mischia il tuo mazzo. Gioca un numero qualsiasi di personaggi Cane Ninja ovunque, pagando 1 in meno.",
+    "[↯] Zabuza Momochi: Ripeti l'effetto MAIN.",
+  ],
+  "SS-148-SV": [
+    "[↯] Naruto Uzumaki: POWERUP 3.",
+    "[↯] Sconfiggi un personaggio nemico potenziato in questa missione con Potenza stampata inferiore a quella di questo personaggio, poi devi spostare questo personaggio, se possibile.",
+  ],
+  "SS-150-SV": [
+    "[↯] Kakashi Hatake: Sposta il personaggio nemico più forte in gioco in questa missione.",
+    "[↯] POWERUP X, dove X è il costo del personaggio nemico più forte in questa missione.",
+  ],
+  "SS-147-S": [
+    "[⧗] I personaggi nemici non possono uscire da questa missione.",
+    "[↯] Sasuke Uchiha: POWERUP 1 per ogni personaggio nemico non-nascosto in gioco.",
+  ],
+  "SS-148-S": [
+    "[↯] Naruto Uzumaki: POWERUP 3.",
+    "[↯] Sconfiggi un personaggio nemico potenziato in questa missione con Potenza stampata inferiore a quella di questo personaggio, poi devi spostare questo personaggio, se possibile.",
+  ],
+  "SS-149-S": [
+    "[↯] Cerca nel tuo mazzo fino a 2 personaggi Cane Ninja, rivelali e pescali, poi mischia il tuo mazzo. Gioca un numero qualsiasi di personaggi Cane Ninja ovunque, pagando 1 in meno.",
+    "[↯] Zabuza Momochi: Ripeti l'effetto MAIN.",
+  ],
+  "SS-150-S": [
+    "[↯] Kakashi Hatake: Sposta il personaggio nemico più forte in gioco in questa missione.",
+    "[↯] POWERUP X, dove X è il costo del personaggio nemico più forte in questa missione.",
   ],
 };

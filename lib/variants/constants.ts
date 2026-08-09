@@ -13,7 +13,7 @@ export const FORCE_UNLOCKED_CARD_IDS: ReadonlySet<string> = new Set([
   'SS-126-SPV',
   'SS-120-CHIBIV',
   'SS-147-POPV',
-  'SS-000-L',
+  'SS-149-L',
   'SS-111-SHINOBIV',
   'SS-112-SHINOBIV',
   'SS-114-SHINOBIV',
@@ -36,6 +36,10 @@ export const FORCE_UNLOCKED_CARD_IDS: ReadonlySet<string> = new Set([
   'SS-121-CHIBIV',
   'SS-123-CHIBIV',
   'SS-126-CHIBIV',
+  'SS-147-SV',
+  'SS-148-SV',
+  'SS-149-SV',
+  'SS-150-SV',
 ]);
 
 export const VARIANT_PACK_SIZE = 8;

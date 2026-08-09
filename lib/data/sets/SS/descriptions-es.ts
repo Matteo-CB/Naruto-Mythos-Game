@@ -29,7 +29,7 @@ export const effectDescriptionsEs: Record<string, string[]> = {
     "[⧗] Los personajes enemigos no pueden salir de esta misión.",
     "[↯] Sasuke Uchiha: POWERUP 1 por cada personaje enemigo no oculto en juego.",
   ],
-  "SS-000-L": [
+  "SS-149-L": [
     "[↯] Busca hasta 2 personajes Perro Ninja en tu mazo, revélalos y róbalos, luego baraja tu mazo. Juega cualquier número de personajes Perro Ninja en cualquier sitio, pagando 1 menos.",
     "[↯] Zabuza Momochi: Repite el efecto MAIN.",
   ],
@@ -266,5 +266,37 @@ export const effectDescriptionsEs: Record<string, string[]> = {
   "SS-118-CHIBIV": [
     "[↯] Revela y derrota a un personaje enemigo oculto en juego.",
     "[↯] Temari: Oculta a un personaje enemigo en juego con el mismo nombre que el personaje revelado.",
+  ],
+  "SS-147-SV": [
+    "[⧗] Los personajes enemigos no pueden salir de esta misión.",
+    "[↯] Sasuke Uchiha: POWERUP 1 por cada personaje enemigo no oculto en juego.",
+  ],
+  "SS-149-SV": [
+    "[↯] Busca hasta 2 personajes Perro Ninja en tu mazo, revélalos y róbalos, luego baraja tu mazo. Juega cualquier número de personajes Perro Ninja en cualquier sitio, pagando 1 menos.",
+    "[↯] Zabuza Momochi: Repite el efecto MAIN.",
+  ],
+  "SS-148-SV": [
+    "[↯] Naruto Uzumaki: POWERUP 3.",
+    "[↯] Derrota a un personaje enemigo mejorado de esta misión con menos Poder impreso que este personaje, luego debes mover a este personaje, si puedes.",
+  ],
+  "SS-150-SV": [
+    "[↯] Kakashi Hatake: Mueve al personaje enemigo más fuerte en juego a esta misión.",
+    "[↯] POWERUP X, donde X es el coste del personaje enemigo más fuerte de esta misión.",
+  ],
+  "SS-147-S": [
+    "[⧗] Los personajes enemigos no pueden salir de esta misión.",
+    "[↯] Sasuke Uchiha: POWERUP 1 por cada personaje enemigo no oculto en juego.",
+  ],
+  "SS-148-S": [
+    "[↯] Naruto Uzumaki: POWERUP 3.",
+    "[↯] Derrota a un personaje enemigo mejorado de esta misión con menos Poder impreso que este personaje, luego debes mover a este personaje, si puedes.",
+  ],
+  "SS-149-S": [
+    "[↯] Busca hasta 2 personajes Perro Ninja en tu mazo, revélalos y róbalos, luego baraja tu mazo. Juega cualquier número de personajes Perro Ninja en cualquier sitio, pagando 1 menos.",
+    "[↯] Zabuza Momochi: Repite el efecto MAIN.",
+  ],
+  "SS-150-S": [
+    "[↯] Kakashi Hatake: Mueve al personaje enemigo más fuerte en juego a esta misión.",
+    "[↯] POWERUP X, donde X es el coste del personaje enemigo más fuerte de esta misión.",
   ],
 };

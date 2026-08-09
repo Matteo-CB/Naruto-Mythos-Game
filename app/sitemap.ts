@@ -29,7 +29,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/tournaments", priority: 0.75, changeFrequency: "daily" as const },
     { path: "/tournaments/results", priority: 0.6, changeFrequency: "weekly" as const },
     { path: "/worldcup", priority: 0.7, changeFrequency: "daily" as const },
-    { path: "/help-us", priority: 0.5, changeFrequency: "monthly" as const },
     { path: "/register", priority: 0.5, changeFrequency: "yearly" as const },
     { path: "/login", priority: 0.4, changeFrequency: "yearly" as const },
     { path: "/legal", priority: 0.2, changeFrequency: "yearly" as const },

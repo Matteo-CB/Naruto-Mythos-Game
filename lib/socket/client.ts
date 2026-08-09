@@ -312,7 +312,7 @@ interface SocketStore {
   opponentForfeitAt: number | null;
 
 
-  pendingReconnect: { roomCode: string; playerRole: 'player1' | 'player2' } | null;
+  pendingReconnect: { roomCode: string; playerRole: 'player1' | 'player2'; tournamentId?: string | null } | null;
   dismissReconnect: () => void;
   acceptReconnect: () => void;
 
@@ -958,7 +958,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ opponentDisconnected: false, opponentForfeitAt: null });
       });
 
-      socket.on('game:active-game', (data: { roomCode: string; playerRole: 'player1' | 'player2' }) => {
+      socket.on('game:active-game', (data: { roomCode: string; playerRole: 'player1' | 'player2'; tournamentId?: string | null }) => {
         console.log('[Socket] Active game found:', data.roomCode, 'as', data.playerRole);
 
         const current = get();

@@ -26,7 +26,7 @@ export const effectDescriptionsPt: Record<string, string[]> = {
     "[⧗] Personagens inimigos não podem sair desta missão.",
     "[↯] Sasuke Uchiha: POWERUP 1 para cada personagem inimigo não-oculto em jogo.",
   ],
-  "SS-000-L": [
+  "SS-149-L": [
     "[↯] Procure no seu baralho até 2 personagens Cão Ninja, revele-os e compre-os, depois embaralhe seu baralho. Jogue qualquer número de personagens Cão Ninja em qualquer lugar, pagando 1 a menos.",
     "[↯] Zabuza Momochi: Repita o efeito MAIN.",
   ],
@@ -262,5 +262,37 @@ export const effectDescriptionsPt: Record<string, string[]> = {
   "SS-118-CHIBIV": [
     "[↯] Revele e derrote um personagem inimigo oculto em jogo.",
     "[↯] Temari: Oculte um personagem inimigo em jogo com o mesmo nome do personagem revelado.",
+  ],
+  "SS-147-SV": [
+    "[⧗] Personagens inimigos não podem sair desta missão.",
+    "[↯] Sasuke Uchiha: POWERUP 1 para cada personagem inimigo não-oculto em jogo.",
+  ],
+  "SS-149-SV": [
+    "[↯] Procure no seu baralho até 2 personagens Cão Ninja, revele-os e compre-os, depois embaralhe seu baralho. Jogue qualquer número de personagens Cão Ninja em qualquer lugar, pagando 1 a menos.",
+    "[↯] Zabuza Momochi: Repita o efeito MAIN.",
+  ],
+  "SS-148-SV": [
+    "[↯] Naruto Uzumaki: POWERUP 3.",
+    "[↯] Derrote um personagem inimigo evoluído nesta missão com menos Poder impresso que este personagem, depois você deve mover este personagem, se possível.",
+  ],
+  "SS-150-SV": [
+    "[↯] Kakashi Hatake: Mova o personagem inimigo mais forte em jogo para esta missão.",
+    "[↯] POWERUP X, onde X é o custo do personagem inimigo mais forte nesta missão.",
+  ],
+  "SS-147-S": [
+    "[⧗] Personagens inimigos não podem sair desta missão.",
+    "[↯] Sasuke Uchiha: POWERUP 1 para cada personagem inimigo não-oculto em jogo.",
+  ],
+  "SS-148-S": [
+    "[↯] Naruto Uzumaki: POWERUP 3.",
+    "[↯] Derrote um personagem inimigo evoluído nesta missão com menos Poder impresso que este personagem, depois você deve mover este personagem, se possível.",
+  ],
+  "SS-149-S": [
+    "[↯] Procure no seu baralho até 2 personagens Cão Ninja, revele-os e compre-os, depois embaralhe seu baralho. Jogue qualquer número de personagens Cão Ninja em qualquer lugar, pagando 1 a menos.",
+    "[↯] Zabuza Momochi: Repita o efeito MAIN.",
+  ],
+  "SS-150-S": [
+    "[↯] Kakashi Hatake: Mova o personagem inimigo mais forte em jogo para esta missão.",
+    "[↯] POWERUP X, onde X é o custo do personagem inimigo mais forte nesta missão.",
   ],
 };

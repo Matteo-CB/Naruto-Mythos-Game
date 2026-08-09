@@ -14,6 +14,7 @@ import {
   PopupOverlay,
   PopupCornerFrame,
   PopupTitle,
+  EffectPromptTitle,
   PopupActionButton,
   PopupDismissLink,
   PopupMinimizeX,
@@ -40,6 +41,7 @@ interface TargetOrderPopupProps {
   targets: OrderTarget[];
   description: string;
   descriptionKey?: string;
+  promptTag?: { effectType: string; duelPartner?: string };
   descriptionParams?: Record<string, string | number>;
   sourceCardName?: string;
   onConfirm: (orderedIds: string[]) => void;
@@ -56,6 +58,7 @@ export function TargetOrderPopup({
   targets,
   description,
   descriptionKey,
+  promptTag,
   descriptionParams,
   sourceCardName,
   onConfirm,
@@ -128,9 +131,9 @@ export function TargetOrderPopup({
         <PopupCornerFrame accentColor={`${accentColor}55`} maxWidth="600px" padding="24px 20px">
           <PopupMinimizeX onClick={minimizeEffectPopup} />
 
-          <PopupTitle accentColor={accentColor} size="lg">
+          <EffectPromptTitle tag={promptTag} accentColor={accentColor} size="lg">
             {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
-          </PopupTitle>
+          </EffectPromptTitle>
 
           <p
             className="font-body text-xs text-center mb-4"

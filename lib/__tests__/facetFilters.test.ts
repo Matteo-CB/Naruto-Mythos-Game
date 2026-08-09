@@ -78,7 +78,7 @@ describe('a filter never offers a value that matches nothing', () => {
 
   it('values outside the canonical order are appended, never dropped', () => {
     const options = facetOptions({
-      cards: [...CARDS, { id: 'SS-000-L', set: 'SS', rarity: 'L', group: 'Leaf Village', keywords: [] }],
+      cards: [...CARDS, { id: 'SS-149-L', set: 'SS', rarity: 'L', group: 'Leaf Village', keywords: [] }],
       predicates: build(ALL), dimension: 'rarity', valueOf: (c) => c.rarity, order: RARITY_ORDER,
     });
     expect(options).toEqual(['C', 'UC', 'S', 'M', 'L']);

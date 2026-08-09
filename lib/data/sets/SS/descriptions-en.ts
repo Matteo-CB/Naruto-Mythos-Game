@@ -26,7 +26,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "[⧗] Enemy characters cannot move out of this mission.",
     "[↯] Sasuke Uchiha: POWERUP 1 for every non-hidden enemy character in play.",
   ],
-  "SS-000-L": [
+  "SS-149-L": [
     "[↯] Search your deck for up to 2 Ninja Hound characters, reveal and draw them, then shuffle your deck. Play any number of Ninja Hound characters anywhere, paying 1 less.",
     "[↯] Zabuza Momochi: Repeat the MAIN effect.",
   ],
@@ -263,5 +263,37 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   "SS-118-CHIBIV": [
     "[↯] Reveal and defeat an enemy hidden character in play.",
     "[↯] Temari: Hide an enemy character in play with the same name as the revealed character.",
+  ],
+  "SS-147-SV": [
+    "[⧗] Enemy characters cannot move out of this mission.",
+    "[↯] Sasuke Uchiha: POWERUP 1 for every non-hidden enemy character in play.",
+  ],
+  "SS-149-SV": [
+    "[↯] Search your deck for up to 2 Ninja Hound characters, reveal and draw them, then shuffle your deck. Play any number of Ninja Hound characters anywhere, paying 1 less.",
+    "[↯] Zabuza Momochi: Repeat the MAIN effect.",
+  ],
+  "SS-148-SV": [
+    "[↯] Naruto Uzumaki: POWERUP 3.",
+    "[↯] Defeat an enemy upgraded character in this mission with less printed Power than this character's Power, then you must move this character, if able.",
+  ],
+  "SS-150-SV": [
+    "[↯] Kakashi Hatake: Move the strongest enemy character in play to this mission.",
+    "[↯] POWERUP X, where X is the cost of the strongest enemy character in this mission.",
+  ],
+  "SS-147-S": [
+    "[⧗] Enemy characters cannot move out of this mission.",
+    "[↯] Sasuke Uchiha: POWERUP 1 for every non-hidden enemy character in play.",
+  ],
+  "SS-148-S": [
+    "[↯] Naruto Uzumaki: POWERUP 3.",
+    "[↯] Defeat an enemy upgraded character in this mission with less printed Power than this character's Power, then you must move this character, if able.",
+  ],
+  "SS-149-S": [
+    "[↯] Search your deck for up to 2 Ninja Hound characters, reveal and draw them, then shuffle your deck. Play any number of Ninja Hound characters anywhere, paying 1 less.",
+    "[↯] Zabuza Momochi: Repeat the MAIN effect.",
+  ],
+  "SS-150-S": [
+    "[↯] Kakashi Hatake: Move the strongest enemy character in play to this mission.",
+    "[↯] POWERUP X, where X is the cost of the strongest enemy character in this mission.",
   ],
 };

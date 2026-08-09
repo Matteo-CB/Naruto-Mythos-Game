@@ -16,23 +16,6 @@ import { useEffect, useState, useCallback } from 'react';
 
 const DELETE_ACCOUNT_PHRASE = 'DELETE MY ACCOUNT';
 
-interface ActiveSubscription {
-  amountCents: number;
-  subscriptionId: string | null;
-}
-
-function formatEur(amountCents: number, bcp47: string): string {
-  try {
-    return new Intl.NumberFormat(bcp47, {
-      style: 'currency',
-      currency: 'EUR',
-      maximumFractionDigits: amountCents % 100 === 0 ? 0 : 2,
-    }).format(amountCents / 100);
-  } catch {
-    return `${(amountCents / 100).toFixed(2)} €`;
-  }
-}
-
 export default function SettingsPage() {
   const { data: session, status, update: updateSession } = useSession();
   const router = useRouter();
@@ -64,9 +47,6 @@ export default function SettingsPage() {
   const [deleteStatus, setDeleteStatus] = useState<'idle' | 'deleting' | 'error'>('idle');
   const [deleteError, setDeleteError] = useState('');
 
-  const [activeSub, setActiveSub] = useState<ActiveSubscription | null>(null);
-  const [loadingPortal, setLoadingPortal] = useState(false);
-  const [portalError, setPortalError] = useState('');
 
   useEffect(() => {
     if (session?.user?.name) {
@@ -74,39 +54,7 @@ export default function SettingsPage() {
     }
   }, [session?.user?.name]);
 
-  useEffect(() => {
-    if (status !== 'authenticated') return;
-    let cancelled = false;
-    fetch('/api/donations/my-status', { cache: 'no-store' })
-      .then((r) => (r.ok ? r.json() : { activeSubscription: null }))
-      .then((data: { activeSubscription: ActiveSubscription | null }) => {
-        if (!cancelled) setActiveSub(data.activeSubscription ?? null);
-      })
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, [status]);
 
-  const handleOpenPortal = useCallback(async () => {
-    setLoadingPortal(true);
-    setPortalError('');
-    try {
-      const res = await fetch('/api/donations/portal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ locale, returnTo: 'settings' }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.url) {
-        setPortalError(t('subscription.errorPortal'));
-        setLoadingPortal(false);
-        return;
-      }
-      window.location.href = data.url;
-    } catch {
-      setPortalError(t('subscription.errorPortal'));
-      setLoadingPortal(false);
-    }
-  }, [locale, t]);
 
   const handleDeleteAccount = useCallback(async () => {
     if (deletePhrase.trim() !== DELETE_ACCOUNT_PHRASE) return;
@@ -256,46 +204,6 @@ export default function SettingsPage() {
             {t('usernameHint')}
           </p>
         </div>
-
-        {activeSub && (
-          <div
-            className="mt-4 flex flex-col gap-3 p-5"
-            style={{
-              backgroundColor: '#111111',
-              border: '1px solid #262626',
-            }}
-          >
-            <span
-              className="text-sm font-medium tracking-wide"
-              style={{ color: '#e0e0e0' }}
-            >
-              {t('subscription.title')}
-            </span>
-            <p className="text-sm" style={{ color: 'rgba(232,232,232,0.85)' }}>
-              {t('subscription.active', { amount: formatEur(activeSub.amountCents, tMeta('bcp47')) })}
-            </p>
-            <button
-              type="button"
-              onClick={handleOpenPortal}
-              disabled={loadingPortal}
-              className="self-start px-4 py-2 text-xs font-bold uppercase tracking-wider transition-opacity"
-              style={{
-                backgroundColor: '#c4a35a',
-                color: '#0a0a0a',
-                opacity: loadingPortal ? 0.6 : 1,
-                cursor: loadingPortal ? 'wait' : 'pointer',
-              }}
-            >
-              {loadingPortal ? t('subscription.opening') : t('subscription.manage')}
-            </button>
-            {portalError && (
-              <p className="text-xs" style={{ color: '#b33e3e' }}>{portalError}</p>
-            )}
-            <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
-              {t('subscription.hint')}
-            </p>
-          </div>
-        )}
 
         <div
           className="mt-4 flex flex-col gap-4 p-5"

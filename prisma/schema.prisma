@@ -623,56 +623,7 @@ model UserBan {
   createdAt DateTime  @default(now())
 }
 
-model Donation {
-  id                   String    @id @default(auto()) @map("_id") @db.ObjectId
-  stripeSessionId      String?   @unique
-  stripeSubscriptionId String?
-  stripeCustomerId     String?
-  stripeInvoiceId      String?   @unique
-  stripeChargeId       String?   @unique
-  userId               String?   @db.ObjectId
-  userEmail            String?
-  username             String?
-  amountCents          Int
-  currency             String    @default("eur")
-  mode                 String
-  status               String
-  isRecurring          Boolean   @default(false)
-  paidAt               DateTime?
-  createdAt            DateTime  @default(now())
-  cancelledAt          DateTime?
-  refundedAt           DateTime?
-  failureReason        String?
-  thankYouMailSentAt   DateTime?
 
-  @@index([status, createdAt])
-  @@index([isRecurring, status])
-  @@index([userId, createdAt])
-  @@index([stripeSubscriptionId])
-  @@index([createdAt])
-}
-
-model Suggestion {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String    @db.ObjectId
-  username  String
-  category  String
-  title     String
-  body      String
-  status    String    @default("open")
-  voteCount Int       @default(0)
-  adminNote String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  closedAt  DateTime?
-
-  votes SuggestionVote[]
-
-  @@index([status, voteCount])
-  @@index([status, createdAt])
-  @@index([category, status])
-  @@index([userId, createdAt])
-}
 
 model AdminAction {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -687,17 +638,6 @@ model AdminAction {
   @@index([actorId, createdAt])
 }
 
-model SuggestionVote {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  suggestionId String   @db.ObjectId
-  userId       String   @db.ObjectId
-  createdAt    DateTime @default(now())
-
-  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
-
-  @@unique([suggestionId, userId])
-  @@index([userId])
-}
 
 model VariantInventory {
   id     String @id @default(auto()) @map("_id") @db.ObjectId

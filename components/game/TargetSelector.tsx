@@ -17,6 +17,7 @@ import {
   PopupOverlay,
   PopupCornerFrame,
   PopupTitle,
+  EffectPromptTitle,
   PopupDescription,
   PopupActionButton,
   PopupDismissLink,
@@ -199,7 +200,7 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
 type ConstraintMode = 'free' | 'one-per-mission' | 'all-in-mission' | 'naruto133';
 
 function OrderedDefeatPopup({
-  missions, validTargets, myPlayer, description, descriptionKey, descriptionParams,
+  missions, validTargets, myPlayer, description, descriptionKey, descriptionParams, promptTag,
   onConfirm, onDecline, canDecline, onRewind, minSelections, constraintMode, sourceMissionIndex, targetGroups: targetGroupsProp,
 }: {
   missions: VisibleMission[];
@@ -208,6 +209,7 @@ function OrderedDefeatPopup({
   description: string;
   descriptionKey?: string;
   descriptionParams?: Record<string, string>;
+  promptTag?: { effectType: string; duelPartner?: string };
   minSelections?: number;
   constraintMode?: ConstraintMode;
   sourceMissionIndex?: number;
@@ -375,9 +377,9 @@ function OrderedDefeatPopup({
     <PopupOverlay holdForEntrance>
         <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.25)" maxWidth="90vw" padding="16px 12px" backgroundColor="rgba(4, 4, 8, 0.95)" fitContent>
           <PopupMinimizeX onClick={minimizeEffectPopup} />
-          <PopupTitle accentColor="#c4a35a" size="lg">
+          <EffectPromptTitle tag={promptTag} accentColor="#c4a35a" size="lg">
             {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
-          </PopupTitle>
+          </EffectPromptTitle>
 
           <div className="text-center mb-3">
             <span className="text-xs" style={{ color: '#888' }}>
@@ -758,7 +760,7 @@ export function TargetSelector() {
     return <PopupMinimizePill text={effectDesc} onRestore={restoreEffectPopup} />;
   }
 
-  const { validTargets, description, descriptionKey, descriptionParams, onDecline, declineLabelKey, playerName, revealedCard } = pendingTargetSelection;
+  const { validTargets, description, descriptionKey, descriptionParams, promptTag, onDecline, declineLabelKey, playerName, revealedCard } = pendingTargetSelection;
   const canDecline = !!onDecline;
   const displayName = playerName || t('game.you');
   const isInfoReveal = pendingTargetSelection.selectionType === 'INFO_REVEAL';
@@ -824,6 +826,7 @@ export function TargetSelector() {
           description={description}
           descriptionKey={descriptionKey}
           descriptionParams={descriptionParams}
+          promptTag={promptTag}
           onConfirm={(orderedIds) => {
             
             queuedOrderRef.current = orderedIds.slice(1);
@@ -857,6 +860,7 @@ export function TargetSelector() {
         description={description}
         descriptionKey={descriptionKey}
         descriptionParams={descriptionParams as Record<string, string> | undefined}
+        promptTag={promptTag}
         onConfirm={(orderedIds) => handleSelect(JSON.stringify(orderedIds))}
         onDecline={canDecline ? handleDecline : undefined}
         canDecline={canDecline}
@@ -919,6 +923,7 @@ export function TargetSelector() {
           description={description}
           descriptionKey={descriptionKey}
           descriptionParams={descriptionParams}
+          promptTag={promptTag}
           sourceCardName=""
           onConfirm={(orderedIds) => {
             
@@ -936,9 +941,9 @@ export function TargetSelector() {
         <PopupOverlay holdForEntrance>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.4)" maxWidth="420px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
-            <PopupTitle accentColor="#c4a35a" size="lg">
+            <EffectPromptTitle tag={promptTag} accentColor="#c4a35a" size="lg">
               {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
-            </PopupTitle>
+            </EffectPromptTitle>
 
             <motion.div
               initial={{ scale: 0.7, opacity: 0 }}
@@ -1023,9 +1028,9 @@ export function TargetSelector() {
         <PopupOverlay holdForEntrance>
           <PopupCornerFrame accentColor={`${accentColor}66`} maxWidth="400px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
-            <PopupTitle accentColor={accentColor} size="lg">
+            <EffectPromptTitle tag={promptTag} accentColor={accentColor} size="lg">
               {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
-            </PopupTitle>
+            </EffectPromptTitle>
 
             <motion.div
               initial={{ scale: 0.7, rotateY: 15, opacity: 0 }}
@@ -1415,9 +1420,9 @@ export function TargetSelector() {
         <PopupOverlay holdForEntrance>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="520px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
-            <PopupTitle accentColor="#c4a35a" size="lg">
+            <EffectPromptTitle tag={promptTag} accentColor="#c4a35a" size="lg">
               {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
-            </PopupTitle>
+            </EffectPromptTitle>
 
             <div className="flex gap-6 items-start justify-center">
               
@@ -1492,6 +1497,7 @@ export function TargetSelector() {
         description={description}
         descriptionKey={descriptionKey}
         descriptionParams={descriptionParams}
+        promptTag={promptTag}
         sourceCardName={pendingTargetSelection.sourceCardName}
         onConfirm={(orderedIds) => {
           
@@ -1538,10 +1544,8 @@ export function TargetSelector() {
           <div className="flex items-stretch gap-3">
             {choices.map((choice, idx) => {
               const imgPath = choice.sourceCardImage ? normalizeImagePath(choice.sourceCardImage) : null;
-              const effectLabel = choice.effectType === 'UPGRADE' ? 'UPGRADE'
-                : choice.effectType === 'AMBUSH' ? 'AMBUSH'
-                : choice.effectType === 'MAIN' ? 'MAIN'
-                : choice.effectType === 'SCORE' ? 'SCORE' : choice.effectType;
+              const effectTypeKey = `card.effectTypes.${choice.effectType}`;
+              const effectLabel = t.has(effectTypeKey) ? t(effectTypeKey) : String(choice.effectType).replace('_', ' ');
               const accentColors = ['#c4a35a', '#4a9eff', '#e06050', '#50c878'];
               const accent = accentColors[idx % accentColors.length];
 
@@ -1660,9 +1664,9 @@ export function TargetSelector() {
         <PopupOverlay holdForEntrance>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="440px">
             <PopupMinimizeX onClick={minimizeEffectPopup} />
-            <PopupTitle accentColor="#c4a35a" size="md">
+            <EffectPromptTitle tag={promptTag} accentColor="#c4a35a" size="md">
               {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
-            </PopupTitle>
+            </EffectPromptTitle>
 
             {confirmImage && (
               <motion.div

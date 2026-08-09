@@ -26,12 +26,12 @@ function pendingTst(s: GameState): string {
   return s.pendingEffects.find((e) => e.id === pa.sourceEffectId)?.targetSelectionType ?? '';
 }
 
-describe('Kakashi SS-000-L search and play UI flow', () => {
+describe('Kakashi SS-149-L search and play UI flow', () => {
   beforeAll(async () => { await initializeRegistry(); });
 
   function baseState(deckIds: string[], handIds: string[] = []) {
     const st = buildSimState({
-      hand1: ['SS-000-L', ...handIds],
+      hand1: ['SS-149-L', ...handIds],
       p1: [],
       p2: [],
       missions: 2,
@@ -124,7 +124,7 @@ describe('Kakashi SS-000-L search and play UI flow', () => {
 
   it('DUEL repeat: second search window never lists ghost cards missing from hand', () => {
     const st = buildSimState({
-      hand1: ['SS-000-L'],
+      hand1: ['SS-149-L'],
       p1: [],
       p2: [simChar('KS-086-C', { owner: 'player2', instanceId: 'zabuza' })],
       missions: 2,

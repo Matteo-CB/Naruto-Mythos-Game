@@ -4,6 +4,7 @@ import { GameEngine } from '@/lib/engine/GameEngine';
 import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import { getCharacterById } from '@/lib/data/cardIndex';
 import type { GameState } from '@/lib/engine/types';
+import { buildPromptTag } from '@/lib/effects/promptTag';
 
 const HINATA = 'SS-111-SHINOBIV';
 const NEJI_ON_BOARD = 'KS-116-R';
@@ -83,14 +84,21 @@ describe('Hinata 111: the DUEL fires and comes before the MAIN, as printed', () 
 });
 
 describe('Hinata 111 prompt wording', () => {
-  it('every prompt names its effect type, like the other cards do', () => {
+  it('no prompt types its effect tag, the popup adds it from the effect itself', () => {
     for (const loc of LOCALES) {
       const messages = JSON.parse(readFileSync(`messages/${loc}.json`, 'utf8'));
       const desc = messages.game.effect.desc;
-      expect(desc.ss111ConfirmDuel, `${loc} duel prompt`).toContain('DUEL');
-      expect(desc.ss111ConfirmMain, `${loc} main prompt`).toContain('MAIN');
-      expect(desc.ss111PlayHyuga, `${loc} main picker`).toContain('MAIN');
+      for (const key of ['ss111ConfirmDuel', 'ss111ConfirmMain', 'ss111PlayHyuga']) {
+        expect(desc[key], `${loc} ${key}`).toBeTruthy();
+        expect(/^(?:DUEL|MAIN|AMBUSH|UPGRADE|SCORE)[ 　]?[:：]/.test(desc[key]), `${loc} ${key}`).toBe(false);
+      }
     }
+  });
+
+  it('the DUEL tag is still available, derived from the printed card', () => {
+    expect(buildPromptTag('DUEL', 'SS111_CONFIRM_DUEL', getCharacterById(HINATA))).toEqual({
+      effectType: 'DUEL', duelPartner: 'Neji Hyuga',
+    });
   });
 
   it('the DUEL rules text starts with DUEL so the engine can read its partner', () => {

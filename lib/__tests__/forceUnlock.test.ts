@@ -9,7 +9,7 @@ describe('force-unlock for not-yet-released (coming_soon / revealing) sets', () 
     expect(isForceUnlockedCard('SS-126-SPV')).toBe(true);
     expect(isForceUnlockedCard('SS-120-CHIBIV')).toBe(true);
     expect(isForceUnlockedCard('SS-147-POPV')).toBe(true);
-    expect(isForceUnlockedCard('SS-000-L')).toBe(true);
+    expect(isForceUnlockedCard('SS-149-L')).toBe(true);
   });
 
   it('unlocks every card of a set that is still being revealed', () => {
@@ -29,7 +29,7 @@ describe('force-unlock for not-yet-released (coming_soon / revealing) sets', () 
     const ids = getForceUnlockedCardIds();
     expect(ids.has('SS-112-SPV')).toBe(true);
     expect(ids.has('SS-126-SPV')).toBe(true);
-    expect(ids.has('SS-000-L')).toBe(true);
+    expect(ids.has('SS-149-L')).toBe(true);
     expect(ids.has('KS-108-MV')).toBe(false);
   });
 });

@@ -14,6 +14,7 @@ import { registerSenbonRamenHandlers } from './senbonRamen';
 import { registerNaruto005Handlers } from './naruto005';
 import { registerRegionalChampionshipHandlers } from './regionalChampionship';
 import { registerShikamaru118Handlers } from './shikamaru118';
+import { registerSecretVariantHandlers } from './secretVariants';
 import { registerSSMissionHandlers } from './missions/ssMissionHandlers';
 
 export function registerAllSSHandlers(): void {
@@ -33,5 +34,6 @@ export function registerAllSSHandlers(): void {
   registerNaruto005Handlers();
   registerRegionalChampionshipHandlers();
   registerShikamaru118Handlers();
+  registerSecretVariantHandlers();
   registerSSMissionHandlers();
 }

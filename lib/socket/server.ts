@@ -3054,7 +3054,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       const entry = liveSeat ?? pendingMatchSeat;
       if (entry) {
-        if (entry.room.tournamentId) {
+        const resumingRunningGame = entry === liveSeat && !!entry.room.gameState;
+        if (entry.room.tournamentId && !resumingRunningGame) {
           socket.emit('match:enter', {
             tournamentId: entry.room.tournamentId,
             matchId: entry.room.tournamentMatchId ?? null,
@@ -3065,6 +3066,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           socket.emit('game:active-game', {
             roomCode: entry.code,
             playerRole: entry.isHost ? 'player1' : 'player2',
+            tournamentId: entry.room.tournamentId ?? null,
           });
         }
       }

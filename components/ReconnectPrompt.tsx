@@ -1,18 +1,21 @@
 'use client';
 
 import { useSocketStore } from '@/lib/socket/client';
-import { useRouter } from '@/lib/i18n/navigation';
+import { usePathname, useRouter } from '@/lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { Z_APP_MODAL } from '@/lib/ui/zIndex';
+import { shouldOfferResume } from '@/lib/socket/resumeScope';
 
 export function ReconnectPrompt() {
   const t = useTranslations('game');
   const router = useRouter();
+  const pathname = usePathname();
   const pendingReconnect = useSocketStore((s) => s.pendingReconnect);
   const acceptReconnect = useSocketStore((s) => s.acceptReconnect);
   const dismissReconnect = useSocketStore((s) => s.dismissReconnect);
 
   if (!pendingReconnect) return null;
+  if (!shouldOfferResume(pathname, pendingReconnect.tournamentId)) return null;
 
   const handleReconnect = () => {
     acceptReconnect();

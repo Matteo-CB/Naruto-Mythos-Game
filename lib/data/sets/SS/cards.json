@@ -280,11 +280,11 @@
       "image_url": "/images/cards/SS/pop_v/SS-147-POPV.webp",
       "image_file": "images/cards/SS/pop_v/SS-147-POPV.webp"
     },
-    "SS-000-L": {
-      "id": "SS-000-L",
-      "cardId": "SS-000-L",
+    "SS-149-L": {
+      "id": "SS-149-L",
+      "cardId": "SS-149-L",
       "rarity": "L",
-      "number": "000",
+      "number": "149",
       "set": "SS",
       "card_type": "character",
       "name_en": "KAKASHI HATAKE",
@@ -318,9 +318,9 @@
       ],
       "rarity_display": "Legendary",
       "data_complete": true,
-      "old_id": "SS-L",
-      "image_url": "/images/cards/SS/legendary/SS-000-L.webp",
-      "image_file": "images/cards/SS/legendary/SS-000-L.webp"
+      "old_id": "149/140 V",
+      "image_url": "/images/cards/SS/legendary/SS-149-L.webp",
+      "image_file": "images/cards/SS/legendary/SS-149-L.webp"
     },
     "SS-128-R": {
       "id": "SS-128-R",
@@ -2931,6 +2931,326 @@
       "data_complete": true,
       "old_id": "126/140 V",
       "image_file": "images/cards/SS/chibi_v/SS-126-CHIBIV.webp"
+    },
+    "SS-147-SV": {
+      "id": "SS-147-SV",
+      "cardId": "SS-147-SV",
+      "rarity": "SV",
+      "number": "147",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_ja": "うずまきナルト",
+      "name_fr": "NARUTO UZUMAKI",
+      "name_es": "NARUTO UZUMAKI",
+      "title_en": "I'm not letting Orochimaru take you away!",
+      "title_ja": "「大蛇丸にお前を渡さねぇ！」",
+      "title_fr": "Je ne laisserai pas Orochimaru t’emmener !",
+      "title_es": "¡No dejaré que Orochimaru te lleve!",
+      "title_pt": "Não vou deixar Orochimaru levar você!",
+      "title_it": "Non lascerò che Orochimaru ti porti via!",
+      "title_pl": "Nie pozwolę, żeby Orochimaru cię zabrał!",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Enemy characters cannot move out of this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Sasuke Uchiha: POWERUP 1 for every non-hidden enemy character in play."
+        }
+      ],
+      "rarity_display": "Secret V",
+      "data_complete": true,
+      "old_id": "147/140 V",
+      "image_url": "/images/cards/SS/pop_v/SS-147-POPV.webp",
+      "image_file": "images/cards/SS/secret_v/SS-147-SV.webp"
+    },
+    "SS-148-SV": {
+      "id": "SS-148-SV",
+      "cardId": "SS-148-SV",
+      "name_en": "SASUKE UCHIHA",
+      "name_ja": "うちはサスケ",
+      "name_fr": "SASUKE UCHIWA",
+      "name_es": "SASUKE UCHIHA",
+      "chakra": 7,
+      "power": 7,
+      "keywords": [],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Naruto Uzumaki: POWERUP 3."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Defeat an enemy upgraded character in this mission with less printed Power than this character's Power, then you must move this character, if able."
+        }
+      ],
+      "card_type": "character",
+      "set": "SS",
+      "rarity": "SV",
+      "rarity_display": "Secret V",
+      "number": "148",
+      "old_id": "148/140 V",
+      "has_visual": true,
+      "data_complete": true,
+      "title_en": "This time we settle it once and for all!",
+      "title_fr": "Cette fois, on règle ça une bonne fois pour toutes !",
+      "title_es": "¡Esta vez lo resolvemos de una vez por todas!",
+      "title_ja": "「今度こそ決着をつける！」",
+      "title_pt": "Desta vez resolvemos isso de uma vez por todas!",
+      "title_it": "Questa volta la chiudiamo una volta per tutte!",
+      "title_pl": "Tym razem kończymy to raz na zawsze!",
+      "image_file": "images/cards/SS/secret_v/SS-148-SV.webp"
+    },
+    "SS-149-SV": {
+      "id": "SS-149-SV",
+      "cardId": "SS-149-SV",
+      "rarity": "SV",
+      "number": "149",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KAKASHI HATAKE",
+      "name_ja": "はたけカカシ",
+      "name_fr": "KAKASHI HATAKE",
+      "name_es": "KAKASHI HATAKE",
+      "title_en": "I will not allow my comrades to die.",
+      "title_ja": "「仲間は死なせない。」",
+      "title_fr": "Je ne laisserai pas mes camarades mourir.",
+      "title_es": "No permitiré que mis compañeros mueran.",
+      "title_pt": "Não vou permitir que meus companheiros morram.",
+      "title_it": "Non permetterò ai miei compagni di morire.",
+      "title_pl": "Nie pozwolę umrzeć moim towarzyszom.",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Search your deck for up to 2 Ninja Hound characters, reveal and draw them, then shuffle your deck. Play any number of Ninja Hound characters anywhere, paying 1 less."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Zabuza Momochi: Repeat the MAIN effect."
+        }
+      ],
+      "rarity_display": "Secret V",
+      "data_complete": true,
+      "old_id": "149/140 V",
+      "image_url": "/images/cards/SS/legendary/SS-149-L.webp",
+      "image_file": "images/cards/SS/secret_v/SS-149-SV.webp"
+    },
+    "SS-150-SV": {
+      "id": "SS-150-SV",
+      "cardId": "SS-150-SV",
+      "name_en": "ZABUZA MOMOCHI",
+      "name_ja": "桃地再不斬",
+      "name_fr": "ZABUZA MOMOCHI",
+      "name_es": "ZABUZA MOMOCHI",
+      "chakra": 6,
+      "power": 7,
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kakashi Hatake: Move the strongest enemy character in play to this mission."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] POWERUP X, where X is the cost of the strongest enemy character in this mission."
+        }
+      ],
+      "card_type": "character",
+      "set": "SS",
+      "rarity": "SV",
+      "rarity_display": "Secret V",
+      "number": "150",
+      "old_id": "150/140 V",
+      "has_visual": true,
+      "data_complete": true,
+      "title_en": "You're just brats.",
+      "title_fr": "Vous n’êtes que des gamins.",
+      "title_es": "No sois más que unos mocosos.",
+      "title_ja": "「ガキが。」",
+      "title_pt": "Vocês não passam de pirralhos.",
+      "title_it": "Non siete che dei marmocchi.",
+      "title_pl": "Jesteście tylko bachorami.",
+      "image_file": "images/cards/SS/secret_v/SS-150-SV.webp"
+    },
+    "SS-147-S": {
+      "id": "SS-147-S",
+      "cardId": "SS-147-S",
+      "rarity": "S",
+      "number": "147",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_ja": "うずまきナルト",
+      "name_fr": "NARUTO UZUMAKI",
+      "name_es": "NARUTO UZUMAKI",
+      "title_en": "I'm not letting Orochimaru take you away!",
+      "title_ja": "「大蛇丸にお前を渡さねぇ！」",
+      "title_fr": "Je ne laisserai pas Orochimaru t’emmener !",
+      "title_es": "¡No dejaré que Orochimaru te lleve!",
+      "title_pt": "Não vou deixar Orochimaru levar você!",
+      "title_it": "Non lascerò che Orochimaru ti porti via!",
+      "title_pl": "Nie pozwolę, żeby Orochimaru cię zabrał!",
+      "has_visual": false,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Enemy characters cannot move out of this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Sasuke Uchiha: POWERUP 1 for every non-hidden enemy character in play."
+        }
+      ],
+      "rarity_display": "Secret",
+      "data_complete": true,
+      "old_id": "147/140",
+      "image_url": "/images/cards/SS/pop_v/SS-147-POPV.webp"
+    },
+    "SS-148-S": {
+      "id": "SS-148-S",
+      "cardId": "SS-148-S",
+      "name_en": "SASUKE UCHIHA",
+      "name_ja": "うちはサスケ",
+      "name_fr": "SASUKE UCHIWA",
+      "name_es": "SASUKE UCHIHA",
+      "chakra": 7,
+      "power": 7,
+      "keywords": [],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Naruto Uzumaki: POWERUP 3."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Defeat an enemy upgraded character in this mission with less printed Power than this character's Power, then you must move this character, if able."
+        }
+      ],
+      "card_type": "character",
+      "set": "SS",
+      "rarity": "S",
+      "rarity_display": "Secret",
+      "number": "148",
+      "old_id": "148/140",
+      "has_visual": false,
+      "data_complete": true,
+      "title_en": "This time we settle it once and for all!",
+      "title_fr": "Cette fois, on règle ça une bonne fois pour toutes !",
+      "title_es": "¡Esta vez lo resolvemos de una vez por todas!",
+      "title_ja": "「今度こそ決着をつける！」",
+      "title_pt": "Desta vez resolvemos isso de uma vez por todas!",
+      "title_it": "Questa volta la chiudiamo una volta per tutte!",
+      "title_pl": "Tym razem kończymy to raz na zawsze!"
+    },
+    "SS-149-S": {
+      "id": "SS-149-S",
+      "cardId": "SS-149-S",
+      "rarity": "S",
+      "number": "149",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KAKASHI HATAKE",
+      "name_ja": "はたけカカシ",
+      "name_fr": "KAKASHI HATAKE",
+      "name_es": "KAKASHI HATAKE",
+      "title_en": "I will not allow my comrades to die.",
+      "title_ja": "「仲間は死なせない。」",
+      "title_fr": "Je ne laisserai pas mes camarades mourir.",
+      "title_es": "No permitiré que mis compañeros mueran.",
+      "title_pt": "Não vou permitir que meus companheiros morram.",
+      "title_it": "Non permetterò ai miei compagni di morire.",
+      "title_pl": "Nie pozwolę umrzeć moim towarzyszom.",
+      "has_visual": false,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Search your deck for up to 2 Ninja Hound characters, reveal and draw them, then shuffle your deck. Play any number of Ninja Hound characters anywhere, paying 1 less."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Zabuza Momochi: Repeat the MAIN effect."
+        }
+      ],
+      "rarity_display": "Secret",
+      "data_complete": true,
+      "old_id": "149/140",
+      "image_url": "/images/cards/SS/legendary/SS-149-L.webp"
+    },
+    "SS-150-S": {
+      "id": "SS-150-S",
+      "cardId": "SS-150-S",
+      "name_en": "ZABUZA MOMOCHI",
+      "name_ja": "桃地再不斬",
+      "name_fr": "ZABUZA MOMOCHI",
+      "name_es": "ZABUZA MOMOCHI",
+      "chakra": 6,
+      "power": 7,
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kakashi Hatake: Move the strongest enemy character in play to this mission."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] POWERUP X, where X is the cost of the strongest enemy character in this mission."
+        }
+      ],
+      "card_type": "character",
+      "set": "SS",
+      "rarity": "S",
+      "rarity_display": "Secret",
+      "number": "150",
+      "old_id": "150/140",
+      "has_visual": false,
+      "data_complete": true,
+      "title_en": "You're just brats.",
+      "title_fr": "Vous n’êtes que des gamins.",
+      "title_es": "No sois más que unos mocosos.",
+      "title_ja": "「ガキが。」",
+      "title_pt": "Vocês não passam de pirralhos.",
+      "title_it": "Non siete che dei marmocchi.",
+      "title_pl": "Jesteście tylko bachorami."
     }
   }
 }

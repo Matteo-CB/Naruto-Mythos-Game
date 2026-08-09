@@ -24,6 +24,7 @@ import { getCharacterById, getCardById } from '@/lib/data/cardIndex';
 import { REWIND_TARGET } from '@/lib/effects/EffectEngine';
 import { lookupCardByName } from '@/lib/i18n/localizeMessageParams';
 import { playSound } from '@/lib/sound/SoundManager';
+import { buildPromptTag } from '@/lib/effects/promptTag';
 
 let _cardsJsonCache: Record<string, unknown> = {};
 let _cardsJsonLoaded = false;
@@ -49,6 +50,7 @@ interface PendingTargetSelection {
   description: string;
   descriptionKey?: string; // i18n key for translated description
   descriptionParams?: Record<string, string | number>; // interpolation params
+  promptTag?: { effectType: string; duelPartner?: string };
   playerName?: string; // display name of the player who must choose
   selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT' | 'DRAW_CARD' | 'CONFIRM_HIDE' | 'CONFIRM_DEFEAT' | 'EFFECT_PLAY_UPGRADE_OR_FRESH' | 'EFFECT_CONFIRM' | 'CHOOSE_EFFECT_ORDER' | 'ORDER_DEFEAT_TARGETS' | 'ORDER_HIDE_TARGETS' | 'DECLARE_NUMBER'; // type of selection
   effectChoices?: Array<{ effectType: string; description: string; cardId?: string; effectIndex?: number }>; // for effect copy choice (Kakashi/Sakon)
@@ -203,6 +205,7 @@ interface PendingActionData {
 
 interface PendingEffectData {
   id: string;
+  effectType?: string;
   sourceCardId?: string;
   validTargets?: string[];
   targetSelectionType?: string;
@@ -744,6 +747,11 @@ export function buildPendingTargetSelectionUI(
     description: pendingAction.description,
     descriptionKey: pendingAction.descriptionKey,
     descriptionParams: pendingAction.descriptionParams,
+    promptTag: buildPromptTag(
+      pendingEffect?.effectType,
+      tst,
+      pendingEffect?.sourceCardId ? getCardById(pendingEffect.sourceCardId) : null,
+    ),
     selectionType,
     effectChoices,
     handCards,

@@ -213,7 +213,7 @@ function ss000SearchAndPlay(ctx: EffectContext): EffectResult {
   if (hounds.length === 0 && !hasPlayable) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kakashi Hatake (SS-000): No Ninja Hound to search or play.',
-      'game.log.effect.noTarget', { card: 'KAKASHI HATAKE', id: 'SS-000-L' }) } };
+      'game.log.effect.noTarget', { card: 'KAKASHI HATAKE', id: 'SS-149-L' }) } };
   }
 
   return {
@@ -400,13 +400,19 @@ export function registerSet2Handlers(): void {
   registerEffect('SS-112-SPV', 'UPGRADE', ss112UpgradeHandler);
   registerEffect('SS-112-SPV', 'DUEL', ss112DuelHandler);
   registerEffect('SS-147-POPV', 'DUEL', ss147DuelHandler);
+  registerEffect('SS-147-SV', 'DUEL', ss147DuelHandler);
+  registerEffect('SS-147-S', 'DUEL', ss147DuelHandler);
   registerEffect('SS-134-R', 'DUEL', ss134DuelHandler);
   registerEffect('SS-134-R', 'UPGRADE', ss134UpgradeHandler);
   registerEffect('SS-120-CHIBIV', 'DUEL', ss120DuelHandler);
   registerEffect('SS-126-SPV', 'DUEL', ss126DuelHandler);
   registerEffect('SS-121-R', 'DUEL', ss121DuelHandler);
-  registerEffect('SS-000-L', 'MAIN', ss000SearchAndPlay);
-  registerEffect('SS-000-L', 'DUEL', ss000SearchAndPlay);
+  registerEffect('SS-149-L', 'MAIN', ss000SearchAndPlay);
+  registerEffect('SS-149-L', 'DUEL', ss000SearchAndPlay);
+  registerEffect('SS-149-SV', 'MAIN', ss000SearchAndPlay);
+  registerEffect('SS-149-SV', 'DUEL', ss000SearchAndPlay);
+  registerEffect('SS-149-S', 'MAIN', ss000SearchAndPlay);
+  registerEffect('SS-149-S', 'DUEL', ss000SearchAndPlay);
   registerEffect('SS-121-MV', 'DUEL', ss121DuelHandler);
   registerEffect('SS-126-R', 'DUEL', ss126DuelHandler);
   registerEffect('SS-126-MV', 'DUEL', ss126DuelHandler);

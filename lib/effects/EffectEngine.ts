@@ -3313,7 +3313,7 @@ export class EffectEngine {
           id: k016uEffId, sourceCardId: pendingEffect.sourceCardId,
           sourceInstanceId: pendingEffect.sourceInstanceId,
           sourceMissionIndex: pendingEffect.sourceMissionIndex,
-          effectType: 'MAIN',
+          effectType: pendingEffect.effectType,
           effectDescription: '', targetSelectionType: 'KAKASHI_COPY_EFFECT',
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
           validTargets: k016uTargets, isOptional: false, isMandatory: true,
@@ -3497,7 +3497,7 @@ export class EffectEngine {
           id: i020uEffId, sourceCardId: pendingEffect.sourceCardId,
           sourceInstanceId: pendingEffect.sourceInstanceId,
           sourceMissionIndex: i020uMIdx,
-          effectType: 'MAIN',
+          effectType: pendingEffect.effectType,
           effectDescription: '', targetSelectionType: 'TAKE_CONTROL_ENEMY_THIS_MISSION',
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
           validTargets: i020uTargets, isOptional: false, isMandatory: true,
@@ -5097,7 +5097,7 @@ export class EffectEngine {
                 sourceCardId: 'KS-049-C',
                 sourceInstanceId: gemmaChar.instanceId,
                 sourceMissionIndex: kb054mMI,
-                effectType: 'MAIN' as const,
+                effectType: pendingEffect.effectType,
                 effectDescription: JSON.stringify({
                   sacrificeInstanceId: gemmaChar.instanceId,
                   effectSource: kb054mPlayer,
@@ -6144,6 +6144,8 @@ export class EffectEngine {
       case 'SS123MV_CONFIRM_DUEL':
       case 'SS118_CONFIRM_AMBUSH':
       case 'SS118_CONFIRM_DUEL':
+      case 'SS148_CONFIRM_MAIN':
+      case 'SS150_CONFIRM_DUEL':
       case 'SS137MV_CONFIRM_UPGRADE':
       case 'MINATO122_CONFIRM_MAIN': {
         let relay: { nextType?: string; targets?: string[]; nextKey?: string; nextText?: string } = {};
@@ -11938,7 +11940,7 @@ export class EffectEngine {
           newState.pendingEffects.push({
             id: s114mEffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
-            sourceMissionIndex: s114cMi, effectType: pendingEffect.effectType,
+            sourceMissionIndex: s114cMi, effectType: 'DUEL' as const,
             effectDescription: JSON.stringify({}),
             targetSelectionType: 'SS114_CONFIRM_DUEL_MODIFIER',
             sourcePlayer: s114cP, requiresTargetSelection: true,
@@ -14869,7 +14871,7 @@ export class EffectEngine {
           newState[ssPlayer] = ssPS;
           newState.log = logAction(newState.log, newState.turn, newState.phase, ssPlayer, 'EFFECT_DRAW',
             `Kakashi Hatake (SS-000): revealed and drew ${ssDrawnCard.name_fr}.`,
-            'game.log.effect.ss000Reveal', { card: 'KAKASHI HATAKE', id: 'SS-000-L', target: ssDrawnCard.name_fr });
+            'game.log.effect.ss000Reveal', { card: 'KAKASHI HATAKE', id: 'SS-149-L', target: ssDrawnCard.name_fr });
 
           const ssRemaining = (ssMeta.remaining ?? 1) - 1;
           const ssDrawnCount = (ssMeta.drawn ?? 0) + 1;
@@ -17144,6 +17146,137 @@ export class EffectEngine {
         break;
       }
 
+      case 'SS148_CONFIRM_DUEL': {
+        newState = EffectEngine.applyPowerupToTarget(newState, pendingEffect.sourceInstanceId, 3);
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_POWERUP', 'Sasuke Uchiha (SS-148) DUEL: POWERUP 3.',
+          'game.log.effect.ss148DuelPowerup',
+          { card: 'SASUKE UCHIWA', id: 'SS-148-SV', amount: 3 },
+        );
+        break;
+      }
+
+      case 'SS148_DEFEAT_UPGRADED': {
+        const s148Victim = EffectEngine.findCharByInstanceId(newState, targetId);
+        const s148Name = s148Victim
+          ? (s148Victim.character.stack?.length > 0
+            ? s148Victim.character.stack[s148Victim.character.stack.length - 1].name_fr
+            : s148Victim.character.card.name_fr)
+          : '';
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', `Sasuke Uchiha (SS-148) MAIN: defeated ${s148Name}.`,
+          'game.log.effect.defeat',
+          { card: 'SASUKE UCHIWA', id: 'SS-148-SV', target: s148Name },
+        );
+
+        const s148Side: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const s148Self = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (s148Self) {
+          const s148Dests: string[] = [];
+          for (let i = 0; i < newState.activeMissions.length; i++) {
+            if (i === s148Self.missionIndex) continue;
+            if (EffectEngine.validateNameUniquenessForMove(newState, s148Self.character, i, pendingEffect.sourcePlayer)) {
+              s148Dests.push(String(i));
+            }
+          }
+          void s148Side;
+          if (s148Dests.length === 1) {
+            newState = EffectEngine.moveCharToMissionDirectPublic(
+              newState, pendingEffect.sourceInstanceId, Number(s148Dests[0]), pendingEffect.sourcePlayer,
+              'SASUKE UCHIWA', 'SS-148-SV', pendingEffect.sourcePlayer,
+            );
+          } else if (s148Dests.length > 1) {
+            const s148EffId = generateInstanceId();
+            const s148ActId = generateInstanceId();
+            newState.pendingEffects = [...newState.pendingEffects, {
+              id: s148EffId,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: '',
+              targetSelectionType: 'SS148_MOVE_SELF',
+              sourcePlayer: pendingEffect.sourcePlayer,
+              requiresTargetSelection: true,
+              validTargets: s148Dests,
+              isOptional: false,
+              isMandatory: true,
+              resolved: false,
+              isUpgrade: pendingEffect.isUpgrade,
+            }];
+            newState.pendingActions = [...newState.pendingActions, {
+              id: s148ActId,
+              type: 'SELECT_TARGET' as PendingAction['type'],
+              player: pendingEffect.sourcePlayer,
+              description: 'Sasuke Uchiha (SS-148) MAIN: choose where this character moves.',
+              descriptionKey: 'game.effect.desc.ss148MoveSelf',
+              options: s148Dests,
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: s148EffId,
+            }];
+          }
+        }
+        break;
+      }
+
+      case 'SS148_MOVE_SELF': {
+        newState = EffectEngine.moveCharToMissionDirectPublic(
+          newState, pendingEffect.sourceInstanceId, Number(targetId), pendingEffect.sourcePlayer,
+          'SASUKE UCHIWA', 'SS-148-SV', pendingEffect.sourcePlayer,
+        );
+        break;
+      }
+
+      case 'SS150_PULL_STRONGEST': {
+        const s150Found = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!s150Found) break;
+        if (!EffectEngine.validateNameUniquenessForMove(
+          newState, s150Found.character, pendingEffect.sourceMissionIndex, s150Found.player,
+        )) {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Zabuza Momochi (SS-150) DUEL: that character cannot be moved here.',
+            'game.log.effect.noTarget', { card: 'ZABUZA MOMOCHI', id: 'SS-150-SV' },
+          );
+          break;
+        }
+        const s150Top = s150Found.character.stack?.length > 0
+          ? s150Found.character.stack[s150Found.character.stack.length - 1]
+          : s150Found.character.card;
+        newState = EffectEngine.moveCharToMissionDirectPublic(
+          newState, targetId, pendingEffect.sourceMissionIndex, s150Found.player,
+          'ZABUZA MOMOCHI', 'SS-150-SV', pendingEffect.sourcePlayer,
+        );
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_MOVE', `Zabuza Momochi (SS-150) DUEL: pulled ${s150Top.name_fr} here.`,
+          'game.log.effect.moveCharacter',
+          { card: 'ZABUZA MOMOCHI', id: 'SS-150-SV', target: s150Top.name_fr },
+        );
+        break;
+      }
+
+      case 'SS150_CONFIRM_UPGRADE': {
+        let s150Data: { amount?: number } = {};
+        try { s150Data = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const s150Amount = s150Data.amount ?? 0;
+        if (s150Amount > 0) {
+          newState = EffectEngine.applyPowerupToTarget(newState, pendingEffect.sourceInstanceId, s150Amount);
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_POWERUP', `Zabuza Momochi (SS-150) UPGRADE: POWERUP ${s150Amount}.`,
+            'game.log.effect.ss150PowerupByCost',
+            { card: 'ZABUZA MOMOCHI', id: 'SS-150-SV', amount: s150Amount },
+          );
+        }
+        break;
+      }
+
       case 'SS118_REVEAL_DEFEAT': {
         const s118Found = EffectEngine.findCharByInstanceId(newState, targetId);
         if (!s118Found) break;
@@ -18106,7 +18239,7 @@ export class EffectEngine {
       sourceCardId: pending.sourceCardId,
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
-      effectType: 'MAIN' as const,
+      effectType: pending.effectType,
       effectDescription: revealData,
       targetSelectionType: 'OROCHIMARU_REVEAL_RESULT',
       sourcePlayer: pending.sourcePlayer,
@@ -18220,7 +18353,7 @@ export class EffectEngine {
       sourceCardId: pending.sourceCardId,
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
-      effectType: 'MAIN' as const,
+      effectType: pending.effectType,
       effectDescription: revealData,
       targetSelectionType: 'DOSU_LOOK_REVEAL',
       sourcePlayer: pending.sourcePlayer,
@@ -18284,7 +18417,7 @@ export class EffectEngine {
       sourceCardId: pending.sourceCardId,
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
-      effectType: 'MAIN' as const,
+      effectType: pending.effectType,
       effectDescription: revealData,
       targetSelectionType: 'DOSU_LOOK_REVEAL',
       sourcePlayer: pending.sourcePlayer,
@@ -18405,7 +18538,7 @@ export class EffectEngine {
       sourceCardId: 'REORDER_DISCARD',
       sourceInstanceId: effId,
       sourceMissionIndex: 0,
-      effectType: 'MAIN' as EffectType,
+      effectType: 'MAIN' as const,
       effectDescription: JSON.stringify({ count: actualCount, discardOwner, ...(chainData ?? {}) }),
       targetSelectionType: 'REORDER_DISCARD',
       sourcePlayer: effectSourcePlayer,
@@ -19430,7 +19563,7 @@ export class EffectEngine {
             sourceCardId: cardId,
             sourceInstanceId: '',
             sourceMissionIndex: missionIndex,
-            effectType: 'MAIN' as EffectType,
+            effectType: 'MAIN' as const,
             effectDescription: JSON.stringify({ cardName, cardId, costReduction, missionIndex }),
             targetSelectionType: 'EFFECT_PLAY_UPGRADE_OR_FRESH',
             sourcePlayer: player,
@@ -20191,7 +20324,7 @@ export class EffectEngine {
           sourceCardId: 'KS-053-UC',
           sourceInstanceId: '',
           sourceMissionIndex: missionIdx,
-          effectType: 'MAIN' as EffectType,
+          effectType: 'MAIN' as const,
           effectDescription: JSON.stringify({ cardName: 'KABUTO YAKUSHI', cardId: 'KS-053-UC', costReduction: 3, missionIndex: missionIdx }),
           targetSelectionType: 'EFFECT_PLAY_UPGRADE_OR_FRESH',
           sourcePlayer: player,
@@ -20366,7 +20499,7 @@ export class EffectEngine {
           sourceCardId: 'KS-002-UC',
           sourceInstanceId: pending.sourceInstanceId,
           sourceMissionIndex: missionIndex,
-          effectType: 'MAIN' as EffectType,
+          effectType: pending.effectType,
           effectDescription: JSON.stringify({ cardIndex, missionIndex }),
           targetSelectionType: 'HIRUZEN002_UPGRADE_OR_FRESH',
           sourcePlayer: player,

@@ -1,6 +1,56 @@
 {
   "entries": [
     {
+      "date": "2026-08-09",
+      "title_fr": "Fenêtre de reprise plus discrète",
+      "title_en": "A quieter resume window",
+      "title_es": "Ventana de reanudación más discreta",
+      "title_ja": "再開ウィンドウの表示を限定",
+      "title_pt": "Janela de retomada mais discreta",
+      "title_it": "Finestra di ripresa più discreta",
+      "title_pl": "Dyskretniejsze okno wznowienia",
+      "categories": [
+        "fix",
+        "feature",
+        "fix"
+      ],
+      "changes_fr": [
+        "La fenêtre « Partie en cours » n'apparaît plus partout : elle s'affiche dans Jouer en ligne pour une partie en ligne, dans Tournois pour un match de tournoi, et vous laisse naviguer ailleurs.",
+        "Les quatre cartes Secret 147 à 150 rejoignent la collection, sans illustration pour le moment.",
+        "La page Suggestions est retirée du jeu, ainsi que les dons."
+      ],
+      "changes_en": [
+        "The \"Game in progress\" window no longer follows you everywhere: it shows in Play Online for an online game, in Tournaments for a tournament match, and lets you browse elsewhere.",
+        "The four Secret cards 147 to 150 join the collection, without artwork for now.",
+        "The Suggestions page is removed from the game, along with donations."
+      ],
+      "changes_es": [
+        "La ventana «Partida en curso» ya no aparece en todas partes: se muestra en Jugar en línea para una partida en línea, en Torneos para un combate de torneo, y te deja navegar por el resto.",
+        "Las cuatro cartas Secret 147 a 150 llegan a la colección, todavía sin ilustración.",
+        "La página de Sugerencias se retira del juego, junto con las donaciones."
+      ],
+      "changes_ja": [
+        "「進行中の対戦」の表示が全ページに出なくなりました。オンライン対戦はオンラインページ、トーナメントの試合はトーナメントページにだけ表示され、他のページは自由に見られます。",
+        "シークレット147から150の4枚がコレクションに加わります。イラストは後日です。",
+        "「提案」ページと寄付機能をゲームから削除しました。"
+      ],
+      "changes_pt": [
+        "A janela \"Partida em andamento\" não aparece mais em todo lugar: ela é exibida em Jogar Online para uma partida online, em Torneios para uma partida de torneio, e deixa você navegar no resto.",
+        "As quatro cartas Secret 147 a 150 chegam à coleção, ainda sem ilustração.",
+        "A página de Sugestões foi removida do jogo, assim como as doações."
+      ],
+      "changes_it": [
+        "La finestra \"Partita in corso\" non appare più ovunque: si mostra in Gioca Online per una partita online, in Tornei per un match di torneo, e ti lascia navigare altrove.",
+        "Le quattro carte Secret dalla 147 alla 150 arrivano nella collezione, per ora senza illustrazione.",
+        "La pagina Suggerimenti è rimossa dal gioco, insieme alle donazioni."
+      ],
+      "changes_pl": [
+        "Okno \"Trwająca partia\" nie pojawia się już wszędzie: widać je w Graj Online dla partii online, w Turniejach dla meczu turniejowego, a poza tym możesz swobodnie przeglądać stronę.",
+        "Cztery karty Secret od 147 do 150 dołączają do kolekcji, na razie bez ilustracji.",
+        "Strona Sugestie została usunięta z gry, razem z darowiznami."
+      ]
+    },
+    {
       "date": "2026-08-08",
       "title_fr": "Huit cartes Chibi, connexion et mot de passe oublié réparés",
       "title_en": "Eight Chibi cards, sign in and forgotten password fixed",
@@ -14,12 +64,21 @@
         "feature",
         "feature",
         "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
         "fix",
         "fix",
         "fix",
         "fix"
       ],
       "changes_fr": [
+        "Quatre cartes Secret numérotées rejoignent le set 2 : Naruto Uzumaki 147, Sasuke Uchiwa 148, Kakashi Hatake 149 et Zabuza Momochi 150.",
+        "Sasuke Uchiwa 148 arrive : il vainc un personnage ennemi amélioré plus faible que lui dans sa mission, puis doit se déplacer.",
+        "Zabuza Momochi 150 arrive : son duel contre Kakashi attire le personnage ennemi le plus fort du plateau dans sa mission.",
+        "Le Kakashi or porte enfin son vrai numéro, 149.",
         "Huit cartes Chibi rejoignent le set 2 : Gaara 78, Hinata Hyûga 111, Neji Hyûga 112, Rock Lee 115, Shikamaru Nara 118, Naruto Uzumaki 121, Sakura Haruno 123 et Sasuke Uchiwa 126.",
         "Shikamaru Nara 118 arrive : en embuscade, il révèle un personnage ennemi caché et le vainc.",
         "Son duel contre Temari cache ensuite un personnage ennemi portant le nom du personnage révélé.",
@@ -27,9 +86,14 @@
         "Votre adresse email est reconnue avec ou sans majuscules, à la connexion comme pour le mot de passe oublié.",
         "Le mail de réinitialisation part maintenant même si vous tapez votre adresse différemment de votre inscription.",
         "Vous pouvez redemander un lien de réinitialisation 5 fois par quart d’heure au lieu de 3.",
-        "Les points d’une mission et sa lettre de rang sont de nouveau visibles sur le plateau, ainsi que le bandeau Gagnée ou Perdue."
+        "Les points d’une mission et sa lettre de rang sont de nouveau visibles sur le plateau, ainsi que le bandeau Gagnée ou Perdue.",
+        "Chaque fenêtre d’effet affiche maintenant d’elle-même de quel effet il s’agit : MAIN, EMBUSCADE, UPGRADE, SCORE, ou le duel avec le nom de l’adversaire concerné."
       ],
       "changes_en": [
+        "Four numbered Secret cards join set 2: Naruto Uzumaki 147, Sasuke Uchiha 148, Kakashi Hatake 149 and Zabuza Momochi 150.",
+        "Sasuke Uchiha 148 arrives: he defeats an enemy upgraded character weaker than him in his mission, then has to move.",
+        "Zabuza Momochi 150 arrives: his duel against Kakashi drags the strongest enemy character on the board into his mission.",
+        "The gold Kakashi finally carries its real number, 149.",
         "Eight Chibi cards join set 2: Gaara 78, Hinata Hyuga 111, Neji Hyuga 112, Rock Lee 115, Shikamaru Nara 118, Naruto Uzumaki 121, Sakura Haruno 123 and Sasuke Uchiha 126.",
         "Shikamaru Nara 118 arrives: on ambush he reveals an enemy hidden character and defeats it.",
         "His duel against Temari then hides an enemy character carrying the revealed name.",
@@ -37,9 +101,14 @@
         "Your email address is recognised with or without capitals, both to sign in and to reset your password.",
         "The reset email now goes out even if you type your address differently from how you signed up.",
         "You can ask for a reset link 5 times per quarter of an hour instead of 3.",
-        "A mission shows its points and its rank letter on the board again, and so does the Won or Lost banner."
+        "A mission shows its points and its rank letter on the board again, and so does the Won or Lost banner.",
+        "Every effect window now shows on its own which effect is resolving: MAIN, AMBUSH, UPGRADE, SCORE, or the duel with the name of the partner involved."
       ],
       "changes_es": [
+        "Cuatro cartas Secret numeradas llegan al set 2: Naruto Uzumaki 147, Sasuke Uchiha 148, Kakashi Hatake 149 y Zabuza Momochi 150.",
+        "Llega Sasuke Uchiha 148: derrota a un personaje enemigo mejorado más débil que él en su misión, y luego debe moverse.",
+        "Llega Zabuza Momochi 150: su duelo contra Kakashi arrastra al personaje enemigo más fuerte del tablero a su misión.",
+        "El Kakashi dorado por fin lleva su número real, 149.",
         "Ocho cartas Chibi llegan al set 2: Gaara 78, Hinata Hyuga 111, Neji Hyuga 112, Rock Lee 115, Shikamaru Nara 118, Naruto Uzumaki 121, Sakura Haruno 123 y Sasuke Uchiha 126.",
         "Llega Shikamaru Nara 118: en emboscada revela a un personaje enemigo oculto y lo derrota.",
         "Su duelo contra Temari oculta después a un personaje enemigo con el nombre revelado.",
@@ -47,9 +116,14 @@
         "Tu correo se reconoce con o sin mayúsculas, tanto al iniciar sesión como al recuperar la contraseña.",
         "El correo de recuperación ahora se envía aunque escribas tu dirección distinta a como te registraste.",
         "Puedes pedir un enlace de recuperación 5 veces por cuarto de hora en vez de 3.",
-        "Una misión vuelve a mostrar sus puntos y su letra de rango en el tablero, igual que el cartel Ganada o Perdida."
+        "Una misión vuelve a mostrar sus puntos y su letra de rango en el tablero, igual que el cartel Ganada o Perdida.",
+        "Cada ventana de efecto muestra ahora por sí sola qué efecto se resuelve: MAIN, AMBUSH, UPGRADE, SCORE, o el duelo con el nombre del rival implicado."
       ],
       "changes_ja": [
+        "番号入りのシークレット4枚がセット2に加わります：うずまきナルト147、うちはサスケ148、はたけカカシ149、桃地再不斬150。",
+        "うちはサスケ148が登場：同じミッションで自分より弱い敵の強化済みキャラクターを倒し、その後移動します。",
+        "桃地再不斬150が登場：カカシとのデュエルで、場で最も強い敵キャラクターを自分のミッションに引き寄せます。",
+        "金のカカシがようやく本来の番号149になりました。",
         "チビ8枚がセット2に加わります：我愛羅78、日向ヒナタ111、日向ネジ112、ロック・リー115、奈良シカマル118、うずまきナルト121、春野サクラ123、うちはサスケ126。",
         "奈良シカマル118が登場：待ち伏せで敵の伏せた忍を公開し、倒します。",
         "テマリとのデュエルでは、公開した忍と同じ名前の敵の忍を伏せます。",
@@ -57,9 +131,14 @@
         "メールアドレスは大文字小文字を問わず認識されます。ログインでもパスワード再設定でも同じです。",
         "登録時と違う書き方で入力しても、再設定メールが届くようになりました。",
         "再設定リンクの再送は15分あたり3回から5回になりました。",
-        "ミッションのポイントとランクの文字が盤面に再び表示されます。勝利・敗北の表示も同様です。"
+        "ミッションのポイントとランクの文字が盤面に再び表示されます。勝利・敗北の表示も同様です。",
+        "効果のウィンドウが、どの効果かを自動で表示するようになりました。MAIN、AMBUSH、UPGRADE、SCORE、デュエルは相手の名前つきです。"
       ],
       "changes_pt": [
+        "Quatro cartas Secret numeradas chegam ao set 2: Naruto Uzumaki 147, Sasuke Uchiha 148, Kakashi Hatake 149 e Zabuza Momochi 150.",
+        "Sasuke Uchiha 148 chega: ele derrota um personagem inimigo evoluído mais fraco que ele na missão dele, depois precisa se mover.",
+        "Zabuza Momochi 150 chega: o duelo dele contra Kakashi puxa o personagem inimigo mais forte do tabuleiro para a missão dele.",
+        "O Kakashi dourado finalmente tem seu número real, 149.",
         "Oito cartas Chibi chegam ao set 2: Gaara 78, Hinata Hyuga 111, Neji Hyuga 112, Rock Lee 115, Shikamaru Nara 118, Naruto Uzumaki 121, Sakura Haruno 123 e Sasuke Uchiha 126.",
         "Shikamaru Nara 118 chega: na emboscada ele revela um personagem inimigo oculto e o derrota.",
         "O duelo dele contra Temari oculta em seguida um personagem inimigo com o nome revelado.",
@@ -67,9 +146,14 @@
         "Seu email é reconhecido com ou sem maiúsculas, tanto para entrar quanto para recuperar a senha.",
         "O email de recuperação agora é enviado mesmo se você digitar o endereço diferente do cadastro.",
         "Você pode pedir um link de recuperação 5 vezes por quinze minutos em vez de 3.",
-        "A missão volta a mostrar seus pontos e a letra do rank no tabuleiro, assim como o aviso Vencida ou Perdida."
+        "A missão volta a mostrar seus pontos e a letra do rank no tabuleiro, assim como o aviso Vencida ou Perdida.",
+        "Cada janela de efeito agora mostra sozinha qual efeito está resolvendo: MAIN, AMBUSH, UPGRADE, SCORE, ou o duelo com o nome do parceiro envolvido."
       ],
       "changes_it": [
+        "Quattro carte Secret numerate arrivano nel set 2: Naruto Uzumaki 147, Sasuke Uchiha 148, Kakashi Hatake 149 e Zabuza Momochi 150.",
+        "Arriva Sasuke Uchiha 148: sconfigge un personaggio nemico potenziato più debole di lui nella sua missione, poi deve spostarsi.",
+        "Arriva Zabuza Momochi 150: il suo duello contro Kakashi trascina il personaggio nemico più forte del tavolo nella sua missione.",
+        "Il Kakashi dorato porta finalmente il suo numero vero, 149.",
         "Otto carte Chibi arrivano nel set 2: Gaara 78, Hinata Hyuga 111, Neji Hyuga 112, Rock Lee 115, Shikamaru Nara 118, Naruto Uzumaki 121, Sakura Haruno 123 e Sasuke Uchiha 126.",
         "Arriva Shikamaru Nara 118: in imboscata rivela un personaggio nemico nascosto e lo sconfigge.",
         "Il suo duello contro Temari nasconde poi un personaggio nemico che porta il nome rivelato.",
@@ -77,9 +161,14 @@
         "La tua email viene riconosciuta con o senza maiuscole, sia per accedere sia per recuperare la password.",
         "La mail di recupero parte anche se scrivi l’indirizzo in modo diverso da come ti sei registrato.",
         "Puoi chiedere un link di recupero 5 volte ogni quarto d’ora invece di 3.",
-        "Una missione mostra di nuovo i suoi punti e la lettera del rango sul tavolo, come pure la scritta Vinta o Persa."
+        "Una missione mostra di nuovo i suoi punti e la lettera del rango sul tavolo, come pure la scritta Vinta o Persa.",
+        "Ogni finestra di effetto mostra ora da sola quale effetto si sta risolvendo: MAIN, AMBUSH, UPGRADE, SCORE, o il duello con il nome dell’avversario coinvolto."
       ],
       "changes_pl": [
+        "Cztery numerowane karty Secret dołączają do zestawu 2: Naruto Uzumaki 147, Sasuke Uchiha 148, Kakashi Hatake 149 i Zabuza Momochi 150.",
+        "Pojawia się Sasuke Uchiha 148: pokonuje słabszą od siebie ulepszoną postać przeciwnika w swojej misji, a potem musi się przesunąć.",
+        "Pojawia się Zabuza Momochi 150: jego pojedynek z Kakashim ściąga do jego misji najsilniejszą postać przeciwnika na planszy.",
+        "Złoty Kakashi w końcu nosi swój prawdziwy numer, 149.",
         "Osiem kart Chibi dołącza do zestawu 2: Gaara 78, Hinata Hyuga 111, Neji Hyuga 112, Rock Lee 115, Shikamaru Nara 118, Naruto Uzumaki 121, Sakura Haruno 123 i Sasuke Uchiha 126.",
         "Pojawia się Shikamaru Nara 118: w zasadzce odkrywa zakrytą postać przeciwnika i pokonuje ją.",
         "Jego pojedynek z Temari zakrywa potem postać przeciwnika noszącą odkrytą nazwę.",
@@ -87,7 +176,8 @@
         "Twój adres email jest rozpoznawany z wielkimi literami i bez nich, przy logowaniu i przy odzyskiwaniu hasła.",
         "Mail z linkiem wychodzi teraz nawet wtedy, gdy wpiszesz adres inaczej niż przy rejestracji.",
         "O link do zmiany hasła możesz poprosić 5 razy na kwadrans zamiast 3.",
-        "Misja znów pokazuje na planszy swoje punkty i literę rangi, tak samo jak napis Wygrana lub Przegrana."
+        "Misja znów pokazuje na planszy swoje punkty i literę rangi, tak samo jak napis Wygrana lub Przegrana.",
+        "Każde okno efektu samo pokazuje teraz, który efekt się rozpatruje: MAIN, AMBUSH, UPGRADE, SCORE albo pojedynek z nazwą powiązanej postaci."
       ]
     },
     {
@@ -1174,7 +1264,6 @@
         "Un bug empêchait certains nouveaux comptes de valider leur code de vérification par email, les bloquant dans une boucle infinie. C'est corrigé.",
         "En scellé, l'ouverture des boosters attend maintenant que tu cliques pour passer au booster suivant, sans limite de temps.",
         "Le bouton Coupe du monde est de retour dans le menu d'accueil.",
-        "La Coupe du monde a un vrai système de score : taux de victoire des 6 meilleurs joueurs du pays, force des adversaires battus, niveau de l'équipe, activité, et malus pour les abandons.",
         "Une nouvelle Coupe du monde recommence tous les 3 mois, et tu peux voir le classement sur 24h, 7 jours, 30 jours ou la saison.",
         "À la fin de chaque saison de 3 mois, les joueurs des 3 pays du podium gagnent des cartes, des boosters et de l'XP, et l'équipe championne reçoit le titre Champion du monde.",
         "La Coupe du monde s'enrichit : bannière du champion en titre, une vraie carte du monde coloriée par le score de chaque pays, comparateur de pays, courbe de progression de la saison et activité par heure.",
@@ -1186,7 +1275,6 @@
         "A bug prevented some new accounts from validating their email verification code, trapping them in an infinite loop. This is fixed.",
         "In sealed, opening boosters now waits for a click before moving to the next booster, with no time limit.",
         "The World Cup button is back in the home menu.",
-        "The World Cup now has a real scoring system: win rate of the country's 6 best players, strength of beaten opponents, team level, activity, and a penalty for forfeits.",
         "A new World Cup restarts every 3 months, and you can view the ranking over 24h, 7 days, 30 days or the season.",
         "At the end of each 3-month season, the podium countries' players earn cards, boosters and XP, and the winning team receives the World Champion title.",
         "The World Cup gains visuals: reigning champion banner, a real world map colored by each country’s score, country comparator, season progression chart and activity by hour.",
@@ -1198,7 +1286,6 @@
         "Un error impedía que algunas cuentas nuevas validaran su código de verificación por correo, atrapándolas en un bucle infinito. Esto está corregido.",
         "En sellado, abrir sobres ahora espera un clic antes de pasar al siguiente sobre, sin límite de tiempo.",
         "El botón Copa del mundo vuelve a estar en el menú de inicio.",
-        "La Copa del mundo tiene un sistema de puntuación real: tasa de victorias de los 6 mejores jugadores del país, fuerza de los rivales vencidos, nivel del equipo, actividad y penalización por abandonos.",
         "Una nueva Copa del mundo comienza cada 3 meses, y puedes ver la clasificación en 24h, 7 días, 30 días o la temporada.",
         "Al final de cada temporada de 3 meses, los jugadores de los países del podio ganan cartas, sobres y XP, y el equipo campeón recibe el título de Campeón del mundo.",
         "La Copa del mundo gana elementos visuales: banner del campeón vigente, un mapa del mundo real coloreado según la puntuación de cada país, comparador de países, gráfico de progresión y actividad por hora.",
@@ -1210,7 +1297,6 @@
         "一部の新規アカウントでメール確認コードが検証できず、無限ループに陥るバグがありました。修正済みです。",
         "シールドでブースターを開封する際、次のブースターに進む前にクリックを待つようになりました(時間制限なし)。",
         "ワールドカップのボタンがホームメニューに戻りました。",
-        "ワールドカップに本格的なスコアシステムを導入:各国の上位6名の勝率、撃破した相手の強さ、チームのレベル、活動量、そして放棄によるペナルティ。",
         "3か月ごとに新しいワールドカップが始まり、24時間・7日・30日・シーズンでランキングを見られます。",
         "3か月ごとのシーズン終了時、表彰台の3か国のプレイヤーはカード・ブースター・XPを獲得し、優勝チームはワールドチャンピオンの称号を得ます。",
         "ワールドカップに新要素:現チャンピオンのバナー、各国のスコアで色分けされた本物の世界地図、国の比較、シーズン推移グラフ、時間帯別の活動。",
@@ -1222,7 +1308,6 @@
         "Um bug impedia algumas contas novas de validar seu código de verificação de e-mail, prendendo-as num loop infinito. Isso foi corrigido.",
         "No sealed, a abertura de boosters agora espera um clique antes de passar para o próximo booster, sem limite de tempo.",
         "O botão Copa do Mundo voltou ao menu inicial.",
-        "A Copa do Mundo agora tem um sistema de pontuação de verdade: taxa de vitórias dos 6 melhores jogadores do país, força dos adversários derrotados, nível da equipe, atividade e uma penalidade por desistências.",
         "Uma nova Copa do Mundo recomeça a cada 3 meses, e você pode ver a classificação em 24h, 7 dias, 30 dias ou na temporada.",
         "No fim de cada temporada de 3 meses, os jogadores dos países do pódio ganham cartas, boosters e XP, e a equipe vencedora recebe o título de Campeã Mundial.",
         "A Copa do Mundo ganha visuais: banner do campeão em exercício, um mapa-múndi de verdade colorido pela pontuação de cada país, comparador de países, gráfico de progressão da temporada e atividade por hora.",
@@ -1234,7 +1319,6 @@
         "Un bug impediva ad alcuni nuovi account di convalidare il codice di verifica email, intrappolandoli in un ciclo infinito. Ora è corretto.",
         "Nel sealed, l'apertura dei booster ora aspetta un clic prima di passare al booster successivo, senza limite di tempo.",
         "Il pulsante Coppa del Mondo è tornato nel menu iniziale.",
-        "La Coppa del Mondo ora ha un vero sistema di punteggio: percentuale di vittorie dei 6 migliori giocatori del Paese, forza degli avversari battuti, livello della squadra, attività e una penalità per le rinunce.",
         "Una nuova Coppa del Mondo ricomincia ogni 3 mesi, e puoi vedere la classifica su 24h, 7 giorni, 30 giorni o sulla stagione.",
         "Alla fine di ogni stagione di 3 mesi, i giocatori dei Paesi sul podio guadagnano carte, booster e XP, e la squadra vincitrice riceve il titolo di Campione del Mondo.",
         "La Coppa del Mondo guadagna elementi visivi: banner del campione in carica, una vera mappa del mondo colorata dal punteggio di ogni Paese, comparatore di Paesi, grafico di progressione della stagione e attività per ora.",
@@ -1246,7 +1330,6 @@
         "Błąd uniemożliwiał niektórym nowym kontom potwierdzenie kodu weryfikacji e-mail, zamykając je w nieskończonej pętli. Zostało to naprawione.",
         "W trybie sealed otwieranie boosterów czeka teraz na kliknięcie przed przejściem do następnego boostera, bez limitu czasu.",
         "Przycisk Puchar Świata wrócił do menu głównego.",
-        "Puchar Świata ma teraz prawdziwy system punktacji: wskaźnik zwycięstw 6 najlepszych graczy kraju, siła pokonanych przeciwników, poziom drużyny, aktywność i kara za walkowery.",
         "Nowy Puchar Świata rusza co 3 miesiące, a ranking możesz zobaczyć w oknie 24h, 7 dni, 30 dni lub całego sezonu.",
         "Na koniec każdego 3-miesięcznego sezonu gracze krajów z podium zdobywają karty, boostery i XP, a zwycięska drużyna otrzymuje tytuł Mistrza Świata.",
         "Puchar Świata zyskuje oprawę wizualną: baner panującego mistrza, prawdziwą mapę świata pokolorowaną według wyniku każdego kraju, porównywarkę krajów, wykres postępu sezonu i aktywność według godziny.",
@@ -1257,7 +1340,6 @@
         "fix",
         "fix",
         "fix",
-        "feature",
         "feature",
         "feature",
         "feature",
@@ -2744,56 +2826,48 @@
       "title_pl": "Zreorganizowane menu i bezpośredni dostęp do rankingowych",
       "title_es": "Menú reorganizado y acceso directo al clasificatorio",
       "changes_fr": [
-        "Nouveau bouton Suggestions dans le menu principal pour proposer des améliorations à la communauté.",
         "Le bouton Personnalisation s'appelle désormais Options.",
         "Sur le menu d'accueil, Profil, Options et Se déconnecter partagent une même ligne, et le bouton Administration prend une ligne entière au-dessus.",
         "Plus besoin de vérifier ton email pour jouer en classé : la vérification est complètement supprimée.",
         "Plus besoin de jouer 5 parties casual avant le classé : tu peux jouer en classé dès ta première partie."
       ],
       "changes_en": [
-        "New Suggestions button in the main menu to post improvement ideas to the community.",
         "The Personnalisation button is now called Options.",
         "On the home menu, Profile, Options and Sign out share one row, and the Administration button takes a full row above.",
         "No more email verification required to play ranked: the check is fully removed.",
         "No more 5 casual games requirement before ranked: you can play ranked from your very first game."
       ],
       "changes_ja": [
-        "コミュニティに改善を提案するための「提案」ボタンをメインメニューに新設。",
         "「カスタマイズ」ボタンは「オプション」になりました。",
         "ホームメニューで、プロフィール・オプション・ログアウトが同じ行に並び、管理ボタンはその上で1行を占めます。",
         "ランクをプレイするためのメール認証は不要になりました：認証は完全に削除されました。",
         "ランク前にカジュアルを5回プレイする必要はなくなりました：最初の対戦からランクをプレイできます。"
       ],
       "changes_pt": [
-        "Novo botão Sugestões no menu principal para postar ideias de melhoria para a comunidade.",
         "O botão Personalização agora se chama Opções.",
         "No menu inicial, Perfil, Opções e Sair compartilham uma linha, e o botão Administração ocupa uma linha inteira acima.",
         "Não é mais necessária verificação de e-mail para jogar ranqueado: a checagem foi totalmente removida.",
         "Não é mais preciso jogar 5 partidas casuais antes do ranqueado: você pode jogar ranqueado desde a sua primeira partida."
       ],
       "changes_it": [
-        "Nuovo pulsante Suggerimenti nel menu principale per proporre idee di miglioramento alla community.",
         "Il pulsante Personalizzazione ora si chiama Opzioni.",
         "Nel menu iniziale, Profilo, Opzioni ed Esci condividono una riga, e il pulsante Amministrazione occupa una riga intera sopra.",
         "Non serve più la verifica email per giocare in classificata: il controllo è stato del tutto rimosso.",
         "Non servono più 5 partite casual prima delle classificate: puoi giocare in classificata fin dalla tua primissima partita."
       ],
       "changes_pl": [
-        "Nowy przycisk Sugestie w menu głównym do zgłaszania pomysłów na ulepszenia społeczności.",
         "Przycisk Personalizacja nazywa się teraz Opcje.",
         "W menu głównym Profil, Opcje i Wyloguj dzielą jeden wiersz, a przycisk Administracja zajmuje cały wiersz powyżej.",
         "Do gry w rankingowych nie jest już wymagana weryfikacja e-mail: sprawdzanie zostało całkowicie usunięte.",
         "Nie trzeba już rozegrać 5 gier towarzyskich przed rankingowymi: możesz grać rankingowo od pierwszej gry."
       ],
       "changes_es": [
-        "Nuevo botón Sugerencias en el menú principal para proponer mejoras a la comunidad.",
         "El botón Personalización ahora se llama Opciones.",
         "En el menú de inicio, Perfil, Opciones y Cerrar sesión comparten una misma fila, y el botón Administración ocupa una fila entera encima.",
         "Ya no hace falta verificar tu correo para jugar en clasificatorio: la verificación se ha eliminado por completo.",
         "Ya no hace falta jugar 5 partidas casuales antes del clasificatorio: puedes jugar en clasificatorio desde tu primera partida."
       ],
       "categories": [
-        "feature",
         "fix",
         "feature",
         "feature",
@@ -4022,7 +4096,6 @@
         "Salon Evolving : les parties Evolving en cours apparaissent maintenant dans la liste comme dans Jouer en ligne. Tu peux les regarder en spectateur.",
         "Bug corrigé : quand l'adversaire restait inactif au mulligan, la partie était annulée mais le joueur restait coincé sur l'écran de jeu. La partie se ferme maintenant proprement et tu retournes au salon en cliquant sur le bouton.",
         "Bug corrigé : Kiba Inuzuka 113 (Mythos) cachait toujours l'Akamaru le plus à gauche au lieu de te laisser choisir. Tu peux maintenant choisir lequel cacher comme avec la version Rare.",
-        "Écran de fin de partie : quand l'adversaire abandonne, une ligne explicite te confirme que tu remportes la partie.",
         "L'animation de révélation des 4 missions au début de partie a été retirée. La phase de mulligan démarre directement.",
         "Page d'accueil : le scintillement sur téléphone et tablette est corrigé. L'animation lente du fond est maintenant réservée aux écrans larges.",
         "Petit fix : la croix de fermeture sur la fenêtre 'En attente de l'adversaire' après le mulligan a été retirée, elle servait à rien.",
@@ -4042,7 +4115,6 @@
         "Evolving lobby: ongoing Evolving games now appear in the list like in Play Online. You can join any of them as a spectator.",
         "Bug fixed: when the opponent stayed idle at mulligan, the game was cancelled but the player got stuck on the game screen. The game now closes cleanly and you return to the lobby with one click.",
         "Bug fixed: Kiba Inuzuka 113 (Mythos variant) always hid the leftmost Akamaru instead of letting you pick. You can now choose which Akamaru to hide, like with the Rare version.",
-        "End-of-game screen: when the opponent abandons, an explicit line now confirms you win the match.",
         "The mission deck reveal animation at the start of the match has been removed. Mulligan now starts directly.",
         "Home page: the flicker on phone and tablet is fixed. The slow background animation is now only enabled on larger screens.",
         "Small fix: the close X on the 'Waiting for opponent' window after mulligan has been removed, it served no purpose.",
@@ -4062,7 +4134,6 @@
         "エボルビングロビー：進行中のエボルビング対戦がオンライン対戦と同様に一覧に表示されるようになりました。観戦者として入れます。",
         "バグ修正：相手がマリガンで無操作のとき対戦は中止されるのに、プレイヤーがゲーム画面で固まっていました。対戦は正しく閉じ、1クリックでロビーに戻ります。",
         "バグ修正：犬塚キバ 113（ミトス）が選ばせずに常に一番左の赤丸を伏せていました。レア版と同様にどの赤丸を伏せるか選べるようになりました。",
-        "対戦終了画面：相手が投了したとき、勝利を確認する明確な一文が表示されるようになりました。",
         "対戦開始時の4ミッション公開アニメーションを削除しました。マリガンが直接始まります。",
         "ホームページ：スマホとタブレットのちらつきを修正。背景の遅いアニメーションは大画面のみになりました。",
         "小修正：マリガン後の「相手を待っています」ウィンドウの閉じる×を削除しました、意味がなかったためです。",
@@ -4082,7 +4153,6 @@
         "Lobby Evolving: as partidas Evolving em andamento agora aparecem na lista como no Jogar Online. Você pode entrar em qualquer uma delas como espectador.",
         "Bug corrigido: quando o adversário ficava inativo no mulligan, a partida era cancelada mas o jogador ficava preso na tela de jogo. A partida agora fecha de forma limpa e você volta ao lobby com um clique.",
         "Bug corrigido: Kiba Inuzuka 113 (variante Mythos) sempre ocultava o Akamaru mais à esquerda em vez de deixar você escolher. Agora você pode escolher qual Akamaru ocultar, como na versão Rara.",
-        "Tela de fim de jogo: quando o adversário abandona, uma linha explícita agora confirma que você vence a partida.",
         "A animação de revelação do baralho de missões no início da partida foi removida. O mulligan agora começa diretamente.",
         "Página inicial: o piscar no celular e no tablet foi corrigido. A animação lenta de fundo agora só é ativada em telas maiores.",
         "Pequena correção: o X de fechar na janela 'Aguardando o adversário' depois do mulligan foi removido, ele não servia para nada.",
@@ -4102,7 +4172,6 @@
         "Lobby Evolving: le partite Evolving in corso ora appaiono nella lista come in Gioca Online. Puoi entrare in una qualsiasi di esse come spettatore.",
         "Bug corretto: quando l'avversario restava inattivo al mulligan, la partita veniva annullata ma il giocatore restava bloccato sulla schermata di gioco. La partita ora si chiude in modo pulito e torni alla lobby con un clic.",
         "Bug corretto: Kiba Inuzuka 113 (variante Mythos) nascondeva sempre l'Akamaru più a sinistra invece di lasciarti scegliere. Ora puoi scegliere quale Akamaru nascondere, come con la versione Rara.",
-        "Schermata di fine partita: quando l'avversario abbandona, una riga esplicita ora conferma che vinci la partita.",
         "L'animazione di rivelazione del mazzo delle missioni all'inizio della partita è stata rimossa. Il mulligan ora inizia direttamente.",
         "Pagina iniziale: lo sfarfallio su telefono e tablet è stato corretto. L'animazione lenta di sfondo ora è attiva solo su schermi più grandi.",
         "Piccola correzione: la X di chiusura sulla finestra 'In attesa dell'avversario' dopo il mulligan è stata rimossa, non serviva a nulla.",
@@ -4122,7 +4191,6 @@
         "Lobby Evolving: trwające gry Evolving pojawiają się teraz na liście jak w Graj Online. Możesz dołączyć do dowolnej z nich jako obserwator.",
         "Naprawiony błąd: gdy przeciwnik pozostawał bezczynny przy mulliganie, gra była anulowana, ale gracz utykał na ekranie gry. Gra zamyka się teraz czysto i wracasz do lobby jednym kliknięciem.",
         "Naprawiony błąd: Kiba Inuzuka 113 (wariant Mythos) zawsze ukrywał skrajnie lewego Akamaru zamiast pozwolić ci wybrać. Teraz możesz wybrać, którego Akamaru ukryć, jak w wersji Rzadkiej.",
-        "Ekran końca gry: gdy przeciwnik się poddaje, wyraźny wiersz potwierdza teraz, że wygrywasz mecz.",
         "Animacja odkrycia talii misji na początku meczu została usunięta. Mulligan zaczyna się teraz bezpośrednio.",
         "Strona główna: migotanie na telefonie i tablecie zostało naprawione. Wolna animacja tła jest teraz włączona tylko na większych ekranach.",
         "Drobna poprawka: krzyżyk zamykający w oknie 'Oczekiwanie na przeciwnika' po mulliganie został usunięty, do niczego nie służył.",
@@ -4142,7 +4210,6 @@
         "Sala Evolving: las partidas Evolving en curso ahora aparecen en la lista como en Jugar en línea. Puedes verlas como espectador.",
         "Error corregido: cuando el rival se quedaba inactivo en el mulligan, la partida se anulaba pero el jugador se quedaba atascado en la pantalla de juego. La partida ahora se cierra correctamente y vuelves a la sala con un clic.",
         "Error corregido: Kiba Inuzuka 113 (Mythos) siempre ocultaba al Akamaru más a la izquierda en lugar de dejarte elegir. Ahora puedes elegir cuál ocultar, como con la versión Rara.",
-        "Pantalla de fin de partida: cuando el rival abandona, una línea explícita te confirma que ganas la partida.",
         "La animación de revelación de las 4 misiones al inicio de la partida se ha quitado. La fase de mulligan empieza directamente.",
         "Página de inicio: se ha corregido el parpadeo en teléfono y tableta. La animación lenta del fondo ahora está reservada a las pantallas grandes.",
         "Pequeño arreglo: la cruz de cierre de la ventana 'Esperando al rival' tras el mulligan se ha quitado, no servía para nada.",
@@ -4157,7 +4224,6 @@
         "fix",
         "feature",
         "feature",
-        "fix",
         "fix",
         "fix",
         "fix",

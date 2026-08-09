@@ -69,7 +69,6 @@ const menuButtons = [
   { key: 'leaderboard' as const,   href: '/leaderboard',  primary: false },
   { key: 'tournaments' as const,   href: '/tournaments',  primary: false },
   { key: 'battlepass' as const,    href: '/battlepass',   primary: false },
-  { key: 'helpUs' as const,        href: '/help-us',      primary: false },
 ];
 
 
