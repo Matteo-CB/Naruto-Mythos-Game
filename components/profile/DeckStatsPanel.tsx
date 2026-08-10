@@ -89,54 +89,54 @@ function Sparkline({ daily }: { daily: DailyEntry[] }) {
     return (
       <div
         className="flex items-center justify-center"
-        style={{ width: 200, height: 36, color: '#333' }}
+        style={{ width: 200, height: 36, color: 'var(--t-muted)' }}
       >
         <span className="text-[10px]">...</span>
       </div>
     );
   }
 
-  const stroke = points.lastValue >= 0 ? '#3e8b3e' : '#b33e3e';
+  const stroke = points.lastValue >= 0 ? 'var(--t-success)' : 'var(--t-danger)';
   return (
     <svg width={points.W} height={points.H} viewBox={`0 0 ${points.W} ${points.H}`} style={{ display: 'block' }}>
-      <line x1="0" y1={points.baselineY} x2={points.W} y2={points.baselineY} stroke="#1e1e1e" strokeWidth="1" />
+      <line x1="0" y1={points.baselineY} x2={points.W} y2={points.baselineY} stroke="var(--t-surface-2)" strokeWidth="1" />
       <path d={points.path} stroke={stroke} strokeWidth="1.5" fill="none" />
     </svg>
   );
 }
 
 function DeckCard({ stats, evolvingPoints, evolvingCompatible, t, tStats }: { stats: DeckStats; evolvingPoints?: number; evolvingCompatible?: boolean; t: ReturnType<typeof useTranslations>; tStats: ReturnType<typeof useTranslations> }) {
-  const eloColor = stats.eloDeltaSum > 0 ? '#3e8b3e' : stats.eloDeltaSum < 0 ? '#b33e3e' : '#888';
-  const winrateColor = stats.winrate >= 60 ? '#3e8b3e' : stats.winrate >= 40 ? '#c4a35a' : '#b33e3e';
+  const eloColor = stats.eloDeltaSum > 0 ? 'var(--t-success)' : stats.eloDeltaSum < 0 ? 'var(--t-danger)' : 'var(--t-muted)';
+  const winrateColor = stats.winrate >= 60 ? 'var(--t-success)' : stats.winrate >= 40 ? 'var(--t-accent)' : 'var(--t-danger)';
 
   return (
     <EvolvingDeckHolo points={evolvingPoints ?? 0} enabled={evolvingCompatible === true} intensity="subtle">
     <div
       className="relative rounded-lg overflow-hidden"
-      style={{ backgroundColor: '#111111', border: '1px solid #1e1e1e' }}
+      style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-surface-2)' }}
     >
       <div
         className="absolute top-0 left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent 10%, #c4a35a33, transparent 90%)' }}
+        style={{ background: 'linear-gradient(90deg, transparent 10%, var(--t-accent)33, transparent 90%)' }}
       />
 
       <div className="flex items-start justify-between gap-3 px-4 pt-4 pb-2">
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          <h3 className="text-sm font-semibold truncate" style={{ color: '#e0e0e0' }}>
+          <h3 className="text-sm font-semibold truncate" style={{ color: 'var(--t-text)' }}>
             {stats.deckName}
           </h3>
           {evolvingCompatible === true && typeof evolvingPoints === 'number' && (
             <EvolvingDeckBadge points={evolvingPoints} />
           )}
         </div>
-        <span className="text-[10px] shrink-0" style={{ color: '#555' }}>
+        <span className="text-[10px] shrink-0" style={{ color: 'var(--t-dim)' }}>
           {relativeTime(stats.lastPlayedAt, tStats)}
         </span>
       </div>
 
       {stats.gamesTotal === 0 ? (
         <div className="px-4 pb-4 pt-2">
-          <p className="text-[11px]" style={{ color: '#444' }}>{tStats('noGamesYet')}</p>
+          <p className="text-[11px]" style={{ color: 'var(--t-muted)' }}>{tStats('noGamesYet')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-[auto,1fr,auto] items-center gap-4 px-4 pb-4 pt-1">
@@ -144,18 +144,18 @@ function DeckCard({ stats, evolvingPoints, evolvingCompatible, t, tStats }: { st
             <span className="text-2xl font-bold tabular-nums leading-tight" style={{ color: winrateColor }}>
               {stats.winrate}%
             </span>
-            <span className="text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>
+            <span className="text-[9px] uppercase tracking-wider" style={{ color: 'var(--t-dim)' }}>
               {tStats('winrate')}
             </span>
           </div>
 
           <div className="flex flex-col gap-1">
             <Sparkline daily={stats.daily} />
-            <div className="flex gap-3 text-[10px] tabular-nums" style={{ color: '#666' }}>
-              <span style={{ color: '#3e8b3e' }}>{stats.wins}W</span>
-              <span style={{ color: '#b33e3e' }}>{stats.losses}L</span>
+            <div className="flex gap-3 text-[10px] tabular-nums" style={{ color: 'var(--t-dim)' }}>
+              <span style={{ color: 'var(--t-success)' }}>{stats.wins}W</span>
+              <span style={{ color: 'var(--t-danger)' }}>{stats.losses}L</span>
               {stats.draws > 0 && <span>{stats.draws}D</span>}
-              <span style={{ color: '#444' }}>·</span>
+              <span style={{ color: 'var(--t-muted)' }}>·</span>
               <span>{tStats('games', { n: stats.gamesTotal })}</span>
             </div>
           </div>
@@ -164,7 +164,7 @@ function DeckCard({ stats, evolvingPoints, evolvingCompatible, t, tStats }: { st
             <span className="text-base font-bold tabular-nums leading-tight" style={{ color: eloColor }}>
               {stats.eloDeltaSum > 0 ? '+' : ''}{stats.eloDeltaSum}
             </span>
-            <span className="text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>
+            <span className="text-[9px] uppercase tracking-wider" style={{ color: 'var(--t-dim)' }}>
               ELO 90d
             </span>
           </div>
@@ -224,11 +224,11 @@ export function DeckStatsPanel({ decks }: { decks: Deck[] }) {
   return (
     <section className="mb-6">
       <div className="flex items-center gap-3 mb-3">
-        <h2 className="text-xs font-bold uppercase tracking-widest" style={{ color: '#555' }}>
+        <h2 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
           {tStats('title')}
         </h2>
-        <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
-        <span className="text-[10px] tabular-nums" style={{ color: '#444' }}>
+        <div className="flex-1 h-px" style={{ backgroundColor: 'var(--t-surface-2)' }} />
+        <span className="text-[10px] tabular-nums" style={{ color: 'var(--t-muted)' }}>
           {loading ? decks.length : sorted.length}
         </span>
       </div>
@@ -240,8 +240,8 @@ export function DeckStatsPanel({ decks }: { decks: Deck[] }) {
               key={d.id}
               className="rounded-lg"
               style={{
-                backgroundColor: '#111111',
-                border: '1px solid #1e1e1e',
+                backgroundColor: 'var(--t-panel)',
+                border: '1px solid var(--t-surface-2)',
                 height: 96,
               }}
             />

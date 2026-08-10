@@ -13,22 +13,18 @@ import { IdleWarningToast } from '@/components/game/IdleWarningToast';
 import { GameCancelledOverlay } from '@/components/game/GameCancelledOverlay';
 
 function useIsMobileViewport(): boolean {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const check = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const touch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
-      setIsMobile((touch && (w < 1024 || h < 600)) || h < 500);
-    };
-    check();
-    window.addEventListener('resize', check);
-    window.addEventListener('orientationchange', check);
-    return () => {
-      window.removeEventListener('resize', check);
-      window.removeEventListener('orientationchange', check);
-    };
-  }, []);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const view = readViewport();
+    return isCompactBoardViewport(view.width, view.height, hasCoarsePointer());
+  });
+
+  useEffect(() => watchViewport(() => {
+    const view = readViewport();
+    const compact = isCompactBoardViewport(view.width, view.height, hasCoarsePointer());
+    setIsMobile((current) => (current === compact ? current : compact));
+  }), []);
+
   return isMobile;
 }
 const TrainingCoachPanel = dynamic(
@@ -36,6 +32,7 @@ const TrainingCoachPanel = dynamic(
   { ssr: false },
 );
 import { BanNotification } from '@/components/BanNotification';
+import { hasCoarsePointer, isCompactBoardViewport, readViewport, watchViewport } from '@/lib/ui/viewport';
 
 const GameBoard = dynamic(
   () => import('@/components/game/GameBoard').then((mod) => mod.default),

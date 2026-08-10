@@ -53,8 +53,8 @@ export default function AdminSettingsPage() {
 
   if (!isAdmin) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
-        <p style={{ color: '#b33e3e' }}>{t('unauthorized')}</p>
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
+        <p style={{ color: 'var(--t-danger)' }}>{t('unauthorized')}</p>
       </main>
     );
   }
@@ -195,18 +195,18 @@ export default function AdminSettingsPage() {
   };
 
   return (
-    <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+    <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: 'var(--t-bg)' }}>
       <CloudBackground />
       <div className="max-w-2xl mx-auto relative z-10 flex-1 px-4 py-8 w-full">
         
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold" style={{ color: '#c4a35a' }}>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--t-accent)' }}>
             {t('title')}
           </h1>
           <Link
             href="/"
             className="px-4 py-2 text-sm rounded"
-            style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+            style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-muted)' }}
           >
             {t('home')}
           </Link>
@@ -217,21 +217,21 @@ export default function AdminSettingsPage() {
           <Link
             href="/admin/settings"
             className="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded"
-            style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+            style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
           >
             {t('tabSettings')}
           </Link>
           <Link
             href="/admin/cards"
             className="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded"
-            style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+            style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-muted)' }}
           >
             {t('tabCards')}
           </Link>
           <Link
             href="/admin/bugs"
             className="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded"
-            style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+            style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-muted)' }}
           >
             {t('tabBugs')}
           </Link>
@@ -240,12 +240,12 @@ export default function AdminSettingsPage() {
         
         <div
           className="rounded-lg p-6 mb-6"
-          style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+          style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}
         >
-          <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>
+          <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>
             {t('leagues.title')}
           </h2>
-          <p className="text-xs mb-4" style={{ color: '#555555' }}>
+          <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>
             {t('leagues.description')}
           </p>
           <div className="flex items-center gap-4">
@@ -254,9 +254,9 @@ export default function AdminSettingsPage() {
               disabled={leaguesLoading || leaguesToggling}
               className="px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
               style={{
-                backgroundColor: leaguesEnabled ? '#3e8b3e' : '#1a1a2e',
-                color: leaguesEnabled ? '#ffffff' : '#888888',
-                border: `1px solid ${leaguesEnabled ? '#3e8b3e' : '#333333'}`,
+                backgroundColor: leaguesEnabled ? 'var(--t-success)' : '#1a1a2e',
+                color: leaguesEnabled ? '#ffffff' : 'var(--t-muted)',
+                border: `1px solid ${leaguesEnabled ? 'var(--t-success)' : 'var(--t-border-strong)'}`,
                 opacity: leaguesToggling ? 0.6 : 1,
               }}
             >
@@ -268,7 +268,7 @@ export default function AdminSettingsPage() {
                     ? t('leagues.enabled')
                     : t('leagues.disabled')}
             </button>
-            <span className="text-xs" style={{ color: leaguesEnabled ? '#3e8b3e' : '#b33e3e' }}>
+            <span className="text-xs" style={{ color: leaguesEnabled ? 'var(--t-success)' : 'var(--t-danger)' }}>
               {leaguesEnabled
                 ? t('leagues.enabledDesc')
                 : t('leagues.disabledDesc')}
@@ -279,12 +279,12 @@ export default function AdminSettingsPage() {
         
         <div
           className="rounded-lg p-6 mb-6"
-          style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+          style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}
         >
-          <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>
+          <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>
             {t('elo.title')}
           </h2>
-          <p className="text-xs mb-4" style={{ color: '#555555' }}>
+          <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>
             {t('elo.description')}
           </p>
           <button
@@ -292,9 +292,9 @@ export default function AdminSettingsPage() {
             disabled={resetEloLoading}
             className="px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
             style={{
-              backgroundColor: resetEloLoading ? '#333333' : '#b33e3e',
-              color: '#ffffff',
-              border: '1px solid #b33e3e',
+              backgroundColor: resetEloLoading ? 'var(--t-border-strong)' : 'var(--t-danger)',
+              color: 'var(--t-text)',
+              border: '1px solid var(--t-danger)',
               opacity: resetEloLoading ? 0.6 : 1,
             }}
           >
@@ -305,12 +305,12 @@ export default function AdminSettingsPage() {
         
         <div
           className="rounded-lg p-6 mb-6"
-          style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+          style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}
         >
-          <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>
+          <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>
             {t('discord.title')}
           </h2>
-          <p className="text-xs mb-4" style={{ color: '#555555' }}>
+          <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>
             {t('discord.description')}
           </p>
           <div className="flex gap-3 flex-wrap">
@@ -320,7 +320,7 @@ export default function AdminSettingsPage() {
               className="px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
               style={{
                 backgroundColor: discordRolesLoading ? '#333333' : '#5865F2',
-                color: '#ffffff',
+                color: 'var(--t-text)',
                 border: '1px solid #5865F2',
                 opacity: discordRolesLoading ? 0.6 : 1,
               }}
@@ -332,7 +332,7 @@ export default function AdminSettingsPage() {
               disabled={discordSyncLoading}
               className="px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
               style={{
-                backgroundColor: discordSyncLoading ? '#333333' : '#1a1a2e',
+                backgroundColor: discordSyncLoading ? 'var(--t-border-strong)' : '#1a1a2e',
                 color: '#5865F2',
                 border: '1px solid #5865F2',
                 opacity: discordSyncLoading ? 0.6 : 1,
@@ -346,12 +346,12 @@ export default function AdminSettingsPage() {
         
         <div
           className="rounded-lg p-6 mb-6"
-          style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+          style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}
         >
-          <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>
+          <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>
             {t('testers.title')}
           </h2>
-          <p className="text-xs mb-4" style={{ color: '#555555' }}>
+          <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>
             {t('testers.description')}
           </p>
 
@@ -365,9 +365,9 @@ export default function AdminSettingsPage() {
               placeholder={t('testers.search')}
               className="flex-1 px-3 py-2 text-sm rounded"
               style={{
-                backgroundColor: '#0a0a0a',
-                border: '1px solid #333333',
-                color: '#e0e0e0',
+                backgroundColor: 'var(--t-bg)',
+                border: '1px solid var(--t-border-strong)',
+                color: 'var(--t-text)',
                 outline: 'none',
               }}
             />
@@ -376,8 +376,8 @@ export default function AdminSettingsPage() {
               disabled={testerAdding || !testerSearch.trim()}
               className="px-4 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
               style={{
-                backgroundColor: '#00CED1',
-                color: '#0a0a0a',
+                backgroundColor: 'var(--t-success)',
+                color: 'var(--t-on-success)',
                 border: '1px solid #00CED1',
                 opacity: testerAdding || !testerSearch.trim() ? 0.5 : 1,
               }}
@@ -388,25 +388,25 @@ export default function AdminSettingsPage() {
 
           
           {testers.length === 0 ? (
-            <p className="text-xs" style={{ color: '#555555' }}>{t('testers.noTesters')}</p>
+            <p className="text-xs" style={{ color: 'var(--t-dim)' }}>{t('testers.noTesters')}</p>
           ) : (
             <div className="flex flex-col gap-1">
               {testers.map((tester) => (
                 <div
                   key={tester.id}
                   className="flex items-center justify-between px-3 py-2 rounded"
-                  style={{ backgroundColor: '#0a0a0a', border: '1px solid #1a1a1a' }}
+                  style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-surface-2)' }}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-sm" style={{ color: '#e0e0e0' }}>{tester.username}</span>
-                    <span className="text-xs" style={{ color: '#555555' }}>ELO {tester.elo}</span>
+                    <span className="text-sm" style={{ color: 'var(--t-text)' }}>{tester.username}</span>
+                    <span className="text-xs" style={{ color: 'var(--t-dim)' }}>ELO {tester.elo}</span>
                   </div>
                   <button
                     onClick={() => handleRemoveTester(tester.username)}
                     className="text-xs px-2 py-1 rounded cursor-pointer"
                     style={{
                       backgroundColor: 'rgba(179, 62, 62, 0.1)',
-                      color: '#b33e3e',
+                      color: 'var(--t-danger)',
                       border: '1px solid rgba(179, 62, 62, 0.3)',
                     }}
                   >
@@ -422,9 +422,9 @@ export default function AdminSettingsPage() {
         {results.length > 0 && (
           <div
             className="rounded-lg p-6"
-            style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+            style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}
           >
-            <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>
+            <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>
               {t('actionLog')}
             </h2>
             <div className="flex flex-col gap-2">
@@ -434,8 +434,8 @@ export default function AdminSettingsPage() {
                   className="text-xs px-3 py-2 rounded"
                   style={{
                     backgroundColor: result.success ? 'rgba(62, 139, 62, 0.1)' : 'rgba(179, 62, 62, 0.1)',
-                    border: `1px solid ${result.success ? '#3e8b3e30' : '#b33e3e30'}`,
-                    color: result.success ? '#3e8b3e' : '#b33e3e',
+                    border: `1px solid ${result.success ? 'var(--t-success)30' : 'var(--t-danger)30'}`,
+                    color: result.success ? 'var(--t-success)' : 'var(--t-danger)',
                   }}
                 >
                   {result.message}

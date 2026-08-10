@@ -32,7 +32,7 @@ const geistMono = Geist_Mono({
 const SITE_URL = "https://narutomythosgame.com";
 
 export const viewport: Viewport = {
-  themeColor: "#c4a35a",
+  themeColor: "var(--t-accent)",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -137,6 +137,11 @@ export default async function RootLayout({
   return (
     <html lang={locale} className="dark" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "try{var t=localStorage.getItem('nmtcg-site-theme');document.documentElement.setAttribute('data-theme',t==='ss'?'ss':'ks')}catch(e){}",
+          }}
+        />
         <link rel="preload" href="/fonts/njnaruto-accented.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/poppins-regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
@@ -147,7 +152,7 @@ export default async function RootLayout({
         <link rel="preload" href="/images/icons/cloud-6.webp" as="image" type="image/webp" />
       </head>
       <body
-        className={`${geistMono.variable} antialiased bg-[#0a0a0a] text-[#e0e0e0] min-h-screen`}
+        className={`${geistMono.variable} antialiased bg-[var(--t-bg)] text-[var(--t-text)] min-h-screen`}
       >
         {process.env.NODE_ENV !== 'production' && (
           <script
@@ -160,12 +165,12 @@ export default async function RootLayout({
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-9999 focus:px-4 focus:py-2 focus:text-sm focus:font-bold"
-          style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+          style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
         >
           {t('skipToContent')}
         </a>
         <noscript>
-          <div style={{ padding: '16px', textAlign: 'center', backgroundColor: '#1a1a0a', color: '#c4a35a', borderBottom: '1px solid #c4a35a' }}>
+          <div style={{ padding: '16px', textAlign: 'center', backgroundColor: 'var(--t-surface-2)', color: 'var(--t-accent)', borderBottom: '1px solid var(--t-accent)' }}>
             {t('noJs')}
           </div>
         </noscript>

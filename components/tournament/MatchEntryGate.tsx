@@ -141,26 +141,26 @@ export function MatchEntryGate() {
       className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 px-5 py-3"
       style={{
         zIndex: Z_APP_MODAL - 1,
-        backgroundColor: '#141414',
-        boxShadow: '0 0 14px rgba(196, 163, 90, 0.25), 0 12px 32px rgba(0,0,0,0.5)',
+        backgroundColor: 'var(--t-surface)',
+        boxShadow: '0 0 14px rgba(196, 163, 90, 0.25), 0 12px 32px var(--t-shadow)',
         maxWidth: 'min(94vw, 26rem)',
       }}
     >
       <div className="flex flex-col min-w-0">
-        <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+        <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--t-accent)' }}>
           {t('readyPrompt.title')}
         </span>
-        <span className="text-[11px] leading-snug" style={{ color: '#999' }}>
+        <span className="text-[11px] leading-snug" style={{ color: 'var(--t-muted)' }}>
           {t('readyPrompt.hint')}
         </span>
       </div>
-      <span className="shrink-0 text-base font-bold tabular-nums" style={{ color: secondsLeft <= 30 ? '#b37e3e' : '#e0e0e0' }}>
+      <span className="shrink-0 text-base font-bold tabular-nums" style={{ color: secondsLeft <= 30 ? '#b37e3e' : 'var(--t-text)' }}>
         {minutes}:{seconds}
       </span>
       <button
         onClick={confirmReady}
         className="shrink-0 px-4 py-2 text-xs font-bold uppercase tracking-wider cursor-pointer"
-        style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+        style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
       >
         {t('readyPrompt.ready')}
       </button>

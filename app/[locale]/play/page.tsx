@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { motion } from "framer-motion";
 import { CloudBackground } from "@/components/CloudBackground";
+import { PowerIcon } from "@/components/icons/GameIcons";
 import { DecorativeIcons } from "@/components/DecorativeIcons";
 import { Footer } from "@/components/Footer";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -16,8 +17,8 @@ type ModeEntry = {
   glyph: string;
 };
 
-const GOLD = "#c4a35a";
-const GOLD_BRIGHT = "#e8c477";
+const ACCENT = "var(--t-on-accent-surface)";
+const ACCENT_BRIGHT = "var(--t-on-accent-surface-strong)";
 
 export default function PlayHubPage() {
   const t = useTranslations("playHub");
@@ -33,7 +34,7 @@ export default function PlayHubPage() {
     <div
       id="main-content"
       className="min-h-screen relative flex flex-col"
-      style={{ backgroundColor: "#0a0a0a" }}
+      style={{ backgroundColor: "var(--t-bg)" }}
     >
       <CloudBackground animated={animationsEnabled} />
       <DecorativeIcons animated={animationsEnabled} />
@@ -50,7 +51,7 @@ export default function PlayHubPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="font-display text-2xl sm:text-3xl font-bold uppercase text-center mb-2"
           style={{
-            color: GOLD_BRIGHT,
+            color: "var(--t-accent)",
             letterSpacing: "0.2em",
             textShadow: "0 2px 16px rgba(196, 163, 90, 0.22)",
           }}
@@ -62,7 +63,7 @@ export default function PlayHubPage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.2 }}
           className="font-body text-[10px] uppercase text-center mb-10"
-          style={{ color: "#777", letterSpacing: "0.36em" }}
+          style={{ color: "var(--t-muted)", letterSpacing: "0.36em" }}
         >
           {t("subtitle")}
         </motion.p>
@@ -79,42 +80,50 @@ export default function PlayHubPage() {
                 href={mode.href}
                 className="group relative flex flex-col items-center justify-center p-5 overflow-hidden"
                 style={{
-                  backgroundColor: "#0f0f12",
-                  border: "1px solid #232323",
+                  backgroundColor: "var(--t-accent-surface)",
+                  border: "1px solid var(--t-accent-surface-border)",
                   transition: "border-color 220ms ease, box-shadow 220ms ease, background-color 220ms ease",
                 }}
                 onMouseEnter={(e: React.MouseEvent) => {
                   const el = e.currentTarget as HTMLElement;
-                  el.style.borderColor = GOLD;
-                  el.style.backgroundColor = "#141418";
+                  el.style.borderColor = "var(--t-accent-surface-border-strong)";
+                  el.style.backgroundColor = "var(--t-accent-surface-hover)";
                   el.style.boxShadow =
-                    "0 8px 22px rgba(0,0,0,0.55), 0 0 22px rgba(196, 163, 90, 0.14)";
+                    "0 8px 22px rgba(0,0,0,0.55), 0 0 22px var(--t-accent-glow)";
                   const sep = el.querySelector<HTMLElement>("[data-sep]");
                   if (sep) {
-                    sep.style.width = "42px";
-                    sep.style.opacity = "0.85";
+                    sep.style.opacity = "1";
+                    const glyph = sep.firstElementChild as HTMLElement | null;
+                    if (glyph) {
+                      glyph.style.transform = "rotate(180deg) scale(1.25)";
+                      glyph.style.backgroundColor = ACCENT_BRIGHT;
+                    }
                   }
                   const title = el.querySelector<HTMLElement>("[data-title]");
-                  if (title) title.style.color = GOLD_BRIGHT;
+                  if (title) title.style.color = ACCENT_BRIGHT;
                   const desc = el.querySelector<HTMLElement>("[data-desc]");
-                  if (desc) desc.style.color = "#b0b0b0";
+                  if (desc) desc.style.color = "var(--t-muted)";
                   const num = el.querySelector<HTMLElement>("[data-num]");
                   if (num) num.style.opacity = "0.11";
                 }}
                 onMouseLeave={(e: React.MouseEvent) => {
                   const el = e.currentTarget as HTMLElement;
-                  el.style.borderColor = "#232323";
-                  el.style.backgroundColor = "#0f0f12";
+                  el.style.borderColor = "var(--t-accent-surface-border)";
+                  el.style.backgroundColor = "var(--t-accent-surface)";
                   el.style.boxShadow = "none";
                   const sep = el.querySelector<HTMLElement>("[data-sep]");
                   if (sep) {
-                    sep.style.width = "24px";
-                    sep.style.opacity = "0.4";
+                    sep.style.opacity = "0.75";
+                    const glyph = sep.firstElementChild as HTMLElement | null;
+                    if (glyph) {
+                      glyph.style.transform = "rotate(0deg) scale(1)";
+                      glyph.style.backgroundColor = ACCENT;
+                    }
                   }
                   const title = el.querySelector<HTMLElement>("[data-title]");
-                  if (title) title.style.color = GOLD;
+                  if (title) title.style.color = ACCENT;
                   const desc = el.querySelector<HTMLElement>("[data-desc]");
-                  if (desc) desc.style.color = "#888888";
+                  if (desc) desc.style.color = "var(--t-muted)";
                   const num = el.querySelector<HTMLElement>("[data-num]");
                   if (num) num.style.opacity = "0.06";
                 }}
@@ -128,7 +137,7 @@ export default function PlayHubPage() {
                     top: 2,
                     fontSize: mode.glyph.length > 2 ? 48 : 60,
                     lineHeight: 1,
-                    color: GOLD,
+                    color: ACCENT,
                     opacity: 0.06,
                     letterSpacing: "0.02em",
                     transition: "opacity 240ms ease",
@@ -141,7 +150,7 @@ export default function PlayHubPage() {
                   data-title
                   className="font-display text-base font-bold uppercase relative z-10"
                   style={{
-                    color: GOLD,
+                    color: ACCENT,
                     letterSpacing: "0.16em",
                     transition: "color 220ms ease",
                   }}
@@ -149,24 +158,30 @@ export default function PlayHubPage() {
                   {t(mode.titleKey)}
                 </span>
 
-                <span
+                <motion.span
                   data-sep
                   aria-hidden
                   className="block mt-2 mb-2 relative z-10"
-                  style={{
-                    width: 24,
-                    height: 1,
-                    backgroundColor: GOLD,
-                    opacity: 0.4,
-                    transition: "width 260ms ease, opacity 240ms ease",
-                  }}
-                />
+                  style={{ lineHeight: 0, opacity: 0.75 }}
+                  animate={animationsEnabled ? { scale: [1, 1.06, 1] } : undefined}
+                  transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <PowerIcon
+                    size={20}
+                    color={ACCENT}
+                    style={{
+                      display: "block",
+                      transition:
+                        "transform 420ms cubic-bezier(0.34, 1.4, 0.5, 1), background-color 220ms ease",
+                    }}
+                  />
+                </motion.span>
 
                 <span
                   data-desc
                   className="font-body text-xs text-center max-w-[260px] relative z-10"
                   style={{
-                    color: "#888888",
+                    color: "var(--t-on-accent-surface-text)",
                     lineHeight: 1.5,
                     transition: "color 220ms ease",
                   }}
@@ -187,7 +202,7 @@ export default function PlayHubPage() {
           <Link
             href={"/" as "/"}
             className="font-body text-[11px] uppercase transition-opacity hover:opacity-100"
-            style={{ color: "#888888", letterSpacing: "0.3em", opacity: 0.7 }}
+            style={{ color: "var(--t-muted)", letterSpacing: "0.3em", opacity: 0.7 }}
           >
             {"<"} {t("backToMenu")}
           </Link>

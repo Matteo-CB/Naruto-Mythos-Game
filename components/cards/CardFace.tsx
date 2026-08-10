@@ -9,28 +9,29 @@ import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import CardBack from './CardBack';
 import { HoloFoilOverlay } from './HoloFoilOverlay';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { ChakraIcon, PowerIcon, CHAKRA_COLOR_SOFT, POWER_COLOR_BRIGHT } from '@/components/icons/GameIcons';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
 import { cardAspectRatio } from '@/lib/cards/orientation';
 
 const RARITY_COLORS: Record<Rarity, string> = {
-  C: '#6b7280',       // gray
-  UC: '#22c55e',      // green
-  R: '#3b82f6',       // blue
-  RA: '#a855f7',      // purple
-  S: '#eab308',       // gold
-  SV: '#eab308',      // gold (Secret Variant)
-  M: '#ef4444',       // red
-  MV: '#ef4444',      // red (Mythos Variant)
-  L: '#eab308',       // gold
-  SP: '#06b6d4',      // cyan (Special)
-  SPV: '#06b6d4',     // cyan (Special Variant)
-  POP: '#e84393',     // magenta (Pop)
-  POPV: '#e84393',    // magenta (Pop Variant)
-  CHIBI: '#10b981',   // emerald (Chibi)
+  C: '#6b7280',
+  UC: '#22c55e',
+  R: '#3b82f6',
+  RA: '#a855f7',
+  S: '#eab308',
+  SV: '#eab308',
+  M: '#ef4444',
+  MV: '#ef4444',
+  L: '#eab308',
+  SP: '#06b6d4',
+  SPV: '#06b6d4',
+  POP: '#e84393',
+  POPV: '#e84393',
+  CHIBI: '#10b981',
   CHIBIV: '#10b981',
   SHINOBI: '#d97706',
-  SHINOBIV: '#d97706',  // emerald (Chibi Variant)
-  MMS: '#6b7280',     // gray
+  SHINOBIV: '#d97706',
+  MMS: '#6b7280',
 };
 
 export interface CardFaceProps {
@@ -208,8 +209,10 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              gap: '6%',
             }}
           >
+            <ChakraIcon size="min(0.5em, 32%)" color={CHAKRA_COLOR_SOFT} />
             <span
               style={{
                 color: '#e0e0e0',
@@ -246,8 +249,10 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              gap: '6%',
             }}
           >
+            <PowerIcon size="min(0.5em, 32%)" color={POWER_COLOR_BRIGHT} />
             <span
               style={{
                 color: powerTokens > 0 ? '#fca5a5' : '#e0e0e0',
@@ -272,8 +277,12 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
             backgroundColor: '#7c2d12',
             borderRadius: '4px',
             padding: '1px 4px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2px',
           }}
         >
+          <PowerIcon size="0.5em" color={POWER_COLOR_BRIGHT} />
           <span
             style={{
               color: '#fca5a5',

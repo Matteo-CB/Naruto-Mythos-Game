@@ -23,7 +23,7 @@ function Select({ rows, value, onChange, countryName }: { rows: Row[]; value: st
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className="px-2 py-1.5 text-[12px] font-display uppercase tracking-wide"
-      style={{ backgroundColor: '#1a1a1a', color: '#e0e0e0', border: '1px solid #262626' }}
+      style={{ backgroundColor: 'var(--t-surface-2)', color: 'var(--t-text)', border: '1px solid var(--t-border)' }}
     >
       {rows.map((r) => (
         <option key={r.countryCode} value={r.countryCode}>{countryName(r.countryCode)}</option>
@@ -54,7 +54,7 @@ export function WorldcupComparator({ rows, countryName, tCardMeta }: { rows: Row
 
   return (
     <div className="mt-8 px-5 py-4" style={{ backgroundColor: 'rgba(17, 17, 17, 0.7)' }}>
-      <div className="text-[10px] uppercase tracking-[0.25em] mb-3" style={{ color: '#c4a35a' }}>
+      <div className="text-[10px] uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--t-accent)' }}>
         {t('comparatorTitle')}
       </div>
       <div className="flex items-center justify-between gap-3 mb-3">
@@ -62,7 +62,7 @@ export function WorldcupComparator({ rows, countryName, tCardMeta }: { rows: Row
           <CountryFlag code={ca.countryCode} size={22} />
           <Select rows={ranked} value={a} onChange={setA} countryName={countryName} />
         </div>
-        <span className="font-display text-[10px] uppercase tracking-widest" style={{ color: '#555' }}>vs</span>
+        <span className="font-display text-[10px] uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>vs</span>
         <div className="flex items-center gap-2">
           <Select rows={ranked} value={b} onChange={setB} countryName={countryName} />
           <CountryFlag code={cb.countryCode} size={22} />
@@ -73,17 +73,17 @@ export function WorldcupComparator({ rows, countryName, tCardMeta }: { rows: Row
           const aBetter = m.a >= m.b;
           return (
             <div key={m.label} className="grid items-center gap-2" style={{ gridTemplateColumns: '4rem 1fr 4rem' }}>
-              <span className="text-right font-display text-xs tabular-nums" style={{ color: aBetter ? '#c4a35a' : '#888' }}>
+              <span className="text-right font-display text-xs tabular-nums" style={{ color: aBetter ? 'var(--t-accent)' : 'var(--t-muted)' }}>
                 {m.a.toFixed(m.suffix ? 1 : 0)}{m.suffix ?? ''}
               </span>
-              <span className="text-center text-[9px] uppercase tracking-widest" style={{ color: '#666' }}>{m.label}</span>
-              <span className="font-display text-xs tabular-nums" style={{ color: !aBetter ? '#c4a35a' : '#888' }}>
+              <span className="text-center text-[9px] uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>{m.label}</span>
+              <span className="font-display text-xs tabular-nums" style={{ color: !aBetter ? 'var(--t-accent)' : 'var(--t-muted)' }}>
                 {m.b.toFixed(m.suffix ? 1 : 0)}{m.suffix ?? ''}
               </span>
             </div>
           );
         })}
-        <div className="grid items-center gap-2 mt-1 pt-2" style={{ gridTemplateColumns: '1fr 1fr', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="grid items-center gap-2 mt-1 pt-2" style={{ gridTemplateColumns: '1fr 1fr', borderTop: '1px solid var(--t-divider)' }}>
           <span className="text-[9px] uppercase tracking-widest text-center" style={{ color: '#6f6249' }}>
             {ca.topGroup ? getCardGroup(ca.topGroup, tCardMeta) : '-'}
           </span>

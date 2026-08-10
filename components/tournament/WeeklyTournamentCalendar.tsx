@@ -208,9 +208,9 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
 
   const arrowStyle = {
     backgroundColor: 'rgba(13,12,16,0.92)',
-    color: '#c4a35a',
+    color: 'var(--t-accent)',
     borderRadius: 9999,
-    boxShadow: '0 4px 14px rgba(0,0,0,0.55)',
+    boxShadow: '0 4px 14px var(--t-shadow)',
   } as const;
 
   const detailModal = (
@@ -236,11 +236,11 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
             transition={{ duration: 0.18, ease: 'easeOut' }}
             onClick={(e) => e.stopPropagation()}
             className="relative flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden"
-            style={{ backgroundColor: '#111114', border: '1px solid #26262c', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}
+            style={{ backgroundColor: 'var(--t-surface-2)', border: '1px solid #26262c', boxShadow: '0 24px 60px var(--t-shadow)' }}
           >
             <header className="flex items-center justify-between gap-3 px-4 py-3" style={{ borderBottom: '1px solid #1c1c20' }}>
               <div className="flex min-w-0 flex-col gap-1">
-                <span className="font-display truncate text-base uppercase tracking-widest" style={{ color: '#e8e6df' }}>
+                <span className="font-display truncate text-base uppercase tracking-widest" style={{ color: 'var(--t-text)' }}>
                   {detail.card.dayLabel}
                 </span>
                 <span
@@ -254,7 +254,7 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
                 type="button"
                 onClick={() => setOpenDay(null)}
                 className="shrink-0 px-2 py-1 text-[11px] uppercase tracking-widest"
-                style={{ color: '#888', background: 'none', border: 'none', cursor: 'pointer' }}
+                style={{ color: 'var(--t-muted)', background: 'none', border: 'none', cursor: 'pointer' }}
               >
                 {t('close')}
               </button>
@@ -280,17 +280,17 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
               </div>
 
               {detail.spec.partner === 'nwl' && (
-                <div className="flex flex-col gap-1.5 px-3 py-3" style={{ backgroundColor: '#161619' }}>
+                <div className="flex flex-col gap-1.5 px-3 py-3" style={{ backgroundColor: 'var(--t-surface-2)' }}>
                   <span className="font-display text-[9px] uppercase tracking-[0.22em]" style={{ color: KIND_COLORS[detail.spec.kind] }}>
                     {t('rules.rewardsLabel')}
                   </span>
-                  <span className="text-[11px] leading-relaxed" style={{ color: '#cfcdc6' }}>
+                  <span className="text-[11px] leading-relaxed" style={{ color: 'var(--t-text)' }}>
                     {t('rules.nwlPrize', {
                       credit: NWL_FIRST_PLACE_STORE_CREDIT_GBP,
                       paypal: NWL_FIRST_PLACE_PAYPAL_GBP,
                     })}
                   </span>
-                  <span className="text-[11px] leading-relaxed" style={{ color: '#cfcdc6' }}>
+                  <span className="text-[11px] leading-relaxed" style={{ color: 'var(--t-text)' }}>
                     {t('rules.nwlChunin', { places: NWL_CHUNIN_PODIUM_PLACES })}
                   </span>
                 </div>
@@ -324,7 +324,7 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
   return (
     <section className="w-full">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-2.5">
-        <h2 className="font-display text-base sm:text-lg uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+        <h2 className="font-display text-base sm:text-lg uppercase tracking-wider" style={{ color: 'var(--t-accent)' }}>
           {t('title')}
         </h2>
         <span className="font-display text-[9px] sm:text-[10px] uppercase tracking-[0.25em]" style={{ color: '#5b5b62' }}>
@@ -350,7 +350,7 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
             type="button"
             onClick={() => scrollDir(-1)}
             aria-label={t('prev')}
-            className="font-display absolute left-1 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 hidden sm:flex items-center justify-center cursor-pointer text-base transition-colors hover:text-[#ffd966]"
+            className="font-display absolute left-1 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 hidden sm:flex items-center justify-center cursor-pointer text-base transition-colors hover:text-[var(--t-accent-bright)]"
             style={arrowStyle}
           >
             &lt;
@@ -361,7 +361,7 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
             type="button"
             onClick={() => scrollDir(1)}
             aria-label={t('next')}
-            className="font-display absolute right-1 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 hidden sm:flex items-center justify-center cursor-pointer text-base transition-colors hover:text-[#ffd966]"
+            className="font-display absolute right-1 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 hidden sm:flex items-center justify-center cursor-pointer text-base transition-colors hover:text-[var(--t-accent-bright)]"
             style={arrowStyle}
           >
             &gt;
@@ -424,7 +424,7 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
                       )}
                     </div>
 
-                    <span aria-hidden="true" className="block w-full" style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.06)' }} />
+                    <span aria-hidden="true" className="block w-full" style={{ height: 1, backgroundColor: 'var(--t-divider)' }} />
 
                     <span
                       className="font-display self-start text-[9px] uppercase tracking-wider px-1.5 py-0.5"

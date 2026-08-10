@@ -74,8 +74,8 @@ export default function TournamentResultsPage() {
 
   if (status === 'loading' || status === 'unauthenticated') {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#08070a' }}>
-        <p className="font-display text-sm uppercase tracking-widest" style={{ color: '#555' }}>{tc('loading')}</p>
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
+        <p className="font-display text-sm uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>{tc('loading')}</p>
       </main>
     );
   }
@@ -86,7 +86,7 @@ export default function TournamentResultsPage() {
   ];
 
   return (
-    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
+    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--t-bg)' }}>
       <CloudBackground />
 
       <div className="w-full max-w-3xl mx-auto relative z-10 flex-1 px-4 sm:px-8 py-6 sm:py-10">
@@ -100,7 +100,7 @@ export default function TournamentResultsPage() {
           <div>
             <h1
               className="font-display text-3xl sm:text-5xl uppercase tracking-wider leading-none"
-              style={{ color: '#f2efe7', letterSpacing: '0.08em', textShadow: '0 0 22px rgba(196, 163, 90, 0.18)' }}
+              style={{ color: 'var(--t-text)', letterSpacing: '0.08em', textShadow: '0 0 22px var(--t-accent-glow)' }}
             >
               {t('resultsTitle')}
             </h1>
@@ -110,18 +110,18 @@ export default function TournamentResultsPage() {
               transition={{ delay: 0.25, duration: 0.4 }}
               className="font-display flex items-baseline gap-2 mt-3"
             >
-              <span className="text-2xl tabular-nums leading-none" style={{ color: '#c4a35a' }}>
+              <span className="text-2xl tabular-nums leading-none" style={{ color: 'var(--t-accent)' }}>
                 {filteredResults.length}
               </span>
-              <span className="text-[11px] uppercase tracking-[0.3em]" style={{ color: '#666' }}>
+              <span className="text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--t-dim)' }}>
                 {tc('all')}
               </span>
             </motion.div>
           </div>
           <Link
             href={'/tournaments' as '/'}
-            className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
-            style={{ color: '#888' }}
+            className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[var(--t-accent)]"
+            style={{ color: 'var(--t-muted)' }}
           >
             {t('backToList')}
           </Link>
@@ -140,8 +140,8 @@ export default function TournamentResultsPage() {
               onClick={() => setFilterTab(tab.key)}
               className="font-display shrink-0 px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors"
               style={{
-                color: filterTab === tab.key ? '#c4a35a' : '#666',
-                backgroundColor: filterTab === tab.key ? 'rgba(196, 163, 90, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+                color: filterTab === tab.key ? 'var(--t-accent)' : 'var(--t-dim)',
+                backgroundColor: filterTab === tab.key ? 'var(--t-accent-glow)' : 'rgba(255, 255, 255, 0.03)',
                 borderRadius: 9999,
               }}
             >
@@ -159,16 +159,16 @@ export default function TournamentResultsPage() {
             transition={{ duration: 0.25 }}
           >
             {loading ? (
-              <p className="font-display text-sm uppercase tracking-widest text-center py-10" style={{ color: '#555' }}>{tc('loading')}</p>
+              <p className="font-display text-sm uppercase tracking-widest text-center py-10" style={{ color: 'var(--t-dim)' }}>{tc('loading')}</p>
             ) : filteredResults.length === 0 ? (
-              <p className="font-display text-sm uppercase tracking-widest text-center py-10" style={{ color: '#555' }}>{t('noResults')}</p>
+              <p className="font-display text-sm uppercase tracking-widest text-center py-10" style={{ color: 'var(--t-dim)' }}>{t('noResults')}</p>
             ) : (
               <div
                 className="flex flex-col gap-3"
                 style={filteredResults.length > 5 ? { maxHeight: '60vh', overflowY: 'auto', paddingRight: '4px' } : undefined}
               >
                 {deleteError && (
-                  <p className="font-display text-[11px] uppercase tracking-widest" style={{ color: '#d97676' }}>
+                  <p className="font-display text-[11px] uppercase tracking-widest" style={{ color: 'var(--t-danger)' }}>
                     {deleteError}
                   </p>
                 )}
@@ -185,7 +185,7 @@ export default function TournamentResultsPage() {
                               onClick={() => setConfirmId(null)}
                               disabled={deletingId === tournament.id}
                               className="font-display px-3 py-1 text-[10px] uppercase tracking-widest cursor-pointer transition-colors"
-                              style={{ color: '#888', backgroundColor: 'rgba(255,255,255,0.03)' }}
+                              style={{ color: 'var(--t-muted)', backgroundColor: 'rgba(255,255,255,0.03)' }}
                             >
                               {tc('cancel')}
                             </button>
@@ -193,7 +193,7 @@ export default function TournamentResultsPage() {
                               onClick={() => handleDelete(tournament.id)}
                               disabled={deletingId === tournament.id}
                               className="font-display px-3 py-1 text-[10px] uppercase tracking-widest cursor-pointer transition-colors"
-                              style={{ color: '#d97676', backgroundColor: 'rgba(217,118,118,0.12)' }}
+                              style={{ color: 'var(--t-danger)', backgroundColor: 'rgba(217,118,118,0.12)' }}
                             >
                               {deletingId === tournament.id ? tc('loading') : t('confirmDelete')}
                             </button>
@@ -201,8 +201,8 @@ export default function TournamentResultsPage() {
                         ) : (
                           <button
                             onClick={() => setConfirmId(tournament.id)}
-                            className="font-display px-3 py-1 text-[10px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[#d97676]"
-                            style={{ color: '#666', backgroundColor: 'rgba(255,255,255,0.03)' }}
+                            className="font-display px-3 py-1 text-[10px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[var(--t-danger)]"
+                            style={{ color: 'var(--t-dim)', backgroundColor: 'rgba(255,255,255,0.03)' }}
                           >
                             {t('deleteTournament')}
                           </button>

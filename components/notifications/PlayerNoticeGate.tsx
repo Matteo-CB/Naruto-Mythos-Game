@@ -97,7 +97,7 @@ export function PlayerNoticeGate() {
     return (
       <PopupOverlay>
         <PopupCornerFrame accentColor="rgba(179, 62, 62, 0.45)" maxWidth="460px">
-          <PopupTitle accentColor="#b33e3e" size="md">{t('notify.suspendedTitle')}</PopupTitle>
+          <PopupTitle accentColor="var(--t-danger)" size="md">{t('notify.suspendedTitle')}</PopupTitle>
           <p className="mb-5 text-center text-xs leading-relaxed" style={{ color: '#c8c8c8' }}>
             {suspBody}
           </p>
@@ -110,7 +110,7 @@ export function PlayerNoticeGate() {
     return (
       <PopupOverlay>
         <PopupCornerFrame accentColor="rgba(179, 62, 62, 0.45)" maxWidth="440px">
-          <PopupTitle accentColor="#b33e3e" size="md">{t('notify.nameResetTitle')}</PopupTitle>
+          <PopupTitle accentColor="var(--t-danger)" size="md">{t('notify.nameResetTitle')}</PopupTitle>
           <p className="mb-4 text-center text-xs leading-relaxed" style={{ color: '#c8c8c8' }}>
             {t('notify.nameResetBody')}
           </p>
@@ -121,13 +121,13 @@ export function PlayerNoticeGate() {
             onKeyDown={(e) => { if (e.key === 'Enter') submitNewName(); }}
             maxLength={20}
             className="w-full mb-2 px-3 py-2 text-[13px] outline-none text-center"
-            style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid #262626', color: '#e0e0e0' }}
+            style={{ backgroundColor: 'var(--t-divider)', border: '1px solid var(--t-border)', color: 'var(--t-text)' }}
           />
           {nameError && (
-            <p className="text-center text-[11px] mb-3" style={{ color: '#b33e3e' }}>{t(nameError)}</p>
+            <p className="text-center text-[11px] mb-3" style={{ color: 'var(--t-danger)' }}>{t(nameError)}</p>
           )}
           <div className="flex justify-center">
-            <PopupActionButton onClick={submitNewName} accentColor="#b33e3e" disabled={nameBusy || newName.trim().length < 3}>
+            <PopupActionButton onClick={submitNewName} accentColor="var(--t-danger)" disabled={nameBusy || newName.trim().length < 3}>
               {t('notify.nameResetButton')}
             </PopupActionButton>
           </div>
@@ -146,7 +146,7 @@ export function PlayerNoticeGate() {
     closeNotice(current.id);
     return null;
   }
-  const accentColor = content.accent === 'red' ? '#b33e3e' : '#c4a35a';
+  const accentColor = content.accent === 'red' ? 'var(--t-danger)' : 'var(--t-accent)';
 
   return (
     <PopupOverlay>

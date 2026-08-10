@@ -30,7 +30,7 @@ export function TradeInventoryGrid({ inventory, offerCounts, onAdd, disabled }: 
 
   if (entries.length === 0) {
     return (
-      <p className="text-[11px] py-8 text-center" style={{ color: '#555' }}>
+      <p className="text-[11px] py-8 text-center" style={{ color: 'var(--t-dim)' }}>
         {t('inventoryEmpty')}
       </p>
     );

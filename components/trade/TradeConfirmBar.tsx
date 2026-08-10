@@ -12,7 +12,7 @@ interface TradeConfirmBarProps {
   onCancel: () => void;
 }
 
-const ACCENT = '#c4a35a';
+const ACCENT = 'var(--t-accent)';
 
 export function TradeConfirmBar({ myReady, partnerReady, partnerName, busy, onToggleReady, onCancel }: TradeConfirmBarProps) {
   const t = useTranslations('trade');
@@ -24,7 +24,7 @@ export function TradeConfirmBar({ myReady, partnerReady, partnerName, busy, onTo
         onClick={onCancel}
         disabled={busy}
         className="font-display px-5 py-2.5 text-[11px] uppercase tracking-widest"
-        style={{ color: '#888', backgroundColor: '#141414', cursor: busy ? 'wait' : 'pointer' }}
+        style={{ color: 'var(--t-muted)', backgroundColor: 'var(--t-surface)', cursor: busy ? 'wait' : 'pointer' }}
       >
         {t('cancel')}
       </button>
@@ -32,7 +32,7 @@ export function TradeConfirmBar({ myReady, partnerReady, partnerName, busy, onTo
       <div className="flex items-center gap-2">
         <span
           className="text-[10px] uppercase tracking-widest"
-          style={{ color: partnerReady ? '#5fb05f' : '#555' }}
+          style={{ color: partnerReady ? 'var(--t-success)' : 'var(--t-dim)' }}
         >
           {partnerReady ? t('confirmed') : t('waitingFor', { name: partnerName })}
         </span>
@@ -44,8 +44,8 @@ export function TradeConfirmBar({ myReady, partnerReady, partnerName, busy, onTo
         disabled={busy}
         className="font-display px-6 py-2.5 text-[12px] uppercase tracking-widest"
         style={{
-          backgroundColor: myReady ? '#1a1a1a' : ACCENT,
-          color: myReady ? ACCENT : '#0a0a0a',
+          backgroundColor: myReady ? 'var(--t-surface-2)' : ACCENT,
+          color: myReady ? ACCENT : 'var(--t-bg)',
           cursor: busy ? 'wait' : 'pointer',
         }}
         animate={!myReady && !busy ? { boxShadow: [`0 0 6px ${ACCENT}55`, `0 0 14px ${ACCENT}aa`, `0 0 6px ${ACCENT}55`] } : undefined}

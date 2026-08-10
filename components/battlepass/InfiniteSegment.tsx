@@ -12,7 +12,7 @@ interface InfiniteSegmentProps {
   active: boolean;
 }
 
-const ACCENT = '#c4a35a';
+const ACCENT = 'var(--t-accent)';
 
 export function InfiniteSegment({
   setId,
@@ -28,7 +28,7 @@ export function InfiniteSegment({
     <div
       className="w-full p-4"
       style={{
-        backgroundColor: '#0f0f0f',
+        backgroundColor: 'var(--t-bg-elevated)',
         boxShadow: active ? `0 0 20px ${ACCENT}33` : 'none',
         opacity: active ? 1 : 0.6,
       }}
@@ -54,12 +54,12 @@ export function InfiniteSegment({
             <span className="flex items-center gap-1.5" style={{ color: ACCENT }}>
               <img src="/images/icons/infinity.svg" alt="" draggable={false} style={{ width: 16, height: 16, opacity: 0.85 }} />
             </span>
-            <span className="text-[10px]" style={{ color: '#888', fontVariantNumeric: 'tabular-nums' }}>
+            <span className="text-[10px]" style={{ color: 'var(--t-muted)', fontVariantNumeric: 'tabular-nums' }}>
               {totalEarned}
             </span>
           </div>
 
-          <div className="w-full" style={{ height: 4, backgroundColor: '#1a1a1a' }}>
+          <div className="w-full" style={{ height: 4, backgroundColor: 'var(--t-surface-2)' }}>
             <motion.div
               style={{ height: '100%', backgroundColor: ACCENT }}
               initial={{ width: 0 }}
@@ -69,7 +69,7 @@ export function InfiniteSegment({
           </div>
 
           {active && xpToNext !== null && (
-            <div className="text-[10px] mt-1.5" style={{ color: '#888', fontVariantNumeric: 'tabular-nums' }}>
+            <div className="text-[10px] mt-1.5" style={{ color: 'var(--t-muted)', fontVariantNumeric: 'tabular-nums' }}>
               {xpToNext} XP
             </div>
           )}

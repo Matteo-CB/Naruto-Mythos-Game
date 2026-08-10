@@ -418,7 +418,14 @@
     "favoriteDecks": "Mazzi preferiti",
     "favoriteDecksHint": "Scegli fino a 3 mazzi. Appaiono sempre per primi nel selettore.",
     "deckPrefsNoDecks": "Non hai ancora mazzi salvati.",
-    "unfavorite": "Rimuovi dai preferiti"
+    "unfavorite": "Rimuovi dai preferiti",
+    "siteThemeTitle": "Tema del sito",
+    "siteThemeHint": "Cambia l'aspetto di tutto il sito. Il tavolo di gioco non è interessato.",
+    "siteThemeKs": "Konoha Shido",
+    "siteThemeSs": "Shinobi Shiren",
+    "siteThemeSave": "Salva",
+    "siteThemeSaving": "Salvataggio",
+    "siteThemeSaved": "Tema salvato"
   },
   "auth": {
     "signIn": "Accedi",
@@ -2788,6 +2795,7 @@
         "gemma049SacrificeHide": "Gemma Shiranui (049): Sacrificato per proteggere un alleato dall'essere nascosto.",
         "dosu069AutoDefeat": "Dosu Kinuta (069): L'avversario non può permettersi di rivelare (costo {cost}), personaggio sconfitto.",
         "dosu069DeclineDefeat": "{card} ({id}): L'avversario ha rifiutato di rivelare. Personaggio nascosto sconfitto.",
+        "dosu069DuplicateNameDefeat": "Dosu Kinuta (069): {target} non può essere rivelato, un personaggio con quel nome è già presente, viene sconfitto.",
         "dosu069LockDefeat": "Dosu Kinuta (069): Rivelazione bloccata da Shikamaru Nara, {target} sconfitto.",
         "dosu069Reveal": "Dosu Kinuta (069): {target} è stato rivelato, pagando {cost} chakra.",
         "shikamaruBlockReveal": "Impossibile rivelare {card}: Shikamaru Nara sta bloccando le giocate coperte in questa missione.",

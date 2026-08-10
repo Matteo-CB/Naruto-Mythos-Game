@@ -32,10 +32,10 @@ export function TradeCardTile({ card, count, onClick, disabled, size = 'md', dim
       style={{
         width: w,
         height: h,
-        backgroundColor: '#141414',
+        backgroundColor: 'var(--t-surface)',
         cursor: disabled ? 'default' : onClick ? 'pointer' : 'default',
         opacity: dimmed ? 0.4 : 1,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+        boxShadow: '0 4px 12px var(--t-shadow)',
       }}
       aria-label={getCardName(card, locale)}
     >
@@ -52,13 +52,13 @@ export function TradeCardTile({ card, count, onClick, disabled, size = 'md', dim
         </>
       ) : (
         <div className="w-full h-full flex items-center justify-center px-1">
-          <span className="text-[8px] text-center" style={{ color: '#888' }}>{getCardName(card, locale)}</span>
+          <span className="text-[8px] text-center" style={{ color: 'var(--t-muted)' }}>{getCardName(card, locale)}</span>
         </div>
       )}
       {count !== undefined && count >= 2 && (
         <span
           className="absolute bottom-0.5 right-0.5 px-1 py-0.5 text-[8px] font-bold"
-          style={{ backgroundColor: '#c4a35a33', color: '#c4a35a', fontVariantNumeric: 'tabular-nums' }}
+          style={{ backgroundColor: 'var(--t-accent)33', color: 'var(--t-accent)', fontVariantNumeric: 'tabular-nums' }}
         >
           x{count}
         </span>

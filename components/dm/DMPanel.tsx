@@ -103,22 +103,22 @@ export function DMPanel() {
       style={{
         zIndex: Z_APP_MODAL,
         backgroundColor: 'rgba(8, 8, 12, 0.98)',
-        boxShadow: '-12px 0 48px rgba(0,0,0,0.6)',
+        boxShadow: '-12px 0 48px var(--t-shadow)',
       }}
     >
-      <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid rgba(196,163,90,0.12)' }}>
+      <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--t-accent-glow)' }}>
         <div className="flex items-center gap-2 min-w-0">
           {view === 'thread' && (
             <button
               onClick={backToList}
               className="shrink-0 cursor-pointer font-bold"
-              style={{ color: '#888', background: 'none', border: 'none', fontSize: '14px', padding: '2px 6px' }}
+              style={{ color: 'var(--t-muted)', background: 'none', border: 'none', fontSize: '14px', padding: '2px 6px' }}
               aria-label={t('dm.back')}
             >
               &#x25C0;
             </button>
           )}
-          <span className="uppercase font-bold tracking-widest truncate" style={{ fontSize: '12px', color: '#c4a35a', fontFamily: 'var(--font-display)' }}>
+          <span className="uppercase font-bold tracking-widest truncate" style={{ fontSize: '12px', color: 'var(--t-accent)', fontFamily: 'var(--font-display)' }}>
             {view === 'thread' && partner ? partner.username : t('dm.title')}
           </span>
           {view === 'thread' && partner && (
@@ -126,19 +126,19 @@ export function DMPanel() {
               <button
                 onClick={() => setMenuOpen((v) => !v)}
                 className="cursor-pointer"
-                style={{ color: '#666', background: 'none', border: 'none', fontSize: '10px', padding: '2px 6px' }}
+                style={{ color: 'var(--t-dim)', background: 'none', border: 'none', fontSize: '10px', padding: '2px 6px' }}
               >
                 &#x25BC;
               </button>
               {menuOpen && (
                 <div
                   className="absolute right-0 top-full mt-1 flex flex-col min-w-[190px]"
-                  style={{ backgroundColor: 'rgba(10,10,16,0.98)', border: '1px solid #262626', boxShadow: '0 8px 24px rgba(0,0,0,0.6)', zIndex: 5 }}
+                  style={{ backgroundColor: 'rgba(10,10,16,0.98)', border: '1px solid var(--t-border)', boxShadow: '0 8px 24px var(--t-shadow)', zIndex: 5 }}
                 >
                   <button
                     onClick={() => { setMenuOpen(false); setReportOpen(true); }}
                     className="text-left px-3 py-2 text-[11px] cursor-pointer"
-                    style={{ color: '#999', background: 'none', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                    style={{ color: 'var(--t-muted)', background: 'none', border: 'none', borderBottom: '1px solid var(--t-divider)' }}
                   >
                     {t('chat.menu.report')}
                   </button>
@@ -147,7 +147,7 @@ export function DMPanel() {
                       onClick={() => { setMenuOpen(false); removeFriend(); }}
                       disabled={busy}
                       className="text-left px-3 py-2 text-[11px] cursor-pointer disabled:opacity-40"
-                      style={{ color: '#999', background: 'none', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                      style={{ color: 'var(--t-muted)', background: 'none', border: 'none', borderBottom: '1px solid var(--t-divider)' }}
                     >
                       {t('dm.removeFriend')}
                     </button>
@@ -155,7 +155,7 @@ export function DMPanel() {
                   <button
                     onClick={() => { setMenuOpen(false); setBlockOpen(true); }}
                     className="text-left px-3 py-2 text-[11px] cursor-pointer"
-                    style={{ color: '#b33e3e', background: 'none', border: 'none' }}
+                    style={{ color: 'var(--t-danger)', background: 'none', border: 'none' }}
                   >
                     {t('chat.menu.block')}
                   </button>
@@ -167,7 +167,7 @@ export function DMPanel() {
         <button
           onClick={() => { setMenuOpen(false); close(); }}
           className="w-8 h-8 flex items-center justify-center cursor-pointer shrink-0"
-          style={{ color: '#666', border: '1px solid #262626', backgroundColor: 'rgba(255,255,255,0.02)', fontSize: '12px' }}
+          style={{ color: 'var(--t-dim)', border: '1px solid var(--t-border)', backgroundColor: 'rgba(255,255,255,0.02)', fontSize: '12px' }}
         >
           X
         </button>
@@ -176,9 +176,9 @@ export function DMPanel() {
       {view === 'list' ? (
         <div className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
           {loadingThreads && threads.length === 0 ? (
-            <p className="text-center py-10 text-[11px]" style={{ color: '#444' }}>...</p>
+            <p className="text-center py-10 text-[11px]" style={{ color: 'var(--t-muted)' }}>...</p>
           ) : threads.length === 0 ? (
-            <p className="text-center py-10 px-6 text-[12px] leading-relaxed" style={{ color: '#555' }}>
+            <p className="text-center py-10 px-6 text-[12px] leading-relaxed" style={{ color: 'var(--t-dim)' }}>
               {t('dm.emptyList')}
             </p>
           ) : (
@@ -187,21 +187,21 @@ export function DMPanel() {
                 key={th.threadKey}
                 onClick={() => { if (myUserId) openThread(myUserId, th.partner); }}
                 className="w-full flex items-center gap-3 px-4 py-3 cursor-pointer text-left"
-                style={{ background: 'none', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+                style={{ background: 'none', border: 'none', borderBottom: '1px solid var(--t-divider)' }}
               >
                 <div className="flex flex-col min-w-0 flex-1">
-                  <span className="font-bold text-[12px] truncate" style={{ color: '#e0e0e0', fontFamily: 'var(--font-display)' }}>
+                  <span className="font-bold text-[12px] truncate" style={{ color: 'var(--t-text)', fontFamily: 'var(--font-display)' }}>
                     {th.partner.username}
                   </span>
                   {th.lastMessage && (
-                    <span className="font-body-force text-[11px] truncate" style={{ color: '#777' }}>
+                    <span className="font-body-force text-[11px] truncate" style={{ color: 'var(--t-dim)' }}>
                       {th.lastMessage.body}
                     </span>
                   )}
                 </div>
                 {th.unreadCount > 0 && (
                   <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[9px] font-bold rounded-full shrink-0"
-                    style={{ backgroundColor: '#b33e3e', color: '#fff' }}>
+                    style={{ backgroundColor: 'var(--t-danger)', color: 'var(--t-on-danger)' }}>
                     {th.unreadCount > 99 ? '99+' : th.unreadCount}
                   </span>
                 )}
@@ -213,9 +213,9 @@ export function DMPanel() {
         <>
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3" style={{ minHeight: 0 }}>
             {loadingMessages && messages.length === 0 ? (
-              <p className="text-center py-10 text-[11px]" style={{ color: '#444' }}>...</p>
+              <p className="text-center py-10 text-[11px]" style={{ color: 'var(--t-muted)' }}>...</p>
             ) : messages.length === 0 ? (
-              <p className="text-center py-10 text-[12px]" style={{ color: '#555' }}>
+              <p className="text-center py-10 text-[12px]" style={{ color: 'var(--t-dim)' }}>
                 {partner ? t('dm.placeholder', { player: partner.username }) : ''}
               </p>
             ) : (
@@ -226,8 +226,8 @@ export function DMPanel() {
                     <div
                       className="font-body-force max-w-[80%] px-3 py-1.5 text-[12px] leading-snug"
                       style={{
-                        backgroundColor: mine ? 'rgba(196,163,90,0.12)' : 'rgba(255,255,255,0.04)',
-                        color: mine ? '#e6d5ac' : '#ccc',
+                        backgroundColor: mine ? 'var(--t-accent-glow)' : 'var(--t-divider)',
+                        color: mine ? '#e6d5ac' : 'var(--t-text)',
                         overflowWrap: 'anywhere',
                       }}
                     >
@@ -240,13 +240,13 @@ export function DMPanel() {
           </div>
 
           {locked ? (
-            <div className="px-4 py-3 shrink-0 text-center" style={{ borderTop: '1px solid rgba(196,163,90,0.08)' }}>
-              <span className="text-[11px]" style={{ color: '#888' }}>
+            <div className="px-4 py-3 shrink-0 text-center" style={{ borderTop: '1px solid var(--t-accent-tint)' }}>
+              <span className="text-[11px]" style={{ color: 'var(--t-muted)' }}>
                 {locked === 'not_friends' ? t('dm.lockedNotFriends') : t('dm.lockedDisabled')}
               </span>
             </div>
           ) : (
-            <div className="px-3 py-2.5 shrink-0 flex items-center gap-1.5" style={{ borderTop: '1px solid rgba(196,163,90,0.08)' }}>
+            <div className="px-3 py-2.5 shrink-0 flex items-center gap-1.5" style={{ borderTop: '1px solid var(--t-accent-tint)' }}>
               <input
                 type="text"
                 value={input}
@@ -255,10 +255,10 @@ export function DMPanel() {
                 placeholder={partner ? t('dm.placeholder', { player: partner.username }) : ''}
                 maxLength={DM_MAX_LENGTH}
                 className="flex-1 min-w-0 px-3 py-2 outline-none text-[13px]"
-                style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid #262626', color: '#e0e0e0' }}
+                style={{ backgroundColor: 'var(--t-divider)', border: '1px solid var(--t-border)', color: 'var(--t-text)' }}
               />
               {input.length >= DM_MAX_LENGTH - 30 && (
-                <span className="shrink-0 tabular-nums text-[9px]" style={{ color: input.length >= DM_MAX_LENGTH ? '#b33e3e' : '#555' }}>
+                <span className="shrink-0 tabular-nums text-[9px]" style={{ color: input.length >= DM_MAX_LENGTH ? 'var(--t-danger)' : 'var(--t-dim)' }}>
                   {DM_MAX_LENGTH - input.length}
                 </span>
               )}
@@ -266,7 +266,7 @@ export function DMPanel() {
                 onClick={submitInput}
                 disabled={cooldown || input.trim().length === 0}
                 className="uppercase font-bold cursor-pointer disabled:opacity-30 shrink-0 text-[11px] px-3.5 py-2"
-                style={{ color: '#0a0a0a', backgroundColor: '#c4a35a', border: 'none', letterSpacing: '0.1em' }}
+                style={{ color: 'var(--t-bg)', backgroundColor: 'var(--t-accent)', border: 'none', letterSpacing: '0.1em' }}
               >
                 {t('chat.send')}
               </button>

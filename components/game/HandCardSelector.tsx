@@ -10,6 +10,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { ManualGuess } from './ManualGuess';
 import { normalizeImagePath , portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from '@/components/icons/GameIcons';
 import { useGameScale } from './GameScaleContext';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import {
@@ -114,25 +115,29 @@ function HandCard({
 
       {card.chakra !== undefined && (
         <div
-          className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[9px] font-bold"
+          className="absolute top-1 left-1 h-5 px-1 flex items-center justify-center text-[9px] font-bold"
           style={{
             backgroundColor: 'rgba(12, 12, 18, 0.9)',
             color: '#c4a35a',
             border: '1px solid rgba(196, 163, 90, 0.5)',
+            gap: '2px',
           }}
         >
+          <ChakraIcon size={10} color={CHAKRA_COLOR} />
           {manualPowerMode ? <ManualGuess actual={card.chakra} color="#c4a35a" /> : card.chakra}
         </div>
       )}
 
       {card.power !== undefined && (
         <div
-          className="absolute bottom-1 right-1 px-1.5 py-0.5 text-[10px] font-bold"
+          className="absolute bottom-1 right-1 px-1.5 py-0.5 text-[10px] font-bold flex items-center"
           style={{
             backgroundColor: 'rgba(0, 0, 0, 0.85)',
             color: '#e0e0e0',
+            gap: '3px',
           }}
         >
+          <PowerIcon size={10} color={POWER_COLOR} />
           {manualPowerMode ? <ManualGuess actual={card.power} color="#e0e0e0" /> : card.power}
         </div>
       )}

@@ -28,10 +28,10 @@ export function ProfilePostsSection({ userId }: { userId: string }) {
   return (
     <section className="mb-6">
       <div className="flex items-center gap-3 mb-3">
-        <span className="font-display text-xs uppercase tracking-[0.28em]" style={{ color: '#c4a35a' }}>{t('posts')}</span>
-        <span className="font-inter-force text-[10px]" style={{ color: '#55555c' }}>{posts.length}</span>
+        <span className="font-display text-xs uppercase tracking-[0.28em]" style={{ color: 'var(--t-accent)' }}>{t('posts')}</span>
+        <span className="font-inter-force text-[10px]" style={{ color: 'var(--t-dim)' }}>{posts.length}</span>
       </div>
-      <div style={{ backgroundColor: '#0d0c10', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
+      <div style={{ backgroundColor: 'var(--t-panel)', boxShadow: '0 12px 32px var(--t-shadow)' }}>
         {posts.map((p) => (
           <PostCard key={p.id} post={p} isAdmin={privilege.isAdmin} onDelete={(id) => setPosts((ps) => ps.filter((x) => x.id !== id))} />
         ))}

@@ -3,6 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 import { isMovementBlockedByKurenai, isHiddenRevealBlocked } from '@/lib/effects/ContinuousEffects';
+import { revealWouldViolateNameUniqueness } from '@/lib/effects/revealNameUniqueness';
 
 
 
@@ -67,33 +68,28 @@ function handleKankuro078Upgrade(ctx: EffectContext): EffectResult {
 
 
   const validTargets: string[] = [];
+  let blockedName: string | null = null;
   for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
     const mission = state.activeMissions[mIdx];
     if (isHiddenRevealBlocked(state, mIdx, sourcePlayer)) continue;
     for (const char of mission[friendlySide]) {
       if (!char.isHidden) continue;
-      const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-      const charName = topCard.name_fr.toUpperCase();
-
-      const hasNameConflict = mission[friendlySide].some((c) => {
-        if (c.instanceId === char.instanceId || c.isHidden) return false;
-        const cTop = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-        return cTop.name_fr.toUpperCase() === charName;
-      });
-      if (hasNameConflict) {
-        
-        const hasUpgradeTarget = mission[friendlySide].some((c) => {
-          if (c.instanceId === char.instanceId || c.isHidden) return false;
-          const cTop = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-          return cTop.name_fr.toUpperCase() === charName && (topCard.chakra ?? 0) > (cTop.chakra ?? 0);
-        });
-        if (!hasUpgradeTarget) continue; // Can't reveal: name conflict + no upgrade target
+      if (revealWouldViolateNameUniqueness(state, sourcePlayer, mIdx, char)) {
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        if (!blockedName) blockedName = topCard.name_fr;
+        continue;
       }
       validTargets.push(char.instanceId);
     }
   }
 
   if (validTargets.length === 0) {
+    if (blockedName) {
+      return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer,
+        'EFFECT_BLOCKED',
+        `Kankuro (078) UPGRADE: Cannot reveal ${blockedName}, a character with that name is already visible on this mission.`,
+        'game.log.effect.duplicateNameReveal', { card: blockedName }) } };
+    }
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer,
       'EFFECT_NO_TARGET', 'Kankuro (078) UPGRADE: No hidden friendly characters in play to reveal.',
       'game.log.effect.noTarget', { card: 'KANKURO', id: 'KS-078-UC' }) } };

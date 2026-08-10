@@ -37,6 +37,7 @@ import {
 } from './handlers/SS/goldCards';
 import { attachCardToCharacter, discardAttachmentsOnLeave, discardAttachments } from './attachments';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
+import { findLegalRevealUpgradeTarget, revealWouldViolateNameUniqueness } from './revealNameUniqueness';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatEnemyCharacter, defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
 import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval, isHiddenRevealBlocked, amplifiedPowerup } from './ContinuousEffects';
@@ -50,6 +51,7 @@ import { moveCharTo, getValidMissions, applyUpgradePowerup } from './handlers/KS
 import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard, findHiddenSoundVillageOnBoard, findAffordableSoundVillageInHand } from './handlers/KS/shared/summonSearch';
 import { isCharacterCopyable, isCopyableEffectType } from './handlers/KS/shared/copyExclusions';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
+import { hasFlexibleUpgradeRestriction, isRestrictedUpgradeTarget } from '@/lib/engine/rules/flexibleUpgradeRestriction';
 
 
 function findUpgradeTargetIdx(
@@ -59,9 +61,7 @@ function findUpgradeTargetIdx(
 ): number {
 
 
-  const cardNumber = typeof card.number === 'string' ? parseInt(card.number, 10) : card.number;
-  const hasFlexibleRestriction = String(card.set ?? 'KS') === 'KS' && (cardNumber === 51 || cardNumber === 138) &&
-    (card.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'));
+  const hasFlexibleRestriction = hasFlexibleUpgradeRestriction(card);
 
 
   const sameNameIdx = chars.findIndex(c => {
@@ -70,11 +70,7 @@ function findUpgradeTargetIdx(
     if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
     const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
 
-    if (hasFlexibleRestriction) {
-      const isSummon = (topCard.keywords ?? []).includes('Summon');
-      const isOrochimaru = topCard.name_fr.toUpperCase().includes('OROCHIMARU');
-      if (isSummon || isOrochimaru) return false;
-    }
+    if (hasFlexibleRestriction && isRestrictedUpgradeTarget(topCard)) return false;
     return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()
       && (card.chakra ?? 0) > (topCard.chakra ?? 0);
   });
@@ -7374,59 +7370,30 @@ export class EffectEngine {
           
           const d069mAutoTargetId = d069mTargets[0];
           const d069mOpponent = d069mPlayer === 'player1' ? 'player2' : 'player1';
-          const d069mCharResult = EffectEngine.findCharByInstanceId(newState, d069mAutoTargetId);
-          if (!d069mCharResult) {
+          const d069mEval = EffectEngine.dosu069EvaluateReveal(newState, d069mOpponent, d069mAutoTargetId);
+          if (!d069mEval) {
             newState = EffectEngine.defeatCharacter(newState, d069mAutoTargetId, d069mPlayer);
             break;
           }
-          const d069mTopCard = d069mCharResult.character.stack?.length > 0
-            ? d069mCharResult.character.stack[d069mCharResult.character.stack?.length - 1]
-            : d069mCharResult.character.card;
-          const d069mFullRevealCost = calculateEffectiveCost(newState, d069mOpponent, d069mTopCard, d069mCharResult.missionIndex, true) + 2;
-          
-          const d069mOppSide: 'player1Characters' | 'player2Characters' =
-            d069mOpponent === 'player1' ? 'player1Characters' : 'player2Characters';
-          const d069mFriendly = newState.activeMissions[d069mCharResult.missionIndex][d069mOppSide];
-          const d069mUpgradeTarget = d069mFriendly.find((c) => {
-            if (c.instanceId === d069mAutoTargetId || c.isHidden) return false;
-            if (c.controlledBy !== c.originalOwner) return false;
-            const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-            if ((d069mTopCard.chakra ?? 0) <= (cTop.chakra ?? 0)) return false;
-            return cTop.name_fr.toUpperCase() === d069mTopCard.name_fr.toUpperCase();
-          });
-          let d069mRevealCost = d069mFullRevealCost;
-          if (d069mUpgradeTarget) {
-            const d069mOldTop = d069mUpgradeTarget.stack?.length > 0
-              ? d069mUpgradeTarget.stack[d069mUpgradeTarget.stack?.length - 1]
-              : d069mUpgradeTarget.card;
-            d069mRevealCost = Math.max(0, (d069mFullRevealCost - 2) - (d069mOldTop.chakra ?? 0)) + 2;
-          }
-          const d069mCanAfford = newState[d069mOpponent].chakra >= d069mRevealCost;
-          const d069mLocked = isHiddenRevealBlocked(newState, d069mCharResult.missionIndex, d069mOpponent);
+          const d069mRevealCost = d069mEval.revealCost;
 
-          if (!d069mCanAfford || d069mLocked) {
+          if (d069mEval.blockedReason) {
             newState = EffectEngine.defeatCharacter(newState, d069mAutoTargetId, d069mPlayer);
-            if (d069mLocked) {
-              newState.log = logAction(newState.log, newState.turn, newState.phase, d069mPlayer,
-                'EFFECT_DEFEAT', `Dosu Kinuta (069): Reveal blocked by Shikamaru Nara, ${d069mTopCard.name_fr} defeated.`,
-                'game.log.effect.dosu069LockDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', target: d069mTopCard.name_fr });
-            } else {
-              newState.log = logAction(newState.log, newState.turn, newState.phase, d069mPlayer,
-                'EFFECT_DEFEAT', `Dosu Kinuta (069): Opponent cannot afford to reveal (cost ${d069mRevealCost}), character defeated.`,
-                'game.log.effect.dosu069AutoDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', cost: String(d069mRevealCost) });
-            }
+            newState = EffectEngine.dosu069LogBlockedReveal(
+              newState, d069mPlayer, d069mEval.blockedReason, d069mEval.topCard.name_fr, d069mRevealCost,
+            );
             break;
           }
 
-          
+
           const d069mOcEffId = generateInstanceId();
           const d069mOcActId = generateInstanceId();
           newState.pendingEffects = [...newState.pendingEffects, {
             id: d069mOcEffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
-            sourceMissionIndex: d069mCharResult.missionIndex,
+            sourceMissionIndex: d069mEval.missionIndex,
             effectType: pendingEffect.effectType,
-            effectDescription: JSON.stringify({ targetInstanceId: d069mAutoTargetId, revealCost: d069mFullRevealCost, sourcePlayer: d069mPlayer }),
+            effectDescription: JSON.stringify({ targetInstanceId: d069mAutoTargetId, revealCost: d069mEval.fullRevealCost, sourcePlayer: d069mPlayer }),
             targetSelectionType: 'DOSU069_OPPONENT_CHOICE',
             sourcePlayer: d069mPlayer, requiresTargetSelection: true,
             validTargets: [d069mAutoTargetId], isOptional: true, isMandatory: false,
@@ -12240,7 +12207,7 @@ export class EffectEngine {
         newState.activeMissions = newState.activeMissions.map((m, i) => {
           if (i === ss121Found.missionIndex) {
             return { ...m, [ss121Side]: m[ss121Side].map((c) =>
-              c.instanceId === ss121Char.instanceId ? { ...c, stack: ss121Remaining, card: ss121Remaining[0] } : c) };
+              c.instanceId === ss121Char.instanceId ? { ...c, stack: ss121Remaining, card: ss121Remaining[ss121Remaining.length - 1] } : c) };
           }
           if (i === ss121Dest) {
             return { ...m, [ss121Side]: [...m[ss121Side], ss121Moved] };
@@ -15274,6 +15241,19 @@ export class EffectEngine {
             const rhPlayer = pendingEffect.sourcePlayer;
             const rhPs = newState[rhPlayer];
             const rhTopCard = rhChar.character.stack?.length > 0 ? rhChar.character.stack[rhChar.character.stack.length - 1] : rhChar.character.card;
+            if (
+              revealWouldViolateNameUniqueness(newState, rhPlayer, rhChar.missionIndex, rhChar.character) ||
+              findLegalRevealUpgradeTarget(newState, rhPlayer, rhChar.missionIndex, rhChar.character) !== null
+            ) {
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, rhPlayer,
+                'EFFECT_BLOCKED',
+                `Cannot reveal ${rhTopCard.name_fr}: a character with the same name is already on this side of this mission.`,
+                'game.log.effect.duplicateNameReveal',
+                { card: rhTopCard.name_fr },
+              );
+              break;
+            }
             const rhFreshCost = Math.max(0, (rhTopCard.chakra ?? 0) - rhReduction);
             if (rhPs.chakra >= rhFreshCost) {
               rhPs.chakra -= rhFreshCost;
@@ -15298,6 +15278,20 @@ export class EffectEngine {
             const rhPs = newState[rhPlayer];
             const rhTopCard = rhChar.character.stack?.length > 0 ? rhChar.character.stack[rhChar.character.stack.length - 1] : rhChar.character.card;
             const rhUpgTop = rhUpgradeTarget.character.stack?.length > 0 ? rhUpgradeTarget.character.stack[rhUpgradeTarget.character.stack.length - 1] : rhUpgradeTarget.character.card;
+            const rhForcedUpgrade = findLegalRevealUpgradeTarget(newState, rhPlayer, rhChar.missionIndex, rhChar.character);
+            if (
+              revealWouldViolateNameUniqueness(newState, rhPlayer, rhChar.missionIndex, rhChar.character) ||
+              (rhForcedUpgrade !== null && rhForcedUpgrade.instanceId !== targetId)
+            ) {
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, rhPlayer,
+                'EFFECT_BLOCKED',
+                `Cannot reveal ${rhTopCard.name_fr}: a character with the same name is already on this side of this mission.`,
+                'game.log.effect.duplicateNameReveal',
+                { card: rhTopCard.name_fr },
+              );
+              break;
+            }
             const rhUpgCost = Math.max(0, ((rhTopCard.chakra ?? 0) - (rhUpgTop.chakra ?? 0)) - rhReduction);
             if (rhPs.chakra >= rhUpgCost) {
               rhPs.chakra -= rhUpgCost;
@@ -15371,7 +15365,14 @@ export class EffectEngine {
         const mission_h002 = { ...missions_h002[mi_h002] };
 
         if (targetId === 'FRESH') {
-          
+          if (hasSameNameConflict(mission_h002[fSide_h002], card_h002)) {
+            newState.log = logAction(newState.log, newState.turn, newState.phase, player_h002,
+              'EFFECT_BLOCKED',
+              `Hiruzen Sarutobi (002): Cannot play ${card_h002.name_fr}, same name already visible in this mission.`,
+              'game.log.effect.nameConflictBlocked',
+              { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card_h002.name_fr });
+            break;
+          }
           const freshCost_h002 = Math.max(0, card_h002.chakra - 1);
           if (ps_h002.chakra < freshCost_h002) break;
           ps_h002.chakra -= freshCost_h002;
@@ -15403,6 +15404,14 @@ export class EffectEngine {
           const existing_h002 = mission_h002[fSide_h002][existIdx_h002];
           const existStack_h002 = existing_h002.stack ?? [existing_h002.card];
           const eTop_h002 = existStack_h002.length > 0 ? existStack_h002[existStack_h002.length - 1] : existing_h002.card;
+          if (hasSameNameConflict(mission_h002[fSide_h002], card_h002, targetId)) {
+            newState.log = logAction(newState.log, newState.turn, newState.phase, player_h002,
+              'EFFECT_BLOCKED',
+              `Hiruzen Sarutobi (002): Cannot play ${card_h002.name_fr}, same name already visible in this mission.`,
+              'game.log.effect.nameConflictBlocked',
+              { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card_h002.name_fr });
+            break;
+          }
           const upgCost_h002 = Math.max(0, (card_h002.chakra - (eTop_h002?.chakra ?? 0)) - 1);
           if (ps_h002.chakra < upgCost_h002) break;
           ps_h002.chakra -= upgCost_h002;
@@ -16222,8 +16231,20 @@ export class EffectEngine {
         const friendlySide_k78 = pendingEffect.sourcePlayer === "player1" ? "player1Characters" : "player2Characters";
         const m_k78_check = newState.activeMissions[mIdx_k78];
         const srcControlled_k78 = hiddenChar_k78.controlledBy !== hiddenChar_k78.originalOwner;
-        const upgradeTargetIdx_k78 = srcControlled_k78 ? -1 : findUpgradeTargetIdx(m_k78_check[friendlySide_k78], topCard_k78, targetId);
-        const upgradeTarget_k78 = upgradeTargetIdx_k78 >= 0 ? m_k78_check[friendlySide_k78][upgradeTargetIdx_k78] : null;
+
+        if (revealWouldViolateNameUniqueness(newState, pendingEffect.sourcePlayer, mIdx_k78, hiddenChar_k78)) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_BLOCKED', `Kankuro (078): Cannot reveal ${topCard_k78.name_fr}, same name already visible in this mission.`,
+            'game.log.effect.duplicateNameReveal', { card: topCard_k78.name_fr });
+          break;
+        }
+
+        const forcedUpgrade_k78 = findLegalRevealUpgradeTarget(newState, pendingEffect.sourcePlayer, mIdx_k78, hiddenChar_k78);
+        const upgradeTargetIdx_k78 = (srcControlled_k78 || forcedUpgrade_k78)
+          ? -1
+          : findUpgradeTargetIdx(m_k78_check[friendlySide_k78], topCard_k78, targetId);
+        const upgradeTarget_k78 = forcedUpgrade_k78
+          ?? (upgradeTargetIdx_k78 >= 0 ? m_k78_check[friendlySide_k78][upgradeTargetIdx_k78] : null);
 
         
         if (upgradeTarget_k78) {
@@ -16289,22 +16310,7 @@ export class EffectEngine {
           }
         }
 
-        
-        if (!upgradeTarget_k78) {
-          const hasNameConflictFresh_k78 = newState.activeMissions[mIdx_k78][friendlySide_k78].some((c: CharacterInPlay) => {
-            if (c.instanceId === targetId || c.isHidden) return false;
-            const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-            return cTop.name_fr.toUpperCase() === topCard_k78.name_fr.toUpperCase();
-          });
-          if (hasNameConflictFresh_k78) {
-            newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-              'EFFECT_BLOCKED', `Kankuro (078): Cannot reveal ${topCard_k78.name_fr}, same name already visible in this mission.`,
-              'game.log.effect.nameConflictBlocked', { card: 'KANKURO', id: 'KS-078-UC', target: topCard_k78.name_fr });
-            break;
-          }
-        }
 
-        
         let revealCost_k78: number;
         if (upgradeTarget_k78) {
           const existingTC = upgradeTarget_k78.stack?.length > 0 ? upgradeTarget_k78.stack[upgradeTarget_k78.stack?.length - 1] : upgradeTarget_k78.card;
@@ -16398,6 +16404,19 @@ export class EffectEngine {
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT_BLOCKED', `Kankuro (078): Cannot reveal ${topCard_k78r.name_fr}, Shikamaru Nara is blocking hidden plays in this mission.`,
             'game.log.effect.shikamaruBlockReveal', { card: topCard_k78r.name_fr });
+          break;
+        }
+
+        const forcedUpgrade_k78r = findLegalRevealUpgradeTarget(
+          newState, pendingEffect.sourcePlayer, mIdx_k78r, charResult_k78r.character,
+        );
+        if (
+          revealWouldViolateNameUniqueness(newState, pendingEffect.sourcePlayer, mIdx_k78r, charResult_k78r.character) ||
+          (forcedUpgrade_k78r !== null && (!doUpgrade_k78r || forcedUpgrade_k78r.instanceId !== targetId))
+        ) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_BLOCKED', `Kankuro (078): Cannot reveal ${topCard_k78r.name_fr}, same name already visible in this mission.`,
+            'game.log.effect.duplicateNameReveal', { card: topCard_k78r.name_fr });
           break;
         }
 
@@ -16586,61 +16605,30 @@ export class EffectEngine {
         
         
         const opponentPlayer_dosu = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-        const charResult_dosu = EffectEngine.findCharByInstanceId(newState, targetId);
-        if (!charResult_dosu) {
+        const eval_dosu = EffectEngine.dosu069EvaluateReveal(newState, opponentPlayer_dosu, targetId);
+        if (!eval_dosu) {
           newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
           break;
         }
-        const topCard_dosu = charResult_dosu.character.stack?.length > 0
-          ? charResult_dosu.character.stack[charResult_dosu.character.stack?.length - 1]
-          : charResult_dosu.character.card;
-        const fullRevealCost_dosu = calculateEffectiveCost(newState, opponentPlayer_dosu, topCard_dosu, charResult_dosu.missionIndex, true) + 2;
-        
-        const dosuOppSide: 'player1Characters' | 'player2Characters' =
-          opponentPlayer_dosu === 'player1' ? 'player1Characters' : 'player2Characters';
-        const dosuFriendly = newState.activeMissions[charResult_dosu.missionIndex][dosuOppSide];
-        const dosuUpgradeTarget = dosuFriendly.find((c) => {
-          if (c.instanceId === targetId || c.isHidden) return false;
-          if (c.controlledBy !== c.originalOwner) return false;
-          const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-          if ((topCard_dosu.chakra ?? 0) <= (cTop.chakra ?? 0)) return false;
-          return cTop.name_fr.toUpperCase() === topCard_dosu.name_fr.toUpperCase();
-        });
-        let revealCost_dosu = fullRevealCost_dosu;
-        if (dosuUpgradeTarget) {
-          const dosuOldTop = dosuUpgradeTarget.stack?.length > 0
-            ? dosuUpgradeTarget.stack[dosuUpgradeTarget.stack?.length - 1]
-            : dosuUpgradeTarget.card;
-          revealCost_dosu = Math.max(0, (fullRevealCost_dosu - 2) - (dosuOldTop.chakra ?? 0)) + 2;
-        }
-        const canAfford_dosu = newState[opponentPlayer_dosu].chakra >= revealCost_dosu;
-        const revealLocked_dosu = isHiddenRevealBlocked(newState, charResult_dosu.missionIndex, opponentPlayer_dosu);
+        const revealCost_dosu = eval_dosu.revealCost;
 
-        if (!canAfford_dosu || revealLocked_dosu) {
+        if (eval_dosu.blockedReason) {
           newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
-          if (revealLocked_dosu) {
-            newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-              'EFFECT_DEFEAT', `Dosu Kinuta (069): Reveal blocked by Shikamaru Nara, ${topCard_dosu.name_fr} defeated.`,
-              'game.log.effect.dosu069LockDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', target: topCard_dosu.name_fr });
-          } else {
-            newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-              'EFFECT_DEFEAT', `Dosu Kinuta (069): Opponent cannot afford to reveal (cost ${revealCost_dosu}), character defeated.`,
-              'game.log.effect.dosu069AutoDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', cost: String(revealCost_dosu) });
-          }
+          newState = EffectEngine.dosu069LogBlockedReveal(
+            newState, pendingEffect.sourcePlayer, eval_dosu.blockedReason, eval_dosu.topCard.name_fr, revealCost_dosu,
+          );
           break;
         }
 
-        
-        
         const effectId_dosu = generateInstanceId();
         const actionId_dosu = generateInstanceId();
         newState.pendingEffects = [...newState.pendingEffects, {
           id: effectId_dosu,
           sourceCardId: pendingEffect.sourceCardId,
           sourceInstanceId: pendingEffect.sourceInstanceId,
-          sourceMissionIndex: charResult_dosu.missionIndex,
+          sourceMissionIndex: eval_dosu.missionIndex,
           effectType: pendingEffect.effectType,
-          effectDescription: JSON.stringify({ targetInstanceId: targetId, revealCost: fullRevealCost_dosu, sourcePlayer: pendingEffect.sourcePlayer }),
+          effectDescription: JSON.stringify({ targetInstanceId: targetId, revealCost: eval_dosu.fullRevealCost, sourcePlayer: pendingEffect.sourcePlayer }),
           targetSelectionType: 'DOSU069_OPPONENT_CHOICE',
           sourcePlayer: pendingEffect.sourcePlayer,
           requiresTargetSelection: true,
@@ -16655,7 +16643,7 @@ export class EffectEngine {
           id: actionId_dosu,
           type: 'SELECT_TARGET' as PendingAction['type'],
           player: opponentPlayer_dosu,
-          originPlayer: pendingEffect.sourcePlayer, // Dosu's player initiated this forced choice
+          originPlayer: pendingEffect.sourcePlayer,
           description: `Dosu Kinuta (069): Your hidden character was targeted. Click to reveal (pay ${revealCost_dosu} chakra) or skip to let it be defeated.`,
           descriptionKey: 'game.effect.desc.dosu069OpponentChoice',
           descriptionParams: { cost: String(revealCost_dosu) },
@@ -16674,41 +16662,26 @@ export class EffectEngine {
         let parsed_dosu69: { targetInstanceId?: string; revealCost?: number; sourcePlayer?: string } = {};
         try { parsed_dosu69 = JSON.parse(pendingEffect.effectDescription); } catch {}
         const targetInst_dosu69 = parsed_dosu69.targetInstanceId ?? targetId;
-        const revCost_dosu69 = parsed_dosu69.revealCost ?? 0;
         const opponent_dosu69 = pendingEffect.selectingPlayer ?? (pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1');
 
-        
-        const charResult_dosu69 = EffectEngine.findCharByInstanceId(newState, targetInst_dosu69);
-        if (!charResult_dosu69) break;
-        const mIdx_dosu69 = charResult_dosu69.missionIndex;
+        const eval_dosu69 = EffectEngine.dosu069EvaluateReveal(newState, opponent_dosu69, targetInst_dosu69);
+        if (!eval_dosu69) break;
+        const mIdx_dosu69 = eval_dosu69.missionIndex;
         const side_dosu69: 'player1Characters' | 'player2Characters' =
           opponent_dosu69 === 'player1' ? 'player1Characters' : 'player2Characters';
-        const charTopCard_dosu69 = charResult_dosu69.character.stack?.length > 0
-          ? charResult_dosu69.character.stack[charResult_dosu69.character.stack?.length - 1]
-          : charResult_dosu69.character.card;
+        const charTopCard_dosu69 = eval_dosu69.topCard;
 
-        
-        const friendlyChars_dosu69 = newState.activeMissions[mIdx_dosu69][side_dosu69];
-        const upgradeTarget_dosu69 = friendlyChars_dosu69.find((c) => {
-          if (c.instanceId === targetInst_dosu69 || c.isHidden) return false;
-          if (c.controlledBy !== c.originalOwner) return false;
-          const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-          if ((charTopCard_dosu69.chakra ?? 0) <= (cTop.chakra ?? 0)) return false;
-          return cTop.name_fr.toUpperCase() === charTopCard_dosu69.name_fr.toUpperCase();
-        });
-
-        
-        let actualCost_dosu69 = revCost_dosu69;
-        if (upgradeTarget_dosu69) {
-          const oldTop_dosu69 = upgradeTarget_dosu69.stack?.length > 0
-            ? upgradeTarget_dosu69.stack[upgradeTarget_dosu69.stack?.length - 1]
-            : upgradeTarget_dosu69.card;
-          const fullEff_dosu69 = calculateEffectiveCost(newState, opponent_dosu69, charTopCard_dosu69, mIdx_dosu69, true);
-          const upgradeDiff = Math.max(0, fullEff_dosu69 - (oldTop_dosu69.chakra ?? 0));
-          actualCost_dosu69 = upgradeDiff + 2;
+        if (eval_dosu69.blockedReason) {
+          newState = EffectEngine.defeatCharacter(newState, targetInst_dosu69, pendingEffect.sourcePlayer);
+          newState = EffectEngine.dosu069LogBlockedReveal(
+            newState, pendingEffect.sourcePlayer, eval_dosu69.blockedReason, charTopCard_dosu69.name_fr, eval_dosu69.revealCost,
+          );
+          break;
         }
 
-        
+        const upgradeTarget_dosu69 = eval_dosu69.upgradeTarget;
+        const actualCost_dosu69 = eval_dosu69.revealCost;
+
         const ps_dosu69 = { ...newState[opponent_dosu69] };
         ps_dosu69.chakra -= actualCost_dosu69;
         newState = { ...newState, [opponent_dosu69]: ps_dosu69 };
@@ -16954,17 +16927,29 @@ export class EffectEngine {
               player === 'player1' ? 'player1Characters' : 'player2Characters';
             const mChars_h002r = newState.activeMissions[charBeforeReveal.missionIndex][friendlySide_h002r];
             const srcControlled_h002r = charBeforeReveal.character.controlledBy !== charBeforeReveal.character.originalOwner;
-            const upgradeIdx_h002r = srcControlled_h002r ? -1 : findUpgradeTargetIdx(mChars_h002r, topCard_h002r, instanceId_h002);
-            if (upgradeIdx_h002r >= 0) {
+            const forcedUpgrade_h002r = findLegalRevealUpgradeTarget(
+              newState, player, charBeforeReveal.missionIndex, charBeforeReveal.character,
+            );
+            const upgradeIdx_h002r = (srcControlled_h002r || forcedUpgrade_h002r)
+              ? -1
+              : findUpgradeTargetIdx(mChars_h002r, topCard_h002r, instanceId_h002);
+            if (forcedUpgrade_h002r) {
+              resultingInstanceId_h002 = forcedUpgrade_h002r.instanceId;
+            } else if (upgradeIdx_h002r >= 0) {
               resultingInstanceId_h002 = mChars_h002r[upgradeIdx_h002r].instanceId;
             }
           }
 
-          
+          const pendingCount_h002r = newState.pendingEffects.length;
           newState = EffectEngine.revealHiddenWithReduction(newState, pendingEffect, instanceId_h002, 1, 0);
 
-          
-          (newState as any)._hiruzen002PlayedCharId = resultingInstanceId_h002;
+          const afterReveal_h002r = EffectEngine.findCharByInstanceId(newState, instanceId_h002);
+          const revealRefused_h002r = !!afterReveal_h002r
+            && afterReveal_h002r.character.isHidden
+            && newState.pendingEffects.length === pendingCount_h002r;
+          if (!revealRefused_h002r) {
+            (newState as any)._hiruzen002PlayedCharId = resultingInstanceId_h002;
+          }
           break;
         }
 
@@ -17279,34 +17264,48 @@ export class EffectEngine {
 
       case 'SS118_REVEAL_DEFEAT': {
         const s118Found = EffectEngine.findCharByInstanceId(newState, targetId);
-        if (!s118Found) break;
+        if (!s118Found || !s118Found.character.isHidden) break;
 
         const s118Top = s118Found.character.stack?.length > 0
           ? s118Found.character.stack[s118Found.character.stack.length - 1]
           : s118Found.character.card;
         const s118Name = s118Top.name_fr ?? s118Top.name_en ?? '';
         const s118Side: 'player1Characters' | 'player2Characters' =
-          pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+          s118Found.player === 'player1' ? 'player1Characters' : 'player2Characters';
 
-        newState.activeMissions = newState.activeMissions.map((mission, index) => {
-          if (index !== s118Found.missionIndex) return mission;
-          return {
-            ...mission,
-            [s118Side]: mission[s118Side].map((c: CharacterInPlay) => (
-              c.instanceId === targetId
-                ? { ...c, isHidden: false, wasRevealedAtLeastOnce: true }
-                : c
-            )),
-          };
-        });
+        const s118RevealBlocked =
+          revealWouldViolateNameUniqueness(newState, s118Found.player, s118Found.missionIndex, s118Found.character) ||
+          findLegalRevealUpgradeTarget(newState, s118Found.player, s118Found.missionIndex, s118Found.character) !== null;
 
-        newState.log = logAction(
-          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-          'EFFECT_REVEAL',
-          `Shikamaru Nara (SS-118) AMBUSH: revealed ${s118Name}.`,
-          'game.log.effect.ss118Reveal',
-          { card: 'SHIKAMARU NARA', id: 'SS-118-CHIBIV', target: s118Name, target_en: s118Top.name_en ?? s118Name },
-        );
+        if (s118RevealBlocked) {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_BLOCKED',
+            `Shikamaru Nara (SS-118) AMBUSH: cannot reveal ${s118Name}, a character with the same name is already on that side of this mission.`,
+            'game.log.effect.duplicateNameReveal',
+            { card: s118Name, card_en: s118Top.name_en ?? s118Name },
+          );
+        } else {
+          newState.activeMissions = newState.activeMissions.map((mission, index) => {
+            if (index !== s118Found.missionIndex) return mission;
+            return {
+              ...mission,
+              [s118Side]: mission[s118Side].map((c: CharacterInPlay) => (
+                c.instanceId === targetId
+                  ? { ...c, isHidden: false, wasRevealedAtLeastOnce: true }
+                  : c
+              )),
+            };
+          });
+
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_REVEAL',
+            `Shikamaru Nara (SS-118) AMBUSH: revealed ${s118Name}.`,
+            'game.log.effect.ss118Reveal',
+            { card: 'SHIKAMARU NARA', id: 'SS-118-CHIBIV', target: s118Name, target_en: s118Top.name_en ?? s118Name },
+          );
+        }
 
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
         newState.log = logAction(
@@ -18316,6 +18315,80 @@ export class EffectEngine {
     return EffectEngine.cascadeControlOnTakeover(newState, targetChar.instanceId, pending.sourcePlayer);
   }
 
+
+  static dosu069EvaluateReveal(
+    state: GameState,
+    opponent: PlayerID,
+    targetInstanceId: string,
+  ): {
+    missionIndex: number;
+    topCard: CharacterCard;
+    upgradeTarget: CharacterInPlay | null;
+    fullRevealCost: number;
+    revealCost: number;
+    blockedReason: 'duplicate' | 'locked' | 'chakra' | null;
+  } | null {
+    const charResult = EffectEngine.findCharByInstanceId(state, targetInstanceId);
+    if (!charResult) return null;
+
+    const missionIndex = charResult.missionIndex;
+    const character = charResult.character;
+    const topCard = character.stack?.length > 0 ? character.stack[character.stack.length - 1] : character.card;
+    const fullRevealCost = calculateEffectiveCost(state, opponent, topCard, missionIndex, true) + 2;
+
+    if (revealWouldViolateNameUniqueness(state, opponent, missionIndex, character)) {
+      return { missionIndex, topCard, upgradeTarget: null, fullRevealCost, revealCost: fullRevealCost, blockedReason: 'duplicate' };
+    }
+
+    const upgradeTarget = findLegalRevealUpgradeTarget(state, opponent, missionIndex, character);
+    let revealCost = fullRevealCost;
+    if (upgradeTarget) {
+      const oldTop = upgradeTarget.stack?.length > 0
+        ? upgradeTarget.stack[upgradeTarget.stack.length - 1]
+        : upgradeTarget.card;
+      revealCost = Math.max(0, (fullRevealCost - 2) - (oldTop.chakra ?? 0)) + 2;
+    }
+
+    if (isHiddenRevealBlocked(state, missionIndex, opponent)) {
+      return { missionIndex, topCard, upgradeTarget, fullRevealCost, revealCost, blockedReason: 'locked' };
+    }
+    if (state[opponent].chakra < revealCost) {
+      return { missionIndex, topCard, upgradeTarget, fullRevealCost, revealCost, blockedReason: 'chakra' };
+    }
+
+    return { missionIndex, topCard, upgradeTarget, fullRevealCost, revealCost, blockedReason: null };
+  }
+
+  static dosu069LogBlockedReveal(
+    state: GameState,
+    dosuPlayer: PlayerID,
+    reason: 'duplicate' | 'locked' | 'chakra',
+    targetName: string,
+    revealCost: number,
+  ): GameState {
+    if (reason === 'duplicate') {
+      return {
+        ...state,
+        log: logAction(state.log, state.turn, state.phase, dosuPlayer,
+          'EFFECT_DEFEAT', `Dosu Kinuta (069): ${targetName} cannot be revealed, a character with that name is already there, defeated instead.`,
+          'game.log.effect.dosu069DuplicateNameDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', target: targetName }),
+      };
+    }
+    if (reason === 'locked') {
+      return {
+        ...state,
+        log: logAction(state.log, state.turn, state.phase, dosuPlayer,
+          'EFFECT_DEFEAT', `Dosu Kinuta (069): Reveal blocked by Shikamaru Nara, ${targetName} defeated.`,
+          'game.log.effect.dosu069LockDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', target: targetName }),
+      };
+    }
+    return {
+      ...state,
+      log: logAction(state.log, state.turn, state.phase, dosuPlayer,
+        'EFFECT_DEFEAT', `Dosu Kinuta (069): Opponent cannot afford to reveal (cost ${revealCost}), character defeated.`,
+        'game.log.effect.dosu069AutoDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', cost: String(revealCost) }),
+    };
+  }
 
   static dosuLookAtHidden(state: GameState, pending: PendingEffect, targetId: string): GameState {
     const charResult = EffectEngine.findCharByInstanceId(state, targetId);
@@ -20468,7 +20541,18 @@ export class EffectEngine {
     const hasNameConflict_h002 = hasSameNameConflict(mission[friendlySide_h002], card);
 
     
-    if (existingIdx < 0 && hasNameConflict_h002) return state;
+    if (existingIdx < 0 && hasNameConflict_h002) {
+      return {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, player,
+          'EFFECT_BLOCKED',
+          `Hiruzen Sarutobi (002): Cannot play ${card.name_fr} on mission ${missionIndex + 1}, same name already present.`,
+          'game.log.effect.nameConflictBlocked',
+          { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card.name_fr },
+        ),
+      };
+    }
 
     
     if (existingIdx >= 0 && !hasNameConflict_h002) {
@@ -22113,24 +22197,22 @@ export class EffectEngine {
     const missionRhr = newState.activeMissions[mIdx];
 
     const isControlledCharRhr = char.controlledBy !== char.originalOwner;
-    if (isControlledCharRhr) {
-      const wouldDuplicateRhr = missionRhr[friendlySideRhr].some((c: CharacterInPlay) => {
-        if (c.isHidden || c.instanceId === instanceId) return false;
-        const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-        return cTop.name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
-      });
-      if (wouldDuplicateRhr) {
-        return {
-          ...state,
-          log: logAction(
-            state.log, state.turn, state.phase, player,
-            'EFFECT_BLOCKED',
-            `Cannot reveal ${topCard.name_fr}: this character is controlled and revealing would create a duplicate on this side.`,
-            'game.log.effect.duplicateNameReveal',
-            { card: topCard.name_fr },
-          ),
-        };
-      }
+    const legalRevealUpgradeRhr = findLegalRevealUpgradeTarget(newState, player, mIdx, char);
+    const forcedUpgradeTargetRhr = noUpgrade ? null : legalRevealUpgradeRhr;
+    if (
+      revealWouldViolateNameUniqueness(newState, player, mIdx, char) ||
+      (noUpgrade && legalRevealUpgradeRhr !== null)
+    ) {
+      return {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, player,
+          'EFFECT_BLOCKED',
+          `Cannot reveal ${topCard.name_fr}: a character with the same name is already on this side of this mission.`,
+          'game.log.effect.duplicateNameReveal',
+          { card: topCard.name_fr },
+        ),
+      };
     }
 
     
@@ -22185,8 +22267,11 @@ export class EffectEngine {
     }
 
     
-    const upgradeTargetIdxRhr = (isControlledCharRhr || noUpgrade) ? -1 : findUpgradeTargetIdx(missionRhr[friendlySideRhr], topCard, instanceId);
-    const upgradeTargetRhr = upgradeTargetIdxRhr >= 0 ? missionRhr[friendlySideRhr][upgradeTargetIdxRhr] : null;
+    const upgradeTargetIdxRhr = (isControlledCharRhr || noUpgrade || forcedUpgradeTargetRhr)
+      ? -1
+      : findUpgradeTargetIdx(missionRhr[friendlySideRhr], topCard, instanceId);
+    const upgradeTargetRhr = forcedUpgradeTargetRhr
+      ?? (upgradeTargetIdxRhr >= 0 ? missionRhr[friendlySideRhr][upgradeTargetIdxRhr] : null);
 
     const effectiveRevealPrice = calculateEffectiveCost(newState, player, topCard, mIdx, true);
 

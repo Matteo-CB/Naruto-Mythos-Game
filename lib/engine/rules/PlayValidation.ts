@@ -2,6 +2,8 @@ import type { GameState, PlayerID, CharacterCard } from '../types';
 import { HIDDEN_PLAY_COST } from '../types';
 import { calculateEffectiveCost } from './ChakraValidation';
 import { calculateCharacterPower } from '../phases/PowerCalculation';
+import { revealUpgradeWouldDuplicateName } from '../../effects/revealNameUniqueness';
+import { flexibleUpgradeRestrictionBlocks, hasFlexibleUpgradeRestriction, isRestrictedUpgradeTarget, FLEXIBLE_UPGRADE_RESTRICTION_REASON_KEY } from './flexibleUpgradeRestriction';
 
 export interface ValidationResult {
   valid: boolean;
@@ -190,6 +192,10 @@ export function validateRevealCharacter(
     return { valid: false, reason: `Cannot upgrade with ${charTopCard.name_fr}: a character you control but don't own cannot be used to upgrade.`, reasonKey: 'game.error.cannotUpgradeWithControlled', reasonParams: { name: charTopCard.name_fr } };
   }
 
+  if (upgradeTarget && revealUpgradeWouldDuplicateName(state, player, missionIndex, char, upgradeTarget)) {
+    return { valid: false, reason: `Cannot reveal ${charTopCard.name_fr}: merging onto that character would leave a second visible ${charTopCard.name_fr} on this side of this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
+  }
+
   let effectiveCost: number;
   if (upgradeTarget) {
     const targetIsControlled = upgradeTarget.controlledBy !== upgradeTarget.originalOwner;
@@ -285,14 +291,8 @@ export function validateUpgradeCharacter(
 
   
   
-  const newCardNumberValidate = typeof newCard.number === 'string' ? parseInt(newCard.number, 10) : newCard.number;
-  if (String(newCard.set ?? 'KS') === 'KS' && (newCardNumberValidate === 51 || newCardNumberValidate === 138) &&
-    (newCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'))) {
-    const isSummon = (topCard.keywords ?? []).includes('Summon');
-    const isOrochimaru = topCard.name_fr.toUpperCase().includes('OROCHIMARU');
-    if (isSummon || isOrochimaru) {
-      return { valid: false, reason: 'Cannot upgrade onto a Summon or Orochimaru.', reasonKey: 'game.error.flexibleUpgradeRestriction' };
-    }
+  if (flexibleUpgradeRestrictionBlocks(newCard, topCard)) {
+    return { valid: false, reason: 'Cannot upgrade onto a Summon or Orochimaru.', reasonKey: FLEXIBLE_UPGRADE_RESTRICTION_REASON_KEY };
   }
 
   
@@ -313,16 +313,8 @@ export function validateUpgradeCharacter(
 
 
 export function isUpgradeNameLegal(newCard: CharacterCard, targetTopCard: CharacterCard): boolean {
-  const numberVal = typeof newCard.number === 'string' ? parseInt(newCard.number, 10) : newCard.number;
-  const isKS = String(newCard.set ?? 'KS') === 'KS';
-  const hasSummonRestriction = isKS && (numberVal === 51 || numberVal === 138)
-    && (newCard.effects ?? []).some(
-      (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'),
-    );
-  if (hasSummonRestriction) {
-    const isSummon = (targetTopCard.keywords ?? []).includes('Summon');
-    const isOrochimaru = targetTopCard.name_fr.toUpperCase().includes('OROCHIMARU');
-    if (isSummon || isOrochimaru) return false;
+  if (hasFlexibleUpgradeRestriction(newCard)) {
+    if (isRestrictedUpgradeTarget(targetTopCard)) return false;
   }
   if (newCard.name_fr.toUpperCase() === targetTopCard.name_fr.toUpperCase()) return true;
   return checkFlexibleUpgrade(newCard, targetTopCard);

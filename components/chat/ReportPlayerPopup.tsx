@@ -68,7 +68,7 @@ export function ReportPlayerPopup({
   return (
     <PopupOverlay>
       <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.4)" maxWidth="480px">
-        <PopupTitle accentColor="#c4a35a" size="md">
+        <PopupTitle accentColor="var(--t-accent)" size="md">
           {done ? t('report.sentTitle') : t('report.title', { player: target.username })}
         </PopupTitle>
 
@@ -83,7 +83,7 @@ export function ReportPlayerPopup({
           </>
         ) : (
           <>
-            <label className="block text-[10px] uppercase font-bold mb-1.5" style={{ color: '#888', letterSpacing: '0.18em' }}>
+            <label className="block text-[10px] uppercase font-bold mb-1.5" style={{ color: 'var(--t-muted)', letterSpacing: '0.18em' }}>
               {t('report.reasonLabel')}
             </label>
             <textarea
@@ -94,56 +94,56 @@ export function ReportPlayerPopup({
               className="w-full mb-1 px-3 py-2 text-[12px] resize-none outline-none"
               style={{
                 backgroundColor: 'rgba(255,255,255,0.03)',
-                border: '1px solid #262626',
-                color: '#e0e0e0',
+                border: '1px solid var(--t-border)',
+                color: 'var(--t-text)',
               }}
             />
             <div className="flex justify-between mb-3">
-              <span className="text-[10px]" style={{ color: reasonTooShort ? '#b33e3e' : '#555' }}>
+              <span className="text-[10px]" style={{ color: reasonTooShort ? 'var(--t-danger)' : 'var(--t-dim)' }}>
                 {reasonTooShort ? t('report.reasonTooShort') : ''}
               </span>
-              <span className="text-[10px] tabular-nums" style={{ color: '#555' }}>
+              <span className="text-[10px] tabular-nums" style={{ color: 'var(--t-dim)' }}>
                 {reason.trim().length}/{REPORT_REASON_MAX}
               </span>
             </div>
 
-            <label className="block text-[10px] uppercase font-bold mb-1.5" style={{ color: '#888', letterSpacing: '0.18em' }}>
+            <label className="block text-[10px] uppercase font-bold mb-1.5" style={{ color: 'var(--t-muted)', letterSpacing: '0.18em' }}>
               {t('report.attachLabel')}
             </label>
             {attached ? (
-              <div className="flex items-start gap-2 mb-4 px-3 py-2" style={{ backgroundColor: 'rgba(196,163,90,0.06)' }}>
+              <div className="flex items-start gap-2 mb-4 px-3 py-2" style={{ backgroundColor: 'var(--t-accent-tint)' }}>
                 <span className="flex-1 text-[11px] leading-snug" style={{ color: '#c8c8c8' }}>
                   {attached.text}
                 </span>
                 <button
                   onClick={() => setAttached(null)}
                   className="text-[10px] uppercase font-bold cursor-pointer shrink-0"
-                  style={{ color: '#666', background: 'none', border: 'none' }}
+                  style={{ color: 'var(--t-dim)', background: 'none', border: 'none' }}
                 >
                   X
                 </button>
               </div>
             ) : selectable.length > 0 ? (
-              <div className="mb-4 max-h-28 overflow-y-auto" style={{ border: '1px solid #1e1e1e' }}>
+              <div className="mb-4 max-h-28 overflow-y-auto" style={{ border: '1px solid var(--t-surface-2)' }}>
                 {selectable.map((m, i) => (
                   <button
                     key={`${m.at}-${i}`}
                     onClick={() => setAttached(m)}
                     className="block w-full text-left px-3 py-1.5 text-[11px] cursor-pointer"
-                    style={{ color: '#999', background: 'none', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+                    style={{ color: 'var(--t-muted)', background: 'none', border: 'none', borderBottom: '1px solid var(--t-divider)' }}
                   >
                     {m.text}
                   </button>
                 ))}
               </div>
             ) : (
-              <p className="text-[11px] mb-4" style={{ color: '#555' }}>
+              <p className="text-[11px] mb-4" style={{ color: 'var(--t-dim)' }}>
                 {t('report.attachNone')}
               </p>
             )}
 
             {errorKey && (
-              <p className="text-center text-[11px] mb-3" style={{ color: '#b33e3e' }}>
+              <p className="text-center text-[11px] mb-3" style={{ color: 'var(--t-danger)' }}>
                 {t(errorKey)}
               </p>
             )}

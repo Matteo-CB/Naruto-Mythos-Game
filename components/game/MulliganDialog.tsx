@@ -13,6 +13,7 @@ import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/u
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import { playSound } from '@/lib/sound/SoundManager';
 import { useGameScale } from './GameScaleContext';
+import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from '@/components/icons/GameIcons';
 import {
   PopupOverlay,
   PopupCornerFrame,
@@ -24,6 +25,7 @@ import {
   PanelFrame,
 } from './PopupPrimitives';
 import { useBoardPalette } from './BoardPaletteContext';
+import { RarityIcon } from '@/components/icons/RarityIcon';
 
 const effectTypeColors: Record<string, string> = {
   MAIN: '#c4a35a',
@@ -118,21 +120,24 @@ function MulliganCard({
           {getCardName(card, locale as 'en' | 'fr')}
         </span>
         <span
-          className="text-[11px] font-bold tabular-nums"
+          className="text-[11px] font-bold tabular-nums inline-flex items-center gap-0.5"
           style={{ color: '#c4a35a' }}
         >
+          <PowerIcon size={10} color={POWER_COLOR} />
           {manualPowerMode ? <ManualGuess actual={card.power} color="#c4a35a" /> : card.power}
         </span>
       </div>
 
       <div
-        className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[10px] font-bold"
+        className="absolute top-1 left-1 h-5 px-1 flex items-center justify-center gap-0.5 text-[10px] font-bold"
         style={{
           backgroundColor: 'rgba(12, 12, 18, 0.9)',
           color: '#c4a35a',
           border: '1px solid rgba(196, 163, 90, 0.5)',
+          minWidth: '20px',
         }}
       >
+        <ChakraIcon size={10} color={CHAKRA_COLOR} />
         {manualPowerMode ? <ManualGuess actual={card.chakra} color="#c4a35a" /> : card.chakra}
       </div>
 
@@ -143,7 +148,10 @@ function MulliganCard({
           color: '#888888',
         }}
       >
-        {card.rarity}
+        <span className="inline-flex items-center gap-1">
+          <RarityIcon rarity={card.rarity} size={11} />
+          {card.rarity}
+        </span>
       </div>
     </motion.div>
   );
@@ -201,7 +209,8 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
               <span className="font-body text-[10px] uppercase tracking-wider" style={{ color: '#888888' }}>
                 {t('collection.details.cost')}
               </span>
-              <span className="text-base font-bold" style={{ color: '#c4a35a' }}>
+              <span className="text-base font-bold inline-flex items-center gap-1" style={{ color: '#c4a35a' }}>
+                <ChakraIcon size={14} color={CHAKRA_COLOR} />
                 {card.chakra}
               </span>
             </div>
@@ -210,7 +219,8 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
               <span className="font-body text-[10px] uppercase tracking-wider" style={{ color: '#888888' }}>
                 {t('collection.details.power')}
               </span>
-              <span className="text-base font-bold" style={{ color: '#e0e0e0' }}>
+              <span className="text-base font-bold inline-flex items-center gap-1" style={{ color: '#e0e0e0' }}>
+                <PowerIcon size={14} color={POWER_COLOR} />
                 {card.power}
               </span>
             </div>

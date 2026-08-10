@@ -36,8 +36,8 @@ export function DeckPublicToggle({ deckId, initialPublic }: { deckId: string; in
       disabled={busy}
       className="font-display text-[9px] uppercase tracking-widest px-2 py-1"
       style={{
-        backgroundColor: isPublic ? 'rgba(196,163,90,0.15)' : 'rgba(136,136,136,0.08)',
-        color: isPublic ? '#c4a35a' : '#666',
+        backgroundColor: isPublic ? 'var(--t-accent-glow)' : 'rgba(136,136,136,0.08)',
+        color: isPublic ? 'var(--t-accent)' : 'var(--t-dim)',
         opacity: busy ? 0.5 : 1,
         cursor: busy ? 'default' : 'pointer',
       }}

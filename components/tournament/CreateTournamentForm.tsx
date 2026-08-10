@@ -11,7 +11,9 @@ import { getCardById } from '@/lib/data/cardIndex';
 import { getAllCards } from '@/lib/data/cardLoader';
 import { facetOptions } from '@/lib/collection/facets';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
+import { ChakraIcon, CHAKRA_COLOR } from '@/components/icons/GameIcons';
 import Image from 'next/image';
+import { RarityIcon } from '@/components/icons/RarityIcon';
 
 interface Props {
   isAdmin: boolean;
@@ -20,6 +22,18 @@ interface Props {
 
 const GROUP_ORDER = ['Leaf Village', 'Sand Village', 'Sound Village', 'Akatsuki', 'Independent'];
 const RARITY_ORDER = ['C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L', 'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV', 'SHINOBI', 'SHINOBIV'];
+
+const ALLOW_CHIP = (selected: boolean): React.CSSProperties => ({
+  backgroundColor: selected ? 'var(--t-accent-tint)' : 'var(--t-surface-2)',
+  color: selected ? 'var(--t-success)' : 'var(--t-dim)',
+  border: `1px solid ${selected ? 'var(--t-success)' : 'var(--t-border-strong)'}`,
+});
+
+const BAN_CHIP = (selected: boolean): React.CSSProperties => ({
+  backgroundColor: selected ? 'var(--t-accent-tint)' : 'var(--t-surface-2)',
+  color: selected ? 'var(--t-danger)' : 'var(--t-dim)',
+  border: `1px solid ${selected ? 'var(--t-danger)' : 'var(--t-border-strong)'}`,
+});
 
 export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props) {
   const t = useTranslations('tournament');
@@ -139,19 +153,19 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
     }
   };
 
-  const inputStyle = { backgroundColor: '#0a0a0a', border: '1px solid #333', color: '#e0e0e0', padding: '8px 12px', fontSize: '13px', width: '100%' };
-  const labelStyle = { color: '#888', fontSize: '11px', textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '4px' };
+  const inputStyle = { backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border-strong)', color: 'var(--t-text)', padding: '8px 12px', fontSize: '13px', width: '100%' };
+  const labelStyle = { color: 'var(--t-muted)', fontSize: '11px', textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '4px' };
 
   const ToggleBtn = ({ val, cur, onClick, children }: { val: string; cur: string; onClick: () => void; children: React.ReactNode }) => (
     <button type="button" onClick={onClick} className="px-3 py-1.5 text-xs uppercase tracking-wider font-medium cursor-pointer"
-      style={{ backgroundColor: cur === val ? '#c4a35a' : '#1a1a1a', color: cur === val ? '#0a0a0a' : '#888', border: `1px solid ${cur === val ? '#c4a35a' : '#333'}` }}>
+      style={{ backgroundColor: cur === val ? 'var(--t-accent)' : 'var(--t-surface-2)', color: cur === val ? 'var(--t-bg)' : 'var(--t-muted)', border: `1px solid ${cur === val ? 'var(--t-accent)' : 'var(--t-border-strong)'}` }}>
       {children}
     </button>
   );
 
   return (
-    <div className="flex flex-col gap-4 p-5" style={{ backgroundColor: '#111', border: '1px solid #262626' }}>
-      <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#c4a35a' }}>{t('create')}</h2>
+    <div className="flex flex-col gap-4 p-5" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' }}>
+      <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--t-accent)' }}>{t('create')}</h2>
 
       <div className="flex flex-col gap-1">
         <label style={labelStyle}>{t('name')}</label>
@@ -176,7 +190,7 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
           <ToggleBtn val="evolving" cur={gameMode} onClick={() => setGameMode('evolving')}>{t('modeEvolving')}</ToggleBtn>
         </div>
         {gameMode === 'evolving' && (
-          <p className="text-[10px] mt-1" style={{ color: '#888' }}>
+          <p className="text-[10px] mt-1" style={{ color: 'var(--t-muted)' }}>
             {t('modeEvolvingHint')}
           </p>
         )}
@@ -184,7 +198,7 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
 
       <div className="flex flex-col gap-2">
         <label style={labelStyle}>{t('prizeLabel')}</label>
-        <p className="text-[10px]" style={{ color: '#555' }}>{t('prizeHint')}</p>
+        <p className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{t('prizeHint')}</p>
         <div className="flex flex-wrap gap-3">
           <button
             type="button"
@@ -192,10 +206,10 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
             className="cursor-pointer flex flex-col items-center justify-center"
             style={{
               width: 110, minHeight: 160,
-              backgroundColor: '#0a0a0a',
-              border: `1px solid ${prizeCardId === '' ? '#c4a35a' : '#333'}`,
-              boxShadow: prizeCardId === '' ? '0 0 18px #c4a35a66' : 'none',
-              color: prizeCardId === '' ? '#c4a35a' : '#888',
+              backgroundColor: 'var(--t-bg)',
+              border: `1px solid ${prizeCardId === '' ? 'var(--t-accent)' : 'var(--t-border-strong)'}`,
+              boxShadow: prizeCardId === '' ? '0 0 18px var(--t-accent-glow)' : 'none',
+              color: prizeCardId === '' ? 'var(--t-accent)' : 'var(--t-muted)',
               fontSize: 11,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
@@ -218,9 +232,9 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
                 className="cursor-pointer flex flex-col"
                 style={{
                   width: 110,
-                  border: `1px solid ${selected ? '#c4a35a' : '#333'}`,
-                  boxShadow: selected ? '0 0 18px #c4a35a66' : 'none',
-                  backgroundColor: '#0a0a0a',
+                  border: `1px solid ${selected ? 'var(--t-accent)' : 'var(--t-border-strong)'}`,
+                  boxShadow: selected ? '0 0 18px var(--t-accent-glow)' : 'none',
+                  backgroundColor: 'var(--t-bg)',
                 }}
                 title={displayLabel}
               >
@@ -233,9 +247,9 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
                     style={{ objectFit: 'cover' }}
                   />
                 </div>
-                <div className="px-2 py-1.5 text-[10px] tracking-wide" style={{ color: selected ? '#c4a35a' : '#bbb' }}>
+                <div className="px-2 py-1.5 text-[10px] tracking-wide" style={{ color: selected ? 'var(--t-accent)' : 'var(--t-text)' }}>
                   <div className="truncate">{card ? getCardName(card, locale as 'en' | 'fr') : cardId}</div>
-                  <div className="text-[9px]" style={{ color: '#666' }}>{number} MV</div>
+                  <div className="text-[9px]" style={{ color: 'var(--t-dim)' }}>{number} MV</div>
                 </div>
               </button>
             );
@@ -270,9 +284,9 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
                     disabled={!available}
                     className="px-3 py-1.5 text-xs uppercase tracking-wider font-medium cursor-pointer disabled:cursor-not-allowed"
                     style={{
-                      backgroundColor: cur === sid ? '#c4a35a' : '#1a1a1a',
-                      color: !available ? '#444' : cur === sid ? '#0a0a0a' : '#888',
-                      border: '1px solid ' + (cur === sid ? '#c4a35a' : '#333'),
+                      backgroundColor: cur === sid ? 'var(--t-accent)' : 'var(--t-surface-2)',
+                      color: !available ? 'var(--t-dim)' : cur === sid ? 'var(--t-bg)' : 'var(--t-muted)',
+                      border: '1px solid ' + (cur === sid ? 'var(--t-accent)' : 'var(--t-border-strong)'),
                       opacity: available ? 1 : 0.6,
                     }}
                     title={!available ? tRoot('common.comingSoon') : undefined}
@@ -288,17 +302,17 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
       )}
 
       {gameMode === 'restricted' && (
-        <div className="flex flex-col gap-3 p-4" style={{ backgroundColor: '#0d0d0d', border: '1px solid #333', }}>
-          <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#c4a35a' }}>{t('restrictedSettings')}</h3>
+        <div className="flex flex-col gap-3 p-4" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border-strong)', }}>
+          <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--t-accent)' }}>{t('restrictedSettings')}</h3>
 
           <div className="flex flex-col gap-1">
             <label style={labelStyle}>{t('allowedGroups')}</label>
-            <p className="text-[10px]" style={{ color: '#555' }}>{t('allowedGroupsHint')}</p>
+            <p className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{t('allowedGroupsHint')}</p>
             <div className="flex flex-wrap gap-1.5">
               {ALL_GROUPS.map(g => {
                 const sel = allowedGroups.includes(g);
                 return <button key={g} type="button" onClick={() => setAllowedGroups(prev => sel ? prev.filter(x => x !== g) : [...prev, g])}
-                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#1a3a1a' : '#1a1a1a', color: sel ? '#4ade80' : '#666', border: `1px solid ${sel ? '#4ade80' : '#333'}` }}>{getCardGroup(g, tCardMeta)}</button>;
+                  className="px-2 py-1 text-[10px] cursor-pointer" style={ALLOW_CHIP(sel)}>{getCardGroup(g, tCardMeta)}</button>;
               })}
             </div>
           </div>
@@ -309,19 +323,19 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
               {ALL_GROUPS.map(g => {
                 const sel = bannedGroups.includes(g);
                 return <button key={g} type="button" onClick={() => setBannedGroups(prev => sel ? prev.filter(x => x !== g) : [...prev, g])}
-                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#3a1a1a' : '#1a1a1a', color: sel ? '#f87171' : '#666', border: `1px solid ${sel ? '#f87171' : '#333'}` }}>{getCardGroup(g, tCardMeta)}</button>;
+                  className="px-2 py-1 text-[10px] cursor-pointer" style={BAN_CHIP(sel)}>{getCardGroup(g, tCardMeta)}</button>;
               })}
             </div>
           </div>
 
           <div className="flex flex-col gap-1">
             <label style={labelStyle}>{t('allowedKeywords')}</label>
-            <p className="text-[10px]" style={{ color: '#555' }}>{t('allowedKeywordsHint')}</p>
+            <p className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{t('allowedKeywordsHint')}</p>
             <div className="flex flex-wrap gap-1.5">
               {ALL_KEYWORDS.map(kw => {
                 const sel = allowedKeywords.includes(kw);
                 return <button key={kw} type="button" onClick={() => setAllowedKeywords(prev => sel ? prev.filter(x => x !== kw) : [...prev, kw])}
-                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#1a3a1a' : '#1a1a1a', color: sel ? '#4ade80' : '#666', border: `1px solid ${sel ? '#4ade80' : '#333'}` }}>{getCardKeyword(kw, tCardMeta)}</button>;
+                  className="px-2 py-1 text-[10px] cursor-pointer" style={ALLOW_CHIP(sel)}>{getCardKeyword(kw, tCardMeta)}</button>;
               })}
             </div>
           </div>
@@ -332,19 +346,19 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
               {ALL_KEYWORDS.map(kw => {
                 const sel = bannedKeywords.includes(kw);
                 return <button key={kw} type="button" onClick={() => setBannedKeywords(prev => sel ? prev.filter(x => x !== kw) : [...prev, kw])}
-                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#3a1a1a' : '#1a1a1a', color: sel ? '#f87171' : '#666', border: `1px solid ${sel ? '#f87171' : '#333'}` }}>{getCardKeyword(kw, tCardMeta)}</button>;
+                  className="px-2 py-1 text-[10px] cursor-pointer" style={BAN_CHIP(sel)}>{getCardKeyword(kw, tCardMeta)}</button>;
               })}
             </div>
           </div>
 
           <div className="flex flex-col gap-1">
             <label style={labelStyle}>{t('allowedRarities')}</label>
-            <p className="text-[10px]" style={{ color: '#555' }}>{t('allowedRaritiesHint')}</p>
+            <p className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{t('allowedRaritiesHint')}</p>
             <div className="flex flex-wrap gap-1.5">
               {ALL_RARITIES.map(r => {
                 const sel = allowedRarities.includes(r);
                 return <button key={r} type="button" onClick={() => setAllowedRarities(prev => sel ? prev.filter(x => x !== r) : [...prev, r])}
-                  className="px-2 py-1 text-[10px] font-bold cursor-pointer" style={{ backgroundColor: sel ? '#1a3a1a' : '#1a1a1a', color: sel ? '#4ade80' : '#666', border: `1px solid ${sel ? '#4ade80' : '#333'}` }}>{getRarityLabel(r, tCardMeta)}</button>;
+                  className="px-2 py-1 text-[10px] font-bold cursor-pointer" style={ALLOW_CHIP(sel)}><span className="inline-flex items-center gap-1"><RarityIcon rarity={r} size={12} />{getRarityLabel(r, tCardMeta)}</span></button>;
               })}
             </div>
           </div>
@@ -355,21 +369,21 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
               {ALL_RARITIES.map(r => {
                 const sel = bannedRarities.includes(r);
                 return <button key={r} type="button" onClick={() => setBannedRarities(prev => sel ? prev.filter(x => x !== r) : [...prev, r])}
-                  className="px-2 py-1 text-[10px] font-bold cursor-pointer" style={{ backgroundColor: sel ? '#3a1a1a' : '#1a1a1a', color: sel ? '#f87171' : '#666', border: `1px solid ${sel ? '#f87171' : '#333'}` }}>{getRarityLabel(r, tCardMeta)}</button>;
+                  className="px-2 py-1 text-[10px] font-bold cursor-pointer" style={BAN_CHIP(sel)}><span className="inline-flex items-center gap-1"><RarityIcon rarity={r} size={12} />{getRarityLabel(r, tCardMeta)}</span></button>;
               })}
             </div>
           </div>
 
           <div className="flex flex-col gap-1">
             <label style={labelStyle}>{t('maxPerRarity')}</label>
-            <p className="text-[10px]" style={{ color: '#555' }}>{t('maxPerRarityHint')}</p>
+            <p className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{t('maxPerRarityHint')}</p>
             <div className="flex flex-wrap gap-2">
               {ALL_RARITIES.map(r => (
                 <div key={r} className="flex items-center gap-1">
-                  <span className="text-[10px] font-bold" style={{ color: '#888' }}>{getRarityLabel(r, tCardMeta)}:</span>
+                  <span className="text-[10px] font-bold" style={{ color: 'var(--t-muted)' }}>{getRarityLabel(r, tCardMeta)}:</span>
                   <input type="number" min="0" max="30" value={maxPerRarity[r] ?? ''} placeholder="-"
                     onChange={(e) => setMaxPerRarity(prev => ({ ...prev, [r]: e.target.value }))}
-                    className="w-10 text-center text-[10px]" style={{ backgroundColor: '#0a0a0a', border: '1px solid #333', color: '#e0e0e0', padding: '2px' }} />
+                    className="w-10 text-center text-[10px]" style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border-strong)', color: 'var(--t-text)', padding: '2px' }} />
                 </div>
               ))}
             </div>
@@ -382,7 +396,10 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
                 placeholder="2" style={{ ...inputStyle, padding: '4px 8px' }} />
             </div>
             <div className="flex flex-col gap-1">
-              <label style={labelStyle}>{t('maxChakraCostLabel')}</label>
+              <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <ChakraIcon size={13} color={CHAKRA_COLOR} />
+                {t('maxChakraCostLabel')}
+              </label>
               <input type="number" min="1" max="10" value={maxChakraCost} onChange={(e) => setMaxChakraCost(e.target.value)}
                 placeholder="-" style={{ ...inputStyle, padding: '4px 8px' }} />
             </div>
@@ -440,28 +457,28 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
         <span style={labelStyle}>{t('useBanList')}</span>
         <button type="button" role="switch" aria-checked={useBanList} onClick={() => setUseBanList(!useBanList)}
           className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden cursor-pointer"
-          style={{ backgroundColor: useBanList ? '#c4a35a' : '#333' }}>
+          style={{ backgroundColor: useBanList ? 'var(--t-accent)' : 'var(--t-border-strong)' }}>
           <span className="absolute top-0.5 h-5 w-5 rounded-full"
-            style={{ backgroundColor: '#0a0a0a', left: useBanList ? '22px' : '2px', transition: 'left 150ms ease' }} />
+            style={{ backgroundColor: 'var(--t-bg)', left: useBanList ? '22px' : '2px', transition: 'left 150ms ease' }} />
         </button>
       </div>
 
       <div className="flex items-center justify-between">
         <div className="flex flex-col">
           <span style={labelStyle}>{t('bestOfThree')}</span>
-          <span className="text-xs" style={{ color: '#666' }}>{t('bestOfThreeHint')}</span>
+          <span className="text-xs" style={{ color: 'var(--t-dim)' }}>{t('bestOfThreeHint')}</span>
         </div>
         <button type="button" role="switch" aria-checked={bestOfThree} onClick={() => setBestOfThree(!bestOfThree)}
           className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden cursor-pointer"
-          style={{ backgroundColor: bestOfThree ? '#c4a35a' : '#333' }}>
+          style={{ backgroundColor: bestOfThree ? 'var(--t-accent)' : 'var(--t-border-strong)' }}>
           <span className="absolute top-0.5 h-5 w-5 rounded-full"
-            style={{ backgroundColor: '#0a0a0a', left: bestOfThree ? '22px' : '2px', transition: 'left 150ms ease' }} />
+            style={{ backgroundColor: 'var(--t-bg)', left: bestOfThree ? '22px' : '2px', transition: 'left 150ms ease' }} />
         </button>
       </div>
 
       <div className="flex flex-col gap-1.5">
         <label style={labelStyle}>{t('allowedLeagues')}</label>
-        <p className="text-xs" style={{ color: '#666' }}>{t('allowedLeaguesHint')}</p>
+        <p className="text-xs" style={{ color: 'var(--t-dim)' }}>{t('allowedLeaguesHint')}</p>
         <div className="flex flex-wrap gap-2">
           {RANK_TIERS.map(tier => {
             const isSelected = allowedLeagues.includes(tier.key);
@@ -478,9 +495,9 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
                 }}
                 className="px-2.5 py-1 text-xs font-medium uppercase tracking-wider cursor-pointer"
                 style={{
-                  backgroundColor: isSelected ? tier.bgColor : '#1a1a1a',
-                  color: isSelected ? tier.color : '#666',
-                  border: `1px solid ${isSelected ? tier.borderColor : '#333'}`,
+                  backgroundColor: isSelected ? tier.bgColor : 'var(--t-surface-2)',
+                  color: isSelected ? tier.color : 'var(--t-dim)',
+                  border: `1px solid ${isSelected ? tier.borderColor : 'var(--t-border-strong)'}`,
                   boxShadow: isSelected ? `0 0 8px ${tier.glowColor}` : 'none',
                 }}
               >
@@ -493,7 +510,7 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
 
       <div className="flex flex-col gap-1">
         <label style={labelStyle}>{t('scheduledStart')}</label>
-        <p className="text-xs" style={{ color: '#666' }}>{t('scheduledStartHint')}</p>
+        <p className="text-xs" style={{ color: 'var(--t-dim)' }}>{t('scheduledStartHint')}</p>
         <div className="flex gap-2">
           <input type="date" value={scheduledDate} onChange={(e) => setScheduledDate(e.target.value)}
             style={{ ...inputStyle, width: 'auto', flex: 1 }} />
@@ -502,11 +519,11 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
         </div>
       </div>
 
-      {error && <p className="text-xs" style={{ color: '#cc4444' }}>{error}</p>}
+      {error && <p className="text-xs" style={{ color: 'var(--t-danger)' }}>{error}</p>}
 
       <button type="button" disabled={submitting || !name.trim()} onClick={handleSubmit}
         className="py-2.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
-        style={{ backgroundColor: name.trim() ? '#c4a35a' : '#333', color: name.trim() ? '#0a0a0a' : '#666' }}>
+        style={{ backgroundColor: name.trim() ? 'var(--t-accent)' : 'var(--t-border-strong)', color: name.trim() ? 'var(--t-bg)' : 'var(--t-dim)' }}>
         {submitting ? '...' : t('create')}
       </button>
     </div>

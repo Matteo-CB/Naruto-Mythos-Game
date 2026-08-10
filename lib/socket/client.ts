@@ -206,6 +206,7 @@ interface SocketStore {
   error: string | null;
   errorKey: string | null;
   errorParams: Record<string, string | number> | null;
+  spectateErrorKey: string | null;
   bannedCardsError: Array<{ cardId: string; reason: string | null }> | null;
   opponentJoined: boolean;
   gameStarted: boolean;
@@ -351,6 +352,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   error: null,
   errorKey: null,
   errorParams: null,
+  spectateErrorKey: null,
   bannedCardsError: null,
   opponentJoined: false,
   gameStarted: false,
@@ -1071,6 +1073,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           visibleState: unpackVisibleState(data.visibleState),
           playerNames: data.playerNames,
           spectatorCount: data.spectatorCount,
+          spectateErrorKey: null,
           isSpectating: true,
           gameStarted: true,
           currentRoomIsEvolving: data.isEvolving === true,
@@ -1087,7 +1090,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       });
 
       socket.on('spectate:error', (data: { message: string; errorKey?: string }) => {
-        set({ error: data.message, errorKey: data.errorKey ?? null });
+        set({ error: data.message, errorKey: data.errorKey ?? null, spectateErrorKey: data.errorKey ?? 'spectate.errorNotFound' });
       });
 
       
@@ -1380,7 +1383,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  clearError: () => set({ error: null, errorKey: null, errorParams: null, bannedCardsError: null }),
+  clearError: () => set({ error: null, errorKey: null, errorParams: null, bannedCardsError: null, spectateErrorKey: null }),
 
   forfeit: (reason: 'abandon' | 'timeout') => {
     const { socket, connected, roomCode, userId } = get();
@@ -1401,7 +1404,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
     console.log(`[Socket] Joining spectate for room ${roomCode}`);
     socket.emit('spectate:join', { roomCode, userId, username });
-    set({ spectatingRoomCode: roomCode, isSpectating: true, chatMessages: [], unreadChatCount: 0, chatLockState: null, chatOpponent: null, chatFriendStatus: null, chatFriendshipId: null });
+    set({ spectateErrorKey: null, spectatingRoomCode: roomCode, isSpectating: true, chatMessages: [], unreadChatCount: 0, chatLockState: null, chatOpponent: null, chatFriendStatus: null, chatFriendshipId: null });
   },
 
   requestSpectateState: () => {
@@ -1417,6 +1420,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.emit('spectate:leave');
     }
     set({
+      spectateErrorKey: null,
       isSpectating: false, spectatingRoomCode: null, spectatorCount: 0,
       visibleState: null, playerNames: null, gameStarted: false,
       chessClock: null,

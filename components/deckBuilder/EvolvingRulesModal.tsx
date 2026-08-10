@@ -24,11 +24,11 @@ interface Props {
   onClose: () => void;
 }
 
-const GOLD = '#c4a35a';
-const PANEL_BG = '#111111';
-const BORDER = '#262626';
-const TEXT_LIGHT = '#e0e0e0';
-const TEXT_DIM = '#888888';
+const GOLD = 'var(--t-accent)';
+const PANEL_BG = 'var(--t-panel)';
+const BORDER = 'var(--t-border)';
+const TEXT_LIGHT = 'var(--t-text)';
+const TEXT_DIM = 'var(--t-muted)';
 
 export function EvolvingRulesModal({ open, onClose }: Props) {
   const t = useTranslations('evolving.rules');
@@ -193,7 +193,7 @@ export function EvolvingRulesModal({ open, onClose }: Props) {
                 className="w-full px-4 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider transition-all"
                 style={{
                   backgroundColor: GOLD,
-                  color: '#0a0a0a',
+                  color: 'var(--t-bg)',
                   border: 'none',
                   cursor: 'pointer',
                 }}

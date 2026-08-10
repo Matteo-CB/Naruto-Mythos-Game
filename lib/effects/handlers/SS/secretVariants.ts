@@ -6,6 +6,7 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
 import { isImmuneToEnemyHideOrDefeat } from '@/lib/effects/ContinuousEffects';
 import { enemyOf, sideKey, topOf } from './sandMove';
 import { confirmFirst } from './confirmFirst';
+import { moveWouldViolateNameUniqueness, sideFor } from '@/lib/effects/moveNameUniqueness';
 
 export const SASUKE_148_ID = 'SS-148-SV';
 export const ZABUZA_150_ID = 'SS-150-SV';
@@ -82,13 +83,13 @@ function sasuke148Duel(ctx: EffectContext): EffectResult {
   };
 }
 
-export function strongestEnemyIn(
+export function strongestEnemiesIn(
   state: GameState,
   player: PlayerID,
   missionIndex?: number,
-): CharacterInPlay | null {
+): CharacterInPlay[] {
   const enemySide = sideKey(enemyOf(player));
-  let best: CharacterInPlay | null = null;
+  let best: CharacterInPlay[] = [];
   let bestPower = -1;
   state.activeMissions.forEach((mission, index) => {
     if (missionIndex !== undefined && index !== missionIndex) return;
@@ -97,32 +98,50 @@ export function strongestEnemyIn(
       const power = getEffectivePower(state, char, char.controlledBy);
       if (power > bestPower) {
         bestPower = power;
-        best = char;
+        best = [char];
+      } else if (power === bestPower) {
+        best.push(char);
       }
     }
   });
   return best;
 }
 
+export function strongestEnemyIn(
+  state: GameState,
+  player: PlayerID,
+  missionIndex?: number,
+): CharacterInPlay | null {
+  return strongestEnemiesIn(state, player, missionIndex)[0] ?? null;
+}
+
 function zabuza150Duel(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex, sourceCard } = ctx;
-  const strongest = strongestEnemyIn(state, sourcePlayer);
-  if (!strongest) {
+  const strongest = strongestEnemiesIn(state, sourcePlayer);
+  if (strongest.length === 0) {
     return noTarget(state, sourcePlayer,
       'Zabuza Momochi (SS-150) DUEL: No enemy character in play.', 'ZABUZA MOMOCHI', ZABUZA_150_ID);
   }
-  const alreadyHere = state.activeMissions[sourceMissionIndex]?.[sideKey(enemyOf(sourcePlayer))]
-    .some((c) => c.instanceId === (strongest as CharacterInPlay).instanceId);
-  if (alreadyHere) {
+
+  const enemySide = sideFor(enemyOf(sourcePlayer));
+  const movable = strongest.filter((char) => {
+    const here = state.activeMissions[sourceMissionIndex]?.[enemySide]
+      .some((c) => c.instanceId === char.instanceId);
+    if (here) return false;
+    return !moveWouldViolateNameUniqueness(state, char, sourceMissionIndex, enemySide);
+  });
+
+  if (movable.length === 0) {
     return noTarget(state, sourcePlayer,
-      'Zabuza Momochi (SS-150) DUEL: The strongest enemy is already in this mission.',
+      'Zabuza Momochi (SS-150) DUEL: The strongest enemy cannot be moved here.',
       'ZABUZA MOMOCHI', ZABUZA_150_ID);
   }
+
   return confirmFirst({
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'SS150_PULL_STRONGEST',
-    validTargets: [(strongest as CharacterInPlay).instanceId],
+    validTargets: movable.map((c) => c.instanceId),
     isOptional: true,
     description: 'Zabuza Momochi (SS-150) DUEL: Move the strongest enemy character here.',
     descriptionKey: 'game.effect.desc.ss150PullStrongest',

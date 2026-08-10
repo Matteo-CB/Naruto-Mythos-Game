@@ -40,11 +40,11 @@ interface EloHistoryData {
   points: EloPoint[];
 }
 
-const GOLD = '#c4a35a';
+const GOLD = 'var(--t-accent)';
 const GREEN = '#4a9e4a';
-const RED = '#b33e3e';
-const GREY = '#888888';
-const DARK = '#0a0a0a';
+const RED = 'var(--t-danger)';
+const GREY = 'var(--t-muted)';
+const DARK = 'var(--t-bg)';
 
 interface Props {
   username: string;
@@ -130,8 +130,8 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
   if (loading) {
     return (
       <div className={compact ? 'py-4' : 'rounded-lg p-5 border'}
-        style={compact ? {} : { backgroundColor: '#111', borderColor: '#1e1e1e' }}>
-        <p className="text-xs" style={{ color: '#666' }}>{t('loading')}</p>
+        style={compact ? {} : { backgroundColor: 'var(--t-panel)', borderColor: 'var(--t-surface-2)' }}>
+        <p className="text-xs" style={{ color: 'var(--t-dim)' }}>{t('loading')}</p>
       </div>
     );
   }
@@ -139,7 +139,7 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
   if (error) {
     return (
       <div className={compact ? 'py-4' : 'rounded-lg p-5 border'}
-        style={compact ? {} : { backgroundColor: '#111', borderColor: '#1e1e1e' }}>
+        style={compact ? {} : { backgroundColor: 'var(--t-panel)', borderColor: 'var(--t-surface-2)' }}>
         <p className="text-xs" style={{ color: RED }}>{t('errorPrefix')}: {error}</p>
       </div>
     );
@@ -148,8 +148,8 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
   if (!data || data.points.length === 0) {
     return (
       <div className={compact ? 'py-4' : 'rounded-lg p-5 border'}
-        style={compact ? {} : { backgroundColor: '#111', borderColor: '#1e1e1e' }}>
-        <p className="text-xs text-center py-6" style={{ color: '#555' }}>
+        style={compact ? {} : { backgroundColor: 'var(--t-panel)', borderColor: 'var(--t-surface-2)' }}>
+        <p className="text-xs text-center py-6" style={{ color: 'var(--t-dim)' }}>
           {t('emptyWindow', { days: data?.windowDays ?? 14 })}
         </p>
       </div>
@@ -160,14 +160,14 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
 
   return (
     <div className={compact ? '' : 'rounded-lg p-5 border'}
-      style={compact ? {} : { backgroundColor: '#111', borderColor: '#1e1e1e' }}>
+      style={compact ? {} : { backgroundColor: 'var(--t-panel)', borderColor: 'var(--t-surface-2)' }}>
 
       {!compact && (
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xs font-bold uppercase tracking-widest" style={{ color: GOLD }}>
             {t('title')}
           </h2>
-          <span className="text-[10px] uppercase tracking-wider" style={{ color: '#555' }}>
+          <span className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--t-dim)' }}>
             {t('windowLabel', { days: data.windowDays })}
           </span>
         </div>
@@ -185,7 +185,7 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
       </div>
 
       {chart && (
-        <div className="relative mb-5" style={{ backgroundColor: DARK, border: `1px solid #1e1e1e`, padding: '8px' }}>
+        <div className="relative mb-5" style={{ backgroundColor: DARK, border: `1px solid var(--t-surface-2)`, padding: '8px' }}>
           <svg
             viewBox={`0 0 ${chart.W} ${chart.H}`}
             className="w-full"
@@ -198,11 +198,11 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
                 <line
                   x1={chart.padL} x2={chart.W - chart.padR}
                   y1={tk.y} y2={tk.y}
-                  stroke="#1a1a1a" strokeWidth={1}
+                  stroke="var(--t-surface-2)" strokeWidth={1}
                 />
                 <text
                   x={chart.padL - 6} y={tk.y + 3}
-                  fontSize={9} fill="#444"
+                  fontSize={9} fill="var(--t-border-strong)"
                   textAnchor="end"
                   fontFamily="ui-monospace, monospace"
                 >
@@ -243,14 +243,14 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
 
             <text
               x={chart.padL} y={chart.H - 10}
-              fontSize={9} fill="#555"
+              fontSize={9} fill="var(--t-dim)"
               fontFamily="ui-monospace, monospace"
             >
               {t('chartStart', { elo: chart.startElo })}
             </text>
             <text
               x={chart.W - chart.padR} y={chart.H - 10}
-              fontSize={9} fill="#555"
+              fontSize={9} fill="var(--t-dim)"
               textAnchor="end"
               fontFamily="ui-monospace, monospace"
             >
@@ -270,9 +270,9 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
               <div
                 className="absolute pointer-events-none px-3 py-2 text-[10px] z-10"
                 style={{
-                  backgroundColor: '#0a0a0a',
+                  backgroundColor: 'var(--t-bg)',
                   border: '1px solid #2a2a2a',
-                  color: '#ccc',
+                  color: 'var(--t-text)',
                   left: onLeft ? 'auto' : `calc(${pct}% + 8px)`,
                   right: onLeft ? `calc(${100 - pct}% + 8px)` : 'auto',
                   top: 8,
@@ -281,9 +281,9 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
               >
                 <div className="flex items-center gap-2">
                   <span className="uppercase font-bold" style={{ color: resultColor }}>{t(`result.${p.result}`)}</span>
-                  <span style={{ color: '#ccc' }}>{t('vsOpponent', { name: p.opponentUsername })}</span>
+                  <span style={{ color: 'var(--t-text)' }}>{t('vsOpponent', { name: p.opponentUsername })}</span>
                 </div>
-                <div style={{ color: '#666' }} className="mt-0.5">
+                <div style={{ color: 'var(--t-dim)' }} className="mt-0.5">
                   {t('oppElo', { elo: p.opponentElo })}  ·  {t('myElo', { elo: p.elo })}
                 </div>
                 <div className="mt-0.5">
@@ -291,7 +291,7 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
                     {t('eloDelta', { delta: p.delta > 0 ? `+${p.delta}` : `${p.delta}` })}
                   </span>
                 </div>
-                <div style={{ color: '#444' }} className="mt-0.5">{dateStr}</div>
+                <div style={{ color: 'var(--t-muted)' }} className="mt-0.5">{dateStr}</div>
               </div>
             );
           })()}
@@ -301,11 +301,11 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
       {data.opponents.length > 0 && (
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#555' }}>
+            <h3 className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
               {t('topOpponents')}
             </h3>
-            <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
-            <span className="text-[10px]" style={{ color: '#444' }}>
+            <div className="flex-1 h-px" style={{ backgroundColor: 'var(--t-surface-2)' }} />
+            <span className="text-[10px]" style={{ color: 'var(--t-muted)' }}>
               {data.opponents.length}
             </span>
           </div>
@@ -318,13 +318,13 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
                   className="flex items-center gap-3 px-3 py-1.5 text-xs"
                   style={{ backgroundColor: `${color}1a` }}
                 >
-                  <span className="truncate flex-1 min-w-0" style={{ color: '#ccc' }}>
+                  <span className="truncate flex-1 min-w-0" style={{ color: 'var(--t-text)' }}>
                     {o.username}
                   </span>
-                  <span className="tabular-nums shrink-0" style={{ color: '#666' }}>
+                  <span className="tabular-nums shrink-0" style={{ color: 'var(--t-dim)' }}>
                     {t('matchCount', { count: o.games })}
                   </span>
-                  <span className="tabular-nums shrink-0 w-20 text-right" style={{ color: '#888' }}>
+                  <span className="tabular-nums shrink-0 w-20 text-right" style={{ color: 'var(--t-muted)' }}>
                     {o.wins}{t('winShort')} {o.losses}{t('lossShort')}
                   </span>
                   <span
@@ -347,9 +347,9 @@ function Stat({ label, value, valueColor }: { label: string; value: string | num
   return (
     <div
       className="flex flex-col gap-0.5 px-3 py-2"
-      style={{ backgroundColor: '#0e0e0e', border: '1px solid #1a1a1a' }}
+      style={{ backgroundColor: 'var(--t-bg-elevated)', border: '1px solid var(--t-surface-2)' }}
     >
-      <span className="text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>
+      <span className="text-[9px] uppercase tracking-wider" style={{ color: 'var(--t-dim)' }}>
         {label}
       </span>
       <span

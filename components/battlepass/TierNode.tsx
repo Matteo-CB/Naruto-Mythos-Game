@@ -23,8 +23,9 @@ interface TierNodeProps {
   claiming?: boolean;
 }
 
-const ACCENT = '#c4a35a';
-const ACCENT_DIM = '#5a4a2e';
+const ACCENT = 'var(--t-accent)';
+const ACCENT_DIM = 'var(--t-accent-dim)';
+const accentAlpha = (percent: number) => `color-mix(in srgb, var(--t-accent) ${percent}%, transparent)`;
 
 function rewardImage(reward: TierReward): { src: string; isCard: boolean } {
   if (reward.type === 'card' && reward.cardId) {
@@ -53,7 +54,7 @@ export function TierNode({ tier, xpRequired, reward, reached, isCurrent, fillRat
     >
       <div
         className="text-xs font-display tracking-widest mb-1.5"
-        style={{ color: reached ? ACCENT : '#666', fontVariantNumeric: 'tabular-nums' }}
+        style={{ color: reached ? ACCENT : 'var(--t-dim)', fontVariantNumeric: 'tabular-nums' }}
       >
         {tier}
       </div>
@@ -64,12 +65,12 @@ export function TierNode({ tier, xpRequired, reward, reached, isCurrent, fillRat
           width: isSpecial ? 96 : 72,
           height: isSpecial ? 132 : 100,
           overflow: isSpecial ? 'hidden' : 'visible',
-          backgroundColor: isSpecial ? (reached ? `${ACCENT}1f` : '#141414') : 'transparent',
+          backgroundColor: isSpecial ? (reached ? 'var(--t-accent-tint)' : 'var(--t-surface)') : 'transparent',
           boxShadow: isSpecial
             ? (isCurrent
-              ? `0 0 24px ${ACCENT}66`
+              ? `0 0 24px ${accentAlpha(40)}`
               : reached
-                ? `0 0 8px ${ACCENT}22`
+                ? '0 0 8px var(--t-accent-glow)'
                 : 'none')
             : 'none',
         }}
@@ -82,9 +83,9 @@ export function TierNode({ tier, xpRequired, reward, reached, isCurrent, fillRat
             filter: isSpecial
               ? 'none'
               : isCurrent
-                ? `drop-shadow(0 0 14px ${ACCENT}99)`
+                ? `drop-shadow(0 0 14px ${accentAlpha(60)})`
                 : reached
-                  ? `drop-shadow(0 0 6px ${ACCENT}55)`
+                  ? `drop-shadow(0 0 6px ${accentAlpha(33)})`
                   : 'none',
           }}
         >
@@ -115,7 +116,7 @@ export function TierNode({ tier, xpRequired, reward, reached, isCurrent, fillRat
         {reward.type === 'card' && reward.cardOwned && (
           <div
             className="absolute top-1 right-1 px-1 py-0.5 text-[8px] font-display tracking-widest"
-            style={{ backgroundColor: '#000c', color: ACCENT }}
+            style={{ backgroundColor: 'var(--t-overlay)', color: ACCENT }}
           >
             ✓
           </div>
@@ -124,7 +125,7 @@ export function TierNode({ tier, xpRequired, reward, reached, isCurrent, fillRat
 
       <div
         className="text-[10px] mt-1.5 tracking-widest font-display"
-        style={{ color: reached ? '#999' : '#555', fontVariantNumeric: 'tabular-nums' }}
+        style={{ color: reached ? 'var(--t-muted)' : 'var(--t-dim)', fontVariantNumeric: 'tabular-nums' }}
       >
         {xpRequired}
       </div>
@@ -136,11 +137,11 @@ export function TierNode({ tier, xpRequired, reward, reached, isCurrent, fillRat
           disabled={claiming}
           className="mt-1.5 px-2 py-1 text-[10px] tracking-widest font-display uppercase"
           style={{
-            backgroundColor: claiming ? '#1a1a1a' : ACCENT,
-            color: claiming ? '#888' : '#0a0a0a',
+            backgroundColor: claiming ? 'var(--t-surface-2)' : ACCENT,
+            color: claiming ? 'var(--t-muted)' : 'var(--t-bg)',
             cursor: claiming ? 'wait' : 'pointer',
           }}
-          animate={claiming ? undefined : { boxShadow: [`0 0 6px ${ACCENT}66`, `0 0 14px ${ACCENT}aa`, `0 0 6px ${ACCENT}66`] }}
+          animate={claiming ? undefined : { boxShadow: [`0 0 6px ${accentAlpha(40)}`, `0 0 14px ${accentAlpha(67)}`, `0 0 6px ${accentAlpha(40)}`] }}
           transition={{ duration: 1.4, repeat: Infinity }}
         >
           {claimLabel ?? 'Claim'}

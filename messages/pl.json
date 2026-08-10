@@ -418,7 +418,14 @@
     "favoriteDecks": "Ulubione talie",
     "favoriteDecksHint": "Wybierz do 3 talii. Zawsze pojawiają się pierwsze w wyborze talii.",
     "deckPrefsNoDecks": "Nie masz jeszcze zapisanych talii.",
-    "unfavorite": "Usuń z ulubionych"
+    "unfavorite": "Usuń z ulubionych",
+    "siteThemeTitle": "Motyw strony",
+    "siteThemeHint": "Zmienia wygląd całej strony. Plansza gry pozostaje bez zmian.",
+    "siteThemeKs": "Konoha Shido",
+    "siteThemeSs": "Shinobi Shiren",
+    "siteThemeSave": "Zapisz",
+    "siteThemeSaving": "Zapisywanie",
+    "siteThemeSaved": "Motyw zapisany"
   },
   "auth": {
     "signIn": "Zaloguj się",
@@ -2788,6 +2795,7 @@
         "gemma049SacrificeHide": "Gemma Shiranui (049): Poświęcony, aby ochronić sojusznika przed ukryciem.",
         "dosu069AutoDefeat": "Dosu Kinuta (069): Przeciwnika nie stać na odkrycie (koszt {cost}), postać pokonana.",
         "dosu069DeclineDefeat": "{card} ({id}): Przeciwnik odmówił odkrycia. Ukryta postać pokonana.",
+        "dosu069DuplicateNameDefeat": "Dosu Kinuta (069): {target} nie może zostać odkryty, postać o tej nazwie już tam jest, zostaje pokonana.",
         "dosu069LockDefeat": "Dosu Kinuta (069): Odkrycie zablokowane przez Shikamaru Narę, {target} pokonany.",
         "dosu069Reveal": "Dosu Kinuta (069): {target} został odkryty, płacąc {cost} czakry.",
         "shikamaruBlockReveal": "Nie można odkryć {card}: Shikamaru Nara blokuje zakryte zagrania na tej misji.",

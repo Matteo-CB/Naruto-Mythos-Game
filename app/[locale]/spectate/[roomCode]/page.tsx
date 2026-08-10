@@ -22,8 +22,7 @@ export default function SpectateTilePage() {
   const leaveSpectating = useSocketStore((s) => s.leaveSpectating);
   const isSpectating = useSocketStore((s) => s.isSpectating);
   const socketVisibleState = useSocketStore((s) => s.visibleState);
-  const socketError = useSocketStore((s) => s.error);
-  const errorKey = useSocketStore((s) => s.errorKey);
+  const spectateErrorKey = useSocketStore((s) => s.spectateErrorKey);
 
   const [joined, setJoined] = useState(false);
   const joinedRef = useRef(false);
@@ -74,9 +73,9 @@ export default function SpectateTilePage() {
   }, [socketVisibleState, syncBoard]);
 
   useEffect(() => {
-    if (!errorKey && !socketError) return;
-    postTileMessage({ kind: 'error', roomCode, errorKey: errorKey ?? undefined });
-  }, [errorKey, socketError, roomCode]);
+    if (!spectateErrorKey) return;
+    postTileMessage({ kind: 'error', roomCode, errorKey: spectateErrorKey });
+  }, [spectateErrorKey, roomCode]);
 
   useEffect(() => {
     const socket = useSocketStore.getState().socket;
@@ -97,8 +96,9 @@ export default function SpectateTilePage() {
     return <TileMessage text={t('signInToWatch')} />;
   }
 
-  if (errorKey || socketError) {
-    return <TileMessage text={errorKey ? t(errorKey.replace('spectate.', 'error.')) : (socketError ?? '')} />;
+  if (spectateErrorKey) {
+    const key = spectateErrorKey.replace('spectate.', '');
+    return <TileMessage text={t.has(key) ? t(key) : t('errorNotFound')} />;
   }
 
   if (!joined || !isSpectating || !socketVisibleState) {

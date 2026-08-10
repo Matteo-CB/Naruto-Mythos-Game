@@ -42,9 +42,9 @@ export function TournamentDeckSelector({ decks, bannedCardIds, onSelect, selecte
 
   if (decks.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-3 p-6" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
-        <p className="text-xs" style={{ color: '#888' }}>{t('noDecksAvailable')}</p>
-        <Link href="/deck-builder" className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+      <div className="flex flex-col items-center gap-3 p-6" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' }}>
+        <p className="text-xs" style={{ color: 'var(--t-muted)' }}>{t('noDecksAvailable')}</p>
+        <Link href="/deck-builder" className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--t-accent)' }}>
           {t('buildADeck')}
         </Link>
       </div>
@@ -65,24 +65,24 @@ export function TournamentDeckSelector({ decks, bannedCardIds, onSelect, selecte
             disabled={deck.hasBanned}
             className="flex flex-col gap-1 p-3 text-left transition-all"
             style={{
-              backgroundColor: isSelected ? '#1a1500' : '#111111',
-              border: deck.hasBanned ? '2px solid #cc4444' : isSelected ? '2px solid #c4a35a' : isHovered ? '1px solid #444' : '1px solid #262626',
+              backgroundColor: isSelected ? '#1a1500' : 'var(--t-panel)',
+              border: deck.hasBanned ? '2px solid var(--t-danger)' : isSelected ? '2px solid var(--t-accent)' : isHovered ? '1px solid var(--t-border-strong)' : '1px solid var(--t-border)',
               cursor: deck.hasBanned ? 'not-allowed' : 'pointer',
               opacity: deck.hasBanned ? 0.7 : 1,
             }}
           >
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium" style={{ color: isSelected ? '#c4a35a' : '#e0e0e0' }}>
+              <span className="text-sm font-medium" style={{ color: isSelected ? 'var(--t-accent)' : 'var(--t-text)' }}>
                 {deck.name}
               </span>
-              <span className="text-[10px]" style={{ color: '#666' }}>{deck.cardIds.length} cards</span>
+              <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{deck.cardIds.length} cards</span>
             </div>
             {deck.hasBanned && (
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#cc4444' }}>
+                <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--t-danger)' }}>
                   {t('containsBanned')}
                 </span>
-                <span className="text-[10px]" style={{ color: '#cc4444' }}>
+                <span className="text-[10px]" style={{ color: 'var(--t-danger)' }}>
                   ({deck.totalBanned} {t('cardBanned')})
                 </span>
               </div>
@@ -96,8 +96,8 @@ export function TournamentDeckSelector({ decks, bannedCardIds, onSelect, selecte
           onClick={() => setVisibleCount((n) => n + LOAD_MORE_STEP)}
           className="px-3 py-2 text-xs uppercase cursor-pointer transition-colors"
           style={{
-            backgroundColor: '#111111',
-            color: '#c4a35a',
+            backgroundColor: 'var(--t-panel)',
+            color: 'var(--t-accent)',
             letterSpacing: '0.18em',
           }}
         >

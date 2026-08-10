@@ -84,14 +84,14 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
   }, [stage, sortedCards, currentIndex, totalBoosters, onComplete]);
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
+    <div className="fixed inset-0 z-40 flex flex-col items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
       
       <motion.div
         className="absolute top-4 left-1/2 -translate-x-1/2 z-50"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <span className="text-sm font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+        <span className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--t-accent)' }}>
           {t('boosterCount', { current: currentIndex + 1, total: totalBoosters })}
         </span>
       </motion.div>
@@ -104,7 +104,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
             style={{
               width: Math.random() * 4 + 2,
               height: Math.random() * 4 + 2,
-              backgroundColor: '#c4a35a',
+              backgroundColor: 'var(--t-accent)',
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
             }}
@@ -170,7 +170,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
-                <span className="text-xs uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+                <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--t-accent)' }}>
                   {t('openBooster')}
                 </span>
               </motion.div>
@@ -205,9 +205,9 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
                 onClick={handleContinue}
                 className="mt-2 px-8 py-3 text-sm font-bold uppercase tracking-wider cursor-pointer"
                 style={{
-                  backgroundColor: 'rgba(196, 163, 90, 0.12)',
-                  border: '1px solid #c4a35a',
-                  color: '#c4a35a',
+                  backgroundColor: 'var(--t-accent-tint)',
+                  border: '1px solid var(--t-accent)',
+                  color: 'var(--t-accent)',
                 }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: [0.7, 1, 0.7], y: 0 }}
@@ -230,7 +230,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
             {sortedCards.map((card) => (
               <div
                 key={card.sealedInstanceId}
-                style={{ width: '120px', height: '168px', backgroundColor: '#1a1a1a', borderRadius: '8px' }}
+                style={{ width: '120px', height: '168px', backgroundColor: 'var(--t-surface-2)', borderRadius: '8px' }}
               />
             ))}
           </motion.div>
@@ -243,7 +243,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          <span className="text-xs" style={{ color: '#888888' }}>
+          <span className="text-xs" style={{ color: 'var(--t-muted)' }}>
             {t('cardsCollected')}: {collectedCards.length}
           </span>
         </motion.div>

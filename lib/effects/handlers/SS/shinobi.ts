@@ -2,10 +2,11 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import type { CardData } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { playLessSelectionResult } from '@/lib/effects/handlers/shared/playLess';
+import { playLessBlockedRevealResult, playLessSelectionResult, type PlayLessCategory } from '@/lib/effects/handlers/shared/playLess';
 
 const HINATA_ID = 'SS-111-SHINOBIV';
 const HINATA_NAME = 'HINATA HYÛGA';
+const SS111_CATEGORY: PlayLessCategory = { kind: 'name', value: 'HYUGA' };
 
 export function topmostHinataIndexInDiscard(discardPile: ReadonlyArray<CardData>): number {
   for (let i = discardPile.length - 1; i >= 0; i--) {
@@ -45,7 +46,7 @@ function ss111DuelHandler(ctx: EffectContext): EffectResult {
 function ss111MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
   const selection = playLessSelectionResult(state, sourcePlayer, {
-    category: { kind: 'name', value: 'HYUGA' },
+    category: SS111_CATEGORY,
     costReduction: 3,
     sourceName: HINATA_NAME,
     sourceId: HINATA_ID,
@@ -54,6 +55,8 @@ function ss111MainHandler(ctx: EffectContext): EffectResult {
   });
 
   if (!selection) {
+    const blocked = playLessBlockedRevealResult(state, sourcePlayer, SS111_CATEGORY, 'Hinata Hyuga (SS-111)');
+    if (blocked) return blocked;
     return {
       state: {
         ...state,
@@ -77,7 +80,7 @@ function ss111MainHandler(ctx: EffectContext): EffectResult {
 
 export function ss111PlayHyugaSelection(ctx: EffectContext): EffectResult | null {
   return playLessSelectionResult(ctx.state, ctx.sourcePlayer, {
-    category: { kind: 'name', value: 'HYUGA' },
+    category: SS111_CATEGORY,
     costReduction: 3,
     sourceName: HINATA_NAME,
     sourceId: HINATA_ID,

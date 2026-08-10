@@ -26,7 +26,7 @@ type Rarity = 'RA' | 'MV' | 'SV' | 'L' | 'HOLO_C' | 'HOLO_UC';
 
 const RARITIES: Rarity[] = ['L', 'SV', 'MV', 'RA', 'HOLO_UC', 'HOLO_C'];
 const COUNTS = [1, 10, 100, 1000, 10000] as const;
-const ACCENT = '#c4a35a';
+const ACCENT = 'var(--t-accent)';
 
 interface SimResult {
   setId: string;
@@ -121,23 +121,23 @@ export default function AdminBoosterSimulatorPage() {
 
   if (session === undefined) {
     return (
-      <main className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
-        <span className="text-sm" style={{ color: '#555' }}>...</span>
+      <main className="flex min-h-screen items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
+        <span className="text-sm" style={{ color: 'var(--t-dim)' }}>...</span>
       </main>
     );
   }
   if (!admin) {
     return (
-      <main className="relative min-h-screen flex flex-col" style={{ backgroundColor: '#0a0a0a', color: '#e8e8e8' }}>
+      <main className="relative min-h-screen flex flex-col" style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-text)' }}>
         <CloudBackground />
         <header className="relative z-10 flex items-center justify-between px-4 py-3 sm:px-6">
-          <Link href="/" className="text-xs tracking-widest font-display" style={{ color: '#888' }}>
+          <Link href="/" className="text-xs tracking-widest font-display" style={{ color: 'var(--t-muted)' }}>
             ← {tCommon('back')}
           </Link>
           <LanguageSwitcher />
         </header>
         <div className="relative z-10 flex-1 px-6 py-12 max-w-3xl mx-auto">
-          <p className="text-sm" style={{ color: '#b33e3e' }}>{t('forbidden')}</p>
+          <p className="text-sm" style={{ color: 'var(--t-danger)' }}>{t('forbidden')}</p>
         </div>
         <Footer />
       </main>
@@ -147,11 +147,11 @@ export default function AdminBoosterSimulatorPage() {
   const maxCardCount = result ? Math.max(1, ...result.perCardCounts.map((c) => c.count)) : 1;
 
   return (
-    <main className="relative min-h-screen flex flex-col" style={{ backgroundColor: '#0a0a0a', color: '#e8e8e8' }}>
+    <main className="relative min-h-screen flex flex-col" style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-text)' }}>
       <CloudBackground />
 
       <header className="relative z-10 flex items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/admin" className="text-xs tracking-widest font-display" style={{ color: '#888' }}>
+        <Link href="/admin" className="text-xs tracking-widest font-display" style={{ color: 'var(--t-muted)' }}>
           ← {tCommon('back')}
         </Link>
         <LanguageSwitcher />
@@ -166,22 +166,22 @@ export default function AdminBoosterSimulatorPage() {
         >
           {t('title')}
         </motion.h1>
-        <p className="text-xs tracking-widest mb-6 uppercase" style={{ color: '#888' }}>
+        <p className="text-xs tracking-widest mb-6 uppercase" style={{ color: 'var(--t-muted)' }}>
           {t('subtitle')}
         </p>
 
         <div
           className="p-4 mb-6 grid gap-4 sm:grid-cols-3"
-          style={{ backgroundColor: '#0f0f0f', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}
+          style={{ backgroundColor: 'var(--t-bg-elevated)', boxShadow: '0 12px 32px var(--t-shadow)' }}
         >
           {isFacetWorthShowing(setOptions) && (
             <label className="flex flex-col gap-1.5">
-              <span className="text-[10px] uppercase tracking-widest" style={{ color: '#888' }}>{t('setLabel')}</span>
+              <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>{t('setLabel')}</span>
               <select
                 value={setId}
                 onChange={(e) => setSetId(e.target.value)}
                 className="px-3 py-2 text-xs"
-                style={{ backgroundColor: '#0a0a0a', color: '#e8e8e8', border: '1px solid #1a1a1a' }}
+                style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-text)', border: '1px solid var(--t-surface-2)' }}
               >
                 {setOptions.map((s) => (
                   <option key={s} value={s}>{SET_REGISTRY[s]?.nameEn ?? s}</option>
@@ -191,12 +191,12 @@ export default function AdminBoosterSimulatorPage() {
           )}
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-[10px] uppercase tracking-widest" style={{ color: '#888' }}>{t('modeLabel')}</span>
+            <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>{t('modeLabel')}</span>
             <select
               value={mode}
               onChange={(e) => setMode(e.target.value as Mode)}
               className="px-3 py-2 text-xs"
-              style={{ backgroundColor: '#0a0a0a', color: '#e8e8e8', border: '1px solid #1a1a1a' }}
+              style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-text)', border: '1px solid var(--t-surface-2)' }}
             >
               <option value="normal">{t('modeNormal')}</option>
               <option value="forceL">{t('modeForceL')}</option>
@@ -205,12 +205,12 @@ export default function AdminBoosterSimulatorPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-[10px] uppercase tracking-widest" style={{ color: '#888' }}>{t('countLabel')}</span>
+            <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>{t('countLabel')}</span>
             <select
               value={count}
               onChange={(e) => setCount(parseInt(e.target.value, 10))}
               className="px-3 py-2 text-xs"
-              style={{ backgroundColor: '#0a0a0a', color: '#e8e8e8', border: '1px solid #1a1a1a' }}
+              style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-text)', border: '1px solid var(--t-surface-2)' }}
             >
               {COUNTS.map((c) => (
                 <option key={c} value={c}>{c.toLocaleString('en')}</option>
@@ -225,8 +225,8 @@ export default function AdminBoosterSimulatorPage() {
               disabled={loading}
               className="px-4 py-2 text-xs font-display tracking-widest uppercase"
               style={{
-                backgroundColor: loading ? '#1a1a1a' : ACCENT,
-                color: loading ? '#888' : '#0a0a0a',
+                backgroundColor: loading ? 'var(--t-surface-2)' : ACCENT,
+                color: loading ? 'var(--t-muted)' : 'var(--t-bg)',
                 cursor: loading ? 'wait' : 'pointer',
               }}
             >
@@ -237,7 +237,7 @@ export default function AdminBoosterSimulatorPage() {
                 type="button"
                 onClick={playSample}
                 className="px-4 py-2 text-xs font-display tracking-widest uppercase"
-                style={{ backgroundColor: '#1a1a1a', color: ACCENT, cursor: 'pointer' }}
+                style={{ backgroundColor: 'var(--t-surface-2)', color: ACCENT, cursor: 'pointer' }}
               >
                 {t('playSample')}
               </button>
@@ -246,18 +246,18 @@ export default function AdminBoosterSimulatorPage() {
         </div>
 
         {error && (
-          <p className="text-sm mb-4" style={{ color: '#b33e3e' }}>{t('serverError')}</p>
+          <p className="text-sm mb-4" style={{ color: 'var(--t-danger)' }}>{t('serverError')}</p>
         )}
 
         {result && (
           <>
-            <h2 className="mb-2 text-xs uppercase tracking-widest" style={{ color: '#888' }}>
+            <h2 className="mb-2 text-xs uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
               {t('perRarityHeader', { count: result.totalSlots })}
             </h2>
-            <div className="overflow-x-auto mb-6" style={{ backgroundColor: '#0f0f0f', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
+            <div className="overflow-x-auto mb-6" style={{ backgroundColor: 'var(--t-bg-elevated)', boxShadow: '0 12px 32px var(--t-shadow)' }}>
               <table className="w-full text-xs" style={{ borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ color: '#888', fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                  <tr style={{ color: 'var(--t-muted)', fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase' }}>
                     <th className="px-4 py-2 text-left">{t('colRarity')}</th>
                     <th className="px-4 py-2 text-right">{t('colActual')}</th>
                     <th className="px-4 py-2 text-right">{t('colExpected')}</th>
@@ -270,11 +270,11 @@ export default function AdminBoosterSimulatorPage() {
                     const expected = result.perRarityExpected[r];
                     const dev = result.perRarityDeviationPct[r];
                     return (
-                      <tr key={r} style={{ borderTop: '1px solid #1a1a1a' }}>
+                      <tr key={r} style={{ borderTop: '1px solid var(--t-surface-2)' }}>
                         <td className="px-4 py-2 font-display" style={{ color: ACCENT }}>{r}</td>
                         <td className="px-4 py-2 text-right" style={{ fontVariantNumeric: 'tabular-nums' }}>{actual}</td>
-                        <td className="px-4 py-2 text-right" style={{ color: '#888', fontVariantNumeric: 'tabular-nums' }}>{expected.toFixed(2)}</td>
-                        <td className="px-4 py-2 text-right" style={{ color: Math.abs(dev) > 25 ? '#b33e3e' : '#888', fontVariantNumeric: 'tabular-nums' }}>
+                        <td className="px-4 py-2 text-right" style={{ color: 'var(--t-muted)', fontVariantNumeric: 'tabular-nums' }}>{expected.toFixed(2)}</td>
+                        <td className="px-4 py-2 text-right" style={{ color: Math.abs(dev) > 25 ? 'var(--t-danger)' : 'var(--t-muted)', fontVariantNumeric: 'tabular-nums' }}>
                           {dev >= 0 ? '+' : ''}{dev.toFixed(1)}%
                         </td>
                       </tr>
@@ -284,10 +284,10 @@ export default function AdminBoosterSimulatorPage() {
               </table>
             </div>
 
-            <h2 className="mb-2 text-xs uppercase tracking-widest" style={{ color: '#888' }}>
+            <h2 className="mb-2 text-xs uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
               {t('perCardHeader', { count: result.perCardCounts.length })}
             </h2>
-            <div className="overflow-y-auto" style={{ maxHeight: 480, backgroundColor: '#0f0f0f', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
+            <div className="overflow-y-auto" style={{ maxHeight: 480, backgroundColor: 'var(--t-bg-elevated)', boxShadow: '0 12px 32px var(--t-shadow)' }}>
               {result.perCardCounts.map((entry) => {
                 const ratio = entry.count / maxCardCount;
                 const card = getCardById(entry.cardId);
@@ -296,13 +296,13 @@ export default function AdminBoosterSimulatorPage() {
                   ? `${getCardName(card, locale)} ${getCardTitle(card, locale)} ${numberPart}`
                   : entry.cardId;
                 return (
-                  <div key={entry.cardId} className="px-4 py-1.5 flex items-center gap-3" style={{ borderTop: '1px solid #141414' }}>
+                  <div key={entry.cardId} className="px-4 py-1.5 flex items-center gap-3" style={{ borderTop: '1px solid var(--t-surface)' }}>
                     <span className="text-[10px] font-display" style={{ color: ACCENT, width: 28 }}>{entry.rarity}</span>
-                    <span className="text-xs flex-1 truncate" style={{ color: '#bbb' }} title={displayLabel}>{displayLabel}</span>
-                    <div className="flex-1" style={{ height: 4, backgroundColor: '#0a0a0a' }}>
+                    <span className="text-xs flex-1 truncate" style={{ color: 'var(--t-muted)' }} title={displayLabel}>{displayLabel}</span>
+                    <div className="flex-1" style={{ height: 4, backgroundColor: 'var(--t-bg)' }}>
                       <div style={{ width: `${ratio * 100}%`, height: '100%', backgroundColor: ACCENT }} />
                     </div>
-                    <span className="text-xs text-right" style={{ width: 64, fontVariantNumeric: 'tabular-nums', color: '#bbb' }}>{entry.count}</span>
+                    <span className="text-xs text-right" style={{ width: 64, fontVariantNumeric: 'tabular-nums', color: 'var(--t-muted)' }}>{entry.count}</span>
                   </div>
                 );
               })}

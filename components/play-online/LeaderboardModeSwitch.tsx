@@ -28,8 +28,8 @@ export function LeaderboardModeSwitch({
     <div
       className="relative inline-flex items-center"
       style={{
-        backgroundColor: 'rgba(8, 8, 14, 0.6)',
-        boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.05)',
+        backgroundColor: 'var(--t-surface)',
+        boxShadow: 'inset 0 0 0 1px var(--t-divider)',
       }}
     >
       {(['ranked', 'evolving'] as LeaderboardMode[]).map((mode) => {
@@ -42,7 +42,7 @@ export function LeaderboardModeSwitch({
             className={`relative ${padX} ${padY} font-bold uppercase ${labelSize} cursor-pointer no-select`}
             style={{
               letterSpacing: '0.18em',
-              color: active ? '#e8e8e8' : '#5a5a5a',
+              color: active ? 'var(--t-text)' : 'var(--t-dim)',
               transition: 'color 0.2s',
               background: 'transparent',
               minHeight,
@@ -53,8 +53,8 @@ export function LeaderboardModeSwitch({
                 layoutId={layoutId}
                 className="absolute inset-0"
                 style={{
-                  backgroundColor: 'rgba(196, 163, 90, 0.18)',
-                  boxShadow: 'inset 0 -2px 0 #c4a35a',
+                  backgroundColor: 'var(--t-accent-glow)',
+                  boxShadow: 'inset 0 -2px 0 var(--t-accent)',
                   pointerEvents: 'none',
                 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 30 }}

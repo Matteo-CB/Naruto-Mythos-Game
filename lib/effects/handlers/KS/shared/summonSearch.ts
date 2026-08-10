@@ -2,6 +2,7 @@ import type { GameState, PlayerID, CharacterCard, CharacterInPlay } from '@/lib/
 import { canAffordAsUpgrade } from './upgradeCheck';
 import { isHiddenRevealBlocked } from '@/lib/effects/ContinuousEffects';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
+import { canRevealHiddenCharacter, revealWouldViolateNameUniqueness } from '@/lib/effects/revealNameUniqueness';
 
 export interface HiddenCharTarget {
   instanceId: string;
@@ -87,14 +88,9 @@ export function freshRevealCost(
   const topCard = topCardOf(hiddenChar);
   const mission = state.activeMissions[missionIndex];
   if (!mission) return null;
-  const friendlySide = player === 'player1' ? mission.player1Characters : mission.player2Characters;
 
-  const sameNameVisible = friendlySide.some((c) => {
-    if (c.isHidden) return false;
-    if (c.instanceId === hiddenChar.instanceId) return false;
-    return topCardOf(c).name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
-  });
-  if (sameNameVisible) return null;
+  const check = canRevealHiddenCharacter(state, player, missionIndex, hiddenChar);
+  if (!check.allowed || check.upgradeTarget) return null;
 
   return Math.max(0, calculateEffectiveCost(state, player, topCard, missionIndex, true) - costReduction);
 }
@@ -109,19 +105,14 @@ export function effectiveRevealCost(
   const topCard = topCardOf(hiddenChar);
   const mission = state.activeMissions[missionIndex];
   if (!mission) return null;
-  const friendlySide = player === 'player1' ? mission.player1Characters : mission.player2Characters;
 
-  const sameNameVisible = friendlySide.find((c) => {
-    if (c.isHidden) return false;
-    if (c.instanceId === hiddenChar.instanceId) return false;
-    return topCardOf(c).name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
-  });
+  const check = canRevealHiddenCharacter(state, player, missionIndex, hiddenChar);
+  if (!check.allowed) return null;
 
   const effective = calculateEffectiveCost(state, player, topCard, missionIndex, true);
 
-  if (sameNameVisible) {
-    const existingTop = topCardOf(sameNameVisible);
-    if ((topCard.chakra ?? 0) <= (existingTop.chakra ?? 0)) return null;
+  if (check.upgradeTarget) {
+    const existingTop = topCardOf(check.upgradeTarget);
     return Math.max(0, (effective - (existingTop.chakra ?? 0)) - costReduction);
   }
 
@@ -172,7 +163,9 @@ export function findHiddenOnBoardByPredicate(
       if (!char.isHidden) continue;
       if (char.controlledBy !== player) continue;
       const topCard = topCardOf(char);
+      if (!isPlayableCharacter(topCard)) continue;
       if (!predicate(topCard)) continue;
+      if (revealWouldViolateNameUniqueness(state, player, mIdx, char)) continue;
 
       const revealCost = freshOnly
         ? freshRevealCost(state, player, char, mIdx, costReduction)
@@ -193,6 +186,26 @@ export function findHiddenOnBoardByPredicate(
     }
   }
   return targets;
+}
+
+export function findRevealBlockedByNameRule(
+  state: GameState,
+  player: PlayerID,
+  predicate: CardPredicate,
+): string | null {
+  const friendlySide = player === 'player1' ? 'player1Characters' : 'player2Characters';
+  for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
+    if (isHiddenRevealBlocked(state, mIdx, player)) continue;
+    for (const char of state.activeMissions[mIdx][friendlySide]) {
+      if (!char.isHidden) continue;
+      if (char.controlledBy !== player) continue;
+      const topCard = topCardOf(char);
+      if (!isPlayableCharacter(topCard)) continue;
+      if (!predicate(topCard)) continue;
+      if (revealWouldViolateNameUniqueness(state, player, mIdx, char)) return topCard.name_fr;
+    }
+  }
+  return null;
 }
 
 const HAS_SUMMON: CardPredicate = (c) => !!c.keywords && c.keywords.includes('Summon');
@@ -221,4 +234,16 @@ export function findAffordableLeafInHand(state: GameState, player: PlayerID, cos
 
 export function findHiddenLeafOnBoard(state: GameState, player: PlayerID, costReduction: number): HiddenCharTarget[] {
   return findHiddenOnBoardByPredicate(state, player, IS_LEAF, costReduction);
+}
+
+export function findRevealBlockedSummon(state: GameState, player: PlayerID): string | null {
+  return findRevealBlockedByNameRule(state, player, HAS_SUMMON);
+}
+
+export function findRevealBlockedSoundVillage(state: GameState, player: PlayerID): string | null {
+  return findRevealBlockedByNameRule(state, player, IS_SOUND);
+}
+
+export function findRevealBlockedLeaf(state: GameState, player: PlayerID): string | null {
+  return findRevealBlockedByNameRule(state, player, IS_LEAF);
 }

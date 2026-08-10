@@ -29,7 +29,7 @@ interface SwissStandingsProps {
   winnerUsername?: string | null;
 }
 
-const GOLD = '#c4a35a';
+const GOLD = 'var(--t-accent)';
 const SILVER = '#a8a8a8';
 const BRONZE = '#cd7f32';
 const MEDAL_COLORS = [GOLD, SILVER, BRONZE];
@@ -89,7 +89,7 @@ export function SwissStandings({
           className="flex flex-col items-center py-6 px-4"
           style={{
             border: `2px solid ${GOLD}`,
-            backgroundColor: 'rgba(196, 163, 90, 0.08)',
+            backgroundColor: 'var(--t-accent-tint)',
           }}
         >
           <span
@@ -129,8 +129,8 @@ export function SwissStandings({
                   >
                     #{i + 1}
                   </span>
-                  <PlayerNameLink username={s.username} className="text-xs mt-0.5" style={{ color: '#e0e0e0' }} />
-                  <span className="text-[10px] mt-0.5" style={{ color: '#888' }}>
+                  <PlayerNameLink username={s.username} className="text-xs mt-0.5" style={{ color: 'var(--t-text)' }} />
+                  <span className="text-[10px] mt-0.5" style={{ color: 'var(--t-muted)' }}>
                     {s.wins}-{s.losses}{s.draws > 0 ? `-${s.draws}` : ''}
                   </span>
                 </motion.div>
@@ -147,51 +147,51 @@ export function SwissStandings({
         >
           {t('swissStandings')}
         </h3>
-        <span className="text-xs" style={{ color: '#888' }}>
+        <span className="text-xs" style={{ color: 'var(--t-muted)' }}>
           {t('swissRoundOf', { current: currentRound, total: totalRounds })}
         </span>
       </div>
 
       <div
         className="overflow-x-auto"
-        style={{ border: '1px solid #262626', backgroundColor: '#111' }}
+        style={{ border: '1px solid var(--t-border)', backgroundColor: 'var(--t-panel)' }}
       >
         <table className="w-full text-xs" style={{ borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ borderBottom: '1px solid #262626' }}>
+            <tr style={{ borderBottom: '1px solid var(--t-border)' }}>
               <th
                 className="text-left px-3 py-2 font-medium uppercase tracking-wider"
-                style={{ color: '#666', width: '40px' }}
+                style={{ color: 'var(--t-dim)', width: '40px' }}
               >
                 {t('swissRank')}
               </th>
               <th
                 className="text-left px-3 py-2 font-medium uppercase tracking-wider"
-                style={{ color: '#666' }}
+                style={{ color: 'var(--t-dim)' }}
               >
                 {t('swissPlayer')}
               </th>
               <th
                 className="text-center px-3 py-2 font-medium uppercase tracking-wider"
-                style={{ color: '#666', width: '70px' }}
+                style={{ color: 'var(--t-dim)', width: '70px' }}
               >
                 {t('swissRecord')}
               </th>
               <th
                 className="text-center px-3 py-2 font-medium uppercase tracking-wider"
-                style={{ color: '#666', width: '50px' }}
+                style={{ color: 'var(--t-dim)', width: '50px' }}
               >
                 {t('swissPoints')}
               </th>
               <th
                 className="text-center px-3 py-2 font-medium uppercase tracking-wider"
-                style={{ color: '#666', width: '55px' }}
+                style={{ color: 'var(--t-dim)', width: '55px' }}
               >
                 {t('swissBuchholz')}
               </th>
               <th
                 className="text-center px-3 py-2 font-medium uppercase tracking-wider"
-                style={{ color: '#666', width: '55px' }}
+                style={{ color: 'var(--t-dim)', width: '55px' }}
               >
                 {t('swissBuchholzExt')}
               </th>
@@ -212,39 +212,39 @@ export function SwissStandings({
                     exit={{ opacity: 0, x: 10 }}
                     transition={{ delay: i * 0.03, duration: 0.25 }}
                     style={{
-                      borderBottom: '1px solid #1a1a1a',
+                      borderBottom: '1px solid var(--t-surface-2)',
                       borderLeft: medalColor
                         ? `3px solid ${medalColor}`
                         : '3px solid transparent',
                       backgroundColor: isWinner
-                        ? 'rgba(196, 163, 90, 0.06)'
+                        ? 'var(--t-accent-tint)'
                         : 'transparent',
                     }}
                   >
                     <td
                       className="px-3 py-2 font-bold"
-                      style={{ color: medalColor ?? '#555' }}
+                      style={{ color: medalColor ?? 'var(--t-dim)' }}
                     >
                       {s.rank}
                     </td>
-                    <td className="px-3 py-2" style={{ color: '#e0e0e0' }}>
+                    <td className="px-3 py-2" style={{ color: 'var(--t-text)' }}>
                       <PlayerNameLink
                         username={s.username}
                         style={{
-                          color: isWinner ? GOLD : '#e0e0e0',
+                          color: isWinner ? GOLD : 'var(--t-text)',
                           fontWeight: isWinner ? 700 : 400,
                         }}
                       />
                       {s.hadBye && (
                         <span
                           className="ml-2 text-[9px] uppercase tracking-wider"
-                          style={{ color: '#555' }}
+                          style={{ color: 'var(--t-dim)' }}
                         >
                           {t('swissByeLabel')}
                         </span>
                       )}
                     </td>
-                    <td className="px-3 py-2 text-center" style={{ color: '#ccc' }}>
+                    <td className="px-3 py-2 text-center" style={{ color: 'var(--t-text)' }}>
                       {s.wins}-{s.losses}{s.draws > 0 ? `-${s.draws}` : ''}
                     </td>
                     <td
@@ -253,10 +253,10 @@ export function SwissStandings({
                     >
                       {s.matchPoints}
                     </td>
-                    <td className="px-3 py-2 text-center" style={{ color: '#999' }}>
+                    <td className="px-3 py-2 text-center" style={{ color: 'var(--t-muted)' }}>
                       {s.buchholz}
                     </td>
-                    <td className="px-3 py-2 text-center" style={{ color: '#777' }}>
+                    <td className="px-3 py-2 text-center" style={{ color: 'var(--t-dim)' }}>
                       {s.buchholzExtended}
                     </td>
                   </motion.tr>
@@ -284,37 +284,37 @@ export function SwissStandings({
                 transition={{ delay: i * 0.05 }}
                 className="flex items-center justify-between px-3 py-2"
                 style={{
-                  backgroundColor: '#111',
-                  border: '1px solid #262626',
+                  backgroundColor: 'var(--t-panel)',
+                  border: '1px solid var(--t-border)',
                 }}
               >
                 <div className="flex items-center gap-2 text-xs">
                   {m.isBye ? (
-                    <span style={{ color: '#e0e0e0' }}>
+                    <span style={{ color: 'var(--t-text)' }}>
                       {m.player1Username ?? m.player2Username}
-                      <span className="ml-2" style={{ color: '#666' }}>
+                      <span className="ml-2" style={{ color: 'var(--t-dim)' }}>
                         -- {t('swissByeLabel')}
                       </span>
                     </span>
                   ) : (
-                    <span style={{ color: '#e0e0e0' }}>
+                    <span style={{ color: 'var(--t-text)' }}>
                       <span
                         style={{
                           color:
-                            m.winnerId === m.player1Id ? GOLD : '#e0e0e0',
+                            m.winnerId === m.player1Id ? GOLD : 'var(--t-text)',
                           fontWeight:
                             m.winnerId === m.player1Id ? 700 : 400,
                         }}
                       >
                         {m.player1Username ?? t('tbd')}
                       </span>
-                      <span className="mx-2" style={{ color: '#555' }}>
+                      <span className="mx-2" style={{ color: 'var(--t-dim)' }}>
                         vs
                       </span>
                       <span
                         style={{
                           color:
-                            m.winnerId === m.player2Id ? GOLD : '#e0e0e0',
+                            m.winnerId === m.player2Id ? GOLD : 'var(--t-text)',
                           fontWeight:
                             m.winnerId === m.player2Id ? 700 : 400,
                         }}
@@ -338,7 +338,7 @@ export function SwissStandings({
         <div>
           <h4
             className="text-xs font-bold uppercase tracking-widest mb-3"
-            style={{ color: '#888', fontFamily: 'var(--font-display)' }}
+            style={{ color: 'var(--t-muted)', fontFamily: 'var(--font-display)' }}
           >
             {t('swissPastRounds')}
           </h4>
@@ -347,15 +347,15 @@ export function SwissStandings({
               <div
                 key={round}
                 style={{
-                  border: '1px solid #262626',
-                  backgroundColor: '#111',
+                  border: '1px solid var(--t-border)',
+                  backgroundColor: 'var(--t-panel)',
                 }}
               >
                 <button
                   onClick={() => toggleRound(round)}
                   className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium uppercase tracking-wider cursor-pointer"
                   style={{
-                    color: expandedRounds.has(round) ? GOLD : '#888',
+                    color: expandedRounds.has(round) ? GOLD : 'var(--t-muted)',
                     backgroundColor: 'transparent',
                     border: 'none',
                   }}
@@ -363,7 +363,7 @@ export function SwissStandings({
                   <span>
                     {t('round')} {round}
                   </span>
-                  <span style={{ color: '#555' }}>
+                  <span style={{ color: 'var(--t-dim)' }}>
                     {expandedRounds.has(round) ? '−' : '+'}
                   </span>
                 </button>
@@ -378,7 +378,7 @@ export function SwissStandings({
                     >
                       <div
                         className="flex flex-col gap-1 px-3 pb-3"
-                        style={{ borderTop: '1px solid #1a1a1a' }}
+                        style={{ borderTop: '1px solid var(--t-surface-2)' }}
                       >
                         {roundMatches.map((m) => (
                           <div
@@ -386,27 +386,27 @@ export function SwissStandings({
                             className="flex items-center justify-between py-1.5 text-xs"
                           >
                             {m.isBye ? (
-                              <span style={{ color: '#ccc' }}>
+                              <span style={{ color: 'var(--t-text)' }}>
                                 {m.player1Username ?? m.player2Username}
-                                <span className="ml-2" style={{ color: '#666' }}>
+                                <span className="ml-2" style={{ color: 'var(--t-dim)' }}>
                                   -- {t('swissByeLabel')}
                                 </span>
                               </span>
                             ) : (
-                              <span style={{ color: '#ccc' }}>
+                              <span style={{ color: 'var(--t-text)' }}>
                                 <span
                                   style={{
                                     color:
                                       m.winnerId === m.player1Id
                                         ? GOLD
-                                        : '#ccc',
+                                        : 'var(--t-text)',
                                     fontWeight:
                                       m.winnerId === m.player1Id ? 700 : 400,
                                   }}
                                 >
                                   {m.player1Username}
                                 </span>
-                                <span className="mx-2" style={{ color: '#555' }}>
+                                <span className="mx-2" style={{ color: 'var(--t-dim)' }}>
                                   vs
                                 </span>
                                 <span
@@ -414,7 +414,7 @@ export function SwissStandings({
                                     color:
                                       m.winnerId === m.player2Id
                                         ? GOLD
-                                        : '#ccc',
+                                        : 'var(--t-text)',
                                     fontWeight:
                                       m.winnerId === m.player2Id ? 700 : 400,
                                   }}
@@ -459,9 +459,9 @@ function MatchCountdown({ deadline }: { deadline: string | null | undefined }) {
     <span
       className="text-[9px] tabular-nums px-1.5 py-0.5 inline-flex items-center gap-1"
       style={{
-        color: urgent ? '#cc4444' : '#c4a35a',
-        backgroundColor: urgent ? 'rgba(204,68,68,0.1)' : 'rgba(196,163,90,0.08)',
-        border: `1px solid ${urgent ? '#cc4444' : '#c4a35a'}33`,
+        color: urgent ? 'var(--t-danger)' : 'var(--t-accent)',
+        backgroundColor: urgent ? 'rgba(204,68,68,0.1)' : 'var(--t-accent-tint)',
+        border: `1px solid ${urgent ? 'var(--t-danger)' : 'var(--t-accent)'}33`,
       }}
       title="Time before auto-forfeit"
     >
@@ -477,12 +477,12 @@ function MatchStatusBadge({ status }: { status: string }) {
   const config: Record<string, { bg: string; border: string; color: string; label: string }> = {
     pending: {
       bg: 'rgba(136, 136, 136, 0.08)',
-      border: '1px solid #333',
-      color: '#888',
+      border: '1px solid var(--t-border-strong)',
+      color: 'var(--t-muted)',
       label: t('swissStatusPending'),
     },
     ready: {
-      bg: 'rgba(196, 163, 90, 0.08)',
+      bg: 'var(--t-accent-tint)',
       border: '1px solid rgba(196, 163, 90, 0.3)',
       color: GOLD,
       label: t('swissStatusReady'),
@@ -496,19 +496,19 @@ function MatchStatusBadge({ status }: { status: string }) {
     completed: {
       bg: 'rgba(74, 222, 128, 0.08)',
       border: '1px solid rgba(74, 222, 128, 0.3)',
-      color: '#4ade80',
+      color: 'var(--t-success)',
       label: t('swissStatusCompleted'),
     },
     forfeit: {
       bg: 'rgba(204, 68, 68, 0.08)',
       border: '1px solid rgba(204, 68, 68, 0.3)',
-      color: '#f87171',
+      color: 'var(--t-danger)',
       label: t('swissStatusForfeit'),
     },
     bye: {
       bg: 'rgba(136, 136, 136, 0.08)',
-      border: '1px solid #333',
-      color: '#888',
+      border: '1px solid var(--t-border-strong)',
+      color: 'var(--t-muted)',
       label: t('swissByeLabel'),
     },
   };

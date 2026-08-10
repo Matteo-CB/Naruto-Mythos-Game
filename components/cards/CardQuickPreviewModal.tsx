@@ -12,10 +12,12 @@ import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 import { isLockedVariantCard } from '@/lib/variants/isVariant';
 import { VariantLockedBanner } from '@/components/cards/VariantLockedBanner';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
+import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from '@/components/icons/GameIcons';
 import { cardIdToSlug } from '@/lib/cards/slug';
 import { Z_APP_MODAL } from '@/lib/ui/zIndex';
 import type { CardData, MissionCard, Rarity } from '@/lib/engine/types';
 import { isLandscapeCard } from '@/lib/cards/orientation';
+import { RarityIcon } from '@/components/icons/RarityIcon';
 
 const RARITY_COLORS: Record<Rarity, string> = {
   C: '#888888', UC: '#4a9e4a', R: '#4a7ab5', RA: '#8a5ab5',
@@ -88,13 +90,19 @@ export function CardQuickPreviewModal({ card, onClose }: { card: CardData; onClo
 
             <div className="flex gap-4 mb-3 text-sm">
               <span className="text-[#888888]">N° <span className="text-[#e0e0e0]">{String(card.number).padStart(3, '0')}</span></span>
-              <span style={{ color: RARITY_COLORS[card.rarity] }}>{getRarityLabel(card.rarity, tCardMeta)}</span>
+              <span className="inline-flex items-center gap-1.5" style={{ color: RARITY_COLORS[card.rarity] }}><RarityIcon rarity={card.rarity} size={14} />{getRarityLabel(card.rarity, tCardMeta)}</span>
             </div>
 
             {hasCombatStats(card) && (
               <div className="flex gap-4 mb-3 text-sm">
-                <span className="text-[#888888]">{t('collection.details.cost')}: <span className="text-[#e0e0e0]">{card.chakra}</span></span>
-                <span className="text-[#888888]">{t('collection.details.power')}: <span className="text-[#e0e0e0]">{card.power}</span></span>
+                <span className="inline-flex items-center gap-1.5 text-[#888888]">
+                  <ChakraIcon size={15} color={CHAKRA_COLOR} />
+                  {t('collection.details.cost')}: <span className="text-[#e0e0e0]">{card.chakra}</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-[#888888]">
+                  <PowerIcon size={15} color={POWER_COLOR} />
+                  {t('collection.details.power')}: <span className="text-[#e0e0e0]">{card.power}</span>
+                </span>
               </div>
             )}
 

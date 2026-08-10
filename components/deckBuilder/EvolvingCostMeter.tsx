@@ -8,11 +8,11 @@ import { EVOLVING_MAX_POINTS } from '@/lib/evolving/constants';
 import { getEvolvingColorForPoints } from '@/lib/evolving/colors';
 import { EvolvingRulesModal } from './EvolvingRulesModal';
 
-const GOLD = '#c4a35a';
-const PANEL_BG = '#0f0f0f';
-const BORDER = '#262626';
-const TEXT_LIGHT = '#e0e0e0';
-const TEXT_DIM = '#888888';
+const GOLD = 'var(--t-accent)';
+const PANEL_BG = 'var(--t-bg-elevated)';
+const BORDER = 'var(--t-border)';
+const TEXT_LIGHT = 'var(--t-text)';
+const TEXT_DIM = 'var(--t-muted)';
 const WARN = '#cc7a30';
 
 interface Props {
@@ -137,7 +137,7 @@ function FullMeter({
         key={i}
         className="flex-1 h-1.5"
         style={{
-          backgroundColor: filled ? (overBudget ? WARN : color) : 'rgba(255,255,255,0.06)',
+          backgroundColor: filled ? (overBudget ? WARN : color) : 'var(--t-divider)',
           transition: 'background-color 0.18s ease',
         }}
       />,
@@ -158,7 +158,7 @@ function FullMeter({
             style={{
               color: GOLD,
               border: `1px solid ${GOLD}`,
-              backgroundColor: 'rgba(196, 163, 90, 0.05)',
+              backgroundColor: 'var(--t-accent-tint)',
               width: '20px',
               height: '20px',
               cursor: 'pointer',
@@ -216,7 +216,7 @@ function FullMeter({
           onClick={() => setEvolvingMode(!evolvingMode)}
           className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 transition-colors"
           style={{
-            color: evolvingMode ? '#0a0a0a' : GOLD,
+            color: evolvingMode ? 'var(--t-bg)' : GOLD,
             backgroundColor: evolvingMode ? GOLD : 'transparent',
             border: `1px solid ${GOLD}`,
             cursor: 'pointer',

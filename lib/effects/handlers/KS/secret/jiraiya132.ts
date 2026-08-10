@@ -1,7 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { findAffordableSummonsInHand, findHiddenSummonsOnBoard } from '@/lib/effects/handlers/KS/shared/summonSearch';
+import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findRevealBlockedSummon } from '@/lib/effects/handlers/KS/shared/summonSearch';
 
 
 
@@ -18,6 +18,12 @@ function jiraiya132MainHandler(ctx: EffectContext): EffectResult {
   ];
 
   if (allTargets.length === 0) {
+    const blockedName = findRevealBlockedSummon(state, sourcePlayer);
+    if (blockedName) {
+      return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_BLOCKED',
+        `Jiraya (132): Cannot reveal ${blockedName}, a character with that name is already visible on this mission.`,
+        'game.log.effect.duplicateNameReveal', { card: blockedName }) } };
+    }
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Jiraya (132): No affordable Summon characters available.',
       'game.log.effect.noTarget', { card: 'JIRAYA', id: 'KS-132-S' }) } };

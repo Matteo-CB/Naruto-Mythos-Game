@@ -2165,7 +2165,9 @@
       "has_visual": false,
       "chakra": 3,
       "power": 2,
-      "keywords": [],
+      "keywords": [
+        "Team 7"
+      ],
       "group": "Leaf Village",
       "effects": [
         {

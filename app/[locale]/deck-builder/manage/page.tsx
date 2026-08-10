@@ -180,47 +180,47 @@ export default function ManageDecksPage() {
 
   if (!session?.user) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
-        <p style={{ color: '#888888' }}>{t('online.signInRequired')}</p>
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
+        <p style={{ color: 'var(--t-muted)' }}>{t('online.signInRequired')}</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+    <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: 'var(--t-bg)' }}>
       <CloudBackground />
       <div className="max-w-xl mx-auto relative z-10 flex-1 px-4 py-8 w-full">
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold" style={{ color: '#c4a35a' }}>
+          <h1 className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--t-accent)' }}>
             {t('deckManager.title')}
           </h1>
           <Link
             href="/deck-builder"
             className="px-4 py-2 text-sm rounded text-center"
-            style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+            style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-muted)' }}
           >
             {t('deckManager.backToBuilder')}
           </Link>
         </div>
 
-        <p className="text-xs mb-4" style={{ color: '#555555' }}>
+        <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>
           {t('deckManager.description')}
         </p>
 
         {loading && (
-          <p className="text-sm" style={{ color: '#888888' }}>{t('common.loading')}</p>
+          <p className="text-sm" style={{ color: 'var(--t-muted)' }}>{t('common.loading')}</p>
         )}
 
         {!loading && decks.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-sm mb-4" style={{ color: '#555555' }}>
+            <p className="text-sm mb-4" style={{ color: 'var(--t-dim)' }}>
               {t('deckBuilder.noSavedDecks')}
             </p>
             <Link
               href="/deck-builder"
               className="px-6 py-2.5 text-sm font-bold uppercase tracking-wider"
-              style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+              style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
             >
               {t('deckManager.createFirst')}
             </Link>
@@ -247,7 +247,7 @@ export default function ManageDecksPage() {
                   onDragEnd={handleDragEnd}
                   className="rounded-lg p-4 transition-all"
                   style={{
-                    backgroundColor: dragIndex === index ? '#1a1a1a' : '#141414',
+                    backgroundColor: dragIndex === index ? 'var(--t-surface-2)' : 'var(--t-surface)',
                     cursor: 'grab',
                     opacity: dragIndex === index ? 0.8 : 1,
                   }}
@@ -259,13 +259,13 @@ export default function ManageDecksPage() {
                         onClick={() => moveUp(index)}
                         disabled={index === 0 || saving}
                         className="text-xs px-1 transition-colors"
-                        style={{ color: index === 0 ? '#333333' : '#888888' }}
+                        style={{ color: index === 0 ? 'var(--t-border-strong)' : 'var(--t-muted)' }}
                       >
                         ▲
                       </button>
                       <span
                         className="text-xs font-bold w-6 text-center"
-                        style={{ color: '#c4a35a' }}
+                        style={{ color: 'var(--t-accent)' }}
                       >
                         {index + 1}
                       </span>
@@ -273,7 +273,7 @@ export default function ManageDecksPage() {
                         onClick={() => moveDown(index)}
                         disabled={index === decks.length - 1 || saving}
                         className="text-xs px-1 transition-colors"
-                        style={{ color: index === decks.length - 1 ? '#333333' : '#888888' }}
+                        style={{ color: index === decks.length - 1 ? 'var(--t-border-strong)' : 'var(--t-muted)' }}
                       >
                         ▼
                       </button>
@@ -291,17 +291,17 @@ export default function ManageDecksPage() {
                               if (e.key === 'Escape') { setRenamingId(null); setRenameValue(''); }
                             }}
                             autoFocus
-                            className="flex-1 px-2 py-1 text-sm bg-[#0a0a0a] border border-[#444] text-[#e0e0e0] focus:outline-none focus:border-[#c4a35a]"
+                            className="flex-1 px-2 py-1 text-sm bg-[var(--t-bg)] border border-[var(--t-border-strong)] text-[var(--t-text)] focus:outline-none focus:border-[var(--t-accent)]"
                           />
                           <button
                             onClick={() => handleRename(deck.id)}
-                            className="px-2 py-1 text-[10px] bg-[#1a2a1a] border border-[#3e8b3e]/30 text-[#3e8b3e]"
+                            className="px-2 py-1 text-[10px] bg-[#1a2a1a] border border-[var(--t-success)]/30 text-[var(--t-success)]"
                           >
                             {t('common.confirm')}
                           </button>
                           <button
                             onClick={() => { setRenamingId(null); setRenameValue(''); }}
-                            className="px-2 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888]"
+                            className="px-2 py-1 text-[10px] bg-[var(--t-surface)] border border-[var(--t-border)] text-[var(--t-muted)]"
                           >
                             {t('common.cancel')}
                           </button>
@@ -309,13 +309,13 @@ export default function ManageDecksPage() {
                       ) : (
                         <>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-medium" style={{ color: '#e0e0e0' }}>
+                            <span className="text-sm font-medium" style={{ color: 'var(--t-text)' }}>
                               {deck.name}
                             </span>
                             {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints} />}
                           </div>
                           <div className="flex items-center gap-3 mt-0.5">
-                            <span className="text-[11px]" style={{ color: '#555555' }}>
+                            <span className="text-[11px]" style={{ color: 'var(--t-dim)' }}>
                               {deck.cardIds.length} {t('deckManager.cards')} + {deck.missionIds.length} missions
                             </span>
                           </div>
@@ -327,18 +327,18 @@ export default function ManageDecksPage() {
                       <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                         {isConfirming ? (
                           <>
-                            <span className="text-[10px]" style={{ color: '#b33e3e' }}>
+                            <span className="text-[10px]" style={{ color: 'var(--t-danger)' }}>
                               {t('deckBuilder.confirmDelete', { name: deck.name })}
                             </span>
                             <button
                               onClick={() => handleDelete(deck.id)}
-                              className="px-2 py-1 text-[10px] bg-[#2a1a1a] border border-[#b33e3e]/40 text-[#b33e3e]"
+                              className="px-2 py-1 text-[10px] bg-[#2a1a1a] border border-[var(--t-danger)]/40 text-[var(--t-danger)]"
                             >
                               {t('common.confirm')}
                             </button>
                             <button
                               onClick={() => setConfirmDeleteId(null)}
-                              className="px-2 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888]"
+                              className="px-2 py-1 text-[10px] bg-[var(--t-surface)] border border-[var(--t-border)] text-[var(--t-muted)]"
                             >
                               {t('common.cancel')}
                             </button>
@@ -357,9 +357,9 @@ export default function ManageDecksPage() {
                                   aria-pressed={isFav}
                                   className="px-2 py-1 text-[12px] leading-none transition-colors"
                                   style={{
-                                    backgroundColor: isFav ? 'rgba(196,163,90,0.14)' : '#141414',
-                                    border: '1px solid ' + (isFav ? 'rgba(196,163,90,0.4)' : '#262626'),
-                                    color: isFav ? '#c4a35a' : atCap ? '#3a3a3a' : '#888',
+                                    backgroundColor: isFav ? 'var(--t-accent-glow)' : 'var(--t-surface)',
+                                    border: '1px solid ' + (isFav ? 'rgba(196,163,90,0.4)' : 'var(--t-border)'),
+                                    color: isFav ? 'var(--t-accent)' : atCap ? 'var(--t-border-strong)' : 'var(--t-muted)',
                                     cursor: atCap ? 'default' : 'pointer',
                                   }}
                                 >
@@ -369,7 +369,7 @@ export default function ManageDecksPage() {
                             })()}
                             <button
                               onClick={() => { setRenamingId(deck.id); setRenameValue(deck.name); }}
-                              className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888] hover:text-[#e0e0e0] hover:border-[#444] transition-colors"
+                              className="px-2.5 py-1 text-[10px] bg-[var(--t-surface)] border border-[var(--t-border)] text-[var(--t-muted)] hover:text-[var(--t-text)] hover:border-[var(--t-border-strong)] transition-colors"
                             >
                               {t('deckManager.rename')}
                             </button>
@@ -379,14 +379,14 @@ export default function ManageDecksPage() {
                                 
                                 sessionStorage.setItem('loadDeckId', deck.id);
                               }}
-                              className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888] hover:text-[#e0e0e0] hover:border-[#444] transition-colors"
+                              className="px-2.5 py-1 text-[10px] bg-[var(--t-surface)] border border-[var(--t-border)] text-[var(--t-muted)] hover:text-[var(--t-text)] hover:border-[var(--t-border-strong)] transition-colors"
                             >
                               {t('deckBuilder.editDeck')}
                             </Link>
                             <div className="relative">
                               <button
                                 onClick={() => setExportMenuId(exportMenuId === deck.id ? null : deck.id)}
-                                className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888] hover:text-[#e0e0e0] hover:border-[#444] transition-colors"
+                                className="px-2.5 py-1 text-[10px] bg-[var(--t-surface)] border border-[var(--t-border)] text-[var(--t-muted)] hover:text-[var(--t-text)] hover:border-[var(--t-border-strong)] transition-colors"
                               >
                                 {exportingId === deck.id ? '...' : copiedId === deck.id ? t('deckBuilder.exportCopied') : t('deckBuilder.exportButton')}
                               </button>
@@ -395,18 +395,18 @@ export default function ManageDecksPage() {
                                   <div className="fixed inset-0 z-10" onClick={() => setExportMenuId(null)} />
                                   <div
                                     className="absolute right-0 top-full mt-1 z-20 flex flex-col rounded overflow-hidden"
-                                    style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', minWidth: '140px' }}
+                                    style={{ backgroundColor: 'var(--t-surface-2)', border: '1px solid var(--t-border-strong)', minWidth: '140px' }}
                                   >
                                     <button
                                       onClick={() => { setExportMenuId(null); handleExport(deck); }}
                                       disabled={exportingId === deck.id}
-                                      className="px-3 py-2 text-[10px] text-left text-[#ccc] hover:bg-[#262626] transition-colors disabled:opacity-40"
+                                      className="px-3 py-2 text-[10px] text-left text-[var(--t-text)] hover:bg-[var(--t-border)] transition-colors disabled:opacity-40"
                                     >
                                       {t('deckBuilder.exportAsImage')}
                                     </button>
                                     <button
                                       onClick={() => { setExportMenuId(null); handleExportText(deck); }}
-                                      className="px-3 py-2 text-[10px] text-left text-[#ccc] hover:bg-[#262626] transition-colors"
+                                      className="px-3 py-2 text-[10px] text-left text-[var(--t-text)] hover:bg-[var(--t-border)] transition-colors"
                                     >
                                       {t('deckBuilder.exportAsText')}
                                     </button>
@@ -416,7 +416,7 @@ export default function ManageDecksPage() {
                             </div>
                             <button
                               onClick={() => setConfirmDeleteId(deck.id)}
-                              className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#b33e3e] hover:bg-[#1a1414] hover:border-[#b33e3e]/30 transition-colors"
+                              className="px-2.5 py-1 text-[10px] bg-[var(--t-surface)] border border-[var(--t-border)] text-[var(--t-danger)] hover:bg-[#1a1414] hover:border-[var(--t-danger)]/30 transition-colors"
                             >
                               {t('deckBuilder.deleteDeck')}
                             </button>
@@ -433,7 +433,7 @@ export default function ManageDecksPage() {
         )}
 
         {saving && (
-          <p className="text-xs mt-3 text-center" style={{ color: '#555555' }}>
+          <p className="text-xs mt-3 text-center" style={{ color: 'var(--t-dim)' }}>
             {t('deckManager.saving')}
           </p>
         )}

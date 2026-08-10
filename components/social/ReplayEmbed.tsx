@@ -10,7 +10,7 @@ function PlayerSide({ name, score, win, align }: { name: string; score?: number;
       <div
         className="font-display text-sm truncate"
         style={{
-          color: win ? '#c4a35a' : '#d8d6cf',
+          color: win ? 'var(--t-accent)' : '#d8d6cf',
           textShadow: win ? '0 0 14px rgba(196,163,90,0.45)' : 'none',
           letterSpacing: '0.02em',
         }}
@@ -18,7 +18,7 @@ function PlayerSide({ name, score, win, align }: { name: string; score?: number;
         {name}
       </div>
       {typeof score === 'number' && (
-        <div className="font-display text-2xl tabular-nums mt-0.5" style={{ color: win ? '#c4a35a' : '#6a6a70' }}>
+        <div className="font-display text-2xl tabular-nums mt-0.5" style={{ color: win ? 'var(--t-accent)' : '#6a6a70' }}>
           {score}
         </div>
       )}
@@ -34,13 +34,13 @@ export function ReplayEmbed({ replay }: { replay: ReplaySnapshot }) {
   const href = `/replay/${replay.gameId}${hasMoment ? `?action=${replay.actionIndex}` : ''}`;
 
   return (
-    <div className="mt-2 overflow-hidden" style={{ backgroundColor: '#0d0c10', border: '1px solid #1e1e22' }}>
+    <div className="mt-2 overflow-hidden" style={{ backgroundColor: 'var(--t-bg)', border: '1px solid #1e1e22' }}>
       <div className="px-3 pt-2.5 flex items-center justify-between">
-        <span className="font-display text-[9px] uppercase tracking-[0.28em]" style={{ color: '#c4a35a' }}>
+        <span className="font-display text-[9px] uppercase tracking-[0.28em]" style={{ color: 'var(--t-accent)' }}>
           {hasMoment ? t('replayMoment') : t('replayLabel')}
         </span>
         {replay.isAiGame && (
-          <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5" style={{ backgroundColor: 'rgba(136,136,136,0.1)', color: '#888' }}>
+          <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5" style={{ backgroundColor: 'rgba(136,136,136,0.1)', color: 'var(--t-muted)' }}>
             {t('vsAi')}
           </span>
         )}
@@ -57,7 +57,7 @@ export function ReplayEmbed({ replay }: { replay: ReplaySnapshot }) {
           <Link
             href={href as '/'}
             className="block w-full text-center font-display text-[11px] uppercase tracking-widest py-2 transition-colors"
-            style={{ backgroundColor: 'rgba(196,163,90,0.12)', color: '#c4a35a' }}
+            style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)' }}
           >
             {hasMoment ? t('watchMoment') : t('watchReplay')}
           </Link>

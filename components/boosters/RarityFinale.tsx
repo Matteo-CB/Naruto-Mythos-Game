@@ -10,10 +10,10 @@ interface RarityFinaleProps {
 }
 
 const COLOR: Record<Rarity, string> = {
-  RA: '#c4a35a',
+  RA: 'var(--t-accent)',
   MV: '#5fa3df',
   SV: '#9b59b6',
-  L: '#d97676',
+  L: 'var(--t-danger)',
 };
 
 export function RarityFinale({ rarity, label }: RarityFinaleProps) {
@@ -69,7 +69,7 @@ function LegendaryBurst({ accent, label, reduce }: { accent: string; label: stri
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.92 }}
         transition={{ duration: 0.3 }}
-        style={{ backgroundColor: '#000' }}
+        style={{ backgroundColor: 'var(--t-overlay)' }}
       />
       <motion.div
         aria-hidden
@@ -96,7 +96,7 @@ function LegendaryBurst({ accent, label, reduce }: { accent: string; label: stri
 function SecretSpiral({ accent, label, reduce }: { accent: string; label: string; reduce: boolean }) {
   const purple = accent;
   const cyan = '#5fa3df';
-  const gold = '#c4a35a';
+  const gold = 'var(--t-accent)';
   const bars = [purple, cyan, gold, purple, cyan, gold];
   const spiralDuration = reduce ? 0.6 : 1.4;
   return (
@@ -107,7 +107,7 @@ function SecretSpiral({ accent, label, reduce }: { accent: string; label: string
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.92 }}
         transition={{ duration: 0.3 }}
-        style={{ backgroundColor: '#000' }}
+        style={{ backgroundColor: 'var(--t-overlay)' }}
       />
       <div className="pointer-events-none fixed inset-0 z-61 flex items-center justify-center">
         <motion.div

@@ -12,6 +12,7 @@ import type { VisibleCharacter, VisibleMission, MissionRank, CharacterCard, Miss
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { isLandscapeCard } from '@/lib/cards/orientation';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from '@/components/icons/GameIcons';
 import { useGameScale } from './GameScaleContext';
 import {
   PopupOverlay,
@@ -160,8 +161,12 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
           style={{
             backgroundColor: 'rgba(0, 0, 0, 0.8)',
             color: character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2px',
           }}
         >
+          <PowerIcon size={9} color={POWER_COLOR} />
           {manualPowerMode
             ? <ManualGuess actual={totalPower} hasModifier={character.powerTokens > 0} color={character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0'} />
             : totalPower}
@@ -527,7 +532,8 @@ const OrderedDefeatCard = React.memo(function OrderedDefeatCard({ character, isV
 
       {!isHidden && topCard && (
         <div className="absolute bottom-0.5 right-0.5 px-1 text-[9px] font-bold tabular-nums"
-          style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0' }}>
+          style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0', display: 'flex', alignItems: 'center', gap: '2px' }}>
+          <PowerIcon size={9} color={POWER_COLOR} />
           {manualPowerMode
             ? <ManualGuess actual={character.effectivePower} hasModifier={character.powerTokens > 0} color={character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0'} />
             : character.effectivePower}
@@ -619,9 +625,10 @@ const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missi
       </span>
 
       <div
-        className="flex items-center justify-center gap-2 w-full px-2 py-0.5"
+        className="flex items-center justify-center gap-1.5 w-full px-2 py-0.5"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
       >
+        <PowerIcon size={10} color={POWER_COLOR} />
         <span
           className="text-[10px] font-bold tabular-nums"
           style={{ color: manualPowerMode ? palette.me.primary : myPower > oppPower ? '#4aff6b' : myPower < oppPower ? '#ff6b6b' : '#888888' }}
@@ -1218,9 +1225,10 @@ export function TargetSelector() {
                       )}
                     </div>
                     <div
-                      className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[9px] font-bold"
-                      style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#4a9eff', border: '1px solid #4a9eff' }}
+                      className="absolute top-1 left-1 h-5 px-1 flex items-center justify-center text-[9px] font-bold"
+                      style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: CHAKRA_COLOR, border: `1px solid ${CHAKRA_COLOR}`, gap: '2px' }}
                     >
+                      <ChakraIcon size={9} color={CHAKRA_COLOR} />
                       {card.chakra}
                     </div>
                   </motion.div>
@@ -1304,7 +1312,8 @@ export function TargetSelector() {
                         </div>
                       )}
                     </div>
-                    <div className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[9px] font-bold" style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#4a9eff', border: '1px solid #4a9eff' }}>
+                    <div className="absolute top-1 left-1 h-5 px-1 flex items-center justify-center text-[9px] font-bold" style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: CHAKRA_COLOR, border: `1px solid ${CHAKRA_COLOR}`, gap: '2px' }}>
+                      <ChakraIcon size={9} color={CHAKRA_COLOR} />
                       {card.chakra}
                     </div>
                     <div
@@ -1371,9 +1380,15 @@ export function TargetSelector() {
               )}
               <div className="absolute inset-x-0 bottom-0 px-2 py-2 text-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}>
                 <div className="text-xs font-bold" style={{ color: '#e0e0e0' }}>{resolveNameToLocale(getCardName(revealedCard, locale), locale)}</div>
-                <div className="text-[10px] mt-0.5" style={{ color: '#888888' }}>{t('collection.details.cost')}: {revealedCard.chakra} | {t('collection.details.power')}: {revealedCard.power}</div>
+                <div className="text-[10px] mt-0.5 flex items-center justify-center gap-1 tabular-nums" style={{ color: '#888888' }}>
+                  <ChakraIcon size={11} color={CHAKRA_COLOR} />
+                  {revealedCard.chakra}
+                  <PowerIcon size={11} color={POWER_COLOR} style={{ marginLeft: '6px' }} />
+                  {revealedCard.power}
+                </div>
               </div>
-              <div className="absolute top-1.5 left-1.5 w-6 h-6 flex items-center justify-center text-[10px] font-bold" style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#4a9eff', border: '1px solid #4a9eff' }}>
+              <div className="absolute top-1.5 left-1.5 h-6 px-1.5 flex items-center justify-center text-[10px] font-bold" style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: CHAKRA_COLOR, border: `1px solid ${CHAKRA_COLOR}`, gap: '3px' }}>
+                <ChakraIcon size={11} color={CHAKRA_COLOR} />
                 {revealedCard.chakra}
               </div>
               <button
@@ -1742,8 +1757,11 @@ export function TargetSelector() {
                 <span className="font-display text-sm font-bold" style={{ color: '#e8c477', letterSpacing: '0.06em' }}>
                   {resolveNameToLocale(getCardName(revealedCard, locale), locale)}
                 </span>
-                <span className="text-[11px]" style={{ color: '#aaa' }}>
-                  {t('collection.details.cost')}: {revealedCard.chakra} · {t('collection.details.power')}: {revealedCard.power}
+                <span className="text-[11px] flex items-center gap-1.5 tabular-nums" style={{ color: '#aaa' }}>
+                  <ChakraIcon size={12} color={CHAKRA_COLOR} />
+                  {revealedCard.chakra}
+                  <PowerIcon size={12} color={POWER_COLOR} style={{ marginLeft: '6px' }} />
+                  {revealedCard.power}
                 </span>
               </div>
             </motion.div>

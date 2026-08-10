@@ -543,7 +543,14 @@
     "favoriteDecks": "Favorite decks",
     "favoriteDecksHint": "Pick up to 3 decks. They are always shown first in the deck picker.",
     "deckPrefsNoDecks": "You have no saved decks yet.",
-    "unfavorite": "Remove from favorites"
+    "unfavorite": "Remove from favorites",
+    "siteThemeTitle": "Site theme",
+    "siteThemeHint": "Changes the look of the whole site. The game board is not affected.",
+    "siteThemeKs": "Konoha Shido",
+    "siteThemeSs": "Shinobi Shiren",
+    "siteThemeSave": "Save",
+    "siteThemeSaving": "Saving",
+    "siteThemeSaved": "Theme saved"
   },
   "game": {
     "turn": "Turn {turn}",
@@ -686,6 +693,7 @@
         "gemma049SacrificeHide": "Gemma Shiranui (049): Sacrificed to protect an ally from being hidden.",
         "dosu069AutoDefeat": "Dosu Kinuta (069): Opponent cannot afford to reveal (cost {cost}), character defeated.",
         "dosu069DeclineDefeat": "{card} ({id}): Opponent declined to reveal. Hidden character defeated.",
+        "dosu069DuplicateNameDefeat": "Dosu Kinuta (069): {target} cannot be revealed, a character with that name is already there, defeated instead.",
         "dosu069LockDefeat": "Dosu Kinuta (069): Reveal blocked by Shikamaru Nara, {target} defeated.",
         "dosu069Reveal": "Dosu Kinuta (069): {target} was revealed, paying {cost} chakra.",
         "shikamaruBlockReveal": "Cannot reveal {card}: Shikamaru Nara is blocking hidden plays in this mission.",

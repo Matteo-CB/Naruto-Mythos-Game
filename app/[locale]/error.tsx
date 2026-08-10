@@ -28,13 +28,13 @@ export default function Error({
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
       <div className="flex flex-col items-center gap-4 max-w-md w-full text-center px-4">
-        <div className="w-12 h-px" style={{ backgroundColor: 'rgba(179, 62, 62, 0.4)' }} />
-        <h2 className="text-lg font-bold uppercase tracking-wider" style={{ color: '#b33e3e' }}>
+        <div className="w-12 h-px" style={{ backgroundColor: 'color-mix(in srgb, var(--t-danger) 40%, transparent)' }} />
+        <h2 className="text-lg font-bold uppercase tracking-wider" style={{ color: 'var(--t-danger)' }}>
           {t('title')}
         </h2>
-        <p className="text-xs" style={{ color: '#666' }}>
+        <p className="text-xs" style={{ color: 'var(--t-dim)' }}>
           {error?.message || t('defaultMessage')}
         </p>
         <div className="flex gap-3 mt-2">
@@ -42,8 +42,8 @@ export default function Error({
             onClick={() => { retryCount.current = 0; reset(); }}
             className="px-5 py-2 text-xs font-bold uppercase tracking-wider cursor-pointer"
             style={{
-              backgroundColor: 'rgba(196, 163, 90, 0.1)',
-              color: '#c4a35a',
+              backgroundColor: 'var(--t-accent-tint)',
+              color: 'var(--t-accent)',
             }}
           >
             {t('tryAgain')}
@@ -52,15 +52,15 @@ export default function Error({
             href="/"
             className="px-5 py-2 text-xs uppercase tracking-wider"
             style={{
-              backgroundColor: '#141414',
-              border: '1px solid #262626',
-              color: '#888',
+              backgroundColor: 'var(--t-surface)',
+              border: '1px solid var(--t-border)',
+              color: 'var(--t-muted)',
             }}
           >
             {t('home')}
           </a>
         </div>
-        <div className="w-12 h-px mt-2" style={{ backgroundColor: 'rgba(179, 62, 62, 0.4)' }} />
+        <div className="w-12 h-px mt-2" style={{ backgroundColor: 'color-mix(in srgb, var(--t-danger) 40%, transparent)' }} />
       </div>
     </div>
   );

@@ -105,12 +105,12 @@ export function SealedTimer({ totalSeconds, onTimeUp, paused = false }: SealedTi
   const isExpired = remaining <= 0;
 
   const textColor = isExpired
-    ? '#b33e3e'
+    ? 'var(--t-danger)'
     : isCritical
       ? '#ff4444'
       : isWarning
         ? '#e67e22'
-        : '#e0e0e0';
+        : 'var(--t-text)';
 
   return (
     <motion.div
@@ -125,7 +125,7 @@ export function SealedTimer({ totalSeconds, onTimeUp, paused = false }: SealedTi
         {isExpired ? t('timeExpired') : timeStr}
       </span>
       {isWarning && !isCritical && (
-        <span className="text-xs font-medium" style={{ color: '#e67e22' }}>
+        <span className="text-xs font-medium" style={{ color: 'var(--t-accent)' }}>
           {t('timeWarning')}
         </span>
       )}

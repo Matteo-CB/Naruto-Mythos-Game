@@ -34,19 +34,19 @@ export function FriendRequestToast({ request, onDismiss }: FriendRequestToastPro
       exit={{ opacity: 0, x: 100 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       style={{
-        backgroundColor: '#111111',
-        border: '1px solid #c4a35a',
+        backgroundColor: 'var(--t-panel)',
+        border: '1px solid var(--t-accent)',
         borderRadius: 8,
         padding: 16,
         maxWidth: 320,
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+        boxShadow: '0 8px 32px var(--t-shadow)',
       }}
     >
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <span
             className="text-sm font-medium"
-            style={{ color: '#e0e0e0' }}
+            style={{ color: 'var(--t-text)' }}
           >
             {t('notifications.requestReceived', { name: request.user.username })}
           </span>
@@ -56,10 +56,10 @@ export function FriendRequestToast({ request, onDismiss }: FriendRequestToastPro
           <span
             className="text-xs px-2 py-0.5"
             style={{
-              backgroundColor: 'rgba(196, 163, 90, 0.1)',
+              backgroundColor: 'var(--t-accent-glow)',
               border: '1px solid rgba(196, 163, 90, 0.25)',
               borderRadius: 4,
-              color: '#c4a35a',
+              color: 'var(--t-accent)',
             }}
           >
             {request.user.elo}
@@ -73,10 +73,10 @@ export function FriendRequestToast({ request, onDismiss }: FriendRequestToastPro
             onClick={handleAccept}
             className="h-8 px-3 text-xs font-bold uppercase tracking-wider cursor-pointer"
             style={{
-              backgroundColor: '#c4a35a',
-              border: '1px solid #c4a35a',
+              backgroundColor: 'var(--t-accent)',
+              border: '1px solid var(--t-accent)',
               borderRadius: 4,
-              color: '#0a0a0a',
+              color: 'var(--t-bg)',
             }}
           >
             {t('requests.accept')}
@@ -89,9 +89,9 @@ export function FriendRequestToast({ request, onDismiss }: FriendRequestToastPro
             className="h-8 px-3 text-xs font-bold uppercase tracking-wider cursor-pointer"
             style={{
               backgroundColor: 'transparent',
-              border: '1px solid #333333',
+              border: '1px solid var(--t-border-strong)',
               borderRadius: 4,
-              color: '#888888',
+              color: 'var(--t-muted)',
             }}
           >
             {t('requests.decline')}

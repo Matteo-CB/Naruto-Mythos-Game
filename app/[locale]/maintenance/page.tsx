@@ -94,7 +94,7 @@ function CardCarousel() {
                   height: cardSize.h,
                   transform: `rotateY(${i * angle}deg) translateZ(${radius}px)`,
                   backfaceVisibility: 'hidden',
-                  boxShadow: '0 4px 24px rgba(0,0,0,0.7), 0 0 12px rgba(196, 163, 90, 0.08)',
+                  boxShadow: '0 4px 24px var(--t-shadow), 0 0 12px var(--t-accent-tint)',
                   }}
               >
                 <Image
@@ -117,7 +117,7 @@ function CardCarousel() {
           width: '60%',
           height: 50,
           marginTop: -10,
-          background: 'radial-gradient(ellipse at center, rgba(196, 163, 90, 0.06) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse at center, var(--t-accent-tint) 0%, transparent 70%)',
         }}
       />
     </div>
@@ -165,7 +165,7 @@ export default function MaintenancePage() {
   return (
     <div
       className="min-h-screen relative flex flex-col items-center justify-center overflow-hidden"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{ backgroundColor: 'var(--t-bg)' }}
     >
       <CloudBackground />
       <div className="fixed top-4 right-4 z-50">
@@ -177,8 +177,8 @@ export default function MaintenancePage() {
           className="font-display tracking-wider"
           style={{
             fontSize: 'clamp(2.2rem, 6vw, 3.5rem)',
-            color: '#c4a35a',
-            textShadow: '0 0 40px rgba(196, 163, 90, 0.3), 0 0 80px rgba(196, 163, 90, 0.1)',
+            color: 'var(--t-accent)',
+            textShadow: '0 0 40px rgba(196, 163, 90, 0.3), 0 0 80px var(--t-accent-glow)',
             lineHeight: 1.1,
           }}
         >
@@ -189,20 +189,20 @@ export default function MaintenancePage() {
           className="font-display uppercase mt-1"
           style={{
             fontSize: 'clamp(0.65rem, 2vw, 0.85rem)',
-            color: '#888888',
+            color: 'var(--t-muted)',
             letterSpacing: '0.35em',
           }}
         >
           {t('subtitle')}
         </p>
 
-        <div className="my-6" style={{ width: 120, height: 1, background: 'rgba(196, 163, 90, 0.1)' }} />
+        <div className="my-6" style={{ width: 120, height: 1, background: 'var(--t-accent-glow)' }} />
 
         <p
           className="font-body"
           style={{
             fontSize: 'clamp(0.9rem, 2.5vw, 1.05rem)',
-            color: '#e0e0e0',
+            color: 'var(--t-text)',
             lineHeight: 1.7,
             maxWidth: 480,
           }}
@@ -213,7 +213,7 @@ export default function MaintenancePage() {
         <div className="mt-7 text-center">
           <p
             className="font-body uppercase"
-            style={{ fontSize: '0.75rem', color: '#888888', letterSpacing: '0.2em' }}
+            style={{ fontSize: '0.75rem', color: 'var(--t-muted)', letterSpacing: '0.2em' }}
           >
             {t('timerLabel')}
           </p>
@@ -221,7 +221,7 @@ export default function MaintenancePage() {
             className="font-display mt-1"
             style={{
               fontSize: 'clamp(2rem, 5vw, 3rem)',
-              color: '#c4a35a',
+              color: 'var(--t-accent)',
               textShadow: '0 0 30px rgba(196, 163, 90, 0.3)',
               letterSpacing: '0.12em',
             }}
@@ -235,14 +235,14 @@ export default function MaintenancePage() {
 
       <div
         className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10"
-        style={{ fontSize: '0.7rem', color: '#888888', letterSpacing: '0.05em' }}
+        style={{ fontSize: '0.7rem', color: 'var(--t-muted)', letterSpacing: '0.05em' }}
       >
         <span
           className="block rounded-full"
           style={{
             width: 6,
             height: 6,
-            background: '#b33e3e',
+            background: 'var(--t-danger)',
             animation: 'pulse-dot 2s ease-in-out infinite',
           }}
         />

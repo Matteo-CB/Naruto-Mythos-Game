@@ -16,10 +16,10 @@ const SLOT_ORDER: PackSlotKind[] = ['HOLO_C', 'HOLO_UC', 'RA', 'MV', 'SV', 'L'];
 const SLOT_COLOR: Record<PackSlotKind, string> = {
   HOLO_C: '#a8e6ff',
   HOLO_UC: '#7fd4a8',
-  RA: '#c4a35a',
+  RA: 'var(--t-accent)',
   MV: '#5fa3df',
   SV: '#9b59b6',
-  L: '#d97676',
+  L: 'var(--t-danger)',
 };
 
 const EXAMPLE_CARD: Record<PackSlotKind, string> = {
@@ -51,12 +51,12 @@ export function BoosterRatesPanel() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       className="px-5 py-4 mt-6"
-      style={{ backgroundColor: '#0d0c10', clipPath: PANEL_CLIP, boxShadow: '0 12px 32px rgba(0,0,0,0.45)' }}
+      style={{ backgroundColor: 'var(--t-bg)', clipPath: PANEL_CLIP, boxShadow: '0 12px 32px var(--t-shadow)' }}
     >
-      <h3 className="font-display text-[11px] uppercase tracking-[0.28em] mb-1" style={{ color: '#666' }}>
+      <h3 className="font-display text-[11px] uppercase tracking-[0.28em] mb-1" style={{ color: 'var(--t-dim)' }}>
         {t('ratesTitle')}
       </h3>
-      <p className="text-[11px] mb-4" style={{ color: '#555' }}>
+      <p className="text-[11px] mb-4" style={{ color: 'var(--t-dim)' }}>
         {t('ratesSubtitle')}
       </p>
 
@@ -71,7 +71,7 @@ export function BoosterRatesPanel() {
             <div
               key={k}
               className="flex flex-col items-center text-center gap-2 px-2 py-4"
-              style={{ backgroundColor: '#0a090d', clipPath: TILE_CLIP }}
+              style={{ backgroundColor: 'var(--t-surface-2)', clipPath: TILE_CLIP }}
             >
               {img && (
                 <div className="relative overflow-hidden" style={{ width: 72, height: 100 }}>
@@ -90,7 +90,7 @@ export function BoosterRatesPanel() {
               <span className="font-display text-lg tabular-nums leading-none" style={{ color: '#f4f1e8' }}>
                 {formatPct(p)}
               </span>
-              <span className="text-[9px] tabular-nums" style={{ color: '#555' }}>
+              <span className="text-[9px] tabular-nums" style={{ color: 'var(--t-dim)' }}>
                 {oneInN(p)}
               </span>
             </div>

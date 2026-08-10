@@ -64,17 +64,17 @@ export function MatchInviteToast({ invite, onDismiss, onAccepted }: MatchInviteT
       exit={{ opacity: 0, x: 100 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       style={{
-        backgroundColor: '#111111',
-        border: '1px solid #c4a35a',
+        backgroundColor: 'var(--t-panel)',
+        border: '1px solid var(--t-accent)',
         borderRadius: 8,
         padding: 16,
         maxWidth: 320,
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+        boxShadow: '0 8px 32px var(--t-shadow)',
       }}
     >
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <span className="flex items-center gap-2 text-sm font-medium" style={{ color: '#e0e0e0' }}>
+          <span className="flex items-center gap-2 text-sm font-medium" style={{ color: 'var(--t-text)' }}>
             <img src="/images/icons/match-invite.svg" alt="" draggable={false} style={{ width: 16, height: 16, opacity: 0.7 }} />
             {t('inviteFrom', { name: invite.user.username })}
           </span>
@@ -84,10 +84,10 @@ export function MatchInviteToast({ invite, onDismiss, onAccepted }: MatchInviteT
           <span
             className="text-xs px-2 py-0.5"
             style={{
-              backgroundColor: 'rgba(196, 163, 90, 0.1)',
+              backgroundColor: 'var(--t-accent-glow)',
               border: '1px solid rgba(196, 163, 90, 0.25)',
               borderRadius: 4,
-              color: '#c4a35a',
+              color: 'var(--t-accent)',
             }}
           >
             {invite.user.elo}
@@ -95,7 +95,7 @@ export function MatchInviteToast({ invite, onDismiss, onAccepted }: MatchInviteT
           <span
             className="text-xs"
             style={{
-              color: remaining <= 10 ? '#b33e3e' : '#888888',
+              color: remaining <= 10 ? 'var(--t-danger)' : 'var(--t-muted)',
               fontVariantNumeric: 'tabular-nums',
             }}
           >
@@ -111,10 +111,10 @@ export function MatchInviteToast({ invite, onDismiss, onAccepted }: MatchInviteT
             disabled={actionLoading}
             className="h-8 px-3 text-xs font-bold uppercase tracking-wider cursor-pointer"
             style={{
-              backgroundColor: '#c4a35a',
-              border: '1px solid #c4a35a',
+              backgroundColor: 'var(--t-accent)',
+              border: '1px solid var(--t-accent)',
               borderRadius: 4,
-              color: '#0a0a0a',
+              color: 'var(--t-bg)',
               opacity: actionLoading ? 0.5 : 1,
               cursor: actionLoading ? 'not-allowed' : 'pointer',
             }}
@@ -130,9 +130,9 @@ export function MatchInviteToast({ invite, onDismiss, onAccepted }: MatchInviteT
             className="h-8 px-3 text-xs font-bold uppercase tracking-wider cursor-pointer"
             style={{
               backgroundColor: 'transparent',
-              border: '1px solid #333333',
+              border: '1px solid var(--t-border-strong)',
               borderRadius: 4,
-              color: '#888888',
+              color: 'var(--t-muted)',
               opacity: actionLoading ? 0.5 : 1,
               cursor: actionLoading ? 'not-allowed' : 'pointer',
             }}

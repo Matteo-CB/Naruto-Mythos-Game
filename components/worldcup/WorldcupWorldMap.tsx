@@ -27,7 +27,7 @@ interface Props {
 const VW = 960;
 const VH = 470;
 const NO_DATA_FILL = '#16151b';
-const STROKE = '#0a0a0a';
+const STROKE = 'var(--t-bg)';
 
 function lerpColor(t: number): string {
   const from = [58, 51, 32];
@@ -97,10 +97,10 @@ export function WorldcupWorldMap({ rows, countryName, onSelect }: Props) {
   return (
     <div className="mb-6">
       <div className="flex items-baseline justify-between gap-3 mb-3">
-        <span className="text-[10px] uppercase tracking-[0.25em]" style={{ color: '#c4a35a' }}>
+        <span className="text-[10px] uppercase tracking-[0.25em]" style={{ color: 'var(--t-accent)' }}>
           {t('worldMapTitle')}
         </span>
-        <span className="font-display text-[11px] uppercase tracking-widest tabular-nums" style={{ color: hoveredRow ? '#e8e8e8' : '#555' }}>
+        <span className="font-display text-[11px] uppercase tracking-widest tabular-nums" style={{ color: hoveredRow ? 'var(--t-text)' : 'var(--t-dim)' }}>
           {hoveredRow
             ? `${countryName(hoveredRow.countryCode)} · ${hoveredRow.score.toFixed(1)}`
             : t('worldMapHint')}
@@ -117,7 +117,7 @@ export function WorldcupWorldMap({ rows, countryName, onSelect }: Props) {
         >
           <defs>
             <filter id="wc-glow" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#c4a35a" floodOpacity="0.65" />
+              <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="var(--t-accent)" floodOpacity="0.65" />
             </filter>
           </defs>
           {countries.map((c) => {

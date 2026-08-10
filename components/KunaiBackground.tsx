@@ -66,7 +66,7 @@ export const KunaiBackground = memo(function KunaiBackground({ className = '', a
   return (
     <div
       className={`fixed inset-0 pointer-events-none overflow-hidden ${className}`}
-      style={{ zIndex: 0, backgroundColor: '#08080a' }}
+      style={{ zIndex: 0, backgroundColor: 'var(--t-surface-2)' }}
       aria-hidden="true"
     >
       {BLADES.map((blade, i) => {

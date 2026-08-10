@@ -30,7 +30,7 @@ const TAB_LABEL_KEY: Record<TabKey, string> = {
 
 const CATEGORY_STYLE: Record<Category, { color: string; bg: string }> = {
   fix: { color: '#d98d8d', bg: 'rgba(217,141,141,0.13)' },
-  feature: { color: '#c4a35a', bg: 'rgba(196,163,90,0.13)' },
+  feature: { color: 'var(--t-accent)', bg: 'var(--t-accent-glow)' },
 };
 
 interface ChangeItem {
@@ -151,7 +151,7 @@ export function ChangelogButton() {
               onClick={(e) => e.stopPropagation()}
               className="relative flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-md border shadow-2xl"
               style={{
-                backgroundColor: '#111111',
+                backgroundColor: 'var(--t-panel)',
                 borderColor: '#2a2a2a',
               }}
             >
@@ -163,11 +163,11 @@ export function ChangelogButton() {
                   <h2
                     id="changelog-title"
                     className="font-display text-xl font-black tracking-wider uppercase"
-                    style={{ color: '#c4a35a' }}
+                    style={{ color: 'var(--t-accent)' }}
                   >
                     {t('modalTitle')}
                   </h2>
-                  <span className="text-xs uppercase tracking-widest" style={{ color: '#555555' }}>
+                  <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
                     {t('modalSubtitle')}
                   </span>
                 </div>
@@ -175,9 +175,9 @@ export function ChangelogButton() {
                   type="button"
                   onClick={closeModal}
                   className="text-xs font-bold uppercase tracking-widest transition-colors"
-                  style={{ color: '#888888' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = '#c4a35a')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = '#888888')}
+                  style={{ color: 'var(--t-muted)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--t-accent)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--t-muted)')}
                   aria-label={t('close')}
                 >
                   {t('close')}
@@ -201,8 +201,8 @@ export function ChangelogButton() {
                       className="font-display px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest transition-colors"
                       style={
                         active
-                          ? { color: '#c4a35a', backgroundColor: 'rgba(196,163,90,0.12)' }
-                          : { color: '#777777', backgroundColor: 'transparent' }
+                          ? { color: 'var(--t-accent)', backgroundColor: 'var(--t-accent-glow)' }
+                          : { color: 'var(--t-dim)', backgroundColor: 'transparent' }
                       }
                     >
                       {t(TAB_LABEL_KEY[tab])}
@@ -213,7 +213,7 @@ export function ChangelogButton() {
 
               <div className="overflow-y-auto px-5 pt-7 pb-6">
                 {visibleEntries.length === 0 ? (
-                  <p className="text-sm" style={{ color: '#777777' }}>
+                  <p className="text-sm" style={{ color: 'var(--t-dim)' }}>
                     {entries.length === 0 ? t('empty') : t('emptyTab')}
                   </p>
                 ) : (
@@ -226,7 +226,7 @@ export function ChangelogButton() {
                           <div className="mb-2 flex items-center gap-3">
                             <span
                               className="text-xs font-bold uppercase tracking-widest"
-                              style={{ color: isLatest ? '#c4a35a' : '#666666' }}
+                              style={{ color: isLatest ? 'var(--t-accent)' : 'var(--t-dim)' }}
                             >
                               {formatDate(entry.date, tMeta('bcp47'))}
                             </span>
@@ -234,8 +234,8 @@ export function ChangelogButton() {
                               <span
                                 className="rounded-sm px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-widest"
                                 style={{
-                                  backgroundColor: 'rgba(196,163,90,0.15)',
-                                  color: '#c4a35a',
+                                  backgroundColor: 'var(--t-accent-glow)',
+                                  color: 'var(--t-accent)',
                                   }}
                               >
                                 {t('latestBadge')}
@@ -244,7 +244,7 @@ export function ChangelogButton() {
                           </div>
                           <h3
                             className="mb-2 text-base font-bold"
-                            style={{ color: '#e8e8e8' }}
+                            style={{ color: 'var(--t-text)' }}
                           >
                             {title}
                           </h3>
@@ -253,7 +253,7 @@ export function ChangelogButton() {
                               <li
                                 key={i}
                                 className="flex items-start gap-2 text-sm leading-relaxed"
-                                style={{ color: '#bbbbbb' }}
+                                style={{ color: 'var(--t-muted)' }}
                               >
                                 <span
                                   className="font-display mt-0.5 shrink-0 rounded-sm px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest"
@@ -287,7 +287,7 @@ export function ChangelogButton() {
         onClick={openModal}
         className="font-display relative px-2 py-1 text-xs font-bold uppercase tracking-wider transition-colors"
         style={{
-          color: hasNew ? '#c4a35a' : '#888888',
+          color: hasNew ? 'var(--t-accent)' : 'var(--t-muted)',
         }}
         aria-label={t('buttonLabel')}
       >
@@ -295,7 +295,7 @@ export function ChangelogButton() {
         {hasNew && (
           <span
             className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full"
-            style={{ backgroundColor: '#c4a35a' }}
+            style={{ backgroundColor: 'var(--t-accent)' }}
             aria-hidden="true"
           />
         )}

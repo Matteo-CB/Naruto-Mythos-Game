@@ -107,15 +107,15 @@ interface OpenedBooster {
   boosterImage?: string;
 }
 
-const ACCENT = '#c4a35a';
+const ACCENT = 'var(--t-accent)';
 const PANEL_CLIP = 'polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px)';
 const STAT_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
-const PANEL_BG = '#0d0c10';
+const PANEL_BG = 'var(--t-bg)';
 const LEVEL_COLOR: Record<number, string> = {
-  1: '#3e8b3e',
+  1: 'var(--t-success)',
   2: '#5fa3df',
-  3: '#c4a35a',
-  4: '#b33e3e',
+  3: 'var(--t-accent)',
+  4: 'var(--t-danger)',
 };
 
 const TABS: TabKey[] = ['rewards', 'boosters', 'quests'];
@@ -440,11 +440,11 @@ export default function RewardsHubPage() {
   const filteredQuests = mainQuests.filter((q) => q.level === activeLevel);
 
   return (
-    <main className="relative min-h-screen flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a', color: '#e8e8e8' }}>
+    <main className="relative min-h-screen flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-text)' }}>
       <CloudBackground />
 
       <header className="relative z-10 flex items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/" className="text-xs tracking-widest font-display" style={{ color: '#888' }}>
+        <Link href="/" className="text-xs tracking-widest font-display" style={{ color: 'var(--t-muted)' }}>
           {'< '}{tCommon('back')}
         </Link>
         <LanguageSwitcher />
@@ -461,7 +461,7 @@ export default function RewardsHubPage() {
         </motion.h1>
         <motion.p
           className="text-xs tracking-widest mb-1 uppercase"
-          style={{ color: '#888' }}
+          style={{ color: 'var(--t-muted)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
@@ -481,7 +481,7 @@ export default function RewardsHubPage() {
           <motion.p
             key="quests-subtitle"
             className="text-[11px] mb-6"
-            style={{ color: '#666' }}
+            style={{ color: 'var(--t-dim)' }}
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25 }}
@@ -492,7 +492,7 @@ export default function RewardsHubPage() {
         {tab !== 'quests' && <div className="mb-5" />}
 
         {loading && (
-          <div className="text-sm" style={{ color: '#666' }}>{tCommon('loading')}</div>
+          <div className="text-sm" style={{ color: 'var(--t-dim)' }}>{tCommon('loading')}</div>
         )}
 
         {error === 'unauth' && (
@@ -505,7 +505,7 @@ export default function RewardsHubPage() {
         )}
 
         {error === 'load' && (
-          <div className="text-sm" style={{ color: '#b33e3e' }}>{t('loadError')}</div>
+          <div className="text-sm" style={{ color: 'var(--t-danger)' }}>{t('loadError')}</div>
         )}
 
         {!loading && !error && bpState && (
@@ -515,28 +515,28 @@ export default function RewardsHubPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="flex flex-wrap items-center gap-6 mb-5 px-5 py-5"
-              style={{ backgroundColor: PANEL_BG, clipPath: PANEL_CLIP, boxShadow: '0 12px 32px rgba(0,0,0,0.45)' }}
+              style={{ backgroundColor: PANEL_BG, clipPath: PANEL_CLIP, boxShadow: '0 12px 32px var(--t-shadow)' }}
             >
               <div>
-                <div className="text-[10px] uppercase tracking-[0.32em]" style={{ color: '#666' }}>
+                <div className="text-[10px] uppercase tracking-[0.32em]" style={{ color: 'var(--t-dim)' }}>
                   {t('currentTier')}
                 </div>
                 <div className="text-3xl sm:text-4xl font-display mt-1" style={{ color: ACCENT, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
                   {bpState.tier}
-                  <span className="text-sm" style={{ color: '#555' }}> / {bpState.tierCount}</span>
+                  <span className="text-sm" style={{ color: 'var(--t-dim)' }}> / {bpState.tierCount}</span>
                 </div>
               </div>
 
               <div className="flex-1 min-w-[200px]">
                 <div className="flex items-baseline justify-between mb-1">
-                  <span className="text-[10px] uppercase tracking-widest" style={{ color: '#888' }}>
+                  <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
                     {t('xpProgress')}
                   </span>
-                  <span className="text-xs" style={{ color: '#bbb', fontVariantNumeric: 'tabular-nums' }}>
+                  <span className="text-xs" style={{ color: 'var(--t-muted)', fontVariantNumeric: 'tabular-nums' }}>
                     {bpState.xp}{bpState.xpForNextTier !== null ? ` / ${bpState.xpForNextTier}` : ''}
                   </span>
                 </div>
-                <div style={{ height: 6, backgroundColor: '#1a1a1a' }}>
+                <div style={{ height: 6, backgroundColor: 'var(--t-surface-2)' }}>
                   <motion.div
                     style={{ height: '100%', backgroundColor: ACCENT }}
                     initial={{ width: 0 }}
@@ -549,7 +549,7 @@ export default function RewardsHubPage() {
                   />
                 </div>
                 {bpState.xpToNext !== null && (
-                  <div className="text-[10px] mt-1.5" style={{ color: '#888' }}>
+                  <div className="text-[10px] mt-1.5" style={{ color: 'var(--t-muted)' }}>
                     {t('xpToNext', { xp: bpState.xpToNext })}
                   </div>
                 )}
@@ -557,7 +557,7 @@ export default function RewardsHubPage() {
 
               {bpState.isMaxNamedTier && (
                 <div>
-                  <div className="text-[10px] uppercase tracking-[0.32em]" style={{ color: '#666' }}>
+                  <div className="text-[10px] uppercase tracking-[0.32em]" style={{ color: 'var(--t-dim)' }}>
                     {t('infiniteBoosters')}
                   </div>
                   <div className="text-2xl font-display mt-1" style={{ color: ACCENT, fontVariantNumeric: 'tabular-nums' }}>
@@ -580,8 +580,8 @@ export default function RewardsHubPage() {
                     onClick={() => switchTab(key)}
                     className="relative px-4 py-2.5 text-[11px] tracking-widest font-display uppercase flex items-center gap-2"
                     style={{
-                      color: isActive ? ACCENT : '#777',
-                      backgroundColor: isActive ? '#141414' : 'transparent',
+                      color: isActive ? ACCENT : 'var(--t-dim)',
+                      backgroundColor: isActive ? 'var(--t-surface)' : 'transparent',
                       cursor: 'pointer',
                       transition: 'color 200ms ease, background-color 200ms ease',
                     }}
@@ -626,10 +626,10 @@ export default function RewardsHubPage() {
                 >
                   <div
                     className="mb-6 py-4"
-                    style={{ backgroundColor: PANEL_BG, clipPath: PANEL_CLIP, boxShadow: '0 12px 32px rgba(0,0,0,0.45)' }}
+                    style={{ backgroundColor: PANEL_BG, clipPath: PANEL_CLIP, boxShadow: '0 12px 32px var(--t-shadow)' }}
                   >
                     <div className="px-5 mb-3 flex items-center justify-between">
-                      <h2 className="text-[11px] uppercase tracking-[0.28em]" style={{ color: '#666' }}>
+                      <h2 className="text-[11px] uppercase tracking-[0.28em]" style={{ color: 'var(--t-dim)' }}>
                         {t('trackLabel')}
                       </h2>
                       {claimableCardTiers.length >= 2 && (
@@ -639,8 +639,8 @@ export default function RewardsHubPage() {
                           disabled={claimingTier !== null}
                           className="px-3 py-1.5 text-[10px] tracking-widest font-display uppercase"
                           style={{
-                            backgroundColor: claimingTier !== null ? '#1a1a1a' : ACCENT,
-                            color: claimingTier !== null ? '#888' : '#0a0a0a',
+                            backgroundColor: claimingTier !== null ? 'var(--t-surface-2)' : ACCENT,
+                            color: claimingTier !== null ? 'var(--t-muted)' : 'var(--t-bg)',
                             cursor: claimingTier !== null ? 'wait' : 'pointer',
                           }}
                           animate={claimingTier !== null ? undefined : { boxShadow: [`0 0 6px ${ACCENT}66`, `0 0 14px ${ACCENT}aa`, `0 0 6px ${ACCENT}66`] }}
@@ -662,7 +662,7 @@ export default function RewardsHubPage() {
                     />
                   </div>
 
-                  <h2 className="mb-2 text-xs uppercase tracking-widest" style={{ color: '#888' }}>
+                  <h2 className="mb-2 text-xs uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
                     {t('infiniteLabel')}
                   </h2>
                   <InfiniteSegment
@@ -677,7 +677,7 @@ export default function RewardsHubPage() {
                   {quests.length > 0 && (
                     <section className="mt-6">
                       <div className="flex items-baseline justify-between mb-3">
-                        <h2 className="text-[11px] uppercase tracking-[0.28em]" style={{ color: '#666' }}>
+                        <h2 className="text-[11px] uppercase tracking-[0.28em]" style={{ color: 'var(--t-dim)' }}>
                           {t('recommendedQuestsTitle')}
                         </h2>
                         <button
@@ -692,17 +692,17 @@ export default function RewardsHubPage() {
                       {recommendedQuests.length === 0 ? (
                         <div className="flex flex-col items-center py-6 gap-2">
                           <img src="/images/icons/empty-quests.svg" alt="" draggable={false} style={{ width: 36, height: 36, opacity: 0.2 }} />
-                          <p className="text-[11px]" style={{ color: '#555' }}>
+                          <p className="text-[11px]" style={{ color: 'var(--t-dim)' }}>
                             {t('recommendedQuestsEmpty')}
                           </p>
                         </div>
                       ) : (
-                        <div style={{ backgroundColor: PANEL_BG, clipPath: STAT_CLIP, boxShadow: '0 12px 32px rgba(0,0,0,0.45)' }}>
+                        <div style={{ backgroundColor: PANEL_BG, clipPath: STAT_CLIP, boxShadow: '0 12px 32px var(--t-shadow)' }}>
                           {recommendedQuests.map((q) => (
                             <div
                               key={q.id}
                               className="px-4 py-3 flex flex-wrap items-center gap-3"
-                              style={{ borderTop: '1px solid #141414' }}
+                              style={{ borderTop: '1px solid var(--t-surface)' }}
                             >
                               <span
                                 className="text-[10px] font-display tracking-widest uppercase shrink-0"
@@ -710,20 +710,20 @@ export default function RewardsHubPage() {
                               >
                                 {tQuests('levelLabel', { level: q.level })}
                               </span>
-                              <span className="text-xs flex-1" style={{ color: '#e8e8e8', minWidth: 180 }}>
+                              <span className="text-xs flex-1" style={{ color: 'var(--t-text)', minWidth: 180 }}>
                                 {questText(q, locale)}
                               </span>
                               <div className="flex items-center gap-2" style={{ minWidth: 140 }}>
-                                <div className="flex-1" style={{ height: 4, backgroundColor: '#1a1a1a', minWidth: 80 }}>
+                                <div className="flex-1" style={{ height: 4, backgroundColor: 'var(--t-surface-2)', minWidth: 80 }}>
                                   <div
                                     style={{
                                       height: '100%',
-                                      backgroundColor: q.completed ? ACCENT : '#666',
+                                      backgroundColor: q.completed ? ACCENT : 'var(--t-dim)',
                                       width: `${Math.min(100, (q.progress / q.target) * 100)}%`,
                                     }}
                                   />
                                 </div>
-                                <span className="text-[10px] shrink-0" style={{ color: '#888', fontVariantNumeric: 'tabular-nums' }}>
+                                <span className="text-[10px] shrink-0" style={{ color: 'var(--t-muted)', fontVariantNumeric: 'tabular-nums' }}>
                                   {q.progress}/{q.target}
                                 </span>
                               </div>
@@ -738,15 +738,15 @@ export default function RewardsHubPage() {
                                     disabled={claimingQuestId !== null}
                                     className="px-2 py-1 text-[10px] tracking-widest font-display uppercase"
                                     style={{
-                                      backgroundColor: claimingQuestId === q.id ? '#1a1a1a' : ACCENT,
-                                      color: claimingQuestId === q.id ? '#888' : '#0a0a0a',
+                                      backgroundColor: claimingQuestId === q.id ? 'var(--t-surface-2)' : ACCENT,
+                                      color: claimingQuestId === q.id ? 'var(--t-muted)' : 'var(--t-bg)',
                                       cursor: claimingQuestId !== null ? 'wait' : 'pointer',
                                     }}
                                   >
                                     {tQuests('claim')}
                                   </button>
                                 ) : (
-                                  <span className="text-[10px]" style={{ color: '#555' }}>...</span>
+                                  <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>...</span>
                                 )}
                               </div>
                             </div>
@@ -756,7 +756,7 @@ export default function RewardsHubPage() {
                     </section>
                   )}
 
-                  <p className="mt-6 text-[11px] leading-relaxed" style={{ color: '#666' }}>
+                  <p className="mt-6 text-[11px] leading-relaxed" style={{ color: 'var(--t-dim)' }}>
                     {t('autoGrantNote')}
                   </p>
                 </motion.section>
@@ -771,10 +771,10 @@ export default function RewardsHubPage() {
                   transition={{ duration: 0.2 }}
                 >
                   <div className="flex items-baseline justify-between mb-4">
-                    <h2 className="text-xs uppercase tracking-widest" style={{ color: '#888' }}>
+                    <h2 className="text-xs uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
                       {tBoosters('title')}
                     </h2>
-                    <span className="text-[11px]" style={{ color: '#888', fontVariantNumeric: 'tabular-nums' }}>
+                    <span className="text-[11px]" style={{ color: 'var(--t-muted)', fontVariantNumeric: 'tabular-nums' }}>
                       {tBoosters('totalUnopened', { count: totalUnopened })}
                     </span>
                   </div>
@@ -782,7 +782,7 @@ export default function RewardsHubPage() {
                   {invLoading ? (
                     <div className="flex flex-row gap-6 justify-center mb-8">
                       {[0, 1].map((i) => (
-                        <div key={i} className="h-115 w-70 bg-[#111111] animate-pulse" style={{ boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }} />
+                        <div key={i} className="h-115 w-70 bg-[var(--t-panel)] animate-pulse" style={{ boxShadow: '0 12px 32px var(--t-shadow)' }} />
                       ))}
                     </div>
                   ) : (
@@ -814,11 +814,11 @@ export default function RewardsHubPage() {
                   <BoosterRatesPanel />
 
                   <section className="mt-6">
-                    <h3 className="font-display uppercase tracking-wider mb-3" style={{ color: '#888', fontSize: 11, letterSpacing: '0.18em' }}>
+                    <h3 className="font-display uppercase tracking-wider mb-3" style={{ color: 'var(--t-muted)', fontSize: 11, letterSpacing: '0.18em' }}>
                       {tBoosters('helpTitle')}
                     </h3>
-                    <div style={{ height: 1, backgroundColor: '#1a1a1a', marginBottom: 12 }} />
-                    <ul className="space-y-2 font-body text-sm" style={{ color: '#aaa' }}>
+                    <div style={{ height: 1, backgroundColor: 'var(--t-surface-2)', marginBottom: 12 }} />
+                    <ul className="space-y-2 font-body text-sm" style={{ color: 'var(--t-muted)' }}>
                       <li>{tBoosters('helpBattlepass')}</li>
                       <li>{tBoosters('helpTournamentWinner')}</li>
                       <li>{tBoosters('helpTournamentFinisher')}</li>
@@ -838,21 +838,21 @@ export default function RewardsHubPage() {
                   {daily && (
                     <section
                       className="mb-5 px-5 py-4"
-                      style={{ backgroundColor: PANEL_BG, clipPath: PANEL_CLIP, boxShadow: '0 12px 32px rgba(0,0,0,0.45)' }}
+                      style={{ backgroundColor: PANEL_BG, clipPath: PANEL_CLIP, boxShadow: '0 12px 32px var(--t-shadow)' }}
                     >
                       <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                         <h3 className="text-xs uppercase tracking-[0.24em] font-display" style={{ color: ACCENT }}>
                           {tQuests('dailyHeader')}
                         </h3>
-                        <span className="text-[10px] uppercase tracking-widest" style={{ color: '#666', fontVariantNumeric: 'tabular-nums' }}>
+                        <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--t-dim)', fontVariantNumeric: 'tabular-nums' }}>
                           {daily.date}
                         </span>
                       </div>
-                      <p className="text-sm mb-3" style={{ color: '#e8e8e8' }}>
+                      <p className="text-sm mb-3" style={{ color: 'var(--t-text)' }}>
                         {questText(daily.quest, locale)}
                       </p>
                       <div className="flex items-center gap-3">
-                        <div className="flex-1" style={{ height: 4, backgroundColor: '#1a1a1a' }}>
+                        <div className="flex-1" style={{ height: 4, backgroundColor: 'var(--t-surface-2)' }}>
                           <div
                             style={{
                               height: '100%',
@@ -861,7 +861,7 @@ export default function RewardsHubPage() {
                             }}
                           />
                         </div>
-                        <span className="text-[10px]" style={{ color: '#bbb', fontVariantNumeric: 'tabular-nums' }}>
+                        <span className="text-[10px]" style={{ color: 'var(--t-muted)', fontVariantNumeric: 'tabular-nums' }}>
                           {daily.progress} / {daily.quest.target}
                         </span>
                         <span className="text-[10px]" style={{ color: ACCENT, fontVariantNumeric: 'tabular-nums' }}>
@@ -870,7 +870,7 @@ export default function RewardsHubPage() {
                         {daily.claimed ? (
                           <span
                             className="text-[10px] uppercase tracking-widest font-display"
-                            style={{ color: '#666' }}
+                            style={{ color: 'var(--t-dim)' }}
                           >
                             {tQuests('claimed')}
                           </span>
@@ -881,8 +881,8 @@ export default function RewardsHubPage() {
                             disabled={claimingQuestId !== null}
                             className="px-3 py-1.5 text-[10px] tracking-widest font-display uppercase"
                             style={{
-                              backgroundColor: claimingQuestId !== null ? '#1a1a1a' : ACCENT,
-                              color: claimingQuestId !== null ? '#888' : '#0a0a0a',
+                              backgroundColor: claimingQuestId !== null ? 'var(--t-surface-2)' : ACCENT,
+                              color: claimingQuestId !== null ? 'var(--t-muted)' : 'var(--t-bg)',
                               cursor: claimingQuestId !== null ? 'wait' : 'pointer',
                             }}
                           >
@@ -901,13 +901,13 @@ export default function RewardsHubPage() {
                         onClick={() => setActiveLevel(level)}
                         className="px-3 py-1.5 text-[10px] tracking-widest font-display uppercase flex items-center gap-2"
                         style={{
-                          backgroundColor: activeLevel === level ? '#1a1a1a' : '#0f0f0f',
-                          color: activeLevel === level ? LEVEL_COLOR[level] : '#888',
+                          backgroundColor: activeLevel === level ? 'var(--t-surface-2)' : 'var(--t-bg-elevated)',
+                          color: activeLevel === level ? LEVEL_COLOR[level] : 'var(--t-muted)',
                           cursor: 'pointer',
                         }}
                       >
                         {tQuests('levelLabel', { level })}
-                        <span style={{ color: '#666', fontVariantNumeric: 'tabular-nums' }}>{completed}/{total}</span>
+                        <span style={{ color: 'var(--t-dim)', fontVariantNumeric: 'tabular-nums' }}>{completed}/{total}</span>
                         {claimable > 0 && (
                           <span style={{ color: ACCENT, fontVariantNumeric: 'tabular-nums' }}>+{claimable}</span>
                         )}
@@ -915,12 +915,12 @@ export default function RewardsHubPage() {
                     ))}
                   </div>
 
-                  <div style={{ backgroundColor: PANEL_BG, clipPath: STAT_CLIP, boxShadow: '0 12px 32px rgba(0,0,0,0.45)' }}>
+                  <div style={{ backgroundColor: PANEL_BG, clipPath: STAT_CLIP, boxShadow: '0 12px 32px var(--t-shadow)' }}>
                     {filteredQuests.map((q) => (
                       <div
                         key={q.id}
                         className="px-4 py-3 flex flex-wrap items-center gap-3"
-                        style={{ borderTop: '1px solid #141414' }}
+                        style={{ borderTop: '1px solid var(--t-surface)' }}
                       >
                         <span
                           className="text-[10px] font-display tracking-widest uppercase shrink-0"
@@ -928,20 +928,20 @@ export default function RewardsHubPage() {
                         >
                           {tQuests('levelLabel', { level: q.level })}
                         </span>
-                        <span className="text-xs flex-1" style={{ color: '#e8e8e8', minWidth: 200 }}>
+                        <span className="text-xs flex-1" style={{ color: 'var(--t-text)', minWidth: 200 }}>
                           {questText(q, locale)}
                         </span>
                         <div className="flex items-center gap-2" style={{ minWidth: 140 }}>
-                          <div className="flex-1" style={{ height: 4, backgroundColor: '#1a1a1a', minWidth: 80 }}>
+                          <div className="flex-1" style={{ height: 4, backgroundColor: 'var(--t-surface-2)', minWidth: 80 }}>
                             <div
                               style={{
                                 height: '100%',
-                                backgroundColor: q.completed ? ACCENT : '#666',
+                                backgroundColor: q.completed ? ACCENT : 'var(--t-dim)',
                                 width: `${Math.min(100, (q.progress / q.target) * 100)}%`,
                               }}
                             />
                           </div>
-                          <span className="text-[10px] shrink-0" style={{ color: '#888', fontVariantNumeric: 'tabular-nums' }}>
+                          <span className="text-[10px] shrink-0" style={{ color: 'var(--t-muted)', fontVariantNumeric: 'tabular-nums' }}>
                             {q.progress}/{q.target}
                           </span>
                         </div>
@@ -952,7 +952,7 @@ export default function RewardsHubPage() {
                           {q.claimed ? (
                             <span
                               className="text-[10px] uppercase tracking-widest font-display"
-                              style={{ color: '#555', whiteSpace: 'nowrap' }}
+                              style={{ color: 'var(--t-dim)', whiteSpace: 'nowrap' }}
                             >
                               {tQuests('claimed')}
                             </span>
@@ -963,15 +963,15 @@ export default function RewardsHubPage() {
                               disabled={claimingQuestId !== null}
                               className="px-2 py-1 text-[10px] tracking-widest font-display uppercase"
                               style={{
-                                backgroundColor: claimingQuestId === q.id ? '#1a1a1a' : ACCENT,
-                                color: claimingQuestId === q.id ? '#888' : '#0a0a0a',
+                                backgroundColor: claimingQuestId === q.id ? 'var(--t-surface-2)' : ACCENT,
+                                color: claimingQuestId === q.id ? 'var(--t-muted)' : 'var(--t-bg)',
                                 cursor: claimingQuestId !== null ? 'wait' : 'pointer',
                               }}
                             >
                               {tQuests('claim')}
                             </button>
                           ) : (
-                            <span className="text-[10px]" style={{ color: '#555' }}>...</span>
+                            <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>...</span>
                           )}
                         </div>
                       </div>

@@ -50,17 +50,17 @@ export function LeaderboardPanel({ mode, onModeChange, topCount = 5 }: Leaderboa
     <section
       className="w-full"
       style={{
-        backgroundColor: 'rgba(15, 15, 20, 0.78)',
-        boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
+        backgroundColor: 'var(--t-bg-elevated)',
+        boxShadow: '0 12px 32px var(--t-shadow)',
       }}
     >
       <header
         className="flex items-center justify-between px-3 py-2.5"
-        style={{ boxShadow: 'inset 0 -1px 0 rgba(255,255,255,0.04)' }}
+        style={{ boxShadow: 'inset 0 -1px 0 var(--t-divider)' }}
       >
         <h2
           className="text-[11px] font-bold uppercase"
-          style={{ color: '#c4a35a', letterSpacing: '0.22em' }}
+          style={{ color: 'var(--t-accent)', letterSpacing: '0.22em' }}
         >
           {t('online.leaderboard.title')}
         </h2>
@@ -82,14 +82,14 @@ export function LeaderboardPanel({ mode, onModeChange, topCount = 5 }: Leaderboa
             )}
             {error && (
               <div className="px-3 py-6 text-center">
-                <span className="text-[10px]" style={{ color: '#555' }}>
+                <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>
                   {t('common.error')}
                 </span>
               </div>
             )}
             {users && users.length === 0 && (
               <div className="px-3 py-6 text-center">
-                <span className="text-[10px]" style={{ color: '#555' }}>
+                <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>
                   {t('online.leaderboard.empty')}
                 </span>
               </div>
@@ -104,30 +104,30 @@ export function LeaderboardPanel({ mode, onModeChange, topCount = 5 }: Leaderboa
                   href={`/profile/${u.username}`}
                   className="flex items-center gap-2 px-2.5 py-2 cursor-pointer no-select"
                   style={{
-                    boxShadow: i < users.length - 1 ? 'inset 0 -1px 0 rgba(255,255,255,0.03)' : undefined,
+                    boxShadow: i < users.length - 1 ? 'inset 0 -1px 0 var(--t-divider)' : undefined,
                   }}
                 >
                   <span
                     className="text-[11px] font-bold tabular-nums"
-                    style={{ color: i === 0 ? '#c4a35a' : i === 1 ? '#aaa' : i === 2 ? '#8a6a3a' : '#555', minWidth: 18 }}
+                    style={{ color: i === 0 ? 'var(--t-accent)' : i === 1 ? 'var(--t-text)' : i === 2 ? 'var(--t-muted)' : 'var(--t-dim)', minWidth: 18 }}
                   >
                     {i + 1}
                   </span>
                   <span
                     className="flex-1 text-[12px] truncate"
-                    style={{ color: '#e8e8e8' }}
+                    style={{ color: 'var(--t-text)' }}
                   >
                     {u.username}
                   </span>
                   <span
                     className="text-[11px] font-bold tabular-nums"
-                    style={{ color: '#c4a35a', minWidth: 42, textAlign: 'right' }}
+                    style={{ color: 'var(--t-accent)', minWidth: 42, textAlign: 'right' }}
                   >
                     {elo}
                   </span>
                   <span
                     className="text-[9px] tabular-nums hidden sm:inline"
-                    style={{ color: '#444', minWidth: 52, textAlign: 'right' }}
+                    style={{ color: 'var(--t-dim)', minWidth: 52, textAlign: 'right' }}
                   >
                     {w}{t('online.leaderboard.winShort')} / {l}{t('online.leaderboard.lossShort')}
                   </span>
@@ -150,7 +150,7 @@ function LeaderboardSkeleton({ rows }: { rows: number }) {
           animate={{ opacity: [0.25, 0.45, 0.25] }}
           transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.08 }}
           className="h-9 mx-2"
-          style={{ backgroundColor: 'rgba(255,255,255,0.025)' }}
+          style={{ backgroundColor: 'var(--t-divider)' }}
         />
       ))}
     </div>

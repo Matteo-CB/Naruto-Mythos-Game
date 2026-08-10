@@ -120,13 +120,13 @@ export default function TournamentSpectatePage() {
   );
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-[#0a0a0a]">
-      <header className="flex items-center justify-between px-4 py-2" style={{ backgroundColor: '#111111' }}>
+    <div className="fixed inset-0 flex flex-col bg-[var(--t-bg)]">
+      <header className="flex items-center justify-between px-4 py-2" style={{ backgroundColor: 'var(--t-panel)' }}>
         <div className="flex items-baseline gap-3 overflow-hidden">
-          <Link href={`/tournaments/${tournamentId}`} className="text-[11px] uppercase tracking-[0.16em] text-[#8a8a8a] hover:text-[#c4a35a]">
+          <Link href={`/tournaments/${tournamentId}`} className="text-[11px] uppercase tracking-[0.16em] text-[var(--t-muted)] hover:text-[var(--t-accent)]">
             {t('backToTournament')}
           </Link>
-          <span className="truncate text-[12px] text-[#e8e8e8]">
+          <span className="truncate text-[12px] text-[var(--t-text)]">
             {t('liveCount', { count: live.length })}
           </span>
         </div>
@@ -138,9 +138,9 @@ export default function TournamentSpectatePage() {
           data-gp="true"
           className="flex flex-col gap-[4px] px-3 py-2"
         >
-          <span className="block h-[2px] w-[20px]" style={{ backgroundColor: '#c4a35a' }} />
-          <span className="block h-[2px] w-[20px]" style={{ backgroundColor: '#c4a35a' }} />
-          <span className="block h-[2px] w-[20px]" style={{ backgroundColor: '#c4a35a' }} />
+          <span className="block h-[2px] w-[20px]" style={{ backgroundColor: 'var(--t-accent)' }} />
+          <span className="block h-[2px] w-[20px]" style={{ backgroundColor: 'var(--t-accent)' }} />
+          <span className="block h-[2px] w-[20px]" style={{ backgroundColor: 'var(--t-accent)' }} />
         </button>
       </header>
 
@@ -163,16 +163,16 @@ export default function TournamentSpectatePage() {
             style={{
               gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
               gridAutoRows: tiles.length > columns ? '1fr' : '100%',
-              backgroundColor: '#050505',
+              backgroundColor: 'var(--t-surface-2)',
             }}
           >
             {tiles.map((tile) => (
-              <section key={tile.roomCode} className="relative overflow-hidden bg-[#0a0a0a]">
+              <section key={tile.roomCode} className="relative overflow-hidden bg-[var(--t-bg)]">
                 <div
                   className="absolute left-0 right-0 top-0 flex items-center justify-between px-3 py-1"
                   style={{ backgroundColor: 'rgba(8,8,12,0.82)', zIndex: 2 }}
                 >
-                  <span className="truncate text-[11px] text-[#e8e8e8]">
+                  <span className="truncate text-[11px] text-[var(--t-text)]">
                     {tile.match
                       ? `${tile.match.player1Name} ${t('versus')} ${tile.match.player2Name}`
                       : t('matchEnded')}
@@ -182,7 +182,7 @@ export default function TournamentSpectatePage() {
                     onClick={() => handleToggle(tile.roomCode)}
                     aria-label={t('removeTile')}
                     data-gp="true"
-                    className="px-2 text-[13px] text-[#8a8a8a] hover:text-[#e8e8e8]"
+                    className="px-2 text-[13px] text-[var(--t-muted)] hover:text-[var(--t-text)]"
                   >
                     X
                   </button>
@@ -216,7 +216,7 @@ export default function TournamentSpectatePage() {
 function CenteredNotice({ text }: { text: string }) {
   return (
     <div className="flex h-full w-full items-center justify-center px-6 text-center">
-      <p className="max-w-md text-[13px] leading-relaxed text-[#8a8a8a]">{text}</p>
+      <p className="max-w-md text-[13px] leading-relaxed text-[var(--t-muted)]">{text}</p>
     </div>
   );
 }

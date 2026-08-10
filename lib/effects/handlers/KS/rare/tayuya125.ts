@@ -4,6 +4,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import {
   findAffordableSoundVillageInHand,
   findHiddenSoundVillageOnBoard,
+  findRevealBlockedSoundVillage,
 } from '@/lib/effects/handlers/KS/shared/summonSearch';
 
 
@@ -28,6 +29,21 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
   const hiddenTargets = findHiddenSoundVillageOnBoard(state, sourcePlayer, 2);
 
   if (handTargets.length === 0 && hiddenTargets.length === 0) {
+    const blockedName = findRevealBlockedSoundVillage(state, sourcePlayer);
+    if (blockedName) {
+      return {
+        state: {
+          ...state,
+          log: logAction(
+            state.log, state.turn, state.phase, sourcePlayer,
+            'EFFECT_BLOCKED',
+            `Tayuya (125) UPGRADE: Cannot reveal ${blockedName}, a character with that name is already visible on this mission.`,
+            'game.log.effect.duplicateNameReveal',
+            { card: blockedName },
+          ),
+        },
+      };
+    }
     const anySoundVillage = hasSoundVillageCandidate(state, sourcePlayer);
     return {
       state: {

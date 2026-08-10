@@ -9,6 +9,7 @@ import { isLandscapeCard } from '@/lib/cards/orientation';
 import { getRarityLabel, getCardName } from '@/lib/utils/cardLocale';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
+import { RarityIcon } from '@/components/icons/RarityIcon';
 
 interface CardRevealProps {
   card: BoosterCard;
@@ -27,7 +28,7 @@ function getRarityGlow(rarity: string): { color: string; intensity: string } {
       return { color: '#ff4444', intensity: '0 0 20px #ff4444, 0 0 40px #ff4444' };
     case 'S':
     case 'SV':
-      return { color: '#c4a35a', intensity: '0 0 20px #c4a35a, 0 0 40px #c4a35a' };
+      return { color: 'var(--t-accent)', intensity: '0 0 20px var(--t-accent), 0 0 40px var(--t-accent)' };
     case 'RA':
       return { color: '#9b59b6', intensity: '0 0 15px #9b59b6, 0 0 30px #9b59b6' };
     case 'R':
@@ -35,9 +36,9 @@ function getRarityGlow(rarity: string): { color: string; intensity: string } {
     case 'UC':
       return { color: '#2ecc71', intensity: '0 0 8px #2ecc71' };
     case 'MMS':
-      return { color: '#e67e22', intensity: '0 0 10px #e67e22, 0 0 20px #e67e22' };
+      return { color: 'var(--t-accent)', intensity: '0 0 10px #e67e22, 0 0 20px #e67e22' };
     default:
-      return { color: '#888888', intensity: '0 0 5px #88888840' };
+      return { color: 'var(--t-muted)', intensity: '0 0 5px var(--t-muted)40' };
   }
 }
 
@@ -55,7 +56,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
   const imagePath = normalizeImagePath(card.image_file);
   const isFoilHolo = card.isHolo === true && (card.rarity === 'C' || card.rarity === 'UC') && !card.isTemporaryVariant;
   const rarityInfo = isFoilHolo
-    ? { color: '#a8e6ff', intensity: '0 0 14px #a8e6ff, 0 0 28px #c9a8ff' }
+    ? { color: 'var(--t-accent)', intensity: '0 0 14px #a8e6ff, 0 0 28px #c9a8ff' }
     : getRarityGlow(card.rarity);
   const highRarity = isHighRarity(card.rarity);
   const isMission = isLandscapeCard(card);
@@ -116,7 +117,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             backfaceVisibility: 'hidden',
             borderRadius: '8px',
             overflow: 'hidden',
-            backgroundColor: '#111',
+            backgroundColor: 'var(--t-panel)',
           }}
         >
           <img
@@ -134,7 +135,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
               className="absolute inset-0"
               animate={{ opacity: [0.05, 0.15, 0.05] }}
               transition={{ repeat: Infinity, duration: 2 }}
-              style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' }}
+              style={{ backgroundColor: 'var(--t-divider)', borderRadius: '8px' }}
             />
           )}
         </div>
@@ -159,9 +160,9 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
           ) : (
             <div
               className="w-full h-full flex items-center justify-center"
-              style={{ backgroundColor: '#1a1a1a' }}
+              style={{ backgroundColor: 'var(--t-surface-2)' }}
             >
-              <span className="text-xs text-center px-2" style={{ color: '#888888' }}>
+              <span className="text-xs text-center px-2" style={{ color: 'var(--t-muted)' }}>
                 {getCardName(card, locale)}
               </span>
             </div>
@@ -175,7 +176,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
               transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
               style={{
                 borderRadius: '8px',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backgroundColor: 'var(--t-divider)',
               }}
             />
           )}
@@ -209,7 +210,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             className="text-[9px] font-bold uppercase tracking-wider"
             style={{ color: rarityInfo.color }}
           >
-            {getRarityLabel(card.rarity, tCardMeta)}
+            <span className="inline-flex items-center gap-1.5"><RarityIcon rarity={card.rarity} size={16} />{getRarityLabel(card.rarity, tCardMeta)}</span>
             {isFoilHolo ? ` ${tCardMeta.has('holo') ? tCardMeta('holo') : 'Holo'}` : ''}
           </span>
         </motion.div>

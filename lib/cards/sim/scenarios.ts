@@ -279,9 +279,9 @@ const FACTORIES: Record<string, Factory> = {
       hidden0: { id, iid: HID },
       e0: [
         { id: 'KS-009-C', iid: 'sim-ghost', hidden: true },
-        { id: 'KS-009-C', iid: 'sim-twin' },
         { id: 'SS-119-R', iid: 'sim-temari' },
       ],
+      e1: [{ id: 'KS-009-C', iid: 'sim-twin' }],
       missionIds: ['KS-001-MMS', 'KS-006-MMS'],
     }),
     play: P1(reveal(HID)),

@@ -57,9 +57,9 @@ export function WorldcupChampionBadge({ titles, reigningChampionMonth, countryCo
       ))}
 
       {showReigning && (
-        <div className="flex items-center gap-1.5 px-2.5 py-1" style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)' }}>
+        <div className="flex items-center gap-1.5 px-2.5 py-1" style={{ backgroundColor: 'var(--t-accent-tint)' }}>
           <CountryFlag code={countryCode!} size={15} />
-          <span className="font-display text-[10px] uppercase tracking-widest" style={{ color: '#c4a35a' }}>
+          <span className="font-display text-[10px] uppercase tracking-widest" style={{ color: 'var(--t-accent)' }}>
             {t('reigningNation', { month: monthLabel(reigningChampionMonth!, bcp47) })}
           </span>
         </div>

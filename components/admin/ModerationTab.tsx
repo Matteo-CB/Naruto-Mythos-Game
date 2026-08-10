@@ -39,7 +39,7 @@ function durationLabel(ms: number | null): string {
   return `${Math.round(ms / 60000)}min`;
 }
 
-const panelStyle = { backgroundColor: '#111111', border: '1px solid #262626' } as const;
+const panelStyle = { backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' } as const;
 
 export function ModerationTab() {
   const t = useTranslations('adminModeration');
@@ -217,9 +217,9 @@ export function ModerationTab() {
           onKeyDown={(e) => { if (e.key === 'Enter') runSearch(); }}
           placeholder={t('searchPlaceholder')}
           className="px-3 py-2 text-[12px] outline-none flex-1 min-w-[180px]"
-          style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid #262626', color: '#e0e0e0' }}
+          style={{ backgroundColor: 'var(--t-divider)', border: '1px solid var(--t-border)', color: 'var(--t-text)' }}
         />
-        <button onClick={runSearch} className="px-4 py-2 text-[11px] font-bold uppercase cursor-pointer" style={{ backgroundColor: '#c4a35a', color: '#0a0a0a', border: 'none' }}>
+        <button onClick={runSearch} className="px-4 py-2 text-[11px] font-bold uppercase cursor-pointer" style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)', border: 'none' }}>
           {t('search')}
         </button>
         {searchResults.map((u) => (
@@ -227,7 +227,7 @@ export function ModerationTab() {
             key={u.id}
             onClick={() => { setSearchResults([]); openFile(u.id, null); }}
             className="px-3 py-1.5 text-[11px] cursor-pointer"
-            style={{ backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a', border: 'none' }}
+            style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)', border: 'none' }}
           >
             {u.username} ({u.elo})
           </button>
@@ -237,22 +237,22 @@ export function ModerationTab() {
       {file && (
         <div className="flex flex-col gap-3 p-4" style={panelStyle}>
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <span className="text-sm font-bold" style={{ color: '#c4a35a' }}>
-              {file.user.username} <span style={{ color: '#666' }}>ELO {file.user.elo}</span>
+            <span className="text-sm font-bold" style={{ color: 'var(--t-accent)' }}>
+              {file.user.username} <span style={{ color: 'var(--t-dim)' }}>ELO {file.user.elo}</span>
             </span>
-            <button onClick={() => { setFile(null); setFileReportId(null); setFileScanId(null); }} className="px-3 py-1 text-[11px] cursor-pointer" style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: '#888', border: 'none' }}>
+            <button onClick={() => { setFile(null); setFileReportId(null); setFileScanId(null); }} className="px-3 py-1 text-[11px] cursor-pointer" style={{ backgroundColor: 'var(--t-divider)', color: 'var(--t-muted)', border: 'none' }}>
               X
             </button>
           </div>
 
           <div className="flex flex-wrap items-end gap-2">
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase" style={{ color: '#888' }}>{t('sanctionType')}</span>
+              <span className="text-[10px] uppercase" style={{ color: 'var(--t-muted)' }}>{t('sanctionType')}</span>
               <select
                 value={sType}
                 onChange={(e) => { const v = e.target.value as SanctionType; setSType(v); setSDuration(SANCTION_DURATIONS[v][0] ?? null); }}
                 className="px-2 py-2 text-[12px]"
-                style={{ backgroundColor: '#1a1a1a', color: '#e0e0e0', border: '1px solid #262626' }}
+                style={{ backgroundColor: 'var(--t-surface-2)', color: 'var(--t-text)', border: '1px solid var(--t-border)' }}
               >
                 {SANCTIONABLE_TYPES.map((ty) => (
                   <option key={ty} value={ty}>{t(`types.${ty}`)}</option>
@@ -261,12 +261,12 @@ export function ModerationTab() {
             </div>
             {availableDurations.length > 0 && (
               <div className="flex flex-col gap-1">
-                <span className="text-[10px] uppercase" style={{ color: '#888' }}>{t('duration')}</span>
+                <span className="text-[10px] uppercase" style={{ color: 'var(--t-muted)' }}>{t('duration')}</span>
                 <select
                   value={sDuration === null ? 'null' : String(sDuration)}
                   onChange={(e) => setSDuration(e.target.value === 'null' ? null : Number(e.target.value))}
                   className="px-2 py-2 text-[12px]"
-                  style={{ backgroundColor: '#1a1a1a', color: '#e0e0e0', border: '1px solid #262626' }}
+                  style={{ backgroundColor: 'var(--t-surface-2)', color: 'var(--t-text)', border: '1px solid var(--t-border)' }}
                 >
                   {availableDurations.map((d) => (
                     <option key={String(d)} value={d === null ? 'null' : String(d)}>{durationLabel(d)}</option>
@@ -279,51 +279,51 @@ export function ModerationTab() {
               onChange={(e) => setSReason(e.target.value.slice(0, 300))}
               placeholder={t('reasonPlaceholder')}
               className="px-3 py-2 text-[12px] outline-none flex-1 min-w-[200px]"
-              style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid #262626', color: '#e0e0e0' }}
+              style={{ backgroundColor: 'var(--t-divider)', border: '1px solid var(--t-border)', color: 'var(--t-text)' }}
             />
             <button
               onClick={applySanction}
               disabled={busy || sReason.trim().length < 3}
               className="px-4 py-2 text-[11px] font-bold uppercase cursor-pointer disabled:opacity-40"
-              style={{ backgroundColor: '#b33e3e', color: '#fff', border: 'none' }}
+              style={{ backgroundColor: 'var(--t-danger)', color: 'var(--t-on-danger)', border: 'none' }}
             >
               {t('apply')}
             </button>
             {fileReportId && (
-              <span className="text-[10px]" style={{ color: '#c4a35a' }}>{t('linkedToReport')}</span>
+              <span className="text-[10px]" style={{ color: 'var(--t-accent)' }}>{t('linkedToReport')}</span>
             )}
             {fileScanId && (
-              <span className="text-[10px]" style={{ color: '#c4a35a' }}>{t('linkedToScan')}</span>
+              <span className="text-[10px]" style={{ color: 'var(--t-accent)' }}>{t('linkedToScan')}</span>
             )}
           </div>
           {sType === 'elo_adjust' && (
-            <p className="text-[10px]" style={{ color: '#888' }}>{t('eloAdjustHint')}</p>
+            <p className="text-[10px]" style={{ color: 'var(--t-muted)' }}>{t('eloAdjustHint')}</p>
           )}
-          {feedback && <p className="text-[11px]" style={{ color: '#c4a35a' }}>{feedback}</p>}
+          {feedback && <p className="text-[11px]" style={{ color: 'var(--t-accent)' }}>{feedback}</p>}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <div>
-              <p className="text-[10px] uppercase font-bold mb-1.5" style={{ color: '#888' }}>{t('history')} ({file.sanctions.length})</p>
+              <p className="text-[10px] uppercase font-bold mb-1.5" style={{ color: 'var(--t-muted)' }}>{t('history')} ({file.sanctions.length})</p>
               <div className="max-h-56 overflow-y-auto flex flex-col gap-1">
-                {file.sanctions.length === 0 && <p className="text-[11px]" style={{ color: '#555' }}>{t('cleanRecord')}</p>}
+                {file.sanctions.length === 0 && <p className="text-[11px]" style={{ color: 'var(--t-dim)' }}>{t('cleanRecord')}</p>}
                 {file.sanctions.map((sc) => {
                   const active = !sc.revokedAt && (sc.expiresAt === null || sc.expiresAt > Date.now());
                   const stateful = ['mute_chat', 'shadow_mute', 'ranked_ban', 'suspension', 'spectate_ban'].includes(sc.type);
                   return (
                     <div key={sc.id} className="flex items-start gap-2 px-2 py-1.5" style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
                       <div className="flex-1 min-w-0">
-                        <span className="text-[11px] font-bold" style={{ color: sc.revokedAt ? '#555' : '#e0e0e0' }}>
+                        <span className="text-[11px] font-bold" style={{ color: sc.revokedAt ? 'var(--t-dim)' : 'var(--t-text)' }}>
                           {t(`types.${sc.type}`)}
                         </span>
-                        <span className="text-[10px] ml-2" style={{ color: '#666' }}>
+                        <span className="text-[10px] ml-2" style={{ color: 'var(--t-dim)' }}>
                           {new Date(sc.createdAt).toLocaleString()} · {sc.issuedByName}
                           {sc.expiresAt ? ` · ${new Date(sc.expiresAt).toLocaleString()}` : ''}
                           {sc.revokedAt ? ` · ${t('revoked')}` : ''}
                         </span>
-                        <p className="text-[10px] truncate" style={{ color: '#888' }}>{sc.reason}</p>
+                        <p className="text-[10px] truncate" style={{ color: 'var(--t-muted)' }}>{sc.reason}</p>
                       </div>
                       {stateful && active && (
-                        <button onClick={() => revoke(sc.id)} disabled={busy} className="text-[9px] uppercase font-bold cursor-pointer shrink-0 px-2 py-1 disabled:opacity-40" style={{ backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a', border: 'none' }}>
+                        <button onClick={() => revoke(sc.id)} disabled={busy} className="text-[9px] uppercase font-bold cursor-pointer shrink-0 px-2 py-1 disabled:opacity-40" style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)', border: 'none' }}>
                           {t('revoke')}
                         </button>
                       )}
@@ -333,13 +333,13 @@ export function ModerationTab() {
               </div>
             </div>
             <div>
-              <p className="text-[10px] uppercase font-bold mb-1.5" style={{ color: '#888' }}>{t('lastMessages')} ({file.messages.length})</p>
+              <p className="text-[10px] uppercase font-bold mb-1.5" style={{ color: 'var(--t-muted)' }}>{t('lastMessages')} ({file.messages.length})</p>
               <div className="max-h-56 overflow-y-auto flex flex-col gap-1">
                 {file.messages.map((m) => (
                   <div key={`${m.source}-${m.id}`} className="flex items-start gap-2 px-2 py-1" style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                    <span className="text-[9px] uppercase shrink-0 font-bold" style={{ color: m.source === 'dm' ? '#5A7ABB' : '#c4a35a' }}>{m.source}</span>
-                    <span className="text-[11px] flex-1 min-w-0" style={{ color: '#bbb', overflowWrap: 'anywhere' }}>{m.text}</span>
-                    <button onClick={() => deleteMessage(m.source, m.id)} disabled={busy} className="text-[9px] uppercase cursor-pointer shrink-0 disabled:opacity-40" style={{ color: '#b33e3e', background: 'none', border: 'none' }}>
+                    <span className="text-[9px] uppercase shrink-0 font-bold" style={{ color: m.source === 'dm' ? '#5A7ABB' : 'var(--t-accent)' }}>{m.source}</span>
+                    <span className="text-[11px] flex-1 min-w-0" style={{ color: 'var(--t-muted)', overflowWrap: 'anywhere' }}>{m.text}</span>
+                    <button onClick={() => deleteMessage(m.source, m.id)} disabled={busy} className="text-[9px] uppercase cursor-pointer shrink-0 disabled:opacity-40" style={{ color: 'var(--t-danger)', background: 'none', border: 'none' }}>
                       {t('deleteMessage')}
                     </button>
                   </div>
@@ -349,7 +349,7 @@ export function ModerationTab() {
           </div>
 
           <div>
-            <p className="text-[10px] uppercase font-bold mb-1.5" style={{ color: '#888' }}>
+            <p className="text-[10px] uppercase font-bold mb-1.5" style={{ color: 'var(--t-muted)' }}>
               {t('reportsAgainst')} ({file.reportsReceived.length}) · {t('reportsBy')} ({file.reportsFiled.length})
             </p>
           </div>
@@ -363,8 +363,8 @@ export function ModerationTab() {
             onClick={() => setStatusFilter(st)}
             className="px-4 py-2 text-[11px] font-bold uppercase cursor-pointer"
             style={{
-              backgroundColor: statusFilter === st ? '#c4a35a' : 'rgba(255,255,255,0.03)',
-              color: statusFilter === st ? '#0a0a0a' : '#888',
+              backgroundColor: statusFilter === st ? 'var(--t-accent)' : 'rgba(255,255,255,0.03)',
+              color: statusFilter === st ? 'var(--t-bg)' : 'var(--t-muted)',
               border: 'none',
             }}
           >
@@ -374,24 +374,24 @@ export function ModerationTab() {
       </div>
 
       {loading ? (
-        <p className="text-[12px]" style={{ color: '#555' }}>...</p>
+        <p className="text-[12px]" style={{ color: 'var(--t-dim)' }}>...</p>
       ) : reports.length === 0 ? (
-        <p className="text-[12px] p-4" style={{ ...panelStyle, color: '#555' }}>{t('noReports')}</p>
+        <p className="text-[12px] p-4" style={{ ...panelStyle, color: 'var(--t-dim)' }}>{t('noReports')}</p>
       ) : (
         <div className="flex flex-col gap-2">
           {reports.map((r) => (
             <div key={r.id} className="flex flex-col gap-1.5 p-4" style={panelStyle}>
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <span className="text-[12px]" style={{ color: '#e0e0e0' }}>
-                  <span style={{ color: '#888' }}>{r.reporterName}</span>
-                  <span style={{ color: '#555' }}> &#x25B8; </span>
-                  <span className="font-bold" style={{ color: '#c4a35a' }}>{r.targetName}</span>
+                <span className="text-[12px]" style={{ color: 'var(--t-text)' }}>
+                  <span style={{ color: 'var(--t-muted)' }}>{r.reporterName}</span>
+                  <span style={{ color: 'var(--t-dim)' }}> &#x25B8; </span>
+                  <span className="font-bold" style={{ color: 'var(--t-accent)' }}>{r.targetName}</span>
                 </span>
-                <span className="text-[10px]" style={{ color: '#666' }}>
+                <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>
                   {t(`context.${r.context}`)} · {new Date(r.createdAt).toLocaleString()}
                 </span>
               </div>
-              <p className="text-[12px]" style={{ color: '#bbb' }}>{r.reason}</p>
+              <p className="text-[12px]" style={{ color: 'var(--t-muted)' }}>{r.reason}</p>
               {r.attachedMessage && (
                 <p className="text-[11px] px-2 py-1.5" style={{ backgroundColor: 'rgba(179,62,62,0.06)', color: '#d0a0a0', overflowWrap: 'anywhere' }}>
                   {r.attachedMessage}
@@ -402,7 +402,7 @@ export function ModerationTab() {
                   <button
                     onClick={() => openFile(r.targetId, r.id)}
                     className="px-3 py-1.5 text-[10px] font-bold uppercase cursor-pointer"
-                    style={{ backgroundColor: '#c4a35a', color: '#0a0a0a', border: 'none' }}
+                    style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)', border: 'none' }}
                   >
                     {t('openFile')}
                   </button>
@@ -410,7 +410,7 @@ export function ModerationTab() {
                     onClick={() => dismissReport(r.id)}
                     disabled={busy}
                     className="px-3 py-1.5 text-[10px] font-bold uppercase cursor-pointer disabled:opacity-40"
-                    style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: '#888', border: 'none' }}
+                    style={{ backgroundColor: 'var(--t-divider)', color: 'var(--t-muted)', border: 'none' }}
                   >
                     {t('dismiss')}
                   </button>
@@ -423,7 +423,7 @@ export function ModerationTab() {
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-3 mt-2 flex-wrap">
-          <p className="text-[11px] uppercase font-bold" style={{ color: '#c4a35a' }}>
+          <p className="text-[11px] uppercase font-bold" style={{ color: 'var(--t-accent)' }}>
             {t('autoScansTitle')}
           </p>
           {(['pending', 'handled'] as const).map((f) => (
@@ -432,8 +432,8 @@ export function ModerationTab() {
               onClick={() => setScanFilter(f)}
               className="px-3 py-1.5 text-[10px] font-bold uppercase cursor-pointer"
               style={{
-                backgroundColor: scanFilter === f ? '#c4a35a' : 'rgba(255,255,255,0.03)',
-                color: scanFilter === f ? '#0a0a0a' : '#888',
+                backgroundColor: scanFilter === f ? 'var(--t-accent)' : 'rgba(255,255,255,0.03)',
+                color: scanFilter === f ? 'var(--t-bg)' : 'var(--t-muted)',
                 border: 'none',
               }}
             >
@@ -442,7 +442,7 @@ export function ModerationTab() {
           ))}
         </div>
         {scans.length === 0 ? (
-          <p className="text-[12px] p-4" style={{ ...panelStyle, color: '#555' }}>{t('autoScansEmpty')}</p>
+          <p className="text-[12px] p-4" style={{ ...panelStyle, color: 'var(--t-dim)' }}>{t('autoScansEmpty')}</p>
         ) : (
           scans.map((s) => (
             <div key={s.id} className="flex flex-col gap-1.5 p-4" style={panelStyle}>
@@ -450,7 +450,7 @@ export function ModerationTab() {
                 <span className="text-[12px]">
                   <span
                     className="font-bold cursor-pointer"
-                    style={{ color: '#c4a35a' }}
+                    style={{ color: 'var(--t-accent)' }}
                     onClick={() => openFile(s.userId, null, s.id)}
                     data-gp="true"
                     role="button"
@@ -462,18 +462,18 @@ export function ModerationTab() {
                     className="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase"
                     style={{
                       backgroundColor: s.action === 'flagged' ? 'rgba(196,163,90,0.12)' : 'rgba(179,62,62,0.14)',
-                      color: s.action === 'flagged' ? '#c4a35a' : '#d98080',
+                      color: s.action === 'flagged' ? 'var(--t-accent)' : 'var(--t-danger)',
                     }}
                   >
                     {s.action === 'blocked' ? t('autoActionBlocked') : s.action === 'removed' ? t('autoActionRemoved') : t('autoActionFlagged')}
                   </span>
                   {s.status === 'handled' && s.handledByName && (
-                    <span className="ml-2 text-[10px]" style={{ color: '#666' }}>
+                    <span className="ml-2 text-[10px]" style={{ color: 'var(--t-dim)' }}>
                       {t('autoHandledBy', { name: s.handledByName })}
                     </span>
                   )}
                 </span>
-                <span className="text-[10px]" style={{ color: '#666' }}>
+                <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>
                   {s.topCategory} {Math.round(s.topScore * 100)}% · {new Date(s.createdAt).toLocaleString()}
                 </span>
               </div>
@@ -485,7 +485,7 @@ export function ModerationTab() {
                   <button
                     onClick={() => openFile(s.userId, null, s.id)}
                     className="px-3 py-1.5 text-[10px] font-bold uppercase cursor-pointer"
-                    style={{ backgroundColor: '#c4a35a', color: '#0a0a0a', border: 'none' }}
+                    style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)', border: 'none' }}
                   >
                     {t('openFile')}
                   </button>
@@ -493,7 +493,7 @@ export function ModerationTab() {
                     onClick={() => resolveScan(s.id)}
                     disabled={busy}
                     className="px-3 py-1.5 text-[10px] font-bold uppercase cursor-pointer disabled:opacity-40"
-                    style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: '#888', border: 'none' }}
+                    style={{ backgroundColor: 'var(--t-divider)', color: 'var(--t-muted)', border: 'none' }}
                   >
                     {t('autoHandle')}
                   </button>

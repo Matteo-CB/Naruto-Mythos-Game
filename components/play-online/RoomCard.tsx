@@ -50,7 +50,7 @@ export function RoomCard({
       className="flex items-center gap-3 px-3 py-2.5 w-full no-select"
       style={{
         backgroundColor: isEvolving ? 'rgba(10, 10, 14, 0.55)' : 'rgba(15, 15, 20, 0.78)',
-        boxShadow: '0 4px 16px rgba(0,0,0,0.35)',
+        boxShadow: '0 4px 16px var(--t-shadow)',
         position: 'relative',
         zIndex: 1,
       }}
@@ -61,18 +61,18 @@ export function RoomCard({
           disabled={anonymousDisplay}
           className="text-[12px] font-medium truncate"
           style={{
-            color: anonymousDisplay ? '#888' : '#e8e8e8',
+            color: anonymousDisplay ? 'var(--t-muted)' : 'var(--t-text)',
             fontStyle: anonymousDisplay ? 'italic' : 'normal',
           }}
         >
           {displayName}
         </PlayerNameLink>
         <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
-          <ChipText label={t(`online.mode.${isRanked ? 'ranked' : gameMode}`)} accent={isRanked ? '#b33e3e' : '#c4a35a'} />
+          <ChipText label={t(`online.mode.${isRanked ? 'ranked' : gameMode}`)} accent={isRanked ? 'var(--t-danger)' : 'var(--t-accent)'} />
           {sealedSetLabel && <ChipText label={sealedSetLabel} accent="#8fae6b" />}
-          {isAnonymous && <ChipText label={t('online.badge.anonymous')} accent="#888" />}
+          {isAnonymous && <ChipText label={t('online.badge.anonymous')} accent="var(--t-muted)" />}
           {isEvolving && <EvoBadge holoHue={holoHue} />}
-          <span className="text-[9px]" style={{ color: '#444', marginLeft: 4 }}>
+          <span className="text-[9px]" style={{ color: 'var(--t-muted)', marginLeft: 4 }}>
             {formatTimeAgo(createdAt, t)}
           </span>
         </div>
@@ -81,8 +81,8 @@ export function RoomCard({
         onClick={(e) => { e.stopPropagation(); onJoin(); }}
         className="px-3.5 py-1.5 text-[10px] font-bold uppercase cursor-pointer no-select shrink-0"
         style={{
-          backgroundColor: isRanked ? '#b33e3e' : '#c4a35a',
-          color: isRanked ? '#e8e8e8' : '#0a0a0a',
+          backgroundColor: isRanked ? 'var(--t-danger)' : 'var(--t-accent)',
+          color: isRanked ? 'var(--t-text)' : 'var(--t-bg)',
           letterSpacing: '0.14em',
           transform: 'skewX(-3deg)',
         }}
@@ -104,7 +104,7 @@ export function RoomCard({
 }
 
 function EvoBadge({ holoHue }: { holoHue: number | null }) {
-  const color = holoHue != null ? holoFromHue(holoHue).primary : '#c4a35a';
+  const color = holoHue != null ? holoFromHue(holoHue).primary : 'var(--t-accent)';
   return (
     <span
       className="inline-flex items-center px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider whitespace-nowrap"

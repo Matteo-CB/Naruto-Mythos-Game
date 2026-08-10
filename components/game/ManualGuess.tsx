@@ -65,20 +65,13 @@ export function ManualGuess({ actual, label, hasModifier, color = '#e0e0e0', fon
           lineHeight: 1,
         }}
       >
-        {result ? actual : '?'}
+        {result ? actual : (
+          hasModifier
+            ? <span className="animate-pulse" title={t('hasModifier')}>?</span>
+            : '?'
+        )}
         {result && (
           <span aria-hidden="true" style={{ fontSize: '0.75em' }}>{result.correct ? '✓' : '✗'}</span>
-        )}
-        {!result && hasModifier && (
-          <span
-            aria-hidden="true"
-            title={t('hasModifier')}
-            style={{
-              width: 5, height: 5, borderRadius: '50%',
-              backgroundColor: '#c4a35a', boxShadow: '0 0 4px rgba(196,163,90,0.8)',
-              display: 'inline-block',
-            }}
-          />
         )}
       </span>
 

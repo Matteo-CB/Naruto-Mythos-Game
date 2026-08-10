@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { localizeMessageParams } from '@/lib/i18n/localizeMessageParams';
 import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from '@/components/icons/GameIcons';
 import { useUIStore } from '@/stores/uiStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { ManualGuess } from './ManualGuess';
@@ -302,12 +303,18 @@ export function TargetOrderPopup({
                       {displayName}
                     </span>
                     {target.power != null && !target.isHidden && (
-                      <span className="text-[7px] tabular-nums" style={{ color: '#666' }}>
-                        {manualPowerMode ? (
-                          <>P:<ManualGuess actual={target.power} color="#888" /> C:<ManualGuess actual={target.chakra ?? 0} color="#888" /></>
-                        ) : (
-                          <>P:{target.power} C:{target.chakra ?? 0}</>
-                        )}
+                      <span
+                        className="text-[8px] tabular-nums"
+                        style={{ color: '#999', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}
+                      >
+                        <PowerIcon size={9} color={POWER_COLOR} />
+                        {manualPowerMode
+                          ? <ManualGuess actual={target.power} color="#999" />
+                          : target.power}
+                        <ChakraIcon size={9} color={CHAKRA_COLOR} style={{ marginLeft: '5px' }} />
+                        {manualPowerMode
+                          ? <ManualGuess actual={target.chakra ?? 0} color="#999" />
+                          : (target.chakra ?? 0)}
                       </span>
                     )}
                   </div>

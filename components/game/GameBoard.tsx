@@ -28,6 +28,7 @@ import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
 import { isLandscapeCard, hasCombatStats } from "@/lib/cards/orientation";
 import { HoloFoilOverlay } from "@/components/cards/HoloFoilOverlay";
+import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from "@/components/icons/GameIcons";
 import { preloadCardImages } from "@/lib/utils/imagePreload";
 import { warmupVfxGl } from "@/lib/motion/vfxgl";
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from "@/lib/utils/cardLocale";
@@ -38,6 +39,7 @@ import { GameChat } from "./GameChat";
 import { SpectatorBanner } from "./SpectatorBanner";
 import { Z_APP_MODAL, Z_GAME_OVERLAY } from "@/lib/ui/zIndex";
 import { useBoardPalette } from "./BoardPaletteContext";
+import { RarityIcon } from '@/components/icons/RarityIcon';
 
 const rarityColorMap: Record<string, string> = {
   C: "#888888",
@@ -159,12 +161,13 @@ function CardPreviewContent({
             {isMission ? t("card.mission") : t("card.character")}
           </span>
           <span
-            className="text-[10px] px-1.5 py-0.5 shrink-0 font-bold"
+            className="text-[10px] px-1.5 py-0.5 shrink-0 font-bold inline-flex items-center gap-1"
             style={{
               backgroundColor: "rgba(255, 255, 255, 0.04)",
               color: rarityColor,
             }}
           >
+            <RarityIcon rarity={card.rarity} size={12} />
             {card.rarity}
           </span>
         </div>
@@ -279,9 +282,10 @@ function CardPreviewContent({
                 {t("collection.details.cost")}
               </span>
               <span
-                className="text-base font-bold"
+                className="text-base font-bold inline-flex items-center gap-1"
                 style={{ color: "#c4a35a" }}
               >
+                <ChakraIcon size={14} color={CHAKRA_COLOR} />
                 {(card as CharacterCard).chakra}
               </span>
             </div>
@@ -297,9 +301,10 @@ function CardPreviewContent({
                 {t("collection.details.power")}
               </span>
               <span
-                className="text-base font-bold"
+                className="text-base font-bold inline-flex items-center gap-1"
                 style={{ color: "#e0e0e0" }}
               >
+                <PowerIcon size={14} color={POWER_COLOR} />
                 {(card as CharacterCard).power}
               </span>
             </div>
@@ -607,12 +612,13 @@ function FullscreenCardDetail() {
           {isMission ? t("card.mission") : t("card.character")}
         </span>
         <span
-          className={`text-xs px-2 py-1 shrink-0 font-bold`}
+          className={`text-xs px-2 py-1 shrink-0 font-bold inline-flex items-center gap-1.5`}
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.04)",
             color: rarityColor,
           }}
         >
+          <RarityIcon rarity={card.rarity} size={14} />
           {card.rarity}
         </span>
       </div>
@@ -646,9 +652,10 @@ function FullscreenCardDetail() {
               {t("collection.details.cost")}
             </span>
             <span
-              className={`text-xl font-bold`}
+              className={`text-xl font-bold inline-flex items-center gap-1.5`}
               style={{ color: "#c4a35a" }}
             >
+              <ChakraIcon size={18} color={CHAKRA_COLOR} />
               {(card as CharacterCard).chakra}
             </span>
           </div>
@@ -664,9 +671,10 @@ function FullscreenCardDetail() {
               {t("collection.details.power")}
             </span>
             <span
-              className={`text-xl font-bold`}
+              className={`text-xl font-bold inline-flex items-center gap-1.5`}
               style={{ color: "#e0e0e0" }}
             >
+              <PowerIcon size={18} color={POWER_COLOR} />
               {(card as CharacterCard).power}
             </span>
           </div>

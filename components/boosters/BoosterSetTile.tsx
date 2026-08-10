@@ -51,9 +51,9 @@ export function BoosterSetTile({
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
       style={{
-        backgroundColor: '#111111',
+        backgroundColor: 'var(--t-panel)',
         padding: 20,
-        boxShadow: hovering ? '0 16px 40px rgba(0,0,0,0.55)' : '0 12px 32px rgba(0,0,0,0.4)',
+        boxShadow: hovering ? '0 16px 40px var(--t-shadow)' : '0 12px 32px var(--t-shadow)',
         width: 280,
         flex: '0 0 280px',
         transition: 'box-shadow 220ms ease-out',
@@ -62,7 +62,7 @@ export function BoosterSetTile({
       {setNumberLabel && (
         <div
           className="font-display absolute text-[10px] uppercase tracking-[0.25em] pointer-events-none"
-          style={{ top: 10, left: 14, color: isLocked ? '#5a5a5a' : '#c4a35a', opacity: isLocked ? 0.7 : 0.92 }}
+          style={{ top: 10, left: 14, color: isLocked ? 'var(--t-dim)' : 'var(--t-accent)', opacity: isLocked ? 0.7 : 0.92 }}
         >
           {setNumberLabel}
         </div>
@@ -93,17 +93,17 @@ export function BoosterSetTile({
 
       <div
         className="font-display uppercase tracking-wider mt-3"
-        style={{ color: '#e8e8e8', fontSize: 22, letterSpacing: '0.12em' }}
+        style={{ color: 'var(--t-text)', fontSize: 22, letterSpacing: '0.12em' }}
       >
         {name}
       </div>
-      <div className="font-body" style={{ color: '#777', fontSize: 13, marginTop: 4 }}>
+      <div className="font-body" style={{ color: 'var(--t-dim)', fontSize: 13, marginTop: 4 }}>
         {subtitle}
       </div>
       <div
         className="font-display uppercase tracking-wider mt-3"
         style={{
-          color: entry.count > 0 ? '#c4a35a' : '#777',
+          color: entry.count > 0 ? 'var(--t-accent)' : 'var(--t-dim)',
           fontSize: 14,
           letterSpacing: '0.12em',
         }}
@@ -117,13 +117,13 @@ export function BoosterSetTile({
         disabled={!canOpen}
         className="mt-4 py-3 font-display uppercase tracking-wider transition-all"
         style={{
-          backgroundColor: canOpen ? '#c4a35a1f' : '#1a1a1a',
-          color: canOpen ? '#c4a35a' : '#555',
+          backgroundColor: canOpen ? 'var(--t-accent-tint)' : 'var(--t-surface-2)',
+          color: canOpen ? 'var(--t-accent)' : 'var(--t-dim)',
           fontSize: 14,
           letterSpacing: '0.18em',
           cursor: canOpen ? 'pointer' : 'not-allowed',
           opacity: canOpen ? 1 : 0.6,
-          boxShadow: canOpen ? '0 0 12px #c4a35a33' : 'none',
+          boxShadow: canOpen ? '0 0 12px var(--t-accent-glow)' : 'none',
         }}
       >
         {isLocked ? lockedLabel : openLabel}

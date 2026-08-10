@@ -79,7 +79,7 @@ function ColorField({
 
   return (
     <div className="flex flex-col gap-1.5 min-w-0">
-      <span className="text-[11px] font-medium tracking-wide" style={{ color: '#999999' }}>
+      <span className="text-[11px] font-medium tracking-wide" style={{ color: 'var(--t-muted)' }}>
         {label}
       </span>
       <div className="flex items-center gap-2 min-w-0">
@@ -94,7 +94,7 @@ function ColorField({
             height: 32,
             padding: 0,
             backgroundColor: 'transparent',
-            border: '1px solid #333333',
+            border: '1px solid var(--t-border-strong)',
             cursor: disabled ? 'default' : 'pointer',
             flexShrink: 0,
           }}
@@ -112,15 +112,15 @@ function ColorField({
           onKeyDown={(e) => { if (e.key === 'Enter') commitText(); }}
           className="min-w-0 flex-1 px-2 py-1.5 text-[12px] tabular-nums"
           style={{
-            backgroundColor: '#0d0d0d',
-            border: '1px solid #333333',
-            color: '#e0e0e0',
+            backgroundColor: 'var(--t-bg)',
+            border: '1px solid var(--t-border-strong)',
+            color: 'var(--t-text)',
             outline: 'none',
           }}
         />
       </div>
       {invalid && (
-        <span className="text-[11px] tracking-wide" style={{ color: '#d97676' }}>
+        <span className="text-[11px] tracking-wide" style={{ color: 'var(--t-danger)' }}>
           {t('boardColorsInvalidHex')}
         </span>
       )}
@@ -162,18 +162,18 @@ export function BoardColorsSection() {
   return (
     <div
       className="mt-4 flex flex-col gap-4 p-5 lg:mt-6 lg:p-6"
-      style={{ backgroundColor: '#111111', border: '1px solid #262626' }}
+      style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' }}
     >
-      <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+      <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
         {t('boardColors')}
       </span>
-      <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+      <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
         {t('boardColorsHint')}
       </p>
 
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-6">
         <div className="min-w-0 flex-1 flex flex-col gap-2">
-          <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: '#888888' }}>
+          <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: 'var(--t-muted)' }}>
             {t('boardColorsPreviewLabel')}
           </span>
           {isLoaded && <BoardColorPreview palette={resolved} />}
@@ -195,7 +195,7 @@ export function BoardColorsSection() {
                   disabled={!isLoaded}
                   onClick={() => resetSide(side)}
                   className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer disabled:opacity-40"
-                  style={{ backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a', border: 'none' }}
+                  style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)', border: 'none' }}
                 >
                   {t('boardColorsReset')}
                 </button>
@@ -234,7 +234,7 @@ export function BoardColorsSection() {
             type="button"
             onClick={() => setAdvancedOpen((v) => !v)}
             className="self-start px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
-            style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: '#888888', border: 'none' }}
+            style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: 'var(--t-muted)', border: 'none' }}
           >
             {t('boardColorsAdvanced')}
           </button>
@@ -250,12 +250,12 @@ export function BoardColorsSection() {
             disabled={!isLoaded || draft === null}
             onClick={() => apply(null)}
             className="self-start px-4 py-2 text-[11px] font-bold uppercase tracking-wider cursor-pointer disabled:opacity-40"
-            style={{ backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a', border: 'none' }}
+            style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)', border: 'none' }}
           >
             {t('boardColorsResetAll')}
           </button>
 
-          <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+          <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
             {t('boardColorsDefaultsHint', {
               me: DEFAULT_BOARD_PALETTE.me.primary,
               opponent: DEFAULT_BOARD_PALETTE.opponent.primary,

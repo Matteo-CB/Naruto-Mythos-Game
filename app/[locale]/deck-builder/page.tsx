@@ -38,16 +38,18 @@ import { EvolvingBuilderHelper } from "@/components/deckBuilder/EvolvingBuilderH
 import { EvolvingDeckHolo } from "@/components/evolving/EvolvingDeckHolo";
 import { EvolvingDeckBadge } from "@/components/evolving/EvolvingDeckBadge";
 import { useRevealingStore } from "@/stores/revealingStore";
+import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from "@/components/icons/GameIcons";
+import { RarityIcon } from '@/components/icons/RarityIcon';
 
 const MISSIONS_PER_PAGE = 15;
 
 const RARITY_COLORS: Record<string, string> = {
-  C: '#888888', UC: '#3e8b3e', R: '#c4a35a', RA: '#c4a35a',
-  S: '#b33e3e', M: '#6a6abb', Legendary: '#c4a35a', Mission: '#c4a35a',
+  C: 'var(--t-muted)', UC: 'var(--t-success)', R: 'var(--t-accent)', RA: 'var(--t-accent)',
+  S: 'var(--t-danger)', M: '#6a6abb', Legendary: 'var(--t-accent)', Mission: 'var(--t-accent)',
 };
 const RARITY_ORDER: Record<string, number> = { C: 0, UC: 1, R: 2, RA: 3, S: 4, M: 5, Legendary: 6 };
 const EFFECT_TYPE_COLORS: Record<string, string> = {
-  MAIN: '#c4a35a', UPGRADE: '#3e8b3e', AMBUSH: '#b33e3e', SCORE: '#6a6abb',
+  MAIN: 'var(--t-accent)', UPGRADE: 'var(--t-success)', AMBUSH: 'var(--t-danger)', SCORE: '#6a6abb',
 };
 type SortField = 'number' | 'name' | 'chakra' | 'power' | 'rarity';
 
@@ -248,30 +250,30 @@ const CatalogCard = memo(function CatalogCard({
       className="relative w-full overflow-hidden group cursor-pointer"
       style={{
         aspectRatio: '5/7',
-        backgroundColor: '#0e0e0e',
+        backgroundColor: 'var(--t-bg-elevated)',
         opacity: allowed ? 1 : 0.35,
       }}
     >
       {imgPath ? (
         <GridThumb src={imgPath} />
       ) : (
-        <div className="w-full h-full" style={{ backgroundColor: '#111' }} />
+        <div className="w-full h-full" style={{ backgroundColor: 'var(--t-panel)' }} />
       )}
       {inDeckCount > 0 && (
         <div className="absolute top-0 right-0 px-1 text-[7px] font-bold"
-          style={{ backgroundColor: inDeckCount >= 2 ? 'rgba(179,62,62,0.9)' : 'rgba(62,139,62,0.9)', color: '#fff' }}>
+          style={{ backgroundColor: inDeckCount >= 2 ? 'rgba(179,62,62,0.9)' : 'rgba(62,139,62,0.9)', color: 'var(--t-text)' }}>
           x{inDeckCount}
         </div>
       )}
       {isBanned && (
         <span aria-hidden className="absolute top-0 left-0 font-display font-bold uppercase pointer-events-none"
-          style={{ padding: '1px 5px', fontSize: 8, letterSpacing: '0.18em', color: '#fff', backgroundColor: 'rgba(179, 62, 62, 0.95)', boxShadow: '0 2px 6px rgba(0,0,0,0.45)' }}>
+          style={{ padding: '1px 5px', fontSize: 8, letterSpacing: '0.18em', color: 'var(--t-text)', backgroundColor: 'rgba(179, 62, 62, 0.95)', boxShadow: '0 2px 6px var(--t-shadow)' }}>
           BAN
         </span>
       )}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none"
         style={{ backgroundColor: allowed ? 'rgba(62,139,62,0.35)' : 'rgba(179,62,62,0.35)', transition: 'opacity 80ms' }}>
-        <span className="text-lg font-bold" style={{ color: '#fff' }}>{allowed ? '+' : ''}</span>
+        <span className="text-lg font-bold" style={{ color: 'var(--t-text)' }}>{allowed ? '+' : ''}</span>
       </div>
     </button>
   );
@@ -294,24 +296,24 @@ const CatalogMission = memo(function CatalogMission({
       className="relative w-full overflow-hidden group cursor-pointer"
       style={{
         aspectRatio: '7/5',
-        backgroundColor: '#0e0e0e',
+        backgroundColor: 'var(--t-bg-elevated)',
         opacity: allowed ? 1 : 0.35,
       }}
     >
       {imgPath ? (
         <GridThumb src={imgPath} />
       ) : (
-        <div className="w-full h-full" style={{ backgroundColor: '#111' }} />
+        <div className="w-full h-full" style={{ backgroundColor: 'var(--t-panel)' }} />
       )}
       {isBanned && (
         <span aria-hidden className="absolute top-0 left-0 font-display font-bold uppercase pointer-events-none"
-          style={{ padding: '1px 5px', fontSize: 8, letterSpacing: '0.18em', color: '#fff', backgroundColor: 'rgba(179, 62, 62, 0.95)', boxShadow: '0 2px 6px rgba(0,0,0,0.45)' }}>
+          style={{ padding: '1px 5px', fontSize: 8, letterSpacing: '0.18em', color: 'var(--t-text)', backgroundColor: 'rgba(179, 62, 62, 0.95)', boxShadow: '0 2px 6px var(--t-shadow)' }}>
           BAN
         </span>
       )}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none"
         style={{ backgroundColor: allowed ? 'rgba(62,139,62,0.35)' : 'rgba(179,62,62,0.35)', transition: 'opacity 80ms' }}>
-        <span className="text-lg font-bold" style={{ color: '#fff' }}>{allowed ? '+' : ''}</span>
+        <span className="text-lg font-bold" style={{ color: 'var(--t-text)' }}>{allowed ? '+' : ''}</span>
       </div>
     </button>
   );
@@ -340,18 +342,18 @@ const DeckCard = memo(function DeckCard({
       className="relative overflow-hidden group cursor-pointer w-full"
       style={{
         aspectRatio: '5/7',
-        backgroundColor: '#0e0e0e',
+        backgroundColor: 'var(--t-bg-elevated)',
       }}
     >
       {imgPath ? (
         <GridThumb src={imgPath} />
       ) : (
-        <div className="w-full h-full" style={{ backgroundColor: '#111' }} />
+        <div className="w-full h-full" style={{ backgroundColor: 'var(--t-panel)' }} />
       )}
       {card.isHolo && imgPath && <HoloFoilOverlay imageUrl={imgPath} />}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none"
         style={{ backgroundColor: 'rgba(179,62,62,0.4)', transition: 'opacity 80ms' }}>
-        <span className="text-sm font-bold" style={{ color: '#fff' }}>x</span>
+        <span className="text-sm font-bold" style={{ color: 'var(--t-text)' }}>x</span>
       </div>
       {showHoloButton && (
         <button
@@ -367,7 +369,7 @@ const DeckCard = memo(function DeckCard({
             fontSize: '9px',
             letterSpacing: '0.02em',
             backgroundColor: card.isHolo ? 'rgba(196,163,90,0.92)' : 'rgba(10,10,10,0.8)',
-            color: card.isHolo ? '#0a0a0a' : '#c4a35a',
+            color: card.isHolo ? 'var(--t-bg)' : 'var(--t-accent)',
             boxShadow: card.isHolo ? '0 0 8px rgba(196,163,90,0.5)' : 'none',
           }}
         >
@@ -932,23 +934,23 @@ export default function DeckBuilderPage() {
 
   if (status === 'loading') {
     return (
-      <main id="main-content" className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
-        <span className="text-sm" style={{ color: '#555' }}>...</span>
+      <main id="main-content" className="flex min-h-screen items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
+        <span className="text-sm" style={{ color: 'var(--t-dim)' }}>...</span>
       </main>
     );
   }
 
   if (!session?.user) {
     return (
-      <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: "#0a0a0a" }}>
+      <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: "var(--t-bg)" }}>
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="flex flex-col items-center gap-6 max-w-md w-full text-center relative z-10">
-            <h1 className="text-2xl font-bold tracking-wider uppercase" style={{ color: "#c4a35a" }}>{t("deckBuilder.title")}</h1>
+            <h1 className="text-2xl font-bold tracking-wider uppercase" style={{ color: "var(--t-accent)" }}>{t("deckBuilder.title")}</h1>
             <div className="w-16 h-px mx-auto" style={{ backgroundColor: 'rgba(196, 163, 90, 0.3)' }} />
-            <p className="text-sm" style={{ color: "#888888" }}>{t("online.signInRequired")}</p>
+            <p className="text-sm" style={{ color: "var(--t-muted)" }}>{t("online.signInRequired")}</p>
             <div className="flex gap-3">
-              <Link href="/login" className="px-6 py-2.5 text-sm font-bold uppercase tracking-wider" style={{ backgroundColor: "#c4a35a", color: "#0a0a0a", }}>{t("common.signIn")}</Link>
-              <Link href="/" className="px-6 py-2.5 text-sm" style={{ backgroundColor: "#141414", border: "1px solid #262626", color: "#888888" }}>{t("common.back")}</Link>
+              <Link href="/login" className="px-6 py-2.5 text-sm font-bold uppercase tracking-wider" style={{ backgroundColor: "var(--t-accent)", color: "var(--t-bg)", }}>{t("common.signIn")}</Link>
+              <Link href="/" className="px-6 py-2.5 text-sm" style={{ backgroundColor: "var(--t-surface)", border: "1px solid var(--t-border)", color: "var(--t-muted)" }}>{t("common.back")}</Link>
             </div>
           </div>
         </div>
@@ -961,11 +963,11 @@ export default function DeckBuilderPage() {
       return (
         <div className="flex-1 flex flex-col items-center justify-center px-4 gap-3">
           <div className="relative overflow-hidden mx-auto" style={{
-            width: '160px', aspectRatio: '5/7', backgroundColor: '#0a0a0a',
+            width: '160px', aspectRatio: '5/7', backgroundColor: 'var(--t-bg)',
           }}>
             <img src="/images/card-back.webp" alt="" className="w-full h-full object-cover" style={{ opacity: 0.6 }} />
           </div>
-          <p className="text-[11px] text-center" style={{ color: '#444' }}>{t("deckBuilder.hoverToPreview")}</p>
+          <p className="text-[11px] text-center" style={{ color: 'var(--t-muted)' }}>{t("deckBuilder.hoverToPreview")}</p>
         </div>
       );
     }
@@ -984,43 +986,49 @@ export default function DeckBuilderPage() {
           width: '100%',
           maxWidth: isWide ? '100%' : '180px',
           aspectRatio: isWide ? '7/5' : '5/7',
-          backgroundColor: '#0a0a0a',
+          backgroundColor: 'var(--t-bg)',
         }}>
           {imgPath ? (
             <img src={imgPath} alt={getCardName(card, loc)} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#111' }}>
-              <span className="text-[10px]" style={{ color: '#555' }}>{getCardName(card, loc)}</span>
+            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'var(--t-panel)' }}>
+              <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{getCardName(card, loc)}</span>
             </div>
           )}
         </div>
 
         <div className="flex items-center gap-2 mb-1">
           <span className="text-[10px] uppercase font-bold px-1.5 py-0.5" style={{
-            backgroundColor: isWide ? 'rgba(196,163,90,0.12)' : 'rgba(255,255,255,0.04)',
-            color: isWide ? '#c4a35a' : '#999',
+            backgroundColor: isWide ? 'var(--t-accent-glow)' : 'var(--t-divider)',
+            color: isWide ? 'var(--t-accent)' : 'var(--t-muted)',
           }}>{(card as { card_type?: string }).card_type === 'mission'
             ? t("deckBuilder.missionCards")
             : isAttachment ? t("collection.attachments") : t("deckBuilder.characterCards")}</span>
           <span className="text-[10px] uppercase font-bold px-1.5 py-0.5" style={{
             backgroundColor: `${rarColor}12`, color: rarColor,
-          }}>{getRarityLabel(card.rarity, tCardMeta)}</span>
+          }}><span className="inline-flex items-center gap-1"><RarityIcon rarity={card.rarity} size={11} />{getRarityLabel(card.rarity, tCardMeta)}</span></span>
         </div>
 
-        <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{getCardName(card, loc)}</div>
-        {isChar && <div className="text-[11px] mb-2" style={{ color: '#777' }}>{getCardTitle(charCard, loc)}</div>}
+        <div className="text-sm font-bold" style={{ color: 'var(--t-text)' }}>{getCardName(card, loc)}</div>
+        {isChar && <div className="text-[11px] mb-2" style={{ color: 'var(--t-dim)' }}>{getCardTitle(charCard, loc)}</div>}
 
         {isChar && (
           <div className="flex items-center gap-0 my-2 py-2" style={{
             backgroundColor: 'rgba(255,255,255,0.02)', }}>
             <div className="flex-1 flex flex-col items-center">
-              <span className="text-[9px] uppercase" style={{ color: '#777', letterSpacing: '0.08em' }}>{t("deckBuilder.chakra")}</span>
-              <span className="text-lg font-bold tabular-nums" style={{ color: '#c4a35a' }}>{charCard.chakra}</span>
+              <span className="text-[9px] uppercase" style={{ color: 'var(--t-dim)', letterSpacing: '0.08em' }}>{t("deckBuilder.chakra")}</span>
+              <span className="text-lg font-bold tabular-nums inline-flex items-center gap-1" style={{ color: 'var(--t-text)' }}>
+                <ChakraIcon size={15} color={CHAKRA_COLOR} />
+                {charCard.chakra}
+              </span>
             </div>
-            <div style={{ width: '1px', height: '24px', backgroundColor: 'rgba(255,255,255,0.08)' }} />
+            <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--t-divider)' }} />
             <div className="flex-1 flex flex-col items-center">
-              <span className="text-[9px] uppercase" style={{ color: '#777', letterSpacing: '0.08em' }}>{t("deckBuilder.power")}</span>
-              <span className="text-lg font-bold tabular-nums" style={{ color: '#e0e0e0' }}>{charCard.power}</span>
+              <span className="text-[9px] uppercase" style={{ color: 'var(--t-dim)', letterSpacing: '0.08em' }}>{t("deckBuilder.power")}</span>
+              <span className="text-lg font-bold tabular-nums inline-flex items-center gap-1" style={{ color: 'var(--t-text)' }}>
+                <PowerIcon size={15} color={POWER_COLOR} />
+                {charCard.power}
+              </span>
             </div>
           </div>
         )}
@@ -1033,7 +1041,7 @@ export default function DeckBuilderPage() {
           <div className="flex gap-1 mt-1 mb-2 flex-wrap">
             {charCard.keywords.map((kw, i) => (
               <span key={i} className="text-[9px] px-1.5 py-0.5" style={{
-                backgroundColor: 'rgba(255,255,255,0.04)', color: '#999',
+                backgroundColor: 'var(--t-divider)', color: 'var(--t-muted)',
               }}>{getCardKeyword(kw, tCardMeta)}</span>
             ))}
           </div>
@@ -1043,11 +1051,11 @@ export default function DeckBuilderPage() {
           <div className="flex flex-col gap-1.5 mt-2">
             {card.effects.map((eff, i) => {
               const description = getCardEffectDescription(card.id, i, locale, eff.description);
-              const effColor = EFFECT_TYPE_COLORS[eff.type] ?? '#888';
+              const effColor = EFFECT_TYPE_COLORS[eff.type] ?? 'var(--t-muted)';
               return (
                 <div key={i} className="py-1.5 px-2" style={{ backgroundColor: `${effColor}08` }}>
                   <span className="text-[10px] font-bold uppercase" style={{ color: effColor, letterSpacing: '0.06em' }}>{eff.type}</span>
-                  <div className="text-[10px] leading-snug mt-0.5" style={{ color: '#bbb' }}>{description}</div>
+                  <div className="text-[10px] leading-snug mt-0.5" style={{ color: 'var(--t-muted)' }}>{description}</div>
                 </div>
               );
             })}
@@ -1057,13 +1065,13 @@ export default function DeckBuilderPage() {
         <div className="mt-3">
           <AngularButton
             onClick={() => isChar ? addChar(charCard) : addMission(card as MissionCard)}
-            accentColor="#3e8b3e"
+            accentColor="var(--t-success)"
             variant={previewAddCheck.allowed ? 'primary' : 'muted'}
             disabled={!previewAddCheck.allowed}
             size="sm"
           >{t("deckBuilder.addToDeck")}</AngularButton>
           {!previewAddCheck.allowed && previewAddCheck.reason && (
-            <div className="text-[9px] mt-1" style={{ color: '#b33e3e' }}>{previewAddCheck.reason}</div>
+            <div className="text-[9px] mt-1" style={{ color: 'var(--t-danger)' }}>{previewAddCheck.reason}</div>
           )}
         </div>
       </div>
@@ -1107,18 +1115,20 @@ export default function DeckBuilderPage() {
   const cardFilters = searchFilters.slice(2, 9);     // k, k+, k!, g, r, s, nv
   const effectFilters = searchFilters.slice(9);       // e, e text, em, emi, emc, eup, ea, es
 
-  const renderFilterRow = ({ key, label, desc, examples }: typeof searchFilters[0], i: number, color = '#c4a35a') => (
+  const renderFilterRow = ({ key, label, desc, examples }: typeof searchFilters[0], i: number, color = 'var(--t-accent)') => (
     <div key={`${key}-${i}`} className="mb-2.5">
       <div className="flex items-baseline gap-2 mb-1">
         <span className="font-body text-[13px] font-bold" style={{ color }}>{key}</span>
-        <span className="font-body text-[11px] font-medium" style={{ color: '#aaa' }}>{label}</span>
-        <span className="font-body text-[10px]" style={{ color: '#444' }}>{desc}</span>
+        {key === 'c' && <ChakraIcon size={12} color={CHAKRA_COLOR} style={{ alignSelf: 'center' }} />}
+        {key === 'p' && <PowerIcon size={12} color={POWER_COLOR} style={{ alignSelf: 'center' }} />}
+        <span className="font-body text-[11px] font-medium" style={{ color: 'var(--t-muted)' }}>{label}</span>
+        <span className="font-body text-[10px]" style={{ color: 'var(--t-muted)' }}>{desc}</span>
       </div>
       <div className="flex flex-wrap gap-1.5">
         {examples.map((ex) => (
           <button key={ex} onClick={() => tryExample(ex)}
             className="font-body text-[11px] px-3 py-1 cursor-pointer"
-            style={{ backgroundColor: '#111111', color, }}>
+            style={{ backgroundColor: 'var(--t-panel)', color, }}>
             {ex}
           </button>
         ))}
@@ -1137,8 +1147,8 @@ export default function DeckBuilderPage() {
         style={{
           maxWidth: '1050px',
           maxHeight: 'calc(100vh - 24px)',
-          backgroundColor: '#0a0a0a',
-          boxShadow: '0 0 80px rgba(0,0,0,0.6)',
+          backgroundColor: 'var(--t-bg)',
+          boxShadow: '0 0 80px var(--t-shadow)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -1151,16 +1161,16 @@ export default function DeckBuilderPage() {
           </div>
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(10,10,10,0.2), rgba(10,10,10,1))' }} />
           <div className="absolute inset-0 flex flex-col items-center justify-end pb-3">
-            <span className="text-2xl tracking-widest" style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif" }}>
+            <span className="text-2xl tracking-widest" style={{ color: 'var(--t-accent)', fontFamily: "'NJNaruto', sans-serif" }}>
               {t('deckBuilder.search.helpTitle')}
             </span>
-            <p className="font-body text-[11px] mt-1 max-w-lg text-center px-4" style={{ color: '#666' }}>
+            <p className="font-body text-[11px] mt-1 max-w-lg text-center px-4" style={{ color: 'var(--t-dim)' }}>
               {t('deckBuilder.search.helpIntro')}
             </p>
           </div>
           <button onClick={() => setShowSearchHelp(false)}
             className="absolute top-3 right-4 font-body text-[11px] cursor-pointer px-2 py-1"
-            style={{ color: '#555', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+            style={{ color: 'var(--t-dim)', backgroundColor: 'rgba(0,0,0,0.5)' }}>
             ESC
           </button>
         </div>
@@ -1168,13 +1178,13 @@ export default function DeckBuilderPage() {
         <div className="flex-1 overflow-y-auto py-5">
           <div className="max-w-4xl mx-auto px-5 sm:px-8">
 
-            <div className="mb-5 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-              <p className="font-body text-[11px] mb-2" style={{ color: '#888' }}>{t('deckBuilder.search.nameDesc')}</p>
+            <div className="mb-5 pb-4" style={{ borderBottom: '1px solid var(--t-divider)' }}>
+              <p className="font-body text-[11px] mb-2" style={{ color: 'var(--t-muted)' }}>{t('deckBuilder.search.nameDesc')}</p>
               <div className="flex flex-wrap gap-1.5">
                 {['naruto', 'KS-133', 'sakura', 'orochimaru'].map((ex) => (
                   <button key={ex} onClick={() => tryExample(ex)}
                     className="font-body text-[11px] px-3 py-1.5 cursor-pointer"
-                    style={{ backgroundColor: '#111111', color: '#bbb', }}>
+                    style={{ backgroundColor: 'var(--t-panel)', color: 'var(--t-muted)', }}>
                     {ex}
                   </button>
                 ))}
@@ -1184,35 +1194,35 @@ export default function DeckBuilderPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
 
               <div>
-                <span className="text-sm tracking-wider block mb-3" style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
+                <span className="text-sm tracking-wider block mb-3" style={{ color: 'var(--t-accent)', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
                   {t('deckBuilder.search.statsHeader')}
                 </span>
-                {statsFilters.map((f, i) => renderFilterRow(f, i, '#c4a35a'))}
+                {statsFilters.map((f, i) => renderFilterRow(f, i, 'var(--t-accent)'))}
               </div>
 
               <div>
-                <span className="text-sm tracking-wider block mb-3" style={{ color: '#3e8b3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
+                <span className="text-sm tracking-wider block mb-3" style={{ color: 'var(--t-success)', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
                   {t('deckBuilder.search.propertiesHeader')}
                 </span>
-                {cardFilters.map((f, i) => renderFilterRow(f, i, '#3e8b3e'))}
+                {cardFilters.map((f, i) => renderFilterRow(f, i, 'var(--t-success)'))}
               </div>
 
               <div>
-                <span className="text-sm tracking-wider block mb-3" style={{ color: '#b33e3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
+                <span className="text-sm tracking-wider block mb-3" style={{ color: 'var(--t-danger)', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
                   {t('deckBuilder.search.effectsHeader')}
                 </span>
                 {effectFilters.map((f, i) => {
-                  const keyColors: Record<string, string> = { e: '#c4a35a', em: '#c4a35a', emi: '#c4a35a', emc: '#888', eup: '#3e8b3e', ea: '#b33e3e', eat: '#7a9e5a', ed: '#c46a3e', ef: '#4a9eff', es: '#6a6abb' };
-                  return renderFilterRow(f, i, keyColors[f.key] ?? '#b33e3e');
+                  const keyColors: Record<string, string> = { e: 'var(--t-accent)', em: 'var(--t-accent)', emi: 'var(--t-accent)', emc: 'var(--t-muted)', eup: 'var(--t-success)', ea: 'var(--t-danger)', eat: '#7a9e5a', ed: '#c46a3e', ef: '#4a9eff', es: '#6a6abb' };
+                  return renderFilterRow(f, i, keyColors[f.key] ?? 'var(--t-danger)');
                 })}
               </div>
             </div>
 
-            <div className="pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+            <div className="pt-5" style={{ borderTop: '1px solid var(--t-divider)' }}>
               <span className="text-sm tracking-wider block mb-1" style={{ color: '#6a6abb', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
                 {t('deckBuilder.search.combineTitle')}
               </span>
-              <p className="font-body text-[10px] mb-3" style={{ color: '#444' }}>
+              <p className="font-body text-[10px] mb-3" style={{ color: 'var(--t-muted)' }}>
                 {t('deckBuilder.search.combineDesc')}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -1229,9 +1239,9 @@ export default function DeckBuilderPage() {
                 ].map(({ query, desc }) => (
                   <button key={query} onClick={() => tryExample(query)}
                     className="flex flex-col items-start text-left px-4 py-2 cursor-pointer"
-                    style={{ backgroundColor: '#0e0e0e', }}>
-                    <span className="font-body text-[11px] font-medium" style={{ color: '#c4a35a' }}>{query}</span>
-                    <span className="font-body text-[10px] mt-0.5" style={{ color: '#555' }}>{desc}</span>
+                    style={{ backgroundColor: 'var(--t-bg-elevated)', }}>
+                    <span className="font-body text-[11px] font-medium" style={{ color: 'var(--t-accent)' }}>{query}</span>
+                    <span className="font-body text-[10px] mt-0.5" style={{ color: 'var(--t-dim)' }}>{desc}</span>
                   </button>
                 ))}
               </div>
@@ -1246,7 +1256,7 @@ export default function DeckBuilderPage() {
     <>
       
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-[9px] uppercase font-bold" style={{ color: '#777', letterSpacing: '0.1em' }}>{t("deckBuilder.missionCards")}</span>
+        <span className="text-[9px] uppercase font-bold" style={{ color: 'var(--t-dim)', letterSpacing: '0.1em' }}>{t("deckBuilder.missionCards")}</span>
         <div className="flex gap-2">
           {[0, 1, 2].map((i) => {
             const m = deckMissions[i];
@@ -1255,8 +1265,8 @@ export default function DeckBuilderPage() {
               <div key={i} className="relative overflow-hidden cursor-pointer group"
                 style={{
                   width: '90px', height: '64px',
-                  backgroundColor: '#0a0a0a',
-                  border: m ? '1px solid rgba(196,163,90,0.2)' : '1px solid rgba(255,255,255,0.04)',
+                  backgroundColor: 'var(--t-bg)',
+                  border: m ? '1px solid rgba(196,163,90,0.2)' : '1px solid var(--t-divider)',
                 }}
                 onClick={() => m && removeMission(i)}
                 onMouseEnter={() => m && setPreviewCard(m)}
@@ -1269,7 +1279,7 @@ export default function DeckBuilderPage() {
                     {mImg && <img src={mImg} alt="" className="w-full h-full object-cover" />}
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none"
                       style={{ backgroundColor: 'rgba(179,62,62,0.4)', transition: 'opacity 80ms' }}>
-                      <span className="text-sm font-bold" style={{ color: '#fff' }}>x</span>
+                      <span className="text-sm font-bold" style={{ color: 'var(--t-text)' }}>x</span>
                     </div>
                   </>
                 ) : (
@@ -1298,34 +1308,35 @@ export default function DeckBuilderPage() {
 
       <div className="flex items-center gap-2 mb-2 flex-wrap">
         <button onClick={deckChars.length > 1 ? sortCharsByCost : undefined}
-          className="px-2 py-0.5 text-[9px] uppercase font-bold"
+          className="px-2 py-0.5 text-[9px] uppercase font-bold inline-flex items-center gap-1"
           style={{
-            backgroundColor: deckChars.length > 1 ? 'rgba(196,163,90,0.08)' : 'rgba(255,255,255,0.02)',
-            borderLeft: deckChars.length > 1 ? '2px solid rgba(196,163,90,0.4)' : '2px solid rgba(255,255,255,0.06)',
-            color: deckChars.length > 1 ? '#c4a35a' : '#333',
+            backgroundColor: deckChars.length > 1 ? 'var(--t-accent-tint)' : 'rgba(255,255,255,0.02)',
+            borderLeft: deckChars.length > 1 ? '2px solid rgba(196,163,90,0.4)' : '2px solid var(--t-divider)',
+            color: deckChars.length > 1 ? 'var(--t-accent)' : 'var(--t-border-strong)',
             cursor: deckChars.length > 1 ? 'pointer' : 'default',
           }}>
+          <ChakraIcon size={10} color={CHAKRA_COLOR} />
           {t("deckBuilder.sortByCost")}
         </button>
         <button onClick={deckChars.length > 1 ? sortCharsByName : undefined}
           className="px-2 py-0.5 text-[9px] uppercase font-bold"
           style={{
-            backgroundColor: deckChars.length > 1 ? 'rgba(196,163,90,0.08)' : 'rgba(255,255,255,0.02)',
-            borderLeft: deckChars.length > 1 ? '2px solid rgba(196,163,90,0.4)' : '2px solid rgba(255,255,255,0.06)',
-            color: deckChars.length > 1 ? '#c4a35a' : '#333',
+            backgroundColor: deckChars.length > 1 ? 'var(--t-accent-tint)' : 'rgba(255,255,255,0.02)',
+            borderLeft: deckChars.length > 1 ? '2px solid rgba(196,163,90,0.4)' : '2px solid var(--t-divider)',
+            color: deckChars.length > 1 ? 'var(--t-accent)' : 'var(--t-border-strong)',
             cursor: deckChars.length > 1 ? 'pointer' : 'default',
           }}>
           {t("deckBuilder.sortByName")}
         </button>
-        <div className="h-3 w-px" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
+        <div className="h-3 w-px" style={{ backgroundColor: 'var(--t-divider)' }} />
         
         {(['grid', 'rows'] as DeckViewMode[]).map((m) => (
           <button key={m} onClick={() => setDeckViewMode(m)}
             className="px-2 py-0.5 text-[9px] uppercase font-bold"
             style={{
-              backgroundColor: deckViewMode === m ? 'rgba(196,163,90,0.12)' : 'rgba(255,255,255,0.02)',
-              borderBottom: deckViewMode === m ? '2px solid #c4a35a' : '2px solid transparent',
-              color: deckViewMode === m ? '#c4a35a' : '#555',
+              backgroundColor: deckViewMode === m ? 'var(--t-accent-glow)' : 'rgba(255,255,255,0.02)',
+              borderBottom: deckViewMode === m ? '2px solid var(--t-accent)' : '2px solid transparent',
+              color: deckViewMode === m ? 'var(--t-accent)' : 'var(--t-dim)',
             }}>
             {t(`deckBuilder.view.${m}`)}
           </button>
@@ -1333,15 +1344,17 @@ export default function DeckBuilderPage() {
         
         {deckViewMode === 'rows' && (
           <>
-            <div className="h-3 w-px" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
+            <div className="h-3 w-px" style={{ backgroundColor: 'var(--t-divider)' }} />
             {(['chakra', 'group', 'rarity', 'power', 'keyword', 'effect'] as DeckGroupBy[]).map((g) => (
               <button key={g} onClick={() => setDeckGroupBy(g)}
-                className="px-1.5 py-0.5 text-[8px] uppercase font-bold"
+                className="px-1.5 py-0.5 text-[8px] uppercase font-bold inline-flex items-center gap-1"
                 style={{
-                  backgroundColor: deckGroupBy === g ? 'rgba(196,163,90,0.1)' : 'transparent',
-                  color: deckGroupBy === g ? '#c4a35a' : '#444',
-                  borderBottom: deckGroupBy === g ? '1px solid #c4a35a' : '1px solid transparent',
+                  backgroundColor: deckGroupBy === g ? 'var(--t-accent-glow)' : 'transparent',
+                  color: deckGroupBy === g ? 'var(--t-accent)' : 'var(--t-border-strong)',
+                  borderBottom: deckGroupBy === g ? '1px solid var(--t-accent)' : '1px solid transparent',
                 }}>
+                {g === 'chakra' && <ChakraIcon size={9} color={CHAKRA_COLOR} />}
+                {g === 'power' && <PowerIcon size={9} color={POWER_COLOR} />}
                 {t(`deckBuilder.groupBy.${g}`)}
               </button>
             ))}
@@ -1368,7 +1381,7 @@ export default function DeckBuilderPage() {
               );
             }
             return (
-              <div key={`empty-${i}`} className="relative overflow-hidden" style={{ aspectRatio: '5/7', backgroundColor: '#0a0a0a' }}>
+              <div key={`empty-${i}`} className="relative overflow-hidden" style={{ aspectRatio: '5/7', backgroundColor: 'var(--t-bg)' }}>
                 <img src="/images/card-back.webp" alt="" className="w-full h-full object-cover" style={{ opacity: 0.12 }} draggable={false} />
               </div>
             );
@@ -1377,7 +1390,7 @@ export default function DeckBuilderPage() {
       ) : (
         <div className="flex flex-col gap-3">
           {deckGroupedRows.length === 0 ? (
-            <div className="text-[10px] text-center py-4" style={{ color: '#444' }}>{t("deckBuilder.emptyDeck")}</div>
+            <div className="text-[10px] text-center py-4" style={{ color: 'var(--t-muted)' }}>{t("deckBuilder.emptyDeck")}</div>
           ) : deckGroupedRows.map(([groupKey, cards]) => {
             const label = deckGroupBy === 'chakra' ? `${t("deckBuilder.groupBy.chakra")} ${groupKey}`
               : deckGroupBy === 'power' ? `${t("deckBuilder.groupBy.power")} ${groupKey}`
@@ -1388,11 +1401,15 @@ export default function DeckBuilderPage() {
             return (
               <div key={groupKey}>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[9px] uppercase font-bold" style={{ color: '#c4a35a', letterSpacing: '0.08em' }}>{label}</span>
-                  <span className="text-[8px]" style={{ color: '#555' }}>({cards.length})</span>
-                  <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(196,163,90,0.15)' }} />
+                  <span className="text-[9px] uppercase font-bold inline-flex items-center gap-1" style={{ color: 'var(--t-accent)', letterSpacing: '0.08em' }}>
+                    {deckGroupBy === 'chakra' && <ChakraIcon size={11} color={CHAKRA_COLOR} />}
+                    {deckGroupBy === 'power' && <PowerIcon size={11} color={POWER_COLOR} />}
+                    {label}
+                  </span>
+                  <span className="text-[8px]" style={{ color: 'var(--t-dim)' }}>({cards.length})</span>
+                  <div className="flex-1 h-px" style={{ backgroundColor: 'var(--t-accent-glow)' }} />
                 </div>
-                <div className="flex gap-1 overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#333 transparent' }}>
+                <div className="flex gap-1 overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--t-border-strong) transparent' }}>
                   {cards.map(({ card, idx }) => (
                     <div key={`${card.id}-${idx}`} className="flex-shrink-0" style={{ width: '60px' }}>
                       <DeckCard
@@ -1416,7 +1433,7 @@ export default function DeckBuilderPage() {
   );
 
   return (
-    <main id="main-content" className="relative" style={{ backgroundColor: '#0a0a0a', height: '100vh', overflow: 'hidden' }}>
+    <main id="main-content" className="relative" style={{ backgroundColor: 'var(--t-bg)', height: '100vh', overflow: 'hidden' }}>
       <CloudBackground />
 
       <div className="hidden lg:flex relative z-10" style={{ height: '100vh' }}>
@@ -1424,11 +1441,11 @@ export default function DeckBuilderPage() {
         <div className="flex flex-col flex-shrink-0" style={{
           width: '250px',
           backgroundColor: 'rgba(10, 10, 10, 0.95)',
-          borderRight: '1px solid rgba(196, 163, 90, 0.12)',
+          borderRight: '1px solid var(--t-accent-glow)',
         }}>
           <div className="px-3 pt-2 pb-1 flex-shrink-0 flex items-center gap-2">
-            <Link href="/" className="text-[10px] uppercase" style={{ color: '#555' }}>{t("common.back")}</Link>
-            <h1 className="text-xs font-bold uppercase" style={{ color: '#c4a35a', letterSpacing: '0.1em' }}>
+            <Link href="/" className="text-[10px] uppercase" style={{ color: 'var(--t-dim)' }}>{t("common.back")}</Link>
+            <h1 className="text-xs font-bold uppercase" style={{ color: 'var(--t-accent)', letterSpacing: '0.1em' }}>
               {t("deckBuilder.title")}
             </h1>
           </div>
@@ -1439,7 +1456,7 @@ export default function DeckBuilderPage() {
           
           <div className="flex items-center gap-3 px-4 py-2 flex-shrink-0" style={{
             backgroundColor: 'rgba(10, 10, 10, 0.9)',
-            borderBottom: '1px solid rgba(255,255,255,0.04)',
+            borderBottom: '1px solid var(--t-divider)',
           }}>
             <input
               type="text"
@@ -1448,32 +1465,32 @@ export default function DeckBuilderPage() {
               onChange={(e) => setDeckName(e.target.value)}
               className="flex-1 min-w-[120px] max-w-[280px] px-2 py-1 text-xs focus:outline-none"
               style={{
-                backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)',
-                color: '#e0e0e0',
+                backgroundColor: 'var(--t-bg-elevated)', border: '1px solid var(--t-divider)',
+                color: 'var(--t-text)',
               }}
             />
             <div className="flex items-center gap-2 text-[10px] flex-shrink-0">
-              <span style={{ color: deckCardCount >= 30 ? '#3e8b3e' : '#b33e3e' }}>
+              <span style={{ color: deckCardCount >= 30 ? 'var(--t-success)' : 'var(--t-danger)' }}>
                 {t("deckBuilder.characters", { count: realCharCount })}
               </span>
               {attachmentCount > 0 && (
-                <span style={{ color: '#8a8a8a' }}>
+                <span style={{ color: 'var(--t-muted)' }}>
                   +{attachmentCount} {t("collection.attachments")}
                 </span>
               )}
-              <span style={{ color: deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e' }}>
+              <span style={{ color: deckMissions.length === 3 ? 'var(--t-success)' : 'var(--t-danger)' }}>
                 {t("deckBuilder.missions", { count: deckMissions.length })}
               </span>
               <EvolvingCostMeter compact />
-              {validation.valid && <span style={{ color: '#3e8b3e' }}>{t("deckBuilder.validation.valid")}</span>}
+              {validation.valid && <span style={{ color: 'var(--t-success)' }}>{t("deckBuilder.validation.valid")}</span>}
               {loadedDeckId && (
                 <span className="text-[8px] uppercase px-1.5 py-0.5" style={{
-                  backgroundColor: 'rgba(62, 139, 62, 0.15)', color: '#3e8b3e',
+                  backgroundColor: 'rgba(62, 139, 62, 0.15)', color: 'var(--t-success)',
                 }}>{t("deckBuilder.currentlyEditing")}</span>
               )}
               {deckHasUnrevealed && (
                 <span className="text-[8px] uppercase px-1.5 py-0.5" style={{
-                  backgroundColor: 'rgba(196,163,90,0.15)', color: '#c4a35a',
+                  backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)',
                 }}>{t("deckBuilder.containsUnrevealed")}</span>
               )}
             </div>
@@ -1482,7 +1499,7 @@ export default function DeckBuilderPage() {
           {(saveError || addError) && (
             <div className="px-4 py-1 flex-shrink-0">
               <div className="text-[10px] py-1 px-2" style={{
-                backgroundColor: 'rgba(179,62,62,0.08)', color: '#b33e3e',
+                backgroundColor: 'rgba(179,62,62,0.08)', color: 'var(--t-danger)',
               }}>{addError ? (addErrorKey ? t(addErrorKey, addErrorParams ?? {}) : addError) : saveError}</div>
             </div>
           )}
@@ -1490,14 +1507,14 @@ export default function DeckBuilderPage() {
           {lockedVariantsInDeck.length > 0 && (
             <div className="px-4 py-1 flex-shrink-0">
               <div className="flex items-center gap-3 text-[10px] py-1.5 px-2.5" style={{
-                backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a',
+                backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)',
               }}>
                 <span className="flex-1">
                   {t("deckBuilder.lockedVariantsWarning", { count: lockedVariantsInDeck.length })}
                 </span>
                 <button onClick={handleRepairLockedVariants}
                   className="uppercase font-bold py-1 px-2.5 no-select flex-shrink-0"
-                  style={{ backgroundColor: 'rgba(196,163,90,0.2)', color: '#c4a35a', letterSpacing: '0.08em' }}>
+                  style={{ backgroundColor: 'rgba(196,163,90,0.2)', color: 'var(--t-accent)', letterSpacing: '0.08em' }}>
                   {t("deckBuilder.repairDeck")}
                 </button>
               </div>
@@ -1514,9 +1531,9 @@ export default function DeckBuilderPage() {
           </div>
 
           <div className="flex items-center gap-2 px-4 py-2 flex-shrink-0 flex-wrap" style={{
-            borderTop: '1px solid rgba(255,255,255,0.04)', backgroundColor: 'rgba(10, 10, 10, 0.9)',
+            borderTop: '1px solid var(--t-divider)', backgroundColor: 'rgba(10, 10, 10, 0.9)',
           }}>
-            <AngularButton onClick={handleSave} accentColor={loadedDeckId && isDirty ? '#c47a1a' : '#3e8b3e'} variant={validation.valid && !isSaving ? 'primary' : 'muted'} disabled={isSaving || !validation.valid} size="sm">
+            <AngularButton onClick={handleSave} accentColor={loadedDeckId && isDirty ? '#c47a1a' : 'var(--t-success)'} variant={validation.valid && !isSaving ? 'primary' : 'muted'} disabled={isSaving || !validation.valid} size="sm">
               {isSaving ? t("common.loading") : loadedDeckId ? t("deckBuilder.updateDeck") : t("deckBuilder.saveDeck")}
             </AngularButton>
             <AngularButton onClick={() => setShowSavedDecks(true)} variant="secondary" size="sm">{t("deckBuilder.loadDeck")}</AngularButton>
@@ -1524,13 +1541,13 @@ export default function DeckBuilderPage() {
             <AngularButton onClick={() => setShowExportModal(true)} variant="muted" disabled={deckChars.length === 0} size="sm">{t("deckBuilder.exportButton")}</AngularButton>
             {loadedDeckId && (
               <Link href={`/feed?deck=${loadedDeckId}` as '/'} className="text-center text-[10px] uppercase font-bold py-1.5 px-3 no-select inline-block"
-                style={{ backgroundColor: 'rgba(196,163,90,0.14)', color: '#c4a35a', letterSpacing: '0.1em', transform: 'skewX(-3deg)' }}>
+                style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)', letterSpacing: '0.1em', transform: 'skewX(-3deg)' }}>
                 {t("feed.postToFeed")}
               </Link>
             )}
             <Link href="/deck-builder/manage" className="text-center text-[10px] uppercase font-bold py-1.5 px-3 no-select inline-block"
               style={{
-                backgroundColor: 'rgba(196,163,90,0.08)', color: '#c4a35a', letterSpacing: '0.1em', transform: 'skewX(-3deg)',
+                backgroundColor: 'var(--t-accent-tint)', color: 'var(--t-accent)', letterSpacing: '0.1em', transform: 'skewX(-3deg)',
               }}>
               <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>{t("deckManager.manageButton")}</span>
             </Link>
@@ -1542,13 +1559,13 @@ export default function DeckBuilderPage() {
         <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{
           width: '540px',
           backgroundColor: 'rgba(10, 10, 10, 0.95)',
-          borderLeft: '1px solid rgba(255,255,255,0.06)',
+          borderLeft: '1px solid var(--t-divider)',
         }}>
           
           <div className="px-3 pt-3 pb-1 flex-shrink-0">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[8px] uppercase font-bold" style={{ color: '#777' }}>{t("deckBuilder.missionCards")}</span>
-              <span className="text-[8px]" style={{ color: '#555' }}>{filteredMissions.length}</span>
+              <span className="text-[8px] uppercase font-bold" style={{ color: 'var(--t-dim)' }}>{t("deckBuilder.missionCards")}</span>
+              <span className="text-[8px]" style={{ color: 'var(--t-dim)' }}>{filteredMissions.length}</span>
             </div>
             <div className="flex items-center gap-1 mb-1">
               <input
@@ -1557,7 +1574,7 @@ export default function DeckBuilderPage() {
                 value={missionSearch}
                 onChange={(e) => setMissionSearch(e.target.value)}
                 className="flex-1 min-w-0 px-2 py-1 text-[10px] focus:outline-none"
-                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
+                style={{ backgroundColor: 'var(--t-bg-elevated)', border: '1px solid var(--t-divider)', color: 'var(--t-text)' }}
               />
               {missionEffectKeys.map((key) => (
                 <button
@@ -1565,8 +1582,8 @@ export default function DeckBuilderPage() {
                   onClick={() => setMissionEffect(key)}
                   className="font-body text-[9px] font-bold px-2 py-1 cursor-pointer shrink-0 uppercase"
                   style={{
-                    backgroundColor: missionEffect === key ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
-                    color: missionEffect === key ? '#c4a35a' : '#666',
+                    backgroundColor: missionEffect === key ? 'var(--t-accent-glow)' : 'rgba(255,255,255,0.03)',
+                    color: missionEffect === key ? 'var(--t-accent)' : 'var(--t-dim)',
                   }}
                 >
                   {t(`deckBuilder.missionFilter.${key}`)}
@@ -1592,14 +1609,14 @@ export default function DeckBuilderPage() {
                   disabled={missionPageSafe === 0}
                   className="font-body text-[10px] font-bold px-2.5 py-1 cursor-pointer"
                   style={{
-                    backgroundColor: 'rgba(196,163,90,0.08)',
-                    color: missionPageSafe === 0 ? '#444' : '#c4a35a',
+                    backgroundColor: 'var(--t-accent-tint)',
+                    color: missionPageSafe === 0 ? 'var(--t-border-strong)' : 'var(--t-accent)',
                     cursor: missionPageSafe === 0 ? 'default' : 'pointer',
                   }}
                 >
                   {'‹'}
                 </button>
-                <span className="text-[9px]" style={{ color: '#777' }}>
+                <span className="text-[9px]" style={{ color: 'var(--t-dim)' }}>
                   {t("deckBuilder.missionPage", { page: missionPageSafe + 1, total: missionPageCount })}
                 </span>
                 <button
@@ -1607,8 +1624,8 @@ export default function DeckBuilderPage() {
                   disabled={missionPageSafe >= missionPageCount - 1}
                   className="font-body text-[10px] font-bold px-2.5 py-1 cursor-pointer"
                   style={{
-                    backgroundColor: 'rgba(196,163,90,0.08)',
-                    color: missionPageSafe >= missionPageCount - 1 ? '#444' : '#c4a35a',
+                    backgroundColor: 'var(--t-accent-tint)',
+                    color: missionPageSafe >= missionPageCount - 1 ? 'var(--t-border-strong)' : 'var(--t-accent)',
                     cursor: missionPageSafe >= missionPageCount - 1 ? 'default' : 'pointer',
                   }}
                 >
@@ -1618,7 +1635,7 @@ export default function DeckBuilderPage() {
             )}
           </div>
 
-          <div className="h-px mx-3" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }} />
+          <div className="h-px mx-3" style={{ backgroundColor: 'var(--t-divider)' }} />
 
           <div className="px-3 pt-2 pb-2 flex-shrink-0">
             <div className="flex items-center gap-1.5">
@@ -1629,14 +1646,14 @@ export default function DeckBuilderPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 min-w-0 px-2.5 py-1.5 text-xs focus:outline-none"
                 style={{
-                  backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)',
-                  color: '#e0e0e0',
+                  backgroundColor: 'var(--t-bg-elevated)', border: '1px solid var(--t-divider)',
+                  color: 'var(--t-text)',
                 }}
               />
               <button
                 onClick={() => setShowSearchHelp(true)}
                 className="font-body text-[10px] font-bold px-3 py-1.5 cursor-pointer shrink-0 whitespace-nowrap"
-                style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', color: '#c4a35a' }}
+                style={{ backgroundColor: 'var(--t-accent-tint)', color: 'var(--t-accent)' }}
               >
                 ?
               </button>
@@ -1645,7 +1662,7 @@ export default function DeckBuilderPage() {
                 <button
                   onClick={() => setShowSortDropdown((v) => !v)}
                   className="font-body text-[10px] font-bold px-3 py-1.5 cursor-pointer shrink-0 whitespace-nowrap"
-                  style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', color: '#c4a35a' }}
+                  style={{ backgroundColor: 'var(--t-accent-tint)', color: 'var(--t-accent)' }}
                 >
                   {'\u21C5'}
                 </button>
@@ -1653,14 +1670,14 @@ export default function DeckBuilderPage() {
                   <>
                     <div className="fixed inset-0 z-30" onClick={() => setShowSortDropdown(false)} />
                     <div className="absolute right-0 top-full mt-1 z-40 flex flex-col rounded overflow-hidden"
-                      style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', minWidth: '130px' }}>
+                      style={{ backgroundColor: 'var(--t-surface-2)', border: '1px solid var(--t-border-strong)', minWidth: '130px' }}>
                       {([
-                        { key: 'number' as SortField, label: '#' },
-                        { key: 'name' as SortField, label: 'Name' },
-                        { key: 'chakra' as SortField, label: 'Chakra' },
-                        { key: 'power' as SortField, label: 'Power' },
-                        { key: 'rarity' as SortField, label: 'Rarity' },
-                      ]).map((opt) => (
+                        { key: 'number', label: '#' },
+                        { key: 'name', label: t("deckBuilder.sortName") },
+                        { key: 'chakra', label: t("deckBuilder.chakra"), stat: 'chakra' },
+                        { key: 'power', label: t("deckBuilder.power"), stat: 'power' },
+                        { key: 'rarity', label: t("deckBuilder.sortRarity") },
+                      ] as { key: SortField; label: string; stat?: 'chakra' | 'power' }[]).map((opt) => (
                         <button
                           key={opt.key}
                           onClick={() => {
@@ -1668,10 +1685,14 @@ export default function DeckBuilderPage() {
                             else { setSortBy(opt.key); setSortOrder('asc'); }
                             setShowSortDropdown(false);
                           }}
-                          className="px-3 py-1.5 text-[10px] text-left hover:bg-[#262626] transition-colors flex items-center justify-between"
-                          style={{ color: sortBy === opt.key ? '#c4a35a' : '#ccc' }}
+                          className="px-3 py-1.5 text-[10px] text-left hover:bg-[var(--t-border)] transition-colors flex items-center justify-between gap-2"
+                          style={{ color: sortBy === opt.key ? 'var(--t-accent)' : 'var(--t-text)' }}
                         >
-                          <span>{opt.label}</span>
+                          <span className="inline-flex items-center gap-1.5">
+                            {opt.stat === 'chakra' && <ChakraIcon size={11} color={CHAKRA_COLOR} />}
+                            {opt.stat === 'power' && <PowerIcon size={11} color={POWER_COLOR} />}
+                            {opt.label}
+                          </span>
                           {sortBy === opt.key && <span>{sortOrder === 'asc' ? '\u2191' : '\u2193'}</span>}
                         </button>
                       ))}
@@ -1680,7 +1701,7 @@ export default function DeckBuilderPage() {
                 )}
               </div>
             </div>
-            <div className="text-[8px] mt-1" style={{ color: '#444' }}>
+            <div className="text-[8px] mt-1" style={{ color: 'var(--t-muted)' }}>
               {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
             </div>
           </div>
@@ -1692,8 +1713,8 @@ export default function DeckBuilderPage() {
                 aria-pressed={quickSet === null}
                 className="text-[9px] uppercase font-bold px-2 py-1 transition-colors"
                 style={{
-                  backgroundColor: quickSet === null ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
-                  color: quickSet === null ? '#c4a35a' : '#6d6d74',
+                  backgroundColor: quickSet === null ? 'var(--t-accent-glow)' : 'rgba(255,255,255,0.03)',
+                  color: quickSet === null ? 'var(--t-accent)' : '#6d6d74',
                   border: 'none', cursor: 'pointer', letterSpacing: '0.08em',
                 }}
               >
@@ -1707,8 +1728,8 @@ export default function DeckBuilderPage() {
                   title={SET_REGISTRY[sid]?.nameEn ?? sid}
                   className="text-[9px] uppercase font-bold px-2 py-1 transition-colors"
                   style={{
-                    backgroundColor: quickSet === sid ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
-                    color: quickSet === sid ? '#c4a35a' : '#6d6d74',
+                    backgroundColor: quickSet === sid ? 'var(--t-accent-glow)' : 'rgba(255,255,255,0.03)',
+                    color: quickSet === sid ? 'var(--t-accent)' : '#6d6d74',
                     border: 'none', cursor: 'pointer', letterSpacing: '0.08em',
                   }}
                 >
@@ -1733,8 +1754,8 @@ export default function DeckBuilderPage() {
                     aria-pressed={active}
                     className="text-[9px] uppercase font-bold px-2 py-1 transition-colors"
                     style={{
-                      backgroundColor: active ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
-                      color: active ? '#c4a35a' : '#6d6d74',
+                      backgroundColor: active ? 'var(--t-accent-glow)' : 'rgba(255,255,255,0.03)',
+                      color: active ? 'var(--t-accent)' : '#6d6d74',
                       border: 'none', cursor: 'pointer', letterSpacing: '0.08em',
                     }}
                   >
@@ -1749,8 +1770,8 @@ export default function DeckBuilderPage() {
               onClick={() => setHideVariants(!hideVariants)}
               className="text-[9px] uppercase font-bold px-2 py-1"
               style={{
-                backgroundColor: showAltArt ? 'rgba(196,163,90,0.1)' : 'rgba(136,136,136,0.08)',
-                color: showAltArt ? '#c4a35a' : '#555',
+                backgroundColor: showAltArt ? 'var(--t-accent-glow)' : 'rgba(136,136,136,0.08)',
+                color: showAltArt ? 'var(--t-accent)' : 'var(--t-dim)',
               }}
             >
               {showAltArt ? t("deckBuilder.hideAlt") : t("deckBuilder.showAlt")}
@@ -1760,8 +1781,8 @@ export default function DeckBuilderPage() {
                 onClick={() => setShowUnrevealed((v) => !v)}
                 className="text-[9px] uppercase font-bold px-2 py-1"
                 style={{
-                  backgroundColor: showUnrevealed ? 'rgba(196,163,90,0.1)' : 'rgba(136,136,136,0.08)',
-                  color: showUnrevealed ? '#c4a35a' : '#555',
+                  backgroundColor: showUnrevealed ? 'var(--t-accent-glow)' : 'rgba(136,136,136,0.08)',
+                  color: showUnrevealed ? 'var(--t-accent)' : 'var(--t-dim)',
                 }}
               >
                 {t("deckBuilder.showUnrevealed")}
@@ -1798,26 +1819,26 @@ export default function DeckBuilderPage() {
         <div className="flex items-center gap-2 px-2 flex-shrink-0" style={{
           height: 44,
           backgroundColor: 'rgba(10, 10, 10, 0.96)',
-          borderBottom: '1px solid rgba(196, 163, 90, 0.18)',
+          borderBottom: '1px solid var(--t-accent-glow)',
         }}>
           <Link href="/" className="flex items-center justify-center flex-shrink-0" style={{
             width: 32, height: 32,
-            backgroundColor: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            color: '#888', fontSize: 16, lineHeight: 1,
+            backgroundColor: 'var(--t-divider)',
+            border: '1px solid var(--t-divider)',
+            color: 'var(--t-muted)', fontSize: 16, lineHeight: 1,
           }}>{'\u2190'}</Link>
           <input type="text" placeholder={t("deckBuilder.deckName")} value={deckName}
             onChange={(e) => setDeckName(e.target.value)}
             className="flex-1 min-w-0 px-2 py-2 text-xs focus:outline-none"
-            style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
+            style={{ backgroundColor: 'var(--t-bg-elevated)', border: '1px solid var(--t-divider)', color: 'var(--t-text)' }}
           />
           <button
             onClick={() => setMobileMenuOpen(true)}
             className="flex items-center justify-center flex-shrink-0 cursor-pointer"
             style={{
               width: 32, height: 32,
-              backgroundColor: 'rgba(196,163,90,0.08)',
-              color: '#c4a35a', fontSize: 18, lineHeight: 1,
+              backgroundColor: 'var(--t-accent-tint)',
+              color: 'var(--t-accent)', fontSize: 18, lineHeight: 1,
             }}
             aria-label={t("common.menu")}
           >{'\u22EE'}</button>
@@ -1825,24 +1846,24 @@ export default function DeckBuilderPage() {
 
         <div className="flex items-center gap-1.5 px-3 py-1.5 flex-shrink-0" style={{
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
-          borderBottom: '1px solid rgba(255,255,255,0.04)',
+          borderBottom: '1px solid var(--t-divider)',
         }}>
           <span className="text-[10px] tabular-nums font-bold px-1.5 py-0.5 flex-shrink-0" style={{
             backgroundColor: deckCardCount >= 30 ? 'rgba(62,139,62,0.12)' : 'rgba(179,62,62,0.1)',
-            color: deckCardCount >= 30 ? '#3e8b3e' : '#b33e3e',
+            color: deckCardCount >= 30 ? 'var(--t-success)' : 'var(--t-danger)',
           }}>{deckCardCount}/30{attachmentCount > 0 ? ` (${realCharCount}+${attachmentCount})` : ''}</span>
           <span className="text-[10px] tabular-nums font-bold px-1.5 py-0.5 flex-shrink-0" style={{
             backgroundColor: deckMissions.length === 3 ? 'rgba(62,139,62,0.12)' : 'rgba(179,62,62,0.1)',
-            color: deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e',
+            color: deckMissions.length === 3 ? 'var(--t-success)' : 'var(--t-danger)',
           }}>{deckMissions.length}/3 M</span>
           {validation.valid && (
             <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 flex-shrink-0" style={{
-              backgroundColor: 'rgba(62,139,62,0.12)', color: '#3e8b3e',
+              backgroundColor: 'rgba(62,139,62,0.12)', color: 'var(--t-success)',
             }}>{t("deckBuilder.validation.valid")}</span>
           )}
           {loadedDeckId && (
             <span className="text-[8px] uppercase font-bold px-1.5 py-0.5 flex-shrink-0 truncate" style={{
-              backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a',
+              backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)',
               maxWidth: '110px',
             }}>{t("deckBuilder.currentlyEditing")}</span>
           )}
@@ -1854,7 +1875,7 @@ export default function DeckBuilderPage() {
 
         <div className="flex flex-shrink-0" style={{
           backgroundColor: 'rgba(10, 10, 10, 0.88)',
-          borderBottom: '1px solid rgba(255,255,255,0.04)',
+          borderBottom: '1px solid var(--t-divider)',
         }}>
           {(['catalog', 'deck'] as const).map((view) => {
             const active = mobileView === view;
@@ -1865,9 +1886,9 @@ export default function DeckBuilderPage() {
                 onClick={() => setMobileView(view)}
                 className="flex-1 text-center py-2.5 text-[11px] font-bold uppercase cursor-pointer"
                 style={{
-                  backgroundColor: active ? 'rgba(196,163,90,0.12)' : 'transparent',
-                  borderBottom: active ? '3px solid #c4a35a' : '3px solid transparent',
-                  color: active ? '#c4a35a' : '#777',
+                  backgroundColor: active ? 'var(--t-accent-glow)' : 'transparent',
+                  borderBottom: active ? '3px solid var(--t-accent)' : '3px solid transparent',
+                  color: active ? 'var(--t-accent)' : 'var(--t-dim)',
                   letterSpacing: '0.08em',
                 }}
               >{label}</button>
@@ -1878,7 +1899,7 @@ export default function DeckBuilderPage() {
         {(saveError || addError) && (
           <div className="px-3 py-1.5 flex-shrink-0">
             <div className="text-[10px] py-1.5 px-2" style={{
-              backgroundColor: 'rgba(179,62,62,0.08)', color: '#b33e3e',
+              backgroundColor: 'rgba(179,62,62,0.08)', color: 'var(--t-danger)',
             }}>{addError ? (addErrorKey ? t(addErrorKey, addErrorParams ?? {}) : addError) : saveError}</div>
           </div>
         )}
@@ -1892,45 +1913,49 @@ export default function DeckBuilderPage() {
           {mobileView === 'catalog' ? (
             <div className="px-3 py-2">
 
-              <div className="sticky top-0 z-20 -mx-3 px-3 pt-1 pb-2" style={{ backgroundColor: '#0a0a0a' }}>
+              <div className="sticky top-0 z-20 -mx-3 px-3 pt-1 pb-2" style={{ backgroundColor: 'var(--t-bg)' }}>
                 <div className="flex items-center gap-1.5">
                   <input type="text" placeholder={t("collection.search")} value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="flex-1 min-w-0 px-2.5 py-2 text-xs focus:outline-none"
-                    style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
+                    style={{ backgroundColor: 'var(--t-bg-elevated)', border: '1px solid var(--t-divider)', color: 'var(--t-text)' }}
                   />
                   <button
                     onClick={() => setShowSearchHelp(true)}
                     className="font-body text-[11px] font-bold cursor-pointer shrink-0"
-                    style={{ width: 34, height: 34, backgroundColor: 'rgba(196,163,90,0.08)', color: '#c4a35a' }}
+                    style={{ width: 34, height: 34, backgroundColor: 'var(--t-accent-tint)', color: 'var(--t-accent)' }}
                   >?</button>
                   <div className="relative">
                     <button
                       onClick={() => setShowSortDropdown((v) => !v)}
                       className="font-body text-[12px] font-bold cursor-pointer shrink-0"
-                      style={{ width: 34, height: 34, backgroundColor: 'rgba(196,163,90,0.08)', color: '#c4a35a' }}
+                      style={{ width: 34, height: 34, backgroundColor: 'var(--t-accent-tint)', color: 'var(--t-accent)' }}
                     >{'\u21C5'}</button>
                     {showSortDropdown && (
                       <>
                         <div className="fixed inset-0 z-30" onClick={() => setShowSortDropdown(false)} />
                         <div className="absolute right-0 top-full mt-1 z-40 flex flex-col rounded overflow-hidden"
-                          style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', minWidth: '140px' }}>
+                          style={{ backgroundColor: 'var(--t-surface-2)', border: '1px solid var(--t-border-strong)', minWidth: '140px' }}>
                           {([
-                            { key: 'number' as SortField, label: '#' },
-                            { key: 'name' as SortField, label: t("deckBuilder.sortName") },
-                            { key: 'chakra' as SortField, label: t("deckBuilder.chakra") },
-                            { key: 'power' as SortField, label: t("deckBuilder.power") },
-                            { key: 'rarity' as SortField, label: t("deckBuilder.sortRarity") },
-                          ]).map((opt) => (
+                            { key: 'number', label: '#' },
+                            { key: 'name', label: t("deckBuilder.sortName") },
+                            { key: 'chakra', label: t("deckBuilder.chakra"), stat: 'chakra' },
+                            { key: 'power', label: t("deckBuilder.power"), stat: 'power' },
+                            { key: 'rarity', label: t("deckBuilder.sortRarity") },
+                          ] as { key: SortField; label: string; stat?: 'chakra' | 'power' }[]).map((opt) => (
                             <button key={opt.key}
                               onClick={() => {
                                 if (sortBy === opt.key) setSortOrder((o) => o === 'asc' ? 'desc' : 'asc');
                                 else { setSortBy(opt.key); setSortOrder('asc'); }
                                 setShowSortDropdown(false);
                               }}
-                              className="px-3 py-2 text-[11px] text-left hover:bg-[#262626] transition-colors flex items-center justify-between"
-                              style={{ color: sortBy === opt.key ? '#c4a35a' : '#ccc' }}>
-                              <span>{opt.label}</span>
+                              className="px-3 py-2 text-[11px] text-left hover:bg-[var(--t-border)] transition-colors flex items-center justify-between gap-2"
+                              style={{ color: sortBy === opt.key ? 'var(--t-accent)' : 'var(--t-text)' }}>
+                              <span className="inline-flex items-center gap-1.5">
+                                {opt.stat === 'chakra' && <ChakraIcon size={12} color={CHAKRA_COLOR} />}
+                                {opt.stat === 'power' && <PowerIcon size={12} color={POWER_COLOR} />}
+                                {opt.label}
+                              </span>
                               {sortBy === opt.key && <span>{sortOrder === 'asc' ? '\u2191' : '\u2193'}</span>}
                             </button>
                           ))}
@@ -1946,8 +1971,8 @@ export default function DeckBuilderPage() {
                       aria-pressed={quickSet === null}
                       className="text-[9px] uppercase font-bold px-2 py-0.5 transition-colors"
                       style={{
-                        backgroundColor: quickSet === null ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
-                        color: quickSet === null ? '#c4a35a' : '#6d6d74',
+                        backgroundColor: quickSet === null ? 'var(--t-accent-glow)' : 'rgba(255,255,255,0.03)',
+                        color: quickSet === null ? 'var(--t-accent)' : '#6d6d74',
                         border: 'none', cursor: 'pointer', letterSpacing: '0.08em',
                       }}
                     >
@@ -1961,8 +1986,8 @@ export default function DeckBuilderPage() {
                         title={SET_REGISTRY[sid]?.nameEn ?? sid}
                         className="text-[9px] uppercase font-bold px-2 py-0.5 transition-colors"
                         style={{
-                          backgroundColor: quickSet === sid ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
-                          color: quickSet === sid ? '#c4a35a' : '#6d6d74',
+                          backgroundColor: quickSet === sid ? 'var(--t-accent-glow)' : 'rgba(255,255,255,0.03)',
+                          color: quickSet === sid ? 'var(--t-accent)' : '#6d6d74',
                           border: 'none', cursor: 'pointer', letterSpacing: '0.08em',
                         }}
                       >
@@ -1972,23 +1997,23 @@ export default function DeckBuilderPage() {
                   </div>
                 )}
                 <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-[9px]" style={{ color: '#666' }}>
+                  <span className="text-[9px]" style={{ color: 'var(--t-dim)' }}>
                     {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
                   </span>
                   <button
                     onClick={() => setHideVariants(!hideVariants)}
                     className="text-[9px] uppercase font-bold px-2 py-0.5"
                     style={{
-                      backgroundColor: showAltArt ? 'rgba(196,163,90,0.1)' : 'rgba(136,136,136,0.06)',
-                      color: showAltArt ? '#c4a35a' : '#666',
+                      backgroundColor: showAltArt ? 'var(--t-accent-glow)' : 'rgba(136,136,136,0.06)',
+                      color: showAltArt ? 'var(--t-accent)' : 'var(--t-dim)',
                     }}
                   >{showAltArt ? t("deckBuilder.hideAlt") : t("deckBuilder.showAlt")}</button>
                 </div>
               </div>
 
               <div className="flex items-center justify-between mb-1.5 mt-1">
-                <span className="text-[10px] uppercase font-bold" style={{ color: '#888', letterSpacing: '0.08em' }}>{t("deckBuilder.missionCards")}</span>
-                <span className="text-[9px]" style={{ color: '#555' }}>{filteredMissions.length}</span>
+                <span className="text-[10px] uppercase font-bold" style={{ color: 'var(--t-muted)', letterSpacing: '0.08em' }}>{t("deckBuilder.missionCards")}</span>
+                <span className="text-[9px]" style={{ color: 'var(--t-dim)' }}>{filteredMissions.length}</span>
               </div>
               <div className="flex items-center gap-1 mb-1.5">
                 <input
@@ -1997,7 +2022,7 @@ export default function DeckBuilderPage() {
                   value={missionSearch}
                   onChange={(e) => setMissionSearch(e.target.value)}
                   className="flex-1 min-w-0 px-2 py-1.5 text-[11px] focus:outline-none"
-                  style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
+                  style={{ backgroundColor: 'var(--t-bg-elevated)', border: '1px solid var(--t-divider)', color: 'var(--t-text)' }}
                 />
                 {missionEffectKeys.map((key) => (
                   <button
@@ -2005,8 +2030,8 @@ export default function DeckBuilderPage() {
                     onClick={() => setMissionEffect(key)}
                     className="font-body text-[9px] font-bold px-2 py-1.5 cursor-pointer shrink-0 uppercase"
                     style={{
-                      backgroundColor: missionEffect === key ? 'rgba(196,163,90,0.16)' : 'rgba(255,255,255,0.03)',
-                      color: missionEffect === key ? '#c4a35a' : '#666',
+                      backgroundColor: missionEffect === key ? 'var(--t-accent-glow)' : 'rgba(255,255,255,0.03)',
+                      color: missionEffect === key ? 'var(--t-accent)' : 'var(--t-dim)',
                     }}
                   >
                     {t(`deckBuilder.missionFilter.${key}`)}
@@ -2026,21 +2051,21 @@ export default function DeckBuilderPage() {
                     onClick={() => setMissionPage((p) => Math.max(0, p - 1))}
                     className="font-body text-[11px] font-bold px-3 py-1.5"
                     style={{
-                      backgroundColor: 'rgba(196,163,90,0.08)',
-                      color: missionPageSafe === 0 ? '#444' : '#c4a35a',
+                      backgroundColor: 'var(--t-accent-tint)',
+                      color: missionPageSafe === 0 ? 'var(--t-border-strong)' : 'var(--t-accent)',
                     }}
                   >
                     {'‹'}
                   </button>
-                  <span className="text-[10px]" style={{ color: '#777' }}>
+                  <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>
                     {t("deckBuilder.missionPage", { page: missionPageSafe + 1, total: missionPageCount })}
                   </span>
                   <button
                     onClick={() => setMissionPage((p) => Math.min(missionPageCount - 1, p + 1))}
                     className="font-body text-[11px] font-bold px-3 py-1.5"
                     style={{
-                      backgroundColor: 'rgba(196,163,90,0.08)',
-                      color: missionPageSafe >= missionPageCount - 1 ? '#444' : '#c4a35a',
+                      backgroundColor: 'var(--t-accent-tint)',
+                      color: missionPageSafe >= missionPageCount - 1 ? 'var(--t-border-strong)' : 'var(--t-accent)',
                     }}
                   >
                     {'›'}
@@ -2049,9 +2074,9 @@ export default function DeckBuilderPage() {
               )}
               <div className="mb-3" />
 
-              <div className="h-px my-2" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }} />
+              <div className="h-px my-2" style={{ backgroundColor: 'var(--t-divider)' }} />
 
-              <span className="text-[10px] uppercase font-bold block mb-1.5" style={{ color: '#888', letterSpacing: '0.08em' }}>
+              <span className="text-[10px] uppercase font-bold block mb-1.5" style={{ color: 'var(--t-muted)', letterSpacing: '0.08em' }}>
                 {t("deckBuilder.characters", { count: filteredChars.length })}
               </span>
               <VirtualCardGrid
@@ -2077,14 +2102,14 @@ export default function DeckBuilderPage() {
             <div className="px-3 py-2 pb-4">
               {lockedVariantsInDeck.length > 0 && (
                 <div className="flex items-center gap-3 text-[10px] py-1.5 px-2.5 mb-2" style={{
-                  backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a',
+                  backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)',
                 }}>
                   <span className="flex-1">
                     {t("deckBuilder.lockedVariantsWarning", { count: lockedVariantsInDeck.length })}
                   </span>
                   <button onClick={handleRepairLockedVariants}
                     className="uppercase font-bold py-1 px-2.5 no-select flex-shrink-0"
-                    style={{ backgroundColor: 'rgba(196,163,90,0.2)', color: '#c4a35a', letterSpacing: '0.08em' }}>
+                    style={{ backgroundColor: 'rgba(196,163,90,0.2)', color: 'var(--t-accent)', letterSpacing: '0.08em' }}>
                     {t("deckBuilder.repairDeck")}
                   </button>
                 </div>
@@ -2096,7 +2121,7 @@ export default function DeckBuilderPage() {
 
         <div className="flex-shrink-0 px-3 py-2 flex items-center gap-2" style={{
           backgroundColor: 'rgba(10, 10, 10, 0.96)',
-          borderTop: '1px solid rgba(196,163,90,0.18)',
+          borderTop: '1px solid var(--t-accent-glow)',
         }}>
           <button
             onClick={handleSave}
@@ -2104,17 +2129,17 @@ export default function DeckBuilderPage() {
             className="flex-1 text-center text-[12px] uppercase font-bold py-2.5 cursor-pointer disabled:cursor-not-allowed"
             style={{
               backgroundColor: !validation.valid
-                ? 'rgba(255,255,255,0.04)'
+                ? 'var(--t-divider)'
                 : (loadedDeckId && isDirty ? 'rgba(196,122,26,0.18)' : 'rgba(62,139,62,0.18)'),
               border: !validation.valid
-                ? '1px solid rgba(255,255,255,0.06)'
-                : `1px solid ${loadedDeckId && isDirty ? '#c47a1a' : '#3e8b3e'}`,
+                ? '1px solid var(--t-divider)'
+                : `1px solid ${loadedDeckId && isDirty ? '#c47a1a' : 'var(--t-success)'}`,
               borderLeft: !validation.valid
-                ? '3px solid rgba(255,255,255,0.06)'
-                : `3px solid ${loadedDeckId && isDirty ? '#c47a1a' : '#3e8b3e'}`,
+                ? '3px solid var(--t-divider)'
+                : `3px solid ${loadedDeckId && isDirty ? '#c47a1a' : 'var(--t-success)'}`,
               color: !validation.valid
-                ? '#555'
-                : (loadedDeckId && isDirty ? '#c47a1a' : '#3e8b3e'),
+                ? 'var(--t-dim)'
+                : (loadedDeckId && isDirty ? '#c47a1a' : 'var(--t-success)'),
               letterSpacing: '0.1em',
               opacity: isSaving ? 0.6 : 1,
             }}
@@ -2127,8 +2152,8 @@ export default function DeckBuilderPage() {
               className="flex items-center justify-center flex-shrink-0 cursor-pointer"
               style={{
                 width: 44, height: 44,
-                backgroundColor: 'rgba(196,163,90,0.08)',
-                color: '#c4a35a', fontSize: 14, lineHeight: 1,
+                backgroundColor: 'var(--t-accent-tint)',
+                color: 'var(--t-accent)', fontSize: 14, lineHeight: 1,
                 fontWeight: 'bold',
               }}
               aria-label={t("deckBuilder.detail") || 'Detail'}
@@ -2148,21 +2173,21 @@ export default function DeckBuilderPage() {
               className="w-full flex flex-col"
               style={{
                 maxHeight: '92dvh',
-                backgroundColor: '#0a0a0a',
+                backgroundColor: 'var(--t-bg)',
               }}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{
                 backgroundColor: 'rgba(10,10,10,0.95)',
-                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                borderBottom: '1px solid var(--t-divider)',
               }}>
-                <span className="text-[11px] uppercase font-bold flex-1 truncate" style={{ color: '#c4a35a', letterSpacing: '0.08em' }}>
+                <span className="text-[11px] uppercase font-bold flex-1 truncate" style={{ color: 'var(--t-accent)', letterSpacing: '0.08em' }}>
                   {t("deckBuilder.cardDetail") || getCardName(previewCard, loc)}
                 </span>
                 <button
                   onClick={() => setMobileDetailOpen(false)}
                   className="flex items-center justify-center cursor-pointer"
-                  style={{ width: 30, height: 30, color: '#888', fontSize: 18, lineHeight: 1 }}
+                  style={{ width: 30, height: 30, color: 'var(--t-muted)', fontSize: 18, lineHeight: 1 }}
                   aria-label={t("common.close")}
                 >{'\u2715'}</button>
               </div>
@@ -2184,17 +2209,17 @@ export default function DeckBuilderPage() {
             <div
               className="w-full flex flex-col gap-2 px-4 py-4"
               style={{
-                backgroundColor: '#0a0a0a',
+                backgroundColor: 'var(--t-bg)',
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="text-[10px] uppercase font-bold mb-1" style={{ color: '#888', letterSpacing: '0.1em' }}>
+              <span className="text-[10px] uppercase font-bold mb-1" style={{ color: 'var(--t-muted)', letterSpacing: '0.1em' }}>
                 {t("deckBuilder.actions") || 'Actions'}
               </span>
               <button
                 onClick={() => { setShowSavedDecks(true); setMobileMenuOpen(false); }}
                 className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer"
-                style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: '#c4a35a', letterSpacing: '0.08em' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: 'var(--t-accent)', letterSpacing: '0.08em' }}
               >{t("deckBuilder.loadDeck")}</button>
               <button
                 onClick={() => { setShowImportModal(true); setMobileMenuOpen(false); }}
@@ -2205,23 +2230,23 @@ export default function DeckBuilderPage() {
                 onClick={() => { setShowExportModal(true); setMobileMenuOpen(false); }}
                 disabled={deckChars.length === 0}
                 className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
-                style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: '#c4a35a', letterSpacing: '0.08em' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: 'var(--t-accent)', letterSpacing: '0.08em' }}
               >{t("deckBuilder.exportButton")}</button>
               <Link
                 href="/deck-builder/manage"
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer"
-                style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: '#c4a35a', letterSpacing: '0.08em', display: 'block' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: 'var(--t-accent)', letterSpacing: '0.08em', display: 'block' }}
               >{t("deckManager.manageButton")}</Link>
               <button
                 onClick={() => { clearDeck(); setMobileMenuOpen(false); }}
                 className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer mt-1"
-                style={{ backgroundColor: 'rgba(179,62,62,0.08)', color: '#b33e3e', letterSpacing: '0.08em' }}
+                style={{ backgroundColor: 'rgba(179,62,62,0.08)', color: 'var(--t-danger)', letterSpacing: '0.08em' }}
               >{t("deckBuilder.clearDeck")}</button>
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-center text-[11px] uppercase font-bold py-2 mt-2 cursor-pointer"
-                style={{ color: '#666', letterSpacing: '0.08em' }}
+                style={{ color: 'var(--t-dim)', letterSpacing: '0.08em' }}
               >{t("common.cancel")}</button>
             </div>
           </div>
@@ -2233,9 +2258,9 @@ export default function DeckBuilderPage() {
       {showSavedDecks && (
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="480px">
-            <PopupTitle accentColor="#c4a35a" size="lg">{t("deckBuilder.myDecks")}</PopupTitle>
-            {isLoading && <p className="text-xs italic text-center" style={{ color: '#555' }}>{t("common.loading")}</p>}
-            {!isLoading && savedDecks.length === 0 && <p className="text-xs italic text-center" style={{ color: '#555' }}>{t("deckBuilder.noSavedDecks")}</p>}
+            <PopupTitle accentColor="var(--t-accent)" size="lg">{t("deckBuilder.myDecks")}</PopupTitle>
+            {isLoading && <p className="text-xs italic text-center" style={{ color: 'var(--t-dim)' }}>{t("common.loading")}</p>}
+            {!isLoading && savedDecks.length === 0 && <p className="text-xs italic text-center" style={{ color: 'var(--t-dim)' }}>{t("deckBuilder.noSavedDecks")}</p>}
             <div className="flex flex-col gap-2 my-4 max-h-[50vh] overflow-y-auto">
               {savedDecks.map((deck) => {
                 const isActive = loadedDeckId === deck.id;
@@ -2247,32 +2272,32 @@ export default function DeckBuilderPage() {
                   }}>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-medium truncate" style={{ color: '#e0e0e0' }}>{deck.name}</span>
+                        <span className="text-xs font-medium truncate" style={{ color: 'var(--t-text)' }}>{deck.name}</span>
                         {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints ?? 0} />}
                         {isActive && (
                           <span className="text-[8px] uppercase px-1 py-0.5 flex-shrink-0" style={{
-                            backgroundColor: 'rgba(62,139,62,0.15)', color: '#3e8b3e',
+                            backgroundColor: 'rgba(62,139,62,0.15)', color: 'var(--t-success)',
                           }}>{t("deckBuilder.currentlyEditing")}</span>
                         )}
                       </div>
-                      <span className="text-[10px]" style={{ color: '#555' }}>
+                      <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>
                         {t("deckBuilder.savedDeckInfo", { cards: deck.cardIds.length, missions: deck.missionIds.length })}
                       </span>
                     </div>
                     {isConfirming ? (
                       <div className="flex flex-wrap items-center gap-1.5 sm:shrink-0">
-                        <span className="text-[10px]" style={{ color: '#b33e3e' }}>{t("deckBuilder.confirmDelete", { name: deck.name })}</span>
-                        <PopupActionButton accentColor="#b33e3e" onClick={() => { handleDeleteDeck(deck.id); setConfirmDeleteId(null); }}>
+                        <span className="text-[10px]" style={{ color: 'var(--t-danger)' }}>{t("deckBuilder.confirmDelete", { name: deck.name })}</span>
+                        <PopupActionButton accentColor="var(--t-danger)" onClick={() => { handleDeleteDeck(deck.id); setConfirmDeleteId(null); }}>
                           {t("common.confirm")}
                         </PopupActionButton>
                         <PopupDismissLink onClick={() => setConfirmDeleteId(null)}>{t("common.cancel")}</PopupDismissLink>
                       </div>
                     ) : (
                       <div className="flex flex-wrap items-center gap-1.5 sm:shrink-0">
-                        <AngularButton onClick={() => { handleLoadDeck(deck.id); setShowSavedDecks(false); }} variant={isActive ? 'primary' : 'secondary'} accentColor="#3e8b3e" size="sm">
+                        <AngularButton onClick={() => { handleLoadDeck(deck.id); setShowSavedDecks(false); }} variant={isActive ? 'primary' : 'secondary'} accentColor="var(--t-success)" size="sm">
                           {t("deckBuilder.editDeck")}
                         </AngularButton>
-                        <AngularButton onClick={() => { handleDuplicateDeck(deck.id); setShowSavedDecks(false); }} variant="secondary" accentColor="#c4a35a" size="sm">
+                        <AngularButton onClick={() => { handleDuplicateDeck(deck.id); setShowSavedDecks(false); }} variant="secondary" accentColor="var(--t-accent)" size="sm">
                           {t("deckBuilder.duplicateDeck")}
                         </AngularButton>
                         <AngularButton onClick={() => setConfirmDeleteId(deck.id)} variant="danger" size="sm">
@@ -2286,7 +2311,7 @@ export default function DeckBuilderPage() {
               })}
             </div>
             <div className="flex items-center justify-between">
-              <AngularButton onClick={() => { clearDeck(); setShowSavedDecks(false); }} accentColor="#3e8b3e" variant="primary" size="sm">
+              <AngularButton onClick={() => { clearDeck(); setShowSavedDecks(false); }} accentColor="var(--t-success)" variant="primary" size="sm">
                 + {t("deckBuilder.newDeck")}
               </AngularButton>
               <PopupDismissLink onClick={() => setShowSavedDecks(false)}>{t("common.close")}</PopupDismissLink>
@@ -2299,7 +2324,7 @@ export default function DeckBuilderPage() {
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(74, 122, 181, 0.35)" maxWidth="480px">
             <PopupTitle accentColor="#4a7ab5" size="lg">{t("deckBuilder.importTitle")}</PopupTitle>
-            <p className="text-xs mb-3" style={{ color: '#888', paddingLeft: '8px' }}>
+            <p className="text-xs mb-3" style={{ color: 'var(--t-muted)', paddingLeft: '8px' }}>
               {t("deckBuilder.importDesc")}
             </p>
             <div className="mb-3">
@@ -2314,16 +2339,16 @@ export default function DeckBuilderPage() {
                 onChange={(e) => setImportCode(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") handleImport(); }}
                 className="flex-1 px-3 py-1.5 text-xs font-mono focus:outline-none"
-                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
+                style={{ backgroundColor: 'var(--t-bg-elevated)', border: '1px solid var(--t-divider)', color: 'var(--t-text)' }}
               />
-              <PopupActionButton accentColor="#3e8b3e" onClick={() => handleImport()} disabled={!importCode.trim()}>
+              <PopupActionButton accentColor="var(--t-success)" onClick={() => handleImport()} disabled={!importCode.trim()}>
                 {t("deckBuilder.importButton")}
               </PopupActionButton>
             </div>
             {importMessage && (
               <div className="text-xs mb-3 py-1 px-2" style={{
                 backgroundColor: importMessage.type === 'success' ? 'rgba(62,139,62,0.08)' : 'rgba(179,62,62,0.08)',
-                color: importMessage.type === 'success' ? '#3e8b3e' : '#b33e3e',
+                color: importMessage.type === 'success' ? 'var(--t-success)' : 'var(--t-danger)',
               }}>{importMessage.text}</div>
             )}
             <PopupDismissLink onClick={() => { setShowImportModal(false); setImportMessage(null); }}>{t("common.close")}</PopupDismissLink>
@@ -2334,22 +2359,22 @@ export default function DeckBuilderPage() {
       {showExportModal && (
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="480px">
-            <PopupTitle accentColor="#c4a35a" size="lg">{t("deckBuilder.exportTitle")}</PopupTitle>
+            <PopupTitle accentColor="var(--t-accent)" size="lg">{t("deckBuilder.exportTitle")}</PopupTitle>
             <div className="flex gap-2 mb-4">
-              <PopupActionButton accentColor="#c4a35a" onClick={() => { exportDeckAsImage(deckName, deckChars, deckMissions); trackUiHook('deck.exported'); setShowExportModal(false); }}>
+              <PopupActionButton accentColor="var(--t-accent)" onClick={() => { exportDeckAsImage(deckName, deckChars, deckMissions); trackUiHook('deck.exported'); setShowExportModal(false); }}>
                 {t("deckBuilder.exportAsImage")}
               </PopupActionButton>
             </div>
-            <p className="text-xs mb-2" style={{ color: '#888', paddingLeft: '8px' }}>
+            <p className="text-xs mb-2" style={{ color: 'var(--t-muted)', paddingLeft: '8px' }}>
               {t("deckBuilder.exportTextDesc")}
             </p>
             <div className="flex items-center gap-2 mb-3">
               <input type="text" readOnly value={exportCode}
                 onClick={(e) => (e.target as HTMLInputElement).select()}
                 className="flex-1 px-3 py-1.5 text-xs font-mono focus:outline-none"
-                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
+                style={{ backgroundColor: 'var(--t-bg-elevated)', border: '1px solid var(--t-divider)', color: 'var(--t-text)' }}
               />
-              <PopupActionButton accentColor={exportCopied ? '#3e8b3e' : '#c4a35a'} onClick={handleCopyExportCode}>
+              <PopupActionButton accentColor={exportCopied ? 'var(--t-success)' : 'var(--t-accent)'} onClick={handleCopyExportCode}>
                 {exportCopied ? t("deckBuilder.exportCopied") : t("deckBuilder.exportCopy")}
               </PopupActionButton>
             </div>
@@ -2361,13 +2386,13 @@ export default function DeckBuilderPage() {
       {overwriteConflict && (
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(179, 62, 62, 0.35)" maxWidth="400px">
-            <PopupTitle accentColor="#b33e3e" size="md">{t('deckBuilder.overwriteTitle')}</PopupTitle>
-            <p className="text-xs mb-4" style={{ color: '#888' }}>
+            <PopupTitle accentColor="var(--t-danger)" size="md">{t('deckBuilder.overwriteTitle')}</PopupTitle>
+            <p className="text-xs mb-4" style={{ color: 'var(--t-muted)' }}>
               {t('deckBuilder.overwriteDesc', { name: overwriteConflict.name })}
             </p>
             <div className="flex gap-2 justify-end">
               <PopupDismissLink onClick={() => setOverwriteConflict(null)}>{t('deckBuilder.overwriteCancel')}</PopupDismissLink>
-              <PopupActionButton accentColor="#b33e3e" onClick={handleOverwriteConfirm}>
+              <PopupActionButton accentColor="var(--t-danger)" onClick={handleOverwriteConfirm}>
                 {t('deckBuilder.overwriteConfirm')}
               </PopupActionButton>
             </div>

@@ -36,26 +36,26 @@ export function AbsenceTimer({ deadline, onExpired }: Props) {
     <div
       className="flex flex-col items-center gap-1 p-3"
       style={{
-        backgroundColor: '#111111',
-        border: `1px solid ${isUrgent ? '#cc4444' : '#262626'}`,
+        backgroundColor: 'var(--t-panel)',
+        border: `1px solid ${isUrgent ? 'var(--t-danger)' : 'var(--t-border)'}`,
       }}
     >
       <span
         className="text-[10px] font-bold uppercase tracking-wider"
-        style={{ color: isUrgent ? '#cc4444' : '#888' }}
+        style={{ color: isUrgent ? 'var(--t-danger)' : 'var(--t-muted)' }}
       >
         {t('absenceTimer')}
       </span>
       <span
         className="text-2xl font-bold tabular-nums"
         style={{
-          color: isUrgent ? '#cc4444' : '#c4a35a',
+          color: isUrgent ? 'var(--t-danger)' : 'var(--t-accent)',
           animation: isUrgent ? 'pulse 1s ease-in-out infinite' : 'none',
         }}
       >
         {minutes}:{seconds.toString().padStart(2, '0')}
       </span>
-      <span className="text-[10px]" style={{ color: '#555' }}>
+      <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>
         {t('autoForfeit')}
       </span>
     </div>

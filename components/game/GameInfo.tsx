@@ -1,8 +1,9 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
-import { ChakraPool } from './ChakraPool';
+import { ChakraIcon, CHAKRA_COLOR } from '@/components/icons/GameIcons';
 import { ScoreDisplay } from './ScoreDisplay';
 import { EdgeToken } from './EdgeToken';
 import { PanelFrame, SectionDivider, StatValue } from './PopupPrimitives';
@@ -19,11 +20,14 @@ const phaseTranslationKeys: Record<string, string> = {
   gameOver: 'game.phase.gameOver',
 };
 
-function InfoRow({ label, value, valueColor = '#e0e0e0' }: { label: string; value: string | number; valueColor?: string }) {
+function InfoRow({ label, value, valueColor = '#e0e0e0', icon }: { label: string; value: string | number; valueColor?: string; icon?: ReactNode }) {
   return (
     <div className="flex justify-between items-center text-xs">
       <span style={{ color: '#888888' }}>{label}</span>
-      <span className="tabular-nums font-medium" style={{ color: valueColor }}>{value}</span>
+      <span className="flex items-center gap-1 tabular-nums font-medium" style={{ color: valueColor }}>
+        {icon}
+        {value}
+      </span>
     </div>
   );
 }
@@ -124,13 +128,24 @@ export function GameInfo() {
       <PanelFrame accentColor="rgba(196, 163, 90, 0.2)" padding="8px 10px">
         <div className="flex flex-col gap-1.5">
           <span
-            className="text-[10px] uppercase tracking-wider font-medium"
+            className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-medium"
             style={{ color: '#888888' }}
           >
+            <ChakraIcon size={11} color={CHAKRA_COLOR} />
             {t('game.chakra')}
           </span>
-          <InfoRow label={t('game.you')} value={myState.chakra} valueColor={palette.me.primary} />
-          <InfoRow label={t('game.opponent')} value={opponentState.chakra} valueColor={palette.opponent.primary} />
+          <InfoRow
+            label={t('game.you')}
+            value={myState.chakra}
+            valueColor={palette.me.primary}
+            icon={<ChakraIcon size={11} color={CHAKRA_COLOR} />}
+          />
+          <InfoRow
+            label={t('game.opponent')}
+            value={opponentState.chakra}
+            valueColor={palette.opponent.primary}
+            icon={<ChakraIcon size={11} color={CHAKRA_COLOR} />}
+          />
         </div>
       </PanelFrame>
 

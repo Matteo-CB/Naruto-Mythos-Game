@@ -41,7 +41,7 @@ export function BlockPlayerPopup({
   return (
     <PopupOverlay>
       <PopupCornerFrame accentColor="rgba(179, 62, 62, 0.4)" maxWidth="420px">
-        <PopupTitle accentColor="#b33e3e" size="md">
+        <PopupTitle accentColor="var(--t-danger)" size="md">
           {done ? t('social.block.doneTitle') : t('social.block.confirmTitle', { player: target.username })}
         </PopupTitle>
         {!done && (
@@ -50,7 +50,7 @@ export function BlockPlayerPopup({
           </PopupDescription>
         )}
         {error && (
-          <p className="text-center text-[11px] mb-3" style={{ color: '#b33e3e' }}>
+          <p className="text-center text-[11px] mb-3" style={{ color: 'var(--t-danger)' }}>
             {t('chat.sendError')}
           </p>
         )}
@@ -61,7 +61,7 @@ export function BlockPlayerPopup({
             </PopupActionButton>
           ) : (
             <>
-              <PopupActionButton onClick={handleBlock} accentColor="#b33e3e" disabled={busy}>
+              <PopupActionButton onClick={handleBlock} accentColor="var(--t-danger)" disabled={busy}>
                 {t('social.block.confirm')}
               </PopupActionButton>
               <PopupDismissLink onClick={onClose}>

@@ -123,22 +123,22 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
         transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
         onClick={(e) => e.stopPropagation()}
         className="relative flex flex-col w-full max-w-3xl max-h-[90vh]"
-        style={{ backgroundColor: '#0c0b10', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}
+        style={{ backgroundColor: 'var(--t-surface-2)', boxShadow: '0 24px 60px var(--t-shadow)' }}
       >
-        <div className="flex items-start justify-between gap-3 px-5 py-4 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="flex items-start justify-between gap-3 px-5 py-4 shrink-0" style={{ borderBottom: '1px solid var(--t-divider)' }}>
           <div className="min-w-0">
-            <h2 className="font-display text-lg truncate" style={{ color: '#e8e6df', letterSpacing: '0.03em' }}>
+            <h2 className="font-display text-lg truncate" style={{ color: 'var(--t-text)', letterSpacing: '0.03em' }}>
               {deck.name}
             </h2>
-            <p className="font-inter-force text-[11px] mt-0.5" style={{ color: '#666' }}>
+            <p className="font-inter-force text-[11px] mt-0.5" style={{ color: 'var(--t-dim)' }}>
               {totalCards} {tm('cards')} + {missions.length} missions
               {isAdminView && ownerName ? ` · ${t('deckOf', { name: ownerName })}` : ''}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="font-display text-[11px] uppercase tracking-widest shrink-0 px-3 py-1.5 cursor-pointer transition-colors hover:text-[#c4a35a]"
-            style={{ color: '#888' }}
+            className="font-display text-[11px] uppercase tracking-widest shrink-0 px-3 py-1.5 cursor-pointer transition-colors hover:text-[var(--t-accent)]"
+            style={{ color: 'var(--t-muted)' }}
           >
             {tc('close')}
           </button>
@@ -150,14 +150,14 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
             style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(64px, 1fr))' }}
           >
             {characters.map(({ card, qty }) => (
-              <div key={card.id} className="relative overflow-hidden" style={{ aspectRatio: '5/7', clipPath: CARD_CLIP, backgroundColor: '#050508' }} title={getCardName(card, locale)}>
+              <div key={card.id} className="relative overflow-hidden" style={{ aspectRatio: '5/7', clipPath: CARD_CLIP, backgroundColor: 'var(--t-surface-2)' }} title={getCardName(card, locale)}>
                 {card.image_file
                   ? <img src={portraitImagePath(card) ?? undefined} alt={getCardName(card, locale)} className="w-full h-full object-cover" draggable={false} />
-                  : <div className="w-full h-full flex items-center justify-center text-[8px] text-center px-1" style={{ color: '#777' }}>{getCardName(card, locale)}</div>}
+                  : <div className="w-full h-full flex items-center justify-center text-[8px] text-center px-1" style={{ color: 'var(--t-dim)' }}>{getCardName(card, locale)}</div>}
                 {qty > 1 && (
                   <span
                     className="absolute bottom-0.5 right-0.5 font-display text-[10px] tabular-nums px-1.5 py-0.5"
-                    style={{ backgroundColor: 'rgba(4,4,8,0.9)', color: '#c4a35a' }}
+                    style={{ backgroundColor: 'rgba(4,4,8,0.9)', color: 'var(--t-accent)' }}
                   >
                     x{qty}
                   </span>
@@ -168,19 +168,19 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
 
           {missions.length > 0 && (
             <>
-              <p className="font-display text-[11px] uppercase tracking-widest mt-5 mb-2" style={{ color: '#666' }}>
+              <p className="font-display text-[11px] uppercase tracking-widest mt-5 mb-2" style={{ color: 'var(--t-dim)' }}>
                 Missions
               </p>
               <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))' }}>
                 {missions.map(({ card, qty }) => (
-                  <div key={card.id} className="relative" style={{ aspectRatio: '7/5', clipPath: CARD_CLIP, backgroundColor: '#050508' }} title={getCardName(card, locale)}>
+                  <div key={card.id} className="relative" style={{ aspectRatio: '7/5', clipPath: CARD_CLIP, backgroundColor: 'var(--t-surface-2)' }} title={getCardName(card, locale)}>
                     {card.image_file
                       ? <img src={portraitImagePath(card) ?? undefined} alt={getCardName(card, locale)} className="w-full h-full object-cover" draggable={false} />
-                      : <div className="w-full h-full flex items-center justify-center text-[9px] text-center px-1" style={{ color: '#777' }}>{getCardName(card, locale)}</div>}
+                      : <div className="w-full h-full flex items-center justify-center text-[9px] text-center px-1" style={{ color: 'var(--t-dim)' }}>{getCardName(card, locale)}</div>}
                     {qty > 1 && (
                       <span
                         className="absolute bottom-0.5 right-0.5 font-display text-[10px] tabular-nums px-1.5 py-0.5"
-                        style={{ backgroundColor: 'rgba(4,4,8,0.9)', color: '#c4a35a' }}
+                        style={{ backgroundColor: 'rgba(4,4,8,0.9)', color: 'var(--t-accent)' }}
                       >
                         x{qty}
                       </span>
@@ -192,7 +192,7 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
           )}
         </div>
 
-        <div className="flex flex-wrap items-center justify-end gap-2 px-5 py-3 shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="flex flex-wrap items-center justify-end gap-2 px-5 py-3 shrink-0" style={{ borderTop: '1px solid var(--t-divider)' }}>
           {isOwner && (
             <div className="flex flex-wrap items-center gap-2 mr-auto">
               <PostDeckButton deckId={deck.id} />
@@ -202,14 +202,14 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
           <button
             onClick={handleUseDeck}
             className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors"
-            style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+            style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
           >
             {tb('useDeck')}
           </button>
           <button
             onClick={handleCopy}
             className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors"
-            style={{ backgroundColor: 'rgba(255,255,255,0.04)', color: copied ? '#5fb05f' : '#ccc' }}
+            style={{ backgroundColor: 'var(--t-divider)', color: copied ? 'var(--t-success)' : 'var(--t-text)' }}
           >
             {copied ? tb('exportCopied') : tb('exportAsText')}
           </button>
@@ -217,7 +217,7 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
             onClick={handleExportImage}
             disabled={exporting}
             className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors disabled:opacity-40"
-            style={{ backgroundColor: 'rgba(255,255,255,0.04)', color: '#ccc' }}
+            style={{ backgroundColor: 'var(--t-divider)', color: 'var(--t-text)' }}
           >
             {exporting ? tc('loading') : tb('exportAsImage')}
           </button>

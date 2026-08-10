@@ -34,8 +34,8 @@ export function BoardPreviewFrame({ children }: { children: ReactNode }) {
       style={{
         maxWidth: '100%',
         height: scaledHeight,
-        backgroundColor: '#0a0a0a',
-        boxShadow: '0 18px 44px rgba(0,0,0,0.55)',
+        backgroundColor: 'var(--t-bg)',
+        boxShadow: '0 18px 44px var(--t-shadow)',
         WebkitOverflowScrolling: 'touch',
         overscrollBehaviorX: 'contain',
       }}

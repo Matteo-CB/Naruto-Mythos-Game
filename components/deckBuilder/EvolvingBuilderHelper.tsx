@@ -11,11 +11,11 @@ import { getCharacterById } from '@/lib/data/cardIndex';
 import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
 import type { CharacterCard } from '@/lib/engine/types';
 
-const GOLD = '#c4a35a';
-const PANEL_BG = '#0d0d0d';
-const BORDER = '#262626';
-const TEXT_LIGHT = '#e0e0e0';
-const TEXT_DIM = '#888888';
+const GOLD = 'var(--t-accent)';
+const PANEL_BG = 'var(--t-bg)';
+const BORDER = 'var(--t-border)';
+const TEXT_LIGHT = 'var(--t-text)';
+const TEXT_DIM = 'var(--t-muted)';
 const WARN = '#cc7a30';
 
 interface HelperEntry {
@@ -193,7 +193,7 @@ export function EvolvingBuilderHelper() {
                     className="text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2 py-1"
                     style={{
                       backgroundColor: disabled ? 'transparent' : color,
-                      color: disabled ? TEXT_DIM : '#0a0a0a',
+                      color: disabled ? TEXT_DIM : 'var(--t-bg)',
                       border: `1px solid ${disabled ? BORDER : color}`,
                       cursor: disabled ? 'not-allowed' : 'pointer',
                       outline: 'none',

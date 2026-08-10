@@ -67,22 +67,22 @@ export function LiveGamesBar() {
       className="w-full"
       style={{
         backgroundColor: 'rgba(15, 15, 20, 0.78)',
-        boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
+        boxShadow: '0 12px 32px var(--t-shadow)',
       }}
     >
       <header
         className="flex items-center justify-between px-3 py-2"
-        style={{ boxShadow: 'inset 0 -1px 0 rgba(255,255,255,0.04)' }}
+        style={{ boxShadow: 'inset 0 -1px 0 var(--t-divider)' }}
       >
-        <h2 className="text-[11px] font-bold uppercase" style={{ color: '#c4a35a', letterSpacing: '0.22em' }}>
+        <h2 className="text-[11px] font-bold uppercase" style={{ color: 'var(--t-accent)', letterSpacing: '0.22em' }}>
           {t('online.activeGames.title')}
         </h2>
-        <span className="text-[9px] tabular-nums" style={{ color: '#555' }}>{publicGames.length}</span>
+        <span className="text-[9px] tabular-nums" style={{ color: 'var(--t-dim)' }}>{publicGames.length}</span>
       </header>
 
       {publicGames.length === 0 ? (
         <div className="px-3 py-3 text-center">
-          <span className="text-[10px]" style={{ color: '#555' }}>{t('online.activeGames.empty')}</span>
+          <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{t('online.activeGames.empty')}</span>
         </div>
       ) : (
         <div
@@ -150,38 +150,38 @@ function LiveGameCard({ game, loading, onSpectate }: { game: LiveGame; loading: 
             username={game.player1Name}
             disabled={anon}
             className="text-[11px] font-medium truncate flex-1"
-            style={{ color: '#e8e8e8' }}
+            style={{ color: 'var(--t-text)' }}
           >
             {p1}
           </PlayerNameLink>
-          <span className="text-[9px]" style={{ color: '#444' }}>{t('spectator.vs')}</span>
+          <span className="text-[9px]" style={{ color: 'var(--t-muted)' }}>{t('spectator.vs')}</span>
           <PlayerNameLink
             username={game.player2Name}
             disabled={anon}
             className="text-[11px] font-medium truncate flex-1 text-right"
-            style={{ color: '#e8e8e8' }}
+            style={{ color: 'var(--t-text)' }}
           >
             {p2}
           </PlayerNameLink>
         </div>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
-            <span className="text-[8.5px] uppercase font-bold" style={{ color: '#555', letterSpacing: '0.18em' }}>
+            <span className="text-[8.5px] uppercase font-bold" style={{ color: 'var(--t-dim)', letterSpacing: '0.18em' }}>
               {t('spectator.turn', { turn: game.turn })}
             </span>
             {game.isRanked && (
-              <span className="text-[8.5px] uppercase font-bold" style={{ color: '#b33e3e', letterSpacing: '0.18em' }}>
+              <span className="text-[8.5px] uppercase font-bold" style={{ color: 'var(--t-danger)', letterSpacing: '0.18em' }}>
                 {t('spectator.ranked')}
               </span>
             )}
             {game.isEvolving && (
-              <span className="text-[8.5px] uppercase font-bold" style={{ color: '#c4a35a', letterSpacing: '0.18em' }}>
+              <span className="text-[8.5px] uppercase font-bold" style={{ color: 'var(--t-accent)', letterSpacing: '0.18em' }}>
                 {t('online.badge.evolving')}
               </span>
             )}
           </div>
           {game.spectatorCount > 0 && (
-            <span className="text-[8.5px] tabular-nums" style={{ color: '#444' }}>
+            <span className="text-[8.5px] tabular-nums" style={{ color: 'var(--t-muted)' }}>
               {t('spectator.spectators', { count: game.spectatorCount })}
             </span>
           )}
@@ -195,16 +195,16 @@ function LiveGameCard({ game, loading, onSpectate }: { game: LiveGame; loading: 
         className="px-3 flex items-center gap-1 cursor-pointer no-select transition-colors shrink-0"
         style={{
           backgroundColor: 'transparent',
-          color: loading ? '#555' : '#c4a35a',
+          color: loading ? 'var(--t-dim)' : 'var(--t-accent)',
           fontSize: '10px',
           fontWeight: 600,
           letterSpacing: '0.05em',
         }}
         onMouseEnter={(e) => {
-          if (!loading) (e.currentTarget as HTMLElement).style.color = '#e8c477';
+          if (!loading) (e.currentTarget as HTMLElement).style.color = 'var(--t-accent-bright)';
         }}
         onMouseLeave={(e) => {
-          if (!loading) (e.currentTarget as HTMLElement).style.color = '#c4a35a';
+          if (!loading) (e.currentTarget as HTMLElement).style.color = 'var(--t-accent)';
         }}
         aria-label={t('spectator.joinSpectate')}
       >

@@ -23,13 +23,13 @@ function ResetPasswordForm() {
   if (!token) {
     return (
       <div className="flex flex-col items-center gap-4">
-        <p className="text-sm text-center" style={{ color: '#b33e3e' }}>
+        <p className="text-sm text-center" style={{ color: 'var(--t-danger)' }}>
           {t('auth.invalidResetLink')}
         </p>
         <Link
           href="/login"
           className="text-sm underline"
-          style={{ color: '#c4a35a' }}
+          style={{ color: 'var(--t-accent)' }}
         >
           {t('auth.goToLogin')}
         </Link>
@@ -80,16 +80,16 @@ function ResetPasswordForm() {
   if (success) {
     return (
       <div className="flex flex-col items-center gap-3">
-        <p className="text-sm text-center" style={{ color: '#c4a35a' }}>
+        <p className="text-sm text-center" style={{ color: 'var(--t-accent)' }}>
           {t('auth.resetSuccess')}
         </p>
-        <p className="text-xs text-center" style={{ color: '#888888' }}>
+        <p className="text-xs text-center" style={{ color: 'var(--t-muted)' }}>
           {t('auth.resetSuccessLogin')}
         </p>
         <Link
           href="/login"
           className="mt-2 inline-block rounded px-6 py-2.5 text-sm font-bold uppercase tracking-wider"
-          style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+          style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
         >
           {t('auth.signIn')}
         </Link>
@@ -104,7 +104,7 @@ function ResetPasswordForm() {
           <label
             htmlFor="password"
             className="text-xs uppercase tracking-wider"
-            style={{ color: '#888888' }}
+            style={{ color: 'var(--t-muted)' }}
           >
             {t('auth.newPassword')}
           </label>
@@ -116,9 +116,9 @@ function ResetPasswordForm() {
             required
             className="rounded px-3 py-2 text-sm outline-none"
             style={{
-              backgroundColor: '#0a0a0a',
-              border: '1px solid #262626',
-              color: '#e0e0e0',
+              backgroundColor: 'var(--t-bg)',
+              border: '1px solid var(--t-border)',
+              color: 'var(--t-text)',
             }}
           />
         </div>
@@ -127,7 +127,7 @@ function ResetPasswordForm() {
           <label
             htmlFor="confirmPassword"
             className="text-xs uppercase tracking-wider"
-            style={{ color: '#888888' }}
+            style={{ color: 'var(--t-muted)' }}
           >
             {t('auth.confirmNewPassword')}
           </label>
@@ -139,15 +139,15 @@ function ResetPasswordForm() {
             required
             className="rounded px-3 py-2 text-sm outline-none"
             style={{
-              backgroundColor: '#0a0a0a',
-              border: '1px solid #262626',
-              color: '#e0e0e0',
+              backgroundColor: 'var(--t-bg)',
+              border: '1px solid var(--t-border)',
+              color: 'var(--t-text)',
             }}
           />
         </div>
 
         {error && (
-          <p className="text-xs" style={{ color: '#b33e3e' }}>
+          <p className="text-xs" style={{ color: 'var(--t-danger)' }}>
             {error}
           </p>
         )}
@@ -157,8 +157,8 @@ function ResetPasswordForm() {
           disabled={loading}
           className="mt-2 rounded py-2.5 text-sm font-bold uppercase tracking-wider transition-colors"
           style={{
-            backgroundColor: loading ? '#333333' : '#c4a35a',
-            color: '#0a0a0a',
+            backgroundColor: loading ? 'var(--t-border-strong)' : 'var(--t-accent)',
+            color: 'var(--t-bg)',
           }}
         >
           {loading ? t('auth.resetting') : t('auth.resetPassword')}
@@ -169,7 +169,7 @@ function ResetPasswordForm() {
         <Link
           href="/login"
           className="text-xs"
-          style={{ color: '#555555' }}
+          style={{ color: 'var(--t-dim)' }}
         >
           {t('auth.goToLogin')}
         </Link>
@@ -185,7 +185,7 @@ export default function ResetPasswordPage() {
     <main
       id="main-content"
       className="min-h-screen relative flex flex-col"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{ backgroundColor: 'var(--t-bg)' }}
     >
       <CloudBackground />
       <DecorativeIcons />
@@ -194,20 +194,20 @@ export default function ResetPasswordPage() {
         <div
           className="w-full max-w-sm rounded-lg p-8 relative z-10"
           style={{
-            backgroundColor: '#141414',
-            border: '1px solid #262626',
+            backgroundColor: 'var(--t-surface)',
+            border: '1px solid var(--t-border)',
           }}
         >
           <h1
             className="text-2xl font-bold text-center mb-8 tracking-wider uppercase"
-            style={{ color: '#c4a35a' }}
+            style={{ color: 'var(--t-accent)' }}
           >
             {t('auth.resetPasswordTitle')}
           </h1>
 
           <Suspense
             fallback={
-              <p className="text-sm text-center" style={{ color: '#888888' }}>
+              <p className="text-sm text-center" style={{ color: 'var(--t-muted)' }}>
                 ...
               </p>
             }

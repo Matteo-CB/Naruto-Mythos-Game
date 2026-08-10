@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from 'framer-motion';
 
-type Accent = 'gold' | 'cyan' | 'pink';
+type Accent = 'gold';
 
 interface MenuBadgeProps {
   accent?: Accent;
@@ -11,9 +11,7 @@ interface MenuBadgeProps {
 }
 
 const COLOR: Record<Accent, string> = {
-  gold: '#c4a35a',
-  cyan: '#5fa3df',
-  pink: '#f472b6',
+  gold: 'var(--t-accent)',
 };
 
 export function MenuBadge({ accent = 'gold', count, tooltip }: MenuBadgeProps) {
@@ -27,7 +25,7 @@ export function MenuBadge({ accent = 'gold', count, tooltip }: MenuBadgeProps) {
     fontWeight: 800,
     letterSpacing: '0.01em',
     lineHeight: 1,
-    color: '#0a0a0a',
+    color: 'var(--t-bg)',
     backgroundColor: color,
     borderRadius: '999px',
     height: '18px',

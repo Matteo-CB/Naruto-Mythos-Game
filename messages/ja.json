@@ -547,7 +547,14 @@
     "favoriteDecks": "お気に入りデッキ",
     "favoriteDecksHint": "最大3つのデッキを選べます。デッキ選択で常に先頭に表示されます。",
     "deckPrefsNoDecks": "保存済みのデッキがまだありません。",
-    "unfavorite": "お気に入りから外す"
+    "unfavorite": "お気に入りから外す",
+    "siteThemeTitle": "サイトのテーマ",
+    "siteThemeHint": "サイト全体の見た目を変えます。ゲーム盤面には影響しません。",
+    "siteThemeKs": "木ノ葉指導",
+    "siteThemeSs": "忍びの試練",
+    "siteThemeSave": "保存",
+    "siteThemeSaving": "保存中",
+    "siteThemeSaved": "テーマを保存しました"
   },
   "game": {
     "turn": "ターン {turn}",
@@ -690,6 +697,7 @@
         "gemma049SacrificeHide": "不知火ゲンマ（049）：味方が伏せられるのを守るために犠牲になりました。",
         "dosu069AutoDefeat": "ドス・キヌタ（069）：相手は表にする費用（コスト {cost}）を払えず、キャラクターが撃破されました。",
         "dosu069DeclineDefeat": "{card}（{id}）：相手は表にすることを拒否。伏せキャラクターが撃破されました。",
+        "dosu069DuplicateNameDefeat": "ドス・キヌタ（069）：同名のキャラクターがすでにいるため {target} を表にできず、代わりに撃破されました。",
         "dosu069LockDefeat": "ドス・キヌタ（069）：奈良シカマルにより表にできず、{target} が撃破されました。",
         "dosu069Reveal": "ドス・キヌタ（069）：{target} がチャクラ {cost} を払って表にされました。",
         "shikamaruBlockReveal": "{card} を表にできません：奈良シカマルがこのミッションで伏せプレイを封じています。",

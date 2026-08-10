@@ -10,6 +10,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { HoloCard } from '@/components/HoloCard';
 import { Footer } from '@/components/Footer';
 import { CloudBackground } from '@/components/CloudBackground';
+import { HoverShuriken, showShuriken, hideShuriken, SHURIKEN_GOLD, SHURIKEN_GOLD_BRIGHT, SHURIKEN_WHITE, SHURIKEN_WHITE_BRIGHT } from '@/components/HoverShuriken';
 import { TournamentNavButton, type TournamentMenuStatus } from '@/components/TournamentNavButton';
 import { HomeMenuButton } from '@/components/HomeMenuButton';
 import { useBoosterBadge } from '@/lib/hooks/useBoosterBadge';
@@ -195,7 +196,7 @@ export default function Home() {
     <main
       id="main-content"
       className="relative min-h-screen w-full overflow-x-hidden overflow-y-auto flex flex-col"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{ backgroundColor: 'var(--t-bg)' }}
     >
       <CloudBackground />
 
@@ -218,8 +219,8 @@ export default function Home() {
                     key={`letter-${i}`}
                     className="font-display inline-block text-3xl font-black tracking-wider sm:text-4xl lg:text-5xl"
                     style={{
-                      color: '#c4a35a',
-                      textShadow: '0 0 40px rgba(196, 163, 90, 0.3), 0 0 80px rgba(196, 163, 90, 0.1)',
+                      color: 'var(--t-accent)',
+                      textShadow: '0 0 40px rgba(196, 163, 90, 0.3), 0 0 80px var(--t-accent-glow)',
                     }}
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -237,8 +238,8 @@ export default function Home() {
 
             
             <motion.p
-              className="font-display mb-5 text-xs font-medium uppercase tracking-[0.35em] sm:mb-8 sm:text-sm"
-              style={{ color: '#888888' }}
+              className="mb-5 text-xs font-medium uppercase tracking-[0.35em] sm:mb-8 sm:text-sm"
+              style={{ color: 'var(--t-muted)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.6 }}
@@ -273,16 +274,15 @@ export default function Home() {
                     key={btn.key}
                     href={btn.href}
                     label={t(btn.key)}
-                    variant={isBp ? 'pink' : (btn.primary ? 'primary' : 'muted')}
+                    variant={isBp ? 'gold' : (btn.primary ? 'primary' : 'muted')}
                     delay={0.8 + i * 0.06}
                     innerClassName={isBp ? 'holo-evolving holo-evolving--subtle' : ''}
-                    innerStyle={isBp ? { ['--foil' as string]: '#f472b6' } : undefined}
                     rightSlot={
                       btn.key === 'leaderboard' && socialBadgeTotal > 0
                         ? <MenuBadge accent="gold" count={socialBadgeTotal} tooltip={t('socialBadgeTooltip', { count: socialBadgeTotal })} />
                         : isBp && (totalUnopenedBoosters > 0 || showBattlepassBadge || showQuestBadge)
                         ? <MenuBadge
-                            accent="pink"
+                            accent="gold"
                             count={
                               (showBattlepassBadge ? bpClaimable.length : 0)
                               + totalUnopenedBoosters
@@ -318,7 +318,7 @@ export default function Home() {
             
             <motion.div
               className="my-2.5 h-px w-full sm:my-3"
-              style={{ backgroundColor: 'rgba(255, 255, 255, 0.06)' }}
+              style={{ backgroundColor: 'var(--t-divider)' }}
               initial={{ opacity: 0, scaleX: 0 }}
               animate={{ opacity: 1, scaleX: 1 }}
               transition={{ duration: 0.3, delay: 1.4 }}
@@ -337,88 +337,112 @@ export default function Home() {
                     {session?.user?.email === 'matteo.biyikli3224@gmail.com' && (
                       <Link
                         href="/admin"
-                        className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
+                        className="relative flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                         style={{
                           backgroundColor: 'transparent',
-                          border: '1px solid #ef4444',
-                          color: '#ef4444',
+                          border: '1px solid var(--t-accent-dim)',
+                          color: 'var(--t-accent)',
                         }}
                         onMouseEnter={(e) => {
                           const target = e.currentTarget as HTMLElement;
-                          target.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
-                          target.style.boxShadow = '0 0 16px rgba(239, 68, 68, 0.12)';
+                          target.style.borderColor = 'var(--t-accent)';
+                          showShuriken(target, SHURIKEN_GOLD_BRIGHT);
+                          target.style.backgroundColor = 'var(--t-accent-tint)';
+                          target.style.boxShadow = '0 0 16px var(--t-accent-glow)';
                         }}
                         onMouseLeave={(e) => {
                           const target = e.currentTarget as HTMLElement;
+                          target.style.borderColor = 'var(--t-accent-dim)';
+                          hideShuriken(target, SHURIKEN_GOLD);
                           target.style.backgroundColor = 'transparent';
                           target.style.boxShadow = 'none';
                         }}
                       >
+                        <HoverShuriken color={SHURIKEN_GOLD} />
                         {t('admin')}
                       </Link>
                     )}
                     <Link
                       href="/social"
-                      className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
+                      className="relative flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                       style={{
                         backgroundColor: 'transparent',
-                        border: '1px solid #5b4a8a',
-                        color: '#b39ddb',
+                        border: '1px solid var(--t-accent-dim)',
+                        color: 'var(--t-accent)',
                       }}
                       onMouseEnter={(e) => {
                         const target = e.currentTarget as HTMLElement;
-                        target.style.backgroundColor = 'rgba(157, 124, 216, 0.08)';
-                        target.style.boxShadow = '0 0 16px rgba(157, 124, 216, 0.14)';
+                        target.style.borderColor = 'var(--t-accent)';
+                        showShuriken(target, SHURIKEN_GOLD_BRIGHT);
+                        target.style.backgroundColor = 'var(--t-accent-tint)';
+                        target.style.boxShadow = '0 0 16px var(--t-accent-glow)';
                       }}
                       onMouseLeave={(e) => {
                         const target = e.currentTarget as HTMLElement;
+                        target.style.borderColor = 'var(--t-accent-dim)';
+                        hideShuriken(target, SHURIKEN_GOLD);
                         target.style.backgroundColor = 'transparent';
                         target.style.boxShadow = 'none';
                       }}
                     >
+                      <HoverShuriken color={SHURIKEN_GOLD} />
                       {t('social')}
                     </Link>
                   </div>
                   <Link
                     href={`/profile/${encodeURIComponent(session.user?.name ?? '')}`}
-                    className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
+                    className="relative flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                     style={{
                       backgroundColor: 'transparent',
-                      border: '1px solid #c4a35a',
-                      color: '#c4a35a',
+                      border: '1px solid var(--t-border)',
+                      color: 'var(--t-text)',
                     }}
                     onMouseEnter={(e) => {
                       const target = e.currentTarget as HTMLElement;
-                      target.style.backgroundColor = 'rgba(196, 163, 90, 0.08)';
-                      target.style.boxShadow = '0 0 16px rgba(196, 163, 90, 0.12)';
+                      showShuriken(target, SHURIKEN_WHITE_BRIGHT);
+                      target.style.backgroundColor = 'var(--t-divider)';
+                      target.style.borderColor = 'var(--t-border-strong)';
+                      target.style.color = '#ffffff';
+                      target.style.boxShadow = '0 0 16px var(--t-divider)';
                     }}
                     onMouseLeave={(e) => {
                       const target = e.currentTarget as HTMLElement;
+                      hideShuriken(target, SHURIKEN_WHITE);
                       target.style.backgroundColor = 'transparent';
+                      target.style.borderColor = 'var(--t-border)';
+                      target.style.color = 'var(--t-text)';
                       target.style.boxShadow = 'none';
                     }}
                   >
+                    <HoverShuriken color={SHURIKEN_WHITE} />
                     {t('profile')}
                   </Link>
                   <Link
                     href="/settings"
-                    className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
+                    className="relative flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                     style={{
                       backgroundColor: 'transparent',
-                      border: '1px solid #c4a35a',
-                      color: '#c4a35a',
+                      border: '1px solid var(--t-border)',
+                      color: 'var(--t-text)',
                     }}
                     onMouseEnter={(e) => {
                       const target = e.currentTarget as HTMLElement;
-                      target.style.backgroundColor = 'rgba(196, 163, 90, 0.08)';
-                      target.style.boxShadow = '0 0 16px rgba(196, 163, 90, 0.12)';
+                      showShuriken(target, SHURIKEN_WHITE_BRIGHT);
+                      target.style.backgroundColor = 'var(--t-divider)';
+                      target.style.borderColor = 'var(--t-border-strong)';
+                      target.style.color = '#ffffff';
+                      target.style.boxShadow = '0 0 16px var(--t-divider)';
                     }}
                     onMouseLeave={(e) => {
                       const target = e.currentTarget as HTMLElement;
+                      hideShuriken(target, SHURIKEN_WHITE);
                       target.style.backgroundColor = 'transparent';
+                      target.style.borderColor = 'var(--t-border)';
+                      target.style.color = 'var(--t-text)';
                       target.style.boxShadow = 'none';
                     }}
                   >
+                    <HoverShuriken color={SHURIKEN_WHITE} />
                     {t('customization')}
                   </Link>
                 </>
@@ -427,25 +451,28 @@ export default function Home() {
                   <Link
                     key={btn.key}
                     href={btn.href}
-                    className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
+                    className="relative flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                     style={{
                       backgroundColor: 'transparent',
-                      border: '1px solid #333333',
-                      color: '#888888',
+                      border: '1px solid var(--t-border-strong)',
+                      color: 'var(--t-muted)',
                     }}
                     onMouseEnter={(e) => {
                       const target = e.currentTarget as HTMLElement;
-                      target.style.borderColor = '#c4a35a';
-                      target.style.color = '#c4a35a';
-                      target.style.backgroundColor = 'rgba(196, 163, 90, 0.05)';
+                      showShuriken(target, SHURIKEN_GOLD_BRIGHT);
+                      target.style.borderColor = 'var(--t-accent)';
+                      target.style.color = 'var(--t-accent)';
+                      target.style.backgroundColor = 'var(--t-accent-tint)';
                     }}
                     onMouseLeave={(e) => {
                       const target = e.currentTarget as HTMLElement;
-                      target.style.borderColor = '#333333';
-                      target.style.color = '#888888';
+                      hideShuriken(target, SHURIKEN_GOLD);
+                      target.style.borderColor = 'var(--t-border-strong)';
+                      target.style.color = 'var(--t-muted)';
                       target.style.backgroundColor = 'transparent';
                     }}
                   >
+                    <HoverShuriken color={SHURIKEN_GOLD} />
                     {t(btn.key)}
                   </Link>
                 ))
@@ -462,25 +489,28 @@ export default function Home() {
               >
                 <button
                   onClick={() => signOut({ callbackUrl: '/' })}
-                  className="flex h-9 w-full items-center justify-center text-xs font-medium tracking-wide transition-all cursor-pointer sm:h-10 sm:text-sm"
+                  className="relative flex h-9 w-full items-center justify-center text-xs font-medium tracking-wide transition-all cursor-pointer sm:h-10 sm:text-sm"
                   style={{
                     backgroundColor: 'transparent',
-                    border: '1px solid #333333',
-                    color: '#888888',
+                    border: '1px solid var(--t-border-strong)',
+                    color: 'var(--t-muted)',
                   }}
                   onMouseEnter={(e) => {
                     const target = e.currentTarget as HTMLElement;
-                    target.style.borderColor = '#ef4444';
-                    target.style.color = '#ef4444';
-                    target.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
+                    showShuriken(target, SHURIKEN_GOLD_BRIGHT);
+                    target.style.borderColor = 'var(--t-accent)';
+                    target.style.color = 'var(--t-accent)';
+                    target.style.backgroundColor = 'var(--t-accent-tint)';
                   }}
                   onMouseLeave={(e) => {
                     const target = e.currentTarget as HTMLElement;
-                    target.style.borderColor = '#333333';
-                    target.style.color = '#888888';
+                    hideShuriken(target, SHURIKEN_GOLD);
+                    target.style.borderColor = 'var(--t-border-strong)';
+                    target.style.color = 'var(--t-muted)';
                     target.style.backgroundColor = 'transparent';
                   }}
                 >
+                  <HoverShuriken color={SHURIKEN_GOLD} />
                   {t('signOut')}
                 </button>
               </motion.div>
@@ -489,7 +519,7 @@ export default function Home() {
             
             <motion.p
               className="mt-4 text-[10px] tracking-widest uppercase sm:mt-6 sm:text-xs"
-              style={{ color: '#333333' }}
+              style={{ color: 'var(--t-muted)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 1.7 }}
@@ -515,7 +545,7 @@ export default function Home() {
               style={{
                 width: '340px',
                 height: '480px',
-                backgroundColor: 'rgba(196, 163, 90, 0.08)',
+                backgroundColor: 'var(--t-accent-tint)',
                 filter: 'blur(60px)',
               }}
               animate={{

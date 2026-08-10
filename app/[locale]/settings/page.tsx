@@ -10,6 +10,7 @@ import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { FlagPicker } from '@/components/FlagPicker';
 import { ChatSettingsSection } from '@/components/settings/ChatSettingsSection';
 import { BoardColorsSection } from '@/components/settings/BoardColorsSection';
+import { SiteThemeSection } from '@/components/settings/SiteThemeSection';
 import { DeckPreferencesSection } from '@/components/settings/DeckPreferencesSection';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useCallback } from 'react';
@@ -122,13 +123,13 @@ export default function SettingsPage() {
   }, [status, fetchFromServer]);
 
   if (status === 'loading' || status === 'unauthenticated') {
-    return <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh' }} />;
+    return <div style={{ backgroundColor: 'var(--t-bg)', minHeight: '100vh' }} />;
   }
 
   return (
     <main
       className="relative flex min-h-screen flex-col items-center justify-center"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{ backgroundColor: 'var(--t-bg)' }}
     >
       <CloudBackground animated={animationsPref} />
       <DecorativeIcons animated={animationsPref} />
@@ -140,7 +141,7 @@ export default function SettingsPage() {
 
         <h1
           className="mb-8 text-center text-base font-semibold uppercase tracking-[0.25em] lg:mb-10 lg:text-lg"
-          style={{ color: '#c4a35a' }}
+          style={{ color: 'var(--t-accent)' }}
         >
           {t('title')}
         </h1>
@@ -150,13 +151,13 @@ export default function SettingsPage() {
         <div
           className="flex flex-col gap-3 p-5"
           style={{
-            backgroundColor: '#111111',
-            border: '1px solid #262626',
+            backgroundColor: 'var(--t-panel)',
+            border: '1px solid var(--t-border)',
           }}
         >
           <span
             className="text-sm font-medium tracking-wide"
-            style={{ color: '#e0e0e0' }}
+            style={{ color: 'var(--t-text)' }}
           >
             {t('username')}
           </span>
@@ -174,12 +175,12 @@ export default function SettingsPage() {
               pattern="[A-Za-z0-9_-]+"
               className="flex-1 px-3 py-1.5 text-sm font-medium outline-none"
               style={{
-                backgroundColor: '#0a0a0a',
-                border: '1px solid #333333',
-                color: '#e0e0e0',
+                backgroundColor: 'var(--t-bg)',
+                border: '1px solid var(--t-border-strong)',
+                color: 'var(--t-text)',
               }}
-              onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = '#c4a35a'; }}
-              onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = '#333333'; }}
+              onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--t-accent)'; }}
+              onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--t-border-strong)'; }}
               onKeyDown={(e) => { if (e.key === 'Enter') handleUsernameSave(); }}
             />
             <button
@@ -188,8 +189,8 @@ export default function SettingsPage() {
               onClick={handleUsernameSave}
               className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-opacity"
               style={{
-                backgroundColor: usernameStatus === 'saved' ? '#2d5a2d' : '#c4a35a',
-                color: usernameStatus === 'saved' ? '#a0d0a0' : '#0a0a0a',
+                backgroundColor: usernameStatus === 'saved' ? 'var(--t-success)' : 'var(--t-accent)',
+                color: 'var(--t-bg)',
                 opacity: (usernameStatus === 'saving' || usernameInput.trim() === session?.user?.name) ? 0.4 : 1,
                 cursor: (usernameStatus === 'saving' || usernameInput.trim() === session?.user?.name) ? 'default' : 'pointer',
               }}
@@ -198,9 +199,9 @@ export default function SettingsPage() {
             </button>
           </div>
           {usernameError && (
-            <p className="text-xs" style={{ color: '#b33e3e' }}>{usernameError}</p>
+            <p className="text-xs" style={{ color: 'var(--t-danger)' }}>{usernameError}</p>
           )}
-          <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+          <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
             {t('usernameHint')}
           </p>
         </div>
@@ -208,13 +209,13 @@ export default function SettingsPage() {
         <div
           className="mt-4 flex flex-col gap-4 p-5"
           style={{
-            backgroundColor: '#111111',
-            border: '1px solid #262626',
+            backgroundColor: 'var(--t-panel)',
+            border: '1px solid var(--t-border)',
           }}
         >
           
           <div className="flex items-center justify-between gap-4">
-            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
               <img src="/images/icons/play.svg" alt="" draggable={false} style={{ width: 16, height: 16, opacity: 0.5 }} />
               {t('animations')}
             </span>
@@ -226,7 +227,7 @@ export default function SettingsPage() {
               onClick={() => setAnimationsEnabled(!animationsPref)}
               className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden"
               style={{
-                backgroundColor: animationsPref ? '#c4a35a' : '#333333',
+                backgroundColor: animationsPref ? 'var(--t-accent)' : 'var(--t-border-strong)',
                 cursor: isLoaded ? 'pointer' : 'default',
                 opacity: isLoaded ? 1 : 0.5,
               }}
@@ -234,7 +235,7 @@ export default function SettingsPage() {
               <span
                 className="absolute top-0.5 h-5 w-5 rounded-full"
                 style={{
-                  backgroundColor: '#0a0a0a',
+                  backgroundColor: 'var(--t-bg)',
                   left: animationsPref ? '22px' : '2px',
                   transition: 'left 150ms ease',
                 }}
@@ -242,25 +243,25 @@ export default function SettingsPage() {
             </button>
           </div>
 
-          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+          <div style={{ height: '1px', backgroundColor: 'var(--t-divider)' }} />
 
           <p
             className="text-xs tracking-wide"
-            style={{ color: '#555555' }}
+            style={{ color: 'var(--t-dim)' }}
           >
             {!isLoaded ? t('loading') : animationsPref ? t('animationsOn') : t('animationsOff')}
           </p>
 
           {isLoaded && isTouchDevice && (
-            <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+            <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
               {t('animationsTouchDisabled')}
             </p>
           )}
 
-          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+          <div style={{ height: '1px', backgroundColor: 'var(--t-divider)' }} />
 
           <div className="flex items-center justify-between gap-4">
-            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: '#e0e0e0' }}>
+            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: 'var(--t-text)' }}>
               {t('sound')}
             </span>
             <button
@@ -270,13 +271,13 @@ export default function SettingsPage() {
               onClick={() => setSoundEnabled(!soundEnabled)}
               className="relative h-6 w-11 flex-shrink-0 rounded-full transition-colors overflow-hidden cursor-pointer"
               style={{
-                backgroundColor: soundEnabled ? '#c4a35a' : '#333333',
+                backgroundColor: soundEnabled ? 'var(--t-accent)' : 'var(--t-border-strong)',
               }}
             >
               <span
                 className="absolute top-0.5 h-5 w-5 rounded-full"
                 style={{
-                  backgroundColor: '#0a0a0a',
+                  backgroundColor: 'var(--t-bg)',
                   left: soundEnabled ? '22px' : '2px',
                   transition: 'left 150ms ease',
                 }}
@@ -286,15 +287,15 @@ export default function SettingsPage() {
 
           <p
             className="text-xs tracking-wide"
-            style={{ color: '#555555' }}
+            style={{ color: 'var(--t-dim)' }}
           >
             {soundEnabled ? t('soundOn') : t('soundOff')}
           </p>
 
-          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+          <div style={{ height: '1px', backgroundColor: 'var(--t-divider)' }} />
 
           <div className="flex items-center justify-between gap-4">
-            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
               {t('fastAnimations')}
             </span>
             <button
@@ -305,7 +306,7 @@ export default function SettingsPage() {
               onClick={() => setFastAnimations(!fastAnimations)}
               className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden"
               style={{
-                backgroundColor: fastAnimations ? '#c4a35a' : '#333333',
+                backgroundColor: fastAnimations ? 'var(--t-accent)' : 'var(--t-border-strong)',
                 cursor: isLoaded ? 'pointer' : 'default',
                 opacity: isLoaded ? 1 : 0.5,
               }}
@@ -313,21 +314,21 @@ export default function SettingsPage() {
               <span
                 className="absolute top-0.5 h-5 w-5 rounded-full"
                 style={{
-                  backgroundColor: '#0a0a0a',
+                  backgroundColor: 'var(--t-bg)',
                   left: fastAnimations ? '22px' : '2px',
                   transition: 'left 150ms ease',
                 }}
               />
             </button>
           </div>
-          <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+          <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
             {t('fastAnimationsHint')}
           </p>
 
-          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+          <div style={{ height: '1px', backgroundColor: 'var(--t-divider)' }} />
 
           <div className="flex items-center justify-between gap-4">
-            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
               {t('hideVariants')}
             </span>
             <button
@@ -338,7 +339,7 @@ export default function SettingsPage() {
               onClick={() => setHideDeckBuilderVariants(!hideDeckBuilderVariants)}
               className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden"
               style={{
-                backgroundColor: hideDeckBuilderVariants ? '#c4a35a' : '#333333',
+                backgroundColor: hideDeckBuilderVariants ? 'var(--t-accent)' : 'var(--t-border-strong)',
                 cursor: isLoaded ? 'pointer' : 'default',
                 opacity: isLoaded ? 1 : 0.5,
               }}
@@ -346,21 +347,21 @@ export default function SettingsPage() {
               <span
                 className="absolute top-0.5 h-5 w-5 rounded-full"
                 style={{
-                  backgroundColor: '#0a0a0a',
+                  backgroundColor: 'var(--t-bg)',
                   left: hideDeckBuilderVariants ? '22px' : '2px',
                   transition: 'left 150ms ease',
                 }}
               />
             </button>
           </div>
-          <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+          <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
             {t('hideVariantsHint')}
           </p>
 
-          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+          <div style={{ height: '1px', backgroundColor: 'var(--t-divider)' }} />
 
           <div className="flex items-center justify-between gap-4">
-            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
               {t('manualPowerMode')}
             </span>
             <button
@@ -371,7 +372,7 @@ export default function SettingsPage() {
               onClick={() => setManualPowerMode(!manualPowerMode)}
               className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden"
               style={{
-                backgroundColor: manualPowerMode ? '#c4a35a' : '#333333',
+                backgroundColor: manualPowerMode ? 'var(--t-accent)' : 'var(--t-border-strong)',
                 cursor: isLoaded ? 'pointer' : 'default',
                 opacity: isLoaded ? 1 : 0.5,
               }}
@@ -379,21 +380,21 @@ export default function SettingsPage() {
               <span
                 className="absolute top-0.5 h-5 w-5 rounded-full"
                 style={{
-                  backgroundColor: '#0a0a0a',
+                  backgroundColor: 'var(--t-bg)',
                   left: manualPowerMode ? '22px' : '2px',
                   transition: 'left 150ms ease',
                 }}
               />
             </button>
           </div>
-          <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+          <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
             {t('manualPowerModeHint')}
           </p>
 
-          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+          <div style={{ height: '1px', backgroundColor: 'var(--t-divider)' }} />
 
           <div className="flex items-center justify-between gap-4">
-            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+            <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
               {t('gamepad')}
             </span>
             <button
@@ -404,7 +405,7 @@ export default function SettingsPage() {
               onClick={() => setGamepadEnabled(!gamepadEnabled)}
               className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden"
               style={{
-                backgroundColor: gamepadEnabled ? '#c4a35a' : '#333333',
+                backgroundColor: gamepadEnabled ? 'var(--t-accent)' : 'var(--t-border-strong)',
                 cursor: isLoaded ? 'pointer' : 'default',
                 opacity: isLoaded ? 1 : 0.5,
               }}
@@ -412,25 +413,25 @@ export default function SettingsPage() {
               <span
                 className="absolute top-0.5 h-5 w-5 rounded-full"
                 style={{
-                  backgroundColor: '#0a0a0a',
+                  backgroundColor: 'var(--t-bg)',
                   left: gamepadEnabled ? '22px' : '2px',
                   transition: 'left 150ms ease',
                 }}
               />
             </button>
           </div>
-          <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+          <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
             {t('gamepadHint')}
           </p>
 
-          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+          <div style={{ height: '1px', backgroundColor: 'var(--t-divider)' }} />
 
           <div className="flex flex-col gap-2">
-            <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+            <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
               {tFlag('label')}
             </span>
             <FlagPicker value={countryCode} onChange={setCountryCode} disabled={!isLoaded} />
-            <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+            <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
               {tFlag('hint')}
             </p>
           </div>
@@ -440,15 +441,15 @@ export default function SettingsPage() {
         <div className="min-w-0 flex flex-col gap-4 lg:gap-6 lg:[&>div]:mt-0">
           <ChatSettingsSection />
 
-          <div className="flex flex-col gap-4 p-5 lg:p-6" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
-            <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+          <div className="flex flex-col gap-4 p-5 lg:p-6" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' }}>
+            <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
               {t('socialSectionTitle')}
             </span>
 
-            <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+            <div style={{ height: '1px', backgroundColor: 'var(--t-divider)' }} />
 
             <div className="flex items-center justify-between gap-4">
-              <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+              <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
                 {t('allowNonFriendMessages')}
               </span>
               <button
@@ -458,19 +459,19 @@ export default function SettingsPage() {
                 disabled={!isLoaded}
                 onClick={() => setAllowNonFriendMessages(!allowNonFriendMessages)}
                 className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden"
-                style={{ backgroundColor: allowNonFriendMessages ? '#c4a35a' : '#333333', cursor: isLoaded ? 'pointer' : 'default', opacity: isLoaded ? 1 : 0.5 }}
+                style={{ backgroundColor: allowNonFriendMessages ? 'var(--t-accent)' : 'var(--t-border-strong)', cursor: isLoaded ? 'pointer' : 'default', opacity: isLoaded ? 1 : 0.5 }}
               >
-                <span className="absolute top-0.5 h-5 w-5 rounded-full" style={{ backgroundColor: '#0a0a0a', left: allowNonFriendMessages ? '22px' : '2px', transition: 'left 150ms ease' }} />
+                <span className="absolute top-0.5 h-5 w-5 rounded-full" style={{ backgroundColor: 'var(--t-bg)', left: allowNonFriendMessages ? '22px' : '2px', transition: 'left 150ms ease' }} />
               </button>
             </div>
-            <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+            <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
               {t('allowNonFriendMessagesHint')}
             </p>
 
-            <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+            <div style={{ height: '1px', backgroundColor: 'var(--t-divider)' }} />
 
             <div className="flex items-center justify-between gap-4">
-              <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+              <span className="flex items-center gap-2 text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
                 {t('privateProfile')}
               </span>
               <button
@@ -480,17 +481,19 @@ export default function SettingsPage() {
                 disabled={!isLoaded}
                 onClick={() => setPrivateProfile(!privateProfile)}
                 className="relative h-6 w-11 shrink-0 rounded-full transition-colors overflow-hidden"
-                style={{ backgroundColor: privateProfile ? '#c4a35a' : '#333333', cursor: isLoaded ? 'pointer' : 'default', opacity: isLoaded ? 1 : 0.5 }}
+                style={{ backgroundColor: privateProfile ? 'var(--t-accent)' : 'var(--t-border-strong)', cursor: isLoaded ? 'pointer' : 'default', opacity: isLoaded ? 1 : 0.5 }}
               >
-                <span className="absolute top-0.5 h-5 w-5 rounded-full" style={{ backgroundColor: '#0a0a0a', left: privateProfile ? '22px' : '2px', transition: 'left 150ms ease' }} />
+                <span className="absolute top-0.5 h-5 w-5 rounded-full" style={{ backgroundColor: 'var(--t-bg)', left: privateProfile ? '22px' : '2px', transition: 'left 150ms ease' }} />
               </button>
             </div>
-            <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+            <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
               {t('privateProfileHint')}
             </p>
           </div>
         </div>
         </div>
+
+        <SiteThemeSection />
 
         <BoardColorsSection />
 
@@ -499,17 +502,17 @@ export default function SettingsPage() {
         <div
           className="mt-4 flex flex-col gap-4 p-5 lg:mt-6 lg:max-w-2xl"
           style={{
-            backgroundColor: '#111111',
+            backgroundColor: 'var(--t-panel)',
             }}
         >
           <div className="flex flex-col gap-1">
             <span
               className="text-sm font-medium tracking-wide"
-              style={{ color: '#b33e3e' }}
+              style={{ color: 'var(--t-danger)' }}
             >
               {t('deleteAccount.title')}
             </span>
-            <p className="text-xs tracking-wide" style={{ color: '#888888' }}>
+            <p className="text-xs tracking-wide" style={{ color: 'var(--t-muted)' }}>
               {t('deleteAccount.description')}
             </p>
           </div>
@@ -520,8 +523,8 @@ export default function SettingsPage() {
               onClick={() => setDeleteOpen(true)}
               className="self-start px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors"
               style={{
-                backgroundColor: '#1a1414',
-                color: '#b33e3e',
+                backgroundColor: 'var(--t-surface)',
+                color: 'var(--t-danger)',
                 cursor: 'pointer',
               }}
             >
@@ -529,7 +532,7 @@ export default function SettingsPage() {
             </button>
           ) : (
             <div className="flex flex-col gap-3">
-              <p className="text-xs leading-relaxed" style={{ color: '#cccccc' }}>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--t-text)' }}>
                 {t('deleteAccount.confirmHint', { phrase: DELETE_ACCOUNT_PHRASE })}
               </p>
               <input
@@ -544,15 +547,15 @@ export default function SettingsPage() {
                 disabled={deleteStatus === 'deleting'}
                 className="px-3 py-1.5 text-sm tracking-wide outline-none"
                 style={{
-                  backgroundColor: '#0a0a0a',
-                  color: '#e0e0e0',
+                  backgroundColor: 'var(--t-bg)',
+                  color: 'var(--t-text)',
                   fontFamily: 'monospace',
                 }}
-                onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = '#b33e3e'; }}
-                onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = '#b33e3e44'; }}
+                onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--t-danger)'; }}
+                onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'color-mix(in srgb, var(--t-danger) 27%, transparent)'; }}
               />
               {deleteError && (
-                <p className="text-xs" style={{ color: '#b33e3e' }}>{deleteError}</p>
+                <p className="text-xs" style={{ color: 'var(--t-danger)' }}>{deleteError}</p>
               )}
               <div className="flex gap-2">
                 <button
@@ -561,8 +564,8 @@ export default function SettingsPage() {
                   disabled={deleteStatus === 'deleting' || deletePhrase.trim() !== DELETE_ACCOUNT_PHRASE}
                   className="px-4 py-2 text-xs font-bold uppercase tracking-wider"
                   style={{
-                    backgroundColor: '#b33e3e',
-                    color: '#0a0a0a',
+                    backgroundColor: 'var(--t-danger)',
+                    color: 'var(--t-bg)',
                     opacity: (deleteStatus === 'deleting' || deletePhrase.trim() !== DELETE_ACCOUNT_PHRASE) ? 0.4 : 1,
                     cursor: (deleteStatus === 'deleting' || deletePhrase.trim() !== DELETE_ACCOUNT_PHRASE) ? 'default' : 'pointer',
                   }}
@@ -581,8 +584,8 @@ export default function SettingsPage() {
                   className="px-4 py-2 text-xs font-medium uppercase tracking-wider"
                   style={{
                     backgroundColor: 'transparent',
-                    border: '1px solid #333333',
-                    color: '#888888',
+                    border: '1px solid var(--t-border-strong)',
+                    color: 'var(--t-muted)',
                     cursor: deleteStatus === 'deleting' ? 'default' : 'pointer',
                   }}
                 >
@@ -597,12 +600,12 @@ export default function SettingsPage() {
           <Link
             href="/"
             className="text-xs font-medium uppercase tracking-wider transition-colors"
-            style={{ color: '#555555' }}
+            style={{ color: 'var(--t-dim)' }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.color = '#c4a35a';
+              (e.currentTarget as HTMLElement).style.color = 'var(--t-accent)';
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.color = '#555555';
+              (e.currentTarget as HTMLElement).style.color = 'var(--t-dim)';
             }}
           >
             {t('back')}

@@ -18,6 +18,7 @@ import { NeuralEvaluator } from '@/lib/ai/neural/NeuralEvaluator';
 import { NeuralISMCTS } from '@/lib/ai/neural/NeuralISMCTS';
 import { GameEngine } from '@/lib/engine/GameEngine';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { PowerIcon, POWER_COLOR } from '@/components/icons/GameIcons';
 import type { CoachAdvice, MissionCoachAnalysis } from '@/lib/ai/coaching/CoachTypes';
 import type { GameState } from '@/lib/engine/types';
 
@@ -521,7 +522,8 @@ function MissionRow({ mission }: { mission: MissionCoachAnalysis }) {
           transition={{ type: 'spring', stiffness: 120, damping: 20 }}
         />
       </div>
-      <span className="text-[10px] font-mono text-[#555] w-10 text-right">
+      <span className="flex items-center justify-end gap-1 text-[10px] font-mono text-[#555] w-14 shrink-0">
+        <PowerIcon size={9} color={POWER_COLOR} />
         {mission.myPower}v{mission.opponentPower}
       </span>
       <span className="text-[10px] text-[#444] w-6 text-right">{mission.pointValue}p</span>

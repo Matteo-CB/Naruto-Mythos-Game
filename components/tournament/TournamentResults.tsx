@@ -13,7 +13,7 @@ interface Props {
 }
 
 function placeColor(place: 1 | 2 | 3): string {
-  if (place === 1) return '#c4a35a';
+  if (place === 1) return 'var(--t-accent)';
   if (place === 2) return '#b8b8b8';
   return '#a87440';
 }
@@ -32,9 +32,9 @@ function outcomeColor(outcome: ResultMatchEntry['outcome']): string {
   switch (outcome) {
     case 'win_played': return '#7a9e4a';
     case 'win_forfeit': return '#cc7a30';
-    case 'double_forfeit': return '#b33e3e';
+    case 'double_forfeit': return 'var(--t-danger)';
     case 'bye': return '#8888aa';
-    case 'incomplete': return '#666';
+    case 'incomplete': return 'var(--t-dim)';
   }
 }
 
@@ -48,8 +48,8 @@ export function TournamentResults({ tournament }: Props) {
   const totalForfeits = view.forfeitCount + view.doubleForfeitCount;
 
   return (
-    <div className="flex flex-col gap-6 p-6" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
-      <h3 className="text-center text-xs font-bold uppercase tracking-[0.3em]" style={{ color: '#888' }}>
+    <div className="flex flex-col gap-6 p-6" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' }}>
+      <h3 className="text-center text-xs font-bold uppercase tracking-[0.3em]" style={{ color: 'var(--t-muted)' }}>
         {t('resultsTitle')}
       </h3>
 
@@ -59,7 +59,7 @@ export function TournamentResults({ tournament }: Props) {
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className="flex flex-col items-center gap-2 py-4"
       >
-        <span className="text-[10px] font-bold uppercase tracking-[0.4em]" style={{ color: '#c4a35a' }}>
+        <span className="text-[10px] font-bold uppercase tracking-[0.4em]" style={{ color: 'var(--t-accent)' }}>
           {t('champion')}
         </span>
         <motion.span
@@ -67,7 +67,7 @@ export function TournamentResults({ tournament }: Props) {
           animate={{ y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
           className="text-2xl font-bold tracking-wide"
-          style={{ color: '#c4a35a', textShadow: '0 0 20px rgba(196, 163, 90, 0.3)' }}
+          style={{ color: 'var(--t-accent)', textShadow: '0 0 20px rgba(196, 163, 90, 0.3)' }}
         >
           <PlayerNameLink username={view.champion.username} />
         </motion.span>
@@ -75,9 +75,9 @@ export function TournamentResults({ tournament }: Props) {
 
       {view.podium.length > 1 && (
         <>
-          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+          <div style={{ height: '1px', backgroundColor: 'var(--t-surface-2)' }} />
           <div className="flex flex-col gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: '#666' }}>
+            <span className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--t-dim)' }}>
               {t('results.podium')}
             </span>
             {view.podium.map((entry, i) => (
@@ -92,7 +92,7 @@ export function TournamentResults({ tournament }: Props) {
                   <span className="font-display text-sm font-bold tabular-nums" style={{ color: placeColor(entry.place) }}>
                     #{entry.place}
                   </span>
-                  <PlayerNameLink username={entry.username} className="text-sm" style={{ color: entry.place === 1 ? '#c4a35a' : '#aaa' }} />
+                  <PlayerNameLink username={entry.username} className="text-sm" style={{ color: entry.place === 1 ? 'var(--t-accent)' : 'var(--t-muted)' }} />
                 </div>
               </motion.div>
             ))}
@@ -102,8 +102,8 @@ export function TournamentResults({ tournament }: Props) {
 
       {totalForfeits > 0 && (
         <>
-          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
-          <div className="px-2 py-2 text-xs" style={{ color: '#cc7a30', backgroundColor: 'rgba(204, 122, 48, 0.06)' }}>
+          <div style={{ height: '1px', backgroundColor: 'var(--t-surface-2)' }} />
+          <div className="px-2 py-2 text-xs" style={{ color: 'var(--t-accent)', backgroundColor: 'rgba(204, 122, 48, 0.06)' }}>
             {t('results.forfeitSummary', { single: view.forfeitCount, double: view.doubleForfeitCount })}
           </div>
         </>
@@ -111,9 +111,9 @@ export function TournamentResults({ tournament }: Props) {
 
       {view.entries.length > 0 && (
         <>
-          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+          <div style={{ height: '1px', backgroundColor: 'var(--t-surface-2)' }} />
           <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: '#666' }}>
+            <span className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--t-dim)' }}>
               {t('results.matchHistory')}
             </span>
             {view.entries.map((entry, i) => {
@@ -121,22 +121,22 @@ export function TournamentResults({ tournament }: Props) {
               const rowContent = (
                 <div className="flex items-center justify-between px-2 py-1 gap-2">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-[10px] uppercase tracking-wider tabular-nums" style={{ color: '#555' }}>
+                    <span className="text-[10px] uppercase tracking-wider tabular-nums" style={{ color: 'var(--t-dim)' }}>
                       R{entry.round}
                     </span>
                     {entry.outcome === 'double_forfeit' ? (
-                      <span className="text-xs truncate" style={{ color: '#aaa' }}>
+                      <span className="text-xs truncate" style={{ color: 'var(--t-muted)' }}>
                         {entry.doubleForfeitUsernames.join(' & ') || '?'}
                       </span>
                     ) : entry.outcome === 'bye' ? (
-                      <span className="text-xs truncate" style={{ color: '#aaa' }}>
+                      <span className="text-xs truncate" style={{ color: 'var(--t-muted)' }}>
                         {entry.winnerUsername ?? '?'}
                       </span>
                     ) : (
-                      <span className="text-xs truncate" style={{ color: '#aaa' }}>
+                      <span className="text-xs truncate" style={{ color: 'var(--t-muted)' }}>
                         {entry.winnerUsername ?? '?'}
                         {entry.loserUsername && (
-                          <span style={{ color: '#555' }}> vs {entry.loserUsername}</span>
+                          <span style={{ color: 'var(--t-dim)' }}> vs {entry.loserUsername}</span>
                         )}
                       </span>
                     )}

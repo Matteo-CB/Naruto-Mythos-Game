@@ -1,7 +1,8 @@
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo, useMemo, type ReactNode } from 'react';
 import { effectTypeLabel } from '@/lib/cards/effectTypeLabel';
+import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from '@/components/icons/GameIcons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
@@ -12,6 +13,7 @@ import { isLandscapeCard, hasCombatStats } from '@/lib/cards/orientation';
 
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
+import { RarityIcon } from '@/components/icons/RarityIcon';
 
 const RARITY_COLORS: Record<Rarity, string> = {
   C: '#6b7280',
@@ -154,7 +156,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                     fontWeight: 600,
                   }}
                 >
-                  {getRarityLabel(card.rarity, tCardMeta)}
+                  <span className="inline-flex items-center gap-1.5"><RarityIcon rarity={card.rarity} size={13} />{getRarityLabel(card.rarity, tCardMeta)}</span>
                 </span>
               </div>
             </div>
@@ -195,7 +197,12 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 }}
               >
                 {hasCombatStats(card) && card.chakra !== undefined && (
-                  <StatBadge label={t('game.chakra')} value={String(card.chakra)} color="#2d5a8e" />
+                  <StatBadge
+                    label={t('game.chakra')}
+                    value={String(card.chakra)}
+                    color="#2d5a8e"
+                    icon={<ChakraIcon size={16} color={CHAKRA_COLOR} />}
+                  />
                 )}
                 {hasCombatStats(card) && (
                   <StatBadge
@@ -203,6 +210,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                     value={String((card.power ?? 0) + powerTokens)}
                     color={powerTokens > 0 ? '#dc2626' : '#6b2121'}
                     extra={powerTokens > 0 ? `(+${powerTokens})` : undefined}
+                    icon={<PowerIcon size={16} color={POWER_COLOR} />}
                   />
                 )}
                 {card.card_type === 'mission' && 'basePoints' in card && (
@@ -307,11 +315,13 @@ function StatBadge({
   value,
   color,
   extra,
+  icon,
 }: {
   label: string;
   value: string;
   color: string;
   extra?: string;
+  icon?: ReactNode;
 }) {
   return (
     <div
@@ -321,6 +331,7 @@ function StatBadge({
         gap: '4px',
       }}
     >
+      {icon}
       <div
         style={{
           width: '24px',

@@ -10,7 +10,7 @@ import { SurveysButton } from './SurveysButton';
 import { LinkDiscordButton } from './LinkDiscordButton';
 
 type AppLocale = (typeof routing.locales)[number];
-const ACCENT = '#c4a35a';
+const ACCENT = 'var(--t-accent)';
 
 export function LanguageSwitcher() {
   const locale = useLocale();
@@ -42,7 +42,7 @@ export function LanguageSwitcher() {
       <LinkDiscordButton />
       <SurveysButton />
       <ChangelogButton />
-      <span className="text-xs" style={{ color: '#333333' }} aria-hidden="true">|</span>
+      <span className="text-xs" style={{ color: 'var(--t-muted)' }} aria-hidden="true">|</span>
       <div ref={ref} className="relative">
         <button
           type="button"
@@ -51,7 +51,7 @@ export function LanguageSwitcher() {
           aria-expanded={open}
           className="flex items-center gap-1.5 px-2 py-1 transition-colors"
           style={{
-            border: `1px solid ${open ? `${ACCENT}55` : '#262626'}`,
+            border: `1px solid ${open ? `${ACCENT}55` : 'var(--t-border)'}`,
             borderRadius: 3,
             backgroundColor: open ? `${ACCENT}12` : 'transparent',
           }}
@@ -89,9 +89,9 @@ export function LanguageSwitcher() {
               className="absolute right-0 z-50 mt-1.5 overflow-hidden"
               style={{
                 minWidth: 156,
-                backgroundColor: '#0e0e0e',
-                border: '1px solid #262626',
-                boxShadow: '0 14px 34px rgba(0,0,0,0.6)',
+                backgroundColor: 'var(--t-bg-elevated)',
+                border: '1px solid var(--t-border)',
+                boxShadow: '0 14px 34px var(--t-shadow)',
                 borderRadius: 4,
               }}
             >
@@ -110,7 +110,7 @@ export function LanguageSwitcher() {
                       <span className="text-sm tracking-wide" style={{ color: selected ? ACCENT : '#dcdcdc' }}>
                         {nameOf(loc)}
                       </span>
-                      <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: selected ? ACCENT : '#555' }}>
+                      <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: selected ? ACCENT : 'var(--t-dim)' }}>
                         {loc}
                       </span>
                     </button>

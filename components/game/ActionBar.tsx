@@ -11,6 +11,7 @@ import { useUIStore } from '@/stores/uiStore';
 import { useSocketStore } from '@/lib/socket/client';
 import { calculateEffectiveCost, hasKurenai034CostReduction } from '@/lib/engine/rules/ChakraValidation';
 import { checkFlexibleUpgrade, isUpgradeNameLegal } from '@/lib/engine/rules/PlayValidation';
+import { ChakraIcon, CHAKRA_COLOR, CHAKRA_COLOR_SOFT } from '@/components/icons/GameIcons';
 import { useGameScale } from './GameScaleContext';
 
 export function ActionBar() {
@@ -372,12 +373,13 @@ export function ActionBar() {
             const canAffordUpgrade = myState.chakra >= upgradeCost;
             const targetName = charCard ? getCardName(charCard, locale) : '';
             const upgradeLabel = isHiddenTarget
-              ? `${t('game.reveal')} + ${t('game.actions.upgrade')} ${targetName} (${upgradeCost} ${t('game.chakra').toLowerCase()})`
-              : `${t('game.actions.upgrade')} ${targetName} (${upgradeCost} ${t('game.chakra').toLowerCase()})`;
+              ? `${t('game.reveal')} + ${t('game.actions.upgrade')} ${targetName}`
+              : `${t('game.actions.upgrade')} ${targetName}`;
             return (
               <ActionButton
                 key={target.instanceId}
                 label={upgradeLabel}
+                chakraCost={upgradeCost}
                 onClick={() => handleUpgrade(target.instanceId)}
                 disabled={!canAffordUpgrade}
                 variant="primary"
@@ -387,7 +389,8 @@ export function ActionBar() {
 
           {cardAndMissionReady && (
             <ActionButton
-              label={`${t('game.play')} (${costLabel} ${t('game.chakra').toLowerCase()})`}
+              label={t('game.play')}
+              chakraCost={costLabel}
               onClick={handlePlayVisible}
               disabled={!canAffordCard}
               variant={upgradeTargets.length > 0 ? "secondary" : "primary"}
@@ -396,7 +399,8 @@ export function ActionBar() {
 
           {cardAndMissionReady && (
             <ActionButton
-              label={t('game.actions.playHiddenCharacter')}
+              label={t('game.playHidden')}
+              chakraCost={1}
               onClick={handlePlayHidden}
               disabled={!canAffordHidden}
               variant="secondary"
@@ -408,7 +412,8 @@ export function ActionBar() {
             return (
               <ActionButton
                 key={`reveal-upgrade-${opt.instanceId}`}
-                label={`${t('game.reveal')} + ${t('game.actions.upgrade')} ${opt.name} (${opt.cost} ${t('game.chakra').toLowerCase()})`}
+                label={`${t('game.reveal')} + ${t('game.actions.upgrade')} ${opt.name}`}
+                chakraCost={opt.cost}
                 onClick={() => handleReveal(opt.instanceId)}
                 disabled={!canAfford}
                 variant="primary"
@@ -418,7 +423,8 @@ export function ActionBar() {
 
           {canReveal && canShowPlainReveal && (
             <ActionButton
-              label={`${t('game.reveal')} (${revealBaseCost} ${t('game.chakra').toLowerCase()})`}
+              label={t('game.reveal')}
+              chakraCost={revealBaseCost}
               onClick={() => handleReveal()}
               disabled={!canAffordReveal}
               variant={revealUpgradeTargets.length > 0 ? "secondary" : "primary"}
@@ -436,6 +442,7 @@ export function ActionBar() {
 
           {confirmingPass ? (
             <div className="flex items-center gap-1.5">
+              <ChakraIcon size={dims.isMobile ? 14 : 12} color={CHAKRA_COLOR} />
               <span className="whitespace-nowrap" style={{ fontSize: dims.isMobile ? '13px' : '10px', color: '#c4a35a' }}>
                 {t('game.passConfirm', { chakra: myState.chakra })}
               </span>
@@ -527,19 +534,28 @@ const variantStyles: Record<
   },
 };
 
+const CHAKRA_ON_GOLD = '#0f2740';
+
 function ActionButton({
   label,
+  chakraCost,
   onClick,
   disabled,
   variant,
 }: {
   label: string;
+  chakraCost?: string | number;
   onClick: () => void;
   disabled: boolean;
   variant: ButtonVariant;
 }) {
   const styles = variantStyles[variant];
   const dims = useGameScale();
+  const chakraIconColor = disabled
+    ? CHAKRA_COLOR_SOFT
+    : variant === 'primary'
+      ? CHAKRA_ON_GOLD
+      : CHAKRA_COLOR;
 
   return (
     <motion.button
@@ -562,6 +578,17 @@ function ActionButton({
     >
       <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
         {label}
+        {chakraCost !== undefined && (
+          <span style={{ whiteSpace: 'nowrap' }}>
+            {` (${chakraCost}`}
+            <ChakraIcon
+              size="1em"
+              color={chakraIconColor}
+              style={{ margin: '0 1px 0 4px', verticalAlign: '-0.13em' }}
+            />
+            {')'}
+          </span>
+        )}
       </span>
     </motion.button>
   );

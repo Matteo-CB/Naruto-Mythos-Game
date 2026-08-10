@@ -215,24 +215,24 @@ export default function AdminPage() {
   if (!isAdmin) {
     if (moderatorAccess === 'loading') {
       return (
-        <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
-          <p style={{ color: '#555' }}>...</p>
+        <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
+          <p style={{ color: 'var(--t-dim)' }}>...</p>
         </main>
       );
     }
     if (moderatorAccess === 'yes') {
       return (
-        <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+        <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: 'var(--t-bg)' }}>
           <CloudBackground />
           <div className="max-w-6xl mx-auto relative z-10 flex-1 px-4 py-8 w-full">
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-2xl font-bold" style={{ color: '#c4a35a' }}>
+              <h1 className="text-2xl font-bold" style={{ color: 'var(--t-accent)' }}>
                 {tc('moderation.reports')}
               </h1>
               <Link
                 href="/"
                 className="px-4 py-2 text-sm rounded"
-                style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+                style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-muted)' }}
               >
                 {t('home')}
               </Link>
@@ -244,8 +244,8 @@ export default function AdminPage() {
       );
     }
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
-        <p style={{ color: '#b33e3e' }}>{t('unauthorized')}</p>
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
+        <p style={{ color: 'var(--t-danger)' }}>{t('unauthorized')}</p>
       </main>
     );
   }
@@ -412,19 +412,19 @@ export default function AdminPage() {
   ];
 
   return (
-    <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+    <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: 'var(--t-bg)' }}>
       <CloudBackground />
 
       <div className="max-w-6xl mx-auto relative z-10 flex-1 px-4 py-8 w-full">
         
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold" style={{ color: '#c4a35a' }}>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--t-accent)' }}>
             {t('title')}
           </h1>
           <Link
             href="/"
             className="px-4 py-2 text-sm rounded"
-            style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+            style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-muted)' }}
           >
             {t('home')}
           </Link>
@@ -438,9 +438,9 @@ export default function AdminPage() {
               onClick={() => setTab(tb.key)}
               className="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded cursor-pointer"
               style={{
-                backgroundColor: tab === tb.key ? '#c4a35a' : '#141414',
-                color: tab === tb.key ? '#0a0a0a' : '#888888',
-                border: `1px solid ${tab === tb.key ? '#c4a35a' : '#262626'}`,
+                backgroundColor: tab === tb.key ? 'var(--t-accent)' : 'var(--t-surface)',
+                color: tab === tb.key ? 'var(--t-bg)' : 'var(--t-muted)',
+                border: `1px solid ${tab === tb.key ? 'var(--t-accent)' : 'var(--t-border)'}`,
               }}
             >
               {tb.label}
@@ -451,118 +451,118 @@ export default function AdminPage() {
         
         {tab === 'settings' && (
           <div className="max-w-2xl">
-            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{tc('adminBoosterSim.title')}</h2>
-              <p className="text-xs mb-4" style={{ color: '#555555' }}>{tc('adminBoosterSim.subtitle')}</p>
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>{tc('adminBoosterSim.title')}</h2>
+              <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>{tc('adminBoosterSim.subtitle')}</p>
               <Link
                 href="/admin/booster-simulator"
                 className="inline-block px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
-                style={{ backgroundColor: '#1a1a2e', color: '#c4a35a', border: '1px solid #c4a35a' }}
+                style={{ backgroundColor: 'var(--t-surface-2)', color: 'var(--t-accent)', border: '1px solid var(--t-accent)' }}
               >
                 {tc('adminBoosterSim.runCta')}
               </Link>
             </div>
 
-            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{tc('adminReveal.title')}</h2>
-              <p className="text-xs mb-4" style={{ color: '#555555' }}>{tc('adminReveal.subtitle')}</p>
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>{tc('adminReveal.title')}</h2>
+              <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>{tc('adminReveal.subtitle')}</p>
               <Link
                 href="/admin/reveal"
                 className="inline-block px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
-                style={{ backgroundColor: '#1a1a2e', color: '#c4a35a', border: '1px solid #c4a35a' }}
+                style={{ backgroundColor: 'var(--t-surface-2)', color: 'var(--t-accent)', border: '1px solid var(--t-accent)' }}
               >
                 {tc('adminReveal.title')}
               </Link>
             </div>
 
-            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{tc('adminFeatured.title')}</h2>
-              <p className="text-xs mb-4" style={{ color: '#555555' }}>{tc('adminFeatured.subtitle')}</p>
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>{tc('adminFeatured.title')}</h2>
+              <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>{tc('adminFeatured.subtitle')}</p>
               <Link
                 href="/admin/featured"
                 className="inline-block px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
-                style={{ backgroundColor: '#1a1a2e', color: '#c4a35a', border: '1px solid #c4a35a' }}
+                style={{ backgroundColor: 'var(--t-surface-2)', color: 'var(--t-accent)', border: '1px solid var(--t-accent)' }}
               >
                 {tc('adminFeatured.title')}
               </Link>
             </div>
 
-            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{tc('adminPostModeration.title')}</h2>
-              <p className="text-xs mb-4" style={{ color: '#555555' }}>{tc('adminPostModeration.subtitle')}</p>
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>{tc('adminPostModeration.title')}</h2>
+              <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>{tc('adminPostModeration.subtitle')}</p>
               <Link
                 href="/admin/post-moderation"
                 className="inline-block px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
-                style={{ backgroundColor: '#1a1a2e', color: '#c4a35a', border: '1px solid #c4a35a' }}
+                style={{ backgroundColor: 'var(--t-surface-2)', color: 'var(--t-accent)', border: '1px solid var(--t-accent)' }}
               >
                 {tc('adminPostModeration.title')}
               </Link>
             </div>
 
-            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{tc('adminTradeHistory.title')}</h2>
-              <p className="text-xs mb-4" style={{ color: '#555555' }}>{tc('adminTradeHistory.subtitle')}</p>
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>{tc('adminTradeHistory.title')}</h2>
+              <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>{tc('adminTradeHistory.subtitle')}</p>
               <div className="flex items-center gap-3 flex-wrap">
                 <Link
                   href="/admin/trade-history"
                   className="inline-block px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
-                  style={{ backgroundColor: '#1a1a2e', color: '#c4a35a', border: '1px solid #c4a35a' }}
+                  style={{ backgroundColor: 'var(--t-surface-2)', color: 'var(--t-accent)', border: '1px solid var(--t-accent)' }}
                 >
                   {tc('adminTradeHistory.title')}
                 </Link>
                 <Link
                   href="/admin/trade-simulator"
                   className="inline-block px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
-                  style={{ backgroundColor: '#1a1a2e', color: '#888888', border: '1px solid #333333' }}
+                  style={{ backgroundColor: 'var(--t-surface-2)', color: 'var(--t-muted)', border: '1px solid var(--t-border-strong)' }}
                 >
                   Trade simulator
                 </Link>
               </div>
             </div>
 
-            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{t('leagues.title')}</h2>
-              <p className="text-xs mb-4" style={{ color: '#555555' }}>{t('leagues.description')}</p>
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>{t('leagues.title')}</h2>
+              <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>{t('leagues.description')}</p>
               <div className="flex items-center gap-4">
                 <button
                   onClick={handleToggleLeagues}
                   disabled={leaguesLoading || leaguesToggling}
                   className="px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
                   style={{
-                    backgroundColor: leaguesEnabled ? '#3e8b3e' : '#1a1a2e',
-                    color: leaguesEnabled ? '#ffffff' : '#888888',
-                    border: `1px solid ${leaguesEnabled ? '#3e8b3e' : '#333333'}`,
+                    backgroundColor: leaguesEnabled ? 'var(--t-success)' : '#1a1a2e',
+                    color: leaguesEnabled ? '#ffffff' : 'var(--t-muted)',
+                    border: `1px solid ${leaguesEnabled ? 'var(--t-success)' : 'var(--t-border-strong)'}`,
                     opacity: leaguesToggling ? 0.6 : 1,
                   }}
                 >
                   {leaguesLoading ? t('leagues.loading') : leaguesToggling ? t('leagues.toggling') : leaguesEnabled ? t('leagues.enabled') : t('leagues.disabled')}
                 </button>
-                <span className="text-xs" style={{ color: leaguesEnabled ? '#3e8b3e' : '#b33e3e' }}>
+                <span className="text-xs" style={{ color: leaguesEnabled ? 'var(--t-success)' : 'var(--t-danger)' }}>
                   {leaguesEnabled ? t('leagues.enabledDesc') : t('leagues.disabledDesc')}
                 </span>
               </div>
             </div>
 
             
-            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{t('elo.title')}</h2>
-              <p className="text-xs mb-4" style={{ color: '#555555' }}>{t('elo.description')}</p>
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>{t('elo.title')}</h2>
+              <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>{t('elo.description')}</p>
               <button
                 onClick={handleResetElo}
                 disabled={resetEloLoading}
                 className="px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
-                style={{ backgroundColor: resetEloLoading ? '#333333' : '#b33e3e', color: '#ffffff', border: '1px solid #b33e3e', opacity: resetEloLoading ? 0.6 : 1 }}
+                style={{ backgroundColor: resetEloLoading ? 'var(--t-border-strong)' : 'var(--t-danger)', color: 'var(--t-text)', border: '1px solid var(--t-danger)', opacity: resetEloLoading ? 0.6 : 1 }}
               >
                 {resetEloLoading ? t('elo.resetting') : t('elo.resetAll')}
               </button>
             </div>
 
             
-            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{t('discord.title')}</h2>
-              <p className="text-xs mb-4" style={{ color: '#555555' }}>{t('discord.description')}</p>
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>{t('discord.title')}</h2>
+              <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>{t('discord.description')}</p>
               <div className="flex gap-3 flex-wrap">
-                <button onClick={handleCreateDiscordRoles} disabled={discordRolesLoading} className="px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer" style={{ backgroundColor: discordRolesLoading ? '#333333' : '#5865F2', color: '#ffffff', border: '1px solid #5865F2', opacity: discordRolesLoading ? 0.6 : 1 }}>
+                <button onClick={handleCreateDiscordRoles} disabled={discordRolesLoading} className="px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer" style={{ backgroundColor: discordRolesLoading ? '#333333' : '#5865F2', color: 'var(--t-text)', border: '1px solid #5865F2', opacity: discordRolesLoading ? 0.6 : 1 }}>
                   {discordRolesLoading ? t('discord.creating') : t('discord.createRoles')}
                 </button>
                 <button onClick={handleSyncDiscordRoles} disabled={discordSyncLoading} className="px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer" style={{ backgroundColor: discordSyncLoading ? '#333333' : '#1a1a2e', color: '#5865F2', border: '1px solid #5865F2', opacity: discordSyncLoading ? 0.6 : 1 }}>
@@ -572,32 +572,32 @@ export default function AdminPage() {
             </div>
 
             
-            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{t('testers.title')}</h2>
-              <p className="text-xs mb-4" style={{ color: '#555555' }}>{t('testers.description')}</p>
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>{t('testers.title')}</h2>
+              <p className="text-xs mb-4" style={{ color: 'var(--t-dim)' }}>{t('testers.description')}</p>
               <div className="flex gap-2 mb-4">
                 <input
                   type="text" value={testerSearch} onChange={(e) => setTesterSearch(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleAddTester()}
                   placeholder={t('testers.search')}
                   className="flex-1 px-3 py-2 text-sm rounded"
-                  style={{ backgroundColor: '#0a0a0a', border: '1px solid #333333', color: '#e0e0e0', outline: 'none' }}
+                  style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border-strong)', color: 'var(--t-text)', outline: 'none' }}
                 />
-                <button onClick={handleAddTester} disabled={testerAdding || !testerSearch.trim()} className="px-4 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer" style={{ backgroundColor: '#00CED1', color: '#0a0a0a', border: '1px solid #00CED1', opacity: testerAdding || !testerSearch.trim() ? 0.5 : 1 }}>
+                <button onClick={handleAddTester} disabled={testerAdding || !testerSearch.trim()} className="px-4 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer" style={{ backgroundColor: 'var(--t-success)', color: 'var(--t-on-success)', border: '1px solid #00CED1', opacity: testerAdding || !testerSearch.trim() ? 0.5 : 1 }}>
                   {t('testers.add')}
                 </button>
               </div>
               {testers.length === 0 ? (
-                <p className="text-xs" style={{ color: '#555555' }}>{t('testers.noTesters')}</p>
+                <p className="text-xs" style={{ color: 'var(--t-dim)' }}>{t('testers.noTesters')}</p>
               ) : (
                 <div className="flex flex-col gap-1">
                   {testers.map((tester) => (
-                    <div key={tester.id} className="flex items-center justify-between px-3 py-2 rounded" style={{ backgroundColor: '#0a0a0a', border: '1px solid #1a1a1a' }}>
+                    <div key={tester.id} className="flex items-center justify-between px-3 py-2 rounded" style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-surface-2)' }}>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm" style={{ color: '#e0e0e0' }}>{tester.username}</span>
-                        <span className="text-xs" style={{ color: '#555555' }}>ELO {tester.elo}</span>
+                        <span className="text-sm" style={{ color: 'var(--t-text)' }}>{tester.username}</span>
+                        <span className="text-xs" style={{ color: 'var(--t-dim)' }}>ELO {tester.elo}</span>
                       </div>
-                      <button onClick={() => handleRemoveTester(tester.username)} className="text-xs px-2 py-1 rounded cursor-pointer" style={{ backgroundColor: 'rgba(179, 62, 62, 0.1)', color: '#b33e3e', border: '1px solid rgba(179, 62, 62, 0.3)' }}>
+                      <button onClick={() => handleRemoveTester(tester.username)} className="text-xs px-2 py-1 rounded cursor-pointer" style={{ backgroundColor: 'rgba(179, 62, 62, 0.1)', color: 'var(--t-danger)', border: '1px solid rgba(179, 62, 62, 0.3)' }}>
                         {t('testers.remove')}
                       </button>
                     </div>
@@ -608,11 +608,11 @@ export default function AdminPage() {
 
             
             {results.length > 0 && (
-              <div className="rounded-lg p-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-                <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{t('actionLog')}</h2>
+              <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+                <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>{t('actionLog')}</h2>
                 <div className="flex flex-col gap-2">
                   {results.map((result, i) => (
-                    <div key={i} className="text-xs px-3 py-2 rounded" style={{ backgroundColor: result.success ? 'rgba(62, 139, 62, 0.1)' : 'rgba(179, 62, 62, 0.1)', border: `1px solid ${result.success ? '#3e8b3e30' : '#b33e3e30'}`, color: result.success ? '#3e8b3e' : '#b33e3e' }}>
+                    <div key={i} className="text-xs px-3 py-2 rounded" style={{ backgroundColor: result.success ? 'rgba(62, 139, 62, 0.1)' : 'rgba(179, 62, 62, 0.1)', border: `1px solid ${result.success ? 'var(--t-success)30' : 'var(--t-danger)30'}`, color: result.success ? 'var(--t-success)' : 'var(--t-danger)' }}>
                       {result.message}
                     </div>
                   ))}
@@ -627,21 +627,21 @@ export default function AdminPage() {
           <div>
             
             <div className="flex items-center gap-4 flex-wrap mb-4">
-              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#888888' }}>
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--t-muted)' }}>
                 {tc('adminCards.bannedCount', { count: bannedIds.size })}
               </span>
               <input
                 type="text" value={cardSearch} onChange={(e) => setCardSearch(e.target.value)}
                 placeholder={tc('adminCards.search')}
                 className="flex-1 min-w-[140px] px-3 py-2 text-sm rounded"
-                style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#e0e0e0', outline: 'none' }}
+                style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-text)', outline: 'none' }}
               />
             </div>
 
             
             <div className="flex flex-wrap gap-2 mb-4">
               {(['all', 'banned', 'authorized'] as FilterMode[]).map((f) => (
-                <button key={f} onClick={() => setCardFilter(f)} className="px-4 py-2 text-xs font-bold uppercase tracking-wider cursor-pointer" style={{ backgroundColor: cardFilter === f ? '#1a1a1a' : '#0a0a0a', borderBottom: cardFilter === f ? `2px solid ${f === 'banned' ? '#b33e3e' : f === 'authorized' ? '#4a9e4a' : '#c4a35a'}` : '2px solid transparent', color: cardFilter === f ? '#e0e0e0' : '#555555' }}>
+                <button key={f} onClick={() => setCardFilter(f)} className="px-4 py-2 text-xs font-bold uppercase tracking-wider cursor-pointer" style={{ backgroundColor: cardFilter === f ? 'var(--t-surface-2)' : 'var(--t-bg)', borderBottom: cardFilter === f ? `2px solid ${f === 'banned' ? 'var(--t-danger)' : f === 'authorized' ? '#4a9e4a' : 'var(--t-accent)'}` : '2px solid transparent', color: cardFilter === f ? 'var(--t-text)' : 'var(--t-dim)' }}>
                   {tc(`adminCards.filter.${f}`)}
                 </button>
               ))}
@@ -649,21 +649,21 @@ export default function AdminPage() {
 
             
             {cardsLoading ? (
-              <p className="text-sm" style={{ color: '#888888' }}>{tc('common.loading')}</p>
+              <p className="text-sm" style={{ color: 'var(--t-muted)' }}>{tc('common.loading')}</p>
             ) : filteredCards.length === 0 ? (
-              <p className="text-sm" style={{ color: '#555555' }}>{tc('adminCards.noCards')}</p>
+              <p className="text-sm" style={{ color: 'var(--t-dim)' }}>{tc('adminCards.noCards')}</p>
             ) : (
               <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))' }}>
                 {filteredCards.map((card) => {
                   const isBanned = bannedIds.has(card.id);
                   const isToggling = togglingId === card.id;
                   return (
-                    <div key={card.id} className="flex flex-col rounded-lg overflow-hidden" style={{ backgroundColor: '#141414', border: `1px solid ${isBanned ? '#b33e3e40' : '#262626'}`, opacity: isBanned ? 0.6 : 1, transition: 'opacity 0.2s, border-color 0.2s' }}>
+                    <div key={card.id} className="flex flex-col rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--t-surface)', border: `1px solid ${isBanned ? 'var(--t-danger)40' : 'var(--t-border)'}`, opacity: isBanned ? 0.6 : 1, transition: 'opacity 0.2s, border-color 0.2s' }}>
                       <div style={{ width: '100%' }}><CardFace card={card} /></div>
                       <div className="p-2 flex flex-col gap-1.5">
-                        <div style={{ fontSize: '11px', fontWeight: 600, color: '#e0e0e0', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{getCardName(card, locale)}</div>
-                        <div style={{ fontSize: '10px', color: '#555555' }}>{card.id}</div>
-                        <button onClick={() => toggleBan(card.id)} disabled={isToggling} className="w-full py-1.5 text-xs font-bold uppercase tracking-wider transition-colors" style={{ backgroundColor: isBanned ? '#1a0a0a' : '#0a1a0a', border: `1px solid ${isBanned ? '#b33e3e' : '#4a9e4a'}`, color: isBanned ? '#b33e3e' : '#4a9e4a', opacity: isToggling ? 0.5 : 1, cursor: isToggling ? 'wait' : 'pointer' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--t-text)', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{getCardName(card, locale)}</div>
+                        <div style={{ fontSize: '10px', color: 'var(--t-dim)' }}>{card.id}</div>
+                        <button onClick={() => toggleBan(card.id)} disabled={isToggling} className="w-full py-1.5 text-xs font-bold uppercase tracking-wider transition-colors" style={{ backgroundColor: isBanned ? '#1a0a0a' : '#0a1a0a', border: `1px solid ${isBanned ? 'var(--t-danger)' : '#4a9e4a'}`, color: isBanned ? 'var(--t-danger)' : '#4a9e4a', opacity: isToggling ? 0.5 : 1, cursor: isToggling ? 'wait' : 'pointer' }}>
                           {isBanned ? tc('adminCards.banned') : tc('adminCards.authorized')}
                         </button>
                       </div>
@@ -686,13 +686,13 @@ export default function AdminPage() {
                 onKeyDown={(e) => { if (e.key === 'Enter') fetchPlayers(playerSearch); }}
                 placeholder={t('players.searchPlaceholder')}
                 className="flex-1 px-3 py-2 text-sm"
-                style={{ backgroundColor: '#111', border: '1px solid #262626', color: '#e0e0e0', outline: 'none' }}
+                style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)', color: 'var(--t-text)', outline: 'none' }}
               />
               <button
                 onClick={() => fetchPlayers(playerSearch)}
                 disabled={playersLoading}
                 className="px-4 py-2 text-xs font-bold uppercase cursor-pointer"
-                style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+                style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
               >
                 {playersLoading ? '...' : t('players.search')}
               </button>
@@ -706,12 +706,12 @@ export default function AdminPage() {
                     key={p.id}
                     className="rounded-lg px-4 py-3 flex flex-wrap items-center gap-3"
                     style={{
-                      backgroundColor: selectedPlayerId === p.id ? '#1a1a0e' : '#111',
-                      border: `1px solid ${selectedPlayerId === p.id ? '#c4a35a44' : '#1e1e1e'}`,
+                      backgroundColor: selectedPlayerId === p.id ? '#1a1a0e' : 'var(--t-panel)',
+                      border: `1px solid ${selectedPlayerId === p.id ? 'var(--t-accent)44' : 'var(--t-surface-2)'}`,
                     }}
                   >
-                    <span className="text-sm font-medium" style={{ color: '#e0e0e0' }}>{p.username}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#1a1a1a', color: '#888' }}>{p.role}</span>
+                    <span className="text-sm font-medium" style={{ color: 'var(--t-text)' }}>{p.username}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: 'var(--t-surface-2)', color: 'var(--t-muted)' }}>{p.role}</span>
 
                     
                     {eloEditId === p.id ? (
@@ -726,30 +726,30 @@ export default function AdminPage() {
                           }}
                           autoFocus
                           className="w-16 px-1 py-0.5 text-xs text-center"
-                          style={{ backgroundColor: '#0a0a0a', border: '1px solid #c4a35a', color: '#e0e0e0', outline: 'none' }}
+                          style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-accent)', color: 'var(--t-text)', outline: 'none' }}
                         />
                         <button onClick={() => { const v = parseInt(eloEditValue); if (!isNaN(v)) handleSetElo(p.id, v); }}
-                          className="text-[10px] px-1.5 py-0.5" style={{ backgroundColor: '#1a2a1a', color: '#3e8b3e', border: '1px solid #3e8b3e44' }}>{t('players.ok')}</button>
+                          className="text-[10px] px-1.5 py-0.5" style={{ backgroundColor: 'var(--t-success-surface)', color: 'var(--t-success)', border: '1px solid var(--t-success)44' }}>{t('players.ok')}</button>
                       </div>
                     ) : (
                       <button
                         onClick={() => { setEloEditId(p.id); setEloEditValue(String(p.elo)); }}
                         className="text-xs font-bold tabular-nums cursor-pointer"
-                        style={{ color: '#c4a35a' }}
+                        style={{ color: 'var(--t-accent)' }}
                         title={t('players.editEloTooltip')}
                       >
                         ELO {p.elo}
                       </button>
                     )}
 
-                    <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>{p.wins}{t('players.winShort')} {p.losses}{t('players.lossShort')}</span>
+                    <span className="text-[10px] tabular-nums" style={{ color: 'var(--t-muted)' }}>{p.wins}{t('players.winShort')} {p.losses}{t('players.lossShort')}</span>
                     {p.discordUsername && <span className="text-[10px]" style={{ color: '#5865F2' }}>{p.discordUsername}</span>}
 
                     <div className="flex items-center gap-1.5 ml-auto">
                       <button
                         onClick={() => { setSelectedPlayerId(p.id); fetchPlayerGames(p.id); }}
                         className="px-2 py-1 text-[10px] cursor-pointer"
-                        style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888' }}
+                        style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-muted)' }}
                       >
                         {t('players.games')}
                       </button>
@@ -759,9 +759,9 @@ export default function AdminPage() {
                         disabled={playerActionLoading}
                         className="px-2 py-1 text-[10px] cursor-pointer"
                         style={{
-                          backgroundColor: p.role === 'moderator' ? '#c4a35a1f' : '#141414',
-                          border: '1px solid #262626',
-                          color: p.role === 'moderator' ? '#c4a35a' : '#888',
+                          backgroundColor: p.role === 'moderator' ? 'var(--t-accent)1f' : 'var(--t-surface)',
+                          border: '1px solid var(--t-border)',
+                          color: p.role === 'moderator' ? 'var(--t-accent)' : 'var(--t-muted)',
                         }}
                       >
                         {p.role === 'moderator' ? t('players.removeModerator') : t('players.makeModerator')}
@@ -772,9 +772,9 @@ export default function AdminPage() {
                         disabled={playerActionLoading}
                         className="px-2 py-1 text-[10px] cursor-pointer"
                         style={{
-                          backgroundColor: p.role === 'tournament_organizer' ? '#c4a35a1f' : '#141414',
-                          border: '1px solid #262626',
-                          color: p.role === 'tournament_organizer' ? '#c4a35a' : '#888',
+                          backgroundColor: p.role === 'tournament_organizer' ? 'var(--t-accent)1f' : 'var(--t-surface)',
+                          border: '1px solid var(--t-border)',
+                          color: p.role === 'tournament_organizer' ? 'var(--t-accent)' : 'var(--t-muted)',
                         }}
                       >
                         {p.role === 'tournament_organizer' ? t('players.removeOrganizer') : t('players.makeOrganizer')}
@@ -782,17 +782,17 @@ export default function AdminPage() {
 
                       {confirmResetId === p.id ? (
                         <div className="flex items-center gap-1">
-                          <span className="text-[10px]" style={{ color: '#b33e3e' }}>{t('players.resetConfirm')}</span>
+                          <span className="text-[10px]" style={{ color: 'var(--t-danger)' }}>{t('players.resetConfirm')}</span>
                           <button onClick={() => handleResetPlayer(p.id)} disabled={playerActionLoading}
-                            className="px-2 py-0.5 text-[10px]" style={{ backgroundColor: '#2a1a1a', color: '#b33e3e', border: '1px solid #b33e3e44' }}>{t('players.yes')}</button>
+                            className="px-2 py-0.5 text-[10px]" style={{ backgroundColor: 'var(--t-danger-surface)', color: 'var(--t-danger)', border: '1px solid var(--t-danger)44' }}>{t('players.yes')}</button>
                           <button onClick={() => setConfirmResetId(null)}
-                            className="px-2 py-0.5 text-[10px]" style={{ backgroundColor: '#141414', color: '#888', border: '1px solid #262626' }}>{t('players.no')}</button>
+                            className="px-2 py-0.5 text-[10px]" style={{ backgroundColor: 'var(--t-surface)', color: 'var(--t-muted)', border: '1px solid var(--t-border)' }}>{t('players.no')}</button>
                         </div>
                       ) : (
                         <button
                           onClick={() => setConfirmResetId(p.id)}
                           className="px-2 py-1 text-[10px] cursor-pointer"
-                          style={{ backgroundColor: '#1a1414', border: '1px solid #b33e3e33', color: '#b33e3e' }}
+                          style={{ backgroundColor: 'var(--t-surface-2)', border: '1px solid var(--t-danger)33', color: 'var(--t-danger)' }}
                         >
                           {t('players.reset')}
                         </button>
@@ -807,18 +807,18 @@ export default function AdminPage() {
             {selectedPlayerId && (
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: '#555' }}>
+                  <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
                     {t('players.matchHistory')}
                   </h3>
-                  <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
+                  <div className="flex-1 h-px" style={{ backgroundColor: 'var(--t-surface-2)' }} />
                   <button onClick={() => { setSelectedPlayerId(null); setPlayerGames([]); }}
-                    className="text-[10px] px-2 py-0.5" style={{ color: '#888', border: '1px solid #262626' }}>{t('players.close')}</button>
+                    className="text-[10px] px-2 py-0.5" style={{ color: 'var(--t-muted)', border: '1px solid var(--t-border)' }}>{t('players.close')}</button>
                 </div>
 
                 {gamesLoading ? (
-                  <p className="text-xs py-4" style={{ color: '#555' }}>{tc('common.loading')}</p>
+                  <p className="text-xs py-4" style={{ color: 'var(--t-dim)' }}>{tc('common.loading')}</p>
                 ) : playerGames.length === 0 ? (
-                  <p className="text-xs py-4" style={{ color: '#555' }}>{t('players.noGames')}</p>
+                  <p className="text-xs py-4" style={{ color: 'var(--t-dim)' }}>{t('players.noGames')}</p>
                 ) : (
                   <div className="flex flex-col gap-1">
                     {playerGames.map((game) => {
@@ -832,39 +832,39 @@ export default function AdminPage() {
                       const myScore = isP1 ? game.player1Score : game.player2Score;
                       const oppScore = isP1 ? game.player2Score : game.player1Score;
                       const eloVal = game.eloChange !== null ? (isP1 ? game.eloChange : -game.eloChange) : null;
-                      const resultColor = won ? '#3e8b3e' : '#b33e3e';
+                      const resultColor = won ? 'var(--t-success)' : 'var(--t-danger)';
 
                       return (
                         <div
                           key={game.id}
                           className="rounded flex items-center gap-2 px-3 py-2"
-                          style={{ backgroundColor: '#111', borderLeft: `2px solid ${resultColor}` }}
+                          style={{ backgroundColor: 'var(--t-panel)', borderLeft: `2px solid ${resultColor}` }}
                         >
                           <span className="text-[10px] font-bold w-4 shrink-0" style={{ color: resultColor }}>{won ? t('players.winShort') : t('players.lossShort')}</span>
-                          <span className="text-xs truncate flex-1" style={{ color: '#ccc' }}>{opponent}</span>
-                          <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>{myScore}-{oppScore}</span>
+                          <span className="text-xs truncate flex-1" style={{ color: 'var(--t-text)' }}>{opponent}</span>
+                          <span className="text-[10px] tabular-nums" style={{ color: 'var(--t-muted)' }}>{myScore}-{oppScore}</span>
                           {eloVal !== null && eloVal !== 0 && (
-                            <span className="text-[10px] tabular-nums w-8 text-right" style={{ color: eloVal > 0 ? '#3e8b3e' : '#b33e3e' }}>
+                            <span className="text-[10px] tabular-nums w-8 text-right" style={{ color: eloVal > 0 ? 'var(--t-success)' : 'var(--t-danger)' }}>
                               {eloVal > 0 ? '+' : ''}{eloVal}
                             </span>
                           )}
-                          <span className="text-[9px] shrink-0" style={{ color: '#444' }}>
+                          <span className="text-[9px] shrink-0" style={{ color: 'var(--t-muted)' }}>
                             {game.completedAt ? new Date(game.completedAt).toLocaleDateString(locale) : ''}
                           </span>
 
                           {confirmDeleteGameId === game.id ? (
                             <div className="flex items-center gap-1 shrink-0">
-                              <span className="text-[9px]" style={{ color: '#b33e3e' }}>{t('players.deleteConfirm')}</span>
+                              <span className="text-[9px]" style={{ color: 'var(--t-danger)' }}>{t('players.deleteConfirm')}</span>
                               <button onClick={() => handleDeleteGame(game.id)} disabled={playerActionLoading}
-                                className="px-1.5 py-0.5 text-[9px]" style={{ backgroundColor: '#2a1a1a', color: '#b33e3e', border: '1px solid #b33e3e44' }}>{t('players.yes')}</button>
+                                className="px-1.5 py-0.5 text-[9px]" style={{ backgroundColor: 'var(--t-danger-surface)', color: 'var(--t-danger)', border: '1px solid var(--t-danger)44' }}>{t('players.yes')}</button>
                               <button onClick={() => setConfirmDeleteGameId(null)}
-                                className="px-1.5 py-0.5 text-[9px]" style={{ backgroundColor: '#141414', color: '#888', border: '1px solid #262626' }}>{t('players.no')}</button>
+                                className="px-1.5 py-0.5 text-[9px]" style={{ backgroundColor: 'var(--t-surface)', color: 'var(--t-muted)', border: '1px solid var(--t-border)' }}>{t('players.no')}</button>
                             </div>
                           ) : (
                             <button
                               onClick={() => setConfirmDeleteGameId(game.id)}
                               className="px-2 py-0.5 text-[9px] shrink-0 cursor-pointer"
-                              style={{ backgroundColor: '#1a1414', border: '1px solid #b33e3e22', color: '#b33e3e' }}
+                              style={{ backgroundColor: 'var(--t-surface-2)', border: '1px solid var(--t-danger)22', color: 'var(--t-danger)' }}
                             >
                               {t('players.delete')}
                             </button>
@@ -983,15 +983,15 @@ function SuspiciousPanel() {
   const visible = findings.filter((f) => !dismissed.has(f.id));
 
   const severityColor = (s: SuspiciousFinding['severity']) =>
-    s === 'high' ? '#b33e3e' : s === 'medium' ? '#c4a35a' : '#888888';
+    s === 'high' ? 'var(--t-danger)' : s === 'medium' ? 'var(--t-accent)' : 'var(--t-muted)';
 
   return (
     <div className="max-w-4xl flex flex-col gap-4">
-      <div className="rounded-lg p-4" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-        <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>
+      <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+        <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--t-accent)' }}>
           {t('title')}
         </h2>
-        <p className="text-[11px] mb-3" style={{ color: '#666' }}>
+        <p className="text-[11px] mb-3" style={{ color: 'var(--t-dim)' }}>
           {t('heuristicsDesc')}
         </p>
         <div className="flex items-center gap-2">
@@ -1002,13 +1002,13 @@ function SuspiciousPanel() {
             onChange={(e) => setFilter(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && runAnalysis(filter ? { user: filter } : undefined)}
             className="flex-1 px-3 py-1.5 text-xs rounded"
-            style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626', color: '#ddd' }}
+            style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border)', color: 'var(--t-text)' }}
           />
           <button
             onClick={() => runAnalysis(filter ? { user: filter } : undefined)}
             disabled={loading}
             className="px-3 py-1.5 text-[11px] rounded uppercase tracking-wider font-bold cursor-pointer"
-            style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+            style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
           >
             {loading ? t('running') : t('runAnalysis')}
           </button>
@@ -1016,31 +1016,31 @@ function SuspiciousPanel() {
             <button
               onClick={() => { setFilter(''); runAnalysis(); }}
               className="px-3 py-1.5 text-[11px] rounded"
-              style={{ backgroundColor: '#141414', border: '1px solid #333', color: '#888' }}
+              style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border-strong)', color: 'var(--t-muted)' }}
             >
               {t('clear')}
             </button>
           )}
         </div>
         {error && (
-          <div className="mt-3 text-[11px] px-3 py-2 rounded" style={{ backgroundColor: 'rgba(179,62,62,0.1)', color: '#b33e3e', border: '1px solid #b33e3e33' }}>
+          <div className="mt-3 text-[11px] px-3 py-2 rounded" style={{ backgroundColor: 'rgba(179,62,62,0.1)', color: 'var(--t-danger)', border: '1px solid var(--t-danger)33' }}>
             {error}
           </div>
         )}
         {actionMsg && (
-          <div className="mt-3 text-[11px] px-3 py-2 rounded" style={{ backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a', border: '1px solid #c4a35a33' }}>
+          <div className="mt-3 text-[11px] px-3 py-2 rounded" style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)', border: '1px solid var(--t-accent)33' }}>
             {actionMsg}
           </div>
         )}
-        <div className="mt-3 text-[10px]" style={{ color: '#555' }}>
+        <div className="mt-3 text-[10px]" style={{ color: 'var(--t-dim)' }}>
           {t('findingsShown', { n: visible.length })}
           {dismissed.size > 0 && ` ${t('dismissedSession', { n: dismissed.size })}`}
         </div>
       </div>
 
       {visible.length === 0 && !loading && (
-        <div className="rounded-lg p-6 text-center" style={{ backgroundColor: '#111', border: '1px solid #1e1e1e' }}>
-          <span className="text-xs" style={{ color: '#555' }}>
+        <div className="rounded-lg p-6 text-center" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-surface-2)' }}>
+          <span className="text-xs" style={{ color: 'var(--t-dim)' }}>
             {filter ? t('noFindingsFiltered') : t('noFindingsGlobal')}
           </span>
         </div>
@@ -1050,7 +1050,7 @@ function SuspiciousPanel() {
         <div
           key={f.id}
           className="rounded-lg p-4 flex flex-col gap-3"
-          style={{ backgroundColor: '#141414', border: `1px solid ${severityColor(f.severity)}44` }}
+          style={{ backgroundColor: 'var(--t-surface)', border: `1px solid ${severityColor(f.severity)}44` }}
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2 flex-wrap">
@@ -1060,64 +1060,64 @@ function SuspiciousPanel() {
               >
                 {f.severity}
               </span>
-              <span className="text-[9px] px-2 py-0.5 rounded uppercase" style={{ backgroundColor: '#0a0a0a', color: '#888', border: '1px solid #262626' }}>
+              <span className="text-[9px] px-2 py-0.5 rounded uppercase" style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-muted)', border: '1px solid var(--t-border)' }}>
                 {f.type.replace(/_/g, ' ')}
               </span>
-              <span className="text-sm font-bold" style={{ color: '#ddd' }}>{f.title}</span>
+              <span className="text-sm font-bold" style={{ color: 'var(--t-text)' }}>{f.title}</span>
             </div>
             <button
               onClick={() => setDismissed((s) => new Set(s).add(f.id))}
               className="text-[10px] px-2 py-1 rounded"
-              style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626', color: '#666' }}
+              style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border)', color: 'var(--t-dim)' }}
               title={t('dismissTitle')}
             >
               {t('dismiss')}
             </button>
           </div>
 
-          <p className="text-[11px]" style={{ color: '#aaa' }}>{f.description}</p>
+          <p className="text-[11px]" style={{ color: 'var(--t-muted)' }}>{f.description}</p>
 
           {f.users.length > 0 && (
             <div className="flex flex-col gap-1">
-              <div className="text-[10px] uppercase tracking-wider" style={{ color: '#555' }}>{t('involvedAccounts')}</div>
+              <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--t-dim)' }}>{t('involvedAccounts')}</div>
               {f.users.map((u) => (
-                <div key={u.id} className="flex items-center gap-3 text-[11px] flex-wrap" style={{ color: '#ccc' }}>
-                  <span className="font-bold" style={{ color: '#c4a35a' }}>{u.username}</span>
-                  <span style={{ color: '#666' }}>ELO {u.elo}</span>
-                  <span style={{ color: '#666' }}>W/L {u.wins}/{u.losses}</span>
-                  <span style={{ color: '#555' }}>{u.email}</span>
-                  {u.discordId && <span style={{ color: '#555' }}>{t('discordId', { id: u.discordId })}</span>}
-                  <span style={{ color: '#444' }}>{t('createdAt', { date: new Date(u.createdAt).toLocaleString(locale) })}</span>
+                <div key={u.id} className="flex items-center gap-3 text-[11px] flex-wrap" style={{ color: 'var(--t-text)' }}>
+                  <span className="font-bold" style={{ color: 'var(--t-accent)' }}>{u.username}</span>
+                  <span style={{ color: 'var(--t-dim)' }}>ELO {u.elo}</span>
+                  <span style={{ color: 'var(--t-dim)' }}>W/L {u.wins}/{u.losses}</span>
+                  <span style={{ color: 'var(--t-dim)' }}>{u.email}</span>
+                  {u.discordId && <span style={{ color: 'var(--t-dim)' }}>{t('discordId', { id: u.discordId })}</span>}
+                  <span style={{ color: 'var(--t-muted)' }}>{t('createdAt', { date: new Date(u.createdAt).toLocaleString(locale) })}</span>
                 </div>
               ))}
             </div>
           )}
 
           {f.game && (
-            <div className="flex flex-col gap-1 mt-1 pt-2" style={{ borderTop: '1px solid #262626' }}>
-              <div className="text-[10px] uppercase tracking-wider" style={{ color: '#555' }}>{t('gameLabel')}</div>
-              <div className="text-[11px] flex items-center gap-3 flex-wrap" style={{ color: '#ccc' }}>
-                <span style={{ color: '#666' }}>#{f.game.id.slice(-8)}</span>
+            <div className="flex flex-col gap-1 mt-1 pt-2" style={{ borderTop: '1px solid var(--t-border)' }}>
+              <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--t-dim)' }}>{t('gameLabel')}</div>
+              <div className="text-[11px] flex items-center gap-3 flex-wrap" style={{ color: 'var(--t-text)' }}>
+                <span style={{ color: 'var(--t-dim)' }}>#{f.game.id.slice(-8)}</span>
                 <span>{f.game.player1Name ?? '?'} {f.game.player1Score} - {f.game.player2Score} {f.game.player2Name ?? '?'}</span>
-                {f.game.durationSec != null && <span style={{ color: '#666' }}>{f.game.durationSec}s</span>}
-                {f.game.eloChange != null && <span style={{ color: '#666' }}>{t('eloDelta', { delta: f.game.eloChange })}</span>}
-                {f.game.completedAt && <span style={{ color: '#444' }}>{new Date(f.game.completedAt).toLocaleString(locale)}</span>}
+                {f.game.durationSec != null && <span style={{ color: 'var(--t-dim)' }}>{f.game.durationSec}s</span>}
+                {f.game.eloChange != null && <span style={{ color: 'var(--t-dim)' }}>{t('eloDelta', { delta: f.game.eloChange })}</span>}
+                {f.game.completedAt && <span style={{ color: 'var(--t-muted)' }}>{new Date(f.game.completedAt).toLocaleString(locale)}</span>}
               </div>
               {confirmRevertGameId === f.game.id ? (
                 <div className="flex items-center gap-2 mt-2">
-                  <span className="text-[10px]" style={{ color: '#b33e3e' }}>{t('confirmRevert')}</span>
+                  <span className="text-[10px]" style={{ color: 'var(--t-danger)' }}>{t('confirmRevert')}</span>
                   <button
                     onClick={() => f.game && handleRevertElo(f.game.id)}
                     disabled={actioningId === f.game.id}
                     className="text-[10px] px-3 py-1 rounded"
-                    style={{ backgroundColor: '#b33e3e', color: '#fff' }}
+                    style={{ backgroundColor: 'var(--t-danger)', color: 'var(--t-on-danger)' }}
                   >
                     {actioningId === f.game.id ? t('reverting') : t('yesRevert')}
                   </button>
                   <button
                     onClick={() => setConfirmRevertGameId(null)}
                     className="text-[10px] px-3 py-1 rounded"
-                    style={{ backgroundColor: '#0a0a0a', border: '1px solid #333', color: '#888' }}
+                    style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border-strong)', color: 'var(--t-muted)' }}
                   >
                     {t('cancel')}
                   </button>
@@ -1129,9 +1129,9 @@ function SuspiciousPanel() {
                     disabled={f.game.eloChange == null}
                     className="text-[10px] px-3 py-1 rounded cursor-pointer"
                     style={{
-                      backgroundColor: f.game.eloChange == null ? '#141414' : 'rgba(179,62,62,0.1)',
-                      color: f.game.eloChange == null ? '#555' : '#b33e3e',
-                      border: `1px solid ${f.game.eloChange == null ? '#262626' : '#b33e3e44'}`,
+                      backgroundColor: f.game.eloChange == null ? 'var(--t-surface)' : 'rgba(179,62,62,0.1)',
+                      color: f.game.eloChange == null ? 'var(--t-dim)' : 'var(--t-danger)',
+                      border: `1px solid ${f.game.eloChange == null ? 'var(--t-border)' : 'var(--t-danger)44'}`,
                     }}
                     title={f.game.eloChange == null ? t('noEloToRevert') : undefined}
                   >
@@ -1143,10 +1143,10 @@ function SuspiciousPanel() {
           )}
 
           {Object.keys(f.metrics).length > 0 && (
-            <div className="flex items-center gap-2 flex-wrap text-[10px]" style={{ color: '#555' }}>
+            <div className="flex items-center gap-2 flex-wrap text-[10px]" style={{ color: 'var(--t-dim)' }}>
               {Object.entries(f.metrics).map(([k, v]) => (
-                <span key={k} className="px-2 py-0.5 rounded" style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626' }}>
-                  {k}: <span style={{ color: '#888' }}>{String(v)}</span>
+                <span key={k} className="px-2 py-0.5 rounded" style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border)' }}>
+                  {k}: <span style={{ color: 'var(--t-muted)' }}>{String(v)}</span>
                 </span>
               ))}
             </div>

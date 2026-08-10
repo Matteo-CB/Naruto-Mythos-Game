@@ -80,16 +80,16 @@ export function LiveGamesSection({ filter = 'all' }: Props) {
   return (
     <div className="w-full mt-4">
       <div className="flex items-center gap-2 mb-2">
-        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#3e8b3e' }} />
-        <span className="text-xs uppercase font-bold tracking-wider" style={{ color: '#c4a35a' }}>
+        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--t-success)' }} />
+        <span className="text-xs uppercase font-bold tracking-wider" style={{ color: 'var(--t-accent)' }}>
           {t('spectator.liveGames')}
         </span>
-        <span className="text-[10px]" style={{ color: '#555' }}>({publicGames.length})</span>
+        <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>({publicGames.length})</span>
       </div>
-      <div className="rounded-lg overflow-hidden" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
+      <div className="rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
         {publicGames.length === 0 ? (
           <div className="px-4 py-4 text-center">
-            <span className="text-[11px]" style={{ color: '#555' }}>
+            <span className="text-[11px]" style={{ color: 'var(--t-dim)' }}>
               {t('spectator.noLiveGames')}
             </span>
           </div>
@@ -97,25 +97,25 @@ export function LiveGamesSection({ filter = 'all' }: Props) {
           <div className="max-h-48 overflow-y-auto">
             {publicGames.map((game) => (
               <div key={game.roomCode} className="flex items-center justify-between px-4 py-2.5"
-                style={{ borderBottom: '1px solid #1e1e1e' }}>
+                style={{ borderBottom: '1px solid var(--t-surface-2)' }}>
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-xs font-medium" style={{ color: '#e0e0e0' }}>
-                    <PlayerNameLink username={game.player1Name} disabled={game.player1Name === '__anonymous__'} /> <span style={{ color: '#555' }}>{t('spectator.vs')}</span> <PlayerNameLink username={game.player2Name} disabled={game.player2Name === '__anonymous__'} />
+                  <span className="text-xs font-medium" style={{ color: 'var(--t-text)' }}>
+                    <PlayerNameLink username={game.player1Name} disabled={game.player1Name === '__anonymous__'} /> <span style={{ color: 'var(--t-dim)' }}>{t('spectator.vs')}</span> <PlayerNameLink username={game.player2Name} disabled={game.player2Name === '__anonymous__'} />
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="text-[9px]" style={{ color: '#888' }}>
+                    <span className="text-[9px]" style={{ color: 'var(--t-muted)' }}>
                       {t('spectator.turn', { turn: game.turn })}
                     </span>
-                    <span className="text-[9px]" style={{ color: game.isRanked ? '#c4a35a' : '#666' }}>
+                    <span className="text-[9px]" style={{ color: game.isRanked ? 'var(--t-accent)' : 'var(--t-dim)' }}>
                       {game.isRanked ? t('spectator.ranked') : t('spectator.casual')}
                     </span>
                     {game.isEvolving && (
-                      <span className="text-[9px] uppercase font-bold" style={{ color: '#c4a35a' }}>
+                      <span className="text-[9px] uppercase font-bold" style={{ color: 'var(--t-accent)' }}>
                         {t('evolving.modeTag')}
                       </span>
                     )}
                     {game.spectatorCount > 0 && (
-                      <span className="text-[9px]" style={{ color: '#666' }}>
+                      <span className="text-[9px]" style={{ color: 'var(--t-dim)' }}>
                         {t('spectator.spectators', { count: game.spectatorCount })}
                       </span>
                     )}
@@ -124,7 +124,7 @@ export function LiveGamesSection({ filter = 'all' }: Props) {
                 <button onClick={() => handleSpectate(game)}
                   disabled={spectateLoading === game.roomCode}
                   className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer disabled:opacity-50"
-                  style={{ backgroundColor: 'rgba(196,163,90,0.1)', border: '1px solid rgba(196,163,90,0.3)', color: '#c4a35a' }}>
+                  style={{ backgroundColor: 'var(--t-accent-glow)', border: '1px solid rgba(196,163,90,0.3)', color: 'var(--t-accent)' }}>
                   {spectateLoading === game.roomCode ? '...' : t('spectator.joinSpectate')}
                 </button>
               </div>

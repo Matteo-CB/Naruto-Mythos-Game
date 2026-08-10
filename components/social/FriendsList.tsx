@@ -22,7 +22,7 @@ export function FriendsList() {
     return (
       <div
         className="text-sm py-6 text-center"
-        style={{ color: '#555555' }}
+        style={{ color: 'var(--t-dim)' }}
       >
         ...
       </div>
@@ -33,7 +33,7 @@ export function FriendsList() {
     return (
       <div
         className="text-sm py-6 text-center"
-        style={{ color: '#555555' }}
+        style={{ color: 'var(--t-dim)' }}
       >
         {t('list.empty')}
       </div>
@@ -49,8 +49,8 @@ export function FriendsList() {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-between"
           style={{
-            backgroundColor: '#111111',
-            border: '1px solid #262626',
+            backgroundColor: 'var(--t-panel)',
+            border: '1px solid var(--t-border)',
             borderRadius: 6,
             padding: '12px 16px',
           }}
@@ -59,17 +59,17 @@ export function FriendsList() {
             <Link
               href={`/profile/${encodeURIComponent(friend.username)}`}
               className="text-sm font-medium no-underline"
-              style={{ color: '#e0e0e0' }}
+              style={{ color: 'var(--t-text)' }}
             >
               {friend.username}
             </Link>
             <span
               className="text-xs px-2 py-0.5"
               style={{
-                backgroundColor: 'rgba(196, 163, 90, 0.1)',
+                backgroundColor: 'var(--t-accent-glow)',
                 border: '1px solid rgba(196, 163, 90, 0.25)',
                 borderRadius: 4,
-                color: '#c4a35a',
+                color: 'var(--t-accent)',
               }}
             >
               {friend.elo}
@@ -84,9 +84,9 @@ export function FriendsList() {
               className="h-8 px-3 text-xs font-medium cursor-pointer"
               style={{
                 backgroundColor: 'transparent',
-                border: '1px solid #c4a35a',
+                border: '1px solid var(--t-accent)',
                 borderRadius: 4,
-                color: '#c4a35a',
+                color: 'var(--t-accent)',
               }}
             >
               {t('list.invite')}
@@ -99,9 +99,9 @@ export function FriendsList() {
               className="h-8 px-3 text-xs font-medium cursor-pointer"
               style={{
                 backgroundColor: 'transparent',
-                border: '1px solid #333333',
+                border: '1px solid var(--t-border-strong)',
                 borderRadius: 4,
-                color: '#888888',
+                color: 'var(--t-muted)',
               }}
             >
               {t('list.remove')}

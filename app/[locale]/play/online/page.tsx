@@ -303,31 +303,31 @@ export default function PlayOnlinePage() {
       <main
         id="main-content"
         className="flex min-h-screen relative flex-col"
-        style={{ backgroundColor: '#0a0a0a' }}
+        style={{ backgroundColor: 'var(--t-bg)' }}
       >
         <CloudBackground />
         <DecorativeIcons />
         <CardBackgroundDecor variant="playOnline" />
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="flex flex-col items-center gap-6 max-w-md w-full text-center relative z-10">
-            <h1 className="text-2xl font-bold" style={{ color: '#c4a35a', letterSpacing: '0.22em' }}>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--t-accent)', letterSpacing: '0.22em' }}>
               {t('online.title')}
             </h1>
-            <p className="text-sm" style={{ color: '#888888' }}>
+            <p className="text-sm" style={{ color: 'var(--t-muted)' }}>
               {t('online.signInRequired')}
             </p>
             <div className="flex gap-3">
               <Link
                 href="/login"
                 className="px-6 py-2.5 text-sm font-bold tracking-wider"
-                style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+                style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
               >
                 {t('common.signIn')}
               </Link>
               <Link
                 href="/"
                 className="px-6 py-2.5 text-sm"
-                style={{ backgroundColor: '#141414', color: '#888888' }}
+                style={{ backgroundColor: 'var(--t-surface)', color: 'var(--t-muted)' }}
               >
                 {t('common.back')}
               </Link>
@@ -447,15 +447,15 @@ export default function PlayOnlinePage() {
   }, [tournamentMatchRoom, deckSelected]);
 
   const modeStyle = (mode: GameMode) => ({
-    backgroundColor: selectedMode === mode ? 'rgba(196, 163, 90, 0.14)' : 'transparent',
-    color: selectedMode === mode ? '#e8c477' : '#666666',
+    backgroundColor: selectedMode === mode ? 'var(--t-accent-glow)' : 'transparent',
+    color: selectedMode === mode ? 'var(--t-accent-bright)' : 'var(--t-dim)',
   });
 
   return (
     <main
       id="main-content"
       className="flex min-h-screen relative flex-col"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{ backgroundColor: 'var(--t-bg)' }}
     >
       <CloudBackground />
       <DecorativeIcons />
@@ -472,16 +472,16 @@ export default function PlayOnlinePage() {
             <h1
               className="font-display text-2xl sm:text-3xl md:text-4xl font-bold leading-none"
               style={{
-                color: '#e8c477',
+                color: 'var(--t-accent-bright)',
                 letterSpacing: '0.18em',
-                textShadow: '0 2px 18px rgba(196, 163, 90, 0.22)',
+                textShadow: '0 2px 18px var(--t-accent-glow)',
               }}
             >
               {t('online.title')}
             </h1>
             <p
               className="font-body text-[10px] sm:text-[11px]"
-              style={{ color: '#666', letterSpacing: '0.32em' }}
+              style={{ color: 'var(--t-dim)', letterSpacing: '0.32em' }}
             >
               {t('online.signedInAs', { name: session.user.name })}
             </p>
@@ -491,15 +491,15 @@ export default function PlayOnlinePage() {
           {bannedCardsError && bannedCardsError.length > 0 && (
             <div
               className="w-full px-4 py-3 mb-4 text-xs flex flex-col gap-2"
-              style={{ backgroundColor: 'rgba(26, 10, 10, 0.92)', boxShadow: 'inset 0 0 0 1px rgba(179, 62, 62, 0.35)', color: '#e8e8e8' }}
+              style={{ backgroundColor: 'color-mix(in srgb, var(--t-danger) 10%, var(--t-panel))', boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--t-danger) 35%, transparent)', color: 'var(--t-text)' }}
             >
-              <div style={{ color: '#b33e3e' }}>{t('online.deckBannedTitle')}</div>
-              <div style={{ color: '#888888', fontSize: '10px' }}>{t('online.deckBannedRankedOnly')}</div>
+              <div style={{ color: 'var(--t-danger)' }}>{t('online.deckBannedTitle')}</div>
+              <div style={{ color: 'var(--t-muted)', fontSize: '10px' }}>{t('online.deckBannedRankedOnly')}</div>
               <div className="flex flex-col gap-1">
                 {bannedCardsError.map((bc) => (
                   <div key={bc.cardId} className="flex items-center gap-2">
-                    <span style={{ color: '#b33e3e', fontWeight: 600 }}>{bc.cardId}</span>
-                    {bc.reason && <span style={{ color: '#888888', fontStyle: 'italic' }}>: {bc.reason}</span>}
+                    <span style={{ color: 'var(--t-danger)', fontWeight: 600 }}>{bc.cardId}</span>
+                    {bc.reason && <span style={{ color: 'var(--t-muted)', fontStyle: 'italic' }}>: {bc.reason}</span>}
                   </div>
                 ))}
               </div>
@@ -514,7 +514,7 @@ export default function PlayOnlinePage() {
                   intensity="subtle"
                   motion="idle"
                   className="overflow-hidden"
-                  style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}
+                  style={{ backgroundColor: 'var(--t-panel)', boxShadow: '0 12px 32px var(--t-shadow)' }}
                 >
                   <div className="p-4 sm:p-6">
                     <DeckSelector
@@ -526,7 +526,7 @@ export default function PlayOnlinePage() {
                   </div>
                 </HoloSurface>
               ) : (
-                <div className="p-4 sm:p-6" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
+                <div className="p-4 sm:p-6" style={{ backgroundColor: 'var(--t-panel)', boxShadow: '0 12px 32px var(--t-shadow)' }}>
                   <DeckSelector
                     onSelect={handleDeckSelect}
                     allCharacters={cards.characters}
@@ -540,13 +540,13 @@ export default function PlayOnlinePage() {
 
           {deckSelected && (
             <div className="flex flex-col items-center gap-3 mb-4">
-              <p className="text-xs" style={{ color: '#c4a35a' }}>
+              <p className="text-xs" style={{ color: 'var(--t-accent)' }}>
                 {opponentChangingDeck ? t('online.opponentChangingDeck') : t('online.waitingForOpponent')}
               </p>
               <button
                 onClick={() => { changeDeck(); setDeckSelected(false); }}
                 className="px-4 py-2 text-xs cursor-pointer"
-                style={{ backgroundColor: 'rgba(20, 20, 20, 0.9)', color: '#888' }}
+                style={{ backgroundColor: 'var(--t-surface)', color: 'var(--t-muted)' }}
               >
                 {t('online.changeDeck')}
               </button>
@@ -603,9 +603,9 @@ export default function PlayOnlinePage() {
                       isEvolving={currentRoomIsEvolving}
                       createdAt={roomCreatedAt}
                     />
-                    <div className="p-6" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
+                    <div className="p-6" style={{ backgroundColor: 'var(--t-panel)', boxShadow: '0 12px 32px var(--t-shadow)' }}>
                       <div className="flex flex-col gap-4 items-center">
-                        <p className="text-sm font-bold" style={{ color: '#c4a35a', letterSpacing: '0.18em' }}>
+                        <p className="text-sm font-bold" style={{ color: 'var(--t-accent)', letterSpacing: '0.18em' }}>
                           {opponentJoined ? t('online.opponentJoined') : t('online.waitingForOpponent')}
                         </p>
                       </div>
@@ -622,37 +622,37 @@ export default function PlayOnlinePage() {
                         createdAt={roomCreatedAt}
                       />
                     )}
-                    <div className="p-5 sm:p-7" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
+                    <div className="p-5 sm:p-7" style={{ backgroundColor: 'var(--t-panel)', boxShadow: '0 12px 32px var(--t-shadow)' }}>
                       {roomCode ? (
                       <div className="flex flex-col gap-5 items-center py-3">
-                        <p className="font-body text-[11px]" style={{ color: '#888', letterSpacing: '0.32em' }}>
+                        <p className="font-body text-[11px]" style={{ color: 'var(--t-muted)', letterSpacing: '0.32em' }}>
                           {t('online.roomCreated')}
                         </p>
                         <div
                           className="px-8 py-5"
                           style={{
-                            backgroundColor: 'rgba(196, 163, 90, 0.06)',
-                            boxShadow: 'inset 0 0 0 1px rgba(196, 163, 90, 0.25)',
+                            backgroundColor: 'var(--t-accent-tint)',
+                            boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--t-accent) 25%, transparent)',
                           }}
                         >
                           <p
                             className="font-display text-3xl sm:text-4xl font-bold"
                             style={{
-                              color: '#e8c477',
+                              color: 'var(--t-accent-bright)',
                               letterSpacing: '0.32em',
-                              textShadow: '0 2px 18px rgba(196, 163, 90, 0.35)',
+                              textShadow: '0 2px 18px var(--t-accent-glow)',
                             }}
                           >
                             {roomCode}
                           </p>
                         </div>
-                        <p className="font-body text-[11px]" style={{ color: '#555', letterSpacing: '0.2em' }}>
+                        <p className="font-body text-[11px]" style={{ color: 'var(--t-dim)', letterSpacing: '0.2em' }}>
                           {opponentJoined ? t('online.opponentJoined') : t('online.waitingForOpponent')}
                         </p>
                       </div>
                     ) : showJoinInput ? (
                       <div className="flex flex-col gap-5 items-center">
-                        <p className="font-body text-[11px]" style={{ color: '#888', letterSpacing: '0.32em' }}>
+                        <p className="font-body text-[11px]" style={{ color: 'var(--t-muted)', letterSpacing: '0.32em' }}>
                           {t('online.enterCode')}
                         </p>
                         <input
@@ -663,10 +663,10 @@ export default function PlayOnlinePage() {
                           placeholder={t('online.codePlaceholder')}
                           className="font-display w-full text-center text-3xl font-bold py-4 outline-none"
                           style={{
-                            backgroundColor: 'rgba(8, 8, 14, 0.7)',
-                            color: '#e8e8e8',
+                            backgroundColor: 'var(--t-surface)',
+                            color: 'var(--t-text)',
                             letterSpacing: '0.32em',
-                            boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
+                            boxShadow: 'inset 0 0 0 1px var(--t-divider)',
                           }}
                         />
                         <button
@@ -674,8 +674,8 @@ export default function PlayOnlinePage() {
                           disabled={joinCode.length < 6}
                           className="w-full py-3 text-sm font-bold cursor-pointer no-select transition-opacity"
                           style={{
-                            backgroundColor: joinCode.length < 6 ? '#2a2a2a' : '#c4a35a',
-                            color: joinCode.length < 6 ? '#666' : '#0a0a0a',
+                            backgroundColor: joinCode.length < 6 ? 'var(--t-surface-2)' : 'var(--t-accent)',
+                            color: joinCode.length < 6 ? 'var(--t-dim)' : 'var(--t-bg)',
                             letterSpacing: '0.22em',
                           }}
                         >
@@ -684,7 +684,7 @@ export default function PlayOnlinePage() {
                         <button
                           onClick={() => setShowJoinInput(false)}
                           className="font-body text-[11px] cursor-pointer transition-opacity hover:opacity-100"
-                          style={{ color: '#888', letterSpacing: '0.3em', opacity: 0.7 }}
+                          style={{ color: 'var(--t-muted)', letterSpacing: '0.3em', opacity: 0.7 }}
                         >
                           {'<'} {t('common.back')}
                         </button>
@@ -694,13 +694,17 @@ export default function PlayOnlinePage() {
                         <Section title={t('online.sectionMode')}>
                           <div
                             className="relative flex w-full"
-                            style={{ backgroundColor: 'rgba(8, 8, 12, 0.55)' }}
+                            style={{ backgroundColor: 'var(--t-surface)' }}
                           >
                             {(['casual', 'ranked'] as GameMode[]).map((mode) => {
                               const active = selectedMode === mode;
-                              const accent = mode === 'ranked' ? '#b33e3e' : '#c4a35a';
-                              const activeColor = mode === 'ranked' ? '#ec8a8a' : '#f0d089';
-                              const subtleBg = mode === 'ranked' ? 'rgba(179, 62, 62, 0.05)' : 'rgba(196, 163, 90, 0.04)';
+                              const accent = mode === 'ranked' ? 'var(--t-danger)' : 'var(--t-accent)';
+                              const activeColor = mode === 'ranked'
+                                ? 'color-mix(in srgb, var(--t-danger) 60%, var(--t-text))'
+                                : 'var(--t-accent-bright)';
+                              const subtleBg = mode === 'ranked'
+                                ? 'color-mix(in srgb, var(--t-danger) 6%, transparent)'
+                                : 'var(--t-accent-tint)';
                               return (
                                 <button
                                   key={mode}
@@ -709,9 +713,9 @@ export default function PlayOnlinePage() {
                                   style={{
                                     letterSpacing: '0.3em',
                                     backgroundColor: 'transparent',
-                                    color: active ? activeColor : '#5a5a5a',
+                                    color: active ? activeColor : 'var(--t-dim)',
                                     transition: 'color 0.2s',
-                                    textShadow: active ? `0 0 18px ${accent}66` : 'none',
+                                    textShadow: active ? `0 0 18px color-mix(in srgb, ${accent} 40%, transparent)` : 'none',
                                     zIndex: 1,
                                   }}
                                 >
@@ -737,7 +741,7 @@ export default function PlayOnlinePage() {
                                         bottom: 0,
                                         height: 3,
                                         backgroundColor: accent,
-                                        boxShadow: `0 0 10px ${accent}aa`,
+                                        boxShadow: `0 0 10px color-mix(in srgb, ${accent} 66%, transparent)`,
                                       }}
                                       transition={{ type: 'spring', stiffness: 320, damping: 32 }}
                                     />
@@ -748,7 +752,7 @@ export default function PlayOnlinePage() {
                           </div>
                           <p
                             className="font-body text-xs mt-3 px-1"
-                            style={{ color: '#888', lineHeight: 1.5 }}
+                            style={{ color: 'var(--t-muted)', lineHeight: 1.5 }}
                           >
                             {t(`online.modeDesc.${selectedMode}`)}
                           </p>
@@ -777,8 +781,8 @@ export default function PlayOnlinePage() {
                             disabled={evoToggleBlocked}
                             className="w-full py-3.5 text-sm font-bold no-select transition-opacity"
                             style={{
-                              backgroundColor: evoToggleBlocked ? '#2a2a2a' : '#c4a35a',
-                              color: evoToggleBlocked ? '#666' : '#0a0a0a',
+                              backgroundColor: evoToggleBlocked ? 'var(--t-surface-2)' : 'var(--t-accent)',
+                              color: evoToggleBlocked ? 'var(--t-dim)' : 'var(--t-bg)',
                               letterSpacing: '0.22em',
                               cursor: evoToggleBlocked ? 'not-allowed' : 'pointer',
                               opacity: evoToggleBlocked ? 0.55 : 1,
@@ -791,12 +795,12 @@ export default function PlayOnlinePage() {
                             className="w-full py-3 text-[12px] font-bold cursor-pointer no-select transition-colors"
                             style={{
                               backgroundColor: 'transparent',
-                              color: '#c4a35a',
+                              color: 'var(--t-accent)',
                               letterSpacing: '0.22em',
-                              boxShadow: 'inset 0 0 0 1px rgba(196, 163, 90, 0.35)',
+                              boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--t-accent) 35%, transparent)',
                             }}
                             onMouseEnter={(e) => {
-                              (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(196, 163, 90, 0.08)';
+                              (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--t-accent-tint)';
                             }}
                             onMouseLeave={(e) => {
                               (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
@@ -819,7 +823,7 @@ export default function PlayOnlinePage() {
             <Link
               href="/"
               className="text-[11px] no-select transition-opacity hover:opacity-100"
-              style={{ color: '#888', letterSpacing: '0.3em', opacity: 0.7 }}
+              style={{ color: 'var(--t-muted)', letterSpacing: '0.3em', opacity: 0.7 }}
             >
               {'<'} {t('auth.backToHome')}
             </Link>
@@ -840,24 +844,24 @@ function ToggleRow({
   onChange: (v: boolean) => void;
   accent?: string;
 }) {
-  const accentColor = accent ?? '#c4a35a';
+  const accentColor = accent ?? 'var(--t-accent)';
   return (
     <div
       className="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5"
-      style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.3)' }}
+      style={{ backgroundColor: 'var(--t-panel)', boxShadow: '0 12px 32px var(--t-shadow)' }}
     >
       <div className="flex flex-col gap-0.5 pr-2 min-w-0">
-        <span className="text-[11px] font-medium truncate" style={{ color: '#e8e8e8', letterSpacing: '0.16em' }}>
+        <span className="text-[11px] font-medium truncate" style={{ color: 'var(--t-text)', letterSpacing: '0.16em' }}>
           {label}
         </span>
-        <span className="font-body text-[10px] leading-snug" style={{ color: '#888' }}>{description}</span>
+        <span className="font-body text-[10px] leading-snug" style={{ color: 'var(--t-muted)' }}>{description}</span>
       </div>
       <button
         type="button"
         onClick={() => onChange(!checked)}
         className="relative w-10 h-5 cursor-pointer shrink-0"
         style={{
-          backgroundColor: checked ? accentColor : 'rgba(60, 60, 60, 0.6)',
+          backgroundColor: checked ? accentColor : 'var(--t-border-strong)',
           transition: 'background-color 0.18s',
           borderRadius: 999,
         }}
@@ -866,7 +870,7 @@ function ToggleRow({
         <span
           className="absolute top-0.5"
           style={{
-            width: 16, height: 16, borderRadius: 999, backgroundColor: '#0a0a0a',
+            width: 16, height: 16, borderRadius: 999, backgroundColor: 'var(--t-bg)',
             left: checked ? 22 : 2, transition: 'left 0.18s',
           }}
         />
@@ -890,7 +894,7 @@ function RoomsGrid({
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <RoomColumn
         title={t('online.mode.casual')}
-        accent="#c4a35a"
+        accent="var(--t-accent)"
         rooms={casualRooms}
         onCreate={onCreateCasual}
         onJoin={onJoin}
@@ -900,7 +904,7 @@ function RoomsGrid({
       />
       <RoomColumn
         title={t('online.mode.ranked')}
-        accent="#b33e3e"
+        accent="var(--t-danger)"
         rooms={rankedRooms}
         onCreate={onCreateRanked}
         onJoin={onJoin}
@@ -925,14 +929,14 @@ function RoomColumn({
   disableCreate?: boolean;
 }) {
   return (
-    <div className="flex flex-col" style={{ backgroundColor: 'rgba(15, 15, 20, 0.78)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}>
+    <div className="flex flex-col" style={{ backgroundColor: 'var(--t-panel)', boxShadow: '0 12px 32px var(--t-shadow)' }}>
       <div className="relative px-4 pt-5 pb-4 flex flex-col items-center">
         <span
           className="font-display text-sm font-bold"
           style={{
             color: accent,
             letterSpacing: '0.36em',
-            textShadow: `0 0 18px ${accent}66`,
+            textShadow: `0 0 18px color-mix(in srgb, ${accent} 40%, transparent)`,
           }}
         >
           {title}
@@ -944,14 +948,14 @@ function RoomColumn({
             bottom: 0,
             height: 3,
             backgroundColor: accent,
-            boxShadow: `0 0 10px ${accent}aa`,
+            boxShadow: `0 0 10px color-mix(in srgb, ${accent} 66%, transparent)`,
           }}
         />
       </div>
       <div className="flex-1 min-h-[100px]">
         {rooms.length === 0 ? (
           <div className="px-3 py-8 text-center">
-            <span className="font-body text-[10px]" style={{ color: '#444', letterSpacing: '0.2em' }}>{emptyLabel}</span>
+            <span className="font-body text-[10px]" style={{ color: 'var(--t-dim)', letterSpacing: '0.2em' }}>{emptyLabel}</span>
           </div>
         ) : (
           <div className="max-h-56 overflow-y-auto flex flex-col gap-1.5 p-2">
@@ -978,8 +982,8 @@ function RoomColumn({
         disabled={disableCreate}
         className="w-full py-3 text-[11px] font-bold no-select transition-opacity"
         style={{
-          backgroundColor: disableCreate ? '#2a2a2a' : accent,
-          color: accent === '#b33e3e' && !disableCreate ? '#ffffff' : '#0a0a0a',
+          backgroundColor: disableCreate ? 'var(--t-surface-2)' : accent,
+          color: accent === 'var(--t-danger)' && !disableCreate ? '#ffffff' : 'var(--t-bg)',
           letterSpacing: '0.22em',
           cursor: disableCreate ? 'not-allowed' : 'pointer',
           opacity: disableCreate ? 0.45 : 1,
@@ -1003,15 +1007,15 @@ function getRoomModeLabel(
   isEvolving: boolean,
 ): { labelKey: string; accent: string } {
   if (gameMode === 'evolving') {
-    return { labelKey: 'online.modeLabel.rankedEvolving', accent: '#b33e3e' };
+    return { labelKey: 'online.modeLabel.rankedEvolving', accent: 'var(--t-danger)' };
   }
   if (gameMode === 'ranked') {
-    return { labelKey: 'online.modeLabel.ranked', accent: '#b33e3e' };
+    return { labelKey: 'online.modeLabel.ranked', accent: 'var(--t-danger)' };
   }
   if (gameMode === 'casual' && isEvolving) {
-    return { labelKey: 'online.modeLabel.casualEvolving', accent: '#c4a35a' };
+    return { labelKey: 'online.modeLabel.casualEvolving', accent: 'var(--t-accent)' };
   }
-  return { labelKey: 'online.modeLabel.casual', accent: '#c4a35a' };
+  return { labelKey: 'online.modeLabel.casual', accent: 'var(--t-accent)' };
 }
 
 function WaitingRoomHeader({
@@ -1033,7 +1037,7 @@ function WaitingRoomHeader({
         style={{
           color: accent,
           letterSpacing: '0.32em',
-          textShadow: `0 0 14px ${accent}55`,
+          textShadow: `0 0 14px color-mix(in srgb, ${accent} 33%, transparent)`,
         }}
       >
         {t(labelKey)}
@@ -1041,7 +1045,7 @@ function WaitingRoomHeader({
       {createdAt !== null && (
         <span
           className="font-body text-[10px]"
-          style={{ color: '#777', letterSpacing: '0.3em' }}
+          style={{ color: 'var(--t-muted)', letterSpacing: '0.3em' }}
         >
           {t('online.roomOpenSince')} · {formatElapsed(elapsed)}
         </span>
@@ -1055,7 +1059,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
     <div className="flex flex-col gap-2">
       <span
         className="font-display text-[10px] font-bold px-1"
-        style={{ color: '#666', letterSpacing: '0.36em' }}
+        style={{ color: 'var(--t-dim)', letterSpacing: '0.36em' }}
       >
         {title}
       </span>
@@ -1071,7 +1075,7 @@ function ViewTabs({ view, onChange }: { view: View; onChange: (v: View) => void 
     { key: 'private', labelKey: 'online.privateRoom' },
   ];
   return (
-    <div className="relative flex w-full" style={{ backgroundColor: 'rgba(15, 15, 20, 0.6)' }}>
+    <div className="relative flex w-full" style={{ backgroundColor: 'var(--t-surface)' }}>
       {tabs.map((tab) => {
         const active = view === tab.key;
         return (
@@ -1082,9 +1086,9 @@ function ViewTabs({ view, onChange }: { view: View; onChange: (v: View) => void 
             style={{
               letterSpacing: '0.3em',
               backgroundColor: 'transparent',
-              color: active ? '#f0d089' : '#5a5a5a',
+              color: active ? 'var(--t-accent-bright)' : 'var(--t-dim)',
               transition: 'color 0.2s',
-              textShadow: active ? '0 0 18px rgba(196, 163, 90, 0.55)' : 'none',
+              textShadow: active ? '0 0 18px color-mix(in srgb, var(--t-accent) 55%, transparent)' : 'none',
               zIndex: 1,
             }}
           >
@@ -1095,7 +1099,7 @@ function ViewTabs({ view, onChange }: { view: View; onChange: (v: View) => void 
                 style={{
                   top: 0,
                   bottom: 3,
-                  backgroundColor: 'rgba(196, 163, 90, 0.04)',
+                  backgroundColor: 'var(--t-accent-tint)',
                   zIndex: -1,
                 }}
                 transition={{ type: 'spring', stiffness: 320, damping: 32 }}
@@ -1109,8 +1113,8 @@ function ViewTabs({ view, onChange }: { view: View; onChange: (v: View) => void 
                 style={{
                   bottom: 0,
                   height: 3,
-                  backgroundColor: '#c4a35a',
-                  boxShadow: '0 0 10px rgba(196, 163, 90, 0.6)',
+                  backgroundColor: 'var(--t-accent)',
+                  boxShadow: '0 0 10px color-mix(in srgb, var(--t-accent) 60%, transparent)',
                 }}
                 transition={{ type: 'spring', stiffness: 320, damping: 32 }}
               />
@@ -1139,17 +1143,17 @@ function SealedToggleBlock({
         description={t('online.sealed.toggleDescription')}
         checked={checked}
         onChange={onChange}
-        accent="#c4a35a"
+        accent="var(--t-accent)"
       />
       <div
         className="flex flex-col gap-2 px-3 sm:px-4 py-2.5"
         style={{
           backgroundColor: 'rgba(15, 15, 20, 0.78)',
-          boxShadow: '0 12px 32px rgba(0,0,0,0.3)',
+          boxShadow: '0 12px 32px var(--t-shadow)',
           opacity: checked ? 1 : 0.55,
         }}
       >
-        <span className="text-[10px] uppercase tracking-widest" style={{ color: '#888' }}>
+        <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
           {t('online.sealed.setChoiceLabel')}
         </span>
         <div className="flex flex-wrap gap-2">
@@ -1167,8 +1171,8 @@ function SealedToggleBlock({
                 disabled={!selectable}
                 className="px-3 py-1.5 text-[10px] uppercase tracking-widest font-display"
                 style={{
-                  backgroundColor: isSelected ? '#c4a35a' : '#1a1a1a',
-                  color: !selectable ? '#444' : isSelected ? '#0a0a0a' : '#888',
+                  backgroundColor: isSelected ? 'var(--t-accent)' : 'var(--t-surface-2)',
+                  color: !selectable ? 'var(--t-border-strong)' : isSelected ? 'var(--t-bg)' : 'var(--t-muted)',
                   cursor: selectable ? 'pointer' : 'not-allowed',
                   opacity: selectable ? 1 : 0.6,
                 }}
@@ -1184,8 +1188,8 @@ function SealedToggleBlock({
             disabled
             className="px-3 py-1.5 text-[10px] uppercase tracking-widest font-display"
             style={{
-              backgroundColor: '#1a1a1a',
-              color: '#444',
+              backgroundColor: 'var(--t-surface-2)',
+              color: 'var(--t-muted)',
               cursor: 'not-allowed',
               opacity: 0.6,
             }}
@@ -1216,7 +1220,7 @@ function EvolvingToggleBlock({
       description={t('online.evolving.toggleDescription')}
       checked={checked}
       onChange={onChange}
-      accent="#c4a35a"
+      accent="var(--t-accent)"
     />
   );
 
@@ -1228,7 +1232,7 @@ function EvolvingToggleBlock({
         </HoloSurface>
       ) : wrapped}
       {blocked && (
-        <span className="text-[10px] italic px-3" style={{ color: '#777' }}>
+        <span className="text-[10px] italic px-3" style={{ color: 'var(--t-dim)' }}>
           {t('online.evolving.needDeckHint')}
         </span>
       )}

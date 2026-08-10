@@ -111,7 +111,7 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
             key={i}
             x1={line.x1} y1={line.y1}
             x2={line.x2} y2={line.y2}
-            stroke={line.isWinnerPath ? '#c4a35a' : '#333'}
+            stroke={line.isWinnerPath ? 'var(--t-accent)' : 'var(--t-border-strong)'}
             strokeWidth={line.isWinnerPath ? 2 : 1}
             initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
@@ -125,7 +125,7 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
           <div key={roundIdx} className="flex flex-col items-center flex-shrink-0">
             <div
               className="text-[10px] font-bold uppercase tracking-widest mb-4"
-              style={{ color: roundIdx + 1 === currentRound ? '#c4a35a' : '#555' }}
+              style={{ color: roundIdx + 1 === currentRound ? 'var(--t-accent)' : 'var(--t-dim)' }}
             >
               {getRoundLabel(roundIdx + 1)}
             </div>
@@ -149,7 +149,7 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
           <div className="flex flex-col items-center flex-shrink-0">
             <div
               className="text-[10px] font-bold uppercase tracking-widest mb-4 text-center"
-              style={{ color: '#8a7a4e' }}
+              style={{ color: 'var(--t-muted)' }}
             >
               {t('thirdPlaceMatch')}
             </div>
@@ -159,7 +159,7 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35 }}
                 className="p-2"
-                style={{ backgroundColor: 'rgba(196, 163, 90, 0.06)' }}
+                style={{ backgroundColor: 'var(--t-accent-tint)' }}
               >
                 <BracketMatch match={thirdPlaceMatch} index={0} />
               </motion.div>
@@ -169,7 +169,7 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
 
         {winnerId && (
           <div className="flex flex-col items-center justify-center flex-shrink-0 ml-4">
-            <div className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ color: '#c4a35a' }}>
+            <div className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--t-accent)' }}>
               {t('champion')}
             </div>
             <motion.div
@@ -178,13 +178,13 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
               transition={{ type: 'spring', stiffness: 200, damping: 15 }}
               className="flex items-center justify-center px-6 py-4"
               style={{
-                border: '2px solid #c4a35a',
-                backgroundColor: 'rgba(196, 163, 90, 0.1)',
+                border: '2px solid var(--t-accent)',
+                backgroundColor: 'var(--t-accent-tint)',
               }}
             >
               <motion.span
                 className="text-sm font-bold tracking-wide"
-                style={{ color: '#c4a35a' }}
+                style={{ color: 'var(--t-accent)' }}
                 animate={{ textShadow: ['0 0 10px rgba(196,163,90,0.3)', '0 0 20px rgba(196,163,90,0.6)', '0 0 10px rgba(196,163,90,0.3)'] }}
                 transition={{ repeat: Infinity, duration: 2 }}
               >

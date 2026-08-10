@@ -80,7 +80,7 @@ function RegisterInner() {
     <main
       id="main-content"
       className="min-h-screen relative flex flex-col"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{ backgroundColor: 'var(--t-bg)' }}
     >
       <CloudBackground />
       <DecorativeIcons />
@@ -89,13 +89,13 @@ function RegisterInner() {
       <div
         className="w-full max-w-sm rounded-lg p-6 sm:p-8 relative z-10"
         style={{
-          backgroundColor: '#141414',
-          border: '1px solid #262626',
+          backgroundColor: 'var(--t-surface)',
+          border: '1px solid var(--t-border)',
         }}
       >
         <h1
           className="text-2xl font-bold text-center mb-8 tracking-wider uppercase"
-          style={{ color: '#c4a35a' }}
+          style={{ color: 'var(--t-accent)' }}
         >
           {t('common.register')}
         </h1>
@@ -105,7 +105,7 @@ function RegisterInner() {
             <label
               htmlFor="username"
               className="text-xs uppercase tracking-wider"
-              style={{ color: '#888888' }}
+              style={{ color: 'var(--t-muted)' }}
             >
               {t('auth.username')}
             </label>
@@ -121,9 +121,9 @@ function RegisterInner() {
               autoComplete="username"
               className="rounded px-3 py-2 text-sm outline-none"
               style={{
-                backgroundColor: '#0a0a0a',
-                border: '1px solid #262626',
-                color: '#e0e0e0',
+                backgroundColor: 'var(--t-bg)',
+                border: '1px solid var(--t-border)',
+                color: 'var(--t-text)',
               }}
             />
           </div>
@@ -132,7 +132,7 @@ function RegisterInner() {
             <label
               htmlFor="email"
               className="text-xs uppercase tracking-wider"
-              style={{ color: '#888888' }}
+              style={{ color: 'var(--t-muted)' }}
             >
               {t('auth.email')}
             </label>
@@ -144,9 +144,9 @@ function RegisterInner() {
               required
               className="rounded px-3 py-2 text-sm outline-none"
               style={{
-                backgroundColor: '#0a0a0a',
-                border: '1px solid #262626',
-                color: '#e0e0e0',
+                backgroundColor: 'var(--t-bg)',
+                border: '1px solid var(--t-border)',
+                color: 'var(--t-text)',
               }}
             />
           </div>
@@ -155,7 +155,7 @@ function RegisterInner() {
             <label
               htmlFor="password"
               className="text-xs uppercase tracking-wider"
-              style={{ color: '#888888' }}
+              style={{ color: 'var(--t-muted)' }}
             >
               {t('auth.password')}
             </label>
@@ -168,9 +168,9 @@ function RegisterInner() {
               minLength={6}
               className="rounded px-3 py-2 text-sm outline-none"
               style={{
-                backgroundColor: '#0a0a0a',
-                border: '1px solid #262626',
-                color: '#e0e0e0',
+                backgroundColor: 'var(--t-bg)',
+                border: '1px solid var(--t-border)',
+                color: 'var(--t-text)',
               }}
             />
           </div>
@@ -179,7 +179,7 @@ function RegisterInner() {
             <label
               htmlFor="confirmPassword"
               className="text-xs uppercase tracking-wider"
-              style={{ color: '#888888' }}
+              style={{ color: 'var(--t-muted)' }}
             >
               {t('auth.confirmPassword')}
             </label>
@@ -191,22 +191,22 @@ function RegisterInner() {
               required
               className="rounded px-3 py-2 text-sm outline-none"
               style={{
-                backgroundColor: '#0a0a0a',
-                border: '1px solid #262626',
-                color: '#e0e0e0',
+                backgroundColor: 'var(--t-bg)',
+                border: '1px solid var(--t-border)',
+                color: 'var(--t-text)',
               }}
             />
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
+            <label className="text-xs uppercase tracking-wider" style={{ color: 'var(--t-muted)' }}>
               {t('flag.label')} <span style={{ color: '#555' }}>({t('auth.optional')})</span>
             </label>
             <FlagPicker value={countryCode} onChange={setCountryCode} />
           </div>
 
           {error && (
-            <p className="text-xs" style={{ color: '#b33e3e' }}>
+            <p className="text-xs" style={{ color: 'var(--t-danger)' }}>
               {error}
             </p>
           )}
@@ -216,8 +216,8 @@ function RegisterInner() {
             disabled={loading}
             className="mt-2 rounded py-2.5 text-sm font-bold uppercase tracking-wider transition-colors"
             style={{
-              backgroundColor: loading ? '#333333' : '#c4a35a',
-              color: '#0a0a0a',
+              backgroundColor: loading ? 'var(--t-border-strong)' : 'var(--t-accent)',
+              color: 'var(--t-bg)',
             }}
           >
             {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
@@ -225,11 +225,11 @@ function RegisterInner() {
         </form>
 
         <div className="flex items-center gap-3 my-5">
-          <div className="flex-1 h-px" style={{ backgroundColor: '#262626' }} />
-          <span className="text-xs uppercase tracking-wider" style={{ color: '#555555' }}>
+          <div className="flex-1 h-px" style={{ backgroundColor: 'var(--t-border)' }} />
+          <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--t-dim)' }}>
             {t('auth.orSeparator')}
           </span>
-          <div className="flex-1 h-px" style={{ backgroundColor: '#262626' }} />
+          <div className="flex-1 h-px" style={{ backgroundColor: 'var(--t-border)' }} />
         </div>
 
         <button
@@ -237,7 +237,7 @@ function RegisterInner() {
           className="w-full rounded py-2.5 text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2"
           style={{
             backgroundColor: '#5865F2',
-            color: '#ffffff',
+            color: 'var(--t-text)',
             border: '1px solid #4752C4',
           }}
         >
@@ -249,13 +249,13 @@ function RegisterInner() {
 
         <p
           className="mt-6 text-center text-xs"
-          style={{ color: '#888888' }}
+          style={{ color: 'var(--t-muted)' }}
         >
           {t('auth.hasAccount')}{' '}
           <Link
             href="/login"
             className="underline"
-            style={{ color: '#c4a35a' }}
+            style={{ color: 'var(--t-accent)' }}
           >
             {t('common.signIn')}
           </Link>
@@ -265,7 +265,7 @@ function RegisterInner() {
           <Link
             href="/"
             className="text-xs"
-            style={{ color: '#555555' }}
+            style={{ color: 'var(--t-dim)' }}
           >
             {t('auth.backToHome')}
           </Link>

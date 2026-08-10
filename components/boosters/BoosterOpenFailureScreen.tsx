@@ -19,16 +19,16 @@ export function BoosterOpenFailureScreen({ title, body, backLabel, onClose }: Bo
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      style={{ backgroundColor: 'rgba(0,0,0,0.95)' }}
+      style={{ backgroundColor: 'var(--t-overlay)' }}
     >
       <div className="max-w-md text-center px-6">
         <div
           className="font-display uppercase tracking-wider mb-3"
-          style={{ color: '#c4a35a', fontSize: 14, letterSpacing: '0.22em' }}
+          style={{ color: 'var(--t-accent)', fontSize: 14, letterSpacing: '0.22em' }}
         >
           {title}
         </div>
-        <div className="font-body text-sm mb-6" style={{ color: '#e8e8e8' }}>
+        <div className="font-body text-sm mb-6" style={{ color: 'var(--t-text)' }}>
           {body}
         </div>
         <button
@@ -37,11 +37,11 @@ export function BoosterOpenFailureScreen({ title, body, backLabel, onClose }: Bo
           autoFocus
           className="px-6 py-2 font-display uppercase tracking-wider"
           style={{
-            backgroundColor: '#c4a35a1f',
-            color: '#c4a35a',
+            backgroundColor: 'var(--t-accent-tint)',
+            color: 'var(--t-accent)',
             fontSize: 13,
             letterSpacing: '0.18em',
-            boxShadow: '0 0 12px #c4a35a33',
+            boxShadow: '0 0 12px var(--t-accent-glow)',
           }}
         >
           {backLabel}

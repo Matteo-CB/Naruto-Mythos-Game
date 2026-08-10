@@ -40,7 +40,7 @@ export function LandscapeBlocker() {
         <div className="portrait-blocker-content">
           <motion.div
             className="rounded-md"
-            style={{ width: 48, height: 80, border: '2px solid #c4a35a' }}
+            style={{ width: 48, height: 80, border: '2px solid var(--t-accent)' }}
             animate={{ rotate: [0, 0, 90, 90], opacity: [0.5, 1, 1, 0.7] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           />

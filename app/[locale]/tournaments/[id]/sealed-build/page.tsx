@@ -149,21 +149,21 @@ export default function TournamentSealedBuildPage() {
 
   if (status === 'loading' || step === 'loading') {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
-        <span className="text-sm" style={{ color: '#888' }}>{tc('loading')}</span>
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
+        <span className="text-sm" style={{ color: 'var(--t-muted)' }}>{tc('loading')}</span>
       </main>
     );
   }
   if (step === 'denied') {
     return (
-      <main className="min-h-screen flex items-center justify-center relative" style={{ backgroundColor: '#0a0a0a' }}>
+      <main className="min-h-screen flex items-center justify-center relative" style={{ backgroundColor: 'var(--t-bg)' }}>
         <CloudBackground />
         <div className="flex flex-col items-center gap-4 relative z-10">
-          <span className="text-sm" style={{ color: '#b33e3e' }}>{t('sealedBuildDenied')}</span>
+          <span className="text-sm" style={{ color: 'var(--t-danger)' }}>{t('sealedBuildDenied')}</span>
           <button
             onClick={() => router.push(('/tournaments/' + tournamentId) as '/')}
             className="px-6 py-2 text-sm cursor-pointer"
-            style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#c4a35a' }}
+            style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-accent)' }}
           >
             {tc('back')}
           </button>
@@ -173,28 +173,28 @@ export default function TournamentSealedBuildPage() {
   }
   if (step === 'submitted') {
     return (
-      <main className="min-h-screen flex items-center justify-center relative" style={{ backgroundColor: '#0a0a0a' }}>
+      <main className="min-h-screen flex items-center justify-center relative" style={{ backgroundColor: 'var(--t-bg)' }}>
         <CloudBackground />
         <div className="flex flex-col items-center gap-4 relative z-10">
-          <span className="text-lg font-bold" style={{ color: '#c4a35a' }}>{t('sealedBuildSubmitted')}</span>
+          <span className="text-lg font-bold" style={{ color: 'var(--t-accent)' }}>{t('sealedBuildSubmitted')}</span>
         </div>
       </main>
     );
   }
   if (step === 'submitting') {
     return (
-      <main className="min-h-screen flex items-center justify-center relative" style={{ backgroundColor: '#0a0a0a' }}>
+      <main className="min-h-screen flex items-center justify-center relative" style={{ backgroundColor: 'var(--t-bg)' }}>
         <CloudBackground />
-        <span className="text-sm relative z-10" style={{ color: '#c4a35a' }}>{tc('loading')}</span>
+        <span className="text-sm relative z-10" style={{ color: 'var(--t-accent)' }}>{tc('loading')}</span>
       </main>
     );
   }
   if (step === 'expired') {
     return (
-      <main className="min-h-screen flex items-center justify-center relative" style={{ backgroundColor: '#0a0a0a' }}>
+      <main className="min-h-screen flex items-center justify-center relative" style={{ backgroundColor: 'var(--t-bg)' }}>
         <CloudBackground />
         <div className="flex flex-col items-center gap-4 relative z-10">
-          <span className="text-sm" style={{ color: '#d97676' }}>{t('sealedBuildExpired')}</span>
+          <span className="text-sm" style={{ color: 'var(--t-danger)' }}>{t('sealedBuildExpired')}</span>
         </div>
       </main>
     );
@@ -208,7 +208,7 @@ export default function TournamentSealedBuildPage() {
   return (
     <>
       {error && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2" style={{ backgroundColor: 'rgba(217,118,118,0.15)', color: '#d97676' }}>
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2" style={{ backgroundColor: 'rgba(217,118,118,0.15)', color: 'var(--t-danger)' }}>
           {error}
         </div>
       )}

@@ -59,6 +59,7 @@ model User {
   questProgresses         QuestProgress[]
   dailyQuestProgresses    DailyQuestProgress[]
   stripeCustomerId        String?
+  siteTheme            String?  @default("ks")
   hideDeckBuilderVariants Boolean              @default(false)
   manualPowerMode         Boolean              @default(false)
   gamepadEnabled          Boolean              @default(true)

@@ -14,7 +14,7 @@ import { stashPreUpdateSnapshot } from '@/lib/motion/boardRegistry';
 import { snapFromGameState, snapFromVisible, buildMotionEventsFromSnaps } from '@/lib/motion/motionDiff';
 import { holdDefeatedCardInPlace, type MotionEventData } from '@/lib/motion/choreographer';
 import { useSocketStore } from '@/lib/socket/client';
-import { validatePlayCharacter, validatePlayHidden, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
+import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
 import { resetIdCounter } from '@/lib/engine/utils/id';
@@ -1170,7 +1170,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     
     
-    if (action.type === 'PLAY_CHARACTER' || action.type === 'PLAY_HIDDEN' || action.type === 'UPGRADE_CHARACTER') {
+    if (action.type === 'PLAY_CHARACTER' || action.type === 'PLAY_HIDDEN' || action.type === 'UPGRADE_CHARACTER'
+      || action.type === 'REVEAL_CHARACTER') {
       const logGrew = newState.log.length > gameState.log.length;
       if (!logGrew) {
         
@@ -1187,6 +1188,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } else if (action.type === 'PLAY_HIDDEN' && action.cardIndex < gameState[humanPlayer].hand.length) {
           const card = gameState[humanPlayer].hand[action.cardIndex];
           const result = validatePlayHidden(gameState, humanPlayer, card, action.missionIndex);
+          errorReason = result.reason ?? '';
+          errorKey = result.reasonKey ?? null;
+          errorParams = result.reasonParams ?? null;
+        } else if (action.type === 'REVEAL_CHARACTER') {
+          const result = validateRevealCharacter(gameState, humanPlayer, action.missionIndex, action.characterInstanceId, action.upgradeTargetInstanceId);
           errorReason = result.reason ?? '';
           errorKey = result.reasonKey ?? null;
           errorParams = result.reasonParams ?? null;

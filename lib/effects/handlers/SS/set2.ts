@@ -3,7 +3,7 @@ import type { PlayerID, CharacterInPlay } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
-import { playLessSelectionResult } from '@/lib/effects/handlers/shared/playLess';
+import { playLessBlockedRevealResult, playLessSelectionResult, type PlayLessCategory } from '@/lib/effects/handlers/shared/playLess';
 import { ss000DeckHounds, ss000HasPlayableHound } from './ss000Search';
 
 function sideFor(player: PlayerID, which: 'friendly' | 'enemy'): 'player1Characters' | 'player2Characters' {
@@ -133,10 +133,12 @@ function ss120DuelHandler(ctx: EffectContext): EffectResult {
 }
 
 
+const SS126_CATEGORY: PlayLessCategory = { kind: 'group', value: 'Sound Village' };
+
 function ss126DuelHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
   const sel = playLessSelectionResult(state, sourcePlayer, {
-    category: { kind: 'group', value: 'Sound Village' },
+    category: SS126_CATEGORY,
     costReduction: 3,
     sourceName: 'SASUKE UCHIWA',
     sourceId: 'SS-126-SPV',
@@ -144,6 +146,8 @@ function ss126DuelHandler(ctx: EffectContext): EffectResult {
     descriptionKey: 'game.effect.desc.ss126PlaySound',
   });
   if (!sel) {
+    const blocked = playLessBlockedRevealResult(state, sourcePlayer, SS126_CATEGORY, 'Sasuke Uchiha (SS-126)');
+    if (blocked) return blocked;
     return {
       state: {
         ...state,

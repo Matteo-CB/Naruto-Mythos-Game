@@ -91,8 +91,8 @@ function LeaderRow({
   const tier = getRankTier(user.elo);
   const placed = total >= PLACEMENT_MATCHES_REQUIRED;
   const showLeagueIcon = type !== 'evolving' && leaguesEnabled && placed;
-  const tierColor = type === 'evolving' ? '#c4a35a' : (placed && leaguesEnabled ? tier.color : '#777');
-  const altBg = index % 2 === 0 ? '#0c0b10' : '#0a0a0d';
+  const tierColor = type === 'evolving' ? 'var(--t-accent)' : (placed && leaguesEnabled ? tier.color : 'var(--t-dim)');
+  const altBg = index % 2 === 0 ? 'var(--t-accent-surface)' : 'var(--t-accent-surface-hover)';
 
   return (
     <motion.div
@@ -103,14 +103,14 @@ function LeaderRow({
       whileHover={{ x: 4 }}
       className="relative grid items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-2.5 cursor-default mb-1"
       style={{
-        backgroundColor: isSelf ? 'rgba(196, 163, 90, 0.08)' : altBg,
+        backgroundColor: isSelf ? 'var(--t-accent-tint)' : altBg,
         gridTemplateColumns: 'auto auto 1fr auto auto auto',
         clipPath: ROW_CLIP,
       }}
     >
       <span
         className="font-display text-base sm:text-lg tabular-nums w-7 sm:w-9 text-center"
-        style={{ color: isSelf ? '#c4a35a' : '#666', letterSpacing: '0.02em' }}
+        style={{ color: isSelf ? 'var(--t-on-accent-surface)' : 'var(--t-on-accent-surface-text)', letterSpacing: '0.02em' }}
       >
         {globalRank}
       </span>
@@ -126,7 +126,7 @@ function LeaderRow({
           style={{ filter: `drop-shadow(0 0 5px ${tier.color}22)` }}
         />
       ) : (
-        <span className="inline-flex items-center justify-center font-display text-[14px]" style={{ width: 30, height: 30, color: '#3a3a3a' }}>
+        <span className="inline-flex items-center justify-center font-display text-[14px]" style={{ width: 30, height: 30, color: 'var(--t-on-accent-surface-text)' }}>
           ·
         </span>
       )}
@@ -135,8 +135,8 @@ function LeaderRow({
         <CountryFlag code={user.countryCode} size={18} />
         <Link
           href={`/profile/${encodeURIComponent(user.username)}` as '/'}
-          className="font-display text-base truncate transition-colors hover:text-[#c4a35a]"
-          style={{ color: '#e8e6df', letterSpacing: '0.02em' }}
+          className="font-display text-base truncate transition-colors hover:text-[var(--t-accent)]"
+          style={{ color: 'var(--t-on-accent-surface-text)', letterSpacing: '0.02em' }}
         >
           {user.username}
         </Link>
@@ -144,11 +144,11 @@ function LeaderRow({
       </div>
 
       <div className="hidden sm:flex font-inter-force items-center gap-1.5">
-        <span className="text-[10px] tabular-nums" style={{ color: '#5fb05f' }}>{wins}W</span>
-        <span className="text-[10px] tabular-nums" style={{ color: '#d97676' }}>{losses}L</span>
+        <span className="text-[10px] tabular-nums" style={{ color: 'var(--t-success)' }}>{wins}W</span>
+        <span className="text-[10px] tabular-nums" style={{ color: 'var(--t-danger)' }}>{losses}L</span>
       </div>
 
-      <span className="hidden sm:block font-inter-force text-xs tabular-nums w-10 text-right" style={{ color: '#666' }}>
+      <span className="hidden sm:block font-inter-force text-xs tabular-nums w-10 text-right" style={{ color: 'var(--t-dim)' }}>
         {winRate}%
       </span>
 
@@ -182,7 +182,7 @@ function FilterPill({
       className="font-display shrink-0 flex items-center gap-1.5 px-3 py-1.5 cursor-pointer transition-colors"
       style={{
         backgroundColor: active ? `${color}1f` : 'rgba(255, 255, 255, 0.03)',
-        color: active ? color : '#666',
+        color: active ? color : 'var(--t-dim)',
         borderRadius: 9999,
       }}
     >
@@ -210,7 +210,7 @@ function SkeletonGrid() {
           initial={{ opacity: 0 }}
           animate={{ opacity: [0.18, 0.4, 0.18] }}
           transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.05 }}
-          style={{ height: 46, backgroundColor: i % 2 === 0 ? '#0c0b10' : '#0a0a0d', clipPath: ROW_CLIP }}
+          style={{ height: 46, backgroundColor: i % 2 === 0 ? 'var(--t-accent-surface)' : 'var(--t-accent-surface-hover)', clipPath: ROW_CLIP }}
         />
       ))}
     </div>
@@ -336,7 +336,7 @@ export default function LeaderboardPage() {
   const pageKey = useMemo(() => `${currentPage}-${debouncedSearch}-${leagueFilter}-${countryFilter}`, [currentPage, debouncedSearch, leagueFilter, countryFilter]);
 
   return (
-    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
+    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--t-bg)' }}>
       <CloudBackground />
       <div className="w-full max-w-4xl mx-auto relative z-10 flex-1 px-4 sm:px-8 py-6 sm:py-10">
 
@@ -349,7 +349,7 @@ export default function LeaderboardPage() {
           <div className="flex items-end justify-between gap-3 flex-wrap">
             <h1
               className="font-display text-3xl sm:text-5xl tracking-wider uppercase leading-none"
-              style={{ color: '#f2efe7', letterSpacing: '0.08em', textShadow: '0 0 22px rgba(196, 163, 90, 0.18)' }}
+              style={{ color: 'var(--t-text)', letterSpacing: '0.08em', textShadow: '0 0 22px var(--t-accent-glow)' }}
             >
               {hubTab === 'friends' ? tf('title') : t('title')}
             </h1>
@@ -357,8 +357,8 @@ export default function LeaderboardPage() {
               {leaguesEnabled && (
                 <button
                   onClick={() => setLeaguesModalOpen(true)}
-                  className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[#c4a35a]"
-                  style={{ color: '#888' }}
+                  className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[var(--t-accent)]"
+                  style={{ color: 'var(--t-muted)' }}
                 >
                   {t('leagues')}
                 </button>
@@ -366,15 +366,15 @@ export default function LeaderboardPage() {
               <LanguageSwitcher />
               <Link
                 href="/"
-                className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
-                style={{ color: '#888' }}
+                className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[var(--t-accent)]"
+                style={{ color: 'var(--t-muted)' }}
               >
                 {tc('back')}
               </Link>
             </div>
           </div>
           {leaguesEnabled && hubTab === 'leaderboard' && (
-            <p className="text-[11px] mt-3" style={{ color: '#555' }}>
+            <p className="text-[11px] mt-3" style={{ color: 'var(--t-dim)' }}>
               {t('subtitle', { count: PLACEMENT_MATCHES_REQUIRED })}
             </p>
           )}
@@ -391,8 +391,8 @@ export default function LeaderboardPage() {
             onClick={() => switchHubTab('leaderboard')}
             className="font-display text-[11px] uppercase tracking-widest px-5 py-2 transition-colors"
             style={{
-              color: hubTab === 'leaderboard' ? '#0a0a0a' : '#c4a35a',
-              backgroundColor: hubTab === 'leaderboard' ? '#c4a35a' : 'transparent',
+              color: hubTab === 'leaderboard' ? 'var(--t-bg)' : 'var(--t-accent)',
+              backgroundColor: hubTab === 'leaderboard' ? 'var(--t-accent)' : 'transparent',
               borderRadius: 9999,
               cursor: 'pointer',
               outline: 'none',
@@ -405,8 +405,8 @@ export default function LeaderboardPage() {
             onClick={() => switchHubTab('friends')}
             className="font-display text-[11px] uppercase tracking-widest px-5 py-2 transition-colors inline-flex items-center gap-2"
             style={{
-              color: hubTab === 'friends' ? '#0a0a0a' : '#c4a35a',
-              backgroundColor: hubTab === 'friends' ? '#c4a35a' : 'transparent',
+              color: hubTab === 'friends' ? 'var(--t-bg)' : 'var(--t-accent)',
+              backgroundColor: hubTab === 'friends' ? 'var(--t-accent)' : 'transparent',
               borderRadius: 9999,
               cursor: 'pointer',
               outline: 'none',
@@ -422,8 +422,8 @@ export default function LeaderboardPage() {
                   height: 16,
                   padding: '0 4px',
                   borderRadius: 9999,
-                  backgroundColor: hubTab === 'friends' ? '#0a0a0a' : '#c4a35a',
-                  color: hubTab === 'friends' ? '#c4a35a' : '#0a0a0a',
+                  backgroundColor: hubTab === 'friends' ? 'var(--t-bg)' : 'var(--t-accent)',
+                  color: hubTab === 'friends' ? 'var(--t-accent)' : 'var(--t-bg)',
                 }}
               >
                 {socialBadgeTotal > 99 ? '99+' : socialBadgeTotal}
@@ -447,8 +447,8 @@ export default function LeaderboardPage() {
             onClick={() => handleBoardTypeChange('ranked')}
             className="font-display text-[11px] uppercase tracking-widest px-4 py-1.5 transition-colors"
             style={{
-              color: boardType === 'ranked' ? '#0a0a0a' : '#c4a35a',
-              backgroundColor: boardType === 'ranked' ? '#c4a35a' : 'transparent',
+              color: boardType === 'ranked' ? 'var(--t-bg)' : 'var(--t-accent)',
+              backgroundColor: boardType === 'ranked' ? 'var(--t-accent)' : 'transparent',
               borderRadius: 9999,
               cursor: 'pointer',
               outline: 'none',
@@ -461,8 +461,8 @@ export default function LeaderboardPage() {
             onClick={() => handleBoardTypeChange('evolving')}
             className="font-display text-[11px] uppercase tracking-widest px-4 py-1.5 transition-colors"
             style={{
-              color: boardType === 'evolving' ? '#0a0a0a' : '#c4a35a',
-              backgroundColor: boardType === 'evolving' ? '#c4a35a' : 'transparent',
+              color: boardType === 'evolving' ? 'var(--t-bg)' : 'var(--t-accent)',
+              backgroundColor: boardType === 'evolving' ? 'var(--t-accent)' : 'transparent',
               borderRadius: 9999,
               cursor: 'pointer',
               outline: 'none',
@@ -493,7 +493,7 @@ export default function LeaderboardPage() {
               <button
                 onClick={handleClearSearch}
                 className="font-display text-[11px] uppercase cursor-pointer"
-                style={{ color: '#888' }}
+                style={{ color: 'var(--t-muted)' }}
               >
                 X
               </button>
@@ -508,7 +508,7 @@ export default function LeaderboardPage() {
             transition={{ duration: 0.4, delay: 0.15 }}
             className="flex items-center gap-1.5 mb-7 overflow-x-auto pb-1 no-scrollbar"
           >
-            <FilterPill active={!leagueFilter} onClick={() => setLeagueFilter('')} label={tc('all')} color="#c4a35a" />
+            <FilterPill active={!leagueFilter} onClick={() => setLeagueFilter('')} label={tc('all')} color="var(--t-accent)" />
             {RANK_TIERS.map((tier) => (
               <FilterPill
                 key={tier.key}
@@ -523,7 +523,7 @@ export default function LeaderboardPage() {
               active={leagueFilter === 'unranked'}
               onClick={() => setLeagueFilter(leagueFilter === 'unranked' ? '' : 'unranked')}
               label={tp('rankNames.unranked')}
-              color="#888"
+              color="var(--t-muted)"
             />
           </motion.div>
         )}
@@ -534,14 +534,14 @@ export default function LeaderboardPage() {
           transition={{ duration: 0.4, delay: 0.2 }}
           className="flex items-center gap-2 mb-5 flex-wrap"
         >
-          <span className="font-display text-[10px] uppercase tracking-widest" style={{ color: '#666' }}>
+          <span className="font-display text-[10px] uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
             {t('countryFilterLabel')}
           </span>
           <select
             value={countryFilter}
             onChange={(e) => setCountryFilter(e.target.value)}
             className="px-3 py-2 text-[12px] cursor-pointer"
-            style={{ backgroundColor: '#14141a', color: countryFilter ? '#c4a35a' : '#999', border: '1px solid #262626', outline: 'none' }}
+            style={{ backgroundColor: 'var(--t-surface-2)', color: countryFilter ? 'var(--t-accent)' : 'var(--t-muted)', border: '1px solid var(--t-border)', outline: 'none' }}
           >
             <option value="">{t('countryAll')}</option>
             {countryOptions.map((c) => (
@@ -562,11 +562,11 @@ export default function LeaderboardPage() {
               transition={{ duration: 0.4 }}
               className="flex items-center gap-3 mb-3"
             >
-              <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)' }} />
-              <span className="font-display text-[10px] uppercase tracking-[0.3em] tabular-nums" style={{ color: '#777' }}>
-                <span style={{ color: '#c4a35a' }}>{totalCount}</span> {t('player')}{totalCount > 1 ? 's' : ''}
+              <div className="flex-1 h-px" style={{ backgroundColor: 'var(--t-accent-glow)' }} />
+              <span className="font-display text-[10px] uppercase tracking-[0.3em] tabular-nums" style={{ color: 'var(--t-dim)' }}>
+                <span style={{ color: 'var(--t-accent)' }}>{totalCount}</span> {t('player')}{totalCount > 1 ? 's' : ''}
               </span>
-              <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)' }} />
+              <div className="flex-1 h-px" style={{ backgroundColor: 'var(--t-accent-glow)' }} />
             </motion.div>
           )}
 
@@ -578,7 +578,7 @@ export default function LeaderboardPage() {
               animate={{ opacity: 1 }}
               className="flex items-center justify-center py-20"
             >
-              <p className="font-display text-sm uppercase tracking-widest" style={{ color: '#555' }}>{t('noPlayers')}</p>
+              <p className="font-display text-sm uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>{t('noPlayers')}</p>
             </motion.div>
           ) : (
             <AnimatePresence mode="wait">
@@ -619,19 +619,19 @@ export default function LeaderboardPage() {
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage <= 1}
-                className="font-display px-4 py-2 text-xs uppercase tracking-widest cursor-pointer disabled:opacity-20 transition-colors hover:text-[#c4a35a]"
-                style={{ color: '#888' }}
+                className="font-display px-4 py-2 text-xs uppercase tracking-widest cursor-pointer disabled:opacity-20 transition-colors hover:text-[var(--t-accent)]"
+                style={{ color: 'var(--t-muted)' }}
               >
                 {tc('previous')}
               </button>
-              <span className="font-display text-sm tabular-nums" style={{ color: '#c4a35a' }}>
+              <span className="font-display text-sm tabular-nums" style={{ color: 'var(--t-accent)' }}>
                 {currentPage} / {totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage >= totalPages}
-                className="font-display px-4 py-2 text-xs uppercase tracking-widest cursor-pointer disabled:opacity-20 transition-colors hover:text-[#c4a35a]"
-                style={{ color: '#888' }}
+                className="font-display px-4 py-2 text-xs uppercase tracking-widest cursor-pointer disabled:opacity-20 transition-colors hover:text-[var(--t-accent)]"
+                style={{ color: 'var(--t-muted)' }}
               >
                 {tc('next')}
               </button>

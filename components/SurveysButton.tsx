@@ -23,14 +23,14 @@ export function SurveysButton() {
     <Link
       href="/surveys"
       className="font-display relative px-2 py-1 text-xs font-bold uppercase tracking-wider transition-colors"
-      style={{ color: hasNew ? '#c4a35a' : '#888888' }}
+      style={{ color: hasNew ? 'var(--t-accent)' : 'var(--t-muted)' }}
       aria-label={t('buttonLabel')}
     >
       {t('buttonLabel')}
       {hasNew && (
         <span
           className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full"
-          style={{ backgroundColor: '#c4a35a' }}
+          style={{ backgroundColor: 'var(--t-accent)' }}
           aria-hidden="true"
         />
       )}

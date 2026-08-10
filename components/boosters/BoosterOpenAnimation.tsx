@@ -73,19 +73,19 @@ export function BoosterOpenAnimation({ cards, duplicateCardIds, onClose, setLabe
       role="dialog"
       aria-modal="true"
       aria-label={t('animation.aria')}
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{ backgroundColor: 'var(--t-bg)' }}
     >
       <button
         type="button"
         onClick={onClose}
-        className="absolute top-4 right-4 text-xs text-[#888] hover:text-[#e8e8e8] underline z-50"
+        className="absolute top-4 right-4 text-xs text-[var(--t-muted)] hover:text-[var(--t-text)] underline z-50"
       >
         {t('animation.skip')}
       </button>
 
       <motion.div
         className="absolute top-4 left-1/2 -translate-x-1/2 z-50 font-display uppercase tracking-wider"
-        style={{ color: '#c4a35a', fontSize: 11, letterSpacing: '0.18em' }}
+        style={{ color: 'var(--t-accent)', fontSize: 11, letterSpacing: '0.18em' }}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
@@ -100,7 +100,7 @@ export function BoosterOpenAnimation({ cards, duplicateCardIds, onClose, setLabe
             style={{
               width: Math.random() * 4 + 2,
               height: Math.random() * 4 + 2,
-              backgroundColor: '#c4a35a',
+              backgroundColor: 'var(--t-accent)',
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
             }}
@@ -159,7 +159,7 @@ export function BoosterOpenAnimation({ cards, duplicateCardIds, onClose, setLabe
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
-                <span className="text-xs uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+                <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--t-accent)' }}>
                   {t('animation.tapToOpen')}
                 </span>
               </motion.div>
@@ -191,8 +191,8 @@ export function BoosterOpenAnimation({ cards, duplicateCardIds, onClose, setLabe
                     transition={{ delay: (i * 0.3) + 1.2, duration: 0.3 }}
                     className="absolute top-1 right-1 px-1.5 py-0.5 pointer-events-none"
                     style={{
-                      backgroundColor: '#c4a35a1f',
-                      color: '#c4a35a',
+                      backgroundColor: 'var(--t-accent)1f',
+                      color: 'var(--t-accent)',
                       fontSize: 9,
                       letterSpacing: '0.12em',
                       textTransform: 'uppercase',
@@ -233,11 +233,11 @@ export function BoosterOpenAnimation({ cards, duplicateCardIds, onClose, setLabe
               autoFocus
               className="px-8 py-3 font-display uppercase tracking-wider"
               style={{
-                backgroundColor: '#c4a35a1f',
-                color: '#c4a35a',
+                backgroundColor: 'var(--t-accent)1f',
+                color: 'var(--t-accent)',
                 fontSize: 14,
                 letterSpacing: '0.22em',
-                boxShadow: '0 0 18px #c4a35a44',
+                boxShadow: '0 0 18px var(--t-accent)44',
               }}
             >
               {t('animation.continue')}

@@ -4,6 +4,7 @@ import { memo, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import type { CharacterCard } from '@/lib/engine/types';
+import { ChakraIcon, CHAKRA_COLOR_SOFT } from '@/components/icons/GameIcons';
 import CardFace from './CardFace';
 
 export interface CardInHandProps {
@@ -146,17 +147,21 @@ function CardInHandInner({
             borderRadius: '10px',
             padding: '1px 8px',
             whiteSpace: 'nowrap',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
           }}
         >
+          <ChakraIcon size={12} color={CHAKRA_COLOR_SOFT} />
           <span
             style={{
-              color: '#60a5fa',
+              color: CHAKRA_COLOR_SOFT,
               fontSize: '11px',
               fontWeight: 700,
               fontFamily: "'NJNaruto', Arial, sans-serif",
             }}
           >
-            Cost: {effectiveCost}
+            {effectiveCost}
           </span>
         </div>
       )}

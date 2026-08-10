@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
     <main
       id="main-content"
       className="min-h-screen relative flex flex-col"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{ backgroundColor: 'var(--t-bg)' }}
     >
       <CloudBackground />
       <DecorativeIcons />
@@ -53,13 +53,13 @@ export default function ForgotPasswordPage() {
         <div
           className="w-full max-w-sm rounded-lg p-8 relative z-10"
           style={{
-            backgroundColor: '#141414',
-            border: '1px solid #262626',
+            backgroundColor: 'var(--t-surface)',
+            border: '1px solid var(--t-border)',
           }}
         >
           <h1
             className="text-2xl font-bold text-center mb-4 tracking-wider uppercase"
-            style={{ color: '#c4a35a' }}
+            style={{ color: 'var(--t-accent)' }}
           >
             {t('auth.forgotPasswordTitle')}
           </h1>
@@ -68,14 +68,14 @@ export default function ForgotPasswordPage() {
             <div className="flex flex-col items-center gap-4">
               <p
                 className="text-sm text-center leading-relaxed"
-                style={{ color: '#888888' }}
+                style={{ color: 'var(--t-muted)' }}
               >
                 {t('auth.resetEmailSent')}
               </p>
               <Link
                 href="/login"
                 className="text-sm underline"
-                style={{ color: '#c4a35a' }}
+                style={{ color: 'var(--t-accent)' }}
               >
                 {t('auth.goToLogin')}
               </Link>
@@ -84,7 +84,7 @@ export default function ForgotPasswordPage() {
             <>
               <p
                 className="text-xs text-center mb-6"
-                style={{ color: '#888888' }}
+                style={{ color: 'var(--t-muted)' }}
               >
                 {t('auth.forgotPasswordDescription')}
               </p>
@@ -94,7 +94,7 @@ export default function ForgotPasswordPage() {
                   <label
                     htmlFor="email"
                     className="text-xs uppercase tracking-wider"
-                    style={{ color: '#888888' }}
+                    style={{ color: 'var(--t-muted)' }}
                   >
                     {t('auth.email')}
                   </label>
@@ -106,15 +106,15 @@ export default function ForgotPasswordPage() {
                     required
                     className="rounded px-3 py-2 text-sm outline-none"
                     style={{
-                      backgroundColor: '#0a0a0a',
-                      border: '1px solid #262626',
-                      color: '#e0e0e0',
+                      backgroundColor: 'var(--t-bg)',
+                      border: '1px solid var(--t-border)',
+                      color: 'var(--t-text)',
                     }}
                   />
                 </div>
 
                 {error && (
-                  <p className="text-xs" style={{ color: '#b33e3e' }}>
+                  <p className="text-xs" style={{ color: 'var(--t-danger)' }}>
                     {error}
                   </p>
                 )}
@@ -124,8 +124,8 @@ export default function ForgotPasswordPage() {
                   disabled={loading}
                   className="mt-2 rounded py-2.5 text-sm font-bold uppercase tracking-wider transition-colors"
                   style={{
-                    backgroundColor: loading ? '#333333' : '#c4a35a',
-                    color: '#0a0a0a',
+                    backgroundColor: loading ? 'var(--t-border-strong)' : 'var(--t-accent)',
+                    color: 'var(--t-bg)',
                   }}
                 >
                   {loading ? t('auth.sending') : t('auth.sendResetLink')}
@@ -136,7 +136,7 @@ export default function ForgotPasswordPage() {
                 <Link
                   href="/login"
                   className="text-xs"
-                  style={{ color: '#555555' }}
+                  style={{ color: 'var(--t-dim)' }}
                 >
                   {t('auth.goToLogin')}
                 </Link>

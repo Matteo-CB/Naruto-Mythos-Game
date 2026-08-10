@@ -21,26 +21,8 @@ interface Props {
   nextStartAt?: string | null;
 }
 
-const ACCENT: Record<TournamentMenuStatus, string> = {
-  none: '#c4a35a',
-  available: '#c4a35a',
-  registered: '#c4a35a',
-  needs_deck: '#b33e3e',
-  in_progress: '#3b82f6',
-};
+const MENU_ACCENT = 'var(--t-accent)';
 
-/**
- * Eye-catching but tasteful countdown. Inter Display 700, tabular numerals,
- * sits inside a faint pill in the status accent color.
- *
- * Format adapts to the remaining duration, always 3 visible units when possible:
- *   ≥ 24h  → "Xd Yh Zm"     (days + hours + minutes)
- *   1-24h  → "Xh Ym Zs"     (hours + minutes + seconds)
- *   < 1h   → "Xm Ys"        (minutes + seconds)
- *
- * Centered both vertically (items-center) and horizontally (justify-center).
- * The pill has a min-width so it doesn't jump as units shorten.
- */
 function TournamentCountdown({ targetIso, accentColor }: { targetIso: string; accentColor: string }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -88,7 +70,9 @@ function TournamentCountdown({ targetIso, accentColor }: { targetIso: string; ac
         fontWeight: 700,
         letterSpacing: '0.02em',
         color: accentColor,
-        backgroundColor: '#0a0a0a',
+        backgroundColor: 'rgba(10, 10, 12, 0.62)',
+        backdropFilter: 'blur(3px)',
+        WebkitBackdropFilter: 'blur(3px)',
         border: `1px solid ${accentColor}`,
         borderRadius: '4px',
         padding: '4px 10px',
@@ -97,7 +81,7 @@ function TournamentCountdown({ targetIso, accentColor }: { targetIso: string; ac
         fontVariantNumeric: 'tabular-nums',
         whiteSpace: 'nowrap',
         textShadow: `0 0 8px ${accentColor}55`,
-        boxShadow: `0 4px 12px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 14px ${accentColor}33`,
+        boxShadow: `0 4px 12px var(--t-shadow), 0 0 0 1px var(--t-shadow), 0 0 14px ${accentColor}33`,
       }}
     >
       {units.map((u, i) => (
@@ -115,8 +99,8 @@ export function TournamentNavButton({ status, label, primary = false, delay = 0,
   const isActive = status !== 'none';
 
   const variant = (() => {
-    if (status === 'in_progress') return 'blue';
-    if (status === 'needs_deck') return 'red';
+    if (status === 'in_progress') return 'gold';
+    if (status === 'needs_deck') return 'gold';
     if (status === 'registered' || status === 'available') return 'gold';
     return primary ? 'primary' : 'muted';
   })() as Parameters<typeof HomeMenuButton>[0]['variant'];
@@ -131,7 +115,7 @@ export function TournamentNavButton({ status, label, primary = false, delay = 0,
     }
   })();
 
-  const accent = ACCENT[status];
+  const accent = MENU_ACCENT;
   const showCountdown = isActive && status !== 'in_progress' && !!nextStartAt;
   const showLive = status === 'in_progress';
 
@@ -159,13 +143,15 @@ export function TournamentNavButton({ status, label, primary = false, delay = 0,
               fontWeight: 700,
               letterSpacing: '0.18em',
               color: accent,
-              backgroundColor: '#0a0a0a',
+              backgroundColor: 'rgba(10, 10, 12, 0.62)',
+              backdropFilter: 'blur(3px)',
+              WebkitBackdropFilter: 'blur(3px)',
               border: `1px solid ${accent}`,
               borderRadius: '4px',
               padding: '4px 10px',
               textTransform: 'uppercase',
               textShadow: `0 0 8px ${accent}55`,
-              boxShadow: `0 4px 12px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 14px ${accent}33`,
+              boxShadow: `0 4px 12px var(--t-shadow), 0 0 0 1px var(--t-shadow), 0 0 14px ${accent}33`,
             }}
           >
             {t('tournamentBadgeInProgress')}

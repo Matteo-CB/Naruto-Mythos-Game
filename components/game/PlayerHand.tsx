@@ -14,6 +14,7 @@ import { useGameScale } from './GameScaleContext';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { ManualGuess } from './ManualGuess';
 import { useBoardPalette } from './BoardPaletteContext';
+import { ChakraIcon, PowerIcon, CHAKRA_COLOR, CHAKRA_COLOR_SOFT, POWER_COLOR } from '@/components/icons/GameIcons';
 
 interface PlayerHandProps {
   hand: CharacterCard[];
@@ -204,18 +205,20 @@ const HandCard = React.memo(function HandCard({
           {getCardName(card, locale as 'en' | 'fr')}
         </span>
         <span
-          className="font-bold tabular-nums"
+          className="font-bold tabular-nums inline-flex items-center gap-0.5"
           style={{ fontSize: dims.isMobile ? '13px' : '10px', color: me.primary, fontFamily: "'NJNaruto', Arial, sans-serif" }}
         >
+          <PowerIcon size={dims.isMobile ? 12 : 9} color="currentColor" />
           {manualPowerMode ? <ManualGuess actual={card.power ?? 0} color={me.primary} /> : card.power}
         </span>
       </div>
 
       <div
-        className="absolute top-1 left-1 flex items-center justify-center font-bold"
+        className="absolute top-1 left-1 flex items-center justify-center gap-0.5 font-bold"
         style={{
-          width: dims.isMobile ? '26px' : '20px',
+          minWidth: dims.isMobile ? '32px' : '28px',
           height: dims.isMobile ? '26px' : '20px',
+          padding: '0 3px',
           fontSize: dims.isMobile ? '14px' : '10px',
           backgroundColor: canAfford
             ? 'rgba(196, 163, 90, 0.9)'
@@ -225,6 +228,7 @@ const HandCard = React.memo(function HandCard({
           fontFamily: "'NJNaruto', Arial, sans-serif",
         }}
       >
+        <ChakraIcon size={dims.isMobile ? 12 : 10} color={canAfford ? '#0f2740' : CHAKRA_COLOR_SOFT} />
         {manualPowerMode ? <ManualGuess actual={card.chakra} color="#0a0a0a" /> : card.chakra}
       </div>
 
@@ -243,11 +247,13 @@ function SortPill({
   active,
   onClick,
   accentColor = 'rgba(196, 163, 90, 0.4)',
+  icon,
 }: {
   label: string;
   active?: boolean;
   onClick: () => void;
   accentColor?: string;
+  icon?: React.ReactNode;
 }) {
   return (
     <motion.button
@@ -269,8 +275,12 @@ function SortPill({
           : 'rgba(255, 255, 255, 0.04)',
         color: active ? '#c4a35a' : '#888888',
         lineHeight: 1.3,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '5px',
       }}
     >
+      {icon}
       {label}
     </motion.button>
   );
@@ -310,7 +320,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     if (prevHand === hand) return;
 
     const currentOrder = useUIStore.getState().handOrder;
-    if (!currentOrder) return; // No custom order to reconcile
+    if (!currentOrder) return;
 
     const newOrder = reconcileHandOrder(currentOrder, prevHand, hand);
     setHandOrder(newOrder);
@@ -465,11 +475,13 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
           <div className="flex items-center gap-2">
             <SortPill
               label={t('game.hand.sortCost')}
+              icon={<ChakraIcon size={12} color={CHAKRA_COLOR} />}
               active={activeSortType === 'cost'}
               onClick={sortByCost}
             />
             <SortPill
               label={t('game.hand.sortPower')}
+              icon={<PowerIcon size={12} color={POWER_COLOR} />}
               active={activeSortType === 'power'}
               onClick={sortByPower}
             />

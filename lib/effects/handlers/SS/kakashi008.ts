@@ -1,7 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { buildPlayLessTargets, type PlayLessCategory } from '@/lib/effects/handlers/shared/playLess';
+import { buildPlayLessTargets, playLessBlockedRevealResult, type PlayLessCategory } from '@/lib/effects/handlers/shared/playLess';
 
 export const KAKASHI_008_ID = 'SS-008-C';
 export const KAKASHI_008_NAME = 'KAKASHI HATAKE';
@@ -15,6 +15,10 @@ function kakashi008FirstStrike(ctx: EffectContext): EffectResult {
   );
 
   if (targets.length === 0) {
+    const blocked = playLessBlockedRevealResult(
+      state, sourcePlayer, KAKASHI_008_CATEGORY, 'Kakashi Hatake (SS-008) FIRST STRIKE',
+    );
+    if (blocked) return blocked;
     return {
       state: {
         ...state,

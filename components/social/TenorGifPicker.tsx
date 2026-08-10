@@ -39,29 +39,29 @@ export function TenorGifPicker({ onSelect, onClose }: { onSelect: (url: string) 
   }, [q, search]);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: Z_APP_MODAL, backgroundColor: 'rgba(0,0,0,0.72)' }} onClick={onClose}>
+    <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: Z_APP_MODAL, backgroundColor: 'var(--t-overlay)' }} onClick={onClose}>
       <motion.div
         initial={{ opacity: 0, scale: 0.97, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.18, ease: 'easeOut' }}
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-lg flex flex-col overflow-hidden"
-        style={{ backgroundColor: '#111114', border: '1px solid #26262c', maxHeight: '80vh', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}
+        style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)', maxHeight: '80vh', boxShadow: '0 24px 60px var(--t-shadow)' }}
       >
-        <div className="p-3 flex items-center gap-2" style={{ borderBottom: '1px solid #1c1c20' }}>
+        <div className="p-3 flex items-center gap-2" style={{ borderBottom: '1px solid var(--t-divider)' }}>
           <input
             ref={inputRef}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t('gifSearch')}
             className="flex-1 min-w-0 px-3 py-2 text-sm focus:outline-none"
-            style={{ backgroundColor: '#0c0c0e', border: '1px solid #26262c', color: '#e0e0e0' }}
+            style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border)', color: 'var(--t-text)' }}
           />
           <button
             type="button"
             onClick={onClose}
             className="font-display text-[11px] uppercase tracking-widest px-3 py-2"
-            style={{ backgroundColor: 'rgba(136,136,136,0.08)', color: '#888' }}
+            style={{ backgroundColor: 'color-mix(in srgb, var(--t-muted) 8%, transparent)', color: 'var(--t-muted)' }}
           >
             {t('close')}
           </button>
@@ -69,9 +69,9 @@ export function TenorGifPicker({ onSelect, onClose }: { onSelect: (url: string) 
 
         <div className="flex-1 overflow-y-auto p-2" style={{ minHeight: 200 }}>
           {loading ? (
-            <div className="flex items-center justify-center h-40 text-xs" style={{ color: '#666' }}>{t('loading')}</div>
+            <div className="flex items-center justify-center h-40 text-xs" style={{ color: 'var(--t-dim)' }}>{t('loading')}</div>
           ) : results.length === 0 ? (
-            <div className="flex items-center justify-center h-40 text-xs" style={{ color: '#666' }}>{t('noGifs')}</div>
+            <div className="flex items-center justify-center h-40 text-xs" style={{ color: 'var(--t-dim)' }}>{t('noGifs')}</div>
           ) : (
             <div className="columns-2 sm:columns-3 gap-2">
               {results.map((g) => (
@@ -80,7 +80,7 @@ export function TenorGifPicker({ onSelect, onClose }: { onSelect: (url: string) 
                   type="button"
                   onClick={() => onSelect(g.url)}
                   className="mb-2 block w-full overflow-hidden"
-                  style={{ backgroundColor: '#0c0c0e', cursor: 'pointer', lineHeight: 0 }}
+                  style={{ backgroundColor: 'var(--t-surface-2)', cursor: 'pointer', lineHeight: 0 }}
                 >
                   {}
                   <img src={g.preview} alt="" style={{ width: '100%', height: 'auto', display: 'block' }} loading="lazy" />

@@ -10,7 +10,7 @@ export function PostDeckButton({ deckId, className, style }: { deckId: string; c
       href={`/feed?deck=${deckId}` as '/'}
       onClick={(e) => e.stopPropagation()}
       className={className ?? 'font-display text-[9px] uppercase tracking-widest px-2 py-1'}
-      style={style ?? { backgroundColor: 'rgba(196,163,90,0.08)', color: '#c4a35a' }}
+      style={style ?? { backgroundColor: 'var(--t-accent-tint)', color: 'var(--t-accent)' }}
     >
       {t('postToFeed')}
     </Link>

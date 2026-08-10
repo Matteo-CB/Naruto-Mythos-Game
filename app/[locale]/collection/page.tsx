@@ -27,6 +27,8 @@ import { LockedCardWrapper } from '@/components/cards/LockedCardWrapper';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { isLandscapeCard, cardAspectRatio } from '@/lib/cards/orientation';
+import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from '@/components/icons/GameIcons';
+import { RarityIcon } from '@/components/icons/RarityIcon';
 
 type AnyCard = CardData;
 
@@ -35,24 +37,26 @@ function StatBadges({ card, costLabel, powerLabel }: { card: AnyCard; costLabel:
   const hasCost = typeof chakra === 'number' && Number.isFinite(chakra);
   const hasPower = typeof power === 'number' && Number.isFinite(power);
   if (!hasCost && !hasPower) return null;
-  const base = 'absolute z-10 px-1.5 py-0.5 text-[10px] font-bold leading-none';
+  const base = 'absolute z-10 inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-bold leading-none';
   return (
     <>
       {hasCost && (
         <span
           className={`${base} top-1 right-1`}
-          style={{ backgroundColor: 'rgba(10,10,10,0.78)', color: '#c4a35a', fontVariantNumeric: 'tabular-nums' }}
+          style={{ backgroundColor: 'rgba(10,10,10,0.78)', color: 'var(--t-text)', fontVariantNumeric: 'tabular-nums' }}
           title={`${costLabel} ${chakra}`}
         >
+          <ChakraIcon size={11} color={CHAKRA_COLOR} />
           {chakra}
         </span>
       )}
       {hasPower && (
         <span
           className={`${base} bottom-1 left-1`}
-          style={{ backgroundColor: 'rgba(10,10,10,0.78)', color: '#e8e8e8', fontVariantNumeric: 'tabular-nums' }}
+          style={{ backgroundColor: 'rgba(10,10,10,0.78)', color: 'var(--t-text)', fontVariantNumeric: 'tabular-nums' }}
           title={`${powerLabel} ${power}`}
         >
+          <PowerIcon size={11} color={POWER_COLOR} />
           {power}
         </span>
       )}
@@ -187,7 +191,7 @@ export default function CollectionPage() {
     return (
       <div
         key={card.id}
-        className="relative bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
+        className="relative bg-[var(--t-surface)] border border-[var(--t-border)] overflow-hidden hover:border-[var(--t-border-strong)] transition-colors group"
         style={{ aspectRatio: cardAspectRatio(card) }}
       >
         <Link
@@ -207,8 +211,8 @@ export default function CollectionPage() {
             />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center p-1">
-              <div className="w-10 h-7 bg-[#1a1a1a] mb-1" />
-              <span className="text-[8px] text-[#555] text-center leading-tight">
+              <div className="w-10 h-7 bg-[var(--t-surface-2)] mb-1" />
+              <span className="text-[8px] text-[var(--t-dim)] text-center leading-tight">
                 {getCardName(card, locale)}
               </span>
             </div>
@@ -219,7 +223,7 @@ export default function CollectionPage() {
           type="button"
           onClick={() => setSelectedCard(card)}
           className="absolute top-1 left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full opacity-70 hover:opacity-100 transition-opacity"
-          style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: '#c4a35a' }}
+          style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: 'var(--t-accent)' }}
           aria-label={t('collection.quickPreview')}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -232,7 +236,7 @@ export default function CollectionPage() {
   };
 
   return (
-    <main id="main-content" className="min-h-screen relative bg-[#0a0a0a] flex flex-col">
+    <main id="main-content" className="min-h-screen relative bg-[var(--t-bg)] flex flex-col">
       <CloudBackground />
       <DecorativeIcons />
       <CardBackgroundDecor variant="collection" />
@@ -240,12 +244,12 @@ export default function CollectionPage() {
         
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-[#e0e0e0]">{t('collection.title')}</h1>
-            <p className="text-sm text-[#888888]">{t('collection.total', { count: allCards.length })}</p>
+            <h1 className="text-2xl font-bold text-[var(--t-text)]">{t('collection.title')}</h1>
+            <p className="text-sm text-[var(--t-muted)]">{t('collection.total', { count: allCards.length })}</p>
           </div>
           <Link
             href="/"
-            className="px-4 py-2 bg-[#141414] border border-[#262626] text-[#888888] text-sm hover:bg-[#1a1a1a] transition-colors"
+            className="px-4 py-2 bg-[var(--t-surface)] border border-[var(--t-border)] text-[var(--t-muted)] text-sm hover:bg-[var(--t-surface-2)] transition-colors"
           >
             {t('common.back')}
           </Link>
@@ -257,27 +261,58 @@ export default function CollectionPage() {
             placeholder={t('collection.search')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444] w-full sm:w-64"
+            className="px-3 py-2 bg-[var(--t-surface)] border border-[var(--t-border)] text-[var(--t-text)] text-sm placeholder-[var(--t-dim)] focus:outline-none focus:border-[var(--t-border-strong)] w-full sm:w-64"
             aria-label={t('collection.search')}
           />
           {showRarityFilter && (
-            <select
-              value={filterRarity}
-              onChange={(e) => setFilterRarity(e.target.value)}
-              className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm focus:outline-none"
+            <div
+              className="flex flex-wrap items-center gap-1.5"
+              role="group"
               aria-label={t('collection.allRarities')}
             >
-              <option value="all">{t('collection.allRarities')}</option>
-              {rarityOptions.map((r) => (
-                <option key={r} value={r}>{getRarityLabel(r, tCardMeta)}</option>
-              ))}
-            </select>
+              <button
+                type="button"
+                onClick={() => setFilterRarity('all')}
+                aria-pressed={filterRarity === 'all'}
+                data-gp="true"
+                className="px-3 py-2 text-xs uppercase tracking-wider transition-colors"
+                style={{
+                  backgroundColor: filterRarity === 'all' ? 'var(--t-accent-tint)' : 'var(--t-surface)',
+                  border: `1px solid ${filterRarity === 'all' ? 'var(--t-accent)' : 'var(--t-border)'}`,
+                  color: filterRarity === 'all' ? 'var(--t-accent)' : 'var(--t-muted)',
+                }}
+              >
+                {t('collection.allRarities')}
+              </button>
+              {rarityOptions.map((r) => {
+                const active = filterRarity === r;
+                return (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setFilterRarity(active ? 'all' : r)}
+                    aria-pressed={active}
+                    title={getRarityLabel(r, tCardMeta)}
+                    data-gp="true"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-2 text-xs transition-colors"
+                    style={{
+                      backgroundColor: active ? 'var(--t-accent-tint)' : 'var(--t-surface)',
+                      border: `1px solid ${active ? 'var(--t-accent)' : 'var(--t-border)'}`,
+                      color: active ? 'var(--t-accent)' : 'var(--t-muted)',
+                    }}
+                  >
+                    <RarityIcon rarity={r} size={16} />
+                    <span className="hidden sm:inline">{getRarityLabel(r, tCardMeta)}</span>
+                  </button>
+                );
+              })}
+            </div>
           )}
           {showGroupFilter && (
             <select
               value={filterGroup}
               onChange={(e) => setFilterGroup(e.target.value)}
-              className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm focus:outline-none"
+              className="px-3 py-2 bg-[var(--t-surface)] border border-[var(--t-border)] text-[var(--t-text)] text-sm focus:outline-none"
               aria-label={t('collection.allGroups')}
             >
               <option value="all">{t('collection.allGroups')}</option>
@@ -290,7 +325,7 @@ export default function CollectionPage() {
             <select
               value={filterSet}
               onChange={(e) => setFilterSet(e.target.value)}
-              className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm focus:outline-none"
+              className="px-3 py-2 bg-[var(--t-surface)] border border-[var(--t-border)] text-[var(--t-text)] text-sm focus:outline-none"
               aria-label={t('collection.allSets')}
             >
               <option value="all">{t('collection.allSets')}</option>
@@ -313,9 +348,9 @@ export default function CollectionPage() {
               aria-pressed={filterVariantsOnly}
               className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
               style={{
-                backgroundColor: filterVariantsOnly ? '#c4a35a1f' : '#141414',
-                color: filterVariantsOnly ? '#c4a35a' : '#888888',
-                boxShadow: filterVariantsOnly ? '0 0 12px #c4a35a33' : 'none',
+                backgroundColor: filterVariantsOnly ? 'var(--t-accent)1f' : 'var(--t-surface)',
+                color: filterVariantsOnly ? 'var(--t-accent)' : 'var(--t-muted)',
+                boxShadow: filterVariantsOnly ? '0 0 12px var(--t-accent)33' : 'none',
               }}
             >
               {t('collection.variantsOnly')}
@@ -328,8 +363,8 @@ export default function CollectionPage() {
               aria-pressed={filterHolosOnly}
               className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
               style={{
-                backgroundColor: filterHolosOnly ? '#a8e6ff1f' : '#141414',
-                color: filterHolosOnly ? '#a8e6ff' : '#888888',
+                backgroundColor: filterHolosOnly ? '#a8e6ff1f' : 'var(--t-surface)',
+                color: filterHolosOnly ? '#a8e6ff' : 'var(--t-muted)',
                 boxShadow: filterHolosOnly ? '0 0 12px #a8e6ff33' : 'none',
               }}
             >
@@ -343,9 +378,9 @@ export default function CollectionPage() {
               aria-pressed={filterTradeableOnly}
               className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
               style={{
-                backgroundColor: filterTradeableOnly ? '#c4a35a1f' : '#141414',
-                color: filterTradeableOnly ? '#c4a35a' : '#888888',
-                boxShadow: filterTradeableOnly ? '0 0 12px #c4a35a33' : 'none',
+                backgroundColor: filterTradeableOnly ? 'var(--t-accent)1f' : 'var(--t-surface)',
+                color: filterTradeableOnly ? 'var(--t-accent)' : 'var(--t-muted)',
+                boxShadow: filterTradeableOnly ? '0 0 12px var(--t-accent)33' : 'none',
               }}
             >
               {t('collection.filterTradeable')}
@@ -353,12 +388,12 @@ export default function CollectionPage() {
           )}
         </div>
 
-        <p className="text-xs text-[#555] mb-4">{t('collection.total', { count: filteredCards.length })}</p>
+        <p className="text-xs text-[var(--t-dim)] mb-4">{t('collection.total', { count: filteredCards.length })}</p>
 
         {cardsLoading && (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 mb-4">
             {Array.from({ length: 24 }).map((_, i) => (
-              <div key={i} className="card-aspect bg-[#141414] border border-[#262626] animate-pulse" />
+              <div key={i} className="card-aspect bg-[var(--t-surface)] border border-[var(--t-border)] animate-pulse" />
             ))}
           </div>
         )}
@@ -384,8 +419,8 @@ export default function CollectionPage() {
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center p-1">
-                    <div className="w-8 h-10 bg-[#1a1a1a] mb-1" />
-                    <span className="text-[8px] text-[#555] text-center leading-tight">
+                    <div className="w-8 h-10 bg-[var(--t-surface-2)] mb-1" />
+                    <span className="text-[8px] text-[var(--t-dim)] text-center leading-tight">
                       {getCardName(card, locale as 'en' | 'fr')}
                     </span>
                   </div>
@@ -397,7 +432,7 @@ export default function CollectionPage() {
             return (
               <div
                 key={card.id}
-                className="relative card-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
+                className="relative card-aspect bg-[var(--t-surface)] border border-[var(--t-border)] overflow-hidden hover:border-[var(--t-border-strong)] transition-colors group"
               >
                 <Link
                   href={`/cards/${cardIdToSlug(card.id)}`}
@@ -420,7 +455,7 @@ export default function CollectionPage() {
                 {variant && !locked && (variantInventory.get(card.id) ?? 0) >= 2 && (
                   <span
                     className="absolute bottom-1 right-1 z-10 px-1.5 py-0.5 text-[9px] font-bold"
-                    style={{ backgroundColor: '#c4a35a33', color: '#c4a35a', fontVariantNumeric: 'tabular-nums' }}
+                    style={{ backgroundColor: 'var(--t-accent)33', color: 'var(--t-accent)', fontVariantNumeric: 'tabular-nums' }}
                   >
                     x{variantInventory.get(card.id)}
                   </span>
@@ -428,7 +463,7 @@ export default function CollectionPage() {
                 {filterHolosOnly && holoOwned && (variantInventory.get(holoIdFor(card.id)) ?? 0) >= 2 && (
                   <span
                     className="absolute bottom-1 right-1 z-10 px-1.5 py-0.5 text-[9px] font-bold"
-                    style={{ backgroundColor: '#a8e6ff26', color: '#a8e6ff', fontVariantNumeric: 'tabular-nums' }}
+                    style={{ backgroundColor: '#a8e6ff26', color: 'var(--t-accent)', fontVariantNumeric: 'tabular-nums' }}
                   >
                     x{variantInventory.get(holoIdFor(card.id))}
                   </span>
@@ -437,7 +472,7 @@ export default function CollectionPage() {
                   type="button"
                   onClick={() => setSelectedCard(filterHolosOnly && holoOwned ? { ...card, isHolo: true } : card)}
                   className="absolute top-1 left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full opacity-70 hover:opacity-100 transition-opacity"
-                  style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: '#c4a35a' }}
+                  style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: 'var(--t-accent)' }}
                   aria-label={t('collection.quickPreview')}
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -456,18 +491,18 @@ export default function CollectionPage() {
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage <= 1}
               className="px-3 py-1.5 text-xs transition-colors disabled:opacity-30"
-              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+              style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-muted)' }}
             >
               {t('common.previous')}
             </button>
-            <span className="text-xs" style={{ color: '#888888' }}>
+            <span className="text-xs" style={{ color: 'var(--t-muted)' }}>
               {currentPage} / {totalCharPages}
             </span>
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalCharPages, p + 1))}
               disabled={currentPage >= totalCharPages}
               className="px-3 py-1.5 text-xs transition-colors disabled:opacity-30"
-              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+              style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-muted)' }}
             >
               {t('common.next')}
             </button>
@@ -477,9 +512,9 @@ export default function CollectionPage() {
         {filteredCards.some((c) => c.card_type === 'mission') && (
           <>
             <div className="mt-8 mb-4 flex items-center gap-3">
-              <div className="flex-1 h-px bg-[#262626]" />
-              <span className="text-sm font-bold text-[#888888] uppercase tracking-wider">{t('collection.missions')}</span>
-              <div className="flex-1 h-px bg-[#262626]" />
+              <div className="flex-1 h-px bg-[var(--t-border)]" />
+              <span className="text-sm font-bold text-[var(--t-muted)] uppercase tracking-wider">{t('collection.missions')}</span>
+              <div className="flex-1 h-px bg-[var(--t-border)]" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredCards.filter((c) => c.card_type === 'mission').map((card) => {
@@ -488,7 +523,7 @@ export default function CollectionPage() {
                 return (
                   <div
                     key={card.id}
-                    className="relative mission-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
+                    className="relative mission-aspect bg-[var(--t-surface)] border border-[var(--t-border)] overflow-hidden hover:border-[var(--t-border-strong)] transition-colors group"
                   >
                     <Link
                       href={`/cards/${cardIdToSlug(card.id)}`}
@@ -507,8 +542,8 @@ export default function CollectionPage() {
                         />
                       ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center p-1">
-                          <div className="w-10 h-7 bg-[#1a1a1a] mb-1" />
-                          <span className="text-[8px] text-[#555] text-center leading-tight">
+                          <div className="w-10 h-7 bg-[var(--t-surface-2)] mb-1" />
+                          <span className="text-[8px] text-[var(--t-dim)] text-center leading-tight">
                             {getCardName(card, locale)}
                           </span>
                         </div>
@@ -520,7 +555,7 @@ export default function CollectionPage() {
                       type="button"
                       onClick={() => setSelectedCard(card)}
                       className="absolute top-1 left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full opacity-70 hover:opacity-100 transition-opacity"
-                      style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: '#c4a35a' }}
+                      style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: 'var(--t-accent)' }}
                       aria-label={t('collection.quickPreview')}
                     >
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -538,9 +573,9 @@ export default function CollectionPage() {
         {characterAttachments.length > 0 && (
           <>
             <div className="mt-8 mb-4 flex items-center gap-3">
-              <div className="flex-1 h-px bg-[#262626]" />
-              <span className="text-sm font-bold text-[#888888] uppercase tracking-wider">{t('collection.characterAttachments')}</span>
-              <div className="flex-1 h-px bg-[#262626]" />
+              <div className="flex-1 h-px bg-[var(--t-border)]" />
+              <span className="text-sm font-bold text-[var(--t-muted)] uppercase tracking-wider">{t('collection.characterAttachments')}</span>
+              <div className="flex-1 h-px bg-[var(--t-border)]" />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 items-start">
               {characterAttachments.map((card) => renderAttachmentTile(card))}
@@ -551,9 +586,9 @@ export default function CollectionPage() {
         {missionAttachments.length > 0 && (
           <>
             <div className="mt-8 mb-4 flex items-center gap-3">
-              <div className="flex-1 h-px bg-[#262626]" />
-              <span className="text-sm font-bold text-[#888888] uppercase tracking-wider">{t('collection.missionAttachments')}</span>
-              <div className="flex-1 h-px bg-[#262626]" />
+              <div className="flex-1 h-px bg-[var(--t-border)]" />
+              <span className="text-sm font-bold text-[var(--t-muted)] uppercase tracking-wider">{t('collection.missionAttachments')}</span>
+              <div className="flex-1 h-px bg-[var(--t-border)]" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
               {missionAttachments.map((card) => renderAttachmentTile(card))}
@@ -581,9 +616,9 @@ function BanBadge({ label }: { label: string }) {
         padding: '2px 6px',
         fontSize: 9,
         letterSpacing: '0.18em',
-        color: '#ffffff',
+        color: 'var(--t-text)',
         backgroundColor: 'rgba(179, 62, 62, 0.95)',
-        boxShadow: '0 2px 6px rgba(0,0,0,0.45)',
+        boxShadow: '0 2px 6px var(--t-shadow)',
         zIndex: 2,
       }}
     >

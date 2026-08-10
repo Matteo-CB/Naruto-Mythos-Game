@@ -147,32 +147,32 @@ export default function AdminRevealPage() {
 
   if (!isAdmin) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
-        <p style={{ color: '#b33e3e' }}>{t('unauthorized')}</p>
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
+        <p style={{ color: 'var(--t-danger)' }}>{t('unauthorized')}</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen relative" style={{ backgroundColor: '#0a0a0a', color: '#e8e8e8' }}>
+    <main className="min-h-screen relative" style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-text)' }}>
       <CloudBackground />
       <div className="relative z-10 max-w-5xl mx-auto px-4 py-8">
-        <Link href="/admin" style={{ color: '#c4a35a', fontSize: 14 }}>
+        <Link href="/admin" style={{ color: 'var(--t-accent)', fontSize: 14 }}>
           {t('back')}
         </Link>
         <h1 className="mt-4" style={{ fontFamily: 'NJNaruto, sans-serif', fontSize: 28, letterSpacing: 1 }}>
           {t('title')}
         </h1>
-        <p className="mt-2" style={{ color: '#9a9a9a', fontSize: 14, maxWidth: 640 }}>
+        <p className="mt-2" style={{ color: 'var(--t-muted)', fontSize: 14, maxWidth: 640 }}>
           {t('subtitle')}
         </p>
 
         <section className="mt-8">
-          <h2 style={{ fontFamily: 'NJNaruto, sans-serif', fontSize: 20, color: '#c4a35a' }}>{t('setStatusTitle')}</h2>
-          <p className="mt-1" style={{ color: '#9a9a9a', fontSize: 13, maxWidth: 640 }}>{t('setStatusSubtitle')}</p>
+          <h2 style={{ fontFamily: 'NJNaruto, sans-serif', fontSize: 20, color: 'var(--t-accent)' }}>{t('setStatusTitle')}</h2>
+          <p className="mt-1" style={{ color: 'var(--t-muted)', fontSize: 13, maxWidth: 640 }}>{t('setStatusSubtitle')}</p>
           <div className="mt-3 space-y-2">
             {sets.map((s) => (
-              <div key={s.id} className="flex items-center gap-3 p-2" style={{ backgroundColor: '#111111' }}>
+              <div key={s.id} className="flex items-center gap-3 p-2" style={{ backgroundColor: 'var(--t-panel)' }}>
                 <span style={{ fontSize: 13, width: 180 }}>{s.nameEn} <span style={{ color: '#7a7a7a' }}>({s.id})</span></span>
                 <div className="flex gap-1.5 flex-wrap">
                   {(['available', 'revealing', 'coming_soon'] as const).map((st) => (
@@ -182,8 +182,8 @@ export default function AdminRevealPage() {
                       disabled={busy !== null}
                       style={{
                         fontSize: 12, padding: '4px 10px', letterSpacing: 0.5,
-                        backgroundColor: s.status === st ? 'rgba(196,163,90,0.18)' : 'rgba(136,136,136,0.08)',
-                        color: s.status === st ? '#c4a35a' : '#777',
+                        backgroundColor: s.status === st ? 'var(--t-accent-glow)' : 'rgba(136,136,136,0.08)',
+                        color: s.status === st ? 'var(--t-accent)' : 'var(--t-dim)',
                         opacity: busy === `set-${s.id}` ? 0.5 : 1,
                       }}
                     >
@@ -198,11 +198,11 @@ export default function AdminRevealPage() {
 
         {variants.length > 0 && (
           <section className="mt-8">
-            <h2 style={{ fontFamily: 'NJNaruto, sans-serif', fontSize: 20, color: '#c4a35a' }}>{t('obtentionTitle')}</h2>
-            <p className="mt-1" style={{ color: '#9a9a9a', fontSize: 13, maxWidth: 640 }}>{t('obtentionSubtitle')}</p>
+            <h2 style={{ fontFamily: 'NJNaruto, sans-serif', fontSize: 20, color: 'var(--t-accent)' }}>{t('obtentionTitle')}</h2>
+            <p className="mt-1" style={{ color: 'var(--t-muted)', fontSize: 13, maxWidth: 640 }}>{t('obtentionSubtitle')}</p>
             <div className="mt-3 grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
               {variants.map((v) => (
-                <div key={v.id} className="flex items-center gap-2 p-2" style={{ backgroundColor: '#111111' }}>
+                <div key={v.id} className="flex items-center gap-2 p-2" style={{ backgroundColor: 'var(--t-panel)' }}>
                   <span style={{ fontSize: 12, flex: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {v.name} <span style={{ color: '#7a7a7a' }}>{v.set} {v.number} {v.rarity}</span>
                   </span>
@@ -214,8 +214,8 @@ export default function AdminRevealPage() {
                         disabled={busy !== null}
                         style={{
                           fontSize: 11, padding: '3px 8px',
-                          backgroundColor: v.mode === m ? 'rgba(196,163,90,0.18)' : 'rgba(136,136,136,0.08)',
-                          color: v.mode === m ? '#c4a35a' : '#777',
+                          backgroundColor: v.mode === m ? 'var(--t-accent-glow)' : 'rgba(136,136,136,0.08)',
+                          color: v.mode === m ? 'var(--t-accent)' : 'var(--t-dim)',
                           opacity: busy === `var-${v.id}` ? 0.5 : 1,
                         }}
                       >
@@ -229,36 +229,36 @@ export default function AdminRevealPage() {
           </section>
         )}
 
-        <h2 className="mt-8" style={{ fontFamily: 'NJNaruto, sans-serif', fontSize: 20, color: '#c4a35a' }}>{t('title')}</h2>
+        <h2 className="mt-8" style={{ fontFamily: 'NJNaruto, sans-serif', fontSize: 20, color: 'var(--t-accent)' }}>{t('title')}</h2>
         <div className="mt-4 flex items-center gap-3 flex-wrap">
-          <span style={{ color: '#c4a35a', fontSize: 14 }}>
+          <span style={{ color: 'var(--t-accent)', fontSize: 14 }}>
             {t('countLabel', { revealed: revealedCount, total: cards.length })}
           </span>
           <button
             onClick={() => bulk('reveal')}
             disabled={busy !== null}
-            style={{ backgroundColor: '#1c2b1c', color: '#8fce8f', padding: '6px 14px', fontSize: 13, letterSpacing: 1, opacity: busy ? 0.5 : 1 }}
+            style={{ backgroundColor: 'var(--t-success-surface)', color: 'var(--t-success)', padding: '6px 14px', fontSize: 13, letterSpacing: 1, opacity: busy ? 0.5 : 1 }}
           >
             {t('revealAll')}
           </button>
           <button
             onClick={() => bulk('hide')}
             disabled={busy !== null}
-            style={{ backgroundColor: '#2b1c1c', color: '#ce8f8f', padding: '6px 14px', fontSize: 13, letterSpacing: 1, opacity: busy ? 0.5 : 1 }}
+            style={{ backgroundColor: 'var(--t-danger-surface)', color: 'var(--t-danger)', padding: '6px 14px', fontSize: 13, letterSpacing: 1, opacity: busy ? 0.5 : 1 }}
           >
             {t('hideAll')}
           </button>
         </div>
 
         {loading ? (
-          <p className="mt-8" style={{ color: '#9a9a9a' }}>{t('loading')}</p>
+          <p className="mt-8" style={{ color: 'var(--t-muted)' }}>{t('loading')}</p>
         ) : cards.length === 0 ? (
-          <p className="mt-8" style={{ color: '#9a9a9a' }}>{t('empty')}</p>
+          <p className="mt-8" style={{ color: 'var(--t-muted)' }}>{t('empty')}</p>
         ) : (
           <div className="mt-6 space-y-8">
             {bySet.map(([setId, setCards]) => (
               <section key={setId}>
-                <h2 style={{ fontFamily: 'NJNaruto, sans-serif', fontSize: 18, color: '#c4a35a', marginBottom: 12 }}>
+                <h2 style={{ fontFamily: 'NJNaruto, sans-serif', fontSize: 18, color: 'var(--t-accent)', marginBottom: 12 }}>
                   {setId}
                 </h2>
                 <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}>
@@ -266,7 +266,7 @@ export default function AdminRevealPage() {
                     <div
                       key={card.id}
                       className="flex items-center gap-3 p-2"
-                      style={{ backgroundColor: '#111111', boxShadow: '0 8px 20px rgba(0,0,0,0.4)' }}
+                      style={{ backgroundColor: 'var(--t-panel)', boxShadow: '0 8px 20px var(--t-shadow)' }}
                     >
                       {}
                       <img
@@ -274,7 +274,7 @@ export default function AdminRevealPage() {
                         alt=""
                         width={44}
                         height={60}
-                        style={{ width: 44, height: 60, objectFit: 'cover', flexShrink: 0, backgroundColor: '#000' }}
+                        style={{ width: 44, height: 60, objectFit: 'cover', flexShrink: 0, backgroundColor: 'var(--t-surface-2)' }}
                       />
                       <div className="flex-1 min-w-0">
                         <div style={{ fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

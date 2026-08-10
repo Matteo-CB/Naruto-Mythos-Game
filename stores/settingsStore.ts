@@ -13,6 +13,24 @@ function effectiveAnimations(pref: boolean): boolean {
 
 export type ChatVisibilitySetting = 'everyone' | 'friends' | 'off';
 
+export type SiteTheme = 'ks' | 'ss';
+
+export const SITE_THEME_STORAGE_KEY = 'nmtcg-site-theme';
+
+export function readStoredSiteTheme(): SiteTheme {
+  if (typeof window === 'undefined') return 'ks';
+  try {
+    return localStorage.getItem(SITE_THEME_STORAGE_KEY) === 'ss' ? 'ss' : 'ks';
+  } catch {
+    return 'ks';
+  }
+}
+
+export function applySiteTheme(theme: SiteTheme): void {
+  if (typeof document === 'undefined') return;
+  document.documentElement.setAttribute('data-theme', theme);
+}
+
 interface SettingsState {
   animationsEnabled: boolean;
   animationsPref: boolean;
@@ -20,6 +38,7 @@ interface SettingsState {
   chatVisibility: ChatVisibilitySetting;
   allowNonFriendMessages: boolean;
   privateProfile: boolean;
+  siteTheme: SiteTheme;
   soundEnabled: boolean;
   soundVolume: number;
   allowSpectatorHand: boolean;
@@ -36,6 +55,7 @@ interface SettingsState {
   isLoaded: boolean;
   fetchFromServer: () => Promise<void>;
   setAnimationsEnabled: (v: boolean) => Promise<void>;
+  setSiteTheme: (v: SiteTheme) => Promise<void>;
   setSoundEnabled: (v: boolean) => void;
   setSoundVolume: (v: number) => void;
   setAllowSpectatorHand: (v: boolean) => Promise<void>;
@@ -106,6 +126,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   allowNonFriendMessages: true,
   privateProfile: false,
   chatVisibility: 'everyone',
+  siteTheme: readStoredSiteTheme(),
   soundEnabled: getLocalSound().enabled,
   soundVolume: getLocalSound().volume,
   allowSpectatorHand: false,
@@ -144,6 +165,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       cacheBackgrounds(backgrounds);
 
       const animPref = prefs.animationsEnabled ?? true;
+      const serverTheme: SiteTheme | null = prefs.siteTheme === 'ss' || prefs.siteTheme === 'ks' ? prefs.siteTheme : null;
+      if (serverTheme) applySiteTheme(serverTheme);
       set({
         animationsPref: animPref,
         animationsEnabled: effectiveAnimations(animPref),
@@ -152,6 +175,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         privateProfile: prefs.privateProfile ?? false,
         chatVisibility: (['everyone', 'friends', 'off'].includes(prefs.chatVisibility) ? prefs.chatVisibility : 'everyone') as ChatVisibilitySetting,
         soundEnabled: prefs.soundsEnabled ?? get().soundEnabled,
+        siteTheme: serverTheme ?? get().siteTheme,
         allowSpectatorHand: prefs.allowSpectatorHand ?? false,
         hideDeckBuilderVariants: prefs.hideDeckBuilderVariants ?? false,
         manualPowerMode: prefs.manualPowerMode ?? false,
@@ -186,6 +210,21 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       if (!res.ok) throw new Error('Failed to save');
     } catch {
       set({ animationsPref: prevPref, animationsEnabled: effectiveAnimations(prevPref) });
+    }
+  },
+
+  setSiteTheme: async (v: SiteTheme) => {
+    set({ siteTheme: v });
+    applySiteTheme(v);
+    try { localStorage.setItem(SITE_THEME_STORAGE_KEY, v); } catch { /* ignore */ }
+    try {
+      await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ siteTheme: v }),
+      });
+    } catch {
+      /* le choix reste applique localement */
     }
   },
 

@@ -73,8 +73,8 @@ export default function TournamentsPage() {
 
   if (status === 'loading' || status === 'unauthenticated') {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#08070a' }}>
-        <p className="font-display text-sm uppercase tracking-widest" style={{ color: '#555' }}>{tc('loading')}</p>
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
+        <p className="font-display text-sm uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>{tc('loading')}</p>
       </main>
     );
   }
@@ -85,7 +85,7 @@ export default function TournamentsPage() {
   ];
 
   return (
-    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
+    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--t-bg)' }}>
       <CloudBackground />
 
       <div className="w-full max-w-3xl mx-auto relative z-10 flex-1 px-4 sm:px-8 py-6 sm:py-10">
@@ -99,7 +99,7 @@ export default function TournamentsPage() {
           <div>
             <h1
               className="font-display text-3xl sm:text-5xl uppercase tracking-wider leading-none"
-              style={{ color: '#f2efe7', letterSpacing: '0.08em', textShadow: '0 0 22px rgba(196, 163, 90, 0.18)' }}
+              style={{ color: 'var(--t-text)', letterSpacing: '0.08em', textShadow: '0 0 22px var(--t-accent-glow)' }}
             >
               {t('title')}
             </h1>
@@ -109,18 +109,18 @@ export default function TournamentsPage() {
               transition={{ delay: 0.25, duration: 0.4 }}
               className="font-display flex items-baseline gap-2 mt-3"
             >
-              <span className="text-2xl tabular-nums leading-none" style={{ color: '#c4a35a' }}>
+              <span className="text-2xl tabular-nums leading-none" style={{ color: 'var(--t-accent)' }}>
                 {simulatorTournaments.length}
               </span>
-              <span className="text-[11px] uppercase tracking-[0.3em]" style={{ color: '#666' }}>
+              <span className="text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--t-dim)' }}>
                 {t('countLabel')}
               </span>
             </motion.div>
           </div>
           <Link
             href="/"
-            className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
-            style={{ color: '#888' }}
+            className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[var(--t-accent)]"
+            style={{ color: 'var(--t-muted)' }}
           >
             {tc('back')}
           </Link>
@@ -132,7 +132,7 @@ export default function TournamentsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.1 }}
             className="relative overflow-hidden p-4 sm:p-5 mb-6"
-            style={{ backgroundColor: '#0b0a0e', clipPath: PANEL_CLIP }}
+            style={{ backgroundColor: 'var(--t-surface-2)', clipPath: PANEL_CLIP }}
           >
             <WeeklyTournamentCalendar tournaments={simulatorTournaments as unknown as Parameters<typeof WeeklyTournamentCalendar>[0]['tournaments']} />
           </motion.div>
@@ -143,9 +143,9 @@ export default function TournamentsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.15 }}
           className="relative overflow-hidden p-4 sm:p-5 mb-6"
-          style={{ backgroundColor: '#0d0c10', clipPath: PANEL_CLIP }}
+          style={{ backgroundColor: 'var(--t-bg)', clipPath: PANEL_CLIP }}
         >
-          <p className="font-display text-[10px] sm:text-[11px] uppercase tracking-widest mb-3" style={{ color: '#666' }}>
+          <p className="font-display text-[10px] sm:text-[11px] uppercase tracking-widest mb-3" style={{ color: 'var(--t-dim)' }}>
             {t('joinByCode')}
           </p>
           <div className="flex flex-col sm:flex-row gap-2">
@@ -162,14 +162,14 @@ export default function TournamentsPage() {
             <motion.button
               whileTap={{ scale: 0.96 }}
               onClick={handleJoinByCode}
-              className="font-display px-5 py-2.5 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[#ffd966]"
-              style={{ color: '#c4a35a', backgroundColor: 'rgba(196, 163, 90, 0.12)', borderRadius: 9999 }}
+              className="font-display px-5 py-2.5 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[var(--t-accent-bright)]"
+              style={{ color: 'var(--t-accent)', backgroundColor: 'var(--t-accent-glow)', borderRadius: 9999 }}
             >
               {t('join')}
             </motion.button>
           </div>
           {joinError && (
-            <p className="font-display text-[11px] mt-3 uppercase tracking-widest" style={{ color: '#d97676' }}>
+            <p className="font-display text-[11px] mt-3 uppercase tracking-widest" style={{ color: 'var(--t-danger)' }}>
               {joinError}
             </p>
           )}
@@ -188,8 +188,8 @@ export default function TournamentsPage() {
               onClick={() => { setActiveTab(tab.key); clearError(); }}
               className="font-display shrink-0 px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors"
               style={{
-                color: activeTab === tab.key ? '#c4a35a' : '#666',
-                backgroundColor: activeTab === tab.key ? 'rgba(196, 163, 90, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+                color: activeTab === tab.key ? 'var(--t-accent)' : 'var(--t-dim)',
+                backgroundColor: activeTab === tab.key ? 'var(--t-accent-glow)' : 'rgba(255, 255, 255, 0.03)',
                 borderRadius: 9999,
               }}
             >
@@ -203,7 +203,7 @@ export default function TournamentsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="font-display mb-4 px-4 py-3 text-[11px] uppercase tracking-widest"
-            style={{ color: '#d97676', backgroundColor: 'rgba(217, 118, 118, 0.08)', clipPath: PANEL_CLIP }}
+            style={{ color: 'var(--t-danger)', backgroundColor: 'rgba(217, 118, 118, 0.08)', clipPath: PANEL_CLIP }}
           >
             {error}
           </motion.div>
@@ -220,9 +220,9 @@ export default function TournamentsPage() {
             {activeTab === 'create' ? (
               <CreateTournamentForm isAdmin={canCreate} canCreatePublic={canCreatePublic} />
             ) : loading ? (
-              <p className="font-display text-sm uppercase tracking-widest text-center py-10" style={{ color: '#555' }}>{tc('loading')}</p>
+              <p className="font-display text-sm uppercase tracking-widest text-center py-10" style={{ color: 'var(--t-dim)' }}>{tc('loading')}</p>
             ) : simulatorTournaments.length === 0 ? (
-              <p className="font-display text-sm uppercase tracking-widest text-center py-10" style={{ color: '#555' }}>{t('noTournaments')}</p>
+              <p className="font-display text-sm uppercase tracking-widest text-center py-10" style={{ color: 'var(--t-dim)' }}>{t('noTournaments')}</p>
             ) : (
               <div
                 className="flex flex-col gap-3"
@@ -244,8 +244,8 @@ export default function TournamentsPage() {
         >
           <Link
             href={'/tournaments/results' as '/'}
-            className="font-display px-4 py-2 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
-            style={{ color: '#888', backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 9999 }}
+            className="font-display px-4 py-2 text-[11px] uppercase tracking-widest transition-colors hover:text-[var(--t-accent)]"
+            style={{ color: 'var(--t-muted)', backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 9999 }}
           >
             {t('pastTournaments')}
           </Link>

@@ -41,7 +41,7 @@ export function WorldcupBanner({ champion, countryName }: { champion: Champion; 
         <div className="font-display text-[10px] uppercase tracking-[0.3em]" style={{ color: '#ffd700' }}>
           {t('lastChampionLabel', { month: monthLabel(champion.endMonth, bcp47) })}
         </div>
-        <div className="font-display text-lg sm:text-xl uppercase tracking-wider truncate" style={{ color: '#f2efe7' }}>
+        <div className="font-display text-lg sm:text-xl uppercase tracking-wider truncate" style={{ color: 'var(--t-text)' }}>
           {countryName(champion.countryCode)}
         </div>
       </div>

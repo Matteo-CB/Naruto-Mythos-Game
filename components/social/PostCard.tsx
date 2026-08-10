@@ -101,20 +101,20 @@ export function PostCard({ post, onChange, onDelete, isAdmin, embedded }: {
   const isRepostWrapper = !!post.repostOf && !post.body;
 
   return (
-    <article className="px-4 py-3" style={{ backgroundColor: embedded ? 'transparent' : '#0d0c10', borderBottom: embedded ? 'none' : '1px solid #17171a', ...(embedded ? { border: '1px solid #1e1e22' } : {}) }}>
+    <article className="px-4 py-3" style={{ backgroundColor: embedded ? 'transparent' : 'var(--t-bg)', borderBottom: embedded ? 'none' : '1px solid #17171a', ...(embedded ? { border: '1px solid #1e1e22' } : {}) }}>
       {isRepostWrapper && (
         <div className="text-[10px] uppercase tracking-wider mb-1.5" style={{ color: '#6a6a70' }}>{t('repostedBy', { user: author })}</div>
       )}
       {pinned && !embedded && (
-        <div className="text-[10px] uppercase tracking-wider mb-1.5" style={{ color: '#c4a35a' }}>{t('pinned')}</div>
+        <div className="text-[10px] uppercase tracking-wider mb-1.5" style={{ color: 'var(--t-accent)' }}>{t('pinned')}</div>
       )}
 
       <div className="flex items-start gap-2.5">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             {inner.author ? (
-              <Link href={`/profile/${inner.author.username}` as '/'} className="font-display text-sm hover:underline" style={{ color: '#e8e6df' }}>{inner.author.username}</Link>
-            ) : <span className="font-display text-sm" style={{ color: '#888' }}>?</span>}
+              <Link href={`/profile/${inner.author.username}` as '/'} className="font-display text-sm hover:underline" style={{ color: 'var(--t-text)' }}>{inner.author.username}</Link>
+            ) : <span className="font-display text-sm" style={{ color: 'var(--t-muted)' }}>?</span>}
             <span className="text-[11px]" style={{ color: '#55555c' }}>· {timeAgo(inner.createdAt, locale)}</span>
             {!embedded && (
               <div className="relative ml-auto">
@@ -122,7 +122,7 @@ export function PostCard({ post, onChange, onDelete, isAdmin, embedded }: {
                 {menuOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-                    <div className="absolute right-0 top-full mt-1 z-50 flex flex-col overflow-hidden" style={{ backgroundColor: '#17171b', border: '1px solid #2a2a30', minWidth: 150 }}>
+                    <div className="absolute right-0 top-full mt-1 z-50 flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--t-surface-2)', border: '1px solid #2a2a30', minWidth: 150 }}>
                       {!isOwner && <MenuItem onClick={report} disabled={reported}>{reported ? t('reported') : t('report')}</MenuItem>}
                       {isOwner && !inner.parentId && <MenuItem onClick={doPin}>{pinned ? t('unpin') : t('pin')}</MenuItem>}
                       {(isOwner || isAdmin) && <MenuItem onClick={doDelete} danger>{t('deleteAction')}</MenuItem>}
@@ -151,7 +151,7 @@ export function PostCard({ post, onChange, onDelete, isAdmin, embedded }: {
               <button type="button" onClick={repost} className="flex items-center gap-1.5 text-[12px]" style={{ color: '#6a6a70', cursor: 'pointer' }}>
                 <span>{t('repost')}</span>{repostCount > 0 && <span className="tabular-nums">{repostCount}</span>}
               </button>
-              <button type="button" onClick={toggleLike} className="flex items-center gap-1.5 text-[12px]" style={{ color: liked ? '#c4a35a' : '#6a6a70', cursor: 'pointer' }}>
+              <button type="button" onClick={toggleLike} className="flex items-center gap-1.5 text-[12px]" style={{ color: liked ? 'var(--t-accent)' : '#6a6a70', cursor: 'pointer' }}>
                 <span>{t('like')}</span>{likeCount > 0 && <span className="tabular-nums">{likeCount}</span>}
               </button>
             </div>

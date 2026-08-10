@@ -50,14 +50,14 @@ export function ChatSettingsSection() {
   return (
     <div
       className="mt-4 flex flex-col gap-4 p-5"
-      style={{ backgroundColor: '#111111', border: '1px solid #262626' }}
+      style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' }}
     >
-      <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+      <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
         {t('chatSection')}
       </span>
 
       <div className="flex flex-col gap-2">
-        <span className="text-xs font-medium tracking-wide" style={{ color: '#999' }}>
+        <span className="text-xs font-medium tracking-wide" style={{ color: 'var(--t-muted)' }}>
           {t('chatVisibilityLabel')}
         </span>
         <div className="flex flex-wrap gap-2">
@@ -71,8 +71,8 @@ export function ChatSettingsSection() {
                 onClick={() => setChatVisibility(opt)}
                 className="px-4 py-2 text-[11px] font-bold uppercase tracking-wider cursor-pointer transition-colors"
                 style={{
-                  backgroundColor: active ? '#c4a35a' : 'rgba(255,255,255,0.03)',
-                  color: active ? '#0a0a0a' : '#888',
+                  backgroundColor: active ? 'var(--t-accent)' : 'rgba(255,255,255,0.03)',
+                  color: active ? 'var(--t-bg)' : 'var(--t-muted)',
                   border: 'none',
                   opacity: isLoaded ? 1 : 0.5,
                 }}
@@ -82,21 +82,21 @@ export function ChatSettingsSection() {
             );
           })}
         </div>
-        <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+        <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
           {t('chatVisibilityHint')}
         </p>
       </div>
 
-      <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+      <div style={{ height: '1px', backgroundColor: 'var(--t-surface-2)' }} />
 
       <div className="flex flex-col gap-2">
-        <span className="text-xs font-medium tracking-wide" style={{ color: '#999' }}>
+        <span className="text-xs font-medium tracking-wide" style={{ color: 'var(--t-muted)' }}>
           {t('blockedPlayers')}
         </span>
         {!blockedLoaded ? (
-          <p className="text-xs" style={{ color: '#555' }}>...</p>
+          <p className="text-xs" style={{ color: 'var(--t-dim)' }}>...</p>
         ) : blocked.length === 0 ? (
-          <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+          <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
             {t('blockedEmpty')}
           </p>
         ) : (
@@ -105,13 +105,13 @@ export function ChatSettingsSection() {
               <div
                 key={b.userId}
                 className="flex items-center justify-between gap-3 py-2"
-                style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+                style={{ borderBottom: '1px solid var(--t-divider)' }}
               >
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[13px] truncate" style={{ color: '#e0e0e0' }}>
+                  <span className="text-[13px] truncate" style={{ color: 'var(--t-text)' }}>
                     {b.username}
                   </span>
-                  <span className="text-[10px]" style={{ color: '#555' }}>
+                  <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>
                     {new Intl.DateTimeFormat(bcp47, { dateStyle: 'medium' }).format(new Date(b.blockedAt))}
                   </span>
                 </div>
@@ -120,7 +120,7 @@ export function ChatSettingsSection() {
                   disabled={busyId === b.userId}
                   onClick={() => unblock(b.userId)}
                   className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer disabled:opacity-40 shrink-0"
-                  style={{ backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a', border: 'none' }}
+                  style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)', border: 'none' }}
                 >
                   {t('unblock')}
                 </button>

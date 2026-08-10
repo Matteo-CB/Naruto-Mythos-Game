@@ -12,6 +12,7 @@ import { usePlayerFlag } from '@/lib/hooks/usePlayerFlags';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { ManualGuess } from './ManualGuess';
 import { useBoardPalette } from './BoardPaletteContext';
+import { ChakraIcon, CHAKRA_COLOR } from '@/components/icons/GameIcons';
 
 export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
   const t = useTranslations();
@@ -83,7 +84,14 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
 
       <div className="flex-1" />
 
-      <StatPill label={t('game.chakra')} value={opponentState.chakra} color={opponent.primary} isMobile={dims.isMobile} manual={manualPowerMode} />
+      <StatPill
+        label={t('game.chakra')}
+        icon={<ChakraIcon size={dims.isMobile ? 14 : 12} color={CHAKRA_COLOR} style={{ verticalAlign: 'middle', marginRight: '3px' }} />}
+        value={opponentState.chakra}
+        color={opponent.primary}
+        isMobile={dims.isMobile}
+        manual={manualPowerMode}
+      />
 
       <StatPill label={t('game.score')} value={opponentState.missionPoints} color="#e0e0e0" isMobile={dims.isMobile} manual={manualPowerMode} />
 
@@ -92,7 +100,7 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
   );
 });
 
-function StatPill({ label, value, color, isMobile, manual }: { label: string; value: number; color: string; isMobile?: boolean; manual?: boolean }) {
+function StatPill({ label, value, color, isMobile, manual, icon }: { label: string; value: number; color: string; isMobile?: boolean; manual?: boolean; icon?: React.ReactNode }) {
   return (
     <div className="flex items-baseline gap-1.5 sm:gap-2 px-1.5 sm:px-2 shrink-0">
       <span
@@ -104,6 +112,7 @@ function StatPill({ label, value, color, isMobile, manual }: { label: string; va
           lineHeight: 1,
         }}
       >
+        {icon}
         {label}
       </span>
       <motion.span

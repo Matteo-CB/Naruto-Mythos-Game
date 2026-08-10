@@ -4,6 +4,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import {
   findAffordableLeafInHand,
   findHiddenLeafOnBoard,
+  findRevealBlockedLeaf,
 } from '@/lib/effects/handlers/KS/shared/summonSearch';
 
 
@@ -20,6 +21,21 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
   const allTargets = [...affordableLeafIndices, ...hiddenLeafIds];
 
   if (allTargets.length === 0) {
+    const blockedName = findRevealBlockedLeaf(state, sourcePlayer);
+    if (blockedName) {
+      return {
+        state: {
+          ...state,
+          log: logAction(
+            state.log, state.turn, state.phase, sourcePlayer,
+            'EFFECT_BLOCKED',
+            `Hiruzen Sarutobi (002): Cannot reveal ${blockedName}, a character with that name is already visible on this mission.`,
+            'game.log.effect.duplicateNameReveal',
+            { card: blockedName },
+          ),
+        },
+      };
+    }
     return {
       state: {
         ...state,

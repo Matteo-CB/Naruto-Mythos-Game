@@ -37,9 +37,9 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
             transition={{ type: 'spring', stiffness: 220, damping: 22 }}
             className="w-full max-w-2xl max-h-[85vh] overflow-y-auto"
             style={{
-              backgroundColor: '#0d0c10',
+              backgroundColor: 'var(--t-bg)',
               clipPath: PANEL_CLIP,
-              boxShadow: '0 24px 80px rgba(0, 0, 0, 0.75), 0 0 70px -30px rgba(196, 163, 90, 0.4)',
+              boxShadow: '0 24px 80px var(--t-shadow), 0 0 70px -30px rgba(196, 163, 90, 0.4)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -48,7 +48,7 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
                 aria-hidden
                 className="font-display pointer-events-none absolute left-7 top-0 leading-none"
                 style={{
-                  color: 'rgba(196, 163, 90, 0.08)',
+                  color: 'var(--t-accent-tint)',
                   fontSize: '110px',
                   letterSpacing: '-0.04em',
                   top: -22,
@@ -61,21 +61,21 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
                 <div>
                   <h2
                     className="font-display text-2xl sm:text-3xl uppercase tracking-wider leading-none"
-                    style={{ color: '#f2efe7', letterSpacing: '0.08em', textShadow: '0 0 18px rgba(196, 163, 90, 0.18)' }}
+                    style={{ color: 'var(--t-text)', letterSpacing: '0.08em', textShadow: '0 0 18px var(--t-accent-glow)' }}
                   >
                     {t('leagues')}
                   </h2>
                   <p
                     className="text-[11px] mt-2.5"
-                    style={{ color: '#666' }}
+                    style={{ color: 'var(--t-dim)' }}
                   >
                     {t('subtitle', { count: PLACEMENT_MATCHES_REQUIRED })}
                   </p>
                 </div>
                 <button
                   onClick={onClose}
-                  className="font-display text-[11px] uppercase tracking-widest px-3 py-1.5 cursor-pointer transition-colors hover:text-[#c4a35a]"
-                  style={{ color: '#888' }}
+                  className="font-display text-[11px] uppercase tracking-widest px-3 py-1.5 cursor-pointer transition-colors hover:text-[var(--t-accent)]"
+                  style={{ color: 'var(--t-muted)' }}
                 >
                   {tc('close')}
                 </button>
@@ -99,7 +99,7 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
                     whileHover={{ y: -2 }}
                     className={`relative flex items-center gap-4 px-4 py-3 ${isTop ? 'sm:col-span-2 sm:justify-center' : ''}`}
                     style={{
-                      backgroundColor: '#0a0a0d',
+                      backgroundColor: 'var(--t-surface-2)',
                       clipPath: TIER_CLIP,
                       boxShadow: `0 0 24px -10px ${tier.color}, inset 0 0 0 1px ${tier.color}18`,
                     }}
@@ -127,7 +127,7 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
                       </span>
                       <span
                         className="font-inter-force text-[11px] tabular-nums"
-                        style={{ color: '#777' }}
+                        style={{ color: 'var(--t-dim)' }}
                       >
                         {eloRange} ELO
                       </span>

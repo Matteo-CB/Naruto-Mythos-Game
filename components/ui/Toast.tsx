@@ -9,9 +9,9 @@ import { useToastStore, type ToastItem, type ToastType } from '@/stores/toastSto
 const TOAST_CLIP = 'polygon(11px 0, calc(100% - 11px) 0, 100% 11px, 100% calc(100% - 11px), calc(100% - 11px) 100%, 11px 100%, 0 calc(100% - 11px), 0 11px)';
 
 const TYPE_ACCENT: Record<ToastType, string> = {
-  error: '#d97676',
-  info: '#c4a35a',
-  success: '#5fb05f',
+  error: 'var(--t-danger)',
+  info: 'var(--t-accent)',
+  success: 'var(--t-success)',
 };
 
 export function ToastContainer() {
@@ -63,9 +63,9 @@ function Toast({ toast }: { toast: ToastItem }) {
       transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
       className="relative w-full sm:w-[340px] pointer-events-auto no-select overflow-hidden"
       style={{
-        backgroundColor: '#0d0c10',
+        backgroundColor: 'var(--t-bg)',
         clipPath: TOAST_CLIP,
-        boxShadow: `0 18px 44px rgba(0,0,0,0.6), 0 0 18px ${accent}22`,
+        boxShadow: `0 18px 44px var(--t-shadow), 0 0 18px ${accent}22`,
       }}
     >
       <div className="flex flex-col gap-1.5 px-4 py-3" style={{ backgroundColor: `${accent}12` }}>
@@ -87,7 +87,7 @@ function Toast({ toast }: { toast: ToastItem }) {
           </div>
         )}
         {message && (
-          <span className="text-[12.5px] leading-snug" style={{ color: '#e8e6df' }}>
+          <span className="text-[12.5px] leading-snug" style={{ color: 'var(--t-text)' }}>
             {message}
           </span>
         )}
@@ -116,8 +116,8 @@ function Toast({ toast }: { toast: ToastItem }) {
           <button
             type="button"
             onClick={() => dismiss(toast.id)}
-            className="font-display text-[9px] uppercase cursor-pointer transition-colors hover:text-[#999]"
-            style={{ color: '#555', letterSpacing: '0.16em', background: 'none', border: 'none', padding: 0 }}
+            className="font-display text-[9px] uppercase cursor-pointer transition-colors hover:text-[var(--t-muted)]"
+            style={{ color: 'var(--t-dim)', letterSpacing: '0.16em', background: 'none', border: 'none', padding: 0 }}
           >
             {t('common.dismiss')}
           </button>

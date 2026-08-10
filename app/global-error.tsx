@@ -24,15 +24,15 @@ export default function GlobalError({
   const s = STR[lang];
   return (
     <html lang={lang}>
-      <body style={{ backgroundColor: '#0a0a0a', margin: 0 }}>
+      <body style={{ backgroundColor: 'var(--t-bg)', margin: 0 }}>
         <div style={{
           minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <div style={{ textAlign: 'center', maxWidth: '400px', padding: '0 16px' }}>
-            <h2 style={{ color: '#b33e3e', fontSize: '18px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            <h2 style={{ color: 'var(--t-danger)', fontSize: '18px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
               {s.title}
             </h2>
-            <p style={{ color: '#666', fontSize: '12px', marginTop: '8px' }}>
+            <p style={{ color: 'var(--t-dim)', fontSize: '12px', marginTop: '8px' }}>
               {error?.message || s.defaultMsg}
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '16px' }}>
@@ -40,7 +40,7 @@ export default function GlobalError({
                 onClick={reset}
                 style={{
                   padding: '8px 20px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase',
-                  backgroundColor: 'rgba(196, 163, 90, 0.1)', color: '#c4a35a', cursor: 'pointer', letterSpacing: '0.1em',
+                  backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)', cursor: 'pointer', letterSpacing: '0.1em',
                 }}
               >
                 {s.tryAgain}
@@ -49,8 +49,8 @@ export default function GlobalError({
                 href="/"
                 style={{
                   padding: '8px 20px', fontSize: '12px', textTransform: 'uppercase',
-                  backgroundColor: '#141414', border: '1px solid #262626',
-                  color: '#888', textDecoration: 'none', letterSpacing: '0.1em',
+                  backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)',
+                  color: 'var(--t-muted)', textDecoration: 'none', letterSpacing: '0.1em',
                 }}
               >
                 {s.home}

@@ -23,11 +23,11 @@ function PickerModal({ title, onClose, children }: { title: string; onClose: () 
         initial={{ opacity: 0, scale: 0.97, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.18 }}
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-md flex flex-col overflow-hidden"
-        style={{ backgroundColor: '#111114', border: '1px solid #26262c', maxHeight: '80vh', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}
+        style={{ backgroundColor: 'var(--t-surface-2)', border: '1px solid #26262c', maxHeight: '80vh', boxShadow: '0 24px 60px var(--t-shadow)' }}
       >
         <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid #1c1c20' }}>
-          <span className="font-display text-sm uppercase tracking-widest" style={{ color: '#c4a35a' }}>{title}</span>
-          <button type="button" onClick={onClose} className="text-[11px] uppercase tracking-widest px-2 py-1" style={{ color: '#888' }}>✕</button>
+          <span className="font-display text-sm uppercase tracking-widest" style={{ color: 'var(--t-accent)' }}>{title}</span>
+          <button type="button" onClick={onClose} className="text-[11px] uppercase tracking-widest px-2 py-1" style={{ color: 'var(--t-muted)' }}>✕</button>
         </div>
         <div className="flex-1 overflow-y-auto p-2">{children}</div>
       </motion.div>
@@ -104,7 +104,7 @@ export function Composer({ onPosted, parentId, prefillReplay, prefillDeck, autoF
   }, [replays.length]);
 
   if (!session?.user?.id) {
-    return <div className="px-4 py-6 text-center text-sm" style={{ color: '#888', backgroundColor: '#0d0c10' }}>{t('loginToPost')}</div>;
+    return <div className="px-4 py-6 text-center text-sm" style={{ color: 'var(--t-muted)', backgroundColor: 'var(--t-bg)' }}>{t('loginToPost')}</div>;
   }
 
   const canPost = (body.trim().length > 0 || deck || replay || gifUrl) && !busy && body.length <= MAX;
@@ -143,7 +143,7 @@ export function Composer({ onPosted, parentId, prefillReplay, prefillDeck, autoF
   };
 
   return (
-    <div className="p-3" style={{ backgroundColor: '#0d0c10', borderBottom: '1px solid #1a1a1e' }}>
+    <div className="p-3" style={{ backgroundColor: 'var(--t-bg)', borderBottom: '1px solid #1a1a1e' }}>
       <textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
@@ -165,7 +165,7 @@ export function Composer({ onPosted, parentId, prefillReplay, prefillDeck, autoF
       )}
 
       {privateProfile && (
-        <div className="mt-2 text-[11px] px-2 py-1" style={{ backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a' }}>
+        <div className="mt-2 text-[11px] px-2 py-1" style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)' }}>
           {t('privateNotice')}
         </div>
       )}
@@ -177,13 +177,13 @@ export function Composer({ onPosted, parentId, prefillReplay, prefillDeck, autoF
         <ToolBtn onClick={openReplays} disabled={!!replay}>{t('attachReplay')}</ToolBtn>
         {gifEnabled && <ToolBtn onClick={() => setShowGif(true)} disabled={!!gifUrl}>{t('addGif')}</ToolBtn>}
         <div className="flex-1" />
-        <span className="font-inter-force text-[10px]" style={{ color: body.length > MAX ? '#b33e3e' : '#55555c' }}>{body.length}/{MAX}</span>
+        <span className="font-inter-force text-[10px]" style={{ color: body.length > MAX ? 'var(--t-danger)' : '#55555c' }}>{body.length}/{MAX}</span>
         <button
           type="button"
           onClick={submit}
           disabled={!canPost}
           className="font-display text-[11px] uppercase tracking-widest px-4 py-1.5"
-          style={{ backgroundColor: canPost ? '#c4a35a' : '#1c1c20', color: canPost ? '#0a0a0a' : '#555', cursor: canPost ? 'pointer' : 'default', opacity: busy ? 0.6 : 1 }}
+          style={{ backgroundColor: canPost ? 'var(--t-accent)' : '#1c1c20', color: canPost ? 'var(--t-bg)' : 'var(--t-dim)', cursor: canPost ? 'pointer' : 'default', opacity: busy ? 0.6 : 1 }}
         >
           {parentId ? t('reply') : t('post')}
         </button>
@@ -191,9 +191,9 @@ export function Composer({ onPosted, parentId, prefillReplay, prefillDeck, autoF
 
       {showDecks && (
         <PickerModal title={t('chooseDeck')} onClose={() => setShowDecks(false)}>
-          {decks.length === 0 ? <div className="p-6 text-center text-xs" style={{ color: '#666' }}>{t('noDecks')}</div> : decks.map((d) => (
+          {decks.length === 0 ? <div className="p-6 text-center text-xs" style={{ color: 'var(--t-dim)' }}>{t('noDecks')}</div> : decks.map((d) => (
             <button key={d.id} type="button" onClick={() => { setDeck({ deckId: d.id, name: d.name, cardIds: d.cardIds, missionIds: d.missionIds }); setShowDecks(false); }}
-              className="block w-full text-left px-3 py-2.5 text-sm" style={{ color: '#e0e0e0', borderBottom: '1px solid #17171a' }}>
+              className="block w-full text-left px-3 py-2.5 text-sm" style={{ color: 'var(--t-text)', borderBottom: '1px solid #17171a' }}>
               {d.name}
             </button>
           ))}
@@ -202,11 +202,11 @@ export function Composer({ onPosted, parentId, prefillReplay, prefillDeck, autoF
 
       {showReplays && (
         <PickerModal title={t('chooseReplay')} onClose={() => setShowReplays(false)}>
-          {replays.length === 0 ? <div className="p-6 text-center text-xs" style={{ color: '#666' }}>{t('noReplays')}</div> : replays.map((r) => (
+          {replays.length === 0 ? <div className="p-6 text-center text-xs" style={{ color: 'var(--t-dim)' }}>{t('noReplays')}</div> : replays.map((r) => (
             <button key={r.gameId} type="button" onClick={() => { setReplay(r); setShowReplays(false); }}
-              className="w-full text-left px-3 py-2.5 text-sm flex items-center justify-between gap-2" style={{ color: '#e0e0e0', borderBottom: '1px solid #17171a' }}>
+              className="w-full text-left px-3 py-2.5 text-sm flex items-center justify-between gap-2" style={{ color: 'var(--t-text)', borderBottom: '1px solid #17171a' }}>
               <span className="truncate">{r.player1Name} vs {r.player2Name}</span>
-              <span className="text-[11px] tabular-nums shrink-0" style={{ color: '#888' }}>{r.player1Score}-{r.player2Score}</span>
+              <span className="text-[11px] tabular-nums shrink-0" style={{ color: 'var(--t-muted)' }}>{r.player1Score}-{r.player2Score}</span>
             </button>
           ))}
         </PickerModal>
@@ -221,7 +221,7 @@ function ToolBtn({ onClick, disabled, children }: { onClick: () => void; disable
   return (
     <button type="button" onClick={onClick} disabled={disabled}
       className="font-display text-[10px] uppercase tracking-wider px-2.5 py-1.5"
-      style={{ backgroundColor: 'rgba(196,163,90,0.08)', color: disabled ? '#4a4a4e' : '#c4a35a', cursor: disabled ? 'default' : 'pointer' }}>
+      style={{ backgroundColor: 'var(--t-accent-tint)', color: disabled ? '#4a4a4e' : 'var(--t-accent)', cursor: disabled ? 'default' : 'pointer' }}>
       {children}
     </button>
   );

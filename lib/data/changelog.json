@@ -1,50 +1,172 @@
 {
   "entries": [
     {
-      "date": "2026-08-09",
-      "title_fr": "Fenêtre de reprise plus discrète",
-      "title_en": "A quieter resume window",
-      "title_es": "Ventana de reanudación más discreta",
-      "title_ja": "再開ウィンドウの表示を限定",
-      "title_pt": "Janela de retomada mais discreta",
-      "title_it": "Finestra di ripresa più discreta",
-      "title_pl": "Dyskretniejsze okno wznowienia",
+      "date": "2026-08-10",
+      "title_fr": "Thème clair Shinobi Shiren et icônes de rareté",
+      "title_en": "Shinobi Shiren light theme and rarity icons",
+      "title_es": "Tema claro Shinobi Shiren e iconos de rareza",
+      "title_ja": "明るいテーマ「忍びの試練」とレアリティアイコン",
+      "title_pt": "Tema claro Shinobi Shiren e ícones de raridade",
+      "title_it": "Tema chiaro Shinobi Shiren e icone di rarità",
+      "title_pl": "Jasny motyw Shinobi Shiren i ikony rzadkości",
       "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ],
+      "changes_fr": [
+        "Un nouveau thème clair, Shinobi Shiren, se choisit dans les Options : fond papier, noir et orange comme les boosters.",
+        "Chaque rareté a désormais son icône, dans la collection, sur les cartes, en jeu et jusque dans les filtres.",
+        "Le filtre de rareté de la collection devient une rangée de boutons avec les icônes, à la place du menu déroulant.",
+        "Le duel de Zabuza Momochi 150 fonctionne quand plusieurs ennemis sont à égalité de puissance : vous choisissez lequel venir chercher.",
+        "Dosu Kinuta 069 ne propose plus de révéler un personnage quand ce serait un doublon : il ne reste que le vaincre.",
+        "Quand une révélation est refusée, le jeu explique pourquoi au lieu de ne rien faire.",
+        "Regarder un match de tournoi en direct fonctionne : la partie s'affiche au lieu d'un message d'erreur.",
+        "Kakashi Hatake 8 du set 2 porte bien le mot clé Team 7, oublié à sa sortie.",
+        "Une carte cachée ne peut plus être révélée à côté d'un personnage du même nom : elle évolue dessus ou reste cachée."
+      ],
+      "changes_en": [
+        "A new light theme, Shinobi Shiren, can be picked in Options: paper background, black and orange like the boosters.",
+        "Every rarity now has its icon, in the collection, on cards, in game and even in the filters.",
+        "The collection rarity filter becomes a row of buttons with the icons, instead of a dropdown.",
+        "Zabuza Momochi 150's duel now works when several enemies tie for strongest: you choose which one to drag over.",
+        "Dosu Kinuta 069 no longer offers to reveal a character when it would be a duplicate: only defeating remains.",
+        "When a reveal is refused, the game now explains why instead of doing nothing.",
+        "Watching a tournament match live now works: the game appears instead of an error message.",
+        "Kakashi Hatake 8 from set 2 now carries the Team 7 keyword, missing since release.",
+        "A face down card can no longer be revealed next to a character with the same name: it upgrades onto it or stays hidden."
+      ],
+      "changes_es": [
+        "Un nuevo tema claro, Shinobi Shiren, se elige en Opciones: fondo papel, negro y naranja como los sobres.",
+        "Cada rareza tiene ahora su icono, en la colección, en las cartas, en partida y hasta en los filtros.",
+        "El filtro de rareza de la colección pasa a ser una fila de botones con los iconos, en lugar de un desplegable.",
+        "El duelo de Zabuza Momochi 150 funciona cuando varios enemigos empatan en poder: tú eliges a cuál traer.",
+        "Dosu Kinuta 069 ya no ofrece revelar un personaje si sería un duplicado: solo queda derrotarlo.",
+        "Cuando se rechaza una revelación, el juego explica por qué en lugar de no hacer nada.",
+        "Ver un combate de torneo en directo ya funciona: la partida aparece en lugar de un mensaje de error.",
+        "Kakashi Hatake 8 del set 2 lleva la palabra clave Team 7, que faltaba desde su salida.",
+        "Una carta oculta ya no puede revelarse junto a un personaje del mismo nombre: evoluciona sobre él o sigue oculta."
+      ],
+      "changes_ja": [
+        "新しい明るいテーマ「忍びの試練」を設定から選べます。紙の背景に、ブースターと同じ黒とオレンジです。",
+        "すべてのレアリティにアイコンが付きました。コレクション、カード、対戦中、絞り込みまで対応します。",
+        "コレクションのレアリティ絞り込みが、プルダウンからアイコン付きのボタン列になりました。",
+        "複数の敵が同じパワーで並んだときも、ザブザ・モモチ150のデュエルが機能し、どの敵を引き寄せるか選べます。",
+        "ドス・キヌタ069は、同名になる場合にオープンの選択肢を出さなくなり、撃破のみとなります。",
+        "オープンが拒否されたとき、何も起こらないのではなく理由が表示されます。",
+        "トーナメントの試合の生観戦が正しく動作します。エラー表示の代わりに対戦画面が出ます。",
+        "セット2のはたけカカシ8に、公開時から抜けていたキーワード「第七班」が付きました。",
+        "伏せたカードは、同じ名前の忍がいる場所では公開できなくなりました。進化するか、伏せたままになります。"
+      ],
+      "changes_pt": [
+        "Um novo tema claro, Shinobi Shiren, escolhe-se nas Opções: fundo papel, preto e laranja como os boosters.",
+        "Cada raridade passa a ter o seu ícone, na coleção, nas cartas, em jogo e até nos filtros.",
+        "O filtro de raridade da coleção passa a ser uma fila de botões com os ícones, em vez de uma lista.",
+        "O duelo de Zabuza Momochi 150 funciona quando vários inimigos empatam em poder: você escolhe qual trazer.",
+        "Dosu Kinuta 069 já não oferece revelar um personagem quando seria um duplicado: resta apenas derrotá-lo.",
+        "Quando uma revelação é recusada, o jogo explica porquê em vez de não fazer nada.",
+        "Ver um combate de torneio ao vivo ja funciona: a partida aparece em vez de uma mensagem de erro.",
+        "Kakashi Hatake 8 do set 2 passa a ter a palavra chave Team 7, em falta desde o lancamento.",
+        "Uma carta virada para baixo já não pode ser revelada ao lado de um personagem com o mesmo nome: evolui sobre ele ou fica escondida."
+      ],
+      "changes_it": [
+        "Un nuovo tema chiaro, Shinobi Shiren, si sceglie nelle Opzioni: sfondo carta, nero e arancione come le bustine.",
+        "Ogni rarità ha ora la sua icona, nella collezione, sulle carte, in partita e perfino nei filtri.",
+        "Il filtro rarità della collezione diventa una fila di pulsanti con le icone, al posto del menu a tendina.",
+        "Il duello di Zabuza Momochi 150 funziona quando più nemici pareggiano in potenza: scegli tu quale trascinare.",
+        "Dosu Kinuta 069 non propone più di rivelare un personaggio quando sarebbe un doppione: resta solo sconfiggerlo.",
+        "Quando una rivelazione viene rifiutata, il gioco spiega il perché invece di non fare nulla.",
+        "Guardare una partita di torneo in diretta ora funziona: la partita appare invece di un messaggio di errore.",
+        "Kakashi Hatake 8 del set 2 ha la parola chiave Team 7, mancante dall'uscita.",
+        "Una carta coperta non può più essere rivelata accanto a un personaggio con lo stesso nome: si evolve su di lui o resta nascosta."
+      ],
+      "changes_pl": [
+        "Nowy jasny motyw, Shinobi Shiren, wybierzesz w Opcjach: papierowe tło, czerń i pomarańcz jak na boosterach.",
+        "Każda rzadkość ma teraz swoją ikonę: w kolekcji, na kartach, w grze i nawet w filtrach.",
+        "Filtr rzadkości w kolekcji to teraz rząd przycisków z ikonami zamiast listy rozwijanej.",
+        "Pojedynek Zabuzy Momochi 150 działa, gdy kilku wrogów ma tę samą siłę: to ty wybierasz, kogo przyciągnąć.",
+        "Dosu Kinuta 069 nie proponuje już odkrycia postaci, gdy powstałby duplikat: zostaje tylko pokonanie.",
+        "Gdy odkrycie zostaje odrzucone, gra wyjaśnia dlaczego, zamiast nic nie robić.",
+        "Ogladanie meczu turniejowego na zywo dziala: pojawia sie partia zamiast komunikatu o bledzie.",
+        "Kakashi Hatake 8 z dodatku 2 ma slowo kluczowe Team 7, brakujace od premiery.",
+        "Zakryta karta nie może już zostać odkryta obok postaci o tej samej nazwie: ewoluuje na niej albo pozostaje zakryta."
+      ]
+    },
+    {
+      "date": "2026-08-09",
+      "title_fr": "Les symboles du chakra et de la puissance",
+      "title_en": "The Chakra and Power symbols",
+      "title_es": "Los símbolos del chakra y del poder",
+      "title_ja": "チャクラとパワーのシンボル",
+      "title_pt": "Os símbolos do chakra e do poder",
+      "title_it": "I simboli del chakra e della potenza",
+      "title_pl": "Symbole czakry i siły",
+      "categories": [
+        "feature",
+        "feature",
+        "fix",
         "fix",
         "feature",
         "fix"
       ],
       "changes_fr": [
+        "Le chakra et la puissance ont enfin leur symbole : la spirale et le shuriken officiels, partout dans le jeu.",
+        "Un shuriken doré animé remplace le trait qui séparait le titre et la description des trois modes de jeu.",
+        "Le fond des menus n'est plus agrandi et s'affiche à sa taille réelle, avec des boutons accordés au décor.",
         "La fenêtre « Partie en cours » n'apparaît plus partout : elle s'affiche dans Jouer en ligne pour une partie en ligne, dans Tournois pour un match de tournoi, et vous laisse naviguer ailleurs.",
         "Les quatre cartes Secret 147 à 150 rejoignent la collection, sans illustration pour le moment.",
         "La page Suggestions est retirée du jeu, ainsi que les dons."
       ],
       "changes_en": [
+        "Chakra and Power finally have their symbol: the official spiral and shuriken, everywhere in the game.",
+        "An animated gold shuriken replaces the line between the title and the description of the three game modes.",
+        "The menu background is no longer enlarged and shows at its real size, with buttons that match the backdrop.",
         "The \"Game in progress\" window no longer follows you everywhere: it shows in Play Online for an online game, in Tournaments for a tournament match, and lets you browse elsewhere.",
         "The four Secret cards 147 to 150 join the collection, without artwork for now.",
         "The Suggestions page is removed from the game, along with donations."
       ],
       "changes_es": [
+        "El chakra y el poder por fin tienen su símbolo: la espiral y el shuriken oficiales, en todo el juego.",
+        "Un shuriken dorado animado sustituye la línea entre el título y la descripción de los tres modos de juego.",
+        "El fondo de los menús ya no se amplía y se muestra a su tamaño real, con botones a juego con el decorado.",
         "La ventana «Partida en curso» ya no aparece en todas partes: se muestra en Jugar en línea para una partida en línea, en Torneos para un combate de torneo, y te deja navegar por el resto.",
         "Las cuatro cartas Secret 147 a 150 llegan a la colección, todavía sin ilustración.",
         "La página de Sugerencias se retira del juego, junto con las donaciones."
       ],
       "changes_ja": [
+        "チャクラとパワーに公式のシンボルが付きました。渦巻きと手裏剣がゲーム全体で使われます。",
+        "3つのゲームモードのタイトルと説明の間にあった線が、金色に輝く手裏剣のアニメーションに変わりました。",
+        "メニューの背景が拡大されなくなり、本来の大きさで表示されます。ボタンの色調も背景に合わせました。",
         "「進行中の対戦」の表示が全ページに出なくなりました。オンライン対戦はオンラインページ、トーナメントの試合はトーナメントページにだけ表示され、他のページは自由に見られます。",
         "シークレット147から150の4枚がコレクションに加わります。イラストは後日です。",
         "「提案」ページと寄付機能をゲームから削除しました。"
       ],
       "changes_pt": [
+        "O chakra e o poder finalmente têm o seu símbolo: a espiral e a shuriken oficiais, em todo o jogo.",
+        "Uma shuriken dourada animada substitui a linha entre o título e a descrição dos três modos de jogo.",
+        "O fundo dos menus deixou de ser ampliado e aparece no tamanho real, com botões a condizer com o cenário.",
         "A janela \"Partida em andamento\" não aparece mais em todo lugar: ela é exibida em Jogar Online para uma partida online, em Torneios para uma partida de torneio, e deixa você navegar no resto.",
         "As quatro cartas Secret 147 a 150 chegam à coleção, ainda sem ilustração.",
         "A página de Sugestões foi removida do jogo, assim como as doações."
       ],
       "changes_it": [
+        "Il chakra e la potenza hanno finalmente il loro simbolo: la spirale e lo shuriken ufficiali, in tutto il gioco.",
+        "Uno shuriken dorato animato sostituisce la linea tra il titolo e la descrizione delle tre modalità di gioco.",
+        "Lo sfondo dei menu non è più ingrandito e appare nella sua dimensione reale, con pulsanti in tinta con lo sfondo.",
         "La finestra \"Partita in corso\" non appare più ovunque: si mostra in Gioca Online per una partita online, in Tornei per un match di torneo, e ti lascia navigare altrove.",
         "Le quattro carte Secret dalla 147 alla 150 arrivano nella collezione, per ora senza illustrazione.",
         "La pagina Suggerimenti è rimossa dal gioco, insieme alle donazioni."
       ],
       "changes_pl": [
+        "Czakra i siła mają wreszcie swój symbol: oficjalną spiralę i shuriken, w całej grze.",
+        "Animowany złoty shuriken zastępuje kreskę między tytułem a opisem trzech trybów gry.",
+        "Tło menu nie jest już powiększane i wyświetla się w prawdziwym rozmiarze, a przyciski pasują do dekoracji.",
         "Okno \"Trwająca partia\" nie pojawia się już wszędzie: widać je w Graj Online dla partii online, w Turniejach dla meczu turniejowego, a poza tym możesz swobodnie przeglądać stronę.",
         "Cztery karty Secret od 147 do 150 dołączają do kolekcji, na razie bez ilustracji.",
         "Strona Sugestie została usunięta z gry, razem z darowiznami."

@@ -98,9 +98,9 @@ export default function TradeSimulatorPage() {
 
   if (!isAdmin) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
+      <main className="min-h-screen flex flex-col items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
         <CloudBackground />
-        <p className="relative z-10 font-display uppercase tracking-widest text-sm" style={{ color: '#b33e3e' }}>
+        <p className="relative z-10 font-display uppercase tracking-widest text-sm" style={{ color: 'var(--t-danger)' }}>
           Admin only
         </p>
       </main>
@@ -122,7 +122,7 @@ export default function TradeSimulatorPage() {
           type="button"
           onClick={() => loadUser(query, setter)}
           className="font-display px-3 py-2 text-[10px] uppercase tracking-widest"
-          style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+          style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
         >
           Load
         </button>
@@ -140,7 +140,7 @@ export default function TradeSimulatorPage() {
               onRemove={(i) => removeFromOffer(side, i)}
             />
           </motion.div>
-          <div className="p-2 max-h-[240px] overflow-y-auto" style={{ backgroundColor: '#0d0d0d' }}>
+          <div className="p-2 max-h-[240px] overflow-y-auto" style={{ backgroundColor: 'var(--t-bg)' }}>
             <TradeInventoryGrid
               inventory={state.inventory}
               offerCounts={countOcc(state.offer)}
@@ -153,16 +153,16 @@ export default function TradeSimulatorPage() {
   );
 
   return (
-    <main className="relative min-h-screen flex flex-col" style={{ backgroundColor: '#0a0a0a', color: '#e8e8e8' }}>
+    <main className="relative min-h-screen flex flex-col" style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-text)' }}>
       <CloudBackground />
       <header className="relative z-10 flex items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/admin" className="text-xs tracking-widest font-display" style={{ color: '#888' }}>
+        <Link href="/admin" className="text-xs tracking-widest font-display" style={{ color: 'var(--t-muted)' }}>
           {'< Admin'}
         </Link>
       </header>
 
       <div className="relative z-10 flex-1 px-4 sm:px-6 max-w-6xl w-full mx-auto pb-10">
-        <h1 className="text-2xl font-display tracking-[0.2em] mb-4 mt-2" style={{ color: '#c4a35a' }}>
+        <h1 className="text-2xl font-display tracking-[0.2em] mb-4 mt-2" style={{ color: 'var(--t-accent)' }}>
           TRADE SIMULATOR
         </h1>
 
@@ -178,7 +178,7 @@ export default function TradeSimulatorPage() {
               onClick={simulate}
               disabled={animating}
               className="font-display px-5 py-2.5 text-[11px] uppercase tracking-widest"
-              style={{ backgroundColor: '#1a1a1a', color: '#c4a35a' }}
+              style={{ backgroundColor: 'var(--t-surface-2)', color: 'var(--t-accent)' }}
             >
               Simulate animation
             </button>
@@ -187,7 +187,7 @@ export default function TradeSimulatorPage() {
               onClick={executeReal}
               disabled={busy || !offerCheck.valid}
               className="font-display px-5 py-2.5 text-[11px] uppercase tracking-widest"
-              style={{ backgroundColor: offerCheck.valid ? '#b33e3e' : '#333', color: offerCheck.valid ? '#fff' : '#777', cursor: offerCheck.valid ? 'pointer' : 'not-allowed' }}
+              style={{ backgroundColor: offerCheck.valid ? 'var(--t-danger)' : 'var(--t-border-strong)', color: offerCheck.valid ? '#fff' : 'var(--t-dim)', cursor: offerCheck.valid ? 'pointer' : 'not-allowed' }}
             >
               Execute for real
             </button>
@@ -207,7 +207,7 @@ export default function TradeSimulatorPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="text-[12px] text-center mt-4"
-              style={{ color: '#888' }}
+              style={{ color: 'var(--t-muted)' }}
             >
               {msg}
             </motion.p>

@@ -173,8 +173,8 @@ export default function AdminFeaturedPage() {
 
   if (!isAdmin) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
-        <p style={{ color: '#b33e3e' }}>{t('unauthorized')}</p>
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
+        <p style={{ color: 'var(--t-danger)' }}>{t('unauthorized')}</p>
       </main>
     );
   }
@@ -182,16 +182,16 @@ export default function AdminFeaturedPage() {
   const previewCard = selected.length > 0 ? cardById.get(selected[0]) : undefined;
 
   return (
-    <main className="min-h-screen relative" style={{ backgroundColor: '#0a0a0a', color: '#e8e8e8' }}>
+    <main className="min-h-screen relative" style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-text)' }}>
       <CloudBackground />
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
-        <Link href="/admin" style={{ color: '#c4a35a', fontSize: 14 }}>
+        <Link href="/admin" style={{ color: 'var(--t-accent)', fontSize: 14 }}>
           {t('back')}
         </Link>
         <h1 className="mt-4" style={{ fontFamily: 'NJNaruto, sans-serif', fontSize: 28, letterSpacing: 1 }}>
           {t('title')}
         </h1>
-        <p className="mt-2" style={{ color: '#9a9a9a', fontSize: 14, maxWidth: 680 }}>
+        <p className="mt-2" style={{ color: 'var(--t-muted)', fontSize: 14, maxWidth: 680 }}>
           {t('subtitle')}
         </p>
 
@@ -205,7 +205,7 @@ export default function AdminFeaturedPage() {
                 placeholder={t('searchPlaceholder')}
                 aria-label={t('searchPlaceholder')}
                 className="min-w-0 flex-1 px-3 py-2 text-[13px]"
-                style={{ backgroundColor: '#0d0d0d', border: '1px solid #333333', color: '#e0e0e0', outline: 'none' }}
+                style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border-strong)', color: 'var(--t-text)', outline: 'none' }}
               />
               {isFacetWorthShowing(setOptions) && (
                 <select
@@ -213,7 +213,7 @@ export default function AdminFeaturedPage() {
                   onChange={(e) => setSetFilter(e.target.value)}
                   aria-label={t('setFilterAll')}
                   className="px-3 py-2 text-[13px]"
-                  style={{ backgroundColor: '#0d0d0d', border: '1px solid #333333', color: '#e0e0e0', outline: 'none' }}
+                  style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border-strong)', color: 'var(--t-text)', outline: 'none' }}
                 >
                   <option value="">{t('setFilterAll')}</option>
                   {setOptions.map((id) => (
@@ -227,7 +227,7 @@ export default function AdminFeaturedPage() {
                   onChange={(e) => setRarityFilter(e.target.value)}
                   aria-label={t('rarityFilterAll')}
                   className="px-3 py-2 text-[13px]"
-                  style={{ backgroundColor: '#0d0d0d', border: '1px solid #333333', color: '#e0e0e0', outline: 'none' }}
+                  style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border-strong)', color: 'var(--t-text)', outline: 'none' }}
                 >
                   <option value="">{t('rarityFilterAll')}</option>
                   {rarityOptions.map((r) => (
@@ -242,9 +242,9 @@ export default function AdminFeaturedPage() {
                   aria-pressed={selectedOnly}
                   className="px-3 py-2 text-[13px] font-bold uppercase tracking-wider"
                   style={{
-                    backgroundColor: selectedOnly ? 'rgba(196,163,90,0.16)' : '#0d0d0d',
-                    color: selectedOnly ? '#c4a35a' : '#9a9a9a',
-                    border: '1px solid #333333', cursor: 'pointer',
+                    backgroundColor: selectedOnly ? 'var(--t-accent-glow)' : 'var(--t-bg)',
+                    color: selectedOnly ? 'var(--t-accent)' : 'var(--t-muted)',
+                    border: '1px solid var(--t-border-strong)', cursor: 'pointer',
                   }}
                 >
                   {t('selectedOnly')}
@@ -253,9 +253,9 @@ export default function AdminFeaturedPage() {
             </div>
 
             {loading ? (
-              <p className="mt-6" style={{ color: '#9a9a9a' }}>{t('loading')}</p>
+              <p className="mt-6" style={{ color: 'var(--t-muted)' }}>{t('loading')}</p>
             ) : filtered.length === 0 ? (
-              <p className="mt-6" style={{ color: '#9a9a9a' }}>{t('empty')}</p>
+              <p className="mt-6" style={{ color: 'var(--t-muted)' }}>{t('empty')}</p>
             ) : (
               <div
                 className="mt-4 grid gap-3"
@@ -271,14 +271,14 @@ export default function AdminFeaturedPage() {
                       onClick={() => (isSelected ? remove(card.id) : add(card.id))}
                       className="flex flex-col gap-1.5 p-2 text-left cursor-pointer disabled:cursor-default"
                       style={{
-                        backgroundColor: isSelected ? 'rgba(196,163,90,0.18)' : '#111111',
+                        backgroundColor: isSelected ? 'var(--t-accent-glow)' : 'var(--t-panel)',
                         border: 'none',
                         opacity: card.locked ? 0.45 : 1,
                       }}
                     >
                       <div
                         className="relative w-full overflow-hidden"
-                        style={{ aspectRatio: '800 / 1100', backgroundColor: '#000' }}
+                        style={{ aspectRatio: '800 / 1100', backgroundColor: 'var(--t-surface-2)' }}
                       >
                         <img
                           src={portraitImagePath(getCardById(card.id)) ?? card.src}
@@ -290,12 +290,12 @@ export default function AdminFeaturedPage() {
                       </div>
                       <span
                         className="text-[11px] leading-tight"
-                        style={{ color: isSelected ? '#c4a35a' : '#bbbbbb' }}
+                        style={{ color: isSelected ? 'var(--t-accent)' : 'var(--t-muted)' }}
                       >
                         {card.label}
                       </span>
                       {card.locked && (
-                        <span className="text-[10px]" style={{ color: '#d97676' }}>{t('notRevealed')}</span>
+                        <span className="text-[10px]" style={{ color: 'var(--t-danger)' }}>{t('notRevealed')}</span>
                       )}
                     </button>
                   );
@@ -306,16 +306,16 @@ export default function AdminFeaturedPage() {
 
           <aside className="min-w-0 lg:w-90 lg:shrink-0 flex flex-col gap-4">
             <div className="flex items-center justify-between gap-3">
-              <span style={{ fontFamily: 'NJNaruto, sans-serif', fontSize: 18, color: '#c4a35a' }}>
+              <span style={{ fontFamily: 'NJNaruto, sans-serif', fontSize: 18, color: 'var(--t-accent)' }}>
                 {t('selectionTitle')}
               </span>
-              <span className="text-[12px]" style={{ color: '#888888' }}>
+              <span className="text-[12px]" style={{ color: 'var(--t-muted)' }}>
                 {t('count', { selected: selected.length, max })}
               </span>
             </div>
 
             {selected.length === 0 ? (
-              <p className="text-[13px]" style={{ color: '#9a9a9a' }}>{t('selectionEmpty')}</p>
+              <p className="text-[13px]" style={{ color: 'var(--t-muted)' }}>{t('selectionEmpty')}</p>
             ) : (
               <div className="flex flex-col">
                 {selected.map((id, index) => {
@@ -325,16 +325,16 @@ export default function AdminFeaturedPage() {
                     <div
                       key={id}
                       className="flex items-center gap-2 py-2"
-                      style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                      style={{ borderBottom: '1px solid var(--t-divider)' }}
                     >
-                      <span className="flex-1 min-w-0 text-[12px] truncate" style={{ color: missing ? '#d97676' : '#e0e0e0' }}>
+                      <span className="flex-1 min-w-0 text-[12px] truncate" style={{ color: missing ? 'var(--t-danger)' : 'var(--t-text)' }}>
                         {card?.label ?? t('unavailableCard')}
                       </span>
                       <button
                         type="button"
                         onClick={() => move(index, -1)}
                         className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
-                        style={{ backgroundColor: 'rgba(255,255,255,0.04)', color: '#999999', border: 'none' }}
+                        style={{ backgroundColor: 'var(--t-divider)', color: 'var(--t-muted)', border: 'none' }}
                       >
                         {t('moveUp')}
                       </button>
@@ -342,7 +342,7 @@ export default function AdminFeaturedPage() {
                         type="button"
                         onClick={() => move(index, 1)}
                         className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
-                        style={{ backgroundColor: 'rgba(255,255,255,0.04)', color: '#999999', border: 'none' }}
+                        style={{ backgroundColor: 'var(--t-divider)', color: 'var(--t-muted)', border: 'none' }}
                       >
                         {t('moveDown')}
                       </button>
@@ -350,7 +350,7 @@ export default function AdminFeaturedPage() {
                         type="button"
                         onClick={() => remove(id)}
                         className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
-                        style={{ backgroundColor: 'rgba(179,62,62,0.14)', color: '#d97676', border: 'none' }}
+                        style={{ backgroundColor: 'rgba(179,62,62,0.14)', color: 'var(--t-danger)', border: 'none' }}
                       >
                         {t('remove')}
                       </button>
@@ -365,14 +365,14 @@ export default function AdminFeaturedPage() {
               disabled={saving}
               onClick={save}
               className="self-start px-5 py-2 text-[11px] font-bold uppercase tracking-wider cursor-pointer disabled:opacity-40"
-              style={{ backgroundColor: 'rgba(196,163,90,0.18)', color: '#c4a35a', border: 'none' }}
+              style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)', border: 'none' }}
             >
               {saving ? t('saving') : t('save')}
             </button>
 
             {previewCard && (
               <div className="flex flex-col gap-2">
-                <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: '#888888' }}>
+                <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: 'var(--t-muted)' }}>
                   {t('previewTitle')}
                 </span>
                 <HoloCard

@@ -31,7 +31,7 @@ export const RANK_TIERS: RankTier[] = [
   {
     key: 'academyStudent',
     minElo: 0,
-    color: '#888888',
+    color: 'var(--t-muted)',
     bgColor: 'rgba(136, 136, 136, 0.08)',
     borderColor: 'rgba(136, 136, 136, 0.25)',
     glowColor: 'rgba(136, 136, 136, 0.15)',
@@ -41,7 +41,7 @@ export const RANK_TIERS: RankTier[] = [
   {
     key: 'genin',
     minElo: 450,
-    color: '#3E8B3E',
+    color: 'var(--t-success)',
     bgColor: 'rgba(62, 139, 62, 0.08)',
     borderColor: 'rgba(62, 139, 62, 0.3)',
     glowColor: 'rgba(62, 139, 62, 0.15)',
@@ -91,8 +91,8 @@ export const RANK_TIERS: RankTier[] = [
   {
     key: 'kage',
     minElo: 1700,
-    color: '#C4A35A',
-    bgColor: 'rgba(196, 163, 90, 0.1)',
+    color: 'var(--t-accent)',
+    bgColor: 'var(--t-accent-glow)',
     borderColor: 'rgba(196, 163, 90, 0.4)',
     glowColor: 'rgba(196, 163, 90, 0.3)',
     symbol: '\u2605\u2605',
@@ -141,7 +141,7 @@ export function EloBadge({ elo, size = 'md', showElo = true, totalGames }: EloBa
 
   const s = sizes[size];
 
-  const displayColor = unranked ? '#666666' : tier.color;
+  const displayColor = unranked ? 'var(--t-dim)' : tier.color;
   const displayBg = unranked ? 'rgba(100, 100, 100, 0.08)' : tier.bgColor;
   const displayBorder = unranked ? 'rgba(100, 100, 100, 0.25)' : tier.borderColor;
   const displayGlow = unranked ? 'rgba(100, 100, 100, 0.1)' : tier.glowColor;
@@ -153,7 +153,7 @@ export function EloBadge({ elo, size = 'md', showElo = true, totalGames }: EloBa
         padding: s.padding,
         backgroundColor: displayBg,
         border: `1px solid ${displayBorder}`,
-        boxShadow: `0 0 12px ${displayGlow}, inset 0 1px 0 rgba(255,255,255,0.05)`,
+        boxShadow: `0 0 12px ${displayGlow}, inset 0 1px 0 var(--t-divider)`,
         gap: s.gap,
       }}
     >
@@ -211,7 +211,7 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
   const tier = getRankTier(elo);
   const unranked = totalGames !== undefined && totalGames < PLACEMENT_MATCHES_REQUIRED;
 
-  const displayColor = unranked ? '#666666' : tier.color;
+  const displayColor = unranked ? 'var(--t-dim)' : tier.color;
   const displayBg = unranked ? 'rgba(100, 100, 100, 0.08)' : tier.bgColor;
   const displayBorder = unranked ? 'rgba(100, 100, 100, 0.25)' : tier.borderColor;
   const displayGlow = unranked ? 'rgba(100, 100, 100, 0.1)' : tier.glowColor;
@@ -222,7 +222,7 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
       style={{
         backgroundColor: displayBg,
         border: `1px solid ${displayBorder}`,
-        boxShadow: `0 0 20px ${displayGlow}, 0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)`,
+        boxShadow: `0 0 20px ${displayGlow}, 0 4px 16px var(--t-shadow), inset 0 1px 0 var(--t-divider)`,
         padding: '16px 24px',
         minWidth: '180px',
       }}
@@ -297,19 +297,19 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
         <div className="flex flex-col items-center mt-3 w-full">
           <span
             className="text-xs uppercase tracking-wider mb-1"
-            style={{ color: '#999' }}
+            style={{ color: 'var(--t-muted)' }}
           >
             {t('rankNames.placement', { current: totalGames, total: PLACEMENT_MATCHES_REQUIRED })}
           </span>
           <div
             className="w-full rounded-full overflow-hidden"
-            style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.08)' }}
+            style={{ height: '4px', backgroundColor: 'var(--t-divider)' }}
           >
             <div
               className="h-full rounded-full"
               style={{
                 width: `${(totalGames / PLACEMENT_MATCHES_REQUIRED) * 100}%`,
-                backgroundColor: '#666',
+                backgroundColor: 'var(--t-dim)',
                 transition: 'width 0.3s ease',
               }}
             />

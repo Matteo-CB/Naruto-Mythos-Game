@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
+import { HoverShuriken, showShuriken, hideShuriken } from '@/components/HoverShuriken';
 import type { ReactNode } from 'react';
 
 /**
@@ -15,15 +16,12 @@ import type { ReactNode } from 'react';
  * opted into via `innerClassName`.
  */
 
-export type MenuVariant = 'muted' | 'primary' | 'gold' | 'red' | 'blue' | 'pink';
+export type MenuVariant = 'muted' | 'primary' | 'gold';
 
 const VARIANT: Record<MenuVariant, { idleBorder: string; hoverBorder: string; idleText: string; hoverText: string }> = {
-  muted:   { idleBorder: '#262626', hoverBorder: '#3a3a3a', idleText: '#e0e0e0', hoverText: '#c4a35a' },
-  primary: { idleBorder: '#5a4520', hoverBorder: '#c4a35a', idleText: '#c4a35a', hoverText: '#ffd966' },
-  gold:    { idleBorder: '#5a4520', hoverBorder: '#c4a35a', idleText: '#c4a35a', hoverText: '#ffd966' },
-  red:     { idleBorder: '#5a2828', hoverBorder: '#b33e3e', idleText: '#cc6666', hoverText: '#ffaaaa' },
-  blue:    { idleBorder: '#1f3a6a', hoverBorder: '#3b82f6', idleText: '#7eb6ff', hoverText: '#bfd9ff' },
-  pink:    { idleBorder: '#7c2d50', hoverBorder: '#f472b6', idleText: '#f9a8d4', hoverText: '#fbcfe8' },
+  muted:   { idleBorder: 'var(--t-accent-surface-border)', hoverBorder: 'var(--t-accent-surface-border-strong)', idleText: 'var(--t-on-accent-surface-text)', hoverText: 'var(--t-on-accent-surface)' },
+  primary: { idleBorder: 'var(--t-accent-surface-border)', hoverBorder: 'var(--t-accent-surface-border-strong)', idleText: 'var(--t-on-accent-surface)', hoverText: 'var(--t-on-accent-surface-strong)' },
+  gold:    { idleBorder: 'var(--t-accent-surface-border)', hoverBorder: 'var(--t-accent-surface-border-strong)', idleText: 'var(--t-on-accent-surface)', hoverText: 'var(--t-on-accent-surface-strong)' },
 };
 
 interface Props {
@@ -56,7 +54,9 @@ export function HomeMenuButton({
   const v = VARIANT[variant];
 
   const baseStyle: React.CSSProperties = {
-    backgroundColor: '#141414',
+    backgroundColor: 'var(--t-accent-surface)',
+    backdropFilter: 'blur(3px)',
+    WebkitBackdropFilter: 'blur(3px)',
     border: `1px solid ${v.idleBorder}`,
     color: v.idleText,
   };
@@ -74,26 +74,30 @@ export function HomeMenuButton({
         style={{ ...baseStyle, ...(innerStyle as React.CSSProperties | undefined) }}
         onMouseEnter={(e) => {
           const t = e.currentTarget as HTMLElement;
+          showShuriken(t, v.hoverText);
           t.style.transform = 'translateX(4px)';
           t.style.borderColor = v.hoverBorder;
           t.style.color = v.hoverText;
-          t.style.backgroundColor = '#191919';
+          t.style.backgroundColor = 'var(--t-accent-surface)';
         }}
         onMouseLeave={(e) => {
           const t = e.currentTarget as HTMLElement;
+          hideShuriken(t, v.idleText);
           t.style.transform = 'translateX(0)';
           t.style.borderColor = v.idleBorder;
           t.style.color = v.idleText;
-          t.style.backgroundColor = '#141414';
+          t.style.backgroundColor = 'var(--t-accent-surface)';
         }}
       >
-        {leftSlot && (
+        {leftSlot ? (
           <span
             className="absolute z-10 flex items-center justify-center pointer-events-none"
-            style={{ left: 10, top: '50%', transform: 'translateY(-50%)' }}
+            style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}
           >
             {leftSlot}
           </span>
+        ) : (
+          <HoverShuriken size={16} left={12} color={v.idleText} />
         )}
         {image ? (
           <img

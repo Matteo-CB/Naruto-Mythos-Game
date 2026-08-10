@@ -13,7 +13,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <div className="mb-6">
       <h2
         className="text-sm font-bold uppercase tracking-wider mb-3 pb-2"
-        style={{ color: '#c4a35a', borderBottom: '1px solid rgba(196, 163, 90, 0.15)' }}
+        style={{ color: 'var(--t-accent)', borderBottom: '1px solid var(--t-accent-glow)' }}
       >
         {title}
       </h2>
@@ -24,7 +24,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function TextBlock({ text }: { text: string }) {
   return (
-    <div className="text-sm leading-relaxed" style={{ color: '#aaaaaa' }}>
+    <div className="text-sm leading-relaxed" style={{ color: 'var(--t-muted)' }}>
       {text.split('\n').map((line, i) => (
         <p key={i} className={line.startsWith('-') ? 'pl-4' : i > 0 ? 'mt-2' : ''}>
           {line}
@@ -41,7 +41,7 @@ export default function LegalPage() {
     <div
       id="main-content"
       className="min-h-screen relative flex flex-col"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{ backgroundColor: 'var(--t-bg)' }}
     >
       <CloudBackground />
       <DecorativeIcons />
@@ -49,14 +49,14 @@ export default function LegalPage() {
 
       <header
         className="relative z-20 flex items-center justify-between px-6 py-3"
-        style={{ borderBottom: '1px solid rgba(196, 163, 90, 0.15)' }}
+        style={{ borderBottom: '1px solid var(--t-accent-glow)' }}
       >
         <Link
           href="/"
           className="text-sm px-3 py-1.5 rounded"
           style={{
-            color: '#c4a35a',
-            backgroundColor: 'rgba(196, 163, 90, 0.05)',
+            color: 'var(--t-accent)',
+            backgroundColor: 'var(--t-accent-tint)',
           }}
         >
           &#8592; {t('back')}
@@ -64,7 +64,7 @@ export default function LegalPage() {
 
         <h1
           className="text-lg font-bold tracking-wider"
-          style={{ color: '#c4a35a' }}
+          style={{ color: 'var(--t-accent)' }}
         >
           {t('title')}
         </h1>
@@ -82,7 +82,7 @@ export default function LegalPage() {
         >
           <h2
             className="text-base font-bold uppercase tracking-wider mb-5 text-center"
-            style={{ color: '#c4a35a' }}
+            style={{ color: 'var(--t-accent)' }}
           >
             {t('legalNotice')}
           </h2>
@@ -108,12 +108,12 @@ export default function LegalPage() {
         >
           <h2
             className="text-base font-bold uppercase tracking-wider mb-5 text-center"
-            style={{ color: '#c4a35a' }}
+            style={{ color: 'var(--t-accent)' }}
           >
             {t('privacyPolicy')}
           </h2>
 
-          <p className="text-sm leading-relaxed mb-5" style={{ color: '#999' }}>
+          <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--t-muted)' }}>
             {t('privacyIntro')}
           </p>
 
@@ -150,7 +150,7 @@ export default function LegalPage() {
           </Section>
 
           <Section title={t('contact')}>
-            <div className="text-sm leading-relaxed" style={{ color: '#aaaaaa' }}>
+            <div className="text-sm leading-relaxed" style={{ color: 'var(--t-muted)' }}>
               {t('contactText').split('\n').map((line, i) => (
                 <p key={i} className={i > 0 ? 'mt-2' : ''}>
                   {line}
@@ -161,14 +161,14 @@ export default function LegalPage() {
                 href="https://hiddenlab.fr"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: '#c4a35a' }}
+                style={{ color: 'var(--t-accent)' }}
               >
                 hiddenlab.fr
               </a>
             </div>
           </Section>
 
-          <p className="text-xs mt-4 text-center" style={{ color: '#555' }}>
+          <p className="text-xs mt-4 text-center" style={{ color: 'var(--t-dim)' }}>
             {t('lastUpdated', { date: '30/05/2026' })}
           </p>
         </div>

@@ -8,6 +8,7 @@ import { CARD_BACK_URL } from './flightLayer';
 import { flyCard, skipAllFlights, registerActiveTimeline, spawnDefeatPlaceholder, consumeDefeatPlaceholder } from './flightLayer';
 import { motionMs } from './speed';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { gameIconMaskCss, POWER_ICON_SRC } from '@/components/icons/GameIcons';
 import { playGlVfx, rarityVfxProfile, VFX_PRESETS } from './vfxgl';
 
 export interface MotionEventData {
@@ -383,17 +384,23 @@ export async function playTokenDelta(data: MotionEventData): Promise<void> {
   if (!el || !data.delta) return;
   const rect = el.getBoundingClientRect();
   const positive = data.delta > 0;
+  const tone = positive ? '#e6c36a' : '#d97676';
   const label = document.createElement('div');
-  label.textContent = `${positive ? '+' : ''}${data.delta}`;
   label.style.cssText = [
     'position:fixed', 'pointer-events:none', 'z-index:46',
-    `left:${rect.left + rect.width / 2 - 20}px`,
+    `left:${rect.left + rect.width / 2 - 28}px`,
     `top:${rect.top - 6}px`,
-    'width:40px', 'text-align:center',
+    'width:56px',
+    'display:flex', 'align-items:center', 'justify-content:center', 'gap:3px',
     'font-weight:800', 'font-size:16px',
-    `color:${positive ? '#e6c36a' : '#d97676'}`,
+    `color:${tone}`,
     'text-shadow:0 2px 8px rgba(0,0,0,0.9)',
   ].join(';');
+  const glyph = document.createElement('span');
+  glyph.style.cssText = `${gameIconMaskCss(POWER_ICON_SRC, 13, tone)};filter:drop-shadow(0 1px 3px rgba(0,0,0,0.9))`;
+  const value = document.createElement('span');
+  value.textContent = `${positive ? '+' : ''}${data.delta}`;
+  label.append(glyph, value);
   document.body.appendChild(label);
   punch(el, 1.12);
   if (data.delta >= 2) {

@@ -16,7 +16,7 @@ export function ProfileModerationActions({ userId, username }: { userId: string;
         type="button"
         onClick={() => setReportOpen(true)}
         className="h-9 px-3 text-xs font-bold uppercase tracking-wider cursor-pointer"
-        style={{ backgroundColor: 'transparent', border: '1px solid #333333', borderRadius: 4, color: '#888' }}
+        style={{ backgroundColor: 'transparent', border: '1px solid var(--t-border-strong)', borderRadius: 4, color: 'var(--t-muted)' }}
       >
         {t('chat.menu.report')}
       </button>
@@ -24,7 +24,7 @@ export function ProfileModerationActions({ userId, username }: { userId: string;
         type="button"
         onClick={() => setBlockOpen(true)}
         className="h-9 px-3 text-xs font-bold uppercase tracking-wider cursor-pointer"
-        style={{ backgroundColor: 'transparent', border: '1px solid rgba(179,62,62,0.4)', borderRadius: 4, color: '#b33e3e' }}
+        style={{ backgroundColor: 'transparent', border: '1px solid rgba(179,62,62,0.4)', borderRadius: 4, color: 'var(--t-danger)' }}
       >
         {t('social.block.confirm')}
       </button>

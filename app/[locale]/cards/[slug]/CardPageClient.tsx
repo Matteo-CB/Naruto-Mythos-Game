@@ -31,21 +31,23 @@ import { useCardUsage } from '@/lib/hooks/useCardUsage';
 import type { CardData, CharacterCard, MissionCard, Rarity } from '@/lib/engine/types';
 import { holoRarity } from '@/lib/cards/holoRarity';
 import { isLandscapeCard } from '@/lib/cards/orientation';
+import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from '@/components/icons/GameIcons';
+import { RarityIcon } from '@/components/icons/RarityIcon';
 
-const GOLD = '#c4a35a';
+const GOLD = 'var(--t-accent)';
 
 const EFFECT_TYPE_COLORS: Record<string, string> = {
   MAIN: '#60a5fa',
   UPGRADE: '#a78bfa',
   AMBUSH: '#f97316',
   SCORE: '#eab308',
-  DUEL: '#ef4444',
+  DUEL: 'var(--t-danger)',
   ATTACH: '#5A7ABB',
 };
 
 const RARITY_COLORS: Record<Rarity, string> = {
-  C: '#9ca3af', UC: '#22c55e', R: '#3b82f6', RA: '#a855f7',
-  S: '#eab308', SV: '#eab308', M: '#ef4444', MV: '#ef4444', L: '#eab308',
+  C: '#9ca3af', UC: 'var(--t-success)', R: '#3b82f6', RA: '#a855f7',
+  S: '#eab308', SV: '#eab308', M: 'var(--t-danger)', MV: 'var(--t-danger)', L: '#eab308',
   SP: '#06b6d4', SPV: '#06b6d4', POP: '#e84393', POPV: '#e84393',
   CHIBI: '#10b981', CHIBIV: '#10b981', SHINOBI: '#d97706', SHINOBIV: '#d97706', MMS: '#5a8ab5',
 };
@@ -108,7 +110,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
           <CardFace card={c as CharacterCard | MissionCard} />
         </div>
         <span className="text-[10px] text-center uppercase tracking-wider truncate" style={{ color: isCurrent ? GOLD : cRarityColor }}>
-          {isCurrent ? t('current') : getRarityLabel(c.rarity, tCardMeta)}
+          {isCurrent ? t('current') : (<span className="inline-flex items-center gap-1.5"><RarityIcon rarity={c.rarity} size={14} />{getRarityLabel(c.rarity, tCardMeta)}</span>)}
         </span>
       </div>
     );
@@ -125,7 +127,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
   const arrowStyle = { backgroundColor: `${GOLD}1f`, color: GOLD };
 
   return (
-    <main id="main-content" className="font-body-force min-h-screen relative bg-[#0a0a0a] flex flex-col text-[#e8e8e8]">
+    <main id="main-content" className="font-body-force min-h-screen relative bg-[var(--t-bg)] flex flex-col text-[var(--t-text)]">
       <CloudBackground />
       <DecorativeIcons />
       <CardBackgroundDecor variant="collection" />
@@ -138,12 +140,12 @@ export function CardPageClient({ cardId }: { cardId: string }) {
       </Link>
 
       <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 flex-1">
-        <nav aria-label="breadcrumb" className="text-xs uppercase tracking-wider mb-6 flex flex-wrap items-center gap-2 text-[#8a8a8a]">
-          <Link href="/" className="hover:text-[#e8e8e8] transition-colors">{tBreadcrumbs('root')}</Link>
+        <nav aria-label="breadcrumb" className="text-xs uppercase tracking-wider mb-6 flex flex-wrap items-center gap-2 text-[var(--t-muted)]">
+          <Link href="/" className="hover:text-[var(--t-text)] transition-colors">{tBreadcrumbs('root')}</Link>
           <span aria-hidden="true">/</span>
-          <Link href="/collection" className="hover:text-[#e8e8e8] transition-colors">{tBreadcrumbs('page.collection')}</Link>
+          <Link href="/collection" className="hover:text-[var(--t-text)] transition-colors">{tBreadcrumbs('page.collection')}</Link>
           <span aria-hidden="true">/</span>
-          <span className="text-[#e8e8e8]">{name} {card.number}</span>
+          <span className="text-[var(--t-text)]">{name} {card.number}</span>
         </nav>
 
         <div className="flex flex-col md:flex-row gap-6 md:gap-10">
@@ -170,22 +172,27 @@ export function CardPageClient({ cardId }: { cardId: string }) {
           <div className="flex-1 min-w-0">
             <h1 className="font-display-force text-2xl sm:text-3xl font-bold leading-tight">{name}</h1>
             {title && <p className="mt-1 text-base sm:text-lg text-[#b9b9b9] italic">{title}</p>}
-            <p className="mt-1 text-sm text-[#8a8a8a] tracking-wider">N° {String(card.number).padStart(3, '0')}</p>
+            <p className="mt-1 text-sm text-[var(--t-muted)] tracking-wider">N° {String(card.number).padStart(3, '0')}</p>
 
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="px-3 py-1.5 rounded text-sm font-semibold" style={{ backgroundColor: `${rarityColor}1f`, color: rarityColor }}>
-                {rarityLabel}
+                <span className="inline-flex items-center gap-2">
+                  <RarityIcon rarity={card.rarity} size={18} />
+                  {rarityLabel}
+                </span>
               </span>
-              <span className="px-3 py-1.5 rounded text-sm" style={{ backgroundColor: '#ffffff0a', color: '#d0d0d0' }}>
+              <span className="px-3 py-1.5 rounded text-sm" style={{ backgroundColor: '#ffffff0a', color: 'var(--t-text)' }}>
                 {t('set')}: {setName}
               </span>
               {(isCharacter || isAttachment) && (
                 <>
-                  <span className="px-3 py-1.5 rounded text-sm" style={{ backgroundColor: '#ffffff0a', color: '#d0d0d0' }}>
-                    {t('chakra')}: {card.chakra}
+                  <span className="px-3 py-1.5 rounded text-sm inline-flex items-center gap-2" style={{ backgroundColor: '#ffffff0a', color: 'var(--t-text)' }}>
+                    <ChakraIcon size={16} color={CHAKRA_COLOR} />
+                    <span>{t('chakra')}: {card.chakra}</span>
                   </span>
-                  <span className="px-3 py-1.5 rounded text-sm" style={{ backgroundColor: '#ffffff0a', color: '#d0d0d0' }}>
-                    {t('power')}: {card.power}
+                  <span className="px-3 py-1.5 rounded text-sm inline-flex items-center gap-2" style={{ backgroundColor: '#ffffff0a', color: 'var(--t-text)' }}>
+                    <PowerIcon size={16} color={POWER_COLOR} />
+                    <span>{t('power')}: {card.power}</span>
                   </span>
                 </>
               )}
@@ -193,15 +200,15 @@ export function CardPageClient({ cardId }: { cardId: string }) {
 
             {card.group && !isMission && (
               <p className="mt-4 text-sm text-[#b9b9b9]">
-                <span className="text-[#8a8a8a] uppercase tracking-wider text-xs">{t('group')} : </span>
+                <span className="text-[var(--t-muted)] uppercase tracking-wider text-xs">{t('group')} : </span>
                 {getCardGroup(card.group, tCardMeta)}
               </p>
             )}
             {card.keywords.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2 items-center">
-                <span className="text-[#8a8a8a] uppercase tracking-wider text-xs">{t('keywords')} :</span>
+                <span className="text-[var(--t-muted)] uppercase tracking-wider text-xs">{t('keywords')} :</span>
                 {card.keywords.map((kw) => (
-                  <span key={kw} className="px-2.5 py-1 rounded text-xs" style={{ backgroundColor: '#ffffff0a', color: '#d0d0d0' }}>
+                  <span key={kw} className="px-2.5 py-1 rounded text-xs" style={{ backgroundColor: '#ffffff0a', color: 'var(--t-text)' }}>
                     {getCardKeyword(kw, tCardMeta)}
                   </span>
                 ))}
@@ -216,18 +223,18 @@ export function CardPageClient({ cardId }: { cardId: string }) {
               const stat = (label: string, value: string) => (
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <span className="text-[10px] uppercase tracking-wider text-[#7a7a7a] truncate">{label}</span>
-                  <span className="text-base font-bold text-[#e8e8e8]">{value}</span>
+                  <span className="text-base font-bold text-[var(--t-text)]">{value}</span>
                 </div>
               );
               return (
                 <div className="mt-6">
-                  <h2 className="text-sm uppercase tracking-wider text-[#8a8a8a] mb-3">{t('usageTier')}</h2>
+                  <h2 className="text-sm uppercase tracking-wider text-[var(--t-muted)] mb-3">{t('usageTier')}</h2>
                   {!isBan && !hasData ? (
-                    <div className="rounded-lg p-4" style={{ backgroundColor: '#ffffff08', boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}>
+                    <div className="rounded-lg p-4" style={{ backgroundColor: '#ffffff08', boxShadow: '0 8px 24px var(--t-shadow)' }}>
                       <p className="text-sm text-[#b9b9b9]">{t('usageCollecting')}</p>
                     </div>
                   ) : (
-                    <div className="rounded-lg p-4" style={{ backgroundColor: `${tierColor}14`, boxShadow: `0 8px 24px rgba(0,0,0,0.35), inset 0 0 40px ${tierColor}0a` }}>
+                    <div className="rounded-lg p-4" style={{ backgroundColor: `${tierColor}14`, boxShadow: `0 8px 24px var(--t-shadow), inset 0 0 40px ${tierColor}0a` }}>
                       <div className="flex items-baseline justify-between gap-2 flex-wrap mb-1">
                         <span className="text-2xl font-bold" style={{ color: tierColor }}>{t(`tier_${usage.tier}`)}</span>
                         <span className="text-[11px] font-bold tracking-widest px-2 py-0.5 rounded" style={{ backgroundColor: `${tierColor}2e`, color: tierColor }}>{usage.tier}</span>
@@ -239,13 +246,13 @@ export function CardPageClient({ cardId }: { cardId: string }) {
                         <>
                           <div className="flex items-baseline gap-2 mb-2">
                             <span className="text-3xl font-bold" style={{ color: tierColor }}>{ratePct}%</span>
-                            <span className="text-xs text-[#8a8a8a]">{t('usageRateLabel')}</span>
+                            <span className="text-xs text-[var(--t-muted)]">{t('usageRateLabel')}</span>
                           </div>
                           <div className="relative h-2.5 rounded-full overflow-hidden mb-4" style={{ backgroundColor: '#ffffff12' }}>
                             <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${Math.max(1.5, Math.round(usage.rate * 100))}%`, backgroundColor: tierColor }} />
                           </div>
 
-                          <div className="grid grid-cols-3 gap-3 pt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                          <div className="grid grid-cols-3 gap-3 pt-1" style={{ borderTop: '1px solid var(--t-divider)' }}>
                             {stat(t('usageDecksLabel'), t('usageDecksValue', { count: usage.count, total: usage.totalDecks }))}
                             {stat(t('usagePlayersLabel'), String(usage.activePlayers))}
                             {stat(t('usageTierLabel'), usage.tier)}
@@ -267,21 +274,21 @@ export function CardPageClient({ cardId }: { cardId: string }) {
               const isCharacter = card.card_type === 'character';
               const winPct = Math.round((gs.gamesWon / gs.gamesSeen) * 1000) / 10;
               const avgCopies = gs.copyDecks > 0 ? Math.round((gs.copiesSum / gs.copyDecks) * 10) / 10 : 0;
-              const winColor = winPct >= 52 ? '#7fd4a8' : winPct <= 48 ? '#d97676' : '#e8e8e8';
+              const winColor = winPct >= 52 ? '#7fd4a8' : winPct <= 48 ? 'var(--t-danger)' : 'var(--t-text)';
               const stat = (label: string, value: string, color?: string) => (
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <span className="text-[10px] uppercase tracking-wider text-[#7a7a7a] truncate">{label}</span>
-                  <span className="text-base font-bold" style={{ color: color ?? '#e8e8e8' }}>{value}</span>
+                  <span className="text-base font-bold" style={{ color: color ?? 'var(--t-text)' }}>{value}</span>
                 </div>
               );
               return (
                 <div className="mt-6">
-                  <h2 className="text-sm uppercase tracking-wider text-[#8a8a8a] mb-3">{t('gameStatsTitle')}</h2>
-                  <div className="rounded-lg p-4" style={{ backgroundColor: '#ffffff08', boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}>
+                  <h2 className="text-sm uppercase tracking-wider text-[var(--t-muted)] mb-3">{t('gameStatsTitle')}</h2>
+                  <div className="rounded-lg p-4" style={{ backgroundColor: '#ffffff08', boxShadow: '0 8px 24px var(--t-shadow)' }}>
                     {gs.gamesSeen >= MIN_SAMPLE ? (
                       <div className="flex items-baseline gap-2 mb-2">
                         <span className="text-3xl font-bold" style={{ color: winColor }}>{winPct}%</span>
-                        <span className="text-xs text-[#8a8a8a]">{t('winRateLabel')}</span>
+                        <span className="text-xs text-[var(--t-muted)]">{t('winRateLabel')}</span>
                       </div>
                     ) : (
                       <p className="text-sm text-[#b9b9b9] mb-2">{t('winRateCollecting', { count: gs.gamesSeen, min: MIN_SAMPLE })}</p>
@@ -291,7 +298,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
                         <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${Math.max(1.5, Math.min(100, winPct))}%`, backgroundColor: winColor }} />
                       </div>
                     )}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1" style={{ borderTop: '1px solid var(--t-divider)' }}>
                       {stat(t('gamesSeenLabel'), String(gs.gamesSeen))}
                       {avgCopies > 0 && isCharacter && stat(t('avgCopiesLabel'), String(avgCopies))}
                     </div>
@@ -303,22 +310,22 @@ export function CardPageClient({ cardId }: { cardId: string }) {
 
             {effects.length > 0 && (
               <div className="mt-6">
-                <h2 className="text-sm uppercase tracking-wider text-[#8a8a8a] mb-3">{t('effects')}</h2>
+                <h2 className="text-sm uppercase tracking-wider text-[var(--t-muted)] mb-3">{t('effects')}</h2>
                 <div className="flex flex-col gap-3">
                   {effects.map((eff, i) => {
                     const color = EFFECT_TYPE_COLORS[eff.type] ?? '#9ca3af';
                     return (
-                      <div key={i} className="rounded-lg p-3" style={{ backgroundColor: '#ffffff08', boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}>
+                      <div key={i} className="rounded-lg p-3" style={{ backgroundColor: '#ffffff08', boxShadow: '0 8px 24px var(--t-shadow)' }}>
                         <div className="flex items-center justify-between gap-3 mb-1.5">
                           <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded" style={{ backgroundColor: `${color}22`, color }}>
                             {eff.type}
                           </span>
                           {hasScenario(card.id, i) ? (
-                            <button type="button" onClick={() => setSimEffect(i)} className="text-[11px] uppercase tracking-wider px-2 py-1 rounded transition-colors hover:brightness-110" style={{ backgroundColor: '#c4a35a1f', color: '#c4a35a' }}>
+                            <button type="button" onClick={() => setSimEffect(i)} className="text-[11px] uppercase tracking-wider px-2 py-1 rounded transition-colors hover:brightness-110" style={{ backgroundColor: 'var(--t-accent)1f', color: 'var(--t-accent)' }}>
                               {t('viewSimulation')}
                             </button>
                           ) : (
-                            <button type="button" disabled className="text-[11px] uppercase tracking-wider px-2 py-1 rounded opacity-45 cursor-not-allowed" style={{ backgroundColor: '#ffffff08', color: '#9a9a9a' }}>
+                            <button type="button" disabled className="text-[11px] uppercase tracking-wider px-2 py-1 rounded opacity-45 cursor-not-allowed" style={{ backgroundColor: '#ffffff08', color: 'var(--t-muted)' }}>
                               {t('viewSimulation')} · {t('simulationSoon')}
                             </button>
                           )}
@@ -335,7 +342,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
 
         {variants.length > 1 && (
           <section className="mt-10">
-            <h2 className="text-sm uppercase tracking-wider text-[#8a8a8a] mb-4">{t('variantsSameEffect')}</h2>
+            <h2 className="text-sm uppercase tracking-wider text-[var(--t-muted)] mb-4">{t('variantsSameEffect')}</h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 sm:gap-4">
               {variants.map(renderThumb)}
             </div>
@@ -344,7 +351,7 @@ export function CardPageClient({ cardId }: { cardId: string }) {
 
         {otherVersions.length > 0 && (
           <section className="mt-10">
-            <h2 className="text-sm uppercase tracking-wider text-[#8a8a8a] mb-4">{t('otherVersions')}</h2>
+            <h2 className="text-sm uppercase tracking-wider text-[var(--t-muted)] mb-4">{t('otherVersions')}</h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 sm:gap-4">
               {otherVersions.map(renderThumb)}
             </div>

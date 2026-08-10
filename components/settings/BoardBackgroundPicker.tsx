@@ -16,7 +16,7 @@ export function BoardBackgroundPicker() {
 
   return (
     <div className="flex flex-col gap-2 min-w-0">
-      <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: '#888888' }}>
+      <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: 'var(--t-muted)' }}>
         {t('gameBackground')}
       </span>
       <div
@@ -41,15 +41,17 @@ export function BoardBackgroundPicker() {
                 scrollSnapAlign: 'start',
                 cursor: isLoaded ? 'pointer' : 'default',
                 opacity: !isLoaded ? 0.5 : active ? 1 : 0.62,
-                backgroundColor: 'rgba(196, 163, 90, 0.06)',
-                boxShadow: active ? '0 0 16px rgba(196, 163, 90, 0.55)' : '0 4px 12px rgba(0,0,0,0.45)',
+                backgroundColor: 'var(--t-accent-tint)',
+                boxShadow: active
+                  ? '0 0 16px color-mix(in srgb, var(--t-accent) 55%, transparent)'
+                  : '0 4px 12px var(--t-shadow)',
                 transition: 'opacity 180ms ease, box-shadow 180ms ease',
               }}
             >
               {bg.id === 'random' ? (
                 <span
                   className="flex h-full w-full items-center justify-center text-xl font-bold"
-                  style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif" }}
+                  style={{ color: 'var(--t-accent)', fontFamily: "'NJNaruto', sans-serif" }}
                 >
                   ?
                 </span>

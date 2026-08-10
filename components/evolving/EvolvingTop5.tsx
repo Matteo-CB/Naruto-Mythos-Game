@@ -14,11 +14,11 @@ interface TopPlayer {
   draws: number;
 }
 
-const GOLD = '#c4a35a';
-const PANEL_BG = '#0e0e0e';
-const BORDER = '#1f1a14';
-const TEXT_LIGHT = '#e0e0e0';
-const TEXT_DIM = '#888888';
+const GOLD = 'var(--t-accent)';
+const PANEL_BG = 'var(--t-panel)';
+const BORDER = 'var(--t-border)';
+const TEXT_LIGHT = 'var(--t-text)';
+const TEXT_DIM = 'var(--t-muted)';
 
 function rankAccent(rank: number): string {
   if (rank === 1) return '#e8c870';
@@ -67,7 +67,7 @@ export function EvolvingTop5() {
         <div className="flex items-center gap-2">
           <span
             className="w-1.5 h-1.5 rounded-full"
-            style={{ backgroundColor: GOLD, boxShadow: `0 0 6px ${GOLD}` }}
+            style={{ backgroundColor: GOLD, boxShadow: '0 0 6px var(--t-accent-glow)' }}
           />
           <h2
             className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.22em]"

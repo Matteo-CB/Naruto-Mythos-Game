@@ -9,7 +9,7 @@ interface ProgressionData {
   series: Array<{ code: string; points: (number | null)[] }>;
 }
 
-const LINE_COLORS = ['#c4a35a', '#8fbf8f', '#5a7abb', '#c48f8f', '#9b7bb8'];
+const LINE_COLORS = ['var(--t-accent)', '#8fbf8f', '#5a7abb', '#c48f8f', '#9b7bb8'];
 const W = 320;
 const H = 120;
 const PAD = 8;
@@ -30,8 +30,8 @@ export function WorldcupProgression({ countryName }: { countryName: (c: string) 
   if (!data || data.days.length < 2 || data.series.length === 0) {
     return (
       <div className="mt-8 px-5 py-4" style={{ backgroundColor: 'rgba(17, 17, 17, 0.7)' }}>
-        <div className="text-[10px] uppercase tracking-[0.25em] mb-2" style={{ color: '#c4a35a' }}>{t('progressionTitle')}</div>
-        <p className="text-[11px]" style={{ color: '#666' }}>{t('progressionCollecting')}</p>
+        <div className="text-[10px] uppercase tracking-[0.25em] mb-2" style={{ color: 'var(--t-accent)' }}>{t('progressionTitle')}</div>
+        <p className="text-[11px]" style={{ color: 'var(--t-dim)' }}>{t('progressionCollecting')}</p>
       </div>
     );
   }
@@ -42,11 +42,11 @@ export function WorldcupProgression({ countryName }: { countryName: (c: string) 
 
   return (
     <div className="mt-8 px-5 py-4" style={{ backgroundColor: 'rgba(17, 17, 17, 0.7)' }}>
-      <div className="text-[10px] uppercase tracking-[0.25em] mb-3" style={{ color: '#c4a35a' }}>{t('progressionTitle')}</div>
+      <div className="text-[10px] uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--t-accent)' }}>{t('progressionTitle')}</div>
       <div className="overflow-x-auto">
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ minWidth: 280, maxHeight: 160 }}>
           {[0, 25, 50, 75, 100].map((g) => (
-            <line key={g} x1={PAD} x2={W - PAD} y1={y(g)} y2={y(g)} stroke="rgba(255,255,255,0.05)" strokeWidth={1} />
+            <line key={g} x1={PAD} x2={W - PAD} y1={y(g)} y2={y(g)} stroke="var(--t-divider)" strokeWidth={1} />
           ))}
           {data.series.map((s, si) => {
             const pts = s.points
@@ -62,7 +62,7 @@ export function WorldcupProgression({ countryName }: { countryName: (c: string) 
           <span key={s.code} className="flex items-center gap-1.5">
             <span style={{ width: 10, height: 3, backgroundColor: LINE_COLORS[si % LINE_COLORS.length], display: 'inline-block' }} />
             <CountryFlag code={s.code} size={14} />
-            <span className="text-[10px] uppercase tracking-wide" style={{ color: '#888' }}>{countryName(s.code)}</span>
+            <span className="text-[10px] uppercase tracking-wide" style={{ color: 'var(--t-muted)' }}>{countryName(s.code)}</span>
           </span>
         ))}
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useMemo, useSyncExternalStore } from 'react';
+import { readViewport, watchViewport } from '@/lib/ui/viewport';
 
 const BASE = {
   
@@ -147,26 +148,29 @@ function buildDimensions(scale: number, vw: number, vh: number): GameDimensions 
   };
 }
 
-let cachedWidth = typeof window !== 'undefined' ? window.innerWidth : 1400;
-let cachedHeight = typeof window !== 'undefined' ? window.innerHeight : 900;
+const initialView = typeof window !== 'undefined' ? readViewport() : { width: 1400, height: 900 };
+let cachedWidth = initialView.width;
+let cachedHeight = initialView.height;
 let listeners: Array<() => void> = [];
-let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+let stopWatching: (() => void) | null = null;
 
-if (typeof window !== 'undefined') {
-  window.addEventListener('resize', () => {
-    if (resizeTimer) clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      cachedWidth = window.innerWidth;
-      cachedHeight = window.innerHeight;
-      for (const cb of listeners) cb();
-    }, 100);
-  });
+function measure() {
+  const view = readViewport();
+  if (view.width === cachedWidth && view.height === cachedHeight) return;
+  cachedWidth = view.width;
+  cachedHeight = view.height;
+  for (const cb of listeners) cb();
 }
 
 function subscribe(cb: () => void) {
   listeners.push(cb);
+  if (!stopWatching) stopWatching = watchViewport(measure);
   return () => {
     listeners = listeners.filter((l) => l !== cb);
+    if (listeners.length === 0 && stopWatching) {
+      stopWatching();
+      stopWatching = null;
+    }
   };
 }
 

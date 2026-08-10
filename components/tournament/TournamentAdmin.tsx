@@ -11,8 +11,8 @@ interface Props {
   isCreator: boolean;
 }
 
-const sectionStyle = { backgroundColor: '#0d0d0d', border: '1px solid #262626', padding: '12px' };
-const labelStyle = { color: '#888', fontSize: '10px', textTransform: 'uppercase' as const, letterSpacing: '0.08em' };
+const sectionStyle = { backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border)', padding: '12px' };
+const labelStyle = { color: 'var(--t-muted)', fontSize: '10px', textTransform: 'uppercase' as const, letterSpacing: '0.08em' };
 const btnBase = 'px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider cursor-pointer transition-opacity';
 
 function SectionHeader({
@@ -21,9 +21,9 @@ function SectionHeader({
   const expanded = currentExpanded === id;
   return (
     <button type="button" onClick={() => onToggle(id)} className="w-full flex items-center justify-between py-1.5 cursor-pointer"
-      style={{ borderBottom: '1px solid #1e1e1e' }}>
+      style={{ borderBottom: '1px solid var(--t-surface-2)' }}>
       <span className="text-[11px] font-medium uppercase tracking-wider" style={{ color }}>{label}</span>
-      <span className="text-[10px]" style={{ color: '#555' }}>{expanded ? '-' : '+'}</span>
+      <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{expanded ? '-' : '+'}</span>
     </button>
   );
 }
@@ -33,7 +33,7 @@ function SmallSelect({
 }: { value: string; onChange: (v: string) => void; children: React.ReactNode }) {
   return (
     <select value={value} onChange={(e) => onChange(e.target.value)}
-      className="text-[10px] px-2 py-1 w-full" style={{ backgroundColor: '#111', color: '#ccc', border: '1px solid #333' }}>
+      className="text-[10px] px-2 py-1 w-full" style={{ backgroundColor: 'var(--t-panel)', color: 'var(--t-text)', border: '1px solid var(--t-border-strong)' }}>
       {children}
     </select>
   );
@@ -44,7 +44,7 @@ function ActionBtn({
 }: { onClick: () => void; disabled?: boolean; color: string; loading?: boolean; children: React.ReactNode }) {
   return (
     <button type="button" onClick={onClick} disabled={disabled || loading}
-      className={btnBase} style={{ backgroundColor: color, color: '#fff', opacity: (disabled || loading) ? 0.4 : 1 }}>
+      className={btnBase} style={{ backgroundColor: color, color: 'var(--t-text)', opacity: (disabled || loading) ? 0.4 : 1 }}>
       {loading ? '...' : children}
     </button>
   );
@@ -129,28 +129,28 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
   const toggle = (s: string) => setExpandedSection(prev => prev === s ? null : s);
 
   return (
-    <div className="flex flex-col gap-3 p-4" style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)' }}>
-      <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+    <div className="flex flex-col gap-3 p-4" style={{ backgroundColor: 'var(--t-accent-tint)' }}>
+      <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--t-accent)' }}>
         {isAdmin ? t('adminPanel') : t('organizer')}
       </h3>
 
-      {adminMessage && <p className="text-[10px] px-2 py-1" style={{ backgroundColor: '#1a3a1a', color: '#4ade80', border: '1px solid #333' }}>{adminMessage}</p>}
-      {adminError && <p className="text-[10px] px-2 py-1" style={{ backgroundColor: '#3a1a1a', color: '#f87171', border: '1px solid #333' }}>{adminError}</p>}
+      {adminMessage && <p className="text-[10px] px-2 py-1" style={{ backgroundColor: 'var(--t-success-surface)', color: 'var(--t-success)', border: '1px solid var(--t-border-strong)' }}>{adminMessage}</p>}
+      {adminError && <p className="text-[10px] px-2 py-1" style={{ backgroundColor: 'var(--t-danger-surface)', color: 'var(--t-danger)', border: '1px solid var(--t-border-strong)' }}>{adminError}</p>}
 
       {tour.status === 'registration' && (
         <div style={sectionStyle}>
           <button onClick={handleStart} disabled={!canStart || startingTournament}
             className="w-full px-4 py-2 text-xs font-semibold uppercase tracking-wider cursor-pointer"
-            style={{ backgroundColor: canStart ? '#c4a35a' : '#333', color: canStart ? '#0a0a0a' : '#666', opacity: startingTournament ? 0.6 : 1 }}>
+            style={{ backgroundColor: canStart ? 'var(--t-accent)' : 'var(--t-border-strong)', color: canStart ? 'var(--t-bg)' : 'var(--t-dim)', opacity: startingTournament ? 0.6 : 1 }}>
             {startingTournament ? '...' : t('start')}
           </button>
-          {!canStart && <p className="text-[10px] mt-1" style={{ color: '#cc4444' }}>{t('minPlayers')}</p>}
+          {!canStart && <p className="text-[10px] mt-1" style={{ color: 'var(--t-danger)' }}>{t('minPlayers')}</p>}
         </div>
       )}
 
       {tour.status === 'in_progress' && activeMatches.length > 0 && (
         <div style={sectionStyle}>
-          <SectionHeader id="forfeit" label={t('forceForfeit')} color="#cc4444" currentExpanded={expandedSection} onToggle={toggle} />
+          <SectionHeader id="forfeit" label={t('forceForfeit')} color="var(--t-danger)" currentExpanded={expandedSection} onToggle={toggle} />
           {expandedSection === 'forfeit' && (
             <div className="flex flex-col gap-2 mt-2">
               <SmallSelect value={forfeitMatchId} onChange={(v) => { setForfeitMatchId(v); setForfeitPlayerId(''); }}>
@@ -163,13 +163,13 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
                 return (
                   <div className="flex gap-1">
                     {m.player1Id && <button type="button" onClick={() => setForfeitPlayerId(m.player1Id!)}
-                      className="flex-1 px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: forfeitPlayerId === m.player1Id ? '#cc4444' : '#1a1a1a', color: forfeitPlayerId === m.player1Id ? '#fff' : '#aaa', border: '1px solid #333' }}>{m.player1Username}</button>}
+                      className="flex-1 px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: forfeitPlayerId === m.player1Id ? 'var(--t-danger)' : 'var(--t-surface-2)', color: forfeitPlayerId === m.player1Id ? '#fff' : 'var(--t-muted)', border: '1px solid var(--t-border-strong)' }}>{m.player1Username}</button>}
                     {m.player2Id && <button type="button" onClick={() => setForfeitPlayerId(m.player2Id!)}
-                      className="flex-1 px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: forfeitPlayerId === m.player2Id ? '#cc4444' : '#1a1a1a', color: forfeitPlayerId === m.player2Id ? '#fff' : '#aaa', border: '1px solid #333' }}>{m.player2Username}</button>}
+                      className="flex-1 px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: forfeitPlayerId === m.player2Id ? 'var(--t-danger)' : 'var(--t-surface-2)', color: forfeitPlayerId === m.player2Id ? '#fff' : 'var(--t-muted)', border: '1px solid var(--t-border-strong)' }}>{m.player2Username}</button>}
                   </div>
                 );
               })()}
-              {forfeitMatchId && forfeitPlayerId && <ActionBtn onClick={handleForfeit} color="#cc4444" loading={adminLoading}>{t('forceForfeit')}</ActionBtn>}
+              {forfeitMatchId && forfeitPlayerId && <ActionBtn onClick={handleForfeit} color="var(--t-danger)" loading={adminLoading}>{t('forceForfeit')}</ActionBtn>}
             </div>
           )}
         </div>
@@ -177,7 +177,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
 
       {tour.status === 'in_progress' && (
         <div style={sectionStyle}>
-          <SectionHeader id="disqualify" label={t('disqualifyPlayer')} color="#ef4444" currentExpanded={expandedSection} onToggle={toggle} />
+          <SectionHeader id="disqualify" label={t('disqualifyPlayer')} color="var(--t-danger)" currentExpanded={expandedSection} onToggle={toggle} />
           {expandedSection === 'disqualify' && (
             <div className="flex flex-col gap-2 mt-2">
               <SmallSelect value={dqUserId} onChange={setDqUserId}>
@@ -185,8 +185,8 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
                 {tour.participants.filter(p => !p.eliminated).map(p => <option key={p.userId} value={p.userId}>{p.username}</option>)}
               </SmallSelect>
               <input type="text" value={dqReason} onChange={e => setDqReason(e.target.value)} placeholder={t('reasonOptional')}
-                className="text-[10px] px-2 py-1" style={{ backgroundColor: '#111', color: '#ccc', border: '1px solid #333' }} />
-              <ActionBtn onClick={() => { adminAction({ action: 'disqualify', userId: dqUserId, reason: dqReason }); setDqUserId(''); setDqReason(''); }} disabled={!dqUserId} color="#ef4444" loading={adminLoading}>{t('disqualify')}</ActionBtn>
+                className="text-[10px] px-2 py-1" style={{ backgroundColor: 'var(--t-panel)', color: 'var(--t-text)', border: '1px solid var(--t-border-strong)' }} />
+              <ActionBtn onClick={() => { adminAction({ action: 'disqualify', userId: dqUserId, reason: dqReason }); setDqUserId(''); setDqReason(''); }} disabled={!dqUserId} color="var(--t-danger)" loading={adminLoading}>{t('disqualify')}</ActionBtn>
             </div>
           )}
         </div>
@@ -209,9 +209,9 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
                 return (
                   <div className="flex gap-1">
                     {m.player1Id && <button type="button" onClick={() => setSwWinnerId(m.player1Id!)}
-                      className="flex-1 px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: swWinnerId === m.player1Id ? '#f59e0b' : '#1a1a1a', color: swWinnerId === m.player1Id ? '#000' : '#aaa', border: '1px solid #333' }}>{m.player1Username}</button>}
+                      className="flex-1 px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: swWinnerId === m.player1Id ? '#f59e0b' : 'var(--t-surface-2)', color: swWinnerId === m.player1Id ? '#000' : 'var(--t-muted)', border: '1px solid var(--t-border-strong)' }}>{m.player1Username}</button>}
                     {m.player2Id && <button type="button" onClick={() => setSwWinnerId(m.player2Id!)}
-                      className="flex-1 px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: swWinnerId === m.player2Id ? '#f59e0b' : '#1a1a1a', color: swWinnerId === m.player2Id ? '#000' : '#aaa', border: '1px solid #333' }}>{m.player2Username}</button>}
+                      className="flex-1 px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: swWinnerId === m.player2Id ? '#f59e0b' : 'var(--t-surface-2)', color: swWinnerId === m.player2Id ? '#000' : 'var(--t-muted)', border: '1px solid var(--t-border-strong)' }}>{m.player2Username}</button>}
                   </div>
                 );
               })()}
@@ -262,17 +262,17 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
               {tour.participants.map(p => <option key={p.userId} value={p.userId}>{p.username}</option>)}
             </SmallSelect>
             <input type="text" value={banReason} onChange={e => setBanReason(e.target.value)} placeholder={t('banReason')}
-              className="text-[10px] px-2 py-1" style={{ backgroundColor: '#111', color: '#ccc', border: '1px solid #333' }} />
+              className="text-[10px] px-2 py-1" style={{ backgroundColor: 'var(--t-panel)', color: 'var(--t-text)', border: '1px solid var(--t-border-strong)' }} />
             <div className="flex items-center gap-3">
               <label className="flex items-center gap-1 cursor-pointer">
                 <input type="checkbox" checked={banPermanent} onChange={e => setBanPermanent(e.target.checked)} />
-                <span className="text-[10px]" style={{ color: '#ccc' }}>{t('permanent')}</span>
+                <span className="text-[10px]" style={{ color: 'var(--t-text)' }}>{t('permanent')}</span>
               </label>
               {!banPermanent && (
                 <label className="flex items-center gap-1">
-                  <span className="text-[10px]" style={{ color: '#888' }}>{t('daysLabel')}</span>
+                  <span className="text-[10px]" style={{ color: 'var(--t-muted)' }}>{t('daysLabel')}</span>
                   <input type="number" min="1" max="365" value={banDays} onChange={e => setBanDays(e.target.value)}
-                    className="w-12 text-[10px] text-center" style={{ backgroundColor: '#111', color: '#ccc', border: '1px solid #333' }} />
+                    className="w-12 text-[10px] text-center" style={{ backgroundColor: 'var(--t-panel)', color: 'var(--t-text)', border: '1px solid var(--t-border-strong)' }} />
                 </label>
               )}
             </div>
@@ -288,23 +288,23 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
 
       {tour.status !== 'completed' && tour.status !== 'cancelled' && (
         <div style={sectionStyle}>
-          <SectionHeader id="cancel" label={t('cancel')} color="#666" currentExpanded={expandedSection} onToggle={toggle} />
+          <SectionHeader id="cancel" label={t('cancel')} color="var(--t-dim)" currentExpanded={expandedSection} onToggle={toggle} />
           {expandedSection === 'cancel' && (
             <div className="flex flex-col gap-2 mt-2">
-              <p className="text-[10px]" style={{ color: '#cc4444' }}>{t('cancelTournamentWarning')}</p>
-              <ActionBtn onClick={() => adminAction({ action: 'cancelTournament' })} color="#666" loading={adminLoading}>{t('cancel')}</ActionBtn>
+              <p className="text-[10px]" style={{ color: 'var(--t-danger)' }}>{t('cancelTournamentWarning')}</p>
+              <ActionBtn onClick={() => adminAction({ action: 'cancelTournament' })} color="var(--t-dim)" loading={adminLoading}>{t('cancel')}</ActionBtn>
             </div>
           )}
         </div>
       )}
 
       <div style={sectionStyle}>
-        <SectionHeader id="delete" label={t('deleteTournament')} color="#cc4444" currentExpanded={expandedSection} onToggle={toggle} />
+        <SectionHeader id="delete" label={t('deleteTournament')} color="var(--t-danger)" currentExpanded={expandedSection} onToggle={toggle} />
         {expandedSection === 'delete' && (
           <div className="flex flex-col gap-2 mt-2">
-            <p className="text-[10px]" style={{ color: '#cc4444' }}>{t('deleteTournamentWarning')}</p>
+            <p className="text-[10px]" style={{ color: 'var(--t-danger)' }}>{t('deleteTournamentWarning')}</p>
             {deleteArmed && (
-              <p className="text-[10px]" style={{ color: '#cc4444' }}>{t('deleteTournamentConfirm')}</p>
+              <p className="text-[10px]" style={{ color: 'var(--t-danger)' }}>{t('deleteTournamentConfirm')}</p>
             )}
             <ActionBtn
               onClick={async () => {
@@ -325,7 +325,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
                 } catch { setAdminError(t('admin.networkError')); }
                 finally { setDeleting(false); }
               }}
-              color="#cc4444"
+              color="var(--t-danger)"
               disabled={deleting}
             >
               {deleting ? '...' : deleteArmed ? t('deleteTournamentConfirmAction') : t('deleteTournament')}

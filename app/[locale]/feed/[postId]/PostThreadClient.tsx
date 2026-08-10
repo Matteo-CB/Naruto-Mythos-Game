@@ -15,11 +15,11 @@ export function PostThreadClient({ initialPost, initialReplies }: { initialPost:
   const [replies, setReplies] = useState<PostView[]>(initialReplies);
 
   return (
-    <main className="min-h-screen relative" style={{ backgroundColor: '#0a0a0a', color: '#e8e8e8' }}>
+    <main className="min-h-screen relative" style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-text)' }}>
       <CloudBackground />
       <div className="relative z-10 mx-auto" style={{ maxWidth: 620 }}>
         <header className="sticky top-0 z-20 px-4 py-3 flex items-center gap-3" style={{ backgroundColor: 'rgba(10,10,10,0.86)', backdropFilter: 'blur(8px)', borderBottom: '1px solid #17171a' }}>
-          <Link href="/feed" className="font-display text-[11px] uppercase tracking-widest" style={{ color: '#c4a35a' }}>‹ {t('title')}</Link>
+          <Link href="/feed" className="font-display text-[11px] uppercase tracking-widest" style={{ color: 'var(--t-accent)' }}>‹ {t('title')}</Link>
         </header>
 
         <PostCard post={initialPost} isAdmin={privilege.isAdmin} />

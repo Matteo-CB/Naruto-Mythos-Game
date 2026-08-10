@@ -2,7 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import type { GameState, PlayerID } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { buildPlayLessTargets } from '@/lib/effects/handlers/shared/playLess';
+import { buildPlayLessTargets, playLessBlockedRevealResult, type PlayLessCategory } from '@/lib/effects/handlers/shared/playLess';
 import { ss078Duel } from './sandVillage';
 import {
   GAARA_GOLD_ID,
@@ -83,13 +83,19 @@ function tsunade001Upgrade(ctx: EffectContext): EffectResult {
   };
 }
 
+const JIRAIYA_GOLD_CATEGORY: PlayLessCategory = { kind: 'keyword', value: SUMMON_KEYWORD };
+
 function jiraiya002Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const playable = buildPlayLessTargets(state, sourcePlayer,
-    { kind: 'keyword', value: SUMMON_KEYWORD }, JIRAIYA_GOLD_REDUCTION).targets;
+    JIRAIYA_GOLD_CATEGORY, JIRAIYA_GOLD_REDUCTION).targets;
   const summonsInPlay = friendlySummonIds(state, sourcePlayer);
 
   if (playable.length === 0 && summonsInPlay.length === 0) {
+    const blocked = playLessBlockedRevealResult(
+      state, sourcePlayer, JIRAIYA_GOLD_CATEGORY, 'Jiraiya (SS-002) UPGRADE',
+    );
+    if (blocked) return blocked;
     return noTarget(state, sourcePlayer,
       'Jiraiya (SS-002) UPGRADE: no Summon to play and none in play.', JIRAIYA_GOLD_NAME, JIRAIYA_GOLD_ID);
   }

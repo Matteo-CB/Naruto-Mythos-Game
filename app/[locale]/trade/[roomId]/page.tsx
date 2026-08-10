@@ -18,7 +18,7 @@ import { TradeInventoryGrid } from '@/components/trade/TradeInventoryGrid';
 import { TradeConfirmBar } from '@/components/trade/TradeConfirmBar';
 
 const PANEL_CLIP = 'polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px)';
-const PANEL_BG = '#0d0c10';
+const PANEL_BG = 'var(--t-bg)';
 
 interface RoomState {
   roomId: string;
@@ -247,11 +247,11 @@ export default function TradePage() {
   const offerValid = validateOffer(myOffer, theirOffer).valid;
 
   return (
-    <main className="relative min-h-screen flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a', color: '#e8e8e8' }}>
+    <main className="relative min-h-screen flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-text)' }}>
       <CloudBackground />
 
       <header className="relative z-10 flex items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/leaderboard?tab=friends" className="text-xs tracking-widest font-display" style={{ color: '#888' }}>
+        <Link href="/leaderboard?tab=friends" className="text-xs tracking-widest font-display" style={{ color: 'var(--t-muted)' }}>
           {'< '}{t('back')}
         </Link>
       </header>
@@ -259,30 +259,30 @@ export default function TradePage() {
       <div className="relative z-10 flex-1 px-4 sm:px-6 max-w-5xl w-full mx-auto pb-10">
         <motion.h1
           className="text-2xl sm:text-3xl font-display tracking-[0.3em] mb-4 mt-2"
-          style={{ color: '#c4a35a' }}
+          style={{ color: 'var(--t-accent)' }}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
           {t('title')}
         </motion.h1>
 
-        {loading && <p className="text-sm" style={{ color: '#666' }}>{t('loading')}</p>}
+        {loading && <p className="text-sm" style={{ color: 'var(--t-dim)' }}>{t('loading')}</p>}
 
         {error && (
-          <p className="text-sm" style={{ color: '#b33e3e' }}>{t(`error.${error}` as 'error.loadError')}</p>
+          <p className="text-sm" style={{ color: 'var(--t-danger)' }}>{t(`error.${error}` as 'error.loadError')}</p>
         )}
 
         {!loading && !error && room && (
           <>
             {room.status === 'pending' && room.side === 'creator' && (
-              <p className="text-[11px] mb-4" style={{ color: '#888' }}>
+              <p className="text-[11px] mb-4" style={{ color: 'var(--t-muted)' }}>
                 {t('waitingJoin', { name: room.partnerUsername })}
               </p>
             )}
 
-            <div className="flex items-center justify-between text-[11px] uppercase tracking-widest mb-3" style={{ color: '#888' }}>
-              <span style={{ color: '#c4a35a' }}>{room.myUsername}</span>
-              <span style={{ color: '#555' }}>{'<->'}</span>
+            <div className="flex items-center justify-between text-[11px] uppercase tracking-widest mb-3" style={{ color: 'var(--t-muted)' }}>
+              <span style={{ color: 'var(--t-accent)' }}>{room.myUsername}</span>
+              <span style={{ color: 'var(--t-dim)' }}>{'<->'}</span>
               <span>{room.partnerUsername}</span>
             </div>
 
@@ -291,7 +291,7 @@ export default function TradePage() {
               <TradeReceivePanel title={t('theirOffer', { name: room.partnerUsername })} cardIds={theirOffer} />
             </div>
 
-            <p className="text-[10px] mb-3" style={{ color: '#666' }}>{t('tournamentNote')}</p>
+            <p className="text-[10px] mb-3" style={{ color: 'var(--t-dim)' }}>{t('tournamentNote')}</p>
 
             {!done && (
               <motion.div
@@ -299,9 +299,9 @@ export default function TradePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                 className="mb-5 px-4 py-4"
-                style={{ backgroundColor: PANEL_BG, clipPath: PANEL_CLIP, boxShadow: '0 12px 32px rgba(0,0,0,0.45)' }}
+                style={{ backgroundColor: PANEL_BG, clipPath: PANEL_CLIP, boxShadow: '0 12px 32px var(--t-shadow)' }}
               >
-                <span className="font-display text-[11px] uppercase tracking-[0.28em] block mb-3" style={{ color: '#666' }}>
+                <span className="font-display text-[11px] uppercase tracking-[0.28em] block mb-3" style={{ color: 'var(--t-dim)' }}>
                   {t('yourInventory')}
                 </span>
                 <div className="max-h-[280px] overflow-y-auto">
@@ -332,7 +332,7 @@ export default function TradePage() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center py-6"
               >
-                <span className="font-display text-lg uppercase tracking-widest" style={{ color: '#5fb05f' }}>
+                <span className="font-display text-lg uppercase tracking-widest" style={{ color: 'var(--t-success)' }}>
                   {t('completed', { count: theirOffer.length })}
                 </span>
               </motion.div>
@@ -354,11 +354,11 @@ export default function TradePage() {
           >
             <motion.div
               className="p-6 max-w-sm w-full text-center"
-              style={{ backgroundColor: PANEL_BG, clipPath: PANEL_CLIP, boxShadow: '0 16px 44px rgba(0,0,0,0.7)' }}
+              style={{ backgroundColor: PANEL_BG, clipPath: PANEL_CLIP, boxShadow: '0 16px 44px var(--t-shadow)' }}
               initial={{ scale: 0.9, y: 10 }}
               animate={{ scale: 1, y: 0 }}
             >
-              <p className="font-display text-sm uppercase tracking-widest mb-5" style={{ color: '#e8e8e8' }}>
+              <p className="font-display text-sm uppercase tracking-widest mb-5" style={{ color: 'var(--t-text)' }}>
                 {t('cancelConfirm')}
               </p>
               <div className="flex gap-3 justify-center">
@@ -366,7 +366,7 @@ export default function TradePage() {
                   type="button"
                   onClick={() => setCancelPrompt(false)}
                   className="font-display px-4 py-2 text-[11px] uppercase tracking-widest"
-                  style={{ color: '#c4a35a', backgroundColor: '#1a1a1a' }}
+                  style={{ color: 'var(--t-accent)', backgroundColor: 'var(--t-surface-2)' }}
                 >
                   {t('cancelConfirmNo')}
                 </button>
@@ -374,7 +374,7 @@ export default function TradePage() {
                   type="button"
                   onClick={handleCancel}
                   className="font-display px-4 py-2 text-[11px] uppercase tracking-widest"
-                  style={{ color: '#0a0a0a', backgroundColor: '#b33e3e' }}
+                  style={{ color: 'var(--t-bg)', backgroundColor: 'var(--t-danger)' }}
                 >
                   {t('cancelConfirmYes')}
                 </button>

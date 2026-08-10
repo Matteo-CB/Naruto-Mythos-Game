@@ -76,9 +76,9 @@ export function FriendshipButton({ userId, username }: FriendshipButtonProps) {
         className="h-9 px-4 text-xs font-bold uppercase tracking-wider"
         style={{
           backgroundColor: 'transparent',
-          border: '1px solid #262626',
+          border: '1px solid var(--t-border)',
           borderRadius: 4,
-          color: '#555555',
+          color: 'var(--t-dim)',
           cursor: 'not-allowed',
         }}
       >
@@ -97,9 +97,9 @@ export function FriendshipButton({ userId, username }: FriendshipButtonProps) {
         className="h-9 px-4 text-xs font-bold uppercase tracking-wider cursor-pointer"
         style={{
           backgroundColor: 'transparent',
-          border: '1px solid #c4a35a',
+          border: '1px solid var(--t-accent)',
           borderRadius: 4,
-          color: '#c4a35a',
+          color: 'var(--t-accent)',
           opacity: actionLoading ? 0.5 : 1,
           cursor: actionLoading ? 'not-allowed' : 'pointer',
         }}
@@ -116,9 +116,9 @@ export function FriendshipButton({ userId, username }: FriendshipButtonProps) {
         className="h-9 px-4 text-xs font-bold uppercase tracking-wider"
         style={{
           backgroundColor: 'transparent',
-          border: '1px solid #333333',
+          border: '1px solid var(--t-border-strong)',
           borderRadius: 4,
-          color: '#555555',
+          color: 'var(--t-dim)',
           cursor: 'not-allowed',
         }}
       >
@@ -136,10 +136,10 @@ export function FriendshipButton({ userId, username }: FriendshipButtonProps) {
         disabled={actionLoading}
         className="h-9 px-4 text-xs font-bold uppercase tracking-wider cursor-pointer"
         style={{
-          backgroundColor: '#c4a35a',
-          border: '1px solid #c4a35a',
+          backgroundColor: 'var(--t-accent)',
+          border: '1px solid var(--t-accent)',
           borderRadius: 4,
-          color: '#0a0a0a',
+          color: 'var(--t-bg)',
           opacity: actionLoading ? 0.5 : 1,
           cursor: actionLoading ? 'not-allowed' : 'pointer',
         }}
@@ -154,7 +154,7 @@ export function FriendshipButton({ userId, username }: FriendshipButtonProps) {
       <span
         className="h-9 px-4 flex items-center text-xs font-bold uppercase tracking-wider"
         style={{
-          color: '#555555',
+          color: 'var(--t-dim)',
         }}
       >
         {t('actions.alreadyFriends')}
@@ -167,10 +167,10 @@ export function FriendshipButton({ userId, username }: FriendshipButtonProps) {
         }}
         className="h-9 px-4 text-xs font-bold uppercase tracking-wider cursor-pointer"
         style={{
-          backgroundColor: 'rgba(196, 163, 90, 0.1)',
+          backgroundColor: 'var(--t-accent-glow)',
           border: '1px solid rgba(196, 163, 90, 0.35)',
           borderRadius: 4,
-          color: '#c4a35a',
+          color: 'var(--t-accent)',
         }}
       >
         {t('actions.message')}
@@ -183,9 +183,9 @@ export function FriendshipButton({ userId, username }: FriendshipButtonProps) {
           className="h-9 w-9 flex items-center justify-center cursor-pointer"
           style={{
             backgroundColor: 'transparent',
-            border: '1px solid #333333',
+            border: '1px solid var(--t-border-strong)',
             borderRadius: 4,
-            color: '#555555',
+            color: 'var(--t-dim)',
             fontSize: 14,
             lineHeight: 1,
           }}
@@ -204,9 +204,9 @@ export function FriendshipButton({ userId, username }: FriendshipButtonProps) {
           className="h-9 px-3 text-xs font-bold uppercase tracking-wider cursor-pointer"
           style={{
             backgroundColor: 'transparent',
-            border: '1px solid #b33e3e',
+            border: '1px solid var(--t-danger)',
             borderRadius: 4,
-            color: '#b33e3e',
+            color: 'var(--t-danger)',
             opacity: actionLoading ? 0.5 : 1,
             cursor: actionLoading ? 'not-allowed' : 'pointer',
           }}

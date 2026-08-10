@@ -63,16 +63,16 @@ export function MyStatsPanel({ username, mode, onModeChange }: MyStatsPanelProps
       className="w-full"
       style={{
         backgroundColor: 'rgba(15, 15, 20, 0.78)',
-        boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
+        boxShadow: '0 12px 32px var(--t-shadow)',
       }}
     >
       <header
         className="flex items-center justify-between px-3 py-2.5"
-        style={{ boxShadow: 'inset 0 -1px 0 rgba(255,255,255,0.04)' }}
+        style={{ boxShadow: 'inset 0 -1px 0 var(--t-divider)' }}
       >
         <h2
           className="text-[11px] font-bold uppercase"
-          style={{ color: '#c4a35a', letterSpacing: '0.22em' }}
+          style={{ color: 'var(--t-accent)', letterSpacing: '0.22em' }}
         >
           {t('online.myStats.title')}
         </h2>
@@ -83,7 +83,7 @@ export function MyStatsPanel({ username, mode, onModeChange }: MyStatsPanelProps
         <AnimatePresence mode="wait">
           {error && (
             <div className="px-2 py-3 text-center">
-              <span className="text-[10px]" style={{ color: '#555' }}>{t('common.error')}</span>
+              <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{t('common.error')}</span>
             </div>
           )}
           {!error && (
@@ -97,24 +97,24 @@ export function MyStatsPanel({ username, mode, onModeChange }: MyStatsPanelProps
             >
               <div className="flex items-end justify-between gap-3">
                 <div className="flex flex-col">
-                  <span className="text-[9px] uppercase" style={{ color: '#555', letterSpacing: '0.18em' }}>
+                  <span className="text-[9px] uppercase" style={{ color: 'var(--t-dim)', letterSpacing: '0.18em' }}>
                     {t('online.myStats.eloLabel')}
                   </span>
                   <span
                     className="text-3xl font-bold tabular-nums"
-                    style={{ color: '#c4a35a', lineHeight: 1.05, letterSpacing: '0.02em' }}
+                    style={{ color: 'var(--t-accent)', lineHeight: 1.05, letterSpacing: '0.02em' }}
                   >
                     {stats ? elo : '...'}
                   </span>
                 </div>
                 {stats && (
                   <div className="flex flex-col items-end">
-                    <span className="text-[9px] uppercase" style={{ color: '#555', letterSpacing: '0.18em' }}>
+                    <span className="text-[9px] uppercase" style={{ color: 'var(--t-dim)', letterSpacing: '0.18em' }}>
                       {t('online.myStats.streakWin')}
                     </span>
                     <span
                       className="text-base font-bold tabular-nums"
-                      style={{ color: winStreak > 0 ? '#8ad88a' : '#888', lineHeight: 1 }}
+                      style={{ color: winStreak > 0 ? '#8ad88a' : 'var(--t-muted)', lineHeight: 1 }}
                     >
                       {winStreak}
                     </span>
@@ -132,10 +132,10 @@ export function MyStatsPanel({ username, mode, onModeChange }: MyStatsPanelProps
 
               {stats && total > 0 && (
                 <div className="flex items-center justify-between gap-2 pt-1">
-                  <span className="text-[9px] uppercase" style={{ color: '#555', letterSpacing: '0.18em' }}>
+                  <span className="text-[9px] uppercase" style={{ color: 'var(--t-dim)', letterSpacing: '0.18em' }}>
                     {t('online.myStats.winRate')}
                   </span>
-                  <span className="text-[11px] font-bold tabular-nums" style={{ color: '#e8e8e8' }}>
+                  <span className="text-[11px] font-bold tabular-nums" style={{ color: 'var(--t-text)' }}>
                     {winRate}%
                   </span>
                 </div>
@@ -159,7 +159,7 @@ function StatCell({ label, value, color }: { label: string; value: number | stri
       </span>
       <span
         className="text-[8px] uppercase mt-1"
-        style={{ color: '#555', letterSpacing: '0.18em' }}
+        style={{ color: 'var(--t-dim)', letterSpacing: '0.18em' }}
       >
         {label}
       </span>

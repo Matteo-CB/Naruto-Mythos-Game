@@ -53,15 +53,15 @@ export function DeckPreferencesSection() {
   return (
     <div
       className="mt-4 flex flex-col gap-4 p-5 lg:mt-6 lg:p-6"
-      style={{ backgroundColor: '#111111', border: '1px solid #262626' }}
+      style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' }}
     >
-      <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}>
+      <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
         {t('deckPrefs')}
       </span>
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-4">
-          <span className="text-sm tracking-wide" style={{ color: '#cfcdc6' }}>{t('deckListLimit')}</span>
+          <span className="text-sm tracking-wide" style={{ color: 'var(--t-text)' }}>{t('deckListLimit')}</span>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -69,7 +69,7 @@ export function DeckPreferencesSection() {
               disabled={!isLoaded || deckListLimit <= DECK_LIST_LIMIT_MIN}
               aria-label={t('deckListLimitLess')}
               className="h-8 w-8 text-sm disabled:opacity-40"
-              style={{ backgroundColor: '#1a1a1a', color: '#c4a35a', border: 'none', cursor: 'pointer' }}
+              style={{ backgroundColor: 'var(--t-surface-2)', color: 'var(--t-accent)', border: 'none', cursor: 'pointer' }}
             >
               &minus;
             </button>
@@ -84,7 +84,7 @@ export function DeckPreferencesSection() {
               onBlur={commitLimit}
               onKeyDown={(e) => { if (e.key === 'Enter') commitLimit(); }}
               className="w-16 px-2 py-1.5 text-center text-sm tabular-nums"
-              style={{ backgroundColor: '#0d0d0d', border: '1px solid #333333', color: '#e0e0e0', outline: 'none' }}
+              style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border-strong)', color: 'var(--t-text)', outline: 'none' }}
             />
             <button
               type="button"
@@ -92,22 +92,22 @@ export function DeckPreferencesSection() {
               disabled={!isLoaded || deckListLimit >= DECK_LIST_LIMIT_MAX}
               aria-label={t('deckListLimitMore')}
               className="h-8 w-8 text-sm disabled:opacity-40"
-              style={{ backgroundColor: '#1a1a1a', color: '#c4a35a', border: 'none', cursor: 'pointer' }}
+              style={{ backgroundColor: 'var(--t-surface-2)', color: 'var(--t-accent)', border: 'none', cursor: 'pointer' }}
             >
               +
             </button>
           </div>
         </div>
-        <p className="text-xs tracking-wide" style={{ color: '#555555' }}>{t('deckListLimitHint')}</p>
+        <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>{t('deckListLimitHint')}</p>
       </div>
 
-      <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+      <div style={{ height: '1px', backgroundColor: 'var(--t-surface-2)' }} />
 
       <div className="flex flex-col gap-2">
-        <span className="text-sm tracking-wide" style={{ color: '#cfcdc6' }}>
+        <span className="text-sm tracking-wide" style={{ color: 'var(--t-text)' }}>
           {t('favoriteDecks')} ({favoriteDeckIds.length}/{MAX_FAVORITE_DECKS})
         </span>
-        <p className="text-xs tracking-wide" style={{ color: '#555555' }}>{t('favoriteDecksHint')}</p>
+        <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>{t('favoriteDecksHint')}</p>
 
         {favoriteDecks.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
@@ -115,7 +115,7 @@ export function DeckPreferencesSection() {
               <span
                 key={deck.id}
                 className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px]"
-                style={{ backgroundColor: 'rgba(196,163,90,0.12)', color: '#c4a35a' }}
+                style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)' }}
               >
                 <span aria-hidden="true">&#9733;</span>
                 <span className="max-w-[140px] truncate">{deck.name}</span>
@@ -124,7 +124,7 @@ export function DeckPreferencesSection() {
                   onClick={() => toggleFavoriteDeck(deck.id)}
                   aria-label={t('unfavorite')}
                   className="text-[11px]"
-                  style={{ background: 'none', border: 'none', color: '#c4a35a', cursor: 'pointer' }}
+                  style={{ background: 'none', border: 'none', color: 'var(--t-accent)', cursor: 'pointer' }}
                 >
                   &times;
                 </button>
@@ -134,7 +134,7 @@ export function DeckPreferencesSection() {
         )}
 
         {decks.length === 0 ? (
-          <p className="text-xs italic" style={{ color: '#555' }}>{t('deckPrefsNoDecks')}</p>
+          <p className="text-xs italic" style={{ color: 'var(--t-dim)' }}>{t('deckPrefsNoDecks')}</p>
         ) : (
           <div
             className="flex flex-col gap-1 overflow-y-auto"
@@ -152,13 +152,13 @@ export function DeckPreferencesSection() {
                   aria-pressed={isFav}
                   className="flex items-center justify-between gap-2 px-2.5 py-2 text-left transition-colors"
                   style={{
-                    backgroundColor: isFav ? 'rgba(196,163,90,0.1)' : '#161616',
-                    color: isFav ? '#e8e6df' : atCap ? '#4a4a4a' : '#b9b7b1',
+                    backgroundColor: isFav ? 'var(--t-accent-glow)' : '#161616',
+                    color: isFav ? 'var(--t-text)' : atCap ? '#4a4a4a' : '#b9b7b1',
                     cursor: atCap ? 'default' : 'pointer',
                   }}
                 >
                   <span className="min-w-0 truncate text-sm">{deck.name}</span>
-                  <span aria-hidden="true" className="shrink-0 text-[13px]" style={{ color: isFav ? '#c4a35a' : atCap ? '#3a3a3a' : '#777' }}>
+                  <span aria-hidden="true" className="shrink-0 text-[13px]" style={{ color: isFav ? 'var(--t-accent)' : atCap ? 'var(--t-border-strong)' : 'var(--t-dim)' }}>
                     {isFav ? '★' : '☆'}
                   </span>
                 </button>

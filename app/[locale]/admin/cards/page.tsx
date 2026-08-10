@@ -111,17 +111,17 @@ export default function AdminCardsPage() {
   
   if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) {
     return (
-      <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+      <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: 'var(--t-bg)' }}>
         <CloudBackground />
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="flex flex-col items-center gap-4 relative z-10">
-            <p className="text-sm" style={{ color: '#b33e3e' }}>
+            <p className="text-sm" style={{ color: 'var(--t-danger)' }}>
               {t('adminCards.forbidden')}
             </p>
             <Link
               href="/"
               className="px-6 py-2.5 text-sm"
-              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+              style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-muted)' }}
             >
               {t('common.back')}
             </Link>
@@ -149,20 +149,20 @@ export default function AdminCardsPage() {
   const bannedCount = bannedIds.size;
 
   return (
-    <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+    <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: 'var(--t-bg)' }}>
       <CloudBackground />
 
       <div className="flex-1 flex flex-col items-center px-4 py-8 relative z-10">
         <div className="w-full max-w-6xl flex flex-col gap-6">
           
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold tracking-wider uppercase" style={{ color: '#c4a35a' }}>
+            <h1 className="text-2xl font-bold tracking-wider uppercase" style={{ color: 'var(--t-accent)' }}>
               {t('adminCards.title')}
             </h1>
             <Link
               href="/"
               className="px-4 py-2 text-xs"
-              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+              style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-muted)' }}
             >
               {t('common.back')}
             </Link>
@@ -170,7 +170,7 @@ export default function AdminCardsPage() {
 
           
           <div className="flex items-center gap-4 flex-wrap">
-            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#888888' }}>
+            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--t-muted)' }}>
               {t('adminCards.bannedCount', { count: bannedCount })}
             </span>
 
@@ -181,9 +181,9 @@ export default function AdminCardsPage() {
               placeholder={t('adminCards.search')}
               className="flex-1 min-w-[140px] px-3 py-2 text-sm rounded"
               style={{
-                backgroundColor: '#141414',
-                border: '1px solid #262626',
-                color: '#e0e0e0',
+                backgroundColor: 'var(--t-surface)',
+                border: '1px solid var(--t-border)',
+                color: 'var(--t-text)',
                 outline: 'none',
               }}
             />
@@ -197,9 +197,9 @@ export default function AdminCardsPage() {
                 onClick={() => setFilter(f)}
                 className="px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors"
                 style={{
-                  backgroundColor: filter === f ? '#1a1a1a' : '#0a0a0a',
-                  borderBottom: filter === f ? `2px solid ${f === 'banned' ? '#b33e3e' : f === 'authorized' ? '#4a9e4a' : '#c4a35a'}` : '2px solid transparent',
-                  color: filter === f ? '#e0e0e0' : '#555555',
+                  backgroundColor: filter === f ? 'var(--t-surface-2)' : 'var(--t-bg)',
+                  borderBottom: filter === f ? `2px solid ${f === 'banned' ? 'var(--t-danger)' : f === 'authorized' ? '#4a9e4a' : 'var(--t-accent)'}` : '2px solid transparent',
+                  color: filter === f ? 'var(--t-text)' : 'var(--t-dim)',
                 }}
               >
                 {t(`adminCards.filter.${f}`)}
@@ -224,8 +224,8 @@ export default function AdminCardsPage() {
                   aria-pressed={active}
                   className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors"
                   style={{
-                    backgroundColor: active ? 'rgba(196,163,90,0.16)' : '#0a0a0a',
-                    color: active ? '#c4a35a' : '#555555',
+                    backgroundColor: active ? 'var(--t-accent-glow)' : 'var(--t-bg)',
+                    color: active ? 'var(--t-accent)' : 'var(--t-dim)',
                     border: 'none', cursor: 'pointer',
                   }}
                 >
@@ -245,8 +245,8 @@ export default function AdminCardsPage() {
                   aria-pressed={active}
                   className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors"
                   style={{
-                    backgroundColor: active ? 'rgba(196,163,90,0.16)' : '#0a0a0a',
-                    color: active ? '#c4a35a' : '#555555',
+                    backgroundColor: active ? 'var(--t-accent-glow)' : 'var(--t-bg)',
+                    color: active ? 'var(--t-accent)' : 'var(--t-dim)',
                     border: 'none', cursor: 'pointer',
                   }}
                 >
@@ -258,9 +258,9 @@ export default function AdminCardsPage() {
 
           
           {loading ? (
-            <p className="text-sm" style={{ color: '#888888' }}>{t('common.loading')}</p>
+            <p className="text-sm" style={{ color: 'var(--t-muted)' }}>{t('common.loading')}</p>
           ) : filtered.length === 0 ? (
-            <p className="text-sm" style={{ color: '#555555' }}>{t('adminCards.noCards')}</p>
+            <p className="text-sm" style={{ color: 'var(--t-dim)' }}>{t('adminCards.noCards')}</p>
           ) : (
             <div
               className="grid gap-3"
@@ -277,8 +277,8 @@ export default function AdminCardsPage() {
                     key={card.id}
                     className="flex flex-col rounded-lg overflow-hidden"
                     style={{
-                      backgroundColor: '#141414',
-                      border: `1px solid ${isBanned ? '#b33e3e40' : '#262626'}`,
+                      backgroundColor: 'var(--t-surface)',
+                      border: `1px solid ${isBanned ? 'var(--t-danger)40' : 'var(--t-border)'}`,
                       opacity: isBanned ? 0.6 : 1,
                       transition: 'opacity 0.2s, border-color 0.2s',
                     }}
@@ -294,7 +294,7 @@ export default function AdminCardsPage() {
                         style={{
                           fontSize: '11px',
                           fontWeight: 600,
-                          color: '#e0e0e0',
+                          color: 'var(--t-text)',
                           lineHeight: 1.2,
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -306,7 +306,7 @@ export default function AdminCardsPage() {
                       <div
                         style={{
                           fontSize: '10px',
-                          color: '#555555',
+                          color: 'var(--t-dim)',
                         }}
                       >
                         {card.id}
@@ -314,7 +314,7 @@ export default function AdminCardsPage() {
 
                       
                       {isBanned && bannedReasons.get(card.id) && (
-                        <div style={{ fontSize: '9px', color: '#b33e3e', lineHeight: 1.2, fontStyle: 'italic' }}>
+                        <div style={{ fontSize: '9px', color: 'var(--t-danger)', lineHeight: 1.2, fontStyle: 'italic' }}>
                           {bannedReasons.get(card.id)}
                         </div>
                       )}
@@ -328,7 +328,7 @@ export default function AdminCardsPage() {
                             onChange={(e) => setBanReason(e.target.value)}
                             placeholder={t('tournament.reasonOptional')}
                             className="w-full px-2 py-1 text-xs rounded"
-                            style={{ backgroundColor: '#0a0a0f', border: '1px solid #b33e3e40', color: '#e0e0e0', outline: 'none' }}
+                            style={{ backgroundColor: 'var(--t-surface-2)', border: '1px solid var(--t-danger)40', color: 'var(--t-text)', outline: 'none' }}
                             autoFocus
                             onKeyDown={(e) => { if (e.key === 'Enter') toggleBan(card.id, banReason); }}
                           />
@@ -336,14 +336,14 @@ export default function AdminCardsPage() {
                             <button
                               onClick={() => toggleBan(card.id, banReason)}
                               className="flex-1 py-1 text-xs font-bold uppercase"
-                              style={{ backgroundColor: '#1a0a0a', border: '1px solid #b33e3e', color: '#b33e3e' }}
+                              style={{ backgroundColor: 'var(--t-danger-surface)', border: '1px solid var(--t-danger)', color: 'var(--t-danger)' }}
                             >
                               {t('adminCards.ban')}
                             </button>
                             <button
                               onClick={() => setBanReasonCardId(null)}
                               className="px-2 py-1 text-xs"
-                              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#555' }}
+                              style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-dim)' }}
                               aria-label={t('common.cancel')}
                             >
                               ×
@@ -359,8 +359,8 @@ export default function AdminCardsPage() {
                           className="w-full py-1.5 text-xs font-bold uppercase tracking-wider transition-colors"
                           style={{
                             backgroundColor: isBanned ? '#1a0a0a' : '#0a1a0a',
-                            border: `1px solid ${isBanned ? '#b33e3e' : '#4a9e4a'}`,
-                            color: isBanned ? '#b33e3e' : '#4a9e4a',
+                            border: `1px solid ${isBanned ? 'var(--t-danger)' : '#4a9e4a'}`,
+                            color: isBanned ? 'var(--t-danger)' : '#4a9e4a',
                             opacity: isToggling ? 0.5 : 1,
                             cursor: isToggling ? 'wait' : 'pointer',
                           }}

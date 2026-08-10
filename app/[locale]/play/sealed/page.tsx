@@ -340,21 +340,21 @@ export default function SealedPage() {
 
   if (step === 'loading') {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
-        <span className="text-sm" style={{ color: '#888888' }}>{tc('loading')}</span>
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
+        <span className="text-sm" style={{ color: 'var(--t-muted)' }}>{tc('loading')}</span>
       </main>
     );
   }
 
   if (step === 'denied') {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
         <div className="flex flex-col items-center gap-4">
-          <span className="text-sm" style={{ color: '#b33e3e' }}>{t('restricted')}</span>
+          <span className="text-sm" style={{ color: 'var(--t-danger)' }}>{t('restricted')}</span>
           <button
             onClick={() => router.push('/')}
             className="px-6 py-2 text-sm rounded cursor-pointer"
-            style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888' }}
+            style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)', color: 'var(--t-muted)' }}
           >
             {tc('back')}
           </button>
@@ -385,7 +385,7 @@ export default function SealedPage() {
 
   if (step === 'starting') {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
         <motion.div
           className="flex flex-col items-center gap-3"
           initial={{ opacity: 0 }}
@@ -393,7 +393,7 @@ export default function SealedPage() {
         >
           <motion.span
             className="text-lg font-bold"
-            style={{ color: '#c4a35a' }}
+            style={{ color: 'var(--t-accent)' }}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
@@ -405,16 +405,16 @@ export default function SealedPage() {
   }
 
   return (
-    <main id="main-content" className="flex min-h-screen relative flex-col bg-[#0a0a0a]">
+    <main id="main-content" className="flex min-h-screen relative flex-col bg-[var(--t-bg)]">
       <CloudBackground />
       <div className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="flex flex-col items-center gap-6 max-w-md w-full relative z-10">
           
           <div className="text-center">
-            <h1 className="text-3xl font-bold mb-1" style={{ color: '#e0e0e0' }}>
+            <h1 className="text-3xl font-bold mb-1" style={{ color: 'var(--t-text)' }}>
               {t('title')}
             </h1>
-            <p className="text-sm" style={{ color: '#888888' }}>
+            <p className="text-sm" style={{ color: 'var(--t-muted)' }}>
               {t('descriptionWithCount', { count: boosterCount })}
             </p>
           </div>
@@ -431,26 +431,26 @@ export default function SealedPage() {
               >
                 <button
                   onClick={() => handleModeSelect('ai')}
-                  className="flex flex-col items-start p-4 border transition-colors text-left hover:bg-[#1a1a1a] hover:border-[#c4a35a] cursor-pointer"
-                  style={{ backgroundColor: '#141414', borderColor: '#262626' }}
+                  className="flex flex-col items-start p-4 border transition-colors text-left hover:bg-[var(--t-surface-2)] hover:border-[var(--t-accent)] cursor-pointer"
+                  style={{ backgroundColor: 'var(--t-surface)', borderColor: 'var(--t-border)' }}
                 >
-                  <span className="text-base font-medium" style={{ color: '#e0e0e0' }}>
+                  <span className="text-base font-medium" style={{ color: 'var(--t-text)' }}>
                     {t('vsAI')}
                   </span>
-                  <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>
+                  <span className="text-xs mt-0.5 font-inter-force" style={{ color: 'var(--t-dim)' }}>
                     {t('vsAIDesc')}
                   </span>
                 </button>
                 <button
                   onClick={() => handleModeSelect('online')}
                   disabled={!session?.user}
-                  className="flex flex-col items-start p-4 border transition-colors text-left cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#1a1a1a] hover:border-[#c4a35a]"
-                  style={{ backgroundColor: '#141414', borderColor: '#262626' }}
+                  className="flex flex-col items-start p-4 border transition-colors text-left cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[var(--t-surface-2)] hover:border-[var(--t-accent)]"
+                  style={{ backgroundColor: 'var(--t-surface)', borderColor: 'var(--t-border)' }}
                 >
-                  <span className="text-base font-medium" style={{ color: '#e0e0e0' }}>
+                  <span className="text-base font-medium" style={{ color: 'var(--t-text)' }}>
                     {t('online')}
                   </span>
-                  <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>
+                  <span className="text-xs mt-0.5 font-inter-force" style={{ color: 'var(--t-dim)' }}>
                     {t('onlineDesc')}
                   </span>
                 </button>
@@ -466,20 +466,20 @@ export default function SealedPage() {
                 className="flex flex-col gap-2 w-full"
               >
 
-                <div className="flex items-center justify-between p-3 rounded-lg mb-1" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-                  <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
+                <div className="flex items-center justify-between p-3 rounded-lg mb-1" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+                  <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--t-muted)' }}>
                     {t('boosterCountLabel')}
                   </span>
-                  <div className="flex rounded overflow-hidden" style={{ border: '1px solid #333' }}>
+                  <div className="flex rounded overflow-hidden" style={{ border: '1px solid var(--t-border-strong)' }}>
                     {([4, 5, 6] as const).map((n) => (
                       <button
                         key={n}
                         onClick={() => setBoosterCount(n)}
                         className="px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer"
                         style={{
-                          backgroundColor: boosterCount === n ? '#c4a35a' : '#0a0a0a',
-                          color: boosterCount === n ? '#0a0a0a' : '#666',
-                          borderLeft: n > 4 ? '1px solid #333' : undefined,
+                          backgroundColor: boosterCount === n ? 'var(--t-accent)' : 'var(--t-bg)',
+                          color: boosterCount === n ? 'var(--t-bg)' : 'var(--t-dim)',
+                          borderLeft: n > 4 ? '1px solid var(--t-border-strong)' : undefined,
                         }}
                       >
                         {n}
@@ -490,18 +490,18 @@ export default function SealedPage() {
 
                 <SealedSetPicker value={setChoice} onChange={setSetChoice} />
 
-                <p className="text-xs uppercase tracking-wider mb-1" style={{ color: '#888888' }}>
+                <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--t-muted)' }}>
                   {tAI('selectDifficulty')}
                 </p>
                 {DIFFICULTIES.map((d) => (
                   <button
                     key={d.key}
                     onClick={() => handleDifficultySelect(d.key)}
-                    className="flex flex-col items-start p-4 border transition-colors text-left hover:bg-[#1a1a1a] hover:border-[#c4a35a] cursor-pointer"
-                    style={{ backgroundColor: '#141414', borderColor: '#262626' }}
+                    className="flex flex-col items-start p-4 border transition-colors text-left hover:bg-[var(--t-surface-2)] hover:border-[var(--t-accent)] cursor-pointer"
+                    style={{ backgroundColor: 'var(--t-surface)', borderColor: 'var(--t-border)' }}
                   >
-                    <span className="text-base font-medium" style={{ color: '#e0e0e0' }}>{d.label}</span>
-                    <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>{d.description}</span>
+                    <span className="text-base font-medium" style={{ color: 'var(--t-text)' }}>{d.label}</span>
+                    <span className="text-xs mt-0.5 font-inter-force" style={{ color: 'var(--t-dim)' }}>{d.description}</span>
                   </button>
                 ))}
               </motion.div>
@@ -516,20 +516,20 @@ export default function SealedPage() {
                 className="flex flex-col gap-4 w-full"
               >
 
-                <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-                  <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
+                <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+                  <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--t-muted)' }}>
                     {t('boosterCountLabel')}
                   </span>
-                  <div className="flex rounded overflow-hidden" style={{ border: '1px solid #333' }}>
+                  <div className="flex rounded overflow-hidden" style={{ border: '1px solid var(--t-border-strong)' }}>
                     {([4, 5, 6] as const).map((n) => (
                       <button
                         key={n}
                         onClick={() => setBoosterCount(n)}
                         className="px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer"
                         style={{
-                          backgroundColor: boosterCount === n ? '#c4a35a' : '#0a0a0a',
-                          color: boosterCount === n ? '#0a0a0a' : '#666',
-                          borderLeft: n > 4 ? '1px solid #333' : undefined,
+                          backgroundColor: boosterCount === n ? 'var(--t-accent)' : 'var(--t-bg)',
+                          color: boosterCount === n ? 'var(--t-bg)' : 'var(--t-dim)',
+                          borderLeft: n > 4 ? '1px solid var(--t-border-strong)' : undefined,
                         }}
                       >
                         {n}
@@ -542,15 +542,15 @@ export default function SealedPage() {
 
                 <div
                   className="flex w-full rounded-lg overflow-hidden"
-                  style={{ border: '1px solid #262626' }}
+                  style={{ border: '1px solid var(--t-border)' }}
                 >
                   <button
                     onClick={() => setOnlineView('browse')}
                     className="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                     style={{
-                      backgroundColor: onlineView === 'browse' ? '#141414' : '#0a0a0a',
-                      borderRight: '1px solid #262626',
-                      color: onlineView === 'browse' ? '#e0e0e0' : '#555555',
+                      backgroundColor: onlineView === 'browse' ? 'var(--t-surface)' : 'var(--t-bg)',
+                      borderRight: '1px solid var(--t-border)',
+                      color: onlineView === 'browse' ? 'var(--t-text)' : 'var(--t-dim)',
                     }}
                   >
                     {tOnline('publicRooms')}
@@ -559,8 +559,8 @@ export default function SealedPage() {
                     onClick={() => setOnlineView('private')}
                     className="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                     style={{
-                      backgroundColor: onlineView === 'private' ? '#141414' : '#0a0a0a',
-                      color: onlineView === 'private' ? '#e0e0e0' : '#555555',
+                      backgroundColor: onlineView === 'private' ? 'var(--t-surface)' : 'var(--t-bg)',
+                      color: onlineView === 'private' ? 'var(--t-text)' : 'var(--t-dim)',
                     }}
                   >
                     {tOnline('privateRoom')}
@@ -571,11 +571,11 @@ export default function SealedPage() {
                   <>
                     <div
                       className="w-full rounded-lg overflow-hidden"
-                      style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+                      style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}
                     >
                       {sealedPublicRooms.length === 0 ? (
                         <div className="p-8 text-center">
-                          <p className="text-xs" style={{ color: '#555555' }}>
+                          <p className="text-xs" style={{ color: 'var(--t-dim)' }}>
                             {tOnline('noRooms')}
                           </p>
                         </div>
@@ -585,20 +585,20 @@ export default function SealedPage() {
                             <div
                               key={room.code}
                               className="flex items-center justify-between px-4 py-3"
-                              style={{ borderBottom: '1px solid #1e1e1e' }}
+                              style={{ borderBottom: '1px solid var(--t-surface-2)' }}
                             >
                               <div className="flex flex-col gap-0.5">
-                                <span className="text-sm font-medium" style={{ color: '#e0e0e0' }}>
+                                <span className="text-sm font-medium" style={{ color: 'var(--t-text)' }}>
                                   {room.hostName}
                                 </span>
-                                <span className="text-xs" style={{ color: '#555555' }}>
+                                <span className="text-xs" style={{ color: 'var(--t-dim)' }}>
                                   {formatTimeAgo(room.createdAt, tOnline)}
                                 </span>
                               </div>
                               <button
                                 onClick={() => handleOnlineJoin(room.code)}
                                 className="px-4 py-1.5 text-xs font-bold uppercase tracking-wider cursor-pointer"
-                                style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+                                style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
                               >
                                 {tOnline('join')}
                               </button>
@@ -611,7 +611,7 @@ export default function SealedPage() {
                     <button
                       onClick={handleOnlineCreatePublic}
                       className="w-full py-3 text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer"
-                      style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+                      style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
                     >
                       {tOnline('createPublicRoom')}
                     </button>
@@ -623,13 +623,13 @@ export default function SealedPage() {
                     <button
                       onClick={handleOnlineCreatePrivate}
                       className="w-full py-3 text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer"
-                      style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+                      style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
                     >
                       {tOnline('createPrivateRoom')}
                     </button>
 
                     <div className="flex flex-col gap-2">
-                      <span className="text-xs uppercase tracking-wider" style={{ color: '#888' }}>
+                      <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--t-muted)' }}>
                         {tOnline('joinRoom')}
                       </span>
                       <div className="flex gap-2">
@@ -642,9 +642,9 @@ export default function SealedPage() {
                           maxLength={6}
                           className="flex-1 px-3 py-2 text-sm rounded uppercase tracking-wider text-center"
                           style={{
-                            backgroundColor: '#1a1a1a',
-                            border: '1px solid #333',
-                            color: '#e0e0e0',
+                            backgroundColor: 'var(--t-surface-2)',
+                            border: '1px solid var(--t-border-strong)',
+                            color: 'var(--t-text)',
                             outline: 'none',
                             letterSpacing: '0.2em',
                           }}
@@ -653,7 +653,7 @@ export default function SealedPage() {
                           onClick={() => handleOnlineJoin()}
                           disabled={joinCode.trim().length < 6}
                           className="px-4 py-2 text-sm font-bold uppercase rounded cursor-pointer disabled:opacity-40"
-                          style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+                          style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
                         >
                           {tOnline('join')}
                         </button>
@@ -663,7 +663,7 @@ export default function SealedPage() {
                 )}
 
                 {socketError && (
-                  <span className="text-xs" style={{ color: '#b33e3e' }}>{socketError}</span>
+                  <span className="text-xs" style={{ color: 'var(--t-danger)' }}>{socketError}</span>
                 )}
               </motion.div>
             )}
@@ -678,12 +678,12 @@ export default function SealedPage() {
               >
                 {socketRoomCode && isPrivateRoom && (
                   <div className="flex flex-col items-center gap-2">
-                    <span className="text-xs uppercase tracking-wider" style={{ color: '#888' }}>
+                    <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--t-muted)' }}>
                       {tOnline('roomCode')}
                     </span>
                     <span
                       className="text-3xl font-bold tracking-[0.3em]"
-                      style={{ color: '#c4a35a' }}
+                      style={{ color: 'var(--t-accent)' }}
                     >
                       {socketRoomCode}
                     </span>
@@ -692,7 +692,7 @@ export default function SealedPage() {
 
                 <motion.span
                   className="text-sm"
-                  style={{ color: '#888' }}
+                  style={{ color: 'var(--t-muted)' }}
                   animate={{ opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
@@ -702,13 +702,13 @@ export default function SealedPage() {
                 </motion.span>
 
                 {!socketConnected && (
-                  <span className="text-xs" style={{ color: '#b33e3e' }}>
+                  <span className="text-xs" style={{ color: 'var(--t-danger)' }}>
                     {tOnline('connecting')}
                   </span>
                 )}
 
                 {socketError && (
-                  <span className="text-xs" style={{ color: '#b33e3e' }}>{socketError}</span>
+                  <span className="text-xs" style={{ color: 'var(--t-danger)' }}>{socketError}</span>
                 )}
               </motion.div>
             )}
@@ -726,7 +726,7 @@ export default function SealedPage() {
                 router.push('/');
               }
             }}
-            className="h-12 px-6 bg-[#141414] border border-[#262626] text-[#888888] font-medium hover:bg-[#1a1a1a] transition-colors cursor-pointer"
+            className="h-12 px-6 bg-[var(--t-surface)] border border-[var(--t-border)] text-[var(--t-muted)] font-medium hover:bg-[var(--t-surface-2)] transition-colors cursor-pointer"
           >
             {tc('back')}
           </button>
@@ -762,8 +762,8 @@ function SealedSetPicker({ value, onChange }: { value: SealedSetChoice; onChange
   }
 
   return (
-    <div className="flex flex-col gap-1 p-3 rounded-lg" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-      <span className="text-xs uppercase tracking-wider mb-1" style={{ color: '#888888' }}>
+    <div className="flex flex-col gap-1 p-3 rounded-lg" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
+      <span className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--t-muted)' }}>
         {t('sealed.setChoiceLabel')}
       </span>
       <div className="grid grid-cols-3 gap-1.5">
@@ -776,16 +776,16 @@ function SealedSetPicker({ value, onChange }: { value: SealedSetChoice; onChange
               disabled={c.disabled}
               className="px-2 py-2 text-[11px] font-bold transition-colors cursor-pointer text-center disabled:cursor-not-allowed"
               style={{
-                backgroundColor: active ? '#c4a35a' : '#0a0a0a',
-                color: c.disabled ? '#444' : active ? '#0a0a0a' : '#aaa',
-                border: '1px solid ' + (active ? '#c4a35a' : '#262626'),
+                backgroundColor: active ? 'var(--t-accent)' : 'var(--t-bg)',
+                color: c.disabled ? 'var(--t-border-strong)' : active ? 'var(--t-bg)' : 'var(--t-muted)',
+                border: '1px solid ' + (active ? 'var(--t-accent)' : 'var(--t-border)'),
                 opacity: c.disabled ? 0.55 : 1,
               }}
               title={c.subLabel}
             >
               <div>{c.label}</div>
               {c.subLabel && (
-                <div className="text-[9px] mt-0.5 normal-case" style={{ color: c.disabled ? '#555' : '#888' }}>
+                <div className="text-[9px] mt-0.5 normal-case" style={{ color: c.disabled ? 'var(--t-dim)' : 'var(--t-muted)' }}>
                   {c.subLabel}
                 </div>
               )}

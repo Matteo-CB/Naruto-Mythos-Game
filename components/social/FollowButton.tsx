@@ -63,8 +63,8 @@ export function FollowButton({
       disabled={busy}
       className="font-display text-[10px] uppercase tracking-widest px-3 py-1.5 transition-colors"
       style={{
-        backgroundColor: following ? 'rgba(136,136,136,0.08)' : 'rgba(196,163,90,0.15)',
-        color: following ? (hover ? '#b33e3e' : '#888') : '#c4a35a',
+        backgroundColor: following ? 'rgba(136,136,136,0.08)' : 'var(--t-accent-glow)',
+        color: following ? (hover ? 'var(--t-danger)' : 'var(--t-muted)') : 'var(--t-accent)',
         opacity: busy ? 0.5 : 1,
         cursor: busy ? 'default' : 'pointer',
       }}

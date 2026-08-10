@@ -94,7 +94,7 @@ function FriendCard({
   const totalGames = friend.wins + friend.losses + friend.draws;
   const placed = totalGames >= PLACEMENT_MATCHES_REQUIRED;
   const tier = getRankTier(friend.elo);
-  const accent = leaguesEnabled && placed ? tier.color : '#888';
+  const accent = leaguesEnabled && placed ? tier.color : 'var(--t-muted)';
   const streakWin = (friend.consecutiveWins ?? 0) >= 3;
   const streakLoss = (friend.consecutiveLosses ?? 0) >= 3;
   const tournaments = friend.tournamentWins ?? 0;
@@ -127,7 +127,7 @@ function FriendCard({
         ) : leaguesEnabled ? (
           <span
             className="font-display text-[8px] uppercase tracking-widest shrink-0 inline-flex items-center justify-center"
-            style={{ width: 32, height: 32, color: '#666' }}
+            style={{ width: 32, height: 32, color: 'var(--t-dim)' }}
           >
             ?
           </span>
@@ -138,12 +138,12 @@ function FriendCard({
             <PlayerNameLink
               username={friend.username}
               className="font-display text-sm sm:text-base truncate"
-              style={{ color: '#e8e6df', letterSpacing: '0.03em' }}
+              style={{ color: 'var(--t-text)', letterSpacing: '0.03em' }}
             />
             {friend.isRival && (
               <span
                 className="font-display text-[8px] uppercase px-1.5 py-0.5 tracking-widest shrink-0"
-                style={{ color: '#d97676', backgroundColor: 'rgba(217, 118, 118, 0.1)', borderRadius: 9999 }}
+                style={{ color: 'var(--t-danger)', backgroundColor: 'rgba(217, 118, 118, 0.1)', borderRadius: 9999 }}
               >
                 {t('rival')}
               </span>
@@ -151,7 +151,7 @@ function FriendCard({
             {streakWin && (
               <span
                 className="font-display text-[8px] uppercase px-1.5 py-0.5 tracking-widest shrink-0"
-                style={{ color: '#5fb05f', backgroundColor: 'rgba(95, 176, 95, 0.1)', borderRadius: 9999 }}
+                style={{ color: 'var(--t-success)', backgroundColor: 'rgba(95, 176, 95, 0.1)', borderRadius: 9999 }}
               >
                 {friend.consecutiveWins}W
               </span>
@@ -159,7 +159,7 @@ function FriendCard({
             {streakLoss && (
               <span
                 className="font-display text-[8px] uppercase px-1.5 py-0.5 tracking-widest shrink-0"
-                style={{ color: '#d97676', backgroundColor: 'rgba(217, 118, 118, 0.1)', borderRadius: 9999 }}
+                style={{ color: 'var(--t-danger)', backgroundColor: 'rgba(217, 118, 118, 0.1)', borderRadius: 9999 }}
               >
                 {friend.consecutiveLosses}L
               </span>
@@ -167,13 +167,13 @@ function FriendCard({
             {tournaments > 0 && (
               <span
                 className="font-display text-[8px] uppercase px-1.5 py-0.5 tracking-widest shrink-0"
-                style={{ color: '#c4a35a', backgroundColor: 'rgba(196, 163, 90, 0.1)', borderRadius: 9999 }}
+                style={{ color: 'var(--t-accent)', backgroundColor: 'var(--t-accent-glow)', borderRadius: 9999 }}
               >
                 {tournaments}T
               </span>
             )}
           </div>
-          <span className="font-display text-[10px] uppercase tracking-widest mt-0.5" style={{ color: '#555' }}>
+          <span className="font-display text-[10px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--t-dim)' }}>
             {relativeShort(friend.lastSeenAt, tStats)}
           </span>
         </div>
@@ -194,33 +194,33 @@ function FriendCard({
           >
             <div
               className="mt-1.5 px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
-              style={{ backgroundColor: '#0a090d', clipPath: ROW_CLIP }}
+              style={{ backgroundColor: 'var(--t-surface-2)', clipPath: ROW_CLIP }}
             >
               <div className="flex-1 grid grid-cols-3 gap-3">
                 <div className="flex flex-col items-center">
-                  <span className="font-display text-xl tabular-nums" style={{ color: '#5fb05f' }}>
+                  <span className="font-display text-xl tabular-nums" style={{ color: 'var(--t-success)' }}>
                     {friend.h2h.wins}
                   </span>
-                  <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#555' }}>
+                  <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
                     {t('h2hWins')}
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="font-display text-xl tabular-nums" style={{ color: '#d97676' }}>
+                  <span className="font-display text-xl tabular-nums" style={{ color: 'var(--t-danger)' }}>
                     {friend.h2h.losses}
                   </span>
-                  <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#555' }}>
+                  <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
                     {t('h2hLosses')}
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
                   <span
                     className="font-display text-xl tabular-nums"
-                    style={{ color: friend.h2h.netDelta > 0 ? '#5fb05f' : friend.h2h.netDelta < 0 ? '#d97676' : '#888' }}
+                    style={{ color: friend.h2h.netDelta > 0 ? 'var(--t-success)' : friend.h2h.netDelta < 0 ? 'var(--t-danger)' : 'var(--t-muted)' }}
                   >
                     {friend.h2h.netDelta > 0 ? '+' : ''}{friend.h2h.netDelta}
                   </span>
-                  <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#555' }}>
+                  <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
                     {t('h2hElo')}
                   </span>
                 </div>
@@ -230,39 +230,39 @@ function FriendCard({
                 <motion.button
                   whileTap={{ scale: 0.94 }}
                   onClick={onInvite}
-                  className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[#c4a35a]"
-                  style={{ color: '#5fb05f', backgroundColor: 'rgba(95, 176, 95, 0.08)', borderRadius: 9999 }}
+                  className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[var(--t-accent)]"
+                  style={{ color: 'var(--t-success)', backgroundColor: 'rgba(95, 176, 95, 0.08)', borderRadius: 9999 }}
                 >
                   {t('list.invite')}
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.94 }}
                   onClick={onTrade}
-                  className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[#ffd966]"
-                  style={{ color: '#c4a35a', backgroundColor: 'rgba(196, 163, 90, 0.08)', borderRadius: 9999 }}
+                  className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[var(--t-accent-bright)]"
+                  style={{ color: 'var(--t-accent)', backgroundColor: 'var(--t-accent-tint)', borderRadius: 9999 }}
                 >
                   {tradeLabel}
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.94 }}
                   onClick={onMessage}
-                  className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[#c4a35a]"
+                  className="font-display px-4 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[var(--t-accent)]"
                   style={{ color: '#8fae6b', backgroundColor: 'rgba(143, 174, 107, 0.08)', borderRadius: 9999 }}
                 >
                   {t('list.message')}
                 </motion.button>
                 <Link
                   href={`/profile/${encodeURIComponent(friend.username)}` as '/'}
-                  className="font-display px-4 py-2 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
-                  style={{ color: '#888' }}
+                  className="font-display px-4 py-2 text-[11px] uppercase tracking-widest transition-colors hover:text-[var(--t-accent)]"
+                  style={{ color: 'var(--t-muted)' }}
                 >
                   {t('profile')}
                 </Link>
                 <motion.button
                   whileTap={{ scale: 0.94 }}
                   onClick={onRemove}
-                  className="font-display px-3 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[#d97676]"
-                  style={{ color: '#555' }}
+                  className="font-display px-3 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[var(--t-danger)]"
+                  style={{ color: 'var(--t-dim)' }}
                 >
                   {t('list.remove')}
                 </motion.button>
@@ -282,8 +282,8 @@ function TabPill({ active, onClick, label, count, alert }: { active: boolean; on
       onClick={onClick}
       className="font-display flex items-center gap-2 px-4 py-2 cursor-pointer transition-colors"
       style={{
-        backgroundColor: active ? 'rgba(196, 163, 90, 0.12)' : 'rgba(255, 255, 255, 0.03)',
-        color: active ? '#c4a35a' : '#666',
+        backgroundColor: active ? 'var(--t-accent-glow)' : 'rgba(255, 255, 255, 0.03)',
+        color: active ? 'var(--t-accent)' : 'var(--t-dim)',
         borderRadius: 9999,
       }}
     >
@@ -292,8 +292,8 @@ function TabPill({ active, onClick, label, count, alert }: { active: boolean; on
         <span
           className="text-[10px] tabular-nums px-1.5 py-0.5 leading-none"
           style={{
-            color: alert ? '#0a0a0a' : active ? '#c4a35a' : '#888',
-            backgroundColor: alert ? '#c4a35a' : 'transparent',
+            color: alert ? 'var(--t-bg)' : active ? 'var(--t-accent)' : 'var(--t-muted)',
+            backgroundColor: alert ? 'var(--t-accent)' : 'transparent',
             borderRadius: 9999,
           }}
         >
@@ -310,7 +310,7 @@ function Stat({ label, value, color }: { label: string; value: string | number; 
       <span className="font-display text-xl sm:text-2xl tabular-nums leading-none" style={{ color }}>
         {value}
       </span>
-      <span className="font-display text-[9px] uppercase tracking-widest mt-1.5" style={{ color: '#555' }}>
+      <span className="font-display text-[9px] uppercase tracking-widest mt-1.5" style={{ color: 'var(--t-dim)' }}>
         {label}
       </span>
     </div>
@@ -336,7 +336,7 @@ function SkeletonRows({ count }: { count: number }) {
 function ActivityRow({ entry, index, locale, t }: { entry: ActivityEntry; index: number; locale: string; t: ReturnType<typeof useTranslations> }) {
   const isWin = entry.type === 'win';
   const isDraw = entry.type === 'draw';
-  const color = isDraw ? '#888' : isWin ? '#5fb05f' : '#d97676';
+  const color = isDraw ? 'var(--t-muted)' : isWin ? 'var(--t-success)' : 'var(--t-danger)';
   const altBg = index % 2 === 0 ? '#0c0b10' : '#0a0a0d';
   const date = new Date(entry.at);
   const ago = Math.floor((Date.now() - date.getTime()) / 60000);
@@ -361,28 +361,28 @@ function ActivityRow({ entry, index, locale, t }: { entry: ActivityEntry; index:
       </span>
 
       <div className="flex flex-col flex-1 min-w-0">
-        <span className="font-display text-sm truncate" style={{ color: '#e8e6df' }}>
-          <Link href={`/profile/${encodeURIComponent(entry.friendUsername)}` as '/'} className="hover:text-[#c4a35a] transition-colors">
+        <span className="font-display text-sm truncate" style={{ color: 'var(--t-text)' }}>
+          <Link href={`/profile/${encodeURIComponent(entry.friendUsername)}` as '/'} className="hover:text-[var(--t-accent)] transition-colors">
             {entry.friendUsername}
           </Link>
-          <span className="font-display text-[10px] uppercase tracking-widest mx-2" style={{ color: '#444' }}>
+          <span className="font-display text-[10px] uppercase tracking-widest mx-2" style={{ color: 'var(--t-muted)' }}>
             {t(entry.type === 'win' ? 'beat' : entry.type === 'loss' ? 'lostTo' : 'drewWith')}
           </span>
-          <span style={{ color: '#aaa' }}>{entry.opponentUsername}</span>
+          <span style={{ color: 'var(--t-muted)' }}>{entry.opponentUsername}</span>
         </span>
-        <span className="font-display text-[9px] uppercase tracking-widest mt-0.5" style={{ color: '#555' }}>
+        <span className="font-display text-[9px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--t-dim)' }}>
           {date.toLocaleDateString(locale)} · {when}
         </span>
       </div>
 
       <span
         className="font-inter-force text-xs tabular-nums shrink-0 w-12 text-right"
-        style={{ color: entry.delta > 0 ? '#5fb05f' : entry.delta < 0 ? '#d97676' : '#888' }}
+        style={{ color: entry.delta > 0 ? 'var(--t-success)' : entry.delta < 0 ? 'var(--t-danger)' : 'var(--t-muted)' }}
       >
         {entry.delta > 0 ? '+' : ''}{entry.delta}
       </span>
 
-      <span className="font-display text-xs tabular-nums shrink-0 w-12 text-right" style={{ color: '#666' }}>
+      <span className="font-display text-xs tabular-nums shrink-0 w-12 text-right" style={{ color: 'var(--t-dim)' }}>
         {entry.newElo}
       </span>
     </motion.div>
@@ -500,13 +500,13 @@ export function FriendsSection() {
         transition={{ duration: 0.4 }}
         className="text-center py-10"
       >
-        <p className="font-display text-sm uppercase tracking-widest mb-6" style={{ color: '#555' }}>
+        <p className="font-display text-sm uppercase tracking-widest mb-6" style={{ color: 'var(--t-dim)' }}>
           {t('signInRequired')}
         </p>
         <Link
           href="/login"
           className="font-display px-6 py-2.5 text-xs uppercase tracking-widest transition-colors"
-          style={{ color: '#c4a35a', backgroundColor: 'rgba(196, 163, 90, 0.1)', borderRadius: 9999 }}
+          style={{ color: 'var(--t-accent)', backgroundColor: 'var(--t-accent-glow)', borderRadius: 9999 }}
         >
           {tc('signIn')}
         </Link>
@@ -522,10 +522,10 @@ export function FriendsSection() {
         transition={{ duration: 0.4 }}
         className="font-display flex items-baseline gap-2 mb-5"
       >
-        <span className="text-2xl tabular-nums leading-none" style={{ color: '#c4a35a' }}>
+        <span className="text-2xl tabular-nums leading-none" style={{ color: 'var(--t-accent)' }}>
           {friends.length}
         </span>
-        <span className="text-[11px] uppercase tracking-[0.3em]" style={{ color: '#666' }}>
+        <span className="text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--t-dim)' }}>
           {t('friendsCountLabel')}
         </span>
       </motion.div>
@@ -537,23 +537,23 @@ export function FriendsSection() {
           transition={{ delay: 0.15, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
           className="holo-menu-foil relative overflow-hidden mb-6 px-5 sm:px-8 py-4 sm:py-5 grid grid-cols-2 sm:grid-cols-4 gap-3"
           style={{
-            backgroundColor: '#0d0c10',
+            backgroundColor: 'var(--t-bg)',
             clipPath: PANEL_CLIP,
-            ['--foil' as string]: '#c4a35a',
+            ['--foil' as string]: 'var(--t-accent)',
           } as React.CSSProperties}
         >
-          <Stat label={t('aggTotal')} value={aggregateStats.totalH2H} color="#c4a35a" />
+          <Stat label={t('aggTotal')} value={aggregateStats.totalH2H} color="var(--t-accent)" />
           <Stat
             label={t('aggRecord')}
             value={`${aggregateStats.wins}-${aggregateStats.losses}`}
-            color={aggregateStats.wins >= aggregateStats.losses ? '#5fb05f' : '#d97676'}
+            color={aggregateStats.wins >= aggregateStats.losses ? 'var(--t-success)' : 'var(--t-danger)'}
           />
           <Stat
             label={t('aggNet')}
             value={`${aggregateStats.netDelta > 0 ? '+' : ''}${aggregateStats.netDelta}`}
-            color={aggregateStats.netDelta > 0 ? '#5fb05f' : aggregateStats.netDelta < 0 ? '#d97676' : '#888'}
+            color={aggregateStats.netDelta > 0 ? 'var(--t-success)' : aggregateStats.netDelta < 0 ? 'var(--t-danger)' : 'var(--t-muted)'}
           />
-          <Stat label={t('aggTop')} value={aggregateStats.topElo} color="#c4a35a" />
+          <Stat label={t('aggTop')} value={aggregateStats.topElo} color="var(--t-accent)" />
         </motion.div>
       )}
 
@@ -569,8 +569,8 @@ export function FriendsSection() {
       <div className="mb-5 -mt-2">
         <Link
           href={'/trade/history' as '/trade/history'}
-          className="font-display text-[10px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
-          style={{ color: '#666' }}
+          className="font-display text-[10px] uppercase tracking-widest transition-colors hover:text-[var(--t-accent)]"
+          style={{ color: 'var(--t-dim)' }}
         >
           {tTrade('history')}
         </Link>
@@ -602,7 +602,7 @@ export function FriendsSection() {
               ) : friends.length === 0 ? (
                 <div className="flex flex-col items-center py-10 gap-3">
                   <img src="/images/icons/empty-friends.svg" alt="" draggable={false} style={{ width: 48, height: 48, opacity: 0.25 }} />
-                  <p className="font-display text-sm text-center uppercase tracking-widest" style={{ color: '#444' }}>
+                  <p className="font-display text-sm text-center uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
                     {t('list.empty')}
                   </p>
                 </div>
@@ -644,7 +644,7 @@ export function FriendsSection() {
               ) : !activity || activity.length === 0 ? (
                 <div className="flex flex-col items-center py-10 gap-3">
                   <img src="/images/icons/empty-games.svg" alt="" draggable={false} style={{ width: 48, height: 48, opacity: 0.25 }} />
-                  <p className="font-display text-sm text-center uppercase tracking-widest" style={{ color: '#444' }}>
+                  <p className="font-display text-sm text-center uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
                     {t('activityEmpty')}
                   </p>
                 </div>

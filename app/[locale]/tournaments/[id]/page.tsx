@@ -10,6 +10,7 @@ import { useParams } from 'next/navigation';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 import { motion } from 'framer-motion';
 import { CloudBackground } from '@/components/CloudBackground';
+import { ChakraIcon, CHAKRA_COLOR } from '@/components/icons/GameIcons';
 import { Footer } from '@/components/Footer';
 import { BracketTree } from '@/components/tournament/BracketTree';
 import { PlayerNameLink } from '@/components/social/PlayerNameLink';
@@ -56,16 +57,16 @@ function ScheduledCountdown({ deadline }: { deadline: string }) {
     <div
       className="mt-3 px-4 py-3 text-center flex items-center justify-center gap-2 flex-wrap"
       style={{
-        backgroundColor: '#0d0c10',
+        backgroundColor: 'var(--t-bg)',
         clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)',
         boxShadow: '0 0 30px -12px rgba(196, 163, 90, 0.35)',
       }}
     >
-      <span className="font-display text-[11px] uppercase tracking-widest" style={{ color: '#888' }}>
+      <span className="font-display text-[11px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
         {expired ? t('startingSoon') : t('startsInLabel')}
       </span>
       {!expired && (
-        <span className="font-display text-base font-bold tabular-nums" style={{ color: '#c4a35a' }}>
+        <span className="font-display text-base font-bold tabular-nums" style={{ color: 'var(--t-accent)' }}>
           {remaining}
         </span>
       )}
@@ -349,13 +350,13 @@ export default function TournamentDetailPage() {
   }, [isSwiss, tour?.standings, tour?.matches, tour?.participants]);
 
   if (status === 'loading' || status === 'unauthenticated') {
-    return (<div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}><p className="text-sm" style={{ color: '#888888' }}>{tc('loading')}</p></div>);
+    return (<div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}><p className="text-sm" style={{ color: 'var(--t-muted)' }}>{tc('loading')}</p></div>);
   }
   if (loading && !tour) {
-    return (<div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}><p className="text-sm" style={{ color: '#888888' }}>{tc('loading')}</p></div>);
+    return (<div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}><p className="text-sm" style={{ color: 'var(--t-muted)' }}>{tc('loading')}</p></div>);
   }
   if (!tour) {
-    return (<div className="min-h-screen flex flex-col items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}><p className="text-sm mb-4" style={{ color: '#888888' }}>{t('notFound')}</p><Link href={'/tournaments' as '/'} className="text-sm transition-colors" style={{ color: '#c4a35a' }}>{t('backToList')}</Link></div>);
+    return (<div className="min-h-screen flex flex-col items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}><p className="text-sm mb-4" style={{ color: 'var(--t-muted)' }}>{t('notFound')}</p><Link href={'/tournaments' as '/'} className="text-sm transition-colors" style={{ color: 'var(--t-accent)' }}>{t('backToList')}</Link></div>);
   }
 
   const statusKey = tour.status === 'registration' ? 'statusRegistration' : tour.status === 'in_progress' ? 'statusInProgress' : tour.status === 'completed' ? 'statusCompleted' : 'statusCancelled';
@@ -374,7 +375,7 @@ export default function TournamentDetailPage() {
     <div
       className="mb-6 p-5"
       style={{
-        backgroundColor: '#151515',
+        backgroundColor: 'var(--t-surface)',
         boxShadow: myMatch.roomCode
           ? '0 12px 32px rgba(0,0,0,0.45), 0 0 26px rgba(74,158,255,0.35)'
           : (myMatch.status === 'ready' || myMatch.status === 'in_progress')
@@ -382,15 +383,15 @@ export default function TournamentDetailPage() {
             : '0 12px 32px rgba(0,0,0,0.4)',
       }}
     >
-      <h2 className="text-xs font-bold uppercase tracking-[0.25em] mb-3" style={{ color: myMatch.roomCode ? '#4a9eff' : '#c4a35a' }}>
+      <h2 className="text-xs font-bold uppercase tracking-[0.25em] mb-3" style={{ color: myMatch.roomCode ? '#4a9eff' : 'var(--t-accent)' }}>
         {t('yourMatchReady')}
       </h2>
-      <p className="text-base font-bold text-center mb-4" style={{ color: '#e8e8e8' }}>
-        {myMatch.player1Username ?? t('tbd')} <span style={{ color: '#666' }}>vs</span> {myMatch.player2Username ?? t('tbd')}
+      <p className="text-base font-bold text-center mb-4" style={{ color: 'var(--t-text)' }}>
+        {myMatch.player1Username ?? t('tbd')} <span style={{ color: 'var(--t-dim)' }}>vs</span> {myMatch.player2Username ?? t('tbd')}
       </p>
 
       {((myMatch.player1GameWins ?? 0) > 0 || (myMatch.player2GameWins ?? 0) > 0) && (
-        <p className="text-center text-xs font-bold uppercase tracking-wider mb-4" style={{ color: '#c4a35a' }}>
+        <p className="text-center text-xs font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-accent)' }}>
           {t('seriesScore', { p1: String(myMatch.player1GameWins ?? 0), p2: String(myMatch.player2GameWins ?? 0) })}
         </p>
       )}
@@ -408,7 +409,7 @@ export default function TournamentDetailPage() {
             href={('/play/online?room=' + myMatch.roomCode) as '/'}
             onClick={handlePlayMatch}
             className="block w-full text-center py-4 text-base font-black uppercase tracking-widest"
-            style={{ backgroundColor: '#4a9eff', color: '#0a0a0a' }}>
+            style={{ backgroundColor: '#4a9eff', color: 'var(--t-bg)' }}>
             {t('enterMatch')}
           </Link>
         </div>
@@ -419,37 +420,37 @@ export default function TournamentDetailPage() {
             whileHover={{ scale: 1.015 }}
             whileTap={{ scale: 0.98 }}
             className="w-full py-4 text-base font-black uppercase tracking-widest cursor-pointer"
-            style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}>
+            style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}>
             {t('launchMatch')}
           </motion.button>
-          <p className="text-xs text-center" style={{ color: '#c4a35a' }}>{t('launchHint')}</p>
-          <p className="text-[11px] text-center" style={{ color: '#777' }}>{t('waitingBothReady')}</p>
+          <p className="text-xs text-center" style={{ color: 'var(--t-accent)' }}>{t('launchHint')}</p>
+          <p className="text-[11px] text-center" style={{ color: 'var(--t-dim)' }}>{t('waitingBothReady')}</p>
         </div>
       ) : (
-        <p className="text-sm text-center" style={{ color: '#888888' }}>{t('waitingOpponent')}</p>
+        <p className="text-sm text-center" style={{ color: 'var(--t-muted)' }}>{t('waitingOpponent')}</p>
       )}
     </div>
   ) : null;
 
   return (
-    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
+    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--t-bg)' }}>
       <CloudBackground animated={animationsEnabled} />
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="max-w-4xl mx-auto relative z-10 flex-1 w-full px-4 sm:px-8 py-6 sm:py-10">
 
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="mb-6">
-          <h1 className="font-display text-2xl sm:text-3xl uppercase tracking-wider mb-2 leading-tight wrap-break-word" style={{ color: '#f2efe7', letterSpacing: '0.06em', textShadow: '0 0 18px rgba(196, 163, 90, 0.18)' }}>{tour.name}</h1>
-          <div className="flex flex-wrap items-center gap-3 text-xs" style={{ color: '#888888' }}>
-            <span className="px-2 py-1 uppercase tracking-wider" style={{ backgroundColor: 'rgba(196, 163, 90, 0.1)', color: '#c4a35a' }}>{tour.type === 'simulator' ? t('typeSimulator') : t('typePlayer')}</span>
-            <span className="px-2 py-1 uppercase tracking-wider" style={{ backgroundColor: '#111111', border: '1px solid #262626', color: '#e0e0e0' }}>{t(statusKey)}</span>
-            <span style={{ color: '#666666' }}>{t(modeKey)}</span>
-            <span style={{ color: '#666666' }}>{t('players')}: {tour.participants.length}/{tour.maxPlayers}</span>
-            <span style={{ color: '#666666' }}>{t('createdBy')}: {tour.creatorUsername}</span>
+          <h1 className="font-display text-2xl sm:text-3xl uppercase tracking-wider mb-2 leading-tight wrap-break-word" style={{ color: 'var(--t-text)', letterSpacing: '0.06em', textShadow: '0 0 18px var(--t-accent-glow)' }}>{tour.name}</h1>
+          <div className="flex flex-wrap items-center gap-3 text-xs" style={{ color: 'var(--t-muted)' }}>
+            <span className="px-2 py-1 uppercase tracking-wider" style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)' }}>{tour.type === 'simulator' ? t('typeSimulator') : t('typePlayer')}</span>
+            <span className="px-2 py-1 uppercase tracking-wider" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)', color: 'var(--t-text)' }}>{t(statusKey)}</span>
+            <span style={{ color: 'var(--t-dim)' }}>{t(modeKey)}</span>
+            <span style={{ color: 'var(--t-dim)' }}>{t('players')}: {tour.participants.length}/{tour.maxPlayers}</span>
+            <span style={{ color: 'var(--t-dim)' }}>{t('createdBy')}: {tour.creatorUsername}</span>
           </div>
           {tour.allowedLeagues && tour.allowedLeagues.length > 0 && (
             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-              <span style={{ color: '#888' }}>{t('allowedLeagues')}:</span>
+              <span style={{ color: 'var(--t-muted)' }}>{t('allowedLeagues')}:</span>
               {tour.allowedLeagues.map(leagueKey => (
-                <span key={leagueKey} className="px-2 py-0.5 uppercase tracking-wider" style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#ccc' }}>{t(`leagueName.${leagueKey}`)}</span>
+                <span key={leagueKey} className="px-2 py-0.5 uppercase tracking-wider" style={{ backgroundColor: 'var(--t-surface-2)', border: '1px solid var(--t-border-strong)', color: 'var(--t-text)' }}>{t(`leagueName.${leagueKey}`)}</span>
               ))}
             </div>
           )}
@@ -462,7 +463,7 @@ export default function TournamentDetailPage() {
               src="/images/tournaments/nwl-friday.webp"
               alt={t('nwlPosterAlt')}
               className="w-full max-w-xs shrink-0"
-              style={{ boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}
+              style={{ boxShadow: '0 12px 32px var(--t-shadow)' }}
             />
             <div className="flex-1">
               <p className="text-sm leading-relaxed" style={{ color: '#c9c7c0' }}>{t('nwlRequirement')}</p>
@@ -485,15 +486,15 @@ export default function TournamentDetailPage() {
 
         <div className="mb-4 flex gap-2">
           <button onClick={handleShare} className="px-4 py-1.5 text-xs font-medium uppercase tracking-wider cursor-pointer transition-colors"
-            style={{ backgroundColor: linkCopied ? '#1a3a1a' : '#1a1a1a', color: linkCopied ? '#4ade80' : '#888' }}>
+            style={{ backgroundColor: linkCopied ? '#1a3a1a' : 'var(--t-surface-2)', color: linkCopied ? 'var(--t-success)' : 'var(--t-muted)' }}>
             {linkCopied ? t('copied') : t('share')}
           </button>
         </div>
 
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }}
-          className="mb-4 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626', }}>
-          <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>{t('rulesTitle')}</h2>
-          <div className="flex flex-col gap-1.5 text-xs" style={{ color: '#aaa' }}>
+          className="mb-4 p-4" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)', }}>
+          <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: 'var(--t-accent)' }}>{t('rulesTitle')}</h2>
+          <div className="flex flex-col gap-1.5 text-xs" style={{ color: 'var(--t-muted)' }}>
             <p>{isSwiss ? t('rulesFormatSwiss') : t('rulesFormat')}</p>
             {tour.gameMode === 'classic' && <p>{t('rulesClassic')}</p>}
             {tour.gameMode === 'sealed' && <p>{t('rulesSealed')}</p>}
@@ -508,29 +509,29 @@ export default function TournamentDetailPage() {
 
         {tour.prizeCardId && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.18 }}
-            className="mb-4 p-4 flex gap-4 items-center" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
+            className="mb-4 p-4 flex gap-4 items-center" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' }}>
             <div className="relative shrink-0" style={{ width: 110, height: 160 }}>
               <Image
                 src={`/images/cards/KS/mythos_v/${tour.prizeCardId}.webp`}
                 alt=""
                 fill
                 sizes="110px"
-                style={{ objectFit: 'cover', boxShadow: '0 0 18px #c4a35a44' }}
+                style={{ objectFit: 'cover', boxShadow: '0 0 18px var(--t-accent)44' }}
               />
             </div>
             <div className="flex flex-col gap-1">
-              <h2 className="text-sm font-medium uppercase tracking-wider mb-1" style={{ color: '#c4a35a' }}>{t('prizePanelTitle')}</h2>
+              <h2 className="text-sm font-medium uppercase tracking-wider mb-1" style={{ color: 'var(--t-accent)' }}>{t('prizePanelTitle')}</h2>
               {(() => {
                 const card = getCardById(tour.prizeCardId);
                 const number = tour.prizeCardId.split('-')[1] ?? '';
-                if (!card) return <p className="text-xs" style={{ color: '#aaa' }}>{tour.prizeCardId}</p>;
+                if (!card) return <p className="text-xs" style={{ color: 'var(--t-muted)' }}>{tour.prizeCardId}</p>;
                 return (
                   <>
-                    <p className="text-xs font-display" style={{ color: '#e8e8e8' }}>{getCardName(card, locale as 'en' | 'fr')}</p>
-                    <p className="text-[10px]" style={{ color: '#888' }}>{getCardTitle(card, locale as 'en' | 'fr')}</p>
-                    <p className="text-[10px]" style={{ color: '#666' }}>{number} Mythos V</p>
-                    <p className="text-[10px] mt-2" style={{ color: '#aaa' }}>{t('prizeDescription')}</p>
-                    <p className="text-[10px] mt-2 italic" style={{ color: '#888' }}>{t('prizeDisclaimer')}</p>
+                    <p className="text-xs font-display" style={{ color: 'var(--t-text)' }}>{getCardName(card, locale as 'en' | 'fr')}</p>
+                    <p className="text-[10px]" style={{ color: 'var(--t-muted)' }}>{getCardTitle(card, locale as 'en' | 'fr')}</p>
+                    <p className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{number} Mythos V</p>
+                    <p className="text-[10px] mt-2" style={{ color: 'var(--t-muted)' }}>{t('prizeDescription')}</p>
+                    <p className="text-[10px] mt-2 italic" style={{ color: 'var(--t-muted)' }}>{t('prizeDisclaimer')}</p>
                   </>
                 );
               })()}
@@ -540,40 +541,40 @@ export default function TournamentDetailPage() {
 
         {hasRestrictions && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}
-            className="mb-4 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626', }}>
-            <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#ef4444' }}>{t('restrictions')}</h2>
-            <div className="flex flex-col gap-2 text-xs" style={{ color: '#ccc' }}>
+            className="mb-4 p-4" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)', }}>
+            <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: 'var(--t-danger)' }}>{t('restrictions')}</h2>
+            <div className="flex flex-col gap-2 text-xs" style={{ color: 'var(--t-text)' }}>
               {(tour as any).allowedGroups?.length > 0 && (
-                <div><span style={{ color: '#888' }}>{t('allowedGroups')}:</span> <span style={{ color: '#4ade80' }}>{(tour as any).allowedGroups.join(', ')}</span></div>
+                <div><span style={{ color: 'var(--t-muted)' }}>{t('allowedGroups')}:</span> <span style={{ color: 'var(--t-success)' }}>{(tour as any).allowedGroups.join(', ')}</span></div>
               )}
               {(tour as any).bannedGroups?.length > 0 && (
-                <div><span style={{ color: '#888' }}>{t('bannedGroups')}:</span> <span style={{ color: '#f87171' }}>{(tour as any).bannedGroups.join(', ')}</span></div>
+                <div><span style={{ color: 'var(--t-muted)' }}>{t('bannedGroups')}:</span> <span style={{ color: 'var(--t-danger)' }}>{(tour as any).bannedGroups.join(', ')}</span></div>
               )}
               {(tour as any).allowedKeywords?.length > 0 && (
-                <div><span style={{ color: '#888' }}>{t('allowedKeywords')}:</span> <span style={{ color: '#4ade80' }}>{(tour as any).allowedKeywords.join(', ')}</span></div>
+                <div><span style={{ color: 'var(--t-muted)' }}>{t('allowedKeywords')}:</span> <span style={{ color: 'var(--t-success)' }}>{(tour as any).allowedKeywords.join(', ')}</span></div>
               )}
               {(tour as any).bannedKeywords?.length > 0 && (
-                <div><span style={{ color: '#888' }}>{t('bannedKeywords')}:</span> <span style={{ color: '#f87171' }}>{(tour as any).bannedKeywords.join(', ')}</span></div>
+                <div><span style={{ color: 'var(--t-muted)' }}>{t('bannedKeywords')}:</span> <span style={{ color: 'var(--t-danger)' }}>{(tour as any).bannedKeywords.join(', ')}</span></div>
               )}
               {(tour as any).allowedRarities?.length > 0 && (
-                <div><span style={{ color: '#888' }}>{t('allowedRarities')}:</span> <span style={{ color: '#4ade80' }}>{(tour as any).allowedRarities.join(', ')}</span></div>
+                <div><span style={{ color: 'var(--t-muted)' }}>{t('allowedRarities')}:</span> <span style={{ color: 'var(--t-success)' }}>{(tour as any).allowedRarities.join(', ')}</span></div>
               )}
               {(tour as any).bannedRarities?.length > 0 && (
-                <div><span style={{ color: '#888' }}>{t('bannedRarities')}:</span> <span style={{ color: '#f87171' }}>{(tour as any).bannedRarities.join(', ')}</span></div>
+                <div><span style={{ color: 'var(--t-muted)' }}>{t('bannedRarities')}:</span> <span style={{ color: 'var(--t-danger)' }}>{(tour as any).bannedRarities.join(', ')}</span></div>
               )}
               {(tour as any).maxPerRarity && Object.keys((tour as any).maxPerRarity).length > 0 && (
-                <div><span style={{ color: '#888' }}>{t('maxPerRarity')}:</span> {Object.entries((tour as any).maxPerRarity).map(([r, v]) => <span key={r} className="ml-1" style={{ color: '#c4a35a' }}>{r}: {String(v)}</span>)}</div>
+                <div><span style={{ color: 'var(--t-muted)' }}>{t('maxPerRarity')}:</span> {Object.entries((tour as any).maxPerRarity).map(([r, v]) => <span key={r} className="ml-1" style={{ color: 'var(--t-accent)' }}>{r}: {String(v)}</span>)}</div>
               )}
-              {(tour as any).maxCopiesPerCard != null && <div><span style={{ color: '#888' }}>{t('maxCopiesPerCard')}:</span> <span style={{ color: '#c4a35a' }}>{(tour as any).maxCopiesPerCard}</span></div>}
-              {(tour as any).maxChakraCost != null && <div><span style={{ color: '#888' }}>{t('maxChakraCostLabel')}:</span> <span style={{ color: '#c4a35a' }}>{(tour as any).maxChakraCost}</span></div>}
-              {(tour as any).minDeckSize != null && <div><span style={{ color: '#888' }}>{t('minDeckSizeLabel')}:</span> <span style={{ color: '#c4a35a' }}>{(tour as any).minDeckSize}</span></div>}
-              {(tour as any).maxDeckSize != null && <div><span style={{ color: '#888' }}>{t('maxDeckSizeLabel')}:</span> <span style={{ color: '#c4a35a' }}>{(tour as any).maxDeckSize}</span></div>}
+              {(tour as any).maxCopiesPerCard != null && <div><span style={{ color: 'var(--t-muted)' }}>{t('maxCopiesPerCard')}:</span> <span style={{ color: 'var(--t-accent)' }}>{(tour as any).maxCopiesPerCard}</span></div>}
+              {(tour as any).maxChakraCost != null && <div><span style={{ color: 'var(--t-muted)' }}>{t('maxChakraCostLabel')}:</span> <span className="inline-flex items-center gap-1 align-middle" style={{ color: 'var(--t-accent)' }}><ChakraIcon size={14} color={CHAKRA_COLOR} />{(tour as any).maxChakraCost}</span></div>}
+              {(tour as any).minDeckSize != null && <div><span style={{ color: 'var(--t-muted)' }}>{t('minDeckSizeLabel')}:</span> <span style={{ color: 'var(--t-accent)' }}>{(tour as any).minDeckSize}</span></div>}
+              {(tour as any).maxDeckSize != null && <div><span style={{ color: 'var(--t-muted)' }}>{t('maxDeckSizeLabel')}:</span> <span style={{ color: 'var(--t-accent)' }}>{(tour as any).maxDeckSize}</span></div>}
               {(tour as any).bannedCardIds?.length > 0 && (
-                <div><span style={{ color: '#888' }}>{t('bannedCards')}:</span> <span style={{ color: '#f87171' }}>{(tour as any).bannedCardIds.join(', ')}</span></div>
+                <div><span style={{ color: 'var(--t-muted)' }}>{t('bannedCards')}:</span> <span style={{ color: 'var(--t-danger)' }}>{(tour as any).bannedCardIds.join(', ')}</span></div>
               )}
               {(tour as any).restrictionNote && (
-                <div className="mt-1 p-2" style={{ backgroundColor: '#0d0d0d', border: '1px solid #333' }}>
-                  <span style={{ color: '#c4a35a' }}>{(tour as any).restrictionNote}</span>
+                <div className="mt-1 p-2" style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border-strong)' }}>
+                  <span style={{ color: 'var(--t-accent)' }}>{(tour as any).restrictionNote}</span>
                 </div>
               )}
             </div>
@@ -582,17 +583,17 @@ export default function TournamentDetailPage() {
 
         {needsSealedBuild && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.25 }}
-            className="mb-4 p-4" style={{ backgroundColor: '#111111' }}>
-            <h2 className="text-sm font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>
+            className="mb-4 p-4" style={{ backgroundColor: 'var(--t-panel)' }}>
+            <h2 className="text-sm font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--t-accent)' }}>
               {t('sealedBuildAction')}
             </h2>
-            <p className="text-xs mb-3" style={{ color: '#888' }}>
+            <p className="text-xs mb-3" style={{ color: 'var(--t-muted)' }}>
               {t('sealedBuildDeadline')}: {sealedBuildDeadline ? new Date(sealedBuildDeadline).toLocaleTimeString() : '-'}
             </p>
             <Link
               href={('/tournaments/' + tournamentId + '/sealed-build') as '/'}
               className="inline-block px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors"
-              style={{ backgroundColor: 'rgba(196, 163, 90, 0.18)', border: '1px solid #c4a35a', color: '#c4a35a' }}
+              style={{ backgroundColor: 'var(--t-accent-glow)', border: '1px solid var(--t-accent)', color: 'var(--t-accent)' }}
             >
               {t('sealedBuildAction')}
             </Link>
@@ -601,8 +602,8 @@ export default function TournamentDetailPage() {
 
         {isParticipant && tour.gameMode === 'sealed' && mySealedDeck && tour.status === 'registration' && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.25 }}
-            className="mb-4 p-4" style={{ backgroundColor: '#111111' }}>
-            <p className="text-xs uppercase tracking-wider" style={{ color: '#4ade80' }}>
+            className="mb-4 p-4" style={{ backgroundColor: 'var(--t-panel)' }}>
+            <p className="text-xs uppercase tracking-wider" style={{ color: 'var(--t-success)' }}>
               {t('sealedDeckReady')}
             </p>
           </motion.div>
@@ -610,30 +611,30 @@ export default function TournamentDetailPage() {
 
         {needsDeck && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.25 }}
-            className="mb-4 p-4" style={{ backgroundColor: '#111111', }}>
-            <h2 className="text-sm font-medium uppercase tracking-wider mb-2" style={{ color: myDeckId && myDeckValid ? '#4ade80' : '#ef4444' }}>
+            className="mb-4 p-4" style={{ backgroundColor: 'var(--t-panel)', }}>
+            <h2 className="text-sm font-medium uppercase tracking-wider mb-2" style={{ color: myDeckId && myDeckValid ? 'var(--t-success)' : 'var(--t-danger)' }}>
               {t('selectDeck')}
             </h2>
-            <p className="text-xs mb-3" style={{ color: '#888' }}>{t('selectDeckHint')}</p>
+            <p className="text-xs mb-3" style={{ color: 'var(--t-muted)' }}>{t('selectDeckHint')}</p>
             
             {((tour as any).allowedGroups?.length > 0 || (tour as any).allowedKeywords?.length > 0 || (tour as any).bannedRarities?.length > 0 || (tour as any).bannedCardIds?.length > 0 || (tour as any).maxCopiesPerCard || (tour as any).restrictionNote) && (
-              <div className="mb-3 p-2 text-xs" style={{ backgroundColor: 'rgba(196, 163, 90, 0.05)', }}>
-                <p className="font-medium mb-1" style={{ color: '#c4a35a' }}>{t('restrictions')}:</p>
-                {(tour as any).allowedGroups?.length > 0 && <p style={{ color: '#999' }}>{t('allowedGroups')}: <span style={{ color: '#4ade80' }}>{(tour as any).allowedGroups.join(', ')}</span></p>}
-                {(tour as any).allowedKeywords?.length > 0 && <p style={{ color: '#999' }}>{t('allowedKeywords')}: <span style={{ color: '#4ade80' }}>{(tour as any).allowedKeywords.join(', ')}</span></p>}
-                {(tour as any).bannedRarities?.length > 0 && <p style={{ color: '#999' }}>{t('bannedRarities')}: <span style={{ color: '#f87171' }}>{(tour as any).bannedRarities.join(', ')}</span></p>}
-                {(tour as any).bannedCardIds?.length > 0 && <p style={{ color: '#999' }}>{t('bannedCards')}: <span style={{ color: '#f87171' }}>{(tour as any).bannedCardIds.join(', ')}</span></p>}
-                {(tour as any).maxCopiesPerCard && <p style={{ color: '#999' }}>{t('maxCopies')}: <span style={{ color: '#c4a35a' }}>{(tour as any).maxCopiesPerCard}</span></p>}
-                {(tour as any).restrictionNote && <p style={{ color: '#c4a35a' }}>{(tour as any).restrictionNote}</p>}
+              <div className="mb-3 p-2 text-xs" style={{ backgroundColor: 'var(--t-accent-tint)', }}>
+                <p className="font-medium mb-1" style={{ color: 'var(--t-accent)' }}>{t('restrictions')}:</p>
+                {(tour as any).allowedGroups?.length > 0 && <p style={{ color: 'var(--t-muted)' }}>{t('allowedGroups')}: <span style={{ color: 'var(--t-success)' }}>{(tour as any).allowedGroups.join(', ')}</span></p>}
+                {(tour as any).allowedKeywords?.length > 0 && <p style={{ color: 'var(--t-muted)' }}>{t('allowedKeywords')}: <span style={{ color: 'var(--t-success)' }}>{(tour as any).allowedKeywords.join(', ')}</span></p>}
+                {(tour as any).bannedRarities?.length > 0 && <p style={{ color: 'var(--t-muted)' }}>{t('bannedRarities')}: <span style={{ color: 'var(--t-danger)' }}>{(tour as any).bannedRarities.join(', ')}</span></p>}
+                {(tour as any).bannedCardIds?.length > 0 && <p style={{ color: 'var(--t-muted)' }}>{t('bannedCards')}: <span style={{ color: 'var(--t-danger)' }}>{(tour as any).bannedCardIds.join(', ')}</span></p>}
+                {(tour as any).maxCopiesPerCard && <p style={{ color: 'var(--t-muted)' }}>{t('maxCopies')}: <span style={{ color: 'var(--t-accent)' }}>{(tour as any).maxCopiesPerCard}</span></p>}
+                {(tour as any).restrictionNote && <p style={{ color: 'var(--t-accent)' }}>{(tour as any).restrictionNote}</p>}
               </div>
             )}
             {myDeckId && (
-              <p className="text-xs mb-2" style={{ color: myDeckValid ? '#4ade80' : '#f87171' }}>
+              <p className="text-xs mb-2" style={{ color: myDeckValid ? 'var(--t-success)' : 'var(--t-danger)' }}>
                 {myDeckValid ? t('deckValid') : t('deckInvalid')}
               </p>
             )}
             {deckErrors.length > 0 && (
-              <div className="mb-3 p-2 text-xs" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#f87171' }}>
+              <div className="mb-3 p-2 text-xs" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: 'var(--t-danger)' }}>
                 <p className="font-medium mb-1">{t('deckErrors')}:</p>
                 {deckErrors.map((err, i) => <p key={i}>- {err}</p>)}
               </div>
@@ -644,24 +645,24 @@ export default function TournamentDetailPage() {
                 <button onClick={() => handleSelectDeck(deck.id)} disabled={deckLoading}
                   className="flex items-center justify-between px-3 py-2 text-xs cursor-pointer transition-colors w-full"
                   style={{
-                    backgroundColor: selectedDeckId === deck.id ? 'rgba(196, 163, 90, 0.1)' : '#0d0d0d',
-                    color: selectedDeckId === deck.id ? '#c4a35a' : '#ccc',
+                    backgroundColor: selectedDeckId === deck.id ? 'var(--t-accent-glow)' : 'var(--t-bg)',
+                    color: selectedDeckId === deck.id ? 'var(--t-accent)' : 'var(--t-text)',
                   }}>
                   <div className="flex items-center gap-2 flex-wrap min-w-0">
                     <span className="truncate">{deck.name}</span>
                     {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints ?? 0} />}
                   </div>
-                  {selectedDeckId === deck.id && <span style={{ color: myDeckValid ? '#4ade80' : '#f87171' }}>{myDeckValid ? t('deckValid') : t('deckInvalid')}</span>}
+                  {selectedDeckId === deck.id && <span style={{ color: myDeckValid ? 'var(--t-success)' : 'var(--t-danger)' }}>{myDeckValid ? t('deckValid') : t('deckInvalid')}</span>}
                 </button>
                 </EvolvingDeckHolo>
               ))}
               {myDecks.length === 0 && (
-                <p className="text-xs" style={{ color: '#888' }}>
+                <p className="text-xs" style={{ color: 'var(--t-muted)' }}>
                   {isEvolvingTournament ? t('noEvolvingDeckWarning') : t('noDeckWarning')}
                 </p>
               )}
               {myDecks.length > 0 && !myDeckValid && (
-                <p className="text-xs mt-2" style={{ color: '#888' }}>
+                <p className="text-xs mt-2" style={{ color: 'var(--t-muted)' }}>
                   {t('noValidDeckHint')}
                 </p>
               )}
@@ -669,7 +670,7 @@ export default function TournamentDetailPage() {
           </motion.div>
         )}
 
-        {error && <div className="mb-4 p-3 text-xs" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#cc4444' }}>{(() => {
+        {error && <div className="mb-4 p-3 text-xs" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: 'var(--t-danger)' }}>{(() => {
           if (storeErrorKey) {
             try { return tRoot(storeErrorKey); } catch { /* fall through */ }
           }
@@ -679,17 +680,17 @@ export default function TournamentDetailPage() {
         {tour.status === 'registration' && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
             
-            <div className="mb-4 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>{t('players')} ({tour.participants.length}/{tour.maxPlayers})</h2>
+            <div className="mb-4 p-4" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' }}>
+              <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: 'var(--t-accent)' }}>{t('players')} ({tour.participants.length}/{tour.maxPlayers})</h2>
               {tour.participants.length === 0 ? (
-                <p className="text-xs" style={{ color: '#666666' }}>{t('registrationOpen')}</p>
+                <p className="text-xs" style={{ color: 'var(--t-dim)' }}>{t('registrationOpen')}</p>
               ) : (
                 <div className="space-y-1">
                   {tour.participants.map((p) => {
                     const excludedNoDeck = p.eliminated && (p.eliminatedRound ?? null) === 0;
                     return (
-                      <div key={p.id} className="flex items-center gap-2 px-2 py-1 text-sm" style={{ color: excludedNoDeck ? '#777777' : '#e0e0e0' }}>
-                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: excludedNoDeck ? '#555555' : '#c4a35a' }} />
+                      <div key={p.id} className="flex items-center gap-2 px-2 py-1 text-sm" style={{ color: excludedNoDeck ? 'var(--t-dim)' : 'var(--t-text)' }}>
+                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: excludedNoDeck ? 'var(--t-dim)' : 'var(--t-accent)' }} />
                         <PlayerNameLink username={p.username} />
                         {excludedNoDeck ? (
                           <span className="text-xs" style={{ color: '#a33636' }}>{t('excludedNoDeck')}</span>
@@ -703,20 +704,20 @@ export default function TournamentDetailPage() {
 
             <div className="mb-4">
               {!isParticipant ? (
-                <div className="p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
+                <div className="p-4" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' }}>
                   
                   {discordPopupType && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }} onClick={() => setDiscordPopupType(null)}>
-                      <div className="max-w-sm w-full mx-4 p-5" style={{ backgroundColor: '#111', border: '1px solid #333' }} onClick={(e) => e.stopPropagation()}>
+                      <div className="max-w-sm w-full mx-4 p-5" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border-strong)' }} onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(88, 101, 242, 0.15)', border: '2px solid rgba(88, 101, 242, 0.4)' }}>
                             <span className="text-lg font-bold" style={{ color: '#5865F2' }}>D</span>
                           </div>
-                          <p className="text-sm font-medium" style={{ color: '#ddd' }}>
+                          <p className="text-sm font-medium" style={{ color: 'var(--t-text)' }}>
                             {discordPopupType === 'not-linked' ? t('discordPopupTitleNotLinked') : t('discordPopupTitleNotInServer')}
                           </p>
                         </div>
-                        <p className="text-xs mb-4 leading-relaxed" style={{ color: '#999' }}>
+                        <p className="text-xs mb-4 leading-relaxed" style={{ color: 'var(--t-muted)' }}>
                           {discordPopupType === 'not-linked' ? t('discordPopupDescNotLinked') : t('discordPopupDescNotInServer')}
                         </p>
                         <div className="flex flex-col gap-2">
@@ -734,7 +735,7 @@ export default function TournamentDetailPage() {
                           )}
                           <button onClick={() => { setDiscordPopupType(null); doJoin(); }}
                             className="w-full px-4 py-2 text-xs font-medium uppercase tracking-wider cursor-pointer transition-colors"
-                            style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', color: '#888' }}>
+                            style={{ backgroundColor: 'var(--t-accent-tint)', color: 'var(--t-muted)' }}>
                             {t('discordContinueWithout')}
                           </button>
                         </div>
@@ -746,12 +747,12 @@ export default function TournamentDetailPage() {
                     
                     {!tour.isPublic && (
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-[10px] uppercase tracking-wider" style={{ color: '#888' }}>{t('enterCode')}</label>
+                        <label className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--t-muted)' }}>{t('enterCode')}</label>
                         <div className="flex gap-2">
                           <input type="text" value={joinCodeInput} onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
                             placeholder={t('codePlaceholder')} maxLength={8}
                             className="flex-1 px-3 py-2 text-sm font-mono text-center uppercase tracking-widest"
-                            style={{ backgroundColor: '#0a0a0a', border: '1px solid #333', color: '#c4a35a' }}
+                            style={{ backgroundColor: 'var(--t-bg)', border: '1px solid var(--t-border-strong)', color: 'var(--t-accent)' }}
                             onKeyDown={(e) => { if (e.key === 'Enter') handleJoin(); }}
                           />
                         </div>
@@ -761,25 +762,25 @@ export default function TournamentDetailPage() {
                     <button onClick={handleJoin}
                       disabled={tour.participants.length >= tour.maxPlayers || (!tour.isPublic && !joinCodeInput.trim())}
                       className="w-full px-5 py-2.5 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors disabled:opacity-40"
-                      style={{ backgroundColor: 'rgba(196, 163, 90, 0.1)', color: '#c4a35a' }}>
+                      style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)' }}>
                       {t('join')}
                     </button>
 
                     {joinError && (
-                      <p className="text-xs px-2 py-1.5" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#f87171' }}>
+                      <p className="text-xs px-2 py-1.5" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: 'var(--t-danger)' }}>
                         {joinError}
                       </p>
                     )}
 
                     {tour.participants.length >= tour.maxPlayers && (
-                      <p className="text-xs text-center" style={{ color: '#888' }}>{t('full')}</p>
+                      <p className="text-xs text-center" style={{ color: 'var(--t-muted)' }}>{t('full')}</p>
                     )}
                   </div>
                 </div>
               ) : (
                 <div className="flex gap-3">
                   <button onClick={handleLeave} className="px-5 py-2.5 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors"
-                    style={{ backgroundColor: 'rgba(204, 68, 68, 0.08)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#cc4444' }}>
+                    style={{ backgroundColor: 'rgba(204, 68, 68, 0.08)', border: '1px solid rgba(204, 68, 68, 0.3)', color: 'var(--t-danger)' }}>
                     {t('leave')}
                   </button>
                 </div>
@@ -787,9 +788,9 @@ export default function TournamentDetailPage() {
             </div>
 
             {(isAdmin || isCreator) && !tour.isPublic && tour.joinCode && (
-              <div className="mb-4 p-3 flex items-center gap-3" style={{ backgroundColor: '#111', border: '1px solid #333' }}>
-                <span className="text-[10px] uppercase tracking-wider" style={{ color: '#888' }}>{t('codeLabel')}:</span>
-                <span className="text-sm font-mono tracking-widest" style={{ color: '#c4a35a' }}>{tour.joinCode}</span>
+              <div className="mb-4 p-3 flex items-center gap-3" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border-strong)' }}>
+                <span className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--t-muted)' }}>{t('codeLabel')}:</span>
+                <span className="text-sm font-mono tracking-widest" style={{ color: 'var(--t-accent)' }}>{tour.joinCode}</span>
               </div>
             )}
 
@@ -805,7 +806,7 @@ export default function TournamentDetailPage() {
                   href={`/tournaments/${tournamentId}/spectate`}
                   data-gp="true"
                   className="px-4 py-2 text-[11px] uppercase tracking-[0.16em]"
-                  style={{ backgroundColor: 'rgba(196,163,90,0.12)', color: '#c4a35a', borderRadius: '3px' }}
+                  style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)', borderRadius: '3px' }}
                 >
                   {tSpectate('watchLive')}
                 </Link>
@@ -819,22 +820,22 @@ export default function TournamentDetailPage() {
               format={tour.format}
             />
             {myMatchPanel}
-            <div className="p-4 overflow-x-auto" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-medium uppercase tracking-wider mb-4" style={{ color: '#c4a35a' }}>{isSwiss ? t('swissStandings') : t('bracket')}</h2>
+            <div className="p-4 overflow-x-auto" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' }}>
+              <h2 className="text-sm font-medium uppercase tracking-wider mb-4" style={{ color: 'var(--t-accent)' }}>{isSwiss ? t('swissStandings') : t('bracket')}</h2>
               {isSwiss ? (
                 <SwissStandings standings={swissStandings} matches={tour.matches} totalRounds={tour.totalRounds} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
               ) : isDoubleElim ? (
                 <div className="flex flex-col gap-6">
                   <div>
-                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>{t('bracketWinners')}</h3>
+                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--t-accent)' }}>{t('bracketWinners')}</h3>
                     <BracketTree matches={tour.matches.filter((m) => m.bracket === 'winners')} totalRounds={Math.max(1, ...tour.matches.filter((m) => m.bracket === 'winners').map((m) => m.round))} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
                   </div>
                   <div>
-                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>{t('bracketLosers')}</h3>
+                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--t-accent)' }}>{t('bracketLosers')}</h3>
                     <BracketTree matches={tour.matches.filter((m) => m.bracket === 'losers')} totalRounds={Math.max(1, ...tour.matches.filter((m) => m.bracket === 'losers').map((m) => m.round))} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
                   </div>
                   <div>
-                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>{t('bracketGrandFinal')}</h3>
+                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--t-accent)' }}>{t('bracketGrandFinal')}</h3>
                     <BracketTree matches={tour.matches.filter((m) => m.bracket === 'grand_final')} totalRounds={Math.max(1, ...tour.matches.filter((m) => m.bracket === 'grand_final').map((m) => m.round))} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
                   </div>
                 </div>
@@ -850,22 +851,22 @@ export default function TournamentDetailPage() {
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
             {myMatchPanel}
             <TournamentResults tournament={tour} />
-            <div className="mt-6 p-4 overflow-x-auto" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-medium uppercase tracking-wider mb-4" style={{ color: '#c4a35a' }}>{isSwiss ? t('swissStandings') : t('bracket')}</h2>
+            <div className="mt-6 p-4 overflow-x-auto" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' }}>
+              <h2 className="text-sm font-medium uppercase tracking-wider mb-4" style={{ color: 'var(--t-accent)' }}>{isSwiss ? t('swissStandings') : t('bracket')}</h2>
               {isSwiss ? (
                 <SwissStandings standings={swissStandings} matches={tour.matches} totalRounds={tour.totalRounds} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
               ) : isDoubleElim ? (
                 <div className="flex flex-col gap-6">
                   <div>
-                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>{t('bracketWinners')}</h3>
+                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--t-accent)' }}>{t('bracketWinners')}</h3>
                     <BracketTree matches={tour.matches.filter((m) => m.bracket === 'winners')} totalRounds={Math.max(1, ...tour.matches.filter((m) => m.bracket === 'winners').map((m) => m.round))} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
                   </div>
                   <div>
-                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>{t('bracketLosers')}</h3>
+                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--t-accent)' }}>{t('bracketLosers')}</h3>
                     <BracketTree matches={tour.matches.filter((m) => m.bracket === 'losers')} totalRounds={Math.max(1, ...tour.matches.filter((m) => m.bracket === 'losers').map((m) => m.round))} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
                   </div>
                   <div>
-                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#c4a35a' }}>{t('bracketGrandFinal')}</h3>
+                    <h3 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--t-accent)' }}>{t('bracketGrandFinal')}</h3>
                     <BracketTree matches={tour.matches.filter((m) => m.bracket === 'grand_final')} totalRounds={Math.max(1, ...tour.matches.filter((m) => m.bracket === 'grand_final').map((m) => m.round))} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
                   </div>
                 </div>
@@ -877,7 +878,7 @@ export default function TournamentDetailPage() {
         )}
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: 0.4 }} className="mt-8 text-center">
-          <Link href={'/tournaments' as '/'} className="text-sm transition-colors" style={{ color: '#888888' }}>{'<'} {t('backToList')}</Link>
+          <Link href={'/tournaments' as '/'} className="text-sm transition-colors" style={{ color: 'var(--t-muted)' }}>{'<'} {t('backToList')}</Link>
         </motion.div>
       </motion.div>
       <Footer />

@@ -9,6 +9,7 @@ import { generateInstanceId as generateAttachId } from '../utils/id';
 import { calculateEffectiveCost, hasKurenai034CostReduction } from '../rules/ChakraValidation';
 import { EffectEngine } from '../../effects/EffectEngine';
 import { applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
+import { revealUpgradeWouldDuplicateName } from '../../effects/revealNameUniqueness';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 import { expireFirstStrike } from '../rules/firstStrike';
 
@@ -521,6 +522,9 @@ function handleRevealCharacter(
           upgradeTarget = candidate;
         }
       }
+    }
+    if (upgradeTarget && revealUpgradeWouldDuplicateName(state, player, missionIndex, char, upgradeTarget)) {
+      return state;
     }
   } else {
 

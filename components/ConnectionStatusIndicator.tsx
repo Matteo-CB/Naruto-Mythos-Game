@@ -80,7 +80,7 @@ export function ConnectionStatusIndicator() {
       .catch(() => {});
   }, [session?.user?.id, session?.user?.name, connected, connect, clearError, rejoinMatch]);
 
-  const color = status === 'offline' ? '#b33e3e' : '#c4a35a';
+  const color = status === 'offline' ? 'var(--t-danger)' : 'var(--t-accent)';
   const label = status === 'offline'
     ? t('offline')
     : status === 'resyncing' && t.has(RESYNC_LABEL_KEY)
@@ -101,7 +101,7 @@ export function ConnectionStatusIndicator() {
             style={{
               backgroundColor: `${color}1f`,
               backdropFilter: 'blur(6px)',
-              boxShadow: '0 6px 18px rgba(0,0,0,0.45)',
+              boxShadow: '0 6px 18px var(--t-shadow)',
             }}
           >
             <SignalBars status={status} color={color} />
@@ -117,7 +117,7 @@ export function ConnectionStatusIndicator() {
                 onClick={onRetry}
                 className="text-[9.5px] uppercase font-bold cursor-pointer"
                 style={{
-                  color: '#e8e8e8',
+                  color: 'var(--t-text)',
                   letterSpacing: '0.16em',
                   background: 'none',
                   border: 'none',

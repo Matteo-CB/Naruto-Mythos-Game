@@ -8,10 +8,10 @@ import type { TournamentData } from '@/stores/tournamentStore';
 const ROW_CLIP = 'polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)';
 
 const STATUS_COLOR: Record<string, string> = {
-  registration: '#c4a35a',
-  in_progress: '#5fb05f',
-  completed: '#888888',
-  cancelled: '#d97676',
+  registration: 'var(--t-accent)',
+  in_progress: 'var(--t-success)',
+  completed: 'var(--t-muted)',
+  cancelled: 'var(--t-danger)',
 };
 
 interface Props {
@@ -29,8 +29,8 @@ export function TournamentCard({ tournament }: Props) {
   };
 
   const participantCount = tournament.participants?.length ?? tournament._count?.participants ?? 0;
-  const accent = STATUS_COLOR[tournament.status] || '#888';
-  const typeColor = tournament.type === 'simulator' ? '#c4a35a' : '#5fa3df';
+  const accent = STATUS_COLOR[tournament.status] || 'var(--t-muted)';
+  const typeColor = tournament.type === 'simulator' ? 'var(--t-accent)' : 'var(--t-text)';
 
   return (
     <motion.div
@@ -40,12 +40,12 @@ export function TournamentCard({ tournament }: Props) {
       <Link
         href={`/tournaments/${tournament.id}` as '/'}
         className="block relative px-4 sm:px-5 py-3 sm:py-4 cursor-pointer transition-colors"
-        style={{ backgroundColor: '#0d0c10', clipPath: ROW_CLIP }}
+        style={{ backgroundColor: 'var(--t-panel)', clipPath: ROW_CLIP }}
       >
         <div className="flex items-start justify-between gap-3 mb-2 flex-wrap">
           <h3
             className="font-display text-sm sm:text-base flex-1 min-w-0 truncate"
-            style={{ color: '#f0eee7', letterSpacing: '0.03em' }}
+            style={{ color: 'var(--t-text-strong)', letterSpacing: '0.03em' }}
           >
             {tournament.name}
           </h3>
@@ -53,7 +53,7 @@ export function TournamentCard({ tournament }: Props) {
             className="font-display text-[9px] uppercase tracking-widest px-2 py-0.5 shrink-0"
             style={{
               color: accent,
-              backgroundColor: `${accent}14`,
+              backgroundColor: `color-mix(in srgb, ${accent} 8%, transparent)`,
               borderRadius: 9999,
             }}
           >
@@ -61,18 +61,18 @@ export function TournamentCard({ tournament }: Props) {
           </span>
         </div>
 
-        <div className="font-display flex items-center gap-3 flex-wrap text-[10px] sm:text-[11px] uppercase tracking-widest" style={{ color: '#666' }}>
+        <div className="font-display flex items-center gap-3 flex-wrap text-[10px] sm:text-[11px] uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
           <span style={{ color: typeColor }}>
             {tournament.type === 'simulator' ? t('typeSimulator') : t('typePlayer')}
           </span>
-          <span style={{ color: '#3a3a3a' }}>·</span>
+          <span style={{ color: 'var(--t-muted)' }}>·</span>
           <span>{tournament.gameMode === 'sealed' ? t('sealed') : t('classic')}</span>
-          <span style={{ color: '#3a3a3a' }}>·</span>
+          <span style={{ color: 'var(--t-muted)' }}>·</span>
           <span className="tabular-nums">{participantCount}/{tournament.maxPlayers}</span>
         </div>
 
-        <div className="font-display text-[10px] uppercase tracking-widest mt-2" style={{ color: '#444' }}>
-          {t('createdBy')} <span style={{ color: '#888' }}>{tournament.creatorUsername}</span>
+        <div className="font-display text-[10px] uppercase tracking-widest mt-2" style={{ color: 'var(--t-dim)' }}>
+          {t('createdBy')} <span style={{ color: 'var(--t-muted)' }}>{tournament.creatorUsername}</span>
         </div>
       </Link>
     </motion.div>

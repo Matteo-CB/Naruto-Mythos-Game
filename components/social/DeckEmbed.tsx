@@ -63,7 +63,7 @@ export function DeckEmbed({ deck, onOpen }: { deck: DeckSnapshot; onOpen?: () =>
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openViewer(e); } }}
         className="block w-full text-left mt-2 overflow-hidden"
         style={{
-          backgroundColor: '#0d0c10',
+          backgroundColor: 'var(--t-bg)',
           border: '1px solid #1e1e22',
           cursor: 'pointer',
         }}
@@ -83,8 +83,8 @@ export function DeckEmbed({ deck, onOpen }: { deck: DeckSnapshot; onOpen?: () =>
                     zIndex: headline.length - i,
                     transform: `rotate(${(i - (headline.length - 1) / 2) * 3}deg)`,
                     transformOrigin: 'bottom center',
-                    boxShadow: '0 6px 14px rgba(0,0,0,0.5)',
-                    backgroundColor: '#000',
+                    boxShadow: '0 6px 14px var(--t-shadow)',
+                    backgroundColor: 'var(--t-surface-2)',
                   }}
                 >
                   {}
@@ -92,13 +92,13 @@ export function DeckEmbed({ deck, onOpen }: { deck: DeckSnapshot; onOpen?: () =>
                 </div>
               );
             })}
-            <div className="absolute inset-0" style={{ boxShadow: 'inset 0 -28px 24px -20px #0d0c10' }} />
+            <div className="absolute inset-0" style={{ boxShadow: 'inset 0 -28px 24px -20px var(--t-bg)' }} />
           </div>
         )}
 
         <div className="px-3 pb-3 pt-2">
           <div className="flex items-baseline justify-between gap-3">
-            <span className="font-display text-sm truncate" style={{ color: '#e8e6df', letterSpacing: '0.02em' }}>
+            <span className="font-display text-sm truncate" style={{ color: 'var(--t-text)', letterSpacing: '0.02em' }}>
               {deck.name}
             </span>
             <span className="font-inter-force text-[10px] shrink-0" style={{ color: '#6a6a70' }}>
@@ -108,7 +108,7 @@ export function DeckEmbed({ deck, onOpen }: { deck: DeckSnapshot; onOpen?: () =>
 
           {groups.length > 0 && (
             <>
-              <div className="mt-2 flex h-1.5 w-full overflow-hidden rounded-full" style={{ backgroundColor: '#050506' }}>
+              <div className="mt-2 flex h-1.5 w-full overflow-hidden rounded-full" style={{ backgroundColor: 'var(--t-surface-2)' }}>
                 {groups.map(([g, n]) => (
                   <div key={g} style={{ width: `${(n / total) * 100}%`, backgroundColor: groupColor(g) }} />
                 ))}

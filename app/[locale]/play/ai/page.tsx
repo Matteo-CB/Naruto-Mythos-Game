@@ -148,31 +148,31 @@ export default function PlayAIPage() {
   };
 
   return (
-    <main id="main-content" className="flex min-h-screen relative flex-col bg-[#0a0a0a]">
+    <main id="main-content" className="flex min-h-screen relative flex-col bg-[var(--t-bg)]">
       <CloudBackground />
       <DecorativeIcons />
       <CardBackgroundDecor variant="playAI" />
       <div className="flex-1 flex items-center justify-center px-4 py-8">
       <div className="flex flex-col items-center gap-6 max-w-md w-full relative z-10">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-[#e0e0e0] mb-1">{t('playAI.title')}</h1>
-          <p className="text-sm text-[#888888]">{t('playAI.selectDifficultyDesc')}</p>
+          <h1 className="text-3xl font-bold text-[var(--t-text)] mb-1">{t('playAI.title')}</h1>
+          <p className="text-sm text-[var(--t-muted)]">{t('playAI.selectDifficultyDesc')}</p>
         </div>
 
         <div className="flex flex-col gap-2 w-full">
-          <p className="text-xs text-[#888888] uppercase tracking-wider mb-1">{t('playAI.selectDifficulty')}</p>
+          <p className="text-xs text-[var(--t-muted)] uppercase tracking-wider mb-1">{t('playAI.selectDifficulty')}</p>
           {DIFFICULTIES.map((d) => (
             <button
               key={d.key}
               onClick={() => setDifficulty(d.key)}
               className={`flex flex-col items-start p-4 border transition-colors text-left ${
                 difficulty === d.key
-                  ? 'bg-[#1a1a1a] border-[#c4a35a] text-[#e0e0e0]'
-                  : 'bg-[#141414] border-[#262626] text-[#888888] hover:bg-[#1a1a1a] hover:border-[#333]'
+                  ? 'bg-[var(--t-surface-2)] border-[var(--t-accent)] text-[var(--t-text)]'
+                  : 'bg-[var(--t-surface)] border-[var(--t-border)] text-[var(--t-muted)] hover:bg-[var(--t-surface-2)] hover:border-[var(--t-border-strong)]'
               }`}
             >
               <span className="text-base font-medium">{d.label}</span>
-              <span className="text-xs text-[#666] mt-0.5 font-inter-force">{d.description}</span>
+              <span className="text-xs text-[var(--t-dim)] mt-0.5 font-inter-force">{d.description}</span>
             </button>
           ))}
         </div>
@@ -186,7 +186,7 @@ export default function PlayAIPage() {
         )}
 
         {cards && (
-          <p className="text-xs text-[#555]">
+          <p className="text-xs text-[var(--t-dim)]">
             {t('playAI.cardsLoaded', { chars: cards.characters.length, missions: cards.missions.length })}
           </p>
         )}
@@ -194,14 +194,14 @@ export default function PlayAIPage() {
         <div className="flex gap-3 w-full">
           <button
             onClick={() => router.push('/')}
-            className="flex-1 h-12 bg-[#141414] border border-[#262626] text-[#888888] font-medium hover:bg-[#1a1a1a] transition-colors"
+            className="flex-1 h-12 bg-[var(--t-surface)] border border-[var(--t-border)] text-[var(--t-muted)] font-medium hover:bg-[var(--t-surface-2)] transition-colors"
           >
             {t('common.back')}
           </button>
           <button
             onClick={handleStart}
             disabled={isLoading || !cards}
-            className="flex-1 h-12 bg-[#1a1a1a] border border-[#c4a35a] text-[#e0e0e0] font-medium hover:bg-[#222] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 h-12 bg-[var(--t-surface-2)] border border-[var(--t-accent)] text-[var(--t-text)] font-medium hover:bg-[var(--t-border)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isLoading ? t('common.loading') : t('playAI.startGame')}
           </button>

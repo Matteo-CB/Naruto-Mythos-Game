@@ -21,10 +21,10 @@ interface BoosterRevealCardProps {
 }
 
 const RARITY_COLOR: Record<Rarity, string> = {
-  RA: '#c4a35a',
+  RA: 'var(--t-accent)',
   MV: '#5fa3df',
   SV: '#9b59b6',
-  L: '#d97676',
+  L: 'var(--t-danger)',
 };
 
 export function BoosterRevealCard({
@@ -86,8 +86,8 @@ export function BoosterRevealCard({
             inset: 0,
             backfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
-            backgroundColor: '#0a0a0a',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+            backgroundColor: 'var(--t-bg)',
+            boxShadow: '0 8px 24px var(--t-shadow)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -100,7 +100,7 @@ export function BoosterRevealCard({
             position: 'absolute',
             inset: 0,
             backfaceVisibility: 'hidden',
-            backgroundColor: '#111111',
+            backgroundColor: 'var(--t-panel)',
             overflow: 'hidden',
           }}
         >
@@ -113,7 +113,7 @@ export function BoosterRevealCard({
               decoding="async"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ color: '#555', fontSize: 11 }}>
+            <div className="w-full h-full flex items-center justify-center" style={{ color: 'var(--t-dim)', fontSize: 11 }}>
               {getCardName(card, locale)}
             </div>
           )}
@@ -150,8 +150,8 @@ export function BoosterRevealCard({
           transition={{ duration: 0.32, delay: 0.7 }}
           className="absolute top-1 left-1 px-1.5 py-0.5"
           style={{
-            backgroundColor: '#c4a35a1f',
-            color: '#c4a35a',
+            backgroundColor: 'var(--t-accent)1f',
+            color: 'var(--t-accent)',
             fontSize: 9,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',

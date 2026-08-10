@@ -44,15 +44,15 @@ export function BoosterCarousel({ children, stepPx = 304 }: Props) {
       {canLeft && (
         <button
           type="button" onClick={() => scrollDir(-1)} aria-label="Previous"
-          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer font-display text-base transition-colors hover:text-[#ffd966]"
-          style={{ backgroundColor: 'rgba(13,12,16,0.92)', color: '#c4a35a', borderRadius: 9999, boxShadow: '0 4px 14px rgba(0,0,0,0.55)' }}
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer font-display text-base transition-colors hover:text-(--t-accent-bright)"
+          style={{ backgroundColor: 'var(--t-overlay)', color: 'var(--t-accent)', borderRadius: 9999, boxShadow: '0 4px 14px var(--t-shadow)' }}
         >&lt;</button>
       )}
       {canRight && (
         <button
           type="button" onClick={() => scrollDir(1)} aria-label="Next"
-          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer font-display text-base transition-colors hover:text-[#ffd966]"
-          style={{ backgroundColor: 'rgba(13,12,16,0.92)', color: '#c4a35a', borderRadius: 9999, boxShadow: '0 4px 14px rgba(0,0,0,0.55)' }}
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center cursor-pointer font-display text-base transition-colors hover:text-(--t-accent-bright)"
+          style={{ backgroundColor: 'var(--t-overlay)', color: 'var(--t-accent)', borderRadius: 9999, boxShadow: '0 4px 14px var(--t-shadow)' }}
         >&gt;</button>
       )}
       <div

@@ -1,8 +1,10 @@
 import type { GameState, PlayerID, CardData } from '@/lib/engine/types';
 import type { EffectResult } from '@/lib/effects/EffectTypes';
+import { logAction } from '@/lib/engine/utils/gameLog';
 import {
   findAffordableInHandByPredicate,
   findHiddenOnBoardByPredicate,
+  findRevealBlockedByNameRule,
   type HiddenCharTarget,
 } from '@/lib/effects/handlers/KS/shared/summonSearch';
 
@@ -32,6 +34,36 @@ export function buildPlayLessTargets(
     ...hiddenChars.map((h) => `HIDDEN_${h.instanceId}`),
   ];
   return { targets, hiddenChars };
+}
+
+export function playLessRevealBlockedName(
+  state: GameState,
+  player: PlayerID,
+  category: PlayLessCategory,
+): string | null {
+  return findRevealBlockedByNameRule(state, player, predicateForCategory(category));
+}
+
+export function playLessBlockedRevealResult(
+  state: GameState,
+  player: PlayerID,
+  category: PlayLessCategory,
+  sourceLabel: string,
+): EffectResult | null {
+  const blockedName = playLessRevealBlockedName(state, player, category);
+  if (!blockedName) return null;
+  return {
+    state: {
+      ...state,
+      log: logAction(
+        state.log, state.turn, state.phase, player,
+        'EFFECT_BLOCKED',
+        `${sourceLabel}: Cannot reveal ${blockedName}, a character with that name is already visible on this mission.`,
+        'game.log.effect.duplicateNameReveal',
+        { card: blockedName },
+      ),
+    },
+  };
 }
 
 export interface PlayLessOptions {

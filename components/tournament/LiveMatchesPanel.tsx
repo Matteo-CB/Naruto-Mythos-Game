@@ -32,7 +32,7 @@ function Countdown({ deadline }: { deadline: string }) {
   return (
     <span
       className="text-[10px] tabular-nums font-bold"
-      style={{ color: urgent ? '#cc4444' : '#c4a35a' }}
+      style={{ color: urgent ? 'var(--t-danger)' : 'var(--t-accent)' }}
     >
       {mins}:{secs.toString().padStart(2, '0')}
     </span>
@@ -75,23 +75,23 @@ export function LiveMatchesPanel({ matches, currentRound, totalRounds, userId, f
   if (total === 0) return null;
 
   return (
-    <div className="mb-6 p-4" style={{ backgroundColor: '#0d0d10', border: '1px solid rgba(196, 163, 90, 0.18)' }}>
+    <div className="mb-6 p-4" style={{ backgroundColor: 'var(--t-surface-2)', border: '1px solid var(--t-accent-glow)' }}>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-medium uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+        <h2 className="text-sm font-medium uppercase tracking-wider" style={{ color: 'var(--t-accent)' }}>
           {format ? `${t('round')} ${currentRound} / ${totalRounds}` : `${t('round')} ${currentRound}`}
         </h2>
-        <span className="text-[11px] tabular-nums" style={{ color: '#888' }}>
+        <span className="text-[11px] tabular-nums" style={{ color: 'var(--t-muted)' }}>
           {completed} / {total}
         </span>
       </div>
 
       <div
         className="h-1 mb-3 overflow-hidden"
-        style={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
+        style={{ backgroundColor: 'var(--t-divider)' }}
       >
         <motion.div
           className="h-full"
-          style={{ backgroundColor: '#c4a35a' }}
+          style={{ backgroundColor: 'var(--t-accent)' }}
           animate={{ width: total > 0 ? `${(completed / total) * 100}%` : '0%' }}
           transition={{ duration: 0.4 }}
         />
@@ -110,9 +110,9 @@ export function LiveMatchesPanel({ matches, currentRound, totalRounds, userId, f
                 backgroundColor: 'rgba(59, 130, 246, 0.06)',
               }}
             >
-              <span style={{ color: '#e0e0e0' }}>
+              <span style={{ color: 'var(--t-text)' }}>
                 <PlayerName name={m.player1Username} highlight={m.player1Id === userId} />
-                <span className="mx-2" style={{ color: '#555' }}>vs</span>
+                <span className="mx-2" style={{ color: 'var(--t-dim)' }}>vs</span>
                 <PlayerName name={m.player2Username} highlight={m.player2Id === userId} />
               </span>
               <div className="flex items-center gap-2">
@@ -135,14 +135,14 @@ export function LiveMatchesPanel({ matches, currentRound, totalRounds, userId, f
                 backgroundColor: 'rgba(196, 163, 90, 0.04)',
               }}
             >
-              <span style={{ color: '#e0e0e0' }}>
+              <span style={{ color: 'var(--t-text)' }}>
                 <PlayerName name={m.player1Username} highlight={m.player1Id === userId} />
-                <span className="mx-2" style={{ color: '#555' }}>vs</span>
+                <span className="mx-2" style={{ color: 'var(--t-dim)' }}>vs</span>
                 <PlayerName name={m.player2Username} highlight={m.player2Id === userId} />
               </span>
               <div className="flex items-center gap-2">
                 {m.absenceDeadline && <Countdown deadline={m.absenceDeadline} />}
-                <span className="text-[9px] uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+                <span className="text-[9px] uppercase tracking-wider" style={{ color: 'var(--t-accent)' }}>
                   {t('swissStatusReady')}
                 </span>
               </div>
@@ -161,12 +161,12 @@ export function LiveMatchesPanel({ matches, currentRound, totalRounds, userId, f
                 opacity: 0.75,
               }}
             >
-              <span style={{ color: '#aaa' }}>
+              <span style={{ color: 'var(--t-muted)' }}>
                 <PlayerName name={m.player1Username} highlight={m.player1Id === userId} won={m.winnerId === m.player1Id} />
-                <span className="mx-2" style={{ color: '#555' }}>vs</span>
+                <span className="mx-2" style={{ color: 'var(--t-dim)' }}>vs</span>
                 <PlayerName name={m.player2Username} highlight={m.player2Id === userId} won={m.winnerId === m.player2Id} />
               </span>
-              <span className="text-[9px] uppercase tracking-wider" style={{ color: m.status === 'forfeit' ? '#f87171' : '#4ade80' }}>
+              <span className="text-[9px] uppercase tracking-wider" style={{ color: m.status === 'forfeit' ? 'var(--t-danger)' : 'var(--t-success)' }}>
                 {m.status === 'forfeit' ? t('swissStatusForfeit') : t('swissStatusCompleted')}
               </span>
             </motion.div>
@@ -182,7 +182,7 @@ function PlayerName({ name, highlight, won }: { name?: string | null; highlight?
     <PlayerNameLink
       username={name}
       style={{
-        color: won ? '#c4a35a' : highlight ? '#e0e0e0' : '#bbb',
+        color: won ? 'var(--t-accent)' : highlight ? 'var(--t-text)' : 'var(--t-muted)',
         fontWeight: won || highlight ? 700 : 400,
         textDecoration: highlight ? 'underline' : 'none',
         textUnderlineOffset: '3px',

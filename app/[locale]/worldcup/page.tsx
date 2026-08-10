@@ -23,7 +23,7 @@ import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardById } from '@/lib/data/cardIndex';
 
 const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
-const MEDAL_COLORS = ['#c4a35a', '#a8a9ad', '#a06b42'];
+const MEDAL_COLORS = ['var(--t-accent)', '#a8a9ad', '#a06b42'];
 
 interface CountryPlayer {
   username: string;
@@ -97,10 +97,10 @@ function StatBlock({ label, value }: { label: string; value: number }) {
       className="flex flex-col items-center gap-1 px-4 py-3 flex-1 min-w-0"
       style={{ backgroundColor: 'rgba(17, 17, 17, 0.85)', clipPath: ROW_CLIP }}
     >
-      <span className="font-display text-xl sm:text-2xl tabular-nums" style={{ color: '#c4a35a' }}>
+      <span className="font-display text-xl sm:text-2xl tabular-nums" style={{ color: 'var(--t-accent)' }}>
         {value}
       </span>
-      <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-center" style={{ color: '#777' }}>
+      <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-center" style={{ color: 'var(--t-dim)' }}>
         {label}
       </span>
     </div>
@@ -138,17 +138,17 @@ function PodiumCard({
       <CountryFlag code={row.countryCode} size={rank === 1 ? 46 : 38} />
       <span
         className="font-display text-xs sm:text-sm uppercase tracking-wider text-center leading-tight"
-        style={{ color: '#e8e8e8' }}
+        style={{ color: 'var(--t-text)' }}
       >
         {countryName}
       </span>
       <span className="font-display text-lg tabular-nums" style={{ color: medal }}>
         {row.score.toFixed(1)}
       </span>
-      <span className="text-[9px] uppercase tracking-[0.2em]" style={{ color: '#666' }}>
+      <span className="text-[9px] uppercase tracking-[0.2em]" style={{ color: 'var(--t-dim)' }}>
         {t('colScore')}
       </span>
-      <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>
+      <span className="text-[10px] tabular-nums" style={{ color: 'var(--t-muted)' }}>
         {row.winRate.toFixed(1)}% · {t('recordLine', { wins: row.wins, losses: row.losses })}
       </span>
     </motion.div>
@@ -228,7 +228,7 @@ export default function WorldcupPage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.45), ease: 'easeOut' }}
                     className="mb-1"
-                    style={{ backgroundColor: isOpen ? 'rgba(196, 163, 90, 0.06)' : altBg, clipPath: ROW_CLIP }}
+                    style={{ backgroundColor: isOpen ? 'var(--t-accent-tint)' : altBg, clipPath: ROW_CLIP }}
                   >
                     <button
                       type="button"
@@ -238,14 +238,14 @@ export default function WorldcupPage() {
                       <span className="grid items-center gap-2 sm:gap-3 grid-cols-[2rem_auto_minmax(0,1fr)_auto] sm:grid-cols-[2.25rem_minmax(0,1fr)_7rem_5rem_4rem]">
                         <span
                           className="font-display text-base sm:text-lg tabular-nums text-center"
-                          style={{ color: rank !== null && rank <= 3 ? MEDAL_COLORS[rank - 1] : '#666' }}
+                          style={{ color: rank !== null && rank <= 3 ? MEDAL_COLORS[rank - 1] : 'var(--t-dim)' }}
                         >
                           {rank ?? '-'}
                         </span>
                         <span className="flex items-center gap-2 min-w-0">
                           <CountryFlag code={row.countryCode} size={22} />
                           <span className="hidden sm:flex flex-col min-w-0">
-                            <span className="font-display text-sm uppercase tracking-wide truncate" style={{ color: '#e8e8e8' }}>
+                            <span className="font-display text-sm uppercase tracking-wide truncate" style={{ color: 'var(--t-text)' }}>
                               {countryName(row.countryCode)}
                             </span>
                             {row.topGroup && (
@@ -256,31 +256,31 @@ export default function WorldcupPage() {
                           </span>
                         </span>
                         <span className="sm:hidden flex flex-col min-w-0">
-                          <span className="font-display text-xs uppercase tracking-wide truncate" style={{ color: '#e8e8e8' }}>
+                          <span className="font-display text-xs uppercase tracking-wide truncate" style={{ color: 'var(--t-text)' }}>
                             {countryName(row.countryCode)}
                           </span>
-                          <span className="text-[9px] tabular-nums" style={{ color: '#777' }}>
+                          <span className="text-[9px] tabular-nums" style={{ color: 'var(--t-dim)' }}>
                             {t('recordLine', { wins: row.wins, losses: row.losses })}
                           </span>
                         </span>
                         <span className="flex items-center justify-end gap-2">
-                          <span className="hidden sm:block h-1 w-12 overflow-hidden" style={{ backgroundColor: '#1c1a16' }}>
+                          <span className="hidden sm:block h-1 w-12 overflow-hidden" style={{ backgroundColor: 'var(--t-surface-2)' }}>
                             <motion.span
                               className="block h-full"
-                              style={{ backgroundColor: '#c4a35a' }}
+                              style={{ backgroundColor: 'var(--t-accent)' }}
                               initial={{ width: 0 }}
                               animate={{ width: `${Math.min(100, row.score)}%` }}
                               transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
                             />
                           </span>
-                          <span className="font-display text-sm sm:text-base tabular-nums" style={{ color: '#c4a35a' }}>
+                          <span className="font-display text-sm sm:text-base tabular-nums" style={{ color: 'var(--t-accent)' }}>
                             {row.score.toFixed(1)}
                           </span>
                         </span>
                         <span className="hidden sm:block text-right text-xs tabular-nums" style={{ color: row.winRate >= 50 ? '#8fbf8f' : '#c48f8f' }}>
                           {row.winRate.toFixed(1)}%
                         </span>
-                        <span className="hidden sm:block text-right text-xs tabular-nums" style={{ color: '#999' }}>
+                        <span className="hidden sm:block text-right text-xs tabular-nums" style={{ color: 'var(--t-muted)' }}>
                           {row.players}
                         </span>
                       </span>
@@ -296,19 +296,19 @@ export default function WorldcupPage() {
                           className="overflow-hidden"
                         >
                           <div className="px-4 sm:px-6 pb-4 pt-1">
-                            <div className="flex flex-wrap gap-x-6 gap-y-1.5 mb-2 text-[10px] uppercase tracking-widest" style={{ color: '#777' }}>
-                              <span className="sm:hidden">{t('colScore')}: <span className="tabular-nums" style={{ color: '#c4a35a' }}>{row.score.toFixed(1)}</span></span>
-                              <span>{t('detailGames')}: <span className="tabular-nums" style={{ color: '#c4a35a' }}>{row.games}</span></span>
-                              <span>{t('detailAvgElo')}: <span className="tabular-nums" style={{ color: '#c4a35a' }}>{row.avgElo}</span></span>
-                              <span>{t('detailBeatenElo')}: <span className="tabular-nums" style={{ color: '#c4a35a' }}>{row.avgOpponentElo}</span></span>
+                            <div className="flex flex-wrap gap-x-6 gap-y-1.5 mb-2 text-[10px] uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
+                              <span className="sm:hidden">{t('colScore')}: <span className="tabular-nums" style={{ color: 'var(--t-accent)' }}>{row.score.toFixed(1)}</span></span>
+                              <span>{t('detailGames')}: <span className="tabular-nums" style={{ color: 'var(--t-accent)' }}>{row.games}</span></span>
+                              <span>{t('detailAvgElo')}: <span className="tabular-nums" style={{ color: 'var(--t-accent)' }}>{row.avgElo}</span></span>
+                              <span>{t('detailBeatenElo')}: <span className="tabular-nums" style={{ color: 'var(--t-accent)' }}>{row.avgOpponentElo}</span></span>
                               <span className="sm:hidden">{t('colWinRate')}: <span className="tabular-nums" style={{ color: row.winRate >= 50 ? '#8fbf8f' : '#c48f8f' }}>{row.winRate.toFixed(1)}%</span></span>
                               {row.forfeitLosses > 0 && (
                                 <span>{t('detailForfeits')}: <span className="tabular-nums" style={{ color: '#c48f8f' }}>{row.forfeitLosses}</span></span>
                               )}
                               {row.topGroup && (
                                 <span>
-                                  {t('detailTopGroup')}: <span style={{ color: '#c4a35a' }}>{getCardGroup(row.topGroup, tCardMeta)}</span>
-                                  <span className="tabular-nums" style={{ color: '#666' }}> ({row.topGroupShare}%)</span>
+                                  {t('detailTopGroup')}: <span style={{ color: 'var(--t-accent)' }}>{getCardGroup(row.topGroup, tCardMeta)}</span>
+                                  <span className="tabular-nums" style={{ color: 'var(--t-dim)' }}> ({row.topGroupShare}%)</span>
                                 </span>
                               )}
                             </div>
@@ -318,14 +318,14 @@ export default function WorldcupPage() {
                                 { label: t('factStrength'), pct: row.breakdown.strengthFactor * 100 },
                                 { label: t('factActivity'), pct: row.breakdown.activityFactor * 100 },
                               ]).map((f) => (
-                                <span key={f.label} className="text-[9px] uppercase tracking-widest px-2 py-1" style={{ backgroundColor: 'rgba(196,163,90,0.08)', color: '#9a8a5f' }}>
-                                  {f.label} <span className="tabular-nums" style={{ color: '#c4a35a' }}>{Math.round(f.pct)}%</span>
+                                <span key={f.label} className="text-[9px] uppercase tracking-widest px-2 py-1" style={{ backgroundColor: 'var(--t-accent-tint)', color: '#9a8a5f' }}>
+                                  {f.label} <span className="tabular-nums" style={{ color: 'var(--t-accent)' }}>{Math.round(f.pct)}%</span>
                                 </span>
                               ))}
                             </div>
                             {row.hourly && row.hourly.some((h) => h > 0) && (
                               <div className="mb-3">
-                                <div className="text-[9px] uppercase tracking-[0.2em] mb-1" style={{ color: '#555' }}>
+                                <div className="text-[9px] uppercase tracking-[0.2em] mb-1" style={{ color: 'var(--t-dim)' }}>
                                   {t('activityTitle')}
                                 </div>
                                 <div className="flex items-end gap-0.5 h-8">
@@ -338,17 +338,17 @@ export default function WorldcupPage() {
                                         key={hr}
                                         title={`${hr}h UTC · ${h}`}
                                         className="flex-1"
-                                        style={{ height: `${Math.max(3, pct)}%`, backgroundColor: peak ? '#c4a35a' : 'rgba(196,163,90,0.3)' }}
+                                        style={{ height: `${Math.max(3, pct)}%`, backgroundColor: peak ? 'var(--t-accent)' : 'rgba(196,163,90,0.3)' }}
                                       />
                                     );
                                   })}
                                 </div>
-                                <div className="flex justify-between text-[8px] tabular-nums mt-0.5" style={{ color: '#555' }}>
+                                <div className="flex justify-between text-[8px] tabular-nums mt-0.5" style={{ color: 'var(--t-dim)' }}>
                                   <span>0h</span><span>6h</span><span>12h</span><span>18h</span><span>23h</span>
                                 </div>
                               </div>
                             )}
-                            <div className="text-[9px] uppercase tracking-[0.2em] mb-1.5" style={{ color: '#555' }}>
+                            <div className="text-[9px] uppercase tracking-[0.2em] mb-1.5" style={{ color: 'var(--t-dim)' }}>
                               {t('topPlayersTitle')}
                             </div>
                             <div className="flex flex-col gap-1">
@@ -358,18 +358,18 @@ export default function WorldcupPage() {
                                   className="flex items-center gap-3 px-3 py-1.5"
                                   style={{ backgroundColor: 'rgba(255, 255, 255, 0.025)' }}
                                 >
-                                  <span className="font-display text-xs tabular-nums w-5 text-center" style={{ color: '#666' }}>
+                                  <span className="font-display text-xs tabular-nums w-5 text-center" style={{ color: 'var(--t-dim)' }}>
                                     {pi + 1}
                                   </span>
                                   <PlayerNameLink
                                     username={p.username}
                                     className="text-xs font-medium truncate flex-1"
-                                    style={{ color: '#e0e0e0' }}
+                                    style={{ color: 'var(--t-text)' }}
                                   />
-                                  <span className="text-[10px] tabular-nums" style={{ color: '#999' }}>
+                                  <span className="text-[10px] tabular-nums" style={{ color: 'var(--t-muted)' }}>
                                     {t('recordLine', { wins: p.wins, losses: p.games - p.wins })}
                                   </span>
-                                  <span className="font-display text-xs tabular-nums" style={{ color: '#c4a35a' }}>
+                                  <span className="font-display text-xs tabular-nums" style={{ color: 'var(--t-accent)' }}>
                                     {p.elo}
                                   </span>
                                 </div>
@@ -384,7 +384,7 @@ export default function WorldcupPage() {
   };
 
   return (
-    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
+    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--t-bg)' }}>
       <CloudBackground />
       <div className="w-full max-w-5xl mx-auto relative z-10 flex-1 px-4 sm:px-8 py-6 sm:py-10">
 
@@ -397,7 +397,7 @@ export default function WorldcupPage() {
           <div className="flex items-end justify-between gap-3 flex-wrap">
             <h1
               className="font-display text-3xl sm:text-5xl tracking-wider uppercase leading-none"
-              style={{ color: '#f2efe7', letterSpacing: '0.08em', textShadow: '0 0 22px rgba(196, 163, 90, 0.18)' }}
+              style={{ color: 'var(--t-text)', letterSpacing: '0.08em', textShadow: '0 0 22px var(--t-accent-glow)' }}
             >
               {t('title')}
             </h1>
@@ -405,14 +405,14 @@ export default function WorldcupPage() {
               <LanguageSwitcher />
               <Link
                 href="/"
-                className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
-                style={{ color: '#888' }}
+                className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[var(--t-accent)]"
+                style={{ color: 'var(--t-muted)' }}
               >
                 {tc('back')}
               </Link>
             </div>
           </div>
-          <p className="text-[11px] mt-3" style={{ color: '#555' }}>
+          <p className="text-[11px] mt-3" style={{ color: 'var(--t-dim)' }}>
             {window === 'season' && seasonLabel ? t('subtitleSeason', { period: seasonLabel }) : t('subtitleWindow')}
           </p>
 
@@ -424,8 +424,8 @@ export default function WorldcupPage() {
                 onClick={() => setWindow(w)}
                 className="font-display px-3 py-1.5 text-[10px] uppercase tracking-widest cursor-pointer transition-colors"
                 style={{
-                  backgroundColor: window === w ? '#c4a35a' : 'rgba(255,255,255,0.03)',
-                  color: window === w ? '#0a0a0a' : '#888',
+                  backgroundColor: window === w ? 'var(--t-accent)' : 'rgba(255,255,255,0.03)',
+                  color: window === w ? 'var(--t-bg)' : 'var(--t-muted)',
                 }}
               >
                 {t(`window_${w}`)}
@@ -438,7 +438,7 @@ export default function WorldcupPage() {
           <div className="flex justify-center py-20">
             <motion.span
               className="font-display text-sm uppercase tracking-widest"
-              style={{ color: '#c4a35a' }}
+              style={{ color: 'var(--t-accent)' }}
               animate={{ opacity: [0.35, 1, 0.35] }}
               transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
             >
@@ -451,10 +451,10 @@ export default function WorldcupPage() {
             animate={{ opacity: 1 }}
             className="flex flex-col items-center gap-3 py-20 text-center"
           >
-            <span className="font-display text-base uppercase tracking-widest" style={{ color: '#c4a35a' }}>
+            <span className="font-display text-base uppercase tracking-widest" style={{ color: 'var(--t-accent)' }}>
               {t('emptyTitle')}
             </span>
-            <p className="text-xs max-w-md" style={{ color: '#777' }}>
+            <p className="text-xs max-w-md" style={{ color: 'var(--t-dim)' }}>
               {t('emptyText')}
             </p>
           </motion.div>
@@ -497,7 +497,7 @@ export default function WorldcupPage() {
 
             <div
               className="hidden sm:grid items-center gap-3 px-5 pb-2 text-[9px] uppercase tracking-[0.2em]"
-              style={{ color: '#555', gridTemplateColumns: '2.25rem 1fr 7rem 5rem 4rem' }}
+              style={{ color: 'var(--t-dim)', gridTemplateColumns: '2.25rem 1fr 7rem 5rem 4rem' }}
             >
               <span />
               <span>{t('colCountry')}</span>
@@ -532,7 +532,7 @@ export default function WorldcupPage() {
               className="mt-8 px-5 py-5"
               style={{ backgroundColor: 'rgba(17, 17, 17, 0.7)', clipPath: ROW_CLIP }}
             >
-              <div className="text-[10px] uppercase tracking-[0.25em] mb-4" style={{ color: '#c4a35a' }}>
+              <div className="text-[10px] uppercase tracking-[0.25em] mb-4" style={{ color: 'var(--t-accent)' }}>
                 {t('rewardsTitle')}
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-6">
@@ -549,12 +549,12 @@ export default function WorldcupPage() {
                   <div className="font-display text-base uppercase tracking-wide" style={{ color: '#e8c877' }}>
                     {t('rewardChampionCardTitle')}
                   </div>
-                  <p className="text-[12px] leading-relaxed" style={{ color: '#bbb' }}>
+                  <p className="text-[12px] leading-relaxed" style={{ color: 'var(--t-muted)' }}>
                     {t('rewardChampionCardDesc')}
                   </p>
                   <div className="flex flex-col gap-2 mt-1">
                     {[t('rewardChampion'), t('rewardPodium'), t('rewardParticipation')].map((line, i) => (
-                      <div key={i} className="text-[11px] leading-relaxed" style={{ color: '#999' }}>{line}</div>
+                      <div key={i} className="text-[11px] leading-relaxed" style={{ color: 'var(--t-muted)' }}>{line}</div>
                     ))}
                   </div>
                 </div>
@@ -568,7 +568,7 @@ export default function WorldcupPage() {
               className="mt-8 px-5 py-4"
               style={{ backgroundColor: 'rgba(17, 17, 17, 0.7)', clipPath: ROW_CLIP }}
             >
-              <div className="text-[10px] uppercase tracking-[0.25em] mb-3" style={{ color: '#c4a35a' }}>
+              <div className="text-[10px] uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--t-accent)' }}>
                 {t('rulesTitle')}
               </div>
               <ol className="flex flex-col gap-2">
@@ -580,8 +580,8 @@ export default function WorldcupPage() {
                   t('rule5', { team: TEAM_SIZE }),
                   t('rule6'),
                 ]).map((rule, i) => (
-                  <li key={i} className="flex gap-2.5 text-[11px] leading-relaxed" style={{ color: '#999' }}>
-                    <span className="font-display shrink-0 tabular-nums" style={{ color: '#c4a35a' }}>{i + 1}.</span>
+                  <li key={i} className="flex gap-2.5 text-[11px] leading-relaxed" style={{ color: 'var(--t-muted)' }}>
+                    <span className="font-display shrink-0 tabular-nums" style={{ color: 'var(--t-accent)' }}>{i + 1}.</span>
                     <span>{rule}</span>
                   </li>
                 ))}

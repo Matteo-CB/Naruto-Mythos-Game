@@ -16,11 +16,11 @@ const DISCORD_BLUE = '#5865F2';
 
 function ServerLogo({ src, name, size }: { src: string; name: string; size: number }) {
   const [failed, setFailed] = useState(false);
-  const style = { width: size, height: size, backgroundColor: '#1a1a1f' };
+  const style = { width: size, height: size, backgroundColor: 'var(--t-surface-2)' };
   if (failed || !src) {
     return (
       <span className="inline-flex shrink-0 items-center justify-center" style={style}>
-        <span className="font-display font-black uppercase" style={{ color: '#c4a35a', fontSize: size * 0.4 }}>{name.charAt(0)}</span>
+        <span className="font-display font-black uppercase" style={{ color: 'var(--t-accent)', fontSize: size * 0.4 }}>{name.charAt(0)}</span>
       </span>
     );
   }
@@ -53,7 +53,7 @@ function ServerCard({ server, joinLabel, index, onOpen }: { server: DiscordServe
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.05 * index }}
       className="group flex items-center gap-3 p-4 transition-transform"
-      style={{ backgroundColor: '#101014', clipPath: PANEL_CLIP, boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}
+      style={{ backgroundColor: 'var(--t-surface-2)', clipPath: PANEL_CLIP, boxShadow: '0 12px 32px var(--t-shadow)' }}
       onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'; }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
     >
@@ -65,8 +65,8 @@ function ServerCard({ server, joinLabel, index, onOpen }: { server: DiscordServe
       >
         <ServerLogo src={server.logo} name={server.name} size={56} />
         <span className="min-w-0 flex-1">
-          <span className="font-display block truncate text-sm font-bold uppercase tracking-wide" style={{ color: '#e8e6df' }}>{server.name}</span>
-          <span className="mt-1 block truncate text-xs leading-relaxed" style={{ color: '#8a8a90' }}>{server.description || ' '}</span>
+          <span className="font-display block truncate text-sm font-bold uppercase tracking-wide" style={{ color: 'var(--t-text)' }}>{server.name}</span>
+          <span className="mt-1 block truncate text-xs leading-relaxed" style={{ color: 'var(--t-muted)' }}>{server.description || ' '}</span>
         </span>
       </button>
       <JoinButton
@@ -102,14 +102,14 @@ function ServerModal({ server, joinLabel, closeLabel, onClose }: { server: Disco
             initial={{ opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: 0.98 }} transition={{ duration: 0.18, ease: 'easeOut' }}
             onClick={(e) => e.stopPropagation()}
             className="relative flex max-h-[85vh] w-full max-w-md flex-col items-center overflow-y-auto p-6 pt-10 text-center"
-            style={{ backgroundColor: '#111111', boxShadow: '0 24px 70px rgba(0,0,0,0.6)' }}
+            style={{ backgroundColor: 'var(--t-panel)', boxShadow: '0 24px 70px var(--t-shadow)' }}
           >
-            <button type="button" onClick={onClose} aria-label={closeLabel} className="absolute right-3 top-3 px-2 py-1 text-[11px] font-bold uppercase tracking-widest" style={{ color: '#888' }}>
+            <button type="button" onClick={onClose} aria-label={closeLabel} className="absolute right-3 top-3 px-2 py-1 text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
               {closeLabel}
             </button>
 
             <ServerLogo src={server.logo} name={server.name} size={88} />
-            <h2 className="mt-4 wrap-break-word text-xl font-black uppercase tracking-wider" style={{ color: '#e8e6df' }}>{server.name}</h2>
+            <h2 className="mt-4 wrap-break-word text-xl font-black uppercase tracking-wider" style={{ color: 'var(--t-text)' }}>{server.name}</h2>
             {server.description && (
               <p className="mt-3 max-w-sm wrap-break-word text-sm leading-relaxed" style={{ color: '#9a9a9f' }}>{server.description}</p>
             )}
@@ -136,12 +136,12 @@ export function SocialClient() {
   useEffect(() => { setMounted(true); }, []);
 
   return (
-    <main id="main-content" className="relative flex min-h-screen flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
+    <main id="main-content" className="relative flex min-h-screen flex-col overflow-hidden" style={{ backgroundColor: 'var(--t-bg)' }}>
       <CloudBackground />
 
       <div className="relative z-10 mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-8 sm:py-10">
         <div className="mb-6 flex items-center justify-between gap-3">
-          <Link href="/" className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]" style={{ color: '#888' }}>
+          <Link href="/" className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[var(--t-accent)]" style={{ color: 'var(--t-muted)' }}>
             {tc('back')}
           </Link>
           <LanguageSwitcher />
@@ -153,7 +153,7 @@ export function SocialClient() {
           transition={{ duration: 0.45, ease: 'easeOut' }}
           className="mb-7"
         >
-          <h1 className="font-display text-3xl uppercase tracking-wider sm:text-5xl" style={{ color: '#f2efe7', letterSpacing: '0.06em', textShadow: '0 0 22px rgba(196,163,90,0.18)' }}>
+          <h1 className="font-display text-3xl uppercase tracking-wider sm:text-5xl" style={{ color: 'var(--t-text)', letterSpacing: '0.06em', textShadow: '0 0 22px var(--t-accent-glow)' }}>
             {t('title')}
           </h1>
           <p className="mt-2 text-sm" style={{ color: '#7a7a80' }}>{t('subtitle')}</p>
@@ -168,18 +168,18 @@ export function SocialClient() {
           <Link
             href="/feed"
             className="group relative block overflow-hidden p-5 sm:p-6 transition-transform"
-            style={{ backgroundColor: '#100f14', clipPath: PANEL_CLIP, boxShadow: '0 14px 40px rgba(0,0,0,0.45)' }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 18px 48px rgba(0,0,0,0.5), 0 0 26px rgba(196,163,90,0.12)'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 14px 40px rgba(0,0,0,0.45)'; }}
+            style={{ backgroundColor: 'var(--t-surface-2)', clipPath: PANEL_CLIP, boxShadow: '0 14px 40px var(--t-shadow)' }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 18px 48px var(--t-shadow), 0 0 26px var(--t-accent-glow)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 14px 40px var(--t-shadow)'; }}
           >
             <div className="flex items-end justify-between gap-4">
               <div className="min-w-0">
-                <p className="font-display text-lg font-black uppercase tracking-wider sm:text-2xl" style={{ color: '#c4a35a' }}>{t('feedTitle')}</p>
+                <p className="font-display text-lg font-black uppercase tracking-wider sm:text-2xl" style={{ color: 'var(--t-accent)' }}>{t('feedTitle')}</p>
                 <p className="mt-2 max-w-md text-xs leading-relaxed sm:text-sm" style={{ color: '#9a9a9f' }}>{t('feedDescription')}</p>
               </div>
               <span
-                className="font-display shrink-0 px-4 py-2 text-[11px] font-bold uppercase tracking-widest transition-colors group-hover:text-[#ffd966] sm:text-xs"
-                style={{ color: '#c4a35a', backgroundColor: 'rgba(196,163,90,0.12)' }}
+                className="font-display shrink-0 px-4 py-2 text-[11px] font-bold uppercase tracking-widest transition-colors group-hover:text-[var(--t-accent-bright)] sm:text-xs"
+                style={{ color: 'var(--t-accent)', backgroundColor: 'var(--t-accent-glow)' }}
               >
                 {t('feedCta')}
               </span>
@@ -193,13 +193,13 @@ export function SocialClient() {
           transition={{ duration: 0.4, delay: 0.2 }}
         >
           <div className="mb-4">
-            <h2 className="font-display text-lg font-black uppercase tracking-wider" style={{ color: '#e8e6df' }}>{t('discordTitle')}</h2>
+            <h2 className="font-display text-lg font-black uppercase tracking-wider" style={{ color: 'var(--t-text)' }}>{t('discordTitle')}</h2>
             <p className="mt-1 text-xs" style={{ color: '#6f6f75' }}>{t('discordSubtitle')}</p>
           </div>
 
           {DISCORD_SERVERS.length === 0 ? (
-            <div className="flex flex-col items-center justify-center px-4 py-12 text-center" style={{ backgroundColor: '#0c0b0f', clipPath: PANEL_CLIP }}>
-              <p className="font-display text-sm font-bold uppercase tracking-widest" style={{ color: '#8a8a90' }}>{t('emptyTitle')}</p>
+            <div className="flex flex-col items-center justify-center px-4 py-12 text-center" style={{ backgroundColor: 'var(--t-surface-2)', clipPath: PANEL_CLIP }}>
+              <p className="font-display text-sm font-bold uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>{t('emptyTitle')}</p>
               <p className="mt-2 max-w-sm text-xs leading-relaxed" style={{ color: '#5a5a60' }}>{t('emptyText')}</p>
             </div>
           ) : (

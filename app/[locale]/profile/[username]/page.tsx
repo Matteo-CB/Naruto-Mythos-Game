@@ -39,7 +39,7 @@ function ProfileModeSwitch({ value, onChange }: { value: ProfileStatsMode; onCha
   return (
     <div
       className="relative inline-flex items-center flex-wrap"
-      style={{ backgroundColor: 'rgba(8, 8, 14, 0.6)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.05)' }}
+      style={{ backgroundColor: 'rgba(8, 8, 14, 0.6)', boxShadow: 'inset 0 0 0 1px var(--t-divider)' }}
     >
       {PROFILE_MODES.map((mode) => {
         const active = value === mode;
@@ -51,7 +51,7 @@ function ProfileModeSwitch({ value, onChange }: { value: ProfileStatsMode; onCha
             className="relative px-2.5 py-1.5 font-bold uppercase text-[9px] cursor-pointer no-select"
             style={{
               letterSpacing: '0.14em',
-              color: active ? '#e8e8e8' : '#5a5a5a',
+              color: active ? 'var(--t-text)' : '#5a5a5a',
               transition: 'color 0.2s',
               background: 'transparent',
               minHeight: 32,
@@ -62,8 +62,8 @@ function ProfileModeSwitch({ value, onChange }: { value: ProfileStatsMode; onCha
                 layoutId="profile-mode-pill"
                 className="absolute inset-0"
                 style={{
-                  backgroundColor: 'rgba(196, 163, 90, 0.18)',
-                  boxShadow: 'inset 0 -2px 0 #c4a35a',
+                  backgroundColor: 'var(--t-accent-glow)',
+                  boxShadow: 'inset 0 -2px 0 var(--t-accent)',
                   pointerEvents: 'none',
                 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 30 }}
@@ -157,7 +157,7 @@ function StatPanel({ label, value, color, delay }: { label: string; value: strin
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay, ease: 'easeOut' }}
       className="flex flex-col items-center justify-center py-5"
-      style={{ backgroundColor: '#0d0c10', clipPath: STAT_CLIP }}
+      style={{ backgroundColor: 'var(--t-bg)', clipPath: STAT_CLIP }}
     >
       <span
         className="font-display text-2xl sm:text-3xl tabular-nums leading-none"
@@ -165,7 +165,7 @@ function StatPanel({ label, value, color, delay }: { label: string; value: strin
       >
         {value}
       </span>
-      <span className="text-[10px] uppercase tracking-widest mt-2" style={{ color: '#555' }}>
+      <span className="text-[10px] uppercase tracking-widest mt-2" style={{ color: 'var(--t-dim)' }}>
         {label}
       </span>
     </motion.div>
@@ -199,7 +199,7 @@ function GameRow({
     ? (isPlayer1 ? game.eloChange : -game.eloChange)
     : null;
 
-  const resultColor = isDraw ? '#888888' : won ? '#5fb05f' : '#d97676';
+  const resultColor = isDraw ? 'var(--t-muted)' : won ? 'var(--t-success)' : 'var(--t-danger)';
   const resultLabel = isDraw ? 'D' : won ? 'W' : 'L';
   const altBg = index % 2 === 0 ? '#0c0b10' : '#0a0a0d';
 
@@ -223,17 +223,17 @@ function GameRow({
         username={opponent}
         disabled={game.isAiGame}
         className="font-display text-sm truncate flex-1 min-w-0"
-        style={{ color: '#e8e6df' }}
+        style={{ color: 'var(--t-text)' }}
       />
 
-      <span className="font-inter-force text-xs tabular-nums shrink-0" style={{ color: '#777' }}>
+      <span className="font-inter-force text-xs tabular-nums shrink-0" style={{ color: 'var(--t-dim)' }}>
         {myScore}-{oppScore}
       </span>
 
       {eloVal !== null && eloVal !== 0 && (
         <span
           className="font-inter-force text-[10px] tabular-nums shrink-0 w-9 text-right"
-          style={{ color: eloVal > 0 ? '#5fb05f' : '#d97676' }}
+          style={{ color: eloVal > 0 ? 'var(--t-success)' : 'var(--t-danger)' }}
         >
           {eloVal > 0 ? '+' : ''}{eloVal}
         </span>
@@ -242,15 +242,15 @@ function GameRow({
       {game.hasReplay && (
         <Link
           href={`/replay/${game.id}` as '/'}
-          className="font-display text-[10px] px-2 py-0.5 uppercase tracking-widest shrink-0 transition-colors hover:text-[#c4a35a]"
-          style={{ color: '#5fb05f' }}
+          className="font-display text-[10px] px-2 py-0.5 uppercase tracking-widest shrink-0 transition-colors hover:text-[var(--t-accent)]"
+          style={{ color: 'var(--t-success)' }}
         >
           {t('replay')}
         </Link>
       )}
 
       {game.completedAt && (
-        <span className="font-inter-force text-[10px] shrink-0 hidden sm:block" style={{ color: '#444' }}>
+        <span className="font-inter-force text-[10px] shrink-0 hidden sm:block" style={{ color: 'var(--t-muted)' }}>
           {new Date(game.completedAt).toLocaleDateString(locale)}
         </span>
       )}
@@ -372,18 +372,18 @@ export default function ProfilePage({
   const displayedTier = eloMode === 'evolving' ? evoTier : tier;
   const displayedPlaced = eloMode === 'evolving' ? evoPlaced : placed;
   const eloCount = useCountUp(displayedElo, 900);
-  const accentColor = leaguesEnabled && displayedPlaced && displayedTier ? displayedTier.color : '#c4a35a';
+  const accentColor = leaguesEnabled && displayedPlaced && displayedTier ? displayedTier.color : 'var(--t-accent)';
 
   if (loading) {
     return (
-      <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#08070a' }}>
+      <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: 'var(--t-bg)' }}>
         <CloudBackground />
         <div className="w-full max-w-4xl mx-auto relative z-10 flex-1 px-4 sm:px-8 py-6 sm:py-10">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: [0.18, 0.45, 0.18] }}
             transition={{ duration: 1.4, repeat: Infinity }}
-            style={{ height: 200, backgroundColor: '#0d0c10', clipPath: PANEL_CLIP, marginBottom: 24 }}
+            style={{ height: 200, backgroundColor: 'var(--t-bg)', clipPath: PANEL_CLIP, marginBottom: 24 }}
           />
         </div>
         <Footer />
@@ -393,9 +393,9 @@ export default function ProfilePage({
 
   if (error || !profile) {
     return (
-      <main className="min-h-screen relative flex flex-col items-center justify-center gap-4" style={{ backgroundColor: '#08070a' }}>
-        <p className="font-display uppercase tracking-widest" style={{ color: '#d97676' }}>{error}</p>
-        <Link href="/" className="font-display text-xs uppercase tracking-widest" style={{ color: '#888' }}>
+      <main className="min-h-screen relative flex flex-col items-center justify-center gap-4" style={{ backgroundColor: 'var(--t-bg)' }}>
+        <p className="font-display uppercase tracking-widest" style={{ color: 'var(--t-danger)' }}>{error}</p>
+        <Link href="/" className="font-display text-xs uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
           {tc('back')}
         </Link>
       </main>
@@ -403,7 +403,7 @@ export default function ProfilePage({
   }
 
   return (
-    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: '#08070a' }}>
+    <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--t-bg)' }}>
       <CloudBackground />
 
       <div className="w-full max-w-4xl mx-auto relative z-10 flex-1 px-4 sm:px-8 py-6 sm:py-10">
@@ -426,8 +426,8 @@ export default function ProfilePage({
           <LanguageSwitcher />
           <Link
             href="/leaderboard"
-            className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
-            style={{ color: '#888' }}
+            className="font-display px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[var(--t-accent)]"
+            style={{ color: 'var(--t-muted)' }}
           >
             {tc('back')}
           </Link>
@@ -439,7 +439,7 @@ export default function ProfilePage({
           transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
           className="holo-menu-foil relative flex flex-col sm:flex-row items-center sm:items-stretch overflow-hidden mb-6"
           style={{
-            backgroundColor: '#0d0c10',
+            backgroundColor: 'var(--t-bg)',
             clipPath: PANEL_CLIP,
             minHeight: 200,
             ['--foil' as string]: accentColor,
@@ -456,14 +456,14 @@ export default function ProfilePage({
                 priority
               />
             ) : (
-              <div className="font-display text-5xl sm:text-6xl tabular-nums leading-none" style={{ color: '#3a3a3a' }}>
+              <div className="font-display text-5xl sm:text-6xl tabular-nums leading-none" style={{ color: 'var(--t-muted)' }}>
                 ?
               </div>
             )}
           </div>
 
           <div className="relative z-10 flex flex-col justify-center items-center sm:items-start px-6 sm:px-4 pb-7 sm:py-8 pr-6 sm:pr-10 sm:w-[66%] gap-1.5 text-center sm:text-left">
-            <span className="font-display text-[10px] uppercase tracking-[0.4em]" style={{ color: '#555' }}>
+            <span className="font-display text-[10px] uppercase tracking-[0.4em]" style={{ color: 'var(--t-dim)' }}>
               {t('rank')}
             </span>
 
@@ -482,13 +482,13 @@ export default function ProfilePage({
                   : '...'}
             </div>
 
-            <div className="h-px w-12 sm:w-16 my-1.5" style={{ backgroundColor: '#1e1e1e' }} />
+            <div className="h-px w-12 sm:w-16 my-1.5" style={{ backgroundColor: 'var(--t-surface-2)' }} />
 
             <div className="flex items-center gap-2 max-w-full">
               <CountryFlag code={profile.countryCode} size={26} />
               <h1
                 className="font-display text-lg sm:text-2xl leading-tight wrap-break-word"
-                style={{ color: '#e8e6df', letterSpacing: '0.04em', wordBreak: 'break-word' }}
+                style={{ color: 'var(--t-text)', letterSpacing: '0.04em', wordBreak: 'break-word' }}
               >
                 {profile.username}
               </h1>
@@ -512,12 +512,12 @@ export default function ProfilePage({
               >
                 {eloCount}
               </div>
-              <span className="font-display text-[10px] uppercase tracking-[0.32em]" style={{ color: '#666' }}>
+              <span className="font-display text-[10px] uppercase tracking-[0.32em]" style={{ color: 'var(--t-dim)' }}>
                 ELO
               </span>
             </div>
 
-            <p className="text-[11px] mt-2" style={{ color: '#555' }}>
+            <p className="text-[11px] mt-2" style={{ color: 'var(--t-dim)' }}>
               {t('memberSince', { date: new Date(profile.createdAt).toLocaleDateString(locale) })}
             </p>
 
@@ -541,8 +541,8 @@ export default function ProfilePage({
                       setUnlinking(false);
                     }}
                     disabled={unlinking}
-                    className="font-display text-[10px] uppercase tracking-widest transition-colors hover:text-[#c4a35a] cursor-pointer"
-                    style={{ color: '#666', opacity: unlinking ? 0.5 : 1 }}
+                    className="font-display text-[10px] uppercase tracking-widest transition-colors hover:text-[var(--t-accent)] cursor-pointer"
+                    style={{ color: 'var(--t-dim)', opacity: unlinking ? 0.5 : 1 }}
                   >
                     {td('unlinkDiscord')}
                   </button>
@@ -553,7 +553,7 @@ export default function ProfilePage({
             {!profile.discordUsername && isOwner && (
               <a
                 href="/api/user/link-discord"
-                className="font-display inline-flex items-center gap-2 px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[#c4a35a]"
+                className="font-display inline-flex items-center gap-2 px-3 py-1.5 text-[11px] uppercase tracking-widest transition-colors hover:text-[var(--t-accent)]"
                 style={{ color: '#5865F2' }}
               >
                 <svg width="14" height="11" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -566,7 +566,7 @@ export default function ProfilePage({
         </motion.div>
 
         <div className="flex items-center justify-between gap-3 mb-3">
-          <span className="font-display text-[11px] uppercase" style={{ color: '#666', letterSpacing: '0.28em' }}>
+          <span className="font-display text-[11px] uppercase" style={{ color: 'var(--t-dim)', letterSpacing: '0.28em' }}>
             {t('statsTitle')}
           </span>
           <ProfileModeSwitch value={profileMode} onChange={setProfileMode} />
@@ -579,12 +579,12 @@ export default function ProfilePage({
           transition={{ duration: 0.18 }}
           className="grid grid-cols-3 gap-2 mb-7"
         >
-          <StatPanel label={t('statsWins')} value={displayedWins} color="#5fb05f" delay={0.05} />
-          <StatPanel label={t('statsLosses')} value={displayedLosses} color="#d97676" delay={0.1} />
+          <StatPanel label={t('statsWins')} value={displayedWins} color="var(--t-success)" delay={0.05} />
+          <StatPanel label={t('statsLosses')} value={displayedLosses} color="var(--t-danger)" delay={0.1} />
           <StatPanel
             label={t('statsWinrate')}
             value={`${winRate}%`}
-            color={winRate >= 60 ? '#5fb05f' : winRate >= 40 ? '#c4a35a' : '#d97676'}
+            color={winRate >= 60 ? 'var(--t-success)' : winRate >= 40 ? 'var(--t-accent)' : 'var(--t-danger)'}
             delay={0.2}
           />
         </motion.div>
@@ -597,7 +597,7 @@ export default function ProfilePage({
             className="mb-7 -mt-4 flex flex-col gap-1.5"
           >
             {sealedEntries.length === 0 ? (
-              <p className="font-display text-xs py-3 text-center uppercase tracking-widest" style={{ color: '#444' }}>
+              <p className="font-display text-xs py-3 text-center uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
                 {t('sealedNoGames')}
               </p>
             ) : (
@@ -609,16 +609,16 @@ export default function ProfilePage({
                   <div
                     key={modeKey}
                     className="px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap"
-                    style={{ backgroundColor: '#0d0c10', clipPath: STAT_CLIP }}
+                    style={{ backgroundColor: 'var(--t-bg)', clipPath: STAT_CLIP }}
                   >
-                    <span className="font-display text-sm truncate" style={{ color: '#e8e6df' }}>{label}</span>
+                    <span className="font-display text-sm truncate" style={{ color: 'var(--t-text)' }}>{label}</span>
                     <div className="flex items-center gap-4 shrink-0">
-                      <span className="font-inter-force text-[11px] tabular-nums" style={{ color: '#888' }}>
+                      <span className="font-inter-force text-[11px] tabular-nums" style={{ color: 'var(--t-muted)' }}>
                         {t('sealedGamesCount', { count: v.games })}
                       </span>
-                      <span className="font-display text-sm tabular-nums" style={{ color: '#5fb05f' }}>{v.wins}</span>
-                      <span className="font-display text-sm tabular-nums" style={{ color: '#d97676' }}>{v.losses}</span>
-                      <span className="font-display text-sm tabular-nums w-11 text-right" style={{ color: rate >= 60 ? '#5fb05f' : rate >= 40 ? '#c4a35a' : '#d97676' }}>
+                      <span className="font-display text-sm tabular-nums" style={{ color: 'var(--t-success)' }}>{v.wins}</span>
+                      <span className="font-display text-sm tabular-nums" style={{ color: 'var(--t-danger)' }}>{v.losses}</span>
+                      <span className="font-display text-sm tabular-nums w-11 text-right" style={{ color: rate >= 60 ? 'var(--t-success)' : rate >= 40 ? 'var(--t-accent)' : 'var(--t-danger)' }}>
                         {rate}%
                       </span>
                     </div>
@@ -635,12 +635,12 @@ export default function ProfilePage({
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25, duration: 0.4 }}
             className="p-4 mb-6"
-            style={{ backgroundColor: '#0d0c10', clipPath: STAT_CLIP }}
+            style={{ backgroundColor: 'var(--t-bg)', clipPath: STAT_CLIP }}
           >
-            <p className="font-display text-[11px] uppercase tracking-widest mb-1" style={{ color: '#888' }}>
+            <p className="font-display text-[11px] uppercase tracking-widest mb-1" style={{ color: 'var(--t-muted)' }}>
               {tb('badgePrefs')}
             </p>
-            <p className="text-[10px] mb-3" style={{ color: '#555' }}>
+            <p className="text-[10px] mb-3" style={{ color: 'var(--t-dim)' }}>
               {tb('badgePrefsDesc')}
             </p>
             <div className="flex flex-wrap gap-4">
@@ -663,7 +663,7 @@ export default function ProfilePage({
                     }}
                     className="accent-amber-500"
                   />
-                  <span className="font-display text-xs" style={{ color: '#e0e0e0' }}>{tb('showAdmin')}</span>
+                  <span className="font-display text-xs" style={{ color: 'var(--t-text)' }}>{tb('showAdmin')}</span>
                 </label>
               )}
               {leaguesEnabled && (
@@ -685,7 +685,7 @@ export default function ProfilePage({
                     }}
                     className="accent-green-500"
                   />
-                  <span className="font-display text-xs" style={{ color: '#e0e0e0' }}>{tb('showLeague')}</span>
+                  <span className="font-display text-xs" style={{ color: 'var(--t-text)' }}>{tb('showLeague')}</span>
                 </label>
               )}
             </div>
@@ -695,10 +695,10 @@ export default function ProfilePage({
         {(typeof profile.followerCount === 'number' || typeof profile.followingCount === 'number') && (
           <div className="flex items-center gap-5 mb-6 px-1">
             <span className="text-sm" style={{ color: '#9a9a9f' }}>
-              <span className="font-display tabular-nums" style={{ color: '#e8e6df' }}>{profile.followerCount ?? 0}</span> <span className="text-[11px] uppercase tracking-wider" style={{ color: '#6a6a70' }}>{tSocial('followers')}</span>
+              <span className="font-display tabular-nums" style={{ color: 'var(--t-text)' }}>{profile.followerCount ?? 0}</span> <span className="text-[11px] uppercase tracking-wider" style={{ color: '#6a6a70' }}>{tSocial('followers')}</span>
             </span>
             <span className="text-sm" style={{ color: '#9a9a9f' }}>
-              <span className="font-display tabular-nums" style={{ color: '#e8e6df' }}>{profile.followingCount ?? 0}</span> <span className="text-[11px] uppercase tracking-wider" style={{ color: '#6a6a70' }}>{tSocial('followingLabel')}</span>
+              <span className="font-display tabular-nums" style={{ color: 'var(--t-text)' }}>{profile.followingCount ?? 0}</span> <span className="text-[11px] uppercase tracking-wider" style={{ color: '#6a6a70' }}>{tSocial('followingLabel')}</span>
             </span>
           </div>
         )}
@@ -728,10 +728,10 @@ export default function ProfilePage({
                     onClick={canView ? openViewer : undefined}
                     onKeyDown={canView ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openViewer(); } } : undefined}
                     className="px-4 py-3 flex items-center justify-between transition-colors"
-                    style={{ backgroundColor: '#0d0c10', clipPath: STAT_CLIP, cursor: canView ? 'pointer' : 'default' }}
+                    style={{ backgroundColor: 'var(--t-bg)', clipPath: STAT_CLIP, cursor: canView ? 'pointer' : 'default' }}
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="font-display text-sm truncate" style={{ color: '#e8e6df' }}>
+                      <span className="font-display text-sm truncate" style={{ color: 'var(--t-text)' }}>
                         {deck.name}
                       </span>
                       {deck.evolvingCompatible === true && typeof deck.evolvingPoints === 'number' && (
@@ -740,11 +740,11 @@ export default function ProfilePage({
                     </div>
                     <div className="flex items-center gap-3 shrink-0 ml-3">
                       {canView && (
-                        <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: '#c4a35a' }}>
+                        <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: 'var(--t-accent)' }}>
                           {t('viewDeck')}
                         </span>
                       )}
-                      <span className="font-inter-force text-[10px]" style={{ color: '#555' }}>
+                      <span className="font-inter-force text-[10px]" style={{ color: 'var(--t-dim)' }}>
                         {new Date(deck.createdAt).toLocaleDateString(locale)}
                       </span>
                     </div>
@@ -764,23 +764,23 @@ export default function ProfilePage({
             <SectionTitle label={t('evolvingTitle')} />
             <div
               className="flex flex-col sm:flex-row items-stretch overflow-hidden"
-              style={{ backgroundColor: '#0d0c10', clipPath: STAT_CLIP }}
+              style={{ backgroundColor: 'var(--t-bg)', clipPath: STAT_CLIP }}
             >
               <div className="flex flex-col items-center justify-center px-6 py-5 sm:py-6 sm:w-[44%]" style={{ borderBottom: '1px solid #1a1a1d' }}>
-                <span className="font-display text-[10px] uppercase tracking-[0.32em] mb-1" style={{ color: '#666' }}>
+                <span className="font-display text-[10px] uppercase tracking-[0.32em] mb-1" style={{ color: 'var(--t-dim)' }}>
                   {t('evolvingElo')}
                 </span>
                 <div className="flex items-baseline gap-2">
-                  <span className="font-display text-3xl sm:text-4xl tabular-nums" style={{ color: '#c4a35a', letterSpacing: '-0.01em' }}>
+                  <span className="font-display text-3xl sm:text-4xl tabular-nums" style={{ color: 'var(--t-accent)', letterSpacing: '-0.01em' }}>
                     {profile.evolvingElo ?? 500}
                   </span>
-                  <span className="font-display text-[10px] uppercase tracking-[0.28em]" style={{ color: '#666' }}>
+                  <span className="font-display text-[10px] uppercase tracking-[0.28em]" style={{ color: 'var(--t-dim)' }}>
                     ELO
                   </span>
                 </div>
               </div>
               <div className="flex-1 flex flex-col justify-center px-6 py-5 sm:py-6 gap-2">
-                <span className="font-display text-[10px] uppercase tracking-[0.32em]" style={{ color: '#666' }}>
+                <span className="font-display text-[10px] uppercase tracking-[0.32em]" style={{ color: 'var(--t-dim)' }}>
                   {t('evolvingMatches')}
                 </span>
                 <div className="flex items-center gap-3 sm:gap-4">
@@ -788,21 +788,21 @@ export default function ProfilePage({
                     <span className="font-display text-xl tabular-nums" style={{ color: '#4a9e4a' }}>
                       {profile.evolvingWins ?? 0}
                     </span>
-                    <span className="text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>{t('wins')}</span>
+                    <span className="text-[9px] uppercase tracking-wider" style={{ color: 'var(--t-dim)' }}>{t('wins')}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-display text-xl tabular-nums" style={{ color: '#b33e3e' }}>
+                    <span className="font-display text-xl tabular-nums" style={{ color: 'var(--t-danger)' }}>
                       {profile.evolvingLosses ?? 0}
                     </span>
-                    <span className="text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>{t('losses')}</span>
+                    <span className="text-[9px] uppercase tracking-wider" style={{ color: 'var(--t-dim)' }}>{t('losses')}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-display text-xl tabular-nums" style={{ color: '#888' }}>
+                    <span className="font-display text-xl tabular-nums" style={{ color: 'var(--t-muted)' }}>
                       {((profile.evolvingWins ?? 0) + (profile.evolvingLosses ?? 0)) > 0
                         ? Math.round(((profile.evolvingWins ?? 0) / ((profile.evolvingWins ?? 0) + (profile.evolvingLosses ?? 0))) * 100)
                         : 0}%
                     </span>
-                    <span className="text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>{t('winRate')}</span>
+                    <span className="text-[9px] uppercase tracking-wider" style={{ color: 'var(--t-dim)' }}>{t('winRate')}</span>
                   </div>
                 </div>
               </div>
@@ -820,7 +820,7 @@ export default function ProfilePage({
           <SectionTitle label={t('recentGames')} count={profile.totalGames} />
 
           {profile.recentGames.length === 0 ? (
-            <p className="font-display text-sm py-8 text-center uppercase tracking-widest" style={{ color: '#444' }}>
+            <p className="font-display text-sm py-8 text-center uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
               {t('noGames')}
             </p>
           ) : (
@@ -848,9 +848,9 @@ export default function ProfilePage({
               <button
                 onClick={() => fetchProfile(currentPage + 1, true)}
                 disabled={loadingMore}
-                className="font-display px-6 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[#c4a35a] disabled:opacity-30"
+                className="font-display px-6 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[var(--t-accent)] disabled:opacity-30"
                 style={{
-                  color: '#888',
+                  color: 'var(--t-muted)',
                   backgroundColor: 'rgba(255, 255, 255, 0.03)',
                   borderRadius: 9999,
                 }}
@@ -881,11 +881,11 @@ export default function ProfilePage({
 function SectionTitle({ label, count }: { label: string; count?: number }) {
   return (
     <div className="flex items-center gap-3 mb-4">
-      <h2 className="font-display text-[11px] uppercase tracking-widest" style={{ color: '#666' }}>
+      <h2 className="font-display text-[11px] uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
         {label}
       </h2>
       {typeof count === 'number' && (
-        <span className="font-display text-[11px] tabular-nums" style={{ color: '#c4a35a' }}>
+        <span className="font-display text-[11px] tabular-nums" style={{ color: 'var(--t-accent)' }}>
           {count}
         </span>
       )}

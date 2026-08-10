@@ -37,12 +37,12 @@ export function FriendRequestsList() {
               >
                 <PillButton
                   onClick={() => acceptFriendRequest(request.friendshipId)}
-                  color="#5fb05f"
+                  color="var(--t-success)"
                   label={t('requests.accept')}
                 />
                 <PillButton
                   onClick={() => declineFriendRequest(request.friendshipId)}
-                  color="#888"
+                  color="var(--t-muted)"
                   label={t('requests.decline')}
                 />
               </RequestRow>
@@ -65,7 +65,7 @@ export function FriendRequestsList() {
               >
                 <PillButton
                   onClick={() => removeFriend(request.friendshipId)}
-                  color="#888"
+                  color="var(--t-muted)"
                   label={t('requests.cancel')}
                 />
               </RequestRow>
@@ -82,7 +82,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <div>
       <h3
         className="font-display text-[11px] uppercase tracking-widest mb-3"
-        style={{ color: '#666' }}
+        style={{ color: 'var(--t-dim)' }}
       >
         {title}
       </h3>
@@ -93,7 +93,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <p className="font-display text-sm py-4 uppercase tracking-widest" style={{ color: '#444' }}>
+    <p className="font-display text-sm py-4 uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
       {text}
     </p>
   );
@@ -124,9 +124,9 @@ function RequestRow({
         <PlayerNameLink
           username={username}
           className="font-display text-sm sm:text-base truncate"
-          style={{ color: '#e8e6df', letterSpacing: '0.03em' }}
+          style={{ color: 'var(--t-text)', letterSpacing: '0.03em' }}
         />
-        <span className="font-display text-sm tabular-nums shrink-0" style={{ color: '#c4a35a' }}>
+        <span className="font-display text-sm tabular-nums shrink-0" style={{ color: 'var(--t-accent)' }}>
           {elo}
         </span>
       </div>

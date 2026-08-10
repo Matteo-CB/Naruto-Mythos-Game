@@ -21,10 +21,10 @@ interface ResolvedDeck {
 }
 
 const DIFFICULTIES: { key: AIDifficulty; color: string }[] = [
-  { key: 'easy', color: '#4ade80' },
-  { key: 'medium', color: '#c4a35a' },
+  { key: 'easy', color: 'var(--t-success)' },
+  { key: 'medium', color: 'var(--t-accent)' },
   { key: 'hard', color: '#f97316' },
-  { key: 'impossible', color: '#ef4444' },
+  { key: 'impossible', color: 'var(--t-danger)' },
 ];
 
 export default function TrainingPage() {
@@ -97,27 +97,27 @@ export default function TrainingPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col bg-[#0a0a0a] relative">
+    <main className="flex min-h-screen flex-col bg-[var(--t-bg)] relative">
       <CloudBackground />
 
       <div className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="flex flex-col gap-6 max-w-lg w-full relative z-10">
 
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-[#e0e0e0] mb-1">
+            <h1 className="text-3xl font-bold text-[var(--t-text)] mb-1">
               {t('title')}
             </h1>
-            <p className="text-sm text-[#888888]">
+            <p className="text-sm text-[var(--t-muted)]">
               {t('intro')}
             </p>
           </div>
 
           <div
             className="border px-4 py-3 text-sm"
-            style={{ borderColor: '#c4a35a22', backgroundColor: '#c4a35a0a' }}
+            style={{ borderColor: 'var(--t-accent)22', backgroundColor: 'var(--t-accent)0a' }}
           >
-            <p className="text-[#c4a35a] font-medium mb-1">{t('coachAnalyzes')}</p>
-            <ul className="text-[#888] space-y-0.5 text-xs list-none">
+            <p className="text-[var(--t-accent)] font-medium mb-1">{t('coachAnalyzes')}</p>
+            <ul className="text-[var(--t-muted)] space-y-0.5 text-xs list-none">
               <li>- {t('feature.winProb')}</li>
               <li>- {t('feature.moveQuality')}</li>
               <li>- {t('feature.bestMove')}</li>
@@ -128,7 +128,7 @@ export default function TrainingPage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <p className="text-xs text-[#888888] uppercase tracking-wider mb-1">
+            <p className="text-xs text-[var(--t-muted)] uppercase tracking-wider mb-1">
               {t('opponentDifficulty')}
             </p>
             {DIFFICULTIES.map((d) => (
@@ -137,8 +137,8 @@ export default function TrainingPage() {
                 onClick={() => setDifficulty(d.key)}
                 className="flex items-start gap-3 p-4 border transition-colors text-left"
                 style={{
-                  backgroundColor: difficulty === d.key ? '#1a1a1a' : '#141414',
-                  borderColor: difficulty === d.key ? d.color : '#262626',
+                  backgroundColor: difficulty === d.key ? 'var(--t-surface-2)' : 'var(--t-surface)',
+                  borderColor: difficulty === d.key ? d.color : 'var(--t-border)',
                 }}
               >
                 <span
@@ -146,8 +146,8 @@ export default function TrainingPage() {
                   style={{ backgroundColor: d.color }}
                 />
                 <div>
-                  <p className="text-sm font-medium text-[#e0e0e0]">{t(`difficulty.${d.key}.label`)}</p>
-                  <p className="text-xs text-[#666] mt-0.5">{t(`difficulty.${d.key}.desc`)}</p>
+                  <p className="text-sm font-medium text-[var(--t-text)]">{t(`difficulty.${d.key}.label`)}</p>
+                  <p className="text-xs text-[var(--t-dim)] mt-0.5">{t(`difficulty.${d.key}.desc`)}</p>
                 </div>
               </button>
             ))}
@@ -164,7 +164,7 @@ export default function TrainingPage() {
           <div className="flex gap-3 w-full">
             <button
               onClick={() => router.push('/')}
-              className="flex-1 h-12 bg-[#141414] border border-[#262626] text-[#888888] font-medium hover:bg-[#1a1a1a] transition-colors"
+              className="flex-1 h-12 bg-[var(--t-surface)] border border-[var(--t-border)] text-[var(--t-muted)] font-medium hover:bg-[var(--t-surface-2)] transition-colors"
             >
               {tc('back')}
             </button>
@@ -173,9 +173,9 @@ export default function TrainingPage() {
               disabled={isLoading || !cards}
               className="flex-1 h-12 border font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               style={{
-                backgroundColor: '#1a1a1a',
-                borderColor: '#c4a35a',
-                color: '#e0e0e0',
+                backgroundColor: 'var(--t-surface-2)',
+                borderColor: 'var(--t-accent)',
+                color: 'var(--t-text)',
               }}
             >
               {isLoading ? tc('loading') : t('startTraining')}

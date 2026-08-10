@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import type { ReactNode } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from '@/components/icons/GameIcons';
 import type { CharacterCard, MissionCard, VisibleCharacter } from '@/lib/engine/types';
 
 type SandboxModal = 'none' | 'draw' | 'viewDeck' | 'addAnyCard' | 'discardHand' | 'returnToHand' | 'moveChar';
@@ -63,10 +65,14 @@ export function SandboxToolbar() {
 
           <div className="w-px h-4 mx-0.5" style={{ backgroundColor: '#333' }} />
 
-          <ToolbarButton label={`+5 ${t('game.chakra')}`} onClick={() => sandboxAddChakra(5)} />
+          <ToolbarButton
+            label={<><ChakraIcon size={11} color={CHAKRA_COLOR} />{`+5 ${t('game.chakra')}`}</>}
+            onClick={() => sandboxAddChakra(5)}
+          />
 
           {chakraInput ? (
             <div className="flex items-center gap-1">
+              <ChakraIcon size={11} color={CHAKRA_COLOR} />
               <input
                 type="number"
                 value={chakraVal}
@@ -87,7 +93,10 @@ export function SandboxToolbar() {
               />
             </div>
           ) : (
-            <ToolbarButton label={`${t('sandbox.setChakra')}: ${currentChakra}`} onClick={() => { setChakraInput(true); setChakraVal(String(currentChakra)); }} />
+            <ToolbarButton
+              label={<><ChakraIcon size={11} color={CHAKRA_COLOR} />{`${t('sandbox.setChakra')}: ${currentChakra}`}</>}
+              onClick={() => { setChakraInput(true); setChakraVal(String(currentChakra)); }}
+            />
           )}
 
           <div className="w-px h-4 mx-0.5" style={{ backgroundColor: '#333' }} />
@@ -123,7 +132,10 @@ export function SandboxToolbar() {
             ))}
           </div>
 
-          <ToolbarButton label={t('sandbox.resetTokens')} onClick={sandboxResetAllPowerTokens} />
+          <ToolbarButton
+            label={<><PowerIcon size={11} color={POWER_COLOR} />{t('sandbox.resetTokens')}</>}
+            onClick={sandboxResetAllPowerTokens}
+          />
           <ToolbarButton label={t('sandbox.switchPlayer')} onClick={sandboxSwitchPlayer} accent />
         </div>
       </div>
@@ -180,11 +192,11 @@ export function SandboxToolbar() {
   );
 }
 
-function ToolbarButton({ label, onClick, accent }: { label: string; onClick: () => void; accent?: boolean }) {
+function ToolbarButton({ label, onClick, accent }: { label: ReactNode; onClick: () => void; accent?: boolean }) {
   return (
     <button
       onClick={onClick}
-      className="px-2 py-1 text-[9px] sm:text-[10px] uppercase tracking-wider font-medium transition-colors shrink-0"
+      className="px-2 py-1 text-[9px] sm:text-[10px] uppercase tracking-wider font-medium transition-colors shrink-0 inline-flex items-center gap-1"
       style={{
         backgroundColor: accent ? 'rgba(196,163,90,0.1)' : '#1a1a1a',
         border: `1px solid ${accent ? 'rgba(196,163,90,0.3)' : '#333'}`,
@@ -363,16 +375,18 @@ function AllCardsModal({
                   )}
                   
                   <span
-                    className="absolute top-0 left-0 text-[8px] font-bold px-1"
+                    className="absolute top-0 left-0 text-[8px] font-bold px-1 inline-flex items-center gap-0.5"
                     style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: '#4a9eff' }}
                   >
+                    <ChakraIcon size={8} color={CHAKRA_COLOR} />
                     {card.chakra}
                   </span>
-                  
+
                   <span
-                    className="absolute top-0 right-0 text-[8px] font-bold px-1"
+                    className="absolute top-0 right-0 text-[8px] font-bold px-1 inline-flex items-center gap-0.5"
                     style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: '#c4a35a' }}
                   >
+                    <PowerIcon size={8} color={POWER_COLOR} />
                     {card.power}
                   </span>
                   
@@ -444,8 +458,9 @@ function BoardCharactersModal({
           {getCardName(char.card, locale as 'en' | 'fr')}
         </span>
         {char.powerTokens > 0 && (
-          <span className="absolute top-0 right-0 text-[8px] font-bold px-1"
+          <span className="absolute top-0 right-0 text-[8px] font-bold px-1 inline-flex items-center gap-0.5"
             style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: '#c4a35a' }}>
+            <PowerIcon size={8} color={POWER_COLOR} />
             +{char.powerTokens}
           </span>
         )}

@@ -45,7 +45,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, manualPowerMode: true, gamepadEnabled: true, countryCode: true, chatVisibility: true, fastAnimations: true, allowNonFriendMessages: true, privateProfile: true, boardPalette: true },
+      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, manualPowerMode: true, gamepadEnabled: true, countryCode: true, chatVisibility: true, fastAnimations: true, allowNonFriendMessages: true, privateProfile: true, boardPalette: true, siteTheme: true },
     });
 
     const deckPrefs = await readDeckPrefs(session.user.id);
@@ -56,6 +56,7 @@ export async function GET() {
       gameBackground: user?.gameBackground || 'default',
       allowSpectatorHand: user?.allowSpectatorHand ?? false,
       hideDeckBuilderVariants: user?.hideDeckBuilderVariants ?? false,
+      siteTheme: user?.siteTheme ?? null,
       manualPowerMode: user?.manualPowerMode ?? false,
       gamepadEnabled: user?.gamepadEnabled ?? true,
       countryCode: user?.countryCode ?? null,
@@ -93,6 +94,9 @@ export async function PATCH(request: NextRequest) {
     }
     if (typeof body.allowSpectatorHand === 'boolean') {
       update.allowSpectatorHand = body.allowSpectatorHand;
+    }
+    if (body.siteTheme === 'ks' || body.siteTheme === 'ss') {
+      update.siteTheme = body.siteTheme;
     }
     if (typeof body.hideDeckBuilderVariants === 'boolean') {
       update.hideDeckBuilderVariants = body.hideDeckBuilderVariants;

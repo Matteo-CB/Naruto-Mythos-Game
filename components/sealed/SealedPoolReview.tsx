@@ -8,6 +8,7 @@ import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { isLandscapeCard } from '@/lib/cards/orientation';
 import { getCardName, getRarityLabel } from '@/lib/utils/cardLocale';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
+import { RarityIcon } from '@/components/icons/RarityIcon';
 
 interface SealedPoolReviewProps {
   cards: BoosterCard[];
@@ -28,12 +29,12 @@ const RARITY_ORDER: Record<string, number> = {
 };
 
 const RARITY_COLORS: Record<string, string> = {
-  C: '#888888',
+  C: 'var(--t-muted)',
   UC: '#2ecc71',
   R: '#3498db',
   RA: '#9b59b6',
-  S: '#c4a35a',
-  SV: '#c4a35a',
+  S: 'var(--t-accent)',
+  SV: 'var(--t-accent)',
   M: '#ff4444',
   MV: '#ff4444',
   L: '#ffd700',
@@ -65,17 +66,17 @@ export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
   }, [cards]);
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+    <div className="fixed inset-0 z-40 flex flex-col" style={{ backgroundColor: 'var(--t-bg)' }}>
       
       <div
         className="flex items-center justify-between px-4 py-3 shrink-0"
-        style={{ backgroundColor: '#141414', borderBottom: '1px solid #262626' }}
+        style={{ backgroundColor: 'var(--t-surface)', borderBottom: '1px solid var(--t-border)' }}
       >
         <div className="flex items-center gap-4">
-          <h2 className="text-lg font-bold" style={{ color: '#c4a35a' }}>
+          <h2 className="text-lg font-bold" style={{ color: 'var(--t-accent)' }}>
             {t('cardsCollected')}
           </h2>
-          <span className="text-sm" style={{ color: '#888' }}>
+          <span className="text-sm" style={{ color: 'var(--t-muted)' }}>
             {cards.length} {t('cards')}
           </span>
         </div>
@@ -84,18 +85,18 @@ export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
           whileTap={{ scale: 0.95 }}
           onClick={onContinue}
           className="px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
-          style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+          style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
         >
           {t('buildDeck')}
         </motion.button>
       </div>
 
-      <div className="flex gap-3 px-4 py-2 flex-wrap shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
+      <div className="flex gap-3 px-4 py-2 flex-wrap shrink-0" style={{ borderBottom: '1px solid var(--t-surface-2)' }}>
         {Object.entries(rarityCounts)
           .sort(([a], [b]) => (RARITY_ORDER[a] ?? 99) - (RARITY_ORDER[b] ?? 99))
           .map(([rarity, count]) => (
             <span key={rarity} className="text-xs font-bold" style={{ color: RARITY_COLORS[rarity] ?? '#888' }}>
-              {getRarityLabel(rarity, tCardMeta)}: {count}
+              <span className="inline-flex items-center gap-1.5"><RarityIcon rarity={rarity} size={13} />{getRarityLabel(rarity, tCardMeta)}: {count}</span>
             </span>
           ))}
       </div>
@@ -104,7 +105,7 @@ export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
         
         {missions.length > 0 && (
           <div className="mb-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#e67e22' }}>
+            <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--t-accent)' }}>
               {t('missionsLabel')} ({missions.length})
             </h3>
             <div className="flex gap-2 flex-wrap">
@@ -115,7 +116,7 @@ export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
           </div>
         )}
 
-        <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#888' }}>
+        <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--t-muted)' }}>
           {t('characters')} ({characters.length})
         </h3>
         <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}>
@@ -149,19 +150,19 @@ function PoolCard({ card, index, locale }: { card: BoosterCard; index: number; l
       {imgPath ? (
         <img src={imgPath} alt={cardName} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
       ) : (
-        <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-          <span className="text-[9px] text-center px-1" style={{ color: '#888' }}>{cardName}</span>
+        <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'var(--t-surface-2)' }}>
+          <span className="text-[9px] text-center px-1" style={{ color: 'var(--t-muted)' }}>{cardName}</span>
         </div>
       )}
       <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
         <div className="flex items-center justify-between">
-          <span className="text-[8px] truncate" style={{ color: '#e0e0e0' }}>{cardName}</span>
-          <span className="text-[8px] font-bold" style={{ color: rarityColor }}>{card.rarity}</span>
+          <span className="text-[8px] truncate" style={{ color: 'var(--t-text)' }}>{cardName}</span>
+          <RarityIcon rarity={card.rarity} size={11} />
         </div>
       </div>
       {card.isHolo && !card.isTemporaryVariant && (
         <div className="absolute top-0.5 left-0.5">
-          <span className="text-[6px] px-0.5 rounded font-bold" style={{ backgroundColor: 'rgba(196,163,90,0.8)', color: '#0a0a0a' }}>
+          <span className="text-[6px] px-0.5 rounded font-bold" style={{ backgroundColor: 'rgba(196,163,90,0.8)', color: 'var(--t-bg)' }}>
             {t('holo')}
           </span>
         </div>
@@ -172,7 +173,7 @@ function PoolCard({ card, index, locale }: { card: BoosterCard; index: number; l
           <div className="absolute top-0.5 left-0.5 z-10" title={t('temporaryVariantTooltip')}>
             <span
               className="font-display text-[7px] px-0.5 tracking-widest uppercase"
-              style={{ backgroundColor: 'rgba(196,163,90,0.85)', color: '#0a0a0a' }}
+              style={{ backgroundColor: 'rgba(196,163,90,0.85)', color: 'var(--t-bg)' }}
             >
               {t('temporaryVariantTag')}
             </span>

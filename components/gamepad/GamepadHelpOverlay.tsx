@@ -34,17 +34,17 @@ export function GamepadHelpOverlay({ onClose }: { onClose: () => void }) {
       <div
         onClick={(e) => e.stopPropagation()}
         className="flex flex-col w-full max-w-sm p-5"
-        style={{ backgroundColor: '#0c0b10', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}
+        style={{ backgroundColor: 'var(--t-surface-2)', boxShadow: '0 24px 60px var(--t-shadow)' }}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display text-base uppercase tracking-widest" style={{ color: '#c4a35a' }}>
+          <h2 className="font-display text-base uppercase tracking-widest" style={{ color: 'var(--t-accent)' }}>
             {t('title')}
           </h2>
           <button
             data-gp-back="true"
             onClick={onClose}
             className="font-display text-[11px] uppercase tracking-widest px-3 py-1.5 cursor-pointer"
-            style={{ color: '#888' }}
+            style={{ color: 'var(--t-muted)' }}
           >
             {t('close')}
           </button>
@@ -54,11 +54,11 @@ export function GamepadHelpOverlay({ onClose }: { onClose: () => void }) {
             <div
               key={r.key}
               className="flex items-center justify-between py-2.5"
-              style={{ borderBottom: i < ROWS.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}
+              style={{ borderBottom: i < ROWS.length - 1 ? '1px solid var(--t-divider)' : 'none' }}
             >
               <span
                 className="font-display text-xs tabular-nums px-2.5 py-1"
-                style={{ backgroundColor: 'rgba(196,163,90,0.14)', color: '#e8d9b0', minWidth: 64, textAlign: 'center' }}
+                style={{ backgroundColor: 'var(--t-accent-glow)', color: '#e8d9b0', minWidth: 64, textAlign: 'center' }}
               >
                 {r.btn}
               </span>
@@ -68,7 +68,7 @@ export function GamepadHelpOverlay({ onClose }: { onClose: () => void }) {
             </div>
           ))}
         </div>
-        <p className="font-body text-[11px] mt-4" style={{ color: '#666' }}>
+        <p className="font-body text-[11px] mt-4" style={{ color: 'var(--t-dim)' }}>
           {t('hint')}
         </p>
       </div>

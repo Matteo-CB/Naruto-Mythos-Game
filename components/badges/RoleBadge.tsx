@@ -11,9 +11,9 @@ const BADGE_CONFIG = {
   admin: {
     symbol: '\u2756',         // ❖ diamond with four dots
     secondarySymbol: '\u2606', // ☆
-    color: '#C4A35A',
-    accentColor: '#b33e3e',
-    bgColor: 'rgba(196, 163, 90, 0.08)',
+    color: 'var(--t-accent)',
+    accentColor: 'var(--t-danger)',
+    bgColor: 'var(--t-accent-tint)',
     borderColor: 'rgba(196, 163, 90, 0.4)',
     glowColor: 'rgba(196, 163, 90, 0.3)',
     innerGlow: 'rgba(179, 62, 62, 0.15)',

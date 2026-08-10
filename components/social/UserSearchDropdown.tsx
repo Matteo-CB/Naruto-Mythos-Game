@@ -92,10 +92,10 @@ export function UserSearchDropdown({ namespace }: UserSearchDropdownProps) {
         placeholder={t('search.placeholder')}
         className="w-full h-10 px-3 text-sm"
         style={{
-          backgroundColor: '#111111',
-          border: '1px solid #262626',
+          backgroundColor: 'var(--t-panel)',
+          border: '1px solid var(--t-border)',
           borderRadius: 6,
-          color: '#e0e0e0',
+          color: 'var(--t-text)',
           outline: 'none',
         }}
       />
@@ -104,19 +104,19 @@ export function UserSearchDropdown({ namespace }: UserSearchDropdownProps) {
         <div
           className="absolute left-0 right-0 mt-1"
           style={{
-            backgroundColor: '#111111',
-            border: '1px solid #262626',
+            backgroundColor: 'var(--t-panel)',
+            border: '1px solid var(--t-border)',
             borderRadius: 6,
             maxHeight: 300,
             overflowY: 'auto',
             zIndex: 50,
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
+            boxShadow: '0 8px 24px var(--t-shadow)',
           }}
         >
           {searchLoading && (
             <div
               className="px-4 py-3 text-sm"
-              style={{ color: '#555555' }}
+              style={{ color: 'var(--t-dim)' }}
             >
               {t('search.searching')}
             </div>
@@ -125,7 +125,7 @@ export function UserSearchDropdown({ namespace }: UserSearchDropdownProps) {
           {!searchLoading && showNoResults && (
             <div
               className="px-4 py-3 text-sm"
-              style={{ color: '#555555' }}
+              style={{ color: 'var(--t-dim)' }}
             >
               {t('search.noResults')}
             </div>
@@ -137,22 +137,22 @@ export function UserSearchDropdown({ namespace }: UserSearchDropdownProps) {
                 key={user.id}
                 className="flex items-center justify-between px-4 py-3"
                 style={{
-                  borderBottom: '1px solid #1a1a1a',
+                  borderBottom: '1px solid var(--t-surface-2)',
                 }}
               >
                 <div className="flex items-center gap-3">
                   <PlayerNameLink
                     username={user.username}
                     className="text-sm font-medium"
-                    style={{ color: '#e0e0e0' }}
+                    style={{ color: 'var(--t-text)' }}
                   />
                   <span
                     className="text-xs px-2 py-0.5"
                     style={{
-                      backgroundColor: 'rgba(196, 163, 90, 0.1)',
+                      backgroundColor: 'var(--t-accent-glow)',
                       border: '1px solid rgba(196, 163, 90, 0.25)',
                       borderRadius: 4,
-                      color: '#c4a35a',
+                      color: 'var(--t-accent)',
                     }}
                   >
                     {user.elo}
