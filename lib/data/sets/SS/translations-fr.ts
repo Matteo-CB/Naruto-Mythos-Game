@@ -224,7 +224,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     "[⧗] Les POWERUP sur les personnages alliés dans cette mission sont augmentés de 1.",
     "[↯] Ino Yamanaka : Reprenez le contrôle d’un personnage que vous possédez en jeu.",
   ],
-  "SS-005-M": [
+  "SS-005-MV": [
     "[↯] Placez la carte du dessus de votre deck comme personnage caché dans cette mission.",
     "[↯] Répétez l’effet MAIN.",
   ],
@@ -295,5 +295,28 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   "SS-150-S": [
     "[↯] Kakashi Hatake : Déplacez le personnage ennemi le plus fort en jeu vers cette mission.",
     "[↯] POWERUP X, où X est le coût du personnage ennemi le plus fort de cette mission.",
+  ],
+  "SS-005-C": [
+    "[↯] Placez la carte du dessus de votre deck comme personnage caché dans cette mission.",
+    "[↯] Répétez l’effet MAIN.",
+  ],
+  "SS-007-C": [
+    "[⧗] Au début de la manche, POWERUP 2 sur un personnage Équipe 7 allié en jeu.",
+  ],
+  "SS-123-R": [
+    "[⧗] Les POWERUP sur les personnages alliés dans cette mission sont augmentés de 1.",
+    "[↯] Ino Yamanaka : Reprenez le contrôle d’un personnage que vous possédez en jeu.",
+  ],
+  "SS-121-SPV": [
+    "[⧗] Ce personnage a +1 Puissance pour chaque Naruto Uzumaki allié en jeu.",
+    "[↯] Kiba Inuzuka : Déplacez la carte au bas de cette pile d'amélioration vers une autre mission.",
+  ],
+  "SS-123-SPV": [
+    "[⧗] Les POWERUP sur les personnages alliés dans cette mission sont augmentés de 1.",
+    "[↯] Ino Yamanaka : Reprenez le contrôle d’un personnage que vous possédez en jeu.",
+  ],
+  "SS-149-SPV": [
+    "[↯] Cherchez jusqu'à 2 personnages Chien Ninja dans votre deck, révélez-les et piochez-les, puis mélangez votre deck. Jouez autant de personnages Chien Ninja que vous voulez n'importe où, en payant 1 de moins.",
+    "[↯] Zabuza Momochi : Répétez l'effet MAIN.",
   ],
 };

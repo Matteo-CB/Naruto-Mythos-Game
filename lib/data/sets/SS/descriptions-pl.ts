@@ -223,7 +223,7 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "[⧗] POWERUP na sojuszniczych postaciach na tej misji są zwiększone o 1.",
     "[↯] Ino Yamanaka: Odzyskaj kontrolę nad postacią, którą posiadasz, w grze.",
   ],
-  "SS-005-M": [
+  "SS-005-MV": [
     "[↯] Połóż wierzchnią kartę swojej talii jako ukrytą postać na tej misji.",
     "[↯] Powtórz efekt MAIN.",
   ],
@@ -294,5 +294,28 @@ export const effectDescriptionsPl: Record<string, string[]> = {
   "SS-150-S": [
     "[↯] Kakashi Hatake: Przesuń najsilniejszą postać przeciwnika w grze do tej misji.",
     "[↯] POWERUP X, gdzie X to koszt najsilniejszej postaci przeciwnika w tej misji.",
+  ],
+  "SS-005-C": [
+    "[↯] Połóż wierzchnią kartę swojej talii jako ukrytą postać na tej misji.",
+    "[↯] Powtórz efekt MAIN.",
+  ],
+  "SS-007-C": [
+    "[⧗] Na początku rundy POWERUP 2 na sojuszniczej postaci z Drużyny 7 w grze.",
+  ],
+  "SS-123-R": [
+    "[⧗] POWERUP na sojuszniczych postaciach na tej misji są zwiększone o 1.",
+    "[↯] Ino Yamanaka: Odzyskaj kontrolę nad postacią, którą posiadasz, w grze.",
+  ],
+  "SS-121-SPV": [
+    "[⧗] Ta postać ma +1 Siły za każdego sojuszniczego Naruto Uzumaki w grze.",
+    "[↯] Kiba Inuzuka: Przenieś dolną kartę tego stosu ulepszeń na inną misję.",
+  ],
+  "SS-123-SPV": [
+    "[⧗] POWERUP na sojuszniczych postaciach na tej misji są zwiększone o 1.",
+    "[↯] Ino Yamanaka: Odzyskaj kontrolę nad postacią, którą posiadasz, w grze.",
+  ],
+  "SS-149-SPV": [
+    "[↯] Przeszukaj talię w poszukiwaniu do 2 postaci Psa Ninja, odkryj je i dobierz, potem przetasuj talię. Zagraj dowolną liczbę postaci Psa Ninja gdziekolwiek, płacąc o 1 mniej.",
+    "[↯] Zabuza Momochi: Powtórz efekt MAIN.",
   ],
 };

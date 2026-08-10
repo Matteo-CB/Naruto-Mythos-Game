@@ -223,7 +223,7 @@ export const effectDescriptionsIt: Record<string, string[]> = {
     "[⧗] I POWERUP sui personaggi alleati in questa missione sono aumentati di 1.",
     "[↯] Ino Yamanaka: Riprendi il controllo di un personaggio che possiedi in gioco.",
   ],
-  "SS-005-M": [
+  "SS-005-MV": [
     "[↯] Metti la carta in cima al tuo mazzo come personaggio nascosto in questa missione.",
     "[↯] Ripeti l’effetto MAIN.",
   ],
@@ -294,5 +294,28 @@ export const effectDescriptionsIt: Record<string, string[]> = {
   "SS-150-S": [
     "[↯] Kakashi Hatake: Sposta il personaggio nemico più forte in gioco in questa missione.",
     "[↯] POWERUP X, dove X è il costo del personaggio nemico più forte in questa missione.",
+  ],
+  "SS-005-C": [
+    "[↯] Metti la carta in cima al tuo mazzo come personaggio nascosto in questa missione.",
+    "[↯] Ripeti l’effetto MAIN.",
+  ],
+  "SS-007-C": [
+    "[⧗] All'inizio del round, POWERUP 2 su un personaggio alleato della Squadra 7 in gioco.",
+  ],
+  "SS-123-R": [
+    "[⧗] I POWERUP sui personaggi alleati in questa missione sono aumentati di 1.",
+    "[↯] Ino Yamanaka: Riprendi il controllo di un personaggio che possiedi in gioco.",
+  ],
+  "SS-121-SPV": [
+    "[⧗] Questo personaggio ha +1 Potenza per ogni Naruto Uzumaki alleato in gioco.",
+    "[↯] Kiba Inuzuka: Sposta la carta in fondo a questa pila di evoluzione su un'altra missione.",
+  ],
+  "SS-123-SPV": [
+    "[⧗] I POWERUP sui personaggi alleati in questa missione sono aumentati di 1.",
+    "[↯] Ino Yamanaka: Riprendi il controllo di un personaggio che possiedi in gioco.",
+  ],
+  "SS-149-SPV": [
+    "[↯] Cerca nel tuo mazzo fino a 2 personaggi Cane Ninja, rivelali e pescali, poi mischia il tuo mazzo. Gioca un numero qualsiasi di personaggi Cane Ninja ovunque, pagando 1 in meno.",
+    "[↯] Zabuza Momochi: Ripeti l'effetto MAIN.",
   ],
 };

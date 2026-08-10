@@ -15725,6 +15725,29 @@ export class EffectEngine {
         }
         break;
       }
+      case 'SS007_START_POWERUP': {
+        const ss007Res = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (ss007Res) {
+          const missions_ss007 = [...newState.activeMissions];
+          const m_ss007 = { ...missions_ss007[ss007Res.missionIndex] };
+          const side_ss007 = ss007Res.player === 'player1' ? 'player1Characters' : 'player2Characters';
+          const gained_ss007 = amplifiedPowerup(state, targetId, 2);
+          m_ss007[side_ss007] = m_ss007[side_ss007].map((c: CharacterInPlay) =>
+            c.instanceId === targetId ? { ...c, powerTokens: c.powerTokens + gained_ss007 } : c
+          );
+          missions_ss007[ss007Res.missionIndex] = m_ss007;
+          newState = { ...newState, activeMissions: missions_ss007 };
+          const name_ss007 = (ss007Res.character.stack?.length > 0
+            ? ss007Res.character.stack[ss007Res.character.stack.length - 1]
+            : ss007Res.character.card);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_POWERUP',
+            `Sakura Haruno (SS-007): POWERUP ${gained_ss007} on ${name_ss007.name_fr} at the start of the round.`,
+            'game.log.effect.powerup',
+            { card: 'SAKURA HARUNO', id: 'SS-007-C', amount: String(gained_ss007), target: name_ss007.name_fr, target_en: name_ss007.name_en || name_ss007.name_fr });
+        }
+        break;
+      }
       case 'TENTEN_POWERUP_LEAF': {
         const ttRes = EffectEngine.findCharByInstanceId(newState, targetId);
         if (ttRes) {

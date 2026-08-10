@@ -2,7 +2,8 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-export const NARUTO_005_ID = 'SS-005-M';
+export const NARUTO_005_ID = 'SS-005-MV';
+export const NARUTO_005_C_ID = 'SS-005-C';
 export const NARUTO_005_NAME = 'NARUTO UZUMAKI';
 
 function placeFromDeck(ctx: EffectContext, confirmType: string, descriptionKey: string): EffectResult {
@@ -41,4 +42,6 @@ function naruto005Ambush(ctx: EffectContext): EffectResult {
 export function registerNaruto005Handlers(): void {
   registerEffect(NARUTO_005_ID, 'MAIN', naruto005Main);
   registerEffect(NARUTO_005_ID, 'AMBUSH', naruto005Ambush);
+  registerEffect(NARUTO_005_C_ID, 'MAIN', naruto005Main);
+  registerEffect(NARUTO_005_C_ID, 'AMBUSH', naruto005Ambush);
 }

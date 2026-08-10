@@ -411,12 +411,15 @@ export function registerSet2Handlers(): void {
   registerEffect('SS-120-CHIBIV', 'DUEL', ss120DuelHandler);
   registerEffect('SS-126-SPV', 'DUEL', ss126DuelHandler);
   registerEffect('SS-121-R', 'DUEL', ss121DuelHandler);
+  registerEffect('SS-121-SPV', 'DUEL', ss121DuelHandler);
   registerEffect('SS-149-L', 'MAIN', ss000SearchAndPlay);
   registerEffect('SS-149-L', 'DUEL', ss000SearchAndPlay);
   registerEffect('SS-149-SV', 'MAIN', ss000SearchAndPlay);
   registerEffect('SS-149-SV', 'DUEL', ss000SearchAndPlay);
   registerEffect('SS-149-S', 'MAIN', ss000SearchAndPlay);
   registerEffect('SS-149-S', 'DUEL', ss000SearchAndPlay);
+  registerEffect('SS-149-SPV', 'MAIN', ss000SearchAndPlay);
+  registerEffect('SS-149-SPV', 'DUEL', ss000SearchAndPlay);
   registerEffect('SS-121-MV', 'DUEL', ss121DuelHandler);
   registerEffect('SS-126-R', 'DUEL', ss126DuelHandler);
   registerEffect('SS-126-MV', 'DUEL', ss126DuelHandler);

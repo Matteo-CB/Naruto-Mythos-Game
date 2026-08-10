@@ -1517,6 +1517,7 @@
         "declareNumber": "Declara un número entre {min} y {max}. Cuanto más alto, más difícil de superar.",
         "ss005ConfirmMain": "¿Colocar la carta superior de tu mazo como personaje oculto en esta misión?",
         "ss005ConfirmAmbush": "¿colocar de nuevo la carta superior de tu mazo como personaje oculto en esta misión?",
+        "ss007StartPowerup": "Inicio de la ronda: elige un personaje Team 7 aliado para POTENCIAR 2.",
         "ss123MvTakeBack": "Recupera el control de un personaje que te pertenece.",
         "ss137MvReturnHidden": "Devuelve a tu mano un personaje oculto aliado de esta misión.",
         "ss137MvConfirmDuel": "¿Obligar al rival a derrotar a sus personajes en esta misión hasta tener tantos como tú?",

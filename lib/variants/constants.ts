@@ -10,6 +10,9 @@ export const LOCKED_VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L', 'SPV', 'POPV', 'C
 export const FORCE_UNLOCKED_CARD_IDS: ReadonlySet<string> = new Set([
   'SS-112-SPV',
   'SS-122-SPV',
+  'SS-121-SPV',
+  'SS-123-SPV',
+  'SS-149-SPV',
   'SS-126-SPV',
   'SS-120-CHIBIV',
   'SS-147-POPV',

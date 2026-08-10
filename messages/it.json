@@ -3614,6 +3614,7 @@
         "declareNumber": "Dichiara un numero tra {min} e {max}. Più è alto, più è difficile da battere.",
         "ss005ConfirmMain": "Mettere la prima carta del tuo mazzo come personaggio nascosto in questa missione?",
         "ss005ConfirmAmbush": "mettere di nuovo la prima carta del tuo mazzo come personaggio nascosto in questa missione?",
+        "ss007StartPowerup": "Inizio del round: scegli un personaggio Team 7 alleato a cui dare POWERUP 2.",
         "ss123MvTakeBack": "Riprendi il controllo di un personaggio che ti appartiene.",
         "ss137MvReturnHidden": "Riporta in mano un personaggio nascosto alleato di questa missione.",
         "ss137MvConfirmDuel": "Costringere l’avversario a sconfiggere i suoi personaggi in questa missione finché non ne ha quanti te?",

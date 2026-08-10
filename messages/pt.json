@@ -3614,6 +3614,7 @@
         "declareNumber": "Declare um número entre {min} e {max}. Quanto maior, mais difícil de acertar.",
         "ss005ConfirmMain": "Colocar a carta do topo do seu deck como personagem oculto nesta missão?",
         "ss005ConfirmAmbush": "colocar novamente a carta do topo do seu deck como personagem oculto nesta missão?",
+        "ss007StartPowerup": "Início da ronda: escolhe um personagem Team 7 aliado para POWERUP 2.",
         "ss123MvTakeBack": "Retome o controle de um personagem que lhe pertence.",
         "ss137MvReturnHidden": "Devolva à sua mão um personagem oculto aliado desta missão.",
         "ss137MvConfirmDuel": "Forçar o oponente a derrotar os personagens dele nesta missão até ter tantos quanto você?",

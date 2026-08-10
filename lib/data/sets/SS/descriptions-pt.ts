@@ -223,7 +223,7 @@ export const effectDescriptionsPt: Record<string, string[]> = {
     "[⧗] Os POWERUP em personagens aliados nesta missão são aumentados em 1.",
     "[↯] Ino Yamanaka: Retome o controle de um personagem que você possui em jogo.",
   ],
-  "SS-005-M": [
+  "SS-005-MV": [
     "[↯] Coloque a carta do topo do seu deck como personagem oculto nesta missão.",
     "[↯] Repita o efeito MAIN.",
   ],
@@ -294,5 +294,28 @@ export const effectDescriptionsPt: Record<string, string[]> = {
   "SS-150-S": [
     "[↯] Kakashi Hatake: Mova o personagem inimigo mais forte em jogo para esta missão.",
     "[↯] POWERUP X, onde X é o custo do personagem inimigo mais forte nesta missão.",
+  ],
+  "SS-005-C": [
+    "[↯] Coloque a carta do topo do seu deck como personagem oculto nesta missão.",
+    "[↯] Repita o efeito MAIN.",
+  ],
+  "SS-007-C": [
+    "[⧗] No início da ronda, POWERUP 2 em um personagem aliado do Time 7 em jogo.",
+  ],
+  "SS-123-R": [
+    "[⧗] Os POWERUP em personagens aliados nesta missão são aumentados em 1.",
+    "[↯] Ino Yamanaka: Retome o controle de um personagem que você possui em jogo.",
+  ],
+  "SS-121-SPV": [
+    "[⧗] Este personagem tem +1 de Poder para cada Naruto Uzumaki aliado em jogo.",
+    "[↯] Kiba Inuzuka: Mova a carta de baixo desta pilha de evolução para outra missão.",
+  ],
+  "SS-123-SPV": [
+    "[⧗] Os POWERUP em personagens aliados nesta missão são aumentados em 1.",
+    "[↯] Ino Yamanaka: Retome o controle de um personagem que você possui em jogo.",
+  ],
+  "SS-149-SPV": [
+    "[↯] Procure no seu baralho até 2 personagens Cão Ninja, revele-os e compre-os, depois embaralhe seu baralho. Jogue qualquer número de personagens Cão Ninja em qualquer lugar, pagando 1 a menos.",
+    "[↯] Zabuza Momochi: Repita o efeito MAIN.",
   ],
 };

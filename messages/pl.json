@@ -3614,6 +3614,7 @@
         "declareNumber": "Zadeklaruj liczbę od {min} do {max}. Im wyższa, tym trudniej ją pobić.",
         "ss005ConfirmMain": "Położyć wierzchnią kartę talii jako zakrytą postać w tej misji?",
         "ss005ConfirmAmbush": "położyć ponownie wierzchnią kartę talii jako zakrytą postać w tej misji?",
+        "ss007StartPowerup": "Początek rundy: wybierz sojuszniczą postać Team 7, aby dać jej POWERUP 2.",
         "ss123MvTakeBack": "Odzyskaj kontrolę nad postacią, która należy do ciebie.",
         "ss137MvReturnHidden": "Zwróć do ręki sojuszniczą zakrytą postać z tej misji.",
         "ss137MvConfirmDuel": "Zmusić przeciwnika, by pokonywał swoje postacie w tej misji, aż będzie miał ich tyle co ty?",

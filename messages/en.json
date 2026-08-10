@@ -1512,6 +1512,7 @@
         "declareNumber": "Declare a number between {min} and {max}. The higher you go, the harder it is to beat.",
         "ss005ConfirmMain": "Put the top card of your deck as a hidden character in this mission?",
         "ss005ConfirmAmbush": "put the top card of your deck as a hidden character in this mission again?",
+        "ss007StartPowerup": "Start of the round: choose a friendly Team 7 character to POWERUP 2.",
         "ss123MvTakeBack": "Take back control of a character you own.",
         "ss137MvReturnHidden": "Return a friendly hidden character from this mission to your hand.",
         "ss137MvConfirmDuel": "Make the opponent defeat their characters in this mission until they have as many as you?",

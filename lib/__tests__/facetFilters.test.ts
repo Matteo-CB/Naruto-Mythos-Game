@@ -18,7 +18,7 @@ const CARDS: Card[] = [
   { id: 'KS-001-C', set: 'KS', rarity: 'C', group: 'Leaf Village', keywords: ['Team 7'] },
   { id: 'KS-131-S', set: 'KS', rarity: 'S', group: 'Leaf Village', keywords: ['Sannin'] },
   { id: 'KS-143-M', set: 'KS', rarity: 'M', group: 'Akatsuki', keywords: [] },
-  { id: 'SS-005-M', set: 'SS', rarity: 'M', group: 'Leaf Village', keywords: ['Team 7', 'Jutsu'] },
+  { id: 'SS-005-MV', set: 'SS', rarity: 'M', group: 'Leaf Village', keywords: ['Team 7', 'Jutsu'] },
   { id: 'SS-046-UC', set: 'SS', rarity: 'UC', group: 'Sand Village', keywords: ['Jutsu'] },
 ];
 

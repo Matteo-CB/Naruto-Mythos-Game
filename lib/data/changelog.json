@@ -2,14 +2,17 @@
   "entries": [
     {
       "date": "2026-08-10",
-      "title_fr": "Thème clair Shinobi Shiren et icônes de rareté",
-      "title_en": "Shinobi Shiren light theme and rarity icons",
-      "title_es": "Tema claro Shinobi Shiren e iconos de rareza",
-      "title_ja": "明るいテーマ「忍びの試練」とレアリティアイコン",
-      "title_pt": "Tema claro Shinobi Shiren e ícones de raridade",
-      "title_it": "Tema chiaro Shinobi Shiren e icone di rarità",
-      "title_pl": "Jasny motyw Shinobi Shiren i ikony rzadkości",
+      "title_fr": "Thème clair Shinobi Shiren, icônes de rareté et nouvelles cartes",
+      "title_en": "Shinobi Shiren light theme, rarity icons and new cards",
+      "title_es": "Tema claro Shinobi Shiren, iconos de rareza y cartas nuevas",
+      "title_ja": "明るいテーマ「忍びの試練」、レアリティアイコン、新カード",
+      "title_pt": "Tema claro Shinobi Shiren, ícones de raridade e cartas novas",
+      "title_it": "Tema chiaro Shinobi Shiren, icone di rarità e nuove carte",
+      "title_pl": "Jasny motyw Shinobi Shiren, ikony rzadkości i nowe karty",
       "categories": [
+        "feature",
+        "feature",
+        "fix",
         "feature",
         "feature",
         "feature",
@@ -21,6 +24,9 @@
         "fix"
       ],
       "changes_fr": [
+        "Neuf cartes du set 2 arrivent avec leur illustration, dont des versions Regional et Special.",
+        "Sakura Haruno Se battre pour ses coéquipiers 7 renforce de 2 un allié Team 7 au début de chaque manche.",
+        "Naruto Uzumaki Des yeux remplis de solitude 5 est désormais classé en Mythos V.",
         "Un nouveau thème clair, Shinobi Shiren, se choisit dans les Options : fond papier, noir et orange comme les boosters.",
         "Chaque rareté a désormais son icône, dans la collection, sur les cartes, en jeu et jusque dans les filtres.",
         "Le filtre de rareté de la collection devient une rangée de boutons avec les icônes, à la place du menu déroulant.",
@@ -32,6 +38,9 @@
         "Une carte cachée ne peut plus être révélée à côté d'un personnage du même nom : elle évolue dessus ou reste cachée."
       ],
       "changes_en": [
+        "Nine set 2 cards arrive with their artwork, including Regional and Special versions.",
+        "Sakura Haruno Fight for Your Teammates 7 gives a friendly Team 7 character 2 Power at the start of each round.",
+        "Naruto Uzumaki Eyes full of loneliness 5 is now listed as a Mythos V.",
         "A new light theme, Shinobi Shiren, can be picked in Options: paper background, black and orange like the boosters.",
         "Every rarity now has its icon, in the collection, on cards, in game and even in the filters.",
         "The collection rarity filter becomes a row of buttons with the icons, instead of a dropdown.",
@@ -43,6 +52,9 @@
         "A face down card can no longer be revealed next to a character with the same name: it upgrades onto it or stays hidden."
       ],
       "changes_es": [
+        "Llegan nueve cartas del set 2 con su ilustración, incluidas versiones Regional y Special.",
+        "Sakura Haruno Luchar por tus compañeros 7 da 2 de poder a un personaje Team 7 aliado al inicio de cada ronda.",
+        "Naruto Uzumaki Ojos llenos de soledad 5 pasa a estar clasificada como Mythos V.",
         "Un nuevo tema claro, Shinobi Shiren, se elige en Opciones: fondo papel, negro y naranja como los sobres.",
         "Cada rareza tiene ahora su icono, en la colección, en las cartas, en partida y hasta en los filtros.",
         "El filtro de rareza de la colección pasa a ser una fila de botones con los iconos, en lugar de un desplegable.",
@@ -54,6 +66,9 @@
         "Una carta oculta ya no puede revelarse junto a un personaje del mismo nombre: evoluciona sobre él o sigue oculta."
       ],
       "changes_ja": [
+        "セット２のカード９枚がイラスト付きで登場。RegionalとSpecialの版も含みます。",
+        "春野サクラ「仲間のために戦う」7は、各ラウンド開始時に味方の第七班にパワー2を与えます。",
+        "うずまきナルト「孤独に満ちた瞳」5は Mythos V に分類されました。",
         "新しい明るいテーマ「忍びの試練」を設定から選べます。紙の背景に、ブースターと同じ黒とオレンジです。",
         "すべてのレアリティにアイコンが付きました。コレクション、カード、対戦中、絞り込みまで対応します。",
         "コレクションのレアリティ絞り込みが、プルダウンからアイコン付きのボタン列になりました。",
@@ -65,6 +80,9 @@
         "伏せたカードは、同じ名前の忍がいる場所では公開できなくなりました。進化するか、伏せたままになります。"
       ],
       "changes_pt": [
+        "Chegam nove cartas do set 2 com a sua ilustração, incluindo versões Regional e Special.",
+        "Sakura Haruno Lutar pelos teus companheiros 7 dá 2 de poder a um personagem Team 7 aliado no início de cada ronda.",
+        "Naruto Uzumaki Olhos cheios de solidão 5 passa a estar classificada como Mythos V.",
         "Um novo tema claro, Shinobi Shiren, escolhe-se nas Opções: fundo papel, preto e laranja como os boosters.",
         "Cada raridade passa a ter o seu ícone, na coleção, nas cartas, em jogo e até nos filtros.",
         "O filtro de raridade da coleção passa a ser uma fila de botões com os ícones, em vez de uma lista.",
@@ -76,6 +94,9 @@
         "Uma carta virada para baixo já não pode ser revelada ao lado de um personagem com o mesmo nome: evolui sobre ele ou fica escondida."
       ],
       "changes_it": [
+        "Arrivano nove carte del set 2 con la loro illustrazione, comprese le versioni Regional e Special.",
+        "Sakura Haruno Combattere per i compagni 7 dà 2 di potenza a un personaggio Team 7 alleato all'inizio di ogni round.",
+        "Naruto Uzumaki Occhi pieni di solitudine 5 è ora classificata come Mythos V.",
         "Un nuovo tema chiaro, Shinobi Shiren, si sceglie nelle Opzioni: sfondo carta, nero e arancione come le bustine.",
         "Ogni rarità ha ora la sua icona, nella collezione, sulle carte, in partita e perfino nei filtri.",
         "Il filtro rarità della collezione diventa una fila di pulsanti con le icone, al posto del menu a tendina.",
@@ -87,6 +108,9 @@
         "Una carta coperta non può più essere rivelata accanto a un personaggio con lo stesso nome: si evolve su di lui o resta nascosta."
       ],
       "changes_pl": [
+        "Dziewięć kart z dodatku 2 trafia do gry wraz z ilustracjami, w tym wersje Regional i Special.",
+        "Sakura Haruno Walcz za drużynę 7 daje sojuszniczej postaci Team 7 2 mocy na początku każdej rundy.",
+        "Naruto Uzumaki Oczy pełne samotności 5 jest teraz klasyfikowana jako Mythos V.",
         "Nowy jasny motyw, Shinobi Shiren, wybierzesz w Opcjach: papierowe tło, czerń i pomarańcz jak na boosterach.",
         "Każda rzadkość ma teraz swoją ikonę: w kolekcji, na kartach, w grze i nawet w filtrach.",
         "Filtr rzadkości w kolekcji to teraz rząd przycisków z ikonami zamiast listy rozwijanej.",

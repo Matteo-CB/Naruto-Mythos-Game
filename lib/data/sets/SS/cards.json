@@ -2162,7 +2162,7 @@
       "number": "8",
       "set": "SS",
       "card_type": "character",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 3,
       "power": 2,
       "keywords": [
@@ -2189,7 +2189,8 @@
       "name_it": "KAKASHI HATAKE",
       "title_it": "Credere nella squadra",
       "name_pl": "KAKASHI HATAKE",
-      "title_pl": "Wiara w drużynę"
+      "title_pl": "Wiara w drużynę",
+      "image_file": "images/cards/SS/common/SS-008-C.webp"
     },
     "SS-016-C": {
       "id": "SS-016-C",
@@ -2464,11 +2465,11 @@
       "rarity_display": "Mythos Variant",
       "image_url": "/images/cards/SS/mythos_v/SS-114-MV.webp"
     },
-    "SS-005-M": {
-      "id": "SS-005-M",
-      "cardId": "SS-005-M",
-      "rarity": "M",
-      "rarity_display": "Mythos",
+    "SS-005-MV": {
+      "id": "SS-005-MV",
+      "cardId": "SS-005-MV",
+      "rarity": "MV",
+      "rarity_display": "Mythos V",
       "number": "005",
       "set": "SS",
       "card_type": "character",
@@ -2505,7 +2506,7 @@
       "title_it": "Occhi pieni di solitudine...",
       "name_pl": "NARUTO UZUMAKI",
       "title_pl": "Oczy pełne samotności...",
-      "image_file": "images/cards/SS/mythos/SS-005-M.webp"
+      "image_file": "images/cards/SS/mythos_v/SS-005-MV.webp"
     },
     "SS-137-MV": {
       "id": "SS-137-MV",
@@ -3114,7 +3115,7 @@
       "title_pt": "Não vou deixar Orochimaru levar você!",
       "title_it": "Non lascerò che Orochimaru ti porti via!",
       "title_pl": "Nie pozwolę, żeby Orochimaru cię zabrał!",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 7,
       "power": 7,
       "keywords": [
@@ -3134,7 +3135,8 @@
       "rarity_display": "Secret",
       "data_complete": true,
       "old_id": "147/140",
-      "image_url": "/images/cards/SS/pop_v/SS-147-POPV.webp"
+      "image_url": "/images/cards/SS/pop_v/SS-147-POPV.webp",
+      "image_file": "images/cards/SS/secret/SS-147-S.webp"
     },
     "SS-148-S": {
       "id": "SS-148-S",
@@ -3191,7 +3193,7 @@
       "title_pt": "Não vou permitir que meus companheiros morram.",
       "title_it": "Non permetterò ai miei compagni di morire.",
       "title_pl": "Nie pozwolę umrzeć moim towarzyszom.",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 6,
       "power": 6,
       "keywords": [
@@ -3212,7 +3214,8 @@
       "rarity_display": "Secret",
       "data_complete": true,
       "old_id": "149/140",
-      "image_url": "/images/cards/SS/legendary/SS-149-L.webp"
+      "image_url": "/images/cards/SS/legendary/SS-149-L.webp",
+      "image_file": "images/cards/SS/secret/SS-149-S.webp"
     },
     "SS-150-S": {
       "id": "SS-150-S",
@@ -3253,6 +3256,255 @@
       "title_pt": "Vocês não passam de pirralhos.",
       "title_it": "Non siete che dei marmocchi.",
       "title_pl": "Jesteście tylko bachorami."
+    },
+    "SS-005-C": {
+      "id": "SS-005-C",
+      "cardId": "SS-005-C",
+      "rarity": "C",
+      "rarity_display": "Common",
+      "number": "005",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 1,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Put the top card of your deck as a hidden character in this mission."
+        },
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Repeat the MAIN effect."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "NARUTO UZUMAKI",
+      "title_en": "Shadow Clone Jutsu",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Technique du Multiclonage",
+      "name_es": "NARUTO UZUMAKI",
+      "title_es": "Jutsu de Clones de Sombra",
+      "name_ja": "うずまきナルト",
+      "title_ja": "影分身の術",
+      "name_pt": "NARUTO UZUMAKI",
+      "title_pt": "Jutsu do Clone das Sombras",
+      "name_it": "NARUTO UZUMAKI",
+      "title_it": "Tecnica della Moltiplicazione del Corpo",
+      "name_pl": "NARUTO UZUMAKI",
+      "title_pl": "Technika Klonów Cienia",
+      "image_file": "images/cards/SS/common/SS-005-C.webp"
+    },
+    "SS-123-R": {
+      "id": "SS-123-R",
+      "cardId": "SS-123-R",
+      "rarity": "R",
+      "rarity_display": "Rare",
+      "number": "123",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] POWERUPs on friendly characters in this mission are increased by 1."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Ino Yamanaka: Take back control of a character you own in play."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "SAKURA HARUNO",
+      "title_en": "Let's see your best Ino.",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "Montre-moi ce que tu sais faire, Ino.",
+      "name_es": "SAKURA HARUNO",
+      "title_es": "Veamos lo mejor que tienes, Ino.",
+      "name_ja": "春野サクラ",
+      "title_ja": "「いの、本気を見せて。」",
+      "name_pt": "SAKURA HARUNO",
+      "title_pt": "Vamos ver o teu melhor, Ino.",
+      "name_it": "SAKURA HARUNO",
+      "title_it": "Vediamo il tuo meglio, Ino.",
+      "name_pl": "SAKURA HARUNO",
+      "title_pl": "Pokaż, co potrafisz, Ino.",
+      "image_file": "images/cards/SS/rare/SS-123-R.webp",
+      "image_url": "/images/cards/SS/mythos_v/SS-123-MV.webp"
+    },
+    "SS-121-SPV": {
+      "id": "SS-121-SPV",
+      "cardId": "SS-121-SPV",
+      "rarity": "SPV",
+      "number": "121",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_ja": "うずまきナルト",
+      "name_fr": "NARUTO UZUMAKI",
+      "name_es": "NARUTO UZUMAKI",
+      "title_en": "I'm not going to lose out to you.",
+      "title_ja": "「お前には負けない。」",
+      "title_fr": "Je ne vais pas me laisser distancer par toi.",
+      "title_es": "No voy a quedarme atrás de ti.",
+      "title_pt": "Não vou ficar atrás de ti.",
+      "title_it": "Non resterò indietro rispetto a te.",
+      "title_pl": "Nie dam ci się prześcignąć.",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every friendly Naruto Uzumaki in play."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kiba Inuzuka: Move the card at the bottom of this upgrade stack to another mission."
+        }
+      ],
+      "rarity_display": "Special V",
+      "data_complete": true,
+      "image_url": "/images/cards/SS/rare/SS-121-R.webp",
+      "image_file": "images/cards/SS/sp_v/SS-121-SPV.webp"
+    },
+    "SS-123-SPV": {
+      "id": "SS-123-SPV",
+      "cardId": "SS-123-SPV",
+      "rarity": "SPV",
+      "rarity_display": "Special V",
+      "number": "123",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] POWERUPs on friendly characters in this mission are increased by 1."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Ino Yamanaka: Take back control of a character you own in play."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "SAKURA HARUNO",
+      "title_en": "I could become a beautiful flower.",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "Je pourrais devenir une belle fleur.",
+      "name_es": "SAKURA HARUNO",
+      "title_es": "Podría convertirme en una hermosa flor.",
+      "name_ja": "春野サクラ",
+      "title_ja": "「わたしも綺麗な花になれる。」",
+      "name_pt": "SAKURA HARUNO",
+      "title_pt": "Eu poderia tornar-me uma bela flor.",
+      "name_it": "SAKURA HARUNO",
+      "title_it": "Potrei diventare un bel fiore.",
+      "name_pl": "SAKURA HARUNO",
+      "title_pl": "Mogłabym stać się pięknym kwiatem.",
+      "image_file": "images/cards/SS/sp_v/SS-123-SPV.webp",
+      "image_url": "/images/cards/SS/mythos_v/SS-123-MV.webp"
+    },
+    "SS-149-SPV": {
+      "id": "SS-149-SPV",
+      "cardId": "SS-149-SPV",
+      "rarity": "SPV",
+      "number": "149",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KAKASHI HATAKE",
+      "name_ja": "はたけカカシ",
+      "name_fr": "KAKASHI HATAKE",
+      "name_es": "KAKASHI HATAKE",
+      "title_en": "All right, scatter.",
+      "title_ja": "「よし、散れ。」",
+      "title_fr": "Bien, dispersez-vous.",
+      "title_es": "Bien, dispersaos.",
+      "title_pt": "Muito bem, dispersem-se.",
+      "title_it": "Bene, disperdetevi.",
+      "title_pl": "Dobrze, rozproszyć się.",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Search your deck for up to 2 Ninja Hound characters, reveal and draw them, then shuffle your deck. Play any number of Ninja Hound characters anywhere, paying 1 less."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Zabuza Momochi: Repeat the MAIN effect."
+        }
+      ],
+      "rarity_display": "Special V",
+      "data_complete": true,
+      "image_url": "/images/cards/SS/legendary/SS-149-L.webp",
+      "image_file": "images/cards/SS/sp_v/SS-149-SPV.webp"
+    },
+    "SS-007-C": {
+      "id": "SS-007-C",
+      "cardId": "SS-007-C",
+      "rarity": "C",
+      "rarity_display": "Common",
+      "number": "7",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SAKURA HARUNO",
+      "name_fr": "SAKURA HARUNO",
+      "name_es": "SAKURA HARUNO",
+      "name_ja": "春野サクラ",
+      "name_pt": "SAKURA HARUNO",
+      "name_it": "SAKURA HARUNO",
+      "name_pl": "SAKURA HARUNO",
+      "title_en": "Fight for Your Teammates",
+      "title_fr": "Se battre pour ses coéquipiers",
+      "title_es": "Luchar por tus compañeros",
+      "title_ja": "仲間のために戦う",
+      "title_pt": "Lutar pelos teus companheiros",
+      "title_it": "Combattere per i compagni",
+      "title_pl": "Walcz za drużynę",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-007-C.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the start of the round, POWERUP 2 a friendly Team 7 character in play."
+        }
+      ],
+      "data_complete": true
     }
   }
 }

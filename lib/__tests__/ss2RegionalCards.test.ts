@@ -15,7 +15,7 @@ const SAKURA = 'SS-123-MV';
 const ITACHI = 'SS-137-MV';
 const GAARA = 'SS-114-MV';
 const SASUKE = 'SS-126-MV';
-const NARUTO = 'SS-005-M';
+const NARUTO = 'SS-005-MV';
 const REGIONALS = [SAKURA, ITACHI, GAARA, SASUKE, NARUTO];
 
 const INO = 'KS-019-C';

@@ -31,6 +31,7 @@ import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
 import { executeMissionPhase, resumeMissionScoring, resolveChosenScoreEffect } from './phases/MissionPhase';
 import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleGiantSpider103EndOfRound, returnCharacterToHand, processChosenEndOfRoundEffect, processRemainingEndOfRoundEffects, finalizeEndPhase } from './phases/EndPhase';
 import { EffectEngine } from '../effects/EffectEngine';
+import { queueStartOfRoundTriggers } from './rules/startOfRoundTriggers';
 import { calculateCharacterPower } from './phases/PowerCalculation';
 import { missionSidePowerBonus } from '../effects/missions/ssMissions';
 import { openLowProfileAmbushPrompt } from '../effects/EffectEngine';
@@ -532,6 +533,8 @@ export class GameEngine {
     
     newState.phase = 'action';
     newState.activePlayer = newState.edgeHolder;
+
+    newState = queueStartOfRoundTriggers(newState);
 
     return newState;
   }

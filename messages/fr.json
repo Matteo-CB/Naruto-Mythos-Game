@@ -1518,6 +1518,7 @@
         "declareNumber": "Annoncez un nombre entre {min} et {max}. Plus il est grand, plus le pari est risqué.",
         "ss005ConfirmMain": "Placer la carte du dessus de votre deck comme personnage caché dans cette mission ?",
         "ss005ConfirmAmbush": "placer à nouveau la carte du dessus de votre deck comme personnage caché dans cette mission ?",
+        "ss007StartPowerup": "Début de manche : choisissez un personnage Team 7 allié à renforcer de 2.",
         "ss123MvTakeBack": "Reprenez le contrôle d’un personnage qui vous appartient.",
         "ss137MvReturnHidden": "Renvoyez un personnage caché allié de cette mission dans votre main.",
         "ss137MvConfirmDuel": "Forcer l’adversaire à vaincre ses personnages dans cette mission jusqu’à en avoir autant que vous ?",

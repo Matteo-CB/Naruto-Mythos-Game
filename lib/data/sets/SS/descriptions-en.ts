@@ -224,7 +224,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "[⧗] POWERUPs on friendly characters in this mission are increased by 1.",
     "[↯] Ino Yamanaka: Take back control of a character you own in play.",
   ],
-  "SS-005-M": [
+  "SS-005-MV": [
     "[↯] Put the top card of your deck as a hidden character in this mission.",
     "[↯] Repeat the MAIN effect.",
   ],
@@ -295,5 +295,28 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   "SS-150-S": [
     "[↯] Kakashi Hatake: Move the strongest enemy character in play to this mission.",
     "[↯] POWERUP X, where X is the cost of the strongest enemy character in this mission.",
+  ],
+  "SS-005-C": [
+    "[↯] Put the top card of your deck as a hidden character in this mission.",
+    "[↯] Repeat the MAIN effect.",
+  ],
+  "SS-007-C": [
+    "[⧗] At the start of the round, POWERUP 2 a friendly Team 7 character in play.",
+  ],
+  "SS-123-R": [
+    "[⧗] POWERUPs on friendly characters in this mission are increased by 1.",
+    "[↯] Ino Yamanaka: Take back control of a character you own in play.",
+  ],
+  "SS-121-SPV": [
+    "[⧗] This character has +1 Power for every friendly Naruto Uzumaki in play.",
+    "[↯] Kiba Inuzuka: Move the card at the bottom of this upgrade stack to another mission.",
+  ],
+  "SS-123-SPV": [
+    "[⧗] POWERUPs on friendly characters in this mission are increased by 1.",
+    "[↯] Ino Yamanaka: Take back control of a character you own in play.",
+  ],
+  "SS-149-SPV": [
+    "[↯] Search your deck for up to 2 Ninja Hound characters, reveal and draw them, then shuffle your deck. Play any number of Ninja Hound characters anywhere, paying 1 less.",
+    "[↯] Zabuza Momochi: Repeat the MAIN effect.",
   ],
 };
