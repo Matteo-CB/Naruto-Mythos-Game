@@ -1,5 +1,7 @@
 export const ADMIN_USERNAMES = ['Kutxyt', 'Daiki0'] as const;
 
+export const TOURNAMENT_OWNER_USERNAME = 'Kutxyt';
+
 export const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'] as const;
 
 const usernameSet = new Set(ADMIN_USERNAMES.map((u) => u.toLowerCase()));

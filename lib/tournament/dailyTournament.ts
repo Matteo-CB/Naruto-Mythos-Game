@@ -2,7 +2,6 @@ import { prisma } from '@/lib/db/prisma';
 import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
 import { sendTournamentCreated } from '@/lib/discord/tournamentCreatedWebhook';
 import { TOURNAMENT_PRIZE_CARD_IDS } from '@/lib/variants/constants';
-import { ADMIN_USERNAMES, ADMIN_EMAILS } from '@/lib/auth/admins';
 import {
   AUTO_TOURNAMENT_MAX_PLAYERS,
   AUTO_TOURNAMENT_REG_HOUR,
@@ -13,6 +12,7 @@ import {
   specForWeekday,
 } from '@/lib/tournament/weeklySchedule';
 import { getLatestSealedSetId } from '@/lib/data/sets/registry';
+import { findTournamentOwner } from '@/lib/tournament/tournamentOwner';
 
 export const DAILY_TOURNAMENT_TZ = 'Europe/Paris';
 export const DAILY_TOURNAMENT_REG_HOUR = AUTO_TOURNAMENT_REG_HOUR;
@@ -84,15 +84,7 @@ export async function createDailyTournamentIfNeeded(now: Date = new Date()): Pro
   });
   if (existing) return { created: false, reason: 'already_exists', tournamentId: existing.id };
 
-  const admin = await prisma.user.findFirst({
-    where: {
-      OR: [
-        { username: { in: [...ADMIN_USERNAMES] } },
-        { email: { in: [...ADMIN_EMAILS] } },
-      ],
-    },
-    select: { id: true, username: true },
-  });
+  const admin = await findTournamentOwner();
   if (!admin) return { created: false, reason: 'no_admin' };
 
   const prizeCardId = pickDailyPrizeCardId();

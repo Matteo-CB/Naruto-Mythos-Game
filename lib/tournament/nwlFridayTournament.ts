@@ -1,8 +1,8 @@
 import { prisma } from '@/lib/db/prisma';
 import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
-import { ADMIN_USERNAMES, ADMIN_EMAILS } from '@/lib/auth/admins';
 import { parisDateParts, parisWallToUtc } from '@/lib/tournament/dailyTournament';
 import { NWL_PARTNER_KEY, NWL_TOURNAMENT_NAME, NWL_MAX_PLAYERS, NWL_START_HOUR, NWL_TOURNAMENT_RULES_NOTE, NWL_CHUNIN_RESET_WEEKDAY, revokeAllNwlChuninRoles } from '@/lib/tournament/nwlPartner';
+import { findTournamentOwner } from '@/lib/tournament/tournamentOwner';
 
 export const NWL_REG_OPEN_HOUR = 14;
 export const NWL_FRIDAY_WEEKDAY = 5;
@@ -56,10 +56,7 @@ export async function createNwlFridayTournamentIfNeeded(now: Date = new Date()):
   });
   if (existing) return { created: false, reason: 'already_exists', tournamentId: existing.id };
 
-  const admin = await prisma.user.findFirst({
-    where: { OR: [{ username: { in: [...ADMIN_USERNAMES] } }, { email: { in: [...ADMIN_EMAILS] } }] },
-    select: { id: true, username: true },
-  });
+  const admin = await findTournamentOwner();
   if (!admin) return { created: false, reason: 'no_admin' };
 
   const tournament = await prisma.tournament.create({
