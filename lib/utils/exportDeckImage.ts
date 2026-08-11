@@ -59,10 +59,80 @@ function drawCornerBrackets(ctx: CanvasRenderingContext2D, x: number, y: number,
 }
 
 
+type ArtlessCard = CharacterCard | MissionCard;
+
+function localizedField(card: ArtlessCard, base: 'name' | 'title', locale: string): string {
+  const champs = card as unknown as Record<string, unknown>;
+  const l = champs[`${base}_${locale}`];
+  if (typeof l === 'string' && l) return l;
+  const en = champs[`${base}_en`];
+  if (typeof en === 'string' && en) return en;
+  const fr = champs[`${base}_fr`];
+  return typeof fr === 'string' ? fr : '';
+}
+
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number): string[] {
+  const mots = text.split(/\s+/).filter(Boolean);
+  const lignes: string[] = [];
+  let courante = '';
+  for (const mot of mots) {
+    const essai = courante ? `${courante} ${mot}` : mot;
+    if (ctx.measureText(essai).width <= maxWidth || !courante) {
+      courante = essai;
+    } else {
+      lignes.push(courante);
+      courante = mot;
+      if (lignes.length === maxLines) break;
+    }
+  }
+  if (courante && lignes.length < maxLines) lignes.push(courante);
+  return lignes.slice(0, maxLines);
+}
+
+function drawMissingArt(
+  ctx: CanvasRenderingContext2D,
+  card: ArtlessCard,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  locale: string,
+): void {
+  const nom = localizedField(card, 'name', locale);
+  const titre = localizedField(card, 'title', locale);
+  const numero = card.number === undefined ? '' : String(card.number).replace(/^(\d+)/, (d) => d.padStart(3, '0'));
+
+  ctx.textBaseline = 'top';
+  ctx.textAlign = 'left';
+
+  ctx.fillStyle = '#f2f0ea';
+  ctx.font = 'bold 13px "Nevanta", sans-serif';
+  const lignesNom = wrapText(ctx, nom.toUpperCase(), w, 3);
+  let curseur = y;
+  for (const ligne of lignesNom) {
+    ctx.fillText(ligne, x, curseur);
+    curseur += 15;
+  }
+
+  if (titre) {
+    ctx.fillStyle = '#a8a29a';
+    ctx.font = 'italic 10px "Nevanta", sans-serif';
+    for (const ligne of wrapText(ctx, titre, w, 2)) {
+      ctx.fillText(ligne, x, curseur + 2);
+      curseur += 12;
+    }
+  }
+
+  ctx.fillStyle = GOLD;
+  ctx.font = 'bold 11px "Nevanta", sans-serif';
+  ctx.fillText([numero, card.rarity].filter(Boolean).join('  '), x, y + h - 12, w);
+}
+
 export async function exportDeckAsImage(
   deckName: string,
   characters: CharacterCard[],
   missions: MissionCard[],
+  locale: string = 'fr',
 ): Promise<void> {
   const sorted = [...characters].sort((a, b) => {
     const costDiff = (a.chakra ?? 0) - (b.chakra ?? 0);
@@ -222,13 +292,10 @@ export async function exportDeckAsImage(
       ctx.drawImage(img, x, cy, CARD_W, CARD_H);
       ctx.restore();
     } else {
-      ctx.fillStyle = '#1a1a1a';
+      ctx.fillStyle = '#16161a';
       drawRoundedRect(ctx, x + 1, cy + 1, CARD_W - 2, CARD_H - 2, 3);
       ctx.fill();
-      ctx.fillStyle = '#555';
-      ctx.font = '10px "Nevanta", sans-serif';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(sorted[i].name_fr, x + 6, cy + CARD_H / 2, CARD_W - 12);
+      drawMissingArt(ctx, sorted[i], x + 8, cy + 10, CARD_W - 16, CARD_H - 20, locale);
     }
 
     
@@ -299,13 +366,10 @@ export async function exportDeckAsImage(
       ctx.drawImage(img, drawX, drawY, drawW, drawH);
       ctx.restore();
     } else {
-      ctx.fillStyle = '#1a1a1a';
+      ctx.fillStyle = '#16161a';
       drawRoundedRect(ctx, x + 1, my + 1, MISSION_W - 2, MISSION_H - 2, 3);
       ctx.fill();
-      ctx.fillStyle = GOLD;
-      ctx.font = '11px "Nevanta", sans-serif';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(missions[i].name_fr, x + 8, my + MISSION_H / 2, MISSION_W - 16);
+      drawMissingArt(ctx, missions[i], x + 10, my + 12, MISSION_W - 20, MISSION_H - 24, locale);
     }
 
     

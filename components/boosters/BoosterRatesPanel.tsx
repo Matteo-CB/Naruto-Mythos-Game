@@ -6,6 +6,7 @@ import { getCardById } from '@/lib/data/cardIndex';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { VARIANT_PACK_PROBABILITIES, type PackSlotKind } from '@/lib/variants/constants';
 
 const PANEL_CLIP = 'polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px)';
@@ -73,15 +74,21 @@ export function BoosterRatesPanel() {
               className="flex flex-col items-center text-center gap-2 px-2 py-4"
               style={{ backgroundColor: 'var(--t-surface-2)', clipPath: TILE_CLIP }}
             >
-              {img && (
+              {card && (
                 <div className="relative overflow-hidden" style={{ width: 72, height: 100 }}>
-                  <img
-                    src={img}
-                    alt={card ? getCardName(card, locale) : k}
-                    draggable={false}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', boxShadow: `0 0 16px ${color}40` }}
-                  />
-                  {isHoloSlot && <HoloFoilOverlay intensity="strong" imageUrl={img} />}
+                  {img ? (
+                    <>
+                      <img
+                        src={img}
+                        alt={getCardName(card, locale)}
+                        draggable={false}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', boxShadow: `0 0 16px ${color}40` }}
+                      />
+                      {isHoloSlot && <HoloFoilOverlay intensity="strong" imageUrl={img} />}
+                    </>
+                  ) : (
+                    <CardArtFallback card={card} />
+                  )}
                 </div>
               )}
               <span className="font-display text-[10px] uppercase leading-none" style={{ color, letterSpacing: '0.14em' }}>

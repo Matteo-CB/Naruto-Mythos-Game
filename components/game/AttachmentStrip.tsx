@@ -4,6 +4,7 @@ import { memo } from 'react';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { isLandscapeCard } from '@/lib/cards/orientation';
 import type { CardData } from '@/lib/engine/types';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 
 interface AttachmentStripProps {
   card: CardData;
@@ -64,6 +65,8 @@ export const AttachmentStrip = memo(function AttachmentStrip({
         zIndex: 0,
         pointerEvents: 'auto',
       }}
-    />
+    >
+      {!card.image_file && <CardArtFallback card={card} />}
+    </div>
   );
 });

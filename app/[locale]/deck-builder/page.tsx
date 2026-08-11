@@ -15,6 +15,7 @@ import { useUnlockedVariants } from "@/lib/hooks/useUnlockedVariants";
 import { isVariantCard, isLockedVariantCard, baseCardIdFor } from "@/lib/variants/isVariant";
 import { holoIdFor, isHoloId, holoBaseId } from "@/lib/holo/holoId";
 import { HoloFoilOverlay } from "@/components/cards/HoloFoilOverlay";
+import { CardArtFallback } from "@/components/cards/CardArtFallback";
 import { CloudBackground } from "@/components/CloudBackground";
 import { isLandscapeCard, hasCombatStats } from "@/lib/cards/orientation";
 import { ORDERED_SET_IDS, SET_REGISTRY } from "@/lib/data/sets/registry";
@@ -257,7 +258,7 @@ const CatalogCard = memo(function CatalogCard({
       {imgPath ? (
         <GridThumb src={imgPath} />
       ) : (
-        <div className="w-full h-full" style={{ backgroundColor: 'var(--t-panel)' }} />
+        <CardArtFallback card={card} />
       )}
       {inDeckCount > 0 && (
         <div className="absolute top-0 right-0 px-1 text-[7px] font-bold"
@@ -303,7 +304,7 @@ const CatalogMission = memo(function CatalogMission({
       {imgPath ? (
         <GridThumb src={imgPath} />
       ) : (
-        <div className="w-full h-full" style={{ backgroundColor: 'var(--t-panel)' }} />
+        <CardArtFallback card={card} />
       )}
       {isBanned && (
         <span aria-hidden className="absolute top-0 left-0 font-display font-bold uppercase pointer-events-none"
@@ -348,7 +349,7 @@ const DeckCard = memo(function DeckCard({
       {imgPath ? (
         <GridThumb src={imgPath} />
       ) : (
-        <div className="w-full h-full" style={{ backgroundColor: 'var(--t-panel)' }} />
+        <CardArtFallback card={card} />
       )}
       {card.isHolo && imgPath && <HoloFoilOverlay imageUrl={imgPath} />}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none"
@@ -991,9 +992,7 @@ export default function DeckBuilderPage() {
           {imgPath ? (
             <img src={imgPath} alt={getCardName(card, loc)} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'var(--t-panel)' }}>
-              <span className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{getCardName(card, loc)}</span>
-            </div>
+            <CardArtFallback card={card} />
           )}
         </div>
 
@@ -1276,7 +1275,7 @@ export default function DeckBuilderPage() {
               >
                 {m ? (
                   <>
-                    {mImg && <img src={mImg} alt="" className="w-full h-full object-cover" />}
+                    {mImg ? <img src={mImg} alt="" className="w-full h-full object-cover" /> : <CardArtFallback card={m} />}
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none"
                       style={{ backgroundColor: 'rgba(179,62,62,0.4)', transition: 'opacity 80ms' }}>
                       <span className="text-sm font-bold" style={{ color: 'var(--t-text)' }}>x</span>

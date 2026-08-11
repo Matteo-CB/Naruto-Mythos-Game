@@ -530,3 +530,146 @@ p, .font-body {
     opacity: 0.82;
   }
 }
+
+.card-fallback {
+  container-type: inline-size;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #101014;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  padding: 0;
+  gap: 0;
+}
+
+.card-fallback-top {
+  display: flex;
+  justify-content: flex-end;
+  padding: 4cqi 4cqi 0 24cqi;
+  min-height: 0;
+}
+
+.card-fallback-set,
+.card-fallback-rarity,
+.card-fallback-group,
+.card-fallback-keywords,
+.card-fallback-notice,
+.card-fallback-title {
+  display: none;
+}
+
+.card-fallback-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.6cqi;
+  padding: 2cqi 4cqi;
+  min-height: 0;
+}
+
+.card-fallback-name {
+  font-family: 'Nevanta', Arial, sans-serif;
+  font-weight: 700;
+  font-size: max(9px, 10.5cqi);
+  line-height: 1.1;
+  color: #f2f0ea;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow-wrap: break-word;
+}
+
+.card-fallback-bottom {
+  display: flex;
+  align-items: baseline;
+  gap: 2.5cqi;
+  padding: 0 24cqi 4cqi 4cqi;
+  min-height: 0;
+}
+
+.card-fallback-meta {
+  font-family: 'Nevanta', Arial, sans-serif;
+  font-weight: 700;
+  font-size: max(9px, 7.5cqi);
+  line-height: 1.1;
+  letter-spacing: 0.03em;
+}
+
+@container (min-width: 88px) {
+  .card-fallback-title {
+    display: -webkit-box;
+    font-size: max(8px, 6.4cqi);
+    line-height: 1.2;
+    color: #b3aea4;
+    font-style: italic;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .card-fallback-set,
+  .card-fallback-rarity {
+    display: block;
+    font-size: max(8px, 5.4cqi);
+    line-height: 1.2;
+    color: #918b82;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@container (min-width: 132px) {
+  .card-fallback-name {
+    font-family: 'NJNaruto', 'Nevanta', Arial, sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  .card-fallback-group {
+    display: block;
+    font-size: max(8px, 5.2cqi);
+    line-height: 1.25;
+    color: #918b82;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@container (min-width: 172px) {
+  .card-fallback-keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2cqi;
+  }
+
+  .card-fallback-keyword {
+    background-color: rgba(255, 255, 255, 0.07);
+    color: #a8a29a;
+    font-size: 4.6cqi;
+    line-height: 1.5;
+    padding: 0.4cqi 1.6cqi;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  .card-fallback-notice {
+    display: block;
+    font-size: 4.2cqi;
+    line-height: 1.2;
+    color: #6d6862;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0 4cqi 3cqi;
+  }
+}

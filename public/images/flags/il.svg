@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="flag-icons-il" viewBox="0 0 640 480">
+  <path fill="#fff" d="M0 0h640v480H0z"/>
+  <path fill="#0038b8" d="M0 60h640v60H0zM0 360h640v60H0z"/>
+  <g fill="none" stroke="#0038b8" stroke-width="20" stroke-miterlimit="4">
+    <path d="M320 135 229.07 292.5h181.86z"/>
+    <path d="M320 345 410.93 187.5H229.07z"/>
+  </g>
+</svg>

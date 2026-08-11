@@ -11,6 +11,7 @@ import { useBannedCards } from '@/lib/hooks/useBannedCards';
 import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 import { isLockedVariantCard } from '@/lib/variants/isVariant';
 import { VariantLockedBanner } from '@/components/cards/VariantLockedBanner';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from '@/components/icons/GameIcons';
 import { cardIdToSlug } from '@/lib/cards/slug';
@@ -69,8 +70,8 @@ export function CardQuickPreviewModal({ card, onClose }: { card: CardData; onClo
                 {card.isHolo && <HoloFoilOverlay intensity="preview" imageUrl={imgPath} />}
               </>
             ) : (
-              <div className={`w-full ${isMission ? 'mission-aspect' : 'card-aspect'} bg-[#1a1a1a] flex items-center justify-center`}>
-                <span className="text-xs text-[#555]">{t('card.noImage')}</span>
+              <div className={`relative w-full ${isMission ? 'mission-aspect' : 'card-aspect'}`}>
+                <CardArtFallback card={card} />
               </div>
             )}
             {isBanned && (

@@ -3,14 +3,15 @@
 import { memo, useMemo } from 'react';
 import { effectTypeLabel } from '@/lib/cards/effectTypeLabel';
 import { hasCombatStats } from '@/lib/cards/orientation';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import type { CardData, CharacterCard, MissionCard, Rarity } from '@/lib/engine/types';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import CardBack from './CardBack';
+import { CardArtFallback } from './CardArtFallback';
 import { HoloFoilOverlay } from './HoloFoilOverlay';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { ChakraIcon, PowerIcon, CHAKRA_COLOR_SOFT, POWER_COLOR_BRIGHT } from '@/components/icons/GameIcons';
-import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
+import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
 import { cardAspectRatio } from '@/lib/cards/orientation';
 
 const RARITY_COLORS: Record<Rarity, string> = {
@@ -44,7 +45,6 @@ export interface CardFaceProps {
 
 function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = false, banned = false }: CardFaceProps) {
   const locale = useLocale();
-  const tCardMeta = useTranslations('cardMeta');
 
   if (banned) {
     return <CardBack className={className} />;
@@ -79,97 +79,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
           }}
         />
       ) : (
-        
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: '#111111',
-            border: `2px solid ${rarityColor}40`,
-            borderRadius: '8px',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '8%',
-          }}
-        >
-          
-          <div style={{
-            width: '40%',
-            height: '2px',
-            backgroundColor: rarityColor,
-            marginBottom: '6%',
-            opacity: 0.6,
-          }} />
-          
-          <div style={{
-            color: '#d0d0d0',
-            fontSize: '0.65em',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.04em',
-            lineHeight: 1.2,
-            marginBottom: '2%',
-          }}>
-            {getCardName(card, locale as 'en' | 'fr')}
-          </div>
-          
-          {getCardTitle(card, locale as 'en' | 'fr') && (
-            <div style={{
-              color: '#777777',
-              fontSize: '0.45em',
-              lineHeight: 1.3,
-              marginBottom: '4%',
-              fontStyle: 'italic',
-            }}>
-              {getCardTitle(card, locale as 'en' | 'fr')}
-            </div>
-          )}
-          
-          {card.group && (
-            <div style={{
-              color: '#666666',
-              fontSize: '0.4em',
-              marginBottom: '3%',
-            }}>
-              {getCardGroup(card.group, tCardMeta)}
-            </div>
-          )}
-          
-          {card.keywords && card.keywords.length > 0 && (
-            <div style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '2px',
-              marginBottom: '3%',
-            }}>
-              {card.keywords.map((kw) => (
-                <span
-                  key={kw}
-                  style={{
-                    backgroundColor: '#1a1a1a',
-                    color: '#888888',
-                    fontSize: '0.35em',
-                    padding: '1px 4px',
-                    borderRadius: '2px',
-                    border: '1px solid #2a2a2a',
-                  }}
-                >
-                  {getCardKeyword(kw, tCardMeta)}
-                </span>
-              ))}
-            </div>
-          )}
-          
-          <div style={{ flex: 1 }} />
-          
-          <div style={{
-            color: '#3a3a3a',
-            fontSize: '0.35em',
-            textAlign: 'right',
-          }}>
-            {card.id}
-          </div>
-        </div>
+        <CardArtFallback card={card} />
       )}
 
       {hasImage && card.isHolo && <HoloFoilOverlay imageUrl={imageSrc} />}

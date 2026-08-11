@@ -8,6 +8,7 @@ import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { isLandscapeCard } from '@/lib/cards/orientation';
 import { getCardName, getRarityLabel } from '@/lib/utils/cardLocale';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { RarityIcon } from '@/components/icons/RarityIcon';
 
 interface SealedPoolReviewProps {
@@ -150,9 +151,7 @@ function PoolCard({ card, index, locale }: { card: BoosterCard; index: number; l
       {imgPath ? (
         <img src={imgPath} alt={cardName} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
       ) : (
-        <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'var(--t-surface-2)' }}>
-          <span className="text-[9px] text-center px-1" style={{ color: 'var(--t-muted)' }}>{cardName}</span>
-        </div>
+        <CardArtFallback card={card} />
       )}
       <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
         <div className="flex items-center justify-between">

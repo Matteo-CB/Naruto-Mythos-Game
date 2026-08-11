@@ -7,6 +7,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from '@/components/icons/GameIcons';
 import type { CharacterCard, MissionCard, VisibleCharacter } from '@/lib/engine/types';
 
@@ -367,11 +368,7 @@ function AllCardsModal({
                       decoding="async"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-[7px] text-center px-0.5" style={{ color: '#666' }}>
-                        {getCardName(card, locale as 'en' | 'fr')}
-                      </span>
-                    </div>
+                    <CardArtFallback card={card} />
                   )}
                   
                   <span
@@ -446,12 +443,14 @@ function BoardCharactersModal({
       >
         {imgPath && !char.isHidden ? (
           <img src={imgPath} alt="" className="w-full h-full" style={{ objectFit: 'cover' }} draggable={false} />
-        ) : (
+        ) : char.isHidden ? (
           <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-            <span className="text-[7px] text-center px-0.5" style={{ color: char.isHidden ? '#888' : '#666' }}>
-              {char.isHidden ? t('sandbox.hide') : getCardName(char.card, locale as 'en' | 'fr')}
+            <span className="text-[7px] text-center px-0.5" style={{ color: '#888' }}>
+              {t('sandbox.hide')}
             </span>
           </div>
+        ) : (
+          <CardArtFallback card={char.card} />
         )}
         <span className="absolute bottom-0 left-0 right-0 text-[7px] text-center truncate px-0.5"
           style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: '#ccc' }}>
@@ -680,11 +679,7 @@ function DeckCardItem({
           draggable={false}
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center">
-          <span className="text-[8px] text-center px-1" style={{ color: '#666' }}>
-            {getCardName(card, locale as 'en' | 'fr')}
-          </span>
-        </div>
+        <CardArtFallback card={card} />
       )}
       {showIndex && (
         <span

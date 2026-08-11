@@ -22,6 +22,7 @@ import {
   PopupMinimizePill,
   PopupMinimizeX,
 } from './PopupPrimitives';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 
 interface HandCardInfo {
   index: number;
@@ -103,14 +104,7 @@ function HandCard({
           style={{ backgroundImage: `url('${imagePath}')` }}
         />
       ) : (
-        <div
-          className="w-full h-full flex items-center justify-center"
-          style={{ backgroundColor: '#1a1a1a' }}
-        >
-          <span className="text-[10px] text-center px-1" style={{ color: '#888888' }}>
-            {getCardName(card as Parameters<typeof getCardName>[0], locale as 'en' | 'fr')}
-          </span>
-        </div>
+        <CardArtFallback card={card as Parameters<typeof getCardName>[0]} />
       )}
 
       {card.chakra !== undefined && (

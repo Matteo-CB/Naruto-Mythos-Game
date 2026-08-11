@@ -7,6 +7,7 @@ import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { getCardById } from '@/lib/data/cardIndex';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 
@@ -31,6 +32,15 @@ function CardRow({ ids }: { ids: string[] }) {
         return img ? (
           <img key={`${id}-${i}`} src={img} alt={card ? getCardName(card, locale) : id} title={card ? getCardName(card, locale) : id}
             style={{ width: 32, height: 45, objectFit: 'cover' }} draggable={false} />
+        ) : card ? (
+          <span
+            key={`${id}-${i}`}
+            className="relative block overflow-hidden"
+            style={{ width: 32, height: 45 }}
+            title={getCardName(card, locale)}
+          >
+            <CardArtFallback card={card} />
+          </span>
         ) : (
           <span key={`${id}-${i}`} className="text-[10px] px-1" style={{ color: 'var(--t-muted)' }}>{id}</span>
         );

@@ -14,6 +14,7 @@ import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel
 import { ChakraIcon, CHAKRA_COLOR } from '@/components/icons/GameIcons';
 import Image from 'next/image';
 import { RarityIcon } from '@/components/icons/RarityIcon';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 
 interface Props {
   isAdmin: boolean;
@@ -239,6 +240,7 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
                 title={displayLabel}
               >
                 <div className="relative" style={{ width: '100%', aspectRatio: '110 / 160' }}>
+                  {card ? <CardArtFallback card={card} /> : null}
                   <Image
                     src={`/images/cards/KS/mythos_v/${cardId}.webp`}
                     alt=""

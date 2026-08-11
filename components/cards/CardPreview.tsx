@@ -8,6 +8,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
 import type { CharacterCard, MissionCard, CardEffect, Rarity } from '@/lib/engine/types';
 import CardBack from './CardBack';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { HoloFoilOverlay } from './HoloFoilOverlay';
 import { isLandscapeCard, hasCombatStats } from '@/lib/cards/orientation';
 
@@ -114,28 +115,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                   {card.isHolo && <HoloFoilOverlay intensity="preview" imageUrl={imageSrc} />}
                 </>
               ) : (
-                <div
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#1a1a1a',
-                  }}
-                >
-                  <span
-                    style={{
-                      color: '#444444',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.08em',
-                    }}
-                  >
-                    {getCardName(card, locale as 'en' | 'fr')}
-                  </span>
-                </div>
+                <CardArtFallback card={card} />
               )}
 
               <div

@@ -26,6 +26,7 @@ import {
 } from './PopupPrimitives';
 import { useBoardPalette } from './BoardPaletteContext';
 import { RarityIcon } from '@/components/icons/RarityIcon';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 
 const effectTypeColors: Record<string, string> = {
   MAIN: '#c4a35a',
@@ -96,17 +97,7 @@ function MulliganCard({
           style={{ backgroundImage: `url('${imagePath}')` }}
         />
       ) : (
-        <div
-          className="w-full h-full flex items-center justify-center"
-          style={{ backgroundColor: '#1a1a1a' }}
-        >
-          <span
-            className="text-[10px] text-center px-1"
-            style={{ color: '#555555' }}
-          >
-            {getCardName(card, locale as 'en' | 'fr')}
-          </span>
-        </div>
+        <CardArtFallback card={card} />
       )}
 
       <div

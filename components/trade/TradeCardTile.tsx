@@ -5,6 +5,7 @@ import type { CardData } from '@/lib/engine/types';
 import { normalizeImagePath , portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { useLocale } from 'next-intl';
 
 interface TradeCardTileProps {
@@ -51,9 +52,7 @@ export function TradeCardTile({ card, count, onClick, disabled, size = 'md', dim
           {card.isHolo && <HoloFoilOverlay imageUrl={img} />}
         </>
       ) : (
-        <div className="w-full h-full flex items-center justify-center px-1">
-          <span className="text-[8px] text-center" style={{ color: 'var(--t-muted)' }}>{getCardName(card, locale)}</span>
-        </div>
+        <CardArtFallback card={card} />
       )}
       {count !== undefined && count >= 2 && (
         <span

@@ -14,6 +14,7 @@ import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from '@/components/i
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
 import { SealedTimer } from './SealedTimer';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { facetOptions, isFacetWorthShowing } from '@/lib/collection/facets';
 import { useValidFacetSelection } from '@/lib/collection/useFacets';
 import { RarityIcon } from '@/components/icons/RarityIcon';
@@ -492,9 +493,7 @@ export function SealedDeckBuilder({
                     {imgPath ? (
                       <img src={imgPath} alt={getCardName(m, locale)} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'var(--t-surface-2)' }}>
-                        <span className="text-[9px] text-center px-1" style={{ color: 'var(--t-muted)' }}>{getCardName(m, locale)}</span>
-                      </div>
+                      <CardArtFallback card={m} />
                     )}
                     <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
                       <span className="text-[8px] truncate" style={{ color: 'var(--t-text)' }}>{getCardName(m, locale)}</span>
@@ -549,9 +548,7 @@ export function SealedDeckBuilder({
                     {imgPath ? (
                       <img src={imgPath} alt={getCardName(card, locale)} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'var(--t-surface-2)' }}>
-                        <span className="text-[9px] text-center px-1" style={{ color: 'var(--t-muted)' }}>{getCardName(card, locale)}</span>
-                      </div>
+                      <CardArtFallback card={card} />
                     )}
 
                     <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
@@ -650,9 +647,7 @@ export function SealedDeckBuilder({
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'var(--t-surface-2)' }}>
-                      <span className="text-xs" style={{ color: 'var(--t-muted)' }}>{getCardName(previewCard, locale)}</span>
-                    </div>
+                    <CardArtFallback card={previewCard} />
                   )}
                 </div>
 
@@ -783,9 +778,7 @@ export function SealedDeckBuilder({
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'var(--t-surface-2)' }}>
-                      <span className="text-xs" style={{ color: 'var(--t-muted)' }}>{getCardName(previewCard, locale)}</span>
-                    </div>
+                    <CardArtFallback card={previewCard} />
                   )}
                 </div>
 

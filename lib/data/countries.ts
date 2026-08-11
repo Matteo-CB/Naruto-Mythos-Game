@@ -438,6 +438,10 @@ export const COUNTRIES: Country[] = [
     "name": "Isle of Man"
   },
   {
+    "code": "il",
+    "name": "Israel"
+  },
+  {
     "code": "it",
     "name": "Italy"
   },

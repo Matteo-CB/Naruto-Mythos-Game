@@ -8,6 +8,7 @@ import { normalizeImagePath , portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useUIStore } from '@/stores/uiStore';
 import { PopupOverlay, PopupCornerFrame, PopupMinimizeX } from './PopupPrimitives';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 
 interface DiscardPileViewerProps {
   cards: CardData[];
@@ -97,14 +98,8 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
                               />
                             </div>
                           ) : (
-                            <div
-                              className="w-full flex items-center justify-center"
-                              style={{
-                                aspectRatio: '5/7',
-                                backgroundColor: '#1a1a1a',
-                              }}
-                            >
-                              <span className="text-[9px]" style={{ color: '#555' }}>?</span>
+                            <div className="relative w-full" style={{ aspectRatio: '5/7' }}>
+                              <CardArtFallback card={card} />
                             </div>
                           )}
                         </div>

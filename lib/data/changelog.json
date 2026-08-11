@@ -10,6 +10,7 @@
       "title_it": "Tema chiaro Shinobi Shiren, icone di rarità e nuove carte",
       "title_pl": "Jasny motyw Shinobi Shiren, ikony rzadkości i nowe karty",
       "categories": [
+        "fix",
         "feature",
         "feature",
         "fix",
@@ -24,6 +25,7 @@
         "fix"
       ],
       "changes_fr": [
+        "Les cartes qui n'ont pas encore d'illustration affichent leur nom, leur set, leur numéro et leur rareté au lieu d'un cadre vide.",
         "Neuf cartes du set 2 arrivent avec leur illustration, dont des versions Regional et Special.",
         "Sakura Haruno Se battre pour ses coéquipiers 7 renforce de 2 un allié Team 7 au début de chaque manche.",
         "Naruto Uzumaki Des yeux remplis de solitude 5 est désormais classé en Mythos V.",
@@ -38,6 +40,7 @@
         "Une carte cachée ne peut plus être révélée à côté d'un personnage du même nom : elle évolue dessus ou reste cachée."
       ],
       "changes_en": [
+        "Cards that do not have artwork yet show their name, set, number and rarity instead of an empty frame.",
         "Nine set 2 cards arrive with their artwork, including Regional and Special versions.",
         "Sakura Haruno Fight for Your Teammates 7 gives a friendly Team 7 character 2 Power at the start of each round.",
         "Naruto Uzumaki Eyes full of loneliness 5 is now listed as a Mythos V.",
@@ -52,6 +55,7 @@
         "A face down card can no longer be revealed next to a character with the same name: it upgrades onto it or stays hidden."
       ],
       "changes_es": [
+        "Las cartas que aún no tienen ilustración muestran su nombre, set, número y rareza en lugar de un marco vacío.",
         "Llegan nueve cartas del set 2 con su ilustración, incluidas versiones Regional y Special.",
         "Sakura Haruno Luchar por tus compañeros 7 da 2 de poder a un personaje Team 7 aliado al inicio de cada ronda.",
         "Naruto Uzumaki Ojos llenos de soledad 5 pasa a estar clasificada como Mythos V.",
@@ -66,6 +70,7 @@
         "Una carta oculta ya no puede revelarse junto a un personaje del mismo nombre: evoluciona sobre él o sigue oculta."
       ],
       "changes_ja": [
+        "イラストが未実装のカードは、空の枠ではなく名前、セット、番号、レアリティを表示します。",
         "セット２のカード９枚がイラスト付きで登場。RegionalとSpecialの版も含みます。",
         "春野サクラ「仲間のために戦う」7は、各ラウンド開始時に味方の第七班にパワー2を与えます。",
         "うずまきナルト「孤独に満ちた瞳」5は Mythos V に分類されました。",
@@ -80,6 +85,7 @@
         "伏せたカードは、同じ名前の忍がいる場所では公開できなくなりました。進化するか、伏せたままになります。"
       ],
       "changes_pt": [
+        "As cartas que ainda não têm ilustração mostram o nome, o set, o número e a raridade em vez de uma moldura vazia.",
         "Chegam nove cartas do set 2 com a sua ilustração, incluindo versões Regional e Special.",
         "Sakura Haruno Lutar pelos teus companheiros 7 dá 2 de poder a um personagem Team 7 aliado no início de cada ronda.",
         "Naruto Uzumaki Olhos cheios de solidão 5 passa a estar classificada como Mythos V.",
@@ -94,6 +100,7 @@
         "Uma carta virada para baixo já não pode ser revelada ao lado de um personagem com o mesmo nome: evolui sobre ele ou fica escondida."
       ],
       "changes_it": [
+        "Le carte che non hanno ancora un'illustrazione mostrano nome, set, numero e rarità invece di una cornice vuota.",
         "Arrivano nove carte del set 2 con la loro illustrazione, comprese le versioni Regional e Special.",
         "Sakura Haruno Combattere per i compagni 7 dà 2 di potenza a un personaggio Team 7 alleato all'inizio di ogni round.",
         "Naruto Uzumaki Occhi pieni di solitudine 5 è ora classificata come Mythos V.",
@@ -108,6 +115,7 @@
         "Una carta coperta non può più essere rivelata accanto a un personaggio con lo stesso nome: si evolve su di lui o resta nascosta."
       ],
       "changes_pl": [
+        "Karty bez ilustracji pokazują nazwę, dodatek, numer i rzadkość zamiast pustej ramki.",
         "Dziewięć kart z dodatku 2 trafia do gry wraz z ilustracjami, w tym wersje Regional i Special.",
         "Sakura Haruno Walcz za drużynę 7 daje sojuszniczej postaci Team 7 2 mocy na początku każdej rundy.",
         "Naruto Uzumaki Oczy pełne samotności 5 jest teraz klasyfikowana jako Mythos V.",

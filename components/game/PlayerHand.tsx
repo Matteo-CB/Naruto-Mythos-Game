@@ -9,6 +9,7 @@ import type { CharacterCard } from '@/lib/engine/types';
 
 import { portraitImagePath } from '@/lib/utils/imagePath';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -182,14 +183,7 @@ const HandCard = React.memo(function HandCard({
           {card.isHolo && <HoloFoilOverlay imageUrl={imagePath} />}
         </>
       ) : (
-        <div
-          className="w-full h-full flex items-center justify-center"
-          style={{ backgroundColor: '#1a1a1a' }}
-        >
-          <span className="text-[9px] text-center px-1" style={{ color: '#555555' }}>
-            {getCardName(card, locale as 'en' | 'fr')}
-          </span>
-        </div>
+        <CardArtFallback card={card} />
       )}
 
       <div

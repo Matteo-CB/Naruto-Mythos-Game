@@ -10,6 +10,7 @@ import { getRarityLabel, getCardName } from '@/lib/utils/cardLocale';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { RarityIcon } from '@/components/icons/RarityIcon';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 
 interface CardRevealProps {
   card: BoosterCard;
@@ -158,14 +159,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
-            <div
-              className="w-full h-full flex items-center justify-center"
-              style={{ backgroundColor: 'var(--t-surface-2)' }}
-            >
-              <span className="text-xs text-center px-2" style={{ color: 'var(--t-muted)' }}>
-                {getCardName(card, locale)}
-              </span>
-            </div>
+            <CardArtFallback card={card} />
           )}
 
           {isFoilHolo && isFlipped && <HoloFoilOverlay intensity="strong" imageUrl={imagePath} />}

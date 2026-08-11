@@ -23,6 +23,7 @@ function boardKeyOf(char: VisibleCharacter): string {
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { AttachmentStrip, CHARACTER_VISIBLE_RATIO, MISSION_VISIBLE_RATIO } from './AttachmentStrip';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
 import { useBoardPalette } from './BoardPaletteContext';
@@ -279,15 +280,13 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
                 opacity: 0.6,
               }}
             />
+          ) : character.card ? (
+            <CardArtFallback
+              card={character.card}
+              style={{ borderRadius: '6px', filter: 'grayscale(100%) brightness(0.5)', opacity: 0.6 }}
+            />
           ) : (
-            <div
-              className="w-full h-full flex items-center justify-center"
-              style={{ backgroundColor: '#1a1a1a', filter: 'grayscale(100%) brightness(0.5)', opacity: 0.6 }}
-            >
-              <span className="text-[8px] text-center px-0.5" style={{ color: '#888888' }}>
-                {character.card ? getCardName(character.card, locale as 'en' | 'fr') : '???'}
-              </span>
-            </div>
+            <div className="w-full h-full" style={{ backgroundColor: '#1a1a1a' }} />
           )}
         </>
       ) : (
@@ -301,15 +300,10 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
               />
               {character.card?.isHolo && <HoloFoilOverlay imageUrl={imagePath} />}
             </>
+          ) : character.card ? (
+            <CardArtFallback card={character.card} style={{ borderRadius: '6px' }} />
           ) : (
-            <div
-              className="w-full h-full flex items-center justify-center"
-              style={{ backgroundColor: '#1a1a1a' }}
-            >
-              <span className="text-[8px] text-center px-0.5" style={{ color: '#888888' }}>
-                {character.card ? getCardName(character.card, locale as 'en' | 'fr') : '???'}
-              </span>
-            </div>
+            <div className="w-full h-full" style={{ backgroundColor: '#1a1a1a' }} />
           )}
         </>
       )}
@@ -609,14 +603,7 @@ function MissionCardDisplay({
           }}
         />
       ) : (
-        <div
-          className="w-full h-full flex items-center justify-center"
-          style={{ backgroundColor: '#1a1a1a', minHeight: '65px', position: 'relative', zIndex: 1 }}
-        >
-          <span className="text-[9px] text-center px-1" style={{ color: '#888888' }}>
-            {getCardName(mission.card, locale as 'en' | 'fr')}
-          </span>
-        </div>
+        <CardArtFallback card={mission.card} style={{ borderRadius: '4px', zIndex: 1 }} />
       )}
 
       <div
@@ -747,11 +734,7 @@ function MissionSwapModal({
                   {imgPath ? (
                     <img src={imgPath} alt={getCardName(m, locale as 'en' | 'fr')} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-[9px] text-center px-1" style={{ color: '#666' }}>
-                        {getCardName(m, locale as 'en' | 'fr')}
-                      </span>
-                    </div>
+                    <CardArtFallback card={m} style={{ paddingBottom: '18px' }} />
                   )}
                   <span className="absolute bottom-0 left-0 right-0 text-[8px] text-center truncate px-1 py-0.5"
                     style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#ccc' }}>

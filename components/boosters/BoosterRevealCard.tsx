@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { getCardName } from '@/lib/utils/cardLocale';
 import type { CardData } from '@/lib/engine/types';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { normalizeImagePath , portraitImagePath } from '@/lib/utils/imagePath';
 
 type Rarity = 'RA' | 'MV' | 'SV' | 'L';
@@ -113,9 +114,7 @@ export function BoosterRevealCard({
               decoding="async"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ color: 'var(--t-dim)', fontSize: 11 }}>
-              {getCardName(card, locale)}
-            </div>
+            <CardArtFallback card={card} />
           )}
           {flipped && <VariantHoloOverlay intensity="subtle" imageUrl={imgPath} />}
         </div>

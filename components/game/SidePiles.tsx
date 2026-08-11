@@ -9,6 +9,7 @@ import { useGameScale } from './GameScaleContext';
 import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 import { useBoardPalette } from './BoardPaletteContext';
 import { withAlpha } from '@/lib/game/boardPalette';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 
 function DeckPile({ count, accentColor }: { count: number; accentColor: string }) {
   const t = useTranslations();
@@ -86,11 +87,13 @@ function DiscardPile({
   accentColor,
   onClick,
   topCardImage,
+  topCard,
 }: {
   count: number;
   accentColor: string;
   onClick: () => void;
   topCardImage?: string;
+  topCard?: Parameters<typeof CardArtFallback>[0]['card'] | null;
 }) {
   const t = useTranslations();
   const dims = useGameScale();
@@ -143,16 +146,20 @@ function DiscardPile({
               overflow: 'hidden',
             }}
           >
-            <img
-              src={topCardImage || '/images/card-back.webp'}
-              alt={t('game.discard')}
-              className="w-full h-full"
-              style={{
-                objectFit: 'cover',
-                filter: topCardImage ? 'none' : 'brightness(0.4) sepia(0.3)',
-              }}
-              draggable={false}
-            />
+            {!topCardImage && topCard ? (
+              <CardArtFallback card={topCard} />
+            ) : (
+              <img
+                src={topCardImage || '/images/card-back.webp'}
+                alt={t('game.discard')}
+                className="w-full h-full"
+                style={{
+                  objectFit: 'cover',
+                  filter: topCardImage ? 'none' : 'brightness(0.4) sepia(0.3)',
+                }}
+                draggable={false}
+              />
+            )}
           </div>
         ) : (
           <div
@@ -217,6 +224,7 @@ export function OpponentSidePiles() {
           accentColor={opponent.primary}
           onClick={() => discardCount > 0 && setShowDiscard(true)}
           topCardImage={portraitImagePath(opponentTopDiscard) ?? undefined}
+          topCard={opponentTopDiscard}
         /></div>
       </aside>
 
@@ -266,6 +274,7 @@ export function PlayerSidePiles() {
           accentColor={me.primary}
           onClick={() => setShowDiscard(true)}
           topCardImage={portraitImagePath(playerTopDiscard) ?? undefined}
+          topCard={playerTopDiscard}
         /></div>
       </aside>
 

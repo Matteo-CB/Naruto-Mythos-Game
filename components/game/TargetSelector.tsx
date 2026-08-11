@@ -12,6 +12,7 @@ import type { VisibleCharacter, VisibleMission, MissionRank, CharacterCard, Miss
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { isLandscapeCard } from '@/lib/cards/orientation';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { CardArtFallback, type FallbackCard } from '@/components/cards/CardArtFallback';
 import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from '@/components/icons/GameIcons';
 import { useGameScale } from './GameScaleContext';
 import {
@@ -95,6 +96,7 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
             pointerEvents: 'none',
             willChange: 'opacity, transform',
             transformOrigin: 'center',
+            zIndex: 2,
           }}
           animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.025, 1] }}
           transition={{ repeat: Infinity, duration: 1.1, ease: 'easeInOut' }}
@@ -118,15 +120,13 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
                 filter: 'brightness(0.4)',
               }}
             />
+          ) : character.card ? (
+            <CardArtFallback card={character.card} style={{ filter: 'brightness(0.4)' }} />
           ) : (
             <div
-              className="w-full h-full flex items-center justify-center"
+              className="w-full h-full"
               style={{ backgroundColor: '#1a1a1a' }}
-            >
-              <span className="text-[8px]" style={{ color: '#444444' }}>
-                {displayName}
-              </span>
-            </div>
+            />
           )}
           <div
             className="absolute inset-x-0 top-0 text-center py-0.5 text-[8px] font-medium"
@@ -142,15 +142,13 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
               className="w-full h-full bg-cover bg-center"
               style={{ backgroundImage: `url('${imagePath}')` }}
             />
+          ) : character.card ? (
+            <CardArtFallback card={character.card} />
           ) : (
             <div
-              className="w-full h-full flex items-center justify-center"
+              className="w-full h-full"
               style={{ backgroundColor: '#1a1a1a' }}
-            >
-              <span className="text-[7px] text-center px-0.5" style={{ color: '#888888' }}>
-                {displayName}
-              </span>
-            </div>
+            />
           )}
         </>
       )}
@@ -488,12 +486,10 @@ const OrderedDefeatCard = React.memo(function OrderedDefeatCard({ character, isV
   onClick: () => void;
 }) {
   const t = useTranslations();
-  const locale = useLocale();
   const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const isHidden = character.isHidden;
   const canSeeCard = character.isOwn || !isHidden || character.wasRevealedAtLeastOnce;
   const topCard = character.topCard ?? character.card;
-  const displayName = topCard ? getCardName(topCard, locale as 'en' | 'fr') : '???';
   const imagePath = topCard?.image_file ? normalizeImagePath(topCard.image_file) : null;
 
   return (
@@ -516,10 +512,10 @@ const OrderedDefeatCard = React.memo(function OrderedDefeatCard({ character, isV
         <img src="/images/card-back.webp" alt={t('card.back')} draggable={false} className="w-full h-full object-cover" />
       ) : imagePath ? (
         <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${imagePath}')` }} />
+      ) : topCard ? (
+        <CardArtFallback card={topCard} style={{ borderRadius: 0 }} />
       ) : (
-        <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-          <span className="text-[7px] text-center px-0.5" style={{ color: '#888' }}>{displayName}</span>
-        </div>
+        <div className="w-full h-full" style={{ backgroundColor: '#1a1a1a' }} />
       )}
 
       {isSelected && orderNumber && (
@@ -1060,12 +1056,13 @@ export function TargetSelector() {
                     filter: isDefeat ? 'brightness(0.6) saturate(0.5)' : 'brightness(0.5)',
                   }}
                 />
+              ) : cardData ? (
+                <CardArtFallback
+                  card={cardData}
+                  style={{ borderRadius: 0, filter: isDefeat ? 'brightness(0.6) saturate(0.5)' : 'brightness(0.5)' }}
+                />
               ) : (
-                <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                  <span className="text-[8px] text-center px-1" style={{ color: '#888888' }}>
-                    {cardData ? (getCardName(cardData, locale)) : '???'}
-                  </span>
-                </div>
+                <div className="w-full h-full" style={{ backgroundColor: '#1a1a1a' }} />
               )}
               
               <div className="absolute inset-0 flex items-center justify-center">
@@ -1198,11 +1195,7 @@ export function TargetSelector() {
                     {imgPath ? (
                       <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${imgPath}')` }} />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                        <span className="text-xs text-center px-2" style={{ color: '#888888' }}>
-                          {getCardName(card, locale)}
-                        </span>
-                      </div>
+                      <CardArtFallback card={card} style={{ borderRadius: 0 }} />
                     )}
 
                     {isSelected && (
@@ -1300,9 +1293,7 @@ export function TargetSelector() {
                     {imgPath ? (
                       <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${imgPath}')` }} />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                        <span className="text-xs text-center px-2" style={{ color: '#888888' }}>{getCardName(card, locale)}</span>
-                      </div>
+                      <CardArtFallback card={card} style={{ borderRadius: 0 }} />
                     )}
                     <div className="absolute inset-x-0 bottom-0 px-2 py-1.5 text-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}>
                       <div className="text-[10px] font-bold" style={{ color: '#e0e0e0' }}>{getCardName(card, locale)}</div>
@@ -1374,9 +1365,10 @@ export function TargetSelector() {
               {imagePath ? (
                 <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${imagePath}')` }} />
               ) : (
-                <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                  <span className="text-sm text-center px-2" style={{ color: '#888888' }}>{resolveNameToLocale(getCardName(revealedCard, locale), locale)}</span>
-                </div>
+                <CardArtFallback
+                  card={{ ...revealedCard, name_en: resolveNameToLocale(getCardName(revealedCard, locale), locale) }}
+                  style={{ borderRadius: 0 }}
+                />
               )}
               <div className="absolute inset-x-0 bottom-0 px-2 py-2 text-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}>
                 <div className="text-xs font-bold" style={{ color: '#e0e0e0' }}>{resolveNameToLocale(getCardName(revealedCard, locale), locale)}</div>
@@ -1602,10 +1594,10 @@ export function TargetSelector() {
                         className="w-full h-full object-cover object-top"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center"
-                        style={{ backgroundColor: 'rgba(30,30,30,0.8)' }}>
-                        <span style={{ color: '#555', fontSize: '11px' }}>?</span>
-                      </div>
+                      <CardArtFallback
+                        card={{ name_fr: choice.sourceCardName }}
+                        style={{ borderRadius: 0 }}
+                      />
                     )}
                     
                     <div className="absolute bottom-0 left-0 right-0 h-8"
@@ -1644,11 +1636,13 @@ export function TargetSelector() {
     const confirmTarget = validTargets[0];
     let confirmImage: string | null = null;
     let confirmName = '';
+    let confirmCard: FallbackCard | null = null;
 
     if (confirmTarget?.startsWith('KS-') && confirmTarget?.includes('-MMS')) {
       for (const m of visibleState.activeMissions) {
         if (m.card?.id === confirmTarget) {
           confirmImage = normalizeImagePath(m.card.image_file);
+          confirmCard = m.card;
           confirmName = getCardName(m.card as MissionCard & { name_en?: string; name_fr: string }, locale as 'en' | 'fr');
           break;
         }
@@ -1658,6 +1652,7 @@ export function TargetSelector() {
         for (const c of [...m.player1Characters, ...m.player2Characters]) {
           if (c.instanceId === confirmTarget && c.card) {
             confirmImage = normalizeImagePath(c.card.image_file);
+            confirmCard = c.card;
             confirmName = getCardName(c.card, locale as 'en' | 'fr');
             break;
           }
@@ -1668,9 +1663,12 @@ export function TargetSelector() {
     let confirmIsLandscape = false;
     if (!confirmImage) {
       const sourceCard = pendingTargetSelection.confirmCardData;
-      if (sourceCard?.image_file) {
-        confirmIsLandscape = isLandscapeCard(sourceCard as unknown as Parameters<typeof isLandscapeCard>[0]);
-        confirmImage = normalizeImagePath(sourceCard.image_file);
+      if (sourceCard) {
+        if (!confirmCard) confirmCard = sourceCard;
+        if (sourceCard.image_file) {
+          confirmIsLandscape = isLandscapeCard(sourceCard as unknown as Parameters<typeof isLandscapeCard>[0]);
+          confirmImage = normalizeImagePath(sourceCard.image_file);
+        }
         if (!confirmName) confirmName = getCardName(sourceCard as never, locale as 'en' | 'fr');
       }
     }
@@ -1683,7 +1681,7 @@ export function TargetSelector() {
               {descriptionKey ? t(descriptionKey, localizeMessageParams(descriptionParams ?? {}, locale) ?? {}) : description}
             </EffectPromptTitle>
 
-            {confirmImage && (
+            {(confirmImage || confirmCard) && (
               <motion.div
                 initial={{ scale: 0.7, rotateY: 15, opacity: 0 }}
                 animate={{ scale: 1, rotateY: 0, opacity: 1 }}
@@ -1697,7 +1695,11 @@ export function TargetSelector() {
                   boxShadow: '0 0 20px rgba(196, 163, 90, 0.15), 0 8px 24px rgba(0, 0, 0, 0.5)',
                 }}
               >
-                <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${confirmImage}')` }} />
+                {confirmImage ? (
+                  <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${confirmImage}')` }} />
+                ) : confirmCard ? (
+                  <CardArtFallback card={confirmCard} style={{ borderRadius: 0 }} />
+                ) : null}
                 <div className="absolute inset-x-0 bottom-0 px-1 py-1 text-center" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
                   <span className="text-[9px] font-bold truncate block" style={{ color: '#e0e0e0' }}>{confirmName}</span>
                 </div>

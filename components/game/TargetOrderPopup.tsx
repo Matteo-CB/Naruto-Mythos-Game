@@ -21,6 +21,7 @@ import {
   PopupMinimizeX,
   PopupMinimizePill,
 } from './PopupPrimitives';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 
 export interface OrderTarget {
   instanceId: string;
@@ -213,14 +214,7 @@ export function TargetOrderPopup({
                       }}
                     />
                   ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center"
-                      style={{ backgroundColor: '#1a1a1a' }}
-                    >
-                      <span className="text-[9px] text-center px-1" style={{ color: '#888' }}>
-                        {displayName}
-                      </span>
-                    </div>
+                    <CardArtFallback card={target} />
                   )}
 
                   {isSelected && (

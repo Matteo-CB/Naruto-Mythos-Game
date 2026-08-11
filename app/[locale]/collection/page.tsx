@@ -7,6 +7,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { CardQuickPreviewModal } from '@/components/cards/CardQuickPreviewModal';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { cardIdToSlug } from '@/lib/cards/slug';
 import { Footer } from '@/components/Footer';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
@@ -196,7 +197,7 @@ export default function CollectionPage() {
       >
         <Link
           href={`/cards/${cardIdToSlug(card.id)}`}
-          className="block w-full h-full"
+          className="relative block w-full h-full"
           aria-label={getCardName(card, locale)}
         >
           {imgPath ? (
@@ -210,12 +211,7 @@ export default function CollectionPage() {
               height={landscape ? 140 : 280}
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center p-1">
-              <div className="w-10 h-7 bg-[var(--t-surface-2)] mb-1" />
-              <span className="text-[8px] text-[var(--t-dim)] text-center leading-tight">
-                {getCardName(card, locale)}
-              </span>
-            </div>
+            <CardArtFallback card={card} />
           )}
         </Link>
         <StatBadges card={card} costLabel={t('collection.details.cost')} powerLabel={t('collection.details.power')} />
@@ -418,12 +414,7 @@ export default function CollectionPage() {
                     height={196}
                   />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center p-1">
-                    <div className="w-8 h-10 bg-[var(--t-surface-2)] mb-1" />
-                    <span className="text-[8px] text-[var(--t-dim)] text-center leading-tight">
-                      {getCardName(card, locale as 'en' | 'fr')}
-                    </span>
-                  </div>
+                  <CardArtFallback card={card} />
                 )}
                 {variant && !locked && <VariantHoloOverlay intensity="subtle" imageUrl={imgPath} />}
                 {filterHolosOnly && holoOwned && imgPath && <HoloFoilOverlay intensity="strong" imageUrl={imgPath} />}
@@ -436,7 +427,7 @@ export default function CollectionPage() {
               >
                 <Link
                   href={`/cards/${cardIdToSlug(card.id)}`}
-                  className="block w-full h-full"
+                  className="relative block w-full h-full"
                   aria-label={getCardName(card, locale)}
                 >
                   {locked ? (
@@ -527,7 +518,7 @@ export default function CollectionPage() {
                   >
                     <Link
                       href={`/cards/${cardIdToSlug(card.id)}`}
-                      className="block w-full h-full"
+                      className="relative block w-full h-full"
                       aria-label={getCardName(card, locale)}
                     >
                       {imgPath ? (
@@ -541,12 +532,7 @@ export default function CollectionPage() {
                           height={140}
                         />
                       ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center p-1">
-                          <div className="w-10 h-7 bg-[var(--t-surface-2)] mb-1" />
-                          <span className="text-[8px] text-[var(--t-dim)] text-center leading-tight">
-                            {getCardName(card, locale)}
-                          </span>
-                        </div>
+                        <CardArtFallback card={card} />
                       )}
                     </Link>
                     <StatBadges card={card} costLabel={t('collection.details.cost')} powerLabel={t('collection.details.power')} />

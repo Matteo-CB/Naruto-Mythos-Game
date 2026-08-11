@@ -12,6 +12,7 @@ import {
   PopupActionButton,
   PopupDismissLink,
 } from './PopupPrimitives';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
 
 export interface NumberPreviewCard {
   position: number;
@@ -91,6 +92,7 @@ export function DeclareNumberPopup({
                     position: 'relative',
                   }}
                 >
+                  {!image && <CardArtFallback card={entry.card as never} />}
                   <span
                     style={{
                       position: 'absolute', bottom: '2px', left: '50%', transform: 'translateX(-50%)',
