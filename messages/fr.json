@@ -1540,7 +1540,17 @@
         "ss148DefeatUpgraded": "Vaincre un personnage ennemi amélioré plus faible que celui-ci, puis déplacer ce personnage.",
         "ss148MoveSelf": "Choisissez la mission vers laquelle ce personnage se déplace.",
         "ss150PullStrongest": "Déplacer le personnage ennemi le plus fort en jeu vers cette mission ?",
-        "ss150PowerupByCost": "POWERUP {amount}, le coût du plus fort ennemi ici ?"
+        "ss150PowerupByCost": "POWERUP {amount}, le coût du plus fort ennemi ici ?",
+        "ss034MoveFriendly": "Choisissez un personnage allié à déplacer vers une autre mission.",
+        "ss125MoveHidden": "Choisissez un personnage allié caché à déplacer vers une autre mission.",
+        "ss101DefeatWeakest": "Vaincre tous les personnages non cachés les moins puissants de cette mission, alliés comme ennemis ?",
+        "ss030PlaceHidden": "Choisissez la mission où la carte du dessus de votre deck est placée comme personnage caché.",
+        "ss045BounceHidden": "Choisissez un personnage allié caché à renvoyer dans votre main.",
+        "ss045PlaceFromHand": "Choisissez une carte de votre main à placer comme personnage caché dans cette même mission.",
+        "ss037RevealSoundFour": "Révélez autant de personnages Quatre du Son que vous voulez depuis votre main. Plus vous en révélez, plus le coût que vous pourrez vaincre est élevé.",
+        "ss037DefeatEnemy": "Choisissez un personnage ennemi dont le coût est inférieur au nombre de cartes révélées.",
+        "ss035MovePerAlly": "Pour chaque autre personnage Quatre du Son allié de cette mission, déplacer un personnage dont le coût ne dépasse pas celui de cet allié ?",
+        "ss035PickChar": "Choisissez un personnage à déplacer, allié ou ennemi, dans la limite de coût de cet allié."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",

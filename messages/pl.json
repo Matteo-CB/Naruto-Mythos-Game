@@ -3636,7 +3636,17 @@
         "ss148DefeatUpgraded": "Pokonać ulepszoną postać przeciwnika słabszą od tej, a potem przesunąć tę postać?",
         "ss148MoveSelf": "Wybierz misję, do której przenosi się ta postać.",
         "ss150PullStrongest": "Przesunąć najsilniejszą postać przeciwnika w grze do tej misji?",
-        "ss150PowerupByCost": "POWERUP {amount}, czyli koszt najsilniejszego wroga tutaj?"
+        "ss150PowerupByCost": "POWERUP {amount}, czyli koszt najsilniejszego wroga tutaj?",
+        "ss034MoveFriendly": "Wybierz sojuszniczą postać do przeniesienia na inną misję.",
+        "ss125MoveHidden": "Wybierz zakrytą sojuszniczą postać do przeniesienia na inną misję.",
+        "ss101DefeatWeakest": "Pokonać wszystkie odkryte postacie o najniższej Mocy na tej misji, zarówno sojusznicze, jak i wrogie?",
+        "ss030PlaceHidden": "Wybierz misję, na której wierzchnia karta talii zostanie położona jako zakryta postać.",
+        "ss045BounceHidden": "Wybierz zakrytą sojuszniczą postać do zwrócenia na rękę.",
+        "ss045PlaceFromHand": "Wybierz kartę z ręki, aby położyć ją jako zakrytą postać na tej samej misji.",
+        "ss037RevealSoundFour": "Odkryj dowolną liczbę postaci Czwórki Dźwięku z ręki. Im więcej odkryjesz, tym wyższy koszt możesz pokonać.",
+        "ss037DefeatEnemy": "Wybierz wrogą postać o koszcie niższym niż liczba odkrytych kart.",
+        "ss035MovePerAlly": "Czy za każdą inną sojuszniczą postać Czwórki Dźwięku na tej misji przenieść postać o koszcie nie wyższym niż koszt tego sojusznika?",
+        "ss035PickChar": "Wybierz postać do przeniesienia, sojuszniczą lub wrogą, w granicach kosztu tego sojusznika."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

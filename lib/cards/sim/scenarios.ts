@@ -125,6 +125,16 @@ const FACTORIES: Record<string, Factory> = {
     play: P1(FRESH),
     noMinimize: true,
   }),
+  'SS-037-UC': (id) => ({
+    build: () => board({
+      hand: [id, 'SS-032-C', 'SS-034-C'],
+      upgBase: { id: 'SS-036-C', iid: 'sim-sakon-base' },
+      e0: [{ id: 'KS-005-C', iid: 'sim-prey', hidden: true }],
+      missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+    }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
   'SS-043-UC': (id) => ({
     build: () => {
       const st = board({ hand: [id] });

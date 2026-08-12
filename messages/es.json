@@ -1539,7 +1539,17 @@
         "ss148DefeatUpgraded": "Derrota a un personaje enemigo mejorado más débil que este, luego mueve a este personaje.",
         "ss148MoveSelf": "Elige la misión a la que se mueve este personaje.",
         "ss150PullStrongest": "¿Mover al personaje enemigo más fuerte en juego a esta misión?",
-        "ss150PowerupByCost": "¿POWERUP {amount}, el coste del enemigo más fuerte de aquí?"
+        "ss150PowerupByCost": "¿POWERUP {amount}, el coste del enemigo más fuerte de aquí?",
+        "ss034MoveFriendly": "Elige un personaje aliado para moverlo a otra misión.",
+        "ss125MoveHidden": "Elige un personaje aliado oculto para moverlo a otra misión.",
+        "ss101DefeatWeakest": "¿Derrotar a todos los personajes no ocultos con menos Poder de esta misión, aliados y enemigos por igual?",
+        "ss030PlaceHidden": "Elige la misión donde se coloca la carta superior de tu mazo como personaje oculto.",
+        "ss045BounceHidden": "Elige un personaje aliado oculto para devolverlo a tu mano.",
+        "ss045PlaceFromHand": "Elige una carta de tu mano para colocarla como personaje oculto en esa misma misión.",
+        "ss037RevealSoundFour": "Revela tantos personajes Cuatro del Sonido como quieras de tu mano. Cuantos más reveles, mayor será el coste que podrás derrotar.",
+        "ss037DefeatEnemy": "Elige un personaje enemigo con coste inferior al número de cartas reveladas.",
+        "ss035MovePerAlly": "¿Por cada otro personaje Cuatro del Sonido aliado de esta misión, mover un personaje cuyo coste no supere el de ese aliado?",
+        "ss035PickChar": "Elige un personaje para mover, aliado o enemigo, dentro del límite de coste de ese aliado."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

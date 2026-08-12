@@ -22,6 +22,12 @@ import { registerIno124Handlers } from './ino124';
 import { registerKin043Handlers } from './kin043';
 import { registerKin044Handlers } from './kin044';
 import { registerSSMissionHandlers } from './missions/ssMissionHandlers';
+import { registerSoundMoveHandlers } from './soundMoves';
+import { registerSnakeSword101Handlers } from './snakeSword101';
+import { registerKabuto030Handlers } from './kabuto030';
+import { registerDosu045Handlers } from './dosu045';
+import { registerSakon037Handlers } from './sakon037';
+import { registerKidomaru035Handlers } from './kidomaru035';
 
 export function registerAllSSHandlers(): void {
   registerMinato122Handlers();
@@ -48,4 +54,10 @@ export function registerAllSSHandlers(): void {
   registerKin043Handlers();
   registerKin044Handlers();
   registerSSMissionHandlers();
+  registerSoundMoveHandlers();
+  registerSnakeSword101Handlers();
+  registerKabuto030Handlers();
+  registerDosu045Handlers();
+  registerSakon037Handlers();
+  registerKidomaru035Handlers();
 }

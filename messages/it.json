@@ -3636,7 +3636,17 @@
         "ss148DefeatUpgraded": "Sconfiggere un personaggio nemico potenziato più debole di questo, poi spostare questo personaggio.",
         "ss148MoveSelf": "Scegli la missione verso cui si sposta questo personaggio.",
         "ss150PullStrongest": "Spostare il personaggio nemico più forte in gioco in questa missione?",
-        "ss150PowerupByCost": "POWERUP {amount}, il costo del nemico più forte qui?"
+        "ss150PowerupByCost": "POWERUP {amount}, il costo del nemico più forte qui?",
+        "ss034MoveFriendly": "Scegli un personaggio alleato da spostare in un’altra missione.",
+        "ss125MoveHidden": "Scegli un personaggio alleato nascosto da spostare in un’altra missione.",
+        "ss101DefeatWeakest": "Sconfiggere tutti i personaggi non nascosti con la Potenza più bassa in questa missione, alleati e nemici?",
+        "ss030PlaceHidden": "Scegli la missione in cui piazzare la carta in cima al tuo mazzo come personaggio nascosto.",
+        "ss045BounceHidden": "Scegli un personaggio alleato nascosto da rimettere in mano.",
+        "ss045PlaceFromHand": "Scegli una carta dalla tua mano da piazzare come personaggio nascosto nella stessa missione.",
+        "ss037RevealSoundFour": "Rivela quanti personaggi Quattro del Suono vuoi dalla tua mano. Più ne riveli, più alto è il costo che puoi sconfiggere.",
+        "ss037DefeatEnemy": "Scegli un personaggio nemico con costo inferiore al numero di carte rivelate.",
+        "ss035MovePerAlly": "Per ogni altro personaggio Quattro del Suono alleato in questa missione, spostare un personaggio il cui costo non superi quello di quell’alleato?",
+        "ss035PickChar": "Scegli un personaggio da spostare, alleato o nemico, entro il limite di costo di quell’alleato."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

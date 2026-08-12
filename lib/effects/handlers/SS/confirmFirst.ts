@@ -16,6 +16,8 @@ export function confirmFirst(
       targets: result.validTargets ?? [],
       nextKey: result.descriptionKey,
       nextText: typeof result.description === 'string' ? result.description : '',
+      nextMin: result.minSelections,
+      nextMax: result.maxSelections,
     }),
     descriptionKey: result.descriptionKey,
   };

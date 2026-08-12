@@ -41,6 +41,11 @@ import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTri
 import { findLegalRevealUpgradeTarget, revealWouldViolateNameUniqueness } from './revealNameUniqueness';
 import { moveWouldViolateNameUniqueness } from './moveNameUniqueness';
 import { INO_124_ID, INO_124_NAME, INO_124_LOG_NAME } from './handlers/SS/ino124';
+import { weakestVisibleIn, SNAKE_SWORD_ID, SNAKE_SWORD_NAME } from './handlers/SS/snakeSword101';
+import { KABUTO_030_ID, KABUTO_030_NAME } from './handlers/SS/kabuto030';
+import { DOSU_045_ID, DOSU_045_NAME } from './handlers/SS/dosu045';
+import { SAKON_037_ID, SAKON_037_NAME, enemiesUnderCost } from './handlers/SS/sakon037';
+import { KIDOMARU_035_ID, KIDOMARU_035_NAME, KIDOMARU_035_LOG, movableUnderCost } from './handlers/SS/kidomaru035';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatEnemyCharacter, defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
 import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval, isHiddenRevealBlocked, amplifiedPowerup } from './ContinuousEffects';
@@ -924,6 +929,122 @@ export class EffectEngine {
   }
 
   
+  static queueKidomaru035Pick(
+    state: GameState,
+    pendingEffect: PendingEffect,
+    limites: number[],
+    depart: number,
+  ): GameState {
+    const newState = state;
+    for (let i = depart; i < limites.length; i++) {
+      const cibles = movableUnderCost(newState, limites[i]);
+      if (cibles.length === 0) continue;
+
+      const effId = generateInstanceId();
+      const actId = generateInstanceId();
+      newState.pendingEffects.push({
+        id: effId,
+        sourceCardId: pendingEffect.sourceCardId,
+        sourceInstanceId: pendingEffect.sourceInstanceId,
+        sourceMissionIndex: pendingEffect.sourceMissionIndex,
+        effectType: pendingEffect.effectType,
+        effectDescription: JSON.stringify({ limites, index: i }),
+        targetSelectionType: 'SS035_PICK_CHAR',
+        sourcePlayer: pendingEffect.sourcePlayer,
+        requiresTargetSelection: true,
+        validTargets: cibles,
+        isOptional: false,
+        isMandatory: true,
+        resolved: false,
+        isUpgrade: pendingEffect.isUpgrade,
+        remainingEffectTypes: undefined,
+      });
+      newState.pendingActions.push({
+        id: actId,
+        type: 'SELECT_TARGET' as PendingAction['type'],
+        player: pendingEffect.sourcePlayer,
+        description: `Choose a character with cost ${limites[i]} or less to move.`,
+        descriptionKey: 'game.effect.desc.ss035PickChar',
+        options: cibles,
+        minSelections: 1,
+        maxSelections: 1,
+        sourceEffectId: effId,
+      });
+      return newState;
+    }
+    return newState;
+  }
+
+  static queueMoveDestination(
+    state: GameState,
+    pendingEffect: PendingEffect,
+    charInstanceId: string,
+    srcName: string,
+    srcId: string,
+    logName: string,
+  ): GameState {
+    let newState = state;
+    const found = EffectEngine.findCharByInstanceId(newState, charInstanceId);
+    if (!found) return newState;
+
+    const side: 'player1Characters' | 'player2Characters' =
+      found.player === 'player1' ? 'player1Characters' : 'player2Characters';
+
+    const dests: string[] = [];
+    for (let i = 0; i < newState.activeMissions.length; i++) {
+      if (i === found.missionIndex) continue;
+      if (moveWouldViolateNameUniqueness(newState, found.character, i, side)) continue;
+      dests.push(String(i));
+    }
+
+    if (dests.length === 0) {
+      newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+        'EFFECT_NO_TARGET', `${srcName}: no legal destination mission for this character.`,
+        'game.log.effect.noTarget', { card: logName, id: srcId });
+      return newState;
+    }
+
+    if (dests.length === 1) {
+      return EffectEngine.moveCharToMissionDirectPublic(
+        newState, charInstanceId, parseInt(dests[0], 10), found.player,
+        srcName, srcId, pendingEffect.sourcePlayer,
+      );
+    }
+
+    const effId = generateInstanceId();
+    const actId = generateInstanceId();
+    newState.pendingEffects.push({
+      id: effId,
+      sourceCardId: pendingEffect.sourceCardId,
+      sourceInstanceId: pendingEffect.sourceInstanceId,
+      sourceMissionIndex: pendingEffect.sourceMissionIndex,
+      effectType: pendingEffect.effectType,
+      effectDescription: JSON.stringify({ charInstanceId, srcName, srcId }),
+      targetSelectionType: 'SS_MOVE_DEST',
+      sourcePlayer: pendingEffect.sourcePlayer,
+      requiresTargetSelection: true,
+      validTargets: dests,
+      isOptional: false,
+      isMandatory: true,
+      resolved: false,
+      isUpgrade: pendingEffect.isUpgrade,
+      remainingEffectTypes: pendingEffect.remainingEffectTypes,
+    });
+    newState.pendingActions.push({
+      id: actId,
+      type: 'SELECT_TARGET' as PendingAction['type'],
+      player: pendingEffect.sourcePlayer,
+      description: 'Choose a mission to move the character to.',
+      descriptionKey: 'game.effect.desc.chooseMissionMove',
+      options: dests,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effId,
+    });
+    pendingEffect.remainingEffectTypes = undefined;
+    return newState;
+  }
+
   static createPendingTargetSelection(
     state: GameState,
     player: PlayerID,
@@ -1032,6 +1153,8 @@ export class EffectEngine {
       tst === 'TAYUYA125_CHOOSE_SOUND' ||
       tst === 'PLAY_LESS_CATEGORY' ||
       tst === 'SS000_CHOOSE_HOUNDS' ||
+      tst === 'SS045_PLACE_FROM_HAND' ||
+      tst === 'SS037_REVEAL_SOUND_FOUR' ||
       tst === 'RECOVER_FROM_DISCARD' ||
       tst === 'HIRUZEN002_CHOOSE_CARD' ||
       tst === 'ITACHI091_CHOOSE_DISCARD' ||
@@ -6148,8 +6271,13 @@ export class EffectEngine {
       case 'SS137MV_CONFIRM_UPGRADE':
       case 'SS124_CONFIRM_DUEL':
       case 'SS124_CONFIRM_UPGRADE':
+      case 'SS030_CONFIRM_FIRST_STRIKE':
+      case 'SS037_CONFIRM_UPGRADE':
+      case 'SS045_CONFIRM_AMBUSH':
+      case 'SS034_CONFIRM_FIRST_STRIKE':
+      case 'SS125_CONFIRM_UPGRADE':
       case 'MINATO122_CONFIRM_MAIN': {
-        let relay: { nextType?: string; targets?: string[]; nextKey?: string; nextText?: string } = {};
+        let relay: { nextType?: string; targets?: string[]; nextKey?: string; nextText?: string; nextMin?: number; nextMax?: number } = {};
         try { relay = JSON.parse(pendingEffect.effectDescription); } catch {}
         const relayTargets = relay.targets ?? [];
         if (!relay.nextType || relayTargets.length === 0) break;
@@ -6180,8 +6308,8 @@ export class EffectEngine {
           description: relay.nextText ?? '',
           descriptionKey: relay.nextKey,
           options: relayTargets,
-          minSelections: 1,
-          maxSelections: 1,
+          minSelections: relay.nextMin ?? 1,
+          maxSelections: relay.nextMax ?? 1,
           sourceEffectId: relayEffId,
         }];
         break;
@@ -12138,6 +12266,260 @@ export class EffectEngine {
         break;
       }
 
+      case 'SS035_CONFIRM_UPGRADE': {
+        let ss035Data: { limites?: number[] } = {};
+        try { ss035Data = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const ss035Limites = ss035Data.limites ?? [];
+        if (ss035Limites.length === 0) break;
+        pendingEffect.remainingEffectTypes = undefined;
+        newState = EffectEngine.queueKidomaru035Pick(newState, pendingEffect, ss035Limites, 0);
+        break;
+      }
+
+      case 'SS035_PICK_CHAR': {
+        let ss035bData: { limites?: number[]; index?: number } = {};
+        try { ss035bData = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const ss035bLimites = ss035bData.limites ?? [];
+        const ss035bIndex = ss035bData.index ?? 0;
+
+        newState = EffectEngine.queueMoveDestination(
+          newState, pendingEffect, targetId, KIDOMARU_035_LOG, KIDOMARU_035_ID, KIDOMARU_035_NAME,
+        );
+        newState = EffectEngine.queueKidomaru035Pick(newState, pendingEffect, ss035bLimites, ss035bIndex + 1);
+        break;
+      }
+
+      case 'SS037_REVEAL_SOUND_FOUR': {
+        const ss037Player = pendingEffect.sourcePlayer;
+        const ss037Indices = String(targetId).split(',').map((v) => parseInt(v, 10)).filter((v) => !isNaN(v));
+        const ss037Main = newState[ss037Player].hand;
+        const ss037Revelees = ss037Indices.map((i) => ss037Main[i]).filter(Boolean);
+        if (ss037Revelees.length === 0) break;
+
+        newState.log = logAction(newState.log, newState.turn, newState.phase, ss037Player,
+          'EFFECT', `Sakon (037): revealed ${ss037Revelees.length} Sound Four card(s) from hand.`,
+          'game.log.effect.revealFromHand',
+          { card: SAKON_037_NAME, id: SAKON_037_ID, count: String(ss037Revelees.length) });
+
+        const ss037Cibles = enemiesUnderCost(newState, ss037Player, ss037Revelees.length);
+        if (ss037Cibles.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, ss037Player,
+            'EFFECT_NO_TARGET', `Sakon (037): no enemy character with cost lower than ${ss037Revelees.length}.`,
+            'game.log.effect.noTarget', { card: SAKON_037_NAME, id: SAKON_037_ID });
+          break;
+        }
+
+        const ss037EffId = generateInstanceId();
+        const ss037ActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: ss037EffId,
+          sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ limite: ss037Revelees.length }),
+          targetSelectionType: 'SS037_DEFEAT_ENEMY',
+          sourcePlayer: ss037Player,
+          requiresTargetSelection: true,
+          validTargets: ss037Cibles,
+          isOptional: false,
+          isMandatory: true,
+          resolved: false,
+          isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: ss037ActId,
+          type: 'SELECT_TARGET' as PendingAction['type'],
+          player: ss037Player,
+          description: 'Choose an enemy character to defeat.',
+          descriptionKey: 'game.effect.desc.ss037DefeatEnemy',
+          options: ss037Cibles,
+          minSelections: 1,
+          maxSelections: 1,
+          sourceEffectId: ss037EffId,
+        });
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'SS037_DEFEAT_ENEMY': {
+        const ss037bFound = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!ss037bFound) break;
+        const ss037bTop = ss037bFound.character.stack?.length > 0
+          ? ss037bFound.character.stack[ss037bFound.character.stack.length - 1]
+          : ss037bFound.character.card;
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', `Sakon (037): defeated ${ss037bTop.name_fr}.`,
+          'game.log.effect.defeat',
+          { card: SAKON_037_NAME, id: SAKON_037_ID, target: ss037bTop.name_fr, target_en: ss037bTop.name_en || ss037bTop.name_fr });
+        break;
+      }
+
+      case 'SS045_BOUNCE_HIDDEN': {
+        const ss045Found = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!ss045Found) break;
+        const ss045Mission = ss045Found.missionIndex;
+
+        newState = returnCharacterToHand(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT', 'Dosu Kinuta (045): returned a friendly hidden character to hand.',
+          'game.log.effect.returnToHand', { card: DOSU_045_NAME, id: DOSU_045_ID });
+
+        const ss045Hand = newState[pendingEffect.sourcePlayer].hand;
+        if (ss045Hand.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Dosu Kinuta (045): no card in hand to place as a hidden character.',
+            'game.log.effect.noTarget', { card: DOSU_045_NAME, id: DOSU_045_ID });
+          break;
+        }
+
+        const ss045EffId = generateInstanceId();
+        const ss045ActId = generateInstanceId();
+        const ss045Options = ss045Hand.map((_, i) => String(i));
+        newState.pendingEffects.push({
+          id: ss045EffId,
+          sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ missionIndex: ss045Mission }),
+          targetSelectionType: 'SS045_PLACE_FROM_HAND',
+          sourcePlayer: pendingEffect.sourcePlayer,
+          requiresTargetSelection: true,
+          validTargets: ss045Options,
+          isOptional: false,
+          isMandatory: true,
+          resolved: false,
+          isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: ss045ActId,
+          type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Choose a card from your hand to place as a hidden character in that same mission.',
+          descriptionKey: 'game.effect.desc.ss045PlaceFromHand',
+          options: ss045Options,
+          minSelections: 1,
+          maxSelections: 1,
+          sourceEffectId: ss045EffId,
+        });
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'SS045_PLACE_FROM_HAND': {
+        const ss045bPlayer = pendingEffect.sourcePlayer;
+        let ss045bData: { missionIndex?: number } = {};
+        try { ss045bData = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const ss045bMission = ss045bData.missionIndex ?? pendingEffect.sourceMissionIndex;
+        const ss045bIndex = parseInt(targetId, 10);
+        const ss045bPs = newState[ss045bPlayer];
+        if (isNaN(ss045bIndex) || !ss045bPs.hand[ss045bIndex] || !newState.activeMissions[ss045bMission]) break;
+
+        const ss045bHand = [...ss045bPs.hand];
+        const ss045bCarte = ss045bHand.splice(ss045bIndex, 1)[0];
+        newState = { ...newState, [ss045bPlayer]: { ...ss045bPs, hand: ss045bHand } };
+
+        const ss045bSide: 'player1Characters' | 'player2Characters' =
+          ss045bPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const ss045bMissions = [...newState.activeMissions];
+        const ss045bCopie = { ...ss045bMissions[ss045bMission] };
+        ss045bCopie[ss045bSide] = [...ss045bCopie[ss045bSide], {
+          card: ss045bCarte,
+          isHidden: true,
+          powerTokens: 0,
+          stack: [ss045bCarte],
+          controlledBy: ss045bPlayer,
+          originalOwner: ss045bPlayer,
+          instanceId: generateInstanceId(),
+          wasRevealedAtLeastOnce: false,
+          missionIndex: ss045bMission,
+        } as CharacterInPlay];
+        ss045bMissions[ss045bMission] = ss045bCopie;
+        newState = { ...newState, activeMissions: ss045bMissions };
+        newState[ss045bPlayer] = {
+          ...newState[ss045bPlayer],
+          charactersInPlay: EffectEngine.countCharsForPlayer(newState, ss045bPlayer),
+        };
+
+        newState.log = logAction(newState.log, newState.turn, newState.phase, ss045bPlayer,
+          'EFFECT', 'Dosu Kinuta (045): placed a card from hand as a hidden character.',
+          'game.log.effect.placeHidden',
+          { card: DOSU_045_NAME, id: DOSU_045_ID, mission: String(ss045bMission + 1) });
+        break;
+      }
+
+      case 'SS030_PLACE_HIDDEN': {
+        const ss030Player = pendingEffect.sourcePlayer;
+        const ss030Ps = newState[ss030Player];
+        const ss030Mission = parseInt(targetId, 10);
+        if (isNaN(ss030Mission) || !newState.activeMissions[ss030Mission]) break;
+
+        if (ss030Ps.deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, ss030Player,
+            'EFFECT_NO_TARGET', 'Kabuto Yakushi (030): the deck is empty (state changed).',
+            'game.log.effect.noTarget', { card: KABUTO_030_NAME, id: KABUTO_030_ID });
+          break;
+        }
+
+        const ss030Deck = [...ss030Ps.deck];
+        const ss030Carte = ss030Deck.shift()!;
+        newState = { ...newState, [ss030Player]: { ...ss030Ps, deck: ss030Deck } };
+
+        const ss030Side: 'player1Characters' | 'player2Characters' =
+          ss030Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const ss030Missions = [...newState.activeMissions];
+        const ss030Copie = { ...ss030Missions[ss030Mission] };
+        ss030Copie[ss030Side] = [...ss030Copie[ss030Side], {
+          card: ss030Carte,
+          isHidden: true,
+          powerTokens: 0,
+          stack: [ss030Carte],
+          controlledBy: ss030Player,
+          originalOwner: ss030Player,
+          instanceId: generateInstanceId(),
+          wasRevealedAtLeastOnce: false,
+          missionIndex: ss030Mission,
+        } as CharacterInPlay];
+        ss030Missions[ss030Mission] = ss030Copie;
+        newState = { ...newState, activeMissions: ss030Missions };
+        newState[ss030Player] = {
+          ...newState[ss030Player],
+          charactersInPlay: EffectEngine.countCharsForPlayer(newState, ss030Player),
+        };
+
+        newState.log = logAction(newState.log, newState.turn, newState.phase, ss030Player,
+          'EFFECT', 'Kabuto Yakushi (030): placed the top card of the deck as a hidden character.',
+          'game.log.effect.placeHidden',
+          { card: KABUTO_030_NAME, id: KABUTO_030_ID, mission: String(ss030Mission + 1) });
+        break;
+      }
+
+      case 'SS101_CONFIRM_FIRST_STRIKE': {
+        let ss101Data: { missionIndex?: number } = {};
+        try { ss101Data = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const ss101Mission = ss101Data.missionIndex ?? pendingEffect.sourceMissionIndex;
+        const ss101Cibles = weakestVisibleIn(newState, ss101Mission);
+        if (ss101Cibles.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Snake Sword (101) FIRST STRIKE: no non-hidden character left in this mission.',
+            'game.log.effect.noTarget', { card: SNAKE_SWORD_NAME, id: SNAKE_SWORD_ID });
+          break;
+        }
+        for (const ss101Cible of ss101Cibles) {
+          const ss101Top = ss101Cible.stack?.length > 0 ? ss101Cible.stack[ss101Cible.stack.length - 1] : ss101Cible.card;
+          newState = EffectEngine.defeatCharacter(newState, ss101Cible.instanceId, pendingEffect.sourcePlayer);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DEFEAT', `Snake Sword (101): defeated ${ss101Top.name_fr}.`,
+            'game.log.effect.defeat',
+            { card: SNAKE_SWORD_NAME, id: SNAKE_SWORD_ID, target: ss101Top.name_fr, target_en: ss101Top.name_en || ss101Top.name_fr });
+        }
+        break;
+      }
+
       case 'SS124_TAKE_CONTROL': {
         emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.controlled.with.source', { sourceName: INO_124_NAME });
         newState = EffectEngine.takeControlOfEnemy(newState, pendingEffect, targetId, INO_124_NAME, INO_124_ID);
@@ -12145,52 +12527,19 @@ export class EffectEngine {
       }
 
       case 'SS124_MOVE_CONTROLLED': {
-        const i124Found = EffectEngine.findCharByInstanceId(newState, targetId);
-        if (!i124Found) break;
-        const i124Side: 'player1Characters' | 'player2Characters' =
-          i124Found.player === 'player1' ? 'player1Characters' : 'player2Characters';
-        const i124Dests: string[] = [];
-        for (let i = 0; i < newState.activeMissions.length; i++) {
-          if (i === i124Found.missionIndex) continue;
-          if (moveWouldViolateNameUniqueness(newState, i124Found.character, i, i124Side)) continue;
-          i124Dests.push(String(i));
-        }
-        if (i124Dests.length === 0) {
-          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_NO_TARGET', 'Ino Yamanaka (124) UPGRADE: No legal destination mission for this controlled character.',
-            'game.log.effect.noTarget', { card: INO_124_NAME, id: INO_124_ID });
-          break;
-        }
-        if (i124Dests.length === 1) {
-          newState = EffectEngine.moveCharToMissionDirectPublic(
-            newState, targetId, parseInt(i124Dests[0], 10), i124Found.player,
-            INO_124_LOG_NAME, INO_124_ID, pendingEffect.sourcePlayer,
-          );
-          break;
-        }
-        const i124EffId = generateInstanceId();
-        const i124ActId = generateInstanceId();
-        newState.pendingEffects.push({
-          id: i124EffId, sourceCardId: pendingEffect.sourceCardId,
-          sourceInstanceId: pendingEffect.sourceInstanceId,
-          sourceMissionIndex: pendingEffect.sourceMissionIndex,
-          effectType: pendingEffect.effectType,
-          effectDescription: JSON.stringify({ charInstanceId: targetId, srcName: INO_124_LOG_NAME, srcId: INO_124_ID }),
-          targetSelectionType: 'SS_MOVE_DEST',
-          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
-          validTargets: i124Dests, isOptional: false, isMandatory: true,
-          resolved: false, isUpgrade: pendingEffect.isUpgrade,
-          remainingEffectTypes: pendingEffect.remainingEffectTypes,
-        });
-        newState.pendingActions.push({
-          id: i124ActId, type: 'SELECT_TARGET' as PendingAction['type'],
-          player: pendingEffect.sourcePlayer,
-          description: 'Choose a mission to move the character to.',
-          descriptionKey: 'game.effect.desc.chooseMissionMove',
-          options: i124Dests, minSelections: 1, maxSelections: 1,
-          sourceEffectId: i124EffId,
-        });
-        pendingEffect.remainingEffectTypes = undefined;
+        newState = EffectEngine.queueMoveDestination(
+          newState, pendingEffect, targetId, INO_124_LOG_NAME, INO_124_ID, INO_124_NAME,
+        );
+        break;
+      }
+
+      case 'SS_MOVE_PICK': {
+        let mpSrc: { srcName?: string; srcId?: string; srcLabel?: string } = {};
+        try { mpSrc = JSON.parse(pendingEffect.effectDescription); } catch {}
+        newState = EffectEngine.queueMoveDestination(
+          newState, pendingEffect, targetId,
+          mpSrc.srcName ?? '', mpSrc.srcId ?? '', mpSrc.srcLabel ?? mpSrc.srcName ?? '',
+        );
         break;
       }
 

@@ -3636,7 +3636,17 @@
         "ss148DefeatUpgraded": "Derrotar um personagem inimigo evoluído mais fraco que este, depois mover este personagem.",
         "ss148MoveSelf": "Escolha a missão para onde este personagem se move.",
         "ss150PullStrongest": "Mover o personagem inimigo mais forte em jogo para esta missão?",
-        "ss150PowerupByCost": "POWERUP {amount}, o custo do inimigo mais forte aqui?"
+        "ss150PowerupByCost": "POWERUP {amount}, o custo do inimigo mais forte aqui?",
+        "ss034MoveFriendly": "Escolhe um personagem aliado para mover para outra missão.",
+        "ss125MoveHidden": "Escolhe um personagem aliado escondido para mover para outra missão.",
+        "ss101DefeatWeakest": "Derrotar todos os personagens não escondidos com menos Poder nesta missão, aliados e inimigos?",
+        "ss030PlaceHidden": "Escolhe a missão onde a carta do topo do teu baralho é colocada como personagem escondido.",
+        "ss045BounceHidden": "Escolhe um personagem aliado escondido para devolver à tua mão.",
+        "ss045PlaceFromHand": "Escolhe uma carta da tua mão para colocar como personagem escondido nessa mesma missão.",
+        "ss037RevealSoundFour": "Revela quantos personagens Quatro do Som quiseres da tua mão. Quantos mais revelares, maior o custo que podes derrotar.",
+        "ss037DefeatEnemy": "Escolhe um personagem inimigo com custo inferior ao número de cartas reveladas.",
+        "ss035MovePerAlly": "Por cada outro personagem Quatro do Som aliado nesta missão, mover um personagem cujo custo não exceda o desse aliado?",
+        "ss035PickChar": "Escolhe um personagem para mover, aliado ou inimigo, dentro do limite de custo desse aliado."
       },
       "upgradeModifierConfirm": "Aplicar o efeito UPGRADE",
       "upgradeModifierDecline": "Manter apenas o efeito MAIN",

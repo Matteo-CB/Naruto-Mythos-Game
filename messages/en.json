@@ -1534,7 +1534,17 @@
         "ss148DefeatUpgraded": "Defeat an enemy upgraded character weaker than this one, then move this character.",
         "ss148MoveSelf": "Choose the mission this character moves to.",
         "ss150PullStrongest": "Move the strongest enemy character in play to this mission?",
-        "ss150PowerupByCost": "POWERUP {amount}, the cost of the strongest enemy here?"
+        "ss150PowerupByCost": "POWERUP {amount}, the cost of the strongest enemy here?",
+        "ss034MoveFriendly": "Choose a friendly character to move to another mission.",
+        "ss125MoveHidden": "Choose a friendly hidden character to move to another mission.",
+        "ss101DefeatWeakest": "Defeat every non-hidden character with the lowest Power in this mission, friendly and enemy alike?",
+        "ss030PlaceHidden": "Choose the mission where the top card of your deck is placed as a hidden character.",
+        "ss045BounceHidden": "Choose a friendly hidden character to return to your hand.",
+        "ss045PlaceFromHand": "Choose a card from your hand to place as a hidden character in that same mission.",
+        "ss037RevealSoundFour": "Reveal any number of Sound Four characters from your hand. The more you reveal, the higher the cost you can defeat.",
+        "ss037DefeatEnemy": "Choose an enemy character with cost lower than the number of cards you revealed.",
+        "ss035MovePerAlly": "For each other friendly Sound Four character in this mission, move a character whose cost does not exceed that ally’s cost?",
+        "ss035PickChar": "Choose a character to move, friendly or enemy, within this ally’s cost limit."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",
