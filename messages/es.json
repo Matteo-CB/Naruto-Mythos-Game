@@ -1558,7 +1558,9 @@
         "ss127TakeControl": "Elige un personaje enemigo no oculto de esta misión para controlarlo. Pagas Chakra igual a su Poder.",
         "ss077Confirm": "¿Derrotar a Kimimaro para derrotar personajes enemigos no ocultos con un coste total de 5 o menos?",
         "ss077ConfirmDuel": "Gaara está presente: ¿derrotar a Kimimaro para derrotar personajes enemigos no ocultos con un coste total de 7 o menos?",
-        "ss077PickTarget": "Elige un personaje enemigo no oculto para derrotarlo, dentro del coste restante."
+        "ss077PickTarget": "Elige un personaje enemigo no oculto para derrotarlo, dentro del coste restante.",
+        "ss125DefeatMoved": "Elige un personaje enemigo que el oponente haya movido esta ronda para derrotarlo.",
+        "ss040PlaySummons": "Juega personajes Invocación. En cada misión con una Tayuya aliada, cuestan 1 menos por personaje Cuatro del Sonido aliado presente."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

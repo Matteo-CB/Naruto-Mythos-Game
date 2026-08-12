@@ -234,6 +234,8 @@ export interface GameState {
   ss001CardsShuffled?: number;
 
   turnPlayedIds?: string[];
+
+  turnMovedIds?: Array<{ instanceId: string; mover: PlayerID }>;
 }
 
 export interface GameLogEntry {

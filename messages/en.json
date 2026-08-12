@@ -1553,7 +1553,9 @@
         "ss127TakeControl": "Choose a non-hidden enemy character in this mission to take control of. You pay Chakra equal to its Power.",
         "ss077Confirm": "Defeat Kimimaro to defeat non-hidden enemy characters with a total cost of 5 or less?",
         "ss077ConfirmDuel": "Gaara is here: defeat Kimimaro to defeat non-hidden enemy characters with a total cost of 7 or less?",
-        "ss077PickTarget": "Choose a non-hidden enemy character to defeat, within the remaining cost budget."
+        "ss077PickTarget": "Choose a non-hidden enemy character to defeat, within the remaining cost budget.",
+        "ss125DefeatMoved": "Choose an enemy character the opponent moved this round to defeat.",
+        "ss040PlaySummons": "Play Summon characters. In each mission holding a friendly Tayuya, they cost 1 less per friendly Sound Four character there."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",

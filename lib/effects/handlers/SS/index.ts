@@ -30,6 +30,7 @@ import { registerSakon037Handlers } from './sakon037';
 import { registerKidomaru035Handlers } from './kidomaru035';
 import { registerOrochimaru130Handlers } from './orochimaru130';
 import { registerOrochimaru127Handlers } from './orochimaru127';
+import { registerTayuya040Handlers } from './tayuya040';
 
 export function registerAllSSHandlers(): void {
   registerMinato122Handlers();
@@ -64,4 +65,5 @@ export function registerAllSSHandlers(): void {
   registerKidomaru035Handlers();
   registerOrochimaru130Handlers();
   registerOrochimaru127Handlers();
+  registerTayuya040Handlers();
 }

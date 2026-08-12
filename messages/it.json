@@ -3655,7 +3655,9 @@
         "ss127TakeControl": "Scegli un personaggio nemico non nascosto in questa missione di cui prendere il controllo. Paghi Chakra pari alla sua Potenza.",
         "ss077Confirm": "Sconfiggere Kimimaro per sconfiggere personaggi nemici non nascosti con un costo totale di 5 o meno?",
         "ss077ConfirmDuel": "Gaara è presente: sconfiggere Kimimaro per sconfiggere personaggi nemici non nascosti con un costo totale di 7 o meno?",
-        "ss077PickTarget": "Scegli un personaggio nemico non nascosto da sconfiggere, entro il costo rimanente."
+        "ss077PickTarget": "Scegli un personaggio nemico non nascosto da sconfiggere, entro il costo rimanente.",
+        "ss125DefeatMoved": "Scegli un personaggio nemico che l’avversario ha spostato in questo round da sconfiggere.",
+        "ss040PlaySummons": "Gioca personaggi Evocazione. In ogni missione con una Tayuya alleata, costano 1 in meno per ogni personaggio Quattro del Suono alleato presente."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

@@ -50,6 +50,7 @@ import { OROCHIMARU_130_ID, OROCHIMARU_130_NAME, leafEnemiesIn } from './handler
 import { KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
 import { OROCHIMARU_127_ID, OROCHIMARU_127_NAME } from './handlers/SS/orochimaru127';
 import { KIMIMARO_077_ID, KIMIMARO_077_NAME, kimimaro077Targets, costOfTarget } from './handlers/SS/kimimaro077';
+import { DOSU_125_ID, DOSU_125_NAME } from './handlers/SS/soundMoves';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatEnemyCharacter, defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
 import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval, isHiddenRevealBlocked, amplifiedPowerup } from './ContinuousEffects';
@@ -6376,6 +6377,7 @@ export class EffectEngine {
       case 'SS124_CONFIRM_DUEL':
       case 'SS124_CONFIRM_UPGRADE':
       case 'SS127_CONFIRM':
+      case 'SS125_CONFIRM_DUEL':
       case 'SS030_CONFIRM_FIRST_STRIKE':
       case 'SS037_CONFIRM_UPGRADE':
       case 'SS045_CONFIRM_AMBUSH':
@@ -12408,6 +12410,20 @@ export class EffectEngine {
         break;
       }
 
+      case 'SS125_DEFEAT_MOVED': {
+        const ss125Found = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!ss125Found) break;
+        const ss125Top = ss125Found.character.stack?.length > 0
+          ? ss125Found.character.stack[ss125Found.character.stack.length - 1]
+          : ss125Found.character.card;
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', `Dosu Kinuta (125): defeated ${ss125Top.name_fr}.`,
+          'game.log.effect.defeat',
+          { card: DOSU_125_NAME, id: DOSU_125_ID, target: ss125Top.name_fr, target_en: ss125Top.name_en || ss125Top.name_fr });
+        break;
+      }
+
       case 'SS127_TAKE_CONTROL': {
         const ss127Found = EffectEngine.findCharByInstanceId(newState, targetId);
         if (!ss127Found) break;
@@ -15417,7 +15433,7 @@ export class EffectEngine {
       }
 
       case 'PLAY_LESS_CATEGORY': {
-        let plc: { costReduction?: number; category?: PlayLessCategory; sourceName?: string; sourceId?: string; repeatable?: boolean; descriptionKey?: string; powerupSummonsAfter?: number; noUpgrade?: boolean } = {};
+        let plc: { costReduction?: number; category?: PlayLessCategory; sourceName?: string; sourceId?: string; repeatable?: boolean; descriptionKey?: string; powerupSummonsAfter?: number; noUpgrade?: boolean; reductionByMission?: Record<number, number> } = {};
         try { plc = JSON.parse(pendingEffect.effectDescription); } catch {}
         const plcReduction = plc.costReduction ?? 0;
         if (targetId && targetId !== 'DONE') {
@@ -15430,7 +15446,7 @@ export class EffectEngine {
             newState = EffectEngine.playCharFromHandWithReduction(
               newState, pendingEffect, plcRaw, plcReduction,
               plc.category?.value ?? '', plc.sourceName ?? '', plc.sourceId ?? '',
-              !!plc.noUpgrade,
+              !!plc.noUpgrade, plc.reductionByMission,
             );
           }
           const awaitsMissionChoice = newState.pendingEffects.some(
@@ -15850,6 +15866,9 @@ export class EffectEngine {
             cardId_gen = desc.cardId ?? '';
             costReduction_gen = desc.costReduction ?? 0;
             noUpgrade_gen = !!desc.noUpgrade;
+            if (desc.reductionByMission && desc.reductionByMission[missionIdx_gen] !== undefined) {
+              costReduction_gen = desc.reductionByMission[missionIdx_gen];
+            }
           } catch {}
           newState = EffectEngine.genericPlaceOnMission(
             newState, pendingEffect.sourcePlayer, missionIdx_gen, cost_gen,
@@ -20153,7 +20172,9 @@ export class EffectEngine {
     state: GameState, pending: PendingEffect, targetId: string,
     costReduction: number, _groupFilter: string, cardName: string, cardId: string,
     noUpgrade = false,
+    reductionByMission?: Record<number, number>,
   ): GameState {
+    const reductionFor = (i: number): number => reductionByMission?.[i] ?? costReduction;
     const handIndex = parseInt(targetId, 10);
     if (isNaN(handIndex)) return state;
 
@@ -20174,7 +20195,7 @@ export class EffectEngine {
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
-      if (isMissionValidForPlay(newState, player, i, friendlySide, chosenCard, ps.chakra, costReduction, undefined, noUpgrade)) {
+      if (isMissionValidForPlay(newState, player, i, friendlySide, chosenCard, ps.chakra, reductionFor(i), undefined, noUpgrade)) {
         validMissions.push(String(i));
       }
     }
@@ -20190,7 +20211,8 @@ export class EffectEngine {
     ps.discardPile.push(chosenCard);
 
     if (validMissions.length === 1) {
-      return EffectEngine.genericPlaceOnMission(newState, player, parseInt(validMissions[0], 10), 0, cardName, cardId, costReduction, noUpgrade);
+      const seule = parseInt(validMissions[0], 10);
+      return EffectEngine.genericPlaceOnMission(newState, player, seule, 0, cardName, cardId, reductionFor(seule), noUpgrade);
     }
 
     
@@ -20204,7 +20226,7 @@ export class EffectEngine {
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
       effectDescription: JSON.stringify({
-        cost: 0, cardName, cardId, costReduction, noUpgrade,
+        cost: 0, cardName, cardId, costReduction, noUpgrade, reductionByMission,
         powerupSummonsAfter: powerupSummonsAfterOf(pending),
       }),
       targetSelectionType: 'GENERIC_CHOOSE_PLAY_MISSION',
@@ -22703,7 +22725,12 @@ export class EffectEngine {
     missions[destMissionIndex] = destMission;
 
     state.activeMissions = missions;
-    
+
+    state.turnMovedIds = [
+      ...(state.turnMovedIds ?? []).filter((m) => m.instanceId !== charInstanceId),
+      { instanceId: charInstanceId, mover: effectInitiator ?? charOwner },
+    ];
+
     const movedCharName = charResult.character.isHidden ? '???' : charResult.character.card.name_fr;
     state.log = logAction(
       state.log, state.turn, state.phase, charOwner,

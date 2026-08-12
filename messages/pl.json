@@ -3655,7 +3655,9 @@
         "ss127TakeControl": "Wybierz odkrytą wrogą postać na tej misji, aby przejąć nad nią kontrolę. Płacisz Czakrę równą jej Mocy.",
         "ss077Confirm": "Pokonać Kimimaro, aby pokonać odkryte wrogie postacie o łącznym koszcie 5 lub mniejszym?",
         "ss077ConfirmDuel": "Gaara jest obecny: pokonać Kimimaro, aby pokonać odkryte wrogie postacie o łącznym koszcie 7 lub mniejszym?",
-        "ss077PickTarget": "Wybierz odkrytą wrogą postać do pokonania, w ramach pozostałego kosztu."
+        "ss077PickTarget": "Wybierz odkrytą wrogą postać do pokonania, w ramach pozostałego kosztu.",
+        "ss125DefeatMoved": "Wybierz wrogą postać, którą przeciwnik przeniósł w tej rundzie, aby ją pokonać.",
+        "ss040PlaySummons": "Zagraj postacie Przywołania. Na każdej misji z sojuszniczą Tayuyą kosztują o 1 mniej za każdą sojuszniczą postać Czwórki Dźwięku."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

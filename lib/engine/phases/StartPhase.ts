@@ -15,6 +15,7 @@ export function executeStartPhase(state: GameState): GameState {
 
   
   newState.turnPlayedIds = [];
+  newState.turnMovedIds = [];
 
   newState = resetFirstStrikeForRound(newState);
 

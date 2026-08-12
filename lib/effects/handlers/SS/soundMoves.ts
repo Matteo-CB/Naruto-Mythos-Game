@@ -91,7 +91,48 @@ function dosu125Upgrade(ctx: EffectContext): EffectResult {
   );
 }
 
+export function enemiesMovedByOpponent(state: GameState, player: PlayerID): string[] {
+  const adversaire: PlayerID = player === 'player1' ? 'player2' : 'player1';
+  const deplaces = (state.turnMovedIds ?? [])
+    .filter((m) => m.mover === adversaire)
+    .map((m) => m.instanceId);
+  if (deplaces.length === 0) return [];
+
+  const side = sideKey(adversaire);
+  const cibles: string[] = [];
+  for (const mission of state.activeMissions) {
+    for (const char of mission[side]) {
+      if (deplaces.includes(char.instanceId)) cibles.push(char.instanceId);
+    }
+  }
+  return cibles;
+}
+
+function dosu125Duel(ctx: EffectContext): EffectResult {
+  const { state, sourcePlayer, sourceCard } = ctx;
+
+  const validTargets = enemiesMovedByOpponent(state, sourcePlayer);
+  if (validTargets.length === 0) {
+    return refuse(
+      state, sourcePlayer,
+      'Dosu Kinuta (125) DUEL: no enemy character moved by the opponent this round.',
+      DOSU_125_NAME, DOSU_125_ID,
+    );
+  }
+
+  return confirmFirst({
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'SS125_DEFEAT_MOVED',
+    validTargets,
+    isOptional: true,
+    description: JSON.stringify({}),
+    descriptionKey: 'game.effect.desc.ss125DefeatMoved',
+  }, sourceCard.instanceId, 'SS125_CONFIRM_DUEL');
+}
+
 export function registerSoundMoveHandlers(): void {
   registerEffect(KIDOMARU_034_ID, 'FIRST_STRIKE', kidomaru034FirstStrike);
   registerEffect(DOSU_125_ID, 'UPGRADE', dosu125Upgrade);
+  registerEffect(DOSU_125_ID, 'DUEL', dosu125Duel);
 }
