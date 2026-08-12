@@ -42,7 +42,7 @@ export function Footer() {
       <Link
         href="/legal"
         className="transition-colors"
-        style={{ color: 'var(--t-footer-text)', textShadow: 'var(--t-footer-shadow)' }}
+        style={{ color: 'var(--t-footer-text)' }}
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLElement).style.color = 'var(--t-footer-text-strong)';
         }}
@@ -68,7 +68,7 @@ export function Footer() {
         target="_blank"
         rel="noopener noreferrer"
         className="transition-colors"
-        style={{ color: 'var(--t-footer-text)', textShadow: 'var(--t-footer-shadow)' }}
+        style={{ color: 'var(--t-footer-text)' }}
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLElement).style.color = 'var(--t-footer-text-strong)';
         }}

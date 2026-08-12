@@ -104,7 +104,6 @@ function CardStackInner({ character, className = '', onClick }: CardStackProps) 
               fontSize: '10px',
               fontWeight: 700,
               lineHeight: 1,
-              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
             }}
           >
             {stackSize}

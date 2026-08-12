@@ -438,7 +438,7 @@ export default function TournamentDetailPage() {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="max-w-4xl mx-auto relative z-10 flex-1 w-full px-4 sm:px-8 py-6 sm:py-10">
 
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="mb-6">
-          <h1 className="font-display text-2xl sm:text-3xl uppercase tracking-wider mb-2 leading-tight wrap-break-word" style={{ color: 'var(--t-text)', letterSpacing: '0.06em', textShadow: '0 0 18px var(--t-accent-glow)' }}>{tour.name}</h1>
+          <h1 className="font-display text-2xl sm:text-3xl uppercase tracking-wider mb-2 leading-tight wrap-break-word" style={{ color: 'var(--t-text)', letterSpacing: '0.06em' }}>{tour.name}</h1>
           <div className="flex flex-wrap items-center gap-3 text-xs" style={{ color: 'var(--t-muted)' }}>
             <span className="px-2 py-1 uppercase tracking-wider" style={{ backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)' }}>{tour.type === 'simulator' ? t('typeSimulator') : t('typePlayer')}</span>
             <span className="px-2 py-1 uppercase tracking-wider" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)', color: 'var(--t-text)' }}>{t(statusKey)}</span>

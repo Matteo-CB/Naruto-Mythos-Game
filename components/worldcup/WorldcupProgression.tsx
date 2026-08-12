@@ -9,7 +9,7 @@ interface ProgressionData {
   series: Array<{ code: string; points: (number | null)[] }>;
 }
 
-const LINE_COLORS = ['var(--t-accent)', '#8fbf8f', '#5a7abb', '#c48f8f', '#9b7bb8'];
+const LINE_COLORS = ['var(--t-accent)', 'var(--t-positive-text)', 'var(--t-series-blue)', 'var(--t-negative-text)', 'var(--t-series-violet)'];
 const W = 320;
 const H = 120;
 const PAD = 8;
@@ -29,7 +29,7 @@ export function WorldcupProgression({ countryName }: { countryName: (c: string) 
 
   if (!data || data.days.length < 2 || data.series.length === 0) {
     return (
-      <div className="mt-8 px-5 py-4" style={{ backgroundColor: 'rgba(17, 17, 17, 0.7)' }}>
+      <div className="mt-8 px-5 py-4" style={{ backgroundColor: 'var(--t-panel-veil)' }}>
         <div className="text-[10px] uppercase tracking-[0.25em] mb-2" style={{ color: 'var(--t-accent)' }}>{t('progressionTitle')}</div>
         <p className="text-[11px]" style={{ color: 'var(--t-dim)' }}>{t('progressionCollecting')}</p>
       </div>
@@ -41,7 +41,7 @@ export function WorldcupProgression({ countryName }: { countryName: (c: string) 
   const y = (v: number) => H - PAD - (Math.max(0, Math.min(100, v)) / 100) * (H - 2 * PAD);
 
   return (
-    <div className="mt-8 px-5 py-4" style={{ backgroundColor: 'rgba(17, 17, 17, 0.7)' }}>
+    <div className="mt-8 px-5 py-4" style={{ backgroundColor: 'var(--t-panel-veil)' }}>
       <div className="text-[10px] uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--t-accent)' }}>{t('progressionTitle')}</div>
       <div className="overflow-x-auto">
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ minWidth: 280, maxHeight: 160 }}>

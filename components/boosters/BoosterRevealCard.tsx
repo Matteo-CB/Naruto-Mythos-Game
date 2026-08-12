@@ -135,7 +135,6 @@ export function BoosterRevealCard({
             color: accent,
             fontSize: 10,
             letterSpacing: '0.18em',
-            textShadow: `0 0 8px ${accent}66`,
           }}
         >
           {tSuffix.has(rarity) ? tSuffix(rarity) : rarity}

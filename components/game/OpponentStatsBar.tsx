@@ -125,7 +125,6 @@ function StatPill({ label, value, color, isMobile, manual, icon }: { label: stri
           color,
           fontSize: isMobile ? '20px' : 'clamp(14px, 1.6vw, 18px)',
           letterSpacing: '-0.01em',
-          textShadow: `0 1px 3px rgba(0,0,0,0.8), 0 0 10px ${color}55`,
         }}
       >
         {manual ? <ManualGuess actual={value} color={color} /> : value}

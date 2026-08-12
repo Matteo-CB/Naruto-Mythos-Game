@@ -44,7 +44,7 @@ function StatBadges({ card, costLabel, powerLabel }: { card: AnyCard; costLabel:
       {hasCost && (
         <span
           className={`${base} top-1 right-1`}
-          style={{ backgroundColor: 'rgba(10,10,10,0.78)', color: 'var(--t-text)', fontVariantNumeric: 'tabular-nums' }}
+          style={{ backgroundColor: 'var(--t-art-scrim)', color: 'var(--t-on-art)', fontVariantNumeric: 'tabular-nums' }}
           title={`${costLabel} ${chakra}`}
         >
           <ChakraIcon size={11} color={CHAKRA_COLOR} />
@@ -54,7 +54,7 @@ function StatBadges({ card, costLabel, powerLabel }: { card: AnyCard; costLabel:
       {hasPower && (
         <span
           className={`${base} bottom-1 left-1`}
-          style={{ backgroundColor: 'rgba(10,10,10,0.78)', color: 'var(--t-text)', fontVariantNumeric: 'tabular-nums' }}
+          style={{ backgroundColor: 'var(--t-art-scrim)', color: 'var(--t-on-art)', fontVariantNumeric: 'tabular-nums' }}
           title={`${powerLabel} ${power}`}
         >
           <PowerIcon size={11} color={POWER_COLOR} />
@@ -219,7 +219,7 @@ export default function CollectionPage() {
           type="button"
           onClick={() => setSelectedCard(card)}
           className="absolute top-1 left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full opacity-70 hover:opacity-100 transition-opacity"
-          style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: 'var(--t-accent)' }}
+          style={{ backgroundColor: 'var(--t-art-scrim-soft)', color: 'var(--t-on-art-accent)' }}
           aria-label={t('collection.quickPreview')}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -359,9 +359,9 @@ export default function CollectionPage() {
               aria-pressed={filterHolosOnly}
               className="px-3 py-2 text-sm uppercase tracking-wider transition-colors"
               style={{
-                backgroundColor: filterHolosOnly ? '#a8e6ff1f' : 'var(--t-surface)',
-                color: filterHolosOnly ? '#a8e6ff' : 'var(--t-muted)',
-                boxShadow: filterHolosOnly ? '0 0 12px #a8e6ff33' : 'none',
+                backgroundColor: filterHolosOnly ? 'var(--t-holo)1f' : 'var(--t-surface)',
+                color: filterHolosOnly ? 'var(--t-holo)' : 'var(--t-muted)',
+                boxShadow: filterHolosOnly ? '0 0 12px var(--t-holo)33' : 'none',
               }}
             >
               {t('collection.holosOnly')}
@@ -446,7 +446,7 @@ export default function CollectionPage() {
                 {variant && !locked && (variantInventory.get(card.id) ?? 0) >= 2 && (
                   <span
                     className="absolute bottom-1 right-1 z-10 px-1.5 py-0.5 text-[9px] font-bold"
-                    style={{ backgroundColor: 'var(--t-accent)33', color: 'var(--t-accent)', fontVariantNumeric: 'tabular-nums' }}
+                    style={{ backgroundColor: 'var(--t-on-art-accent)33', color: 'var(--t-on-art-accent)', fontVariantNumeric: 'tabular-nums' }}
                   >
                     x{variantInventory.get(card.id)}
                   </span>
@@ -454,7 +454,7 @@ export default function CollectionPage() {
                 {filterHolosOnly && holoOwned && (variantInventory.get(holoIdFor(card.id)) ?? 0) >= 2 && (
                   <span
                     className="absolute bottom-1 right-1 z-10 px-1.5 py-0.5 text-[9px] font-bold"
-                    style={{ backgroundColor: '#a8e6ff26', color: 'var(--t-accent)', fontVariantNumeric: 'tabular-nums' }}
+                    style={{ backgroundColor: 'var(--t-on-art-holo)', color: 'var(--t-on-art-accent)', fontVariantNumeric: 'tabular-nums' }}
                   >
                     x{variantInventory.get(holoIdFor(card.id))}
                   </span>
@@ -463,7 +463,7 @@ export default function CollectionPage() {
                   type="button"
                   onClick={() => setSelectedCard(filterHolosOnly && holoOwned ? { ...card, isHolo: true } : card)}
                   className="absolute top-1 left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full opacity-70 hover:opacity-100 transition-opacity"
-                  style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: 'var(--t-accent)' }}
+                  style={{ backgroundColor: 'var(--t-art-scrim-soft)', color: 'var(--t-on-art-accent)' }}
                   aria-label={t('collection.quickPreview')}
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -541,7 +541,7 @@ export default function CollectionPage() {
                       type="button"
                       onClick={() => setSelectedCard(card)}
                       className="absolute top-1 left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full opacity-70 hover:opacity-100 transition-opacity"
-                      style={{ backgroundColor: 'rgba(10,10,10,0.72)', color: 'var(--t-accent)' }}
+                      style={{ backgroundColor: 'var(--t-art-scrim-soft)', color: 'var(--t-on-art-accent)' }}
                       aria-label={t('collection.quickPreview')}
                     >
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -602,9 +602,9 @@ function BanBadge({ label }: { label: string }) {
         padding: '2px 6px',
         fontSize: 9,
         letterSpacing: '0.18em',
-        color: 'var(--t-text)',
+        color: 'var(--t-on-art)',
         backgroundColor: 'rgba(179, 62, 62, 0.95)',
-        boxShadow: '0 2px 6px var(--t-shadow)',
+        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.55)',
         zIndex: 2,
       }}
     >

@@ -66,7 +66,7 @@ export function LiveGamesBar() {
     <section
       className="w-full"
       style={{
-        backgroundColor: 'rgba(15, 15, 20, 0.78)',
+        backgroundColor: 'var(--t-panel-veil)',
         boxShadow: '0 12px 32px var(--t-shadow)',
       }}
     >
@@ -133,7 +133,7 @@ function LiveGameCard({ game, loading, onSpectate }: { game: LiveGame; loading: 
       transition={isWaiting ? { duration: 4, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.2 }}
       className="flex items-stretch no-select w-full"
       style={{
-        backgroundColor: game.isEvolving ? 'rgba(10, 10, 14, 0.55)' : 'rgba(15, 15, 20, 0.85)',
+        backgroundColor: game.isEvolving ? 'var(--t-panel-veil-holo)' : 'var(--t-panel-veil-strong)',
         position: 'relative',
         zIndex: 1,
       }}

@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl';
 import { useLocaleBcp47 } from '@/lib/i18n/useLocaleMeta';
 import { CountryFlag } from '@/components/CountryFlag';
 
+const CHAMPION_SHEEN = 'color-mix(in srgb, var(--t-champion) 22%, transparent)';
+
 interface WorldcupTitle {
   month: string;
   countryCode: string;
@@ -40,17 +42,17 @@ export function WorldcupChampionBadge({ titles, reigningChampionMonth, countryCo
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="relative flex items-center gap-2 px-3 py-1.5 overflow-hidden"
-          style={{ backgroundColor: 'rgba(255, 215, 0, 0.08)' }}
+          style={{ backgroundColor: 'var(--t-champion-surface)' }}
         >
           <motion.span
             aria-hidden
             className="absolute inset-0 pointer-events-none"
-            style={{ background: 'linear-gradient(115deg, transparent 30%, rgba(255,215,0,0.22) 50%, transparent 70%)' }}
+            style={{ background: `linear-gradient(115deg, transparent 30%, ${CHAMPION_SHEEN} 50%, transparent 70%)` }}
             animate={{ x: ['-120%', '120%'] }}
             transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1.4 }}
           />
           <CountryFlag code={title.countryCode} size={18} />
-          <span className="font-display text-[11px] uppercase tracking-widest" style={{ color: '#ffd700' }}>
+          <span className="font-display text-[11px] uppercase tracking-widest" style={{ color: 'var(--t-champion)' }}>
             {t('championTitle', { month: monthLabel(title.month, bcp47) })}
           </span>
         </motion.div>

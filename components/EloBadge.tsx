@@ -184,7 +184,6 @@ export function EloBadge({ elo, size = 'md', showElo = true, totalGames }: EloBa
           color: displayColor,
           fontSize: s.fontSize,
           lineHeight: 1,
-          textShadow: unranked ? 'none' : `0 0 8px ${displayGlow}`,
         }}
       >
         {unranked ? t('rankNames.unranked') : t(`rankNames.${tier.key}`)}
@@ -268,7 +267,6 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
           color: displayColor,
           fontSize: '13px',
           lineHeight: 1,
-          textShadow: unranked ? 'none' : `0 0 10px ${displayGlow}`,
         }}
       >
         {unranked ? t('rankNames.unranked') : t(`rankNames.${tier.key}`)}
@@ -280,7 +278,6 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
           color: displayColor,
           fontSize: '22px',
           lineHeight: 1,
-          textShadow: unranked ? 'none' : `0 0 15px ${displayGlow}`,
         }}
       >
         {elo}

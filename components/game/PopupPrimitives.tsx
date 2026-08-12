@@ -224,7 +224,6 @@ export function PopupTitle({
           color: accentColor,
           fontSize: fontSizes[size],
           letterSpacing: '0.22em',
-          textShadow: `0 0 24px ${accentColor}30`,
           lineHeight: 1.3,
         }}
       >

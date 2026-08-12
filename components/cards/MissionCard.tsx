@@ -212,7 +212,6 @@ function MissionCardInner({
             fontWeight: 700,
             fontSize: '0.65em',
             lineHeight: 1.3,
-            textShadow: '0 1px 4px rgba(0,0,0,0.9)',
           }}
         >
           {getCardName(card, locale as 'en' | 'fr')}
@@ -224,7 +223,6 @@ function MissionCardInner({
               fontSize: '0.45em',
               lineHeight: 1.2,
               marginTop: '2px',
-              textShadow: '0 1px 3px rgba(0,0,0,0.9)',
             }}
           >
             {locale === 'en' ? card.name_fr : card.name_en}

@@ -124,7 +124,7 @@ export function LiveGamesSection({ filter = 'all' }: Props) {
                 <button onClick={() => handleSpectate(game)}
                   disabled={spectateLoading === game.roomCode}
                   className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer disabled:opacity-50"
-                  style={{ backgroundColor: 'var(--t-accent-glow)', border: '1px solid rgba(196,163,90,0.3)', color: 'var(--t-accent)' }}>
+                  style={{ backgroundColor: 'var(--t-accent-glow)', border: '1px solid color-mix(in srgb, var(--t-accent) 30%, transparent)', color: 'var(--t-accent)' }}>
                   {spectateLoading === game.roomCode ? '...' : t('spectator.joinSpectate')}
                 </button>
               </div>

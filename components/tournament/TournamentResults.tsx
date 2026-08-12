@@ -67,7 +67,7 @@ export function TournamentResults({ tournament }: Props) {
           animate={{ y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
           className="text-2xl font-bold tracking-wide"
-          style={{ color: 'var(--t-accent)', textShadow: '0 0 20px rgba(196, 163, 90, 0.3)' }}
+          style={{ color: 'var(--t-accent)' }}
         >
           <PlayerNameLink username={view.champion.username} />
         </motion.span>

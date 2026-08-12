@@ -11,7 +11,6 @@ function PlayerSide({ name, score, win, align }: { name: string; score?: number;
         className="font-display text-sm truncate"
         style={{
           color: win ? 'var(--t-accent)' : '#d8d6cf',
-          textShadow: win ? '0 0 14px rgba(196,163,90,0.45)' : 'none',
           letterSpacing: '0.02em',
         }}
       >

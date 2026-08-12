@@ -49,7 +49,7 @@ export function RoomCard({
       transition={{ duration: 0.15 }}
       className="flex items-center gap-3 px-3 py-2.5 w-full no-select"
       style={{
-        backgroundColor: isEvolving ? 'rgba(10, 10, 14, 0.55)' : 'rgba(15, 15, 20, 0.78)',
+        backgroundColor: isEvolving ? 'var(--t-panel-veil-holo)' : 'var(--t-panel-veil)',
         boxShadow: '0 4px 16px var(--t-shadow)',
         position: 'relative',
         zIndex: 1,
@@ -69,7 +69,13 @@ export function RoomCard({
         </PlayerNameLink>
         <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
           <ChipText label={t(`online.mode.${isRanked ? 'ranked' : gameMode}`)} accent={isRanked ? 'var(--t-danger)' : 'var(--t-accent)'} />
-          {sealedSetLabel && <ChipText label={sealedSetLabel} accent="#8fae6b" />}
+          {sealedSetLabel && (
+            <ChipText
+              label={sealedSetLabel}
+              accent="var(--t-sage)"
+              tint="color-mix(in srgb, var(--t-sage) 8%, transparent)"
+            />
+          )}
           {isAnonymous && <ChipText label={t('online.badge.anonymous')} accent="var(--t-muted)" />}
           {isEvolving && <EvoBadge holoHue={holoHue} />}
           <span className="text-[9px]" style={{ color: 'var(--t-muted)', marginLeft: 4 }}>
@@ -82,7 +88,7 @@ export function RoomCard({
         className="px-3.5 py-1.5 text-[10px] font-bold uppercase cursor-pointer no-select shrink-0"
         style={{
           backgroundColor: isRanked ? 'var(--t-danger)' : 'var(--t-accent)',
-          color: isRanked ? 'var(--t-text)' : 'var(--t-bg)',
+          color: isRanked ? 'var(--t-on-danger-soft)' : 'var(--t-on-accent)',
           letterSpacing: '0.14em',
           transform: 'skewX(-3deg)',
         }}
@@ -110,7 +116,7 @@ function EvoBadge({ holoHue }: { holoHue: number | null }) {
       className="inline-flex items-center px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider whitespace-nowrap"
       style={{
         color,
-        backgroundColor: 'rgba(0,0,0,0.35)',
+        backgroundColor: 'var(--t-holo-scrim)',
         border: `1px solid ${color}`,
         borderRadius: '3px',
         opacity: 0.92,
@@ -120,15 +126,14 @@ function EvoBadge({ holoHue }: { holoHue: number | null }) {
     </span>
   );
 }
-
-function ChipText({ label, accent }: { label: string; accent: string }) {
+function ChipText({ label, accent, tint }: { label: string; accent: string; tint?: string }) {
   return (
     <span
       className="text-[8.5px] font-bold uppercase"
       style={{
         color: accent,
         letterSpacing: '0.18em',
-        backgroundColor: `${accent}14`,
+        backgroundColor: tint ?? `${accent}14`,
         padding: '2px 6px',
       }}
     >

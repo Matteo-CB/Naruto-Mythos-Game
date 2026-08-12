@@ -62,7 +62,7 @@ export function MyStatsPanel({ username, mode, onModeChange }: MyStatsPanelProps
     <section
       className="w-full"
       style={{
-        backgroundColor: 'rgba(15, 15, 20, 0.78)',
+        backgroundColor: 'var(--t-panel-veil)',
         boxShadow: '0 12px 32px var(--t-shadow)',
       }}
     >
@@ -114,7 +114,7 @@ export function MyStatsPanel({ username, mode, onModeChange }: MyStatsPanelProps
                     </span>
                     <span
                       className="text-base font-bold tabular-nums"
-                      style={{ color: winStreak > 0 ? '#8ad88a' : 'var(--t-muted)', lineHeight: 1 }}
+                      style={{ color: winStreak > 0 ? 'var(--t-positive-text)' : 'var(--t-muted)', lineHeight: 1 }}
                     >
                       {winStreak}
                     </span>
@@ -124,10 +124,10 @@ export function MyStatsPanel({ username, mode, onModeChange }: MyStatsPanelProps
 
               <div
                 className="grid grid-cols-2 gap-2 pt-2"
-                style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)' }}
+                style={{ boxShadow: 'inset 0 1px 0 color-mix(in srgb, var(--t-text-strong) 3%, transparent)' }}
               >
-                <StatCell label={t('online.myStats.wins')} value={stats ? w : '...'} color="#8ad88a" />
-                <StatCell label={t('online.myStats.losses')} value={stats ? l : '...'} color="#d88a8a" />
+                <StatCell label={t('online.myStats.wins')} value={stats ? w : '...'} color="var(--t-positive-text)" />
+                <StatCell label={t('online.myStats.losses')} value={stats ? l : '...'} color="var(--t-negative-text)" />
               </div>
 
               {stats && total > 0 && (

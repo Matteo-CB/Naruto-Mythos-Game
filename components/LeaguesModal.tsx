@@ -61,7 +61,7 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
                 <div>
                   <h2
                     className="font-display text-2xl sm:text-3xl uppercase tracking-wider leading-none"
-                    style={{ color: 'var(--t-text)', letterSpacing: '0.08em', textShadow: '0 0 18px var(--t-accent-glow)' }}
+                    style={{ color: 'var(--t-text)', letterSpacing: '0.08em' }}
                   >
                     {t('leagues')}
                   </h2>
@@ -119,7 +119,6 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
                         className="font-display text-base sm:text-lg leading-none uppercase tracking-wider"
                         style={{
                           color: tier.color,
-                          textShadow: `0 0 14px ${tier.color}40`,
                           letterSpacing: '0.06em',
                         }}
                       >

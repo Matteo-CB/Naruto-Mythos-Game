@@ -114,7 +114,7 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
   const content = (
     <div
       className="fixed inset-0 flex items-center justify-center p-3 sm:p-6"
-      style={{ zIndex: Z_APP_MODAL, backgroundColor: 'rgba(4, 4, 8, 0.85)' }}
+      style={{ zIndex: Z_APP_MODAL, backgroundColor: 'var(--t-overlay)' }}
       onClick={onClose}
     >
       <motion.div
@@ -144,7 +144,7 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 py-4" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}>
+        <div className="flex-1 overflow-y-auto px-5 py-4" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--t-border) transparent' }}>
           <div
             className="grid gap-2"
             style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(64px, 1fr))' }}
@@ -157,7 +157,7 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
                 {qty > 1 && (
                   <span
                     className="absolute bottom-0.5 right-0.5 font-display text-[10px] tabular-nums px-1.5 py-0.5"
-                    style={{ backgroundColor: 'rgba(4,4,8,0.9)', color: 'var(--t-accent)' }}
+                    style={{ backgroundColor: 'var(--t-overlay)', color: 'var(--t-accent)' }}
                   >
                     x{qty}
                   </span>
@@ -180,7 +180,7 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
                     {qty > 1 && (
                       <span
                         className="absolute bottom-0.5 right-0.5 font-display text-[10px] tabular-nums px-1.5 py-0.5"
-                        style={{ backgroundColor: 'rgba(4,4,8,0.9)', color: 'var(--t-accent)' }}
+                        style={{ backgroundColor: 'var(--t-overlay)', color: 'var(--t-accent)' }}
                       >
                         x{qty}
                       </span>

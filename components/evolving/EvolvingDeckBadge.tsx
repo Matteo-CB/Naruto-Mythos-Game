@@ -28,7 +28,7 @@ export function EvolvingDeckBadge({ points, size = 'sm', showLabel = true }: Pro
       className={`inline-flex items-center gap-1 ${padX} ${padY} ${text} font-bold uppercase tracking-wider whitespace-nowrap`}
       style={{
         color,
-        backgroundColor: 'rgba(0,0,0,0.35)',
+        backgroundColor: 'var(--t-holo-scrim)',
         border: `1px solid ${color}`,
         borderRadius: '3px',
       }}

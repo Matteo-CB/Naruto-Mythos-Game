@@ -41,7 +41,7 @@ interface EloHistoryData {
 }
 
 const GOLD = 'var(--t-accent)';
-const GREEN = '#4a9e4a';
+const GREEN = 'var(--t-success-bright)';
 const RED = 'var(--t-danger)';
 const GREY = 'var(--t-muted)';
 const DARK = 'var(--t-bg)';
@@ -271,7 +271,7 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
                 className="absolute pointer-events-none px-3 py-2 text-[10px] z-10"
                 style={{
                   backgroundColor: 'var(--t-bg)',
-                  border: '1px solid #2a2a2a',
+                  border: '1px solid var(--t-border)',
                   color: 'var(--t-text)',
                   left: onLeft ? 'auto' : `calc(${pct}% + 8px)`,
                   right: onLeft ? `calc(${100 - pct}% + 8px)` : 'auto',
@@ -316,7 +316,7 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
                 <div
                   key={o.username}
                   className="flex items-center gap-3 px-3 py-1.5 text-xs"
-                  style={{ backgroundColor: `${color}1a` }}
+                  style={{ backgroundColor: o.deltaSum > 0 ? 'var(--t-success-tint)' : 'transparent' }}
                 >
                   <span className="truncate flex-1 min-w-0" style={{ color: 'var(--t-text)' }}>
                     {o.username}
@@ -354,7 +354,7 @@ function Stat({ label, value, valueColor }: { label: string; value: string | num
       </span>
       <span
         className="text-base font-bold tabular-nums"
-        style={{ color: valueColor ?? '#ddd' }}
+        style={{ color: valueColor ?? 'var(--t-text)' }}
       >
         {value}
       </span>

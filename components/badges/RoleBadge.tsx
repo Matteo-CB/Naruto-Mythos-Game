@@ -63,7 +63,6 @@ export function RoleBadge({ role, size = 'sm' }: RoleBadgeProps) {
           color: config.color,
           fontSize: s.fontSize,
           lineHeight: 1,
-          textShadow: `0 0 8px ${config.glowColor}`,
           letterSpacing: '1.5px',
         }}
       >

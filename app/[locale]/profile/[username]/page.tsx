@@ -39,7 +39,7 @@ function ProfileModeSwitch({ value, onChange }: { value: ProfileStatsMode; onCha
   return (
     <div
       className="relative inline-flex items-center flex-wrap"
-      style={{ backgroundColor: 'rgba(8, 8, 14, 0.6)', boxShadow: 'inset 0 0 0 1px var(--t-divider)' }}
+      style={{ backgroundColor: 'var(--t-switch-track)', boxShadow: 'inset 0 0 0 1px var(--t-divider)' }}
     >
       {PROFILE_MODES.map((mode) => {
         const active = value === mode;
@@ -51,7 +51,7 @@ function ProfileModeSwitch({ value, onChange }: { value: ProfileStatsMode; onCha
             className="relative px-2.5 py-1.5 font-bold uppercase text-[9px] cursor-pointer no-select"
             style={{
               letterSpacing: '0.14em',
-              color: active ? 'var(--t-text)' : '#5a5a5a',
+              color: active ? 'var(--t-text)' : 'var(--t-switch-inactive)',
               transition: 'color 0.2s',
               background: 'transparent',
               minHeight: 32,
@@ -201,7 +201,7 @@ function GameRow({
 
   const resultColor = isDraw ? 'var(--t-muted)' : won ? 'var(--t-success)' : 'var(--t-danger)';
   const resultLabel = isDraw ? 'D' : won ? 'W' : 'L';
-  const altBg = index % 2 === 0 ? '#0c0b10' : '#0a0a0d';
+  const altBg = index % 2 === 0 ? 'var(--t-row-alt-a)' : 'var(--t-row-alt-b)';
 
   return (
     <motion.div
@@ -508,7 +508,7 @@ export default function ProfilePage({
             <div className="flex items-baseline gap-2 mt-1">
               <div
                 className="font-display tabular-nums leading-none text-2xl sm:text-3xl"
-                style={{ color: '#f4f1e8', letterSpacing: '-0.01em' }}
+                style={{ color: 'var(--t-text-warm)', letterSpacing: '-0.01em' }}
               >
                 {eloCount}
               </div>
@@ -694,11 +694,11 @@ export default function ProfilePage({
 
         {(typeof profile.followerCount === 'number' || typeof profile.followingCount === 'number') && (
           <div className="flex items-center gap-5 mb-6 px-1">
-            <span className="text-sm" style={{ color: '#9a9a9f' }}>
-              <span className="font-display tabular-nums" style={{ color: 'var(--t-text)' }}>{profile.followerCount ?? 0}</span> <span className="text-[11px] uppercase tracking-wider" style={{ color: '#6a6a70' }}>{tSocial('followers')}</span>
+            <span className="text-sm" style={{ color: 'var(--t-muted)' }}>
+              <span className="font-display tabular-nums" style={{ color: 'var(--t-text)' }}>{profile.followerCount ?? 0}</span> <span className="text-[11px] uppercase tracking-wider" style={{ color: 'var(--t-dim)' }}>{tSocial('followers')}</span>
             </span>
-            <span className="text-sm" style={{ color: '#9a9a9f' }}>
-              <span className="font-display tabular-nums" style={{ color: 'var(--t-text)' }}>{profile.followingCount ?? 0}</span> <span className="text-[11px] uppercase tracking-wider" style={{ color: '#6a6a70' }}>{tSocial('followingLabel')}</span>
+            <span className="text-sm" style={{ color: 'var(--t-muted)' }}>
+              <span className="font-display tabular-nums" style={{ color: 'var(--t-text)' }}>{profile.followingCount ?? 0}</span> <span className="text-[11px] uppercase tracking-wider" style={{ color: 'var(--t-dim)' }}>{tSocial('followingLabel')}</span>
             </span>
           </div>
         )}
@@ -766,7 +766,7 @@ export default function ProfilePage({
               className="flex flex-col sm:flex-row items-stretch overflow-hidden"
               style={{ backgroundColor: 'var(--t-bg)', clipPath: STAT_CLIP }}
             >
-              <div className="flex flex-col items-center justify-center px-6 py-5 sm:py-6 sm:w-[44%]" style={{ borderBottom: '1px solid #1a1a1d' }}>
+              <div className="flex flex-col items-center justify-center px-6 py-5 sm:py-6 sm:w-[44%]" style={{ borderBottom: '1px solid var(--t-divider)' }}>
                 <span className="font-display text-[10px] uppercase tracking-[0.32em] mb-1" style={{ color: 'var(--t-dim)' }}>
                   {t('evolvingElo')}
                 </span>
@@ -785,7 +785,7 @@ export default function ProfilePage({
                 </span>
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="flex flex-col">
-                    <span className="font-display text-xl tabular-nums" style={{ color: '#4a9e4a' }}>
+                    <span className="font-display text-xl tabular-nums" style={{ color: 'var(--t-success-bright)' }}>
                       {profile.evolvingWins ?? 0}
                     </span>
                     <span className="text-[9px] uppercase tracking-wider" style={{ color: 'var(--t-dim)' }}>{t('wins')}</span>
@@ -851,7 +851,7 @@ export default function ProfilePage({
                 className="font-display px-6 py-2 text-[11px] uppercase tracking-widest cursor-pointer transition-colors hover:text-[var(--t-accent)] disabled:opacity-30"
                 style={{
                   color: 'var(--t-muted)',
-                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                  backgroundColor: 'var(--t-divider)',
                   borderRadius: 9999,
                 }}
               >

@@ -45,7 +45,6 @@ export function ChakraPool({ amount, label, isOpponent = false }: ChakraPoolProp
             className="absolute -top-3 flex items-center gap-1 text-sm font-bold tabular-nums pointer-events-none"
             style={{
               color: floatDelta.value > 0 ? '#e6c36a' : '#d97676',
-              textShadow: '0 2px 8px rgba(0,0,0,0.9)',
               zIndex: 5,
             }}
           >

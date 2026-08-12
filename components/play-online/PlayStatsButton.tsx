@@ -21,7 +21,7 @@ type Range = 'week' | 'month';
 function StatTile({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <div className="flex flex-col gap-1 px-3 py-3" style={{ backgroundColor: 'var(--t-surface-2)' }}>
-      <span className="font-display text-[9px] uppercase tracking-[0.22em]" style={{ color: '#6d6d74' }}>
+      <span className="font-display text-[9px] uppercase tracking-[0.22em]" style={{ color: 'var(--t-dim)' }}>
         {label}
       </span>
       <span
@@ -31,7 +31,7 @@ function StatTile({ label, value, hint }: { label: string; value: string; hint?:
         {value}
       </span>
       {hint && (
-        <span className="text-[10px] leading-tight" style={{ color: '#6d6d74' }}>
+        <span className="text-[10px] leading-tight" style={{ color: 'var(--t-dim)' }}>
           {hint}
         </span>
       )}
@@ -52,7 +52,7 @@ function DayBars({ rows, label, showDates }: { rows: DailyPlayRow[]; label: stri
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="font-display text-[9px] uppercase tracking-[0.22em]" style={{ color: '#6d6d74' }}>
+      <span className="font-display text-[9px] uppercase tracking-[0.22em]" style={{ color: 'var(--t-dim)' }}>
         {label}
       </span>
       <div className="flex items-end gap-1 overflow-x-auto pb-1" style={{ height: 96 }}>
@@ -60,7 +60,7 @@ function DayBars({ rows, label, showDates }: { rows: DailyPlayRow[]; label: stri
           const ratio = max > 0 ? row.games / max : 0;
           return (
             <div key={row.day} className="flex min-w-0 flex-1 flex-col items-center justify-end gap-1" style={{ minWidth: 18 }}>
-              <span className="text-[9px] tabular-nums" style={{ color: row.games > 0 ? '#9a9aa2' : '#3a3a40' }}>
+              <span className="text-[9px] tabular-nums" style={{ color: row.games > 0 ? 'var(--t-muted)' : 'var(--t-border-strong)' }}>
                 {row.games}
               </span>
               <motion.span
@@ -68,10 +68,10 @@ function DayBars({ rows, label, showDates }: { rows: DailyPlayRow[]; label: stri
                 initial={{ height: 0 }}
                 animate={{ height: Math.max(2, Math.round(ratio * 60)) }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
-                style={{ backgroundColor: row.games > 0 ? 'var(--t-accent)' : '#2a2a2e', display: 'block' }}
+                style={{ backgroundColor: row.games > 0 ? 'var(--t-accent)' : 'var(--t-border)', display: 'block' }}
               />
               {showDates && (
-                <span className="text-[9px] tabular-nums" style={{ color: '#5a5a61' }}>
+                <span className="text-[9px] tabular-nums" style={{ color: 'var(--t-faint)' }}>
                   {dayFmt ? dayFmt.format(new Date(`${row.day}T00:00:00.000Z`)) : row.day.slice(5)}
                 </span>
               )}
@@ -149,7 +149,7 @@ export function PlayStatsButton() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
           className="fixed inset-0 flex items-center justify-center p-4"
-          style={{ backgroundColor: 'rgba(0,0,0,0.75)', zIndex: Z_APP_MODAL }}
+          style={{ backgroundColor: 'var(--t-overlay)', zIndex: Z_APP_MODAL }}
           onClick={close}
           role="dialog"
           aria-modal="true"
@@ -163,11 +163,11 @@ export function PlayStatsButton() {
             transition={{ duration: 0.18, ease: 'easeOut' }}
             onClick={(e) => e.stopPropagation()}
             className="relative flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-md border shadow-2xl"
-            style={{ backgroundColor: 'var(--t-panel)', borderColor: '#2a2a2a' }}
+            style={{ backgroundColor: 'var(--t-panel)', borderColor: 'var(--t-border)' }}
           >
             <header
               className="flex items-center justify-between gap-3 border-b px-4 py-3 sm:px-5 sm:py-4"
-              style={{ borderColor: '#2a2a2a' }}
+              style={{ borderColor: 'var(--t-border)' }}
             >
               <div className="flex min-w-0 flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
                 <h2
@@ -201,7 +201,7 @@ export function PlayStatsButton() {
                   className="font-display px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] transition-colors"
                   style={{
                     backgroundColor: range === r ? 'var(--t-accent-glow)' : 'transparent',
-                    color: range === r ? 'var(--t-accent)' : '#70707a',
+                    color: range === r ? 'var(--t-accent)' : 'var(--t-dim)',
                     border: 'none',
                     cursor: 'pointer',
                   }}
@@ -213,13 +213,13 @@ export function PlayStatsButton() {
 
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
               {failed && (
-                <p className="py-8 text-center text-xs" style={{ color: '#70707a' }}>
+                <p className="py-8 text-center text-xs" style={{ color: 'var(--t-dim)' }}>
                   {t('unavailable')}
                 </p>
               )}
 
               {!failed && !period && (
-                <p className="py-8 text-center text-xs" style={{ color: '#70707a' }}>
+                <p className="py-8 text-center text-xs" style={{ color: 'var(--t-dim)' }}>
                   {t('loading')}
                 </p>
               )}
@@ -241,10 +241,10 @@ export function PlayStatsButton() {
 
                   {period.busiestDay && (
                     <div className="px-3 py-3" style={{ backgroundColor: 'var(--t-surface-2)' }}>
-                      <span className="font-display text-[9px] uppercase tracking-[0.22em]" style={{ color: '#6d6d74' }}>
+                      <span className="font-display text-[9px] uppercase tracking-[0.22em]" style={{ color: 'var(--t-dim)' }}>
                         {t('busiestDay')}
                       </span>
-                      <p className="mt-1 text-sm" style={{ color: '#d9d7d0' }}>
+                      <p className="mt-1 text-sm" style={{ color: 'var(--t-text)' }}>
                         {t('busiestDayValue', {
                           day: formatLongDay(period.busiestDay.day),
                           games: period.busiestDay.games,
@@ -253,7 +253,7 @@ export function PlayStatsButton() {
                     </div>
                   )}
 
-                  <p className="text-[10px] leading-relaxed" style={{ color: '#55555c' }}>
+                  <p className="text-[10px] leading-relaxed" style={{ color: 'var(--t-faint)' }}>
                     {t('note')}
                   </p>
                 </div>

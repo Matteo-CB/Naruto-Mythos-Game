@@ -53,7 +53,6 @@ export default function PlayHubPage() {
           style={{
             color: "var(--t-accent)",
             letterSpacing: "0.2em",
-            textShadow: "0 2px 16px rgba(196, 163, 90, 0.22)",
           }}
         >
           {t("title")}
@@ -89,7 +88,7 @@ export default function PlayHubPage() {
                   el.style.borderColor = "var(--t-accent-surface-border-strong)";
                   el.style.backgroundColor = "var(--t-accent-surface-hover)";
                   el.style.boxShadow =
-                    "0 8px 22px rgba(0,0,0,0.55), 0 0 22px var(--t-accent-glow)";
+                    "0 8px 22px var(--t-shadow), 0 0 22px var(--t-accent-glow)";
                   const sep = el.querySelector<HTMLElement>("[data-sep]");
                   if (sep) {
                     sep.style.opacity = "1";
@@ -172,8 +171,7 @@ export default function PlayHubPage() {
                     style={{
                       display: "block",
                       transition:
-                        "transform 420ms cubic-bezier(0.34, 1.4, 0.5, 1), background-color 220ms ease",
-                    }}
+                        "transform 420ms cubic-bezier(0.34, 1.4, 0.5, 1), background-color 220ms ease" }}
                   />
                 </motion.span>
 

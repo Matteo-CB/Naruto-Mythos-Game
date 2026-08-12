@@ -185,8 +185,6 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
               <motion.span
                 className="text-sm font-bold tracking-wide"
                 style={{ color: 'var(--t-accent)' }}
-                animate={{ textShadow: ['0 0 10px rgba(196,163,90,0.3)', '0 0 20px rgba(196,163,90,0.6)', '0 0 10px rgba(196,163,90,0.3)'] }}
-                transition={{ repeat: Infinity, duration: 2 }}
               >
                 {winnerUsername}
               </motion.span>

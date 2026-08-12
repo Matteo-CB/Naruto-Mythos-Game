@@ -23,7 +23,10 @@ import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardById } from '@/lib/data/cardIndex';
 
 const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
-const MEDAL_COLORS = ['var(--t-accent)', '#a8a9ad', '#a06b42'];
+const MEDAL_COLORS = ['var(--t-accent)', 'var(--t-medal-silver)', 'var(--t-medal-bronze)'];
+const SOFT_INSET = 'color-mix(in srgb, var(--t-text-strong) 3%, transparent)';
+const ACCENT_SOFT = 'color-mix(in srgb, var(--t-accent) 30%, transparent)';
+const PODIUM_GLOW = '0 0 32px color-mix(in srgb, var(--t-accent) 22%, transparent)';
 
 interface CountryPlayer {
   username: string;
@@ -95,7 +98,7 @@ function StatBlock({ label, value }: { label: string; value: number }) {
   return (
     <div
       className="flex flex-col items-center gap-1 px-4 py-3 flex-1 min-w-0"
-      style={{ backgroundColor: 'rgba(17, 17, 17, 0.85)', clipPath: ROW_CLIP }}
+      style={{ backgroundColor: 'var(--t-panel-veil-strong)', clipPath: ROW_CLIP }}
     >
       <span className="font-display text-xl sm:text-2xl tabular-nums" style={{ color: 'var(--t-accent)' }}>
         {value}
@@ -127,9 +130,9 @@ function PodiumCard({
       transition={{ duration: 0.45, delay, ease: 'easeOut' }}
       className="relative flex flex-col items-center gap-2 px-4 pt-5 pb-4 flex-1 min-w-0"
       style={{
-        backgroundColor: 'rgba(17, 17, 17, 0.9)',
+        backgroundColor: 'var(--t-panel-veil-strong)',
         clipPath: ROW_CLIP,
-        boxShadow: rank === 1 ? '0 0 32px rgba(196, 163, 90, 0.22)' : 'none',
+        boxShadow: rank === 1 ? PODIUM_GLOW : 'none',
       }}
     >
       <span className="font-display text-2xl leading-none" style={{ color: medal }}>
@@ -220,7 +223,7 @@ export default function WorldcupPage() {
 
   const renderCountryRow = (row: CountryRow, rank: number | null, index: number) => {
     const isOpen = expanded === row.countryCode;
-    const altBg = index % 2 === 0 ? '#0c0b10' : '#0a0a0d';
+    const altBg = index % 2 === 0 ? 'var(--t-row-alt-a)' : 'var(--t-row-alt-b)';
     return (
                   <motion.div
                     key={row.countryCode}
@@ -249,7 +252,7 @@ export default function WorldcupPage() {
                               {countryName(row.countryCode)}
                             </span>
                             {row.topGroup && (
-                              <span className="text-[9px] uppercase tracking-widest truncate" style={{ color: '#6f6249' }}>
+                              <span className="text-[9px] uppercase tracking-widest truncate" style={{ color: 'var(--t-accent-label)' }}>
                                 {getCardGroup(row.topGroup, tCardMeta)}
                               </span>
                             )}
@@ -277,7 +280,7 @@ export default function WorldcupPage() {
                             {row.score.toFixed(1)}
                           </span>
                         </span>
-                        <span className="hidden sm:block text-right text-xs tabular-nums" style={{ color: row.winRate >= 50 ? '#8fbf8f' : '#c48f8f' }}>
+                        <span className="hidden sm:block text-right text-xs tabular-nums" style={{ color: row.winRate >= 50 ? 'var(--t-positive-text)' : 'var(--t-negative-text)' }}>
                           {row.winRate.toFixed(1)}%
                         </span>
                         <span className="hidden sm:block text-right text-xs tabular-nums" style={{ color: 'var(--t-muted)' }}>
@@ -301,9 +304,9 @@ export default function WorldcupPage() {
                               <span>{t('detailGames')}: <span className="tabular-nums" style={{ color: 'var(--t-accent)' }}>{row.games}</span></span>
                               <span>{t('detailAvgElo')}: <span className="tabular-nums" style={{ color: 'var(--t-accent)' }}>{row.avgElo}</span></span>
                               <span>{t('detailBeatenElo')}: <span className="tabular-nums" style={{ color: 'var(--t-accent)' }}>{row.avgOpponentElo}</span></span>
-                              <span className="sm:hidden">{t('colWinRate')}: <span className="tabular-nums" style={{ color: row.winRate >= 50 ? '#8fbf8f' : '#c48f8f' }}>{row.winRate.toFixed(1)}%</span></span>
+                              <span className="sm:hidden">{t('colWinRate')}: <span className="tabular-nums" style={{ color: row.winRate >= 50 ? 'var(--t-positive-text)' : 'var(--t-negative-text)' }}>{row.winRate.toFixed(1)}%</span></span>
                               {row.forfeitLosses > 0 && (
-                                <span>{t('detailForfeits')}: <span className="tabular-nums" style={{ color: '#c48f8f' }}>{row.forfeitLosses}</span></span>
+                                <span>{t('detailForfeits')}: <span className="tabular-nums" style={{ color: 'var(--t-negative-text)' }}>{row.forfeitLosses}</span></span>
                               )}
                               {row.topGroup && (
                                 <span>
@@ -318,7 +321,7 @@ export default function WorldcupPage() {
                                 { label: t('factStrength'), pct: row.breakdown.strengthFactor * 100 },
                                 { label: t('factActivity'), pct: row.breakdown.activityFactor * 100 },
                               ]).map((f) => (
-                                <span key={f.label} className="text-[9px] uppercase tracking-widest px-2 py-1" style={{ backgroundColor: 'var(--t-accent-tint)', color: '#9a8a5f' }}>
+                                <span key={f.label} className="text-[9px] uppercase tracking-widest px-2 py-1" style={{ backgroundColor: 'var(--t-accent-tint)', color: 'var(--t-accent-label-strong)' }}>
                                   {f.label} <span className="tabular-nums" style={{ color: 'var(--t-accent)' }}>{Math.round(f.pct)}%</span>
                                 </span>
                               ))}
@@ -338,7 +341,7 @@ export default function WorldcupPage() {
                                         key={hr}
                                         title={`${hr}h UTC · ${h}`}
                                         className="flex-1"
-                                        style={{ height: `${Math.max(3, pct)}%`, backgroundColor: peak ? 'var(--t-accent)' : 'rgba(196,163,90,0.3)' }}
+                                        style={{ height: `${Math.max(3, pct)}%`, backgroundColor: peak ? 'var(--t-accent)' : ACCENT_SOFT }}
                                       />
                                     );
                                   })}
@@ -356,7 +359,7 @@ export default function WorldcupPage() {
                                 <div
                                   key={p.username}
                                   className="flex items-center gap-3 px-3 py-1.5"
-                                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.025)' }}
+                                  style={{ backgroundColor: SOFT_INSET }}
                                 >
                                   <span className="font-display text-xs tabular-nums w-5 text-center" style={{ color: 'var(--t-dim)' }}>
                                     {pi + 1}
@@ -397,7 +400,7 @@ export default function WorldcupPage() {
           <div className="flex items-end justify-between gap-3 flex-wrap">
             <h1
               className="font-display text-3xl sm:text-5xl tracking-wider uppercase leading-none"
-              style={{ color: 'var(--t-text)', letterSpacing: '0.08em', textShadow: '0 0 22px var(--t-accent-glow)' }}
+              style={{ color: 'var(--t-text)', letterSpacing: '0.08em' }}
             >
               {t('title')}
             </h1>
@@ -424,8 +427,8 @@ export default function WorldcupPage() {
                 onClick={() => setWindow(w)}
                 className="font-display px-3 py-1.5 text-[10px] uppercase tracking-widest cursor-pointer transition-colors"
                 style={{
-                  backgroundColor: window === w ? 'var(--t-accent)' : 'rgba(255,255,255,0.03)',
-                  color: window === w ? 'var(--t-bg)' : 'var(--t-muted)',
+                  backgroundColor: window === w ? 'var(--t-accent)' : SOFT_INSET,
+                  color: window === w ? 'var(--t-on-accent)' : 'var(--t-muted)',
                 }}
               >
                 {t(`window_${w}`)}
@@ -512,7 +515,7 @@ export default function WorldcupPage() {
 
             {unrankedRows.length > 0 && (
               <div className="mt-8">
-                <div className="px-1 pb-2 text-[10px] uppercase tracking-[0.25em]" style={{ color: '#8a7b55' }}>
+                <div className="px-1 pb-2 text-[10px] uppercase tracking-[0.25em]" style={{ color: 'var(--t-accent-label-mid)' }}>
                   {t('unrankedTitle', { min: MIN_RANKED_PLAYERS })}
                 </div>
                 <div style={{ opacity: 0.72 }}>
@@ -530,7 +533,7 @@ export default function WorldcupPage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.25 }}
               className="mt-8 px-5 py-5"
-              style={{ backgroundColor: 'rgba(17, 17, 17, 0.7)', clipPath: ROW_CLIP }}
+              style={{ backgroundColor: 'var(--t-panel-veil)', clipPath: ROW_CLIP }}
             >
               <div className="text-[10px] uppercase tracking-[0.25em] mb-4" style={{ color: 'var(--t-accent)' }}>
                 {t('rewardsTitle')}
@@ -546,7 +549,7 @@ export default function WorldcupPage() {
                   />
                 </div>
                 <div className="flex flex-col gap-2.5">
-                  <div className="font-display text-base uppercase tracking-wide" style={{ color: '#e8c877' }}>
+                  <div className="font-display text-base uppercase tracking-wide" style={{ color: 'var(--t-accent-bright)' }}>
                     {t('rewardChampionCardTitle')}
                   </div>
                   <p className="text-[12px] leading-relaxed" style={{ color: 'var(--t-muted)' }}>
@@ -566,7 +569,7 @@ export default function WorldcupPage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.3 }}
               className="mt-8 px-5 py-4"
-              style={{ backgroundColor: 'rgba(17, 17, 17, 0.7)', clipPath: ROW_CLIP }}
+              style={{ backgroundColor: 'var(--t-panel-veil)', clipPath: ROW_CLIP }}
             >
               <div className="text-[10px] uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--t-accent)' }}>
                 {t('rulesTitle')}

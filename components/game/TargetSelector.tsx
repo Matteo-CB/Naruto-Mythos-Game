@@ -520,7 +520,7 @@ const OrderedDefeatCard = React.memo(function OrderedDefeatCard({ character, isV
 
       {isSelected && orderNumber && (
         <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <span className="text-2xl font-black" style={{ color: '#c4a35a', textShadow: '0 0 8px rgba(196,163,90,0.8)' }}>
+          <span className="text-2xl font-black" style={{ color: '#c4a35a' }}>
             {orderNumber}
           </span>
         </div>

@@ -320,7 +320,7 @@ export default function PlayOnlinePage() {
               <Link
                 href="/login"
                 className="px-6 py-2.5 text-sm font-bold tracking-wider"
-                style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
+                style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-on-accent)' }}
               >
                 {t('common.signIn')}
               </Link>
@@ -474,7 +474,6 @@ export default function PlayOnlinePage() {
               style={{
                 color: 'var(--t-accent-bright)',
                 letterSpacing: '0.18em',
-                textShadow: '0 2px 18px var(--t-accent-glow)',
               }}
             >
               {t('online.title')}
@@ -640,7 +639,6 @@ export default function PlayOnlinePage() {
                             style={{
                               color: 'var(--t-accent-bright)',
                               letterSpacing: '0.32em',
-                              textShadow: '0 2px 18px var(--t-accent-glow)',
                             }}
                           >
                             {roomCode}
@@ -675,7 +673,7 @@ export default function PlayOnlinePage() {
                           className="w-full py-3 text-sm font-bold cursor-pointer no-select transition-opacity"
                           style={{
                             backgroundColor: joinCode.length < 6 ? 'var(--t-surface-2)' : 'var(--t-accent)',
-                            color: joinCode.length < 6 ? 'var(--t-dim)' : 'var(--t-bg)',
+                            color: joinCode.length < 6 ? 'var(--t-dim)' : 'var(--t-on-accent)',
                             letterSpacing: '0.22em',
                           }}
                         >
@@ -715,7 +713,6 @@ export default function PlayOnlinePage() {
                                     backgroundColor: 'transparent',
                                     color: active ? activeColor : 'var(--t-dim)',
                                     transition: 'color 0.2s',
-                                    textShadow: active ? `0 0 18px color-mix(in srgb, ${accent} 40%, transparent)` : 'none',
                                     zIndex: 1,
                                   }}
                                 >
@@ -782,7 +779,7 @@ export default function PlayOnlinePage() {
                             className="w-full py-3.5 text-sm font-bold no-select transition-opacity"
                             style={{
                               backgroundColor: evoToggleBlocked ? 'var(--t-surface-2)' : 'var(--t-accent)',
-                              color: evoToggleBlocked ? 'var(--t-dim)' : 'var(--t-bg)',
+                              color: evoToggleBlocked ? 'var(--t-dim)' : 'var(--t-on-accent)',
                               letterSpacing: '0.22em',
                               cursor: evoToggleBlocked ? 'not-allowed' : 'pointer',
                               opacity: evoToggleBlocked ? 0.55 : 1,
@@ -870,7 +867,7 @@ function ToggleRow({
         <span
           className="absolute top-0.5"
           style={{
-            width: 16, height: 16, borderRadius: 999, backgroundColor: 'var(--t-bg)',
+            width: 16, height: 16, borderRadius: 999, backgroundColor: 'var(--t-on-accent)',
             left: checked ? 22 : 2, transition: 'left 0.18s',
           }}
         />
@@ -936,7 +933,6 @@ function RoomColumn({
           style={{
             color: accent,
             letterSpacing: '0.36em',
-            textShadow: `0 0 18px color-mix(in srgb, ${accent} 40%, transparent)`,
           }}
         >
           {title}
@@ -983,7 +979,7 @@ function RoomColumn({
         className="w-full py-3 text-[11px] font-bold no-select transition-opacity"
         style={{
           backgroundColor: disableCreate ? 'var(--t-surface-2)' : accent,
-          color: accent === 'var(--t-danger)' && !disableCreate ? '#ffffff' : 'var(--t-bg)',
+          color: accent === 'var(--t-danger)' && !disableCreate ? 'var(--t-on-danger)' : 'var(--t-on-accent)',
           letterSpacing: '0.22em',
           cursor: disableCreate ? 'not-allowed' : 'pointer',
           opacity: disableCreate ? 0.45 : 1,
@@ -1037,7 +1033,6 @@ function WaitingRoomHeader({
         style={{
           color: accent,
           letterSpacing: '0.32em',
-          textShadow: `0 0 14px color-mix(in srgb, ${accent} 33%, transparent)`,
         }}
       >
         {t(labelKey)}
@@ -1088,7 +1083,6 @@ function ViewTabs({ view, onChange }: { view: View; onChange: (v: View) => void 
               backgroundColor: 'transparent',
               color: active ? 'var(--t-accent-bright)' : 'var(--t-dim)',
               transition: 'color 0.2s',
-              textShadow: active ? '0 0 18px color-mix(in srgb, var(--t-accent) 55%, transparent)' : 'none',
               zIndex: 1,
             }}
           >
@@ -1148,7 +1142,7 @@ function SealedToggleBlock({
       <div
         className="flex flex-col gap-2 px-3 sm:px-4 py-2.5"
         style={{
-          backgroundColor: 'rgba(15, 15, 20, 0.78)',
+          backgroundColor: 'var(--t-panel-veil)',
           boxShadow: '0 12px 32px var(--t-shadow)',
           opacity: checked ? 1 : 0.55,
         }}
@@ -1172,7 +1166,7 @@ function SealedToggleBlock({
                 className="px-3 py-1.5 text-[10px] uppercase tracking-widest font-display"
                 style={{
                   backgroundColor: isSelected ? 'var(--t-accent)' : 'var(--t-surface-2)',
-                  color: !selectable ? 'var(--t-border-strong)' : isSelected ? 'var(--t-bg)' : 'var(--t-muted)',
+                  color: !selectable ? 'var(--t-text-disabled)' : isSelected ? 'var(--t-on-accent)' : 'var(--t-muted)',
                   cursor: selectable ? 'pointer' : 'not-allowed',
                   opacity: selectable ? 1 : 0.6,
                 }}

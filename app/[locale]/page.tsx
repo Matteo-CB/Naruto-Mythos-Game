@@ -220,7 +220,6 @@ export default function Home() {
                     className="font-display inline-block text-3xl font-black tracking-wider sm:text-4xl lg:text-5xl"
                     style={{
                       color: 'var(--t-accent)',
-                      textShadow: '0 0 40px rgba(196, 163, 90, 0.3), 0 0 80px var(--t-accent-glow)',
                     }}
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -339,23 +338,24 @@ export default function Home() {
                         href="/admin"
                         className="relative flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                         style={{
-                          backgroundColor: 'transparent',
-                          border: '1px solid var(--t-accent-dim)',
+                          backgroundColor: 'var(--t-menu-secondary-bg)',
+                          border: '1px solid var(--t-menu-secondary-border-accent)',
                           color: 'var(--t-accent)',
+                          boxShadow: 'var(--t-menu-secondary-shadow)',
                         }}
                         onMouseEnter={(e) => {
                           const target = e.currentTarget as HTMLElement;
                           target.style.borderColor = 'var(--t-accent)';
                           showShuriken(target, SHURIKEN_GOLD_BRIGHT);
-                          target.style.backgroundColor = 'var(--t-accent-tint)';
+                          target.style.backgroundColor = 'var(--t-menu-secondary-bg-hover)';
                           target.style.boxShadow = '0 0 16px var(--t-accent-glow)';
                         }}
                         onMouseLeave={(e) => {
                           const target = e.currentTarget as HTMLElement;
-                          target.style.borderColor = 'var(--t-accent-dim)';
+                          target.style.borderColor = 'var(--t-menu-secondary-border-accent)';
                           hideShuriken(target, SHURIKEN_GOLD);
-                          target.style.backgroundColor = 'transparent';
-                          target.style.boxShadow = 'none';
+                          target.style.backgroundColor = 'var(--t-menu-secondary-bg)';
+                          target.style.boxShadow = 'var(--t-menu-secondary-shadow)';
                         }}
                       >
                         <HoverShuriken color={SHURIKEN_GOLD} />
@@ -366,23 +366,24 @@ export default function Home() {
                       href="/social"
                       className="relative flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                       style={{
-                        backgroundColor: 'transparent',
-                        border: '1px solid var(--t-accent-dim)',
+                        backgroundColor: 'var(--t-menu-secondary-bg)',
+                        border: '1px solid var(--t-menu-secondary-border-accent)',
                         color: 'var(--t-accent)',
+                        boxShadow: 'var(--t-menu-secondary-shadow)',
                       }}
                       onMouseEnter={(e) => {
                         const target = e.currentTarget as HTMLElement;
                         target.style.borderColor = 'var(--t-accent)';
                         showShuriken(target, SHURIKEN_GOLD_BRIGHT);
-                        target.style.backgroundColor = 'var(--t-accent-tint)';
+                        target.style.backgroundColor = 'var(--t-menu-secondary-bg-hover)';
                         target.style.boxShadow = '0 0 16px var(--t-accent-glow)';
                       }}
                       onMouseLeave={(e) => {
                         const target = e.currentTarget as HTMLElement;
-                        target.style.borderColor = 'var(--t-accent-dim)';
+                        target.style.borderColor = 'var(--t-menu-secondary-border-accent)';
                         hideShuriken(target, SHURIKEN_GOLD);
-                        target.style.backgroundColor = 'transparent';
-                        target.style.boxShadow = 'none';
+                        target.style.backgroundColor = 'var(--t-menu-secondary-bg)';
+                        target.style.boxShadow = 'var(--t-menu-secondary-shadow)';
                       }}
                     >
                       <HoverShuriken color={SHURIKEN_GOLD} />
@@ -393,25 +394,26 @@ export default function Home() {
                     href={`/profile/${encodeURIComponent(session.user?.name ?? '')}`}
                     className="relative flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                     style={{
-                      backgroundColor: 'transparent',
-                      border: '1px solid var(--t-border)',
+                      backgroundColor: 'var(--t-menu-secondary-bg)',
+                      border: '1px solid var(--t-menu-secondary-border)',
                       color: 'var(--t-text)',
+                      boxShadow: 'var(--t-menu-secondary-shadow)',
                     }}
                     onMouseEnter={(e) => {
                       const target = e.currentTarget as HTMLElement;
                       showShuriken(target, SHURIKEN_WHITE_BRIGHT);
-                      target.style.backgroundColor = 'var(--t-divider)';
+                      target.style.backgroundColor = 'var(--t-menu-secondary-bg-hover-neutral)';
                       target.style.borderColor = 'var(--t-border-strong)';
-                      target.style.color = '#ffffff';
+                      target.style.color = 'var(--t-text-strong)';
                       target.style.boxShadow = '0 0 16px var(--t-divider)';
                     }}
                     onMouseLeave={(e) => {
                       const target = e.currentTarget as HTMLElement;
                       hideShuriken(target, SHURIKEN_WHITE);
-                      target.style.backgroundColor = 'transparent';
-                      target.style.borderColor = 'var(--t-border)';
+                      target.style.backgroundColor = 'var(--t-menu-secondary-bg)';
+                      target.style.borderColor = 'var(--t-menu-secondary-border)';
                       target.style.color = 'var(--t-text)';
-                      target.style.boxShadow = 'none';
+                      target.style.boxShadow = 'var(--t-menu-secondary-shadow)';
                     }}
                   >
                     <HoverShuriken color={SHURIKEN_WHITE} />
@@ -421,25 +423,26 @@ export default function Home() {
                     href="/settings"
                     className="relative flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                     style={{
-                      backgroundColor: 'transparent',
-                      border: '1px solid var(--t-border)',
+                      backgroundColor: 'var(--t-menu-secondary-bg)',
+                      border: '1px solid var(--t-menu-secondary-border)',
                       color: 'var(--t-text)',
+                      boxShadow: 'var(--t-menu-secondary-shadow)',
                     }}
                     onMouseEnter={(e) => {
                       const target = e.currentTarget as HTMLElement;
                       showShuriken(target, SHURIKEN_WHITE_BRIGHT);
-                      target.style.backgroundColor = 'var(--t-divider)';
+                      target.style.backgroundColor = 'var(--t-menu-secondary-bg-hover-neutral)';
                       target.style.borderColor = 'var(--t-border-strong)';
-                      target.style.color = '#ffffff';
+                      target.style.color = 'var(--t-text-strong)';
                       target.style.boxShadow = '0 0 16px var(--t-divider)';
                     }}
                     onMouseLeave={(e) => {
                       const target = e.currentTarget as HTMLElement;
                       hideShuriken(target, SHURIKEN_WHITE);
-                      target.style.backgroundColor = 'transparent';
-                      target.style.borderColor = 'var(--t-border)';
+                      target.style.backgroundColor = 'var(--t-menu-secondary-bg)';
+                      target.style.borderColor = 'var(--t-menu-secondary-border)';
                       target.style.color = 'var(--t-text)';
-                      target.style.boxShadow = 'none';
+                      target.style.boxShadow = 'var(--t-menu-secondary-shadow)';
                     }}
                   >
                     <HoverShuriken color={SHURIKEN_WHITE} />
@@ -453,23 +456,24 @@ export default function Home() {
                     href={btn.href}
                     className="relative flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                     style={{
-                      backgroundColor: 'transparent',
-                      border: '1px solid var(--t-border-strong)',
+                      backgroundColor: 'var(--t-menu-secondary-bg)',
+                      border: '1px solid var(--t-menu-secondary-border-muted)',
                       color: 'var(--t-muted)',
+                      boxShadow: 'var(--t-menu-secondary-shadow)',
                     }}
                     onMouseEnter={(e) => {
                       const target = e.currentTarget as HTMLElement;
                       showShuriken(target, SHURIKEN_GOLD_BRIGHT);
                       target.style.borderColor = 'var(--t-accent)';
                       target.style.color = 'var(--t-accent)';
-                      target.style.backgroundColor = 'var(--t-accent-tint)';
+                      target.style.backgroundColor = 'var(--t-menu-secondary-bg-hover)';
                     }}
                     onMouseLeave={(e) => {
                       const target = e.currentTarget as HTMLElement;
                       hideShuriken(target, SHURIKEN_GOLD);
-                      target.style.borderColor = 'var(--t-border-strong)';
+                      target.style.borderColor = 'var(--t-menu-secondary-border-muted)';
                       target.style.color = 'var(--t-muted)';
-                      target.style.backgroundColor = 'transparent';
+                      target.style.backgroundColor = 'var(--t-menu-secondary-bg)';
                     }}
                   >
                     <HoverShuriken color={SHURIKEN_GOLD} />
@@ -491,23 +495,24 @@ export default function Home() {
                   onClick={() => signOut({ callbackUrl: '/' })}
                   className="relative flex h-9 w-full items-center justify-center text-xs font-medium tracking-wide transition-all cursor-pointer sm:h-10 sm:text-sm"
                   style={{
-                    backgroundColor: 'transparent',
-                    border: '1px solid var(--t-border-strong)',
+                    backgroundColor: 'var(--t-menu-secondary-bg)',
+                    border: '1px solid var(--t-menu-secondary-border-muted)',
                     color: 'var(--t-muted)',
+                    boxShadow: 'var(--t-menu-secondary-shadow)',
                   }}
                   onMouseEnter={(e) => {
                     const target = e.currentTarget as HTMLElement;
                     showShuriken(target, SHURIKEN_GOLD_BRIGHT);
                     target.style.borderColor = 'var(--t-accent)';
                     target.style.color = 'var(--t-accent)';
-                    target.style.backgroundColor = 'var(--t-accent-tint)';
+                    target.style.backgroundColor = 'var(--t-menu-secondary-bg-hover)';
                   }}
                   onMouseLeave={(e) => {
                     const target = e.currentTarget as HTMLElement;
                     hideShuriken(target, SHURIKEN_GOLD);
-                    target.style.borderColor = 'var(--t-border-strong)';
+                    target.style.borderColor = 'var(--t-menu-secondary-border-muted)';
                     target.style.color = 'var(--t-muted)';
-                    target.style.backgroundColor = 'transparent';
+                    target.style.backgroundColor = 'var(--t-menu-secondary-bg)';
                   }}
                 >
                   <HoverShuriken color={SHURIKEN_GOLD} />

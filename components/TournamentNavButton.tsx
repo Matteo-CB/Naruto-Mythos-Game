@@ -80,7 +80,6 @@ function TournamentCountdown({ targetIso, accentColor }: { targetIso: string; ac
         minWidth: '92px',
         fontVariantNumeric: 'tabular-nums',
         whiteSpace: 'nowrap',
-        textShadow: `0 0 8px ${accentColor}55`,
         boxShadow: `0 4px 12px var(--t-shadow), 0 0 0 1px var(--t-shadow), 0 0 14px ${accentColor}33`,
       }}
     >
@@ -150,7 +149,6 @@ export function TournamentNavButton({ status, label, primary = false, delay = 0,
               borderRadius: '4px',
               padding: '4px 10px',
               textTransform: 'uppercase',
-              textShadow: `0 0 8px ${accent}55`,
               boxShadow: `0 4px 12px var(--t-shadow), 0 0 0 1px var(--t-shadow), 0 0 14px ${accent}33`,
             }}
           >

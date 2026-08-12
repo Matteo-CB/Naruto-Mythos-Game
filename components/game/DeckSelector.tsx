@@ -157,21 +157,23 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
         }}
         className="flex flex-col items-start p-3 transition-colors text-left w-full no-select"
         style={{
-          backgroundColor: selectedDeckId === deck.id ? 'rgba(26, 26, 26, 0.95)' : 'rgba(20, 20, 20, 0.85)',
-          color: selectedDeckId === deck.id ? '#e8e8e8' : '#888',
-          boxShadow: selectedDeckId === deck.id ? 'inset 0 -2px 0 #c4a35a' : 'inset 0 -2px 0 transparent',
+          backgroundColor: selectedDeckId === deck.id
+            ? 'color-mix(in srgb, var(--t-surface-2) 95%, transparent)'
+            : 'color-mix(in srgb, var(--t-surface) 85%, transparent)',
+          color: selectedDeckId === deck.id ? 'var(--t-text)' : 'var(--t-muted)',
+          boxShadow: selectedDeckId === deck.id ? 'inset 0 -2px 0 var(--t-accent)' : 'inset 0 -2px 0 transparent',
           position: 'relative',
           zIndex: 1,
         }}
       >
         <div className="flex items-center gap-2 flex-wrap">
           {isFavorite && (
-            <span aria-hidden="true" style={{ color: '#c4a35a', fontSize: 12, lineHeight: 1 }}>&#9733;</span>
+            <span aria-hidden="true" style={{ color: 'var(--t-accent)', fontSize: 12, lineHeight: 1 }}>&#9733;</span>
           )}
           <span className="text-sm font-medium">{deck.name}</span>
           {deck.evolvingCompatible === true && <EvolvingDeckBadge points={deck.evolvingPoints ?? 0} />}
         </div>
-        <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>
+        <span className="text-xs mt-0.5 font-inter-force" style={{ color: 'var(--t-dim)' }}>
           {deck.cardIds.length} {t('deckBuilder.characters', { count: deck.cardIds.length })} + {deck.missionIds.length} missions
         </span>
       </button>
@@ -180,7 +182,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
 
   return (
     <div className="flex flex-col gap-3 w-full">
-      <p className="text-xs uppercase" style={{ color: '#888', letterSpacing: '0.18em' }}>
+      <p className="text-xs uppercase" style={{ color: 'var(--t-muted)', letterSpacing: '0.18em' }}>
         {t('playAI.selectDeck')}
       </p>
 
@@ -192,32 +194,34 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
           }}
           className="flex flex-col items-start p-3 transition-colors text-left no-select"
           style={{
-            backgroundColor: selectedDeckId === null ? 'rgba(26, 26, 26, 0.95)' : 'rgba(20, 20, 20, 0.85)',
-            color: selectedDeckId === null ? '#e8e8e8' : '#888',
-            boxShadow: selectedDeckId === null ? 'inset 0 -2px 0 #c4a35a' : 'inset 0 -2px 0 transparent',
+            backgroundColor: selectedDeckId === null
+              ? 'color-mix(in srgb, var(--t-surface-2) 95%, transparent)'
+              : 'color-mix(in srgb, var(--t-surface) 85%, transparent)',
+            color: selectedDeckId === null ? 'var(--t-text)' : 'var(--t-muted)',
+            boxShadow: selectedDeckId === null ? 'inset 0 -2px 0 var(--t-accent)' : 'inset 0 -2px 0 transparent',
           }}
         >
           <span className="text-sm font-medium">{t('playAI.randomDeck')}</span>
-          <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>
+          <span className="text-xs mt-0.5 font-inter-force" style={{ color: 'var(--t-dim)' }}>
             {t('playAI.randomDeckDesc')}
           </span>
         </button>
       )}
 
       {loading && (
-        <p className="text-xs italic" style={{ color: '#555' }}>{t('common.loading')}</p>
+        <p className="text-xs italic" style={{ color: 'var(--t-faint)' }}>{t('common.loading')}</p>
       )}
 
       {!loading && savedDecks.length === 0 && (
         evolvingOnly ? (
-          <div className="flex flex-col gap-3 items-center text-center p-5" style={{ backgroundColor: 'rgba(20, 20, 20, 0.85)' }}>
-            <p className="text-xs italic" style={{ color: '#888' }}>
+          <div className="flex flex-col gap-3 items-center text-center p-5" style={{ backgroundColor: 'color-mix(in srgb, var(--t-surface) 85%, transparent)' }}>
+            <p className="text-xs italic" style={{ color: 'var(--t-muted)' }}>
               {t('online.evolving.noDeckInSelector')}
             </p>
             <Link
               href={'/deck-builder/manage?evolving=1' as '/deck-builder/manage'}
               className="px-4 py-2 text-[11px] font-bold uppercase no-select"
-              style={{ backgroundColor: '#c4a35a', color: '#0a0a0a', letterSpacing: '0.18em' }}
+              style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-on-accent)', letterSpacing: '0.18em' }}
             >
               {t('online.evolving.createDeck')}
             </Link>
@@ -225,7 +229,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
         ) : (
           <div className="flex flex-col items-center py-6 gap-2">
             <img src="/images/icons/empty-decks.svg" alt="" draggable={false} style={{ width: 36, height: 36, opacity: 0.2 }} />
-            <p className="text-xs italic" style={{ color: '#555' }}>{t('deckBuilder.noSavedDecks')}</p>
+            <p className="text-xs italic" style={{ color: 'var(--t-faint)' }}>{t('deckBuilder.noSavedDecks')}</p>
           </div>
         )
       )}
@@ -235,9 +239,9 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
           {favoriteDecks.map((deck) => renderDeckButton(deck, true))}
           {otherDecks.length > 0 && (
             <div className="flex items-center gap-2 pt-1" aria-hidden="true">
-              <span className="flex-1 h-px" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }} />
-              <span className="text-[9px] uppercase tracking-[0.2em]" style={{ color: '#555' }}>{t('deckBuilder.otherDecks')}</span>
-              <span className="flex-1 h-px" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }} />
+              <span className="flex-1 h-px" style={{ backgroundColor: 'var(--t-divider)' }} />
+              <span className="text-[9px] uppercase tracking-[0.2em]" style={{ color: 'var(--t-faint)' }}>{t('deckBuilder.otherDecks')}</span>
+              <span className="flex-1 h-px" style={{ backgroundColor: 'var(--t-divider)' }} />
             </div>
           )}
         </>
@@ -250,8 +254,8 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
           onClick={() => setVisibleCount((n) => n + LOAD_MORE_STEP)}
           className="px-3 py-2 text-xs uppercase no-select cursor-pointer transition-colors"
           style={{
-            backgroundColor: 'rgba(20, 20, 20, 0.85)',
-            color: '#c4a35a',
+            backgroundColor: 'color-mix(in srgb, var(--t-surface) 85%, transparent)',
+            color: 'var(--t-accent)',
             letterSpacing: '0.18em',
           }}
         >

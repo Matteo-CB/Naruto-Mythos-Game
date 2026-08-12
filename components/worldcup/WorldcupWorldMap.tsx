@@ -26,14 +26,12 @@ interface Props {
 
 const VW = 960;
 const VH = 470;
-const NO_DATA_FILL = '#16151b';
+const NO_DATA_FILL = 'var(--t-map-nodata)';
 const STROKE = 'var(--t-bg)';
-
-function lerpColor(t: number): string {
-  const from = [58, 51, 32];
-  const to = [196, 163, 90];
-  const c = from.map((f, i) => Math.round(f + (to[i] - f) * t));
-  return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+const HOVER_FILL = 'var(--t-accent-bright)';
+function rampColor(t: number): string {
+  const pct = Math.round(Math.max(0, Math.min(1, t)) * 1000) / 10;
+  return `color-mix(in srgb, var(--t-accent) ${pct}%, var(--t-map-low))`;
 }
 
 interface Country {
@@ -107,7 +105,7 @@ export function WorldcupWorldMap({ rows, countryName, onSelect }: Props) {
         </span>
       </div>
 
-      <div className="w-full overflow-hidden" style={{ backgroundColor: 'rgba(10, 10, 14, 0.55)' }}>
+      <div className="w-full overflow-hidden" style={{ backgroundColor: 'var(--t-map-bg)' }}>
         <svg
           viewBox={`0 0 ${VW} ${VH}`}
           className="block w-full h-auto"
@@ -124,15 +122,15 @@ export function WorldcupWorldMap({ rows, countryName, onSelect }: Props) {
             const score = scoreByCode.get(c.code);
             const isRanked = rankedSet.has(c.code);
             const isHovered = hovered === c.code;
-            const fill = isRanked && score !== undefined ? lerpColor(Math.min(1, score / maxScore)) : NO_DATA_FILL;
+            const fill = isRanked && score !== undefined ? rampColor(Math.min(1, score / maxScore)) : NO_DATA_FILL;
             return (
               <path
                 key={c.code + c.d.length}
                 d={c.d}
-                fill={isHovered && isRanked ? '#e8c877' : fill}
                 stroke={STROKE}
                 strokeWidth={0.4}
                 style={{
+                  fill: isHovered && isRanked ? HOVER_FILL : fill,
                   cursor: isRanked ? 'pointer' : 'default',
                   filter: c.code === leader ? 'url(#wc-glow)' : undefined,
                   transition: 'fill 160ms ease',

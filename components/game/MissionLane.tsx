@@ -319,7 +319,6 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
             backgroundColor: character.powerTokens > 0 ? 'rgba(196, 163, 90, 0.25)' : 'rgba(0, 0, 0, 0.85)',
             color: character.powerTokens > 0 ? '#f0d890' : '#e0e0e0',
             border: character.powerTokens > 0 ? '1px solid rgba(196, 163, 90, 0.5)' : '1px solid rgba(255,255,255,0.1)',
-            textShadow: character.powerTokens > 0 ? '0 0 6px rgba(196, 163, 90, 0.6)' : 'none',
             fontFamily: "'NJNaruto', Arial, sans-serif",
           }}
         >
@@ -357,7 +356,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
               initial={false}
               animate={{ opacity: 1, scale: 1 }}
               className="font-bold pr-0.5"
-              style={{ fontSize: dims.isMobile ? '11px' : '8px', color: '#f0d890', textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
+              style={{ fontSize: dims.isMobile ? '11px' : '8px', color: '#f0d890' }}
             >
               +{character.powerTokens - 5}
             </motion.span>
@@ -398,7 +397,6 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
                 backgroundColor: 'rgba(138, 92, 246, 0.25)',
                 color: '#b89bff',
                 border: '1px solid rgba(138, 92, 246, 0.55)',
-                textShadow: '0 0 4px rgba(138, 92, 246, 0.45)',
               }}
             >
               <span style={{ fontSize: dims.isMobile ? '9px' : '7px', letterSpacing: '0.5px' }}>{t('game.board.controlled')}</span>
@@ -414,7 +412,6 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
                 backgroundColor: 'rgba(62, 139, 62, 0.25)',
                 color: '#5cb85c',
                 border: '1px solid rgba(62, 139, 62, 0.5)',
-                textShadow: '0 0 4px rgba(62, 139, 62, 0.4)',
               }}
             >
               <span style={{ fontSize: dims.isMobile ? '9px' : '7px', letterSpacing: '0.5px' }}>{t('game.board.up')}</span>

@@ -100,7 +100,7 @@ export default function TournamentResultsPage() {
           <div>
             <h1
               className="font-display text-3xl sm:text-5xl uppercase tracking-wider leading-none"
-              style={{ color: 'var(--t-text)', letterSpacing: '0.08em', textShadow: '0 0 22px var(--t-accent-glow)' }}
+              style={{ color: 'var(--t-text)', letterSpacing: '0.08em' }}
             >
               {t('resultsTitle')}
             </h1>

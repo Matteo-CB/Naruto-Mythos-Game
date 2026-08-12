@@ -159,7 +159,6 @@ function FinaleLabel({ accent, label, big = false, reduce = false }: { accent: s
         color: accent,
         fontSize: big ? 28 : 12,
         letterSpacing: '0.22em',
-        textShadow: `0 0 12px ${accent}88`,
         zIndex: big ? 62 : 'auto',
       }}
     >

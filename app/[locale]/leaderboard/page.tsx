@@ -154,7 +154,7 @@ function LeaderRow({
 
       <span
         className="font-display text-lg sm:text-xl tabular-nums w-16 text-right"
-        style={{ color: tierColor, textShadow: `0 0 10px ${tierColor}33`, letterSpacing: '0.02em' }}
+        style={{ color: tierColor,letterSpacing: '0.02em' }}
       >
         {displayElo}
       </span>
@@ -349,7 +349,7 @@ export default function LeaderboardPage() {
           <div className="flex items-end justify-between gap-3 flex-wrap">
             <h1
               className="font-display text-3xl sm:text-5xl tracking-wider uppercase leading-none"
-              style={{ color: 'var(--t-text)', letterSpacing: '0.08em', textShadow: '0 0 22px var(--t-accent-glow)' }}
+              style={{ color: 'var(--t-text)', letterSpacing: '0.08em' }}
             >
               {hubTab === 'friends' ? tf('title') : t('title')}
             </h1>

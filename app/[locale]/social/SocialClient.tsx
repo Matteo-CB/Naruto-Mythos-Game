@@ -153,7 +153,7 @@ export function SocialClient() {
           transition={{ duration: 0.45, ease: 'easeOut' }}
           className="mb-7"
         >
-          <h1 className="font-display text-3xl uppercase tracking-wider sm:text-5xl" style={{ color: 'var(--t-text)', letterSpacing: '0.06em', textShadow: '0 0 22px var(--t-accent-glow)' }}>
+          <h1 className="font-display text-3xl uppercase tracking-wider sm:text-5xl" style={{ color: 'var(--t-text)', letterSpacing: '0.06em' }}>
             {t('title')}
           </h1>
           <p className="mt-2 text-sm" style={{ color: '#7a7a80' }}>{t('subtitle')}</p>

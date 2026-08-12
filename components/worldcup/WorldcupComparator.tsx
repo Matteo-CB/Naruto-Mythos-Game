@@ -53,7 +53,7 @@ export function WorldcupComparator({ rows, countryName, tCardMeta }: { rows: Row
   ];
 
   return (
-    <div className="mt-8 px-5 py-4" style={{ backgroundColor: 'rgba(17, 17, 17, 0.7)' }}>
+    <div className="mt-8 px-5 py-4" style={{ backgroundColor: 'var(--t-panel-veil)' }}>
       <div className="text-[10px] uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--t-accent)' }}>
         {t('comparatorTitle')}
       </div>
@@ -84,10 +84,10 @@ export function WorldcupComparator({ rows, countryName, tCardMeta }: { rows: Row
           );
         })}
         <div className="grid items-center gap-2 mt-1 pt-2" style={{ gridTemplateColumns: '1fr 1fr', borderTop: '1px solid var(--t-divider)' }}>
-          <span className="text-[9px] uppercase tracking-widest text-center" style={{ color: '#6f6249' }}>
+          <span className="text-[9px] uppercase tracking-widest text-center" style={{ color: 'var(--t-accent-label)' }}>
             {ca.topGroup ? getCardGroup(ca.topGroup, tCardMeta) : '-'}
           </span>
-          <span className="text-[9px] uppercase tracking-widest text-center" style={{ color: '#6f6249' }}>
+          <span className="text-[9px] uppercase tracking-widest text-center" style={{ color: 'var(--t-accent-label)' }}>
             {cb.topGroup ? getCardGroup(cb.topGroup, tCardMeta) : '-'}
           </span>
         </div>

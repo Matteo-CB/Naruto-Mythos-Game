@@ -101,14 +101,6 @@ export function SwissStandings({
           <motion.span
             className="text-lg font-bold tracking-wide"
             style={{ color: GOLD, fontFamily: 'var(--font-display)' }}
-            animate={{
-              textShadow: [
-                '0 0 10px rgba(196,163,90,0.3)',
-                '0 0 20px rgba(196,163,90,0.6)',
-                '0 0 10px rgba(196,163,90,0.3)',
-              ],
-            }}
-            transition={{ repeat: Infinity, duration: 2 }}
           >
             {winnerUsername}
           </motion.span>
@@ -218,8 +210,7 @@ export function SwissStandings({
                         : '3px solid transparent',
                       backgroundColor: isWinner
                         ? 'var(--t-accent-tint)'
-                        : 'transparent',
-                    }}
+                        : 'transparent' }}
                   >
                     <td
                       className="px-3 py-2 font-bold"
@@ -303,8 +294,7 @@ export function SwissStandings({
                           color:
                             m.winnerId === m.player1Id ? GOLD : 'var(--t-text)',
                           fontWeight:
-                            m.winnerId === m.player1Id ? 700 : 400,
-                        }}
+                            m.winnerId === m.player1Id ? 700 : 400 }}
                       >
                         {m.player1Username ?? t('tbd')}
                       </span>
@@ -316,8 +306,7 @@ export function SwissStandings({
                           color:
                             m.winnerId === m.player2Id ? GOLD : 'var(--t-text)',
                           fontWeight:
-                            m.winnerId === m.player2Id ? 700 : 400,
-                        }}
+                            m.winnerId === m.player2Id ? 700 : 400 }}
                       >
                         {m.player2Username ?? t('tbd')}
                       </span>
@@ -401,8 +390,7 @@ export function SwissStandings({
                                         ? GOLD
                                         : 'var(--t-text)',
                                     fontWeight:
-                                      m.winnerId === m.player1Id ? 700 : 400,
-                                  }}
+                                      m.winnerId === m.player1Id ? 700 : 400 }}
                                 >
                                   {m.player1Username}
                                 </span>
@@ -416,8 +404,7 @@ export function SwissStandings({
                                         ? GOLD
                                         : 'var(--t-text)',
                                     fontWeight:
-                                      m.winnerId === m.player2Id ? 700 : 400,
-                                  }}
+                                      m.winnerId === m.player2Id ? 700 : 400 }}
                                 >
                                   {m.player2Username}
                                 </span>

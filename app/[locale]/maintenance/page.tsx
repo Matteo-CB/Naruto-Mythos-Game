@@ -95,7 +95,7 @@ function CardCarousel() {
                   transform: `rotateY(${i * angle}deg) translateZ(${radius}px)`,
                   backfaceVisibility: 'hidden',
                   boxShadow: '0 4px 24px var(--t-shadow), 0 0 12px var(--t-accent-tint)',
-                  }}
+                }}
               >
                 <Image
                   src={src}
@@ -178,7 +178,6 @@ export default function MaintenancePage() {
           style={{
             fontSize: 'clamp(2.2rem, 6vw, 3.5rem)',
             color: 'var(--t-accent)',
-            textShadow: '0 0 40px rgba(196, 163, 90, 0.3), 0 0 80px var(--t-accent-glow)',
             lineHeight: 1.1,
           }}
         >
@@ -222,7 +221,6 @@ export default function MaintenancePage() {
             style={{
               fontSize: 'clamp(2rem, 5vw, 3rem)',
               color: 'var(--t-accent)',
-              textShadow: '0 0 30px rgba(196, 163, 90, 0.3)',
               letterSpacing: '0.12em',
             }}
           >
