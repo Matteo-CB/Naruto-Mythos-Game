@@ -3,6 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { generateInstanceId } from '@/lib/engine/utils/id';
 import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
+import { characterHasGroup } from '@/lib/effects/groupUtils';
 
 
 
@@ -18,8 +19,7 @@ function handleTayuya065Ambush(ctx: EffectContext): EffectResult {
     for (const char of mission[friendlySide]) {
       if (char.isHidden) continue;
       if (char.instanceId === ctx.sourceCard.instanceId) continue; // "another" - exclude self
-      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-      if (topCard.group === 'Sound Village') {
+      if (characterHasGroup(char, 'Sound Village')) {
         validTargets.push(char.instanceId);
       }
     }

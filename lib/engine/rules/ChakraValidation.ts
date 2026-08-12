@@ -14,6 +14,35 @@ export function isCharacterCard(card: CharacterCard): boolean {
   return type === undefined || type === 'character';
 }
 
+function discardPileSizeOf(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  state: GameState | any,
+  player: PlayerID,
+): number {
+  const fullSide = state?.[player];
+  if (fullSide && Array.isArray(fullSide.discardPile)) return fullSide.discardPile.length;
+  if (state?.myPlayer === player && Array.isArray(state?.myState?.discardPile)) {
+    return state.myState.discardPile.length;
+  }
+  const opponentSide = state?.opponentState;
+  if (opponentSide?.id === player) {
+    if (typeof opponentSide.discardPileSize === 'number') return opponentSide.discardPileSize;
+    if (Array.isArray(opponentSide.discardPile)) return opponentSide.discardPile.length;
+  }
+  return 0;
+}
+
+export function hasKin043DiscardDiscount(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  state: GameState | any,
+  player: PlayerID,
+  card: CharacterCard,
+): boolean {
+  if (String(card?.set) !== 'SS' || Number(card?.number) !== 43) return false;
+  if (!isCharacterCard(card)) return false;
+  return discardPileSizeOf(state, player) > 0;
+}
+
 export function calculateEffectiveCost(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   state: GameState | any,
@@ -23,6 +52,10 @@ export function calculateEffectiveCost(
   isReveal: boolean,
 ): number {
   let cost = card.chakra;
+
+  if (hasKin043DiscardDiscount(state, player, card)) {
+    cost = Math.max(0, cost - 1);
+  }
 
   if (missionIndex < 0 || missionIndex >= (state.activeMissions?.length ?? 0)) {
     return cost;

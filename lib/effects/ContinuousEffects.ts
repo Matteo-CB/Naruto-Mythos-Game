@@ -3,6 +3,7 @@ import { honorableDuelBonus, kingOfTheHillBonus, missionCarries, teamTrainingBon
 import { generateInstanceId } from '../engine/utils/id';
 import { logAction } from '../engine/utils/gameLog';
 import { isSummonPlay, jiraiyaGoldSources, JIRAIYA_GOLD_ID, JIRAIYA_GOLD_NAME } from './handlers/SS/goldCards';
+import { characterHasGroup } from './groupUtils';
 
 
 
@@ -392,8 +393,7 @@ export function calculateContinuousPowerModifier(
       let soundCount = 0;
       for (const c of [...friendlyChars, ...enemyChars]) {
         if (c.isHidden) continue;
-        const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-        if ((cTop.group ?? '') === 'Sound Village') soundCount += 1;
+        if (characterHasGroup(c, 'Sound Village')) soundCount += 1;
       }
       modifier += soundCount;
     }

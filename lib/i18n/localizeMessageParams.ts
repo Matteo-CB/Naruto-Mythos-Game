@@ -2,6 +2,7 @@ import { getAllCards } from '@/lib/data/cardLoader';
 import { getCardById } from '@/lib/data/cardIndex';
 import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
+import { formatCardLabelShort } from '@/lib/variants/cardLabel';
 import type { CardData } from '@/lib/engine/types';
 
 function stripEffectMarkers(s: string): string {
@@ -73,6 +74,11 @@ export function localizeMessageParams(
     if (typeof v !== 'string' || !v) continue;
     const card = map.get(v.toUpperCase());
     if (card) result[key] = getCardName(card, locale);
+  }
+
+  if (typeof params.targetId === 'string' && params.targetId && typeof result.target === 'string') {
+    const targetCard = getCardById(params.targetId);
+    if (targetCard) result.target = formatCardLabelShort(targetCard, locale);
   }
 
   for (const key of NAME_LIST_PARAM_KEYS) {

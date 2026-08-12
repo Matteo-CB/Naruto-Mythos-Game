@@ -7,7 +7,10 @@ import { registerKimimaro031Handlers } from './kimimaro031';
 import { registerLegendaryGoldHandlers } from './legendaryGold';
 import { registerItachi053Handlers } from './itachi053';
 import { registerKakashi008Handlers } from './kakashi008';
+import { registerJirobo032Handlers } from './jirobo032';
 import { registerJirobo033Handlers } from './jirobo033';
+import { registerZaku042Handlers } from './zaku042';
+import { registerSakon036Handlers } from './sakon036';
 import { registerKyubi006Handlers } from './kyubi006';
 import { registerTsunade002Handlers } from './tsunade002';
 import { registerSenbonRamenHandlers } from './senbonRamen';
@@ -16,6 +19,8 @@ import { registerRegionalChampionshipHandlers } from './regionalChampionship';
 import { registerShikamaru118Handlers } from './shikamaru118';
 import { registerSecretVariantHandlers } from './secretVariants';
 import { registerIno124Handlers } from './ino124';
+import { registerKin043Handlers } from './kin043';
+import { registerKin044Handlers } from './kin044';
 import { registerSSMissionHandlers } from './missions/ssMissionHandlers';
 
 export function registerAllSSHandlers(): void {
@@ -28,7 +33,10 @@ export function registerAllSSHandlers(): void {
   registerLegendaryGoldHandlers();
   registerItachi053Handlers();
   registerKakashi008Handlers();
+  registerJirobo032Handlers();
   registerJirobo033Handlers();
+  registerZaku042Handlers();
+  registerSakon036Handlers();
   registerKyubi006Handlers();
   registerTsunade002Handlers();
   registerSenbonRamenHandlers();
@@ -37,5 +45,7 @@ export function registerAllSSHandlers(): void {
   registerShikamaru118Handlers();
   registerSecretVariantHandlers();
   registerIno124Handlers();
+  registerKin043Handlers();
+  registerKin044Handlers();
   registerSSMissionHandlers();
 }

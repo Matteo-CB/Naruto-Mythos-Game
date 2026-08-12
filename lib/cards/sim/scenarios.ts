@@ -125,6 +125,15 @@ const FACTORIES: Record<string, Factory> = {
     play: P1(FRESH),
     noMinimize: true,
   }),
+  'SS-043-UC': (id) => ({
+    build: () => {
+      const st = board({ hand: [id] });
+      st.player1.discardPile = [getCharacterById('KS-009-C')!];
+      return st;
+    },
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
   'KS-111-R': (id) => ({
     build: () => board({
       p1m0: [{ id, iid: 'sim-shika' }],

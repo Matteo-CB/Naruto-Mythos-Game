@@ -24,6 +24,7 @@ import { hiddenCharactersInPlay, attachmentsInPlay } from './handlers/SS/mission
 import { NARUTO_005_ID, NARUTO_005_NAME } from './handlers/SS/naruto005';
 import { KAKASHI_008_ID, KAKASHI_008_NAME, KAKASHI_008_CATEGORY, KAKASHI_008_REDUCTION } from './handlers/SS/kakashi008';
 import { JIROBO_033_ID, JIROBO_033_NAME, JIROBO_033_POWERUP, friendlySoundFourCount } from './handlers/SS/jirobo033';
+import { ZAKU_042_ID, ZAKU_042_NAME } from './handlers/SS/zaku042';
 import { KYUBI_006_ID, KYUBI_006_NAME, costOfDefeated } from './handlers/SS/kyubi006';
 import {
   TSUNADE_002_ID, TSUNADE_002_NAME, DECLARE_NUMBER_MIN, DECLARE_NUMBER_MAX,
@@ -5853,8 +5854,7 @@ export class EffectEngine {
           for (const char of (mission as any)[t065aFriendlySide] as CharacterInPlay[]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
-            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-            if (topCard.group === 'Sound Village') t065aTargets.push(char.instanceId);
+            if (characterHasGroup(char, 'Sound Village')) t065aTargets.push(char.instanceId);
           }
         }
 
@@ -6131,6 +6131,7 @@ export class EffectEngine {
         break;
       }
 
+      case 'SS042_CONFIRM_UPGRADE':
       case 'SS047_CONFIRM_UPGRADE':
       case 'SS078_CONFIRM_DUEL':
       case 'SS117_CONFIRM_DUEL':
@@ -11886,6 +11887,16 @@ export class EffectEngine {
         newState.log = logAction(newState.log, newState.turn, newState.phase, s81Player,
           'EFFECT_DRAW', 'Ramen (SS-081): drew 1 card.',
           'game.log.effect.draw', { card: RAMEN_NAME, id: RAMEN_ID, count: 1 });
+        break;
+      }
+
+      case 'SS042_DEFEAT': {
+        const s042F = EffectEngine.findCharByInstanceId(newState, targetId);
+        const s042Name = s042F ? (s042F.character.stack?.length > 0 ? s042F.character.stack[s042F.character.stack.length - 1] : s042F.character.card).name_fr : '';
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', 'Zaku Abumi (SS-042): Defeated a character with cost 3 or less.',
+          'game.log.effect.defeat', { card: ZAKU_042_NAME, id: ZAKU_042_ID, target: s042Name });
         break;
       }
 
