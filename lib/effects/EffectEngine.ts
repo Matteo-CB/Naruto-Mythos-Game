@@ -51,6 +51,7 @@ import { KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
 import { OROCHIMARU_127_ID, OROCHIMARU_127_NAME } from './handlers/SS/orochimaru127';
 import { KIMIMARO_077_ID, KIMIMARO_077_NAME, kimimaro077Targets, costOfTarget } from './handlers/SS/kimimaro077';
 import { DOSU_125_ID, DOSU_125_NAME } from './handlers/SS/soundMoves';
+import { UKON_038_ID, UKON_038_NAME } from './handlers/SS/ukon038';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatEnemyCharacter, defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
 import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval, isHiddenRevealBlocked, amplifiedPowerup } from './ContinuousEffects';
@@ -6377,6 +6378,7 @@ export class EffectEngine {
       case 'SS124_CONFIRM_DUEL':
       case 'SS124_CONFIRM_UPGRADE':
       case 'SS127_CONFIRM':
+      case 'SS038_CONFIRM_AMBUSH':
       case 'SS125_CONFIRM_DUEL':
       case 'SS030_CONFIRM_FIRST_STRIKE':
       case 'SS037_CONFIRM_UPGRADE':
@@ -12407,6 +12409,43 @@ export class EffectEngine {
           { card: KIMIMARO_077_NAME, id: KIMIMARO_077_ID, target: ss077bTop.name_fr, target_en: ss077bTop.name_en || ss077bTop.name_fr });
 
         newState = EffectEngine.queueKimimaro077Pick(newState, pendingEffect, ss077bReste - ss077bCout);
+        break;
+      }
+
+      case 'SS038_ATTACH': {
+        let ss038Data: { ukonInstanceId?: string } = {};
+        try { ss038Data = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const ss038Player = pendingEffect.sourcePlayer;
+        const ss038UkonId = ss038Data.ukonInstanceId ?? pendingEffect.sourceInstanceId;
+
+        const ss038Ukon = EffectEngine.findCharByInstanceId(newState, ss038UkonId);
+        const ss038Hote = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!ss038Ukon || !ss038Hote) break;
+
+        const ss038Carte = ss038Ukon.character.stack?.length > 0
+          ? ss038Ukon.character.stack[ss038Ukon.character.stack.length - 1]
+          : ss038Ukon.character.card;
+
+        const ss038Missions = newState.activeMissions.map((mission) => ({
+          ...mission,
+          player1Characters: mission.player1Characters.filter((c) => c.instanceId !== ss038UkonId),
+          player2Characters: mission.player2Characters.filter((c) => c.instanceId !== ss038UkonId),
+        }));
+        newState = { ...newState, activeMissions: ss038Missions };
+        newState[ss038Player] = {
+          ...newState[ss038Player],
+          charactersInPlay: EffectEngine.countCharsForPlayer(newState, ss038Player),
+        };
+
+        newState = attachCardToCharacter(newState, ss038Player, ss038Carte, targetId);
+
+        const ss038TopHote = ss038Hote.character.stack?.length > 0
+          ? ss038Hote.character.stack[ss038Hote.character.stack.length - 1]
+          : ss038Hote.character.card;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, ss038Player,
+          'EFFECT', `Ukon (038): attached to ${ss038TopHote.name_fr}, which loses 5 Power.`,
+          'game.log.effect.ss038Attached',
+          { card: UKON_038_NAME, id: UKON_038_ID, target: ss038TopHote.name_fr, target_en: ss038TopHote.name_en || ss038TopHote.name_fr });
         break;
       }
 

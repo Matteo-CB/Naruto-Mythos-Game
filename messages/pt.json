@@ -2938,7 +2938,8 @@
         "ss118Reveal": "{card} revelou {target}.",
         "ss118HideSameName": "{card} ocultou {target}, que tem o nome revelado.",
         "ss148DuelPowerup": "{card} ganha POWERUP {amount}.",
-        "ss150PowerupByCost": "{card} ganha POWERUP {amount}, o custo do inimigo mais forte."
+        "ss150PowerupByCost": "{card} ganha POWERUP {amount}, o custo do inimigo mais forte.",
+        "ss038Attached": "{card} ({id}): anexa-se a {target}, que perde 5 de Poder."
       },
       "score": {
         "draw": "[SCORE] {card}: Comprou {count} carta(s).",
@@ -3657,7 +3658,8 @@
         "ss077ConfirmDuel": "Gaara está presente: derrotar Kimimaro para derrotar personagens inimigos não escondidos com um custo total de 7 ou menos?",
         "ss077PickTarget": "Escolhe um personagem inimigo não escondido para derrotar, dentro do custo restante.",
         "ss125DefeatMoved": "Escolhe um personagem inimigo que o adversário moveu nesta ronda para derrotar.",
-        "ss040PlaySummons": "Joga personagens Invocação. Em cada missão com uma Tayuya aliada, custam menos 1 por personagem Quatro do Som aliado presente."
+        "ss040PlaySummons": "Joga personagens Invocação. Em cada missão com uma Tayuya aliada, custam menos 1 por personagem Quatro do Som aliado presente.",
+        "ss038Attach": "Escolhe um personagem inimigo não escondido nesta missão. Ukon anexa-se a ele e esse personagem perde 5 de Poder, mas Ukon deixa de ser um personagem."
       },
       "upgradeModifierConfirm": "Aplicar o efeito UPGRADE",
       "upgradeModifierDecline": "Manter apenas o efeito MAIN",

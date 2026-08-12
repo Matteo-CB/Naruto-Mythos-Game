@@ -168,6 +168,7 @@ export function attachedPowerOf(char: CharacterInPlay): number {
     && (hostTop.effects ?? []).some((e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('Food'));
   let total = 0;
   for (const att of char.attachments) {
+    if (att.card.id === 'SS-038-UC') { total += -5; continue; }
     let p = att.card.power ?? 0;
     if (p !== 0 && doublesFood && (att.card.keywords ?? []).includes('Food')) p *= 2;
     total += p;

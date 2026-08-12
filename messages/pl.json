@@ -2938,7 +2938,8 @@
         "ss118Reveal": "{card} odkrywa {target}.",
         "ss118HideSameName": "{card} zakrywa {target}, który nosi odkrytą nazwę.",
         "ss148DuelPowerup": "{card} zyskuje POWERUP {amount}.",
-        "ss150PowerupByCost": "{card} zyskuje POWERUP {amount}, koszt najsilniejszego wroga."
+        "ss150PowerupByCost": "{card} zyskuje POWERUP {amount}, koszt najsilniejszego wroga.",
+        "ss038Attached": "{card} ({id}): dołącza do {target}, która traci 5 Mocy."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3657,7 +3658,8 @@
         "ss077ConfirmDuel": "Gaara jest obecny: pokonać Kimimaro, aby pokonać odkryte wrogie postacie o łącznym koszcie 7 lub mniejszym?",
         "ss077PickTarget": "Wybierz odkrytą wrogą postać do pokonania, w ramach pozostałego kosztu.",
         "ss125DefeatMoved": "Wybierz wrogą postać, którą przeciwnik przeniósł w tej rundzie, aby ją pokonać.",
-        "ss040PlaySummons": "Zagraj postacie Przywołania. Na każdej misji z sojuszniczą Tayuyą kosztują o 1 mniej za każdą sojuszniczą postać Czwórki Dźwięku."
+        "ss040PlaySummons": "Zagraj postacie Przywołania. Na każdej misji z sojuszniczą Tayuyą kosztują o 1 mniej za każdą sojuszniczą postać Czwórki Dźwięku.",
+        "ss038Attach": "Wybierz odkrytą wrogą postać na tej misji. Ukon dołącza do niej, a ta postać traci 5 Mocy, lecz Ukon przestaje być postacią."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

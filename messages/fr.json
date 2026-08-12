@@ -842,7 +842,8 @@
         "ss118Reveal": "{card} a révélé {target}.",
         "ss118HideSameName": "{card} a caché {target}, qui porte le nom révélé.",
         "ss148DuelPowerup": "{card} gagne POWERUP {amount}.",
-        "ss150PowerupByCost": "{card} gagne POWERUP {amount}, le coût du plus fort ennemi."
+        "ss150PowerupByCost": "{card} gagne POWERUP {amount}, le coût du plus fort ennemi.",
+        "ss038Attached": "{card} ({id}) : s’attache à {target}, qui perd 5 Puissance."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1561,7 +1562,8 @@
         "ss077ConfirmDuel": "Gaara est présent : vaincre Kimimaro pour vaincre des personnages ennemis non cachés dont le coût total ne dépasse pas 7 ?",
         "ss077PickTarget": "Choisissez un personnage ennemi non caché à vaincre, dans la limite du coût restant.",
         "ss125DefeatMoved": "Choisissez un personnage ennemi que l’adversaire a déplacé cette manche, à vaincre.",
-        "ss040PlaySummons": "Jouez des personnages Invocation. Dans chaque mission abritant une Tayuya alliée, ils coûtent 1 de moins par personnage Quatre du Son allié présent."
+        "ss040PlaySummons": "Jouez des personnages Invocation. Dans chaque mission abritant une Tayuya alliée, ils coûtent 1 de moins par personnage Quatre du Son allié présent.",
+        "ss038Attach": "Choisissez un personnage ennemi non caché de cette mission. Ukon s’y attache et ce personnage perd 5 Puissance, mais Ukon cesse d’être un personnage."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",

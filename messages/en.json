@@ -836,7 +836,8 @@
         "ss118Reveal": "{card} revealed {target}.",
         "ss118HideSameName": "{card} hid {target}, who shares the revealed name.",
         "ss148DuelPowerup": "{card} gains POWERUP {amount}.",
-        "ss150PowerupByCost": "{card} gains POWERUP {amount}, the cost of the strongest enemy."
+        "ss150PowerupByCost": "{card} gains POWERUP {amount}, the cost of the strongest enemy.",
+        "ss038Attached": "{card} ({id}): attached to {target}, which loses 5 Power."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -1555,7 +1556,8 @@
         "ss077ConfirmDuel": "Gaara is here: defeat Kimimaro to defeat non-hidden enemy characters with a total cost of 7 or less?",
         "ss077PickTarget": "Choose a non-hidden enemy character to defeat, within the remaining cost budget.",
         "ss125DefeatMoved": "Choose an enemy character the opponent moved this round to defeat.",
-        "ss040PlaySummons": "Play Summon characters. In each mission holding a friendly Tayuya, they cost 1 less per friendly Sound Four character there."
+        "ss040PlaySummons": "Play Summon characters. In each mission holding a friendly Tayuya, they cost 1 less per friendly Sound Four character there.",
+        "ss038Attach": "Choose a non-hidden enemy character in this mission. Ukon attaches to it and it loses 5 Power, but Ukon stops being a character."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",
