@@ -1544,7 +1544,12 @@
         "ss037RevealSoundFour": "Reveal any number of Sound Four characters from your hand. The more you reveal, the higher the cost you can defeat.",
         "ss037DefeatEnemy": "Choose an enemy character with cost lower than the number of cards you revealed.",
         "ss035MovePerAlly": "For each other friendly Sound Four character in this mission, move a character whose cost does not exceed that ally’s cost?",
-        "ss035PickChar": "Choose a character to move, friendly or enemy, within this ally’s cost limit."
+        "ss035PickChar": "Choose a character to move, friendly or enemy, within this ally’s cost limit.",
+        "ss130ConfirmHide": "Hide an enemy Leaf Village character in this mission?",
+        "ss130ConfirmDuel": "Hiruzen Sarutobi is here: defeat the enemy Leaf Village character instead of hiding it?",
+        "ss130Hide": "Choose an enemy Leaf Village character in this mission to hide.",
+        "ss130Defeat": "Choose an enemy Leaf Village character in this mission to defeat.",
+        "ss139Discard": "Kabuto Yakushi: you drew a card, now choose a card to discard."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",

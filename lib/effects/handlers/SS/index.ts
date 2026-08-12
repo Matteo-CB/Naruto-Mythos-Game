@@ -28,6 +28,7 @@ import { registerKabuto030Handlers } from './kabuto030';
 import { registerDosu045Handlers } from './dosu045';
 import { registerSakon037Handlers } from './sakon037';
 import { registerKidomaru035Handlers } from './kidomaru035';
+import { registerOrochimaru130Handlers } from './orochimaru130';
 
 export function registerAllSSHandlers(): void {
   registerMinato122Handlers();
@@ -60,4 +61,5 @@ export function registerAllSSHandlers(): void {
   registerDosu045Handlers();
   registerSakon037Handlers();
   registerKidomaru035Handlers();
+  registerOrochimaru130Handlers();
 }

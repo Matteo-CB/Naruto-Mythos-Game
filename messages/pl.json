@@ -3646,7 +3646,12 @@
         "ss037RevealSoundFour": "Odkryj dowolną liczbę postaci Czwórki Dźwięku z ręki. Im więcej odkryjesz, tym wyższy koszt możesz pokonać.",
         "ss037DefeatEnemy": "Wybierz wrogą postać o koszcie niższym niż liczba odkrytych kart.",
         "ss035MovePerAlly": "Czy za każdą inną sojuszniczą postać Czwórki Dźwięku na tej misji przenieść postać o koszcie nie wyższym niż koszt tego sojusznika?",
-        "ss035PickChar": "Wybierz postać do przeniesienia, sojuszniczą lub wrogą, w granicach kosztu tego sojusznika."
+        "ss035PickChar": "Wybierz postać do przeniesienia, sojuszniczą lub wrogą, w granicach kosztu tego sojusznika.",
+        "ss130ConfirmHide": "Zakryć wrogą postać z Wioski Liścia na tej misji?",
+        "ss130ConfirmDuel": "Hiruzen Sarutobi jest obecny: pokonać wrogą postać z Wioski Liścia zamiast ją zakrywać?",
+        "ss130Hide": "Wybierz wrogą postać z Wioski Liścia na tej misji do zakrycia.",
+        "ss130Defeat": "Wybierz wrogą postać z Wioski Liścia na tej misji do pokonania.",
+        "ss139Discard": "Kabuto Yakushi: dobrałeś kartę, teraz wybierz kartę do odrzucenia."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

@@ -1550,7 +1550,12 @@
         "ss037RevealSoundFour": "Révélez autant de personnages Quatre du Son que vous voulez depuis votre main. Plus vous en révélez, plus le coût que vous pourrez vaincre est élevé.",
         "ss037DefeatEnemy": "Choisissez un personnage ennemi dont le coût est inférieur au nombre de cartes révélées.",
         "ss035MovePerAlly": "Pour chaque autre personnage Quatre du Son allié de cette mission, déplacer un personnage dont le coût ne dépasse pas celui de cet allié ?",
-        "ss035PickChar": "Choisissez un personnage à déplacer, allié ou ennemi, dans la limite de coût de cet allié."
+        "ss035PickChar": "Choisissez un personnage à déplacer, allié ou ennemi, dans la limite de coût de cet allié.",
+        "ss130ConfirmHide": "Cacher un personnage ennemi du Village de Konoha dans cette mission ?",
+        "ss130ConfirmDuel": "Hiruzen Sarutobi est présent : vaincre le personnage ennemi du Village de Konoha au lieu de le cacher ?",
+        "ss130Hide": "Choisissez un personnage ennemi du Village de Konoha de cette mission à cacher.",
+        "ss130Defeat": "Choisissez un personnage ennemi du Village de Konoha de cette mission à vaincre.",
+        "ss139Discard": "Kabuto Yakushi : vous avez pioché, choisissez maintenant une carte à défausser."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",

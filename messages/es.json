@@ -1549,7 +1549,12 @@
         "ss037RevealSoundFour": "Revela tantos personajes Cuatro del Sonido como quieras de tu mano. Cuantos más reveles, mayor será el coste que podrás derrotar.",
         "ss037DefeatEnemy": "Elige un personaje enemigo con coste inferior al número de cartas reveladas.",
         "ss035MovePerAlly": "¿Por cada otro personaje Cuatro del Sonido aliado de esta misión, mover un personaje cuyo coste no supere el de ese aliado?",
-        "ss035PickChar": "Elige un personaje para mover, aliado o enemigo, dentro del límite de coste de ese aliado."
+        "ss035PickChar": "Elige un personaje para mover, aliado o enemigo, dentro del límite de coste de ese aliado.",
+        "ss130ConfirmHide": "¿Ocultar un personaje enemigo de la Aldea de la Hoja en esta misión?",
+        "ss130ConfirmDuel": "Hiruzen Sarutobi está presente: ¿derrotar al personaje enemigo de la Aldea de la Hoja en lugar de ocultarlo?",
+        "ss130Hide": "Elige un personaje enemigo de la Aldea de la Hoja de esta misión para ocultarlo.",
+        "ss130Defeat": "Elige un personaje enemigo de la Aldea de la Hoja de esta misión para derrotarlo.",
+        "ss139Discard": "Kabuto Yakushi: has robado, ahora elige una carta para descartar."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

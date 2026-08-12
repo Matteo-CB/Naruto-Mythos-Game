@@ -3646,7 +3646,12 @@
         "ss037RevealSoundFour": "Revela quantos personagens Quatro do Som quiseres da tua mão. Quantos mais revelares, maior o custo que podes derrotar.",
         "ss037DefeatEnemy": "Escolhe um personagem inimigo com custo inferior ao número de cartas reveladas.",
         "ss035MovePerAlly": "Por cada outro personagem Quatro do Som aliado nesta missão, mover um personagem cujo custo não exceda o desse aliado?",
-        "ss035PickChar": "Escolhe um personagem para mover, aliado ou inimigo, dentro do limite de custo desse aliado."
+        "ss035PickChar": "Escolhe um personagem para mover, aliado ou inimigo, dentro do limite de custo desse aliado.",
+        "ss130ConfirmHide": "Esconder um personagem inimigo da Vila da Folha nesta missão?",
+        "ss130ConfirmDuel": "Hiruzen Sarutobi está presente: derrotar o personagem inimigo da Vila da Folha em vez de o esconder?",
+        "ss130Hide": "Escolhe um personagem inimigo da Vila da Folha nesta missão para esconder.",
+        "ss130Defeat": "Escolhe um personagem inimigo da Vila da Folha nesta missão para derrotar.",
+        "ss139Discard": "Kabuto Yakushi: compraste uma carta, escolhe agora uma carta para descartar."
       },
       "upgradeModifierConfirm": "Aplicar o efeito UPGRADE",
       "upgradeModifierDecline": "Manter apenas o efeito MAIN",

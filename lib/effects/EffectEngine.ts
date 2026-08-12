@@ -46,6 +46,8 @@ import { KABUTO_030_ID, KABUTO_030_NAME } from './handlers/SS/kabuto030';
 import { DOSU_045_ID, DOSU_045_NAME } from './handlers/SS/dosu045';
 import { SAKON_037_ID, SAKON_037_NAME, enemiesUnderCost } from './handlers/SS/sakon037';
 import { KIDOMARU_035_ID, KIDOMARU_035_NAME, KIDOMARU_035_LOG, movableUnderCost } from './handlers/SS/kidomaru035';
+import { OROCHIMARU_130_ID, OROCHIMARU_130_NAME, leafEnemiesIn } from './handlers/SS/orochimaru130';
+import { KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatEnemyCharacter, defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
 import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval, isHiddenRevealBlocked, amplifiedPowerup } from './ContinuousEffects';
@@ -929,6 +931,59 @@ export class EffectEngine {
   }
 
   
+  static queueOrochimaru130Target(
+    state: GameState,
+    pendingEffect: PendingEffect,
+    useDefeat: boolean,
+  ): GameState {
+    const newState = state;
+    const cibles = leafEnemiesIn(
+      newState, pendingEffect.sourcePlayer, pendingEffect.sourceMissionIndex, false,
+    ).map((c) => c.instanceId);
+
+    if (cibles.length === 0) {
+      newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+        'EFFECT_NO_TARGET', 'Orochimaru (130): no enemy Leaf Village character left in this mission.',
+        'game.log.effect.noTarget', { card: OROCHIMARU_130_NAME, id: OROCHIMARU_130_ID });
+      return newState;
+    }
+
+    const effId = generateInstanceId();
+    const actId = generateInstanceId();
+    newState.pendingEffects.push({
+      id: effId,
+      sourceCardId: pendingEffect.sourceCardId,
+      sourceInstanceId: pendingEffect.sourceInstanceId,
+      sourceMissionIndex: pendingEffect.sourceMissionIndex,
+      effectType: pendingEffect.effectType,
+      effectDescription: JSON.stringify({ useDefeat }),
+      targetSelectionType: 'SS130_APPLY',
+      sourcePlayer: pendingEffect.sourcePlayer,
+      requiresTargetSelection: true,
+      validTargets: cibles,
+      isOptional: false,
+      isMandatory: true,
+      resolved: false,
+      isUpgrade: pendingEffect.isUpgrade,
+      remainingEffectTypes: pendingEffect.remainingEffectTypes,
+    });
+    newState.pendingActions.push({
+      id: actId,
+      type: 'SELECT_TARGET' as PendingAction['type'],
+      player: pendingEffect.sourcePlayer,
+      description: useDefeat
+        ? 'Choose an enemy Leaf Village character in this mission to defeat.'
+        : 'Choose an enemy Leaf Village character in this mission to hide.',
+      descriptionKey: useDefeat ? 'game.effect.desc.ss130Defeat' : 'game.effect.desc.ss130Hide',
+      options: cibles,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effId,
+    });
+    pendingEffect.remainingEffectTypes = undefined;
+    return newState;
+  }
+
   static queueKidomaru035Pick(
     state: GameState,
     pendingEffect: PendingEffect,
@@ -1138,7 +1193,8 @@ export class EffectEngine {
       tst === 'SASUKE142_CHOOSE_DISCARD' ||
       tst === 'KIN073_CHOOSE_DISCARD' ||
       tst === 'KABUTO053_CHOOSE_DISCARD' ||
-      tst === 'SS114_CHOOSE_DISCARD'
+      tst === 'SS114_CHOOSE_DISCARD' ||
+      tst === 'SS139_DISCARD'
     ) {
       actionType = 'DISCARD_CARD';
     } else if (
@@ -12263,6 +12319,57 @@ export class EffectEngine {
           newState, mvdF.character.instanceId, mvdDest, mvdF.player,
           mvdParsed.srcName ?? 'Temari', mvdParsed.srcId ?? 'SS-119-R', pendingEffect.sourcePlayer,
         );
+        break;
+      }
+
+      case 'SS139_DISCARD': {
+        const ss139Player = pendingEffect.sourcePlayer;
+        const ss139Index = parseInt(targetId, 10);
+        const ss139Ps = newState[ss139Player];
+        if (isNaN(ss139Index) || !ss139Ps.hand[ss139Index]) break;
+
+        const ss139Main = [...ss139Ps.hand];
+        const ss139Carte = ss139Main.splice(ss139Index, 1)[0];
+        newState = {
+          ...newState,
+          [ss139Player]: {
+            ...ss139Ps,
+            hand: ss139Main,
+            discardPile: [...ss139Ps.discardPile, ss139Carte],
+          },
+        };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, ss139Player,
+          'EFFECT_DISCARD', `Kabuto Yakushi (139): discarded ${ss139Carte.name_fr}.`,
+          'game.log.effect.discard',
+          { card: KABUTO_139_NAME, id: KABUTO_139_ID, target: ss139Carte.name_fr, target_en: ss139Carte.name_en || ss139Carte.name_fr });
+        break;
+      }
+
+      case 'SS130_CONFIRM_FIRST_STRIKE':
+      case 'SS130_CONFIRM_DUEL_MODIFIER': {
+        const ss130Vaincre = pendingEffect.targetSelectionType === 'SS130_CONFIRM_DUEL_MODIFIER';
+        newState = EffectEngine.queueOrochimaru130Target(newState, pendingEffect, ss130Vaincre);
+        break;
+      }
+
+      case 'SS130_APPLY': {
+        let ss130bData: { useDefeat?: boolean } = {};
+        try { ss130bData = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const ss130bFound = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!ss130bFound) break;
+        const ss130bTop = ss130bFound.character.stack?.length > 0
+          ? ss130bFound.character.stack[ss130bFound.character.stack.length - 1]
+          : ss130bFound.character.card;
+
+        if (ss130bData.useDefeat) {
+          newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DEFEAT', `Orochimaru (130): defeated ${ss130bTop.name_fr}.`,
+            'game.log.effect.defeat',
+            { card: OROCHIMARU_130_NAME, id: OROCHIMARU_130_ID, target: ss130bTop.name_fr, target_en: ss130bTop.name_en || ss130bTop.name_fr });
+        } else {
+          newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        }
         break;
       }
 
