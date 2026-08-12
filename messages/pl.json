@@ -2779,8 +2779,6 @@
         "discard": "{card} ({id}): Odrzucił {target}.",
         "takeControl": "{card} ({id}): Przejął kontrolę nad {target}.",
         "takeControlNoRepDiscard": "{card} ({id}): Przejął kontrolę nad {target}, ale ta sama nazwa była już po tej stronie, {target} odrzucony (Zakaz Powtórzeń).",
-        "controlCascade": "{card} podąża za swoim kontrolerem i zmienia stronę.",
-        "controlCascadeDiscard": "{card} podążał za swoim kontrolerem, ale ta sama nazwa była już po tej stronie, {card} odrzucony (Zakaz Powtórzeń).",
         "returnToHand": "{card} ({id}): Zwrócił {target} do ręki.",
         "lookAtHidden": "{card} ({id}): Podejrzał ukrytego {target}.",
         "removeTokens": "{card} ({id}): Usunął do {amount} żetonów Siły z {target}.",

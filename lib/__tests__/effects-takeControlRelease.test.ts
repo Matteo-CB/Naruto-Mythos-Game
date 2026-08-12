@@ -23,10 +23,10 @@ function makeState(ov: Partial<GameState> = {}): GameState {
   return { turn: 2, phase: 'action', activePlayer: 'player1', edgeHolder: 'player1', player1: makePlayer(), player2: makePlayer({ id: 'player2' as PlayerID, userId: 'u2' }), missionDeck: [], activeMissions: [mockMission(), mockMission({ rank: 'C', rankBonus: 2 })], log: [], pendingEffects: [], pendingActions: [], actionHistory: [], ...ov } as GameState;
 }
 
-describe('cascadeControlOnTakeover (Kabuto + Ino bug)', () => {
+describe('un controleur vole libere ce qu il controlait', () => {
   beforeAll(async () => { await initializeRegistry(); });
 
-  it('moves the controlled-by-controller cascade chain to the new player when the controller is taken', () => {
+  it('rend la carte controlee a son proprietaire quand le controleur est vole', () => {
     const kabutoCard = mockCard({ id: 'KS-052-C', number: 52, name_fr: 'KABUTO YAKUSHI', title_fr: 'The Mole', chakra: 3, power: 1 });
     const stolenCard = mockCard({ id: 'KS-100-C', number: 100, name_fr: 'STOLEN ENEMY', chakra: 2, power: 2 });
     const inoCard = mockCard({ id: 'KS-020-UC', number: 20, name_fr: 'INO YAMANAKA', chakra: 3, keywords: ['Team 10', 'Jutsu'] });
@@ -66,13 +66,13 @@ describe('cascadeControlOnTakeover (Kabuto + Ino bug)', () => {
     const m1 = after.activeMissions[1];
     const stolenAfter = m1.player1Characters.find((c) => c.instanceId === 'stolen-1');
     expect(stolenAfter).toBeTruthy();
-    expect(stolenAfter?.controlledBy).toBe('player1');
-    expect(stolenAfter?.controllerInstanceId).toBe('kabuto-1');
     expect(stolenAfter?.originalOwner).toBe('player1');
+    expect(stolenAfter?.controlledBy).toBe('player1');
+    expect(stolenAfter?.controllerInstanceId).toBeUndefined();
     expect(m1.player2Characters.find((c) => c.instanceId === 'stolen-1')).toBeFalsy();
   });
 
-  it('discards the cascading card to its original owner if same-name conflict on the new side (No Repetition)', () => {
+  it('defausse la carte rendue si son proprietaire a deja ce nom en jeu (Repetition interdite)', () => {
     const inoCard = mockCard({ id: 'KS-020-UC', number: 20, name_fr: 'INO YAMANAKA', chakra: 3, keywords: ['Team 10', 'Jutsu'] });
     const kabutoCard = mockCard({ id: 'KS-052-C', number: 52, name_fr: 'KABUTO YAKUSHI', chakra: 3, power: 1 });
     const naruto = mockCard({ id: 'KS-108-R', number: 108, name_fr: 'NARUTO UZUMAKI', chakra: 5, power: 4 });
@@ -113,7 +113,7 @@ describe('cascadeControlOnTakeover (Kabuto + Ino bug)', () => {
     expect(m1.player1Characters.find((c) => c.instanceId === 'own-naruto')).toBeTruthy();
   });
 
-  it('does nothing when no cards reference the taken controller', () => {
+  it('ne touche a rien quand le personnage vole ne controlait personne', () => {
     const inoCard = mockCard({ id: 'KS-020-UC', number: 20, name_fr: 'INO YAMANAKA', chakra: 3 });
     const enemy = mockCard({ id: 'KS-046-C', number: 46, name_fr: 'EBISU', chakra: 2, power: 1 });
     const ino = mockChar({ instanceId: 'ino-1', card: inoCard });

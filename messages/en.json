@@ -677,8 +677,6 @@
         "discard": "{card} ({id}): Discarded {target}.",
         "takeControl": "{card} ({id}): Took control of {target}.",
         "takeControlNoRepDiscard": "{card} ({id}): Took control of {target} but the same name was already on this side, {target} discarded (No Repetition).",
-        "controlCascade": "{card} follows its controller and switches sides.",
-        "controlCascadeDiscard": "{card} was following its controller but the same name was already on this side, {card} discarded (No Repetition).",
         "returnToHand": "{card} ({id}): Returned {target} to hand.",
         "lookAtHidden": "{card} ({id}): Looked at hidden {target}.",
         "removeTokens": "{card} ({id}): Removed up to {amount} Power tokens from {target}.",

@@ -37,7 +37,11 @@ describe('Reveal No Repetition (2026-05-14, post-Marcello clarification): reveal
       { controlledBy: 'player1', originalOwner: 'player1', missionIndex: 0, isHidden: true, wasRevealedAtLeastOnce: false },
       { id: 'KS-010-C', name_fr: 'Naruto', chakra: 4 },
     );
-    state.activeMissions[0].player1Characters = [stolenFaceUp, ownHidden];
+    const ino = mockCharInPlay(
+      { instanceId: 'inst-ino', controlledBy: 'player1', originalOwner: 'player1', missionIndex: 0, isHidden: false },
+      { id: 'KS-020-UC', name_fr: 'Ino Yamanaka', chakra: 3 },
+    );
+    state.activeMissions[0].player1Characters = [ino, stolenFaceUp, ownHidden];
 
     const newState = GameEngine.applyAction(state, 'player1', {
       type: 'REVEAL_CHARACTER',
@@ -165,7 +169,11 @@ describe('Reveal No Repetition (2026-05-14, post-Marcello clarification): reveal
       { controlledBy: 'player1', originalOwner: 'player1', missionIndex: 0, isHidden: true, wasRevealedAtLeastOnce: false },
       { id: 'KS-136-S', name_fr: 'Sasuke', chakra: 6 },
     );
-    state.activeMissions[0].player1Characters = [stolenFaceUp, ownHidden];
+    const ino = mockCharInPlay(
+      { instanceId: 'inst-ino', controlledBy: 'player1', originalOwner: 'player1', missionIndex: 0, isHidden: false },
+      { id: 'KS-020-UC', name_fr: 'Ino Yamanaka', chakra: 3 },
+    );
+    state.activeMissions[0].player1Characters = [ino, stolenFaceUp, ownHidden];
 
     const newState = GameEngine.applyAction(state, 'player1', {
       type: 'REVEAL_CHARACTER',

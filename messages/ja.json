@@ -681,8 +681,6 @@
         "discard": "{card}（{id}）：{target} を捨てました。",
         "takeControl": "{card}（{id}）：{target} のコントロールを奪いました。",
         "takeControlNoRepDiscard": "{card}（{id}）：{target} のコントロールを奪いましたが、この側にすでに同名がいたため {target} を捨てました（同名禁止）。",
-        "controlCascade": "{card} はコントロール元に従って側を移りました。",
-        "controlCascadeDiscard": "{card} はコントロール元に従いましたが、この側にすでに同名がいたため {card} を捨てました（同名禁止）。",
         "returnToHand": "{card}（{id}）：{target} を手札に戻しました。",
         "lookAtHidden": "{card}（{id}）：伏せの {target} を見ました。",
         "removeTokens": "{card}（{id}）：{target} からパワートークンを {amount} 個まで取り除きました。",

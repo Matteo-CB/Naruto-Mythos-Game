@@ -1,6 +1,48 @@
 {
   "entries": [
     {
+      "date": "2026-08-13",
+      "title_fr": "Cartes contrôlées",
+      "title_en": "Controlled cards",
+      "title_es": "Cartas controladas",
+      "title_ja": "コントロールされたカード",
+      "title_pt": "Cartas controladas",
+      "title_it": "Carte controllate",
+      "title_pl": "Kontrolowane karty",
+      "categories": [
+        "fix",
+        "fix"
+      ],
+      "changes_fr": [
+        "Un personnage volé rend ce qu'il contrôlait : voler le voleur ne vous donne plus sa prise.",
+        "Une carte prise revient toujours à son propriétaire quand celui qui la contrôlait quitte le terrain."
+      ],
+      "changes_en": [
+        "A stolen character releases what it controlled: stealing the thief no longer hands you their prize.",
+        "A taken card always returns to its owner when the character controlling it leaves the board."
+      ],
+      "changes_es": [
+        "Un personaje robado suelta lo que controlaba: robar al ladrón ya no te entrega su botín.",
+        "Una carta tomada siempre vuelve a su dueño cuando el personaje que la controlaba abandona el tablero."
+      ],
+      "changes_ja": [
+        "奪われたキャラクターは、コントロールしていたカードを手放します。奪い返しても、その獲物までは手に入りません。",
+        "コントロールしていたキャラクターが場を離れると、奪われたカードは必ず持ち主のもとへ戻ります。"
+      ],
+      "changes_pt": [
+        "Um personagem roubado solta o que controlava: roubar o ladrão já não lhe entrega o espólio.",
+        "Uma carta tomada volta sempre ao dono quando o personagem que a controlava deixa o tabuleiro."
+      ],
+      "changes_it": [
+        "Un personaggio rubato lascia ciò che controllava: rubare il ladro non ti consegna più il suo bottino.",
+        "Una carta presa torna sempre al proprietario quando il personaggio che la controllava lascia il campo."
+      ],
+      "changes_pl": [
+        "Skradziona postać oddaje to, co kontrolowała: kradzież złodzieja nie daje ci już jego łupu.",
+        "Zabrana karta zawsze wraca do właściciela, gdy postać, która ją kontrolowała, opuszcza planszę."
+      ]
+    },
+    {
       "date": "2026-08-12",
       "title_fr": "Deux cartes Shinobi V",
       "title_en": "Two Shinobi V cards",
@@ -11,51 +53,35 @@
       "title_pl": "Dwie karty Shinobi V",
       "categories": [
         "feature",
-        "fix",
-        "feature",
-        "feature"
+        "fix"
       ],
       "changes_fr": [
-        "Nouvelles cartes : 030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 125, 127, 130, 139.",
-        "Sakura Haruno 7 ne consomme plus votre tour quand son effet se déclenche au début de la manche.",
-        "Ino Yamanaka Examen Chûnin 124 est une carte inédite, en duel avec Sakura Haruno.",
-        "En duel, Ino prend le contrôle d'un ennemi moins puissant que Sakura, et en évolution elle déplace un personnage contrôlé."
+        "Nouvelles cartes : 030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 124, 125, 127, 130, 139.",
+        "Sakura Haruno 7 ne consomme plus votre tour quand son effet se déclenche au début de la manche."
       ],
       "changes_en": [
-        "New cards: 030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 125, 127, 130, 139.",
-        "Sakura Haruno 7 no longer uses up your turn when her effect triggers at the start of the round.",
-        "Ino Yamanaka Chunin Exams 124 is a brand new card, duelling with Sakura Haruno.",
-        "In a duel Ino takes control of an enemy weaker than Sakura, and as an upgrade she moves a controlled character away."
+        "New cards: 030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 124, 125, 127, 130, 139.",
+        "Sakura Haruno 7 no longer uses up your turn when her effect triggers at the start of the round."
       ],
       "changes_es": [
-        "Cartas nuevas: 030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 125, 127, 130, 139.",
-        "Sakura Haruno 7 ya no consume tu turno cuando su efecto se activa al inicio de la ronda.",
-        "Ino Yamanaka Exámenes Chunin 124 es una carta nueva, en duelo con Sakura Haruno.",
-        "En duelo Ino toma el control de un enemigo más débil que Sakura, y al evolucionar mueve un personaje controlado."
+        "Cartas nuevas: 030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 124, 125, 127, 130, 139.",
+        "Sakura Haruno 7 ya no consume tu turno cuando su efecto se activa al inicio de la ronda."
       ],
       "changes_ja": [
-        "新カード：030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 125, 127, 130, 139.",
-        "春野サクラ7の効果がラウンド開始時に発動しても、あなたのターンを消費しなくなりました。",
-        "山中いの「中忍試験」124 は新カードで、春野サクラとデュエルします。",
-        "デュエルではサクラより弱い敵のコントロールを得、進化時にはコントロール中のキャラクターを移動させます。"
+        "新カード：030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 124, 125, 127, 130, 139.",
+        "春野サクラ7の効果がラウンド開始時に発動しても、あなたのターンを消費しなくなりました。"
       ],
       "changes_pt": [
-        "Cartas novas: 030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 125, 127, 130, 139.",
-        "Sakura Haruno 7 já não consome o teu turno quando o efeito dela é ativado no início da ronda.",
-        "Ino Yamanaka Exames Chunin 124 é uma carta inédita, em duelo com Sakura Haruno.",
-        "Em duelo Ino toma o controlo de um inimigo mais fraco que Sakura, e ao evoluir move um personagem controlado."
+        "Cartas novas: 030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 124, 125, 127, 130, 139.",
+        "Sakura Haruno 7 já não consome o teu turno quando o efeito dela é ativado no início da ronda."
       ],
       "changes_it": [
-        "Carte nuove: 030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 125, 127, 130, 139.",
-        "Sakura Haruno 7 non consuma più il tuo turno quando il suo effetto si attiva all'inizio del round.",
-        "Ino Yamanaka Esami Chunin 124 è una carta inedita, in duello con Sakura Haruno.",
-        "In duello Ino prende il controllo di un nemico più debole di Sakura, e in evoluzione sposta un personaggio controllato."
+        "Carte nuove: 030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 124, 125, 127, 130, 139.",
+        "Sakura Haruno 7 non consuma più il tuo turno quando il suo effetto si attiva all'inizio del round."
       ],
       "changes_pl": [
-        "Nowe karty: 030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 125, 127, 130, 139.",
-        "Sakura Haruno 7 nie zużywa już twojej tury, gdy jej efekt uruchamia się na początku rundy.",
-        "Ino Yamanaka Egzamin na Chūnina 124 to zupełnie nowa karta, pojedynkująca się z Sakurą Haruno.",
-        "W pojedynku Ino przejmuje kontrolę nad słabszym wrogiem, a przy ulepszeniu przenosi kontrolowaną postać."
+        "Nowe karty: 030, 031, 032, 034, 035, 036, 037, 039, 040, 041, 042, 043, 044, 045, 077, 093, 101, 123, 124, 125, 127, 130, 139.",
+        "Sakura Haruno 7 nie zużywa już twojej tury, gdy jej efekt uruchamia się na początku rundy."
       ]
     },
     {

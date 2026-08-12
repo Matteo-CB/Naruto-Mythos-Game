@@ -2779,8 +2779,6 @@
         "discard": "{card} ({id}): Ha scartato {target}.",
         "takeControl": "{card} ({id}): Ha preso il controllo di {target}.",
         "takeControlNoRepDiscard": "{card} ({id}): Ha preso il controllo di {target} ma lo stesso nome era già su questo lato, {target} scartato (Nessuna Ripetizione).",
-        "controlCascade": "{card} segue il suo controllore e cambia lato.",
-        "controlCascadeDiscard": "{card} stava seguendo il suo controllore ma lo stesso nome era già su questo lato, {card} scartato (Nessuna Ripetizione).",
         "returnToHand": "{card} ({id}): Ha rimesso {target} in mano.",
         "lookAtHidden": "{card} ({id}): Ha guardato il nascosto {target}.",
         "removeTokens": "{card} ({id}): Ha rimosso fino a {amount} token Potenza da {target}.",

@@ -2779,8 +2779,6 @@
         "discard": "{card} ({id}): Descartou {target}.",
         "takeControl": "{card} ({id}): Assumiu o controle de {target}.",
         "takeControlNoRepDiscard": "{card} ({id}): Assumiu o controle de {target}, mas o mesmo nome já estava deste lado, {target} descartado (Sem Repetição).",
-        "controlCascade": "{card} segue seu controlador e troca de lado.",
-        "controlCascadeDiscard": "{card} estava seguindo seu controlador, mas o mesmo nome já estava deste lado, {card} descartado (Sem Repetição).",
         "returnToHand": "{card} ({id}): Devolveu {target} à mão.",
         "lookAtHidden": "{card} ({id}): Olhou o oculto {target}.",
         "removeTokens": "{card} ({id}): Removeu até {amount} fichas de Poder de {target}.",
