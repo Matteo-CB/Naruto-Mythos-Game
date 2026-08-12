@@ -326,4 +326,69 @@ export const effectDescriptionsPt: Record<string, string[]> = {
     "[↯] Procure no seu baralho até 2 personagens Cão Ninja, revele-os e compre-os, depois embaralhe seu baralho. Jogue qualquer número de personagens Cão Ninja em qualquer lugar, pagando 1 a menos.",
     "[↯] Zabuza Momochi: Repita o efeito MAIN.",
   ],
+  "SS-030-C": [
+    "[↯] Olhe a carta do topo do seu deck, depois coloque-a em qualquer lugar como personagem oculto.",
+  ],
+  "SS-031-UC": [
+    "[↯] Descarta até uma de cada personagem para: Jirobo: POWERUP 3. Tayuya: Ganha 2 Chakra. Kidomaru: Move uma personagem aliada. Sakon: Compra 2 cartas.",
+  ],
+  "SS-032-C": [
+    "[⧗] Este personagem custa 1 a menos para cada personagem aliado do Quarteto do Som nesta missão.",
+    "[↯] POWERUP 2.",
+  ],
+  "SS-034-C": [
+    "[⧗] Este personagem custa 1 a menos para cada personagem aliado do Quarteto do Som nesta missão.",
+    "[↯] Mova um personagem aliado em jogo.",
+  ],
+  "SS-035-UC": [
+    "[↯] Para cada personagem aliado do Quarteto do Som nesta missão, mova um personagem em jogo com custo igual ou menor ao custo desse personagem do Quarteto do Som.",
+  ],
+  "SS-036-C": [
+    "[⧗] Este personagem custa 1 a menos para cada personagem aliado do Quarteto do Som nesta missão.",
+    "[↯] Compre uma carta.",
+  ],
+  "SS-037-UC": [
+    "[↯] Revele qualquer número de personagens do Quarteto do Som da sua mão. Derrote um personagem inimigo com custo menor que o número de cartas reveladas.",
+  ],
+  "SS-040-UC": [
+    "[↯] Jogue um ou mais personagens de Invocação nesta missão e em cada missão com uma Tayuya aliada, pagando X a menos. X é o número de personagens aliados do Quarteto do Som naquela missão.",
+  ],
+  "SS-042-UC": [
+    "[↯] Se você tiver um personagem aliado do Time Dosu nesta missão, derrote um personagem com custo 3 ou menos.",
+  ],
+  "SS-043-UC": [
+    "[↯] Se você tiver alguma carta na sua pilha de descarte, jogue este personagem pagando 1 a menos.",
+  ],
+  "SS-044-UC": [
+    "[↯] O oponente deve descartar 1 carta aleatoriamente.",
+  ],
+  "SS-045-C": [
+    "[↯] Devolva um personagem aliado oculto em jogo para a sua mão e coloque uma carta como personagem oculto nessa mesma missão.",
+  ],
+  "SS-077-UC": [
+    "[⧗] Quando você passar, pode derrotar este personagem para derrotar personagens inimigos não-ocultos em jogo com custo total de 5 ou menos.",
+    "Gaara, efeito MAIN: Em vez disso, o limite de custo é 7.",
+  ],
+  "SS-093-C": [
+    "Anexe a um personagem aliado não-oculto. Este personagem também é considerado um personagem da Vila do Som.",
+  ],
+  "SS-101-UC": [
+    "Anexe a um personagem aliado da Vila do Som.",
+    "[↯] Derrote todos os personagens não-ocultos mais fracos nesta missão.",
+  ],
+  "SS-125-R": [
+    "[↯] Choji Akimichi: Derrote um personagem inimigo que se moveu no turno anterior do oponente.",
+    "[↯] Mova um personagem aliado oculto em jogo.",
+  ],
+  "SS-127-R": [
+    "[↯] Assuma o controle de um personagem inimigo não-oculto nesta missão, pagando Chakra igual ao Poder dele.",
+    "Sasuke Uchiha: O efeito AMBUSH se torna um efeito MAIN.",
+  ],
+  "SS-130-R": [
+    "[↯] Oculte um personagem inimigo da Vila da Folha nesta missão.",
+    "Hiruzen Sarutobi, efeito FIRST STRIKE: Em vez disso, derrote-o.",
+  ],
+  "SS-139-R": [
+    "[⧗] Quando você jogar um personagem da Vila do Som, deve comprar uma carta e depois descartar uma carta, se possível.",
+  ],
 };

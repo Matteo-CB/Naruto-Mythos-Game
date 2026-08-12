@@ -202,7 +202,7 @@ export const effectDescriptionsEs: Record<string, string[]> = {
     "[⧗] Si hay un personaje aliado Naruto Uzumaki o del Equipo 8 en esta misión, CHAKRA +1.",
   ],
   "SS-033-UC": [
-    "[↯] POWERUP 2 por cada personaje aliado del Cuarteto del Sonido en esta misión.",
+    "[↯] POWERUP 2 por cada personaje aliado de los Cuatro del Sonido en esta misión.",
   ],
   "SS-053-C": [
     "[↯] FIRST STRIKE Debes ocultar a un personaje no oculto en esta misión con coste 2 o menos.",
@@ -329,5 +329,70 @@ export const effectDescriptionsEs: Record<string, string[]> = {
   "SS-149-SPV": [
     "[↯] Busca hasta 2 personajes Perro Ninja en tu mazo, revélalos y róbalos, luego baraja tu mazo. Juega cualquier número de personajes Perro Ninja en cualquier sitio, pagando 1 menos.",
     "[↯] Zabuza Momochi: Repite el efecto MAIN.",
+  ],
+  "SS-030-C": [
+    "[↯] Mira la carta superior de tu mazo y luego ponla como personaje oculto en cualquier misión.",
+  ],
+  "SS-031-UC": [
+    "[↯] Descarta hasta uno de cada personaje para: Jirobo: POWERUP 3. Tayuya: Gana 2 Chakra. Kidomaru: Mueve un personaje aliado. Sakon: Roba 2 cartas.",
+  ],
+  "SS-032-C": [
+    "[⧗] Este personaje cuesta 1 menos por cada personaje aliado de los Cuatro del Sonido en esta misión.",
+    "[↯] POWERUP 2.",
+  ],
+  "SS-034-C": [
+    "[⧗] Este personaje cuesta 1 menos por cada personaje aliado de los Cuatro del Sonido en esta misión.",
+    "[↯] Mueve un personaje aliado en juego.",
+  ],
+  "SS-035-UC": [
+    "[↯] Por cada personaje aliado de los Cuatro del Sonido en esta misión, mueve un personaje en juego con coste igual o inferior al de ese personaje de los Cuatro del Sonido.",
+  ],
+  "SS-036-C": [
+    "[⧗] Este personaje cuesta 1 menos por cada personaje aliado de los Cuatro del Sonido en esta misión.",
+    "[↯] Roba una carta.",
+  ],
+  "SS-037-UC": [
+    "[↯] Revela de tu mano cualquier número de personajes de los Cuatro del Sonido. Derrota a un personaje enemigo con coste inferior al número de cartas reveladas.",
+  ],
+  "SS-040-UC": [
+    "[↯] Juega uno o más personajes de Invocación en esta misión y en cada misión con una Tayuya aliada, pagando X menos. X es el número de personajes aliados de los Cuatro del Sonido en esa misión.",
+  ],
+  "SS-042-UC": [
+    "[↯] Si tienes un personaje aliado del Equipo Dosu en esta misión, derrota a un personaje con coste 3 o menos.",
+  ],
+  "SS-043-UC": [
+    "[↯] Si tienes alguna carta en tu pila de descartes, juega este personaje pagando 1 menos.",
+  ],
+  "SS-044-UC": [
+    "[↯] El oponente debe descartar 1 carta al azar.",
+  ],
+  "SS-045-C": [
+    "[↯] Devuelve a tu mano un personaje aliado oculto en juego y pon una carta como personaje oculto en esa misma misión.",
+  ],
+  "SS-077-UC": [
+    "[⧗] Cuando pases, puedes derrotar a este personaje para derrotar personajes enemigos no ocultos en juego con un coste total de 5 o menos.",
+    "Gaara, efecto MAIN: En su lugar, el límite de coste es 7.",
+  ],
+  "SS-093-C": [
+    "Une a un personaje aliado no oculto. Este personaje también se considera un personaje de la Aldea del Sonido.",
+  ],
+  "SS-101-UC": [
+    "Une a un personaje aliado de la Aldea del Sonido.",
+    "[↯] Derrota a todos los personajes no ocultos más débiles en esta misión.",
+  ],
+  "SS-125-R": [
+    "[↯] Choji Akimichi: Derrota a un personaje enemigo que se haya movido en el turno anterior del oponente.",
+    "[↯] Mueve un personaje aliado oculto en juego.",
+  ],
+  "SS-127-R": [
+    "[↯] Toma el control de un personaje enemigo no oculto en esta misión, pagando Chakra igual a su Poder.",
+    "Sasuke Uchiha: El efecto AMBUSH se convierte en efecto MAIN.",
+  ],
+  "SS-130-R": [
+    "[↯] Oculta a un personaje enemigo de la Aldea de la Hoja en esta misión.",
+    "Hiruzen Sarutobi, efecto FIRST STRIKE: En su lugar, derrótalo.",
+  ],
+  "SS-139-R": [
+    "[⧗] Cuando juegues un personaje de la Aldea del Sonido, debes robar una carta y luego descartar una carta, si puedes.",
   ],
 };

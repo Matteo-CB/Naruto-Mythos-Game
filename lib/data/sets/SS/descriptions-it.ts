@@ -326,4 +326,69 @@ export const effectDescriptionsIt: Record<string, string[]> = {
     "[↯] Cerca nel tuo mazzo fino a 2 personaggi Cane Ninja, rivelali e pescali, poi mischia il tuo mazzo. Gioca un numero qualsiasi di personaggi Cane Ninja ovunque, pagando 1 in meno.",
     "[↯] Zabuza Momochi: Ripeti l'effetto MAIN.",
   ],
+  "SS-030-C": [
+    "[↯] Guarda la carta in cima al tuo mazzo, poi mettila ovunque come personaggio nascosto.",
+  ],
+  "SS-031-UC": [
+    "[↯] Scarta fino a uno di ciascun personaggio per: Jirobo: POWERUP 3. Tayuya: Guadagna 2 Chakra. Kidomaru: Sposta un personaggio alleato. Sakon: Pesca 2 carte.",
+  ],
+  "SS-032-C": [
+    "[⧗] Questo personaggio costa 1 in meno per ogni personaggio alleato del Quartetto del Suono in questa missione.",
+    "[↯] POWERUP 2.",
+  ],
+  "SS-034-C": [
+    "[⧗] Questo personaggio costa 1 in meno per ogni personaggio alleato del Quartetto del Suono in questa missione.",
+    "[↯] Sposta un personaggio alleato in gioco.",
+  ],
+  "SS-035-UC": [
+    "[↯] Per ogni personaggio alleato del Quartetto del Suono in questa missione, sposta un personaggio in gioco con costo pari o inferiore a quello di quel personaggio del Quartetto del Suono.",
+  ],
+  "SS-036-C": [
+    "[⧗] Questo personaggio costa 1 in meno per ogni personaggio alleato del Quartetto del Suono in questa missione.",
+    "[↯] Pesca una carta.",
+  ],
+  "SS-037-UC": [
+    "[↯] Rivela un numero qualsiasi di personaggi del Quartetto del Suono dalla tua mano. Sconfiggi un personaggio nemico con costo inferiore al numero di carte rivelate.",
+  ],
+  "SS-040-UC": [
+    "[↯] Gioca uno o più personaggi Evocazione in questa missione e in ogni missione con una Tayuya alleata, pagando X in meno. X è il numero di personaggi alleati del Quartetto del Suono in quella missione.",
+  ],
+  "SS-042-UC": [
+    "[↯] Se hai un personaggio alleato della Squadra Dosu in questa missione, sconfiggi un personaggio con costo 3 o inferiore.",
+  ],
+  "SS-043-UC": [
+    "[↯] Se hai almeno una carta nella tua pila degli scarti, gioca questo personaggio pagando 1 in meno.",
+  ],
+  "SS-044-UC": [
+    "[↯] L'avversario deve scartare 1 carta a caso.",
+  ],
+  "SS-045-C": [
+    "[↯] Riporta in mano un personaggio alleato nascosto in gioco e metti una carta come personaggio nascosto in quella stessa missione.",
+  ],
+  "SS-077-UC": [
+    "[⧗] Quando passi, puoi sconfiggere questo personaggio per sconfiggere personaggi nemici non nascosti in gioco con un costo totale di 5 o inferiore.",
+    "Gaara, effetto MAIN: Invece, il limite di costo è 7.",
+  ],
+  "SS-093-C": [
+    "Collega a un personaggio alleato non nascosto. Questo personaggio è considerato anche un personaggio del Villaggio del Suono.",
+  ],
+  "SS-101-UC": [
+    "Collega a un personaggio alleato del Villaggio del Suono.",
+    "[↯] Sconfiggi tutti i personaggi non nascosti più deboli in questa missione.",
+  ],
+  "SS-125-R": [
+    "[↯] Choji Akimichi: Sconfiggi un personaggio nemico che si è spostato durante il turno precedente dell'avversario.",
+    "[↯] Sposta un personaggio alleato nascosto in gioco.",
+  ],
+  "SS-127-R": [
+    "[↯] Prendi il controllo di un personaggio nemico non nascosto in questa missione, pagando Chakra pari alla sua Potenza.",
+    "Sasuke Uchiha: L'effetto AMBUSH diventa un effetto MAIN.",
+  ],
+  "SS-130-R": [
+    "[↯] Nascondi un personaggio nemico del Villaggio della Foglia in questa missione.",
+    "Hiruzen Sarutobi, effetto FIRST STRIKE: Invece, sconfiggilo.",
+  ],
+  "SS-139-R": [
+    "[⧗] Quando giochi un personaggio del Villaggio del Suono, devi pescare una carta e poi scartarne una, se possibile.",
+  ],
 };

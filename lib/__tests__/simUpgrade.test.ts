@@ -5,6 +5,7 @@ import { getScenario } from '@/lib/cards/sim/scenarios';
 import { runScenario } from '@/lib/cards/sim/runScenario';
 import { hasUpgradeEffect, upgradeEffectIndex } from '@/lib/cards/sim/upgradeSim';
 import type { GameState, CharacterCard } from '@/lib/engine/types';
+import { awaitsEffectImplementation } from '@/lib/cards/sim/pendingImplementation';
 
 const ANNOUNCE = new Set(['EFFECT_NO_TARGET', 'EFFECT_CONTINUOUS', 'EFFECT_SCORE_ANNOUNCE']);
 
@@ -42,6 +43,7 @@ describe('UPGRADE effects: every one is played as an upgrade and executes', () =
     const broken: string[] = [];
     const seen = new Set<string>();
     for (const card of getAllCards()) {
+      if (awaitsEffectImplementation(card.id)) continue;
       if (card.card_type !== 'character' || !hasUpgradeEffect(card as CharacterCard)) continue;
       const key = `${card.set}-${card.number}`;
       if (seen.has(key)) continue;

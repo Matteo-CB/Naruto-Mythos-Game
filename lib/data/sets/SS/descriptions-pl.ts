@@ -326,4 +326,69 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "[↯] Przeszukaj talię w poszukiwaniu do 2 postaci Psa Ninja, odkryj je i dobierz, potem przetasuj talię. Zagraj dowolną liczbę postaci Psa Ninja gdziekolwiek, płacąc o 1 mniej.",
     "[↯] Zabuza Momochi: Powtórz efekt MAIN.",
   ],
+  "SS-030-C": [
+    "[↯] Zajrzyj do wierzchniej karty swojej talii, a następnie połóż ją gdziekolwiek jako ukrytą postać.",
+  ],
+  "SS-031-UC": [
+    "[↯] Odrzuć maksymalnie po jednej z tych postaci, aby: Jirobo: POWERUP 3. Tayuya: Zyskaj 2 Czakry. Kidomaru: Przenieś sojuszniczą postać. Sakon: Dobierz 2 karty.",
+  ],
+  "SS-032-C": [
+    "[⧗] Ta postać kosztuje o 1 mniej za każdą sojuszniczą postać z Czwórki Dźwięku na tej misji.",
+    "[↯] POWERUP 2.",
+  ],
+  "SS-034-C": [
+    "[⧗] Ta postać kosztuje o 1 mniej za każdą sojuszniczą postać z Czwórki Dźwięku na tej misji.",
+    "[↯] Przenieś sojuszniczą postać w grze.",
+  ],
+  "SS-035-UC": [
+    "[↯] Za każdą sojuszniczą postać z Czwórki Dźwięku na tej misji przenieś postać w grze o koszcie równym lub niższym od kosztu tej postaci z Czwórki Dźwięku.",
+  ],
+  "SS-036-C": [
+    "[⧗] Ta postać kosztuje o 1 mniej za każdą sojuszniczą postać z Czwórki Dźwięku na tej misji.",
+    "[↯] Dobierz kartę.",
+  ],
+  "SS-037-UC": [
+    "[↯] Odkryj dowolną liczbę postaci z Czwórki Dźwięku ze swojej ręki. Pokonaj wrogą postać o koszcie niższym niż liczba odkrytych kart.",
+  ],
+  "SS-040-UC": [
+    "[↯] Zagraj jedną lub więcej postaci Przywołania na tej misji oraz na każdej misji z sojuszniczą Tayuyą, płacąc o X mniej. X to liczba sojuszniczych postaci z Czwórki Dźwięku na danej misji.",
+  ],
+  "SS-042-UC": [
+    "[↯] Jeśli masz sojuszniczą postać z Drużyny Dosu na tej misji, pokonaj postać o koszcie 3 lub mniejszym.",
+  ],
+  "SS-043-UC": [
+    "[↯] Jeśli masz jakąkolwiek kartę na swoim stosie odrzuconych, zagraj tę postać, płacąc o 1 mniej.",
+  ],
+  "SS-044-UC": [
+    "[↯] Przeciwnik musi odrzucić 1 losową kartę.",
+  ],
+  "SS-045-C": [
+    "[↯] Zwróć sojuszniczą ukrytą postać w grze do swojej ręki i połóż kartę jako ukrytą postać na tej samej misji.",
+  ],
+  "SS-077-UC": [
+    "[⧗] Gdy spasujesz, możesz pokonać tę postać, aby pokonać nieukryte wrogie postacie w grze o łącznym koszcie 5 lub mniejszym.",
+    "Gaara, efekt MAIN: Zamiast tego limit kosztu to 7.",
+  ],
+  "SS-093-C": [
+    "Dołącz do sojuszniczej nieukrytej postaci. Ta postać jest uznawana również za postać z Wioski Dźwięku.",
+  ],
+  "SS-101-UC": [
+    "Dołącz do sojuszniczej postaci z Wioski Dźwięku.",
+    "[↯] Pokonaj wszystkie najsłabsze nieukryte postacie na tej misji.",
+  ],
+  "SS-125-R": [
+    "[↯] DUEL Choji Akimichi: Pokonaj wrogą postać, która została przeniesiona w poprzedniej turze przeciwnika.",
+    "[↯] Przenieś sojuszniczą ukrytą postać w grze.",
+  ],
+  "SS-127-R": [
+    "[↯] Przejmij kontrolę nad nieukrytą wrogą postacią na tej misji, płacąc Czakrę równą jej Sile.",
+    "Sasuke Uchiha: Efekt AMBUSH staje się efektem MAIN.",
+  ],
+  "SS-130-R": [
+    "[↯] Ukryj wrogą postać Wioski Liścia na tej misji.",
+    "Hiruzen Sarutobi, efekt FIRST STRIKE: Zamiast tego pokonaj ją.",
+  ],
+  "SS-139-R": [
+    "[⧗] Gdy zagrasz postać Wioski Dźwięku, musisz dobrać kartę, a następnie odrzucić kartę, jeśli to możliwe.",
+  ],
 };

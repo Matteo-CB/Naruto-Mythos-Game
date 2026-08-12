@@ -45,7 +45,9 @@
       "Puppet": "Marionetka",
       "Armor": "Zbroja",
       "Food": "Jedzenie",
-      "Location": "Lokacja"
+      "Location": "Lokacja",
+      "Team Dosu": "Drużyna Dosu",
+      "Medical Ninja": "Ninja medyczny"
     },
     "rarity": {
       "C": "Pospolita",

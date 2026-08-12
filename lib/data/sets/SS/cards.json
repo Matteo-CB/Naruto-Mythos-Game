@@ -2232,10 +2232,10 @@
       "id": "SS-033-UC",
       "cardId": "SS-033-UC",
       "rarity": "UC",
-      "number": "33",
+      "number": "033",
       "set": "SS",
       "card_type": "character",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 6,
       "power": 7,
       "keywords": [
@@ -2252,17 +2252,19 @@
       "name_en": "JIROBO",
       "title_en": "Cursemark Second State",
       "name_fr": "JIRÔBÔ",
-      "title_fr": "Marque Maudite Second Stade",
-      "name_es": "JIROBO",
-      "title_es": "Sello Maldito Segundo Estado",
+      "title_fr": "Sceau Maudit, second stade",
+      "name_es": "JIRÔBÔ",
+      "title_es": "Sello Maldito, segundo estado",
       "name_ja": "次郎坊",
-      "title_ja": "呪印第二段階",
-      "name_pt": "JIROBO",
-      "title_pt": "Marca Amaldiçoada Segundo Estágio",
-      "name_it": "JIROBO",
-      "title_it": "Marchio Maledetto Secondo Stadio",
-      "name_pl": "JIROBO",
-      "title_pl": "Przeklęta Pieczęć Drugi Stopień"
+      "title_ja": "呪印 第二段階",
+      "name_pt": "JIRÔBÔ",
+      "title_pt": "Selo Amaldiçoado, segundo estado",
+      "name_it": "JIRÔBÔ",
+      "title_it": "Sigillo Maledetto, secondo stadio",
+      "name_pl": "JIRÔBÔ",
+      "title_pl": "Przeklęta Pieczęć, drugi stan",
+      "image_file": "images/cards/SS/uncommon/SS-033-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-033-UC.webp"
     },
     "SS-053-C": {
       "id": "SS-053-C",
@@ -3592,6 +3594,764 @@
       "title_pt": "Exames Chunin",
       "title_it": "Esami Chunin",
       "title_pl": "Egzamin na Chūnina"
+    },
+    "SS-030-C": {
+      "id": "SS-030-C",
+      "cardId": "SS-030-C",
+      "rarity": "C",
+      "number": "030",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KABUTO YAKUSHI",
+      "name_fr": "KABUTO YAKUSHI",
+      "name_es": "KABUTO YAKUSHI",
+      "name_ja": "薬師カブト",
+      "name_pt": "KABUTO YAKUSHI",
+      "name_it": "KABUTO YAKUSHI",
+      "name_pl": "KABUTO YAKUSHI",
+      "title_en": "Laying the Trap",
+      "title_fr": "Poser le piège",
+      "title_es": "Tendiendo la trampa",
+      "title_ja": "罠を仕掛ける",
+      "title_pt": "A armar a armadilha",
+      "title_it": "Preparare la trappola",
+      "title_pl": "Zastawianie pułapki",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-030-C.webp",
+      "image_url": "/images/cards/SS/common/SS-030-C.webp",
+      "chakra": 3,
+      "power": 2,
+      "keywords": [
+        "Medical Ninja"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "FIRST_STRIKE",
+          "description": "[↯] Look at the top card of your deck, then put it anywhere as a hidden character."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-031-UC": {
+      "id": "SS-031-UC",
+      "cardId": "SS-031-UC",
+      "rarity": "UC",
+      "number": "031",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KIMIMARO",
+      "name_fr": "KIMIMARO",
+      "name_es": "KIMIMARO",
+      "name_ja": "君麻呂",
+      "name_pt": "KIMIMARO",
+      "name_it": "KIMIMARO",
+      "name_pl": "KIMIMARO",
+      "title_en": "Leader of the Sound Five",
+      "title_fr": "Chef des Cinq du Son",
+      "title_es": "Líder de los Cinco del Sonido",
+      "title_ja": "音の五人衆の長",
+      "title_pt": "Líder dos Cinco do Som",
+      "title_it": "Capo dei Cinque del Suono",
+      "title_pl": "Przywódca Piątki Dźwięku",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-031-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-031-UC.webp",
+      "chakra": 5,
+      "power": 5,
+      "keywords": [],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Discard up to one of each character to: Jirobo: Powerup 3. Tayuya: Gain 2 Chakra. Kidomaru: Move a friendly character. Sakon: Draw 2 cards."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-032-C": {
+      "id": "SS-032-C",
+      "cardId": "SS-032-C",
+      "rarity": "C",
+      "number": "032",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "JIROBO",
+      "name_fr": "JIRÔBÔ",
+      "name_es": "JIRÔBÔ",
+      "name_ja": "次郎坊",
+      "name_pt": "JIRÔBÔ",
+      "name_it": "JIRÔBÔ",
+      "name_pl": "JIRÔBÔ",
+      "title_en": "South Gate of Sound Four",
+      "title_fr": "Porte Sud des Quatre du Son",
+      "title_es": "Puerta Sur de los Cuatro del Sonido",
+      "title_ja": "音の四人衆 南門",
+      "title_pt": "Portão Sul dos Quatro do Som",
+      "title_it": "Porta Sud dei Quattro del Suono",
+      "title_pl": "Południowa Brama Czwórki Dźwięku",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-032-C.webp",
+      "image_url": "/images/cards/SS/common/SS-032-C.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Sound Four"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character costs 1 less for every friendly Sound Four character in this mission."
+        },
+        {
+          "type": "FIRST_STRIKE",
+          "description": "[↯] POWERUP 2."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-034-C": {
+      "id": "SS-034-C",
+      "cardId": "SS-034-C",
+      "rarity": "C",
+      "number": "034",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KIDOMARU",
+      "name_fr": "KIDÔMARU",
+      "name_es": "KIDÔMARU",
+      "name_ja": "鬼童丸",
+      "name_pt": "KIDÔMARU",
+      "name_it": "KIDÔMARU",
+      "name_pl": "KIDÔMARU",
+      "title_en": "East Gate of Sound Four",
+      "title_fr": "Porte Est des Quatre du Son",
+      "title_es": "Puerta Este de los Cuatro del Sonido",
+      "title_ja": "音の四人衆 東門",
+      "title_pt": "Portão Leste dos Quatro do Som",
+      "title_it": "Porta Est dei Quattro del Suono",
+      "title_pl": "Wschodnia Brama Czwórki Dźwięku",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-034-C.webp",
+      "image_url": "/images/cards/SS/common/SS-034-C.webp",
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Sound Four"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character costs 1 less for every friendly Sound Four character in this mission."
+        },
+        {
+          "type": "FIRST_STRIKE",
+          "description": "[↯] Move a friendly character in play."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-035-UC": {
+      "id": "SS-035-UC",
+      "cardId": "SS-035-UC",
+      "rarity": "UC",
+      "number": "035",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KIDOMARU",
+      "name_fr": "KIDÔMARU",
+      "name_es": "KIDÔMARU",
+      "name_ja": "鬼童丸",
+      "name_pt": "KIDÔMARU",
+      "name_it": "KIDÔMARU",
+      "name_pl": "KIDÔMARU",
+      "title_en": "Cursemark Second State",
+      "title_fr": "Sceau Maudit, second stade",
+      "title_es": "Sello Maldito, segundo estado",
+      "title_ja": "呪印 第二段階",
+      "title_pt": "Selo Amaldiçoado, segundo estado",
+      "title_it": "Sigillo Maledetto, secondo stadio",
+      "title_pl": "Przeklęta Pieczęć, drugi stan",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-035-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-035-UC.webp",
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Sound Four"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] For every friendly Sound Four character in this mission, move a character in play with cost equal to or less than that friendly Sound Four character's cost."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-036-C": {
+      "id": "SS-036-C",
+      "cardId": "SS-036-C",
+      "rarity": "C",
+      "number": "036",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SAKON",
+      "name_fr": "SAKON",
+      "name_es": "SAKON",
+      "name_ja": "左近",
+      "name_pt": "SAKON",
+      "name_it": "SAKON",
+      "name_pl": "SAKON",
+      "title_en": "West Gate of Sound Four",
+      "title_fr": "Porte Ouest des Quatre du Son",
+      "title_es": "Puerta Oeste de los Cuatro del Sonido",
+      "title_ja": "音の四人衆 西門",
+      "title_pt": "Portão Oeste dos Quatro do Som",
+      "title_it": "Porta Ovest dei Quattro del Suono",
+      "title_pl": "Zachodnia Brama Czwórki Dźwięku",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-036-C.webp",
+      "image_url": "/images/cards/SS/common/SS-036-C.webp",
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Sound Four"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character costs 1 less for every friendly Sound Four character in this mission."
+        },
+        {
+          "type": "FIRST_STRIKE",
+          "description": "[↯] Draw a card."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-037-UC": {
+      "id": "SS-037-UC",
+      "cardId": "SS-037-UC",
+      "rarity": "UC",
+      "number": "037",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SAKON",
+      "name_fr": "SAKON",
+      "name_es": "SAKON",
+      "name_ja": "左近",
+      "name_pt": "SAKON",
+      "name_it": "SAKON",
+      "name_pl": "SAKON",
+      "title_en": "Cursemark Second State",
+      "title_fr": "Sceau Maudit, second stade",
+      "title_es": "Sello Maldito, segundo estado",
+      "title_ja": "呪印 第二段階",
+      "title_pt": "Selo Amaldiçoado, segundo estado",
+      "title_it": "Sigillo Maledetto, secondo stadio",
+      "title_pl": "Przeklęta Pieczęć, drugi stan",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-037-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-037-UC.webp",
+      "chakra": 6,
+      "power": 5,
+      "keywords": [
+        "Sound Four"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Reveal any number of Sound Four characters from your hand. Defeat an enemy character with cost less than the number of revealed cards."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-040-UC": {
+      "id": "SS-040-UC",
+      "cardId": "SS-040-UC",
+      "rarity": "UC",
+      "number": "040",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TAYUYA",
+      "name_fr": "TAYUYA",
+      "name_es": "TAYUYA",
+      "name_ja": "多由也",
+      "name_pt": "TAYUYA",
+      "name_it": "TAYUYA",
+      "name_pl": "TAYUYA",
+      "title_en": "Cursemark Second State",
+      "title_fr": "Sceau Maudit, second stade",
+      "title_es": "Sello Maldito, segundo estado",
+      "title_ja": "呪印 第二段階",
+      "title_pt": "Selo Amaldiçoado, segundo estado",
+      "title_it": "Sigillo Maledetto, secondo stadio",
+      "title_pl": "Przeklęta Pieczęć, drugi stan",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-040-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-040-UC.webp",
+      "chakra": 6,
+      "power": 5,
+      "keywords": [
+        "Sound Four"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Play one or more Summon characters in this mission and every mission with a friendly Tayuya, paying X less. X is the number of friendly Sound Four characters in that mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-042-UC": {
+      "id": "SS-042-UC",
+      "cardId": "SS-042-UC",
+      "rarity": "UC",
+      "number": "042",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ZAKU ABUMI",
+      "name_fr": "ZAKU ABUMI",
+      "name_es": "ZAKU ABUMI",
+      "name_ja": "ザク・アブミ",
+      "name_pt": "ZAKU ABUMI",
+      "name_it": "ZAKU ABUMI",
+      "name_pl": "ZAKU ABUMI",
+      "title_en": "Malicious Teammate",
+      "title_fr": "Coéquipier malveillant",
+      "title_es": "Compañero malicioso",
+      "title_ja": "悪意ある仲間",
+      "title_pt": "Companheiro malicioso",
+      "title_it": "Compagno malevolo",
+      "title_pl": "Złośliwy towarzysz",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-042-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-042-UC.webp",
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Dosu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] If you have a friendly Team Dosu character in this mission, defeat a character with cost 3 or less."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-043-UC": {
+      "id": "SS-043-UC",
+      "cardId": "SS-043-UC",
+      "rarity": "UC",
+      "number": "043",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KIN TSUCHI",
+      "name_fr": "KIN TSUCHI",
+      "name_es": "KIN TSUCHI",
+      "name_ja": "キン・ツチ",
+      "name_pt": "KIN TSUCHI",
+      "name_it": "KIN TSUCHI",
+      "name_pl": "KIN TSUCHI",
+      "title_en": "Cruel-hearted",
+      "title_fr": "Cœur cruel",
+      "title_es": "De corazón cruel",
+      "title_ja": "残酷な心",
+      "title_pt": "Coração cruel",
+      "title_it": "Cuore crudele",
+      "title_pl": "Okrutne serce",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-043-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-043-UC.webp",
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Team Dosu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] If you have any card in your discard pile, play this character paying 1 less."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-044-UC": {
+      "id": "SS-044-UC",
+      "cardId": "SS-044-UC",
+      "rarity": "UC",
+      "number": "044",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KIN TSUCHI",
+      "name_fr": "KIN TSUCHI",
+      "name_es": "KIN TSUCHI",
+      "name_ja": "キン・ツチ",
+      "name_pt": "KIN TSUCHI",
+      "name_it": "KIN TSUCHI",
+      "name_pl": "KIN TSUCHI",
+      "title_en": "Shadow Senbon",
+      "title_fr": "Senbon de l’ombre",
+      "title_es": "Senbon de sombra",
+      "title_ja": "影千本",
+      "title_pt": "Senbon das sombras",
+      "title_it": "Senbon d’ombra",
+      "title_pl": "Senbon cienia",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-044-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-044-UC.webp",
+      "chakra": 4,
+      "power": 5,
+      "keywords": [
+        "Team Dosu",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] The opponent must discard 1 card at random."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-045-C": {
+      "id": "SS-045-C",
+      "cardId": "SS-045-C",
+      "rarity": "C",
+      "number": "045",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "DOSU KINUTA",
+      "name_fr": "DOSU KINUTA",
+      "name_es": "DOSU KINUTA",
+      "name_ja": "ドス・キヌタ",
+      "name_pt": "DOSU KINUTA",
+      "name_it": "DOSU KINUTA",
+      "name_pl": "DOSU KINUTA",
+      "title_en": "Reading Soundwaves",
+      "title_fr": "Lire les ondes sonores",
+      "title_es": "Leer las ondas sonoras",
+      "title_ja": "音波を読む",
+      "title_pt": "Ler as ondas sonoras",
+      "title_it": "Leggere le onde sonore",
+      "title_pl": "Odczyt fal dźwiękowych",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-045-C.webp",
+      "image_url": "/images/cards/SS/common/SS-045-C.webp",
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Team Dosu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Return a friendly hidden character in play to your hand and put a card as a hidden character in that same mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-077-UC": {
+      "id": "SS-077-UC",
+      "cardId": "SS-077-UC",
+      "rarity": "UC",
+      "number": "077",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KIMIMARO",
+      "name_fr": "KIMIMARO",
+      "name_es": "KIMIMARO",
+      "name_ja": "君麻呂",
+      "name_pt": "KIMIMARO",
+      "name_it": "KIMIMARO",
+      "name_pl": "KIMIMARO",
+      "title_en": "Fight to the Death",
+      "title_fr": "Combat à mort",
+      "title_es": "Lucha a muerte",
+      "title_ja": "死闘",
+      "title_pt": "Luta até à morte",
+      "title_it": "Lotta all’ultimo sangue",
+      "title_pl": "Walka na śmierć",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-077-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-077-UC.webp",
+      "chakra": 7,
+      "power": 9,
+      "keywords": [
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When you pass, you can defeat this character to defeat enemy non-hidden characters in play with a total cost of 5 or less."
+        },
+        {
+          "type": "DUEL",
+          "description": "DUEL Gaara MAIN effect: Instead, the cost limit is 7."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-093-C": {
+      "id": "SS-093-C",
+      "cardId": "SS-093-C",
+      "rarity": "C",
+      "number": "093",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "SOUND VILLAGE HEADBAND",
+      "name_fr": "BANDEAU DU VILLAGE DU SON",
+      "name_es": "BANDANA DE LA ALDEA DEL SONIDO",
+      "name_ja": "音隠れの額当て",
+      "name_pt": "BANDANA DA VILA DO SOM",
+      "name_it": "FASCIA DEL VILLAGGIO DEL SUONO",
+      "name_pl": "OPASKA WIOSKI DŹWIĘKU",
+      "title_en": "",
+      "title_fr": "",
+      "title_es": "",
+      "title_ja": "",
+      "title_pt": "",
+      "title_it": "",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-093-C.webp",
+      "image_url": "/images/cards/SS/attachment/SS-093-C.webp",
+      "chakra": 1,
+      "power": 2,
+      "keywords": [
+        "Armor"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden character. This character is also considered a Sound Village character."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-101-UC": {
+      "id": "SS-101-UC",
+      "cardId": "SS-101-UC",
+      "rarity": "UC",
+      "number": "101",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "SNAKE SWORD",
+      "name_fr": "ÉPÉE SERPENT",
+      "name_es": "ESPADA SERPIENTE",
+      "name_ja": "蛇の剣",
+      "name_pt": "ESPADA SERPENTE",
+      "name_it": "SPADA SERPENTE",
+      "name_pl": "WĘŻOWY MIECZ",
+      "title_en": "",
+      "title_fr": "",
+      "title_es": "",
+      "title_ja": "",
+      "title_pt": "",
+      "title_it": "",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-101-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-101-UC.webp",
+      "chakra": 2,
+      "power": 1,
+      "keywords": [
+        "Weapon"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly Sound Village character."
+        },
+        {
+          "type": "FIRST_STRIKE",
+          "description": "[↯] Defeat all the weakest non-hidden characters in this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-125-R": {
+      "id": "SS-125-R",
+      "cardId": "SS-125-R",
+      "rarity": "R",
+      "number": "125",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "DOSU KINUTA",
+      "name_fr": "DOSU KINUTA",
+      "name_es": "DOSU KINUTA",
+      "name_ja": "ドス・キヌタ",
+      "name_pt": "DOSU KINUTA",
+      "name_it": "DOSU KINUTA",
+      "name_pl": "DOSU KINUTA",
+      "title_en": "\"I'll just win it quickly.\"",
+      "title_fr": "« Je vais gagner vite, c’est tout. »",
+      "title_es": "«Simplemente ganaré rápido.»",
+      "title_ja": "「さっさと勝つだけだ。」",
+      "title_pt": "«Vou apenas ganhar depressa.»",
+      "title_it": "«Vincerò e in fretta.»",
+      "title_pl": "„Po prostu wygram szybko.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-125-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-125-R.webp",
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team Dosu",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Choji Akimichi: Defeat an enemy character that moved in the opponent's previous turn."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Move a friendly hidden character in play."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-127-R": {
+      "id": "SS-127-R",
+      "cardId": "SS-127-R",
+      "rarity": "R",
+      "number": "127",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "OROCHIMARU",
+      "name_fr": "OROCHIMARU",
+      "name_es": "OROCHIMARU",
+      "name_ja": "大蛇丸",
+      "name_pt": "OROCHIMARU",
+      "name_it": "OROCHIMARU",
+      "name_pl": "OROCHIMARU",
+      "title_en": "\"Yes, you'll do nicely.\"",
+      "title_fr": "« Oui, tu feras très bien l’affaire. »",
+      "title_es": "«Sí, tú me servirás.»",
+      "title_ja": "「うむ、お前でいい。」",
+      "title_pt": "«Sim, tu servirás na perfeição.»",
+      "title_it": "«Sì, andrai benissimo.»",
+      "title_pl": "„Tak, ty się nadasz.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-127-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-127-R.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Take control of an enemy non-hidden character in this mission, paying Chakra equal to their Power."
+        },
+        {
+          "type": "DUEL",
+          "description": "DUEL Sasuke Uchiha: The AMBUSH effect becomes a MAIN effect."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-130-R": {
+      "id": "SS-130-R",
+      "cardId": "SS-130-R",
+      "rarity": "R",
+      "number": "130",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "OROCHIMARU",
+      "name_fr": "OROCHIMARU",
+      "name_es": "OROCHIMARU",
+      "name_ja": "大蛇丸",
+      "name_pt": "OROCHIMARU",
+      "name_it": "OROCHIMARU",
+      "name_pl": "OROCHIMARU",
+      "title_en": "\"The Leaf Village will fall.\"",
+      "title_fr": "« Le Village de Konoha tombera. »",
+      "title_es": "«La Aldea de la Hoja caerá.»",
+      "title_ja": "「木ノ葉隠れの里は滅びる。」",
+      "title_pt": "«A Vila da Folha vai cair.»",
+      "title_it": "«Il Villaggio della Foglia cadrà.»",
+      "title_pl": "„Wioska Liścia upadnie.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-130-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-130-R.webp",
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "FIRST_STRIKE",
+          "description": "[↯] Hide an enemy Leaf Village character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "DUEL Hiruzen Sarutobi FIRST STRIKE effect: Instead, defeat them."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-139-R": {
+      "id": "SS-139-R",
+      "cardId": "SS-139-R",
+      "rarity": "R",
+      "number": "139",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KABUTO YAKUSHI",
+      "name_fr": "KABUTO YAKUSHI",
+      "name_es": "KABUTO YAKUSHI",
+      "name_ja": "薬師カブト",
+      "name_pt": "KABUTO YAKUSHI",
+      "name_it": "KABUTO YAKUSHI",
+      "name_pl": "KABUTO YAKUSHI",
+      "title_en": "\"Time's running out.\"",
+      "title_fr": "« Le temps presse. »",
+      "title_es": "«Se acaba el tiempo.»",
+      "title_ja": "「時間がない。」",
+      "title_pt": "«O tempo está a acabar.»",
+      "title_it": "«Il tempo stringe.»",
+      "title_pl": "„Czas się kończy.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-139-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-139-R.webp",
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Medical Ninja"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When you play a Sound Village character, you must draw a card and then discard a card, if able."
+        }
+      ],
+      "data_complete": true
     }
   }
 }

@@ -327,4 +327,69 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "[↯] Search your deck for up to 2 Ninja Hound characters, reveal and draw them, then shuffle your deck. Play any number of Ninja Hound characters anywhere, paying 1 less.",
     "[↯] Zabuza Momochi: Repeat the MAIN effect.",
   ],
+  "SS-030-C": [
+    "[↯] Look at the top card of your deck, then put it anywhere as a hidden character.",
+  ],
+  "SS-031-UC": [
+    "[↯] Discard up to one of each character to: Jirobo: Powerup 3. Tayuya: Gain 2 Chakra. Kidomaru: Move a friendly character. Sakon: Draw 2 cards.",
+  ],
+  "SS-032-C": [
+    "[⧗] This character costs 1 less for every friendly Sound Four character in this mission.",
+    "[↯] POWERUP 2.",
+  ],
+  "SS-034-C": [
+    "[⧗] This character costs 1 less for every friendly Sound Four character in this mission.",
+    "[↯] Move a friendly character in play.",
+  ],
+  "SS-035-UC": [
+    "[↯] For every friendly Sound Four character in this mission, move a character in play with cost equal to or less than that friendly Sound Four character's cost.",
+  ],
+  "SS-036-C": [
+    "[⧗] This character costs 1 less for every friendly Sound Four character in this mission.",
+    "[↯] Draw a card.",
+  ],
+  "SS-037-UC": [
+    "[↯] Reveal any number of Sound Four characters from your hand. Defeat an enemy character with cost less than the number of revealed cards.",
+  ],
+  "SS-040-UC": [
+    "[↯] Play one or more Summon characters in this mission and every mission with a friendly Tayuya, paying X less. X is the number of friendly Sound Four characters in that mission.",
+  ],
+  "SS-042-UC": [
+    "[↯] If you have a friendly Team Dosu character in this mission, defeat a character with cost 3 or less.",
+  ],
+  "SS-043-UC": [
+    "[↯] If you have any card in your discard pile, play this character paying 1 less.",
+  ],
+  "SS-044-UC": [
+    "[↯] The opponent must discard 1 card at random.",
+  ],
+  "SS-045-C": [
+    "[↯] Return a friendly hidden character in play to your hand and put a card as a hidden character in that same mission.",
+  ],
+  "SS-077-UC": [
+    "[⧗] When you pass, you can defeat this character to defeat enemy non-hidden characters in play with a total cost of 5 or less.",
+    "DUEL Gaara MAIN effect: Instead, the cost limit is 7.",
+  ],
+  "SS-093-C": [
+    "Attach to a friendly non-hidden character. This character is also considered a Sound Village character.",
+  ],
+  "SS-101-UC": [
+    "Attach to a friendly Sound Village character.",
+    "[↯] Defeat all the weakest non-hidden characters in this mission.",
+  ],
+  "SS-125-R": [
+    "[↯] DUEL Choji Akimichi: Defeat an enemy character that moved in the opponent's previous turn.",
+    "[↯] Move a friendly hidden character in play.",
+  ],
+  "SS-127-R": [
+    "[↯] Take control of an enemy non-hidden character in this mission, paying Chakra equal to their Power.",
+    "DUEL Sasuke Uchiha: The AMBUSH effect becomes a MAIN effect.",
+  ],
+  "SS-130-R": [
+    "[↯] Hide an enemy Leaf Village character in this mission.",
+    "DUEL Hiruzen Sarutobi FIRST STRIKE effect: Instead, defeat them.",
+  ],
+  "SS-139-R": [
+    "[⧗] When you play a Sound Village character, you must draw a card and then discard a card, if able.",
+  ],
 };

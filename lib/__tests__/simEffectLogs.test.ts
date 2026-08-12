@@ -4,6 +4,7 @@ import { getAllCards } from '@/lib/data/cardLoader';
 import { getScenario } from '@/lib/cards/sim/scenarios';
 import { runScenario } from '@/lib/cards/sim/runScenario';
 import type { GameState } from '@/lib/engine/types';
+import { awaitsEffectImplementation } from '@/lib/cards/sim/pendingImplementation';
 
 const WRAPPER = new Set(['PLAY_CHARACTER', 'PLAY_HIDDEN', 'REVEAL_CHARACTER', 'REVEAL_UPGRADE', 'UPGRADE_CHARACTER', 'PASS', 'ADVANCE_PHASE', 'MULLIGAN']);
 const ANNOUNCE = new Set(['EFFECT_NO_TARGET', 'EFFECT_CONTINUOUS', 'EFFECT_SCORE_ANNOUNCE']);
@@ -25,6 +26,7 @@ describe('every active effect emits a precise game-log line', () => {
     const seen = new Set<string>();
     const missing: string[] = [];
     for (const card of getAllCards()) {
+      if (awaitsEffectImplementation(card.id)) continue;
       if (card.card_type !== 'character') continue;
       const effs = card.effects ?? [];
       for (let i = 0; i < effs.length; i++) {

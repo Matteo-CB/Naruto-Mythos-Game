@@ -4,6 +4,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
 export const KIMIMARO_031_ID = 'SS-031-CHIBIV';
+export const KIMIMARO_031_BASE_ID = 'SS-031-UC';
 export const KIMIMARO_031_NAME = 'KIMIMARO';
 
 export type SoundFourName = 'JIROBO' | 'TAYUYA' | 'KIDOMARU' | 'SAKON';
@@ -88,4 +89,5 @@ function kimimaro031Main(ctx: EffectContext): EffectResult {
 
 export function registerKimimaro031Handlers(): void {
   registerEffect(KIMIMARO_031_ID, 'MAIN', kimimaro031Main);
+  registerEffect(KIMIMARO_031_BASE_ID, 'MAIN', kimimaro031Main);
 }

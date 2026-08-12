@@ -327,4 +327,69 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     "[↯] Cherchez jusqu'à 2 personnages Chien Ninja dans votre deck, révélez-les et piochez-les, puis mélangez votre deck. Jouez autant de personnages Chien Ninja que vous voulez n'importe où, en payant 1 de moins.",
     "[↯] Zabuza Momochi : Répétez l'effet MAIN.",
   ],
+  "SS-030-C": [
+    "[↯] Regardez la carte du dessus de votre deck, puis placez-la n’importe où comme personnage caché.",
+  ],
+  "SS-031-UC": [
+    "[↯] Défaussez jusqu’à un exemplaire de chacun de ces personnages pour : Jirobo : POWERUP 3. Tayuya : Gagnez 2 Chakra. Kidomaru : Déplacez un personnage allié. Sakon : Piochez 2 cartes.",
+  ],
+  "SS-032-C": [
+    "[⧗] Ce personnage coûte 1 de moins pour chaque personnage Quatre du Son allié dans cette mission.",
+    "[↯] POWERUP 2.",
+  ],
+  "SS-034-C": [
+    "[⧗] Ce personnage coûte 1 de moins pour chaque personnage Quatre du Son allié dans cette mission.",
+    "[↯] Déplacez un personnage allié en jeu.",
+  ],
+  "SS-035-UC": [
+    "[↯] Pour chaque personnage Quatre du Son allié dans cette mission, déplacez un personnage en jeu dont le coût est inférieur ou égal au coût de ce personnage Quatre du Son allié.",
+  ],
+  "SS-036-C": [
+    "[⧗] Ce personnage coûte 1 de moins pour chaque personnage Quatre du Son allié dans cette mission.",
+    "[↯] Piochez une carte.",
+  ],
+  "SS-037-UC": [
+    "[↯] Révélez autant de personnages Quatre du Son que vous voulez depuis votre main. Vainquez un personnage ennemi dont le coût est inférieur au nombre de cartes révélées.",
+  ],
+  "SS-040-UC": [
+    "[↯] Jouez un ou plusieurs personnages Invocation dans cette mission et dans chaque mission où se trouve une Tayuya alliée, en payant X de moins. X est le nombre de personnages Quatre du Son alliés dans la mission concernée.",
+  ],
+  "SS-042-UC": [
+    "[↯] Si vous avez un personnage Équipe Dosu allié dans cette mission, vainquez un personnage dont le coût est de 3 ou moins.",
+  ],
+  "SS-043-UC": [
+    "[↯] Si vous avez au moins une carte dans votre pile de défausse, jouez ce personnage en payant 1 de moins.",
+  ],
+  "SS-044-UC": [
+    "[↯] L’adversaire doit défausser 1 carte au hasard.",
+  ],
+  "SS-045-C": [
+    "[↯] Renvoyez dans votre main un personnage allié caché en jeu et placez une carte comme personnage caché dans cette même mission.",
+  ],
+  "SS-077-UC": [
+    "[⧗] Quand vous passez, vous pouvez vaincre ce personnage pour vaincre des personnages ennemis non cachés en jeu dont le coût total est de 5 ou moins.",
+    "Gaara, effet MAIN : À la place, la limite de coût est de 7.",
+  ],
+  "SS-093-C": [
+    "Attachez à un personnage allié non caché. Ce personnage est également considéré comme un personnage Village du Son.",
+  ],
+  "SS-101-UC": [
+    "Attachez à un personnage Village du Son allié.",
+    "[↯] Vainquez tous les personnages non cachés les plus faibles dans cette mission.",
+  ],
+  "SS-125-R": [
+    "[↯] Chôji Akimichi : Vainquez un personnage ennemi qui s’est déplacé lors du tour précédent de l’adversaire.",
+    "[↯] Déplacez un personnage allié caché en jeu.",
+  ],
+  "SS-127-R": [
+    "[↯] Prenez le contrôle d’un personnage ennemi non caché dans cette mission en payant autant de Chakra que sa Puissance.",
+    "Sasuke Uchiwa : L’effet AMBUSH devient un effet MAIN.",
+  ],
+  "SS-130-R": [
+    "[↯] Cachez un personnage Village de Konoha ennemi dans cette mission.",
+    "Hiruzen Sarutobi, effet FIRST STRIKE : À la place, vainquez-le.",
+  ],
+  "SS-139-R": [
+    "[⧗] Quand vous jouez un personnage Village du Son, vous devez piocher une carte puis défausser une carte, si possible.",
+  ],
 };
