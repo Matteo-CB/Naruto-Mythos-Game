@@ -184,6 +184,24 @@ export function calculateContinuousPowerModifier(
 
   const attachmentPower = attachedPowerOf(char);
 
+  let auraZaku041 = 0;
+  if (!char.isHidden) {
+    const sommetZaku = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    if (sommetZaku.id === 'SS-041-UC') {
+      const missionZaku = state.activeMissions[missionIndex];
+      const alliesZaku = missionZaku
+        ? (player === 'player1' ? missionZaku.player1Characters : missionZaku.player2Characters)
+        : [];
+      const aCoequipier = alliesZaku.some((c) => {
+        if (c.isHidden) return false;
+        if (c.instanceId === char.instanceId) return false;
+        const top = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        return (top.keywords ?? []).includes('Team Dosu');
+      });
+      if (aCoequipier) auraZaku041 = 1;
+    }
+  }
+
   if (!char.isHidden) {
     const mission_zc = state.activeMissions[missionIndex];
     if (mission_zc) {
@@ -425,7 +443,7 @@ export function calculateContinuousPowerModifier(
     }
   }
 
-  return modifier + attachmentPower;
+  return modifier + attachmentPower + auraZaku041;
 }
 
 

@@ -399,4 +399,10 @@ export const effectDescriptionsEs: Record<string, string[]> = {
     "[⧗] Este personaje cuesta 1 menos por cada personaje Cuatro del Sonido aliado en esta misión.",
     "[↯] Gana 2 Chakra.",
   ],
+  "SS-041-UC": [
+    "[⧗] Si tienes un personaje Equipo Dosu aliado en esta misión, este personaje tiene +1 Poder.",
+  ],
+  "SS-038-UC": [
+    "[↯] Une a Ukon a un personaje enemigo no oculto de esta misión. Mientras esté unido, ese personaje tiene -5 Poder, y Ukon se considera un equipo en lugar de un personaje.",
+  ],
 };

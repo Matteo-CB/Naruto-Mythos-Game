@@ -4394,6 +4394,82 @@
         }
       ],
       "data_complete": true
+    },
+    "SS-041-UC": {
+      "id": "SS-041-UC",
+      "cardId": "SS-041-UC",
+      "rarity": "UC",
+      "number": "041",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ZAKU ABUMI",
+      "name_fr": "ZAKU ABUMI",
+      "name_es": "ZAKU ABUMI",
+      "name_ja": "ザク・アブミ",
+      "name_pt": "ZAKU ABUMI",
+      "name_it": "ZAKU ABUMI",
+      "name_pl": "ZAKU ABUMI",
+      "title_en": "Pride in Sound Village",
+      "title_fr": "La fierté du Village du Son",
+      "title_es": "Orgullo de la Aldea del Sonido",
+      "title_ja": "音隠れの里の誇り",
+      "title_pt": "Orgulho da Vila do Som",
+      "title_it": "L’orgoglio del Villaggio del Suono",
+      "title_pl": "Duma Wioski Dźwięku",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-041-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-041-UC.webp",
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Team Dosu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If you have a friendly Team Dosu character in this mission, this character has +1 Power."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-038-UC": {
+      "id": "SS-038-UC",
+      "cardId": "SS-038-UC",
+      "rarity": "UC",
+      "number": "038",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "UKON",
+      "name_fr": "UKON",
+      "name_es": "UKON",
+      "name_ja": "五重羅",
+      "name_pt": "UKON",
+      "name_it": "UKON",
+      "name_pl": "UKON",
+      "title_en": "Cursemark Second State",
+      "title_fr": "Sceau Maudit, second stade",
+      "title_es": "Sello Maldito, segundo estado",
+      "title_ja": "呪印 第二段階",
+      "title_pt": "Selo Amaldiçoado, segundo estado",
+      "title_it": "Sigillo Maledetto, secondo stadio",
+      "title_pl": "Przeklęta Pieczęć, drugi stan",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-038-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-038-UC.webp",
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Sound Four"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Attach Ukon to an enemy non-hidden character in this mission. While attached, that character gets -5 Power, and Ukon is treated as an attachment instead of a character."
+        }
+      ],
+      "data_complete": true
     }
   }
 }

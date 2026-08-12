@@ -395,4 +395,10 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "[⧗] Ta postać kosztuje o 1 mniej za każdą sojuszniczą postać Czwórki Dźwięku na tej misji.",
     "[↯] Zyskaj 2 Czakry.",
   ],
+  "SS-041-UC": [
+    "[⧗] Jeśli masz sojuszniczą postać Drużyny Dosu na tej misji, ta postać ma +1 Mocy.",
+  ],
+  "SS-038-UC": [
+    "[↯] Dołącz Ukona do odkrytej wrogiej postaci na tej misji. Dopóki jest dołączony, ta postać ma -5 Mocy, a Ukon jest traktowany jako ekwipunek, a nie postać.",
+  ],
 };

@@ -395,4 +395,10 @@ export const effectDescriptionsIt: Record<string, string[]> = {
     "[⧗] Questo personaggio costa 1 in meno per ogni personaggio Quattro del Suono alleato in questa missione.",
     "[↯] Guadagna 2 Chakra.",
   ],
+  "SS-041-UC": [
+    "[⧗] Se hai un personaggio Squadra Dosu alleato in questa missione, questo personaggio ha +1 Potenza.",
+  ],
+  "SS-038-UC": [
+    "[↯] Attacca Ukon a un personaggio nemico non nascosto in questa missione. Finché è attaccato, quel personaggio ha -5 Potenza, e Ukon è trattato come un equipaggiamento invece che come un personaggio.",
+  ],
 };

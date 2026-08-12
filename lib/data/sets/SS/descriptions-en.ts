@@ -396,4 +396,10 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "[⧗] This character costs 1 less for every friendly Sound Four character in this mission.",
     "[↯] Gain 2 Chakra.",
   ],
+  "SS-041-UC": [
+    "[⧗] If you have a friendly Team Dosu character in this mission, this character has +1 Power.",
+  ],
+  "SS-038-UC": [
+    "[↯] Attach Ukon to an enemy non-hidden character in this mission. While attached, that character gets -5 Power, and Ukon is treated as an attachment instead of a character.",
+  ],
 };

@@ -395,4 +395,10 @@ export const effectDescriptionsPt: Record<string, string[]> = {
     "[⧗] Este personagem custa menos 1 por cada personagem Quatro do Som aliado nesta missão.",
     "[↯] Ganha 2 Chakra.",
   ],
+  "SS-041-UC": [
+    "[⧗] Se tiveres um personagem Equipa Dosu aliado nesta missão, este personagem tem +1 Poder.",
+  ],
+  "SS-038-UC": [
+    "[↯] Anexa Ukon a um personagem inimigo não escondido nesta missão. Enquanto anexado, esse personagem tem -5 Poder, e Ukon é tratado como equipamento em vez de personagem.",
+  ],
 };
