@@ -43,6 +43,45 @@ export function hasKin043DiscardDiscount(
   return discardPileSizeOf(state, player) > 0;
 }
 
+const PER_ALLY_DISCOUNT = /costs?\s+1\s+less\s+for\s+every\s+friendly\s+(.+?)\s+character\s+in\s+this\s+mission/i;
+
+export function perAllyDiscountKeyword(card: CharacterCard): string | null {
+  if (!isCharacterCard(card)) return null;
+  for (const effect of card.effects ?? []) {
+    if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
+    const match = effect.description.match(PER_ALLY_DISCOUNT);
+    if (match) return match[1].trim();
+  }
+  return null;
+}
+
+export function perAllyDiscountAmount(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  state: GameState | any,
+  player: PlayerID,
+  card: CharacterCard,
+  missionIndex: number,
+): number {
+  const keyword = perAllyDiscountKeyword(card);
+  if (!keyword) return 0;
+
+  const mission = state.activeMissions?.[missionIndex];
+  if (!mission) return 0;
+  const friendlyChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+  if (!friendlyChars) return 0;
+
+  const ownName = String(card.name_fr ?? '').toUpperCase();
+  let count = 0;
+  for (const c of friendlyChars) {
+    if (c.isHidden) continue;
+    const top = getTopCard(c);
+    if (!top) continue;
+    if (ownName && String(top.name_fr ?? '').toUpperCase() === ownName) continue;
+    if ((top.keywords ?? []).includes(keyword)) count += 1;
+  }
+  return count;
+}
+
 export function calculateEffectiveCost(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   state: GameState | any,
@@ -65,6 +104,9 @@ export function calculateEffectiveCost(
   if (!mission) return cost;
   const friendlyChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   if (!friendlyChars) return cost;
+
+  const parAllie = perAllyDiscountAmount(state, player, card, missionIndex);
+  if (parAllie > 0) cost = Math.max(0, cost - parAllie);
 
   
   const allCharsInMission = [...(friendlyChars || []), ...(player === 'player1' ? mission.player2Characters : mission.player1Characters) || []];
