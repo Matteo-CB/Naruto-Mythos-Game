@@ -3651,7 +3651,11 @@
         "ss130ConfirmDuel": "Hiruzen Sarutobi está presente: derrotar o personagem inimigo da Vila da Folha em vez de o esconder?",
         "ss130Hide": "Escolhe um personagem inimigo da Vila da Folha nesta missão para esconder.",
         "ss130Defeat": "Escolhe um personagem inimigo da Vila da Folha nesta missão para derrotar.",
-        "ss139Discard": "Kabuto Yakushi: compraste uma carta, escolhe agora uma carta para descartar."
+        "ss139Discard": "Kabuto Yakushi: compraste uma carta, escolhe agora uma carta para descartar.",
+        "ss127TakeControl": "Escolhe um personagem inimigo não escondido nesta missão para controlar. Pagas Chakra igual ao seu Poder.",
+        "ss077Confirm": "Derrotar Kimimaro para derrotar personagens inimigos não escondidos com um custo total de 5 ou menos?",
+        "ss077ConfirmDuel": "Gaara está presente: derrotar Kimimaro para derrotar personagens inimigos não escondidos com um custo total de 7 ou menos?",
+        "ss077PickTarget": "Escolhe um personagem inimigo não escondido para derrotar, dentro do custo restante."
       },
       "upgradeModifierConfirm": "Aplicar o efeito UPGRADE",
       "upgradeModifierDecline": "Manter apenas o efeito MAIN",

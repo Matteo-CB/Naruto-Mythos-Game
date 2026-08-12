@@ -16,7 +16,7 @@ export function isCharacterCopyable(topCard: CharacterCard): boolean {
 
 export function isEffectAlteration(description: string | undefined | null): boolean {
   if (!description) return false;
-  return /(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(description);
+  return /(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE|FIRST STRIKE|DUEL)\s+effect\b/.test(description);
 }
 
 

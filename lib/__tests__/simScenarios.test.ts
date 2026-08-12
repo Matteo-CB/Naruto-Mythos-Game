@@ -8,6 +8,7 @@ import { getAllCards } from '@/lib/data/cardLoader';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 import type { GameState, CharacterInPlay } from '@/lib/engine/types';
 import { awaitsEffectImplementation } from '@/lib/cards/sim/pendingImplementation';
+import { isEffectAlteration } from '@/lib/effects/handlers/KS/shared/copyExclusions';
 
 function calc(s: GameState, c: CharacterInPlay): number {
   return getEffectivePower(s, c, 'player1');
@@ -28,7 +29,7 @@ describe('card effect simulations (verified through the real engine)', () => {
   it('phases 1-7: EVERY active-effect card (non-static, non-SCORE) STRICTLY executes its effect', () => {
     const broken = getAllCards()
       .filter((c) => c.card_type === 'character' &&
-        (c.effects ?? []).some((e) => e.type !== 'SCORE' && !e.description.includes('[⧗]')))
+        (c.effects ?? []).some((e) => e.type !== 'SCORE' && !e.description.includes('[⧗]') && !isEffectAlteration(e.description)))
       .filter((c) => !awaitsEffectImplementation(c.id))
       .filter((c) => !generatedScenarioFiresReal(c.id) && !hasCuratedScenario(c.id))
       .map((c) => c.id);

@@ -48,6 +48,8 @@ import { SAKON_037_ID, SAKON_037_NAME, enemiesUnderCost } from './handlers/SS/sa
 import { KIDOMARU_035_ID, KIDOMARU_035_NAME, KIDOMARU_035_LOG, movableUnderCost } from './handlers/SS/kidomaru035';
 import { OROCHIMARU_130_ID, OROCHIMARU_130_NAME, leafEnemiesIn } from './handlers/SS/orochimaru130';
 import { KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
+import { OROCHIMARU_127_ID, OROCHIMARU_127_NAME } from './handlers/SS/orochimaru127';
+import { KIMIMARO_077_ID, KIMIMARO_077_NAME, kimimaro077Targets, costOfTarget } from './handlers/SS/kimimaro077';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatEnemyCharacter, defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
 import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval, isHiddenRevealBlocked, amplifiedPowerup } from './ContinuousEffects';
@@ -931,6 +933,52 @@ export class EffectEngine {
   }
 
   
+  static queueKimimaro077Pick(
+    state: GameState,
+    pendingEffect: PendingEffect,
+    reste: number,
+  ): GameState {
+    const newState = state;
+    if (reste <= 0) return newState;
+
+    const cibles = kimimaro077Targets(newState, pendingEffect.sourcePlayer)
+      .filter((c) => costOfTarget(c) <= reste)
+      .map((c) => c.instanceId);
+    if (cibles.length === 0) return newState;
+
+    const effId = generateInstanceId();
+    const actId = generateInstanceId();
+    newState.pendingEffects.push({
+      id: effId,
+      sourceCardId: pendingEffect.sourceCardId,
+      sourceInstanceId: pendingEffect.sourceInstanceId,
+      sourceMissionIndex: pendingEffect.sourceMissionIndex,
+      effectType: pendingEffect.effectType,
+      effectDescription: JSON.stringify({ reste }),
+      targetSelectionType: 'SS077_PICK_TARGET',
+      sourcePlayer: pendingEffect.sourcePlayer,
+      requiresTargetSelection: true,
+      validTargets: cibles,
+      isOptional: true,
+      isMandatory: false,
+      resolved: false,
+      isUpgrade: pendingEffect.isUpgrade,
+      remainingEffectTypes: undefined,
+    });
+    newState.pendingActions.push({
+      id: actId,
+      type: 'SELECT_TARGET' as PendingAction['type'],
+      player: pendingEffect.sourcePlayer,
+      description: `Choose an enemy character to defeat. Remaining cost budget: ${reste}.`,
+      descriptionKey: 'game.effect.desc.ss077PickTarget',
+      options: cibles,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effId,
+    });
+    return newState;
+  }
+
   static queueOrochimaru130Target(
     state: GameState,
     pendingEffect: PendingEffect,
@@ -6327,6 +6375,7 @@ export class EffectEngine {
       case 'SS137MV_CONFIRM_UPGRADE':
       case 'SS124_CONFIRM_DUEL':
       case 'SS124_CONFIRM_UPGRADE':
+      case 'SS127_CONFIRM':
       case 'SS030_CONFIRM_FIRST_STRIKE':
       case 'SS037_CONFIRM_UPGRADE':
       case 'SS045_CONFIRM_AMBUSH':
@@ -12318,6 +12367,71 @@ export class EffectEngine {
         newState = EffectEngine.moveCharToMissionDirectPublic(
           newState, mvdF.character.instanceId, mvdDest, mvdF.player,
           mvdParsed.srcName ?? 'Temari', mvdParsed.srcId ?? 'SS-119-R', pendingEffect.sourcePlayer,
+        );
+        break;
+      }
+
+      case 'SS077_CONFIRM_SACRIFICE': {
+        let ss077Data: { limite?: number; sourceInstanceId?: string } = {};
+        try { ss077Data = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const ss077Limite = ss077Data.limite ?? 5;
+        const ss077Source = ss077Data.sourceInstanceId ?? pendingEffect.sourceInstanceId;
+
+        newState = EffectEngine.defeatCharacter(newState, ss077Source, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', 'Kimimaro (077): defeated himself to strike the enemy.',
+          'game.log.effect.selfDefeat', { card: KIMIMARO_077_NAME, id: KIMIMARO_077_ID });
+
+        newState = EffectEngine.queueKimimaro077Pick(newState, pendingEffect, ss077Limite);
+        break;
+      }
+
+      case 'SS077_PICK_TARGET': {
+        let ss077bData: { reste?: number } = {};
+        try { ss077bData = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const ss077bReste = ss077bData.reste ?? 0;
+
+        const ss077bFound = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!ss077bFound) break;
+        const ss077bTop = ss077bFound.character.stack?.length > 0
+          ? ss077bFound.character.stack[ss077bFound.character.stack.length - 1]
+          : ss077bFound.character.card;
+        const ss077bCout = ss077bTop.chakra ?? 0;
+
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', `Kimimaro (077): defeated ${ss077bTop.name_fr}.`,
+          'game.log.effect.defeat',
+          { card: KIMIMARO_077_NAME, id: KIMIMARO_077_ID, target: ss077bTop.name_fr, target_en: ss077bTop.name_en || ss077bTop.name_fr });
+
+        newState = EffectEngine.queueKimimaro077Pick(newState, pendingEffect, ss077bReste - ss077bCout);
+        break;
+      }
+
+      case 'SS127_TAKE_CONTROL': {
+        const ss127Found = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!ss127Found) break;
+        const ss127Prix = getEffectivePower(newState, ss127Found.character, ss127Found.character.controlledBy);
+        const ss127Player = pendingEffect.sourcePlayer;
+
+        if (newState[ss127Player].chakra < ss127Prix) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, ss127Player,
+            'EFFECT_NO_TARGET', `Orochimaru (127): not enough Chakra to pay ${ss127Prix}.`,
+            'game.log.effect.noTarget', { card: OROCHIMARU_127_NAME, id: OROCHIMARU_127_ID });
+          break;
+        }
+
+        newState = {
+          ...newState,
+          [ss127Player]: { ...newState[ss127Player], chakra: newState[ss127Player].chakra - ss127Prix },
+        };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, ss127Player,
+          'EFFECT', `Orochimaru (127): paid ${ss127Prix} Chakra.`,
+          'game.log.effect.payChakra',
+          { card: OROCHIMARU_127_NAME, id: OROCHIMARU_127_ID, amount: String(ss127Prix) });
+
+        newState = EffectEngine.takeControlOfEnemy(
+          newState, pendingEffect, targetId, OROCHIMARU_127_NAME, OROCHIMARU_127_ID,
         );
         break;
       }

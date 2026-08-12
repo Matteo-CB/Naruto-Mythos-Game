@@ -328,6 +328,40 @@ function triggerBoard(demoId: string, opts: { victim?: boolean; hidden?: boolean
   return st;
 }
 
+export function hasOnPassEffect(card: CharacterCard): boolean {
+  return (card.effects ?? []).some((e) => e.description.includes('[⧗]') &&
+    /when you pass/i.test(e.description));
+}
+
+function passBoard(demoId: string): GameState {
+  const p2: CharacterInPlay[] = [
+    simChar('KS-005-C', { owner: 'player2', instanceId: 'pass-prey' }),
+  ];
+  const st = buildSimState({ hand1: [demoId], p1: [], p2, missions: 2, chakra1: 20, edgeHolder: 'player1' });
+  stripMissionEffects(st);
+  st.player1.deck = deck();
+  st.player2.deck = deck();
+  return st;
+}
+
+export function onPassScenario(card: CharacterCard): SimScenario {
+  return {
+    build: () => passBoard(card.id),
+    play: P1(FRESH0),
+    followups: [P2(PASS), P1(PASS)],
+  };
+}
+
+export function firesOnPass(card: CharacterCard): boolean {
+  try {
+    const etats = runScenario(onPassScenario(card));
+    const premier = etats[0];
+    const dernier = etats[etats.length - 1];
+    if (dernier.pendingActions.length > 0) return false;
+    return sigDiffers(signature(premier), signature(dernier));
+  } catch { return false; }
+}
+
 export function hasOnOwnPlay(card: CharacterCard): boolean {
   return (card.effects ?? []).some((e) => e.description.includes('[⧗]') &&
     /when you play a/i.test(e.description));
@@ -1010,7 +1044,7 @@ export function firesHideAllyBlock(card: CharacterCard): boolean {
   return full === false && base === true;
 }
 
-export type Phase810Kind = 'score' | 'aura' | 'endround' | 'startround' | 'onownplay' | 'chakra' | 'onenemy' | 'protect' | 'upgradeover' | 'costmod' | 'hiddencost' | 'winrestrict' | 'sacrifice' | 'onmove' | 'selfcost' | 'onanydefeat' | 'costpenalty' | 'tokenpersist' | 'scoringmove' | 'immunity' | 'moveblock' | 'revealblock' | 'hideallyblock' | 'onaffected';
+export type Phase810Kind = 'score' | 'aura' | 'endround' | 'startround' | 'onownplay' | 'onpass' | 'chakra' | 'onenemy' | 'protect' | 'upgradeover' | 'costmod' | 'hiddencost' | 'winrestrict' | 'sacrifice' | 'onmove' | 'selfcost' | 'onanydefeat' | 'costpenalty' | 'tokenpersist' | 'scoringmove' | 'immunity' | 'moveblock' | 'revealblock' | 'hideallyblock' | 'onaffected';
 
 export function phase810ScenarioKind(cardId: string): Phase810Kind | null {
   const card = getCharacterById(cardId);
@@ -1021,6 +1055,7 @@ export function phase810ScenarioKind(cardId: string): Phase810Kind | null {
   if (hasEndRoundEffect(card) && firesEndRound(card)) return 'endround';
   if (hasStartRoundEffect(card) && firesStartRound(card)) return 'startround';
   if (hasChakraStatic(card) && firesChakra(card)) return 'chakra';
+  if (hasOnPassEffect(card) && firesOnPass(card)) return 'onpass';
   if (hasOnOwnPlay(card) && firesOnOwnPlay(card)) return 'onownplay';
   if (hasOnEnemyPlayed(card) && firesOnEnemyPlayed(card)) return 'onenemy';
   if (hasProtectStatic(card) && firesProtect(card)) return 'protect';
@@ -1059,6 +1094,7 @@ export function phase810KindForEffect(cardId: string, effectIndex: number): Phas
   if (/end of (the )?round|fin de (la )?manche|fin du round/i.test(d) && firesEndRound(card)) return 'endround';
   if (/at the start of (the )?round|au début de (la )?manche/i.test(d) && firesStartRound(card)) return 'startround';
   if (/chakra \+/i.test(d) && firesChakra(card)) return 'chakra';
+  if (/when you pass/i.test(d) && firesOnPass(card)) return 'onpass';
   if (/when you play a/i.test(d) && firesOnOwnPlay(card)) return 'onownplay';
   if (/when.*enemy.*(is )?played/i.test(d) && firesOnEnemyPlayed(card)) return 'onenemy';
   if (/friendly[^.]*would be (hidden|defeated)/i.test(d) && firesSacrifice(card)) return 'sacrifice';
@@ -1088,6 +1124,7 @@ export function phase810Scenario(cardId: string, kind: Phase810Kind): SimScenari
     case 'endround': return endRoundScenario(card);
     case 'startround': return startRoundScenario(card);
     case 'chakra': return chakraScenario(card);
+    case 'onpass': return onPassScenario(card);
     case 'onownplay': return onOwnPlayScenario(card);
     case 'onenemy': return onEnemyPlayedScenario(card);
     case 'protect': return protectScenario(card);

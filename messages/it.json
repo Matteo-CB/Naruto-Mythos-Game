@@ -3651,7 +3651,11 @@
         "ss130ConfirmDuel": "Hiruzen Sarutobi è presente: sconfiggere il personaggio nemico del Villaggio della Foglia invece di nasconderlo?",
         "ss130Hide": "Scegli un personaggio nemico del Villaggio della Foglia in questa missione da nascondere.",
         "ss130Defeat": "Scegli un personaggio nemico del Villaggio della Foglia in questa missione da sconfiggere.",
-        "ss139Discard": "Kabuto Yakushi: hai pescato, ora scegli una carta da scartare."
+        "ss139Discard": "Kabuto Yakushi: hai pescato, ora scegli una carta da scartare.",
+        "ss127TakeControl": "Scegli un personaggio nemico non nascosto in questa missione di cui prendere il controllo. Paghi Chakra pari alla sua Potenza.",
+        "ss077Confirm": "Sconfiggere Kimimaro per sconfiggere personaggi nemici non nascosti con un costo totale di 5 o meno?",
+        "ss077ConfirmDuel": "Gaara è presente: sconfiggere Kimimaro per sconfiggere personaggi nemici non nascosti con un costo totale di 7 o meno?",
+        "ss077PickTarget": "Scegli un personaggio nemico non nascosto da sconfiggere, entro il costo rimanente."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

@@ -1549,7 +1549,11 @@
         "ss130ConfirmDuel": "Hiruzen Sarutobi is here: defeat the enemy Leaf Village character instead of hiding it?",
         "ss130Hide": "Choose an enemy Leaf Village character in this mission to hide.",
         "ss130Defeat": "Choose an enemy Leaf Village character in this mission to defeat.",
-        "ss139Discard": "Kabuto Yakushi: you drew a card, now choose a card to discard."
+        "ss139Discard": "Kabuto Yakushi: you drew a card, now choose a card to discard.",
+        "ss127TakeControl": "Choose a non-hidden enemy character in this mission to take control of. You pay Chakra equal to its Power.",
+        "ss077Confirm": "Defeat Kimimaro to defeat non-hidden enemy characters with a total cost of 5 or less?",
+        "ss077ConfirmDuel": "Gaara is here: defeat Kimimaro to defeat non-hidden enemy characters with a total cost of 7 or less?",
+        "ss077PickTarget": "Choose a non-hidden enemy character to defeat, within the remaining cost budget."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",

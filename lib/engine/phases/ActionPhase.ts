@@ -12,6 +12,7 @@ import { applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
 import { revealUpgradeWouldDuplicateName } from '../../effects/revealNameUniqueness';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 import { expireFirstStrike } from '../rules/firstStrike';
+import { offerKimimaro077Sacrifice } from '@/lib/effects/handlers/SS/kimimaro077Pass';
 
 
 export function executeAction(state: GameState, player: PlayerID, action: GameAction): GameState {
@@ -824,15 +825,16 @@ function handlePass(state: GameState, player: PlayerID): GameState {
   const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
   const activePlayer = state[otherPlayer].hasPassed ? state.activePlayer : otherPlayer;
 
-  return {
+  const apresPassage: GameState = {
     ...state,
     [player]: ps,
     edgeHolder,
     firstPasser,
     activePlayer,
     log,
-    
   };
+
+  return offerKimimaro077Sacrifice(apresPassage, player);
 }
 
 

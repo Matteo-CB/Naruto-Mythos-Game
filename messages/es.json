@@ -1554,7 +1554,11 @@
         "ss130ConfirmDuel": "Hiruzen Sarutobi está presente: ¿derrotar al personaje enemigo de la Aldea de la Hoja en lugar de ocultarlo?",
         "ss130Hide": "Elige un personaje enemigo de la Aldea de la Hoja de esta misión para ocultarlo.",
         "ss130Defeat": "Elige un personaje enemigo de la Aldea de la Hoja de esta misión para derrotarlo.",
-        "ss139Discard": "Kabuto Yakushi: has robado, ahora elige una carta para descartar."
+        "ss139Discard": "Kabuto Yakushi: has robado, ahora elige una carta para descartar.",
+        "ss127TakeControl": "Elige un personaje enemigo no oculto de esta misión para controlarlo. Pagas Chakra igual a su Poder.",
+        "ss077Confirm": "¿Derrotar a Kimimaro para derrotar personajes enemigos no ocultos con un coste total de 5 o menos?",
+        "ss077ConfirmDuel": "Gaara está presente: ¿derrotar a Kimimaro para derrotar personajes enemigos no ocultos con un coste total de 7 o menos?",
+        "ss077PickTarget": "Elige un personaje enemigo no oculto para derrotarlo, dentro del coste restante."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

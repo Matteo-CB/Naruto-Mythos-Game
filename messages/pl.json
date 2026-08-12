@@ -3651,7 +3651,11 @@
         "ss130ConfirmDuel": "Hiruzen Sarutobi jest obecny: pokonać wrogą postać z Wioski Liścia zamiast ją zakrywać?",
         "ss130Hide": "Wybierz wrogą postać z Wioski Liścia na tej misji do zakrycia.",
         "ss130Defeat": "Wybierz wrogą postać z Wioski Liścia na tej misji do pokonania.",
-        "ss139Discard": "Kabuto Yakushi: dobrałeś kartę, teraz wybierz kartę do odrzucenia."
+        "ss139Discard": "Kabuto Yakushi: dobrałeś kartę, teraz wybierz kartę do odrzucenia.",
+        "ss127TakeControl": "Wybierz odkrytą wrogą postać na tej misji, aby przejąć nad nią kontrolę. Płacisz Czakrę równą jej Mocy.",
+        "ss077Confirm": "Pokonać Kimimaro, aby pokonać odkryte wrogie postacie o łącznym koszcie 5 lub mniejszym?",
+        "ss077ConfirmDuel": "Gaara jest obecny: pokonać Kimimaro, aby pokonać odkryte wrogie postacie o łącznym koszcie 7 lub mniejszym?",
+        "ss077PickTarget": "Wybierz odkrytą wrogą postać do pokonania, w ramach pozostałego kosztu."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

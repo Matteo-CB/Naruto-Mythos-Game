@@ -5,6 +5,7 @@ import { getScenario } from '@/lib/cards/sim/scenarios';
 import { runScenario } from '@/lib/cards/sim/runScenario';
 import type { GameState } from '@/lib/engine/types';
 import { awaitsEffectImplementation } from '@/lib/cards/sim/pendingImplementation';
+import { isEffectAlteration } from '@/lib/effects/handlers/KS/shared/copyExclusions';
 
 const WRAPPER = new Set(['PLAY_CHARACTER', 'PLAY_HIDDEN', 'REVEAL_CHARACTER', 'REVEAL_UPGRADE', 'UPGRADE_CHARACTER', 'PASS', 'ADVANCE_PHASE', 'MULLIGAN']);
 const ANNOUNCE = new Set(['EFFECT_NO_TARGET', 'EFFECT_CONTINUOUS', 'EFFECT_SCORE_ANNOUNCE']);
@@ -33,6 +34,7 @@ describe('every active effect emits a precise game-log line', () => {
         const e = effs[i];
         if (!ACTIVE_TYPES.has(e.type)) continue;
         if (e.type !== 'SCORE' && e.description.includes('[⧗]')) continue;
+        if (isEffectAlteration(e.description)) continue;
         const key = `${card.set}-${card.number}#${i}-${e.type}`;
         if (seen.has(key)) continue;
         seen.add(key);

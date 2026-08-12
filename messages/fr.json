@@ -1555,7 +1555,11 @@
         "ss130ConfirmDuel": "Hiruzen Sarutobi est présent : vaincre le personnage ennemi du Village de Konoha au lieu de le cacher ?",
         "ss130Hide": "Choisissez un personnage ennemi du Village de Konoha de cette mission à cacher.",
         "ss130Defeat": "Choisissez un personnage ennemi du Village de Konoha de cette mission à vaincre.",
-        "ss139Discard": "Kabuto Yakushi : vous avez pioché, choisissez maintenant une carte à défausser."
+        "ss139Discard": "Kabuto Yakushi : vous avez pioché, choisissez maintenant une carte à défausser.",
+        "ss127TakeControl": "Choisissez un personnage ennemi non caché de cette mission à contrôler. Vous payez son montant de Puissance en Chakra.",
+        "ss077Confirm": "Vaincre Kimimaro pour vaincre des personnages ennemis non cachés dont le coût total ne dépasse pas 5 ?",
+        "ss077ConfirmDuel": "Gaara est présent : vaincre Kimimaro pour vaincre des personnages ennemis non cachés dont le coût total ne dépasse pas 7 ?",
+        "ss077PickTarget": "Choisissez un personnage ennemi non caché à vaincre, dans la limite du coût restant."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",
