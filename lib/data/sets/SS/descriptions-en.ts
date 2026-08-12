@@ -307,6 +307,14 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "[⧗] POWERUPs on friendly characters in this mission are increased by 1.",
     "[↯] Ino Yamanaka: Take back control of a character you own in play.",
   ],
+  "SS-123-SHINOBIV": [
+    "[⧗] POWERUPs on friendly characters in this mission are increased by 1.",
+    "[↯] Ino Yamanaka: Take back control of a character you own in play.",
+  ],
+  "SS-124-SHINOBIV": [
+    "[↯] Sakura Haruno: Take control of an enemy character of Power lower than the Sakura Haruno's Power.",
+    "[↯] Move a controlled character from this mission.",
+  ],
   "SS-121-SPV": [
     "[⧗] This character has +1 Power for every friendly Naruto Uzumaki in play.",
     "[↯] Kiba Inuzuka: Move the card at the bottom of this upgrade stack to another mission.",

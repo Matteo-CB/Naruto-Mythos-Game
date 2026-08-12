@@ -1,6 +1,56 @@
 {
   "entries": [
     {
+      "date": "2026-08-12",
+      "title_fr": "Deux cartes Shinobi V",
+      "title_en": "Two Shinobi V cards",
+      "title_es": "Dos cartas Shinobi V",
+      "title_ja": "忍 V カード２枚",
+      "title_pt": "Duas cartas Shinobi V",
+      "title_it": "Due carte Shinobi V",
+      "title_pl": "Dwie karty Shinobi V",
+      "categories": [
+        "feature",
+        "feature",
+        "feature"
+      ],
+      "changes_fr": [
+        "Sakura Haruno Examen Chûnin 123 arrive en Shinobi V, avec les mêmes effets que sa version Rare.",
+        "Ino Yamanaka Examen Chûnin 124 est une carte inédite, en duel avec Sakura Haruno.",
+        "En duel, Ino prend le contrôle d'un ennemi moins puissant que Sakura, et en évolution elle déplace un personnage contrôlé."
+      ],
+      "changes_en": [
+        "Sakura Haruno Chunin Exams 123 arrives as a Shinobi V, with the same effects as its Rare version.",
+        "Ino Yamanaka Chunin Exams 124 is a brand new card, duelling with Sakura Haruno.",
+        "In a duel Ino takes control of an enemy weaker than Sakura, and as an upgrade she moves a controlled character away."
+      ],
+      "changes_es": [
+        "Sakura Haruno Exámenes Chunin 123 llega como Shinobi V, con los mismos efectos que su versión Rara.",
+        "Ino Yamanaka Exámenes Chunin 124 es una carta nueva, en duelo con Sakura Haruno.",
+        "En duelo Ino toma el control de un enemigo más débil que Sakura, y al evolucionar mueve un personaje controlado."
+      ],
+      "changes_ja": [
+        "春野サクラ「中忍試験」123 が忍 V として登場し、レア版と同じ効果を持ちます。",
+        "山中いの「中忍試験」124 は新カードで、春野サクラとデュエルします。",
+        "デュエルではサクラより弱い敵のコントロールを得、進化時にはコントロール中のキャラクターを移動させます。"
+      ],
+      "changes_pt": [
+        "Sakura Haruno Exames Chunin 123 chega como Shinobi V, com os mesmos efeitos da sua versão Rara.",
+        "Ino Yamanaka Exames Chunin 124 é uma carta inédita, em duelo com Sakura Haruno.",
+        "Em duelo Ino toma o controlo de um inimigo mais fraco que Sakura, e ao evoluir move um personagem controlado."
+      ],
+      "changes_it": [
+        "Sakura Haruno Esami Chunin 123 arriva come Shinobi V, con gli stessi effetti della sua versione Rara.",
+        "Ino Yamanaka Esami Chunin 124 è una carta inedita, in duello con Sakura Haruno.",
+        "In duello Ino prende il controllo di un nemico più debole di Sakura, e in evoluzione sposta un personaggio controllato."
+      ],
+      "changes_pl": [
+        "Sakura Haruno Egzamin na Chūnina 123 pojawia się jako Shinobi V, z tymi samymi efektami co wersja Rzadka.",
+        "Ino Yamanaka Egzamin na Chūnina 124 to zupełnie nowa karta, pojedynkująca się z Sakurą Haruno.",
+        "W pojedynku Ino przejmuje kontrolę nad słabszym wrogiem, a przy ulepszeniu przenosi kontrolowaną postać."
+      ]
+    },
+    {
       "date": "2026-08-10",
       "title_fr": "Thème clair Shinobi Shiren, icônes de rareté et nouvelles cartes",
       "title_en": "Shinobi Shiren light theme, rarity icons and new cards",

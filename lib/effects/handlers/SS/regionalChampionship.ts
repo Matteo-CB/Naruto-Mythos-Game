@@ -111,6 +111,7 @@ export function registerRegionalChampionshipHandlers(): void {
   registerEffect('SS-123-CHIBIV', 'DUEL', sakura123MvDuel);
   registerEffect('SS-123-R', 'DUEL', sakura123MvDuel);
   registerEffect('SS-123-SPV', 'DUEL', sakura123MvDuel);
+  registerEffect('SS-123-SHINOBIV', 'DUEL', sakura123MvDuel);
   registerEffect(ITACHI_137_MV_ID, 'UPGRADE', itachi137MvUpgrade);
   registerEffect(ITACHI_137_MV_ID, 'DUEL', itachi137MvDuel);
 }

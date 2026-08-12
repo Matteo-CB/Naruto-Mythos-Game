@@ -1520,6 +1520,8 @@
         "ss005ConfirmAmbush": "placer à nouveau la carte du dessus de votre deck comme personnage caché dans cette mission ?",
         "ss007StartPowerup": "Début de manche : choisissez un personnage Team 7 allié à renforcer de 2.",
         "ss123MvTakeBack": "Reprenez le contrôle d’un personnage qui vous appartient.",
+        "ss124TakeControl": "Prenez le contrôle d’un personnage ennemi de Puissance inférieure à celle de Sakura Haruno.",
+        "ss124MoveControlled": "Déplacez un personnage contrôlé de cette mission vers une autre mission.",
         "ss137MvReturnHidden": "Renvoyez un personnage caché allié de cette mission dans votre main.",
         "ss137MvConfirmDuel": "Forcer l’adversaire à vaincre ses personnages dans cette mission jusqu’à en avoir autant que vous ?",
         "ss137MvOpponentChooseDefeat": "Choisissez un de vos personnages à vaincre dans cette mission ({count} de trop).",

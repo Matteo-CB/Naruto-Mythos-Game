@@ -34,6 +34,16 @@ export function isDuelCharacterPresent(
   return false;
 }
 
+export function duelPartnersIn(
+  state: GameState,
+  missionIndex: number,
+  characterName: string,
+): CharacterInPlay[] {
+  const mission = state.activeMissions[missionIndex];
+  if (!mission) return [];
+  return [...mission.player1Characters, ...mission.player2Characters].filter((c) => nameMatches(c, characterName));
+}
+
 export function isDuelConditionMet(
   state: GameState,
   missionIndex: number,

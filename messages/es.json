@@ -1519,6 +1519,8 @@
         "ss005ConfirmAmbush": "¿colocar de nuevo la carta superior de tu mazo como personaje oculto en esta misión?",
         "ss007StartPowerup": "Inicio de la ronda: elige un personaje Team 7 aliado para POTENCIAR 2.",
         "ss123MvTakeBack": "Recupera el control de un personaje que te pertenece.",
+        "ss124TakeControl": "Toma el control de un personaje enemigo con menos Poder que Sakura Haruno.",
+        "ss124MoveControlled": "Mueve un personaje controlado de esta misión a otra misión.",
         "ss137MvReturnHidden": "Devuelve a tu mano un personaje oculto aliado de esta misión.",
         "ss137MvConfirmDuel": "¿Obligar al rival a derrotar a sus personajes en esta misión hasta tener tantos como tú?",
         "ss137MvOpponentChooseDefeat": "Elige uno de tus personajes para derrotar en esta misión ({count} de más).",

@@ -3616,6 +3616,8 @@
         "ss005ConfirmAmbush": "położyć ponownie wierzchnią kartę talii jako zakrytą postać w tej misji?",
         "ss007StartPowerup": "Początek rundy: wybierz sojuszniczą postać Team 7, aby dać jej POWERUP 2.",
         "ss123MvTakeBack": "Odzyskaj kontrolę nad postacią, która należy do ciebie.",
+        "ss124TakeControl": "Przejmij kontrolę nad wrogą postacią o Sile niższej niż Sakura Haruno.",
+        "ss124MoveControlled": "Przenieś kontrolowaną postać z tej misji na inną misję.",
         "ss137MvReturnHidden": "Zwróć do ręki sojuszniczą zakrytą postać z tej misji.",
         "ss137MvConfirmDuel": "Zmusić przeciwnika, by pokonywał swoje postacie w tej misji, aż będzie miał ich tyle co ty?",
         "ss137MvOpponentChooseDefeat": "Wybierz jedną ze swoich postaci do pokonania w tej misji (o {count} za dużo).",

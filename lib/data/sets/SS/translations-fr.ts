@@ -307,6 +307,14 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     "[⧗] Les POWERUP sur les personnages alliés dans cette mission sont augmentés de 1.",
     "[↯] Ino Yamanaka : Reprenez le contrôle d’un personnage que vous possédez en jeu.",
   ],
+  "SS-123-SHINOBIV": [
+    "[⧗] Les POWERUP sur les personnages alliés dans cette mission sont augmentés de 1.",
+    "[↯] Ino Yamanaka : Reprenez le contrôle d’un personnage que vous possédez en jeu.",
+  ],
+  "SS-124-SHINOBIV": [
+    "[↯] Sakura Haruno : Prenez le contrôle d’un personnage ennemi dont la Puissance est inférieure à celle de Sakura Haruno.",
+    "[↯] Déplacez un personnage contrôlé depuis cette mission.",
+  ],
   "SS-121-SPV": [
     "[⧗] Ce personnage a +1 Puissance pour chaque Naruto Uzumaki allié en jeu.",
     "[↯] Kiba Inuzuka : Déplacez la carte au bas de cette pile d'amélioration vers une autre mission.",

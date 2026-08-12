@@ -38,6 +38,8 @@ import {
 import { attachCardToCharacter, discardAttachmentsOnLeave, discardAttachments } from './attachments';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { findLegalRevealUpgradeTarget, revealWouldViolateNameUniqueness } from './revealNameUniqueness';
+import { moveWouldViolateNameUniqueness } from './moveNameUniqueness';
+import { INO_124_ID, INO_124_NAME, INO_124_LOG_NAME } from './handlers/SS/ino124';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatEnemyCharacter, defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
 import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval, isHiddenRevealBlocked, amplifiedPowerup } from './ContinuousEffects';
@@ -6143,6 +6145,8 @@ export class EffectEngine {
       case 'SS148_CONFIRM_MAIN':
       case 'SS150_CONFIRM_DUEL':
       case 'SS137MV_CONFIRM_UPGRADE':
+      case 'SS124_CONFIRM_DUEL':
+      case 'SS124_CONFIRM_UPGRADE':
       case 'MINATO122_CONFIRM_MAIN': {
         let relay: { nextType?: string; targets?: string[]; nextKey?: string; nextText?: string } = {};
         try { relay = JSON.parse(pendingEffect.effectDescription); } catch {}
@@ -12120,6 +12124,62 @@ export class EffectEngine {
           newState, mvdF.character.instanceId, mvdDest, mvdF.player,
           mvdParsed.srcName ?? 'Temari', mvdParsed.srcId ?? 'SS-119-R', pendingEffect.sourcePlayer,
         );
+        break;
+      }
+
+      case 'SS124_TAKE_CONTROL': {
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.controlled.with.source', { sourceName: INO_124_NAME });
+        newState = EffectEngine.takeControlOfEnemy(newState, pendingEffect, targetId, INO_124_NAME, INO_124_ID);
+        break;
+      }
+
+      case 'SS124_MOVE_CONTROLLED': {
+        const i124Found = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!i124Found) break;
+        const i124Side: 'player1Characters' | 'player2Characters' =
+          i124Found.player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const i124Dests: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (i === i124Found.missionIndex) continue;
+          if (moveWouldViolateNameUniqueness(newState, i124Found.character, i, i124Side)) continue;
+          i124Dests.push(String(i));
+        }
+        if (i124Dests.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Ino Yamanaka (124) UPGRADE: No legal destination mission for this controlled character.',
+            'game.log.effect.noTarget', { card: INO_124_NAME, id: INO_124_ID });
+          break;
+        }
+        if (i124Dests.length === 1) {
+          newState = EffectEngine.moveCharToMissionDirectPublic(
+            newState, targetId, parseInt(i124Dests[0], 10), i124Found.player,
+            INO_124_LOG_NAME, INO_124_ID, pendingEffect.sourcePlayer,
+          );
+          break;
+        }
+        const i124EffId = generateInstanceId();
+        const i124ActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: i124EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ charInstanceId: targetId, srcName: INO_124_LOG_NAME, srcId: INO_124_ID }),
+          targetSelectionType: 'SS_MOVE_DEST',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: i124Dests, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: i124ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Choose a mission to move the character to.',
+          descriptionKey: 'game.effect.desc.chooseMissionMove',
+          options: i124Dests, minSelections: 1, maxSelections: 1,
+          sourceEffectId: i124EffId,
+        });
+        pendingEffect.remainingEffectTypes = undefined;
         break;
       }
 
@@ -21743,7 +21803,13 @@ export class EffectEngine {
     return newState;
   }
 
-  static takeControlOfEnemy(state: GameState, pending: PendingEffect, targetId: string): GameState {
+  static takeControlOfEnemy(
+    state: GameState,
+    pending: PendingEffect,
+    targetId: string,
+    effectCardName: string = 'INO YAMANAKA',
+    effectCardId: string = 'KS-020-UC',
+  ): GameState {
     const charResult = EffectEngine.findCharByInstanceId(state, targetId);
     if (!charResult) return state;
 
@@ -21803,16 +21869,16 @@ export class EffectEngine {
         'EFFECT_DISCARD',
         `Took control of ${targetName} but a character with the same name already on this side, ${targetName} discarded (No Repetition).`,
         'game.log.effect.takeControlNoRepDiscard',
-        { card: 'INO YAMANAKA', id: 'KS-020-UC', target: targetName, target_en: targetNameEn },
+        { card: effectCardName, id: effectCardId, target: targetName, target_en: targetNameEn },
       );
       return newState;
     }
     newState.log = logAction(
       newState.log, newState.turn, newState.phase, player,
       'EFFECT_TAKE_CONTROL',
-      `Ino Yamanaka (020): Takes control of ${targetName} in this mission.`,
+      `${effectCardName} (${effectCardId}): Takes control of ${targetName} in this mission.`,
       'game.log.effect.takeControl',
-      { card: 'INO YAMANAKA', id: 'KS-020-UC', target: targetName },
+      { card: effectCardName, id: effectCardId, target: targetName },
     );
 
     return EffectEngine.cascadeControlOnTakeover(newState, targetChar.instanceId, player);

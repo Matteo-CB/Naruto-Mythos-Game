@@ -1514,6 +1514,8 @@
         "ss005ConfirmAmbush": "put the top card of your deck as a hidden character in this mission again?",
         "ss007StartPowerup": "Start of the round: choose a friendly Team 7 character to POWERUP 2.",
         "ss123MvTakeBack": "Take back control of a character you own.",
+        "ss124TakeControl": "Take control of an enemy character with less Power than Sakura Haruno.",
+        "ss124MoveControlled": "Move a controlled character from this mission to another mission.",
         "ss137MvReturnHidden": "Return a friendly hidden character from this mission to your hand.",
         "ss137MvConfirmDuel": "Make the opponent defeat their characters in this mission until they have as many as you?",
         "ss137MvOpponentChooseDefeat": "Choose one of your characters to defeat in this mission ({count} too many).",

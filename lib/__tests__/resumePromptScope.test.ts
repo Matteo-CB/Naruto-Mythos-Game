@@ -32,17 +32,19 @@ describe('the resume prompt only shows where the game was played', () => {
   });
 });
 
-describe('the four Secret cards exist without artwork', () => {
+describe('the four Secret cards are wired in', () => {
   const SECRETS = ['SS-147-S', 'SS-148-S', 'SS-149-S', 'SS-150-S'];
   const LOCALES = ['en', 'fr', 'es', 'ja', 'pt', 'it', 'pl'];
 
-  it('each one is a Secret with no image yet', () => {
+  it('each one is a Secret, and its artwork state matches its file', () => {
     for (const id of SECRETS) {
       const card = getCardById(id)!;
       expect(card, id).toBeTruthy();
       expect(card.rarity).toBe('S');
-      expect(card.has_visual, `${id} has no art yet`).toBe(false);
-      expect(card.image_file, `${id} carries no file`).toBeFalsy();
+      expect(card.has_visual, `${id} art flag matches its file`).toBe(!!card.image_file);
+      if (card.image_file) {
+        expect(card.image_file, `${id} stores a full path`).toMatch(new RegExp(`images/cards/SS/secret/${id}\.webp$`));
+      }
     }
   });
 

@@ -306,6 +306,14 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "[⧗] POWERUP na sojuszniczych postaciach na tej misji są zwiększone o 1.",
     "[↯] Ino Yamanaka: Odzyskaj kontrolę nad postacią, którą posiadasz, w grze.",
   ],
+  "SS-123-SHINOBIV": [
+    "[⧗] POWERUP na sojuszniczych postaciach na tej misji są zwiększone o 1.",
+    "[↯] Ino Yamanaka: Odzyskaj kontrolę nad postacią, którą posiadasz, w grze.",
+  ],
+  "SS-124-SHINOBIV": [
+    "[↯] Sakura Haruno: Przejmij kontrolę nad wrogą postacią o Mocy niższej niż Moc Sakury Haruno.",
+    "[↯] Przenieś kontrolowaną postać z tej misji.",
+  ],
   "SS-121-SPV": [
     "[⧗] Ta postać ma +1 Siły za każdego sojuszniczego Naruto Uzumaki w grze.",
     "[↯] Kiba Inuzuka: Przenieś dolną kartę tego stosu ulepszeń na inną misję.",

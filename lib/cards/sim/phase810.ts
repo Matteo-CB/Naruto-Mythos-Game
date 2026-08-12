@@ -236,6 +236,58 @@ function chakraBoard(demoId: string): GameState {
   return st;
 }
 
+export function hasStartRoundEffect(card: CharacterCard): boolean {
+  return (card.effects ?? []).some((e) => e.description.includes('[⧗]')
+    && /at the start of (the )?round|au début de (la )?manche/i.test(e.description));
+}
+
+function startBoard(card: CharacterCard): GameState {
+  const p1: CharacterInPlay[] = [
+    simChar('KS-009-C', { owner: 'player1', instanceId: 'sr-team7' }),
+  ].filter((c) => c.card.id !== card.id);
+  const p2: CharacterInPlay[] = [simChar('KS-005-C', { owner: 'player2', instanceId: 'sr-enemy' })];
+  const st = buildSimState({ hand1: [card.id], p1, p2, missions: 2, chakra1: 20, edgeHolder: 'player1' });
+  stripMissionEffects(st);
+  st.player1.deck = deck();
+  st.player2.deck = deck();
+  return st;
+}
+
+export function startRoundScenario(card: CharacterCard): SimScenario {
+  return {
+    build: () => startBoard(card),
+    play: P1(FRESH0),
+    followups: [P2(PASS), P1(PASS), P1(ADVANCE)],
+  };
+}
+
+function totalPowerTokens(s: GameState): number {
+  let total = 0;
+  for (const m of s.activeMissions) {
+    for (const c of [...m.player1Characters, ...m.player2Characters]) total += c.powerTokens;
+  }
+  return total;
+}
+
+function startSignature(demoId: string): { sig: Sig; tokens: number } | null {
+  try {
+    const c = getCharacterById(demoId);
+    if (!c) return null;
+    const states = runScenario(startRoundScenario(c));
+    const last = states[states.length - 1];
+    if (last.pendingActions.length > 0) return null;
+    return { sig: signature(last), tokens: totalPowerTokens(last) };
+  } catch { return null; }
+}
+
+export function firesStartRound(card: CharacterCard): boolean {
+  if (card.id === VANILLA) return false;
+  const full = startSignature(card.id);
+  const base = startSignature(VANILLA);
+  if (!full || !base) return false;
+  return sigDiffers(full.sig, base.sig) || full.tokens !== base.tokens;
+}
+
 export function hasChakraStatic(card: CharacterCard): boolean {
   return (card.effects ?? []).some((e) => e.description.includes('[⧗]') && /chakra \+/i.test(e.description));
 }
@@ -920,7 +972,7 @@ export function firesHideAllyBlock(card: CharacterCard): boolean {
   return full === false && base === true;
 }
 
-export type Phase810Kind = 'score' | 'aura' | 'endround' | 'chakra' | 'onenemy' | 'protect' | 'upgradeover' | 'costmod' | 'hiddencost' | 'winrestrict' | 'sacrifice' | 'onmove' | 'selfcost' | 'onanydefeat' | 'costpenalty' | 'tokenpersist' | 'scoringmove' | 'immunity' | 'moveblock' | 'revealblock' | 'hideallyblock' | 'onaffected';
+export type Phase810Kind = 'score' | 'aura' | 'endround' | 'startround' | 'chakra' | 'onenemy' | 'protect' | 'upgradeover' | 'costmod' | 'hiddencost' | 'winrestrict' | 'sacrifice' | 'onmove' | 'selfcost' | 'onanydefeat' | 'costpenalty' | 'tokenpersist' | 'scoringmove' | 'immunity' | 'moveblock' | 'revealblock' | 'hideallyblock' | 'onaffected';
 
 export function phase810ScenarioKind(cardId: string): Phase810Kind | null {
   const card = getCharacterById(cardId);
@@ -929,6 +981,7 @@ export function phase810ScenarioKind(cardId: string): Phase810Kind | null {
   if (hasUpgradeOver(card) && firesUpgradeOver(card)) return 'upgradeover';
   if (hasPowerAura(card) && firesAura(card)) return 'aura';
   if (hasEndRoundEffect(card) && firesEndRound(card)) return 'endround';
+  if (hasStartRoundEffect(card) && firesStartRound(card)) return 'startround';
   if (hasChakraStatic(card) && firesChakra(card)) return 'chakra';
   if (hasOnEnemyPlayed(card) && firesOnEnemyPlayed(card)) return 'onenemy';
   if (hasProtectStatic(card) && firesProtect(card)) return 'protect';
@@ -965,6 +1018,7 @@ export function phase810KindForEffect(cardId: string, effectIndex: number): Phas
   if (/upgrade[^.]*over|as an upgrade to|amélioration/i.test(d) && firesUpgradeOver(card)) return 'upgradeover';
   if (/power|puissance/i.test(d) && (/[+\-]\s?\d/.test(d) || /set to 0|loses all power|power set to|réduite à 0/i.test(d)) && firesAura(card)) return 'aura';
   if (/end of (the )?round|fin de (la )?manche|fin du round/i.test(d) && firesEndRound(card)) return 'endround';
+  if (/at the start of (the )?round|au début de (la )?manche/i.test(d) && firesStartRound(card)) return 'startround';
   if (/chakra \+/i.test(d) && firesChakra(card)) return 'chakra';
   if (/when.*enemy.*(is )?played/i.test(d) && firesOnEnemyPlayed(card)) return 'onenemy';
   if (/friendly[^.]*would be (hidden|defeated)/i.test(d) && firesSacrifice(card)) return 'sacrifice';
@@ -992,6 +1046,7 @@ export function phase810Scenario(cardId: string, kind: Phase810Kind): SimScenari
     case 'score': return scoreScenario(card);
     case 'aura': return auraScenario(card);
     case 'endround': return endRoundScenario(card);
+    case 'startround': return startRoundScenario(card);
     case 'chakra': return chakraScenario(card);
     case 'onenemy': return onEnemyPlayedScenario(card);
     case 'protect': return protectScenario(card);

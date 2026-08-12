@@ -1,5 +1,5 @@
 
-export const IMAGE_VERSION = 13;
+export const IMAGE_VERSION = 14;
 
 export function normalizeImagePath(imageFile?: string): string | null {
   if (!imageFile) return null;

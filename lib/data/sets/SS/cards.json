@@ -3505,6 +3505,93 @@
         }
       ],
       "data_complete": true
+    },
+    "SS-123-SHINOBIV": {
+      "id": "SS-123-SHINOBIV",
+      "cardId": "SS-123-SHINOBIV",
+      "rarity": "SHINOBIV",
+      "rarity_display": "Shinobi V",
+      "number": "123",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] POWERUPs on friendly characters in this mission are increased by 1."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Ino Yamanaka: Take back control of a character you own in play."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "SAKURA HARUNO",
+      "title_en": "Chunin Exams",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "Examen Chûnin",
+      "name_es": "SAKURA HARUNO",
+      "title_es": "Exámenes Chunin",
+      "name_ja": "春野サクラ",
+      "title_ja": "中忍試験",
+      "name_pt": "SAKURA HARUNO",
+      "title_pt": "Exames Chunin",
+      "name_it": "SAKURA HARUNO",
+      "title_it": "Esami Chunin",
+      "name_pl": "SAKURA HARUNO",
+      "title_pl": "Egzamin na Chūnina",
+      "image_file": "images/cards/SS/shinobi_v/SS-123-SHINOBIV.webp",
+      "image_url": "/images/cards/SS/shinobi_v/SS-123-SHINOBIV.webp"
+    },
+    "SS-124-SHINOBIV": {
+      "id": "SS-124-SHINOBIV",
+      "cardId": "SS-124-SHINOBIV",
+      "rarity": "SHINOBIV",
+      "rarity_display": "Shinobi V",
+      "number": "124",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "INO YAMANAKA",
+      "name_fr": "INO YAMANAKA",
+      "name_es": "INO YAMANAKA",
+      "name_ja": "山中いの",
+      "name_pt": "INO YAMANAKA",
+      "name_it": "INO YAMANAKA",
+      "name_pl": "INO YAMANAKA",
+      "has_visual": true,
+      "image_file": "images/cards/SS/shinobi_v/SS-124-SHINOBIV.webp",
+      "image_url": "/images/cards/SS/shinobi_v/SS-124-SHINOBIV.webp",
+      "chakra": 6,
+      "power": 2,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Sakura Haruno: Take control of an enemy character of Power lower than the Sakura Haruno's Power."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Move a controlled character from this mission."
+        }
+      ],
+      "data_complete": true,
+      "title_en": "Chunin Exams",
+      "title_fr": "Examen Chûnin",
+      "title_es": "Exámenes Chunin",
+      "title_ja": "中忍試験",
+      "title_pt": "Exames Chunin",
+      "title_it": "Esami Chunin",
+      "title_pl": "Egzamin na Chūnina"
     }
   }
 }
