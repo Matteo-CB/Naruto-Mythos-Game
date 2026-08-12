@@ -76,6 +76,7 @@ export const STATIC_RANKED_BANNED_CARD_IDS: ReadonlySet<string> = new Set([
   'SS-127-R',
   'SS-130-R',
   'SS-139-R',
+  'SS-039-C',
 ]);
 
 // A card is auto-banned from ranked if it is on the explicit list, OR if its set is

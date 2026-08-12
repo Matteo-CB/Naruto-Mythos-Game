@@ -391,4 +391,8 @@ export const effectDescriptionsPl: Record<string, string[]> = {
   "SS-139-R": [
     "[⧗] Gdy zagrasz postać Wioski Dźwięku, musisz dobrać kartę, a następnie odrzucić kartę, jeśli to możliwe.",
   ],
+  "SS-039-C": [
+    "[⧗] Ta postać kosztuje o 1 mniej za każdą sojuszniczą postać Czwórki Dźwięku na tej misji.",
+    "[↯] Zyskaj 2 Czakry.",
+  ],
 };

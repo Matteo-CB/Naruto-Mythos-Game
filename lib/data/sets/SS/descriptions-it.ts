@@ -391,4 +391,8 @@ export const effectDescriptionsIt: Record<string, string[]> = {
   "SS-139-R": [
     "[⧗] Quando giochi un personaggio del Villaggio del Suono, devi pescare una carta e poi scartarne una, se possibile.",
   ],
+  "SS-039-C": [
+    "[⧗] Questo personaggio costa 1 in meno per ogni personaggio Quattro del Suono alleato in questa missione.",
+    "[↯] Guadagna 2 Chakra.",
+  ],
 };

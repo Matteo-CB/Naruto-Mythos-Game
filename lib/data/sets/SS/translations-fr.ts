@@ -392,4 +392,8 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   "SS-139-R": [
     "[⧗] Quand vous jouez un personnage Village du Son, vous devez piocher une carte puis défausser une carte, si possible.",
   ],
+  "SS-039-C": [
+    "[⧗] Ce personnage coûte 1 de moins par personnage Quatre du Son allié dans cette mission.",
+    "[↯] Gagnez 2 Chakra.",
+  ],
 };

@@ -4352,6 +4352,48 @@
         }
       ],
       "data_complete": true
+    },
+    "SS-039-C": {
+      "id": "SS-039-C",
+      "cardId": "SS-039-C",
+      "rarity": "C",
+      "number": "039",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TAYUYA",
+      "name_fr": "TAYUYA",
+      "name_es": "TAYUYA",
+      "name_ja": "多由也",
+      "name_pt": "TAYUYA",
+      "name_it": "TAYUYA",
+      "name_pl": "TAYUYA",
+      "title_en": "North Gate of Sound Four",
+      "title_fr": "Porte Nord des Quatre du Son",
+      "title_es": "Puerta Norte de los Cuatro del Sonido",
+      "title_ja": "音の四人衆 北門",
+      "title_pt": "Portão Norte dos Quatro do Som",
+      "title_it": "Porta Nord dei Quattro del Suono",
+      "title_pl": "Północna Brama Czwórki Dźwięku",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-039-C.webp",
+      "image_url": "/images/cards/SS/common/SS-039-C.webp",
+      "chakra": 2,
+      "power": 1,
+      "keywords": [
+        "Sound Four"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character costs 1 less for every friendly Sound Four character in this mission."
+        },
+        {
+          "type": "FIRST_STRIKE",
+          "description": "[↯] Gain 2 Chakra."
+        }
+      ],
+      "data_complete": true
     }
   }
 }

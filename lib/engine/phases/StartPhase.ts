@@ -4,6 +4,7 @@ import { logSystem, logAction } from '../utils/gameLog';
 import { calculateContinuousChakraBonus, calculateMissionChakraBonus } from '../../effects/ContinuousEffects';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 import { resetFirstStrikeForRound } from '../rules/firstStrike';
+import { applyStartOfRoundTriggers } from '../rules/startOfRoundTriggers';
 
 
 export function executeStartPhase(state: GameState): GameState {
@@ -28,6 +29,8 @@ export function executeStartPhase(state: GameState): GameState {
   
   newState = drawCards(newState, 'player1', CARDS_DRAWN_PER_TURN);
   newState = drawCards(newState, 'player2', CARDS_DRAWN_PER_TURN);
+
+  newState = applyStartOfRoundTriggers(newState);
 
   newState.turnMissionRevealed = true;
 

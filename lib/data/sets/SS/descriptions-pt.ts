@@ -391,4 +391,8 @@ export const effectDescriptionsPt: Record<string, string[]> = {
   "SS-139-R": [
     "[⧗] Quando você jogar um personagem da Vila do Som, deve comprar uma carta e depois descartar uma carta, se possível.",
   ],
+  "SS-039-C": [
+    "[⧗] Este personagem custa menos 1 por cada personagem Quatro do Som aliado nesta missão.",
+    "[↯] Ganha 2 Chakra.",
+  ],
 };

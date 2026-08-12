@@ -392,4 +392,8 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   "SS-139-R": [
     "[⧗] When you play a Sound Village character, you must draw a card and then discard a card, if able.",
   ],
+  "SS-039-C": [
+    "[⧗] This character costs 1 less for every friendly Sound Four character in this mission.",
+    "[↯] Gain 2 Chakra.",
+  ],
 };

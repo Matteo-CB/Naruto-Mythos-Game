@@ -395,4 +395,8 @@ export const effectDescriptionsEs: Record<string, string[]> = {
   "SS-139-R": [
     "[⧗] Cuando juegues un personaje de la Aldea del Sonido, debes robar una carta y luego descartar una carta, si puedes.",
   ],
+  "SS-039-C": [
+    "[⧗] Este personaje cuesta 1 menos por cada personaje Cuatro del Sonido aliado en esta misión.",
+    "[↯] Gana 2 Chakra.",
+  ],
 };
