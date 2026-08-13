@@ -1904,7 +1904,7 @@
       "title_pt": "Só me importava sobreviver para derrotar meu irmão.",
       "title_it": "L'unica cosa che m'importava era sopravvivere per sconfiggere mio fratello.",
       "title_pl": "Zależało mi tylko na przetrwaniu, by pokonać brata.",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 5,
       "power": 5,
       "keywords": [
@@ -1923,7 +1923,9 @@
       ],
       "rarity_display": "Special V",
       "data_complete": true,
-      "old_id": "126/140 V"
+      "old_id": "126/140 V",
+      "image_file": "images/cards/SS/rare/SS-126-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-126-R.webp"
     },
     "SS-031-CHIBIV": {
       "id": "SS-031-CHIBIV",
@@ -1932,7 +1934,7 @@
       "number": "031",
       "set": "SS",
       "card_type": "character",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 5,
       "power": 5,
       "keywords": [],
@@ -1957,7 +1959,9 @@
       "name_it": "KIMIMARO",
       "title_it": "Non sono la sua pedina",
       "name_pl": "KIMIMARO",
-      "title_pl": "Nie jestem jego pionkiem"
+      "title_pl": "Nie jestem jego pionkiem",
+      "image_file": "images/cards/SS/chibi_v/SS-031-CHIBIV.webp",
+      "image_url": "/images/cards/SS/chibi_v/SS-031-CHIBIV.webp"
     },
     "SS-999-L": {
       "id": "SS-999-L",
@@ -2314,7 +2318,7 @@
       "set": "SS",
       "card_type": "attachment",
       "attach_to": "character",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 0,
       "power": 1,
       "keywords": [
@@ -2345,7 +2349,9 @@
       "name_it": "SENBON",
       "title_it": "",
       "name_pl": "SENBON",
-      "title_pl": ""
+      "title_pl": "",
+      "image_file": "images/cards/SS/attachment/SS-079-C.webp",
+      "image_url": "/images/cards/SS/attachment/SS-079-C.webp"
     },
     "SS-081-C": {
       "id": "SS-081-C",
@@ -2355,7 +2361,7 @@
       "set": "SS",
       "card_type": "attachment",
       "attach_to": "character",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 2,
       "power": 2,
       "keywords": [
@@ -2386,7 +2392,9 @@
       "name_it": "RAMEN",
       "title_it": "",
       "name_pl": "RAMEN",
-      "title_pl": ""
+      "title_pl": "",
+      "image_file": "images/cards/SS/attachment/SS-081-C.webp",
+      "image_url": "/images/cards/SS/attachment/SS-081-C.webp"
     },
     "SS-123-MV": {
       "id": "SS-123-MV",
@@ -3171,7 +3179,7 @@
       "rarity_display": "Secret",
       "number": "148",
       "old_id": "148/140",
-      "has_visual": false,
+      "has_visual": true,
       "data_complete": true,
       "title_en": "This time we settle it once and for all!",
       "title_fr": "Cette fois, on règle ça une bonne fois pour toutes !",
@@ -3179,7 +3187,9 @@
       "title_ja": "「今度こそ決着をつける！」",
       "title_pt": "Desta vez resolvemos isso de uma vez por todas!",
       "title_it": "Questa volta la chiudiamo una volta per tutte!",
-      "title_pl": "Tym razem kończymy to raz na zawsze!"
+      "title_pl": "Tym razem kończymy to raz na zawsze!",
+      "image_file": "images/cards/SS/secret/SS-148-S.webp",
+      "image_url": "/images/cards/SS/secret/SS-148-S.webp"
     },
     "SS-149-S": {
       "id": "SS-149-S",
@@ -3253,7 +3263,7 @@
       "rarity_display": "Secret",
       "number": "150",
       "old_id": "150/140",
-      "has_visual": false,
+      "has_visual": true,
       "data_complete": true,
       "title_en": "You're just brats.",
       "title_fr": "Vous n’êtes que des gamins.",
@@ -3261,7 +3271,9 @@
       "title_ja": "「ガキが。」",
       "title_pt": "Vocês não passam de pirralhos.",
       "title_it": "Non siete che dei marmocchi.",
-      "title_pl": "Jesteście tylko bachorami."
+      "title_pl": "Jesteście tylko bachorami.",
+      "image_file": "images/cards/SS/secret/SS-150-S.webp",
+      "image_url": "/images/cards/SS/secret/SS-150-S.webp"
     },
     "SS-005-C": {
       "id": "SS-005-C",
@@ -8864,6 +8876,47 @@
       "title_pl": "„Ochronię was własnym życiem.”",
       "image_file": "images/cards/SS/pop_v/SS-149-POPV.webp",
       "image_url": "/images/cards/SS/pop_v/SS-149-POPV.webp"
+    },
+    "SS-121_2-SPV": {
+      "id": "SS-121_2-SPV",
+      "cardId": "SS-121_2-SPV",
+      "rarity": "SPV",
+      "number": "121",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_ja": "うずまきナルト",
+      "name_fr": "NARUTO UZUMAKI",
+      "name_es": "NARUTO UZUMAKI",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every friendly Naruto Uzumaki in play."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kiba Inuzuka: Move the card at the bottom of this upgrade stack to another mission."
+        }
+      ],
+      "rarity_display": "Special V",
+      "data_complete": true,
+      "title_en": "\"I don't quit and I don't run!\"",
+      "title_fr": "« Je n'abandonne pas et je ne fuis pas ! »",
+      "title_es": "«¡Ni me rindo ni huyo!»",
+      "title_ja": "「諦めないし、逃げない！」",
+      "title_pt": "«Não desisto e não fujo!»",
+      "title_it": "«Non mollo e non scappo!»",
+      "title_pl": "„Nie poddaję się i nie uciekam!”",
+      "image_file": "images/cards/SS/sp_v/SS-121_2-SPV.webp",
+      "image_url": "/images/cards/SS/sp_v/SS-121_2-SPV.webp"
     }
   }
 }
