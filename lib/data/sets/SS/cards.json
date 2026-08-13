@@ -8917,6 +8917,45 @@
       "title_pl": "„Nie poddaję się i nie uciekam!”",
       "image_file": "images/cards/SS/sp_v/SS-121_2-SPV.webp",
       "image_url": "/images/cards/SS/sp_v/SS-121_2-SPV.webp"
+    },
+    "SS-126_2-MV": {
+      "id": "SS-126_2-MV",
+      "cardId": "SS-126_2-MV",
+      "rarity": "MV",
+      "number": "126",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_ja": "うちはサスケ",
+      "name_fr": "SASUKE UCHIWA",
+      "name_es": "SASUKE UCHIHA",
+      "title_en": "\"I'm able to see...\"",
+      "title_ja": "「見える…」",
+      "title_fr": "Je peux voir...",
+      "title_es": "Puedo ver...",
+      "title_pt": "Consigo ver...",
+      "title_it": "Riesco a vedere...",
+      "title_pl": "Potrafię widzieć...",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every Sound Village character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Orochimaru: Play a Sound Village character anywhere, paying 3 less."
+        }
+      ],
+      "rarity_display": "Mythos Variant",
+      "data_complete": true,
+      "old_id": "126/140 V"
     }
   }
 }

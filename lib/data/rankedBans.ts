@@ -83,6 +83,7 @@ export const STATIC_RANKED_BANNED_CARD_IDS: ReadonlySet<string> = new Set([
   'SS-050-C',
   'SS-127-MV',
   'SS-127_2-MV',
+  'SS-126_2-MV',
   'SS-121_2-SPV',
   'SS-061-CHIBIV',
   'SS-111-RA',
