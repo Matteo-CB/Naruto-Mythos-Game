@@ -1537,6 +1537,7 @@
         "ss034MoveFriendly": "Choose a friendly character to move to another mission.",
         "ss125MoveHidden": "Choose a friendly hidden character to move to another mission.",
         "ss101DefeatWeakest": "Defeat every non-hidden character with the lowest Power in this mission, friendly and enemy alike?",
+        "ss050Powerup": "Choose a friendly Sand Village character in play. It gains 2 Power tokens.",
         "ss030PlaceHidden": "Choose the mission where the top card of your deck is placed as a hidden character.",
         "ss045BounceHidden": "Choose a friendly hidden character to return to your hand.",
         "ss045PlaceFromHand": "Choose a card from your hand to place as a hidden character in that same mission.",

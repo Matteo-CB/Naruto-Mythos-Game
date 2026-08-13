@@ -53,6 +53,9 @@ export const effectDescriptionsEs: Record<string, string[]> = {
     "[⧗] Puedes jugar este personaje como mejora sobre un Gaara.",
     "[↯] Derrota a un personaje enemigo con 3 de Poder o menos.",
   ],
+  "SS-050-C": [
+    "[↯] POWERUP 2 a un personaje aliado de la Aldea de la Arena en juego.",
+  ],
   "SS-049-C": [
     "[↯] Mueve un personaje desde esta misión.",
   ],

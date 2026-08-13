@@ -6385,6 +6385,7 @@ export class EffectEngine {
       case 'SS045_CONFIRM_AMBUSH':
       case 'SS034_CONFIRM_FIRST_STRIKE':
       case 'SS125_CONFIRM_UPGRADE':
+      case 'SS050_CONFIRM_SCORE':
       case 'MINATO122_CONFIRM_MAIN': {
         let relay: { nextType?: string; targets?: string[]; nextKey?: string; nextText?: string; nextMin?: number; nextMax?: number } = {};
         try { relay = JSON.parse(pendingEffect.effectDescription); } catch {}
@@ -16421,6 +16422,29 @@ export class EffectEngine {
           );
           missions_tay[tayRes.missionIndex] = m_tay;
           newState = { ...newState, activeMissions: missions_tay };
+        }
+        break;
+      }
+      case 'SS050_POWERUP': {
+        const ss050Res = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (ss050Res) {
+          const missions_ss050 = [...newState.activeMissions];
+          const m_ss050 = { ...missions_ss050[ss050Res.missionIndex] };
+          const side_ss050 = ss050Res.player === 'player1' ? 'player1Characters' : 'player2Characters';
+          const gained_ss050 = amplifiedPowerup(state, targetId, 2);
+          m_ss050[side_ss050] = m_ss050[side_ss050].map((c: CharacterInPlay) =>
+            c.instanceId === targetId ? { ...c, powerTokens: c.powerTokens + gained_ss050 } : c
+          );
+          missions_ss050[ss050Res.missionIndex] = m_ss050;
+          newState = { ...newState, activeMissions: missions_ss050 };
+          const name_ss050 = (ss050Res.character.stack?.length > 0
+            ? ss050Res.character.stack[ss050Res.character.stack.length - 1]
+            : ss050Res.character.card);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_POWERUP',
+            `Baki (SS-050): POWERUP ${gained_ss050} on ${name_ss050.name_fr}.`,
+            'game.log.effect.powerup',
+            { card: 'BAKI', id: 'SS-050-C', amount: String(gained_ss050), target: name_ss050.name_fr, target_en: name_ss050.name_en || name_ss050.name_fr });
         }
         break;
       }

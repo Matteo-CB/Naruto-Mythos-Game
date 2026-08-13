@@ -2094,7 +2094,7 @@
       "number": "2",
       "set": "SS",
       "card_type": "character",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 4,
       "power": 5,
       "keywords": [
@@ -2121,7 +2121,8 @@
       "name_it": "TSUNADE",
       "title_it": "La Giocatrice Incallita",
       "name_pl": "TSUNADE",
-      "title_pl": "Nałogowa Hazardzistka"
+      "title_pl": "Nałogowa Hazardzistka",
+      "image_file": "images/cards/SS/uncommon/SS-002-UC.webp"
     },
     "SS-006-UC": {
       "id": "SS-006-UC",
@@ -2130,7 +2131,7 @@
       "number": "6",
       "set": "SS",
       "card_type": "character",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 5,
       "power": 6,
       "keywords": [
@@ -2153,7 +2154,8 @@
       "title_ja": "檻を破る",
       "title_pt": "Quebrando a Jaula",
       "title_it": "Spezzare la Gabbia",
-      "title_pl": "Rozbijając Klatkę"
+      "title_pl": "Rozbijając Klatkę",
+      "image_file": "images/cards/SS/uncommon/SS-006-UC.webp"
     },
     "SS-008-C": {
       "id": "SS-008-C",
@@ -2199,7 +2201,7 @@
       "number": "16",
       "set": "SS",
       "card_type": "character",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 2,
       "power": 2,
       "keywords": [
@@ -2226,7 +2228,8 @@
       "name_it": "HINATA HYUGA",
       "title_it": "Controllo del Chakra",
       "name_pl": "HINATA HYUGA",
-      "title_pl": "Kontrola Czakry"
+      "title_pl": "Kontrola Czakry",
+      "image_file": "images/cards/SS/common/SS-016-C.webp"
     },
     "SS-033-UC": {
       "id": "SS-033-UC",
@@ -2273,7 +2276,7 @@
       "number": "53",
       "set": "SS",
       "card_type": "character",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 2,
       "power": 2,
       "keywords": [
@@ -2300,7 +2303,8 @@
       "name_it": "ITACHI UCHIHA",
       "title_it": "Ninja Spietato",
       "name_pl": "ITACHI UCHIHA",
-      "title_pl": "Bezlitosny Ninja"
+      "title_pl": "Bezlitosny Ninja",
+      "image_file": "images/cards/SS/common/SS-053-C.webp"
     },
     "SS-079-C": {
       "id": "SS-079-C",
@@ -4470,6 +4474,75 @@
         }
       ],
       "data_complete": true
+    },
+    "SS-048-C": {
+      "id": "SS-048-C",
+      "cardId": "SS-048-C",
+      "rarity": "C",
+      "number": "48",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KANKURO",
+      "title_en": "Full of Surprises",
+      "name_fr": "KANKURÔ",
+      "title_fr": "Plein de Surprises",
+      "name_es": "KANKURO",
+      "title_es": "Lleno de Sorpresas",
+      "name_ja": "カンクロウ",
+      "title_ja": "意外性の男",
+      "name_pt": "KANKURO",
+      "title_pt": "Cheio de Surpresas",
+      "name_it": "KANKURO",
+      "title_it": "Pieno di Sorprese",
+      "name_pl": "KANKURO",
+      "title_pl": "Pełen Niespodzianek",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Team Baki"
+      ],
+      "group": "Sand Village",
+      "effects": [],
+      "data_complete": true,
+      "image_file": "images/cards/SS/common/SS-048-C.webp"
+    },
+    "SS-050-C": {
+      "id": "SS-050-C",
+      "cardId": "SS-050-C",
+      "rarity": "C",
+      "number": "50",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "BAKI",
+      "title_en": "Conspirator in the Invasion",
+      "name_fr": "BAKI",
+      "title_fr": "Conspirateur de l'Invasion",
+      "name_es": "BAKI",
+      "title_es": "Conspirador en la Invasión",
+      "name_ja": "バキ",
+      "title_ja": "木ノ葉崩しの共謀者",
+      "name_pt": "BAKI",
+      "title_pt": "Conspirador na Invasão",
+      "name_it": "BAKI",
+      "title_it": "Cospiratore nell'Invasione",
+      "name_pl": "BAKI",
+      "title_pl": "Spiskowiec Inwazji",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team Baki"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] POWERUP 2 a friendly Sand Village character in play."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/common/SS-050-C.webp"
     }
   }
 }

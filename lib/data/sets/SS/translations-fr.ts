@@ -50,6 +50,9 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     "[⧗] Vous pouvez jouer ce personnage en amélioration sur un Gaara.",
     "[↯] Vainquez un personnage ennemi ayant une Puissance de 3 ou moins.",
   ],
+  "SS-050-C": [
+    "[↯] POWERUP 2 sur un personnage Village du Sable allié en jeu.",
+  ],
   "SS-049-C": [
     "[↯] Déplacez un personnage depuis cette mission.",
   ],

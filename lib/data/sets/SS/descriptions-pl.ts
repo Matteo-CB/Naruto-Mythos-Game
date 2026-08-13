@@ -49,6 +49,9 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "[⧗] Możesz zagrać tę postać jako ulepszenie na Gaarę.",
     "[↯] Pokonaj wrogą postać z Siłą 3 lub mniejszą.",
   ],
+  "SS-050-C": [
+    "[↯] POWERUP 2 na sojuszniczą postać z Wioski Piasku w grze.",
+  ],
   "SS-049-C": [
     "[↯] Przenieś postać z tej misji.",
   ],

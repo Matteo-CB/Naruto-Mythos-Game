@@ -2,42 +2,58 @@
   "entries": [
     {
       "date": "2026-08-13",
-      "title_fr": "Cartes contrôlées",
-      "title_en": "Controlled cards",
-      "title_es": "Cartas controladas",
-      "title_ja": "コントロールされたカード",
-      "title_pt": "Cartas controladas",
-      "title_it": "Carte controllate",
-      "title_pl": "Kontrolowane karty",
+      "title_fr": "Nouvelles cartes et corrections",
+      "title_en": "New cards and fixes",
+      "title_es": "Cartas nuevas y correcciones",
+      "title_ja": "新カードと修正",
+      "title_pt": "Cartas novas e correções",
+      "title_it": "Carte nuove e correzioni",
+      "title_pl": "Nowe karty i poprawki",
       "categories": [
+        "feature",
+        "fix",
         "fix",
         "fix"
       ],
       "changes_fr": [
+        "Nouvelles cartes : 048 commune, 050 commune.",
+        "Les cartes 002, 006, 016 et 053 affichent enfin leur illustration.",
         "Un personnage volé rend ce qu'il contrôlait : voler le voleur ne vous donne plus sa prise.",
         "Une carte prise revient toujours à son propriétaire quand celui qui la contrôlait quitte le terrain."
       ],
       "changes_en": [
+        "New cards: 048 common, 050 common.",
+        "Cards 002, 006, 016 and 053 finally show their artwork.",
         "A stolen character releases what it controlled: stealing the thief no longer hands you their prize.",
         "A taken card always returns to its owner when the character controlling it leaves the board."
       ],
       "changes_es": [
+        "Cartas nuevas: 048 común, 050 común.",
+        "Las cartas 002, 006, 016 y 053 por fin muestran su ilustración.",
         "Un personaje robado suelta lo que controlaba: robar al ladrón ya no te entrega su botín.",
         "Una carta tomada siempre vuelve a su dueño cuando el personaje que la controlaba abandona el tablero."
       ],
       "changes_ja": [
+        "新カード：048 コモン、050 コモン。",
+        "002、006、016、053 のカードにイラストが表示されるようになりました。",
         "奪われたキャラクターは、コントロールしていたカードを手放します。奪い返しても、その獲物までは手に入りません。",
         "コントロールしていたキャラクターが場を離れると、奪われたカードは必ず持ち主のもとへ戻ります。"
       ],
       "changes_pt": [
+        "Cartas novas: 048 comum, 050 comum.",
+        "As cartas 002, 006, 016 e 053 mostram finalmente a sua ilustração.",
         "Um personagem roubado solta o que controlava: roubar o ladrão já não lhe entrega o espólio.",
         "Uma carta tomada volta sempre ao dono quando o personagem que a controlava deixa o tabuleiro."
       ],
       "changes_it": [
+        "Carte nuove: 048 comune, 050 comune.",
+        "Le carte 002, 006, 016 e 053 mostrano finalmente la loro illustrazione.",
         "Un personaggio rubato lascia ciò che controllava: rubare il ladro non ti consegna più il suo bottino.",
         "Una carta presa torna sempre al proprietario quando il personaggio che la controllava lascia il campo."
       ],
       "changes_pl": [
+        "Nowe karty: 048 pospolita, 050 pospolita.",
+        "Karty 002, 006, 016 i 053 wreszcie pokazują swoją ilustrację.",
         "Skradziona postać oddaje to, co kontrolowała: kradzież złodzieja nie daje ci już jego łupu.",
         "Zabrana karta zawsze wraca do właściciela, gdy postać, która ją kontrolowała, opuszcza planszę."
       ]

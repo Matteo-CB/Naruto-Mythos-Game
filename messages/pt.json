@@ -3639,6 +3639,7 @@
         "ss034MoveFriendly": "Escolhe um personagem aliado para mover para outra missão.",
         "ss125MoveHidden": "Escolhe um personagem aliado escondido para mover para outra missão.",
         "ss101DefeatWeakest": "Derrotar todos os personagens não escondidos com menos Poder nesta missão, aliados e inimigos?",
+        "ss050Powerup": "Escolhe um personagem aliado da Vila da Areia em jogo. Ele ganha 2 fichas de Poder.",
         "ss030PlaceHidden": "Escolhe a missão onde a carta do topo do teu baralho é colocada como personagem escondido.",
         "ss045BounceHidden": "Escolhe um personagem aliado escondido para devolver à tua mão.",
         "ss045PlaceFromHand": "Escolhe uma carta da tua mão para colocar como personagem escondido nessa mesma missão.",

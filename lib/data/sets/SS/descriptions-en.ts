@@ -50,6 +50,9 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "[⧗] You can play this character as an upgrade over Gaara.",
     "[↯] Defeat an enemy character with Power 3 or less.",
   ],
+  "SS-050-C": [
+    "[↯] POWERUP 2 a friendly Sand Village character in play.",
+  ],
   "SS-049-C": [
     "[↯] Move a character from this mission.",
   ],
