@@ -6,6 +6,7 @@ import { canBeHiddenByEnemy, isImmuneToEnemyHideOrDefeat } from '@/lib/effects/C
 import { confirmFirst } from './confirmFirst';
 
 export const SHIKAMARU_118_ID = 'SS-118-CHIBIV';
+export const SHIKAMARU_118_BASE_ID = 'SS-118-R';
 export const SHIKAMARU_118_NAME = 'SHIKAMARU NARA';
 
 function enemyOf(player: PlayerID): PlayerID {
@@ -109,4 +110,6 @@ function shikamaru118Duel(ctx: EffectContext): EffectResult {
 export function registerShikamaru118Handlers(): void {
   registerEffect(SHIKAMARU_118_ID, 'AMBUSH', shikamaru118Ambush);
   registerEffect(SHIKAMARU_118_ID, 'DUEL', shikamaru118Duel);
+  registerEffect(SHIKAMARU_118_BASE_ID, 'AMBUSH', shikamaru118Ambush);
+  registerEffect(SHIKAMARU_118_BASE_ID, 'DUEL', shikamaru118Duel);
 }

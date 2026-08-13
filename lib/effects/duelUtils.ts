@@ -4,10 +4,10 @@ function topCardOf(char: CharacterInPlay) {
   return char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 }
 
-const DUEL_NAME_TERMINATOR = /[,:]|\b(?:MAIN|AMBUSH|UPGRADE|SCORE|DUEL|FIRST\s+STRIKE)\s+effect\b/i;
+const DUEL_NAME_TERMINATOR = /[,:]|\[[^\]]*\]|\b(?:MAIN|AMBUSH|UPGRADE|SCORE|DUEL|FIRST\s+STRIKE)\s+effect\b/i;
 
 export function parseDuelCharacterName(description: string): string | null {
-  const cleaned = description.replace(/\[[^\]]*\]/g, ' ').trim();
+  const cleaned = description.replace(/^\s*\[[^\]]*\]\s*/, '').trim();
   const m = cleaned.match(/^DUEL\s+(.+)$/i);
   if (!m) return null;
   const reste = m[1];

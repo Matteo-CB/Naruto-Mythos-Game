@@ -383,6 +383,14 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "[↯] DUEL Choji Akimichi: Pokonaj wrogą postać, która została przeniesiona w poprzedniej turze przeciwnika.",
     "[↯] Przenieś sojuszniczą ukrytą postać w grze.",
   ],
+  "SS-127-MV": [
+    "[↯] Przejmij kontrolę nad nieukrytą wrogą postacią na tej misji, płacąc Czakrę równą jej Sile.",
+    "Sasuke Uchiha: Efekt AMBUSH staje się efektem MAIN.",
+  ],
+  "SS-127_2-MV": [
+    "[↯] Przejmij kontrolę nad nieukrytą wrogą postacią na tej misji, płacąc Czakrę równą jej Sile.",
+    "Sasuke Uchiha: Efekt AMBUSH staje się efektem MAIN.",
+  ],
   "SS-127-R": [
     "[↯] Przejmij kontrolę nad nieukrytą wrogą postacią na tej misji, płacąc Czakrę równą jej Sile.",
     "Sasuke Uchiha: Efekt AMBUSH staje się efektem MAIN.",

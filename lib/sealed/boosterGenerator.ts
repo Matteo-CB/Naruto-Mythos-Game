@@ -2,6 +2,7 @@ import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoade
 import { getSealedSetIds } from '@/lib/data/sets/registry';
 import type { CharacterCard, MissionCard, CardData } from '@/lib/engine/types';
 import { isVariantRarity } from '@/lib/variants/constants';
+import { NUMBERED_RARITIES, SHINOBI_SHIREN_SET_ID, rollShinobiShirenChase } from './shinobiShirenRates';
 
 export interface BoosterCard extends CardData {
   isHolo?: boolean;
@@ -51,6 +52,9 @@ interface RarityBuckets {
   rareArts: CharacterCard[];
   secrets: CharacterCard[];
   legendaries: CharacterCard[];
+  specials: CharacterCard[];
+  shinobis: CharacterCard[];
+  numbered: CharacterCard[];
   missions: MissionCard[];
 }
 
@@ -64,12 +68,48 @@ function buildRarityBuckets(setId: string): RarityBuckets {
     rareArts: allChars.filter((c) => c.rarity === 'RA'),
     secrets: allChars.filter((c) => c.rarity === 'S'),
     legendaries: allChars.filter((c) => c.rarity === 'L'),
+    specials: allChars.filter((c) => c.rarity === 'SP'),
+    shinobis: allChars.filter((c) => c.rarity === 'SHINOBI'),
+    numbered: allChars.filter((c) => NUMBERED_RARITIES.includes(c.rarity)),
     missions: allMissions,
   };
 }
 
 function bucketsHaveEnough(b: RarityBuckets): boolean {
   return b.commons.length >= 4 && b.uncommons.length >= 3 && b.rares.length >= 1 && b.missions.length >= 1;
+}
+
+function chaseCardForShinobiShiren(b: RarityBuckets): CardData | null {
+  const parRarete: Record<string, CharacterCard[]> = {
+    RA: b.rareArts,
+    S: b.secrets,
+    SP: b.specials,
+    SHINOBI: b.shinobis,
+    L: b.legendaries,
+    NUMBERED: b.numbered,
+  };
+  for (let essai = 0; essai < 12; essai++) {
+    const tire = rollShinobiShirenChase();
+    if (!tire) return null;
+    const vivier = parRarete[tire];
+    if (vivier && vivier.length > 0) return pickRandom(vivier);
+  }
+  return null;
+}
+
+function generateShinobiShirenBooster(boosterIndex: number, setId: string, b: RarityBuckets): BoosterPack {
+  const cards: BoosterCard[] = [];
+
+  for (const c of pickRandomN(b.commons, 4)) cards.push(toBoosterCard(c));
+  for (const c of pickRandomN(b.uncommons, 3)) cards.push(toBoosterCard(c));
+  cards.push(toBoosterCard(pickRandom(b.rares)));
+
+  const chase = chaseCardForShinobiShiren(b);
+  cards.push(chase ? toBoosterCard(chase, true) : toBoosterCard(pickRandom(b.commons)));
+
+  cards.push(toBoosterCard(pickRandom(b.missions)));
+
+  return { cards, boosterIndex, setId };
 }
 
 export function generateBooster(boosterIndex: number, setId?: string, buckets?: RarityBuckets): BoosterPack {
@@ -81,6 +121,8 @@ export function generateBooster(boosterIndex: number, setId?: string, buckets?: 
       throw new Error(`Set "${resolvedSetId}" does not have enough cards to generate a booster`);
     }
   }
+  if (resolvedSetId === SHINOBI_SHIREN_SET_ID) return generateShinobiShirenBooster(boosterIndex, resolvedSetId, b);
+
   const { commons, uncommons, rares, rareArts, secrets, legendaries, missions: allMissions } = b;
 
   const cards: BoosterCard[] = [];

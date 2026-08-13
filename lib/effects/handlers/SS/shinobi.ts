@@ -5,6 +5,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { playLessBlockedRevealResult, playLessSelectionResult, type PlayLessCategory } from '@/lib/effects/handlers/shared/playLess';
 
 const HINATA_ID = 'SS-111-SHINOBIV';
+const HINATA_BASE_ID = 'SS-111-R';
 const HINATA_NAME = 'HINATA HYÛGA';
 const SS111_CATEGORY: PlayLessCategory = { kind: 'name', value: 'HYUGA' };
 
@@ -92,6 +93,8 @@ export function ss111PlayHyugaSelection(ctx: EffectContext): EffectResult | null
 export function registerShinobiHandlers(): void {
   registerEffect(HINATA_ID, 'DUEL', ss111DuelHandler);
   registerEffect(HINATA_ID, 'MAIN', ss111MainHandler);
+  registerEffect(HINATA_BASE_ID, 'DUEL', ss111DuelHandler);
+  registerEffect(HINATA_BASE_ID, 'MAIN', ss111MainHandler);
   registerEffect('SS-111-CHIBIV', 'DUEL', ss111DuelHandler);
   registerEffect('SS-111-CHIBIV', 'MAIN', ss111MainHandler);
 }

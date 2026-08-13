@@ -77,7 +77,11 @@ function orochimaru127Duel(ctx: EffectContext): EffectResult {
   return takeControlPaying(ctx);
 }
 
+export const OROCHIMARU_127_VARIANTS = ['SS-127-R', 'SS-127-MV', 'SS-127_2-MV'];
+
 export function registerOrochimaru127Handlers(): void {
-  registerEffect(OROCHIMARU_127_ID, 'AMBUSH', orochimaru127Ambush);
-  registerEffect(OROCHIMARU_127_ID, 'DUEL', orochimaru127Duel);
+  for (const id of OROCHIMARU_127_VARIANTS) {
+    registerEffect(id, 'AMBUSH', orochimaru127Ambush);
+    registerEffect(id, 'DUEL', orochimaru127Duel);
+  }
 }

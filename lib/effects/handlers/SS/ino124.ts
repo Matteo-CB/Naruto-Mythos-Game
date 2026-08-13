@@ -8,6 +8,7 @@ import { charactersMovableFromMission, enemyOf, sideKey } from './sandMove';
 import { confirmFirst } from './confirmFirst';
 
 export const INO_124_ID = 'SS-124-SHINOBIV';
+export const INO_124_BASE_ID = 'SS-124-R';
 export const INO_124_NAME = 'INO YAMANAKA';
 export const INO_124_LOG_NAME = 'Ino Yamanaka';
 const DEFAULT_DUEL_PARTNER = 'Sakura Haruno';
@@ -128,4 +129,6 @@ function ino124Upgrade(ctx: EffectContext): EffectResult {
 export function registerIno124Handlers(): void {
   registerEffect(INO_124_ID, 'DUEL', ino124Duel);
   registerEffect(INO_124_ID, 'UPGRADE', ino124Upgrade);
+  registerEffect(INO_124_BASE_ID, 'DUEL', ino124Duel);
+  registerEffect(INO_124_BASE_ID, 'UPGRADE', ino124Upgrade);
 }

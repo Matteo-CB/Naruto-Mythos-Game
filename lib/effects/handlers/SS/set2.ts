@@ -403,12 +403,15 @@ export function registerSet2Handlers(): void {
   registerEffect('SS-108-C', 'SCORE', stadium108ScoreHandler);
   registerEffect('SS-112-SPV', 'UPGRADE', ss112UpgradeHandler);
   registerEffect('SS-112-SPV', 'DUEL', ss112DuelHandler);
+  registerEffect('SS-112-R', 'UPGRADE', ss112UpgradeHandler);
+  registerEffect('SS-112-R', 'DUEL', ss112DuelHandler);
   registerEffect('SS-147-POPV', 'DUEL', ss147DuelHandler);
   registerEffect('SS-147-SV', 'DUEL', ss147DuelHandler);
   registerEffect('SS-147-S', 'DUEL', ss147DuelHandler);
   registerEffect('SS-134-R', 'DUEL', ss134DuelHandler);
   registerEffect('SS-134-R', 'UPGRADE', ss134UpgradeHandler);
   registerEffect('SS-120-CHIBIV', 'DUEL', ss120DuelHandler);
+  registerEffect('SS-120-R', 'DUEL', ss120DuelHandler);
   registerEffect('SS-126-SPV', 'DUEL', ss126DuelHandler);
   registerEffect('SS-121-R', 'DUEL', ss121DuelHandler);
   registerEffect('SS-121-SPV', 'DUEL', ss121DuelHandler);

@@ -4543,6 +4543,2562 @@
       ],
       "data_complete": true,
       "image_file": "images/cards/SS/common/SS-050-C.webp"
+    },
+    "SS-127-MV": {
+      "id": "SS-127-MV",
+      "cardId": "SS-127-MV",
+      "rarity": "MV",
+      "number": "127",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "OROCHIMARU",
+      "title_en": "\"Come see the truth of the world through my eyes.\"",
+      "name_fr": "OROCHIMARU",
+      "title_fr": "« Viens voir la vérité du monde à travers mes yeux. »",
+      "name_es": "OROCHIMARU",
+      "title_es": "«Ven a ver la verdad del mundo a través de mis ojos.»",
+      "name_ja": "大蛇丸",
+      "title_ja": "「私の目を通して世界の真実を見に来い。」",
+      "name_pt": "OROCHIMARU",
+      "title_pt": "«Vem ver a verdade do mundo através dos meus olhos.»",
+      "name_it": "OROCHIMARU",
+      "title_it": "«Vieni a vedere la verità del mondo attraverso i miei occhi.»",
+      "name_pl": "OROCHIMARU",
+      "title_pl": "„Chodź zobaczyć prawdę świata moimi oczami.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/mythos_v/SS-127-MV.webp",
+      "image_url": "/images/cards/SS/mythos_v/SS-127-MV.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Take control of an enemy non-hidden character in this mission, paying Chakra equal to their Power."
+        },
+        {
+          "type": "DUEL",
+          "description": "DUEL Sasuke Uchiha: The AMBUSH effect becomes a MAIN effect."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-127_2-MV": {
+      "id": "SS-127_2-MV",
+      "cardId": "SS-127_2-MV",
+      "rarity": "MV",
+      "number": "127",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "OROCHIMARU",
+      "title_en": "\"Come see the truth of the world through my eyes.\"",
+      "name_fr": "OROCHIMARU",
+      "title_fr": "« Viens voir la vérité du monde à travers mes yeux. »",
+      "name_es": "OROCHIMARU",
+      "title_es": "«Ven a ver la verdad del mundo a través de mis ojos.»",
+      "name_ja": "大蛇丸",
+      "title_ja": "「私の目を通して世界の真実を見に来い。」",
+      "name_pt": "OROCHIMARU",
+      "title_pt": "«Vem ver a verdade do mundo através dos meus olhos.»",
+      "name_it": "OROCHIMARU",
+      "title_it": "«Vieni a vedere la verità del mondo attraverso i miei occhi.»",
+      "name_pl": "OROCHIMARU",
+      "title_pl": "„Chodź zobaczyć prawdę świata moimi oczami.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/mythos_v/SS-127_2-MV.webp",
+      "image_url": "/images/cards/SS/mythos_v/SS-127_2-MV.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Take control of an enemy non-hidden character in this mission, paying Chakra equal to their Power."
+        },
+        {
+          "type": "DUEL",
+          "description": "DUEL Sasuke Uchiha: The AMBUSH effect becomes a MAIN effect."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-001-UC": {
+      "id": "SS-001-UC",
+      "cardId": "SS-001-UC",
+      "rarity": "UC",
+      "number": "1",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "HIRUZEN SARUTOBI",
+      "name_fr": "HIRUZEN SARUTOBI",
+      "name_ja": "猿飛ヒルゼン",
+      "title_en": "Leader of the Leaf Village",
+      "title_fr": "Chef du Village de la Feuille",
+      "title_es": "Líder de la Aldea de la Hoja",
+      "title_ja": "木ノ葉隠れの里の長",
+      "title_pt": "Líder da Vila da Folha",
+      "title_it": "Capo del Villaggio della Foglia",
+      "title_pl": "Przywódca Wioski Liścia",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-001-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-001-UC.webp",
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Hokage"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If all friendly characters in this mission are Leaf Village, this character has +1 Power for every friendly Leaf Village character in this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-003-C": {
+      "id": "SS-003-C",
+      "cardId": "SS-003-C",
+      "rarity": "C",
+      "number": "3",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SHIZUNE",
+      "name_fr": "SHIZUNE",
+      "name_ja": "シズネ",
+      "title_en": "Jonin in Training",
+      "title_fr": "Jônin en formation",
+      "title_es": "Jonin en formación",
+      "title_ja": "修行中の上忍",
+      "title_pt": "Jonin em formação",
+      "title_it": "Jonin in addestramento",
+      "title_pl": "Jonin w szkoleniu",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-003-C.webp",
+      "image_url": "/images/cards/SS/common/SS-003-C.webp",
+      "chakra": 1,
+      "power": 1,
+      "keywords": [],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] POWERUP 1 a friendly Leaf Village character in this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-004-UC": {
+      "id": "SS-004-UC",
+      "cardId": "SS-004-UC",
+      "rarity": "UC",
+      "number": "4",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "JIRAIYA",
+      "name_fr": "JIRAYA",
+      "name_ja": "自来也",
+      "title_en": "Searching for Tsunade",
+      "title_fr": "À la recherche de Tsunade",
+      "title_es": "En busca de Tsunade",
+      "title_ja": "綱手を探して",
+      "title_pt": "À procura de Tsunade",
+      "title_it": "Alla ricerca di Tsunade",
+      "title_pl": "W poszukiwaniu Tsunade",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-004-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-004-UC.webp",
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Sannin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Look at the top 3 cards of your deck, choose and reveal a Sannin character, then add it to your hand. Put the other cards randomly at the bottom of your deck."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-009-C": {
+      "id": "SS-009-C",
+      "cardId": "SS-009-C",
+      "rarity": "C",
+      "number": "9",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "CHOJI AKIMICHI",
+      "name_fr": "CHÔJI AKIMICHI",
+      "name_ja": "秋道チョウジ",
+      "title_en": "Always eating",
+      "title_fr": "Toujours en train de manger",
+      "title_es": "Siempre comiendo",
+      "title_ja": "いつも食べている",
+      "title_pt": "Sempre a comer",
+      "title_it": "Sempre a mangiare",
+      "title_pl": "Zawsze je",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-009-C.webp",
+      "image_url": "/images/cards/SS/common/SS-009-C.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Team 10"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Discard a Food card from hand to gain 1 Chakra and draw a card."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-010-C": {
+      "id": "SS-010-C",
+      "cardId": "SS-010-C",
+      "rarity": "C",
+      "number": "10",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "INO YAMANAKA",
+      "name_fr": "INO YAMANAKA",
+      "name_ja": "山中いの",
+      "title_en": "Natural Leader",
+      "title_fr": "Meneuse née",
+      "title_es": "Líder nata",
+      "title_ja": "生まれながらのリーダー",
+      "title_pt": "Líder nata",
+      "title_it": "Leader nata",
+      "title_pl": "Urodzona przywódczyni",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-010-C.webp",
+      "image_url": "/images/cards/SS/common/SS-010-C.webp",
+      "chakra": 2,
+      "power": 1,
+      "keywords": [
+        "Team 10"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If there is a friendly Team 10 character in this mission, CHAKRA +1."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-011-C": {
+      "id": "SS-011-C",
+      "cardId": "SS-011-C",
+      "rarity": "C",
+      "number": "11",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SHIKAMARU NARA",
+      "name_fr": "SHIKAMARU NARA",
+      "name_ja": "奈良シカマル",
+      "title_en": "Gathering Information",
+      "title_fr": "Collecte d'informations",
+      "title_es": "Reuniendo información",
+      "title_ja": "情報収集",
+      "title_pt": "A reunir informação",
+      "title_it": "Raccolta di informazioni",
+      "title_pl": "Zbieranie informacji",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-011-C.webp",
+      "image_url": "/images/cards/SS/common/SS-011-C.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Team 10"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Look at a hidden character in this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-012-C": {
+      "id": "SS-012-C",
+      "cardId": "SS-012-C",
+      "rarity": "C",
+      "number": "12",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ASUMA SARUTOBI",
+      "name_fr": "ASUMA SARUTOBI",
+      "name_ja": "猿飛アスマ",
+      "title_en": "Training the Genin",
+      "title_fr": "L'entraînement des Genin",
+      "title_es": "Entrenando a los Genin",
+      "title_ja": "下忍の指導",
+      "title_pt": "A treinar os Genin",
+      "title_it": "Addestrare i Genin",
+      "title_pl": "Szkolenie geninów",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-012-C.webp",
+      "image_url": "/images/cards/SS/common/SS-012-C.webp",
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team 10"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] POWERUP 2 a friendly Team 10 character in this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-013-UC": {
+      "id": "SS-013-UC",
+      "cardId": "SS-013-UC",
+      "rarity": "UC",
+      "number": "13",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ASUMA SARUTOBI",
+      "name_fr": "ASUMA SARUTOBI",
+      "name_ja": "猿飛アスマ",
+      "title_en": "Close Ranged Combat",
+      "title_fr": "Combat rapproché",
+      "title_es": "Combate cuerpo a cuerpo",
+      "title_ja": "接近戦",
+      "title_pt": "Combate corpo a corpo",
+      "title_it": "Combattimento ravvicinato",
+      "title_pl": "Walka wręcz",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-013-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-013-UC.webp",
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 10",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] If the strongest enemy character in play is present in this mission, POWERUP 5."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Repeat the AMBUSH effect."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-014-C": {
+      "id": "SS-014-C",
+      "cardId": "SS-014-C",
+      "rarity": "C",
+      "number": "14",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KIBA INUZUKA",
+      "name_fr": "KIBA INUZUKA",
+      "name_ja": "犬塚キバ",
+      "title_en": "On the Hunt",
+      "title_fr": "En chasse",
+      "title_es": "A la caza",
+      "title_ja": "狩りの最中",
+      "title_pt": "Na caçada",
+      "title_it": "A caccia",
+      "title_pl": "Na polowaniu",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-014-C.webp",
+      "image_url": "/images/cards/SS/common/SS-014-C.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Team 8"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "FIRST_STRIKE",
+          "description": "[↯] FIRST STRIKE Look at a hidden enemy character in this mission. If it costs 3 or less, defeat them."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-015-UC": {
+      "id": "SS-015-UC",
+      "cardId": "SS-015-UC",
+      "rarity": "UC",
+      "number": "15",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "AKAMARU",
+      "name_fr": "AKAMARU",
+      "name_ja": "赤丸",
+      "title_en": "Companion",
+      "title_fr": "Compagnon",
+      "title_es": "Compañero",
+      "title_ja": "相棒",
+      "title_pt": "Companheiro",
+      "title_it": "Compagno",
+      "title_pl": "Towarzysz",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-015-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-015-UC.webp",
+      "chakra": 2,
+      "power": 4,
+      "keywords": [
+        "Team 8"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must pay 1 Chakra or defeat this character."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-017-C": {
+      "id": "SS-017-C",
+      "cardId": "SS-017-C",
+      "rarity": "C",
+      "number": "17",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SHINO ABURAME",
+      "name_fr": "SHINO ABURAME",
+      "name_ja": "油女シノ",
+      "title_en": "Spying Insects",
+      "title_fr": "Insectes espions",
+      "title_es": "Insectos espía",
+      "title_ja": "偵察の蟲",
+      "title_pt": "Insetos espiões",
+      "title_it": "Insetti spia",
+      "title_pl": "Owady zwiadowcze",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-017-C.webp",
+      "image_url": "/images/cards/SS/common/SS-017-C.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Team 8"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] The opponent must reveal a random card from their hand, if able. If it costs 4 or more, you gain 2 Chakra."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-018-UC": {
+      "id": "SS-018-UC",
+      "cardId": "SS-018-UC",
+      "rarity": "UC",
+      "number": "18",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KURENAI YUHI",
+      "name_fr": "KURENAI YUHI",
+      "name_ja": "夕日紅",
+      "title_en": "Team Tactics",
+      "title_fr": "Tactique d'équipe",
+      "title_es": "Táctica de equipo",
+      "title_ja": "チーム戦術",
+      "title_pt": "Tática de equipa",
+      "title_it": "Tattica di squadra",
+      "title_pl": "Taktyka drużyny",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-018-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-018-UC.webp",
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 8"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] POWERUP 1 every friendly Team 8 character in this mission."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] POWERUP 1 every friendly Team 8 character in this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-019-C": {
+      "id": "SS-019-C",
+      "cardId": "SS-019-C",
+      "rarity": "C",
+      "number": "19",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NEJI HYUGA",
+      "name_fr": "NEJI HYÛGA",
+      "name_ja": "日向ネジ",
+      "title_en": "Against Destiny",
+      "title_fr": "Contre le destin",
+      "title_es": "Contra el destino",
+      "title_ja": "運命に抗って",
+      "title_pt": "Contra o destino",
+      "title_it": "Contro il destino",
+      "title_pl": "Wbrew przeznaczeniu",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-019-C.webp",
+      "image_url": "/images/cards/SS/common/SS-019-C.webp",
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Team Guy"
+      ],
+      "group": "Leaf Village",
+      "effects": [],
+      "data_complete": true
+    },
+    "SS-020-C": {
+      "id": "SS-020-C",
+      "cardId": "SS-020-C",
+      "rarity": "C",
+      "number": "20",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ROCK LEE",
+      "name_fr": "ROCK LEE",
+      "name_ja": "ロック・リー",
+      "title_en": "Train Every Day",
+      "title_fr": "S'entraîner chaque jour",
+      "title_es": "Entrenar cada día",
+      "title_ja": "毎日の鍛錬",
+      "title_pt": "Treinar todos os dias",
+      "title_it": "Allenarsi ogni giorno",
+      "title_pl": "Trenować każdego dnia",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-020-C.webp",
+      "image_url": "/images/cards/SS/common/SS-020-C.webp",
+      "chakra": 1,
+      "power": 2,
+      "keywords": [
+        "Team Guy"
+      ],
+      "group": "Leaf Village",
+      "effects": [],
+      "data_complete": true
+    },
+    "SS-021-C": {
+      "id": "SS-021-C",
+      "cardId": "SS-021-C",
+      "rarity": "C",
+      "number": "21",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TENTEN",
+      "name_fr": "TENTEN",
+      "name_ja": "テンテン",
+      "title_en": "On the Line",
+      "title_fr": "Sur le fil",
+      "title_es": "En la cuerda floja",
+      "title_ja": "綱渡り",
+      "title_pt": "No fio da navalha",
+      "title_it": "Sul filo",
+      "title_pl": "Na linie",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-021-C.webp",
+      "image_url": "/images/cards/SS/common/SS-021-C.webp",
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Team Guy"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "FIRST_STRIKE",
+          "description": "[↯] FIRST STRIKE Play this character paying 1 less."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-022-UC": {
+      "id": "SS-022-UC",
+      "cardId": "SS-022-UC",
+      "rarity": "UC",
+      "number": "22",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TENTEN",
+      "name_fr": "TENTEN",
+      "name_ja": "テンテン",
+      "title_en": "Armed to the teeth",
+      "title_fr": "Armée jusqu'aux dents",
+      "title_es": "Armada hasta los dientes",
+      "title_ja": "武器だらけ",
+      "title_pt": "Armada até aos dentes",
+      "title_it": "Armata fino ai denti",
+      "title_pl": "Uzbrojona po zęby",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-022-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-022-UC.webp",
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team Guy"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When you put a Weapon attachment on this character, POWERUP 3."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Play an attachment in this mission, paying 2 less."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-023-C": {
+      "id": "SS-023-C",
+      "cardId": "SS-023-C",
+      "rarity": "C",
+      "number": "23",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "EBISU",
+      "name_fr": "EBISU",
+      "name_ja": "エビス",
+      "title_en": "Personal Trainer",
+      "title_fr": "Précepteur particulier",
+      "title_es": "Entrenador personal",
+      "title_ja": "専属指導役",
+      "title_pt": "Treinador particular",
+      "title_it": "Istruttore personale",
+      "title_pl": "Osobisty trener",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-023-C.webp",
+      "image_url": "/images/cards/SS/common/SS-023-C.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Special Jonin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Look at the top card of your deck. Choose to put it back or put it at the bottom of your deck."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-024-C": {
+      "id": "SS-024-C",
+      "cardId": "SS-024-C",
+      "rarity": "C",
+      "number": "24",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "IRUKA UMINO",
+      "name_fr": "IRUKA UMINO",
+      "name_ja": "うみのイルカ",
+      "title_en": "Teaching to New Students",
+      "title_fr": "Enseigner aux nouveaux élèves",
+      "title_es": "Enseñando a los nuevos alumnos",
+      "title_ja": "新入生に教える",
+      "title_pt": "A ensinar os novos alunos",
+      "title_it": "Insegnare ai nuovi allievi",
+      "title_pl": "Nauczanie nowych uczniów",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-024-C.webp",
+      "image_url": "/images/cards/SS/common/SS-024-C.webp",
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Special Jonin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If there is a friendly Naruto Uzumaki in this mission, CHAKRA +1."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-025-C": {
+      "id": "SS-025-C",
+      "cardId": "SS-025-C",
+      "rarity": "C",
+      "number": "25",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "HAYATE GEKKO",
+      "name_fr": "HAYATE GEKKO",
+      "name_ja": "月光ハヤテ",
+      "title_en": "In the Shadows",
+      "title_fr": "Dans l'ombre",
+      "title_es": "En las sombras",
+      "title_ja": "影の中で",
+      "title_pt": "Nas sombras",
+      "title_it": "Nell'ombra",
+      "title_pl": "W cieniu",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-025-C.webp",
+      "image_url": "/images/cards/SS/common/SS-025-C.webp",
+      "chakra": 4,
+      "power": 5,
+      "keywords": [
+        "Special Jonin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Move a friendly hidden character from this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-026-C": {
+      "id": "SS-026-C",
+      "cardId": "SS-026-C",
+      "rarity": "C",
+      "number": "26",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GENMA SHIRANUI",
+      "name_fr": "GEMMA SHIRANUI",
+      "name_ja": "不知火ゲンマ",
+      "title_en": "Weapon of Choice",
+      "title_fr": "L'arme de prédilection",
+      "title_es": "El arma preferida",
+      "title_ja": "得物",
+      "title_pt": "A arma de eleição",
+      "title_it": "L'arma prediletta",
+      "title_pl": "Ulubiona broń",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-026-C.webp",
+      "image_url": "/images/cards/SS/common/SS-026-C.webp",
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Special Jonin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If this character has a Senbon attachment, they have +2 Power."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-027-UC": {
+      "id": "SS-027-UC",
+      "cardId": "SS-027-UC",
+      "rarity": "UC",
+      "number": "27",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GENMA SHIRANUI",
+      "name_fr": "GEMMA SHIRANUI",
+      "name_ja": "不知火ゲンマ",
+      "title_en": "First Vanguard",
+      "title_fr": "Première ligne",
+      "title_es": "Primera vanguardia",
+      "title_ja": "先鋒",
+      "title_pt": "Primeira vanguarda",
+      "title_it": "Prima avanguardia",
+      "title_pl": "Pierwsza straż przednia",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-027-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-027-UC.webp",
+      "chakra": 5,
+      "power": 2,
+      "keywords": [
+        "Special Jonin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +2 Power for every mission in play."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-028-UC": {
+      "id": "SS-028-UC",
+      "cardId": "SS-028-UC",
+      "rarity": "UC",
+      "number": "28",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "IBIKI MORINO",
+      "name_fr": "IBIKI MORINO",
+      "name_ja": "森乃イビキ",
+      "title_en": "Interrogation Specialist",
+      "title_fr": "Spécialiste de l'interrogatoire",
+      "title_es": "Especialista en interrogatorios",
+      "title_ja": "尋問の専門家",
+      "title_pt": "Especialista em interrogatórios",
+      "title_it": "Specialista dell'interrogatorio",
+      "title_pl": "Specjalista od przesłuchań",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-028-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-028-UC.webp",
+      "chakra": 3,
+      "power": 4,
+      "keywords": [
+        "Special Jonin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Look at the top card of the opponent's deck. You may put that card on the bottom of their deck."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-029-UC": {
+      "id": "SS-029-UC",
+      "cardId": "SS-029-UC",
+      "rarity": "UC",
+      "number": "29",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "IBIKI MORINO",
+      "name_fr": "IBIKI MORINO",
+      "name_ja": "森乃イビキ",
+      "title_en": "Psychological Torture",
+      "title_fr": "Torture psychologique",
+      "title_es": "Tortura psicológica",
+      "title_ja": "精神的拷問",
+      "title_pt": "Tortura psicológica",
+      "title_it": "Tortura psicologica",
+      "title_pl": "Tortura psychiczna",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-029-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-029-UC.webp",
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Special Jonin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Reveal the top card of the opponent's deck. Hide an enemy character in play with the same name as the revealed card."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-052-C": {
+      "id": "SS-052-C",
+      "cardId": "SS-052-C",
+      "rarity": "C",
+      "number": "52",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "HAKU",
+      "name_fr": "HAKU",
+      "name_ja": "白",
+      "title_en": "Hidden Behind the Mask",
+      "title_fr": "Caché derrière le masque",
+      "title_es": "Oculto tras la máscara",
+      "title_ja": "仮面の陰に",
+      "title_pt": "Escondido atrás da máscara",
+      "title_it": "Nascosto dietro la maschera",
+      "title_pl": "Ukryty za maską",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-052-C.webp",
+      "image_url": "/images/cards/SS/common/SS-052-C.webp",
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Rogue Ninja"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Move a Zabuza Momochi to or from this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-054-UC": {
+      "id": "SS-054-UC",
+      "cardId": "SS-054-UC",
+      "rarity": "UC",
+      "number": "54",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ITACHI UCHIHA",
+      "name_fr": "ITACHI UCHIWA",
+      "name_ja": "うちはイタチ",
+      "title_en": "Avoiding Conflict",
+      "title_fr": "Éviter le combat",
+      "title_es": "Evitando el conflicto",
+      "title_ja": "争いを避けて",
+      "title_pt": "A evitar o conflito",
+      "title_it": "Evitare lo scontro",
+      "title_pl": "Unikanie starcia",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-054-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-054-UC.webp",
+      "chakra": 5,
+      "power": 8,
+      "keywords": [
+        "Rogue Ninja"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "DUEL Sasuke Uchiha [⧗] This character has -3 Power."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-055-UC": {
+      "id": "SS-055-UC",
+      "cardId": "SS-055-UC",
+      "rarity": "UC",
+      "number": "55",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KISAME HOSHIGAKI",
+      "name_fr": "KISAME HOSHIGAKI",
+      "name_ja": "干柿鬼鮫",
+      "title_en": "Transfer Attack",
+      "title_fr": "Transfert d'attaque",
+      "title_es": "Transferencia de ataque",
+      "title_ja": "攻撃の転移",
+      "title_pt": "Transferência de ataque",
+      "title_it": "Trasferimento d'attacco",
+      "title_pl": "Przeniesienie ataku",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-055-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-055-UC.webp",
+      "chakra": 4,
+      "power": 5,
+      "keywords": [
+        "Rogue Ninja"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Steal 1 Chakra from the opponent's pool."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Steal 1 Chakra from the opponent's pool."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-056-UC": {
+      "id": "SS-056-UC",
+      "cardId": "SS-056-UC",
+      "rarity": "UC",
+      "number": "56",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "THREE GIANT SNAKES",
+      "name_fr": "TROIS SERPENTS GÉANTS",
+      "name_ja": "三匹の大蛇",
+      "title_en": "Breach the Defence Lines",
+      "title_fr": "Percer les lignes de défense",
+      "title_es": "Rompiendo las líneas de defensa",
+      "title_ja": "防衛線の突破",
+      "title_pt": "A romper as linhas de defesa",
+      "title_it": "Sfondare le linee difensive",
+      "title_pl": "Przełamanie linii obrony",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-056-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-056-UC.webp",
+      "chakra": 3,
+      "power": 6,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Discard an enemy attachment in this mission."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must return this character to your hand."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-057-UC": {
+      "id": "SS-057-UC",
+      "cardId": "SS-057-UC",
+      "rarity": "UC",
+      "number": "57",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SHINIGAMI",
+      "name_fr": "SHINIGAMI",
+      "name_ja": "死神",
+      "title_en": "Reaper Death Seal",
+      "title_fr": "Sceau du Dieu de la Mort",
+      "title_es": "Sello del Dios de la Muerte",
+      "title_ja": "屍鬼封尽",
+      "title_pt": "Selo do Deus da Morte",
+      "title_it": "Sigillo del Dio della Morte",
+      "title_pl": "Pieczęć Boga Śmierci",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-057-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-057-UC.webp",
+      "chakra": 5,
+      "power": 0,
+      "keywords": [
+        "Summon",
+        "Jutsu"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Before determining Power in the Mission Evaluation phase, defeat an enemy character in this mission."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must return this character to your hand."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-058-UC": {
+      "id": "SS-058-UC",
+      "cardId": "SS-058-UC",
+      "rarity": "UC",
+      "number": "58",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "FUGAKU UCHIHA",
+      "name_fr": "FUGAKU UCHIWA",
+      "name_ja": "うちはフガク",
+      "title_en": "Head of the Uchiha Clan",
+      "title_fr": "Chef du clan Uchiwa",
+      "title_es": "Cabeza del clan Uchiha",
+      "title_ja": "うちは一族の当主",
+      "title_pt": "Chefe do clã Uchiha",
+      "title_it": "Capo del clan Uchiha",
+      "title_pl": "Głowa klanu Uchiha",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-058-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-058-UC.webp",
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Head of Clan"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Look at the top 3 cards of your deck, choose and reveal a Uchiha-named character, then add it to your hand. Put the other cards randomly at the bottom of your deck."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-059-C": {
+      "id": "SS-059-C",
+      "cardId": "SS-059-C",
+      "rarity": "C",
+      "number": "59",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NINJA HOUND CORPS",
+      "name_fr": "NINJA HOUND CORPS",
+      "name_ja": "忍犬隊",
+      "title_en": "Fanged Pursuit Jutsu",
+      "title_fr": "Technique de poursuite canine",
+      "title_es": "Técnica de persecución canina",
+      "title_ja": "牙通牙の追跡",
+      "title_pt": "Técnica de perseguição canina",
+      "title_it": "Tecnica di inseguimento canino",
+      "title_pl": "Technika psiego pościgu",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-059-C.webp",
+      "image_url": "/images/cards/SS/common/SS-059-C.webp",
+      "chakra": 2,
+      "power": 0,
+      "keywords": [
+        "Ninja Hound",
+        "Jutsu"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Look at an enemy hidden character in this mission. POWERUP X, where X is the cost of that hidden character."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-060-UC": {
+      "id": "SS-060-UC",
+      "cardId": "SS-060-UC",
+      "rarity": "UC",
+      "number": "60",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "MIZUKI",
+      "name_fr": "MIZUKI",
+      "name_ja": "ミズキ",
+      "title_en": "Jealous and Sadistic Chunin",
+      "title_fr": "Chûnin jaloux et sadique",
+      "title_es": "Chunin celoso y sádico",
+      "title_ja": "嫉妬深く残忍な中忍",
+      "title_pt": "Chunin invejoso e sádico",
+      "title_it": "Chunin geloso e sadico",
+      "title_pl": "Zazdrosny i sadystyczny chunin",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-060-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-060-UC.webp",
+      "chakra": 3,
+      "power": 3,
+      "keywords": [],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] You must hide a friendly character in this mission, if able. If you do so, gain 1 Mission point."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-061-C": {
+      "id": "SS-061-C",
+      "cardId": "SS-061-C",
+      "rarity": "C",
+      "number": "61",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TEUCHI",
+      "name_fr": "TEUCHI",
+      "name_ja": "テウチ",
+      "title_en": "Ichiraku Ramen Owner",
+      "title_fr": "Patron d'Ichiraku Ramen",
+      "title_es": "Dueño del Ichiraku Ramen",
+      "title_ja": "一楽の店主",
+      "title_pt": "Dono do Ichiraku Ramen",
+      "title_it": "Proprietario dell'Ichiraku Ramen",
+      "title_pl": "Właściciel Ichiraku Ramen",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-061-C.webp",
+      "image_url": "/images/cards/SS/common/SS-061-C.webp",
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Civilian"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If there are no friendly hidden characters in this mission, CHAKRA +1."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-062-C": {
+      "id": "SS-062-C",
+      "cardId": "SS-062-C",
+      "rarity": "C",
+      "number": "62",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KONOHAMARU",
+      "name_fr": "KONOHAMARU",
+      "name_ja": "木ノ葉丸",
+      "title_en": "Third Hokage's Grandson",
+      "title_fr": "Petit-fils du Troisième Hokage",
+      "title_es": "Nieto del Tercer Hokage",
+      "title_ja": "三代目火影の孫",
+      "title_pt": "Neto do Terceiro Hokage",
+      "title_it": "Nipote del Terzo Hokage",
+      "title_pl": "Wnuk Trzeciego Hokage",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-062-C.webp",
+      "image_url": "/images/cards/SS/common/SS-062-C.webp",
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Academy Student"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every friendly Academy Student character in this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-063-C": {
+      "id": "SS-063-C",
+      "cardId": "SS-063-C",
+      "rarity": "C",
+      "number": "63",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "UDON",
+      "name_fr": "UDON",
+      "name_ja": "ウドン",
+      "title_en": "Konohamaru Ninja Squad",
+      "title_fr": "Escouade Konohamaru",
+      "title_es": "Escuadrón Konohamaru",
+      "title_ja": "木ノ葉丸忍者隊",
+      "title_pt": "Esquadrão Konohamaru",
+      "title_it": "Squadra Konohamaru",
+      "title_pl": "Oddział Konohamaru",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-063-C.webp",
+      "image_url": "/images/cards/SS/common/SS-063-C.webp",
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Academy Student"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] If there is a friendly Konohamaru in this mission, POWERUP 1."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-064-C": {
+      "id": "SS-064-C",
+      "cardId": "SS-064-C",
+      "rarity": "C",
+      "number": "64",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "MOEGI",
+      "name_fr": "MOEGI",
+      "name_ja": "モエギ",
+      "title_en": "Konohamaru Ninja Squad",
+      "title_fr": "Escouade Konohamaru",
+      "title_es": "Escuadrón Konohamaru",
+      "title_ja": "木ノ葉丸忍者隊",
+      "title_pt": "Esquadrão Konohamaru",
+      "title_it": "Squadra Konohamaru",
+      "title_pl": "Oddział Konohamaru",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-064-C.webp",
+      "image_url": "/images/cards/SS/common/SS-064-C.webp",
+      "chakra": 1,
+      "power": 0,
+      "keywords": [
+        "Academy Student"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] If there is a friendly Konohamaru in this mission, draw 1 card."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-065-UC": {
+      "id": "SS-065-UC",
+      "cardId": "SS-065-UC",
+      "rarity": "UC",
+      "number": "65",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SEIMEI",
+      "name_fr": "SEIMEI",
+      "title_en": "The Ultimate Weapon Reborn",
+      "title_fr": "L'arme ultime ressuscitée",
+      "title_es": "El arma definitiva renacida",
+      "title_ja": "蘇りし究極の武器",
+      "title_pt": "A arma suprema renascida",
+      "title_it": "L'arma suprema rinata",
+      "title_pl": "Odrodzona broń ostateczna",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-065-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-065-UC.webp",
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Village of Artisans"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] You can move any number of friendly attachments in play to this character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character can have more than one friendly attachment, ignoring all requirements."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-066-C": {
+      "id": "SS-066-C",
+      "cardId": "SS-066-C",
+      "rarity": "C",
+      "number": "66",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "AOI ROKUSHO",
+      "name_fr": "AOI ROKUSHÔ",
+      "title_en": "Jonin from Village Hidden in the Rain",
+      "title_fr": "Jônin du Village de la Pluie",
+      "title_es": "Jonin de la Aldea de la Lluvia",
+      "title_ja": "雨隠れの里の上忍",
+      "title_pt": "Jonin da Vila da Chuva",
+      "title_it": "Jonin del Villaggio della Pioggia",
+      "title_pl": "Jonin z Wioski Deszczu",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-066-C.webp",
+      "image_url": "/images/cards/SS/common/SS-066-C.webp",
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Rogue Ninja"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +X Power, where X is the cost of their Weapon attachment, if they have any."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-067-C": {
+      "id": "SS-067-C",
+      "cardId": "SS-067-C",
+      "rarity": "C",
+      "number": "67",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GRANDMA SANSHO",
+      "name_fr": "MAMIE SANSHÔ",
+      "title_en": "Owner of Curry of Life Shop",
+      "title_fr": "Patronne de la boutique du Curry de la Vie",
+      "title_es": "Dueña de la tienda del Curry de la Vida",
+      "title_ja": "命のカレー屋の女将",
+      "title_pt": "Dona da loja do Caril da Vida",
+      "title_it": "Proprietaria del negozio del Curry della Vita",
+      "title_pl": "Właścicielka sklepu z Curry Życia",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-067-C.webp",
+      "image_url": "/images/cards/SS/common/SS-067-C.webp",
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Civilian"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Friendly Food attachments cost 1 less."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-068-UC": {
+      "id": "SS-068-UC",
+      "cardId": "SS-068-UC",
+      "rarity": "UC",
+      "number": "68",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SHIGURE",
+      "name_fr": "SHIGURE",
+      "name_ja": "シグレ",
+      "title_en": "From the Village Hidden in the Rain",
+      "title_fr": "Du Village de la Pluie",
+      "title_es": "De la Aldea de la Lluvia",
+      "title_ja": "雨隠れの里から",
+      "title_pt": "Da Vila da Chuva",
+      "title_it": "Dal Villaggio della Pioggia",
+      "title_pl": "Z Wioski Deszczu",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-068-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-068-UC.webp",
+      "chakra": 2,
+      "power": 3,
+      "keywords": [],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] POWERUP X, where X is the number of Independent characters in this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-069-UC": {
+      "id": "SS-069-UC",
+      "cardId": "SS-069-UC",
+      "rarity": "UC",
+      "number": "69",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GOZU",
+      "name_fr": "GÔZU",
+      "title_en": "Coordinated Attack",
+      "title_fr": "Attaque coordonnée",
+      "title_es": "Ataque coordinado",
+      "title_ja": "連携攻撃",
+      "title_pt": "Ataque coordenado",
+      "title_it": "Attacco coordinato",
+      "title_pl": "Skoordynowany atak",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-069-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-069-UC.webp",
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Rogue Ninja",
+        "Demon Brother"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If you have a friendly Demon Brother character in this mission, this character has +2 Power."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-070-UC": {
+      "id": "SS-070-UC",
+      "cardId": "SS-070-UC",
+      "rarity": "UC",
+      "number": "70",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "MEIZU",
+      "name_fr": "MEIZU",
+      "title_en": "Coordinated Attack",
+      "title_fr": "Attaque coordonnée",
+      "title_es": "Ataque coordinado",
+      "title_ja": "連携攻撃",
+      "title_pt": "Ataque coordenado",
+      "title_it": "Attacco coordinato",
+      "title_pl": "Skoordynowany atak",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-070-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-070-UC.webp",
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Rogue Ninja",
+        "Demon Brother"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If you have a friendly Demon Brother character in this mission, this character has +2 Power."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-071-C": {
+      "id": "SS-071-C",
+      "cardId": "SS-071-C",
+      "rarity": "C",
+      "number": "71",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "HOKI",
+      "name_fr": "HÔKI",
+      "title_en": "The Four Celestials",
+      "title_fr": "Les Quatre Célestes",
+      "title_es": "Los Cuatro Celestiales",
+      "title_ja": "四天",
+      "title_pt": "Os Quatro Celestiais",
+      "title_it": "I Quattro Celesti",
+      "title_pl": "Czterej Niebiańscy",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-071-C.webp",
+      "image_url": "/images/cards/SS/common/SS-071-C.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Village of Artisans"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] POWERUP 1 for every attachment in this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-072-C": {
+      "id": "SS-072-C",
+      "cardId": "SS-072-C",
+      "rarity": "C",
+      "number": "72",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KUJAKU",
+      "name_fr": "KUJAKU",
+      "title_en": "The Four Celestials",
+      "title_fr": "Les Quatre Célestes",
+      "title_es": "Los Cuatro Celestiales",
+      "title_ja": "四天",
+      "title_pt": "Os Quatro Celestiais",
+      "title_it": "I Quattro Celesti",
+      "title_pl": "Czterej Niebiańscy",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-072-C.webp",
+      "image_url": "/images/cards/SS/common/SS-072-C.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Village of Artisans"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Return the topmost attachment in your discard pile to your hand."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-073-C": {
+      "id": "SS-073-C",
+      "cardId": "SS-073-C",
+      "rarity": "C",
+      "number": "73",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "RYUGAN",
+      "name_fr": "RYÛGAN",
+      "title_en": "The Four Celestials",
+      "title_fr": "Les Quatre Célestes",
+      "title_es": "Los Cuatro Celestiales",
+      "title_ja": "四天",
+      "title_pt": "Os Quatro Celestiais",
+      "title_it": "I Quattro Celesti",
+      "title_pl": "Czterej Niebiańscy",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-073-C.webp",
+      "image_url": "/images/cards/SS/common/SS-073-C.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Village of Artisans"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Move a character attachment in play."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-074-C": {
+      "id": "SS-074-C",
+      "cardId": "SS-074-C",
+      "rarity": "C",
+      "number": "74",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SUIKO",
+      "name_fr": "SUIKÔ",
+      "title_en": "The Four Celestials",
+      "title_fr": "Les Quatre Célestes",
+      "title_es": "Los Cuatro Celestiales",
+      "title_ja": "四天",
+      "title_pt": "Os Quatro Celestiais",
+      "title_it": "I Quattro Celesti",
+      "title_pl": "Czterej Niebiańscy",
+      "has_visual": true,
+      "image_file": "images/cards/SS/common/SS-074-C.webp",
+      "image_url": "/images/cards/SS/common/SS-074-C.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Village of Artisans"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Look at the top 5 cards of your deck, choose and reveal a Weapon or Armor attachment, then add it to your hand. Put the other cards randomly at the bottom of your deck."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-075-UC": {
+      "id": "SS-075-UC",
+      "cardId": "SS-075-UC",
+      "rarity": "UC",
+      "number": "75",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GATO",
+      "name_fr": "GATÔ",
+      "name_ja": "ガトー",
+      "title_en": "Shipping Magnate",
+      "title_fr": "Magnat du transport maritime",
+      "title_es": "Magnate naviero",
+      "title_ja": "海運王",
+      "title_pt": "Magnata do transporte marítimo",
+      "title_it": "Magnate dei trasporti marittimi",
+      "title_pl": "Magnat żeglugowy",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-075-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-075-UC.webp",
+      "chakra": 2,
+      "power": 0,
+      "keywords": [
+        "Civilian"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When you play a Rogue Ninja character in this mission, gain 1 Chakra. POWERUP 1 that character."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-076-UC": {
+      "id": "SS-076-UC",
+      "cardId": "SS-076-UC",
+      "rarity": "UC",
+      "number": "76",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TAZUNA",
+      "name_fr": "TAZUNA",
+      "name_ja": "タズナ",
+      "title_en": "Master Bridge Builder",
+      "title_fr": "Maître constructeur de ponts",
+      "title_es": "Maestro constructor de puentes",
+      "title_ja": "橋作りの名人",
+      "title_pt": "Mestre construtor de pontes",
+      "title_it": "Maestro costruttore di ponti",
+      "title_pl": "Mistrz budowy mostów",
+      "has_visual": true,
+      "image_file": "images/cards/SS/uncommon/SS-076-UC.webp",
+      "image_url": "/images/cards/SS/uncommon/SS-076-UC.webp",
+      "chakra": 2,
+      "power": 0,
+      "keywords": [
+        "Civilian"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] Gain 2 Mission points."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-111-R": {
+      "id": "SS-111-R",
+      "cardId": "SS-111-R",
+      "rarity": "R",
+      "number": "111",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "HINATA HYUGA",
+      "name_fr": "HINATA HYÛGA",
+      "name_ja": "日向ヒナタ",
+      "title_en": "\"I can do this.\"",
+      "title_fr": "« Je peux y arriver. »",
+      "title_es": "«Puedo hacerlo.»",
+      "title_ja": "「私にもできる。」",
+      "title_pt": "«Eu consigo.»",
+      "title_it": "«Ce la posso fare.»",
+      "title_pl": "„Dam radę.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-111-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-111-R.webp",
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Neji Hyuga: Return the topmost Hinata Hyuga from your discard pile to your hand."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Play a Hyuga-named character anywhere, paying 3 less."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-112-R": {
+      "id": "SS-112-R",
+      "cardId": "SS-112-R",
+      "rarity": "R",
+      "number": "112",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NEJI HYUGA",
+      "name_fr": "NEJI HYÛGA",
+      "name_ja": "日向ネジ",
+      "title_en": "\"My eyes cannot be deceived.\"",
+      "title_fr": "« Mes yeux ne peuvent être trompés. »",
+      "title_es": "«Mis ojos no pueden ser engañados.»",
+      "title_ja": "「私の眼は欺けない。」",
+      "title_pt": "«Os meus olhos não podem ser enganados.»",
+      "title_it": "«I miei occhi non possono essere ingannati.»",
+      "title_pl": "„Moich oczu nie da się oszukać.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-112-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-112-R.webp",
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team Guy",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Remove all Power tokens from an enemy character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Hinata Hyuga: Hide an enemy character without Power tokens in this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-113-R": {
+      "id": "SS-113-R",
+      "cardId": "SS-113-R",
+      "rarity": "R",
+      "number": "113",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SHINO ABURAME",
+      "name_fr": "SHINO ABURAME",
+      "name_ja": "油女シノ",
+      "title_en": "\"I hate having to explain the same thing twice.\"",
+      "title_fr": "« Je déteste devoir répéter deux fois la même chose. »",
+      "title_es": "«Odio tener que explicar lo mismo dos veces.»",
+      "title_ja": "「同じことを二度説明するのは嫌いだ。」",
+      "title_pt": "«Odeio ter de explicar a mesma coisa duas vezes.»",
+      "title_it": "«Odio dover spiegare due volte la stessa cosa.»",
+      "title_pl": "„Nienawidzę tłumaczyć dwa razy tego samego.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-113-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-113-R.webp",
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] The opponent discards a card from hand."
+        },
+        {
+          "type": "DUEL",
+          "description": "DUEL Kankuro MAIN effect: Instead, the opponent discards a card at random."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-115-R": {
+      "id": "SS-115-R",
+      "cardId": "SS-115-R",
+      "rarity": "R",
+      "number": "115",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ROCK LEE",
+      "name_fr": "ROCK LEE",
+      "name_ja": "ロック・リー",
+      "title_en": "\"It is over, all right: one way or the other!\"",
+      "title_fr": "« C'est fini, d'une façon ou d'une autre ! »",
+      "title_es": "«Se acabó, de una forma u otra.»",
+      "title_ja": "「どちらにせよ、これで終わりだ！」",
+      "title_pt": "«Acabou, de uma maneira ou de outra!»",
+      "title_it": "«È finita, in un modo o nell'altro!»",
+      "title_pl": "„To koniec, tak czy inaczej!”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-115-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-115-R.webp",
+      "chakra": 6,
+      "power": 7,
+      "keywords": [
+        "Team Guy"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character doesn't lose Power tokens at the end of the round."
+        },
+        {
+          "type": "DUEL",
+          "description": "[⧗] DUEL Gaara: When you defeat an enemy character, POWERUP 2."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-116-R": {
+      "id": "SS-116-R",
+      "cardId": "SS-116-R",
+      "rarity": "R",
+      "number": "116",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "MIGHT GUY",
+      "name_fr": "GAÏ MAITO",
+      "name_ja": "マイト・ガイ",
+      "title_en": "\"Forge ahead to the end.\"",
+      "title_fr": "« Aller de l'avant jusqu'au bout. »",
+      "title_es": "«Avanzar hasta el final.»",
+      "title_ja": "「最後まで突き進む。」",
+      "title_pt": "«Avançar até ao fim.»",
+      "title_it": "«Andare avanti fino alla fine.»",
+      "title_pl": "„Naprzód aż do końca.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-116-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-116-R.webp",
+      "chakra": 3,
+      "power": 4,
+      "keywords": [
+        "Team Guy",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the start of the round, POWERUP 2 every Team Guy character of yours with an attachment in play."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-118-R": {
+      "id": "SS-118-R",
+      "cardId": "SS-118-R",
+      "rarity": "R",
+      "number": "118",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SHIKAMARU NARA",
+      "name_fr": "SHIKAMARU NARA",
+      "name_ja": "奈良シカマル",
+      "title_en": "\"But who ever said I was classy?\"",
+      "title_fr": "« Mais qui a dit que j'avais de la classe ? »",
+      "title_es": "«¿Pero quién ha dicho que yo tenga clase?»",
+      "title_ja": "「誰が俺を上品だと言った？」",
+      "title_pt": "«Mas quem disse que eu tenho classe?»",
+      "title_it": "«Ma chi ha mai detto che ho classe?»",
+      "title_pl": "„A kto powiedział, że mam klasę?”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-118-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-118-R.webp",
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Reveal and defeat an enemy hidden character in play."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Temari: Hide an enemy character in play with the same name as the revealed character."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-120-R": {
+      "id": "SS-120-R",
+      "cardId": "SS-120-R",
+      "rarity": "R",
+      "number": "120",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KIBA INUZUKA",
+      "name_fr": "KIBA INUZUKA",
+      "name_ja": "犬塚キバ",
+      "title_en": "\"I got you now!!\"",
+      "title_fr": "« Je te tiens ! »",
+      "title_es": "«¡Ahora te tengo!»",
+      "title_ja": "「捕まえたぞ！！」",
+      "title_pt": "«Agora apanhei-te!»",
+      "title_it": "«Adesso ti ho preso!»",
+      "title_pl": "„Mam cię!”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-120-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-120-R.webp",
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 8"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] The opponent must pay 1 more Chakra when revealing characters from hidden in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Naruto Uzumaki: Hide an enemy character with Power 4 or less in play."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-122-R": {
+      "id": "SS-122-R",
+      "cardId": "SS-122-R",
+      "rarity": "R",
+      "number": "122",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "MINATO NAMIKAZE",
+      "name_fr": "MINATO NAMIKAZE",
+      "name_ja": "波風ミナト",
+      "title_en": "\"This ninja was known as the Fourth Hokage.\"",
+      "title_fr": "« Ce ninja était connu comme le Quatrième Hokage. »",
+      "title_es": "«Este ninja era conocido como el Cuarto Hokage.»",
+      "title_ja": "「この忍は四代目火影と呼ばれていた。」",
+      "title_pt": "«Este ninja era conhecido como o Quarto Hokage.»",
+      "title_it": "«Questo ninja era noto come il Quarto Hokage.»",
+      "title_pl": "„Ten shinobi znany był jako Czwarty Hokage.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-122-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-122-R.webp",
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Hokage"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Discard all Tailed Beast characters from an enemy stack in this mission or move a friendly Tailed Beast character in play."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-124-R": {
+      "id": "SS-124-R",
+      "cardId": "SS-124-R",
+      "rarity": "R",
+      "number": "124",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "INO YAMANAKA",
+      "name_fr": "INO YAMANAKA",
+      "name_ja": "山中いの",
+      "title_en": "\"Get ready to tell everyone that you lost!\"",
+      "title_fr": "« Prépare-toi à annoncer à tout le monde que tu as perdu ! »",
+      "title_es": "«¡Prepárate para contarle a todos que perdiste!»",
+      "title_ja": "「負けたと皆に言う準備をしなさい！」",
+      "title_pt": "«Prepara-te para dizer a todos que perdeste!»",
+      "title_it": "«Preparati a dire a tutti che hai perso!»",
+      "title_pl": "„Szykuj się, by powiedzieć wszystkim, że przegrałaś!”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-124-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-124-R.webp",
+      "chakra": 6,
+      "power": 2,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Sakura Haruno: Take control of an enemy character of Power lower than the Sakura Haruno's Power."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Move a controlled character from this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-129-R": {
+      "id": "SS-129-R",
+      "cardId": "SS-129-R",
+      "rarity": "R",
+      "number": "129",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "HASHIRAMA SENJU",
+      "name_fr": "HASHIRAMA SENJU",
+      "name_ja": "千手柱間",
+      "title_en": "\"Forgive us, Sarutobi.\"",
+      "title_fr": "« Pardonne-nous, Sarutobi. »",
+      "title_es": "«Perdónanos, Sarutobi.»",
+      "title_ja": "「許せ、猿飛。」",
+      "title_pt": "«Perdoa-nos, Sarutobi.»",
+      "title_it": "«Perdonaci, Sarutobi.»",
+      "title_pl": "„Wybacz nam, Sarutobi.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-129-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-129-R.webp",
+      "chakra": 6,
+      "power": 8,
+      "keywords": [
+        "Hokage",
+        "Reanimation"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "DUEL Orochimaru [⧗] You can upgrade over friendly characters with a different name than this character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] POWERUP 2 a Hokage character in play."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-131-R": {
+      "id": "SS-131-R",
+      "cardId": "SS-131-R",
+      "rarity": "R",
+      "number": "131",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TOBIRAMA SENJU",
+      "name_fr": "TOBIRAMA SENJU",
+      "name_ja": "千手扉間",
+      "title_en": "\"We made your life difficult.\"",
+      "title_fr": "« Nous t'avons compliqué la vie. »",
+      "title_es": "«Te hemos complicado la vida.»",
+      "title_ja": "「お前の人生を難しくしてしまった。」",
+      "title_pt": "«Complicámos-te a vida.»",
+      "title_it": "«Ti abbiamo complicato la vita.»",
+      "title_pl": "„Utrudniliśmy ci życie.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-131-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-131-R.webp",
+      "chakra": 6,
+      "power": 8,
+      "keywords": [
+        "Hokage",
+        "Reanimation"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "DUEL Orochimaru [⧗] You can upgrade over friendly characters with a different name than this character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Move a Hokage character in play."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-132-R": {
+      "id": "SS-132-R",
+      "cardId": "SS-132-R",
+      "rarity": "R",
+      "number": "132",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ENMA",
+      "name_fr": "ENMA",
+      "title_en": "\"Surely you didn't summon me just for this.\"",
+      "title_fr": "« Tu ne m'as sûrement pas invoqué juste pour ça. »",
+      "title_es": "«No me habrás invocado solo para esto.»",
+      "title_ja": "「まさかこの程度で口寄せしたのか。」",
+      "title_pt": "«De certeza que não me invocaste só para isto.»",
+      "title_it": "«Non mi avrai evocato solo per questo.»",
+      "title_pl": "„Chyba nie przywołałeś mnie tylko po to.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-132-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-132-R.webp",
+      "chakra": 4,
+      "power": 6,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, search your deck for Adamantine Nyoi and play it, paying 2 less. Shuffle the deck afterwards. Then, you must return this character to your hand."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-133-R": {
+      "id": "SS-133-R",
+      "cardId": "SS-133-R",
+      "rarity": "R",
+      "number": "133",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "HIRUZEN SARUTOBI",
+      "name_fr": "HIRUZEN SARUTOBI",
+      "name_ja": "猿飛ヒルゼン",
+      "title_en": "\"You were meant to guide them, not toy with them!\"",
+      "title_fr": "« Tu devais les guider, pas jouer avec eux ! »",
+      "title_es": "«¡Debías guiarlos, no jugar con ellos!»",
+      "title_ja": "「導くべきだった、弄ぶのではなく！」",
+      "title_pt": "«Devias guiá-los, não brincar com eles!»",
+      "title_it": "«Dovevi guidarli, non giocare con loro!»",
+      "title_pl": "„Miałeś ich prowadzić, a nie się nimi bawić!”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-133-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-133-R.webp",
+      "chakra": 6,
+      "power": 7,
+      "keywords": [
+        "Hokage"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When a friendly Leaf Village character is played in this mission, POWERUP 2 that character."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Orochimaru: Play a Summon character in this mission, paying 2 less."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-135-R": {
+      "id": "SS-135-R",
+      "cardId": "SS-135-R",
+      "rarity": "R",
+      "number": "135",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "HAKU",
+      "name_fr": "HAKU",
+      "name_ja": "白",
+      "title_en": "\"I face death for him.\"",
+      "title_fr": "« J'affronte la mort pour lui. »",
+      "title_es": "«Afronto la muerte por él.»",
+      "title_ja": "「あの人のためなら死をも厭わない。」",
+      "title_pt": "«Enfrento a morte por ele.»",
+      "title_it": "«Affronto la morte per lui.»",
+      "title_pl": "„Zmierzę się ze śmiercią dla niego.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-135-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-135-R.webp",
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Discard the top card of your deck. Hide an enemy character in this mission with cost less than the cost of the discarded card."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-136-R": {
+      "id": "SS-136-R",
+      "cardId": "SS-136-R",
+      "rarity": "R",
+      "number": "136",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ZABUZA MOMOCHI",
+      "name_fr": "ZABUZA MOMOCHI",
+      "name_ja": "桃地再不斬",
+      "title_en": "\"A very simple plan can defeat you.\"",
+      "title_fr": "« Un plan très simple peut te vaincre. »",
+      "title_es": "«Un plan muy simple puede vencerte.»",
+      "title_ja": "「単純な策でもお前を倒せる。」",
+      "title_pt": "«Um plano muito simples pode derrotar-te.»",
+      "title_it": "«Un piano molto semplice può sconfiggerti.»",
+      "title_pl": "„Bardzo prosty plan może cię pokonać.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-136-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-136-R.webp",
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Defeat an enemy character in this mission that was played last turn for less than its printed cost due to a card effect."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-138-R": {
+      "id": "SS-138-R",
+      "cardId": "SS-138-R",
+      "rarity": "R",
+      "number": "138",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ASUMA SARUTOBI",
+      "name_fr": "ASUMA SARUTOBI",
+      "name_ja": "猿飛アスマ",
+      "title_en": "\"Now come on, out with it.\"",
+      "title_fr": "« Allez, crache le morceau. »",
+      "title_es": "«Venga, suéltalo ya.»",
+      "title_ja": "「さあ、吐いてもらおうか。」",
+      "title_pt": "«Vá lá, desembucha.»",
+      "title_it": "«Su, sputa il rospo.»",
+      "title_pl": "„No dalej, mów.”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-138-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-138-R.webp",
+      "chakra": 6,
+      "power": 4,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Discard a card from your hand. POWERUP X where X is the Power of the discarded card."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Defeat an enemy character in this mission with Power equal to this character."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-140-R": {
+      "id": "SS-140-R",
+      "cardId": "SS-140-R",
+      "rarity": "R",
+      "number": "140",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "IRUKA UMINO",
+      "name_fr": "IRUKA UMINO",
+      "name_ja": "うみのイルカ",
+      "title_en": "\"I can't help it... I still want Naruto to win!\"",
+      "title_fr": "« Je n'y peux rien... je veux quand même que Naruto gagne ! »",
+      "title_es": "«No puedo evitarlo... ¡sigo queriendo que Naruto gane!»",
+      "title_ja": "「仕方ない…それでもナルトに勝ってほしい！」",
+      "title_pt": "«Não consigo evitar... ainda quero que o Naruto ganhe!»",
+      "title_it": "«Non ci posso fare nulla... voglio ancora che Naruto vinca!»",
+      "title_pl": "„Nic na to nie poradzę... wciąż chcę, żeby Naruto wygrał!”",
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-140-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-140-R.webp",
+      "chakra": 5,
+      "power": 6,
+      "keywords": [],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Hide a Naruto Uzumaki in play."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Play a Naruto Uzumaki while hidden anywhere, paying 2 less."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-141-S": {
+      "id": "SS-141-S",
+      "cardId": "SS-141-S",
+      "rarity": "S",
+      "number": "141",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TSUNADE",
+      "name_fr": "TSUNADE",
+      "name_ja": "綱手",
+      "title_en": "Battle of the Sannin",
+      "title_fr": "Le combat des Sannin",
+      "title_es": "La batalla de los Sannin",
+      "title_ja": "三忍の戦い",
+      "title_pt": "A batalha dos Sannin",
+      "title_it": "La battaglia dei Sannin",
+      "title_pl": "Bitwa Sanninów",
+      "has_visual": true,
+      "image_file": "images/cards/SS/secret/SS-141-S.webp",
+      "image_url": "/images/cards/SS/secret/SS-141-S.webp",
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Sannin",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Shuffle up to 5 cards from the top of your discard pile into your deck. For each card shuffled, POWERUP 1."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: In addition, for each card, also POWERUP 1 a friendly character in play."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-142-S": {
+      "id": "SS-142-S",
+      "cardId": "SS-142-S",
+      "rarity": "S",
+      "number": "142",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KATSUYU",
+      "name_fr": "KATSUYU",
+      "name_ja": "カツユ",
+      "title_en": "Battle of the Sannin",
+      "title_fr": "Le combat des Sannin",
+      "title_es": "La batalla de los Sannin",
+      "title_ja": "三忍の戦い",
+      "title_pt": "A batalha dos Sannin",
+      "title_it": "La battaglia dei Sannin",
+      "title_pl": "Bitwa Sanninów",
+      "has_visual": true,
+      "image_file": "images/cards/SS/secret/SS-142-S.webp",
+      "image_url": "/images/cards/SS/secret/SS-142-S.webp",
+      "chakra": 5,
+      "power": 8,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must return this character to your hand if there isn't a friendly Tsunade in this mission."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Gain 1 Chakra for every friendly Tsunade in play."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-143-S": {
+      "id": "SS-143-S",
+      "cardId": "SS-143-S",
+      "rarity": "S",
+      "number": "143",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GAMABUNTA",
+      "name_fr": "GAMA BUNTA",
+      "name_ja": "ガマ文太",
+      "title_en": "Battle of the Sannin",
+      "title_fr": "Le combat des Sannin",
+      "title_es": "La batalla de los Sannin",
+      "title_ja": "三忍の戦い",
+      "title_pt": "A batalha dos Sannin",
+      "title_it": "La battaglia dei Sannin",
+      "title_pl": "Bitwa Sanninów",
+      "has_visual": true,
+      "image_file": "images/cards/SS/secret/SS-143-S.webp",
+      "image_url": "/images/cards/SS/secret/SS-143-S.webp",
+      "chakra": 5,
+      "power": 8,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must return this character to your hand if there isn't a friendly Jiraiya in this mission."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Draw 1 card for every friendly Jiraiya in play."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-144-S": {
+      "id": "SS-144-S",
+      "cardId": "SS-144-S",
+      "rarity": "S",
+      "number": "144",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "JIRAIYA",
+      "name_fr": "JIRAYA",
+      "name_ja": "自来也",
+      "title_en": "Battle of the Sannin",
+      "title_fr": "Le combat des Sannin",
+      "title_es": "La batalla de los Sannin",
+      "title_ja": "三忍の戦い",
+      "title_pt": "A batalha dos Sannin",
+      "title_it": "La battaglia dei Sannin",
+      "title_pl": "Bitwa Sanninów",
+      "has_visual": true,
+      "image_file": "images/cards/SS/secret/SS-144-S.webp",
+      "image_url": "/images/cards/SS/secret/SS-144-S.webp",
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When you play a Summon character, gain 1 Chakra."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Play a Summon character anywhere, paying 3 less. POWERUP 2 every friendly Summon character in play."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-145-S": {
+      "id": "SS-145-S",
+      "cardId": "SS-145-S",
+      "rarity": "S",
+      "number": "145",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "OROCHIMARU",
+      "name_fr": "OROCHIMARU",
+      "name_ja": "大蛇丸",
+      "title_en": "Battle of the Sannin",
+      "title_fr": "Le combat des Sannin",
+      "title_es": "La batalla de los Sannin",
+      "title_ja": "三忍の戦い",
+      "title_pt": "A batalha dos Sannin",
+      "title_it": "La battaglia dei Sannin",
+      "title_pl": "Bitwa Sanninów",
+      "has_visual": true,
+      "image_file": "images/cards/SS/secret/SS-145-S.webp",
+      "image_url": "/images/cards/SS/secret/SS-145-S.webp",
+      "chakra": 8,
+      "power": 10,
+      "keywords": [
+        "Sannin"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Defeat all enemy characters in this mission with cost lower than the number of cards in this upgrade stack."
+        },
+        {
+          "type": "AMBUSH",
+          "description": "MAIN effect: Instead, with cost equal to or lower than."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-146-S": {
+      "id": "SS-146-S",
+      "cardId": "SS-146-S",
+      "rarity": "S",
+      "number": "146",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "MANDA",
+      "name_fr": "MANDA",
+      "name_ja": "マンダ",
+      "title_en": "Battle of the Sannin",
+      "title_fr": "Le combat des Sannin",
+      "title_es": "La batalla de los Sannin",
+      "title_ja": "三忍の戦い",
+      "title_pt": "A batalha dos Sannin",
+      "title_it": "La battaglia dei Sannin",
+      "title_pl": "Bitwa Sanninów",
+      "has_visual": true,
+      "image_file": "images/cards/SS/secret/SS-146-S.webp",
+      "image_url": "/images/cards/SS/secret/SS-146-S.webp",
+      "chakra": 5,
+      "power": 8,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must return this character to your hand if there isn't a friendly Orochimaru in this mission."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] POWERUP 2 for every friendly Orochimaru in play."
+        }
+      ],
+      "data_complete": true
     }
   }
 }

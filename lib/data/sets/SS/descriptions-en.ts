@@ -53,6 +53,235 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   "SS-050-C": [
     "[↯] POWERUP 2 a friendly Sand Village character in play.",
   ],
+  "SS-001-UC": [
+    "[⧗] If all friendly characters in this mission are Leaf Village, this character has +1 Power for every friendly Leaf Village character in this mission.",
+  ],
+  "SS-003-C": [
+    "[↯] POWERUP 1 a friendly Leaf Village character in this mission.",
+  ],
+  "SS-004-UC": [
+    "[↯] Look at the top 3 cards of your deck, choose and reveal a Sannin character, then add it to your hand. Put the other cards randomly at the bottom of your deck.",
+  ],
+  "SS-009-C": [
+    "[↯] Discard a Food card from hand to gain 1 Chakra and draw a card.",
+  ],
+  "SS-010-C": [
+    "[⧗] If there is a friendly Team 10 character in this mission, CHAKRA +1.",
+  ],
+  "SS-011-C": [
+    "[↯] Look at a hidden character in this mission.",
+  ],
+  "SS-012-C": [
+    "[↯] POWERUP 2 a friendly Team 10 character in this mission.",
+  ],
+  "SS-013-UC": [
+    "[↯] If the strongest enemy character in play is present in this mission, POWERUP 5.",
+    "[↯] Repeat the AMBUSH effect.",
+  ],
+  "SS-014-C": [
+    "[↯] FIRST STRIKE Look at a hidden enemy character in this mission. If it costs 3 or less, defeat them.",
+  ],
+  "SS-015-UC": [
+    "[⧗] At the end of the round, you must pay 1 Chakra or defeat this character.",
+  ],
+  "SS-017-C": [
+    "[↯] The opponent must reveal a random card from their hand, if able. If it costs 4 or more, you gain 2 Chakra.",
+  ],
+  "SS-018-UC": [
+    "[↯] POWERUP 1 every friendly Team 8 character in this mission.",
+    "[↯] POWERUP 1 every friendly Team 8 character in this mission.",
+  ],
+  "SS-021-C": [
+    "[↯] FIRST STRIKE Play this character paying 1 less.",
+  ],
+  "SS-022-UC": [
+    "[⧗] When you put a Weapon attachment on this character, POWERUP 3.",
+    "[↯] Play an attachment in this mission, paying 2 less.",
+  ],
+  "SS-023-C": [
+    "[↯] Look at the top card of your deck. Choose to put it back or put it at the bottom of your deck.",
+  ],
+  "SS-024-C": [
+    "[⧗] If there is a friendly Naruto Uzumaki in this mission, CHAKRA +1.",
+  ],
+  "SS-025-C": [
+    "[↯] Move a friendly hidden character from this mission.",
+  ],
+  "SS-026-C": [
+    "[⧗] If this character has a Senbon attachment, they have +2 Power.",
+  ],
+  "SS-027-UC": [
+    "[⧗] This character has +2 Power for every mission in play.",
+  ],
+  "SS-028-UC": [
+    "[↯] Look at the top card of the opponent's deck. You may put that card on the bottom of their deck.",
+  ],
+  "SS-029-UC": [
+    "[↯] Reveal the top card of the opponent's deck. Hide an enemy character in play with the same name as the revealed card.",
+  ],
+  "SS-052-C": [
+    "[↯] Move a Zabuza Momochi to or from this mission.",
+  ],
+  "SS-054-UC": [
+    "DUEL Sasuke Uchiha [⧗] This character has -3 Power.",
+  ],
+  "SS-055-UC": [
+    "[↯] Steal 1 Chakra from the opponent's pool.",
+    "[↯] Steal 1 Chakra from the opponent's pool.",
+  ],
+  "SS-056-UC": [
+    "[↯] Discard an enemy attachment in this mission.",
+    "[⧗] At the end of the round, you must return this character to your hand.",
+  ],
+  "SS-057-UC": [
+    "[⧗] Before determining Power in the Mission Evaluation phase, defeat an enemy character in this mission.",
+    "[⧗] At the end of the round, you must return this character to your hand.",
+  ],
+  "SS-058-UC": [
+    "[↯] Look at the top 3 cards of your deck, choose and reveal a Uchiha-named character, then add it to your hand. Put the other cards randomly at the bottom of your deck.",
+  ],
+  "SS-059-C": [
+    "[↯] Look at an enemy hidden character in this mission. POWERUP X, where X is the cost of that hidden character.",
+  ],
+  "SS-060-UC": [
+    "[↯] You must hide a friendly character in this mission, if able. If you do so, gain 1 Mission point.",
+  ],
+  "SS-061-C": [
+    "[⧗] If there are no friendly hidden characters in this mission, CHAKRA +1.",
+  ],
+  "SS-062-C": [
+    "[⧗] This character has +1 Power for every friendly Academy Student character in this mission.",
+  ],
+  "SS-063-C": [
+    "[↯] If there is a friendly Konohamaru in this mission, POWERUP 1.",
+  ],
+  "SS-064-C": [
+    "[↯] If there is a friendly Konohamaru in this mission, draw 1 card.",
+  ],
+  "SS-065-UC": [
+    "[↯] You can move any number of friendly attachments in play to this character.",
+    "[⧗] This character can have more than one friendly attachment, ignoring all requirements.",
+  ],
+  "SS-066-C": [
+    "[⧗] This character has +X Power, where X is the cost of their Weapon attachment, if they have any.",
+  ],
+  "SS-067-C": [
+    "[⧗] Friendly Food attachments cost 1 less.",
+  ],
+  "SS-068-UC": [
+    "[↯] POWERUP X, where X is the number of Independent characters in this mission.",
+  ],
+  "SS-069-UC": [
+    "[⧗] If you have a friendly Demon Brother character in this mission, this character has +2 Power.",
+  ],
+  "SS-070-UC": [
+    "[⧗] If you have a friendly Demon Brother character in this mission, this character has +2 Power.",
+  ],
+  "SS-071-C": [
+    "[↯] POWERUP 1 for every attachment in this mission.",
+  ],
+  "SS-072-C": [
+    "[↯] Return the topmost attachment in your discard pile to your hand.",
+  ],
+  "SS-073-C": [
+    "[↯] Move a character attachment in play.",
+  ],
+  "SS-074-C": [
+    "[↯] Look at the top 5 cards of your deck, choose and reveal a Weapon or Armor attachment, then add it to your hand. Put the other cards randomly at the bottom of your deck.",
+  ],
+  "SS-075-UC": [
+    "[⧗] When you play a Rogue Ninja character in this mission, gain 1 Chakra. POWERUP 1 that character.",
+  ],
+  "SS-076-UC": [
+    "[↯] Gain 2 Mission points.",
+  ],
+  "SS-111-R": [
+    "[↯] DUEL Neji Hyuga: Return the topmost Hinata Hyuga from your discard pile to your hand.",
+    "[↯] Play a Hyuga-named character anywhere, paying 3 less.",
+  ],
+  "SS-112-R": [
+    "[↯] Remove all Power tokens from an enemy character in this mission.",
+    "[↯] DUEL Hinata Hyuga: Hide an enemy character without Power tokens in this mission.",
+  ],
+  "SS-113-R": [
+    "[↯] The opponent discards a card from hand.",
+    "DUEL Kankuro MAIN effect: Instead, the opponent discards a card at random.",
+  ],
+  "SS-115-R": [
+    "[⧗] This character doesn't lose Power tokens at the end of the round.",
+    "[⧗] DUEL Gaara: When you defeat an enemy character, POWERUP 2.",
+  ],
+  "SS-116-R": [
+    "[⧗] At the start of the round, POWERUP 2 every Team Guy character of yours with an attachment in play.",
+  ],
+  "SS-118-R": [
+    "[↯] Reveal and defeat an enemy hidden character in play.",
+    "[↯] DUEL Temari: Hide an enemy character in play with the same name as the revealed character.",
+  ],
+  "SS-120-R": [
+    "[⧗] The opponent must pay 1 more Chakra when playing characters from hidden in this mission.",
+    "[↯] DUEL Naruto Uzumaki: Hide an enemy character with Power 4 or less in play.",
+  ],
+  "SS-122-R": [
+    "[↯] Discard all Tailed Beast characters from an enemy stack in this mission or move a friendly Tailed Beast character in play.",
+  ],
+  "SS-124-R": [
+    "[↯] DUEL Sakura Haruno: Take control of an enemy character of Power lower than the Sakura Haruno's Power.",
+    "[↯] Move a controlled character from this mission.",
+  ],
+  "SS-129-R": [
+    "DUEL Orochimaru [⧗] You can upgrade over friendly characters with a different name than this character.",
+    "[↯] POWERUP 2 a Hokage character in play.",
+  ],
+  "SS-131-R": [
+    "DUEL Orochimaru [⧗] You can upgrade over friendly characters with a different name than this character.",
+    "[↯] Move a Hokage character in play.",
+  ],
+  "SS-132-R": [
+    "[⧗] At the end of the round, search your deck for Adamantine Nyoi and play it, paying 2 less. Shuffle the deck afterwards. Then, you must return this character to your hand.",
+  ],
+  "SS-133-R": [
+    "[⧗] When a friendly Leaf Village character is played in this mission, POWERUP 2 that character.",
+    "[↯] DUEL Orochimaru: Play a Summon character in this mission, paying 2 less.",
+  ],
+  "SS-135-R": [
+    "[↯] Discard the top card of your deck. Hide an enemy character in this mission with cost less than the cost of the discarded card.",
+  ],
+  "SS-136-R": [
+    "[↯] Defeat an enemy character in this mission that was played last turn for less than its printed cost due to a card effect.",
+  ],
+  "SS-138-R": [
+    "[↯] Discard a card from your hand. POWERUP X where X is the Power of the discarded card.",
+    "[↯] Defeat an enemy character in this mission with Power equal to this character.",
+  ],
+  "SS-140-R": [
+    "[↯] Hide a Naruto Uzumaki in play.",
+    "[↯] Play a Naruto Uzumaki while hidden anywhere, paying 2 less.",
+  ],
+  "SS-141-S": [
+    "[↯] Shuffle up to 5 cards from the top of your discard pile into your deck. For each card shuffled, POWERUP 1.",
+    "MAIN effect: In addition, for each card, also POWERUP 1 a friendly character in play.",
+  ],
+  "SS-142-S": [
+    "[⧗] At the end of the round, you must return this character to your hand if there isn't a friendly Tsunade in this mission.",
+    "[↯] Gain 1 Chakra for every friendly Tsunade in play.",
+  ],
+  "SS-143-S": [
+    "[⧗] At the end of the round, you must return this character to your hand if there isn't a friendly Jiraiya in this mission.",
+    "[↯] Draw 1 card for every friendly Jiraiya in play.",
+  ],
+  "SS-144-S": [
+    "[⧗] When you play a Summon character, gain 1 Chakra.",
+    "[↯] Play a Summon character anywhere, paying 3 less. POWERUP 2 every friendly Summon character in play.",
+  ],
+  "SS-145-S": [
+    "[↯] Defeat all enemy characters in this mission with cost lower than the number of cards in this upgrade stack.",
+    "MAIN effect: Instead, with cost equal to or lower than.",
+  ],
+  "SS-146-S": [
+    "[⧗] At the end of the round, you must return this character to your hand if there isn't a friendly Orochimaru in this mission.",
+    "[↯] POWERUP 2 for every friendly Orochimaru in play.",
+  ],
   "SS-049-C": [
     "[↯] Move a character from this mission.",
   ],
@@ -383,6 +612,14 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   "SS-125-R": [
     "[↯] DUEL Choji Akimichi: Defeat an enemy character that moved in the opponent's previous turn.",
     "[↯] Move a friendly hidden character in play.",
+  ],
+  "SS-127-MV": [
+    "[↯] Take control of an enemy non-hidden character in this mission, paying Chakra equal to their Power.",
+    "DUEL Sasuke Uchiha: The AMBUSH effect becomes a MAIN effect.",
+  ],
+  "SS-127_2-MV": [
+    "[↯] Take control of an enemy non-hidden character in this mission, paying Chakra equal to their Power.",
+    "DUEL Sasuke Uchiha: The AMBUSH effect becomes a MAIN effect.",
   ],
   "SS-127-R": [
     "[↯] Take control of an enemy non-hidden character in this mission, paying Chakra equal to their Power.",

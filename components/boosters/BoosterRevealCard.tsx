@@ -8,8 +8,7 @@ import type { CardData } from '@/lib/engine/types';
 import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { normalizeImagePath , portraitImagePath } from '@/lib/utils/imagePath';
-
-type Rarity = 'RA' | 'MV' | 'SV' | 'L';
+import { rarityAccent } from '@/lib/variants/rarityTier';
 
 interface BoosterRevealCardProps {
   card: CardData;
@@ -21,12 +20,7 @@ interface BoosterRevealCardProps {
   instantReveal?: boolean;
 }
 
-const RARITY_COLOR: Record<Rarity, string> = {
-  RA: 'var(--t-accent)',
-  MV: '#5fa3df',
-  SV: '#9b59b6',
-  L: 'var(--t-danger)',
-};
+
 
 export function BoosterRevealCard({
   card,
@@ -43,8 +37,8 @@ export function BoosterRevealCard({
   const [flipped, setFlipped] = useState(instantReveal);
   const [zooming, setZooming] = useState(false);
   const imgPath = portraitImagePath(card);
-  const rarity = card.rarity as Rarity;
-  const accent = RARITY_COLOR[rarity] ?? '#e8e8e8';
+  const rarity = card.rarity;
+  const accent = rarityAccent(rarity);
 
   useEffect(() => {
     if (instantReveal) {

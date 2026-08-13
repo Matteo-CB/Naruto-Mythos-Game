@@ -11,6 +11,7 @@ import { VariantHoloOverlay } from '@/components/cards/VariantHoloOverlay';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { RarityIcon } from '@/components/icons/RarityIcon';
 import { CardArtFallback } from '@/components/cards/CardArtFallback';
+import { rarityAccent, rarityTier } from '@/lib/variants/rarityTier';
 
 interface CardRevealProps {
   card: BoosterCard;
@@ -32,6 +33,16 @@ function getRarityGlow(rarity: string): { color: string; intensity: string } {
       return { color: 'var(--t-accent)', intensity: '0 0 20px var(--t-accent), 0 0 40px var(--t-accent)' };
     case 'RA':
       return { color: '#9b59b6', intensity: '0 0 15px #9b59b6, 0 0 30px #9b59b6' };
+    case 'SP':
+    case 'SPV':
+    case 'CHIBI':
+    case 'CHIBIV':
+      return { color: rarityAccent(rarity), intensity: `0 0 20px ${rarityAccent(rarity)}, 0 0 40px ${rarityAccent(rarity)}` };
+    case 'SHINOBI':
+    case 'SHINOBIV':
+    case 'POP':
+    case 'POPV':
+      return { color: rarityAccent(rarity), intensity: `0 0 26px ${rarityAccent(rarity)}, 0 0 52px ${rarityAccent(rarity)}, 0 0 78px ${rarityAccent(rarity)}` };
     case 'R':
       return { color: '#3498db', intensity: '0 0 12px #3498db, 0 0 25px #3498db' };
     case 'UC':
@@ -44,7 +55,8 @@ function getRarityGlow(rarity: string): { color: string; intensity: string } {
 }
 
 function isHighRarity(rarity: string): boolean {
-  return ['S', 'SV', 'M', 'MV', 'L'].includes(rarity);
+  const palier = rarityTier(rarity);
+  return palier === 'prestige' || palier === 'sommet';
 }
 
 export function CardReveal({ card, index, onRevealed, autoReveal = false, delay = 0 }: CardRevealProps) {

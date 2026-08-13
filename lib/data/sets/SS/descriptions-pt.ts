@@ -383,6 +383,14 @@ export const effectDescriptionsPt: Record<string, string[]> = {
     "[↯] Choji Akimichi: Derrote um personagem inimigo que se moveu no turno anterior do oponente.",
     "[↯] Mova um personagem aliado oculto em jogo.",
   ],
+  "SS-127-MV": [
+    "[↯] Assuma o controle de um personagem inimigo não-oculto nesta missão, pagando Chakra igual ao Poder dele.",
+    "Sasuke Uchiha: O efeito AMBUSH se torna um efeito MAIN.",
+  ],
+  "SS-127_2-MV": [
+    "[↯] Assuma o controle de um personagem inimigo não-oculto nesta missão, pagando Chakra igual ao Poder dele.",
+    "Sasuke Uchiha: O efeito AMBUSH se torna um efeito MAIN.",
+  ],
   "SS-127-R": [
     "[↯] Assuma o controle de um personagem inimigo não-oculto nesta missão, pagando Chakra igual ao Poder dele.",
     "Sasuke Uchiha: O efeito AMBUSH se torna um efeito MAIN.",

@@ -69,6 +69,8 @@ describe('le nom de duel se lit sur toutes les cartes', () => {
     expect(parseDuelCharacterName('DUEL Hiruzen Sarutobi FIRST STRIKE effect: Instead, defeat them.')).toBe('Hiruzen Sarutobi');
     expect(parseDuelCharacterName('DUEL Sasuke Uchiha: The AMBUSH effect becomes a MAIN effect.')).toBe('Sasuke Uchiha');
     expect(parseDuelCharacterName('DUEL Gaara')).toBe('Gaara');
+    expect(parseDuelCharacterName('DUEL Sasuke Uchiha [⧗] This character has -3 Power.')).toBe('Sasuke Uchiha');
+    expect(parseDuelCharacterName('[↯] DUEL Temari: Hide an enemy character.')).toBe('Temari');
   });
 });
 

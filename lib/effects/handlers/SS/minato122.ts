@@ -73,5 +73,6 @@ function minato122MainHandler(ctx: EffectContext): EffectResult {
 
 export function registerMinato122Handlers(): void {
   registerEffect('SS-122-SPV', 'MAIN', minato122MainHandler);
+  registerEffect('SS-122-R', 'MAIN', minato122MainHandler);
   registerEffect('SS-122-SP', 'MAIN', minato122MainHandler);
 }

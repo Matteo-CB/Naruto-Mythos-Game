@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { compareBySetOrder } from '@/lib/cards/order';
+import { deservesHoloSheen } from '@/lib/variants/rarityTier';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import type { CardData } from '@/lib/engine/types';
@@ -35,7 +36,7 @@ export function BoosterOpenAnimation({ cards, duplicateCardIds, onClose, setLabe
       .map((c, i) => ({
         ...c,
         sealedInstanceId: `${c.cardId}-${i}`,
-        isHolo: c.isHolo === true || c.rarity === 'M' || c.rarity === 'MV' || c.rarity === 'S' || c.rarity === 'SV' || c.rarity === 'L',
+        isHolo: c.isHolo === true || deservesHoloSheen(c.rarity),
       }));
   }, [cards]);
 

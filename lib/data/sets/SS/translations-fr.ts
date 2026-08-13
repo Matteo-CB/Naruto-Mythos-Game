@@ -53,6 +53,235 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   "SS-050-C": [
     "[↯] POWERUP 2 sur un personnage Village du Sable allié en jeu.",
   ],
+  "SS-001-UC": [
+    "[⧗] Si tous les personnages alliés de cette mission sont Village de la Feuille, ce personnage a +1 Puissance pour chaque personnage Village de la Feuille allié de cette mission.",
+  ],
+  "SS-003-C": [
+    "[↯] POWERUP 1 sur un personnage Village de la Feuille allié de cette mission.",
+  ],
+  "SS-004-UC": [
+    "[↯] Regardez les 3 cartes du dessus de votre deck, choisissez et révélez un personnage Sannin, puis ajoutez-le à votre main. Placez les autres cartes au hasard sous votre deck.",
+  ],
+  "SS-009-C": [
+    "[↯] Défaussez une carte Nourriture de votre main pour gagner 1 Chakra et piocher une carte.",
+  ],
+  "SS-010-C": [
+    "[⧗] S'il y a un personnage Équipe 10 allié dans cette mission, CHAKRA +1.",
+  ],
+  "SS-011-C": [
+    "[↯] Regardez un personnage caché de cette mission.",
+  ],
+  "SS-012-C": [
+    "[↯] POWERUP 2 sur un personnage Équipe 10 allié de cette mission.",
+  ],
+  "SS-013-UC": [
+    "[↯] Si le personnage ennemi le plus puissant en jeu est présent dans cette mission, POWERUP 5.",
+    "[↯] Répétez l'effet AMBUSH.",
+  ],
+  "SS-014-C": [
+    "[↯] FIRST STRIKE Regardez un personnage ennemi caché de cette mission. S'il coûte 3 ou moins, vainquez-le.",
+  ],
+  "SS-015-UC": [
+    "[⧗] À la fin de la manche, vous devez payer 1 Chakra ou vaincre ce personnage.",
+  ],
+  "SS-017-C": [
+    "[↯] L'adversaire doit révéler une carte au hasard de sa main, s'il le peut. Si elle coûte 4 ou plus, vous gagnez 2 Chakra.",
+  ],
+  "SS-018-UC": [
+    "[↯] POWERUP 1 sur chaque personnage Équipe 8 allié de cette mission.",
+    "[↯] POWERUP 1 sur chaque personnage Équipe 8 allié de cette mission.",
+  ],
+  "SS-021-C": [
+    "[↯] FIRST STRIKE Jouez ce personnage en payant 1 de moins.",
+  ],
+  "SS-022-UC": [
+    "[⧗] Quand vous posez un équipement Arme sur ce personnage, POWERUP 3.",
+    "[↯] Jouez un équipement dans cette mission en payant 2 de moins.",
+  ],
+  "SS-023-C": [
+    "[↯] Regardez la carte du dessus de votre deck. Choisissez de la remettre en place ou de la placer sous votre deck.",
+  ],
+  "SS-024-C": [
+    "[⧗] S'il y a un Naruto Uzumaki allié dans cette mission, CHAKRA +1.",
+  ],
+  "SS-025-C": [
+    "[↯] Déplacez un personnage caché allié depuis cette mission.",
+  ],
+  "SS-026-C": [
+    "[⧗] Si ce personnage a un équipement Senbon, il a +2 Puissance.",
+  ],
+  "SS-027-UC": [
+    "[⧗] Ce personnage a +2 Puissance pour chaque mission en jeu.",
+  ],
+  "SS-028-UC": [
+    "[↯] Regardez la carte du dessus du deck de l'adversaire. Vous pouvez placer cette carte sous son deck.",
+  ],
+  "SS-029-UC": [
+    "[↯] Révélez la carte du dessus du deck de l'adversaire. Cachez un personnage ennemi en jeu portant le même nom que la carte révélée.",
+  ],
+  "SS-052-C": [
+    "[↯] Déplacez un Zabuza Momochi vers cette mission ou depuis cette mission.",
+  ],
+  "SS-054-UC": [
+    "DUEL Sasuke Uchiwa [⧗] Ce personnage a -3 Puissance.",
+  ],
+  "SS-055-UC": [
+    "[↯] Volez 1 Chakra dans la réserve de l'adversaire.",
+    "[↯] Volez 1 Chakra dans la réserve de l'adversaire.",
+  ],
+  "SS-056-UC": [
+    "[↯] Défaussez un équipement ennemi de cette mission.",
+    "[⧗] À la fin de la manche, vous devez renvoyer ce personnage dans votre main.",
+  ],
+  "SS-057-UC": [
+    "[⧗] Avant de déterminer la Puissance lors de la phase d'évaluation des missions, vainquez un personnage ennemi de cette mission.",
+    "[⧗] À la fin de la manche, vous devez renvoyer ce personnage dans votre main.",
+  ],
+  "SS-058-UC": [
+    "[↯] Regardez les 3 cartes du dessus de votre deck, choisissez et révélez un personnage au nom Uchiwa, puis ajoutez-le à votre main. Placez les autres cartes au hasard sous votre deck.",
+  ],
+  "SS-059-C": [
+    "[↯] Regardez un personnage caché ennemi de cette mission. POWERUP X, où X est le coût de ce personnage caché.",
+  ],
+  "SS-060-UC": [
+    "[↯] Vous devez cacher un personnage allié de cette mission, si possible. Si vous le faites, gagnez 1 point de Mission.",
+  ],
+  "SS-061-C": [
+    "[⧗] S'il n'y a aucun personnage caché allié dans cette mission, CHAKRA +1.",
+  ],
+  "SS-062-C": [
+    "[⧗] Ce personnage a +1 Puissance pour chaque personnage Élève de l'Académie allié de cette mission.",
+  ],
+  "SS-063-C": [
+    "[↯] S'il y a un Konohamaru allié dans cette mission, POWERUP 1.",
+  ],
+  "SS-064-C": [
+    "[↯] S'il y a un Konohamaru allié dans cette mission, piochez 1 carte.",
+  ],
+  "SS-065-UC": [
+    "[↯] Vous pouvez déplacer autant d'équipements alliés en jeu que vous le souhaitez sur ce personnage.",
+    "[⧗] Ce personnage peut porter plus d'un équipement allié, en ignorant toutes les conditions.",
+  ],
+  "SS-066-C": [
+    "[⧗] Ce personnage a +X Puissance, où X est le coût de son équipement Arme, s'il en a un.",
+  ],
+  "SS-067-C": [
+    "[⧗] Les équipements Nourriture alliés coûtent 1 de moins.",
+  ],
+  "SS-068-UC": [
+    "[↯] POWERUP X, où X est le nombre de personnages Indépendants dans cette mission.",
+  ],
+  "SS-069-UC": [
+    "[⧗] Si vous avez un personnage Frère Démon allié dans cette mission, ce personnage a +2 Puissance.",
+  ],
+  "SS-070-UC": [
+    "[⧗] Si vous avez un personnage Frère Démon allié dans cette mission, ce personnage a +2 Puissance.",
+  ],
+  "SS-071-C": [
+    "[↯] POWERUP 1 pour chaque équipement de cette mission.",
+  ],
+  "SS-072-C": [
+    "[↯] Renvoyez l'équipement le plus haut de votre défausse dans votre main.",
+  ],
+  "SS-073-C": [
+    "[↯] Déplacez un équipement de personnage en jeu.",
+  ],
+  "SS-074-C": [
+    "[↯] Regardez les 5 cartes du dessus de votre deck, choisissez et révélez un équipement Arme ou Armure, puis ajoutez-le à votre main. Placez les autres cartes au hasard sous votre deck.",
+  ],
+  "SS-075-UC": [
+    "[⧗] Quand vous jouez un personnage Ninja Déserteur dans cette mission, gagnez 1 Chakra. POWERUP 1 sur ce personnage.",
+  ],
+  "SS-076-UC": [
+    "[↯] Gagnez 2 points de Mission.",
+  ],
+  "SS-111-R": [
+    "[↯] DUEL Neji Hyûga : Renvoyez la Hinata Hyûga la plus haute de votre défausse dans votre main.",
+    "[↯] Jouez un personnage au nom Hyûga n'importe où, en payant 3 de moins.",
+  ],
+  "SS-112-R": [
+    "[↯] Retirez tous les jetons de Puissance d'un personnage ennemi de cette mission.",
+    "[↯] DUEL Hinata Hyûga : Cachez un personnage ennemi sans jeton de Puissance dans cette mission.",
+  ],
+  "SS-113-R": [
+    "[↯] L'adversaire défausse une carte de sa main.",
+    "DUEL Kankurô MAIN effect: À la place, l'adversaire défausse une carte au hasard.",
+  ],
+  "SS-115-R": [
+    "[⧗] Ce personnage ne perd pas ses jetons de Puissance à la fin de la manche.",
+    "[⧗] DUEL Gaara : Quand vous vainquez un personnage ennemi, POWERUP 2.",
+  ],
+  "SS-116-R": [
+    "[⧗] Au début de la manche, POWERUP 2 sur chacun de vos personnages Équipe Gaï portant un équipement en jeu.",
+  ],
+  "SS-118-R": [
+    "[↯] Révélez et vainquez un personnage caché ennemi en jeu.",
+    "[↯] DUEL Temari : Cachez un personnage ennemi en jeu portant le même nom que le personnage révélé.",
+  ],
+  "SS-120-R": [
+    "[⧗] L'adversaire doit payer 1 Chakra de plus pour jouer des personnages depuis la position cachée dans cette mission.",
+    "[↯] DUEL Naruto Uzumaki : Cachez un personnage ennemi de Puissance 4 ou moins en jeu.",
+  ],
+  "SS-122-R": [
+    "[↯] Défaussez tous les personnages Démon à Queues d'une pile ennemie de cette mission ou déplacez un personnage Démon à Queues allié en jeu.",
+  ],
+  "SS-124-R": [
+    "[↯] DUEL Sakura Haruno : Prenez le contrôle d'un personnage ennemi de Puissance inférieure à celle de Sakura Haruno.",
+    "[↯] Déplacez un personnage contrôlé depuis cette mission.",
+  ],
+  "SS-129-R": [
+    "DUEL Orochimaru [⧗] Vous pouvez améliorer par-dessus des personnages alliés portant un nom différent de celui de ce personnage.",
+    "[↯] POWERUP 2 sur un personnage Hokage en jeu.",
+  ],
+  "SS-131-R": [
+    "DUEL Orochimaru [⧗] Vous pouvez améliorer par-dessus des personnages alliés portant un nom différent de celui de ce personnage.",
+    "[↯] Déplacez un personnage Hokage en jeu.",
+  ],
+  "SS-132-R": [
+    "[⧗] À la fin de la manche, cherchez le Nyoi Adamantin dans votre deck et jouez-le en payant 2 de moins. Mélangez ensuite votre deck. Puis vous devez renvoyer ce personnage dans votre main.",
+  ],
+  "SS-133-R": [
+    "[⧗] Quand un personnage Village de la Feuille allié est joué dans cette mission, POWERUP 2 sur ce personnage.",
+    "[↯] DUEL Orochimaru : Jouez un personnage Invocation dans cette mission en payant 2 de moins.",
+  ],
+  "SS-135-R": [
+    "[↯] Défaussez la carte du dessus de votre deck. Cachez un personnage ennemi de cette mission dont le coût est inférieur à celui de la carte défaussée.",
+  ],
+  "SS-136-R": [
+    "[↯] Vainquez un personnage ennemi de cette mission qui a été joué au tour précédent pour moins que son coût imprimé grâce à un effet de carte.",
+  ],
+  "SS-138-R": [
+    "[↯] Défaussez une carte de votre main. POWERUP X, où X est la Puissance de la carte défaussée.",
+    "[↯] Vainquez un personnage ennemi de cette mission dont la Puissance est égale à celle de ce personnage.",
+  ],
+  "SS-140-R": [
+    "[↯] Cachez un Naruto Uzumaki en jeu.",
+    "[↯] Jouez un Naruto Uzumaki face cachée n'importe où, en payant 2 de moins.",
+  ],
+  "SS-141-S": [
+    "[↯] Mélangez jusqu'à 5 cartes du dessus de votre défausse dans votre deck. Pour chaque carte mélangée, POWERUP 1.",
+    "MAIN effect: De plus, pour chaque carte, POWERUP 1 également sur un personnage allié en jeu.",
+  ],
+  "SS-142-S": [
+    "[⧗] À la fin de la manche, vous devez renvoyer ce personnage dans votre main s'il n'y a pas de Tsunade alliée dans cette mission.",
+    "[↯] Gagnez 1 Chakra pour chaque Tsunade alliée en jeu.",
+  ],
+  "SS-143-S": [
+    "[⧗] À la fin de la manche, vous devez renvoyer ce personnage dans votre main s'il n'y a pas de Jiraya allié dans cette mission.",
+    "[↯] Piochez 1 carte pour chaque Jiraya allié en jeu.",
+  ],
+  "SS-144-S": [
+    "[⧗] Quand vous jouez un personnage Invocation, gagnez 1 Chakra.",
+    "[↯] Jouez un personnage Invocation n'importe où en payant 3 de moins. POWERUP 2 sur chaque personnage Invocation allié en jeu.",
+  ],
+  "SS-145-S": [
+    "[↯] Vainquez tous les personnages ennemis de cette mission dont le coût est inférieur au nombre de cartes de cette pile d'améliorations.",
+    "MAIN effect: À la place, de coût inférieur ou égal.",
+  ],
+  "SS-146-S": [
+    "[⧗] À la fin de la manche, vous devez renvoyer ce personnage dans votre main s'il n'y a pas d'Orochimaru allié dans cette mission.",
+    "[↯] POWERUP 2 pour chaque Orochimaru allié en jeu.",
+  ],
   "SS-049-C": [
     "[↯] Déplacez un personnage depuis cette mission.",
   ],
@@ -383,6 +612,14 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   "SS-125-R": [
     "[↯] Chôji Akimichi : Vainquez un personnage ennemi qui s’est déplacé lors du tour précédent de l’adversaire.",
     "[↯] Déplacez un personnage allié caché en jeu.",
+  ],
+  "SS-127-MV": [
+    "[↯] Prenez le contrôle d’un personnage ennemi non caché dans cette mission en payant autant de Chakra que sa Puissance.",
+    "Sasuke Uchiwa : L’effet AMBUSH devient un effet MAIN.",
+  ],
+  "SS-127_2-MV": [
+    "[↯] Prenez le contrôle d’un personnage ennemi non caché dans cette mission en payant autant de Chakra que sa Puissance.",
+    "Sasuke Uchiwa : L’effet AMBUSH devient un effet MAIN.",
   ],
   "SS-127-R": [
     "[↯] Prenez le contrôle d’un personnage ennemi non caché dans cette mission en payant autant de Chakra que sa Puissance.",

@@ -1,28 +1,21 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
-
-type Rarity = 'RA' | 'MV' | 'SV' | 'L';
+import { rarityAccent, rarityTier } from '@/lib/variants/rarityTier';
 
 interface RarityFinaleProps {
-  rarity: Rarity;
+  rarity: string;
   label: string;
 }
 
-const COLOR: Record<Rarity, string> = {
-  RA: 'var(--t-accent)',
-  MV: '#5fa3df',
-  SV: '#9b59b6',
-  L: 'var(--t-danger)',
-};
-
 export function RarityFinale({ rarity, label }: RarityFinaleProps) {
   const reduce = useReducedMotion();
-  const accent = COLOR[rarity];
+  const accent = rarityAccent(rarity);
+  const palier = rarityTier(rarity);
 
   if (rarity === 'L') return <LegendaryBurst accent={accent} label={label} reduce={!!reduce} />;
-  if (rarity === 'SV') return <SecretSpiral accent={accent} label={label} reduce={!!reduce} />;
-  if (rarity === 'MV') return <MythosTracer accent={accent} label={label} reduce={!!reduce} />;
+  if (palier === 'sommet') return <SecretSpiral accent={accent} label={label} reduce={!!reduce} />;
+  if (palier === 'prestige') return <MythosTracer accent={accent} label={label} reduce={!!reduce} />;
   return <RaShimmer accent={accent} reduce={!!reduce} />;
 }
 

@@ -34,6 +34,8 @@ export const FORCE_UNLOCKED_CARD_IDS: ReadonlySet<string> = new Set([
   'SS-123-MV',
   'SS-126-MV',
   'SS-137-MV',
+  'SS-127-MV',
+  'SS-127_2-MV',
   'SS-078-CHIBIV',
   'SS-111-CHIBIV',
   'SS-112-CHIBIV',
