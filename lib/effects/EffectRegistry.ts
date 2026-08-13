@@ -67,6 +67,11 @@ export function hasHandler(cardId: string, effectType: EffectType): boolean {
 }
 
 
+export function getRegisteredEffectTypes(cardId: string): EffectType[] {
+  const handlers = registry.get(cardId);
+  return handlers ? Array.from(handlers.keys()) : [];
+}
+
 export function getRegisteredCardIds(): string[] {
   return Array.from(registry.keys());
 }

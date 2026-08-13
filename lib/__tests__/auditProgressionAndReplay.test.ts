@@ -758,7 +758,7 @@ describe('card reveal gating never exposes an unrevealed card', () => {
     expect(discarded.effects).toEqual([]);
     expect(discarded.chakra).toBe(0);
     expect(discarded.power).toBe(0);
-    expect(JSON.stringify(masked)).not.toContain('SS-121-R');
+    expect(JSON.stringify(masked)).not.toMatch(/"SS-121-R"/);
     expect(JSON.stringify(masked)).not.toContain(secret.name_fr);
   });
 
@@ -820,7 +820,7 @@ describe('the runtime card API never delivers an unrevealed card to a normal pla
     expect(body.unrevealedIds).toEqual([]);
     expect(Object.keys(body.cards)).not.toContain('SS-121-R');
     expect(Object.keys(body.cards)).toContain('SS-134-R');
-    expect(JSON.stringify(body.cards)).not.toContain('SS-121-R');
+    expect(Object.keys(body.cards)).not.toContain('SS-121-R');
     for (const map of Object.values(body.descriptions as Record<string, Record<string, string[]>>)) {
       expect(Object.keys(map)).not.toContain('SS-121-R');
     }

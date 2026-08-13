@@ -11,6 +11,8 @@
       "title_pl": "Nowe karty i poprawki",
       "categories": [
         "feature",
+        "feature",
+        "feature",
         "fix",
         "fix",
         "fix",
@@ -22,6 +24,8 @@
         "fix"
       ],
       "changes_fr": [
+        "Nouvelles cartes : 47 communes et peu communes, 18 rares, 6 secrètes, 26 rare art et 20 promos.",
+        "Le set 2 est jouable en scellé, avec les taux de tirage officiels.",
         "Nouvelles cartes : 048 commune, 050 commune.",
         "Les cartes 002, 006, 016 et 053 affichent enfin leur illustration.",
         "Un personnage volé rend ce qu'il contrôlait : voler le voleur ne vous donne plus sa prise.",
@@ -34,6 +38,8 @@
         "Les cartes sont rangées par set, puis par rareté, puis par numéro, dans la collection comme partout ailleurs."
       ],
       "changes_en": [
+        "New cards: 47 commons and uncommons, 18 rares, 6 secrets, 26 rare arts and 20 promos.",
+        "Set 2 is playable in sealed, with the official pull rates.",
         "New cards: 048 common, 050 common.",
         "Cards 002, 006, 016 and 053 finally show their artwork.",
         "A stolen character releases what it controlled: stealing the thief no longer hands you their prize.",
@@ -46,6 +52,8 @@
         "Cards are ordered by set, then rarity, then number, in the collection and everywhere else."
       ],
       "changes_es": [
+        "Cartas nuevas: 47 comunes y poco comunes, 18 raras, 6 secretas, 26 rare art y 20 promocionales.",
+        "El set 2 se puede jugar en sellado, con las probabilidades oficiales.",
         "Cartas nuevas: 048 común, 050 común.",
         "Las cartas 002, 006, 016 y 053 por fin muestran su ilustración.",
         "Un personaje robado suelta lo que controlaba: robar al ladrón ya no te entrega su botín.",
@@ -58,6 +66,8 @@
         "Las cartas se ordenan por set, luego por rareza y luego por número, en la colección y en todas partes."
       ],
       "changes_ja": [
+        "新カード：コモンとアンコモン47枚、レア18枚、シークレット6枚、レアアート26枚、プロモ20枚。",
+        "セット2がシールド戦で遊べるようになりました。封入率は公式のものです。",
         "新カード：048 コモン、050 コモン。",
         "002、006、016、053 のカードにイラストが表示されるようになりました。",
         "奪われたキャラクターは、コントロールしていたカードを手放します。奪い返しても、その獲物までは手に入りません。",
@@ -70,6 +80,8 @@
         "カードはセット順、レアリティ順、番号順に並ぶようになりました。コレクションでも他の画面でも同じです。"
       ],
       "changes_pt": [
+        "Cartas novas: 47 comuns e pouco comuns, 18 raras, 6 secretas, 26 rare art e 20 promocionais.",
+        "O set 2 é jogável em selado, com as probabilidades oficiais.",
         "Cartas novas: 048 comum, 050 comum.",
         "As cartas 002, 006, 016 e 053 mostram finalmente a sua ilustração.",
         "Um personagem roubado solta o que controlava: roubar o ladrão já não lhe entrega o espólio.",
@@ -82,6 +94,8 @@
         "As cartas são ordenadas por conjunto, depois por raridade e depois por número, na coleção e em todo o lado."
       ],
       "changes_it": [
+        "Carte nuove: 47 comuni e non comuni, 18 rare, 6 segrete, 26 rare art e 20 promo.",
+        "Il set 2 è giocabile in sealed, con le probabilità ufficiali.",
         "Carte nuove: 048 comune, 050 comune.",
         "Le carte 002, 006, 016 e 053 mostrano finalmente la loro illustrazione.",
         "Un personaggio rubato lascia ciò che controllava: rubare il ladro non ti consegna più il suo bottino.",
@@ -94,6 +108,8 @@
         "Le carte sono ordinate per set, poi per rarità, poi per numero, nella collezione e ovunque."
       ],
       "changes_pl": [
+        "Nowe karty: 47 pospolitych i niepospolitych, 18 rzadkich, 6 sekretnych, 26 rare art i 20 promo.",
+        "Set 2 jest grywalny w sealed, z oficjalnymi szansami na trafienie.",
         "Nowe karty: 048 pospolita, 050 pospolita.",
         "Karty 002, 006, 016 i 053 wreszcie pokazują swoją ilustrację.",
         "Skradziona postać oddaje to, co kontrolowała: kradzież złodzieja nie daje ci już jego łupu.",

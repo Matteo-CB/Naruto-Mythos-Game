@@ -22,6 +22,12 @@ describe("l'interrupteur qui revele tout est reserve au poste de developpement",
     expect(revealsEverything()).toBe(false);
   });
 
+  it('inerte pendant les tests, pour ne pas fausser les gardes', () => {
+    vi.stubEnv('REVEAL_EVERYTHING', '1');
+    vi.stubEnv('NODE_ENV', 'test');
+    expect(revealsEverything()).toBe(false);
+  });
+
   it('inerte quand la variable est absente', () => {
     vi.stubEnv('REVEAL_EVERYTHING', '');
     vi.stubEnv('NODE_ENV', 'development');

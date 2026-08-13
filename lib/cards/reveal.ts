@@ -15,7 +15,7 @@ const TTL_MS = 30_000;
 // is treated as public and every set is delivered, so a developer can exercise unreleased content
 // without touching the shared database. Never set it on the production host.
 export function revealsEverything(): boolean {
-  return process.env.REVEAL_EVERYTHING === '1' && process.env.NODE_ENV !== 'production';
+  return process.env.REVEAL_EVERYTHING === '1' && process.env.NODE_ENV === 'development';
 }
 
 export async function getHiddenCardIds(): Promise<Set<string>> {
