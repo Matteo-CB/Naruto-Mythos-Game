@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { compareBySetOrder } from '@/lib/cards/order';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
@@ -50,7 +51,8 @@ export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
   const sortedCards = useMemo(
     () =>
       [...cards].sort(
-        (a, b) => (RARITY_ORDER[a.rarity] ?? 99) - (RARITY_ORDER[b.rarity] ?? 99),
+        (a, b) => (RARITY_ORDER[a.rarity] ?? 99) - (RARITY_ORDER[b.rarity] ?? 99)
+          || compareBySetOrder(a, b),
       ),
     [cards],
   );

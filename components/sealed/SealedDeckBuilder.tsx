@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
+import { compareBySetOrder } from '@/lib/cards/order';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
@@ -153,7 +154,8 @@ export function SealedDeckBuilder({
       .sort((a, b) => {
         const costDiff = (a.chakra ?? 0) - (b.chakra ?? 0);
         if (costDiff !== 0) return costDiff;
-        return getCardName(a, locale as 'en' | 'fr').localeCompare(getCardName(b, locale as 'en' | 'fr'));
+        const parNom = getCardName(a, locale as 'en' | 'fr').localeCompare(getCardName(b, locale as 'en' | 'fr'));
+        return parNom !== 0 ? parNom : compareBySetOrder(a, b);
       });
   }, [catalogChars, matchesRarity, matchesGroup, matchesSearch, locale]);
 

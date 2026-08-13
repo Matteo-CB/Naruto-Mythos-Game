@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { sortCardsForDisplay, RARITY_ORDER as CANONICAL_RARITY_ORDER } from '@/lib/cards/order';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
@@ -65,7 +66,7 @@ function StatBadges({ card, costLabel, powerLabel }: { card: AnyCard; costLabel:
   );
 }
 
-const RARITY_ORDER: Rarity[] = ['C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L', 'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV', 'SHINOBI', 'SHINOBIV', 'MMS'];
+const RARITY_ORDER = CANONICAL_RARITY_ORDER as unknown as Rarity[];
 const CHIP_ON = 'on';
 const CHIP_OFF = 'off';
 const NO_CHOICE: string[] = [];
@@ -93,7 +94,7 @@ export default function CollectionPage() {
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
-      const cards = mod.getAllCards().filter((c) => c.id !== WORLDCUP_CHAMPION_CARD);
+      const cards = sortCardsForDisplay(mod.getAllCards().filter((c) => c.id !== WORLDCUP_CHAMPION_CARD));
       setAllCards(cards);
       setCardsLoading(false);
     });

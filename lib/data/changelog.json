@@ -18,6 +18,7 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
@@ -29,7 +30,8 @@
         "Kimimaro 77 et Orochimaru 130 appliquent enfin leur effet en duel.",
         "Un effet FIRST STRIKE copié ne se déclenche plus si la carte qui copie n'est pas la première jouée de la manche.",
         "Kabuto 30 montre la carte piochée avant que vous choisissiez la mission.",
-        "Kin Tsuchi 43 affiche le bon symbole : sa remise est un effet continu, active seulement si votre défausse n'est pas vide."
+        "Kin Tsuchi 43 affiche le bon symbole : sa remise est un effet continu, active seulement si votre défausse n'est pas vide.",
+        "Les cartes sont rangées par set, puis par rareté, puis par numéro, dans la collection comme partout ailleurs."
       ],
       "changes_en": [
         "New cards: 048 common, 050 common.",
@@ -40,7 +42,8 @@
         "Kimimaro 77 and Orochimaru 130 finally apply their duel effect.",
         "A copied FIRST STRIKE effect no longer triggers when the copying card is not the first one played this round.",
         "Kabuto 30 shows the drawn card before you choose the mission.",
-        "Kin Tsuchi 43 shows the right symbol: her discount is a continuous effect, active only when your discard pile is not empty."
+        "Kin Tsuchi 43 shows the right symbol: her discount is a continuous effect, active only when your discard pile is not empty.",
+        "Cards are ordered by set, then rarity, then number, in the collection and everywhere else."
       ],
       "changes_es": [
         "Cartas nuevas: 048 común, 050 común.",
@@ -51,7 +54,8 @@
         "Kimimaro 77 y Orochimaru 130 por fin aplican su efecto de duelo.",
         "Un efecto FIRST STRIKE copiado ya no se activa si la carta que copia no es la primera jugada de la ronda.",
         "Kabuto 30 muestra la carta robada antes de que elijas la misión.",
-        "Kin Tsuchi 43 muestra el símbolo correcto: su descuento es un efecto continuo, activo solo si tu descarte no está vacío."
+        "Kin Tsuchi 43 muestra el símbolo correcto: su descuento es un efecto continuo, activo solo si tu descarte no está vacío.",
+        "Las cartas se ordenan por set, luego por rareza y luego por número, en la colección y en todas partes."
       ],
       "changes_ja": [
         "新カード：048 コモン、050 コモン。",
@@ -62,7 +66,8 @@
         "君麻呂77と大蛇丸130のデュエル効果がようやく機能するようになりました。",
         "コピーしたFIRST STRIKE効果は、コピーしたカードがそのラウンド最初に出したカードでない場合は発動しなくなりました。",
         "薬師カブト30は、ミッションを選ぶ前に引いたカードを見せるようになりました。",
-        "キン・ツチ43の記号を修正しました。彼女の割引は継続効果で、捨て札があるときだけ働きます。"
+        "キン・ツチ43の記号を修正しました。彼女の割引は継続効果で、捨て札があるときだけ働きます。",
+        "カードはセット順、レアリティ順、番号順に並ぶようになりました。コレクションでも他の画面でも同じです。"
       ],
       "changes_pt": [
         "Cartas novas: 048 comum, 050 comum.",
@@ -73,7 +78,8 @@
         "Kimimaro 77 e Orochimaru 130 aplicam finalmente o seu efeito de duelo.",
         "Um efeito FIRST STRIKE copiado deixa de ativar se a carta que copia não for a primeira jogada da ronda.",
         "Kabuto 30 mostra a carta comprada antes de escolheres a missão.",
-        "Kin Tsuchi 43 mostra o símbolo certo: o seu desconto é um efeito contínuo, ativo apenas se o teu descarte não estiver vazio."
+        "Kin Tsuchi 43 mostra o símbolo certo: o seu desconto é um efeito contínuo, ativo apenas se o teu descarte não estiver vazio.",
+        "As cartas são ordenadas por conjunto, depois por raridade e depois por número, na coleção e em todo o lado."
       ],
       "changes_it": [
         "Carte nuove: 048 comune, 050 comune.",
@@ -84,7 +90,8 @@
         "Kimimaro 77 e Orochimaru 130 applicano finalmente il loro effetto duello.",
         "Un effetto FIRST STRIKE copiato non si attiva più se la carta che copia non è la prima giocata del round.",
         "Kabuto 30 mostra la carta pescata prima che tu scelga la missione.",
-        "Kin Tsuchi 43 mostra il simbolo giusto: il suo sconto è un effetto continuo, attivo solo se la tua pila degli scarti non è vuota."
+        "Kin Tsuchi 43 mostra il simbolo giusto: il suo sconto è un effetto continuo, attivo solo se la tua pila degli scarti non è vuota.",
+        "Le carte sono ordinate per set, poi per rarità, poi per numero, nella collezione e ovunque."
       ],
       "changes_pl": [
         "Nowe karty: 048 pospolita, 050 pospolita.",
@@ -95,7 +102,8 @@
         "Kimimaro 77 i Orochimaru 130 wreszcie stosują swój efekt pojedynku.",
         "Skopiowany efekt FIRST STRIKE nie aktywuje się już, gdy kopiująca karta nie jest pierwszą zagraną w rundzie.",
         "Kabuto 30 pokazuje dobraną kartę, zanim wybierzesz misję.",
-        "Kin Tsuchi 43 pokazuje właściwy symbol: jej zniżka to efekt ciągły, działa tylko gdy twój stos kart odrzuconych nie jest pusty."
+        "Kin Tsuchi 43 pokazuje właściwy symbol: jej zniżka to efekt ciągły, działa tylko gdy twój stos kart odrzuconych nie jest pusty.",
+        "Karty są uporządkowane według setu, potem rzadkości, potem numeru, w kolekcji i wszędzie indziej."
       ]
     },
     {

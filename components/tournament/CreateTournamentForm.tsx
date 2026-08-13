@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
+import { sortCardsForDisplay } from '@/lib/cards/order';
 import { useMemo, useState } from 'react';
 import { useTournamentStore, type CreateTournamentInput } from '@/stores/tournamentStore';
 import { useRouter } from '@/lib/i18n/navigation';
@@ -75,7 +76,7 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
   const [prizeCardId, setPrizeCardId] = useState<string>('');
 
   const deckLegalCards = useMemo(
-    () => getAllCards().filter((c) => c.card_type !== 'mission'),
+    () => sortCardsForDisplay(getAllCards().filter((c) => c.card_type !== 'mission')),
     [],
   );
   const noFilter = useMemo(() => ({}), []);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
+import { compareBySetOrder } from '@/lib/cards/order';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import type { CardData } from '@/lib/engine/types';
@@ -29,7 +30,8 @@ export function BoosterOpenAnimation({ cards, duplicateCardIds, onClose, setLabe
 
   const sortedCards: BoosterCard[] = useMemo(() => {
     return [...cards]
-      .sort((a, b) => (RARITY_ORDER[a.rarity] ?? 0) - (RARITY_ORDER[b.rarity] ?? 0))
+      .sort((a, b) => (RARITY_ORDER[a.rarity] ?? 0) - (RARITY_ORDER[b.rarity] ?? 0)
+        || compareBySetOrder(a, b))
       .map((c, i) => ({
         ...c,
         sealedInstanceId: `${c.cardId}-${i}`,

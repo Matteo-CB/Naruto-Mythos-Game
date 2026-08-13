@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { sortCardsForDisplay } from '@/lib/cards/order';
 import { getCardById } from '@/lib/data/cardIndex';
 import { useSession } from 'next-auth/react';
 import { useTranslations, useLocale } from 'next-intl';
@@ -71,9 +72,9 @@ export default function AdminFeaturedPage() {
 
   const allPickerCards = useMemo<PickerCard[]>(() => {
     void cardIndexVersion;
-    return (getAllCards() as CardData[])
+    return sortCardsForDisplay((getAllCards() as CardData[])
       .filter((c) => !!c.image_file && !isHoloId(c.id)
-        && (c.card_type === 'character' || c.card_type === 'attachment' || c.card_type === 'mission'))
+        && (c.card_type === 'character' || c.card_type === 'attachment' || c.card_type === 'mission')))
       .map((c) => ({
         id: c.id,
         set: c.set,
@@ -82,7 +83,7 @@ export default function AdminFeaturedPage() {
         rarity: holoRarity(c.rarity),
         locked: unrevealedIds.has(c.id),
       }))
-      .sort((a, b) => a.set.localeCompare(b.set) || a.label.localeCompare(b.label));
+
   }, [cardIndexVersion, locale, unrevealedIds]);
 
   const cardById = useMemo(() => {

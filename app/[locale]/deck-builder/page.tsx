@@ -8,7 +8,7 @@ import { Link } from "@/lib/i18n/navigation";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { parseSearchQuery, normalizeStr, type SearchFilter } from "@/lib/deckSearch/parseSearchQuery";
 import { validateDeck } from "@/lib/engine/rules/DeckValidation";
-import { compareBySetOrder } from "@/lib/cards/order";
+import { compareBySetOrder, rarityRank } from "@/lib/cards/order";
 import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useUnlockedVariants } from "@/lib/hooks/useUnlockedVariants";
@@ -48,7 +48,6 @@ const RARITY_COLORS: Record<string, string> = {
   C: 'var(--t-muted)', UC: 'var(--t-success)', R: 'var(--t-accent)', RA: 'var(--t-accent)',
   S: 'var(--t-danger)', M: '#6a6abb', Legendary: 'var(--t-accent)', Mission: 'var(--t-accent)',
 };
-const RARITY_ORDER: Record<string, number> = { C: 0, UC: 1, R: 2, RA: 3, S: 4, M: 5, Legendary: 6 };
 const EFFECT_TYPE_COLORS: Record<string, string> = {
   MAIN: 'var(--t-accent)', UPGRADE: 'var(--t-success)', AMBUSH: 'var(--t-danger)', SCORE: '#6a6abb',
 };
@@ -568,7 +567,7 @@ export default function DeckBuilderPage() {
         case 'name': cmp = getCardName(a, loc).localeCompare(getCardName(b, loc)); break;
         case 'chakra': cmp = (a.chakra ?? 0) - (b.chakra ?? 0); break;
         case 'power': cmp = (a.power ?? 0) - (b.power ?? 0); break;
-        case 'rarity': cmp = (RARITY_ORDER[a.rarity] ?? 99) - (RARITY_ORDER[b.rarity] ?? 99); break;
+        case 'rarity': cmp = rarityRank(a.rarity) - rarityRank(b.rarity); break;
       }
       if (cmp === 0) cmp = compareBySetOrder(a, b);
       return sortOrder === 'desc' ? -cmp : cmp;
@@ -737,7 +736,7 @@ export default function DeckBuilderPage() {
     });
     return Array.from(groups.entries()).sort((a, b) => {
       if (deckGroupBy === 'chakra' || deckGroupBy === 'power') return Number(a[0]) - Number(b[0]);
-      if (deckGroupBy === 'rarity') return (RARITY_ORDER[a[0] as keyof typeof RARITY_ORDER] ?? 99) - (RARITY_ORDER[b[0] as keyof typeof RARITY_ORDER] ?? 99);
+      if (deckGroupBy === 'rarity') return rarityRank(String(a[0])) - rarityRank(String(b[0]));
       return a[0].localeCompare(b[0]);
     });
   }, [deckChars, deckGroupBy]);

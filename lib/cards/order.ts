@@ -2,13 +2,15 @@ import type { CardData } from '@/lib/engine/types';
 import { getAllCards } from '@/lib/data/cardLoader';
 import { getSetNumber, isSetAvailable } from '@/lib/data/sets/registry';
 
-const RARITY_ORDER = [
+export const RARITY_ORDER: readonly string[] = [
   'C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'MV', 'L',
   'SP', 'SPV', 'POP', 'POPV', 'CHIBI', 'CHIBIV', 'SHINOBI', 'SHINOBIV', 'MMS',
 ];
 
-function rarityRank(rarity: string): number {
-  const i = RARITY_ORDER.indexOf(rarity);
+const SORTED_AS_ONE_RARITY: Record<string, string> = { UC: 'C' };
+
+export function rarityRank(rarity: string): number {
+  const i = RARITY_ORDER.indexOf(SORTED_AS_ONE_RARITY[rarity] ?? rarity);
   return i === -1 ? RARITY_ORDER.length : i;
 }
 
@@ -26,19 +28,19 @@ function compareCards(a: CardData, b: CardData): number {
   const sb = setRank(b.set);
   if (sa !== sb) return sa - sb;
 
-  const ma = a.card_type === 'mission' ? 1 : 0;
-  const mb = b.card_type === 'mission' ? 1 : 0;
-  if (ma !== mb) return ma - mb;
-
-  if (a.number !== b.number) return a.number - b.number;
-
   const ra = rarityRank(a.rarity);
   const rb = rarityRank(b.rarity);
   if (ra !== rb) return ra - rb;
 
+  if (a.number !== b.number) return a.number - b.number;
+
   if (a.id < b.id) return -1;
   if (a.id > b.id) return 1;
   return 0;
+}
+
+export function sortCardsForDisplay<T extends CardData>(cards: readonly T[]): T[] {
+  return [...cards].sort(compareCards);
 }
 
 export const ORDERED_CARD_IDS: string[] = getAllCards()
