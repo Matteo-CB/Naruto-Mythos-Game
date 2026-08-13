@@ -36,7 +36,14 @@ function kabuto030FirstStrike(ctx: EffectContext): EffectResult {
     targetSelectionType: 'SS030_PLACE_HIDDEN',
     validTargets: destinations,
     isOptional: true,
-    description: JSON.stringify({ revealedCardId: carte.id }),
+    description: JSON.stringify({
+      revealedCardId: carte.id,
+      cardName_fr: carte.name_fr,
+      cardName_en: carte.name_en ?? carte.name_fr,
+      cardCost: carte.chakra ?? 0,
+      cardPower: carte.power ?? 0,
+      cardImageFile: carte.image_file,
+    }),
     descriptionKey: 'game.effect.desc.ss030PlaceHidden',
   }, ctx.sourceCard.instanceId, 'SS030_CONFIRM_FIRST_STRIKE');
 }

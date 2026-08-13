@@ -360,7 +360,7 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "[↯] Jeśli masz sojuszniczą postać z Drużyny Dosu na tej misji, pokonaj postać o koszcie 3 lub mniejszym.",
   ],
   "SS-043-UC": [
-    "[↯] Jeśli masz jakąkolwiek kartę na swoim stosie odrzuconych, zagraj tę postać, płacąc o 1 mniej.",
+    "[⧗] Jeśli masz jakąkolwiek kartę na swoim stosie odrzuconych, zagraj tę postać, płacąc o 1 mniej.",
   ],
   "SS-044-UC": [
     "[↯] Przeciwnik musi odrzucić 1 losową kartę.",

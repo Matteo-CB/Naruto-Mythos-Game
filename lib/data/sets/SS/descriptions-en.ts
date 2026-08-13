@@ -361,7 +361,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "[↯] If you have a friendly Team Dosu character in this mission, defeat a character with cost 3 or less.",
   ],
   "SS-043-UC": [
-    "[↯] If you have any card in your discard pile, play this character paying 1 less.",
+    "[⧗] If you have any card in your discard pile, play this character paying 1 less.",
   ],
   "SS-044-UC": [
     "[↯] The opponent must discard 1 card at random.",

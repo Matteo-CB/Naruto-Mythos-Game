@@ -63,7 +63,7 @@ import { calculateEffectiveCost } from '../engine/rules/ChakraValidation';
 import { canAffordAsUpgrade } from './handlers/KS/shared/upgradeCheck';
 import { moveCharTo, getValidMissions, applyUpgradePowerup } from './handlers/KS/rare/sasuke107';
 import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard, findHiddenSoundVillageOnBoard, findAffordableSoundVillageInHand } from './handlers/KS/shared/summonSearch';
-import { isCharacterCopyable, isCopyableEffectType } from './handlers/KS/shared/copyExclusions';
+import { isCharacterCopyable, isCopyableEffect } from './handlers/KS/shared/copyExclusions';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 import { hasFlexibleUpgradeRestriction, isRestrictedUpgradeTarget } from '@/lib/engine/rules/flexibleUpgradeRestriction';
 
@@ -439,6 +439,7 @@ export class EffectEngine {
     }
 
     const tokensBeforePlay = character.powerTokens;
+    const wasFirstCardOfRound = isFirstCardPlayedThisRound(newState, player);
 
     if (!character.isHidden) {
       newState = triggerOnPlayReactions(newState, player, missionIndex, false, character.instanceId);
@@ -509,6 +510,7 @@ export class EffectEngine {
           triggerType: effectType,
           isUpgrade,
           tokensBeforePlay,
+          wasFirstCard: wasFirstCardOfRound,
         };
         const result = handler(ctx);
 
@@ -518,7 +520,7 @@ export class EffectEngine {
 
           newState = EffectEngine.createPendingTargetSelection(
             result.state, player, currentChar, currentMissionIndex, effectType, isUpgrade,
-            result, remainingEffectTypes,
+            result, remainingEffectTypes, undefined, undefined, wasFirstCardOfRound,
           );
           return newState;
         }
@@ -598,6 +600,8 @@ export class EffectEngine {
       insertDuelAtPrintedPosition(orderedTypes, topCard);
     }
 
+    const wasFirstCardOfRoundReveal = isFirstCardPlayedThisRound(newState, player);
+
     if (isFirstStrikeArmed(newState, player, character, topCard, isOwnPlayAction)) {
       orderedTypes.push('FIRST_STRIKE' as EffectType);
       newState = withFirstStrikeStatus(newState, player, 'used');
@@ -633,6 +637,7 @@ export class EffectEngine {
           triggerType: effectType,
           isUpgrade: true,
           wasRevealed: true,
+          wasFirstCard: wasFirstCardOfRoundReveal,
         };
         const result = handler(ctx);
 
@@ -644,7 +649,7 @@ export class EffectEngine {
 
           newState = EffectEngine.createPendingTargetSelection(
             result.state, player, character, missionIndex, effectType, true,
-            result, remainingEffectTypes, true,
+            result, remainingEffectTypes, true, undefined, wasFirstCardOfRoundReveal,
           );
           return newState;
         }
@@ -1161,6 +1166,7 @@ export class EffectEngine {
     remainingEffectTypes: EffectType[],
     wasRevealed?: boolean,
     sourcelessCardId?: string,
+    wasFirstCard?: boolean,
   ): GameState {
     
     
@@ -1216,6 +1222,7 @@ export class EffectEngine {
       resolved: false,
       isUpgrade,
       wasRevealed: wasRevealed ?? false,
+      wasFirstCard: wasFirstCard ?? false,
       remainingEffectTypes: remainingEffectTypes.length > 0 ? remainingEffectTypes : undefined,
       selectingPlayer: result.selectingPlayer,
       
@@ -3467,11 +3474,7 @@ export class EffectEngine {
             if (topCard.chakra > 4) continue;
             const k016WasRevealed = pendingEffect.wasRevealed ?? false;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
-              if (!isCopyableEffectType(eff.type)) return false;
-              if (eff.type === 'AMBUSH' && !k016WasRevealed) return false;
-              if (eff.description.includes('[⧗]')) return false;
-              if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
-              return true;
+              return isCopyableEffect(eff, { wasRevealed: k016WasRevealed, wasFirstCard: pendingEffect.wasFirstCard });
             });
             if (hasInstant) k016Targets.push(char.instanceId);
           }
@@ -3520,11 +3523,7 @@ export class EffectEngine {
             if (char.isHidden) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
-              if (!isCopyableEffectType(eff.type)) return false;
-              if (eff.type === 'AMBUSH' && !k016uWasRevealed) return false;
-              if (eff.description.includes('[⧗]')) return false;
-              if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
-              return true;
+              return isCopyableEffect(eff, { wasRevealed: k016uWasRevealed, wasFirstCard: pendingEffect.wasFirstCard });
             });
             if (hasInstant) k016uTargets.push(char.instanceId);
           }
@@ -5981,10 +5980,7 @@ export class EffectEngine {
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
               const hasInstant = topCard.effects?.some((eff: any) => {
-                if (!isCopyableEffectType(eff.type)) return false;
-                if (eff.description && eff.description.includes('[⧗]')) return false;
-                if (eff.description && /(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
-                return true;
+                return isCopyableEffect(eff, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard });
               });
               if (hasInstant) s062Targets.push(char.instanceId);
             }
@@ -6006,10 +6002,7 @@ export class EffectEngine {
             ? s062AutoResult.character.stack[s062AutoResult.character.stack?.length - 1]
             : s062AutoResult.character.card;
           const s062Copyable = (s062TopCard.effects ?? []).filter((eff: any) => {
-            if (!isCopyableEffectType(eff.type)) return false;
-            if (eff.description.includes('[⧗]')) return false;
-            if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
-            return true;
+            return isCopyableEffect(eff, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard });
           });
           if (s062Copyable.length === 0) break;
           if (s062Copyable.length === 1) {
@@ -15202,10 +15195,7 @@ export class EffectEngine {
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
             const hasCopyableEffect = topCard.effects.some((effect: { type: string; description: string }) => {
-              if (!isCopyableEffectType(effect.type)) return false;
-              if (effect.description.includes('[⧗]')) return false;
-              if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(effect.description)) return false;
-              return true;
+              return isCopyableEffect(effect, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard });
             });
             if (hasCopyableEffect) {
               k148aValidTargets.push(char.instanceId);
@@ -15630,10 +15620,7 @@ export class EffectEngine {
         
         
         const k148Copyable = !isCharacterCopyable(k148TopCard) ? [] : (k148TopCard.effects ?? []).filter((eff) => {
-          if (!isCopyableEffectType(eff.type)) return false;
-          if (eff.description.includes('[⧗]')) return false;
-          if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
-          return eff.type === 'MAIN' || eff.type === 'AMBUSH';
+          return isCopyableEffect(eff, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard }) && (eff.type === 'MAIN' || eff.type === 'AMBUSH');
         });
 
         if (k148Copyable.length === 0) {
@@ -17533,11 +17520,7 @@ export class EffectEngine {
         
         const copierWasRevealed = pendingEffect.wasRevealed ?? false;
         const copyableEffects = (copyTargetTopCard.effects ?? []).filter((eff) => {
-          if (!isCopyableEffectType(eff.type)) return false;
-          if (eff.type === 'AMBUSH' && !copierWasRevealed) return false;
-          if (eff.description.includes('[⧗]')) return false;
-          if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
-          return true;
+          return isCopyableEffect(eff, { wasRevealed: copierWasRevealed, wasFirstCard: pendingEffect.wasFirstCard });
         });
 
         if (copyableEffects.length === 0) {
@@ -18545,6 +18528,8 @@ export class EffectEngine {
         sourceMissionIndex: missionIndex,
         triggerType: effectType,
         isUpgrade: resolvedPending.isUpgrade,
+        wasRevealed: resolvedPending.wasRevealed,
+        wasFirstCard: resolvedPending.wasFirstCard,
       };
 
       const result = handler(ctx);
@@ -18555,6 +18540,7 @@ export class EffectEngine {
         newState = EffectEngine.createPendingTargetSelection(
           newState, resolvedPending.sourcePlayer, character, missionIndex,
           effectType, resolvedPending.isUpgrade, result, remainingAfterThis,
+          resolvedPending.wasRevealed, undefined, resolvedPending.wasFirstCard,
         );
         return newState;
       }
@@ -18875,11 +18861,7 @@ export class EffectEngine {
       const copier106WasRevealed = pending.wasRevealed ?? false;
       const copyableEffects = !isCharacterCopyable(discardedCard) ? [] : (discardedCard.effects ?? []).filter(
         (e) => {
-          if (!isCopyableEffectType(e.type)) return false;
-          if (e.type === 'AMBUSH' && !copier106WasRevealed) return false;
-          if (e.description.includes('[⧗]')) return false;
-          if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(e.description)) return false;
-          return true;
+          return isCopyableEffect(e, { wasRevealed: copier106WasRevealed, wasFirstCard: pending.wasFirstCard });
         },
       );
       if (copyableEffects.length === 1) {

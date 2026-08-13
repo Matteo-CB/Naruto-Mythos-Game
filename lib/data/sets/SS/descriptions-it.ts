@@ -360,7 +360,7 @@ export const effectDescriptionsIt: Record<string, string[]> = {
     "[↯] Se hai un personaggio alleato della Squadra Dosu in questa missione, sconfiggi un personaggio con costo 3 o inferiore.",
   ],
   "SS-043-UC": [
-    "[↯] Se hai almeno una carta nella tua pila degli scarti, gioca questo personaggio pagando 1 in meno.",
+    "[⧗] Se hai almeno una carta nella tua pila degli scarti, gioca questo personaggio pagando 1 in meno.",
   ],
   "SS-044-UC": [
     "[↯] L'avversario deve scartare 1 carta a caso.",

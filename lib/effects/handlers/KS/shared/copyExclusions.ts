@@ -23,3 +23,17 @@ export function isEffectAlteration(description: string | undefined | null): bool
 export function isCopyableEffectType(effectType: string | undefined | null): boolean {
   return effectType !== 'SCORE' && effectType !== 'UPGRADE';
 }
+
+
+export function isCopyableEffect(
+  effect: { type: string; description?: string } | undefined | null,
+  context: { wasRevealed?: boolean; wasFirstCard?: boolean },
+): boolean {
+  if (!effect) return false;
+  if (!isCopyableEffectType(effect.type)) return false;
+  if (effect.type === 'AMBUSH' && !context.wasRevealed) return false;
+  if (effect.type === 'FIRST_STRIKE' && !context.wasFirstCard) return false;
+  if (effect.description?.includes('[⧗]')) return false;
+  if (isEffectAlteration(effect.description)) return false;
+  return true;
+}

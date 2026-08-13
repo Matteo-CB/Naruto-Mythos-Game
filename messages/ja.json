@@ -978,6 +978,8 @@
       "kiba026UpgradeRevealTitle": "キバ（026）：山札公開",
       "kiba026UpgradeRevealFound": "赤丸を発見！手札に加えました。",
       "kiba026UpgradeRevealNone": "赤丸は見つかりませんでした。カードを上に戻しました。",
+      "ss030ChooseRevealTitle": "薬師カブト：デッキの一番上のカード",
+      "ss030ChooseRevealResult": "このカードを伏せて置くミッションを選んでください。",
       "kabuto052ChooseRevealTitle": "薬師カブト：奪ったカード",
       "kabuto052ChooseRevealResult": "このカードを伏せて置くミッションを選んでください。",
       "kiba026UpgradeChooseTitle": "キバ（026）：赤丸カードを選択",
@@ -1560,7 +1562,7 @@
         "ss077PickTarget": "残りのコスト内で、倒す伏せていない敵キャラクターを選ぶ。",
         "ss125DefeatMoved": "相手がこのラウンドに移動させた敵キャラクターを選んで倒す。",
         "ss040PlaySummons": "口寄せキャラクターを出す。味方の多由也がいる各ミッションでは、そこにいる味方の音の四人衆1体につきコストが1減る。",
-        "ss038Attach": "このミッションの伏せていない敵キャラクター1体を選ぶ。五重羅がそれに装備され、そのキャラクターはパワー5を失うが、五重羅はキャラクターではなくなる。"
+        "ss038Attach": "このミッションの伏せていない敵キャラクター1体を選ぶ。右近がそれに装備され、そのキャラクターはパワー5を失うが、右近はキャラクターではなくなる。"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",

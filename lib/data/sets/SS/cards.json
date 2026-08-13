@@ -3984,7 +3984,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "[↯] If you have any card in your discard pile, play this character paying 1 less."
+          "description": "[⧗] If you have any card in your discard pile, play this character paying 1 less."
         }
       ],
       "data_complete": true
@@ -4447,7 +4447,7 @@
       "name_en": "UKON",
       "name_fr": "UKON",
       "name_es": "UKON",
-      "name_ja": "五重羅",
+      "name_ja": "右近",
       "name_pt": "UKON",
       "name_it": "UKON",
       "name_pl": "UKON",

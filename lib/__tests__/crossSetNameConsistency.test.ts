@@ -21,6 +21,27 @@ describe('cross-set character name consistency', () => {
     expect(conflicts.map(([en, frs]) => `${en}: ${[...frs].join(' / ')}`)).toEqual([]);
   });
 
+  it('every character sharing a name_en has one spelling per locale across all sets', () => {
+    const locales = ['fr', 'es', 'ja', 'pt', 'it', 'pl'] as const;
+    const conflicts: string[] = [];
+    for (const locale of locales) {
+      const byEn = new Map<string, Set<string>>();
+      for (const c of getAllCards()) {
+        if (c.card_type !== 'character') continue;
+        const en = (c.name_en ?? c.name_fr ?? '').toUpperCase().trim();
+        const traduit = ((c as unknown as Record<string, string>)[`name_${locale}`] ?? '').trim();
+        if (!en || !traduit) continue;
+        const set = byEn.get(en) ?? new Set<string>();
+        set.add(traduit.toUpperCase());
+        byEn.set(en, set);
+      }
+      for (const [en, noms] of byEn.entries()) {
+        if (noms.size > 1) conflicts.push(`${locale} ${en}: ${[...noms].join(' / ')}`);
+      }
+    }
+    expect(conflicts).toEqual([]);
+  });
+
   it('SS-126-SPV Sasuke upgrades over a KS Sasuke (cross-set same name)', () => {
     const st = buildSimState({
       hand1: ['SS-126-SPV'],

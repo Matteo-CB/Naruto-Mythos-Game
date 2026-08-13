@@ -9,6 +9,7 @@ export interface EffectContext {
   triggerType: EffectType;
   isUpgrade: boolean; // Whether this is being triggered by an upgrade
   wasRevealed?: boolean; // Whether the card was just revealed from hidden
+  wasFirstCard?: boolean;
   
   subPlayCostReduction?: number;
 

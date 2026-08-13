@@ -1,7 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { isCharacterCopyable, isCopyableEffectType } from '@/lib/effects/handlers/KS/shared/copyExclusions';
+import { isCharacterCopyable, isCopyableEffect } from '@/lib/effects/handlers/KS/shared/copyExclusions';
 
 
 
@@ -22,10 +22,7 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
       if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
         
         const hasInstantEffect = topCard.effects?.some((eff) => {
-          if (!isCopyableEffectType(eff.type)) return false;
-          if (eff.description && eff.description.includes('[⧗]')) return false;
-          if (eff.description && /(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
-          return true;
+          return isCopyableEffect(eff, { wasRevealed: ctx.wasRevealed, wasFirstCard: ctx.wasFirstCard });
         });
         if (hasInstantEffect) {
           validTargets.push(char.instanceId);

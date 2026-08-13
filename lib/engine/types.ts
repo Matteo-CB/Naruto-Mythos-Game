@@ -269,6 +269,7 @@ export interface PendingEffect {
   resolved: boolean;
   isUpgrade: boolean;
   wasRevealed?: boolean; // Whether the source card was revealed from hidden
+  wasFirstCard?: boolean;
   
   remainingEffectTypes?: EffectType[];
   

@@ -536,9 +536,10 @@ export function buildPendingTargetSelectionUI(
   const isTayuya065Choose = tst === 'TAYUYA065_UPGRADE_CHOOSE';
   const isKiba026Choose = tst === 'KIBA026_UPGRADE_CHOOSE';
   const isKabuto052ChooseMission = tst === 'KABUTO_CHOOSE_MISSION';
+  const isKabuto030PlaceHidden = tst === 'SS030_PLACE_HIDDEN';
   const isMultiSelectChoose = isTayuya065Choose || isKiba026Choose;
   const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isReconLookReveal || isDeclareReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal;
-  const shouldParseRevealedCard = isInfoReveal || isKabuto052ChooseMission;
+  const shouldParseRevealedCard = isInfoReveal || isKabuto052ChooseMission || isKabuto030PlaceHidden;
 
   let revealedCard: PendingTargetSelection['revealedCard'];
   let revealedCards: PendingTargetSelection['revealedCards'];
@@ -632,6 +633,15 @@ export function buildPendingTargetSelectionUI(
           revealTitleKey: 'game.effect.kabuto052ChooseRevealTitle',
           revealResultKey: 'game.effect.kabuto052ChooseRevealResult',
         };
+      } else if (isKabuto030PlaceHidden) {
+        revealedCard = enrichRevealedLocale({
+          id: rd.revealedCardId,
+          name_fr: rd.cardName_fr, name_en: rd.cardName_en,
+          chakra: rd.cardCost, power: rd.cardPower,
+          image_file: rd.cardImageFile, canSteal: false,
+          revealTitleKey: 'game.effect.ss030ChooseRevealTitle',
+          revealResultKey: 'game.effect.ss030ChooseRevealResult',
+        });
       }
     } catch { /* ignore */ }
   }

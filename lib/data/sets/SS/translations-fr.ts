@@ -361,7 +361,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     "[↯] Si vous avez un personnage Équipe Dosu allié dans cette mission, vainquez un personnage dont le coût est de 3 ou moins.",
   ],
   "SS-043-UC": [
-    "[↯] Si vous avez au moins une carte dans votre pile de défausse, jouez ce personnage en payant 1 de moins.",
+    "[⧗] Si vous avez au moins une carte dans votre pile de défausse, jouez ce personnage en payant 1 de moins.",
   ],
   "SS-044-UC": [
     "[↯] L’adversaire doit défausser 1 carte au hasard.",

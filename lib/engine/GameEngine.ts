@@ -39,7 +39,7 @@ import { isRempartZeroed, canBeHiddenByEnemy, amplifiedPowerup } from '../effect
 import { triggerOnDefeatEffects } from '../effects/onDefeatTriggers';
 import { ss000FinalizeSearch } from '../effects/handlers/SS/ss000Search';
 import { getEffectivePower } from '../effects/powerUtils';
-import { isCopyableEffectType } from '../effects/handlers/KS/shared/copyExclusions';
+import { isCopyableEffect } from '../effects/handlers/KS/shared/copyExclusions';
 
 
 function collectCharInstanceIds(state: GameState): Set<string> {
@@ -1623,10 +1623,7 @@ export class GameEngine {
             const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
             if (topCard.chakra > 4) continue;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
-              if (!isCopyableEffectType(eff.type)) return false;
-              if (eff.description.includes('[⧗]')) return false;
-              if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(eff.description)) return false;
-              return true;
+              return isCopyableEffect(eff, { wasRevealed: effect.wasRevealed, wasFirstCard: effect.wasFirstCard });
             });
             if (hasInstant) k016dTargets.push(char.instanceId);
           }

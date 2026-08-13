@@ -1,7 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { isCharacterCopyable, isCopyableEffectType } from '@/lib/effects/handlers/KS/shared/copyExclusions';
+import { isCharacterCopyable, isCopyableEffect } from '@/lib/effects/handlers/KS/shared/copyExclusions';
 
 
 function handleKakashi016Main(ctx: EffectContext): EffectResult {
@@ -23,13 +23,7 @@ function handleKakashi016Main(ctx: EffectContext): EffectResult {
 
       
       const hasInstantEffect = topCard.effects?.some(effect => {
-        if (!isCopyableEffectType(effect.type)) return false;
-        if (effect.type === 'AMBUSH' && !ctx.wasRevealed) return false;
-        
-        if (effect.description.includes('[⧗]')) return false;
-        
-        if (/(?:^|\s)(?:MAIN|AMBUSH|UPGRADE|SCORE)\s+effect\b/.test(effect.description)) return false;
-        return true;
+        return isCopyableEffect(effect, { wasRevealed: ctx.wasRevealed, wasFirstCard: ctx.wasFirstCard });
       });
 
       if (hasInstantEffect) {

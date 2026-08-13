@@ -364,7 +364,7 @@ export const effectDescriptionsEs: Record<string, string[]> = {
     "[↯] Si tienes un personaje aliado del Equipo Dosu en esta misión, derrota a un personaje con coste 3 o menos.",
   ],
   "SS-043-UC": [
-    "[↯] Si tienes alguna carta en tu pila de descartes, juega este personaje pagando 1 menos.",
+    "[⧗] Si tienes alguna carta en tu pila de descartes, juega este personaje pagando 1 menos.",
   ],
   "SS-044-UC": [
     "[↯] El oponente debe descartar 1 carta al azar.",

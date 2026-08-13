@@ -3,7 +3,7 @@ import { initializeRegistry } from '@/lib/effects/EffectRegistry';
 import { runScenario } from '@/lib/cards/sim/runScenario';
 import { getScenario, hasCuratedScenario } from '@/lib/cards/sim/scenarios';
 import { hasScenario } from '@/lib/cards/sim/keys';
-import { generatedScenarioFires, generatedScenarioFiresReal } from '@/lib/cards/sim/generate';
+import { generatedScenarioFires, generatedScenarioFiresReal, buildScenarioForEffect } from '@/lib/cards/sim/generate';
 import { getAllCards } from '@/lib/data/cardLoader';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 import type { GameState, CharacterInPlay } from '@/lib/engine/types';
@@ -34,6 +34,21 @@ describe('card effect simulations (verified through the real engine)', () => {
       .filter((c) => !generatedScenarioFiresReal(c.id) && !hasCuratedScenario(c.id))
       .map((c) => c.id);
     expect(broken).toEqual([]);
+  });
+
+  it('EVERY effect of a card fires, not just one of them', () => {
+    const muets: string[] = [];
+    for (const c of getAllCards()) {
+      if (c.card_type !== 'character') continue;
+      if (awaitsEffectImplementation(c.id) || hasCuratedScenario(c.id)) continue;
+      for (const e of c.effects ?? []) {
+        if (e.description.includes('[⧗]')) continue;
+        if (isEffectAlteration(e.description)) continue;
+        if (buildScenarioForEffect(c.id, e.type)) continue;
+        muets.push(`${c.id} ${e.type}`);
+      }
+    }
+    expect(muets).toEqual([]);
   });
 
   it('hasScenario matches the "has effects" rule so new cards auto-get a simulation', () => {

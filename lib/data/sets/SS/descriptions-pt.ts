@@ -360,7 +360,7 @@ export const effectDescriptionsPt: Record<string, string[]> = {
     "[↯] Se você tiver um personagem aliado do Time Dosu nesta missão, derrote um personagem com custo 3 ou menos.",
   ],
   "SS-043-UC": [
-    "[↯] Se você tiver alguma carta na sua pilha de descarte, jogue este personagem pagando 1 a menos.",
+    "[⧗] Se você tiver alguma carta na sua pilha de descarte, jogue este personagem pagando 1 a menos.",
   ],
   "SS-044-UC": [
     "[↯] O oponente deve descartar 1 carta aleatoriamente.",
