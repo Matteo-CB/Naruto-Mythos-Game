@@ -5,7 +5,7 @@ import { isAdmin } from '@/lib/auth/admins';
 import { getExtraRawCards, getExtraEffectDescriptions } from '@/lib/data/serverCards';
 import { getSetStatus, getSetStatusOverrides } from '@/lib/data/sets/registry';
 import { getVariantObtentionOverrides } from '@/lib/variants/obtention';
-import { getHiddenCardIds } from '@/lib/cards/reveal';
+import { getHiddenCardIds, revealsEverything } from '@/lib/cards/reveal';
 import { ensureSetConfigLoaded } from '@/lib/data/setConfigServer';
 
 export const dynamic = 'force-dynamic';
@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   await ensureSetConfigLoaded();
   const session = await auth().catch(() => null);
-  let privileged = false;
+  let privileged = revealsEverything();
   if (session?.user?.id) {
     const admin = isAdmin({ username: session.user.name, email: session.user.email });
     if (admin) {
@@ -31,6 +31,7 @@ export async function GET() {
   }
 
   const hidden = await getHiddenCardIds();
+  const toutRevele = revealsEverything();
   const extra = getExtraRawCards();
   const extraDesc = getExtraEffectDescriptions();
 
@@ -42,7 +43,9 @@ export async function GET() {
     if (!setId) continue;
     const status = getSetStatus(setId);
     let deliver = false;
-    if (status === 'available') {
+    if (toutRevele) {
+      deliver = true;
+    } else if (status === 'available') {
       deliver = true;
     } else if (status === 'revealing') {
       // Revealing-set cards are public by default; hidden ones go to privileged viewers only.
@@ -66,7 +69,7 @@ export async function GET() {
     descriptions[locale] = filtered;
   }
 
-  const unrevealedIds = [...deliveredHiddenIds];
+  const unrevealedIds = toutRevele ? [] : [...deliveredHiddenIds];
 
   return NextResponse.json({
     cards,

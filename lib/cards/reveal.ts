@@ -11,7 +11,15 @@ import { holoBaseId } from '@/lib/holo/holoId';
 let cache: { ids: Set<string>; time: number } | null = null;
 const TTL_MS = 30_000;
 
+// Local-only escape hatch: with REVEAL_EVERYTHING=1 in the environment, every card of every set
+// is treated as public and every set is delivered, so a developer can exercise unreleased content
+// without touching the shared database. Never set it on the production host.
+export function revealsEverything(): boolean {
+  return process.env.REVEAL_EVERYTHING === '1' && process.env.NODE_ENV !== 'production';
+}
+
 export async function getHiddenCardIds(): Promise<Set<string>> {
+  if (revealsEverything()) return new Set<string>();
   if (cache && Date.now() - cache.time < TTL_MS) return cache.ids;
   try {
     const rows = await prisma.hiddenCard.findMany({ select: { cardId: true } });
@@ -36,6 +44,7 @@ export function isCardPublicSync(cardId: string, hiddenIds: Set<string>): boolea
   const baseId = holoBaseId(cardId);
   const card = getCardById(baseId);
   if (!card) return false;
+  if (revealsEverything()) return true;
   if (isSetAvailable(card.set)) return true;
   if (isSetRevealing(card.set)) return !hiddenIds.has(baseId);
   return false;
