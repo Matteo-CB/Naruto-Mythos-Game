@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { generateBooster } from '@/lib/sealed/boosterGenerator';
+import { generateBooster, generateSealedPool } from '@/lib/sealed/boosterGenerator';
+import { getSealedSetIds } from '@/lib/data/sets/registry';
 import { SHINOBI_SHIREN_ODDS, chaseSlotProbability, rollShinobiShirenChase } from '@/lib/sealed/shinobiShirenRates';
 
 const NUMERO_DU_TIRAGE = 10000;
@@ -73,12 +74,50 @@ describe('booster Shinobi Shiren', () => {
     }
   });
 
-  it('laisse le booster Konoha Shido inchange : 4 communes, 3 peu communes, 1 rare, 1 holo, 1 mission', () => {
+  it('laisse le booster Konoha Shido a dix cartes avec sa mission', () => {
     for (let i = 0; i < 20; i++) {
       const pack = generateBooster(i, 'KS');
       expect(pack.cards).toHaveLength(10);
-      expect(pack.cards.filter((c) => c.isHolo)).toHaveLength(1);
       expect(pack.cards.filter((c) => c.card_type === 'mission')).toHaveLength(1);
+    }
+  });
+
+  it('aucun booster scelle ne distribue de carte holographique, quel que soit le set', () => {
+    for (const set of ['KS', 'SS']) {
+      for (let i = 0; i < 60; i++) {
+        for (const carte of generateBooster(i, set).cards) {
+          expect(carte.isHolo, `${set} ${carte.id}`).toBe(false);
+          expect(carte.id.endsWith('_H'), `${set} ${carte.id}`).toBe(false);
+        }
+      }
+    }
+  });
+});
+
+describe('scelle Shinobi Shiren', () => {
+  it('le set 2 est proposable en scelle', () => {
+    expect(getSealedSetIds()).toContain('SS');
+  });
+
+  it('un pool de 6 boosters donne 54 personnages et 6 missions', () => {
+    const pool = generateSealedPool(6, 'SS');
+    expect(pool.boosters).toHaveLength(6);
+    expect(pool.allCards).toHaveLength(60);
+    expect(pool.allCards.filter((c) => c.card_type === 'mission')).toHaveLength(6);
+    expect(pool.allCards.every((c) => c.set === 'SS')).toBe(true);
+  });
+
+  it('un pool ne contient jamais de holo et suit les taux annonces', () => {
+    const pool = generateSealedPool(30, 'SS');
+    expect(pool.allCards.filter((c) => c.isHolo)).toHaveLength(0);
+    const chasse = pool.allCards.filter((c) => ['RA', 'S', 'SP', 'SHINOBI', 'L', 'SV', 'POP'].includes(c.rarity));
+    expect(chasse.length).toBeLessThanOrEqual(30);
+  });
+
+  it('les variantes tirees en scelle restent ephemeres', () => {
+    const pool = generateSealedPool(20, 'SS');
+    for (const id of pool.temporaryVariants) {
+      expect(pool.allCards.some((c) => c.id === id)).toBe(true);
     }
   });
 });

@@ -12,7 +12,7 @@ describe('sealed booster: IRL composition + ephemeral variants', () => {
     for (const booster of pool.boosters) {
       for (const v of booster.cards.filter((c) => c.isTemporaryVariant)) {
         expect(['RA', 'MV', 'SV', 'L']).toContain(v.rarity);
-        expect(v.isHolo).toBe(true);
+        expect(v.isHolo).toBe(false);
       }
     }
   });

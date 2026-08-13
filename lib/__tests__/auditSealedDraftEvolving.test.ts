@@ -110,20 +110,20 @@ describe('sealed booster — exact 10 card composition with no bonus variant slo
     }
   });
 
-  it('slot 9 is the single holo slot and only ever RA, C, UC, S or L', () => {
+  it('slot 9 is the chase slot and only ever RA, C, UC, S or L', () => {
     const seen = new Set<string>();
     for (let i = 0; i < 400; i++) {
       const cards = generateBooster(i, 'KS').cards;
-      expect(cards[8].isHolo).toBe(true);
+      expect(cards[8].isHolo).toBe(false);
       seen.add(cards[8].rarity);
     }
     for (const r of seen) expect(['RA', 'C', 'UC', 'S', 'L']).toContain(r);
   });
 
-  it('exactly one card per booster carries isHolo', () => {
+  it('no sealed card carries isHolo: the holo skins belong to the reward boosters', () => {
     for (let i = 0; i < 200; i++) {
       const holos = generateBooster(i, 'KS').cards.filter((c) => c.isHolo);
-      expect(holos.length).toBe(1);
+      expect(holos.length).toBe(0);
     }
   });
 
@@ -243,14 +243,14 @@ describe('sealed pool — variants are ephemeral and never unlock anything', () 
     }
   });
 
-  it('every flagged card is a locked variant rarity and is marked holo', () => {
+  it('every flagged card is a locked variant rarity and is never marked holo', () => {
     const pool = generateSealedPool(80, 'KS');
     const flagged = pool.allCards.filter((c) => c.isTemporaryVariant);
     expect(flagged.length).toBeGreaterThan(0);
     for (const c of flagged) {
       expect(VARIANT_RARITIES as readonly string[]).toContain(c.rarity);
       expect(isLockedVariantCard(getCardById(c.id))).toBe(true);
-      expect(c.isHolo).toBe(true);
+      expect(c.isHolo).toBe(false);
     }
   });
 
@@ -321,7 +321,9 @@ describe('sealed set choice — random resolves against AVAILABLE sets only', ()
   });
 
   it('an explicitly requested revealing set is refused', () => {
+    applySetStatusOverrides({ SS: 'revealing' });
     expect(() => generateSealedPool(1, 'SS')).toThrow(/not available for sealed play/);
+    applySetStatusOverrides({});
   });
 
   it('an explicitly requested coming-soon set is refused', () => {
@@ -346,9 +348,9 @@ describe('sealed set choice — random resolves against AVAILABLE sets only', ()
   });
 
   it('a set that is available but not sealed ready is still refused', () => {
-    applySetStatusOverrides({ SS: 'available' });
-    expect(getAvailableSetIds()).toContain('SS');
-    expect(() => generateSealedPool(1, 'SS')).toThrow(/not available for sealed play/);
+    applySetStatusOverrides({ AK: 'available' });
+    expect(getAvailableSetIds()).toContain('AK');
+    expect(() => generateSealedPool(1, 'AK')).toThrow(/not available for sealed play/);
   });
 
   it('generateSealedPool honours a status override that pulls a set out of rotation', () => {

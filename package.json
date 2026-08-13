@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "dev:server": "node --import tsx server/index.ts",
     "build": "prisma generate && next build",
     "start": "next start",
     "start:server": "node --import tsx server/index.ts",
-    "lint": "eslint"
+    "lint": "eslint",
+    "dev:webpack": "next dev --webpack",
+    "dev:tunnel": "ssh -i ~/.ssh/naruto_vps -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=6 -N -L 27018:127.0.0.1:27018 root@82.165.93.135"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

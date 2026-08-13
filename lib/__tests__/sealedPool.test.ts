@@ -65,11 +65,10 @@ describe('generateSealedPool — instance ID format', () => {
     }
   });
 
-  it('isHolo is set on the rare slot in each booster', () => {
+  it('no card of a sealed pool is holo, whatever the set', () => {
     const pool = generateSealedPool(3);
     for (const b of pool.boosters) {
-      const holos = b.cards.filter((c) => c.isHolo);
-      expect(holos.length).toBeGreaterThanOrEqual(1);
+      expect(b.cards.filter((c) => c.isHolo)).toHaveLength(0);
     }
   });
 });

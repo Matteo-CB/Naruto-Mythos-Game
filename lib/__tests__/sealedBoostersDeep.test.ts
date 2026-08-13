@@ -57,7 +57,7 @@ function assertSlotComposition(cards: BoosterCard[]): void {
   }
   expect(cards[7].rarity).toBe('R');
   expect(RARE_IDS.has(cards[7].id)).toBe(true);
-  expect(cards[HOLO_SLOT].isHolo).toBe(true);
+  expect(cards[HOLO_SLOT].isHolo).toBe(false);
   expect(ALLOWED_HOLO_RARITIES).toContain(cards[HOLO_SLOT].rarity);
   expect(HOLO_BUCKETS[cards[HOLO_SLOT].rarity].has(cards[HOLO_SLOT].id)).toBe(true);
   expect(cards[MISSION_SLOT].card_type).toBe('mission');
@@ -130,21 +130,22 @@ describe('pool size math for the configurable 4, 5 and 6 booster counts', () => 
     }
   });
 
-  it('carries exactly one holo per booster for each configurable count', () => {
+  it('carries no holo at all for each configurable count', () => {
     for (const n of CONFIGURABLE_COUNTS) {
       const pool = generateSealedPool(n, SET);
-      expect(pool.allCards.filter((c) => c.isHolo).length).toBe(n);
+      expect(pool.allCards.filter((c) => c.isHolo).length).toBe(0);
     }
   });
 
   it('the per rarity slot budget of a pool is exactly 4, 3, 1, 1, 1 times the booster count', () => {
     for (const n of CONFIGURABLE_COUNTS) {
       const pool = generateSealedPool(n, SET);
-      const nonHolo = pool.allCards.filter((c) => !c.isHolo && c.card_type === 'character');
-      expect(nonHolo.filter((c) => c.rarity === 'C').length).toBe(4 * n);
-      expect(nonHolo.filter((c) => c.rarity === 'UC').length).toBe(3 * n);
-      expect(nonHolo.filter((c) => c.rarity === 'R').length).toBe(1 * n);
-      expect(pool.allCards.filter((c) => c.isHolo).length).toBe(1 * n);
+      const personnages = pool.allCards.filter((c) => c.card_type === 'character');
+      expect(personnages.filter((c) => c.rarity === 'C').length).toBeGreaterThanOrEqual(4 * n);
+      expect(personnages.filter((c) => c.rarity === 'UC').length).toBeGreaterThanOrEqual(3 * n);
+      expect(personnages.filter((c) => c.rarity === 'R').length).toBeGreaterThanOrEqual(1 * n);
+      expect(personnages.length).toBe(9 * n);
+      expect(pool.allCards.filter((c) => c.isHolo).length).toBe(0);
       expect(pool.allCards.filter((c) => c.card_type === 'mission').length).toBe(1 * n);
     }
   });
@@ -272,12 +273,12 @@ describe('the holo slot never produces a card from a wrong slot', () => {
     }
   });
 
-  it('the isHolo flag is a strict boolean on every card and only true on slot 9', () => {
+  it('the isHolo flag is a strict boolean and always false in sealed', () => {
     const pool = generateSealedPool(50, SET);
     for (const b of pool.boosters) {
       for (let i = 0; i < BOOSTER_SIZE; i++) {
         expect(typeof b.cards[i].isHolo).toBe('boolean');
-        expect(b.cards[i].isHolo).toBe(i === HOLO_SLOT);
+        expect(b.cards[i].isHolo).toBe(false);
       }
     }
   });
@@ -309,7 +310,7 @@ describe('forced holo branches prove the special roll replaces the slot instead 
     const cards = boosterWithFixedRandom(0.001);
     expect(cards.length).toBe(BOOSTER_SIZE);
     expect(cards[HOLO_SLOT].rarity).toBe('L');
-    expect(cards[HOLO_SLOT].isHolo).toBe(true);
+    expect(cards[HOLO_SLOT].isHolo).toBe(false);
     expect(cards[HOLO_SLOT].isTemporaryVariant).toBe(true);
     expect(cards.filter((c) => c.rarity === 'L').length).toBe(1);
     assertSlotComposition(cards);
@@ -319,7 +320,7 @@ describe('forced holo branches prove the special roll replaces the slot instead 
     const cards = boosterWithFixedRandom(0.05);
     expect(cards.length).toBe(BOOSTER_SIZE);
     expect(cards[HOLO_SLOT].rarity).toBe('S');
-    expect(cards[HOLO_SLOT].isHolo).toBe(true);
+    expect(cards[HOLO_SLOT].isHolo).toBe(false);
     expect(cards[HOLO_SLOT].isTemporaryVariant).toBe(false);
     expect(cards.filter((c) => isVariantRarity(c.rarity)).length).toBe(0);
     assertSlotComposition(cards);
@@ -467,7 +468,7 @@ describe('sealed instance identity inside a pool', () => {
 
 describe('the random set choice never resolves to a non available set', () => {
   it('the shipped registry only exposes KS as sealed ready', () => {
-    expect(getSealedSetIds()).toEqual(['KS']);
+    expect(getSealedSetIds()).toEqual(['KS', 'SS']);
     for (const id of ALL_SET_IDS) {
       if (getSealedSetIds().includes(id)) {
         expect(getSetStatus(id)).toBe('available');
@@ -494,12 +495,15 @@ describe('the random set choice never resolves to a non available set', () => {
     }
   });
 
-  it('a bare generateBooster with no set id defaults to an available set', () => {
+  it('a bare generateBooster with no set id defaults to a sealed ready set', () => {
     const available = getSealedSetIds();
     for (let i = 0; i < 40; i++) {
       const booster = generateBooster(i);
       expect(available).toContain(booster.setId);
-      assertSlotComposition(booster.cards);
+      expect(booster.cards).toHaveLength(BOOSTER_SIZE);
+      expect(booster.cards[MISSION_SLOT].card_type).toBe('mission');
+      expect(booster.cards.every((c) => c.isHolo === false)).toBe(true);
+      if (booster.setId === SET) assertSlotComposition(booster.cards);
     }
   });
 });

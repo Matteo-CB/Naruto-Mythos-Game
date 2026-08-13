@@ -41,8 +41,8 @@ function nextInstanceId(): string {
   return `sealed-${_instancePrefix}-${_instanceCounter}`;
 }
 
-function toBoosterCard(card: CardData, isHolo = false): BoosterCard {
-  return { ...card, isHolo, isTemporaryVariant: isVariantRarity(card.rarity), sealedInstanceId: nextInstanceId() };
+function toBoosterCard(card: CardData): BoosterCard {
+  return { ...card, isHolo: false, isTemporaryVariant: isVariantRarity(card.rarity), sealedInstanceId: nextInstanceId() };
 }
 
 interface RarityBuckets {
@@ -105,7 +105,7 @@ function generateShinobiShirenBooster(boosterIndex: number, setId: string, b: Ra
   cards.push(toBoosterCard(pickRandom(b.rares)));
 
   const chase = chaseCardForShinobiShiren(b);
-  cards.push(chase ? toBoosterCard(chase, true) : toBoosterCard(pickRandom(b.commons)));
+  cards.push(toBoosterCard(chase ?? pickRandom(b.commons)));
 
   cards.push(toBoosterCard(pickRandom(b.missions)));
 
@@ -135,21 +135,21 @@ export function generateBooster(boosterIndex: number, setId?: string, buckets?: 
 
   cards.push(toBoosterCard(pickRandom(rares)));
 
-  const holoRoll = Math.random();
+  const chaseRoll = Math.random();
   const specialRoll = Math.random();
-  let holoCard: CardData;
+  let chaseCard: CardData;
   if (specialRoll < 0.00125 && legendaries.length > 0) {
-    holoCard = pickRandom(legendaries);
+    chaseCard = pickRandom(legendaries);
   } else if (specialRoll < 0.10 && secrets.length > 0) {
-    holoCard = pickRandom(secrets);
-  } else if (holoRoll < 0.2 && rareArts.length > 0) {
-    holoCard = pickRandom(rareArts);
-  } else if (holoRoll < 0.6) {
-    holoCard = pickRandom(commons);
+    chaseCard = pickRandom(secrets);
+  } else if (chaseRoll < 0.2 && rareArts.length > 0) {
+    chaseCard = pickRandom(rareArts);
+  } else if (chaseRoll < 0.6) {
+    chaseCard = pickRandom(commons);
   } else {
-    holoCard = pickRandom(uncommons);
+    chaseCard = pickRandom(uncommons);
   }
-  cards.push(toBoosterCard(holoCard, true));
+  cards.push(toBoosterCard(chaseCard));
 
   cards.push(toBoosterCard(pickRandom(allMissions)));
 

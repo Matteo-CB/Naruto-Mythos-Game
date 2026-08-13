@@ -15,28 +15,27 @@ afterEach(() => {
 });
 
 describe('sealed only ever uses a set that is explicitly sealed ready', () => {
-  it('today that is Konoha Shido and nothing else', () => {
-    expect(getSealedSetIds()).toEqual(['KS']);
-    expect(getLatestSealedSetId()).toBe('KS');
+  it('today that is Konoha Shido and Shinobi Shiren, and nothing else', () => {
+    expect(getSealedSetIds()).toEqual(['KS', 'SS']);
+    expect(getLatestSealedSetId()).toBe('SS');
   });
 
   it('an available set is not sealed ready unless it says so', () => {
     expect(SET_REGISTRY.SS.status).toBe('available');
-    expect(SET_REGISTRY.SS.sealedReady).not.toBe(true);
-    expect(isSetSealedReady('SS')).toBe(false);
+    expect(SET_REGISTRY.SS.sealedReady).toBe(true);
+    expect(isSetSealedReady('SS')).toBe(true);
     expect(isSetSealedReady('AK')).toBe(false);
   });
 
   it('becoming available is NOT enough to enter sealed on its own', () => {
-    applySetStatusOverrides({ SS: 'available' });
-    expect(isSetAvailable('SS')).toBe(true);
-    expect(isSetSealedReady('SS')).toBe(false);
-    expect(getSealedSetIds()).toEqual(['KS']);
-    expect(getLatestSealedSetId()).toBe('KS');
+    applySetStatusOverrides({ AK: 'available' });
+    expect(isSetAvailable('AK')).toBe(true);
+    expect(isSetSealedReady('AK')).toBe(false);
+    expect(getSealedSetIds()).toEqual(['KS', 'SS']);
   });
 
   it('a sealed ready set that is pulled back from release leaves sealed too', () => {
-    applySetStatusOverrides({ KS: 'revealing' });
+    applySetStatusOverrides({ KS: 'revealing', SS: 'revealing' });
     expect(isSetSealedReady('KS')).toBe(false);
     expect(getSealedSetIds()).toEqual([]);
     expect(getLatestSealedSetId()).toBeNull();
@@ -58,21 +57,31 @@ describe('sealed only ever uses a set that is explicitly sealed ready', () => {
 });
 
 describe('a random sealed pool never contains a set that is not sealed ready', () => {
-  it('draws only Konoha Shido cards today', () => {
+  it('draws only cards of sets that are sealed ready', () => {
+    const prets = new Set(getSealedSetIds());
     for (let i = 0; i < 40; i++) {
       const pool = generateSealedPool(5, 'random');
       for (const card of pool.allCards) {
-        expect(card.id.startsWith('KS-'), `unexpected set for ${card.id}`).toBe(true);
+        expect(prets.has(card.set), `unexpected set for ${card.id}`).toBe(true);
+      }
+      for (const booster of pool.boosters) expect(prets.has(booster.setId)).toBe(true);
+    }
+  });
+
+  it('a set that becomes merely available never enters a random pool', () => {
+    applySetStatusOverrides({ AK: 'available' });
+    for (let i = 0; i < 25; i++) {
+      const pool = generateSealedPool(5, 'random');
+      for (const booster of pool.boosters) {
+        expect(booster.setId).not.toBe('AK');
       }
     }
   });
 
-  it('still draws only Konoha Shido once a later set is merely available', () => {
-    applySetStatusOverrides({ SS: 'available' });
-    for (let i = 0; i < 25; i++) {
-      const pool = generateSealedPool(5, 'random');
-      for (const booster of pool.boosters) {
-        expect(booster.setId).toBe('KS');
+  it('un booster ne melange jamais deux sets', () => {
+    for (let i = 0; i < 30; i++) {
+      for (const booster of generateSealedPool(4, 'random').boosters) {
+        for (const carte of booster.cards) expect(carte.set).toBe(booster.setId);
       }
     }
   });
