@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { sortCardsForDisplay, RARITY_ORDER as CANONICAL_RARITY_ORDER } from '@/lib/cards/order';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
@@ -22,6 +22,8 @@ import { holoIdFor, isHoloEligibleCard } from '@/lib/holo/holoId';
 import { matchesCollectionFilters } from '@/lib/collection/filter';
 import { facetOptions, isFacetWorthShowing } from '@/lib/collection/facets';
 import { useValidFacetSelection } from '@/lib/collection/useFacets';
+import { filterSignature, type CollectionFilterState } from '@/lib/collection/filterUrl';
+import { useFiltersInUrl } from '@/lib/collection/useFiltersInUrl';
 import { useUnlockedVariants } from '@/lib/hooks/useUnlockedVariants';
 import { useTrackOnMount } from '@/lib/hooks/useTrackUi';
 import { useRevealingStore } from '@/stores/revealingStore';
@@ -171,9 +173,43 @@ export default function CollectionPage() {
   useValidFacetSelection(filterHolosOnly ? CHIP_ON : CHIP_OFF, showHolosChip ? holosChipOptions : NO_CHOICE, CHIP_OFF, setHolosChip);
   useValidFacetSelection(filterTradeableOnly ? CHIP_ON : CHIP_OFF, showTradeableChip ? tradeableChipOptions : NO_CHOICE, CHIP_OFF, setTradeableChip);
 
+  const filterState: CollectionFilterState = useMemo(
+    () => ({
+      rarity: filterRarity,
+      group: filterGroup,
+      set: filterSet,
+      variantsOnly: filterVariantsOnly,
+      holosOnly: filterHolosOnly,
+      tradeableOnly: filterTradeableOnly,
+      search: searchQuery,
+      page: currentPage,
+    }),
+    [filterRarity, filterGroup, filterSet, filterVariantsOnly, filterHolosOnly, filterTradeableOnly, searchQuery, currentPage],
+  );
+
+  const appliedSignature = useRef<string | null>(null);
+
+  const restoreFilters = useCallback((restored: CollectionFilterState) => {
+    appliedSignature.current = filterSignature(restored);
+    setFilterRarity(restored.rarity);
+    setFilterGroup(restored.group);
+    setFilterSet(restored.set);
+    setFilterVariantsOnly(restored.variantsOnly);
+    setFilterHolosOnly(restored.holosOnly);
+    setFilterTradeableOnly(restored.tradeableOnly);
+    setSearchQuery(restored.search);
+    setCurrentPage(restored.page);
+  }, []);
+
+  useFiltersInUrl(filterState, !cardsLoading, restoreFilters);
+
+  const currentSignature = filterSignature(filterState);
   useEffect(() => {
-    setCurrentPage(1);
-  }, [filterRarity, filterGroup, filterSet, filterVariantsOnly, filterHolosOnly, filterTradeableOnly, searchQuery]);
+    if (appliedSignature.current === currentSignature) return;
+    const first = appliedSignature.current === null;
+    appliedSignature.current = currentSignature;
+    if (!first) setCurrentPage(1);
+  }, [currentSignature]);
 
   const characterCards = useMemo(() => filteredCards.filter((c) => c.card_type === 'character'), [filteredCards]);
   const totalCharPages = Math.max(1, Math.ceil(characterCards.length / CARDS_PER_PAGE));

@@ -35,8 +35,25 @@ describe('attachments print their cost on the spiral and their power on the shur
   });
 
   it('no attachment costs more than it gives, which was the swapped-values symptom', () => {
-    const swapped = getPlayableAttachments().filter((a) => (a.chakra ?? 0) > (a.power ?? 0) + 1);
+    // Only a character attachment that actually grants Power obeys this: one that hangs on an
+    // enemy, or on a mission, or that deliberately weighs its host down, prints 0 or less.
+    const donneDeLaPuissance = getPlayableAttachments().filter(
+      (a) => a.attach_to !== 'mission' && (a.power ?? 0) > 0,
+    );
+    const swapped = donneDeLaPuissance.filter((a) => (a.chakra ?? 0) > (a.power ?? 0) + 1);
     expect(swapped.map((a) => a.id)).toEqual([]);
+  });
+
+  it('an attachment that costs Chakra without granting Power hangs on an enemy, on a mission, or trains its host', () => {
+    for (const a of getPlayableAttachments()) {
+      if ((a.power ?? 0) > 0) continue;
+      const ligne = (a.effects ?? []).find((e) => e.type === 'ATTACH')?.description ?? '';
+      const justifie = a.attach_to === 'mission'
+        || /enemy/i.test(ligne)
+        || (a.power ?? 0) < 0
+        || (a.chakra ?? 0) <= 1;
+      expect(justifie, `${a.id} coute ${a.chakra} et ne donne aucune puissance`).toBe(true);
+    }
   });
 });
 

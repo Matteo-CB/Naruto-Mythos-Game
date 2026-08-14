@@ -1897,13 +1897,13 @@
       "name_ja": "うちはサスケ",
       "name_fr": "SASUKE UCHIWA",
       "name_es": "SASUKE UCHIHA",
-      "title_en": "All I cared was surviving to defeat my brother.",
-      "title_ja": "「兄を倒すために生き延びることだけを考えていた。」",
-      "title_fr": "Tout ce qui m'importait, c'était de survivre pour vaincre mon frère.",
-      "title_es": "Lo único que me importaba era sobrevivir para derrotar a mi hermano.",
-      "title_pt": "Só me importava sobreviver para derrotar meu irmão.",
-      "title_it": "L'unica cosa che m'importava era sopravvivere per sconfiggere mio fratello.",
-      "title_pl": "Zależało mi tylko na przetrwaniu, by pokonać brata.",
+      "title_en": "\"I see the truth now.\"",
+      "title_ja": "「今、真実が見える。」",
+      "title_fr": "« Je vois la vérité maintenant. »",
+      "title_es": "«Ahora veo la verdad.»",
+      "title_pt": "«Agora vejo a verdade.»",
+      "title_it": "«Ora vedo la verità.»",
+      "title_pl": "„Teraz widzę prawdę.”",
       "has_visual": true,
       "chakra": 5,
       "power": 5,
@@ -7133,7 +7133,9 @@
       "title_it": "«Non è mio desiderio ucciderti.»",
       "name_pl": "ITACHI UCHIHA",
       "title_pl": "„Nie pragnę cię zabić.”",
-      "has_visual": false,
+      "has_visual": true,
+      "image_file": "images/cards/SS/rare/SS-137-R.webp",
+      "image_url": "/images/cards/SS/rare/SS-137-R.webp",
       "chakra": 6,
       "power": 6,
       "keywords": [
@@ -7749,13 +7751,13 @@
       "name_ja": "うちはサスケ",
       "name_fr": "SASUKE UCHIWA",
       "name_es": "SASUKE UCHIHA",
-      "title_en": "All I cared was surviving to defeat my brother.",
-      "title_ja": "「兄を倒すために生き延びることだけを考えていた。」",
-      "title_fr": "Tout ce qui m'importait, c'était de survivre pour vaincre mon frère.",
-      "title_es": "Lo único que me importaba era sobrevivir para derrotar a mi hermano.",
-      "title_pt": "Só me importava sobreviver para derrotar meu irmão.",
-      "title_it": "L'unica cosa che m'importava era sopravvivere per sconfiggere mio fratello.",
-      "title_pl": "Zależało mi tylko na przetrwaniu, by pokonać brata.",
+      "title_en": "\"I see the truth now.\"",
+      "title_ja": "「今、真実が見える。」",
+      "title_fr": "« Je vois la vérité maintenant. »",
+      "title_es": "«Ahora veo la verdad.»",
+      "title_pt": "«Agora vejo a verdade.»",
+      "title_it": "«Ora vedo la verità.»",
+      "title_pl": "„Teraz widzę prawdę.”",
       "has_visual": true,
       "chakra": 5,
       "power": 5,
@@ -8929,13 +8931,13 @@
       "name_ja": "うちはサスケ",
       "name_fr": "SASUKE UCHIWA",
       "name_es": "SASUKE UCHIHA",
-      "title_en": "All I cared was surviving to defeat my brother.",
-      "title_ja": "「兄を倒すために生き延びることだけを考えていた。」",
-      "title_fr": "Tout ce qui m'importait, c'était de survivre pour vaincre mon frère.",
-      "title_es": "Lo único que me importaba era sobrevivir para derrotar a mi hermano.",
-      "title_pt": "Só me importava sobreviver para derrotar meu irmão.",
-      "title_it": "L'unica cosa che m'importava era sopravvivere per sconfiggere mio fratello.",
-      "title_pl": "Zależało mi tylko na przetrwaniu, by pokonać brata.",
+      "title_en": "\"I see the truth now.\"",
+      "title_ja": "「今、真実が見える。」",
+      "title_fr": "« Je vois la vérité maintenant. »",
+      "title_es": "«Ahora veo la verdad.»",
+      "title_pt": "«Agora vejo a verdade.»",
+      "title_it": "«Ora vedo la verità.»",
+      "title_pl": "„Teraz widzę prawdę.”",
       "has_visual": false,
       "chakra": 5,
       "power": 5,
@@ -8956,6 +8958,958 @@
       "rarity_display": "Mythos Variant",
       "data_complete": true,
       "old_id": "126/140 V"
+    },
+    "SS-080-C": {
+      "id": "SS-080-C",
+      "cardId": "SS-080-C",
+      "rarity": "C",
+      "number": "80",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "KUNAI KNIFE",
+      "title_en": "",
+      "name_fr": "KUNAI",
+      "title_fr": "",
+      "name_es": "KUNAI",
+      "title_es": "",
+      "name_ja": "クナイ",
+      "title_ja": "",
+      "name_pt": "KUNAI",
+      "title_pt": "",
+      "name_it": "KUNAI",
+      "title_it": "",
+      "name_pl": "KUNAI",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-080-C.webp",
+      "image_url": "/images/cards/SS/attachment/SS-080-C.webp",
+      "chakra": 1,
+      "power": 3,
+      "keywords": [
+        "Weapon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden character."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-083-UC": {
+      "id": "SS-083-UC",
+      "cardId": "SS-083-UC",
+      "rarity": "UC",
+      "number": "83",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "FLASH BOMB",
+      "title_en": "",
+      "name_fr": "BOMBE AVEUGLANTE",
+      "title_fr": "",
+      "name_es": "BOMBA DE DESTELLO",
+      "title_es": "",
+      "name_ja": "閃光弾",
+      "title_ja": "",
+      "name_pt": "BOMBA DE LUZ",
+      "title_pt": "",
+      "name_it": "BOMBA ACCECANTE",
+      "title_it": "",
+      "name_pl": "BOMBA BŁYSKOWA",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-083-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-083-UC.webp",
+      "chakra": 2,
+      "power": 0,
+      "keywords": [
+        "Bomb"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to an enemy non-hidden character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character's effect text is blank."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-084-C": {
+      "id": "SS-084-C",
+      "cardId": "SS-084-C",
+      "rarity": "C",
+      "number": "84",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "POISON NEEDLES",
+      "title_en": "",
+      "name_fr": "AIGUILLES EMPOISONNÉES",
+      "title_fr": "",
+      "name_es": "AGUJAS ENVENENADAS",
+      "title_es": "",
+      "name_ja": "毒針",
+      "title_ja": "",
+      "name_pt": "AGULHAS ENVENENADAS",
+      "title_pt": "",
+      "name_it": "AGHI AVVELENATI",
+      "title_it": "",
+      "name_pl": "ZATRUTE IGŁY",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-084-C.webp",
+      "image_url": "/images/cards/SS/attachment/SS-084-C.webp",
+      "chakra": 1,
+      "power": -1,
+      "keywords": [
+        "Weapon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to an enemy non-hidden character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character cannot receive any Power tokens."
+        },
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Remove all Power tokens from this character."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-086-C": {
+      "id": "SS-086-C",
+      "cardId": "SS-086-C",
+      "rarity": "C",
+      "number": "86",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "SMOKE BOMB",
+      "title_en": "",
+      "name_fr": "BOMBE FUMIGÈNE",
+      "title_fr": "",
+      "name_es": "BOMBA DE HUMO",
+      "title_es": "",
+      "name_ja": "煙玉",
+      "title_ja": "",
+      "name_pt": "BOMBA DE FUMO",
+      "title_pt": "",
+      "name_it": "BOMBA FUMOGENA",
+      "title_it": "",
+      "name_pl": "BOMBA DYMNA",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-086-C.webp",
+      "image_url": "/images/cards/SS/attachment/SS-086-C.webp",
+      "chakra": 1,
+      "power": 0,
+      "keywords": [
+        "Bomb"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Hide and move this character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can play this character while hidden paying 1 less."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-087-UC": {
+      "id": "SS-087-UC",
+      "cardId": "SS-087-UC",
+      "rarity": "UC",
+      "number": "87",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "WEIGHTS",
+      "title_en": "",
+      "name_fr": "POIDS",
+      "title_fr": "",
+      "name_es": "PESAS",
+      "title_es": "",
+      "name_ja": "重り",
+      "title_ja": "",
+      "name_pt": "PESOS",
+      "title_pt": "",
+      "name_it": "PESI",
+      "title_it": "",
+      "name_pl": "OBCIĄŻNIKI",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-087-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-087-UC.webp",
+      "chakra": 1,
+      "power": -1,
+      "keywords": [
+        "Tool"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a Rock Lee or Taijutsu character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the start of each round, POWERUP 5."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-088-UC": {
+      "id": "SS-088-UC",
+      "cardId": "SS-088-UC",
+      "rarity": "UC",
+      "number": "88",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "MAKE-OUT PARADISE BOOK",
+      "title_en": "",
+      "name_fr": "LE PARADIS DU BATIFOLAGE",
+      "title_fr": "",
+      "name_es": "PARAÍSO DEL CORTEJO",
+      "title_es": "",
+      "name_ja": "イチャイチャパラダイス",
+      "title_ja": "",
+      "name_pt": "PARAÍSO DA SEDUÇÃO",
+      "title_pt": "",
+      "name_it": "IL PARADISO DELLA SEDUZIONE",
+      "title_it": "",
+      "name_pl": "RAJ UWODZENIA",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-088-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-088-UC.webp",
+      "chakra": 1,
+      "power": 0,
+      "keywords": [
+        "Book"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a non-hidden character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Discard all other attachments on this character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character cannot receive other attachments."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-090-UC": {
+      "id": "SS-090-UC",
+      "cardId": "SS-090-UC",
+      "rarity": "UC",
+      "number": "90",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "SHARK SKIN",
+      "title_en": "",
+      "name_fr": "SAMEHADA",
+      "title_fr": "",
+      "name_es": "SAMEHADA",
+      "title_es": "",
+      "name_ja": "鮫肌",
+      "title_ja": "",
+      "name_pt": "SAMEHADA",
+      "title_pt": "",
+      "name_it": "SAMEHADA",
+      "title_it": "",
+      "name_pl": "SAMEHADA",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-090-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-090-UC.webp",
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Weapon"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly Akatsuki or Rogue Ninja character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Remove up to 3 Power tokens from an enemy character in this mission and put them on this character."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-091-C": {
+      "id": "SS-091-C",
+      "cardId": "SS-091-C",
+      "rarity": "C",
+      "number": "91",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "LEAF VILLAGE HEADBAND",
+      "title_en": "",
+      "name_fr": "BANDEAU DU VILLAGE DE LA FEUILLE",
+      "title_fr": "",
+      "name_es": "BANDANA DE LA ALDEA DE LA HOJA",
+      "title_es": "",
+      "name_ja": "木ノ葉隠れの額当て",
+      "title_ja": "",
+      "name_pt": "BANDANA DA VILA DA FOLHA",
+      "title_pt": "",
+      "name_it": "FASCIA DEL VILLAGGIO DELLA FOGLIA",
+      "title_it": "",
+      "name_pl": "OPASKA WIOSKI LIŚCIA",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-091-C.webp",
+      "image_url": "/images/cards/SS/attachment/SS-091-C.webp",
+      "chakra": 1,
+      "power": 2,
+      "keywords": [
+        "Armor"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden character. This character is also considered a Leaf Village character."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-094-C": {
+      "id": "SS-094-C",
+      "cardId": "SS-094-C",
+      "rarity": "C",
+      "number": "94",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "ROGUE NINJA HEADBAND",
+      "title_en": "",
+      "name_fr": "BANDEAU DE NINJA DÉSERTEUR",
+      "title_fr": "",
+      "name_es": "BANDANA DE NINJA RENEGADO",
+      "title_es": "",
+      "name_ja": "抜け忍の額当て",
+      "title_ja": "",
+      "name_pt": "BANDANA DE NINJA RENEGADO",
+      "title_pt": "",
+      "name_it": "FASCIA DEL NINJA RINNEGATO",
+      "title_it": "",
+      "name_pl": "OPASKA ZBIEGŁEGO NINJA",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-094-C.webp",
+      "image_url": "/images/cards/SS/attachment/SS-094-C.webp",
+      "chakra": 1,
+      "power": 2,
+      "keywords": [
+        "Armor"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden character. This character is also considered a Rogue Ninja character."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-095-UC": {
+      "id": "SS-095-UC",
+      "cardId": "SS-095-UC",
+      "rarity": "UC",
+      "number": "95",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "THE SCROLL OF SEALING",
+      "title_en": "",
+      "name_fr": "LE PARCHEMIN DES SCEAUX",
+      "title_fr": "",
+      "name_es": "EL PERGAMINO DEL SELLADO",
+      "title_es": "",
+      "name_ja": "封印の書",
+      "title_ja": "",
+      "name_pt": "O PERGAMINHO DO SELAMENTO",
+      "title_pt": "",
+      "name_it": "LA PERGAMENA DEI SIGILLI",
+      "title_it": "",
+      "name_pl": "ZWÓJ PIECZĘTOWANIA",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-095-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-095-UC.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Scroll"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden, non-Jutsu character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Look at the top 3 cards of your deck, choose and reveal a Jutsu character, then add it to your hand. Put the other cards randomly at the bottom of your deck."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-096-UC": {
+      "id": "SS-096-UC",
+      "cardId": "SS-096-UC",
+      "rarity": "UC",
+      "number": "96",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "HEAVEN SCROLL",
+      "title_en": "",
+      "name_fr": "PARCHEMIN DU CIEL",
+      "title_fr": "",
+      "name_es": "PERGAMINO DEL CIELO",
+      "title_es": "",
+      "name_ja": "天の書",
+      "title_ja": "",
+      "name_pt": "PERGAMINHO DO CÉU",
+      "title_pt": "",
+      "name_it": "PERGAMENA DEL CIELO",
+      "title_it": "",
+      "name_pl": "ZWÓJ NIEBA",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-096-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-096-UC.webp",
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Scroll"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden character."
+        },
+        {
+          "type": "SCORE",
+          "description": "[↯] If you have an Earth Scroll in this mission, gain 1 Mission point."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-097-UC": {
+      "id": "SS-097-UC",
+      "cardId": "SS-097-UC",
+      "rarity": "UC",
+      "number": "97",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "EARTH SCROLL",
+      "title_en": "",
+      "name_fr": "PARCHEMIN DE LA TERRE",
+      "title_fr": "",
+      "name_es": "PERGAMINO DE LA TIERRA",
+      "title_es": "",
+      "name_ja": "地の書",
+      "title_ja": "",
+      "name_pt": "PERGAMINHO DA TERRA",
+      "title_pt": "",
+      "name_it": "PERGAMENA DELLA TERRA",
+      "title_it": "",
+      "name_pl": "ZWÓJ ZIEMI",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-097-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-097-UC.webp",
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Scroll"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden character."
+        },
+        {
+          "type": "SCORE",
+          "description": "[↯] If you have a Heaven Scroll in this mission, gain 1 Mission point."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-098-UC": {
+      "id": "SS-098-UC",
+      "cardId": "SS-098-UC",
+      "rarity": "UC",
+      "number": "98",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "ADAMANTINE NYOI",
+      "title_en": "",
+      "name_fr": "NYOI ADAMANTIN",
+      "title_fr": "",
+      "name_es": "NYOI ADAMANTINO",
+      "title_es": "",
+      "name_ja": "金剛如意",
+      "title_ja": "",
+      "name_pt": "NYOI ADAMANTINO",
+      "title_pt": "",
+      "name_it": "NYOI ADAMANTINO",
+      "title_it": "",
+      "name_pl": "ADAMANTOWY NYOI",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-098-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-098-UC.webp",
+      "chakra": 2,
+      "power": 1,
+      "keywords": [
+        "Weapon"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly Leaf Village character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] This attachment has +1 Power for every friendly Leaf Village character in this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-100-C": {
+      "id": "SS-100-C",
+      "cardId": "SS-100-C",
+      "rarity": "C",
+      "number": "100",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "NINJA INFO CARDS",
+      "title_en": "",
+      "name_fr": "FICHES DE RENSEIGNEMENT",
+      "title_fr": "",
+      "name_es": "FICHAS DE INFORMACIÓN NINJA",
+      "title_es": "",
+      "name_ja": "忍者情報カード",
+      "title_ja": "",
+      "name_pt": "FICHAS DE INFORMAÇÃO NINJA",
+      "title_pt": "",
+      "name_it": "SCHEDE INFORMATIVE NINJA",
+      "title_it": "",
+      "name_pl": "KARTY INFORMACYJNE NINJA",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-100-C.webp",
+      "image_url": "/images/cards/SS/attachment/SS-100-C.webp",
+      "chakra": 1,
+      "power": 0,
+      "keywords": [
+        "Tool"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can look at enemy hidden characters in this mission anytime. This attachment has +1 Power for every enemy hidden character in this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-102-UC": {
+      "id": "SS-102-UC",
+      "cardId": "SS-102-UC",
+      "rarity": "UC",
+      "number": "102",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "character",
+      "name_en": "FOOD PILLS",
+      "title_en": "",
+      "name_fr": "PILULES MILITAIRES",
+      "title_fr": "",
+      "name_es": "PÍLDORAS MILITARES",
+      "title_es": "",
+      "name_ja": "兵糧丸",
+      "title_ja": "",
+      "name_pt": "PÍLULAS MILITARES",
+      "title_pt": "",
+      "name_it": "PILLOLE MILITARI",
+      "title_it": "",
+      "name_pl": "PIGUŁKI ŻOŁNIERSKIE",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-102-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-102-UC.webp",
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Weapon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a friendly non-hidden character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has CHAKRA +1."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-103-UC": {
+      "id": "SS-103-UC",
+      "cardId": "SS-103-UC",
+      "rarity": "UC",
+      "number": "103",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "mission",
+      "name_en": "CHANGE OF MISSION RANK",
+      "title_en": "",
+      "name_fr": "CHANGEMENT DE RANG DE MISSION",
+      "title_fr": "",
+      "name_es": "CAMBIO DE RANGO DE MISIÓN",
+      "title_es": "",
+      "name_ja": "任務ランクの変更",
+      "title_ja": "",
+      "name_pt": "MUDANÇA DE RANK DA MISSÃO",
+      "title_pt": "",
+      "name_it": "CAMBIO DI RANGO DELLA MISSIONE",
+      "title_it": "",
+      "name_pl": "ZMIANA RANGI MISJI",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-103-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-103-UC.webp",
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Situation"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a mission."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] This mission is worth +1 Mission point for both players."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-104-C": {
+      "id": "SS-104-C",
+      "cardId": "SS-104-C",
+      "rarity": "C",
+      "number": "104",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "mission",
+      "name_en": "RAMEN ICHIRAKU",
+      "title_en": "",
+      "name_fr": "ICHIRAKU RAMEN",
+      "title_fr": "",
+      "name_es": "ICHIRAKU RAMEN",
+      "title_es": "",
+      "name_ja": "一楽ラーメン",
+      "title_ja": "",
+      "name_pt": "ICHIRAKU RAMEN",
+      "title_pt": "",
+      "name_it": "ICHIRAKU RAMEN",
+      "title_it": "",
+      "name_pl": "ICHIRAKU RAMEN",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-104-C.webp",
+      "image_url": "/images/cards/SS/attachment/SS-104-C.webp",
+      "chakra": 2,
+      "power": 0,
+      "keywords": [
+        "Location"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a mission."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] All your non-hidden characters with cost 2 or less in this mission have +1 Power. All your non-hidden characters with a Food attachment in this mission have +1 Power."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-105-UC": {
+      "id": "SS-105-UC",
+      "cardId": "SS-105-UC",
+      "rarity": "UC",
+      "number": "105",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "mission",
+      "name_en": "DEMON'S ISLAND LABORATORY",
+      "title_en": "",
+      "name_fr": "LABORATOIRE DE L'ÎLE DU DÉMON",
+      "title_fr": "",
+      "name_es": "LABORATORIO DE LA ISLA DEL DEMONIO",
+      "title_es": "",
+      "name_ja": "鬼の島の研究所",
+      "title_ja": "",
+      "name_pt": "LABORATÓRIO DA ILHA DO DEMÓNIO",
+      "title_pt": "",
+      "name_it": "LABORATORIO DELL'ISOLA DEL DEMONE",
+      "title_it": "",
+      "name_pl": "LABORATORIUM WYSPY DEMONA",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-105-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-105-UC.webp",
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Landmark",
+        "Lair"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a mission."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] For your Sound Four card effects, you have an additional friendly Sound Four character in this mission (with cost and Power equal to this attachment)."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-106-C": {
+      "id": "SS-106-C",
+      "cardId": "SS-106-C",
+      "rarity": "C",
+      "number": "106",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "mission",
+      "name_en": "HOKAGE ROCKS",
+      "title_en": "",
+      "name_fr": "LA FALAISE DES HOKAGE",
+      "title_fr": "",
+      "name_es": "EL MONUMENTO HOKAGE",
+      "title_es": "",
+      "name_ja": "火影岩",
+      "title_ja": "",
+      "name_pt": "O ROCHEDO DOS HOKAGE",
+      "title_pt": "",
+      "name_it": "LA RUPE DEGLI HOKAGE",
+      "title_it": "",
+      "name_pl": "SKAŁY HOKAGE",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-106-C.webp",
+      "image_url": "/images/cards/SS/attachment/SS-106-C.webp",
+      "chakra": 2,
+      "power": 0,
+      "keywords": [
+        "Landmark"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a mission."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] Your characters in this mission with printed Power of 5 or more have +2 Power."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-107-C": {
+      "id": "SS-107-C",
+      "cardId": "SS-107-C",
+      "rarity": "C",
+      "number": "107",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "mission",
+      "name_en": "THE FOREST OF DEATH",
+      "title_en": "",
+      "name_fr": "LA FORÊT DE LA MORT",
+      "title_fr": "",
+      "name_es": "EL BOSQUE DE LA MUERTE",
+      "title_es": "",
+      "name_ja": "死の森",
+      "title_ja": "",
+      "name_pt": "A FLORESTA DA MORTE",
+      "title_pt": "",
+      "name_it": "LA FORESTA DELLA MORTE",
+      "title_it": "",
+      "name_pl": "LAS ŚMIERCI",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-107-C.webp",
+      "image_url": "/images/cards/SS/attachment/SS-107-C.webp",
+      "chakra": 1,
+      "power": 0,
+      "keywords": [
+        "Landmark"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a mission."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] When a non-hidden character is played in this mission from hand, activate their AMBUSH effects."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-109-UC": {
+      "id": "SS-109-UC",
+      "cardId": "SS-109-UC",
+      "rarity": "UC",
+      "number": "109",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "mission",
+      "name_en": "PLANNED REINFORCEMENTS",
+      "title_en": "",
+      "name_fr": "RENFORTS PLANIFIÉS",
+      "title_fr": "",
+      "name_es": "REFUERZOS PLANIFICADOS",
+      "title_es": "",
+      "name_ja": "計画された増援",
+      "title_ja": "",
+      "name_pt": "REFORÇOS PLANEADOS",
+      "title_pt": "",
+      "name_it": "RINFORZI PIANIFICATI",
+      "title_it": "",
+      "name_pl": "ZAPLANOWANE POSIŁKI",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-109-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-109-UC.webp",
+      "chakra": 2,
+      "power": 0,
+      "keywords": [
+        "Situation"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a mission."
+        },
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Put the top card of your deck as a hidden character in this mission."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, put the top card of your deck as a hidden character in this mission."
+        }
+      ],
+      "data_complete": true
+    },
+    "SS-110-UC": {
+      "id": "SS-110-UC",
+      "cardId": "SS-110-UC",
+      "rarity": "UC",
+      "number": "110",
+      "set": "SS",
+      "card_type": "attachment",
+      "attach_to": "mission",
+      "name_en": "VILLAGE OF ARTISANS",
+      "title_en": "",
+      "name_fr": "VILLAGE DES ARTISANS",
+      "title_fr": "",
+      "name_es": "ALDEA DE LOS ARTESANOS",
+      "title_es": "",
+      "name_ja": "匠の里",
+      "title_ja": "",
+      "name_pt": "VILA DOS ARTESÃOS",
+      "title_pt": "",
+      "name_it": "VILLAGGIO DEGLI ARTIGIANI",
+      "title_it": "",
+      "name_pl": "WIOSKA RZEMIEŚLNIKÓW",
+      "title_pl": "",
+      "has_visual": true,
+      "image_file": "images/cards/SS/attachment/SS-110-UC.webp",
+      "image_url": "/images/cards/SS/attachment/SS-110-UC.webp",
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Landmark",
+        "Village"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "ATTACH",
+          "description": "Attach to a mission."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] When you attach a Weapon or Armor attachment to a friendly character in this mission, draw 1 card and POWERUP 1 that character."
+        }
+      ],
+      "data_complete": true
     }
   }
 }

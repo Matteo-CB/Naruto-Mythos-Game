@@ -1,6 +1,64 @@
 {
   "entries": [
     {
+      "date": "2026-08-14",
+      "title_fr": "Équipements du set 2",
+      "title_en": "Set 2 equipment",
+      "title_es": "Equipamiento del set 2",
+      "title_ja": "セット2の装備カード",
+      "title_pt": "Equipamentos do set 2",
+      "title_it": "Equipaggiamenti del set 2",
+      "title_pl": "Ekwipunek z dodatku 2",
+      "categories": [
+        "feature",
+        "fix",
+        "fix",
+        "fix"
+      ],
+      "changes_fr": [
+        "Nouvelles cartes : 21 équipements du set 2, à attacher à un personnage ou à une mission.",
+        "La carte 137 rare affiche enfin son illustration.",
+        "La carte 126 rare porte enfin son vrai titre.",
+        "Le filtre de la collection reste en place quand vous revenez en arrière depuis une carte."
+      ],
+      "changes_en": [
+        "New cards: 21 set 2 equipment cards, attached to a character or to a mission.",
+        "Rare card 137 finally shows its artwork.",
+        "Rare card 126 finally carries its real title.",
+        "The collection filter stays in place when you come back from a card."
+      ],
+      "changes_es": [
+        "Cartas nuevas: 21 equipamientos del set 2, para unir a un personaje o a una misión.",
+        "La carta 137 rara ya muestra su ilustración.",
+        "La carta 126 rara ya lleva su título real.",
+        "El filtro de la colección se mantiene al volver atrás desde una carta."
+      ],
+      "changes_ja": [
+        "新カード：セット2の装備カード21枚。キャラクターまたはミッションに付けられます。",
+        "レア137のイラストが表示されるようになりました。",
+        "レア126のタイトルが正しくなりました。",
+        "カードから戻ったとき、コレクションの絞り込みが保たれるようになりました。"
+      ],
+      "changes_pt": [
+        "Cartas novas: 21 equipamentos do set 2, para anexar a um personagem ou a uma missão.",
+        "A carta 137 rara mostra finalmente a sua ilustração.",
+        "A carta 126 rara tem finalmente o título certo.",
+        "O filtro da coleção permanece quando você volta a partir de uma carta."
+      ],
+      "changes_it": [
+        "Carte nuove: 21 equipaggiamenti del set 2, da attaccare a un personaggio o a una missione.",
+        "La carta 137 rara mostra finalmente la sua illustrazione.",
+        "La carta 126 rara ha finalmente il titolo giusto.",
+        "Il filtro della collezione resta al suo posto quando torni indietro da una carta."
+      ],
+      "changes_pl": [
+        "Nowe karty: 21 kart ekwipunku z dodatku 2, dołączanych do postaci lub do misji.",
+        "Rzadka karta 137 pokazuje wreszcie swoją ilustrację.",
+        "Rzadka karta 126 ma wreszcie właściwy tytuł.",
+        "Filtr kolekcji zostaje na miejscu, gdy wracasz z karty."
+      ]
+    },
+    {
       "date": "2026-08-13",
       "title_fr": "Nouvelles cartes et corrections",
       "title_en": "New cards and fixes",
