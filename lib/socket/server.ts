@@ -1649,6 +1649,7 @@ export async function maybeStartTournamentGame(
     if (room.gameState.phase === 'mulligan') {
       armMulliganIdleTimer(room, code, io);
     }
+    armCoinFlipFallback(room, code, io);
 
     armTournamentGameTimer(room, code, io);
     return true;
@@ -2453,15 +2454,15 @@ export async function handleMulliganIdleTimeout(
   const p1Done = room.gameState.player1.hasMulliganed;
   const p2Done = room.gameState.player2.hasMulliganed;
 
+  let mulliganBudgetExhausted = false;
   if (room.tournamentMatchId) {
     const cancels = mulliganCancelsFor(room.tournamentMatchId);
-    if (cancels >= MAX_MULLIGAN_CANCELS_PER_MATCH) {
+    mulliganBudgetExhausted = cancels >= MAX_MULLIGAN_CANCELS_PER_MATCH;
+    if (mulliganBudgetExhausted) {
       console.error(
-        `[ChessClock] CRITICAL: match ${room.tournamentMatchId} already lost ${cancels} games to mulligan idle. `
-        + 'Letting this one run instead of cancelling again, the clock and the absence rules decide from here.',
+        `[ChessClock] match ${room.tournamentMatchId} already lost ${cancels} games to mulligan idle. `
+        + 'Deciding it on absence instead of reopening it again, so the bracket cannot hang.',
       );
-      clearMulliganTimer(room);
-      return;
     }
     mulliganCancelCount.set(room.tournamentMatchId, cancels + 1);
   }
@@ -2519,7 +2520,7 @@ export async function handleMulliganIdleTimeout(
         (hostMissingSeat && missingSeatIsReachable('player1'))
         || (guestMissingSeat && missingSeatIsReachable('player2'));
 
-      if (missingSeatReachable) {
+      if (missingSeatReachable && !mulliganBudgetExhausted) {
         console.log(`[ChessClock] mulligan-idle in tournament match ${room.tournamentMatchId}: the player who did not answer is still online, reopening the match instead of forfeiting them`);
         try {
           const { reopenTournamentMatch } = await import('@/lib/socket/tournamentHandlers');
@@ -2541,13 +2542,25 @@ export async function handleMulliganIdleTimeout(
             await handlers.handleMatchForfeit(io, room.tournamentId, room.tournamentMatchId, missingId);
           }
         }
-      } else {
+      } else if (!mulliganBudgetExhausted) {
         console.log(`[ChessClock] mulligan-idle in elimination tournament match ${room.tournamentMatchId}: reopening the match so it can be replayed`);
         try {
           const { reopenTournamentMatch } = await import('@/lib/socket/tournamentHandlers');
           await reopenTournamentMatch(io, room.tournamentId, room.tournamentMatchId, room.hostId, room.guestId);
         } catch (err) {
           console.error('[ChessClock] failed to reopen elimination tournament match on mulligan-idle:', err instanceof Error ? err.message : err);
+        }
+      } else {
+        const handlers = await import('@/lib/socket/tournamentHandlers');
+        const { pickDoubleAbsenceLoser } = await import('@/lib/tournament/matchRulings');
+        if (hostMissingSeat && guestMissingSeat && room.hostId && room.guestId) {
+          const loser = await pickDoubleAbsenceLoser(room.tournamentId, room.hostId, room.guestId);
+          console.log(`[ChessClock] mulligan-idle budget spent on elimination match ${room.tournamentMatchId}: neither player answered, better seed advances, forfeiting ${loser}`);
+          await handlers.handleMatchForfeit(io, room.tournamentId, room.tournamentMatchId, loser);
+        } else {
+          const missingId = hostMissingSeat ? room.hostId : room.guestId;
+          console.log(`[ChessClock] mulligan-idle budget spent on elimination match ${room.tournamentMatchId}: forfeiting the seat that never answered`);
+          if (missingId) await handlers.handleMatchForfeit(io, room.tournamentId, room.tournamentMatchId, missingId);
         }
       }
     } catch (err) {
@@ -3271,6 +3284,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
               chessClock,
             });
           }
+
+          if (room.gameState.phase === 'mulligan') {
+            armMulliganIdleTimer(room, roomCode, io);
+          }
+          armCoinFlipFallback(room, roomCode, io);
         }
       }
     });

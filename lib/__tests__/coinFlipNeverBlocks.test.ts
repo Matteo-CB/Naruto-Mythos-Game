@@ -1,4 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 vi.mock('@/lib/db/prisma', () => ({ prisma: {} }));
 vi.mock('@/lib/socket/io', () => ({ emitToUser: vi.fn(), isUserConnected: vi.fn(() => true), getOnlineUserIds: vi.fn(() => new Set()) }));
@@ -105,9 +107,71 @@ describe('a match can never cycle forever on mulligan cancellations', () => {
     clearMulliganCancels(matchId);
 
     expect(mulliganCancelsFor(matchId)).toBe(0);
-    expect(MAX_MULLIGAN_CANCELS_PER_MATCH, 'two cancellations, then the game must be allowed to run').toBe(2);
+    expect(MAX_MULLIGAN_CANCELS_PER_MATCH, 'two cancellations, then the match must be decided').toBe(2);
 
     clearMulliganCancels(matchId);
     expect(mulliganCancelsFor(matchId), 'a finished mulligan clears the record').toBe(0);
+  });
+});
+
+function serverSource(): string {
+  return readFileSync(join(process.cwd(), 'lib/socket/server.ts'), 'utf8');
+}
+
+function bodyOf(source: string, declaration: string): string {
+  const start = source.indexOf(declaration);
+  expect(start, `${declaration} still exists`).toBeGreaterThan(-1);
+  const openings = source.indexOf('{', start);
+  let depth = 0;
+  for (let i = openings; i < source.length; i++) {
+    if (source[i] === '{') depth++;
+    else if (source[i] === '}') {
+      depth--;
+      if (depth === 0) return source.slice(start, i + 1);
+    }
+  }
+  throw new Error(`could not read the body of ${declaration}`);
+}
+
+describe('every path that starts a game arms the coin flip fallback', () => {
+  it('a tournament match arms it too, it is the one place a stuck flip freezes a bracket', () => {
+    const body = bodyOf(serverSource(), 'export async function maybeStartTournamentGame');
+    expect(
+      body.includes('armCoinFlipFallback('),
+      'startTournamentGameIfReady must arm the fallback: a client that never confirms the flip used to hang the match forever',
+    ).toBe(true);
+  });
+
+  it('no game creation is left without the fallback', () => {
+    const source = serverSource();
+    let from = 0;
+    let sites = 0;
+    for (;;) {
+      const at = source.indexOf('GameEngine.createGame(', from);
+      if (at === -1) break;
+      sites++;
+      from = at + 1;
+      const window = source.slice(at, at + 4000);
+      expect(
+        window.includes('armCoinFlipFallback('),
+        `the game creation at offset ${at} starts a game without arming the coin flip fallback`,
+      ).toBe(true);
+    }
+    expect(sites, 'the guard actually found the game creations').toBeGreaterThan(0);
+  });
+});
+
+describe('a tournament match is always decided, never left hanging', () => {
+  it('once the cancellation budget is spent, the missing seat is forfeited instead of the match stalling', () => {
+    const body = bodyOf(serverSource(), 'export async function handleMulliganIdleTimeout');
+    expect(body.includes('mulliganBudgetExhausted'), 'the budget decides the outcome').toBe(true);
+    expect(
+      body.includes('handleMatchForfeit'),
+      'the spent budget must forfeit the seat that never answered, otherwise the bracket hangs forever',
+    ).toBe(true);
+    expect(
+      /missingSeatReachable && !mulliganBudgetExhausted/.test(body),
+      'reopening is only allowed while the budget lasts',
+    ).toBe(true);
   });
 });

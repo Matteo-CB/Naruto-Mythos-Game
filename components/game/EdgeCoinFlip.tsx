@@ -13,6 +13,7 @@ import { useBoardPalette } from './BoardPaletteContext';
 const TOKEN_SIZE = 150;
 const SPIN_DURATION_MS = 2800;
 const RESULT_HOLD_MS = 2000;
+const SPIN_WALL_CLOCK_LIMIT_MS = SPIN_DURATION_MS + 3000;
 const REVOLUTIONS = 7;
 
 function easeOutCoinFlip(t: number): number {
@@ -186,8 +187,13 @@ export function EdgeCoinFlip() {
     if (phase !== 'animating') return;
     startTimeRef.current = 0;
     rafRef.current = requestAnimationFrame(animate);
+    const wallClock = setTimeout(() => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      setPhase('result');
+    }, SPIN_WALL_CLOCK_LIMIT_MS);
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      clearTimeout(wallClock);
     };
   }, [phase, animate]);
 

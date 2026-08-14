@@ -13,49 +13,65 @@
         "feature",
         "fix",
         "fix",
+        "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
         "Nouvelles cartes : 21 équipements du set 2, à attacher à un personnage ou à une mission.",
         "La carte 137 rare affiche enfin son illustration.",
         "La carte 126 rare porte enfin son vrai titre.",
-        "Le filtre de la collection reste en place quand vous revenez en arrière depuis une carte."
+        "Le filtre de la collection reste en place quand vous revenez en arrière depuis une carte.",
+        "Un match de tournoi ne reste plus bloqué sur le lancer de pièce quand un joueur ne le confirme pas.",
+        "Une partie de tournoi bloquée avant son début ne vous retient plus prisonnier de l'écran de jeu."
       ],
       "changes_en": [
         "New cards: 21 set 2 equipment cards, attached to a character or to a mission.",
         "Rare card 137 finally shows its artwork.",
         "Rare card 126 finally carries its real title.",
-        "The collection filter stays in place when you come back from a card."
+        "The collection filter stays in place when you come back from a card.",
+        "A tournament match no longer hangs on the coin flip when a player does not confirm it.",
+        "A tournament game stuck before it starts no longer traps you on the game screen."
       ],
       "changes_es": [
         "Cartas nuevas: 21 equipamientos del set 2, para unir a un personaje o a una misión.",
         "La carta 137 rara ya muestra su ilustración.",
         "La carta 126 rara ya lleva su título real.",
-        "El filtro de la colección se mantiene al volver atrás desde una carta."
+        "El filtro de la colección se mantiene al volver atrás desde una carta.",
+        "Una partida de torneo ya no se queda bloqueada en el lanzamiento de moneda si un jugador no lo confirma.",
+        "Una partida de torneo bloqueada antes de empezar ya no te deja atrapado en la pantalla de juego."
       ],
       "changes_ja": [
         "新カード：セット2の装備カード21枚。キャラクターまたはミッションに付けられます。",
         "レア137のイラストが表示されるようになりました。",
         "レア126のタイトルが正しくなりました。",
-        "カードから戻ったとき、コレクションの絞り込みが保たれるようになりました。"
+        "カードから戻ったとき、コレクションの絞り込みが保たれるようになりました。",
+        "トーナメントの対戦が、コイントスの確認待ちで止まらなくなりました。",
+        "開始前に止まったトーナメントの対戦に、閉じ込められなくなりました。"
       ],
       "changes_pt": [
         "Cartas novas: 21 equipamentos do set 2, para anexar a um personagem ou a uma missão.",
         "A carta 137 rara mostra finalmente a sua ilustração.",
         "A carta 126 rara tem finalmente o título certo.",
-        "O filtro da coleção permanece quando você volta a partir de uma carta."
+        "O filtro da coleção permanece quando você volta a partir de uma carta.",
+        "Uma partida de torneio já não fica bloqueada no lançamento da moeda quando um jogador não confirma.",
+        "Uma partida de torneio bloqueada antes de começar já não o prende no ecrã de jogo."
       ],
       "changes_it": [
         "Carte nuove: 21 equipaggiamenti del set 2, da attaccare a un personaggio o a una missione.",
         "La carta 137 rara mostra finalmente la sua illustrazione.",
         "La carta 126 rara ha finalmente il titolo giusto.",
-        "Il filtro della collezione resta al suo posto quando torni indietro da una carta."
+        "Il filtro della collezione resta al suo posto quando torni indietro da una carta.",
+        "Una partita di torneo non resta più bloccata sul lancio della moneta se un giocatore non conferma.",
+        "Una partita di torneo bloccata prima di iniziare non ti tiene più prigioniero nella schermata di gioco."
       ],
       "changes_pl": [
         "Nowe karty: 21 kart ekwipunku z dodatku 2, dołączanych do postaci lub do misji.",
         "Rzadka karta 137 pokazuje wreszcie swoją ilustrację.",
         "Rzadka karta 126 ma wreszcie właściwy tytuł.",
-        "Filtr kolekcji zostaje na miejscu, gdy wracasz z karty."
+        "Filtr kolekcji zostaje na miejscu, gdy wracasz z karty.",
+        "Mecz turniejowy nie zawiesza się już na rzucie monetą, gdy gracz go nie potwierdzi.",
+        "Zablokowana przed startem partia turniejowa nie więzi już na ekranie gry."
       ]
     },
     {
