@@ -36,9 +36,13 @@ import {
   JIRAIYA_GOLD_REDUCTION, JIRAIYA_GOLD_POWERUP, SUMMON_KEYWORD,
   tsunadeGoldShuffleableCount, tsunadeGoldShuffleTopOfDiscard, friendlySummonIds,
 } from './handlers/SS/goldCards';
-import { attachCardToCharacter, discardAttachmentsOnLeave, discardAttachments } from './attachments';
+import { attachCardToCharacter, attachCardToMission, discardAttachmentsOnLeave, discardAttachments, getCharacterAttachTargets, missionAlreadyHasPlayerAttachment, parseAttachSpec } from './attachments';
 import { destinationsPour } from './handlers/SS/hiddenMove';
 import { equipementsDeplacablesVers, apercuEquipements } from './handlers/SS/seimei065';
+import { team8AlliesIn, KURENAI_018 } from './handlers/SS/kurenai018';
+import { TENTEN_022 } from './handlers/SS/tenten022';
+import { ASUMA_138 } from './handlers/SS/asuma138';
+import { IRUKA_140, coutCacheReduit } from './handlers/SS/iruka140';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { findLegalRevealUpgradeTarget, revealWouldViolateNameUniqueness } from './revealNameUniqueness';
 import { moveWouldViolateNameUniqueness } from './moveNameUniqueness';
@@ -1239,7 +1243,8 @@ export class EffectEngine {
         tst === 'KABUTO053_CHOOSE_DISCARD' ||
         tst === 'SS114_CHOOSE_DISCARD' ||
         tst === 'SS139_DISCARD' ||
-        tst === 'SS009_DISCARD_FOOD'
+        tst === 'SS009_DISCARD_FOOD' ||
+      tst === 'SS138_DISCARD_FOR_POWER'
       ) {
         actionType = 'DISCARD_CARD';
       } else if (
@@ -1266,13 +1271,87 @@ export class EffectEngine {
         tst === 'SS095_TAKE_JUTSU' ||
         tst === 'SS023_TOP_OR_BOTTOM' ||
       tst === 'SS028_BOTTOM_OR_KEEP' ||
-      tst === 'SS065_MOVE_ATTACHMENT'
+      tst === 'SS065_MOVE_ATTACHMENT' ||
+      tst === 'SS022_PLAY_ATTACHMENT' ||
+      tst === 'SS140_PLAY_HIDDEN'
       ) {
         actionType = 'CHOOSE_CARD_FROM_LIST';
       } else if (tst === 'COPY_EFFECT_CHOSEN') {
         actionType = 'CHOOSE_EFFECT';
       }
       return actionType;
+  }
+
+  static payerEtPoserEquipement(
+    state: GameState,
+    player: PlayerID,
+    handIndex: number,
+    reduction: number,
+    missionIndex: number,
+    hostInstanceId: string | null,
+  ): GameState {
+    const carte = state[player].hand[handIndex] as unknown as CardData | undefined;
+    if (!carte) return state;
+    const cout = Math.max(0, (carte.chakra ?? 0) - reduction);
+    if (state[player].chakra < cout) return state;
+
+    const main = [...state[player].hand];
+    main.splice(handIndex, 1);
+    let next: GameState = {
+      ...state,
+      [player]: { ...state[player], hand: main, chakra: state[player].chakra - cout },
+    };
+    next = hostInstanceId
+      ? attachCardToCharacter(next, player, carte, hostInstanceId)
+      : attachCardToMission(next, player, carte, missionIndex);
+    next.log = logAction(next.log, next.turn, next.phase, player,
+      'EFFECT', `Tenten (022): played ${carte.name_fr} for ${cout} chakra.`,
+      'game.log.effect.ss022Played',
+      { card: 'TENTEN', id: TENTEN_022, target: carte.name_fr, target_en: carte.name_en || carte.name_fr, cost: String(cout) });
+    return next;
+  }
+
+  static poserNarutoCache(
+    state: GameState,
+    player: PlayerID,
+    handIndex: number,
+    reduction: number,
+    missionIndex: number,
+  ): GameState {
+    const carte = state[player].hand[handIndex];
+    if (!carte || !state.activeMissions[missionIndex]) return state;
+    const cout = coutCacheReduit(reduction);
+    if (state[player].chakra < cout) return state;
+
+    const main = [...state[player].hand];
+    main.splice(handIndex, 1);
+    const side: 'player1Characters' | 'player2Characters' =
+      player === 'player1' ? 'player1Characters' : 'player2Characters';
+    const missions = [...state.activeMissions];
+    const mission = { ...missions[missionIndex] };
+    mission[side] = [...mission[side], {
+      instanceId: generateInstanceId(),
+      card: carte,
+      isHidden: true,
+      wasRevealedAtLeastOnce: false,
+      powerTokens: 0,
+      stack: [carte],
+      controlledBy: player,
+      originalOwner: player,
+      missionIndex,
+    } as CharacterInPlay];
+    missions[missionIndex] = mission;
+
+    const next: GameState = {
+      ...state,
+      activeMissions: missions,
+      [player]: { ...state[player], hand: main, chakra: state[player].chakra - cout },
+    };
+    next.log = logAction(next.log, next.turn, next.phase, player,
+      'EFFECT', `Iruka Umino (140): played a hidden Naruto Uzumaki on mission ${missionIndex + 1} for ${cout} chakra.`,
+      'game.log.effect.ss140PlayedHidden',
+      { card: 'IRUKA UMINO', id: IRUKA_140, mission: missionIndex + 1, cost: String(cout) });
+    return next;
   }
 
   static createPendingTargetSelection(
@@ -6468,6 +6547,11 @@ export class EffectEngine {
       case 'SS029_CONFIRM_MAIN':
       case 'SS065_CONFIRM_MAIN':
       case 'SS136_CONFIRM_MAIN':
+      case 'SS022_CONFIRM_UPGRADE':
+      case 'SS138_CONFIRM_MAIN':
+      case 'SS138_CONFIRM_UPGRADE':
+      case 'SS140_CONFIRM_MAIN':
+      case 'SS140_CONFIRM_UPGRADE':
       case 'SS127_CONFIRM':
       case 'SS038_CONFIRM_AMBUSH':
       case 'SS125_CONFIRM_DUEL':
@@ -13131,6 +13215,179 @@ export class EffectEngine {
           'EFFECT_MOVE', `Smoke Bomb (086): the character is hidden and moved to mission ${destination + 1}.`,
           'game.log.effect.ss086Moved',
           { card: 'BOMBE FUMIGENE', id: 'SS-086-C', mission: destination + 1 });
+        break;
+      }
+
+      case 'SS018_CONFIRM_MAIN':
+      case 'SS018_CONFIRM_UPGRADE': {
+        const j018 = pendingEffect.sourcePlayer;
+        const cibles018 = team8AlliesIn(newState, j018, pendingEffect.sourceMissionIndex, pendingEffect.sourceInstanceId);
+        if (cibles018.length === 0) break;
+        const ids018 = new Set(cibles018.map((c) => c.instanceId));
+        newState.activeMissions = newState.activeMissions.map((m) => ({
+          ...m,
+          player1Characters: m.player1Characters.map((c) => ids018.has(c.instanceId)
+            ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, 1) } : c),
+          player2Characters: m.player2Characters.map((c) => ids018.has(c.instanceId)
+            ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, 1) } : c),
+        }));
+        newState.log = logAction(newState.log, newState.turn, newState.phase, j018,
+          'EFFECT_POWERUP', `Kurenai Yuhi (018): POWERUP 1 on ${cibles018.length} Team 8 ally(ies).`,
+          'game.log.effect.ss018PoweredUp',
+          { card: 'KURENAI YUHI', id: KURENAI_018, count: cibles018.length });
+        break;
+      }
+
+      case 'SS022_PLAY_ATTACHMENT': {
+        let d022: { missionIndex?: number; reduction?: number } = {};
+        try { d022 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const j022 = pendingEffect.sourcePlayer;
+        const mission022 = d022.missionIndex ?? pendingEffect.sourceMissionIndex;
+        const reduction022 = d022.reduction ?? 0;
+        const index022 = Number(targetId);
+        const carte022 = newState[j022].hand[index022] as unknown as CardData | undefined;
+        if (!Number.isFinite(index022) || !carte022 || carte022.card_type !== 'attachment') break;
+
+        if (parseAttachSpec(carte022).toMission) {
+          if (missionAlreadyHasPlayerAttachment(newState, j022, mission022)) {
+            newState.log = logAction(newState.log, newState.turn, newState.phase, j022,
+              'EFFECT_NO_TARGET', 'Tenten (022) UPGRADE: this mission already carries one of your attachments.',
+              'game.log.effect.noTarget', { card: 'TENTEN', id: TENTEN_022 });
+            break;
+          }
+          newState = EffectEngine.payerEtPoserEquipement(newState, j022, index022, reduction022, mission022, null);
+          break;
+        }
+
+        const hotes022 = getCharacterAttachTargets(newState, j022, mission022, carte022);
+        if (hotes022.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, j022,
+            'EFFECT_NO_TARGET', 'Tenten (022) UPGRADE: no legal host for this attachment in this mission.',
+            'game.log.effect.noTarget', { card: 'TENTEN', id: TENTEN_022 });
+          break;
+        }
+        if (hotes022.length === 1) {
+          newState = EffectEngine.payerEtPoserEquipement(newState, j022, index022, reduction022, mission022, hotes022[0].instanceId);
+          break;
+        }
+        const eff022 = generateInstanceId();
+        const act022 = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: eff022, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: mission022, effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ handIndex: index022, missionIndex: mission022, reduction: reduction022 }),
+          targetSelectionType: 'SS022_CHOOSE_HOST', sourcePlayer: j022,
+          requiresTargetSelection: true, validTargets: hotes022.map((c) => c.instanceId),
+          isOptional: false, isMandatory: true, resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: act022, type: 'SELECT_TARGET', player: j022,
+          description: 'Tenten (022): choose the character that receives the attachment.',
+          descriptionKey: 'game.effect.desc.ss022ChooseHost',
+          options: hotes022.map((c) => c.instanceId), minSelections: 1, maxSelections: 1, sourceEffectId: eff022,
+        }];
+        break;
+      }
+
+      case 'SS022_CHOOSE_HOST': {
+        let h022: { handIndex?: number; missionIndex?: number; reduction?: number } = {};
+        try { h022 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        if (h022.handIndex == null) break;
+        newState = EffectEngine.payerEtPoserEquipement(
+          newState, pendingEffect.sourcePlayer, h022.handIndex, h022.reduction ?? 0,
+          h022.missionIndex ?? pendingEffect.sourceMissionIndex, targetId);
+        break;
+      }
+
+      case 'SS138_DISCARD_FOR_POWER': {
+        const j138 = pendingEffect.sourcePlayer;
+        const index138 = Number(targetId);
+        const main138 = [...newState[j138].hand];
+        if (!Number.isFinite(index138) || index138 < 0 || index138 >= main138.length) break;
+        const defaussee138 = main138.splice(index138, 1)[0];
+        newState[j138] = {
+          ...newState[j138],
+          hand: main138,
+          discardPile: [...newState[j138].discardPile, defaussee138],
+        };
+        const gain138 = Math.max(0, (defaussee138 as unknown as CardData).power ?? 0);
+        if (gain138 > 0) {
+          newState.activeMissions = newState.activeMissions.map((m) => ({
+            ...m,
+            player1Characters: m.player1Characters.map((c) => c.instanceId === pendingEffect.sourceInstanceId
+              ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, gain138) } : c),
+            player2Characters: m.player2Characters.map((c) => c.instanceId === pendingEffect.sourceInstanceId
+              ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, gain138) } : c),
+          }));
+        }
+        newState.log = logAction(newState.log, newState.turn, newState.phase, j138,
+          'EFFECT_POWERUP', `Asuma Sarutobi (138): discarded ${defaussee138.name_fr} and gained ${gain138} Power.`,
+          'game.log.effect.ss138Discarded',
+          { card: 'ASUMA SARUTOBI', id: ASUMA_138, target: defaussee138.name_fr, target_en: defaussee138.name_en || defaussee138.name_fr, amount: String(gain138) });
+        break;
+      }
+
+      case 'SS138_DEFEAT_EQUAL': {
+        const trouve138 = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!trouve138) break;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', 'Asuma Sarutobi (138): defeats an enemy of equal Power.',
+          'game.log.effect.ss138Defeated', { card: 'ASUMA SARUTOBI', id: ASUMA_138 });
+        newState = defeatEnemyCharacter(newState, trouve138.missionIndex, targetId, pendingEffect.sourcePlayer);
+        break;
+      }
+
+      case 'SS140_HIDE_NARUTO': {
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT', 'Iruka Umino (140): a Naruto Uzumaki is hidden.',
+          'game.log.effect.ss140Hidden', { card: 'IRUKA UMINO', id: IRUKA_140 });
+        break;
+      }
+
+      case 'SS140_PLAY_HIDDEN': {
+        let d140: { reduction?: number } = {};
+        try { d140 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const index140 = Number(targetId);
+        if (!Number.isFinite(index140)) break;
+        if (newState.activeMissions.length === 1) {
+          newState = EffectEngine.poserNarutoCache(newState, pendingEffect.sourcePlayer, index140, d140.reduction ?? 0, 0);
+          break;
+        }
+        const eff140 = generateInstanceId();
+        const act140 = generateInstanceId();
+        const missions140 = newState.activeMissions.map((_, i) => String(i));
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: eff140, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ handIndex: index140, reduction: d140.reduction ?? 0 }),
+          targetSelectionType: 'SS140_CHOOSE_MISSION', sourcePlayer: pendingEffect.sourcePlayer,
+          requiresTargetSelection: true, validTargets: missions140,
+          isOptional: false, isMandatory: true, resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: act140, type: 'SELECT_TARGET', player: pendingEffect.sourcePlayer,
+          description: 'Iruka Umino (140): choose the mission where the hidden card is placed.',
+          descriptionKey: 'game.effect.desc.ss140ChooseMission',
+          options: missions140, minSelections: 1, maxSelections: 1, sourceEffectId: eff140,
+        }];
+        break;
+      }
+
+      case 'SS140_CHOOSE_MISSION': {
+        let m140: { handIndex?: number; reduction?: number } = {};
+        try { m140 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const destination140 = Number(targetId);
+        if (m140.handIndex == null || !Number.isFinite(destination140)) break;
+        newState = EffectEngine.poserNarutoCache(
+          newState, pendingEffect.sourcePlayer, m140.handIndex, m140.reduction ?? 0, destination140);
         break;
       }
 

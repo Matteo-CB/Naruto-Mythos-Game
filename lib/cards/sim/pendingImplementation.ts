@@ -4,9 +4,7 @@ export const PENDING_EFFECT_IMPLEMENTATION: ReadonlySet<string> = new Set([
   'SS-013-UC',
   'SS-014-C',
   'SS-017-C',
-  'SS-018-UC',
   'SS-021-C',
-  'SS-022-UC',
   'SS-052-C',
   'SS-055-UC',
   'SS-056-UC',
@@ -19,10 +17,6 @@ export const PENDING_EFFECT_IMPLEMENTATION: ReadonlySet<string> = new Set([
   'SS-131-R',
   'SS-133-R',
   'SS-135-R',
-  'SS-138-R',
-  'SS-140-R',
-  'SS-141-S',
-  'SS-144-S',
   'SS-145-S',
 ]);
 

@@ -862,7 +862,14 @@
         "ss023Bottom": "{card}（{id}）：山札の一番上のカードを一番下に置きました。",
         "ss029Revealed": "{card}（{id}）：相手の山札から{target}を公開しました。",
         "ss065Moved": "{card}（{id}）：{target}をこのキャラクターに移しました。",
-        "ss136Defeated": "{card}（{id}）：印刷されたコストより安く出されたキャラクターを倒しました。"
+        "ss136Defeated": "{card}（{id}）：印刷されたコストより安く出されたキャラクターを倒しました。",
+        "ss018PoweredUp": "{card}（{id}）：第八班の味方{count}体がパワー1を得ました。",
+        "ss022Played": "{card}（{id}）：{target}をチャクラ{cost}で出しました。",
+        "ss022WeaponBonus": "{card}（{id}）：武器がつき、POWERUP {amount}。",
+        "ss138Discarded": "{card}（{id}）：{target}を捨て、パワー{amount}を得ました。",
+        "ss138Defeated": "{card}（{id}）：同じパワーの敵を倒しました。",
+        "ss140Hidden": "{card}（{id}）：うずまきナルトを裏向きにしました。",
+        "ss140PlayedHidden": "{card}（{id}）：ミッション{mission}にうずまきナルトをチャクラ{cost}で裏向きに出しました。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1605,7 +1612,15 @@
         "ss025MoveDestination": "移動先のミッションを選んでください。",
         "ss029HideSameName": "公開されたカードと同じ名前の敵キャラクターを選んで裏向きにします。",
         "ss065MoveAttachment": "このキャラクターに移す味方の装備カードを選んでください。",
-        "ss136DefeatDiscounted": "前のターンに印刷されたコストより安く出された敵キャラクターを選んで倒します。"
+        "ss136DefeatDiscounted": "前のターンに印刷されたコストより安く出された敵キャラクターを選んで倒します。",
+        "ss018PowerupTeam8": "このミッションの他の味方第八班キャラクター全員にパワートークンを1個ずつ与えますか。",
+        "ss022PlayAttachment": "手札から装備カードを1枚選び、2少なく支払ってこのミッションに出します。",
+        "ss022ChooseHost": "装備カードをつけるキャラクターを選んでください。",
+        "ss138DiscardForPower": "捨てるカードを1枚選びます。そのカードのパワーぶんだけパワーを得ます。",
+        "ss138DefeatEqual": "このミッションで、このキャラクターと同じパワーの敵キャラクターを選んで倒します。",
+        "ss140HideNaruto": "場のうずまきナルトを1体選んで裏向きにします。",
+        "ss140PlayHidden": "手札からうずまきナルトを1枚選び、2少なく支払って裏向きで出します。",
+        "ss140ChooseMission": "裏向きのカードを置くミッションを選んでください。"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",

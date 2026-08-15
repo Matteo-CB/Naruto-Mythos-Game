@@ -7,6 +7,8 @@ import { characterHasGroup } from '@/lib/effects/groupUtils';
 import { isFirstCardPlayedThisRound, withFirstStrikeStatus } from '@/lib/engine/rules/firstStrike';
 import { artisanVillageCount, cannotReceiveOtherAttachments } from '@/lib/effects/handlers/SS/attachmentStatics';
 import { estSeimei } from './handlers/SS/seimei065';
+import { bonusArmeSurTenten, TENTEN_022 } from './handlers/SS/tenten022';
+import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
 
 function artisanVillageReward(
   state: GameState,
@@ -510,6 +512,14 @@ export function attachCardToCharacter(state: GameState, player: PlayerID, card: 
   mission[hostSide] = chars;
   missions[hostMissionIndex] = mission;
 
+  const bonusArme = bonusArmeSurTenten(host, card);
+  if (bonusArme > 0) {
+    host.powerTokens = host.powerTokens + amplifiedPowerup({ ...state, activeMissions: missions }, host.instanceId, bonusArme);
+    chars[hostIdx] = host;
+    mission[hostSide] = chars;
+    missions[hostMissionIndex] = mission;
+  }
+
   const hostTop = host.stack?.length > 0 ? host.stack[host.stack.length - 1] : host.card;
   const afterReplacement = discardAttachments(state, replaced);
   let newState: GameState = {
@@ -523,6 +533,13 @@ export function attachCardToCharacter(state: GameState, player: PlayerID, card: 
       { card: card.name_fr, card_en: card.name_en ?? card.name_fr, id: card.id, target: hostTop.name_fr },
     ),
   };
+
+  if (bonusArme > 0) {
+    newState.log = logAction(newState.log, state.turn, state.phase, player,
+      'EFFECT_POWERUP', `Tenten (022): POWERUP ${bonusArme} from the Weapon attachment.`,
+      'game.log.effect.ss022WeaponBonus',
+      { card: 'TENTEN', id: TENTEN_022, amount: String(bonusArme) });
+  }
 
   const handler = getEffectHandler(card.id, 'MAIN');
   const hasInstantMain = (card.effects ?? []).some((e) => e.type === 'MAIN' && !e.description.includes('[⧗]'));

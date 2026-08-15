@@ -23,6 +23,10 @@
         "feature",
         "fix",
         "fix",
+        "fix",
+        "feature",
+        "feature",
+        "feature",
         "fix"
       ],
       "changes_fr": [
@@ -39,7 +43,11 @@
         "Seimei peut porter plusieurs équipements à la fois et les rassembler sur elle depuis tout le terrain.",
         "Les fenêtres de choix qui montrent des cartes de la pioche affichent enfin les cartes au lieu d'un écran vide.",
         "Ibiki 28 laisse de nouveau le choix de garder la carte au sommet de la pioche adverse.",
-        "La Bombe Fumigène laisse de nouveau désigner la mission où part son porteur."
+        "La Bombe Fumigène laisse de nouveau désigner la mission où part son porteur.",
+        "Six cartes du set 2 gagnent leur effet d'amélioration, dont Kurenai 18, Tenten 22 et Asuma 138.",
+        "Tenten 22 gagne 3 de Puissance dès qu'une Arme est posée sur elle.",
+        "Iruka 140 cache un Naruto Uzumaki en jeu et peut en poser un autre face cachée sans rien payer.",
+        "Les versions Secrètes de Tsunade et Jiraya, qui ne faisaient rien, agissent comme leurs versions dorées."
       ],
       "changes_en": [
         "A revealed Orochimaru 127 now takes a single character, even with Sasuke in the mission.",
@@ -55,7 +63,11 @@
         "Seimei can hold several attachments at once and gather them onto herself from anywhere on the board.",
         "The choice windows that show cards from your deck finally display the cards instead of an empty screen.",
         "Ibiki 28 lets you choose again to leave the card on top of the opponent's deck.",
-        "The Smoke Bomb lets you pick the mission its host moves to again."
+        "The Smoke Bomb lets you pick the mission its host moves to again.",
+        "Six set 2 cards gain their upgrade effect, including Kurenai 18, Tenten 22 and Asuma 138.",
+        "Tenten 22 gains 3 Power as soon as a Weapon is attached to her.",
+        "Iruka 140 hides a Naruto Uzumaki in play and can place another one face down for free.",
+        "The Secret versions of Tsunade and Jiraiya, which did nothing, now act like their gold versions."
       ],
       "changes_es": [
         "Orochimaru 127 revelado ya solo toma un personaje, incluso con Sasuke en la misión.",
@@ -71,7 +83,11 @@
         "Seimei puede llevar varios equipos a la vez y reunirlos sobre ella desde todo el tablero.",
         "Las ventanas de elección que muestran cartas del mazo por fin muestran las cartas en vez de una pantalla vacía.",
         "Ibiki 28 vuelve a permitir dejar la carta encima del mazo rival.",
-        "La Bomba de Humo vuelve a permitir elegir la misión a la que se mueve su portador."
+        "La Bomba de Humo vuelve a permitir elegir la misión a la que se mueve su portador.",
+        "Seis cartas del set 2 ganan su efecto de mejora, entre ellas Kurenai 18, Tenten 22 y Asuma 138.",
+        "Tenten 22 gana 3 de Potencia en cuanto se le coloca un Arma.",
+        "Iruka 140 oculta a un Naruto Uzumaki en juego y puede colocar otro boca abajo sin pagar nada.",
+        "Las versiones Secretas de Tsunade y Jiraiya, que no hacían nada, actúan como sus versiones doradas."
       ],
       "changes_ja": [
         "公開した大蛇丸127は、そのミッションにサスケがいても1体しか奪わなくなりました。",
@@ -87,7 +103,11 @@
         "セイメイは装備カードを複数つけられ、場のどこからでも自分に集められます。",
         "山札のカードを見せる選択ウィンドウが、空白ではなくカードを表示するようになりました。",
         "イビキ28は、相手の山札の一番上にカードを残す選択が再びできます。",
-        "煙玉は、装備したキャラクターの移動先ミッションを再び選べます。"
+        "煙玉は、装備したキャラクターの移動先ミッションを再び選べます。",
+        "セット2の6枚がアップグレード効果を得ました。クレナイ18、テンテン22、アスマ138などです。",
+        "テンテン22は、武器がつくたびにパワー3を得ます。",
+        "イルカ140は場のうずまきナルトを裏向きにし、もう1体を無償で裏向きに出せます。",
+        "何もしなかったツナデとジライヤのシークレット版が、ゴールド版と同じように働きます。"
       ],
       "changes_pt": [
         "Orochimaru 127 revelado passa a levar apenas um personagem, mesmo com Sasuke na missão.",
@@ -103,7 +123,11 @@
         "Seimei pode portar vários equipamentos ao mesmo tempo e reuni-los nela de qualquer parte do tabuleiro.",
         "As janelas de escolha que mostram cartas do deck finalmente exibem as cartas em vez de uma tela vazia.",
         "Ibiki 28 volta a permitir deixar a carta no topo do deck adversário.",
-        "A Bomba de Fumaça volta a permitir escolher a missão para onde seu portador vai."
+        "A Bomba de Fumaça volta a permitir escolher a missão para onde seu portador vai.",
+        "Seis cartas do set 2 ganham seu efeito de melhoria, incluindo Kurenai 18, Tenten 22 e Asuma 138.",
+        "Tenten 22 ganha 3 de Potência assim que uma Arma é colocada nela.",
+        "Iruka 140 oculta um Naruto Uzumaki em jogo e pode colocar outro virado para baixo sem pagar nada.",
+        "As versões Secretas de Tsunade e Jiraiya, que não faziam nada, agora agem como suas versões douradas."
       ],
       "changes_it": [
         "Orochimaru 127 rivelato prende un solo personaggio, anche con Sasuke nella missione.",
@@ -119,7 +143,11 @@
         "Seimei può portare più equipaggiamenti insieme e radunarli su di sé da tutto il campo.",
         "Le finestre di scelta che mostrano carte del mazzo mostrano finalmente le carte invece di uno schermo vuoto.",
         "Ibiki 28 permette di nuovo di lasciare la carta in cima al mazzo avversario.",
-        "La Bomba Fumogena permette di nuovo di scegliere la missione dove va il suo portatore."
+        "La Bomba Fumogena permette di nuovo di scegliere la missione dove va il suo portatore.",
+        "Sei carte del set 2 ottengono il loro effetto di miglioramento, tra cui Kurenai 18, Tenten 22 e Asuma 138.",
+        "Tenten 22 guadagna 3 Potenza appena le viene messa un'Arma.",
+        "Iruka 140 nasconde un Naruto Uzumaki in gioco e può metterne un altro coperto senza pagare nulla.",
+        "Le versioni Segrete di Tsunade e Jiraiya, che non facevano nulla, agiscono come le versioni dorate."
       ],
       "changes_pl": [
         "Odkryty Orochimaru 127 przejmuje już tylko jedną postać, nawet gdy Sasuke jest w misji.",
@@ -135,7 +163,11 @@
         "Seimei może nosić kilka wyposażeń naraz i zbierać je na siebie z całego stołu.",
         "Okna wyboru pokazujące karty z talii wreszcie wyświetlają karty zamiast pustego ekranu.",
         "Ibiki 28 znów pozwala zostawić kartę na wierzchu talii przeciwnika.",
-        "Bomba dymna znów pozwala wskazać misję, do której trafia jej nosiciel."
+        "Bomba dymna znów pozwala wskazać misję, do której trafia jej nosiciel.",
+        "Sześć kart z zestawu 2 zyskuje efekt ulepszenia, w tym Kurenai 18, Tenten 22 i Asuma 138.",
+        "Tenten 22 zyskuje 3 Mocy, gdy tylko dołożona zostanie do niej Broń.",
+        "Iruka 140 zakrywa Naruto Uzumakiego w grze i może położyć kolejnego zakrytego za darmo.",
+        "Sekretne wersje Tsunade i Jiraiyi, które nic nie robiły, działają jak ich złote wersje."
       ]
     },
     {

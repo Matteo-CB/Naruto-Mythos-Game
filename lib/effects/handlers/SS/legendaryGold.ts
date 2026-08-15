@@ -12,6 +12,8 @@ import {
   SUMMON_KEYWORD,
   TSUNADE_GOLD_ID,
   TSUNADE_GOLD_NAME,
+  JIRAIYA_SANNIN_PRINTINGS,
+  TSUNADE_SANNIN_PRINTINGS,
   friendlyCharacterIds,
   friendlySummonIds,
   tsunadeGoldShuffleableCount,
@@ -112,8 +114,12 @@ function jiraiya002Upgrade(ctx: EffectContext): EffectResult {
 }
 
 export function registerLegendaryGoldHandlers(): void {
-  registerEffect(TSUNADE_GOLD_ID, 'MAIN', tsunade001Main);
-  registerEffect(TSUNADE_GOLD_ID, 'UPGRADE', tsunade001Upgrade);
-  registerEffect(JIRAIYA_GOLD_ID, 'UPGRADE', jiraiya002Upgrade);
+  for (const id of TSUNADE_SANNIN_PRINTINGS) {
+    registerEffect(id, 'MAIN', tsunade001Main);
+    registerEffect(id, 'UPGRADE', tsunade001Upgrade);
+  }
+  for (const id of JIRAIYA_SANNIN_PRINTINGS) {
+    registerEffect(id, 'UPGRADE', jiraiya002Upgrade);
+  }
   registerEffect(GAARA_GOLD_ID, 'DUEL', ss078Duel);
 }

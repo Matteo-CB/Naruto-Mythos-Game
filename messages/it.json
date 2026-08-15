@@ -2960,7 +2960,14 @@
         "ss023Bottom": "{card} ({id}): la carta in cima al mazzo va in fondo.",
         "ss029Revealed": "{card} ({id}): {target} rivelata dal mazzo avversario.",
         "ss065Moved": "{card} ({id}): {target} spostato su questo personaggio.",
-        "ss136Defeated": "{card} ({id}): un personaggio giocato per meno del suo costo stampato viene sconfitto."
+        "ss136Defeated": "{card} ({id}): un personaggio giocato per meno del suo costo stampato viene sconfitto.",
+        "ss018PoweredUp": "{card} ({id}): {count} alleato/i del Team 8 guadagnano 1 Potenza.",
+        "ss022Played": "{card} ({id}): {target} giocato per {cost} Chakra.",
+        "ss022WeaponBonus": "{card} ({id}): viene messa un'Arma, POWERUP {amount}.",
+        "ss138Discarded": "{card} ({id}): {target} scartata, {amount} Potenza guadagnata.",
+        "ss138Defeated": "{card} ({id}): un nemico di pari Potenza viene sconfitto.",
+        "ss140Hidden": "{card} ({id}): un Naruto Uzumaki viene nascosto.",
+        "ss140PlayedHidden": "{card} ({id}): un Naruto Uzumaki viene giocato nascosto sulla missione {mission} per {cost} Chakra."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3703,7 +3710,15 @@
         "ss025MoveDestination": "Scegli la missione di destinazione.",
         "ss029HideSameName": "Scegli un personaggio nemico con il nome della carta rivelata per nasconderlo.",
         "ss065MoveAttachment": "Scegli un equipaggiamento alleato da spostare su questo personaggio.",
-        "ss136DefeatDiscounted": "Scegli un personaggio nemico giocato lo scorso turno per meno del suo costo stampato per sconfiggerlo."
+        "ss136DefeatDiscounted": "Scegli un personaggio nemico giocato lo scorso turno per meno del suo costo stampato per sconfiggerlo.",
+        "ss018PowerupTeam8": "Dare 1 segnalino Potenza a ogni altro alleato del Team 8 in questa missione?",
+        "ss022PlayAttachment": "Scegli un equipaggiamento dalla tua mano da giocare in questa missione pagando 2 in meno.",
+        "ss022ChooseHost": "Scegli il personaggio che riceve l'equipaggiamento.",
+        "ss138DiscardForPower": "Scegli una carta da scartare per guadagnare tanta Potenza quanta ne ha.",
+        "ss138DefeatEqual": "Scegli un personaggio nemico in questa missione con la stessa Potenza di questo personaggio per sconfiggerlo.",
+        "ss140HideNaruto": "Scegli un Naruto Uzumaki in gioco per nasconderlo.",
+        "ss140PlayHidden": "Scegli un Naruto Uzumaki dalla tua mano da giocare nascosto pagando 2 in meno.",
+        "ss140ChooseMission": "Scegli la missione dove viene messa la carta nascosta."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

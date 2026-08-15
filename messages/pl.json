@@ -2960,7 +2960,14 @@
         "ss023Bottom": "{card} ({id}): wierzchnia karta talii trafia na spód.",
         "ss029Revealed": "{card} ({id}): odkryto {target} z talii przeciwnika.",
         "ss065Moved": "{card} ({id}): {target} przeniesiono na tę postać.",
-        "ss136Defeated": "{card} ({id}): postać zagrana poniżej nadrukowanego kosztu zostaje pokonana."
+        "ss136Defeated": "{card} ({id}): postać zagrana poniżej nadrukowanego kosztu zostaje pokonana.",
+        "ss018PoweredUp": "{card} ({id}): {count} sojusznik(ów) z Drużyny 8 zyskuje 1 Mocy.",
+        "ss022Played": "{card} ({id}): zagrano {target} za {cost} czakry.",
+        "ss022WeaponBonus": "{card} ({id}): dołożono Broń, POWERUP {amount}.",
+        "ss138Discarded": "{card} ({id}): odrzucono {target}, zyskano {amount} Mocy.",
+        "ss138Defeated": "{card} ({id}): wróg o równej Mocy zostaje pokonany.",
+        "ss140Hidden": "{card} ({id}): Naruto Uzumaki zostaje zakryty.",
+        "ss140PlayedHidden": "{card} ({id}): Naruto Uzumaki zagrany zakryty w misji {mission} za {cost} czakry."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3703,7 +3710,15 @@
         "ss025MoveDestination": "Wybierz misję docelową.",
         "ss029HideSameName": "Wybierz wrogą postać o nazwie odkrytej karty, aby ją zakryć.",
         "ss065MoveAttachment": "Wybierz sojusznicze wyposażenie do przeniesienia na tę postać.",
-        "ss136DefeatDiscounted": "Wybierz wrogą postać zagraną w poprzedniej turze poniżej jej nadrukowanego kosztu, aby ją pokonać."
+        "ss136DefeatDiscounted": "Wybierz wrogą postać zagraną w poprzedniej turze poniżej jej nadrukowanego kosztu, aby ją pokonać.",
+        "ss018PowerupTeam8": "Dać 1 znacznik Mocy każdemu innemu sojusznikowi z Drużyny 8 w tej misji?",
+        "ss022PlayAttachment": "Wybierz wyposażenie z ręki, aby zagrać je w tej misji, płacąc 2 mniej.",
+        "ss022ChooseHost": "Wybierz postać, która otrzyma wyposażenie.",
+        "ss138DiscardForPower": "Wybierz kartę do odrzucenia, aby zyskać tyle Mocy, ile ona ma.",
+        "ss138DefeatEqual": "Wybierz wrogą postać w tej misji o Mocy równej tej postaci, aby ją pokonać.",
+        "ss140HideNaruto": "Wybierz Naruto Uzumakiego w grze, aby go zakryć.",
+        "ss140PlayHidden": "Wybierz Naruto Uzumakiego z ręki, aby zagrać go zakrytego, płacąc 2 mniej.",
+        "ss140ChooseMission": "Wybierz misję, w której zostanie położona zakryta karta."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

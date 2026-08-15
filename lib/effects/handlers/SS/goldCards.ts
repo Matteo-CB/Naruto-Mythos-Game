@@ -4,6 +4,8 @@ import { shuffle } from '@/lib/engine/utils/shuffle';
 export const TSUNADE_GOLD_ID = 'SS-999-L';
 export const TSUNADE_GOLD_NAME = 'TSUNADE';
 export const JIRAIYA_GOLD_ID = 'SS-998-L';
+export const JIRAIYA_SANNIN_PRINTINGS = ['SS-998-L', 'SS-144-S', 'SS-144-CHIBIV'];
+export const TSUNADE_SANNIN_PRINTINGS = ['SS-999-L', 'SS-141-S', 'SS-141-CHIBIV', 'SS-141-SPV'];
 export const JIRAIYA_GOLD_NAME = 'JIRAIYA';
 export const GAARA_GOLD_ID = 'SS-078-L';
 
@@ -72,7 +74,7 @@ export function jiraiyaGoldSources(state: GameState, player: PlayerID): Characte
     for (const char of mission[sideOf(player)]) {
       if (char.isHidden) continue;
       const top = topCardOf(char);
-      if ((top.cardId ?? top.id) === JIRAIYA_GOLD_ID) sources.push(char);
+      if (JIRAIYA_SANNIN_PRINTINGS.includes(String(top.cardId ?? top.id))) sources.push(char);
     }
   }
   return sources;

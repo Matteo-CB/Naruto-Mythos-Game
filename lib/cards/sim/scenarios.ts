@@ -618,6 +618,78 @@ const FACTORIES: Record<string, Factory> = {
     play: P1(FRESH),
     noMinimize: true,
   }),
+  'SS-018-UC': (id) => ({
+    build: () => board({
+      hand: [id],
+      upgBase: { id: 'KS-034-C', iid: 'sim-upg-base' },
+      p1m0: ['SS-016-C'],
+      chakra: 20,
+    }),
+    play: P1(upgrade('sim-upg-base')), noMinimize: true,
+  }),
+  'SS-022-UC': (id) => ({
+    build: () => board({
+      hand: [id, 'SS-080-C'],
+      upgBase: { id: 'SS-021-C', iid: 'sim-upg-base' },
+      chakra: 20,
+    }),
+    play: P1(upgrade('sim-upg-base')), noMinimize: true,
+  }),
+  'SS-138-R': (id) => ({
+    build: () => board({
+      hand: [id, 'KS-011-C'],
+      upgBase: { id: 'SS-012-C', iid: 'sim-upg-base' },
+      e0: [{ id: 'KS-104-R', iid: 'sim-egale' }],
+      chakra: 20,
+    }),
+    play: P1(upgrade('sim-upg-base')), noMinimize: true,
+  }),
+  'SS-140-R': (id) => ({
+    build: () => board({
+      hand: [id, 'KS-009-C'],
+      upgBase: { id: 'SS-024-C', iid: 'sim-upg-base' },
+      e0: [{ id: 'KS-010-C', iid: 'sim-naruto' }],
+      chakra: 20,
+    }),
+    play: P1(upgrade('sim-upg-base')), noMinimize: true,
+  }),
+  'SS-141-S': (id) => ({
+    build: () => {
+      const st = board({
+        hand: [id],
+        upgBase: { id: 'KS-104-R', iid: 'sim-upg-base' },
+        chakra: 20,
+        missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+      });
+      st.player1.discardPile = ['KS-009-C', 'KS-011-C', 'KS-021-C']
+        .map((x) => getCharacterById(x)!).filter(Boolean);
+      return st;
+    },
+    play: P1(upgrade('sim-upg-base')),
+    choose: (state, pending) => {
+      const opts = pending.options ?? [];
+      if (pending.descriptionKey === 'game.effect.desc.ss001ChooseCount') return [opts[opts.length - 1]];
+      return opts.slice(0, Math.max(1, pending.minSelections ?? 1));
+    },
+    noMinimize: true,
+  }),
+  'SS-144-S': (id) => ({
+    build: () => board({
+      hand: [id, 'KS-096-C'],
+      upgBase: { id: 'KS-007-C', iid: 'sim-upg-base' },
+      p1m1: ['KS-097-C'],
+      chakra: 20,
+      missionIds: ['KS-001-MMS', 'KS-006-MMS'],
+    }),
+    play: P1(upgrade('sim-upg-base')),
+    choose: (state, pending) => {
+      const opts = pending.options ?? [];
+      const hand = opts.find((o) => o.startsWith('HAND_'));
+      if (hand) return [hand];
+      return opts.slice(0, Math.max(1, pending.minSelections ?? 1));
+    },
+    noMinimize: true,
+  }),
   'SS-999-L': (id) => ({
     build: () => {
       const st = board({

@@ -864,7 +864,14 @@
         "ss023Bottom": "{card} ({id}) : la carte du dessus de votre pioche passe au fond.",
         "ss029Revealed": "{card} ({id}) : {target} révélée depuis la pioche adverse.",
         "ss065Moved": "{card} ({id}) : {target} déplacé sur ce personnage.",
-        "ss136Defeated": "{card} ({id}) : un personnage joué sous son coût imprimé est vaincu."
+        "ss136Defeated": "{card} ({id}) : un personnage joué sous son coût imprimé est vaincu.",
+        "ss018PoweredUp": "{card} ({id}) : {count} allié(s) Équipe 8 gagnent 1 Puissance.",
+        "ss022Played": "{card} ({id}) : {target} joué pour {cost} Chakra.",
+        "ss022WeaponBonus": "{card} ({id}) : une Arme est posée, POWERUP {amount}.",
+        "ss138Discarded": "{card} ({id}) : {target} défaussée, {amount} Puissance gagnée.",
+        "ss138Defeated": "{card} ({id}) : un ennemi de même Puissance est vaincu.",
+        "ss140Hidden": "{card} ({id}) : un Naruto Uzumaki est caché.",
+        "ss140PlayedHidden": "{card} ({id}) : un Naruto Uzumaki est posé face cachée sur la mission {mission} pour {cost} Chakra."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1607,7 +1614,15 @@
         "ss025MoveDestination": "Choisissez la mission de destination.",
         "ss029HideSameName": "Choisissez un personnage ennemi portant le nom de la carte révélée pour le cacher.",
         "ss065MoveAttachment": "Choisissez un équipement allié à déplacer sur ce personnage.",
-        "ss136DefeatDiscounted": "Choisissez un personnage ennemi joué au tour précédent sous son coût imprimé pour le vaincre."
+        "ss136DefeatDiscounted": "Choisissez un personnage ennemi joué au tour précédent sous son coût imprimé pour le vaincre.",
+        "ss018PowerupTeam8": "Donner 1 jeton de Puissance à chaque autre allié Équipe 8 de cette mission ?",
+        "ss022PlayAttachment": "Choisissez un équipement de votre main à jouer dans cette mission en payant 2 de moins.",
+        "ss022ChooseHost": "Choisissez le personnage qui reçoit l'équipement.",
+        "ss138DiscardForPower": "Choisissez une carte à défausser pour gagner autant de Puissance qu'elle en a.",
+        "ss138DefeatEqual": "Choisissez un personnage ennemi de cette mission ayant la même Puissance que ce personnage pour le vaincre.",
+        "ss140HideNaruto": "Choisissez un Naruto Uzumaki en jeu pour le cacher.",
+        "ss140PlayHidden": "Choisissez un Naruto Uzumaki de votre main à jouer face cachée en payant 2 de moins.",
+        "ss140ChooseMission": "Choisissez la mission où poser la carte face cachée."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",
