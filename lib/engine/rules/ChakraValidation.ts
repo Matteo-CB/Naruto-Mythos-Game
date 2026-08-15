@@ -1,5 +1,6 @@
 import type { GameState, PlayerID, CharacterCard } from '../types';
 import { foodAttachmentDiscountCount } from '@/lib/effects/handlers/SS/staticAuras';
+import { virtualSoundFourCount } from '@/lib/effects/handlers/SS/attachmentStatics';
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -80,6 +81,7 @@ export function perAllyDiscountAmount(
     if (ownName && String(top.name_fr ?? '').toUpperCase() === ownName) continue;
     if ((top.keywords ?? []).includes(keyword)) count += 1;
   }
+  if (keyword === 'Sound Four') count += virtualSoundFourCount(mission, player);
   return count;
 }
 

@@ -842,7 +842,16 @@
         "ss038Attached": "{card}（{id}）：{target}に装備され、パワー5を失わせる。",
         "gato075": "{card}（{id}）：このミッションに抜け忍が出たため、チャクラ1を獲得し、{target}にパワーアップ1。",
         "enma132Search": "{card}（{id}）：デッキから金剛如意を見つけ、チャクラ{cost}で使用しました。",
-        "ss015Paid": "{card}（{id}）：チャクラ1を支払い、場に残しました。"
+        "ss015Paid": "{card}（{id}）：チャクラ1を支払い、場に残しました。",
+        "ss090Stolen": "{card}（{id}）：{target}からパワートークン{amount}個を奪いました。",
+        "ss088Discarded": "{card}（{id}）：{target}を捨てました。",
+        "ss084Removed": "{card}（{id}）：{target}のパワートークンをすべて取り除きました。",
+        "ss086Moved": "{card}（{id}）：キャラクターを裏向きにしてミッション{mission}へ移動しました。",
+        "ss095Taken": "{card}（{id}）：{target}を公開し手札に加えました。",
+        "ssScrollPair": "{card}（{id}）：天と地の書がそろい、ミッションポイント1を獲得しました。",
+        "ss110Reward": "{card}（{id}）：カードを1枚引き、{target}にパワーアップ1。",
+        "ss107Ambush": "{card}（{id}）：手札から出したキャラクターがアンブッシュ効果を発動します。",
+        "ss109Reinforcement": "{card}（{id}）：デッキの一番上のカードがミッション{mission}に裏向きで登場しました。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1567,7 +1576,12 @@
         "ss040PlaySummons": "口寄せキャラクターを出す。味方の多由也がいる各ミッションでは、そこにいる味方の音の四人衆1体につきコストが1減る。",
         "ss038Attach": "このミッションの伏せていない敵キャラクター1体を選ぶ。右近がそれに装備され、そのキャラクターはパワー5を失うが、右近はキャラクターではなくなる。",
         "ss015PayOrDefeat": "チャクラ1を支払って赤丸を場に残しますか。支払わない場合、赤丸は倒されます。",
-        "ss057DefeatBeforePower": "パワー決定前に死神が連れて行く敵キャラクターを選んでください。"
+        "ss057DefeatBeforePower": "パワー決定前に死神が連れて行く敵キャラクターを選んでください。",
+        "ss090StealTokens": "このミッションの敵キャラクターからパワートークンを3個まで奪い、このキャラクターに置きますか。",
+        "ss088DiscardOthers": "このキャラクターの他の装備カードをすべて捨てますか。",
+        "ss084RemoveTokens": "このキャラクターのパワートークンをすべて取り除きますか。",
+        "ss086HideAndMove": "このキャラクターを裏向きにして別のミッションへ移動しますか。",
+        "ss095TakeJutsu": "公開して手札に加える術キャラクターを選んでください。"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",

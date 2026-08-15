@@ -5,6 +5,125 @@ import { getEffectHandler } from '@/lib/effects/EffectRegistry';
 import type { EffectContext } from '@/lib/effects/EffectTypes';
 import { characterHasGroup } from '@/lib/effects/groupUtils';
 import { isFirstCardPlayedThisRound, withFirstStrikeStatus } from '@/lib/engine/rules/firstStrike';
+import { artisanVillageCount } from '@/lib/effects/handlers/SS/attachmentStatics';
+
+function artisanVillageReward(
+  state: GameState,
+  player: PlayerID,
+  card: CardData,
+  host: CharacterInPlay,
+  missionIndex: number,
+): GameState {
+  const mission = state.activeMissions[missionIndex];
+  const villages = artisanVillageCount(mission, player);
+  if (villages === 0) return state;
+  const motsCles = card.keywords ?? [];
+  if (!motsCles.includes('Weapon') && !motsCles.includes('Armor')) return state;
+  if (host.controlledBy !== player) return state;
+
+  let newState = state;
+  for (let i = 0; i < villages; i++) {
+    const deck = newState[player].deck;
+    const piochee = deck.length > 0 ? deck[0] : null;
+    newState = {
+      ...newState,
+      [player]: {
+        ...newState[player],
+        deck: piochee ? deck.slice(1) : deck,
+        hand: piochee ? [...newState[player].hand, piochee] : newState[player].hand,
+      },
+    };
+    const missions = newState.activeMissions.map((m) => ({
+      ...m,
+      player1Characters: m.player1Characters.map((c) =>
+        c.instanceId === host.instanceId ? { ...c, powerTokens: c.powerTokens + 1 } : c),
+      player2Characters: m.player2Characters.map((c) =>
+        c.instanceId === host.instanceId ? { ...c, powerTokens: c.powerTokens + 1 } : c),
+    }));
+    const hostTop = host.stack?.length > 0 ? host.stack[host.stack.length - 1] : host.card;
+    newState = {
+      ...newState,
+      activeMissions: missions,
+      log: logAction(newState.log, newState.turn, newState.phase, player, 'EFFECT_POWERUP',
+        `Village of Artisans (110): 1 card drawn and POWERUP 1 on ${hostTop.name_fr}.`,
+        'game.log.effect.ss110Reward',
+        { card: 'VILLAGE DES ARTISANS', id: 'SS-110-UC', target: hostTop.name_fr, target_en: hostTop.name_en || hostTop.name_fr }),
+    };
+  }
+  return newState;
+}
+
+function resolveAttachmentTrigger(
+  state: GameState,
+  player: PlayerID,
+  card: CardData,
+  host: CharacterInPlay | null,
+  missionIndex: number,
+  type: 'AMBUSH',
+  revealed: boolean,
+): GameState {
+  if (!revealed) return state;
+  if (!(card.effects ?? []).some((e) => e.type === type)) return state;
+  const handler = getEffectHandler(card.id, type);
+  if (!handler) return state;
+  if (state.pendingActions.length > 0) return state;
+
+  const source = host ?? ({ instanceId: '', card } as unknown as CharacterInPlay);
+  let newState = state;
+  try {
+    const result = handler({
+      state: newState,
+      sourcePlayer: player,
+      sourceCard: source,
+      sourceMissionIndex: missionIndex,
+      triggerType: type,
+      isUpgrade: false,
+      wasRevealed: true,
+    } as EffectContext);
+    newState = result.state;
+
+    if (result.requiresTargetSelection && result.targetSelectionType && result.validTargets && result.validTargets.length > 0) {
+      const effId = generateInstanceId();
+      const actId = generateInstanceId();
+      newState = {
+        ...newState,
+        pendingEffects: [...newState.pendingEffects, {
+          id: effId,
+          sourceCardId: card.id,
+          sourceInstanceId: source.instanceId,
+          sourceMissionIndex: missionIndex,
+          effectType: type,
+          effectDescription: result.description ?? '',
+          targetSelectionType: result.targetSelectionType,
+          sourcePlayer: player,
+          requiresTargetSelection: true,
+          validTargets: result.validTargets,
+          isOptional: result.isOptional ?? true,
+          isMandatory: result.isMandatory ?? false,
+          resolved: false,
+          isUpgrade: false,
+          wasRevealed: true,
+          rootOptional: result.isOptional ?? true,
+        }],
+        pendingActions: [...newState.pendingActions, {
+          id: actId,
+          type: 'SELECT_TARGET',
+          player,
+          description: result.description ?? '',
+          descriptionKey: result.descriptionKey,
+          descriptionParams: result.descriptionParams,
+          options: result.validTargets,
+          minSelections: result.minSelections ?? 1,
+          maxSelections: result.maxSelections ?? 1,
+          sourceEffectId: effId,
+        }],
+      };
+    }
+  } catch (err) {
+    console.error(`[attachments] ${type} handler error for ${card.id}:`, err);
+  }
+  return newState;
+}
 
 function resolveAttachmentFirstStrike(
   state: GameState,
@@ -320,7 +439,7 @@ export function missionAlreadyHasPlayerAttachment(state: GameState, player: Play
   return (mission.attachments ?? []).some((a) => a.owner === player);
 }
 
-export function attachCardToMission(state: GameState, player: PlayerID, card: CardData, missionIndex: number): GameState {
+export function attachCardToMission(state: GameState, player: PlayerID, card: CardData, missionIndex: number, revealed = false): GameState {
   const previous = (state.activeMissions[missionIndex]?.attachments ?? []).filter((a) => a.owner === player);
   const base = discardAttachments(state, previous);
   const missions = [...base.activeMissions];
@@ -351,10 +470,11 @@ export function attachCardToMission(state: GameState, player: PlayerID, card: Ca
       ),
     };
   }
+  newState = resolveAttachmentTrigger(newState, player, card, null, missionIndex, 'AMBUSH', revealed);
   return resolveAttachmentFirstStrike(newState, player, card, null, missionIndex);
 }
 
-export function attachCardToCharacter(state: GameState, player: PlayerID, card: CardData, hostInstanceId: string): GameState {
+export function attachCardToCharacter(state: GameState, player: PlayerID, card: CardData, hostInstanceId: string, revealed = false): GameState {
   let hostMissionIndex = -1;
   let hostSide: 'player1Characters' | 'player2Characters' | null = null;
   let hostIdx = -1;
@@ -448,5 +568,7 @@ export function attachCardToCharacter(state: GameState, player: PlayerID, card: 
     }
   }
 
+  newState = artisanVillageReward(newState, player, card, host, hostMissionIndex);
+  newState = resolveAttachmentTrigger(newState, player, card, host, hostMissionIndex, 'AMBUSH', revealed);
   return resolveAttachmentFirstStrike(newState, player, card, host, hostMissionIndex);
 }

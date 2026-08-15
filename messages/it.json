@@ -2940,7 +2940,16 @@
         "ss038Attached": "{card} ({id}): si attacca a {target}, che perde 5 Potenza.",
         "gato075": "{card} ({id}): 1 Chakra guadagnato e POWERUP 1 su {target}, un Ninja Rinnegato giocato in questa missione.",
         "enma132Search": "{card} ({id}): Nyoi Adamantino trovato nel mazzo e giocato per {cost} Chakra.",
-        "ss015Paid": "{card} ({id}): 1 Chakra pagato per tenerlo in gioco."
+        "ss015Paid": "{card} ({id}): 1 Chakra pagato per tenerlo in gioco.",
+        "ss090Stolen": "{card} ({id}): presi {amount} segnalini Potenza da {target}.",
+        "ss088Discarded": "{card} ({id}): {target} scartato.",
+        "ss084Removed": "{card} ({id}): rimossi tutti i segnalini Potenza da {target}.",
+        "ss086Moved": "{card} ({id}): personaggio nascosto e spostato nella missione {mission}.",
+        "ss095Taken": "{card} ({id}): {target} rivelato e aggiunto alla mano.",
+        "ssScrollPair": "{card} ({id}): entrambe le pergamene sono qui, 1 punto missione guadagnato.",
+        "ss110Reward": "{card} ({id}): 1 carta pescata e POWERUP 1 su {target}.",
+        "ss107Ambush": "{card} ({id}): il personaggio giocato dalla mano attiva i suoi effetti AMBUSH.",
+        "ss109Reinforcement": "{card} ({id}): la carta in cima al mazzo arriva coperta nella missione {mission}."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3665,7 +3674,12 @@
         "ss040PlaySummons": "Gioca personaggi Evocazione. In ogni missione con una Tayuya alleata, costano 1 in meno per ogni personaggio Quattro del Suono alleato presente.",
         "ss038Attach": "Scegli un personaggio nemico non nascosto in questa missione. Ukon si attacca a lui e quel personaggio perde 5 Potenza, ma Ukon smette di essere un personaggio.",
         "ss015PayOrDefeat": "Pagare 1 Chakra per tenere Akamaru in gioco? Altrimenti viene sconfitto.",
-        "ss057DefeatBeforePower": "Scegli il personaggio nemico che lo Shinigami porta via prima del calcolo della Potenza."
+        "ss057DefeatBeforePower": "Scegli il personaggio nemico che lo Shinigami porta via prima del calcolo della Potenza.",
+        "ss090StealTokens": "Prendere fino a 3 segnalini Potenza da un personaggio nemico in questa missione e metterli su questo personaggio?",
+        "ss088DiscardOthers": "Scartare tutti gli altri equipaggiamenti su questo personaggio?",
+        "ss084RemoveTokens": "Rimuovere tutti i segnalini Potenza da questo personaggio?",
+        "ss086HideAndMove": "Nascondere questo personaggio e spostarlo in un'altra missione?",
+        "ss095TakeJutsu": "Scegli il personaggio Jutsu da rivelare e aggiungere alla tua mano."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

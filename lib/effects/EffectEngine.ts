@@ -66,6 +66,7 @@ import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOn
 import { isCharacterCopyable, isCopyableEffect } from './handlers/KS/shared/copyExclusions';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 import { hasFlexibleUpgradeRestriction, isRestrictedUpgradeTarget } from '@/lib/engine/rules/flexibleUpgradeRestriction';
+import { forestOfDeathActive } from './handlers/SS/attachmentStatics';
 
 
 function findUpgradeTargetIdx(
@@ -490,6 +491,19 @@ export class EffectEngine {
 
     if (!orderedTypes.includes('DUEL') && hasResolvableInstantDuel(newState, missionIndex, topCard.effects)) {
       insertDuelAtPrintedPosition(orderedTypes, topCard);
+    }
+
+    if (!isUpgrade && !character.isHidden
+      && forestOfDeathActive(newState.activeMissions[missionIndex], player)
+      && !orderedTypes.includes('AMBUSH')
+      && (topCard.effects ?? []).some((e) => e.type === 'AMBUSH')) {
+      orderedTypes.push('AMBUSH');
+      newState = {
+        ...newState,
+        log: logAction(newState.log, newState.turn, newState.phase, player, 'EFFECT_CONTINUOUS',
+          'The Forest of Death (107): the character played from hand activates its AMBUSH effects.',
+          'game.log.effect.ss107Ambush', { card: 'FORET DE LA MORT', id: 'SS-107-C' }),
+      };
     }
 
     const hasFirstStrike = (topCard.effects ?? []).some((e) => e.type === 'FIRST_STRIKE');
@@ -12807,6 +12821,112 @@ export class EffectEngine {
           'EFFECT_DEFEAT', `Shinigami (057): defeated ${ss057Nom?.name_fr ?? targetId} before Power is determined.`,
           'game.log.effect.defeat',
           { card: 'SHINIGAMI', id: 'SS-057-UC', target: ss057Nom?.name_fr ?? '', target_en: ss057Nom?.name_en ?? '' });
+        break;
+      }
+
+      case 'SS090_STEAL_TOKENS': {
+        let s090: { hostInstanceId?: string } = {};
+        try { s090 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const hote090 = s090.hostInstanceId ?? pendingEffect.sourceInstanceId;
+        const donneur = EffectEngine.findCharByInstanceId(newState, targetId);
+        const receveur = EffectEngine.findCharByInstanceId(newState, hote090);
+        if (!donneur || !receveur) break;
+        const pris = Math.min(3, donneur.character.powerTokens ?? 0);
+        if (pris <= 0) break;
+        const missions090 = newState.activeMissions.map((m) => ({
+          ...m,
+          player1Characters: m.player1Characters.map((c) => {
+            if (c.instanceId === targetId) return { ...c, powerTokens: c.powerTokens - pris };
+            if (c.instanceId === hote090) return { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, pris) };
+            return c;
+          }),
+          player2Characters: m.player2Characters.map((c) => {
+            if (c.instanceId === targetId) return { ...c, powerTokens: c.powerTokens - pris };
+            if (c.instanceId === hote090) return { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, pris) };
+            return c;
+          }),
+        }));
+        newState.activeMissions = missions090;
+        const nom090 = donneur.character.stack?.length > 0 ? donneur.character.stack[donneur.character.stack.length - 1] : donneur.character.card;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_POWERUP', `Shark Skin (090): took ${pris} Power token(s) from ${nom090.name_fr}.`,
+          'game.log.effect.ss090Stolen',
+          { card: 'PEAU DE REQUIN', id: 'SS-090-UC', amount: String(pris), target: nom090.name_fr, target_en: nom090.name_en || nom090.name_fr });
+        break;
+      }
+
+      case 'SS088_DISCARD_OTHERS': {
+        const hote088 = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!hote088) break;
+        const autres = (hote088.character.attachments ?? []).filter((a) => a.card.id !== 'SS-088-UC');
+        if (autres.length === 0) break;
+        const restants = (hote088.character.attachments ?? []).filter((a) => a.card.id === 'SS-088-UC');
+        const missions088 = newState.activeMissions.map((m) => ({
+          ...m,
+          player1Characters: m.player1Characters.map((c) => c.instanceId === hote088.character.instanceId ? { ...c, attachments: restants } : c),
+          player2Characters: m.player2Characters.map((c) => c.instanceId === hote088.character.instanceId ? { ...c, attachments: restants } : c),
+        }));
+        newState.activeMissions = missions088;
+        for (const att of autres) {
+          newState[att.owner] = { ...newState[att.owner], discardPile: [...newState[att.owner].discardPile, att.card as never] };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'DISCARD_ATTACHMENT', `Make-Out Paradise Book (088): discarded ${att.card.name_fr}.`,
+            'game.log.effect.ss088Discarded',
+            { card: 'PARADIS DU BATIFOLAGE', id: 'SS-088-UC', target: att.card.name_fr, target_en: att.card.name_en || att.card.name_fr });
+        }
+        break;
+      }
+
+      case 'SS084_REMOVE_TOKENS': {
+        const cible084 = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!cible084 || (cible084.character.powerTokens ?? 0) === 0) break;
+        const nom084 = cible084.character.stack?.length > 0 ? cible084.character.stack[cible084.character.stack.length - 1] : cible084.character.card;
+        const missions084 = newState.activeMissions.map((m) => ({
+          ...m,
+          player1Characters: m.player1Characters.map((c) => c.instanceId === cible084.character.instanceId ? { ...c, powerTokens: 0 } : c),
+          player2Characters: m.player2Characters.map((c) => c.instanceId === cible084.character.instanceId ? { ...c, powerTokens: 0 } : c),
+        }));
+        newState.activeMissions = missions084;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_TOKENS_REMOVED', `Poison Needles (084): removed every Power token from ${nom084.name_fr}.`,
+          'game.log.effect.ss084Removed',
+          { card: 'AIGUILLES EMPOISONNEES', id: 'SS-084-C', target: nom084.name_fr, target_en: nom084.name_en || nom084.name_fr });
+        break;
+      }
+
+      case 'SS086_HIDE_AND_MOVE': {
+        let s086: { hostInstanceId?: string } = {};
+        try { s086 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const hote086 = s086.hostInstanceId ?? pendingEffect.sourceInstanceId;
+        const destination = Number(String(targetId).replace('MISSION_', ''));
+        if (!Number.isFinite(destination)) break;
+        newState = EffectEngine.hideCharacterWithLog(newState, hote086, pendingEffect.sourcePlayer);
+        newState = EffectEngine.moveCharToMissionDirectPublic(newState, hote086, destination, pendingEffect.sourcePlayer, 'BOMBE FUMIGENE', 'SS-086-C', pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_MOVE', `Smoke Bomb (086): the character is hidden and moved to mission ${destination + 1}.`,
+          'game.log.effect.ss086Moved',
+          { card: 'BOMBE FUMIGENE', id: 'SS-086-C', mission: destination + 1 });
+        break;
+      }
+
+      case 'SS095_TAKE_JUTSU': {
+        const index095 = Number(String(targetId).replace('DECK_', ''));
+        const joueur095 = pendingEffect.sourcePlayer;
+        const deck095 = [...newState[joueur095].deck];
+        if (!Number.isFinite(index095) || index095 < 0 || index095 >= deck095.length) break;
+        const sommet095 = deck095.slice(0, 3);
+        const choisi = deck095[index095];
+        const autres095 = sommet095.filter((_, i) => i !== index095);
+        const reste095 = deck095.slice(3);
+        newState[joueur095] = {
+          ...newState[joueur095],
+          hand: [...newState[joueur095].hand, choisi as never],
+          deck: [...reste095, ...autres095] as never,
+        };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, joueur095,
+          'EFFECT_DRAW', `The Scroll of Sealing (095): revealed ${choisi.name_fr} and added it to hand.`,
+          'game.log.effect.ss095Taken',
+          { card: 'PARCHEMIN DU SCEAU', id: 'SS-095-UC', target: choisi.name_fr, target_en: choisi.name_en || choisi.name_fr });
         break;
       }
 

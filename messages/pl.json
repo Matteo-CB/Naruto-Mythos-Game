@@ -2940,7 +2940,16 @@
         "ss038Attached": "{card} ({id}): dołącza do {target}, która traci 5 Mocy.",
         "gato075": "{card} ({id}): zdobyto 1 czakrę i POWERUP 1 na {target}, zbiegły ninja zagrany w tej misji.",
         "enma132Search": "{card} ({id}): Adamantynowe Nyoi znalezione w talii i zagrane za {cost} czakry.",
-        "ss015Paid": "{card} ({id}): zapłacono 1 czakrę, aby zostawić go w grze."
+        "ss015Paid": "{card} ({id}): zapłacono 1 czakrę, aby zostawić go w grze.",
+        "ss090Stolen": "{card} ({id}): zabrano {amount} znaczników Mocy postaci {target}.",
+        "ss088Discarded": "{card} ({id}): odrzucono {target}.",
+        "ss084Removed": "{card} ({id}): usunięto wszystkie znaczniki Mocy z {target}.",
+        "ss086Moved": "{card} ({id}): postać zakryta i przeniesiona do misji {mission}.",
+        "ss095Taken": "{card} ({id}): odkryto {target} i dodano do ręki.",
+        "ssScrollPair": "{card} ({id}): oba zwoje są razem, zdobyto 1 punkt misji.",
+        "ss110Reward": "{card} ({id}): dobrano 1 kartę i POWERUP 1 na {target}.",
+        "ss107Ambush": "{card} ({id}): postać zagrana z ręki uruchamia swoje efekty AMBUSH.",
+        "ss109Reinforcement": "{card} ({id}): wierzchnia karta talii pojawia się zakryta w misji {mission}."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3665,7 +3674,12 @@
         "ss040PlaySummons": "Zagraj postacie Przywołania. Na każdej misji z sojuszniczą Tayuyą kosztują o 1 mniej za każdą sojuszniczą postać Czwórki Dźwięku.",
         "ss038Attach": "Wybierz odkrytą wrogą postać na tej misji. Ukon dołącza do niej, a ta postać traci 5 Mocy, lecz Ukon przestaje być postacią.",
         "ss015PayOrDefeat": "Zapłacić 1 czakrę, aby zatrzymać Akamaru w grze? W przeciwnym razie zostaje pokonany.",
-        "ss057DefeatBeforePower": "Wybierz wrogą postać, którą Shinigami zabiera przed obliczeniem Mocy."
+        "ss057DefeatBeforePower": "Wybierz wrogą postać, którą Shinigami zabiera przed obliczeniem Mocy.",
+        "ss090StealTokens": "Zabrać do 3 znaczników Mocy wrogiej postaci w tej misji i położyć je na tej postaci?",
+        "ss088DiscardOthers": "Odrzucić cały pozostały ekwipunek tej postaci?",
+        "ss084RemoveTokens": "Usunąć wszystkie znaczniki Mocy z tej postaci?",
+        "ss086HideAndMove": "Zakryć tę postać i przenieść ją do innej misji?",
+        "ss095TakeJutsu": "Wybierz postać Jutsu, którą odkryjesz i weźmiesz do ręki."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

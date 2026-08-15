@@ -838,7 +838,16 @@
         "ss038Attached": "{card} ({id}): attached to {target}, which loses 5 Power.",
         "gato075": "{card} ({id}): 1 Chakra gained and POWERUP 1 on {target}, a Rogue Ninja played in this mission.",
         "enma132Search": "{card} ({id}): Adamantine Nyoi found in the deck and played for {cost} Chakra.",
-        "ss015Paid": "{card} ({id}): 1 Chakra paid to keep it in play."
+        "ss015Paid": "{card} ({id}): 1 Chakra paid to keep it in play.",
+        "ss090Stolen": "{card} ({id}): took {amount} Power token(s) from {target}.",
+        "ss088Discarded": "{card} ({id}): discarded {target}.",
+        "ss084Removed": "{card} ({id}): removed every Power token from {target}.",
+        "ss086Moved": "{card} ({id}): the character is hidden and moved to mission {mission}.",
+        "ss095Taken": "{card} ({id}): revealed {target} and added it to hand.",
+        "ssScrollPair": "{card} ({id}): both scrolls are here, 1 Mission point gained.",
+        "ss110Reward": "{card} ({id}): 1 card drawn and POWERUP 1 on {target}.",
+        "ss107Ambush": "{card} ({id}): the character played from hand activates its AMBUSH effects.",
+        "ss109Reinforcement": "{card} ({id}): the top card of the deck arrives face down in mission {mission}."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -1563,7 +1572,12 @@
         "ss040PlaySummons": "Play Summon characters. In each mission holding a friendly Tayuya, they cost 1 less per friendly Sound Four character there.",
         "ss038Attach": "Choose a non-hidden enemy character in this mission. Ukon attaches to it and it loses 5 Power, but Ukon stops being a character.",
         "ss015PayOrDefeat": "Pay 1 Chakra to keep Akamaru in play? Otherwise he is defeated.",
-        "ss057DefeatBeforePower": "Choose the enemy character the Shinigami takes before Power is determined."
+        "ss057DefeatBeforePower": "Choose the enemy character the Shinigami takes before Power is determined.",
+        "ss090StealTokens": "Take up to 3 Power tokens from an enemy character in this mission and put them on this character?",
+        "ss088DiscardOthers": "Discard every other attachment on this character?",
+        "ss084RemoveTokens": "Remove all Power tokens from this character?",
+        "ss086HideAndMove": "Hide this character and move it to another mission?",
+        "ss095TakeJutsu": "Choose the Jutsu character to reveal and add to your hand."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",

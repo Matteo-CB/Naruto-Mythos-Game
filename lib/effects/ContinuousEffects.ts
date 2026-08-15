@@ -6,7 +6,7 @@ import { isSummonPlay, jiraiyaGoldSources, JIRAIYA_GOLD_ID, JIRAIYA_GOLD_NAME } 
 import { characterHasGroup } from './groupUtils';
 import { kabuto139Triggers, KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
 import { ss2StaticPowerModifier, ss2StaticChakraBonus } from './handlers/SS/staticAuras';
-import { attachmentPowerBonus, missionAttachmentPowerModifier, hostChakraBonus, cannotReceivePowerTokens } from './handlers/SS/attachmentStatics';
+import { attachmentPowerBonus, missionAttachmentPowerModifier, hostChakraBonus, cannotReceivePowerTokens, textIsBlanked } from './handlers/SS/attachmentStatics';
 
 
 
@@ -99,6 +99,8 @@ export function calculateContinuousChakraBonus(
       if (hasNarutoOrTeam8) bonus += 1;
     }
   }
+
+  if (textIsBlanked(char)) return hostChakraBonus(char);
 
   bonus += ss2StaticChakraBonus(state, player, missionIndex, char);
   bonus += hostChakraBonus(char);
@@ -307,6 +309,7 @@ export function calculateContinuousPowerModifier(
   const allMissionChars = [...friendlyChars, ...enemyChars];
   for (const otherChar of allMissionChars) {
     if (otherChar.isHidden) continue;
+    if (textIsBlanked(otherChar)) continue;
     if (otherChar.instanceId === char.instanceId) continue; // Skip self for "other" effects
 
     const topCard = otherChar.stack?.length > 0 ? otherChar.stack[otherChar.stack?.length - 1] : otherChar.card;
@@ -436,6 +439,8 @@ export function calculateContinuousPowerModifier(
   
   
   
+  if (textIsBlanked(char)) return attachmentPower + missionAttachmentPowerModifier(state, char, player, missionIndex);
+
   modifier += ss2StaticPowerModifier(state, char, player, missionIndex);
   modifier += missionAttachmentPowerModifier(state, char, player, missionIndex);
   modifier += honorableDuelBonus(mission, player, char);

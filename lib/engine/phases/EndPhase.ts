@@ -5,6 +5,7 @@ import { EffectEngine } from '../../effects/EffectEngine';
 import { calculateEffectiveCost } from '../rules/ChakraValidation';
 import { attachCardToCharacter, getCharacterAttachTargets } from '../../effects/attachments';
 import { shuffle } from '../utils/shuffle';
+import { putTopCardAsHidden } from '../../effects/handlers/SS/attachmentReinforcements';
 
 
 
@@ -380,6 +381,21 @@ export function enma132EndOfRound(state: GameState): GameState {
   return newState;
 }
 
+export const REINFORCEMENTS_109_ID = 'SS-109-UC';
+export const REINFORCEMENTS_109_NAME = 'RENFORTS PLANIFIES';
+
+export function plannedReinforcementsEndOfRound(state: GameState): GameState {
+  let newState = state;
+  for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
+    const mission = newState.activeMissions[mIdx];
+    for (const att of mission.attachments ?? []) {
+      if (att.card.id !== REINFORCEMENTS_109_ID) continue;
+      newState = putTopCardAsHidden(newState, att.owner, mIdx, REINFORCEMENTS_109_NAME, REINFORCEMENTS_109_ID);
+    }
+  }
+  return newState;
+}
+
 export function executeEndPhase(state: GameState): GameState {
   let newState = { ...state };
 
@@ -388,6 +404,8 @@ export function executeEndPhase(state: GameState): GameState {
 
   newState = enma132EndOfRound(newState);
   if (newState.pendingActions.length > 0) return newState;
+
+  newState = plannedReinforcementsEndOfRound(newState);
 
   newState = resetChakraPools(newState);
 

@@ -24,6 +24,8 @@ import { registerKin044Handlers } from './kin044';
 import { registerSSMissionHandlers } from './missions/ssMissionHandlers';
 import { registerSoundMoveHandlers } from './soundMoves';
 import { registerSnakeSword101Handlers } from './snakeSword101';
+import { registerAttachmentHandlers, registerScrollHandlers } from './attachmentHandlers';
+import { registerReinforcementsHandlers } from './attachmentReinforcements';
 import { registerKabuto030Handlers } from './kabuto030';
 import { registerDosu045Handlers } from './dosu045';
 import { registerSakon037Handlers } from './sakon037';
@@ -62,6 +64,9 @@ export function registerAllSSHandlers(): void {
   registerSSMissionHandlers();
   registerSoundMoveHandlers();
   registerSnakeSword101Handlers();
+  registerAttachmentHandlers();
+  registerScrollHandlers();
+  registerReinforcementsHandlers();
   registerKabuto030Handlers();
   registerDosu045Handlers();
   registerSakon037Handlers();

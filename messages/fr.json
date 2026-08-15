@@ -844,7 +844,16 @@
         "ss038Attached": "{card} ({id}) : s’attache à {target}, qui perd 5 Puissance.",
         "gato075": "{card} ({id}) : 1 Chakra gagné et POWERUP 1 sur {target}, un Ninja Déserteur arrivé dans cette mission.",
         "enma132Search": "{card} ({id}) : Nyoi Adamantin trouvé dans le deck et joué pour {cost} Chakra.",
-        "ss015Paid": "{card} ({id}) : 1 Chakra payé pour le garder en jeu."
+        "ss015Paid": "{card} ({id}) : 1 Chakra payé pour le garder en jeu.",
+        "ss090Stolen": "{card} ({id}) : {amount} jeton(s) de Puissance pris à {target}.",
+        "ss088Discarded": "{card} ({id}) : {target} défaussé.",
+        "ss084Removed": "{card} ({id}) : tous les jetons de Puissance de {target} retirés.",
+        "ss086Moved": "{card} ({id}) : personnage caché et déplacé vers la mission {mission}.",
+        "ss095Taken": "{card} ({id}) : {target} révélé et ajouté à la main.",
+        "ssScrollPair": "{card} ({id}) : les deux parchemins sont réunis, 1 point de mission gagné.",
+        "ss110Reward": "{card} ({id}) : 1 carte piochée et POWERUP 1 sur {target}.",
+        "ss107Ambush": "{card} ({id}) : le personnage joué depuis la main active ses effets AMBUSH.",
+        "ss109Reinforcement": "{card} ({id}) : la carte du dessus du deck arrive face cachée dans la mission {mission}."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1569,7 +1578,12 @@
         "ss040PlaySummons": "Jouez des personnages Invocation. Dans chaque mission abritant une Tayuya alliée, ils coûtent 1 de moins par personnage Quatre du Son allié présent.",
         "ss038Attach": "Choisissez un personnage ennemi non caché de cette mission. Ukon s’y attache et ce personnage perd 5 Puissance, mais Ukon cesse d’être un personnage.",
         "ss015PayOrDefeat": "Payer 1 Chakra pour garder Akamaru en jeu ? Sinon il est vaincu.",
-        "ss057DefeatBeforePower": "Choisissez le personnage ennemi que le Shinigami emporte avant le calcul des puissances."
+        "ss057DefeatBeforePower": "Choisissez le personnage ennemi que le Shinigami emporte avant le calcul des puissances.",
+        "ss090StealTokens": "Prendre jusqu'à 3 jetons de Puissance d'un personnage ennemi de cette mission et les poser sur ce personnage ?",
+        "ss088DiscardOthers": "Défausser tous les autres équipements de ce personnage ?",
+        "ss084RemoveTokens": "Retirer tous les jetons de Puissance de ce personnage ?",
+        "ss086HideAndMove": "Cacher ce personnage et le déplacer vers une autre mission ?",
+        "ss095TakeJutsu": "Choisissez le personnage Jutsu à révéler et à ajouter à votre main."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",

@@ -2,11 +2,16 @@ import { describe, it, expect } from 'vitest';
 import { calculateCharacterPower } from '@/lib/engine/phases/PowerCalculation';
 import { calculateContinuousChakraBonus, amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
 import { applyStartOfRoundTriggers } from '@/lib/engine/rules/startOfRoundTriggers';
-import { parseAttachSpec, getCharacterAttachTargets } from '@/lib/effects/attachments';
+import { parseAttachSpec, getCharacterAttachTargets, attachCardToCharacter } from '@/lib/effects/attachments';
+import { plannedReinforcementsEndOfRound } from '@/lib/engine/phases/EndPhase';
+import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
+import { registerAllSetHandlers } from '@/lib/effects/handlers';
 import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import { getCardById } from '@/lib/data/cardIndex';
 import { getAllCards } from '@/lib/data/cardLoader';
 import type { AttachedCard, CardData, CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
+
+registerAllSetHandlers();
 
 function equipe(char: CharacterInPlay, cardIds: string[], owner: PlayerID = 'player1'): CharacterInPlay {
   const attachments: AttachedCard[] = cardIds.map((id, i) => ({
@@ -188,5 +193,145 @@ describe('phase 2, les equipements de mission qui changent le score', () => {
     const mission = avec.activeMissions[0];
     const attendu = (mission.basePoints ?? 0) + (mission.rankBonus ?? 0) + 1;
     expect(attendu, 'le calcul de points inclut la carte posée').toBeGreaterThan((mission.basePoints ?? 0) + (mission.rankBonus ?? 0));
+  });
+});
+
+describe('phase 2, les effets instantanes des equipements', () => {
+  it('la Peau de Requin propose les ennemis charges en jetons', () => {
+    const hote = simChar('SS-054-UC', { owner: 'player1' });
+    const charge = simChar('SS-010-C', { owner: 'player2', powerTokens: 3 });
+    const vide = simChar('SS-009-C', { owner: 'player2' });
+    const s = buildSimState({ p1: [hote], p2: [charge, vide], missions: 1 });
+
+    const apres = attachCardToCharacter(s, 'player1', getCardById('SS-090-UC') as CardData, hote.instanceId);
+    const attente = apres.pendingEffects.find((p) => p.targetSelectionType === 'SS090_CONFIRM_MAIN');
+    expect(attente, 'la confirmation est proposee').toBeTruthy();
+    const relais = JSON.parse(attente!.effectDescription) as { targets?: string[] };
+    expect(relais.targets, 'seul l ennemi charge est proposable').toEqual([charge.instanceId]);
+  });
+
+  it('les Aiguilles ne declenchent leur AMBUSH qu a la revelation', () => {
+    const cible = simChar('SS-010-C', { owner: 'player2', powerTokens: 2 });
+    const s = buildSimState({ p1: [], p2: [cible], missions: 1 });
+
+    const pose = attachCardToCharacter(s, 'player1', getCardById('SS-084-C') as CardData, cible.instanceId, false);
+    expect(pose.pendingEffects.some((p) => p.targetSelectionType === 'SS084_CONFIRM_AMBUSH'), 'posee normalement, rien').toBe(false);
+
+    const revelee = attachCardToCharacter(s, 'player1', getCardById('SS-084-C') as CardData, cible.instanceId, true);
+    expect(revelee.pendingEffects.some((p) => p.targetSelectionType === 'SS084_CONFIRM_AMBUSH'), 'revelee, l embuscade s ouvre').toBe(true);
+  });
+
+  it('le Paradis du Batifolage ne se propose que s il y a autre chose a defausser', () => {
+    const nu = simChar('SS-010-C', { owner: 'player1' });
+    const charge = equipe(simChar('SS-009-C', { owner: 'player1' }), ['SS-080-C'], 'player2');
+    const s = buildSimState({ p1: [nu, charge], p2: [], missions: 1 });
+
+    const surNu = attachCardToCharacter(s, 'player1', getCardById('SS-088-UC') as CardData, nu.instanceId);
+    expect(surNu.pendingEffects.some((p) => p.targetSelectionType === 'SS088_CONFIRM_MAIN')).toBe(false);
+    expect(surNu.log.some((l) => l.messageKey === 'game.log.effect.noTarget'), 'le refus est journalise').toBe(true);
+
+    const surCharge = attachCardToCharacter(s, 'player1', getCardById('SS-088-UC') as CardData, charge.instanceId);
+    expect(surCharge.pendingEffects.some((p) => p.targetSelectionType === 'SS088_CONFIRM_MAIN')).toBe(true);
+  });
+
+  it('le Parchemin du Sceau ne se propose que si un Jutsu est sur le dessus du deck', () => {
+    const hote = simChar('SS-010-C', { owner: 'player1' });
+    const sansJutsu = buildSimState({ p1: [hote], p2: [], missions: 1 });
+    const avecJutsu: GameState = {
+      ...sansJutsu,
+      player1: { ...sansJutsu.player1, deck: [getCardById('SS-057-UC') as never] },
+    };
+
+    const rate = attachCardToCharacter(sansJutsu, 'player1', getCardById('SS-095-UC') as CardData, hote.instanceId);
+    expect(rate.pendingEffects.some((p) => p.targetSelectionType === 'SS095_CONFIRM_MAIN')).toBe(false);
+
+    const reussi = attachCardToCharacter(avecJutsu, 'player1', getCardById('SS-095-UC') as CardData, hote.instanceId);
+    expect(reussi.pendingEffects.some((p) => p.targetSelectionType === 'SS095_CONFIRM_MAIN')).toBe(true);
+  });
+
+  it('le Village des Artisans paie a la pose d une Arme, pas d un Parchemin', () => {
+    const hote = simChar('SS-010-C', { owner: 'player1' });
+    const base = buildSimState({ p1: [hote], p2: [], missions: 1 });
+    const avecVillage = avecEquipementMission(base, 'SS-110-UC');
+    const avecDeck: GameState = {
+      ...avecVillage,
+      player1: { ...avecVillage.player1, deck: [getCardById('SS-009-C') as never, getCardById('SS-011-C') as never] },
+    };
+
+    const arme = attachCardToCharacter(avecDeck, 'player1', getCardById('SS-080-C') as CardData, hote.instanceId);
+    expect(arme.player1.hand.length - avecDeck.player1.hand.length, 'une carte piochee').toBe(1);
+    expect(arme.activeMissions[0].player1Characters[0].powerTokens, 'et un jeton').toBe(1);
+
+    const parchemin = attachCardToCharacter(avecDeck, 'player1', getCardById('SS-096-UC') as CardData, hote.instanceId);
+    expect(parchemin.player1.hand.length, 'un parchemin ne paie rien').toBe(avecDeck.player1.hand.length);
+  });
+
+  it('les Renforts Planifies posent la carte du dessus face cachee', () => {
+    const base = buildSimState({ p1: [], p2: [], missions: 1 });
+    const avecDeck: GameState = {
+      ...base,
+      player1: { ...base.player1, deck: [getCardById('SS-009-C') as never, getCardById('SS-011-C') as never] },
+    };
+    const apres = plannedReinforcementsEndOfRound(avecEquipementMission(avecDeck, 'SS-109-UC'));
+
+    const caches = apres.activeMissions[0].player1Characters.filter((c) => c.isHidden);
+    expect(caches.length, 'un renfort face cachee').toBe(1);
+    expect(apres.player1.deck.length, 'le deck perd sa carte du dessus').toBe(1);
+  });
+
+  it('la Bombe Eclair efface le texte de son porteur', () => {
+    const parlant = simChar('SS-062-C', { owner: 'player1' });
+    const camarade = simChar('SS-063-C', { owner: 'player1' });
+    const sans = buildSimState({ p1: [parlant, camarade], p2: [], missions: 1 });
+    const avec = buildSimState({ p1: [equipe(parlant, ['SS-083-UC'], 'player2'), camarade], p2: [], missions: 1 });
+
+    const imprime = getCardById('SS-062-C') as CardData;
+    expect(puissance(sans, sans.activeMissions[0].player1Characters[0]), 'son aura compte le camarade').toBe((imprime.power ?? 0) + 1);
+    expect(puissance(avec, avec.activeMissions[0].player1Characters[0]), 'texte efface, plus aucune aura').toBe(imprime.power);
+  });
+
+  it('le Laboratoire ajoute un Sound Four virtuel aux comptages', () => {
+    const jirobo = simChar('SS-032-C', { owner: 'player1' });
+    const base = buildSimState({ p1: [jirobo], p2: [], missions: 1 });
+    const avecLabo = avecEquipementMission(base, 'SS-105-UC');
+    const tayuya = getCardById('SS-039-C') as CardData;
+
+    expect(
+      calculateEffectiveCost(base, 'player1', tayuya as never, 0, false)
+      - calculateEffectiveCost(avecLabo, 'player1', tayuya as never, 0, false),
+      'le laboratoire vaut un allie Sound Four de plus',
+    ).toBe(1);
+  });
+});
+
+describe('phase 2, chaque texte des equipements existe dans les sept langues', () => {
+  const CLES = [
+    'game.effect.desc.ss090StealTokens',
+    'game.effect.desc.ss088DiscardOthers',
+    'game.effect.desc.ss084RemoveTokens',
+    'game.effect.desc.ss086HideAndMove',
+    'game.effect.desc.ss095TakeJutsu',
+    'game.log.effect.ss090Stolen',
+    'game.log.effect.ss088Discarded',
+    'game.log.effect.ss084Removed',
+    'game.log.effect.ss086Moved',
+    'game.log.effect.ss095Taken',
+    'game.log.effect.ssScrollPair',
+    'game.log.effect.ss110Reward',
+    'game.log.effect.ss107Ambush',
+    'game.log.effect.ss109Reinforcement',
+  ];
+
+  it('aucune cle manquante', async () => {
+    const manquantes: string[] = [];
+    for (const langue of ['en', 'fr', 'es', 'ja', 'pt', 'it', 'pl']) {
+      const messages = (await import(`@/messages/${langue}.json`)).default as Record<string, unknown>;
+      for (const cle of CLES) {
+        let noeud: unknown = messages;
+        for (const partie of cle.split('.')) noeud = (noeud as Record<string, unknown> | undefined)?.[partie];
+        if (typeof noeud !== 'string' || noeud.trim() === '') manquantes.push(`${langue}:${cle}`);
+      }
+    }
+    expect(manquantes).toEqual([]);
   });
 });

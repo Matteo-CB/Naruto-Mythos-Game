@@ -359,9 +359,9 @@ function handlePlayAttachment(
   };
 
   if (attachTo === 'mission') {
-    newState = attachCardToMission(newState, player, card, missionIndex);
+    newState = attachCardToMission(newState, player, card, missionIndex, false);
   } else if (targets.length === 1) {
-    newState = attachCardToCharacter(newState, player, card, targets[0].instanceId);
+    newState = attachCardToCharacter(newState, player, card, targets[0].instanceId, false);
   } else {
     const effId = generateAttachId();
     const actId = generateAttachId();
@@ -438,9 +438,9 @@ function handleRevealAttachment(
   };
 
   if (attachTo === 'mission') {
-    newState = attachCardToMission(newState, player, card, missionIndex);
+    newState = attachCardToMission(newState, player, card, missionIndex, true);
   } else if (targets.length === 1) {
-    newState = attachCardToCharacter(newState, player, card, targets[0].instanceId);
+    newState = attachCardToCharacter(newState, player, card, targets[0].instanceId, true);
   } else {
     const effId = generateAttachId();
     const actId = generateAttachId();
