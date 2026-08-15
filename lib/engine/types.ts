@@ -187,6 +187,7 @@ export interface GameState {
   endPhaseEnma132Ids?: string[];
   endPhaseChakraReset?: boolean;
   missionPhaseShinigamiIds?: string[];
+  peekedHiddenIds?: { player1: string[]; player2: string[] };
   
   endPhaseGiantSpider103Ids?: string[];
   

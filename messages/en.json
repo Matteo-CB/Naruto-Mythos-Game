@@ -849,7 +849,9 @@
         "ss107Ambush": "{card} ({id}): the character played from hand activates its AMBUSH effects.",
         "ss109Reinforcement": "{card} ({id}): the top card of the deck arrives face down in mission {mission}.",
         "ss083Blank": "{card} ({id}): this character has no effect text left, nothing resolves.",
-        "ssDeckSearchTaken": "{card} ({id}): revealed {target} and added it to hand."
+        "ssDeckSearchTaken": "{card} ({id}): revealed {target} and added it to hand.",
+        "ssPeeked": "{card} ({id}): looked at a hidden character.",
+        "ss028Bottom": "{card} ({id}): the top card of the opponent deck goes to the bottom."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -1581,7 +1583,10 @@
         "ss086HideAndMove": "Hide this character and move it to another mission?",
         "ss095TakeJutsu": "Choose the Jutsu character to reveal and add to your hand.",
         "ss090ChooseAmount": "How many Power tokens do you take, up to 3?",
-        "ssDeckSearchTake": "Choose the card to reveal and add to your hand."
+        "ssDeckSearchTake": "Choose the card to reveal and add to your hand.",
+        "ssPeekHidden": "Choose the hidden character to look at.",
+        "ssPeekHiddenPowerup": "Choose the enemy hidden character to look at, its chakra cost becomes Power tokens.",
+        "ss028BottomOrKeep": "Put the top card of the opponent deck at the bottom of their deck?"
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",

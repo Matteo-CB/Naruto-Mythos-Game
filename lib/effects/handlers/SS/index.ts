@@ -27,6 +27,7 @@ import { registerSnakeSword101Handlers } from './snakeSword101';
 import { registerAttachmentHandlers, registerScrollHandlers } from './attachmentHandlers';
 import { registerReinforcementsHandlers } from './attachmentReinforcements';
 import { registerDeckSearchHandlers } from './deckSearch';
+import { registerHiddenPeekHandlers } from './hiddenPeek';
 import { registerKabuto030Handlers } from './kabuto030';
 import { registerDosu045Handlers } from './dosu045';
 import { registerSakon037Handlers } from './sakon037';
@@ -69,6 +70,7 @@ export function registerAllSSHandlers(): void {
   registerScrollHandlers();
   registerReinforcementsHandlers();
   registerDeckSearchHandlers();
+  registerHiddenPeekHandlers();
   registerKabuto030Handlers();
   registerDosu045Handlers();
   registerSakon037Handlers();

@@ -2951,7 +2951,9 @@
         "ss107Ambush": "{card} ({id}): il personaggio giocato dalla mano attiva i suoi effetti AMBUSH.",
         "ss109Reinforcement": "{card} ({id}): la carta in cima al mazzo arriva coperta nella missione {mission}.",
         "ss083Blank": "{card} ({id}): questo personaggio non ha più testo, non si attiva nulla.",
-        "ssDeckSearchTaken": "{card} ({id}): {target} rivelato e aggiunto alla mano."
+        "ssDeckSearchTaken": "{card} ({id}): {target} rivelato e aggiunto alla mano.",
+        "ssPeeked": "{card} ({id}): un personaggio nascosto è stato guardato.",
+        "ss028Bottom": "{card} ({id}): la carta in cima al mazzo avversario passa in fondo."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3683,7 +3685,10 @@
         "ss086HideAndMove": "Nascondere questo personaggio e spostarlo in un'altra missione?",
         "ss095TakeJutsu": "Scegli il personaggio Jutsu da rivelare e aggiungere alla tua mano.",
         "ss090ChooseAmount": "Quanti segnalini Potenza prendi, fino a 3?",
-        "ssDeckSearchTake": "Scegli la carta da rivelare e aggiungere alla tua mano."
+        "ssDeckSearchTake": "Scegli la carta da rivelare e aggiungere alla tua mano.",
+        "ssPeekHidden": "Scegli il personaggio nascosto da guardare.",
+        "ssPeekHiddenPowerup": "Scegli il personaggio nascosto nemico da guardare, il suo costo in chakra diventa segnalini Potenza.",
+        "ss028BottomOrKeep": "Mettere la carta in cima al mazzo avversario in fondo al suo mazzo?"
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

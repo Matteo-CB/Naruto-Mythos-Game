@@ -67,6 +67,7 @@ import { isCharacterCopyable, isCopyableEffect } from './handlers/KS/shared/copy
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 import { hasFlexibleUpgradeRestriction, isRestrictedUpgradeTarget } from '@/lib/engine/rules/flexibleUpgradeRestriction';
 import { forestOfDeathActive, textIsBlanked } from './handlers/SS/attachmentStatics';
+import { rememberPeek } from './handlers/SS/hiddenPeek';
 
 
 function findUpgradeTargetIdx(
@@ -6440,6 +6441,8 @@ export class EffectEngine {
       case 'SS137MV_CONFIRM_UPGRADE':
       case 'SS124_CONFIRM_DUEL':
       case 'SS124_CONFIRM_UPGRADE':
+      case 'SS_PEEK_CONFIRM':
+      case 'SS028_CONFIRM_MAIN':
       case 'SS_DECK_SEARCH_CONFIRM':
       case 'SS090_CONFIRM_MAIN':
       case 'SS088_CONFIRM_MAIN':
@@ -12923,6 +12926,50 @@ export class EffectEngine {
           'EFFECT_POWERUP', `Shark Skin (090): took ${pris} Power token(s) from ${nom090.name_fr}.`,
           'game.log.effect.ss090Stolen',
           { card: 'PEAU DE REQUIN', id: 'SS-090-UC', amount: String(pris), target: nom090.name_fr, target_en: nom090.name_en || nom090.name_fr });
+        break;
+      }
+
+      case 'SS_PEEK_HIDDEN': {
+        let mp = {};
+        try { mp = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const infos = mp as { sourceName?: string; sourceId?: string; powerup?: boolean; hostInstanceId?: string };
+        const vu = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!vu) break;
+        newState = rememberPeek(newState, pendingEffect.sourcePlayer, targetId);
+        const carteVue = vu.character.stack?.length > 0 ? vu.character.stack[vu.character.stack.length - 1] : vu.character.card;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT', 'Peek at a hidden character.',
+          'game.log.effect.ssPeeked', { card: infos.sourceName ?? '', id: infos.sourceId ?? '' });
+
+        if (infos.powerup && infos.hostInstanceId) {
+          const gain = carteVue.chakra ?? 0;
+          const hote = infos.hostInstanceId;
+          if (gain > 0) {
+            newState.activeMissions = newState.activeMissions.map((m) => ({
+              ...m,
+              player1Characters: m.player1Characters.map((c) => c.instanceId === hote
+                ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, gain) } : c),
+              player2Characters: m.player2Characters.map((c) => c.instanceId === hote
+                ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, gain) } : c),
+            }));
+            newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_POWERUP', 'POWERUP from the revealed cost.',
+              'game.log.effect.powerup',
+              { card: infos.sourceName ?? '', id: infos.sourceId ?? '', amount: String(gain), target: infos.sourceName ?? '' });
+          }
+        }
+        break;
+      }
+
+      case 'SS028_BOTTOM_OR_KEEP': {
+        const adv028 = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const deck028 = [...newState[adv028].deck];
+        if (deck028.length === 0) break;
+        const sommet028 = deck028.shift()!;
+        newState[adv028] = { ...newState[adv028], deck: [...deck028, sommet028] };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT', 'The top card of the opponent deck goes to the bottom.',
+          'game.log.effect.ss028Bottom', { card: 'IBIKI MORINO', id: 'SS-028-UC' });
         break;
       }
 

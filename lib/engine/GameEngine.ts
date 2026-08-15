@@ -1843,7 +1843,7 @@ export class GameEngine {
         chars.map((c) => {
           const isOwn = c.controlledBy === player;
           
-          const canSee = isOwn || !c.isHidden || c.wasRevealedAtLeastOnce || ninjaInfoCardsWatching(mission, player);
+          const canSee = isOwn || !c.isHidden || c.wasRevealedAtLeastOnce || ninjaInfoCardsWatching(mission, player) || (state.peekedHiddenIds?.[player] ?? []).includes(c.instanceId);
           let power = 0;
           try { power = calculateCharacterPower(state, c, side); } catch { /* prevent crash */ }
           const topCard = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;

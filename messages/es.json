@@ -854,7 +854,9 @@
         "ss107Ambush": "{card} ({id}): el personaje jugado desde la mano activa sus efectos AMBUSH.",
         "ss109Reinforcement": "{card} ({id}): la carta superior del mazo llega boca abajo a la misión {mission}.",
         "ss083Blank": "{card} ({id}): este personaje ya no tiene texto, no se activa nada.",
-        "ssDeckSearchTaken": "{card} ({id}): {target} revelado y añadido a la mano."
+        "ssDeckSearchTaken": "{card} ({id}): {target} revelado y añadido a la mano.",
+        "ssPeeked": "{card} ({id}): se ha mirado un personaje oculto.",
+        "ss028Bottom": "{card} ({id}): la carta superior del mazo enemigo pasa al fondo."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",
@@ -1586,7 +1588,10 @@
         "ss086HideAndMove": "¿Ocultar este personaje y moverlo a otra misión?",
         "ss095TakeJutsu": "Elige el personaje Jutsu que revelas y añades a tu mano.",
         "ss090ChooseAmount": "¿Cuántos marcadores de Potencia tomas, hasta 3?",
-        "ssDeckSearchTake": "Elige la carta que revelas y añades a tu mano."
+        "ssDeckSearchTake": "Elige la carta que revelas y añades a tu mano.",
+        "ssPeekHidden": "Elige el personaje oculto que miras.",
+        "ssPeekHiddenPowerup": "Elige el personaje oculto enemigo que miras, su coste en chakra se convierte en marcadores de Potencia.",
+        "ss028BottomOrKeep": "¿Poner la carta superior del mazo enemigo al fondo de su mazo?"
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

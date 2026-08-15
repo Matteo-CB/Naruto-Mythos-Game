@@ -2951,7 +2951,9 @@
         "ss107Ambush": "{card} ({id}): postać zagrana z ręki uruchamia swoje efekty AMBUSH.",
         "ss109Reinforcement": "{card} ({id}): wierzchnia karta talii pojawia się zakryta w misji {mission}.",
         "ss083Blank": "{card} ({id}): ta postać nie ma już tekstu, nic się nie uruchamia.",
-        "ssDeckSearchTaken": "{card} ({id}): odkryto {target} i dodano do ręki."
+        "ssDeckSearchTaken": "{card} ({id}): odkryto {target} i dodano do ręki.",
+        "ssPeeked": "{card} ({id}): obejrzano zakrytą postać.",
+        "ss028Bottom": "{card} ({id}): wierzchnia karta talii przeciwnika trafia na spód."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3683,7 +3685,10 @@
         "ss086HideAndMove": "Zakryć tę postać i przenieść ją do innej misji?",
         "ss095TakeJutsu": "Wybierz postać Jutsu, którą odkryjesz i weźmiesz do ręki.",
         "ss090ChooseAmount": "Ile znaczników Mocy zabierasz, maksymalnie 3?",
-        "ssDeckSearchTake": "Wybierz kartę, którą odkryjesz i weźmiesz do ręki."
+        "ssDeckSearchTake": "Wybierz kartę, którą odkryjesz i weźmiesz do ręki.",
+        "ssPeekHidden": "Wybierz zakrytą postać, którą chcesz zobaczyć.",
+        "ssPeekHiddenPowerup": "Wybierz zakrytą wrogą postać, jej koszt czakry zamienia się w znaczniki Mocy.",
+        "ss028BottomOrKeep": "Położyć wierzchnią kartę talii przeciwnika na spód jego talii?"
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

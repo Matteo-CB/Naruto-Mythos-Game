@@ -853,7 +853,9 @@
         "ss107Ambush": "{card}（{id}）：手札から出したキャラクターがアンブッシュ効果を発動します。",
         "ss109Reinforcement": "{card}（{id}）：デッキの一番上のカードがミッション{mission}に裏向きで登場しました。",
         "ss083Blank": "{card}（{id}）：このキャラクターの効果テキストは失われており、何も発動しません。",
-        "ssDeckSearchTaken": "{card}（{id}）：{target}を公開し手札に加えました。"
+        "ssDeckSearchTaken": "{card}（{id}）：{target}を公開し手札に加えました。",
+        "ssPeeked": "{card}（{id}）：裏向きのキャラクターを確認しました。",
+        "ss028Bottom": "{card}（{id}）：相手のデッキの一番上のカードを一番下に置きました。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1585,7 +1587,10 @@
         "ss086HideAndMove": "このキャラクターを裏向きにして別のミッションへ移動しますか。",
         "ss095TakeJutsu": "公開して手札に加える術キャラクターを選んでください。",
         "ss090ChooseAmount": "パワートークンを何個奪いますか（最大3個）。",
-        "ssDeckSearchTake": "公開して手札に加えるカードを選んでください。"
+        "ssDeckSearchTake": "公開して手札に加えるカードを選んでください。",
+        "ssPeekHidden": "確認する裏向きのキャラクターを選んでください。",
+        "ssPeekHiddenPowerup": "確認する敵の裏向きキャラクターを選んでください。そのチャクラコスト分のパワートークンを得ます。",
+        "ss028BottomOrKeep": "相手のデッキの一番上のカードを、デッキの一番下に置きますか。"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",
