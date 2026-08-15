@@ -56,7 +56,13 @@ describe('Choji Akimichi 009, defausser une Nourriture pour du Chakra et une pio
 
     expect(indicesDeNourriture(s, 'player1'), 'seul le Ramen est une Nourriture').toEqual([0]);
 
-    const fin = jusquAuBout(EffectEngine.resolvePlayEffects(s, 'player1', choji, 0, false));
+    const joue = EffectEngine.resolvePlayEffects(s, 'player1', choji, 0, false);
+    const confirmation = joue.pendingEffects[joue.pendingEffects.length - 1];
+    const apresConfirmation = EffectEngine.applyTargetedEffect(joue, confirmation, [confirmation.validTargets![0]]);
+    const question = apresConfirmation.pendingActions[apresConfirmation.pendingActions.length - 1];
+    expect(question.type, 'la defausse ouvre la main du joueur').toBe('DISCARD_CARD');
+
+    const fin = jusquAuBout(joue);
 
     expect(fin.player1.discardPile.some((c) => c.id === 'SS-081-C'), 'le Ramen est defausse').toBe(true);
     expect(fin.player1.chakra, 'un Chakra de plus').toBe(6);
@@ -101,6 +107,10 @@ describe('Ebisu 023, regarder son sommet de pioche et choisir', () => {
     expect(joue.pendingEffects.length, 'la question est posee').toBeGreaterThan(0);
     expect(joue.pendingEffects[joue.pendingEffects.length - 1].isOptional, 'elle est refusable').toBe(true);
     expect(joue.player1.deck[0].id, 'tant qu_on ne repond pas, rien ne bouge').toBe('KS-009-C');
+
+    const question = joue.pendingActions[joue.pendingActions.length - 1];
+    expect(question.type, 'la carte regardee s_affiche dans une liste').toBe('CHOOSE_CARD_FROM_LIST');
+    expect(question.options, 'la carte du dessus est l_unique option').toEqual(['DECK_0']);
   });
 
   it('une pioche vide se contente d_un refus', () => {
