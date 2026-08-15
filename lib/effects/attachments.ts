@@ -83,16 +83,65 @@ export function isAttachmentCard(card: Pick<CardData, 'card_type'> | null | unde
   return card?.card_type === 'attachment';
 }
 
-function requiredAttachGroup(card?: CardData | null): string | null {
-  for (const effect of card?.effects ?? []) {
-    if (effect.type !== 'ATTACH') continue;
-    const m = (effect.description ?? '').match(/Attach to a friendly\s+(.+?)\s+character/i);
-    if (m) {
-      const g = m[1].trim().replace(/^non-hidden\s+/i, '').trim();
-      if (g && g.toLowerCase() !== 'non-hidden') return g;
-    }
+export interface AttachSpec {
+  side: 'friendly' | 'enemy' | 'any';
+  hidden: 'hidden' | 'nonHidden' | 'any';
+  requires: string[];
+  excludes: string[];
+  toMission: boolean;
+}
+
+const SPEC_VIDE: AttachSpec = { side: 'friendly', hidden: 'any', requires: [], excludes: [], toMission: false };
+
+export function parseAttachSpec(card?: CardData | null): AttachSpec {
+  const texte = attachTexts(card)[0] ?? '';
+  if (!texte) return { ...SPEC_VIDE, toMission: (card?.attach_to ?? 'character') === 'mission' };
+  if (/attach to a mission/i.test(texte)) return { ...SPEC_VIDE, toMission: true };
+
+  const corps = texte.match(/attach to an?\s+(.+?)\s+character/i)?.[1] ?? '';
+  const spec: AttachSpec = { side: 'any', hidden: 'any', requires: [], excludes: [], toMission: false };
+
+  let reste = corps.trim();
+
+  if (/\benemy\b/i.test(reste)) spec.side = 'enemy';
+  else if (/\bfriendly\b/i.test(reste)) spec.side = 'friendly';
+  reste = reste.replace(/\b(friendly|enemy)\b/gi, ' ');
+
+  if (/\bnon-hidden\b/i.test(reste)) spec.hidden = 'nonHidden';
+  else if (/\bhidden\b/i.test(reste)) spec.hidden = 'hidden';
+  reste = reste.replace(/\bnon-hidden\b/gi, ' ').replace(/\bhidden\b/gi, ' ');
+
+  for (const brut of reste.split(/,| or /i)) {
+    const token = brut.trim().replace(/\s+/g, ' ');
+    if (!token) continue;
+    const negatif = token.match(/^non-(.+)$/i);
+    if (negatif) { spec.excludes.push(negatif[1].trim()); continue; }
+    spec.requires.push(token);
   }
-  return null;
+
+  return spec;
+}
+
+function hostMatchesToken(char: CharacterInPlay, token: string): boolean {
+  if (characterHasGroup(char, token)) return true;
+  const top = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  if ((top.keywords ?? []).includes(token)) return true;
+  const wanted = token.toUpperCase();
+  return `${top.name_fr ?? ''} ${top.name_en ?? ''}`.toUpperCase().includes(wanted);
+}
+
+export function hostMatchesAttachSpec(char: CharacterInPlay, spec: AttachSpec): boolean {
+  if (spec.hidden === 'hidden' && !char.isHidden) return false;
+  if (spec.hidden === 'nonHidden' && char.isHidden) return false;
+  if (char.isHidden) return spec.requires.length === 0 && spec.excludes.length === 0;
+  if (spec.requires.length > 0 && !spec.requires.some((t) => hostMatchesToken(char, t))) return false;
+  if (spec.excludes.some((t) => hostMatchesToken(char, t))) return false;
+  return true;
+}
+
+function requiredAttachGroup(card?: CardData | null): string | null {
+  const spec = parseAttachSpec(card);
+  return spec.requires[0] ?? null;
 }
 
 export function attachesToEnemy(card?: CardData | null): boolean {
@@ -123,24 +172,25 @@ export function getCharacterAttachTargets(
 ): CharacterInPlay[] {
   const mission = state.activeMissions[missionIndex];
   if (!mission) return [];
-  const wantsEnemy = attachesToEnemy(attachmentCard);
-  const hostOwner: PlayerID = wantsEnemy
-    ? (player === 'player1' ? 'player2' : 'player1')
-    : player;
-  const side = hostOwner === 'player1' ? 'player1Characters' : 'player2Characters';
-  const needGroup = requiredAttachGroup(attachmentCard);
-  const wantsHiddenHost = requiresHiddenHost(attachmentCard);
-  const wantsNonHiddenHost = requiresNonHiddenHost(attachmentCard) || !!needGroup;
-  const hostMatchesVisibility = (c: CharacterInPlay): boolean => {
-    if (wantsHiddenHost) return c.isHidden;
-    if (wantsNonHiddenHost) return !c.isHidden;
-    return true;
-  };
-  return mission[side].filter(
-    (c) => hostMatchesVisibility(c) && c.controlledBy === hostOwner
-      && (c.card as CardData).card_type !== 'attachment'
-      && (!needGroup || characterHasGroup(c, needGroup)),
-  );
+  const spec = parseAttachSpec(attachmentCard);
+  if (spec.toMission) return [];
+
+  const adversaire: PlayerID = player === 'player1' ? 'player2' : 'player1';
+  const camps: PlayerID[] = spec.side === 'friendly'
+    ? [player]
+    : spec.side === 'enemy' ? [adversaire] : [player, adversaire];
+
+  const cibles: CharacterInPlay[] = [];
+  for (const proprietaire of camps) {
+    const side = proprietaire === 'player1' ? 'player1Characters' : 'player2Characters';
+    for (const c of mission[side]) {
+      if (c.controlledBy !== proprietaire) continue;
+      if ((c.card as CardData).card_type === 'attachment') continue;
+      if (!hostMatchesAttachSpec(c, spec)) continue;
+      cibles.push(c);
+    }
+  }
+  return cibles;
 }
 
 export function discardAttachments(state: GameState, attachments: AttachedCard[]): GameState {

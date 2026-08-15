@@ -6,6 +6,7 @@ import { isSummonPlay, jiraiyaGoldSources, JIRAIYA_GOLD_ID, JIRAIYA_GOLD_NAME } 
 import { characterHasGroup } from './groupUtils';
 import { kabuto139Triggers, KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
 import { ss2StaticPowerModifier, ss2StaticChakraBonus } from './handlers/SS/staticAuras';
+import { attachmentPowerBonus, missionAttachmentPowerModifier, hostChakraBonus, cannotReceivePowerTokens } from './handlers/SS/attachmentStatics';
 
 
 
@@ -100,6 +101,7 @@ export function calculateContinuousChakraBonus(
   }
 
   bonus += ss2StaticChakraBonus(state, player, missionIndex, char);
+  bonus += hostChakraBonus(char);
 
   return bonus;
 }
@@ -164,7 +166,12 @@ function countMissionsWithKeyword(state: GameState, player: PlayerID, keyword: s
 
 
 
-export function attachedPowerOf(char: CharacterInPlay): number {
+export function attachedPowerOf(
+  char: CharacterInPlay,
+  state?: GameState,
+  owner?: PlayerID,
+  missionIndex?: number,
+): number {
   if (char.isHidden || !char.attachments || char.attachments.length === 0) return 0;
   const hostTop = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
   const doublesFood = hostTop.id?.startsWith('SS-128')
@@ -174,6 +181,9 @@ export function attachedPowerOf(char: CharacterInPlay): number {
     if (att.card.id === 'SS-038-UC') { total += -5; continue; }
     let p = att.card.power ?? 0;
     if (p !== 0 && doublesFood && (att.card.keywords ?? []).includes('Food')) p *= 2;
+    if (state && owner && missionIndex !== undefined) {
+      p += attachmentPowerBonus(state, char, owner, missionIndex, att);
+    }
     total += p;
   }
   return total;
@@ -186,7 +196,7 @@ export function calculateContinuousPowerModifier(
   char: CharacterInPlay,
 ): number {
 
-  const attachmentPower = attachedPowerOf(char);
+  const attachmentPower = attachedPowerOf(char, state, player, missionIndex);
 
   let auraZaku041 = 0;
   if (!char.isHidden) {
@@ -427,6 +437,7 @@ export function calculateContinuousPowerModifier(
   
   
   modifier += ss2StaticPowerModifier(state, char, player, missionIndex);
+  modifier += missionAttachmentPowerModifier(state, char, player, missionIndex);
   modifier += honorableDuelBonus(mission, player, char);
   modifier += kingOfTheHillBonus(state, mission, char, attachedPowerOf);
 
@@ -1142,7 +1153,9 @@ export function amplifiedPowerup(state: GameState, targetInstanceId: string, amo
   for (let missionIndex = 0; missionIndex < state.activeMissions.length; missionIndex++) {
     const mission = state.activeMissions[missionIndex];
     for (const player of ['player1', 'player2'] as PlayerID[]) {
-      if (!mission[sideOfPlayer(player)].some((c) => c.instanceId === targetInstanceId)) continue;
+      const cible = mission[sideOfPlayer(player)].find((c) => c.instanceId === targetInstanceId);
+      if (!cible) continue;
+      if (cannotReceivePowerTokens(cible)) return 0;
       return amount + powerupAmplifierBonus(state, missionIndex, player, targetInstanceId);
     }
   }

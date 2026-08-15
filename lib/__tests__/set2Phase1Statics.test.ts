@@ -122,7 +122,7 @@ describe('phase 1, effets sur les équipements et les déclenchements', () => {
 
   it('Might Guy 116 renforce la Team Guy équipée au début de la manche', () => {
     const guy = simChar('SS-116-R', { owner: 'player1' });
-    const lee = avecEquipement(simChar('SS-115-R', { owner: 'player1' }), 'SS-087-UC');
+    const lee = avecEquipement(simChar('SS-115-R', { owner: 'player1' }), 'SS-080-C');
     const sansEquipement = simChar('SS-112-R', { owner: 'player1' });
     const s = buildSimState({ p1: [guy, lee, sansEquipement], p2: [], missions: 1 });
 
@@ -288,7 +288,7 @@ describe('phase 1, la source doit cesser d agir quand elle disparait', () => {
 
   it('Might Guy 116 ne renforce personne quand il est cache', () => {
     const guy = simChar('SS-116-R', { owner: 'player1' });
-    const lee = avecEquipement(simChar('SS-115-R', { owner: 'player1' }), 'SS-087-UC');
+    const lee = avecEquipement(simChar('SS-115-R', { owner: 'player1' }), 'SS-080-C');
     const cacheState = buildSimState({ p1: [{ ...guy, isHidden: true, wasRevealedAtLeastOnce: false }, lee], p2: [], missions: 1 });
 
     const apres = applyStartOfRoundTriggers(cacheState);

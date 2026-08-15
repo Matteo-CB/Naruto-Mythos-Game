@@ -5,6 +5,7 @@ import { teamTrainingBonus, missionCarries, SS_MISSION_HIGH_PRIORITY } from '../
 import { generateInstanceId } from '../utils/id';
 import { EffectEngine } from '../../effects/EffectEngine';
 import { isMovementBlockedByKurenai, applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
+import { missionPointBonus } from '../../effects/handlers/SS/attachmentStatics';
 
 const RANK_ORDER = ['D', 'C', 'B', 'A'] as const;
 
@@ -251,7 +252,7 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
   if (winner && winner !== 'draw') {
     const basePts = Number.isFinite(mission.basePoints) ? mission.basePoints : 1;
     const rankPts = Number.isFinite(mission.rankBonus) ? mission.rankBonus : 0;
-    const points = basePts + rankPts;
+    const points = basePts + rankPts + missionPointBonus(mission);
     const ps = { ...newState[winner] };
     const prior = Number.isFinite(ps.missionPoints) ? ps.missionPoints : 0;
     ps.missionPoints = prior + points;

@@ -1,5 +1,7 @@
 import type { GameState, PlayerID, CharacterInPlay } from '../types';
 import { logAction } from '../utils/gameLog';
+import { weightsPowerupTargets } from '../../effects/handlers/SS/attachmentStatics';
+import { amplifiedPowerup } from '../../effects/ContinuousEffects';
 
 export const SAKURA_007_ID = 'SS-007-C';
 export const SAKURA_007_NAME = 'SAKURA HARUNO';
@@ -166,13 +168,53 @@ function applyMightGuy116(state: GameState, player: PlayerID): GameState {
   return newState;
 }
 
+export const WEIGHTS_087_ID = 'SS-087-UC';
+export const WEIGHTS_087_NAME = 'POIDS';
+export const WEIGHTS_087_POWERUP = 5;
+
+function applyWeights087(state: GameState, player: PlayerID): GameState {
+  let newState = state;
+  const cibles = weightsPowerupTargets(newState, player);
+  if (cibles.length === 0) return newState;
+
+  const cibleIds = new Set(cibles.map((c) => c.instanceId));
+  const missions = newState.activeMissions.map((m) => ({
+    ...m,
+    player1Characters: m.player1Characters.map((c) =>
+      cibleIds.has(c.instanceId) ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, WEIGHTS_087_POWERUP) } : c),
+    player2Characters: m.player2Characters.map((c) =>
+      cibleIds.has(c.instanceId) ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, WEIGHTS_087_POWERUP) } : c),
+  }));
+  newState = { ...newState, activeMissions: missions };
+
+  for (const cible of cibles) {
+    const nom = topCardOf(cible).name_fr;
+    newState = {
+      ...newState,
+      log: logAction(newState.log, newState.turn, 'start', player, 'EFFECT_POWERUP',
+        `Weights (087): POWERUP ${WEIGHTS_087_POWERUP} on ${nom} at the start of the round.`,
+        'game.log.effect.powerup',
+        {
+          card: WEIGHTS_087_NAME,
+          id: WEIGHTS_087_ID,
+          amount: String(WEIGHTS_087_POWERUP),
+          target: nom,
+          target_en: topCardOf(cible).name_en || nom,
+        }),
+    };
+  }
+  return newState;
+}
+
 export function applyStartOfRoundTriggers(state: GameState): GameState {
   const premier: PlayerID = state.edgeHolder === 'player2' ? 'player2' : 'player1';
   const second: PlayerID = premier === 'player1' ? 'player2' : 'player1';
 
   let newState = applyForPlayer(state, premier);
   newState = applyMightGuy116(newState, premier);
+  newState = applyWeights087(newState, premier);
   newState = applyForPlayer(newState, second);
   newState = applyMightGuy116(newState, second);
+  newState = applyWeights087(newState, second);
   return newState;
 }
