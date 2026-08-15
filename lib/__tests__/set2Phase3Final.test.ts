@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
+import { actionTypeForSelectionType } from '@/lib/effects/selectionActionType';
 import { registerAllSetHandlers } from '@/lib/effects/handlers';
 import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import { getCardById } from '@/lib/data/cardIndex';
@@ -326,13 +327,13 @@ describe('le moteur marque les personnages joues sous leur cout imprime', () => 
 
 describe('les selections de liste du set 2 ouvrent la bonne fenetre', () => {
   it('chaque type de liste sort du selecteur de plateau', () => {
-    expect(EffectEngine.actionTypeForSelectionType('SS_DECK_SEARCH_TAKE')).toBe('CHOOSE_CARD_FROM_LIST');
-    expect(EffectEngine.actionTypeForSelectionType('SS095_TAKE_JUTSU')).toBe('CHOOSE_CARD_FROM_LIST');
-    expect(EffectEngine.actionTypeForSelectionType('SS023_TOP_OR_BOTTOM')).toBe('CHOOSE_CARD_FROM_LIST');
-    expect(EffectEngine.actionTypeForSelectionType('SS028_BOTTOM_OR_KEEP')).toBe('CHOOSE_CARD_FROM_LIST');
-    expect(EffectEngine.actionTypeForSelectionType('SS065_MOVE_ATTACHMENT')).toBe('CHOOSE_CARD_FROM_LIST');
-    expect(EffectEngine.actionTypeForSelectionType('SS009_DISCARD_FOOD')).toBe('DISCARD_CARD');
-    expect(EffectEngine.actionTypeForSelectionType('SS025_MOVE_HIDDEN')).toBe('SELECT_TARGET');
+    expect(actionTypeForSelectionType('SS_DECK_SEARCH_TAKE')).toBe('CHOOSE_CARD_FROM_LIST');
+    expect(actionTypeForSelectionType('SS095_TAKE_JUTSU')).toBe('CHOOSE_CARD_FROM_LIST');
+    expect(actionTypeForSelectionType('SS023_TOP_OR_BOTTOM')).toBe('CHOOSE_CARD_FROM_LIST');
+    expect(actionTypeForSelectionType('SS028_BOTTOM_OR_KEEP')).toBe('CHOOSE_CARD_FROM_LIST');
+    expect(actionTypeForSelectionType('SS065_MOVE_ATTACHMENT')).toBe('CHOOSE_CARD_FROM_LIST');
+    expect(actionTypeForSelectionType('SS009_DISCARD_FOOD')).toBe('DISCARD_CARD');
+    expect(actionTypeForSelectionType('SS025_MOVE_HIDDEN')).toBe('SELECT_TARGET');
   });
 
   it('la confirmation relaie le bon type de fenetre a la question suivante', () => {

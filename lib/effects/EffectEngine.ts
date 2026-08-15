@@ -36,6 +36,7 @@ import {
   JIRAIYA_GOLD_REDUCTION, JIRAIYA_GOLD_POWERUP, SUMMON_KEYWORD,
   tsunadeGoldShuffleableCount, tsunadeGoldShuffleTopOfDiscard, friendlySummonIds,
 } from './handlers/SS/goldCards';
+import { actionTypeForSelectionType } from './selectionActionType';
 import { attachCardToCharacter, attachCardToMission, discardAttachmentsOnLeave, discardAttachments, getCharacterAttachTargets, missionAlreadyHasPlayerAttachment, parseAttachSpec } from './attachments';
 import { destinationsPour } from './handlers/SS/hiddenMove';
 import { equipementsDeplacablesVers, apercuEquipements } from './handlers/SS/seimei065';
@@ -1222,65 +1223,6 @@ export class EffectEngine {
     return newState;
   }
 
-  static actionTypeForSelectionType(tst: string): PendingAction['type'] {
-      let actionType: PendingAction['type'] = 'SELECT_TARGET';
-      if (tst === 'PUT_CARD_ON_DECK') {
-        actionType = 'PUT_CARD_ON_DECK';
-      } else if (
-        tst === 'DISCARD_CARD' ||
-        tst === 'KIMIMARO_CHOOSE_DISCARD' ||
-        tst === 'KIMIMARO123_CHOOSE_DISCARD' ||
-        tst === 'CHOJI_CHOOSE_DISCARD' ||
-        tst === 'MSS03_OPPONENT_DISCARD' ||
-        tst === 'SAKURA_012_DISCARD' ||
-        tst === 'SASUKE_014_DISCARD_OWN' ||
-        tst === 'SASUKE_014_DISCARD_OPPONENT' ||
-        tst === 'ASUMA_024_DISCARD_FOR_POWERUP' ||
-        tst === 'KIMIMARO056_CHOOSE_DISCARD' ||
-        tst === 'NARUTO141_CHOOSE_DISCARD' ||
-        tst === 'SASUKE142_CHOOSE_DISCARD' ||
-        tst === 'KIN073_CHOOSE_DISCARD' ||
-        tst === 'KABUTO053_CHOOSE_DISCARD' ||
-        tst === 'SS114_CHOOSE_DISCARD' ||
-        tst === 'SS139_DISCARD' ||
-        tst === 'SS009_DISCARD_FOOD' ||
-      tst === 'SS138_DISCARD_FOR_POWER'
-      ) {
-        actionType = 'DISCARD_CARD';
-      } else if (
-        tst === 'CHOOSE_CARD_FROM_LIST' ||
-        tst === 'MSS08_CHOOSE_CARD' ||
-        tst === 'JIRAIYA_CHOOSE_SUMMON' ||
-        tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
-        tst === 'JIRAIYA105_CHOOSE_SUMMON' ||
-        tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
-        tst === 'SAKURA109_CHOOSE_DISCARD' ||
-        tst === 'SAKURA135_CHOOSE_CARD' ||
-        tst === 'TAYUYA125_CHOOSE_SOUND' ||
-        tst === 'PLAY_LESS_CATEGORY' ||
-        tst === 'SS000_CHOOSE_HOUNDS' ||
-        tst === 'SS045_PLACE_FROM_HAND' ||
-        tst === 'SS037_REVEAL_SOUND_FOUR' ||
-        tst === 'RECOVER_FROM_DISCARD' ||
-        tst === 'HIRUZEN002_CHOOSE_CARD' ||
-        tst === 'ITACHI091_CHOOSE_DISCARD' ||
-        tst === 'TSUNADE104_CHOOSE_CHAKRA' ||
-        tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' ||
-        tst === 'CHOOSE_TOKEN_AMOUNT_STEAL' ||
-        tst === 'SS_DECK_SEARCH_TAKE' ||
-        tst === 'SS095_TAKE_JUTSU' ||
-        tst === 'SS023_TOP_OR_BOTTOM' ||
-      tst === 'SS028_BOTTOM_OR_KEEP' ||
-      tst === 'SS065_MOVE_ATTACHMENT' ||
-      tst === 'SS022_PLAY_ATTACHMENT' ||
-      tst === 'SS140_PLAY_HIDDEN'
-      ) {
-        actionType = 'CHOOSE_CARD_FROM_LIST';
-      } else if (tst === 'COPY_EFFECT_CHOSEN') {
-        actionType = 'CHOOSE_EFFECT';
-      }
-      return actionType;
-  }
 
   static payerEtPoserEquipement(
     state: GameState,
@@ -1351,6 +1293,10 @@ export class EffectEngine {
       'EFFECT', `Iruka Umino (140): played a hidden Naruto Uzumaki on mission ${missionIndex + 1} for ${cout} chakra.`,
       'game.log.effect.ss140PlayedHidden',
       { card: 'IRUKA UMINO', id: IRUKA_140, mission: missionIndex + 1, cost: String(cout) });
+    emitEngineQuestEvent(next, player, 'character.played.by.effect', {
+      sourceName: 'IRUKA UMINO',
+      targetName: (carte.name_fr ?? '').toUpperCase(),
+    });
     return next;
   }
 
@@ -1431,7 +1377,7 @@ export class EffectEngine {
 
     
     const tst = result.targetSelectionType ?? '';
-    const actionType: PendingAction['type'] = EffectEngine.actionTypeForSelectionType(tst);
+    const actionType: PendingAction['type'] = actionTypeForSelectionType(tst);
 
     
     let actionDescription = result.description ?? '';
@@ -6588,7 +6534,7 @@ export class EffectEngine {
         pendingEffect.remainingEffectTypes = undefined;
         newState.pendingActions = [...newState.pendingActions, {
           id: relayActId,
-          type: EffectEngine.actionTypeForSelectionType(relay.nextType),
+          type: actionTypeForSelectionType(relay.nextType),
           player: pendingEffect.sourcePlayer,
           description: relay.nextText ?? '',
           descriptionKey: relay.nextKey,

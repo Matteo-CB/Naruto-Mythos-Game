@@ -7,6 +7,7 @@ import { characterHasGroup } from '@/lib/effects/groupUtils';
 import { isFirstCardPlayedThisRound, withFirstStrikeStatus } from '@/lib/engine/rules/firstStrike';
 import { artisanVillageCount, cannotReceiveOtherAttachments } from '@/lib/effects/handlers/SS/attachmentStatics';
 import { estSeimei } from './handlers/SS/seimei065';
+import { actionTypeForSelectionType } from './selectionActionType';
 import { bonusArmeSurTenten, TENTEN_022 } from './handlers/SS/tenten022';
 import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
 
@@ -203,6 +204,71 @@ function resolveAttachmentFirstStrike(
 
 export function ignoreLesConditionsDePose(char: CharacterInPlay | null | undefined): boolean {
   return estSeimei(char);
+}
+
+function resolveAttachmentMain(
+  state: GameState,
+  player: PlayerID,
+  card: CardData,
+  host: CharacterInPlay | null,
+  missionIndex: number,
+): GameState {
+  const hasInstantMain = (card.effects ?? []).some((e) => e.type === 'MAIN' && !e.description.includes('[⧗]'));
+  if (!hasInstantMain) return state;
+  const handler = getEffectHandler(card.id, 'MAIN');
+  if (!handler) return state;
+
+  let newState = state;
+  try {
+    const result = handler({
+      state: newState,
+      sourcePlayer: player,
+      sourceCard: host ?? ({ instanceId: '', card } as unknown as CharacterInPlay),
+      sourceMissionIndex: missionIndex,
+      triggerType: 'MAIN',
+      isUpgrade: false,
+    } as EffectContext);
+    newState = result.state;
+
+    if (result.requiresTargetSelection && result.targetSelectionType && result.validTargets && result.validTargets.length > 0) {
+      const effId = generateInstanceId();
+      const actId = generateInstanceId();
+      newState = {
+        ...newState,
+        pendingEffects: [...newState.pendingEffects, {
+          id: effId,
+          sourceCardId: card.id,
+          sourceInstanceId: host?.instanceId ?? '',
+          sourceMissionIndex: missionIndex,
+          effectType: 'MAIN',
+          effectDescription: result.description ?? '',
+          targetSelectionType: result.targetSelectionType,
+          sourcePlayer: player,
+          requiresTargetSelection: true,
+          validTargets: result.validTargets,
+          isOptional: result.isOptional ?? false,
+          isMandatory: !(result.isOptional ?? false),
+          resolved: false,
+          isUpgrade: false,
+        }],
+        pendingActions: [...newState.pendingActions, {
+          id: actId,
+          type: actionTypeForSelectionType(result.targetSelectionType),
+          player,
+          description: result.description ?? '',
+          descriptionKey: result.descriptionKey,
+          descriptionParams: result.descriptionParams,
+          options: result.validTargets,
+          minSelections: result.minSelections ?? 1,
+          maxSelections: result.maxSelections ?? 1,
+          sourceEffectId: effId,
+        }],
+      };
+    }
+  } catch (err) {
+    console.error(`[attachments] MAIN handler error for ${card.id}:`, err);
+  }
+  return newState;
 }
 
 export function isAttachmentCard(card: Pick<CardData, 'card_type'> | null | undefined): boolean {
@@ -481,6 +547,7 @@ export function attachCardToMission(state: GameState, player: PlayerID, card: Ca
       ),
     };
   }
+  newState = resolveAttachmentMain(newState, player, card, null, missionIndex);
   newState = resolveAttachmentTrigger(newState, player, card, null, missionIndex, 'AMBUSH', revealed);
   return resolveAttachmentFirstStrike(newState, player, card, null, missionIndex);
 }
@@ -541,60 +608,7 @@ export function attachCardToCharacter(state: GameState, player: PlayerID, card: 
       { card: 'TENTEN', id: TENTEN_022, amount: String(bonusArme) });
   }
 
-  const handler = getEffectHandler(card.id, 'MAIN');
-  const hasInstantMain = (card.effects ?? []).some((e) => e.type === 'MAIN' && !e.description.includes('[⧗]'));
-  if (handler && hasInstantMain) {
-    try {
-      const ctx: EffectContext = {
-        state: newState,
-        sourcePlayer: player,
-        sourceCard: host,
-        sourceMissionIndex: hostMissionIndex,
-        triggerType: 'MAIN',
-        isUpgrade: false,
-      };
-      const result = handler(ctx);
-      newState = result.state;
-
-      if (result.requiresTargetSelection && result.targetSelectionType && result.validTargets && result.validTargets.length > 0) {
-        const effId = generateInstanceId();
-        const actId = generateInstanceId();
-        newState = {
-          ...newState,
-          pendingEffects: [...newState.pendingEffects, {
-            id: effId,
-            sourceCardId: card.id,
-            sourceInstanceId: host.instanceId,
-            sourceMissionIndex: hostMissionIndex,
-            effectType: 'MAIN',
-            effectDescription: result.description ?? '',
-            targetSelectionType: result.targetSelectionType,
-            sourcePlayer: player,
-            requiresTargetSelection: true,
-            validTargets: result.validTargets,
-            isOptional: result.isOptional ?? false,
-            isMandatory: !(result.isOptional ?? false),
-            resolved: false,
-            isUpgrade: false,
-          }],
-          pendingActions: [...newState.pendingActions, {
-            id: actId,
-            type: 'SELECT_TARGET',
-            player,
-            description: result.description ?? '',
-            descriptionKey: result.descriptionKey,
-            descriptionParams: result.descriptionParams,
-            options: result.validTargets,
-            minSelections: 1,
-            maxSelections: 1,
-            sourceEffectId: effId,
-          }],
-        };
-      }
-    } catch (err) {
-      console.error(`[attachments] MAIN handler error for ${card.id}:`, err);
-    }
-  }
+  newState = resolveAttachmentMain(newState, player, card, host, hostMissionIndex);
 
   newState = artisanVillageReward(newState, player, card, host, hostMissionIndex);
   newState = resolveAttachmentTrigger(newState, player, card, host, hostMissionIndex, 'AMBUSH', revealed);
