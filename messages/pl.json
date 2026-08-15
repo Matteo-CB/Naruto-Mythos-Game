@@ -2937,7 +2937,10 @@
         "ss118HideSameName": "{card} zakrywa {target}, który nosi odkrytą nazwę.",
         "ss148DuelPowerup": "{card} zyskuje POWERUP {amount}.",
         "ss150PowerupByCost": "{card} zyskuje POWERUP {amount}, koszt najsilniejszego wroga.",
-        "ss038Attached": "{card} ({id}): dołącza do {target}, która traci 5 Mocy."
+        "ss038Attached": "{card} ({id}): dołącza do {target}, która traci 5 Mocy.",
+        "gato075": "{card} ({id}): zdobyto 1 czakrę i POWERUP 1 na {target}, zbiegły ninja zagrany w tej misji.",
+        "enma132Search": "{card} ({id}): Adamantynowe Nyoi znalezione w talii i zagrane za {cost} czakry.",
+        "ss015Paid": "{card} ({id}): zapłacono 1 czakrę, aby zostawić go w grze."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3660,7 +3663,9 @@
         "ss077PickTarget": "Wybierz odkrytą wrogą postać do pokonania, w ramach pozostałego kosztu.",
         "ss125DefeatMoved": "Wybierz wrogą postać, którą przeciwnik przeniósł w tej rundzie, aby ją pokonać.",
         "ss040PlaySummons": "Zagraj postacie Przywołania. Na każdej misji z sojuszniczą Tayuyą kosztują o 1 mniej za każdą sojuszniczą postać Czwórki Dźwięku.",
-        "ss038Attach": "Wybierz odkrytą wrogą postać na tej misji. Ukon dołącza do niej, a ta postać traci 5 Mocy, lecz Ukon przestaje być postacią."
+        "ss038Attach": "Wybierz odkrytą wrogą postać na tej misji. Ukon dołącza do niej, a ta postać traci 5 Mocy, lecz Ukon przestaje być postacią.",
+        "ss015PayOrDefeat": "Zapłacić 1 czakrę, aby zatrzymać Akamaru w grze? W przeciwnym razie zostaje pokonany.",
+        "ss057DefeatBeforePower": "Wybierz wrogą postać, którą Shinigami zabiera przed obliczeniem Mocy."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

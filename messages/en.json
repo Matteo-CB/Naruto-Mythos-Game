@@ -835,7 +835,10 @@
         "ss118HideSameName": "{card} hid {target}, who shares the revealed name.",
         "ss148DuelPowerup": "{card} gains POWERUP {amount}.",
         "ss150PowerupByCost": "{card} gains POWERUP {amount}, the cost of the strongest enemy.",
-        "ss038Attached": "{card} ({id}): attached to {target}, which loses 5 Power."
+        "ss038Attached": "{card} ({id}): attached to {target}, which loses 5 Power.",
+        "gato075": "{card} ({id}): 1 Chakra gained and POWERUP 1 on {target}, a Rogue Ninja played in this mission.",
+        "enma132Search": "{card} ({id}): Adamantine Nyoi found in the deck and played for {cost} Chakra.",
+        "ss015Paid": "{card} ({id}): 1 Chakra paid to keep it in play."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -1558,7 +1561,9 @@
         "ss077PickTarget": "Choose a non-hidden enemy character to defeat, within the remaining cost budget.",
         "ss125DefeatMoved": "Choose an enemy character the opponent moved this round to defeat.",
         "ss040PlaySummons": "Play Summon characters. In each mission holding a friendly Tayuya, they cost 1 less per friendly Sound Four character there.",
-        "ss038Attach": "Choose a non-hidden enemy character in this mission. Ukon attaches to it and it loses 5 Power, but Ukon stops being a character."
+        "ss038Attach": "Choose a non-hidden enemy character in this mission. Ukon attaches to it and it loses 5 Power, but Ukon stops being a character.",
+        "ss015PayOrDefeat": "Pay 1 Chakra to keep Akamaru in play? Otherwise he is defeated.",
+        "ss057DefeatBeforePower": "Choose the enemy character the Shinigami takes before Power is determined."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",

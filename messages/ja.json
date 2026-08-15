@@ -839,7 +839,10 @@
         "ss118HideSameName": "{card}が、公開した名前と同じ{target}を伏せた。",
         "ss148DuelPowerup": "{card}が POWERUP {amount} を得た。",
         "ss150PowerupByCost": "{card}が、最も強い敵のコスト分 POWERUP {amount} を得た。",
-        "ss038Attached": "{card}（{id}）：{target}に装備され、パワー5を失わせる。"
+        "ss038Attached": "{card}（{id}）：{target}に装備され、パワー5を失わせる。",
+        "gato075": "{card}（{id}）：このミッションに抜け忍が出たため、チャクラ1を獲得し、{target}にパワーアップ1。",
+        "enma132Search": "{card}（{id}）：デッキから金剛如意を見つけ、チャクラ{cost}で使用しました。",
+        "ss015Paid": "{card}（{id}）：チャクラ1を支払い、場に残しました。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1562,7 +1565,9 @@
         "ss077PickTarget": "残りのコスト内で、倒す伏せていない敵キャラクターを選ぶ。",
         "ss125DefeatMoved": "相手がこのラウンドに移動させた敵キャラクターを選んで倒す。",
         "ss040PlaySummons": "口寄せキャラクターを出す。味方の多由也がいる各ミッションでは、そこにいる味方の音の四人衆1体につきコストが1減る。",
-        "ss038Attach": "このミッションの伏せていない敵キャラクター1体を選ぶ。右近がそれに装備され、そのキャラクターはパワー5を失うが、右近はキャラクターではなくなる。"
+        "ss038Attach": "このミッションの伏せていない敵キャラクター1体を選ぶ。右近がそれに装備され、そのキャラクターはパワー5を失うが、右近はキャラクターではなくなる。",
+        "ss015PayOrDefeat": "チャクラ1を支払って赤丸を場に残しますか。支払わない場合、赤丸は倒されます。",
+        "ss057DefeatBeforePower": "パワー決定前に死神が連れて行く敵キャラクターを選んでください。"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",

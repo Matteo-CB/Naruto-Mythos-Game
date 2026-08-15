@@ -330,3 +330,29 @@ describe('phase 1, chaque statique annonce sa presence en arrivant', () => {
     expect(restantes, 'la phase 1 est entierement sortie de la file d attente').toEqual([]);
   });
 });
+
+describe('phase 1, chaque texte affiche au joueur existe dans les sept langues', () => {
+  const CLES = [
+    'game.log.effect.gato075',
+    'game.log.effect.enma132Search',
+    'game.log.effect.ss015Paid',
+    'game.effect.desc.ss015PayOrDefeat',
+    'game.effect.desc.ss057DefeatBeforePower',
+    'game.effect.desc.attachChooseTarget',
+  ];
+
+  it('aucune cle de la phase 1 ne manque, dans aucune langue', async () => {
+    const manquantes: string[] = [];
+    for (const langue of ['en', 'fr', 'es', 'ja', 'pt', 'it', 'pl']) {
+      const messages = (await import(`@/messages/${langue}.json`)).default as Record<string, unknown>;
+      for (const cle of CLES) {
+        let noeud: unknown = messages;
+        for (const partie of cle.split('.')) {
+          noeud = (noeud as Record<string, unknown> | undefined)?.[partie];
+        }
+        if (typeof noeud !== 'string' || noeud.trim() === '') manquantes.push(`${langue}:${cle}`);
+      }
+    }
+    expect(manquantes, 'un texte manquant laisse une popup vide devant le joueur').toEqual([]);
+  });
+});

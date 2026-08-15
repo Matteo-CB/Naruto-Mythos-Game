@@ -2937,7 +2937,10 @@
         "ss118HideSameName": "{card} ha nascosto {target}, che porta il nome rivelato.",
         "ss148DuelPowerup": "{card} ottiene POWERUP {amount}.",
         "ss150PowerupByCost": "{card} ottiene POWERUP {amount}, il costo del nemico più forte.",
-        "ss038Attached": "{card} ({id}): si attacca a {target}, che perde 5 Potenza."
+        "ss038Attached": "{card} ({id}): si attacca a {target}, che perde 5 Potenza.",
+        "gato075": "{card} ({id}): 1 Chakra guadagnato e POWERUP 1 su {target}, un Ninja Rinnegato giocato in questa missione.",
+        "enma132Search": "{card} ({id}): Nyoi Adamantino trovato nel mazzo e giocato per {cost} Chakra.",
+        "ss015Paid": "{card} ({id}): 1 Chakra pagato per tenerlo in gioco."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3660,7 +3663,9 @@
         "ss077PickTarget": "Scegli un personaggio nemico non nascosto da sconfiggere, entro il costo rimanente.",
         "ss125DefeatMoved": "Scegli un personaggio nemico che l’avversario ha spostato in questo round da sconfiggere.",
         "ss040PlaySummons": "Gioca personaggi Evocazione. In ogni missione con una Tayuya alleata, costano 1 in meno per ogni personaggio Quattro del Suono alleato presente.",
-        "ss038Attach": "Scegli un personaggio nemico non nascosto in questa missione. Ukon si attacca a lui e quel personaggio perde 5 Potenza, ma Ukon smette di essere un personaggio."
+        "ss038Attach": "Scegli un personaggio nemico non nascosto in questa missione. Ukon si attacca a lui e quel personaggio perde 5 Potenza, ma Ukon smette di essere un personaggio.",
+        "ss015PayOrDefeat": "Pagare 1 Chakra per tenere Akamaru in gioco? Altrimenti viene sconfitto.",
+        "ss057DefeatBeforePower": "Scegli il personaggio nemico che lo Shinigami porta via prima del calcolo della Potenza."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",
