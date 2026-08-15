@@ -974,7 +974,8 @@
     "continueToNextBooster": "Dotknij, aby otworzyć następny booster",
     "continueToFinish": "Dotknij, aby zakończyć otwieranie",
     "timeJustNow": "przed chwilą",
-    "timeMinutesAgo": "{minutes} min temu"
+    "timeMinutesAgo": "{minutes} min temu",
+    "temporarilyClosed": "Tryb zapieczetowany jest tymczasowo zamkniety, konczymy ostatnie poprawki. Wroci bardzo szybko."
   },
   "online": {
     "title": "Graj Online",
@@ -3834,7 +3835,8 @@
       "invalidAction": "Nieprawidłowa akcja.",
       "upgradeNameConflict": "Nie można ulepszyć: utworzyłoby to zduplikowanego {name} na tej misji.",
       "suspended": "Twoje konto jest zawieszone.",
-      "rankedBanned": "Tryb rankingowy jest dla ciebie na razie zamknięty."
+      "rankedBanned": "Tryb rankingowy jest dla ciebie na razie zamknięty.",
+      "sealedClosed": "Tryb zapieczętowany jest tymczasowo zamknięty."
     },
     "opponentDisconnected": "Przeciwnik rozłączony. Ma {time} na ponowne połączenie, w przeciwnym razie przegrywa walkowerem.",
     "opponentDisconnectedShort": "Przeciwnik rozłączony. Jego zegar szachowy nadal biegnie.",

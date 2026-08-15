@@ -1736,7 +1736,8 @@
       "invalidAction": "無効な操作です。",
       "upgradeNameConflict": "アップグレードできません：このミッションに {name} の重複が生じます。",
       "suspended": "アカウントが停止されています。",
-      "rankedBanned": "現在ランク戦は利用できません。"
+      "rankedBanned": "現在ランク戦は利用できません。",
+      "sealedClosed": "シールド戦は一時的に閉じています。"
     },
     "opponentDisconnected": "相手が切断しました。{time} 以内に再接続しないと敗北です。",
     "opponentDisconnectedShort": "相手が切断しました。持ち時間は動き続けます。",
@@ -2777,7 +2778,8 @@
     "continueToNextBooster": "タップして次のブースターを開ける",
     "continueToFinish": "タップして開封を終える",
     "timeJustNow": "たった今",
-    "timeMinutesAgo": "{minutes} 分前"
+    "timeMinutesAgo": "{minutes} 分前",
+    "temporarilyClosed": "シールド戦は最終調整のため一時的に閉じています。まもなく再開します。"
   },
   "tournament": {
     "launchMatch": "試合を開始",

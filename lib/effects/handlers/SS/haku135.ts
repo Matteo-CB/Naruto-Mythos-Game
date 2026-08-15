@@ -5,7 +5,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { sideFor } from '@/lib/effects/moveNameUniqueness';
 
 export const HAKU_135 = 'SS-135-R';
-export const HAKU_135_VARIANTS = [HAKU_135, 'SS-135-RA'];
+export const HAKU_135_VARIANTS = [HAKU_135];
 
 function topOf(char: CharacterInPlay) {
   return char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;

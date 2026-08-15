@@ -8,16 +8,23 @@ function isPreReleaseSet(setId: string): boolean {
   return status === 'coming_soon' || status === 'revealing';
 }
 
+const SETS_TEMPORAIREMENT_DEBLOQUES = new Set(['SS']);
+
+function estTemporairementDebloque(setId: string): boolean {
+  return SETS_TEMPORAIREMENT_DEBLOQUES.has(setId);
+}
+
 export function isForceUnlockedCard(cardId: string): boolean {
   if (FORCE_UNLOCKED_CARD_IDS.has(cardId)) return true;
   const parsed = parseCardId(cardId);
-  return parsed ? isPreReleaseSet(parsed.set) : false;
+  if (!parsed) return false;
+  return isPreReleaseSet(parsed.set) || estTemporairementDebloque(parsed.set);
 }
 
 export function getForceUnlockedCardIds(): Set<string> {
   const ids = new Set<string>(FORCE_UNLOCKED_CARD_IDS);
   for (const card of getAllCards()) {
-    if (isPreReleaseSet(card.set)) ids.add(card.id);
+    if (isPreReleaseSet(card.set) || estTemporairementDebloque(card.set)) ids.add(card.id);
   }
   return ids;
 }

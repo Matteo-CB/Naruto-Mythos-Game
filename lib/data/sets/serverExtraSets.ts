@@ -18,6 +18,7 @@ import {
   effectDescriptionsIt as akIt,
   effectDescriptionsPl as akPl,
 } from './AK';
+import { stripHiddenPrintings } from './hiddenPrintings';
 
 // Server-only bundle of the not-yet-released sets (revealing + coming soon). This module
 // is imported ONLY by server code (serverCards.ts) and by the authenticated runtime card
@@ -25,18 +26,18 @@ import {
 // shipped in the client bundle and the reveal server-lock would leak.
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ssCards = (ssCardData as any).cards ?? {};
+const ssCards = stripHiddenPrintings((ssCardData as any).cards ?? {});
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const akCards = (akCardData as any).cards ?? {};
 
 export const extraRawCards: Record<string, unknown> = { ...ssCards, ...akCards };
 
 export const extraEffectDescriptions: Record<string, Record<string, string[]>> = {
-  fr: { ...ssFr, ...akFr },
-  en: { ...ssEn, ...akEn },
-  es: { ...ssEs, ...akEs },
-  ja: { ...ssJa, ...akJa },
-  pt: { ...ssPt, ...akPt },
-  it: { ...ssIt, ...akIt },
-  pl: { ...ssPl, ...akPl },
+  fr: stripHiddenPrintings({ ...ssFr, ...akFr }),
+  en: stripHiddenPrintings({ ...ssEn, ...akEn }),
+  es: stripHiddenPrintings({ ...ssEs, ...akEs }),
+  ja: stripHiddenPrintings({ ...ssJa, ...akJa }),
+  pt: stripHiddenPrintings({ ...ssPt, ...akPt }),
+  it: stripHiddenPrintings({ ...ssIt, ...akIt }),
+  pl: stripHiddenPrintings({ ...ssPl, ...akPl }),
 };

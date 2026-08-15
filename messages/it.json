@@ -974,7 +974,8 @@
     "continueToNextBooster": "Tocca per aprire il prossimo booster",
     "continueToFinish": "Tocca per finire di aprire",
     "timeJustNow": "proprio ora",
-    "timeMinutesAgo": "{minutes} min fa"
+    "timeMinutesAgo": "{minutes} min fa",
+    "temporarilyClosed": "La modalita sigillata e temporaneamente chiusa mentre completiamo gli ultimi ritocchi. Torna prestissimo."
   },
   "online": {
     "title": "Gioca Online",
@@ -3834,7 +3835,8 @@
       "invalidAction": "Azione non valida.",
       "upgradeNameConflict": "Impossibile evolvere: creerebbe un {name} duplicato in questa missione.",
       "suspended": "Il tuo account è sospeso.",
-      "rankedBanned": "La modalità classificata è chiusa per te al momento."
+      "rankedBanned": "La modalità classificata è chiusa per te al momento.",
+      "sealedClosed": "La modalità sigillata è temporaneamente chiusa."
     },
     "opponentDisconnected": "Avversario disconnesso. Ha {time} per riconnettersi o perde la partita per rinuncia.",
     "opponentDisconnectedShort": "Avversario disconnesso. Il suo orologio di gioco continua a scorrere.",

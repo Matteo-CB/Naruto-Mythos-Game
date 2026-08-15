@@ -12,6 +12,7 @@ import { BoosterOpening } from '@/components/sealed/BoosterOpening';
 import { SealedPoolReview } from '@/components/sealed/SealedPoolReview';
 import { SealedDeckBuilder } from '@/components/sealed/SealedDeckBuilder';
 import { useGameStore } from '@/stores/gameStore';
+import { sealedOuvertPour } from '@/lib/sealed/sealedGate';
 import { useSocketStore } from '@/lib/socket/client';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { AIDifficulty } from '@/lib/ai/AIPlayer';
@@ -400,6 +401,25 @@ export default function SealedPage() {
             {mode === 'online' ? t('waitingOpponent') : tc('loading')}
           </motion.span>
         </motion.div>
+      </main>
+    );
+  }
+
+  if (!sealedOuvertPour(session?.user as { username?: string | null; email?: string | null } | null)) {
+    return (
+      <main id="main-content" className="flex min-h-screen relative flex-col bg-[var(--t-bg)]">
+        <CloudBackground />
+        <div className="flex-1 flex items-center justify-center px-4 py-8">
+          <div className="flex flex-col items-center gap-4 max-w-md w-full relative z-10 text-center">
+            <h1 className="text-2xl uppercase tracking-[0.2em]" style={{ color: 'var(--t-accent)' }}>
+              {tc('comingSoon')}
+            </h1>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--t-text-dim)' }}>
+              {t('temporarilyClosed')}
+            </p>
+          </div>
+        </div>
+        <Footer />
       </main>
     );
   }

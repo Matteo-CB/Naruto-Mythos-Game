@@ -18,6 +18,7 @@ import {
   effectDescriptionsIt as ssIt,
   effectDescriptionsPl as ssPl,
 } from './SS';
+import { stripHiddenPrintings } from './hiddenPrintings';
 
 
 // This module exposes released sets plus Shinobi Shiren, whose cards are all revealed.
@@ -28,16 +29,16 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ksCards = (ksCardData as any).cards ?? {};
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ssCards = (ssCardData as any).cards ?? {};
+const ssCards = stripHiddenPrintings((ssCardData as any).cards ?? {});
 export const allCardData = {
   cards: { ...ksCards, ...ssCards },
 };
 
 
-export const allEffectDescriptionsFr: Record<string, string[]> = { ...ksFr, ...ssFr };
-export const allEffectDescriptionsEn: Record<string, string[]> = { ...ksEn, ...ssEn };
-export const allEffectDescriptionsEs: Record<string, string[]> = { ...ksEs, ...ssEs };
-export const allEffectDescriptionsJa: Record<string, string[]> = { ...ksJa, ...ssJa };
-export const allEffectDescriptionsPt: Record<string, string[]> = { ...ksPt, ...ssPt };
-export const allEffectDescriptionsIt: Record<string, string[]> = { ...ksIt, ...ssIt };
-export const allEffectDescriptionsPl: Record<string, string[]> = { ...ksPl, ...ssPl };
+export const allEffectDescriptionsFr: Record<string, string[]> = stripHiddenPrintings({ ...ksFr, ...ssFr });
+export const allEffectDescriptionsEn: Record<string, string[]> = stripHiddenPrintings({ ...ksEn, ...ssEn });
+export const allEffectDescriptionsEs: Record<string, string[]> = stripHiddenPrintings({ ...ksEs, ...ssEs });
+export const allEffectDescriptionsJa: Record<string, string[]> = stripHiddenPrintings({ ...ksJa, ...ssJa });
+export const allEffectDescriptionsPt: Record<string, string[]> = stripHiddenPrintings({ ...ksPt, ...ssPt });
+export const allEffectDescriptionsIt: Record<string, string[]> = stripHiddenPrintings({ ...ksIt, ...ssIt });
+export const allEffectDescriptionsPl: Record<string, string[]> = stripHiddenPrintings({ ...ksPl, ...ssPl });

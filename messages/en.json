@@ -1732,7 +1732,8 @@
       "invalidAction": "Invalid action.",
       "upgradeNameConflict": "Cannot upgrade: would create duplicate {name} on this mission.",
       "suspended": "Your account is suspended.",
-      "rankedBanned": "Ranked mode is closed to you for now."
+      "rankedBanned": "Ranked mode is closed to you for now.",
+      "sealedClosed": "Sealed mode is temporarily closed."
     },
     "opponentDisconnected": "Opponent disconnected. They have {time} to reconnect or the game is forfeit.",
     "opponentDisconnectedShort": "Opponent disconnected. Their chess clock continues to run.",
@@ -2773,7 +2774,8 @@
     "continueToNextBooster": "Tap to open the next booster",
     "continueToFinish": "Tap to finish opening",
     "timeJustNow": "just now",
-    "timeMinutesAgo": "{minutes} min ago"
+    "timeMinutesAgo": "{minutes} min ago",
+    "temporarilyClosed": "Sealed mode is temporarily closed while we finish the last adjustments. It will be back very soon."
   },
   "tournament": {
     "launchMatch": "Launch the match",

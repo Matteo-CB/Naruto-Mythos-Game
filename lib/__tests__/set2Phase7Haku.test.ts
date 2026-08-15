@@ -119,7 +119,7 @@ describe('phase 7, porte de sortie du set 2', () => {
 
   it('Haku 135 et sa version illustree ont handler, simulation et textes', async () => {
     const { getCardEffectDescriptions } = await import('@/lib/data/effectDescriptions');
-    for (const id of ['SS-135-R', 'SS-135-RA']) {
+    for (const id of ['SS-135-R']) {
       for (const effet of (getCardById(id) as CardData).effects ?? []) {
         if (effet.description.includes('[⧗]')) continue;
         expect(getEffectHandler(id, effet.type as EffectType), `${id} a son handler`).toBeTruthy();

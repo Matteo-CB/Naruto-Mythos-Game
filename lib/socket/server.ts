@@ -50,6 +50,7 @@ import { getModerationFlags, isSuspended, isRankedBanned, isSpectateBanned } fro
 import { initChatAutoScan, enqueueChatScan, holdScanMessage, type HoldVerdict } from '@/lib/moderation/autoScan';
 import { setChatLockRefresher } from '@/lib/socket/chatLockBridge';
 import { sendDm, getUnreadDmCount, markThreadRead } from '@/lib/dm/dmService';
+import { sealedOuvertPour } from '@/lib/sealed/sealedGate';
 
 ensureQuestPersistenceListener();
 
@@ -3311,6 +3312,15 @@ export function setupSocketHandlers(io: SocketIOServer) {
         socket.emit('room:error', { message: 'Account suspended', errorKey: 'game.error.suspended' });
         return;
       }
+      const createIsSealed = data.isSealed === true || data.gameMode === 'sealed';
+      if (createIsSealed) {
+        const auteur = await prisma.user.findUnique({ where: { id: data.userId }, select: { username: true, email: true } });
+        if (!sealedOuvertPour(auteur)) {
+          socket.emit('room:error', { message: 'Sealed mode is closed', errorKey: 'game.error.sealedClosed' });
+          return;
+        }
+      }
+
       const createIsRanked = data.isRanked === true || data.gameMode === 'ranked' || data.gameMode === 'evolving' || data.isEvolving === true;
       if (createIsRanked && (await isRankedBanned(data.userId))) {
         socket.emit('room:error', { message: 'Ranked mode is closed to you', errorKey: 'game.error.rankedBanned' });

@@ -974,7 +974,8 @@
     "continueToNextBooster": "Toque para abrir o próximo booster",
     "continueToFinish": "Toque para terminar de abrir",
     "timeJustNow": "agora mesmo",
-    "timeMinutesAgo": "há {minutes} min"
+    "timeMinutesAgo": "há {minutes} min",
+    "temporarilyClosed": "O modo selado esta temporariamente fechado enquanto terminamos os ultimos ajustes. Volta muito em breve."
   },
   "online": {
     "title": "Jogar Online",
@@ -3834,7 +3835,8 @@
       "invalidAction": "Ação inválida.",
       "upgradeNameConflict": "Não é possível evoluir: criaria um {name} duplicado nesta missão.",
       "suspended": "Sua conta está suspensa.",
-      "rankedBanned": "O modo ranqueado está fechado para você por enquanto."
+      "rankedBanned": "O modo ranqueado está fechado para você por enquanto.",
+      "sealedClosed": "O modo selado está temporariamente fechado."
     },
     "opponentDisconnected": "Adversário desconectado. Ele tem {time} para reconectar ou o jogo será perdido por desistência.",
     "opponentDisconnectedShort": "Adversário desconectado. O relógio de xadrez dele continua correndo.",

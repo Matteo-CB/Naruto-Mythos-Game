@@ -1737,7 +1737,8 @@
       "invalidAction": "Acción no válida.",
       "upgradeNameConflict": "No se puede mejorar: crearía un {name} duplicado en esta misión.",
       "suspended": "Tu cuenta está suspendida.",
-      "rankedBanned": "El modo clasificatorio está cerrado para ti por ahora."
+      "rankedBanned": "El modo clasificatorio está cerrado para ti por ahora.",
+      "sealedClosed": "El modo sellado está temporalmente cerrado."
     },
     "opponentDisconnected": "El rival se ha desconectado. Tiene {time} para reconectarse o pierde la partida.",
     "opponentDisconnectedShort": "El rival se ha desconectado. Su reloj de partida sigue corriendo.",
@@ -2778,7 +2779,8 @@
     "continueToNextBooster": "Toca para abrir el siguiente sobre",
     "continueToFinish": "Toca para terminar la apertura",
     "timeJustNow": "ahora mismo",
-    "timeMinutesAgo": "hace {minutes} min"
+    "timeMinutesAgo": "hace {minutes} min",
+    "temporarilyClosed": "El modo sellado esta cerrado temporalmente mientras terminamos los ultimos ajustes. Vuelve muy pronto."
   },
   "tournament": {
     "launchMatch": "Iniciar la partida",
