@@ -148,3 +148,34 @@ describe('phase 7, porte de sortie du set 2', () => {
     }
   });
 });
+
+describe('aucun effet du set 2 ne reste sans code', () => {
+  it('chaque effet imprime non continu de chaque carte SS a un handler', async () => {
+    const { allCardData } = await import('@/lib/data/sets');
+    const sans: string[] = [];
+    for (const carte of Object.values(allCardData.cards as Record<string, CardData>)) {
+      if (!String(carte.id).startsWith('SS-')) continue;
+      for (const effet of carte.effects ?? []) {
+        if (effet.type === 'ATTACH') continue;
+        if (effet.description.includes('[⧗]')) continue;
+        if (!getEffectHandler(carte.id, effet.type as EffectType)) sans.push(`${carte.id} ${effet.type}`);
+      }
+    }
+    expect(sans, 'aucun effet imprime sans code').toEqual([]);
+  });
+
+  it('les alterations traitees ailleurs sont declarees explicitement', async () => {
+    const { ALTERATIONS_APPLIQUEES_AILLEURS } = await import('@/lib/effects/handlers/SS/duelAlterations');
+    const { getCardById: parId } = await import('@/lib/data/cardIndex');
+    for (const [id, types] of Object.entries(ALTERATIONS_APPLIQUEES_AILLEURS)) {
+      const carte = parId(id) as CardData;
+      expect(carte, `${id} existe`).toBeTruthy();
+      for (const type of types) {
+        const effet = (carte.effects ?? []).find((e) => e.type === type);
+        expect(effet, `${id} porte bien un ${type}`).toBeTruthy();
+        expect(/(MAIN|AMBUSH|UPGRADE|SCORE|DUEL|FIRST STRIKE) effect/.test(effet!.description),
+          `${id} ${type} est bien une alteration`).toBe(true);
+      }
+    }
+  });
+});
