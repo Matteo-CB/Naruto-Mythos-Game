@@ -66,7 +66,7 @@ import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOn
 import { isCharacterCopyable, isCopyableEffect } from './handlers/KS/shared/copyExclusions';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 import { hasFlexibleUpgradeRestriction, isRestrictedUpgradeTarget } from '@/lib/engine/rules/flexibleUpgradeRestriction';
-import { forestOfDeathActive } from './handlers/SS/attachmentStatics';
+import { forestOfDeathActive, textIsBlanked } from './handlers/SS/attachmentStatics';
 
 
 function findUpgradeTargetIdx(
@@ -444,6 +444,15 @@ export class EffectEngine {
     missionIndex: number,
     isUpgrade: boolean,
   ): GameState {
+    if (textIsBlanked(character)) {
+      return {
+        ...state,
+        log: logAction(state.log, state.turn, state.phase, player, 'EFFECT_BLOCKED',
+          'Flash Bomb (083): this character has no effect text, nothing resolves.',
+          'game.log.effect.ss083Blank', { card: 'BOMBE ECLAIR', id: 'SS-083-UC' }),
+      };
+    }
+
     let newState = deepClone(state);
     const charStack = character.stack ?? [character.card];
     const topCard = charStack.length > 0 ? charStack[charStack.length - 1] : character.card;
@@ -611,6 +620,15 @@ export class EffectEngine {
     missionIndex: number,
     isOwnPlayAction = false,
   ): GameState {
+    if (textIsBlanked(character)) {
+      return {
+        ...state,
+        log: logAction(state.log, state.turn, state.phase, player, 'EFFECT_BLOCKED',
+          'Flash Bomb (083): this character has no effect text, nothing resolves.',
+          'game.log.effect.ss083Blank', { card: 'BOMBE ECLAIR', id: 'SS-083-UC' }),
+      };
+    }
+
     let newState = deepClone(state);
     const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;
 
@@ -702,6 +720,15 @@ export class EffectEngine {
     missionIndex: number,
     isOwnPlayAction = false,
   ): GameState {
+    if (textIsBlanked(character)) {
+      return {
+        ...state,
+        log: logAction(state.log, state.turn, state.phase, player, 'EFFECT_BLOCKED',
+          'Flash Bomb (083): this character has no effect text, nothing resolves.',
+          'game.log.effect.ss083Blank', { card: 'BOMBE ECLAIR', id: 'SS-083-UC' }),
+      };
+    }
+
     let newState = deepClone(state);
 
     const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;

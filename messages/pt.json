@@ -2949,7 +2949,8 @@
         "ssScrollPair": "{card} ({id}): os dois pergaminhos estão juntos, 1 ponto de missão ganho.",
         "ss110Reward": "{card} ({id}): 1 carta comprada e POWERUP 1 em {target}.",
         "ss107Ambush": "{card} ({id}): o personagem jogado da mão ativa os seus efeitos AMBUSH.",
-        "ss109Reinforcement": "{card} ({id}): a carta do topo do baralho chega virada para baixo na missão {mission}."
+        "ss109Reinforcement": "{card} ({id}): a carta do topo do baralho chega virada para baixo na missão {mission}.",
+        "ss083Blank": "{card} ({id}): este personagem já não tem texto, nada é ativado."
       },
       "score": {
         "draw": "[SCORE] {card}: Comprou {count} carta(s).",

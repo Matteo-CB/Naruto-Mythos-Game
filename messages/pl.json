@@ -2949,7 +2949,8 @@
         "ssScrollPair": "{card} ({id}): oba zwoje są razem, zdobyto 1 punkt misji.",
         "ss110Reward": "{card} ({id}): dobrano 1 kartę i POWERUP 1 na {target}.",
         "ss107Ambush": "{card} ({id}): postać zagrana z ręki uruchamia swoje efekty AMBUSH.",
-        "ss109Reinforcement": "{card} ({id}): wierzchnia karta talii pojawia się zakryta w misji {mission}."
+        "ss109Reinforcement": "{card} ({id}): wierzchnia karta talii pojawia się zakryta w misji {mission}.",
+        "ss083Blank": "{card} ({id}): ta postać nie ma już tekstu, nic się nie uruchamia."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",

@@ -2949,7 +2949,8 @@
         "ssScrollPair": "{card} ({id}): entrambe le pergamene sono qui, 1 punto missione guadagnato.",
         "ss110Reward": "{card} ({id}): 1 carta pescata e POWERUP 1 su {target}.",
         "ss107Ambush": "{card} ({id}): il personaggio giocato dalla mano attiva i suoi effetti AMBUSH.",
-        "ss109Reinforcement": "{card} ({id}): la carta in cima al mazzo arriva coperta nella missione {mission}."
+        "ss109Reinforcement": "{card} ({id}): la carta in cima al mazzo arriva coperta nella missione {mission}.",
+        "ss083Blank": "{card} ({id}): questo personaggio non ha più testo, non si attiva nulla."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",

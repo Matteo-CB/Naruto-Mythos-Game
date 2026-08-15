@@ -6,6 +6,7 @@ import { parseAttachSpec, getCharacterAttachTargets, attachCardToCharacter } fro
 import { plannedReinforcementsEndOfRound } from '@/lib/engine/phases/EndPhase';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { registerAllSetHandlers } from '@/lib/effects/handlers';
+import { EffectEngine } from '@/lib/effects/EffectEngine';
 import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import { getCardById } from '@/lib/data/cardIndex';
 import { getAllCards } from '@/lib/data/cardLoader';
@@ -333,5 +334,31 @@ describe('phase 2, chaque texte des equipements existe dans les sept langues', (
       }
     }
     expect(manquantes).toEqual([]);
+  });
+});
+
+describe('phase 2, la Bombe Eclair rend son porteur definitivement muet', () => {
+  it('une amelioration posee sur un porteur enfume ne declenche rien', () => {
+    const porteur = simChar('SS-010-C', { owner: 'player2' });
+    const enfume = equipe(porteur, ['SS-083-UC'], 'player1');
+    const s = buildSimState({ p1: [], p2: [enfume], missions: 1, chakra1: 20 });
+    const cible = s.activeMissions[0].player2Characters[0];
+
+    const apres = EffectEngine.resolvePlayEffects(s, 'player2', cible, 0, true);
+    expect(apres.pendingEffects.length, 'aucun effet ne s ouvre').toBe(0);
+    expect(
+      apres.log.some((l) => l.messageKey === 'game.log.effect.ss083Blank'),
+      'le silence est journalise',
+    ).toBe(true);
+  });
+
+  it('la revelation d un porteur enfume ne declenche rien non plus', () => {
+    const porteur = simChar('SS-127-R', { owner: 'player2' });
+    const enfume = equipe(porteur, ['SS-083-UC'], 'player1');
+    const s = buildSimState({ p1: [], p2: [enfume], missions: 1, chakra1: 20 });
+    const cible = s.activeMissions[0].player2Characters[0];
+
+    const apres = EffectEngine.resolveRevealEffects(s, 'player2', cible, 0, true);
+    expect(apres.pendingEffects.length, 'meme une embuscade reste muette').toBe(0);
   });
 });

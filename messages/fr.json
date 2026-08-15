@@ -853,7 +853,8 @@
         "ssScrollPair": "{card} ({id}) : les deux parchemins sont réunis, 1 point de mission gagné.",
         "ss110Reward": "{card} ({id}) : 1 carte piochée et POWERUP 1 sur {target}.",
         "ss107Ambush": "{card} ({id}) : le personnage joué depuis la main active ses effets AMBUSH.",
-        "ss109Reinforcement": "{card} ({id}) : la carte du dessus du deck arrive face cachée dans la mission {mission}."
+        "ss109Reinforcement": "{card} ({id}) : la carte du dessus du deck arrive face cachée dans la mission {mission}.",
+        "ss083Blank": "{card} ({id}) : ce personnage n'a plus aucun texte, rien ne se déclenche."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",

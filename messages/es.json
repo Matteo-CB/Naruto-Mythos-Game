@@ -852,7 +852,8 @@
         "ssScrollPair": "{card} ({id}): los dos pergaminos están reunidos, 1 punto de misión ganado.",
         "ss110Reward": "{card} ({id}): 1 carta robada y POWERUP 1 en {target}.",
         "ss107Ambush": "{card} ({id}): el personaje jugado desde la mano activa sus efectos AMBUSH.",
-        "ss109Reinforcement": "{card} ({id}): la carta superior del mazo llega boca abajo a la misión {mission}."
+        "ss109Reinforcement": "{card} ({id}): la carta superior del mazo llega boca abajo a la misión {mission}.",
+        "ss083Blank": "{card} ({id}): este personaje ya no tiene texto, no se activa nada."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",

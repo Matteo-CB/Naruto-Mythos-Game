@@ -22,6 +22,7 @@ function boardKeyOf(char: VisibleCharacter): string {
 
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { AttachmentStrip, CHARACTER_VISIBLE_RATIO, MISSION_VISIBLE_RATIO } from './AttachmentStrip';
+import { FlashBombSmoke } from './FlashBombSmoke';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { CardArtFallback } from '@/components/cards/CardArtFallback';
 import { getCardName } from '@/lib/utils/cardLocale';
@@ -202,6 +203,9 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         marginLeft: attachmentRoom.left + 'px',
       }}
     >
+      {(character.attachments ?? []).some((a) => a.card.id === 'SS-083-UC') && (
+        <FlashBombSmoke instanceId={character.instanceId} />
+      )}
       {(character.attachments ?? []).map((att, attIndex) => {
         const mine = att.owner === myPlayer;
         return (
