@@ -2955,7 +2955,12 @@
         "ssPeeked": "{card} ({id}): un personaggio nascosto è stato guardato.",
         "ss028Bottom": "{card} ({id}): la carta in cima al mazzo avversario passa in fondo.",
         "ssSummonChakra": "{card} ({id}): {amount} Chakra guadagnato.",
-        "ss072Recovered": "{card} ({id}): {target} torna dagli scarti alla mano."
+        "ss072Recovered": "{card} ({id}): {target} torna dagli scarti alla mano.",
+        "ss009Fed": "{card} ({id}): {target} scartata, 1 Chakra guadagnato e una carta pescata.",
+        "ss023Bottom": "{card} ({id}): la carta in cima al mazzo va in fondo.",
+        "ss029Revealed": "{card} ({id}): {target} rivelata dal mazzo avversario.",
+        "ss065Moved": "{card} ({id}): {target} spostato su questo personaggio.",
+        "ss136Defeated": "{card} ({id}): un personaggio giocato per meno del suo costo stampato viene sconfitto."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3691,7 +3696,14 @@
         "ssPeekHidden": "Scegli il personaggio nascosto da guardare.",
         "ssPeekHiddenPowerup": "Scegli il personaggio nascosto nemico da guardare, il suo costo in chakra diventa segnalini Potenza.",
         "ss028BottomOrKeep": "Mettere la carta in cima al mazzo avversario in fondo al suo mazzo?",
-        "ssTargetedPowerup": "Scegli il personaggio alleato che riceve i segnalini Potenza."
+        "ssTargetedPowerup": "Scegli il personaggio alleato che riceve i segnalini Potenza.",
+        "ss009DiscardFood": "Scegli una carta Cibo da scartare per guadagnare 1 Chakra e pescare una carta.",
+        "ss023TopOrBottom": "Seleziona la carta per metterla in fondo al mazzo, oppure rifiuta per lasciarla in cima.",
+        "ss025MoveHidden": "Scegli un personaggio alleato nascosto da spostare fuori da questa missione.",
+        "ss025MoveDestination": "Scegli la missione di destinazione.",
+        "ss029HideSameName": "Scegli un personaggio nemico con il nome della carta rivelata per nasconderlo.",
+        "ss065MoveAttachment": "Scegli un equipaggiamento alleato da spostare su questo personaggio.",
+        "ss136DefeatDiscounted": "Scegli un personaggio nemico giocato lo scorso turno per meno del suo costo stampato per sconfiggerlo."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

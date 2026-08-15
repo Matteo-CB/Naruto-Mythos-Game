@@ -412,4 +412,23 @@ export const effectDescriptionsPl: Record<string, string[]> = {
   "SS-038-UC": [
     "[↯] Dołącz Ukona do odkrytej wrogiej postaci na tej misji. Dopóki jest dołączony, ta postać ma -5 Mocy, a Ukon jest traktowany jako ekwipunek, a nie postać.",
   ],
+  "SS-009-C": [
+    "[↯] Odrzuć kartę Jedzenia z ręki, aby zyskać 1 czakry i dobrać kartę.",
+  ],
+  "SS-023-C": [
+    "[↯] Spójrz na wierzchnią kartę swojej talii. Wybierz, czy ją zostawić, czy odłożyć na spód talii.",
+  ],
+  "SS-025-C": [
+    "[↯] Przenieś zakrytą sojuszniczą postać z tej misji.",
+  ],
+  "SS-029-UC": [
+    "[↯] Odkryj wierzchnią kartę talii przeciwnika. Zakryj wrogą postać w grze o tej samej nazwie co odkryta karta.",
+  ],
+  "SS-065-UC": [
+    "[↯] Możesz przenieść dowolną liczbę sojuszniczych wyposażeń w grze na tę postać.",
+    "[⧗] Ta postać może mieć więcej niż jedno sojusznicze wyposażenie, ignorując wszystkie wymagania.",
+  ],
+  "SS-136-R": [
+    "[↯] Pokonaj wrogą postać w tej misji, która została zagrana w poprzedniej turze poniżej swojego nadrukowanego kosztu dzięki efektowi karty.",
+  ],
 };

@@ -412,4 +412,23 @@ export const effectDescriptionsIt: Record<string, string[]> = {
   "SS-038-UC": [
     "[↯] Attacca Ukon a un personaggio nemico non nascosto in questa missione. Finché è attaccato, quel personaggio ha -5 Potenza, e Ukon è trattato come un equipaggiamento invece che come un personaggio.",
   ],
+  "SS-009-C": [
+    "[↯] Scarta una carta Cibo dalla mano per guadagnare 1 Chakra e pescare una carta.",
+  ],
+  "SS-023-C": [
+    "[↯] Guarda la carta in cima al tuo mazzo. Scegli se lasciarla o metterla in fondo al mazzo.",
+  ],
+  "SS-025-C": [
+    "[↯] Sposta un personaggio alleato nascosto da questa missione.",
+  ],
+  "SS-029-UC": [
+    "[↯] Rivela la carta in cima al mazzo avversario. Nascondi un personaggio nemico in gioco con lo stesso nome della carta rivelata.",
+  ],
+  "SS-065-UC": [
+    "[↯] Puoi spostare un numero qualsiasi di equipaggiamenti alleati in gioco su questo personaggio.",
+    "[⧗] Questo personaggio può avere più di un equipaggiamento alleato, ignorando tutti i requisiti.",
+  ],
+  "SS-136-R": [
+    "[↯] Sconfiggi un personaggio nemico in questa missione giocato lo scorso turno per meno del suo costo stampato a causa di un effetto di carta.",
+  ],
 };

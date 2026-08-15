@@ -37,6 +37,8 @@ import {
   tsunadeGoldShuffleableCount, tsunadeGoldShuffleTopOfDiscard, friendlySummonIds,
 } from './handlers/SS/goldCards';
 import { attachCardToCharacter, discardAttachmentsOnLeave, discardAttachments } from './attachments';
+import { destinationsPour } from './handlers/SS/hiddenMove';
+import { equipementsDeplacablesVers, apercuEquipements } from './handlers/SS/seimei065';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { findLegalRevealUpgradeTarget, revealWouldViolateNameUniqueness } from './revealNameUniqueness';
 import { moveWouldViolateNameUniqueness } from './moveNameUniqueness';
@@ -1216,6 +1218,63 @@ export class EffectEngine {
     return newState;
   }
 
+  static actionTypeForSelectionType(tst: string): PendingAction['type'] {
+      let actionType: PendingAction['type'] = 'SELECT_TARGET';
+      if (tst === 'PUT_CARD_ON_DECK') {
+        actionType = 'PUT_CARD_ON_DECK';
+      } else if (
+        tst === 'DISCARD_CARD' ||
+        tst === 'KIMIMARO_CHOOSE_DISCARD' ||
+        tst === 'KIMIMARO123_CHOOSE_DISCARD' ||
+        tst === 'CHOJI_CHOOSE_DISCARD' ||
+        tst === 'MSS03_OPPONENT_DISCARD' ||
+        tst === 'SAKURA_012_DISCARD' ||
+        tst === 'SASUKE_014_DISCARD_OWN' ||
+        tst === 'SASUKE_014_DISCARD_OPPONENT' ||
+        tst === 'ASUMA_024_DISCARD_FOR_POWERUP' ||
+        tst === 'KIMIMARO056_CHOOSE_DISCARD' ||
+        tst === 'NARUTO141_CHOOSE_DISCARD' ||
+        tst === 'SASUKE142_CHOOSE_DISCARD' ||
+        tst === 'KIN073_CHOOSE_DISCARD' ||
+        tst === 'KABUTO053_CHOOSE_DISCARD' ||
+        tst === 'SS114_CHOOSE_DISCARD' ||
+        tst === 'SS139_DISCARD' ||
+        tst === 'SS009_DISCARD_FOOD'
+      ) {
+        actionType = 'DISCARD_CARD';
+      } else if (
+        tst === 'CHOOSE_CARD_FROM_LIST' ||
+        tst === 'MSS08_CHOOSE_CARD' ||
+        tst === 'JIRAIYA_CHOOSE_SUMMON' ||
+        tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
+        tst === 'JIRAIYA105_CHOOSE_SUMMON' ||
+        tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
+        tst === 'SAKURA109_CHOOSE_DISCARD' ||
+        tst === 'SAKURA135_CHOOSE_CARD' ||
+        tst === 'TAYUYA125_CHOOSE_SOUND' ||
+        tst === 'PLAY_LESS_CATEGORY' ||
+        tst === 'SS000_CHOOSE_HOUNDS' ||
+        tst === 'SS045_PLACE_FROM_HAND' ||
+        tst === 'SS037_REVEAL_SOUND_FOUR' ||
+        tst === 'RECOVER_FROM_DISCARD' ||
+        tst === 'HIRUZEN002_CHOOSE_CARD' ||
+        tst === 'ITACHI091_CHOOSE_DISCARD' ||
+        tst === 'TSUNADE104_CHOOSE_CHAKRA' ||
+        tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' ||
+        tst === 'CHOOSE_TOKEN_AMOUNT_STEAL' ||
+        tst === 'SS_DECK_SEARCH_TAKE' ||
+        tst === 'SS095_TAKE_JUTSU' ||
+        tst === 'SS023_TOP_OR_BOTTOM' ||
+      tst === 'SS028_BOTTOM_OR_KEEP' ||
+      tst === 'SS065_MOVE_ATTACHMENT'
+      ) {
+        actionType = 'CHOOSE_CARD_FROM_LIST';
+      } else if (tst === 'COPY_EFFECT_CHOSEN') {
+        actionType = 'CHOOSE_EFFECT';
+      }
+      return actionType;
+  }
+
   static createPendingTargetSelection(
     state: GameState,
     player: PlayerID,
@@ -1292,54 +1351,8 @@ export class EffectEngine {
     };
 
     
-    let actionType: PendingAction['type'] = 'SELECT_TARGET';
     const tst = result.targetSelectionType ?? '';
-    if (tst === 'PUT_CARD_ON_DECK') {
-      actionType = 'PUT_CARD_ON_DECK';
-    } else if (
-      tst === 'DISCARD_CARD' ||
-      tst === 'KIMIMARO_CHOOSE_DISCARD' ||
-      tst === 'KIMIMARO123_CHOOSE_DISCARD' ||
-      tst === 'CHOJI_CHOOSE_DISCARD' ||
-      tst === 'MSS03_OPPONENT_DISCARD' ||
-      tst === 'SAKURA_012_DISCARD' ||
-      tst === 'SASUKE_014_DISCARD_OWN' ||
-      tst === 'SASUKE_014_DISCARD_OPPONENT' ||
-      tst === 'ASUMA_024_DISCARD_FOR_POWERUP' ||
-      tst === 'KIMIMARO056_CHOOSE_DISCARD' ||
-      tst === 'NARUTO141_CHOOSE_DISCARD' ||
-      tst === 'SASUKE142_CHOOSE_DISCARD' ||
-      tst === 'KIN073_CHOOSE_DISCARD' ||
-      tst === 'KABUTO053_CHOOSE_DISCARD' ||
-      tst === 'SS114_CHOOSE_DISCARD' ||
-      tst === 'SS139_DISCARD'
-    ) {
-      actionType = 'DISCARD_CARD';
-    } else if (
-      tst === 'CHOOSE_CARD_FROM_LIST' ||
-      tst === 'MSS08_CHOOSE_CARD' ||
-      tst === 'JIRAIYA_CHOOSE_SUMMON' ||
-      tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
-      tst === 'JIRAIYA105_CHOOSE_SUMMON' ||
-      tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
-      tst === 'SAKURA109_CHOOSE_DISCARD' ||
-      tst === 'SAKURA135_CHOOSE_CARD' ||
-      tst === 'TAYUYA125_CHOOSE_SOUND' ||
-      tst === 'PLAY_LESS_CATEGORY' ||
-      tst === 'SS000_CHOOSE_HOUNDS' ||
-      tst === 'SS045_PLACE_FROM_HAND' ||
-      tst === 'SS037_REVEAL_SOUND_FOUR' ||
-      tst === 'RECOVER_FROM_DISCARD' ||
-      tst === 'HIRUZEN002_CHOOSE_CARD' ||
-      tst === 'ITACHI091_CHOOSE_DISCARD' ||
-      tst === 'TSUNADE104_CHOOSE_CHAKRA' ||
-      tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' ||
-      tst === 'CHOOSE_TOKEN_AMOUNT_STEAL'
-    ) {
-      actionType = 'CHOOSE_CARD_FROM_LIST';
-    } else if (tst === 'COPY_EFFECT_CHOSEN') {
-      actionType = 'CHOOSE_EFFECT';
-    }
+    const actionType: PendingAction['type'] = EffectEngine.actionTypeForSelectionType(tst);
 
     
     let actionDescription = result.description ?? '';
@@ -6450,6 +6463,11 @@ export class EffectEngine {
       case 'SS084_CONFIRM_AMBUSH':
       case 'SS086_CONFIRM_MAIN':
       case 'SS095_CONFIRM_MAIN':
+      case 'SS009_CONFIRM_MAIN':
+      case 'SS025_CONFIRM_MAIN':
+      case 'SS029_CONFIRM_MAIN':
+      case 'SS065_CONFIRM_MAIN':
+      case 'SS136_CONFIRM_MAIN':
       case 'SS127_CONFIRM':
       case 'SS038_CONFIRM_AMBUSH':
       case 'SS125_CONFIRM_DUEL':
@@ -6486,7 +6504,7 @@ export class EffectEngine {
         pendingEffect.remainingEffectTypes = undefined;
         newState.pendingActions = [...newState.pendingActions, {
           id: relayActId,
-          type: 'SELECT_TARGET',
+          type: EffectEngine.actionTypeForSelectionType(relay.nextType),
           player: pendingEffect.sourcePlayer,
           description: relay.nextText ?? '',
           descriptionKey: relay.nextKey,
@@ -13113,6 +13131,182 @@ export class EffectEngine {
           'EFFECT_MOVE', `Smoke Bomb (086): the character is hidden and moved to mission ${destination + 1}.`,
           'game.log.effect.ss086Moved',
           { card: 'BOMBE FUMIGENE', id: 'SS-086-C', mission: destination + 1 });
+        break;
+      }
+
+      case 'SS009_DISCARD_FOOD': {
+        const joueur009 = pendingEffect.sourcePlayer;
+        const index009 = Number(targetId);
+        const main009 = [...newState[joueur009].hand];
+        if (!Number.isFinite(index009) || index009 < 0 || index009 >= main009.length) break;
+        const defaussee009 = main009[index009];
+        main009.splice(index009, 1);
+        const deck009 = [...newState[joueur009].deck];
+        const tiree009 = deck009.length > 0 ? deck009.shift() : undefined;
+        newState[joueur009] = {
+          ...newState[joueur009],
+          hand: tiree009 ? [...main009, tiree009] : main009,
+          deck: deck009,
+          discardPile: [...newState[joueur009].discardPile, defaussee009],
+          chakra: newState[joueur009].chakra + 1,
+        };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, joueur009,
+          'EFFECT', `Choji Akimichi (009): discarded ${defaussee009.name_fr}, gained 1 Chakra and drew a card.`,
+          'game.log.effect.ss009Fed',
+          { card: 'CHOJI AKIMICHI', id: 'SS-009-C', target: defaussee009.name_fr, target_en: defaussee009.name_en || defaussee009.name_fr });
+        break;
+      }
+
+      case 'SS023_TOP_OR_BOTTOM': {
+        const joueur023 = pendingEffect.sourcePlayer;
+        const deck023 = [...newState[joueur023].deck];
+        if (deck023.length === 0) break;
+        const sommet023 = deck023.shift()!;
+        newState[joueur023] = { ...newState[joueur023], deck: [...deck023, sommet023] };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, joueur023,
+          'EFFECT', 'Ebisu (023): the top card of your deck goes to the bottom.',
+          'game.log.effect.ss023Bottom', { card: 'EBISU', id: 'SS-023-C' });
+        break;
+      }
+
+      case 'SS025_MOVE_HIDDEN': {
+        const joueur025 = pendingEffect.sourcePlayer;
+        const trouve025 = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!trouve025) break;
+        const destinations025 = destinationsPour(newState, trouve025.character, joueur025, trouve025.missionIndex);
+        if (destinations025.length === 0) break;
+        if (destinations025.length === 1) {
+          newState = EffectEngine.moveCharToMissionDirectPublic(
+            newState, targetId, destinations025[0], joueur025, 'HAYATE GEKKO', 'SS-025-C', joueur025);
+          break;
+        }
+        const eff025 = generateInstanceId();
+        const act025 = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: eff025, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ charInstanceId: targetId }),
+          targetSelectionType: 'SS025_MOVE_DESTINATION',
+          sourcePlayer: joueur025, requiresTargetSelection: true,
+          validTargets: destinations025.map((i) => String(i)),
+          isOptional: false, isMandatory: true, resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: act025, type: 'SELECT_TARGET', player: joueur025,
+          description: 'Hayate Gekko (025): choose the destination mission.',
+          descriptionKey: 'game.effect.desc.ss025MoveDestination',
+          options: destinations025.map((i) => String(i)),
+          minSelections: 1, maxSelections: 1, sourceEffectId: eff025,
+        }];
+        break;
+      }
+
+      case 'SS025_MOVE_DESTINATION': {
+        let d025: { charInstanceId?: string } = {};
+        try { d025 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const destination025 = Number(targetId);
+        if (!d025.charInstanceId || !Number.isFinite(destination025)) break;
+        newState = EffectEngine.moveCharToMissionDirectPublic(
+          newState, d025.charInstanceId, destination025, pendingEffect.sourcePlayer,
+          'HAYATE GEKKO', 'SS-025-C', pendingEffect.sourcePlayer);
+        break;
+      }
+
+      case 'SS029_HIDE_SAME_NAME': {
+        let d029: { revealed?: string; revealed_en?: string } = {};
+        try { d029 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT', `Ibiki Morino (029): revealed ${d029.revealed ?? ''} from the opponent deck.`,
+          'game.log.effect.ss029Revealed',
+          { card: 'IBIKI MORINO', id: 'SS-029-UC', target: d029.revealed ?? '', target_en: d029.revealed_en ?? d029.revealed ?? '' });
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        break;
+      }
+
+      case 'SS065_MOVE_ATTACHMENT': {
+        const joueur065 = pendingEffect.sourcePlayer;
+        const seimei065 = pendingEffect.sourceInstanceId;
+        let deplace: AttachedCard | null = null;
+        const missions065 = newState.activeMissions.map((m) => {
+          const missionAtt = (m.attachments ?? []).filter((a) => {
+            if (a.instanceId !== targetId) return true;
+            deplace = a;
+            return false;
+          });
+          return {
+            ...m,
+            attachments: missionAtt,
+            player1Characters: m.player1Characters.map((c) => ({
+              ...c,
+              attachments: (c.attachments ?? []).filter((a) => {
+                if (a.instanceId !== targetId) return true;
+                deplace = a;
+                return false;
+              }),
+            })),
+            player2Characters: m.player2Characters.map((c) => ({
+              ...c,
+              attachments: (c.attachments ?? []).filter((a) => {
+                if (a.instanceId !== targetId) return true;
+                deplace = a;
+                return false;
+              }),
+            })),
+          };
+        });
+        if (!deplace) break;
+        const equipement065: AttachedCard = deplace;
+        newState.activeMissions = missions065.map((m) => ({
+          ...m,
+          player1Characters: m.player1Characters.map((c) => c.instanceId === seimei065
+            ? { ...c, attachments: [...(c.attachments ?? []), equipement065] } : c),
+          player2Characters: m.player2Characters.map((c) => c.instanceId === seimei065
+            ? { ...c, attachments: [...(c.attachments ?? []), equipement065] } : c),
+        }));
+        newState.log = logAction(newState.log, newState.turn, newState.phase, joueur065,
+          'EFFECT', `Seimei (065): moved ${equipement065.card.name_fr} onto itself.`,
+          'game.log.effect.ss065Moved',
+          { card: 'SEIMEI', id: 'SS-065-UC', target: equipement065.card.name_fr, target_en: equipement065.card.name_en || equipement065.card.name_fr });
+
+        const restants065 = equipementsDeplacablesVers(newState, joueur065, seimei065);
+        if (restants065.length > 0) {
+          const eff065 = generateInstanceId();
+          const act065 = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: eff065, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: seimei065,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ attachments: apercuEquipements(restants065) }),
+            targetSelectionType: 'SS065_MOVE_ATTACHMENT',
+            sourcePlayer: joueur065, requiresTargetSelection: true,
+            validTargets: restants065.map((e) => e.attachment.instanceId),
+            isOptional: true, isMandatory: false, resolved: false, isUpgrade: false,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          }];
+          pendingEffect.remainingEffectTypes = undefined;
+          newState.pendingActions = [...newState.pendingActions, {
+            id: act065, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'], player: joueur065,
+            description: 'Seimei (065): move another friendly attachment onto this character.',
+            descriptionKey: 'game.effect.desc.ss065MoveAttachment',
+            options: restants065.map((e) => e.attachment.instanceId),
+            minSelections: 1, maxSelections: 1, sourceEffectId: eff065,
+          }];
+        }
+        break;
+      }
+
+      case 'SS136_DEFEAT_DISCOUNTED': {
+        const trouve136 = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!trouve136) break;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', 'Zabuza Momochi (136): defeats a character played below its printed cost.',
+          'game.log.effect.ss136Defeated', { card: 'ZABUZA MOMOCHI', id: 'SS-136-R' });
+        newState = defeatEnemyCharacter(newState, trouve136.missionIndex, targetId, pendingEffect.sourcePlayer);
         break;
       }
 
@@ -20943,6 +21137,7 @@ export class EffectEngine {
       mission[friendlySide] = updatedChars;
       missions[missionIndex] = mission;
       state.activeMissions = missions;
+      updatedChars[existingIdx] = { ...updatedChars[existingIdx], playedBelowPrintedCost: actualCost < (card.chakra ?? 0) };
       placedChar = updatedChars[existingIdx];
       isCardUpgrade = true;
 
@@ -20967,6 +21162,7 @@ export class EffectEngine {
         instanceId: generateInstanceId(), card: card as any, isHidden: false,
         wasRevealedAtLeastOnce: true, powerTokens: 0, stack: [card as any],
         controlledBy: player, originalOwner: player, missionIndex,
+        playedBelowPrintedCost: actualCost < (card.chakra ?? 0),
       };
       mission[friendlySide] = [...mission[friendlySide], charInPlay];
       missions[missionIndex] = mission;
@@ -21614,6 +21810,7 @@ export class EffectEngine {
         controlledBy: player,
         originalOwner: player,
         missionIndex: missionIdx,
+        playedBelowPrintedCost: actualCost_fresh < (card.chakra ?? 0),
       };
 
       mission[friendlySide] = [...mission[friendlySide], charInPlay];
@@ -21798,6 +21995,7 @@ export class EffectEngine {
         controlledBy: player,
         originalOwner: player,
         missionIndex,
+        playedBelowPrintedCost: actualCost < (card.chakra ?? 0),
       };
 
       mission[friendlySide_h002] = [...mission[friendlySide_h002], charInPlay];

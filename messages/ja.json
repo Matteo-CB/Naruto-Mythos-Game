@@ -857,7 +857,12 @@
         "ssPeeked": "{card}（{id}）：裏向きのキャラクターを確認しました。",
         "ss028Bottom": "{card}（{id}）：相手のデッキの一番上のカードを一番下に置きました。",
         "ssSummonChakra": "{card}（{id}）：チャクラ{amount}を獲得しました。",
-        "ss072Recovered": "{card}（{id}）：{target}が捨て札から手札に戻りました。"
+        "ss072Recovered": "{card}（{id}）：{target}が捨て札から手札に戻りました。",
+        "ss009Fed": "{card}（{id}）：{target}を捨て、チャクラ1を得てカードを1枚引きました。",
+        "ss023Bottom": "{card}（{id}）：山札の一番上のカードを一番下に置きました。",
+        "ss029Revealed": "{card}（{id}）：相手の山札から{target}を公開しました。",
+        "ss065Moved": "{card}（{id}）：{target}をこのキャラクターに移しました。",
+        "ss136Defeated": "{card}（{id}）：印刷されたコストより安く出されたキャラクターを倒しました。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1593,7 +1598,14 @@
         "ssPeekHidden": "確認する裏向きのキャラクターを選んでください。",
         "ssPeekHiddenPowerup": "確認する敵の裏向きキャラクターを選んでください。そのチャクラコスト分のパワートークンを得ます。",
         "ss028BottomOrKeep": "相手のデッキの一番上のカードを、デッキの一番下に置きますか。",
-        "ssTargetedPowerup": "パワートークンを受け取る味方キャラクターを選んでください。"
+        "ssTargetedPowerup": "パワートークンを受け取る味方キャラクターを選んでください。",
+        "ss009DiscardFood": "捨てる食べ物カードを1枚選んでください。チャクラ1を得てカードを1枚引きます。",
+        "ss023TopOrBottom": "そのカードを選ぶと山札の一番下に置きます。拒否すると一番上に残します。",
+        "ss025MoveHidden": "このミッションから移動させる裏向きの味方キャラクターを選んでください。",
+        "ss025MoveDestination": "移動先のミッションを選んでください。",
+        "ss029HideSameName": "公開されたカードと同じ名前の敵キャラクターを選んで裏向きにします。",
+        "ss065MoveAttachment": "このキャラクターに移す味方の装備カードを選んでください。",
+        "ss136DefeatDiscounted": "前のターンに印刷されたコストより安く出された敵キャラクターを選んで倒します。"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",

@@ -92,6 +92,7 @@ export interface CharacterInPlay {
   
   rempartLockedTargetId?: string;
   ss118RevealedName?: string;
+  playedBelowPrintedCost?: boolean;
 
   attachments?: AttachedCard[];
 }
@@ -239,6 +240,8 @@ export interface GameState {
   ss001CardsShuffled?: number;
 
   turnPlayedIds?: string[];
+  lastTurnPlayedIds?: Record<PlayerID, string[]>;
+  lastActionPlayer?: PlayerID;
 
   turnMovedIds?: Array<{ instanceId: string; mover: PlayerID }>;
 }

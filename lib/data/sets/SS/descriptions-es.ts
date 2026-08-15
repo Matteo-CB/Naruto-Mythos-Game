@@ -416,4 +416,23 @@ export const effectDescriptionsEs: Record<string, string[]> = {
   "SS-038-UC": [
     "[↯] Une a Ukon a un personaje enemigo no oculto de esta misión. Mientras esté unido, ese personaje tiene -5 Poder, y Ukon se considera un equipo en lugar de un personaje.",
   ],
+  "SS-009-C": [
+    "[↯] Descarta una carta de Comida de tu mano para ganar 1 de Chakra y robar una carta.",
+  ],
+  "SS-023-C": [
+    "[↯] Mira la carta superior de tu mazo. Elige dejarla o ponerla al fondo de tu mazo.",
+  ],
+  "SS-025-C": [
+    "[↯] Mueve un personaje aliado oculto desde esta misión.",
+  ],
+  "SS-029-UC": [
+    "[↯] Revela la carta superior del mazo rival. Oculta un personaje enemigo en juego con el mismo nombre que la carta revelada.",
+  ],
+  "SS-065-UC": [
+    "[↯] Puedes mover cualquier cantidad de equipos aliados en juego a este personaje.",
+    "[⧗] Este personaje puede tener más de un equipo aliado, ignorando todos los requisitos.",
+  ],
+  "SS-136-R": [
+    "[↯] Derrota a un personaje enemigo en esta misión que se jugó el turno pasado por menos de su coste impreso debido a un efecto de carta.",
+  ],
 };

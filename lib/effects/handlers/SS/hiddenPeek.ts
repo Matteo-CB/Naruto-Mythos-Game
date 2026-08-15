@@ -5,7 +5,6 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { confirmFirst } from './confirmFirst';
 
 export const SHIKAMARU_011 = 'SS-011-C';
-export const IBIKI_028 = 'SS-028-UC';
 export const NINJA_HOUNDS_059 = 'SS-059-C';
 
 export function peekedBy(state: GameState, player: PlayerID): string[] {
@@ -88,25 +87,7 @@ function ninjaHounds059(ctx: EffectContext): EffectResult {
   }, sourceCard.instanceId, 'SS_PEEK_CONFIRM');
 }
 
-function ibiki028(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceCard } = ctx;
-  const adversaire: PlayerID = sourcePlayer === 'player1' ? 'player2' : 'player1';
-  if (state[adversaire].deck.length === 0) {
-    return refus(state, sourcePlayer, 'Ibiki Morino (028): the opponent deck is empty.', 'IBIKI MORINO', IBIKI_028);
-  }
-  return confirmFirst({
-    state,
-    requiresTargetSelection: true,
-    targetSelectionType: 'SS028_BOTTOM_OR_KEEP',
-    validTargets: [sourceCard.instanceId],
-    isOptional: true,
-    description: JSON.stringify({}),
-    descriptionKey: 'game.effect.desc.ss028BottomOrKeep',
-  }, sourceCard.instanceId, 'SS028_CONFIRM_MAIN');
-}
-
 export function registerHiddenPeekHandlers(): void {
   registerEffect(SHIKAMARU_011, 'MAIN', shikamaru011);
   registerEffect(NINJA_HOUNDS_059, 'MAIN', ninjaHounds059);
-  registerEffect(IBIKI_028, 'MAIN', ibiki028);
 }

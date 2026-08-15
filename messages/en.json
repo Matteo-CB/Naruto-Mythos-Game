@@ -853,7 +853,12 @@
         "ssPeeked": "{card} ({id}): looked at a hidden character.",
         "ss028Bottom": "{card} ({id}): the top card of the opponent deck goes to the bottom.",
         "ssSummonChakra": "{card} ({id}): {amount} Chakra gained.",
-        "ss072Recovered": "{card} ({id}): {target} returns from the discard pile to hand."
+        "ss072Recovered": "{card} ({id}): {target} returns from the discard pile to hand.",
+        "ss009Fed": "{card} ({id}): discarded {target}, gained 1 Chakra and drew a card.",
+        "ss023Bottom": "{card} ({id}): the top card of your deck goes to the bottom.",
+        "ss029Revealed": "{card} ({id}): revealed {target} from the opponent's deck.",
+        "ss065Moved": "{card} ({id}): {target} moved onto this character.",
+        "ss136Defeated": "{card} ({id}): a character played below its printed cost is defeated."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -1589,7 +1594,14 @@
         "ssPeekHidden": "Choose the hidden character to look at.",
         "ssPeekHiddenPowerup": "Choose the enemy hidden character to look at, its chakra cost becomes Power tokens.",
         "ss028BottomOrKeep": "Put the top card of the opponent deck at the bottom of their deck?",
-        "ssTargetedPowerup": "Choose the friendly character that receives the Power tokens."
+        "ssTargetedPowerup": "Choose the friendly character that receives the Power tokens.",
+        "ss009DiscardFood": "Choose a Food card to discard to gain 1 Chakra and draw a card.",
+        "ss023TopOrBottom": "Select the card to put it at the bottom of your deck, or decline to leave it on top.",
+        "ss025MoveHidden": "Choose a friendly hidden character to move out of this mission.",
+        "ss025MoveDestination": "Choose the destination mission.",
+        "ss029HideSameName": "Choose an enemy character with the revealed card's name to hide it.",
+        "ss065MoveAttachment": "Choose a friendly attachment to move onto this character.",
+        "ss136DefeatDiscounted": "Choose an enemy character played last turn below its printed cost to defeat it."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",

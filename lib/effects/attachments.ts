@@ -6,6 +6,7 @@ import type { EffectContext } from '@/lib/effects/EffectTypes';
 import { characterHasGroup } from '@/lib/effects/groupUtils';
 import { isFirstCardPlayedThisRound, withFirstStrikeStatus } from '@/lib/engine/rules/firstStrike';
 import { artisanVillageCount, cannotReceiveOtherAttachments } from '@/lib/effects/handlers/SS/attachmentStatics';
+import { estSeimei } from './handlers/SS/seimei065';
 
 function artisanVillageReward(
   state: GameState,
@@ -198,6 +199,10 @@ function resolveAttachmentFirstStrike(
   return newState;
 }
 
+export function ignoreLesConditionsDePose(char: CharacterInPlay | null | undefined): boolean {
+  return estSeimei(char);
+}
+
 export function isAttachmentCard(card: Pick<CardData, 'card_type'> | null | undefined): boolean {
   return card?.card_type === 'attachment';
 }
@@ -305,8 +310,10 @@ export function getCharacterAttachTargets(
     for (const c of mission[side]) {
       if (c.controlledBy !== proprietaire) continue;
       if ((c.card as CardData).card_type === 'attachment') continue;
-      if (!hostMatchesAttachSpec(c, spec)) continue;
-      if (cannotReceiveOtherAttachments(c)) continue;
+      if (!ignoreLesConditionsDePose(c)) {
+        if (!hostMatchesAttachSpec(c, spec)) continue;
+        if (cannotReceiveOtherAttachments(c)) continue;
+      }
       cibles.push(c);
     }
   }
@@ -419,6 +426,7 @@ export function enforceAttachmentConditions(state: GameState): GameState {
       const chars = mission[side].map((char) => {
         const held = char.attachments ?? [];
         if (held.length === 0) return char;
+        if (ignoreLesConditionsDePose(char)) return char;
         const kept = held.filter((att) => attachConditionHolds(char, att.card));
         if (kept.length === held.length) return char;
         for (const att of held) if (!kept.includes(att)) dropped.push(att);
@@ -493,9 +501,11 @@ export function attachCardToCharacter(state: GameState, player: PlayerID, card: 
   const chars = [...mission[hostSide]];
   const host = { ...chars[hostIdx] };
   const held = host.attachments ?? [];
-  const replaced = held.filter((a) => a.owner === player);
+  const replaced = ignoreLesConditionsDePose(host) ? [] : held.filter((a) => a.owner === player);
   const att: AttachedCard = { instanceId: generateInstanceId(), card, owner: player };
-  host.attachments = [...held.filter((a) => a.owner !== player), att];
+  host.attachments = ignoreLesConditionsDePose(host)
+    ? [...held, att]
+    : [...held.filter((a) => a.owner !== player), att];
   chars[hostIdx] = host;
   mission[hostSide] = chars;
   missions[hostMissionIndex] = mission;

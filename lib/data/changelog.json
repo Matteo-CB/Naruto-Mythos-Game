@@ -17,7 +17,13 @@
         "fix",
         "feature",
         "feature",
-        "feature"
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "fix",
+        "fix",
+        "fix"
       ],
       "changes_fr": [
         "Orochimaru 127 révélé ne prend plus qu'un seul personnage, même quand Sasuke est dans la mission.",
@@ -27,7 +33,13 @@
         "La mission Priorité Haute ne donne plus ses points deux fois : seuls les effets SCORE se répètent.",
         "Dix-sept cartes du set 2 ont leur effet permanent en jeu, dont Hiruzen 1, Might Guy 116 et Enma 132.",
         "Les 19 équipements du set 2 sont jouables, des parchemins jumeaux aux lieux qui renforcent toute une mission.",
-        "La Bombe Éclair couvre sa cible d'un écran de fumée, et la carte reste muette même si on l'améliore."
+        "La Bombe Éclair couvre sa cible d'un écran de fumée, et la carte reste muette même si on l'améliore.",
+        "Vingt et une cartes du set 2 gagnent leur effet immédiat, dont Chôji 9, Hayate 25, Ibiki 29 et Seimei 65.",
+        "Zabuza 136 vainc un ennemi que l'adversaire a joué au tour précédent moins cher que son coût imprimé.",
+        "Seimei peut porter plusieurs équipements à la fois et les rassembler sur elle depuis tout le terrain.",
+        "Les fenêtres de choix qui montrent des cartes de la pioche affichent enfin les cartes au lieu d'un écran vide.",
+        "Ibiki 28 laisse de nouveau le choix de garder la carte au sommet de la pioche adverse.",
+        "La Bombe Fumigène laisse de nouveau désigner la mission où part son porteur."
       ],
       "changes_en": [
         "A revealed Orochimaru 127 now takes a single character, even with Sasuke in the mission.",
@@ -37,7 +49,13 @@
         "The High Priority mission no longer pays its points twice: only the SCORE effects repeat.",
         "Seventeen set 2 cards now have their permanent effect in play, including Hiruzen 1, Might Guy 116 and Enma 132.",
         "All 19 set 2 equipment cards are playable, from the twin scrolls to the places that boost a whole mission.",
-        "The Flash Bomb covers its target with a smoke screen, and the card stays blank even if it is upgraded."
+        "The Flash Bomb covers its target with a smoke screen, and the card stays blank even if it is upgraded.",
+        "Twenty-one set 2 cards gain their instant effect, including Choji 9, Hayate 25, Ibiki 29 and Seimei 65.",
+        "Zabuza 136 defeats an enemy the opponent played last turn for less than its printed cost.",
+        "Seimei can hold several attachments at once and gather them onto herself from anywhere on the board.",
+        "The choice windows that show cards from your deck finally display the cards instead of an empty screen.",
+        "Ibiki 28 lets you choose again to leave the card on top of the opponent's deck.",
+        "The Smoke Bomb lets you pick the mission its host moves to again."
       ],
       "changes_es": [
         "Orochimaru 127 revelado ya solo toma un personaje, incluso con Sasuke en la misión.",
@@ -47,7 +65,13 @@
         "La misión Prioridad Alta ya no da sus puntos dos veces: solo se repiten los efectos SCORE.",
         "Diecisiete cartas del set 2 ya tienen su efecto permanente en juego, entre ellas Hiruzen 1, Might Guy 116 y Enma 132.",
         "Los 19 equipamientos del set 2 son jugables, desde los pergaminos gemelos hasta los lugares que refuerzan toda una misión.",
-        "La Bomba de Destello cubre a su objetivo con una cortina de humo, y la carta sigue muda aunque la mejores."
+        "La Bomba de Destello cubre a su objetivo con una cortina de humo, y la carta sigue muda aunque la mejores.",
+        "Veintiuna cartas del set 2 ganan su efecto inmediato, entre ellas Choji 9, Hayate 25, Ibiki 29 y Seimei 65.",
+        "Zabuza 136 derrota a un enemigo que el rival jugó el turno pasado por menos de su coste impreso.",
+        "Seimei puede llevar varios equipos a la vez y reunirlos sobre ella desde todo el tablero.",
+        "Las ventanas de elección que muestran cartas del mazo por fin muestran las cartas en vez de una pantalla vacía.",
+        "Ibiki 28 vuelve a permitir dejar la carta encima del mazo rival.",
+        "La Bomba de Humo vuelve a permitir elegir la misión a la que se mueve su portador."
       ],
       "changes_ja": [
         "公開した大蛇丸127は、そのミッションにサスケがいても1体しか奪わなくなりました。",
@@ -57,7 +81,13 @@
         "最優先ミッションはポイントを二重に与えなくなりました。繰り返すのはSCORE効果だけです。",
         "セット2の17枚のカードが常時効果を発揮するようになりました（ヒルゼン1、マイト・ガイ116、猿魔132など）。",
         "セット2の装備カード19枚がすべて使用可能になりました。対の書からミッション全体を強化する場所まで。",
-        "閃光弾は対象を煙幕で覆い、そのカードは強化しても効果を持ちません。"
+        "閃光弾は対象を煙幕で覆い、そのカードは強化しても効果を持ちません。",
+        "セット2の21枚が即時効果を得ました。チョウジ9、ハヤテ25、イビキ29、セイメイ65などです。",
+        "ザブザ136は、相手が前のターンに印刷されたコストより安く出した敵を倒します。",
+        "セイメイは装備カードを複数つけられ、場のどこからでも自分に集められます。",
+        "山札のカードを見せる選択ウィンドウが、空白ではなくカードを表示するようになりました。",
+        "イビキ28は、相手の山札の一番上にカードを残す選択が再びできます。",
+        "煙玉は、装備したキャラクターの移動先ミッションを再び選べます。"
       ],
       "changes_pt": [
         "Orochimaru 127 revelado passa a levar apenas um personagem, mesmo com Sasuke na missão.",
@@ -67,7 +97,13 @@
         "A missão Prioridade Alta já não dá os pontos duas vezes: apenas os efeitos SCORE se repetem.",
         "Dezassete cartas do set 2 passam a ter o seu efeito permanente em jogo, incluindo Hiruzen 1, Might Guy 116 e Enma 132.",
         "Os 19 equipamentos do set 2 são jogáveis, dos pergaminhos gémeos aos locais que reforçam toda uma missão.",
-        "A Bomba de Luz cobre o seu alvo com uma cortina de fumo, e a carta continua muda mesmo se for melhorada."
+        "A Bomba de Luz cobre o seu alvo com uma cortina de fumo, e a carta continua muda mesmo se for melhorada.",
+        "Vinte e uma cartas do set 2 ganham seu efeito imediato, incluindo Choji 9, Hayate 25, Ibiki 29 e Seimei 65.",
+        "Zabuza 136 derrota um inimigo que o adversário jogou no turno passado por menos que seu custo impresso.",
+        "Seimei pode portar vários equipamentos ao mesmo tempo e reuni-los nela de qualquer parte do tabuleiro.",
+        "As janelas de escolha que mostram cartas do deck finalmente exibem as cartas em vez de uma tela vazia.",
+        "Ibiki 28 volta a permitir deixar a carta no topo do deck adversário.",
+        "A Bomba de Fumaça volta a permitir escolher a missão para onde seu portador vai."
       ],
       "changes_it": [
         "Orochimaru 127 rivelato prende un solo personaggio, anche con Sasuke nella missione.",
@@ -77,7 +113,13 @@
         "La missione Priorità Alta non assegna più i punti due volte: si ripetono solo gli effetti SCORE.",
         "Diciassette carte del set 2 hanno ora il loro effetto permanente in gioco, tra cui Hiruzen 1, Might Guy 116 ed Enma 132.",
         "I 19 equipaggiamenti del set 2 sono giocabili, dalle pergamene gemelle ai luoghi che rinforzano un'intera missione.",
-        "La Bomba Accecante copre il bersaglio con una cortina di fumo, e la carta resta muta anche se la potenzi."
+        "La Bomba Accecante copre il bersaglio con una cortina di fumo, e la carta resta muta anche se la potenzi.",
+        "Ventuno carte del set 2 ottengono il loro effetto immediato, tra cui Choji 9, Hayate 25, Ibiki 29 e Seimei 65.",
+        "Zabuza 136 sconfigge un nemico che l'avversario ha giocato lo scorso turno per meno del suo costo stampato.",
+        "Seimei può portare più equipaggiamenti insieme e radunarli su di sé da tutto il campo.",
+        "Le finestre di scelta che mostrano carte del mazzo mostrano finalmente le carte invece di uno schermo vuoto.",
+        "Ibiki 28 permette di nuovo di lasciare la carta in cima al mazzo avversario.",
+        "La Bomba Fumogena permette di nuovo di scegliere la missione dove va il suo portatore."
       ],
       "changes_pl": [
         "Odkryty Orochimaru 127 przejmuje już tylko jedną postać, nawet gdy Sasuke jest w misji.",
@@ -87,7 +129,13 @@
         "Misja Wysoki Priorytet nie daje już punktów dwa razy: powtarzają się tylko efekty SCORE.",
         "Siedemnaście kart z dodatku 2 ma już swój stały efekt w grze, w tym Hiruzen 1, Might Guy 116 i Enma 132.",
         "Wszystkie 19 kart ekwipunku z dodatku 2 są grywalne, od bliźniaczych zwojów po miejsca wzmacniające całą misję.",
-        "Bomba błyskowa zakrywa cel zasłoną dymną, a karta pozostaje niema nawet po ulepszeniu."
+        "Bomba błyskowa zakrywa cel zasłoną dymną, a karta pozostaje niema nawet po ulepszeniu.",
+        "Dwadzieścia jeden kart z zestawu 2 zyskuje swój natychmiastowy efekt, w tym Choji 9, Hayate 25, Ibiki 29 i Seimei 65.",
+        "Zabuza 136 pokonuje wroga, którego przeciwnik zagrał w poprzedniej turze poniżej jego nadrukowanego kosztu.",
+        "Seimei może nosić kilka wyposażeń naraz i zbierać je na siebie z całego stołu.",
+        "Okna wyboru pokazujące karty z talii wreszcie wyświetlają karty zamiast pustego ekranu.",
+        "Ibiki 28 znów pozwala zostawić kartę na wierzchu talii przeciwnika.",
+        "Bomba dymna znów pozwala wskazać misję, do której trafia jej nosiciel."
       ]
     },
     {

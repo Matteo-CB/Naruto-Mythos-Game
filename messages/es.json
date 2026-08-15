@@ -858,7 +858,12 @@
         "ssPeeked": "{card} ({id}): se ha mirado un personaje oculto.",
         "ss028Bottom": "{card} ({id}): la carta superior del mazo enemigo pasa al fondo.",
         "ssSummonChakra": "{card} ({id}): {amount} de Chakra ganado.",
-        "ss072Recovered": "{card} ({id}): {target} vuelve del descarte a la mano."
+        "ss072Recovered": "{card} ({id}): {target} vuelve del descarte a la mano.",
+        "ss009Fed": "{card} ({id}): {target} descartada, 1 de Chakra ganado y una carta robada.",
+        "ss023Bottom": "{card} ({id}): la carta superior de tu mazo pasa al fondo.",
+        "ss029Revealed": "{card} ({id}): {target} revelada del mazo rival.",
+        "ss065Moved": "{card} ({id}): {target} movido a este personaje.",
+        "ss136Defeated": "{card} ({id}): un personaje jugado por menos de su coste impreso es derrotado."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",
@@ -1594,7 +1599,14 @@
         "ssPeekHidden": "Elige el personaje oculto que miras.",
         "ssPeekHiddenPowerup": "Elige el personaje oculto enemigo que miras, su coste en chakra se convierte en marcadores de Potencia.",
         "ss028BottomOrKeep": "¿Poner la carta superior del mazo enemigo al fondo de su mazo?",
-        "ssTargetedPowerup": "Elige el personaje aliado que recibe los marcadores de Potencia."
+        "ssTargetedPowerup": "Elige el personaje aliado que recibe los marcadores de Potencia.",
+        "ss009DiscardFood": "Elige una carta de Comida para descartarla, ganar 1 de Chakra y robar una carta.",
+        "ss023TopOrBottom": "Selecciona la carta para ponerla al fondo de tu mazo, o rechaza para dejarla arriba.",
+        "ss025MoveHidden": "Elige un personaje aliado oculto para moverlo fuera de esta misión.",
+        "ss025MoveDestination": "Elige la misión de destino.",
+        "ss029HideSameName": "Elige un personaje enemigo con el nombre de la carta revelada para ocultarlo.",
+        "ss065MoveAttachment": "Elige un equipo aliado para moverlo a este personaje.",
+        "ss136DefeatDiscounted": "Elige un personaje enemigo jugado el turno pasado por menos de su coste impreso para derrotarlo."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

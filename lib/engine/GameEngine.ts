@@ -21,6 +21,7 @@ import {
   TOTAL_TURNS,
 } from './types';
 import { deepClone } from './utils/deepClone';
+import { archiverTourPrecedent } from './rules/discountedPlay';
 import { normalizeHoloCardForGame } from '../holo/holoId';
 import { shuffle } from './utils/shuffle';
 import { generateGameId, generateInstanceId, resetIdCounter, seedIdCounterFromState, getIdCounter } from './utils/id';
@@ -205,6 +206,7 @@ export class GameEngine {
       action.type === 'UPGRADE_CHARACTER' ||
       action.type === 'PASS';
     if (isNewActionStart) {
+      newState = archiverTourPrecedent(newState, player);
       newState.turnPlayedIds = [];
     }
 

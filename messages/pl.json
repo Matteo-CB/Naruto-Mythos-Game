@@ -2955,7 +2955,12 @@
         "ssPeeked": "{card} ({id}): obejrzano zakrytą postać.",
         "ss028Bottom": "{card} ({id}): wierzchnia karta talii przeciwnika trafia na spód.",
         "ssSummonChakra": "{card} ({id}): zdobyto {amount} czakry.",
-        "ss072Recovered": "{card} ({id}): {target} wraca ze stosu kart odrzuconych do ręki."
+        "ss072Recovered": "{card} ({id}): {target} wraca ze stosu kart odrzuconych do ręki.",
+        "ss009Fed": "{card} ({id}): odrzucono {target}, zyskano 1 czakry i dobrano kartę.",
+        "ss023Bottom": "{card} ({id}): wierzchnia karta talii trafia na spód.",
+        "ss029Revealed": "{card} ({id}): odkryto {target} z talii przeciwnika.",
+        "ss065Moved": "{card} ({id}): {target} przeniesiono na tę postać.",
+        "ss136Defeated": "{card} ({id}): postać zagrana poniżej nadrukowanego kosztu zostaje pokonana."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3691,7 +3696,14 @@
         "ssPeekHidden": "Wybierz zakrytą postać, którą chcesz zobaczyć.",
         "ssPeekHiddenPowerup": "Wybierz zakrytą wrogą postać, jej koszt czakry zamienia się w znaczniki Mocy.",
         "ss028BottomOrKeep": "Położyć wierzchnią kartę talii przeciwnika na spód jego talii?",
-        "ssTargetedPowerup": "Wybierz sojuszniczą postać, która otrzyma znaczniki Mocy."
+        "ssTargetedPowerup": "Wybierz sojuszniczą postać, która otrzyma znaczniki Mocy.",
+        "ss009DiscardFood": "Wybierz kartę Jedzenia do odrzucenia, aby zyskać 1 czakry i dobrać kartę.",
+        "ss023TopOrBottom": "Wybierz kartę, aby odłożyć ją na spód talii, albo odmów, aby zostawić ją na wierzchu.",
+        "ss025MoveHidden": "Wybierz zakrytą sojuszniczą postać do przeniesienia z tej misji.",
+        "ss025MoveDestination": "Wybierz misję docelową.",
+        "ss029HideSameName": "Wybierz wrogą postać o nazwie odkrytej karty, aby ją zakryć.",
+        "ss065MoveAttachment": "Wybierz sojusznicze wyposażenie do przeniesienia na tę postać.",
+        "ss136DefeatDiscounted": "Wybierz wrogą postać zagraną w poprzedniej turze poniżej jej nadrukowanego kosztu, aby ją pokonać."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

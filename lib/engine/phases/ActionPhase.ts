@@ -166,9 +166,10 @@ function handlePlayCharacter(
     controlledBy: player,
     originalOwner: player,
     missionIndex,
+    playedBelowPrintedCost: effectiveCost < (card.chakra ?? 0),
   };
 
-  
+
   const missions = [...state.activeMissions];
   const mission = { ...missions[missionIndex] };
   if (player === 'player1') {
@@ -178,7 +179,7 @@ function handlePlayCharacter(
   }
   missions[missionIndex] = mission;
 
-  
+
   ps.charactersInPlay = countPlayerCharsInMissions(missions, player);
 
   let log = logAction(
@@ -541,6 +542,7 @@ function handleRevealCharacter(
 
   
   const fullCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
+  char.playedBelowPrintedCost = fullCost < (charTopCard.chakra ?? 0);
   let costToPay = fullCost;
 
   if (upgradeTarget) {
@@ -738,6 +740,7 @@ function handleUpgradeCharacter(
   
   existingChar.card = newCard;
   existingChar.stack = [...existingChar.stack, newCard];
+  existingChar.playedBelowPrintedCost = effectiveNewCost < (newCard.chakra ?? 0);
   
   
 

@@ -3,6 +3,7 @@ import type { CardData, GameState, PlayerID } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { confirmFirst } from './confirmFirst';
+import { apercuDeCartes } from './deckPreview';
 
 export interface FouilleDeDeck {
   id: string;
@@ -71,7 +72,12 @@ function fouilleHandler(fouille: FouilleDeDeck) {
       targetSelectionType: 'SS_DECK_SEARCH_TAKE',
       validTargets: candidats.map((i) => `DECK_${i}`),
       isOptional: true,
-      description: JSON.stringify({ depth: fouille.profondeur, sourceName: fouille.nom, sourceId: fouille.id }),
+      description: JSON.stringify({
+        depth: fouille.profondeur,
+        sourceName: fouille.nom,
+        sourceId: fouille.id,
+        cards: apercuDeCartes(state, sourcePlayer, candidats),
+      }),
       descriptionKey: 'game.effect.desc.ssDeckSearchTake',
     }, sourceCard.instanceId, 'SS_DECK_SEARCH_CONFIRM');
   };

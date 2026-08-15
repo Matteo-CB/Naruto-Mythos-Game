@@ -443,6 +443,23 @@ export function buildPendingTargetSelectionUI(
           card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
         };
       });
+    } else if (tst === 'SS_DECK_SEARCH_TAKE' || tst === 'SS095_TAKE_JUTSU' || tst === 'SS023_TOP_OR_BOTTOM' || tst === 'SS028_BOTTOM_OR_KEEP') {
+      let deckInfo: Array<{ index: number; id?: string; name_fr: string; name_en?: string; chakra?: number; power?: number; image_file?: string }> = [];
+      try { deckInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
+      handCards = pendingAction.options.map((optStr, optIdx) => {
+        const deckIdx = optStr.startsWith('DECK_') ? parseInt(optStr.slice(5), 10) : NaN;
+        const info = deckInfo.find((c) => c.index === deckIdx);
+        const indexed = info?.id ? getCharacterById(info.id) : null;
+        return {
+          index: optIdx,
+          targetId: optStr,
+          card: indexed?.image_file
+            ? fullCardData(indexed)
+            : info
+              ? { name_fr: info.name_fr, name_en: info.name_en, chakra: info.chakra, power: info.power, image_file: info.image_file, id: info.id }
+              : { name_fr: '???' },
+        };
+      });
     } else if (tst === 'SS000_CHOOSE_HOUNDS') {
       let houndsInfo: Array<{ index: number; id?: string; name_fr: string; name_en?: string; chakra?: number; power?: number; image_file?: string }> = [];
       try { houndsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').hounds ?? []; } catch { /* ignore */ }
@@ -457,7 +474,7 @@ export function buildPendingTargetSelectionUI(
             : { name_fr: '???' },
         };
       });
-    } else if (tst === 'SSMSS10_DISCARD_ATTACHMENT') {
+    } else if (tst === 'SSMSS10_DISCARD_ATTACHMENT' || tst === 'SS065_MOVE_ATTACHMENT') {
       let attachmentInfo: Array<{ attachmentId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number; hostName?: string }> = [];
       try { attachmentInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').attachments ?? []; } catch { /* ignore */ }
       const attachmentRanks = dataSource.activeMissions.map((m) => m.rank || '?');

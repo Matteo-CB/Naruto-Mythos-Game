@@ -3,6 +3,7 @@ import type { CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { confirmFirst } from './confirmFirst';
+import { apercuDeCartes } from './deckPreview';
 
 export const SHARK_SKIN_ID = 'SS-090-UC';
 export const MAKE_OUT_BOOK_ID = 'SS-088-UC';
@@ -106,7 +107,7 @@ function smokeBombMain(ctx: EffectContext): EffectResult {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'SS086_HIDE_AND_MOVE',
-    validTargets: destinations.map((i) => `MISSION_${i}`),
+    validTargets: destinations.map((i) => String(i)),
     isOptional: true,
     description: JSON.stringify({ hostInstanceId: sourceCard.instanceId }),
     descriptionKey: 'game.effect.desc.ss086HideAndMove',
@@ -133,7 +134,7 @@ function sealingScrollMain(ctx: EffectContext): EffectResult {
     targetSelectionType: 'SS095_TAKE_JUTSU',
     validTargets: jutsu.map((c) => `DECK_${state[sourcePlayer].deck.indexOf(c)}`),
     isOptional: true,
-    description: JSON.stringify({}),
+    description: JSON.stringify({ cards: apercuDeCartes(state, sourcePlayer, jutsu.map((c) => state[sourcePlayer].deck.indexOf(c))) }),
     descriptionKey: 'game.effect.desc.ss095TakeJutsu',
   }, sourceCard.instanceId, 'SS095_CONFIRM_MAIN');
 }

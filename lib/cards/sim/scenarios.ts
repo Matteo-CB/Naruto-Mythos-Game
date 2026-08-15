@@ -134,6 +134,46 @@ const FACTORIES: Record<string, Factory> = {
     },
     play: P1(FRESH), noMinimize: true,
   }),
+  'SS-009-C': (id) => ({
+    build: () => board({ hand: [id, 'SS-081-C'], chakra: 14 }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-023-C': (id) => ({
+    build: () => board({ hand: [id], chakra: 14 }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-025-C': (id) => ({
+    build: () => board({ hand: [id], hidden0: { id: 'SS-010-C', iid: HID }, chakra: 14 }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-029-UC': (id) => ({
+    build: () => {
+      const st = board({ hand: [id], e0: [{ id: 'SS-010-C', iid: 'sim-meme-nom' }], chakra: 14 });
+      st.player2.deck = [getCharacterById('SS-010-C')!, ...st.player2.deck];
+      return st;
+    },
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-065-UC': (id) => ({
+    build: () => {
+      const st = board({ hand: [id], p1m0: [{ id: 'SS-010-C', iid: 'sim-porteur' }], chakra: 14 });
+      st.activeMissions[0].player1Characters[0].attachments = [
+        { instanceId: 'att-sim-065', card: getCardById('SS-080-C') as never, owner: 'player1' },
+      ];
+      return st;
+    },
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-136-R': (id) => ({
+    build: () => {
+      const st = board({ hand: [id], e0: [{ id: 'SS-010-C', iid: 'sim-cible' }], chakra: 14 });
+      st.activeMissions[0].player2Characters[0].playedBelowPrintedCost = true;
+      st.lastActionPlayer = 'player1';
+      st.lastTurnPlayedIds = { player1: [], player2: ['sim-cible'] };
+      return st;
+    },
+    play: P1(FRESH), noMinimize: true,
+  }),
   'SS-003-C': (id) => ({
     build: () => board({ hand: [id], p1m0: ['SS-010-C'] }),
     play: P1(FRESH), noMinimize: true,

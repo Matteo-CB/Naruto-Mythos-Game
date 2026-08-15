@@ -2955,7 +2955,12 @@
         "ssPeeked": "{card} ({id}): foi visto um personagem escondido.",
         "ss028Bottom": "{card} ({id}): a carta do topo do baralho adversário passa para o fundo.",
         "ssSummonChakra": "{card} ({id}): {amount} de Chakra ganho.",
-        "ss072Recovered": "{card} ({id}): {target} volta do descarte para a mão."
+        "ss072Recovered": "{card} ({id}): {target} volta do descarte para a mão.",
+        "ss009Fed": "{card} ({id}): {target} descartada, 1 de Chakra ganho e uma carta comprada.",
+        "ss023Bottom": "{card} ({id}): a carta do topo do seu deck vai para o fundo.",
+        "ss029Revealed": "{card} ({id}): {target} revelada do deck adversário.",
+        "ss065Moved": "{card} ({id}): {target} movido para este personagem.",
+        "ss136Defeated": "{card} ({id}): um personagem jogado por menos que seu custo impresso é derrotado."
       },
       "score": {
         "draw": "[SCORE] {card}: Comprou {count} carta(s).",
@@ -3691,7 +3696,14 @@
         "ssPeekHidden": "Escolha o personagem escondido que quer ver.",
         "ssPeekHiddenPowerup": "Escolha o personagem escondido inimigo que quer ver, o seu custo em chakra torna-se marcadores de Potência.",
         "ss028BottomOrKeep": "Colocar a carta do topo do baralho adversário no fundo do baralho dele?",
-        "ssTargetedPowerup": "Escolha o personagem aliado que recebe os marcadores de Potência."
+        "ssTargetedPowerup": "Escolha o personagem aliado que recebe os marcadores de Potência.",
+        "ss009DiscardFood": "Escolha uma carta de Comida para descartar, ganhar 1 de Chakra e comprar uma carta.",
+        "ss023TopOrBottom": "Selecione a carta para colocá-la no fundo do seu deck, ou recuse para deixá-la no topo.",
+        "ss025MoveHidden": "Escolha um personagem aliado oculto para mover para fora desta missão.",
+        "ss025MoveDestination": "Escolha a missão de destino.",
+        "ss029HideSameName": "Escolha um personagem inimigo com o nome da carta revelada para ocultá-lo.",
+        "ss065MoveAttachment": "Escolha um equipamento aliado para mover para este personagem.",
+        "ss136DefeatDiscounted": "Escolha um personagem inimigo jogado no turno passado por menos que seu custo impresso para derrotá-lo."
       },
       "upgradeModifierConfirm": "Aplicar o efeito UPGRADE",
       "upgradeModifierDecline": "Manter apenas o efeito MAIN",

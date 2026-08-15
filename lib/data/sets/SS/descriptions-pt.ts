@@ -412,4 +412,23 @@ export const effectDescriptionsPt: Record<string, string[]> = {
   "SS-038-UC": [
     "[↯] Anexa Ukon a um personagem inimigo não escondido nesta missão. Enquanto anexado, esse personagem tem -5 Poder, e Ukon é tratado como equipamento em vez de personagem.",
   ],
+  "SS-009-C": [
+    "[↯] Descarte uma carta de Comida da sua mão para ganhar 1 de Chakra e comprar uma carta.",
+  ],
+  "SS-023-C": [
+    "[↯] Olhe a carta do topo do seu deck. Escolha deixá-la ou colocá-la no fundo do seu deck.",
+  ],
+  "SS-025-C": [
+    "[↯] Mova um personagem aliado oculto desta missão.",
+  ],
+  "SS-029-UC": [
+    "[↯] Revele a carta do topo do deck adversário. Oculte um personagem inimigo em jogo com o mesmo nome da carta revelada.",
+  ],
+  "SS-065-UC": [
+    "[↯] Você pode mover qualquer quantidade de equipamentos aliados em jogo para este personagem.",
+    "[⧗] Este personagem pode ter mais de um equipamento aliado, ignorando todos os requisitos.",
+  ],
+  "SS-136-R": [
+    "[↯] Derrote um personagem inimigo nesta missão que foi jogado no turno passado por menos que seu custo impresso devido a um efeito de carta.",
+  ],
 };

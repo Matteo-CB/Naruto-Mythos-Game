@@ -859,7 +859,12 @@
         "ssPeeked": "{card} ({id}) : un personnage caché a été regardé.",
         "ss028Bottom": "{card} ({id}) : la carte du dessus du deck adverse passe en dessous.",
         "ssSummonChakra": "{card} ({id}) : {amount} Chakra gagné.",
-        "ss072Recovered": "{card} ({id}) : {target} revient de la défausse à la main."
+        "ss072Recovered": "{card} ({id}) : {target} revient de la défausse à la main.",
+        "ss009Fed": "{card} ({id}) : {target} défaussée, 1 Chakra gagné et une carte piochée.",
+        "ss023Bottom": "{card} ({id}) : la carte du dessus de votre pioche passe au fond.",
+        "ss029Revealed": "{card} ({id}) : {target} révélée depuis la pioche adverse.",
+        "ss065Moved": "{card} ({id}) : {target} déplacé sur ce personnage.",
+        "ss136Defeated": "{card} ({id}) : un personnage joué sous son coût imprimé est vaincu."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1595,7 +1600,14 @@
         "ssPeekHidden": "Choisissez le personnage caché à regarder.",
         "ssPeekHiddenPowerup": "Choisissez le personnage caché ennemi à regarder, sa valeur en chakra devient des jetons de Puissance.",
         "ss028BottomOrKeep": "Mettre la carte du dessus du deck adverse en dessous de son deck ?",
-        "ssTargetedPowerup": "Choisissez le personnage allié qui reçoit les jetons de Puissance."
+        "ssTargetedPowerup": "Choisissez le personnage allié qui reçoit les jetons de Puissance.",
+        "ss009DiscardFood": "Choisissez une carte Nourriture à défausser pour gagner 1 Chakra et piocher une carte.",
+        "ss023TopOrBottom": "Choisissez la carte pour la placer au fond de votre pioche, ou refusez pour la laisser au sommet.",
+        "ss025MoveHidden": "Choisissez un personnage allié caché à déplacer hors de cette mission.",
+        "ss025MoveDestination": "Choisissez la mission de destination.",
+        "ss029HideSameName": "Choisissez un personnage ennemi portant le nom de la carte révélée pour le cacher.",
+        "ss065MoveAttachment": "Choisissez un équipement allié à déplacer sur ce personnage.",
+        "ss136DefeatDiscounted": "Choisissez un personnage ennemi joué au tour précédent sous son coût imprimé pour le vaincre."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",
