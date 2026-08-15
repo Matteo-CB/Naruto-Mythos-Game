@@ -83,6 +83,32 @@ describe('phase 5, porte de sortie des douze declenchements', () => {
     expect(muettes, 'aucune AMBUSH muette a la revelation').toEqual([]);
   });
 
+  it('aucune amelioration ni alteration de la phase n_est copiable', async () => {
+    const { isCopyableEffect } = await import('@/lib/effects/handlers/KS/shared/copyExclusions');
+    const copiables: string[] = [];
+    for (const id of PHASE5) {
+      for (const effet of (getCardById(id) as CardData).effects ?? []) {
+        const alteration = /(MAIN|AMBUSH|UPGRADE|SCORE|DUEL|FIRST STRIKE) effect/.test(effet.description)
+          || /Repeat the/.test(effet.description);
+        if (effet.type !== 'UPGRADE' && !alteration) continue;
+        if (isCopyableEffect(effet, { wasRevealed: true, wasFirstCard: true })) copiables.push(`${id} ${effet.type}`);
+      }
+    }
+    expect(copiables, 'ni UPGRADE ni alteration ne se copient').toEqual([]);
+  });
+
+  it('les Trois Serpents rentrent en main a la fin de la manche', async () => {
+    const { buildSimState } = await import('@/lib/cards/sim/buildState');
+    const { executeEndPhase } = await import('@/lib/engine/phases/EndPhase');
+    const serpents = simChar('SS-056-UC', { owner: 'player1', instanceId: 'sim-serpents' });
+    const depart = buildSimState({ p1: [serpents], p2: [], missions: 1, chakra1: 0 });
+    const fin = executeEndPhase(depart);
+
+    expect(fin.activeMissions[0].player1Characters.some((c) => c.instanceId === 'sim-serpents'),
+      'l_invocation quitte le terrain').toBe(false);
+    expect(fin.player1.hand.some((c) => c.id === 'SS-056-UC'), 'elle revient en main').toBe(true);
+  });
+
   it('chaque SCORE de la phase a son handler et se lit au decompte', () => {
     for (const id of PHASE5) {
       if (effetsDe(id, 'SCORE').length === 0) continue;
