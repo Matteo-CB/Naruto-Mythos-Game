@@ -1,6 +1,72 @@
 {
   "entries": [
     {
+      "date": "2026-08-16",
+      "title_fr": "Correctifs des equipements et des Hokage",
+      "title_en": "Attachment and Hokage fixes",
+      "title_es": "Correcciones de equipamientos y Hokage",
+      "title_pt": "Correções de equipamentos e Hokage",
+      "title_it": "Correzioni di equipaggiamenti e Hokage",
+      "title_pl": "Poprawki wyposażenia i Hokage",
+      "title_ja": "装備と火影の修正",
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ],
+      "changes_fr": [
+        "POIDS 087 Peu commune ne disparait plus quand on l'attache a Rock Lee ou a un personnage Taijutsu.",
+        "Poser un second equipement sur un personnage ne defausse plus l'ancien et le nouveau, seulement l'ancien.",
+        "SAMEHADA 090 Peu commune tient desormais sur un Deserteur qui n'est pas de l'Akatsuki.",
+        "BOMBE AVEUGLANTE 083 Peu commune annule bien le surcout en chakra impose par la carte equipee.",
+        "HASHIRAMA SENJU 129 Rare et TOBIRAMA SENJU 131 Rare peuvent enfin s'ameliorer par-dessus un allie quand Orochimaru est dans la mission."
+      ],
+      "changes_en": [
+        "WEIGHTS 087 Uncommon no longer vanishes when attached to Rock Lee or a Taijutsu character.",
+        "Playing a second attachment on a character no longer discards both the old and the new one, only the old one.",
+        "SAMEHADA 090 Uncommon now stays on a Rogue Ninja who is not Akatsuki.",
+        "FLASH BOMB 083 Uncommon now cancels the extra chakra cost imposed by the card it is attached to.",
+        "HASHIRAMA SENJU 129 Rare and TOBIRAMA SENJU 131 Rare can finally upgrade over an ally when Orochimaru is in the mission."
+      ],
+      "changes_es": [
+        "PESAS 087 Poco comun ya no desaparece al equiparla a Rock Lee o a un personaje Taijutsu.",
+        "Poner un segundo equipamiento en un personaje ya no descarta el antiguo y el nuevo, solo el antiguo.",
+        "SAMEHADA 090 Poco comun ahora permanece en un Ninja Renegado que no es de Akatsuki.",
+        "BOMBA CEGADORA 083 Poco comun ya anula el coste extra de chakra impuesto por la carta equipada.",
+        "HASHIRAMA SENJU 129 Rara y TOBIRAMA SENJU 131 Rara por fin pueden mejorar sobre un aliado cuando Orochimaru esta en la mision."
+      ],
+      "changes_pt": [
+        "PESOS 087 Incomum não desaparece mais ao ser anexado a Rock Lee ou a um personagem Taijutsu.",
+        "Colocar um segundo equipamento em um personagem não descarta mais o antigo e o novo, apenas o antigo.",
+        "SAMEHADA 090 Incomum agora permanece em um Ninja Renegado que não é da Akatsuki.",
+        "BOMBA DE LUZ 083 Incomum agora anula o custo extra de chakra imposto pela carta equipada.",
+        "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara enfim podem melhorar sobre um aliado quando Orochimaru está na missão."
+      ],
+      "changes_it": [
+        "PESI 087 Non comune non sparisce più quando lo equipaggi a Rock Lee o a un personaggio Taijutsu.",
+        "Mettere un secondo equipaggiamento su un personaggio non scarta più il vecchio e il nuovo, solo il vecchio.",
+        "SAMEHADA 090 Non comune ora resta su un Ninja Rinnegato che non è dell'Alba.",
+        "BOMBA ACCECANTE 083 Non comune ora annulla il costo extra di chakra imposto dalla carta equipaggiata.",
+        "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara possono finalmente migliorare su un alleato quando Orochimaru è nella missione."
+      ],
+      "changes_pl": [
+        "CIĘŻARKI 087 Niepospolita nie znikają już po założeniu na Rock Lee lub postać Taijutsu.",
+        "Zagranie drugiego wyposażenia na postaci nie odrzuca już starego i nowego, tylko stare.",
+        "SAMEHADA 090 Niepospolita zostaje teraz na Zbiegu, który nie należy do Akatsuki.",
+        "BOMBA BŁYSKOWA 083 Niepospolita anuluje teraz dodatkowy koszt czakry narzucony przez wyposażoną kartę.",
+        "HASHIRAMA SENJU 129 Rzadka i TOBIRAMA SENJU 131 Rzadka mogą wreszcie ulepszyć sojusznika, gdy Orochimaru jest w misji."
+      ],
+      "changes_ja": [
+        "おもり 087 アンコモンが、ロック・リーや体術キャラに付けても消えなくなりました。",
+        "キャラに2枚目の装備を付けたとき、古い方と新しい方の両方ではなく、古い方だけが捨てられます。",
+        "鮫肌 090 アンコモンが、暁でない抜け忍にも残るようになりました。",
+        "閃光弾 083 アンコモンが、装備先のカードによるチャクラ追加コストを打ち消すようになりました。",
+        "千手柱間 129 レアと千手扉間 131 レアが、大蛇丸がミッションにいるとき味方の上に重ねられるようになりました。"
+      ]
+    },
+    {
       "date": "2026-08-15",
       "title_fr": "Correctifs de cartes du set 2",
       "title_en": "Set 2 card fixes",

@@ -331,11 +331,6 @@ export function hostMatchesAttachSpec(char: CharacterInPlay, spec: AttachSpec): 
   return true;
 }
 
-function requiredAttachGroup(card?: CardData | null): string | null {
-  const spec = parseAttachSpec(card);
-  return spec.requires[0] ?? null;
-}
-
 export function attachesToEnemy(card?: CardData | null): boolean {
   return (card?.effects ?? []).some(
     (e) => e.type === 'ATTACH' && /attach to an enemy/i.test(e.description ?? ''),
@@ -430,11 +425,7 @@ export function discardAttachmentsOnLeave(state: GameState, character: Character
 }
 
 function attachConditionHolds(host: CharacterInPlay, attachment: CardData): boolean {
-  if (requiresNonHiddenHost(attachment) && host.isHidden) return false;
-  if (requiresHiddenHost(attachment) && !host.isHidden) return false;
-  const group = requiredAttachGroup(attachment);
-  if (group && !characterHasGroup(host, group)) return false;
-  return true;
+  return hostMatchesAttachSpec(host, parseAttachSpec(attachment));
 }
 
 function collectAttachmentsInPlay(state: GameState): Map<string, AttachedCard> {

@@ -1,6 +1,6 @@
 import type { GameState, PlayerID, CharacterCard } from '../types';
 import { foodAttachmentDiscountCount } from '@/lib/effects/handlers/SS/staticAuras';
-import { virtualSoundFourCount } from '@/lib/effects/handlers/SS/attachmentStatics';
+import { virtualSoundFourCount, textIsBlanked } from '@/lib/effects/handlers/SS/attachmentStatics';
 import { reductionPremiereFrappe } from './firstStrikeDiscount';
 
 
@@ -119,6 +119,7 @@ export function calculateEffectiveCost(
   const allCharsInMission = [...(friendlyChars || []), ...(player === 'player1' ? mission.player2Characters : mission.player1Characters) || []];
   for (const charInMission of allCharsInMission) {
     if (charInMission.isHidden) continue;
+    if (textIsBlanked(charInMission)) continue;
 
     const topCard = getTopCard(charInMission);
     if (!topCard) continue;

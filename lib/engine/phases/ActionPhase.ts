@@ -520,7 +520,7 @@ function handleRevealCharacter(
       const cTop = candidate.stack?.length > 0 ? candidate.stack[candidate.stack?.length - 1] : candidate.card;
       if (charTopCard.chakra > cTop.chakra) {
         const isSameName = cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
-        if (isSameName || checkFlexibleUpgrade(charTopCard, cTop)) {
+        if (isSameName || checkFlexibleUpgrade(charTopCard, cTop, state, missionIndex)) {
           upgradeTarget = candidate;
         }
       }

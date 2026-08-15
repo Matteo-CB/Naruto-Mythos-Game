@@ -313,12 +313,17 @@ export function validateUpgradeCharacter(
 }
 
 
-export function isUpgradeNameLegal(newCard: CharacterCard, targetTopCard: CharacterCard): boolean {
+export function isUpgradeNameLegal(
+  newCard: CharacterCard,
+  targetTopCard: CharacterCard,
+  state?: GameState,
+  missionIndex?: number,
+): boolean {
   if (hasFlexibleUpgradeRestriction(newCard)) {
     if (isRestrictedUpgradeTarget(targetTopCard)) return false;
   }
   if (newCard.name_fr.toUpperCase() === targetTopCard.name_fr.toUpperCase()) return true;
-  return checkFlexibleUpgrade(newCard, targetTopCard);
+  return checkFlexibleUpgrade(newCard, targetTopCard, state, missionIndex);
 }
 
 

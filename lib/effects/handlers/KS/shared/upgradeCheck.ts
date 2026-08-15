@@ -38,7 +38,7 @@ export function canAffordAsUpgrade(
       const topCard = topCardOf(char);
       if (card.chakra <= (topCard.chakra ?? 0)) continue;
 
-      if (!isUpgradeNameLegal(card as CharacterCard, topCard)) continue;
+      if (!isUpgradeNameLegal(card as CharacterCard, topCard, state, missionIndex)) continue;
 
       const isSameName = topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
       if (!isSameName && visibleSameNameElsewhere(mission[friendlySide], card, char.instanceId)) continue;

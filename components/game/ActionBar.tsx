@@ -99,8 +99,8 @@ export function ActionBar() {
       const charCard = c.topCard ?? c.card;
       if (!charCard) return false;
       const sameNameMatch = charCard.name_fr.toUpperCase() === selectedCard.name_fr.toUpperCase();
-      const isFlexUpgrade = checkFlexibleUpgrade(selectedCard as any, charCard as any);
-      const nameOk = isUpgradeNameLegal(selectedCard as any, charCard as any);
+      const isFlexUpgrade = checkFlexibleUpgrade(selectedCard as any, charCard as any, visibleState as any, selectedMissionIndex);
+      const nameOk = isUpgradeNameLegal(selectedCard as any, charCard as any, visibleState as any, selectedMissionIndex);
       if (!nameOk || charCard.chakra >= selectedCard.chakra) return false;
 
       if (!sameNameMatch && isFlexUpgrade) {
@@ -114,7 +114,7 @@ export function ActionBar() {
       }
       return true;
     });
-  }, [selectedCard, selectedMissionIndex, visibleState?.activeMissions, myPlayer]);
+  }, [selectedCard, selectedMissionIndex, visibleState, myPlayer]);
 
   const canReveal = isMyTurn && isActionPhase && hasTargetSelected && !hasPassed;
   
@@ -136,7 +136,7 @@ export function ActionBar() {
           if (!cTop) continue;
           if (hiddenTopCard.chakra <= cTop.chakra) continue;
           const isSameName = cTop.name_fr.toUpperCase() === hiddenTopCard.name_fr.toUpperCase();
-          const isFlexible = checkFlexibleUpgrade(hiddenTopCard as any, cTop as any);
+          const isFlexible = checkFlexibleUpgrade(hiddenTopCard as any, cTop as any, visibleState as any, mi);
           if (isSameName || isFlexible) {
             
             if (isFlexible && !isSameName) {
