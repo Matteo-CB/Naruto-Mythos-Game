@@ -12,10 +12,15 @@ interface AttachmentStripProps {
   mine: boolean;
   index: number;
   glow: string;
+  layer?: number;
   onClick: () => void;
   onHover?: (x: number, y: number) => void;
   onLeave?: () => void;
 }
+
+export const FLASH_BOMB_ID = 'SS-083-UC';
+export const SMOKE_LAYER = 6;
+export const ABOVE_SMOKE_LAYER = SMOKE_LAYER + 1;
 
 export const CHARACTER_VISIBLE_RATIO = 0.32;
 export const MISSION_VISIBLE_RATIO = 0.4;
@@ -29,6 +34,7 @@ export const AttachmentStrip = memo(function AttachmentStrip({
   mine,
   index,
   glow,
+  layer = 0,
   onClick,
   onHover,
   onLeave,
@@ -62,7 +68,7 @@ export const AttachmentStrip = memo(function AttachmentStrip({
         borderRadius: '4px',
         boxShadow: `0 2px 10px rgba(0,0,0,0.8), 0 0 8px ${glow}`,
         cursor: 'pointer',
-        zIndex: 0,
+        zIndex: layer,
         pointerEvents: 'auto',
       }}
     >

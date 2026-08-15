@@ -34,8 +34,24 @@ describe('attachments are laid out exactly like the printed reference', () => {
     expect(STRIP).toContain('export const MISSION_VISIBLE_RATIO = 0.4;');
   });
 
-  it('it stays behind the card it belongs to', () => {
-    expect(STRIP).toContain('zIndex: 0');
+  it('it stays behind the card it belongs to by default', () => {
+    expect(STRIP, 'the layer defaults to zero, so the host card covers it')
+      .toContain('layer = 0');
+    expect(STRIP).toContain('zIndex: layer');
+  });
+
+  it('the Flash Bomb rises above its own smoke screen', () => {
+    expect(STRIP, 'the smoke layer is named once and shared')
+      .toContain('export const SMOKE_LAYER');
+    expect(STRIP).toContain('export const ABOVE_SMOKE_LAYER = SMOKE_LAYER + 1;');
+
+    const smoke = readFileSync('components/game/FlashBombSmoke.tsx', 'utf8');
+    expect(smoke, 'the smoke reads the shared layer instead of its own number')
+      .toContain('zIndex: SMOKE_LAYER');
+
+    const lane = readFileSync('components/game/MissionLane.tsx', 'utf8');
+    expect(lane, 'the strip that caused the smoke is raised above it')
+      .toContain('layer={att.card.id === FLASH_BOMB_ID ? ABOVE_SMOKE_LAYER : 0}');
   });
 
   it('several attachments fan out instead of hiding one another', () => {

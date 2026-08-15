@@ -21,7 +21,7 @@ function boardKeyOf(char: VisibleCharacter): string {
 }
 
 import { normalizeImagePath } from '@/lib/utils/imagePath';
-import { AttachmentStrip, CHARACTER_VISIBLE_RATIO, MISSION_VISIBLE_RATIO } from './AttachmentStrip';
+import { AttachmentStrip, ABOVE_SMOKE_LAYER, FLASH_BOMB_ID, CHARACTER_VISIBLE_RATIO, MISSION_VISIBLE_RATIO } from './AttachmentStrip';
 import { FlashBombSmoke } from './FlashBombSmoke';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { CardArtFallback } from '@/components/cards/CardArtFallback';
@@ -203,7 +203,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         marginLeft: attachmentRoom.left + 'px',
       }}
     >
-      {(character.attachments ?? []).some((a) => a.card.id === 'SS-083-UC') && (
+      {(character.attachments ?? []).some((a) => a.card.id === FLASH_BOMB_ID) && (
         <FlashBombSmoke instanceId={character.instanceId} />
       )}
       {(character.attachments ?? []).map((att, attIndex) => {
@@ -215,6 +215,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
             label={getCardName(att.card, locale as 'en' | 'fr')}
             mine={mine}
             index={attIndex}
+            layer={att.card.id === FLASH_BOMB_ID ? ABOVE_SMOKE_LAYER : 0}
             glow={mine ? palette.me.tint(0.55) : palette.opponent.tint(0.55)}
             onClick={() => pinCard(att.card as never)}
             onHover={(x, y) => showPreview(att.card as never, { x, y })}

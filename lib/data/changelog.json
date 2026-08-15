@@ -14,9 +14,11 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "BOMBE AVEUGLANTE 083 Peu commune est de nouveau visible sur sa cible: son propre ecran de fumee la recouvrait.",
         "POIDS 087 Peu commune ne disparait plus quand on l'attache a Rock Lee ou a un personnage Taijutsu.",
         "Poser un second equipement sur un personnage ne defausse plus l'ancien et le nouveau, seulement l'ancien.",
         "SAMEHADA 090 Peu commune tient desormais sur un Deserteur qui n'est pas de l'Akatsuki.",
@@ -24,6 +26,7 @@
         "HASHIRAMA SENJU 129 Rare et TOBIRAMA SENJU 131 Rare peuvent enfin s'ameliorer par-dessus un allie quand Orochimaru est dans la mission."
       ],
       "changes_en": [
+        "FLASH BOMB 083 Uncommon is visible again on its target: its own smoke screen was covering it.",
         "WEIGHTS 087 Uncommon no longer vanishes when attached to Rock Lee or a Taijutsu character.",
         "Playing a second attachment on a character no longer discards both the old and the new one, only the old one.",
         "SAMEHADA 090 Uncommon now stays on a Rogue Ninja who is not Akatsuki.",
@@ -31,6 +34,7 @@
         "HASHIRAMA SENJU 129 Rare and TOBIRAMA SENJU 131 Rare can finally upgrade over an ally when Orochimaru is in the mission."
       ],
       "changes_es": [
+        "BOMBA CEGADORA 083 Poco comun vuelve a verse sobre su objetivo: su propia cortina de humo la tapaba.",
         "PESAS 087 Poco comun ya no desaparece al equiparla a Rock Lee o a un personaje Taijutsu.",
         "Poner un segundo equipamiento en un personaje ya no descarta el antiguo y el nuevo, solo el antiguo.",
         "SAMEHADA 090 Poco comun ahora permanece en un Ninja Renegado que no es de Akatsuki.",
@@ -38,6 +42,7 @@
         "HASHIRAMA SENJU 129 Rara y TOBIRAMA SENJU 131 Rara por fin pueden mejorar sobre un aliado cuando Orochimaru esta en la mision."
       ],
       "changes_pt": [
+        "BOMBA DE LUZ 083 Incomum voltou a aparecer sobre o alvo: a própria cortina de fumaça a cobria.",
         "PESOS 087 Incomum não desaparece mais ao ser anexado a Rock Lee ou a um personagem Taijutsu.",
         "Colocar um segundo equipamento em um personagem não descarta mais o antigo e o novo, apenas o antigo.",
         "SAMEHADA 090 Incomum agora permanece em um Ninja Renegado que não é da Akatsuki.",
@@ -45,6 +50,7 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara enfim podem melhorar sobre um aliado quando Orochimaru está na missão."
       ],
       "changes_it": [
+        "BOMBA ACCECANTE 083 Non comune è di nuovo visibile sul suo bersaglio: la sua stessa cortina di fumo la copriva.",
         "PESI 087 Non comune non sparisce più quando lo equipaggi a Rock Lee o a un personaggio Taijutsu.",
         "Mettere un secondo equipaggiamento su un personaggio non scarta più il vecchio e il nuovo, solo il vecchio.",
         "SAMEHADA 090 Non comune ora resta su un Ninja Rinnegato che non è dell'Alba.",
@@ -52,6 +58,7 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara possono finalmente migliorare su un alleato quando Orochimaru è nella missione."
       ],
       "changes_pl": [
+        "BOMBA BŁYSKOWA 083 Niepospolita znów jest widoczna na celu: zasłaniała ją jej własna zasłona dymna.",
         "CIĘŻARKI 087 Niepospolita nie znikają już po założeniu na Rock Lee lub postać Taijutsu.",
         "Zagranie drugiego wyposażenia na postaci nie odrzuca już starego i nowego, tylko stare.",
         "SAMEHADA 090 Niepospolita zostaje teraz na Zbiegu, który nie należy do Akatsuki.",
@@ -59,6 +66,7 @@
         "HASHIRAMA SENJU 129 Rzadka i TOBIRAMA SENJU 131 Rzadka mogą wreszcie ulepszyć sojusznika, gdy Orochimaru jest w misji."
       ],
       "changes_ja": [
+        "閃光弾 083 アンコモンが対象の上に再び表示されます。自身の煙幕で隠れていました。",
         "おもり 087 アンコモンが、ロック・リーや体術キャラに付けても消えなくなりました。",
         "キャラに2枚目の装備を付けたとき、古い方と新しい方の両方ではなく、古い方だけが捨てられます。",
         "鮫肌 090 アンコモンが、暁でない抜け忍にも残るようになりました。",
