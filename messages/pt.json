@@ -2950,7 +2950,8 @@
         "ss110Reward": "{card} ({id}): 1 carta comprada e POWERUP 1 em {target}.",
         "ss107Ambush": "{card} ({id}): o personagem jogado da mão ativa os seus efeitos AMBUSH.",
         "ss109Reinforcement": "{card} ({id}): a carta do topo do baralho chega virada para baixo na missão {mission}.",
-        "ss083Blank": "{card} ({id}): este personagem já não tem texto, nada é ativado."
+        "ss083Blank": "{card} ({id}): este personagem já não tem texto, nada é ativado.",
+        "ssDeckSearchTaken": "{card} ({id}): {target} revelado e adicionado à mão."
       },
       "score": {
         "draw": "[SCORE] {card}: Comprou {count} carta(s).",
@@ -3681,7 +3682,8 @@
         "ss084RemoveTokens": "Retirar todos os marcadores de Potência deste personagem?",
         "ss086HideAndMove": "Esconder este personagem e movê-lo para outra missão?",
         "ss095TakeJutsu": "Escolha o personagem Jutsu a revelar e a adicionar à sua mão.",
-        "ss090ChooseAmount": "Quantos marcadores de Potência leva, até 3?"
+        "ss090ChooseAmount": "Quantos marcadores de Potência leva, até 3?",
+        "ssDeckSearchTake": "Escolha a carta a revelar e a adicionar à sua mão."
       },
       "upgradeModifierConfirm": "Aplicar o efeito UPGRADE",
       "upgradeModifierDecline": "Manter apenas o efeito MAIN",

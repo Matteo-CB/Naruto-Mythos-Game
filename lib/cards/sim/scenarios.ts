@@ -1,7 +1,7 @@
 import type { GameState, PendingAction, PlayerID, GameAction, GameLogEntry, CharacterInPlay } from '@/lib/engine/types';
 import { buildGeneratedScenario, buildScenarioForEffect, revealScenarioFor } from '@/lib/cards/sim/generate';
 import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
-import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
+import { getCardById, getCharacterById, getMissionById } from '@/lib/data/cardIndex';
 import { phase810KindForEffect, phase810Scenario } from '@/lib/cards/sim/phase810';
 import { firesUpgrade, upgradeScenario } from '@/lib/cards/sim/upgradeSim';
 import { minimizeScenario } from '@/lib/cards/sim/minimize';
@@ -110,6 +110,31 @@ const FACTORIES: Record<string, Factory> = {
   'KS-110-R': (id) => ({ build: () => board({ hand: [id], e0: [{ id: 'KS-005-C', iid: 'sim-weak' }, { id: 'KS-086-C', iid: 'sim-strong' }] }), play: P1(FRESH) }),
   'KS-113-R': (id) => ({ build: () => board({ hand: [id], p1m0: ['KS-027-C', 'KS-009-C'] }), play: P1(FRESH) }),
   'KS-138-S': (id) => ({ build: () => board({ hand: [id], upgBase: { id: 'KS-063-UC', iid: 'sim-upg-base' } }), play: P1(upgrade('sim-upg-base')) }),
+  'SS-004-UC': (id) => ({
+    build: () => {
+      const st = board({ hand: [id] });
+      st.player1.deck = ['SS-004-UC', 'KS-009-C', 'KS-010-C', 'KS-005-C'].map((x) => getCharacterById(x)!).filter(Boolean);
+      return st;
+    },
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-058-UC': (id) => ({
+    build: () => {
+      const st = board({ hand: [id] });
+      st.player1.deck = ['SS-126-R', 'KS-009-C', 'KS-010-C', 'KS-005-C'].map((x) => getCharacterById(x)!).filter(Boolean);
+      return st;
+    },
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-074-C': (id) => ({
+    build: () => {
+      const st = board({ hand: [id] });
+      st.player1.deck = ['KS-009-C', 'KS-010-C', 'KS-005-C', 'KS-086-C', 'KS-003-C'].map((x) => getCharacterById(x)!).filter(Boolean);
+      st.player1.deck[2] = getCardById('SS-080-C') as never;
+      return st;
+    },
+    play: P1(FRESH), noMinimize: true,
+  }),
   'SS-083-UC': (id) => ({
     build: () => board({ hand: [id], e0: [{ id: 'SS-062-C', iid: 'sim-bavard' }], p1m0: ['KS-009-C'] }),
     play: P1(FRESH), noMinimize: true,

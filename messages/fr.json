@@ -854,7 +854,8 @@
         "ss110Reward": "{card} ({id}) : 1 carte piochée et POWERUP 1 sur {target}.",
         "ss107Ambush": "{card} ({id}) : le personnage joué depuis la main active ses effets AMBUSH.",
         "ss109Reinforcement": "{card} ({id}) : la carte du dessus du deck arrive face cachée dans la mission {mission}.",
-        "ss083Blank": "{card} ({id}) : ce personnage n'a plus aucun texte, rien ne se déclenche."
+        "ss083Blank": "{card} ({id}) : ce personnage n'a plus aucun texte, rien ne se déclenche.",
+        "ssDeckSearchTaken": "{card} ({id}) : {target} révélé et ajouté à la main."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1585,7 +1586,8 @@
         "ss084RemoveTokens": "Retirer tous les jetons de Puissance de ce personnage ?",
         "ss086HideAndMove": "Cacher ce personnage et le déplacer vers une autre mission ?",
         "ss095TakeJutsu": "Choisissez le personnage Jutsu à révéler et à ajouter à votre main.",
-        "ss090ChooseAmount": "Combien de jetons de Puissance prendre, jusqu'à 3 ?"
+        "ss090ChooseAmount": "Combien de jetons de Puissance prendre, jusqu'à 3 ?",
+        "ssDeckSearchTake": "Choisissez la carte à révéler et à ajouter à votre main."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",

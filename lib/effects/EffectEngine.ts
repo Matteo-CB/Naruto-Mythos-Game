@@ -6440,6 +6440,7 @@ export class EffectEngine {
       case 'SS137MV_CONFIRM_UPGRADE':
       case 'SS124_CONFIRM_DUEL':
       case 'SS124_CONFIRM_UPGRADE':
+      case 'SS_DECK_SEARCH_CONFIRM':
       case 'SS090_CONFIRM_MAIN':
       case 'SS088_CONFIRM_MAIN':
       case 'SS084_CONFIRM_AMBUSH':
@@ -12922,6 +12923,34 @@ export class EffectEngine {
           'EFFECT_POWERUP', `Shark Skin (090): took ${pris} Power token(s) from ${nom090.name_fr}.`,
           'game.log.effect.ss090Stolen',
           { card: 'PEAU DE REQUIN', id: 'SS-090-UC', amount: String(pris), target: nom090.name_fr, target_en: nom090.name_en || nom090.name_fr });
+        break;
+      }
+
+      case 'SS_DECK_SEARCH_TAKE': {
+        let meta: { depth?: number; sourceName?: string; sourceId?: string } = {};
+        try { meta = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const profondeur = meta.depth ?? 3;
+        const joueurF = pendingEffect.sourcePlayer;
+        const index = Number(String(targetId).replace('DECK_', ''));
+        const deckF = [...newState[joueurF].deck];
+        if (!Number.isFinite(index) || index < 0 || index >= deckF.length) break;
+
+        const sommet = deckF.slice(0, profondeur);
+        const choisi = deckF[index];
+        const autres = sommet.filter((_, i) => i !== index);
+        for (let i = autres.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [autres[i], autres[j]] = [autres[j], autres[i]];
+        }
+        newState[joueurF] = {
+          ...newState[joueurF],
+          hand: [...newState[joueurF].hand, choisi],
+          deck: [...deckF.slice(profondeur), ...autres],
+        };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, joueurF,
+          'EFFECT_DRAW', `${meta.sourceName ?? ''} (${meta.sourceId ?? ''}): revealed ${choisi.name_fr} and added it to hand.`,
+          'game.log.effect.ssDeckSearchTaken',
+          { card: meta.sourceName ?? '', id: meta.sourceId ?? '', target: choisi.name_fr, target_en: choisi.name_en || choisi.name_fr });
         break;
       }
 

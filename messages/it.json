@@ -2950,7 +2950,8 @@
         "ss110Reward": "{card} ({id}): 1 carta pescata e POWERUP 1 su {target}.",
         "ss107Ambush": "{card} ({id}): il personaggio giocato dalla mano attiva i suoi effetti AMBUSH.",
         "ss109Reinforcement": "{card} ({id}): la carta in cima al mazzo arriva coperta nella missione {mission}.",
-        "ss083Blank": "{card} ({id}): questo personaggio non ha più testo, non si attiva nulla."
+        "ss083Blank": "{card} ({id}): questo personaggio non ha più testo, non si attiva nulla.",
+        "ssDeckSearchTaken": "{card} ({id}): {target} rivelato e aggiunto alla mano."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3681,7 +3682,8 @@
         "ss084RemoveTokens": "Rimuovere tutti i segnalini Potenza da questo personaggio?",
         "ss086HideAndMove": "Nascondere questo personaggio e spostarlo in un'altra missione?",
         "ss095TakeJutsu": "Scegli il personaggio Jutsu da rivelare e aggiungere alla tua mano.",
-        "ss090ChooseAmount": "Quanti segnalini Potenza prendi, fino a 3?"
+        "ss090ChooseAmount": "Quanti segnalini Potenza prendi, fino a 3?",
+        "ssDeckSearchTake": "Scegli la carta da rivelare e aggiungere alla tua mano."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

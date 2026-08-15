@@ -2950,7 +2950,8 @@
         "ss110Reward": "{card} ({id}): dobrano 1 kartę i POWERUP 1 na {target}.",
         "ss107Ambush": "{card} ({id}): postać zagrana z ręki uruchamia swoje efekty AMBUSH.",
         "ss109Reinforcement": "{card} ({id}): wierzchnia karta talii pojawia się zakryta w misji {mission}.",
-        "ss083Blank": "{card} ({id}): ta postać nie ma już tekstu, nic się nie uruchamia."
+        "ss083Blank": "{card} ({id}): ta postać nie ma już tekstu, nic się nie uruchamia.",
+        "ssDeckSearchTaken": "{card} ({id}): odkryto {target} i dodano do ręki."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3681,7 +3682,8 @@
         "ss084RemoveTokens": "Usunąć wszystkie znaczniki Mocy z tej postaci?",
         "ss086HideAndMove": "Zakryć tę postać i przenieść ją do innej misji?",
         "ss095TakeJutsu": "Wybierz postać Jutsu, którą odkryjesz i weźmiesz do ręki.",
-        "ss090ChooseAmount": "Ile znaczników Mocy zabierasz, maksymalnie 3?"
+        "ss090ChooseAmount": "Ile znaczników Mocy zabierasz, maksymalnie 3?",
+        "ssDeckSearchTake": "Wybierz kartę, którą odkryjesz i weźmiesz do ręki."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

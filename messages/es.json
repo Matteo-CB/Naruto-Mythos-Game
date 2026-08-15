@@ -853,7 +853,8 @@
         "ss110Reward": "{card} ({id}): 1 carta robada y POWERUP 1 en {target}.",
         "ss107Ambush": "{card} ({id}): el personaje jugado desde la mano activa sus efectos AMBUSH.",
         "ss109Reinforcement": "{card} ({id}): la carta superior del mazo llega boca abajo a la misión {mission}.",
-        "ss083Blank": "{card} ({id}): este personaje ya no tiene texto, no se activa nada."
+        "ss083Blank": "{card} ({id}): este personaje ya no tiene texto, no se activa nada.",
+        "ssDeckSearchTaken": "{card} ({id}): {target} revelado y añadido a la mano."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",
@@ -1584,7 +1585,8 @@
         "ss084RemoveTokens": "¿Retirar todos los marcadores de Potencia de este personaje?",
         "ss086HideAndMove": "¿Ocultar este personaje y moverlo a otra misión?",
         "ss095TakeJutsu": "Elige el personaje Jutsu que revelas y añades a tu mano.",
-        "ss090ChooseAmount": "¿Cuántos marcadores de Potencia tomas, hasta 3?"
+        "ss090ChooseAmount": "¿Cuántos marcadores de Potencia tomas, hasta 3?",
+        "ssDeckSearchTake": "Elige la carta que revelas y añades a tu mano."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

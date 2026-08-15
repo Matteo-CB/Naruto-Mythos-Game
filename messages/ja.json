@@ -852,7 +852,8 @@
         "ss110Reward": "{card}（{id}）：カードを1枚引き、{target}にパワーアップ1。",
         "ss107Ambush": "{card}（{id}）：手札から出したキャラクターがアンブッシュ効果を発動します。",
         "ss109Reinforcement": "{card}（{id}）：デッキの一番上のカードがミッション{mission}に裏向きで登場しました。",
-        "ss083Blank": "{card}（{id}）：このキャラクターの効果テキストは失われており、何も発動しません。"
+        "ss083Blank": "{card}（{id}）：このキャラクターの効果テキストは失われており、何も発動しません。",
+        "ssDeckSearchTaken": "{card}（{id}）：{target}を公開し手札に加えました。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1583,7 +1584,8 @@
         "ss084RemoveTokens": "このキャラクターのパワートークンをすべて取り除きますか。",
         "ss086HideAndMove": "このキャラクターを裏向きにして別のミッションへ移動しますか。",
         "ss095TakeJutsu": "公開して手札に加える術キャラクターを選んでください。",
-        "ss090ChooseAmount": "パワートークンを何個奪いますか（最大3個）。"
+        "ss090ChooseAmount": "パワートークンを何個奪いますか（最大3個）。",
+        "ssDeckSearchTake": "公開して手札に加えるカードを選んでください。"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",
