@@ -110,6 +110,35 @@ const FACTORIES: Record<string, Factory> = {
   'KS-110-R': (id) => ({ build: () => board({ hand: [id], e0: [{ id: 'KS-005-C', iid: 'sim-weak' }, { id: 'KS-086-C', iid: 'sim-strong' }] }), play: P1(FRESH) }),
   'KS-113-R': (id) => ({ build: () => board({ hand: [id], p1m0: ['KS-027-C', 'KS-009-C'] }), play: P1(FRESH) }),
   'KS-138-S': (id) => ({ build: () => board({ hand: [id], upgBase: { id: 'KS-063-UC', iid: 'sim-upg-base' } }), play: P1(upgrade('sim-upg-base')) }),
+  'SS-003-C': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-010-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-012-C': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-009-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-063-C': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-062-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-064-C': (id) => ({
+    build: () => {
+      const st = board({ hand: [id], p1m0: ['SS-062-C'] });
+      st.player1.deck = ['KS-009-C', 'KS-010-C'].map((x) => getCharacterById(x)!).filter(Boolean);
+      return st;
+    },
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-071-C': (id) => ({
+    build: () => {
+      const st = board({ hand: [id], p1m0: [{ id: 'SS-010-C', iid: 'sim-porteur' }] });
+      const hote = st.activeMissions[0].player1Characters[0];
+      hote.attachments = [{ instanceId: 'att-sim', card: getCardById('SS-080-C') as never, owner: 'player1' }];
+      return st;
+    },
+    play: P1(FRESH), noMinimize: true,
+  }),
   'SS-011-C': (id) => ({
     build: () => board({ hand: [id], e0: [{ id: 'KS-005-C', iid: 'sim-cache-vu', hidden: true }] }),
     play: P1(FRESH), noMinimize: true,

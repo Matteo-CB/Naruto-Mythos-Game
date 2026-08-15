@@ -3688,7 +3688,8 @@
         "ssDeckSearchTake": "Scegli la carta da rivelare e aggiungere alla tua mano.",
         "ssPeekHidden": "Scegli il personaggio nascosto da guardare.",
         "ssPeekHiddenPowerup": "Scegli il personaggio nascosto nemico da guardare, il suo costo in chakra diventa segnalini Potenza.",
-        "ss028BottomOrKeep": "Mettere la carta in cima al mazzo avversario in fondo al suo mazzo?"
+        "ss028BottomOrKeep": "Mettere la carta in cima al mazzo avversario in fondo al suo mazzo?",
+        "ssTargetedPowerup": "Scegli il personaggio alleato che riceve i segnalini Potenza."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

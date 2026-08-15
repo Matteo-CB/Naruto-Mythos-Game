@@ -3688,7 +3688,8 @@
         "ssDeckSearchTake": "Escolha a carta a revelar e a adicionar à sua mão.",
         "ssPeekHidden": "Escolha o personagem escondido que quer ver.",
         "ssPeekHiddenPowerup": "Escolha o personagem escondido inimigo que quer ver, o seu custo em chakra torna-se marcadores de Potência.",
-        "ss028BottomOrKeep": "Colocar a carta do topo do baralho adversário no fundo do baralho dele?"
+        "ss028BottomOrKeep": "Colocar a carta do topo do baralho adversário no fundo do baralho dele?",
+        "ssTargetedPowerup": "Escolha o personagem aliado que recebe os marcadores de Potência."
       },
       "upgradeModifierConfirm": "Aplicar o efeito UPGRADE",
       "upgradeModifierDecline": "Manter apenas o efeito MAIN",

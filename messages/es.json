@@ -1591,7 +1591,8 @@
         "ssDeckSearchTake": "Elige la carta que revelas y añades a tu mano.",
         "ssPeekHidden": "Elige el personaje oculto que miras.",
         "ssPeekHiddenPowerup": "Elige el personaje oculto enemigo que miras, su coste en chakra se convierte en marcadores de Potencia.",
-        "ss028BottomOrKeep": "¿Poner la carta superior del mazo enemigo al fondo de su mazo?"
+        "ss028BottomOrKeep": "¿Poner la carta superior del mazo enemigo al fondo de su mazo?",
+        "ssTargetedPowerup": "Elige el personaje aliado que recibe los marcadores de Potencia."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

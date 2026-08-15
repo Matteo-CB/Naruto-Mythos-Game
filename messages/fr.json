@@ -1592,7 +1592,8 @@
         "ssDeckSearchTake": "Choisissez la carte à révéler et à ajouter à votre main.",
         "ssPeekHidden": "Choisissez le personnage caché à regarder.",
         "ssPeekHiddenPowerup": "Choisissez le personnage caché ennemi à regarder, sa valeur en chakra devient des jetons de Puissance.",
-        "ss028BottomOrKeep": "Mettre la carte du dessus du deck adverse en dessous de son deck ?"
+        "ss028BottomOrKeep": "Mettre la carte du dessus du deck adverse en dessous de son deck ?",
+        "ssTargetedPowerup": "Choisissez le personnage allié qui reçoit les jetons de Puissance."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",

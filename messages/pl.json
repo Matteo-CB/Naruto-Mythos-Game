@@ -3688,7 +3688,8 @@
         "ssDeckSearchTake": "Wybierz kartę, którą odkryjesz i weźmiesz do ręki.",
         "ssPeekHidden": "Wybierz zakrytą postać, którą chcesz zobaczyć.",
         "ssPeekHiddenPowerup": "Wybierz zakrytą wrogą postać, jej koszt czakry zamienia się w znaczniki Mocy.",
-        "ss028BottomOrKeep": "Położyć wierzchnią kartę talii przeciwnika na spód jego talii?"
+        "ss028BottomOrKeep": "Położyć wierzchnią kartę talii przeciwnika na spód jego talii?",
+        "ssTargetedPowerup": "Wybierz sojuszniczą postać, która otrzyma znaczniki Mocy."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

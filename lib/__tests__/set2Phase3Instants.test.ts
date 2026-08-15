@@ -151,3 +151,86 @@ describe('phase 3, la consultation des cartes cachees', () => {
     expect(manquantes).toEqual([]);
   });
 });
+
+describe('phase 3, les renforts conditionnels', () => {
+  it('Shizune 3 ne propose que les allies Feuille de sa mission', () => {
+    const shizune = simChar('SS-003-C', { owner: 'player1' });
+    const feuille = simChar('SS-010-C', { owner: 'player1' });
+    const etranger = simChar('SS-032-C', { owner: 'player1' });
+    const s = buildSimState({ p1: [shizune, feuille, etranger], p2: [], missions: 1 });
+
+    const joue = EffectEngine.resolvePlayEffects(s, 'player1', shizune, 0, false);
+    const relais = JSON.parse(joue.pendingEffects[0].effectDescription) as { targets?: string[] };
+    expect(relais.targets, 'Shizune et son allie Feuille, pas le Sonore').toEqual(
+      expect.arrayContaining([shizune.instanceId, feuille.instanceId]),
+    );
+    expect(relais.targets).not.toContain(etranger.instanceId);
+  });
+
+  it('Asuma 12 pose vraiment ses deux jetons sur un Team 10', () => {
+    const asuma = simChar('SS-012-C', { owner: 'player1' });
+    const choji = simChar('SS-009-C', { owner: 'player1' });
+    const s = buildSimState({ p1: [asuma, choji], p2: [], missions: 1 });
+
+    const fin = jusquAuBout(EffectEngine.resolvePlayEffects(s, 'player1', asuma, 0, false));
+    const total = fin.activeMissions[0].player1Characters.reduce((n, c) => n + c.powerTokens, 0);
+    expect(total, 'deux jetons distribues').toBe(2);
+  });
+
+  it('Udon 63 et Moegi 64 exigent Konohamaru', () => {
+    const udon = simChar('SS-063-C', { owner: 'player1' });
+    const moegi = simChar('SS-064-C', { owner: 'player1' });
+    const konohamaru = simChar('SS-062-C', { owner: 'player1' });
+
+    const sans = buildSimState({ p1: [udon, moegi], p2: [], missions: 1 });
+    const refus = EffectEngine.resolvePlayEffects(sans, 'player1', udon, 0, false);
+    expect(refus.log.some((l) => l.messageKey === 'game.log.effect.noTarget'), 'sans Konohamaru, refus journalise').toBe(true);
+
+    const base = buildSimState({ p1: [udon, moegi, konohamaru], p2: [], missions: 1 });
+    const avec: GameState = { ...base, player1: { ...base.player1, deck: [getCardById('KS-009-C') as never] } };
+
+    const parUdon = EffectEngine.resolvePlayEffects(avec, 'player1', udon, 0, false);
+    const udonFin = parUdon.activeMissions[0].player1Characters.find((c) => c.instanceId === udon.instanceId)!;
+    expect(udonFin.powerTokens, 'Udon gagne son jeton').toBe(1);
+
+    const parMoegi = EffectEngine.resolvePlayEffects(avec, 'player1', moegi, 0, false);
+    expect(parMoegi.player1.hand.length - avec.player1.hand.length, 'Moegi pioche').toBe(1);
+  });
+
+  it('Hoki 71 compte tous les equipements de la mission, les deux camps confondus', () => {
+    const hoki = simChar('SS-071-C', { owner: 'player1' });
+    const allie = simChar('SS-010-C', { owner: 'player1' });
+    const ennemi = simChar('SS-009-C', { owner: 'player2' });
+    const base = buildSimState({ p1: [hoki, allie], p2: [ennemi], missions: 1 });
+    const s: GameState = {
+      ...base,
+      activeMissions: base.activeMissions.map((m, i) => i !== 0 ? m : {
+        ...m,
+        attachments: [{ instanceId: 'att-mission', card: getCardById('SS-103-UC') as never, owner: 'player1' }],
+        player1Characters: m.player1Characters.map((c) => c.instanceId === allie.instanceId
+          ? { ...c, attachments: [{ instanceId: 'att-allie', card: getCardById('SS-080-C') as never, owner: 'player1' }] } : c),
+        player2Characters: m.player2Characters.map((c) => ({
+          ...c,
+          attachments: [{ instanceId: 'att-ennemi', card: getCardById('SS-084-C') as never, owner: 'player2' }],
+        })),
+      }),
+    };
+
+    const fin = EffectEngine.resolvePlayEffects(s, 'player1', hoki, 0, false);
+    const hokiFin = fin.activeMissions[0].player1Characters.find((c) => c.instanceId === hoki.instanceId)!;
+    expect(hokiFin.powerTokens, 'trois equipements dans la mission').toBe(3);
+  });
+
+  it('le texte du renfort cible existe dans les sept langues', async () => {
+    const manquantes: string[] = [];
+    for (const langue of ['en', 'fr', 'es', 'ja', 'pt', 'it', 'pl']) {
+      const messages = (await import(`@/messages/${langue}.json`)).default as Record<string, unknown>;
+      let noeud: unknown = messages;
+      for (const partie of 'game.effect.desc.ssTargetedPowerup'.split('.')) {
+        noeud = (noeud as Record<string, unknown> | undefined)?.[partie];
+      }
+      if (typeof noeud !== 'string' || noeud.trim() === '') manquantes.push(langue);
+    }
+    expect(manquantes).toEqual([]);
+  });
+});

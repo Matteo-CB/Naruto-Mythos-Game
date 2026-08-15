@@ -1586,7 +1586,8 @@
         "ssDeckSearchTake": "Choose the card to reveal and add to your hand.",
         "ssPeekHidden": "Choose the hidden character to look at.",
         "ssPeekHiddenPowerup": "Choose the enemy hidden character to look at, its chakra cost becomes Power tokens.",
-        "ss028BottomOrKeep": "Put the top card of the opponent deck at the bottom of their deck?"
+        "ss028BottomOrKeep": "Put the top card of the opponent deck at the bottom of their deck?",
+        "ssTargetedPowerup": "Choose the friendly character that receives the Power tokens."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",

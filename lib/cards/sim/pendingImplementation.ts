@@ -1,9 +1,7 @@
 import { getCardById } from '@/lib/data/cardIndex';
 
 export const PENDING_EFFECT_IMPLEMENTATION: ReadonlySet<string> = new Set([
-  'SS-003-C',
   'SS-009-C',
-  'SS-012-C',
   'SS-013-UC',
   'SS-014-C',
   'SS-017-C',
@@ -17,11 +15,8 @@ export const PENDING_EFFECT_IMPLEMENTATION: ReadonlySet<string> = new Set([
   'SS-055-UC',
   'SS-056-UC',
   'SS-060-UC',
-  'SS-063-C',
-  'SS-064-C',
   'SS-065-UC',
   'SS-068-UC',
-  'SS-071-C',
   'SS-072-C',
   'SS-073-C',
   'SS-076-UC',

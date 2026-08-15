@@ -28,6 +28,7 @@ import { registerAttachmentHandlers, registerScrollHandlers } from './attachment
 import { registerReinforcementsHandlers } from './attachmentReinforcements';
 import { registerDeckSearchHandlers } from './deckSearch';
 import { registerHiddenPeekHandlers } from './hiddenPeek';
+import { registerConditionalBoostHandlers } from './conditionalBoost';
 import { registerKabuto030Handlers } from './kabuto030';
 import { registerDosu045Handlers } from './dosu045';
 import { registerSakon037Handlers } from './sakon037';
@@ -71,6 +72,7 @@ export function registerAllSSHandlers(): void {
   registerReinforcementsHandlers();
   registerDeckSearchHandlers();
   registerHiddenPeekHandlers();
+  registerConditionalBoostHandlers();
   registerKabuto030Handlers();
   registerDosu045Handlers();
   registerSakon037Handlers();

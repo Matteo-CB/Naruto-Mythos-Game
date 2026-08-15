@@ -6441,6 +6441,7 @@ export class EffectEngine {
       case 'SS137MV_CONFIRM_UPGRADE':
       case 'SS124_CONFIRM_DUEL':
       case 'SS124_CONFIRM_UPGRADE':
+      case 'SS_TARGETED_POWERUP_CONFIRM':
       case 'SS_PEEK_CONFIRM':
       case 'SS028_CONFIRM_MAIN':
       case 'SS_DECK_SEARCH_CONFIRM':
@@ -12926,6 +12927,30 @@ export class EffectEngine {
           'EFFECT_POWERUP', `Shark Skin (090): took ${pris} Power token(s) from ${nom090.name_fr}.`,
           'game.log.effect.ss090Stolen',
           { card: 'PEAU DE REQUIN', id: 'SS-090-UC', amount: String(pris), target: nom090.name_fr, target_en: nom090.name_en || nom090.name_fr });
+        break;
+      }
+
+      case 'SS_TARGETED_POWERUP': {
+        let mt = {};
+        try { mt = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const infosT = mt as { amount?: number; sourceName?: string; sourceId?: string };
+        const montant = infosT.amount ?? 1;
+        const cibleT = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!cibleT || montant <= 0) break;
+        newState.activeMissions = newState.activeMissions.map((m) => ({
+          ...m,
+          player1Characters: m.player1Characters.map((c) => c.instanceId === targetId
+            ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, montant) } : c),
+          player2Characters: m.player2Characters.map((c) => c.instanceId === targetId
+            ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, montant) } : c),
+        }));
+        const nomT = cibleT.character.stack?.length > 0
+          ? cibleT.character.stack[cibleT.character.stack.length - 1]
+          : cibleT.character.card;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_POWERUP', 'Targeted POWERUP.',
+          'game.log.effect.powerup',
+          { card: infosT.sourceName ?? '', id: infosT.sourceId ?? '', amount: String(montant), target: nomT.name_fr, target_en: nomT.name_en || nomT.name_fr });
         break;
       }
 
