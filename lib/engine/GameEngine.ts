@@ -714,6 +714,13 @@ export class GameEngine {
       if (!effect.isOptional && !effect.rootOptional) return state;
 
 
+      if (effect.targetSelectionType === 'SS015_CONFIRM_PAY') {
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+        newState = EffectEngine.defeatCharacter(newState, effect.sourceInstanceId, effect.sourcePlayer);
+        return newState;
+      }
+
       if (effect.targetSelectionType === 'SS130_CONFIRM_DUEL_MODIFIER') {
         newState.pendingEffects.splice(effectIdx, 1);
         newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);

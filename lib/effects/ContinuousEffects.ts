@@ -5,6 +5,7 @@ import { logAction } from '../engine/utils/gameLog';
 import { isSummonPlay, jiraiyaGoldSources, JIRAIYA_GOLD_ID, JIRAIYA_GOLD_NAME } from './handlers/SS/goldCards';
 import { characterHasGroup } from './groupUtils';
 import { kabuto139Triggers, KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
+import { ss2StaticPowerModifier, ss2StaticChakraBonus } from './handlers/SS/staticAuras';
 
 
 
@@ -97,6 +98,8 @@ export function calculateContinuousChakraBonus(
       if (hasNarutoOrTeam8) bonus += 1;
     }
   }
+
+  bonus += ss2StaticChakraBonus(state, player, missionIndex, char);
 
   return bonus;
 }
@@ -423,6 +426,7 @@ export function calculateContinuousPowerModifier(
   
   
   
+  modifier += ss2StaticPowerModifier(state, char, player, missionIndex);
   modifier += honorableDuelBonus(mission, player, char);
   modifier += kingOfTheHillBonus(state, mission, char, attachedPowerOf);
 
@@ -766,12 +770,66 @@ function applyJiraiyaGoldSummonChakra(
   };
 }
 
+export const GATO_075_ID = 'SS-075-UC';
+export const GATO_075_NAME = 'GATO';
+
+function applyGato075Reward(
+  state: GameState,
+  playingPlayer: PlayerID,
+  missionIndex: number,
+  playedInstanceId?: string,
+): GameState {
+  if (!playedInstanceId) return state;
+  const mission = state.activeMissions[missionIndex];
+  if (!mission) return state;
+  const side = playingPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+
+  const joue = mission[side].find((c) => c.instanceId === playedInstanceId);
+  if (!joue || joue.isHidden) return state;
+  const joueTop = joue.stack?.length > 0 ? joue.stack[joue.stack.length - 1] : joue.card;
+  if (!(joueTop.keywords ?? []).includes('Rogue Ninja')) return state;
+
+  const gatos = mission[side].filter((c) => {
+    if (c.isHidden || c.instanceId === playedInstanceId) return false;
+    const top = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    return String(top.set) === 'SS' && Number(top.number) === 75;
+  });
+  if (gatos.length === 0) return state;
+
+  let newState = state;
+  for (let i = 0; i < gatos.length; i++) {
+    const ps = { ...newState[playingPlayer], chakra: newState[playingPlayer].chakra + 1 };
+    const missions = [...newState.activeMissions];
+    const cible = { ...missions[missionIndex] };
+    cible[side] = cible[side].map((c: CharacterInPlay) =>
+      c.instanceId === playedInstanceId
+        ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, 1) }
+        : c,
+    );
+    missions[missionIndex] = cible;
+    newState = {
+      ...newState,
+      [playingPlayer]: ps,
+      activeMissions: missions,
+      log: logAction(
+        newState.log, newState.turn, 'action', playingPlayer,
+        'EFFECT_CONTINUOUS',
+        `Gato (075): 1 Chakra gained and POWERUP 1 on ${joueTop.name_fr}, a Rogue Ninja played in this mission.`,
+        'game.log.effect.gato075',
+        { card: GATO_075_NAME, id: GATO_075_ID, target: joueTop.name_fr, target_en: joueTop.name_en || joueTop.name_fr },
+      ),
+    };
+  }
+  return newState;
+}
+
 export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID, missionIndex: number, _isReveal?: boolean, playedInstanceId?: string): GameState {
   
   
 
   let newState = { ...state };
   newState = triggerCrow089Relocation(newState, playingPlayer, playedInstanceId);
+  newState = applyGato075Reward(newState, playingPlayer, missionIndex, playedInstanceId);
   newState = applyNewForcesPowerup(newState, playingPlayer, missionIndex, playedInstanceId);
   newState = applyJiraiyaGoldSummonChakra(newState, playingPlayer, playedInstanceId);
   newState = applyKabuto139DrawDiscard(newState, playingPlayer, playedInstanceId);

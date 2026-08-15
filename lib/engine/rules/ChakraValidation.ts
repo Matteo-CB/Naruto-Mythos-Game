@@ -1,4 +1,5 @@
 import type { GameState, PlayerID, CharacterCard } from '../types';
+import { foodAttachmentDiscountCount } from '@/lib/effects/handlers/SS/staticAuras';
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -133,6 +134,11 @@ export function calculateEffectiveCost(
         cost = Math.max(0, cost - 1);
       }
     }
+  }
+
+  if (!isCharacterCard(card) && ((card as unknown as { keywords?: string[] }).keywords ?? []).includes('Food')) {
+    const sanshos = foodAttachmentDiscountCount(state, player);
+    if (sanshos > 0) cost = Math.max(0, cost - sanshos);
   }
 
   if (card.group === 'Sand Village' && isCharacterCard(card)) {

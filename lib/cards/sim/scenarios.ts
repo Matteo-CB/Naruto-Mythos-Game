@@ -110,6 +110,68 @@ const FACTORIES: Record<string, Factory> = {
   'KS-110-R': (id) => ({ build: () => board({ hand: [id], e0: [{ id: 'KS-005-C', iid: 'sim-weak' }, { id: 'KS-086-C', iid: 'sim-strong' }] }), play: P1(FRESH) }),
   'KS-113-R': (id) => ({ build: () => board({ hand: [id], p1m0: ['KS-027-C', 'KS-009-C'] }), play: P1(FRESH) }),
   'KS-138-S': (id) => ({ build: () => board({ hand: [id], upgBase: { id: 'KS-063-UC', iid: 'sim-upg-base' } }), play: P1(upgrade('sim-upg-base')) }),
+  'SS-001-UC': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-010-C', 'SS-024-C'] }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
+  'SS-010-C': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-009-C'] }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
+  'SS-015-UC': (id) => ({
+    build: () => board({ hand: [id] }),
+    play: P1(FRESH),
+    followups: [{ player: 'player2', action: PASS_ACTION }, P1(PASS_ACTION)],
+    noMinimize: true,
+  }),
+  'SS-026-C': (id) => ({
+    build: () => board({ hand: ['SS-079-C'], p1m0: [{ id, iid: 'sim-genma' }] }),
+    play: P1({ type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false }),
+    noMinimize: true,
+  }),
+  'SS-054-UC': (id) => ({
+    build: () => board({ hand: [id], e0: [{ id: 'SS-126-R', iid: 'sim-sasuke' }] }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
+  'SS-062-C': (id) => ({
+    build: () => board({ hand: [id], p1m0: [{ id: 'SS-063-C', iid: 'sim-udon' }] }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
+  'SS-066-C': (id) => ({
+    build: () => board({ hand: ['SS-080-C'], p1m0: [{ id, iid: 'sim-aoi' }] }),
+    play: P1({ type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false }),
+    noMinimize: true,
+  }),
+  'SS-067-C': (id) => ({
+    build: () => board({ hand: ['SS-082-C'], p1m0: [{ id, iid: 'sim-sansho' }, { id: 'KS-009-C', iid: 'sim-hote' }] }),
+    play: P1({ type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false }),
+    noMinimize: true,
+  }),
+  'SS-069-UC': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-070-UC'] }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
+  'SS-070-UC': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-069-UC'] }),
+    play: P1(FRESH),
+    noMinimize: true,
+  }),
+  'SS-075-UC': (id) => ({
+    build: () => board({ hand: ['SS-054-UC'], p1m0: [{ id, iid: 'sim-gato' }], chakra: 12 }),
+    play: P1({ type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false }),
+    noMinimize: true,
+  }),
+  'SS-116-R': (id) => ({
+    build: () => board({ hand: ['SS-087-UC'], p1m0: [{ id, iid: 'sim-guy' }, { id: 'SS-115-R', iid: 'sim-lee' }] }),
+    play: P1({ type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false }),
+    followups: [{ player: 'player2', action: PASS_ACTION }, P1(PASS_ACTION)],
+    noMinimize: true,
+  }),
   'SS-082-C': (id) => ({
     build: () => board({ hand: [id], p1m0: ['KS-009-C'] }),
     play: P1(FRESH),

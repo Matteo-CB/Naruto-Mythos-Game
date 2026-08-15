@@ -183,6 +183,10 @@ export interface GameState {
   endPhaseMovedIds?: string[];
   
   endPhaseAkamaru028Ids?: string[];
+  endPhaseAkamaru015Ids?: string[];
+  endPhaseEnma132Ids?: string[];
+  endPhaseChakraReset?: boolean;
+  missionPhaseShinigamiIds?: string[];
   
   endPhaseGiantSpider103Ids?: string[];
   

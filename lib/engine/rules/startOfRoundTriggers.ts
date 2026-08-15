@@ -92,11 +92,87 @@ function applyForPlayer(state: GameState, player: PlayerID): GameState {
   return newState;
 }
 
+export const MIGHT_GUY_116_ID = 'SS-116-R';
+export const MIGHT_GUY_116_NAME = 'MIGHT GUY';
+export const MIGHT_GUY_116_POWERUP = 2;
+
+function isMightGuy116(char: CharacterInPlay): boolean {
+  const top = topCardOf(char);
+  return String(top.set) === 'SS' && Number(top.number) === 116;
+}
+
+function mightGuy116Targets(state: GameState, player: PlayerID): CharacterInPlay[] {
+  const side = sideOf(player);
+  const cibles: CharacterInPlay[] = [];
+  for (const mission of state.activeMissions) {
+    for (const char of mission[side]) {
+      if (char.isHidden) continue;
+      if (!(topCardOf(char).keywords ?? []).includes('Team Guy')) continue;
+      if ((char.attachments ?? []).length === 0) continue;
+      cibles.push(char);
+    }
+  }
+  return cibles;
+}
+
+function applyMightGuy116(state: GameState, player: PlayerID): GameState {
+  const side = sideOf(player);
+  let newState = state;
+
+  for (const mission of newState.activeMissions) {
+    for (const source of mission[side]) {
+      if (source.isHidden || !isMightGuy116(source)) continue;
+
+      const cibles = mightGuy116Targets(newState, player);
+      if (cibles.length === 0) {
+        newState = {
+          ...newState,
+          log: logAction(newState.log, newState.turn, 'start', player, 'EFFECT_NO_TARGET',
+            'Might Guy (116): no friendly Team Guy character with an attachment in play.',
+            'game.log.effect.noTarget', { card: MIGHT_GUY_116_NAME, id: MIGHT_GUY_116_ID }),
+        };
+        continue;
+      }
+
+      const cibleIds = new Set(cibles.map((c) => c.instanceId));
+      const missions = newState.activeMissions.map((m) => ({
+        ...m,
+        player1Characters: m.player1Characters.map((c) =>
+          cibleIds.has(c.instanceId) ? { ...c, powerTokens: c.powerTokens + MIGHT_GUY_116_POWERUP } : c),
+        player2Characters: m.player2Characters.map((c) =>
+          cibleIds.has(c.instanceId) ? { ...c, powerTokens: c.powerTokens + MIGHT_GUY_116_POWERUP } : c),
+      }));
+
+      newState = { ...newState, activeMissions: missions };
+      for (const cible of cibles) {
+        const nomCible = topCardOf(cible).name_fr;
+        newState = {
+          ...newState,
+          log: logAction(newState.log, newState.turn, 'start', player, 'EFFECT_POWERUP',
+            `Might Guy (116): POWERUP ${MIGHT_GUY_116_POWERUP} on ${nomCible} at the start of the round.`,
+            'game.log.effect.powerup',
+            {
+              card: MIGHT_GUY_116_NAME,
+              id: MIGHT_GUY_116_ID,
+              amount: String(MIGHT_GUY_116_POWERUP),
+              target: nomCible,
+              target_en: topCardOf(cible).name_en || nomCible,
+            }),
+        };
+      }
+    }
+  }
+
+  return newState;
+}
+
 export function applyStartOfRoundTriggers(state: GameState): GameState {
   const premier: PlayerID = state.edgeHolder === 'player2' ? 'player2' : 'player1';
   const second: PlayerID = premier === 'player1' ? 'player2' : 'player1';
 
   let newState = applyForPlayer(state, premier);
+  newState = applyMightGuy116(newState, premier);
   newState = applyForPlayer(newState, second);
+  newState = applyMightGuy116(newState, second);
   return newState;
 }

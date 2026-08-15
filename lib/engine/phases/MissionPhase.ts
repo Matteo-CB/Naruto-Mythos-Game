@@ -9,8 +9,77 @@ import { isMovementBlockedByKurenai, applyRempartTokenRemoval } from '../../effe
 const RANK_ORDER = ['D', 'C', 'B', 'A'] as const;
 
 
+export const SHINIGAMI_057_ID = 'SS-057-UC';
+export const SHINIGAMI_057_NAME = 'SHINIGAMI';
+
+export function shinigami057BeforePower(state: GameState): GameState {
+  const traites = new Set<string>(state.missionPhaseShinigamiIds ?? []);
+  let newState = state;
+
+  for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+      for (const char of newState.activeMissions[mIdx][side]) {
+        if (char.isHidden || traites.has(char.instanceId)) continue;
+        const top = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        if (String(top.set) !== 'SS' || Number(top.number) !== 57) continue;
+
+        const controleur = char.controlledBy ?? player;
+        traites.add(char.instanceId);
+        newState = { ...newState, missionPhaseShinigamiIds: [...traites] };
+
+        const ennemiSide = controleur === 'player1' ? 'player2Characters' : 'player1Characters';
+        const cibles = newState.activeMissions[mIdx][ennemiSide].filter((c) => !c.isHidden);
+
+        if (cibles.length === 0) {
+          newState = {
+            ...newState,
+            log: logAction(newState.log, newState.turn, 'mission', controleur, 'EFFECT_NO_TARGET',
+              'Shinigami (057): no non-hidden enemy character in this mission.',
+              'game.log.effect.noTarget', { card: SHINIGAMI_057_NAME, id: SHINIGAMI_057_ID }),
+          };
+          continue;
+        }
+
+        if (cibles.length === 1) {
+          const cibleTop = cibles[0].stack?.length > 0 ? cibles[0].stack[cibles[0].stack.length - 1] : cibles[0].card;
+          newState = EffectEngine.defeatCharacter(newState, cibles[0].instanceId, controleur);
+          newState = {
+            ...newState,
+            log: logAction(newState.log, newState.turn, 'mission', controleur, 'EFFECT_DEFEAT',
+              `Shinigami (057): defeated ${cibleTop.name_fr} before Power is determined.`,
+              'game.log.effect.defeat',
+              { card: SHINIGAMI_057_NAME, id: SHINIGAMI_057_ID, target: cibleTop.name_fr, target_en: cibleTop.name_en || cibleTop.name_fr }),
+          };
+          continue;
+        }
+
+        return EffectEngine.createPendingTargetSelection(
+          newState, controleur, char, mIdx, 'MAIN', false,
+          {
+            state: newState,
+            requiresTargetSelection: true,
+            targetSelectionType: 'SS057_DEFEAT_BEFORE_POWER',
+            validTargets: cibles.map((c) => c.instanceId),
+            isOptional: false,
+            isMandatory: true,
+            description: JSON.stringify({}),
+            descriptionKey: 'game.effect.desc.ss057DefeatBeforePower',
+          },
+          [],
+        );
+      }
+    }
+  }
+
+  return newState;
+}
+
 export function executeMissionPhase(state: GameState): GameState {
   let newState: GameState = { ...state, missionScoringProgress: undefined };
+
+  newState = shinigami057BeforePower(newState);
+  if (newState.pendingActions.length > 0) return newState;
 
   
   newState = applyRempartTokenRemoval(newState);

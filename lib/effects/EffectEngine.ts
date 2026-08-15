@@ -12797,6 +12797,32 @@ export class EffectEngine {
         break;
       }
 
+      case 'SS057_DEFEAT_BEFORE_POWER': {
+        const ss057Top = EffectEngine.findCharByInstanceId(newState, targetId)?.character;
+        const ss057Nom = ss057Top
+          ? (ss057Top.stack?.length > 0 ? ss057Top.stack[ss057Top.stack.length - 1] : ss057Top.card)
+          : null;
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', `Shinigami (057): defeated ${ss057Nom?.name_fr ?? targetId} before Power is determined.`,
+          'game.log.effect.defeat',
+          { card: 'SHINIGAMI', id: 'SS-057-UC', target: ss057Nom?.name_fr ?? '', target_en: ss057Nom?.name_en ?? '' });
+        break;
+      }
+
+      case 'SS015_CONFIRM_PAY': {
+        const ss015Joueur = pendingEffect.sourcePlayer;
+        if (newState[ss015Joueur].chakra < 1) {
+          newState = EffectEngine.defeatCharacter(newState, pendingEffect.sourceInstanceId, ss015Joueur);
+          break;
+        }
+        newState[ss015Joueur] = { ...newState[ss015Joueur], chakra: newState[ss015Joueur].chakra - 1 };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, ss015Joueur,
+          'EFFECT_CHAKRA', 'Akamaru (015): 1 Chakra paid to keep this character in play.',
+          'game.log.effect.ss015Paid', { card: 'AKAMARU', id: 'SS-015-UC' });
+        break;
+      }
+
       case 'SS101_CONFIRM_FIRST_STRIKE': {
         let ss101Data: { missionIndex?: number } = {};
         try { ss101Data = JSON.parse(pendingEffect.effectDescription); } catch {}

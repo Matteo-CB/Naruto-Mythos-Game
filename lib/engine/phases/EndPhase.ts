@@ -2,6 +2,9 @@ import type { GameState, PlayerID, CharacterInPlay } from '../types';
 import { logSystem, logAction } from '../utils/gameLog';
 import { shouldRetainPowerTokens, isMovementBlockedByKurenai } from '../../effects/ContinuousEffects';
 import { EffectEngine } from '../../effects/EffectEngine';
+import { calculateEffectiveCost } from '../rules/ChakraValidation';
+import { attachCardToCharacter, getCharacterAttachTargets } from '../../effects/attachments';
+import { shuffle } from '../utils/shuffle';
 
 
 
@@ -15,6 +18,65 @@ interface EndOfRoundEffectInfo {
   cardId: string;
   cardName: string;
   cardImage?: string;
+}
+
+export const AKAMARU_015_ID = 'SS-015-UC';
+export const AKAMARU_015_NAME = 'AKAMARU';
+
+function topOf(char: CharacterInPlay) {
+  return char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+}
+
+function isCard(char: CharacterInPlay, set: string, number: number): boolean {
+  const top = topOf(char);
+  return String(top.set) === set && Number(top.number) === number;
+}
+
+export function akamaru015EndOfRound(state: GameState): GameState {
+  const traites = new Set<string>(state.endPhaseAkamaru015Ids ?? []);
+  let newState = state;
+
+  for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+      for (const char of newState.activeMissions[mIdx][side]) {
+        if (char.isHidden || traites.has(char.instanceId)) continue;
+        if (!isCard(char, 'SS', 15)) continue;
+
+        const controleur = char.controlledBy ?? player;
+        traites.add(char.instanceId);
+        newState = { ...newState, endPhaseAkamaru015Ids: [...traites] };
+
+        if (newState[controleur].chakra < 1) {
+          newState = EffectEngine.defeatCharacter(newState, char.instanceId, controleur);
+          newState = {
+            ...newState,
+            log: logAction(newState.log, newState.turn, 'end', controleur, 'EFFECT_DEFEAT',
+              'Akamaru (015): no Chakra left to pay, this character is defeated.',
+              'game.log.effect.defeat',
+              { card: AKAMARU_015_NAME, id: AKAMARU_015_ID, target: topOf(char).name_fr, target_en: topOf(char).name_en || topOf(char).name_fr }),
+          };
+          continue;
+        }
+
+        return EffectEngine.createPendingTargetSelection(
+          newState, controleur, char, mIdx, 'MAIN', false,
+          {
+            state: newState,
+            requiresTargetSelection: true,
+            targetSelectionType: 'SS015_CONFIRM_PAY',
+            validTargets: [char.instanceId],
+            isOptional: true,
+            description: JSON.stringify({}),
+            descriptionKey: 'game.effect.desc.ss015PayOrDefeat',
+          },
+          [],
+        );
+      }
+    }
+  }
+
+  return newState;
 }
 
 
@@ -198,7 +260,7 @@ export function processRemainingEndOfRoundEffects(state: GameState): GameState {
 
 
 export function finalizeEndPhase(state: GameState): GameState {
-  let newState = { ...state };
+  let newState = resetChakraPools(state);
 
   if (!newState.endPhaseTokensRemoved) {
     newState = removeAllPowerTokens(newState);
@@ -212,23 +274,124 @@ export function finalizeEndPhase(state: GameState): GameState {
 }
 
 
+export function resetChakraPools(state: GameState): GameState {
+  if (state.endPhaseChakraReset) return state;
+  return {
+    ...state,
+    endPhaseChakraReset: true,
+    player1: { ...state.player1, chakra: 0 },
+    player2: { ...state.player2, chakra: 0 },
+    log: logSystem(
+      state.log,
+      state.turn,
+      'end',
+      'RESET_CHAKRA',
+      'Both players\' chakra pools reset to 0.',
+      'game.log.resetChakra',
+    ),
+  };
+}
+
+export const ENMA_132_ID = 'SS-132-R';
+export const ENMA_132_NAME = 'ENMA';
+export const ADAMANTINE_NYOI_ID = 'SS-098-UC';
+export const ENMA_132_REDUCTION = 2;
+
+export function enma132EndOfRound(state: GameState): GameState {
+  const traites = new Set<string>(state.endPhaseEnma132Ids ?? []);
+  let newState = state;
+
+  for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+      for (const char of newState.activeMissions[mIdx][side]) {
+        if (char.isHidden || traites.has(char.instanceId)) continue;
+        if (!isCard(char, 'SS', 132)) continue;
+
+        const controleur = char.controlledBy ?? player;
+        traites.add(char.instanceId);
+        newState = { ...newState, endPhaseEnma132Ids: [...traites] };
+
+        const deck = newState[controleur].deck;
+        const idx = deck.findIndex((c) => c.id === ADAMANTINE_NYOI_ID);
+        if (idx === -1) {
+          newState = {
+            ...newState,
+            log: logAction(newState.log, newState.turn, 'end', controleur, 'EFFECT_NO_TARGET',
+              'Enma (132): Adamantine Nyoi is not in the deck.',
+              'game.log.effect.noTarget', { card: ENMA_132_NAME, id: ENMA_132_ID }),
+          };
+          continue;
+        }
+
+        const carte = deck[idx];
+        const cout = Math.max(0, calculateEffectiveCost(newState, controleur, carte as never, mIdx, false) - ENMA_132_REDUCTION);
+        const cibles = getCharacterAttachTargets(newState, controleur, mIdx, carte as never);
+
+        if (newState[controleur].chakra < cout || cibles.length === 0) {
+          newState = {
+            ...newState,
+            log: logAction(newState.log, newState.turn, 'end', controleur, 'EFFECT_NO_TARGET',
+              cibles.length === 0
+                ? 'Enma (132): no friendly character can carry Adamantine Nyoi.'
+                : 'Enma (132): not enough Chakra to play Adamantine Nyoi, even reduced by 2.',
+              'game.log.effect.noTarget', { card: ENMA_132_NAME, id: ENMA_132_ID }),
+          };
+          continue;
+        }
+
+        const nouveauDeck = [...deck];
+        nouveauDeck.splice(idx, 1);
+        newState = {
+          ...newState,
+          [controleur]: {
+            ...newState[controleur],
+            deck: shuffle(nouveauDeck),
+            chakra: newState[controleur].chakra - cout,
+          },
+          log: logAction(newState.log, newState.turn, 'end', controleur, 'PLAY_ATTACHMENT',
+            `Enma (132): Adamantine Nyoi found in the deck and played for ${cout} chakra.`,
+            'game.log.effect.enma132Search', { card: ENMA_132_NAME, id: ENMA_132_ID, cost: cout }),
+        };
+
+        if (cibles.length === 1) {
+          newState = attachCardToCharacter(newState, controleur, carte as never, cibles[0].instanceId);
+          continue;
+        }
+
+        return EffectEngine.createPendingTargetSelection(
+          newState, controleur, char, mIdx, 'MAIN', false,
+          {
+            state: newState,
+            requiresTargetSelection: true,
+            targetSelectionType: 'ATTACH_CHOOSE_TARGET',
+            validTargets: cibles.map((c) => c.instanceId),
+            isOptional: false,
+            isMandatory: true,
+            description: JSON.stringify({ card: carte }),
+            descriptionKey: 'game.effect.desc.attachChooseTarget',
+          },
+          [],
+        );
+      }
+    }
+  }
+
+  return newState;
+}
+
 export function executeEndPhase(state: GameState): GameState {
   let newState = { ...state };
 
-  
-  newState.player1 = { ...newState.player1, chakra: 0 };
-  newState.player2 = { ...newState.player2, chakra: 0 };
+  newState = akamaru015EndOfRound(newState);
+  if (newState.pendingActions.length > 0) return newState;
 
-  newState.log = logSystem(
-    newState.log,
-    state.turn,
-    'end',
-    'RESET_CHAKRA',
-    'Both players\' chakra pools reset to 0.',
-    'game.log.resetChakra',
-  );
+  newState = enma132EndOfRound(newState);
+  if (newState.pendingActions.length > 0) return newState;
 
-  
+  newState = resetChakraPools(newState);
+
+
   const interactiveEffects = scanEndOfRoundInteractiveEffects(newState);
 
   
