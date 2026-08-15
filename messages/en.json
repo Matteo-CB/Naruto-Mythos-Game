@@ -852,7 +852,8 @@
         "ssDeckSearchTaken": "{card} ({id}): revealed {target} and added it to hand.",
         "ssPeeked": "{card} ({id}): looked at a hidden character.",
         "ss028Bottom": "{card} ({id}): the top card of the opponent deck goes to the bottom.",
-        "ssSummonChakra": "{card} ({id}): {amount} Chakra gained."
+        "ssSummonChakra": "{card} ({id}): {amount} Chakra gained.",
+        "ss072Recovered": "{card} ({id}): {target} returns from the discard pile to hand."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",

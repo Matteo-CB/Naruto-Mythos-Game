@@ -17,7 +17,6 @@ export const PENDING_EFFECT_IMPLEMENTATION: ReadonlySet<string> = new Set([
   'SS-060-UC',
   'SS-065-UC',
   'SS-068-UC',
-  'SS-072-C',
   'SS-073-C',
   'SS-076-UC',
   'SS-113-R',

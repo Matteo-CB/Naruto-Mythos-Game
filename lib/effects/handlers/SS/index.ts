@@ -30,6 +30,7 @@ import { registerDeckSearchHandlers } from './deckSearch';
 import { registerHiddenPeekHandlers } from './hiddenPeek';
 import { registerConditionalBoostHandlers } from './conditionalBoost';
 import { registerSanninSummonHandlers } from './sanninSummons';
+import { registerKujaku072Handler } from './kujaku072';
 import { registerKabuto030Handlers } from './kabuto030';
 import { registerDosu045Handlers } from './dosu045';
 import { registerSakon037Handlers } from './sakon037';
@@ -75,6 +76,7 @@ export function registerAllSSHandlers(): void {
   registerHiddenPeekHandlers();
   registerConditionalBoostHandlers();
   registerSanninSummonHandlers();
+  registerKujaku072Handler();
   registerKabuto030Handlers();
   registerDosu045Handlers();
   registerSakon037Handlers();

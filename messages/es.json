@@ -857,7 +857,8 @@
         "ssDeckSearchTaken": "{card} ({id}): {target} revelado y añadido a la mano.",
         "ssPeeked": "{card} ({id}): se ha mirado un personaje oculto.",
         "ss028Bottom": "{card} ({id}): la carta superior del mazo enemigo pasa al fondo.",
-        "ssSummonChakra": "{card} ({id}): {amount} de Chakra ganado."
+        "ssSummonChakra": "{card} ({id}): {amount} de Chakra ganado.",
+        "ss072Recovered": "{card} ({id}): {target} vuelve del descarte a la mano."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",

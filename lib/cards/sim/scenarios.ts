@@ -126,6 +126,14 @@ const FACTORIES: Record<string, Factory> = {
     build: () => board({ hand: [id], p1m0: ['SS-145-S'], chakra: 14 }),
     play: P1(FRESH), noMinimize: true,
   }),
+  'SS-072-C': (id) => ({
+    build: () => {
+      const st = board({ hand: [id] });
+      st.player1.discardPile = [getCardById('SS-080-C') as never];
+      return st;
+    },
+    play: P1(FRESH), noMinimize: true,
+  }),
   'SS-003-C': (id) => ({
     build: () => board({ hand: [id], p1m0: ['SS-010-C'] }),
     play: P1(FRESH), noMinimize: true,

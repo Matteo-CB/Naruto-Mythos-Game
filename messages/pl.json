@@ -2954,7 +2954,8 @@
         "ssDeckSearchTaken": "{card} ({id}): odkryto {target} i dodano do ręki.",
         "ssPeeked": "{card} ({id}): obejrzano zakrytą postać.",
         "ss028Bottom": "{card} ({id}): wierzchnia karta talii przeciwnika trafia na spód.",
-        "ssSummonChakra": "{card} ({id}): zdobyto {amount} czakry."
+        "ssSummonChakra": "{card} ({id}): zdobyto {amount} czakry.",
+        "ss072Recovered": "{card} ({id}): {target} wraca ze stosu kart odrzuconych do ręki."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",

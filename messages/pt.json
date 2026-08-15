@@ -2954,7 +2954,8 @@
         "ssDeckSearchTaken": "{card} ({id}): {target} revelado e adicionado à mão.",
         "ssPeeked": "{card} ({id}): foi visto um personagem escondido.",
         "ss028Bottom": "{card} ({id}): a carta do topo do baralho adversário passa para o fundo.",
-        "ssSummonChakra": "{card} ({id}): {amount} de Chakra ganho."
+        "ssSummonChakra": "{card} ({id}): {amount} de Chakra ganho.",
+        "ss072Recovered": "{card} ({id}): {target} volta do descarte para a mão."
       },
       "score": {
         "draw": "[SCORE] {card}: Comprou {count} carta(s).",

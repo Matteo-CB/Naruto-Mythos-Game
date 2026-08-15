@@ -856,7 +856,8 @@
         "ssDeckSearchTaken": "{card}（{id}）：{target}を公開し手札に加えました。",
         "ssPeeked": "{card}（{id}）：裏向きのキャラクターを確認しました。",
         "ss028Bottom": "{card}（{id}）：相手のデッキの一番上のカードを一番下に置きました。",
-        "ssSummonChakra": "{card}（{id}）：チャクラ{amount}を獲得しました。"
+        "ssSummonChakra": "{card}（{id}）：チャクラ{amount}を獲得しました。",
+        "ss072Recovered": "{card}（{id}）：{target}が捨て札から手札に戻りました。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
