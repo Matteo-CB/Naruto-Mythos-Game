@@ -3,7 +3,6 @@
 import { useMemo } from 'react';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
-import { SMOKE_LAYER } from './AttachmentStrip';
 
 const COLONNES = 8;
 const LIGNES = 4;
@@ -37,7 +36,7 @@ export function FlashBombSmoke({ instanceId }: { instanceId: string }) {
   return (
     <div
       className="pointer-events-none absolute inset-0 overflow-hidden"
-      style={{ zIndex: SMOKE_LAYER, borderRadius: 'inherit', backgroundColor: 'rgba(18,18,20,0.76)' }}
+      style={{ zIndex: 6, borderRadius: 'inherit', backgroundColor: 'rgba(18,18,20,0.76)' }}
       aria-hidden
     >
       <div
