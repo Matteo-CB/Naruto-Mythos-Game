@@ -431,4 +431,97 @@ export const effectDescriptionsPt: Record<string, string[]> = {
   "SS-136-R": [
     "[↯] Derrote um personagem inimigo nesta missão que foi jogado no turno passado por menos que seu custo impresso devido a um efeito de carta.",
   ],
+  "SS-137-R": [
+    "[↯] Devolva para sua mão um personagem aliado oculto desta missão.",
+    "[↯] DUELO Kurenai Yuhi: O adversário escolhe e derrota seus personagens desta missão até ter tantos quanto você.",
+  ],
+  "SS-080-C": [
+    "Equipe a um personagem aliado não oculto.",
+  ],
+  "SS-083-UC": [
+    "Equipe a um personagem inimigo não oculto.",
+    "[⧗] O texto de efeito deste personagem fica em branco.",
+  ],
+  "SS-084-C": [
+    "Equipe a um personagem inimigo não oculto.",
+    "[⧗] Este personagem não pode receber nenhum marcador de Potência.",
+    "[↯] Remova todos os marcadores de Potência deste personagem.",
+  ],
+  "SS-086-C": [
+    "Equipe a um personagem aliado.",
+    "[↯] Oculte e mova este personagem.",
+    "[⧗] Você pode jogar este personagem oculto pagando 1 a menos.",
+  ],
+  "SS-087-UC": [
+    "Equipe a um personagem Rock Lee ou Taijutsu.",
+    "[⧗] No início de cada rodada, POWERUP 5.",
+  ],
+  "SS-088-UC": [
+    "Equipe a um personagem não oculto.",
+    "[↯] Descarte todos os outros equipamentos deste personagem.",
+    "[⧗] Este personagem não pode receber outros equipamentos.",
+  ],
+  "SS-090-UC": [
+    "Equipe a um personagem aliado Akatsuki ou Ninja Renegado.",
+    "[↯] Remova até 3 marcadores de Potência de um personagem inimigo desta missão e coloque-os neste personagem.",
+  ],
+  "SS-091-C": [
+    "Equipe a um personagem aliado não oculto. Este personagem também é considerado um personagem da Vila da Folha.",
+  ],
+  "SS-094-C": [
+    "Equipe a um personagem aliado não oculto. Este personagem também é considerado um personagem Ninja Renegado.",
+  ],
+  "SS-095-UC": [
+    "Equipe a um personagem aliado não oculto e sem Jutsu.",
+    "[↯] Olhe as 3 primeiras cartas do seu deck, escolha e revele um personagem Jutsu e adicione-o à sua mão. Ponha as outras cartas ao acaso no fundo do seu deck.",
+  ],
+  "SS-096-UC": [
+    "Equipe a um personagem aliado não oculto.",
+    "[↯] Se você tiver um Pergaminho da Terra nesta missão, ganhe 1 ponto de missão.",
+  ],
+  "SS-097-UC": [
+    "Equipe a um personagem aliado não oculto.",
+    "[↯] Se você tiver um Pergaminho do Céu nesta missão, ganhe 1 ponto de missão.",
+  ],
+  "SS-098-UC": [
+    "Equipe a um personagem aliado da Vila da Folha.",
+    "[⧗] Este equipamento tem +1 de Potência para cada personagem aliado da Vila da Folha nesta missão.",
+  ],
+  "SS-100-C": [
+    "Equipe a um personagem aliado não oculto.",
+    "[⧗] Você pode olhar os personagens inimigos ocultos desta missão a qualquer momento. Este equipamento tem +1 de Potência para cada personagem inimigo oculto nesta missão.",
+  ],
+  "SS-102-UC": [
+    "Equipe a um personagem aliado não oculto.",
+    "[⧗] Este personagem tem CHAKRA +1.",
+  ],
+  "SS-103-UC": [
+    "Equipe a uma missão.",
+    "[⧗] Esta missão vale +1 ponto de missão para ambos os jogadores.",
+  ],
+  "SS-104-C": [
+    "Equipe a uma missão.",
+    "[⧗] Seus personagens não ocultos de custo 2 ou menos nesta missão têm +1 de Potência. Seus personagens não ocultos com um equipamento de Comida nesta missão têm +1 de Potência.",
+  ],
+  "SS-105-UC": [
+    "Equipe a uma missão.",
+    "[⧗] Para os efeitos das suas cartas dos Quatro do Som, você tem um personagem aliado dos Quatro do Som a mais nesta missão (com custo e Potência iguais a este equipamento).",
+  ],
+  "SS-106-C": [
+    "Equipe a uma missão.",
+    "[⧗] Seus personagens nesta missão com Potência impressa de 5 ou mais têm +2 de Potência.",
+  ],
+  "SS-107-C": [
+    "Equipe a uma missão.",
+    "[⧗] Quando um personagem não oculto é jogado nesta missão a partir da mão, ative seus efeitos EMBOSCADA.",
+  ],
+  "SS-109-UC": [
+    "Equipe a uma missão.",
+    "[↯] Ponha a carta do topo do seu deck como personagem oculto nesta missão.",
+    "[⧗] No final da rodada, ponha a carta do topo do seu deck como personagem oculto nesta missão.",
+  ],
+  "SS-110-UC": [
+    "Equipe a uma missão.",
+    "[⧗] Quando você equipa uma Arma ou Armadura a um personagem aliado desta missão, compre 1 carta e POWERUP 1 nesse personagem.",
+  ],
 };

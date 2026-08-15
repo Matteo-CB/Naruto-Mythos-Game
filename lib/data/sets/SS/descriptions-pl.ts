@@ -431,4 +431,97 @@ export const effectDescriptionsPl: Record<string, string[]> = {
   "SS-136-R": [
     "[↯] Pokonaj wrogą postać w tej misji, która została zagrana w poprzedniej turze poniżej swojego nadrukowanego kosztu dzięki efektowi karty.",
   ],
+  "SS-137-R": [
+    "[↯] Zwróć do ręki zakrytą sojuszniczą postać z tej misji.",
+    "[↯] POJEDYNEK Kurenai Yuhi: Przeciwnik wybiera i pokonuje swoje postacie w tej misji, aż będzie ich tyle co twoich.",
+  ],
+  "SS-080-C": [
+    "Dołącz do odkrytej sojuszniczej postaci.",
+  ],
+  "SS-083-UC": [
+    "Dołącz do odkrytej wrogiej postaci.",
+    "[⧗] Tekst efektu tej postaci zostaje wymazany.",
+  ],
+  "SS-084-C": [
+    "Dołącz do odkrytej wrogiej postaci.",
+    "[⧗] Ta postać nie może otrzymywać znaczników Mocy.",
+    "[↯] Usuń z tej postaci wszystkie znaczniki Mocy.",
+  ],
+  "SS-086-C": [
+    "Dołącz do sojuszniczej postaci.",
+    "[↯] Zakryj i przenieś tę postać.",
+    "[⧗] Możesz zagrać tę postać zakrytą, płacąc 1 mniej.",
+  ],
+  "SS-087-UC": [
+    "Dołącz do postaci Rock Lee lub Taijutsu.",
+    "[⧗] Na początku każdej rundy, POWERUP 5.",
+  ],
+  "SS-088-UC": [
+    "Dołącz do odkrytej postaci.",
+    "[↯] Odrzuć wszystkie inne wyposażenia tej postaci.",
+    "[⧗] Ta postać nie może otrzymywać innych wyposażeń.",
+  ],
+  "SS-090-UC": [
+    "Dołącz do sojuszniczej postaci Akatsuki lub Zbiegłego Ninja.",
+    "[↯] Usuń do 3 znaczników Mocy z wrogiej postaci w tej misji i połóż je na tej postaci.",
+  ],
+  "SS-091-C": [
+    "Dołącz do odkrytej sojuszniczej postaci. Ta postać jest też uznawana za postać Wioski Liścia.",
+  ],
+  "SS-094-C": [
+    "Dołącz do odkrytej sojuszniczej postaci. Ta postać jest też uznawana za Zbiegłego Ninja.",
+  ],
+  "SS-095-UC": [
+    "Dołącz do odkrytej sojuszniczej postaci bez Jutsu.",
+    "[↯] Spójrz na 3 wierzchnie karty talii, wybierz i odkryj postać Jutsu, po czym dodaj ją do ręki. Pozostałe karty połóż losowo na spód talii.",
+  ],
+  "SS-096-UC": [
+    "Dołącz do odkrytej sojuszniczej postaci.",
+    "[↯] Jeśli masz Zwój Ziemi w tej misji, zyskaj 1 punkt misji.",
+  ],
+  "SS-097-UC": [
+    "Dołącz do odkrytej sojuszniczej postaci.",
+    "[↯] Jeśli masz Zwój Nieba w tej misji, zyskaj 1 punkt misji.",
+  ],
+  "SS-098-UC": [
+    "Dołącz do sojuszniczej postaci Wioski Liścia.",
+    "[⧗] To wyposażenie ma +1 Mocy za każdą sojuszniczą postać Wioski Liścia w tej misji.",
+  ],
+  "SS-100-C": [
+    "Dołącz do odkrytej sojuszniczej postaci.",
+    "[⧗] Możesz w każdej chwili podejrzeć zakryte wrogie postacie w tej misji. To wyposażenie ma +1 Mocy za każdą zakrytą wrogą postać w tej misji.",
+  ],
+  "SS-102-UC": [
+    "Dołącz do odkrytej sojuszniczej postaci.",
+    "[⧗] Ta postać ma CZAKRA +1.",
+  ],
+  "SS-103-UC": [
+    "Dołącz do misji.",
+    "[⧗] Ta misja jest warta +1 punkt misji dla obu graczy.",
+  ],
+  "SS-104-C": [
+    "Dołącz do misji.",
+    "[⧗] Twoje odkryte postacie o koszcie 2 lub mniejszym w tej misji mają +1 Mocy. Twoje odkryte postacie z wyposażeniem Jedzenie w tej misji mają +1 Mocy.",
+  ],
+  "SS-105-UC": [
+    "Dołącz do misji.",
+    "[⧗] Na potrzeby efektów twoich kart Czwórki Dźwięku masz w tej misji jedną dodatkową sojuszniczą postać Czwórki Dźwięku (o koszcie i Mocy równych temu wyposażeniu).",
+  ],
+  "SS-106-C": [
+    "Dołącz do misji.",
+    "[⧗] Twoje postacie w tej misji o nadrukowanej Mocy 5 lub większej mają +2 Mocy.",
+  ],
+  "SS-107-C": [
+    "Dołącz do misji.",
+    "[⧗] Gdy odkryta postać zostaje zagrana w tej misji z ręki, aktywuj jej efekty ZASADZKI.",
+  ],
+  "SS-109-UC": [
+    "Dołącz do misji.",
+    "[↯] Połóż wierzchnią kartę talii jako zakrytą postać w tej misji.",
+    "[⧗] Na koniec rundy połóż wierzchnią kartę talii jako zakrytą postać w tej misji.",
+  ],
+  "SS-110-UC": [
+    "Dołącz do misji.",
+    "[⧗] Gdy dołączasz Broń lub Zbroję do sojuszniczej postaci w tej misji, dobierz 1 kartę i POWERUP 1 dla tej postaci.",
+  ],
 };

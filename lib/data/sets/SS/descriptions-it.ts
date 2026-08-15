@@ -431,4 +431,97 @@ export const effectDescriptionsIt: Record<string, string[]> = {
   "SS-136-R": [
     "[↯] Sconfiggi un personaggio nemico in questa missione giocato lo scorso turno per meno del suo costo stampato a causa di un effetto di carta.",
   ],
+  "SS-137-R": [
+    "[↯] Rimetti in mano un personaggio alleato nascosto di questa missione.",
+    "[↯] DUELLO Kurenai Yuhi: L'avversario sceglie e sconfigge i suoi personaggi in questa missione finché non ne ha quanti te.",
+  ],
+  "SS-080-C": [
+    "Equipaggia a un personaggio alleato non nascosto.",
+  ],
+  "SS-083-UC": [
+    "Equipaggia a un personaggio nemico non nascosto.",
+    "[⧗] Il testo di effetto di questo personaggio è cancellato.",
+  ],
+  "SS-084-C": [
+    "Equipaggia a un personaggio nemico non nascosto.",
+    "[⧗] Questo personaggio non può ricevere segnalini Potenza.",
+    "[↯] Rimuovi tutti i segnalini Potenza da questo personaggio.",
+  ],
+  "SS-086-C": [
+    "Equipaggia a un personaggio alleato.",
+    "[↯] Nascondi e sposta questo personaggio.",
+    "[⧗] Puoi giocare questo personaggio nascosto pagando 1 in meno.",
+  ],
+  "SS-087-UC": [
+    "Equipaggia a un personaggio Rock Lee o Taijutsu.",
+    "[⧗] All'inizio di ogni round, POWERUP 5.",
+  ],
+  "SS-088-UC": [
+    "Equipaggia a un personaggio non nascosto.",
+    "[↯] Scarta tutti gli altri equipaggiamenti di questo personaggio.",
+    "[⧗] Questo personaggio non può ricevere altri equipaggiamenti.",
+  ],
+  "SS-090-UC": [
+    "Equipaggia a un personaggio alleato Alba o Ninja Rinnegato.",
+    "[↯] Rimuovi fino a 3 segnalini Potenza da un personaggio nemico in questa missione e mettili su questo personaggio.",
+  ],
+  "SS-091-C": [
+    "Equipaggia a un personaggio alleato non nascosto. Questo personaggio è considerato anche un personaggio del Villaggio della Foglia.",
+  ],
+  "SS-094-C": [
+    "Equipaggia a un personaggio alleato non nascosto. Questo personaggio è considerato anche un personaggio Ninja Rinnegato.",
+  ],
+  "SS-095-UC": [
+    "Equipaggia a un personaggio alleato non nascosto e senza Jutsu.",
+    "[↯] Guarda le prime 3 carte del tuo mazzo, scegli e rivela un personaggio Jutsu e aggiungilo alla tua mano. Metti le altre carte a caso in fondo al mazzo.",
+  ],
+  "SS-096-UC": [
+    "Equipaggia a un personaggio alleato non nascosto.",
+    "[↯] Se hai una Pergamena della Terra in questa missione, guadagna 1 punto missione.",
+  ],
+  "SS-097-UC": [
+    "Equipaggia a un personaggio alleato non nascosto.",
+    "[↯] Se hai una Pergamena del Cielo in questa missione, guadagna 1 punto missione.",
+  ],
+  "SS-098-UC": [
+    "Equipaggia a un personaggio alleato del Villaggio della Foglia.",
+    "[⧗] Questo equipaggiamento ha +1 Potenza per ogni personaggio alleato del Villaggio della Foglia in questa missione.",
+  ],
+  "SS-100-C": [
+    "Equipaggia a un personaggio alleato non nascosto.",
+    "[⧗] Puoi guardare i personaggi nemici nascosti in questa missione in qualsiasi momento. Questo equipaggiamento ha +1 Potenza per ogni personaggio nemico nascosto in questa missione.",
+  ],
+  "SS-102-UC": [
+    "Equipaggia a un personaggio alleato non nascosto.",
+    "[⧗] Questo personaggio ha CHAKRA +1.",
+  ],
+  "SS-103-UC": [
+    "Equipaggia a una missione.",
+    "[⧗] Questa missione vale +1 punto missione per entrambi i giocatori.",
+  ],
+  "SS-104-C": [
+    "Equipaggia a una missione.",
+    "[⧗] I tuoi personaggi non nascosti di costo 2 o meno in questa missione hanno +1 Potenza. I tuoi personaggi non nascosti con un equipaggiamento Cibo in questa missione hanno +1 Potenza.",
+  ],
+  "SS-105-UC": [
+    "Equipaggia a una missione.",
+    "[⧗] Per gli effetti delle tue carte dei Quattro del Suono, hai un personaggio alleato dei Quattro del Suono in più in questa missione (con costo e Potenza pari a questo equipaggiamento).",
+  ],
+  "SS-106-C": [
+    "Equipaggia a una missione.",
+    "[⧗] I tuoi personaggi in questa missione con Potenza stampata di 5 o più hanno +2 Potenza.",
+  ],
+  "SS-107-C": [
+    "Equipaggia a una missione.",
+    "[⧗] Quando un personaggio non nascosto viene giocato in questa missione dalla mano, attiva i suoi effetti IMBOSCATA.",
+  ],
+  "SS-109-UC": [
+    "Equipaggia a una missione.",
+    "[↯] Metti la carta in cima al tuo mazzo come personaggio nascosto in questa missione.",
+    "[⧗] Alla fine del round, metti la carta in cima al tuo mazzo come personaggio nascosto in questa missione.",
+  ],
+  "SS-110-UC": [
+    "Equipaggia a una missione.",
+    "[⧗] Quando equipaggi un'Arma o un'Armatura a un personaggio alleato in questa missione, pesca 1 carta e POWERUP 1 quel personaggio.",
+  ],
 };

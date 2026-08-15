@@ -642,4 +642,97 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   "SS-038-UC": [
     "[↯] Attachez Ukon à un personnage ennemi non caché de cette mission. Tant qu’il est attaché, ce personnage a -5 Puissance, et Ukon est traité comme un équipement et non comme un personnage.",
   ],
+  "SS-137-R": [
+    "[↯] Renvoyez un personnage allié caché de cette mission dans votre main.",
+    "[↯] DUEL Kurenai Yûhi : L'adversaire choisit et vainc ses personnages de cette mission jusqu'à en avoir autant que vous.",
+  ],
+  "SS-080-C": [
+    "Attachez à un personnage allié non caché.",
+  ],
+  "SS-083-UC": [
+    "Attachez à un personnage ennemi non caché.",
+    "[⧗] Le texte d'effet de ce personnage est vierge.",
+  ],
+  "SS-084-C": [
+    "Attachez à un personnage ennemi non caché.",
+    "[⧗] Ce personnage ne peut recevoir aucun jeton de Puissance.",
+    "[↯] Retirez tous les jetons de Puissance de ce personnage.",
+  ],
+  "SS-086-C": [
+    "Attachez à un personnage allié.",
+    "[↯] Cachez et déplacez ce personnage.",
+    "[⧗] Vous pouvez jouer ce personnage face cachée en payant 1 de moins.",
+  ],
+  "SS-087-UC": [
+    "Attachez à un personnage Rock Lee ou Taijutsu.",
+    "[⧗] Au début de chaque manche, POWERUP 5.",
+  ],
+  "SS-088-UC": [
+    "Attachez à un personnage non caché.",
+    "[↯] Défaussez tous les autres équipements de ce personnage.",
+    "[⧗] Ce personnage ne peut pas recevoir d'autres équipements.",
+  ],
+  "SS-090-UC": [
+    "Attachez à un personnage allié Akatsuki ou Ninja Déserteur.",
+    "[↯] Retirez jusqu'à 3 jetons de Puissance d'un personnage ennemi de cette mission et placez-les sur ce personnage.",
+  ],
+  "SS-091-C": [
+    "Attachez à un personnage allié non caché. Ce personnage est également considéré comme un personnage du Village de la Feuille.",
+  ],
+  "SS-094-C": [
+    "Attachez à un personnage allié non caché. Ce personnage est également considéré comme un personnage Ninja Déserteur.",
+  ],
+  "SS-095-UC": [
+    "Attachez à un personnage allié non caché et non Jutsu.",
+    "[↯] Regardez les 3 premières cartes de votre pioche, choisissez et révélez un personnage Jutsu, puis ajoutez-le à votre main. Placez les autres cartes au hasard au fond de votre pioche.",
+  ],
+  "SS-096-UC": [
+    "Attachez à un personnage allié non caché.",
+    "[↯] Si vous avez un Parchemin de la Terre dans cette mission, gagnez 1 point de mission.",
+  ],
+  "SS-097-UC": [
+    "Attachez à un personnage allié non caché.",
+    "[↯] Si vous avez un Parchemin du Ciel dans cette mission, gagnez 1 point de mission.",
+  ],
+  "SS-098-UC": [
+    "Attachez à un personnage allié du Village de la Feuille.",
+    "[⧗] Cet équipement a +1 Puissance pour chaque personnage allié du Village de la Feuille dans cette mission.",
+  ],
+  "SS-100-C": [
+    "Attachez à un personnage allié non caché.",
+    "[⧗] Vous pouvez regarder les personnages ennemis cachés de cette mission à tout moment. Cet équipement a +1 Puissance pour chaque personnage ennemi caché dans cette mission.",
+  ],
+  "SS-102-UC": [
+    "Attachez à un personnage allié non caché.",
+    "[⧗] Ce personnage a CHAKRA +1.",
+  ],
+  "SS-103-UC": [
+    "Attachez à une mission.",
+    "[⧗] Cette mission vaut +1 point de mission pour les deux joueurs.",
+  ],
+  "SS-104-C": [
+    "Attachez à une mission.",
+    "[⧗] Vos personnages non cachés de coût 2 ou moins dans cette mission ont +1 Puissance. Vos personnages non cachés portant un équipement Nourriture dans cette mission ont +1 Puissance.",
+  ],
+  "SS-105-UC": [
+    "Attachez à une mission.",
+    "[⧗] Pour les effets de vos cartes Quatre du Son, vous avez un personnage allié Quatre du Son supplémentaire dans cette mission (de coût et de Puissance égaux à cet équipement).",
+  ],
+  "SS-106-C": [
+    "Attachez à une mission.",
+    "[⧗] Vos personnages de cette mission ayant une Puissance imprimée de 5 ou plus ont +2 Puissance.",
+  ],
+  "SS-107-C": [
+    "Attachez à une mission.",
+    "[⧗] Quand un personnage non caché est joué dans cette mission depuis la main, activez ses effets AMBUSH.",
+  ],
+  "SS-109-UC": [
+    "Attachez à une mission.",
+    "[↯] Placez la carte du dessus de votre pioche comme personnage caché dans cette mission.",
+    "[⧗] À la fin de la manche, placez la carte du dessus de votre pioche comme personnage caché dans cette mission.",
+  ],
+  "SS-110-UC": [
+    "Attachez à une mission.",
+    "[⧗] Quand vous attachez un équipement Arme ou Armure à un personnage allié de cette mission, piochez 1 carte et POWERUP 1 ce personnage.",
+  ],
 };

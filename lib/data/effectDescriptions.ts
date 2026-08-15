@@ -18,9 +18,24 @@ export function augmentEffectDescriptions(byLocale: Record<string, DescMap>): vo
   }
 }
 
+const RARETES_DE_BASE = ['R', 'UC', 'C', 'S', 'M', 'L'];
+
+function impressionsDeBase(cardId: string): string[] {
+  const decoupe = cardId.match(/^([A-Z]+)-(\d+)(?:_\d+)?-([A-Z]+)$/);
+  if (!decoupe) return [];
+  const [, set, numero, rarete] = decoupe;
+  if (RARETES_DE_BASE.includes(rarete)) return [];
+  return RARETES_DE_BASE.map((r) => `${set}-${numero}-${r}`);
+}
+
 function pick(map: DescMap | undefined, cardId: string, raFallbackId: string | undefined): string[] | undefined {
   if (!map) return undefined;
-  return map[cardId] ?? (raFallbackId ? map[raFallbackId] : undefined);
+  const direct = map[cardId] ?? (raFallbackId ? map[raFallbackId] : undefined);
+  if (direct) return direct;
+  for (const candidat of impressionsDeBase(cardId)) {
+    if (map[candidat]) return map[candidat];
+  }
+  return undefined;
 }
 
 export function getCardEffectDescriptions(cardId: string, locale: string): string[] | undefined {

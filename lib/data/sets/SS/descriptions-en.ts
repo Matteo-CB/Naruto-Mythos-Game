@@ -642,4 +642,97 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   "SS-038-UC": [
     "[↯] Attach Ukon to an enemy non-hidden character in this mission. While attached, that character gets -5 Power, and Ukon is treated as an attachment instead of a character.",
   ],
+  "SS-137-R": [
+    "[↯] Return a friendly hidden character from this mission to your hand.",
+    "[↯] DUEL Kurenai Yuhi: The opponent chooses and defeats their characters in this mission until they have the same number as your characters.",
+  ],
+  "SS-080-C": [
+    "Attach to a friendly non-hidden character.",
+  ],
+  "SS-083-UC": [
+    "Attach to an enemy non-hidden character.",
+    "[⧗] This character's effect text is blank.",
+  ],
+  "SS-084-C": [
+    "Attach to an enemy non-hidden character.",
+    "[⧗] This character cannot receive any Power tokens.",
+    "[↯] Remove all Power tokens from this character.",
+  ],
+  "SS-086-C": [
+    "Attach to a friendly character.",
+    "[↯] Hide and move this character.",
+    "[⧗] You can play this character while hidden paying 1 less.",
+  ],
+  "SS-087-UC": [
+    "Attach to a Rock Lee or Taijutsu character.",
+    "[⧗] At the start of each round, POWERUP 5.",
+  ],
+  "SS-088-UC": [
+    "Attach to a non-hidden character.",
+    "[↯] Discard all other attachments on this character.",
+    "[⧗] This character cannot receive other attachments.",
+  ],
+  "SS-090-UC": [
+    "Attach to a friendly Akatsuki or Rogue Ninja character.",
+    "[↯] Remove up to 3 Power tokens from an enemy character in this mission and put them on this character.",
+  ],
+  "SS-091-C": [
+    "Attach to a friendly non-hidden character. This character is also considered a Leaf Village character.",
+  ],
+  "SS-094-C": [
+    "Attach to a friendly non-hidden character. This character is also considered a Rogue Ninja character.",
+  ],
+  "SS-095-UC": [
+    "Attach to a friendly non-hidden, non-Jutsu character.",
+    "[↯] Look at the top 3 cards of your deck, choose and reveal a Jutsu character, then add it to your hand. Put the other cards randomly at the bottom of your deck.",
+  ],
+  "SS-096-UC": [
+    "Attach to a friendly non-hidden character.",
+    "[↯] If you have an Earth Scroll in this mission, gain 1 Mission point.",
+  ],
+  "SS-097-UC": [
+    "Attach to a friendly non-hidden character.",
+    "[↯] If you have a Heaven Scroll in this mission, gain 1 Mission point.",
+  ],
+  "SS-098-UC": [
+    "Attach to a friendly Leaf Village character.",
+    "[⧗] This attachment has +1 Power for every friendly Leaf Village character in this mission.",
+  ],
+  "SS-100-C": [
+    "Attach to a friendly non-hidden character.",
+    "[⧗] You can look at enemy hidden characters in this mission anytime. This attachment has +1 Power for every enemy hidden character in this mission.",
+  ],
+  "SS-102-UC": [
+    "Attach to a friendly non-hidden character.",
+    "[⧗] This character has CHAKRA +1.",
+  ],
+  "SS-103-UC": [
+    "Attach to a mission.",
+    "[⧗] This mission is worth +1 Mission point for both players.",
+  ],
+  "SS-104-C": [
+    "Attach to a mission.",
+    "[⧗] All your non-hidden characters with cost 2 or less in this mission have +1 Power. All your non-hidden characters with a Food attachment in this mission have +1 Power.",
+  ],
+  "SS-105-UC": [
+    "Attach to a mission.",
+    "[⧗] For your Sound Four card effects, you have an additional friendly Sound Four character in this mission (with cost and Power equal to this attachment).",
+  ],
+  "SS-106-C": [
+    "Attach to a mission.",
+    "[⧗] Your characters in this mission with printed Power of 5 or more have +2 Power.",
+  ],
+  "SS-107-C": [
+    "Attach to a mission.",
+    "[⧗] When a non-hidden character is played in this mission from hand, activate their AMBUSH effects.",
+  ],
+  "SS-109-UC": [
+    "Attach to a mission.",
+    "[↯] Put the top card of your deck as a hidden character in this mission.",
+    "[⧗] At the end of the round, put the top card of your deck as a hidden character in this mission.",
+  ],
+  "SS-110-UC": [
+    "Attach to a mission.",
+    "[⧗] When you attach a Weapon or Armor attachment to a friendly character in this mission, draw 1 card and POWERUP 1 that character.",
+  ],
 };

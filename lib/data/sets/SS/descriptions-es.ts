@@ -435,4 +435,97 @@ export const effectDescriptionsEs: Record<string, string[]> = {
   "SS-136-R": [
     "[↯] Derrota a un personaje enemigo en esta misión que se jugó el turno pasado por menos de su coste impreso debido a un efecto de carta.",
   ],
+  "SS-137-R": [
+    "[↯] Devuelve a tu mano un personaje aliado oculto de esta misión.",
+    "[↯] DUELO Kurenai Yuhi: El rival elige y derrota a sus personajes de esta misión hasta tener tantos como tú.",
+  ],
+  "SS-080-C": [
+    "Equipa a un personaje aliado no oculto.",
+  ],
+  "SS-083-UC": [
+    "Equipa a un personaje enemigo no oculto.",
+    "[⧗] El texto de efecto de este personaje queda en blanco.",
+  ],
+  "SS-084-C": [
+    "Equipa a un personaje enemigo no oculto.",
+    "[⧗] Este personaje no puede recibir ningún marcador de Potencia.",
+    "[↯] Retira todos los marcadores de Potencia de este personaje.",
+  ],
+  "SS-086-C": [
+    "Equipa a un personaje aliado.",
+    "[↯] Oculta y mueve a este personaje.",
+    "[⧗] Puedes jugar a este personaje oculto pagando 1 menos.",
+  ],
+  "SS-087-UC": [
+    "Equipa a un personaje Rock Lee o Taijutsu.",
+    "[⧗] Al inicio de cada ronda, POWERUP 5.",
+  ],
+  "SS-088-UC": [
+    "Equipa a un personaje no oculto.",
+    "[↯] Descarta todos los demás equipos de este personaje.",
+    "[⧗] Este personaje no puede recibir otros equipos.",
+  ],
+  "SS-090-UC": [
+    "Equipa a un personaje aliado Akatsuki o Ninja Renegado.",
+    "[↯] Retira hasta 3 marcadores de Potencia de un personaje enemigo de esta misión y ponlos en este personaje.",
+  ],
+  "SS-091-C": [
+    "Equipa a un personaje aliado no oculto. Este personaje también se considera un personaje de la Aldea de la Hoja.",
+  ],
+  "SS-094-C": [
+    "Equipa a un personaje aliado no oculto. Este personaje también se considera un personaje Ninja Renegado.",
+  ],
+  "SS-095-UC": [
+    "Equipa a un personaje aliado no oculto y sin Jutsu.",
+    "[↯] Mira las 3 primeras cartas de tu mazo, elige y revela un personaje Jutsu, y añádelo a tu mano. Pon las demás cartas al azar al fondo de tu mazo.",
+  ],
+  "SS-096-UC": [
+    "Equipa a un personaje aliado no oculto.",
+    "[↯] Si tienes un Pergamino de la Tierra en esta misión, gana 1 punto de misión.",
+  ],
+  "SS-097-UC": [
+    "Equipa a un personaje aliado no oculto.",
+    "[↯] Si tienes un Pergamino del Cielo en esta misión, gana 1 punto de misión.",
+  ],
+  "SS-098-UC": [
+    "Equipa a un personaje aliado de la Aldea de la Hoja.",
+    "[⧗] Este equipo tiene +1 de Potencia por cada personaje aliado de la Aldea de la Hoja en esta misión.",
+  ],
+  "SS-100-C": [
+    "Equipa a un personaje aliado no oculto.",
+    "[⧗] Puedes mirar los personajes enemigos ocultos de esta misión en cualquier momento. Este equipo tiene +1 de Potencia por cada personaje enemigo oculto en esta misión.",
+  ],
+  "SS-102-UC": [
+    "Equipa a un personaje aliado no oculto.",
+    "[⧗] Este personaje tiene CHAKRA +1.",
+  ],
+  "SS-103-UC": [
+    "Equipa a una misión.",
+    "[⧗] Esta misión vale +1 punto de misión para ambos jugadores.",
+  ],
+  "SS-104-C": [
+    "Equipa a una misión.",
+    "[⧗] Tus personajes no ocultos de coste 2 o menos en esta misión tienen +1 de Potencia. Tus personajes no ocultos con un equipo de Comida en esta misión tienen +1 de Potencia.",
+  ],
+  "SS-105-UC": [
+    "Equipa a una misión.",
+    "[⧗] Para los efectos de tus cartas de los Cuatro del Sonido, tienes un personaje aliado de los Cuatro del Sonido adicional en esta misión (con coste y Potencia iguales a este equipo).",
+  ],
+  "SS-106-C": [
+    "Equipa a una misión.",
+    "[⧗] Tus personajes en esta misión con Potencia impresa de 5 o más tienen +2 de Potencia.",
+  ],
+  "SS-107-C": [
+    "Equipa a una misión.",
+    "[⧗] Cuando un personaje no oculto se juega en esta misión desde la mano, activa sus efectos EMBOSCADA.",
+  ],
+  "SS-109-UC": [
+    "Equipa a una misión.",
+    "[↯] Pon la carta superior de tu mazo como personaje oculto en esta misión.",
+    "[⧗] Al final de la ronda, pon la carta superior de tu mazo como personaje oculto en esta misión.",
+  ],
+  "SS-110-UC": [
+    "Equipa a una misión.",
+    "[⧗] Cuando equipas un Arma o una Armadura a un personaje aliado de esta misión, roba 1 carta y POWERUP 1 a ese personaje.",
+  ],
 };

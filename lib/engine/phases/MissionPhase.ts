@@ -534,6 +534,25 @@ function resolveScoreEffectsOnce(
 }
 
 
+function marquerSourceScoreTraitee(state: GameState, source: ScoreEffectSource): GameState {
+  if (!source.instanceId) return state;
+  const dejaTraitees = state.missionScoringProgress?.processedCharacterIds ?? [];
+  if (dejaTraitees.includes(source.instanceId)) return state;
+  return {
+    ...state,
+    missionScoringProgress: {
+      ...(state.missionScoringProgress ?? {
+        currentRankIndex: 0,
+        missionCardScoreDone: false,
+        processedCharacterIds: [],
+        winner: null,
+        currentRankComplete: false,
+      }),
+      processedCharacterIds: [...dejaTraitees, source.instanceId],
+    } as GameState['missionScoringProgress'],
+  };
+}
+
 function resolveSingleScoreEffect(
   state: GameState,
   player: PlayerID,
@@ -546,9 +565,19 @@ function resolveSingleScoreEffect(
 
   
   let character = null;
+  let sourceIntrouvable = false;
   if (source.instanceId) {
     const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
     character = chars.find((c) => c.instanceId === source.instanceId) ?? null;
+    const attaches = [
+      ...(mission.attachments ?? []),
+      ...chars.flatMap((c) => c.attachments ?? []),
+    ];
+    sourceIntrouvable = !character && !attaches.some((a) => a.instanceId === source.instanceId);
+  }
+
+  if (sourceIntrouvable) {
+    return marquerSourceScoreTraitee(newState, source);
   }
 
   const result = EffectEngine.resolveScoreEffectSingle(newState, player, missionIndex, source.cardId, character);

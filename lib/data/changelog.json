@@ -37,7 +37,8 @@
         "feature",
         "feature",
         "feature",
-        "feature"
+        "feature",
+        "fix"
       ],
       "changes_fr": [
         "Orochimaru 127 révélé ne prend plus qu'un seul personnage, même quand Sasuke est dans la mission.",
@@ -60,14 +61,15 @@
         "Les versions Secrètes de Tsunade et Jiraya, qui ne faisaient rien, agissent comme leurs versions dorées.",
         "Douze cartes du set 2 gagnent leur effet déclenché, dont Shino 17, Haku 52, Kiba 14 et Orochimaru 145.",
         "Tenten 21 coûte 1 de moins quand elle est la première carte que vous jouez dans la manche.",
-        "Orochimaru 145 frappe plus large quand il est révélé : son seuil de coût devient inclusif.",
+        "Orochimaru 145 frappe plus large quand il est révélé : il emporte aussi les ennemis qui coûtent pile sa limite.",
         "Mizuki 60 et Tazuna 76 marquent des points de mission au décompte.",
         "Les quatre cartes à duel du set 2 sont jouables : Shino 113, Hashirama 129, Tobirama 131 et Hiruzen 133.",
         "Shino 113 fait défausser l'adversaire, et au hasard si Kankuro est dans la mission.",
         "Hashirama et Tobirama peuvent s'améliorer par-dessus un allié d'un autre nom quand Orochimaru est là.",
         "Hiruzen 133 renforce de 2 chaque allié de Konoha qui arrive dans sa mission.",
         "Haku 135 défausse la carte du dessus de votre pioche et cache un ennemi moins cher qu'elle.",
-        "Toutes les cartes du set 2 ont désormais leur effet en jeu, sans exception."
+        "Toutes les cartes du set 2 ont désormais leur effet en jeu, sans exception.",
+        "Les équipements affichent enfin leur texte de règles sur la carte, dans toutes les langues."
       ],
       "changes_en": [
         "A revealed Orochimaru 127 now takes a single character, even with Sasuke in the mission.",
@@ -90,14 +92,15 @@
         "The Secret versions of Tsunade and Jiraiya, which did nothing, now act like their gold versions.",
         "Twelve set 2 cards gain their triggered effect, including Shino 17, Haku 52, Kiba 14 and Orochimaru 145.",
         "Tenten 21 costs 1 less when she is the first card you play in the round.",
-        "Orochimaru 145 hits wider when revealed: his cost threshold becomes inclusive.",
+        "Orochimaru 145 hits wider when revealed: he also takes down enemies costing exactly his limit.",
         "Mizuki 60 and Tazuna 76 score Mission points at scoring.",
         "The four duel cards of set 2 are playable: Shino 113, Hashirama 129, Tobirama 131 and Hiruzen 133.",
         "Shino 113 makes the opponent discard, at random if Kankuro is in the mission.",
         "Hashirama and Tobirama can upgrade over an ally with a different name when Orochimaru is present.",
         "Hiruzen 133 gives 2 Power to every Leaf Village ally arriving in his mission.",
         "Haku 135 discards the top card of your deck and hides an enemy cheaper than it.",
-        "Every set 2 card now has its effect in play, without exception."
+        "Every set 2 card now has its effect in play, without exception.",
+        "Attachments finally show their rules text on the card, in every language."
       ],
       "changes_es": [
         "Orochimaru 127 revelado ya solo toma un personaje, incluso con Sasuke en la misión.",
@@ -120,14 +123,15 @@
         "Las versiones Secretas de Tsunade y Jiraiya, que no hacían nada, actúan como sus versiones doradas.",
         "Doce cartas del set 2 ganan su efecto activado, entre ellas Shino 17, Haku 52, Kiba 14 y Orochimaru 145.",
         "Tenten 21 cuesta 1 menos cuando es la primera carta que juegas en la ronda.",
-        "Orochimaru 145 golpea más amplio al ser revelado: su umbral de coste pasa a ser inclusivo.",
+        "Orochimaru 145 golpea más amplio al ser revelado: también se lleva a los enemigos que cuestan justo su límite.",
         "Mizuki 60 y Tazuna 76 consiguen puntos de misión en el recuento.",
         "Las cuatro cartas de duelo del set 2 son jugables: Shino 113, Hashirama 129, Tobirama 131 y Hiruzen 133.",
         "Shino 113 hace descartar al rival, al azar si Kankuro está en la misión.",
         "Hashirama y Tobirama pueden mejorar sobre un aliado de otro nombre cuando Orochimaru está presente.",
         "Hiruzen 133 da 2 de Potencia a cada aliado de Konoha que llega a su misión.",
         "Haku 135 descarta la carta superior de tu mazo y oculta a un enemigo más barato que ella.",
-        "Todas las cartas del set 2 ya tienen su efecto en juego, sin excepción."
+        "Todas las cartas del set 2 ya tienen su efecto en juego, sin excepción.",
+        "Los equipos por fin muestran su texto de reglas en la carta, en todos los idiomas."
       ],
       "changes_ja": [
         "公開した大蛇丸127は、そのミッションにサスケがいても1体しか奪わなくなりました。",
@@ -150,14 +154,15 @@
         "何もしなかったツナデとジライヤのシークレット版が、ゴールド版と同じように働きます。",
         "セット2の12枚が誘発効果を得ました。シノ17、ハク52、キバ14、大蛇丸145などです。",
         "テンテン21は、そのラウンドで最初に出すカードなら1少なく支払います。",
-        "大蛇丸145は公開されるとより広く攻撃します。コストのしきい値が以下になります。",
+        "大蛇丸145は公開されるとより広く攻撃し、ちょうど上限のコストの敵も倒します。",
         "ミズキ60とタズナ76は、得点時にミッションポイントを得ます。",
         "セット2の決闘カード4枚が使えます。シノ113、柱間129、扉間131、ヒルゼン133です。",
         "シノ113は相手に手札を捨てさせ、カンクロウが同じミッションにいるならランダムになります。",
         "柱間と扉間は、大蛇丸がいるとき別名の味方の上に重ねられます。",
         "ヒルゼン133は、自分のミッションに来る木ノ葉の味方にパワー2を与えます。",
         "ハク135は山札の一番上のカードを捨て、それより安い敵を裏向きにします。",
-        "セット2の全カードが例外なく効果を持つようになりました。"
+        "セット2の全カードが例外なく効果を持つようになりました。",
+        "装備カードにルール文が全言語で表示されるようになりました。"
       ],
       "changes_pt": [
         "Orochimaru 127 revelado passa a levar apenas um personagem, mesmo com Sasuke na missão.",
@@ -180,14 +185,15 @@
         "As versões Secretas de Tsunade e Jiraiya, que não faziam nada, agora agem como suas versões douradas.",
         "Doze cartas do set 2 ganham seu efeito ativado, incluindo Shino 17, Haku 52, Kiba 14 e Orochimaru 145.",
         "Tenten 21 custa 1 a menos quando é a primeira carta que você joga na rodada.",
-        "Orochimaru 145 atinge mais alvos ao ser revelado: seu limite de custo passa a ser inclusivo.",
+        "Orochimaru 145 atinge mais alvos ao ser revelado: também derruba inimigos que custam exatamente seu limite.",
         "Mizuki 60 e Tazuna 76 marcam pontos de missão na contagem.",
         "As quatro cartas de duelo do set 2 são jogáveis: Shino 113, Hashirama 129, Tobirama 131 e Hiruzen 133.",
         "Shino 113 faz o adversário descartar, ao acaso se Kankuro estiver na missão.",
         "Hashirama e Tobirama podem melhorar sobre um aliado de outro nome quando Orochimaru está presente.",
         "Hiruzen 133 dá 2 de Potência a cada aliado da Folha que chega à sua missão.",
         "Haku 135 descarta a carta do topo do seu deck e oculta um inimigo mais barato que ela.",
-        "Todas as cartas do set 2 agora têm seu efeito em jogo, sem exceção."
+        "Todas as cartas do set 2 agora têm seu efeito em jogo, sem exceção.",
+        "Os equipamentos finalmente mostram seu texto de regras na carta, em todos os idiomas."
       ],
       "changes_it": [
         "Orochimaru 127 rivelato prende un solo personaggio, anche con Sasuke nella missione.",
@@ -210,14 +216,15 @@
         "Le versioni Segrete di Tsunade e Jiraiya, che non facevano nulla, agiscono come le versioni dorate.",
         "Dodici carte del set 2 ottengono il loro effetto attivato, tra cui Shino 17, Haku 52, Kiba 14 e Orochimaru 145.",
         "Tenten 21 costa 1 in meno quando è la prima carta che giochi nel round.",
-        "Orochimaru 145 colpisce più ampio quando viene rivelato: la sua soglia di costo diventa inclusiva.",
+        "Orochimaru 145 colpisce più ampio quando viene rivelato: elimina anche i nemici che costano esattamente il suo limite.",
         "Mizuki 60 e Tazuna 76 segnano punti missione al conteggio.",
         "Le quattro carte con duello del set 2 sono giocabili: Shino 113, Hashirama 129, Tobirama 131 e Hiruzen 133.",
         "Shino 113 fa scartare l'avversario, a caso se Kankuro è nella missione.",
         "Hashirama e Tobirama possono migliorare su un alleato con un altro nome quando Orochimaru è presente.",
         "Hiruzen 133 dà 2 Potenza a ogni alleato della Foglia che arriva nella sua missione.",
         "Haku 135 scarta la carta in cima al mazzo e nasconde un nemico che costa meno di essa.",
-        "Tutte le carte del set 2 hanno ora il loro effetto in gioco, senza eccezioni."
+        "Tutte le carte del set 2 hanno ora il loro effetto in gioco, senza eccezioni.",
+        "Gli equipaggiamenti mostrano finalmente il testo di regole sulla carta, in tutte le lingue."
       ],
       "changes_pl": [
         "Odkryty Orochimaru 127 przejmuje już tylko jedną postać, nawet gdy Sasuke jest w misji.",
@@ -240,14 +247,15 @@
         "Sekretne wersje Tsunade i Jiraiyi, które nic nie robiły, działają jak ich złote wersje.",
         "Dwanaście kart z zestawu 2 zyskuje efekt wyzwalany, w tym Shino 17, Haku 52, Kiba 14 i Orochimaru 145.",
         "Tenten 21 kosztuje o 1 mniej, gdy jest pierwszą kartą zagraną w rundzie.",
-        "Orochimaru 145 uderza szerzej po odkryciu: jego próg kosztu staje się włączny.",
+        "Orochimaru 145 uderza szerzej po odkryciu: zabiera też wrogów o koszcie dokładnie równym jego limitowi.",
         "Mizuki 60 i Tazuna 76 zdobywają punkty misji podczas liczenia.",
         "Cztery karty z pojedynkiem z zestawu 2 są grywalne: Shino 113, Hashirama 129, Tobirama 131 i Hiruzen 133.",
         "Shino 113 zmusza przeciwnika do odrzucenia karty, losowo jeśli Kankuro jest w misji.",
         "Hashirama i Tobirama mogą ulepszać na sojuszniku o innej nazwie, gdy Orochimaru jest obecny.",
         "Hiruzen 133 daje 2 Mocy każdemu sojusznikowi z Liścia wchodzącemu do jego misji.",
         "Haku 135 odrzuca wierzchnią kartę talii i zakrywa wroga tańszego od niej.",
-        "Wszystkie karty z zestawu 2 mają teraz swój efekt w grze, bez wyjątku."
+        "Wszystkie karty z zestawu 2 mają teraz swój efekt w grze, bez wyjątku.",
+        "Wyposażenia wreszcie pokazują swój tekst zasad na karcie, we wszystkich językach."
       ]
     },
     {
