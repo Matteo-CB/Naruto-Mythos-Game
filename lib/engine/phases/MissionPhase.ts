@@ -182,8 +182,7 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
   if (winner && winner !== 'draw') {
     const basePts = Number.isFinite(mission.basePoints) ? mission.basePoints : 1;
     const rankPts = Number.isFinite(mission.rankBonus) ? mission.rankBonus : 0;
-    const scoreMultiplier = missionCarries(mission, SS_MISSION_HIGH_PRIORITY) ? 2 : 1;
-    const points = (basePts + rankPts) * scoreMultiplier;
+    const points = basePts + rankPts;
     const ps = { ...newState[winner] };
     const prior = Number.isFinite(ps.missionPoints) ? ps.missionPoints : 0;
     ps.missionPoints = prior + points;

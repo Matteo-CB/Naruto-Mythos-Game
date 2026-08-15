@@ -149,8 +149,13 @@ describe('card effect simulations (verified through the real engine)', () => {
             return !!solo && calc(last, solo) >= 5;
           }
           case 'SS-004-MMS':
-          case 'SS-004_2-MMS':
-            return states.some((s) => s.player1.missionPoints === 2);
+          case 'SS-004_2-MMS': {
+            const mission = last.activeMissions[0];
+            const imprimes = (mission.basePoints ?? 0) + (mission.rankBonus ?? 0);
+            const scores = last.log.filter((l) => l.action === 'SCORE_DRAW').length;
+            const repetition = last.log.some((l) => l.action === 'SCORE_REPEAT');
+            return scores >= 2 && repetition && last.player1.missionPoints === imprimes;
+          }
           case 'SS-005-MMS':
           case 'SS-005_2-MMS':
             return states.some((s) => s.turn === 2 && s.player1.chakra >= 8);

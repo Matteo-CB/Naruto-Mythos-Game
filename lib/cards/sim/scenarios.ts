@@ -451,7 +451,7 @@ const MISSION_FACTORIES: Record<string, () => SimScenario> = {
   }),
   'SS-002-MMS': () => scoreMissionScenario('SS-002-MMS', { e0: [{ id: 'KS-005-C', iid: 'sim-hid-enemy', hidden: true }] }),
   'SS-003-MMS': () => scoreMissionScenario('SS-003-MMS'),
-  'SS-004-MMS': () => scoreMissionScenario('SS-004-MMS'),
+  'SS-004-MMS': () => scoreMissionScenario('SS-004-MMS', { p1m0: ['KS-081-C'] }),
   'SS-005-MMS': () => ({
     build: () => board({ p1m0: [VANILLA], e0: [{ id: 'KS-136-S', iid: 'sim-strong' }], missionIds: ['SS-005-MMS', 'KS-006-MMS'] }),
     play: P1(PASS_ACTION),

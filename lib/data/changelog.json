@@ -1,6 +1,72 @@
 {
   "entries": [
     {
+      "date": "2026-08-15",
+      "title_fr": "Correctifs de cartes du set 2",
+      "title_en": "Set 2 card fixes",
+      "title_es": "Correcciones de cartas del set 2",
+      "title_ja": "セット2のカード修正",
+      "title_pt": "Correções de cartas do set 2",
+      "title_it": "Correzioni delle carte del set 2",
+      "title_pl": "Poprawki kart z dodatku 2",
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ],
+      "changes_fr": [
+        "Orochimaru 127 révélé ne prend plus qu'un seul personnage, même quand Sasuke est dans la mission.",
+        "Kakashi 016 copie de nouveau un effet FIRST STRIKE quand il est la première carte que vous jouez.",
+        "Tayuya 125 ne fait plus payer un chakra de plus sur les équipements, seulement sur les personnages.",
+        "L'Épée Serpent déclenche son effet FIRST STRIKE, depuis la main comme en la révélant.",
+        "La mission Priorité Haute ne donne plus ses points deux fois : seuls les effets SCORE se répètent."
+      ],
+      "changes_en": [
+        "A revealed Orochimaru 127 now takes a single character, even with Sasuke in the mission.",
+        "Kakashi 016 copies a FIRST STRIKE effect again when he is the first card you play.",
+        "Tayuya 125 no longer charges one extra chakra on attachments, only on characters.",
+        "Snake Sword triggers its FIRST STRIKE effect, from your hand and when revealed.",
+        "The High Priority mission no longer pays its points twice: only the SCORE effects repeat."
+      ],
+      "changes_es": [
+        "Orochimaru 127 revelado ya solo toma un personaje, incluso con Sasuke en la misión.",
+        "Kakashi 016 vuelve a copiar un efecto FIRST STRIKE cuando es la primera carta que juegas.",
+        "Tayuya 125 ya no cobra un chakra extra por los equipamientos, solo por los personajes.",
+        "La Espada Serpiente activa su efecto FIRST STRIKE, desde la mano y al revelarla.",
+        "La misión Prioridad Alta ya no da sus puntos dos veces: solo se repiten los efectos SCORE."
+      ],
+      "changes_ja": [
+        "公開した大蛇丸127は、そのミッションにサスケがいても1体しか奪わなくなりました。",
+        "カカシ016は、そのラウンド最初に出したカードであればFIRST STRIKEをコピーできるようになりました。",
+        "テユヤ125の追加チャクラは、装備カードには適用されず、キャラクターのみになりました。",
+        "草薙の剣が、手札からでも公開時でもFIRST STRIKEを発動するようになりました。",
+        "最優先ミッションはポイントを二重に与えなくなりました。繰り返すのはSCORE効果だけです。"
+      ],
+      "changes_pt": [
+        "Orochimaru 127 revelado passa a levar apenas um personagem, mesmo com Sasuke na missão.",
+        "Kakashi 016 volta a copiar um efeito FIRST STRIKE quando é a primeira carta que você joga.",
+        "Tayuya 125 já não cobra um chakra extra nos equipamentos, apenas nos personagens.",
+        "A Espada Serpente ativa o seu efeito FIRST STRIKE, da mão e ao ser revelada.",
+        "A missão Prioridade Alta já não dá os pontos duas vezes: apenas os efeitos SCORE se repetem."
+      ],
+      "changes_it": [
+        "Orochimaru 127 rivelato prende un solo personaggio, anche con Sasuke nella missione.",
+        "Kakashi 016 copia di nuovo un effetto FIRST STRIKE quando è la prima carta che giochi.",
+        "Tayuya 125 non fa più pagare un chakra in più sugli equipaggiamenti, solo sui personaggi.",
+        "La Spada Serpente attiva il suo effetto FIRST STRIKE, dalla mano e quando viene rivelata.",
+        "La missione Priorità Alta non assegna più i punti due volte: si ripetono solo gli effetti SCORE."
+      ],
+      "changes_pl": [
+        "Odkryty Orochimaru 127 przejmuje już tylko jedną postać, nawet gdy Sasuke jest w misji.",
+        "Kakashi 016 znowu kopiuje efekt FIRST STRIKE, gdy jest pierwszą zagraną przez ciebie kartą.",
+        "Tayuya 125 nie pobiera już dodatkowej czakry za ekwipunek, tylko za postacie.",
+        "Wężowy Miecz uruchamia swój efekt FIRST STRIKE, z ręki i przy odkryciu.",
+        "Misja Wysoki Priorytet nie daje już punktów dwa razy: powtarzają się tylko efekty SCORE."
+      ]
+    },
+    {
       "date": "2026-08-14",
       "title_fr": "Équipements du set 2",
       "title_en": "Set 2 equipment",

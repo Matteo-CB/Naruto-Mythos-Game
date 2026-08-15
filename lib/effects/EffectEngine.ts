@@ -416,6 +416,24 @@ function isFirstStrikeArmed(
   return !!getEffectHandler(topCard.id, 'FIRST_STRIKE' as EffectType);
 }
 
+function inheritPlayContext(
+  state: GameState,
+  knownPendingIds: Set<string>,
+  parent: PendingEffect,
+): GameState {
+  if (!parent.wasRevealed && !parent.wasFirstCard) return state;
+  let changed = false;
+  const pendingEffects = state.pendingEffects.map((pe) => {
+    if (knownPendingIds.has(pe.id)) return pe;
+    const wasRevealed = !!(pe.wasRevealed || parent.wasRevealed);
+    const wasFirstCard = !!(pe.wasFirstCard || parent.wasFirstCard);
+    if (wasRevealed === !!pe.wasRevealed && wasFirstCard === !!pe.wasFirstCard) return pe;
+    changed = true;
+    return { ...pe, wasRevealed, wasFirstCard };
+  });
+  return changed ? { ...state, pendingEffects } : state;
+}
+
 export class EffectEngine {
   
   static resolvePlayEffects(
@@ -681,6 +699,7 @@ export class EffectEngine {
       };
     }
 
+    const wasFirstCardOfReveal = isFirstCardPlayedThisRound(newState, player);
     const firstStrikeArmed = isFirstStrikeArmed(newState, player, character, topCard, isOwnPlayAction);
     if (firstStrikeArmed) newState = withFirstStrikeStatus(newState, player, 'used');
     const firstStrikeTail: EffectType[] = firstStrikeArmed ? ['FIRST_STRIKE' as EffectType] : [];
@@ -733,7 +752,7 @@ export class EffectEngine {
 
             newState = EffectEngine.createPendingTargetSelection(
               result.state, player, character, missionIndex, 'MAIN', false,
-              result, remainingEffectTypes, true,
+              result, remainingEffectTypes, true, undefined, wasFirstCardOfReveal,
             );
             return newState;
           }
@@ -769,7 +788,7 @@ export class EffectEngine {
 
             newState = EffectEngine.createPendingTargetSelection(
               result.state, player, character, missionIndex, 'AMBUSH', false,
-              result, ambushRemaining, true,
+              result, ambushRemaining, true, undefined, wasFirstCardOfReveal,
             );
             return newState;
           }
@@ -1313,6 +1332,16 @@ export class EffectEngine {
 
   
   static applyTargetedEffect(
+    state: GameState,
+    pendingEffect: PendingEffect,
+    selectedTargets: string[],
+  ): GameState {
+    const knownPendingIds = new Set(state.pendingEffects.map((pe) => pe.id));
+    const resolved = EffectEngine.dispatchTargetedEffect(state, pendingEffect, selectedTargets);
+    return inheritPlayContext(resolved, knownPendingIds, pendingEffect);
+  }
+
+  static dispatchTargetedEffect(
     state: GameState,
     pendingEffect: PendingEffect,
     selectedTargets: string[],
