@@ -20,7 +20,7 @@ import {
   isSpecialVariant,
   isLockedVariant,
 } from '@/lib/variants/constants';
-import { isVariantCard, isLockedVariantCard, baseCardIdFor, parseCardId } from '@/lib/variants/isVariant';
+import { isVariantCard, isLockedVariantCard, baseCardIdFor, parseCardId, SETS_TEMPORAIREMENT_DEBLOQUES } from '@/lib/variants/isVariant';
 import { resolveVariantToBaseCardId } from '@/lib/variants/variantPool';
 import { isForceUnlockedCard, getForceUnlockedCardIds } from '@/lib/variants/forceUnlock';
 import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
@@ -192,12 +192,25 @@ describe('variant rarity classification', () => {
     expect(isVariantCard({ rarity: undefined } as unknown as Pick<CardData, 'rarity'>)).toBe(false);
   });
 
-  it('classifies every real card of a locked rarity as locked', () => {
-    const locked = getAllCards().filter((c) => DOCUMENTED_LOCKED_RARITIES.includes(c.rarity));
+  it('classifies every real card of a locked rarity as locked, hors sets temporairement ouverts', () => {
+    const locked = getAllCards()
+      .filter((c) => DOCUMENTED_LOCKED_RARITIES.includes(c.rarity))
+      .filter((c) => !SETS_TEMPORAIREMENT_DEBLOQUES.has(String(c.set)));
     expect(locked.length).toBeGreaterThan(0);
     for (const card of locked) {
       expect(isLockedVariantCard(card)).toBe(true);
       expect(isVariantCard(card)).toBe(true);
+    }
+  });
+
+  it('un set temporairement ouvert ne verrouille aucune de ses variantes', () => {
+    const ouvertes = getAllCards()
+      .filter((c) => DOCUMENTED_LOCKED_RARITIES.includes(c.rarity))
+      .filter((c) => SETS_TEMPORAIREMENT_DEBLOQUES.has(String(c.set)));
+    expect(ouvertes.length, 'le set 2 a bien des variantes').toBeGreaterThan(0);
+    for (const card of ouvertes) {
+      expect(isLockedVariantCard(card), `${card.id} est ouverte`).toBe(false);
+      expect(isVariantCard(card), `${card.id} reste une variante`).toBe(true);
     }
   });
 
@@ -358,7 +371,7 @@ describe('server side deck variant validation', () => {
   });
 
   it('accepts a locked rarity from a not yet released set without any ownership', async () => {
-    expect(isLockedVariantCard(getCardById('SS-147-POPV'))).toBe(true);
+    expect(isLockedVariantCard(getCardById('SS-147-POPV')), 'ouverte pendant le deblocage temporaire').toBe(false);
     const res = await validateDeckVariantUnlocks('u1', ['SS-147-POPV', 'SS-149-L']);
     expect(res.ok).toBe(true);
     expect(fakeUserFindUnique).not.toHaveBeenCalled();

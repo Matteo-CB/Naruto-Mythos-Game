@@ -6,9 +6,16 @@ export function isVariantCard(card: Pick<CardData, 'rarity'> | null | undefined)
   return isSpecialVariant(card.rarity);
 }
 
-export function isLockedVariantCard(card: Pick<CardData, 'rarity'> | null | undefined): boolean {
+export const SETS_TEMPORAIREMENT_DEBLOQUES = new Set(['SS']);
+
+export function isLockedVariantCard(
+  card: Pick<CardData, 'rarity'> & { set?: string; id?: string } | null | undefined,
+): boolean {
   if (!card) return false;
-  return isLockedVariant(card.rarity);
+  if (!isLockedVariant(card.rarity)) return false;
+  const jeu = card.set ?? (card.id ? card.id.split('-')[0] : undefined);
+  if (jeu && SETS_TEMPORAIREMENT_DEBLOQUES.has(jeu)) return false;
+  return true;
 }
 
 export function getVariantRarity(card: Pick<CardData, 'rarity'> | null | undefined): VariantRarity | null {
