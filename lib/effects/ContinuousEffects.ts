@@ -655,6 +655,52 @@ export function isMovementBlockedByKurenai(
 
 
 
+function applyHiruzen133Powerup(
+  state: GameState,
+  player: PlayerID,
+  missionIndex: number,
+  playedInstanceId?: string,
+): GameState {
+  if (!playedInstanceId) return state;
+  const mission = state.activeMissions[missionIndex];
+  if (!mission) return state;
+  const side: 'player1Characters' | 'player2Characters' =
+    player === 'player1' ? 'player1Characters' : 'player2Characters';
+
+  const sources = mission[side].filter((c) => {
+    if (c.isHidden) return false;
+    if (c.instanceId === playedInstanceId) return false;
+    const top = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    return String(top.set) === 'SS' && Number(top.number) === 133;
+  });
+  if (sources.length === 0) return state;
+
+  const joue = mission[side].find((c) => c.instanceId === playedInstanceId);
+  if (!joue || joue.isHidden) return state;
+  const topJoue = joue.stack?.length > 0 ? joue.stack[joue.stack.length - 1] : joue.card;
+  if (!characterHasGroup(joue, 'Leaf Village')) return state;
+
+  const gain = 2 * sources.length;
+  const missions = state.activeMissions.map((m, idx) => {
+    if (idx !== missionIndex) return m;
+    return {
+      ...m,
+      [side]: m[side].map((c: CharacterInPlay) => c.instanceId === playedInstanceId
+        ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, gain) }
+        : c),
+    };
+  });
+
+  return {
+    ...state,
+    activeMissions: missions,
+    log: logAction(state.log, state.turn, state.phase, player, 'EFFECT_POWERUP',
+      `Hiruzen Sarutobi (133): POWERUP ${gain} on ${topJoue.name_fr}.`,
+      'game.log.effect.ss133Powerup',
+      { card: 'HIRUZEN SARUTOBI', id: 'SS-133-R', amount: String(gain), target: topJoue.name_fr, target_en: topJoue.name_en || topJoue.name_fr }),
+  };
+}
+
 function applyNewForcesPowerup(
   state: GameState,
   player: PlayerID,
@@ -847,6 +893,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
   newState = triggerCrow089Relocation(newState, playingPlayer, playedInstanceId);
   newState = applyGato075Reward(newState, playingPlayer, missionIndex, playedInstanceId);
   newState = applyNewForcesPowerup(newState, playingPlayer, missionIndex, playedInstanceId);
+  newState = applyHiruzen133Powerup(newState, playingPlayer, missionIndex, playedInstanceId);
   newState = applyJiraiyaGoldSummonChakra(newState, playingPlayer, playedInstanceId);
   newState = applyKabuto139DrawDiscard(newState, playingPlayer, playedInstanceId);
   const opponent: PlayerID = playingPlayer === 'player1' ? 'player2' : 'player1';

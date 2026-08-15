@@ -4,6 +4,7 @@ import { calculateEffectiveCost } from './ChakraValidation';
 import { calculateCharacterPower } from '../phases/PowerCalculation';
 import { revealUpgradeWouldDuplicateName } from '../../effects/revealNameUniqueness';
 import { flexibleUpgradeRestrictionBlocks, hasFlexibleUpgradeRestriction, isRestrictedUpgradeTarget, FLEXIBLE_UPGRADE_RESTRICTION_REASON_KEY } from './flexibleUpgradeRestriction';
+import { ameliorationLibreAutorisee } from './senjuUpgrade';
 
 export interface ValidationResult {
   valid: boolean;
@@ -163,7 +164,7 @@ export function validateRevealCharacter(
       const cTop = candidate.stack?.length > 0 ? candidate.stack[candidate.stack?.length - 1] : candidate.card;
       if (charTopCard.chakra > cTop.chakra) {
         const isSameName = cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
-        if (isSameName || checkFlexibleUpgrade(charTopCard, cTop)) {
+        if (isSameName || checkFlexibleUpgrade(charTopCard, cTop, state, missionIndex)) {
           upgradeTarget = candidate;
         }
       }
@@ -174,7 +175,7 @@ export function validateRevealCharacter(
       if (c.instanceId === characterInstanceId || c.isHidden) return false;
       if (c.controlledBy !== c.originalOwner) return false;
       const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-      if (!checkFlexibleUpgrade(charTopCard, cTop) || charTopCard.chakra <= cTop.chakra) return false;
+      if (!checkFlexibleUpgrade(charTopCard, cTop, state, missionIndex) || charTopCard.chakra <= cTop.chakra) return false;
 
       const wouldConflict = chars.some((other) => {
         if (other.instanceId === characterInstanceId || other.instanceId === c.instanceId) return false;
@@ -265,7 +266,7 @@ export function validateUpgradeCharacter(
   const topCard = target.stack?.length > 0 ? target.stack[target.stack?.length - 1] : target.card;
 
   
-  const isFlexibleUpgrade = checkFlexibleUpgrade(newCard, topCard);
+  const isFlexibleUpgrade = checkFlexibleUpgrade(newCard, topCard, state, missionIndex);
 
   if (!isFlexibleUpgrade) {
     
@@ -321,9 +322,16 @@ export function isUpgradeNameLegal(newCard: CharacterCard, targetTopCard: Charac
 }
 
 
-export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: CharacterCard): boolean {
+export function checkFlexibleUpgrade(
+  newCard: CharacterCard,
+  targetCard: CharacterCard,
+  state?: GameState,
+  missionIndex?: number,
+): boolean {
 
   if (newCard.name_fr.toUpperCase() === targetCard.name_fr.toUpperCase()) return false;
+
+  if (ameliorationLibreAutorisee(newCard, state, missionIndex)) return true;
 
   const newCardNumber = typeof newCard.number === 'string' ? parseInt(newCard.number, 10) : newCard.number;
   const newCardSet = String(newCard.set ?? 'KS');

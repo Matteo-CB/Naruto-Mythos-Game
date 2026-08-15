@@ -761,6 +761,14 @@ export class GameEngine {
         }
       }
 
+      if (effect.targetSelectionType === 'SS113_CONFIRM_DUEL_MODIFIER') {
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+        const adverseShino: PlayerID = effect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        newState = EffectEngine.demanderChoixShino113(newState, effect, 'SS113_CHOOSE_DISCARD', adverseShino);
+        return newState;
+      }
+
       if (effect.targetSelectionType === 'SASUKE014_CONFIRM_UPGRADE_MODIFIER') {
         newState.pendingEffects.splice(effectIdx, 1);
         newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);

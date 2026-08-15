@@ -882,7 +882,10 @@
         "ss021Cheaper": "{card} ({id}): jugado por 1 menos como primer golpe.",
         "ss060Scored": "{card} ({id}): un aliado queda oculto, {amount} punto de misión ganado.",
         "ss076Scored": "{card} ({id}): {amount} puntos de misión ganados.",
-        "ss145Threshold": "{card} ({id}): revelado, el umbral pasa a {amount} o menos."
+        "ss145Threshold": "{card} ({id}): revelado, el umbral pasa a {amount} o menos.",
+        "ss113Random": "{card} ({id}): el rival descarta {target} al azar.",
+        "ss113Chosen": "{card} ({id}): el rival descarta {target}.",
+        "ss133Powerup": "{card} ({id}): {target} gana {amount} de Potencia al llegar."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",
@@ -1647,7 +1650,14 @@
         "ss145DefeatUpTo": "¿Derrotar a todos los enemigos de esta misión que cuesten {amount} o menos?",
         "ss014PeekAndDefeat": "Elige el personaje enemigo oculto que quieres mirar. Si cuesta 3 o menos, es derrotado.",
         "ss060HideFriendly": "Elige el personaje aliado de esta misión que se ocultará para ganar 1 punto de misión.",
-        "ss076GainPoints": "¿Ganar 2 puntos de misión?"
+        "ss076GainPoints": "¿Ganar 2 puntos de misión?",
+        "ss113Discard": "¿Obligar al rival a descartar una carta de su mano?",
+        "ss113DuelModifier": "Kankuro está aquí: ¿hacer el descarte al azar en vez de dejar elegir al rival?",
+        "ss113ChooseDiscard": "Elige la carta que descartas.",
+        "ss129PowerupHokage": "Elige el personaje Hokage que recibe 2 marcadores de Potencia.",
+        "ss131MoveHokage": "Elige el personaje Hokage que se moverá.",
+        "ss131MoveDestination": "Elige la misión de destino.",
+        "ss133PlaySummon": "Elige la Invocación que jugarás en esta misión pagando 2 menos."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

@@ -6,7 +6,7 @@ import { generateInstanceId } from '../engine/utils/id';
 import { moveOrochimaru051 } from '../engine/phases/MissionPhase';
 import { logAction } from '../engine/utils/gameLog';
 import { triggerOnDefeatEffects } from './onDefeatTriggers';
-import { hasResolvableInstantDuel, isDuelConditionMet } from './duelUtils';
+import { hasResolvableInstantDuel, isDuelConditionMet, isDuelCharacterPresent } from './duelUtils';
 import { shuffle } from '@/lib/engine/utils/shuffle';
 import { isFirstCardPlayedThisRound, withFirstStrikeStatus } from '@/lib/engine/rules/firstStrike';
 
@@ -48,6 +48,7 @@ import { IRUKA_140, coutCacheReduit } from './handlers/SS/iruka140';
 import { SHINO_017, SHINO_017_THRESHOLD, SHINO_017_GAIN, SHIGURE_068, KISAME_055, ASUMA_013, ASUMA_013_POWERUP, personnagesIndependantsDans, leplusFortEstDans, chakraVolable } from './handlers/SS/ambushSet5';
 import { HAKU_052, RYUGAN_073, zabuzasDeplacables, equipementsDePersonnage, hotesPossiblesPour } from './handlers/SS/moveTargets5';
 import { SERPENTS_056, OROCHIMARU_145, KIBA_014, KIBA_014_THRESHOLD, MIZUKI_060, MIZUKI_060_POINTS, TAZUNA_076, TAZUNA_076_POINTS, ciblesDOrochimaru, equipementParId } from './handlers/SS/set5Others';
+import { SHINO_113, HASHIRAMA_129, HASHIRAMA_129_POWERUP, TOBIRAMA_131, HIRUZEN_133, KANKURO_NOM, SUMMON, proprietaireDe, destinationsDeHokage } from './handlers/SS/duels6';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { findLegalRevealUpgradeTarget, revealWouldViolateNameUniqueness } from './revealNameUniqueness';
 import { moveWouldViolateNameUniqueness } from './moveNameUniqueness';
@@ -1227,6 +1228,59 @@ export class EffectEngine {
     return newState;
   }
 
+
+  static demanderChoixShino113(
+    state: GameState,
+    pendingEffect: PendingEffect,
+    type: string,
+    decideur: PlayerID,
+  ): GameState {
+    const adversaire: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+    const options = state[adversaire].hand.map((_, i) => String(i));
+    if (options.length === 0) return state;
+    const estConfirmation = type === 'SS113_CONFIRM_DUEL_MODIFIER';
+    const cibles = estConfirmation ? [pendingEffect.sourceInstanceId] : options;
+    const effId = generateInstanceId();
+    const actId = generateInstanceId();
+    const next: GameState = {
+      ...state,
+      pendingEffects: [...state.pendingEffects, {
+        id: effId, sourceCardId: pendingEffect.sourceCardId,
+        sourceInstanceId: pendingEffect.sourceInstanceId,
+        sourceMissionIndex: pendingEffect.sourceMissionIndex,
+        effectType: pendingEffect.effectType,
+        effectDescription: JSON.stringify({}),
+        targetSelectionType: type,
+        sourcePlayer: pendingEffect.sourcePlayer,
+        requiresTargetSelection: true,
+        validTargets: cibles,
+        isOptional: estConfirmation,
+        isMandatory: !estConfirmation,
+        resolved: false,
+        isUpgrade: pendingEffect.isUpgrade,
+        selectingPlayer: decideur,
+        remainingEffectTypes: pendingEffect.remainingEffectTypes,
+      }],
+      pendingActions: [...state.pendingActions, {
+        id: actId,
+        type: actionTypeForSelectionType(type),
+        player: decideur,
+        originPlayer: pendingEffect.sourcePlayer,
+        description: estConfirmation
+          ? 'Shino Aburame (113): apply the DUEL and make the discard random?'
+          : 'Shino Aburame (113): choose the card you discard.',
+        descriptionKey: estConfirmation
+          ? 'game.effect.desc.ss113DuelModifier'
+          : 'game.effect.desc.ss113ChooseDiscard',
+        options: cibles,
+        minSelections: 1,
+        maxSelections: 1,
+        sourceEffectId: effId,
+      }],
+    };
+    pendingEffect.remainingEffectTypes = undefined;
+    return next;
+  }
 
   static appliquerPowerupSur(state: GameState, instanceId: string, montant: number): GameState {
     if (montant <= 0) return state;
@@ -6576,6 +6630,9 @@ export class EffectEngine {
       case 'SS073_CONFIRM_AMBUSH':
       case 'SS056_CONFIRM_AMBUSH':
       case 'SS014_CONFIRM_FIRST_STRIKE':
+      case 'SS129_CONFIRM_MAIN':
+      case 'SS131_CONFIRM_MAIN':
+      case 'SS133_CONFIRM_DUEL':
       case 'SS127_CONFIRM':
       case 'SS038_CONFIRM_AMBUSH':
       case 'SS125_CONFIRM_DUEL':
@@ -13629,6 +13686,138 @@ export class EffectEngine {
           'EFFECT', `Tazuna (076): gained ${TAZUNA_076_POINTS} Mission points.`,
           'game.log.effect.ss076Scored',
           { card: 'TAZUNA', id: TAZUNA_076, amount: String(TAZUNA_076_POINTS) });
+        break;
+      }
+
+      case 'SS113_CONFIRM_MAIN': {
+        const j113 = pendingEffect.sourcePlayer;
+        const adv113: PlayerID = j113 === 'player1' ? 'player2' : 'player1';
+        if (newState[adv113].hand.length === 0) break;
+        const duel113 = isDuelCharacterPresent(newState, pendingEffect.sourceMissionIndex, KANKURO_NOM);
+        if (duel113) {
+          newState = EffectEngine.demanderChoixShino113(newState, pendingEffect, 'SS113_CONFIRM_DUEL_MODIFIER', j113);
+          break;
+        }
+        newState = EffectEngine.demanderChoixShino113(newState, pendingEffect, 'SS113_CHOOSE_DISCARD', adv113);
+        break;
+      }
+
+      case 'SS113_CONFIRM_DUEL_MODIFIER': {
+        const j113r = pendingEffect.sourcePlayer;
+        const adv113r: PlayerID = j113r === 'player1' ? 'player2' : 'player1';
+        const main113 = [...newState[adv113r].hand];
+        if (main113.length === 0) break;
+        const index113 = Math.floor(Math.random() * main113.length);
+        const jetee = main113.splice(index113, 1)[0];
+        newState[adv113r] = {
+          ...newState[adv113r],
+          hand: main113,
+          discardPile: [...newState[adv113r].discardPile, jetee],
+        };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, j113r,
+          'EFFECT', `Shino Aburame (113): the opponent discards ${jetee.name_fr} at random.`,
+          'game.log.effect.ss113Random',
+          { card: 'SHINO ABURAME', id: SHINO_113, target: jetee.name_fr, target_en: jetee.name_en || jetee.name_fr });
+        break;
+      }
+
+      case 'SS113_CHOOSE_DISCARD': {
+        const j113c = pendingEffect.sourcePlayer;
+        const adv113c: PlayerID = j113c === 'player1' ? 'player2' : 'player1';
+        const index113c = Number(targetId);
+        const main113c = [...newState[adv113c].hand];
+        if (!Number.isFinite(index113c) || index113c < 0 || index113c >= main113c.length) break;
+        const choisie = main113c.splice(index113c, 1)[0];
+        newState[adv113c] = {
+          ...newState[adv113c],
+          hand: main113c,
+          discardPile: [...newState[adv113c].discardPile, choisie],
+        };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, j113c,
+          'EFFECT', `Shino Aburame (113): the opponent discards ${choisie.name_fr}.`,
+          'game.log.effect.ss113Chosen',
+          { card: 'SHINO ABURAME', id: SHINO_113, target: choisie.name_fr, target_en: choisie.name_en || choisie.name_fr });
+        break;
+      }
+
+      case 'SS129_POWERUP_HOKAGE': {
+        const cible129 = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!cible129) break;
+        newState = EffectEngine.appliquerPowerupSur(newState, targetId, HASHIRAMA_129_POWERUP);
+        const nom129 = cible129.character.stack?.length > 0
+          ? cible129.character.stack[cible129.character.stack.length - 1]
+          : cible129.character.card;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_POWERUP', `Hashirama Senju (129): POWERUP ${HASHIRAMA_129_POWERUP}.`,
+          'game.log.effect.powerup',
+          { card: 'HASHIRAMA SENJU', id: HASHIRAMA_129, amount: String(HASHIRAMA_129_POWERUP), target: nom129.name_fr, target_en: nom129.name_en || nom129.name_fr });
+        break;
+      }
+
+      case 'SS131_MOVE_HOKAGE': {
+        const trouve131 = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!trouve131) break;
+        const proprio131 = proprietaireDe(newState, targetId);
+        if (!proprio131) break;
+        const destinations131 = destinationsDeHokage(newState, trouve131.character, proprio131);
+        if (destinations131.length === 0) break;
+        if (destinations131.length === 1) {
+          newState = EffectEngine.moveCharToMissionDirectPublic(
+            newState, targetId, destinations131[0], proprio131,
+            'TOBIRAMA SENJU', TOBIRAMA_131, pendingEffect.sourcePlayer);
+          break;
+        }
+        const eff131 = generateInstanceId();
+        const act131 = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: eff131, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ charInstanceId: targetId, owner: proprio131 }),
+          targetSelectionType: 'SS131_MOVE_DESTINATION', sourcePlayer: pendingEffect.sourcePlayer,
+          requiresTargetSelection: true, validTargets: destinations131.map((i) => String(i)),
+          isOptional: false, isMandatory: true, resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: act131, type: 'SELECT_TARGET', player: pendingEffect.sourcePlayer,
+          description: 'Tobirama Senju (131): choose the destination mission.',
+          descriptionKey: 'game.effect.desc.ss131MoveDestination',
+          options: destinations131.map((i) => String(i)),
+          minSelections: 1, maxSelections: 1, sourceEffectId: eff131,
+        }];
+        break;
+      }
+
+      case 'SS131_MOVE_DESTINATION': {
+        let m131: { charInstanceId?: string; owner?: PlayerID } = {};
+        try { m131 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const dest131 = Number(targetId);
+        if (!m131.charInstanceId || !Number.isFinite(dest131)) break;
+        newState = EffectEngine.moveCharToMissionDirectPublic(
+          newState, m131.charInstanceId, dest131, m131.owner ?? pendingEffect.sourcePlayer,
+          'TOBIRAMA SENJU', TOBIRAMA_131, pendingEffect.sourcePlayer);
+        break;
+      }
+
+      case 'SS133_PLAY_SUMMON': {
+        let d133: { costReduction?: number; missionIndex?: number } = {};
+        try { d133 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const reduction133 = d133.costReduction ?? 0;
+        const mission133 = d133.missionIndex ?? pendingEffect.sourceMissionIndex;
+        if (String(targetId).startsWith('HIDDEN_')) {
+          newState = EffectEngine.revealHiddenWithReduction(
+            newState, pendingEffect, String(targetId).slice(7), reduction133, 0, false,
+          );
+          break;
+        }
+        const brut133 = String(targetId).startsWith('HAND_') ? String(targetId).slice(5) : String(targetId);
+        newState = EffectEngine.playCharFromHandWithReduction(
+          newState, pendingEffect, brut133, reduction133, SUMMON,
+          'HIRUZEN SARUTOBI', HIRUZEN_133, false, undefined, mission133,
+        );
         break;
       }
 
@@ -21297,6 +21486,7 @@ export class EffectEngine {
     costReduction: number, _groupFilter: string, cardName: string, cardId: string,
     noUpgrade = false,
     reductionByMission?: Record<number, number>,
+    forcedMission?: number,
   ): GameState {
     const reductionFor = (i: number): number => reductionByMission?.[i] ?? costReduction;
     const handIndex = parseInt(targetId, 10);
@@ -21319,6 +21509,7 @@ export class EffectEngine {
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
+      if (forcedMission != null && i !== forcedMission) continue;
       if (isMissionValidForPlay(newState, player, i, friendlySide, chosenCard, ps.chakra, reductionFor(i), undefined, noUpgrade)) {
         validMissions.push(String(i));
       }

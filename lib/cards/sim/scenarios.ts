@@ -765,6 +765,33 @@ const FACTORIES: Record<string, Factory> = {
     followups: [{ player: 'player2', action: PASS_ACTION }],
     noMinimize: true,
   }),
+  'SS-113-R': (id) => ({
+    build: () => board({ hand: [id], p2hand: ['KS-104-R', 'KS-009-C'], chakra: 14 }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-129-R': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-133-R'], chakra: 14 }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-131-R': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-133-R'], chakra: 14 }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-133-R': (id) => ({
+    build: () => board({
+      hand: [id, 'KS-096-C'],
+      p1m0: [{ id: 'SS-127-R', iid: 'sim-orochimaru' }],
+      chakra: 20,
+    }),
+    play: P1(FRESH),
+    choose: (state, pending) => {
+      const opts = pending.options ?? [];
+      const main = opts.find((o) => o.startsWith('HAND_'));
+      if (main) return [main];
+      return opts.slice(0, Math.max(1, pending.minSelections ?? 1));
+    },
+    noMinimize: true,
+  }),
   'SS-999-L': (id) => ({
     build: () => {
       const st = board({

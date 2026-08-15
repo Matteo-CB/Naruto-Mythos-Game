@@ -495,7 +495,8 @@ export function buildPendingTargetSelectionUI(
       tst === 'PLAY_LESS_CATEGORY' ||
       tst === 'JIRAIYA_CHOOSE_SUMMON' || tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
       tst === 'JIRAIYA105_CHOOSE_SUMMON' || tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
-      tst === 'HIRUZEN002_CHOOSE_CARD'
+      tst === 'HIRUZEN002_CHOOSE_CARD' ||
+      tst === 'SS133_PLAY_SUMMON'
     ) {
       let hiddenCharsInfo: Array<{ instanceId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number }> = [];
       try { hiddenCharsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').hiddenChars ?? []; } catch { /* ignore */ }

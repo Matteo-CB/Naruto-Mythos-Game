@@ -2979,7 +2979,10 @@
         "ss021Cheaper": "{card} ({id}): zagrany o 1 taniej jako pierwsze uderzenie.",
         "ss060Scored": "{card} ({id}): sojusznik zostaje zakryty, zyskano {amount} punkt misji.",
         "ss076Scored": "{card} ({id}): zyskano {amount} punktów misji.",
-        "ss145Threshold": "{card} ({id}): odkryty, próg zmienia się na {amount} lub mniej."
+        "ss145Threshold": "{card} ({id}): odkryty, próg zmienia się na {amount} lub mniej.",
+        "ss113Random": "{card} ({id}): przeciwnik odrzuca losowo {target}.",
+        "ss113Chosen": "{card} ({id}): przeciwnik odrzuca {target}.",
+        "ss133Powerup": "{card} ({id}): {target} zyskuje {amount} Mocy po wejściu."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3744,7 +3747,14 @@
         "ss145DefeatUpTo": "Pokonać wszystkich wrogów w tej misji o koszcie {amount} lub mniejszym?",
         "ss014PeekAndDefeat": "Wybierz zakrytą wrogą postać do podejrzenia. Jeśli kosztuje 3 lub mniej, zostaje pokonana.",
         "ss060HideFriendly": "Wybierz sojuszniczą postać w tej misji do zakrycia, aby zyskać 1 punkt misji.",
-        "ss076GainPoints": "Zyskać 2 punkty misji?"
+        "ss076GainPoints": "Zyskać 2 punkty misji?",
+        "ss113Discard": "Zmusić przeciwnika do odrzucenia karty z ręki?",
+        "ss113DuelModifier": "Kankuro jest tutaj: odrzucić losowo zamiast pozwolić przeciwnikowi wybrać?",
+        "ss113ChooseDiscard": "Wybierz kartę, którą odrzucasz.",
+        "ss129PowerupHokage": "Wybierz postać Hokage, która otrzyma 2 znaczniki Mocy.",
+        "ss131MoveHokage": "Wybierz postać Hokage do przeniesienia.",
+        "ss131MoveDestination": "Wybierz misję docelową.",
+        "ss133PlaySummon": "Wybierz Przywołanie do zagrania w tej misji, płacąc 2 mniej."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

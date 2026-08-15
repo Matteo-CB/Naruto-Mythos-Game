@@ -2979,7 +2979,10 @@
         "ss021Cheaper": "{card} ({id}): giocato per 1 in meno come primo colpo.",
         "ss060Scored": "{card} ({id}): un alleato viene nascosto, {amount} punto missione guadagnato.",
         "ss076Scored": "{card} ({id}): {amount} punti missione guadagnati.",
-        "ss145Threshold": "{card} ({id}): rivelato, la soglia diventa {amount} o meno."
+        "ss145Threshold": "{card} ({id}): rivelato, la soglia diventa {amount} o meno.",
+        "ss113Random": "{card} ({id}): l'avversario scarta {target} a caso.",
+        "ss113Chosen": "{card} ({id}): l'avversario scarta {target}.",
+        "ss133Powerup": "{card} ({id}): {target} guadagna {amount} Potenza all'arrivo."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3744,7 +3747,14 @@
         "ss145DefeatUpTo": "Sconfiggere tutti i nemici in questa missione che costano {amount} o meno?",
         "ss014PeekAndDefeat": "Scegli il personaggio nemico nascosto da guardare. Se costa 3 o meno, viene sconfitto.",
         "ss060HideFriendly": "Scegli il personaggio alleato in questa missione da nascondere per guadagnare 1 punto missione.",
-        "ss076GainPoints": "Guadagnare 2 punti missione?"
+        "ss076GainPoints": "Guadagnare 2 punti missione?",
+        "ss113Discard": "Costringere l'avversario a scartare una carta dalla mano?",
+        "ss113DuelModifier": "Kankuro è qui: rendere lo scarto casuale invece di lasciar scegliere l'avversario?",
+        "ss113ChooseDiscard": "Scegli la carta che scarti.",
+        "ss129PowerupHokage": "Scegli il personaggio Hokage che riceve 2 segnalini Potenza.",
+        "ss131MoveHokage": "Scegli il personaggio Hokage da spostare.",
+        "ss131MoveDestination": "Scegli la missione di destinazione.",
+        "ss133PlaySummon": "Scegli l'Evocazione da giocare in questa missione pagando 2 in meno."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

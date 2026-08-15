@@ -31,6 +31,10 @@
         "feature",
         "feature",
         "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
         "feature"
       ],
       "changes_fr": [
@@ -55,7 +59,11 @@
         "Douze cartes du set 2 gagnent leur effet déclenché, dont Shino 17, Haku 52, Kiba 14 et Orochimaru 145.",
         "Tenten 21 coûte 1 de moins quand elle est la première carte que vous jouez dans la manche.",
         "Orochimaru 145 frappe plus large quand il est révélé : son seuil de coût devient inclusif.",
-        "Mizuki 60 et Tazuna 76 marquent des points de mission au décompte."
+        "Mizuki 60 et Tazuna 76 marquent des points de mission au décompte.",
+        "Les quatre cartes à duel du set 2 sont jouables : Shino 113, Hashirama 129, Tobirama 131 et Hiruzen 133.",
+        "Shino 113 fait défausser l'adversaire, et au hasard si Kankuro est dans la mission.",
+        "Hashirama et Tobirama peuvent s'améliorer par-dessus un allié d'un autre nom quand Orochimaru est là.",
+        "Hiruzen 133 renforce de 2 chaque allié de Konoha qui arrive dans sa mission."
       ],
       "changes_en": [
         "A revealed Orochimaru 127 now takes a single character, even with Sasuke in the mission.",
@@ -79,7 +87,11 @@
         "Twelve set 2 cards gain their triggered effect, including Shino 17, Haku 52, Kiba 14 and Orochimaru 145.",
         "Tenten 21 costs 1 less when she is the first card you play in the round.",
         "Orochimaru 145 hits wider when revealed: his cost threshold becomes inclusive.",
-        "Mizuki 60 and Tazuna 76 score Mission points at scoring."
+        "Mizuki 60 and Tazuna 76 score Mission points at scoring.",
+        "The four duel cards of set 2 are playable: Shino 113, Hashirama 129, Tobirama 131 and Hiruzen 133.",
+        "Shino 113 makes the opponent discard, at random if Kankuro is in the mission.",
+        "Hashirama and Tobirama can upgrade over an ally with a different name when Orochimaru is present.",
+        "Hiruzen 133 gives 2 Power to every Leaf Village ally arriving in his mission."
       ],
       "changes_es": [
         "Orochimaru 127 revelado ya solo toma un personaje, incluso con Sasuke en la misión.",
@@ -103,7 +115,11 @@
         "Doce cartas del set 2 ganan su efecto activado, entre ellas Shino 17, Haku 52, Kiba 14 y Orochimaru 145.",
         "Tenten 21 cuesta 1 menos cuando es la primera carta que juegas en la ronda.",
         "Orochimaru 145 golpea más amplio al ser revelado: su umbral de coste pasa a ser inclusivo.",
-        "Mizuki 60 y Tazuna 76 consiguen puntos de misión en el recuento."
+        "Mizuki 60 y Tazuna 76 consiguen puntos de misión en el recuento.",
+        "Las cuatro cartas de duelo del set 2 son jugables: Shino 113, Hashirama 129, Tobirama 131 y Hiruzen 133.",
+        "Shino 113 hace descartar al rival, al azar si Kankuro está en la misión.",
+        "Hashirama y Tobirama pueden mejorar sobre un aliado de otro nombre cuando Orochimaru está presente.",
+        "Hiruzen 133 da 2 de Potencia a cada aliado de Konoha que llega a su misión."
       ],
       "changes_ja": [
         "公開した大蛇丸127は、そのミッションにサスケがいても1体しか奪わなくなりました。",
@@ -127,7 +143,11 @@
         "セット2の12枚が誘発効果を得ました。シノ17、ハク52、キバ14、大蛇丸145などです。",
         "テンテン21は、そのラウンドで最初に出すカードなら1少なく支払います。",
         "大蛇丸145は公開されるとより広く攻撃します。コストのしきい値が以下になります。",
-        "ミズキ60とタズナ76は、得点時にミッションポイントを得ます。"
+        "ミズキ60とタズナ76は、得点時にミッションポイントを得ます。",
+        "セット2の決闘カード4枚が使えます。シノ113、柱間129、扉間131、ヒルゼン133です。",
+        "シノ113は相手に手札を捨てさせ、カンクロウが同じミッションにいるならランダムになります。",
+        "柱間と扉間は、大蛇丸がいるとき別名の味方の上に重ねられます。",
+        "ヒルゼン133は、自分のミッションに来る木ノ葉の味方にパワー2を与えます。"
       ],
       "changes_pt": [
         "Orochimaru 127 revelado passa a levar apenas um personagem, mesmo com Sasuke na missão.",
@@ -151,7 +171,11 @@
         "Doze cartas do set 2 ganham seu efeito ativado, incluindo Shino 17, Haku 52, Kiba 14 e Orochimaru 145.",
         "Tenten 21 custa 1 a menos quando é a primeira carta que você joga na rodada.",
         "Orochimaru 145 atinge mais alvos ao ser revelado: seu limite de custo passa a ser inclusivo.",
-        "Mizuki 60 e Tazuna 76 marcam pontos de missão na contagem."
+        "Mizuki 60 e Tazuna 76 marcam pontos de missão na contagem.",
+        "As quatro cartas de duelo do set 2 são jogáveis: Shino 113, Hashirama 129, Tobirama 131 e Hiruzen 133.",
+        "Shino 113 faz o adversário descartar, ao acaso se Kankuro estiver na missão.",
+        "Hashirama e Tobirama podem melhorar sobre um aliado de outro nome quando Orochimaru está presente.",
+        "Hiruzen 133 dá 2 de Potência a cada aliado da Folha que chega à sua missão."
       ],
       "changes_it": [
         "Orochimaru 127 rivelato prende un solo personaggio, anche con Sasuke nella missione.",
@@ -175,7 +199,11 @@
         "Dodici carte del set 2 ottengono il loro effetto attivato, tra cui Shino 17, Haku 52, Kiba 14 e Orochimaru 145.",
         "Tenten 21 costa 1 in meno quando è la prima carta che giochi nel round.",
         "Orochimaru 145 colpisce più ampio quando viene rivelato: la sua soglia di costo diventa inclusiva.",
-        "Mizuki 60 e Tazuna 76 segnano punti missione al conteggio."
+        "Mizuki 60 e Tazuna 76 segnano punti missione al conteggio.",
+        "Le quattro carte con duello del set 2 sono giocabili: Shino 113, Hashirama 129, Tobirama 131 e Hiruzen 133.",
+        "Shino 113 fa scartare l'avversario, a caso se Kankuro è nella missione.",
+        "Hashirama e Tobirama possono migliorare su un alleato con un altro nome quando Orochimaru è presente.",
+        "Hiruzen 133 dà 2 Potenza a ogni alleato della Foglia che arriva nella sua missione."
       ],
       "changes_pl": [
         "Odkryty Orochimaru 127 przejmuje już tylko jedną postać, nawet gdy Sasuke jest w misji.",
@@ -199,7 +227,11 @@
         "Dwanaście kart z zestawu 2 zyskuje efekt wyzwalany, w tym Shino 17, Haku 52, Kiba 14 i Orochimaru 145.",
         "Tenten 21 kosztuje o 1 mniej, gdy jest pierwszą kartą zagraną w rundzie.",
         "Orochimaru 145 uderza szerzej po odkryciu: jego próg kosztu staje się włączny.",
-        "Mizuki 60 i Tazuna 76 zdobywają punkty misji podczas liczenia."
+        "Mizuki 60 i Tazuna 76 zdobywają punkty misji podczas liczenia.",
+        "Cztery karty z pojedynkiem z zestawu 2 są grywalne: Shino 113, Hashirama 129, Tobirama 131 i Hiruzen 133.",
+        "Shino 113 zmusza przeciwnika do odrzucenia karty, losowo jeśli Kankuro jest w misji.",
+        "Hashirama i Tobirama mogą ulepszać na sojuszniku o innej nazwie, gdy Orochimaru jest obecny.",
+        "Hiruzen 133 daje 2 Mocy każdemu sojusznikowi z Liścia wchodzącemu do jego misji."
       ]
     },
     {

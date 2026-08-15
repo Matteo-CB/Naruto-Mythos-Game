@@ -881,7 +881,10 @@
         "ss021Cheaper": "{card}（{id}）：ファーストストライクで1少なく出しました。",
         "ss060Scored": "{card}（{id}）：味方を裏向きにし、ミッションポイント{amount}を得ました。",
         "ss076Scored": "{card}（{id}）：ミッションポイント{amount}を得ました。",
-        "ss145Threshold": "{card}（{id}）：公開され、しきい値がコスト{amount}以下になりました。"
+        "ss145Threshold": "{card}（{id}）：公開され、しきい値がコスト{amount}以下になりました。",
+        "ss113Random": "{card}（{id}）：相手がランダムに{target}を捨てました。",
+        "ss113Chosen": "{card}（{id}）：相手が{target}を捨てました。",
+        "ss133Powerup": "{card}（{id}）：{target}が登場時にパワー{amount}を得ました。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1646,7 +1649,14 @@
         "ss145DefeatUpTo": "このミッションでコスト{amount}以下の敵をすべて倒しますか。",
         "ss014PeekAndDefeat": "見る裏向きの敵キャラクターを選んでください。コストが3以下なら倒します。",
         "ss060HideFriendly": "ミッションポイント1を得るために裏向きにする、このミッションの味方キャラクターを選んでください。",
-        "ss076GainPoints": "ミッションポイントを2得ますか。"
+        "ss076GainPoints": "ミッションポイントを2得ますか。",
+        "ss113Discard": "相手に手札からカードを1枚捨てさせますか。",
+        "ss113DuelModifier": "カンクロウがいます。相手に選ばせる代わりにランダムで捨てさせますか。",
+        "ss113ChooseDiscard": "捨てるカードを選んでください。",
+        "ss129PowerupHokage": "パワートークンを2個受け取る火影キャラクターを選んでください。",
+        "ss131MoveHokage": "移動させる火影キャラクターを選んでください。",
+        "ss131MoveDestination": "移動先のミッションを選んでください。",
+        "ss133PlaySummon": "2少なく支払ってこのミッションに出す口寄せを選んでください。"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",

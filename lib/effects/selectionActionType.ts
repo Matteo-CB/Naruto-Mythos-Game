@@ -22,6 +22,7 @@ export function actionTypeForSelectionType(tst: string): PendingAction['type'] {
     tst === 'SS114_CHOOSE_DISCARD' ||
     tst === 'SS139_DISCARD' ||
     tst === 'SS009_DISCARD_FOOD' ||
+  tst === 'SS113_CHOOSE_DISCARD' ||
   tst === 'SS138_DISCARD_FOR_POWER'
   ) {
     actionType = 'DISCARD_CARD';
@@ -53,7 +54,8 @@ export function actionTypeForSelectionType(tst: string): PendingAction['type'] {
   tst === 'SS022_PLAY_ATTACHMENT' ||
   tst === 'SS140_PLAY_HIDDEN' ||
   tst === 'SS073_MOVE_ATTACHMENT' ||
-  tst === 'SS056_DISCARD_ATTACHMENT'
+  tst === 'SS056_DISCARD_ATTACHMENT' ||
+  tst === 'SS133_PLAY_SUMMON'
   ) {
     actionType = 'CHOOSE_CARD_FROM_LIST';
   } else if (tst === 'COPY_EFFECT_CHOSEN') {

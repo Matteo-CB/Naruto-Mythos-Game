@@ -883,7 +883,10 @@
         "ss021Cheaper": "{card} ({id}) : joué pour 1 de moins en première frappe.",
         "ss060Scored": "{card} ({id}) : un allié est caché, {amount} point de mission gagné.",
         "ss076Scored": "{card} ({id}) : {amount} points de mission gagnés.",
-        "ss145Threshold": "{card} ({id}) : révélé, le seuil devient {amount} ou moins."
+        "ss145Threshold": "{card} ({id}) : révélé, le seuil devient {amount} ou moins.",
+        "ss113Random": "{card} ({id}) : l'adversaire défausse {target} au hasard.",
+        "ss113Chosen": "{card} ({id}) : l'adversaire défausse {target}.",
+        "ss133Powerup": "{card} ({id}) : {target} gagne {amount} de Puissance en arrivant."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1648,7 +1651,14 @@
         "ss145DefeatUpTo": "Vaincre tous les ennemis de cette mission coûtant {amount} ou moins ?",
         "ss014PeekAndDefeat": "Choisissez le personnage ennemi caché à regarder. S'il coûte 3 ou moins, il est vaincu.",
         "ss060HideFriendly": "Choisissez le personnage allié de cette mission à cacher pour gagner 1 point de mission.",
-        "ss076GainPoints": "Gagner 2 points de mission ?"
+        "ss076GainPoints": "Gagner 2 points de mission ?",
+        "ss113Discard": "Forcer l'adversaire à défausser une carte de sa main ?",
+        "ss113DuelModifier": "Kankuro est présent : rendre la défausse aléatoire au lieu de laisser l'adversaire choisir ?",
+        "ss113ChooseDiscard": "Choisissez la carte que vous défaussez.",
+        "ss129PowerupHokage": "Choisissez le personnage Hokage qui reçoit 2 jetons de Puissance.",
+        "ss131MoveHokage": "Choisissez le personnage Hokage à déplacer.",
+        "ss131MoveDestination": "Choisissez la mission de destination.",
+        "ss133PlaySummon": "Choisissez l'Invocation à jouer dans cette mission en payant 2 de moins."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",

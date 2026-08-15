@@ -1,10 +1,6 @@
 import { getCardById } from '@/lib/data/cardIndex';
 
 export const PENDING_EFFECT_IMPLEMENTATION: ReadonlySet<string> = new Set([
-  'SS-113-R',
-  'SS-129-R',
-  'SS-131-R',
-  'SS-133-R',
   'SS-135-R',
 ]);
 
