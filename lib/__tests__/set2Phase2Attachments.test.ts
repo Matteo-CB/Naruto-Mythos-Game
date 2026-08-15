@@ -315,6 +315,7 @@ describe('phase 2, chaque texte des equipements existe dans les sept langues', (
     'game.effect.desc.ss084RemoveTokens',
     'game.effect.desc.ss086HideAndMove',
     'game.effect.desc.ss095TakeJutsu',
+    'game.effect.desc.ss090ChooseAmount',
     'game.log.effect.ss090Stolen',
     'game.log.effect.ss088Discarded',
     'game.log.effect.ss084Removed',
@@ -425,5 +426,56 @@ describe('phase 2, chaque equipement doit avoir sa simulation', () => {
     for (const id of SANS_SIMULATION_ENCORE) {
       expect(getCardById(id), `${id} existe`).toBeTruthy();
     }
+  });
+});
+
+describe('phase 2, la Peau de Requin laisse choisir combien de jetons', () => {
+  function resoudre(depart: GameState, choix: (p: { targetSelectionType: string; validTargets: string[] }) => string): GameState {
+    let s = depart;
+    for (let i = 0; i < 5 && s.pendingEffects.length > 0; i++) {
+      const p = s.pendingEffects[s.pendingEffects.length - 1];
+      const cible = choix(p);
+      if (!cible) break;
+      s = EffectEngine.applyTargetedEffect(s, p, [cible]);
+      s = {
+        ...s,
+        pendingEffects: s.pendingEffects.filter((pe) => pe.id !== p.id),
+        pendingActions: s.pendingActions.filter((pa) => pa.sourceEffectId !== p.id),
+      };
+    }
+    return s;
+  }
+
+  it('trois jetons disponibles donnent trois choix, et le joueur peut n en prendre qu un', () => {
+    const hote = simChar('SS-054-UC', { owner: 'player1' });
+    const donneur = simChar('SS-010-C', { owner: 'player2', powerTokens: 3 });
+    const s = buildSimState({ p1: [hote], p2: [donneur], missions: 1 });
+
+    const pose = attachCardToCharacter(s, 'player1', getCardById('SS-090-UC') as CardData, hote.instanceId);
+    let quantitesProposees: string[] = [];
+    const fin = resoudre(pose, (p) => {
+      if (p.targetSelectionType === 'SS090_CHOOSE_AMOUNT') {
+        quantitesProposees = p.validTargets;
+        return 'AMOUNT_1';
+      }
+      return p.validTargets[0];
+    });
+
+    expect(quantitesProposees, 'un choix par jeton disponible, plafonne a trois').toEqual(['AMOUNT_1', 'AMOUNT_2', 'AMOUNT_3']);
+    const donneurFin = fin.activeMissions[0].player2Characters[0];
+    const hoteFin = fin.activeMissions[0].player1Characters[0];
+    expect(donneurFin.powerTokens, 'le joueur n en a pris qu un').toBe(2);
+    expect(hoteFin.powerTokens, 'et il arrive sur la Peau de Requin').toBe(1);
+  });
+
+  it('un seul jeton disponible ne pose aucune question', () => {
+    const hote = simChar('SS-054-UC', { owner: 'player1' });
+    const donneur = simChar('SS-010-C', { owner: 'player2', powerTokens: 1 });
+    const s = buildSimState({ p1: [hote], p2: [donneur], missions: 1 });
+
+    const pose = attachCardToCharacter(s, 'player1', getCardById('SS-090-UC') as CardData, hote.instanceId);
+    const fin = resoudre(pose, (p) => p.validTargets[0]);
+    expect(fin.pendingEffects.some((p) => p.targetSelectionType === 'SS090_CHOOSE_AMOUNT'), 'aucune question inutile').toBe(false);
+    expect(fin.activeMissions[0].player2Characters[0].powerTokens, 'le jeton est pris').toBe(0);
   });
 });

@@ -1584,7 +1584,8 @@
         "ss088DiscardOthers": "Défausser tous les autres équipements de ce personnage ?",
         "ss084RemoveTokens": "Retirer tous les jetons de Puissance de ce personnage ?",
         "ss086HideAndMove": "Cacher ce personnage et le déplacer vers une autre mission ?",
-        "ss095TakeJutsu": "Choisissez le personnage Jutsu à révéler et à ajouter à votre main."
+        "ss095TakeJutsu": "Choisissez le personnage Jutsu à révéler et à ajouter à votre main.",
+        "ss090ChooseAmount": "Combien de jetons de Puissance prendre, jusqu'à 3 ?"
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",

@@ -3680,7 +3680,8 @@
         "ss088DiscardOthers": "Scartare tutti gli altri equipaggiamenti su questo personaggio?",
         "ss084RemoveTokens": "Rimuovere tutti i segnalini Potenza da questo personaggio?",
         "ss086HideAndMove": "Nascondere questo personaggio e spostarlo in un'altra missione?",
-        "ss095TakeJutsu": "Scegli il personaggio Jutsu da rivelare e aggiungere alla tua mano."
+        "ss095TakeJutsu": "Scegli il personaggio Jutsu da rivelare e aggiungere alla tua mano.",
+        "ss090ChooseAmount": "Quanti segnalini Potenza prendi, fino a 3?"
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

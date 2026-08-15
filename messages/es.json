@@ -1583,7 +1583,8 @@
         "ss088DiscardOthers": "¿Descartar todos los demás equipamientos de este personaje?",
         "ss084RemoveTokens": "¿Retirar todos los marcadores de Potencia de este personaje?",
         "ss086HideAndMove": "¿Ocultar este personaje y moverlo a otra misión?",
-        "ss095TakeJutsu": "Elige el personaje Jutsu que revelas y añades a tu mano."
+        "ss095TakeJutsu": "Elige el personaje Jutsu que revelas y añades a tu mano.",
+        "ss090ChooseAmount": "¿Cuántos marcadores de Potencia tomas, hasta 3?"
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

@@ -3680,7 +3680,8 @@
         "ss088DiscardOthers": "Odrzucić cały pozostały ekwipunek tej postaci?",
         "ss084RemoveTokens": "Usunąć wszystkie znaczniki Mocy z tej postaci?",
         "ss086HideAndMove": "Zakryć tę postać i przenieść ją do innej misji?",
-        "ss095TakeJutsu": "Wybierz postać Jutsu, którą odkryjesz i weźmiesz do ręki."
+        "ss095TakeJutsu": "Wybierz postać Jutsu, którą odkryjesz i weźmiesz do ręki.",
+        "ss090ChooseAmount": "Ile znaczników Mocy zabierasz, maksymalnie 3?"
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

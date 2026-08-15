@@ -1578,7 +1578,8 @@
         "ss088DiscardOthers": "Discard every other attachment on this character?",
         "ss084RemoveTokens": "Remove all Power tokens from this character?",
         "ss086HideAndMove": "Hide this character and move it to another mission?",
-        "ss095TakeJutsu": "Choose the Jutsu character to reveal and add to your hand."
+        "ss095TakeJutsu": "Choose the Jutsu character to reveal and add to your hand.",
+        "ss090ChooseAmount": "How many Power tokens do you take, up to 3?"
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",

@@ -6440,6 +6440,11 @@ export class EffectEngine {
       case 'SS137MV_CONFIRM_UPGRADE':
       case 'SS124_CONFIRM_DUEL':
       case 'SS124_CONFIRM_UPGRADE':
+      case 'SS090_CONFIRM_MAIN':
+      case 'SS088_CONFIRM_MAIN':
+      case 'SS084_CONFIRM_AMBUSH':
+      case 'SS086_CONFIRM_MAIN':
+      case 'SS095_CONFIRM_MAIN':
       case 'SS127_CONFIRM':
       case 'SS038_CONFIRM_AMBUSH':
       case 'SS125_CONFIRM_DUEL':
@@ -12858,8 +12863,46 @@ export class EffectEngine {
         const donneur = EffectEngine.findCharByInstanceId(newState, targetId);
         const receveur = EffectEngine.findCharByInstanceId(newState, hote090);
         if (!donneur || !receveur) break;
-        const pris = Math.min(3, donneur.character.powerTokens ?? 0);
-        if (pris <= 0) break;
+        const disponibles = Math.min(3, donneur.character.powerTokens ?? 0);
+        if (disponibles <= 0) break;
+
+        if (disponibles > 1) {
+          const s090EffId = generateInstanceId();
+          const s090ActId = generateInstanceId();
+          const choix090 = Array.from({ length: disponibles }, (_, i) => `AMOUNT_${i + 1}`);
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: s090EffId,
+            sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ hostInstanceId: hote090, donorInstanceId: targetId }),
+            targetSelectionType: 'SS090_CHOOSE_AMOUNT',
+            sourcePlayer: pendingEffect.sourcePlayer,
+            requiresTargetSelection: true,
+            validTargets: choix090,
+            isOptional: false,
+            isMandatory: true,
+            resolved: false,
+            isUpgrade: pendingEffect.isUpgrade,
+            wasRevealed: pendingEffect.wasRevealed,
+            wasFirstCard: pendingEffect.wasFirstCard,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: s090ActId,
+            type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
+            player: pendingEffect.sourcePlayer,
+            description: '',
+            descriptionKey: 'game.effect.desc.ss090ChooseAmount',
+            options: choix090,
+            minSelections: 1,
+            maxSelections: 1,
+            sourceEffectId: s090EffId,
+          }];
+          break;
+        }
+
+        const pris = disponibles;
         const missions090 = newState.activeMissions.map((m) => ({
           ...m,
           player1Characters: m.player1Characters.map((c) => {
@@ -12879,6 +12922,42 @@ export class EffectEngine {
           'EFFECT_POWERUP', `Shark Skin (090): took ${pris} Power token(s) from ${nom090.name_fr}.`,
           'game.log.effect.ss090Stolen',
           { card: 'PEAU DE REQUIN', id: 'SS-090-UC', amount: String(pris), target: nom090.name_fr, target_en: nom090.name_en || nom090.name_fr });
+        break;
+      }
+
+      case 'SS090_CHOOSE_AMOUNT': {
+        let d090: { hostInstanceId?: string; donorInstanceId?: string } = {};
+        try { d090 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const hoteChoix = d090.hostInstanceId ?? pendingEffect.sourceInstanceId;
+        const donneurChoix = d090.donorInstanceId ?? '';
+        const quantite = Number(String(targetId).replace('AMOUNT_', ''));
+        if (!Number.isFinite(quantite) || quantite <= 0) break;
+
+        const source090 = EffectEngine.findCharByInstanceId(newState, donneurChoix);
+        if (!source090) break;
+        const reels = Math.min(quantite, source090.character.powerTokens ?? 0);
+        if (reels <= 0) break;
+
+        newState.activeMissions = newState.activeMissions.map((m) => ({
+          ...m,
+          player1Characters: m.player1Characters.map((c) => {
+            if (c.instanceId === donneurChoix) return { ...c, powerTokens: c.powerTokens - reels };
+            if (c.instanceId === hoteChoix) return { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, reels) };
+            return c;
+          }),
+          player2Characters: m.player2Characters.map((c) => {
+            if (c.instanceId === donneurChoix) return { ...c, powerTokens: c.powerTokens - reels };
+            if (c.instanceId === hoteChoix) return { ...c, powerTokens: c.powerTokens + amplifiedPowerup(newState, c.instanceId, reels) };
+            return c;
+          }),
+        }));
+        const nomChoix = source090.character.stack?.length > 0
+          ? source090.character.stack[source090.character.stack.length - 1]
+          : source090.character.card;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_POWERUP', `Shark Skin (090): took ${reels} Power token(s) from ${nomChoix.name_fr}.`,
+          'game.log.effect.ss090Stolen',
+          { card: 'PEAU DE REQUIN', id: 'SS-090-UC', amount: String(reels), target: nomChoix.name_fr, target_en: nomChoix.name_en || nomChoix.name_fr });
         break;
       }
 
