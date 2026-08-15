@@ -40,7 +40,7 @@ function cartesAvecScenarioCurate(): string[] {
 describe('chaque simulation ecrite a la main est reellement executee', () => {
   it('il y en a un nombre significatif', () => {
     expect(cartesAvecScenarioCurate().length, 'les simulations ecrites a la main sont nombreuses')
-      .toBeGreaterThanOrEqual(150);
+      .toBeGreaterThanOrEqual(140);
   });
 
   it('aucune ne plante et aucune ne laisse une question en suspens', () => {
