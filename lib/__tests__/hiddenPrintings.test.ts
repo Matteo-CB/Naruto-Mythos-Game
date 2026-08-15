@@ -6,7 +6,7 @@ import { HIDDEN_PRINTING_IDS, isHiddenPrinting } from '@/lib/data/sets/hiddenPri
 
 describe('les impressions masquees n_existent nulle part', () => {
   it('la liste couvre les trente-cinq impressions retirees', () => {
-    expect(HIDDEN_PRINTING_IDS.length, 'trente-cinq impressions').toBe(35);
+    expect(HIDDEN_PRINTING_IDS.length, 'trente-huit impressions').toBe(38);
   });
 
   it('aucune n_apparait dans les donnees de carte', () => {
@@ -27,8 +27,8 @@ describe('les impressions masquees n_existent nulle part', () => {
   });
 
   it('les impressions conservees sont toujours la', () => {
-    for (const id of ['SS-112-SPV', 'SS-121-SPV', 'SS-121_2-SPV', 'SS-122-SPV', 'SS-123-SPV',
-      'SS-126-SPV', 'SS-149-SPV', 'SS-149-L', 'SS-149-SV', 'SS-149-POPV', 'SS-149-CHIBIV',
+    for (const id of ['SS-112-SPV', 'SS-122-SPV', 'SS-123-SPV',
+      'SS-126-SPV', 'SS-149-SPV', 'SS-149-L', 'SS-149-SV', 'SS-149-POPV', 'SS-149-CHIBIV', 'SS-147-POPV',
       'SS-111-SHINOBIV', 'SS-123-SHINOBIV', 'SS-121-CHIBIV']) {
       expect(getCardById(id), `${id} reste disponible`).toBeTruthy();
     }
