@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
 import { registerAllSetHandlers } from '@/lib/effects/handlers';
 import { getEffectHandler } from '@/lib/effects/EffectRegistry';
+import { GameEngine } from '@/lib/engine/GameEngine';
 import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import { getCardById } from '@/lib/data/cardIndex';
 import { attachCardToCharacter } from '@/lib/effects/attachments';
@@ -35,6 +36,16 @@ function jusquAuBout(depart: GameState, pas = 8): GameState {
       pendingEffects: s.pendingEffects.filter((pe) => pe.id !== p.id),
       pendingActions: s.pendingActions.filter((pa) => pa.sourceEffectId !== p.id),
     };
+  }
+  return s;
+}
+
+function refuseTout(depart: GameState): GameState {
+  let s = depart;
+  for (let i = 0; i < 8 && s.pendingEffects.length > 0; i++) {
+    const p = s.pendingEffects[s.pendingEffects.length - 1];
+    if (!p.isOptional) break;
+    s = GameEngine.applyAction(s, p.sourcePlayer, { type: 'DECLINE_OPTIONAL_EFFECT', pendingEffectId: p.id });
   }
   return s;
 }
@@ -133,6 +144,15 @@ describe('Tenten 022, l_arme qui renforce et l_equipement a prix reduit', () => 
     expect(charDe(pose, 'sim-autre')?.powerTokens, 'le voisin ne gagne rien').toBe(0);
   });
 
+  it('refuser l_amelioration ne pose rien et ne coute rien', () => {
+    const { state, tenten } = plateau(['SS-099-UC']);
+    const fin = refuseTout(EffectEngine.resolvePlayEffects(state, 'player1', tenten, 0, true));
+
+    expect(fin.player1.hand.length, 'la carte reste en main').toBe(1);
+    expect(fin.player1.chakra, 'aucun Chakra depense').toBe(6);
+    expect((charDe(fin, 'sim-tenten')?.attachments ?? []).length, 'aucun equipement pose').toBe(0);
+  });
+
   it('sans equipement abordable, la carte le journalise sans rien demander', () => {
     const { state, tenten } = plateau(['KS-009-C']);
     const joue = EffectEngine.resolvePlayEffects(state, 'player1', tenten, 0, true);
@@ -164,6 +184,15 @@ describe('Asuma Sarutobi 138, defausser pour frapper a puissance egale', () => {
 
     expect(charDe(fin, 'sim-asuma')?.powerTokens, 'Asuma passe a 4 plus 2').toBe(2);
     expect(charDe(fin, 'sim-egale'), 'la cible de Puissance 6 est vaincue').toBeNull();
+  });
+
+  it('refuser les deux effets laisse la main et l_ennemi intacts', () => {
+    const { state, asuma } = plateau(['KS-011-C']);
+    const fin = refuseTout(EffectEngine.resolvePlayEffects(state, 'player1', asuma, 0, true));
+
+    expect(fin.player1.hand.length, 'rien n_est defausse').toBe(1);
+    expect(charDe(fin, 'sim-asuma')?.powerTokens, 'aucun jeton gagne').toBe(0);
+    expect(charDe(fin, 'sim-egale'), 'l_ennemi survit').toBeTruthy();
   });
 
   it('un ennemi d_une autre Puissance n_est pas une cible', () => {
@@ -211,6 +240,15 @@ describe('Iruka Umino 140, cacher un Naruto et en poser un autre', () => {
     expect(poses[0].wasRevealedAtLeastOnce, 'il n_a jamais ete montre').toBe(false);
   });
 
+  it('refuser les deux effets ne cache rien et ne pose rien', () => {
+    const { state, iruka } = plateau(['KS-009-C']);
+    const fin = refuseTout(EffectEngine.resolvePlayEffects(state, 'player1', iruka, 0, true));
+
+    expect(charDe(fin, 'sim-naruto')?.isHidden, 'le Naruto ennemi reste visible').toBe(false);
+    expect(fin.player1.hand.length, 'la carte reste en main').toBe(1);
+    expect(fin.player1.chakra, 'aucun Chakra depense').toBe(20);
+  });
+
   it('sans Naruto visible en jeu, le MAIN le journalise sans rien demander', () => {
     const { state, iruka } = plateau([], false);
     const joue = EffectEngine.resolvePlayEffects(state, 'player1', iruka, 0, false);
@@ -245,6 +283,23 @@ describe('Tsunade 141 et Jiraya 144, memes cartes que les impressions Gold', () 
 
     expect(jiraiyaGoldSources(state, 'player1').map((c) => c.instanceId).sort(),
       'les deux impressions comptent').toEqual(['sim-jiraya-l', 'sim-jiraya-s']);
+  });
+
+  it('refuser la Tsunade Secrete ne melange rien', () => {
+    const tsunade = empile(simChar('KS-104-R', { owner: 'player1', instanceId: 'sim-tsunade' }), 'SS-141-S');
+    let state = buildSimState({ p1: [tsunade], p2: [], missions: 1, chakra1: 20 });
+    state = { ...state, player1: { ...state.player1, discardPile: [getCardById('KS-009-C') as never] } };
+
+    const fin = refuseTout(EffectEngine.resolvePlayEffects(state, 'player1', tsunade, 0, true));
+    expect(fin.player1.discardPile.length, 'la defausse est intacte').toBe(1);
+    expect(charDe(fin, 'sim-tsunade')?.powerTokens, 'aucun jeton gagne').toBe(0);
+  });
+
+  it('l_amelioration de Tsunade s_ajoute au MAIN sans poser de question prealable', () => {
+    const carte = getCardById('SS-141-S') as CardData;
+    const amelioration = (carte.effects ?? []).find((e) => e.type === 'UPGRADE');
+    expect(amelioration?.description.startsWith('MAIN effect:'), 'le texte est une continuation du MAIN').toBe(true);
+    expect(amelioration?.description.includes('In addition'), 'elle ajoute au lieu de remplacer').toBe(true);
   });
 
   it('la Tsunade Secrete ouvre la meme question que la Gold', () => {
