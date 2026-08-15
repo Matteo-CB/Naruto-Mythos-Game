@@ -479,3 +479,74 @@ describe('phase 2, la Peau de Requin laisse choisir combien de jetons', () => {
     expect(fin.activeMissions[0].player2Characters[0].powerTokens, 'le jeton est pris').toBe(0);
   });
 });
+
+describe('phase 2, les quatre effets restants vont jusqu au bout', () => {
+  function jusquAuBout(depart: GameState, preference?: (cibles: string[]) => string): GameState {
+    let s = depart;
+    for (let i = 0; i < 6 && s.pendingEffects.length > 0; i++) {
+      const p = s.pendingEffects[s.pendingEffects.length - 1];
+      const cibles = p.validTargets ?? [];
+      if (cibles.length === 0) break;
+      const choisi = preference ? preference(cibles) : cibles[0];
+      s = EffectEngine.applyTargetedEffect(s, p, [choisi]);
+      s = {
+        ...s,
+        pendingEffects: s.pendingEffects.filter((pe) => pe.id !== p.id),
+        pendingActions: s.pendingActions.filter((pa) => pa.sourceEffectId !== p.id),
+      };
+    }
+    return s;
+  }
+
+  it('les Aiguilles revelees vident vraiment les jetons du porteur', () => {
+    const cible = simChar('SS-010-C', { owner: 'player2', powerTokens: 4 });
+    const s = buildSimState({ p1: [], p2: [cible], missions: 1 });
+
+    const pose = attachCardToCharacter(s, 'player1', getCardById('SS-084-C') as CardData, cible.instanceId, true);
+    const fin = jusquAuBout(pose);
+    expect(fin.activeMissions[0].player2Characters[0].powerTokens, 'plus un seul jeton').toBe(0);
+  });
+
+  it('le Paradis du Batifolage defausse vraiment l equipement adverse', () => {
+    const hote = equipe(simChar('SS-009-C', { owner: 'player1' }), ['SS-080-C'], 'player2');
+    const s = buildSimState({ p1: [hote], p2: [], missions: 1 });
+
+    const pose = attachCardToCharacter(s, 'player1', getCardById('SS-088-UC') as CardData, hote.instanceId);
+    const fin = jusquAuBout(pose);
+    const restants = fin.activeMissions[0].player1Characters[0].attachments ?? [];
+    expect(restants.map((a) => a.card.id), 'seul le livre reste').toEqual(['SS-088-UC']);
+    expect(fin.player2.discardPile.some((c) => c.id === 'SS-080-C'), 'le kunai part chez son proprietaire').toBe(true);
+  });
+
+  it('la Bombe Fumigene cache et deplace vraiment son porteur', () => {
+    const hote = simChar('SS-009-C', { owner: 'player1' });
+    const s = buildSimState({ p1: [hote], p2: [], missions: 2, chakra1: 12 });
+
+    const pose = attachCardToCharacter(s, 'player1', getCardById('SS-086-C') as CardData, hote.instanceId);
+    const fin = jusquAuBout(pose, (cibles) => cibles.find((c) => c.startsWith('MISSION_')) ?? cibles[0]);
+
+    const surPremiere = fin.activeMissions[0].player1Characters.some((c) => c.instanceId === hote.instanceId);
+    const surSeconde = fin.activeMissions[1].player1Characters.find((c) => c.instanceId === hote.instanceId);
+    expect(surPremiere, 'il a quitte sa mission').toBe(false);
+    expect(surSeconde, 'il est arrive dans l autre').toBeTruthy();
+    expect(surSeconde!.isHidden, 'et il est bien cache').toBe(true);
+  });
+
+  it('le Parchemin du Sceau met vraiment le Jutsu en main', () => {
+    const hote = simChar('SS-010-C', { owner: 'player1' });
+    const base = buildSimState({ p1: [hote], p2: [], missions: 1 });
+    const s: GameState = {
+      ...base,
+      player1: {
+        ...base.player1,
+        deck: ['SS-057-UC', 'KS-009-C', 'KS-010-C', 'KS-005-C'].map((x) => getCardById(x) as never),
+      },
+    };
+
+    const pose = attachCardToCharacter(s, 'player1', getCardById('SS-095-UC') as CardData, hote.instanceId);
+    const fin = jusquAuBout(pose);
+    expect(fin.player1.hand.some((c) => c.id === 'SS-057-UC'), 'le Jutsu est en main').toBe(true);
+    expect(fin.player1.deck.length, 'les deux autres repartent au fond, la quatrieme reste').toBe(3);
+    expect(fin.player1.deck.some((c) => c.id === 'SS-057-UC'), 'et il ne reste pas dans le deck').toBe(false);
+  });
+});
