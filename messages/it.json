@@ -2953,7 +2953,8 @@
         "ss083Blank": "{card} ({id}): questo personaggio non ha più testo, non si attiva nulla.",
         "ssDeckSearchTaken": "{card} ({id}): {target} rivelato e aggiunto alla mano.",
         "ssPeeked": "{card} ({id}): un personaggio nascosto è stato guardato.",
-        "ss028Bottom": "{card} ({id}): la carta in cima al mazzo avversario passa in fondo."
+        "ss028Bottom": "{card} ({id}): la carta in cima al mazzo avversario passa in fondo.",
+        "ssSummonChakra": "{card} ({id}): {amount} Chakra guadagnato."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",

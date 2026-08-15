@@ -855,7 +855,8 @@
         "ss083Blank": "{card}（{id}）：このキャラクターの効果テキストは失われており、何も発動しません。",
         "ssDeckSearchTaken": "{card}（{id}）：{target}を公開し手札に加えました。",
         "ssPeeked": "{card}（{id}）：裏向きのキャラクターを確認しました。",
-        "ss028Bottom": "{card}（{id}）：相手のデッキの一番上のカードを一番下に置きました。"
+        "ss028Bottom": "{card}（{id}）：相手のデッキの一番上のカードを一番下に置きました。",
+        "ssSummonChakra": "{card}（{id}）：チャクラ{amount}を獲得しました。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",

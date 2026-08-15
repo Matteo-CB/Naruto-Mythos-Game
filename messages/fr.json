@@ -857,7 +857,8 @@
         "ss083Blank": "{card} ({id}) : ce personnage n'a plus aucun texte, rien ne se déclenche.",
         "ssDeckSearchTaken": "{card} ({id}) : {target} révélé et ajouté à la main.",
         "ssPeeked": "{card} ({id}) : un personnage caché a été regardé.",
-        "ss028Bottom": "{card} ({id}) : la carte du dessus du deck adverse passe en dessous."
+        "ss028Bottom": "{card} ({id}) : la carte du dessus du deck adverse passe en dessous.",
+        "ssSummonChakra": "{card} ({id}) : {amount} Chakra gagné."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",

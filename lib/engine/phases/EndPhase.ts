@@ -5,6 +5,7 @@ import { EffectEngine } from '../../effects/EffectEngine';
 import { calculateEffectiveCost } from '../rules/ChakraValidation';
 import { attachCardToCharacter, getCharacterAttachTargets } from '../../effects/attachments';
 import { shuffle } from '../utils/shuffle';
+import { invocationDoitRentrer } from '../../effects/handlers/SS/sanninSummons';
 import { putTopCardAsHidden } from '../../effects/handlers/SS/attachmentReinforcements';
 
 
@@ -509,7 +510,7 @@ function handleEndOfRoundAutoTriggers(state: GameState): GameState {
         const isSummon = (topCard.keywords ?? []).includes('Summon');
 
         
-        if (isSummon) {
+        if (isSummon && invocationDoitRentrer(newState, char, player, newState.activeMissions.indexOf(mission))) {
           const isGiantSpider103 = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
               e.description.toLowerCase().includes('hide a character'),

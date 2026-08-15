@@ -856,7 +856,8 @@
         "ss083Blank": "{card} ({id}): este personaje ya no tiene texto, no se activa nada.",
         "ssDeckSearchTaken": "{card} ({id}): {target} revelado y añadido a la mano.",
         "ssPeeked": "{card} ({id}): se ha mirado un personaje oculto.",
-        "ss028Bottom": "{card} ({id}): la carta superior del mazo enemigo pasa al fondo."
+        "ss028Bottom": "{card} ({id}): la carta superior del mazo enemigo pasa al fondo.",
+        "ssSummonChakra": "{card} ({id}): {amount} de Chakra ganado."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",

@@ -2953,7 +2953,8 @@
         "ss083Blank": "{card} ({id}): este personagem já não tem texto, nada é ativado.",
         "ssDeckSearchTaken": "{card} ({id}): {target} revelado e adicionado à mão.",
         "ssPeeked": "{card} ({id}): foi visto um personagem escondido.",
-        "ss028Bottom": "{card} ({id}): a carta do topo do baralho adversário passa para o fundo."
+        "ss028Bottom": "{card} ({id}): a carta do topo do baralho adversário passa para o fundo.",
+        "ssSummonChakra": "{card} ({id}): {amount} de Chakra ganho."
       },
       "score": {
         "draw": "[SCORE] {card}: Comprou {count} carta(s).",

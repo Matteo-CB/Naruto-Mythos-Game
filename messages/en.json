@@ -851,7 +851,8 @@
         "ss083Blank": "{card} ({id}): this character has no effect text left, nothing resolves.",
         "ssDeckSearchTaken": "{card} ({id}): revealed {target} and added it to hand.",
         "ssPeeked": "{card} ({id}): looked at a hidden character.",
-        "ss028Bottom": "{card} ({id}): the top card of the opponent deck goes to the bottom."
+        "ss028Bottom": "{card} ({id}): the top card of the opponent deck goes to the bottom.",
+        "ssSummonChakra": "{card} ({id}): {amount} Chakra gained."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",

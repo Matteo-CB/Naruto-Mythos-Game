@@ -110,6 +110,22 @@ const FACTORIES: Record<string, Factory> = {
   'KS-110-R': (id) => ({ build: () => board({ hand: [id], e0: [{ id: 'KS-005-C', iid: 'sim-weak' }, { id: 'KS-086-C', iid: 'sim-strong' }] }), play: P1(FRESH) }),
   'KS-113-R': (id) => ({ build: () => board({ hand: [id], p1m0: ['KS-027-C', 'KS-009-C'] }), play: P1(FRESH) }),
   'KS-138-S': (id) => ({ build: () => board({ hand: [id], upgBase: { id: 'KS-063-UC', iid: 'sim-upg-base' } }), play: P1(upgrade('sim-upg-base')) }),
+  'SS-142-S': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-141-S'], chakra: 14 }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-143-S': (id) => ({
+    build: () => {
+      const st = board({ hand: [id], p1m0: ['SS-144-S'], chakra: 14 });
+      st.player1.deck = ['KS-009-C', 'KS-010-C'].map((x) => getCharacterById(x)!).filter(Boolean);
+      return st;
+    },
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-146-S': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-145-S'], chakra: 14 }),
+    play: P1(FRESH), noMinimize: true,
+  }),
   'SS-003-C': (id) => ({
     build: () => board({ hand: [id], p1m0: ['SS-010-C'] }),
     play: P1(FRESH), noMinimize: true,

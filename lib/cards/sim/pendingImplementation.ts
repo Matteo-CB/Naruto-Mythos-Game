@@ -29,11 +29,8 @@ export const PENDING_EFFECT_IMPLEMENTATION: ReadonlySet<string> = new Set([
   'SS-138-R',
   'SS-140-R',
   'SS-141-S',
-  'SS-142-S',
-  'SS-143-S',
   'SS-144-S',
   'SS-145-S',
-  'SS-146-S',
 ]);
 
 function printingKey(cardId: string): string | null {

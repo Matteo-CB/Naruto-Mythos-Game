@@ -4,6 +4,7 @@ import { registerAllSetHandlers } from '@/lib/effects/handlers';
 import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import { getCardById } from '@/lib/data/cardIndex';
 import { GameEngine } from '@/lib/engine/GameEngine';
+import { executeEndPhase } from '@/lib/engine/phases/EndPhase';
 import { FOUILLES, candidatsDeFouille } from '@/lib/effects/handlers/SS/deckSearch';
 import type { GameState } from '@/lib/engine/types';
 
@@ -232,5 +233,54 @@ describe('phase 3, les renforts conditionnels', () => {
       if (typeof noeud !== 'string' || noeud.trim() === '') manquantes.push(langue);
     }
     expect(manquantes).toEqual([]);
+  });
+});
+
+describe('phase 3, les trois invocations des Sannin', () => {
+  it('chacune paie selon le nombre de son maitre en jeu', () => {
+    const katsuyu = simChar('SS-142-S', { owner: 'player1' });
+    const tsunade1 = simChar('SS-141-S', { owner: 'player1' });
+    const base = buildSimState({ p1: [katsuyu, tsunade1], p2: [], missions: 1 });
+
+    const un = EffectEngine.resolvePlayEffects(base, 'player1', katsuyu, 0, false);
+    expect(un.player1.chakra - base.player1.chakra, 'un Tsunade, un chakra').toBe(1);
+
+    const tsunade2 = simChar('SS-141-S', { owner: 'player1', instanceId: 'tsunade-2' });
+    const deuxBase = buildSimState({ p1: [katsuyu, tsunade1], p2: [], missions: 2 });
+    const deux: GameState = {
+      ...deuxBase,
+      activeMissions: deuxBase.activeMissions.map((m, i) => i !== 1 ? m : { ...m, player1Characters: [tsunade2] }),
+    };
+    const apres = EffectEngine.resolvePlayEffects(deux, 'player1', katsuyu, 0, false);
+    expect(apres.player1.chakra - deux.player1.chakra, 'deux Tsunade, deux chakra').toBe(2);
+  });
+
+  it('sans son maitre, l invocation le dit et ne donne rien', () => {
+    const manda = simChar('SS-146-S', { owner: 'player1' });
+    const s = buildSimState({ p1: [manda], p2: [], missions: 1 });
+
+    const apres = EffectEngine.resolvePlayEffects(s, 'player1', manda, 0, false);
+    const mandaFin = apres.activeMissions[0].player1Characters[0];
+    expect(mandaFin.powerTokens, 'aucun jeton').toBe(0);
+    expect(apres.log.some((l) => l.messageKey === 'game.log.effect.noTarget'), 'le refus est journalise').toBe(true);
+  });
+
+  it('l invocation reste en jeu tant que son maitre est dans sa mission', () => {
+    const katsuyu = simChar('SS-142-S', { owner: 'player1' });
+    const tsunade = simChar('SS-141-S', { owner: 'player1' });
+
+    const avecMaitre = buildSimState({ p1: [katsuyu, tsunade], p2: [], missions: 1 });
+    const finAvec = executeEndPhase({ ...avecMaitre, phase: 'end' } as GameState);
+    expect(
+      finAvec.activeMissions[0].player1Characters.some((c) => c.instanceId === katsuyu.instanceId),
+      'avec Tsunade, Katsuyu reste',
+    ).toBe(true);
+
+    const sansMaitre = buildSimState({ p1: [katsuyu], p2: [], missions: 1 });
+    const finSans = executeEndPhase({ ...sansMaitre, phase: 'end' } as GameState);
+    expect(
+      finSans.activeMissions[0].player1Characters.some((c) => c.instanceId === katsuyu.instanceId),
+      'sans Tsunade, elle repart en main',
+    ).toBe(false);
   });
 });

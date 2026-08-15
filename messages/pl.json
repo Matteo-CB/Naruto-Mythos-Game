@@ -2953,7 +2953,8 @@
         "ss083Blank": "{card} ({id}): ta postać nie ma już tekstu, nic się nie uruchamia.",
         "ssDeckSearchTaken": "{card} ({id}): odkryto {target} i dodano do ręki.",
         "ssPeeked": "{card} ({id}): obejrzano zakrytą postać.",
-        "ss028Bottom": "{card} ({id}): wierzchnia karta talii przeciwnika trafia na spód."
+        "ss028Bottom": "{card} ({id}): wierzchnia karta talii przeciwnika trafia na spód.",
+        "ssSummonChakra": "{card} ({id}): zdobyto {amount} czakry."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
