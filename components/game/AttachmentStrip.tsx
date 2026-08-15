@@ -10,6 +10,7 @@ interface AttachmentStripProps {
   card: CardData;
   label: string;
   mine: boolean;
+  hostIsOwn?: boolean;
   index: number;
   glow: string;
   onClick: () => void;
@@ -27,6 +28,7 @@ export const AttachmentStrip = memo(function AttachmentStrip({
   card,
   label,
   mine,
+  hostIsOwn = true,
   index,
   glow,
   onClick,
@@ -35,13 +37,14 @@ export const AttachmentStrip = memo(function AttachmentStrip({
 }: AttachmentStripProps) {
   const onMission = isLandscapeCard(card);
   const towardsMe = mine ? 1 : -1;
+  const towardsFreeSpace = hostIsOwn ? 1 : -1;
   const fan = index * FAN_PCT;
 
   const shiftPct = (onMission ? MISSION_VISIBLE_RATIO : CHARACTER_VISIBLE_RATIO) * 100 + fan;
 
   const transform = onMission
     ? `translate(${towardsMe * MISSION_DRIFT_PCT}%, ${towardsMe * shiftPct}%) rotate(${mine ? 0 : 180}deg)`
-    : `translate(${towardsMe * shiftPct}%, ${towardsMe * (CHARACTER_DRIFT_PCT + fan)}%) rotate(${mine ? 0 : 180}deg)`;
+    : `translate(${towardsMe * shiftPct}%, ${towardsFreeSpace * (CHARACTER_DRIFT_PCT + fan)}%) rotate(${mine ? 0 : 180}deg)`;
 
   return (
     <div

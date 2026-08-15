@@ -42,6 +42,17 @@ describe('attachments are laid out exactly like the printed reference', () => {
     expect(STRIP).toContain('const FAN_PCT = 5;');
   });
 
+  it('it drifts towards the empty side of its row, never past the clipped edge', () => {
+    expect(STRIP, 'the vertical drift follows the row the host sits in')
+      .toContain('const towardsFreeSpace = hostIsOwn ? 1 : -1;');
+    expect(LANE, 'the lane tells the strip which row its host is on')
+      .toContain('hostIsOwn={isOwn}');
+    expect(LANE, 'my row stacks from the top, so there is room below')
+      .toContain('content-start');
+    expect(LANE, 'the enemy row stacks from the bottom, so there is room above')
+      .toContain('content-end');
+  });
+
   it('hovering one shows it in the detail panel, clicking pins it', () => {
     expect(STRIP).toContain('onMouseEnter');
     expect(LANE.split('onHover={(x, y) => showPreview').length - 1, 'characters and missions both preview').toBe(2);
@@ -52,7 +63,7 @@ describe('attachments are laid out exactly like the printed reference', () => {
     expect(LANE.split('<AttachmentStrip').length - 1).toBe(2);
     expect(STRIP, 'the shape comes from the card itself').toContain('isLandscapeCard(card)');
     expect(STRIP, 'a character attachment drifts diagonally instead')
-      .toContain('translate(${towardsMe * shiftPct}%, ${towardsMe * (CHARACTER_DRIFT_PCT + fan)}%)');
+      .toContain('translate(${towardsMe * shiftPct}%, ${towardsFreeSpace * (CHARACTER_DRIFT_PCT + fan)}%)');
     expect(LANE, 'no hand-rolled box is left behind').not.toContain("[mine ? 'right' : 'left']");
   });
 

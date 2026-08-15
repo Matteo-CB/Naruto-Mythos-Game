@@ -214,6 +214,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
             card={att.card as never}
             label={getCardName(att.card, locale as 'en' | 'fr')}
             mine={mine}
+            hostIsOwn={isOwn}
             index={attIndex}
             glow={mine ? palette.me.tint(0.55) : palette.opponent.tint(0.55)}
             onClick={() => pinCard(att.card as never)}
