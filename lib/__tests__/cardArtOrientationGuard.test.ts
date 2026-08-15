@@ -14,6 +14,7 @@ const ALLOWED_RAW_PATHS = new Set<string>([
   'components/cards/MissionCard.tsx',
   'components/game/MissionLane.tsx',
   'components/boosters/BoosterRatesPanel.tsx',
+  'components/game/FlashBombSmoke.tsx',
 ]);
 
 function walk(dir: string, out: string[] = []): string[] {
