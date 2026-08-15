@@ -37,6 +37,7 @@ import {
   tsunadeGoldShuffleableCount, tsunadeGoldShuffleTopOfDiscard, friendlySummonIds,
 } from './handlers/SS/goldCards';
 import { actionTypeForSelectionType } from './selectionActionType';
+import { ignoreLesConditionsDePose, enforceAttachmentConditions } from './attachments';
 import { attachCardToCharacter, attachCardToMission, discardAttachmentsOnLeave, discardAttachments, getCharacterAttachTargets, missionAlreadyHasPlayerAttachment, parseAttachSpec } from './attachments';
 import { destinationsPour } from './handlers/SS/hiddenMove';
 import { equipementsDeplacablesVers, apercuEquipements } from './handlers/SS/seimei065';
@@ -44,6 +45,9 @@ import { team8AlliesIn, KURENAI_018 } from './handlers/SS/kurenai018';
 import { TENTEN_022 } from './handlers/SS/tenten022';
 import { ASUMA_138 } from './handlers/SS/asuma138';
 import { IRUKA_140, coutCacheReduit } from './handlers/SS/iruka140';
+import { SHINO_017, SHINO_017_THRESHOLD, SHINO_017_GAIN, SHIGURE_068, KISAME_055, ASUMA_013, ASUMA_013_POWERUP, personnagesIndependantsDans, leplusFortEstDans, chakraVolable } from './handlers/SS/ambushSet5';
+import { HAKU_052, RYUGAN_073, zabuzasDeplacables, equipementsDePersonnage, hotesPossiblesPour } from './handlers/SS/moveTargets5';
+import { SERPENTS_056, OROCHIMARU_145, KIBA_014, KIBA_014_THRESHOLD, MIZUKI_060, MIZUKI_060_POINTS, TAZUNA_076, TAZUNA_076_POINTS, ciblesDOrochimaru, equipementParId } from './handlers/SS/set5Others';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { findLegalRevealUpgradeTarget, revealWouldViolateNameUniqueness } from './revealNameUniqueness';
 import { moveWouldViolateNameUniqueness } from './moveNameUniqueness';
@@ -1223,6 +1227,76 @@ export class EffectEngine {
     return newState;
   }
 
+
+  static appliquerPowerupSur(state: GameState, instanceId: string, montant: number): GameState {
+    if (montant <= 0) return state;
+    return {
+      ...state,
+      activeMissions: state.activeMissions.map((m) => ({
+        ...m,
+        player1Characters: m.player1Characters.map((c) => c.instanceId === instanceId
+          ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, montant) } : c),
+        player2Characters: m.player2Characters.map((c) => c.instanceId === instanceId
+          ? { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, montant) } : c),
+      })),
+    };
+  }
+
+  static retirerEquipement(state: GameState, attachmentId: string): GameState {
+    return {
+      ...state,
+      activeMissions: state.activeMissions.map((m) => ({
+        ...m,
+        attachments: (m.attachments ?? []).filter((a) => a.instanceId !== attachmentId),
+        player1Characters: m.player1Characters.map((c) => ({
+          ...c, attachments: (c.attachments ?? []).filter((a) => a.instanceId !== attachmentId),
+        })),
+        player2Characters: m.player2Characters.map((c) => ({
+          ...c, attachments: (c.attachments ?? []).filter((a) => a.instanceId !== attachmentId),
+        })),
+      })),
+    };
+  }
+
+  static deplacerEquipement(
+    state: GameState,
+    attachmentId: string,
+    hostInstanceId: string,
+    sourceId: string,
+  ): GameState {
+    const equipement = equipementParId(state, attachmentId);
+    if (!equipement) return state;
+    const nouvelHote = EffectEngine.findCharByInstanceId(state, hostInstanceId);
+    if (!nouvelHote) return state;
+
+    let next = EffectEngine.retirerEquipement(state, attachmentId);
+    const remplaces = ignoreLesConditionsDePose(nouvelHote.character)
+      ? []
+      : (nouvelHote.character.attachments ?? []).filter((a) => a.owner === equipement.owner);
+    if (remplaces.length > 0) {
+      next = EffectEngine.retirerEquipement(next, remplaces[0].instanceId);
+      next = discardAttachments(next, remplaces);
+    }
+
+    next = {
+      ...next,
+      activeMissions: next.activeMissions.map((m) => ({
+        ...m,
+        player1Characters: m.player1Characters.map((c) => c.instanceId === hostInstanceId
+          ? { ...c, attachments: [...(c.attachments ?? []), equipement] } : c),
+        player2Characters: m.player2Characters.map((c) => c.instanceId === hostInstanceId
+          ? { ...c, attachments: [...(c.attachments ?? []), equipement] } : c),
+      })),
+    };
+    const nomHote = nouvelHote.character.stack?.length > 0
+      ? nouvelHote.character.stack[nouvelHote.character.stack.length - 1]
+      : nouvelHote.character.card;
+    next.log = logAction(next.log, next.turn, next.phase, equipement.owner,
+      'EFFECT', `Attachment ${equipement.card.name_fr} moved onto ${nomHote.name_fr}.`,
+      'game.log.effect.ss073Moved',
+      { card: 'RYUGAN', id: sourceId, target: equipement.card.name_fr, target_en: equipement.card.name_en || equipement.card.name_fr, name: nomHote.name_fr });
+    return enforceAttachmentConditions(next);
+  }
 
   static payerEtPoserEquipement(
     state: GameState,
@@ -6498,6 +6572,10 @@ export class EffectEngine {
       case 'SS138_CONFIRM_UPGRADE':
       case 'SS140_CONFIRM_MAIN':
       case 'SS140_CONFIRM_UPGRADE':
+      case 'SS052_CONFIRM_AMBUSH':
+      case 'SS073_CONFIRM_AMBUSH':
+      case 'SS056_CONFIRM_AMBUSH':
+      case 'SS014_CONFIRM_FIRST_STRIKE':
       case 'SS127_CONFIRM':
       case 'SS038_CONFIRM_AMBUSH':
       case 'SS125_CONFIRM_DUEL':
@@ -13334,6 +13412,223 @@ export class EffectEngine {
         if (m140.handIndex == null || !Number.isFinite(destination140)) break;
         newState = EffectEngine.poserNarutoCache(
           newState, pendingEffect.sourcePlayer, m140.handIndex, m140.reduction ?? 0, destination140);
+        break;
+      }
+
+      case 'SS017_CONFIRM_AMBUSH': {
+        const j017 = pendingEffect.sourcePlayer;
+        const adv017: PlayerID = j017 === 'player1' ? 'player2' : 'player1';
+        const main017 = newState[adv017].hand;
+        if (main017.length === 0) break;
+        const tiree017 = main017[Math.floor(Math.random() * main017.length)];
+        const cout017 = (tiree017 as unknown as CardData).chakra ?? 0;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, j017,
+          'EFFECT', `Shino Aburame (017): revealed ${tiree017.name_fr} (cost ${cout017}).`,
+          'game.log.effect.ss017Revealed',
+          { card: 'SHINO ABURAME', id: SHINO_017, target: tiree017.name_fr, target_en: tiree017.name_en || tiree017.name_fr, amount: String(cout017) });
+        if (cout017 >= SHINO_017_THRESHOLD) {
+          newState[j017] = { ...newState[j017], chakra: newState[j017].chakra + SHINO_017_GAIN };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, j017,
+            'EFFECT_CHAKRA', `Shino Aburame (017): gained ${SHINO_017_GAIN} Chakra.`,
+            'game.log.effect.ss017Chakra',
+            { card: 'SHINO ABURAME', id: SHINO_017, amount: String(SHINO_017_GAIN) });
+        }
+        break;
+      }
+
+      case 'SS068_CONFIRM_AMBUSH': {
+        const total068 = personnagesIndependantsDans(newState, pendingEffect.sourceMissionIndex);
+        if (total068 <= 0) break;
+        newState = EffectEngine.appliquerPowerupSur(newState, pendingEffect.sourceInstanceId, total068);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_POWERUP', `Shigure (068): POWERUP ${total068}.`,
+          'game.log.effect.powerup',
+          { card: 'SHIGURE', id: SHIGURE_068, amount: String(total068), target: 'SHIGURE' });
+        break;
+      }
+
+      case 'SS013_CONFIRM_AMBUSH':
+      case 'SS013_CONFIRM_UPGRADE': {
+        if (!leplusFortEstDans(newState, pendingEffect.sourcePlayer, pendingEffect.sourceMissionIndex)) break;
+        newState = EffectEngine.appliquerPowerupSur(newState, pendingEffect.sourceInstanceId, ASUMA_013_POWERUP);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_POWERUP', `Asuma Sarutobi (013): POWERUP ${ASUMA_013_POWERUP}.`,
+          'game.log.effect.powerup',
+          { card: 'ASUMA SARUTOBI', id: ASUMA_013, amount: String(ASUMA_013_POWERUP), target: 'ASUMA SARUTOBI' });
+        break;
+      }
+
+      case 'SS055_CONFIRM_AMBUSH':
+      case 'SS055_CONFIRM_UPGRADE': {
+        const j055 = pendingEffect.sourcePlayer;
+        const adv055: PlayerID = j055 === 'player1' ? 'player2' : 'player1';
+        const vole055 = chakraVolable(newState, j055);
+        if (vole055 <= 0) break;
+        newState[adv055] = { ...newState[adv055], chakra: newState[adv055].chakra - vole055 };
+        newState[j055] = { ...newState[j055], chakra: newState[j055].chakra + vole055 };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, j055,
+          'EFFECT_CHAKRA', `Kisame Hoshigaki (055): stole ${vole055} Chakra.`,
+          'game.log.effect.ss055Stolen',
+          { card: 'KISAME HOSHIGAKI', id: KISAME_055, amount: String(vole055) });
+        break;
+      }
+
+      case 'SS052_MOVE_ZABUZA': {
+        let d052: { missionIndex?: number } = {};
+        try { d052 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const mission052 = d052.missionIndex ?? pendingEffect.sourceMissionIndex;
+        const choisi052 = zabuzasDeplacables(newState, mission052).find((z) => z.char.instanceId === targetId);
+        if (!choisi052) break;
+        if (choisi052.destinations.length === 1) {
+          newState = EffectEngine.moveCharToMissionDirectPublic(
+            newState, targetId, choisi052.destinations[0], choisi052.proprietaire,
+            'HAKU', HAKU_052, pendingEffect.sourcePlayer);
+          break;
+        }
+        const eff052 = generateInstanceId();
+        const act052 = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: eff052, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: mission052, effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ charInstanceId: targetId, owner: choisi052.proprietaire }),
+          targetSelectionType: 'SS052_MOVE_DESTINATION', sourcePlayer: pendingEffect.sourcePlayer,
+          requiresTargetSelection: true, validTargets: choisi052.destinations.map((i) => String(i)),
+          isOptional: false, isMandatory: true, resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: act052, type: 'SELECT_TARGET', player: pendingEffect.sourcePlayer,
+          description: 'Haku (052): choose the destination mission.',
+          descriptionKey: 'game.effect.desc.ss052MoveDestination',
+          options: choisi052.destinations.map((i) => String(i)),
+          minSelections: 1, maxSelections: 1, sourceEffectId: eff052,
+        }];
+        break;
+      }
+
+      case 'SS052_MOVE_DESTINATION': {
+        let m052: { charInstanceId?: string; owner?: PlayerID } = {};
+        try { m052 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const dest052 = Number(targetId);
+        if (!m052.charInstanceId || !Number.isFinite(dest052)) break;
+        newState = EffectEngine.moveCharToMissionDirectPublic(
+          newState, m052.charInstanceId, dest052, m052.owner ?? pendingEffect.sourcePlayer,
+          'HAKU', HAKU_052, pendingEffect.sourcePlayer);
+        break;
+      }
+
+      case 'SS073_MOVE_ATTACHMENT': {
+        const equipement073 = equipementParId(newState, targetId);
+        if (!equipement073) break;
+        const situation073 = equipementsDePersonnage(newState).find((e) => e.attachment.instanceId === targetId);
+        const hotes073 = hotesPossiblesPour(newState, equipement073, situation073?.hostInstanceId ?? '');
+        if (hotes073.length === 0) break;
+        if (hotes073.length === 1) {
+          newState = EffectEngine.deplacerEquipement(newState, targetId, hotes073[0].instanceId, RYUGAN_073);
+          break;
+        }
+        const eff073 = generateInstanceId();
+        const act073 = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: eff073, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ attachmentId: targetId }),
+          targetSelectionType: 'SS073_CHOOSE_HOST', sourcePlayer: pendingEffect.sourcePlayer,
+          requiresTargetSelection: true, validTargets: hotes073.map((c) => c.instanceId),
+          isOptional: false, isMandatory: true, resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: act073, type: 'SELECT_TARGET', player: pendingEffect.sourcePlayer,
+          description: 'Ryugan (073): choose the character that receives the attachment.',
+          descriptionKey: 'game.effect.desc.ss073ChooseHost',
+          options: hotes073.map((c) => c.instanceId),
+          minSelections: 1, maxSelections: 1, sourceEffectId: eff073,
+        }];
+        break;
+      }
+
+      case 'SS073_CHOOSE_HOST': {
+        let h073: { attachmentId?: string } = {};
+        try { h073 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        if (!h073.attachmentId) break;
+        newState = EffectEngine.deplacerEquipement(newState, h073.attachmentId, targetId, RYUGAN_073);
+        break;
+      }
+
+      case 'SS056_DISCARD_ATTACHMENT': {
+        const equipement056 = equipementParId(newState, targetId);
+        if (!equipement056) break;
+        newState = EffectEngine.retirerEquipement(newState, targetId);
+        newState = discardAttachments(newState, [equipement056]);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT', `Three Giant Snakes (056): discarded ${equipement056.card.name_fr}.`,
+          'game.log.effect.ss056Discarded',
+          { card: 'TROIS SERPENTS GEANTS', id: SERPENTS_056, target: equipement056.card.name_fr, target_en: equipement056.card.name_en || equipement056.card.name_fr });
+        break;
+      }
+
+      case 'SS145_CONFIRM_MAIN': {
+        let d145: { seuil?: number; strict?: boolean } = {};
+        try { d145 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const cibles145 = ciblesDOrochimaru(newState, pendingEffect.sourcePlayer,
+          pendingEffect.sourceMissionIndex, d145.seuil ?? 0, d145.strict !== false);
+        if (cibles145.length === 0) break;
+        const ids145 = cibles145.map((c) => c.instanceId);
+        for (const id of ids145) {
+          newState = defeatEnemyCharacter(newState, pendingEffect.sourceMissionIndex, id, pendingEffect.sourcePlayer, ids145);
+        }
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', `Orochimaru (145): defeated ${ids145.length} enemy character(s).`,
+          'game.log.effect.ss145Defeated',
+          { card: 'OROCHIMARU', id: OROCHIMARU_145, count: ids145.length });
+        break;
+      }
+
+      case 'SS014_PEEK_AND_DEFEAT': {
+        const trouve014 = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!trouve014) break;
+        const carte014 = trouve014.character.stack?.length > 0
+          ? trouve014.character.stack[trouve014.character.stack.length - 1]
+          : trouve014.character.card;
+        const cout014 = (carte014 as unknown as CardData).chakra ?? 0;
+        newState = rememberPeek(newState, pendingEffect.sourcePlayer, targetId);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT', `Kiba Inuzuka (014): looked at a hidden enemy (cost ${cout014}).`,
+          'game.log.effect.ss014Peeked',
+          { card: 'KIBA INUZUKA', id: KIBA_014, amount: String(cout014) });
+        if (cout014 <= KIBA_014_THRESHOLD) {
+          newState = defeatEnemyCharacter(newState, trouve014.missionIndex, targetId, pendingEffect.sourcePlayer);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DEFEAT', 'Kiba Inuzuka (014): the hidden enemy is defeated.',
+            'game.log.effect.ss014Defeated', { card: 'KIBA INUZUKA', id: KIBA_014 });
+        }
+        break;
+      }
+
+      case 'SS060_HIDE_FRIENDLY': {
+        const j060 = pendingEffect.sourcePlayer;
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, j060);
+        newState[j060] = { ...newState[j060], missionPoints: (newState[j060].missionPoints ?? 0) + MIZUKI_060_POINTS };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, j060,
+          'EFFECT', `Mizuki (060): hid a friendly character and gained ${MIZUKI_060_POINTS} Mission point.`,
+          'game.log.effect.ss060Scored',
+          { card: 'MIZUKI', id: MIZUKI_060, amount: String(MIZUKI_060_POINTS) });
+        break;
+      }
+
+      case 'SS076_CONFIRM_SCORE': {
+        const j076 = pendingEffect.sourcePlayer;
+        newState[j076] = { ...newState[j076], missionPoints: (newState[j076].missionPoints ?? 0) + TAZUNA_076_POINTS };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, j076,
+          'EFFECT', `Tazuna (076): gained ${TAZUNA_076_POINTS} Mission points.`,
+          'game.log.effect.ss076Scored',
+          { card: 'TAZUNA', id: TAZUNA_076, amount: String(TAZUNA_076_POINTS) });
         break;
       }
 

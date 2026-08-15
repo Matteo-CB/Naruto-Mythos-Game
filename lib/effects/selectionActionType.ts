@@ -51,7 +51,9 @@ export function actionTypeForSelectionType(tst: string): PendingAction['type'] {
   tst === 'SS028_BOTTOM_OR_KEEP' ||
   tst === 'SS065_MOVE_ATTACHMENT' ||
   tst === 'SS022_PLAY_ATTACHMENT' ||
-  tst === 'SS140_PLAY_HIDDEN'
+  tst === 'SS140_PLAY_HIDDEN' ||
+  tst === 'SS073_MOVE_ATTACHMENT' ||
+  tst === 'SS056_DISCARD_ATTACHMENT'
   ) {
     actionType = 'CHOOSE_CARD_FROM_LIST';
   } else if (tst === 'COPY_EFFECT_CHOSEN') {

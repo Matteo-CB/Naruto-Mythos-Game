@@ -27,7 +27,11 @@
         "feature",
         "feature",
         "feature",
-        "fix"
+        "fix",
+        "feature",
+        "feature",
+        "feature",
+        "feature"
       ],
       "changes_fr": [
         "Orochimaru 127 révélé ne prend plus qu'un seul personnage, même quand Sasuke est dans la mission.",
@@ -47,7 +51,11 @@
         "Six cartes du set 2 gagnent leur effet d'amélioration, dont Kurenai 18, Tenten 22 et Asuma 138.",
         "Tenten 22 gagne 3 de Puissance dès qu'une Arme est posée sur elle.",
         "Iruka 140 cache un Naruto Uzumaki en jeu et peut en poser un autre face cachée sans rien payer.",
-        "Les versions Secrètes de Tsunade et Jiraya, qui ne faisaient rien, agissent comme leurs versions dorées."
+        "Les versions Secrètes de Tsunade et Jiraya, qui ne faisaient rien, agissent comme leurs versions dorées.",
+        "Douze cartes du set 2 gagnent leur effet déclenché, dont Shino 17, Haku 52, Kiba 14 et Orochimaru 145.",
+        "Tenten 21 coûte 1 de moins quand elle est la première carte que vous jouez dans la manche.",
+        "Orochimaru 145 frappe plus large quand il est révélé : son seuil de coût devient inclusif.",
+        "Mizuki 60 et Tazuna 76 marquent des points de mission au décompte."
       ],
       "changes_en": [
         "A revealed Orochimaru 127 now takes a single character, even with Sasuke in the mission.",
@@ -67,7 +75,11 @@
         "Six set 2 cards gain their upgrade effect, including Kurenai 18, Tenten 22 and Asuma 138.",
         "Tenten 22 gains 3 Power as soon as a Weapon is attached to her.",
         "Iruka 140 hides a Naruto Uzumaki in play and can place another one face down for free.",
-        "The Secret versions of Tsunade and Jiraiya, which did nothing, now act like their gold versions."
+        "The Secret versions of Tsunade and Jiraiya, which did nothing, now act like their gold versions.",
+        "Twelve set 2 cards gain their triggered effect, including Shino 17, Haku 52, Kiba 14 and Orochimaru 145.",
+        "Tenten 21 costs 1 less when she is the first card you play in the round.",
+        "Orochimaru 145 hits wider when revealed: his cost threshold becomes inclusive.",
+        "Mizuki 60 and Tazuna 76 score Mission points at scoring."
       ],
       "changes_es": [
         "Orochimaru 127 revelado ya solo toma un personaje, incluso con Sasuke en la misión.",
@@ -87,7 +99,11 @@
         "Seis cartas del set 2 ganan su efecto de mejora, entre ellas Kurenai 18, Tenten 22 y Asuma 138.",
         "Tenten 22 gana 3 de Potencia en cuanto se le coloca un Arma.",
         "Iruka 140 oculta a un Naruto Uzumaki en juego y puede colocar otro boca abajo sin pagar nada.",
-        "Las versiones Secretas de Tsunade y Jiraiya, que no hacían nada, actúan como sus versiones doradas."
+        "Las versiones Secretas de Tsunade y Jiraiya, que no hacían nada, actúan como sus versiones doradas.",
+        "Doce cartas del set 2 ganan su efecto activado, entre ellas Shino 17, Haku 52, Kiba 14 y Orochimaru 145.",
+        "Tenten 21 cuesta 1 menos cuando es la primera carta que juegas en la ronda.",
+        "Orochimaru 145 golpea más amplio al ser revelado: su umbral de coste pasa a ser inclusivo.",
+        "Mizuki 60 y Tazuna 76 consiguen puntos de misión en el recuento."
       ],
       "changes_ja": [
         "公開した大蛇丸127は、そのミッションにサスケがいても1体しか奪わなくなりました。",
@@ -107,7 +123,11 @@
         "セット2の6枚がアップグレード効果を得ました。クレナイ18、テンテン22、アスマ138などです。",
         "テンテン22は、武器がつくたびにパワー3を得ます。",
         "イルカ140は場のうずまきナルトを裏向きにし、もう1体を無償で裏向きに出せます。",
-        "何もしなかったツナデとジライヤのシークレット版が、ゴールド版と同じように働きます。"
+        "何もしなかったツナデとジライヤのシークレット版が、ゴールド版と同じように働きます。",
+        "セット2の12枚が誘発効果を得ました。シノ17、ハク52、キバ14、大蛇丸145などです。",
+        "テンテン21は、そのラウンドで最初に出すカードなら1少なく支払います。",
+        "大蛇丸145は公開されるとより広く攻撃します。コストのしきい値が以下になります。",
+        "ミズキ60とタズナ76は、得点時にミッションポイントを得ます。"
       ],
       "changes_pt": [
         "Orochimaru 127 revelado passa a levar apenas um personagem, mesmo com Sasuke na missão.",
@@ -127,7 +147,11 @@
         "Seis cartas do set 2 ganham seu efeito de melhoria, incluindo Kurenai 18, Tenten 22 e Asuma 138.",
         "Tenten 22 ganha 3 de Potência assim que uma Arma é colocada nela.",
         "Iruka 140 oculta um Naruto Uzumaki em jogo e pode colocar outro virado para baixo sem pagar nada.",
-        "As versões Secretas de Tsunade e Jiraiya, que não faziam nada, agora agem como suas versões douradas."
+        "As versões Secretas de Tsunade e Jiraiya, que não faziam nada, agora agem como suas versões douradas.",
+        "Doze cartas do set 2 ganham seu efeito ativado, incluindo Shino 17, Haku 52, Kiba 14 e Orochimaru 145.",
+        "Tenten 21 custa 1 a menos quando é a primeira carta que você joga na rodada.",
+        "Orochimaru 145 atinge mais alvos ao ser revelado: seu limite de custo passa a ser inclusivo.",
+        "Mizuki 60 e Tazuna 76 marcam pontos de missão na contagem."
       ],
       "changes_it": [
         "Orochimaru 127 rivelato prende un solo personaggio, anche con Sasuke nella missione.",
@@ -147,7 +171,11 @@
         "Sei carte del set 2 ottengono il loro effetto di miglioramento, tra cui Kurenai 18, Tenten 22 e Asuma 138.",
         "Tenten 22 guadagna 3 Potenza appena le viene messa un'Arma.",
         "Iruka 140 nasconde un Naruto Uzumaki in gioco e può metterne un altro coperto senza pagare nulla.",
-        "Le versioni Segrete di Tsunade e Jiraiya, che non facevano nulla, agiscono come le versioni dorate."
+        "Le versioni Segrete di Tsunade e Jiraiya, che non facevano nulla, agiscono come le versioni dorate.",
+        "Dodici carte del set 2 ottengono il loro effetto attivato, tra cui Shino 17, Haku 52, Kiba 14 e Orochimaru 145.",
+        "Tenten 21 costa 1 in meno quando è la prima carta che giochi nel round.",
+        "Orochimaru 145 colpisce più ampio quando viene rivelato: la sua soglia di costo diventa inclusiva.",
+        "Mizuki 60 e Tazuna 76 segnano punti missione al conteggio."
       ],
       "changes_pl": [
         "Odkryty Orochimaru 127 przejmuje już tylko jedną postać, nawet gdy Sasuke jest w misji.",
@@ -167,7 +195,11 @@
         "Sześć kart z zestawu 2 zyskuje efekt ulepszenia, w tym Kurenai 18, Tenten 22 i Asuma 138.",
         "Tenten 22 zyskuje 3 Mocy, gdy tylko dołożona zostanie do niej Broń.",
         "Iruka 140 zakrywa Naruto Uzumakiego w grze i może położyć kolejnego zakrytego za darmo.",
-        "Sekretne wersje Tsunade i Jiraiyi, które nic nie robiły, działają jak ich złote wersje."
+        "Sekretne wersje Tsunade i Jiraiyi, które nic nie robiły, działają jak ich złote wersje.",
+        "Dwanaście kart z zestawu 2 zyskuje efekt wyzwalany, w tym Shino 17, Haku 52, Kiba 14 i Orochimaru 145.",
+        "Tenten 21 kosztuje o 1 mniej, gdy jest pierwszą kartą zagraną w rundzie.",
+        "Orochimaru 145 uderza szerzej po odkryciu: jego próg kosztu staje się włączny.",
+        "Mizuki 60 i Tazuna 76 zdobywają punkty misji podczas liczenia."
       ]
     },
     {

@@ -690,6 +690,81 @@ const FACTORIES: Record<string, Factory> = {
     },
     noMinimize: true,
   }),
+  'SS-017-C': (id) => ({
+    build: () => board({ hidden0: { id, iid: HID }, p2hand: ['KS-104-R'], chakra: 14 }),
+    play: P1(reveal(HID)), noMinimize: true,
+  }),
+  'SS-052-C': (id) => ({
+    build: () => board({ hidden0: { id, iid: HID }, p1m1: ['SS-136-R'], chakra: 14 }),
+    play: P1(reveal(HID)), noMinimize: true,
+  }),
+  'SS-068-UC': (id) => ({
+    build: () => board({ hidden0: { id, iid: HID }, p1m0: ['SS-073-C'], chakra: 14 }),
+    play: P1(reveal(HID)), noMinimize: true,
+  }),
+  'SS-073-C': (id) => ({
+    build: () => {
+      const st = board({
+        hidden0: { id, iid: HID },
+        p1m0: [{ id: 'SS-010-C', iid: 'sim-porteur' }, { id: 'SS-016-C', iid: 'sim-autre' }],
+        chakra: 14,
+      });
+      const porteur = st.activeMissions[0].player1Characters.find((c) => c.instanceId === 'sim-porteur')!;
+      porteur.attachments = [{ instanceId: 'att-sim-073', card: getCardById('SS-080-C') as never, owner: 'player1' }];
+      return st;
+    },
+    play: P1(reveal(HID)), noMinimize: true,
+  }),
+  'SS-013-UC': (id) => ({
+    build: () => board({ hidden0: { id, iid: HID }, e0: [{ id: 'KS-104-R', iid: 'sim-fort' }], chakra: 14 }),
+    play: P1(reveal(HID)), noMinimize: true,
+  }),
+  'SS-055-UC': (id) => ({
+    build: () => board({ hidden0: { id, iid: HID }, chakra: 14, p2chakra: 5 }),
+    play: P1(reveal(HID)), noMinimize: true,
+  }),
+  'SS-056-UC': (id) => ({
+    build: () => {
+      const st = board({ hidden0: { id, iid: HID }, e0: [{ id: 'SS-010-C', iid: 'sim-ennemi' }], chakra: 14 });
+      const ennemi = st.activeMissions[0].player2Characters.find((c) => c.instanceId === 'sim-ennemi')!;
+      ennemi.attachments = [{ instanceId: 'att-sim-056', card: getCardById('SS-080-C') as never, owner: 'player2' }];
+      return st;
+    },
+    play: P1(reveal(HID)), noMinimize: true,
+  }),
+  'SS-145-S': (id) => ({
+    build: () => board({
+      hand: [id],
+      upgBase: { id: 'SS-130-R', iid: 'sim-upg-base' },
+      e0: [{ id: 'SS-021-C', iid: 'sim-petit' }],
+      chakra: 20,
+    }),
+    play: P1(upgrade('sim-upg-base')), noMinimize: true,
+  }),
+  'SS-014-C': (id) => ({
+    build: () => board({
+      hand: [id],
+      e0: [{ id: 'SS-010-C', iid: 'sim-cache-ennemi', hidden: true }],
+      chakra: 14,
+    }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-021-C': (id) => ({
+    build: () => board({ hand: [id], chakra: 14 }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-060-UC': (id) => ({
+    build: () => board({ p1m0: [id, 'KS-009-C'] }),
+    play: P1(PASS_ACTION),
+    followups: [{ player: 'player2', action: PASS_ACTION }],
+    noMinimize: true,
+  }),
+  'SS-076-UC': (id) => ({
+    build: () => board({ p1m0: [id, 'KS-009-C'] }),
+    play: P1(PASS_ACTION),
+    followups: [{ player: 'player2', action: PASS_ACTION }],
+    noMinimize: true,
+  }),
   'SS-999-L': (id) => ({
     build: () => {
       const st = board({

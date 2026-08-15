@@ -1,6 +1,7 @@
 import type { GameState, PlayerID, CharacterCard } from '../types';
 import { foodAttachmentDiscountCount } from '@/lib/effects/handlers/SS/staticAuras';
 import { virtualSoundFourCount } from '@/lib/effects/handlers/SS/attachmentStatics';
+import { reductionPremiereFrappe } from './firstStrikeDiscount';
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -94,6 +95,9 @@ export function calculateEffectiveCost(
   isReveal: boolean,
 ): number {
   let cost = card.chakra;
+
+  const premiereFrappe = reductionPremiereFrappe(state, player, card);
+  if (premiereFrappe > 0) cost = Math.max(0, cost - premiereFrappe);
 
   if (hasKin043DiscardDiscount(state, player, card)) {
     cost = Math.max(0, cost - 1);

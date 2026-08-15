@@ -474,7 +474,7 @@ export function buildPendingTargetSelectionUI(
             : { name_fr: '???' },
         };
       });
-    } else if (tst === 'SSMSS10_DISCARD_ATTACHMENT' || tst === 'SS065_MOVE_ATTACHMENT') {
+    } else if (tst === 'SSMSS10_DISCARD_ATTACHMENT' || tst === 'SS065_MOVE_ATTACHMENT' || tst === 'SS073_MOVE_ATTACHMENT' || tst === 'SS056_DISCARD_ATTACHMENT') {
       let attachmentInfo: Array<{ attachmentId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number; hostName?: string }> = [];
       try { attachmentInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').attachments ?? []; } catch { /* ignore */ }
       const attachmentRanks = dataSource.activeMissions.map((m) => m.rank || '?');
