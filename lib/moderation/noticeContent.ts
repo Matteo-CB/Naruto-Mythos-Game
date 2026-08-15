@@ -1,9 +1,11 @@
-export type NoticeKind = 'warn' | 'warn_severe' | 'sanction_notice' | 'victim_notice' | 'name_reset';
+export type NoticeKind = 'warn' | 'warn_severe' | 'sanction_notice' | 'victim_notice' | 'name_reset'
+  | 'tournament_no_deck';
 
 export interface NoticePayload {
   reason?: string;
   sanctionType?: string;
   untilTs?: number | null;
+  tournamentName?: string;
 }
 
 export interface NoticeContent {
@@ -31,6 +33,13 @@ export function buildNoticeContent(kind: NoticeKind, payload: NoticePayload, for
       return { titleKey: 'notify.victimTitle', bodyKey: 'notify.victimBody', params: {}, accent: 'gold' };
     case 'name_reset':
       return { titleKey: 'notify.nameResetTitle', bodyKey: 'notify.nameResetBody', params: {}, accent: 'red' };
+    case 'tournament_no_deck':
+      return {
+        titleKey: 'notify.tournamentNoDeckTitle',
+        bodyKey: 'notify.tournamentNoDeckBody',
+        params: { tournament: payload.tournamentName ?? '' },
+        accent: 'red',
+      };
     case 'sanction_notice': {
       const type = payload.sanctionType ?? '';
       const keys = SANCTION_BODY_KEYS[type];

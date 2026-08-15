@@ -3137,7 +3137,9 @@
       "title": "マッチの準備ができました",
       "hint": "一息ついてください。両者が準備完了するとゲームが始まります。",
       "ready": "準備完了"
-    }
+    },
+    "deckMissingTitle": "デッキ未選択",
+    "deckMissingBody": "参加登録は済んでいますが、デッキを選ぶまでは大会開始時に対戦表から外されます。このページの下でデッキを選んでください。"
   },
   "playHub": {
     "title": "プレイ",
@@ -3700,7 +3702,9 @@
       "spectateBanPermanent": "他のプレイヤーの対戦を観戦できません。理由：{reason}。"
     },
     "nameResetButton": "新しいユーザー名を確定",
-    "suspendedTitle": "アカウント停止中"
+    "suspendedTitle": "アカウント停止中",
+    "tournamentNoDeckTitle": "大会: デッキ未選択",
+    "tournamentNoDeckBody": "{tournament} に参加登録していましたが、デッキが選択されていなかったため、対戦表に組み込めませんでした。開始前に大会ページでデッキを選んでください。"
   },
   "adminModeration": {
     "searchPlaceholder": "プレイヤーを検索...",

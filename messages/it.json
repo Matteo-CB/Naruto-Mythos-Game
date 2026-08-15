@@ -232,7 +232,9 @@
       "spectateBanPermanent": "Non puoi più guardare le partite degli altri giocatori. Motivo: {reason}."
     },
     "nameResetButton": "Conferma nuovo nome utente",
-    "suspendedTitle": "Account sospeso"
+    "suspendedTitle": "Account sospeso",
+    "tournamentNoDeckTitle": "Torneo: mazzo mancante",
+    "tournamentNoDeckBody": "Eri iscritto a {tournament} ma non avevi selezionato nessun mazzo, quindi non è stato possibile inserirti nel tabellone. Ricordati di scegliere il mazzo nella pagina del torneo prima dell'inizio."
   },
   "maintenance": {
     "title": "NARUTO MYTHOS",
@@ -2655,7 +2657,9 @@
       "title": "Il tuo match è pronto",
       "hint": "Prenditi un momento, la partita inizia quando entrambi i giocatori sono pronti.",
       "ready": "Pronto"
-    }
+    },
+    "deckMissingTitle": "Nessun mazzo selezionato",
+    "deckMissingBody": "Sei iscritto, ma finché non scegli un mazzo verrai rimosso dal tabellone all'inizio del torneo. Scegli il tuo mazzo più in basso in questa pagina."
   },
   "game": {
     "turn": "Turno {turn}",

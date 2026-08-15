@@ -491,6 +491,26 @@ export default function TournamentDetailPage() {
           </button>
         </div>
 
+        {needsDeck && !(myDeckId && myDeckValid) && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.12 }}
+            className="mb-4 p-4"
+            style={{ backgroundColor: 'rgba(204, 68, 68, 0.12)', boxShadow: '0 0 14px rgba(204, 68, 68, 0.22)' }}
+          >
+            <motion.h2
+              animate={{ opacity: [1, 0.55, 1] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+              className="text-sm font-medium uppercase tracking-wider mb-1"
+              style={{ color: 'var(--t-danger)' }}
+            >
+              {t('deckMissingTitle')}
+            </motion.h2>
+            <p className="text-xs" style={{ color: 'var(--t-text)' }}>{t('deckMissingBody')}</p>
+          </motion.div>
+        )}
+
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }}
           className="mb-4 p-4" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)', }}>
           <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: 'var(--t-accent)' }}>{t('rulesTitle')}</h2>

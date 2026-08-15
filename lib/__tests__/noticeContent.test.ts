@@ -43,4 +43,12 @@ describe('buildNoticeContent', () => {
     expect(n.titleKey).toBe('notify.nameResetTitle');
     expect(n.accent).toBe('red');
   });
+
+  it('a player dropped from a bracket for a missing deck is told which tournament', () => {
+    const n = buildNoticeContent('tournament_no_deck', { tournamentName: 'New World Loot X Chunin Exam' }, fmt)!;
+    expect(n.titleKey).toBe('notify.tournamentNoDeckTitle');
+    expect(n.bodyKey).toBe('notify.tournamentNoDeckBody');
+    expect(n.params.tournament).toBe('New World Loot X Chunin Exam');
+    expect(n.accent).toBe('red');
+  });
 });

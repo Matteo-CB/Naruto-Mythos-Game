@@ -109,6 +109,12 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
       });
       logMatchEvent({ type: 'participant.excluded.invalid-deck', tournamentId, forfeitedPlayerId: p.userId });
       try {
+        const { notifyUser } = await import('@/lib/moderation/notify');
+        await notifyUser(p.userId, 'tournament_no_deck', { tournamentName: tournament.name });
+      } catch (notifyErr) {
+        console.error('[startLogic] could not store the no-deck notice:', notifyErr);
+      }
+      try {
         const { emitToUser } = await import('@/lib/socket/io');
         emitToUser(p.userId, 'tournament:excluded', { tournamentId, reason: 'invalid_deck' });
       } catch { /* socket layer absent in scripts */ }

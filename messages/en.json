@@ -3133,7 +3133,9 @@
       "title": "Your match is ready",
       "hint": "Take a breath, the game starts when both players are ready.",
       "ready": "Ready"
-    }
+    },
+    "deckMissingTitle": "No deck selected",
+    "deckMissingBody": "You are registered, but as long as no deck is chosen you will be removed from the bracket when the tournament starts. Pick your deck further down this page."
   },
   "playHub": {
     "title": "Play",
@@ -3696,7 +3698,9 @@
       "spectateBanPermanent": "You can no longer watch other players' games. Reason: {reason}."
     },
     "nameResetButton": "Confirm new username",
-    "suspendedTitle": "Account suspended"
+    "suspendedTitle": "Account suspended",
+    "tournamentNoDeckTitle": "Tournament: no deck selected",
+    "tournamentNoDeckBody": "You were registered for {tournament} but no deck was selected, so you could not be placed in the bracket. Remember to pick your deck on the tournament page before it starts."
   },
   "adminModeration": {
     "searchPlaceholder": "Search a player...",

@@ -3139,7 +3139,9 @@
       "title": "Votre match est prêt",
       "hint": "Prenez votre temps, la partie démarre quand les deux joueurs sont prêts.",
       "ready": "Prêt"
-    }
+    },
+    "deckMissingTitle": "Aucun deck sélectionné",
+    "deckMissingBody": "Tu es inscrit, mais tant qu'aucun deck n'est choisi tu seras retiré du tableau au lancement du tournoi. Choisis ton deck plus bas sur cette page."
   },
   "playHub": {
     "title": "Jouer",
@@ -3702,7 +3704,9 @@
       "spectateBanPermanent": "Tu ne peux plus regarder les parties des autres joueurs. Motif : {reason}."
     },
     "nameResetButton": "Valider le nouveau pseudo",
-    "suspendedTitle": "Compte suspendu"
+    "suspendedTitle": "Compte suspendu",
+    "tournamentNoDeckTitle": "Tournoi : deck manquant",
+    "tournamentNoDeckBody": "Tu étais inscrit au tournoi {tournament} mais aucun deck n'était sélectionné, donc tu n'as pas pu être placé dans le tableau. Pense à choisir ton deck sur la page du tournoi avant le lancement."
   },
   "adminModeration": {
     "searchPlaceholder": "Chercher un joueur...",

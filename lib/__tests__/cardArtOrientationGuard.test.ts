@@ -1,10 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import { readdirSync, readFileSync, statSync } from 'fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import { join } from 'path';
 import { isLandscapeCard, cardAspectRatio } from '@/lib/cards/orientation';
 import { portraitImagePath } from '@/lib/utils/imagePath';
-import { getPlayableAttachments } from '@/lib/data/cardLoader';
+import { getPlayableAttachments, getPlayableMissions } from '@/lib/data/cardLoader';
 import type { CardData } from '@/lib/engine/types';
+
+function fichierPivote(card: CardData): string | null {
+  const chemin = portraitImagePath(card);
+  if (!chemin) return null;
+  return join('public', chemin.split('?')[0]);
+}
 
 const ROOTS = ['components', 'app'];
 
@@ -38,6 +44,25 @@ describe('a mission attachment is never squeezed into a portrait slot un-rotated
       expect(rotated, `${attachment.id} must resolve a rotated asset`).toBeTruthy();
       expect(rotated, `${attachment.id} must use the pre-rotated art`).toContain('-rot');
     }
+  });
+
+  it('the rotated file really exists on disk for every landscape card', () => {
+    const paysage: CardData[] = [
+      ...(getPlayableMissions() as unknown as CardData[]),
+      ...(getPlayableAttachments().filter((a) => a.attach_to === 'mission') as unknown as CardData[]),
+    ];
+    expect(paysage.length, 'the sets ship landscape cards').toBeGreaterThan(0);
+
+    const absents = paysage
+      .filter((card) => card.image_file)
+      .map((card) => ({ id: card.id, chemin: fichierPivote(card) }))
+      .filter((entree) => !entree.chemin || !existsSync(entree.chemin))
+      .map((entree) => `${entree.id} -> ${entree.chemin ?? 'aucun chemin'}`);
+
+    expect(
+      absents,
+      `these landscape cards point at a rotated file that does not exist:\n  ${absents.join('\n  ')}`,
+    ).toEqual([]);
   });
 
   it('every surface rendering card art is either rotation aware or orientation aware', () => {

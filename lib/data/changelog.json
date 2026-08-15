@@ -20,6 +20,9 @@
         "fix",
         "fix",
         "fix",
+        "fix",
+        "fix",
+        "fix",
         "feature",
         "feature",
         "feature",
@@ -43,6 +46,9 @@
         "feature"
       ],
       "changes_fr": [
+        "Les équipements de mission affichent enfin leur illustration dans la main et dans les fenêtres de choix.",
+        "Un avertissement bien visible signale qu'aucun deck n'est choisi tant que les inscriptions au tournoi sont ouvertes.",
+        "Un joueur écarté du tableau au lancement faute de deck reçoit maintenant un message qui le lui explique.",
         "OROCHIMARU « Oui, tu feras très bien l’affaire. » 127 Rare révélé ne prend plus qu'un seul personnage, même quand Sasuke est dans la mission.",
         "KAKASHI HATAKE Sharingan 016 Peu commune copie de nouveau un effet de première frappe quand il est la première carte que vous jouez.",
         "TAYUYA Flûte Démoniaque : Chaînes de Fantasia 125 Rare ne fait plus payer un chakra de plus sur les équipements, seulement sur les personnages.",
@@ -76,6 +82,9 @@
         "Toutes les cartes du set 2 ont désormais leur effet en jeu, sans exception."
       ],
       "changes_en": [
+        "Mission attachments finally show their artwork in hand and in the choice windows.",
+        "A clear warning shows that no deck is selected while tournament registration is open.",
+        "A player left out of the bracket at start for having no deck now gets a message explaining it.",
         "OROCHIMARU \"Yes, you'll do nicely.\" 127 Rare revealed now takes a single character, even with Sasuke in the mission.",
         "KAKASHI HATAKE Sharingan 016 Uncommon copies a first strike effect again when he is the first card you play.",
         "TAYUYA Demon Flute: Chains of Fantasia 125 Rare no longer charges one extra chakra on attachments, only on characters.",
@@ -109,6 +118,9 @@
         "Every set 2 card now has its effect in play, without exception."
       ],
       "changes_es": [
+        "Los equipamientos de misión por fin muestran su ilustración en la mano y en las ventanas de elección.",
+        "Un aviso bien visible indica que no has elegido mazo mientras las inscripciones al torneo siguen abiertas.",
+        "El jugador excluido del cuadro al empezar por no tener mazo recibe ahora un mensaje que se lo explica.",
         "OROCHIMARU «Sí, tú me servirás.» 127 Rara revelado ahora se lleva un solo personaje, incluso con Sasuke en la misión.",
         "KAKASHI HATAKE Sharingan 016 Poco común vuelve a copiar un efecto de primer golpe cuando es la primera carta que juegas.",
         "TAYUYA Flauta Demoníaca: Cadenas de Sonido Fantasma 125 Rara ya no cobra un chakra extra por los equipos, solo por los personajes.",
@@ -142,6 +154,9 @@
         "Todas las cartas del set 2 ya tienen su efecto en juego, sin excepción."
       ],
       "changes_ja": [
+        "ミッション装備がようやく手札と選択ウィンドウでイラストを表示します。",
+        "大会の受付中にデッキを選んでいないことを、はっきりした警告で知らせます。",
+        "デッキ未選択で開始時に対戦表から外された選手に、その理由を伝えるお知らせが届きます。",
         "公開された大蛇丸 「うむ、お前でいい。」 127 レアは、サスケが同じミッションにいても1体しか奪わなくなりました。",
         "はたけカカシ 写輪眼 016 アンコモンは、最初に出すカードならファーストストライクの効果を再びコピーします。",
         "多由也 魔笛・幻ノ音鎖 125 レアは装備カードに追加のチャクラを課さなくなり、キャラクターにのみ課します。",
@@ -175,6 +190,9 @@
         "セット2の全カードが例外なく効果を持つようになりました。"
       ],
       "changes_pt": [
+        "Os equipamentos de missão finalmente mostram sua ilustração na mão e nas janelas de escolha.",
+        "Um aviso bem visível indica que nenhum baralho foi escolhido enquanto as inscrições do torneio estão abertas.",
+        "O jogador retirado da chave no início por não ter baralho agora recebe uma mensagem explicando o motivo.",
         "OROCHIMARU «Sim, tu servirás na perfeição.» 127 Rara revelado agora leva apenas um personagem, mesmo com Sasuke na missão.",
         "KAKASHI HATAKE Sharingan 016 Incomum volta a copiar um efeito de primeiro golpe quando é a primeira carta que você joga.",
         "TAYUYA Flauta Demoníaca: Correntes Sonoras Fantasma 125 Rara não cobra mais um chakra extra nos equipamentos, apenas nos personagens.",
@@ -208,6 +226,9 @@
         "Todas as cartas do set 2 agora têm seu efeito em jogo, sem exceção."
       ],
       "changes_it": [
+        "Gli equipaggiamenti missione mostrano finalmente la loro illustrazione in mano e nelle finestre di scelta.",
+        "Un avviso ben visibile segnala che non hai scelto un mazzo finché le iscrizioni al torneo sono aperte.",
+        "Il giocatore escluso dal tabellone alla partenza per mancanza di mazzo riceve ora un messaggio che lo spiega.",
         "OROCHIMARU «Sì, andrai benissimo.» 127 Rara rivelato ora prende un solo personaggio, anche con Sasuke nella missione.",
         "KAKASHI HATAKE Sharingan 016 Non Comune copia di nuovo un effetto di primo colpo quando è la prima carta che giochi.",
         "TAYUYA Flauto Demoniaco: Catene Sonore Fantasma 125 Rara non fa più pagare un chakra in più sugli equipaggiamenti, solo sui personaggi.",
@@ -241,6 +262,9 @@
         "Tutte le carte del set 2 hanno ora il loro effetto in gioco, senza eccezioni."
       ],
       "changes_pl": [
+        "Wyposażenie misji wreszcie pokazuje swoją ilustrację w ręce i w oknach wyboru.",
+        "Wyraźne ostrzeżenie informuje, że nie wybrano talii, dopóki zapisy na turniej są otwarte.",
+        "Gracz usunięty z drabinki na starcie z powodu braku talii dostaje teraz wiadomość z wyjaśnieniem.",
         "Odkryty OROCHIMARU „Tak, ty się nadasz.” 127 Rzadka zabiera teraz tylko jedną postać, nawet gdy Sasuke jest w misji.",
         "KAKASHI HATAKE Sharingan 016 Niepospolita znów kopiuje efekt pierwszego uderzenia, gdy jest pierwszą zagraną kartą.",
         "TAYUYA Demoniczny Flet: Widmowe Łańcuchy Dźwięku 125 Rzadka nie pobiera już dodatkowej czakry za wyposażenia, tylko za postacie.",

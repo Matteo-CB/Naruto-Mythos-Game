@@ -3138,7 +3138,9 @@
       "title": "Tu duelo está listo",
       "hint": "Tómate un respiro, la partida empieza cuando ambos jugadores estén listos.",
       "ready": "Listo"
-    }
+    },
+    "deckMissingTitle": "Ningún mazo seleccionado",
+    "deckMissingBody": "Estás inscrito, pero mientras no elijas un mazo serás retirado del cuadro cuando empiece el torneo. Elige tu mazo más abajo en esta página."
   },
   "playHub": {
     "title": "Jugar",
@@ -3701,7 +3703,9 @@
       "spectateBanPermanent": "Ya no puedes ver las partidas de otros jugadores. Motivo: {reason}."
     },
     "nameResetButton": "Confirmar nuevo nombre",
-    "suspendedTitle": "Cuenta suspendida"
+    "suspendedTitle": "Cuenta suspendida",
+    "tournamentNoDeckTitle": "Torneo: falta el mazo",
+    "tournamentNoDeckBody": "Estabas inscrito en {tournament} pero no habías seleccionado ningún mazo, así que no se te pudo incluir en el cuadro. Recuerda elegir tu mazo en la página del torneo antes de que empiece."
   },
   "adminModeration": {
     "searchPlaceholder": "Buscar un jugador...",
