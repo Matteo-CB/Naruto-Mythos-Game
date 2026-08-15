@@ -15,15 +15,15 @@ afterEach(() => {
 });
 
 describe('sealed only ever uses a set that is explicitly sealed ready', () => {
-  it('today that is Konoha Shido and Shinobi Shiren, and nothing else', () => {
-    expect(getSealedSetIds()).toEqual(['KS', 'SS']);
-    expect(getLatestSealedSetId()).toBe('SS');
+  it('today that is Konoha Shido, and nothing else', () => {
+    expect(getSealedSetIds()).toEqual(['KS']);
+    expect(getLatestSealedSetId()).toBe('KS');
   });
 
   it('an available set is not sealed ready unless it says so', () => {
     expect(SET_REGISTRY.SS.status).toBe('available');
-    expect(SET_REGISTRY.SS.sealedReady).toBe(true);
-    expect(isSetSealedReady('SS')).toBe(true);
+    expect(SET_REGISTRY.SS.sealedReady).toBe(false);
+    expect(isSetSealedReady('SS')).toBe(false);
     expect(isSetSealedReady('AK')).toBe(false);
   });
 
@@ -31,7 +31,7 @@ describe('sealed only ever uses a set that is explicitly sealed ready', () => {
     applySetStatusOverrides({ AK: 'available' });
     expect(isSetAvailable('AK')).toBe(true);
     expect(isSetSealedReady('AK')).toBe(false);
-    expect(getSealedSetIds()).toEqual(['KS', 'SS']);
+    expect(getSealedSetIds()).toEqual(['KS']);
   });
 
   it('a sealed ready set that is pulled back from release leaves sealed too', () => {

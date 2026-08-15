@@ -95,29 +95,27 @@ describe('booster Shinobi Shiren', () => {
 });
 
 describe('scelle Shinobi Shiren', () => {
-  it('le set 2 est proposable en scelle', () => {
-    expect(getSealedSetIds()).toContain('SS');
+  it('le set 2 n_est pas propose en scelle', () => {
+    expect(getSealedSetIds()).not.toContain('SS');
+    expect(() => generateSealedPool(6, 'SS')).toThrow();
   });
 
-  it('un pool de 6 boosters donne 54 personnages et 6 missions', () => {
-    const pool = generateSealedPool(6, 'SS');
-    expect(pool.boosters).toHaveLength(6);
-    expect(pool.allCards).toHaveLength(60);
-    expect(pool.allCards.filter((c) => c.card_type === 'mission')).toHaveLength(6);
-    expect(pool.allCards.every((c) => c.set === 'SS')).toBe(true);
+  it('six boosters du set 2 donneraient bien 54 personnages et 6 missions', () => {
+    const cartes = [];
+    for (let i = 0; i < 6; i++) cartes.push(...generateBooster(i, 'SS').cards);
+    expect(cartes).toHaveLength(60);
+    expect(cartes.filter((c) => c.card_type === 'mission')).toHaveLength(6);
+    expect(cartes.every((c) => c.set === 'SS')).toBe(true);
   });
 
-  it('un pool ne contient jamais de holo et suit les taux annonces', () => {
-    const pool = generateSealedPool(30, 'SS');
-    expect(pool.allCards.filter((c) => c.isHolo)).toHaveLength(0);
-    const chasse = pool.allCards.filter((c) => ['RA', 'S', 'SP', 'SHINOBI', 'L', 'SV', 'POP'].includes(c.rarity));
-    expect(chasse.length).toBeLessThanOrEqual(30);
-  });
-
-  it('les variantes tirees en scelle restent ephemeres', () => {
-    const pool = generateSealedPool(20, 'SS');
-    for (const id of pool.temporaryVariants) {
-      expect(pool.allCards.some((c) => c.id === id)).toBe(true);
+  it('aucun booster du set 2 ne contient de holo', () => {
+    for (let i = 0; i < 30; i++) {
+      for (const carte of generateBooster(i, 'SS').cards) expect(carte.isHolo).toBe(false);
     }
+  });
+
+  it('le scelle par defaut ne tire que le set 1', () => {
+    const pool = generateSealedPool(6, 'random');
+    expect(pool.allCards.every((c) => c.set === 'KS')).toBe(true);
   });
 });
