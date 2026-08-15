@@ -1,7 +1,6 @@
 import { getCardById } from '@/lib/data/cardIndex';
 
 export const PENDING_EFFECT_IMPLEMENTATION: ReadonlySet<string> = new Set([
-  'SS-135-R',
 ]);
 
 function printingKey(cardId: string): string | null {

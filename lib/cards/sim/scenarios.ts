@@ -792,6 +792,19 @@ const FACTORIES: Record<string, Factory> = {
     },
     noMinimize: true,
   }),
+  'SS-135-R': (id) => ({
+    build: () => {
+      const st = board({
+        hand: [id],
+        upgBase: { id: 'SS-052-C', iid: 'sim-upg-base' },
+        e0: [{ id: 'SS-021-C', iid: 'sim-petit' }],
+        chakra: 20,
+      });
+      st.player1.deck = ['KS-104-R', 'KS-009-C'].map((x) => getCharacterById(x)!).filter(Boolean);
+      return st;
+    },
+    play: P1(upgrade('sim-upg-base')), noMinimize: true,
+  }),
   'SS-999-L': (id) => ({
     build: () => {
       const st = board({

@@ -49,6 +49,7 @@ import { SHINO_017, SHINO_017_THRESHOLD, SHINO_017_GAIN, SHIGURE_068, KISAME_055
 import { HAKU_052, RYUGAN_073, zabuzasDeplacables, equipementsDePersonnage, hotesPossiblesPour } from './handlers/SS/moveTargets5';
 import { SERPENTS_056, OROCHIMARU_145, KIBA_014, KIBA_014_THRESHOLD, MIZUKI_060, MIZUKI_060_POINTS, TAZUNA_076, TAZUNA_076_POINTS, ciblesDOrochimaru, equipementParId } from './handlers/SS/set5Others';
 import { SHINO_113, HASHIRAMA_129, HASHIRAMA_129_POWERUP, TOBIRAMA_131, HIRUZEN_133, KANKURO_NOM, SUMMON, proprietaireDe, destinationsDeHokage } from './handlers/SS/duels6';
+import { HAKU_135, ennemisMoinsChersQue } from './handlers/SS/haku135';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { findLegalRevealUpgradeTarget, revealWouldViolateNameUniqueness } from './revealNameUniqueness';
 import { moveWouldViolateNameUniqueness } from './moveNameUniqueness';
@@ -13818,6 +13819,63 @@ export class EffectEngine {
           newState, pendingEffect, brut133, reduction133, SUMMON,
           'HIRUZEN SARUTOBI', HIRUZEN_133, false, undefined, mission133,
         );
+        break;
+      }
+
+      case 'SS135_CONFIRM_UPGRADE': {
+        const j135 = pendingEffect.sourcePlayer;
+        const deck135 = [...newState[j135].deck];
+        if (deck135.length === 0) break;
+        const jetee135 = deck135.shift()!;
+        newState[j135] = {
+          ...newState[j135],
+          deck: deck135,
+          discardPile: [...newState[j135].discardPile, jetee135],
+        };
+        const seuil135 = (jetee135 as unknown as CardData).chakra ?? 0;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, j135,
+          'EFFECT', `Haku (135): discarded ${jetee135.name_fr} (cost ${seuil135}).`,
+          'game.log.effect.ss135Discarded',
+          { card: 'HAKU', id: HAKU_135, target: jetee135.name_fr, target_en: jetee135.name_en || jetee135.name_fr, amount: String(seuil135) });
+
+        const cibles135 = ennemisMoinsChersQue(newState, j135, pendingEffect.sourceMissionIndex, seuil135);
+        if (cibles135.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, j135,
+            'EFFECT_NO_TARGET', 'Haku (135): no enemy character here is cheap enough to hide.',
+            'game.log.effect.noTarget', { card: 'HAKU', id: HAKU_135 });
+          break;
+        }
+
+        const eff135 = generateInstanceId();
+        const act135 = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: eff135, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ amount: seuil135 }),
+          targetSelectionType: 'SS135_HIDE_ENEMY', sourcePlayer: j135,
+          requiresTargetSelection: true, validTargets: cibles135.map((c) => c.instanceId),
+          isOptional: false, isMandatory: true, resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        newState.pendingActions = [...newState.pendingActions, {
+          id: act135, type: 'SELECT_TARGET', player: j135,
+          description: 'Haku (135): choose the enemy character to hide.',
+          descriptionKey: 'game.effect.desc.ss135HideEnemy',
+          descriptionParams: { amount: seuil135 },
+          options: cibles135.map((c) => c.instanceId),
+          minSelections: 1, maxSelections: 1, sourceEffectId: eff135,
+        }];
+        break;
+      }
+
+      case 'SS135_HIDE_ENEMY': {
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT', 'Haku (135): the enemy character is hidden.',
+          'game.log.effect.ss135Hidden', { card: 'HAKU', id: HAKU_135 });
         break;
       }
 

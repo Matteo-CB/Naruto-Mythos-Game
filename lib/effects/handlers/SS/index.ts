@@ -44,6 +44,7 @@ import { registerAmbushSet5Handlers } from './ambushSet5';
 import { registerMoveTargets5Handlers } from './moveTargets5';
 import { registerSet5OtherHandlers } from './set5Others';
 import { registerDuels6Handlers } from './duels6';
+import { registerHaku135Handlers } from './haku135';
 import { registerKujaku072Handler } from './kujaku072';
 import { registerKabuto030Handlers } from './kabuto030';
 import { registerDosu045Handlers } from './dosu045';
@@ -104,6 +105,7 @@ export function registerAllSSHandlers(): void {
   registerMoveTargets5Handlers();
   registerSet5OtherHandlers();
   registerDuels6Handlers();
+  registerHaku135Handlers();
   registerKujaku072Handler();
   registerKabuto030Handlers();
   registerDosu045Handlers();

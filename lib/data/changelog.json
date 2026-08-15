@@ -35,6 +35,8 @@
         "feature",
         "feature",
         "feature",
+        "feature",
+        "feature",
         "feature"
       ],
       "changes_fr": [
@@ -63,7 +65,9 @@
         "Les quatre cartes à duel du set 2 sont jouables : Shino 113, Hashirama 129, Tobirama 131 et Hiruzen 133.",
         "Shino 113 fait défausser l'adversaire, et au hasard si Kankuro est dans la mission.",
         "Hashirama et Tobirama peuvent s'améliorer par-dessus un allié d'un autre nom quand Orochimaru est là.",
-        "Hiruzen 133 renforce de 2 chaque allié de Konoha qui arrive dans sa mission."
+        "Hiruzen 133 renforce de 2 chaque allié de Konoha qui arrive dans sa mission.",
+        "Haku 135 défausse la carte du dessus de votre pioche et cache un ennemi moins cher qu'elle.",
+        "Toutes les cartes du set 2 ont désormais leur effet en jeu, sans exception."
       ],
       "changes_en": [
         "A revealed Orochimaru 127 now takes a single character, even with Sasuke in the mission.",
@@ -91,7 +95,9 @@
         "The four duel cards of set 2 are playable: Shino 113, Hashirama 129, Tobirama 131 and Hiruzen 133.",
         "Shino 113 makes the opponent discard, at random if Kankuro is in the mission.",
         "Hashirama and Tobirama can upgrade over an ally with a different name when Orochimaru is present.",
-        "Hiruzen 133 gives 2 Power to every Leaf Village ally arriving in his mission."
+        "Hiruzen 133 gives 2 Power to every Leaf Village ally arriving in his mission.",
+        "Haku 135 discards the top card of your deck and hides an enemy cheaper than it.",
+        "Every set 2 card now has its effect in play, without exception."
       ],
       "changes_es": [
         "Orochimaru 127 revelado ya solo toma un personaje, incluso con Sasuke en la misión.",
@@ -119,7 +125,9 @@
         "Las cuatro cartas de duelo del set 2 son jugables: Shino 113, Hashirama 129, Tobirama 131 y Hiruzen 133.",
         "Shino 113 hace descartar al rival, al azar si Kankuro está en la misión.",
         "Hashirama y Tobirama pueden mejorar sobre un aliado de otro nombre cuando Orochimaru está presente.",
-        "Hiruzen 133 da 2 de Potencia a cada aliado de Konoha que llega a su misión."
+        "Hiruzen 133 da 2 de Potencia a cada aliado de Konoha que llega a su misión.",
+        "Haku 135 descarta la carta superior de tu mazo y oculta a un enemigo más barato que ella.",
+        "Todas las cartas del set 2 ya tienen su efecto en juego, sin excepción."
       ],
       "changes_ja": [
         "公開した大蛇丸127は、そのミッションにサスケがいても1体しか奪わなくなりました。",
@@ -147,7 +155,9 @@
         "セット2の決闘カード4枚が使えます。シノ113、柱間129、扉間131、ヒルゼン133です。",
         "シノ113は相手に手札を捨てさせ、カンクロウが同じミッションにいるならランダムになります。",
         "柱間と扉間は、大蛇丸がいるとき別名の味方の上に重ねられます。",
-        "ヒルゼン133は、自分のミッションに来る木ノ葉の味方にパワー2を与えます。"
+        "ヒルゼン133は、自分のミッションに来る木ノ葉の味方にパワー2を与えます。",
+        "ハク135は山札の一番上のカードを捨て、それより安い敵を裏向きにします。",
+        "セット2の全カードが例外なく効果を持つようになりました。"
       ],
       "changes_pt": [
         "Orochimaru 127 revelado passa a levar apenas um personagem, mesmo com Sasuke na missão.",
@@ -175,7 +185,9 @@
         "As quatro cartas de duelo do set 2 são jogáveis: Shino 113, Hashirama 129, Tobirama 131 e Hiruzen 133.",
         "Shino 113 faz o adversário descartar, ao acaso se Kankuro estiver na missão.",
         "Hashirama e Tobirama podem melhorar sobre um aliado de outro nome quando Orochimaru está presente.",
-        "Hiruzen 133 dá 2 de Potência a cada aliado da Folha que chega à sua missão."
+        "Hiruzen 133 dá 2 de Potência a cada aliado da Folha que chega à sua missão.",
+        "Haku 135 descarta a carta do topo do seu deck e oculta um inimigo mais barato que ela.",
+        "Todas as cartas do set 2 agora têm seu efeito em jogo, sem exceção."
       ],
       "changes_it": [
         "Orochimaru 127 rivelato prende un solo personaggio, anche con Sasuke nella missione.",
@@ -203,7 +215,9 @@
         "Le quattro carte con duello del set 2 sono giocabili: Shino 113, Hashirama 129, Tobirama 131 e Hiruzen 133.",
         "Shino 113 fa scartare l'avversario, a caso se Kankuro è nella missione.",
         "Hashirama e Tobirama possono migliorare su un alleato con un altro nome quando Orochimaru è presente.",
-        "Hiruzen 133 dà 2 Potenza a ogni alleato della Foglia che arriva nella sua missione."
+        "Hiruzen 133 dà 2 Potenza a ogni alleato della Foglia che arriva nella sua missione.",
+        "Haku 135 scarta la carta in cima al mazzo e nasconde un nemico che costa meno di essa.",
+        "Tutte le carte del set 2 hanno ora il loro effetto in gioco, senza eccezioni."
       ],
       "changes_pl": [
         "Odkryty Orochimaru 127 przejmuje już tylko jedną postać, nawet gdy Sasuke jest w misji.",
@@ -231,7 +245,9 @@
         "Cztery karty z pojedynkiem z zestawu 2 są grywalne: Shino 113, Hashirama 129, Tobirama 131 i Hiruzen 133.",
         "Shino 113 zmusza przeciwnika do odrzucenia karty, losowo jeśli Kankuro jest w misji.",
         "Hashirama i Tobirama mogą ulepszać na sojuszniku o innej nazwie, gdy Orochimaru jest obecny.",
-        "Hiruzen 133 daje 2 Mocy każdemu sojusznikowi z Liścia wchodzącemu do jego misji."
+        "Hiruzen 133 daje 2 Mocy każdemu sojusznikowi z Liścia wchodzącemu do jego misji.",
+        "Haku 135 odrzuca wierzchnią kartę talii i zakrywa wroga tańszego od niej.",
+        "Wszystkie karty z zestawu 2 mają teraz swój efekt w grze, bez wyjątku."
       ]
     },
     {

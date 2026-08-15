@@ -2982,7 +2982,9 @@
         "ss145Threshold": "{card} ({id}): rivelato, la soglia diventa {amount} o meno.",
         "ss113Random": "{card} ({id}): l'avversario scarta {target} a caso.",
         "ss113Chosen": "{card} ({id}): l'avversario scarta {target}.",
-        "ss133Powerup": "{card} ({id}): {target} guadagna {amount} Potenza all'arrivo."
+        "ss133Powerup": "{card} ({id}): {target} guadagna {amount} Potenza all'arrivo.",
+        "ss135Discarded": "{card} ({id}): {target} scartata, costo {amount}.",
+        "ss135Hidden": "{card} ({id}): il personaggio nemico viene nascosto."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3754,7 +3756,9 @@
         "ss129PowerupHokage": "Scegli il personaggio Hokage che riceve 2 segnalini Potenza.",
         "ss131MoveHokage": "Scegli il personaggio Hokage da spostare.",
         "ss131MoveDestination": "Scegli la missione di destinazione.",
-        "ss133PlaySummon": "Scegli l'Evocazione da giocare in questa missione pagando 2 in meno."
+        "ss133PlaySummon": "Scegli l'Evocazione da giocare in questa missione pagando 2 in meno.",
+        "ss135DiscardThenHide": "Scartare la carta in cima al mazzo e nascondere un nemico che costa meno di essa?",
+        "ss135HideEnemy": "Scegli il personaggio nemico da nascondere, deve costare meno di {amount}."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

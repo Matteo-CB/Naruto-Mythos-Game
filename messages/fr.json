@@ -886,7 +886,9 @@
         "ss145Threshold": "{card} ({id}) : révélé, le seuil devient {amount} ou moins.",
         "ss113Random": "{card} ({id}) : l'adversaire défausse {target} au hasard.",
         "ss113Chosen": "{card} ({id}) : l'adversaire défausse {target}.",
-        "ss133Powerup": "{card} ({id}) : {target} gagne {amount} de Puissance en arrivant."
+        "ss133Powerup": "{card} ({id}) : {target} gagne {amount} de Puissance en arrivant.",
+        "ss135Discarded": "{card} ({id}) : {target} défaussée, coût {amount}.",
+        "ss135Hidden": "{card} ({id}) : le personnage ennemi est caché."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1658,7 +1660,9 @@
         "ss129PowerupHokage": "Choisissez le personnage Hokage qui reçoit 2 jetons de Puissance.",
         "ss131MoveHokage": "Choisissez le personnage Hokage à déplacer.",
         "ss131MoveDestination": "Choisissez la mission de destination.",
-        "ss133PlaySummon": "Choisissez l'Invocation à jouer dans cette mission en payant 2 de moins."
+        "ss133PlaySummon": "Choisissez l'Invocation à jouer dans cette mission en payant 2 de moins.",
+        "ss135DiscardThenHide": "Défausser la carte du dessus de votre pioche, puis cacher un ennemi moins cher qu'elle ?",
+        "ss135HideEnemy": "Choisissez le personnage ennemi à cacher, il doit coûter moins de {amount}."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",

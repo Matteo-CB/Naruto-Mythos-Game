@@ -885,7 +885,9 @@
         "ss145Threshold": "{card} ({id}): revelado, el umbral pasa a {amount} o menos.",
         "ss113Random": "{card} ({id}): el rival descarta {target} al azar.",
         "ss113Chosen": "{card} ({id}): el rival descarta {target}.",
-        "ss133Powerup": "{card} ({id}): {target} gana {amount} de Potencia al llegar."
+        "ss133Powerup": "{card} ({id}): {target} gana {amount} de Potencia al llegar.",
+        "ss135Discarded": "{card} ({id}): {target} descartada, coste {amount}.",
+        "ss135Hidden": "{card} ({id}): el personaje enemigo queda oculto."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",
@@ -1657,7 +1659,9 @@
         "ss129PowerupHokage": "Elige el personaje Hokage que recibe 2 marcadores de Potencia.",
         "ss131MoveHokage": "Elige el personaje Hokage que se moverá.",
         "ss131MoveDestination": "Elige la misión de destino.",
-        "ss133PlaySummon": "Elige la Invocación que jugarás en esta misión pagando 2 menos."
+        "ss133PlaySummon": "Elige la Invocación que jugarás en esta misión pagando 2 menos.",
+        "ss135DiscardThenHide": "¿Descartar la carta superior de tu mazo y ocultar a un enemigo más barato que ella?",
+        "ss135HideEnemy": "Elige el personaje enemigo a ocultar, debe costar menos de {amount}."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",
