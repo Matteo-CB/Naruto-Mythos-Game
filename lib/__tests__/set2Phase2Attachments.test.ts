@@ -12,6 +12,7 @@ import { EffectEngine } from '@/lib/effects/EffectEngine';
 import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import { getCardById } from '@/lib/data/cardIndex';
 import { getAllCards } from '@/lib/data/cardLoader';
+import { hasScenario } from '@/lib/cards/sim/keys';
 import type { AttachedCard, CardData, CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
 
 registerAllSetHandlers();
@@ -401,5 +402,32 @@ describe('phase 2, les clauses secondaires des equipements', () => {
     const normal = calculateEffectiveCost(s, 'player1', carte as never, 0, false);
     const revele = calculateEffectiveCost(s, 'player1', carte as never, 0, true);
     expect(normal - revele, 'un chakra de moins a la revelation').toBe(1);
+  });
+});
+
+describe('phase 2, chaque equipement doit avoir sa simulation', () => {
+  const SANS_SIMULATION_ENCORE = new Set([
+    'SS-083-UC', 'SS-084-C', 'SS-086-C', 'SS-087-UC', 'SS-088-UC', 'SS-090-UC',
+    'SS-095-UC', 'SS-096-UC', 'SS-097-UC', 'SS-098-UC', 'SS-100-C', 'SS-102-UC',
+    'SS-103-UC', 'SS-104-C', 'SS-105-UC', 'SS-106-C', 'SS-107-C', 'SS-109-UC', 'SS-110-UC',
+  ]);
+
+  it('le balayage couvre tous les equipements, pas une liste ecrite a la main', () => {
+    const manquants: string[] = [];
+    for (const carte of getAllCards()) {
+      if (carte.card_type !== 'attachment') continue;
+      if ((carte.effects ?? []).length === 0) continue;
+      if (hasScenario(carte.id)) continue;
+      if (SANS_SIMULATION_ENCORE.has(carte.id)) continue;
+      manquants.push(carte.id);
+    }
+    expect(manquants, 'un equipement sans simulation doit figurer dans la dette, jamais passer inapercu').toEqual([]);
+  });
+
+  it('la dette de simulations est explicite et ne grandit pas', () => {
+    expect(SANS_SIMULATION_ENCORE.size, 'dix-neuf equipements attendent encore leur simulation').toBe(19);
+    for (const id of SANS_SIMULATION_ENCORE) {
+      expect(getCardById(id), `${id} existe`).toBeTruthy();
+    }
   });
 });
