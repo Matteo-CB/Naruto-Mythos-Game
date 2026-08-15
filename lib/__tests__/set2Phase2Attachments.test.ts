@@ -406,11 +406,7 @@ describe('phase 2, les clauses secondaires des equipements', () => {
 });
 
 describe('phase 2, chaque equipement doit avoir sa simulation', () => {
-  const SANS_SIMULATION_ENCORE = new Set([
-    'SS-083-UC', 'SS-084-C', 'SS-086-C', 'SS-087-UC', 'SS-088-UC', 'SS-090-UC',
-    'SS-095-UC', 'SS-096-UC', 'SS-097-UC', 'SS-098-UC', 'SS-100-C', 'SS-102-UC',
-    'SS-103-UC', 'SS-104-C', 'SS-105-UC', 'SS-106-C', 'SS-107-C', 'SS-109-UC', 'SS-110-UC',
-  ]);
+  const SANS_SIMULATION_ENCORE = new Set<string>([]);
 
   it('le balayage couvre tous les equipements, pas une liste ecrite a la main', () => {
     const manquants: string[] = [];
@@ -425,7 +421,7 @@ describe('phase 2, chaque equipement doit avoir sa simulation', () => {
   });
 
   it('la dette de simulations est explicite et ne grandit pas', () => {
-    expect(SANS_SIMULATION_ENCORE.size, 'dix-neuf equipements attendent encore leur simulation').toBe(19);
+    expect(SANS_SIMULATION_ENCORE.size, 'plus aucune dette de simulation sur les equipements').toBe(0);
     for (const id of SANS_SIMULATION_ENCORE) {
       expect(getCardById(id), `${id} existe`).toBeTruthy();
     }

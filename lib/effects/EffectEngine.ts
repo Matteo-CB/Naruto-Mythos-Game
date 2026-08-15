@@ -12945,10 +12945,15 @@ export class EffectEngine {
         const choisi = deck095[index095];
         const autres095 = sommet095.filter((_, i) => i !== index095);
         const reste095 = deck095.slice(3);
+        const melangees095 = [...autres095];
+        for (let i = melangees095.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [melangees095[i], melangees095[j]] = [melangees095[j], melangees095[i]];
+        }
         newState[joueur095] = {
           ...newState[joueur095],
           hand: [...newState[joueur095].hand, choisi as never],
-          deck: [...reste095, ...autres095] as never,
+          deck: [...reste095, ...melangees095] as never,
         };
         newState.log = logAction(newState.log, newState.turn, newState.phase, joueur095,
           'EFFECT_DRAW', `The Scroll of Sealing (095): revealed ${choisi.name_fr} and added it to hand.`,

@@ -157,3 +157,17 @@ export function ninjaInfoCardsWatching(
   }
   return false;
 }
+
+export function virtualSoundFourStats(
+  mission: { attachments?: AttachedCard[] } | undefined,
+  player: PlayerID,
+): { compte: number; cout: number; puissance: number } {
+  const labos = missionCarriesAttachment(mission, DEMON_ISLAND_LAB, player);
+  let cout = 0;
+  let puissance = 0;
+  for (const labo of labos) {
+    cout += labo.card.chakra ?? 0;
+    puissance += labo.card.power ?? 0;
+  }
+  return { compte: labos.length, cout, puissance };
+}

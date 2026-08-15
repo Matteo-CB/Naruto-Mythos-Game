@@ -110,6 +110,90 @@ const FACTORIES: Record<string, Factory> = {
   'KS-110-R': (id) => ({ build: () => board({ hand: [id], e0: [{ id: 'KS-005-C', iid: 'sim-weak' }, { id: 'KS-086-C', iid: 'sim-strong' }] }), play: P1(FRESH) }),
   'KS-113-R': (id) => ({ build: () => board({ hand: [id], p1m0: ['KS-027-C', 'KS-009-C'] }), play: P1(FRESH) }),
   'KS-138-S': (id) => ({ build: () => board({ hand: [id], upgBase: { id: 'KS-063-UC', iid: 'sim-upg-base' } }), play: P1(upgrade('sim-upg-base')) }),
+  'SS-083-UC': (id) => ({
+    build: () => board({ hand: [id], e0: [{ id: 'SS-062-C', iid: 'sim-bavard' }], p1m0: ['KS-009-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-084-C': (id) => ({
+    build: () => board({ hand: [id], e0: [{ id: 'SS-010-C', iid: 'sim-charge' }], p1m0: ['KS-009-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-086-C': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['KS-009-C'], missions: 2 }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-087-UC': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-115-R'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-088-UC': (id) => ({
+    build: () => board({ hand: [id], e0: [{ id: 'SS-010-C', iid: 'sim-hote' }], p1m0: ['KS-009-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-090-UC': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-054-UC'], e0: [{ id: 'SS-010-C', iid: 'sim-donneur', tokens: 3 }] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-095-UC': (id) => ({
+    build: () => {
+      const st = board({ hand: [id], p1m0: ['SS-010-C'] });
+      st.player1.deck = ['SS-057-UC', 'KS-009-C', 'KS-010-C'].map((x) => getCharacterById(x)!).filter(Boolean);
+      return st;
+    },
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-096-UC': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-010-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-097-UC': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-010-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-098-UC': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-024-C', 'SS-010-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-100-C': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-010-C'], e0: [{ id: 'KS-005-C', iid: 'sim-cache-ennemi', hidden: true }] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-102-UC': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-010-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-103-UC': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['KS-009-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-104-C': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-010-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-105-UC': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-032-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-106-C': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-054-UC'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-107-C': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['KS-009-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-109-UC': (id) => ({
+    build: () => {
+      const st = board({ hand: [id], p1m0: ['KS-009-C'] });
+      st.player1.deck = ['KS-009-C', 'KS-010-C'].map((x) => getCharacterById(x)!).filter(Boolean);
+      return st;
+    },
+    play: P1(FRESH), noMinimize: true,
+  }),
+  'SS-110-UC': (id) => ({
+    build: () => board({ hand: [id], p1m0: ['SS-010-C'] }),
+    play: P1(FRESH), noMinimize: true,
+  }),
   'SS-001-UC': (id) => ({
     build: () => board({ hand: [id], p1m0: ['SS-010-C', 'SS-024-C'] }),
     play: P1(FRESH),
