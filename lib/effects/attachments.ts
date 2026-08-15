@@ -5,7 +5,7 @@ import { getEffectHandler } from '@/lib/effects/EffectRegistry';
 import type { EffectContext } from '@/lib/effects/EffectTypes';
 import { characterHasGroup } from '@/lib/effects/groupUtils';
 import { isFirstCardPlayedThisRound, withFirstStrikeStatus } from '@/lib/engine/rules/firstStrike';
-import { artisanVillageCount } from '@/lib/effects/handlers/SS/attachmentStatics';
+import { artisanVillageCount, cannotReceiveOtherAttachments } from '@/lib/effects/handlers/SS/attachmentStatics';
 
 function artisanVillageReward(
   state: GameState,
@@ -306,6 +306,7 @@ export function getCharacterAttachTargets(
       if (c.controlledBy !== proprietaire) continue;
       if ((c.card as CardData).card_type === 'attachment') continue;
       if (!hostMatchesAttachSpec(c, spec)) continue;
+      if (cannotReceiveOtherAttachments(c)) continue;
       cibles.push(c);
     }
   }

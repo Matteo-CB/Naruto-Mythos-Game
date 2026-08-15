@@ -145,3 +145,15 @@ export function weightsPowerupTargets(state: GameState, player: PlayerID): Chara
   }
   return cibles;
 }
+
+export function ninjaInfoCardsWatching(
+  mission: { player1Characters?: CharacterInPlay[]; player2Characters?: CharacterInPlay[] } | undefined,
+  viewer: PlayerID,
+): boolean {
+  const side = viewer === 'player1' ? 'player1Characters' : 'player2Characters';
+  for (const char of mission?.[side] ?? []) {
+    if (char.isHidden) continue;
+    if (attachmentsOn(char).some((a) => a.owner === viewer && isSs(a.card, NINJA_INFO_CARDS))) return true;
+  }
+  return false;
+}

@@ -5,7 +5,7 @@ import { teamTrainingBonus, missionCarries, SS_MISSION_HIGH_PRIORITY } from '../
 import { generateInstanceId } from '../utils/id';
 import { EffectEngine } from '../../effects/EffectEngine';
 import { isMovementBlockedByKurenai, applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
-import { missionPointBonus } from '../../effects/handlers/SS/attachmentStatics';
+import { missionPointBonus, textIsBlanked } from '../../effects/handlers/SS/attachmentStatics';
 
 const RANK_ORDER = ['D', 'C', 'B', 'A'] as const;
 
@@ -343,7 +343,7 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
 }
 
 
-function collectScoreEffectSources(
+export function collectScoreEffectSources(
   state: GameState,
   player: PlayerID,
   missionIndex: number,
@@ -399,6 +399,7 @@ function collectScoreEffectSources(
 
   for (const char of chars) {
     if (char.isHidden) continue;
+    if (textIsBlanked(char)) continue;
     if (processed.includes(char.instanceId)) continue; // Already resolved
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     const hasCharScore = (topCard.effects ?? []).some((e) => e.type === 'SCORE');

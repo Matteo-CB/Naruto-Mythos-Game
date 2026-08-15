@@ -40,6 +40,7 @@ import { triggerOnDefeatEffects } from '../effects/onDefeatTriggers';
 import { ss000FinalizeSearch } from '../effects/handlers/SS/ss000Search';
 import { getEffectivePower } from '../effects/powerUtils';
 import { isCopyableEffect } from '../effects/handlers/KS/shared/copyExclusions';
+import { ninjaInfoCardsWatching } from '../effects/handlers/SS/attachmentStatics';
 
 
 function collectCharInstanceIds(state: GameState): Set<string> {
@@ -1842,7 +1843,7 @@ export class GameEngine {
         chars.map((c) => {
           const isOwn = c.controlledBy === player;
           
-          const canSee = isOwn || !c.isHidden || c.wasRevealedAtLeastOnce;
+          const canSee = isOwn || !c.isHidden || c.wasRevealedAtLeastOnce || ninjaInfoCardsWatching(mission, player);
           let power = 0;
           try { power = calculateCharacterPower(state, c, side); } catch { /* prevent crash */ }
           const topCard = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;

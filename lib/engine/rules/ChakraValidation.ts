@@ -176,6 +176,10 @@ export function calculateEffectiveCost(
     }
 
     
+    if (String(card.set) === 'SS' && Number(card.number) === 86 && effect.description.includes('hidden paying 1 less')) {
+      if (isReveal) cost = Math.max(0, cost - 1);
+    }
+
     if ((card.set === 'KS' && card.number === 75) && effect.description.includes('hidden paying 2 less')) {
       
       if (isReveal) {

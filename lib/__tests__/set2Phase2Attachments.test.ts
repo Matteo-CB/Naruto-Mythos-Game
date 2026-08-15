@@ -4,6 +4,8 @@ import { calculateContinuousChakraBonus, amplifiedPowerup } from '@/lib/effects/
 import { applyStartOfRoundTriggers } from '@/lib/engine/rules/startOfRoundTriggers';
 import { parseAttachSpec, getCharacterAttachTargets, attachCardToCharacter } from '@/lib/effects/attachments';
 import { plannedReinforcementsEndOfRound } from '@/lib/engine/phases/EndPhase';
+import { collectScoreEffectSources } from '@/lib/engine/phases/MissionPhase';
+import { GameEngine } from '@/lib/engine/GameEngine';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { registerAllSetHandlers } from '@/lib/effects/handlers';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
@@ -360,5 +362,44 @@ describe('phase 2, la Bombe Eclair rend son porteur definitivement muet', () => 
 
     const apres = EffectEngine.resolveRevealEffects(s, 'player2', cible, 0, true);
     expect(apres.pendingEffects.length, 'meme une embuscade reste muette').toBe(0);
+  });
+});
+
+describe('phase 2, les clauses secondaires des equipements', () => {
+  it('le Paradis du Batifolage ferme la place a tout autre equipement', () => {
+    const libre = simChar('SS-010-C', { owner: 'player1' });
+    const occupe = equipe(simChar('SS-009-C', { owner: 'player1' }), ['SS-088-UC']);
+    const s = buildSimState({ p1: [libre, occupe], p2: [], missions: 1 });
+
+    const cibles = getCharacterAttachTargets(s, 'player1', 0, getCardById('SS-080-C') as CardData).map((c) => c.instanceId);
+    expect(cibles, 'le porteur du livre n est plus proposable').toEqual([libre.instanceId]);
+  });
+
+  it('les Fiches Ninja laissent voir les caches adverses de la mission', () => {
+    const porteur = simChar('SS-010-C', { owner: 'player1' });
+    const cache = simChar('SS-009-C', { owner: 'player2', hidden: true });
+    const sans = buildSimState({ p1: [porteur], p2: [cache], missions: 1 });
+    const avec = buildSimState({ p1: [equipe(porteur, ['SS-100-C'])], p2: [cache], missions: 1 });
+
+    const vuSans = GameEngine.getVisibleState(sans, 'player1').activeMissions[0].player2Characters[0];
+    const vuAvec = GameEngine.getVisibleState(avec, 'player1').activeMissions[0].player2Characters[0];
+    expect(vuSans.card, 'sans les fiches, la carte reste secrete').toBeUndefined();
+    expect(vuAvec.card, 'avec les fiches, on la voit').toBeTruthy();
+  });
+
+  it('un porteur enfume ne declenche plus son effet SCORE', () => {
+    const marqueur = simChar('KS-081-C', { owner: 'player1' });
+    const enfume = equipe(marqueur, ['SS-083-UC'], 'player2');
+    const s = buildSimState({ p1: [enfume], p2: [], missions: 1 });
+    const sources = collectScoreEffectSources(s, 'player1', 0);
+    expect(sources.some((x) => x.cardId === 'KS-081-C'), 'son SCORE est efface comme le reste').toBe(false);
+  });
+
+  it('la Bombe Fumigene se revele pour un chakra de moins', () => {
+    const s = buildSimState({ p1: [], p2: [], missions: 1 });
+    const carte = getCardById('SS-086-C') as CardData;
+    const normal = calculateEffectiveCost(s, 'player1', carte as never, 0, false);
+    const revele = calculateEffectiveCost(s, 'player1', carte as never, 0, true);
+    expect(normal - revele, 'un chakra de moins a la revelation').toBe(1);
   });
 });
