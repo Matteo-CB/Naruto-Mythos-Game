@@ -6,7 +6,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { confirmFirst } from './confirmFirst';
 
 export const IRUKA_140 = 'SS-140-R';
-export const IRUKA_140_VARIANTS = [IRUKA_140, 'SS-140-RA', 'SS-140-CHIBIV'];
+export const IRUKA_140_VARIANTS = [IRUKA_140, 'SS-140-CHIBIV'];
 export const IRUKA_140_REDUCTION = 2;
 export const NARUTO_UZUMAKI = 'NARUTO UZUMAKI';
 

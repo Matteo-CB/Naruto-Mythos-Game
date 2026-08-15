@@ -16,10 +16,10 @@ export const HASHIRAMA_129 = 'SS-129-R';
 export const TOBIRAMA_131 = 'SS-131-R';
 export const HIRUZEN_133 = 'SS-133-R';
 
-export const SHINO_113_VARIANTS = [SHINO_113, 'SS-113-RA'];
-export const HASHIRAMA_129_VARIANTS = [HASHIRAMA_129, 'SS-129-RA'];
-export const TOBIRAMA_131_VARIANTS = [TOBIRAMA_131, 'SS-131-RA'];
-export const HIRUZEN_133_VARIANTS = [HIRUZEN_133, 'SS-133-RA'];
+export const SHINO_113_VARIANTS = [SHINO_113];
+export const HASHIRAMA_129_VARIANTS = [HASHIRAMA_129];
+export const TOBIRAMA_131_VARIANTS = [TOBIRAMA_131];
+export const HIRUZEN_133_VARIANTS = [HIRUZEN_133];
 
 export const HOKAGE = 'Hokage';
 export const SUMMON = 'Summon';
