@@ -8,6 +8,8 @@ import { shinigami057BeforePower } from '@/lib/engine/phases/MissionPhase';
 import { triggerOnPlayReactions } from '@/lib/effects/ContinuousEffects';
 import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import { getCardById } from '@/lib/data/cardIndex';
+import { GameEngine } from '@/lib/engine/GameEngine';
+import { awaitsEffectImplementation } from '@/lib/cards/sim/pendingImplementation';
 import type { CardData, CharacterInPlay, GameState } from '@/lib/engine/types';
 
 function puissance(state: GameState, char: CharacterInPlay, owner: 'player1' | 'player2' = 'player1'): number {
@@ -219,5 +221,112 @@ describe('phase 1, obligations de fin et de décompte', () => {
     const choix = apres.pendingEffects.find((p) => p.targetSelectionType === 'SS057_DEFEAT_BEFORE_POWER');
     expect(choix, 'un choix est proposé').toBeTruthy();
     expect(choix!.validTargets.length, 'les deux ennemis sont proposés').toBe(2);
+  });
+});
+
+describe('phase 1, la source doit cesser d agir quand elle disparait', () => {
+  it('Iruka 024 ne donne son chakra qu avec un Naruto dans sa mission', () => {
+    const iruka = simChar('SS-024-C', { owner: 'player1' });
+    const seul = buildSimState({ p1: [iruka], p2: [], missions: 1 });
+    expect(calculateContinuousChakraBonus(seul, 'player1', 0, iruka), 'sans Naruto, rien').toBe(0);
+
+    const naruto = simChar('SS-005-C', { owner: 'player1' });
+    const avec = buildSimState({ p1: [iruka, naruto], p2: [], missions: 1 });
+    expect(calculateContinuousChakraBonus(avec, 'player1', 0, iruka), 'avec Naruto, +1').toBe(1);
+
+    const cache = simChar('SS-005-C', { owner: 'player1', hidden: true });
+    const avecCache = buildSimState({ p1: [iruka, cache], p2: [], missions: 1 });
+    expect(calculateContinuousChakraBonus(avecCache, 'player1', 0, iruka), 'un Naruto caché n a pas de nom visible').toBe(0);
+  });
+
+  it('une aura cesse quand sa source est cachee', () => {
+    const gozu = simChar('SS-069-UC', { owner: 'player1' });
+    const meizuVisible = simChar('SS-070-UC', { owner: 'player1' });
+    const meizuCache = { ...meizuVisible, isHidden: true, wasRevealedAtLeastOnce: false };
+    const seul = buildSimState({ p1: [gozu], p2: [], missions: 1 });
+    const visible = buildSimState({ p1: [gozu, meizuVisible], p2: [], missions: 1 });
+    const cache = buildSimState({ p1: [gozu, meizuCache], p2: [], missions: 1 });
+
+    expect(puissance(visible, gozu) - puissance(seul, gozu), 'le frere visible donne +2').toBe(2);
+    expect(puissance(cache, gozu), 'un frere cache ne donne rien').toBe(puissance(seul, gozu));
+  });
+
+  it('une source cachee n applique plus sa propre aura', () => {
+    const konohamaru = simChar('SS-062-C', { owner: 'player1' });
+    const udon = simChar('SS-063-C', { owner: 'player1' });
+    const visible = buildSimState({ p1: [konohamaru, udon], p2: [], missions: 1 });
+    const konohamaruCache = { ...konohamaru, isHidden: true, wasRevealedAtLeastOnce: false };
+    const cache = buildSimState({ p1: [konohamaruCache, udon], p2: [], missions: 1 });
+
+    const imprime = getCardById('SS-062-C') as CardData;
+    expect(puissance(visible, konohamaru), 'visible, il compte son camarade').toBe((imprime.power ?? 0) + 1);
+    expect(puissance(cache, konohamaruCache), 'cache, il vaut zero comme toute carte face cachee').toBe(0);
+  });
+
+  it('Itachi 054 retrouve sa puissance quand Sasuke quitte la mission', () => {
+    const itachi = simChar('SS-054-UC', { owner: 'player1' });
+    const sasuke = simChar('SS-126-R', { owner: 'player2' });
+    const avec = buildSimState({ p1: [itachi], p2: [sasuke], missions: 1 });
+    const sans = buildSimState({ p1: [itachi], p2: [], missions: 1 });
+    const cacheState = buildSimState({ p1: [itachi], p2: [{ ...sasuke, isHidden: true, wasRevealedAtLeastOnce: false }], missions: 1 });
+
+    expect(puissance(avec, itachi), 'le duel retire 3').toBe(puissance(sans, itachi) - 3);
+    expect(puissance(cacheState, itachi), 'un Sasuke cache n a pas de nom visible').toBe(puissance(sans, itachi));
+  });
+
+  it('la remise de Sansho 067 disparait avec elle', () => {
+    const sansho = simChar('SS-067-C', { owner: 'player1' });
+    const curry = getCardById('SS-082-C') as CardData;
+    const avec = buildSimState({ p1: [sansho], p2: [], missions: 1 });
+    const sans = buildSimState({ p1: [], p2: [], missions: 1 });
+    const cache = buildSimState({ p1: [{ ...sansho, isHidden: true, wasRevealedAtLeastOnce: false }], p2: [], missions: 1 });
+
+    expect(calculateEffectiveCost(avec, 'player1', curry as never, 0, false)).toBe(Math.max(0, (curry.chakra ?? 0) - 1));
+    expect(calculateEffectiveCost(sans, 'player1', curry as never, 0, false), 'sans elle, plein tarif').toBe(curry.chakra);
+    expect(calculateEffectiveCost(cache, 'player1', curry as never, 0, false), 'cachee, elle ne remise plus').toBe(curry.chakra);
+  });
+
+  it('Might Guy 116 ne renforce personne quand il est cache', () => {
+    const guy = simChar('SS-116-R', { owner: 'player1' });
+    const lee = avecEquipement(simChar('SS-115-R', { owner: 'player1' }), 'SS-087-UC');
+    const cacheState = buildSimState({ p1: [{ ...guy, isHidden: true, wasRevealedAtLeastOnce: false }, lee], p2: [], missions: 1 });
+
+    const apres = applyStartOfRoundTriggers(cacheState);
+    const leeApres = apres.activeMissions[0].player1Characters.find((c) => c.instanceId === lee.instanceId)!;
+    expect(leeApres.powerTokens, 'aucun jeton distribue par une source cachee').toBe(0);
+  });
+
+  it('Gato 075 ne paie plus quand il est cache', () => {
+    const gato = simChar('SS-075-UC', { owner: 'player1' });
+    const rogue = simChar('SS-054-UC', { owner: 'player1' });
+    const s = buildSimState({ p1: [{ ...gato, isHidden: true, wasRevealedAtLeastOnce: false }, rogue], p2: [], missions: 1, chakra1: 3 });
+
+    const apres = triggerOnPlayReactions(s, 'player1', 0, false, rogue.instanceId);
+    expect(apres.player1.chakra, 'aucun chakra gagne').toBe(s.player1.chakra);
+  });
+});
+
+describe('phase 1, chaque statique annonce sa presence en arrivant', () => {
+  const PHASE1 = [
+    'SS-001-UC', 'SS-010-C', 'SS-015-UC', 'SS-024-C', 'SS-026-C', 'SS-027-UC', 'SS-054-UC',
+    'SS-057-UC', 'SS-061-C', 'SS-062-C', 'SS-066-C', 'SS-067-C', 'SS-069-UC', 'SS-070-UC',
+    'SS-075-UC', 'SS-116-R', 'SS-132-R',
+  ];
+
+  it('les dix-sept cartes ecrivent une ligne de journal a leur arrivee', () => {
+    const muettes: string[] = [];
+    for (const id of PHASE1) {
+      const allie = simChar('KS-009-C', { owner: 'player1' });
+      const depart = buildSimState({ p1: [allie], p2: [], missions: 1, hand1: [id], chakra1: 20 });
+      const apres = GameEngine.applyAction(depart, 'player1', { type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0 } as never);
+      const nouvelles = apres.log.slice(depart.log.length);
+      if (!nouvelles.some((l) => l.action === 'EFFECT_CONTINUOUS')) muettes.push(id);
+    }
+    expect(muettes, 'aucune ne doit arriver en silence').toEqual([]);
+  });
+
+  it('aucune des dix-sept n attend encore son implementation', () => {
+    const restantes = PHASE1.filter((id) => awaitsEffectImplementation(id));
+    expect(restantes, 'la phase 1 est entierement sortie de la file d attente').toEqual([]);
   });
 });
