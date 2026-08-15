@@ -119,9 +119,10 @@ function kisame055(type: string) {
   };
 }
 
-function asuma013(type: string) {
+function asuma013(type: string, exigeLAmbush = false) {
   return (ctx: EffectContext): EffectResult => {
-    const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+    const { state, sourcePlayer, sourceCard, sourceMissionIndex, wasRevealed } = ctx;
+    if (exigeLAmbush && !wasRevealed) return { state };
     if (!leplusFortEstDans(state, sourcePlayer, sourceMissionIndex)) {
       return refus(state, sourcePlayer,
         'Asuma Sarutobi (013): the strongest enemy character is not in this mission.', 'ASUMA SARUTOBI', ASUMA_013);
@@ -136,5 +137,5 @@ export function registerAmbushSet5Handlers(): void {
   registerEffect(KISAME_055, 'AMBUSH', kisame055('SS055_CONFIRM_AMBUSH'));
   registerEffect(KISAME_055, 'UPGRADE', kisame055('SS055_CONFIRM_UPGRADE'));
   registerEffect(ASUMA_013, 'AMBUSH', asuma013('SS013_CONFIRM_AMBUSH'));
-  registerEffect(ASUMA_013, 'UPGRADE', asuma013('SS013_CONFIRM_UPGRADE'));
+  registerEffect(ASUMA_013, 'UPGRADE', asuma013('SS013_CONFIRM_UPGRADE', true));
 }

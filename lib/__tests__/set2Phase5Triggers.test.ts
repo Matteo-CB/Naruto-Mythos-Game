@@ -145,6 +145,37 @@ describe('Asuma Sarutobi 013, frapper le plus fort', () => {
     expect(joue.log.some((l) => l.messageKey === 'game.log.effect.noTarget'), 'le refus est journalise').toBe(true);
   });
 
+  it('revele en amelioration, l_AMBUSH puis sa repetition donnent dix jetons', () => {
+    const asuma = simChar('SS-013-UC', { owner: 'player1', instanceId: 'sim-asuma', hidden: true });
+    asuma.stack = [getCardById('SS-012-C') as never as CharacterCard, getCardById('SS-013-UC') as never as CharacterCard];
+    const fort = simChar('KS-104-R', { owner: 'player2', instanceId: 'sim-fort' });
+    const s = buildSimState({ p1: [asuma], p2: [fort], missions: 1, chakra1: 0 });
+
+    const visible = {
+      ...s,
+      activeMissions: s.activeMissions.map((m) => ({
+        ...m,
+        player1Characters: m.player1Characters.map((c) => c.instanceId === 'sim-asuma'
+          ? { ...c, isHidden: false, wasRevealedAtLeastOnce: true } : c),
+      })),
+    };
+    const retourne = { ...asuma, isHidden: false, wasRevealedAtLeastOnce: true };
+    const fin = jusquAuBout(EffectEngine.resolveRevealUpgradeEffects(visible, 'player1', retourne, 0, true), 14);
+
+    expect(charDe(fin, 'sim-asuma')?.powerTokens, 'cinq pour l_AMBUSH, cinq pour la repetition').toBe(10);
+  });
+
+  it('jouee en amelioration sans revelation, la repetition ne se produit pas', () => {
+    const asuma = simChar('SS-013-UC', { owner: 'player1', instanceId: 'sim-asuma' });
+    asuma.stack = [getCardById('SS-012-C') as never as CharacterCard, getCardById('SS-013-UC') as never as CharacterCard];
+    const fort = simChar('KS-104-R', { owner: 'player2', instanceId: 'sim-fort' });
+    const s = buildSimState({ p1: [asuma], p2: [fort], missions: 1, chakra1: 0 });
+
+    const fin = jusquAuBout(EffectEngine.resolvePlayEffects(s, 'player1', asuma, 0, true), 14);
+    expect(charDe(fin, 'sim-asuma')?.powerTokens, 'sans AMBUSH, rien a repeter').toBe(0);
+    expect(fin.log.length, 'et pas un mot dans le journal').toBe(0);
+  });
+
   it('les egalites comptent toutes comme le plus fort', () => {
     const asuma = simChar('SS-013-UC', { owner: 'player1', instanceId: 'sim-asuma', hidden: true });
     const a = simChar('KS-104-R', { owner: 'player2', instanceId: 'sim-a' });
