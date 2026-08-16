@@ -54,7 +54,7 @@ function naruto133MainHandler(ctx: EffectContext): EffectResult {
     validTargets: [ctx.sourceCard.instanceId],
     description: JSON.stringify({
       missionIndex: ctx.sourceMissionIndex,
-      useDefeat: false,
+      useDefeat: canTargetHidden,
     }),
     descriptionKey: "game.effect.desc.naruto133ConfirmMain",
   };
@@ -113,10 +113,11 @@ export function checkTarget2Only(
   };
 }
 
+const NARUTO_133_IMPRESSIONS = ["KS-133-S", "KS-133-SV", "KS-133-MV", "KS-133_2-MV"];
+
 export function registerNaruto133Handlers(): void {
-  registerEffect("KS-133-S", "MAIN", naruto133MainHandler);
-  registerEffect("KS-133-S", "UPGRADE", (ctx) => ({ state: ctx.state }));
-  registerEffect("KS-133-MV", "MAIN", naruto133MainHandler);
-  registerEffect("KS-133_2-MV", "MAIN", naruto133MainHandler);
-  registerEffect("KS-133_2-MV", "UPGRADE", (ctx) => ({ state: ctx.state }));
+  for (const id of NARUTO_133_IMPRESSIONS) {
+    registerEffect(id, "MAIN", naruto133MainHandler);
+    registerEffect(id, "UPGRADE", (ctx) => ({ state: ctx.state }));
+  }
 }

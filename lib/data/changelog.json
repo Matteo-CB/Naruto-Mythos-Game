@@ -18,9 +18,13 @@
         "fix",
         "fix",
         "fix",
+        "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "NARUTO UZUMAKI Rasengan 133 Secret joue en amelioration vainc de nouveau ses cibles au lieu de les cacher, et atteint les personnages caches.",
+        "NARUTO UZUMAKI Rasengan 133 Secret numerotee n'avait aucun effet: elle se comporte desormais comme la carte de base.",
         "SHINIGAMI 057 Peu commune ne bloque plus le decompte: les points repartaient a zero pour le reste de la partie.",
         "SHINIGAMI 057 Peu commune frappe de nouveau a chaque manche, et non une seule fois par partie.",
         "Le journal se ferme de nouveau quand l'indicateur de connexion est affiche.",
@@ -32,6 +36,8 @@
         "HASHIRAMA SENJU 129 Rare et TOBIRAMA SENJU 131 Rare peuvent enfin s'ameliorer par-dessus un allie quand Orochimaru est dans la mission."
       ],
       "changes_en": [
+        "NARUTO UZUMAKI Rasengan 133 Secret played as an upgrade defeats its targets again instead of hiding them, and can reach hidden characters.",
+        "NARUTO UZUMAKI Rasengan 133 Secret numbered had no effect at all: it now behaves like the base card.",
         "SHINIGAMI 057 Uncommon no longer freezes scoring: no points at all were awarded for the rest of the game.",
         "SHINIGAMI 057 Uncommon strikes again every round, instead of only once per game.",
         "The log can be closed again while the connection indicator is showing.",
@@ -43,6 +49,8 @@
         "HASHIRAMA SENJU 129 Rare and TOBIRAMA SENJU 131 Rare can finally upgrade over an ally when Orochimaru is in the mission."
       ],
       "changes_es": [
+        "NARUTO UZUMAKI Rasengan 133 Secreta jugada como mejora vuelve a derrotar a sus objetivos en vez de ocultarlos, y alcanza a los personajes ocultos.",
+        "NARUTO UZUMAKI Rasengan 133 Secreta numerada no tenia ningun efecto: ahora se comporta como la carta base.",
         "SHINIGAMI 057 Poco comun ya no bloquea el recuento: no se daba ningun punto durante el resto de la partida.",
         "SHINIGAMI 057 Poco comun vuelve a actuar cada ronda, en vez de una sola vez por partida.",
         "El registro vuelve a cerrarse cuando se muestra el indicador de conexion.",
@@ -54,6 +62,8 @@
         "HASHIRAMA SENJU 129 Rara y TOBIRAMA SENJU 131 Rara por fin pueden mejorar sobre un aliado cuando Orochimaru esta en la mision."
       ],
       "changes_pt": [
+        "NARUTO UZUMAKI Rasengan 133 Secreta jogada como melhoria volta a derrotar seus alvos em vez de escondê-los, e alcança personagens escondidos.",
+        "NARUTO UZUMAKI Rasengan 133 Secreta numerada não tinha efeito algum: agora se comporta como a carta base.",
         "SHINIGAMI 057 Incomum não trava mais a contagem: nenhum ponto era dado no resto da partida.",
         "SHINIGAMI 057 Incomum age de novo a cada rodada, em vez de apenas uma vez por partida.",
         "O registro volta a fechar quando o indicador de conexão está visível.",
@@ -65,6 +75,8 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara enfim podem melhorar sobre um aliado quando Orochimaru está na missão."
       ],
       "changes_it": [
+        "NARUTO UZUMAKI Rasengan 133 Segreta giocata come miglioramento sconfigge di nuovo i bersagli invece di nasconderli, e raggiunge i personaggi nascosti.",
+        "NARUTO UZUMAKI Rasengan 133 Segreta numerata non aveva alcun effetto: ora si comporta come la carta base.",
         "SHINIGAMI 057 Non comune non blocca più il conteggio: nessun punto veniva assegnato per il resto della partita.",
         "SHINIGAMI 057 Non comune colpisce di nuovo a ogni round, invece di una sola volta per partita.",
         "Il registro si chiude di nuovo quando è visibile l indicatore di connessione.",
@@ -76,6 +88,8 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara possono finalmente migliorare su un alleato quando Orochimaru è nella missione."
       ],
       "changes_pl": [
+        "NARUTO UZUMAKI Rasengan 133 Sekretna zagrana jako ulepszenie znów pokonuje cele zamiast je ukrywać i sięga ukrytych postaci.",
+        "NARUTO UZUMAKI Rasengan 133 Sekretna numerowana nie miała żadnego efektu: działa teraz jak karta podstawowa.",
         "SHINIGAMI 057 Niepospolita nie blokuje już liczenia punktów: do końca partii nie przyznawano żadnych.",
         "SHINIGAMI 057 Niepospolita działa znów w każdej rundzie, a nie raz na partię.",
         "Dziennik znów można zamknąć, gdy widoczny jest wskaźnik połączenia.",
@@ -87,6 +101,8 @@
         "HASHIRAMA SENJU 129 Rzadka i TOBIRAMA SENJU 131 Rzadka mogą wreszcie ulepszyć sojusznika, gdy Orochimaru jest w misji."
       ],
       "changes_ja": [
+        "うずまきナルト 螺旋丸 133 シークレットを重ねて出したとき、隠すのではなく再び撃破し、裏向きのキャラにも届きます。",
+        "うずまきナルト 螺旋丸 133 シークレットのナンバリング版に効果がありませんでした。基本カードと同じ挙動になりました。",
         "死神 057 アンコモンが得点計算を止めなくなりました。以降の得点が一切入らなくなっていました。",
         "死神 057 アンコモンが毎ラウンド発動します。1試合に1回だけではなくなりました。",
         "接続表示が出ているときにも記録を閉じられるようになりました。",
