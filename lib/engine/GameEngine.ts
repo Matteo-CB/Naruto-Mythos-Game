@@ -369,6 +369,10 @@ export class GameEngine {
             if (newState.missionScoringProgress) {
               newState = resumeMissionScoring(newState);
               if (newState.pendingActions.length > 0) break;
+            } else if (newState.phase === 'mission' && !newState.missionScoringComplete) {
+              newState = executeMissionPhase(newState);
+              if (newState.pendingActions.length > 0) break;
+              if (newState.missionScoringProgress) break;
             }
             newState.missionScoringComplete = true;
           }
@@ -550,7 +554,9 @@ export class GameEngine {
     
     newState.activeMissions = newState.activeMissions.map(m => ({ ...m, wonBy: null, highPriorityPassDone: false }));
 
-    
+    newState.missionPhaseShinigamiIds = [];
+
+
     newState = executeMissionPhase(newState);
 
     
