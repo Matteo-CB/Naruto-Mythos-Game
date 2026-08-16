@@ -50,9 +50,18 @@ describe('cleanupOldTournaments', () => {
     expect(pending.createdAt.lt.getTime()).toBe(NOW - TOURNAMENT_RETENTION_MS);
     expect(pending.OR).toHaveLength(2);
 
-    const inProgress = arg.where.OR[3] as { status: string; createdAt: { lt: Date } };
+    const inProgress = arg.where.OR[3] as {
+      status: string;
+      startedAt?: { lt: Date };
+      createdAt?: { lt: Date };
+    };
     expect(inProgress.status).toBe('in_progress');
-    expect(inProgress.createdAt.lt.getTime()).toBe(NOW - TOURNAMENT_RETENTION_MS);
+    expect(
+      inProgress.createdAt,
+      'a running tournament must never be purged on its creation age: one scheduled days in advance would be wiped mid-event',
+    ).toBeUndefined();
+    expect(inProgress.startedAt!.lt.getTime(), 'it ages from the moment it actually started')
+      .toBe(NOW - TOURNAMENT_RETENTION_MS);
   });
 
   it('counts by status and forwards the delete to prisma', async () => {

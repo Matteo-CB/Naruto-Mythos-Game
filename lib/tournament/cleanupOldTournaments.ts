@@ -24,7 +24,7 @@ export async function cleanupOldTournaments(now: number = Date.now()): Promise<C
             { scheduledStartAt: { lt: nowDate } },
           ],
         },
-        { status: 'in_progress', createdAt: { lt: cutoff } },
+        { status: 'in_progress', startedAt: { lt: cutoff } },
       ],
     },
     select: { id: true, status: true },
