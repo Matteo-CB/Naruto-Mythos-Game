@@ -52,6 +52,21 @@ describe('attachments are laid out exactly like the printed reference', () => {
     expect(STRIP).toContain('const FAN_PCT = 5;');
   });
 
+  it('posing an attachment really redraws the slot, it is part of the memo comparison', () => {
+    expect(LANE, 'a cheap signature identifies the attachments carried')
+      .toContain('export function attachmentsSignature');
+
+    const comparateurs = LANE.split('(prev, next) =>').slice(1);
+    expect(comparateurs.length, 'a character slot and a mission lane are both memoised').toBe(2);
+    for (const bloc of comparateurs) {
+      const corps = bloc.split(');')[0];
+      expect(
+        corps.includes('attachmentsSignature('),
+        `this comparator ignores attachments, so posing one would not redraw:\n${corps.trim()}`,
+      ).toBe(true);
+    }
+  });
+
   it('it drifts towards the empty side of its row, never past the clipped edge', () => {
     expect(STRIP, 'the vertical drift follows the row the host sits in')
       .toContain('const towardsFreeSpace = hostIsOwn ? 1 : -1;');

@@ -20,6 +20,11 @@ function boardKeyOf(char: VisibleCharacter): string {
   return `${char.instanceId}-${face?.id ?? 'hidden'}`;
 }
 
+export function attachmentsSignature(list: { instanceId: string; card: { id: string } }[] | undefined): string {
+  if (!list || list.length === 0) return '';
+  return list.map((a) => `${a.instanceId}:${a.card.id}`).join('|');
+}
+
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { AttachmentStrip, SLOT_LAYER, SLOT_WITH_ATTACHMENT_LAYER, CHARACTER_VISIBLE_RATIO, MISSION_VISIBLE_RATIO } from './AttachmentStrip';
 import { FlashBombSmoke } from './FlashBombSmoke';
@@ -141,7 +146,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       right: visible.some((a) => a.owner === myPlayer) ? peek : 0,
       left: visible.some((a) => a.owner !== myPlayer) ? peek : 0,
     };
-  }, [character.attachments, dims.missionCard.w, myPlayer]);
+  }, [character.attachments, dims.missionCard.h, myPlayer]);
 
   return (
     <>
@@ -441,6 +446,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     prev.character.controlledBy === next.character.controlledBy &&
     prev.character.originalOwner === next.character.originalOwner &&
     prev.character.card?.id === next.character.card?.id &&
+    attachmentsSignature(prev.character.attachments) === attachmentsSignature(next.character.attachments) &&
     prev.isOwn === next.isOwn,
 );
 
@@ -978,5 +984,6 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
     prev.mission.player1Characters === next.mission.player1Characters &&
     prev.mission.player2Characters === next.mission.player2Characters &&
     prev.mission.card?.id === next.mission.card?.id &&
+    attachmentsSignature(prev.mission.attachments) === attachmentsSignature(next.mission.attachments) &&
     prev.mission.wonBy === next.mission.wonBy,
 );

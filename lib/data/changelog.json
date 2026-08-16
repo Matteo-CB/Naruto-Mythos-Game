@@ -21,9 +21,11 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "Un equipement pose apparait immediatement sur sa carte, au lieu d'attendre qu'il se passe autre chose sur ce personnage.",
         "Le chakra non depense est de nouveau defausse a chaque fin de manche: il s'accumulait depuis la manche 2.",
         "NARUTO UZUMAKI Rasengan 133 Secret joue en amelioration vainc de nouveau ses cibles au lieu de les cacher, et atteint les personnages caches.",
         "NARUTO UZUMAKI Rasengan 133 Secret numerotee n'avait aucun effet: elle se comporte desormais comme la carte de base.",
@@ -38,6 +40,7 @@
         "HASHIRAMA SENJU 129 Rare et TOBIRAMA SENJU 131 Rare peuvent enfin s'ameliorer par-dessus un allie quand Orochimaru est dans la mission."
       ],
       "changes_en": [
+        "An attachment shows on its card as soon as it is played, instead of waiting for something else to happen to that character.",
         "Unspent chakra is discarded again at the end of every round: it had been piling up from round 2 onwards.",
         "NARUTO UZUMAKI Rasengan 133 Secret played as an upgrade defeats its targets again instead of hiding them, and can reach hidden characters.",
         "NARUTO UZUMAKI Rasengan 133 Secret numbered had no effect at all: it now behaves like the base card.",
@@ -52,6 +55,7 @@
         "HASHIRAMA SENJU 129 Rare and TOBIRAMA SENJU 131 Rare can finally upgrade over an ally when Orochimaru is in the mission."
       ],
       "changes_es": [
+        "Un equipamiento aparece en su carta nada mas jugarlo, en vez de esperar a que le pase algo mas a ese personaje.",
         "El chakra no gastado vuelve a descartarse al final de cada ronda: se acumulaba desde la ronda 2.",
         "NARUTO UZUMAKI Rasengan 133 Secreta jugada como mejora vuelve a derrotar a sus objetivos en vez de ocultarlos, y alcanza a los personajes ocultos.",
         "NARUTO UZUMAKI Rasengan 133 Secreta numerada no tenia ningun efecto: ahora se comporta como la carta base.",
@@ -66,6 +70,7 @@
         "HASHIRAMA SENJU 129 Rara y TOBIRAMA SENJU 131 Rara por fin pueden mejorar sobre un aliado cuando Orochimaru esta en la mision."
       ],
       "changes_pt": [
+        "Um equipamento aparece na carta assim que é jogado, em vez de esperar que outra coisa aconteça com aquele personagem.",
         "O chakra não gasto volta a ser descartado no fim de cada rodada: ele se acumulava a partir da rodada 2.",
         "NARUTO UZUMAKI Rasengan 133 Secreta jogada como melhoria volta a derrotar seus alvos em vez de escondê-los, e alcança personagens escondidos.",
         "NARUTO UZUMAKI Rasengan 133 Secreta numerada não tinha efeito algum: agora se comporta como a carta base.",
@@ -80,6 +85,7 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara enfim podem melhorar sobre um aliado quando Orochimaru está na missão."
       ],
       "changes_it": [
+        "Un equipaggiamento appare sulla sua carta appena giocato, invece di attendere che succeda altro a quel personaggio.",
         "Il chakra non speso viene di nuovo scartato alla fine di ogni round: si accumulava dal round 2 in poi.",
         "NARUTO UZUMAKI Rasengan 133 Segreta giocata come miglioramento sconfigge di nuovo i bersagli invece di nasconderli, e raggiunge i personaggi nascosti.",
         "NARUTO UZUMAKI Rasengan 133 Segreta numerata non aveva alcun effetto: ora si comporta come la carta base.",
@@ -94,6 +100,7 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara possono finalmente migliorare su un alleato quando Orochimaru è nella missione."
       ],
       "changes_pl": [
+        "Wyposażenie pojawia się na karcie od razu po zagraniu, zamiast czekać, aż z postacią stanie się coś innego.",
         "Niewykorzystana czakra znów jest odrzucana na koniec każdej rundy: kumulowała się od rundy 2.",
         "NARUTO UZUMAKI Rasengan 133 Sekretna zagrana jako ulepszenie znów pokonuje cele zamiast je ukrywać i sięga ukrytych postaci.",
         "NARUTO UZUMAKI Rasengan 133 Sekretna numerowana nie miała żadnego efektu: działa teraz jak karta podstawowa.",
@@ -108,6 +115,7 @@
         "HASHIRAMA SENJU 129 Rzadka i TOBIRAMA SENJU 131 Rzadka mogą wreszcie ulepszyć sojusznika, gdy Orochimaru jest w misji."
       ],
       "changes_ja": [
+        "装備を出した瞬間にカード上へ表示されます。そのキャラに別の出来事が起きるまで待たなくなりました。",
         "使わなかったチャクラが再び毎ラウンド終了時に捨てられます。ラウンド2から持ち越されていました。",
         "うずまきナルト 螺旋丸 133 シークレットを重ねて出したとき、隠すのではなく再び撃破し、裏向きのキャラにも届きます。",
         "うずまきナルト 螺旋丸 133 シークレットのナンバリング版に効果がありませんでした。基本カードと同じ挙動になりました。",
