@@ -421,6 +421,7 @@ export class GameEngine {
               newState.endPhaseAkamaru028Ids = undefined;
               newState.endPhaseGiantSpider103Ids = undefined;
               newState.endPhaseTokensRemoved = undefined;
+              newState.endPhaseChakraReset = undefined;
               if (newState.turn >= TOTAL_TURNS) {
                 newState = GameEngine.endGame(newState);
               } else {
@@ -446,6 +447,7 @@ export class GameEngine {
             newState.endPhaseAkamaru028Ids = undefined;
             newState.endPhaseGiantSpider103Ids = undefined;
             newState.endPhaseTokensRemoved = undefined;
+            newState.endPhaseChakraReset = undefined;
             if (newState.turn >= TOTAL_TURNS) {
               newState = GameEngine.endGame(newState);
             } else {
@@ -461,6 +463,7 @@ export class GameEngine {
           newState.endPhaseAkamaru028Ids = undefined;
           newState.endPhaseGiantSpider103Ids = undefined;
           newState.endPhaseTokensRemoved = undefined;
+          newState.endPhaseChakraReset = undefined;
           if (newState.turn >= TOTAL_TURNS) {
             newState = GameEngine.endGame(newState);
           } else {
@@ -590,6 +593,7 @@ export class GameEngine {
     newState.endPhaseAkamaru028Ids = undefined;
     newState.endPhaseGiantSpider103Ids = undefined;
     newState.endPhaseTokensRemoved = undefined;
+    newState.endPhaseChakraReset = undefined;
 
     
     if (newState.turn >= TOTAL_TURNS) {
