@@ -18,6 +18,8 @@ interface AttachmentStripProps {
   onLeave?: () => void;
 }
 
+export const SLOT_LAYER = 1;
+export const SLOT_WITH_ATTACHMENT_LAYER = 3;
 export const CHARACTER_VISIBLE_RATIO = 0.32;
 export const MISSION_VISIBLE_RATIO = 0.4;
 const CHARACTER_DRIFT_PCT = 9;

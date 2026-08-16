@@ -38,6 +38,16 @@ describe('attachments are laid out exactly like the printed reference', () => {
     expect(STRIP).toContain('zIndex: 0');
   });
 
+  it('a slot carrying an attachment is lifted above its neighbours, so nothing can cover it', () => {
+    expect(STRIP, 'the two slot layers are named once and shared')
+      .toContain('export const SLOT_LAYER = 1;');
+    expect(STRIP).toContain('export const SLOT_WITH_ATTACHMENT_LAYER = 3;');
+    expect(LANE, 'a character slot lifts itself only when it carries something')
+      .toContain('zIndex: (character.attachments ?? []).length > 0 ? SLOT_WITH_ATTACHMENT_LAYER : SLOT_LAYER,');
+    expect(LANE, 'a mission slot does the same')
+      .toContain('zIndex: (mission.attachments ?? []).length > 0 ? SLOT_WITH_ATTACHMENT_LAYER : SLOT_LAYER,');
+  });
+
   it('several attachments fan out instead of hiding one another', () => {
     expect(STRIP).toContain('const FAN_PCT = 5;');
   });

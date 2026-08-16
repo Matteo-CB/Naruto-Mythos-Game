@@ -21,7 +21,7 @@ function boardKeyOf(char: VisibleCharacter): string {
 }
 
 import { normalizeImagePath } from '@/lib/utils/imagePath';
-import { AttachmentStrip, CHARACTER_VISIBLE_RATIO, MISSION_VISIBLE_RATIO } from './AttachmentStrip';
+import { AttachmentStrip, SLOT_LAYER, SLOT_WITH_ATTACHMENT_LAYER, CHARACTER_VISIBLE_RATIO, MISSION_VISIBLE_RATIO } from './AttachmentStrip';
 import { FlashBombSmoke } from './FlashBombSmoke';
 import { HoloFoilOverlay } from '@/components/cards/HoloFoilOverlay';
 import { CardArtFallback } from '@/components/cards/CardArtFallback';
@@ -201,6 +201,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         flex: '0 0 auto',
         marginRight: attachmentRoom.right + 'px',
         marginLeft: attachmentRoom.left + 'px',
+        zIndex: (character.attachments ?? []).length > 0 ? SLOT_WITH_ATTACHMENT_LAYER : SLOT_LAYER,
       }}
     >
       {(character.attachments ?? []).some((a) => a.card.id === 'SS-083-UC') && (
@@ -545,6 +546,7 @@ function MissionCardDisplay({
         border: `2px solid ${rankColors[mission.rank]}`,
         borderRadius: '6px',
         overflow: 'visible',
+        zIndex: (mission.attachments ?? []).length > 0 ? SLOT_WITH_ATTACHMENT_LAYER : SLOT_LAYER,
         cursor: 'pointer',
         boxShadow: `0 0 12px ${rankColors[mission.rank]}30, 0 4px 12px rgba(0, 0, 0, 0.5)`,
       }}
