@@ -5,12 +5,12 @@ import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import type { GameState } from '@/lib/engine/types';
 
 const SHINIGAMI = 'SS-057-UC';
-const ALLIE = 'KS-001-C';
+const ENNEMI = 'KS-001-C';
 
 function plateau(nombreDEnnemis: number): GameState {
   const p2 = [];
   for (let i = 0; i < nombreDEnnemis; i++) {
-    p2.push(simChar(ALLIE, { owner: 'player2', instanceId: `ennemi${i}` }));
+    p2.push(simChar(ENNEMI, { owner: 'player2', instanceId: `ennemi${i}` }));
   }
   const state = buildSimState({
     p1: [simChar(SHINIGAMI, { owner: 'player1', instanceId: 'shini' })],
@@ -23,38 +23,50 @@ function plateau(nombreDEnnemis: number): GameState {
   return state;
 }
 
-function pointsTotaux(state: GameState): number {
-  return state.player1.missionPoints + state.player2.missionPoints;
+function ennemisEnJeu(state: GameState): number {
+  return state.activeMissions.reduce((total, m) => total + m.player2Characters.length, 0);
+}
+
+function decompteFige(state: GameState): boolean {
+  return state.missionScoringComplete === true
+    && state.pendingActions.length === 0
+    && state.player1.missionPoints === 0
+    && state.player2.missionPoints === 0;
 }
 
 describe('Shinigami ne gele plus le decompte des points', () => {
-  it('avec une seule cible, le decompte se fait dans la foulee', () => {
+  it('avec une seule cible, il frappe et le decompte suit sans question', () => {
     const apres = executeMissionPhase(plateau(1));
     expect(apres.pendingActions.length, 'aucune question a poser').toBe(0);
-    expect(pointsTotaux(apres), 'des points ont ete marques').toBeGreaterThan(0);
+    expect(ennemisEnJeu(apres), 'la cible unique est vaincue').toBe(0);
   });
 
-  it('avec plusieurs cibles, le decompte reprend une fois la cible choisie', () => {
-    const depart = plateau(2);
-    const enAttente = executeMissionPhase(depart);
-
+  it('avec plusieurs cibles, une question est posee avant tout decompte', () => {
+    const enAttente = executeMissionPhase(plateau(2));
     expect(enAttente.pendingActions.length, 'une cible doit etre choisie').toBe(1);
-    expect(pointsTotaux(enAttente), 'rien n_est encore marque').toBe(0);
+    expect(enAttente.missionScoringComplete, 'le decompte n_est surtout pas declare fini')
+      .not.toBe(true);
+  });
 
+  it('repondre a la question ne declare plus le decompte termine sans avoir rien compte', () => {
+    const enAttente = executeMissionPhase(plateau(2));
     const question = enAttente.pendingActions[0];
+
     const apres = GameEngine.applyAction(enAttente, question.player, {
       type: 'SELECT_TARGET', pendingActionId: question.id, selectedTargets: ['ennemi0'],
     } as never);
 
-    expect(apres.pendingActions.length, 'plus rien en suspens').toBe(0);
-    expect(pointsTotaux(apres), 'le decompte a bien eu lieu apres le choix').toBeGreaterThan(0);
+    expect(ennemisEnJeu(apres), 'la cible choisie est bien vaincue').toBe(1);
+    expect(
+      decompteFige(apres),
+      'le decompte ne doit pas etre scelle a zero point sans question en cours',
+    ).toBe(false);
   });
 
-  it('le marqueur des Shinigami deja traites est remis a zero a chaque manche', () => {
+  it('le marqueur des Shinigami traites repart vide a chaque entree en phase de mission', () => {
     const state = plateau(1);
     state.missionPhaseShinigamiIds = ['shini'];
     const apres = GameEngine.transitionToMissionPhase(state);
-    expect(apres.missionPhaseShinigamiIds, 'la manche repart sur une liste vide')
-      .not.toContain('shini');
+    expect(ennemisEnJeu(apres), 'il frappe de nouveau a la manche suivante').toBe(0);
   });
 });

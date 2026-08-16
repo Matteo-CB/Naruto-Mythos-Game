@@ -15,9 +15,15 @@
         "fix",
         "fix",
         "fix",
+        "fix",
+        "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "SHINIGAMI 057 Peu commune ne bloque plus le decompte: les points repartaient a zero pour le reste de la partie.",
+        "SHINIGAMI 057 Peu commune frappe de nouveau a chaque manche, et non une seule fois par partie.",
+        "Le journal se ferme de nouveau quand l'indicateur de connexion est affiche.",
         "Un equipement pose sur un personnage adverse est de nouveau visible: il sortait par le bas et se faisait couper.",
         "POIDS 087 Peu commune ne disparait plus quand on l'attache a Rock Lee ou a un personnage Taijutsu.",
         "Poser un second equipement sur un personnage ne defausse plus l'ancien et le nouveau, seulement l'ancien.",
@@ -26,6 +32,9 @@
         "HASHIRAMA SENJU 129 Rare et TOBIRAMA SENJU 131 Rare peuvent enfin s'ameliorer par-dessus un allie quand Orochimaru est dans la mission."
       ],
       "changes_en": [
+        "SHINIGAMI 057 Uncommon no longer freezes scoring: no points at all were awarded for the rest of the game.",
+        "SHINIGAMI 057 Uncommon strikes again every round, instead of only once per game.",
+        "The log can be closed again while the connection indicator is showing.",
         "An attachment placed on an enemy character is visible again: it slid out downwards and was being cut off.",
         "WEIGHTS 087 Uncommon no longer vanishes when attached to Rock Lee or a Taijutsu character.",
         "Playing a second attachment on a character no longer discards both the old and the new one, only the old one.",
@@ -34,6 +43,9 @@
         "HASHIRAMA SENJU 129 Rare and TOBIRAMA SENJU 131 Rare can finally upgrade over an ally when Orochimaru is in the mission."
       ],
       "changes_es": [
+        "SHINIGAMI 057 Poco comun ya no bloquea el recuento: no se daba ningun punto durante el resto de la partida.",
+        "SHINIGAMI 057 Poco comun vuelve a actuar cada ronda, en vez de una sola vez por partida.",
+        "El registro vuelve a cerrarse cuando se muestra el indicador de conexion.",
         "Un equipamiento puesto en un personaje enemigo vuelve a verse: salia hacia abajo y quedaba cortado.",
         "PESAS 087 Poco comun ya no desaparece al equiparla a Rock Lee o a un personaje Taijutsu.",
         "Poner un segundo equipamiento en un personaje ya no descarta el antiguo y el nuevo, solo el antiguo.",
@@ -42,6 +54,9 @@
         "HASHIRAMA SENJU 129 Rara y TOBIRAMA SENJU 131 Rara por fin pueden mejorar sobre un aliado cuando Orochimaru esta en la mision."
       ],
       "changes_pt": [
+        "SHINIGAMI 057 Incomum não trava mais a contagem: nenhum ponto era dado no resto da partida.",
+        "SHINIGAMI 057 Incomum age de novo a cada rodada, em vez de apenas uma vez por partida.",
+        "O registro volta a fechar quando o indicador de conexão está visível.",
         "Um equipamento colocado em um personagem inimigo voltou a aparecer: ele saía para baixo e era cortado.",
         "PESOS 087 Incomum não desaparece mais ao ser anexado a Rock Lee ou a um personagem Taijutsu.",
         "Colocar um segundo equipamento em um personagem não descarta mais o antigo e o novo, apenas o antigo.",
@@ -50,6 +65,9 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara enfim podem melhorar sobre um aliado quando Orochimaru está na missão."
       ],
       "changes_it": [
+        "SHINIGAMI 057 Non comune non blocca più il conteggio: nessun punto veniva assegnato per il resto della partita.",
+        "SHINIGAMI 057 Non comune colpisce di nuovo a ogni round, invece di una sola volta per partita.",
+        "Il registro si chiude di nuovo quando è visibile l indicatore di connessione.",
         "Un equipaggiamento messo su un personaggio nemico è di nuovo visibile: usciva verso il basso e veniva tagliato.",
         "PESI 087 Non comune non sparisce più quando lo equipaggi a Rock Lee o a un personaggio Taijutsu.",
         "Mettere un secondo equipaggiamento su un personaggio non scarta più il vecchio e il nuovo, solo il vecchio.",
@@ -58,6 +76,9 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara possono finalmente migliorare su un alleato quando Orochimaru è nella missione."
       ],
       "changes_pl": [
+        "SHINIGAMI 057 Niepospolita nie blokuje już liczenia punktów: do końca partii nie przyznawano żadnych.",
+        "SHINIGAMI 057 Niepospolita działa znów w każdej rundzie, a nie raz na partię.",
+        "Dziennik znów można zamknąć, gdy widoczny jest wskaźnik połączenia.",
         "Wyposażenie założone na wrogą postać znów jest widoczne: wysuwało się w dół i było ucinane.",
         "CIĘŻARKI 087 Niepospolita nie znikają już po założeniu na Rock Lee lub postać Taijutsu.",
         "Zagranie drugiego wyposażenia na postaci nie odrzuca już starego i nowego, tylko stare.",
@@ -66,6 +87,9 @@
         "HASHIRAMA SENJU 129 Rzadka i TOBIRAMA SENJU 131 Rzadka mogą wreszcie ulepszyć sojusznika, gdy Orochimaru jest w misji."
       ],
       "changes_ja": [
+        "死神 057 アンコモンが得点計算を止めなくなりました。以降の得点が一切入らなくなっていました。",
+        "死神 057 アンコモンが毎ラウンド発動します。1試合に1回だけではなくなりました。",
+        "接続表示が出ているときにも記録を閉じられるようになりました。",
         "敵キャラに付けた装備が再び見えるようになりました。下方向にはみ出して見切れていました。",
         "おもり 087 アンコモンが、ロック・リーや体術キャラに付けても消えなくなりました。",
         "キャラに2枚目の装備を付けたとき、古い方と新しい方の両方ではなく、古い方だけが捨てられます。",

@@ -151,18 +151,13 @@ export function GameLog() {
           >
             
             <div
-              className="flex items-center justify-between px-4 py-3 shrink-0"
+              className="flex items-center gap-3 px-4 py-3 shrink-0"
               style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}
             >
-              <span
-                className="text-sm font-medium uppercase tracking-wider"
-                style={{ color: '#c4a35a' }}
-              >
-                {t('game.log.title')}
-              </span>
               <button
                 onClick={toggleGameLog}
-                className={`cursor-pointer uppercase tracking-wider font-bold ${dims.isMobile ? 'text-sm px-4 py-1.5' : 'text-xs px-3 py-1'}`}
+                aria-label={t('common.close')}
+                className={`cursor-pointer uppercase tracking-wider font-bold shrink-0 ${dims.isMobile ? 'text-sm px-4 py-1.5' : 'text-xs px-3 py-1'}`}
                 style={{
                   backgroundColor: 'rgba(179, 62, 62, 0.18)',
                   border: 'none',
@@ -171,6 +166,12 @@ export function GameLog() {
               >
                 X
               </button>
+              <span
+                className="text-sm font-medium uppercase tracking-wider"
+                style={{ color: '#c4a35a' }}
+              >
+                {t('game.log.title')}
+              </span>
             </div>
 
             <div
