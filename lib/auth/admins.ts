@@ -1,4 +1,4 @@
-export const ADMIN_USERNAMES = ['Kutxyt', 'Daiki0'] as const;
+export const ADMIN_USERNAMES = ['Kutxyt', 'Daiki0', 'John_Games_TCG'] as const;
 
 export const TOURNAMENT_OWNER_USERNAME = 'Kutxyt';
 
