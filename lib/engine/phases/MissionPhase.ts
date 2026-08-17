@@ -501,13 +501,30 @@ export function startHighPrioritySecondPass(
   missions[missionIndex] = { ...mission, highPriorityPassDone: true };
   let newState: GameState = { ...state, activeMissions: missions, missionScoringProgress: undefined };
 
-  const sources = collectScoreEffectSources(newState, player, missionIndex);
-  if (sources.length === 0) return newState;
-
   newState.log = logAction(newState.log, newState.turn, newState.phase, player, 'SCORE_REPEAT',
     'High Priority Mission (SS-004): this mission scores a second time.',
     'game.log.effect.ssMss04SecondScore',
     { card: 'Mission prioritaire', id: 'SS-004-MMS' });
+
+  const basePts = Number.isFinite(mission.basePoints) ? mission.basePoints : 1;
+  const rankPts = Number.isFinite(mission.rankBonus) ? mission.rankBonus : 0;
+  const points = basePts + rankPts + missionPointBonus(mission);
+  const ps = { ...newState[player] };
+  const prior = Number.isFinite(ps.missionPoints) ? ps.missionPoints : 0;
+  ps.missionPoints = prior + points;
+  newState = {
+    ...newState,
+    [player]: ps,
+    log: logAction(
+      newState.log, newState.turn, 'mission', player, 'WIN_MISSION',
+      `${player} scores mission ${missionIndex + 1} a second time for ${points} points. Total: ${ps.missionPoints}.`,
+      'game.log.winMission',
+      { index: missionIndex + 1, points, base: mission.basePoints, bonus: mission.rankBonus, total: ps.missionPoints },
+    ),
+  };
+
+  const sources = collectScoreEffectSources(newState, player, missionIndex);
+  if (sources.length === 0) return newState;
 
   return resolveScoreEffectsOnce(newState, player, missionIndex, rankIndex, sources);
 }

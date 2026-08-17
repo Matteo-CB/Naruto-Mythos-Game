@@ -52,19 +52,22 @@ describe('High Priority Mission scores the mission twice, SCORE effects included
     expect(scored.player1.hand.length).toBe(2);
   });
 
-  it('the mission points are awarded once: only the SCORE effects repeat', () => {
+  it('the mission scores twice in full: its points are paid twice too', () => {
     const doubled = scoreIt(board('SS-004-MMS'));
     const mission = doubled.activeMissions[0];
     const printed = (mission.basePoints ?? 0) + (mission.rankBonus ?? 0);
-    expect(doubled.player1.missionPoints, 'base plus rank, once, never doubled').toBe(printed);
+    expect(
+      doubled.player1.missionPoints,
+      'scoring a second time pays the mission a second time, not just its SCORE effects',
+    ).toBe(printed * 2);
 
     const ordinary = scoreIt(board('SS-001-MMS'));
     const ordinaryMission = ordinary.activeMissions[0];
     const ordinaryPrinted = (ordinaryMission.basePoints ?? 0) + (ordinaryMission.rankBonus ?? 0);
     expect(
-      doubled.player1.missionPoints - printed,
-      'the repeated mission pays exactly like an ordinary one of the same printed value',
-    ).toBe(ordinary.player1.missionPoints - ordinaryPrinted);
+      ordinary.player1.missionPoints,
+      'an ordinary mission still pays once',
+    ).toBe(ordinaryPrinted);
   });
 
   it('several SCORE effects on the mission all fire again in the second pass', () => {

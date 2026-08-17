@@ -29,9 +29,11 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "La mission Priorite Haute rapporte bien ses points deux fois, en plus de repeter les effets de score.",
         "TAYUYA Sceau Maudit, second stade 040 Peu commune ne pose plus d'invocation dans une mission sans Tayuya alliee.",
         "TAYUYA Sceau Maudit, second stade 040 Peu commune compte sa reduction mission par mission, et non la meilleure appliquee partout.",
         "Regarder un personnage cache montre enfin sa carte sur le plateau, au lieu de n'ecrire que son cout dans le journal.",
@@ -54,6 +56,7 @@
         "HASHIRAMA SENJU 129 Rare et TOBIRAMA SENJU 131 Rare peuvent enfin s'ameliorer par-dessus un allie quand Orochimaru est dans la mission."
       ],
       "changes_en": [
+        "The High Priority mission now pays its points twice as well, on top of repeating the SCORE effects.",
         "TAYUYA Cursemark Second State 040 Uncommon no longer plays a Summon in a mission without a friendly Tayuya.",
         "TAYUYA Cursemark Second State 040 Uncommon counts its discount mission by mission, instead of applying the best one everywhere.",
         "Looking at a hidden character finally shows its card on the board, instead of only writing its cost in the log.",
@@ -76,6 +79,7 @@
         "HASHIRAMA SENJU 129 Rare and TOBIRAMA SENJU 131 Rare can finally upgrade over an ally when Orochimaru is in the mission."
       ],
       "changes_es": [
+        "La mision Prioridad Alta ahora tambien paga sus puntos dos veces, ademas de repetir los efectos de puntuacion.",
         "TAYUYA Sello Maldito, segunda fase 040 Poco comun ya no juega una Invocacion en una mision sin una Tayuya aliada.",
         "TAYUYA Sello Maldito, segunda fase 040 Poco comun cuenta su descuento mision por mision, en vez de aplicar el mejor en todas.",
         "Mirar un personaje oculto por fin muestra su carta en el tablero, en vez de solo escribir su coste en el registro.",
@@ -98,6 +102,7 @@
         "HASHIRAMA SENJU 129 Rara y TOBIRAMA SENJU 131 Rara por fin pueden mejorar sobre un aliado cuando Orochimaru esta en la mision."
       ],
       "changes_pt": [
+        "A missao Prioridade Alta agora tambem paga seus pontos duas vezes, alem de repetir os efeitos de pontuacao.",
         "TAYUYA Selo Amaldicoado, segundo estagio 040 Incomum nao joga mais uma Invocacao em uma missao sem uma Tayuya aliada.",
         "TAYUYA Selo Amaldicoado, segundo estagio 040 Incomum conta o desconto missao a missao, em vez de aplicar o melhor em todas.",
         "Olhar um personagem escondido enfim mostra a carta no tabuleiro, em vez de apenas escrever o custo no registro.",
@@ -120,6 +125,7 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara enfim podem melhorar sobre um aliado quando Orochimaru está na missão."
       ],
       "changes_it": [
+        "La missione Priorita Alta paga ora anche i suoi punti due volte, oltre a ripetere gli effetti di punteggio.",
         "TAYUYA Sigillo Maledetto, secondo stadio 040 Non comune non gioca piu una Evocazione in una missione senza una Tayuya alleata.",
         "TAYUYA Sigillo Maledetto, secondo stadio 040 Non comune conta lo sconto missione per missione, invece di applicare il migliore ovunque.",
         "Guardare un personaggio nascosto mostra finalmente la sua carta sul tavolo, invece di scriverne solo il costo nel registro.",
@@ -142,6 +148,7 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara possono finalmente migliorare su un alleato quando Orochimaru è nella missione."
       ],
       "changes_pl": [
+        "Misja Wysoki Priorytet przyznaje teraz swoje punkty dwukrotnie, nie tylko powtarza efekty punktacji.",
         "TAYUYA Przeklety Znak, druga faza 040 Niepospolita nie zagrywa juz Przyzwania w misji bez sojuszniczej Tayuyi.",
         "TAYUYA Przeklety Znak, druga faza 040 Niepospolita liczy znizke osobno dla kazdej misji, zamiast stosowac najlepsza wszedzie.",
         "Podejrzenie zakrytej postaci wreszcie pokazuje jej karte na stole, zamiast tylko zapisac koszt w dzienniku.",
@@ -164,6 +171,7 @@
         "HASHIRAMA SENJU 129 Rzadka i TOBIRAMA SENJU 131 Rzadka mogą wreszcie ulepszyć sojusznika, gdy Orochimaru jest w misji."
       ],
       "changes_ja": [
+        "高優先度ミッションが、スコア効果の再実行に加えて、ミッション点も2回入るようになりました。",
         "多由也 呪印二段階 040 アンコモンが、味方の多由也がいないミッションに口寄せを出せなくなりました。",
         "多由也 呪印二段階 040 アンコモンの軽減が、最大値を全体に適用するのではなく、ミッションごとに数えられます。",
         "裏向きのキャラを見たとき、記録にコストが出るだけでなく、盤面にカードが表示されるようになりました。",
@@ -208,7 +216,6 @@
         "fix",
         "fix",
         "fix",
-        "fix",
         "feature",
         "feature",
         "feature",
@@ -239,7 +246,6 @@
         "KAKASHI HATAKE Sharingan 016 Peu commune copie de nouveau un effet de première frappe quand il est la première carte que vous jouez.",
         "TAYUYA Flûte Démoniaque : Chaînes de Fantasia 125 Rare ne fait plus payer un chakra de plus sur les équipements, seulement sur les personnages.",
         "ÉPÉE SERPENT 101 Peu commune déclenche son effet de première frappe, depuis la main comme en la révélant.",
-        "La mission Priorité Haute ne donne plus ses points deux fois : seuls les effets de score se répètent.",
         "Les fenêtres de choix qui montrent des cartes de la pioche affichent enfin les cartes au lieu d'un écran vide.",
         "IBIKI MORINO Spécialiste de l'interrogatoire 028 Peu commune laisse de nouveau le choix de garder la carte au sommet de la pioche adverse.",
         "BOMBE FUMIGÈNE 086 Commune laisse de nouveau désigner la mission où part son porteur.",
@@ -275,7 +281,6 @@
         "KAKASHI HATAKE Sharingan 016 Uncommon copies a first strike effect again when he is the first card you play.",
         "TAYUYA Demon Flute: Chains of Fantasia 125 Rare no longer charges one extra chakra on attachments, only on characters.",
         "SNAKE SWORD 101 Uncommon triggers its first strike effect, from your hand and when revealed.",
-        "The High Priority mission no longer pays its points twice: only the score effects repeat.",
         "The choice windows that show cards from your deck finally display the cards instead of an empty screen.",
         "IBIKI MORINO Interrogation Specialist 028 Uncommon lets you choose again to leave the card on top of the opponent's deck.",
         "SMOKE BOMB 086 Common lets you pick the mission its host moves to again.",
@@ -311,7 +316,6 @@
         "KAKASHI HATAKE Sharingan 016 Poco común vuelve a copiar un efecto de primer golpe cuando es la primera carta que juegas.",
         "TAYUYA Flauta Demoníaca: Cadenas de Sonido Fantasma 125 Rara ya no cobra un chakra extra por los equipos, solo por los personajes.",
         "ESPADA SERPIENTE 101 Poco común activa su efecto de primer golpe, desde la mano y al revelarla.",
-        "La misión Prioridad Alta ya no da sus puntos dos veces: solo se repiten los efectos de puntuación.",
         "Las ventanas de elección que muestran cartas del mazo por fin muestran las cartas en vez de una pantalla vacía.",
         "IBIKI MORINO Especialista en interrogatorios 028 Poco común vuelve a permitir dejar la carta encima del mazo rival.",
         "BOMBA DE HUMO 086 Común vuelve a permitir elegir la misión a la que se mueve su portador.",
@@ -347,7 +351,6 @@
         "はたけカカシ 写輪眼 016 アンコモンは、最初に出すカードならファーストストライクの効果を再びコピーします。",
         "多由也 魔笛・幻ノ音鎖 125 レアは装備カードに追加のチャクラを課さなくなり、キャラクターにのみ課します。",
         "蛇の剣 101 アンコモンは、手札から出しても公開してもファーストストライクの効果が発動します。",
-        "高優先度ミッションはポイントを二重に与えなくなり、得点効果だけが繰り返されます。",
         "山札のカードを見せる選択ウィンドウが、空白ではなくカードを表示するようになりました。",
         "森乃イビキ 尋問の専門家 028 アンコモンは、相手の山札の一番上にカードを残す選択が再びできます。",
         "煙玉 086 コモンは、装備したキャラクターの移動先ミッションを再び選べます。",
@@ -383,7 +386,6 @@
         "KAKASHI HATAKE Sharingan 016 Incomum volta a copiar um efeito de primeiro golpe quando é a primeira carta que você joga.",
         "TAYUYA Flauta Demoníaca: Correntes Sonoras Fantasma 125 Rara não cobra mais um chakra extra nos equipamentos, apenas nos personagens.",
         "ESPADA SERPENTE 101 Incomum aciona seu efeito de primeiro golpe, da mão e ao ser revelada.",
-        "A missão Prioridade Alta não dá mais seus pontos duas vezes: só os efeitos de pontuação se repetem.",
         "As janelas de escolha que mostram cartas do deck finalmente exibem as cartas em vez de uma tela vazia.",
         "IBIKI MORINO Especialista em interrogatórios 028 Incomum volta a permitir deixar a carta no topo do deck adversário.",
         "BOMBA DE FUMO 086 Comum volta a permitir escolher a missão para onde seu portador vai.",
@@ -419,7 +421,6 @@
         "KAKASHI HATAKE Sharingan 016 Non Comune copia di nuovo un effetto di primo colpo quando è la prima carta che giochi.",
         "TAYUYA Flauto Demoniaco: Catene Sonore Fantasma 125 Rara non fa più pagare un chakra in più sugli equipaggiamenti, solo sui personaggi.",
         "SPADA SERPENTE 101 Non Comune attiva il suo effetto di primo colpo, dalla mano e quando viene rivelata.",
-        "La missione Priorità Alta non dà più i suoi punti due volte: si ripetono solo gli effetti di punteggio.",
         "Le finestre di scelta che mostrano carte del mazzo mostrano finalmente le carte invece di uno schermo vuoto.",
         "IBIKI MORINO Specialista dell'interrogatorio 028 Non Comune permette di nuovo di lasciare la carta in cima al mazzo avversario.",
         "BOMBA FUMOGENA 086 Comune permette di nuovo di scegliere la missione dove va il suo portatore.",
@@ -455,7 +456,6 @@
         "KAKASHI HATAKE Sharingan 016 Niepospolita znów kopiuje efekt pierwszego uderzenia, gdy jest pierwszą zagraną kartą.",
         "TAYUYA Demoniczny Flet: Widmowe Łańcuchy Dźwięku 125 Rzadka nie pobiera już dodatkowej czakry za wyposażenia, tylko za postacie.",
         "WĘŻOWY MIECZ 101 Niepospolita wyzwala swój efekt pierwszego uderzenia, z ręki i przy odkryciu.",
-        "Misja Wysoki Priorytet nie daje już punktów dwa razy: powtarzają się tylko efekty punktowania.",
         "Okna wyboru pokazujące karty z talii wreszcie wyświetlają karty zamiast pustego ekranu.",
         "IBIKI MORINO Specjalista od przesłuchań 028 Niepospolita znów pozwala zostawić kartę na wierzchu talii przeciwnika.",
         "BOMBA DYMNA 086 Pospolita znów pozwala wskazać misję, do której trafia jej nosiciel.",
