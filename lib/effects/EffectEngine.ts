@@ -22306,7 +22306,7 @@ export class EffectEngine {
           if (char.isHidden) return { state, blocked: false }; // Hidden = no continuous effects
 
           const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-          if (topCard.number !== 56) return { state, blocked: false };
+          if (topCard.set !== 'KS' || topCard.number !== 56) return { state, blocked: false };
 
           
           const hasProtection = (topCard.effects ?? []).some(

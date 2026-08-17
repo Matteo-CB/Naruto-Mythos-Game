@@ -596,7 +596,7 @@ function handleKimimaro123SelfDefeat(state: GameState): GameState {
       for (const char of chars) {
         if (char.isHidden) continue;
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-        if (topCard.number !== 123) continue;
+        if (topCard.set !== 'KS' || topCard.number !== 123) continue;
 
         
         
@@ -657,7 +657,7 @@ export function handleRockLee117Move(
         if (char.isHidden) continue;
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         
-        if (topCard.number !== 117 && topCard.number !== 151) continue;
+        if (topCard.set !== 'KS' || (topCard.number !== 117 && topCard.number !== 151)) continue;
 
         const hasMove = (topCard.effects ?? []).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
@@ -769,7 +769,7 @@ export function handleAkamaru028Return(state: GameState, targetInstanceId?: stri
         if (alreadyProcessed.has(char.instanceId)) continue;
         if (char.isHidden) continue;
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-        if (topCard.number !== 28) continue;
+        if (topCard.set !== 'KS' || topCard.number !== 28) continue;
 
         
         const hasReturnEffect = (topCard.effects ?? []).some(
@@ -834,7 +834,7 @@ export function handleGiantSpider103EndOfRound(state: GameState, targetInstanceI
         if (alreadyProcessed.has(char.instanceId)) continue;
         if (char.isHidden) continue;
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-        if (topCard.number !== 103) continue;
+        if (topCard.set !== 'KS' || topCard.number !== 103) continue;
 
         
         const powerThreshold = (topCard.power ?? 4) + char.powerTokens;

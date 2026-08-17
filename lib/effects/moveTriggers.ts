@@ -21,7 +21,7 @@ export function checkNinjaHoundsTrigger(
     ? movedChar.stack[movedChar.stack?.length - 1]
     : movedChar.card;
 
-  if (topCard.number !== 100) return state;
+  if (topCard.set !== 'KS' || topCard.number !== 100) return state;
 
   const hasEffect = (topCard.effects ?? []).some(
     (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('moves to a different mission'),
@@ -163,7 +163,7 @@ export function checkChoji018PostMoveTrigger(
     ? movedChar.stack[movedChar.stack?.length - 1]
     : movedChar.card;
 
-  if (topCard.number !== 18) return state;
+  if (topCard.set !== 'KS' || topCard.number !== 18) return state;
 
   const hasEffect = (topCard.effects ?? []).some(
     (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),

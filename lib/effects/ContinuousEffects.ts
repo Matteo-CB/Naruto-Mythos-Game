@@ -227,7 +227,7 @@ export function calculateContinuousPowerModifier(
       for (const enemy_zc of enemyChars_zc) {
         if (enemy_zc.isHidden) continue;
         const enemyTop_zc = enemy_zc.stack?.length > 0 ? enemy_zc.stack[enemy_zc.stack.length - 1] : enemy_zc.card;
-        if (enemyTop_zc.number !== 67) continue;
+        if (enemyTop_zc.set !== 'KS' || enemyTop_zc.number !== 67) continue;
         const hasRempart_zc = (enemyTop_zc.effects ?? []).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
         );
@@ -959,7 +959,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
         for (const enemyChar of opponentChars) {
           if (enemyChar.isHidden) continue;
           const eTop = enemyChar.stack?.length > 0 ? enemyChar.stack[enemyChar.stack.length - 1] : enemyChar.card;
-          if (eTop.number !== 56) continue;
+          if (eTop.set !== 'KS' || eTop.number !== 56) continue;
           const hasProtection = (eTop.effects ?? []).some(
             (e: { type: string; description: string }) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('chakra'),
           );

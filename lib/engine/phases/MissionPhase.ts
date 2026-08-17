@@ -190,7 +190,7 @@ function checkOrochimaru051OnMission(state: GameState, missionIndex: number, pla
   for (const char of mission[side]) {
     if (char.isHidden) continue;
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-    if (topCard.number !== 51) continue;
+    if (topCard.set !== 'KS' || topCard.number !== 51) continue;
     const hasMove = (topCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('lost this mission'),
     );
@@ -819,7 +819,7 @@ function handleOrochimaru051Move(state: GameState, missionIndex: number, winner:
     for (const char of chars) {
       if (char.isHidden) continue;
       const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-      if (topCard.number !== 51) continue;
+      if (topCard.set !== 'KS' || topCard.number !== 51) continue;
 
       const hasMove = (topCard.effects ?? []).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('lost this mission'),
