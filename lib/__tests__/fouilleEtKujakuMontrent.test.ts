@@ -73,3 +73,18 @@ describe('KUJAKU 072 demande confirmation, son effet est optionnel', () => {
     expect(apres.player1.discardPile.length, 'et a quitte la defausse').toBe(0);
   });
 });
+
+describe('le PARCHEMIN DU SCEAU 095 montre aussi ce qu il a regarde', () => {
+  it('sans personnage Jutsu, les 3 cartes sont montrees', () => {
+    const s = plateau(SANS_EQUIPEMENT, []);
+    s.activeMissions[0].player1Characters.push({
+      instanceId: 'hote', card: getCardById('KS-011-C') as CharacterCard, isHidden: false,
+      wasRevealedAtLeastOnce: true, powerTokens: 0, stack: [getCardById('KS-011-C') as CharacterCard],
+      controlledBy: 'player1', originalOwner: 'player1', missionIndex: 0,
+    } as never);
+    const apres = jouer(s, 'SS-095-UC');
+    const question = apres.pendingActions[0];
+    expect(question?.descriptionKey, 'la fenetre d information s ouvre').toBe('game.effect.desc.ssDeckSearchShow');
+    expect(question.options.length, 'les trois cartes du dessus sont montrees').toBe(3);
+  });
+});

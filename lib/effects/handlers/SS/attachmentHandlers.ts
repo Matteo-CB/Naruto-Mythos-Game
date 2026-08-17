@@ -126,7 +126,22 @@ function sealingScrollMain(ctx: EffectContext): EffectResult {
   }
   const jutsu = sommet.filter((c) => (c.keywords ?? []).includes('Jutsu'));
   if (jutsu.length === 0) {
-    return refuse(state, sourcePlayer, 'The Scroll of Sealing (095): no Jutsu character among the top 3 cards.', 'PARCHEMIN DU SCEAU', SEALING_SCROLL_ID);
+    const sansCible = refuse(state, sourcePlayer, 'The Scroll of Sealing (095): no Jutsu character among the top 3 cards.', 'PARCHEMIN DU SCEAU', SEALING_SCROLL_ID);
+    return {
+      state: sansCible.state,
+      requiresTargetSelection: true,
+      targetSelectionType: 'SS_DECK_SEARCH_SHOW',
+      validTargets: sommet.map((c) => `DECK_${state[sourcePlayer].deck.indexOf(c)}`),
+      isOptional: false,
+      isMandatory: true,
+      description: JSON.stringify({
+        depth: 3,
+        sourceName: 'PARCHEMIN DU SCEAU',
+        sourceId: SEALING_SCROLL_ID,
+        cards: apercuDeCartes(state, sourcePlayer, sommet.map((c) => state[sourcePlayer].deck.indexOf(c))),
+      }),
+      descriptionKey: 'game.effect.desc.ssDeckSearchShow',
+    };
   }
   return confirmFirst({
     state,
