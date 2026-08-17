@@ -2,6 +2,7 @@ import type { GameState, PlayerID, CharacterCard } from '../types';
 import { foodAttachmentDiscountCount } from '@/lib/effects/handlers/SS/staticAuras';
 import { virtualSoundFourCount, textIsBlanked } from '@/lib/effects/handlers/SS/attachmentStatics';
 import { reductionPremiereFrappe } from './firstStrikeDiscount';
+import { missionCostReduction } from './missionCostReduction';
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -109,6 +110,12 @@ export function calculateEffectiveCost(
 
   const mission = state.activeMissions[missionIndex];
   if (!mission) return cost;
+
+  const remiseMission = missionCostReduction(mission, player, card);
+  if (remiseMission.montant > 0) {
+    cost = Math.max(remiseMission.plancher, cost - remiseMission.montant);
+  }
+
   const friendlyChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   if (!friendlyChars) return cost;
 
