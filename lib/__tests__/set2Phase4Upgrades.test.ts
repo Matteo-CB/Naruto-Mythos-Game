@@ -10,7 +10,7 @@ import { jiraiyaGoldSources } from '@/lib/effects/handlers/SS/goldCards';
 import { team8AlliesIn } from '@/lib/effects/handlers/SS/kurenai018';
 import { equipementsJouablesDepuisLaMain, bonusArmeSurTenten } from '@/lib/effects/handlers/SS/tenten022';
 import { ennemisDeMemePuissance } from '@/lib/effects/handlers/SS/asuma138';
-import { narutosEnJeu, narutosJouablesEnMain, coutCacheReduit } from '@/lib/effects/handlers/SS/iruka140';
+import { narutosEnJeu, narutosCachesRevelables } from '@/lib/effects/handlers/SS/iruka140';
 import type { CardData, CharacterInPlay, GameState } from '@/lib/engine/types';
 
 registerAllSetHandlers();
@@ -212,7 +212,8 @@ describe('Iruka Umino 140, cacher un Naruto et en poser un autre', () => {
   function plateau(mainIds: string[], avecNaruto = true) {
     const iruka = empile(simChar('SS-024-C', { owner: 'player1', instanceId: 'sim-iruka' }), 'SS-140-R');
     const ennemis = avecNaruto ? [simChar('KS-010-C', { owner: 'player2', instanceId: 'sim-naruto' })] : [];
-    let s = buildSimState({ p1: [iruka], p2: ennemis, missions: 2, chakra1: 20 });
+    const cache = simChar('SS-005-C', { owner: 'player1', instanceId: 'sim-cache', hidden: true });
+    let s = buildSimState({ p1: [iruka, cache], p2: ennemis, missions: 2, chakra1: 20 });
     s = avecMain(s, mainIds);
     return { state: s, iruka };
   }
@@ -225,27 +226,32 @@ describe('Iruka Umino 140, cacher un Naruto et en poser un autre', () => {
     expect(charDe(fin, 'sim-naruto')?.isHidden, 'il est cache').toBe(true);
   });
 
-  it('l_UPGRADE pose un Naruto de la main face cachee sans rien payer', () => {
-    const { state, iruka } = plateau(['KS-009-C']);
-    expect(coutCacheReduit(2), 'un moins deux, plancher a zero').toBe(0);
-    expect(narutosJouablesEnMain(state, 'player1', 2), 'le Naruto de la main est jouable').toEqual([0]);
+  it('l_UPGRADE revele un Naruto deja cache en jeu en payant 2 de moins', () => {
+    const { state, iruka } = plateau([]);
+    const revelables = narutosCachesRevelables(state, 'player1', 2);
+    expect(revelables.map((h) => h.instanceId), 'le Naruto cache est proposé').toEqual(['sim-cache']);
 
     const fin = jusquAuBout(EffectEngine.resolvePlayEffects(state, 'player1', iruka, 0, true), 12);
-    expect(fin.player1.chakra, 'rien n_est paye').toBe(20);
-    expect(fin.player1.hand.length, 'la carte quitte la main').toBe(0);
-
-    const poses = fin.activeMissions.flatMap((m) => m.player1Characters).filter((c) => c.card.id === 'KS-009-C');
-    expect(poses.length, 'le Naruto est en jeu').toBe(1);
-    expect(poses[0].isHidden, 'il est face cachee').toBe(true);
-    expect(poses[0].wasRevealedAtLeastOnce, 'il n_a jamais ete montre').toBe(false);
+    const revele = charDe(fin, 'sim-cache');
+    expect(revele?.isHidden, 'il est desormais face visible').toBe(false);
+    expect(fin.player1.chakra, 'son cout de 3 est paye 2 de moins').toBe(19);
   });
 
-  it('refuser les deux effets ne cache rien et ne pose rien', () => {
-    const { state, iruka } = plateau(['KS-009-C']);
+  it('l_UPGRADE ne propose jamais la main', () => {
+    const { state } = plateau(['KS-009-C']);
+    const revelables = narutosCachesRevelables(state, 'player1', 2);
+    expect(
+      revelables.map((h) => h.instanceId),
+      'seuls les Naruto deja caches en jeu comptent',
+    ).toEqual(['sim-cache']);
+  });
+
+  it('refuser les deux effets ne cache rien et ne revele rien', () => {
+    const { state, iruka } = plateau([]);
     const fin = refuseTout(EffectEngine.resolvePlayEffects(state, 'player1', iruka, 0, true));
 
     expect(charDe(fin, 'sim-naruto')?.isHidden, 'le Naruto ennemi reste visible').toBe(false);
-    expect(fin.player1.hand.length, 'la carte reste en main').toBe(1);
+    expect(charDe(fin, 'sim-cache')?.isHidden, 'le Naruto cache le reste').toBe(true);
     expect(fin.player1.chakra, 'aucun Chakra depense').toBe(20);
   });
 
@@ -316,9 +322,9 @@ describe('Tsunade 141 et Jiraya 144, memes cartes que les impressions Gold', () 
 describe('les textes de la phase 4 existent partout', () => {
   it('les sept langues portent les nouvelles cles', async () => {
     const descriptions = ['ss018PowerupTeam8', 'ss022PlayAttachment', 'ss022ChooseHost', 'ss138DiscardForPower',
-      'ss138DefeatEqual', 'ss140HideNaruto', 'ss140PlayHidden', 'ss140ChooseMission'];
+      'ss138DefeatEqual', 'ss140HideNaruto', 'ss140PlayHidden'];
     const journaux = ['ss018PoweredUp', 'ss022Played', 'ss022WeaponBonus', 'ss138Discarded', 'ss138Defeated',
-      'ss140Hidden', 'ss140PlayedHidden'];
+      'ss140Hidden'];
 
     for (const langue of ['fr', 'en', 'es', 'ja', 'pt', 'it', 'pl']) {
       const messages = (await import(`@/messages/${langue}.json`)).default as never;

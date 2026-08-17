@@ -646,7 +646,8 @@ const FACTORIES: Record<string, Factory> = {
   }),
   'SS-140-R': (id) => ({
     build: () => board({
-      hand: [id, 'KS-009-C'],
+      hand: [id],
+      hidden0: { id: 'SS-005-C', iid: 'sim-naruto-cache' },
       upgBase: { id: 'SS-024-C', iid: 'sim-upg-base' },
       e0: [{ id: 'KS-010-C', iid: 'sim-naruto' }],
       chakra: 20,

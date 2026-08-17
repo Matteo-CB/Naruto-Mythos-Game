@@ -44,7 +44,7 @@ import { equipementsDeplacablesVers, apercuEquipements } from './handlers/SS/sei
 import { team8AlliesIn, KURENAI_018 } from './handlers/SS/kurenai018';
 import { TENTEN_022 } from './handlers/SS/tenten022';
 import { ASUMA_138 } from './handlers/SS/asuma138';
-import { IRUKA_140, coutCacheReduit } from './handlers/SS/iruka140';
+import { IRUKA_140, IRUKA_140_REDUCTION } from './handlers/SS/iruka140';
 import { SHINO_017, SHINO_017_THRESHOLD, SHINO_017_GAIN, SHIGURE_068, KISAME_055, ASUMA_013, ASUMA_013_POWERUP, personnagesIndependantsDans, leplusFortEstDans, chakraVolable } from './handlers/SS/ambushSet5';
 import { HAKU_052, RYUGAN_073, zabuzasDeplacables, equipementsDePersonnage, hotesPossiblesPour } from './handlers/SS/moveTargets5';
 import { SERPENTS_056, OROCHIMARU_145, KIBA_014, KIBA_014_THRESHOLD, MIZUKI_060, MIZUKI_060_POINTS, TAZUNA_076, TAZUNA_076_POINTS, ciblesDOrochimaru, equipementParId } from './handlers/SS/set5Others';
@@ -1386,53 +1386,6 @@ export class EffectEngine {
       'EFFECT', `Tenten (022): played ${carte.name_fr} for ${cout} chakra.`,
       'game.log.effect.ss022Played',
       { card: 'TENTEN', id: TENTEN_022, target: carte.name_fr, target_en: carte.name_en || carte.name_fr, cost: String(cout) });
-    return next;
-  }
-
-  static poserNarutoCache(
-    state: GameState,
-    player: PlayerID,
-    handIndex: number,
-    reduction: number,
-    missionIndex: number,
-  ): GameState {
-    const carte = state[player].hand[handIndex];
-    if (!carte || !state.activeMissions[missionIndex]) return state;
-    const cout = coutCacheReduit(reduction);
-    if (state[player].chakra < cout) return state;
-
-    const main = [...state[player].hand];
-    main.splice(handIndex, 1);
-    const side: 'player1Characters' | 'player2Characters' =
-      player === 'player1' ? 'player1Characters' : 'player2Characters';
-    const missions = [...state.activeMissions];
-    const mission = { ...missions[missionIndex] };
-    mission[side] = [...mission[side], {
-      instanceId: generateInstanceId(),
-      card: carte,
-      isHidden: true,
-      wasRevealedAtLeastOnce: false,
-      powerTokens: 0,
-      stack: [carte],
-      controlledBy: player,
-      originalOwner: player,
-      missionIndex,
-    } as CharacterInPlay];
-    missions[missionIndex] = mission;
-
-    const next: GameState = {
-      ...state,
-      activeMissions: missions,
-      [player]: { ...state[player], hand: main, chakra: state[player].chakra - cout },
-    };
-    next.log = logAction(next.log, next.turn, next.phase, player,
-      'EFFECT', `Iruka Umino (140): played a hidden Naruto Uzumaki on mission ${missionIndex + 1} for ${cout} chakra.`,
-      'game.log.effect.ss140PlayedHidden',
-      { card: 'IRUKA UMINO', id: IRUKA_140, mission: missionIndex + 1, cost: String(cout) });
-    emitEngineQuestEvent(next, player, 'character.played.by.effect', {
-      sourceName: 'IRUKA UMINO',
-      targetName: (carte.name_fr ?? '').toUpperCase(),
-    });
     return next;
   }
 
@@ -13442,45 +13395,9 @@ export class EffectEngine {
       }
 
       case 'SS140_PLAY_HIDDEN': {
-        let d140: { reduction?: number } = {};
-        try { d140 = JSON.parse(pendingEffect.effectDescription); } catch {}
-        const index140 = Number(targetId);
-        if (!Number.isFinite(index140)) break;
-        if (newState.activeMissions.length === 1) {
-          newState = EffectEngine.poserNarutoCache(newState, pendingEffect.sourcePlayer, index140, d140.reduction ?? 0, 0);
-          break;
-        }
-        const eff140 = generateInstanceId();
-        const act140 = generateInstanceId();
-        const missions140 = newState.activeMissions.map((_, i) => String(i));
-        newState.pendingEffects = [...newState.pendingEffects, {
-          id: eff140, sourceCardId: pendingEffect.sourceCardId,
-          sourceInstanceId: pendingEffect.sourceInstanceId,
-          sourceMissionIndex: pendingEffect.sourceMissionIndex,
-          effectType: pendingEffect.effectType,
-          effectDescription: JSON.stringify({ handIndex: index140, reduction: d140.reduction ?? 0 }),
-          targetSelectionType: 'SS140_CHOOSE_MISSION', sourcePlayer: pendingEffect.sourcePlayer,
-          requiresTargetSelection: true, validTargets: missions140,
-          isOptional: false, isMandatory: true, resolved: false, isUpgrade: false,
-          remainingEffectTypes: pendingEffect.remainingEffectTypes,
-        }];
-        pendingEffect.remainingEffectTypes = undefined;
-        newState.pendingActions = [...newState.pendingActions, {
-          id: act140, type: 'SELECT_TARGET', player: pendingEffect.sourcePlayer,
-          description: 'Iruka Umino (140): choose the mission where the hidden card is placed.',
-          descriptionKey: 'game.effect.desc.ss140ChooseMission',
-          options: missions140, minSelections: 1, maxSelections: 1, sourceEffectId: eff140,
-        }];
-        break;
-      }
-
-      case 'SS140_CHOOSE_MISSION': {
-        let m140: { handIndex?: number; reduction?: number } = {};
-        try { m140 = JSON.parse(pendingEffect.effectDescription); } catch {}
-        const destination140 = Number(targetId);
-        if (m140.handIndex == null || !Number.isFinite(destination140)) break;
-        newState = EffectEngine.poserNarutoCache(
-          newState, pendingEffect.sourcePlayer, m140.handIndex, m140.reduction ?? 0, destination140);
+        const instance140 = targetId.startsWith('HIDDEN_') ? targetId.slice(7) : targetId;
+        newState = EffectEngine.revealHiddenWithReduction(
+          newState, pendingEffect, instance140, IRUKA_140_REDUCTION);
         break;
       }
 

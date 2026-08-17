@@ -1,9 +1,9 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import type { CardData, CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
-import { HIDDEN_PLAY_COST } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { confirmFirst } from './confirmFirst';
+import { findHiddenOnBoardByPredicate, type HiddenCharTarget } from '@/lib/effects/handlers/KS/shared/summonSearch';
 
 export const IRUKA_140 = 'SS-140-R';
 export const IRUKA_140_VARIANTS = [IRUKA_140, 'SS-140-CHIBIV'];
@@ -42,25 +42,6 @@ export function narutosEnJeu(state: GameState): CharacterInPlay[] {
   return trouves;
 }
 
-export function coutCacheReduit(reduction: number): number {
-  return Math.max(0, HIDDEN_PLAY_COST - reduction);
-}
-
-export function narutosJouablesEnMain(
-  state: GameState,
-  player: PlayerID,
-  reduction: number,
-): number[] {
-  if (state[player].chakra < coutCacheReduit(reduction)) return [];
-  const main = state[player].hand as unknown as CardData[];
-  const indices: number[] = [];
-  for (let i = 0; i < main.length; i++) {
-    if (main[i]?.card_type === 'attachment') continue;
-    if (porteLeNomDeNaruto(main[i])) indices.push(i);
-  }
-  return indices;
-}
-
 function iruka140Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const cibles = narutosEnJeu(state);
@@ -78,20 +59,33 @@ function iruka140Main(ctx: EffectContext): EffectResult {
   }, sourceCard.instanceId, 'SS140_CONFIRM_MAIN');
 }
 
+export function narutosCachesRevelables(
+  state: GameState,
+  player: PlayerID,
+  reduction: number,
+): HiddenCharTarget[] {
+  return findHiddenOnBoardByPredicate(
+    state,
+    player,
+    (carte) => porteLeNomDeNaruto(carte as unknown as CardData),
+    reduction,
+  );
+}
+
 function iruka140Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
-  const indices = narutosJouablesEnMain(state, sourcePlayer, IRUKA_140_REDUCTION);
-  if (indices.length === 0) {
+  const caches = narutosCachesRevelables(state, sourcePlayer, IRUKA_140_REDUCTION);
+  if (caches.length === 0) {
     return refus(state, sourcePlayer,
-      'Iruka Umino (140) UPGRADE: no Naruto Uzumaki in hand you can play hidden.');
+      'Iruka Umino (140) UPGRADE: no hidden Naruto Uzumaki you can reveal.');
   }
   return confirmFirst({
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'SS140_PLAY_HIDDEN',
-    validTargets: indices.map((i) => String(i)),
+    validTargets: caches.map((h) => `HIDDEN_${h.instanceId}`),
     isOptional: true,
-    description: JSON.stringify({ reduction: IRUKA_140_REDUCTION }),
+    description: JSON.stringify({ reduction: IRUKA_140_REDUCTION, hiddenChars: caches }),
     descriptionKey: 'game.effect.desc.ss140PlayHidden',
   }, sourceCard.instanceId, 'SS140_CONFIRM_UPGRADE');
 }
