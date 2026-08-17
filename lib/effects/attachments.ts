@@ -11,7 +11,7 @@ import { actionTypeForSelectionType } from './selectionActionType';
 import { bonusArmeSurTenten, TENTEN_022 } from './handlers/SS/tenten022';
 import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
 
-function artisanVillageReward(
+export function artisanVillageReward(
   state: GameState,
   player: PlayerID,
   card: CardData,

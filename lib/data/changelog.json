@@ -13,49 +13,57 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
         "Quand SAKON Apposition des sceaux maléfiques 062 copie UKON Sceau Maudit, second stade 038, la cible perd bien 5 puissance au lieu d en gagner.",
         "La mission Faire profil bas accorde aussi son embuscade quand un personnage caché est révélé en amélioration.",
         "IRUKA UMINO 140 Rare révèle un Naruto Uzumaki déjà caché en jeu en payant 2 de moins, au lieu d en poser un depuis la main.",
-        "ZABUZA MOMOCHI 136 Rare vainc bien les personnages arrivés par un effet de carte à prix réduit, et plus seulement ceux posés à la main."
+        "ZABUZA MOMOCHI 136 Rare vainc bien les personnages arrivés par un effet de carte à prix réduit, et plus seulement ceux posés à la main.",
+        "VILLAGE DES ARTISANS 110 récompense aussi les armes et armures déplacées sur un personnage, pas seulement celles posées."
       ],
       "changes_en": [
         "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power.",
         "The mission Keep a Low Profile now grants its ambush bonus when a hidden character is revealed as an upgrade.",
         "IRUKA UMINO 140 Rare now reveals a Naruto Uzumaki already hidden in play paying 2 less, instead of playing one from hand.",
-        "ZABUZA MOMOCHI 136 Rare now defeats characters brought into play at a reduced price by a card effect, not only those played from hand."
+        "ZABUZA MOMOCHI 136 Rare now defeats characters brought into play at a reduced price by a card effect, not only those played from hand.",
+        "VILLAGE OF ARTISANS 110 now also rewards weapons and armor moved onto a character, not only those freshly attached."
       ],
       "changes_es": [
         "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo.",
         "La misión Mantener un perfil bajo también concede su emboscada cuando un personaje oculto se revela como mejora.",
         "IRUKA UMINO 140 Rara revela a un Naruto Uzumaki ya oculto en juego pagando 2 menos, en vez de jugar uno desde la mano.",
-        "ZABUZA MOMOCHI 136 Rara derrota a los personajes que entran en juego a precio reducido por un efecto de carta, no solo a los jugados desde la mano."
+        "ZABUZA MOMOCHI 136 Rara derrota a los personajes que entran en juego a precio reducido por un efecto de carta, no solo a los jugados desde la mano.",
+        "ALDEA DE LOS ARTESANOS 110 también recompensa las armas y armaduras movidas a un personaje, no solo las recién equipadas."
       ],
       "changes_pt": [
         "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar.",
         "A missão Manter um perfil discreto também concede a sua emboscada quando um personagem oculto é revelado como melhoria.",
         "IRUKA UMINO 140 Rara revela um Naruto Uzumaki já oculto em jogo pagando 2 a menos, em vez de jogar um da mão.",
-        "ZABUZA MOMOCHI 136 Rara derrota os personagens que entram em jogo a preço reduzido por um efeito de carta, e não apenas os jogados da mão."
+        "ZABUZA MOMOCHI 136 Rara derrota os personagens que entram em jogo a preço reduzido por um efeito de carta, e não apenas os jogados da mão.",
+        "ALDEIA DOS ARTESÃOS 110 também recompensa as armas e armaduras movidas para um personagem, e não apenas as recém-equipadas."
       ],
       "changes_it": [
         "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne.",
         "La missione Mantenere un profilo basso concede la sua imboscata anche quando un personaggio nascosto viene rivelato come miglioramento.",
         "IRUKA UMINO 140 Rara rivela un Naruto Uzumaki già nascosto in gioco pagando 2 in meno, invece di giocarne uno dalla mano.",
-        "ZABUZA MOMOCHI 136 Rara sconfigge i personaggi entrati in gioco a prezzo ridotto per un effetto di carta, non solo quelli giocati dalla mano."
+        "ZABUZA MOMOCHI 136 Rara sconfigge i personaggi entrati in gioco a prezzo ridotto per un effetto di carta, non solo quelli giocati dalla mano.",
+        "VILLAGGIO DEGLI ARTIGIANI 110 premia anche le armi e le armature spostate su un personaggio, non solo quelle appena equipaggiate."
       ],
       "changes_pl": [
         "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać.",
         "Misja Nie rzucaj się w oczy przyznaje swoją zasadzkę także wtedy, gdy ukryta postać zostaje odkryta jako ulepszenie.",
         "IRUKA UMINO 140 Rzadka odkrywa Naruto Uzumakiego już ukrytego w grze, płacąc o 2 mniej, zamiast zagrywać go z ręki.",
-        "ZABUZA MOMOCHI 136 Rzadka pokonuje postacie wprowadzone do gry po obniżonej cenie przez efekt karty, a nie tylko zagrane z ręki."
+        "ZABUZA MOMOCHI 136 Rzadka pokonuje postacie wprowadzone do gry po obniżonej cenie przez efekt karty, a nie tylko zagrane z ręki.",
+        "WIOSKA RZEMIEŚLNIKÓW 110 nagradza także bronie i pancerze przeniesione na postać, a nie tylko te świeżo założone."
       ],
       "changes_ja": [
         "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。",
         "ミッション「目立たないように」は、伏せたキャラクターが強化として公開されたときにも待ち伏せの効果を与えるようになりました。",
         "うみのイルカ 140 レアは、手札から出すのではなく、場にすでに伏せられている うずまきナルト を2少ないコストで公開するようになりました。",
-        "桃地再不斬 136 レアは、手札から出されたものだけでなく、カード効果によって割引で場に出たキャラクターも倒せるようになりました。"
+        "桃地再不斬 136 レアは、手札から出されたものだけでなく、カード効果によって割引で場に出たキャラクターも倒せるようになりました。",
+        "職人の里 110 は、新たに装備されたものだけでなく、キャラクターに移動された武器と防具にも報酬を与えるようになりました。"
       ]
     },
     {

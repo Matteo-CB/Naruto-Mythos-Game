@@ -38,6 +38,7 @@ import {
 } from './handlers/SS/goldCards';
 import { actionTypeForSelectionType } from './selectionActionType';
 import { ignoreLesConditionsDePose, enforceAttachmentConditions } from './attachments';
+import { artisanVillageReward } from './attachments';
 import { attachCardToCharacter, attachCardToMission, discardAttachmentsOnLeave, discardAttachments, getCharacterAttachTargets, missionAlreadyHasPlayerAttachment, parseAttachSpec } from './attachments';
 import { destinationsPour } from './handlers/SS/hiddenMove';
 import { equipementsDeplacablesVers, apercuEquipements } from './handlers/SS/seimei065';
@@ -1357,6 +1358,12 @@ export class EffectEngine {
       'EFFECT', `Attachment ${equipement.card.name_fr} moved onto ${nomHote.name_fr}.`,
       'game.log.effect.ss073Moved',
       { card: 'RYUGAN', id: sourceId, target: equipement.card.name_fr, target_en: equipement.card.name_en || equipement.card.name_fr, name: nomHote.name_fr });
+    const apresRecompense = EffectEngine.findCharByInstanceId(next, hostInstanceId);
+    if (apresRecompense) {
+      next = artisanVillageReward(
+        next, apresRecompense.character.controlledBy, equipement.card,
+        apresRecompense.character, apresRecompense.missionIndex);
+    }
     return enforceAttachmentConditions(next);
   }
 
@@ -13940,6 +13947,11 @@ export class EffectEngine {
           player2Characters: m.player2Characters.map((c) => c.instanceId === seimei065
             ? { ...c, attachments: [...(c.attachments ?? []), equipement065] } : c),
         }));
+        const hote065 = EffectEngine.findCharByInstanceId(newState, seimei065);
+        if (hote065) {
+          newState = artisanVillageReward(
+            newState, joueur065, equipement065.card, hote065.character, hote065.missionIndex);
+        }
         newState.log = logAction(newState.log, newState.turn, newState.phase, joueur065,
           'EFFECT', `Seimei (065): moved ${equipement065.card.name_fr} onto itself.`,
           'game.log.effect.ss065Moved',
