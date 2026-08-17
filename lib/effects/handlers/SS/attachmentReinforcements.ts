@@ -32,7 +32,7 @@ export function putTopCardAsHidden(
     isHidden: true,
     wasRevealedAtLeastOnce: false,
     powerTokens: 0,
-    stack: [],
+    stack: [carte as never],
     controlledBy: player,
     originalOwner: player,
     missionIndex,
