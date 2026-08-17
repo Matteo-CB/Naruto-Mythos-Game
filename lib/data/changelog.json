@@ -26,9 +26,11 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "Regarder un personnage cache montre enfin sa carte sur le plateau, au lieu de n'ecrire que son cout dans le journal.",
         "KAKASHI HATAKE Sharingan 016 Peu commune revelee en amelioration retrouve ses cibles: la copie ne proposait plus personne.",
         "Un personnage vaincu arrive toujours dans la defausse de son proprietaire: certains disparaissaient sans laisser de carte.",
         "SAKURA HARUNO Sasuke est en train de me regarder ! 135 Mythos Variante applique enfin son propre effet, et non celui de la carte du dessous.",
@@ -48,6 +50,7 @@
         "HASHIRAMA SENJU 129 Rare et TOBIRAMA SENJU 131 Rare peuvent enfin s'ameliorer par-dessus un allie quand Orochimaru est dans la mission."
       ],
       "changes_en": [
+        "Looking at a hidden character finally shows its card on the board, instead of only writing its cost in the log.",
         "KAKASHI HATAKE Sharingan 016 Uncommon revealed as an upgrade finds its targets again: the copy offered nobody.",
         "A defeated character always reaches its owner discard pile: some vanished without leaving a card behind.",
         "SAKURA HARUNO Sasuke is watching me ! 135 Mythos Variant now applies its own effect instead of the card underneath it.",
@@ -67,6 +70,7 @@
         "HASHIRAMA SENJU 129 Rare and TOBIRAMA SENJU 131 Rare can finally upgrade over an ally when Orochimaru is in the mission."
       ],
       "changes_es": [
+        "Mirar un personaje oculto por fin muestra su carta en el tablero, en vez de solo escribir su coste en el registro.",
         "KAKASHI HATAKE Sharingan 016 Poco comun revelada como mejora vuelve a encontrar objetivos: la copia no ofrecia a nadie.",
         "Un personaje derrotado siempre llega al descarte de su dueno: algunos desaparecian sin dejar carta.",
         "SAKURA HARUNO 135 Variante Mythos aplica por fin su propio efecto, y no el de la carta de debajo.",
@@ -86,6 +90,7 @@
         "HASHIRAMA SENJU 129 Rara y TOBIRAMA SENJU 131 Rara por fin pueden mejorar sobre un aliado cuando Orochimaru esta en la mision."
       ],
       "changes_pt": [
+        "Olhar um personagem escondido enfim mostra a carta no tabuleiro, em vez de apenas escrever o custo no registro.",
         "KAKASHI HATAKE Sharingan 016 Incomum revelada como melhoria encontra alvos de novo: a copia nao oferecia ninguem.",
         "Um personagem derrotado sempre chega ao descarte do dono: alguns sumiam sem deixar carta.",
         "SAKURA HARUNO 135 Variante Mythos aplica enfim o proprio efeito, e nao o da carta de baixo.",
@@ -105,6 +110,7 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara enfim podem melhorar sobre um aliado quando Orochimaru está na missão."
       ],
       "changes_it": [
+        "Guardare un personaggio nascosto mostra finalmente la sua carta sul tavolo, invece di scriverne solo il costo nel registro.",
         "KAKASHI HATAKE Sharingan 016 Non comune rivelata come miglioramento ritrova i bersagli: la copia non proponeva nessuno.",
         "Un personaggio sconfitto arriva sempre negli scarti del suo proprietario: alcuni sparivano senza lasciare carta.",
         "SAKURA HARUNO 135 Variante Mythos applica finalmente il proprio effetto, non quello della carta sottostante.",
@@ -124,6 +130,7 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara possono finalmente migliorare su un alleato quando Orochimaru è nella missione."
       ],
       "changes_pl": [
+        "Podejrzenie zakrytej postaci wreszcie pokazuje jej karte na stole, zamiast tylko zapisac koszt w dzienniku.",
         "KAKASHI HATAKE Sharingan 016 Niepospolita odkryta jako ulepszenie znow znajduje cele: kopiowanie nie proponowalo nikogo.",
         "Pokonana postac zawsze trafia na stos odrzuconych wlasciciela: niektore znikaly bez sladu.",
         "SAKURA HARUNO 135 Wariant Mythos stosuje wreszcie wlasny efekt, a nie efekt karty pod spodem.",
@@ -143,6 +150,7 @@
         "HASHIRAMA SENJU 129 Rzadka i TOBIRAMA SENJU 131 Rzadka mogą wreszcie ulepszyć sojusznika, gdy Orochimaru jest w misji."
       ],
       "changes_ja": [
+        "裏向きのキャラを見たとき、記録にコストが出るだけでなく、盤面にカードが表示されるようになりました。",
         "はたけカカシ 写輪眼 016 アンコモンを重ねて公開したとき、コピー対象が再び選べます。誰も表示されませんでした。",
         "撃破されたキャラは必ず持ち主の捨て札に行きます。カードを残さず消えることがありました。",
         "春野サクラ 135 ミソスバリアントが、下のカードではなく自身の効果を適用するようになりました。",

@@ -79,9 +79,9 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
 
   const isRevealable = isOwn && isHidden && isMyTurn && hasCardData && !effectPopupMinimized;
 
-  const isReHidden = isHidden && character.wasRevealedAtLeastOnce;
-  
-  const isUnknownHiddenEnemy = isHidden && !isOwn && !character.wasRevealedAtLeastOnce;
+  const isReHidden = isHidden && (character.wasRevealedAtLeastOnce || (!isOwn && hasCardData));
+
+  const isUnknownHiddenEnemy = isHidden && !isOwn && !hasCardData;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
