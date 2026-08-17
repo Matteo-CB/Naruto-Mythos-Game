@@ -32,9 +32,11 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "Les effets de DUEL ne se declenchaient pas sur une large partie des cartes du set 2, dont ZABUZA MOMOCHI 150 Secret. Ils fonctionnent tous.",
         "BOMBE AVEUGLANTE 083 Peu commune eteint aussi les effets qui se declenchent sur une defaite, comme le chakra de TSUNADE 003.",
         "Les fouilles de deck montrent toutes les cartes regardees, et non plus seulement celles que l'on peut prendre.",
         "La mission Priorite Haute rapporte bien ses points deux fois, en plus de repeter les effets de score.",
@@ -60,6 +62,7 @@
         "HASHIRAMA SENJU 129 Rare et TOBIRAMA SENJU 131 Rare peuvent enfin s'ameliorer par-dessus un allie quand Orochimaru est dans la mission."
       ],
       "changes_en": [
+        "DUEL effects failed to trigger on a large share of set 2 cards, including ZABUZA MOMOCHI 150 Secret. They all work now.",
         "FLASH BOMB 083 Uncommon now also silences effects that trigger on a defeat, such as TSUNADE 003 chakra gain.",
         "Deck searches now show every card you looked at, not only the ones you may take.",
         "The High Priority mission now pays its points twice as well, on top of repeating the SCORE effects.",
@@ -85,6 +88,7 @@
         "HASHIRAMA SENJU 129 Rare and TOBIRAMA SENJU 131 Rare can finally upgrade over an ally when Orochimaru is in the mission."
       ],
       "changes_es": [
+        "Los efectos de DUELO no se activaban en buena parte de las cartas del set 2, incluida ZABUZA MOMOCHI 150 Secreta. Ya funcionan todos.",
         "BOMBA CEGADORA 083 Poco comun tambien apaga los efectos que se activan al derrotar, como el chakra de TSUNADE 003.",
         "Las busquedas en el mazo muestran todas las cartas miradas, no solo las que puedes coger.",
         "La mision Prioridad Alta ahora tambien paga sus puntos dos veces, ademas de repetir los efectos de puntuacion.",
@@ -110,6 +114,7 @@
         "HASHIRAMA SENJU 129 Rara y TOBIRAMA SENJU 131 Rara por fin pueden mejorar sobre un aliado cuando Orochimaru esta en la mision."
       ],
       "changes_pt": [
+        "Os efeitos de DUELO nao disparavam em boa parte das cartas do set 2, incluindo ZABUZA MOMOCHI 150 Secreta. Agora todos funcionam.",
         "BOMBA DE LUZ 083 Incomum tambem silencia os efeitos ativados por uma derrota, como o chakra de TSUNADE 003.",
         "As buscas no baralho mostram todas as cartas olhadas, nao apenas as que voce pode pegar.",
         "A missao Prioridade Alta agora tambem paga seus pontos duas vezes, alem de repetir os efeitos de pontuacao.",
@@ -135,6 +140,7 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara enfim podem melhorar sobre um aliado quando Orochimaru está na missão."
       ],
       "changes_it": [
+        "Gli effetti DUELLO non si attivavano su buona parte delle carte del set 2, inclusa ZABUZA MOMOCHI 150 Segreta. Ora funzionano tutti.",
         "BOMBA ACCECANTE 083 Non comune spegne anche gli effetti che si attivano su una sconfitta, come il chakra di TSUNADE 003.",
         "Le ricerche nel mazzo mostrano tutte le carte guardate, non solo quelle che puoi prendere.",
         "La missione Priorita Alta paga ora anche i suoi punti due volte, oltre a ripetere gli effetti di punteggio.",
@@ -160,6 +166,7 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara possono finalmente migliorare su un alleato quando Orochimaru è nella missione."
       ],
       "changes_pl": [
+        "Efekty POJEDYNKU nie uruchamialy sie na duzej czesci kart z dodatku 2, w tym ZABUZA MOMOCHI 150 Sekretna. Teraz dzialaja wszystkie.",
         "BOMBA BŁYSKOWA 083 Niepospolita wycisza teraz takze efekty wyzwalane przy pokonaniu, jak czakra TSUNADE 003.",
         "Przeszukiwanie talii pokazuje wszystkie obejrzane karty, nie tylko te, ktore mozesz wziac.",
         "Misja Wysoki Priorytet przyznaje teraz swoje punkty dwukrotnie, nie tylko powtarza efekty punktacji.",
@@ -185,6 +192,7 @@
         "HASHIRAMA SENJU 129 Rzadka i TOBIRAMA SENJU 131 Rzadka mogą wreszcie ulepszyć sojusznika, gdy Orochimaru jest w misji."
       ],
       "changes_ja": [
+        "セット2の多くのカードでDUEL効果が発動していませんでした。桃地再不斬 150 シークレットを含め、すべて動作します。",
         "閃光弾 083 アンコモンが、綱手 003 のチャクラなど、撃破時に誘発する効果も打ち消すようになりました。",
         "デッキを見る効果が、取れるカードだけでなく、見たカードをすべて表示するようになりました。",
         "高優先度ミッションが、スコア効果の再実行に加えて、ミッション点も2回入るようになりました。",

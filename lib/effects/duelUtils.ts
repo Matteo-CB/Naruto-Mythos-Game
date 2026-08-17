@@ -8,9 +8,9 @@ const DUEL_NAME_TERMINATOR = /[,:]|\[[^\]]*\]|\b(?:MAIN|AMBUSH|UPGRADE|SCORE|DUE
 
 export function parseDuelCharacterName(description: string): string | null {
   const cleaned = description.replace(/^\s*\[[^\]]*\]\s*/, '').trim();
+  if (!cleaned) return null;
   const m = cleaned.match(/^DUEL\s+(.+)$/i);
-  if (!m) return null;
-  const reste = m[1];
+  const reste = m ? m[1] : cleaned;
   const coupe = reste.match(DUEL_NAME_TERMINATOR);
   const name = (coupe && coupe.index !== undefined ? reste.slice(0, coupe.index) : reste).trim();
   return name.length > 0 ? name : null;
