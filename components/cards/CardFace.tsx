@@ -162,7 +162,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
               gap: '6%',
             }}
           >
-            <PowerIcon size="min(0.5em, 32%)" color={POWER_COLOR_BRIGHT} />
+            <PowerIcon size="min(0.64em, 42%)" color={POWER_COLOR_BRIGHT} style={{ filter: 'drop-shadow(0 0 3px rgba(232, 196, 119, 0.5))' }} />
             <span
               style={{
                 color: powerTokens > 0 ? '#fca5a5' : '#e0e0e0',
@@ -192,7 +192,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
             gap: '2px',
           }}
         >
-          <PowerIcon size="0.5em" color={POWER_COLOR_BRIGHT} />
+          <PowerIcon size="0.62em" color={POWER_COLOR_BRIGHT} style={{ filter: 'drop-shadow(0 0 3px rgba(232, 196, 119, 0.5))' }} />
           <span
             style={{
               color: '#fca5a5',

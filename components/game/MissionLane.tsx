@@ -188,12 +188,12 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
           )}
           <button onClick={() => { sandboxAddPowerToken(missionIndex, character.instanceId, 1); setShowSandboxMenu(false); }}
             className="px-3 py-1.5 text-[10px] text-left text-[#c4a35a] hover:bg-[#262626] transition-colors flex items-center gap-1.5">
-            <PowerIcon size={12} color="currentColor" />
+            <PowerIcon size={15} color="currentColor" style={{ filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.6))' }} />
             +1 {t('sandbox.powerToken')}
           </button>
           <button onClick={() => { sandboxAddPowerToken(missionIndex, character.instanceId, -1); setShowSandboxMenu(false); }}
             className="px-3 py-1.5 text-[10px] text-left text-[#888] hover:bg-[#262626] transition-colors flex items-center gap-1.5">
-            <PowerIcon size={12} color="currentColor" />
+            <PowerIcon size={15} color="currentColor" style={{ filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.6))' }} />
             -1 {t('sandbox.powerToken')}
           </button>
         </div>
@@ -324,20 +324,20 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         <div
           className={`absolute bottom-0.5 right-0.5 flex items-center justify-center gap-0.5 font-bold tabular-nums${character.powerTokens > 0 ? ' power-glow' : ''}`}
           style={{
-            minWidth: Math.min(dims.isMobile ? 32 : 26, dims.missionCard.w - 6) + 'px',
-            height: dims.isMobile ? '22px' : '18px',
-            padding: '0 2px',
+            minWidth: Math.min(dims.isMobile ? 36 : 30, dims.missionCard.w - 6) + 'px',
+            height: dims.isMobile ? '24px' : '20px',
+            padding: '0 3px',
             fontSize: dims.isMobile ? '15px' : '11px',
-            backgroundColor: character.powerTokens > 0 ? 'rgba(196, 163, 90, 0.25)' : 'rgba(0, 0, 0, 0.85)',
+            backgroundColor: character.powerTokens > 0 ? 'rgba(196, 163, 90, 0.32)' : 'rgba(0, 0, 0, 0.92)',
             color: character.powerTokens > 0 ? '#f0d890' : '#e0e0e0',
             border: character.powerTokens > 0 ? '1px solid rgba(196, 163, 90, 0.5)' : '1px solid rgba(255,255,255,0.1)',
             fontFamily: "'NJNaruto', Arial, sans-serif",
           }}
         >
           <PowerIcon
-            size={dims.isMobile ? 11 : 9}
-            color={character.powerTokens > 0 ? '#f0d890' : POWER_COLOR_BRIGHT}
-            style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9))' }}
+            size={dims.isMobile ? 15 : 13}
+            color={character.powerTokens > 0 ? '#ffe9a8' : POWER_COLOR_BRIGHT}
+            style={{ filter: 'drop-shadow(0 0 3px rgba(232, 196, 119, 0.55)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95))' }}
           />
           {manualPowerMode
             ? <ManualGuess actual={totalPower} hasModifier={character.powerTokens > 0} color={character.powerTokens > 0 ? '#f0d890' : '#e0e0e0'} />
@@ -357,10 +357,10 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
               animate={{ scale: 1, y: 0, opacity: 1 }}
               style={{
                 lineHeight: 0,
-                filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.9))',
+                filter: 'drop-shadow(0 0 4px rgba(232, 196, 119, 0.5)) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.95))',
               }}
             >
-              <PowerIcon size={dims.isMobile ? 13 : 11} color={POWER_COLOR_BRIGHT} />
+              <PowerIcon size={dims.isMobile ? 16 : 14} color={POWER_COLOR_BRIGHT} />
             </motion.div>
           ))}
           {character.powerTokens > 5 && (
@@ -889,7 +889,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
                 boxShadow: `0 0 10px ${palette.opponent.tint(0.35)}`,
               }}
             >
-              <PowerIcon size={dims.isMobile ? 13 : 9} color="currentColor" />
+              <PowerIcon size={dims.isMobile ? 16 : 12} color="currentColor" style={{ filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.6))' }} />
               {manualPowerMode ? <ManualGuess actual={oppPower} color={palette.opponent.bright} /> : oppPower}
             </span>
           </div>
@@ -933,7 +933,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
                 boxShadow: `0 0 10px ${palette.me.tint(0.35)}`,
               }}
             >
-              <PowerIcon size={dims.isMobile ? 13 : 9} color="currentColor" />
+              <PowerIcon size={dims.isMobile ? 16 : 12} color="currentColor" style={{ filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.6))' }} />
               {manualPowerMode ? <ManualGuess actual={myPower} color={palette.me.bright} /> : myPower}
             </span>
           </div>

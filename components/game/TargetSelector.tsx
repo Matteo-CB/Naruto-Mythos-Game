@@ -165,7 +165,7 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
             gap: '2px',
           }}
         >
-          <PowerIcon size={9} color={POWER_COLOR} />
+          <PowerIcon size={12} color={POWER_COLOR} style={{ filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.7))' }} />
           {manualPowerMode
             ? <ManualGuess actual={totalPower} hasModifier={character.powerTokens > 0} color={character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0'} />
             : totalPower}
@@ -530,7 +530,7 @@ const OrderedDefeatCard = React.memo(function OrderedDefeatCard({ character, isV
       {!isHidden && topCard && (
         <div className="absolute bottom-0.5 right-0.5 px-1 text-[9px] font-bold tabular-nums"
           style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0', display: 'flex', alignItems: 'center', gap: '2px' }}>
-          <PowerIcon size={9} color={POWER_COLOR} />
+          <PowerIcon size={12} color={POWER_COLOR} style={{ filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.7))' }} />
           {manualPowerMode
             ? <ManualGuess actual={character.effectivePower} hasModifier={character.powerTokens > 0} color={character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0'} />
             : character.effectivePower}
@@ -625,7 +625,7 @@ const TargetMissionLane = React.memo(function TargetMissionLane({ mission, missi
         className="flex items-center justify-center gap-1.5 w-full px-2 py-0.5"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
       >
-        <PowerIcon size={10} color={POWER_COLOR} />
+        <PowerIcon size={13} color={POWER_COLOR} style={{ filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.7))' }} />
         <span
           className="text-[10px] font-bold tabular-nums"
           style={{ color: manualPowerMode ? palette.me.primary : myPower > oppPower ? '#4aff6b' : myPower < oppPower ? '#ff6b6b' : '#888888' }}

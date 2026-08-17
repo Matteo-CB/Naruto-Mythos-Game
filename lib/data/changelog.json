@@ -36,7 +36,8 @@
         "fix",
         "fix",
         "fix",
-        "fix"
+        "fix",
+        "feature"
       ],
       "changes_fr": [
         "Quand SAKON Apposition des sceaux maléfiques 062 copie UKON Sceau Maudit, second stade 038, la cible perd bien 5 puissance au lieu d en gagner.",
@@ -65,7 +66,8 @@
         "ASUMA SARUTOBI 012 et SHIZUNE 003 ne peuvent plus se renforcer eux-mêmes: un personnage n est pas son propre allié.",
         "SAKON 037 comptait une seule carte révélée même quand on en révélait plusieurs, l effet n aboutissait donc pas.",
         "TAYUYA 040 ne se compte plus elle-même dans la remise qu elle accorde.",
-        "Une carte cachée que vous avez le droit de voir s affiche aussi dans les fenêtres de choix, et plus seulement sur le plateau."
+        "Une carte cachée que vous avez le droit de voir s affiche aussi dans les fenêtres de choix, et plus seulement sur le plateau.",
+        "Les icônes de puissance sur les cartes sont nettement plus grandes et se détachent mieux sur les illustrations claires."
       ],
       "changes_en": [
         "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power.",
@@ -94,7 +96,8 @@
         "ASUMA SARUTOBI 012 and SHIZUNE 003 can no longer POWERUP themselves: a character is not its own ally.",
         "SAKON 037 was counting only one revealed card even when several were revealed, so the effect went nowhere.",
         "TAYUYA 040 no longer counts herself in the discount she grants.",
-        "A hidden card you are allowed to see now also appears in the choice windows, not only on the board."
+        "A hidden card you are allowed to see now also appears in the choice windows, not only on the board.",
+        "The Power icons on cards are noticeably larger and stand out better against light artwork."
       ],
       "changes_es": [
         "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo.",
@@ -123,7 +126,8 @@
         "ASUMA SARUTOBI 012 y SHIZUNE 003 ya no pueden potenciarse a sí mismos: un personaje no es su propio aliado.",
         "SAKON 037 contaba una sola carta revelada aunque revelaras varias, así que el efecto no llegaba a nada.",
         "TAYUYA 040 ya no se cuenta a sí misma en el descuento que concede.",
-        "Una carta oculta que tienes derecho a ver aparece también en las ventanas de elección, no solo en el tablero."
+        "Una carta oculta que tienes derecho a ver aparece también en las ventanas de elección, no solo en el tablero.",
+        "Los iconos de poder en las cartas son claramente más grandes y destacan mejor sobre ilustraciones claras."
       ],
       "changes_pt": [
         "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar.",
@@ -152,7 +156,8 @@
         "ASUMA SARUTOBI 012 e SHIZUNE 003 já não podem reforçar-se a si próprios: um personagem não é seu próprio aliado.",
         "SAKON 037 contava apenas uma carta revelada mesmo revelando várias, pelo que o efeito não dava em nada.",
         "TAYUYA 040 já não se conta a si própria no desconto que concede.",
-        "Uma carta oculta que tens direito a ver aparece também nas janelas de escolha, e não apenas no tabuleiro."
+        "Uma carta oculta que tens direito a ver aparece também nas janelas de escolha, e não apenas no tabuleiro.",
+        "Os ícones de poder nas cartas são bem maiores e destacam-se melhor sobre ilustrações claras."
       ],
       "changes_it": [
         "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne.",
@@ -181,7 +186,8 @@
         "ASUMA SARUTOBI 012 e SHIZUNE 003 non possono piu potenziare se stessi: un personaggio non e alleato di se stesso.",
         "SAKON 037 contava una sola carta rivelata anche rivelandone piu di una, quindi l effetto non concludeva nulla.",
         "TAYUYA 040 non conta piu se stessa nello sconto che concede.",
-        "Una carta nascosta che hai il diritto di vedere appare anche nelle finestre di scelta, non solo sul tavolo."
+        "Una carta nascosta che hai il diritto di vedere appare anche nelle finestre di scelta, non solo sul tavolo.",
+        "Le icone di potenza sulle carte sono nettamente piu grandi e risaltano meglio sulle illustrazioni chiare."
       ],
       "changes_pl": [
         "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać.",
@@ -210,7 +216,8 @@
         "ASUMA SARUTOBI 012 i SHIZUNE 003 nie mogą już wzmacniać samych siebie: postać nie jest własnym sojusznikiem.",
         "SAKON 037 liczył tylko jedną odkrytą kartę, nawet gdy odkrywano kilka, więc efekt nic nie dawał.",
         "TAYUYA 040 nie liczy już samej siebie w przyznawanej zniżce.",
-        "Ukryta karta, którą masz prawo widzieć, pojawia się także w oknach wyboru, a nie tylko na planszy."
+        "Ukryta karta, którą masz prawo widzieć, pojawia się także w oknach wyboru, a nie tylko na planszy.",
+        "Ikony mocy na kartach są wyraźnie większe i lepiej odcinają się od jasnych ilustracji."
       ],
       "changes_ja": [
         "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。",
@@ -239,7 +246,8 @@
         "猿飛アスマ 012 と シズネ 003 は自身を強化できなくなりました。キャラクターは自分自身の味方ではありません。",
         "左近 037 は複数枚公開しても1枚しか数えておらず、効果が成立していませんでした。",
         "多由也 040 は、自身が与える割引に自分自身を数えなくなりました。",
-        "見る権利のある伏せカードは、盤面だけでなく選択ウィンドウにも表示されるようになりました。"
+        "見る権利のある伏せカードは、盤面だけでなく選択ウィンドウにも表示されるようになりました。",
+        "カード上のパワーアイコンが大きくなり、明るいイラストの上でも見やすくなりました。"
       ]
     },
     {

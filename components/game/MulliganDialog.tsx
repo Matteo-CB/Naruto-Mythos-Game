@@ -114,7 +114,7 @@ function MulliganCard({
           className="text-[11px] font-bold tabular-nums inline-flex items-center gap-0.5"
           style={{ color: '#c4a35a' }}
         >
-          <PowerIcon size={10} color={POWER_COLOR} />
+          <PowerIcon size={13} color={POWER_COLOR} style={{ filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.7))' }} />
           {manualPowerMode ? <ManualGuess actual={card.power} color="#c4a35a" /> : card.power}
         </span>
       </div>

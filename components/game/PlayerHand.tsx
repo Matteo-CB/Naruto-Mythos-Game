@@ -202,7 +202,7 @@ const HandCard = React.memo(function HandCard({
           className="font-bold tabular-nums inline-flex items-center gap-0.5"
           style={{ fontSize: dims.isMobile ? '13px' : '10px', color: me.primary, fontFamily: "'NJNaruto', Arial, sans-serif" }}
         >
-          <PowerIcon size={dims.isMobile ? 12 : 9} color="currentColor" />
+          <PowerIcon size={dims.isMobile ? 15 : 12} color="currentColor" style={{ filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.7))' }} />
           {manualPowerMode ? <ManualGuess actual={card.power ?? 0} color={me.primary} /> : card.power}
         </span>
       </div>

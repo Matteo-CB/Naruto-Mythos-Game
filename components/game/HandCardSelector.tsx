@@ -131,7 +131,7 @@ function HandCard({
             gap: '3px',
           }}
         >
-          <PowerIcon size={10} color={POWER_COLOR} />
+          <PowerIcon size={13} color={POWER_COLOR} style={{ filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.7))' }} />
           {manualPowerMode ? <ManualGuess actual={card.power} color="#e0e0e0" /> : card.power}
         </div>
       )}
