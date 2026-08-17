@@ -84,3 +84,67 @@ describe('Zabuza 136 voit les personnages arrives par un effet de carte', () => 
     ).toEqual([]);
   });
 });
+
+describe('une amelioration seule n est pas une remise d effet de carte', () => {
+  function ameliore(idBas: string, idHaut: string, viaEffet: boolean): GameState {
+    const state = buildSimState({
+      p2: [simChar(idBas, { owner: 'player2', instanceId: 'cible' })],
+      missions: 2, chakra1: 30, edgeHolder: 'player2',
+    });
+    state.phase = 'action';
+    state.activePlayer = 'player2';
+    state.player2.chakra = 30;
+    state.player2.hand = [getCardById(idHaut) as CharacterCard];
+    void viaEffet;
+    return repondre(GameEngine.applyAction(state, 'player2', {
+      type: 'UPGRADE_CHARACTER', cardIndex: 0, missionIndex: 0, targetInstanceId: 'cible',
+    } as never));
+  }
+
+  it('payer la difference est une regle du jeu, pas un effet, donc aucune cible pour Zabuza', () => {
+    const apres = ameliore('KS-009-C', 'KS-133-S', false);
+    const perso = apres.activeMissions[0].player2Characters.find((c) => c.instanceId === 'cible')!;
+    expect(perso.stack.length, 'l amelioration a bien eu lieu').toBe(2);
+    expect(
+      perso.playedBelowPrintedCost,
+      'la remise d amelioration ne compte pas comme un effet de carte',
+    ).toBe(false);
+
+    const tourSuivant: GameState = {
+      ...apres,
+      lastTurnPlayedIds: { player1: [], player2: apres.turnPlayedIds ?? [] },
+    };
+    expect(ennemisJouesMoinsCher(tourSuivant, 'player1', 0), 'Zabuza ne le vise pas').toEqual([]);
+  });
+})
+
+describe('une remise ecrite sur une carte compte bien', () => {
+  it('le Sakon 036 du set 2, moins cher grace a un allie Son, devient une cible', () => {
+    const state = buildSimState({
+      p2: [simChar('KS-057-C', { owner: 'player2', instanceId: 'jirobo' })],
+      missions: 2, chakra1: 30, edgeHolder: 'player2',
+    });
+    state.phase = 'action';
+    state.activePlayer = 'player2';
+    state.player2.chakra = 30;
+    state.player2.hand = [getCardById('SS-036-C') as CharacterCard];
+
+    const avant = state.player2.chakra;
+    const apres = repondre(GameEngine.applyAction(state, 'player2', {
+      type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false,
+    } as never));
+
+    const sakon = apres.activeMissions[0].player2Characters.find((c) => c.instanceId !== 'jirobo')!;
+    expect(avant - apres.player2.chakra, 'il coute 1 de moins que ses 3 imprimes').toBe(2);
+    expect(sakon.playedBelowPrintedCost, 'la remise vient bien de son texte').toBe(true);
+
+    const tourSuivant: GameState = {
+      ...apres,
+      lastTurnPlayedIds: { player1: [], player2: apres.turnPlayedIds ?? [] },
+    };
+    expect(
+      ennemisJouesMoinsCher(tourSuivant, 'player1', 0).map((c) => c.instanceId),
+      'Zabuza peut le vaincre',
+    ).toContain(sakon.instanceId);
+  });
+})

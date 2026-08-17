@@ -21818,7 +21818,8 @@ export class EffectEngine {
       mission[friendlySide] = updatedChars;
       missions[missionIndex] = mission;
       state.activeMissions = missions;
-      updatedChars[existingIdx] = { ...updatedChars[existingIdx], playedBelowPrintedCost: actualCost < (card.chakra ?? 0) };
+      const prixHorsRegleAmelioration = Math.max(0, baseEffectiveCostUpgChoice - costReduction);
+      updatedChars[existingIdx] = { ...updatedChars[existingIdx], playedBelowPrintedCost: prixHorsRegleAmelioration < (card.chakra ?? 0) };
       placedChar = updatedChars[existingIdx];
       isCardUpgrade = true;
 
@@ -24211,6 +24212,7 @@ export class EffectEngine {
 
     const effectiveRevealPrice = calculateEffectiveCost(newState, player, topCard, mIdx, true);
 
+    const prixRevelationHorsAmelioration = Math.max(0, effectiveRevealPrice - costReduction);
     let cost: number;
     if (upgradeTargetRhr) {
       const existingTC = upgradeTargetRhr.stack?.length > 0 ? upgradeTargetRhr.stack[upgradeTargetRhr.stack?.length - 1] : upgradeTargetRhr.card;
@@ -24224,7 +24226,7 @@ export class EffectEngine {
     
     char.isHidden = false;
     char.wasRevealedAtLeastOnce = true;
-    char.playedBelowPrintedCost = cost < (topCard.chakra ?? 0);
+    char.playedBelowPrintedCost = prixRevelationHorsAmelioration < (topCard.chakra ?? 0);
 
     
     if (powerUpBonus > 0) {
@@ -24246,7 +24248,7 @@ export class EffectEngine {
         chars_rhr[upgradeIdx_rhr] = {
           ...prev_rhr,
           card: revealedCharData.card,
-          playedBelowPrintedCost: cost < (topCard.chakra ?? 0),
+          playedBelowPrintedCost: prixRevelationHorsAmelioration < (topCard.chakra ?? 0),
           stack: [...prev_rhr.stack, ...revealedCharData.stack],
           attachments: mergedAttachments(prev_rhr, revealedCharData),
           powerTokens: prev_rhr.powerTokens + revealedCharData.powerTokens,
