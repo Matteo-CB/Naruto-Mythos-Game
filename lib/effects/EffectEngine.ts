@@ -520,7 +520,7 @@ export class EffectEngine {
     }
 
     if (!isUpgrade && !character.isHidden
-      && forestOfDeathActive(newState.activeMissions[missionIndex], player)
+      && forestOfDeathActive(newState.activeMissions[missionIndex])
       && !orderedTypes.includes('AMBUSH')
       && (topCard.effects ?? []).some((e) => e.type === 'AMBUSH')) {
       orderedTypes.push('AMBUSH');

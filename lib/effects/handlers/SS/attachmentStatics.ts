@@ -117,9 +117,8 @@ export function virtualSoundFourCount(
 
 export function forestOfDeathActive(
   mission: { attachments?: AttachedCard[] } | undefined,
-  player: PlayerID,
 ): boolean {
-  return missionCarriesAttachment(mission, FOREST_OF_DEATH, player).length > 0;
+  return missionCarriesAttachment(mission, FOREST_OF_DEATH).length > 0;
 }
 
 export function artisanVillageCount(
