@@ -54,8 +54,7 @@ export function calculateContinuousChakraBonus(
       const hasOtherLeaf = friendlyChars.some(
         (c) => {
           if (c.instanceId === char.instanceId || c.isHidden) return false;
-          const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-          return cTop.group === 'Leaf Village';
+          return characterHasGroup(c, 'Leaf Village');
         },
       );
       if (hasOtherLeaf) bonus += 1;

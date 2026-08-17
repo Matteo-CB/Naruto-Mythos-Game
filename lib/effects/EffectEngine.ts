@@ -3073,7 +3073,7 @@ export class EffectEngine {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-            if (topCard.group === 'Leaf Village') h001Targets.push(char.instanceId);
+            if (characterHasGroup(char, 'Leaf Village')) h001Targets.push(char.instanceId);
           }
         }
         if (h001Targets.length === 0) {
@@ -4903,8 +4903,7 @@ export class EffectEngine {
           for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
-            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-            if (topCard.group === 'Leaf Village') {
+            if (characterHasGroup(char, 'Leaf Village')) {
               tt041uTargets.push(char.instanceId);
             }
           }
@@ -10990,8 +10989,7 @@ export class EffectEngine {
             const c = chars[j];
             if (c.isHidden) continue;
             if (c.instanceId === pendingEffect.sourceInstanceId) continue;
-            const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-            if (topCard.group === 'Leaf Village') {
+            if (characterHasGroup(c, 'Leaf Village')) {
               chars[j] = { ...c, powerTokens: c.powerTokens + amplifiedPowerup(state, c.instanceId, 1) };
               t131Count++;
               changed = true;
@@ -21411,7 +21409,7 @@ export class EffectEngine {
     const alreadyHasGemmaPending = state.pendingEffects.some(
       (pe) => (pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' || pe.targetSelectionType === 'GEMMA049_CHOOSE_PROTECT_HIDE') && !pe.resolved,
     );
-    if (isEnemyEffect && charResult.character.card.group === 'Leaf Village' && !alreadyHasGemmaPending) {
+    if (isEnemyEffect && characterHasGroup(charResult.character, 'Leaf Village') && !alreadyHasGemmaPending) {
       const mission = state.activeMissions[charResult.missionIndex];
       const friendlyChars = charResult.player === 'player1' ? mission.player1Characters : mission.player2Characters;
       for (const friendly of friendlyChars) {
@@ -24440,7 +24438,7 @@ export class EffectEngine {
               e.description.includes('Leaf Village') &&
               e.description.includes('defeat this character instead'),
           );
-          if (hasSacrifice && targetChar.card.group === 'Leaf Village') {
+          if (hasSacrifice && characterHasGroup(targetChar, 'Leaf Village')) {
             return { replaced: true, replacement: 'sacrifice', sacrificeInstanceId: friendly.instanceId };
           }
         }

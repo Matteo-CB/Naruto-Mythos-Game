@@ -403,9 +403,10 @@ export function buildPendingTargetSelectionUI(
     } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL' || tst === 'SS090_CHOOSE_AMOUNT') {
       const isSteal = tst !== 'CHOOSE_TOKEN_AMOUNT_REMOVE';
       handCards = pendingAction.options.map((amountStr) => {
-        const amount = parseInt(amountStr, 10);
+        const amount = parseInt(amountStr.replace(/^AMOUNT_/, ''), 10);
         return {
           index: amount,
+          targetId: amountStr,
           card: {
             name_fr: isSteal ? `Voler ${amount} jeton(s)` : `Retirer ${amount} jeton(s)`,
             name_en: isSteal ? `Steal ${amount} token(s)` : `Remove ${amount} token(s)`,

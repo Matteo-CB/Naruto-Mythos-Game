@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
+import { characterHasGroup } from '@/lib/effects/groupUtils';
 
 
 function handleHiruzen001Main(ctx: EffectContext): EffectResult {
@@ -18,8 +19,7 @@ function handleHiruzen001Main(ctx: EffectContext): EffectResult {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (char.isHidden) continue;
 
-      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-      if (topCard.group === 'Leaf Village') {
+      if (characterHasGroup(char, 'Leaf Village')) {
         validTargets.push(char.instanceId);
       }
     }

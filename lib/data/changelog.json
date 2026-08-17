@@ -23,6 +23,8 @@
         "fix",
         "fix",
         "fix",
+        "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
@@ -39,7 +41,9 @@
         "Les fouilles de deck montrent les cartes regardées même quand aucune n est valide, avant qu elles ne repartent sous le deck.",
         "KUJAKU 072 demande confirmation avant de récupérer un équipement, son effet étant optionnel.",
         "Tout effet instantané facultatif demande désormais confirmation avant de s appliquer, au lieu de partir tout seul.",
-        "BOMBE FUMIGENE 086 réduit le coût du personnage qui la porte, et non plus le sien."
+        "BOMBE FUMIGENE 086 réduit le coût du personnage qui la porte, et non plus le sien.",
+        "SAMEHADA 090 affiche le nombre de jetons à voler au lieu d un choix illisible, et le clic fonctionne.",
+        "Les bandeaux de village accordent vraiment leur groupe: leur porteur est désormais reconnu par les effets qui cherchent ce village."
       ],
       "changes_en": [
         "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power.",
@@ -55,7 +59,9 @@
         "Deck searches now show the cards looked at even when none is valid, before they go back to the bottom of the deck.",
         "KUJAKU 072 now asks for confirmation before returning an attachment, since its effect is optional.",
         "Every optional instant effect now asks for confirmation before applying, instead of firing on its own.",
-        "SMOKE BOMB 086 now reduces the cost of the character carrying it, no longer its own."
+        "SMOKE BOMB 086 now reduces the cost of the character carrying it, no longer its own.",
+        "SAMEHADA 090 now shows how many tokens to steal instead of an unreadable choice, and clicking works.",
+        "Village headbands now truly grant their group: their bearer is recognised by effects looking for that village."
       ],
       "changes_es": [
         "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo.",
@@ -71,7 +77,9 @@
         "Las búsquedas en el mazo muestran las cartas miradas aunque ninguna sea válida, antes de volver al fondo del mazo.",
         "KUJAKU 072 pide confirmación antes de recuperar un equipamiento, ya que su efecto es opcional.",
         "Todo efecto instantáneo opcional pide ahora confirmación antes de aplicarse, en lugar de activarse solo.",
-        "BOMBA DE HUMO 086 reduce el coste del personaje que la lleva, ya no el suyo propio."
+        "BOMBA DE HUMO 086 reduce el coste del personaje que la lleva, ya no el suyo propio.",
+        "SAMEHADA 090 muestra cuántos contadores robar en vez de una opción ilegible, y el clic funciona.",
+        "Las bandas de aldea conceden de verdad su grupo: su portador es reconocido por los efectos que buscan esa aldea."
       ],
       "changes_pt": [
         "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar.",
@@ -87,7 +95,9 @@
         "As buscas no baralho mostram as cartas observadas mesmo quando nenhuma é válida, antes de voltarem ao fundo do baralho.",
         "KUJAKU 072 pede confirmação antes de recuperar um equipamento, já que o seu efeito é opcional.",
         "Todos os efeitos instantâneos opcionais pedem agora confirmação antes de se aplicarem, em vez de dispararem sozinhos.",
-        "BOMBA DE FUMO 086 reduz o custo do personagem que a transporta, e já não o seu."
+        "BOMBA DE FUMO 086 reduz o custo do personagem que a transporta, e já não o seu.",
+        "SAMEHADA 090 mostra quantos marcadores roubar em vez de uma escolha ilegível, e o clique funciona.",
+        "As bandanas de aldeia concedem mesmo o seu grupo: quem as usa é reconhecido pelos efeitos que procuram essa aldeia."
       ],
       "changes_it": [
         "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne.",
@@ -103,7 +113,9 @@
         "Le ricerche nel mazzo mostrano le carte guardate anche quando nessuna è valida, prima che tornino in fondo al mazzo.",
         "KUJAKU 072 chiede conferma prima di recuperare un equipaggiamento, essendo il suo effetto opzionale.",
         "Ogni effetto istantaneo facoltativo chiede ora conferma prima di applicarsi, invece di attivarsi da solo.",
-        "BOMBA FUMOGENA 086 riduce il costo del personaggio che la porta, non piu il proprio."
+        "BOMBA FUMOGENA 086 riduce il costo del personaggio che la porta, non piu il proprio.",
+        "SAMEHADA 090 mostra quanti segnalini rubare invece di una scelta illeggibile, e il clic funziona.",
+        "Le fasce del villaggio concedono davvero il loro gruppo: chi le porta viene riconosciuto dagli effetti che cercano quel villaggio."
       ],
       "changes_pl": [
         "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać.",
@@ -119,7 +131,9 @@
         "Przeszukiwanie talii pokazuje obejrzane karty nawet gdy żadna nie pasuje, zanim wrócą na spód talii.",
         "KUJAKU 072 prosi o potwierdzenie przed odzyskaniem wyposażenia, bo jego efekt jest opcjonalny.",
         "Każdy opcjonalny efekt natychmiastowy prosi teraz o potwierdzenie przed zastosowaniem, zamiast uruchamiać się sam.",
-        "BOMBA DYMNA 086 obniża koszt postaci, która ją nosi, a nie własny."
+        "BOMBA DYMNA 086 obniża koszt postaci, która ją nosi, a nie własny.",
+        "SAMEHADA 090 pokazuje, ile żetonów ukraść, zamiast nieczytelnego wyboru, a kliknięcie działa.",
+        "Opaski wioski naprawdę przyznają swoją grupę: ich nosiciel jest rozpoznawany przez efekty szukające tej wioski."
       ],
       "changes_ja": [
         "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。",
@@ -135,7 +149,9 @@
         "山札を見る効果は、該当するカードがない場合でも見たカードを表示してから山札の下に戻すようになりました。",
         "孔雀 072 は効果が任意のため、装備を回収する前に確認を求めるようになりました。",
         "任意の即時効果は、勝手に発動するのではなく、適用前に確認を求めるようになりました。",
-        "煙玉 086 は自身ではなく、それを装備しているキャラクターのコストを下げるようになりました。"
+        "煙玉 086 は自身ではなく、それを装備しているキャラクターのコストを下げるようになりました。",
+        "鮫肌 090 は読めない選択肢ではなく、奪うトークン数を表示し、クリックも機能するようになりました。",
+        "里の額当ては本当にその里の所属を与えます。装備者はその里を探す効果に認識されるようになりました。"
       ]
     },
     {
