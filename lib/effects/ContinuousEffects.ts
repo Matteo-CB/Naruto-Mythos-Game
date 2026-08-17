@@ -953,7 +953,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
   if (playedInstanceId) {
     const km056Side = playingPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
     const justPlayed = mission[km056Side].find((c: CharacterInPlay) => c.instanceId === playedInstanceId);
-    if (justPlayed && !justPlayed.isHidden) {
+    if (justPlayed && !justPlayed.isHidden && !textIsBlanked(justPlayed)) {
       const jpTop = justPlayed.stack?.length > 0 ? justPlayed.stack[justPlayed.stack.length - 1] : justPlayed.card;
       if ((jpTop.set === 'KS' && jpTop.number === 128) || (jpTop.set === 'KS' && jpTop.number === 152) || (jpTop.set === 'KS' && jpTop.number === 127)) {
         for (const enemyChar of opponentChars) {
