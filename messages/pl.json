@@ -3766,7 +3766,8 @@
         "ssDeckSearchShow": "Brak odpowiedniej karty wśród obejrzanych. Wracają losowo na spód twojej talii.",
         "ss072ConfirmMain": "Odzyskać ostatnie wyposażenie ze stosu kart odrzuconych?",
         "autoConfirmInstant": "Zastosować ten efekt?",
-        "ss007ChoosePowerup": "Wybierz sojuszniczą postać z Drużyny 7, aby WZMOCNIĆ o 2."
+        "ss007ChoosePowerup": "Wybierz sojuszniczą postać z Drużyny 7, aby WZMOCNIĆ o 2.",
+        "ss017RevealResult": "Odkryta karta"
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",
@@ -3780,7 +3781,9 @@
       "ss002RevealWonResult": "Twój zakład się opłacił.",
       "ss002RevealLostResult": "Tym razem pech.",
       "chooseCountTitle": "Karty do wtasowania",
-      "chooseCountConfirm": "Wtasuj {value} kart(y)"
+      "chooseCountConfirm": "Wtasuj {value} kart(y)",
+      "ss017RevealTitle": "Shino Aburame: owady szpiedzy",
+      "ss017RevealResult": "Karta odkryta losowo z ręki przeciwnika."
     },
     "anim": {
       "cardPlayedHidden": "Karta Zagrana Zakryta",

@@ -1659,7 +1659,8 @@
         "ssDeckSearchShow": "No valid card among those looked at. They go randomly to the bottom of your deck.",
         "ss072ConfirmMain": "Return the topmost attachment from your discard pile to your hand?",
         "autoConfirmInstant": "Apply this effect?",
-        "ss007ChoosePowerup": "Choose a friendly Team 7 character to POWERUP 2."
+        "ss007ChoosePowerup": "Choose a friendly Team 7 character to POWERUP 2.",
+        "ss017RevealResult": "Revealed card"
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",
@@ -1673,7 +1674,9 @@
       "ss002RevealWonResult": "Your bet pays off.",
       "ss002RevealLostResult": "Bad luck this time.",
       "chooseCountTitle": "Cards to shuffle back",
-      "chooseCountConfirm": "Shuffle {value} card(s)"
+      "chooseCountConfirm": "Shuffle {value} card(s)",
+      "ss017RevealTitle": "Shino Aburame: Spying Insects",
+      "ss017RevealResult": "A card revealed at random from the opponent's hand."
     },
     "anim": {
       "cardPlayedHidden": "Card Played Hidden",

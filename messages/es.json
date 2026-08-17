@@ -1664,7 +1664,8 @@
         "ssDeckSearchShow": "Ninguna carta válida entre las miradas. Vuelven al azar al fondo de tu mazo.",
         "ss072ConfirmMain": "¿Recuperar el último equipamiento de tu descarte?",
         "autoConfirmInstant": "¿Aplicar este efecto?",
-        "ss007ChoosePowerup": "Elige un personaje aliado del Equipo 7 para POTENCIAR 2."
+        "ss007ChoosePowerup": "Elige un personaje aliado del Equipo 7 para POTENCIAR 2.",
+        "ss017RevealResult": "Carta revelada"
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",
@@ -1678,7 +1679,9 @@
       "ss002RevealWonResult": "Tu apuesta sale bien.",
       "ss002RevealLostResult": "Mala suerte esta vez.",
       "chooseCountTitle": "Cartas a barajar",
-      "chooseCountConfirm": "Barajar {value} carta(s)"
+      "chooseCountConfirm": "Barajar {value} carta(s)",
+      "ss017RevealTitle": "Shino Aburame: insectos espía",
+      "ss017RevealResult": "Una carta revelada al azar de la mano del rival."
     },
     "anim": {
       "cardPlayedHidden": "Carta jugada oculta",

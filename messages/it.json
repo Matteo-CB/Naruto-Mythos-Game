@@ -3766,7 +3766,8 @@
         "ssDeckSearchShow": "Nessuna carta valida tra quelle guardate. Tornano a caso in fondo al mazzo.",
         "ss072ConfirmMain": "Recuperare l ultimo equipaggiamento dagli scarti?",
         "autoConfirmInstant": "Applicare questo effetto?",
-        "ss007ChoosePowerup": "Scegli un personaggio alleato del Team 7 da POTENZIARE di 2."
+        "ss007ChoosePowerup": "Scegli un personaggio alleato del Team 7 da POTENZIARE di 2.",
+        "ss017RevealResult": "Carta rivelata"
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",
@@ -3780,7 +3781,9 @@
       "ss002RevealWonResult": "La tua scommessa paga.",
       "ss002RevealLostResult": "Sfortuna questa volta.",
       "chooseCountTitle": "Carte da rimescolare",
-      "chooseCountConfirm": "Rimescola {value} carta/e"
+      "chooseCountConfirm": "Rimescola {value} carta/e",
+      "ss017RevealTitle": "Shino Aburame: insetti spia",
+      "ss017RevealResult": "Una carta rivelata a caso dalla mano avversaria."
     },
     "anim": {
       "cardPlayedHidden": "Carta Giocata Coperta",

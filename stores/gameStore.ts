@@ -555,7 +555,7 @@ export function buildPendingTargetSelectionUI(
 
   
   const isOroReveal = tst === 'OROCHIMARU_REVEAL_RESULT';
-  const isItachi091Reveal = tst === 'ITACHI091_HAND_REVEAL';
+  const isItachi091Reveal = tst === 'ITACHI091_HAND_REVEAL' || tst === 'SS017_REVEAL_RESULT';
   const isDosuLookReveal = tst === 'DOSU_LOOK_REVEAL';
   const isReconLookReveal = tst === 'SSMSS02_LOOK_REVEAL';
   const isDeclareReveal = tst === 'SS002_NUMBER_REVEAL';
@@ -590,8 +590,8 @@ export function buildPendingTargetSelectionUI(
       } else if (isItachi091Reveal) {
         revealedCard = {
           name_fr: '', chakra: 0, power: 0, canSteal: false,
-          revealTitleKey: 'game.effect.itachi091RevealTitle',
-          revealResultKey: 'game.effect.itachi091RevealResult',
+          revealTitleKey: tst === 'SS017_REVEAL_RESULT' ? 'game.effect.ss017RevealTitle' : 'game.effect.itachi091RevealTitle',
+          revealResultKey: tst === 'SS017_REVEAL_RESULT' ? 'game.effect.ss017RevealResult' : 'game.effect.itachi091RevealResult',
         };
         revealedCards = (rd.cards ?? []).map((c: { id?: string; name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra: number; power: number; image_file?: string; isDiscarded?: boolean; effects?: Array<{ type: string; description: string }>; keywords?: string[]; group?: string; rarity?: string; card_type?: string }) => enrichRevealedLocale({
           id: c.id, name_fr: c.name_fr, name_en: c.name_en,

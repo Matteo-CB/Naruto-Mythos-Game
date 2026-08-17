@@ -1663,7 +1663,8 @@
         "ssDeckSearchShow": "見たカードの中に該当するカードはありません。それらはランダムに山札の一番下に戻ります。",
         "ss072ConfirmMain": "捨て札の一番上の装備を手札に戻しますか？",
         "autoConfirmInstant": "この効果を適用しますか？",
-        "ss007ChoosePowerup": "パワーアップ2を与える味方の第七班キャラクターを選んでください。"
+        "ss007ChoosePowerup": "パワーアップ2を与える味方の第七班キャラクターを選んでください。",
+        "ss017RevealResult": "公開されたカード"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",
@@ -1677,7 +1678,9 @@
       "ss002RevealWonResult": "賭けは成功。",
       "ss002RevealLostResult": "今回は運がなかった。",
       "chooseCountTitle": "デッキに戻すカード",
-      "chooseCountConfirm": "{value}枚を混ぜる"
+      "chooseCountConfirm": "{value}枚を混ぜる",
+      "ss017RevealTitle": "油女シノ：偵察の蟲",
+      "ss017RevealResult": "相手の手札からランダムに公開されたカード。"
     },
     "anim": {
       "cardPlayedHidden": "カードを伏せて出した",

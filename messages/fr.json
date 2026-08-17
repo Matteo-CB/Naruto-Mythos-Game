@@ -1665,7 +1665,8 @@
         "ssDeckSearchShow": "Aucune carte valide parmi celles regardées. Elles retournent au hasard sous votre deck.",
         "ss072ConfirmMain": "Récupérer le dernier équipement de votre défausse ?",
         "autoConfirmInstant": "Appliquer cet effet ?",
-        "ss007ChoosePowerup": "Choisissez un personnage Équipe 7 allié à renforcer de 2."
+        "ss007ChoosePowerup": "Choisissez un personnage Équipe 7 allié à renforcer de 2.",
+        "ss017RevealResult": "Carte révélée"
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",
@@ -1679,7 +1680,9 @@
       "ss002RevealWonResult": "Votre pari est gagnant.",
       "ss002RevealLostResult": "Pas de chance cette fois.",
       "chooseCountTitle": "Cartes à remélanger",
-      "chooseCountConfirm": "Remélanger {value} carte(s)"
+      "chooseCountConfirm": "Remélanger {value} carte(s)",
+      "ss017RevealTitle": "Shino Aburame : insectes espions",
+      "ss017RevealResult": "Carte révélée au hasard dans la main adverse."
     },
     "anim": {
       "cardPlayedHidden": "Carte jouée face cachée",

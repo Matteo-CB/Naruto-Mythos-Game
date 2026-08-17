@@ -13498,6 +13498,52 @@ export class EffectEngine {
             'game.log.effect.ss017Chakra',
             { card: 'SHINO ABURAME', id: SHINO_017, amount: String(SHINO_017_GAIN) });
         }
+
+        {
+          const eff017 = generateInstanceId();
+          const act017 = generateInstanceId();
+          const carte017 = tiree017 as unknown as CardData;
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: eff017,
+            sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({
+              cards: [{
+                id: carte017.id, name_fr: carte017.name_fr, name_en: carte017.name_en,
+                title_fr: carte017.title_fr, title_en: carte017.title_en,
+                chakra: carte017.chakra ?? 0, power: carte017.power ?? 0,
+                image_file: carte017.image_file, effects: carte017.effects,
+                keywords: carte017.keywords, group: carte017.group,
+                rarity: carte017.rarity, card_type: carte017.card_type,
+              }],
+            }),
+            targetSelectionType: 'SS017_REVEAL_RESULT',
+            sourcePlayer: j017,
+            requiresTargetSelection: true,
+            validTargets: ['confirm'],
+            isOptional: false,
+            isMandatory: true,
+            resolved: false,
+            isUpgrade: false,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: act017,
+            type: 'SELECT_TARGET',
+            player: j017,
+            description: '',
+            descriptionKey: 'game.effect.desc.ss017RevealResult',
+            options: ['confirm'],
+            minSelections: 1,
+            maxSelections: 1,
+            sourceEffectId: eff017,
+          }];
+        }
+        break;
+      }
+
+      case 'SS017_REVEAL_RESULT': {
         break;
       }
 
