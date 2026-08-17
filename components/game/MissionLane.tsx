@@ -74,6 +74,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   const isHidden = character.isHidden;
 
   const hasCardData = !!character.card;
+  const carteActive = character.topCard ?? character.card;
 
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
 
@@ -87,41 +88,41 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     e.stopPropagation();
     if (!isMyTurn) {
 
-      if (!isUnknownHiddenEnemy && character.card) {
-        pinCard(character.card);
+      if (!isUnknownHiddenEnemy && carteActive) {
+        pinCard(carteActive);
       }
       return;
     }
     if (isRevealable) {
       selectTarget(character.instanceId);
       
-      if (character.card) {
-        pinCard(character.card);
+      if (carteActive) {
+        pinCard(carteActive);
       }
       return;
     }
     
-    if (!isUnknownHiddenEnemy && character.card) {
-      pinCard(character.card);
+    if (!isUnknownHiddenEnemy && carteActive) {
+      pinCard(carteActive);
     }
   };
 
   const handleDoubleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!isUnknownHiddenEnemy && character.card) {
-      zoomCard(character.card);
+    if (!isUnknownHiddenEnemy && carteActive) {
+      zoomCard(carteActive);
     }
   };
 
-  const imagePath = hasCardData ? normalizeImagePath(character.card?.image_file) : null;
+  const imagePath = hasCardData ? normalizeImagePath(carteActive?.image_file) : null;
 
   const totalPower = character.effectivePower;
   const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
 
   const handleMouseEnter = (e: React.MouseEvent) => {
     
-    if (isUnknownHiddenEnemy || !character.card) return;
-    showPreview(character.card, { x: e.clientX, y: e.clientY });
+    if (isUnknownHiddenEnemy || !carteActive) return;
+    showPreview(carteActive, { x: e.clientX, y: e.clientY });
   };
 
   const handleMouseLeave = () => {
@@ -253,7 +254,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         width: dims.missionCard.w + 'px',
         height: dims.missionCard.h + 'px',
         borderRadius: '6px',
-        cursor: isRevealable ? 'pointer' : (!isUnknownHiddenEnemy && character.card ? 'pointer' : 'default'),
+        cursor: isRevealable ? 'pointer' : (!isUnknownHiddenEnemy && carteActive ? 'pointer' : 'default'),
         border: isSelected
           ? `2px solid ${me.primary}`
           : isLastPlayed
@@ -291,9 +292,9 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
                 opacity: 0.6,
               }}
             />
-          ) : character.card ? (
+          ) : carteActive ? (
             <CardArtFallback
-              card={character.card}
+              card={carteActive}
               style={{ borderRadius: '6px', filter: 'grayscale(100%) brightness(0.5)', opacity: 0.6 }}
             />
           ) : (
@@ -309,10 +310,10 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
                 className="w-full h-full bg-cover bg-center"
                 style={{ backgroundImage: `url('${imagePath}')`, imageRendering: 'crisp-edges' }}
               />
-              {character.card?.isHolo && <HoloFoilOverlay imageUrl={imagePath} />}
+              {carteActive?.isHolo && <HoloFoilOverlay imageUrl={imagePath} />}
             </>
-          ) : character.card ? (
-            <CardArtFallback card={character.card} style={{ borderRadius: '6px' }} />
+          ) : carteActive ? (
+            <CardArtFallback card={carteActive} style={{ borderRadius: '6px' }} />
           ) : (
             <div className="w-full h-full" style={{ backgroundColor: '#1a1a1a' }} />
           )}
@@ -375,7 +376,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </div>
       )}
 
-      {!isHidden && character.card && (
+      {!isHidden && carteActive && (
         <div
           className="absolute top-0.5 left-0.5 flex items-center justify-center gap-0.5 font-bold"
           style={{
@@ -391,8 +392,8 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         >
           <ChakraIcon size={dims.isMobile ? 11 : 9} color="#0f2740" />
           {manualPowerMode
-            ? <ManualGuess actual={character.card.chakra} color="#0a0a0a" />
-            : character.card.chakra}
+            ? <ManualGuess actual={carteActive.chakra} color="#0a0a0a" />
+            : carteActive.chakra}
         </div>
       )}
 
@@ -446,6 +447,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     prev.character.controlledBy === next.character.controlledBy &&
     prev.character.originalOwner === next.character.originalOwner &&
     prev.character.card?.id === next.character.card?.id &&
+    prev.character.topCard?.id === next.character.topCard?.id &&
     attachmentsSignature(prev.character.attachments) === attachmentsSignature(next.character.attachments) &&
     prev.isOwn === next.isOwn,
 );

@@ -45,14 +45,15 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
   const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const zoomCard = useUIStore((s) => s.zoomCard);
   const isHidden = character.isHidden;
-  const canSeeCard = (character.isOwn || character.wasRevealedAtLeastOnce) && character.card;
+  const carteActive = character.topCard ?? character.card;
+  const canSeeCard = (character.isOwn || character.wasRevealedAtLeastOnce) && carteActive;
 
   const imagePath = (canSeeCard || !isHidden)
-    ? normalizeImagePath(character.card?.image_file)
+    ? normalizeImagePath(carteActive?.image_file)
     : null;
 
   const totalPower = character.effectivePower;
-  const displayName = character.card ? getCardName(character.card, locale as 'en' | 'fr') : (isHidden ? '???' : 'Unknown');
+  const displayName = carteActive ? getCardName(carteActive, locale as 'en' | 'fr') : (isHidden ? '???' : 'Unknown');
 
   const handleClick = () => {
     if (isValidTarget) {
@@ -120,8 +121,8 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
                 filter: 'brightness(0.4)',
               }}
             />
-          ) : character.card ? (
-            <CardArtFallback card={character.card} style={{ filter: 'brightness(0.4)' }} />
+          ) : carteActive ? (
+            <CardArtFallback card={carteActive} style={{ filter: 'brightness(0.4)' }} />
           ) : (
             <div
               className="w-full h-full"
@@ -142,8 +143,8 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
               className="w-full h-full bg-cover bg-center"
               style={{ backgroundImage: `url('${imagePath}')` }}
             />
-          ) : character.card ? (
-            <CardArtFallback card={character.card} />
+          ) : carteActive ? (
+            <CardArtFallback card={carteActive} />
           ) : (
             <div
               className="w-full h-full"
@@ -183,9 +184,9 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
         </div>
       )}
 
-      {character.card && !isHidden && (
+      {carteActive && !isHidden && (
         <button
-          onClick={(e) => { e.stopPropagation(); zoomCard(character.card as CharacterCard | MissionCard); }}
+          onClick={(e) => { e.stopPropagation(); zoomCard(carteActive as CharacterCard | MissionCard); }}
           className="absolute top-0.5 right-0.5 px-1 py-px text-[7px] font-bold cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
           style={{
             backgroundColor: 'rgba(0,0,0,0.85)',
@@ -801,15 +802,16 @@ export function TargetSelector() {
       for (let mIdx = 0; mIdx < visibleState.activeMissions.length; mIdx++) {
         const mission = visibleState.activeMissions[mIdx];
         for (const c of [...mission.player1Characters, ...mission.player2Characters]) {
-          if (c.instanceId === targetId && c.card) {
+          const sommet = c.topCard ?? c.card;
+          if (c.instanceId === targetId && sommet) {
             orderTargets.push({
               instanceId: c.instanceId,
-              name_fr: c.card.name_fr,
-              name_en: (c.card as any).name_en,
-              name_ja: (c.card as any).name_ja,
-              name_es: (c.card as any).name_es,
-              image_file: c.card.image_file,
-              chakra: c.card.chakra,
+              name_fr: sommet.name_fr,
+              name_en: (sommet as any).name_en,
+              name_ja: (sommet as any).name_ja,
+              name_es: (sommet as any).name_es,
+              image_file: sommet.image_file,
+              chakra: sommet.chakra,
               power: c.effectivePower,
               missionIndex: mIdx,
               missionRank: mission.rank,
@@ -1650,10 +1652,11 @@ export function TargetSelector() {
     } else if (confirmTarget) {
       for (const m of visibleState.activeMissions) {
         for (const c of [...m.player1Characters, ...m.player2Characters]) {
-          if (c.instanceId === confirmTarget && c.card) {
-            confirmImage = normalizeImagePath(c.card.image_file);
-            confirmCard = c.card;
-            confirmName = getCardName(c.card, locale as 'en' | 'fr');
+          const sommetConfirm = c.topCard ?? c.card;
+          if (c.instanceId === confirmTarget && sommetConfirm) {
+            confirmImage = normalizeImagePath(sommetConfirm.image_file);
+            confirmCard = sommetConfirm;
+            confirmName = getCardName(sommetConfirm, locale as 'en' | 'fr');
             break;
           }
         }
