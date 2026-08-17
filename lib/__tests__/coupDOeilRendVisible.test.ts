@@ -54,6 +54,20 @@ describe('regarder un personnage cache le rend visible a celui qui a regarde', (
     ).toContain('const isUnknownHiddenEnemy = isHidden && !isOwn && !hasCardData;');
   });
 
+  it('toutes les cartes qui font regarder passent par le meme mecanisme', () => {
+    const moteur = readFileSync('lib/effects/EffectEngine.ts', 'utf8');
+    const cas = ['SS_PEEK_HIDDEN', 'SS014_PEEK_AND_DEFEAT'];
+    for (const nom of cas) {
+      const debut = moteur.indexOf(`case '${nom}': {`);
+      expect(debut, `le cas ${nom} existe`).toBeGreaterThan(-1);
+      const bloc = moteur.slice(debut, debut + 2000);
+      expect(
+        bloc.includes('rememberPeek('),
+        `${nom} doit memoriser le coup d oeil, sinon le plateau ne montrera jamais la carte`,
+      ).toBe(true);
+    }
+  });
+
   it('l adversaire ne profite pas du coup d oeil', () => {
     const apres = rememberPeek(plateau(), 'player1', 'cache');
     const vuParLAutre = carteVue(apres, 'player2', 'cache');
