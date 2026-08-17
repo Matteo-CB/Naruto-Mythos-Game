@@ -885,7 +885,8 @@
         "ss113Chosen": "{card}（{id}）：相手が{target}を捨てました。",
         "ss133Powerup": "{card}（{id}）：{target}が登場時にパワー{amount}を得ました。",
         "ss135Discarded": "{card}（{id}）：{target}を捨てました。コスト{amount}。",
-        "ss135Hidden": "{card}（{id}）：敵キャラクターを裏向きにしました。"
+        "ss135Hidden": "{card}（{id}）：敵キャラクターを裏向きにしました。",
+        "ssDeckSearchBottom": "{card} ({id}): 見た {amount} 枚のカードはランダムに山札の一番下に戻ります。"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1658,7 +1659,9 @@
         "ss131MoveDestination": "移動先のミッションを選んでください。",
         "ss133PlaySummon": "2少なく支払ってこのミッションに出す口寄せを選んでください。",
         "ss135DiscardThenHide": "山札の一番上のカードを捨て、それより安い敵を裏向きにしますか。",
-        "ss135HideEnemy": "裏向きにする敵キャラクターを選んでください。コストは{amount}未満である必要があります。"
+        "ss135HideEnemy": "裏向きにする敵キャラクターを選んでください。コストは{amount}未満である必要があります。",
+        "ssDeckSearchShow": "見たカードの中に該当するカードはありません。それらはランダムに山札の一番下に戻ります。",
+        "ss072ConfirmMain": "捨て札の一番上の装備を手札に戻しますか？"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",

@@ -2988,7 +2988,8 @@
         "ss113Chosen": "{card} ({id}): przeciwnik odrzuca {target}.",
         "ss133Powerup": "{card} ({id}): {target} zyskuje {amount} Mocy po wejściu.",
         "ss135Discarded": "{card} ({id}): odrzucono {target}, koszt {amount}.",
-        "ss135Hidden": "{card} ({id}): wroga postać zostaje zakryta."
+        "ss135Hidden": "{card} ({id}): wroga postać zostaje zakryta.",
+        "ssDeckSearchBottom": "{card} ({id}): {amount} obejrzanych kart wraca losowo na spód talii."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3761,7 +3762,9 @@
         "ss131MoveDestination": "Wybierz misję docelową.",
         "ss133PlaySummon": "Wybierz Przywołanie do zagrania w tej misji, płacąc 2 mniej.",
         "ss135DiscardThenHide": "Odrzucić wierzchnią kartę talii i zakryć wroga tańszego od niej?",
-        "ss135HideEnemy": "Wybierz wrogą postać do zakrycia, musi kosztować mniej niż {amount}."
+        "ss135HideEnemy": "Wybierz wrogą postać do zakrycia, musi kosztować mniej niż {amount}.",
+        "ssDeckSearchShow": "Brak odpowiedniej karty wśród obejrzanych. Wracają losowo na spód twojej talii.",
+        "ss072ConfirmMain": "Odzyskać ostatnie wyposażenie ze stosu kart odrzuconych?"
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

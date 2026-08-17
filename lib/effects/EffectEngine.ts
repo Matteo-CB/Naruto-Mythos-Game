@@ -66,6 +66,7 @@ import { OROCHIMARU_127_ID, OROCHIMARU_127_NAME } from './handlers/SS/orochimaru
 import { KIMIMARO_077_ID, KIMIMARO_077_NAME, kimimaro077Targets, costOfTarget } from './handlers/SS/kimimaro077';
 import { DOSU_125_ID, DOSU_125_NAME } from './handlers/SS/soundMoves';
 import { UKON_038_ID, UKON_038_MALUS, UKON_038_NAME } from './handlers/SS/ukon038';
+import { recupererEquipementDefausse } from './handlers/SS/kujaku072';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatEnemyCharacter, defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
 import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval, isHiddenRevealBlocked, amplifiedPowerup } from './ContinuousEffects';
@@ -13178,6 +13179,34 @@ export class EffectEngine {
           'EFFECT_DRAW', `${meta.sourceName ?? ''} (${meta.sourceId ?? ''}): revealed ${choisi.name_fr} and added it to hand.`,
           'game.log.effect.ssDeckSearchTaken',
           { card: meta.sourceName ?? '', id: meta.sourceId ?? '', target: choisi.name_fr, target_en: choisi.name_en || choisi.name_fr });
+        break;
+      }
+
+      case 'SS072_CONFIRM_MAIN': {
+        newState = recupererEquipementDefausse(newState, pendingEffect.sourcePlayer);
+        break;
+      }
+
+      case 'SS_DECK_SEARCH_SHOW': {
+        let metaVue: { depth?: number; sourceName?: string; sourceId?: string } = {};
+        try { metaVue = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const profondeurVue = metaVue.depth ?? 3;
+        const joueurVue = pendingEffect.sourcePlayer;
+        const deckVue = [...newState[joueurVue].deck];
+        const sommetVue = deckVue.slice(0, profondeurVue);
+        if (sommetVue.length === 0) break;
+        for (let i = sommetVue.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [sommetVue[i], sommetVue[j]] = [sommetVue[j], sommetVue[i]];
+        }
+        newState[joueurVue] = {
+          ...newState[joueurVue],
+          deck: [...deckVue.slice(profondeurVue), ...sommetVue],
+        };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, joueurVue,
+          'EFFECT', `${metaVue.sourceName ?? ''} (${metaVue.sourceId ?? ''}): the ${sommetVue.length} cards looked at go randomly to the bottom of the deck.`,
+          'game.log.effect.ssDeckSearchBottom',
+          { card: metaVue.sourceName ?? '', id: metaVue.sourceId ?? '', amount: String(sommetVue.length) });
         break;
       }
 

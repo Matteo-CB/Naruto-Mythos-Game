@@ -19,6 +19,8 @@
         "fix",
         "fix",
         "fix",
+        "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
@@ -31,7 +33,9 @@
         "ENMA 132 Rare peut poser le NYOI ADAMANTIN sur un personnage de n importe quelle mission, plus seulement la sienne.",
         "SAMEHADA 090 affiche enfin le nombre de jetons à voler au lieu de cartes illisibles marquées de points d interrogation.",
         "BOMBE AVEUGLANTE 083 efface vraiment tout le texte de sa cible: sa surtaxe de chakra et ses auras de puissance ne s appliquent plus.",
-        "GRAND-MERE SANSHO 067 déclenchait par erreur le REMPART 067 du set 1 et mettait un allié à 0 de puissance."
+        "GRAND-MERE SANSHO 067 déclenchait par erreur le REMPART 067 du set 1 et mettait un allié à 0 de puissance.",
+        "Les fouilles de deck montrent les cartes regardées même quand aucune n est valide, avant qu elles ne repartent sous le deck.",
+        "KUJAKU 072 demande confirmation avant de récupérer un équipement, son effet étant optionnel."
       ],
       "changes_en": [
         "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power.",
@@ -43,7 +47,9 @@
         "ENMA 132 Rare can attach the ADAMANTINE NYOI to a character on any mission, not only its own.",
         "SAMEHADA 090 now shows how many Power tokens to steal instead of unreadable cards marked with question marks.",
         "FLASH BOMB 083 now truly blanks its target: its extra Chakra tax and its Power auras no longer apply.",
-        "GRANDMA SANSHO 067 was wrongly triggering RASHOMON 067 from set 1 and setting an ally to 0 Power."
+        "GRANDMA SANSHO 067 was wrongly triggering RASHOMON 067 from set 1 and setting an ally to 0 Power.",
+        "Deck searches now show the cards looked at even when none is valid, before they go back to the bottom of the deck.",
+        "KUJAKU 072 now asks for confirmation before returning an attachment, since its effect is optional."
       ],
       "changes_es": [
         "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo.",
@@ -55,7 +61,9 @@
         "ENMA 132 Rara puede equipar el NYOI ADAMANTINO a un personaje de cualquier misión, no solo de la suya.",
         "SAMEHADA 090 muestra por fin cuántos contadores de poder robar, en vez de cartas ilegibles con signos de interrogación.",
         "BOMBA CEGADORA 083 borra de verdad todo el texto de su objetivo: su recargo de chakra y sus auras de poder ya no se aplican.",
-        "ABUELA SANSHO 067 activaba por error el BALUARTE 067 del set 1 y dejaba a un aliado con 0 de poder."
+        "ABUELA SANSHO 067 activaba por error el BALUARTE 067 del set 1 y dejaba a un aliado con 0 de poder.",
+        "Las búsquedas en el mazo muestran las cartas miradas aunque ninguna sea válida, antes de volver al fondo del mazo.",
+        "KUJAKU 072 pide confirmación antes de recuperar un equipamiento, ya que su efecto es opcional."
       ],
       "changes_pt": [
         "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar.",
@@ -67,7 +75,9 @@
         "ENMA 132 Rara pode equipar o NYOI ADAMANTINO num personagem de qualquer missão, e não apenas da sua.",
         "SAMEHADA 090 mostra finalmente quantos marcadores de poder roubar, em vez de cartas ilegíveis com pontos de interrogação.",
         "BOMBA OFUSCANTE 083 apaga mesmo todo o texto do seu alvo: a sua sobretaxa de chakra e as suas auras de poder deixam de se aplicar.",
-        "AVÓ SANSHO 067 acionava por engano o BALUARTE 067 do set 1 e deixava um aliado com 0 de poder."
+        "AVÓ SANSHO 067 acionava por engano o BALUARTE 067 do set 1 e deixava um aliado com 0 de poder.",
+        "As buscas no baralho mostram as cartas observadas mesmo quando nenhuma é válida, antes de voltarem ao fundo do baralho.",
+        "KUJAKU 072 pede confirmação antes de recuperar um equipamento, já que o seu efeito é opcional."
       ],
       "changes_it": [
         "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne.",
@@ -79,7 +89,9 @@
         "ENMA 132 Rara può equipaggiare il NYOI ADAMANTINO a un personaggio di qualsiasi missione, non solo della propria.",
         "SAMEHADA 090 mostra finalmente quanti segnalini potenza rubare, invece di carte illeggibili con punti interrogativi.",
         "BOMBA ACCECANTE 083 cancella davvero tutto il testo del bersaglio: il sovrapprezzo di chakra e le aure di potenza non si applicano piu.",
-        "NONNA SANSHO 067 attivava per errore il BALUARDO 067 del set 1 e portava un alleato a 0 di potenza."
+        "NONNA SANSHO 067 attivava per errore il BALUARDO 067 del set 1 e portava un alleato a 0 di potenza.",
+        "Le ricerche nel mazzo mostrano le carte guardate anche quando nessuna è valida, prima che tornino in fondo al mazzo.",
+        "KUJAKU 072 chiede conferma prima di recuperare un equipaggiamento, essendo il suo effetto opzionale."
       ],
       "changes_pl": [
         "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać.",
@@ -91,7 +103,9 @@
         "ENMA 132 Rzadka może założyć ADAMANTOWY NYOI postaci na dowolnej misji, a nie tylko na własnej.",
         "SAMEHADA 090 pokazuje wreszcie, ile żetonów mocy ukraść, zamiast nieczytelnych kart ze znakami zapytania.",
         "BOMBA OŚLEPIAJĄCA 083 naprawdę wymazuje cały tekst celu: jego dopłata chakry i aury mocy przestają działać.",
-        "BABCIA SANSHO 067 przez pomyłkę uruchamiała RASHOMON 067 z zestawu 1 i ustawiała moc sojusznika na 0."
+        "BABCIA SANSHO 067 przez pomyłkę uruchamiała RASHOMON 067 z zestawu 1 i ustawiała moc sojusznika na 0.",
+        "Przeszukiwanie talii pokazuje obejrzane karty nawet gdy żadna nie pasuje, zanim wrócą na spód talii.",
+        "KUJAKU 072 prosi o potwierdzenie przed odzyskaniem wyposażenia, bo jego efekt jest opcjonalny."
       ],
       "changes_ja": [
         "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。",
@@ -103,7 +117,9 @@
         "猿魔 132 レアは、自分のミッションだけでなく、任意のミッションのキャラクターに 剛力金剛如意 を装備できるようになりました。",
         "鮫肌 090 は、疑問符だけの読めないカードではなく、奪うパワートークンの数を表示するようになりました。",
         "閃光弾 083 は対象のテキストを完全に消すようになりました。追加チャクラの上乗せもパワーのオーラも適用されません。",
-        "サンショ婆 067 が誤ってセット1の羅生門 067 を発動し、味方のパワーを0にしていた不具合を修正しました。"
+        "サンショ婆 067 が誤ってセット1の羅生門 067 を発動し、味方のパワーを0にしていた不具合を修正しました。",
+        "山札を見る効果は、該当するカードがない場合でも見たカードを表示してから山札の下に戻すようになりました。",
+        "孔雀 072 は効果が任意のため、装備を回収する前に確認を求めるようになりました。"
       ]
     },
     {

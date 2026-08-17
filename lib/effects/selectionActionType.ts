@@ -47,6 +47,7 @@ export function actionTypeForSelectionType(tst: string): PendingAction['type'] {
     tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' ||
     tst === 'CHOOSE_TOKEN_AMOUNT_STEAL' ||
     tst === 'SS_DECK_SEARCH_TAKE' ||
+    tst === 'SS_DECK_SEARCH_SHOW' ||
     tst === 'SS095_TAKE_JUTSU' ||
     tst === 'SS023_TOP_OR_BOTTOM' ||
   tst === 'SS028_BOTTOM_OR_KEEP' ||

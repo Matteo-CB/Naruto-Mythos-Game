@@ -443,7 +443,7 @@ export function buildPendingTargetSelectionUI(
           card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
         };
       });
-    } else if (tst === 'SS_DECK_SEARCH_TAKE' || tst === 'SS095_TAKE_JUTSU' || tst === 'SS023_TOP_OR_BOTTOM' || tst === 'SS028_BOTTOM_OR_KEEP') {
+    } else if (tst === 'SS_DECK_SEARCH_TAKE' || tst === 'SS_DECK_SEARCH_SHOW' || tst === 'SS095_TAKE_JUTSU' || tst === 'SS023_TOP_OR_BOTTOM' || tst === 'SS028_BOTTOM_OR_KEEP') {
       let deckInfo: Array<{ index: number; id?: string; name_fr: string; name_en?: string; chakra?: number; power?: number; image_file?: string }> = [];
       try { deckInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
       const choisissables = new Map<number, string>();

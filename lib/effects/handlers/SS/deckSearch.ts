@@ -66,14 +66,29 @@ function fouilleHandler(fouille: FouilleDeDeck) {
   return (ctx: EffectContext): EffectResult => {
     const { state, sourcePlayer, sourceCard } = ctx;
     const candidats = candidatsDeFouille(state, sourcePlayer, fouille);
+    const regardees = cartesRegardees(state, sourcePlayer, fouille);
+
     if (candidats.length === 0) {
+      const journal = logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+        `${fouille.nom} (${fouille.id}): ${fouille.refus}`,
+        'game.log.effect.noTarget', { card: fouille.nom, id: fouille.id });
+
+      if (regardees.length === 0) return { state: { ...state, log: journal } };
+
       return {
-        state: {
-          ...state,
-          log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-            `${fouille.nom} (${fouille.id}): ${fouille.refus}`,
-            'game.log.effect.noTarget', { card: fouille.nom, id: fouille.id }),
-        },
+        state: { ...state, log: journal },
+        requiresTargetSelection: true,
+        targetSelectionType: 'SS_DECK_SEARCH_SHOW',
+        validTargets: regardees.map((i) => `DECK_${i}`),
+        isOptional: false,
+        isMandatory: true,
+        description: JSON.stringify({
+          depth: fouille.profondeur,
+          sourceName: fouille.nom,
+          sourceId: fouille.id,
+          cards: apercuDeCartes(state, sourcePlayer, regardees),
+        }),
+        descriptionKey: 'game.effect.desc.ssDeckSearchShow',
       };
     }
 
@@ -87,7 +102,7 @@ function fouilleHandler(fouille: FouilleDeDeck) {
         depth: fouille.profondeur,
         sourceName: fouille.nom,
         sourceId: fouille.id,
-        cards: apercuDeCartes(state, sourcePlayer, cartesRegardees(state, sourcePlayer, fouille)),
+        cards: apercuDeCartes(state, sourcePlayer, regardees),
       }),
       descriptionKey: 'game.effect.desc.ssDeckSearchTake',
     }, sourceCard.instanceId, 'SS_DECK_SEARCH_CONFIRM');

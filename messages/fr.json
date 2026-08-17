@@ -887,7 +887,8 @@
         "ss113Chosen": "{card} ({id}) : l'adversaire défausse {target}.",
         "ss133Powerup": "{card} ({id}) : {target} gagne {amount} de Puissance en arrivant.",
         "ss135Discarded": "{card} ({id}) : {target} défaussée, coût {amount}.",
-        "ss135Hidden": "{card} ({id}) : le personnage ennemi est caché."
+        "ss135Hidden": "{card} ({id}) : le personnage ennemi est caché.",
+        "ssDeckSearchBottom": "{card} ({id}) : les {amount} cartes regardées repartent au hasard sous le deck."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1660,7 +1661,9 @@
         "ss131MoveDestination": "Choisissez la mission de destination.",
         "ss133PlaySummon": "Choisissez l'Invocation à jouer dans cette mission en payant 2 de moins.",
         "ss135DiscardThenHide": "Défausser la carte du dessus de votre pioche, puis cacher un ennemi moins cher qu'elle ?",
-        "ss135HideEnemy": "Choisissez le personnage ennemi à cacher, il doit coûter moins de {amount}."
+        "ss135HideEnemy": "Choisissez le personnage ennemi à cacher, il doit coûter moins de {amount}.",
+        "ssDeckSearchShow": "Aucune carte valide parmi celles regardées. Elles retournent au hasard sous votre deck.",
+        "ss072ConfirmMain": "Récupérer le dernier équipement de votre défausse ?"
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",

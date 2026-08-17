@@ -886,7 +886,8 @@
         "ss113Chosen": "{card} ({id}): el rival descarta {target}.",
         "ss133Powerup": "{card} ({id}): {target} gana {amount} de Potencia al llegar.",
         "ss135Discarded": "{card} ({id}): {target} descartada, coste {amount}.",
-        "ss135Hidden": "{card} ({id}): el personaje enemigo queda oculto."
+        "ss135Hidden": "{card} ({id}): el personaje enemigo queda oculto.",
+        "ssDeckSearchBottom": "{card} ({id}): las {amount} cartas miradas vuelven al azar al fondo del mazo."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",
@@ -1659,7 +1660,9 @@
         "ss131MoveDestination": "Elige la misión de destino.",
         "ss133PlaySummon": "Elige la Invocación que jugarás en esta misión pagando 2 menos.",
         "ss135DiscardThenHide": "¿Descartar la carta superior de tu mazo y ocultar a un enemigo más barato que ella?",
-        "ss135HideEnemy": "Elige el personaje enemigo a ocultar, debe costar menos de {amount}."
+        "ss135HideEnemy": "Elige el personaje enemigo a ocultar, debe costar menos de {amount}.",
+        "ssDeckSearchShow": "Ninguna carta válida entre las miradas. Vuelven al azar al fondo de tu mazo.",
+        "ss072ConfirmMain": "¿Recuperar el último equipamiento de tu descarte?"
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

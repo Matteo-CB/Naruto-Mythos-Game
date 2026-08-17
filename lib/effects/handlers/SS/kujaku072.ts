@@ -28,21 +28,33 @@ function kujaku072(ctx: EffectContext): EffectResult {
     };
   }
 
-  const defausse = [...state[sourcePlayer].discardPile];
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'SS072_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({}),
+    descriptionKey: 'game.effect.desc.ss072ConfirmMain',
+  };
+}
+
+export function recupererEquipementDefausse(state: GameState, player: PlayerID): GameState {
+  const index = dernierEquipementDefausse(state, player);
+  if (index === -1) return state;
+  const defausse = [...state[player].discardPile];
   const [recuperee] = defausse.splice(index, 1);
   return {
-    state: {
-      ...state,
-      [sourcePlayer]: {
-        ...state[sourcePlayer],
-        discardPile: defausse,
-        hand: [...state[sourcePlayer].hand, recuperee],
-      },
-      log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_DRAW',
-        `Kujaku (072): ${recuperee.name_fr} returns from the discard pile to hand.`,
-        'game.log.effect.ss072Recovered',
-        { card: KUJAKU_072_NOM, id: KUJAKU_072, target: recuperee.name_fr, target_en: recuperee.name_en || recuperee.name_fr }),
+    ...state,
+    [player]: {
+      ...state[player],
+      discardPile: defausse,
+      hand: [...state[player].hand, recuperee],
     },
+    log: logAction(state.log, state.turn, state.phase, player, 'EFFECT_DRAW',
+      `Kujaku (072): ${recuperee.name_fr} returns from the discard pile to hand.`,
+      'game.log.effect.ss072Recovered',
+      { card: KUJAKU_072_NOM, id: KUJAKU_072, target: recuperee.name_fr, target_en: recuperee.name_en || recuperee.name_fr }),
   };
 }
 

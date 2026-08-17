@@ -881,7 +881,8 @@
         "ss113Chosen": "{card} ({id}): the opponent discards {target}.",
         "ss133Powerup": "{card} ({id}): {target} gains {amount} Power on arrival.",
         "ss135Discarded": "{card} ({id}): {target} discarded, cost {amount}.",
-        "ss135Hidden": "{card} ({id}): the enemy character is hidden."
+        "ss135Hidden": "{card} ({id}): the enemy character is hidden.",
+        "ssDeckSearchBottom": "{card} ({id}): the {amount} cards looked at go randomly to the bottom of the deck."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -1654,7 +1655,9 @@
         "ss131MoveDestination": "Choose the destination mission.",
         "ss133PlaySummon": "Choose the Summon to play in this mission, paying 2 less.",
         "ss135DiscardThenHide": "Discard the top card of your deck, then hide an enemy cheaper than it?",
-        "ss135HideEnemy": "Choose the enemy character to hide, it must cost less than {amount}."
+        "ss135HideEnemy": "Choose the enemy character to hide, it must cost less than {amount}.",
+        "ssDeckSearchShow": "No valid card among those looked at. They go randomly to the bottom of your deck.",
+        "ss072ConfirmMain": "Return the topmost attachment from your discard pile to your hand?"
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",
