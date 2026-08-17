@@ -32,6 +32,7 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
@@ -57,7 +58,8 @@
         "Quatre fenêtres de confirmation s affichaient comme une liste de cartes illisible, dont celle des fouilles de deck.",
         "SAKURA HARUNO 007 laisse choisir le personnage Équipe 7 à renforcer au lieu de désigner le plus fort d office.",
         "KAKASHI HATAKE 008 peut révéler un Équipe 7 déjà caché même si la révélation fusionne, sa restriction ne visant que la main.",
-        "SHINO ABURAME 017 montre enfin la carte révélée dans la main adverse au lieu de se contenter de la citer."
+        "SHINO ABURAME 017 montre enfin la carte révélée dans la main adverse au lieu de se contenter de la citer.",
+        "ASUMA SARUTOBI 012 et SHIZUNE 003 ne peuvent plus se renforcer eux-mêmes: un personnage n est pas son propre allié."
       ],
       "changes_en": [
         "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power.",
@@ -82,7 +84,8 @@
         "Four confirmation windows were showing as an unreadable card list, including the one for deck searches.",
         "SAKURA HARUNO 007 now lets you choose which Team 7 character to POWERUP instead of picking the strongest for you.",
         "KAKASHI HATAKE 008 can reveal a Team 7 already hidden even if the reveal merges, since its restriction only covers cards from hand.",
-        "SHINO ABURAME 017 now actually shows the card revealed from the opponent's hand instead of only naming it."
+        "SHINO ABURAME 017 now actually shows the card revealed from the opponent's hand instead of only naming it.",
+        "ASUMA SARUTOBI 012 and SHIZUNE 003 can no longer POWERUP themselves: a character is not its own ally."
       ],
       "changes_es": [
         "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo.",
@@ -107,7 +110,8 @@
         "Cuatro ventanas de confirmación se mostraban como una lista de cartas ilegible, incluida la de las búsquedas en el mazo.",
         "SAKURA HARUNO 007 te deja elegir a qué personaje del Equipo 7 potenciar, en vez de escoger al más fuerte por ti.",
         "KAKASHI HATAKE 008 puede revelar un Equipo 7 ya oculto aunque la revelación se fusione, ya que su restricción solo afecta a la mano.",
-        "SHINO ABURAME 017 muestra por fin la carta revelada de la mano rival en vez de solo nombrarla."
+        "SHINO ABURAME 017 muestra por fin la carta revelada de la mano rival en vez de solo nombrarla.",
+        "ASUMA SARUTOBI 012 y SHIZUNE 003 ya no pueden potenciarse a sí mismos: un personaje no es su propio aliado."
       ],
       "changes_pt": [
         "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar.",
@@ -132,7 +136,8 @@
         "Quatro janelas de confirmação apareciam como uma lista de cartas ilegível, incluindo a das buscas no baralho.",
         "SAKURA HARUNO 007 deixa-te escolher que personagem da Equipa 7 reforçar, em vez de escolher o mais forte por ti.",
         "KAKASHI HATAKE 008 pode revelar uma Equipa 7 já oculta mesmo que a revelação funda, pois a restrição só cobre a mão.",
-        "SHINO ABURAME 017 mostra finalmente a carta revelada da mão do adversário em vez de apenas a nomear."
+        "SHINO ABURAME 017 mostra finalmente a carta revelada da mão do adversário em vez de apenas a nomear.",
+        "ASUMA SARUTOBI 012 e SHIZUNE 003 já não podem reforçar-se a si próprios: um personagem não é seu próprio aliado."
       ],
       "changes_it": [
         "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne.",
@@ -157,7 +162,8 @@
         "Quattro finestre di conferma apparivano come un elenco di carte illeggibile, inclusa quella delle ricerche nel mazzo.",
         "SAKURA HARUNO 007 ti lascia scegliere quale personaggio del Team 7 potenziare, invece di scegliere il piu forte al posto tuo.",
         "KAKASHI HATAKE 008 puo rivelare un Team 7 gia nascosto anche se la rivelazione si fonde, poiche la restrizione riguarda solo la mano.",
-        "SHINO ABURAME 017 mostra finalmente la carta rivelata dalla mano avversaria invece di limitarsi a nominarla."
+        "SHINO ABURAME 017 mostra finalmente la carta rivelata dalla mano avversaria invece di limitarsi a nominarla.",
+        "ASUMA SARUTOBI 012 e SHIZUNE 003 non possono piu potenziare se stessi: un personaggio non e alleato di se stesso."
       ],
       "changes_pl": [
         "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać.",
@@ -182,7 +188,8 @@
         "Cztery okna potwierdzenia wyświetlały się jako nieczytelna lista kart, w tym to od przeszukiwania talii.",
         "SAKURA HARUNO 007 pozwala wybrać, którą postać z Drużyny 7 wzmocnić, zamiast wybierać najsilniejszą za ciebie.",
         "KAKASHI HATAKE 008 może odkryć ukrytą już postać z Drużyny 7, nawet gdy odkrycie łączy karty, bo ograniczenie dotyczy tylko ręki.",
-        "SHINO ABURAME 017 wreszcie pokazuje kartę odkrytą z ręki przeciwnika, zamiast tylko ją wymieniać."
+        "SHINO ABURAME 017 wreszcie pokazuje kartę odkrytą z ręki przeciwnika, zamiast tylko ją wymieniać.",
+        "ASUMA SARUTOBI 012 i SHIZUNE 003 nie mogą już wzmacniać samych siebie: postać nie jest własnym sojusznikiem."
       ],
       "changes_ja": [
         "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。",
@@ -207,7 +214,8 @@
         "山札を見る効果のものを含め、4つの確認ウィンドウが読めないカード一覧として表示されていました。",
         "春野サクラ 007 は、最も強い第七班キャラクターを自動で選ぶのではなく、対象をプレイヤーが選べるようになりました。",
         "はたけカカシ 008 の制限は手札のカードのみに及ぶため、すでに伏せている第七班を公開して重ねることができるようになりました。",
-        "油女シノ 017 は、名前を挙げるだけでなく、相手の手札から公開されたカードを実際に表示するようになりました。"
+        "油女シノ 017 は、名前を挙げるだけでなく、相手の手札から公開されたカードを実際に表示するようになりました。",
+        "猿飛アスマ 012 と シズネ 003 は自身を強化できなくなりました。キャラクターは自分自身の味方ではありません。"
       ]
     },
     {

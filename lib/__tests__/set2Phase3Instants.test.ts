@@ -157,7 +157,7 @@ describe('phase 3, la consultation des cartes cachees', () => {
 });
 
 describe('phase 3, les renforts conditionnels', () => {
-  it('Shizune 3 ne propose que les allies Feuille de sa mission', () => {
+  it('Shizune 3 ne propose que ses allies Feuille, jamais elle-meme', () => {
     const shizune = simChar('SS-003-C', { owner: 'player1' });
     const feuille = simChar('SS-010-C', { owner: 'player1' });
     const etranger = simChar('SS-032-C', { owner: 'player1' });
@@ -165,9 +165,8 @@ describe('phase 3, les renforts conditionnels', () => {
 
     const joue = EffectEngine.resolvePlayEffects(s, 'player1', shizune, 0, false);
     const relais = JSON.parse(joue.pendingEffects[0].effectDescription) as { targets?: string[] };
-    expect(relais.targets, 'Shizune et son allie Feuille, pas le Sonore').toEqual(
-      expect.arrayContaining([shizune.instanceId, feuille.instanceId]),
-    );
+    expect(relais.targets, 'seulement l allie Feuille').toEqual([feuille.instanceId]);
+    expect(relais.targets, 'un personnage n est pas son propre allie').not.toContain(shizune.instanceId);
     expect(relais.targets).not.toContain(etranger.instanceId);
   });
 

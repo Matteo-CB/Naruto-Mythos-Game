@@ -4,6 +4,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
 import { confirmFirst } from './confirmFirst';
+import { characterHasGroup } from '@/lib/effects/groupUtils';
 
 export const SHIZUNE_003 = 'SS-003-C';
 export const ASUMA_012 = 'SS-012-C';
@@ -94,7 +95,8 @@ function targetedPowerup(
 ) {
   return (ctx: EffectContext): EffectResult => {
     const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
-    const cibles = alliesIn(state, sourceMissionIndex, sourcePlayer, accepte);
+    const cibles = alliesIn(state, sourceMissionIndex, sourcePlayer, accepte)
+      .filter((c) => c.instanceId !== sourceCard.instanceId);
     if (cibles.length === 0) return refus(state, sourcePlayer, `${nom} (${id}): ${refusTexte}`, nom, id);
 
     return confirmFirst({
@@ -153,7 +155,7 @@ function hoki071(ctx: EffectContext): EffectResult {
 export function registerConditionalBoostHandlers(): void {
   registerEffect(SHIZUNE_003, 'MAIN', targetedPowerup(
     'SHIZUNE', SHIZUNE_003, 1,
-    (c) => (topOf(c).group ?? '') === 'Leaf Village',
+    (c) => characterHasGroup(c, 'Leaf Village'),
     'no friendly Leaf Village character in this mission.',
   ));
   registerEffect(ASUMA_012, 'MAIN', targetedPowerup(
