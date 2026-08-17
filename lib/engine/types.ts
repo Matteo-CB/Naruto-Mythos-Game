@@ -65,6 +65,7 @@ export interface AttachedCard {
   instanceId: string;
   card: CardData;
   owner: PlayerID;
+  powerOverride?: number;
 }
 
 export interface MissionCard extends CardData {

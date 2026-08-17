@@ -543,7 +543,7 @@ export function attachCardToMission(state: GameState, player: PlayerID, card: Ca
   return resolveAttachmentFirstStrike(newState, player, card, null, missionIndex);
 }
 
-export function attachCardToCharacter(state: GameState, player: PlayerID, card: CardData, hostInstanceId: string, revealed = false): GameState {
+export function attachCardToCharacter(state: GameState, player: PlayerID, card: CardData, hostInstanceId: string, revealed = false, powerOverride?: number): GameState {
   let hostMissionIndex = -1;
   let hostSide: 'player1Characters' | 'player2Characters' | null = null;
   let hostIdx = -1;
@@ -563,6 +563,7 @@ export function attachCardToCharacter(state: GameState, player: PlayerID, card: 
   const held = host.attachments ?? [];
   const replaced = ignoreLesConditionsDePose(host) ? [] : held.filter((a) => a.owner === player);
   const att: AttachedCard = { instanceId: generateInstanceId(), card, owner: player };
+  if (powerOverride !== undefined) att.powerOverride = powerOverride;
   host.attachments = ignoreLesConditionsDePose(host)
     ? [...held, att]
     : [...held.filter((a) => a.owner !== player), att];

@@ -64,7 +64,7 @@ import { KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
 import { OROCHIMARU_127_ID, OROCHIMARU_127_NAME } from './handlers/SS/orochimaru127';
 import { KIMIMARO_077_ID, KIMIMARO_077_NAME, kimimaro077Targets, costOfTarget } from './handlers/SS/kimimaro077';
 import { DOSU_125_ID, DOSU_125_NAME } from './handlers/SS/soundMoves';
-import { UKON_038_ID, UKON_038_NAME } from './handlers/SS/ukon038';
+import { UKON_038_ID, UKON_038_MALUS, UKON_038_NAME } from './handlers/SS/ukon038';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatEnemyCharacter, defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
 import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval, isHiddenRevealBlocked, amplifiedPowerup } from './ContinuousEffects';
@@ -12699,7 +12699,7 @@ export class EffectEngine {
           charactersInPlay: EffectEngine.countCharsForPlayer(newState, ss038Player),
         };
 
-        newState = attachCardToCharacter(newState, ss038Player, ss038Carte, targetId);
+        newState = attachCardToCharacter(newState, ss038Player, ss038Carte, targetId, false, UKON_038_MALUS);
 
         const ss038TopHote = ss038Hote.character.stack?.length > 0
           ? ss038Hote.character.stack[ss038Hote.character.stack.length - 1]

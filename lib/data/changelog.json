@@ -1,6 +1,40 @@
 {
   "entries": [
     {
+      "date": "2026-08-17",
+      "title_fr": "Correctif de UKON copie",
+      "title_en": "Copied Ukon fix",
+      "title_es": "Corrección de Ukon copiado",
+      "title_pt": "Correção de Ukon copiado",
+      "title_it": "Correzione di Ukon copiato",
+      "title_pl": "Poprawka skopiowanego Ukona",
+      "title_ja": "コピーされた右近の修正",
+      "categories": [
+        "fix"
+      ],
+      "changes_fr": [
+        "Quand SAKON Apposition des sceaux maléfiques 062 copie UKON Sceau Maudit, second stade 038, la cible perd bien 5 puissance au lieu d en gagner."
+      ],
+      "changes_en": [
+        "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power."
+      ],
+      "changes_es": [
+        "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo."
+      ],
+      "changes_pt": [
+        "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar."
+      ],
+      "changes_it": [
+        "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne."
+      ],
+      "changes_pl": [
+        "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać."
+      ],
+      "changes_ja": [
+        "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。"
+      ]
+    },
+    {
       "date": "2026-08-16",
       "title_fr": "Correctifs des equipements et des Hokage",
       "title_en": "Attachment and Hokage fixes",

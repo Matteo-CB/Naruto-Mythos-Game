@@ -180,6 +180,7 @@ export function attachedPowerOf(
     && (hostTop.effects ?? []).some((e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('Food'));
   let total = 0;
   for (const att of char.attachments) {
+    if (att.powerOverride !== undefined) { total += att.powerOverride; continue; }
     if (att.card.id === 'SS-038-UC') { total += -5; continue; }
     let p = att.card.power ?? 0;
     if (p !== 0 && doublesFood && (att.card.keywords ?? []).includes('Food')) p *= 2;
