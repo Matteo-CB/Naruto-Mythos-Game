@@ -3,6 +3,7 @@ import type { CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { sideKey, topOf } from './sandMove';
+import { virtualSoundFourCount } from '@/lib/effects/handlers/SS/attachmentStatics';
 
 export const JIROBO_033_ID = 'SS-033-UC';
 export const JIROBO_033_NAME = 'JIRÔBÔ';
@@ -18,12 +19,13 @@ export function friendlySoundFourCount(
   const mission = state.activeMissions[missionIndex];
   if (!mission) return 0;
 
-  return (mission[sideKey(player)] as CharacterInPlay[]).filter((char) => {
+  const reels = (mission[sideKey(player)] as CharacterInPlay[]).filter((char) => {
     if (char.instanceId === sourceInstanceId) return false;
     if (char.isHidden) return false;
     if (char.controlledBy !== player) return false;
     return (topOf(char).keywords ?? []).includes(SOUND_FOUR_KEYWORD);
   }).length;
+  return reels + virtualSoundFourCount(mission, player);
 }
 
 function jirobo033Upgrade(ctx: EffectContext): EffectResult {

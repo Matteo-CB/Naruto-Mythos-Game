@@ -6,7 +6,7 @@ import { isSummonPlay, jiraiyaGoldSources, JIRAIYA_GOLD_ID, JIRAIYA_GOLD_NAME } 
 import { characterHasGroup } from './groupUtils';
 import { kabuto139Triggers, KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
 import { ss2StaticPowerModifier, ss2StaticChakraBonus } from './handlers/SS/staticAuras';
-import { attachmentPowerBonus, missionAttachmentPowerModifier, hostChakraBonus, cannotReceivePowerTokens, textIsBlanked } from './handlers/SS/attachmentStatics';
+import { attachmentPowerBonus, missionAttachmentPowerModifier, hostChakraBonus, cannotReceivePowerTokens, textIsBlanked, virtualSoundFourCount } from './handlers/SS/attachmentStatics';
 
 
 
@@ -157,7 +157,8 @@ function countMissionsWithKeyword(state: GameState, player: PlayerID, keyword: s
         return (top.keywords ?? []).includes(keyword) && c.controlledBy === player;
       },
     );
-    if (hasKeyword) count++;
+    const laboratoire = keyword === 'Sound Four' && virtualSoundFourCount(mission, player) > 0;
+    if (hasKeyword || laboratoire) count++;
   }
   return count;
 }

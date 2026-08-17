@@ -4,6 +4,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { playLessSelectionResult } from '../shared/playLess';
 import { sideKey, topOf } from './sandMove';
+import { virtualSoundFourCount } from '@/lib/effects/handlers/SS/attachmentStatics';
 
 export const TAYUYA_040_ID = 'SS-040-UC';
 export const TAYUYA_040_NAME = 'TAYUYA';
@@ -45,7 +46,7 @@ export function tayuya040Reductions(
       if (char.isHidden) continue;
       if ((topOf(char).keywords ?? []).includes('Sound Four')) compte += 1;
     }
-    table[i] = compte;
+    table[i] = compte + virtualSoundFourCount(mission, player);
   }
   return table;
 }

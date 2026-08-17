@@ -26,6 +26,7 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
@@ -45,7 +46,8 @@
         "BOMBE FUMIGENE 086 réduit le coût du personnage qui la porte, et non plus le sien.",
         "SAMEHADA 090 affiche le nombre de jetons à voler au lieu d un choix illisible, et le clic fonctionne.",
         "Les bandeaux de village accordent vraiment leur groupe: leur porteur est désormais reconnu par les effets qui cherchent ce village.",
-        "Un équipement posé sur une mission apporte sa puissance à son camp, à l affichage comme au décompte des missions."
+        "Un équipement posé sur une mission apporte sa puissance à son camp, à l affichage comme au décompte des missions.",
+        "LABORATOIRE DE L ILE DU DEMON 105 compte bien comme un allié Son 4 supplémentaire pour tous les effets qui en comptent."
       ],
       "changes_en": [
         "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power.",
@@ -64,7 +66,8 @@
         "SMOKE BOMB 086 now reduces the cost of the character carrying it, no longer its own.",
         "SAMEHADA 090 now shows how many tokens to steal instead of an unreadable choice, and clicking works.",
         "Village headbands now truly grant their group: their bearer is recognised by effects looking for that village.",
-        "An attachment placed on a mission now adds its Power to its side, both on screen and when missions are scored."
+        "An attachment placed on a mission now adds its Power to its side, both on screen and when missions are scored.",
+        "DEMON'S ISLAND LABORATORY 105 now counts as an extra friendly Sound Four for every effect that counts them."
       ],
       "changes_es": [
         "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo.",
@@ -83,7 +86,8 @@
         "BOMBA DE HUMO 086 reduce el coste del personaje que la lleva, ya no el suyo propio.",
         "SAMEHADA 090 muestra cuántos contadores robar en vez de una opción ilegible, y el clic funciona.",
         "Las bandas de aldea conceden de verdad su grupo: su portador es reconocido por los efectos que buscan esa aldea.",
-        "Un equipamiento colocado en una misión aporta su poder a su bando, tanto en pantalla como al puntuar las misiones."
+        "Un equipamiento colocado en una misión aporta su poder a su bando, tanto en pantalla como al puntuar las misiones.",
+        "LABORATORIO DE LA ISLA DEL DEMONIO 105 cuenta como un aliado del Cuarteto del Sonido más para todos los efectos que los cuentan."
       ],
       "changes_pt": [
         "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar.",
@@ -102,7 +106,8 @@
         "BOMBA DE FUMO 086 reduz o custo do personagem que a transporta, e já não o seu.",
         "SAMEHADA 090 mostra quantos marcadores roubar em vez de uma escolha ilegível, e o clique funciona.",
         "As bandanas de aldeia concedem mesmo o seu grupo: quem as usa é reconhecido pelos efeitos que procuram essa aldeia.",
-        "Um equipamento colocado numa missão dá o seu poder ao seu lado, no ecrã e na contagem das missões."
+        "Um equipamento colocado numa missão dá o seu poder ao seu lado, no ecrã e na contagem das missões.",
+        "LABORATÓRIO DA ILHA DO DEMÓNIO 105 conta como mais um aliado do Quarteto do Som para todos os efeitos que os contam."
       ],
       "changes_it": [
         "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne.",
@@ -121,7 +126,8 @@
         "BOMBA FUMOGENA 086 riduce il costo del personaggio che la porta, non piu il proprio.",
         "SAMEHADA 090 mostra quanti segnalini rubare invece di una scelta illeggibile, e il clic funziona.",
         "Le fasce del villaggio concedono davvero il loro gruppo: chi le porta viene riconosciuto dagli effetti che cercano quel villaggio.",
-        "Un equipaggiamento posto su una missione aggiunge la sua potenza al proprio schieramento, a schermo e nel calcolo delle missioni."
+        "Un equipaggiamento posto su una missione aggiunge la sua potenza al proprio schieramento, a schermo e nel calcolo delle missioni.",
+        "LABORATORIO DELL ISOLA DEL DEMONE 105 conta come un alleato del Quartetto del Suono in piu per tutti gli effetti che li contano."
       ],
       "changes_pl": [
         "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać.",
@@ -140,7 +146,8 @@
         "BOMBA DYMNA 086 obniża koszt postaci, która ją nosi, a nie własny.",
         "SAMEHADA 090 pokazuje, ile żetonów ukraść, zamiast nieczytelnego wyboru, a kliknięcie działa.",
         "Opaski wioski naprawdę przyznają swoją grupę: ich nosiciel jest rozpoznawany przez efekty szukające tej wioski.",
-        "Wyposażenie położone na misji dodaje swoją moc swojej stronie, zarówno na ekranie, jak i przy punktacji misji."
+        "Wyposażenie położone na misji dodaje swoją moc swojej stronie, zarówno na ekranie, jak i przy punktacji misji.",
+        "LABORATORIUM WYSPY DEMONA 105 liczy się jako dodatkowy sojusznik Czwórki Dźwięku dla wszystkich efektów, które ich liczą."
       ],
       "changes_ja": [
         "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。",
@@ -159,7 +166,8 @@
         "煙玉 086 は自身ではなく、それを装備しているキャラクターのコストを下げるようになりました。",
         "鮫肌 090 は読めない選択肢ではなく、奪うトークン数を表示し、クリックも機能するようになりました。",
         "里の額当ては本当にその里の所属を与えます。装備者はその里を探す効果に認識されるようになりました。",
-        "ミッションに置かれた装備は、画面表示でもミッションの集計でも、自陣にパワーを加えるようになりました。"
+        "ミッションに置かれた装備は、画面表示でもミッションの集計でも、自陣にパワーを加えるようになりました。",
+        "鬼の島の研究所 105 は、音の四人衆を数えるすべての効果において、味方の音の四人衆1体として数えられるようになりました。"
       ]
     },
     {
