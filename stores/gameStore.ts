@@ -551,7 +551,7 @@ export function buildPendingTargetSelectionUI(
   
   const isSakura011Draw = tst === 'SAKURA011_DRAW' || tst === 'HAKU088_CONFIRM_DRAW';
   const isKiba113ConfirmHide = tst === 'KIBA113_CONFIRM_HIDE_AKAMARU' || tst === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
-  const isEffectConfirm = tst.includes('_CONFIRM_') && !isKiba113ConfirmHide && !isSakura011Draw;
+  const isEffectConfirm = (tst.includes('_CONFIRM_') || tst.endsWith('_CONFIRM')) && !isKiba113ConfirmHide && !isSakura011Draw;
 
   
   const isOroReveal = tst === 'OROCHIMARU_REVEAL_RESULT';

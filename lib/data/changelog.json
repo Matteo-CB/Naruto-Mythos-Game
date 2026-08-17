@@ -28,6 +28,7 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
@@ -49,7 +50,8 @@
         "Les bandeaux de village accordent vraiment leur groupe: leur porteur est désormais reconnu par les effets qui cherchent ce village.",
         "Un équipement posé sur une mission apporte sa puissance à son camp, à l affichage comme au décompte des missions.",
         "LABORATOIRE DE L ILE DU DEMON 105 compte bien comme un allié Son 4 supplémentaire pour tous les effets qui en comptent.",
-        "LA FORET DE LA MORT 107 déclenche les embuscades des deux camps, et non plus seulement de celui qui l a posée."
+        "LA FORET DE LA MORT 107 déclenche les embuscades des deux camps, et non plus seulement de celui qui l a posée.",
+        "Quatre fenêtres de confirmation s affichaient comme une liste de cartes illisible, dont celle des fouilles de deck."
       ],
       "changes_en": [
         "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power.",
@@ -70,7 +72,8 @@
         "Village headbands now truly grant their group: their bearer is recognised by effects looking for that village.",
         "An attachment placed on a mission now adds its Power to its side, both on screen and when missions are scored.",
         "DEMON'S ISLAND LABORATORY 105 now counts as an extra friendly Sound Four for every effect that counts them.",
-        "THE FOREST OF DEATH 107 now triggers ambushes for both players, not only for the one who placed it."
+        "THE FOREST OF DEATH 107 now triggers ambushes for both players, not only for the one who placed it.",
+        "Four confirmation windows were showing as an unreadable card list, including the one for deck searches."
       ],
       "changes_es": [
         "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo.",
@@ -91,7 +94,8 @@
         "Las bandas de aldea conceden de verdad su grupo: su portador es reconocido por los efectos que buscan esa aldea.",
         "Un equipamiento colocado en una misión aporta su poder a su bando, tanto en pantalla como al puntuar las misiones.",
         "LABORATORIO DE LA ISLA DEL DEMONIO 105 cuenta como un aliado del Cuarteto del Sonido más para todos los efectos que los cuentan.",
-        "EL BOSQUE DE LA MUERTE 107 activa las emboscadas de ambos bandos, no solo del que lo colocó."
+        "EL BOSQUE DE LA MUERTE 107 activa las emboscadas de ambos bandos, no solo del que lo colocó.",
+        "Cuatro ventanas de confirmación se mostraban como una lista de cartas ilegible, incluida la de las búsquedas en el mazo."
       ],
       "changes_pt": [
         "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar.",
@@ -112,7 +116,8 @@
         "As bandanas de aldeia concedem mesmo o seu grupo: quem as usa é reconhecido pelos efeitos que procuram essa aldeia.",
         "Um equipamento colocado numa missão dá o seu poder ao seu lado, no ecrã e na contagem das missões.",
         "LABORATÓRIO DA ILHA DO DEMÓNIO 105 conta como mais um aliado do Quarteto do Som para todos os efeitos que os contam.",
-        "A FLORESTA DA MORTE 107 ativa as emboscadas de ambos os lados, e não apenas de quem a colocou."
+        "A FLORESTA DA MORTE 107 ativa as emboscadas de ambos os lados, e não apenas de quem a colocou.",
+        "Quatro janelas de confirmação apareciam como uma lista de cartas ilegível, incluindo a das buscas no baralho."
       ],
       "changes_it": [
         "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne.",
@@ -133,7 +138,8 @@
         "Le fasce del villaggio concedono davvero il loro gruppo: chi le porta viene riconosciuto dagli effetti che cercano quel villaggio.",
         "Un equipaggiamento posto su una missione aggiunge la sua potenza al proprio schieramento, a schermo e nel calcolo delle missioni.",
         "LABORATORIO DELL ISOLA DEL DEMONE 105 conta come un alleato del Quartetto del Suono in piu per tutti gli effetti che li contano.",
-        "LA FORESTA DELLA MORTE 107 attiva le imboscate di entrambi gli schieramenti, non solo di chi l ha posata."
+        "LA FORESTA DELLA MORTE 107 attiva le imboscate di entrambi gli schieramenti, non solo di chi l ha posata.",
+        "Quattro finestre di conferma apparivano come un elenco di carte illeggibile, inclusa quella delle ricerche nel mazzo."
       ],
       "changes_pl": [
         "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać.",
@@ -154,7 +160,8 @@
         "Opaski wioski naprawdę przyznają swoją grupę: ich nosiciel jest rozpoznawany przez efekty szukające tej wioski.",
         "Wyposażenie położone na misji dodaje swoją moc swojej stronie, zarówno na ekranie, jak i przy punktacji misji.",
         "LABORATORIUM WYSPY DEMONA 105 liczy się jako dodatkowy sojusznik Czwórki Dźwięku dla wszystkich efektów, które ich liczą.",
-        "LAS ŚMIERCI 107 wyzwala zasadzki obu stron, a nie tylko tej, która go położyła."
+        "LAS ŚMIERCI 107 wyzwala zasadzki obu stron, a nie tylko tej, która go położyła.",
+        "Cztery okna potwierdzenia wyświetlały się jako nieczytelna lista kart, w tym to od przeszukiwania talii."
       ],
       "changes_ja": [
         "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。",
@@ -175,7 +182,8 @@
         "里の額当ては本当にその里の所属を与えます。装備者はその里を探す効果に認識されるようになりました。",
         "ミッションに置かれた装備は、画面表示でもミッションの集計でも、自陣にパワーを加えるようになりました。",
         "鬼の島の研究所 105 は、音の四人衆を数えるすべての効果において、味方の音の四人衆1体として数えられるようになりました。",
-        "死の森 107 は、設置した側だけでなく、両プレイヤーの待ち伏せを発動させるようになりました。"
+        "死の森 107 は、設置した側だけでなく、両プレイヤーの待ち伏せを発動させるようになりました。",
+        "山札を見る効果のものを含め、4つの確認ウィンドウが読めないカード一覧として表示されていました。"
       ]
     },
     {
