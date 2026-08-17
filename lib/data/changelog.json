@@ -25,6 +25,7 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
@@ -43,7 +44,8 @@
         "Tout effet instantané facultatif demande désormais confirmation avant de s appliquer, au lieu de partir tout seul.",
         "BOMBE FUMIGENE 086 réduit le coût du personnage qui la porte, et non plus le sien.",
         "SAMEHADA 090 affiche le nombre de jetons à voler au lieu d un choix illisible, et le clic fonctionne.",
-        "Les bandeaux de village accordent vraiment leur groupe: leur porteur est désormais reconnu par les effets qui cherchent ce village."
+        "Les bandeaux de village accordent vraiment leur groupe: leur porteur est désormais reconnu par les effets qui cherchent ce village.",
+        "Un équipement posé sur une mission apporte sa puissance à son camp, à l affichage comme au décompte des missions."
       ],
       "changes_en": [
         "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power.",
@@ -61,7 +63,8 @@
         "Every optional instant effect now asks for confirmation before applying, instead of firing on its own.",
         "SMOKE BOMB 086 now reduces the cost of the character carrying it, no longer its own.",
         "SAMEHADA 090 now shows how many tokens to steal instead of an unreadable choice, and clicking works.",
-        "Village headbands now truly grant their group: their bearer is recognised by effects looking for that village."
+        "Village headbands now truly grant their group: their bearer is recognised by effects looking for that village.",
+        "An attachment placed on a mission now adds its Power to its side, both on screen and when missions are scored."
       ],
       "changes_es": [
         "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo.",
@@ -79,7 +82,8 @@
         "Todo efecto instantáneo opcional pide ahora confirmación antes de aplicarse, en lugar de activarse solo.",
         "BOMBA DE HUMO 086 reduce el coste del personaje que la lleva, ya no el suyo propio.",
         "SAMEHADA 090 muestra cuántos contadores robar en vez de una opción ilegible, y el clic funciona.",
-        "Las bandas de aldea conceden de verdad su grupo: su portador es reconocido por los efectos que buscan esa aldea."
+        "Las bandas de aldea conceden de verdad su grupo: su portador es reconocido por los efectos que buscan esa aldea.",
+        "Un equipamiento colocado en una misión aporta su poder a su bando, tanto en pantalla como al puntuar las misiones."
       ],
       "changes_pt": [
         "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar.",
@@ -97,7 +101,8 @@
         "Todos os efeitos instantâneos opcionais pedem agora confirmação antes de se aplicarem, em vez de dispararem sozinhos.",
         "BOMBA DE FUMO 086 reduz o custo do personagem que a transporta, e já não o seu.",
         "SAMEHADA 090 mostra quantos marcadores roubar em vez de uma escolha ilegível, e o clique funciona.",
-        "As bandanas de aldeia concedem mesmo o seu grupo: quem as usa é reconhecido pelos efeitos que procuram essa aldeia."
+        "As bandanas de aldeia concedem mesmo o seu grupo: quem as usa é reconhecido pelos efeitos que procuram essa aldeia.",
+        "Um equipamento colocado numa missão dá o seu poder ao seu lado, no ecrã e na contagem das missões."
       ],
       "changes_it": [
         "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne.",
@@ -115,7 +120,8 @@
         "Ogni effetto istantaneo facoltativo chiede ora conferma prima di applicarsi, invece di attivarsi da solo.",
         "BOMBA FUMOGENA 086 riduce il costo del personaggio che la porta, non piu il proprio.",
         "SAMEHADA 090 mostra quanti segnalini rubare invece di una scelta illeggibile, e il clic funziona.",
-        "Le fasce del villaggio concedono davvero il loro gruppo: chi le porta viene riconosciuto dagli effetti che cercano quel villaggio."
+        "Le fasce del villaggio concedono davvero il loro gruppo: chi le porta viene riconosciuto dagli effetti che cercano quel villaggio.",
+        "Un equipaggiamento posto su una missione aggiunge la sua potenza al proprio schieramento, a schermo e nel calcolo delle missioni."
       ],
       "changes_pl": [
         "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać.",
@@ -133,7 +139,8 @@
         "Każdy opcjonalny efekt natychmiastowy prosi teraz o potwierdzenie przed zastosowaniem, zamiast uruchamiać się sam.",
         "BOMBA DYMNA 086 obniża koszt postaci, która ją nosi, a nie własny.",
         "SAMEHADA 090 pokazuje, ile żetonów ukraść, zamiast nieczytelnego wyboru, a kliknięcie działa.",
-        "Opaski wioski naprawdę przyznają swoją grupę: ich nosiciel jest rozpoznawany przez efekty szukające tej wioski."
+        "Opaski wioski naprawdę przyznają swoją grupę: ich nosiciel jest rozpoznawany przez efekty szukające tej wioski.",
+        "Wyposażenie położone na misji dodaje swoją moc swojej stronie, zarówno na ekranie, jak i przy punktacji misji."
       ],
       "changes_ja": [
         "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。",
@@ -151,7 +158,8 @@
         "任意の即時効果は、勝手に発動するのではなく、適用前に確認を求めるようになりました。",
         "煙玉 086 は自身ではなく、それを装備しているキャラクターのコストを下げるようになりました。",
         "鮫肌 090 は読めない選択肢ではなく、奪うトークン数を表示し、クリックも機能するようになりました。",
-        "里の額当ては本当にその里の所属を与えます。装備者はその里を探す効果に認識されるようになりました。"
+        "里の額当ては本当にその里の所属を与えます。装備者はその里を探す効果に認識されるようになりました。",
+        "ミッションに置かれた装備は、画面表示でもミッションの集計でも、自陣にパワーを加えるようになりました。"
       ]
     },
     {

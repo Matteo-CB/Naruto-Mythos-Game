@@ -1,7 +1,7 @@
 import type { GameState, PlayerID, ActiveMission, MissionScoringProgress, ScoreEffectSource, PendingEffect, PendingAction } from '../types';
 import { logSystem, logAction } from '../utils/gameLog';
 import { calculateCharacterPower } from './PowerCalculation';
-import { teamTrainingBonus, missionCarries, SS_MISSION_HIGH_PRIORITY } from '../../effects/missions/ssMissions';
+import { teamTrainingBonus, missionCarries, missionSidePowerBonus, SS_MISSION_HIGH_PRIORITY } from '../../effects/missions/ssMissions';
 import { generateInstanceId } from '../utils/id';
 import { EffectEngine } from '../../effects/EffectEngine';
 import { isMovementBlockedByKurenai, applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
@@ -948,5 +948,5 @@ function calculateMissionPower(
     totalPower += calculateCharacterPower(state, char, player);
   }
 
-  return totalPower + teamTrainingBonus(mission, player);
+  return totalPower + missionSidePowerBonus(mission, player);
 }

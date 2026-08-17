@@ -109,6 +109,15 @@ function nameCoveredByThisPlay(played: CharacterInPlay): string | null {
   return stack[stack.length - 2]?.name_fr?.toUpperCase() ?? null;
 }
 
+export function puissanceDesEquipementsDeMission(mission: ActiveMission, player: PlayerID): number {
+  let total = 0;
+  for (const equipement of mission.attachments ?? []) {
+    if (equipement.owner !== player) continue;
+    total += equipement.card.power ?? 0;
+  }
+  return total;
+}
+
 export function missionSidePowerBonus(mission: ActiveMission, player: PlayerID): number {
-  return teamTrainingBonus(mission, player);
+  return teamTrainingBonus(mission, player) + puissanceDesEquipementsDeMission(mission, player);
 }
