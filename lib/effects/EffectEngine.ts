@@ -16793,7 +16793,7 @@ export class EffectEngine {
       }
 
       case 'PLAY_LESS_CATEGORY': {
-        let plc: { costReduction?: number; category?: PlayLessCategory; sourceName?: string; sourceId?: string; repeatable?: boolean; descriptionKey?: string; powerupSummonsAfter?: number; noUpgrade?: boolean; reductionByMission?: Record<number, number> } = {};
+        let plc: { costReduction?: number; category?: PlayLessCategory; sourceName?: string; sourceId?: string; repeatable?: boolean; descriptionKey?: string; powerupSummonsAfter?: number; noUpgrade?: boolean; reductionByMission?: Record<number, number>; allowedMissions?: number[] } = {};
         try { plc = JSON.parse(pendingEffect.effectDescription); } catch {}
         const plcReduction = plc.costReduction ?? 0;
         if (targetId && targetId !== 'DONE') {
@@ -16806,7 +16806,7 @@ export class EffectEngine {
             newState = EffectEngine.playCharFromHandWithReduction(
               newState, pendingEffect, plcRaw, plcReduction,
               plc.category?.value ?? '', plc.sourceName ?? '', plc.sourceId ?? '',
-              !!plc.noUpgrade, plc.reductionByMission,
+              !!plc.noUpgrade, plc.reductionByMission, undefined, plc.allowedMissions,
             );
           }
           const awaitsMissionChoice = newState.pendingEffects.some(
@@ -21552,8 +21552,10 @@ export class EffectEngine {
     noUpgrade = false,
     reductionByMission?: Record<number, number>,
     forcedMission?: number,
+    allowedMissions?: number[],
   ): GameState {
     const reductionFor = (i: number): number => reductionByMission?.[i] ?? costReduction;
+    const missionAutorisee = (i: number): boolean => !allowedMissions || allowedMissions.includes(i);
     const handIndex = parseInt(targetId, 10);
     if (isNaN(handIndex)) return state;
 
@@ -21575,6 +21577,7 @@ export class EffectEngine {
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
       if (forcedMission != null && i !== forcedMission) continue;
+      if (!missionAutorisee(i)) continue;
       if (isMissionValidForPlay(newState, player, i, friendlySide, chosenCard, ps.chakra, reductionFor(i), undefined, noUpgrade)) {
         validMissions.push(String(i));
       }
@@ -21606,7 +21609,7 @@ export class EffectEngine {
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
       effectDescription: JSON.stringify({
-        cost: 0, cardName, cardId, costReduction, noUpgrade, reductionByMission,
+        cost: 0, cardName, cardId, costReduction, noUpgrade, reductionByMission, allowedMissions,
         powerupSummonsAfter: powerupSummonsAfterOf(pending),
       }),
       targetSelectionType: 'GENERIC_CHOOSE_PLAY_MISSION',

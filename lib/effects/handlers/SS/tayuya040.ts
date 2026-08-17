@@ -85,7 +85,23 @@ function tayuya040Upgrade(ctx: EffectContext): EffectResult {
   charge.reductionByMission = reductions;
   charge.allowedMissions = missions;
 
-  return { ...resultat, description: JSON.stringify(charge) };
+  const autorisees = new Set(missions);
+  const cibles = (resultat.validTargets ?? []).filter((cible) => {
+    if (!cible.startsWith('HIDDEN_')) return true;
+    const instanceId = cible.slice(7);
+    for (let i = 0; i < state.activeMissions.length; i++) {
+      const dans = state.activeMissions[i][sideKey(sourcePlayer)]
+        .some((c) => c.instanceId === instanceId);
+      if (dans) return autorisees.has(i);
+    }
+    return false;
+  });
+
+  if (cibles.length === 0) {
+    return refuse(state, sourcePlayer, 'Tayuya (040) UPGRADE: no Summon character can be played in a mission holding a friendly Tayuya.');
+  }
+
+  return { ...resultat, validTargets: cibles, description: JSON.stringify(charge) };
 }
 
 export function registerTayuya040Handlers(): void {

@@ -27,9 +27,13 @@
         "fix",
         "fix",
         "fix",
+        "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "TAYUYA Sceau Maudit, second stade 040 Peu commune ne pose plus d'invocation dans une mission sans Tayuya alliee.",
+        "TAYUYA Sceau Maudit, second stade 040 Peu commune compte sa reduction mission par mission, et non la meilleure appliquee partout.",
         "Regarder un personnage cache montre enfin sa carte sur le plateau, au lieu de n'ecrire que son cout dans le journal.",
         "KAKASHI HATAKE Sharingan 016 Peu commune revelee en amelioration retrouve ses cibles: la copie ne proposait plus personne.",
         "Un personnage vaincu arrive toujours dans la defausse de son proprietaire: certains disparaissaient sans laisser de carte.",
@@ -50,6 +54,8 @@
         "HASHIRAMA SENJU 129 Rare et TOBIRAMA SENJU 131 Rare peuvent enfin s'ameliorer par-dessus un allie quand Orochimaru est dans la mission."
       ],
       "changes_en": [
+        "TAYUYA Cursemark Second State 040 Uncommon no longer plays a Summon in a mission without a friendly Tayuya.",
+        "TAYUYA Cursemark Second State 040 Uncommon counts its discount mission by mission, instead of applying the best one everywhere.",
         "Looking at a hidden character finally shows its card on the board, instead of only writing its cost in the log.",
         "KAKASHI HATAKE Sharingan 016 Uncommon revealed as an upgrade finds its targets again: the copy offered nobody.",
         "A defeated character always reaches its owner discard pile: some vanished without leaving a card behind.",
@@ -70,6 +76,8 @@
         "HASHIRAMA SENJU 129 Rare and TOBIRAMA SENJU 131 Rare can finally upgrade over an ally when Orochimaru is in the mission."
       ],
       "changes_es": [
+        "TAYUYA Sello Maldito, segunda fase 040 Poco comun ya no juega una Invocacion en una mision sin una Tayuya aliada.",
+        "TAYUYA Sello Maldito, segunda fase 040 Poco comun cuenta su descuento mision por mision, en vez de aplicar el mejor en todas.",
         "Mirar un personaje oculto por fin muestra su carta en el tablero, en vez de solo escribir su coste en el registro.",
         "KAKASHI HATAKE Sharingan 016 Poco comun revelada como mejora vuelve a encontrar objetivos: la copia no ofrecia a nadie.",
         "Un personaje derrotado siempre llega al descarte de su dueno: algunos desaparecian sin dejar carta.",
@@ -90,6 +98,8 @@
         "HASHIRAMA SENJU 129 Rara y TOBIRAMA SENJU 131 Rara por fin pueden mejorar sobre un aliado cuando Orochimaru esta en la mision."
       ],
       "changes_pt": [
+        "TAYUYA Selo Amaldicoado, segundo estagio 040 Incomum nao joga mais uma Invocacao em uma missao sem uma Tayuya aliada.",
+        "TAYUYA Selo Amaldicoado, segundo estagio 040 Incomum conta o desconto missao a missao, em vez de aplicar o melhor em todas.",
         "Olhar um personagem escondido enfim mostra a carta no tabuleiro, em vez de apenas escrever o custo no registro.",
         "KAKASHI HATAKE Sharingan 016 Incomum revelada como melhoria encontra alvos de novo: a copia nao oferecia ninguem.",
         "Um personagem derrotado sempre chega ao descarte do dono: alguns sumiam sem deixar carta.",
@@ -110,6 +120,8 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara enfim podem melhorar sobre um aliado quando Orochimaru está na missão."
       ],
       "changes_it": [
+        "TAYUYA Sigillo Maledetto, secondo stadio 040 Non comune non gioca piu una Evocazione in una missione senza una Tayuya alleata.",
+        "TAYUYA Sigillo Maledetto, secondo stadio 040 Non comune conta lo sconto missione per missione, invece di applicare il migliore ovunque.",
         "Guardare un personaggio nascosto mostra finalmente la sua carta sul tavolo, invece di scriverne solo il costo nel registro.",
         "KAKASHI HATAKE Sharingan 016 Non comune rivelata come miglioramento ritrova i bersagli: la copia non proponeva nessuno.",
         "Un personaggio sconfitto arriva sempre negli scarti del suo proprietario: alcuni sparivano senza lasciare carta.",
@@ -130,6 +142,8 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara possono finalmente migliorare su un alleato quando Orochimaru è nella missione."
       ],
       "changes_pl": [
+        "TAYUYA Przeklety Znak, druga faza 040 Niepospolita nie zagrywa juz Przyzwania w misji bez sojuszniczej Tayuyi.",
+        "TAYUYA Przeklety Znak, druga faza 040 Niepospolita liczy znizke osobno dla kazdej misji, zamiast stosowac najlepsza wszedzie.",
         "Podejrzenie zakrytej postaci wreszcie pokazuje jej karte na stole, zamiast tylko zapisac koszt w dzienniku.",
         "KAKASHI HATAKE Sharingan 016 Niepospolita odkryta jako ulepszenie znow znajduje cele: kopiowanie nie proponowalo nikogo.",
         "Pokonana postac zawsze trafia na stos odrzuconych wlasciciela: niektore znikaly bez sladu.",
@@ -150,6 +164,8 @@
         "HASHIRAMA SENJU 129 Rzadka i TOBIRAMA SENJU 131 Rzadka mogą wreszcie ulepszyć sojusznika, gdy Orochimaru jest w misji."
       ],
       "changes_ja": [
+        "多由也 呪印二段階 040 アンコモンが、味方の多由也がいないミッションに口寄せを出せなくなりました。",
+        "多由也 呪印二段階 040 アンコモンの軽減が、最大値を全体に適用するのではなく、ミッションごとに数えられます。",
         "裏向きのキャラを見たとき、記録にコストが出るだけでなく、盤面にカードが表示されるようになりました。",
         "はたけカカシ 写輪眼 016 アンコモンを重ねて公開したとき、コピー対象が再び選べます。誰も表示されませんでした。",
         "撃破されたキャラは必ず持ち主の捨て札に行きます。カードを残さず消えることがありました。",
