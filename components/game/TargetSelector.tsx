@@ -46,7 +46,7 @@ const TargetCharacter = React.memo(function TargetCharacter({ character, isValid
   const zoomCard = useUIStore((s) => s.zoomCard);
   const isHidden = character.isHidden;
   const carteActive = character.topCard ?? character.card;
-  const canSeeCard = (character.isOwn || character.wasRevealedAtLeastOnce) && carteActive;
+  const canSeeCard = !!carteActive;
 
   const imagePath = (canSeeCard || !isHidden)
     ? normalizeImagePath(carteActive?.image_file)
@@ -489,8 +489,8 @@ const OrderedDefeatCard = React.memo(function OrderedDefeatCard({ character, isV
   const t = useTranslations();
   const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
   const isHidden = character.isHidden;
-  const canSeeCard = character.isOwn || !isHidden || character.wasRevealedAtLeastOnce;
   const topCard = character.topCard ?? character.card;
+  const canSeeCard = !!topCard;
   const imagePath = topCard?.image_file ? normalizeImagePath(topCard.image_file) : null;
 
   return (
