@@ -3687,6 +3687,8 @@ export class EffectEngine {
             sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
             validTargets: [pendingEffect.sourceInstanceId], isOptional: true, isMandatory: false,
             resolved: false, isUpgrade: true,
+            wasRevealed: pendingEffect.wasRevealed,
+            wasFirstCard: pendingEffect.wasFirstCard,
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           }];
           newState.pendingActions = [...newState.pendingActions, {
@@ -3735,6 +3737,7 @@ export class EffectEngine {
           validTargets: k016Targets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: pendingEffect.isUpgrade,
           wasRevealed: pendingEffect.wasRevealed,
+          wasFirstCard: pendingEffect.wasFirstCard,
           remainingEffectTypes: pendingEffect.remainingEffectTypes,
         }];
         newState.pendingActions = [...newState.pendingActions, {
@@ -3784,6 +3787,7 @@ export class EffectEngine {
           validTargets: k016uTargets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: true,
           wasRevealed: k016uWasRevealed,
+          wasFirstCard: pendingEffect.wasFirstCard,
           remainingEffectTypes: pendingEffect.remainingEffectTypes,
         }];
         newState.pendingActions = [...newState.pendingActions, {
