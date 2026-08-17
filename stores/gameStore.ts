@@ -446,18 +446,27 @@ export function buildPendingTargetSelectionUI(
     } else if (tst === 'SS_DECK_SEARCH_TAKE' || tst === 'SS095_TAKE_JUTSU' || tst === 'SS023_TOP_OR_BOTTOM' || tst === 'SS028_BOTTOM_OR_KEEP') {
       let deckInfo: Array<{ index: number; id?: string; name_fr: string; name_en?: string; chakra?: number; power?: number; image_file?: string }> = [];
       try { deckInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
-      handCards = pendingAction.options.map((optStr, optIdx) => {
+      const choisissables = new Map<number, string>();
+      for (const optStr of pendingAction.options) {
         const deckIdx = optStr.startsWith('DECK_') ? parseInt(optStr.slice(5), 10) : NaN;
-        const info = deckInfo.find((c) => c.index === deckIdx);
-        const indexed = info?.id ? getCharacterById(info.id) : null;
+        if (!Number.isNaN(deckIdx)) choisissables.set(deckIdx, optStr);
+      }
+      const regardees: typeof deckInfo = deckInfo.length > 0
+        ? deckInfo
+        : pendingAction.options.map((optStr) => ({
+          index: optStr.startsWith('DECK_') ? parseInt(optStr.slice(5), 10) : NaN,
+          name_fr: '???',
+        }));
+      handCards = regardees.map((info, optIdx) => {
+        const indexed = info.id ? getCharacterById(info.id) : null;
+        const cible = choisissables.get(info.index);
         return {
           index: optIdx,
-          targetId: optStr,
+          targetId: cible,
+          isPlayable: cible !== undefined,
           card: indexed?.image_file
             ? fullCardData(indexed)
-            : info
-              ? { name_fr: info.name_fr, name_en: info.name_en, chakra: info.chakra, power: info.power, image_file: info.image_file, id: info.id }
-              : { name_fr: '???' },
+            : { name_fr: info.name_fr, name_en: info.name_en, chakra: info.chakra, power: info.power, image_file: info.image_file, id: info.id },
         };
       });
     } else if (tst === 'SS000_CHOOSE_HOUNDS') {

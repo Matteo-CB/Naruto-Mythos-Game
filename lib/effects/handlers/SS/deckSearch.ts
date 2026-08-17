@@ -38,6 +38,17 @@ export const FOUILLES: FouilleDeDeck[] = [
   },
 ];
 
+export function cartesRegardees(
+  state: GameState,
+  player: PlayerID,
+  fouille: FouilleDeDeck,
+): number[] {
+  const deck = state[player].deck as unknown as CardData[];
+  const indices: number[] = [];
+  for (let i = 0; i < Math.min(fouille.profondeur, deck.length); i++) indices.push(i);
+  return indices;
+}
+
 export function candidatsDeFouille(
   state: GameState,
   player: PlayerID,
@@ -76,7 +87,7 @@ function fouilleHandler(fouille: FouilleDeDeck) {
         depth: fouille.profondeur,
         sourceName: fouille.nom,
         sourceId: fouille.id,
-        cards: apercuDeCartes(state, sourcePlayer, candidats),
+        cards: apercuDeCartes(state, sourcePlayer, cartesRegardees(state, sourcePlayer, fouille)),
       }),
       descriptionKey: 'game.effect.desc.ssDeckSearchTake',
     }, sourceCard.instanceId, 'SS_DECK_SEARCH_CONFIRM');

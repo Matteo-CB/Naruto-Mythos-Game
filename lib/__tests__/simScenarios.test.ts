@@ -154,7 +154,7 @@ describe('card effect simulations (verified through the real engine)', () => {
             const imprimes = (mission.basePoints ?? 0) + (mission.rankBonus ?? 0);
             const scores = last.log.filter((l) => l.action === 'SCORE_DRAW').length;
             const repetition = last.log.some((l) => l.action === 'SCORE_REPEAT');
-            return scores >= 2 && repetition && last.player1.missionPoints === imprimes;
+            return scores >= 2 && repetition && last.player1.missionPoints === imprimes * 2;
           }
           case 'SS-005-MMS':
           case 'SS-005_2-MMS':

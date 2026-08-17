@@ -134,7 +134,7 @@ function sealingScrollMain(ctx: EffectContext): EffectResult {
     targetSelectionType: 'SS095_TAKE_JUTSU',
     validTargets: jutsu.map((c) => `DECK_${state[sourcePlayer].deck.indexOf(c)}`),
     isOptional: true,
-    description: JSON.stringify({ cards: apercuDeCartes(state, sourcePlayer, jutsu.map((c) => state[sourcePlayer].deck.indexOf(c))) }),
+    description: JSON.stringify({ cards: apercuDeCartes(state, sourcePlayer, sommet.map((c) => state[sourcePlayer].deck.indexOf(c))) }),
     descriptionKey: 'game.effect.desc.ss095TakeJutsu',
   }, sourceCard.instanceId, 'SS095_CONFIRM_MAIN');
 }

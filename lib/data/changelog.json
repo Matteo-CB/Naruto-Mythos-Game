@@ -30,9 +30,11 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "Les fouilles de deck montrent toutes les cartes regardees, et non plus seulement celles que l'on peut prendre.",
         "La mission Priorite Haute rapporte bien ses points deux fois, en plus de repeter les effets de score.",
         "TAYUYA Sceau Maudit, second stade 040 Peu commune ne pose plus d'invocation dans une mission sans Tayuya alliee.",
         "TAYUYA Sceau Maudit, second stade 040 Peu commune compte sa reduction mission par mission, et non la meilleure appliquee partout.",
@@ -56,6 +58,7 @@
         "HASHIRAMA SENJU 129 Rare et TOBIRAMA SENJU 131 Rare peuvent enfin s'ameliorer par-dessus un allie quand Orochimaru est dans la mission."
       ],
       "changes_en": [
+        "Deck searches now show every card you looked at, not only the ones you may take.",
         "The High Priority mission now pays its points twice as well, on top of repeating the SCORE effects.",
         "TAYUYA Cursemark Second State 040 Uncommon no longer plays a Summon in a mission without a friendly Tayuya.",
         "TAYUYA Cursemark Second State 040 Uncommon counts its discount mission by mission, instead of applying the best one everywhere.",
@@ -79,6 +82,7 @@
         "HASHIRAMA SENJU 129 Rare and TOBIRAMA SENJU 131 Rare can finally upgrade over an ally when Orochimaru is in the mission."
       ],
       "changes_es": [
+        "Las busquedas en el mazo muestran todas las cartas miradas, no solo las que puedes coger.",
         "La mision Prioridad Alta ahora tambien paga sus puntos dos veces, ademas de repetir los efectos de puntuacion.",
         "TAYUYA Sello Maldito, segunda fase 040 Poco comun ya no juega una Invocacion en una mision sin una Tayuya aliada.",
         "TAYUYA Sello Maldito, segunda fase 040 Poco comun cuenta su descuento mision por mision, en vez de aplicar el mejor en todas.",
@@ -102,6 +106,7 @@
         "HASHIRAMA SENJU 129 Rara y TOBIRAMA SENJU 131 Rara por fin pueden mejorar sobre un aliado cuando Orochimaru esta en la mision."
       ],
       "changes_pt": [
+        "As buscas no baralho mostram todas as cartas olhadas, nao apenas as que voce pode pegar.",
         "A missao Prioridade Alta agora tambem paga seus pontos duas vezes, alem de repetir os efeitos de pontuacao.",
         "TAYUYA Selo Amaldicoado, segundo estagio 040 Incomum nao joga mais uma Invocacao em uma missao sem uma Tayuya aliada.",
         "TAYUYA Selo Amaldicoado, segundo estagio 040 Incomum conta o desconto missao a missao, em vez de aplicar o melhor em todas.",
@@ -125,6 +130,7 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara enfim podem melhorar sobre um aliado quando Orochimaru está na missão."
       ],
       "changes_it": [
+        "Le ricerche nel mazzo mostrano tutte le carte guardate, non solo quelle che puoi prendere.",
         "La missione Priorita Alta paga ora anche i suoi punti due volte, oltre a ripetere gli effetti di punteggio.",
         "TAYUYA Sigillo Maledetto, secondo stadio 040 Non comune non gioca piu una Evocazione in una missione senza una Tayuya alleata.",
         "TAYUYA Sigillo Maledetto, secondo stadio 040 Non comune conta lo sconto missione per missione, invece di applicare il migliore ovunque.",
@@ -148,6 +154,7 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara possono finalmente migliorare su un alleato quando Orochimaru è nella missione."
       ],
       "changes_pl": [
+        "Przeszukiwanie talii pokazuje wszystkie obejrzane karty, nie tylko te, ktore mozesz wziac.",
         "Misja Wysoki Priorytet przyznaje teraz swoje punkty dwukrotnie, nie tylko powtarza efekty punktacji.",
         "TAYUYA Przeklety Znak, druga faza 040 Niepospolita nie zagrywa juz Przyzwania w misji bez sojuszniczej Tayuyi.",
         "TAYUYA Przeklety Znak, druga faza 040 Niepospolita liczy znizke osobno dla kazdej misji, zamiast stosowac najlepsza wszedzie.",
@@ -171,6 +178,7 @@
         "HASHIRAMA SENJU 129 Rzadka i TOBIRAMA SENJU 131 Rzadka mogą wreszcie ulepszyć sojusznika, gdy Orochimaru jest w misji."
       ],
       "changes_ja": [
+        "デッキを見る効果が、取れるカードだけでなく、見たカードをすべて表示するようになりました。",
         "高優先度ミッションが、スコア効果の再実行に加えて、ミッション点も2回入るようになりました。",
         "多由也 呪印二段階 040 アンコモンが、味方の多由也がいないミッションに口寄せを出せなくなりました。",
         "多由也 呪印二段階 040 アンコモンの軽減が、最大値を全体に適用するのではなく、ミッションごとに数えられます。",
