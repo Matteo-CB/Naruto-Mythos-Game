@@ -65,6 +65,7 @@ import { KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
 import { OROCHIMARU_127_ID, OROCHIMARU_127_NAME } from './handlers/SS/orochimaru127';
 import { KIMIMARO_077_ID, KIMIMARO_077_NAME, kimimaro077Targets, costOfTarget } from './handlers/SS/kimimaro077';
 import { DOSU_125_ID, DOSU_125_NAME } from './handlers/SS/soundMoves';
+import { AUTO_CONFIRM_INSTANT, envelopperResultat } from './autoConfirm';
 import { UKON_038_ID, UKON_038_MALUS, UKON_038_NAME } from './handlers/SS/ukon038';
 import { recupererEquipementDefausse } from './handlers/SS/kujaku072';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
@@ -569,7 +570,7 @@ export class EffectEngine {
           tokensBeforePlay,
           wasFirstCard: wasFirstCardOfRound,
         };
-        const result = handler(ctx);
+        const result = envelopperResultat(handler(ctx), ctx, effectType as EffectType);
 
         if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
           
@@ -615,7 +616,7 @@ export class EffectEngine {
         triggerType: 'FIRST_STRIKE' as EffectType,
         isUpgrade: false,
       };
-      const result = handler(ctx);
+      const result = envelopperResultat(handler(ctx), ctx, 'FIRST_STRIKE' as EffectType);
       if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
         return EffectEngine.createPendingTargetSelection(
           result.state, player, character, missionIndex, 'FIRST_STRIKE' as EffectType, false, result, [],
@@ -712,7 +713,7 @@ export class EffectEngine {
           wasRevealed: true,
           wasFirstCard: wasFirstCardOfRoundReveal,
         };
-        const result = handler(ctx);
+        const result = envelopperResultat(handler(ctx), ctx, effectType as EffectType);
 
         if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
           
@@ -803,7 +804,7 @@ export class EffectEngine {
             isUpgrade: false,
             wasRevealed: true,
           };
-          const result = handler(ctx);
+          const result = envelopperResultat(handler(ctx), ctx, 'MAIN' as EffectType);
 
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
 
@@ -842,7 +843,7 @@ export class EffectEngine {
             isUpgrade: false,
             wasRevealed: true,
           };
-          const result = handler(ctx);
+          const result = envelopperResultat(handler(ctx), ctx, 'AMBUSH' as EffectType);
 
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
 
@@ -926,7 +927,7 @@ export class EffectEngine {
             triggerType: 'SCORE',
             isUpgrade: false,
           };
-          const result = handler(ctx);
+          const result = envelopperResultat(handler(ctx), ctx, 'SCORE' as EffectType);
 
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
             newState = EffectEngine.createPendingTargetSelection(
@@ -960,7 +961,7 @@ export class EffectEngine {
               triggerType: 'SCORE',
               isUpgrade: false,
             };
-            const result = handler(ctx);
+            const result = envelopperResultat(handler(ctx), ctx, 'SCORE' as EffectType);
 
             if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
               newState = EffectEngine.createPendingTargetSelection(
@@ -1004,7 +1005,7 @@ export class EffectEngine {
         triggerType: 'SCORE',
         isUpgrade: false,
       };
-      const result = handler(ctx);
+      const result = envelopperResultat(handler(ctx), ctx, 'SCORE' as EffectType);
 
       if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
         
@@ -13182,6 +13183,34 @@ export class EffectEngine {
         break;
       }
 
+      case AUTO_CONFIRM_INSTANT: {
+        let infoAuto: { cardId?: string; effectType?: EffectType } = {};
+        try { infoAuto = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const sourceAuto = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!sourceAuto || !infoAuto.cardId || !infoAuto.effectType) break;
+        const gestionnaireAuto = getEffectHandler(infoAuto.cardId, infoAuto.effectType);
+        if (!gestionnaireAuto) break;
+        const resultatAuto = gestionnaireAuto({
+          state: newState,
+          sourcePlayer: pendingEffect.sourcePlayer,
+          sourceCard: sourceAuto.character,
+          sourceMissionIndex: sourceAuto.missionIndex,
+          triggerType: infoAuto.effectType,
+          isUpgrade: pendingEffect.isUpgrade,
+          wasRevealed: pendingEffect.wasRevealed,
+          wasFirstCard: pendingEffect.wasFirstCard,
+        } as EffectContext);
+        newState = resultatAuto.state;
+        if (resultatAuto.requiresTargetSelection && resultatAuto.validTargets && resultatAuto.validTargets.length > 0) {
+          newState = EffectEngine.createPendingTargetSelection(
+            newState, pendingEffect.sourcePlayer, sourceAuto.character, sourceAuto.missionIndex,
+            infoAuto.effectType, pendingEffect.isUpgrade, resultatAuto,
+            pendingEffect.remainingEffectTypes ?? [], pendingEffect.wasRevealed, undefined, pendingEffect.wasFirstCard,
+          );
+        }
+        break;
+      }
+
       case 'SS072_CONFIRM_MAIN': {
         newState = recupererEquipementDefausse(newState, pendingEffect.sourcePlayer);
         break;
@@ -19827,7 +19856,7 @@ export class EffectEngine {
         wasFirstCard: resolvedPending.wasFirstCard,
       };
 
-      const result = handler(ctx);
+      const result = envelopperResultat(handler(ctx), ctx, effectType as EffectType);
 
       if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
         

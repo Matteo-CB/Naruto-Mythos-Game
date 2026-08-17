@@ -3764,7 +3764,8 @@
         "ss135DiscardThenHide": "Scartare la carta in cima al mazzo e nascondere un nemico che costa meno di essa?",
         "ss135HideEnemy": "Scegli il personaggio nemico da nascondere, deve costare meno di {amount}.",
         "ssDeckSearchShow": "Nessuna carta valida tra quelle guardate. Tornano a caso in fondo al mazzo.",
-        "ss072ConfirmMain": "Recuperare l ultimo equipaggiamento dagli scarti?"
+        "ss072ConfirmMain": "Recuperare l ultimo equipaggiamento dagli scarti?",
+        "autoConfirmInstant": "Applicare questo effetto?"
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

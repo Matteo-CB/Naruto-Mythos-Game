@@ -1663,7 +1663,8 @@
         "ss135DiscardThenHide": "Défausser la carte du dessus de votre pioche, puis cacher un ennemi moins cher qu'elle ?",
         "ss135HideEnemy": "Choisissez le personnage ennemi à cacher, il doit coûter moins de {amount}.",
         "ssDeckSearchShow": "Aucune carte valide parmi celles regardées. Elles retournent au hasard sous votre deck.",
-        "ss072ConfirmMain": "Récupérer le dernier équipement de votre défausse ?"
+        "ss072ConfirmMain": "Récupérer le dernier équipement de votre défausse ?",
+        "autoConfirmInstant": "Appliquer cet effet ?"
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",

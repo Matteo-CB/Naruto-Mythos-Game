@@ -63,6 +63,19 @@ function upgradeZaku(st: GameState): GameState {
   } as GameAction);
 }
 
+function repondreOui(state: GameState): GameState {
+  let courant = state;
+  let garde = 0;
+  while (courant.pendingActions.length > 0 && garde < 8) {
+    const q = courant.pendingActions[0];
+    courant = GameEngine.applyAction(courant, q.player, {
+      type: 'SELECT_TARGET', pendingActionId: q.id, selectedTargets: [q.options[0]],
+    } as never);
+    garde += 1;
+  }
+  return courant;
+}
+
 describe('SS-042-UC Zaku Abumi UPGRADE', () => {
   beforeAll(() => { initializeRegistry(); });
 
@@ -213,11 +226,11 @@ describe('SS-044-UC Kin Tsuchi UPGRADE', () => {
 describe('SS-032-C Jirobo FIRST STRIKE', () => {
   beforeAll(() => { initializeRegistry(); });
 
-  it('gives itself 2 power tokens without opening any window', () => {
+  it('gives itself 2 power tokens apres confirmation', () => {
     const st = buildSimState({ hand1: ['SS-032-C'], missions: 2, chakra1: 20 });
-    const s = GameEngine.applyAction(st, 'player1', {
+    const s = repondreOui(GameEngine.applyAction(st, 'player1', {
       type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false,
-    } as GameAction);
+    } as GameAction));
     expect(s.pendingActions.length).toBe(0);
     expect(s.pendingEffects.length).toBe(0);
     expect(s.activeMissions[0].player1Characters[0].powerTokens).toBe(2);
@@ -255,12 +268,12 @@ describe('SS-032-C Jirobo FIRST STRIKE', () => {
 describe('SS-036-C Sakon FIRST STRIKE', () => {
   beforeAll(() => { initializeRegistry(); });
 
-  it('draws one card with no window', () => {
+  it('pioche une carte apres confirmation', () => {
     const st = buildSimState({ hand1: ['SS-036-C'], missions: 2, chakra1: 20 });
     st.player1.deck = [getCardById('KS-005-C') as unknown as CharacterCard];
-    const s = GameEngine.applyAction(st, 'player1', {
+    const s = repondreOui(GameEngine.applyAction(st, 'player1', {
       type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0, hidden: false,
-    } as GameAction);
+    } as GameAction));
     expect(s.pendingActions.length).toBe(0);
     expect(s.player1.deck.length).toBe(0);
     expect(s.player1.hand.length).toBe(1);

@@ -25,9 +25,22 @@ function play(state: GameState): GameState {
   });
 }
 
+function repondreOui(state: GameState): GameState {
+  let courant = state;
+  let garde = 0;
+  while (courant.pendingActions.length > 0 && garde < 8) {
+    const q = courant.pendingActions[0];
+    courant = GameEngine.applyAction(courant, q.player, {
+      type: 'SELECT_TARGET', pendingActionId: q.id, selectedTargets: [q.options[0]],
+    } as never);
+    garde += 1;
+  }
+  return courant;
+}
+
 describe('Jirobo SS-032 FIRST STRIKE', () => {
-  it('puts 2 power tokens on itself with no window and logs it', () => {
-    const after = play(boardWith(JIROBO));
+  it('puts 2 power tokens on itself apres confirmation, et le journalise', () => {
+    const after = repondreOui(play(boardWith(JIROBO)));
 
     expect(after.pendingEffects.length).toBe(0);
     expect(after.pendingActions.length).toBe(0);
@@ -51,11 +64,11 @@ describe('Jirobo SS-032 FIRST STRIKE', () => {
 });
 
 describe('Sakon SS-036 FIRST STRIKE', () => {
-  it('draws one card with no window and logs it', () => {
+  it('draws one card apres confirmation, et le journalise', () => {
     const state = boardWith(SAKON);
     state.player1.deck = [getCardById('KS-005-C') as unknown as CharacterCard];
 
-    const after = play(state);
+    const after = repondreOui(play(state));
 
     expect(after.pendingEffects.length).toBe(0);
     expect(after.pendingActions.length).toBe(0);
@@ -69,7 +82,7 @@ describe('Sakon SS-036 FIRST STRIKE', () => {
     const state = boardWith(SAKON);
     state.player1.deck = [];
 
-    const after = play(state);
+    const after = repondreOui(play(state));
 
     expect(after.player1.hand.length).toBe(0);
     expect(after.log.some((l) => l.messageKey === 'game.log.effect.ss036EmptyDeck'

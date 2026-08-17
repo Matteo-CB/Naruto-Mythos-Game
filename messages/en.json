@@ -1657,7 +1657,8 @@
         "ss135DiscardThenHide": "Discard the top card of your deck, then hide an enemy cheaper than it?",
         "ss135HideEnemy": "Choose the enemy character to hide, it must cost less than {amount}.",
         "ssDeckSearchShow": "No valid card among those looked at. They go randomly to the bottom of your deck.",
-        "ss072ConfirmMain": "Return the topmost attachment from your discard pile to your hand?"
+        "ss072ConfirmMain": "Return the topmost attachment from your discard pile to your hand?",
+        "autoConfirmInstant": "Apply this effect?"
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",

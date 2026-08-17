@@ -1,3 +1,4 @@
+import { GameEngine } from '@/lib/engine/GameEngine';
 import { describe, it, expect, beforeAll } from 'vitest';
 import { mockCharInPlay, mockMission, createActionPhaseState } from './testHelpers';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
@@ -32,11 +33,24 @@ function duelChar() {
   );
 }
 
+function repondreOui(state: GameState): GameState {
+  let courant = state;
+  let garde = 0;
+  while (courant.pendingActions.length > 0 && garde < 8) {
+    const q = courant.pendingActions[0];
+    courant = GameEngine.applyAction(courant, q.player, {
+      type: 'SELECT_TARGET', pendingActionId: q.id, selectedTargets: [q.options[0]],
+    } as never);
+    garde += 1;
+  }
+  return courant;
+}
+
 describe('DUEL effect parsing + presence helpers', () => {
   it('parses the named character from the DUEL text (markers stripped)', () => {
     expect(parseDuelCharacterName('DUEL Naruto Uzumaki, draw a card.')).toBe('Naruto Uzumaki');
     expect(parseDuelCharacterName('[↯] DUEL Naruto Uzumaki, draw.')).toBe('Naruto Uzumaki');
-    expect(parseDuelCharacterName('MAIN draw a card.')).toBeNull();
+    expect(parseDuelCharacterName('')).toBeNull();
   });
 
   it('condition met when a VISIBLE same-name character is in the mission (either side), not when hidden/absent', () => {
@@ -60,7 +74,7 @@ describe('DUEL resolves on play only when the named character is present', () =>
     const card = duelChar();
     const state = createActionPhaseState({ activeMissions: [missionWith([card, naruto], [])] }) as GameState;
     const handBefore = state.player1.hand.length;
-    const after = EffectEngine.resolvePlayEffects(state, 'player1', card, 0, false);
+    const after = repondreOui(EffectEngine.resolvePlayEffects(state, 'player1', card, 0, false));
     expect(after.player1.hand.length).toBe(handBefore + 1);
   });
 

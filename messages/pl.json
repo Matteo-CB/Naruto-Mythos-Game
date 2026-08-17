@@ -3764,7 +3764,8 @@
         "ss135DiscardThenHide": "Odrzucić wierzchnią kartę talii i zakryć wroga tańszego od niej?",
         "ss135HideEnemy": "Wybierz wrogą postać do zakrycia, musi kosztować mniej niż {amount}.",
         "ssDeckSearchShow": "Brak odpowiedniej karty wśród obejrzanych. Wracają losowo na spód twojej talii.",
-        "ss072ConfirmMain": "Odzyskać ostatnie wyposażenie ze stosu kart odrzuconych?"
+        "ss072ConfirmMain": "Odzyskać ostatnie wyposażenie ze stosu kart odrzuconych?",
+        "autoConfirmInstant": "Zastosować ten efekt?"
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

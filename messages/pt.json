@@ -3764,7 +3764,8 @@
         "ss135DiscardThenHide": "Descartar a carta do topo do seu deck e ocultar um inimigo mais barato que ela?",
         "ss135HideEnemy": "Escolha o personagem inimigo a ocultar, ele deve custar menos de {amount}.",
         "ssDeckSearchShow": "Nenhuma carta válida entre as observadas. Voltam ao acaso para o fundo do teu baralho.",
-        "ss072ConfirmMain": "Recuperar o último equipamento da tua pilha de descarte?"
+        "ss072ConfirmMain": "Recuperar o último equipamento da tua pilha de descarte?",
+        "autoConfirmInstant": "Aplicar este efeito?"
       },
       "upgradeModifierConfirm": "Aplicar o efeito UPGRADE",
       "upgradeModifierDecline": "Manter apenas o efeito MAIN",

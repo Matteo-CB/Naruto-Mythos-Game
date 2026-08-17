@@ -3,7 +3,7 @@ import { isAdmin, isAdminUsername, isAdminEmail, ADMIN_USERNAMES, ADMIN_EMAILS }
 
 describe('admin whitelist', () => {
   it('contains exactly the expected admins', () => {
-    expect(ADMIN_USERNAMES).toEqual(['Kutxyt', 'Daiki0']);
+    expect(ADMIN_USERNAMES).toEqual(['Kutxyt', 'Daiki0', 'John_Games_TCG']);
     expect(ADMIN_EMAILS).toEqual(['matteo.biyikli3224@gmail.com']);
   });
 

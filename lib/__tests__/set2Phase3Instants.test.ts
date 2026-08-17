@@ -63,7 +63,10 @@ describe('phase 3, la fouille de deck partagee par trois cartes', () => {
     const s = avecDeck(base, ['KS-009-C', 'KS-010-C', 'KS-005-C']);
 
     const joue = EffectEngine.resolvePlayEffects(s, 'player1', fugaku, 0, false);
-    expect(joue.pendingEffects.length, 'aucune question posee').toBe(0);
+    expect(
+      joue.pendingActions[0]?.descriptionKey,
+      'les cartes regardees sont quand meme montrees au joueur',
+    ).toBe('game.effect.desc.ssDeckSearchShow');
     expect(joue.log.some((l) => l.messageKey === 'game.log.effect.noTarget'), 'le refus est journalise').toBe(true);
   });
 
@@ -190,11 +193,11 @@ describe('phase 3, les renforts conditionnels', () => {
     const base = buildSimState({ p1: [udon, moegi, konohamaru], p2: [], missions: 1 });
     const avec: GameState = { ...base, player1: { ...base.player1, deck: [getCardById('KS-009-C') as never] } };
 
-    const parUdon = EffectEngine.resolvePlayEffects(avec, 'player1', udon, 0, false);
+    const parUdon = jusquAuBout(EffectEngine.resolvePlayEffects(avec, 'player1', udon, 0, false));
     const udonFin = parUdon.activeMissions[0].player1Characters.find((c) => c.instanceId === udon.instanceId)!;
     expect(udonFin.powerTokens, 'Udon gagne son jeton').toBe(1);
 
-    const parMoegi = EffectEngine.resolvePlayEffects(avec, 'player1', moegi, 0, false);
+    const parMoegi = jusquAuBout(EffectEngine.resolvePlayEffects(avec, 'player1', moegi, 0, false));
     expect(parMoegi.player1.hand.length - avec.player1.hand.length, 'Moegi pioche').toBe(1);
   });
 
@@ -217,7 +220,7 @@ describe('phase 3, les renforts conditionnels', () => {
       }),
     };
 
-    const fin = EffectEngine.resolvePlayEffects(s, 'player1', hoki, 0, false);
+    const fin = jusquAuBout(EffectEngine.resolvePlayEffects(s, 'player1', hoki, 0, false));
     const hokiFin = fin.activeMissions[0].player1Characters.find((c) => c.instanceId === hoki.instanceId)!;
     expect(hokiFin.powerTokens, 'trois equipements dans la mission').toBe(3);
   });
@@ -297,7 +300,7 @@ describe('phase 3, Kujaku 72 recupere un equipement', () => {
       },
     };
 
-    const apres = EffectEngine.resolvePlayEffects(s, 'player1', kujaku, 0, false);
+    const apres = jusquAuBout(EffectEngine.resolvePlayEffects(s, 'player1', kujaku, 0, false));
     expect(apres.player1.hand.some((c) => c.id === 'SS-096-UC'), 'le plus recent des equipements').toBe(true);
     expect(apres.player1.discardPile.length, 'la defausse perd une carte').toBe(3);
     expect(apres.player1.discardPile.some((c) => c.id === 'SS-080-C'), 'le plus ancien reste').toBe(true);
