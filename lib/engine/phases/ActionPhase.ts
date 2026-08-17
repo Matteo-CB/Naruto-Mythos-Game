@@ -11,6 +11,7 @@ import { EffectEngine } from '../../effects/EffectEngine';
 import { applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
 import { revealUpgradeWouldDuplicateName } from '../../effects/revealNameUniqueness';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
+import { avecJoueCeTour } from '../rules/discountedPlay';
 import { expireFirstStrike } from '../rules/firstStrike';
 import { offerKimimaro077Sacrifice } from '@/lib/effects/handlers/SS/kimimaro077Pass';
 
@@ -935,9 +936,7 @@ function countPlayerCharsInMissions(missions: GameState['activeMissions'], playe
 
 
 function trackLastPlayed(state: GameState, _player: PlayerID, instanceId: string): GameState {
-  const ids = state.turnPlayedIds ?? [];
-  if (ids.includes(instanceId)) return state; // already tracked
-  return { ...state, turnPlayedIds: [...ids, instanceId] };
+  return { ...state, turnPlayedIds: avecJoueCeTour(state.turnPlayedIds, instanceId) };
 }
 
 

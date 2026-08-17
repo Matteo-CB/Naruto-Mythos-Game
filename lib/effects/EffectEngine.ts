@@ -24224,6 +24224,7 @@ export class EffectEngine {
     
     char.isHidden = false;
     char.wasRevealedAtLeastOnce = true;
+    char.playedBelowPrintedCost = cost < (topCard.chakra ?? 0);
 
     
     if (powerUpBonus > 0) {
@@ -24245,6 +24246,7 @@ export class EffectEngine {
         chars_rhr[upgradeIdx_rhr] = {
           ...prev_rhr,
           card: revealedCharData.card,
+          playedBelowPrintedCost: cost < (topCard.chakra ?? 0),
           stack: [...prev_rhr.stack, ...revealedCharData.stack],
           attachments: mergedAttachments(prev_rhr, revealedCharData),
           powerTokens: prev_rhr.powerTokens + revealedCharData.powerTokens,
