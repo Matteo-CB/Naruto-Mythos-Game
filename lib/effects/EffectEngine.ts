@@ -24280,7 +24280,7 @@ export class EffectEngine {
     const upgradeTargetRhr = forcedUpgradeTargetRhr
       ?? (upgradeTargetIdxRhr >= 0 ? missionRhr[friendlySideRhr][upgradeTargetIdxRhr] : null);
 
-    const effectiveRevealPrice = calculateEffectiveCost(newState, player, topCard, mIdx, true);
+    const effectiveRevealPrice = calculateEffectiveCost(newState, player, topCard, mIdx, true, char);
 
     const prixRevelationHorsAmelioration = Math.max(0, effectiveRevealPrice - costReduction);
     let cost: number;

@@ -22,6 +22,7 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
@@ -37,7 +38,8 @@
         "GRAND-MERE SANSHO 067 déclenchait par erreur le REMPART 067 du set 1 et mettait un allié à 0 de puissance.",
         "Les fouilles de deck montrent les cartes regardées même quand aucune n est valide, avant qu elles ne repartent sous le deck.",
         "KUJAKU 072 demande confirmation avant de récupérer un équipement, son effet étant optionnel.",
-        "Tout effet instantané facultatif demande désormais confirmation avant de s appliquer, au lieu de partir tout seul."
+        "Tout effet instantané facultatif demande désormais confirmation avant de s appliquer, au lieu de partir tout seul.",
+        "BOMBE FUMIGENE 086 réduit le coût du personnage qui la porte, et non plus le sien."
       ],
       "changes_en": [
         "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power.",
@@ -52,7 +54,8 @@
         "GRANDMA SANSHO 067 was wrongly triggering RASHOMON 067 from set 1 and setting an ally to 0 Power.",
         "Deck searches now show the cards looked at even when none is valid, before they go back to the bottom of the deck.",
         "KUJAKU 072 now asks for confirmation before returning an attachment, since its effect is optional.",
-        "Every optional instant effect now asks for confirmation before applying, instead of firing on its own."
+        "Every optional instant effect now asks for confirmation before applying, instead of firing on its own.",
+        "SMOKE BOMB 086 now reduces the cost of the character carrying it, no longer its own."
       ],
       "changes_es": [
         "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo.",
@@ -67,7 +70,8 @@
         "ABUELA SANSHO 067 activaba por error el BALUARTE 067 del set 1 y dejaba a un aliado con 0 de poder.",
         "Las búsquedas en el mazo muestran las cartas miradas aunque ninguna sea válida, antes de volver al fondo del mazo.",
         "KUJAKU 072 pide confirmación antes de recuperar un equipamiento, ya que su efecto es opcional.",
-        "Todo efecto instantáneo opcional pide ahora confirmación antes de aplicarse, en lugar de activarse solo."
+        "Todo efecto instantáneo opcional pide ahora confirmación antes de aplicarse, en lugar de activarse solo.",
+        "BOMBA DE HUMO 086 reduce el coste del personaje que la lleva, ya no el suyo propio."
       ],
       "changes_pt": [
         "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar.",
@@ -82,7 +86,8 @@
         "AVÓ SANSHO 067 acionava por engano o BALUARTE 067 do set 1 e deixava um aliado com 0 de poder.",
         "As buscas no baralho mostram as cartas observadas mesmo quando nenhuma é válida, antes de voltarem ao fundo do baralho.",
         "KUJAKU 072 pede confirmação antes de recuperar um equipamento, já que o seu efeito é opcional.",
-        "Todos os efeitos instantâneos opcionais pedem agora confirmação antes de se aplicarem, em vez de dispararem sozinhos."
+        "Todos os efeitos instantâneos opcionais pedem agora confirmação antes de se aplicarem, em vez de dispararem sozinhos.",
+        "BOMBA DE FUMO 086 reduz o custo do personagem que a transporta, e já não o seu."
       ],
       "changes_it": [
         "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne.",
@@ -97,7 +102,8 @@
         "NONNA SANSHO 067 attivava per errore il BALUARDO 067 del set 1 e portava un alleato a 0 di potenza.",
         "Le ricerche nel mazzo mostrano le carte guardate anche quando nessuna è valida, prima che tornino in fondo al mazzo.",
         "KUJAKU 072 chiede conferma prima di recuperare un equipaggiamento, essendo il suo effetto opzionale.",
-        "Ogni effetto istantaneo facoltativo chiede ora conferma prima di applicarsi, invece di attivarsi da solo."
+        "Ogni effetto istantaneo facoltativo chiede ora conferma prima di applicarsi, invece di attivarsi da solo.",
+        "BOMBA FUMOGENA 086 riduce il costo del personaggio che la porta, non piu il proprio."
       ],
       "changes_pl": [
         "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać.",
@@ -112,7 +118,8 @@
         "BABCIA SANSHO 067 przez pomyłkę uruchamiała RASHOMON 067 z zestawu 1 i ustawiała moc sojusznika na 0.",
         "Przeszukiwanie talii pokazuje obejrzane karty nawet gdy żadna nie pasuje, zanim wrócą na spód talii.",
         "KUJAKU 072 prosi o potwierdzenie przed odzyskaniem wyposażenia, bo jego efekt jest opcjonalny.",
-        "Każdy opcjonalny efekt natychmiastowy prosi teraz o potwierdzenie przed zastosowaniem, zamiast uruchamiać się sam."
+        "Każdy opcjonalny efekt natychmiastowy prosi teraz o potwierdzenie przed zastosowaniem, zamiast uruchamiać się sam.",
+        "BOMBA DYMNA 086 obniża koszt postaci, która ją nosi, a nie własny."
       ],
       "changes_ja": [
         "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。",
@@ -127,7 +134,8 @@
         "サンショ婆 067 が誤ってセット1の羅生門 067 を発動し、味方のパワーを0にしていた不具合を修正しました。",
         "山札を見る効果は、該当するカードがない場合でも見たカードを表示してから山札の下に戻すようになりました。",
         "孔雀 072 は効果が任意のため、装備を回収する前に確認を求めるようになりました。",
-        "任意の即時効果は、勝手に発動するのではなく、適用前に確認を求めるようになりました。"
+        "任意の即時効果は、勝手に発動するのではなく、適用前に確認を求めるようになりました。",
+        "煙玉 086 は自身ではなく、それを装備しているキャラクターのコストを下げるようになりました。"
       ]
     },
     {

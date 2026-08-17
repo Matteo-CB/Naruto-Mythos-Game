@@ -397,12 +397,22 @@ describe('phase 2, les clauses secondaires des equipements', () => {
     expect(sources.some((x) => x.cardId === 'KS-081-C'), 'son SCORE est efface comme le reste').toBe(false);
   });
 
-  it('la Bombe Fumigene se revele pour un chakra de moins', () => {
+  it('la Bombe Fumigene reduit le cout de son hote, jamais le sien', () => {
     const s = buildSimState({ p1: [], p2: [], missions: 1 });
     const carte = getCardById('SS-086-C') as CardData;
-    const normal = calculateEffectiveCost(s, 'player1', carte as never, 0, false);
-    const revele = calculateEffectiveCost(s, 'player1', carte as never, 0, true);
-    expect(normal - revele, 'un chakra de moins a la revelation').toBe(1);
+    expect(
+      calculateEffectiveCost(s, 'player1', carte as never, 0, true),
+      'elle ne se fait pas de remise a elle-meme',
+    ).toBe(carte.chakra);
+
+    const porteur = {
+      attachments: [{ card: getCardById('SS-086-C') as CardData }],
+    };
+    const hote = getCardById('KS-011-C') as CardData;
+    expect(
+      calculateEffectiveCost(s, 'player1', hote as never, 0, true, porteur as never),
+      'le personnage qui la porte se revele pour un chakra de moins',
+    ).toBe((hote.chakra ?? 0) - 1);
   });
 });
 

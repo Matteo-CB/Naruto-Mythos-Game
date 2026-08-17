@@ -94,8 +94,20 @@ export function calculateEffectiveCost(
   card: CharacterCard,
   missionIndex: number,
   isReveal: boolean,
+  personnage?: { attachments?: Array<{ card: { set?: string; number?: string | number; effects?: Array<{ description: string }> } }> },
 ): number {
   let cost = card.chakra;
+
+  if (isReveal && personnage) {
+    for (const equipement of personnage.attachments ?? []) {
+      const carte = equipement.card;
+      if (String(carte.set) !== 'SS' || Number(carte.number) !== 86) continue;
+      const remise = (carte.effects ?? []).some(
+        (e) => e.description.includes('[⧗]') && e.description.includes('hidden paying 1 less'),
+      );
+      if (remise) cost = Math.max(0, cost - 1);
+    }
+  }
 
   const premiereFrappe = reductionPremiereFrappe(state, player, card);
   if (premiereFrappe > 0) cost = Math.max(0, cost - premiereFrappe);
@@ -187,10 +199,6 @@ export function calculateEffectiveCost(
       }
     }
 
-    
-    if (String(card.set) === 'SS' && Number(card.number) === 86 && effect.description.includes('hidden paying 1 less')) {
-      if (isReveal) cost = Math.max(0, cost - 1);
-    }
 
     if ((card.set === 'KS' && card.number === 75) && effect.description.includes('hidden paying 2 less')) {
       

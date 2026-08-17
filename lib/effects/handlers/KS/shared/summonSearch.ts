@@ -92,7 +92,7 @@ export function freshRevealCost(
   const check = canRevealHiddenCharacter(state, player, missionIndex, hiddenChar);
   if (!check.allowed || check.upgradeTarget) return null;
 
-  return Math.max(0, calculateEffectiveCost(state, player, topCard, missionIndex, true) - costReduction);
+  return Math.max(0, calculateEffectiveCost(state, player, topCard, missionIndex, true, hiddenChar) - costReduction);
 }
 
 export function effectiveRevealCost(
@@ -109,7 +109,7 @@ export function effectiveRevealCost(
   const check = canRevealHiddenCharacter(state, player, missionIndex, hiddenChar);
   if (!check.allowed) return null;
 
-  const effective = calculateEffectiveCost(state, player, topCard, missionIndex, true);
+  const effective = calculateEffectiveCost(state, player, topCard, missionIndex, true, hiddenChar);
 
   if (check.upgradeTarget) {
     const existingTop = topCardOf(check.upgradeTarget);

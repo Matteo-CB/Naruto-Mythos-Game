@@ -542,7 +542,7 @@ function handleRevealCharacter(
   }
 
   
-  const fullCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
+  const fullCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true, char);
   char.playedBelowPrintedCost = fullCost < (charTopCard.chakra ?? 0);
   let costToPay = fullCost;
 
