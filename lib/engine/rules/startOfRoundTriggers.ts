@@ -1,5 +1,6 @@
 import type { GameState, PlayerID, CharacterInPlay } from '../types';
 import { logAction } from '../utils/gameLog';
+import { generateInstanceId } from '../utils/id';
 import { weightsPowerupTargets } from '../../effects/handlers/SS/attachmentStatics';
 import { amplifiedPowerup } from '../../effects/ContinuousEffects';
 
@@ -18,6 +19,23 @@ function hasTeam7Keyword(char: CharacterInPlay): boolean {
 
 function sideOf(player: PlayerID): 'player1Characters' | 'player2Characters' {
   return player === 'player1' ? 'player1Characters' : 'player2Characters';
+}
+
+export function startOfRoundPowerupChoices(
+  state: GameState,
+  player: PlayerID,
+  sourceInstanceId: string,
+): CharacterInPlay[] {
+  const side = sideOf(player);
+  const choix: CharacterInPlay[] = [];
+  for (const mission of state.activeMissions) {
+    for (const char of mission[side]) {
+      if (char.instanceId === sourceInstanceId) continue;
+      if (!hasTeam7Keyword(char)) continue;
+      choix.push(char);
+    }
+  }
+  return choix;
 }
 
 export function startOfRoundPowerupTarget(
@@ -54,7 +72,44 @@ function applyForPlayer(state: GameState, player: PlayerID): GameState {
     );
 
     for (const source of sources) {
-      const cible = startOfRoundPowerupTarget(newState, player, source.instanceId);
+      const choix = startOfRoundPowerupChoices(newState, player, source.instanceId);
+      if (choix.length > 1) {
+        const effId = generateInstanceId();
+        const actId = generateInstanceId();
+        newState = {
+          ...newState,
+          pendingEffects: [...newState.pendingEffects, {
+            id: effId,
+            sourceCardId: SAKURA_007_ID,
+            sourceInstanceId: source.instanceId,
+            sourceMissionIndex: missionIndex,
+            effectType: 'MAIN',
+            effectDescription: JSON.stringify({}),
+            targetSelectionType: 'SS007_CHOOSE_POWERUP',
+            sourcePlayer: player,
+            requiresTargetSelection: true,
+            validTargets: choix.map((c) => c.instanceId),
+            isOptional: false,
+            isMandatory: true,
+            resolved: false,
+            isUpgrade: false,
+          }],
+          pendingActions: [...newState.pendingActions, {
+            id: actId,
+            type: 'SELECT_TARGET',
+            player,
+            description: 'Sakura Haruno (007): choose a friendly Team 7 character to POWERUP 2.',
+            descriptionKey: 'game.effect.desc.ss007ChoosePowerup',
+            options: choix.map((c) => c.instanceId),
+            minSelections: 1,
+            maxSelections: 1,
+            sourceEffectId: effId,
+          }],
+        };
+        continue;
+      }
+
+      const cible = choix.length === 1 ? choix[0] : null;
       if (!cible) {
         newState = {
           ...newState,

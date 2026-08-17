@@ -66,6 +66,7 @@ import { OROCHIMARU_127_ID, OROCHIMARU_127_NAME } from './handlers/SS/orochimaru
 import { KIMIMARO_077_ID, KIMIMARO_077_NAME, kimimaro077Targets, costOfTarget } from './handlers/SS/kimimaro077';
 import { DOSU_125_ID, DOSU_125_NAME } from './handlers/SS/soundMoves';
 import { AUTO_CONFIRM_INSTANT, envelopperResultat } from './autoConfirm';
+import { SAKURA_007_ID, SAKURA_007_NAME, SAKURA_007_POWERUP } from '@/lib/engine/rules/startOfRoundTriggers';
 import { UKON_038_ID, UKON_038_MALUS, UKON_038_NAME } from './handlers/SS/ukon038';
 import { recupererEquipementDefausse } from './handlers/SS/kujaku072';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
@@ -13178,6 +13179,21 @@ export class EffectEngine {
           'EFFECT_DRAW', `${meta.sourceName ?? ''} (${meta.sourceId ?? ''}): revealed ${choisi.name_fr} and added it to hand.`,
           'game.log.effect.ssDeckSearchTaken',
           { card: meta.sourceName ?? '', id: meta.sourceId ?? '', target: choisi.name_fr, target_en: choisi.name_en || choisi.name_fr });
+        break;
+      }
+
+      case 'SS007_CHOOSE_POWERUP': {
+        const cible007 = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!cible007) break;
+        newState = EffectEngine.applyPowerupToTarget(newState, targetId, SAKURA_007_POWERUP);
+        const sommet007 = cible007.character.stack?.length > 0
+          ? cible007.character.stack[cible007.character.stack.length - 1]
+          : cible007.character.card;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_POWERUP',
+          `Sakura Haruno (007): POWERUP ${SAKURA_007_POWERUP} on ${sommet007.name_fr} at the start of the round.`,
+          'game.log.effect.powerup',
+          { card: SAKURA_007_NAME, id: SAKURA_007_ID, amount: String(SAKURA_007_POWERUP), target: sommet007.name_fr, target_en: sommet007.name_en || sommet007.name_fr });
         break;
       }
 

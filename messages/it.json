@@ -3765,7 +3765,8 @@
         "ss135HideEnemy": "Scegli il personaggio nemico da nascondere, deve costare meno di {amount}.",
         "ssDeckSearchShow": "Nessuna carta valida tra quelle guardate. Tornano a caso in fondo al mazzo.",
         "ss072ConfirmMain": "Recuperare l ultimo equipaggiamento dagli scarti?",
-        "autoConfirmInstant": "Applicare questo effetto?"
+        "autoConfirmInstant": "Applicare questo effetto?",
+        "ss007ChoosePowerup": "Scegli un personaggio alleato del Team 7 da POTENZIARE di 2."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

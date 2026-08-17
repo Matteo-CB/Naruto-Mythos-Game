@@ -1662,7 +1662,8 @@
         "ss135HideEnemy": "裏向きにする敵キャラクターを選んでください。コストは{amount}未満である必要があります。",
         "ssDeckSearchShow": "見たカードの中に該当するカードはありません。それらはランダムに山札の一番下に戻ります。",
         "ss072ConfirmMain": "捨て札の一番上の装備を手札に戻しますか？",
-        "autoConfirmInstant": "この効果を適用しますか？"
+        "autoConfirmInstant": "この効果を適用しますか？",
+        "ss007ChoosePowerup": "パワーアップ2を与える味方の第七班キャラクターを選んでください。"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",

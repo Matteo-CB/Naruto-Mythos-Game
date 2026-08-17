@@ -1663,7 +1663,8 @@
         "ss135HideEnemy": "Elige el personaje enemigo a ocultar, debe costar menos de {amount}.",
         "ssDeckSearchShow": "Ninguna carta válida entre las miradas. Vuelven al azar al fondo de tu mazo.",
         "ss072ConfirmMain": "¿Recuperar el último equipamiento de tu descarte?",
-        "autoConfirmInstant": "¿Aplicar este efecto?"
+        "autoConfirmInstant": "¿Aplicar este efecto?",
+        "ss007ChoosePowerup": "Elige un personaje aliado del Equipo 7 para POTENCIAR 2."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

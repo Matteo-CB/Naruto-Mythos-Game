@@ -1658,7 +1658,8 @@
         "ss135HideEnemy": "Choose the enemy character to hide, it must cost less than {amount}.",
         "ssDeckSearchShow": "No valid card among those looked at. They go randomly to the bottom of your deck.",
         "ss072ConfirmMain": "Return the topmost attachment from your discard pile to your hand?",
-        "autoConfirmInstant": "Apply this effect?"
+        "autoConfirmInstant": "Apply this effect?",
+        "ss007ChoosePowerup": "Choose a friendly Team 7 character to POWERUP 2."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",
