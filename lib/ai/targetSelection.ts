@@ -98,7 +98,7 @@ export function aiSelectTarget(
   }
 
   
-  if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL' ||
+  if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL' || tst === 'SS090_CHOOSE_AMOUNT' ||
       pendingAction.descriptionKey === 'game.effect.desc.chooseTokenAmountRemove' ||
       pendingAction.descriptionKey === 'game.effect.desc.chooseTokenAmountSteal') {
     return options.reduce((max, opt) => parseInt(opt, 10) > parseInt(max, 10) ? opt : max, options[0]);

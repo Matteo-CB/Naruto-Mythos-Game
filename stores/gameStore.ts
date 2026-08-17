@@ -400,8 +400,8 @@ export function buildPendingTargetSelectionUI(
           },
         };
       });
-    } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL') {
-      const isSteal = tst === 'CHOOSE_TOKEN_AMOUNT_STEAL';
+    } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL' || tst === 'SS090_CHOOSE_AMOUNT') {
+      const isSteal = tst !== 'CHOOSE_TOKEN_AMOUNT_REMOVE';
       handCards = pendingAction.options.map((amountStr) => {
         const amount = parseInt(amountStr, 10);
         return {
