@@ -328,7 +328,8 @@ export function enma132EndOfRound(state: GameState): GameState {
 
         const carte = deck[idx];
         const cout = Math.max(0, calculateEffectiveCost(newState, controleur, carte as never, mIdx, false) - ENMA_132_REDUCTION);
-        const cibles = getCharacterAttachTargets(newState, controleur, mIdx, carte as never);
+        const cibles = newState.activeMissions.flatMap((_, autreMission) =>
+          getCharacterAttachTargets(newState, controleur, autreMission, carte as never));
 
         if (newState[controleur].chakra < cout || cibles.length === 0) {
           newState = {
