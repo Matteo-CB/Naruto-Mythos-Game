@@ -3,6 +3,7 @@ import { generateInstanceId } from '../engine/utils/id';
 import { logAction } from '../engine/utils/gameLog';
 import { isDuelConditionMet } from './duelUtils';
 import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
+import { textIsBlanked } from './handlers/SS/attachmentStatics';
 
 
 export function triggerOnDefeatEffects(
@@ -21,6 +22,7 @@ export function triggerOnDefeatEffects(
 
       for (const char of mission[side]) {
         if (char.isHidden) continue;
+        if (textIsBlanked(char)) continue;
         if (char.instanceId === defeatedChar.instanceId) continue;
         if (simultaneousDefeatIds && simultaneousDefeatIds.includes(char.instanceId)) continue;
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
@@ -136,6 +138,7 @@ function queueGaara078Draw(
   for (let mi = 0; mi < state.activeMissions.length; mi++) {
     for (const char of state.activeMissions[mi][side]) {
       if (char.isHidden) continue;
+      if (textIsBlanked(char)) continue;
       if (char.controlledBy !== beneficiary) continue;
       if (char.instanceId === defeatedChar.instanceId) continue;
       if (simultaneousDefeatIds && simultaneousDefeatIds.includes(char.instanceId)) continue;
