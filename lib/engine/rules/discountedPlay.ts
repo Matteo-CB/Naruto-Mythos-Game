@@ -58,3 +58,23 @@ export function suivreEntreesEnJeu(avant: GameState, apres: GameState): GameStat
 
   return modifie ? { ...apres, turnPlayedIds: ids } : apres;
 }
+
+export function reparerPilesVides(state: GameState): GameState {
+  let modifie = false;
+  const missions = (state.activeMissions ?? []).map((mission) => {
+    const reparerCote = (liste: CharacterInPlay[] | undefined) => {
+      if (!liste) return liste;
+      return liste.map((c) => {
+        if ((c.stack?.length ?? 0) > 0 || !c.card) return c;
+        modifie = true;
+        return { ...c, stack: [c.card] };
+      });
+    };
+    return {
+      ...mission,
+      player1Characters: reparerCote(mission.player1Characters) as CharacterInPlay[],
+      player2Characters: reparerCote(mission.player2Characters) as CharacterInPlay[],
+    };
+  });
+  return modifie ? { ...state, activeMissions: missions } : state;
+}
