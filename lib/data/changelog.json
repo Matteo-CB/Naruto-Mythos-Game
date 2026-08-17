@@ -2,36 +2,44 @@
   "entries": [
     {
       "date": "2026-08-17",
-      "title_fr": "Correctif de UKON copie",
-      "title_en": "Copied Ukon fix",
-      "title_es": "Corrección de Ukon copiado",
-      "title_pt": "Correção de Ukon copiado",
-      "title_it": "Correzione di Ukon copiato",
-      "title_pl": "Poprawka skopiowanego Ukona",
-      "title_ja": "コピーされた右近の修正",
+      "title_fr": "Correctifs de cartes",
+      "title_en": "Card fixes",
+      "title_es": "Correcciones de cartas",
+      "title_pt": "Correções de cartas",
+      "title_it": "Correzioni di carte",
+      "title_pl": "Poprawki kart",
+      "title_ja": "カードの修正",
       "categories": [
+        "fix",
         "fix"
       ],
       "changes_fr": [
-        "Quand SAKON Apposition des sceaux maléfiques 062 copie UKON Sceau Maudit, second stade 038, la cible perd bien 5 puissance au lieu d en gagner."
+        "Quand SAKON Apposition des sceaux maléfiques 062 copie UKON Sceau Maudit, second stade 038, la cible perd bien 5 puissance au lieu d en gagner.",
+        "La mission Faire profil bas accorde aussi son embuscade quand un personnage caché est révélé en amélioration."
       ],
       "changes_en": [
-        "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power."
+        "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power.",
+        "The mission Keep a Low Profile now grants its ambush bonus when a hidden character is revealed as an upgrade."
       ],
       "changes_es": [
-        "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo."
+        "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo.",
+        "La misión Mantener un perfil bajo también concede su emboscada cuando un personaje oculto se revela como mejora."
       ],
       "changes_pt": [
-        "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar."
+        "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar.",
+        "A missão Manter um perfil discreto também concede a sua emboscada quando um personagem oculto é revelado como melhoria."
       ],
       "changes_it": [
-        "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne."
+        "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne.",
+        "La missione Mantenere un profilo basso concede la sua imboscata anche quando un personaggio nascosto viene rivelato come miglioramento."
       ],
       "changes_pl": [
-        "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać."
+        "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać.",
+        "Misja Nie rzucaj się w oczy przyznaje swoją zasadzkę także wtedy, gdy ukryta postać zostaje odkryta jako ulepszenie."
       ],
       "changes_ja": [
-        "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。"
+        "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。",
+        "ミッション「目立たないように」は、伏せたキャラクターが強化として公開されたときにも待ち伏せの効果を与えるようになりました。"
       ]
     },
     {

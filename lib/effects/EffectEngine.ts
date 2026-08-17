@@ -646,6 +646,13 @@ export class EffectEngine {
     let newState = deepClone(state);
     const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;
 
+    if (missionCarries(newState.activeMissions[missionIndex], SS_MISSION_LOW_PROFILE)) {
+      newState = {
+        ...newState,
+        lowProfileAmbush: { player, instanceId: character.instanceId, sourceCardId: topCard.id },
+      };
+    }
+
     if (!character.isHidden) {
       newState = triggerOnPlayReactions(newState, player, missionIndex, true, character.instanceId);
     }
