@@ -280,6 +280,7 @@ export function calculateContinuousPowerModifier(
     const ownerOfEnemyChars = player === 'player1' ? 'player2' : 'player1';
     for (const enemy of enemyCharsHidden) {
       if (enemy.isHidden) continue;
+      if (textIsBlanked(enemy)) continue;
       const eTop = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
       for (const effect of eTop.effects ?? []) {
         if (!effect.description.includes('[⧗]')) continue;
@@ -339,6 +340,7 @@ export function calculateContinuousPowerModifier(
   
   for (const enemy of enemyChars) {
     if (enemy.isHidden) continue;
+    if (textIsBlanked(enemy)) continue;
     const enemyTopCard = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
 
     for (const effect of enemyTopCard.effects ?? []) {

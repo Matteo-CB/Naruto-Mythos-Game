@@ -228,6 +228,7 @@ export function calculateEffectiveCost(
   if (!enemyChars) return Math.max(0, cost);
   for (const enemy of enemyChars) {
     if (enemy.isHidden) continue;
+    if (textIsBlanked(enemy)) continue;
 
     const enemyTopCard = getTopCard(enemy);
     if (!enemyTopCard) continue;

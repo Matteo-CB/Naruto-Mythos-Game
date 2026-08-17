@@ -17,6 +17,7 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
@@ -27,7 +28,8 @@
         "VILLAGE DES ARTISANS 110 récompense aussi les armes et armures déplacées sur un personnage, pas seulement celles posées.",
         "Un personnage amélioré ne peut plus afficher le coût d une carte et la puissance d une autre, ni déclencher l effet de la carte du dessous.",
         "ENMA 132 Rare peut poser le NYOI ADAMANTIN sur un personnage de n importe quelle mission, plus seulement la sienne.",
-        "SAMEHADA 090 affiche enfin le nombre de jetons à voler au lieu de cartes illisibles marquées de points d interrogation."
+        "SAMEHADA 090 affiche enfin le nombre de jetons à voler au lieu de cartes illisibles marquées de points d interrogation.",
+        "BOMBE AVEUGLANTE 083 efface vraiment tout le texte de sa cible: sa surtaxe de chakra et ses auras de puissance ne s appliquent plus."
       ],
       "changes_en": [
         "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power.",
@@ -37,7 +39,8 @@
         "VILLAGE OF ARTISANS 110 now also rewards weapons and armor moved onto a character, not only those freshly attached.",
         "An upgraded character can no longer show one card's cost with another card's Power, nor trigger the effect of the card underneath.",
         "ENMA 132 Rare can attach the ADAMANTINE NYOI to a character on any mission, not only its own.",
-        "SAMEHADA 090 now shows how many Power tokens to steal instead of unreadable cards marked with question marks."
+        "SAMEHADA 090 now shows how many Power tokens to steal instead of unreadable cards marked with question marks.",
+        "FLASH BOMB 083 now truly blanks its target: its extra Chakra tax and its Power auras no longer apply."
       ],
       "changes_es": [
         "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo.",
@@ -47,7 +50,8 @@
         "ALDEA DE LOS ARTESANOS 110 también recompensa las armas y armaduras movidas a un personaje, no solo las recién equipadas.",
         "Un personaje mejorado ya no puede mostrar el coste de una carta y el poder de otra, ni activar el efecto de la carta de debajo.",
         "ENMA 132 Rara puede equipar el NYOI ADAMANTINO a un personaje de cualquier misión, no solo de la suya.",
-        "SAMEHADA 090 muestra por fin cuántos contadores de poder robar, en vez de cartas ilegibles con signos de interrogación."
+        "SAMEHADA 090 muestra por fin cuántos contadores de poder robar, en vez de cartas ilegibles con signos de interrogación.",
+        "BOMBA CEGADORA 083 borra de verdad todo el texto de su objetivo: su recargo de chakra y sus auras de poder ya no se aplican."
       ],
       "changes_pt": [
         "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar.",
@@ -57,7 +61,8 @@
         "ALDEIA DOS ARTESÃOS 110 também recompensa as armas e armaduras movidas para um personagem, e não apenas as recém-equipadas.",
         "Um personagem melhorado já não pode mostrar o custo de uma carta e o poder de outra, nem ativar o efeito da carta de baixo.",
         "ENMA 132 Rara pode equipar o NYOI ADAMANTINO num personagem de qualquer missão, e não apenas da sua.",
-        "SAMEHADA 090 mostra finalmente quantos marcadores de poder roubar, em vez de cartas ilegíveis com pontos de interrogação."
+        "SAMEHADA 090 mostra finalmente quantos marcadores de poder roubar, em vez de cartas ilegíveis com pontos de interrogação.",
+        "BOMBA OFUSCANTE 083 apaga mesmo todo o texto do seu alvo: a sua sobretaxa de chakra e as suas auras de poder deixam de se aplicar."
       ],
       "changes_it": [
         "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne.",
@@ -67,7 +72,8 @@
         "VILLAGGIO DEGLI ARTIGIANI 110 premia anche le armi e le armature spostate su un personaggio, non solo quelle appena equipaggiate.",
         "Un personaggio migliorato non può più mostrare il costo di una carta e la potenza di un altra, né attivare l effetto della carta sottostante.",
         "ENMA 132 Rara può equipaggiare il NYOI ADAMANTINO a un personaggio di qualsiasi missione, non solo della propria.",
-        "SAMEHADA 090 mostra finalmente quanti segnalini potenza rubare, invece di carte illeggibili con punti interrogativi."
+        "SAMEHADA 090 mostra finalmente quanti segnalini potenza rubare, invece di carte illeggibili con punti interrogativi.",
+        "BOMBA ACCECANTE 083 cancella davvero tutto il testo del bersaglio: il sovrapprezzo di chakra e le aure di potenza non si applicano piu."
       ],
       "changes_pl": [
         "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać.",
@@ -77,7 +83,8 @@
         "WIOSKA RZEMIEŚLNIKÓW 110 nagradza także bronie i pancerze przeniesione na postać, a nie tylko te świeżo założone.",
         "Ulepszona postać nie może już pokazywać kosztu jednej karty i mocy innej ani aktywować efektu karty pod spodem.",
         "ENMA 132 Rzadka może założyć ADAMANTOWY NYOI postaci na dowolnej misji, a nie tylko na własnej.",
-        "SAMEHADA 090 pokazuje wreszcie, ile żetonów mocy ukraść, zamiast nieczytelnych kart ze znakami zapytania."
+        "SAMEHADA 090 pokazuje wreszcie, ile żetonów mocy ukraść, zamiast nieczytelnych kart ze znakami zapytania.",
+        "BOMBA OŚLEPIAJĄCA 083 naprawdę wymazuje cały tekst celu: jego dopłata chakry i aury mocy przestają działać."
       ],
       "changes_ja": [
         "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。",
@@ -87,7 +94,8 @@
         "職人の里 110 は、新たに装備されたものだけでなく、キャラクターに移動された武器と防具にも報酬を与えるようになりました。",
         "強化されたキャラクターが、あるカードのコストと別のカードのパワーを同時に表示したり、下のカードの効果を発動したりすることはなくなりました。",
         "猿魔 132 レアは、自分のミッションだけでなく、任意のミッションのキャラクターに 剛力金剛如意 を装備できるようになりました。",
-        "鮫肌 090 は、疑問符だけの読めないカードではなく、奪うパワートークンの数を表示するようになりました。"
+        "鮫肌 090 は、疑問符だけの読めないカードではなく、奪うパワートークンの数を表示するようになりました。",
+        "閃光弾 083 は対象のテキストを完全に消すようになりました。追加チャクラの上乗せもパワーのオーラも適用されません。"
       ]
     },
     {
