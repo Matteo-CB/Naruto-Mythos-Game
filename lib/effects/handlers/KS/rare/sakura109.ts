@@ -51,7 +51,10 @@ function sakura109MainHandler(ctx: EffectContext): EffectResult {
   };
 }
 
+const SAKURA_109_IMPRESSIONS = ['KS-109-R', 'KS-109-RA', 'KS-109-MV'];
+
 export function registerSakura109Handlers(): void {
-  registerEffect('KS-109-R', 'MAIN', sakura109MainHandler);
-  registerEffect('KS-109-MV', 'MAIN', sakura109MainHandler);
+  for (const id of SAKURA_109_IMPRESSIONS) {
+    registerEffect(id, 'MAIN', sakura109MainHandler);
+  }
 }

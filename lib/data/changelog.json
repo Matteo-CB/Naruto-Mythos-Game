@@ -22,9 +22,15 @@
         "fix",
         "fix",
         "fix",
+        "fix",
+        "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "Un personnage vaincu arrive toujours dans la defausse de son proprietaire: certains disparaissaient sans laisser de carte.",
+        "SAKURA HARUNO Sasuke est en train de me regarder ! 135 Mythos Variante applique enfin son propre effet, et non celui de la carte du dessous.",
+        "NARUTO UZUMAKI 108 et SAKURA HARUNO 109 en illustration alternative n'avaient aucun effet: elles se comportent comme la carte de base.",
         "Un equipement pose apparait immediatement sur sa carte, au lieu d'attendre qu'il se passe autre chose sur ce personnage.",
         "Le chakra non depense est de nouveau defausse a chaque fin de manche: il s'accumulait depuis la manche 2.",
         "NARUTO UZUMAKI Rasengan 133 Secret joue en amelioration vainc de nouveau ses cibles au lieu de les cacher, et atteint les personnages caches.",
@@ -40,6 +46,9 @@
         "HASHIRAMA SENJU 129 Rare et TOBIRAMA SENJU 131 Rare peuvent enfin s'ameliorer par-dessus un allie quand Orochimaru est dans la mission."
       ],
       "changes_en": [
+        "A defeated character always reaches its owner discard pile: some vanished without leaving a card behind.",
+        "SAKURA HARUNO Sasuke is watching me ! 135 Mythos Variant now applies its own effect instead of the card underneath it.",
+        "NARUTO UZUMAKI 108 and SAKURA HARUNO 109 alternate art had no effect at all: they now behave like the base card.",
         "An attachment shows on its card as soon as it is played, instead of waiting for something else to happen to that character.",
         "Unspent chakra is discarded again at the end of every round: it had been piling up from round 2 onwards.",
         "NARUTO UZUMAKI Rasengan 133 Secret played as an upgrade defeats its targets again instead of hiding them, and can reach hidden characters.",
@@ -55,6 +64,9 @@
         "HASHIRAMA SENJU 129 Rare and TOBIRAMA SENJU 131 Rare can finally upgrade over an ally when Orochimaru is in the mission."
       ],
       "changes_es": [
+        "Un personaje derrotado siempre llega al descarte de su dueno: algunos desaparecian sin dejar carta.",
+        "SAKURA HARUNO 135 Variante Mythos aplica por fin su propio efecto, y no el de la carta de debajo.",
+        "NARUTO UZUMAKI 108 y SAKURA HARUNO 109 en arte alternativo no tenian ningun efecto: ahora actuan como la carta base.",
         "Un equipamiento aparece en su carta nada mas jugarlo, en vez de esperar a que le pase algo mas a ese personaje.",
         "El chakra no gastado vuelve a descartarse al final de cada ronda: se acumulaba desde la ronda 2.",
         "NARUTO UZUMAKI Rasengan 133 Secreta jugada como mejora vuelve a derrotar a sus objetivos en vez de ocultarlos, y alcanza a los personajes ocultos.",
@@ -70,6 +82,9 @@
         "HASHIRAMA SENJU 129 Rara y TOBIRAMA SENJU 131 Rara por fin pueden mejorar sobre un aliado cuando Orochimaru esta en la mision."
       ],
       "changes_pt": [
+        "Um personagem derrotado sempre chega ao descarte do dono: alguns sumiam sem deixar carta.",
+        "SAKURA HARUNO 135 Variante Mythos aplica enfim o proprio efeito, e nao o da carta de baixo.",
+        "NARUTO UZUMAKI 108 e SAKURA HARUNO 109 em arte alternativa nao tinham efeito algum: agora agem como a carta base.",
         "Um equipamento aparece na carta assim que é jogado, em vez de esperar que outra coisa aconteça com aquele personagem.",
         "O chakra não gasto volta a ser descartado no fim de cada rodada: ele se acumulava a partir da rodada 2.",
         "NARUTO UZUMAKI Rasengan 133 Secreta jogada como melhoria volta a derrotar seus alvos em vez de escondê-los, e alcança personagens escondidos.",
@@ -85,6 +100,9 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara enfim podem melhorar sobre um aliado quando Orochimaru está na missão."
       ],
       "changes_it": [
+        "Un personaggio sconfitto arriva sempre negli scarti del suo proprietario: alcuni sparivano senza lasciare carta.",
+        "SAKURA HARUNO 135 Variante Mythos applica finalmente il proprio effetto, non quello della carta sottostante.",
+        "NARUTO UZUMAKI 108 e SAKURA HARUNO 109 in arte alternativa non avevano alcun effetto: ora agiscono come la carta base.",
         "Un equipaggiamento appare sulla sua carta appena giocato, invece di attendere che succeda altro a quel personaggio.",
         "Il chakra non speso viene di nuovo scartato alla fine di ogni round: si accumulava dal round 2 in poi.",
         "NARUTO UZUMAKI Rasengan 133 Segreta giocata come miglioramento sconfigge di nuovo i bersagli invece di nasconderli, e raggiunge i personaggi nascosti.",
@@ -100,6 +118,9 @@
         "HASHIRAMA SENJU 129 Rara e TOBIRAMA SENJU 131 Rara possono finalmente migliorare su un alleato quando Orochimaru è nella missione."
       ],
       "changes_pl": [
+        "Pokonana postac zawsze trafia na stos odrzuconych wlasciciela: niektore znikaly bez sladu.",
+        "SAKURA HARUNO 135 Wariant Mythos stosuje wreszcie wlasny efekt, a nie efekt karty pod spodem.",
+        "NARUTO UZUMAKI 108 i SAKURA HARUNO 109 w alternatywnej grafice nie mialy zadnego efektu: dzialaja teraz jak karta podstawowa.",
         "Wyposażenie pojawia się na karcie od razu po zagraniu, zamiast czekać, aż z postacią stanie się coś innego.",
         "Niewykorzystana czakra znów jest odrzucana na koniec każdej rundy: kumulowała się od rundy 2.",
         "NARUTO UZUMAKI Rasengan 133 Sekretna zagrana jako ulepszenie znów pokonuje cele zamiast je ukrywać i sięga ukrytych postaci.",
@@ -115,6 +136,9 @@
         "HASHIRAMA SENJU 129 Rzadka i TOBIRAMA SENJU 131 Rzadka mogą wreszcie ulepszyć sojusznika, gdy Orochimaru jest w misji."
       ],
       "changes_ja": [
+        "撃破されたキャラは必ず持ち主の捨て札に行きます。カードを残さず消えることがありました。",
+        "春野サクラ 135 ミソスバリアントが、下のカードではなく自身の効果を適用するようになりました。",
+        "うずまきナルト 108 と春野サクラ 109 のイラスト違いに効果がありませんでした。基本カードと同じ挙動になりました。",
         "装備を出した瞬間にカード上へ表示されます。そのキャラに別の出来事が起きるまで待たなくなりました。",
         "使わなかったチャクラが再び毎ラウンド終了時に捨てられます。ラウンド2から持ち越されていました。",
         "うずまきナルト 螺旋丸 133 シークレットを重ねて出したとき、隠すのではなく再び撃破し、裏向きのキャラにも届きます。",

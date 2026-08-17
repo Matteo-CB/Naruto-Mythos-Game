@@ -30,10 +30,11 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
   };
 }
 
+const SAKURA_135_IMPRESSIONS = ['KS-135-S', 'KS-135-SV', 'KS-135-MV'];
+
 export function registerSakura135Handlers(): void {
-  registerEffect('KS-135-S', 'MAIN', sakura135MainHandler);
-  registerEffect('KS-135-S', 'UPGRADE', (ctx) => ({ state: ctx.state })); // Handled by MAIN via isUpgrade
-  registerEffect('KS-135-MV', 'MAIN', sakura135MainHandler);
-  registerEffect('KS-135-SV', 'MAIN', sakura135MainHandler);
-  registerEffect('KS-135-SV', 'UPGRADE', (ctx) => ({ state: ctx.state }));
+  for (const id of SAKURA_135_IMPRESSIONS) {
+    registerEffect(id, 'MAIN', sakura135MainHandler);
+    registerEffect(id, 'UPGRADE', (ctx) => ({ state: ctx.state }));
+  }
 }

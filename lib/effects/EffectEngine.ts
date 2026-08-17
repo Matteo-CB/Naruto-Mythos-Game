@@ -20795,11 +20795,14 @@ export class EffectEngine {
 
     
     const owner = defeated.originalOwner;
+    const cartesDuPersonnage = defeated.stack?.length > 0
+      ? defeated.stack
+      : (defeated.card ? [defeated.card] : []);
     const hasTsunade004 = EffectEngine.hasTsunade004Active(newState, charResult2.player);
     if (hasTsunade004 && charResult2.player === owner) {
-      
-      const topCard = defeated.stack?.length > 0 ? defeated.stack[defeated.stack?.length - 1] : null;
-      const underCards = defeated.stack?.length > 1 ? defeated.stack.slice(0, -1) : [];
+
+      const topCard = cartesDuPersonnage.length > 0 ? cartesDuPersonnage[cartesDuPersonnage.length - 1] : null;
+      const underCards = cartesDuPersonnage.length > 1 ? cartesDuPersonnage.slice(0, -1) : [];
       if (topCard) newState[owner].hand.push(topCard);
       for (let ui = 0; ui < underCards.length; ui++) {
         const card = underCards[ui];
@@ -20807,10 +20810,10 @@ export class EffectEngine {
         newState[owner].discardPile.push(discardCard as any);
       }
     } else {
-      
-      
-      for (let si = 0; si < defeated.stack.length; si++) {
-        const card = defeated.stack[si];
+
+
+      for (let si = 0; si < cartesDuPersonnage.length; si++) {
+        const card = cartesDuPersonnage[si];
         const discardCard = { ...card, instanceId: defeated.instanceId + (si > 0 ? `-stack-${si}` : ''), wasHiddenBeforeDefeat: defeated.isHidden };
         newState[owner].discardPile.push(discardCard as any);
       }

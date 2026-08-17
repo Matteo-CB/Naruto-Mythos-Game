@@ -44,10 +44,12 @@ function naruto108MainHandler(ctx: EffectContext): EffectResult {
   };
 }
 
+const NARUTO_108_IMPRESSIONS = [
+  'KS-108-R', 'KS-108-RA', 'KS-108-MV', 'KS-108_2-MV', 'KS-108_3-MV', 'KS-108_4-MV',
+];
+
 export function registerNaruto108Handlers(): void {
-  registerEffect('KS-108-R', 'MAIN', naruto108MainHandler);
-  registerEffect('KS-108-MV', 'MAIN', naruto108MainHandler);
-  registerEffect('KS-108_2-MV', 'MAIN', naruto108MainHandler);
-  registerEffect('KS-108_3-MV', 'MAIN', naruto108MainHandler);
-  registerEffect('KS-108_4-MV', 'MAIN', naruto108MainHandler);
+  for (const id of NARUTO_108_IMPRESSIONS) {
+    registerEffect(id, 'MAIN', naruto108MainHandler);
+  }
 }
