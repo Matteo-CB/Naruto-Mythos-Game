@@ -35,6 +35,7 @@ export function tayuya040Reductions(
   state: GameState,
   player: PlayerID,
   missions: number[],
+  sourceInstanceId?: string,
 ): Record<number, number> {
   const side = sideKey(player);
   const table: Record<number, number> = {};
@@ -44,6 +45,7 @@ export function tayuya040Reductions(
     let compte = 0;
     for (const char of mission[side]) {
       if (char.isHidden) continue;
+      if (sourceInstanceId && char.instanceId === sourceInstanceId) continue;
       if ((topOf(char).keywords ?? []).includes('Sound Four')) compte += 1;
     }
     table[i] = compte + virtualSoundFourCount(mission, player);
@@ -65,7 +67,7 @@ function tayuya040Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
 
   const missions = tayuya040Missions(state, sourcePlayer, sourceMissionIndex, sourceCard.instanceId);
-  const reductions = tayuya040Reductions(state, sourcePlayer, missions);
+  const reductions = tayuya040Reductions(state, sourcePlayer, missions, sourceCard.instanceId);
   const meilleure = Math.max(0, ...Object.values(reductions));
 
   const resultat = playLessSelectionResult(state, sourcePlayer, {

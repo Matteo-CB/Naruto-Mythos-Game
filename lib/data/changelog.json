@@ -33,6 +33,8 @@
         "fix",
         "fix",
         "fix",
+        "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
@@ -59,7 +61,9 @@
         "SAKURA HARUNO 007 laisse choisir le personnage Équipe 7 à renforcer au lieu de désigner le plus fort d office.",
         "KAKASHI HATAKE 008 peut révéler un Équipe 7 déjà caché même si la révélation fusionne, sa restriction ne visant que la main.",
         "SHINO ABURAME 017 montre enfin la carte révélée dans la main adverse au lieu de se contenter de la citer.",
-        "ASUMA SARUTOBI 012 et SHIZUNE 003 ne peuvent plus se renforcer eux-mêmes: un personnage n est pas son propre allié."
+        "ASUMA SARUTOBI 012 et SHIZUNE 003 ne peuvent plus se renforcer eux-mêmes: un personnage n est pas son propre allié.",
+        "SAKON 037 comptait une seule carte révélée même quand on en révélait plusieurs, l effet n aboutissait donc pas.",
+        "TAYUYA 040 ne se compte plus elle-même dans la remise qu elle accorde."
       ],
       "changes_en": [
         "When SAKON Black Seal 062 copies UKON Cursemark Second State 038, the target now loses 5 Power instead of gaining Power.",
@@ -85,7 +89,9 @@
         "SAKURA HARUNO 007 now lets you choose which Team 7 character to POWERUP instead of picking the strongest for you.",
         "KAKASHI HATAKE 008 can reveal a Team 7 already hidden even if the reveal merges, since its restriction only covers cards from hand.",
         "SHINO ABURAME 017 now actually shows the card revealed from the opponent's hand instead of only naming it.",
-        "ASUMA SARUTOBI 012 and SHIZUNE 003 can no longer POWERUP themselves: a character is not its own ally."
+        "ASUMA SARUTOBI 012 and SHIZUNE 003 can no longer POWERUP themselves: a character is not its own ally.",
+        "SAKON 037 was counting only one revealed card even when several were revealed, so the effect went nowhere.",
+        "TAYUYA 040 no longer counts herself in the discount she grants."
       ],
       "changes_es": [
         "Cuando SAKON Sello de los Cinco Elementos 062 copia a UKON Sello Maldito, segundo estado 038, el objetivo pierde 5 de poder en lugar de ganarlo.",
@@ -111,7 +117,9 @@
         "SAKURA HARUNO 007 te deja elegir a qué personaje del Equipo 7 potenciar, en vez de escoger al más fuerte por ti.",
         "KAKASHI HATAKE 008 puede revelar un Equipo 7 ya oculto aunque la revelación se fusione, ya que su restricción solo afecta a la mano.",
         "SHINO ABURAME 017 muestra por fin la carta revelada de la mano rival en vez de solo nombrarla.",
-        "ASUMA SARUTOBI 012 y SHIZUNE 003 ya no pueden potenciarse a sí mismos: un personaje no es su propio aliado."
+        "ASUMA SARUTOBI 012 y SHIZUNE 003 ya no pueden potenciarse a sí mismos: un personaje no es su propio aliado.",
+        "SAKON 037 contaba una sola carta revelada aunque revelaras varias, así que el efecto no llegaba a nada.",
+        "TAYUYA 040 ya no se cuenta a sí misma en el descuento que concede."
       ],
       "changes_pt": [
         "Quando SAKON Selo dos Cinco Elementos 062 copia UKON Selo Amaldiçoado, segundo estado 038, o alvo perde 5 de poder em vez de ganhar.",
@@ -137,7 +145,9 @@
         "SAKURA HARUNO 007 deixa-te escolher que personagem da Equipa 7 reforçar, em vez de escolher o mais forte por ti.",
         "KAKASHI HATAKE 008 pode revelar uma Equipa 7 já oculta mesmo que a revelação funda, pois a restrição só cobre a mão.",
         "SHINO ABURAME 017 mostra finalmente a carta revelada da mão do adversário em vez de apenas a nomear.",
-        "ASUMA SARUTOBI 012 e SHIZUNE 003 já não podem reforçar-se a si próprios: um personagem não é seu próprio aliado."
+        "ASUMA SARUTOBI 012 e SHIZUNE 003 já não podem reforçar-se a si próprios: um personagem não é seu próprio aliado.",
+        "SAKON 037 contava apenas uma carta revelada mesmo revelando várias, pelo que o efeito não dava em nada.",
+        "TAYUYA 040 já não se conta a si própria no desconto que concede."
       ],
       "changes_it": [
         "Quando SAKON Sigillo dei Cinque Elementi 062 copia UKON Sigillo Maledetto, secondo stadio 038, il bersaglio perde 5 potenza invece di guadagnarne.",
@@ -163,7 +173,9 @@
         "SAKURA HARUNO 007 ti lascia scegliere quale personaggio del Team 7 potenziare, invece di scegliere il piu forte al posto tuo.",
         "KAKASHI HATAKE 008 puo rivelare un Team 7 gia nascosto anche se la rivelazione si fonde, poiche la restrizione riguarda solo la mano.",
         "SHINO ABURAME 017 mostra finalmente la carta rivelata dalla mano avversaria invece di limitarsi a nominarla.",
-        "ASUMA SARUTOBI 012 e SHIZUNE 003 non possono piu potenziare se stessi: un personaggio non e alleato di se stesso."
+        "ASUMA SARUTOBI 012 e SHIZUNE 003 non possono piu potenziare se stessi: un personaggio non e alleato di se stesso.",
+        "SAKON 037 contava una sola carta rivelata anche rivelandone piu di una, quindi l effetto non concludeva nulla.",
+        "TAYUYA 040 non conta piu se stessa nello sconto che concede."
       ],
       "changes_pl": [
         "Gdy SAKON Pieczęć Pięciu Żywiołów 062 kopiuje UKONA Przeklęta Pieczęć, drugi stan 038, cel traci 5 mocy zamiast ją zyskiwać.",
@@ -189,7 +201,9 @@
         "SAKURA HARUNO 007 pozwala wybrać, którą postać z Drużyny 7 wzmocnić, zamiast wybierać najsilniejszą za ciebie.",
         "KAKASHI HATAKE 008 może odkryć ukrytą już postać z Drużyny 7, nawet gdy odkrycie łączy karty, bo ograniczenie dotyczy tylko ręki.",
         "SHINO ABURAME 017 wreszcie pokazuje kartę odkrytą z ręki przeciwnika, zamiast tylko ją wymieniać.",
-        "ASUMA SARUTOBI 012 i SHIZUNE 003 nie mogą już wzmacniać samych siebie: postać nie jest własnym sojusznikiem."
+        "ASUMA SARUTOBI 012 i SHIZUNE 003 nie mogą już wzmacniać samych siebie: postać nie jest własnym sojusznikiem.",
+        "SAKON 037 liczył tylko jedną odkrytą kartę, nawet gdy odkrywano kilka, więc efekt nic nie dawał.",
+        "TAYUYA 040 nie liczy już samej siebie w przyznawanej zniżce."
       ],
       "changes_ja": [
         "左近 五行封印 062 が 右近 呪印 第二段階 038 をコピーしたとき、対象はパワーを得るのではなく正しく5失うようになりました。",
@@ -215,7 +229,9 @@
         "春野サクラ 007 は、最も強い第七班キャラクターを自動で選ぶのではなく、対象をプレイヤーが選べるようになりました。",
         "はたけカカシ 008 の制限は手札のカードのみに及ぶため、すでに伏せている第七班を公開して重ねることができるようになりました。",
         "油女シノ 017 は、名前を挙げるだけでなく、相手の手札から公開されたカードを実際に表示するようになりました。",
-        "猿飛アスマ 012 と シズネ 003 は自身を強化できなくなりました。キャラクターは自分自身の味方ではありません。"
+        "猿飛アスマ 012 と シズネ 003 は自身を強化できなくなりました。キャラクターは自分自身の味方ではありません。",
+        "左近 037 は複数枚公開しても1枚しか数えておらず、効果が成立していませんでした。",
+        "多由也 040 は、自身が与える割引に自分自身を数えなくなりました。"
       ]
     },
     {

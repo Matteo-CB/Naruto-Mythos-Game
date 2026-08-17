@@ -12797,7 +12797,10 @@ export class EffectEngine {
 
       case 'SS037_REVEAL_SOUND_FOUR': {
         const ss037Player = pendingEffect.sourcePlayer;
-        const ss037Indices = String(targetId).split(',').map((v) => parseInt(v, 10)).filter((v) => !isNaN(v));
+        const ss037Indices = selectedTargets
+          .flatMap((v) => String(v).split(','))
+          .map((v) => parseInt(v, 10))
+          .filter((v) => !isNaN(v));
         const ss037Main = newState[ss037Player].hand;
         const ss037Revelees = ss037Indices.map((i) => ss037Main[i]).filter(Boolean);
         if (ss037Revelees.length === 0) break;
