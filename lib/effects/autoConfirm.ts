@@ -1,15 +1,8 @@
 import type { EffectType, GameState, PlayerID } from '@/lib/engine/types';
 import type { EffectResult } from '@/lib/effects/EffectTypes';
+import { effetInstantOptionnel } from '@/lib/effects/autoConfirmRules';
 
 export const AUTO_CONFIRM_INSTANT = 'AUTO_CONFIRM_INSTANT';
-
-const TYPES_CONCERNES: EffectType[] = ['MAIN', 'AMBUSH', 'UPGRADE', 'DUEL', 'FIRST_STRIKE'];
-
-export function effetInstantOptionnel(description: string, type: EffectType): boolean {
-  if (description.includes('[⧗]')) return false;
-  if (/\bMUST\b/i.test(description)) return false;
-  return TYPES_CONCERNES.includes(type);
-}
 
 function signature(state: GameState): string {
   const morceaux: Array<string | number> = [];
@@ -84,3 +77,5 @@ export function envelopperResultat(
     resultat, ctx.state, effet.description, effectType, source.instanceId, sommet.id,
   );
 }
+
+export { effetInstantOptionnel };
