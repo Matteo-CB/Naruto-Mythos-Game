@@ -10,27 +10,43 @@
       "title_pl": "Poprawka wyposażenia",
       "title_ja": "装備の修正",
       "categories": [
+        "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "Un effet qui vise un personnage immunisé le dit désormais dans le journal, au lieu de sembler ne rien faire.",
+        "JIRÔBÔ Poing d Arhat 122 ne propose plus un ennemi immunisé comme cible de sa défaite.",
         "Un personnage qui perd le droit de porter plusieurs équipements ne garde plus que le dernier, les autres partent à la défausse."
       ],
       "changes_en": [
+        "An effect aimed at an immune character now says so in the log instead of appearing to do nothing.",
+        "JIROBO Slamming Palm 122 no longer offers an immune enemy as a target for its defeat.",
         "A character that loses the right to carry several attachments now keeps only the most recent one, the others go to the discard pile."
       ],
       "changes_es": [
+        "Un efecto dirigido a un personaje inmune ahora lo indica en el registro, en vez de parecer que no hace nada.",
+        "JIROBO Palma Demoledora 122 ya no ofrece a un enemigo inmune como objetivo de su derrota.",
         "Un personaje que pierde el derecho a llevar varios equipamientos conserva solo el más reciente; los demás van al descarte."
       ],
       "changes_pt": [
+        "Um efeito dirigido a um personagem imune indica-o agora no registo, em vez de parecer não fazer nada.",
+        "JIROBO Palma Esmagadora 122 já não oferece um inimigo imune como alvo da sua derrota.",
         "Um personagem que perde o direito de levar vários equipamentos mantém apenas o mais recente; os outros vão para o descarte."
       ],
       "changes_it": [
+        "Un effetto rivolto a un personaggio immune ora lo indica nel registro, invece di sembrare non fare nulla.",
+        "JIROBO Palmo Rovinoso 122 non propone piu un nemico immune come bersaglio della sua sconfitta.",
         "Un personaggio che perde il diritto di portare piu equipaggiamenti conserva solo il piu recente, gli altri vanno agli scarti."
       ],
       "changes_pl": [
+        "Efekt wymierzony w odporną postać informuje o tym w dzienniku, zamiast sprawiać wrażenie, że nic nie robi.",
+        "JIROBO Miażdżąca Dłoń 122 nie proponuje już odpornego wroga jako celu pokonania.",
         "Postać, która traci prawo do noszenia kilku przedmiotów, zachowuje tylko najnowszy; pozostałe trafiają na stos kart odrzuconych."
       ],
       "changes_ja": [
+        "免疫を持つキャラクターを狙った効果は、何も起きていないように見えるのではなく、ログに理由が表示されるようになりました。",
+        "次郎坊 羅漢貫手 122 は、免疫を持つ敵を撃破対象として提示しなくなりました。",
         "複数の装備を持てる資格を失ったキャラクターは最新の1つだけを保持し、残りは捨て札に置かれるようになりました。"
       ]
     },

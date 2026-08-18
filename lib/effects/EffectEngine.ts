@@ -10750,6 +10750,7 @@ export class EffectEngine {
         if (!j122Mission) break;
         const j122Targets = j122Mission[j122EnemySide]
           .filter((c: CharacterInPlay) => getEffectivePower(newState, c, j122Opponent as PlayerID) <= 1)
+          .filter((c: CharacterInPlay) => !isImmuneToEnemyHideOrDefeat(c))
           .map((c: CharacterInPlay) => c.instanceId);
         if (j122Targets.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, j122Player,
@@ -20770,8 +20771,17 @@ export class EffectEngine {
     );
     if (replacement.replaced) {
       if (replacement.replacement === 'immune') {
-        
-        return state;
+        const sommetImmunise = charResult.character.stack?.length > 0
+          ? charResult.character.stack[charResult.character.stack.length - 1]
+          : charResult.character.card;
+        return {
+          ...state,
+          log: logAction(state.log, state.turn, state.phase, charResult.player, 'EFFECT_BLOCKED',
+            `${sommetImmunise.name_fr} is immune to this effect.`,
+            'game.log.effect.immune',
+            { card: sommetImmunise.name_fr, id: sommetImmunise.id, target: sommetImmunise.name_fr,
+              target_en: sommetImmunise.name_en || sommetImmunise.name_fr }),
+        };
       }
       if (replacement.replacement === 'hide') {
         return EffectEngine.hideCharacter(state, targetId);
