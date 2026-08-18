@@ -486,7 +486,12 @@ export function enforceAttachmentConditions(state: GameState): GameState {
         const held = char.attachments ?? [];
         if (held.length === 0) return char;
         if (ignoreLesConditionsDePose(char)) return char;
-        const kept = held.filter((att) => attachConditionHolds(char, att.card));
+
+        const conformes = held.filter((att) => attachConditionHolds(char, att.card));
+        const derniersParProprietaire = new Map<PlayerID, AttachedCard>();
+        for (const att of conformes) derniersParProprietaire.set(att.owner, att);
+        const kept = conformes.filter((att) => derniersParProprietaire.get(att.owner) === att);
+
         if (kept.length === held.length) return char;
         for (const att of held) if (!kept.includes(att)) dropped.push(att);
         sideChanged = true;
@@ -497,8 +502,19 @@ export function enforceAttachmentConditions(state: GameState): GameState {
     return missionChanged ? next : mission;
   });
 
+  const missionsFinales = missions.map((mission) => {
+    const surMission = mission.attachments ?? [];
+    if (surMission.length === 0) return mission;
+    const derniers = new Map<PlayerID, AttachedCard>();
+    for (const att of surMission) derniers.set(att.owner, att);
+    const gardes = surMission.filter((att) => derniers.get(att.owner) === att);
+    if (gardes.length === surMission.length) return mission;
+    for (const att of surMission) if (!gardes.includes(att)) dropped.push(att);
+    return { ...mission, attachments: gardes };
+  });
+
   if (dropped.length === 0) return state;
-  return discardAttachments({ ...state, activeMissions: missions }, dropped);
+  return discardAttachments({ ...state, activeMissions: missionsFinales }, dropped);
 }
 
 export function missionAlreadyHasPlayerAttachment(state: GameState, player: PlayerID, missionIndex: number): boolean {

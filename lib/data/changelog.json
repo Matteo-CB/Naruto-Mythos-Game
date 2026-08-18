@@ -1,6 +1,40 @@
 {
   "entries": [
     {
+      "date": "2026-08-18",
+      "title_fr": "Correctif des équipements",
+      "title_en": "Attachment fix",
+      "title_es": "Corrección de equipamientos",
+      "title_pt": "Correção de equipamentos",
+      "title_it": "Correzione degli equipaggiamenti",
+      "title_pl": "Poprawka wyposażenia",
+      "title_ja": "装備の修正",
+      "categories": [
+        "fix"
+      ],
+      "changes_fr": [
+        "Un personnage qui perd le droit de porter plusieurs équipements ne garde plus que le dernier, les autres partent à la défausse."
+      ],
+      "changes_en": [
+        "A character that loses the right to carry several attachments now keeps only the most recent one, the others go to the discard pile."
+      ],
+      "changes_es": [
+        "Un personaje que pierde el derecho a llevar varios equipamientos conserva solo el más reciente; los demás van al descarte."
+      ],
+      "changes_pt": [
+        "Um personagem que perde o direito de levar vários equipamentos mantém apenas o mais recente; os outros vão para o descarte."
+      ],
+      "changes_it": [
+        "Un personaggio che perde il diritto di portare piu equipaggiamenti conserva solo il piu recente, gli altri vanno agli scarti."
+      ],
+      "changes_pl": [
+        "Postać, która traci prawo do noszenia kilku przedmiotów, zachowuje tylko najnowszy; pozostałe trafiają na stos kart odrzuconych."
+      ],
+      "changes_ja": [
+        "複数の装備を持てる資格を失ったキャラクターは最新の1つだけを保持し、残りは捨て札に置かれるようになりました。"
+      ]
+    },
+    {
       "date": "2026-08-17",
       "title_fr": "Correctifs de cartes",
       "title_en": "Card fixes",
