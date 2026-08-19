@@ -21841,6 +21841,15 @@ export class EffectEngine {
       if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
       ps.chakra -= actualCost;
 
+      const prixHorsAmeliorationGpm = Math.max(0, baseEffectiveCostUpg - costReduction);
+      updatedChars[existingIdx] = {
+        ...updatedChars[existingIdx],
+        playedBelowPrintedCost: prixHorsAmeliorationGpm < (card.chakra ?? 0),
+      };
+      mission[friendlySide] = updatedChars;
+      missions[missionIndex] = mission;
+      state.activeMissions = missions;
+
       state.log = logAction(
         state.log, state.turn, 'action', player,
         'EFFECT_UPGRADE',
@@ -21884,6 +21893,7 @@ export class EffectEngine {
         controlledBy: player,
         originalOwner: player,
         missionIndex,
+        playedBelowPrintedCost: actualCost < (card.chakra ?? 0),
       };
 
       mission[friendlySide] = [...mission[friendlySide], charInPlay];

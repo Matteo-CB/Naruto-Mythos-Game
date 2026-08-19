@@ -14,9 +14,11 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "ZABUZA MOMOCHI 136 vainc enfin les personnages posés par un autre effet à prix réduit, comme une invocation de JIRAIYA.",
         "PILULES MILITAIRES 102 est désormais de la Nourriture et non une Arme, comme prévu par le concepteur.",
         "ZAKU ABUMI 070 et KIN TSUCHI 072 ne peuvent plus voir leur inconvénient refusé: un effet subi par l adversaire s applique toujours.",
         "Un effet qui vise un personnage immunisé le dit désormais dans le journal, au lieu de sembler ne rien faire.",
@@ -24,6 +26,7 @@
         "Un personnage qui perd le droit de porter plusieurs équipements ne garde plus que le dernier, les autres partent à la défausse."
       ],
       "changes_en": [
+        "ZABUZA MOMOCHI 136 can finally defeat characters put into play at a reduced price by another effect, such as a JIRAIYA summon.",
         "FOOD PILLS 102 is now Food instead of a Weapon, as intended by the designer.",
         "ZAKU ABUMI 070 and KIN TSUCHI 072 can no longer have their drawback skipped: an effect the opponent undergoes always applies.",
         "An effect aimed at an immune character now says so in the log instead of appearing to do nothing.",
@@ -31,6 +34,7 @@
         "A character that loses the right to carry several attachments now keeps only the most recent one, the others go to the discard pile."
       ],
       "changes_es": [
+        "ZABUZA MOMOCHI 136 por fin derrota a los personajes puestos en juego a precio reducido por otro efecto, como una invocación de JIRAIYA.",
         "PÍLDORAS MILITARES 102 ahora es Comida en vez de Arma, tal como pretendía el diseñador.",
         "ZAKU ABUMI 070 y KIN TSUCHI 072 ya no pueden saltarse su desventaja: un efecto que sufre el rival siempre se aplica.",
         "Un efecto dirigido a un personaje inmune ahora lo indica en el registro, en vez de parecer que no hace nada.",
@@ -38,6 +42,7 @@
         "Un personaje que pierde el derecho a llevar varios equipamientos conserva solo el más reciente; los demás van al descarte."
       ],
       "changes_pt": [
+        "ZABUZA MOMOCHI 136 derrota finalmente os personagens colocados em jogo a preço reduzido por outro efeito, como uma invocação de JIRAIYA.",
         "PÍLULAS MILITARES 102 é agora Comida em vez de Arma, como pretendido pelo criador.",
         "ZAKU ABUMI 070 e KIN TSUCHI 072 já não podem ignorar a sua desvantagem: um efeito sofrido pelo adversário aplica-se sempre.",
         "Um efeito dirigido a um personagem imune indica-o agora no registo, em vez de parecer não fazer nada.",
@@ -45,6 +50,7 @@
         "Um personagem que perde o direito de levar vários equipamentos mantém apenas o mais recente; os outros vão para o descarte."
       ],
       "changes_it": [
+        "ZABUZA MOMOCHI 136 sconfigge finalmente i personaggi messi in gioco a prezzo ridotto da un altro effetto, come un evocazione di JIRAIYA.",
         "PILLOLE MILITARI 102 ora e Cibo invece che un Arma, come previsto dal designer.",
         "ZAKU ABUMI 070 e KIN TSUCHI 072 non possono piu saltare il loro svantaggio: un effetto subito dall avversario si applica sempre.",
         "Un effetto rivolto a un personaggio immune ora lo indica nel registro, invece di sembrare non fare nulla.",
@@ -52,6 +58,7 @@
         "Un personaggio che perde il diritto di portare piu equipaggiamenti conserva solo il piu recente, gli altri vanno agli scarti."
       ],
       "changes_pl": [
+        "ZABUZA MOMOCHI 136 wreszcie pokonuje postacie wprowadzone do gry po obniżonej cenie przez inny efekt, jak przywołanie JIRAIYI.",
         "PIGUŁKI ŻOŁNIERSKIE 102 to teraz Jedzenie zamiast Broni, zgodnie z zamysłem projektanta.",
         "ZAKU ABUMI 070 i KIN TSUCHI 072 nie mogą już pominąć swojej wady: efekt, któremu podlega przeciwnik, zawsze się stosuje.",
         "Efekt wymierzony w odporną postać informuje o tym w dzienniku, zamiast sprawiać wrażenie, że nic nie robi.",
@@ -59,6 +66,7 @@
         "Postać, która traci prawo do noszenia kilku przedmiotów, zachowuje tylko najnowszy; pozostałe trafiają na stos kart odrzuconych."
       ],
       "changes_ja": [
+        "桃地再不斬 136 は、自来也の口寄せなど、別の効果によって割引で場に出たキャラクターをようやく倒せるようになりました。",
         "兵糧丸 102 は、デザイナーの意図どおり武器ではなく食べ物になりました。",
         "ザク・アブミ 070 と キン・ツチ 072 のデメリットを飛ばせなくなりました。相手が受ける効果は常に適用されます。",
         "免疫を持つキャラクターを狙った効果は、何も起きていないように見えるのではなく、ログに理由が表示されるようになりました。",
