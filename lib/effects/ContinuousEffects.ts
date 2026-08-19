@@ -744,6 +744,69 @@ function applyNewForcesPowerup(
   };
 }
 
+export function kabuto139PiocheEtDefausse(
+  state: GameState,
+  playingPlayer: PlayerID,
+  restants: number,
+): GameState {
+  if (restants <= 0) return state;
+
+  const ps = state[playingPlayer];
+  if (ps.deck.length === 0) {
+    return {
+      ...state,
+      log: logAction(state.log, state.turn, state.phase, playingPlayer,
+        'EFFECT_NO_TARGET', 'Kabuto Yakushi (139): the deck is empty, no card drawn.',
+        'game.log.effect.noTarget', { card: KABUTO_139_NAME, id: KABUTO_139_ID }),
+    };
+  }
+
+  const deck = [...ps.deck];
+  const piochee = deck.shift()!;
+  const main = [...ps.hand, piochee];
+  let newState: GameState = { ...state, [playingPlayer]: { ...ps, deck, hand: main } };
+  newState = {
+    ...newState,
+    log: logAction(newState.log, newState.turn, newState.phase, playingPlayer,
+      'DRAW', 'Kabuto Yakushi (139): drew a card, a card must now be discarded.',
+      'game.log.effect.kabuto139Draw', { card: KABUTO_139_NAME, id: KABUTO_139_ID }),
+  };
+
+  const effId = generateInstanceId();
+  const actId = generateInstanceId();
+  const options = main.map((_, idx) => String(idx));
+  newState.pendingEffects = [...newState.pendingEffects, {
+    id: effId,
+    sourceCardId: KABUTO_139_ID,
+    sourceInstanceId: '',
+    sourceMissionIndex: 0,
+    effectType: 'MAIN',
+    effectDescription: JSON.stringify({ restants: restants - 1 }),
+    targetSelectionType: 'SS139_DISCARD',
+    sourcePlayer: playingPlayer,
+    requiresTargetSelection: true,
+    validTargets: options,
+    isOptional: false,
+    isMandatory: true,
+    resolved: false,
+    isUpgrade: false,
+    remainingEffectTypes: undefined,
+  }];
+  newState.pendingActions = [...newState.pendingActions, {
+    id: actId,
+    type: 'DISCARD_CARD' as PendingAction['type'],
+    player: playingPlayer,
+    description: 'Kabuto Yakushi (139): choose a card to discard.',
+    descriptionKey: 'game.effect.desc.ss139Discard',
+    options,
+    minSelections: 1,
+    maxSelections: 1,
+    sourceEffectId: effId,
+  }];
+
+  return newState;
+}
+
 function applyKabuto139DrawDiscard(
   state: GameState,
   playingPlayer: PlayerID,
@@ -751,65 +814,7 @@ function applyKabuto139DrawDiscard(
 ): GameState {
   const declencheurs = kabuto139Triggers(state, playingPlayer, playedInstanceId);
   if (declencheurs === 0) return state;
-
-  let newState = state;
-  for (let i = 0; i < declencheurs; i++) {
-    const ps = newState[playingPlayer];
-    if (ps.deck.length === 0) {
-      newState = {
-        ...newState,
-        log: logAction(newState.log, newState.turn, newState.phase, playingPlayer,
-          'EFFECT_NO_TARGET', 'Kabuto Yakushi (139): the deck is empty, no card drawn.',
-          'game.log.effect.noTarget', { card: KABUTO_139_NAME, id: KABUTO_139_ID }),
-      };
-      continue;
-    }
-
-    const deck = [...ps.deck];
-    const piochee = deck.shift()!;
-    const main = [...ps.hand, piochee];
-    newState = { ...newState, [playingPlayer]: { ...ps, deck, hand: main } };
-    newState = {
-      ...newState,
-      log: logAction(newState.log, newState.turn, newState.phase, playingPlayer,
-        'DRAW', 'Kabuto Yakushi (139): drew a card, a card must now be discarded.',
-        'game.log.effect.kabuto139Draw', { card: KABUTO_139_NAME, id: KABUTO_139_ID }),
-    };
-
-    const effId = generateInstanceId();
-    const actId = generateInstanceId();
-    const options = main.map((_, idx) => String(idx));
-    newState.pendingEffects = [...newState.pendingEffects, {
-      id: effId,
-      sourceCardId: KABUTO_139_ID,
-      sourceInstanceId: '',
-      sourceMissionIndex: 0,
-      effectType: 'MAIN',
-      effectDescription: JSON.stringify({}),
-      targetSelectionType: 'SS139_DISCARD',
-      sourcePlayer: playingPlayer,
-      requiresTargetSelection: true,
-      validTargets: options,
-      isOptional: false,
-      isMandatory: true,
-      resolved: false,
-      isUpgrade: false,
-      remainingEffectTypes: undefined,
-    }];
-    newState.pendingActions = [...newState.pendingActions, {
-      id: actId,
-      type: 'DISCARD_CARD' as PendingAction['type'],
-      player: playingPlayer,
-      description: 'Kabuto Yakushi (139): choose a card to discard.',
-      descriptionKey: 'game.effect.desc.ss139Discard',
-      options,
-      minSelections: 1,
-      maxSelections: 1,
-      sourceEffectId: effId,
-    }];
-  }
-
-  return newState;
+  return kabuto139PiocheEtDefausse(state, playingPlayer, declencheurs);
 }
 
 function applyJiraiyaGoldSummonChakra(

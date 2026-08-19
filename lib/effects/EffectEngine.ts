@@ -62,6 +62,7 @@ import { SAKON_037_ID, SAKON_037_NAME, enemiesUnderCost } from './handlers/SS/sa
 import { KIDOMARU_035_ID, KIDOMARU_035_NAME, KIDOMARU_035_LOG, movableUnderCost } from './handlers/SS/kidomaru035';
 import { OROCHIMARU_130_ID, OROCHIMARU_130_NAME, leafEnemiesIn } from './handlers/SS/orochimaru130';
 import { KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
+import { kabuto139PiocheEtDefausse } from './ContinuousEffects';
 import { OROCHIMARU_127_ID, OROCHIMARU_127_NAME } from './handlers/SS/orochimaru127';
 import { KIMIMARO_077_ID, KIMIMARO_077_NAME, kimimaro077Targets, costOfTarget } from './handlers/SS/kimimaro077';
 import { DOSU_125_ID, DOSU_125_NAME } from './handlers/SS/soundMoves';
@@ -12724,9 +12725,18 @@ export class EffectEngine {
 
       case 'SS139_DISCARD': {
         const ss139Player = pendingEffect.sourcePlayer;
-        const ss139Index = parseInt(targetId, 10);
         const ss139Ps = newState[ss139Player];
-        if (isNaN(ss139Index) || !ss139Ps.hand[ss139Index]) break;
+        let ss139Restants = 0;
+        try { ss139Restants = JSON.parse(pendingEffect.effectDescription).restants ?? 0; } catch {}
+        if (ss139Ps.hand.length === 0) {
+          newState = kabuto139PiocheEtDefausse(newState, ss139Player, ss139Restants);
+          break;
+        }
+
+        const ss139Demande = parseInt(targetId, 10);
+        const ss139Index = (!isNaN(ss139Demande) && ss139Ps.hand[ss139Demande])
+          ? ss139Demande
+          : ss139Ps.hand.length - 1;
 
         const ss139Main = [...ss139Ps.hand];
         const ss139Carte = ss139Main.splice(ss139Index, 1)[0];
@@ -12742,6 +12752,7 @@ export class EffectEngine {
           'EFFECT_DISCARD', `Kabuto Yakushi (139): discarded ${ss139Carte.name_fr}.`,
           'game.log.effect.discard',
           { card: KABUTO_139_NAME, id: KABUTO_139_ID, target: ss139Carte.name_fr, target_en: ss139Carte.name_en || ss139Carte.name_fr });
+        newState = kabuto139PiocheEtDefausse(newState, ss139Player, ss139Restants);
         break;
       }
 
