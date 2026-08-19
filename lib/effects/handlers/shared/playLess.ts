@@ -28,7 +28,7 @@ export function buildPlayLessTargets(
 ): { targets: string[]; hiddenChars: HiddenCharTarget[] } {
   const predicate = predicateForCategory(category);
   const handIndices = findAffordableInHandByPredicate(state, player, predicate, costReduction, noUpgrade);
-  const hiddenChars = findHiddenOnBoardByPredicate(state, player, predicate, costReduction, false);
+  const hiddenChars = findHiddenOnBoardByPredicate(state, player, predicate, costReduction, noUpgrade);
   const targets = [
     ...handIndices.map((i) => `HAND_${i}`),
     ...hiddenChars.map((h) => `HIDDEN_${h.instanceId}`),
