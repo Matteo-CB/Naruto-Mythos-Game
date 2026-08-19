@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { virtualSoundFourCount } from '@/lib/effects/handlers/SS/attachmentStatics';
 
 
 
@@ -18,8 +19,9 @@ function handleDoki066Main(ctx: EffectContext): EffectResult {
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     return topCard.keywords && topCard.keywords.includes('Sound Four');
   });
+  const laboratoireSon4 = virtualSoundFourCount(mission, sourcePlayer) > 0;
 
-  if (!hasSoundFour) {
+  if (!hasSoundFour && !laboratoireSon4) {
     const log = logAction(
       state.log,
       state.turn,

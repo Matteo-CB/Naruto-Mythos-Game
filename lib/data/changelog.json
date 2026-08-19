@@ -10,6 +10,8 @@
       "title_pl": "Poprawka wyposażenia",
       "title_ja": "装備の修正",
       "categories": [
+        "fix",
+        "fix",
         "feature",
         "feature",
         "fix",
@@ -23,6 +25,8 @@
         "fix"
       ],
       "changes_fr": [
+        "Répondre à la question de SAKURA HARUNO 007 en début de manche ne fait plus passer votre tour.",
+        "LABORATOIRE DE L ILE DU DEMON 105 compte aussi pour SAKON 061, KIDOMARU 059, JIRÔBÔ 057 et DOKI 066, qui l ignoraient.",
         "La mission Priorité Haute affiche directement son score doublé, pour qu on voie ce qu elle rapporte vraiment.",
         "Les boutons de révélation et d amélioration affichent la remise ou le surcoût, comme le fait déjà la pose depuis la main.",
         "KAKASHI HATAKE 008 ne propose plus les personnages dont la seule pose possible serait une amélioration, qu il interdit.",
@@ -36,6 +40,8 @@
         "Un personnage qui perd le droit de porter plusieurs équipements ne garde plus que le dernier, les autres partent à la défausse."
       ],
       "changes_en": [
+        "Answering SAKURA HARUNO 007 at the start of the round no longer skips your turn.",
+        "DEMON'S ISLAND LABORATORY 105 now also counts for SAKON 061, KIDOMARU 059, JIROBO 057 and DOKI 066, which ignored it.",
         "The High Priority mission now shows its doubled score directly, so you can see what it really pays.",
         "The reveal and upgrade buttons now show the discount or surcharge, just like playing from hand already did.",
         "KAKASHI HATAKE 008 no longer offers characters whose only possible placement would be an upgrade, which it forbids.",
@@ -49,6 +55,8 @@
         "A character that loses the right to carry several attachments now keeps only the most recent one, the others go to the discard pile."
       ],
       "changes_es": [
+        "Responder a SAKURA HARUNO 007 al inicio de la ronda ya no te salta el turno.",
+        "LABORATORIO DE LA ISLA DEL DEMONIO 105 cuenta también para SAKON 061, KIDOMARU 059, JIROBO 057 y DOKI 066, que lo ignoraban.",
         "La misión Prioridad Alta muestra ya su puntuación doblada, para que se vea lo que realmente da.",
         "Los botones de revelar y mejorar muestran ahora el descuento o el recargo, como ya hacía jugar desde la mano.",
         "KAKASHI HATAKE 008 ya no ofrece personajes cuya única colocación posible sería una mejora, que él prohíbe.",
@@ -62,6 +70,8 @@
         "Un personaje que pierde el derecho a llevar varios equipamientos conserva solo el más reciente; los demás van al descarte."
       ],
       "changes_pt": [
+        "Responder a SAKURA HARUNO 007 no início da ronda já não salta o teu turno.",
+        "LABORATÓRIO DA ILHA DO DEMÓNIO 105 conta também para SAKON 061, KIDOMARU 059, JIROBO 057 e DOKI 066, que o ignoravam.",
         "A missão Prioridade Alta mostra agora a sua pontuação dobrada, para se ver o que realmente rende.",
         "Os botões de revelar e melhorar mostram agora o desconto ou o acréscimo, tal como já fazia jogar da mão.",
         "KAKASHI HATAKE 008 já não oferece personagens cuja única colocação possível seria uma melhoria, que ele proíbe.",
@@ -75,6 +85,8 @@
         "Um personagem que perde o direito de levar vários equipamentos mantém apenas o mais recente; os outros vão para o descarte."
       ],
       "changes_it": [
+        "Rispondere a SAKURA HARUNO 007 a inizio round non salta piu il tuo turno.",
+        "LABORATORIO DELL ISOLA DEL DEMONE 105 conta anche per SAKON 061, KIDOMARU 059, JIROBO 057 e DOKI 066, che lo ignoravano.",
         "La missione Priorita Alta mostra ora il suo punteggio raddoppiato, cosi si vede quanto rende davvero.",
         "I pulsanti di rivelazione e miglioramento mostrano ora lo sconto o il sovrapprezzo, come gia faceva giocare dalla mano.",
         "KAKASHI HATAKE 008 non propone piu i personaggi la cui unica messa in gioco possibile sarebbe un miglioramento, che vieta.",
@@ -88,6 +100,8 @@
         "Un personaggio che perde il diritto di portare piu equipaggiamenti conserva solo il piu recente, gli altri vanno agli scarti."
       ],
       "changes_pl": [
+        "Odpowiedź na pytanie SAKURY HARUNO 007 na początku rundy nie pomija już twojej tury.",
+        "LABORATORIUM WYSPY DEMONA 105 liczy się także dla SAKONA 061, KIDOMARU 059, JIROBO 057 i DOKI 066, które je ignorowały.",
         "Misja Wysoki Priorytet pokazuje teraz od razu podwojony wynik, więc widać, ile naprawdę daje.",
         "Przyciski odkrywania i ulepszania pokazują teraz zniżkę lub dopłatę, tak jak już robiło to zagrywanie z ręki.",
         "KAKASHI HATAKE 008 nie proponuje już postaci, których jedynym możliwym zagraniem byłoby ulepszenie, którego zabrania.",
@@ -101,6 +115,8 @@
         "Postać, która traci prawo do noszenia kilku przedmiotów, zachowuje tylko najnowszy; pozostałe trafiają na stos kart odrzuconych."
       ],
       "changes_ja": [
+        "ラウンド開始時の 春野サクラ 007 の選択に答えても、自分のターンが飛ばされなくなりました。",
+        "鬼の島の研究所 105 は、これを無視していた 左近 061、鬼童丸 059、次郎坊 057、土鬼 066 にも数えられるようになりました。",
         "最優先ミッションは、実際に得られる点数がわかるよう、2倍のスコアをそのまま表示するようになりました。",
         "公開と強化のボタンにも、手札から出す場合と同様に割引や追加コストが表示されるようになりました。",
         "はたけカカシ 008 は、自身が禁じている強化としてしか出せないキャラクターを提示しなくなりました。",

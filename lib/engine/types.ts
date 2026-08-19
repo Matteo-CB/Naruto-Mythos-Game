@@ -304,6 +304,7 @@ export interface PendingAction {
   minSelections: number;
   maxSelections: number;
   sourceEffectId?: string;
+  horsTour?: boolean;
 }
 
 

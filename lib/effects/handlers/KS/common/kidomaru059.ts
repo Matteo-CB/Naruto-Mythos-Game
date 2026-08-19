@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
+import { virtualSoundFourCount } from '@/lib/effects/handlers/SS/attachmentStatics';
 
 
 function handleKidomaru059Main(ctx: EffectContext): EffectResult {
@@ -18,7 +19,8 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
       const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       return topCard.keywords && topCard.keywords.includes('Sound Four');
     });
-    if (hasSoundFour) soundFourMissionCount++;
+  const laboratoireSon4 = virtualSoundFourCount(mission, sourcePlayer) > 0;
+    if (hasSoundFour || laboratoireSon4) soundFourMissionCount++;
   }
 
   if (soundFourMissionCount === 0) {

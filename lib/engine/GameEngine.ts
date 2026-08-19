@@ -310,7 +310,7 @@ export class GameEngine {
                 }
                 return false;
               });
-              if (!newState.sandboxNoAlternate) {
+              if (!newState.sandboxNoAlternate && !resolvedAction?.horsTour) {
                 const turnOwner = resolvedAction?.originPlayer ?? player;
                 const otherPlayer: PlayerID = turnOwner === 'player1' ? 'player2' : 'player1';
                 newState.activePlayer = otherPlayer;

@@ -104,6 +104,7 @@ function applyForPlayer(state: GameState, player: PlayerID): GameState {
             minSelections: 1,
             maxSelections: 1,
             sourceEffectId: effId,
+            horsTour: true,
           }],
         };
         continue;
