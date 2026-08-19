@@ -468,7 +468,7 @@ export default function TournamentDetailPage() {
             <div className="flex-1">
               <p className="text-sm leading-relaxed" style={{ color: '#c9c7c0' }}>{t('nwlRequirement')}</p>
               <a
-                href="https://discord.gg/Wk5MQhkNEw"
+                href="https://discord.gg/UXQX8McFD3"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-display mt-3 inline-flex items-center px-4 py-2 text-[11px] uppercase tracking-widest"
