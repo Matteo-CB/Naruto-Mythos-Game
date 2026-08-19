@@ -119,7 +119,8 @@ export function ActionBar() {
   const canReveal = isMyTurn && isActionPhase && hasTargetSelected && !hasPassed;
   
   let revealBaseCost = 0;
-  const revealUpgradeTargets: { instanceId: string; name: string; cost: number; isSameName: boolean }[] = [];
+  let revealPrintedCost = 0;
+  const revealUpgradeTargets: { instanceId: string; name: string; cost: number; coutRegle: number; isSameName: boolean }[] = [];
   if (hasTargetSelected && visibleState.activeMissions) {
     for (let mi = 0; mi < visibleState.activeMissions.length; mi++) {
       const m = visibleState.activeMissions[mi];
@@ -128,7 +129,8 @@ export function ActionBar() {
       const target = myChars.find((c) => c.instanceId === selectedTargetId);
       if (target && target.isHidden && target.card) {
         const hiddenTopCard = target.topCard ?? target.card;
-        revealBaseCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true);
+        revealPrintedCost = hiddenTopCard.chakra ?? 0;
+        revealBaseCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true, target);
         
         for (const c of myChars) {
           if (c.instanceId === selectedTargetId || c.isHidden) continue;
@@ -156,6 +158,7 @@ export function ActionBar() {
               instanceId: c.instanceId,
               name: getCardName(cTop, locale),
               cost: upgradeCost,
+              coutRegle: Math.max(0, (hiddenTopCard.chakra ?? 0) - (cTop.chakra ?? 0)),
               isSameName,
             });
           }
@@ -168,6 +171,10 @@ export function ActionBar() {
   const hasSameNameRevealUpgrade = revealUpgradeTargets.some(t => t.isSameName);
   const canShowPlainReveal = !hasSameNameRevealUpgrade;
   const canAffordReveal = myState.chakra >= revealBaseCost;
+  const revealCostModifier = revealBaseCost - revealPrintedCost;
+  const revealCostLabel = revealCostModifier !== 0
+    ? `${revealPrintedCost}${revealCostModifier > 0 ? '+' : ''}${revealCostModifier}`
+    : `${revealBaseCost}`;
 
   const handlePlayVisible = () => {
     if (!cardAndMissionReady || !canAffordCard || !isMyTurn || hasPassed || actionsBlocked) return;
@@ -371,6 +378,11 @@ export function ActionBar() {
               && hasKurenai034CostReduction(visibleState, myPlayer, selectedCard, selectedMissionIndex))
               ? Math.max(1, rawUpgradeCost) : rawUpgradeCost;
             const canAffordUpgrade = myState.chakra >= upgradeCost;
+            const coutRegleUpg = Math.max(0, (isHiddenTarget ? revealPrintedCost : (selectedCard?.chakra ?? 0)) - (charCard?.chakra ?? 0));
+            const ecartUpg = upgradeCost - coutRegleUpg;
+            const libelleUpg = ecartUpg !== 0
+              ? `${coutRegleUpg}${ecartUpg > 0 ? '+' : ''}${ecartUpg}`
+              : `${upgradeCost}`;
             const targetName = charCard ? getCardName(charCard, locale) : '';
             const upgradeLabel = isHiddenTarget
               ? `${t('game.reveal')} + ${t('game.actions.upgrade')} ${targetName}`
@@ -379,7 +391,7 @@ export function ActionBar() {
               <ActionButton
                 key={target.instanceId}
                 label={upgradeLabel}
-                chakraCost={upgradeCost}
+                chakraCost={libelleUpg}
                 onClick={() => handleUpgrade(target.instanceId)}
                 disabled={!canAffordUpgrade}
                 variant="primary"
@@ -409,11 +421,15 @@ export function ActionBar() {
 
           {canReveal && revealUpgradeTargets.map((opt) => {
             const canAfford = myState.chakra >= opt.cost;
+            const ecartOpt = opt.cost - opt.coutRegle;
+            const libelleCout = ecartOpt !== 0
+              ? `${opt.coutRegle}${ecartOpt > 0 ? '+' : ''}${ecartOpt}`
+              : `${opt.cost}`;
             return (
               <ActionButton
                 key={`reveal-upgrade-${opt.instanceId}`}
                 label={`${t('game.reveal')} + ${t('game.actions.upgrade')} ${opt.name}`}
-                chakraCost={opt.cost}
+                chakraCost={libelleCout}
                 onClick={() => handleReveal(opt.instanceId)}
                 disabled={!canAfford}
                 variant="primary"
@@ -424,7 +440,7 @@ export function ActionBar() {
           {canReveal && canShowPlainReveal && (
             <ActionButton
               label={t('game.reveal')}
-              chakraCost={revealBaseCost}
+              chakraCost={revealCostLabel}
               onClick={() => handleReveal()}
               disabled={!canAffordReveal}
               variant={revealUpgradeTargets.length > 0 ? "secondary" : "primary"}
