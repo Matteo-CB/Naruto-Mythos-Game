@@ -121,3 +121,21 @@ export function puissanceDesEquipementsDeMission(mission: ActiveMission, player:
 export function missionSidePowerBonus(mission: ActiveMission, player: PlayerID): number {
   return teamTrainingBonus(mission, player) + puissanceDesEquipementsDeMission(mission, player);
 }
+
+export function missionCompteDouble(mission: ActiveMission | undefined): boolean {
+  if (!mission?.card) return false;
+  return (mission.card.effects ?? []).some(
+    (e) => e.description.includes('[⧗]') && /score this mission twice/i.test(e.description),
+  );
+}
+
+export function pointsAffichesDeLaMission(
+  mission: ActiveMission | undefined,
+  bonusEquipements = 0,
+): number {
+  if (!mission) return 0;
+  const base = (Number.isFinite(mission.basePoints) ? mission.basePoints : 0)
+    + (Number.isFinite(mission.rankBonus) ? mission.rankBonus : 0)
+    + bonusEquipements;
+  return missionCompteDouble(mission) ? base * 2 : base;
+}

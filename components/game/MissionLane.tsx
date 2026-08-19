@@ -34,6 +34,8 @@ import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
 import { useBoardPalette } from './BoardPaletteContext';
 import { ChakraIcon, PowerIcon, POWER_COLOR_BRIGHT } from '@/components/icons/GameIcons';
+import { pointsAffichesDeLaMission } from '@/lib/effects/missions/ssMissions';
+import { missionPointBonus } from '@/lib/effects/handlers/SS/attachmentStatics';
 
 interface CharacterSlotProps {
   character: VisibleCharacter;
@@ -495,7 +497,7 @@ function MissionCardDisplay({
     };
   }, [mission.attachments, dims.missionMaxW, myPlayer]);
 
-  const totalPoints = mission.basePoints + mission.rankBonus;
+  const totalPoints = pointsAffichesDeLaMission(mission as never, missionPointBonus(mission as never));
 
   const handleMissionContextMenu = (e: React.MouseEvent) => {
     if (!isSandboxMode) return;
@@ -564,6 +566,7 @@ function MissionCardDisplay({
           rank: mission.rank,
           basePoints: mission.basePoints,
           rankBonus: mission.rankBonus,
+          totalPoints,
         });
       }}
       onDoubleClick={(e) => {
@@ -572,6 +575,7 @@ function MissionCardDisplay({
           rank: mission.rank,
           basePoints: mission.basePoints,
           rankBonus: mission.rankBonus,
+          totalPoints,
         });
       }}
       onContextMenu={handleMissionContextMenu}
@@ -580,6 +584,7 @@ function MissionCardDisplay({
           rank: mission.rank,
           basePoints: mission.basePoints,
           rankBonus: mission.rankBonus,
+          totalPoints,
         });
       }}
       onMouseLeave={() => hidePreview()}

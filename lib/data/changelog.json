@@ -11,6 +11,7 @@
       "title_ja": "装備の修正",
       "categories": [
         "feature",
+        "feature",
         "fix",
         "fix",
         "fix",
@@ -22,6 +23,7 @@
         "fix"
       ],
       "changes_fr": [
+        "La mission Priorité Haute affiche directement son score doublé, pour qu on voie ce qu elle rapporte vraiment.",
         "Les boutons de révélation et d amélioration affichent la remise ou le surcoût, comme le fait déjà la pose depuis la main.",
         "KAKASHI HATAKE 008 ne propose plus les personnages dont la seule pose possible serait une amélioration, qu il interdit.",
         "La remise de la BOMBE FUMIGENE 086 est bien débitée quand on révèle le personnage qui la porte.",
@@ -34,6 +36,7 @@
         "Un personnage qui perd le droit de porter plusieurs équipements ne garde plus que le dernier, les autres partent à la défausse."
       ],
       "changes_en": [
+        "The High Priority mission now shows its doubled score directly, so you can see what it really pays.",
         "The reveal and upgrade buttons now show the discount or surcharge, just like playing from hand already did.",
         "KAKASHI HATAKE 008 no longer offers characters whose only possible placement would be an upgrade, which it forbids.",
         "The SMOKE BOMB 086 discount is now actually charged when revealing the character carrying it.",
@@ -46,6 +49,7 @@
         "A character that loses the right to carry several attachments now keeps only the most recent one, the others go to the discard pile."
       ],
       "changes_es": [
+        "La misión Prioridad Alta muestra ya su puntuación doblada, para que se vea lo que realmente da.",
         "Los botones de revelar y mejorar muestran ahora el descuento o el recargo, como ya hacía jugar desde la mano.",
         "KAKASHI HATAKE 008 ya no ofrece personajes cuya única colocación posible sería una mejora, que él prohíbe.",
         "El descuento de la BOMBA DE HUMO 086 se aplica de verdad al revelar al personaje que la lleva.",
@@ -58,6 +62,7 @@
         "Un personaje que pierde el derecho a llevar varios equipamientos conserva solo el más reciente; los demás van al descarte."
       ],
       "changes_pt": [
+        "A missão Prioridade Alta mostra agora a sua pontuação dobrada, para se ver o que realmente rende.",
         "Os botões de revelar e melhorar mostram agora o desconto ou o acréscimo, tal como já fazia jogar da mão.",
         "KAKASHI HATAKE 008 já não oferece personagens cuja única colocação possível seria uma melhoria, que ele proíbe.",
         "O desconto da BOMBA DE FUMO 086 é agora realmente aplicado ao revelar o personagem que a transporta.",
@@ -70,6 +75,7 @@
         "Um personagem que perde o direito de levar vários equipamentos mantém apenas o mais recente; os outros vão para o descarte."
       ],
       "changes_it": [
+        "La missione Priorita Alta mostra ora il suo punteggio raddoppiato, cosi si vede quanto rende davvero.",
         "I pulsanti di rivelazione e miglioramento mostrano ora lo sconto o il sovrapprezzo, come gia faceva giocare dalla mano.",
         "KAKASHI HATAKE 008 non propone piu i personaggi la cui unica messa in gioco possibile sarebbe un miglioramento, che vieta.",
         "Lo sconto della BOMBA FUMOGENA 086 viene ora davvero applicato quando si rivela il personaggio che la porta.",
@@ -82,6 +88,7 @@
         "Un personaggio che perde il diritto di portare piu equipaggiamenti conserva solo il piu recente, gli altri vanno agli scarti."
       ],
       "changes_pl": [
+        "Misja Wysoki Priorytet pokazuje teraz od razu podwojony wynik, więc widać, ile naprawdę daje.",
         "Przyciski odkrywania i ulepszania pokazują teraz zniżkę lub dopłatę, tak jak już robiło to zagrywanie z ręki.",
         "KAKASHI HATAKE 008 nie proponuje już postaci, których jedynym możliwym zagraniem byłoby ulepszenie, którego zabrania.",
         "Zniżka BOMBY DYMNEJ 086 jest teraz naprawdę naliczana przy odkrywaniu postaci, która ją nosi.",
@@ -94,6 +101,7 @@
         "Postać, która traci prawo do noszenia kilku przedmiotów, zachowuje tylko najnowszy; pozostałe trafiają na stos kart odrzuconych."
       ],
       "changes_ja": [
+        "最優先ミッションは、実際に得られる点数がわかるよう、2倍のスコアをそのまま表示するようになりました。",
         "公開と強化のボタンにも、手札から出す場合と同様に割引や追加コストが表示されるようになりました。",
         "はたけカカシ 008 は、自身が禁じている強化としてしか出せないキャラクターを提示しなくなりました。",
         "煙玉 086 の割引が、それを装備しているキャラクターを公開する際に実際に適用されるようになりました。",
