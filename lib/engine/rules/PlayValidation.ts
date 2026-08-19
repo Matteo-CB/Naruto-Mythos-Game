@@ -208,18 +208,18 @@ export function validateRevealCharacter(
     }
     if (charTopCard.chakra > existingTopCard.chakra && !targetIsControlled) {
 
-      const revealCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
+      const revealCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true, char);
       effectiveCost = Math.max(0, revealCost - existingTopCard.chakra);
     } else if (sameNameChar) {
       return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
     } else {
-      effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
+      effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true, char);
     }
   } else {
     if (sameNameChar) {
       return { valid: false, reason: `Cannot reveal ${charTopCard.name_fr}: a character with the same name is already on this side of this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
     }
-    effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
+    effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true, char);
   }
 
 
