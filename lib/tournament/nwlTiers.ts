@@ -16,6 +16,7 @@ import {
   NWL_DECKS_CHANNEL_ID,
   NWL_INVITE_URL,
   NWL_STORE_URL,
+  NWL_TOURNAMENTS_URL,
   listNwlChuninHolders,
   listNwlRoleHolders,
   nwlPostMessage,
@@ -346,11 +347,12 @@ export async function kageQualifiers(now: Date = new Date()): Promise<NwlStandin
   return classement.slice(0, NWL_KAGE_MAX_PLAYERS);
 }
 
-export function texteCodeAcces(nom: string, code: string, heureParis: number): string {
+export function texteCodeAcces(nom: string, code: string, heureParis: number, entete?: string): string {
   return [
-    `**${nom}**`,
+    entete ?? `**${nom}**`,
     `Your join code: \`${code}\``,
-    `Start: ${heureParis - 1}:00 BST. Open the Naruto Mythos simulator, go to Tournaments, and join with this code.`,
+    `Start: ${heureParis - 1}:00 BST. You can join right now with this code.`,
+    NWL_TOURNAMENTS_URL,
     'Keep it private: it is reserved to eligible players.',
   ].join('\n');
 }
@@ -380,7 +382,14 @@ export async function diffuserCodeKage(code: string, now: Date = new Date()): Pr
   let mp = 0;
   for (const q of qualifies) {
     if (!q.discordId) continue;
-    const ok = await nwlSendDirectMessage(q.discordId, texteCodeAcces(NWL_KAGE_TOURNAMENT_NAME, code, NWL_KAGE_START_HOUR));
+    const ok = await nwlSendDirectMessage(
+      q.discordId,
+      texteCodeAcces(
+        NWL_KAGE_TOURNAMENT_NAME, code, NWL_KAGE_START_HOUR,
+        `**${NWL_KAGE_TOURNAMENT_NAME}**
+You have made it in the Top ${NWL_KAGE_MAX_PLAYERS}.`,
+      ),
+    );
     if (ok) mp += 1;
   }
   const mentions = qualifies.map((q) => q.discordId).filter((d): d is string => !!d);

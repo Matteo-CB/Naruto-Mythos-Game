@@ -13,6 +13,7 @@ export const NWL_CHUNIN_SUBSCRIBER_ROLE_ID = '';
 export const NWL_TAG_CHANNEL_ID = '1396218674486055023';
 export const NWL_INVITE_URL = 'https://discord.gg/UXQX8McFD3';
 export const NWL_STORE_URL = 'https://www.newworldloot.com/collections/naruto-mythos';
+export const NWL_TOURNAMENTS_URL = 'https://narutomythosgame.com/en/tournaments';
 export const NWL_APP_ID = '1530185831841534048';
 export const NWL_PRIZE_TOP_N = 3;
 export const NWL_ANNOUNCEMENT_IMAGE = '/images/tournaments/nwl-friday.webp';
