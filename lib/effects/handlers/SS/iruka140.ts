@@ -6,7 +6,7 @@ import { confirmFirst } from './confirmFirst';
 import { findHiddenOnBoardByPredicate, type HiddenCharTarget } from '@/lib/effects/handlers/KS/shared/summonSearch';
 
 export const IRUKA_140 = 'SS-140-R';
-export const IRUKA_140_VARIANTS = [IRUKA_140, 'SS-140-CHIBIV'];
+export const IRUKA_140_VARIANTS = [IRUKA_140];
 export const IRUKA_140_REDUCTION = 2;
 export const NARUTO_UZUMAKI = 'NARUTO UZUMAKI';
 

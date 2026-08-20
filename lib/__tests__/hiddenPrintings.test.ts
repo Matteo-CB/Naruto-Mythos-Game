@@ -6,7 +6,7 @@ import { HIDDEN_PRINTING_IDS, isHiddenPrinting } from '@/lib/data/sets/hiddenPri
 
 describe('les impressions masquees n_existent nulle part', () => {
   it('la liste couvre les trente-cinq impressions retirees', () => {
-    expect(HIDDEN_PRINTING_IDS.length, 'trente-huit impressions').toBe(38);
+    expect(HIDDEN_PRINTING_IDS.length, 'trente-neuf impressions').toBe(39);
   });
 
   it('aucune n_apparait dans les donnees de carte', () => {

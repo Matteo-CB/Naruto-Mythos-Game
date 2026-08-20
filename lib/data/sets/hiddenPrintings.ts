@@ -35,6 +35,7 @@ export const HIDDEN_PRINTING_IDS: readonly string[] = [
   'SS-136-RA',
   'SS-137-RA',
   'SS-137-SPV',
+  'SS-140-CHIBIV',
   'SS-140-RA',
   'SS-141-SPV',
 ];
