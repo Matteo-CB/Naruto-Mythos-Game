@@ -5,6 +5,7 @@ type MatchEventType =
   | 'match.forfeit.disconnect'
   | 'match.forfeit.admin'
   | 'match.forfeit.double'
+  | 'match.forfeit.overridden'
   | 'match.auto-forfeit.eliminated'
   | 'match.auto-forfeit.eliminated.both'
   | 'match.completed.played'

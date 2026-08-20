@@ -36,6 +36,7 @@ import {
   grantParticipantReward,
   listEligibleParticipantsForReward,
   markParticipantAbsence,
+  clearParticipantAbsence,
   readTournamentPrizeCardId,
   acquirePrizeAwardLock,
 } from '@/lib/tournament/prizes';
@@ -338,10 +339,16 @@ export async function fireAbsenceTimerCallback(
   try {
     const m = await prisma.tournamentMatch.findUnique({
       where: { id: matchId },
-      select: { roomCode: true, status: true, tournamentId: true },
+      select: { roomCode: true, status: true, tournamentId: true, gameId: true },
     });
     if (m && (m.status === 'completed' || m.status === 'forfeit')) {
       console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} already resolved (${m.status}), no-op`);
+      return;
+    }
+    if (m?.gameId) {
+      console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} already has game ${m.gameId}, absence forfeit cancelled`);
+      clearAbsenceTimer(matchId);
+      matchGraceCycles.delete(matchId);
       return;
     }
     currentRoomCode = m?.roomCode ?? null;
@@ -1351,9 +1358,20 @@ export async function handleTournamentMatchEnd(io: Server, tournamentId: string,
   try {
     const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
     if (!match) return;
-    if (match.status === 'completed' || match.status === 'forfeit') {
+    if (match.status === 'completed') {
       console.log(`[Tournament] handleTournamentMatchEnd skipped for ${matchId}: already ${match.status}`);
       return;
+    }
+    if (match.status === 'forfeit') {
+      console.error(
+        `[Tournament] CRITICAL: match ${matchId} was marked forfeit but a played result arrived (winner ${winnerId}); the played result wins and the bracket is corrected`,
+      );
+      logMatchEvent({ type: 'match.forfeit.overridden', tournamentId, matchId, winnerId });
+      await prisma.tournamentParticipant.updateMany({
+        where: { tournamentId, userId: winnerId },
+        data: { eliminated: false, eliminatedRound: null },
+      });
+      await clearParticipantAbsence(tournamentId, winnerId);
     }
     clearAbsenceTimer(matchId);
     matchReadyPlayers.delete(matchId);

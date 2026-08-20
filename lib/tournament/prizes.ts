@@ -152,3 +152,19 @@ export async function markParticipantAbsence(tournamentId: string, userId: strin
     console.error('[Tournament] markParticipantAbsence failed:', err instanceof Error ? err.message : err);
   }
 }
+
+export async function clearParticipantAbsence(tournamentId: string, userId: string): Promise<void> {
+  try {
+    await prisma.$runCommandRaw({
+      update: 'TournamentParticipant',
+      updates: [
+        {
+          q: { tournamentId: { $oid: tournamentId }, userId: { $oid: userId } },
+          u: { $set: { absenceForfeited: false } },
+        },
+      ],
+    });
+  } catch (err) {
+    console.error('[Tournament] clearParticipantAbsence failed:', err instanceof Error ? err.message : err);
+  }
+}

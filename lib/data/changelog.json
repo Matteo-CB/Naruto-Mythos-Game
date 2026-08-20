@@ -10,6 +10,8 @@
       "title_pl": "Automatyczne turnieje partnerskie",
       "title_ja": "提携大会の自動化",
       "categories": [
+        "fix",
+        "fix",
         "feature",
         "feature",
         "feature",
@@ -18,6 +20,8 @@
         "feature"
       ],
       "changes_fr": [
+        "Un joueur dont la partie a commencé ne peut plus perdre son match de tournoi pour absence.",
+        "Si un match était marqué perdu par absence alors que la partie a bien été jouée, le vrai résultat reprend le dessus.",
         "Les tournois Chunin du samedi et Kage du mois s ouvrent tout seuls, et leur code d accès est envoyé sur Discord aux joueurs qui ont le rôle.",
         "Ces deux tournois sont privés: sans le rôle demandé sur le serveur New World Loot, le code ne fonctionne pas.",
         "Le classement mensuel Chunin est publié sur Discord et remis à jour après chaque tournoi.",
@@ -26,6 +30,8 @@
         "Chaque tournoi partenaire affiche maintenant sa propre affiche et ses propres conditions d entrée."
       ],
       "changes_en": [
+        "A player whose game has started can no longer lose their tournament match for absence.",
+        "If a match was marked lost for absence while the game was actually played, the real result takes over.",
         "The Saturday Chunin and monthly Kage tournaments now open on their own, and their join code is sent on Discord to players who hold the role.",
         "Both tournaments are private: without the required role on the New World Loot server, the code does not work.",
         "The monthly Chunin standings are posted on Discord and refreshed after every tournament.",
@@ -34,6 +40,8 @@
         "Each partner tournament now shows its own poster and its own entry conditions."
       ],
       "changes_es": [
+        "Un jugador cuya partida ya ha empezado ya no puede perder su combate de torneo por ausencia.",
+        "Si un combate se marcó como perdido por ausencia aunque la partida sí se jugó, el resultado real prevalece.",
         "Los torneos Chunin del sábado y Kage del mes se abren solos, y su código de acceso se envía por Discord a los jugadores que tienen el rol.",
         "Ambos torneos son privados: sin el rol requerido en el servidor de New World Loot, el código no funciona.",
         "La clasificación mensual Chunin se publica en Discord y se actualiza después de cada torneo.",
@@ -42,6 +50,8 @@
         "Cada torneo asociado muestra ahora su propio cartel y sus propias condiciones de entrada."
       ],
       "changes_pt": [
+        "Um jogador cuja partida já começou deixa de poder perder o seu jogo de torneio por ausência.",
+        "Se um jogo foi marcado como perdido por ausência apesar de ter sido jogado, o resultado real passa a valer.",
         "Os torneios Chunin de sábado e Kage do mês abrem sozinhos, e o código de acesso é enviado no Discord aos jogadores que têm o cargo.",
         "Os dois torneios são privados: sem o cargo exigido no servidor da New World Loot, o código não funciona.",
         "A classificação mensal Chunin é publicada no Discord e atualizada depois de cada torneio.",
@@ -50,6 +60,8 @@
         "Cada torneio parceiro mostra agora o seu próprio cartaz e as suas próprias condições de entrada."
       ],
       "changes_it": [
+        "Un giocatore la cui partita è iniziata non può più perdere il suo incontro di torneo per assenza.",
+        "Se un incontro era segnato come perso per assenza ma la partita è stata giocata, vale il risultato reale.",
         "I tornei Chunin del sabato e Kage del mese si aprono da soli, e il codice di accesso viene inviato su Discord ai giocatori che hanno il ruolo.",
         "I due tornei sono privati: senza il ruolo richiesto sul server di New World Loot, il codice non funziona.",
         "La classifica mensile Chunin viene pubblicata su Discord e aggiornata dopo ogni torneo.",
@@ -58,6 +70,8 @@
         "Ogni torneo partner mostra ora la propria locandina e le proprie condizioni di ingresso."
       ],
       "changes_pl": [
+        "Gracz, którego partia już się zaczęła, nie może już przegrać meczu turniejowego przez nieobecność.",
+        "Jeśli mecz został oznaczony jako przegrany przez nieobecność, mimo że partia się odbyła, liczy się prawdziwy wynik.",
         "Turnieje Chunin w sobotę i Kage w miesiącu otwierają się same, a kod dostępu jest wysyłany na Discordzie graczom z odpowiednią rolą.",
         "Oba turnieje są prywatne: bez wymaganej roli na serwerze New World Loot kod nie zadziała.",
         "Miesięczna klasyfikacja Chunin jest publikowana na Discordzie i odświeżana po każdym turnieju.",
@@ -66,6 +80,8 @@
         "Każdy turniej partnerski pokazuje teraz własny plakat i własne warunki wejścia."
       ],
       "changes_ja": [
+        "対戦が始まったプレイヤーが、不在扱いで大会の試合を落とすことはなくなりました。",
+        "実際に対戦したのに不在で敗北と記録された試合は、本来の結果が優先されるようになりました。",
         "土曜の中忍大会と月例の影大会が自動で開催され、参加コードは対象ロールを持つプレイヤーへ Discord で届きます。",
         "この2つの大会は非公開です。New World Loot サーバーで必要なロールがないとコードは通りません。",
         "中忍の月間ランキングを Discord に掲載し、大会ごとに更新します。",
