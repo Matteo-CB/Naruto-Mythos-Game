@@ -74,6 +74,12 @@ function ScheduledCountdown({ deadline }: { deadline: string }) {
   );
 }
 
+const NWL_POSTERS: Record<string, { image: string; requirementKey: string }> = {
+  nwl: { image: '/images/tournaments/nwl-friday.webp', requirementKey: 'nwlRequirement' },
+  'nwl-chunin': { image: '/images/tournaments/nwl-saturday-chunin.webp', requirementKey: 'nwlChuninRequirement' },
+  'nwl-kage': { image: '/images/tournaments/nwl-monthly-kage.webp', requirementKey: 'nwlKageRequirement' },
+};
+
 export default function TournamentDetailPage() {
   const t = useTranslations('tournament');
   const tSpectate = useTranslations('tournamentSpectate');
@@ -322,6 +328,7 @@ export default function TournamentDetailPage() {
   }, []);
 
   const tour = activeTournament;
+  const nwlPoster = NWL_POSTERS[(tour as { partner?: string | null } | null)?.partner ?? ''] ?? null;
   const isSwiss = tour?.format === 'swiss';
   const isDoubleElim = tour?.format === 'double_elimination';
   const swissStandings: SwissStandingEntry[] = useMemo(() => {
@@ -456,17 +463,17 @@ export default function TournamentDetailPage() {
           )}
         </motion.div>
 
-        {(tour as { partner?: string | null }).partner === 'nwl' && (
+        {nwlPoster && (
           <div className="mb-6 flex flex-col items-center gap-4 sm:flex-row sm:items-start">
             {}
             <img
-              src="/images/tournaments/nwl-friday.webp"
+              src={nwlPoster.image}
               alt={t('nwlPosterAlt')}
               className="w-full max-w-xs shrink-0"
               style={{ boxShadow: '0 12px 32px var(--t-shadow)' }}
             />
             <div className="flex-1">
-              <p className="text-sm leading-relaxed" style={{ color: '#c9c7c0' }}>{t('nwlRequirement')}</p>
+              <p className="text-sm leading-relaxed" style={{ color: '#c9c7c0' }}>{t(nwlPoster.requirementKey)}</p>
               <a
                 href="https://discord.gg/UXQX8McFD3"
                 target="_blank"

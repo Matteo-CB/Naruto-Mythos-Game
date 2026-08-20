@@ -1,23 +1,93 @@
 {
   "entries": [
     {
-      "date": "2026-08-18",
-      "title_fr": "Correctif des équipements",
-      "title_en": "Attachment fix",
-      "title_es": "Corrección de equipamientos",
-      "title_pt": "Correção de equipamentos",
-      "title_it": "Correzione degli equipaggiamenti",
-      "title_pl": "Poprawka wyposażenia",
-      "title_ja": "装備の修正",
+      "date": "2026-08-20",
+      "title_fr": "Tournois partenaires automatiques",
+      "title_en": "Automatic partner tournaments",
+      "title_es": "Torneos asociados automáticos",
+      "title_pt": "Torneios parceiros automáticos",
+      "title_it": "Tornei partner automatici",
+      "title_pl": "Automatyczne turnieje partnerskie",
+      "title_ja": "提携大会の自動化",
+      "categories": [
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature"
+      ],
+      "changes_fr": [
+        "Les tournois Chunin du samedi et Kage du mois s ouvrent tout seuls, et leur code d accès est envoyé sur Discord aux joueurs qui ont le rôle.",
+        "Ces deux tournois sont privés: sans le rôle demandé sur le serveur New World Loot, le code ne fonctionne pas.",
+        "Le classement mensuel Chunin est publié sur Discord et remis à jour après chaque tournoi.",
+        "Le rôle Kage est donné automatiquement aux huit meilleurs joueurs du mois, et retiré à ceux qui sortent du top 8.",
+        "Le tournoi Genin du vendredi est annoncé sur Discord dès l ouverture des inscriptions.",
+        "Chaque tournoi partenaire affiche maintenant sa propre affiche et ses propres conditions d entrée."
+      ],
+      "changes_en": [
+        "The Saturday Chunin and monthly Kage tournaments now open on their own, and their join code is sent on Discord to players who hold the role.",
+        "Both tournaments are private: without the required role on the New World Loot server, the code does not work.",
+        "The monthly Chunin standings are posted on Discord and refreshed after every tournament.",
+        "The Kage role is given automatically to the eight best players of the month, and removed from those who drop out of the top 8.",
+        "The Friday Genin tournament is announced on Discord as soon as registration opens.",
+        "Each partner tournament now shows its own poster and its own entry conditions."
+      ],
+      "changes_es": [
+        "Los torneos Chunin del sábado y Kage del mes se abren solos, y su código de acceso se envía por Discord a los jugadores que tienen el rol.",
+        "Ambos torneos son privados: sin el rol requerido en el servidor de New World Loot, el código no funciona.",
+        "La clasificación mensual Chunin se publica en Discord y se actualiza después de cada torneo.",
+        "El rol Kage se otorga automáticamente a los ocho mejores jugadores del mes, y se retira a quienes salen del top 8.",
+        "El torneo Genin del viernes se anuncia en Discord en cuanto abren las inscripciones.",
+        "Cada torneo asociado muestra ahora su propio cartel y sus propias condiciones de entrada."
+      ],
+      "changes_pt": [
+        "Os torneios Chunin de sábado e Kage do mês abrem sozinhos, e o código de acesso é enviado no Discord aos jogadores que têm o cargo.",
+        "Os dois torneios são privados: sem o cargo exigido no servidor da New World Loot, o código não funciona.",
+        "A classificação mensal Chunin é publicada no Discord e atualizada depois de cada torneio.",
+        "O cargo Kage é dado automaticamente aos oito melhores jogadores do mês, e retirado a quem sai do top 8.",
+        "O torneio Genin de sexta é anunciado no Discord assim que as inscrições abrem.",
+        "Cada torneio parceiro mostra agora o seu próprio cartaz e as suas próprias condições de entrada."
+      ],
+      "changes_it": [
+        "I tornei Chunin del sabato e Kage del mese si aprono da soli, e il codice di accesso viene inviato su Discord ai giocatori che hanno il ruolo.",
+        "I due tornei sono privati: senza il ruolo richiesto sul server di New World Loot, il codice non funziona.",
+        "La classifica mensile Chunin viene pubblicata su Discord e aggiornata dopo ogni torneo.",
+        "Il ruolo Kage viene assegnato automaticamente agli otto migliori giocatori del mese, e tolto a chi esce dalla top 8.",
+        "Il torneo Genin del venerdì viene annunciato su Discord appena aprono le iscrizioni.",
+        "Ogni torneo partner mostra ora la propria locandina e le proprie condizioni di ingresso."
+      ],
+      "changes_pl": [
+        "Turnieje Chunin w sobotę i Kage w miesiącu otwierają się same, a kod dostępu jest wysyłany na Discordzie graczom z odpowiednią rolą.",
+        "Oba turnieje są prywatne: bez wymaganej roli na serwerze New World Loot kod nie zadziała.",
+        "Miesięczna klasyfikacja Chunin jest publikowana na Discordzie i odświeżana po każdym turnieju.",
+        "Rola Kage jest przyznawana automatycznie ośmiu najlepszym graczom miesiąca i odbierana tym, którzy wypadają z top 8.",
+        "Piątkowy turniej Genin jest ogłaszany na Discordzie zaraz po otwarciu zapisów.",
+        "Każdy turniej partnerski pokazuje teraz własny plakat i własne warunki wejścia."
+      ],
+      "changes_ja": [
+        "土曜の中忍大会と月例の影大会が自動で開催され、参加コードは対象ロールを持つプレイヤーへ Discord で届きます。",
+        "この2つの大会は非公開です。New World Loot サーバーで必要なロールがないとコードは通りません。",
+        "中忍の月間ランキングを Discord に掲載し、大会ごとに更新します。",
+        "影ロールは月間上位8名へ自動で付与され、上位8名から外れた人からは外れます。",
+        "金曜の下忍大会は、参加受付が始まると同時に Discord で告知されます。",
+        "提携大会ごとに、専用のポスターと参加条件を表示するようになりました。"
+      ]
+    },
+    {
+      "date": "2026-08-19",
+      "title_fr": "Corrections de cartes",
+      "title_en": "Card fixes",
+      "title_es": "Correcciones de cartas",
+      "title_pt": "Correções de cartas",
+      "title_it": "Correzioni delle carte",
+      "title_pl": "Poprawki kart",
+      "title_ja": "カードの修正",
       "categories": [
         "fix",
         "fix",
         "feature",
         "feature",
-        "fix",
-        "fix",
-        "fix",
-        "fix",
         "fix",
         "fix",
         "fix",
@@ -33,11 +103,7 @@
         "La remise de la BOMBE FUMIGENE 086 est bien débitée quand on révèle le personnage qui la porte.",
         "KABUTO YAKUSHI 139 perdait une défausse quand plusieurs de ses déclenchements s enchaînaient, laissant une carte en trop en main.",
         "ZABUZA MOMOCHI 136 vainc enfin les personnages posés par un autre effet à prix réduit, comme une invocation de JIRAIYA.",
-        "PILULES MILITAIRES 102 est désormais de la Nourriture et non une Arme, comme prévu par le concepteur.",
-        "ZAKU ABUMI 070 et KIN TSUCHI 072 ne peuvent plus voir leur inconvénient refusé: un effet subi par l adversaire s applique toujours.",
-        "Un effet qui vise un personnage immunisé le dit désormais dans le journal, au lieu de sembler ne rien faire.",
-        "JIRÔBÔ Poing d Arhat 122 ne propose plus un ennemi immunisé comme cible de sa défaite.",
-        "Un personnage qui perd le droit de porter plusieurs équipements ne garde plus que le dernier, les autres partent à la défausse."
+        "PILULES MILITAIRES 102 est désormais de la Nourriture et non une Arme, comme prévu par le concepteur."
       ],
       "changes_en": [
         "Answering SAKURA HARUNO 007 at the start of the round no longer skips your turn.",
@@ -48,11 +114,7 @@
         "The SMOKE BOMB 086 discount is now actually charged when revealing the character carrying it.",
         "KABUTO YAKUSHI 139 was losing one discard when several of its triggers chained, leaving one extra card in hand.",
         "ZABUZA MOMOCHI 136 can finally defeat characters put into play at a reduced price by another effect, such as a JIRAIYA summon.",
-        "FOOD PILLS 102 is now Food instead of a Weapon, as intended by the designer.",
-        "ZAKU ABUMI 070 and KIN TSUCHI 072 can no longer have their drawback skipped: an effect the opponent undergoes always applies.",
-        "An effect aimed at an immune character now says so in the log instead of appearing to do nothing.",
-        "JIROBO Slamming Palm 122 no longer offers an immune enemy as a target for its defeat.",
-        "A character that loses the right to carry several attachments now keeps only the most recent one, the others go to the discard pile."
+        "FOOD PILLS 102 is now Food instead of a Weapon, as intended by the designer."
       ],
       "changes_es": [
         "Responder a SAKURA HARUNO 007 al inicio de la ronda ya no te salta el turno.",
@@ -63,11 +125,7 @@
         "El descuento de la BOMBA DE HUMO 086 se aplica de verdad al revelar al personaje que la lleva.",
         "KABUTO YAKUSHI 139 perdía un descarte cuando varios de sus disparos se encadenaban, dejando una carta de más en la mano.",
         "ZABUZA MOMOCHI 136 por fin derrota a los personajes puestos en juego a precio reducido por otro efecto, como una invocación de JIRAIYA.",
-        "PÍLDORAS MILITARES 102 ahora es Comida en vez de Arma, tal como pretendía el diseñador.",
-        "ZAKU ABUMI 070 y KIN TSUCHI 072 ya no pueden saltarse su desventaja: un efecto que sufre el rival siempre se aplica.",
-        "Un efecto dirigido a un personaje inmune ahora lo indica en el registro, en vez de parecer que no hace nada.",
-        "JIROBO Palma Demoledora 122 ya no ofrece a un enemigo inmune como objetivo de su derrota.",
-        "Un personaje que pierde el derecho a llevar varios equipamientos conserva solo el más reciente; los demás van al descarte."
+        "PÍLDORAS MILITARES 102 ahora es Comida en vez de Arma, tal como pretendía el diseñador."
       ],
       "changes_pt": [
         "Responder a SAKURA HARUNO 007 no início da ronda já não salta o teu turno.",
@@ -78,11 +136,7 @@
         "O desconto da BOMBA DE FUMO 086 é agora realmente aplicado ao revelar o personagem que a transporta.",
         "KABUTO YAKUSHI 139 perdia um descarte quando vários dos seus gatilhos se encadeavam, deixando uma carta a mais na mão.",
         "ZABUZA MOMOCHI 136 derrota finalmente os personagens colocados em jogo a preço reduzido por outro efeito, como uma invocação de JIRAIYA.",
-        "PÍLULAS MILITARES 102 é agora Comida em vez de Arma, como pretendido pelo criador.",
-        "ZAKU ABUMI 070 e KIN TSUCHI 072 já não podem ignorar a sua desvantagem: um efeito sofrido pelo adversário aplica-se sempre.",
-        "Um efeito dirigido a um personagem imune indica-o agora no registo, em vez de parecer não fazer nada.",
-        "JIROBO Palma Esmagadora 122 já não oferece um inimigo imune como alvo da sua derrota.",
-        "Um personagem que perde o direito de levar vários equipamentos mantém apenas o mais recente; os outros vão para o descarte."
+        "PÍLULAS MILITARES 102 é agora Comida em vez de Arma, como pretendido pelo criador."
       ],
       "changes_it": [
         "Rispondere a SAKURA HARUNO 007 a inizio round non salta piu il tuo turno.",
@@ -93,11 +147,7 @@
         "Lo sconto della BOMBA FUMOGENA 086 viene ora davvero applicato quando si rivela il personaggio che la porta.",
         "KABUTO YAKUSHI 139 perdeva uno scarto quando piu inneschi si concatenavano, lasciando una carta di troppo in mano.",
         "ZABUZA MOMOCHI 136 sconfigge finalmente i personaggi messi in gioco a prezzo ridotto da un altro effetto, come un evocazione di JIRAIYA.",
-        "PILLOLE MILITARI 102 ora e Cibo invece che un Arma, come previsto dal designer.",
-        "ZAKU ABUMI 070 e KIN TSUCHI 072 non possono piu saltare il loro svantaggio: un effetto subito dall avversario si applica sempre.",
-        "Un effetto rivolto a un personaggio immune ora lo indica nel registro, invece di sembrare non fare nulla.",
-        "JIROBO Palmo Rovinoso 122 non propone piu un nemico immune come bersaglio della sua sconfitta.",
-        "Un personaggio che perde il diritto di portare piu equipaggiamenti conserva solo il piu recente, gli altri vanno agli scarti."
+        "PILLOLE MILITARI 102 ora e Cibo invece che un Arma, come previsto dal designer."
       ],
       "changes_pl": [
         "Odpowiedź na pytanie SAKURY HARUNO 007 na początku rundy nie pomija już twojej tury.",
@@ -108,11 +158,7 @@
         "Zniżka BOMBY DYMNEJ 086 jest teraz naprawdę naliczana przy odkrywaniu postaci, która ją nosi.",
         "KABUTO YAKUSHI 139 gubił jedno odrzucenie, gdy kilka jego wyzwoleń następowało po sobie, zostawiając jedną kartę za dużo w ręce.",
         "ZABUZA MOMOCHI 136 wreszcie pokonuje postacie wprowadzone do gry po obniżonej cenie przez inny efekt, jak przywołanie JIRAIYI.",
-        "PIGUŁKI ŻOŁNIERSKIE 102 to teraz Jedzenie zamiast Broni, zgodnie z zamysłem projektanta.",
-        "ZAKU ABUMI 070 i KIN TSUCHI 072 nie mogą już pominąć swojej wady: efekt, któremu podlega przeciwnik, zawsze się stosuje.",
-        "Efekt wymierzony w odporną postać informuje o tym w dzienniku, zamiast sprawiać wrażenie, że nic nie robi.",
-        "JIROBO Miażdżąca Dłoń 122 nie proponuje już odpornego wroga jako celu pokonania.",
-        "Postać, która traci prawo do noszenia kilku przedmiotów, zachowuje tylko najnowszy; pozostałe trafiają na stos kart odrzuconych."
+        "PIGUŁKI ŻOŁNIERSKIE 102 to teraz Jedzenie zamiast Broni, zgodnie z zamysłem projektanta."
       ],
       "changes_ja": [
         "ラウンド開始時の 春野サクラ 007 の選択に答えても、自分のターンが飛ばされなくなりました。",
@@ -123,7 +169,61 @@
         "煙玉 086 の割引が、それを装備しているキャラクターを公開する際に実際に適用されるようになりました。",
         "薬師カブト 139 は複数の誘発が連鎖したときに捨て札を1つ取りこぼし、手札が1枚多く残っていました。",
         "桃地再不斬 136 は、自来也の口寄せなど、別の効果によって割引で場に出たキャラクターをようやく倒せるようになりました。",
-        "兵糧丸 102 は、デザイナーの意図どおり武器ではなく食べ物になりました。",
+        "兵糧丸 102 は、デザイナーの意図どおり武器ではなく食べ物になりました。"
+      ]
+    },
+    {
+      "date": "2026-08-18",
+      "title_fr": "Correctif des équipements",
+      "title_en": "Attachment fix",
+      "title_es": "Corrección de equipamientos",
+      "title_pt": "Correção de equipamentos",
+      "title_it": "Correzione degli equipaggiamenti",
+      "title_pl": "Poprawka wyposażenia",
+      "title_ja": "装備の修正",
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix"
+      ],
+      "changes_fr": [
+        "ZAKU ABUMI 070 et KIN TSUCHI 072 ne peuvent plus voir leur inconvénient refusé: un effet subi par l adversaire s applique toujours.",
+        "Un effet qui vise un personnage immunisé le dit désormais dans le journal, au lieu de sembler ne rien faire.",
+        "JIRÔBÔ Poing d Arhat 122 ne propose plus un ennemi immunisé comme cible de sa défaite.",
+        "Un personnage qui perd le droit de porter plusieurs équipements ne garde plus que le dernier, les autres partent à la défausse."
+      ],
+      "changes_en": [
+        "ZAKU ABUMI 070 and KIN TSUCHI 072 can no longer have their drawback skipped: an effect the opponent undergoes always applies.",
+        "An effect aimed at an immune character now says so in the log instead of appearing to do nothing.",
+        "JIROBO Slamming Palm 122 no longer offers an immune enemy as a target for its defeat.",
+        "A character that loses the right to carry several attachments now keeps only the most recent one, the others go to the discard pile."
+      ],
+      "changes_es": [
+        "ZAKU ABUMI 070 y KIN TSUCHI 072 ya no pueden saltarse su desventaja: un efecto que sufre el rival siempre se aplica.",
+        "Un efecto dirigido a un personaje inmune ahora lo indica en el registro, en vez de parecer que no hace nada.",
+        "JIROBO Palma Demoledora 122 ya no ofrece a un enemigo inmune como objetivo de su derrota.",
+        "Un personaje que pierde el derecho a llevar varios equipamientos conserva solo el más reciente; los demás van al descarte."
+      ],
+      "changes_pt": [
+        "ZAKU ABUMI 070 e KIN TSUCHI 072 já não podem ignorar a sua desvantagem: um efeito sofrido pelo adversário aplica-se sempre.",
+        "Um efeito dirigido a um personagem imune indica-o agora no registo, em vez de parecer não fazer nada.",
+        "JIROBO Palma Esmagadora 122 já não oferece um inimigo imune como alvo da sua derrota.",
+        "Um personagem que perde o direito de levar vários equipamentos mantém apenas o mais recente; os outros vão para o descarte."
+      ],
+      "changes_it": [
+        "ZAKU ABUMI 070 e KIN TSUCHI 072 non possono piu saltare il loro svantaggio: un effetto subito dall avversario si applica sempre.",
+        "Un effetto rivolto a un personaggio immune ora lo indica nel registro, invece di sembrare non fare nulla.",
+        "JIROBO Palmo Rovinoso 122 non propone piu un nemico immune come bersaglio della sua sconfitta.",
+        "Un personaggio che perde il diritto di portare piu equipaggiamenti conserva solo il piu recente, gli altri vanno agli scarti."
+      ],
+      "changes_pl": [
+        "ZAKU ABUMI 070 i KIN TSUCHI 072 nie mogą już pominąć swojej wady: efekt, któremu podlega przeciwnik, zawsze się stosuje.",
+        "Efekt wymierzony w odporną postać informuje o tym w dzienniku, zamiast sprawiać wrażenie, że nic nie robi.",
+        "JIROBO Miażdżąca Dłoń 122 nie proponuje już odpornego wroga jako celu pokonania.",
+        "Postać, która traci prawo do noszenia kilku przedmiotów, zachowuje tylko najnowszy; pozostałe trafiają na stos kart odrzuconych."
+      ],
+      "changes_ja": [
         "ザク・アブミ 070 と キン・ツチ 072 のデメリットを飛ばせなくなりました。相手が受ける効果は常に適用されます。",
         "免疫を持つキャラクターを狙った効果は、何も起きていないように見えるのではなく、ログに理由が表示されるようになりました。",
         "次郎坊 羅漢貫手 122 は、免疫を持つ敵を撃破対象として提示しなくなりました。",

@@ -88,16 +88,50 @@ export async function isNwlMember(discordId: string | null | undefined): Promise
   return (await checkNwlMembership(discordId)) === 'member';
 }
 
-export async function grantNwlChuninRole(discordId: string | null | undefined): Promise<NwlGrantResult> {
+export type NwlRoleCheck = 'has_role' | 'no_role' | 'not_member' | 'unavailable';
+
+export async function checkNwlRole(
+  discordId: string | null | undefined,
+  roleId: string,
+): Promise<NwlRoleCheck> {
+  if (!discordId) return 'not_member';
+  const res = await nwlApi(`/guilds/${NWL_GUILD_ID}/members/${discordId}`);
+  if (!res) return 'unavailable';
+  if (res.status === 404) return 'not_member';
+  if (res.status !== 200) return 'unavailable';
+  const membre = (await res.json().catch(() => null)) as { roles?: string[] } | null;
+  if (!membre || !Array.isArray(membre.roles)) return 'unavailable';
+  return membre.roles.includes(roleId) ? 'has_role' : 'no_role';
+}
+
+export async function grantNwlRole(
+  discordId: string | null | undefined,
+  roleId: string,
+): Promise<NwlGrantResult> {
   if (!discordId) return 'not_member';
   const res = await nwlApi(
-    `/guilds/${NWL_GUILD_ID}/members/${discordId}/roles/${NWL_CHUNIN_ROLE_ID}`,
+    `/guilds/${NWL_GUILD_ID}/members/${discordId}/roles/${roleId}`,
     { method: 'PUT' },
   );
   if (!res) return 'unavailable';
   if (res.status === 204 || res.status === 200) return 'granted';
   if (res.status === 404) return 'not_member';
   return 'unavailable';
+}
+
+export async function revokeNwlRole(discordId: string, roleId: string): Promise<NwlGrantResult> {
+  const res = await nwlApi(
+    `/guilds/${NWL_GUILD_ID}/members/${discordId}/roles/${roleId}`,
+    { method: 'DELETE' },
+  );
+  if (!res) return 'unavailable';
+  if (res.status === 204 || res.status === 200) return 'granted';
+  if (res.status === 404) return 'not_member';
+  return 'unavailable';
+}
+
+export async function grantNwlChuninRole(discordId: string | null | undefined): Promise<NwlGrantResult> {
+  return grantNwlRole(discordId, NWL_CHUNIN_ROLE_ID);
 }
 
 export const NWL_CHUNIN_RESET_WEEKDAY = 1;
@@ -130,14 +164,7 @@ export async function listNwlChuninHolders(): Promise<string[] | null> {
 }
 
 export async function revokeNwlChuninRole(discordId: string): Promise<NwlGrantResult> {
-  const res = await nwlApi(
-    `/guilds/${NWL_GUILD_ID}/members/${discordId}/roles/${NWL_CHUNIN_ROLE_ID}`,
-    { method: 'DELETE' },
-  );
-  if (!res) return 'unavailable';
-  if (res.status === 204 || res.status === 200) return 'granted';
-  if (res.status === 404) return 'not_member';
-  return 'unavailable';
+  return revokeNwlRole(discordId, NWL_CHUNIN_ROLE_ID);
 }
 
 export async function revokeAllNwlChuninRoles(): Promise<{ revoked: number; failed: number; listed: number } | null> {
@@ -236,4 +263,72 @@ export async function announceNwlPodium(entries: NwlPodiumEntry[]): Promise<bool
     }),
   });
   return res?.status === 200 || res?.status === 201;
+}
+
+export const NWL_NARUTO_MYTHOS_ROLE_ID = '1500156919971577968';
+export const NWL_KAGE_ROLE_ID = '1504441360059469875';
+export const NWL_ANNOUNCE_CHANNEL_ID = '1539215631629418588';
+export const NWL_MOD_CHANNEL_ID = '1396225805381664791';
+export const NWL_LEADERBOARD_CHANNEL_ID = '1538844100898324491';
+
+export interface NwlMessageRef {
+  channelId: string;
+  messageId: string;
+}
+
+export async function nwlPostMessage(
+  channelId: string,
+  content: string,
+  roleToPing?: string,
+): Promise<NwlMessageRef | null> {
+  const res = await nwlApi(`/channels/${channelId}/messages`, {
+    method: 'POST',
+    body: JSON.stringify({
+      content,
+      allowed_mentions: roleToPing ? { roles: [roleToPing] } : { parse: [] },
+    }),
+  });
+  if (!res || (res.status !== 200 && res.status !== 201)) return null;
+  const body = (await res.json().catch(() => null)) as { id?: string } | null;
+  if (!body?.id) return null;
+  return { channelId, messageId: body.id };
+}
+
+export async function nwlEditMessage(ref: NwlMessageRef, content: string): Promise<boolean> {
+  const res = await nwlApi(`/channels/${ref.channelId}/messages/${ref.messageId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ content, allowed_mentions: { parse: [] } }),
+  });
+  return !!res && res.status === 200;
+}
+
+export async function nwlSendDirectMessage(discordId: string, content: string): Promise<boolean> {
+  const canal = await nwlApi('/users/@me/channels', {
+    method: 'POST',
+    body: JSON.stringify({ recipient_id: discordId }),
+  });
+  if (!canal || (canal.status !== 200 && canal.status !== 201)) return false;
+  const body = (await canal.json().catch(() => null)) as { id?: string } | null;
+  if (!body?.id) return false;
+  const envoi = await nwlPostMessage(body.id, content);
+  return envoi !== null;
+}
+
+export async function listNwlRoleHolders(roleId: string): Promise<string[] | null> {
+  const holders: string[] = [];
+  let after = '0';
+  for (let page = 0; page < 20; page++) {
+    const res = await nwlApi(`/guilds/${NWL_GUILD_ID}/members?limit=1000&after=${after}`);
+    if (!res || res.status !== 200) return null;
+    const members = (await res.json().catch(() => null)) as Array<{ user?: { id?: string }; roles?: string[] }> | null;
+    if (!Array.isArray(members) || members.length === 0) break;
+    for (const m of members) {
+      const id = m.user?.id;
+      if (id && Array.isArray(m.roles) && m.roles.includes(roleId)) holders.push(id);
+    }
+    const last = members[members.length - 1]?.user?.id;
+    if (!last || members.length < 1000) break;
+    after = last;
+  }
+  return holders;
 }

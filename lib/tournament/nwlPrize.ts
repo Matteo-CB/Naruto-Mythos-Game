@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db/prisma';
 import { NWL_PARTNER_KEY, grantNwlPodiumRoles, announceNwlPodium, type NwlPodiumEntry } from '@/lib/tournament/nwlPartner';
+import { cloturerPalierNwl, estPalierNwl, NWL_CHUNIN_PARTNER_KEY, NWL_KAGE_PARTNER_KEY } from '@/lib/tournament/nwlTiers';
 import { buildEliminationPrizeUserIds } from '@/lib/tournament/resultsView';
 import { MAIN_BRACKET, THIRD_PLACE_BRACKET } from '@/lib/tournament/tournamentEngine';
 import type { TournamentData } from '@/stores/tournamentStore';
@@ -10,7 +11,12 @@ export async function awardNwlPrizeIfNeeded(tournamentId: string): Promise<void>
       where: { id: tournamentId },
       include: { matches: true },
     });
-    if (!tournament || tournament.partner !== NWL_PARTNER_KEY) return;
+    if (!tournament) return;
+    if (estPalierNwl(tournament.partner)) {
+      await cloturerPalierNwl(tournamentId);
+      return;
+    }
+    if (tournament.partner !== NWL_PARTNER_KEY) return;
     if (tournament.status !== 'completed' || !tournament.winnerId) return;
     if (tournament.partnerPrizeAwarded) return;
 
@@ -79,7 +85,7 @@ export async function retryPendingNwlPrizes(now: Date): Promise<{ retried: numbe
   const cutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const pending = await prisma.tournament.findMany({
     where: {
-      partner: NWL_PARTNER_KEY,
+      partner: { in: [NWL_PARTNER_KEY, NWL_CHUNIN_PARTNER_KEY, NWL_KAGE_PARTNER_KEY] },
       status: 'completed',
       partnerPrizeAwarded: false,
       completedAt: { gte: cutoff },

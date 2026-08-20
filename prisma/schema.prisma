@@ -352,6 +352,7 @@ model SiteSettings {
   setStatusOverrides     Json?
   variantObtentionConfig Json?
   featuredMenuCards      Json?
+  nwlLeaderboard         Json?
 }
 
 // A card from a "revealing" set that an admin has explicitly HIDDEN (not yet revealed).

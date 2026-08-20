@@ -7,6 +7,7 @@ import { generateSealedPool, type SealedSetChoice } from '@/lib/sealed/boosterGe
 import { SEALED_BUILD_RESERVATION_MS, SEALED_MAX_JOIN_ATTEMPTS, canJoinSealedAgain } from '@/lib/tournament/sealedRegistration';
 import { isSuspended } from '@/lib/moderation/sanctions';
 import { NWL_PARTNER_KEY, checkNwlMembership, NWL_INVITE_URL } from '@/lib/tournament/nwlPartner';
+import { refuserSiPalierNwlInterdit } from '@/lib/tournament/nwlTiers';
 
 
 export async function POST(
@@ -105,6 +106,12 @@ export async function POST(
       if (membership === 'unavailable') {
         return NextResponse.json({ error: 'Membership check temporarily unavailable, please try again in a moment', errorKey: 'tournament.error.nwlCheckUnavailable' }, { status: 503 });
       }
+    }
+
+    const refusPalier = await refuserSiPalierNwlInterdit(tournament.partner, user?.discordId);
+    if (refusPalier) {
+      const { status, ...corps } = refusPalier;
+      return NextResponse.json(corps, { status });
     }
 
 

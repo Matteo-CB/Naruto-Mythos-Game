@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isSuspended } from '@/lib/moderation/sanctions';
 import { NWL_PARTNER_KEY, checkNwlMembership, NWL_INVITE_URL } from '@/lib/tournament/nwlPartner';
+import { refuserSiPalierNwlInterdit } from '@/lib/tournament/nwlTiers';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
@@ -113,6 +114,12 @@ export async function POST(req: NextRequest) {
       if (membership === 'unavailable') {
         return NextResponse.json({ error: 'Membership check temporarily unavailable, please try again in a moment', errorKey: 'tournament.error.nwlCheckUnavailable' }, { status: 503 });
       }
+    }
+
+    const refusPalier = await refuserSiPalierNwlInterdit(tournament.partner, user?.discordId);
+    if (refusPalier) {
+      const { status, ...corps } = refusPalier;
+      return NextResponse.json(corps, { status });
     }
 
     const activeBan = await prisma.userBan.findFirst({
