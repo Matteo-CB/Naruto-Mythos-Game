@@ -1864,7 +1864,7 @@
       "title_pt": "Nunca me subestime!",
       "title_it": "Non sottovalutarmi mai!",
       "title_pl": "Nigdy mnie nie lekceważ!",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 5,
       "power": 6,
       "keywords": [
@@ -1884,7 +1884,8 @@
       ],
       "rarity_display": "Rare",
       "data_complete": true,
-      "old_id": "121/140"
+      "old_id": "121/140",
+      "image_file": "images/cards/SS/mythos_v/SS-121-MV.webp"
     },
     "SS-126-R": {
       "id": "SS-126-R",
@@ -7448,7 +7449,7 @@
       "title_pt": "«Agora vejo a verdade.»",
       "title_it": "«Ora vedo la verità.»",
       "title_pl": "„Teraz widzę prawdę.”",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 5,
       "power": 5,
       "keywords": [
@@ -7467,7 +7468,8 @@
       ],
       "rarity_display": "Mythos Variant",
       "data_complete": true,
-      "old_id": "126/140 V"
+      "old_id": "126/140 V",
+      "image_file": "images/cards/SS/mythos_v/SS-126_2-MV.webp"
     },
     "SS-080-C": {
       "id": "SS-080-C",
