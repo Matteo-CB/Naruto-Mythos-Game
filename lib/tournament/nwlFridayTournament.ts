@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/db/prisma';
 import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
 import { parisDateParts, parisWallToUtc } from '@/lib/tournament/dailyTournament';
-import { NWL_PARTNER_KEY, NWL_TOURNAMENT_NAME, NWL_MAX_PLAYERS, NWL_START_HOUR, NWL_TOURNAMENT_RULES_NOTE, NWL_CHUNIN_RESET_WEEKDAY, revokeAllNwlChuninRoles } from '@/lib/tournament/nwlPartner';
+import { NWL_PARTNER_KEY, NWL_TOURNAMENT_NAME, NWL_MAX_PLAYERS, NWL_START_HOUR, NWL_TOURNAMENT_RULES_NOTE, NWL_CHUNIN_RESET_WEEKDAY, revokeNwlChuninRolesFor } from '@/lib/tournament/nwlPartner';
+import { lireChuninGagnes, ecrireChuninGagnes } from '@/lib/tournament/nwlChuninEarned';
 import { findTournamentOwner } from '@/lib/tournament/tournamentOwner';
 
 export const NWL_REG_OPEN_HOUR = 14;
@@ -26,8 +27,13 @@ export async function resetNwlChuninIfMonday(now: Date = new Date()): Promise<{ 
   });
   if (already) return { ran: false };
 
-  const result = await revokeAllNwlChuninRoles();
-  if (!result) return { ran: false };
+  const gagnes = await lireChuninGagnes();
+  if (gagnes.length === 0) {
+    console.log('[NWL] weekly Chunin reset: nobody won the role this week, nothing to remove');
+    return { ran: false };
+  }
+  const result = await revokeNwlChuninRolesFor(gagnes);
+  await ecrireChuninGagnes(result.restants);
 
   const latest = await prisma.tournament.findFirst({
     where: { partner: NWL_PARTNER_KEY },

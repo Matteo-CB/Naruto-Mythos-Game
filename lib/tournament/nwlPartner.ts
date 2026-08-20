@@ -34,6 +34,7 @@ export interface NwlPodiumGrantResult {
   grantedEntries: NwlPodiumEntry[];
   skippedNoDiscord: NwlPodiumEntry[];
   allEligibleHandled: boolean;
+  gagnesEnTournoi: string[];
 }
 
 function botToken(): string | undefined {
@@ -150,7 +151,7 @@ export const NWL_TOURNAMENT_RULES_NOTE = [
   'New World Loot weekly Friday tournament. Single elimination, standard ban list.',
   `Rewards. First place wins £${NWL_FIRST_PLACE_STORE_CREDIT_GBP} of store credit, offered by New World Loot.`,
   `The first ${NWL_CHUNIN_PODIUM_PLACES} players also earn the Chunin role. It lets you enter the Chunin tournament held the next day, where the rewards are bigger. Details on the New World Loot Discord server.`,
-  'The Chunin role counts for that next Chunin tournament only: it is removed every Monday, so it has to be earned again each week.',
+  'A Chunin role won here counts for that next Chunin tournament only: it is removed the following Monday, so it has to be earned again each week. A Chunin role obtained any other way is never touched.',
   `To receive the Chunin role you must link your Discord account and be a member of the New World Loot server: ${NWL_DISCORD_INVITE}`,
 ].join(' ');
 
@@ -177,37 +178,38 @@ export async function revokeNwlChuninRole(discordId: string): Promise<NwlGrantRe
   return revokeNwlRole(discordId, NWL_CHUNIN_ROLE_ID);
 }
 
-export async function revokeAllNwlChuninRoles(): Promise<{ revoked: number; failed: number; listed: number } | null> {
-  const holders = await listNwlChuninHolders();
-  if (holders === null) {
-    console.error('[NWL] could not list Chunin holders, weekly reset skipped');
-    return null;
-  }
+export async function revokeNwlChuninRolesFor(
+  discordIds: string[],
+): Promise<{ revoked: number; failed: number; listed: number; restants: string[] }> {
+  const cibles = [...new Set(discordIds.filter(Boolean))];
   let revoked = 0;
-  let failed = 0;
-  for (const discordId of holders) {
+  const restants: string[] = [];
+  for (const discordId of cibles) {
     const result = await revokeNwlChuninRole(discordId);
-    if (result === 'unavailable') failed++;
+    if (result === 'unavailable') restants.push(discordId);
     else revoked++;
   }
-  console.log(`[NWL] weekly Chunin reset: listed ${holders.length}, revoked ${revoked}, failed ${failed}`);
-  return { revoked, failed, listed: holders.length };
+  console.log(`[NWL] weekly Chunin reset: listed ${cibles.length}, revoked ${revoked}, failed ${restants.length}`);
+  return { revoked, failed: restants.length, listed: cibles.length, restants };
 }
 
 export async function grantNwlPodiumRoles(podium: NwlPodiumEntry[]): Promise<NwlPodiumGrantResult> {
   const grantedUserIds: string[] = [];
   const grantedEntries: NwlPodiumEntry[] = [];
   const skippedNoDiscord: NwlPodiumEntry[] = [];
+  const gagnesEnTournoi: string[] = [];
   let allEligibleHandled = true;
   for (const e of podium) {
     if (!e.discordId) {
       skippedNoDiscord.push(e);
       continue;
     }
+    const avant = await checkNwlRole(e.discordId, NWL_CHUNIN_ROLE_ID);
     const result = await grantNwlChuninRole(e.discordId);
     if (result === 'granted') {
       grantedUserIds.push(e.userId);
       grantedEntries.push(e);
+      if (avant === 'no_role') gagnesEnTournoi.push(e.discordId);
     } else if (result === 'unavailable') {
       allEligibleHandled = false;
     }
@@ -218,7 +220,7 @@ export async function grantNwlPodiumRoles(podium: NwlPodiumEntry[]): Promise<Nwl
         skippedNoDiscord.map((e) => e.username).join(', '),
     );
   }
-  return { grantedUserIds, grantedEntries, skippedNoDiscord, allEligibleHandled };
+  return { grantedUserIds, grantedEntries, skippedNoDiscord, allEligibleHandled, gagnesEnTournoi };
 }
 
 function joinReadable(parts: string[]): string {

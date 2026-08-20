@@ -355,6 +355,7 @@ model SiteSettings {
   nwlLeaderboard         Json?
   nwlChuninSeed          Json?
   nwlKageChampions       Json?
+  nwlChuninEarned        Json?
 }
 
 // A card from a "revealing" set that an admin has explicitly HIDDEN (not yet revealed).

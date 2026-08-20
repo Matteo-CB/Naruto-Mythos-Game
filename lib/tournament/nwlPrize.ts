@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { NWL_PARTNER_KEY, grantNwlPodiumRoles, announceNwlPodium, type NwlPodiumEntry } from '@/lib/tournament/nwlPartner';
 import { cloturerPalierNwl, estPalierNwl, NWL_CHUNIN_PARTNER_KEY, NWL_KAGE_PARTNER_KEY } from '@/lib/tournament/nwlTiers';
+import { ajouterChuninGagnes } from '@/lib/tournament/nwlChuninEarned';
 import { buildEliminationPrizeUserIds } from '@/lib/tournament/resultsView';
 import { MAIN_BRACKET, THIRD_PLACE_BRACKET } from '@/lib/tournament/tournamentEngine';
 import type { TournamentData } from '@/stores/tournamentStore';
@@ -44,7 +45,8 @@ export async function awardNwlPrizeIfNeeded(tournamentId: string): Promise<void>
       return { place: p.place, userId: p.userId, username: u?.username ?? '?', discordId: u?.discordId ?? null };
     });
 
-    const { grantedEntries, allEligibleHandled } = await grantNwlPodiumRoles(podium);
+    const { grantedEntries, allEligibleHandled, gagnesEnTournoi } = await grantNwlPodiumRoles(podium);
+    if (gagnesEnTournoi.length > 0) await ajouterChuninGagnes(gagnesEnTournoi);
 
     let announced = tournament.partnerAnnounced ?? false;
     if (allEligibleHandled && !announced) {
