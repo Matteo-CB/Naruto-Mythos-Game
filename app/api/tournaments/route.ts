@@ -48,6 +48,14 @@ export async function GET(req: NextRequest) {
       if (viewerId && t.participants.some(p => p.userId === viewerId)) return true;
       return false;
     });
+    const enCours = (t: { partner?: string | null; status?: string }) =>
+      !!t.partner && (t.status === 'registration' || t.status === 'in_progress');
+    visible.sort((a, b) => {
+      const ecart = Number(enCours(b)) - Number(enCours(a));
+      if (ecart !== 0) return ecart;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
     const safe = visible.map(t => {
       const { participants, ...rest } = t;
       void participants;

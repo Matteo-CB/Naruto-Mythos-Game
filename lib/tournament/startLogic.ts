@@ -296,5 +296,14 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
     });
   }
 
+  const partenaire = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { partner: true },
+  });
+  if (partenaire?.partner) {
+    const { publierDecksDuTournoi } = await import('@/lib/tournament/nwlTiers');
+    await publierDecksDuTournoi(tournamentId).catch(() => false);
+  }
+
   return { ok: true };
 }

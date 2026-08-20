@@ -7,6 +7,17 @@ import { findTournamentOwner } from '@/lib/tournament/tournamentOwner';
 
 export const NWL_REG_OPEN_HOUR = 14;
 export const NWL_FRIDAY_WEEKDAY = 5;
+export const NWL_GENIN_LEAD_HOURS = 24;
+
+export function prochainVendredi(now: Date, heureDepart: number): Date {
+  const p = parisDateParts(now);
+  const jour = new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay();
+  const dansCombien = jour === NWL_FRIDAY_WEEKDAY && p.hour < heureDepart
+    ? 0
+    : (NWL_FRIDAY_WEEKDAY - jour + 7) % 7 || 7;
+  const cible = new Date(Date.UTC(p.year, p.month - 1, p.day + dansCombien));
+  return parisWallToUtc(cible.getUTCFullYear(), cible.getUTCMonth() + 1, cible.getUTCDate(), heureDepart, 0);
+}
 
 export interface NwlFridayResult {
   created: boolean;
@@ -32,17 +43,13 @@ export async function retirerChuninExpires(now: Date = new Date()): Promise<{ ra
 }
 
 export async function createNwlFridayTournamentIfNeeded(now: Date = new Date()): Promise<NwlFridayResult> {
-  const p = parisDateParts(now);
-  const weekday = new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay();
-  if (weekday !== NWL_FRIDAY_WEEKDAY) return { created: false, reason: 'not_friday' };
-  if (p.hour < NWL_REG_OPEN_HOUR || p.hour >= NWL_START_HOUR) return { created: false, reason: 'outside_window' };
+  const scheduledStartAt = prochainVendredi(now, NWL_START_HOUR);
+  const avance = scheduledStartAt.getTime() - now.getTime();
+  if (avance > NWL_GENIN_LEAD_HOURS * 60 * 60 * 1000) return { created: false, reason: 'outside_window' };
 
-  const scheduledStartAt = parisWallToUtc(p.year, p.month, p.day, NWL_START_HOUR, 0);
-  const dayStart = parisWallToUtc(p.year, p.month, p.day, 0, 0);
-  const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
-
+  const dayStart = new Date(scheduledStartAt.getTime() - 22 * 60 * 60 * 1000);
   const existing = await prisma.tournament.findFirst({
-    where: { partner: NWL_PARTNER_KEY, scheduledStartAt: { gte: dayStart, lt: dayEnd } },
+    where: { partner: NWL_PARTNER_KEY, scheduledStartAt: { gte: dayStart, lte: scheduledStartAt } },
     select: { id: true },
   });
   if (existing) return { created: false, reason: 'already_exists', tournamentId: existing.id };

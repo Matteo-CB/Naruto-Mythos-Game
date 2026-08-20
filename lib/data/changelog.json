@@ -15,6 +15,8 @@
         "feature",
         "feature",
         "feature",
+        "feature",
+        "feature",
         "fix",
         "fix",
         "fix",
@@ -28,6 +30,8 @@
         "feature"
       ],
       "changes_fr": [
+        "Le tournoi du vendredi ouvre ses inscriptions vingt quatre heures avant et reste en tête de la liste des tournois.",
+        "Les decks sont publiés au démarrage de chaque tournoi partenaire, dans le salon prévu pour ça.",
         "Le tournoi Chunin s ouvre dès la fin du tournoi du vendredi et le code part aussitôt à ceux qui viennent de gagner le rôle.",
         "Un rappel est envoyé deux heures avant le départ de chaque tournoi partenaire.",
         "Le rôle Chunin gagné en tournoi dure trois jours, puis il est retiré tout seul.",
@@ -46,6 +50,8 @@
         "Chaque tournoi partenaire affiche maintenant sa propre affiche et ses propres conditions d entrée."
       ],
       "changes_en": [
+        "The Friday tournament opens registration twenty four hours ahead and stays at the top of the tournament list.",
+        "Deck lists are posted when each partner tournament starts, in the channel meant for them.",
         "The Chunin tournament opens as soon as the Friday tournament ends, and the code goes straight to the players who just earned the role.",
         "A reminder is sent two hours before every partner tournament starts.",
         "A Chunin role won in a tournament now lasts three days, then it is removed on its own.",
@@ -64,6 +70,8 @@
         "Each partner tournament now shows its own poster and its own entry conditions."
       ],
       "changes_es": [
+        "El torneo del viernes abre inscripciones veinticuatro horas antes y se queda arriba en la lista de torneos.",
+        "Las listas de mazos se publican al empezar cada torneo asociado, en el canal previsto para ello.",
         "El torneo Chunin se abre en cuanto termina el torneo del viernes, y el código llega enseguida a quienes acaban de ganar el rol.",
         "Se envía un recordatorio dos horas antes del inicio de cada torneo asociado.",
         "El rol Chunin ganado en torneo dura tres días y luego se retira solo.",
@@ -82,6 +90,8 @@
         "Cada torneo asociado muestra ahora su propio cartel y sus propias condiciones de entrada."
       ],
       "changes_pt": [
+        "O torneio de sexta abre inscrições vinte e quatro horas antes e fica no topo da lista de torneios.",
+        "As listas de baralhos são publicadas no arranque de cada torneio parceiro, no canal próprio.",
         "O torneio Chunin abre assim que o torneio de sexta acaba, e o código segue logo para quem acabou de ganhar o cargo.",
         "É enviado um lembrete duas horas antes do início de cada torneio parceiro.",
         "O cargo Chunin ganho em torneio dura três dias e depois é retirado sozinho.",
@@ -100,6 +110,8 @@
         "Cada torneio parceiro mostra agora o seu próprio cartaz e as suas próprias condições de entrada."
       ],
       "changes_it": [
+        "Il torneo del venerdì apre le iscrizioni ventiquattro ore prima e resta in cima alla lista dei tornei.",
+        "Le liste dei mazzi vengono pubblicate all avvio di ogni torneo partner, nel canale dedicato.",
         "Il torneo Chunin si apre appena finisce il torneo del venerdì, e il codice parte subito a chi ha appena ottenuto il ruolo.",
         "Un promemoria viene inviato due ore prima dell inizio di ogni torneo partner.",
         "Il ruolo Chunin vinto in torneo dura tre giorni, poi viene tolto da solo.",
@@ -118,6 +130,8 @@
         "Ogni torneo partner mostra ora la propria locandina e le proprie condizioni di ingresso."
       ],
       "changes_pl": [
+        "Piątkowy turniej otwiera zapisy dwadzieścia cztery godziny wcześniej i zostaje na szczycie listy turniejów.",
+        "Listy talii są publikowane przy starcie każdego turnieju partnerskiego, w przeznaczonym do tego kanale.",
         "Turniej Chunin otwiera się zaraz po zakończeniu turnieju piątkowego, a kod trafia od razu do tych, którzy właśnie zdobyli rolę.",
         "Przypomnienie jest wysyłane dwie godziny przed startem każdego turnieju partnerskiego.",
         "Rola Chunin zdobyta w turnieju trwa teraz trzy dni, potem znika sama.",
@@ -136,6 +150,8 @@
         "Każdy turniej partnerski pokazuje teraz własny plakat i własne warunki wejścia."
       ],
       "changes_ja": [
+        "金曜の大会は24時間前に参加受付を開き、大会一覧の先頭に表示され続けます。",
+        "提携大会の開始時に、デッキリストが専用チャンネルへ投稿されます。",
         "中忍大会は金曜の大会が終わり次第すぐ開き、ロールを獲得したばかりのプレイヤーに参加コードが届きます。",
         "提携大会は開始2時間前にリマインドが届きます。",
         "大会で獲得した中忍ロールは3日間続き、その後は自動で外れます。",

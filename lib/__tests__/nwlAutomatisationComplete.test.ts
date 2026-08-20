@@ -12,7 +12,8 @@ import {
   NWL_KAGE_START_HOUR,
   NWL_RAPPEL_HEURES,
 } from '@/lib/tournament/nwlTiers';
-import { NWL_STORE_URL, NWL_INVITE_URL } from '@/lib/tournament/nwlPartner';
+import { NWL_STORE_URL, NWL_INVITE_URL, NWL_START_HOUR } from '@/lib/tournament/nwlPartner';
+import { prochainVendredi, NWL_GENIN_LEAD_HOURS } from '@/lib/tournament/nwlFridayTournament';
 import { NWL_FIRST_PLACE_STORE_CREDIT_GBP } from '@/lib/tournament/weeklySchedule';
 
 function partiesParis(d: Date) {
@@ -101,5 +102,31 @@ describe('le code du Kage part beaucoup plus tot que celui des autres', () => {
   it('vingt heures avant le depart, comme demande', () => {
     expect(NWL_KAGE_LEAD_HOURS).toBe(20);
     expect(NWL_KAGE_START_HOUR - NWL_KAGE_LEAD_HOURS, 'ouverture a 1h du matin a Paris').toBe(1);
+  });
+});
+
+describe('le tournoi du vendredi ouvre vingt quatre heures avant', () => {
+  it('le jeudi soir, la fenetre est ouverte et vise le vendredi suivant', () => {
+    const jeudiSoir = new Date('2026-08-20T20:30:00Z');
+    const vendredi = prochainVendredi(jeudiSoir, NWL_START_HOUR);
+    expect(partiesParis(vendredi)).toContain('21/08');
+    expect(
+      vendredi.getTime() - jeudiSoir.getTime() <= NWL_GENIN_LEAD_HOURS * 3600 * 1000,
+      'moins de vingt quatre heures avant le depart, donc creable',
+    ).toBe(true);
+  });
+
+  it('le jeudi matin, c est encore trop tot', () => {
+    const jeudiMatin = new Date('2026-08-20T08:00:00Z');
+    const vendredi = prochainVendredi(jeudiMatin, NWL_START_HOUR);
+    expect(
+      vendredi.getTime() - jeudiMatin.getTime() > NWL_GENIN_LEAD_HOURS * 3600 * 1000,
+      'plus de vingt quatre heures, on attend',
+    ).toBe(true);
+  });
+
+  it('le vendredi apres le depart, la cible passe au vendredi suivant', () => {
+    const vendrediTard = new Date('2026-08-21T21:00:00Z');
+    expect(partiesParis(prochainVendredi(vendrediTard, NWL_START_HOUR))).toContain('28/08');
   });
 });
