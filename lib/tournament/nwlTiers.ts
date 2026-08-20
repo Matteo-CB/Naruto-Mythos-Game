@@ -12,10 +12,12 @@ import {
   NWL_ANNOUNCE_CHANNEL_ID,
   NWL_LEADERBOARD_CHANNEL_ID,
   NWL_MOD_CHANNEL_ID,
+  NWL_DECKS_CHANNEL_ID,
   NWL_INVITE_URL,
   listNwlChuninHolders,
   listNwlRoleHolders,
   nwlPostMessage,
+  nwlPostForumThread,
   nwlEditMessage,
   nwlSendDirectMessage,
   checkNwlAnyRole,
@@ -466,17 +468,28 @@ export async function publierDecksDuTournoi(tournamentId: string): Promise<boole
     return `**${p.username}** : ${d.name} (${d.cardIds.length} cards, ${d.missionIds.length} missions)\n\`${d.cardIds.join(' ')}\``;
   });
 
-  const entete = `**Decks played : ${tournoi.name}**`;
-  let bloc = entete;
-  for (const ligne of lignes) {
-    if (bloc.length + ligne.length + 2 > 1900) {
-      await nwlPostMessage(NWL_MOD_CHANNEL_ID, bloc);
-      bloc = '';
-    }
-    bloc += (bloc ? '\n\n' : '') + ligne;
+  const blocs = decouperEnMessages(`**Decks played : ${tournoi.name}**`, lignes);
+  const fil = await nwlPostForumThread(NWL_DECKS_CHANNEL_ID, tournoi.name, blocs[0]);
+  const salonSuite = fil?.channelId ?? NWL_MOD_CHANNEL_ID;
+  if (!fil) await nwlPostMessage(NWL_MOD_CHANNEL_ID, blocs[0]);
+  for (const bloc of blocs.slice(1)) {
+    await nwlPostMessage(salonSuite, bloc);
   }
-  if (bloc) await nwlPostMessage(NWL_MOD_CHANNEL_ID, bloc);
   return true;
+}
+
+function decouperEnMessages(entete: string, lignes: string[]): string[] {
+  const blocs: string[] = [];
+  let courant = entete;
+  for (const ligne of lignes) {
+    if (courant.length + ligne.length + 2 > 1900) {
+      blocs.push(courant);
+      courant = '';
+    }
+    courant += (courant ? '\n\n' : '') + ligne;
+  }
+  if (courant) blocs.push(courant);
+  return blocs.length > 0 ? blocs : [entete];
 }
 
 export async function annoncerOuvertureGenin(): Promise<boolean> {

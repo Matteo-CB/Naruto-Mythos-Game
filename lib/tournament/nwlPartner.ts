@@ -284,6 +284,7 @@ export const NWL_KAGE_CHAMPIONS_MAX = 3;
 export const NWL_ANNOUNCE_CHANNEL_ID = '1539215631629418588';
 export const NWL_MOD_CHANNEL_ID = '1396225805381664791';
 export const NWL_LEADERBOARD_CHANNEL_ID = '1538844100898324491';
+export const NWL_DECKS_CHANNEL_ID = '1539216467885555734';
 
 export interface NwlMessageRef {
   channelId: string;
@@ -309,6 +310,24 @@ export async function nwlPostMessage(
   const body = (await res.json().catch(() => null)) as { id?: string } | null;
   if (!body?.id) return null;
   return { channelId, messageId: body.id };
+}
+
+export async function nwlPostForumThread(
+  channelId: string,
+  name: string,
+  content: string,
+): Promise<NwlMessageRef | null> {
+  const res = await nwlApi(`/channels/${channelId}/threads`, {
+    method: 'POST',
+    body: JSON.stringify({
+      name: name.slice(0, 100),
+      message: { content: content.slice(0, 2000), allowed_mentions: { parse: [] } },
+    }),
+  });
+  if (!res || (res.status !== 200 && res.status !== 201)) return null;
+  const body = (await res.json().catch(() => null)) as { id?: string } | null;
+  if (!body?.id) return null;
+  return { channelId: body.id, messageId: body.id };
 }
 
 export async function nwlEditMessage(ref: NwlMessageRef, content: string): Promise<boolean> {
