@@ -417,7 +417,9 @@ export function formaterClassement(entrees: NwlStandingEntry[], titre: string): 
     `**${titre}**`,
     ...lignes,
     '',
-    `The top ${haut} qualify for the ${NWL_KAGE_TOURNAMENT_NAME} on the first Sunday of next month.`,
+    haut === 1
+      ? `The top player qualifies for the ${NWL_KAGE_TOURNAMENT_NAME} on the first Sunday of next month.`
+      : `The top ${haut} qualify for the ${NWL_KAGE_TOURNAMENT_NAME} on the first Sunday of next month.`,
     `${NWL_POINTS_PER_WIN} points per win, ${NWL_POINTS_PER_LOSS} point per loss.`,
   ].join('\n');
 }

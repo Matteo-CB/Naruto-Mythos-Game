@@ -128,6 +128,10 @@ describe('classement mensuel Chunin', () => {
     expect(texte.indexOf('Ako')).toBeLessThan(texte.indexOf('Bee'));
     expect(texte).toContain('10 pts');
     expect(texte, 'le nombre de qualifies suit le nombre de joueurs classes').toContain('The top 2 qualify');
+    expect(
+      formaterClassement([{ userId: 'a', username: 'Seul', discordId: null, wins: 1, losses: 0, points: 3 }], 'Chunin'),
+      'un seul joueur classe ne donne pas une phrase bancale',
+    ).toContain('The top player qualifies');
   });
 
   it('ne plafonne le nombre de qualifies qu au nombre de places Kage', () => {
