@@ -4004,7 +4004,7 @@
       "regLabel": "Zapisy",
       "startLabel": "Start",
       "rewardsLabel": "Nagrody",
-      "nwlPrize": "1. miejsce: £{credit} kredytu w sklepie lub £{paypal} przez PayPal",
+      "nwlPrize": "1. miejsce: {credit} £ kredytu w sklepie",
       "nwlChunin": "Top {places}: ranga Chunin. Daje wstęp na turniej Chunin następnego dnia, gdzie nagrody są większe. Szczegóły na Discordzie New World Loot. Ranga znika w każdy poniedziałek, więc liczy się tylko na ten turniej."
     },
     "today": "Dziś",

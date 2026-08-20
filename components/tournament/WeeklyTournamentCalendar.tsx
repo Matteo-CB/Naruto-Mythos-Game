@@ -13,7 +13,6 @@ import {
   AUTO_SEALED_BOOSTER_COUNT,
   NWL_PARTNER_NAME,
   NWL_FIRST_PLACE_STORE_CREDIT_GBP,
-  NWL_FIRST_PLACE_PAYPAL_GBP,
   NWL_CHUNIN_PODIUM_PLACES,
   inferTournamentKind,
   startHourForSpec,
@@ -285,10 +284,7 @@ export function WeeklyTournamentCalendar({ tournaments = [] }: { tournaments?: T
                     {t('rules.rewardsLabel')}
                   </span>
                   <span className="text-[11px] leading-relaxed" style={{ color: 'var(--t-text)' }}>
-                    {t('rules.nwlPrize', {
-                      credit: NWL_FIRST_PLACE_STORE_CREDIT_GBP,
-                      paypal: NWL_FIRST_PLACE_PAYPAL_GBP,
-                    })}
+                    {t('rules.nwlPrize', { credit: NWL_FIRST_PLACE_STORE_CREDIT_GBP })}
                   </span>
                   <span className="text-[11px] leading-relaxed" style={{ color: 'var(--t-text)' }}>
                     {t('rules.nwlChunin', { places: NWL_CHUNIN_PODIUM_PLACES })}

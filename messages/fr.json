@@ -4010,7 +4010,7 @@
       "regLabel": "Inscriptions",
       "startLabel": "Début",
       "rewardsLabel": "Récompenses",
-      "nwlPrize": "1er : {credit} £ en bon d’achat ou {paypal} £ par PayPal",
+      "nwlPrize": "1er : {credit} £ en bon d’achat",
       "nwlChunin": "Top {places} : rôle Chunin. Il donne accès au tournoi Chunin du lendemain, où les récompenses sont plus grosses. Détails sur le Discord New World Loot. Le rôle est retiré chaque lundi, il ne vaut donc que pour ce tournoi."
     },
     "today": "Aujourd'hui",

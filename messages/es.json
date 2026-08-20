@@ -4009,7 +4009,7 @@
       "regLabel": "Inscripciones",
       "startLabel": "Inicio",
       "rewardsLabel": "Recompensas",
-      "nwlPrize": "1.º: {credit} £ en saldo de tienda o {paypal} £ por PayPal",
+      "nwlPrize": "1º: {credit} £ de crédito en tienda",
       "nwlChunin": "Top {places}: rol Chunin. Da acceso al torneo Chunin del día siguiente, con recompensas mayores. Detalles en el Discord de New World Loot. El rol se retira cada lunes, así que solo vale para ese torneo."
     },
     "today": "Hoy",

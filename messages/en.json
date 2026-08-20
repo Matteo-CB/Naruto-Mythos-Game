@@ -4004,7 +4004,7 @@
       "regLabel": "Registration",
       "startLabel": "Start",
       "rewardsLabel": "Rewards",
-      "nwlPrize": "1st: £{credit} store credit or £{paypal} by PayPal",
+      "nwlPrize": "1st: £{credit} store credit",
       "nwlChunin": "Top {places}: Chunin role. It opens the Chunin tournament held the next day, where the rewards are bigger. Details on the New World Loot Discord. The role is removed every Monday, so it counts for that tournament only."
     },
     "today": "Today",

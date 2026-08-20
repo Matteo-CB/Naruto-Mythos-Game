@@ -1,6 +1,5 @@
 import {
   NWL_FIRST_PLACE_STORE_CREDIT_GBP,
-  NWL_FIRST_PLACE_PAYPAL_GBP,
   NWL_CHUNIN_PODIUM_PLACES,
   NWL_DISCORD_INVITE,
 } from '@/lib/tournament/weeklySchedule';
@@ -105,7 +104,7 @@ export const NWL_CHUNIN_RESET_WEEKDAY = 1;
 
 export const NWL_TOURNAMENT_RULES_NOTE = [
   'New World Loot weekly Friday tournament. Single elimination, standard ban list.',
-  `Rewards. First place wins £${NWL_FIRST_PLACE_STORE_CREDIT_GBP} of store credit, or £${NWL_FIRST_PLACE_PAYPAL_GBP} paid by PayPal if you prefer, offered by New World Loot.`,
+  `Rewards. First place wins £${NWL_FIRST_PLACE_STORE_CREDIT_GBP} of store credit, offered by New World Loot.`,
   `The first ${NWL_CHUNIN_PODIUM_PLACES} players also earn the Chunin role. It lets you enter the Chunin tournament held the next day, where the rewards are bigger. Details on the New World Loot Discord server.`,
   'The Chunin role counts for that next Chunin tournament only: it is removed every Monday, so it has to be earned again each week.',
   `To receive the Chunin role you must link your Discord account and be a member of the New World Loot server: ${NWL_DISCORD_INVITE}`,
@@ -223,7 +222,7 @@ export async function announceNwlPodium(entries: NwlPodiumEntry[]): Promise<bool
   );
   lines.push('');
   lines.push(
-    `Rewards: first place wins £${NWL_FIRST_PLACE_STORE_CREDIT_GBP} of store credit, or £${NWL_FIRST_PLACE_PAYPAL_GBP} by PayPal if preferred, offered by New World Loot.`,
+    `Rewards: first place wins £${NWL_FIRST_PLACE_STORE_CREDIT_GBP} of store credit, offered by New World Loot.`,
   );
   lines.push(
     'The Chunin role lets you enter the Chunin tournament held the next day, where the rewards are bigger. Details on this server. It counts for that one only, as the role is removed every Monday.',

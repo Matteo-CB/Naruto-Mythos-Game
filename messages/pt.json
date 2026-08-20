@@ -4004,7 +4004,7 @@
       "regLabel": "Inscrições",
       "startLabel": "Início",
       "rewardsLabel": "Recompensas",
-      "nwlPrize": "1.º: £{credit} em crédito na loja ou £{paypal} via PayPal",
+      "nwlPrize": "1º: {credit} £ de crédito na loja",
       "nwlChunin": "Top {places}: cargo Chunin. Dá acesso ao torneio Chunin do dia seguinte, com recompensas maiores. Detalhes no Discord da New World Loot. O cargo é removido toda segunda-feira, então vale só para esse torneio."
     },
     "today": "Hoje",

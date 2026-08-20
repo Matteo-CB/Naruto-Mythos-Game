@@ -4008,7 +4008,7 @@
       "regLabel": "エントリー",
       "startLabel": "開始",
       "rewardsLabel": "報酬",
-      "nwlPrize": "1位：ストアクレジット£{credit}、またはPayPalで£{paypal}",
+      "nwlPrize": "1位：ストアクレジット {credit} ポンド",
       "nwlChunin": "上位{places}名：中忍ロール。翌日に開催される中忍トーナメントに参加でき、報酬はさらに大きくなります。詳細はNew World LootのDiscordへ。ロールは毎週月曜に削除されるため、その大会限りです。"
     },
     "today": "今日",
