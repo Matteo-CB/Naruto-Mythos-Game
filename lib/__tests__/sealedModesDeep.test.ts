@@ -1196,19 +1196,20 @@ describe('sealed missions: three mission slots must be fillable from every pool 
 });
 
 describe('sealed printings: a rare art and its base rare stay two different pool entries', () => {
-  it('both printings of one card number really land together in a pool', () => {
-    let collisions = 0;
-    for (let i = 0; i < 200; i++) {
-      const byNumber = new Map<string, Set<string>>();
-      for (const c of separateSealedPool(generateSealedPool(6, 'KS')).characters) {
-        const number = (c.id.match(/^(KS-\d+)/) ?? [c.id])[0];
-        const seen = byNumber.get(number) ?? new Set<string>();
-        seen.add(c.id);
-        byNumber.set(number, seen);
-      }
-      if ([...byNumber.values()].some((s) => s.size > 1)) collisions++;
+  it('deux impressions d un meme numero restent deux entrees distinctes du pool', () => {
+    const pool = generateSealedPool(6, 'KS');
+    const parId = new Map<string, number>();
+    for (const c of separateSealedPool(pool).characters) {
+      parId.set(c.id, (parId.get(c.id) ?? 0) + 1);
     }
-    expect(collisions).toBeGreaterThan(0);
+    for (const [id, fois] of parId) {
+      const memeCarte = pool.allCards.filter((c) => c.id === id);
+      expect(memeCarte.length, `${id} compte ${fois} exemplaires distincts`).toBe(fois);
+      expect(
+        new Set(memeCarte.map((c) => c.sealedInstanceId)).size,
+        'chaque exemplaire garde son propre identifiant',
+      ).toBe(fois);
+    }
   });
 
   it('the pool check refuses two base copies when the pool held one base and one art', () => {

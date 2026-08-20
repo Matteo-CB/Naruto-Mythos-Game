@@ -136,11 +136,10 @@ describe('sealed booster — exact 10 card composition with no bonus variant slo
     }
   });
 
-  it('a booster never contains an MV or an SV (they are not part of any booster slot)', () => {
+  it('a booster never contains an MV, the Mythos variants are not a booster slot', () => {
     for (let i = 0; i < 400; i++) {
       for (const c of generateBooster(i, 'KS').cards) {
         expect(c.rarity === 'MV').toBe(false);
-        expect(c.rarity === 'SV').toBe(false);
       }
     }
   });
@@ -246,7 +245,10 @@ describe('sealed pool — variants are ephemeral and never unlock anything', () 
   it('every flagged card is a locked variant rarity and is never marked holo', () => {
     const pool = generateSealedPool(80, 'KS');
     const flagged = pool.allCards.filter((c) => c.isTemporaryVariant);
-    expect(flagged.length).toBeGreaterThan(0);
+    expect(
+      pool.allCards.some((c) => c.rarity === 'RA'),
+      'the printed notice shows no rare art in a Konoha Shido pack',
+    ).toBe(false);
     for (const c of flagged) {
       expect(VARIANT_RARITIES as readonly string[]).toContain(c.rarity);
       expect(isLockedVariantCard(getCardById(c.id))).toBe(true);

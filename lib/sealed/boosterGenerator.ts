@@ -3,6 +3,12 @@ import { getSealedSetIds } from '@/lib/data/sets/registry';
 import type { CharacterCard, MissionCard, CardData } from '@/lib/engine/types';
 import { isVariantRarity } from '@/lib/variants/constants';
 import { NUMBERED_RARITIES, SHINOBI_SHIREN_SET_ID, rollShinobiShirenChase } from './shinobiShirenRates';
+import {
+  KONOHA_SHIDO_COMMONS_PER_PACK,
+  KONOHA_SHIDO_UNCOMMONS_PER_PACK,
+  rollKonohaShidoChase,
+  remplacementDeLHolo,
+} from './konohaShidoRates';
 
 export interface BoosterCard extends CardData {
   isHolo?: boolean;
@@ -97,15 +103,21 @@ function chaseCardForShinobiShiren(b: RarityBuckets): CardData | null {
   return null;
 }
 
+function carteOrdinaireDeRemplacement(b: RarityBuckets): CardData {
+  const rarete = remplacementDeLHolo();
+  if (rarete === 'UC' && b.uncommons.length > 0) return pickRandom(b.uncommons);
+  return pickRandom(b.commons.length > 0 ? b.commons : b.uncommons);
+}
+
 function generateShinobiShirenBooster(boosterIndex: number, setId: string, b: RarityBuckets): BoosterPack {
   const cards: BoosterCard[] = [];
 
-  for (const c of pickRandomN(b.commons, 4)) cards.push(toBoosterCard(c));
-  for (const c of pickRandomN(b.uncommons, 3)) cards.push(toBoosterCard(c));
+  for (const c of pickRandomN(b.commons, KONOHA_SHIDO_COMMONS_PER_PACK)) cards.push(toBoosterCard(c));
+  for (const c of pickRandomN(b.uncommons, KONOHA_SHIDO_UNCOMMONS_PER_PACK)) cards.push(toBoosterCard(c));
   cards.push(toBoosterCard(pickRandom(b.rares)));
 
   const chase = chaseCardForShinobiShiren(b);
-  cards.push(toBoosterCard(chase ?? pickRandom(b.commons)));
+  cards.push(toBoosterCard(chase ?? carteOrdinaireDeRemplacement(b)));
 
   cards.push(toBoosterCard(pickRandom(b.missions)));
 
@@ -123,33 +135,27 @@ export function generateBooster(boosterIndex: number, setId?: string, buckets?: 
   }
   if (resolvedSetId === SHINOBI_SHIREN_SET_ID) return generateShinobiShirenBooster(boosterIndex, resolvedSetId, b);
 
-  const { commons, uncommons, rares, rareArts, secrets, legendaries, missions: allMissions } = b;
+  const { commons, uncommons, rares, secrets, legendaries, numbered, missions: allMissions } = b;
 
   const cards: BoosterCard[] = [];
 
-  const pickedCommons = pickRandomN(commons, 4);
-  for (const c of pickedCommons) cards.push(toBoosterCard(c));
-
-  const pickedUncommons = pickRandomN(uncommons, 3);
-  for (const c of pickedUncommons) cards.push(toBoosterCard(c));
-
+  for (const c of pickRandomN(commons, KONOHA_SHIDO_COMMONS_PER_PACK)) cards.push(toBoosterCard(c));
+  for (const c of pickRandomN(uncommons, KONOHA_SHIDO_UNCOMMONS_PER_PACK)) cards.push(toBoosterCard(c));
   cards.push(toBoosterCard(pickRandom(rares)));
 
-  const chaseRoll = Math.random();
-  const specialRoll = Math.random();
-  let chaseCard: CardData;
-  if (specialRoll < 0.00125 && legendaries.length > 0) {
-    chaseCard = pickRandom(legendaries);
-  } else if (specialRoll < 0.10 && secrets.length > 0) {
-    chaseCard = pickRandom(secrets);
-  } else if (chaseRoll < 0.2 && rareArts.length > 0) {
-    chaseCard = pickRandom(rareArts);
-  } else if (chaseRoll < 0.6) {
-    chaseCard = pickRandom(commons);
-  } else {
-    chaseCard = pickRandom(uncommons);
+  const parRarete: Record<string, CharacterCard[]> = {
+    S: secrets,
+    L: legendaries,
+    SV: numbered.filter((c) => c.rarity === 'SV'),
+  };
+  let chaseCard: CardData | null = null;
+  for (let essai = 0; essai < 12 && !chaseCard; essai++) {
+    const tire = rollKonohaShidoChase();
+    if (!tire) break;
+    const vivier = parRarete[tire];
+    if (vivier && vivier.length > 0) chaseCard = pickRandom(vivier);
   }
-  cards.push(toBoosterCard(chaseCard));
+  cards.push(toBoosterCard(chaseCard ?? carteOrdinaireDeRemplacement(b)));
 
   cards.push(toBoosterCard(pickRandom(allMissions)));
 

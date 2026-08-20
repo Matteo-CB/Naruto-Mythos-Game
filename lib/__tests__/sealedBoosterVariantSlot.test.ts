@@ -23,9 +23,16 @@ describe('sealed booster: IRL composition + ephemeral variants', () => {
     expect([...pool.temporaryVariants].sort()).toEqual(flagged);
   });
 
-  it('variants still appear at booster rates over a large pool', () => {
+  it('a variant stays exceptional, at the rate printed on the notice', () => {
     const pool = generateSealedPool(100, 'KS');
-    expect(pool.temporaryVariants.length).toBeGreaterThan(0);
+    expect(
+      pool.temporaryVariants.length,
+      'one legendary in eight hundred packs, one numbered secret in four thousand',
+    ).toBeLessThanOrEqual(2);
+    for (const id of pool.temporaryVariants) {
+      const carte = pool.allCards.find((c) => c.id === id)!;
+      expect(['L', 'SV'], `${id} is not a Konoha Shido chase rarity`).toContain(carte.rarity);
+    }
   });
 
   it('non-variant cards have isTemporaryVariant=false', () => {

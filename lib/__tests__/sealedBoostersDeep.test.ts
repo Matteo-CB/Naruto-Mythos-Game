@@ -25,9 +25,9 @@ const idsOfRarity = (rarity: string): Set<string> =>
 const COMMON_IDS = idsOfRarity('C');
 const UNCOMMON_IDS = idsOfRarity('UC');
 const RARE_IDS = idsOfRarity('R');
-const RARE_ART_IDS = idsOfRarity('RA');
 const SECRET_IDS = idsOfRarity('S');
 const LEGENDARY_IDS = idsOfRarity('L');
+const NUMBERED_SECRET_IDS = idsOfRarity('SV');
 const MISSION_IDS = new Set(
   getPlayableMissions()
     .filter((m) => m.set === SET)
@@ -37,9 +37,9 @@ const MISSION_IDS = new Set(
 const HOLO_BUCKETS: Record<string, Set<string>> = {
   C: COMMON_IDS,
   UC: UNCOMMON_IDS,
-  RA: RARE_ART_IDS,
   S: SECRET_IDS,
   L: LEGENDARY_IDS,
+  SV: NUMBERED_SECRET_IDS,
 };
 
 const ALLOWED_HOLO_RARITIES = Object.keys(HOLO_BUCKETS);
@@ -77,7 +77,7 @@ describe('sealed pool fixtures resolve against the real card data', () => {
     expect(COMMON_IDS.size).toBeGreaterThanOrEqual(4);
     expect(UNCOMMON_IDS.size).toBeGreaterThanOrEqual(3);
     expect(RARE_IDS.size).toBeGreaterThanOrEqual(1);
-    expect(RARE_ART_IDS.size).toBeGreaterThan(0);
+    expect(NUMBERED_SECRET_IDS.size, 'the numbered secrets feed the rarest slot').toBeGreaterThan(0);
     expect(SECRET_IDS.size).toBeGreaterThan(0);
     expect(LEGENDARY_IDS.size).toBeGreaterThan(0);
     expect(MISSION_IDS.size).toBeGreaterThanOrEqual(1);
@@ -289,14 +289,14 @@ describe('the holo slot never produces a card from a wrong slot', () => {
     const holos = pool.boosters.map((b) => b.cards[HOLO_SLOT]);
     expect(holos.length).toBe(sample);
     const rate = (r: string): number => holos.filter((c) => c.rarity === r).length / sample;
-    expect(rate('RA')).toBeGreaterThan(0.1);
-    expect(rate('RA')).toBeLessThan(0.28);
-    expect(rate('S')).toBeGreaterThan(0.04);
+    expect(rate('RA'), 'the notice shows no rare art in a pack').toBe(0);
+    expect(rate('S'), 'one secret in ten packs').toBeGreaterThan(0.04);
     expect(rate('S')).toBeLessThan(0.17);
-    expect(rate('L')).toBeLessThan(0.02);
+    expect(rate('L'), 'one legendary in eight hundred').toBeLessThan(0.02);
+    expect(rate('SV'), 'one numbered secret in four thousand').toBeLessThan(0.005);
     expect(rate('C')).toBeGreaterThan(0.2);
     expect(rate('UC')).toBeGreaterThan(0.2);
-    expect(rate('C') + rate('UC') + rate('RA') + rate('S') + rate('L')).toBeCloseTo(1, 10);
+    expect(rate('C') + rate('UC') + rate('S') + rate('L') + rate('SV')).toBeCloseTo(1, 10);
   });
 });
 
@@ -326,24 +326,24 @@ describe('forced holo branches prove the special roll replaces the slot instead 
     assertSlotComposition(cards);
   });
 
-  it('a forced rare art roll without a special upgrade yields one flagged variant in the holo slot', () => {
+  it('a roll that misses every chase gives an ordinary card, never a rare art', () => {
     const cards = boosterWithFixedRandom(0.15);
     expect(cards.length).toBe(BOOSTER_SIZE);
-    expect(cards[HOLO_SLOT].rarity).toBe('RA');
-    expect(cards[HOLO_SLOT].isTemporaryVariant).toBe(true);
-    expect(cards.filter((c) => c.isTemporaryVariant).length).toBe(1);
+    expect(['C', 'UC'], 'the slot falls back to a common or an uncommon').toContain(cards[HOLO_SLOT].rarity);
+    expect(cards[HOLO_SLOT].isTemporaryVariant).toBe(false);
+    expect(cards.filter((c) => c.rarity === 'RA').length).toBe(0);
     assertSlotComposition(cards);
   });
 
-  it('a mid roll yields a holo common and a high roll yields a holo uncommon, both 10 cards', () => {
+  it('a mid roll and a high roll both give an ordinary card, both 10 cards', () => {
     const midCards = boosterWithFixedRandom(0.3);
     expect(midCards.length).toBe(BOOSTER_SIZE);
-    expect(midCards[HOLO_SLOT].rarity).toBe('C');
+    expect(['C', 'UC']).toContain(midCards[HOLO_SLOT].rarity);
     expect(midCards[HOLO_SLOT].isTemporaryVariant).toBe(false);
     vi.restoreAllMocks();
     const highCards = boosterWithFixedRandom(0.7);
     expect(highCards.length).toBe(BOOSTER_SIZE);
-    expect(highCards[HOLO_SLOT].rarity).toBe('UC');
+    expect(['C', 'UC']).toContain(highCards[HOLO_SLOT].rarity);
     expect(highCards[HOLO_SLOT].isTemporaryVariant).toBe(false);
   });
 
@@ -364,13 +364,12 @@ describe('temporary variant flagging is exact in both directions', () => {
     for (const c of pool.allCards) expect(typeof c.isTemporaryVariant).toBe('boolean');
   });
 
-  it('only RA and L ever carry the flag in a sealed pool', () => {
+  it('only the two chase rarities of the notice ever carry the flag in a sealed pool', () => {
     const pool = generateSealedPool(600, SET);
     const flaggedRarities = new Set(pool.allCards.filter((c) => c.isTemporaryVariant).map((c) => c.rarity));
-    expect(flaggedRarities.size).toBeGreaterThan(0);
     for (const r of flaggedRarities) {
       expect(VARIANT_RARITIES as readonly string[]).toContain(r);
-      expect(['RA', 'L']).toContain(r);
+      expect(['L', 'SV'], 'a Konoha Shido pack only chases the legendary and the numbered secret').toContain(r);
     }
   });
 
