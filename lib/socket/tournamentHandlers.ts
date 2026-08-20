@@ -322,6 +322,18 @@ function seatBoundInMatchRoom(
   return false;
 }
 
+async function partieEncoreVivante(gameId: string, roomCode: string | null | undefined): Promise<boolean> {
+  if (roomCode && isMatchGameLive(roomCode)) return true;
+  try {
+    const partie = await prisma.game.findUnique({ where: { id: gameId }, select: { status: true } });
+    if (!partie) return false;
+    return partie.status !== 'completed' && partie.status !== 'cancelled';
+  } catch (err) {
+    console.error(`[Tournament] partieEncoreVivante: lookup failed for ${gameId}:`, err instanceof Error ? err.message : err);
+    return true;
+  }
+}
+
 export async function fireAbsenceTimerCallback(
   io: Server,
   tournamentId: string,
@@ -346,8 +358,8 @@ export async function fireAbsenceTimerCallback(
       console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} already resolved (${m.status}), no-op`);
       return;
     }
-    if (m?.gameId) {
-      console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} already has game ${m.gameId}, absence forfeit cancelled`);
+    if (m?.gameId && (await partieEncoreVivante(m.gameId, m.roomCode))) {
+      console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} is being played in game ${m.gameId}, absence forfeit cancelled`);
       clearAbsenceTimer(matchId);
       matchGraceCycles.delete(matchId);
       return;
@@ -985,7 +997,7 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
         const newStatus: 'ready' | 'pending' = m.player1Id && m.player2Id ? 'ready' : 'pending';
         await prisma.tournamentMatch.update({
           where: { id: m.id },
-          data: { status: newStatus, roomCode: null, startedAt: null, absenceDeadline: null, absentPlayerId: null },
+          data: { status: newStatus, roomCode: null, startedAt: null, gameId: null, absenceDeadline: null, absentPlayerId: null },
         });
         matchReadyPlayers.delete(m.id);
         io.to(`tournament:${m.tournamentId}`).emit('tournament:match-updated', {

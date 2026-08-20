@@ -7,6 +7,7 @@ vi.mock('@/lib/db/prisma', () => {
     tournamentMatch: { findUnique: vi.fn(), findMany: vi.fn(), update: vi.fn(), updateMany: vi.fn(), createMany: vi.fn(), findFirst: vi.fn() },
     user: { findUnique: vi.fn(), update: vi.fn() },
     deck: { findUnique: vi.fn() },
+    game: { findUnique: vi.fn() },
     $runCommandRaw: vi.fn(),
   };
   return { prisma: m };
@@ -54,6 +55,7 @@ const p = prisma as never as {
   tournament: { findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
   tournamentParticipant: { updateMany: ReturnType<typeof vi.fn> };
   tournamentMatch: { findUnique: ReturnType<typeof vi.fn>; findMany: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn> };
+  game: { findUnique: ReturnType<typeof vi.fn> };
   $runCommandRaw: ReturnType<typeof vi.fn>;
 };
 
@@ -91,6 +93,7 @@ beforeEach(() => {
   p.tournamentMatch.update.mockReset();
   p.tournamentMatch.updateMany.mockReset();
   p.$runCommandRaw.mockResolvedValue({});
+  p.game.findUnique.mockResolvedValue({ status: 'in_progress' });
 });
 
 describe('un match dont la partie a demarre ne peut plus etre perdu pour absence', () => {
@@ -108,6 +111,26 @@ describe('un match dont la partie a demarre ne peut plus etre perdu pour absence
     expect(p.tournamentMatch.update, 'aucune ecriture de forfait').not.toHaveBeenCalled();
     expect(io.emissions.some((e) => e.event === 'tournament:player-forfeited')).toBe(false);
     expect(timersArretes, 'le compte a rebours est arrete pour de bon').toContain('m1');
+  });
+
+  it('une partie deja terminee ne protege plus le match, sinon il resterait fige pour toujours', async () => {
+    const io = fakeIo('t1', []);
+    p.tournamentMatch.findUnique.mockResolvedValue({
+      id: 'm5', tournamentId: 't1', status: 'ready', roomCode: null, gameId: 'game-fantome',
+      player1Id: 'p1', player2Id: 'p2', player1Username: 'P1', player2Username: 'P2',
+      round: 1, matchIndex: 0, bracket: null,
+    });
+    p.game.findUnique.mockResolvedValue({ status: 'completed' });
+    p.tournament.findUnique.mockResolvedValue({ format: 'elimination' });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentParticipant.updateMany.mockResolvedValue({ count: 1 });
+    p.tournamentMatch.findMany.mockResolvedValue([]);
+
+    await fireAbsenceTimerCallback(io as never, 't1', 'm5', 'p1', 'p2', 'p2', false);
+
+    expect(p.tournamentMatch.update).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ status: 'forfeit' }),
+    }));
   });
 
   it('laisse le forfait partir quand le match n a pas encore de partie', async () => {
