@@ -13,6 +13,7 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "feature",
         "feature",
         "feature",
@@ -21,6 +22,7 @@
         "feature"
       ],
       "changes_fr": [
+        "Un personnage sous BOMBE AVEUGLANTE 083 n a plus aucun effet à copier, aucun copieur ne le propose plus.",
         "Une page laissée ouverte pendant une mise à jour du site se recharge toute seule au lieu d afficher une erreur.",
         "Un joueur dont la partie a commencé ne peut plus perdre son match de tournoi pour absence.",
         "Si un match était marqué perdu par absence alors que la partie a bien été jouée, le vrai résultat reprend le dessus.",
@@ -32,6 +34,7 @@
         "Chaque tournoi partenaire affiche maintenant sa propre affiche et ses propres conditions d entrée."
       ],
       "changes_en": [
+        "A character under FLASH BOMB 083 has no effect left to copy, no copier offers it as a target any more.",
         "A page left open during a site update now reloads on its own instead of showing an error.",
         "A player whose game has started can no longer lose their tournament match for absence.",
         "If a match was marked lost for absence while the game was actually played, the real result takes over.",
@@ -43,6 +46,7 @@
         "Each partner tournament now shows its own poster and its own entry conditions."
       ],
       "changes_es": [
+        "Un personaje bajo BOMBA CEGADORA 083 ya no tiene ningún efecto que copiar, ningún copiador lo propone.",
         "Una página que quedó abierta durante una actualización del sitio ahora se recarga sola en vez de mostrar un error.",
         "Un jugador cuya partida ya ha empezado ya no puede perder su combate de torneo por ausencia.",
         "Si un combate se marcó como perdido por ausencia aunque la partida sí se jugó, el resultado real prevalece.",
@@ -54,6 +58,7 @@
         "Cada torneo asociado muestra ahora su propio cartel y sus propias condiciones de entrada."
       ],
       "changes_pt": [
+        "Uma personagem sob BOMBA DE LUZ 083 deixa de ter efeitos para copiar, nenhum copiador a propõe.",
         "Uma página deixada aberta durante uma atualização do site passa a recarregar sozinha em vez de mostrar um erro.",
         "Um jogador cuja partida já começou deixa de poder perder o seu jogo de torneio por ausência.",
         "Se um jogo foi marcado como perdido por ausência apesar de ter sido jogado, o resultado real passa a valer.",
@@ -65,6 +70,7 @@
         "Cada torneio parceiro mostra agora o seu próprio cartaz e as suas próprias condições de entrada."
       ],
       "changes_it": [
+        "Un personaggio sotto BOMBA ACCECANTE 083 non ha più effetti da copiare, nessun copiatore lo propone.",
         "Una pagina rimasta aperta durante un aggiornamento del sito ora si ricarica da sola invece di mostrare un errore.",
         "Un giocatore la cui partita è iniziata non può più perdere il suo incontro di torneo per assenza.",
         "Se un incontro era segnato come perso per assenza ma la partita è stata giocata, vale il risultato reale.",
@@ -76,6 +82,7 @@
         "Ogni torneo partner mostra ora la propria locandina e le proprie condizioni di ingresso."
       ],
       "changes_pl": [
+        "Postać z BOMBĄ BŁYSKOWĄ 083 nie ma już żadnego efektu do skopiowania, żaden kopiujący jej nie proponuje.",
         "Strona pozostawiona otwarta podczas aktualizacji serwisu odświeża się teraz sama zamiast pokazywać błąd.",
         "Gracz, którego partia już się zaczęła, nie może już przegrać meczu turniejowego przez nieobecność.",
         "Jeśli mecz został oznaczony jako przegrany przez nieobecność, mimo że partia się odbyła, liczy się prawdziwy wynik.",
@@ -87,6 +94,7 @@
         "Każdy turniej partnerski pokazuje teraz własny plakat i własne warunki wejścia."
       ],
       "changes_ja": [
+        "閃光弾 083 を受けた忍にはコピーできる効果が残らず、コピー系のカードの対象にも出なくなりました。",
         "サイト更新中に開いたままだったページは、エラーを出さずに自動で再読み込みされるようになりました。",
         "対戦が始まったプレイヤーが、不在扱いで大会の試合を落とすことはなくなりました。",
         "実際に対戦したのに不在で敗北と記録された試合は、本来の結果が優先されるようになりました。",

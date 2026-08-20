@@ -1,4 +1,5 @@
-import type { CharacterCard } from '@/lib/engine/types';
+import type { CharacterCard, CharacterInPlay } from '@/lib/engine/types';
+import { textIsBlanked } from '@/lib/effects/handlers/SS/attachmentStatics';
 
 
 const UNCOPYABLE_KS_CARD_NUMBERS = new Set<number>([
@@ -11,6 +12,16 @@ const UNCOPYABLE_KS_CARD_NUMBERS = new Set<number>([
 export function isCharacterCopyable(topCard: CharacterCard): boolean {
   if (String(topCard.set ?? 'KS') !== 'KS') return true;
   return !UNCOPYABLE_KS_CARD_NUMBERS.has(Number(topCard.number));
+}
+
+
+export function isCopyableCharacter(char: CharacterInPlay | undefined | null): boolean {
+  if (!char) return false;
+  if (char.isHidden) return false;
+  if (textIsBlanked(char)) return false;
+  const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  if (!topCard) return false;
+  return isCharacterCopyable(topCard);
 }
 
 

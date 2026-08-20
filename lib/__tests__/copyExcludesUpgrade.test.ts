@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { isCopyableEffect, isCopyableEffectType } from '@/lib/effects/handlers/KS/shared/copyExclusions';
+import { isCopyableEffect, isCopyableEffectType, isCopyableCharacter } from '@/lib/effects/handlers/KS/shared/copyExclusions';
 
 const COPY_FILTER_FILES = [
   'lib/effects/EffectEngine.ts',
@@ -37,6 +37,28 @@ describe('Copy filter — UPGRADE (effect alteration) is never copyable by any c
       expect(src, `${f} must not re-implement the effect-alteration filter locally`)
         .not.toContain('UPGRADE|SCORE)');
     }
+  });
+
+  it('every copy-filter file decides which characters are copyable through the shared predicate', () => {
+    for (const f of COPY_FILTER_FILES) {
+      const src = readFileSync(join(ROOT, f), 'utf8');
+      expect(src, `${f} should route character copyability through isCopyableCharacter`).toContain('isCopyableCharacter(');
+    }
+  });
+
+  it('a character whose text is blanked or which is face down is never a copy source', () => {
+    const socle = {
+      instanceId: 'x', isHidden: false, powerTokens: 0, attachments: [],
+      card: { id: 'KS-020-UC', set: 'KS', number: '020', effects: [] },
+      stack: [{ id: 'KS-020-UC', set: 'KS', number: '020', effects: [] }],
+    } as never as Parameters<typeof isCopyableCharacter>[0];
+    expect(isCopyableCharacter(socle)).toBe(true);
+    expect(isCopyableCharacter({ ...socle!, isHidden: true })).toBe(false);
+    expect(isCopyableCharacter({
+      ...socle!,
+      attachments: [{ card: { id: 'SS-083-UC', set: 'SS', number: '083' }, owner: 'player1' }],
+    } as never)).toBe(false);
+    expect(isCopyableCharacter(null)).toBe(false);
   });
 
   it('a FIRST STRIKE effect is copyable only when the copier is the first card played this round', () => {

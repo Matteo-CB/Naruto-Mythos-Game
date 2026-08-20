@@ -81,7 +81,7 @@ import { calculateEffectiveCost } from '../engine/rules/ChakraValidation';
 import { canAffordAsUpgrade } from './handlers/KS/shared/upgradeCheck';
 import { moveCharTo, getValidMissions, applyUpgradePowerup } from './handlers/KS/rare/sasuke107';
 import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard, findHiddenSoundVillageOnBoard, findAffordableSoundVillageInHand } from './handlers/KS/shared/summonSearch';
-import { isCharacterCopyable, isCopyableEffect } from './handlers/KS/shared/copyExclusions';
+import { isCharacterCopyable, isCopyableCharacter, isCopyableEffect } from './handlers/KS/shared/copyExclusions';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 import { hasFlexibleUpgradeRestriction, isRestrictedUpgradeTarget } from '@/lib/engine/rules/flexibleUpgradeRestriction';
 import { forestOfDeathActive, textIsBlanked } from './handlers/SS/attachmentStatics';
@@ -3680,7 +3680,7 @@ export class EffectEngine {
         const k016Targets: string[] = [];
         for (const mission of newState.activeMissions) {
           for (const char of mission[enemySide016]) {
-            if (char.isHidden) continue;
+            if (!isCopyableCharacter(char)) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.chakra > 4) continue;
             const k016WasRevealed = pendingEffect.wasRevealed ?? false;
@@ -3732,7 +3732,7 @@ export class EffectEngine {
         const k016uTargets: string[] = [];
         for (const mission of newState.activeMissions) {
           for (const char of mission[enemySide016u]) {
-            if (char.isHidden) continue;
+            if (!isCopyableCharacter(char)) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
               return isCopyableEffect(eff, { wasRevealed: k016uWasRevealed, wasFirstCard: pendingEffect.wasFirstCard });
@@ -6188,7 +6188,7 @@ export class EffectEngine {
         for (const mission of newState.activeMissions) {
           for (const char of (mission as any)[s062FriendlySide] as CharacterInPlay[]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
-            if (char.isHidden) continue;
+            if (!isCopyableCharacter(char)) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
               const hasInstant = topCard.effects?.some((eff: any) => {
@@ -16590,7 +16590,7 @@ export class EffectEngine {
         for (let i = 0; i < newState.activeMissions.length; i++) {
           for (const char of newState.activeMissions[i][k148aFriendlySide]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
-            if (char.isHidden) continue;
+            if (!isCopyableCharacter(char)) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
             const hasCopyableEffect = topCard.effects.some((effect: { type: string; description: string }) => {
@@ -17018,7 +17018,7 @@ export class EffectEngine {
 
         
         
-        const k148Copyable = !isCharacterCopyable(k148TopCard) ? [] : (k148TopCard.effects ?? []).filter((eff) => {
+        const k148Copyable = !isCopyableCharacter(k148Target.character) ? [] : (k148TopCard.effects ?? []).filter((eff) => {
           return isCopyableEffect(eff, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard }) && (eff.type === 'MAIN' || eff.type === 'AMBUSH');
         });
 
@@ -18918,7 +18918,7 @@ export class EffectEngine {
         
         
         const copierWasRevealed = pendingEffect.wasRevealed ?? false;
-        const copyableEffects = (copyTargetTopCard.effects ?? []).filter((eff) => {
+        const copyableEffects = !isCopyableCharacter(copyTargetResult.character) ? [] : (copyTargetTopCard.effects ?? []).filter((eff) => {
           return isCopyableEffect(eff, { wasRevealed: copierWasRevealed, wasFirstCard: pendingEffect.wasFirstCard });
         });
 
@@ -20258,7 +20258,8 @@ export class EffectEngine {
     
     if (pending.isUpgrade) {
       const copier106WasRevealed = pending.wasRevealed ?? false;
-      const copyableEffects = !isCharacterCopyable(discardedCard) ? [] : (discardedCard.effects ?? []).filter(
+      const texteEfface106 = textIsBlanked(targetChar);
+      const copyableEffects = (texteEfface106 || !isCharacterCopyable(discardedCard)) ? [] : (discardedCard.effects ?? []).filter(
         (e) => {
           return isCopyableEffect(e, { wasRevealed: copier106WasRevealed, wasFirstCard: pending.wasFirstCard });
         },

@@ -41,7 +41,7 @@ import { isRempartZeroed, canBeHiddenByEnemy, amplifiedPowerup } from '../effect
 import { triggerOnDefeatEffects } from '../effects/onDefeatTriggers';
 import { ss000FinalizeSearch } from '../effects/handlers/SS/ss000Search';
 import { getEffectivePower } from '../effects/powerUtils';
-import { isCopyableEffect } from '../effects/handlers/KS/shared/copyExclusions';
+import { isCopyableCharacter, isCopyableEffect } from '../effects/handlers/KS/shared/copyExclusions';
 import { ninjaInfoCardsWatching } from '../effects/handlers/SS/attachmentStatics';
 
 
@@ -1648,7 +1648,7 @@ export class GameEngine {
         const k016dTargets: string[] = [];
         for (const mission of newState.activeMissions) {
           for (const char of mission[enemySide016d]) {
-            if (char.isHidden) continue;
+            if (!isCopyableCharacter(char)) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
             if (topCard.chakra > 4) continue;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
