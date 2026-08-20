@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { localizeMessageParams } from '@/lib/i18n/localizeMessageParams';
@@ -19,6 +19,7 @@ import {
   PopupTitle,
   PopupDescription,
   PopupDismissLink,
+  PopupActionButton,
   PopupMinimizePill,
   PopupMinimizeX,
 } from './PopupPrimitives';
@@ -52,10 +53,12 @@ function HandCard({
   cardInfo,
   onSelect,
   idx,
+  choisie,
 }: {
   cardInfo: HandCardInfo;
   onSelect: (index: string) => void;
   idx: number;
+  choisie?: boolean;
 }) {
   const t = useTranslations();
   const manualPowerMode = useSettingsStore((s) => s.manualPowerMode);
@@ -85,7 +88,9 @@ function HandCard({
         aspectRatio: '5 / 7',
         cursor: disabled ? 'not-allowed' : 'pointer',
         border: disabled ? '2px solid rgba(120, 120, 120, 0.4)' : '2px solid rgba(196, 163, 90, 0.4)',
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
+        boxShadow: choisie
+          ? '0 0 0 3px #c4a35a, 0 6px 20px rgba(0, 0, 0, 0.6)'
+          : '0 4px 16px rgba(0, 0, 0, 0.5)',
         transition: 'border-color 0.2s',
         flexShrink: 0,
         opacity: disabled ? 0.45 : 1,
@@ -192,12 +197,33 @@ export function HandCardSelector() {
     prevPendingIdRef.current = currentPendingId;
   }, [currentPendingId, restoreEffectPopup]);
 
+  const [choix, setChoix] = useState<string[]>([]);
+
+  const maxChoix = pendingTargetSelection?.maxSelections ?? 1;
+  const minChoix = pendingTargetSelection?.minSelections ?? 1;
+  const choixMultiple = maxChoix > 1;
+
   const handleSelect = useCallback(
     (targetId: string) => {
-      selectTarget(targetId);
+      if (!choixMultiple) {
+        selectTarget(targetId);
+        return;
+      }
+      setChoix((avant) => {
+        if (avant.includes(targetId)) return avant.filter((x) => x !== targetId);
+        if (avant.length >= maxChoix) return avant;
+        return [...avant, targetId];
+      });
     },
-    [selectTarget],
+    [selectTarget, choixMultiple, maxChoix],
   );
+
+  const validerChoix = useCallback(() => {
+    if (choix.length === 0) return;
+    const envoi = choix.join(',');
+    setChoix([]);
+    selectTarget(envoi);
+  }, [choix, selectTarget]);
 
   const handleDecline = useCallback(() => {
     declineTarget();
@@ -244,9 +270,25 @@ export function HandCardSelector() {
                 cardInfo={cardInfo}
                 onSelect={handleSelect}
                 idx={idx}
+                choisie={choix.includes(cardInfo.targetId ?? String(cardInfo.index))}
               />
             ))}
           </div>
+
+          {choixMultiple && (
+            <div className="flex flex-col items-center gap-2 mb-3">
+              <span className="font-body text-xs" style={{ color: 'var(--t-muted)' }}>
+                {t('game.board.chosenCount', { count: choix.length, max: maxChoix })}
+              </span>
+              <PopupActionButton
+                onClick={validerChoix}
+                accentColor="#c4a35a"
+                disabled={choix.length < Math.max(1, minChoix)}
+              >
+                {t('game.board.validate')}
+              </PopupActionButton>
+            </div>
+          )}
 
           {canDecline && (
             <div className="flex justify-center">

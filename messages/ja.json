@@ -1004,7 +1004,9 @@
       "edge": "主導権",
       "edgeLocked": "固定",
       "handPeeked": "相手があなたの手札を見ています",
-      "goBack": "戻る"
+      "goBack": "戻る",
+      "chosenCount": "{max} 枚中 {count} 枚選択",
+      "validate": "決定"
     },
     "handLabel": "手札",
     "effect": {

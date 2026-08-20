@@ -10,6 +10,7 @@
       "title_pl": "Automatyczne turnieje partnerskie",
       "title_ja": "提携大会の自動化",
       "categories": [
+        "fix",
         "feature",
         "feature",
         "feature",
@@ -30,6 +31,7 @@
         "feature"
       ],
       "changes_fr": [
+        "La fenêtre qui fait choisir des cartes en main laisse enfin en sélectionner plusieurs, comme le demande SAKON 037.",
         "Le tournoi du vendredi ouvre ses inscriptions vingt quatre heures avant et reste en tête de la liste des tournois.",
         "Les decks sont publiés au démarrage de chaque tournoi partenaire, dans le salon prévu pour ça.",
         "Le tournoi Chunin s ouvre dès la fin du tournoi du vendredi et le code part aussitôt à ceux qui viennent de gagner le rôle.",
@@ -50,6 +52,7 @@
         "Chaque tournoi partenaire affiche maintenant sa propre affiche et ses propres conditions d entrée."
       ],
       "changes_en": [
+        "The window that asks you to pick cards from hand finally lets you select several, as SAKON 037 requires.",
         "The Friday tournament opens registration twenty four hours ahead and stays at the top of the tournament list.",
         "Deck lists are posted when each partner tournament starts, in the channel meant for them.",
         "The Chunin tournament opens as soon as the Friday tournament ends, and the code goes straight to the players who just earned the role.",
@@ -70,6 +73,7 @@
         "Each partner tournament now shows its own poster and its own entry conditions."
       ],
       "changes_es": [
+        "La ventana que pide elegir cartas de la mano por fin permite seleccionar varias, como exige SAKON 037.",
         "El torneo del viernes abre inscripciones veinticuatro horas antes y se queda arriba en la lista de torneos.",
         "Las listas de mazos se publican al empezar cada torneo asociado, en el canal previsto para ello.",
         "El torneo Chunin se abre en cuanto termina el torneo del viernes, y el código llega enseguida a quienes acaban de ganar el rol.",
@@ -90,6 +94,7 @@
         "Cada torneo asociado muestra ahora su propio cartel y sus propias condiciones de entrada."
       ],
       "changes_pt": [
+        "A janela que pede para escolher cartas da mão passa finalmente a permitir escolher várias, como SAKON 037 exige.",
         "O torneio de sexta abre inscrições vinte e quatro horas antes e fica no topo da lista de torneios.",
         "As listas de baralhos são publicadas no arranque de cada torneio parceiro, no canal próprio.",
         "O torneio Chunin abre assim que o torneio de sexta acaba, e o código segue logo para quem acabou de ganhar o cargo.",
@@ -110,6 +115,7 @@
         "Cada torneio parceiro mostra agora o seu próprio cartaz e as suas próprias condições de entrada."
       ],
       "changes_it": [
+        "La finestra che chiede di scegliere carte dalla mano permette finalmente di sceglierne più di una, come richiede SAKON 037.",
         "Il torneo del venerdì apre le iscrizioni ventiquattro ore prima e resta in cima alla lista dei tornei.",
         "Le liste dei mazzi vengono pubblicate all avvio di ogni torneo partner, nel canale dedicato.",
         "Il torneo Chunin si apre appena finisce il torneo del venerdì, e il codice parte subito a chi ha appena ottenuto il ruolo.",
@@ -130,6 +136,7 @@
         "Ogni torneo partner mostra ora la propria locandina e le proprie condizioni di ingresso."
       ],
       "changes_pl": [
+        "Okno wyboru kart z ręki pozwala wreszcie zaznaczyć kilka naraz, tak jak wymaga tego SAKON 037.",
         "Piątkowy turniej otwiera zapisy dwadzieścia cztery godziny wcześniej i zostaje na szczycie listy turniejów.",
         "Listy talii są publikowane przy starcie każdego turnieju partnerskiego, w przeznaczonym do tego kanale.",
         "Turniej Chunin otwiera się zaraz po zakończeniu turnieju piątkowego, a kod trafia od razu do tych, którzy właśnie zdobyli rolę.",
@@ -150,6 +157,7 @@
         "Każdy turniej partnerski pokazuje teraz własny plakat i własne warunki wejścia."
       ],
       "changes_ja": [
+        "手札からカードを選ぶ画面で複数枚を選べるようになりました。SAKON 037 の効果に必要な操作です。",
         "金曜の大会は24時間前に参加受付を開き、大会一覧の先頭に表示され続けます。",
         "提携大会の開始時に、デッキリストが専用チャンネルへ投稿されます。",
         "中忍大会は金曜の大会が終わり次第すぐ開き、ロールを獲得したばかりのプレイヤーに参加コードが届きます。",

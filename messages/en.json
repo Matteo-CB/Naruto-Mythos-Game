@@ -1000,7 +1000,9 @@
       "edge": "Edge",
       "edgeLocked": "Locked",
       "handPeeked": "Your opponent is looking at your hand",
-      "goBack": "Go back"
+      "goBack": "Go back",
+      "chosenCount": "{count} of {max} chosen",
+      "validate": "Confirm"
     },
     "handLabel": "Hand",
     "effect": {

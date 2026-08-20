@@ -3114,7 +3114,9 @@
       "edge": "Przewaga",
       "edgeLocked": "Zablokowana",
       "handPeeked": "Twój przeciwnik ogląda twoją rękę",
-      "goBack": "Wróć"
+      "goBack": "Wróć",
+      "chosenCount": "{count} z {max} wybranych",
+      "validate": "Zatwierdź"
     },
     "handLabel": "Ręka",
     "effect": {

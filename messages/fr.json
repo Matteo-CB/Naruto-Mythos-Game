@@ -1006,7 +1006,9 @@
       "edge": "Edge",
       "edgeLocked": "Verrouillé",
       "handPeeked": "L'adversaire regarde ta main",
-      "goBack": "Revenir"
+      "goBack": "Revenir",
+      "chosenCount": "{count} sur {max} choisies",
+      "validate": "Valider"
     },
     "handLabel": "Main",
     "effect": {

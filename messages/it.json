@@ -3114,7 +3114,9 @@
       "edge": "Vantaggio",
       "edgeLocked": "Bloccato",
       "handPeeked": "Il tuo avversario sta guardando la tua mano",
-      "goBack": "Indietro"
+      "goBack": "Indietro",
+      "chosenCount": "{count} su {max} scelte",
+      "validate": "Conferma"
     },
     "handLabel": "Mano",
     "effect": {

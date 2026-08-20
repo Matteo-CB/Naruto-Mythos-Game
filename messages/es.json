@@ -1005,7 +1005,9 @@
       "edge": "Ventaja",
       "edgeLocked": "Bloqueada",
       "handPeeked": "Tu oponente está mirando tu mano",
-      "goBack": "Volver"
+      "goBack": "Volver",
+      "chosenCount": "{count} de {max} elegidas",
+      "validate": "Confirmar"
     },
     "handLabel": "Mano",
     "effect": {
