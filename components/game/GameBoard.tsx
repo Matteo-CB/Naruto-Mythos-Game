@@ -17,6 +17,7 @@ import { ActionBar } from "./ActionBar";
 import { MulliganDialog } from "./MulliganDialog";
 import { GameEndScreen } from "./GameEndScreen";
 import { GameLog } from "./GameLog";
+import { PublicRevealOverlay } from "./PublicRevealOverlay";
 import { AnimationController } from "./AnimationController";
 import { TargetSelector } from "./TargetSelector";
 import { HandCardSelector } from "./HandCardSelector";
@@ -1258,6 +1259,7 @@ function GameBoardInner() {
       <SpectatorBanner />
       {!isReplayMode && <MulliganDialog />}
       <GameLog />
+      <PublicRevealOverlay />
       <GameChat />
       <AnimationController />
       {!isReplayMode && (

@@ -1758,7 +1758,10 @@
       "dismiss": "Ocultar"
     },
     "edgeToken": "Ficha de Ventaja",
-    "edgeLocked": "Bloqueado"
+    "edgeLocked": "Bloqueado",
+    "publicReveal": {
+      "title": "{card} revela"
+    }
   },
   "collection": {
     "title": "Colección de cartas",

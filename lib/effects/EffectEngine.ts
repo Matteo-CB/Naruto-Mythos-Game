@@ -82,6 +82,7 @@ import { canAffordAsUpgrade } from './handlers/KS/shared/upgradeCheck';
 import { moveCharTo, getValidMissions, applyUpgradePowerup } from './handlers/KS/rare/sasuke107';
 import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard, findHiddenSoundVillageOnBoard, findAffordableSoundVillageInHand } from './handlers/KS/shared/summonSearch';
 import { isCharacterCopyable, isCopyableCharacter, isCopyableEffect } from './handlers/KS/shared/copyExclusions';
+import { annoncerRevelationPublique, annoncerRevelationSs002, apercuRevele } from './publicReveal';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 import { hasFlexibleUpgradeRestriction, isRestrictedUpgradeTarget } from '@/lib/engine/rules/flexibleUpgradeRestriction';
 import { forestOfDeathActive, textIsBlanked } from './handlers/SS/attachmentStatics';
@@ -1798,6 +1799,8 @@ export class EffectEngine {
             `Kiba Inuzuka (026): Revealed and drew ${drawnCards026.length} Akamaru card(s) from top 3: ${revealedNames026} (upgrade).`,
             'game.log.effect.revealDraw',
             { card: 'KIBA INUZUKA', id: 'KS-026-UC', count: drawnCards026.length, revealed: revealedNames026 });
+          newState = annoncerRevelationPublique(newState, pendingEffect.sourcePlayer, 'KS-026-UC',
+            topCardsRaw026.filter((_: CardData, i: number) => selectedIndices026.includes(i)).map((c: CardData) => apercuRevele(c, true)));
         } else {
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT',
@@ -1834,6 +1837,8 @@ export class EffectEngine {
             `Tayuya (065): Revealed and drew ${drawnCards065.length} Summon card(s) from top 3: ${revealedNames065} (upgrade).`,
             'game.log.effect.revealDraw',
             { card: 'TAYUYA', id: 'KS-065-UC', count: drawnCards065.length, revealed: revealedNames065 });
+          newState = annoncerRevelationPublique(newState, pendingEffect.sourcePlayer, 'KS-065-UC',
+            topCardsRaw065.filter((_: CardData, i: number) => selectedIndices065.includes(i)).map((c: CardData) => apercuRevele(c, true)));
         } else {
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT',
@@ -7305,6 +7310,7 @@ export class EffectEngine {
         const nrDeclared = nrMeta.declared ?? 0;
 
         if (!nrMeta.matched || nrDeclared <= 0) {
+          newState = annoncerRevelationSs002(newState, nrPlayer, pendingEffect.effectDescription);
           newState.log = logAction(newState.log, newState.turn, newState.phase, nrPlayer,
             'EFFECT', `Tsunade (SS-002): declared ${nrDeclared}, revealed ${nrMeta.cardName ?? ''}, no POWERUP.`,
             'game.log.effect.ss002RevealFailed',
@@ -7313,6 +7319,7 @@ export class EffectEngine {
         }
 
         newState = EffectEngine.applyPowerupToTarget(newState, pendingEffect.sourceInstanceId, nrDeclared);
+        newState = annoncerRevelationSs002(newState, nrPlayer, pendingEffect.effectDescription);
         newState.log = logAction(newState.log, newState.turn, newState.phase, nrPlayer,
           'EFFECT_POWERUP', `Tsunade (SS-002): declared ${nrDeclared}, revealed ${nrMeta.cardName ?? ''}, POWERUP ${nrDeclared}.`,
           'game.log.effect.ss002RevealWon',
@@ -12170,6 +12177,10 @@ export class EffectEngine {
         newState.log = logAction(newState.log, newState.turn, newState.phase, s046P,
           'EFFECT_DRAW', `Gaara (SS-046): Revealed ${s046RevealedNames} and drew ${s046Drawn.name_fr}.`,
           'game.log.effect.ss046DrawNames', { card: 'GAARA', id: 'SS-046-UC', target: s046Drawn.name_fr, revealed: s046RevealedNames, count: s046Revealed.length });
+        newState = annoncerRevelationPublique(newState, s046P, 'SS-046-UC', [
+          ...s046Revealed.map((c) => apercuRevele(c)),
+          apercuRevele(s046Drawn, true),
+        ]);
         break;
       }
 
@@ -12821,6 +12832,8 @@ export class EffectEngine {
           'EFFECT', `Sakon (037): revealed ${ss037Revelees.length} Sound Four card(s) from hand.`,
           'game.log.effect.revealFromHand',
           { card: SAKON_037_NAME, id: SAKON_037_ID, count: String(ss037Revelees.length) });
+        newState = annoncerRevelationPublique(newState, ss037Player, SAKON_037_ID,
+          ss037Revelees.map((c) => apercuRevele(c as unknown as CardData, true)));
 
         const ss037Cibles = enemiesUnderCost(newState, ss037Player, ss037Revelees.length);
         if (ss037Cibles.length === 0) {
@@ -13194,6 +13207,7 @@ export class EffectEngine {
           'EFFECT_DRAW', `${meta.sourceName ?? ''} (${meta.sourceId ?? ''}): revealed ${choisi.name_fr} and added it to hand.`,
           'game.log.effect.ssDeckSearchTaken',
           { card: meta.sourceName ?? '', id: meta.sourceId ?? '', target: choisi.name_fr, target_en: choisi.name_en || choisi.name_fr });
+        newState = annoncerRevelationPublique(newState, joueurF, meta.sourceId ?? '', [apercuRevele(choisi, true)]);
         break;
       }
 
@@ -16925,6 +16939,7 @@ export class EffectEngine {
           newState.log = logAction(newState.log, newState.turn, newState.phase, ssPlayer, 'EFFECT_DRAW',
             `Kakashi Hatake (SS-000): revealed and drew ${ssDrawnCard.name_fr}.`,
             'game.log.effect.ss000Reveal', { card: 'KAKASHI HATAKE', id: 'SS-149-L', target: ssDrawnCard.name_fr });
+          newState = annoncerRevelationPublique(newState, ssPlayer, 'SS-149-L', [apercuRevele(ssDrawnCard, true)]);
 
           const ssRemaining = (ssMeta.remaining ?? 1) - 1;
           const ssDrawnCount = (ssMeta.drawn ?? 0) + 1;

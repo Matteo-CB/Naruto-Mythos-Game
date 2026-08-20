@@ -1759,7 +1759,10 @@
       "dismiss": "Masquer"
     },
     "edgeToken": "Jeton Edge",
-    "edgeLocked": "Verrouillé"
+    "edgeLocked": "Verrouillé",
+    "publicReveal": {
+      "title": "{card} révèle"
+    }
   },
   "collection": {
     "title": "Collection de Cartes",

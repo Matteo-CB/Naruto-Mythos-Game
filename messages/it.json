@@ -3867,7 +3867,10 @@
       "dismiss": "Nascondi"
     },
     "edgeToken": "Token Vantaggio",
-    "edgeLocked": "Bloccato"
+    "edgeLocked": "Bloccato",
+    "publicReveal": {
+      "title": "{card} rivela"
+    }
   },
   "adminReveal": {
     "title": "Gestione rivelazione carte",

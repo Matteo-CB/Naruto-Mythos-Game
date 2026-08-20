@@ -3867,7 +3867,10 @@
       "dismiss": "Ocultar"
     },
     "edgeToken": "Ficha de Vantagem",
-    "edgeLocked": "Bloqueado"
+    "edgeLocked": "Bloqueado",
+    "publicReveal": {
+      "title": "{card} revela"
+    }
   },
   "adminReveal": {
     "title": "Gestão de revelação de cartas",

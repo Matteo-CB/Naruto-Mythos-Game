@@ -14,6 +14,7 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "feature",
         "feature",
         "feature",
@@ -22,6 +23,7 @@
         "feature"
       ],
       "changes_fr": [
+        "Les cartes qu un joueur retourne face visible, comme avec GAARA 046, s affichent aussi chez l adversaire.",
         "Un personnage sous BOMBE AVEUGLANTE 083 n a plus aucun effet à copier, aucun copieur ne le propose plus.",
         "Une page laissée ouverte pendant une mise à jour du site se recharge toute seule au lieu d afficher une erreur.",
         "Un joueur dont la partie a commencé ne peut plus perdre son match de tournoi pour absence.",
@@ -34,6 +36,7 @@
         "Chaque tournoi partenaire affiche maintenant sa propre affiche et ses propres conditions d entrée."
       ],
       "changes_en": [
+        "Cards a player turns face up, like with GAARA 046, are now shown on the opponent's screen too.",
         "A character under FLASH BOMB 083 has no effect left to copy, no copier offers it as a target any more.",
         "A page left open during a site update now reloads on its own instead of showing an error.",
         "A player whose game has started can no longer lose their tournament match for absence.",
@@ -46,6 +49,7 @@
         "Each partner tournament now shows its own poster and its own entry conditions."
       ],
       "changes_es": [
+        "Las cartas que un jugador pone boca arriba, como con GAARA 046, ahora también se ven en la pantalla del rival.",
         "Un personaje bajo BOMBA CEGADORA 083 ya no tiene ningún efecto que copiar, ningún copiador lo propone.",
         "Una página que quedó abierta durante una actualización del sitio ahora se recarga sola en vez de mostrar un error.",
         "Un jugador cuya partida ya ha empezado ya no puede perder su combate de torneo por ausencia.",
@@ -58,6 +62,7 @@
         "Cada torneo asociado muestra ahora su propio cartel y sus propias condiciones de entrada."
       ],
       "changes_pt": [
+        "As cartas que um jogador vira para cima, como com GAARA 046, passam a aparecer também no ecrã do adversário.",
         "Uma personagem sob BOMBA DE LUZ 083 deixa de ter efeitos para copiar, nenhum copiador a propõe.",
         "Uma página deixada aberta durante uma atualização do site passa a recarregar sozinha em vez de mostrar um erro.",
         "Um jogador cuja partida já começou deixa de poder perder o seu jogo de torneio por ausência.",
@@ -70,6 +75,7 @@
         "Cada torneio parceiro mostra agora o seu próprio cartaz e as suas próprias condições de entrada."
       ],
       "changes_it": [
+        "Le carte che un giocatore scopre, come con GAARA 046, ora compaiono anche sullo schermo dell avversario.",
         "Un personaggio sotto BOMBA ACCECANTE 083 non ha più effetti da copiare, nessun copiatore lo propone.",
         "Una pagina rimasta aperta durante un aggiornamento del sito ora si ricarica da sola invece di mostrare un errore.",
         "Un giocatore la cui partita è iniziata non può più perdere il suo incontro di torneo per assenza.",
@@ -82,6 +88,7 @@
         "Ogni torneo partner mostra ora la propria locandina e le proprie condizioni di ingresso."
       ],
       "changes_pl": [
+        "Karty odkrywane przez gracza, na przykład przy GAARA 046, pokazują się teraz także na ekranie przeciwnika.",
         "Postać z BOMBĄ BŁYSKOWĄ 083 nie ma już żadnego efektu do skopiowania, żaden kopiujący jej nie proponuje.",
         "Strona pozostawiona otwarta podczas aktualizacji serwisu odświeża się teraz sama zamiast pokazywać błąd.",
         "Gracz, którego partia już się zaczęła, nie może już przegrać meczu turniejowego przez nieobecność.",
@@ -94,6 +101,7 @@
         "Każdy turniej partnerski pokazuje teraz własny plakat i własne warunki wejścia."
       ],
       "changes_ja": [
+        "GAARA 046 などで表向きにしたカードが、相手の画面にも表示されるようになりました。",
         "閃光弾 083 を受けた忍にはコピーできる効果が残らず、コピー系のカードの対象にも出なくなりました。",
         "サイト更新中に開いたままだったページは、エラーを出さずに自動で再読み込みされるようになりました。",
         "対戦が始まったプレイヤーが、不在扱いで大会の試合を落とすことはなくなりました。",

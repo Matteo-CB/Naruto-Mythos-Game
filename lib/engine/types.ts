@@ -190,6 +190,7 @@ export interface GameState {
   endPhaseChakraReset?: boolean;
   missionPhaseShinigamiIds?: string[];
   peekedHiddenIds?: { player1: string[]; player2: string[] };
+  publicReveal?: PublicReveal | null;
   
   endPhaseGiantSpider103Ids?: string[];
   
@@ -378,6 +379,25 @@ export interface GameConfig {
 
 
 
+export interface RevealedCardPreview {
+  id: string;
+  name_fr: string;
+  name_en?: string;
+  title_fr?: string;
+  title_en?: string;
+  chakra: number;
+  power: number;
+  image_file?: string;
+  isMatch?: boolean;
+}
+
+export interface PublicReveal {
+  id: string;
+  player: PlayerID;
+  sourceCardId: string;
+  cards: RevealedCardPreview[];
+}
+
 export interface VisibleGameState {
   gameId: string;
   gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving';
@@ -399,6 +419,7 @@ export interface VisibleGameState {
   effectOrderResolved?: boolean;
   forfeitedBy?: PlayerID;
   firstStrike?: { player1: FirstStrikeStatus; player2: FirstStrikeStatus };
+  publicReveal?: PublicReveal | null;
 }
 
 export interface VisibleOpponentState {

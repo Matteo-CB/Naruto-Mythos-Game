@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import type { CardData, CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { annoncerRevelationPublique, apercuRevele } from '@/lib/effects/publicReveal';
 import { confirmFirst } from './confirmFirst';
 
 export const IBIKI_029 = 'SS-029-UC';
@@ -52,11 +53,13 @@ function ibiki029(ctx: EffectContext): EffectResult {
     };
   }
 
+  const avecRevelation = annoncerRevelationPublique(state, sourcePlayer, IBIKI_029, [apercuRevele(carte, true)]);
+
   const cibles = ennemisDuMemeNom(state, sourcePlayer, carte);
   if (cibles.length === 0) {
     return {
       state: {
-        ...state,
+        ...avecRevelation,
         log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
           'Ibiki Morino (029): no enemy character shares the name of the revealed card.',
           'game.log.effect.noTarget', { card: 'IBIKI MORINO', id: IBIKI_029 }),
@@ -65,7 +68,7 @@ function ibiki029(ctx: EffectContext): EffectResult {
   }
 
   return confirmFirst({
-    state,
+    state: avecRevelation,
     requiresTargetSelection: true,
     targetSelectionType: 'SS029_HIDE_SAME_NAME',
     validTargets: cibles.map((c) => c.instanceId),

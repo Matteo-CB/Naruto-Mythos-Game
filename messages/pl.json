@@ -3867,7 +3867,10 @@
       "dismiss": "Ukryj"
     },
     "edgeToken": "Żeton Przewagi",
-    "edgeLocked": "Zablokowany"
+    "edgeLocked": "Zablokowany",
+    "publicReveal": {
+      "title": "{card} odsłania"
+    }
   },
   "adminReveal": {
     "title": "Zarządzanie ujawnianiem kart",

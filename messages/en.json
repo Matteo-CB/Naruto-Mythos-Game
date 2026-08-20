@@ -1753,7 +1753,10 @@
       "dismiss": "Hide"
     },
     "edgeToken": "Edge Token",
-    "edgeLocked": "Locked"
+    "edgeLocked": "Locked",
+    "publicReveal": {
+      "title": "{card} reveals"
+    }
   },
   "collection": {
     "title": "Card Collection",

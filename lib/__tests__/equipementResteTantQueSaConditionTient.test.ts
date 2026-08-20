@@ -27,7 +27,7 @@ function pileDe(carteDuDessous: string): GameState {
   let s = buildSimState({
     p1: [simChar(carteDuDessous, { owner: 'player1', instanceId: 'hote' })],
     p2: [simChar('KS-106-R', { owner: 'player2', instanceId: 'kakashi' })],
-    missions: 2, chakra1: 30, chakra2: 30, edgeHolder: 'player1',
+    missions: 2, chakra1: 30, edgeHolder: 'player1',
   });
   s.phase = 'action';
   const hote = s.activeMissions[0].player1Characters[0];
@@ -90,7 +90,7 @@ describe('la regle vaut apres n importe quelle action, pas seulement apres ce re
     let s = buildSimState({
       p1: [simChar(SAKON_SON, { owner: 'player1', instanceId: 'hote' })],
       p2: [simChar(SAKURA_FEUILLE, { owner: 'player2', instanceId: 'temoin' })],
-      missions: 2, chakra1: 30, chakra2: 30, edgeHolder: 'player1',
+      missions: 2, chakra1: 30, edgeHolder: 'player1',
     });
     s.phase = 'action';
     s = attachCardToCharacter(s, 'player1', getCardById(EPEE_SERPENT) as CardData, 'hote');

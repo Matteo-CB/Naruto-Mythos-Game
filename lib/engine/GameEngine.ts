@@ -1928,6 +1928,7 @@ export class GameEngine {
       effectOrderResolved: (state as any).effectOrderResolved ?? false,
       forfeitedBy: state.forfeitedBy,
       firstStrike: state.firstStrike,
+      publicReveal: state.publicReveal ?? null,
     };
   }
 
