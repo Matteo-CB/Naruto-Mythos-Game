@@ -353,6 +353,7 @@ model SiteSettings {
   variantObtentionConfig Json?
   featuredMenuCards      Json?
   nwlLeaderboard         Json?
+  nwlChuninSeed          Json?
 }
 
 // A card from a "revealing" set that an admin has explicitly HIDDEN (not yet revealed).

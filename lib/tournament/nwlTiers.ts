@@ -1,9 +1,11 @@
 import { prisma } from '@/lib/db/prisma';
 import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
 import { parisDateParts, parisWallToUtc } from '@/lib/tournament/dailyTournament';
+import { NWL_REG_OPEN_HOUR } from '@/lib/tournament/nwlFridayTournament';
 import { findTournamentOwner } from '@/lib/tournament/tournamentOwner';
 import {
   NWL_CHUNIN_ROLE_ID,
+  NWL_CHUNIN_SUBSCRIBER_ROLE_ID,
   NWL_KAGE_ROLE_ID,
   NWL_ANNOUNCE_CHANNEL_ID,
   NWL_LEADERBOARD_CHANNEL_ID,
@@ -14,7 +16,7 @@ import {
   nwlPostMessage,
   nwlEditMessage,
   nwlSendDirectMessage,
-  checkNwlRole,
+  checkNwlAnyRole,
   grantNwlRole,
   revokeNwlRole,
   NWL_NARUTO_MYTHOS_ROLE_ID,
@@ -41,7 +43,7 @@ export const NWL_KAGE_WEEKDAY = 0;
 
 export const NWL_CHUNIN_START_HOUR = 22;
 export const NWL_KAGE_START_HOUR = 21;
-export const NWL_TIER_CODE_LEAD_HOURS = 12;
+export const NWL_TIER_LEAD_HOURS = NWL_START_HOUR - NWL_REG_OPEN_HOUR;
 
 export const NWL_CHUNIN_MAX_PLAYERS = 32;
 export const NWL_KAGE_MAX_PLAYERS = 8;
@@ -52,6 +54,8 @@ export const NWL_POINTS_PER_LOSS = 1;
 export const NWL_CHUNIN_STORE_CREDIT_GBP = 50;
 
 export const NWL_HEURE_SYNCHRO_KAGE = 12;
+
+const CLE_REGLAGES = 'global';
 
 export function estPremierDimancheDuMois(annee: number, mois: number, jour: number): boolean {
   if (jour > 7) return false;
@@ -108,7 +112,7 @@ async function creerTournoiPrive(
   const p = parisDateParts(now);
   if (!jourValide(p)) return { created: false, reason: 'wrong_day' };
 
-  const ouverture = spec.startHour - NWL_TIER_CODE_LEAD_HOURS;
+  const ouverture = spec.startHour - NWL_TIER_LEAD_HOURS;
   if (p.hour < Math.max(0, ouverture) || p.hour >= spec.startHour) {
     return { created: false, reason: 'outside_window' };
   }
@@ -169,7 +173,7 @@ export async function createNwlKageTournamentIfNeeded(now: Date = new Date()): P
 }
 
 export interface NwlStandingEntry {
-  userId: string;
+  userId: string | null;
   username: string;
   discordId: string | null;
   wins: number;
@@ -199,49 +203,120 @@ export function bornesDuMoisPrecedent(now: Date): { debut: Date; fin: Date } {
   return { debut, fin };
 }
 
+export interface GraineChunin {
+  userId: string | null;
+  username: string;
+  discordId: string | null;
+  wins: number;
+  losses: number;
+}
+
+export function cleDuMois(instant: Date): string {
+  const p = parisDateParts(instant);
+  return `${p.year}-${String(p.month).padStart(2, '0')}`;
+}
+
+export async function lireGraineChunin(cle: string): Promise<GraineChunin[]> {
+  const reglages = await prisma.siteSettings.findUnique({
+    where: { key: CLE_REGLAGES },
+    select: { nwlChuninSeed: true },
+  });
+  const brut = reglages?.nwlChuninSeed as Record<string, GraineChunin[]> | null | undefined;
+  const mois = brut?.[cle];
+  return Array.isArray(mois) ? mois : [];
+}
+
+export async function ecrireGraineChunin(cle: string, entrees: GraineChunin[]): Promise<void> {
+  const reglages = await prisma.siteSettings.findUnique({
+    where: { key: CLE_REGLAGES },
+    select: { nwlChuninSeed: true },
+  });
+  const brut = (reglages?.nwlChuninSeed as Record<string, GraineChunin[]> | null | undefined) ?? {};
+  const valeur = JSON.parse(JSON.stringify({ ...brut, [cle]: entrees }));
+  await prisma.siteSettings.upsert({
+    where: { key: CLE_REGLAGES },
+    update: { nwlChuninSeed: valeur },
+    create: { key: CLE_REGLAGES, nwlChuninSeed: valeur },
+  });
+}
+
+interface CompteChunin {
+  userId: string | null;
+  username: string;
+  discordId: string | null;
+  wins: number;
+  losses: number;
+}
+
 export async function chuninStandings(debut: Date, fin: Date): Promise<NwlStandingEntry[]> {
+  const compte = new Map<string, CompteChunin>();
+  const cleDe = (userId: string | null, username: string) => userId ?? `nom:${username.toLowerCase()}`;
+
+  for (const graine of await lireGraineChunin(cleDuMois(debut))) {
+    const cle = cleDe(graine.userId, graine.username);
+    compte.set(cle, {
+      userId: graine.userId,
+      username: graine.username,
+      discordId: graine.discordId,
+      wins: Math.max(0, graine.wins),
+      losses: Math.max(0, graine.losses),
+    });
+  }
+
   const tournois = await prisma.tournament.findMany({
     where: { partner: NWL_CHUNIN_PARTNER_KEY, scheduledStartAt: { gte: debut, lt: fin } },
     select: { id: true },
   });
-  if (tournois.length === 0) return [];
-  const ids = tournois.map((t) => t.id);
 
-  const matchs = await prisma.tournamentMatch.findMany({
-    where: { tournamentId: { in: ids }, status: 'completed' },
-    select: { player1Id: true, player2Id: true, winnerId: true },
-  });
+  if (tournois.length > 0) {
+    const ids = tournois.map((t) => t.id);
+    const matchs = await prisma.tournamentMatch.findMany({
+      where: { tournamentId: { in: ids }, status: 'completed' },
+      select: { player1Id: true, player2Id: true, winnerId: true },
+    });
 
-  const compte = new Map<string, { wins: number; losses: number }>();
-  const ajoute = (userId: string | null | undefined, gagne: boolean) => {
-    if (!userId) return;
-    const c = compte.get(userId) ?? { wins: 0, losses: 0 };
-    if (gagne) c.wins += 1; else c.losses += 1;
-    compte.set(userId, c);
-  };
-  for (const m of matchs) {
-    if (!m.winnerId) continue;
-    ajoute(m.player1Id, m.player1Id === m.winnerId);
-    ajoute(m.player2Id, m.player2Id === m.winnerId);
+    const joues = new Map<string, { wins: number; losses: number }>();
+    const ajoute = (userId: string | null | undefined, gagne: boolean) => {
+      if (!userId) return;
+      const c = joues.get(userId) ?? { wins: 0, losses: 0 };
+      if (gagne) c.wins += 1; else c.losses += 1;
+      joues.set(userId, c);
+    };
+    for (const m of matchs) {
+      if (!m.winnerId) continue;
+      ajoute(m.player1Id, m.player1Id === m.winnerId);
+      ajoute(m.player2Id, m.player2Id === m.winnerId);
+    }
+
+    if (joues.size > 0) {
+      const joueurs = await prisma.user.findMany({
+        where: { id: { in: [...joues.keys()] } },
+        select: { id: true, username: true, discordId: true },
+      });
+      for (const u of joueurs) {
+        const c = joues.get(u.id)!;
+        const existant = compte.get(u.id);
+        compte.set(u.id, {
+          userId: u.id,
+          username: u.username,
+          discordId: u.discordId ?? null,
+          wins: (existant?.wins ?? 0) + c.wins,
+          losses: (existant?.losses ?? 0) + c.losses,
+        });
+      }
+    }
   }
+
   if (compte.size === 0) return [];
 
-  const joueurs = await prisma.user.findMany({
-    where: { id: { in: [...compte.keys()] } },
-    select: { id: true, username: true, discordId: true },
-  });
-
-  const entrees: NwlStandingEntry[] = joueurs.map((u) => {
-    const c = compte.get(u.id) ?? { wins: 0, losses: 0 };
-    return {
-      userId: u.id,
-      username: u.username,
-      discordId: u.discordId ?? null,
-      wins: c.wins,
-      losses: c.losses,
-      points: pointsDe(c.wins, c.losses),
-    };
-  });
+  const entrees: NwlStandingEntry[] = [...compte.values()].map((c) => ({
+    userId: c.userId,
+    username: c.username,
+    discordId: c.discordId,
+    wins: c.wins,
+    losses: c.losses,
+    points: pointsDe(c.wins, c.losses),
+  }));
 
   entrees.sort((a, b) => b.points - a.points || b.wins - a.wins || a.username.localeCompare(b.username));
   return entrees;
@@ -263,7 +338,11 @@ export function texteCodeAcces(nom: string, code: string, heureParis: number): s
 }
 
 export async function diffuserCodeChunin(code: string): Promise<{ mp: number; salon: boolean }> {
-  const porteurs = (await listNwlChuninHolders()) ?? [];
+  const hebdomadaires = (await listNwlChuninHolders()) ?? [];
+  const abonnes = NWL_CHUNIN_SUBSCRIBER_ROLE_ID
+    ? ((await listNwlRoleHolders(NWL_CHUNIN_SUBSCRIBER_ROLE_ID)) ?? [])
+    : [];
+  const porteurs = [...new Set([...hebdomadaires, ...abonnes])];
   let mp = 0;
   for (const discordId of porteurs) {
     const ok = await nwlSendDirectMessage(discordId, texteCodeAcces(NWL_CHUNIN_TOURNAMENT_NAME, code, NWL_CHUNIN_START_HOUR));
@@ -295,7 +374,6 @@ export async function diffuserCodeKage(code: string, now: Date = new Date()): Pr
   return { mp, salon: salon !== null };
 }
 
-const CLE_REGLAGES = 'global';
 
 export function formaterClassement(entrees: NwlStandingEntry[], titre: string): string {
   if (entrees.length === 0) {
@@ -409,7 +487,15 @@ export async function annoncerOuvertureGenin(): Promise<boolean> {
 
 export async function synchroniserRoleKage(now: Date = new Date()): Promise<{ ajoutes: number; retires: number } | null> {
   const qualifies = await kageQualifiers(now);
+  if (qualifies.length === 0) {
+    console.log('[NWL] aucun qualifie pour le mois ecoule, le role Kage est laisse tel quel');
+    return { ajoutes: 0, retires: 0 };
+  }
   const attendus = new Set(qualifies.map((q) => q.discordId).filter((d): d is string => !!d));
+  if (attendus.size === 0) {
+    console.log('[NWL] aucun qualifie avec un Discord lie, le role Kage est laisse tel quel');
+    return { ajoutes: 0, retires: 0 };
+  }
   const porteurs = await listNwlRoleHolders(NWL_KAGE_ROLE_ID);
   if (porteurs === null) return null;
 
@@ -488,10 +574,16 @@ export async function cloturerPalierNwl(tournamentId: string): Promise<boolean> 
   return true;
 }
 
+export function rolesAcceptesPourPalier(partner: string | null | undefined): string[] {
+  if (partner === NWL_CHUNIN_PARTNER_KEY) {
+    return [NWL_CHUNIN_ROLE_ID, NWL_CHUNIN_SUBSCRIBER_ROLE_ID].filter(Boolean);
+  }
+  if (partner === NWL_KAGE_PARTNER_KEY) return [NWL_KAGE_ROLE_ID];
+  return [];
+}
+
 export function roleRequisPourPalier(partner: string | null | undefined): string | null {
-  if (partner === NWL_CHUNIN_PARTNER_KEY) return NWL_CHUNIN_ROLE_ID;
-  if (partner === NWL_KAGE_PARTNER_KEY) return NWL_KAGE_ROLE_ID;
-  return null;
+  return rolesAcceptesPourPalier(partner)[0] ?? null;
 }
 
 export interface RefusPalierNwl {
@@ -505,12 +597,12 @@ export async function refuserSiPalierNwlInterdit(
   partner: string | null | undefined,
   discordId: string | null | undefined,
 ): Promise<RefusPalierNwl | null> {
-  const role = roleRequisPourPalier(partner);
-  if (!role) return null;
+  const roles = rolesAcceptesPourPalier(partner);
+  if (roles.length === 0) return null;
   if (!discordId) {
     return { errorKey: 'tournament.error.linkDiscord', error: 'Link your Discord account first', status: 403 };
   }
-  const verdict = await checkNwlRole(discordId, role);
+  const verdict = await checkNwlAnyRole(discordId, roles);
   if (verdict === 'not_member') {
     return {
       errorKey: 'tournament.error.nwlNotMember',

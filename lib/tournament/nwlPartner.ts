@@ -9,6 +9,7 @@ const DISCORD_API = 'https://discord.com/api/v10';
 export const NWL_PARTNER_KEY = 'nwl';
 export const NWL_GUILD_ID = '1396218672858534080';
 export const NWL_CHUNIN_ROLE_ID = '1504440900783308820';
+export const NWL_CHUNIN_SUBSCRIBER_ROLE_ID = '';
 export const NWL_TAG_CHANNEL_ID = '1396218674486055023';
 export const NWL_INVITE_URL = 'https://discord.gg/UXQX8McFD3';
 export const NWL_APP_ID = '1530185831841534048';
@@ -94,14 +95,23 @@ export async function checkNwlRole(
   discordId: string | null | undefined,
   roleId: string,
 ): Promise<NwlRoleCheck> {
+  return checkNwlAnyRole(discordId, [roleId]);
+}
+
+export async function checkNwlAnyRole(
+  discordId: string | null | undefined,
+  roleIds: string[],
+): Promise<NwlRoleCheck> {
   if (!discordId) return 'not_member';
+  const attendus = roleIds.filter(Boolean);
+  if (attendus.length === 0) return 'no_role';
   const res = await nwlApi(`/guilds/${NWL_GUILD_ID}/members/${discordId}`);
   if (!res) return 'unavailable';
   if (res.status === 404) return 'not_member';
   if (res.status !== 200) return 'unavailable';
   const membre = (await res.json().catch(() => null)) as { roles?: string[] } | null;
   if (!membre || !Array.isArray(membre.roles)) return 'unavailable';
-  return membre.roles.includes(roleId) ? 'has_role' : 'no_role';
+  return attendus.some((r) => membre.roles!.includes(r)) ? 'has_role' : 'no_role';
 }
 
 export async function grantNwlRole(

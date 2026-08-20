@@ -11,7 +11,10 @@ import {
   NWL_KAGE_MAX_PLAYERS,
   NWL_POINTS_PER_WIN,
   NWL_POINTS_PER_LOSS,
+  NWL_TIER_LEAD_HOURS,
 } from '@/lib/tournament/nwlTiers';
+import { NWL_REG_OPEN_HOUR } from '@/lib/tournament/nwlFridayTournament';
+import { NWL_START_HOUR } from '@/lib/tournament/nwlPartner';
 
 describe('les horaires suivent les affiches', () => {
   it('le Chunin part a 21h britannique, soit 22h a Paris', () => {
@@ -75,3 +78,15 @@ describe('le message de code reste discret et complet', () => {
     expect(texte.toLowerCase()).toContain('private');
   });
 });
+
+describe('les inscriptions ouvrent aussi longtemps avant que pour le tournoi du vendredi', () => {
+  it('le delai entre ouverture et depart est le meme que celui du Genin', () => {
+    expect(NWL_TIER_LEAD_HOURS).toBe(NWL_START_HOUR - NWL_REG_OPEN_HOUR);
+    expect(NWL_TIER_LEAD_HOURS, 'huit heures, comme le vendredi').toBe(8);
+  });
+
+  it('les trois tournois ouvrent donc a la meme distance de leur depart', () => {
+    expect(NWL_CHUNIN_START_HOUR - NWL_TIER_LEAD_HOURS, 'Chunin ouvert des 14h a Paris').toBe(14);
+    expect(NWL_KAGE_START_HOUR - NWL_TIER_LEAD_HOURS, 'Kage ouvert des 13h a Paris').toBe(13);
+  });
+})

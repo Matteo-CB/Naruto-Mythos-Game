@@ -6,7 +6,7 @@ vi.mock('@/lib/tournament/nwlPartner', async (importOriginal) => {
   const reel = await importOriginal<typeof import('@/lib/tournament/nwlPartner')>();
   return {
     ...reel,
-    checkNwlRole: (discordId: string | null | undefined, roleId: string) => verdictRole(discordId, roleId),
+    checkNwlAnyRole: (discordId: string | null | undefined, roleIds: string[]) => verdictRole(discordId, roleIds),
   };
 });
 
@@ -53,7 +53,7 @@ describe('acces aux tournois prives Chunin et Kage', () => {
   it('laisse entrer le porteur du role', async () => {
     verdictRole.mockResolvedValue('has_role');
     expect(await refuserSiPalierNwlInterdit(NWL_CHUNIN_PARTNER_KEY, '42')).toBeNull();
-    expect(verdictRole).toHaveBeenCalledWith('42', NWL_CHUNIN_ROLE_ID);
+    expect(verdictRole).toHaveBeenCalledWith('42', [NWL_CHUNIN_ROLE_ID]);
   });
 
   it('refuse le joueur sans le role, avec un message propre a chaque palier', async () => {
@@ -64,7 +64,7 @@ describe('acces aux tournois prives Chunin et Kage', () => {
 
     const kage = await refuserSiPalierNwlInterdit(NWL_KAGE_PARTNER_KEY, '42');
     expect(kage?.errorKey).toBe('tournament.error.nwlNoKageRole');
-    expect(verdictRole).toHaveBeenLastCalledWith('42', NWL_KAGE_ROLE_ID);
+    expect(verdictRole).toHaveBeenLastCalledWith('42', [NWL_KAGE_ROLE_ID]);
   });
 
   it('renvoie le lien du serveur au joueur qui n en est pas membre', async () => {
@@ -111,5 +111,24 @@ describe('classement mensuel Chunin', () => {
 
   it('dit clairement quand aucun match n a encore ete joue', () => {
     expect(formaterClassement([], 'Chunin standings')).toContain('No match played yet');
+  });
+});
+
+describe('le role paye du Chunin', () => {
+  it('la liste des roles acceptes est prete a accueillir un role d abonne', async () => {
+    const { rolesAcceptesPourPalier } = await import('@/lib/tournament/nwlTiers');
+    const { NWL_CHUNIN_SUBSCRIBER_ROLE_ID } = await import('@/lib/tournament/nwlPartner');
+    const acceptes = rolesAcceptesPourPalier(NWL_CHUNIN_PARTNER_KEY);
+    expect(acceptes, 'le role hebdomadaire est toujours accepte').toContain(NWL_CHUNIN_ROLE_ID);
+    expect(
+      acceptes.length,
+      'tant que New World Loot n a pas cree le role d abonne, seul l hebdomadaire compte',
+    ).toBe(NWL_CHUNIN_SUBSCRIBER_ROLE_ID ? 2 : 1);
+    expect(acceptes.every(Boolean), 'aucun identifiant vide ne part vers Discord').toBe(true);
+  });
+
+  it('le Kage ne s ouvre jamais avec un role de Chunin', async () => {
+    const { rolesAcceptesPourPalier } = await import('@/lib/tournament/nwlTiers');
+    expect(rolesAcceptesPourPalier(NWL_KAGE_PARTNER_KEY)).toEqual([NWL_KAGE_ROLE_ID]);
   });
 });
