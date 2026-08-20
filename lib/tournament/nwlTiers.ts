@@ -57,6 +57,8 @@ export const NWL_RAPPEL_HEURES = 2;
 
 export const NWL_CHUNIN_MAX_PLAYERS = 32;
 export const NWL_KAGE_MAX_PLAYERS = 8;
+export const NWL_KAGE_STANDINGS_SLOTS = 7;
+export const NWL_KAGE_BEST_OF = 3;
 
 export const NWL_POINTS_PER_WIN = 3;
 export const NWL_POINTS_PER_LOSS = 1;
@@ -86,6 +88,7 @@ interface SpecPalier {
   maxPlayers: number;
   startHour: number;
   leadHours: number;
+  bestOf: number;
   note: string;
 }
 
@@ -95,6 +98,7 @@ const SPEC_CHUNIN: SpecPalier = {
   maxPlayers: NWL_CHUNIN_MAX_PLAYERS,
   startHour: NWL_CHUNIN_START_HOUR,
   leadHours: NWL_TIER_LEAD_HOURS,
+  bestOf: 1,
   note: [
     'New World Loot weekly Saturday tournament, reserved to players holding the Chunin role.',
     `Rewards. First place wins £${NWL_CHUNIN_STORE_CREDIT_GBP} of store credit, offered by New World Loot.`,
@@ -107,12 +111,13 @@ const SPEC_CHUNIN: SpecPalier = {
 const SPEC_KAGE: SpecPalier = {
   partnerKey: NWL_KAGE_PARTNER_KEY,
   name: NWL_KAGE_TOURNAMENT_NAME,
-  maxPlayers: NWL_KAGE_MAX_PLAYERS + 1,
+  maxPlayers: NWL_KAGE_MAX_PLAYERS,
   startHour: NWL_KAGE_START_HOUR,
   leadHours: NWL_KAGE_LEAD_HOURS,
+  bestOf: NWL_KAGE_BEST_OF,
   note: [
-    'New World Loot monthly tournament, reserved to the eight best players of last month Chunin standings, plus the reigning champion who defends the title.',
-    'Rewards. First place wins a sealed box of Naruto Mythos, offered by New World Loot.',
+    `New World Loot monthly tournament, best of ${NWL_KAGE_BEST_OF}, reserved to the ${NWL_KAGE_STANDINGS_SLOTS} best players of last month Chunin standings, plus the reigning champion who defends the title.`,
+    'Rewards. First place wins a sealed box of Naruto Mythos, offered by New World Loot, and keeps the Kage role.',
     `Entry is private: the join code is sent to the eight qualified players on the New World Loot Discord server: ${NWL_INVITE_URL}`,
   ].join(' '),
 };
@@ -160,6 +165,7 @@ async function creerTournoiPrive(
       creatorUsername: admin.username,
       requiresDiscord: true,
       useBanList: true,
+      bestOf: spec.bestOf,
       restrictionNote: spec.note,
       partner: spec.partnerKey,
       scheduledStartAt,
@@ -372,10 +378,11 @@ export async function championKageEnTitre(now: Date = new Date()): Promise<NwlSt
 
 export async function kageQualifiers(now: Date = new Date()): Promise<NwlStandingEntry[]> {
   const { debut, fin } = bornesDuMoisPrecedent(now);
-  const classement = (await chuninStandings(debut, fin)).slice(0, NWL_KAGE_MAX_PLAYERS);
+  const complet = await chuninStandings(debut, fin);
   const champion = await championKageEnTitre(now);
-  if (!champion) return classement;
-  return [champion, ...classement.filter((e) => e.userId !== champion.userId)];
+  if (!champion) return complet.slice(0, NWL_KAGE_MAX_PLAYERS);
+  const sansChampion = complet.filter((e) => e.userId !== champion.userId);
+  return [champion, ...sansChampion.slice(0, NWL_KAGE_STANDINGS_SLOTS)];
 }
 
 export async function grainePourKage(userId: string, now: Date = new Date()): Promise<number | null> {
@@ -424,7 +431,7 @@ export async function diffuserCodeKage(code: string, now: Date = new Date()): Pr
       texteCodeAcces(
         NWL_KAGE_TOURNAMENT_NAME, code, NWL_KAGE_START_HOUR,
         `**${NWL_KAGE_TOURNAMENT_NAME}**
-You have made it in the Top ${NWL_KAGE_MAX_PLAYERS}.`,
+You have made it in the Top ${NWL_KAGE_STANDINGS_SLOTS}.`,
       ),
     );
     if (ok) mp += 1;
@@ -449,7 +456,7 @@ export function formaterClassement(entrees: NwlStandingEntry[], titre: string): 
     const rang = `${i + 1}`.padStart(2, ' ');
     return `\`${rang}.\` **${e.username}** : ${e.points} pts (${e.wins}W / ${e.losses}L)`;
   });
-  const haut = entrees.slice(0, NWL_KAGE_MAX_PLAYERS).length;
+  const haut = entrees.slice(0, NWL_KAGE_STANDINGS_SLOTS).length;
   return [
     `**${titre}**`,
     ...lignes,
@@ -568,7 +575,7 @@ export async function standingsPourJonin(now: Date = new Date()): Promise<NwlSta
   const kageDejaJoue = await kageDuMoisJoue(now);
   const bornes = kageDejaJoue ? bornesDuMois(now) : bornesDuMoisPrecedent(now);
   const classement = await chuninStandings(bornes.debut, bornes.fin);
-  return classement.slice(0, NWL_KAGE_MAX_PLAYERS);
+  return classement.slice(0, NWL_KAGE_STANDINGS_SLOTS);
 }
 
 async function kageDuMoisJoue(now: Date): Promise<boolean> {
@@ -766,7 +773,7 @@ export async function refuserSiPalierNwlInterdit(
     if (qualifies.some((q) => q.discordId === discordId)) return null;
     return {
       errorKey: 'tournament.error.nwlNoKageRole',
-      error: 'This tournament is reserved to the eight players who qualified last month',
+      error: 'This tournament is reserved to the players who qualified last month and to the reigning champion',
       status: 403,
       inviteUrl: NWL_INVITE_URL,
     };
@@ -894,6 +901,7 @@ export async function creerChuninApresGenin(now: Date = new Date()): Promise<Nwl
       creatorUsername: admin.username,
       requiresDiscord: true,
       useBanList: true,
+      bestOf: SPEC_CHUNIN.bestOf,
       restrictionNote: SPEC_CHUNIN.note,
       partner: NWL_CHUNIN_PARTNER_KEY,
       scheduledStartAt,
@@ -939,10 +947,10 @@ export async function rappelerLeTopHuit(now: Date = new Date()): Promise<{ envoy
     return `\`${String(i + 1).padStart(2, ' ')}.\` ${qui} ${e.points} pts`;
   });
   const texte = [
-    `**Top ${NWL_KAGE_MAX_PLAYERS} heading to the ${NWL_KAGE_TOURNAMENT_NAME}**`,
+    `**Top ${NWL_KAGE_STANDINGS_SLOTS} heading to the ${NWL_KAGE_TOURNAMENT_NAME}**`,
     ...lignes,
     '',
-    'They hold the Jonin role. Win Chunin matches this week to take their place.',
+    'They hold the Jonin role and join the reigning Kage champion at the next monthly tournament. Win Chunin matches this week to take their place.',
   ].join('\n');
 
   const poste = await nwlPostMessage(

@@ -27,6 +27,7 @@ const {
   NWL_CHUNIN_PARTNER_KEY,
   NWL_KAGE_PARTNER_KEY,
   NWL_KAGE_MAX_PLAYERS,
+  NWL_KAGE_STANDINGS_SLOTS,
 } = await import('@/lib/tournament/nwlTiers');
 const { NWL_CHUNIN_ROLE_ID } = await import('@/lib/tournament/nwlPartner');
 
@@ -150,7 +151,7 @@ describe('classement mensuel Chunin', () => {
     ).toContain('The top player qualifies');
   });
 
-  it('ne plafonne le nombre de qualifies qu au nombre de places Kage', () => {
+  it('ne plafonne le nombre de qualifies qu au nombre de places du classement', () => {
     const entrees = Array.from({ length: NWL_KAGE_MAX_PLAYERS + 4 }, (_, i) => ({
       userId: `u${i}`,
       username: `Joueur${i}`,
@@ -159,7 +160,7 @@ describe('classement mensuel Chunin', () => {
       losses: 0,
       points: (10 - i) * 3,
     }));
-    expect(formaterClassement(entrees, 'Chunin standings')).toContain(`The top ${NWL_KAGE_MAX_PLAYERS} qualify`);
+    expect(formaterClassement(entrees, 'Chunin standings')).toContain(`The top ${NWL_KAGE_STANDINGS_SLOTS} qualify`);
   });
 
   it('dit clairement quand aucun match n a encore ete joue', () => {
@@ -221,5 +222,36 @@ describe('le Kage ne s ouvre qu aux qualifies du mois ecoule', () => {
     bd.siteSettings.findUnique.mockResolvedValue({ nwlChuninSeed: {} } as never);
     const refus = await refuserSiPalierNwlInterdit(NWL_KAGE_PARTNER_KEY, 'nimporte-qui');
     expect(refus?.errorKey, 'un classement vide ne laisse pas la porte ouverte').toBe('tournament.error.nwlNoKageRole');
+  });
+});
+
+describe('le Kage se joue a huit, sept qualifies et le champion', () => {
+  it('le tournoi ouvre huit places et se joue au meilleur des trois', async () => {
+    const { NWL_KAGE_MAX_PLAYERS: places, NWL_KAGE_STANDINGS_SLOTS: qualifies, NWL_KAGE_BEST_OF: manches } =
+      await import('@/lib/tournament/nwlTiers');
+    expect(places, 'huit joueurs sur l affiche').toBe(8);
+    expect(qualifies, 'sept viennent du classement').toBe(7);
+    expect(qualifies + 1, 'le champion complete le tableau').toBe(places);
+    expect(manches, 'au meilleur des trois').toBe(3);
+  });
+
+  it('sans champion en titre, le classement remplit les huit places', async () => {
+    graineKage(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
+    bd.tournament.findFirst.mockResolvedValue(null as never);
+    const { kageQualifiers } = await import('@/lib/tournament/nwlTiers');
+    const liste = await kageQualifiers();
+    expect(liste.length, 'huit joueurs quand personne ne defend son titre').toBe(8);
+  });
+
+  it('avec un champion en titre, il prend la premiere place et sept qualifies suivent', async () => {
+    graineKage(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
+    bd.tournament.findFirst.mockResolvedValue({ winnerId: 'champion', winnerUsername: 'Champion' } as never);
+    bd.user.findUnique = vi.fn(async () => ({ id: 'champion', username: 'Champion', discordId: 'champion-discord' })) as never;
+
+    const { kageQualifiers } = await import('@/lib/tournament/nwlTiers');
+    const liste = await kageQualifiers();
+    expect(liste.length, 'toujours huit joueurs').toBe(8);
+    expect(liste[0].userId, 'le champion ouvre la liste').toBe('champion');
+    bd.tournament.findFirst.mockResolvedValue(null as never);
   });
 });

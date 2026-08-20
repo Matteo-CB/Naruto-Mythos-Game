@@ -27,7 +27,7 @@ describe('les horaires suivent les affiches', () => {
 
   it('les tailles annoncees sont respectees', () => {
     expect(NWL_CHUNIN_MAX_PLAYERS, '32 joueurs le samedi').toBe(32);
-    expect(NWL_KAGE_MAX_PLAYERS, 'les 8 meilleurs Chunin').toBe(8);
+    expect(NWL_KAGE_MAX_PLAYERS, 'huit joueurs sur l affiche').toBe(8);
   });
 });
 
