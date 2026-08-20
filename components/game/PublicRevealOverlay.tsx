@@ -38,7 +38,7 @@ export function PublicRevealOverlay() {
     }
     if (!revelation || revelation.id === dernierIdVu.current) return;
     dernierIdVu.current = revelation.id;
-    if (monCamp && revelation.player === monCamp) return;
+    if (monCamp && revelation.player === monCamp && !revelation.montrerALaSource) return;
     setAffichee(revelation);
   }, [revelation, monCamp]);
 

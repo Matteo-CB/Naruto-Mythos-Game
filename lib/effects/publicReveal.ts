@@ -20,6 +20,7 @@ export function annoncerRevelationPublique(
   player: PlayerID,
   sourceCardId: string,
   cards: RevealedCardPreview[],
+  montrerALaSource = false,
 ): GameState {
   if (cards.length === 0) return state;
   const revelation: PublicReveal = {
@@ -27,6 +28,7 @@ export function annoncerRevelationPublique(
     player,
     sourceCardId,
     cards,
+    montrerALaSource,
   };
   return { ...state, publicReveal: revelation };
 }

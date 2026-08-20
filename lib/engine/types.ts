@@ -396,6 +396,7 @@ export interface PublicReveal {
   player: PlayerID;
   sourceCardId: string;
   cards: RevealedCardPreview[];
+  montrerALaSource?: boolean;
 }
 
 export interface VisibleGameState {

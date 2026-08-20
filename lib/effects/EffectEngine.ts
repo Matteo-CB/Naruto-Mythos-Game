@@ -12180,7 +12180,7 @@ export class EffectEngine {
         newState = annoncerRevelationPublique(newState, s046P, 'SS-046-UC', [
           ...s046Revealed.map((c) => apercuRevele(c)),
           apercuRevele(s046Drawn, true),
-        ]);
+        ], true);
         break;
       }
 

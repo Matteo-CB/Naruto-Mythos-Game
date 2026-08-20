@@ -107,3 +107,56 @@ describe('l annonce de revelation publique est un outil generique', () => {
     expect(typeof apercu.power).toBe('number');
   });
 });
+
+describe('la carte du Sable trouvee est montree, meme quand rien n a ete retourne avant elle', () => {
+  function plateauSableEnTete(): GameState {
+    const state = buildSimState({
+      p2: [simChar(FEUILLE_A, { owner: 'player2', instanceId: 'temoin' })],
+      missions: 2, chakra1: 40, edgeHolder: 'player1',
+    });
+    state.phase = 'action';
+    state.activePlayer = 'player1';
+    state.player1.hand = [getCardById(GAARA_046) as CharacterCard];
+    state.player1.deck = [
+      getCardById(SABLE) as CharacterCard,
+      getCardById(FEUILLE_A) as CharacterCard,
+    ];
+    return state;
+  }
+
+  function joue(depart: GameState): GameState {
+    let courant = GameEngine.applyAction(depart, 'player1', {
+      type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0,
+    } as never);
+    let garde = 0;
+    while (courant.pendingActions.length > 0 && garde < 10) {
+      const question = courant.pendingActions[0];
+      courant = GameEngine.applyAction(courant, question.player, {
+        type: 'SELECT_TARGET', pendingActionId: question.id, selectedTargets: [question.options[0]],
+      } as never);
+      garde += 1;
+    }
+    return courant;
+  }
+
+  it('une seule carte annoncee, celle qui part en main, et elle est mise en avant', () => {
+    const apres = joue(plateauSableEnTete());
+    expect(apres.publicReveal!.cards.map((c) => c.id)).toEqual([SABLE]);
+    expect(apres.publicReveal!.cards[0].isMatch).toBe(true);
+    expect(
+      apres.player1.hand.some((c) => c.id === SABLE),
+      'la carte annoncee est bien celle qui rejoint la main',
+    ).toBe(true);
+  });
+
+  it('celui qui revele voit lui aussi le bandeau, car rien d autre ne lui montre ces cartes', () => {
+    const apres = joueEtConfirme();
+    expect(apres.publicReveal!.montrerALaSource).toBe(true);
+  });
+
+  it('une fouille de deck ne rejoue pas le bandeau chez celui qui vient de choisir dans sa liste', () => {
+    const base = plateauGaara();
+    const fouille = annoncerRevelationPublique(base, 'player1', 'SS-004-UC', [apercuRevele(getCardById(SABLE) as CardData, true)]);
+    expect(fouille.publicReveal!.montrerALaSource).toBe(false);
+  });
+});
