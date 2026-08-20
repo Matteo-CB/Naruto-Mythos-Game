@@ -6,7 +6,9 @@ import { findTournamentOwner } from '@/lib/tournament/tournamentOwner';
 import {
   NWL_CHUNIN_ROLE_ID,
   NWL_CHUNIN_SUBSCRIBER_ROLE_ID,
+  NWL_JONIN_ROLE_ID,
   NWL_KAGE_ROLE_ID,
+  NWL_KAGE_CHAMPIONS_MAX,
   NWL_ANNOUNCE_CHANNEL_ID,
   NWL_LEADERBOARD_CHANNEL_ID,
   NWL_MOD_CHANNEL_ID,
@@ -485,31 +487,84 @@ export async function annoncerOuvertureGenin(): Promise<boolean> {
   return ref !== null;
 }
 
-export async function synchroniserRoleKage(now: Date = new Date()): Promise<{ ajoutes: number; retires: number } | null> {
-  const qualifies = await kageQualifiers(now);
+export async function standingsPourJonin(now: Date = new Date()): Promise<NwlStandingEntry[]> {
+  const kageDejaJoue = await kageDuMoisJoue(now);
+  const bornes = kageDejaJoue ? bornesDuMois(now) : bornesDuMoisPrecedent(now);
+  const classement = await chuninStandings(bornes.debut, bornes.fin);
+  return classement.slice(0, NWL_KAGE_MAX_PLAYERS);
+}
+
+async function kageDuMoisJoue(now: Date): Promise<boolean> {
+  const { debut, fin } = bornesDuMois(now);
+  const kage = await prisma.tournament.findFirst({
+    where: { partner: NWL_KAGE_PARTNER_KEY, scheduledStartAt: { gte: debut, lt: fin } },
+    select: { status: true },
+  });
+  return kage?.status === 'completed';
+}
+
+export async function synchroniserRoleJonin(now: Date = new Date()): Promise<{ ajoutes: number; retires: number } | null> {
+  if (!NWL_JONIN_ROLE_ID) return { ajoutes: 0, retires: 0 };
+  const qualifies = await standingsPourJonin(now);
   if (qualifies.length === 0) {
-    console.log('[NWL] aucun qualifie pour le mois ecoule, le role Kage est laisse tel quel');
+    console.log('[NWL] aucun classement exploitable, le role Jonin est laisse tel quel');
     return { ajoutes: 0, retires: 0 };
   }
   const attendus = new Set(qualifies.map((q) => q.discordId).filter((d): d is string => !!d));
   if (attendus.size === 0) {
-    console.log('[NWL] aucun qualifie avec un Discord lie, le role Kage est laisse tel quel');
+    console.log('[NWL] aucun qualifie avec un Discord lie, le role Jonin est laisse tel quel');
     return { ajoutes: 0, retires: 0 };
   }
-  const porteurs = await listNwlRoleHolders(NWL_KAGE_ROLE_ID);
+  const porteurs = await listNwlRoleHolders(NWL_JONIN_ROLE_ID);
   if (porteurs === null) return null;
 
   let ajoutes = 0;
   let retires = 0;
   for (const discordId of attendus) {
     if (porteurs.includes(discordId)) continue;
-    if ((await grantNwlRole(discordId, NWL_KAGE_ROLE_ID)) === 'granted') ajoutes += 1;
+    if ((await grantNwlRole(discordId, NWL_JONIN_ROLE_ID)) === 'granted') ajoutes += 1;
   }
   for (const discordId of porteurs) {
     if (attendus.has(discordId)) continue;
-    if ((await revokeNwlRole(discordId, NWL_KAGE_ROLE_ID)) === 'granted') retires += 1;
+    if ((await revokeNwlRole(discordId, NWL_JONIN_ROLE_ID)) === 'granted') retires += 1;
   }
   return { ajoutes, retires };
+}
+
+async function championsKage(): Promise<string[]> {
+  const reglages = await prisma.siteSettings.findUnique({
+    where: { key: CLE_REGLAGES },
+    select: { nwlKageChampions: true },
+  });
+  const brut = reglages?.nwlKageChampions as string[] | null | undefined;
+  return Array.isArray(brut) ? brut.filter((x) => typeof x === 'string') : [];
+}
+
+async function ecrireChampionsKage(liste: string[]): Promise<void> {
+  await prisma.siteSettings.upsert({
+    where: { key: CLE_REGLAGES },
+    update: { nwlKageChampions: liste },
+    create: { key: CLE_REGLAGES, nwlKageChampions: liste },
+  });
+}
+
+export function championsApresVictoire(anciens: string[], vainqueur: string, maximum: number): string[] {
+  const suite = [...anciens.filter((d) => d !== vainqueur), vainqueur];
+  return suite.slice(Math.max(0, suite.length - maximum));
+}
+
+export async function couronnerChampionKage(discordIdVainqueur: string | null): Promise<{ couronne: boolean; detrones: string[] }> {
+  if (!NWL_KAGE_ROLE_ID || !discordIdVainqueur) return { couronne: false, detrones: [] };
+  const anciens = await championsKage();
+  const suivants = championsApresVictoire(anciens, discordIdVainqueur, NWL_KAGE_CHAMPIONS_MAX);
+  const detrones = anciens.filter((d) => !suivants.includes(d));
+
+  const couronne = (await grantNwlRole(discordIdVainqueur, NWL_KAGE_ROLE_ID)) === 'granted';
+  for (const discordId of detrones) {
+    await revokeNwlRole(discordId, NWL_KAGE_ROLE_ID);
+  }
+  await ecrireChampionsKage(suivants);
+  return { couronne, detrones };
 }
 
 export function estPalierNwl(partner: string | null | undefined): boolean {
@@ -560,14 +615,19 @@ export async function cloturerPalierNwl(tournamentId: string): Promise<boolean> 
   const estChunin = tournoi.partner === NWL_CHUNIN_PARTNER_KEY;
   const recompense = estChunin
     ? `First place wins £${NWL_CHUNIN_STORE_CREDIT_GBP} of store credit, offered by New World Loot. Every match played counts towards the monthly Chunin standings.`
-    : 'First place wins a sealed box of Naruto Mythos, offered by New World Loot.';
-  const role = estChunin ? NWL_CHUNIN_ROLE_ID : NWL_KAGE_ROLE_ID;
+    : `First place wins a sealed box of Naruto Mythos, offered by New World Loot, and the Kage role, held by the last ${NWL_KAGE_CHAMPIONS_MAX} champions.`;
+  const role = estChunin ? NWL_CHUNIN_ROLE_ID : NWL_JONIN_ROLE_ID;
 
   await nwlPostMessage(
     NWL_ANNOUNCE_CHANNEL_ID,
     `<@&${role}>\n${texteVictoirePalier(tournoi.name, podium, recompense)}`,
     role,
   );
+
+  if (!estChunin) {
+    const vainqueur = podium.find((e) => e.place === 1);
+    await couronnerChampionKage(vainqueur?.discordId ?? null);
+  }
 
   await publierDecksDuTournoi(tournamentId);
   if (estChunin) await publierClassementChunin();
@@ -578,7 +638,7 @@ export function rolesAcceptesPourPalier(partner: string | null | undefined): str
   if (partner === NWL_CHUNIN_PARTNER_KEY) {
     return [NWL_CHUNIN_ROLE_ID, NWL_CHUNIN_SUBSCRIBER_ROLE_ID].filter(Boolean);
   }
-  if (partner === NWL_KAGE_PARTNER_KEY) return [NWL_KAGE_ROLE_ID];
+  if (partner === NWL_KAGE_PARTNER_KEY) return [NWL_JONIN_ROLE_ID].filter(Boolean);
   return [];
 }
 
@@ -597,11 +657,26 @@ export async function refuserSiPalierNwlInterdit(
   partner: string | null | undefined,
   discordId: string | null | undefined,
 ): Promise<RefusPalierNwl | null> {
-  const roles = rolesAcceptesPourPalier(partner);
-  if (roles.length === 0) return null;
+  if (!estPalierNwl(partner)) return null;
   if (!discordId) {
     return { errorKey: 'tournament.error.linkDiscord', error: 'Link your Discord account first', status: 403 };
   }
+
+  if (partner === NWL_KAGE_PARTNER_KEY) {
+    const qualifies = await kageQualifiers();
+    if (qualifies.length === 0) return null;
+    const invite = qualifies.some((q) => q.discordId === discordId);
+    if (invite) return null;
+    return {
+      errorKey: 'tournament.error.nwlNoKageRole',
+      error: 'This tournament is reserved to the eight qualified players holding the Jonin role',
+      status: 403,
+      inviteUrl: NWL_INVITE_URL,
+    };
+  }
+
+  const roles = rolesAcceptesPourPalier(partner);
+  if (roles.length === 0) return null;
   const verdict = await checkNwlAnyRole(discordId, roles);
   if (verdict === 'not_member') {
     return {

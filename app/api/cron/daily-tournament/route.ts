@@ -9,7 +9,7 @@ import {
   diffuserCodeKage,
   annoncerOuvertureGenin,
   publierClassementChunin,
-  synchroniserRoleKage,
+  synchroniserRoleJonin,
   NWL_HEURE_SYNCHRO_KAGE,
 } from '@/lib/tournament/nwlTiers';
 import { parisDateParts } from '@/lib/tournament/dailyTournament';
@@ -55,14 +55,14 @@ async function handle(request: NextRequest) {
     }
 
     let classement: { publie: boolean; joueurs: number } | null = null;
-    let roleKage: { ajoutes: number; retires: number } | null = null;
+    let roleJonin: { ajoutes: number; retires: number } | null = null;
     if (parisDateParts(new Date()).hour === NWL_HEURE_SYNCHRO_KAGE) {
       classement = await publierClassementChunin();
-      roleKage = await synchroniserRoleKage();
-      console.log(`[Cron] Chunin standings published: ${classement.publie}, Kage role sync: ${JSON.stringify(roleKage)}`);
+      roleJonin = await synchroniserRoleJonin();
+      console.log(`[Cron] Chunin standings published: ${classement.publie}, Jonin role sync: ${JSON.stringify(roleJonin)}`);
     }
 
-    return NextResponse.json({ daily, nwl, nwlPrizeRetry, chuninReset, chunin, kage, classement, roleKage });
+    return NextResponse.json({ daily, nwl, nwlPrizeRetry, chuninReset, chunin, kage, classement, roleJonin });
   } catch (err) {
     console.error('[Cron] daily-tournament error:', err instanceof Error ? err.message : err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });

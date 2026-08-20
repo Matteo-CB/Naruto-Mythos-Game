@@ -2,6 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const verdictRole = vi.fn();
 
+const bd = {
+  siteSettings: { findUnique: vi.fn(async () => ({ nwlChuninSeed: {} })), upsert: vi.fn() },
+  tournament: { findMany: vi.fn(async () => []), findFirst: vi.fn(async () => null) },
+  tournamentMatch: { findMany: vi.fn(async () => []) },
+  user: { findMany: vi.fn(async () => []) },
+};
+vi.mock('@/lib/db/prisma', () => ({ prisma: bd }));
+
 vi.mock('@/lib/tournament/nwlPartner', async (importOriginal) => {
   const reel = await importOriginal<typeof import('@/lib/tournament/nwlPartner')>();
   return {
@@ -15,11 +23,31 @@ const {
   roleRequisPourPalier,
   refuserSiPalierNwlInterdit,
   formaterClassement,
+  cleDuMois,
   NWL_CHUNIN_PARTNER_KEY,
   NWL_KAGE_PARTNER_KEY,
   NWL_KAGE_MAX_PLAYERS,
 } = await import('@/lib/tournament/nwlTiers');
-const { NWL_CHUNIN_ROLE_ID, NWL_KAGE_ROLE_ID } = await import('@/lib/tournament/nwlPartner');
+const { NWL_CHUNIN_ROLE_ID, NWL_JONIN_ROLE_ID } = await import('@/lib/tournament/nwlPartner');
+
+function graineKage(discordIds: string[]) {
+  bd.siteSettings.findUnique.mockResolvedValue({
+    nwlChuninSeed: {
+      [cleDuMois(new Date())]: discordIds.map((d, i) => ({
+        userId: `u${i}`, username: `Joueur${i}`, discordId: d, wins: 1, losses: 0,
+      })),
+      [cleDuMoisPrecedent()]: discordIds.map((d, i) => ({
+        userId: `u${i}`, username: `Joueur${i}`, discordId: d, wins: 1, losses: 0,
+      })),
+    },
+  } as never);
+}
+
+function cleDuMoisPrecedent(): string {
+  const maintenant = new Date();
+  const precedent = new Date(Date.UTC(maintenant.getUTCFullYear(), maintenant.getUTCMonth() - 1, 15, 12, 0));
+  return cleDuMois(precedent);
+}
 
 describe('acces aux tournois prives Chunin et Kage', () => {
   beforeEach(() => {
@@ -35,7 +63,7 @@ describe('acces aux tournois prives Chunin et Kage', () => {
 
   it('associe chaque palier a son role Discord', () => {
     expect(roleRequisPourPalier(NWL_CHUNIN_PARTNER_KEY)).toBe(NWL_CHUNIN_ROLE_ID);
-    expect(roleRequisPourPalier(NWL_KAGE_PARTNER_KEY)).toBe(NWL_KAGE_ROLE_ID);
+    expect(roleRequisPourPalier(NWL_KAGE_PARTNER_KEY), 'le Kage se lit sur le role Jonin').toBe(NWL_JONIN_ROLE_ID);
     expect(roleRequisPourPalier('nwl')).toBeNull();
   });
 
@@ -56,22 +84,27 @@ describe('acces aux tournois prives Chunin et Kage', () => {
     expect(verdictRole).toHaveBeenCalledWith('42', [NWL_CHUNIN_ROLE_ID]);
   });
 
-  it('refuse le joueur sans le role, avec un message propre a chaque palier', async () => {
+  it('refuse le joueur sans le role Chunin', async () => {
     verdictRole.mockResolvedValue('no_role');
     const chunin = await refuserSiPalierNwlInterdit(NWL_CHUNIN_PARTNER_KEY, '42');
     expect(chunin?.errorKey).toBe('tournament.error.nwlNoChuninRole');
     expect(chunin?.status).toBe(403);
-
-    const kage = await refuserSiPalierNwlInterdit(NWL_KAGE_PARTNER_KEY, '42');
-    expect(kage?.errorKey).toBe('tournament.error.nwlNoKageRole');
-    expect(verdictRole).toHaveBeenLastCalledWith('42', [NWL_KAGE_ROLE_ID]);
   });
 
   it('renvoie le lien du serveur au joueur qui n en est pas membre', async () => {
     verdictRole.mockResolvedValue('not_member');
-    const refus = await refuserSiPalierNwlInterdit(NWL_KAGE_PARTNER_KEY, '42');
+    const refus = await refuserSiPalierNwlInterdit(NWL_CHUNIN_PARTNER_KEY, '42');
     expect(refus?.errorKey).toBe('tournament.error.nwlNotMember');
     expect(refus?.inviteUrl).toBe('https://discord.gg/UXQX8McFD3');
+  });
+
+  it('le Kage se decide sur la liste des qualifies, pas sur un role porte au moment de l inscription', async () => {
+    graineKage(['111', '222']);
+    expect(await refuserSiPalierNwlInterdit(NWL_KAGE_PARTNER_KEY, '111'), 'un qualifie entre').toBeNull();
+
+    const refus = await refuserSiPalierNwlInterdit(NWL_KAGE_PARTNER_KEY, '999');
+    expect(refus?.errorKey, 'un non qualifie est refuse').toBe('tournament.error.nwlNoKageRole');
+    expect(verdictRole, 'aucun appel Discord n est necessaire pour trancher').not.toHaveBeenCalled();
   });
 
   it('ne ferme pas la porte quand Discord ne repond pas, il demande de reessayer', async () => {
@@ -129,6 +162,30 @@ describe('le role paye du Chunin', () => {
 
   it('le Kage ne s ouvre jamais avec un role de Chunin', async () => {
     const { rolesAcceptesPourPalier } = await import('@/lib/tournament/nwlTiers');
-    expect(rolesAcceptesPourPalier(NWL_KAGE_PARTNER_KEY)).toEqual([NWL_KAGE_ROLE_ID]);
+    expect(rolesAcceptesPourPalier(NWL_KAGE_PARTNER_KEY)).not.toContain(NWL_CHUNIN_ROLE_ID);
+  });
+});
+
+describe('le role Kage recompense les derniers champions', () => {
+  it('le vainqueur rejoint la liste et le plus ancien sort quand elle deborde', async () => {
+    const { championsApresVictoire } = await import('@/lib/tournament/nwlTiers');
+    const { NWL_KAGE_CHAMPIONS_MAX } = await import('@/lib/tournament/nwlPartner');
+    expect(NWL_KAGE_CHAMPIONS_MAX, 'trois champions au plus, comme demande').toBe(3);
+
+    let liste: string[] = [];
+    for (const vainqueur of ['a', 'b', 'c']) {
+      liste = championsApresVictoire(liste, vainqueur, NWL_KAGE_CHAMPIONS_MAX);
+    }
+    expect(liste).toEqual(['a', 'b', 'c']);
+
+    liste = championsApresVictoire(liste, 'd', NWL_KAGE_CHAMPIONS_MAX);
+    expect(liste, 'le premier sacre laisse sa place au nouveau').toEqual(['b', 'c', 'd']);
+  });
+
+  it('un champion qui gagne a nouveau ne prend pas deux places', async () => {
+    const { championsApresVictoire } = await import('@/lib/tournament/nwlTiers');
+    const liste = championsApresVictoire(['a', 'b', 'c'], 'b', 3);
+    expect(liste).toEqual(['a', 'c', 'b']);
+    expect(new Set(liste).size, 'aucun doublon').toBe(3);
   });
 });
