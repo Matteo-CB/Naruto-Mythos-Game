@@ -3378,6 +3378,9 @@
   "errorPage": {
     "title": "問題が発生しました",
     "defaultMessage": "予期しないエラーが発生しました。",
+    "staleTitle": "新しいバージョンがあります",
+    "staleMessage": "このページを開いている間にサイトが更新されました。再読み込みして続けてください。",
+    "reload": "再読み込み",
     "tryAgain": "再試行",
     "home": "ホーム"
   },

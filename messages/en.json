@@ -3374,6 +3374,9 @@
   "errorPage": {
     "title": "Something went wrong",
     "defaultMessage": "An unexpected error occurred.",
+    "staleTitle": "A new version is available",
+    "staleMessage": "The site was updated while this page was open. Reload it to continue.",
+    "reload": "Reload",
     "tryAgain": "Try again",
     "home": "Home"
   },

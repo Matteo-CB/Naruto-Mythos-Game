@@ -3379,6 +3379,9 @@
   "errorPage": {
     "title": "Algo ha ido mal",
     "defaultMessage": "Se ha producido un error inesperado.",
+    "staleTitle": "Hay una nueva versión disponible",
+    "staleMessage": "El sitio se ha actualizado mientras esta página estaba abierta. Recárgala para continuar.",
+    "reload": "Recargar",
     "tryAgain": "Reintentar",
     "home": "Inicio"
   },

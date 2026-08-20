@@ -3380,6 +3380,9 @@
   "errorPage": {
     "title": "Une erreur est survenue",
     "defaultMessage": "Une erreur inattendue s'est produite.",
+    "staleTitle": "Une nouvelle version est disponible",
+    "staleMessage": "Le site a été mis à jour pendant que cette page était ouverte. Recharge-la pour continuer.",
+    "reload": "Recharger",
     "tryAgain": "Réessayer",
     "home": "Accueil"
   },

@@ -246,6 +246,9 @@
   "errorPage": {
     "title": "Algo deu errado",
     "defaultMessage": "Ocorreu um erro inesperado.",
+    "staleTitle": "Está disponível uma nova versão",
+    "staleMessage": "O site foi atualizado enquanto esta página estava aberta. Recarrega-a para continuar.",
+    "reload": "Recarregar",
     "tryAgain": "Tentar novamente",
     "home": "Início"
   },

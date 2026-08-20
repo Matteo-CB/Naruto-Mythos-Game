@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
+import { estBundleObsolete, rechargerUneSeuleFois } from '@/lib/ui/staleDeploy';
 
 export default function Error({
   error,
@@ -12,18 +13,27 @@ export default function Error({
 }) {
   const t = useTranslations('errorPage');
   const retryCount = useRef(0);
+  const obsolete = estBundleObsolete(error);
 
   useEffect(() => {
     console.error('[App Error]', error);
-    
+
+    if (obsolete) {
+      rechargerUneSeuleFois(
+        typeof window === 'undefined' ? null : window.sessionStorage,
+        () => window.location.reload(),
+      );
+      return;
+    }
+
     if (retryCount.current < 3) {
       retryCount.current++;
       const timer = setTimeout(() => reset(), 200);
       return () => clearTimeout(timer);
     }
-  }, [error, reset]);
+  }, [error, reset, obsolete]);
 
-  if (retryCount.current < 3) {
+  if (!obsolete && retryCount.current < 3) {
     return null;
   }
 
@@ -32,21 +42,25 @@ export default function Error({
       <div className="flex flex-col items-center gap-4 max-w-md w-full text-center px-4">
         <div className="w-12 h-px" style={{ backgroundColor: 'color-mix(in srgb, var(--t-danger) 40%, transparent)' }} />
         <h2 className="text-lg font-bold uppercase tracking-wider" style={{ color: 'var(--t-danger)' }}>
-          {t('title')}
+          {obsolete ? t('staleTitle') : t('title')}
         </h2>
         <p className="text-xs" style={{ color: 'var(--t-dim)' }}>
-          {error?.message || t('defaultMessage')}
+          {obsolete ? t('staleMessage') : (error?.message || t('defaultMessage'))}
         </p>
         <div className="flex gap-3 mt-2">
           <button
-            onClick={() => { retryCount.current = 0; reset(); }}
+            onClick={() => {
+              if (obsolete) { window.location.reload(); return; }
+              retryCount.current = 0;
+              reset();
+            }}
             className="px-5 py-2 text-xs font-bold uppercase tracking-wider cursor-pointer"
             style={{
               backgroundColor: 'var(--t-accent-tint)',
               color: 'var(--t-accent)',
             }}
           >
-            {t('tryAgain')}
+            {obsolete ? t('reload') : t('tryAgain')}
           </button>
           <a
             href="/"

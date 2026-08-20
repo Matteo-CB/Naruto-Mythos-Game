@@ -246,6 +246,9 @@
   "errorPage": {
     "title": "Qualcosa è andato storto",
     "defaultMessage": "Si è verificato un errore imprevisto.",
+    "staleTitle": "È disponibile una nuova versione",
+    "staleMessage": "Il sito è stato aggiornato mentre questa pagina era aperta. Ricaricala per continuare.",
+    "reload": "Ricarica",
     "tryAgain": "Riprova",
     "home": "Home"
   },

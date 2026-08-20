@@ -246,6 +246,9 @@
   "errorPage": {
     "title": "Coś poszło nie tak",
     "defaultMessage": "Wystąpił nieoczekiwany błąd.",
+    "staleTitle": "Dostępna jest nowa wersja",
+    "staleMessage": "Strona została zaktualizowana, gdy ta karta była otwarta. Odśwież ją, aby kontynuować.",
+    "reload": "Odśwież",
     "tryAgain": "Spróbuj ponownie",
     "home": "Strona główna"
   },

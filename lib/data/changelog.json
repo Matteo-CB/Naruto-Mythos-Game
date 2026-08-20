@@ -12,6 +12,7 @@
       "categories": [
         "fix",
         "fix",
+        "fix",
         "feature",
         "feature",
         "feature",
@@ -20,6 +21,7 @@
         "feature"
       ],
       "changes_fr": [
+        "Une page laissée ouverte pendant une mise à jour du site se recharge toute seule au lieu d afficher une erreur.",
         "Un joueur dont la partie a commencé ne peut plus perdre son match de tournoi pour absence.",
         "Si un match était marqué perdu par absence alors que la partie a bien été jouée, le vrai résultat reprend le dessus.",
         "Les tournois Chunin du samedi et Kage du mois s ouvrent tout seuls, et leur code d accès est envoyé sur Discord aux joueurs qui ont le rôle.",
@@ -30,6 +32,7 @@
         "Chaque tournoi partenaire affiche maintenant sa propre affiche et ses propres conditions d entrée."
       ],
       "changes_en": [
+        "A page left open during a site update now reloads on its own instead of showing an error.",
         "A player whose game has started can no longer lose their tournament match for absence.",
         "If a match was marked lost for absence while the game was actually played, the real result takes over.",
         "The Saturday Chunin and monthly Kage tournaments now open on their own, and their join code is sent on Discord to players who hold the role.",
@@ -40,6 +43,7 @@
         "Each partner tournament now shows its own poster and its own entry conditions."
       ],
       "changes_es": [
+        "Una página que quedó abierta durante una actualización del sitio ahora se recarga sola en vez de mostrar un error.",
         "Un jugador cuya partida ya ha empezado ya no puede perder su combate de torneo por ausencia.",
         "Si un combate se marcó como perdido por ausencia aunque la partida sí se jugó, el resultado real prevalece.",
         "Los torneos Chunin del sábado y Kage del mes se abren solos, y su código de acceso se envía por Discord a los jugadores que tienen el rol.",
@@ -50,6 +54,7 @@
         "Cada torneo asociado muestra ahora su propio cartel y sus propias condiciones de entrada."
       ],
       "changes_pt": [
+        "Uma página deixada aberta durante uma atualização do site passa a recarregar sozinha em vez de mostrar um erro.",
         "Um jogador cuja partida já começou deixa de poder perder o seu jogo de torneio por ausência.",
         "Se um jogo foi marcado como perdido por ausência apesar de ter sido jogado, o resultado real passa a valer.",
         "Os torneios Chunin de sábado e Kage do mês abrem sozinhos, e o código de acesso é enviado no Discord aos jogadores que têm o cargo.",
@@ -60,6 +65,7 @@
         "Cada torneio parceiro mostra agora o seu próprio cartaz e as suas próprias condições de entrada."
       ],
       "changes_it": [
+        "Una pagina rimasta aperta durante un aggiornamento del sito ora si ricarica da sola invece di mostrare un errore.",
         "Un giocatore la cui partita è iniziata non può più perdere il suo incontro di torneo per assenza.",
         "Se un incontro era segnato come perso per assenza ma la partita è stata giocata, vale il risultato reale.",
         "I tornei Chunin del sabato e Kage del mese si aprono da soli, e il codice di accesso viene inviato su Discord ai giocatori che hanno il ruolo.",
@@ -70,6 +76,7 @@
         "Ogni torneo partner mostra ora la propria locandina e le proprie condizioni di ingresso."
       ],
       "changes_pl": [
+        "Strona pozostawiona otwarta podczas aktualizacji serwisu odświeża się teraz sama zamiast pokazywać błąd.",
         "Gracz, którego partia już się zaczęła, nie może już przegrać meczu turniejowego przez nieobecność.",
         "Jeśli mecz został oznaczony jako przegrany przez nieobecność, mimo że partia się odbyła, liczy się prawdziwy wynik.",
         "Turnieje Chunin w sobotę i Kage w miesiącu otwierają się same, a kod dostępu jest wysyłany na Discordzie graczom z odpowiednią rolą.",
@@ -80,6 +87,7 @@
         "Każdy turniej partnerski pokazuje teraz własny plakat i własne warunki wejścia."
       ],
       "changes_ja": [
+        "サイト更新中に開いたままだったページは、エラーを出さずに自動で再読み込みされるようになりました。",
         "対戦が始まったプレイヤーが、不在扱いで大会の試合を落とすことはなくなりました。",
         "実際に対戦したのに不在で敗北と記録された試合は、本来の結果が優先されるようになりました。",
         "土曜の中忍大会と月例の影大会が自動で開催され、参加コードは対象ロールを持つプレイヤーへ Discord で届きます。",
