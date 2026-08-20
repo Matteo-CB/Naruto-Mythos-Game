@@ -403,6 +403,25 @@ export function discardAttachments(state: GameState, attachments: AttachedCard[]
   return next;
 }
 
+export function campDeLEquipement(att: AttachedCard): PlayerID {
+  return att.controlledBy ?? att.owner;
+}
+
+export interface ProvenanceEquipement {
+  owner: PlayerID;
+  controllerInstanceId?: string;
+}
+
+function marquerProvenance(att: AttachedCard, player: PlayerID, provenance?: ProvenanceEquipement): AttachedCard {
+  if (!provenance || provenance.owner === player) return att;
+  return {
+    ...att,
+    owner: provenance.owner,
+    controlledBy: player,
+    controllerInstanceId: provenance.controllerInstanceId,
+  };
+}
+
 export function discardAttachmentsOnLeave(state: GameState, character: CharacterInPlay | null | undefined): GameState {
   const attachments = character?.attachments ?? [];
   if (attachments.length === 0) return state;
@@ -489,7 +508,7 @@ export function enforceAttachmentConditions(state: GameState): GameState {
 
         const conformes = held.filter((att) => attachConditionHolds(char, att.card));
         const derniersParProprietaire = new Map<PlayerID, AttachedCard>();
-        for (const att of conformes) derniersParProprietaire.set(att.owner, att);
+        for (const att of conformes) derniersParProprietaire.set(campDeLEquipement(att), att);
         const kept = conformes.filter((att) => derniersParProprietaire.get(att.owner) === att);
 
         if (kept.length === held.length) return char;
@@ -506,7 +525,7 @@ export function enforceAttachmentConditions(state: GameState): GameState {
     const surMission = mission.attachments ?? [];
     if (surMission.length === 0) return mission;
     const derniers = new Map<PlayerID, AttachedCard>();
-    for (const att of surMission) derniers.set(att.owner, att);
+    for (const att of surMission) derniers.set(campDeLEquipement(att), att);
     const gardes = surMission.filter((att) => derniers.get(att.owner) === att);
     if (gardes.length === surMission.length) return mission;
     for (const att of surMission) if (!gardes.includes(att)) dropped.push(att);
@@ -520,16 +539,17 @@ export function enforceAttachmentConditions(state: GameState): GameState {
 export function missionAlreadyHasPlayerAttachment(state: GameState, player: PlayerID, missionIndex: number): boolean {
   const mission = state.activeMissions[missionIndex];
   if (!mission) return false;
-  return (mission.attachments ?? []).some((a) => a.owner === player);
+  return (mission.attachments ?? []).some((a) => campDeLEquipement(a) === player);
 }
 
-export function attachCardToMission(state: GameState, player: PlayerID, card: CardData, missionIndex: number, revealed = false): GameState {
-  const previous = (state.activeMissions[missionIndex]?.attachments ?? []).filter((a) => a.owner === player);
+export function attachCardToMission(state: GameState, player: PlayerID, card: CardData, missionIndex: number, revealed = false, provenance?: ProvenanceEquipement): GameState {
+  const previous = (state.activeMissions[missionIndex]?.attachments ?? []).filter((a) => campDeLEquipement(a) === player);
   const base = discardAttachments(state, previous);
   const missions = [...base.activeMissions];
   const mission = { ...missions[missionIndex] };
-  const att: AttachedCard = { instanceId: generateInstanceId(), card, owner: player };
-  mission.attachments = [...(mission.attachments ?? []).filter((a) => a.owner !== player), att];
+  let att: AttachedCard = { instanceId: generateInstanceId(), card, owner: player };
+  att = marquerProvenance(att, player, provenance);
+  mission.attachments = [...(mission.attachments ?? []).filter((a) => campDeLEquipement(a) !== player), att];
   missions[missionIndex] = mission;
   let newState: GameState = { ...base, activeMissions: missions };
   newState = {
@@ -559,7 +579,7 @@ export function attachCardToMission(state: GameState, player: PlayerID, card: Ca
   return resolveAttachmentFirstStrike(newState, player, card, null, missionIndex);
 }
 
-export function attachCardToCharacter(state: GameState, player: PlayerID, card: CardData, hostInstanceId: string, revealed = false, powerOverride?: number): GameState {
+export function attachCardToCharacter(state: GameState, player: PlayerID, card: CardData, hostInstanceId: string, revealed = false, powerOverride?: number, provenance?: ProvenanceEquipement): GameState {
   let hostMissionIndex = -1;
   let hostSide: 'player1Characters' | 'player2Characters' | null = null;
   let hostIdx = -1;
@@ -577,12 +597,13 @@ export function attachCardToCharacter(state: GameState, player: PlayerID, card: 
   const chars = [...mission[hostSide]];
   const host = { ...chars[hostIdx] };
   const held = host.attachments ?? [];
-  const replaced = ignoreLesConditionsDePose(host) ? [] : held.filter((a) => a.owner === player);
-  const att: AttachedCard = { instanceId: generateInstanceId(), card, owner: player };
+  const replaced = ignoreLesConditionsDePose(host) ? [] : held.filter((a) => campDeLEquipement(a) === player);
+  let att: AttachedCard = { instanceId: generateInstanceId(), card, owner: player };
   if (powerOverride !== undefined) att.powerOverride = powerOverride;
+  att = marquerProvenance(att, player, provenance);
   host.attachments = ignoreLesConditionsDePose(host)
     ? [...held, att]
-    : [...held.filter((a) => a.owner !== player), att];
+    : [...held.filter((a) => campDeLEquipement(a) !== player), att];
   chars[hostIdx] = host;
   mission[hostSide] = chars;
   missions[hostMissionIndex] = mission;

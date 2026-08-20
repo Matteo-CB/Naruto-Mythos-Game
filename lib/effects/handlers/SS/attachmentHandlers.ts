@@ -1,3 +1,4 @@
+import { campDeLEquipement } from '@/lib/effects/attachments';
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import type { CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
@@ -176,10 +177,10 @@ export function scrollPairPresent(
   const chars = mission[sideOf(player)];
   for (const char of chars) {
     for (const att of char.attachments ?? []) {
-      if (att.owner === player && att.card.id === wantedCardId) return true;
+      if (campDeLEquipement(att) === player && att.card.id === wantedCardId) return true;
     }
   }
-  return (mission.attachments ?? []).some((a) => a.owner === player && a.card.id === wantedCardId);
+  return (mission.attachments ?? []).some((a) => campDeLEquipement(a) === player && a.card.id === wantedCardId);
 }
 
 function scrollScore(selfId: string, pairId: string, nom: string) {

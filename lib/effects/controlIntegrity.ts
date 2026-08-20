@@ -1,5 +1,6 @@
 import type { GameState, CharacterInPlay } from '@/lib/engine/types';
 import { EffectEngine } from './EffectEngine';
+import { libererEquipementsOrphelins } from './attachmentControl';
 
 function instanceIdsInPlay(state: GameState): Set<string> {
   const ids = new Set<string>();
@@ -28,10 +29,10 @@ function danglingControlled(state: GameState): CharacterInPlay[] {
 }
 
 export function releaseDanglingControl(state: GameState): GameState {
-  const orphelins = danglingControlled(state);
-  if (orphelins.length === 0) return state;
+  let newState = libererEquipementsOrphelins(state);
+  const orphelins = danglingControlled(newState);
+  if (orphelins.length === 0) return newState;
 
-  let newState = state;
   for (const char of orphelins) {
     newState = EffectEngine.returnControlToOwner(newState, char.instanceId);
   }

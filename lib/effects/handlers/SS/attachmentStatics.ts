@@ -37,7 +37,7 @@ export function missionCarriesAttachment(
   owner?: PlayerID,
 ): AttachedCard[] {
   return (mission?.attachments ?? []).filter(
-    (a) => isSs(a.card, numero) && (owner === undefined || a.owner === owner),
+    (a) => isSs(a.card, numero) && (owner === undefined || (a.controlledBy ?? a.owner) === owner),
   );
 }
 
@@ -65,7 +65,7 @@ export function attachmentPowerBonus(
   const adversaire: PlayerID = hostOwner === 'player1' ? 'player2' : 'player1';
 
   if (isSs(attachment.card, ADAMANTINE_NYOI)) {
-    const side = attachment.owner === 'player1' ? 'player1Characters' : 'player2Characters';
+    const side = (attachment.controlledBy ?? attachment.owner) === 'player1' ? 'player1Characters' : 'player2Characters';
     return mission[side].filter(
       (c) => !c.isHidden && (topOf(c).group ?? '') === 'Leaf Village',
     ).length;
@@ -152,7 +152,7 @@ export function ninjaInfoCardsWatching(
   const side = viewer === 'player1' ? 'player1Characters' : 'player2Characters';
   for (const char of mission?.[side] ?? []) {
     if (char.isHidden) continue;
-    if (attachmentsOn(char).some((a) => a.owner === viewer && isSs(a.card, NINJA_INFO_CARDS))) return true;
+    if (attachmentsOn(char).some((a) => (a.controlledBy ?? a.owner) === viewer && isSs(a.card, NINJA_INFO_CARDS))) return true;
   }
   return false;
 }

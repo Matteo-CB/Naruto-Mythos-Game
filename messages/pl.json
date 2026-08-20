@@ -3018,7 +3018,9 @@
       "attachmentDiscarded": "{card} została odrzucona: jej warunek załącznika nie jest już spełniony.",
       "attachmentHostLeft": "{card} trafia na stos kart odrzuconych: postać, która ją nosiła, opuściła grę.",
       "chakraBonusMission": "{card}: CHAKRA +{bonus} (misja {mission})",
-      "chakraBonusMissionWon": "{card}: CHAKRA +{bonus} (premia za wygraną misję)"
+      "chakraBonusMissionWon": "{card}: CHAKRA +{bonus} (premia za wygraną misję)",
+      "attachmentReturned": "{card} wraca do właściciela: postać, która ją kontrolowała, opuściła grę.",
+      "attachmentReturnedDiscarded": "{card} trafia na stos kart odrzuconych: właściciel nie ma już żadnego celu."
     },
     "end": {
       "victory": "Zwycięstwo",
@@ -3776,7 +3778,8 @@
         "ss072ConfirmMain": "Odzyskać ostatnie wyposażenie ze stosu kart odrzuconych?",
         "autoConfirmInstant": "Zastosować ten efekt?",
         "ss007ChoosePowerup": "Wybierz sojuszniczą postać z Drużyny 7, aby WZMOCNIĆ o 2.",
-        "ss017RevealResult": "Odkryta karta"
+        "ss017RevealResult": "Odkryta karta",
+        "attachReturnChooseTarget": "Wybierz, dokąd wraca {card}."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

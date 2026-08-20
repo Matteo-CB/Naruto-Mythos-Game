@@ -65,6 +65,8 @@ export interface AttachedCard {
   instanceId: string;
   card: CardData;
   owner: PlayerID;
+  controlledBy?: PlayerID;
+  controllerInstanceId?: string;
   powerOverride?: number;
 }
 

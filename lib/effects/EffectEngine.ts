@@ -39,7 +39,8 @@ import {
 import { actionTypeForSelectionType } from './selectionActionType';
 import { ignoreLesConditionsDePose, enforceAttachmentConditions } from './attachments';
 import { artisanVillageReward } from './attachments';
-import { attachCardToCharacter, attachCardToMission, discardAttachmentsOnLeave, discardAttachments, getCharacterAttachTargets, missionAlreadyHasPlayerAttachment, parseAttachSpec } from './attachments';
+import { attachCardToCharacter, attachCardToMission, discardAttachmentsOnLeave, discardAttachments, getCharacterAttachTargets, missionAlreadyHasPlayerAttachment, parseAttachSpec, campDeLEquipement, type ProvenanceEquipement } from './attachments';
+import { poserEquipementRendu, rendreEquipementsDuControleur } from './attachmentControl';
 import { destinationsPour } from './handlers/SS/hiddenMove';
 import { equipementsDeplacablesVers, apercuEquipements } from './handlers/SS/seimei065';
 import { team8AlliesIn, KURENAI_018 } from './handlers/SS/kurenai018';
@@ -287,7 +288,7 @@ export function applyLowProfileAmbushPowerup(state: GameState, player: PlayerID,
 function mergedAttachments(host: CharacterInPlay, incoming: CharacterInPlay): CharacterInPlay['attachments'] {
   const merged = [...(host.attachments ?? [])];
   for (const carried of incoming.attachments ?? []) {
-    if (merged.some((a) => a.owner === carried.owner)) continue;
+    if (merged.some((a) => campDeLEquipement(a) === campDeLEquipement(carried))) continue;
     merged.push(carried);
   }
   return merged;
@@ -1340,7 +1341,7 @@ export class EffectEngine {
     let next = EffectEngine.retirerEquipement(state, attachmentId);
     const remplaces = ignoreLesConditionsDePose(nouvelHote.character)
       ? []
-      : (nouvelHote.character.attachments ?? []).filter((a) => a.owner === equipement.owner);
+      : (nouvelHote.character.attachments ?? []).filter((a) => campDeLEquipement(a) === campDeLEquipement(equipement));
     if (remplaces.length > 0) {
       next = EffectEngine.retirerEquipement(next, remplaces[0].instanceId);
       next = discardAttachments(next, remplaces);
@@ -6563,9 +6564,25 @@ export class EffectEngine {
 
       case 'ATTACH_CHOOSE_TARGET': {
         let attCard: CardData | null = null;
-        try { attCard = JSON.parse(pendingEffect.effectDescription).card ?? null; } catch {}
+        let attProvenance: ProvenanceEquipement | undefined;
+        try {
+          const lu = JSON.parse(pendingEffect.effectDescription);
+          attCard = lu.card ?? null;
+          attProvenance = lu.provenance ?? undefined;
+        } catch {}
         if (attCard) {
-          newState = attachCardToCharacter(newState, pendingEffect.sourcePlayer, attCard, targetId);
+          newState = attachCardToCharacter(
+            newState, pendingEffect.sourcePlayer, attCard, targetId, false, undefined, attProvenance,
+          );
+        }
+        break;
+      }
+
+      case 'ATTACH_RETURN_CHOOSE_TARGET': {
+        let retour: { attachmentId?: string } = {};
+        try { retour = JSON.parse(pendingEffect.effectDescription); } catch {}
+        if (retour.attachmentId) {
+          newState = poserEquipementRendu(newState, retour.attachmentId, pendingEffect.sourcePlayer, targetId);
         }
         break;
       }
@@ -21041,10 +21058,11 @@ export class EffectEngine {
       }
     }
 
-    if (controlledChars.length === 0) return state;
+    const equipementsRendus = rendreEquipementsDuControleur(state, controllerInstanceId);
+    if (controlledChars.length === 0) return equipementsRendus;
     console.log(`[restoreControlOnLeave] Controller ${controllerInstanceId} leaving, returning ${controlledChars.length} controlled character(s)`);
 
-    let newState = state;
+    let newState = equipementsRendus;
 
     for (const { instanceId } of controlledChars) {
       newState = EffectEngine.returnControlToOwner(newState, instanceId);

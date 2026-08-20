@@ -439,10 +439,14 @@ function handleRevealAttachment(
     ),
   };
 
+  const provenance = hiddenChar.originalOwner !== player
+    ? { owner: hiddenChar.originalOwner, controllerInstanceId: hiddenChar.controllerInstanceId }
+    : undefined;
+
   if (attachTo === 'mission') {
-    newState = attachCardToMission(newState, player, card, missionIndex, true);
+    newState = attachCardToMission(newState, player, card, missionIndex, true, provenance);
   } else if (targets.length === 1) {
-    newState = attachCardToCharacter(newState, player, card, targets[0].instanceId, true);
+    newState = attachCardToCharacter(newState, player, card, targets[0].instanceId, true, undefined, provenance);
   } else {
     const effId = generateAttachId();
     const actId = generateAttachId();
@@ -453,7 +457,7 @@ function handleRevealAttachment(
       sourceInstanceId: '',
       sourceMissionIndex: missionIndex,
       effectType: 'ATTACH',
-      effectDescription: JSON.stringify({ card }),
+      effectDescription: JSON.stringify({ card, provenance }),
       targetSelectionType: 'ATTACH_CHOOSE_TARGET',
       sourcePlayer: player,
       requiresTargetSelection: true,

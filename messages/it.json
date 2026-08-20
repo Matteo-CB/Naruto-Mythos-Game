@@ -3018,7 +3018,9 @@
       "attachmentDiscarded": "{card} è stata scartata: la sua condizione di allegato non è più valida.",
       "attachmentHostLeft": "{card} va nella pila degli scarti: il personaggio che la portava ha lasciato il campo.",
       "chakraBonusMission": "{card}: CHAKRA +{bonus} (missione {mission})",
-      "chakraBonusMissionWon": "{card}: CHAKRA +{bonus} (bonus missione vinta)"
+      "chakraBonusMissionWon": "{card}: CHAKRA +{bonus} (bonus missione vinta)",
+      "attachmentReturned": "{card} torna al suo proprietario: il personaggio che la controllava ha lasciato il gioco.",
+      "attachmentReturnedDiscarded": "{card} va negli scarti: il proprietario non ha più nessun bersaglio valido."
     },
     "end": {
       "victory": "Vittoria",
@@ -3776,7 +3778,8 @@
         "ss072ConfirmMain": "Recuperare l ultimo equipaggiamento dagli scarti?",
         "autoConfirmInstant": "Applicare questo effetto?",
         "ss007ChoosePowerup": "Scegli un personaggio alleato del Team 7 da POTENZIARE di 2.",
-        "ss017RevealResult": "Carta rivelata"
+        "ss017RevealResult": "Carta rivelata",
+        "attachReturnChooseTarget": "Scegli dove torna {card}."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

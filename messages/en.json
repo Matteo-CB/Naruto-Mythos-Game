@@ -904,7 +904,9 @@
       "attachmentDiscarded": "{card} was discarded: its attach condition no longer holds.",
       "attachmentHostLeft": "{card} goes to the discard pile: the character carrying it left play.",
       "chakraBonusMission": "{card}: CHAKRA +{bonus} (mission {mission})",
-      "chakraBonusMissionWon": "{card}: CHAKRA +{bonus} (won mission bonus)"
+      "chakraBonusMissionWon": "{card}: CHAKRA +{bonus} (won mission bonus)",
+      "attachmentReturned": "{card} returns to its owner: the character controlling it left play.",
+      "attachmentReturnedDiscarded": "{card} goes to the discard pile: its owner has no legal target left."
     },
     "end": {
       "victory": "Victory",
@@ -1662,7 +1664,8 @@
         "ss072ConfirmMain": "Return the topmost attachment from your discard pile to your hand?",
         "autoConfirmInstant": "Apply this effect?",
         "ss007ChoosePowerup": "Choose a friendly Team 7 character to POWERUP 2.",
-        "ss017RevealResult": "Revealed card"
+        "ss017RevealResult": "Revealed card",
+        "attachReturnChooseTarget": "Choose where {card} goes back."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",

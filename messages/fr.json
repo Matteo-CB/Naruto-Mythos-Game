@@ -910,7 +910,9 @@
       "attachmentDiscarded": "{card} est défaussée : sa condition d attache n est plus remplie.",
       "attachmentHostLeft": "{card} part à la défausse : le personnage qui la portait a quitté le terrain.",
       "chakraBonusMission": "{card} : CHAKRA +{bonus} (mission {mission})",
-      "chakraBonusMissionWon": "{card} : CHAKRA +{bonus} (bonus de mission gagnée)"
+      "chakraBonusMissionWon": "{card} : CHAKRA +{bonus} (bonus de mission gagnée)",
+      "attachmentReturned": "{card} revient à son propriétaire : le personnage qui la contrôlait a quitté le jeu.",
+      "attachmentReturnedDiscarded": "{card} part à la défausse : son propriétaire n a plus de cible valide."
     },
     "end": {
       "victory": "Victoire",
@@ -1668,7 +1670,8 @@
         "ss072ConfirmMain": "Récupérer le dernier équipement de votre défausse ?",
         "autoConfirmInstant": "Appliquer cet effet ?",
         "ss007ChoosePowerup": "Choisissez un personnage Équipe 7 allié à renforcer de 2.",
-        "ss017RevealResult": "Carte révélée"
+        "ss017RevealResult": "Carte révélée",
+        "attachReturnChooseTarget": "Choisis où {card} retourne."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",

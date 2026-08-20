@@ -909,7 +909,9 @@
       "attachmentDiscarded": "{card} fue descartada: su condición de equipo ya no se cumple.",
       "attachmentHostLeft": "{card} va a la pila de descartes: el personaje que la llevaba abandonó el juego.",
       "chakraBonusMission": "{card}: CHAKRA +{bonus} (misión {mission})",
-      "chakraBonusMissionWon": "{card}: CHAKRA +{bonus} (bono de misión ganada)"
+      "chakraBonusMissionWon": "{card}: CHAKRA +{bonus} (bono de misión ganada)",
+      "attachmentReturned": "{card} vuelve a su dueño: el personaje que la controlaba ha dejado el juego.",
+      "attachmentReturnedDiscarded": "{card} va al descarte: su dueño ya no tiene ningún objetivo válido."
     },
     "end": {
       "victory": "Victoria",
@@ -1667,7 +1669,8 @@
         "ss072ConfirmMain": "¿Recuperar el último equipamiento de tu descarte?",
         "autoConfirmInstant": "¿Aplicar este efecto?",
         "ss007ChoosePowerup": "Elige un personaje aliado del Equipo 7 para POTENCIAR 2.",
-        "ss017RevealResult": "Carta revelada"
+        "ss017RevealResult": "Carta revelada",
+        "attachReturnChooseTarget": "Elige dónde vuelve {card}."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

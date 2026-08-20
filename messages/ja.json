@@ -908,7 +908,9 @@
       "attachmentDiscarded": "{card}は装着条件を満たさなくなったため捨てられた。",
       "attachmentHostLeft": "{card}を捨て札にする。装備していたキャラクターが場を離れたため。",
       "chakraBonusMission": "{card}：CHAKRA +{bonus}（ミッション{mission}）",
-      "chakraBonusMissionWon": "{card}：CHAKRA +{bonus}（獲得ミッションボーナス）"
+      "chakraBonusMissionWon": "{card}：CHAKRA +{bonus}（獲得ミッションボーナス）",
+      "attachmentReturned": "{card} は持ち主のもとへ戻ります。支配していた忍が場を離れました。",
+      "attachmentReturnedDiscarded": "{card} は捨て札になります。持ち主に付けられる対象が残っていません。"
     },
     "end": {
       "victory": "勝利",
@@ -1666,7 +1668,8 @@
         "ss072ConfirmMain": "捨て札の一番上の装備を手札に戻しますか？",
         "autoConfirmInstant": "この効果を適用しますか？",
         "ss007ChoosePowerup": "パワーアップ2を与える味方の第七班キャラクターを選んでください。",
-        "ss017RevealResult": "公開されたカード"
+        "ss017RevealResult": "公開されたカード",
+        "attachReturnChooseTarget": "{card} をどこに戻すか選んでください。"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",
