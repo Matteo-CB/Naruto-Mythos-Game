@@ -74,10 +74,12 @@ function ScheduledCountdown({ deadline }: { deadline: string }) {
   );
 }
 
+const NWL_POSTER_VERSION = 2;
+
 const NWL_POSTERS: Record<string, { image: string; requirementKey: string }> = {
-  nwl: { image: '/images/tournaments/nwl-friday.webp', requirementKey: 'nwlRequirement' },
-  'nwl-chunin': { image: '/images/tournaments/nwl-saturday-chunin.webp', requirementKey: 'nwlChuninRequirement' },
-  'nwl-kage': { image: '/images/tournaments/nwl-monthly-kage.webp', requirementKey: 'nwlKageRequirement' },
+  nwl: { image: `/images/tournaments/nwl-friday.webp?v=${NWL_POSTER_VERSION}`, requirementKey: 'nwlRequirement' },
+  'nwl-chunin': { image: `/images/tournaments/nwl-saturday-chunin.webp?v=${NWL_POSTER_VERSION}`, requirementKey: 'nwlChuninRequirement' },
+  'nwl-kage': { image: `/images/tournaments/nwl-monthly-kage.webp?v=${NWL_POSTER_VERSION}`, requirementKey: 'nwlKageRequirement' },
 };
 
 export default function TournamentDetailPage() {
