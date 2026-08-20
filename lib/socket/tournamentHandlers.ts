@@ -166,6 +166,7 @@ export function getOnlineUserIds(io: Server): Set<string> {
 const matchGraceCycles = new Map<string, number>();
 const matchNoContestCount = new Map<string, number>();
 export const NO_CONTEST_ESCALATION_THRESHOLD = 3;
+export const NO_CONTEST_HARD_CAP = 12;
 export const MAX_GRACE_CYCLES = 8;
 
 export const MATCH_ENTRY_INVITE_INTERVAL_MS = 5_000;
@@ -398,6 +399,25 @@ export async function fireAbsenceTimerCallback(
     matchGraceCycles.delete(matchId);
     const stalls = (matchNoContestCount.get(matchId) ?? 0) + 1;
     matchNoContestCount.set(matchId, stalls);
+
+    if (stalls >= NO_CONTEST_HARD_CAP) {
+      matchNoContestCount.delete(matchId);
+      const perdant = p2 ? await pickDoubleAbsenceLoser(tournamentId, p1, p2) : p1;
+      console.error(
+        `[Tournament] CRITICAL: match ${matchId} never launched after ${stalls} attempts, the better seed advances so the tournament can continue`,
+      );
+      logMatchEvent({
+        type: 'match.launch.unresolvable',
+        tournamentId,
+        matchId,
+        forfeitedPlayerId: perdant,
+        detail: `stalled ${stalls} times`,
+      });
+      await handleMatchForfeit(io, tournamentId, matchId, perdant);
+      matchReadyPlayers.delete(matchId);
+      return;
+    }
+
     const detail = `match ${matchId} could not be launched while ${outcome.players.join(', ')} stayed online, reopening it instead of forfeiting anyone (stall ${stalls})`;
     if (stalls >= NO_CONTEST_ESCALATION_THRESHOLD) {
       console.error(`[Tournament] CRITICAL: ${detail}. This match needs an organizer to resolve it manually from the admin panel.`);

@@ -14,6 +14,7 @@ type MatchEventType =
   | 'match.series.continue'
   | 'match.launch.no-contest'
   | 'match.launch.stalled'
+  | 'match.launch.unresolvable'
   | 'tournament.start.begin'
   | 'tournament.start.success'
   | 'tournament.start.failed'

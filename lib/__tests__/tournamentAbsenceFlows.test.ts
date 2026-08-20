@@ -62,6 +62,7 @@ import {
   fireAbsenceTimerCallback,
   getConnectedUserIdsInTournament,
   MAX_GRACE_CYCLES,
+  NO_CONTEST_HARD_CAP,
 } from '../socket/tournamentHandlers';
 
 const p = prisma as never as {
@@ -543,5 +544,42 @@ describe('fireAbsenceTimerCallback (grace-period defense against mass-forfeit)',
     const confirms = io.emissions.filter(e => e.event === 'tournament:please-confirm-ready');
     expect(confirms).toHaveLength(2);
     expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
+  });
+});
+
+describe('un match qui ne demarre jamais finit par etre tranche', () => {
+  it('apres le plafond de tentatives, le meilleur seed avance au lieu de bloquer le tournoi', async () => {
+    const io = fakeIoWithConnectedUsers('t1', ['p1', 'p2']);
+    p.tournamentMatch.findUnique.mockResolvedValue({
+      id: 'mbloque', tournamentId: 't1', status: 'ready', roomCode: null, gameId: null,
+      player1Id: 'p1', player2Id: 'p2', player1Username: 'P1', player2Username: 'P2',
+      round: 1, matchIndex: 0, bracket: null,
+    });
+    p.tournament.findUnique.mockResolvedValue({ format: 'elimination' });
+    p.tournamentMatch.update.mockResolvedValue({});
+    p.tournamentMatch.updateMany.mockResolvedValue({ count: 1 });
+    p.tournamentParticipant.updateMany.mockResolvedValue({ count: 1 });
+    p.tournamentParticipant.findMany.mockResolvedValue([
+      { userId: 'p1', seed: 1 },
+      { userId: 'p2', seed: 8 },
+    ]);
+    p.tournamentMatch.findMany.mockResolvedValue([]);
+
+    for (let i = 0; i < (NO_CONTEST_HARD_CAP + 1) * (MAX_GRACE_CYCLES + 2); i++) {
+      await fireAbsenceTimerCallback(io as never, 't1', 'mbloque', 'p1', 'p2', null, true);
+      const tranche = p.tournamentMatch.update.mock.calls.some(
+        (appel: unknown[]) => (appel[0] as { data?: { status?: string } })?.data?.status === 'forfeit',
+      );
+      if (tranche) break;
+    }
+
+    const forfait = p.tournamentMatch.update.mock.calls.find(
+      (appel: unknown[]) => (appel[0] as { data?: { status?: string } })?.data?.status === 'forfeit',
+    );
+    expect(forfait, 'le match finit par etre tranche au lieu de tourner en boucle').toBeTruthy();
+    expect(
+      (forfait![0] as { data: { winnerId: string } }).data.winnerId,
+      'le meilleur seed passe, comme pour une double absence',
+    ).toBe('p1');
   });
 });
