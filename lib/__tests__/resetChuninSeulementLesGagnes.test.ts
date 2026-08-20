@@ -120,3 +120,18 @@ describe('le tag Chunin gagne en tournoi est le seul a sauter le lundi', () => {
     expect(await lireChuninGagnes()).toEqual(['a', 'b', 'c']);
   });
 });
+
+describe('le role Jonin se gere sans pouvoir lister les membres du serveur', () => {
+  it('accorde aux qualifies, retire a ceux qui sortent, et retient ce qu il a donne', async () => {
+    let stocke: string[] = [];
+    bd.siteSettings.findUnique.mockImplementation(async () => ({ nwlJoninGranted: stocke }));
+    bd.siteSettings.upsert.mockImplementation(async (args: { update: Record<string, string[]> }) => {
+      stocke = args.update.nwlJoninGranted ?? stocke;
+      return {};
+    });
+
+    const { lireJoninAccordes, ecrireJoninAccordes } = await import('@/lib/tournament/nwlChuninEarned');
+    await ecrireJoninAccordes(['sortant', 'reste']);
+    expect(await lireJoninAccordes()).toEqual(['sortant', 'reste']);
+  });
+});

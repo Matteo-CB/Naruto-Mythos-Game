@@ -27,6 +27,7 @@ import {
   type NwlMessageRef,
   type NwlPodiumEntry,
 } from '@/lib/tournament/nwlPartner';
+import { lireChuninGagnes, lireJoninAccordes, ecrireJoninAccordes } from '@/lib/tournament/nwlChuninEarned';
 import { buildEliminationPrizeUserIds } from '@/lib/tournament/resultsView';
 import type { TournamentData } from '@/stores/tournamentStore';
 import {
@@ -350,7 +351,8 @@ export async function diffuserCodeChunin(code: string): Promise<{ mp: number; sa
   const abonnes = NWL_CHUNIN_SUBSCRIBER_ROLE_ID
     ? ((await listNwlRoleHolders(NWL_CHUNIN_SUBSCRIBER_ROLE_ID)) ?? [])
     : [];
-  const porteurs = [...new Set([...hebdomadaires, ...abonnes])];
+  const gagnes = await lireChuninGagnes();
+  const porteurs = [...new Set([...hebdomadaires, ...abonnes, ...gagnes])];
   let mp = 0;
   for (const discordId of porteurs) {
     const ok = await nwlSendDirectMessage(discordId, texteCodeAcces(NWL_CHUNIN_TOURNAMENT_NAME, code, NWL_CHUNIN_START_HOUR));
@@ -517,24 +519,38 @@ export async function synchroniserRoleJonin(now: Date = new Date()): Promise<{ a
     console.log('[NWL] aucun classement exploitable, le role Jonin est laisse tel quel');
     return { ajoutes: 0, retires: 0 };
   }
-  const attendus = new Set(qualifies.map((q) => q.discordId).filter((d): d is string => !!d));
-  if (attendus.size === 0) {
+  const attendus = qualifies.map((q) => q.discordId).filter((d): d is string => !!d);
+  if (attendus.length === 0) {
     console.log('[NWL] aucun qualifie avec un Discord lie, le role Jonin est laisse tel quel');
     return { ajoutes: 0, retires: 0 };
   }
-  const porteurs = await listNwlRoleHolders(NWL_JONIN_ROLE_ID);
-  if (porteurs === null) return null;
+
+  const deja = await lireJoninAccordes();
+  const porteursListes = await listNwlRoleHolders(NWL_JONIN_ROLE_ID);
+  const connus = [...new Set([...deja, ...(porteursListes ?? [])])];
 
   let ajoutes = 0;
   let retires = 0;
+  const tenus: string[] = [];
+
   for (const discordId of attendus) {
-    if (porteurs.includes(discordId)) continue;
-    if ((await grantNwlRole(discordId, NWL_JONIN_ROLE_ID)) === 'granted') ajoutes += 1;
+    if (connus.includes(discordId)) {
+      tenus.push(discordId);
+      continue;
+    }
+    if ((await grantNwlRole(discordId, NWL_JONIN_ROLE_ID)) === 'granted') {
+      ajoutes += 1;
+      tenus.push(discordId);
+    }
   }
-  for (const discordId of porteurs) {
-    if (attendus.has(discordId)) continue;
+
+  for (const discordId of connus) {
+    if (attendus.includes(discordId)) continue;
     if ((await revokeNwlRole(discordId, NWL_JONIN_ROLE_ID)) === 'granted') retires += 1;
+    else tenus.push(discordId);
   }
+
+  await ecrireJoninAccordes(tenus);
   return { ajoutes, retires };
 }
 

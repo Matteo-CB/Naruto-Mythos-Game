@@ -278,8 +278,8 @@ export async function announceNwlPodium(entries: NwlPodiumEntry[]): Promise<bool
 }
 
 export const NWL_NARUTO_MYTHOS_ROLE_ID = '1500156919971577968';
-export const NWL_JONIN_ROLE_ID = '1504441360059469875';
-export const NWL_KAGE_ROLE_ID = '';
+export const NWL_JONIN_ROLE_ID = '1523084007854833728';
+export const NWL_KAGE_ROLE_ID = '1504441360059469875';
 export const NWL_KAGE_CHAMPIONS_MAX = 3;
 export const NWL_ANNOUNCE_CHANNEL_ID = '1539215631629418588';
 export const NWL_MOD_CHANNEL_ID = '1396225805381664791';
