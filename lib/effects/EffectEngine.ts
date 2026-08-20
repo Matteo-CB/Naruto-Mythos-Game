@@ -6565,14 +6565,16 @@ export class EffectEngine {
       case 'ATTACH_CHOOSE_TARGET': {
         let attCard: CardData | null = null;
         let attProvenance: ProvenanceEquipement | undefined;
+        let attRevelee = false;
         try {
           const lu = JSON.parse(pendingEffect.effectDescription);
           attCard = lu.card ?? null;
           attProvenance = lu.provenance ?? undefined;
+          attRevelee = lu.revealed === true;
         } catch {}
         if (attCard) {
           newState = attachCardToCharacter(
-            newState, pendingEffect.sourcePlayer, attCard, targetId, false, undefined, attProvenance,
+            newState, pendingEffect.sourcePlayer, attCard, targetId, attRevelee, undefined, attProvenance,
           );
         }
         break;

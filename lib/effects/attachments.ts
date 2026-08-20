@@ -70,7 +70,6 @@ function resolveAttachmentTrigger(
   if (!(card.effects ?? []).some((e) => e.type === type)) return state;
   const handler = getEffectHandler(card.id, type);
   if (!handler) return state;
-  if (state.pendingActions.length > 0) return state;
 
   const source = host ?? ({ instanceId: '', card } as unknown as CharacterInPlay);
   let newState = state;

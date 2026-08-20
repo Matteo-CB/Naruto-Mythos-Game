@@ -110,14 +110,14 @@ describe('sealed booster — exact 10 card composition with no bonus variant slo
     }
   });
 
-  it('slot 9 is the chase slot and only ever RA, C, UC, S or L', () => {
+  it('slot 9 is the chase slot and only ever C, UC, S, L or SV', () => {
     const seen = new Set<string>();
     for (let i = 0; i < 400; i++) {
       const cards = generateBooster(i, 'KS').cards;
       expect(cards[8].isHolo).toBe(false);
       seen.add(cards[8].rarity);
     }
-    for (const r of seen) expect(['RA', 'C', 'UC', 'S', 'L']).toContain(r);
+    for (const r of seen) expect(['C', 'UC', 'S', 'L', 'SV'], 'the notice lists no rare art in a Konoha Shido pack').toContain(r);
   });
 
   it('no sealed card carries isHolo: the holo skins belong to the reward boosters', () => {
