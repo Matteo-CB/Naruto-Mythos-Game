@@ -294,12 +294,15 @@ export async function nwlPostMessage(
   channelId: string,
   content: string,
   roleToPing?: string,
+  usersToPing?: string[],
 ): Promise<NwlMessageRef | null> {
+  const roles = roleToPing ? [roleToPing] : [];
+  const users = (usersToPing ?? []).filter(Boolean);
   const res = await nwlApi(`/channels/${channelId}/messages`, {
     method: 'POST',
     body: JSON.stringify({
       content,
-      allowed_mentions: roleToPing ? { roles: [roleToPing] } : { parse: [] },
+      allowed_mentions: roles.length > 0 || users.length > 0 ? { roles, users } : { parse: [] },
     }),
   });
   if (!res || (res.status !== 200 && res.status !== 201)) return null;

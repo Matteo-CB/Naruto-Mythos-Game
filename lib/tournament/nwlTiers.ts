@@ -171,7 +171,13 @@ export async function createNwlChuninTournamentIfNeeded(now: Date = new Date()):
 }
 
 export async function createNwlKageTournamentIfNeeded(now: Date = new Date()): Promise<NwlTierCreation> {
-  return creerTournoiPrive(SPEC_KAGE, now, (p) => estPremierDimancheDuMois(p.year, p.month, p.day));
+  const jourValide = (p: ReturnType<typeof parisDateParts>) => estPremierDimancheDuMois(p.year, p.month, p.day);
+  if (!jourValide(parisDateParts(now))) return { created: false, reason: 'wrong_day' };
+  if ((await kageQualifiers(now)).length === 0) {
+    console.log('[NWL] aucun qualifie pour le Kage, le tournoi n est pas cree');
+    return { created: false, reason: 'no_eligible' };
+  }
+  return creerTournoiPrive(SPEC_KAGE, now, jourValide);
 }
 
 export interface NwlStandingEntry {
@@ -366,12 +372,13 @@ export async function diffuserCodeKage(code: string, now: Date = new Date()): Pr
     const ok = await nwlSendDirectMessage(q.discordId, texteCodeAcces(NWL_KAGE_TOURNAMENT_NAME, code, NWL_KAGE_START_HOUR));
     if (ok) mp += 1;
   }
-  const porteursKage = (await listNwlRoleHolders(NWL_KAGE_ROLE_ID)) ?? [];
-  void porteursKage;
+  const mentions = qualifies.map((q) => q.discordId).filter((d): d is string => !!d);
+  const entete = mentions.length > 0 ? `${mentions.map((d) => `<@${d}>`).join(' ')}\n` : '';
   const salon = await nwlPostMessage(
     NWL_ANNOUNCE_CHANNEL_ID,
-    `<@&${NWL_KAGE_ROLE_ID}>\n${texteCodeAcces(NWL_KAGE_TOURNAMENT_NAME, code, NWL_KAGE_START_HOUR)}`,
-    NWL_KAGE_ROLE_ID,
+    `${entete}${texteCodeAcces(NWL_KAGE_TOURNAMENT_NAME, code, NWL_KAGE_START_HOUR)}`,
+    undefined,
+    mentions,
   );
   return { mp, salon: salon !== null };
 }
@@ -617,11 +624,12 @@ export async function cloturerPalierNwl(tournamentId: string): Promise<boolean> 
     ? `First place wins £${NWL_CHUNIN_STORE_CREDIT_GBP} of store credit, offered by New World Loot. Every match played counts towards the monthly Chunin standings.`
     : `First place wins a sealed box of Naruto Mythos, offered by New World Loot, and the Kage role, held by the last ${NWL_KAGE_CHAMPIONS_MAX} champions.`;
   const role = estChunin ? NWL_CHUNIN_ROLE_ID : NWL_JONIN_ROLE_ID;
+  const entete = role ? `<@&${role}>\n` : '';
 
   await nwlPostMessage(
     NWL_ANNOUNCE_CHANNEL_ID,
-    `<@&${role}>\n${texteVictoirePalier(tournoi.name, podium, recompense)}`,
-    role,
+    `${entete}${texteVictoirePalier(tournoi.name, podium, recompense)}`,
+    role || undefined,
   );
 
   if (!estChunin) {
@@ -638,7 +646,7 @@ export function rolesAcceptesPourPalier(partner: string | null | undefined): str
   if (partner === NWL_CHUNIN_PARTNER_KEY) {
     return [NWL_CHUNIN_ROLE_ID, NWL_CHUNIN_SUBSCRIBER_ROLE_ID].filter(Boolean);
   }
-  if (partner === NWL_KAGE_PARTNER_KEY) return [NWL_JONIN_ROLE_ID].filter(Boolean);
+  if (partner === NWL_KAGE_PARTNER_KEY) return [];
   return [];
 }
 
@@ -664,12 +672,10 @@ export async function refuserSiPalierNwlInterdit(
 
   if (partner === NWL_KAGE_PARTNER_KEY) {
     const qualifies = await kageQualifiers();
-    if (qualifies.length === 0) return null;
-    const invite = qualifies.some((q) => q.discordId === discordId);
-    if (invite) return null;
+    if (qualifies.some((q) => q.discordId === discordId)) return null;
     return {
       errorKey: 'tournament.error.nwlNoKageRole',
-      error: 'This tournament is reserved to the eight qualified players holding the Jonin role',
+      error: 'This tournament is reserved to the eight players who qualified last month',
       status: 403,
       inviteUrl: NWL_INVITE_URL,
     };

@@ -28,7 +28,7 @@ const {
   NWL_KAGE_PARTNER_KEY,
   NWL_KAGE_MAX_PLAYERS,
 } = await import('@/lib/tournament/nwlTiers');
-const { NWL_CHUNIN_ROLE_ID, NWL_JONIN_ROLE_ID } = await import('@/lib/tournament/nwlPartner');
+const { NWL_CHUNIN_ROLE_ID } = await import('@/lib/tournament/nwlPartner');
 
 function graineKage(discordIds: string[]) {
   bd.siteSettings.findUnique.mockResolvedValue({
@@ -63,7 +63,7 @@ describe('acces aux tournois prives Chunin et Kage', () => {
 
   it('associe chaque palier a son role Discord', () => {
     expect(roleRequisPourPalier(NWL_CHUNIN_PARTNER_KEY)).toBe(NWL_CHUNIN_ROLE_ID);
-    expect(roleRequisPourPalier(NWL_KAGE_PARTNER_KEY), 'le Kage se lit sur le role Jonin').toBe(NWL_JONIN_ROLE_ID);
+    expect(roleRequisPourPalier(NWL_KAGE_PARTNER_KEY), 'le Kage ne se lit sur aucun role').toBeNull();
     expect(roleRequisPourPalier('nwl')).toBeNull();
   });
 
@@ -162,7 +162,7 @@ describe('le role paye du Chunin', () => {
 
   it('le Kage ne s ouvre jamais avec un role de Chunin', async () => {
     const { rolesAcceptesPourPalier } = await import('@/lib/tournament/nwlTiers');
-    expect(rolesAcceptesPourPalier(NWL_KAGE_PARTNER_KEY)).not.toContain(NWL_CHUNIN_ROLE_ID);
+    expect(rolesAcceptesPourPalier(NWL_KAGE_PARTNER_KEY), 'aucun role n ouvre le Kage, seule la liste des qualifies compte').toEqual([]);
   });
 });
 
@@ -187,5 +187,19 @@ describe('le role Kage recompense les derniers champions', () => {
     const liste = championsApresVictoire(['a', 'b', 'c'], 'b', 3);
     expect(liste).toEqual(['a', 'c', 'b']);
     expect(new Set(liste).size, 'aucun doublon').toBe(3);
+  });
+});
+
+describe('le Kage ne s ouvre qu aux qualifies du mois ecoule', () => {
+  it('un ancien vainqueur qui n est plus dans le top 8 ne peut pas s inscrire', async () => {
+    graineKage(['qualifie1', 'qualifie2']);
+    const refus = await refuserSiPalierNwlInterdit(NWL_KAGE_PARTNER_KEY, 'ancien-champion');
+    expect(refus?.errorKey, 'le titre de champion n est pas un laissez-passer').toBe('tournament.error.nwlNoKageRole');
+  });
+
+  it('sans aucun qualifie, personne n entre', async () => {
+    bd.siteSettings.findUnique.mockResolvedValue({ nwlChuninSeed: {} } as never);
+    const refus = await refuserSiPalierNwlInterdit(NWL_KAGE_PARTNER_KEY, 'nimporte-qui');
+    expect(refus?.errorKey, 'un classement vide ne laisse pas la porte ouverte').toBe('tournament.error.nwlNoKageRole');
   });
 });
