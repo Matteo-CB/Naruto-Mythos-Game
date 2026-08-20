@@ -1,6 +1,40 @@
 {
   "entries": [
     {
+      "date": "2026-08-21",
+      "title_fr": "Correctif des équipements",
+      "title_en": "Attachment fix",
+      "title_es": "Corrección de equipos",
+      "title_pt": "Correção de equipamentos",
+      "title_it": "Correzione degli equipaggiamenti",
+      "title_pl": "Poprawka ekwipunku",
+      "title_ja": "装備の修正",
+      "categories": [
+        "fix"
+      ],
+      "changes_fr": [
+        "Les AIGUILLES EMPOISONNÉES 084 retirent bien les jetons de puissance quand vous choisissez sur qui les poser."
+      ],
+      "changes_en": [
+        "POISON NEEDLES 084 now really removes the Power tokens when you pick which character to attach them to."
+      ],
+      "changes_es": [
+        "AGUJAS ENVENENADAS 084 ya retira de verdad las fichas de poder cuando eliges a quién colocarlas."
+      ],
+      "changes_pt": [
+        "AGULHAS ENVENENADAS 084 passa a retirar mesmo as fichas de poder quando escolhes em quem as colocar."
+      ],
+      "changes_it": [
+        "AGHI AVVELENATI 084 toglie davvero i segnalini potenza quando scegli su chi metterli."
+      ],
+      "changes_pl": [
+        "ZATRUTE IGŁY 084 naprawdę zdejmują żetony mocy, gdy wybierasz, na kogo je założyć."
+      ],
+      "changes_ja": [
+        "毒針 084 が、付ける相手を選んだ場合にもきちんとパワートークンを取り除くようになりました。"
+      ]
+    },
+    {
       "date": "2026-08-20",
       "title_fr": "Tournois partenaires automatiques",
       "title_en": "Automatic partner tournaments",
@@ -10,6 +44,7 @@
       "title_pl": "Automatyczne turnieje partnerskie",
       "title_ja": "提携大会の自動化",
       "categories": [
+        "feature",
         "fix",
         "fix",
         "fix",
@@ -19,6 +54,7 @@
         "fix"
       ],
       "changes_fr": [
+        "NARUTO UZUMAKI 121 et SASUKE UCHIWA 126 de l évènement de sortie ont enfin leur illustration.",
         "Un équipement volé revient à son propriétaire quand le personnage qui le contrôlait quitte le jeu, sur une cible valide ou à la défausse.",
         "La fenêtre qui fait choisir des cartes en main laisse enfin en sélectionner plusieurs, comme le demande SAKON 037.",
         "Les cartes qu un joueur retourne face visible, comme avec GAARA 046, s affichent aussi chez l adversaire.",
@@ -28,6 +64,7 @@
         "Si un match était marqué perdu par absence alors que la partie a bien été jouée, le vrai résultat reprend le dessus."
       ],
       "changes_en": [
+        "NARUTO UZUMAKI 121 and SASUKE UCHIHA 126 from the release event finally have their artwork.",
         "A stolen attachment returns to its owner when the character controlling it leaves play, onto a legal target or to the discard pile.",
         "The window that asks you to pick cards from hand finally lets you select several, as SAKON 037 requires.",
         "Cards a player turns face up, like with GAARA 046, are now shown on the opponent's screen too.",
@@ -37,6 +74,7 @@
         "If a match was marked lost for absence while the game was actually played, the real result takes over."
       ],
       "changes_es": [
+        "NARUTO UZUMAKI 121 y SASUKE UCHIHA 126 del evento de lanzamiento ya tienen su ilustración.",
         "Un equipo robado vuelve a su dueño cuando el personaje que lo controlaba deja el juego, a un objetivo válido o al descarte.",
         "La ventana que pide elegir cartas de la mano por fin permite seleccionar varias, como exige SAKON 037.",
         "Las cartas que un jugador pone boca arriba, como con GAARA 046, ahora también se ven en la pantalla del rival.",
@@ -46,6 +84,7 @@
         "Si un combate se marcó como perdido por ausencia aunque la partida sí se jugó, el resultado real prevalece."
       ],
       "changes_pt": [
+        "NARUTO UZUMAKI 121 e SASUKE UCHIHA 126 do evento de lançamento passam a ter a sua ilustração.",
         "Um equipamento roubado volta ao seu dono quando a personagem que o controlava sai de jogo, para um alvo válido ou para o descarte.",
         "A janela que pede para escolher cartas da mão passa finalmente a permitir escolher várias, como SAKON 037 exige.",
         "As cartas que um jogador vira para cima, como com GAARA 046, passam a aparecer também no ecrã do adversário.",
@@ -55,6 +94,7 @@
         "Se um jogo foi marcado como perdido por ausência apesar de ter sido jogado, o resultado real passa a valer."
       ],
       "changes_it": [
+        "NARUTO UZUMAKI 121 e SASUKE UCHIHA 126 dell evento di lancio hanno finalmente la loro illustrazione.",
         "Un equipaggiamento rubato torna al suo proprietario quando il personaggio che lo controllava lascia il gioco, su un bersaglio valido o negli scarti.",
         "La finestra che chiede di scegliere carte dalla mano permette finalmente di sceglierne più di una, come richiede SAKON 037.",
         "Le carte che un giocatore scopre, come con GAARA 046, ora compaiono anche sullo schermo dell avversario.",
@@ -64,6 +104,7 @@
         "Se un incontro era segnato come perso per assenza ma la partita è stata giocata, vale il risultato reale."
       ],
       "changes_pl": [
+        "NARUTO UZUMAKI 121 i SASUKE UCHIHA 126 z eventu premierowego mają wreszcie swoją ilustrację.",
         "Skradziony ekwipunek wraca do właściciela, gdy postać, która go kontrolowała, opuszcza grę: na legalny cel albo na stos kart odrzuconych.",
         "Okno wyboru kart z ręki pozwala wreszcie zaznaczyć kilka naraz, tak jak wymaga tego SAKON 037.",
         "Karty odkrywane przez gracza, na przykład przy GAARA 046, pokazują się teraz także na ekranie przeciwnika.",
@@ -73,6 +114,7 @@
         "Jeśli mecz został oznaczony jako przegrany przez nieobecność, mimo że partia się odbyła, liczy się prawdziwy wynik."
       ],
       "changes_ja": [
+        "リリースイベントの NARUTO UZUMAKI 121 と SASUKE UCHIHA 126 にイラストが入りました。",
         "奪われた装備は、支配していた忍が場を離れると持ち主のもとへ戻ります。付けられる対象があればそこへ、なければ捨て札へ。",
         "手札からカードを選ぶ画面で複数枚を選べるようになりました。SAKON 037 の効果に必要な操作です。",
         "GAARA 046 などで表向きにしたカードが、相手の画面にも表示されるようになりました。",
