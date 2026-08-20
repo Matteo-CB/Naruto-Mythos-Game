@@ -12,6 +12,7 @@ export const NWL_CHUNIN_ROLE_ID = '1504440900783308820';
 export const NWL_CHUNIN_SUBSCRIBER_ROLE_ID = '';
 export const NWL_TAG_CHANNEL_ID = '1396218674486055023';
 export const NWL_INVITE_URL = 'https://discord.gg/UXQX8McFD3';
+export const NWL_STORE_URL = 'https://www.newworldloot.com/collections/naruto-mythos';
 export const NWL_APP_ID = '1530185831841534048';
 export const NWL_PRIZE_TOP_N = 3;
 export const NWL_ANNOUNCEMENT_IMAGE = '/images/tournaments/nwl-friday.webp';
@@ -145,13 +146,11 @@ export async function grantNwlChuninRole(discordId: string | null | undefined): 
   return grantNwlRole(discordId, NWL_CHUNIN_ROLE_ID);
 }
 
-export const NWL_CHUNIN_RESET_WEEKDAY = 1;
-
 export const NWL_TOURNAMENT_RULES_NOTE = [
   'New World Loot weekly Friday tournament. Single elimination, standard ban list.',
   `Rewards. First place wins £${NWL_FIRST_PLACE_STORE_CREDIT_GBP} of store credit, offered by New World Loot.`,
   `The first ${NWL_CHUNIN_PODIUM_PLACES} players also earn the Chunin role. It lets you enter the Chunin tournament held the next day, where the rewards are bigger. Details on the New World Loot Discord server.`,
-  'A Chunin role won here counts for that next Chunin tournament only: it is removed the following Monday, so it has to be earned again each week. A Chunin role obtained any other way is never touched.',
+  'A Chunin role won here lasts 3 days, long enough for the Chunin tournament the next day, then it is removed automatically. A Chunin role obtained any other way is never touched.',
   `To receive the Chunin role you must link your Discord account and be a member of the New World Loot server: ${NWL_DISCORD_INVITE}`,
 ].join(' ');
 

@@ -11,6 +11,10 @@
       "title_ja": "提携大会の自動化",
       "categories": [
         "feature",
+        "feature",
+        "feature",
+        "feature",
+        "feature",
         "fix",
         "fix",
         "fix",
@@ -24,6 +28,10 @@
         "feature"
       ],
       "changes_fr": [
+        "Le tournoi Chunin s ouvre dès la fin du tournoi du vendredi et le code part aussitôt à ceux qui viennent de gagner le rôle.",
+        "Un rappel est envoyé deux heures avant le départ de chaque tournoi partenaire.",
+        "Le rôle Chunin gagné en tournoi dure trois jours, puis il est retiré tout seul.",
+        "Le vainqueur d un tournoi partenaire reçoit un message privé qui lui explique comment récupérer sa récompense.",
         "Les tournois Chunin et Kage ouvrent leurs inscriptions huit heures avant le départ, comme le tournoi du vendredi.",
         "Les cartes qu un joueur retourne face visible, comme avec GAARA 046, s affichent aussi chez l adversaire.",
         "Un personnage sous BOMBE AVEUGLANTE 083 n a plus aucun effet à copier, aucun copieur ne le propose plus.",
@@ -38,6 +46,10 @@
         "Chaque tournoi partenaire affiche maintenant sa propre affiche et ses propres conditions d entrée."
       ],
       "changes_en": [
+        "The Chunin tournament opens as soon as the Friday tournament ends, and the code goes straight to the players who just earned the role.",
+        "A reminder is sent two hours before every partner tournament starts.",
+        "A Chunin role won in a tournament now lasts three days, then it is removed on its own.",
+        "The winner of a partner tournament receives a private message explaining how to claim their reward.",
         "The Chunin and Kage tournaments open registration eight hours before the start, like the Friday tournament.",
         "Cards a player turns face up, like with GAARA 046, are now shown on the opponent's screen too.",
         "A character under FLASH BOMB 083 has no effect left to copy, no copier offers it as a target any more.",
@@ -52,6 +64,10 @@
         "Each partner tournament now shows its own poster and its own entry conditions."
       ],
       "changes_es": [
+        "El torneo Chunin se abre en cuanto termina el torneo del viernes, y el código llega enseguida a quienes acaban de ganar el rol.",
+        "Se envía un recordatorio dos horas antes del inicio de cada torneo asociado.",
+        "El rol Chunin ganado en torneo dura tres días y luego se retira solo.",
+        "El ganador de un torneo asociado recibe un mensaje privado que explica cómo reclamar su recompensa.",
         "Los torneos Chunin y Kage abren inscripciones ocho horas antes del inicio, como el torneo del viernes.",
         "Las cartas que un jugador pone boca arriba, como con GAARA 046, ahora también se ven en la pantalla del rival.",
         "Un personaje bajo BOMBA CEGADORA 083 ya no tiene ningún efecto que copiar, ningún copiador lo propone.",
@@ -66,6 +82,10 @@
         "Cada torneo asociado muestra ahora su propio cartel y sus propias condiciones de entrada."
       ],
       "changes_pt": [
+        "O torneio Chunin abre assim que o torneio de sexta acaba, e o código segue logo para quem acabou de ganhar o cargo.",
+        "É enviado um lembrete duas horas antes do início de cada torneio parceiro.",
+        "O cargo Chunin ganho em torneio dura três dias e depois é retirado sozinho.",
+        "O vencedor de um torneio parceiro recebe uma mensagem privada a explicar como receber a recompensa.",
         "Os torneios Chunin e Kage abrem inscrições oito horas antes do início, como o torneio de sexta.",
         "As cartas que um jogador vira para cima, como com GAARA 046, passam a aparecer também no ecrã do adversário.",
         "Uma personagem sob BOMBA DE LUZ 083 deixa de ter efeitos para copiar, nenhum copiador a propõe.",
@@ -80,6 +100,10 @@
         "Cada torneio parceiro mostra agora o seu próprio cartaz e as suas próprias condições de entrada."
       ],
       "changes_it": [
+        "Il torneo Chunin si apre appena finisce il torneo del venerdì, e il codice parte subito a chi ha appena ottenuto il ruolo.",
+        "Un promemoria viene inviato due ore prima dell inizio di ogni torneo partner.",
+        "Il ruolo Chunin vinto in torneo dura tre giorni, poi viene tolto da solo.",
+        "Il vincitore di un torneo partner riceve un messaggio privato che spiega come ottenere il premio.",
         "I tornei Chunin e Kage aprono le iscrizioni otto ore prima dell inizio, come il torneo del venerdì.",
         "Le carte che un giocatore scopre, come con GAARA 046, ora compaiono anche sullo schermo dell avversario.",
         "Un personaggio sotto BOMBA ACCECANTE 083 non ha più effetti da copiare, nessun copiatore lo propone.",
@@ -94,6 +118,10 @@
         "Ogni torneo partner mostra ora la propria locandina e le proprie condizioni di ingresso."
       ],
       "changes_pl": [
+        "Turniej Chunin otwiera się zaraz po zakończeniu turnieju piątkowego, a kod trafia od razu do tych, którzy właśnie zdobyli rolę.",
+        "Przypomnienie jest wysyłane dwie godziny przed startem każdego turnieju partnerskiego.",
+        "Rola Chunin zdobyta w turnieju trwa teraz trzy dni, potem znika sama.",
+        "Zwycięzca turnieju partnerskiego dostaje prywatną wiadomość z informacją, jak odebrać nagrodę.",
         "Turnieje Chunin i Kage otwierają zapisy osiem godzin przed startem, tak jak turniej piątkowy.",
         "Karty odkrywane przez gracza, na przykład przy GAARA 046, pokazują się teraz także na ekranie przeciwnika.",
         "Postać z BOMBĄ BŁYSKOWĄ 083 nie ma już żadnego efektu do skopiowania, żaden kopiujący jej nie proponuje.",
@@ -108,6 +136,10 @@
         "Każdy turniej partnerski pokazuje teraz własny plakat i własne warunki wejścia."
       ],
       "changes_ja": [
+        "中忍大会は金曜の大会が終わり次第すぐ開き、ロールを獲得したばかりのプレイヤーに参加コードが届きます。",
+        "提携大会は開始2時間前にリマインドが届きます。",
+        "大会で獲得した中忍ロールは3日間続き、その後は自動で外れます。",
+        "提携大会の優勝者に、賞品の受け取り方を伝える個別メッセージが届きます。",
         "中忍大会と影大会の参加受付が、金曜の大会と同じく開始8時間前に始まります。",
         "GAARA 046 などで表向きにしたカードが、相手の画面にも表示されるようになりました。",
         "閃光弾 083 を受けた忍にはコピーできる効果が残らず、コピー系のカードの対象にも出なくなりました。",

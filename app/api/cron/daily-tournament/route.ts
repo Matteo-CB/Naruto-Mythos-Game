@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDailyTournamentIfNeeded } from '@/lib/tournament/dailyTournament';
-import { createNwlFridayTournamentIfNeeded, resetNwlChuninIfMonday } from '@/lib/tournament/nwlFridayTournament';
+import { createNwlFridayTournamentIfNeeded, retirerChuninExpires } from '@/lib/tournament/nwlFridayTournament';
 import { retryPendingNwlPrizes } from '@/lib/tournament/nwlPrize';
 import {
   createNwlChuninTournamentIfNeeded,
@@ -10,6 +10,8 @@ import {
   annoncerOuvertureGenin,
   publierClassementChunin,
   synchroniserRoleJonin,
+  rappelerLesTournoisProches,
+  rappelerLeTopHuit,
   NWL_HEURE_SYNCHRO_KAGE,
 } from '@/lib/tournament/nwlTiers';
 import { parisDateParts } from '@/lib/tournament/dailyTournament';
@@ -35,7 +37,7 @@ async function handle(request: NextRequest) {
       createNwlFridayTournamentIfNeeded(),
       retryPendingNwlPrizes(new Date()),
     ]);
-    const chuninReset = await resetNwlChuninIfMonday(new Date());
+    const chuninReset = await retirerChuninExpires(new Date());
 
     if (nwl.created) {
       const annonce = await annoncerOuvertureGenin();
@@ -54,15 +56,19 @@ async function handle(request: NextRequest) {
       console.log(`[Cron] Kage tournament created, code sent to ${diffusion.mp} player(s), channel: ${diffusion.salon}`);
     }
 
+    const rappels = await rappelerLesTournoisProches(new Date());
+
     let classement: { publie: boolean; joueurs: number } | null = null;
     let roleJonin: { ajoutes: number; retires: number } | null = null;
+    let topHuit: { envoye: boolean } | null = null;
     if (parisDateParts(new Date()).hour === NWL_HEURE_SYNCHRO_KAGE) {
       classement = await publierClassementChunin();
       roleJonin = await synchroniserRoleJonin();
-      console.log(`[Cron] Chunin standings published: ${classement.publie}, Jonin role sync: ${JSON.stringify(roleJonin)}`);
+      topHuit = await rappelerLeTopHuit();
+      console.log(`[Cron] Chunin standings published: ${classement.publie}, Jonin role sync: ${JSON.stringify(roleJonin)}, top 8 reminder: ${topHuit.envoye}`);
     }
 
-    return NextResponse.json({ daily, nwl, nwlPrizeRetry, chuninReset, chunin, kage, classement, roleJonin });
+    return NextResponse.json({ daily, nwl, nwlPrizeRetry, chuninReset, chunin, kage, classement, roleJonin, rappels, topHuit });
   } catch (err) {
     console.error('[Cron] daily-tournament error:', err instanceof Error ? err.message : err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });

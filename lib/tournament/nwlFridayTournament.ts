@@ -1,8 +1,8 @@
 import { prisma } from '@/lib/db/prisma';
 import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
 import { parisDateParts, parisWallToUtc } from '@/lib/tournament/dailyTournament';
-import { NWL_PARTNER_KEY, NWL_TOURNAMENT_NAME, NWL_MAX_PLAYERS, NWL_START_HOUR, NWL_TOURNAMENT_RULES_NOTE, NWL_CHUNIN_RESET_WEEKDAY, revokeNwlChuninRolesFor } from '@/lib/tournament/nwlPartner';
-import { lireChuninGagnes, ecrireChuninGagnes } from '@/lib/tournament/nwlChuninEarned';
+import { NWL_PARTNER_KEY, NWL_TOURNAMENT_NAME, NWL_MAX_PLAYERS, NWL_START_HOUR, NWL_TOURNAMENT_RULES_NOTE, revokeNwlChuninRolesFor } from '@/lib/tournament/nwlPartner';
+import { lireTagsChunin, ecrireTagsChunin, separerTagsExpires } from '@/lib/tournament/nwlChuninEarned';
 import { findTournamentOwner } from '@/lib/tournament/tournamentOwner';
 
 export const NWL_REG_OPEN_HOUR = 14;
@@ -15,35 +15,20 @@ export interface NwlFridayResult {
   scheduledStartAt?: string;
 }
 
-export async function resetNwlChuninIfMonday(now: Date = new Date()): Promise<{ ran: boolean; revoked?: number }> {
-  const p = parisDateParts(now);
-  const weekday = new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay();
-  if (weekday !== NWL_CHUNIN_RESET_WEEKDAY) return { ran: false };
+export async function retirerChuninExpires(now: Date = new Date()): Promise<{ ran: boolean; revoked?: number }> {
+  const tags = await lireTagsChunin();
+  if (tags.length === 0) return { ran: false };
 
-  const dayStart = parisWallToUtc(p.year, p.month, p.day, 0, 0);
-  const already = await prisma.tournament.findFirst({
-    where: { partner: NWL_PARTNER_KEY, chuninResetAt: { gte: dayStart } },
-    select: { id: true },
-  });
-  if (already) return { ran: false };
+  const { expires, valides } = separerTagsExpires(tags, now.getTime());
+  if (expires.length === 0) return { ran: false };
 
-  const gagnes = await lireChuninGagnes();
-  if (gagnes.length === 0) {
-    console.log('[NWL] weekly Chunin reset: nobody won the role this week, nothing to remove');
-    return { ran: false };
-  }
-  const result = await revokeNwlChuninRolesFor(gagnes);
-  await ecrireChuninGagnes(result.restants);
-
-  const latest = await prisma.tournament.findFirst({
-    where: { partner: NWL_PARTNER_KEY },
-    orderBy: { createdAt: 'desc' },
-    select: { id: true },
-  });
-  if (latest) {
-    await prisma.tournament.update({ where: { id: latest.id }, data: { chuninResetAt: now } });
-  }
-  return { ran: true, revoked: result.revoked };
+  const resultat = await revokeNwlChuninRolesFor(expires.map((t) => t.discordId));
+  const gardes = [
+    ...valides,
+    ...expires.filter((t) => resultat.restants.includes(t.discordId)),
+  ];
+  await ecrireTagsChunin(gardes);
+  return { ran: true, revoked: resultat.revoked };
 }
 
 export async function createNwlFridayTournamentIfNeeded(now: Date = new Date()): Promise<NwlFridayResult> {

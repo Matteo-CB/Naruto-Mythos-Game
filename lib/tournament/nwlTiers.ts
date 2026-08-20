@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db/prisma';
 import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
 import { parisDateParts, parisWallToUtc } from '@/lib/tournament/dailyTournament';
 import { NWL_REG_OPEN_HOUR } from '@/lib/tournament/nwlFridayTournament';
+import { NWL_PARTNER_KEY } from '@/lib/tournament/nwlPartner';
 import { findTournamentOwner } from '@/lib/tournament/tournamentOwner';
 import {
   NWL_CHUNIN_ROLE_ID,
@@ -14,6 +15,7 @@ import {
   NWL_MOD_CHANNEL_ID,
   NWL_DECKS_CHANNEL_ID,
   NWL_INVITE_URL,
+  NWL_STORE_URL,
   listNwlChuninHolders,
   listNwlRoleHolders,
   nwlPostMessage,
@@ -29,7 +31,7 @@ import {
   type NwlMessageRef,
   type NwlPodiumEntry,
 } from '@/lib/tournament/nwlPartner';
-import { lireChuninGagnes, lireJoninAccordes, ecrireJoninAccordes } from '@/lib/tournament/nwlChuninEarned';
+import { lireTagsChunin, lireJoninAccordes, ecrireJoninAccordes } from '@/lib/tournament/nwlChuninEarned';
 import { buildEliminationPrizeUserIds } from '@/lib/tournament/resultsView';
 import type { TournamentData } from '@/stores/tournamentStore';
 import {
@@ -49,6 +51,8 @@ export const NWL_KAGE_WEEKDAY = 0;
 export const NWL_CHUNIN_START_HOUR = 22;
 export const NWL_KAGE_START_HOUR = 21;
 export const NWL_TIER_LEAD_HOURS = NWL_START_HOUR - NWL_REG_OPEN_HOUR;
+export const NWL_KAGE_LEAD_HOURS = 20;
+export const NWL_RAPPEL_HEURES = 2;
 
 export const NWL_CHUNIN_MAX_PLAYERS = 32;
 export const NWL_KAGE_MAX_PLAYERS = 8;
@@ -80,6 +84,7 @@ interface SpecPalier {
   name: string;
   maxPlayers: number;
   startHour: number;
+  leadHours: number;
   note: string;
 }
 
@@ -88,6 +93,7 @@ const SPEC_CHUNIN: SpecPalier = {
   name: NWL_CHUNIN_TOURNAMENT_NAME,
   maxPlayers: NWL_CHUNIN_MAX_PLAYERS,
   startHour: NWL_CHUNIN_START_HOUR,
+  leadHours: NWL_TIER_LEAD_HOURS,
   note: [
     'New World Loot weekly Saturday tournament, reserved to players holding the Chunin role.',
     `Rewards. First place wins £${NWL_CHUNIN_STORE_CREDIT_GBP} of store credit, offered by New World Loot.`,
@@ -102,6 +108,7 @@ const SPEC_KAGE: SpecPalier = {
   name: NWL_KAGE_TOURNAMENT_NAME,
   maxPlayers: NWL_KAGE_MAX_PLAYERS,
   startHour: NWL_KAGE_START_HOUR,
+  leadHours: NWL_KAGE_LEAD_HOURS,
   note: [
     'New World Loot monthly tournament, reserved to the eight best players of last month Chunin standings.',
     'Rewards. First place wins a sealed box of Naruto Mythos, offered by New World Loot.',
@@ -117,7 +124,7 @@ async function creerTournoiPrive(
   const p = parisDateParts(now);
   if (!jourValide(p)) return { created: false, reason: 'wrong_day' };
 
-  const ouverture = spec.startHour - NWL_TIER_LEAD_HOURS;
+  const ouverture = spec.startHour - spec.leadHours;
   if (p.hour < Math.max(0, ouverture) || p.hour >= spec.startHour) {
     return { created: false, reason: 'outside_window' };
   }
@@ -353,7 +360,7 @@ export async function diffuserCodeChunin(code: string): Promise<{ mp: number; sa
   const abonnes = NWL_CHUNIN_SUBSCRIBER_ROLE_ID
     ? ((await listNwlRoleHolders(NWL_CHUNIN_SUBSCRIBER_ROLE_ID)) ?? [])
     : [];
-  const gagnes = await lireChuninGagnes();
+  const gagnes = (await lireTagsChunin()).map((t) => t.discordId);
   const porteurs = [...new Set([...hebdomadaires, ...abonnes, ...gagnes])];
   let mp = 0;
   for (const discordId of porteurs) {
@@ -661,8 +668,15 @@ export async function cloturerPalierNwl(tournamentId: string): Promise<boolean> 
     role || undefined,
   );
 
+  const vainqueur = podium.find((e) => e.place === 1);
+  if (vainqueur) {
+    await feliciterVainqueur(
+      vainqueur.discordId, vainqueur.username,
+      estChunin ? texteRecompenseChunin() : texteRecompenseKage(),
+      estChunin ? `£${NWL_CHUNIN_STORE_CREDIT_GBP} of store credit` : 'a sealed box of Naruto Mythos',
+    );
+  }
   if (!estChunin) {
-    const vainqueur = podium.find((e) => e.place === 1);
     await couronnerChampionKage(vainqueur?.discordId ?? null);
   }
 
@@ -744,4 +758,199 @@ export async function refuserSiPalierNwlInterdit(
         };
   }
   return null;
+}
+
+export function texteRecompenseGenin(): string {
+  return [
+    `Congratulations, you won the **${NWL_TOURNAMENT_NAME}**.`,
+    `Your £${NWL_FIRST_PLACE_STORE_CREDIT_GBP} of store credit will be added to the email you used for the simulator.`,
+    NWL_STORE_URL,
+  ].join('\n');
+}
+
+export function texteRecompenseChunin(): string {
+  return [
+    `Congratulations, you won the **${NWL_CHUNIN_TOURNAMENT_NAME}**.`,
+    `Your £${NWL_CHUNIN_STORE_CREDIT_GBP} of store credit will be credited to the email you used for the simulator.`,
+    NWL_STORE_URL,
+  ].join('\n');
+}
+
+export function texteRecompenseKage(): string {
+  return [
+    `Congratulations, you won the **${NWL_KAGE_TOURNAMENT_NAME}**.`,
+    'Your box will be sent out as soon as possible. Send your name, phone number, email, postcode, address and country to the New World Loot organisers on their Discord server so they can ship it.',
+    NWL_INVITE_URL,
+  ].join('\n');
+}
+
+export async function prevenirLesOrganisateurs(nom: string, discordId: string | null, recompense: string): Promise<void> {
+  const qui = discordId ? `**${nom}** (<@${discordId}>)` : `**${nom}**`;
+  await nwlPostMessage(NWL_MOD_CHANNEL_ID, `Prize to hand out: ${qui} won ${recompense}.`);
+}
+
+export async function feliciterVainqueur(
+  discordId: string | null,
+  username: string,
+  texte: string,
+  recompense: string,
+): Promise<boolean> {
+  await prevenirLesOrganisateurs(username, discordId, recompense);
+  if (!discordId) return false;
+  return nwlSendDirectMessage(discordId, texte);
+}
+
+export function texteRappelAvantDepart(nom: string, heuresRestantes: number): string {
+  return [
+    `**${nom}** starts in ${heuresRestantes} hours.`,
+    'Open the Naruto Mythos simulator and make sure you are registered with a legal deck.',
+  ].join('\n');
+}
+
+export function prochainSamedi(now: Date, heureDepart: number): Date {
+  const p = parisDateParts(now);
+  const jour = new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay();
+  const dansCombien = jour === NWL_CHUNIN_WEEKDAY && p.hour < heureDepart
+    ? 0
+    : (NWL_CHUNIN_WEEKDAY - jour + 7) % 7 || 7;
+  const cible = new Date(Date.UTC(p.year, p.month - 1, p.day + dansCombien));
+  return parisWallToUtc(cible.getUTCFullYear(), cible.getUTCMonth() + 1, cible.getUTCDate(), heureDepart, 0);
+}
+
+export async function creerChuninApresGenin(now: Date = new Date()): Promise<NwlTierCreation> {
+  const scheduledStartAt = prochainSamedi(now, NWL_CHUNIN_START_HOUR);
+  const debutJour = new Date(scheduledStartAt.getTime() - 22 * 60 * 60 * 1000);
+  const existant = await prisma.tournament.findFirst({
+    where: { partner: NWL_CHUNIN_PARTNER_KEY, scheduledStartAt: { gte: debutJour, lte: scheduledStartAt } },
+    select: { id: true, joinCode: true },
+  });
+  if (existant) {
+    return { created: false, reason: 'already_exists', tournamentId: existant.id, joinCode: existant.joinCode ?? undefined };
+  }
+
+  const admin = await findTournamentOwner();
+  if (!admin) return { created: false, reason: 'no_admin' };
+
+  const joinCode = generateJoinCode();
+  const tournoi = await prisma.tournament.create({
+    data: {
+      name: SPEC_CHUNIN.name,
+      type: 'simulator',
+      format: 'elimination',
+      status: 'registration',
+      gameMode: 'classic',
+      maxPlayers: SPEC_CHUNIN.maxPlayers,
+      isPublic: false,
+      joinCode,
+      creatorId: admin.id,
+      creatorUsername: admin.username,
+      requiresDiscord: true,
+      useBanList: true,
+      restrictionNote: SPEC_CHUNIN.note,
+      partner: NWL_CHUNIN_PARTNER_KEY,
+      scheduledStartAt,
+    },
+  });
+
+  return {
+    created: true,
+    tournamentId: tournoi.id,
+    joinCode,
+    scheduledStartAt: scheduledStartAt.toISOString(),
+  };
+}
+
+export async function ouvrirChuninEtDiffuser(now: Date = new Date()): Promise<{ cree: boolean; mp: number }> {
+  const chunin = await creerChuninApresGenin(now);
+  if (!chunin.created || !chunin.joinCode) return { cree: false, mp: 0 };
+  const diffusion = await diffuserCodeChunin(chunin.joinCode);
+  return { cree: true, mp: diffusion.mp };
+}
+
+export function cleDeSemaine(now: Date): string {
+  const p = parisDateParts(now);
+  const jour = new Date(Date.UTC(p.year, p.month - 1, p.day));
+  const recul = (jour.getUTCDay() + 6) % 7;
+  const lundi = new Date(Date.UTC(p.year, p.month - 1, p.day - recul));
+  return lundi.toISOString().slice(0, 10);
+}
+
+export async function rappelerLeTopHuit(now: Date = new Date()): Promise<{ envoye: boolean }> {
+  const semaine = cleDeSemaine(now);
+  const reglages = await prisma.siteSettings.findUnique({
+    where: { key: CLE_REGLAGES },
+    select: { nwlTopEightWeek: true },
+  });
+  if (reglages?.nwlTopEightWeek === semaine) return { envoye: false };
+
+  const huit = await standingsPourJonin(now);
+  if (huit.length === 0) return { envoye: false };
+
+  const lignes = huit.map((e, i) => {
+    const qui = e.discordId ? `<@${e.discordId}>` : `**${e.username}**`;
+    return `\`${String(i + 1).padStart(2, ' ')}.\` ${qui} ${e.points} pts`;
+  });
+  const texte = [
+    `**Top ${NWL_KAGE_MAX_PLAYERS} heading to the ${NWL_KAGE_TOURNAMENT_NAME}**`,
+    ...lignes,
+    '',
+    'They hold the Jonin role. Win Chunin matches this week to take their place.',
+  ].join('\n');
+
+  const poste = await nwlPostMessage(
+    NWL_ANNOUNCE_CHANNEL_ID,
+    texte,
+    undefined,
+    huit.map((e) => e.discordId).filter((d): d is string => !!d),
+  );
+  if (!poste) return { envoye: false };
+
+  await prisma.siteSettings.upsert({
+    where: { key: CLE_REGLAGES },
+    update: { nwlTopEightWeek: semaine },
+    create: { key: CLE_REGLAGES, nwlTopEightWeek: semaine },
+  });
+  return { envoye: true };
+}
+
+export function estDansLaFenetreDeRappel(depart: Date, now: Date, heures: number): boolean {
+  const restant = depart.getTime() - now.getTime();
+  return restant > 0 && restant <= heures * 60 * 60 * 1000 + 15 * 60 * 1000;
+}
+
+export async function rappelerLesTournoisProches(now: Date = new Date()): Promise<{ rappels: number }> {
+  const limite = new Date(now.getTime() + (NWL_RAPPEL_HEURES * 60 + 15) * 60 * 1000);
+  const tournois = await prisma.tournament.findMany({
+    where: {
+      partner: { in: [NWL_PARTNER_KEY, NWL_CHUNIN_PARTNER_KEY, NWL_KAGE_PARTNER_KEY] },
+      status: 'registration',
+      reminderSentAt: null,
+      scheduledStartAt: { gt: now, lte: limite },
+    },
+    select: { id: true, name: true, partner: true },
+  });
+
+  let rappels = 0;
+  for (const t of tournois) {
+    const reserve = await prisma.tournament.updateMany({
+      where: { id: t.id, reminderSentAt: null },
+      data: { reminderSentAt: now },
+    });
+    if (reserve.count !== 1) continue;
+
+    const texte = texteRappelAvantDepart(t.name, NWL_RAPPEL_HEURES);
+    let poste: NwlMessageRef | null = null;
+    if (t.partner === NWL_KAGE_PARTNER_KEY) {
+      const huit = (await kageQualifiers(now)).map((q) => q.discordId).filter((d): d is string => !!d);
+      const entete = huit.length > 0 ? `${huit.map((d) => `<@${d}>`).join(' ')}\n` : '';
+      poste = await nwlPostMessage(NWL_ANNOUNCE_CHANNEL_ID, `${entete}${texte}`, undefined, huit);
+    } else {
+      const role = t.partner === NWL_CHUNIN_PARTNER_KEY ? NWL_CHUNIN_ROLE_ID : NWL_NARUTO_MYTHOS_ROLE_ID;
+      poste = await nwlPostMessage(NWL_ANNOUNCE_CHANNEL_ID, `<@&${role}>\n${texte}`, role);
+    }
+
+    if (poste) rappels += 1;
+    else await prisma.tournament.updateMany({ where: { id: t.id }, data: { reminderSentAt: null } });
+  }
+  return { rappels };
 }

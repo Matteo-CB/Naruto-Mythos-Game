@@ -357,6 +357,7 @@ model SiteSettings {
   nwlKageChampions       Json?
   nwlChuninEarned        Json?
   nwlJoninGranted        Json?
+  nwlTopEightWeek        String?
 }
 
 // A card from a "revealing" set that an admin has explicitly HIDDEN (not yet revealed).
@@ -410,6 +411,7 @@ model Tournament {
   partnerAnnounced    Boolean                 @default(false)
   awardsPrizes        Boolean                 @default(true)
   chuninResetAt       DateTime?
+  reminderSentAt      DateTime?
   scheduledStartAt    DateTime?
   matchTimeLimitMs    Int                     @default(1800000)
   joinTimeLimitMs     Int                     @default(300000)
