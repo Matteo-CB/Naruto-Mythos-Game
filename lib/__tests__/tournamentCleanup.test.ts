@@ -30,38 +30,51 @@ describe('cleanupOldTournaments', () => {
     expect(deleteMany).not.toHaveBeenCalled();
   });
 
-  it('queries the four eligibility branches with a 24h cutoff', async () => {
+  it('aucune branche ne fait vieillir un tournoi depuis sa creation quand il a une date de depart', async () => {
     findMany.mockResolvedValue([]);
     await cleanupOldTournaments(NOW);
 
     const arg = findMany.mock.calls[0][0] as { where: { OR: Array<Record<string, unknown>> } };
-    expect(arg.where.OR).toHaveLength(4);
+    const limite = NOW - TOURNAMENT_RETENTION_MS;
 
-    const completed = arg.where.OR[0] as { status: string; completedAt: { lt: Date } };
-    expect(completed.status).toBe('completed');
-    expect(completed.completedAt.lt.getTime()).toBe(NOW - TOURNAMENT_RETENTION_MS);
+    for (const branche of arg.where.OR) {
+      const parCreation = branche.createdAt as { lt: Date } | undefined;
+      if (!parCreation) continue;
+      expect(
+        branche.scheduledStartAt,
+        `la branche ${JSON.stringify(branche.status)} vieillit depuis la creation, elle doit exiger l absence de date de depart`,
+      ).toBeNull();
+    }
 
-    const cancelled = arg.where.OR[1] as { status: string; createdAt: { lt: Date } };
-    expect(cancelled.status).toBe('cancelled');
-    expect(cancelled.createdAt.lt.getTime()).toBe(NOW - TOURNAMENT_RETENTION_MS);
+    const termine = arg.where.OR.find((b) => b.status === 'completed') as { completedAt: { lt: Date } };
+    expect(termine.completedAt.lt.getTime(), 'un tournoi termine vieillit depuis sa fin').toBe(limite);
 
-    const pending = arg.where.OR[2] as { status: string; createdAt: { lt: Date }; OR: Array<unknown> };
-    expect(pending.status).toBe('pending');
-    expect(pending.createdAt.lt.getTime()).toBe(NOW - TOURNAMENT_RETENTION_MS);
-    expect(pending.OR).toHaveLength(2);
+    const enCours = arg.where.OR.find((b) => b.status === 'in_progress') as { startedAt: { lt: Date }; createdAt?: unknown };
+    expect(enCours.createdAt, 'un tournoi en cours ne vieillit jamais depuis sa creation').toBeUndefined();
+    expect(enCours.startedAt.lt.getTime(), 'il vieillit depuis son demarrage reel').toBe(limite);
 
-    const inProgress = arg.where.OR[3] as {
-      status: string;
-      startedAt?: { lt: Date };
-      createdAt?: { lt: Date };
-    };
-    expect(inProgress.status).toBe('in_progress');
-    expect(
-      inProgress.createdAt,
-      'a running tournament must never be purged on its creation age: one scheduled days in advance would be wiped mid-event',
-    ).toBeUndefined();
-    expect(inProgress.startedAt!.lt.getTime(), 'it ages from the moment it actually started')
-      .toBe(NOW - TOURNAMENT_RETENTION_MS);
+    const annules = arg.where.OR.filter((b) => b.status === 'cancelled');
+    expect(annules.length, 'plusieurs facons de dater une annulation').toBeGreaterThan(1);
+    const annuleDate = annules.find((b) => b.completedAt && typeof b.completedAt === 'object') as { completedAt: { lt: Date } };
+    expect(annuleDate.completedAt.lt.getTime(), 'une annulation datee vieillit depuis cette date').toBe(limite);
+  });
+
+  it('un tournoi ouvert vingt quatre heures avant son depart ne peut pas etre efface avant d avoir eu lieu', async () => {
+    findMany.mockResolvedValue([]);
+    await cleanupOldTournaments(NOW);
+    const arg = findMany.mock.calls[0][0] as { where: { OR: Array<Record<string, unknown>> } };
+
+    const enInscription = arg.where.OR.filter((b) => b.status === 'registration');
+    expect(enInscription, 'ce nettoyage court ne touche jamais un tournoi encore ouvert').toEqual([]);
+
+    for (const branche of arg.where.OR) {
+      const depart = branche.scheduledStartAt as { lt?: Date } | null | undefined;
+      if (!depart || typeof depart !== 'object' || !depart.lt) continue;
+      expect(
+        depart.lt.getTime(),
+        'un tournoi date ne part qu une fois sa date de depart passee depuis assez longtemps',
+      ).toBe(NOW - TOURNAMENT_RETENTION_MS);
+    }
   });
 
   it('counts by status and forwards the delete to prisma', async () => {

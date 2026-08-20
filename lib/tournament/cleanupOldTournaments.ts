@@ -9,20 +9,22 @@ export interface CleanupOldTournamentsResult {
 
 export async function cleanupOldTournaments(now: number = Date.now()): Promise<CleanupOldTournamentsResult> {
   const cutoff = new Date(now - TOURNAMENT_RETENTION_MS);
-  const nowDate = new Date(now);
 
   const candidates = await prisma.tournament.findMany({
     where: {
       OR: [
         { status: 'completed', completedAt: { lt: cutoff } },
-        { status: 'cancelled', createdAt: { lt: cutoff } },
+        { status: 'cancelled', completedAt: { lt: cutoff } },
+        { status: 'cancelled', completedAt: null, createdAt: { lt: cutoff }, scheduledStartAt: null },
+        { status: 'cancelled', completedAt: null, scheduledStartAt: { lt: cutoff } },
         {
           status: 'pending',
           createdAt: { lt: cutoff },
-          OR: [
-            { scheduledStartAt: null },
-            { scheduledStartAt: { lt: nowDate } },
-          ],
+          scheduledStartAt: null,
+        },
+        {
+          status: 'pending',
+          scheduledStartAt: { lt: cutoff, not: null },
         },
         { status: 'in_progress', startedAt: { lt: cutoff } },
       ],

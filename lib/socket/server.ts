@@ -2929,7 +2929,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const { logMatchEvent } = await import('@/lib/tournament/matchEventLog');
       for (const t of scheduledTournaments) {
         if (t._count.participants < 2) {
-          await prisma.tournament.update({ where: { id: t.id }, data: { status: 'cancelled' } });
+          await prisma.tournament.update({ where: { id: t.id }, data: { status: 'cancelled', completedAt: new Date() } });
           logMatchEvent({ type: 'tournament.cancelled.not-enough-players', tournamentId: t.id });
           io.to(`tournament:${t.id}`).emit('tournament:cancelled', { reason: 'not_enough_players', tournamentId: t.id });
           continue;
@@ -2939,7 +2939,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           const { executeTournamentStart } = await import('@/lib/tournament/startLogic');
           const result = await executeTournamentStart(t.id);
           if (!result.ok) {
-            await prisma.tournament.update({ where: { id: t.id }, data: { status: 'cancelled' } });
+            await prisma.tournament.update({ where: { id: t.id }, data: { status: 'cancelled', completedAt: new Date() } });
             logMatchEvent({ type: 'tournament.cancelled.start-failed', tournamentId: t.id, detail: result.error });
             io.to(`tournament:${t.id}`).emit('tournament:cancelled', { reason: 'start_failed', detail: result.error, tournamentId: t.id });
             continue;
