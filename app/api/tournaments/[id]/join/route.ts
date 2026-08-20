@@ -7,7 +7,7 @@ import { generateSealedPool, type SealedSetChoice } from '@/lib/sealed/boosterGe
 import { SEALED_BUILD_RESERVATION_MS, SEALED_MAX_JOIN_ATTEMPTS, canJoinSealedAgain } from '@/lib/tournament/sealedRegistration';
 import { isSuspended } from '@/lib/moderation/sanctions';
 import { NWL_PARTNER_KEY, checkNwlMembership, NWL_INVITE_URL } from '@/lib/tournament/nwlPartner';
-import { refuserSiPalierNwlInterdit } from '@/lib/tournament/nwlTiers';
+import { refuserSiPalierNwlInterdit, grainePourKage, NWL_KAGE_PARTNER_KEY } from '@/lib/tournament/nwlTiers';
 
 
 export async function POST(
@@ -179,11 +179,15 @@ export async function POST(
         }
       }
 
+      const graineKage = tournament.partner === NWL_KAGE_PARTNER_KEY
+        ? await grainePourKage(session.user.id)
+        : null;
       const participant = await prisma.tournamentParticipant.create({
         data: {
           tournamentId: id,
           userId: session.user.id,
           username: user?.username || 'Unknown',
+          ...(graineKage !== null ? { seed: graineKage } : {}),
           ...(sealedPoolData ? { sealedPool: sealedPoolData as never } : {}),
         },
       });

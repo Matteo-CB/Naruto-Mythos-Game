@@ -107,11 +107,11 @@ const SPEC_CHUNIN: SpecPalier = {
 const SPEC_KAGE: SpecPalier = {
   partnerKey: NWL_KAGE_PARTNER_KEY,
   name: NWL_KAGE_TOURNAMENT_NAME,
-  maxPlayers: NWL_KAGE_MAX_PLAYERS,
+  maxPlayers: NWL_KAGE_MAX_PLAYERS + 1,
   startHour: NWL_KAGE_START_HOUR,
   leadHours: NWL_KAGE_LEAD_HOURS,
   note: [
-    'New World Loot monthly tournament, reserved to the eight best players of last month Chunin standings.',
+    'New World Loot monthly tournament, reserved to the eight best players of last month Chunin standings, plus the reigning champion who defends the title.',
     'Rewards. First place wins a sealed box of Naruto Mythos, offered by New World Loot.',
     `Entry is private: the join code is sent to the eight qualified players on the New World Loot Discord server: ${NWL_INVITE_URL}`,
   ].join(' '),
@@ -341,10 +341,47 @@ export async function chuninStandings(debut: Date, fin: Date): Promise<NwlStandi
   return entrees;
 }
 
+export async function championKageEnTitre(now: Date = new Date()): Promise<NwlStandingEntry | null> {
+  const dernier = await prisma.tournament.findFirst({
+    where: {
+      partner: NWL_KAGE_PARTNER_KEY,
+      status: 'completed',
+      winnerId: { not: null },
+      scheduledStartAt: { lt: now },
+    },
+    orderBy: { scheduledStartAt: 'desc' },
+    select: { winnerId: true, winnerUsername: true },
+  });
+  if (!dernier?.winnerId) return null;
+
+  const joueur = await prisma.user.findUnique({
+    where: { id: dernier.winnerId },
+    select: { id: true, username: true, discordId: true },
+  });
+  if (!joueur) return null;
+
+  return {
+    userId: joueur.id,
+    username: joueur.username || dernier.winnerUsername || '?',
+    discordId: joueur.discordId ?? null,
+    wins: 0,
+    losses: 0,
+    points: 0,
+  };
+}
+
 export async function kageQualifiers(now: Date = new Date()): Promise<NwlStandingEntry[]> {
   const { debut, fin } = bornesDuMoisPrecedent(now);
-  const classement = await chuninStandings(debut, fin);
-  return classement.slice(0, NWL_KAGE_MAX_PLAYERS);
+  const classement = (await chuninStandings(debut, fin)).slice(0, NWL_KAGE_MAX_PLAYERS);
+  const champion = await championKageEnTitre(now);
+  if (!champion) return classement;
+  return [champion, ...classement.filter((e) => e.userId !== champion.userId)];
+}
+
+export async function grainePourKage(userId: string, now: Date = new Date()): Promise<number | null> {
+  const qualifies = await kageQualifiers(now);
+  const rang = qualifies.findIndex((q) => q.userId === userId);
+  return rang < 0 ? null : rang + 1;
 }
 
 export function texteCodeAcces(nom: string, code: string, heureParis: number, entete?: string): string {

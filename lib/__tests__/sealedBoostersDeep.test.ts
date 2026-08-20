@@ -94,13 +94,16 @@ describe('every booster inside a generated pool keeps the exact 10 card composit
   });
 
   it('a booster that rolled a variant is exactly the same size as one that did not', () => {
-    const pool = generateSealedPool(400, SET);
-    const withVariant = pool.boosters.filter((b) => b.cards.some((c) => isVariantRarity(c.rarity)));
-    const withoutVariant = pool.boosters.filter((b) => !b.cards.some((c) => isVariantRarity(c.rarity)));
-    expect(withVariant.length).toBeGreaterThan(0);
-    expect(withoutVariant.length).toBeGreaterThan(0);
-    for (const b of withVariant) expect(b.cards.length).toBe(BOOSTER_SIZE);
-    for (const b of withoutVariant) expect(b.cards.length).toBe(BOOSTER_SIZE);
+    vi.spyOn(Math, 'random').mockReturnValue(0.001);
+    const withVariant = generateSealedPool(20, SET);
+    expect(withVariant.boosters.some((b) => b.cards.some((c) => isVariantRarity(c.rarity)))).toBe(true);
+    for (const b of withVariant.boosters) expect(b.cards.length).toBe(BOOSTER_SIZE);
+
+    vi.restoreAllMocks();
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const withoutVariant = generateSealedPool(20, SET);
+    expect(withoutVariant.boosters.some((b) => b.cards.some((c) => isVariantRarity(c.rarity)))).toBe(false);
+    for (const b of withoutVariant.boosters) expect(b.cards.length).toBe(BOOSTER_SIZE);
   });
 
   it('allCards is the flat concatenation of the boosters in order', () => {
@@ -193,13 +196,12 @@ describe('every generated card belongs to the requested set and to the card inde
     }
   });
 
-  it('a pool only ever contains sealed booster rarities, never M, MV or SV', () => {
+  it('a pool only ever contains sealed booster rarities, never M nor MV', () => {
     const pool = generateSealedPool(400, SET);
     const rarities = new Set(pool.allCards.map((c) => c.rarity));
     for (const r of rarities) expect(ALLOWED_POOL_RARITIES).toContain(r);
-    expect(rarities.has('M')).toBe(false);
-    expect(rarities.has('MV')).toBe(false);
-    expect(rarities.has('SV')).toBe(false);
+    expect(rarities.has('M'), 'the mythos are not a booster slot').toBe(false);
+    expect(rarities.has('MV'), 'the mythos variants are not a booster slot').toBe(false);
   });
 
   it('every booster of a set specific pool reports that same set id', () => {

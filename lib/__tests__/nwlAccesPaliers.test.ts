@@ -5,8 +5,8 @@ const verdictRole = vi.fn();
 const bd = {
   siteSettings: { findUnique: vi.fn(async () => ({ nwlChuninSeed: {} })), upsert: vi.fn() },
   tournament: { findMany: vi.fn(async () => []), findFirst: vi.fn(async () => null) },
+  user: { findMany: vi.fn(async () => []), findUnique: vi.fn(async () => null) },
   tournamentMatch: { findMany: vi.fn(async () => []) },
-  user: { findMany: vi.fn(async () => []) },
 };
 vi.mock('@/lib/db/prisma', () => ({ prisma: bd }));
 
@@ -96,6 +96,22 @@ describe('acces aux tournois prives Chunin et Kage', () => {
     const refus = await refuserSiPalierNwlInterdit(NWL_CHUNIN_PARTNER_KEY, '42');
     expect(refus?.errorKey).toBe('tournament.error.nwlNotMember');
     expect(refus?.inviteUrl).toBe('https://discord.gg/UXQX8McFD3');
+  });
+
+  it('le champion en titre entre meme s il n est plus dans les huit', async () => {
+    graineKage(['q1', 'q2']);
+    bd.tournament.findFirst.mockResolvedValue({ winnerId: 'champion', winnerUsername: 'Champion' } as never);
+    bd.user.findUnique = vi.fn(async () => ({ id: 'champion', username: 'Champion', discordId: 'champion-discord' })) as never;
+
+    expect(
+      await refuserSiPalierNwlInterdit(NWL_KAGE_PARTNER_KEY, 'champion-discord'),
+      'il defend son titre',
+    ).toBeNull();
+
+    const { grainePourKage } = await import('@/lib/tournament/nwlTiers');
+    expect(await grainePourKage('champion'), 'il est tete de serie, donc exempte du premier tour').toBe(1);
+
+    bd.tournament.findFirst.mockResolvedValue(null as never);
   });
 
   it('le Kage se decide sur la liste des qualifies, pas sur un role porte au moment de l inscription', async () => {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isSuspended } from '@/lib/moderation/sanctions';
 import { NWL_PARTNER_KEY, checkNwlMembership, NWL_INVITE_URL } from '@/lib/tournament/nwlPartner';
-import { refuserSiPalierNwlInterdit } from '@/lib/tournament/nwlTiers';
+import { refuserSiPalierNwlInterdit, grainePourKage, NWL_KAGE_PARTNER_KEY } from '@/lib/tournament/nwlTiers';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
@@ -189,11 +189,15 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      const graineKage = tournament.partner === NWL_KAGE_PARTNER_KEY
+        ? await grainePourKage(session.user.id)
+        : null;
       const participant = await prisma.tournamentParticipant.create({
         data: {
           tournamentId: tournament.id,
           userId: session.user.id,
           username: user?.username || 'Unknown',
+          ...(graineKage !== null ? { seed: graineKage } : {}),
           ...(sealedPoolData ? { sealedPool: sealedPoolData as never } : {}),
         },
       });

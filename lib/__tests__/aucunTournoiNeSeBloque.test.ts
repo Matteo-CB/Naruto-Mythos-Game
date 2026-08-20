@@ -221,3 +221,28 @@ describe('double elimination: chaque perdant a une seconde chance et le bracket 
     }
   });
 });
+
+describe('le champion du Kage defend son titre avec un tour d avance', () => {
+  it('neuf joueurs, la tete de serie ne joue pas le premier tour', () => {
+    const { matches } = generateBracket(joueurs(9));
+    const premier = matches.filter((m) => m.round === 1);
+    const teteDeSerie = premier.find((m) => m.player1?.participantId === 'u1');
+
+    expect(teteDeSerie, 'la tete de serie est bien placee au premier tour').toBeTruthy();
+    expect(teteDeSerie!.isBye, 'elle est exemptee').toBe(true);
+    expect(teteDeSerie!.winnerId, 'elle passe au tour suivant sans jouer').toBe('u1');
+  });
+
+  it('les deux derniers qualifies jouent le barrage, personne n est oublie', () => {
+    const { matches } = generateBracket(joueurs(9));
+    const vraisMatchs = matches.filter((m) => m.round === 1 && !m.isBye);
+    expect(vraisMatchs.length, 'un seul match de barrage a neuf joueurs').toBe(1);
+    const noms = [vraisMatchs[0].player1?.participantId, vraisMatchs[0].player2?.participantId].sort();
+    expect(noms, 'ce sont les deux moins bien classes').toEqual(['u8', 'u9']);
+  });
+
+  it('le champion gagne le titre en trois victoires, le barragiste en quatre', () => {
+    const { totalRounds } = generateBracket(joueurs(9));
+    expect(totalRounds, 'quatre tours au tableau').toBe(4);
+  });
+});
