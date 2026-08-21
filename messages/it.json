@@ -2987,7 +2987,7 @@
         "ss145Defeated": "{card} ({id}): {count} personaggio/i nemico/i sconfitto/i.",
         "ss014Peeked": "{card} ({id}): il personaggio nascosto costa {amount}.",
         "ss014Defeated": "{card} ({id}): il personaggio nascosto viene sconfitto.",
-        "ss021Cheaper": "{card} ({id}): giocato per 1 in meno come primo colpo.",
+        "ss021Cheaper": "{card} ({id}): giocato per 1 in meno come FIRST STRIKE.",
         "ss060Scored": "{card} ({id}): un alleato viene nascosto, {amount} punto missione guadagnato.",
         "ss076Scored": "{card} ({id}): {amount} punti missione guadagnati.",
         "ss145Threshold": "{card} ({id}): rivelato, la soglia diventa {amount} o meno.",

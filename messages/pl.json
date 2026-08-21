@@ -2987,7 +2987,7 @@
         "ss145Defeated": "{card} ({id}): pokonano {count} wrogich postaci.",
         "ss014Peeked": "{card} ({id}): zakryta postać kosztuje {amount}.",
         "ss014Defeated": "{card} ({id}): zakryta postać zostaje pokonana.",
-        "ss021Cheaper": "{card} ({id}): zagrany o 1 taniej jako pierwsze uderzenie.",
+        "ss021Cheaper": "{card} ({id}): zagrany o 1 taniej jako FIRST STRIKE.",
         "ss060Scored": "{card} ({id}): sojusznik zostaje zakryty, zyskano {amount} punkt misji.",
         "ss076Scored": "{card} ({id}): zyskano {amount} punktów misji.",
         "ss145Threshold": "{card} ({id}): odkryty, próg zmienia się na {amount} lub mniej.",

@@ -877,7 +877,7 @@
         "ss145Defeated": "{card}（{id}）：敵キャラクター{count}体を倒しました。",
         "ss014Peeked": "{card}（{id}）：裏向きのキャラクターのコストは{amount}です。",
         "ss014Defeated": "{card}（{id}）：裏向きのキャラクターを倒しました。",
-        "ss021Cheaper": "{card}（{id}）：ファーストストライクで1少なく出しました。",
+        "ss021Cheaper": "{card}（{id}）：FIRST STRIKE で1少なく出しました。",
         "ss060Scored": "{card}（{id}）：味方を裏向きにし、ミッションポイント{amount}を得ました。",
         "ss076Scored": "{card}（{id}）：ミッションポイント{amount}を得ました。",
         "ss145Threshold": "{card}（{id}）：公開され、しきい値がコスト{amount}以下になりました。",
