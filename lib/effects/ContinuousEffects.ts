@@ -118,7 +118,10 @@ function adverseTerrainChakraBonus(
   const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
   const own = missionPowerFor(state, missionIndex, player);
   const other = missionPowerFor(state, missionIndex, opponent);
-  return own < other ? 2 : 0;
+  if (own < other) return 2;
+  if (own > other) return 0;
+  if (own <= 0) return 0;
+  return state.edgeHolder === opponent ? 2 : 0;
 }
 
 export function calculateMissionChakraBonus(state: GameState, player: PlayerID): number {

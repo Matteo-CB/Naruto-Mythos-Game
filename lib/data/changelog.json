@@ -11,6 +11,7 @@
       "title_ja": "新規16種",
       "categories": [
         "fix",
+        "fix",
         "feature",
         "feature",
         "feature",
@@ -25,6 +26,7 @@
         "fix"
       ],
       "changes_fr": [
+        "TERRAIN HOSTILE 005 donne ses 2 Chakra à égalité de Puissance, au joueur qui n a pas l Edge et perdrait la mission.",
         "Quand un effet vous fait défausser une carte, la fenêtre propose enfin toutes celles que vous venez de piocher.",
         "Deux cartes Tournois Hebdomadaires rejoignent la collection : NARUTO UZUMAKI 147 et SASUKE UCHIWA 148.",
         "Quatre Shinobi de l Examen Chûnin rejoignent la collection : SHIKAMARU NARA 118, TEMARI 119, KIBA INUZUKA 120 et NARUTO UZUMAKI 121.",
@@ -40,6 +42,7 @@
         "Les AIGUILLES EMPOISONNÉES 084 retirent bien les jetons de puissance quand vous choisissez sur qui les poser."
       ],
       "changes_en": [
+        "ADVERSE TERRAIN 005 now gives its 2 Chakra on equal Power, to the player without the Edge who would lose the mission.",
         "When an effect makes you discard a card, the window now offers every card you just drew.",
         "Two Weekly Tournaments cards join the collection: NARUTO UZUMAKI 147 and SASUKE UCHIHA 148.",
         "Four Chunin Exam Shinobi join the collection: SHIKAMARU NARA 118, TEMARI 119, KIBA INUZUKA 120 and NARUTO UZUMAKI 121.",
@@ -55,6 +58,7 @@
         "POISON NEEDLES 084 now really removes the Power tokens when you pick which character to attach them to."
       ],
       "changes_es": [
+        "TERRENO HOSTIL 005 da sus 2 Chakra con Poder igualado, al jugador sin la Ventaja que perdería la misión.",
         "Cuando un efecto te hace descartar una carta, la ventana ya ofrece todas las que acabas de robar.",
         "Dos cartas de Torneos Semanales llegan a la colección: NARUTO UZUMAKI 147 y SASUKE UCHIHA 148.",
         "Cuatro Shinobi del Examen Chunin llegan a la colección: SHIKAMARU NARA 118, TEMARI 119, KIBA INUZUKA 120 y NARUTO UZUMAKI 121.",
@@ -70,6 +74,7 @@
         "AGUJAS ENVENENADAS 084 ya retira de verdad las fichas de poder cuando eliges a quién colocarlas."
       ],
       "changes_pt": [
+        "TERRENO HOSTIL 005 dá os seus 2 Chakra com Poder empatado, ao jogador sem a Vantagem que perderia a missão.",
         "Quando um efeito te faz descartar uma carta, a janela passa a oferecer todas as que acabaste de comprar.",
         "Duas cartas dos Torneios Semanais chegam à coleção: NARUTO UZUMAKI 147 e SASUKE UCHIHA 148.",
         "Quatro Shinobi do Exame Chunin chegam à coleção: SHIKAMARU NARA 118, TEMARI 119, KIBA INUZUKA 120 e NARUTO UZUMAKI 121.",
@@ -85,6 +90,7 @@
         "AGULHAS ENVENENADAS 084 passa a retirar mesmo as fichas de poder quando escolhes em quem as colocar."
       ],
       "changes_it": [
+        "TERRENO OSTILE 005 dà i suoi 2 Chakra a parità di Potenza, al giocatore senza il Vantaggio che perderebbe la missione.",
         "Quando un effetto ti fa scartare una carta, la finestra propone finalmente tutte quelle che hai appena pescato.",
         "Due carte dei Tornei Settimanali entrano nella collezione: NARUTO UZUMAKI 147 e SASUKE UCHIHA 148.",
         "Quattro Shinobi dell Esame Chunin entrano nella collezione: SHIKAMARU NARA 118, TEMARI 119, KIBA INUZUKA 120 e NARUTO UZUMAKI 121.",
@@ -100,6 +106,7 @@
         "AGHI AVVELENATI 084 toglie davvero i segnalini potenza quando scegli su chi metterli."
       ],
       "changes_pl": [
+        "WROGI TEREN 005 daje swoje 2 Czakry przy remisie Mocy, graczowi bez Przewagi, który przegrałby misję.",
         "Gdy efekt każe ci odrzucić kartę, okno oferuje wreszcie wszystkie te, które właśnie dobrałeś.",
         "Dwie karty Turniejów Tygodniowych dołączają do kolekcji: NARUTO UZUMAKI 147 i SASUKE UCHIHA 148.",
         "Czterech Shinobi z Egzaminu na Chunina dołącza do kolekcji: SHIKAMARU NARA 118, TEMARI 119, KIBA INUZUKA 120 i NARUTO UZUMAKI 121.",
@@ -115,6 +122,7 @@
         "ZATRUTE IGŁY 084 naprawdę zdejmują żetony mocy, gdy wybierasz, na kogo je założyć."
       ],
       "changes_ja": [
+        "敵地 005 は、パワーが同数のとき、Edge を持たずその任務を落とす側に チャクラ2 を与えます。",
         "効果でカードを捨てるとき、直前に引いたカードも選べるようになりました。",
         "ウィークリートーナメントのカード2枚がコレクションに加わりました。うずまきナルト 147、うちはサスケ 148。",
         "中忍試験の忍レア4枚がコレクションに加わりました。奈良シカマル 118、テマリ 119、犬塚キバ 120、うずまきナルト 121。",

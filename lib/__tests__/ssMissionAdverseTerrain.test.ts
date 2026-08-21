@@ -36,10 +36,31 @@ describe('Adverse Terrain gives 2 chakra to whoever is losing the mission', () =
     expect(bonusFor(state, 'player1'), 'the leader gets nothing').toBe(0);
   });
 
-  it('on a tie nobody gets it', () => {
+  it('on a tie the Edge decides who is losing, and that side gets it', () => {
     const state = terrainBoard();
+    state.edgeHolder = 'player2';
     state.activeMissions[0].player1Characters.push(simChar(WEAK, { owner: 'player1', instanceId: 'p1' }));
     state.activeMissions[0].player2Characters.push(simChar(WEAK, { owner: 'player2', instanceId: 'p2' }));
+
+    expect(bonusFor(state, 'player1'), 'equal Power but the tie goes to the Edge, so they are behind').toBe(2);
+    expect(bonusFor(state, 'player2'), 'the Edge holder would take the mission right now').toBe(0);
+  });
+
+  it('the same tie flips when the Edge changes hands', () => {
+    const state = terrainBoard();
+    state.edgeHolder = 'player1';
+    state.activeMissions[0].player1Characters.push(simChar(WEAK, { owner: 'player1', instanceId: 'p1' }));
+    state.activeMissions[0].player2Characters.push(simChar(WEAK, { owner: 'player2', instanceId: 'p2' }));
+
+    expect(bonusFor(state, 'player1')).toBe(0);
+    expect(bonusFor(state, 'player2')).toBe(2);
+  });
+
+  it('a tie at zero Power gives nothing: nobody wins such a mission, so nobody loses it', () => {
+    const state = terrainBoard();
+    state.edgeHolder = 'player2';
+    state.activeMissions[0].player1Characters.push(simChar(STRONG, { owner: 'player1', instanceId: 'p1', hidden: true }));
+    state.activeMissions[0].player2Characters.push(simChar(STRONG, { owner: 'player2', instanceId: 'p2', hidden: true }));
 
     expect(bonusFor(state, 'player1')).toBe(0);
     expect(bonusFor(state, 'player2')).toBe(0);
