@@ -17376,7 +17376,8 @@ export class EffectEngine {
               );
               break;
             }
-            const rhFreshCost = Math.max(0, (rhTopCard.chakra ?? 0) - rhReduction);
+            const rhPrixRevelation = calculateEffectiveCost(newState, rhPlayer, rhTopCard, rhChar.missionIndex, true, rhChar.character);
+            const rhFreshCost = Math.max(0, rhPrixRevelation - rhReduction);
             if (rhPs.chakra >= rhFreshCost) {
               rhPs.chakra -= rhFreshCost;
               rhChar.character.isHidden = false;
@@ -17388,7 +17389,7 @@ export class EffectEngine {
               const rhIdx = rhMission[rhSide].findIndex((c: CharacterInPlay) => c.instanceId === rhInstanceId);
               if (rhIdx >= 0) rhMission[rhSide][rhIdx] = { ...rhChar.character };
               rhPs.charactersInPlay = EffectEngine.countCharsForPlayer(newState, rhPlayer);
-              newState = EffectEngine.resolvePlayEffects(newState, rhPlayer, rhChar.character, rhChar.missionIndex, false);
+              newState = EffectEngine.resolveRevealEffects(newState, rhPlayer, rhChar.character, rhChar.missionIndex);
             }
           }
         } else {
@@ -17414,7 +17415,8 @@ export class EffectEngine {
               );
               break;
             }
-            const rhUpgCost = Math.max(0, ((rhTopCard.chakra ?? 0) - (rhUpgTop.chakra ?? 0)) - rhReduction);
+            const rhPrixRevelationUpg = calculateEffectiveCost(newState, rhPlayer, rhTopCard, rhChar.missionIndex, true, rhChar.character);
+            const rhUpgCost = Math.max(0, (rhPrixRevelationUpg - (rhUpgTop.chakra ?? 0)) - rhReduction);
             if (rhPs.chakra >= rhUpgCost) {
               rhPs.chakra -= rhUpgCost;
               
@@ -17440,7 +17442,7 @@ export class EffectEngine {
                   };
                   rhMission[rhSide] = rhChars;
                   rhPs.charactersInPlay = EffectEngine.countCharsForPlayer(newState, rhPlayer);
-                  newState = EffectEngine.resolvePlayEffects(newState, rhPlayer, rhChars[actualUpgIdx], rhMIdx, true);
+                  newState = EffectEngine.resolveRevealUpgradeEffects(newState, rhPlayer, rhChars[actualUpgIdx], rhMIdx);
                 }
               }
             }
@@ -24354,7 +24356,8 @@ export class EffectEngine {
       };
     }
 
-    
+    const prixRevelationRhr = calculateEffectiveCost(newState, player, topCard, mIdx, true, char);
+
     const allUpgradeTargets: string[] = [];
     for (const c of ((isControlledCharRhr || noUpgrade) ? [] : missionRhr[friendlySideRhr])) {
       if (c.instanceId === instanceId || c.isHidden) continue;
@@ -24363,7 +24366,7 @@ export class EffectEngine {
       const isSameName = cTop.name_fr.toUpperCase() === topCard.name_fr.toUpperCase() && (topCard.chakra ?? 0) > (cTop.chakra ?? 0);
       const isFlex = checkFlexibleUpgrade(topCard as any, cTop) && (topCard.chakra ?? 0) > (cTop.chakra ?? 0);
       if (isSameName || isFlex) {
-        const upgCost = Math.max(0, ((topCard.chakra ?? 0) - (cTop.chakra ?? 0)) - costReduction);
+        const upgCost = Math.max(0, (prixRevelationRhr - (cTop.chakra ?? 0)) - costReduction);
         if (ps.chakra >= upgCost) allUpgradeTargets.push(c.instanceId);
       }
     }
@@ -24374,7 +24377,7 @@ export class EffectEngine {
       const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       return cTop.name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
     });
-    const freshCost = Math.max(0, (topCard.chakra ?? 0) - costReduction);
+    const freshCost = Math.max(0, prixRevelationRhr - costReduction);
     const canFreshPlay = !hasNameConflictRhr && ps.chakra >= freshCost;
 
     
@@ -24412,7 +24415,7 @@ export class EffectEngine {
     const upgradeTargetRhr = forcedUpgradeTargetRhr
       ?? (upgradeTargetIdxRhr >= 0 ? missionRhr[friendlySideRhr][upgradeTargetIdxRhr] : null);
 
-    const effectiveRevealPrice = calculateEffectiveCost(newState, player, topCard, mIdx, true, char);
+    const effectiveRevealPrice = prixRevelationRhr;
 
     const prixRevelationHorsAmelioration = Math.max(0, effectiveRevealPrice - costReduction);
     let cost: number;
@@ -24481,8 +24484,10 @@ export class EffectEngine {
     
     ps.charactersInPlay = EffectEngine.countCharsForPlayer(newState, player);
 
-    
-    return EffectEngine.resolveRevealEffects(newState, player, resultChar, mIdx);
+
+    return upgradeTargetRhr
+      ? EffectEngine.resolveRevealUpgradeEffects(newState, player, resultChar, mIdx)
+      : EffectEngine.resolveRevealEffects(newState, player, resultChar, mIdx);
   }
 
   static findCharByInstanceId(

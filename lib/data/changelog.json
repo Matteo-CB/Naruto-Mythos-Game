@@ -2,56 +2,80 @@
   "entries": [
     {
       "date": "2026-08-21",
-      "title_fr": "Missions et équipements",
-      "title_en": "Missions and attachments",
-      "title_es": "Misiones y equipos",
-      "title_pt": "Missões e equipamentos",
-      "title_it": "Missioni ed equipaggiamenti",
-      "title_pl": "Misje i ekwipunek",
-      "title_ja": "任務と装備",
+      "title_fr": "Missions, équipements et révélations",
+      "title_en": "Missions, attachments and reveals",
+      "title_es": "Misiones, equipos y revelaciones",
+      "title_pt": "Missões, equipamentos e revelações",
+      "title_it": "Missioni, equipaggiamenti e rivelazioni",
+      "title_pl": "Misje, ekwipunek i odkrycia",
+      "title_ja": "任務、装備、公開",
       "categories": [
+        "fix",
+        "fix",
+        "fix",
         "fix",
         "fix",
         "fix",
         "fix"
       ],
       "changes_fr": [
+        "Un personnage révélé par un effet applique enfin son effet d amélioration quand il se pose sur un allié du même nom.",
+        "Une révélation déclenchée par un effet déclenche aussi l embuscade de la carte révélée.",
+        "Une révélation payée grâce à un effet tient compte des réductions de coût de vos autres cartes.",
         "MISSION PRIORITAIRE 004 affiche ses points doublés sous la mission aussi, plus seulement sur la carte.",
         "L ÉPÉE SERPENT 101 n oublie plus son effet quand vous devez choisir quel personnage la porte.",
         "L adversaire ordinateur tient enfin compte des missions qui rapportent le double de points.",
         "Les AIGUILLES EMPOISONNÉES 084 retirent bien les jetons de puissance quand vous choisissez sur qui les poser."
       ],
       "changes_en": [
+        "A character revealed by an effect now applies its upgrade effect when it lands on an ally with the same name.",
+        "A reveal triggered by an effect now also triggers the revealed card's ambush.",
+        "A reveal paid through an effect now takes the cost reductions from your other cards into account.",
         "HIGH PRIORITY MISSION 004 now shows its doubled points under the mission too, not only on the card.",
         "SNAKE SWORD 101 no longer loses its effect when you have to choose which character carries it.",
         "The computer opponent now takes missions that award double points into account.",
         "POISON NEEDLES 084 now really removes the Power tokens when you pick which character to attach them to."
       ],
       "changes_es": [
+        "Un personaje revelado por un efecto ya aplica su efecto de mejora cuando se coloca sobre un aliado del mismo nombre.",
+        "Una revelación provocada por un efecto también activa la emboscada de la carta revelada.",
+        "Una revelación pagada mediante un efecto tiene en cuenta las reducciones de coste de tus otras cartas.",
         "MISIÓN PRIORITARIA 004 muestra sus puntos dobles también debajo de la misión, no solo en la carta.",
         "ESPADA SERPIENTE 101 ya no pierde su efecto cuando debes elegir qué personaje la lleva.",
         "El oponente de la máquina ya tiene en cuenta las misiones que dan el doble de puntos.",
         "AGUJAS ENVENENADAS 084 ya retira de verdad las fichas de poder cuando eliges a quién colocarlas."
       ],
       "changes_pt": [
+        "Uma personagem revelada por um efeito passa a aplicar o efeito de melhoria quando assenta num aliado com o mesmo nome.",
+        "Uma revelação provocada por um efeito passa a acionar também a emboscada da carta revelada.",
+        "Uma revelação paga através de um efeito passa a ter em conta as reduções de custo das tuas outras cartas.",
         "MISSÃO PRIORITÁRIA 004 mostra os pontos a dobrar também por baixo da missão, não só na carta.",
         "ESPADA SERPENTE 101 deixa de perder o efeito quando tens de escolher que personagem a leva.",
         "O adversário do computador passa a ter em conta as missões que dão o dobro dos pontos.",
         "AGULHAS ENVENENADAS 084 passa a retirar mesmo as fichas de poder quando escolhes em quem as colocar."
       ],
       "changes_it": [
+        "Un personaggio rivelato da un effetto applica finalmente il suo effetto di potenziamento quando si posa su un alleato con lo stesso nome.",
+        "Una rivelazione provocata da un effetto attiva anche l agguato della carta rivelata.",
+        "Una rivelazione pagata tramite un effetto tiene conto delle riduzioni di costo delle tue altre carte.",
         "MISSIONE PRIORITARIA 004 mostra i punti raddoppiati anche sotto la missione, non solo sulla carta.",
         "SPADA SERPENTE 101 non perde più il suo effetto quando devi scegliere chi la porta.",
         "L avversario del computer tiene finalmente conto delle missioni che valgono il doppio.",
         "AGHI AVVELENATI 084 toglie davvero i segnalini potenza quando scegli su chi metterli."
       ],
       "changes_pl": [
+        "Postać odkryta przez efekt stosuje wreszcie swój efekt ulepszenia, gdy trafia na sojusznika o tej samej nazwie.",
+        "Odkrycie wywołane efektem uruchamia teraz także zasadzkę odkrytej karty.",
+        "Odkrycie opłacone przez efekt uwzględnia teraz zniżki kosztu z twoich innych kart.",
         "MISJA PRIORYTETOWA 004 pokazuje podwojone punkty także pod misją, nie tylko na karcie.",
         "WĘŻOWY MIECZ 101 nie traci już efektu, gdy musisz wybrać, kto go nosi.",
         "Komputerowy przeciwnik uwzględnia wreszcie misje dające podwójne punkty.",
         "ZATRUTE IGŁY 084 naprawdę zdejmują żetony mocy, gdy wybierasz, na kogo je założyć."
       ],
       "changes_ja": [
+        "効果によって公開されたキャラクターが、同名の味方の上に重なるときにアップグレード効果を発揮するようになりました。",
+        "効果による公開でも、公開されたカードの奇襲が発動するようになりました。",
+        "効果で支払う公開のコストが、他のカードによるコスト軽減を反映するようになりました。",
         "最優先任務 004 の2倍のポイントが、カードだけでなく任務の下にも表示されます。",
         "蛇の剣 101 が、装備する味方を選ぶ場合にも効果を失わなくなりました。",
         "コンピューター対戦相手が、得点が2倍になる任務を考慮するようになりました。",
