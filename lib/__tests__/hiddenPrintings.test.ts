@@ -5,8 +5,8 @@ import { getAllCards } from '@/lib/data/cardLoader';
 import { HIDDEN_PRINTING_IDS, isHiddenPrinting } from '@/lib/data/sets/hiddenPrintings';
 
 describe('les impressions masquees n_existent nulle part', () => {
-  it('la liste couvre les trente-cinq impressions retirees', () => {
-    expect(HIDDEN_PRINTING_IDS.length, 'trente-neuf impressions').toBe(39);
+  it('la liste couvre les impressions retirees', () => {
+    expect(HIDDEN_PRINTING_IDS.length, 'vingt-cinq impressions').toBe(25);
   });
 
   it('aucune n_apparait dans les donnees de carte', () => {

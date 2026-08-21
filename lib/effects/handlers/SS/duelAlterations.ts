@@ -5,6 +5,8 @@ export const ALTERATIONS_APPLIQUEES_AILLEURS: Record<string, string[]> = {
   'SS-114-R': ['DUEL'],
   'SS-114-MV': ['DUEL'],
   'SS-114-SHINOBIV': ['DUEL'],
+  'SS-114-RA': ['DUEL'],
+  'SS-114-SPV': ['DUEL'],
   'SS-077-UC': ['DUEL'],
   'SS-130-R': ['DUEL'],
 };

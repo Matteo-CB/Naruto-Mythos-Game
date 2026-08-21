@@ -715,6 +715,45 @@
       ],
       "image_file": "images/cards/SS/rare/SS-119-R.webp"
     },
+    "SS-119-SHINOBIV": {
+      "id": "SS-119-SHINOBIV",
+      "cardId": "SS-119-SHINOBIV",
+      "rarity": "SHINOBIV",
+      "number": "119",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TEMARI",
+      "name_fr": "TEMARI",
+      "name_es": "TEMARI",
+      "name_ja": "テマリ",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Move an enemy character from this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Shikamaru Nara: Draw a card and gain the Edge."
+        }
+      ],
+      "title_en": "Chunin Exams",
+      "title_fr": "Examen Chûnin",
+      "title_es": "Exámenes Chunin",
+      "title_ja": "中忍試験",
+      "title_pt": "Exames Chunin",
+      "title_it": "Esami Chunin",
+      "title_pl": "Egzaminy na chunina",
+      "image_file": "images/cards/SS/shinobi_v/SS-119-SHINOBIV.webp",
+      "image_url": "/images/cards/SS/shinobi_v/SS-119-SHINOBIV.webp"
+    },
     "SS-085-UC": {
       "id": "SS-085-UC",
       "cardId": "SS-085-UC",
@@ -2480,6 +2519,84 @@
       "rarity_display": "Mythos Variant",
       "image_url": "/images/cards/SS/mythos_v/SS-114-MV.webp"
     },
+    "SS-114-SPV": {
+      "id": "SS-114-SPV",
+      "cardId": "SS-114-SPV",
+      "rarity": "SPV",
+      "number": "114",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "name_es": "GAARA",
+      "name_ja": "我愛羅",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Discard a Gaara from your hand. Hide an enemy character in this mission with cost equal to or lower than the discarded card cost."
+        },
+        {
+          "type": "DUEL",
+          "description": "DUEL Rock Lee MAIN effect: Instead, defeat them."
+        }
+      ],
+      "title_en": "\"I hope you haven't finished entertaining me.\"",
+      "title_fr": "« J'espère que tu n'as pas fini de me divertir. »",
+      "title_es": "«Espero que no hayas terminado de entretenerme.»",
+      "title_ja": "「まだ楽しませてくれるんだろうな。」",
+      "title_pt": "«Espero que ainda não tenhas acabado de me entreter.»",
+      "title_it": "«Spero che tu non abbia finito di divertirmi.»",
+      "title_pl": "„Mam nadzieję, że jeszcze mnie nie znudziłeś.”",
+      "image_file": "images/cards/SS/sp_v/SS-114-SPV.webp",
+      "image_url": "/images/cards/SS/sp_v/SS-114-SPV.webp"
+    },
+    "SS-114-RA": {
+      "id": "SS-114-RA",
+      "cardId": "SS-114-RA",
+      "rarity": "RA",
+      "number": "114",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "name_es": "GAARA",
+      "name_ja": "我愛羅",
+      "title_en": "\"Well, is that all?\"",
+      "title_fr": "C’est tout ce que tu sais faire ?",
+      "title_es": "¿Eso es todo?",
+      "title_ja": "「それだけか？」",
+      "title_pt": "É só isso?",
+      "title_it": "È tutto qui?",
+      "title_pl": "To wszystko?",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Discard a Gaara from your hand. Hide an enemy character in this mission with cost equal to or lower than the discarded card cost."
+        },
+        {
+          "type": "DUEL",
+          "description": "DUEL Rock Lee MAIN effect: Instead, defeat them."
+        }
+      ],
+      "image_file": "images/cards/SS/rare_art/SS-114-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-114-RA.webp"
+    },
     "SS-005-MV": {
       "id": "SS-005-MV",
       "cardId": "SS-005-MV",
@@ -3403,6 +3520,131 @@
       "image_url": "/images/cards/SS/rare/SS-121-R.webp",
       "image_file": "images/cards/SS/sp_v/SS-121-SPV.webp"
     },
+    "SS-121_2-SPV": {
+      "id": "SS-121_2-SPV",
+      "cardId": "SS-121_2-SPV",
+      "rarity": "SPV",
+      "number": "121",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_ja": "うずまきナルト",
+      "name_fr": "NARUTO UZUMAKI",
+      "name_es": "NARUTO UZUMAKI",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every friendly Naruto Uzumaki in play."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kiba Inuzuka: Move the card at the bottom of this upgrade stack to another mission."
+        }
+      ],
+      "rarity_display": "Special V",
+      "data_complete": true,
+      "title_en": "\"I don't quit and I don't run!\"",
+      "title_fr": "« Je n'abandonne pas et je ne fuis pas ! »",
+      "title_es": "«¡Ni me rindo ni huyo!»",
+      "title_ja": "「諦めないし、逃げない！」",
+      "title_pt": "«Não desisto e não fujo!»",
+      "title_it": "«Non mollo e non scappo!»",
+      "title_pl": "„Nie poddaję się i nie uciekam!”",
+      "image_file": "images/cards/SS/sp_v/SS-121_2-SPV.webp",
+      "image_url": "/images/cards/SS/sp_v/SS-121_2-SPV.webp"
+    },
+    "SS-121-RA": {
+      "id": "SS-121-RA",
+      "cardId": "SS-121-RA",
+      "rarity": "RA",
+      "number": "121",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_ja": "うずまきナルト",
+      "name_fr": "NARUTO UZUMAKI",
+      "name_es": "NARUTO UZUMAKI",
+      "title_en": "\"Don't ever underestimate me!\"",
+      "title_ja": "「オレを甘く見るな！」",
+      "title_fr": "Ne me sous-estime jamais !",
+      "title_es": "¡No me subestimes nunca!",
+      "title_pt": "Nunca me subestime!",
+      "title_it": "Non sottovalutarmi mai!",
+      "title_pl": "Nigdy mnie nie lekceważ!",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every friendly Naruto Uzumaki in play."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kiba Inuzuka: Move the card at the bottom of this upgrade stack to another mission."
+        }
+      ],
+      "rarity_display": "Rare",
+      "data_complete": true,
+      "old_id": "121/140",
+      "image_file": "images/cards/SS/rare_art/SS-121-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-121-RA.webp"
+    },
+    "SS-121-SHINOBIV": {
+      "id": "SS-121-SHINOBIV",
+      "cardId": "SS-121-SHINOBIV",
+      "rarity": "SHINOBIV",
+      "number": "121",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_ja": "うずまきナルト",
+      "name_fr": "NARUTO UZUMAKI",
+      "name_es": "NARUTO UZUMAKI",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every friendly Naruto Uzumaki in play."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kiba Inuzuka: Move the card at the bottom of this upgrade stack to another mission."
+        }
+      ],
+      "rarity_display": "Rare",
+      "data_complete": true,
+      "old_id": "121/140",
+      "title_en": "Chunin Exams",
+      "title_fr": "Examen Chûnin",
+      "title_es": "Exámenes Chunin",
+      "title_ja": "中忍試験",
+      "title_pt": "Exames Chunin",
+      "title_it": "Esami Chunin",
+      "title_pl": "Egzaminy na chunina",
+      "image_file": "images/cards/SS/shinobi_v/SS-121-SHINOBIV.webp",
+      "image_url": "/images/cards/SS/shinobi_v/SS-121-SHINOBIV.webp"
+    },
     "SS-123-SPV": {
       "id": "SS-123-SPV",
       "cardId": "SS-123-SPV",
@@ -3567,6 +3809,49 @@
       "title_pl": "Egzamin na Chūnina",
       "image_file": "images/cards/SS/shinobi_v/SS-123-SHINOBIV.webp",
       "image_url": "/images/cards/SS/shinobi_v/SS-123-SHINOBIV.webp"
+    },
+    "SS-123-POPV": {
+      "id": "SS-123-POPV",
+      "cardId": "SS-123-POPV",
+      "rarity": "POPV",
+      "rarity_display": "Rare",
+      "number": "123",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] POWERUPs on friendly characters in this mission are increased by 1."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Ino Yamanaka: Take back control of a character you own in play."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "SAKURA HARUNO",
+      "name_fr": "SAKURA HARUNO",
+      "name_es": "SAKURA HARUNO",
+      "name_ja": "春野サクラ",
+      "name_pt": "SAKURA HARUNO",
+      "name_it": "SAKURA HARUNO",
+      "name_pl": "SAKURA HARUNO",
+      "title_en": "\"It's about time I learned the lesson.\"",
+      "title_fr": "« Il était temps que je retienne la leçon. »",
+      "title_es": "«Ya era hora de que aprendiera la lección.»",
+      "title_ja": "「そろそろ学ぶべきだった。」",
+      "title_pt": "«Já era tempo de eu aprender a lição.»",
+      "title_it": "«Era ora che imparassi la lezione.»",
+      "title_pl": "„Najwyższy czas, bym odrobiła lekcję.”",
+      "image_file": "images/cards/SS/pop_v/SS-123-POPV.webp",
+      "image_url": "/images/cards/SS/pop_v/SS-123-POPV.webp"
     },
     "SS-124-SHINOBIV": {
       "id": "SS-124-SHINOBIV",
@@ -6404,6 +6689,82 @@
       ],
       "data_complete": true
     },
+    "SS-115-SPV": {
+      "id": "SS-115-SPV",
+      "cardId": "SS-115-SPV",
+      "rarity": "SPV",
+      "number": "115",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ROCK LEE",
+      "name_fr": "ROCK LEE",
+      "name_ja": "ロック・リー",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 7,
+      "keywords": [
+        "Team Guy"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character doesn't lose Power tokens at the end of the round."
+        },
+        {
+          "type": "DUEL",
+          "description": "[⧗] DUEL Gaara: When you defeat an enemy character, POWERUP 2."
+        }
+      ],
+      "data_complete": true,
+      "title_en": "\"If I can't do 500 kicks, then it's 2,000 squats.\"",
+      "title_fr": "« Si je ne fais pas 500 coups de pied, ce sera 2000 squats. »",
+      "title_es": "«Si no doy 500 patadas, serán 2000 sentadillas.»",
+      "title_ja": "「蹴り五百回ができなければ、スクワット二千回だ。」",
+      "title_pt": "«Se não der 500 pontapés, então são 2000 agachamentos.»",
+      "title_it": "«Se non faccio 500 calci, allora sono 2000 squat.»",
+      "title_pl": "„Jeśli nie zrobię 500 kopnięć, to będzie 2000 przysiadów.”",
+      "image_file": "images/cards/SS/sp_v/SS-115-SPV.webp",
+      "image_url": "/images/cards/SS/sp_v/SS-115-SPV.webp"
+    },
+    "SS-115-RA": {
+      "id": "SS-115-RA",
+      "cardId": "SS-115-RA",
+      "rarity": "RA",
+      "number": "115",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ROCK LEE",
+      "name_fr": "ROCK LEE",
+      "name_ja": "ロック・リー",
+      "title_en": "\"It is over, all right: one way or the other!\"",
+      "title_fr": "« C'est fini, d'une façon ou d'une autre ! »",
+      "title_es": "«Se acabó, de una forma u otra.»",
+      "title_ja": "「どちらにせよ、これで終わりだ！」",
+      "title_pt": "«Acabou, de uma maneira ou de outra!»",
+      "title_it": "«È finita, in un modo o nell'altro!»",
+      "title_pl": "„To koniec, tak czy inaczej!”",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 7,
+      "keywords": [
+        "Team Guy"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character doesn't lose Power tokens at the end of the round."
+        },
+        {
+          "type": "DUEL",
+          "description": "[⧗] DUEL Gaara: When you defeat an enemy character, POWERUP 2."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-115-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-115-RA.webp"
+    },
     "SS-116-R": {
       "id": "SS-116-R",
       "cardId": "SS-116-R",
@@ -6478,6 +6839,45 @@
       ],
       "data_complete": true
     },
+    "SS-118-SHINOBIV": {
+      "id": "SS-118-SHINOBIV",
+      "cardId": "SS-118-SHINOBIV",
+      "rarity": "SHINOBIV",
+      "number": "118",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SHIKAMARU NARA",
+      "name_fr": "SHIKAMARU NARA",
+      "name_ja": "奈良シカマル",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Reveal and defeat an enemy hidden character in play."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Temari: Hide an enemy character in play with the same name as the revealed character."
+        }
+      ],
+      "data_complete": true,
+      "title_en": "Chunin Exams",
+      "title_fr": "Examen Chûnin",
+      "title_es": "Exámenes Chunin",
+      "title_ja": "中忍試験",
+      "title_pt": "Exames Chunin",
+      "title_it": "Esami Chunin",
+      "title_pl": "Egzaminy na chunina",
+      "image_file": "images/cards/SS/shinobi_v/SS-118-SHINOBIV.webp",
+      "image_url": "/images/cards/SS/shinobi_v/SS-118-SHINOBIV.webp"
+    },
     "SS-120-R": {
       "id": "SS-120-R",
       "cardId": "SS-120-R",
@@ -6515,6 +6915,44 @@
         }
       ],
       "data_complete": true
+    },
+    "SS-120-SHINOBIV": {
+      "id": "SS-120-SHINOBIV",
+      "cardId": "SS-120-SHINOBIV",
+      "rarity": "SHINOBIV",
+      "number": "120",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KIBA INUZUKA",
+      "name_fr": "KIBA INUZUKA",
+      "name_ja": "犬塚キバ",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 8"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] The opponent must pay 1 more Chakra when revealing characters from hidden in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Naruto Uzumaki: Hide an enemy character with Power 4 or less in play."
+        }
+      ],
+      "data_complete": true,
+      "title_en": "Chunin Exams",
+      "title_fr": "Examen Chûnin",
+      "title_es": "Exámenes Chunin",
+      "title_ja": "中忍試験",
+      "title_pt": "Exames Chunin",
+      "title_it": "Esami Chunin",
+      "title_pl": "Egzaminy na chunina",
+      "image_file": "images/cards/SS/shinobi_v/SS-120-SHINOBIV.webp",
+      "image_url": "/images/cards/SS/shinobi_v/SS-120-SHINOBIV.webp"
     },
     "SS-122-R": {
       "id": "SS-122-R",
@@ -7233,6 +7671,49 @@
       "image_file": "images/cards/SS/chibi_v/SS-137-CHIBIV.webp",
       "image_url": "/images/cards/SS/chibi_v/SS-137-CHIBIV.webp"
     },
+    "SS-137-SPV": {
+      "id": "SS-137-SPV",
+      "cardId": "SS-137-SPV",
+      "rarity": "SPV",
+      "number": "137",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ITACHI UCHIHA",
+      "name_fr": "ITACHI UCHIWA",
+      "name_es": "ITACHI UCHIHA",
+      "name_ja": "うちはイタチ",
+      "name_pt": "ITACHI UCHIHA",
+      "name_it": "ITACHI UCHIHA",
+      "name_pl": "ITACHI UCHIHA",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Return a friendly hidden character from this mission to your hand."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kurenai Yuhi: The opponent chooses and defeats their characters in this mission until they have the same number as your characters."
+        }
+      ],
+      "data_complete": true,
+      "title_en": "\"It's time to go. Sorry, Sasuke.\"",
+      "title_fr": "« Il est temps d'y aller. Désolé, Sasuke. »",
+      "title_es": "«Es hora de irse. Lo siento, Sasuke.»",
+      "title_ja": "「もう行く時間だ。すまない、サスケ。」",
+      "title_pt": "«Está na hora de ir. Desculpa, Sasuke.»",
+      "title_it": "«È ora di andare. Scusa, Sasuke.»",
+      "title_pl": "„Czas iść. Wybacz, Sasuke.”",
+      "image_file": "images/cards/SS/sp_v/SS-137-SPV.webp",
+      "image_url": "/images/cards/SS/sp_v/SS-137-SPV.webp"
+    },
     "SS-141-CHIBIV": {
       "id": "SS-141-CHIBIV",
       "cardId": "SS-141-CHIBIV",
@@ -7434,6 +7915,88 @@
       "data_complete": true,
       "old_id": "126/140 V",
       "image_file": "images/cards/SS/mythos_v/SS-126_2-MV.webp"
+    },
+    "SS-126-POPV": {
+      "id": "SS-126-POPV",
+      "cardId": "SS-126-POPV",
+      "rarity": "POPV",
+      "number": "126",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_ja": "うちはサスケ",
+      "name_fr": "SASUKE UCHIWA",
+      "name_es": "SASUKE UCHIHA",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every Sound Village character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Orochimaru: Play a Sound Village character anywhere, paying 3 less."
+        }
+      ],
+      "rarity_display": "Special V",
+      "data_complete": true,
+      "old_id": "126/140 V",
+      "title_en": "\"What a fool I've been!\"",
+      "title_fr": "« Quel idiot j'ai été ! »",
+      "title_es": "«¡Qué tonto he sido!»",
+      "title_ja": "「なんて愚かだったんだ！」",
+      "title_pt": "«Que tolo eu fui!»",
+      "title_it": "«Che sciocco sono stato!»",
+      "title_pl": "„Jakim byłem głupcem!”",
+      "image_file": "images/cards/SS/pop_v/SS-126-POPV.webp",
+      "image_url": "/images/cards/SS/pop_v/SS-126-POPV.webp"
+    },
+    "SS-126-RA": {
+      "id": "SS-126-RA",
+      "cardId": "SS-126-RA",
+      "rarity": "RA",
+      "number": "126",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_ja": "うちはサスケ",
+      "name_fr": "SASUKE UCHIWA",
+      "name_es": "SASUKE UCHIHA",
+      "title_en": "\"I see the truth now.\"",
+      "title_ja": "「今、真実が見える。」",
+      "title_fr": "« Je vois la vérité maintenant. »",
+      "title_es": "«Ahora veo la verdad.»",
+      "title_pt": "«Agora vejo a verdade.»",
+      "title_it": "«Ora vedo la verità.»",
+      "title_pl": "„Teraz widzę prawdę.”",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +1 Power for every Sound Village character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Orochimaru: Play a Sound Village character anywhere, paying 3 less."
+        }
+      ],
+      "rarity_display": "Special V",
+      "data_complete": true,
+      "old_id": "126/140 V",
+      "image_file": "images/cards/SS/rare_art/SS-126-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-126-RA.webp"
     },
     "SS-080-C": {
       "id": "SS-080-C",
