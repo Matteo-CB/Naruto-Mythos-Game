@@ -449,7 +449,6 @@ export async function fireAbsenceTimerCallback(
   if (outcome.kind === 'grace') {
     matchGraceCycles.set(matchId, cycles + 1);
     console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} grace cycle ${cycles + 1}/${MAX_GRACE_CYCLES} (no confirmed absence)`);
-    io.to(`tournament:${tournamentId}`).emit('tournament:please-confirm-ready', { matchId, tournamentId });
     emitToUser(p1, 'tournament:please-confirm-ready', { matchId, tournamentId });
     if (p2) emitToUser(p2, 'tournament:please-confirm-ready', { matchId, tournamentId });
     const newDeadline = new Date(Date.now() + ABSENCE_GRACE_RETRY_MS);
@@ -957,7 +956,6 @@ export async function reopenTournamentMatch(
   io.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
     matchId, status: newStatus, roomCode: null,
   });
-  io.to(`tournament:${tournamentId}`).emit('tournament:please-confirm-ready', { matchId, tournamentId });
   if (p1) emitToUser(p1, 'tournament:please-confirm-ready', { matchId, tournamentId });
   if (p2) emitToUser(p2, 'tournament:please-confirm-ready', { matchId, tournamentId });
 
@@ -1149,7 +1147,8 @@ export async function rehydrateAbsenceTimers(io: Server): Promise<void> {
         } catch (err) {
           console.error(`[Tournament] Rehydrate: failed to persist grace deadline for ${matchId}:`, err);
         }
-        io.to(`tournament:${tournamentId}`).emit('tournament:please-confirm-ready', { matchId, tournamentId });
+        emitToUser(p1, 'tournament:please-confirm-ready', { matchId, tournamentId });
+        if (p2) emitToUser(p2, 'tournament:please-confirm-ready', { matchId, tournamentId });
         continue;
       }
 
@@ -1378,7 +1377,6 @@ async function advanceSeriesToNextGame(
   io.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
     matchId, status: 'ready', roomCode: null, player1GameWins, player2GameWins,
   });
-  io.to(`tournament:${tournamentId}`).emit('tournament:please-confirm-ready', { matchId, tournamentId });
   if (match.player1Id) emitToUser(match.player1Id, 'tournament:please-confirm-ready', { matchId, tournamentId });
   if (match.player2Id) emitToUser(match.player2Id, 'tournament:please-confirm-ready', { matchId, tournamentId });
   if (match.player1Id && match.player2Id) {
