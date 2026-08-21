@@ -3270,6 +3270,46 @@
       "image_url": "/images/cards/SS/pop_v/SS-147-POPV.webp",
       "image_file": "images/cards/SS/secret/SS-147-S.webp"
     },
+    "SS-147-MV": {
+      "id": "SS-147-MV",
+      "cardId": "SS-147-MV",
+      "rarity": "MV",
+      "number": "147",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_ja": "うずまきナルト",
+      "name_fr": "NARUTO UZUMAKI",
+      "name_es": "NARUTO UZUMAKI",
+      "title_en": "You idiot....",
+      "title_ja": "「このバカ野郎…」",
+      "title_fr": "Espèce d idiot...",
+      "title_es": "Serás idiota...",
+      "title_pt": "Seu idiota...",
+      "title_it": "Che idiota...",
+      "title_pl": "Ty idioto...",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Enemy characters cannot move out of this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Sasuke Uchiha: POWERUP 1 for every non-hidden enemy character in play."
+        }
+      ],
+      "rarity_display": "Secret",
+      "data_complete": true,
+      "image_url": "/images/cards/SS/mythos_v/SS-147-MV.webp",
+      "image_file": "images/cards/SS/mythos_v/SS-147-MV.webp"
+    },
     "SS-148-S": {
       "id": "SS-148-S",
       "cardId": "SS-148-S",
@@ -3308,6 +3348,44 @@
       "title_pl": "Tym razem kończymy to raz na zawsze!",
       "image_file": "images/cards/SS/secret/SS-148-S.webp",
       "image_url": "/images/cards/SS/secret/SS-148-S.webp"
+    },
+    "SS-148-MV": {
+      "id": "SS-148-MV",
+      "cardId": "SS-148-MV",
+      "name_en": "SASUKE UCHIHA",
+      "name_ja": "うちはサスケ",
+      "name_fr": "SASUKE UCHIWA",
+      "name_es": "SASUKE UCHIHA",
+      "chakra": 7,
+      "power": 7,
+      "keywords": [],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Naruto Uzumaki: POWERUP 3."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Defeat an enemy upgraded character in this mission with less printed Power than this character's Power, then you must move this character, if able."
+        }
+      ],
+      "card_type": "character",
+      "set": "SS",
+      "rarity": "MV",
+      "rarity_display": "Secret",
+      "number": "148",
+      "has_visual": true,
+      "data_complete": true,
+      "title_en": "I will be the end of you!",
+      "title_fr": "Je serai ta fin !",
+      "title_es": "¡Yo seré tu final!",
+      "title_ja": "「オレがお前を終わらせる！」",
+      "title_pt": "Eu serei o teu fim!",
+      "title_it": "Sarò la tua fine!",
+      "title_pl": "To ja będę twoim końcem!",
+      "image_file": "images/cards/SS/mythos_v/SS-148-MV.webp",
+      "image_url": "/images/cards/SS/mythos_v/SS-148-MV.webp"
     },
     "SS-149-S": {
       "id": "SS-149-S",

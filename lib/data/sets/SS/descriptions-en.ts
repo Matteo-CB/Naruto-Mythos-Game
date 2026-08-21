@@ -516,7 +516,15 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     "[⧗] Enemy characters cannot move out of this mission.",
     "[↯] Sasuke Uchiha: POWERUP 1 for every non-hidden enemy character in play.",
   ],
+  "SS-147-MV": [
+    "[⧗] Enemy characters cannot move out of this mission.",
+    "[↯] Sasuke Uchiha: POWERUP 1 for every non-hidden enemy character in play.",
+  ],
   "SS-148-S": [
+    "[↯] Naruto Uzumaki: POWERUP 3.",
+    "[↯] Defeat an enemy upgraded character in this mission with less printed Power than this character's Power, then you must move this character, if able.",
+  ],
+  "SS-148-MV": [
     "[↯] Naruto Uzumaki: POWERUP 3.",
     "[↯] Defeat an enemy upgraded character in this mission with less printed Power than this character's Power, then you must move this character, if able.",
   ],

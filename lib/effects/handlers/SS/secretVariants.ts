@@ -174,7 +174,7 @@ function zabuza150Upgrade(ctx: EffectContext): EffectResult {
 }
 
 export function registerSecretVariantHandlers(): void {
-  for (const id of [SASUKE_148_ID, 'SS-148-S']) {
+  for (const id of [SASUKE_148_ID, 'SS-148-S', 'SS-148-MV']) {
     registerEffect(id, 'MAIN', sasuke148Main);
     registerEffect(id, 'DUEL', sasuke148Duel);
   }

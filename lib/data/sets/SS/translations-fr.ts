@@ -516,7 +516,15 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     "[⧗] Les personnages ennemis ne peuvent pas quitter cette mission.",
     "[↯] Sasuke Uchiwa : POWERUP 1 pour chaque personnage ennemi non caché en jeu.",
   ],
+  "SS-147-MV": [
+    "[⧗] Les personnages ennemis ne peuvent pas quitter cette mission.",
+    "[↯] Sasuke Uchiwa : POWERUP 1 pour chaque personnage ennemi non caché en jeu.",
+  ],
   "SS-148-S": [
+    "[↯] Naruto Uzumaki : POWERUP 3.",
+    "[↯] Vainquez un personnage ennemi amélioré de cette mission dont la Puissance imprimée est inférieure à celle de ce personnage, puis vous devez déplacer ce personnage, si possible.",
+  ],
+  "SS-148-MV": [
     "[↯] Naruto Uzumaki : POWERUP 3.",
     "[↯] Vainquez un personnage ennemi amélioré de cette mission dont la Puissance imprimée est inférieure à celle de ce personnage, puis vous devez déplacer ce personnage, si possible.",
   ],

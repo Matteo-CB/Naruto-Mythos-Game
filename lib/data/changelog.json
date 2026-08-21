@@ -2,14 +2,15 @@
   "entries": [
     {
       "date": "2026-08-21",
-      "title_fr": "Quatorze nouvelles impressions",
-      "title_en": "Fourteen new printings",
-      "title_es": "Catorce impresiones nuevas",
-      "title_pt": "Catorze novas impressões",
-      "title_it": "Quattordici nuove stampe",
-      "title_pl": "Czternaście nowych druków",
-      "title_ja": "新規14種",
+      "title_fr": "Seize nouvelles impressions",
+      "title_en": "Sixteen new printings",
+      "title_es": "Dieciséis impresiones nuevas",
+      "title_pt": "Dezasseis novas impressões",
+      "title_it": "Sedici nuove stampe",
+      "title_pl": "Szesnaście nowych druków",
+      "title_ja": "新規16種",
       "categories": [
+        "feature",
         "feature",
         "feature",
         "feature",
@@ -23,6 +24,7 @@
         "fix"
       ],
       "changes_fr": [
+        "Deux cartes Tournois Hebdomadaires rejoignent la collection : NARUTO UZUMAKI 147 et SASUKE UCHIWA 148.",
         "Quatre Shinobi de l Examen Chûnin rejoignent la collection : SHIKAMARU NARA 118, TEMARI 119, KIBA INUZUKA 120 et NARUTO UZUMAKI 121.",
         "Deux Pop V rejoignent la collection : SAKURA HARUNO 123 et SASUKE UCHIWA 126.",
         "Quatre Spéciales V rejoignent la collection : GAARA 114, ROCK LEE 115, NARUTO UZUMAKI 121 et ITACHI UCHIWA 137.",
@@ -36,6 +38,7 @@
         "Les AIGUILLES EMPOISONNÉES 084 retirent bien les jetons de puissance quand vous choisissez sur qui les poser."
       ],
       "changes_en": [
+        "Two Weekly Tournaments cards join the collection: NARUTO UZUMAKI 147 and SASUKE UCHIHA 148.",
         "Four Chunin Exam Shinobi join the collection: SHIKAMARU NARA 118, TEMARI 119, KIBA INUZUKA 120 and NARUTO UZUMAKI 121.",
         "Two Pop V printings join the collection: SAKURA HARUNO 123 and SASUKE UCHIHA 126.",
         "Four Special V printings join the collection: GAARA 114, ROCK LEE 115, NARUTO UZUMAKI 121 and ITACHI UCHIHA 137.",
@@ -49,6 +52,7 @@
         "POISON NEEDLES 084 now really removes the Power tokens when you pick which character to attach them to."
       ],
       "changes_es": [
+        "Dos cartas de Torneos Semanales llegan a la colección: NARUTO UZUMAKI 147 y SASUKE UCHIHA 148.",
         "Cuatro Shinobi del Examen Chunin llegan a la colección: SHIKAMARU NARA 118, TEMARI 119, KIBA INUZUKA 120 y NARUTO UZUMAKI 121.",
         "Dos impresiones Pop V llegan a la colección: SAKURA HARUNO 123 y SASUKE UCHIHA 126.",
         "Cuatro impresiones Especial V llegan a la colección: GAARA 114, ROCK LEE 115, NARUTO UZUMAKI 121 e ITACHI UCHIHA 137.",
@@ -62,6 +66,7 @@
         "AGUJAS ENVENENADAS 084 ya retira de verdad las fichas de poder cuando eliges a quién colocarlas."
       ],
       "changes_pt": [
+        "Duas cartas dos Torneios Semanais chegam à coleção: NARUTO UZUMAKI 147 e SASUKE UCHIHA 148.",
         "Quatro Shinobi do Exame Chunin chegam à coleção: SHIKAMARU NARA 118, TEMARI 119, KIBA INUZUKA 120 e NARUTO UZUMAKI 121.",
         "Duas impressões Pop V chegam à coleção: SAKURA HARUNO 123 e SASUKE UCHIHA 126.",
         "Quatro impressões Especial V chegam à coleção: GAARA 114, ROCK LEE 115, NARUTO UZUMAKI 121 e ITACHI UCHIHA 137.",
@@ -75,6 +80,7 @@
         "AGULHAS ENVENENADAS 084 passa a retirar mesmo as fichas de poder quando escolhes em quem as colocar."
       ],
       "changes_it": [
+        "Due carte dei Tornei Settimanali entrano nella collezione: NARUTO UZUMAKI 147 e SASUKE UCHIHA 148.",
         "Quattro Shinobi dell Esame Chunin entrano nella collezione: SHIKAMARU NARA 118, TEMARI 119, KIBA INUZUKA 120 e NARUTO UZUMAKI 121.",
         "Due stampe Pop V entrano nella collezione: SAKURA HARUNO 123 e SASUKE UCHIHA 126.",
         "Quattro stampe Speciale V entrano nella collezione: GAARA 114, ROCK LEE 115, NARUTO UZUMAKI 121 e ITACHI UCHIHA 137.",
@@ -88,6 +94,7 @@
         "AGHI AVVELENATI 084 toglie davvero i segnalini potenza quando scegli su chi metterli."
       ],
       "changes_pl": [
+        "Dwie karty Turniejów Tygodniowych dołączają do kolekcji: NARUTO UZUMAKI 147 i SASUKE UCHIHA 148.",
         "Czterech Shinobi z Egzaminu na Chunina dołącza do kolekcji: SHIKAMARU NARA 118, TEMARI 119, KIBA INUZUKA 120 i NARUTO UZUMAKI 121.",
         "Dwa druki Pop V dołączają do kolekcji: SAKURA HARUNO 123 i SASUKE UCHIHA 126.",
         "Cztery druki Specjalne V dołączają do kolekcji: GAARA 114, ROCK LEE 115, NARUTO UZUMAKI 121 i ITACHI UCHIHA 137.",
@@ -101,6 +108,7 @@
         "ZATRUTE IGŁY 084 naprawdę zdejmują żetony mocy, gdy wybierasz, na kogo je założyć."
       ],
       "changes_ja": [
+        "ウィークリートーナメントのカード2枚がコレクションに加わりました。うずまきナルト 147、うちはサスケ 148。",
         "中忍試験の忍レア4枚がコレクションに加わりました。奈良シカマル 118、テマリ 119、犬塚キバ 120、うずまきナルト 121。",
         "Pop V 2枚がコレクションに加わりました。春野サクラ 123、うちはサスケ 126。",
         "スペシャルV 4枚がコレクションに加わりました。我愛羅 114、ロック・リー 115、うずまきナルト 121、うちはイタチ 137。",

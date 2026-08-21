@@ -286,7 +286,15 @@ export const effectDescriptionsPl: Record<string, string[]> = {
     "[⧗] Wrogie postacie nie mogą opuścić tej misji.",
     "[↯] Sasuke Uchiha: POWERUP 1 za każdą nieukrytą wrogą postać w grze.",
   ],
+  "SS-147-MV": [
+    "[⧗] Wrogie postacie nie mogą opuścić tej misji.",
+    "[↯] Sasuke Uchiha: POWERUP 1 za każdą nieukrytą wrogą postać w grze.",
+  ],
   "SS-148-S": [
+    "[↯] Naruto Uzumaki: POWERUP 3.",
+    "[↯] Pokonaj ulepszoną postać przeciwnika w tej misji o niższej nadrukowanej Mocy niż ta postać, a następnie musisz przesunąć tę postać, jeśli możesz.",
+  ],
+  "SS-148-MV": [
     "[↯] Naruto Uzumaki: POWERUP 3.",
     "[↯] Pokonaj ulepszoną postać przeciwnika w tej misji o niższej nadrukowanej Mocy niż ta postać, a następnie musisz przesunąć tę postać, jeśli możesz.",
   ],

@@ -286,7 +286,15 @@ export const effectDescriptionsIt: Record<string, string[]> = {
     "[⧗] I personaggi nemici non possono uscire da questa missione.",
     "[↯] Sasuke Uchiha: POWERUP 1 per ogni personaggio nemico non-nascosto in gioco.",
   ],
+  "SS-147-MV": [
+    "[⧗] I personaggi nemici non possono uscire da questa missione.",
+    "[↯] Sasuke Uchiha: POWERUP 1 per ogni personaggio nemico non-nascosto in gioco.",
+  ],
   "SS-148-S": [
+    "[↯] Naruto Uzumaki: POWERUP 3.",
+    "[↯] Sconfiggi un personaggio nemico potenziato in questa missione con Potenza stampata inferiore a quella di questo personaggio, poi devi spostare questo personaggio, se possibile.",
+  ],
+  "SS-148-MV": [
     "[↯] Naruto Uzumaki: POWERUP 3.",
     "[↯] Sconfiggi un personaggio nemico potenziato in questa missione con Potenza stampata inferiore a quella di questo personaggio, poi devi spostare questo personaggio, se possibile.",
   ],

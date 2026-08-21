@@ -408,6 +408,7 @@ export function registerSet2Handlers(): void {
   registerEffect('SS-147-POPV', 'DUEL', ss147DuelHandler);
   registerEffect('SS-147-SV', 'DUEL', ss147DuelHandler);
   registerEffect('SS-147-S', 'DUEL', ss147DuelHandler);
+  registerEffect('SS-147-MV', 'DUEL', ss147DuelHandler);
   registerEffect('SS-134-R', 'DUEL', ss134DuelHandler);
   registerEffect('SS-134-R', 'UPGRADE', ss134UpgradeHandler);
   registerEffect('SS-120-CHIBIV', 'DUEL', ss120DuelHandler);
