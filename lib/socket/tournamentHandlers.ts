@@ -413,20 +413,17 @@ export async function fireAbsenceTimerCallback(
     matchNoContestCount.set(matchId, stalls);
 
     if (stalls >= NO_CONTEST_HARD_CAP) {
-      matchNoContestCount.delete(matchId);
-      const perdant = p2 ? await pickDoubleAbsenceLoser(tournamentId, p1, p2) : p1;
       console.error(
-        `[Tournament] CRITICAL: match ${matchId} never launched after ${stalls} attempts, the better seed advances so the tournament can continue`,
+        `[Tournament] CRITICAL: match ${matchId} never launched after ${stalls} attempts while ${outcome.players.join(', ')} stayed online. Nobody is forfeited: a connected player is never disqualified. An organizer must resolve this match from the admin panel.`,
       );
       logMatchEvent({
         type: 'match.launch.unresolvable',
         tournamentId,
         matchId,
-        forfeitedPlayerId: perdant,
-        detail: `stalled ${stalls} times`,
+        forfeitedPlayerId: null,
+        detail: `stalled ${stalls} times, players online, left open`,
       });
-      await handleMatchForfeit(io, tournamentId, matchId, perdant);
-      matchReadyPlayers.delete(matchId);
+      await reopenTournamentMatch(io, tournamentId, matchId, p1, p2 || null);
       return;
     }
 
