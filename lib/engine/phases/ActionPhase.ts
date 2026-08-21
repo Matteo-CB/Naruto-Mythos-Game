@@ -12,7 +12,7 @@ import { applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
 import { revealUpgradeWouldDuplicateName } from '../../effects/revealNameUniqueness';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 import { avecJoueCeTour } from '../rules/discountedPlay';
-import { expireFirstStrike } from '../rules/firstStrike';
+import { expireFirstStrike, isFirstCardPlayedThisRound } from '../rules/firstStrike';
 import { offerKimimaro077Sacrifice } from '@/lib/effects/handlers/SS/kimimaro077Pass';
 
 
@@ -374,7 +374,7 @@ function handlePlayAttachment(
       sourceInstanceId: '',
       sourceMissionIndex: missionIndex,
       effectType: 'ATTACH',
-      effectDescription: JSON.stringify({ card, revealed: false }),
+      effectDescription: JSON.stringify({ card, revealed: false, premiereFrappeArmee: isFirstCardPlayedThisRound(state, player) }),
       targetSelectionType: 'ATTACH_CHOOSE_TARGET',
       sourcePlayer: player,
       requiresTargetSelection: true,
@@ -457,7 +457,7 @@ function handleRevealAttachment(
       sourceInstanceId: '',
       sourceMissionIndex: missionIndex,
       effectType: 'ATTACH',
-      effectDescription: JSON.stringify({ card, provenance, revealed: true }),
+      effectDescription: JSON.stringify({ card, provenance, revealed: true, premiereFrappeArmee: isFirstCardPlayedThisRound(state, player) }),
       targetSelectionType: 'ATTACH_CHOOSE_TARGET',
       sourcePlayer: player,
       requiresTargetSelection: true,

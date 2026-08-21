@@ -8,6 +8,7 @@ import { FeatureExtractor } from '../neural/FeatureExtractor';
 import { NeuralEvaluator } from '../neural/NeuralEvaluator';
 import { BoardEvaluator } from '../evaluation/BoardEvaluator';
 import { calculateCharacterPower } from '../../engine/phases/PowerCalculation';
+import { pointsGagnesEnRemportant } from '@/lib/effects/missions/ssMissions';
 import type {
   CoachAdvice,
   MissionCoachAnalysis,
@@ -112,7 +113,7 @@ export class Coach {
         try { return s + calculateCharacterPower(state, c, opponent); } catch { return s; }
       }, 0);
 
-      const pointValue = mission.basePoints + mission.rankBonus;
+      const pointValue = pointsGagnesEnRemportant(mission);
 
       let myWinProbability: number;
       let status: MissionCoachAnalysis['status'];
@@ -270,7 +271,7 @@ export class Coach {
             try { return s + calculateCharacterPower(state, c, opponent); } catch { return s; }
           }, 0);
 
-          const missionValue = mission.basePoints + mission.rankBonus;
+          const missionValue = pointsGagnesEnRemportant(mission);
     
           const newMyPower = myPower + (card.power ?? 0);
           const advantage = newMyPower - oppPower;

@@ -134,13 +134,14 @@ function resolveAttachmentFirstStrike(
   card: CardData,
   host: CharacterInPlay | null,
   missionIndex: number,
+  premiereFrappeArmee?: boolean,
 ): GameState {
   const hasFirstStrike = (card.effects ?? []).some((e) => e.type === 'FIRST_STRIKE');
   if (!hasFirstStrike) return state;
-  if (!isFirstCardPlayedThisRound(state, player)) return state;
+  const armee = premiereFrappeArmee ?? isFirstCardPlayedThisRound(state, player);
+  if (!armee) return state;
   const handler = getEffectHandler(card.id, 'FIRST_STRIKE');
   if (!handler) return state;
-  if (state.pendingActions.length > 0) return state;
 
   let newState = withFirstStrikeStatus(state, player, 'used');
   const source = host ?? ({ instanceId: '', card } as unknown as CharacterInPlay);
@@ -578,7 +579,7 @@ export function attachCardToMission(state: GameState, player: PlayerID, card: Ca
   return resolveAttachmentFirstStrike(newState, player, card, null, missionIndex);
 }
 
-export function attachCardToCharacter(state: GameState, player: PlayerID, card: CardData, hostInstanceId: string, revealed = false, powerOverride?: number, provenance?: ProvenanceEquipement): GameState {
+export function attachCardToCharacter(state: GameState, player: PlayerID, card: CardData, hostInstanceId: string, revealed = false, powerOverride?: number, provenance?: ProvenanceEquipement, premiereFrappeArmee?: boolean): GameState {
   let hostMissionIndex = -1;
   let hostSide: 'player1Characters' | 'player2Characters' | null = null;
   let hostIdx = -1;
@@ -640,5 +641,5 @@ export function attachCardToCharacter(state: GameState, player: PlayerID, card: 
 
   newState = artisanVillageReward(newState, player, card, host, hostMissionIndex);
   newState = resolveAttachmentTrigger(newState, player, card, host, hostMissionIndex, 'AMBUSH', revealed);
-  return resolveAttachmentFirstStrike(newState, player, card, host, hostMissionIndex);
+  return resolveAttachmentFirstStrike(newState, player, card, host, hostMissionIndex, premiereFrappeArmee);
 }

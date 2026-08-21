@@ -1,7 +1,7 @@
 import type { GameState, PlayerID, ActiveMission, MissionScoringProgress, ScoreEffectSource, PendingEffect, PendingAction } from '../types';
 import { logSystem, logAction } from '../utils/gameLog';
 import { calculateCharacterPower } from './PowerCalculation';
-import { teamTrainingBonus, missionCarries, missionSidePowerBonus, SS_MISSION_HIGH_PRIORITY } from '../../effects/missions/ssMissions';
+import { teamTrainingBonus, missionCompteDouble, missionSidePowerBonus } from '../../effects/missions/ssMissions';
 import { generateInstanceId } from '../utils/id';
 import { EffectEngine } from '../../effects/EffectEngine';
 import { isMovementBlockedByKurenai, applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
@@ -494,17 +494,18 @@ export function startHighPrioritySecondPass(
   rankIndex: number,
 ): GameState {
   const mission = state.activeMissions[missionIndex];
-  if (!missionCarries(mission, SS_MISSION_HIGH_PRIORITY)) return state;
+  if (!missionCompteDouble(mission)) return state;
   if (mission.highPriorityPassDone) return state;
 
   const missions = [...state.activeMissions];
   missions[missionIndex] = { ...mission, highPriorityPassDone: true };
   let newState: GameState = { ...state, activeMissions: missions, missionScoringProgress: undefined };
 
+  const nomMission = mission.card?.name_fr ?? '';
   newState.log = logAction(newState.log, newState.turn, newState.phase, player, 'SCORE_REPEAT',
-    'High Priority Mission (SS-004): this mission scores a second time.',
+    `${mission.card?.name_en ?? nomMission}: this mission scores a second time.`,
     'game.log.effect.ssMss04SecondScore',
-    { card: 'Mission prioritaire', id: 'SS-004-MMS' });
+    { card: nomMission, card_en: mission.card?.name_en ?? nomMission, id: mission.card?.id ?? '' });
 
   const basePts = Number.isFinite(mission.basePoints) ? mission.basePoints : 1;
   const rankPts = Number.isFinite(mission.rankBonus) ? mission.rankBonus : 0;

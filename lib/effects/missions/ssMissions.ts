@@ -1,4 +1,5 @@
 import type { GameState, PlayerID, CharacterInPlay, ActiveMission } from '@/lib/engine/types';
+import { missionPointBonus } from '@/lib/effects/handlers/SS/attachmentStatics';
 
 export const SS_MISSION_NEW_FORCES = 1;
 export const SS_MISSION_RECONNAISSANCE = 2;
@@ -138,4 +139,8 @@ export function pointsAffichesDeLaMission(
     + (Number.isFinite(mission.rankBonus) ? mission.rankBonus : 0)
     + bonusEquipements;
   return missionCompteDouble(mission) ? base * 2 : base;
+}
+
+export function pointsGagnesEnRemportant(mission: ActiveMission | undefined): number {
+  return pointsAffichesDeLaMission(mission, missionPointBonus(mission));
 }

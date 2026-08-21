@@ -21,6 +21,7 @@ import { getCardName } from '@/lib/utils/cardLocale';
 import { PowerIcon, POWER_COLOR } from '@/components/icons/GameIcons';
 import type { CoachAdvice, MissionCoachAnalysis } from '@/lib/ai/coaching/CoachTypes';
 import type { GameState } from '@/lib/engine/types';
+import { pointsGagnesEnRemportant } from '@/lib/effects/missions/ssMissions';
 
 const coachMCTS = new NeuralISMCTS({
   simulations: 80,
@@ -61,7 +62,7 @@ function buildQuickAdvice(state: GameState, t: TranslateFn, locale: string): Coa
     const oppChars = mission.player2Characters;
     const myPower = myChars.reduce((s, c) => s + (c.isHidden ? 0 : (c.card.power ?? 0) + c.powerTokens), 0);
     const oppPower = oppChars.reduce((s, c) => s + (c.isHidden ? 0 : (c.card.power ?? 0) + c.powerTokens), 0);
-    const pointValue = mission.basePoints + mission.rankBonus;
+    const pointValue = pointsGagnesEnRemportant(mission);
 
     let status: MissionCoachAnalysis['status'] = 'empty';
     let recommendation: MissionCoachAnalysis['recommendation'] = 'attack';

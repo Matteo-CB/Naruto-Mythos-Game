@@ -2,35 +2,59 @@
   "entries": [
     {
       "date": "2026-08-21",
-      "title_fr": "Correctif des équipements",
-      "title_en": "Attachment fix",
-      "title_es": "Corrección de equipos",
-      "title_pt": "Correção de equipamentos",
-      "title_it": "Correzione degli equipaggiamenti",
-      "title_pl": "Poprawka ekwipunku",
-      "title_ja": "装備の修正",
+      "title_fr": "Missions et équipements",
+      "title_en": "Missions and attachments",
+      "title_es": "Misiones y equipos",
+      "title_pt": "Missões e equipamentos",
+      "title_it": "Missioni ed equipaggiamenti",
+      "title_pl": "Misje i ekwipunek",
+      "title_ja": "任務と装備",
       "categories": [
+        "fix",
+        "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "MISSION PRIORITAIRE 004 affiche ses points doublés sous la mission aussi, plus seulement sur la carte.",
+        "L ÉPÉE SERPENT 101 n oublie plus son effet quand vous devez choisir quel personnage la porte.",
+        "L adversaire ordinateur tient enfin compte des missions qui rapportent le double de points.",
         "Les AIGUILLES EMPOISONNÉES 084 retirent bien les jetons de puissance quand vous choisissez sur qui les poser."
       ],
       "changes_en": [
+        "HIGH PRIORITY MISSION 004 now shows its doubled points under the mission too, not only on the card.",
+        "SNAKE SWORD 101 no longer loses its effect when you have to choose which character carries it.",
+        "The computer opponent now takes missions that award double points into account.",
         "POISON NEEDLES 084 now really removes the Power tokens when you pick which character to attach them to."
       ],
       "changes_es": [
+        "MISIÓN PRIORITARIA 004 muestra sus puntos dobles también debajo de la misión, no solo en la carta.",
+        "ESPADA SERPIENTE 101 ya no pierde su efecto cuando debes elegir qué personaje la lleva.",
+        "El oponente de la máquina ya tiene en cuenta las misiones que dan el doble de puntos.",
         "AGUJAS ENVENENADAS 084 ya retira de verdad las fichas de poder cuando eliges a quién colocarlas."
       ],
       "changes_pt": [
+        "MISSÃO PRIORITÁRIA 004 mostra os pontos a dobrar também por baixo da missão, não só na carta.",
+        "ESPADA SERPENTE 101 deixa de perder o efeito quando tens de escolher que personagem a leva.",
+        "O adversário do computador passa a ter em conta as missões que dão o dobro dos pontos.",
         "AGULHAS ENVENENADAS 084 passa a retirar mesmo as fichas de poder quando escolhes em quem as colocar."
       ],
       "changes_it": [
+        "MISSIONE PRIORITARIA 004 mostra i punti raddoppiati anche sotto la missione, non solo sulla carta.",
+        "SPADA SERPENTE 101 non perde più il suo effetto quando devi scegliere chi la porta.",
+        "L avversario del computer tiene finalmente conto delle missioni che valgono il doppio.",
         "AGHI AVVELENATI 084 toglie davvero i segnalini potenza quando scegli su chi metterli."
       ],
       "changes_pl": [
+        "MISJA PRIORYTETOWA 004 pokazuje podwojone punkty także pod misją, nie tylko na karcie.",
+        "WĘŻOWY MIECZ 101 nie traci już efektu, gdy musisz wybrać, kto go nosi.",
+        "Komputerowy przeciwnik uwzględnia wreszcie misje dające podwójne punkty.",
         "ZATRUTE IGŁY 084 naprawdę zdejmują żetony mocy, gdy wybierasz, na kogo je założyć."
       ],
       "changes_ja": [
+        "最優先任務 004 の2倍のポイントが、カードだけでなく任務の下にも表示されます。",
+        "蛇の剣 101 が、装備する味方を選ぶ場合にも効果を失わなくなりました。",
+        "コンピューター対戦相手が、得点が2倍になる任務を考慮するようになりました。",
         "毒針 084 が、付ける相手を選んだ場合にもきちんとパワートークンを取り除くようになりました。"
       ]
     },

@@ -1,5 +1,6 @@
 import type { GameState, PlayerID, VisibleGameState } from '@/lib/engine/types';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
+import { pointsGagnesEnRemportant } from '@/lib/effects/missions/ssMissions';
 
 export type MotionSide = 'me' | 'opp';
 
@@ -82,7 +83,7 @@ export function snapFromGameState(state: GameState, me: PlayerID): MotionSnap {
     }
     return {
       wonBy: m.wonBy ? (m.wonBy === 'draw' ? 'draw' : (m.wonBy === me ? 'me' : 'opp')) : null,
-      value: m.basePoints + m.rankBonus,
+      value: pointsGagnesEnRemportant(m as never),
       powerMe,
       powerOpp,
     };
@@ -135,7 +136,7 @@ export function snapFromVisible(v: VisibleGameState): MotionSnap {
     }
     return {
       wonBy: m.wonBy ? (m.wonBy === 'draw' ? 'draw' : (m.wonBy === me ? 'me' : 'opp')) : null,
-      value: m.basePoints + m.rankBonus,
+      value: pointsGagnesEnRemportant(m as never),
       powerMe,
       powerOpp,
     };

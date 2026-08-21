@@ -7,7 +7,7 @@ interface MissionContext {
   rank: string;
   basePoints: number;
   rankBonus: number;
-  totalPoints?: number;
+  totalPoints: number;
 }
 
 interface UIStore {

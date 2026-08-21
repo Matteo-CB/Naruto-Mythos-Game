@@ -34,8 +34,7 @@ import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
 import { useBoardPalette } from './BoardPaletteContext';
 import { ChakraIcon, PowerIcon, POWER_COLOR_BRIGHT } from '@/components/icons/GameIcons';
-import { pointsAffichesDeLaMission } from '@/lib/effects/missions/ssMissions';
-import { missionPointBonus } from '@/lib/effects/handlers/SS/attachmentStatics';
+import { pointsGagnesEnRemportant } from '@/lib/effects/missions/ssMissions';
 
 interface CharacterSlotProps {
   character: VisibleCharacter;
@@ -497,7 +496,7 @@ function MissionCardDisplay({
     };
   }, [mission.attachments, dims.missionMaxW, myPlayer]);
 
-  const totalPoints = pointsAffichesDeLaMission(mission as never, missionPointBonus(mission as never));
+  const totalPoints = pointsGagnesEnRemportant(mission as never);
 
   const handleMissionContextMenu = (e: React.MouseEvent) => {
     if (!isSandboxMode) return;
@@ -832,7 +831,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
     }
   };
 
-  const totalPoints = mission.basePoints + mission.rankBonus;
+  const totalPoints = pointsGagnesEnRemportant(mission as never);
   const rankColor: Record<MissionRank, string> = {
     D: '#3e8b3e', C: '#c4a35a', B: '#b37e3e', A: '#b33e3e',
   };

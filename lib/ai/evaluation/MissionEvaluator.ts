@@ -2,6 +2,7 @@
 
 import type { GameState, PlayerID, ActiveMission } from '../../engine/types';
 import { calculateCharacterPower } from '../../engine/phases/PowerCalculation';
+import { pointsGagnesEnRemportant } from '@/lib/effects/missions/ssMissions';
 
 export class MissionEvaluator {
   
@@ -22,7 +23,7 @@ export class MissionEvaluator {
     
     if (mission.wonBy) {
       if (mission.wonBy === 'draw') return 0;
-      const missionValue = mission.basePoints + mission.rankBonus;
+      const missionValue = pointsGagnesEnRemportant(mission);
       return mission.wonBy === player ? missionValue * 1.5 : -missionValue * 1.0;
     }
 
@@ -38,7 +39,7 @@ export class MissionEvaluator {
     );
 
     const turn = state.turn ?? 1;
-    const baseMissionValue = mission.basePoints + mission.rankBonus;
+    const baseMissionValue = pointsGagnesEnRemportant(mission);
     
     
     const urgencyMultiplier = turn >= 4 ? 1.4 : turn >= 3 ? 1.2 : 1.0;
@@ -119,7 +120,7 @@ export class MissionEvaluator {
       const mission = state.activeMissions[i];
       if (mission.wonBy) continue;
 
-      const value = mission.basePoints + mission.rankBonus;
+      const value = pointsGagnesEnRemportant(mission);
       const missionScore = MissionEvaluator.evaluateSingleMission(state, mission, player);
 
       
@@ -171,7 +172,7 @@ export class MissionEvaluator {
       if (mission.wonBy) continue;
 
       const score = MissionEvaluator.evaluateSingleMission(state, mission, player);
-      const missionValue = mission.basePoints + mission.rankBonus;
+      const missionValue = pointsGagnesEnRemportant(mission);
 
       if (score > 0) {
         myProjected += missionValue;

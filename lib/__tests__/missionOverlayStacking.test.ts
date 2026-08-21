@@ -46,6 +46,11 @@ describe('what is drawn on a mission stays visible above its artwork', () => {
 
   it('the mission still prints its total value', () => {
     expect(MISSION_CARD).toContain("{totalPoints} {t('game.board.pts')}");
-    expect(FILE).toContain('const totalPoints = mission.basePoints + mission.rankBonus;');
+    const totals = FILE.match(/const totalPoints = [^\n]+/g) ?? [];
+    expect(totals.length, 'the card and the lane both print a total').toBe(2);
+    for (const ligne of totals) {
+      expect(ligne, 'a doubling mission must be worth double everywhere it is printed')
+        .toContain('pointsGagnesEnRemportant');
+    }
   });
 });

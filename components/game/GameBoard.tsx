@@ -76,7 +76,7 @@ function CardPreviewContent({
   isPinned,
 }: {
   card: CharacterCard | MissionCard;
-  missionContext: { rank: string; basePoints: number; rankBonus: number; totalPoints?: number } | null;
+  missionContext: { rank: string; basePoints: number; rankBonus: number; totalPoints: number } | null;
   isPinned: boolean;
 }) {
   const t = useTranslations();
@@ -252,7 +252,7 @@ function CardPreviewContent({
                 className="text-sm font-bold tabular-nums"
                 style={{ color: "#c4a35a" }}
               >
-                {missionContext.totalPoints ?? (missionContext.basePoints + missionContext.rankBonus)}{" "}
+                {missionContext.totalPoints}{" "}
                 {t("game.board.pts")}
               </span>
             </div>
@@ -708,7 +708,7 @@ function FullscreenCardDetail() {
               {t("card.totalPoints")}
             </span>
             <span className={`text-base font-bold tabular-nums`} style={{ color: "#c4a35a" }}>
-              {missionContext.totalPoints ?? (missionContext.basePoints + missionContext.rankBonus)} {t("game.board.pts")}
+              {missionContext.totalPoints} {t("game.board.pts")}
             </span>
           </div>
         </div>

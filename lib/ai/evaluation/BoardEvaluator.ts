@@ -5,6 +5,7 @@ import { calculateCharacterPower } from '../../engine/phases/PowerCalculation';
 import { MissionEvaluator } from './MissionEvaluator';
 import { ChakraEvaluator } from './ChakraEvaluator';
 import { getCardTier, evaluateHandSynergies, evaluateBoardSynergies, hasUpgradeTarget, isSummon, evaluateCardSynergies } from './CardTiers';
+import { pointsGagnesEnRemportant } from '@/lib/effects/missions/ssMissions';
 
 
 
@@ -121,7 +122,7 @@ export class BoardEvaluator {
         (sum, c) => sum + calculateCharacterPower(state, c, opponent), 0,
       );
 
-      const missionValue = mission.basePoints + mission.rankBonus;
+      const missionValue = pointsGagnesEnRemportant(mission);
       score += (myPower - oppPower) * missionValue * 0.35;
 
       
@@ -164,7 +165,7 @@ export class BoardEvaluator {
       const oppPower = oppChars.reduce(
         (sum, c) => sum + calculateCharacterPower(state, c, opponent), 0,
       );
-      const missionValue = mission.basePoints + mission.rankBonus;
+      const missionValue = pointsGagnesEnRemportant(mission);
 
       if (myPower === oppPower && myPower > 0) {
         tiedMissionValue += missionValue;
@@ -288,7 +289,7 @@ export class BoardEvaluator {
       const oppPower = oppChars.reduce(
         (sum, c) => sum + calculateCharacterPower(state, c, opponent), 0,
       );
-      const missionValue = mission.basePoints + mission.rankBonus;
+      const missionValue = pointsGagnesEnRemportant(mission);
 
       if (myPower > oppPower && myPower > 0) {
         const excess = myPower - oppPower - 1;

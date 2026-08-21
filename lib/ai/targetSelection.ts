@@ -2,6 +2,7 @@
 
 import type { GameState, PlayerID, CharacterInPlay, ActiveMission, PendingEffect } from '../engine/types';
 import { getCardTier, hasUpgradeTarget } from './evaluation/CardTiers';
+import { pointsGagnesEnRemportant } from '@/lib/effects/missions/ssMissions';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard' | 'impossible';
 
@@ -314,7 +315,7 @@ function hasScoreEffect(char: CharacterInPlay): boolean {
 function getMissionValue(state: GameState, missionIndex: number): number {
   const mission = state.activeMissions[missionIndex];
   if (!mission) return 0;
-  return (mission.basePoints ?? 0) + (mission.rankBonus ?? 0);
+  return pointsGagnesEnRemportant(mission);
 }
 
 
