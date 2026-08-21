@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { decideAbsenceOutcome, type AbsenceEvidence } from '@/lib/tournament/absenceDecision';
+import { decideAbsenceOutcome, type AbsenceEvidence , MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE } from '@/lib/tournament/absenceDecision';
 
 const P1 = 'user-1';
 const P2 = 'user-2';
@@ -97,12 +97,19 @@ describe('a tournament never forfeits a player the server can still see', () => 
     expect(out.kind).toBe('no-contest');
   });
 
-  it('an offline player who never showed up is still forfeited', () => {
-    const out = decideAbsenceOutcome({
+  it('an offline player who never showed up is still forfeited, but only after several checks', () => {
+    const preuve = (cycles: number) => ({
       p1: P1, p2: P2, knownAbsentPlayerId: P2, readySetPresent: true,
       readyP1: true, readyP2: false, seatBoundP1: true, seatBoundP2: false,
-      onlineP1: true, onlineP2: false, gameLive: false, cycles: 0, maxCycles: MAX,
+      onlineP1: true, onlineP2: false, gameLive: false, cycles, maxCycles: MAX,
     });
+
+    expect(
+      decideAbsenceOutcome(preuve(0)).kind,
+      'un seul controle ne suffit pas: le joueur peut naviguer vers son match',
+    ).toBe('grace');
+
+    const out = decideAbsenceOutcome(preuve(MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE));
     expect(out.kind).toBe('forfeit');
     expect(out.kind === 'forfeit' && out.players).toEqual([P2]);
   });

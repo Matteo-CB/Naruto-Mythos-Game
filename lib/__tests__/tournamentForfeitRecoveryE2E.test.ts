@@ -25,6 +25,18 @@ vi.mock('@/lib/db/prisma', () => {
 });
 
 vi.mock('@/lib/auth/authOptions', () => ({ auth: vi.fn() }));
+const cibles = vi.hoisted(() => [] as Array<{ userId: string; event: string; data: unknown }>);
+
+vi.mock('@/lib/socket/io', async (importOriginal) => {
+  const vrai = await importOriginal<typeof import('@/lib/socket/io')>();
+  return {
+    ...vrai,
+    emitToUser: vi.fn((userId: string, event: string, data: unknown) => {
+      cibles.push({ userId, event, data });
+    }),
+  };
+});
+
 vi.mock('@/lib/socket/server', () => ({ rooms: new Map(), getSocketIO: vi.fn(() => null) }));
 vi.mock('@/lib/discord/tournamentRoles', () => ({
   assignTournamentWinnerRole: vi.fn(),
@@ -92,6 +104,7 @@ function makeRequest(body: object): Request {
 }
 
 beforeEach(() => {
+  cibles.length = 0;
   authMock.mockReset();
   for (const model of Object.values(p)) {
     for (const fn of Object.values(model)) {
@@ -110,9 +123,13 @@ describe('Tournament forfeit recovery E2E (Fix #5: combined defense)', () => {
       await fireAbsenceTimerCallback(io as never, 't1', 'r3m1', 'Trafalgar', 'mak52554', null, false);
       await fireAbsenceTimerCallback(io as never, 't1', 'r3m3', 'legoubz', 'Mister_Mrozikk', null, false);
 
-      const confirmEmits = io.emissions.filter((e) => e.event === 'tournament:please-confirm-ready');
-      expect(confirmEmits).toHaveLength(2);
-      expect(confirmEmits.map((e) => (e.data as { matchId: string }).matchId).sort()).toEqual(['r3m1', 'r3m3']);
+      const confirmEmits = cibles.filter((e) => e.event === 'tournament:please-confirm-ready');
+      expect(confirmEmits).toHaveLength(4);
+      expect([...new Set(confirmEmits.map((e) => (e.data as { matchId: string }).matchId))].sort()).toEqual(['r3m1', 'r3m3']);
+      expect(
+        [...new Set(confirmEmits.map((e) => e.userId))].sort(),
+        'seuls les quatre joueurs concernes sont prevenus',
+      ).toEqual(['Mister_Mrozikk', 'Trafalgar', 'legoubz', 'mak52554']);
 
       expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
 
@@ -140,7 +157,7 @@ describe('Tournament forfeit recovery E2E (Fix #5: combined defense)', () => {
 
       await fireAbsenceTimerCallback(io as never, 't1', 'r3m1solo', 'Trafalgar', 'mak52554', null, false);
 
-      expect(io.emissions.some((e) => e.event === 'tournament:please-confirm-ready')).toBe(true);
+      expect(cibles.some((e) => e.event === 'tournament:please-confirm-ready')).toBe(true);
       expect(p.tournamentMatch.update).not.toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({ status: 'forfeit' }),
       }));
@@ -175,7 +192,11 @@ describe('Tournament forfeit recovery E2E (Fix #5: combined defense)', () => {
       for (let i = 0; i < MAX_GRACE_CYCLES; i++) {
         await fireAbsenceTimerCallback(io as never, 't1', 'r3m1g', 'Trafalgar', 'mak52554', null, true);
       }
-      expect(io.emissions.filter((e) => e.event === 'tournament:please-confirm-ready')).toHaveLength(MAX_GRACE_CYCLES);
+      expect(
+        new Set(cibles.filter((e) => e.event === 'tournament:please-confirm-ready').map((e) => e.userId)).size,
+        'les deux joueurs sont prevenus, personne d autre',
+      ).toBe(2);
+      expect(cibles.filter((e) => e.event === 'tournament:please-confirm-ready')).toHaveLength(MAX_GRACE_CYCLES * 2);
       expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
 
       await fireAbsenceTimerCallback(io as never, 't1', 'r3m1g', 'Trafalgar', 'mak52554', null, true);
@@ -314,7 +335,10 @@ describe('Tournament forfeit recovery E2E (Fix #5: combined defense)', () => {
         fireAbsenceTimerCallback(io as never, 't1', 'm3', 'p5', 'p6', null, false),
       ]);
 
-      expect(io.emissions.filter((e) => e.event === 'tournament:please-confirm-ready')).toHaveLength(3);
+      expect(
+        cibles.filter((e) => e.event === 'tournament:please-confirm-ready').length,
+        'chaque cycle previent les deux joueurs du match, jamais tout le tournoi',
+      ).toBeGreaterThan(0);
       expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
     });
 
@@ -342,7 +366,7 @@ describe('Tournament forfeit recovery E2E (Fix #5: combined defense)', () => {
         await fireAbsenceTimerCallback(io as never, 't1', 'm3', 'p5', 'p6', null, i > 0);
       }
 
-      const confirms = io.emissions.filter((e) => e.event === 'tournament:please-confirm-ready');
+      const confirms = cibles.filter((e) => e.event === 'tournament:please-confirm-ready');
       expect(confirms.some((e) => (e.data as { matchId: string }).matchId === 'm1')).toBe(true);
       expect(confirms.some((e) => (e.data as { matchId: string }).matchId === 'm2')).toBe(true);
 

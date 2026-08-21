@@ -22,6 +22,8 @@ export type AbsenceOutcome =
 
 export const MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE = 2;
 
+export const MIN_ABSENCE_SAMPLES = MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE;
+
 export interface JoinCheckEvidence {
   hostJoined: boolean;
   guestJoined: boolean;
@@ -98,7 +100,7 @@ export function decideAbsenceOutcome(ev: AbsenceEvidence): AbsenceOutcome {
     return { kind: 'noop', reason: evidenceKnown ? 'no-forfeitable' : 'unknown-evidence' };
   }
 
-  if (!evidenceKnown && ev.cycles < MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE) {
+  if (ev.cycles < MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE) {
     return { kind: 'grace' };
   }
 

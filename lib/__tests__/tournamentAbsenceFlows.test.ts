@@ -11,6 +11,18 @@ vi.mock('@/lib/db/prisma', () => {
   return { prisma: m };
 });
 
+const cibles = vi.hoisted(() => [] as Array<{ userId: string; event: string; data: unknown }>);
+
+vi.mock('@/lib/socket/io', async (importOriginal) => {
+  const vrai = await importOriginal<typeof import('@/lib/socket/io')>();
+  return {
+    ...vrai,
+    emitToUser: vi.fn((userId: string, event: string, data: unknown) => {
+      cibles.push({ userId, event, data });
+    }),
+  };
+});
+
 vi.mock('@/lib/socket/server', () => ({
   rooms: new Map(),
   getSocketIO: vi.fn(() => null),
@@ -64,6 +76,7 @@ import {
   MAX_GRACE_CYCLES,
   NO_CONTEST_HARD_CAP,
 } from '../socket/tournamentHandlers';
+import { MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE } from '../tournament/absenceDecision';
 
 const p = prisma as never as {
   tournament: { findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
@@ -103,6 +116,7 @@ function fakeIoWithConnectedUsers(tournamentId: string, connectedUserIds: string
 }
 
 beforeEach(() => {
+  cibles.length = 0;
   vi.clearAllMocks();
   p.tournament.findUnique.mockReset();
   p.tournament.update.mockReset();
@@ -435,7 +449,7 @@ describe('fireAbsenceTimerCallback (grace-period defense against mass-forfeit)',
 
     await fireAbsenceTimerCallback(io as never, 't1', 'm1', 'p1', 'p2', null, false);
 
-    const confirmEmit = io.emissions.find(e => e.event === 'tournament:please-confirm-ready');
+    const confirmEmit = cibles.find(e => e.event === 'tournament:please-confirm-ready');
     expect(confirmEmit).toBeDefined();
     expect((confirmEmit!.data as { matchId: string }).matchId).toBe('m1');
 
@@ -454,7 +468,7 @@ describe('fireAbsenceTimerCallback (grace-period defense against mass-forfeit)',
 
     await fireAbsenceTimerCallback(io as never, 't1', 'm1', 'p1', 'p2', 'p2', false);
 
-    expect(io.emissions.some(e => e.event === 'tournament:please-confirm-ready')).toBe(true);
+    expect(cibles.some(e => e.event === 'tournament:please-confirm-ready')).toBe(true);
     expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
   });
 
@@ -476,7 +490,7 @@ describe('fireAbsenceTimerCallback (grace-period defense against mass-forfeit)',
 
     await fireAbsenceTimerCallback(io as never, 't1', 'm1', 'p1', 'p2', null, false);
 
-    expect(io.emissions.some(e => e.event === 'tournament:please-confirm-ready')).toBe(false);
+    expect(cibles.some(e => e.event === 'tournament:please-confirm-ready')).toBe(false);
     expect(p.tournamentParticipant.updateMany).toHaveBeenCalledWith(expect.objectContaining({
       where: expect.objectContaining({ userId: { in: ['p1', 'p2'] } }),
       data: expect.objectContaining({ eliminated: true }),
@@ -502,7 +516,7 @@ describe('fireAbsenceTimerCallback (grace-period defense against mass-forfeit)',
     for (let i = 0; i < MAX_GRACE_CYCLES; i++) {
       await fireAbsenceTimerCallback(io as never, 't1', 'mgrace', 'p1', 'p2', null, true);
     }
-    expect(io.emissions.filter(e => e.event === 'tournament:please-confirm-ready')).toHaveLength(MAX_GRACE_CYCLES);
+    expect(cibles.filter(e => e.event === 'tournament:please-confirm-ready')).toHaveLength(MAX_GRACE_CYCLES * 2);
     expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
 
     await fireAbsenceTimerCallback(io as never, 't1', 'mgrace', 'p1', 'p2', null, true);
@@ -514,7 +528,7 @@ describe('fireAbsenceTimerCallback (grace-period defense against mass-forfeit)',
     }));
   });
 
-  it('with knownAbsentPlayerId set and that player NOT connected, forfeits only that player', async () => {
+  it('un joueur hors ligne n est disqualifie qu apres plusieurs controles, jamais au premier', async () => {
     const io = fakeIoWithConnectedUsers('t1', ['p1']);
     p.tournamentMatch.findUnique.mockResolvedValue({
       id: 'm1', tournamentId: 't1', status: 'ready',
@@ -527,8 +541,17 @@ describe('fireAbsenceTimerCallback (grace-period defense against mass-forfeit)',
     p.tournamentMatch.findMany.mockResolvedValue([]);
 
     await fireAbsenceTimerCallback(io as never, 't1', 'm1', 'p1', 'p2', 'p2', false);
+    expect(
+      p.tournamentMatch.update.mock.calls.some(
+        (appel: unknown[]) => (appel[0] as { data?: { status?: string } })?.data?.status === 'forfeit',
+      ),
+      'un seul controle ne suffit pas: un joueur qui navigue vers son match peut paraitre hors ligne une seconde',
+    ).toBe(false);
 
-    expect(io.emissions.some(e => e.event === 'tournament:please-confirm-ready')).toBe(false);
+    for (let i = 0; i < MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE + 1; i++) {
+      await fireAbsenceTimerCallback(io as never, 't1', 'm1', 'p1', 'p2', 'p2', true);
+    }
+
     expect(p.tournamentMatch.update).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ status: 'forfeit', winnerId: 'p1' }),
     }));
@@ -541,14 +564,14 @@ describe('fireAbsenceTimerCallback (grace-period defense against mass-forfeit)',
     await fireAbsenceTimerCallback(io as never, 't1', 'r3-match1', 'Trafalgar', 'mak52554', null, false);
     await fireAbsenceTimerCallback(io as never, 't1', 'r3-match3', 'legoubz', 'Mister_Mrozikk', null, false);
 
-    const confirms = io.emissions.filter(e => e.event === 'tournament:please-confirm-ready');
-    expect(confirms).toHaveLength(2);
+    const confirms = cibles.filter(e => e.event === 'tournament:please-confirm-ready');
+    expect(confirms).toHaveLength(4);
     expect(p.tournamentParticipant.updateMany).not.toHaveBeenCalled();
   });
 });
 
 describe('un match qui ne demarre jamais finit par etre tranche', () => {
-  it('apres le plafond de tentatives, le meilleur seed avance au lieu de bloquer le tournoi', async () => {
+  it('apres le plafond de tentatives, aucun joueur connecte n est disqualifie', async () => {
     const io = fakeIoWithConnectedUsers('t1', ['p1', 'p2']);
     p.tournamentMatch.findUnique.mockResolvedValue({
       id: 'mbloque', tournamentId: 't1', status: 'ready', roomCode: null, gameId: null,
@@ -565,21 +588,21 @@ describe('un match qui ne demarre jamais finit par etre tranche', () => {
     ]);
     p.tournamentMatch.findMany.mockResolvedValue([]);
 
-    for (let i = 0; i < (NO_CONTEST_HARD_CAP + 1) * (MAX_GRACE_CYCLES + 2); i++) {
+    for (let i = 0; i < (NO_CONTEST_HARD_CAP + 3) * (MAX_GRACE_CYCLES + 2); i++) {
       await fireAbsenceTimerCallback(io as never, 't1', 'mbloque', 'p1', 'p2', null, true);
-      const tranche = p.tournamentMatch.update.mock.calls.some(
-        (appel: unknown[]) => (appel[0] as { data?: { status?: string } })?.data?.status === 'forfeit',
-      );
-      if (tranche) break;
     }
 
     const forfait = p.tournamentMatch.update.mock.calls.find(
       (appel: unknown[]) => (appel[0] as { data?: { status?: string } })?.data?.status === 'forfeit',
     );
-    expect(forfait, 'le match finit par etre tranche au lieu de tourner en boucle').toBeTruthy();
     expect(
-      (forfait![0] as { data: { winnerId: string } }).data.winnerId,
-      'le meilleur seed passe, comme pour une double absence',
-    ).toBe('p1');
+      forfait,
+      'deux joueurs connectes ne doivent jamais etre disqualifies, meme si le match ne demarre pas',
+    ).toBeUndefined();
+
+    const rouvert = p.tournamentMatch.update.mock.calls.some(
+      (appel: unknown[]) => (appel[0] as { data?: { status?: string } })?.data?.status === 'ready',
+    );
+    expect(rouvert, 'le match est laisse ouvert pour que les joueurs reessaient').toBe(true);
   });
 });

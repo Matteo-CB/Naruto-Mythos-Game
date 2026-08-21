@@ -161,8 +161,14 @@ describe('tournament absence decision', () => {
     expect(out).toEqual({ kind: 'noop', reason: 'no-forfeitable' });
   });
 
-  it('forfeits the single player the server positively identified as absent', () => {
-    const out = decideAbsenceOutcome(evidence({ knownAbsentPlayerId: 'p2', onlineP1: true }));
+  it('forfeits the single player the server positively identified as absent, after the confirmation window', () => {
+    expect(
+      decideAbsenceOutcome(evidence({ knownAbsentPlayerId: 'p2', onlineP1: true, cycles: 0 })),
+      'jamais des le premier controle',
+    ).toEqual({ kind: 'grace' });
+    const out = decideAbsenceOutcome(evidence({
+      knownAbsentPlayerId: 'p2', onlineP1: true, cycles: MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE,
+    }));
     expect(out).toEqual({ kind: 'forfeit', players: ['p2'] });
   });
 
@@ -183,8 +189,13 @@ describe('tournament absence decision', () => {
     expect(out).toEqual({ kind: 'noop', reason: 'no-forfeitable' });
   });
 
-  it('still forfeits both when both are offline and readiness was recorded', () => {
-    const out = decideAbsenceOutcome(evidence({ readySetPresent: true, readyP1: false, readyP2: false }));
+  it('still forfeits both when both are offline and readiness was recorded, after the confirmation window', () => {
+    expect(
+      decideAbsenceOutcome(evidence({ readySetPresent: true, readyP1: false, readyP2: false, cycles: 0 })),
+    ).toEqual({ kind: 'grace' });
+    const out = decideAbsenceOutcome(evidence({
+      readySetPresent: true, readyP1: false, readyP2: false, cycles: MIN_ABSENCE_SAMPLES_WITHOUT_EVIDENCE,
+    }));
     expect(out).toEqual({ kind: 'forfeit', players: ['p1', 'p2'] });
   });
 

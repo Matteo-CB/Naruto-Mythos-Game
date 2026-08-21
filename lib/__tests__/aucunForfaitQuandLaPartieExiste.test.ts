@@ -126,7 +126,9 @@ describe('un match dont la partie a demarre ne peut plus etre perdu pour absence
     p.tournamentParticipant.updateMany.mockResolvedValue({ count: 1 });
     p.tournamentMatch.findMany.mockResolvedValue([]);
 
-    await fireAbsenceTimerCallback(io as never, 't1', 'm5', 'p1', 'p2', 'p2', false);
+    for (let i = 0; i < 4; i++) {
+      await fireAbsenceTimerCallback(io as never, 't1', 'm5', 'p1', 'p2', 'p2', true);
+    }
 
     expect(p.tournamentMatch.update).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ status: 'forfeit' }),
@@ -145,7 +147,9 @@ describe('un match dont la partie a demarre ne peut plus etre perdu pour absence
     p.tournamentParticipant.updateMany.mockResolvedValue({ count: 1 });
     p.tournamentMatch.findMany.mockResolvedValue([]);
 
-    await fireAbsenceTimerCallback(io as never, 't1', 'm2', 'p1', 'p2', 'p2', false);
+    for (let i = 0; i < 4; i++) {
+      await fireAbsenceTimerCallback(io as never, 't1', 'm2', 'p1', 'p2', 'p2', true);
+    }
 
     expect(p.tournamentMatch.update).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ status: 'forfeit', winnerId: 'p1' }),
