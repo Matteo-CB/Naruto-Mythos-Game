@@ -79,3 +79,9 @@ nginx/
 __pycache__/
 
 style-reference/
+
+/*.jpg
+/*.jpeg
+/*.png
+/*.webp
+/set2-effets-a-verifier.txt
