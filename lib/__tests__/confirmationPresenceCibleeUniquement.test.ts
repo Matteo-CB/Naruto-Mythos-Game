@@ -50,3 +50,32 @@ describe('un joueur connecte n est jamais disqualifie pour absence', () => {
     expect(ABSENCE_TIMEOUT_MS, 'deux minutes etaient trop courtes pour rejoindre un match').toBe(5 * 60 * 1000);
   });
 });
+
+describe('les annonces du tournoi Chunin partent dans le salon reserve', () => {
+  const TIERS = readFileSync(join(RACINE, 'lib', 'tournament', 'nwlTiers.ts'), 'utf8');
+  const PARTNER = readFileSync(join(RACINE, 'lib', 'tournament', 'nwlPartner.ts'), 'utf8');
+
+  it('le salon Chunin est declare', () => {
+    expect(PARTNER).toContain("NWL_CHUNIN_ANNOUNCE_CHANNEL_ID = '1540492429017481296'");
+  });
+
+  it('le code d acces Chunin ne part plus dans le salon general', () => {
+    const at = TIERS.indexOf('NWL_CHUNIN_TOURNAMENT_NAME, code, NWL_CHUNIN_START_HOUR)}`,');
+    expect(at, 'le message de code Chunin existe').toBeGreaterThan(-1);
+    const bloc = TIERS.slice(Math.max(0, at - 300), at);
+    expect(bloc, 'il vise le salon reserve aux Chunin').toContain('NWL_CHUNIN_ANNOUNCE_CHANNEL_ID');
+  });
+
+  it('la victoire et le rappel suivent le palier', () => {
+    expect(TIERS).toContain('function salonDuPalier(');
+    expect(TIERS).toContain('salonDuPalier(tournoi.partner)');
+    expect(TIERS).toContain('salonDuPalier(t.partner)');
+  });
+
+  it('le Genin et le Kage restent dans le salon general', () => {
+    const at = TIERS.indexOf('function salonDuPalier(');
+    const corps = TIERS.slice(at, at + 240);
+    expect(corps, 'seul le Chunin est detourne').toContain('NWL_CHUNIN_PARTNER_KEY');
+    expect(corps).toContain('NWL_ANNOUNCE_CHANNEL_ID');
+  });
+});

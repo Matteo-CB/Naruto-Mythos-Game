@@ -11,6 +11,7 @@ import {
   NWL_KAGE_ROLE_ID,
   NWL_KAGE_CHAMPIONS_MAX,
   NWL_ANNOUNCE_CHANNEL_ID,
+  NWL_CHUNIN_ANNOUNCE_CHANNEL_ID,
   NWL_LEADERBOARD_CHANNEL_ID,
   NWL_MOD_CHANNEL_ID,
   NWL_DECKS_CHANNEL_ID,
@@ -414,11 +415,15 @@ export async function diffuserCodeChunin(code: string): Promise<{ mp: number; sa
     if (ok) mp += 1;
   }
   const salon = await nwlPostMessage(
-    NWL_ANNOUNCE_CHANNEL_ID,
+    NWL_CHUNIN_ANNOUNCE_CHANNEL_ID,
     `<@&${NWL_CHUNIN_ROLE_ID}>\n${texteCodeAcces(NWL_CHUNIN_TOURNAMENT_NAME, code, NWL_CHUNIN_START_HOUR)}`,
     NWL_CHUNIN_ROLE_ID,
   );
   return { mp, salon: salon !== null };
+}
+
+function salonDuPalier(partner: string | null | undefined): string {
+  return partner === NWL_CHUNIN_PARTNER_KEY ? NWL_CHUNIN_ANNOUNCE_CHANNEL_ID : NWL_ANNOUNCE_CHANNEL_ID;
 }
 
 export async function diffuserCodeKage(code: string, now: Date = new Date()): Promise<{ mp: number; salon: boolean }> {
@@ -718,7 +723,7 @@ export async function cloturerPalierNwl(tournamentId: string): Promise<boolean> 
   const entete = role ? `<@&${role}>\n` : '';
 
   await nwlPostMessage(
-    NWL_ANNOUNCE_CHANNEL_ID,
+    salonDuPalier(tournoi.partner),
     `${entete}${texteVictoirePalier(tournoi.name, podium, recompense)}`,
     role || undefined,
   );
@@ -1002,7 +1007,7 @@ export async function rappelerLesTournoisProches(now: Date = new Date()): Promis
       poste = await nwlPostMessage(NWL_ANNOUNCE_CHANNEL_ID, `${entete}${texte}`, undefined, huit);
     } else {
       const role = t.partner === NWL_CHUNIN_PARTNER_KEY ? NWL_CHUNIN_ROLE_ID : NWL_NARUTO_MYTHOS_ROLE_ID;
-      poste = await nwlPostMessage(NWL_ANNOUNCE_CHANNEL_ID, `<@&${role}>\n${texte}`, role);
+      poste = await nwlPostMessage(salonDuPalier(t.partner), `<@&${role}>\n${texte}`, role);
     }
 
     if (poste) rappels += 1;
