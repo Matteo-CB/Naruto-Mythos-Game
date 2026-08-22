@@ -1253,6 +1253,19 @@ export async function handleSwissDoubleAbsence(io: Server, tournamentId: string,
   const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
   if (!match || match.status === 'completed' || match.status === 'forfeit') return;
 
+  if (matchEnCoursDeJeu(matchId, match.roomCode)) {
+    console.error(
+      `[Tournament] CRITICAL: refusing the double absence on match ${matchId}: the game is being played right now. Players at the board are never disqualified.`,
+    );
+    logMatchEvent({
+      type: 'match.forfeit.refused.game-live',
+      tournamentId,
+      matchId,
+      forfeitedPlayerId: null,
+    });
+    return;
+  }
+
   await prisma.tournamentMatch.update({
     where: { id: matchId },
     data: { status: 'forfeit', winnerId: null, winnerUsername: null, completedAt: new Date() },
@@ -1610,6 +1623,7 @@ export async function handleSwissMatchEnd(
             winnerId: winner.userId,
             format: 'swiss',
           });
+          awardNwlPrizeIfNeeded(tournamentId).catch(() => {});
           io.to(`tournament:${tournamentId}`).emit('tournament:completed', {
             winnerId: winner.userId,
             winnerUsername: winner.username,
@@ -1623,11 +1637,14 @@ export async function handleSwissMatchEnd(
             console.error('[Tournament] Discord role assign error:', err);
           }
           try {
-            const podium = standings.slice(0, 3).map((s, i) => ({
-              userId: s.userId,
-              username: s.username,
-              place: (i + 1) as 1 | 2 | 3,
-            }));
+            const podium = standings
+              .filter((s) => !eliminatedIds.has(s.userId))
+              .slice(0, 3)
+              .map((s, i) => ({
+                userId: s.userId,
+                username: s.username,
+                place: (i + 1) as 1 | 2 | 3,
+              }));
             await sendTournamentResults(
               tournament.name,
               podium,
@@ -1757,6 +1774,8 @@ export async function handleSwissMatchEnd(
         format: 'swiss',
       });
 
+      awardNwlPrizeIfNeeded(tournamentId).catch(() => {});
+
       try {
         emitQuestEvent('tournament.won.swiss', winner.userId);
         const isMono = await isWinnerDeckMonoVillage(tournamentId, winner.userId);
@@ -1797,11 +1816,14 @@ export async function handleSwissMatchEnd(
 
       
       try {
-        const podium = standings.slice(0, 3).map((s, i) => ({
-          userId: s.userId,
-          username: s.username,
-          place: (i + 1) as 1 | 2 | 3,
-        }));
+        const podium = standings
+          .filter((s) => !eliminatedIds.has(s.userId))
+          .slice(0, 3)
+          .map((s, i) => ({
+            userId: s.userId,
+            username: s.username,
+            place: (i + 1) as 1 | 2 | 3,
+          }));
         await sendTournamentResults(
           tournament.name,
           podium,

@@ -388,10 +388,55 @@ export function generateSwissPairings(
     }
   }
 
-  return pairings;
+  const revanches = pairings.filter(
+    (p) => p.player2 !== null && previousPairings.has(pairKey(p.player1.userId, p.player2.userId)),
+  );
+  if (revanches.length === 0) return pairings;
+
+  const bye = pairings.find((p) => p.player2 === null) ?? null;
+  const sansRevanche = apparierSansRevanche(toPair.slice(), previousPairings);
+  if (!sansRevanche) return pairings;
+
+  const refaits: SwissPairing[] = [];
+  let indexRefait = 0;
+  if (bye) refaits.push({ ...bye, matchIndex: indexRefait++ });
+  for (const [a, b] of sansRevanche) {
+    refaits.push({
+      round: roundNumber,
+      matchIndex: indexRefait++,
+      player1: playerMap.get(a)!,
+      player2: playerMap.get(b)!,
+    });
+  }
+  return refaits;
 }
 
 
+const RECHERCHE_APPARIEMENT_MAX = 200_000;
+
+export function apparierSansRevanche(
+  ordre: string[],
+  dejaJoues: Set<string>,
+): Array<[string, string]> | null {
+  let essais = 0;
+
+  function chercher(restants: string[]): Array<[string, string]> | null {
+    if (restants.length === 0) return [];
+    if (restants.length % 2 === 1) return null;
+    const premier = restants[0];
+    const autres = restants.slice(1);
+    for (let i = 0; i < autres.length; i += 1) {
+      essais += 1;
+      if (essais > RECHERCHE_APPARIEMENT_MAX) return null;
+      if (dejaJoues.has(pairKey(premier, autres[i]))) continue;
+      const suite = chercher(autres.filter((_, j) => j !== i));
+      if (suite) return [[premier, autres[i]], ...suite];
+    }
+    return null;
+  }
+
+  return chercher(ordre);
+}
 
 
 
