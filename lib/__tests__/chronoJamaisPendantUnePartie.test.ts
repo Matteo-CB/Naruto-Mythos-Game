@@ -159,7 +159,7 @@ describe('aucun mecanisme de tournoi ne cherche la partie par le seul code de sa
       "chercher la partie avec rooms.has(roomCode) remet un match EN COURS a l etat pret "
       + "des que le code stocke a derive, toutes les cinq minutes, pendant que les joueurs jouent",
     ).not.toContain('rooms.has(m.roomCode)');
-    expect(corps, 'la partie se retrouve par son match').toContain('salonDuMatch(m.id');
+    expect(corps, 'la partie se retrouve par son match').toContain('entreeDuSalonDuMatch(m.id');
   });
 
   it('la relance et la finalisation d un match bloque passent aussi par le match', () => {
@@ -224,8 +224,8 @@ describe('la garde centrale des forfaits', () => {
   });
 
   it('le salon d un autre match ne peut jamais etre pris pour celui-ci', () => {
-    const at = SOURCE.indexOf('export function salonDuMatch');
-    const corps = SOURCE.slice(at, at + 500);
+    const at = SOURCE.indexOf('export function entreeDuSalonDuMatch');
+    const corps = SOURCE.slice(at, at + 700);
     expect(
       corps,
       "accepter un salon dont l identifiant de match differe ferait passer la partie d autrui pour la sienne",

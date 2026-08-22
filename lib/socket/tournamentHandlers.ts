@@ -256,16 +256,17 @@ export async function reconcileTournamentLaunches(io: Server): Promise<void> {
   const now = Date.now();
   for (const m of pending) {
     if (!m.player1Id || !m.player2Id) continue;
-    const room = salonDuMatch(m.id, m.roomCode) ?? null;
+    const entree = entreeDuSalonDuMatch(m.id, m.roomCode);
 
-    if (room) {
+    if (entree) {
+      const room = entree.room;
       if (room.finalized) continue;
       if (room.gameState) continue;
       if (!room.tournamentInviteTimer) {
-        startMatchEntryInvites(io, m.roomCode!, m.tournamentId, m.id);
+        startMatchEntryInvites(io, entree.code, m.tournamentId, m.id);
       }
       try {
-        await reconcileTournamentRoomSeats(room, m.roomCode!, io);
+        await reconcileTournamentRoomSeats(room, entree.code, io);
       } catch (err) {
         console.error(`[Tournament] reconcile failed for match ${m.id}:`, err);
       }
@@ -307,16 +308,23 @@ function salonVivant(room: { finalized?: boolean; gameState?: { phase?: string }
   return room.gameState.phase !== 'gameOver';
 }
 
-export function salonDuMatch(matchId: string, roomCode: string | null | undefined) {
+export function entreeDuSalonDuMatch(
+  matchId: string,
+  roomCode: string | null | undefined,
+): { code: string; room: RoomData } | undefined {
   if (roomCode) {
     const parCode = rooms.get(roomCode);
-    if (parCode && parCode.tournamentMatchId === matchId) return parCode;
-    if (parCode && !parCode.tournamentMatchId && salonVivant(parCode)) return parCode;
+    if (parCode && parCode.tournamentMatchId === matchId) return { code: roomCode, room: parCode };
+    if (parCode && !parCode.tournamentMatchId && salonVivant(parCode)) return { code: roomCode, room: parCode };
   }
-  for (const [, room] of rooms) {
-    if (room.tournamentMatchId === matchId) return room;
+  for (const [code, room] of rooms) {
+    if (room.tournamentMatchId === matchId) return { code, room };
   }
   return undefined;
+}
+
+export function salonDuMatch(matchId: string, roomCode: string | null | undefined) {
+  return entreeDuSalonDuMatch(matchId, roomCode)?.room;
 }
 
 function isMatchGameLive(matchId: string, roomCode: string | null | undefined): boolean {
@@ -918,6 +926,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
 
 
 const STUCK_MATCH_HARD_TIMEOUT_MS = 35 * 60_000;
+const STUCK_MATCH_NO_PROGRESS_MS = 10 * 60_000;
 const PREGAME_STUCK_TIMEOUT_MS = 6 * 60_000;
 
 export async function reopenTournamentMatch(
@@ -1010,7 +1019,7 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
     for (const m of inProgress) {
       const startedMs = m.startedAt ? m.startedAt.getTime() : 0;
       const ageMs = Date.now() - startedMs;
-      const salon = salonDuMatch(m.id, m.roomCode);
+      const salon = entreeDuSalonDuMatch(m.id, m.roomCode);
       const roomGone = !salon;
 
       if (roomGone) {
@@ -1045,31 +1054,38 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
         continue;
       }
 
-      const liveRoom = salonDuMatch(m.id, m.roomCode) ?? null;
-      if (liveRoom && !liveRoom.gameState && !liveRoom.finalized) {
-        const started = await reconcileTournamentRoomSeats(liveRoom, m.roomCode!, io);
+      const entree = salon ? { code: salon.code, room: salon.room } : null;
+      const liveRoom = entree?.room ?? null;
+      if (entree && liveRoom && !liveRoom.gameState && !liveRoom.finalized) {
+        const started = await reconcileTournamentRoomSeats(liveRoom, entree.code, io);
         if (started || liveRoom.gameState) {
           console.log(`[Tournament] Match ${m.id}: launched by the orphan sweep reconciliation`);
           continue;
         }
         if (ageMs >= PREGAME_STUCK_TIMEOUT_MS) {
-          console.log(`[Tournament] Match ${m.id}: room ${m.roomCode} never started a game after ${Math.round(ageMs / 60_000)}min, reopening the match`);
+          console.log(`[Tournament] Match ${m.id}: room ${entree.code} never started a game after ${Math.round(ageMs / 60_000)}min, reopening the match`);
           clearTournamentInviteTimer(liveRoom);
-          rooms.delete(m.roomCode!);
+          rooms.delete(entree.code);
           await reopenTournamentMatch(io, m.tournamentId, m.id, m.player1Id, m.player2Id);
         } else if (!liveRoom.tournamentInviteTimer) {
-          startMatchEntryInvites(io, m.roomCode!, m.tournamentId, m.id);
+          startMatchEntryInvites(io, entree.code, m.tournamentId, m.id);
         }
         continue;
       }
 
       if (ageMs >= STUCK_MATCH_HARD_TIMEOUT_MS && startedMs > 0) {
-        const room = salonDuMatch(m.id, m.roomCode);
+        const room = liveRoom;
         if (!room || !room.gameState || room.finalized) continue;
         const p1Connected = !!room.hostSocket;
         const p2Connected = !!room.guestSocket;
         if (p1Connected && p2Connected) {
           console.log(`[Tournament] Stuck match ${m.id} (room ${m.roomCode}, age ${Math.round(ageMs / 60_000)}min) but both players connected; skipping force-finalize`);
+          continue;
+        }
+        const derniereAction = room.lastApplyActionAt ?? startedMs;
+        const immobileDepuis = Date.now() - derniereAction;
+        if (immobileDepuis < STUCK_MATCH_NO_PROGRESS_MS) {
+          console.log(`[Tournament] Stuck match ${m.id} (room ${m.roomCode}, age ${Math.round(ageMs / 60_000)}min) is still progressing (last action ${Math.round(immobileDepuis / 1000)}s ago); skipping force-finalize`);
           continue;
         }
         const winnerId: string | null = !p1Connected && p2Connected
@@ -1116,7 +1132,7 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
           });
         }
 
-        if (m.roomCode) finalizeAndScheduleRoomDeletion(rooms, m.roomCode);
+        if (entree) finalizeAndScheduleRoomDeletion(rooms, entree.code);
       }
     }
   } catch (err) {
