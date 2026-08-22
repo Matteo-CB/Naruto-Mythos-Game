@@ -1585,27 +1585,28 @@ export class EffectEngine {
     };
     const stateFingerprintBefore = parentWasOptional ? fingerprintPermanentState(state) : '';
 
-    
-    
-    const isMultiSelectType = pendingEffect.targetSelectionType === 'KIBA026_UPGRADE_CHOOSE'
-      || pendingEffect.targetSelectionType === 'TAYUYA065_UPGRADE_CHOOSE';
-    if (isMultiSelectType) {
-      
-      if (targetId !== 'skip' && pendingEffect.validTargets && pendingEffect.validTargets.length > 0) {
-        const indices = targetId.split(',');
-        const allValid = indices.every(idx => pendingEffect.validTargets!.includes(idx));
-        if (!allValid) {
-          console.warn(`[EffectEngine] Invalid multi-select target ${targetId} - not all in validTargets [${pendingEffect.validTargets.join(', ')}] for ${pendingEffect.targetSelectionType}`);
-          return state;
-        }
-      }
-    } else if (pendingEffect.targetSelectionType === 'REORDER_DISCARD'
+
+
+    const typesSansValidation = pendingEffect.targetSelectionType === 'REORDER_DISCARD'
       || pendingEffect.targetSelectionType === 'ORDERED_DEFEAT'
-      || pendingEffect.targetSelectionType === 'DECLARE_NUMBER') {
-      
-    } else if (pendingEffect.validTargets && pendingEffect.validTargets.length > 0 && !pendingEffect.validTargets.includes(targetId)) {
-      console.warn(`[EffectEngine] Invalid target ${targetId} - not in validTargets [${pendingEffect.validTargets.join(', ')}] for ${pendingEffect.targetSelectionType}`);
-      return state;
+      || pendingEffect.targetSelectionType === 'DECLARE_NUMBER';
+    const partiesDuChoix = typeof targetId === 'string' ? targetId.split(',') : [];
+    const choixMultiple = partiesDuChoix.length > 1;
+    const questionPosee = state.pendingActions.find((a) => a.sourceEffectId === pendingEffect.id);
+    const choixVideAutorise = targetId === 'skip' && (questionPosee?.minSelections ?? 1) === 0;
+
+    if (typesSansValidation || choixVideAutorise) {
+
+    } else if (pendingEffect.validTargets && pendingEffect.validTargets.length > 0) {
+      const invalides = partiesDuChoix.filter((part) => !pendingEffect.validTargets!.includes(part));
+      if (invalides.length > 0) {
+        console.warn(`[EffectEngine] Invalid target ${targetId} - not in validTargets [${pendingEffect.validTargets.join(', ')}] for ${pendingEffect.targetSelectionType}`);
+        return state;
+      }
+    }
+
+    if (choixMultiple && !typesSansValidation) {
+      selectedTargets = partiesDuChoix;
     }
 
     

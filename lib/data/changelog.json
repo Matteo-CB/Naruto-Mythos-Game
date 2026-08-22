@@ -1,6 +1,40 @@
 {
   "entries": [
     {
+      "date": "2026-08-23",
+      "title_fr": "Révélations multiples réparées",
+      "title_en": "Multiple reveals fixed",
+      "title_es": "Revelaciones múltiples corregidas",
+      "title_pt": "Revelações múltiplas corrigidas",
+      "title_it": "Rivelazioni multiple corrette",
+      "title_pl": "Naprawione odkrywanie wielu kart",
+      "title_ja": "複数公開の修正",
+      "categories": [
+        "fix"
+      ],
+      "changes_fr": [
+        "SAKON 037 révèle bien toutes les cartes que vous choisissez, et plus une seule."
+      ],
+      "changes_en": [
+        "SAKON 037 now reveals every card you pick, instead of only one."
+      ],
+      "changes_es": [
+        "SAKON 037 revela todas las cartas que eliges, ya no solo una."
+      ],
+      "changes_pt": [
+        "SAKON 037 revela todas as cartas que escolhes, já não apenas uma."
+      ],
+      "changes_it": [
+        "SAKON 037 rivela tutte le carte che scegli, non più una sola."
+      ],
+      "changes_pl": [
+        "SAKON 037 odkrywa wszystkie wybrane karty, a nie tylko jedną."
+      ],
+      "changes_ja": [
+        "サコン 037 が、選んだカードをすべて公開するようになりました。これまでは一枚だけでした。"
+      ]
+    },
+    {
       "date": "2026-08-22",
       "title_fr": "Tournois fiables et coûts réduits corrigés",
       "title_en": "Reliable tournaments and fixed cost reductions",
