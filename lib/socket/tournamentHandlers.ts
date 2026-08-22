@@ -373,8 +373,10 @@ export async function fireAbsenceTimerCallback(
       console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} already resolved (${m.status}), no-op`);
       return;
     }
-    if (m?.gameId && (await partieEncoreVivante(matchId, m.gameId, m.roomCode))) {
-      console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} is being played in game ${m.gameId}, absence forfeit cancelled`);
+    const partieEnCours = isMatchGameLive(matchId, m?.roomCode)
+      || (!!m?.gameId && (await partieEncoreVivante(matchId, m.gameId, m.roomCode)));
+    if (partieEnCours) {
+      console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} is being played, absence forfeit cancelled`);
       clearAbsenceTimer(matchId);
       matchGraceCycles.delete(matchId);
       return;
@@ -936,7 +938,7 @@ export async function reopenTournamentMatch(
         return;
       }
     }
-    const liveRoom = previousRoomCode ? rooms.get(previousRoomCode) : null;
+    const liveRoom = salonDuMatch(matchId, previousRoomCode);
     if (liveRoom?.gameState && !liveRoom.finalized) {
       console.warn(`[Tournament] reopenTournamentMatch: refusing to reopen ${matchId}, its game is running in room ${previousRoomCode}.`);
       return;

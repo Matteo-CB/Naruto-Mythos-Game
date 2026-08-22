@@ -171,3 +171,29 @@ describe('aucun mecanisme de tournoi ne cherche la partie par le seul code de sa
     expect(SOURCE, 'aucun rappel ne repose sur le seul code').not.toContain('m.roomCode ? rooms.get(m.roomCode) : null');
   });
 });
+
+describe('le controle d absence connait la partie sans passer par la base', () => {
+  const SOURCE = (() => {
+    const { readFileSync } = require('fs') as typeof import('fs');
+    const { join } = require('path') as typeof import('path');
+    return readFileSync(join(__dirname, '..', 'socket', 'tournamentHandlers.ts'), 'utf8');
+  })();
+
+  it('la sortie anticipee ne depend plus de l identifiant de partie en base', () => {
+    const at = SOURCE.indexOf('export async function fireAbsenceTimerCallback');
+    const corps = SOURCE.slice(at, at + 2600);
+    expect(
+      corps,
+      "une partie de tournoi ne cree sa ligne en base qu a la fin, donc exiger un identifiant de partie "
+      + "rendait ce garde-fou inerte pendant toute la partie: le chrono d absence continuait de tourner",
+    ).not.toContain('if (m?.gameId && (await partieEncoreVivante(');
+    expect(corps, 'la partie en memoire suffit a arreter le chrono').toContain('isMatchGameLive(matchId, m?.roomCode)');
+  });
+
+  it('la reouverture d un match refuse de toucher une partie en cours', () => {
+    const at = SOURCE.indexOf('export async function reopenTournamentMatch');
+    const corps = SOURCE.slice(at, at + 2600);
+    expect(corps, 'la partie vivante se retrouve par le match').toContain('salonDuMatch(matchId, previousRoomCode)');
+    expect(corps).not.toContain('previousRoomCode ? rooms.get(previousRoomCode) : null');
+  });
+});
