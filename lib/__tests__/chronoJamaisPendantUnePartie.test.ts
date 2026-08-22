@@ -197,3 +197,38 @@ describe('le controle d absence connait la partie sans passer par la base', () =
     expect(corps).not.toContain('previousRoomCode ? rooms.get(previousRoomCode) : null');
   });
 });
+
+describe('la garde centrale des forfaits', () => {
+  const SOURCE = (() => {
+    const { readFileSync } = require('fs') as typeof import('fs');
+    const { join } = require('path') as typeof import('path');
+    return readFileSync(join(__dirname, '..', 'socket', 'tournamentHandlers.ts'), 'utf8');
+  })();
+
+  it('aucun forfait ne passe pendant que la partie du match se joue', () => {
+    const at = SOURCE.indexOf('export async function handleMatchForfeit');
+    const corps = SOURCE.slice(at, at + 1400);
+    expect(
+      corps,
+      "c est le dernier rempart: quel que soit l appelant, un joueur assis a la table ne perd pas son match",
+    ).toContain('matchEnCoursDeJeu(matchId, match.roomCode)');
+    expect(corps).toContain('match.forfeit.refused.game-live');
+  });
+
+  it('la garde laisse passer les etapes d avant partie', () => {
+    const at = SOURCE.indexOf('const PHASES_HORS_PARTIE');
+    const corps = SOURCE.slice(at, at + 320);
+    for (const phase of ['setup', 'mulligan', 'gameOver']) {
+      expect(corps, `${phase} n est pas une partie en cours`).toContain(`'${phase}'`);
+    }
+  });
+
+  it('le salon d un autre match ne peut jamais etre pris pour celui-ci', () => {
+    const at = SOURCE.indexOf('export function salonDuMatch');
+    const corps = SOURCE.slice(at, at + 500);
+    expect(
+      corps,
+      "accepter un salon dont l identifiant de match differe ferait passer la partie d autrui pour la sienne",
+    ).toContain('!parCode.tournamentMatchId && salonVivant(parCode)');
+  });
+});

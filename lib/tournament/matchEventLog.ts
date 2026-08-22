@@ -2,6 +2,7 @@ type MatchEventType =
   | 'match.advance'
   | 'match.advance.bye'
   | 'match.forfeit.absence'
+  | 'match.forfeit.refused.game-live'
   | 'match.forfeit.disconnect'
   | 'match.forfeit.admin'
   | 'match.forfeit.double'

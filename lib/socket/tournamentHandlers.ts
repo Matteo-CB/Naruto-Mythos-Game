@@ -311,7 +311,7 @@ export function salonDuMatch(matchId: string, roomCode: string | null | undefine
   if (roomCode) {
     const parCode = rooms.get(roomCode);
     if (parCode && parCode.tournamentMatchId === matchId) return parCode;
-    if (parCode && salonVivant(parCode)) return parCode;
+    if (parCode && !parCode.tournamentMatchId && salonVivant(parCode)) return parCode;
   }
   for (const [, room] of rooms) {
     if (room.tournamentMatchId === matchId) return room;
@@ -321,6 +321,15 @@ export function salonDuMatch(matchId: string, roomCode: string | null | undefine
 
 function isMatchGameLive(matchId: string, roomCode: string | null | undefined): boolean {
   return salonVivant(salonDuMatch(matchId, roomCode));
+}
+
+const PHASES_HORS_PARTIE = new Set(['setup', 'mulligan', 'gameOver']);
+
+export function matchEnCoursDeJeu(matchId: string, roomCode: string | null | undefined): boolean {
+  const salon = salonDuMatch(matchId, roomCode);
+  if (!salonVivant(salon)) return false;
+  const phase = salon?.gameState?.phase;
+  return !!phase && !PHASES_HORS_PARTIE.has(phase);
 }
 
 function seatBoundInMatchRoom(
@@ -1274,6 +1283,19 @@ export async function handleSwissDoubleAbsence(io: Server, tournamentId: string,
 export async function handleMatchForfeit(io: Server, tournamentId: string, matchId: string, forfeitPlayerId: string) {
   const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
   if (!match || match.status === 'completed' || match.status === 'forfeit') return;
+
+  if (matchEnCoursDeJeu(matchId, match.roomCode)) {
+    console.error(
+      `[Tournament] CRITICAL: refusing to forfeit ${forfeitPlayerId} on match ${matchId}: the game is being played right now. A player at the board is never disqualified.`,
+    );
+    logMatchEvent({
+      type: 'match.forfeit.refused.game-live',
+      tournamentId,
+      matchId,
+      forfeitedPlayerId: forfeitPlayerId,
+    });
+    return;
+  }
 
   const winnerId = match.player1Id === forfeitPlayerId ? match.player2Id : match.player1Id;
   const winnerUsername = match.player1Id === forfeitPlayerId ? match.player2Username : match.player1Username;
