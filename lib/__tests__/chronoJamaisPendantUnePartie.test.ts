@@ -138,3 +138,36 @@ describe('rien n est annonce avant la fin reelle du bracket', () => {
     expect(bloc).toContain('return;');
   });
 });
+
+describe('aucun mecanisme de tournoi ne cherche la partie par le seul code de salon', () => {
+  const SOURCE = (() => {
+    const { readFileSync } = require('fs') as typeof import('fs');
+    const { join } = require('path') as typeof import('path');
+    return readFileSync(join(__dirname, '..', 'socket', 'tournamentHandlers.ts'), 'utf8');
+  })();
+
+  function bloc(ancre: string, longueur: number): string {
+    const at = SOURCE.indexOf(ancre);
+    expect(at, `ancre introuvable: ${ancre}`).toBeGreaterThan(-1);
+    return SOURCE.slice(at, at + longueur);
+  }
+
+  it('le balayage des matchs orphelins retrouve la partie par le match', () => {
+    const corps = bloc('export async function sweepOrphanTournamentMatches', 3000);
+    expect(
+      corps,
+      "chercher la partie avec rooms.has(roomCode) remet un match EN COURS a l etat pret "
+      + "des que le code stocke a derive, toutes les cinq minutes, pendant que les joueurs jouent",
+    ).not.toContain('rooms.has(m.roomCode)');
+    expect(corps, 'la partie se retrouve par son match').toContain('salonDuMatch(m.id');
+  });
+
+  it('la relance et la finalisation d un match bloque passent aussi par le match', () => {
+    const corps = bloc('export async function sweepOrphanTournamentMatches', 3000);
+    expect(corps, 'aucune lecture directe du salon par son code').not.toContain('rooms.get(m.roomCode)');
+  });
+
+  it('le rappel de presence lit le salon du match', () => {
+    expect(SOURCE, 'aucun rappel ne repose sur le seul code').not.toContain('m.roomCode ? rooms.get(m.roomCode) : null');
+  });
+});

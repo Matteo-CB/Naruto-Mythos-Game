@@ -256,7 +256,7 @@ export async function reconcileTournamentLaunches(io: Server): Promise<void> {
   const now = Date.now();
   for (const m of pending) {
     if (!m.player1Id || !m.player2Id) continue;
-    const room = m.roomCode ? rooms.get(m.roomCode) : null;
+    const room = salonDuMatch(m.id, m.roomCode) ?? null;
 
     if (room) {
       if (room.finalized) continue;
@@ -999,7 +999,8 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
     for (const m of inProgress) {
       const startedMs = m.startedAt ? m.startedAt.getTime() : 0;
       const ageMs = Date.now() - startedMs;
-      const roomGone = !m.roomCode || !rooms.has(m.roomCode);
+      const salon = salonDuMatch(m.id, m.roomCode);
+      const roomGone = !salon;
 
       if (roomGone) {
         if (ageMs < 60_000) continue;
@@ -1033,7 +1034,7 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
         continue;
       }
 
-      const liveRoom = m.roomCode ? rooms.get(m.roomCode) : null;
+      const liveRoom = salonDuMatch(m.id, m.roomCode) ?? null;
       if (liveRoom && !liveRoom.gameState && !liveRoom.finalized) {
         const started = await reconcileTournamentRoomSeats(liveRoom, m.roomCode!, io);
         if (started || liveRoom.gameState) {
@@ -1051,8 +1052,8 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
         continue;
       }
 
-      if (ageMs >= STUCK_MATCH_HARD_TIMEOUT_MS && m.roomCode && startedMs > 0) {
-        const room = rooms.get(m.roomCode);
+      if (ageMs >= STUCK_MATCH_HARD_TIMEOUT_MS && startedMs > 0) {
+        const room = salonDuMatch(m.id, m.roomCode);
         if (!room || !room.gameState || room.finalized) continue;
         const p1Connected = !!room.hostSocket;
         const p2Connected = !!room.guestSocket;
@@ -1104,7 +1105,7 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
           });
         }
 
-        finalizeAndScheduleRoomDeletion(rooms, m.roomCode);
+        if (m.roomCode) finalizeAndScheduleRoomDeletion(rooms, m.roomCode);
       }
     }
   } catch (err) {
