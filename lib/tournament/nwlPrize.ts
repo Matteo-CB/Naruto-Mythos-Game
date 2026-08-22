@@ -38,6 +38,15 @@ export async function awardNwlPrizeIfNeeded(tournamentId: string): Promise<void>
       return;
     }
 
+    const encoreOuverts = tournament.matches.filter((m) =>
+      !!m.player1Id && !!m.player2Id && m.status !== 'completed' && m.status !== 'forfeit');
+    if (encoreOuverts.length > 0) {
+      console.log(
+        `[NWL] ${encoreOuverts.length} match(es) still open for ${tournamentId}, nothing is announced before the bracket is really finished`,
+      );
+      return;
+    }
+
     const prizeIds = buildEliminationPrizeUserIds(tournament as unknown as TournamentData);
     if (prizeIds.length === 0) return;
 

@@ -300,30 +300,45 @@ export function clearTournamentMatchTimers(matchId: string): void {
   matchReadyPlayers.delete(matchId);
 }
 
-function isMatchGameLive(roomCode: string | null | undefined): boolean {
-  if (!roomCode) return false;
-  const room = rooms.get(roomCode);
+function salonVivant(room: { finalized?: boolean; gameState?: { phase?: string } | null } | undefined): boolean {
   if (!room) return false;
   if (room.finalized) return false;
   if (!room.gameState) return false;
   return room.gameState.phase !== 'gameOver';
 }
 
+export function salonDuMatch(matchId: string, roomCode: string | null | undefined) {
+  if (roomCode) {
+    const parCode = rooms.get(roomCode);
+    if (parCode && parCode.tournamentMatchId === matchId) return parCode;
+    if (parCode && salonVivant(parCode)) return parCode;
+  }
+  for (const [, room] of rooms) {
+    if (room.tournamentMatchId === matchId) return room;
+  }
+  return undefined;
+}
+
+function isMatchGameLive(matchId: string, roomCode: string | null | undefined): boolean {
+  return salonVivant(salonDuMatch(matchId, roomCode));
+}
+
 function seatBoundInMatchRoom(
   io: Server,
+  matchId: string,
   roomCode: string | null | undefined,
   userId: string | null,
 ): boolean {
-  if (!roomCode || !userId) return false;
-  const room = rooms.get(roomCode);
+  if (!userId) return false;
+  const room = salonDuMatch(matchId, roomCode);
   if (!room) return false;
   if (room.hostId === userId) return isSeatSocketAlive(room, 'player1', io);
   if (room.guestId === userId) return isSeatSocketAlive(room, 'player2', io);
   return false;
 }
 
-async function partieEncoreVivante(gameId: string, roomCode: string | null | undefined): Promise<boolean> {
-  if (roomCode && isMatchGameLive(roomCode)) return true;
+async function partieEncoreVivante(matchId: string, gameId: string, roomCode: string | null | undefined): Promise<boolean> {
+  if (isMatchGameLive(matchId, roomCode)) return true;
   try {
     const partie = await prisma.game.findUnique({ where: { id: gameId }, select: { status: true } });
     if (!partie) return false;
@@ -358,7 +373,7 @@ export async function fireAbsenceTimerCallback(
       console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} already resolved (${m.status}), no-op`);
       return;
     }
-    if (m?.gameId && (await partieEncoreVivante(m.gameId, m.roomCode))) {
+    if (m?.gameId && (await partieEncoreVivante(matchId, m.gameId, m.roomCode))) {
       console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} is being played in game ${m.gameId}, absence forfeit cancelled`);
       clearAbsenceTimer(matchId);
       matchGraceCycles.delete(matchId);
@@ -393,11 +408,11 @@ export async function fireAbsenceTimerCallback(
     readySetPresent: !!ready,
     readyP1: !!ready?.has(p1),
     readyP2: !!p2 && !!ready?.has(p2),
-    seatBoundP1: seatBoundInMatchRoom(io, currentRoomCode, p1),
-    seatBoundP2: seatBoundInMatchRoom(io, currentRoomCode, p2 || null),
+    seatBoundP1: seatBoundInMatchRoom(io, matchId, currentRoomCode, p1),
+    seatBoundP2: seatBoundInMatchRoom(io, matchId, currentRoomCode, p2 || null),
     onlineP1: reachableP1,
     onlineP2: reachableP2,
-    gameLive: isMatchGameLive(currentRoomCode),
+    gameLive: isMatchGameLive(matchId, currentRoomCode),
     cycles,
     maxCycles: MAX_GRACE_CYCLES,
   });
