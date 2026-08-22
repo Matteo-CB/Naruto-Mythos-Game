@@ -14,9 +14,15 @@
         "fix",
         "fix",
         "fix",
+        "fix",
+        "fix",
+        "fix",
         "feature"
       ],
       "changes_fr": [
+        "Un tour suisse ne vous refait plus affronter le même adversaire quand un autre appariement est possible.",
+        "Le podium d un tournoi suisse n annonce plus un joueur sorti pour absence.",
+        "Dans un tournoi suisse, deux joueurs en pleine partie ne sont plus déclarés absents tous les deux.",
         "Le compte à rebours d absence s arrête dès que votre partie de tournoi commence.",
         "Un match de tournoi en cours n est plus remis à zéro pendant que vous jouez.",
         "FUGAKU UCHIWA 058 ne cherche plus que de vrais Uchiwa, KIN TSUCHI n en fait pas partie.",
@@ -24,6 +30,9 @@
         "L annonce du tournoi Chûnin part dans le salon Discord réservé aux joueurs qui ont le tag."
       ],
       "changes_en": [
+        "A Swiss round no longer pairs you against the same opponent when another pairing is possible.",
+        "The podium of a Swiss tournament no longer announces a player who was removed for absence.",
+        "In a Swiss tournament, two players in the middle of a game are no longer both declared absent.",
         "The absence countdown stops as soon as your tournament game begins.",
         "A tournament match in progress is no longer reset while you are playing.",
         "FUGAKU UCHIHA 058 only searches for real Uchiha, KIN TSUCHI is not one of them.",
@@ -31,6 +40,9 @@
         "The Chunin tournament announcement goes to the Discord channel reserved for tag holders."
       ],
       "changes_es": [
+        "Una ronda suiza ya no te empareja con el mismo rival cuando existe otro emparejamiento posible.",
+        "El podio de un torneo suizo ya no anuncia a un jugador excluido por ausencia.",
+        "En un torneo suizo, dos jugadores en plena partida ya no son declarados ausentes ambos.",
         "La cuenta atrás por ausencia se detiene en cuanto empieza tu partida de torneo.",
         "Una partida de torneo en curso ya no se reinicia mientras estás jugando.",
         "FUGAKU UCHIHA 058 solo busca auténticos Uchiha, KIN TSUCHI no lo es.",
@@ -38,6 +50,9 @@
         "El anuncio del torneo Chunin se envía al canal de Discord reservado a quienes tienen la etiqueta."
       ],
       "changes_pt": [
+        "Uma ronda suíça deixa de te emparelhar com o mesmo adversário quando existe outro emparelhamento possível.",
+        "O pódio de um torneio suíço deixa de anunciar um jogador excluído por ausência.",
+        "Num torneio suíço, dois jogadores a meio de uma partida deixam de ser ambos declarados ausentes.",
         "A contagem decrescente por ausência para assim que a tua partida de torneio começa.",
         "Uma partida de torneio a decorrer deixa de ser reiniciada enquanto estás a jogar.",
         "FUGAKU UCHIHA 058 só procura verdadeiros Uchiha, KIN TSUCHI não é um deles.",
@@ -45,6 +60,9 @@
         "O anúncio do torneio Chunin vai para o canal de Discord reservado a quem tem a etiqueta."
       ],
       "changes_it": [
+        "Un turno svizzero non ti fa più affrontare lo stesso avversario quando esiste un altro accoppiamento.",
+        "Il podio di un torneo svizzero non annuncia più un giocatore escluso per assenza.",
+        "In un torneo svizzero, due giocatori in piena partita non vengono più dichiarati entrambi assenti.",
         "Il conto alla rovescia per assenza si ferma appena inizia la tua partita di torneo.",
         "Una partita di torneo in corso non viene più azzerata mentre stai giocando.",
         "FUGAKU UCHIHA 058 cerca solo veri Uchiha, KIN TSUCHI non lo è.",
@@ -52,6 +70,9 @@
         "L annuncio del torneo Chunin arriva nel canale Discord riservato a chi ha il tag."
       ],
       "changes_pl": [
+        "Runda systemu szwajcarskiego nie kojarzy cię już z tym samym przeciwnikiem, gdy możliwe jest inne parowanie.",
+        "Podium turnieju szwajcarskiego nie ogłasza już gracza usuniętego za nieobecność.",
+        "W turnieju szwajcarskim dwoje graczy w trakcie partii nie jest już uznawanych za nieobecnych.",
         "Odliczanie nieobecności zatrzymuje się, gdy tylko zacznie się twoja partia turniejowa.",
         "Trwający mecz turniejowy nie jest już resetowany, gdy grasz.",
         "FUGAKU UCHIHA 058 szuka już tylko prawdziwych Uchiha, KIN TSUCHI nim nie jest.",
@@ -59,6 +80,9 @@
         "Ogłoszenie turnieju Chunin trafia na kanał Discord zarezerwowany dla graczy z tagiem."
       ],
       "changes_ja": [
+        "スイス式のラウンドで、別の組み合わせが可能なときに同じ相手と再戦することはなくなりました。",
+        "スイス式大会の表彰台に、不在で除外された選手が並ぶことはなくなりました。",
+        "スイス式大会で、対戦中の二人がそろって不在扱いになることはなくなりました。",
         "大会の対戦が始まった時点で、不在のカウントダウンが止まります。",
         "進行中の大会の対戦が、プレイ中にやり直しになることはなくなりました。",
         "うちはフガク 058 は本物のうちは一族だけを探します。ツチ キンは含まれません。",
