@@ -8,9 +8,8 @@ import {
   texteRecompenseGenin,
 } from '@/lib/tournament/nwlTiers';
 import { NWL_FIRST_PLACE_STORE_CREDIT_GBP } from '@/lib/tournament/weeklySchedule';
-import { buildEliminationPrizeUserIds } from '@/lib/tournament/resultsView';
+import { podiumDesRecompenses } from '@/lib/tournament/prizePodium';
 import { MAIN_BRACKET, THIRD_PLACE_BRACKET } from '@/lib/tournament/tournamentEngine';
-import type { TournamentData } from '@/stores/tournamentStore';
 
 export async function awardNwlPrizeIfNeeded(tournamentId: string): Promise<void> {
   try {
@@ -47,7 +46,7 @@ export async function awardNwlPrizeIfNeeded(tournamentId: string): Promise<void>
       return;
     }
 
-    const prizeIds = buildEliminationPrizeUserIds(tournament as unknown as TournamentData);
+    const prizeIds = await podiumDesRecompenses(tournamentId);
     if (prizeIds.length === 0) return;
 
     const users = await prisma.user.findMany({

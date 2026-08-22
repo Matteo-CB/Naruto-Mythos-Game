@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db/prisma';
+import { podiumDesRecompenses, matchsEncoreOuverts } from '@/lib/tournament/prizePodium';
 import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
 import { parisDateParts, parisWallToUtc } from '@/lib/tournament/dailyTournament';
 import { NWL_REG_OPEN_HOUR } from '@/lib/tournament/nwlFridayTournament';
@@ -34,8 +35,6 @@ import {
   type NwlPodiumEntry,
 } from '@/lib/tournament/nwlPartner';
 import { lireTagsChunin, lireJoninAccordes, ecrireJoninAccordes } from '@/lib/tournament/nwlChuninEarned';
-import { buildEliminationPrizeUserIds } from '@/lib/tournament/resultsView';
-import type { TournamentData } from '@/stores/tournamentStore';
 import {
   NWL_FIRST_PLACE_STORE_CREDIT_GBP,
   NWL_CHUNIN_PODIUM_PLACES,
@@ -90,6 +89,7 @@ interface SpecPalier {
   startHour: number;
   leadHours: number;
   bestOf: number;
+  format: 'swiss' | 'elimination';
   note: string;
 }
 
@@ -100,6 +100,7 @@ const SPEC_CHUNIN: SpecPalier = {
   startHour: NWL_CHUNIN_START_HOUR,
   leadHours: NWL_TIER_LEAD_HOURS,
   bestOf: 1,
+  format: 'swiss',
   note: [
     'New World Loot weekly Saturday tournament, reserved to players holding the Chunin role.',
     `Rewards. First place wins £${NWL_CHUNIN_STORE_CREDIT_GBP} of store credit, offered by New World Loot.`,
@@ -116,6 +117,7 @@ const SPEC_KAGE: SpecPalier = {
   startHour: NWL_KAGE_START_HOUR,
   leadHours: NWL_KAGE_LEAD_HOURS,
   bestOf: NWL_KAGE_BEST_OF,
+  format: 'elimination',
   note: [
     `New World Loot monthly tournament, best of ${NWL_KAGE_BEST_OF}, reserved to the ${NWL_KAGE_STANDINGS_SLOTS} best players of last month Chunin standings, plus the reigning champion who defends the title.`,
     'Rewards. First place wins a sealed box of Naruto Mythos, offered by New World Loot, and keeps the Kage role.',
@@ -156,7 +158,7 @@ async function creerTournoiPrive(
     data: {
       name: spec.name,
       type: 'simulator',
-      format: 'elimination',
+      format: spec.format,
       status: 'registration',
       gameMode: 'classic',
       maxPlayers: spec.maxPlayers,
@@ -697,14 +699,23 @@ export async function cloturerPalierNwl(tournamentId: string): Promise<boolean> 
   if (tournoi.status !== 'completed' || !tournoi.winnerId) return false;
   if (tournoi.partnerPrizeAwarded) return false;
 
+  const matchs = await prisma.tournamentMatch.findMany({
+    where: { tournamentId },
+    select: { player1Id: true, player2Id: true, status: true, round: true, winnerId: true, isBye: true },
+  });
+  const ouverts = matchsEncoreOuverts(matchs);
+  if (ouverts > 0) {
+    console.log(`[NWL] ${ouverts} match(s) encore ouvert(s) sur ${tournamentId}, rien n est annonce avant la fin reelle`);
+    return false;
+  }
+
   const reserve = await prisma.tournament.updateMany({
     where: { id: tournamentId, partnerPrizeAwarded: false },
     data: { partnerPrizeAwarded: true },
   });
   if (reserve.count !== 1) return false;
 
-  const complet = await prisma.tournament.findUnique({ where: { id: tournamentId }, include: { matches: true } });
-  const places = complet ? buildEliminationPrizeUserIds(complet as unknown as TournamentData) : [];
+  const places = await podiumDesRecompenses(tournamentId);
   const joueurs = await prisma.user.findMany({
     where: { id: { in: places.map((p) => p.userId) } },
     select: { id: true, username: true, discordId: true },
@@ -896,7 +907,7 @@ export async function creerChuninApresGenin(now: Date = new Date()): Promise<Nwl
     data: {
       name: SPEC_CHUNIN.name,
       type: 'simulator',
-      format: 'elimination',
+      format: SPEC_CHUNIN.format,
       status: 'registration',
       gameMode: 'classic',
       maxPlayers: SPEC_CHUNIN.maxPlayers,
