@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeCheck';
+import { bestFreshPlayCost } from '@/lib/effects/handlers/KS/shared/summonSearch';
 
 
 
@@ -18,7 +19,7 @@ function sakura109MainHandler(ctx: EffectContext): EffectResult {
       const canFreshFull = playerState.chakra >= card.chakra;
       const canUpgradeFull = canAffordAsUpgrade(state, sourcePlayer, card as { name_fr: string; chakra: number }, 0);
       
-      const freshCost2 = Math.max(0, card.chakra - 2);
+      const freshCost2 = bestFreshPlayCost(state, sourcePlayer, card as never, 2);
       const canFresh2 = playerState.chakra >= freshCost2;
       const canUpgrade2 = canAffordAsUpgrade(state, sourcePlayer, card as { name_fr: string; chakra: number }, 2);
       if (canFreshFull || canUpgradeFull || canFresh2 || canUpgrade2) {

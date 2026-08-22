@@ -2,8 +2,11 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
+import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 
 
+
+export const KABUTO_053_REDUCTION = 3;
 
 function handleKabuto053Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
@@ -74,15 +77,15 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     };
   }
 
-  const reducedCost = Math.max(0, (topCard.chakra ?? 0) - 3);
-  const canAffordFresh = playerState.chakra >= reducedCost;
-
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
+  let reducedCost = Math.max(0, (topCard.chakra ?? 0) - KABUTO_053_REDUCTION);
   const validMissions: string[] = [];
   for (let mi = 0; mi < state.activeMissions.length; mi++) {
     const chars = state.activeMissions[mi][friendlySide];
+    const prixEffectif = calculateEffectiveCost(state, sourcePlayer, topCard as never, mi, false);
+    const prixFrais = Math.max(0, prixEffectif - KABUTO_053_REDUCTION);
 
     const hasNameConflict = chars.some((c) => {
       if (c.isHidden) return false;
@@ -99,12 +102,13 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
       const isFlex = checkFlexibleUpgrade(topCard as any, tc)
         && (topCard.chakra ?? 0) > (tc.chakra ?? 0);
       if (!isSameName && !isFlex) return false;
-      const upgradeCost = Math.max(0, ((topCard.chakra ?? 0) - (tc.chakra ?? 0)) - 3);
+      const upgradeCost = Math.max(0, (prixEffectif - (tc.chakra ?? 0)) - KABUTO_053_REDUCTION);
       return playerState.chakra >= upgradeCost;
     });
 
-    if (hasUpgradeTarget || (!hasNameConflict && canAffordFresh)) {
+    if (hasUpgradeTarget || (!hasNameConflict && playerState.chakra >= prixFrais)) {
       validMissions.push(String(mi));
+      reducedCost = Math.min(reducedCost, prixFrais);
     }
   }
 

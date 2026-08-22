@@ -63,6 +63,7 @@ import { SAKON_037_ID, SAKON_037_NAME, enemiesUnderCost } from './handlers/SS/sa
 import { KIDOMARU_035_ID, KIDOMARU_035_NAME, KIDOMARU_035_LOG, movableUnderCost } from './handlers/SS/kidomaru035';
 import { OROCHIMARU_130_ID, OROCHIMARU_130_NAME, leafEnemiesIn } from './handlers/SS/orochimaru130';
 import { KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
+import { KABUTO_053_REDUCTION } from './handlers/KS/uncommon/kabuto053';
 import { kabuto139PiocheEtDefausse } from './ContinuousEffects';
 import { OROCHIMARU_127_ID, OROCHIMARU_127_NAME } from './handlers/SS/orochimaru127';
 import { KIMIMARO_077_ID, KIMIMARO_077_NAME, kimimaro077Targets, costOfTarget } from './handlers/SS/kimimaro077';
@@ -81,7 +82,7 @@ import { grantEdge } from '../engine/rules/edge';
 import { calculateEffectiveCost } from '../engine/rules/ChakraValidation';
 import { canAffordAsUpgrade } from './handlers/KS/shared/upgradeCheck';
 import { moveCharTo, getValidMissions, applyUpgradePowerup } from './handlers/KS/rare/sasuke107';
-import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard, findHiddenSoundVillageOnBoard, findAffordableSoundVillageInHand } from './handlers/KS/shared/summonSearch';
+import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard, findHiddenSoundVillageOnBoard, findAffordableSoundVillageInHand, bestFreshPlayCost, effectiveRevealCost } from './handlers/KS/shared/summonSearch';
 import { isCharacterCopyable, isCopyableCharacter, isCopyableEffect } from './handlers/KS/shared/copyExclusions';
 import { annoncerRevelationPublique, annoncerRevelationSs002, apercuRevele } from './publicReveal';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
@@ -5372,13 +5373,14 @@ export class EffectEngine {
           break;
         }
 
-        const kb053mReducedCost = Math.max(0, (kb053mTopCard.chakra ?? 0) - 3);
-        const kb053mCanAffordFresh = kb053mPs.chakra >= kb053mReducedCost;
+        let kb053mReducedCost = Math.max(0, (kb053mTopCard.chakra ?? 0) - KABUTO_053_REDUCTION);
 
         const kb053mFriendlySide = kb053mPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
         const kb053mValidMissions: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
           const mChars = newState.activeMissions[i][kb053mFriendlySide];
+          const kb053mPrix = calculateEffectiveCost(newState, kb053mPlayer, kb053mTopCard as never, i, false);
+          const kb053mFrais = Math.max(0, kb053mPrix - KABUTO_053_REDUCTION);
           const hasSameName = mChars.some((c: CharacterInPlay) => {
             if (c.isHidden) return false;
             const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
@@ -5395,11 +5397,12 @@ export class EffectEngine {
               && (kb053mTopCard.chakra ?? 0) > (cTop.chakra ?? 0);
             if (!isSameName && !isFlex) return false;
             
-            const upgCost = Math.max(0, ((kb053mTopCard.chakra ?? 0) - (cTop.chakra ?? 0)) - 3);
+            const upgCost = Math.max(0, (kb053mPrix - (cTop.chakra ?? 0)) - KABUTO_053_REDUCTION);
             return kb053mPs.chakra >= upgCost;
           });
-          if (canUpgrade || (!hasSameName && kb053mCanAffordFresh)) {
+          if (canUpgrade || (!hasSameName && kb053mPs.chakra >= kb053mFrais)) {
             kb053mValidMissions.push(String(i));
+            kb053mReducedCost = Math.min(kb053mReducedCost, kb053mFrais);
           }
         }
 
@@ -9148,7 +9151,7 @@ export class EffectEngine {
             if (c.card_type !== 'character') return false;
             const hasSummon = (c.keywords ?? []).some((k: string) => k.toLowerCase().includes('invocation') || k.toLowerCase().includes('summon'));
             if (!hasSummon) return false;
-            return j105Chakra >= Math.max(0, (c.chakra ?? 0) - 3);
+            return j105Chakra >= bestFreshPlayCost(newState, j105Player, c as never, 3);
           })
           .map(({ i }) => String(i));
         
@@ -11612,7 +11615,7 @@ export class EffectEngine {
           
           const s109HasAffordable = s109PS.discardPile.some((c) => {
             if (c.card_type !== 'character' || c.group !== 'Leaf Village') return false;
-            if (s109PS.chakra >= Math.max(0, (c.chakra ?? 0) - 2)) return true;
+            if (s109PS.chakra >= bestFreshPlayCost(newState, s109Player, c as never, 2)) return true;
             return canAffordAsUpgrade(newState, s109Player, c as any, 2);
           });
           if (!s109HasAffordable) {
@@ -11706,7 +11709,7 @@ export class EffectEngine {
           .filter(({ c }) => {
             if (c.card_type !== 'character' || c.group !== 'Leaf Village') return false;
             
-            if (s109uPS.chakra >= Math.max(0, (c.chakra ?? 0) - 2)) return true;
+            if (s109uPS.chakra >= bestFreshPlayCost(newState, s109uPlayer, c as never, 2)) return true;
             
             return canAffordAsUpgrade(newState, s109uPlayer, c as any, 2);
           })
@@ -17497,7 +17500,7 @@ export class EffectEngine {
               { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card_h002.name_fr });
             break;
           }
-          const freshCost_h002 = Math.max(0, card_h002.chakra - 1);
+          const freshCost_h002 = Math.max(0, calculateEffectiveCost(newState, player_h002, card_h002, mi_h002, false) - 1);
           if (ps_h002.chakra < freshCost_h002) break;
           ps_h002.chakra -= freshCost_h002;
           ps_h002.hand.splice(ci_h002, 1);
@@ -18486,7 +18489,8 @@ export class EffectEngine {
           const existingTC = upgradeTarget_k78.stack?.length > 0 ? upgradeTarget_k78.stack[upgradeTarget_k78.stack?.length - 1] : upgradeTarget_k78.card;
           revealCost_k78 = Math.max(0, ((topCard_k78.chakra ?? 0) - (existingTC.chakra ?? 0)) - 1);
         } else {
-          revealCost_k78 = Math.max(0, (topCard_k78.chakra ?? 0) - 1);
+          revealCost_k78 = effectiveRevealCost(newState, pendingEffect.sourcePlayer, charResult_k78.character, mIdx_k78, 1)
+            ?? Math.max(0, (topCard_k78.chakra ?? 0) - 1);
         }
         const ps_k78 = { ...newState[pendingEffect.sourcePlayer] };
         if (ps_k78.chakra < revealCost_k78) break; // can't afford
@@ -18599,7 +18603,8 @@ export class EffectEngine {
           const existingTC_k78r = upgradeTarget_k78r.stack?.length > 0 ? upgradeTarget_k78r.stack[upgradeTarget_k78r.stack?.length - 1] : upgradeTarget_k78r.card;
           revealCost_k78r = Math.max(0, ((topCard_k78r.chakra ?? 0) - (existingTC_k78r.chakra ?? 0)) - 1);
         } else {
-          revealCost_k78r = Math.max(0, (topCard_k78r.chakra ?? 0) - 1);
+          revealCost_k78r = effectiveRevealCost(newState, pendingEffect.sourcePlayer, charResult_k78r.character, mIdx_k78r, 1)
+            ?? Math.max(0, (topCard_k78r.chakra ?? 0) - 1);
         }
 
         const ps_k78r = { ...newState[pendingEffect.sourcePlayer] };
@@ -19131,7 +19136,7 @@ export class EffectEngine {
         
         const friendlySide = player === 'player1' ? 'player1Characters' : 'player2Characters';
         const validMissions: string[] = [];
-        let minCost = Math.max(0, card.chakra - 1); // fresh play baseline
+        let minCost = Math.max(0, calculateEffectiveCost(newState, player, card, 0, false) - 1); // fresh play baseline
         for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
           const mission = newState.activeMissions[mIdx];
           const chars_h002 = mission[friendlySide];
@@ -19151,7 +19156,7 @@ export class EffectEngine {
             
           }
           if (!h002MissionAdded && !hasSameNameConflict(chars_h002, card)) {
-            const freshCost = Math.max(0, card.chakra - 1);
+            const freshCost = Math.max(0, calculateEffectiveCost(newState, player, card, mIdx, false) - 1);
             if (ps.chakra >= freshCost) {
               validMissions.push(String(mIdx));
               minCost = Math.min(minCost, freshCost);
@@ -22558,6 +22563,7 @@ export class EffectEngine {
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
+    const prixEffectifK053 = calculateEffectiveCost(newState, player, card as never, missionIdx, false);
     const missions = [...newState.activeMissions];
     const mission = { ...missions[missionIdx] };
 
@@ -22580,7 +22586,7 @@ export class EffectEngine {
         const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         if (isSameName || isFlex) {
 
-          const upgCost = Math.max(0, ((card.chakra ?? 0) - (cTop.chakra ?? 0)) - 3);
+          const upgCost = Math.max(0, (prixEffectifK053 - (cTop.chakra ?? 0)) - 3);
           if (ps.chakra >= upgCost) upgradeTargetIds_k053.push(c.instanceId);
         }
       }
@@ -22657,7 +22663,7 @@ export class EffectEngine {
 
       
       const existingTop_k053 = existing.stack?.length > 0 ? existing.stack[existing.stack?.length - 1] : existing.card;
-      const actualCost = Math.max(0, ((card.chakra ?? 0) - (existingTop_k053.chakra ?? 0)) - 3);
+      const actualCost = Math.max(0, (prixEffectifK053 - (existingTop_k053.chakra ?? 0)) - 3);
       if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
       ps.chakra -= actualCost;
       newState.log = logAction(
@@ -22682,7 +22688,7 @@ export class EffectEngine {
       }
 
       
-      const actualCost_fresh = Math.max(0, (card.chakra ?? 0) - 3);
+      const actualCost_fresh = Math.max(0, prixEffectifK053 - 3);
       if (ps.chakra < actualCost_fresh) { ps.discardPile.push(card); return state; }
       ps.chakra -= actualCost_fresh;
 
@@ -22818,6 +22824,7 @@ export class EffectEngine {
     }
 
     
+    const prixEffectifH002 = calculateEffectiveCost(newState, player, card, missionIndex, false);
     let actualCost: number;
     if (existingIdx >= 0) {
       const existing_h002 = mission[friendlySide_h002][existingIdx];
@@ -22825,9 +22832,9 @@ export class EffectEngine {
       const existingTop_h002 = existStack_h002p.length > 0
         ? existStack_h002p[existStack_h002p.length - 1]
         : existing_h002.card;
-      actualCost = Math.max(0, (card.chakra - (existingTop_h002?.chakra ?? 0)) - 1);
+      actualCost = Math.max(0, (prixEffectifH002 - (existingTop_h002?.chakra ?? 0)) - 1);
     } else {
-      actualCost = Math.max(0, card.chakra - 1);
+      actualCost = Math.max(0, prixEffectifH002 - 1);
     }
     if (ps.chakra < actualCost) return state;
 
