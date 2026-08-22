@@ -313,3 +313,50 @@ describe('les joueurs sortis en cours de route ne cassent pas les tours suivants
     });
   }
 });
+
+describe('la recherche d appariement reste rapide, meme dans le pire cas', () => {
+  it('trente deux joueurs avec un historique enorme repondent en un instant', async () => {
+    const { apparierSansRevanche } = await import('@/lib/tournament/swissEngine');
+    const ids = Array.from({ length: 32 }, (_, i) => `u${i}`);
+
+    const tout = new Set<string>();
+    for (let i = 0; i < ids.length; i += 1) {
+      for (let j = i + 1; j < ids.length; j += 1) {
+        tout.add([ids[i], ids[j]].sort().join('|'));
+      }
+    }
+    const debut = Date.now();
+    expect(apparierSansRevanche(ids, tout), 'tout le monde a joue contre tout le monde').toBeNull();
+    expect(Date.now() - debut, 'la recherche doit rendre la main tout de suite').toBeLessThan(2000);
+
+    const presque = new Set(tout);
+    presque.delete([ids[0], ids[1]].sort().join('|'));
+    const debut2 = Date.now();
+    const solution = apparierSansRevanche(ids, presque);
+    expect(Date.now() - debut2, 'meme quand une seule solution partielle existe').toBeLessThan(2000);
+    expect(solution, 'une seule paire libre ne suffit pas a apparier trente deux joueurs').toBeNull();
+  });
+
+  it('un historique realiste trouve toujours une solution', async () => {
+    const { apparierSansRevanche } = await import('@/lib/tournament/swissEngine');
+    const ids = Array.from({ length: 32 }, (_, i) => `u${i}`);
+    const joues = new Set<string>();
+    for (let tour = 0; tour < 4; tour += 1) {
+      for (let i = 0; i < ids.length; i += 2) {
+        const a = ids[(i + tour) % ids.length];
+        const b = ids[(i + 1 + tour) % ids.length];
+        joues.add([a, b].sort().join('|'));
+      }
+    }
+    const debut = Date.now();
+    const solution = apparierSansRevanche(ids, joues);
+    expect(solution, 'apres quatre tours il reste largement de quoi apparier').not.toBeNull();
+    expect(solution!.length).toBe(16);
+    const vus = solution!.flat();
+    expect(new Set(vus).size, 'chacun une seule fois').toBe(32);
+    for (const [a, b] of solution!) {
+      expect(joues.has([a, b].sort().join('|')), `${a} vs ${b} est une revanche`).toBe(false);
+    }
+    expect(Date.now() - debut).toBeLessThan(2000);
+  });
+});

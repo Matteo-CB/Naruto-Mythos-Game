@@ -314,3 +314,55 @@ describe('la double absence suisse ne peut pas frapper une partie en cours', () 
     expect(partage.evenements.map((e) => e.type)).toContain('match.forfeit.double');
   });
 });
+
+describe('deux matchs qui finissent en meme temps ne creent pas deux fois le tour suivant', () => {
+  function tournoiTourUnFini() {
+    const matchs = [
+      match({ id: 'm1', round: 1, player1Id: 'a', player1Username: 'A', player2Id: 'b', player2Username: 'B', winnerId: 'a' }),
+      match({ id: 'm2', round: 1, player1Id: 'c', player1Username: 'C', player2Id: 'd', player2Username: 'D', winnerId: 'c' }),
+    ];
+    let tourCourant = 1;
+    let tourDeuxCree = false;
+
+    p.tournamentMatch.findMany.mockImplementation(async (args: { where?: { status?: string; round?: number } }) => {
+      if (args?.where?.status === 'ready') return [];
+      if (args?.where?.round === 1) return matchs;
+      return matchs;
+    });
+    p.tournamentMatch.findFirst.mockImplementation(async () => (tourDeuxCree ? { id: 'm3' } : null));
+    p.tournamentMatch.createMany.mockImplementation(async () => { tourDeuxCree = true; return { count: 2 }; });
+    p.tournament.update.mockImplementation(async (args: { data?: { currentRound?: number } }) => {
+      if (typeof args?.data?.currentRound === 'number') tourCourant = args.data.currentRound;
+      return {};
+    });
+    p.tournament.findUnique.mockImplementation(async () => ({
+      id: 't-swiss', name: 'Suisse', format: 'swiss', status: 'in_progress',
+      currentRound: tourCourant, totalRounds: 2, isPublic: true,
+      participants: participants(['a', 'b', 'c', 'd']), matches: matchs,
+    }));
+  }
+
+  it('en sequence, le second appel ne recree rien', async () => {
+    tournoiTourUnFini();
+    const io = fauxIo();
+
+    await handleSwissMatchEnd(io as never, 't-swiss', { round: 1, matchIndex: 0 });
+    await handleSwissMatchEnd(io as never, 't-swiss', { round: 1, matchIndex: 1 });
+
+    expect(p.tournamentMatch.createMany, 'le tour 2 n est cree qu une fois').toHaveBeenCalledTimes(1);
+  });
+
+  it('en simultane, le verrou de tour tient', async () => {
+    tournoiTourUnFini();
+    const io = fauxIo();
+
+    await Promise.all([
+      handleSwissMatchEnd(io as never, 't-swiss', { round: 1, matchIndex: 0 }),
+      handleSwissMatchEnd(io as never, 't-swiss', { round: 1, matchIndex: 1 }),
+    ]);
+
+    expect(p.tournamentMatch.createMany, 'un seul tour 2 malgre deux fins simultanees').toHaveBeenCalledTimes(1);
+    const passages = io.emissions.filter((e) => e.event === 'tournament:round-complete');
+    expect(passages.length, 'un seul passage de tour annonce').toBe(1);
+  });
+});
