@@ -4,6 +4,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { confirmFirst } from './confirmFirst';
 import { apercuDeCartes } from './deckPreview';
+import { estDuClanUchiha } from '@/lib/effects/nameMatch';
 
 export interface FouilleDeDeck {
   id: string;
@@ -25,7 +26,7 @@ export const FOUILLES: FouilleDeDeck[] = [
     id: 'SS-058-UC',
     nom: 'FUGAKU UCHIWA',
     profondeur: 3,
-    accepte: (c) => `${c.name_fr ?? ''} ${c.name_en ?? ''}`.toUpperCase().includes('UCHI'),
+    accepte: (c) => estDuClanUchiha(c),
     refus: 'no Uchiha-named character among the top 3 cards.',
   },
   {
